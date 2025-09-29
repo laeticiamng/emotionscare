@@ -10,7 +10,9 @@ import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from '@/components/ui/sonner';
 import { MusicProvider } from '@/contexts/MusicContext';
 import { MoodProvider } from '@/contexts/MoodContext';
+import { AccessibilityProvider } from '@/components/common/AccessibilityProvider';
 import { NotificationProvider } from '@/components/ui/notification-system';
+import RootErrorBoundary from '@/components/error/RootErrorBoundary';
 
 interface AppProvidersProps {
   children: React.ReactNode;
@@ -24,38 +26,42 @@ interface AppProvidersProps {
 const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
   return (
     <HelmetProvider>
-      <ErrorProvider>
-        <ThemeProvider defaultTheme="light" storageKey="emotions-care-theme">
-          <NotificationProvider>
-            <SimpleAuthProvider>
-              <AuthProvider>
-                <UserModeProvider>
-                  <MoodProvider>
-                    <UnifiedProvider>
-                      <MusicProvider>
-                        {children}
-                        <Toaster
-                          position="top-right"
-                          className="toaster group"
-                          closeButton
-                          toastOptions={{
-                            classNames: {
-                              toast: "group-[.toaster]:bg-card group-[.toaster]:text-card-foreground group-[.toaster]:border-border group-[.toaster]:shadow-premium",
-                              description: "group-[.toast]:text-muted-foreground",
-                              actionButton: "group-[.toast]:bg-primary group-[.toast]:text-primary-foreground",
-                              cancelButton: "group-[.toast]:bg-muted group-[.toast]:text-muted-foreground",
-                            },
-                          }}
-                        />
-                      </MusicProvider>
-                    </UnifiedProvider>
-                  </MoodProvider>
-                </UserModeProvider>
-              </AuthProvider>
-            </SimpleAuthProvider>
-          </NotificationProvider>
-        </ThemeProvider>
-      </ErrorProvider>
+      <RootErrorBoundary>
+        <ErrorProvider>
+          <AccessibilityProvider>
+            <ThemeProvider defaultTheme="light" storageKey="emotions-care-theme">
+              <NotificationProvider>
+                <SimpleAuthProvider>
+                  <AuthProvider>
+                    <UserModeProvider>
+                      <MoodProvider>
+                        <UnifiedProvider>
+                          <MusicProvider>
+                            {children}
+                            <Toaster
+                              position="top-right"
+                              className="toaster group"
+                              closeButton
+                              toastOptions={{
+                                classNames: {
+                                  toast: "group-[.toaster]:bg-card group-[.toaster]:text-card-foreground group-[.toaster]:border-border group-[.toaster]:shadow-premium",
+                                  description: "group-[.toast]:text-muted-foreground",
+                                  actionButton: "group-[.toast]:bg-primary group-[.toast]:text-primary-foreground",
+                                  cancelButton: "group-[.toast]:bg-muted group-[.toast]:text-muted-foreground",
+                                },
+                              }}
+                            />
+                          </MusicProvider>
+                        </UnifiedProvider>
+                      </MoodProvider>
+                    </UserModeProvider>
+                  </AuthProvider>
+                </SimpleAuthProvider>
+              </NotificationProvider>
+            </ThemeProvider>
+          </AccessibilityProvider>
+        </ErrorProvider>
+      </RootErrorBoundary>
     </HelmetProvider>
   );
 };

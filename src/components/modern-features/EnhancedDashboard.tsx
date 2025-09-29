@@ -547,4 +547,4 @@ const EnhancedDashboard: React.FC = () => {
   );
 };
 
-export default EnhancedDashboard; // Fixed export
+export default EnhancedDashboard;

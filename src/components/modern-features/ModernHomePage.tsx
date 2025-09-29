@@ -218,7 +218,7 @@ const ModernHomePage: React.FC = () => {
       )}
       
       {/* Page d'accueil unifiée originale */}
-      <UnifiedHomePage />
+      <UnifiedHomePage variant="full" />
 
       {/* Section fonctionnalités modernes (pour tous les utilisateurs) */}
       <div className="bg-gradient-to-b from-muted/20 to-background py-16">
