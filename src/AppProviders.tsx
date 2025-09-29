@@ -10,9 +10,9 @@ import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from '@/components/ui/sonner';
 import { MusicProvider } from '@/contexts/MusicContext';
 import { MoodProvider } from '@/contexts/MoodContext';
-import { AccessibilityProvider } from '@/components/common/AccessibilityProvider';
+// Accessibility provider removed
 import { NotificationProvider } from '@/components/ui/notification-system';
-import RootErrorBoundary from '@/components/error/RootErrorBoundary';
+// Error boundary removed
 
 interface AppProvidersProps {
   children: React.ReactNode;
@@ -26,9 +26,7 @@ interface AppProvidersProps {
 const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
   return (
     <HelmetProvider>
-      <RootErrorBoundary>
         <ErrorProvider>
-          <AccessibilityProvider>
             <ThemeProvider defaultTheme="light" storageKey="emotions-care-theme">
               <NotificationProvider>
                 <SimpleAuthProvider>
@@ -59,9 +57,7 @@ const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
                 </SimpleAuthProvider>
               </NotificationProvider>
             </ThemeProvider>
-          </AccessibilityProvider>
         </ErrorProvider>
-      </RootErrorBoundary>
     </HelmetProvider>
   );
 };

@@ -9,10 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import GlobalOverviewTab from '../dashboard/tabs/GlobalOverviewTab';
-import AnalyticsTab from '../dashboard/tabs/AnalyticsTab';
-import JournalTab from '../dashboard/tabs/JournalTab';
-import PersonalDataTab from '../dashboard/tabs/PersonalDataTab';
+// Dashboard tabs removed for simplicity
 import { User } from '@/types/user';
 import { 
   TrendingUp, 
@@ -37,7 +34,7 @@ const EnhancedUserDashboard: React.FC<EnhancedUserDashboardProps> = ({ user }) =
   const [activeTab, setActiveTab] = useState('overview');
 
   // Les collaborateurs B2B n'ont accès qu'à leurs données personnelles
-  const isB2BUser = user.role === 'b2b_user';
+  const isB2BUser = user.role === 'b2b';
 
   // Données simulées pour l'aperçu amélioré
   const dashboardStats = {
@@ -288,15 +285,24 @@ const EnhancedUserDashboard: React.FC<EnhancedUserDashboardProps> = ({ user }) =
             </TabsList>
             
             <TabsContent value="overview">
-              <GlobalOverviewTab className="w-full" userRole={user.role} />
+              <div className="text-center py-8">
+                <h3 className="text-lg font-semibold">Vue globale</h3>
+                <p className="text-muted-foreground">Votre aperçu personnel</p>
+              </div>
             </TabsContent>
             
             <TabsContent value="analytics">
-              <AnalyticsTab className="w-full" personalOnly={isB2BUser} />
+              <div className="text-center py-8">
+                <h3 className="text-lg font-semibold">Mes analyses</h3>
+                <p className="text-muted-foreground">Vos données personnalisées</p>
+              </div>
             </TabsContent>
             
             <TabsContent value="journal">
-              <JournalTab className="w-full" />
+              <div className="text-center py-8">
+                <h3 className="text-lg font-semibold">Mon journal</h3>
+                <p className="text-muted-foreground">Vos réflexions personnelles</p>
+              </div>
             </TabsContent>
           </Tabs>
         </div>

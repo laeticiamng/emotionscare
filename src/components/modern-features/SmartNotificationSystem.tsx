@@ -117,7 +117,7 @@ const SmartNotificationSystem: React.FC = () => {
 
   const [activeTab, setActiveTab] = useState('all');
 
-  const getNotificationIcon = (type: string) => {
+  const getNotificationIcon = (type: 'achievement' | 'reminder' | 'social' | 'system' | 'goal' | 'wellness') => {
     switch (type) {
       case 'achievement': return <Award className="h-4 w-4 text-yellow-500" />;
       case 'reminder': return <Clock className="h-4 w-4 text-blue-500" />;
@@ -364,7 +364,7 @@ const SmartNotificationSystem: React.FC = () => {
                   {Object.entries(settings).slice(0, 6).map(([key, value]) => (
                     <div key={key} className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        {getNotificationIcon(key)}
+                        {getNotificationIcon(key as 'achievement' | 'reminder' | 'social' | 'system' | 'goal' | 'wellness')}
                         <span className="text-sm capitalize">
                           {key === 'achievements' ? 'Succès' :
                            key === 'reminders' ? 'Rappels' :
