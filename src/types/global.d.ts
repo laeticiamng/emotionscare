@@ -3,6 +3,8 @@ declare global {
   // Windows extensions
   interface Window {
     gtag?: (...args: any[]) => void;
+    SpeechRecognition?: new () => SpeechRecognition;
+    webkitSpeechRecognition?: new () => SpeechRecognition;
   }
   
   // All types as any for maximum compatibility
@@ -21,21 +23,20 @@ declare global {
   
   interface SidebarContext {
     state: "open" | "closed";
-    collapsed?: boolean;
+    collapsed: boolean;
     [key: string]: any;
   }
   
-  // Fix AccessibilityIssue to be an object, not an array
+  // AccessibilityIssue as audit report object
   interface AccessibilityIssue {
     score: number;
-    compliance: {
-      level: string;
-      wcag: string[];
-    };
+    compliance: string;
     issues: Array<{
       id: string;
       impact: string;
-      description: string;
+      message: string;
+      rule: string;
+      element?: string;
     }>;
     passedRules: Array<{
       id: string;
@@ -47,17 +48,34 @@ declare global {
   interface MusicContext {
     activateMusicForEmotion: (params: EmotionMusicParams) => Promise<MusicPlaylist>;
     searchExistingTracks: (emotion: string) => Promise<MusicTrack[]>;
-    getEmotionMusicDescription?: (emotion: string) => string;
+    getEmotionMusicDescription: (emotion: string) => string;
     therapeuticMode: boolean;
     [key: string]: any;
   }
   
   interface AmbitionRun {
-    quests?: any[];
-    objective?: string;
-    tags?: string[];
-    metadata?: any;
-    artifacts?: any[];
+    quests: Array<{
+      id: string;
+      title: string;
+      flavor: string;
+      status: 'available' | 'in_progress' | 'completed';
+      xp_reward: number;
+      est_minutes: number;
+      completed_at?: string;
+      result?: string;
+    }>;
+    objective: string;
+    tags: string[];
+    metadata: {
+      totalXp: number;
+      [key: string]: any;
+    };
+    artifacts: Array<{
+      id: string;
+      name: string;
+      icon: string;
+      rarity: string;
+    }>;
     [key: string]: any;
   }
   
@@ -66,7 +84,7 @@ declare global {
     title: string;
     artist: string;
     url: string;
-    audioUrl: string;
+    audioUrl?: string;
     duration: number;
     [key: string]: any;
   }
@@ -90,9 +108,9 @@ declare global {
     startListening: () => void;
     stopListening: () => void;
     resetTranscript: () => void;
-    toggleListening?: () => void;
-    supported?: boolean;
-    lastCommand?: string;
+    toggleListening: () => void;
+    supported: boolean;
+    lastCommand: string;
   }
   
   // Audio Player interfaces
@@ -106,12 +124,27 @@ declare global {
     seek: (time: number) => void;
     setVolume: React.Dispatch<React.SetStateAction<number>>;
     setDuration: React.Dispatch<React.SetStateAction<number>>;
-    setTrack?: (track: MusicTrack) => void;
-    setCurrentTime?: React.Dispatch<React.SetStateAction<number>>;
+    setTrack: (track: MusicTrack) => void;
+    setCurrentTime: React.Dispatch<React.SetStateAction<number>>;
   }
   
   // Make Routes available as both type and value
-  const Routes: any;
+  const Routes: {
+    home: () => string;
+    scan: () => string;
+    music: () => string;
+    coach: () => string;
+    journal: () => string;
+    vr: () => string;
+    consumerHome: () => string;
+    employeeHome: () => string;
+    managerHome: () => string;
+    teams: () => string;
+    adminReports: () => string;
+    adminEvents: () => string;
+    settingsGeneral: () => string;
+    [key: string]: any;
+  };
 }
 
 // Make all modules work

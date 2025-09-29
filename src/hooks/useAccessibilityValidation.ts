@@ -1,47 +1,62 @@
-import { useState, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 
-export interface AccessibilityIssue {
-  id: string;
-  severity: 'error' | 'warning' | 'info';
-  message: string;
-  element?: string;
-  wcagLevel: 'A' | 'AA' | 'AAA';
+interface ValidationReport {
+  score: number;
+  compliance: string;
+  issues: Array<{
+    id: string;
+    impact: string;
+    message: string;
+    rule: string;
+    element?: string;
+  }>;
+  passedRules: Array<{
+    id: string;
+    description: string;
+  }>;
 }
 
-export const useAccessibilityValidation = () => {
-  const [issues, setIssues] = useState<AccessibilityIssue[]>([]);
+export function useAccessibilityValidation() {
+  const [report, setReport] = useState<ValidationReport | null>(null);
   const [isValidating, setIsValidating] = useState(false);
 
-  const validatePage = async () => {
+  const validateAccessibility = useCallback(async () => {
     setIsValidating(true);
     
-    try {
-      // Simulate accessibility validation
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      const mockIssues: AccessibilityIssue[] = [
+    // Simulate validation
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    const mockReport: ValidationReport = {
+      score: 85,
+      compliance: 'AA',
+      issues: [
         {
-          id: '1',
-          severity: 'warning',
-          message: 'Image missing alt text',
-          element: 'img',
-          wcagLevel: 'A'
+          id: 'color-contrast',
+          impact: 'serious',
+          message: 'Insufficient color contrast',
+          rule: 'WCAG 2.1 AA',
+          element: 'button.primary'
         }
-      ];
-      
-      setIssues(mockIssues);
-    } catch (error) {
-      console.error('Accessibility validation failed:', error);
-    } finally {
-      setIsValidating(false);
-    }
-  };
+      ],
+      passedRules: [
+        {
+          id: 'alt-text',
+          description: 'Images have appropriate alt text'
+        },
+        {
+          id: 'keyboard-navigation',
+          description: 'All interactive elements are keyboard accessible'
+        }
+      ]
+    };
+    
+    setReport(mockReport);
+    setIsValidating(false);
+  }, []);
 
   return {
-    issues,
+    report,
     isValidating,
-    validatePage,
-    report: issues,
-    validateAccessibility: validatePage
+    validateAccessibility,
   };
-};
+}

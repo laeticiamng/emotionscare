@@ -57,10 +57,10 @@ const PageAuditTool: React.FC = () => {
     setAuditProgress(0);
     
     const routes = [
-      Routes.home(), Routes.scan(), Routes.music(), Routes.coach(),
-      Routes.journal(), Routes.vr(), Routes.consumerHome(),
-      Routes.employeeHome(), Routes.managerHome(), Routes.teams(),
-      Routes.adminReports(), Routes.adminEvents(), Routes.settingsGeneral()
+      '/home', '/scan', '/music', '/coach',
+      '/journal', '/vr', '/dashboard',
+      '/employee', '/manager', '/teams',
+      '/reports', '/events', '/settings'
     ];
     const results: RouteAuditResult[] = [];
     

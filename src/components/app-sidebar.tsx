@@ -58,7 +58,8 @@ interface NavigationGroup {
 }
 
 export function AppSidebar() {
-  const { collapsed } = useSidebar();
+  const { state } = useSidebar();
+  const collapsed = state === 'closed';
   const location = useLocation();
   const currentPath = location.pathname;
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
@@ -256,7 +257,9 @@ export function AppSidebar() {
           <SidebarGroup key={group.label}>
             {!collapsed && (
               <SidebarGroupLabel className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 flex items-center">
-                {group.icon && <group.icon className="w-4 h-4 mr-2" />}
+                {group.icon && (
+                  <group.icon className="w-4 h-4 mr-2" />
+                )}
                 {group.label}
               </SidebarGroupLabel>
             )}
