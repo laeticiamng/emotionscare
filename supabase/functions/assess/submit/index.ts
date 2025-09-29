@@ -149,7 +149,7 @@ function computeWHO5(values: number[]) {
 }
 
 function computeSTAI6(values: number[]) {
-  const inverted = new Set([1, 3, 5]);
+  const inverted = new Set([0, 2, 4]);
   const corrected = values.map((value, index) => (inverted.has(index) ? 5 - value : value));
   const sum = corrected.reduce((acc, value) => acc + value, 0);
   return { score_scaled: scale(sum, 6, 24) };
