@@ -35,7 +35,9 @@ const EnhancedCoachChat: React.FC<EnhancedCoachChatProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { generateText } = useOpenAI();
-  const { transcript, isRecording, startRecordingAndTranscribe, stopRecording } = useWhisper();
+  const { transcribeAudio, isTranscribing, error } = useWhisper();
+  const [isRecording, setIsRecording] = useState(false);
+  const [transcript, setTranscript] = useState('');
   
   useEffect(() => {
     // Add initial message
@@ -132,7 +134,7 @@ const EnhancedCoachChat: React.FC<EnhancedCoachChatProps> = ({
   
   const handleStartRecording = async () => {
     try {
-      await startRecordingAndTranscribe();
+      setIsRecording(true);
       toast.info("Enregistrement en cours... Parlez maintenant.");
     } catch (error) {
       console.error('Error starting recording:', error);
@@ -141,7 +143,7 @@ const EnhancedCoachChat: React.FC<EnhancedCoachChatProps> = ({
   };
   
   const handleStopRecording = () => {
-    stopRecording();
+    setIsRecording(false);
     toast.success("Enregistrement terminé.");
   };
   

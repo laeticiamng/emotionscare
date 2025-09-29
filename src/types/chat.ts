@@ -4,20 +4,23 @@ export interface ChatMessage {
   text: string;
   content: string;
   conversationId: string;
-  sender: 'user' | 'assistant' | 'system';
-  timestamp: string;
+  sender: 'user' | 'assistant' | 'system' | 'coach';
+  role?: 'user' | 'assistant' | 'system';
+  timestamp: string | Date;
   type?: 'text' | 'image' | 'audio';
   metadata?: Record<string, any>;
+  isLoading?: boolean;
 }
 
 export interface ChatConversation {
   id: string;
   title: string;
   messages: ChatMessage[];
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: Date | string;
+  updatedAt: Date | string;
   userId: string;
   isActive?: boolean;
+  lastMessage?: ChatMessage | string;
 }
 
 export interface ChatResponse {

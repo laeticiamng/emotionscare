@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Loader2, Key, Save, RefreshCw, ExternalLink } from 'lucide-react';
+import { Loader2, Key, Save, RefreshCw, ExternalLink } from '@/lib/icons';
 import ApiStatus from './ApiStatus';
 import { API_URL } from '@/lib/env';
 

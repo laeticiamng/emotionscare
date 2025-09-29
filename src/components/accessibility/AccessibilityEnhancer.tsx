@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Eye, Keyboard, Volume2, Type, Contrast } from 'lucide-react';
+import { Eye, Keyboard, Volume2, Type, Contrast } from '@/lib/icons';
 import {
   safeClassAdd,
   safeClassRemove,

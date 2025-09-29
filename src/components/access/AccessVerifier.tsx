@@ -14,7 +14,7 @@ import {
   User,
   Settings,
   Zap
-} from 'lucide-react';
+} from '@/lib/icons';
 import { useNavigate } from 'react-router-dom';
 
 interface AccessRule {

@@ -1,13 +1,31 @@
 /// <reference types="react" />
 /// <reference types="react-dom" />
 
-declare module "*.tsx" {
-  import React from 'react';
-  const component: React.ComponentType<any>;
-  export default component;
+// Removed universal module declarations that interfere with lucide-react
+
+// Global window types and universal type overrides
+declare global {
+  interface Window {
+    SpeechRecognition: any;
+    webkitSpeechRecognition: any;
+    [key: string]: any;
+  }
+  
+  var SpeechRecognition: any;
+  var webkitSpeechRecognition: any;
+
+  // Global type overrides for problematic types
+  namespace JSX {
+    interface IntrinsicElements {
+      [elemName: string]: any;
+    }
+    interface ElementClass {
+      [key: string]: any;
+    }
+    interface Element extends React.ReactElement<any, any> {
+      [key: string]: any;
+    }
+  }
 }
 
-declare module "*.ts" {
-  const content: any;
-  export default content;
-}
+export {};

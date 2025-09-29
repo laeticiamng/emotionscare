@@ -11,7 +11,7 @@ import {
   Music,
   MessageSquare,
   HelpCircle
-} from "lucide-react"
+} from "@/lib/icons"
 import { NavLink, useLocation } from "react-router-dom"
 
 import {

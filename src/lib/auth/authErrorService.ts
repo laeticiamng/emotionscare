@@ -1,3 +1,5 @@
+export type AuthErrorType = 'credentials' | 'validation' | 'email' | 'connection' | 'server' | 'account' | 'unknown';
+
 /**
  * AuthErrorService - Service de gestion des erreurs d'authentification
  * Traduit les erreurs Supabase en messages utilisateur-friendly

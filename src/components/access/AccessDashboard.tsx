@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
 import { useNavigate } from 'react-router-dom';
-import { CheckCircle, XCircle, AlertCircle, User, Shield, Users, Settings } from 'lucide-react';
+import { CheckCircle, XCircle, AlertCircle, User, Shield, Users, Settings } from '@/lib/icons';
 import { routes } from '@/routerV2';
 
 interface PageAccess {
