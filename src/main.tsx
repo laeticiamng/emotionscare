@@ -1,20 +1,18 @@
-// Solution définitive : remplacer le main.tsx par une version simplifiée
+// Updated main.tsx for latest Lovable template
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './styles/globals.css';
-
-// Import de l'app simplifiée qui fonctionne
-import App from './App.tsx';
+import App from './App';
 
 const rootElement = document.getElementById('root');
 
 if (!rootElement) {
-  throw new Error('Application root element not found');
+  throw new Error('Root element not found');
 }
 
-// Configuration React 18 optimisée
 const root = ReactDOM.createRoot(rootElement);
 
+// Updated for latest Lovable template with clean App structure
 root.render(
   <React.StrictMode>
     <App />
