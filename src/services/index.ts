@@ -1,14 +1,9 @@
-import { APIStatus, APIStatusItem } from '@/lib/api/status';
+// Services API centralisés pour EmotionsCare
+export { default as openaiService } from './openai.service';
+export { default as humeService } from './hume.service';
+export { default as sunoService } from './suno.service';
+export { default as emotionAnalysisService } from './emotionAnalysis.service';
+export { default as musicTherapyService } from './musicTherapy.service';
 
-// Export the APIStatus class and types
-export { APIStatus } from '@/lib/api/status';
-export type { APIStatusItem } from '@/lib/api/status';
-
-// Default services object that wraps APIStatus methods
-const apiServices = {
-  checkAllAPIs: () => APIStatus.checkAllAPIs(),
-  getAPIConfiguration: () => APIStatus.getAPIConfiguration(),
-  getAllAPIs: () => APIStatus.getAllAPIs(),
-};
-
-export default apiServices;
+// Types et interfaces
+export type * from './types';

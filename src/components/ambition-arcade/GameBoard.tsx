@@ -45,8 +45,8 @@ const GameBoard: React.FC<GameBoardProps> = ({
     );
   }
 
-  const totalQuests = (currentRun as any)?.quests?.length || 0;
-  const completedQuests = (currentRun as any)?.quests?.filter((q: any) => q.status === 'completed').length || 0;
+  const totalQuests = currentRun.quests?.length || 0;
+  const completedQuests = currentRun.quests?.filter(q => q.status === 'completed').length || 0;
   const progressPercent = totalQuests > 0 ? (completedQuests / totalQuests) * 100 : 0;
 
   return (
@@ -56,9 +56,9 @@ const GameBoard: React.FC<GameBoardProps> = ({
         <CardContent className="p-6">
           <div className="flex items-start justify-between mb-4">
             <div className="space-y-2">
-              <h2 className="text-2xl font-bold">{(currentRun as any)?.objective}</h2>
+              <h2 className="text-2xl font-bold">{currentRun.objective}</h2>
               <div className="flex items-center gap-2">
-                {((currentRun as any)?.tags || []).map((tag: string, i: number) => (
+                {currentRun.tags?.map((tag, i) => (
                   <Badge key={i} variant="secondary" className="text-xs">
                     {tag}
                   </Badge>
@@ -67,7 +67,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
             </div>
             <div className="text-right">
               <div className="text-3xl font-bold text-primary">
-                {(currentRun as any)?.metadata?.totalXp || 0}
+                {currentRun.metadata?.totalXp || 0}
               </div>
               <div className="text-sm text-muted-foreground">XP Total</div>
             </div>
@@ -88,13 +88,13 @@ const GameBoard: React.FC<GameBoardProps> = ({
             </div>
             <div className="text-center">
               <div className="text-lg font-bold text-blue-600">
-                {((currentRun as any)?.quests || []).filter((q: any) => q.status === 'in_progress').length || 0}
+                {currentRun.quests?.filter(q => q.status === 'in_progress').length || 0}
               </div>
               <div className="text-xs text-muted-foreground">En cours</div>
             </div>
             <div className="text-center">
               <div className="text-lg font-bold text-gray-600">
-                {((currentRun as any)?.quests || []).filter((q: any) => q.status === 'available').length || 0}
+                {currentRun.quests?.filter(q => q.status === 'available').length || 0}
               </div>
               <div className="text-xs text-muted-foreground">Disponibles</div>
             </div>
@@ -104,7 +104,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
 
       {/* Grille des quêtes */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {((currentRun as any)?.quests || []).map((quest: any) => (
+        {currentRun.quests?.map((quest) => (
           <Card 
             key={quest.id} 
             className={`transition-all hover:shadow-md ${
@@ -189,7 +189,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
       </div>
 
       {/* Artefacts obtenus */}
-      {(currentRun as any)?.artifacts && ((currentRun as any)?.artifacts || []).length > 0 && (
+      {currentRun.artifacts && currentRun.artifacts.length > 0 && (
         <Card>
           <CardContent className="p-4">
             <h3 className="font-semibold mb-3 flex items-center gap-2">
@@ -197,7 +197,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
               Artefacts d'Ambition Obtenus
             </h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              {((currentRun as any)?.artifacts || []).map((artifact: any) => (
+              {currentRun.artifacts.map((artifact) => (
                 <div 
                   key={artifact.id}
                   className="text-center p-3 bg-gradient-to-b from-yellow-50 to-yellow-100 border border-yellow-200 rounded-lg"

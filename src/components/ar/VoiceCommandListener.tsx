@@ -11,8 +11,7 @@ interface VoiceCommandListenerProps {
 }
 
 const VoiceCommandListener: React.FC<VoiceCommandListenerProps> = ({ isActive, onCommand }) => {
-  const voiceCommands = useVoiceCommands();
-  const { isListening, toggleListening, supported, lastCommand } = voiceCommands;
+  const { isListening, toggleListening, supported, lastCommand } = useVoiceCommands();
   
   const { toast } = useToast();
   

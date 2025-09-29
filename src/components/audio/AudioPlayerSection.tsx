@@ -15,12 +15,11 @@ interface AudioPlayerSectionProps {
 
 const AudioPlayerSection: React.FC<AudioPlayerSectionProps> = ({ audioUrl, title, artist }) => {
   // Create a track object from props
-  const track: MusicTrack = {
+  const track: AudioTrack = {
     id: 'current-track',
     title,
     artist: artist || 'Unknown Artist',
     url: audioUrl,
-    audioUrl: audioUrl,
     duration: 0,
   };
   
@@ -63,7 +62,7 @@ const AudioPlayerSection: React.FC<AudioPlayerSectionProps> = ({ audioUrl, title
   };
 
   const handleSeek = (value: number[]) => {
-    audioPlayer.seek(value[0]);
+    audioPlayer.setCurrentTime(value[0]);
   };
 
   const formatTime = (seconds: number): string => {

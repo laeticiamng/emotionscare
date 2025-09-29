@@ -1,47 +1,55 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
-    "useDefineForClassFields": true,
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
-    "module": "ESNext",
-    "skipLibCheck": true,
-    "allowJs": true,
-    "checkJs": false,
+    "allowImportingTsExtensions": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+    "jsx": "react-jsx",
+    "jsxImportSource": "react",
     "allowSyntheticDefaultImports": true,
+    "allowJs": true,
+    "lib": [
+      "ES2020",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    },
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
     "strict": false,
     "noImplicitAny": false,
     "noImplicitReturns": false,
     "noImplicitThis": false,
     "noImplicitOverride": false,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
-    "exactOptionalPropertyTypes": false,
-    "noPropertyAccessFromIndexSignature": false,
-    "noUncheckedIndexedAccess": false,
-    "suppressImplicitAnyIndexErrors": true,
-    "suppressExcessPropertyErrors": true,
-    "noEmitOnError": false,
-    "noTypeCheck": true,
-    "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": true,
-    "jsx": "react-jsx",
-    "paths": {
-      "@/*": ["./src/*"]
-    }
+    "target": "ES2020",
+    "types": [
+      "vite/client"
+    ],
+    "useDefineForClassFields": true,
+    "noEmit": false,
+    "declaration": false,
+    "declarationMap": false,
+    "sourceMap": false
   },
-  "include": [
-    "src"
-  ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "dist",
+    "scripts/**/*",
+    "services/**/*", 
+    "src/__tests__/**/*",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/*.spec.ts",
+    "**/*.spec.tsx"
   ],
-  "ts-node": {
-    "transpileOnly": true,
-    "compilerOptions": {
-      "module": "CommonJS"
-    }
-  }
+  "include": [
+    "./src/**/*.ts",
+    "./src/**/*.tsx"
+  ]
 }

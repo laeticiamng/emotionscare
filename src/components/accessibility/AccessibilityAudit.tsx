@@ -59,15 +59,15 @@ const AccessibilityAudit: React.FC = () => {
                 <div className="flex-1">
                   <div className="flex items-center justify-between mb-2">
                     <span className="font-medium">Score d'accessibilité</span>
-                    <span className="text-2xl font-bold">{(report as any)?.score || 85}/100</span>
+                    <span className="text-2xl font-bold">{report.score}/100</span>
                   </div>
-                  <Progress value={(report as any)?.score || 85} className="h-3" />
+                  <Progress value={report.score} className="h-3" />
                 </div>
                 <Badge 
-                  className={`${getComplianceColor((report as any)?.compliance || 'AA')} text-white`}
+                  className={`${getComplianceColor(report.compliance)} text-white`}
                 >
-                  {(report as any)?.compliance === 'AA' ? 'WCAG 2.1 AA' : 
-                   (report as any)?.compliance === 'A' ? 'WCAG 2.1 A' : 
+                  {report.compliance === 'AA' ? 'WCAG 2.1 AA' : 
+                   report.compliance === 'A' ? 'WCAG 2.1 A' : 
                    'Non conforme'}
                 </Badge>
               </div>
@@ -79,7 +79,7 @@ const AccessibilityAudit: React.FC = () => {
                     <XCircle className="h-5 w-5 text-red-500" />
                     <div>
                       <div className="font-semibold text-red-500">
-                        {((report as any)?.issues || []).filter((i: any) => i.impact === 'critical').length}
+                        {report.issues.filter(i => i.impact === 'critical').length}
                       </div>
                       <div className="text-xs text-muted-foreground">Critiques</div>
                     </div>
@@ -90,7 +90,7 @@ const AccessibilityAudit: React.FC = () => {
                     <AlertTriangle className="h-5 w-5 text-orange-500" />
                     <div>
                       <div className="font-semibold text-orange-500">
-                        {((report as any)?.issues || []).filter((i: any) => i.impact === 'serious').length}
+                        {report.issues.filter(i => i.impact === 'serious').length}
                       </div>
                       <div className="text-xs text-muted-foreground">Graves</div>
                     </div>
@@ -101,7 +101,7 @@ const AccessibilityAudit: React.FC = () => {
                     <AlertTriangle className="h-5 w-5 text-yellow-500" />
                     <div>
                       <div className="font-semibold text-yellow-500">
-                        {((report as any)?.issues || []).filter((i: any) => i.impact === 'moderate').length}
+                        {report.issues.filter(i => i.impact === 'moderate').length}
                       </div>
                       <div className="text-xs text-muted-foreground">Modérés</div>
                     </div>
@@ -112,7 +112,7 @@ const AccessibilityAudit: React.FC = () => {
                     <CheckCircle className="h-5 w-5 text-green-500" />
                     <div>
                       <div className="font-semibold text-green-500">
-                        {((report as any)?.passedRules || []).length}
+                        {report.passedRules.length}
                       </div>
                       <div className="text-xs text-muted-foreground">Réussis</div>
                     </div>
@@ -121,10 +121,10 @@ const AccessibilityAudit: React.FC = () => {
               </div>
 
               {/* Liste des problèmes */}
-              {((report as any)?.issues || []).length > 0 && (
+              {report.issues.length > 0 && (
                 <div className="space-y-4">
                   <h4 className="font-semibold">Problèmes détectés</h4>
-                  {((report as any)?.issues || []).map((issue: any, index: number) => (
+                  {report.issues.map((issue, index) => (
                     <Alert key={index} className={
                       issue.impact === 'critical' ? 'border-red-200 bg-red-50' :
                       issue.impact === 'serious' ? 'border-orange-200 bg-orange-50' :

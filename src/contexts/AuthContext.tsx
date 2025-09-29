@@ -15,7 +15,6 @@ interface AuthContextType {
   signUp: (email: string, password: string, metadata?: any) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
-  logout: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
   register: (email: string, password: string, metadata?: any) => Promise<void>;
 }
@@ -181,7 +180,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   // Alias pour la compatibilité
   const register = signUp;
-  const logout = signOut;
 
   const value: AuthContextType = {
     user,
@@ -191,7 +189,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
     signUp,
     signIn,
     signOut,
-    logout,
     resetPassword,
     register,
   };

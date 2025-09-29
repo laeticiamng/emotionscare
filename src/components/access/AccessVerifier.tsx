@@ -176,9 +176,9 @@ const AccessVerifier: React.FC = () => {
                     </div>
                     
                     <div className="flex items-center gap-2">
-              <Badge variant="secondary">
-                {isAccessible ? "Accessible" : "Restreint"}
-              </Badge>
+                      <Badge variant={isAccessible ? "success" : "destructive"}>
+                        {isAccessible ? "Accessible" : "Restreint"}
+                      </Badge>
                       {isAccessible && (
                         <Button
                           variant="outline"

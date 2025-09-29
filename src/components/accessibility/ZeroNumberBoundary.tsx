@@ -11,7 +11,7 @@ export function ZeroNumberBoundary<T extends ElementType = 'div'>(
   props: ZeroNumberBoundaryProps<T>,
 ) {
   const { as, children, ...rest } = props;
-  const Component = (as ?? 'div') as ElementType;
+  const Element = (as ?? 'div') as ElementType;
   const containerRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
@@ -31,10 +31,9 @@ export function ZeroNumberBoundary<T extends ElementType = 'div'>(
   }, [children]);
 
   return (
-    // @ts-ignore
-    <Component ref={containerRef} data-zero-number-boundary="true" {...rest}>
+    <Element ref={containerRef as never} data-zero-number-boundary="true" {...rest}>
       {children}
-    </Component>
+    </Element>
   );
 }
 

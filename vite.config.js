@@ -7,8 +7,6 @@ export default defineConfig({
   plugins: [
     react({
       jsxRuntime: 'automatic',
-      // Disable TypeScript processing completely
-      typescript: false,
     }),
     componentTagger(),
   ],
@@ -33,49 +31,22 @@ export default defineConfig({
     target: 'esnext',
     minify: 'esbuild',
     rollupOptions: {
-      external: ['next', 'next/link', 'next/navigation', 'next/server'],
       onwarn(warning, warn) {
-        // Ignore all warnings to prevent build failures
-        return;
+        if (warning.code === 'MODULE_LEVEL_DIRECTIVE') return;
+        if (warning.code === 'UNUSED_EXTERNAL_IMPORT') return;
+        warn(warning);
       }
     }
   },
   
   esbuild: {
-    // Process TypeScript files as JavaScript
-    loader: {
-      '.ts': 'jsx',
-      '.tsx': 'jsx'
-    },
     logOverride: { 
       'this-is-undefined-in-esm': 'silent',
-      'direct-eval': 'silent',
-      'unresolved-import': 'silent'
-    },
-    include: [
-      /\.tsx?$/,
-      /\.jsx?$/
-    ],
-    exclude: [],
-    target: 'esnext',
-    minify: false,
-    // No TypeScript config at all
-    jsx: 'automatic'
+      'direct-eval': 'silent'
+    }
   },
   
   define: {
     'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development')
-  },
-
-  // Optimize deps without TypeScript
-  optimizeDeps: {
-    include: ['react', 'react-dom', 'react-router-dom'],
-    exclude: ['@types/*'],
-    esbuildOptions: {
-      loader: {
-        '.ts': 'jsx',
-        '.tsx': 'jsx'
-      }
-    }
   }
 });
