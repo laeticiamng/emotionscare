@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { CheckCircle, XCircle, AlertTriangle, RefreshCw } from 'lucide-react';
-import { routes } from '@/routerV2';
+import { Routes } from '@/routerV2/routes';
 import { validateRouteAccess } from '@/utils/routeValidation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
@@ -179,7 +179,7 @@ const SystemAudit: React.FC = () => {
   }, [isAuthenticated, userMode]);
 
   const totalRoutes = allRoutes.length; // Should be 26 now
-  const completedAudits = auditResults.filter(r => r.status === 'success').length;
+  const completedAudits = auditResults.filter(r => r.score >= 70).length;
   const globalScore = totalRoutes > 0 ? Math.round((completedAudits / totalRoutes) * 100) : 0;
 
   return (

@@ -51,3 +51,5 @@ export const useChat = () => {
     isLoading
   };
 };
+
+export default useChat;
