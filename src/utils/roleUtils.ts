@@ -53,4 +53,7 @@ export const getRolePermissions = (role: UserRole | string | undefined): string[
   return permissions[roleStr] || [];
 };
 
-export const getRoleName = getRoleDisplayName;
+export const hasPermission = (userRole: UserRole | string | undefined, requiredPermission: string): boolean => {
+  const permissions = getRolePermissions(userRole);
+  return permissions.includes('all') || permissions.includes(requiredPermission);
+};

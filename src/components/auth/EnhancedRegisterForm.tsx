@@ -38,7 +38,7 @@ const EnhancedRegisterForm: React.FC = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   
   const navigate = useNavigate();
-  const { register } = useAuth();
+  const { register, error: authError, clearError } = useAuth();
   const { toast } = useToast();
   const { theme } = useTheme();
   
@@ -52,7 +52,12 @@ const EnhancedRegisterForm: React.FC = () => {
     },
   });
   
-  // Remove cleanup effect since we don't have clearError
+  useEffect(() => {
+    // Clean up error on unmount
+    return () => {
+      if (clearError) clearError();
+    };
+  }, [clearError]);
   
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsLoading(true);
@@ -62,8 +67,10 @@ const EnhancedRegisterForm: React.FC = () => {
       navigator.vibrate(50);
     }
     
+    if (clearError) clearError();
+    
     try {
-      await register(values.email, values.password, { name: values.name });
+      const user = await register(values.name, values.email, values.password);
       
       // Success toast notification
       toast({
@@ -276,6 +283,16 @@ const EnhancedRegisterForm: React.FC = () => {
                   />
                 </motion.div>
                 
+                {authError && (
+                  <motion.div 
+                    className="p-3 rounded-md bg-destructive/10 text-destructive text-sm border border-destructive/20"
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    {authError}
+                  </motion.div>
+                )}
                 
                 <motion.div variants={itemVariants}>
                   <Button

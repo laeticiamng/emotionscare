@@ -32,7 +32,7 @@ const ModeSwitcher: React.FC<ModeSwitcherProps> = ({
   const [isOpen, setIsOpen] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const { toast } = useToast();
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   
   // Sync logs were used during development; remove in production
   useEffect(() => {
@@ -53,9 +53,9 @@ const ModeSwitcher: React.FC<ModeSwitcherProps> = ({
     setUserMode(normalizedMode);
     
     // Update user role in AuthContext to keep them in sync
-    if (user) {
+    if (user && updateUser) {
       // This ensures role and userMode are consistent
-      // updateUser functionality would be handled by auth context
+      await updateUser({ ...user, role: normalizedMode });
     }
     
     // Update localStorage values

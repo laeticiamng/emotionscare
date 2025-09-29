@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft } from '@/lib/icons';
+import { ArrowLeft } from 'lucide-react';
 
 interface ChatHeaderProps {
   title: string;

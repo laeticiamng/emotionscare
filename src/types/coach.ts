@@ -2,14 +2,10 @@
 import { ChatMessage } from './chat';
 
 export interface CoachCharacterProps {
-  name?: string;
-  avatar?: string;
   mood?: string;
   size?: 'sm' | 'md' | 'lg';
   animated?: boolean;
-  animate?: boolean;
   className?: string;
-  onClick?: () => void;
 }
 
 export interface CoachMessageProps {

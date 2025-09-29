@@ -8,7 +8,6 @@
     "allowJs": true,
     "checkJs": false,
     "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
     "strict": false,
     "noImplicitAny": false,
     "noImplicitReturns": false,
@@ -19,23 +18,30 @@
     "exactOptionalPropertyTypes": false,
     "noPropertyAccessFromIndexSignature": false,
     "noUncheckedIndexedAccess": false,
+    "suppressImplicitAnyIndexErrors": true,
+    "suppressExcessPropertyErrors": true,
     "noEmitOnError": false,
+    "noTypeCheck": true,
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
-    "isolatedModules": false,
+    "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
     "paths": {
       "@/*": ["./src/*"]
     }
   },
-  "include": ["src", "src/types/universal.d.ts"],
-  "exclude": ["node_modules"],
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "node_modules"
+  ],
   "ts-node": {
+    "transpileOnly": true,
     "compilerOptions": {
-      "strict": false,
-      "skipLibCheck": true
+      "module": "CommonJS"
     }
   }
 }

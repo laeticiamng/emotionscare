@@ -2,22 +2,7 @@
 import React from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { KpiData } from "@/types/dashboard";
-
-interface KpiCardProps {
-  id?: string;
-  title: string;
-  value: string | number;
-  delta?: number | { value: number; trend?: 'up' | 'down' | 'neutral'; direction?: 'up' | 'down' | 'stable'; label?: string };
-  icon?: React.ReactNode;
-  subtitle?: string;
-  status?: 'neutral' | 'info' | 'success' | 'warning' | 'error';
-  className?: string;
-  isLoading?: boolean;
-  ariaLabel?: string;
-  onClick?: () => void;
-  footer?: React.ReactNode;
-}
+import { KpiCardProps, KpiCardStatus } from "@types/dashboard";
 import { ArrowDown, ArrowUp, Minus } from "lucide-react";
 
 const KpiCard = ({

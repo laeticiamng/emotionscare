@@ -19,14 +19,3 @@ export const analyzeEmotion = async (options: EmotionScanOptions): Promise<Emoti
     recommendations: ['Continuez à maintenir cette énergie positive']
   };
 };
-
-export const enhancedAnalyzeService = {
-  analyzeEmotion,
-  analyzeTextEmotion: analyzeEmotion,
-  processVideo: async (videoBlob: Blob) => {
-    return analyzeEmotion({ type: 'video', data: videoBlob });
-  },
-  processAudio: async (audioBlob: Blob) => {
-    return analyzeEmotion({ type: 'audio', data: audioBlob });
-  }
-};

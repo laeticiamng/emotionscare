@@ -7,10 +7,6 @@ export interface EmotionResult {
   insight?: string;
   intensity?: number;
   suggestions?: string[];
-  emojis?: string[];
-  primaryEmotion?: string;
-  feedback?: string;
-  recommendations?: string[];
 }
 
 export interface EmotionRecommendation {
@@ -34,12 +30,4 @@ export interface EmotionAnalysis {
   arousal: number;
   overallMood: string;
   recommendations: EmotionRecommendation[];
-}
-
-export interface Emotion {
-  id: string;
-  name: string;
-  intensity?: number;
-  category?: string;
-  [key: string]: any;
 }

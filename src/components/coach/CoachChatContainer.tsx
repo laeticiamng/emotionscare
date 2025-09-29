@@ -71,7 +71,7 @@ const CoachChatContainer: React.FC<CoachChatContainerProps> = ({
 
   return (
     <CoachChatInterface
-      messages={coachMessages as any}
+      messages={coachMessages}
       sendMessage={sendMessage}
       isProcessing={isProcessing}
     />

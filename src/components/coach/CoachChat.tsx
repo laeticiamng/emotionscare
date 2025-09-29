@@ -33,7 +33,7 @@ const CoachChat: React.FC<CoachChatProps> = ({
     // Send initial message from coach if provided
     if (initialMessage && messages.length === 0) {
       // Add initial message from coach to the chat
-      sendMessage(initialMessage, 'assistant');
+      sendMessage(initialMessage, 'coach');
     }
   }, [initialMessage, messages.length, sendMessage]);
   

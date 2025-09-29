@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
-import { Clock } from '@/lib/icons';
+import { Clock } from 'lucide-react';
 
 interface TrialBadgeProps {
   user?: {
