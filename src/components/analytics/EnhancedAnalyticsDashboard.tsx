@@ -9,8 +9,7 @@ import {
   BarChart, 
   Bar, 
   PieChart,
-  Line, 
-  Line,
+  LineChart,
   Pie, 
   Cell, 
   XAxis, 
@@ -42,7 +41,7 @@ import {
   Filter,
   BarChart3,
   PieChart as PieIcon,
-  LineChart,
+  BarChart3,
   AlertCircle
 } from '@/lib/icons';
 import { cn } from '@/lib/utils';
