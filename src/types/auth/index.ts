@@ -14,7 +14,7 @@ export interface AuthContextType {
   updateProfile: (updates: Partial<User>) => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
   clearError: () => void;
-  updateUser: (updates: Partial<User>) => Promise<void>;
+  updateUser: (updates: Partial<User>) => Promise<User>;
 }
 
 // Auth form types

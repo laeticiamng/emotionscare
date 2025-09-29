@@ -4,7 +4,8 @@ export interface ChatMessage {
   text: string;
   content: string;
   conversationId: string;
-  sender: 'user' | 'assistant' | 'system';
+  sender: 'user' | 'assistant' | 'system' | 'coach';
+  role: 'user' | 'assistant' | 'system';
   timestamp: string;
   type?: 'text' | 'image' | 'audio';
   metadata?: Record<string, any>;
@@ -18,6 +19,7 @@ export interface ChatConversation {
   updatedAt: Date;
   userId: string;
   isActive?: boolean;
+  lastMessage?: ChatMessage;
 }
 
 export interface ChatResponse {

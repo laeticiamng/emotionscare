@@ -27,4 +27,5 @@ const useUserModeHelpers = () => {
   };
 };
 
+export { useUserModeHelpers };
 export default useUserModeHelpers;

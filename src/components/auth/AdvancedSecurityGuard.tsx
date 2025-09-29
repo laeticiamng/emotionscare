@@ -307,7 +307,7 @@ const AdvancedSecurityGuard: React.FC<AdvancedSecurityGuardProps> = ({
     } else {
       setSecurityState('granted');
     }
-  }, [isAuthenticated, user, securityScore, requiredPermissions, checkPermission, securityLevel, config.requireMFA, showMFA, navigate, location.pathname]);
+  }, [isAuthenticated, user, securityScore, requiredPermissions, securityLevel, config.requireMFA, showMFA, navigate, location.pathname]);
 
   // Gestionnaires
   const handleMFASuccess = () => {
