@@ -15,7 +15,7 @@ interface LoginFormProps {
 }
 
 const LoginForm: React.FC<LoginFormProps> = ({ onToggleMode }) => {
-  const { signIn } = useAuth();
+  const { login } = useAuth();
   const [rememberMe, setRememberMe] = useState(false);
   
   const form = useForm<LoginFormData>({
@@ -28,7 +28,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onToggleMode }) => {
 
   const onSubmit = async (data: LoginFormData) => {
     try {
-      await signIn(data.email, data.password);
+      await login(data.email, data.password);
     } catch (error: any) {
       toast({
         title: "Erreur de connexion",

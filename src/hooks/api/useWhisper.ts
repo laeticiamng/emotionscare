@@ -26,11 +26,7 @@ const useWhisper = () => {
   return {
     transcribeAudio,
     isTranscribing,
-    error,
-    transcript: '',
-    isRecording: false,
-    startRecordingAndTranscribe: transcribeAudio,
-    stopRecording: () => setIsTranscribing(false)
+    error
   };
 };
 

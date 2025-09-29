@@ -40,32 +40,3 @@ export interface UserStats {
   emotionalScore: number;
   status: 'active' | 'inactive' | 'pending';
 }
-
-export interface KpiData {
-  label: string;
-  value: string | number;
-  change?: number;
-  trend?: 'up' | 'down' | 'stable';
-}
-
-export interface UserModeSelectorProps {
-  minimal?: boolean;
-  className?: string;
-  [key: string]: any;
-}
-
-export interface DashboardAction {
-  id: string;
-  label: string;
-  icon: any;
-  path?: string;
-  action?: string;
-}
-
-export interface NavigationCard {
-  id: string;
-  label: string;
-  icon: any;
-  path?: string;
-  action?: string;
-}

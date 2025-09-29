@@ -23,13 +23,8 @@ const useUserModeHelpers = () => {
     switchToMode,
     getDashboardPath,
     getDisplayName,
-    setUserMode,
-    isB2C: userMode === 'b2c',
-    isB2BUser: userMode === 'b2b_user', 
-    isB2BAdmin: userMode === 'b2b_admin',
-    normalizedMode: userMode
+    setUserMode
   };
 };
 
-export { useUserModeHelpers };
 export default useUserModeHelpers;

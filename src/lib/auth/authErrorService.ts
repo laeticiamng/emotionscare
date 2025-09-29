@@ -1,4 +1,22 @@
-export type AuthErrorType = 'credentials' | 'validation' | 'email' | 'connection' | 'server' | 'account' | 'unknown';
+export type AuthErrorType = 
+  | 'SIGNUP_DISABLED'
+  | 'USER_EXISTS'
+  | 'WEAK_PASSWORD'
+  | 'INVALID_EMAIL'
+  | 'INVALID_CREDENTIALS'
+  | 'EMAIL_NOT_CONFIRMED'
+  | 'RATE_LIMITED'
+  | 'ACCOUNT_LOCKED'
+  | 'SESSION_EXPIRED'
+  | 'INVALID_TOKEN'
+  | 'RESET_FAILED'
+  | 'INVALID_RESET_TOKEN'
+  | 'NETWORK_ERROR'
+  | 'SERVICE_UNAVAILABLE'
+  | 'EMAIL_FORMAT_INVALID'
+  | 'PASSWORD_TOO_SHORT'
+  | 'PASSWORD_MISMATCH'
+  | 'UNKNOWN_ERROR';
 
 /**
  * AuthErrorService - Service de gestion des erreurs d'authentification

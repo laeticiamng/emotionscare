@@ -21,8 +21,6 @@ export interface Challenge {
   threshold: number;
   completed: boolean;
   category: string;
-  type: string;
-  dueDate: string;
   userId?: string;
   startDate?: string;
   endDate?: string;

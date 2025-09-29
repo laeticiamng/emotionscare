@@ -1,5 +1,5 @@
 
-export type UserMode = 'b2c' | 'b2b_user' | 'b2b_admin' | 'admin';
+export type UserMode = 'b2c' | 'b2b_user' | 'b2b_admin';
 
 export const getUserModeDisplayName = (mode: UserMode | null): string => {
   switch (mode) {
@@ -35,24 +35,7 @@ export const getModeDashboardPath = (mode: UserMode | null): string => {
       return '/b2b/user/dashboard';
     case 'b2b_admin':
       return '/b2b/admin/dashboard';
-    case 'admin':
-      return '/admin/dashboard';
     default:
       return '/';
-  }
-};
-
-export const normalizeUserMode = (mode: string | UserMode | null): UserMode | null => {
-  if (!mode) return null;
-  const modeStr = String(mode).toLowerCase();
-  
-  switch (modeStr) {
-    case 'b2c':
-    case 'b2b_user':
-    case 'b2b_admin':
-    case 'admin':
-      return modeStr as UserMode;
-    default:
-      return null;
   }
 };
