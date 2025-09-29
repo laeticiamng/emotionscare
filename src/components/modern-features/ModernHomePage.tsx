@@ -57,21 +57,21 @@ const ModernHomePage: React.FC = () => {
       title: 'Démarrer une session', 
       desc: 'Commencer votre parcours bien-être',
       icon: <Zap className="h-5 w-5" />,
-      href: '/app/sessions/new',
+      href: '/app/scan',
       color: 'bg-blue-500'
     },
     { 
       title: 'Voir mes statistiques', 
       desc: 'Analyser vos progrès',
       icon: <TrendingUp className="h-5 w-5" />,
-      href: '/app/analytics',
+      href: '/app',
       color: 'bg-green-500'
     },
     { 
       title: 'Gérer mon profil', 
       desc: 'Personnaliser votre expérience',
       icon: <User className="h-5 w-5" />,
-      href: '/app/profile',
+      href: '/app',
       color: 'bg-purple-500'
     }
   ];
@@ -115,7 +115,7 @@ const ModernHomePage: React.FC = () => {
                 </Button>
 
                 {/* Accès rapide */}
-                <Link to="/app/home">
+                <Link to="/app">
                   <Button variant="default" size="sm" className="gap-2">
                     <ArrowRight className="h-4 w-4" />
                     Accéder à votre espace
