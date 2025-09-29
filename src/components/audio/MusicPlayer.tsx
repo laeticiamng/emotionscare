@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
-import { Play, Pause, SkipForward, Volume2, Music } from 'lucide-react';
+import { Play, Pause, SkipForward, Volume2, Music } from '@/lib/icons';
 
 interface MusicPlayerProps {
   autoPlay?: boolean;

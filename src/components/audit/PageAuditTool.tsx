@@ -10,17 +10,17 @@ import { useUserMode } from '@/contexts/UserModeContext';
 import { routes } from '@/routerV2';
 import { validateRouteAccess } from '@/utils/routeValidation';
 import { 
-  CheckCircle, 
-  XCircle, 
-  AlertTriangle, 
-  Clock, 
-  Users, 
-  Shield, 
+  CheckCircle,
+  XCircle,
+  AlertTriangle,
+  Clock,
+  Users,
+  Shield,
   Eye,
   BarChart3,
   FileText,
   Zap
-} from 'lucide-react';
+} from '@/lib/icons';
 import { toast } from 'sonner';
 
 interface RouteAuditResult {

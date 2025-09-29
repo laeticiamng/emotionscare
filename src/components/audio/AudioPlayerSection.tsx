@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
 import { AudioTrack } from '@/types/audio';
-import { Play, Pause, SkipForward, SkipBack, Volume, VolumeX } from 'lucide-react';
+import { Play, Pause, SkipForward, SkipBack, Volume, VolumeX } from '@/lib/icons';
 import { Slider } from '@/components/ui/slider';
 
 interface AudioPlayerSectionProps {

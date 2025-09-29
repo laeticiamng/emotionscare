@@ -156,7 +156,8 @@ import {
   Percent,
   Minus,
   Divide,
-  Equal
+  Equal,
+  Fingerprint
 } from 'lucide-react';
 
 // Export all icons for consistent usage across the app
@@ -320,5 +321,6 @@ export {
   Minus,
   Divide,
   Equal,
-  MoreHorizontal as More
+  MoreHorizontal as More,
+  Fingerprint
 };

@@ -8,9 +8,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { 
   BarChart, 
   Bar, 
-  LineChart, 
+  PieChart,
   Line, 
-  PieChart, 
+  Line,
   Pie, 
   Cell, 
   XAxis, 
@@ -42,7 +42,7 @@ import {
   Filter,
   BarChart3,
   PieChart as PieIcon,
-  LineChartIcon,
+  LineChart,
   AlertCircle
 } from '@/lib/icons';
 import { cn } from '@/lib/utils';

@@ -5,9 +5,9 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { 
-  Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, 
-  Shuffle, Repeat, Heart, Share2, MoreHorizontal 
-} from 'lucide-react';
+  Play, Pause, SkipBack, SkipForward, Volume2, VolumeX,
+  Shuffle, Repeat, Heart, Share2, MoreHorizontal
+} from '@/lib/icons';
 import { cn } from '@/lib/utils';
 
 interface Track {
