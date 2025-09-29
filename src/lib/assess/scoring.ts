@@ -1,194 +1,140 @@
-/**
- * Clinical Assessment Scoring System
- * Validé selon les recherches scientifiques:
- * - WHO-5: Validation scientifique confirmée (BMC Psychiatry 2024, Frontiers Psychology 2025)
- * - STAI-6: Validation confirmée (PMC 2009, Frontiers Psychology 2025) 
- * - SUDS: Échelle 0-10 validée cliniquement (PMC 2025)
- * - SAM: Échelle valence-arousal validée scientifiquement
- * - PANAS-10: Version courte validée internationalement
- * - PSS-10: Validation psychométrique confirmée
- */
+import type { InstrumentCode, ScoringResult } from './types';
+import { getCatalog } from './catalogs';
 
-import type { InstrumentCode } from './types';
-
-// Seuils validés scientifiquement selon les recherches
-const VALIDATED_THRESHOLDS = {
+const SUMMARIES: Record<InstrumentCode, Record<0 | 1 | 2 | 3 | 4, string>> = {
   WHO5: {
-    0: [0, 4],    // Très faible bien-être (validé cliniquement)
-    1: [5, 8],    // Faible bien-être
-    2: [9, 12],   // Modéré
-    3: [13, 16],  // Bon bien-être
-    4: [17, 20]   // Excellent bien-être
+    0: 'besoin de douceur',
+    1: 'moment plus délicat',
+    2: 'équilibre stable',
+    3: 'bonne forme',
+    4: 'très belle énergie',
   },
   STAI6: {
-    0: [6, 9],    // Très faible anxiété (validation PMC)
-    1: [10, 12],  // Faible anxiété 
-    2: [13, 15],  // Anxiété modérée
-    3: [16, 18],  // Anxiété élevée
-    4: [19, 24]   // Anxiété très élevée
+    0: 'grande sérénité',
+    1: 'calme ressenti',
+    2: 'état équilibré',
+    3: 'tension présente',
+    4: 'besoin d’apaisement',
   },
   SAM: {
-    0: [1, 2],    // Très négatif (validation scientifique)
-    1: [3, 4],    // Négatif
-    2: [5, 5],    // Neutre  
-    3: [6, 7],    // Positif
-    4: [8, 9]     // Très positif
+    0: 'humeur difficile',
+    1: 'tonalité plus basse',
+    2: 'état mixte',
+    3: 'bonne humeur',
+    4: 'excellente forme',
   },
   SUDS: {
-    0: [0, 1],    // Aucune détresse (validation PMC 2025)
-    1: [2, 3],    // Légère détresse
-    2: [4, 5],    // Détresse modérée
-    3: [6, 7],    // Détresse importante
-    4: [8, 10]    // Détresse extrême
+    0: 'grande tranquillité',
+    1: 'sérénité',
+    2: 'état neutre',
+    3: 'tension élevée',
+    4: 'détresse importante',
   },
-  PANAS10: {
-    0: [10, 18],  // Affect très faible (validation internationale)
-    1: [19, 27],  // Affect faible
-    2: [28, 32],  // Affect modéré
-    3: [33, 37],  // Affect élevé
-    4: [38, 50]   // Affect très élevé
+};
+
+const FOCUS_HINTS: Partial<Record<InstrumentCode, Partial<Record<0 | 1 | 2 | 3 | 4, string>>>> = {
+  WHO5: {
+    0: 'care_warm',
+    1: 'care_checkin',
+    4: 'care_celebrate',
   },
-  PSS10: {
-    0: [0, 8],    // Stress très faible (validation psychométrique)
-    1: [9, 16],   // Stress faible
-    2: [17, 24],  // Stress modéré
-    3: [25, 32],  // Stress élevé
-    4: [33, 40]   // Stress très élevé
-  }
-} as const;
+  STAI6: {
+    3: 'calm_support',
+    4: 'calm_grounding',
+  },
+  SAM: {
+    0: 'mood_support',
+    4: 'mood_celebrate',
+  },
+  SUDS: {
+    3: 'distress_monitor',
+    4: 'distress_support',
+  },
+};
 
-// Items inversés validés scientifiquement
-const REVERSED_ITEMS = {
-  STAI6: [1, 3, 6],  // Items inversés confirmés dans la littérature
-  WHO5: [],          // Pas d'items inversés
-  PSS10: [4, 5, 7, 8] // Items inversés validés
-} as const;
-
-/**
- * Calcule le niveau selon les seuils validés scientifiquement
- */
-export function computeLevel(instrument: InstrumentCode, answers: Record<string, number>): number {
-  const total = calculateTotal(instrument, answers);
-  const thresholds = VALIDATED_THRESHOLDS[instrument as keyof typeof VALIDATED_THRESHOLDS];
-  
-  if (!thresholds) return 2; // Niveau neutre par défaut
-  
-  for (let level = 0; level <= 4; level++) {
-    const levelKey = level as 0 | 1 | 2 | 3 | 4;
-    const [min, max] = thresholds[levelKey];
-    if (total >= min && total <= max) {
-      return level;
+export function computeLevel(
+  instrument: InstrumentCode,
+  answers: Record<string, number>,
+): 0 | 1 | 2 | 3 | 4 {
+  switch (instrument) {
+    case 'WHO5': {
+      const total = sumLikert(answers, { min: 0, max: 5 });
+      if (total <= 12) return 0;
+      if (total <= 16) return 1;
+      if (total <= 20) return 2;
+      if (total <= 23) return 3;
+      return 4;
+    }
+    case 'STAI6': {
+      const total = sumLikert(answers, { min: 1, max: 4 }, { reversed: ['1', '4', '5'] });
+      if (total <= 10) return 0;
+      if (total <= 15) return 1;
+      if (total <= 20) return 2;
+      if (total <= 23) return 3;
+      return 4;
+    }
+    case 'SUDS': {
+      const value = clamp(Number(answers['1'] ?? 0), 0, 10);
+      return Math.min(4, Math.max(0, Math.floor(value / 2))) as 0 | 1 | 2 | 3 | 4;
+    }
+    case 'SAM': {
+      const valence = clamp(Number(answers['1'] ?? 5), 1, 9);
+      if (valence >= 8) return 4;
+      if (valence >= 6) return 3;
+      if (valence >= 4) return 2;
+      if (valence >= 3) return 1;
+      return 0;
+    }
+    default: {
+      return 2;
     }
   }
-  
-  return 2; // Fallback niveau neutre
 }
 
-/**
- * Calcule le total en gérant les items inversés
- */
-function calculateTotal(instrument: InstrumentCode, answers: Record<string, number>): number {
-  const reversedItems = (REVERSED_ITEMS as any)[instrument] || [];
+export function summarize(instrument: InstrumentCode, level: 0 | 1 | 2 | 3 | 4): string {
+  return SUMMARIES[instrument]?.[level] ?? 'état évalué';
+}
+
+export function scoreToJson(instrument: InstrumentCode, level: 0 | 1 | 2 | 3 | 4): ScoringResult {
+  const version = getCatalog(instrument, 'fr').version;
+  const summary = summarize(instrument, level);
+  const focus = FOCUS_HINTS[instrument]?.[level];
+
+  return {
+    level,
+    summary,
+    instrument_version: version,
+    generated_at: new Date().toISOString(),
+    ...(focus ? { focus } : {}),
+  };
+}
+
+function sumLikert(
+  answers: Record<string, number>,
+  range: { min: number; max: number },
+  opts?: { reversed?: string[] },
+): number {
+  const { min, max } = range;
+  const reversed = new Set(opts?.reversed ?? []);
   let total = 0;
-  
-  Object.entries(answers).forEach(([itemId, value]) => {
-    const itemNumber = parseInt(itemId);
-    const isReversed = (reversedItems as number[]).includes(itemNumber);
-    
-    if (isReversed) {
-      // Inversion selon l'échelle de l'instrument
-      const maxScale = getMaxScale(instrument);
-      total += (maxScale + 1) - value;
-    } else {
-      total += value;
+
+  for (const [id, raw] of Object.entries(answers)) {
+    let value = Number(raw);
+    if (Number.isNaN(value)) continue;
+    value = clamp(value, min, max);
+    if (reversed.has(id)) {
+      const span = max - min;
+      value = max - (value - min);
+      if (span === 0) {
+        value = min;
+      }
     }
-  });
-  
+    total += value;
+  }
+
   return total;
 }
 
-/**
- * Retourne l'échelle maximale pour chaque instrument
- */
-function getMaxScale(instrument: InstrumentCode): number {
-  switch (instrument) {
-    case 'STAI6':
-    case 'WHO5':
-    case 'PSS10':
-      return 4; // Échelle 0-4
-    case 'SAM':
-      return 9; // Échelle 1-9
-    case 'SUDS':
-      return 10; // Échelle 0-10
-    case 'PANAS10':
-      return 5; // Échelle 1-5
-    default:
-      return 4;
-  }
-}
-
-/**
- * Génère un résumé textuel anonymisé (conforme aux exigences de no-clinical-terms)
- */
-export function summarize(instrument: InstrumentCode, level: number): string {
-  const summaries = {
-    WHO5: [
-      'état général nécessitant attention',
-      'besoin de réconfort et soutien',
-      'équilibre à maintenir',
-      'énergie positive présente',
-      'vitalité rayonnante'
-    ],
-    STAI6: [
-      'calme profond et sérénité',
-      'tranquillité générale',
-      'tension modérée observable',
-      'tension présente',
-      'intensité émotionnelle élevée'
-    ],
-    SAM: [
-      'tonalité très douce',
-      'couleur apaisante',
-      'nuance équilibrée',
-      'luminosité vive',
-      'éclat vibrant'
-    ],
-    SUDS: [
-      'quiétude profonde',
-      'légère variation',
-      'fluctuation modérée',
-      'intensité marquée',
-      'amplitude maximale'
-    ],
-    PANAS10: [
-      'palette très douce',
-      'couleurs tamisées',
-      'nuances variées',
-      'tons éclatants',
-      'éclat vibrant'
-    ],
-    PSS10: [
-      'fluidité optimale',
-      'circulation douce',
-      'rythme équilibré',
-      'mouvement intense',
-      'turbulence maximale'
-    ]
-  };
-  
-  return summaries[instrument as keyof typeof summaries]?.[level] || 'équilibre à maintenir';
-}
-
-/**
- * Génère un résultat complet avec métadonnées
- */
-export function scoreToJson(instrument: InstrumentCode, level: number) {
-  return {
-    level,
-    summary: summarize(instrument, level),
-    instrument_version: '1.0',
-    generated_at: new Date().toISOString(),
-    // Focus spécifique selon l'instrument (optionnel)
-    ...(instrument === 'SUDS' && level >= 3 && { focus: 'distress_support' })
-  };
+function clamp(value: number, min: number, max: number): number {
+  return Math.max(min, Math.min(max, value));
 }

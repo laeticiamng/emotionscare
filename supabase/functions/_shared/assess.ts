@@ -47,7 +47,6 @@ const CATALOGS: Record<InstrumentCode, Record<LocaleCode, InstrumentCatalog>> = 
   'WHO5': {
     'fr': {
       code: 'WHO5',
-      locale: 'fr',
       name: 'Indice de bien-être OMS',
       version: '1.0',
       expiry_minutes: 30,
@@ -61,7 +60,6 @@ const CATALOGS: Record<InstrumentCode, Record<LocaleCode, InstrumentCatalog>> = 
     },
     'en': {
       code: 'WHO5',
-      locale: 'en',
       name: 'WHO Well-Being Index',
       version: '1.0',
       expiry_minutes: 30,
@@ -75,7 +73,6 @@ const CATALOGS: Record<InstrumentCode, Record<LocaleCode, InstrumentCatalog>> = 
     },
     'es': {
       code: 'WHO5',
-      locale: 'es',
       name: 'Índice de Bienestar OMS',
       version: '1.0',
       expiry_minutes: 30,
@@ -89,7 +86,6 @@ const CATALOGS: Record<InstrumentCode, Record<LocaleCode, InstrumentCatalog>> = 
     },
     'de': {
       code: 'WHO5',
-      locale: 'de',
       name: 'WHO Wohlbefinden Index',
       version: '1.0',
       expiry_minutes: 30,
@@ -103,7 +99,6 @@ const CATALOGS: Record<InstrumentCode, Record<LocaleCode, InstrumentCatalog>> = 
     },
     'it': {
       code: 'WHO5',
-      locale: 'it',
       name: 'Indice di Benessere OMS',
       version: '1.0',
       expiry_minutes: 30,
@@ -119,7 +114,6 @@ const CATALOGS: Record<InstrumentCode, Record<LocaleCode, InstrumentCatalog>> = 
   'STAI6': {
     'fr': {
       code: 'STAI6',
-      locale: 'fr',
       name: 'Inventaire d\'anxiété état (court)',
       version: '1.0',
       expiry_minutes: 15,
@@ -134,7 +128,6 @@ const CATALOGS: Record<InstrumentCode, Record<LocaleCode, InstrumentCatalog>> = 
     },
     'en': {
       code: 'STAI6',
-      locale: 'en',
       name: 'State Anxiety Inventory (Short)',
       version: '1.0',
       expiry_minutes: 15,
@@ -149,7 +142,6 @@ const CATALOGS: Record<InstrumentCode, Record<LocaleCode, InstrumentCatalog>> = 
     },
     'es': {
       code: 'STAI6',
-      locale: 'es',
       name: 'Inventario de Ansiedad Estado (Corto)',
       version: '1.0',
       expiry_minutes: 15,
@@ -164,7 +156,6 @@ const CATALOGS: Record<InstrumentCode, Record<LocaleCode, InstrumentCatalog>> = 
     },
     'de': {
       code: 'STAI6',
-      locale: 'de',
       name: 'Zustandsangst Inventar (Kurz)',
       version: '1.0',
       expiry_minutes: 15,
@@ -179,7 +170,6 @@ const CATALOGS: Record<InstrumentCode, Record<LocaleCode, InstrumentCatalog>> = 
     },
     'it': {
       code: 'STAI6',
-      locale: 'it',
       name: 'Inventario Ansia di Stato (Breve)',
       version: '1.0',
       expiry_minutes: 15,
@@ -196,7 +186,6 @@ const CATALOGS: Record<InstrumentCode, Record<LocaleCode, InstrumentCatalog>> = 
   'SAM': {
     'fr': {
       code: 'SAM',
-      locale: 'fr',
       name: 'Auto-évaluation émotionnelle',
       version: '1.0',
       expiry_minutes: 5,
@@ -207,7 +196,6 @@ const CATALOGS: Record<InstrumentCode, Record<LocaleCode, InstrumentCatalog>> = 
     },
     'en': {
       code: 'SAM',
-      locale: 'en',
       name: 'Self-Assessment Manikin',
       version: '1.0',
       expiry_minutes: 5,
@@ -218,7 +206,6 @@ const CATALOGS: Record<InstrumentCode, Record<LocaleCode, InstrumentCatalog>> = 
     },
     'es': {
       code: 'SAM',
-      locale: 'es',
       name: 'Muñeco de Auto-evaluación',
       version: '1.0',
       expiry_minutes: 5,
@@ -229,7 +216,6 @@ const CATALOGS: Record<InstrumentCode, Record<LocaleCode, InstrumentCatalog>> = 
     },
     'de': {
       code: 'SAM',
-      locale: 'de',
       name: 'Selbstbewertungs-Männchen',
       version: '1.0',
       expiry_minutes: 5,
@@ -240,7 +226,6 @@ const CATALOGS: Record<InstrumentCode, Record<LocaleCode, InstrumentCatalog>> = 
     },
     'it': {
       code: 'SAM',
-      locale: 'it',
       name: 'Omino di Auto-valutazione',
       version: '1.0',
       expiry_minutes: 5,
@@ -253,7 +238,6 @@ const CATALOGS: Record<InstrumentCode, Record<LocaleCode, InstrumentCatalog>> = 
   'SUDS': {
     'fr': {
       code: 'SUDS',
-      locale: 'fr',
       name: 'Unités subjectives de détresse',
       version: '1.0',
       expiry_minutes: 5,
@@ -263,7 +247,6 @@ const CATALOGS: Record<InstrumentCode, Record<LocaleCode, InstrumentCatalog>> = 
     },
     'en': {
       code: 'SUDS',
-      locale: 'en',
       name: 'Subjective Units of Distress',
       version: '1.0',
       expiry_minutes: 5,
@@ -273,7 +256,6 @@ const CATALOGS: Record<InstrumentCode, Record<LocaleCode, InstrumentCatalog>> = 
     },
     'es': {
       code: 'SUDS',
-      locale: 'es',
       name: 'Unidades Subjetivas de Angustia',
       version: '1.0',
       expiry_minutes: 5,
@@ -283,7 +265,6 @@ const CATALOGS: Record<InstrumentCode, Record<LocaleCode, InstrumentCatalog>> = 
     },
     'de': {
       code: 'SUDS',
-      locale: 'de',
       name: 'Subjektive Belastungseinheiten',
       version: '1.0',
       expiry_minutes: 5,
@@ -293,7 +274,6 @@ const CATALOGS: Record<InstrumentCode, Record<LocaleCode, InstrumentCatalog>> = 
     },
     'it': {
       code: 'SUDS',
-      locale: 'it',
       name: 'Unità Soggettive di Distress',
       version: '1.0',
       expiry_minutes: 5,
@@ -310,7 +290,6 @@ const CATALOGS: Record<InstrumentCode, Record<LocaleCode, InstrumentCatalog>> = 
   'AAQ2': {
     'fr': {
       code: 'AAQ2',
-      locale: 'fr',
       name: "Questionnaire d'acceptation et d'action", 
       version: '1.0',
       expiry_minutes: 30,
@@ -326,7 +305,6 @@ const CATALOGS: Record<InstrumentCode, Record<LocaleCode, InstrumentCatalog>> = 
     },
     'en': {
       code: 'AAQ2',
-      locale: 'en',
       name: 'Acceptance and Action Questionnaire II',
       version: '1.0',
       expiry_minutes: 30,
