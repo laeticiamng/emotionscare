@@ -3,10 +3,10 @@ import { useAssess } from '@/hooks/useAssess';
 import { AssessCard } from './AssessCard';
 import { AssessForm } from './AssessForm';
 import { VerbalBadge } from './VerbalBadge';
-import type { Instrument } from '../../../../packages/contracts/assess';
+import type { InstrumentCode } from '@/lib/assess/types';
 
 interface AssessmentWrapperProps {
-  instrument: Instrument;
+  instrument: InstrumentCode;
   title: string;
   description: string;
   context?: string;
@@ -50,9 +50,10 @@ export function AssessmentWrapper({
     setView('form');
   };
 
-  const handleSubmit = (answers: Array<{id: string, value: number}>, meta?: any) => {
+  const handleSubmit = (responses: Record<string, number>) => {
+    const answers = Object.entries(responses).map(([id, value]) => ({ id, value }));
     if (assess.currentSession) {
-      assess.submit(assess.currentSession.session_id, answers, meta);
+      assess.submit(assess.currentSession.session_id, answers);
     }
   };
 
@@ -92,10 +93,11 @@ export function AssessmentWrapper({
   if (view === 'form' && assess.currentSession) {
     return (
       <AssessForm
-        session={assess.currentSession}
+        instrument={instrument}
+        items={assess.currentSession.items || []}
         onSubmit={handleSubmit}
         onCancel={handleCancel}
-        isSubmitting={assess.isSubmitting}
+        isLoading={assess.isSubmitting}
         className={className}
       />
     );

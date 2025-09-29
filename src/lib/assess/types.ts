@@ -1,5 +1,5 @@
 export type LocaleCode = 'fr' | 'en' | 'es' | 'de' | 'it';
-export type InstrumentCode = 'WHO5' | 'STAI6' | 'SAM' | 'SUDS';
+export type InstrumentCode = 'WHO5' | 'STAI6' | 'SAM' | 'SUDS' | 'PANAS10' | 'PSS10' | 'UCLA3' | 'MSPSS' | 'AAQ2' | 'POMS_SF' | 'SSQ' | 'ISI' | 'GAS' | 'GRITS' | 'BRS' | 'WEMWBS' | 'SWEMWBS' | 'UWES9' | 'CBI' | 'CVSQ';
 
 export type ItemType = 'scale' | 'choice' | 'slider';
 

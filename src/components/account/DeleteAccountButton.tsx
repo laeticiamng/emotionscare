@@ -18,8 +18,8 @@ export const DeleteAccountButton: React.FC<DeleteAccountButtonProps> = ({
     setShowModal(true);
     
     // Analytics
-    if (typeof window !== 'undefined' && window.gtag) {
-      window.gtag('event', 'account_delete_open_modal');
+    if (typeof window !== 'undefined' && (window as any).gtag) {
+      (window as any).gtag('event', 'account_delete_open_modal');
     }
   };
 

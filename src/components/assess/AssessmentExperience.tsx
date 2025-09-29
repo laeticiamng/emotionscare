@@ -4,10 +4,10 @@ import { AssessmentWrapper } from './AssessmentWrapper';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Star, Sparkles, Heart, Brain, Zap, Wind } from 'lucide-react';
-import type { Instrument } from '../../../../packages/contracts/assess';
+import type { InstrumentCode } from '@/lib/assess/types';
 
 interface AssessmentExperienceProps {
-  instrument: Instrument;
+  instrument: InstrumentCode;
   title: string;
   description: string;
   context?: string;

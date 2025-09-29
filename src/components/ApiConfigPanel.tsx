@@ -13,7 +13,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Loader2, Key, Save, RefreshCw, ExternalLink } from 'lucide-react';
-import ApiStatus from './ApiStatus';
+// ApiStatus component was removed during cleanup
+const ApiStatus = () => (
+  <div className="p-4 text-center text-muted-foreground">
+    <p>Configuration API en cours de développement</p>
+  </div>
+);
 import { API_URL } from '@/lib/env';
 
 interface ApiConfigPanelProps {

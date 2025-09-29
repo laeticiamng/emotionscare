@@ -22,8 +22,8 @@ import {
   Mountain,
   Flag,
   Gem,
-  Fire,
-  Lightning,
+  Flame as Fire,
+  Zap as Lightning,
   Users
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';

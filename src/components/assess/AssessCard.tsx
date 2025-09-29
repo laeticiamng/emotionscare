@@ -3,10 +3,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { AlertCircle, Clock, CheckCircle2 } from 'lucide-react';
-import type { Instrument } from '../../../../packages/contracts/assess';
+import type { InstrumentCode } from '@/lib/assess/types';
 
 interface AssessCardProps {
-  instrument: Instrument;
+  instrument: InstrumentCode;
   title: string;
   description: string;
   estimatedTime?: number; // en minutes
@@ -18,7 +18,7 @@ interface AssessCardProps {
   className?: string;
 }
 
-const instrumentLabels: Record<Instrument, string> = {
+const instrumentLabels: Record<InstrumentCode, string> = {
   WHO5: "Bien-être",
   STAI6: "Détente",
   PANAS10: "Émotions",

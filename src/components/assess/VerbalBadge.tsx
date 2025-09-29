@@ -22,7 +22,7 @@ interface VerbalBadgeProps {
   className?: string;
 }
 
-const iconMap: Record<string, React.ElementType> = {
+const iconMap: Record<string, typeof Heart> = {
   // Mots-clés positifs
   'apais': Leaf,
   'calme': Leaf,
@@ -64,7 +64,7 @@ const iconMap: Record<string, React.ElementType> = {
   'victoire': CheckCircle2
 };
 
-const getIconForHint = (hint: string): React.ElementType => {
+const getIconForHint = (hint: string): typeof Heart => {
   const lowerHint = hint.toLowerCase();
   
   for (const [keyword, Icon] of Object.entries(iconMap)) {
@@ -116,7 +116,7 @@ export function VerbalBadge({
   if (variant === 'minimal') {
     return (
       <Badge variant={badgeVariant} className={`assess-badge-minimal ${className}`}>
-        {Icon && <Icon className="w-3 h-3 mr-1" />}
+        {Icon && React.createElement(Icon, { className: "w-3 h-3 mr-1" })}
         {primaryHint}
       </Badge>
     );
@@ -129,7 +129,7 @@ export function VerbalBadge({
           <div className="flex items-start gap-3">
             {Icon && (
               <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                <Icon className="w-4 h-4 text-primary" />
+                {React.createElement(Icon, { className: "w-4 h-4 text-primary" })}
               </div>
             )}
             <div className="flex-1 min-w-0">
@@ -159,7 +159,7 @@ export function VerbalBadge({
   return (
     <div className={`assess-badge-default space-y-2 ${className}`}>
       <Badge variant={badgeVariant} className="inline-flex items-center gap-1">
-        {Icon && <Icon className="w-3 h-3" />}
+        {Icon && React.createElement(Icon, { className: "w-3 h-3" })}
         {primaryHint}
       </Badge>
       
