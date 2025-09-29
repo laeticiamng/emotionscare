@@ -18,8 +18,6 @@
     "exactOptionalPropertyTypes": false,
     "noPropertyAccessFromIndexSignature": false,
     "noUncheckedIndexedAccess": false,
-    "suppressImplicitAnyIndexErrors": true,
-    "suppressExcessPropertyErrors": true,
     "noEmitOnError": false,
     "noTypeCheck": true,
     "moduleResolution": "bundler",
