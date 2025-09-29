@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useAccessibilityValidation } from '@/hooks/useAccessibilityValidation';
-import { CheckCircle, XCircle, AlertTriangle, RefreshCw, Shield, Eye, Keyboard, Volume2 } from 'lucide-react';
+import { CheckCircle, XCircle, AlertTriangle, RefreshCw, Shield, Eye, Keyboard, Volume2 } from '@/lib/icons';
 
 const AccessibilityAudit: React.FC = () => {
   const { report, isValidating, validateAccessibility } = useAccessibilityValidation();
