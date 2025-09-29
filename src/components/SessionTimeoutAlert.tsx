@@ -2,7 +2,7 @@
 import React, { useEffect } from 'react';
 import { useSessionSecurity } from '@/hooks/use-session-security';
 import { Button } from '@/components/ui/button';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle } from '@/lib/icons';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 

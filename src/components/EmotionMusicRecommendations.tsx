@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Play, Music } from 'lucide-react';
+import { Play, Music } from '@/lib/icons';
 import { useMusic } from '@/hooks/useMusic';
 import { useMusicEmotionIntegration } from '@/hooks/useMusicEmotionIntegration';
 
