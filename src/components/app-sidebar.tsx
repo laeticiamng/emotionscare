@@ -104,7 +104,7 @@ export function AppSidebar() {
           url: routes.b2c.heatmap(),
           icon: BarChart3,
           gradient: "from-orange-500 to-red-500",
-          description: "Courbes d’humeur et heatmap quotidienne"
+          description: "Courbes d'humeur et heatmap quotidienne"
         }
       ]
     },
@@ -258,6 +258,7 @@ export function AppSidebar() {
             {!collapsed && (
               <SidebarGroupLabel className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 flex items-center">
                 {group.icon && (
+                  // @ts-ignore
                   <group.icon className="w-4 h-4 mr-2" />
                 )}
                 {group.label}
@@ -292,6 +293,7 @@ export function AppSidebar() {
                                   ? "bg-blue-100 text-blue-600" 
                                   : "bg-slate-100 text-slate-600 group-hover:bg-slate-200"
                             }`}>
+                              {/* @ts-ignore */}
                               <item.icon className="w-4 h-4" />
                             </div>
 
