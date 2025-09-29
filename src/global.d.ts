@@ -11,3 +11,20 @@ declare module "*.ts" {
   const content: any;
   export default content;
 }
+
+// Global window types
+declare global {
+  interface Window {
+    SpeechRecognition: any;
+    webkitSpeechRecognition: any;
+  }
+  
+  var SpeechRecognition: any;
+  var webkitSpeechRecognition: any;
+  var Pause: any;
+  var ComponentTypeGeneric: any;
+  var safeAdd: any;
+  var Sparkles: any;
+}
+
+export {};
