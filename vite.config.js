@@ -31,7 +31,7 @@ export default defineConfig(({ mode }) => ({
     logLevel: 'silent'
   },
   optimizeDeps: {
-    include: ['react', 'react-dom', 'react-router-dom', '@tanstack/react-query']
+    include: ['react', 'react-dom', 'react-router-dom', '@tanstack/react-query', 'lucide-react']
   },
   define: {
     __LOVABLE_TEMPLATE_UPDATED__: true,

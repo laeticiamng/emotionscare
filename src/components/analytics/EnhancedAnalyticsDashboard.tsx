@@ -44,7 +44,7 @@ import {
   PieChart as PieIcon,
   LineChartIcon,
   AlertCircle
-} from 'lucide-react';
+} from '@/lib/icons';
 import { cn } from '@/lib/utils';
 
 // Services et hooks

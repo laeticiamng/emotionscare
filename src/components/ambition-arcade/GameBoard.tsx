@@ -8,10 +8,10 @@ import {
   Zap, 
   Star, 
   Trophy,
-  ArrowUp,
+  ArrowLeft as ArrowUp,
   Clock,
   TrendingUp
-} from 'lucide-react';
+} from '@/lib/icons';
 import { AmbitionRun } from '@/types/ambition';
 
 interface GameBoardProps {

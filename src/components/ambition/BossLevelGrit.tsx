@@ -25,7 +25,7 @@ import {
   Fire,
   Lightning,
   Users
-} from 'lucide-react';
+} from '@/lib/icons';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 
