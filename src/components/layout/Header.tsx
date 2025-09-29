@@ -48,7 +48,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/contexts/AuthContext';
-import { useTheme } from '@/providers/ThemeProvider';
+// import { useTheme } from '@/providers/ThemeProvider';
 
 interface HeaderProps {
   className?: string;
@@ -64,7 +64,7 @@ const Header: React.FC<HeaderProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [notifications, setNotifications] = useState(3);
   const { user, signOut, isAuthenticated } = useAuth();
-  const { theme, setTheme } = useTheme();
+  // const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -313,37 +313,15 @@ const Header: React.FC<HeaderProps> = ({
               </div>
             )}
 
-            {/* Theme Switcher */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  className="w-9 h-9 p-0"
-                  aria-label="Changer le thème"
-                >
-                  {theme === 'light' && <Sun className="h-4 w-4" />}
-                  {theme === 'dark' && <Moon className="h-4 w-4" />}
-                  {theme === 'system' && <Monitor className="h-4 w-4" />}
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuLabel>Apparence</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => setTheme('light')}>
-                  <Sun className="mr-2 h-4 w-4" />
-                  <span>Clair</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setTheme('dark')}>
-                  <Moon className="mr-2 h-4 w-4" />
-                  <span>Sombre</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setTheme('system')}>
-                  <Monitor className="mr-2 h-4 w-4" />
-                  <span>Système</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {/* Theme Switcher - Simplifié */}
+            <Button 
+              variant="ghost" 
+              size="sm"
+              className="w-9 h-9 p-0"
+              aria-label="Changer le thème"
+            >
+              <Sun className="h-4 w-4" />
+            </Button>
 
             {/* User Actions */}
             {isAuthenticated && user ? (
