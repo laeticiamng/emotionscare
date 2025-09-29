@@ -1,13 +1,16 @@
+import '@/observability/sentry.client';
 import i18n from '@/lib/i18n';
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { RouterProvider } from 'react-router-dom';
 import './index.css';
+import './styles/accessibility.css';
+import './theme/theme.css';
 import { Loader2 } from 'lucide-react';
 import AccessibilitySkipLinks from '@/components/AccessibilitySkipLinks';
 import RootErrorBoundary from '@/app/RootErrorBoundary';
-import AppProviders from './AppProviders';
-import router from '@/router';
+import { RootProvider } from '@/providers';
+import { router } from '@/routerV2/router';
 
 // Ajouter les métadonnées d'accessibilité essentielles
 const addAccessibilityMeta = () => {
@@ -99,10 +102,10 @@ createRoot(rootElement).render(
           </div>
         }
       >
-        <AppProviders>
+        <RootProvider>
           <AccessibilitySkipLinks />
           <RouterProvider router={router} />
-        </AppProviders>
+        </RootProvider>
       </React.Suspense>
     </RootErrorBoundary>
   </React.StrictMode>

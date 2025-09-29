@@ -9,7 +9,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-// Dashboard tabs removed for simplicity
+import GlobalOverviewTab from '../dashboard/tabs/GlobalOverviewTab';
+import AnalyticsTab from '../dashboard/tabs/AnalyticsTab';
+import JournalTab from '../dashboard/tabs/JournalTab';
+import PersonalDataTab from '../dashboard/tabs/PersonalDataTab';
 import { User } from '@/types/user';
 import { 
   TrendingUp, 
@@ -34,7 +37,7 @@ const EnhancedUserDashboard: React.FC<EnhancedUserDashboardProps> = ({ user }) =
   const [activeTab, setActiveTab] = useState('overview');
 
   // Les collaborateurs B2B n'ont accès qu'à leurs données personnelles
-  const isB2BUser = user.role === 'b2b';
+  const isB2BUser = user.role === 'b2b_user';
 
   // Données simulées pour l'aperçu amélioré
   const dashboardStats = {
@@ -285,24 +288,15 @@ const EnhancedUserDashboard: React.FC<EnhancedUserDashboardProps> = ({ user }) =
             </TabsList>
             
             <TabsContent value="overview">
-              <div className="text-center py-8">
-                <h3 className="text-lg font-semibold">Vue globale</h3>
-                <p className="text-muted-foreground">Votre aperçu personnel</p>
-              </div>
+              <GlobalOverviewTab className="w-full" userRole={user.role} />
             </TabsContent>
             
             <TabsContent value="analytics">
-              <div className="text-center py-8">
-                <h3 className="text-lg font-semibold">Mes analyses</h3>
-                <p className="text-muted-foreground">Vos données personnalisées</p>
-              </div>
+              <AnalyticsTab className="w-full" personalOnly={isB2BUser} />
             </TabsContent>
             
             <TabsContent value="journal">
-              <div className="text-center py-8">
-                <h3 className="text-lg font-semibold">Mon journal</h3>
-                <p className="text-muted-foreground">Vos réflexions personnelles</p>
-              </div>
+              <JournalTab className="w-full" />
             </TabsContent>
           </Tabs>
         </div>

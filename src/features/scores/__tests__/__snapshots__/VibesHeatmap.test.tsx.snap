@@ -1,0 +1,216 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`VibesHeatmap > renders a stable accessible grid 1`] = `
+<figure
+  aria-describedby="desc"
+  aria-labelledby="title"
+  class="space-y-3"
+  data-testid="scores-heatmap-chart"
+  role="img"
+>
+  <div
+    class="rounded-lg border border-border bg-card p-4"
+  >
+    <div
+      class="flex gap-4"
+    >
+      <div
+        aria-hidden="true"
+        class="flex flex-col justify-between py-2 text-xs text-muted-foreground"
+      >
+        <span
+          class="h-[22px] leading-[22px]"
+        >
+          Lun
+        </span>
+        <span
+          class="h-[22px] leading-[22px]"
+        >
+          Mar
+        </span>
+        <span
+          class="h-[22px] leading-[22px]"
+        >
+          Mer
+        </span>
+        <span
+          class="h-[22px] leading-[22px]"
+        >
+          Jeu
+        </span>
+        <span
+          class="h-[22px] leading-[22px]"
+        >
+          Ven
+        </span>
+        <span
+          class="h-[22px] leading-[22px]"
+        >
+          Sam
+        </span>
+        <span
+          class="h-[22px] leading-[22px]"
+        >
+          Dim
+        </span>
+      </div>
+      <div
+        aria-label="Vibes quotidiennes"
+        class="grid"
+        role="grid"
+        style="grid-template-columns: repeat(1, 22px); gap: 6px; grid-auto-rows: 22px; grid-auto-flow: column;"
+      >
+        <div
+          aria-label="Lundi 6 mai : vibe Posé, nuance présente."
+          class="h-[22px] w-[22px] rounded-md outline-none transition-[box-shadow] focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          data-testid="heatmap-cell-2024-05-06-0-0"
+          role="gridcell"
+          style="background-color: rgb(52, 211, 153);"
+          tabindex="0"
+          title="Lundi 6 mai — Posé (nuance présente)"
+        >
+          <span
+            class="sr-only"
+          >
+            Lundi 6 mai — Posé (nuance présente)
+          </span>
+        </div>
+        <div
+          aria-label="Mardi 7 mai : vibe Lumineux, nuance intense."
+          class="h-[22px] w-[22px] rounded-md outline-none transition-[box-shadow] focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          data-testid="heatmap-cell-2024-05-07-0-1"
+          role="gridcell"
+          style="background-color: rgb(194, 65, 12);"
+          tabindex="0"
+          title="Mardi 7 mai — Lumineux (nuance intense)"
+        >
+          <span
+            class="sr-only"
+          >
+            Mardi 7 mai — Lumineux (nuance intense)
+          </span>
+        </div>
+        <div
+          aria-label="Mercredi 8 mai : aucune vibe dominante."
+          class="h-[22px] w-[22px] rounded-md outline-none transition-[box-shadow] focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          data-testid="heatmap-cell-2024-05-08-0-2"
+          role="gridcell"
+          style="background-color: rgb(226, 232, 240);"
+          tabindex="0"
+          title="Mercredi 8 mai — aucune vibe dominante"
+        >
+          <span
+            class="sr-only"
+          >
+            Mercredi 8 mai — aucune vibe dominante
+          </span>
+        </div>
+      </div>
+    </div>
+    <div
+      aria-label="Légende des vibes"
+      class="mt-4 flex flex-wrap gap-3"
+      role="list"
+    >
+      <div
+        class="flex items-center gap-2"
+        role="listitem"
+      >
+        <span
+          aria-hidden="true"
+          class="inline-flex h-3 w-3 rounded-sm"
+          style="background-color: rgb(52, 211, 153);"
+        />
+        <span
+          class="text-xs text-muted-foreground"
+        >
+          Posé
+        </span>
+      </div>
+      <div
+        class="flex items-center gap-2"
+        role="listitem"
+      >
+        <span
+          aria-hidden="true"
+          class="inline-flex h-3 w-3 rounded-sm"
+          style="background-color: rgb(14, 165, 233);"
+        />
+        <span
+          class="text-xs text-muted-foreground"
+        >
+          Focalisé
+        </span>
+      </div>
+      <div
+        class="flex items-center gap-2"
+        role="listitem"
+      >
+        <span
+          aria-hidden="true"
+          class="inline-flex h-3 w-3 rounded-sm"
+          style="background-color: rgb(249, 115, 22);"
+        />
+        <span
+          class="text-xs text-muted-foreground"
+        >
+          Lumineux
+        </span>
+      </div>
+      <div
+        class="flex items-center gap-2"
+        role="listitem"
+      >
+        <span
+          aria-hidden="true"
+          class="inline-flex h-3 w-3 rounded-sm"
+          style="background-color: rgb(168, 85, 247);"
+        />
+        <span
+          class="text-xs text-muted-foreground"
+        >
+          Régénérant
+        </span>
+      </div>
+      <div
+        class="flex items-center gap-2"
+        role="listitem"
+      >
+        <span
+          aria-hidden="true"
+          class="inline-flex h-3 w-3 rounded-sm bg-muted"
+        />
+        <span
+          class="text-xs text-muted-foreground"
+        >
+          Aucune vibe détectée
+        </span>
+      </div>
+      <div
+        class="flex items-center gap-2"
+        role="listitem"
+      >
+        <div
+          aria-hidden="true"
+          class="flex h-3 overflow-hidden rounded-sm border border-border"
+        >
+          <span
+            class="h-full w-3 bg-slate-200"
+          />
+          <span
+            class="h-full w-3 bg-slate-400"
+          />
+          <span
+            class="h-full w-3 bg-slate-600"
+          />
+        </div>
+        <span
+          class="text-xs text-muted-foreground"
+        >
+          Intensité de la vibe
+        </span>
+      </div>
+    </div>
+  </div>
+</figure>
+`;

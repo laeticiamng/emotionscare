@@ -1,8 +1,16 @@
+
 export interface User {
   id: string;
   email: string;
+  name: string;
   role: 'b2c' | 'b2b';
-  name?: string;
+  createdAt: string;
+  avatar?: string;
+  preferences?: UserPreferences;
 }
 
-export type Segment = 'b2c' | 'b2b';
+export interface UserPreferences {
+  theme?: 'light' | 'dark' | 'system';
+  language?: 'fr' | 'en';
+  notifications?: boolean;
+}
