@@ -1,3 +1,4 @@
+import React from 'react';
 import type { AppLocale } from '@/providers/i18n/resources';
 import { resources } from '@/providers/i18n/resources';
 import { ensureI18n } from '@/providers/i18n/client';
@@ -115,5 +116,15 @@ if (isBrowser) {
     storageWithMarker.__i18nLanguageSyncApplied__ = true;
   }
 }
+
+// Simple t function for compatibility
+export const t = (key: string): string => {
+  return i18nInstance.t(key);
+};
+
+// Simple I18nProvider for compatibility
+export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  return React.createElement(React.Fragment, null, children);
+};
 
 export default i18nInstance;

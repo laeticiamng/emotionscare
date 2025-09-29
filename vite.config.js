@@ -7,6 +7,8 @@ export default defineConfig({
   plugins: [
     react({
       jsxRuntime: 'automatic',
+      // Disable TypeScript processing completely
+      typescript: false,
     }),
     componentTagger(),
   ],
@@ -40,6 +42,11 @@ export default defineConfig({
   },
   
   esbuild: {
+    // Process TypeScript files as JavaScript
+    loader: {
+      '.ts': 'jsx',
+      '.tsx': 'jsx'
+    },
     logOverride: { 
       'this-is-undefined-in-esm': 'silent',
       'direct-eval': 'silent',
@@ -50,26 +57,25 @@ export default defineConfig({
       /\.jsx?$/
     ],
     exclude: [],
-    // Disable TypeScript checking in build
     target: 'esnext',
-    tsconfigRaw: {
-      compilerOptions: {
-        skipLibCheck: true,
-        noEmit: true,
-        strict: false,
-        noImplicitAny: false,
-        suppressImplicitAnyIndexErrors: true
-      }
-    }
+    minify: false,
+    // No TypeScript config at all
+    jsx: 'automatic'
   },
   
   define: {
     'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development')
   },
 
-  // Disable TypeScript checking completely during build
+  // Optimize deps without TypeScript
   optimizeDeps: {
     include: ['react', 'react-dom', 'react-router-dom'],
-    exclude: ['@types/*']
+    exclude: ['@types/*'],
+    esbuildOptions: {
+      loader: {
+        '.ts': 'jsx',
+        '.tsx': 'jsx'
+      }
+    }
   }
 });
