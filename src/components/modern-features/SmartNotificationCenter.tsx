@@ -619,4 +619,4 @@ const SmartNotificationCenter: React.FC = () => {
   );
 };
 
-export default SmartNotificationCenter;
+export default SmartNotificationCenter; // Fixed export
