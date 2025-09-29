@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Activity, AlertTriangle, CheckCircle, XCircle } from '@/lib/icons';
+import { Activity, AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
 
 type HealthStatus = 'online' | 'degraded' | 'offline' | 'checking';
 

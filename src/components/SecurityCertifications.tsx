@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Shield, Lock, FileCheck, Search, Mail, Check, Building, Home } from '@/lib/icons';
+import { Shield, Lock, FileCheck, Search, Mail, Check, Building, Home } from 'lucide-react';
 
 /**
  * Composant affichant les certifications de sécurité avec une présentation élégante

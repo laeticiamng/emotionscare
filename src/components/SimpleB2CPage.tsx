@@ -4,7 +4,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Heart, Brain, Music, Camera, MessageCircle, Star } from '@/lib/icons';
+import { Heart, Brain, Music, Camera, MessageCircle, Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const SimpleB2CPage: React.FC = () => {
