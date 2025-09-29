@@ -289,7 +289,7 @@ describe('Assessment System QA Scenarios', () => {
   describe('7. Telemetry (Structure Only)', () => {
     it('should track assessment events without PII', async () => {
       // Mock console.log to capture telemetry
-      const consoleSpy = vi.spyOn(console, 'log').mockImplementation();
+      const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
 
       render(
         <AssessmentWrapper

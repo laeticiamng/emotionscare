@@ -1,6 +1,6 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import sanitizeHtml from "npm:sanitize-html@2.17.0";
+import sanitizeHtml from "https://esm.sh/sanitize-html@2.17.0";
 import { buildRateLimitResponse, enforceEdgeRateLimit } from "../_shared/rate-limit.ts";
 
 const corsHeaders = {
