@@ -17,21 +17,7 @@ const SessionTimeoutAlert: React.FC = () => {
     if (auth.isAuthenticated && showWarning) {
       toast({
         title: "Session expiration",
-        description: (
-          <div className="flex flex-col space-y-2">
-            <div className="flex items-center text-destructive">
-              <AlertCircle className="w-4 h-4 mr-1" />
-              <span>Votre session va expirer dans {Math.round(timeLeft)} secondes.</span>
-            </div>
-            <Button 
-              size="sm" 
-              onClick={resetTimer} 
-              variant="outline"
-            >
-              Prolonger la session
-            </Button>
-          </div>
-        )
+        description: "Votre session va expirer dans " + Math.round(timeLeft) + " secondes."
       });
     }
   }, [showWarning, resetTimer, auth.isAuthenticated, timeLeft, toast]);

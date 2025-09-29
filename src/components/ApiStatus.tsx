@@ -10,7 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Loader2, CheckCircle, XCircle, RefreshCw } from 'lucide-react';
-import apiServices, { APIStatus } from '@/services';
+import apiServices, { APIStatus, APIStatusItem } from '@/services';
 
 interface ApiStatusProps {
   autoCheck?: boolean;
@@ -21,7 +21,7 @@ const ApiStatus: React.FC<ApiStatusProps> = ({
   autoCheck = false,
   className = '' 
 }) => {
-  const [apiStatus, setApiStatus] = useState<Record<string, APIStatus>>({});
+  const [apiStatus, setApiStatus] = useState<APIStatusItem[]>([]);
   const [isChecking, setIsChecking] = useState(false);
   
   const checkApiStatus = async () => {
@@ -75,13 +75,13 @@ const ApiStatus: React.FC<ApiStatusProps> = ({
       </CardHeader>
       <CardContent>
         <div className="space-y-3">
-          {Object.keys(apiStatus).length === 0 ? (
+          {apiStatus.length === 0 ? (
             <div className="text-center text-muted-foreground py-4">
               {isChecking ? "Vérification en cours..." : "Cliquez sur Vérifier pour tester les API"}
             </div>
           ) : (
-            Object.entries(apiStatus).map(([key, status]) => (
-              <div key={key} className="flex items-center justify-between p-2 border rounded-md">
+            apiStatus.map((status) => (
+              <div key={status.name} className="flex items-center justify-between p-2 border rounded-md">
                 <div>
                   <span className="font-medium">{status.name}</span>
                   <div className="text-xs text-muted-foreground">

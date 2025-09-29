@@ -1,29 +1,14 @@
-export interface APIStatusType {
-  status: 'online' | 'offline' | 'degraded';
-  lastCheck: Date;
-  responseTime: number;
-}
+import { APIStatus, APIStatusItem } from '@/lib/api/status';
 
-export class APIStatus {
-  static async check(): Promise<APIStatusType> {
-    try {
-      const start = Date.now();
-      const response = await fetch('/api/health');
-      const responseTime = Date.now() - start;
-      
-      return {
-        status: response.ok ? 'online' : 'degraded',
-        lastCheck: new Date(),
-        responseTime
-      };
-    } catch (error) {
-      return {
-        status: 'offline',
-        lastCheck: new Date(),
-        responseTime: 0
-      };
-    }
-  }
-}
+// Export the APIStatus class and types
+export { APIStatus } from '@/lib/api/status';
+export type { APIStatusItem } from '@/lib/api/status';
 
-export default APIStatus;
+// Default services object that wraps APIStatus methods
+const apiServices = {
+  checkAllAPIs: () => APIStatus.checkAllAPIs(),
+  getAPIConfiguration: () => APIStatus.getAPIConfiguration(),
+  getAllAPIs: () => APIStatus.getAllAPIs(),
+};
+
+export default apiServices;

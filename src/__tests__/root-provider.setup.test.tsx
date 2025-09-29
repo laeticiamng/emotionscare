@@ -60,6 +60,6 @@ describe('contexts barrel exports', () => {
       <ErrorProvider>{children}</ErrorProvider>
     );
     const { result } = renderHook(() => useError(), { wrapper });
-    expect(typeof result.current.addError).toBe('function');
+    expect(typeof result.current.notify).toBe('function');
   });
 });
