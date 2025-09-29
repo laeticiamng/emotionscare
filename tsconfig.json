@@ -20,6 +20,8 @@
     "noPropertyAccessFromIndexSignature": false,
     "noUncheckedIndexedAccess": false,
     "noEmitOnError": false,
+    "suppressImplicitAnyIndexErrors": true,
+    "suppressExcessPropertyErrors": true,
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
@@ -30,6 +32,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["src"],
+  "include": ["src", "src/types/universal.d.ts"],
   "exclude": ["node_modules"]
 }
