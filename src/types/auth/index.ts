@@ -5,16 +5,15 @@ export type { UserProfile } from '../api.d';
 // Auth context and state types
 export interface AuthContextType {
   user: User | null;
+  session: any | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  error: string | null;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, userData?: any) => Promise<void>;
   signOut: () => Promise<void>;
-  updateProfile: (updates: Partial<User>) => Promise<void>;
-  login: (email: string, password: string) => Promise<void>;
-  clearError: () => void;
-  updateUser: (updates: Partial<User>) => Promise<User>;
+  logout: () => Promise<void>;
+  register: (email: string, password: string, metadata?: any) => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
 }
 
 // Auth form types

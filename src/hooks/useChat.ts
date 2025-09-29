@@ -6,9 +6,12 @@ export interface ChatMessage {
   content: string;
   text: string;
   conversationId: string;
-  sender: 'user' | 'assistant' | 'system';
-  role: 'user' | 'assistant';
-  timestamp: string;
+  sender: 'user' | 'assistant' | 'system' | 'coach';
+  role?: 'user' | 'assistant' | 'system';
+  timestamp: string | Date;
+  isLoading?: boolean;
+  type?: 'text' | 'image' | 'audio';
+  metadata?: Record<string, any>;
 }
 
 export const useChat = ({ initialMessages = [] }: { initialMessages?: ChatMessage[] } = {}) => {

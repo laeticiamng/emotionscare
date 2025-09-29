@@ -23,7 +23,10 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({ message, className })
       >
         <p className="text-sm">{message.content}</p>
         <span className="text-xs opacity-70 mt-1 block">
-          {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          {typeof message.timestamp === 'string' 
+            ? new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            : message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          }
         </span>
       </div>
     </div>

@@ -5,10 +5,11 @@ export interface ChatMessage {
   content: string;
   conversationId: string;
   sender: 'user' | 'assistant' | 'system' | 'coach';
-  role: 'user' | 'assistant' | 'system';
-  timestamp: string;
+  role?: 'user' | 'assistant' | 'system';
+  timestamp: string | Date;
   type?: 'text' | 'image' | 'audio';
   metadata?: Record<string, any>;
+  isLoading?: boolean;
 }
 
 export interface ChatConversation {
