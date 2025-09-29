@@ -17,7 +17,7 @@ import {
   Lightbulb,
   Heart,
   TrendingUp
-} from '@/lib/icons';
+} from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
 interface Message {

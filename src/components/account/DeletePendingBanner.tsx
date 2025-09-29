@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { AlertTriangle, Undo } from '@/lib/icons';
+import { AlertTriangle, Undo } from 'lucide-react';
 import { useAccountDeletion } from '@/hooks/useAccountDeletion';
 
 export const DeletePendingBanner: React.FC = () => {

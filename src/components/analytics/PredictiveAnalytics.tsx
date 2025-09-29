@@ -14,7 +14,7 @@ import {
   Calendar,
   Lightbulb,
   Activity
-} from '@/lib/icons';
+} from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
 
 interface Prediction {

@@ -16,7 +16,7 @@ import {
   Zap,
   Heart,
   Shield
-} from '@/lib/icons';
+} from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, RechartsTooltipProps } from 'recharts';
 
 // Algorithmes de Machine Learning simplifiés

@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { CheckCircle, XCircle, AlertTriangle, RefreshCw } from '@/lib/icons';
+import { CheckCircle, XCircle, AlertTriangle, RefreshCw } from 'lucide-react';
 import { Routes } from '@/routerV2/routes';
 import { validateRouteAccess } from '@/utils/routeValidation';
 import { useAuth } from '@/contexts/AuthContext';

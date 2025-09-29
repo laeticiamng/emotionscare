@@ -8,8 +8,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { 
   BarChart, 
   Bar, 
-  PieChart,
-  LineChart,
+  LineChart, 
+  Line, 
+  PieChart, 
   Pie, 
   Cell, 
   XAxis, 
@@ -41,9 +42,9 @@ import {
   Filter,
   BarChart3,
   PieChart as PieIcon,
-  BarChart3,
+  LineChartIcon,
   AlertCircle
-} from '@/lib/icons';
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 // Services et hooks

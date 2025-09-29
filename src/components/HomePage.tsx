@@ -8,7 +8,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import UnifiedHomePage from '@/pages/unified/UnifiedHomePage';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import { ArrowRight, User } from '@/lib/icons';
+import { ArrowRight, User } from 'lucide-react';
 
 const HomePage: React.FC = () => {
   const { isAuthenticated, user } = useAuth();

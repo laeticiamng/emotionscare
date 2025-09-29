@@ -12,7 +12,7 @@ import {
   Zap,
   Plus,
   X
-} from '@/lib/icons';
+} from 'lucide-react';
 
 interface ObjectiveCreatorProps {
   onCreateObjective: (objective: string, timeframe: string, difficulty: string, tags: string[]) => void;

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Camera, Smile } from '@/lib/icons';
+import { Camera, Smile } from 'lucide-react';
 import { type Emotion } from '@/store/ar.store';
 import EmotionBubble from './EmotionBubble';
 import { useHumeVision } from '@/hooks/useHumeVision';

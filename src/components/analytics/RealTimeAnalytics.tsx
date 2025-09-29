@@ -16,7 +16,7 @@ import {
   BarChart3,
   PieChart,
   LineChart
-} from '@/lib/icons';
+} from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface AnalyticsData {

@@ -2,7 +2,7 @@ import React, { useState, useRef, useCallback } from 'react';
 import { motion, useAnimation, useMotionValue, useTransform } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Heart, Star, ThumbsUp, Zap, Sparkles, Target } from '@/lib/icons';
+import { Heart, Star, ThumbsUp, Zap, Sparkles, Target } from 'lucide-react';
 
 interface MicroInteractionProps {
   children: React.ReactNode;

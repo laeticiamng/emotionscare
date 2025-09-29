@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { CheckCircle, XCircle, AlertCircle, PlayCircle } from '@/lib/icons';
+import { CheckCircle, XCircle, AlertCircle, PlayCircle } from 'lucide-react';
 
 interface AuditItem {
   name: string;

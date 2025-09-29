@@ -9,7 +9,7 @@ import {
   ZoomIn,
   Settings,
   X
-} from '@/lib/icons';
+} from 'lucide-react';
 import {
   safeClassAdd,
   safeClassRemove,

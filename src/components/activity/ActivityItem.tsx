@@ -12,7 +12,7 @@ import {
   Play,
   RotateCcw,
   MoreHorizontal
-} from '@/lib/icons';
+} from 'lucide-react';
 import { ActivityItem } from '@/store/activity.store';
 import { useRouter } from '@/hooks/router';
 

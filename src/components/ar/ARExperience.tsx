@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader } from '@/lib/icons';
+import { Loader } from 'lucide-react';
 
 interface ARExperienceProps {
   emotionData?: any;

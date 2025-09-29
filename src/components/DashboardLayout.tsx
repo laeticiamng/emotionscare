@@ -5,7 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { ModeToggle } from '@/components/theme/ModeToggle';
 import { useLayout } from '@/contexts/LayoutContext';
 import { Button } from '@/components/ui/button';
-import { Menu, Home, Settings, Heart, FileText, Music, User, LogOut } from '@/lib/icons';
+import { Menu, Home, Settings, Heart, FileText, Music, User, LogOut } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface DashboardLayoutProps {
