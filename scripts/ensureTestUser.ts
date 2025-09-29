@@ -51,7 +51,13 @@ const testUsers: TestUser[] = [
 
 async function ensureTestUsers() {
   for (const { email, password, role, name } of testUsers) {
-    const { data: existing, error: fetchError } = await supabase.auth.admin.getUserByEmail(email);
+    const { data: existing, error: fetchError } = await supabase.auth.admin.listUsers({
+      page: 1,
+      perPage: 1000
+    }).then(result => ({
+      data: { user: result.data?.users?.find(u => u.email === email) || null },
+      error: result.error
+    }));
 
     if (fetchError) {
       console.error(`Error fetching user ${email}:`, fetchError.message);

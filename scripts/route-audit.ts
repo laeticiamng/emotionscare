@@ -100,8 +100,14 @@ function detectDuplicatePaths(): string[] {
   }
 
   // Compter les chemins dans les alias
-  for (const alias of ROUTE_ALIASES) {
-    pathCounts.set(alias.from, (pathCounts.get(alias.from) || 0) + 1);
+  if (Array.isArray(ROUTE_ALIASES)) {
+    for (const alias of ROUTE_ALIASES) {
+      pathCounts.set(alias.from, (pathCounts.get(alias.from) || 0) + 1);
+    }
+  } else if (ROUTE_ALIASES && typeof ROUTE_ALIASES === 'object') {
+    Object.entries(ROUTE_ALIASES).forEach(([from, to]) => {
+      pathCounts.set(from, (pathCounts.get(from) || 0) + 1);
+    });
   }
 
   // Identifier les doublons
@@ -211,7 +217,7 @@ async function main() {
   console.log(`📊 Résumé de l'audit:`);
   console.log(`   Routes configurées: ${result.routesCount}`);
   console.log(`   Pages trouvées: ${result.pagesCount}`);
-  console.log(`   Alias configurés: ${ROUTE_ALIASES.length}`);
+  console.log(`   Alias configurés: ${Array.isArray(ROUTE_ALIASES) ? ROUTE_ALIASES.length : Object.keys(ROUTE_ALIASES || {}).length}`);
   console.log('');
 
   // Erreurs critiques (bloquantes)

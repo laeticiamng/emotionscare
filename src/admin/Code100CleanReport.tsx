@@ -219,11 +219,11 @@ const Code100CleanReport: React.FC = () => {
                   <>
                     <div className="flex justify-between text-xs">
                       <span>Fichiers analysés</span>
-                      <span className="font-mono">{phase.filesAnalyzed}</span>
+                      <span className="font-mono">{'filesAnalyzed' in phase ? phase.filesAnalyzed : 0}</span>
                     </div>
                     <div className="flex justify-between text-xs">
                       <span>Issues détectées</span>
-                      <span className="font-mono">{phase.issuesDetected}</span>
+                      <span className="font-mono">{'issuesDetected' in phase ? phase.issuesDetected : 0}</span>
                     </div>
                   </>
                 )}
@@ -231,11 +231,11 @@ const Code100CleanReport: React.FC = () => {
                   <>
                     <div className="flex justify-between text-xs">
                       <span>Fichiers supprimés</span>
-                      <span className="font-mono">{phase.filesDeleted}</span>
+                      <span className="font-mono">{'filesDeleted' in phase ? phase.filesDeleted : 0}</span>
                     </div>
                     <div className="flex justify-between text-xs">
                       <span>Taille réduite</span>
-                      <span className="font-mono text-green-600">{phase.sizeReduced}</span>
+                      <span className="font-mono text-green-600">{'sizeReduced' in phase ? phase.sizeReduced : '0KB'}</span>
                     </div>
                   </>
                 )}
@@ -243,11 +243,11 @@ const Code100CleanReport: React.FC = () => {
                   <>
                     <div className="flex justify-between text-xs">
                       <span>Fichiers nettoyés</span>
-                      <span className="font-mono">{phase.filesDeleted}</span>
+                      <span className="font-mono">{'filesDeleted' in phase ? phase.filesDeleted : 0}</span>
                     </div>
                     <div className="flex justify-between text-xs">
                       <span>Orphelins supprimés</span>
-                      <span className="font-mono">{phase.orphanFilesRemoved}</span>
+                      <span className="font-mono">{'orphanFilesRemoved' in phase ? phase.orphanFilesRemoved : 0}</span>
                     </div>
                   </>
                 )}
@@ -255,11 +255,11 @@ const Code100CleanReport: React.FC = () => {
                   <>
                     <div className="flex justify-between text-xs">
                       <span>Console.log nettoyés</span>
-                      <span className="font-mono">{phase.consoleLogsReplaced}</span>
+                      <span className="font-mono">{'consoleLogsReplaced' in phase ? phase.consoleLogsReplaced : 0}</span>
                     </div>
                     <div className="flex justify-between text-xs">
                       <span>TODOs résolus</span>
-                      <span className="font-mono">{phase.todosResolved}</span>
+                      <span className="font-mono">{'todosResolved' in phase ? phase.todosResolved : 0}</span>
                     </div>
                   </>
                 )}
@@ -271,7 +271,7 @@ const Code100CleanReport: React.FC = () => {
                     </div>
                     <div className="flex justify-between text-xs">
                       <span>Performance</span>
-                      <span className="font-mono text-green-600">+{phase.performanceImproved}</span>
+                      <span className="font-mono text-green-600">+{'performanceImproved' in phase ? phase.performanceImproved : '0%'}</span>
                     </div>
                   </>
                 )}
