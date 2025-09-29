@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Menu } from 'lucide-react';
+import { Menu } from '@/lib/icons';
 import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer';
 
 interface ConversationDrawerProps {
