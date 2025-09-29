@@ -31,8 +31,10 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": [],
+  "include": [
+    "src"
+  ],
   "exclude": [
-    "**/*"
+    "node_modules"
   ]
 }
