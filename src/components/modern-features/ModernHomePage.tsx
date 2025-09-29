@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import UnifiedHomePage from '@/pages/unified/UnifiedHomePage';
+// Unified home page removed for simplicity
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -217,8 +217,11 @@ const ModernHomePage: React.FC = () => {
         </div>
       )}
       
-      {/* Page d'accueil unifiée originale */}
-      <UnifiedHomePage variant="full" />
+      {/* Page d'accueil moderne */}
+      <div className="text-center py-8">
+        <h3 className="text-lg font-semibold">Page d'accueil moderne</h3>
+        <p className="text-muted-foreground">Interface utilisateur améliorée</p>
+      </div>
 
       {/* Section fonctionnalités modernes (pour tous les utilisateurs) */}
       <div className="bg-gradient-to-b from-muted/20 to-background py-16">

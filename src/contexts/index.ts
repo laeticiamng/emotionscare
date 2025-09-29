@@ -16,7 +16,6 @@ export { MusicProvider, useMusic } from './MusicContext';
 // Contextes fonctionnels
 export { FeedbackProvider, useFeedback } from './FeedbackContext';
 export { InnovationProvider, useInnovation } from './InnovationContext';
-export { EthicsProvider, useEthics } from './EthicsContext';
 export { ErrorProvider, useError } from './ErrorContext';
 
 // ========== CONTEXTES SIMPLIFIÉS POUR COMPATIBILITÉ ==========
