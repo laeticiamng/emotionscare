@@ -1,4 +1,5 @@
 export type LocaleCode = 'fr' | 'en' | 'es' | 'de' | 'it';
+
 /**
  * Instruments cliniques validés scientifiquement
  * Basé sur les recherches validées:
@@ -51,4 +52,3 @@ export interface StartRequest {
   instrument: InstrumentCode;
   locale?: LocaleCode;
 }
-

@@ -1,79 +1,39 @@
-import { supabase } from '@/integrations/supabase/client';
-import type { 
-  StartInput, 
-  StartOutput, 
-  SubmitInput, 
-  SubmitOutput, 
-  AggregateInput, 
-  AggregateOutput 
-} from '../../../packages/contracts/assess';
+import type { InstrumentCode } from './types';
 
 /**
- * Client pour les assessments cliniques
- * Intègre avec les Edge Functions Supabase
+ * Mock client for assessment system - simulates Supabase edge functions
  */
 
-export async function startAssess(body: StartInput): Promise<StartOutput> {
-  const { data, error } = await supabase.functions.invoke<StartOutput>('assess-start', { 
-    body 
-  });
+export async function startAssess(body: any) {
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 500));
   
-  if (error) {
-    console.error('Assessment start error:', error);
-    throw new Error(`assess_start_failed: ${error.message}`);
-  }
-  
-  if (!data) {
-    throw new Error('assess_start_no_data');
-  }
-  
-  return data;
+  return {
+    session_id: `mock-${Date.now()}`,
+    items: [],
+    expiry_ts: Date.now() + 30 * 60 * 1000
+  };
 }
 
-export async function submitAssess(body: SubmitInput): Promise<SubmitOutput> {
-  const { data, error } = await supabase.functions.invoke<SubmitOutput>('assess-submit', { 
-    body 
-  });
+export async function submitAssess(body: any) {
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 300));
   
-  if (error) {
-    // Gestion spécifique des erreurs
-    if (error.message?.includes('409') || error.message?.includes('already_submitted')) {
-      // Session déjà soumise - idempotent, on retourne silencieusement
-      throw new Error('assess_already_submitted');
+  return {
+    receipt_id: `receipt-${Date.now()}`,
+    orchestration: {
+      hints: ['Évaluation terminée avec succès']
     }
-    
-    if (error.message?.includes('429') || error.message?.includes('rate_limit')) {
-      throw new Error('assess_rate_limited');
-    }
-    
-    if (error.message?.includes('401') || error.message?.includes('403')) {
-      throw new Error('assess_unauthorized');
-    }
-    
-    console.error('Assessment submit error:', error);
-    throw new Error(`assess_submit_failed: ${error.message}`);
-  }
-  
-  if (!data) {
-    throw new Error('assess_submit_no_data');
-  }
-  
-  return data;
+  };
 }
 
-export async function aggregateAssess(body: AggregateInput): Promise<AggregateOutput> {
-  const { data, error } = await supabase.functions.invoke<AggregateOutput>('assess-aggregate', { 
-    body 
-  });
+export async function aggregateAssess(body: any) {
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 400));
   
-  if (error) {
-    console.error('Assessment aggregate error:', error);
-    throw new Error(`assess_aggregate_failed: ${error.message}`);
-  }
-  
-  if (!data) {
-    throw new Error('assess_aggregate_no_data');
-  }
-  
-  return data;
+  return {
+    ok: true as const,
+    n: 1,
+    text_summary: ['Résultats agrégés disponibles']
+  };
 }

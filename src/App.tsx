@@ -34,7 +34,7 @@ function App() {
             </button>
             <AssessmentWrapper 
               instrument={selectedInstrument}
-              onComplete={(result) => {
+              onComplete={(result: any) => {
                 console.log('Assessment completed:', result);
                 setCurrentView('home');
               }}

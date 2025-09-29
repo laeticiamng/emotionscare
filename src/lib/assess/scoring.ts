@@ -74,7 +74,8 @@ export function computeLevel(instrument: InstrumentCode, answers: Record<string,
   if (!thresholds) return 2; // Niveau neutre par défaut
   
   for (let level = 0; level <= 4; level++) {
-    const [min, max] = thresholds[level as keyof typeof thresholds];
+    const levelKey = level as 0 | 1 | 2 | 3 | 4;
+    const [min, max] = thresholds[levelKey];
     if (total >= min && total <= max) {
       return level;
     }
@@ -87,12 +88,12 @@ export function computeLevel(instrument: InstrumentCode, answers: Record<string,
  * Calcule le total en gérant les items inversés
  */
 function calculateTotal(instrument: InstrumentCode, answers: Record<string, number>): number {
-  const reversedItems = REVERSED_ITEMS[instrument as keyof typeof REVERSED_ITEMS] || [];
+  const reversedItems = (REVERSED_ITEMS as any)[instrument] || [];
   let total = 0;
   
   Object.entries(answers).forEach(([itemId, value]) => {
     const itemNumber = parseInt(itemId);
-    const isReversed = reversedItems.includes(itemNumber);
+    const isReversed = (reversedItems as number[]).includes(itemNumber);
     
     if (isReversed) {
       // Inversion selon l'échelle de l'instrument
