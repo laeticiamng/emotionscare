@@ -1,12 +1,7 @@
 /// <reference types="react" />
 /// <reference types="react-dom" />
 
-// Universal module declarations - completely bypass all type checking
-declare module "*" {
-  const content: any;
-  export = content;
-  export default content;
-}
+// Removed universal module declarations that interfere with lucide-react
 
 // Global window types and universal type overrides
 declare global {
