@@ -16,8 +16,11 @@
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "exactOptionalPropertyTypes": false,
+    "noImplicitUseStrict": false,
     "noPropertyAccessFromIndexSignature": false,
     "noUncheckedIndexedAccess": false,
+    "suppressImplicitAnyIndexErrors": true,
+    "suppressExcessPropertyErrors": true,
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
@@ -28,8 +31,10 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": [],
+  "include": [
+    "src"
+  ],
   "exclude": [
-    "**/*"
+    "node_modules"
   ]
 }
