@@ -1,14 +1,11 @@
 import React from 'react';
-import { createBrowserRouter } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import HomePage from '@/components/HomePage';
+import AppHome from '@/pages/app/AppHome';
+import AdvancedSettings from '@/components/modern-features/AdvancedSettings';
 import ScanPage from '@/pages/modules/ScanPage';
 import MusicPage from '@/pages/modules/MusicPage';
 import CoachPage from '@/pages/modules/CoachPage';
-import JournalPage from '@/pages/modules/JournalPage';
-import VRPage from '@/pages/modules/VRPage';
-import AnalyticsPage from '@/pages/modules/AnalyticsPage';
-import SocialPage from '@/pages/modules/SocialPage';
-import BreathworkPage from '@/pages/modules/BreathworkPage';
 
 export const router = createBrowserRouter([
   {
@@ -17,7 +14,11 @@ export const router = createBrowserRouter([
   },
   {
     path: '/app',
-    element: <HomePage />
+    element: <AppHome />
+  },
+  {
+    path: '/app/settings',
+    element: <AdvancedSettings />
   },
   {
     path: '/scan',
@@ -30,26 +31,6 @@ export const router = createBrowserRouter([
   {
     path: '/coach',
     element: <CoachPage />
-  },
-  {
-    path: '/journal',
-    element: <JournalPage />
-  },
-  {
-    path: '/vr',
-    element: <VRPage />
-  },
-  {
-    path: '/analytics',
-    element: <AnalyticsPage />
-  },
-  {
-    path: '/social',
-    element: <SocialPage />
-  },
-  {
-    path: '/breathwork',
-    element: <BreathworkPage />
   }
 ]);
 

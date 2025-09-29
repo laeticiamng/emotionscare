@@ -1,0 +1,202 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`ModulesIndexPage > rend la page et liste les modules 1`] = `
+<div>
+  <main
+    aria-label="Catalogue des modules"
+  >
+    <header>
+      <h1>
+        Modules
+      </h1>
+      <p>
+        Explore les expériences disponibles
+      </p>
+    </header>
+    <div
+      style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px;"
+    >
+      <div>
+        <h2>
+          FlashGlow
+        </h2>
+        <p>
+          Accéder au module 
+          flash-glow
+        </p>
+        <a
+          data-ui="primary-cta"
+          href="/modules/flash-glow"
+        >
+          Ouvrir
+        </a>
+      </div>
+      <div>
+        <h2>
+          AdaptiveMusic
+        </h2>
+        <p>
+          Accéder au module 
+          adaptive-music
+        </p>
+        <a
+          data-ui="primary-cta"
+          href="/modules/adaptive-music"
+        >
+          Ouvrir
+        </a>
+      </div>
+      <div>
+        <h2>
+          BossGrit
+        </h2>
+        <p>
+          Accéder au module 
+          boss-grit
+        </p>
+        <a
+          data-ui="primary-cta"
+          href="/modules/boss-grit"
+        >
+          Ouvrir
+        </a>
+      </div>
+      <div>
+        <h2>
+          BreathConstellation
+        </h2>
+        <p>
+          Accéder au module 
+          breath-constellation
+        </p>
+        <a
+          data-ui="primary-cta"
+          href="/modules/breath-constellation"
+        >
+          Ouvrir
+        </a>
+      </div>
+      <div>
+        <h2>
+          BubbleBeat
+        </h2>
+        <p>
+          Accéder au module 
+          bubble-beat
+        </p>
+        <a
+          data-ui="primary-cta"
+          href="/modules/bubble-beat"
+        >
+          Ouvrir
+        </a>
+      </div>
+      <div>
+        <h2>
+          Coach
+        </h2>
+        <p>
+          Accéder au module 
+          coach
+        </p>
+        <a
+          data-ui="primary-cta"
+          href="/modules/coach"
+        >
+          Ouvrir
+        </a>
+      </div>
+      <div>
+        <h2>
+          EmotionScan
+        </h2>
+        <p>
+          Accéder au module 
+          emotion-scan
+        </p>
+        <a
+          data-ui="primary-cta"
+          href="/modules/emotion-scan"
+        >
+          Ouvrir
+        </a>
+      </div>
+      <div>
+        <h2>
+          FlashGlowUltra
+        </h2>
+        <p>
+          Accéder au module 
+          flash-glow-ultra
+        </p>
+        <a
+          data-ui="primary-cta"
+          href="/modules/flash-glow-ultra"
+        >
+          Ouvrir
+        </a>
+      </div>
+      <div>
+        <h2>
+          Journal
+        </h2>
+        <p>
+          Accéder au module 
+          journal
+        </p>
+        <a
+          data-ui="primary-cta"
+          href="/modules/journal"
+        >
+          Ouvrir
+        </a>
+      </div>
+      <div>
+        <h2>
+          MoodMixer
+        </h2>
+        <p>
+          Accéder au module 
+          mood-mixer
+        </p>
+        <a
+          data-ui="primary-cta"
+          href="/modules/mood-mixer"
+        >
+          Ouvrir
+        </a>
+      </div>
+      <div>
+        <h2>
+          Scan
+        </h2>
+        <p>
+          Accéder au module 
+          scan
+        </p>
+        <a
+          data-ui="primary-cta"
+          href="/modules/scan"
+        >
+          Ouvrir
+        </a>
+      </div>
+      <div>
+        <h2>
+          StorySynth
+        </h2>
+        <p>
+          Accéder au module 
+          story-synth
+        </p>
+        <a
+          data-ui="primary-cta"
+          href="/modules/story-synth"
+        >
+          Ouvrir
+        </a>
+      </div>
+    </div>
+  </main>
+</div>
+`;

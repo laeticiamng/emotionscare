@@ -1,142 +1,119 @@
-import { useState, useEffect, useCallback } from 'react';
-import { useClinicalAssessment } from './useClinicalAssessment';
+import { useMemo } from "react";
 
-export interface MoodState {
-  valence: number; // -4 à +4 (SAM transformé)
-  arousal: number; // 1 à 9 (SAM direct)
-  lastUpdated: Date | null;
-  source: 'sam' | 'inferred' | 'default';
+import { useMood } from "@/contexts/MoodContext";
+import { getVibeEmoji, getVibeLabel, type MoodVibe } from "@/utils/moodVibes";
+import type { MoodPalette } from "@/utils/moodSignals";
+
+interface MoodDescriptor {
+  title: string;
+  description: string;
 }
 
-export interface MoodContextualizer {
-  adjustCardOrder: (cards: any[], mood: MoodState) => any[];
-  getNudgeTone: (mood: MoodState) => 'gentle' | 'neutral' | 'energizing';
-  getRecommendedModule: (mood: MoodState) => string | null;
-}
-
-const DEFAULT_MOOD: MoodState = {
-  valence: 0,
-  arousal: 5,
-  lastUpdated: null,
-  source: 'default'
+const VIBE_DESCRIPTIONS: Record<MoodVibe, MoodDescriptor> = {
+  calm: {
+    title: "Souffle paisible",
+    description: "Un flux régulier et rassurant enveloppe la pièce.",
+  },
+  focus: {
+    title: "Clarté attentive",
+    description: "Une présence nette qui accompagne les pensées avec douceur.",
+  },
+  bright: {
+    title: "Élan lumineux",
+    description: "Une énergie positive et chaleureuse qui rayonne sans brusquer.",
+  },
+  reset: {
+    title: "Cocon réparateur",
+    description: "Une bulle protectrice qui invite au relâchement complet.",
+  },
 };
 
-export const useCurrentMood = (userId?: string) => {
-  const [mood, setMood] = useState<MoodState>(DEFAULT_MOOD);
-  const { getClinicalSignal } = useClinicalAssessment();
+const clamp = (value: number, min: number, max: number) => {
+  return Math.min(Math.max(value, min), max);
+};
 
-  // Charger l'humeur depuis les signaux cliniques
-  const loadCurrentMood = useCallback(async () => {
-    if (!userId) return;
-
-    try {
-      const samSignal = await getClinicalSignal(userId, 'mood');
-      
-      if (samSignal?.metadata?.score) {
-        // Transformer le score SAM en valence/arousal
-        const valenceRaw = samSignal.metadata.responses?.sam_valence || 5;
-        const arousalRaw = samSignal.metadata.responses?.sam_arousal || 5;
-        
-        setMood({
-          valence: valenceRaw - 5, // Convertir 1-9 en -4 à +4
-          arousal: arousalRaw,
-          lastUpdated: new Date(samSignal.created_at),
-          source: 'sam'
-        });
-      }
-    } catch (error) {
-      console.error('Error loading mood:', error);
-    }
-  }, [userId, getClinicalSignal]);
-
-  useEffect(() => {
-    loadCurrentMood();
-  }, [loadCurrentMood]);
-
-  // Publier un événement mood.updated pour tous les modules
-  const publishMoodUpdate = useCallback((newMood: MoodState) => {
-    const event = new CustomEvent('mood.updated', {
-      detail: newMood
-    });
-    window.dispatchEvent(event);
-  }, []);
-
-  const updateMood = useCallback((valence: number, arousal: number, source: 'sam' | 'inferred' = 'inferred') => {
-    const newMood: MoodState = {
-      valence,
-      arousal,
-      lastUpdated: new Date(),
-      source
-    };
-    
-    setMood(newMood);
-    publishMoodUpdate(newMood);
-  }, [publishMoodUpdate]);
-
-  // Contextualizer pour adapter l'interface selon l'humeur
-  const contextualizer: MoodContextualizer = {
-    adjustCardOrder: (cards: any[], currentMood: MoodState) => {
-      // Si valence basse, prioriser les modules apaisants
-      if (currentMood.valence < -1) {
-        const soothing = ['nyvee', 'breathwork', 'music'];
-        return cards.sort((a, b) => {
-          const aIndex = soothing.indexOf(a.id);
-          const bIndex = soothing.indexOf(b.id);
-          if (aIndex !== -1 && bIndex === -1) return -1;
-          if (aIndex === -1 && bIndex !== -1) return 1;
-          return 0;
-        });
-      }
-      
-      // Si arousal élevé, prioriser les modules de décharge
-      if (currentMood.arousal > 7) {
-        const discharge = ['flash-glow', 'vr-breath', 'bubble-beat'];
-        return cards.sort((a, b) => {
-          const aIndex = discharge.indexOf(a.id);
-          const bIndex = discharge.indexOf(b.id);
-          if (aIndex !== -1 && bIndex === -1) return -1;
-          if (aIndex === -1 && bIndex !== -1) return 1;
-          return 0;
-        });
-      }
-      
-      return cards; // Ordre normal
-    },
-
-    getNudgeTone: (currentMood: MoodState) => {
-      if (currentMood.valence < -1 || currentMood.arousal > 7) {
-        return 'gentle'; // Ton doux si stress/négativité
-      }
-      if (currentMood.valence > 1 && currentMood.arousal > 5) {
-        return 'energizing'; // Ton dynamique si positif et énergique
-      }
-      return 'neutral'; // Ton neutre par défaut
-    },
-
-    getRecommendedModule: (currentMood: MoodState) => {
-      // Logique de recommandation basée sur valence/arousal
-      if (currentMood.valence < -2 && currentMood.arousal > 6) {
-        return 'nyvee'; // Anxiété/stress élevé
-      }
-      if (currentMood.valence < 0 && currentMood.arousal < 3) {
-        return 'music'; // Tristesse/fatigue
-      }
-      if (currentMood.arousal > 7) {
-        return 'flash-glow'; // Arousal très élevé
-      }
-      if (currentMood.valence > 2) {
-        return 'journal'; // Humeur positive, capturer le moment
-      }
-      
-      return null; // Pas de recommandation spécifique
-    }
+export interface CurrentMoodSnapshot {
+  vibe: MoodVibe;
+  label: string;
+  emoji: string;
+  title: string;
+  description: string;
+  headline: string;
+  valence: number | null;
+  arousal: number | null;
+  normalized: {
+    valence: number;
+    arousal: number;
   };
+  updatedAt: string;
+  isLoading: boolean;
+  hasError: boolean;
+  summary: string;
+  microGesture: string;
+  palette: MoodPalette;
+}
+
+export const useCurrentMood = (): CurrentMoodSnapshot => {
+  const { currentMood } = useMood();
+
+  const valence = Number.isFinite(currentMood.valence)
+    ? (currentMood.valence as number)
+    : null;
+  const arousal = Number.isFinite(currentMood.arousal)
+    ? (currentMood.arousal as number)
+    : null;
+
+  const normalized = useMemo(() => {
+    const safeValence = valence ?? 0;
+    const safeArousal = arousal ?? 50;
+    const valencePercent = clamp(Math.round(((safeValence + 100) / 200) * 100), 0, 100);
+    const arousalPercent = clamp(Math.round(safeArousal), 0, 100);
+    return { valence: valencePercent, arousal: arousalPercent };
+  }, [valence, arousal]);
+
+  const descriptor = VIBE_DESCRIPTIONS[currentMood.vibe];
+
+  const headline = useMemo(() => {
+    if (valence === null || arousal === null) {
+      return "Ambiance stable et enveloppante";
+    }
+
+    if (arousal < 25) {
+      return "Tempo très doux pour accompagner le relâchement";
+    }
+
+    if (arousal < 45) {
+      return "Cadence souple qui laisse de l'espace à la respiration";
+    }
+
+    if (valence > 50 && arousal > 60) {
+      return "Belle dynamique, on prolonge cet élan lumineux";
+    }
+
+    if (valence < -30 && arousal > 60) {
+      return "On adoucit le flux pour guider la décharge du stress";
+    }
+
+    return "Nous ajustons la texture pour rester dans le confort";
+  }, [valence, arousal]);
 
   return {
-    mood,
-    updateMood,
-    contextualizer,
-    isStale: mood.lastUpdated ? Date.now() - mood.lastUpdated.getTime() > 2 * 60 * 60 * 1000 : true, // 2h
-    reload: loadCurrentMood
+    vibe: currentMood.vibe,
+    label: getVibeLabel(currentMood.vibe),
+    emoji: getVibeEmoji(currentMood.vibe),
+    title: descriptor.title,
+    description: descriptor.description,
+    headline,
+    valence,
+    arousal,
+    normalized,
+    updatedAt: currentMood.timestamp,
+    isLoading: currentMood.isLoading,
+    hasError: Boolean(currentMood.error),
+    summary: currentMood.summary,
+    microGesture: currentMood.microGesture,
+    palette: currentMood.palette,
   };
 };
+
+export default useCurrentMood;

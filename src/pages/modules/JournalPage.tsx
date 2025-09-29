@@ -1,209 +1,348 @@
-import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { BookOpen, Calendar, TrendingUp, Heart, Star } from 'lucide-react';
+import {
+  ArrowLeft,
+  Flower,
+  PenTool,
+  Trash2,
+  Save
+} from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { useToast } from '@/hooks/use-toast';
+import { UniverseEngine } from '@/components/universe/UniverseEngine';
+import { RewardSystem } from '@/components/rewards/RewardSystem';
+import { getOptimizedUniverse } from '@/data/universes/config';
+import { useOptimizedAnimation } from '@/hooks/useOptimizedAnimation';
+import { ClinicalOptIn } from '@/components/consent/ClinicalOptIn';
+import { useClinicalConsent } from '@/hooks/useClinicalConsent';
 
-const JournalPage = () => {
-  const [journalEntry, setJournalEntry] = useState('');
-  const [mood, setMood] = useState<number | null>(null);
+interface JournalEntry {
+  id: string;
+  text: string;
+  createdAt: Date;
+  flowerColor: string;
+}
 
-  const moods = [
-    { emoji: '😢', label: 'Triste', value: 1 },
-    { emoji: '😐', label: 'Neutre', value: 2 },
-    { emoji: '😊', label: 'Content', value: 3 },
-    { emoji: '😄', label: 'Joyeux', value: 4 },
-    { emoji: '🤩', label: 'Excellent', value: 5 }
-  ];
+const flowerColors = [
+  'hsl(320, 60%, 70%)', // Rose
+  'hsl(280, 50%, 65%)', // Violet
+  'hsl(200, 60%, 70%)', // Bleu
+  'hsl(140, 50%, 65%)', // Vert
+  'hsl(40, 70%, 70%)',  // Jaune
+];
 
-  const recentEntries = [
-    { date: '2024-01-15', mood: 4, preview: 'Journée productive au travail...' },
-    { date: '2024-01-14', mood: 3, preview: 'Session de méditation apaisante...' },
-    { date: '2024-01-13', mood: 2, preview: 'Réflexions sur mes objectifs...' }
-  ];
+const JournalPage: React.FC = () => {
+  const { toast } = useToast();
+
+  // Get optimized universe config
+  const universe = getOptimizedUniverse('journal');
+
+  // Universe state
+  const [isEntering, setIsEntering] = useState(true);
+  const [universeEntered, setUniverseEntered] = useState(false);
+
+  // Journal state
+  const [currentText, setCurrentText] = useState('');
+  const [isWriting, setIsWriting] = useState(false);
+  const [showReward, setShowReward] = useState(false);
+  const [savedEntry, setSavedEntry] = useState<JournalEntry | null>(null);
+  const [flowerGrowth, setFlowerGrowth] = useState(0);
+  const panasConsent = useClinicalConsent('PANAS');
+
+  // Optimized animations
+  const { entranceVariants, cleanupAnimation } = useOptimizedAnimation({
+    enableComplexAnimations: true,
+    useCSSAnimations: true,
+  });
+
+  // Handle universe entrance
+  const handleUniverseEnterComplete = () => {
+    setUniverseEntered(true);
+  };
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      cleanupAnimation();
+    };
+  }, [cleanupAnimation]);
+
+  // Animate flower growth based on text length
+  useEffect(() => {
+    if (currentText.length > 0) {
+      const growth = Math.min(currentText.length / 100, 1); // Max growth at 100 chars
+      setFlowerGrowth(growth);
+    } else {
+      setFlowerGrowth(0);
+    }
+  }, [currentText]);
+
+  const startWriting = () => {
+    setIsWriting(true);
+    setCurrentText('');
+  };
+
+  const saveEntry = () => {
+    if (currentText.trim().length < 5) {
+      toast({
+        title: "Écris un peu plus",
+        description: "Quelques mots de plus pour faire éclore ta fleur 🌸",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const entry: JournalEntry = {
+      id: `entry-${Date.now()}`,
+      text: currentText.trim(),
+      createdAt: new Date(),
+      flowerColor: flowerColors[Math.floor(Math.random() * flowerColors.length)]
+    };
+
+    setSavedEntry(entry);
+    setShowReward(true);
+    
+    toast({
+      title: "Belle expression ✨",
+      description: "Tes mots se transforment en fleur lumineuse",
+    });
+  };
+
+  const burnEntry = () => {
+    setCurrentText('');
+    setIsWriting(false);
+    
+    toast({
+      title: "Libération douce",
+      description: "Tes mots s'évaporent en poussière d'étoile ✨",
+    });
+  };
+
+  const handleRewardComplete = () => {
+    setShowReward(false);
+    setIsWriting(false);
+    setCurrentText('');
+    setSavedEntry(null);
+  };
+
+  if (showReward && savedEntry) {
+    return (
+      <RewardSystem
+        reward={{
+          type: 'flower',
+          name: 'Fleur de mots',
+          description: universe.artifacts.description,
+          moduleId: 'journal'
+        }}
+        badgeText="Belle expression 🌸"
+        onComplete={handleRewardComplete}
+      />
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-violet-50 to-indigo-100 p-6">
-      {/* Skip Links pour l'accessibilité */}
-      <div className="sr-only focus:not-sr-only">
-        <a 
-          href="#main-content" 
-          className="absolute top-4 left-4 bg-primary text-primary-foreground px-4 py-2 rounded-md z-50"
-        >
-          Aller au contenu principal
-        </a>
-        <a 
-          href="#new-entry" 
-          className="absolute top-4 left-32 bg-primary text-primary-foreground px-4 py-2 rounded-md z-50"
-        >
-          Nouvelle entrée
-        </a>
-      </div>
-
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <header className="text-center mb-8">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <BookOpen className="h-8 w-8 text-violet-600" aria-hidden="true" />
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-violet-600 to-indigo-600 bg-clip-text text-transparent">
-              Journal Émotionnel
-            </h1>
+    <UniverseEngine
+      universe={universe}
+      isEntering={isEntering}
+      onEnterComplete={handleUniverseEnterComplete}
+      enableParticles={true}
+      enableAmbianceSound={false}
+      className="min-h-screen"
+    >
+      {/* Header */}
+      <header className="relative z-50 p-6">
+        <div className="flex items-center justify-between">
+          <Link 
+            to="/app" 
+            className="flex items-center space-x-2 text-foreground/80 hover:text-foreground transition-colors"
+          >
+            <ArrowLeft className="h-5 w-5" />
+            <span className="font-medium">Retour</span>
+          </Link>
+          
+          <div className="flex items-center space-x-2 text-foreground">
+            <Flower className="h-6 w-6 text-pink-500" />
+            <h1 className="text-xl font-light tracking-wide">{universe.name}</h1>
           </div>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Explorez vos émotions, suivez votre bien-être et développez votre intelligence émotionnelle
-          </p>
-        </header>
+        </div>
+      </header>
 
-        <main id="main-content" className="grid lg:grid-cols-3 gap-6">
-          {/* Nouvelle entrée */}
-          <section id="new-entry" className="lg:col-span-2 space-y-6" aria-labelledby="new-entry-title">
-            <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle id="new-entry-title" className="flex items-center gap-2">
-                  <Heart className="h-5 w-5 text-red-500" aria-hidden="true" />
-                  Nouvelle Entrée
-                </CardTitle>
-                <CardDescription>
-                  Comment vous sentez-vous aujourd'hui ? Partagez vos pensées et émotions.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {/* Sélection de l'humeur */}
-                <fieldset className="space-y-3">
-                  <legend className="text-sm font-medium">Votre humeur aujourd'hui :</legend>
-                  <div className="flex gap-3 justify-center">
-                    {moods.map((moodOption) => (
-                      <button
-                        key={moodOption.value}
-                        onClick={() => setMood(moodOption.value)}
-                        className={`p-3 rounded-xl border-2 transition-all duration-200 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 ${
-                          mood === moodOption.value
-                            ? 'border-violet-500 bg-violet-50 shadow-md'
-                            : 'border-gray-200 hover:border-violet-300'
-                        }`}
-                        aria-label={`Humeur ${moodOption.label}`}
-                        aria-pressed={mood === moodOption.value}
-                      >
-                        <div className="text-3xl">{moodOption.emoji}</div>
-                        <div className="text-xs font-medium mt-1">{moodOption.label}</div>
-                      </button>
-                    ))}
-                  </div>
-                </fieldset>
-
-                {/* Zone de texte */}
-                <div className="space-y-2">
-                  <label htmlFor="journal-text" className="text-sm font-medium">
-                    Vos pensées et émotions :
-                  </label>
-                  <Textarea
-                    id="journal-text"
-                    placeholder="Décrivez vos émotions, ce qui s'est passé aujourd'hui, vos réflexions..."
-                    value={journalEntry}
-                    onChange={(e) => setJournalEntry(e.target.value)}
-                    rows={6}
-                    className="resize-none focus:ring-violet-500 focus:border-violet-500"
-                    aria-describedby="journal-help"
-                  />
-                  <p id="journal-help" className="text-xs text-muted-foreground">
-                    Prenez le temps d'explorer vos émotions en profondeur. Aucun jugement, juste de l'authenticité.
-                  </p>
-                </div>
-
-                <Button 
-                  className="w-full bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700"
-                  disabled={!journalEntry.trim() || mood === null}
-                  aria-describedby="save-help"
+      {/* Main Content */}
+      <main className="relative z-10 container mx-auto px-6 py-12 space-y-12">
+        {panasConsent.shouldPrompt && (
+          <ClinicalOptIn
+            title="Activer l'humeur PANAS"
+            description="Quelques mots sur vos émotions nous aident à nourrir le journal. Votre choix est mémorisé et reste modifiable dans les paramètres."
+            acceptLabel="Oui, me guider"
+            declineLabel="Non merci"
+            onAccept={panasConsent.grantConsent}
+            onDecline={panasConsent.declineConsent}
+            isProcessing={panasConsent.isSaving}
+            error={panasConsent.error}
+            className="bg-white/10 border-white/20 backdrop-blur-md"
+          />
+        )}
+        <AnimatePresence mode="wait">
+          {!isWriting ? (
+            <motion.div
+              key="welcome"
+              variants={entranceVariants}
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+              className="space-y-12 text-center"
+            >
+              {/* Introduction */}
+              <div className="space-y-6">
+                <motion.div
+                  initial={{ scale: 0, rotate: -180 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  transition={{ delay: 0.5, type: "spring" }}
+                  className="inline-flex items-center justify-center w-20 h-20 rounded-full mb-6"
+                  style={{ 
+                    background: `linear-gradient(135deg, ${universe.ambiance.colors.primary}, ${universe.ambiance.colors.accent})` 
+                  }}
                 >
-                  <Star className="h-4 w-4 mr-2" aria-hidden="true" />
-                  Sauvegarder l'entrée
-                </Button>
-                <p id="save-help" className="text-xs text-muted-foreground text-center">
-                  Votre entrée sera chiffrée et stockée en sécurité
+                  <PenTool className="h-10 w-10 text-white" />
+                </motion.div>
+                
+                <h2 className="text-4xl font-light text-foreground tracking-wide">
+                  Jardin des Mots
+                </h2>
+                <p className="text-xl text-muted-foreground max-w-2xl mx-auto font-light">
+                  Écris une ligne, une pensée, un ressenti. 
+                  Chaque mot que tu poses ici devient une fleur qui s'illumine dans ton jardin personnel.
                 </p>
-              </CardContent>
-            </Card>
-          </section>
+              </div>
 
-          {/* Sidebar - Statistiques et historique */}
-          <aside className="space-y-6" aria-labelledby="sidebar-title">
-            <h2 id="sidebar-title" className="sr-only">Informations complémentaires</h2>
-            
-            {/* Statistiques */}
-            <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm">
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-2 text-lg">
-                  <TrendingUp className="h-5 w-5 text-green-500" aria-hidden="true" />
-                  Progression
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span>Entrées ce mois</span>
-                    <span className="font-medium">12/31</span>
-                  </div>
-                  <Progress value={39} className="h-2" aria-label="Progression: 12 entrées sur 31 jours" />
-                </div>
-
-                <div className="grid grid-cols-2 gap-3 pt-2">
-                  <div className="text-center p-3 bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg">
-                    <div className="text-2xl font-bold text-green-600">4.2</div>
-                    <div className="text-xs text-green-700">Humeur moyenne</div>
-                  </div>
-                  <div className="text-center p-3 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg">
-                    <div className="text-2xl font-bold text-blue-600">7</div>
-                    <div className="text-xs text-blue-700">Jours consécutifs</div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Historique récent */}
-            <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm">
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-2 text-lg">
-                  <Calendar className="h-5 w-5 text-blue-500" aria-hidden="true" />
-                  Entrées récentes
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {recentEntries.map((entry, index) => (
-                  <div 
-                    key={entry.date}
-                    className="p-3 rounded-lg border border-gray-100 hover:border-violet-200 transition-colors cursor-pointer"
-                    role="button"
-                    tabIndex={0}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        // Action pour ouvrir l'entrée
-                      }
-                    }}
-                    aria-label={`Entrée du ${entry.date}, humeur ${entry.mood}/5`}
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium">{entry.date}</span>
-                      <Badge 
-                        variant={entry.mood >= 4 ? 'default' : entry.mood >= 3 ? 'secondary' : 'outline'}
-                        className="text-xs"
+              {/* Writing prompt */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.8 }}
+                className="max-w-md mx-auto"
+              >
+                <Card className="bg-card/90 backdrop-blur-md hover:shadow-lg transition-all duration-300">
+                  <CardContent className="p-8">
+                    <div className="text-center space-y-4">
+                      <Flower className="w-12 h-12 text-pink-500 mx-auto animate-pulse" />
+                      <h3 className="text-lg font-medium">Que ressens-tu aujourd'hui ?</h3>
+                      <p className="text-sm text-muted-foreground">
+                        Une ligne suffit pour faire naître une fleur
+                      </p>
+                      <Button 
+                        onClick={startWriting}
+                        className="w-full bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600"
                       >
-                        {moods.find(m => m.value === entry.mood)?.emoji} {entry.mood}/5
-                      </Badge>
+                        <PenTool className="h-4 w-4 mr-2" />
+                        Commencer à écrire
+                      </Button>
                     </div>
-                    <p className="text-sm text-muted-foreground truncate">
-                      {entry.preview}
-                    </p>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="writing"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              className="max-w-2xl mx-auto space-y-8"
+            >
+              {/* Writing interface */}
+              <div className="text-center mb-8">
+                <h2 className="text-2xl font-light text-foreground mb-2">
+                  Laisse tes mots fleurir
+                </h2>
+                <p className="text-muted-foreground">
+                  Écris ce qui te traverse l'esprit, une ligne à la fois
+                </p>
+              </div>
+
+              {/* Growing flower visualization */}
+              <div className="text-center mb-6">
+                <motion.div
+                  className="inline-block"
+                  animate={{ 
+                    scale: 1 + flowerGrowth * 0.5,
+                    rotate: flowerGrowth * 10
+                  }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <Flower 
+                    className="w-16 h-16 text-pink-500"
+                    style={{ 
+                      opacity: 0.3 + flowerGrowth * 0.7,
+                      filter: `hue-rotate(${flowerGrowth * 60}deg)` 
+                    }}
+                  />
+                </motion.div>
+                <p className="text-xs text-muted-foreground mt-2">
+                  Ta fleur grandit à mesure que tu écris
+                </p>
+              </div>
+
+              {/* Text area */}
+              <Card className="bg-card/90 backdrop-blur-md">
+                <CardContent className="p-6">
+                  <Textarea
+                    value={currentText}
+                    onChange={(e) => setCurrentText(e.target.value)}
+                    placeholder="Écris ici tes pensées, tes ressentis, tes rêves..."
+                    className="min-h-32 border-none bg-transparent resize-none focus:ring-0 text-lg leading-relaxed"
+                    autoFocus
+                  />
+                  
+                  <div className="flex items-center justify-between mt-4 pt-4 border-t">
+                    <span className="text-xs text-muted-foreground">
+                      {currentText.length} caractères
+                    </span>
+                    
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={burnEntry}
+                        className="text-orange-500 hover:text-orange-600"
+                      >
+                        <Trash2 className="h-4 w-4 mr-1" />
+                        Brûler
+                      </Button>
+                      
+                      <Button
+                        onClick={saveEntry}
+                        size="sm"
+                        disabled={currentText.trim().length < 5}
+                        className="bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600"
+                      >
+                        <Save className="h-4 w-4 mr-1" />
+                        Faire fleurir
+                      </Button>
+                    </div>
                   </div>
-                ))}
-              </CardContent>
-            </Card>
-          </aside>
-        </main>
-      </div>
-    </div>
+                </CardContent>
+              </Card>
+
+              {/* Writing tips */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1 }}
+                className="text-center"
+              >
+                <p className="text-xs text-muted-foreground italic">
+                  "Brûler" tes mots les transforme en poussière d'étoile libératrice ✨
+                </p>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </main>
+    </UniverseEngine>
   );
 };
 
