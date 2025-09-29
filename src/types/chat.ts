@@ -16,11 +16,11 @@ export interface ChatConversation {
   id: string;
   title: string;
   messages: ChatMessage[];
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: Date | string;
+  updatedAt: Date | string;
   userId: string;
   isActive?: boolean;
-  lastMessage?: ChatMessage;
+  lastMessage?: ChatMessage | string;
 }
 
 export interface ChatResponse {

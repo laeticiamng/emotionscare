@@ -23,7 +23,10 @@ const ConversationTimeline: React.FC<ConversationTimelineProps> = ({
   // Group conversations by date
   const groupedConversations = conversations.reduce<Record<string, ChatConversation[]>>(
     (acc, conversation) => {
-      const date = conversation.createdAt.split('T')[0]; // YYYY-MM-DD
+      const dateStr = typeof conversation.createdAt === 'string' 
+        ? conversation.createdAt 
+        : conversation.createdAt.toISOString();
+      const date = dateStr.split('T')[0]; // YYYY-MM-DD
       if (!acc[date]) {
         acc[date] = [];
       }
@@ -92,7 +95,7 @@ const ConversationTimeline: React.FC<ConversationTimelineProps> = ({
                         {emotionalTone}
                       </Badge>
                       <p className="text-xs text-muted-foreground truncate">
-                        {conversation.lastMessage || "Nouvelle conversation"}
+                        {typeof conversation.lastMessage === 'string' ? conversation.lastMessage : "Nouvelle conversation"}
                       </p>
                     </div>
                   </div>
