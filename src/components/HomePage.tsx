@@ -1,11 +1,86 @@
 import React from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Heart, Brain, Music } from 'lucide-react'
+import { Heart, Brain, Music, BookOpen, Headphones, BarChart3, Users, Wind } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
 export default function HomePage() {
   const navigate = useNavigate()
+
+  const modules = [
+    {
+      title: 'Scanner Émotionnel',
+      description: 'Analysez vos émotions en temps réel avec notre technologie avancée',
+      icon: Heart,
+      href: '/scan',
+      gradient: 'from-blue-500 to-purple-500',
+      hoverGradient: 'from-blue-600 to-purple-600',
+      iconColor: 'text-red-500'
+    },
+    {
+      title: 'Musique Thérapeutique',
+      description: 'Musique personnalisée adaptée à votre état émotionnel',
+      icon: Music,
+      href: '/music',
+      gradient: 'from-green-500 to-teal-500',
+      hoverGradient: 'from-green-600 to-teal-600',
+      iconColor: 'text-green-500'
+    },
+    {
+      title: 'Coach IA',
+      description: 'Votre assistant personnel pour améliorer votre bien-être',
+      icon: Brain,
+      href: '/coach',
+      gradient: 'from-purple-500 to-pink-500',
+      hoverGradient: 'from-purple-600 to-pink-600',
+      iconColor: 'text-purple-500'
+    },
+    {
+      title: 'Journal Émotionnel',
+      description: 'Suivez votre parcours émotionnel quotidien',
+      icon: BookOpen,
+      href: '/journal',
+      gradient: 'from-violet-500 to-purple-500',
+      hoverGradient: 'from-violet-600 to-purple-600',
+      iconColor: 'text-violet-500'
+    },
+    {
+      title: 'Réalité Virtuelle',
+      description: 'Immersion thérapeutique en environnements apaisants',
+      icon: Headphones,
+      href: '/vr',
+      gradient: 'from-indigo-500 to-purple-500',
+      hoverGradient: 'from-indigo-600 to-purple-600',
+      iconColor: 'text-indigo-500'
+    },
+    {
+      title: 'Analytics RH',
+      description: 'Tableau de bord pour managers et RH',
+      icon: BarChart3,
+      href: '/analytics',
+      gradient: 'from-orange-500 to-red-500',
+      hoverGradient: 'from-orange-600 to-red-600',
+      iconColor: 'text-orange-500'
+    },
+    {
+      title: 'Communauté',
+      description: 'Connectez-vous avec d\'autres utilisateurs',
+      icon: Users,
+      href: '/social',
+      gradient: 'from-emerald-500 to-teal-500',
+      hoverGradient: 'from-emerald-600 to-teal-600',
+      iconColor: 'text-emerald-500'
+    },
+    {
+      title: 'Exercices de Respiration',
+      description: 'Techniques de respiration guidées',
+      icon: Wind,
+      href: '/breathwork',
+      gradient: 'from-sky-500 to-blue-500',
+      hoverGradient: 'from-sky-600 to-blue-600',
+      iconColor: 'text-sky-500'
+    }
+  ]
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-purple-900">
@@ -19,69 +94,37 @@ export default function HomePage() {
           </p>
         </header>
 
-        <main className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto mb-16" role="main">
-          <Card className="hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1" role="article" aria-labelledby="scan-title">
-            <CardHeader>
-              <CardTitle id="scan-title" className="flex items-center gap-3 text-lg">
-                <Heart className="h-6 w-6 text-red-500" aria-hidden="true" />
-                Scanner Émotionnel
-              </CardTitle>
-              <CardDescription>
-                Analysez vos émotions en temps réel avec notre technologie avancée
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button 
-                onClick={() => navigate('/scan')} 
-                className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
-                aria-label="Accéder au scanner émotionnel"
+        <main className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 max-w-7xl mx-auto mb-16" role="main">
+          {modules.map((module, index) => {
+            const IconComponent = module.icon
+            return (
+              <Card 
+                key={index}
+                className="hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1" 
+                role="article" 
+                aria-labelledby={`module-${index}-title`}
               >
-                Commencer l'analyse
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card className="hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1" role="article" aria-labelledby="music-title">
-            <CardHeader>
-              <CardTitle id="music-title" className="flex items-center gap-3 text-lg">
-                <Music className="h-6 w-6 text-green-500" aria-hidden="true" />
-                Musique Thérapeutique
-              </CardTitle>
-              <CardDescription>
-                Musique personnalisée adaptée à votre état émotionnel
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button 
-                onClick={() => navigate('/music')} 
-                className="w-full bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600"
-                aria-label="Accéder à la musique thérapeutique"
-              >
-                Écouter maintenant
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card className="hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1" role="article" aria-labelledby="coach-title">
-            <CardHeader>
-              <CardTitle id="coach-title" className="flex items-center gap-3 text-lg">
-                <Brain className="h-6 w-6 text-purple-500" aria-hidden="true" />
-                Coach IA
-              </CardTitle>
-              <CardDescription>
-                Votre assistant personnel pour améliorer votre bien-être
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button 
-                onClick={() => navigate('/coach')} 
-                className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
-                aria-label="Accéder au coach IA"
-              >
-                Parler au coach
-              </Button>
-            </CardContent>
-          </Card>
+                <CardHeader>
+                  <CardTitle id={`module-${index}-title`} className="flex items-center gap-3 text-lg">
+                    <IconComponent className={`h-6 w-6 ${module.iconColor}`} aria-hidden="true" />
+                    {module.title}
+                  </CardTitle>
+                  <CardDescription>
+                    {module.description}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button 
+                    onClick={() => navigate(module.href)} 
+                    className={`w-full bg-gradient-to-r ${module.gradient} hover:${module.hoverGradient} text-white`}
+                    aria-label={`Accéder au module ${module.title}`}
+                  >
+                    Découvrir
+                  </Button>
+                </CardContent>
+              </Card>
+            )
+          })}
         </main>
 
         <nav className="text-center" role="navigation" aria-label="Navigation principale">
