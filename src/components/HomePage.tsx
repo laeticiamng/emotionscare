@@ -19,11 +19,11 @@ export default function HomePage() {
           </p>
         </header>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto mb-16">
-          <Card className="hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+        <main className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto mb-16" role="main">
+          <Card className="hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1" role="article" aria-labelledby="scan-title">
             <CardHeader>
-              <CardTitle className="flex items-center gap-3 text-lg">
-                <Heart className="h-6 w-6 text-red-500" />
+              <CardTitle id="scan-title" className="flex items-center gap-3 text-lg">
+                <Heart className="h-6 w-6 text-red-500" aria-hidden="true" />
                 Scanner Émotionnel
               </CardTitle>
               <CardDescription>
@@ -34,16 +34,17 @@ export default function HomePage() {
               <Button 
                 onClick={() => navigate('/scan')} 
                 className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
+                aria-label="Accéder au scanner émotionnel"
               >
                 Commencer l'analyse
               </Button>
             </CardContent>
           </Card>
 
-          <Card className="hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+          <Card className="hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1" role="article" aria-labelledby="music-title">
             <CardHeader>
-              <CardTitle className="flex items-center gap-3 text-lg">
-                <Music className="h-6 w-6 text-green-500" />
+              <CardTitle id="music-title" className="flex items-center gap-3 text-lg">
+                <Music className="h-6 w-6 text-green-500" aria-hidden="true" />
                 Musique Thérapeutique
               </CardTitle>
               <CardDescription>
@@ -54,16 +55,17 @@ export default function HomePage() {
               <Button 
                 onClick={() => navigate('/music')} 
                 className="w-full bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600"
+                aria-label="Accéder à la musique thérapeutique"
               >
                 Écouter maintenant
               </Button>
             </CardContent>
           </Card>
 
-          <Card className="hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+          <Card className="hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1" role="article" aria-labelledby="coach-title">
             <CardHeader>
-              <CardTitle className="flex items-center gap-3 text-lg">
-                <Brain className="h-6 w-6 text-purple-500" />
+              <CardTitle id="coach-title" className="flex items-center gap-3 text-lg">
+                <Brain className="h-6 w-6 text-purple-500" aria-hidden="true" />
                 Coach IA
               </CardTitle>
               <CardDescription>
@@ -74,22 +76,24 @@ export default function HomePage() {
               <Button 
                 onClick={() => navigate('/coach')} 
                 className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+                aria-label="Accéder au coach IA"
               >
                 Parler au coach
               </Button>
             </CardContent>
           </Card>
-        </div>
+        </main>
 
-        <div className="text-center">
+        <nav className="text-center" role="navigation" aria-label="Navigation principale">
           <Button 
             onClick={() => navigate('/app')} 
             size="lg"
             className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-8 py-3"
+            aria-label="Accéder à l'application complète EmotionsCare"
           >
             Accéder à l'application complète
           </Button>
-        </div>
+        </nav>
       </div>
     </div>
   )

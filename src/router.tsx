@@ -1,7 +1,7 @@
 import React from 'react';
 import { createBrowserRouter } from 'react-router-dom';
 import HomePage from '@/components/HomePage';
-import AppHome from '@/pages/app/AppHome';
+// AppHome supprimé - doublon avec HomePage
 import ScanPage from '@/pages/modules/ScanPage';
 import MusicPage from '@/pages/modules/MusicPage';
 import CoachPage from '@/pages/modules/CoachPage';
@@ -13,7 +13,7 @@ export const router = createBrowserRouter([
   },
   {
     path: '/app',
-    element: <AppHome />
+    element: <HomePage />
   },
   {
     path: '/scan',
