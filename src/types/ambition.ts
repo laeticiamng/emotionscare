@@ -15,9 +15,20 @@ export interface AmbitionArtifact {
   icon: string;
 }
 
+export interface AmbitionQuest {
+  id: string;
+  title: string;
+  status: 'available' | 'active' | 'completed';
+  progress: number;
+  flavor?: string;
+  xpReward?: number;
+}
+
 export interface AmbitionRun {
   id: string;
   objective: string;
   status: 'active' | 'completed' | 'paused';
   metadata: Record<string, any>;
+  tags?: string[];
+  quests?: AmbitionQuest[];
 }

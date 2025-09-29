@@ -1,13 +1,22 @@
-
-export type UserMode = 'b2c' | 'b2b_user' | 'b2b_admin';
-
-export interface User {
+export interface Profile {
   id: string;
   email: string;
-  name: string;
-  role: string;
-  created_at: string;
-  user_metadata?: any;
-  firstName?: string;
+  name?: string;
   avatar?: string;
+  avatar_url?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ActivityFiltersState {
+  activityType: string;
+  startDate: string;
+  endDate: string;
+  userId?: string;
+}
+
+declare global {
+  interface Window {
+    gtag: (command: string, targetId: string, config?: any) => void;
+  }
 }
