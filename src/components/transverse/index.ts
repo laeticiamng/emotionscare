@@ -1,9 +1,0 @@
-// Composants transversaux - Export centralisé
-export { AsyncState } from './AsyncState';
-export { QueueFlusher } from './QueueFlusher';
-export { CopyBadge } from './CopyBadge';
-export { HealthBadge } from './HealthBadge';
-export { NoCamVariant } from './NoCamVariant';
-export { NoMicVariant } from './NoMicVariant';
-export { SimHRVariant } from './SimHRVariant';
-export { EmptyFeature } from './EmptyFeature';
