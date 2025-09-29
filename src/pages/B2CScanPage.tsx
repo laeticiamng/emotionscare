@@ -12,6 +12,7 @@ import { useSamOrchestration } from '@/features/mood/useSamOrchestration';
 import { ConsentGate } from '@/features/clinical-optin/ConsentGate';
 import { useAssessment } from '@/hooks/useAssessment';
 import { withGuard } from '@/routerV2/withGuard';
+import { AssessmentWrapper } from '@/components/assess';
 
 const mapToSamScale = (value: number) => {
   const normalized = Math.max(0, Math.min(100, value));
@@ -191,6 +192,19 @@ const B2CScanPage: React.FC = () => {
               error={samState.error}
             />
           )}
+
+          <AssessmentWrapper
+            instrument="SAM"
+            title="Ressenti instantané"
+            description="2 curseurs pour colorer l'interface selon votre état"
+            context="adhoc"
+            estimatedTime={1}
+            onComplete={(badges) => {
+              // badges SAM influencent les couleurs UI et micro-gestes
+              console.log('SAM badges:', badges);
+            }}
+            className="mb-6"
+          />
 
           <main className="grid gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
             <div className="space-y-8">

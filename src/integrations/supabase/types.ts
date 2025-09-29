@@ -4020,13 +4020,6 @@ export type Database = {
             referencedRelation: "lyrics_texts"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "lyrics_texts_previous_version_id_fkey"
-            columns: ["previous_version_id"]
-            isOneToOne: false
-            referencedRelation: "lyrics_texts_latest"
-            referencedColumns: ["id"]
-          },
         ]
       }
       med_mng_audio_access_logs: {
@@ -8344,53 +8337,12 @@ export type Database = {
       }
     }
     Views: {
-      lyrics_texts_latest: {
-        Row: {
-          content: string | null
-          created_at: string | null
-          generated_by: string | null
-          id: string | null
-          is_published: boolean | null
-          item_code: string | null
-          rang: string | null
-          status: string | null
-          style_meta: Json | null
-          updated_at: string | null
-          version: number | null
-        }
-        Relationships: []
-      }
       med_mng_view_library: {
         Row: {
           created_at: string | null
           id: string | null
           in_library: boolean | null
           title: string | null
-        }
-        Relationships: []
-      }
-      oic_completion_dashboard: {
-        Row: {
-          nb_empty: number | null
-          nb_error: number | null
-          nb_updated: number | null
-          total: number | null
-        }
-        Relationships: []
-      }
-      secure_platform_stats: {
-        Row: {
-          metric: string | null
-          unit: string | null
-          value: string | null
-        }
-        Relationships: []
-      }
-      security_summary: {
-        Row: {
-          description: string | null
-          metric: string | null
-          value: string | null
         }
         Relationships: []
       }
@@ -8440,42 +8392,6 @@ export type Database = {
           total_badges: number | null
           total_challenges: number | null
           user_id: string | null
-        }
-        Relationships: []
-      }
-      v_competences_parsed: {
-        Row: {
-          description: string | null
-          intitule: string | null
-          item_id: string | null
-          item_parent: string | null
-          objectif_id: string | null
-          ordre_num: number | null
-          rang: string | null
-          rang_code: string | null
-          url_source: string | null
-        }
-        Insert: {
-          description?: string | null
-          intitule?: string | null
-          item_id?: never
-          item_parent?: string | null
-          objectif_id?: string | null
-          ordre_num?: never
-          rang?: string | null
-          rang_code?: never
-          url_source?: string | null
-        }
-        Update: {
-          description?: string | null
-          intitule?: string | null
-          item_id?: never
-          item_parent?: string | null
-          objectif_id?: string | null
-          ordre_num?: never
-          rang?: string | null
-          rang_code?: never
-          url_source?: string | null
         }
         Relationships: []
       }
@@ -8915,6 +8831,20 @@ export type Database = {
           valid_titles: number
         }[]
       }
+      get_competences_parsed: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          description: string
+          intitule: string
+          item_id: string
+          item_parent: string
+          objectif_id: string
+          ordre_num: number
+          rang: string
+          rang_code: string
+          url_source: string
+        }[]
+      }
       get_current_user_role: {
         Args: Record<PropertyKey, never>
         Returns: string
@@ -8947,6 +8877,22 @@ export type Database = {
           total_items: number
         }[]
       }
+      get_latest_lyrics_texts: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          content: string
+          created_at: string
+          generated_by: string
+          id: string
+          is_published: boolean
+          item_code: string
+          rang: string
+          status: string
+          style_meta: Json
+          updated_at: string
+          version: number
+        }[]
+      }
       get_medical_dashboard_stats: {
         Args: Record<PropertyKey, never>
         Returns: Json
@@ -8959,6 +8905,15 @@ export type Database = {
           completude_pct: number
           item_parent: string
           manquants: string[]
+        }[]
+      }
+      get_oic_completion_dashboard: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          nb_empty: number
+          nb_error: number
+          nb_updated: number
+          total: number
         }[]
       }
       get_oic_extraction_report: {
@@ -8993,6 +8948,14 @@ export type Database = {
         }
         Returns: Json
       }
+      get_secure_platform_stats: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          metric: string
+          unit: string
+          value: string
+        }[]
+      }
       get_secure_user_count: {
         Args: Record<PropertyKey, never>
         Returns: number
@@ -9013,6 +8976,14 @@ export type Database = {
       get_security_status: {
         Args: Record<PropertyKey, never>
         Returns: Json
+      }
+      get_security_summary: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          description: string
+          metric: string
+          value: string
+        }[]
       }
       get_security_violations_summary: {
         Args: Record<PropertyKey, never>

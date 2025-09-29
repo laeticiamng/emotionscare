@@ -6,6 +6,8 @@ import { DashboardCards } from '@/features/dashboard/DashboardCards';
 import { Who5InviteBanner } from '@/features/dashboard/Who5InviteBanner';
 import { ZeroNumberBoundary } from '@/features/dashboard/ZeroNumberBoundary';
 import { useWho5Orchestration } from '@/features/orchestration/useWho5Orchestration';
+import { AssessmentWrapper } from '@/components/assess';
+import { isAssessmentEnabled } from '@/lib/assess/features';
 
 const HomePage: React.FC = () => {
   const who5 = useWho5Orchestration();
@@ -30,6 +32,19 @@ const HomePage: React.FC = () => {
           {who5.due && (
             <Who5InviteBanner summary={who5.summaryLabel} tone={who5.tone} onStart={who5.start} onSnooze={() => who5.snooze()} />
           )}
+
+          <AssessmentWrapper
+            instrument="WHO5"
+            title="Mini bien-être"
+            description="5 questions courtes pour adapter votre plan du jour"
+            context="weekly"
+            estimatedTime={2}
+            onComplete={(badges) => {
+              // badges verbaux influencent l'ordre des cartes et le ton
+              console.log('WHO5 badges:', badges);
+            }}
+            className="mb-6"
+          />
 
           <PrimaryCTA kind={who5.primaryCta} tone={who5.tone} />
 
