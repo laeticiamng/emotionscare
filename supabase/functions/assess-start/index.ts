@@ -12,8 +12,8 @@ import { buildRateLimitResponse, enforceEdgeRateLimit } from '../_shared/rate-li
 import { recordEdgeLatencyMetric } from '../_shared/metrics.ts';
 import { createClient } from '../_shared/supabase.ts';
 
-import { getCatalog } from '../../../src/lib/assess/catalogs.ts';
-import type { InstrumentCatalog, InstrumentCode, LocaleCode } from '../../../src/lib/assess/types.ts';
+import { getCatalog } from '../_shared/assess.ts';
+import type { InstrumentCode, LocaleCode } from '../_shared/assess.ts';
 
 const instrumentSchema = z.enum(['WHO5', 'STAI6', 'SAM', 'SUDS']);
 const localeSchema = z.enum(['fr', 'en', 'es', 'de', 'it']);
@@ -232,7 +232,7 @@ serve(async (req) => {
       });
     }
 
-    let catalog: InstrumentCatalog;
+  let catalog: any;
     try {
       catalog = getCatalog(instrument, locale);
     } catch (error) {

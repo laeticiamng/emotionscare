@@ -11,8 +11,8 @@ import { addSentryBreadcrumb, captureSentryException } from '../_shared/sentry.t
 import { traced } from '../_shared/otel.ts';
 import { buildRateLimitResponse, enforceEdgeRateLimit } from '../_shared/rate-limit.ts';
 import { recordEdgeLatencyMetric } from '../_shared/metrics.ts';
-import { computeLevel, scoreToJson } from '../../../src/lib/assess/scoring.ts';
-import type { InstrumentCode } from '../../../src/lib/assess/types.ts';
+import { summarizeAssessment } from '../_shared/assess.ts';
+import type { InstrumentCode } from '../_shared/assess.ts';
 
 const answerValueSchema = z.union([z.string(), z.number(), z.boolean()]);
 
@@ -280,10 +280,9 @@ serve(async (req) => {
       );
     }
 
-    const level = computeLevel(instrument, sanitizeAnswers(answers));
-    const score = scoreToJson(instrument, level);
-    const hints = buildOrchestrationHints(instrument, level);
-    const severity: 'calm' | 'balanced' | 'alert' = level >= 3 ? 'alert' : level <= 1 ? 'calm' : 'balanced';
+    const result = summarizeAssessment(instrument, answers);
+    const hints = buildOrchestrationHints(instrument, result.level);
+    const severity: 'calm' | 'balanced' | 'alert' = result.level >= 3 ? 'alert' : result.level <= 1 ? 'calm' : 'balanced';
 
     addSentryBreadcrumb({
       category: 'assess',
@@ -299,11 +298,11 @@ serve(async (req) => {
 
     const submittedAt = ts ?? new Date().toISOString();
     const scorePayload = {
-      summary: score.summary,
-      level: score.level,
-      instrument_version: score.instrument_version,
-      generated_at: score.generated_at,
-      ...(score.focus ? { focus: score.focus } : {}),
+      summary: result.summary,
+      level: result.level,
+      instrument_version: '1.0',
+      generated_at: new Date().toISOString(),
+      ...(result.focus ? { focus: result.focus } : {}),
     };
 
     const payload = {
@@ -342,13 +341,13 @@ serve(async (req) => {
       domain: getInstrumentDomain(instrument),
       module_context: SIGNAL_MODULE_CONTEXT,
       metadata: {
-        summary: score.summary,
-        focus: score.focus ?? null,
+        summary: result.summary,
+        focus: result.focus ?? null,
         severity,
         hints,
       },
       expires_at: new Date(Date.now() + SIGNAL_TTL_MS).toISOString(),
-      level,
+      level: result.level,
     };
 
     const maybeProcess = (globalThis as { process?: { env?: Record<string, unknown> } }).process;
@@ -394,7 +393,7 @@ serve(async (req) => {
       data: { instrument },
     });
 
-    const response = appendCorsHeaders(json(200, { status: 'ok', summary: score.summary }), cors);
+    const response = appendCorsHeaders(json(200, { status: 'ok', summary: result.summary }), cors);
     applySecurityHeaders(response, { cacheControl: 'no-store' });
     return finalize(response, { outcome: 'success', stage: 'summary_stored' });
   } catch (error) {

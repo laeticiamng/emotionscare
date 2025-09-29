@@ -26,15 +26,16 @@ interface InstrumentItem {
   subscale?: string;
 }
 
-interface InstrumentCatalog {
+export interface InstrumentCatalog {
   code: InstrumentCode;
+  locale: LocaleCode;
   name: string;
   version: string;
   items: InstrumentItem[];
   expiry_minutes: number;
 }
 
-interface ScoringResult {
+export interface ScoringResult {
   summary: string;
   level: number;
   scores: Record<string, number>;
@@ -341,7 +342,7 @@ export function getCatalog(instrument: InstrumentCode, locale: LocaleCode = 'fr'
     throw new Error(`No catalog available for ${instrument} in ${locale}`);
   }
 
-  return catalog;
+  return { ...catalog, locale };
 }
 
 export function summarizeAssessment(instrument: InstrumentCode, answers: Record<string, any>): ScoringResult {
