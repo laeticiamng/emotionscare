@@ -92,47 +92,19 @@ const Header: React.FC<HeaderProps> = ({
     { 
       label: 'Scanner', 
       href: '/app/scan', 
-      icon: Camera,
-      badge: 'IA',
-      children: [
-        { label: 'Scan Facial', href: '/app/scan/facial' },
-        { label: 'Analyse Vocale', href: '/app/scan/voice' },
-        { label: 'Analyse de Texte', href: '/app/scan/text' },
-      ]
+      icon: Camera
     },
     { 
       label: 'Musique', 
       href: '/app/music', 
-      icon: Music,
-      badge: 'Suno',
-      children: [
-        { label: 'Thérapie Musicale', href: '/app/music' },
-        { label: 'Génération IA', href: '/app/music/generate' },
-        { label: 'Bibliothèque', href: '/app/music/library' },
-      ]
+      icon: Music
     },
     { 
       label: 'Coach IA', 
       href: '/app/coach', 
-      icon: Brain,
-      badge: 'Premium',
-      children: [
-        { label: 'Chat avec Nyvée', href: '/app/coach' },
-        { label: 'Séances guidées', href: '/app/coach/sessions' },
-        { label: 'Programmes', href: '/app/coach/programs' },
-      ]
+      icon: Brain
     },
-    { label: 'Journal', href: '/app/journal', icon: Sparkles },
-    { 
-      label: 'Bien-être', 
-      href: '/app/wellbeing', 
-      icon: Zap,
-      children: [
-        { label: 'Respiration', href: '/app/breath' },
-        { label: 'VR Thérapie', href: '/app/vr-breath' },
-        { label: 'Méditation', href: '/app/meditation' },
-      ]
-    },
+    { label: 'Journal', href: '/app/journal', icon: Sparkles }
   ];
 
   const navigationItems = isAuthenticated ? authenticatedNavItems : guestNavItems;

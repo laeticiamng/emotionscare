@@ -22,8 +22,8 @@ import {
   Mountain,
   Flag,
   Gem,
-  Fire,
-  Lightning,
+  Flame, // Remplace Fire
+  Bolt, // Remplace Lightning
   Users
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -89,8 +89,8 @@ const difficultyConfig = {
   novice: { name: 'Novice', icon: Flag, color: 'text-gray-600', multiplier: 1 },
   warrior: { name: 'Guerrier', icon: Sword, color: 'text-green-600', multiplier: 1.5 },
   champion: { name: 'Champion', icon: Crown, color: 'text-blue-600', multiplier: 2 },
-  legend: { name: 'Légende', icon: Lightning, color: 'text-purple-600', multiplier: 3 },
-  mythic: { name: 'Mythique', icon: Fire, color: 'text-red-600', multiplier: 5 }
+  legend: { name: 'Légende', icon: Bolt, color: 'text-purple-600', multiplier: 3 },
+  mythic: { name: 'Mythique', icon: Flame, color: 'text-red-600', multiplier: 5 }
 };
 
 const questDatabase: Quest[] = [
@@ -164,7 +164,7 @@ const questDatabase: Quest[] = [
     unlockLevel: 25,
     rewards: { xp: 800, coins: 300, title: 'Tueur de Dragons' },
     flavor: 'Le courage n\'est pas l\'absence de peur, mais l\'action malgré la peur.',
-    icon: Fire
+    icon: Flame
   },
 
   // Quêtes Santé
@@ -406,7 +406,7 @@ export const BossLevelGrit: React.FC = () => {
         
         <Card>
           <CardContent className="p-4 text-center">
-            <Fire className="h-8 w-8 mx-auto mb-2 text-orange-600" />
+            <Flame className="h-8 w-8 mx-auto mb-2 text-orange-600" />
             <p className="text-2xl font-bold">{playerProfile.currentStreak}</p>
             <p className="text-sm text-muted-foreground">Série Jours</p>
           </CardContent>

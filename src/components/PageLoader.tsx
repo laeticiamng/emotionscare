@@ -63,7 +63,7 @@ const PageLoader: React.FC<PageLoaderProps> = ({
               transition={{ delay: 0.3 }}
             >
               <h3 className="text-xl font-semibold mb-2">
-                {user ? `Bienvenue, ${user.name}` : 'Bienvenue'}
+                {user ? `Bienvenue, ${user.email?.split('@')[0] || 'Utilisateur'}` : 'Bienvenue'}
               </h3>
               <p className="text-muted-foreground">{message}</p>
             </motion.div>

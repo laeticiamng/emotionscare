@@ -1,16 +1,16 @@
 import React from 'react';
 import { RouterProvider } from 'react-router-dom';
-import { AuthProvider } from '@/contexts/AuthContext';
+import AppProviders from './AppProviders';
 import { router } from './router';
 
 function App() {
   return (
-    <AuthProvider>
+    <AppProviders>
       <a className="skip-link" href="#main-content">
         Aller au contenu principal
       </a>
       <RouterProvider router={router} />
-    </AuthProvider>
+    </AppProviders>
   );
 }
 
