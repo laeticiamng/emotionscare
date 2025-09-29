@@ -88,6 +88,7 @@ create table if not exists public.org_members (
   org_id uuid not null,
   team_id uuid,
   role text default 'member',
+  -- The default UUID '00000000-0000-0000-0000-000000000000' is used to represent a "no team" value for team_id in the primary key.
   constraint org_members_pk primary key (user_id, org_id, coalesce(team_id,'00000000-0000-0000-0000-000000000000'))
 );
 
