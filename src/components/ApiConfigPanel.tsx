@@ -13,7 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Loader2, Key, Save, RefreshCw, ExternalLink } from 'lucide-react';
-// import ApiStatus from './ApiStatus'; // Temporairement désactivé
+import ApiStatus from './ApiStatus';
 import { API_URL } from '@/lib/env';
 
 interface ApiConfigPanelProps {
@@ -146,9 +146,7 @@ const ApiConfigPanel: React.FC<ApiConfigPanelProps> = ({ className = '', onUpdat
           
           {/* Onglet de statut */}
           <TabsContent value="status" className="px-6 py-4">
-            <div className="text-center py-8">
-              <p className="text-muted-foreground">Composant ApiStatus temporairement indisponible</p>
-            </div>
+            <ApiStatus />
           </TabsContent>
           
           {/* Onglet des options avancées */}
