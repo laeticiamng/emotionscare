@@ -1,441 +1,380 @@
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+/**
+ * CoachPage - Module de coach IA
+ * Interface conversationnelle avec un coach virtuel
+ */
+
+import React, { useState, useRef, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { 
-  ArrowLeft,
-  BookOpen,
-  MessageCircle,
+  Send, 
+  Brain, 
+  MessageCircle, 
   Lightbulb,
   Heart,
-  Send,
-  Sparkles
+  Zap,
+  Clock,
+  User,
+  Bot,
+  Mic,
+  Image,
+  MoreHorizontal
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { useToast } from '@/hooks/use-toast';
-import { UniverseEngine } from '@/components/universe/UniverseEngine';
-import { RewardSystem } from '@/components/rewards/RewardSystem';
-import { getOptimizedUniverse } from '@/data/universes/config';
-import { useOptimizedAnimation } from '@/hooks/useOptimizedAnimation';
+import { motion, AnimatePresence } from 'framer-motion';
 
-interface CoachResponse {
+interface Message {
   id: string;
-  question: string;
-  answer: string;
-  mantraCard: string;
-  category: 'stress' | 'confiance' | 'énergie' | 'clarté';
+  content: string;
+  sender: 'user' | 'coach';
   timestamp: Date;
+  type: 'text' | 'suggestion' | 'exercise';
+  metadata?: {
+    mood?: string;
+    confidence?: number;
+    suggestions?: string[];
+  };
 }
 
-const quickSuggestions = [
-  "Je stresse pour demain",
-  "J'ai du mal à me concentrer",
-  "Je me sens fatigué",
-  "Comment me motiver ?",
-  "J'ai besoin de confiance",
-  "Comment mieux dormir ?"
-];
+interface CoachPersonality {
+  id: string;
+  name: string;
+  description: string;
+  avatar: string;
+  specialties: string[];
+  tone: string;
+}
 
 const CoachPage: React.FC = () => {
-  const { toast } = useToast();
-  
-  // Get optimized universe config
-  const universe = getOptimizedUniverse('journal'); // Using journal universe for now
-  
-  // Universe state
-  const [isEntering, setIsEntering] = useState(true);
-  const [universeEntered, setUniverseEntered] = useState(false);
-  
-  // Coach state
-  const [currentQuestion, setCurrentQuestion] = useState('');
-  const [isThinking, setIsThinking] = useState(false);
-  const [response, setResponse] = useState<CoachResponse | null>(null);
-  const [showReward, setShowReward] = useState(false);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [inputValue, setInputValue] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
+  const [currentCoach, setCurrentCoach] = useState<CoachPersonality | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Optimized animations
-  const { entranceVariants, cleanupAnimation } = useOptimizedAnimation({
-    enableComplexAnimations: true,
-    useCSSAnimations: true,
-  });
+  const coaches: CoachPersonality[] = [
+    {
+      id: 'emma',
+      name: 'Emma',
+      description: 'Coach empathique spécialisée en gestion du stress',
+      avatar: '👩‍⚕️',
+      specialties: ['Stress', 'Anxiété', 'Relaxation'],
+      tone: 'Empathique et bienveillant'
+    },
+    {
+      id: 'alex',
+      name: 'Alex',
+      description: 'Coach motivationnel pour l\'énergie et la productivité',
+      avatar: '🧑‍💼',
+      specialties: ['Motivation', 'Énergie', 'Objectifs'],
+      tone: 'Dynamique et encourageant'
+    },
+    {
+      id: 'zen',
+      name: 'Zen',
+      description: 'Maître de méditation et mindfulness',
+      avatar: '🧘‍♀️',
+      specialties: ['Méditation', 'Pleine conscience', 'Équilibre'],
+      tone: 'Calme et sage'
+    }
+  ];
 
-  // Handle universe entrance
-  const handleUniverseEnterComplete = () => {
-    setUniverseEntered(true);
-  };
+  const quickSuggestions = [
+    "Je me sens stressé aujourd'hui",
+    "Comment améliorer ma concentration ?",
+    "J'ai besoin de motivation",
+    "Peux-tu me guider dans une méditation ?",
+    "Comment mieux gérer mes émotions ?"
+  ];
 
-  // Cleanup on unmount
   useEffect(() => {
-    return () => {
-      cleanupAnimation();
-    };
-  }, [cleanupAnimation]);
-
-  const generateCoachResponse = (question: string): CoachResponse => {
-    // Simple AI-like response generation based on keywords
-    let answer = '';
-    let mantraCard = '';
-    let category: CoachResponse['category'] = 'clarté';
-
-    const lowerQuestion = question.toLowerCase();
-
-    if (lowerQuestion.includes('stress') || lowerQuestion.includes('anxieu') || lowerQuestion.includes('peur')) {
-      category = 'stress';
-      answer = "Je comprends cette tension. Une pause respiration peut t'aider à retrouver ton centre. Essaie 3 respirations profondes maintenant.";
-      mantraCard = "Je respire, je me centre, je trouve ma paix intérieure";
-    } else if (lowerQuestion.includes('confiance') || lowerQuestion.includes('doute') || lowerQuestion.includes('peur')) {
-      category = 'confiance';
-      answer = "Ta valeur ne dépend pas de tes doutes. Chaque petit pas compte. Rappelle-toi une réussite récente, même minime.";
-      mantraCard = "Je suis capable, je progresse à mon rythme";
-    } else if (lowerQuestion.includes('fatigué') || lowerQuestion.includes('énergie') || lowerQuestion.includes('motivation')) {
-      category = 'énergie';
-      answer = "L'énergie se cultive doucement. Commence par une chose simple qui te fait plaisir. Parfois, moins faire c'est plus avancer.";
-      mantraCard = "Mon énergie renaît à chaque moment présent";
-    } else if (lowerQuestion.includes('concentration') || lowerQuestion.includes('focus') || lowerQuestion.includes('distrait')) {
-      category = 'clarté';
-      answer = "L'esprit papillon est normal aujourd'hui. Essaie la technique Pomodoro : 15min focalisées, puis pause. La régularité surpasse l'intensité.";
-      mantraCard = "Ma concentration grandit pas à pas, sans jugement";
-    } else {
-      answer = "Je t'entends. Chaque questionnement mérite bienveillance. Prends un moment pour respirer et écouter ce que ton cœur te dit.";
-      mantraCard = "J'accueille mes questions avec douceur et sagesse";
+    if (!currentCoach) {
+      setCurrentCoach(coaches[0]);
+      // Message d'accueil
+      const welcomeMessage: Message = {
+        id: 'welcome',
+        content: `Bonjour ! Je suis ${coaches[0].name}, votre coach IA personnalisé. Je suis là pour vous accompagner dans votre parcours de bien-être émotionnel. Comment puis-je vous aider aujourd'hui ?`,
+        sender: 'coach',
+        timestamp: new Date(),
+        type: 'text'
+      };
+      setMessages([welcomeMessage]);
     }
+  }, []);
 
-    return {
-      id: `response-${Date.now()}`,
-      question,
-      answer,
-      mantraCard,
-      category,
-      timestamp: new Date()
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  const sendMessage = async (content: string) => {
+    if (!content.trim()) return;
+
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      content,
+      sender: 'user',
+      timestamp: new Date(),
+      type: 'text'
     };
-  };
 
-  const askQuestion = () => {
-    if (currentQuestion.trim().length < 5) {
-      toast({
-        title: "Question trop courte",
-        description: "Partage un peu plus tes pensées pour que je puisse t'aider 💙",
-        variant: "destructive",
-      });
-      return;
-    }
+    setMessages(prev => [...prev, userMessage]);
+    setInputValue('');
+    setIsTyping(true);
 
-    setIsThinking(true);
-    
-    // Simulate AI thinking time
+    // Simuler la réponse du coach
     setTimeout(() => {
-      const coachResponse = generateCoachResponse(currentQuestion);
-      setResponse(coachResponse);
-      setIsThinking(false);
+      const responses = [
+        {
+          content: "Je comprends votre préoccupation. Prenons quelques instants pour explorer cela ensemble. Pouvez-vous me dire ce qui vous préoccupe le plus en ce moment ?",
+          suggestions: ["Parlons de stress", "Exercice de respiration", "Technique de relaxation"]
+        },
+        {
+          content: "C'est tout à fait normal de ressentir cela. Voici quelques techniques qui pourraient vous aider. Voulez-vous que nous commencions par un exercice simple ?",
+          suggestions: ["Exercice guidé", "Conseils pratiques", "Planifier ensemble"]
+        },
+        {
+          content: "Excellente question ! Votre bien-être est important. Basé sur ce que vous me dites, je recommande de commencer par petites étapes. Que diriez-vous d'essayer ceci ?",
+          suggestions: ["Commencer maintenant", "En savoir plus", "Autres options"]
+        }
+      ];
+
+      const randomResponse = responses[Math.floor(Math.random() * responses.length)];
       
-      toast({
-        title: "Conseil reçu ✨",
-        description: "Ton mentor t'accompagne avec bienveillance",
-      });
+      const coachMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        content: randomResponse.content,
+        sender: 'coach',
+        timestamp: new Date(),
+        type: 'suggestion',
+        metadata: {
+          suggestions: randomResponse.suggestions,
+          confidence: 85 + Math.floor(Math.random() * 15)
+        }
+      };
 
-      // Show reward after response
-      setTimeout(() => {
-        setShowReward(true);
-      }, 3000);
-    }, 2000);
+      setMessages(prev => [...prev, coachMessage]);
+      setIsTyping(false);
+    }, 1500 + Math.random() * 1000);
   };
 
-  const handleQuickSuggestion = (suggestion: string) => {
-    setCurrentQuestion(suggestion);
+  const selectCoach = (coach: CoachPersonality) => {
+    setCurrentCoach(coach);
+    const switchMessage: Message = {
+      id: Date.now().toString(),
+      content: `Bonjour ! Je suis ${coach.name}. ${coach.description}. Comment puis-je vous aider aujourd'hui ?`,
+      sender: 'coach',
+      timestamp: new Date(),
+      type: 'text'
+    };
+    setMessages(prev => [...prev, switchMessage]);
   };
-
-  const handleRewardComplete = () => {
-    setShowReward(false);
-    setResponse(null);
-    setCurrentQuestion('');
-  };
-
-  const getCategoryColor = (category: CoachResponse['category']) => {
-    switch (category) {
-      case 'stress': return 'hsl(200, 70%, 60%)';
-      case 'confiance': return 'hsl(280, 60%, 65%)';
-      case 'énergie': return 'hsl(30, 80%, 60%)';
-      case 'clarté': return 'hsl(140, 60%, 60%)';
-      default: return 'hsl(220, 60%, 60%)';
-    }
-  };
-
-  if (showReward && response) {
-    return (
-      <RewardSystem
-        reward={{
-          type: 'lantern',
-          name: 'Carte Mantra',
-          description: "Sagesse bienveillante à emporter partout",
-          moduleId: 'coach'
-        }}
-        badgeText="On avance pas à pas 🧭"
-        onComplete={handleRewardComplete}
-      />
-    );
-  }
 
   return (
-    <UniverseEngine
-      universe={universe}
-      isEntering={isEntering}
-      onEnterComplete={handleUniverseEnterComplete}
-      enableParticles={true}
-      enableAmbianceSound={false}
-      className="min-h-screen"
-    >
-      {/* Header */}
-      <header className="relative z-50 p-6">
-        <div className="flex items-center justify-between">
-          <Link 
-            to="/app" 
-            className="flex items-center space-x-2 text-foreground/80 hover:text-foreground transition-colors"
-          >
-            <ArrowLeft className="h-5 w-5" />
-            <span className="font-medium">Retour</span>
-          </Link>
-          
-          <div className="flex items-center space-x-2 text-foreground">
-            <BookOpen className="h-6 w-6 text-amber-600" />
-            <h1 className="text-xl font-light tracking-wide">Le Salon du Mentor</h1>
-          </div>
-        </div>
-      </header>
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-100 dark:from-slate-900 dark:to-slate-800">
+      <div className="container mx-auto p-6 space-y-6">
+        {/* Header */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center space-y-2"
+        >
+          <h1 className="text-3xl font-bold flex items-center justify-center gap-3">
+            <Brain className="h-8 w-8 text-green-600" />
+            Coach IA Personnel
+          </h1>
+          <p className="text-muted-foreground max-w-2xl mx-auto">
+            Votre accompagnement personnalisé pour le bien-être émotionnel
+          </p>
+        </motion.div>
 
-      {/* Main Content */}
-      <main className="relative z-10 container mx-auto px-6 py-12">
-        <AnimatePresence mode="wait">
-          {!response && !isThinking ? (
-            <motion.div
-              key="question"
-              variants={entranceVariants}
-              initial="hidden"
-              animate="visible"
-              exit="hidden"
-              className="space-y-12"
-            >
-              {/* Introduction */}
-              <div className="text-center space-y-6">
-                <motion.div
-                  initial={{ scale: 0, rotate: -15 }}
-                  animate={{ scale: 1, rotate: 0 }}
-                  transition={{ delay: 0.5, type: "spring" }}
-                  className="inline-flex items-center justify-center w-20 h-20 rounded-full mb-6"
-                  style={{ 
-                    background: `linear-gradient(135deg, hsl(25, 60%, 55%), hsl(35, 70%, 65%))` 
-                  }}
-                >
-                  <MessageCircle className="h-10 w-10 text-white" />
-                </motion.div>
-                
-                <h2 className="text-4xl font-light text-foreground tracking-wide">
-                  Ton Mentor Personnel
-                </h2>
-                <p className="text-xl text-muted-foreground max-w-2xl mx-auto font-light">
-                  Partage ce qui te préoccupe. Ton mentor t'écoute avec bienveillance 
-                  et t'offre des conseils personnalisés, sans jugement.
-                </p>
-              </div>
-
-              {/* Question Input */}
-              <div className="max-w-2xl mx-auto space-y-6">
-                <Card className="bg-card/90 backdrop-blur-md">
-                  <CardContent className="p-6">
-                    <div className="space-y-4">
-                      <h3 className="font-medium text-foreground flex items-center gap-2">
-                        <Heart className="w-5 h-5 text-red-400" />
-                        Que ressens-tu en ce moment ?
-                      </h3>
-                      
-                      <Textarea
-                        value={currentQuestion}
-                        onChange={(e) => setCurrentQuestion(e.target.value)}
-                        placeholder="Ex: Je stresse pour ma présentation demain, j'ai du mal à me concentrer..."
-                        className="min-h-24 border-none bg-transparent resize-none focus:ring-0 text-base leading-relaxed"
-                      />
-                      
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs text-muted-foreground">
-                          {currentQuestion.length} caractères
-                        </span>
-                        
-                        <Button
-                          onClick={askQuestion}
-                          disabled={currentQuestion.trim().length < 5}
-                          className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600"
-                        >
-                          <Send className="h-4 w-4 mr-2" />
-                          Demander conseil
-                        </Button>
+        <div className="max-w-4xl mx-auto grid grid-cols-1 lg:grid-cols-4 gap-6">
+          {/* Sidebar - Coaches */}
+          <div className="lg:col-span-1 space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Choisir votre coach</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {coaches.map((coach) => (
+                  <div
+                    key={coach.id}
+                    onClick={() => selectCoach(coach)}
+                    className={`p-3 rounded-lg cursor-pointer transition-all ${
+                      currentCoach?.id === coach.id 
+                        ? 'bg-primary/10 border-2 border-primary' 
+                        : 'bg-muted/50 hover:bg-muted'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="text-2xl">{coach.avatar}</div>
+                      <div className="flex-1">
+                        <div className="font-medium">{coach.name}</div>
+                        <div className="text-xs text-muted-foreground">
+                          {coach.specialties.join(', ')}
+                        </div>
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
-
-                {/* Quick suggestions */}
-                <div className="space-y-4">
-                  <h4 className="text-sm font-medium text-muted-foreground text-center">
-                    Ou choisis une question fréquente :
-                  </h4>
-                  
-                  <div className="grid gap-2 md:grid-cols-2">
-                    {quickSuggestions.map((suggestion, index) => (
-                      <motion.div
-                        key={suggestion}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.8 + index * 0.1 }}
-                      >
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleQuickSuggestion(suggestion)}
-                          className="w-full text-left justify-start h-auto py-2 px-3 text-sm"
-                        >
-                          <MessageCircle className="w-3 h-3 mr-2 flex-shrink-0" />
-                          {suggestion}
-                        </Button>
-                      </motion.div>
-                    ))}
                   </div>
-                </div>
-              </div>
-            </motion.div>
-          ) : isThinking ? (
-            <motion.div
-              key="thinking"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              className="max-w-2xl mx-auto text-center space-y-8"
-            >
-              <div className="space-y-6">
-                <motion.div
-                  className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r from-amber-500 to-orange-500"
-                  animate={{ scale: [1, 1.1, 1], rotate: [0, 5, -5, 0] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                >
-                  <BookOpen className="h-8 w-8 text-white" />
-                </motion.div>
-                
-                <h2 className="text-2xl font-light text-foreground">
-                  Ton mentor réfléchit...
-                </h2>
-                
-                <div className="space-y-2">
-                  <p className="text-muted-foreground">
-                    Il consulte sa sagesse bienveillante
-                  </p>
-                  <div className="flex justify-center space-x-1">
-                    {[0, 1, 2].map((i) => (
-                      <motion.div
-                        key={i}
-                        className="w-2 h-2 bg-amber-500 rounded-full"
-                        animate={{ opacity: [0.3, 1, 0.3] }}
-                        transition={{ 
-                          duration: 1.5, 
-                          repeat: Infinity, 
-                          delay: i * 0.2 
-                        }}
-                      />
-                    ))}
-                  </div>
-                </div>
-              </div>
-              
-              <Card className="bg-card/90 backdrop-blur-md">
-                <CardContent className="p-6">
-                  <div className="text-sm text-muted-foreground italic">
-                    "Chaque question mérite une réponse thoughtful et personnalisée..."
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-          ) : (
-            <motion.div
-              key="response"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              className="max-w-2xl mx-auto space-y-8"
-            >
-              {/* Coach Response */}
-              <div className="text-center space-y-4">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 mb-4">
-                  <Lightbulb className="h-8 w-8 text-white" />
-                </div>
-                
-                <h2 className="text-2xl font-light text-foreground">
-                  Conseil bienveillant
-                </h2>
-              </div>
+                ))}
+              </CardContent>
+            </Card>
 
-              {response && (
-                <div className="space-y-6">
-                  {/* Question reminder */}
-                  <Card className="bg-card/50 backdrop-blur-md border-l-4" style={{ borderLeftColor: getCategoryColor(response.category) }}>
-                    <CardContent className="p-4">
-                      <p className="text-sm text-muted-foreground italic">
-                        "{response.question}"
-                      </p>
-                    </CardContent>
-                  </Card>
-
-                  {/* Answer */}
-                  <Card className="bg-card/90 backdrop-blur-md">
-                    <CardContent className="p-6">
-                      <div className="space-y-4">
-                        <Badge 
-                          variant="secondary"
-                          style={{ 
-                            backgroundColor: `${getCategoryColor(response.category)}20`,
-                            color: getCategoryColor(response.category)
-                          }}
-                        >
-                          {response.category}
-                        </Badge>
-                        
-                        <p className="text-foreground leading-relaxed">
-                          {response.answer}
-                        </p>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  {/* Mantra Card */}
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 1 }}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Suggestions rapides</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                {quickSuggestions.map((suggestion, index) => (
+                  <Button
+                    key={index}
+                    variant="outline"
+                    size="sm"
+                    onClick={() => sendMessage(suggestion)}
+                    className="w-full text-left justify-start h-auto py-2 px-3"
                   >
-                    <Card 
-                      className="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border-amber-200/50"
-                    >
-                      <CardContent className="p-6 text-center">
-                        <div className="space-y-3">
-                          <Sparkles className="w-6 h-6 mx-auto text-amber-600" />
-                          <h4 className="font-medium text-foreground">Ta carte mantra</h4>
-                          <p 
-                            className="font-light italic text-lg leading-relaxed"
-                            style={{ color: getCategoryColor(response.category) }}
-                          >
-                            "{response.mantraCard}"
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            À garder dans ton portefeuille virtuel ✨
-                          </p>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </motion.div>
+                    <span className="text-xs">{suggestion}</span>
+                  </Button>
+                ))}
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Chat Interface */}
+          <div className="lg:col-span-3">
+            <Card className="h-[600px] flex flex-col">
+              {/* Chat Header */}
+              <CardHeader className="border-b">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="text-2xl">{currentCoach?.avatar}</div>
+                    <div>
+                      <CardTitle className="text-lg">{currentCoach?.name}</CardTitle>
+                      <p className="text-sm text-muted-foreground">
+                        {currentCoach?.tone}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <Badge variant="secondary" className="text-xs">
+                      <Clock className="h-3 w-3 mr-1" />
+                      En ligne
+                    </Badge>
+                  </div>
                 </div>
-              )}
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </main>
-    </UniverseEngine>
+              </CardHeader>
+
+              {/* Messages */}
+              <CardContent className="flex-1 overflow-y-auto p-4 space-y-4">
+                <AnimatePresence>
+                  {messages.map((message) => (
+                    <motion.div
+                      key={message.id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+                    >
+                      <div className={`flex gap-3 max-w-[80%] ${message.sender === 'user' ? 'flex-row-reverse' : ''}`}>
+                        <Avatar className="h-8 w-8 shrink-0">
+                          {message.sender === 'user' ? (
+                            <AvatarFallback><User className="h-4 w-4" /></AvatarFallback>
+                          ) : (
+                            <AvatarFallback>{currentCoach?.avatar}</AvatarFallback>
+                          )}
+                        </Avatar>
+                        
+                        <div className={`space-y-2 ${message.sender === 'user' ? 'items-end' : 'items-start'} flex flex-col`}>
+                          <div className={`rounded-lg p-3 ${
+                            message.sender === 'user' 
+                              ? 'bg-primary text-primary-foreground' 
+                              : 'bg-muted'
+                          }`}>
+                            <p className="text-sm">{message.content}</p>
+                            {message.metadata?.confidence && (
+                              <div className="text-xs opacity-70 mt-1">
+                                Confiance: {message.metadata.confidence}%
+                              </div>
+                            )}
+                          </div>
+                          
+                          {message.metadata?.suggestions && (
+                            <div className="flex flex-wrap gap-2">
+                              {message.metadata.suggestions.map((suggestion, index) => (
+                                <Button
+                                  key={index}
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => sendMessage(suggestion)}
+                                  className="text-xs"
+                                >
+                                  {suggestion}
+                                </Button>
+                              ))}
+                            </div>
+                          )}
+                          
+                          <div className="text-xs text-muted-foreground">
+                            {message.timestamp.toLocaleTimeString()}
+                          </div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+
+                {isTyping && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="flex justify-start"
+                  >
+                    <div className="flex gap-3">
+                      <Avatar className="h-8 w-8">
+                        <AvatarFallback>{currentCoach?.avatar}</AvatarFallback>
+                      </Avatar>
+                      <div className="bg-muted rounded-lg p-3 flex items-center gap-1">
+                        <div className="flex gap-1">
+                          <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                          <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                          <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+                
+                <div ref={messagesEndRef} />
+              </CardContent>
+
+              {/* Input */}
+              <div className="border-t p-4">
+                <div className="flex gap-2">
+                  <Input
+                    value={inputValue}
+                    onChange={(e) => setInputValue(e.target.value)}
+                    placeholder="Tapez votre message..."
+                    onKeyPress={(e) => e.key === 'Enter' && sendMessage(inputValue)}
+                    className="flex-1"
+                  />
+                  <Button 
+                    size="icon" 
+                    onClick={() => sendMessage(inputValue)}
+                    disabled={!inputValue.trim() || isTyping}
+                  >
+                    <Send className="h-4 w-4" />
+                  </Button>
+                  <Button size="icon" variant="outline">
+                    <Mic className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            </Card>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 
