@@ -117,3 +117,7 @@ if (isBrowser) {
 }
 
 export default i18nInstance;
+
+// Export named exports for compatibility
+export const t = (key: string, options?: any) => i18nInstance.t(key, options);
+export const I18nProvider = ({ children }: { children: React.ReactNode }) => children;
