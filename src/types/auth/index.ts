@@ -7,10 +7,14 @@ export interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  error: string | null;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, userData?: any) => Promise<void>;
   signOut: () => Promise<void>;
   updateProfile: (updates: Partial<User>) => Promise<void>;
+  login: (email: string, password: string) => Promise<void>;
+  clearError: () => void;
+  updateUser: (updates: Partial<User>) => Promise<void>;
 }
 
 // Auth form types

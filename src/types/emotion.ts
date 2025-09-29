@@ -7,6 +7,10 @@ export interface EmotionResult {
   insight?: string;
   intensity?: number;
   suggestions?: string[];
+  emojis?: string[];
+  primaryEmotion?: string;
+  feedback?: string;
+  recommendations?: string[];
 }
 
 export interface EmotionRecommendation {
