@@ -1,8 +1,9 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
+import { componentTagger } from "lovable-tagger";
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
@@ -12,15 +13,9 @@ export default defineConfig({
     host: "::"
   },
   plugins: [
-    react({
-      // Complete TypeScript bypass for template update
-      typescript: false,
-      babel: {
-        babelrc: false,
-        configFile: false
-      }
-    }),
-  ],
+    react(),
+    mode === 'development' && componentTagger(),
+  ].filter(Boolean),
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
@@ -31,7 +26,6 @@ export default defineConfig({
     minify: 'esbuild',
     sourcemap: false,
   },
-  // Ignore TypeScript errors completely
   esbuild: {
     target: 'esnext',
     logLevel: 'silent'
@@ -43,4 +37,4 @@ export default defineConfig({
     __LOVABLE_TEMPLATE_UPDATED__: true,
     __DEV__: true
   }
-});
+}));

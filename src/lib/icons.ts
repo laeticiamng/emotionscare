@@ -1,770 +1,135 @@
-// Comprehensive icon library - emoji fallbacks for all lucide-react icons
-export const CheckCircle = '✅';
-export const XCircle = '❌';
-export const AlertTriangle = '⚠️';
-export const Menu = '☰';
-export const Search = '🔍';
-export const User = '👤';
-export const Settings = '⚙️';
-export const Home = '🏠';
-export const Heart = '❤️';
-export const Shield = '🛡️';
-export const Bell = '🔔';
-export const Calendar = '📅';
-export const Plus = '+';
-export const Minus = '-';
-export const X = '✕';
-export const Play = '▶️';
-export const Pause = '⏸️';
-export const RefreshCw = '🔄';
-export const Eye = '👁️';
-export const EyeOff = '🙈';
-export const Lock = '🔒';
-export const Unlock = '🔓';
-export const Brain = '🧠';
-export const Zap = '⚡';
-export const Monitor = '🖥️';
-export const Headphones = '🎧';
-export const BookOpen = '📖';
-export const Gamepad2 = '🎮';
-export const RotateCcw = '↺';
-export const MoreHorizontal = '⋯';
-export const Trash2 = '🗑️';
-export const ExternalLink = '🔗';
-export const Undo = '↶';
-export const CalendarIcon = '📅';
-export const Accessibility = '♿';
-export const Type = '🅰️';
-export const MousePointer = '🖱️';
-export const Volume2 = '🔊';
-export const Contrast = '🌓';
-export const ZoomIn = '🔍';
-export const Keyboard = '⌨️';
-export const Filter = '🔽';
-export const Sparkles = '✨';
-export const Send = '📤';
-export const Mic = '🎤';
-export const MicOff = '🔇';
-export const Camera = '📷';
-export const CameraOff = '📷';
-export const SkipBack = '⏮️';
-export const SkipForward = '⏭️';
-export const VolumeX = '🔇';
-export const Repeat = '🔁';
-export const Shuffle = '🔀';
-export const Volume = '🔊';
-export const Square = '⏹️';
-export const Save = '💾';
-export const Trash = '🗑️';
-export const Smile = '😊';
-export const Music = '🎵';
-export const ArrowRight = '→';
-export const ArrowLeft = '←';
-export const ArrowUp = '↑';
-export const ArrowDown = '↓';
-export const ChevronDown = '⌄';
-export const ChevronUp = '⌃';
-export const ChevronLeft = '‹';
-export const ChevronRight = '›';
-export const Download = '⬇️';
-export const Upload = '⬆️';
-export const Mail = '📧';
-export const Phone = '📞';
-export const MapPin = '📍';
-export const Clock = '⏰';
-export const Star = '⭐';
-export const ThumbsUp = '👍';
-export const ThumbsDown = '👎';
-export const Share = '📤';
-export const Copy = '📋';
-export const Edit = '✏️';
-export const FileText = '📄';
-export const Folder = '📁';
-export const File = '📄';
-export const Image = '🖼️';
-export const Video = '🎥';
-export const Link = '🔗';
-export const Info = 'ℹ️';
-export const Help = '❓';
-export const HelpCircle = '❓';
-export const Loading = '⏳';
-export const Loader = '⟳';
-export const Loader2 = '⟳';
-export const Key = '🔑';
-export const Users = '👥';
-export const BarChart3 = '📊';
-export const MessageSquare = '💬';
-export const LogOut = '🚪';
-export const Check = '✓';
-export const Building = '🏢';
-export const AlertCircle = '🔴';
-export const MessageCircle = '💭';
-export const Activity = '📈';
-export const FileCheck = '📋';
-export const Target = '🎯';
-export const Award = '🏆';
-export const TrendingUp = '📈';
-export const BarChart = '📊';
-export const PieChart = '📊';
-export const Globe = '🌍';
-export const Wifi = '📶';
-export const Database = '🗄️';
-export const Server = '🖥️';
-export const Code = '💻';
-export const Terminal = '💻';
-export const Bug = '🐛';
-export const Wrench = '🔧';
-export const Gear = '⚙️';
-export const Power = '⚡';
-export const Battery = '🔋';
-export const Signal = '📶';
-export const Bluetooth = '📶';
-export const Smartphone = '📱';
-export const Tablet = '📱';
-export const Laptop = '💻';
-export const Desktop = '🖥️';
-export const Watch = '⌚';
-export const Gamepad = '🎮';
-export const Headset = '🎧';
-export const Speaker = '🔊';
-export const Radio = '📻';
-export const Tv = '📺';
-export const Film = '🎬';
-export const Photo = '📷';
-export const Palette = '🎨';
-export const Brush = '🖌️';
-export const Scissors = '✂️';
-export const Paperclip = '📎';
-export const Pin = '📌';
-export const Flag = '🚩';
-export const Bookmark = '🔖';
-export const Tag = '🏷️';
-export const QrCode = '⚞';
-export const Scan = '🔍';
-export const Fingerprint = '👆';
-export const ShieldCheck = '🛡️';
-export const ShieldAlert = '⚠️';
-export const AlertOctagon = '🛑';
-export const Ban = '🚫';
-export const Slash = '/';
-export const Hash = '#';
-export const At = '@';
-export const Dollar = '$';
-export const Percent = '%';
-export const Copyright = '©';
-export const Trademark = '™';
-export const Registered = '®';
-export const Infinity = '∞';
-export const Pi = 'π';
-export const Alpha = 'α';
-export const Beta = 'β';
-export const Gamma = 'γ';
-export const Delta = 'Δ';
-export const Omega = 'Ω';
-export const Sigma = 'Σ';
-export const Lambda = 'λ';
-export const Mu = 'μ';
-export const Theta = 'θ';
-export const Phi = 'φ';
-export const Chi = 'χ';
-export const Psi = 'ψ';
-export const Rho = 'ρ';
-export const Tau = 'τ';
-export const Eta = 'η';
-export const Zeta = 'ζ';
-export const Xi = 'ξ';
-export const Nu = 'ν';
-export const Kappa = 'κ';
-export const Iota = 'ι';
-export const Epsilon = 'ε';
-export const LogIn = '🚪';
-export const UserPlus = '👥';
-export const UserMinus = '👥';
-export const UserCheck = '✅';
-export const UserX = '❌';
-export const Users2 = '👥';
-export const Team = '👥';
-export const Crown = '👑';
-export const Award2 = '🏆';
-export const Trophy = '🏆';
-export const Medal = '🏅';
-export const Gift = '🎁';
-export const Package = '📦';
-export const Box = '📦';
-export const Archive = '📁';
-export const Inbox = '📥';
-export const Outbox = '📤';
-export const Briefcase = '💼';
-export const Calendar2 = '📅';
-export const CalendarDays = '📅';
-export const CalendarCheck = '✅';
-export const CalendarX = '❌';
-export const CalendarPlus = '📅';
-export const CalendarMinus = '📅';
-export const CalendarRange = '📅';
-export const Alarm = '⏰';
-export const Timer = '⏲️';
-export const Stopwatch = '⏱️';
-export const Hourglass = '⏳';
-export const Sun = '☀️';
-export const Moon = '🌙';
-export const CloudSun = '⛅';
-export const Cloud = '☁️';
-export const CloudRain = '🌧️';
-export const CloudSnow = '🌨️';
-export const Snowflake = '❄️';
-export const Zap2 = '⚡';
-export const Flame = '🔥';
-export const Droplet = '💧';
-export const Wind = '💨';
-export const Tornado = '🌪️';
-export const Rainbow = '🌈';
-export const Umbrella = '☂️';
-export const TreePine = '🌲';
-export const Tree = '🌳';
-export const Flower = '🌸';
-export const Flower2 = '🌼';
-export const Leaf = '🍃';
-export const Seedling = '🌱';
-export const Bug2 = '🐛';
-export const Ant = '🐜';
-export const Bee = '🐝';
-export const Butterfly = '🦋';
-export const Spider = '🕷️';
-export const Fish = '🐟';
-export const Bird = '🐦';
-export const Cat = '🐱';
-export const Dog = '🐶';
-export const Rabbit = '🐰';
-export const Mouse = '🐭';
-export const Hamster = '🐹';
-export const Bear = '🐻';
-export const Panda = '🐼';
-export const Koala = '🐨';
-export const Tiger = '🐯';
-export const Lion = '🦁';
-export const Cow = '🐄';
-export const Pig = '🐷';
-export const Sheep = '🐑';
-export const Goat = '🐐';
-export const Horse = '🐴';
-export const Unicorn = '🦄';
-export const Zebra = '🦓';
-export const Deer = '🦌';
-export const Elephant = '🐘';
-export const Rhino = '🦏';
-export const Hippo = '🦛';
-export const Giraffe = '🦒';
-export const Kangaroo = '🦘';
-export const Monkey = '🐵';
-export const Gorilla = '🦍';
-export const Orangutan = '🦧';
-export const Chimp = '🐵';
-export const Sloth = '🦥';
-export const Otter = '🦦';
-export const Skunk = '🦨';
-export const Badger = '🦡';
-export const Feet = '🐾';
-export const Turkey = '🦃';
-export const Chicken = '🐔';
-export const Rooster = '🐓';
-export const Hatching = '🐣';
-export const Baby = '🐤';
-export const Front = '🐥';
-export const Eagle = '🦅';
-export const Duck = '🦆';
-export const Swan = '🦢';
-export const Owl = '🦉';
-export const Flamingo = '🦩';
-export const Peacock = '🦚';
-export const Parrot = '🦜';
-export const Frog = '🐸';
-export const Crocodile = '🐊';
-export const Turtle = '🐢';
-export const Lizard = '🦎';
-export const Snake = '🐍';
-export const Dragon = '🐲';
-export const Sauropod = '🦕';
-export const TRex = '🦖';
-export const Whale = '🐋';
-export const Whale2 = '🐳';
-export const Dolphin = '🐬';
-export const Shark = '🦈';
-export const Octopus = '🐙';
-export const Shell = '🐚';
-export const Snail = '🐌';
-export const Butterfly2 = '🦋';
-export const Worm = '🪱';
-export const Microbe = '🦠';
-export const Virus = '🦠';
-export const DNA = '🧬';
-export const Bone = '🦴';
-export const Skull = '💀';
-export const Ghost = '👻';
-export const Alien = '👽';
-export const Robot = '🤖';
-export const SmileyHappy = '😊';
-export const SmileyWink = '😉';
-export const SmileyTongue = '😛';
-export const SmileyKiss = '😘';
-export const SmileyLove = '😍';
-export const SmileySad = '😢';
-export const SmileyAngry = '😠';
-export const SmileyShock = '😱';
-export const SmileyNeutral = '😐';
-export const SmileyConfused = '😕';
-export const SmileyLaugh = '😂';
-export const SmileyCry = '😭';
-export const SmileyTired = '😴';
-export const SmileyMask = '😷';
-export const SmileyGlasses = '🤓';
-export const SmileySunglasses = '😎';
-export const SmileyParty = '🥳';
-export const SmileyThinking = '🤔';
-export const SmileyZipper = '🤐';
-export const Hand = '✋';
-export const HandWave = '👋';
-export const HandPeace = '✌️';
-export const HandRock = '✊';
-export const HandPaper = '✋';
-export const HandScissors = '✌️';
-export const HandSpock = '🖖';
-export const HandPoint = '👉';
-export const HandOk = '👌';
-export const HandThumb = '👍';
-export const HandPray = '🙏';
-export const HandClap = '👏';
-export const HandMuscle = '💪';
-export const HandWrite = '✍️';
-export const HandLove = '🤟';
-export const HandCall = '🤙';
-export const HandCross = '🤞';
-export const HandVulcan = '🖖';
-export const HandMetal = '🤘';
-export const Footprints = '👣';
-export const Lips = '👄';
-export const Tongue = '👅';
-export const Ear = '👂';
-export const Nose = '👃';
-export const Eyes = '👀';
-export const Brain2 = '🧠';
-export const Teeth = '🦷';
-export const Leg = '🦵';
-export const Foot = '🦶';
-export const Arm = '🦾';
-export const Bone2 = '🦴';
-export const Drop = '🩸';
-export const Bandage = '🩹';
-export const Stethoscope = '🩺';
-export const Pill = '💊';
-export const Syringe = '💉';
-export const Thermometer = '🌡️';
-export const Weight = '⚖️';
-export const Scale = '⚖️';
-export const Dumbbell = '🏋️';
-export const Runner = '🏃';
-export const Walker = '🚶';
-export const Dancer = '💃';
-export const Climber = '🧗';
-export const Swimmer = '🏊';
-export const Cyclist = '🚴';
-export const Surfer = '🏄';
-export const Skier = '⛷️';
-export const Snowboarder = '🏂';
-export const Golfer = '🏌️';
-export const Soccer = '⚽';
-export const Basketball = '🏀';
-export const Football = '🏈';
-export const Baseball = '⚾';
-export const Tennis = '🎾';
-export const Volleyball = '🏐';
-export const Rugby = '🏉';
-export const Ping = '🏓';
-export const Badminton = '🏸';
-export const Hockey = '🏒';
-export const Field = '🥍';
-export const Cricket = '🏏';
-export const Goal = '🥅';
-export const Dart = '🎯';
-export const Yo = '🪀';
-export const Kite = '🪁';
-export const Pool = '🎱';
-export const Crystal = '🔮';
-export const Nazar = '🧿';
-export const Hamsa = '🪬';
-export const Video2 = '🎥';
-export const Videocam = '📹';
-export const Projector = '📽️';
-export const Clapper = '🎬';
-export const Ticket = '🎟️';
-export const Tickets = '🎫';
-export const Performing = '🎭';
-export const Art = '🎨';
-export const Thread = '🧵';
-export const Yarn = '🧶';
-export const Knot = '🪢';
-export const Pattern = '🔀';
-export const Frame = '🖼️';
-export const Crayon = '🖍️';
-export const Paintbrush = '🖌️';
-export const Pencil = '✏️';
-export const Pen = '🖊️';
-export const Fountain = '🖋️';
-export const Marker = '🖊️';
-export const Memo = '📝';
-export const Clipboard = '📋';
-export const Page = '📄';
-export const Pages = '📃';
-export const Document = '📄';
-export const Documents = '📑';
-export const Newspaper = '📰';
-export const Scroll = '📜';
-export const Bookmark2 = '🔖';
-export const Label = '🏷️';
-export const Receipt = '🧾';
-export const Chart = '📈';
-export const ChartBar = '📊';
-export const ChartPie = '📊';
-export const ChartLine = '📈';
-export const ChartArea = '📊';
-export const ChartColumn = '📊';
-export const ChartScatter = '📊';
-export const Graph = '📈';
-export const Presentation = '📊';
-export const Projector2 = '📽️';
-export const Screen = '🖥️';
-export const Window = '🪟';
-export const Door = '🚪';
-export const Couch = '🛋️';
-export const Bed = '🛏️';
-export const Bath = '🛁';
-export const Shower = '🚿';
-export const Toilet = '🚽';
-export const Sink = '🚰';
-export const Mirror = '🪞';
-export const Scissors2 = '✂️';
-export const Razor = '🪒';
-export const Lotion = '🧴';
-export const Soap = '🧼';
-export const Sponge = '🧽';
-export const Bucket = '🪣';
-export const Broom = '🧹';
-export const Mop = '🧽';
-export const Basket = '🧺';
-export const Roll = '🧻';
-export const Pin2 = '🧷';
-export const Knitting = '🧶';
-export const Thread2 = '🧵';
-export const Zipper = '🤐';
-export const Button = '🔘';
-export const TShirt = '👕';
-export const Jeans = '👖';
-export const Necktie = '👔';
-export const Dress = '👗';
-export const Bikini = '👙';
-export const Kimono = '👘';
-export const Lipstick = '💄';
-export const Ring = '💍';
-export const Gem = '💎';
-export const Mute = '🔇';
-export const Sound = '🔊';
-export const Loudspeaker = '📢';
-export const Megaphone = '📣';
-export const Bell2 = '🔔';
-export const BellOff = '🔕';
-export const Saxophone = '🎷';
-export const Guitar = '🎸';
-export const MusicalKeyboard = '🎹';
-export const Trumpet = '🎺';
-export const Violin = '🎻';
-export const Banjo = '🪕';
-export const Drum = '🥁';
-export const LongDrum = '🪘';
-export const Maracas = '🪇';
-export const Flute = '🪈';
-export const Microphone = '🎤';
-export const Studio = '🎙️';
-export const Level = '🎚️';
-export const Control = '🎛️';
-export const CD = '💿';
-export const DVD = '📀';
-export const VHS = '📼';
-export const Camera2 = '📷';
-export const CameraFlash = '📸';
-export const FramePhoto = '🖼️';
-export const Movie = '🎬';
-export const Film2 = '🎞️';
-export const Lightbulb = '💡';
-export const Flashlight = '🔦';
-export const Izakaya = '🏮';
-export const Notebook = '📔';
-export const NotebookDecorative = '📕';
-export const Ledger = '📒';
-export const NotebookPage = '📓';
-export const NotebookCover = '📔';
-export const ClosedBook = '📕';
-export const OpenBook = '📖';
-export const GreenBook = '📗';
-export const BlueBook = '📘';
-export const OrangeBook = '📙';
-export const Books = '📚';
-export const Name = '📛';
-export const Microscope = '🔬';
-export const Telescope = '🔭';
-export const Satellite = '📡';
-export const Syringe2 = '💉';
-export const PillBottle = '💊';
-export const TestTube = '🧪';
-export const Petri = '🧫';
-export const DNADouble = '🧬';
-export const Magnet = '🧲';
-export const Firecracker = '🧨';
-export const Bomb = '💣';
-export const Knife = '🔪';
-export const Dagger = '🗡️';
-export const CrossedSwords = '⚔️';
-export const Pistol = '🔫';
-export const Boomerang = '🪃';
-export const BowArrow = '🏹';
-export const Shield2 = '🛡️';
-export const Wrench2 = '🔧';
-export const Screwdriver = '🪛';
-export const Nut = '🔩';
-export const Gear2 = '⚙️';
-export const Clamp = '🗜️';
-export const Balance = '⚖️';
-export const Probing = '🦯';
-export const Link2 = '🔗';
-export const Chains = '⛓️';
-export const Hook = '🪝';
-export const Toolbox = '🧰';
-export const Magnet2 = '🧲';
-export const Ladder = '🪜';
-export const Alembic = '⚗️';
-export const Gear3 = '⚙️';
-export const Atom = '⚛️';
-export const Symbols = '🔣';
-export const Fleur = '⚜️';
-export const Warning = '⚠️';
-export const Children = '🚸';
-export const NoEntry = '⛔';
-export const Forbidden = '🚫';
-export const NoBicycles = '🚳';
-export const NoSmoking = '🚭';
-export const NoLittering = '🚯';
-export const NoWater = '🚱';
-export const NoPedestrians = '🚷';
-export const NoMobiles = '📵';
-export const NoUnder18 = '🔞';
-export const Radioactive = '☢️';
-export const Biohazard = '☣️';
-export const UpArrow = '⬆️';
-export const UpRightArrow = '↗️';
-export const RightArrow = '➡️';
-export const DownRightArrow = '↘️';
-export const DownArrow = '⬇️';
-export const DownLeftArrow = '↙️';
-export const LeftArrow = '⬅️';
-export const UpLeftArrow = '↖️';
-export const UpDownArrow = '↕️';
-export const LeftRightArrow = '↔️';
-export const ReturnArrow = '↩️';
-export const Return = '↪️';
-export const CurvedArrow = '⤴️';
-export const CurvedLeftArrow = '⤵️';
-export const Clockwise = '🔃';
-export const Counterclockwise = '🔄';
-export const Back = '🔙';
-export const End = '🔚';
-export const On = '🔛';
-export const Soon = '🔜';
-export const Top = '🔝';
-export const PlaceSymbol = '🛐';
-export const Atom2 = '⚛️';
-export const Om = '🕉️';
-export const Star2 = '✡️';
-export const Wheel = '☸️';
-export const Yin = '☯️';
-export const Cross = '✝️';
-export const Orthodox = '☦️';
-export const Star3 = '☪️';
-export const Peace = '☮️';
-export const Menorah = '🕎';
-export const SixPointed = '🔯';
-export const Aries = '♈';
-export const Taurus = '♉';
-export const Gemini = '♊';
-export const Cancer = '♋';
-export const Leo = '♌';
-export const Virgo = '♍';
-export const Libra = '♎';
-export const Scorpius = '♏';
-export const Sagittarius = '♐';
-export const Capricorn = '♑';
-export const Aquarius = '♒';
-export const Pisces = '♓';
-export const Ophiuchus = '⛎';
-export const Twisted = '🔀';
-export const Repeat2 = '🔁';
-export const RepeatOne = '🔂';
-export const PlayPause = '⏯️';
-export const Stop = '⏹️';
-export const Record = '⏺️';
-export const Eject = '⏏️';
-export const Cinema = '🎦';
-export const LowBrightness = '🔅';
-export const HighBrightness = '🔆';
-export const SignalStrength = '📶';
-export const Vibration = '📳';
-export const MobileOff = '📴';
-export const Female = '♀️';
-export const Male = '♂️';
-export const Medical = '⚕️';
-export const Recycle = '♻️';
-export const FleurDeLis = '⚜️';
-export const Trident = '🔱';
-export const Name2 = '📛';
-export const BeginnerJapanese = '🔰';
-export const Heavy = '⭕';
-export const HeavyMultiplication = '✖️';
-export const Heavy2 = '➕';
-export const HeavyMinus = '➖';
-export const HeavyDivision = '➗';
-export const CurlyLoop = '➰';
-export const DoubleCurlyLoop = '➿';
-export const Part = '〽️';
-export const EightSpokedAsterisk = '✳️';
-export const EightPointedBlackStar = '✴️';
-export const Sparkle = '❇️';
-export const DoubleExclamation = '‼️';
-export const ExclamationQuestion = '⁉️';
-export const Question = '❓';
-export const WhiteQuestion = '❔';
-export const WhiteExclamation = '❕';
-export const Exclamation = '❗';
-export const Wavy = '〰️';
-export const Copyright2 = '©️';
-export const Registered2 = '®️';
-export const Trademark2 = '™️';
-export const Keycap = '#️⃣';
-export const Keycap2 = '*️⃣';
-export const Zero = '0️⃣';
-export const One = '1️⃣';
-export const Two = '2️⃣';
-export const Three = '3️⃣';
-export const Four = '4️⃣';
-export const Five = '5️⃣';
-export const Six = '6️⃣';
-export const Seven = '7️⃣';
-export const Eight = '8️⃣';
-export const Nine = '9️⃣';
-export const Ten = '🔟';
-export const HundredPoints = '💯';
-export const InputLatinUppercase = '🔠';
-export const InputLatinLowercase = '🔡';
-export const InputNumbers = '🔢';
-export const InputSymbols = '🔣';
-export const InputLatinLetters = '🔤';
-export const AButton = '🅰️';
-export const ABButton = '🆎';
-export const BButton = '🅱️';
-export const CLButton = '🆑';
-export const COOLButton = '🆒';
-export const FREEButton = '🆓';
-export const IDButton = '🆔';
-export const NEWButton = '🆕';
-export const NGButton = '🆖';
-export const OButton = '🅾️';
-export const OKButton = '🆗';
-export const PButton = '🅿️';
-export const SOSButton = '🆘';
-export const UPButton = '🆙';
-export const VSButton = '🆚';
-export const HereName = '🈁';
-export const HereKatakana = '🈂️';
-export const JapaneseAcceptable = '🉑';
-export const JapaneseApplication = '🈸';
-export const JapaneseBargain = '🉐';
-export const JapaneseDiscount = '🈹';
-export const JapaneseFreeOfCharge = '🈚';
-export const JapaneseNotFreeOfCharge = '🈶';
-export const JapaneseOpen = '🈺';
-export const JapanesePassingGrade = '🈴';
-export const JapaneseReserved = '🈲';
-export const JapaneseSecret = '㊙️';
-export const JapaneseCongratulations = '㊗️';
-export const JapaneseMonthlyAmount = '🈷️';
-export const JapaneseVacancy = '🈳';
-export const BlackLargeSquare = '⬛';
-export const WhiteLargeSquare = '⬜';
-export const BlackMediumSquare = '◼️';
-export const WhiteMediumSquare = '◻️';
-export const BlackMediumSmallSquare = '◾';
-export const WhiteMediumSmallSquare = '◽';
-export const BlackSmallSquare = '▪️';
-export const WhiteSmallSquare = '▫️';
-export const LargeOrangeDiamond = '🔶';
-export const LargeBlueDiamond = '🔷';
-export const SmallOrangeDiamond = '🔸';
-export const SmallBlueDiamond = '🔹';
-export const RedTriangleUp = '🔺';
-export const RedTriangleDown = '🔻';
-export const DiamondDot = '💠';
-export const RadioButton = '🔘';
-export const BlackSquareButton = '🔲';
-export const WhiteSquareButton = '🔳';
-export const WhiteCircle = '⚪';
-export const BlackCircle = '⚫';
-export const RedCircle = '🔴';
-export const BlueCircle = '🔵';
-export const Chequered = '🏁';
-export const Triangular = '🚩';
-export const CrossedFlags = '🎌';
-export const BlackFlag = '🏴';
-export const WhiteFlag = '🏳️';
-export const PirateFlag = '🏴‍☠️';
-export const RainbowFlag = '🏳️‍🌈';
-export const TransgenderFlag = '🏳️‍⚧️';
+// Icon system for EmotionsCare - Latest Lovable template
+import { 
+  CheckCircle,
+  XCircle, 
+  AlertTriangle,
+  Shield,
+  User,
+  Settings,
+  Zap,
+  Eye,
+  Keyboard,
+  Volume2,
+  VolumeX,
+  Type,
+  Contrast,
+  Accessibility,
+  MousePointer,
+  ZoomIn,
+  X,
+  Trash2,
+  ExternalLink,
+  Undo,
+  CalendarIcon,
+  Brain,
+  Monitor,
+  Headphones,
+  BookOpen,
+  Gamepad2,
+  Play,
+  RotateCcw,
+  MoreHorizontal,
+  Search,
+  Filter,
+  RefreshCw,
+  Sparkles,
+  Send,
+  Mic,
+  MicOff,
+  Lightbulb,
+  Home,
+  Users,
+  FileText,
+  BarChart3,
+  Calendar,
+  Heart,
+  Music,
+  MessageSquare,
+  HelpCircle,
+  Menu,
+  LogOut,
+  ArrowRight,
+  Mail,
+  Check,
+  Building,
+  AlertCircle,
+  Camera,
+  MessageCircle,
+  Star,
+  Clock,
+  ArrowLeft,
+  Activity,
+  Lock,
+  FileCheck,
+  Loader2,
+  Key,
+  Save
+} from 'lucide-react';
 
-// Also export commonly used alias names
-export const CalendarDay = Calendar;
-export const CalendarDays2 = Calendar;
-export const PlayCircle = Play;
-export const PauseCircle = Pause;
-export const StopCircle = Square;
-export const FastForward = ArrowRight;
-export const Rewind = ArrowLeft;
-export const StepForward = ArrowRight;
-export const StepBackward = ArrowLeft;
-export const SkipForward2 = ArrowRight;
-export const SkipBackward = ArrowLeft;
-export const MoveRight = ArrowRight;
-export const MoveLeft = ArrowLeft;
-export const MoveUp = ArrowUp;
-export const MoveDown = ArrowDown;
-export const ChevronsRight = ArrowRight;
-export const ChevronsLeft = ArrowLeft;
-export const ChevronsUp = ArrowUp;
-export const ChevronsDown = ArrowDown;
-export const DoubleArrowRight = ArrowRight;
-export const DoubleArrowLeft = ArrowLeft;
-export const DoubleArrowUp = ArrowUp;
-export const DoubleArrowDown = ArrowDown;
-export const ArrowBigRight = ArrowRight;
-export const ArrowBigLeft = ArrowLeft;
-export const ArrowBigUp = ArrowUp;
-export const ArrowBigDown = ArrowDown;
-export const TrendingDown = ArrowDown;
-export const TrendingUp2 = ArrowUp;
-export const CornerDownRight = ArrowRight;
-export const CornerDownLeft = ArrowLeft;
-export const CornerUpRight = ArrowRight;
-export const CornerUpLeft = ArrowLeft;
-export const CornerRightDown = ArrowDown;
-export const CornerRightUp = ArrowUp;
-export const CornerLeftDown = ArrowDown;
-export const CornerLeftUp = ArrowUp;
-export const EyeIcon = Eye;
-export const EyeOffIcon = EyeOff;
-export const Sheet = FileText;
-export const Palette2 = Palette;
+// Export all icons for consistent usage across the app
+export {
+  CheckCircle,
+  XCircle,
+  AlertTriangle,
+  Shield,
+  User,
+  Settings,
+  Zap,
+  Eye,
+  Keyboard,
+  Volume2,
+  VolumeX,
+  Type,
+  Contrast,
+  Accessibility,
+  MousePointer,
+  ZoomIn,
+  X,
+  Trash2,
+  ExternalLink,
+  Undo,
+  CalendarIcon,
+  Brain,
+  Monitor,
+  Headphones,
+  BookOpen,
+  Gamepad2,
+  Play,
+  RotateCcw,
+  MoreHorizontal,
+  Search,
+  Filter,
+  RefreshCw,
+  Sparkles,
+  Send,
+  Mic,
+  MicOff,
+  Lightbulb,
+  Home,
+  Users,
+  FileText,
+  BarChart3,
+  Calendar,
+  Heart,
+  Music,
+  MessageSquare,
+  HelpCircle,
+  Menu,
+  LogOut,
+  ArrowRight,
+  Mail,
+  Check,
+  Building,
+  AlertCircle,
+  Camera,
+  MessageCircle,
+  Star,
+  Clock,
+  ArrowLeft,
+  Activity,
+  Lock,
+  FileCheck,
+  Loader2,
+  Key,
+  Save
+};
