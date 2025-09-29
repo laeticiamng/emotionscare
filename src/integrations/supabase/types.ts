@@ -4074,6 +4074,13 @@ export type Database = {
             referencedRelation: "med_mng_songs"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "med_mng_audio_access_logs_song_id_fkey"
+            columns: ["song_id"]
+            isOneToOne: false
+            referencedRelation: "med_mng_view_library"
+            referencedColumns: ["id"]
+          },
         ]
       }
       med_mng_cancellations: {
@@ -4483,6 +4490,13 @@ export type Database = {
             referencedRelation: "med_mng_songs"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "med_mng_listening_sessions_song_id_fkey"
+            columns: ["song_id"]
+            isOneToOne: false
+            referencedRelation: "med_mng_view_library"
+            referencedColumns: ["id"]
+          },
         ]
       }
       med_mng_lyrics_access_logs: {
@@ -4516,6 +4530,13 @@ export type Database = {
             columns: ["song_id"]
             isOneToOne: false
             referencedRelation: "med_mng_songs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "med_mng_lyrics_access_logs_song_id_fkey"
+            columns: ["song_id"]
+            isOneToOne: false
+            referencedRelation: "med_mng_view_library"
             referencedColumns: ["id"]
           },
         ]
@@ -4604,6 +4625,13 @@ export type Database = {
             referencedRelation: "med_mng_songs"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "med_mng_music_generation_logs_song_id_fkey"
+            columns: ["song_id"]
+            isOneToOne: false
+            referencedRelation: "med_mng_view_library"
+            referencedColumns: ["id"]
+          },
         ]
       }
       med_mng_playlist_analytics: {
@@ -4677,6 +4705,13 @@ export type Database = {
             columns: ["song_id"]
             isOneToOne: false
             referencedRelation: "med_mng_songs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "med_mng_playlist_songs_song_id_fkey"
+            columns: ["song_id"]
+            isOneToOne: false
+            referencedRelation: "med_mng_view_library"
             referencedColumns: ["id"]
           },
         ]
@@ -4781,6 +4816,13 @@ export type Database = {
             columns: ["song_id"]
             isOneToOne: false
             referencedRelation: "med_mng_songs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "med_mng_song_likes_song_id_fkey"
+            columns: ["song_id"]
+            isOneToOne: false
+            referencedRelation: "med_mng_view_library"
             referencedColumns: ["id"]
           },
         ]
@@ -4893,6 +4935,13 @@ export type Database = {
             referencedRelation: "med_mng_songs"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "med_mng_synchronized_lyrics_song_id_fkey"
+            columns: ["song_id"]
+            isOneToOne: true
+            referencedRelation: "med_mng_view_library"
+            referencedColumns: ["id"]
+          },
         ]
       }
       med_mng_user_analytics: {
@@ -4992,6 +5041,13 @@ export type Database = {
             columns: ["song_id"]
             isOneToOne: false
             referencedRelation: "med_mng_songs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "med_mng_user_songs_song_id_fkey"
+            columns: ["song_id"]
+            isOneToOne: false
+            referencedRelation: "med_mng_view_library"
             referencedColumns: ["id"]
           },
         ]
@@ -8304,6 +8360,15 @@ export type Database = {
         }
         Relationships: []
       }
+      med_mng_view_library: {
+        Row: {
+          created_at: string | null
+          id: string | null
+          in_library: boolean | null
+          title: string | null
+        }
+        Relationships: []
+      }
       oic_completion_dashboard: {
         Row: {
           nb_empty: number | null
@@ -8329,12 +8394,51 @@ export type Database = {
         }
         Relationships: []
       }
+      security_violations_summary: {
+        Row: {
+          finding_type: string | null
+          last_detection: string | null
+          severity: string | null
+          unresolved_count: number | null
+          violation_count: number | null
+        }
+        Relationships: []
+      }
+      team_emotion_summary: {
+        Row: {
+          avg_confidence: number | null
+          count: number | null
+          date: string | null
+          emotion_type: string | null
+          org_id: string | null
+          team_name: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "org_memberships_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_activity_summary: {
         Row: {
           last_conversation_date: string | null
           last_emotion_date: string | null
           total_conversations: number | null
           total_emotions: number | null
+          user_id: string | null
+        }
+        Relationships: []
+      }
+      user_progress_view: {
+        Row: {
+          avg_points: number | null
+          completed_challenges: number | null
+          total_badges: number | null
+          total_challenges: number | null
           user_id: string | null
         }
         Relationships: []
