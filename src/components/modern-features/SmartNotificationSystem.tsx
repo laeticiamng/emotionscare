@@ -186,7 +186,7 @@ const SmartNotificationSystem: React.FC = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       if (Math.random() > 0.7) { // 30% de chance toutes les 30 secondes
-        const types: (keyof typeof settings)[] = ['wellness', 'goals', 'achievements'];
+        const types: ('wellness' | 'goal' | 'achievement')[] = ['wellness', 'goal', 'achievement'];
         const randomType = types[Math.floor(Math.random() * types.length)];
         
         const newNotification: Notification = {
@@ -361,10 +361,12 @@ const SmartNotificationSystem: React.FC = () => {
               <div>
                 <h4 className="font-medium mb-3">Types de notifications</h4>
                 <div className="space-y-3">
-                  {Object.entries(settings).slice(0, 6).map(([key, value]) => (
+                {Object.entries(settings).slice(0, 6).map(([key, value]) => {
+                  const iconKey = key === 'achievements' ? 'achievement' as const : key as 'achievement' | 'reminder' | 'social' | 'system' | 'goal' | 'wellness';
+                  return (
                     <div key={key} className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        {getNotificationIcon(key as 'achievement' | 'reminder' | 'social' | 'system' | 'goal' | 'wellness')}
+                        {getNotificationIcon(iconKey)}
                         <span className="text-sm capitalize">
                           {key === 'achievements' ? 'Succès' :
                            key === 'reminders' ? 'Rappels' :
@@ -376,12 +378,13 @@ const SmartNotificationSystem: React.FC = () => {
                       </div>
                       <Switch
                         checked={value}
-                        onCheckedChange={(checked) => 
+                        onCheckedChange={(checked: boolean) => 
                           setSettings(prev => ({ ...prev, [key]: checked }))
                         }
                       />
                     </div>
-                  ))}
+                  );
+                })}
                 </div>
               </div>
 
@@ -392,7 +395,7 @@ const SmartNotificationSystem: React.FC = () => {
                     <span className="text-sm">Notifications sonores</span>
                     <Switch
                       checked={settings.sound}
-                      onCheckedChange={(checked) => 
+                      onCheckedChange={(checked: boolean) => 
                         setSettings(prev => ({ ...prev, sound: checked }))
                       }
                     />
@@ -401,7 +404,7 @@ const SmartNotificationSystem: React.FC = () => {
                     <span className="text-sm">Notifications bureau</span>
                     <Switch
                       checked={settings.desktop}
-                      onCheckedChange={(checked) => 
+                      onCheckedChange={(checked: boolean) => 
                         setSettings(prev => ({ ...prev, desktop: checked }))
                       }
                     />
@@ -410,7 +413,7 @@ const SmartNotificationSystem: React.FC = () => {
                     <span className="text-sm">Notifications email</span>
                     <Switch
                       checked={settings.email}
-                      onCheckedChange={(checked) => 
+                      onCheckedChange={(checked: boolean) => 
                         setSettings(prev => ({ ...prev, email: checked }))
                       }
                     />

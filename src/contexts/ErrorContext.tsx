@@ -1,70 +1,47 @@
-import React, { createContext, useCallback, useContext, useMemo, useState } from 'react';
-import type { AppError } from '@/lib/errors/types';
-import { toAppError } from '@/lib/errors/normalize';
-import { toastError } from '@/components/error/ErrorToast';
-import { captureHandledError, addErrorBreadcrumb } from '@/lib/errors/sentry';
+import React, { createContext, useContext, useState } from 'react';
 
-export interface ErrorContextValue {
-  notify: (error: unknown, context?: Record<string, unknown>) => AppError;
-  lastError: AppError | null;
+interface ErrorContextType {
+  errors: string[];
+  addError: (error: string) => void;
+  removeError: (error: string) => void;
+  clearErrors: () => void;
 }
 
-const ErrorContext = createContext<ErrorContextValue | undefined>(undefined);
+const ErrorContext = createContext<ErrorContextType | undefined>(undefined);
 
-export const ErrorProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [lastError, setLastError] = useState<AppError | null>(null);
-
-  const notify = useCallback((error: unknown, context?: Record<string, unknown>) => {
-    const baseError = toAppError(error);
-    const contextCopy = context ? { ...context } : undefined;
-    let suppressToast = false;
-    if (contextCopy && 'suppressToast' in contextCopy) {
-      suppressToast = Boolean((contextCopy as Record<string, unknown>)['suppressToast']);
-      delete (contextCopy as Record<string, unknown>)['suppressToast'];
-    }
-
-    const mergedContext = {
-      ...(baseError.context ?? {}),
-      ...(contextCopy ?? {}),
-    };
-
-    const enrichedError: AppError = {
-      ...baseError,
-      context: Object.keys(mergedContext).length > 0 ? mergedContext : baseError.context,
-    };
-
-    setLastError(enrichedError);
-
-    addErrorBreadcrumb('error.notify', {
-      code: enrichedError.code,
-      messageKey: enrichedError.messageKey,
-      context: mergedContext,
-    });
-
-    if (!suppressToast) {
-      toastError(enrichedError);
-    }
-    captureHandledError(enrichedError, contextCopy);
-
-    return enrichedError;
-  }, []);
-
-  const value = useMemo<ErrorContextValue>(() => ({
-    notify,
-    lastError,
-  }), [notify, lastError]);
-
-  return <ErrorContext.Provider value={value}>{children}</ErrorContext.Provider>;
+export const useError = () => {
+  const context = useContext(ErrorContext);
+  if (!context) {
+    throw new Error('useError must be used within an ErrorProvider');
+  }
+  return context;
 };
 
-export function useErrorHandler(): ErrorContextValue {
-  const context = useContext(ErrorContext);
-
-  if (!context) {
-    throw new Error('useErrorHandler must be used within an ErrorProvider');
-  }
-
-  return context;
+interface ErrorProviderProps {
+  children: React.ReactNode;
 }
 
-export { ErrorContext };
+export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
+  const [errors, setErrors] = useState<string[]>([]);
+
+  const addError = (error: string) => {
+    setErrors(prev => [...prev, error]);
+  };
+
+  const removeError = (error: string) => {
+    setErrors(prev => prev.filter(e => e !== error));
+  };
+
+  const clearErrors = () => setErrors([]);
+
+  return (
+    <ErrorContext.Provider value={{
+      errors,
+      addError,
+      removeError,
+      clearErrors,
+    }}>
+      {children}
+    </ErrorContext.Provider>
+  );
+};

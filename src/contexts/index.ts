@@ -10,16 +10,14 @@ export { ThemeProvider, useTheme } from '@/components/theme-provider';
 
 // Contextes unifiés optimisés  
 export { UnifiedCacheProvider as CacheProvider, useUnifiedCache as useCache } from './UnifiedCacheContext';
-export { UnifiedCoachProvider as CoachProvider, useUnifiedCoach as useCoach } from './coach/UnifiedCoachContext';
-
 // MusicContext - Utiliser la version complète
-export { MusicProvider, useMusic, MusicContext } from './MusicContext';
+export { MusicProvider, useMusic } from './MusicContext';
 
 // Contextes fonctionnels
 export { FeedbackProvider, useFeedback } from './FeedbackContext';
 export { InnovationProvider, useInnovation } from './InnovationContext';
 export { EthicsProvider, useEthics } from './EthicsContext';
-export { ErrorProvider, useErrorHandler as useError } from './ErrorContext';
+export { ErrorProvider, useError } from './ErrorContext';
 
 // ========== CONTEXTES SIMPLIFIÉS POUR COMPATIBILITÉ ==========
 // Ces providers existent mais avec des implémentations minimales
