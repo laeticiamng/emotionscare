@@ -165,7 +165,7 @@ function computePANAS10(values: number[]) {
 }
 
 function computePSS10(values: number[]) {
-  const inverted = new Set([1, 2, 3, 6, 9]);
+  const inverted = new Set([0, 1, 2, 5, 8]);
   const corrected = values.map((value, index) => (inverted.has(index) ? 4 - value : value));
   const sum = corrected.reduce((acc, value) => acc + value, 0);
   return { score_scaled: scale(sum, 0, 40) };
