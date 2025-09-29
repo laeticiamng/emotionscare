@@ -37,31 +37,25 @@
     "declarationMap": false,
     "sourceMap": false
   },
+  "include": [
+    "./src/components/ui/**/*",
+    "./src/components/assess/**/*",
+    "./src/components/chat/**/*",
+    "./src/components/account/**/*",
+    "./src/components/activity/**/*",
+    "./src/components/boss-level-grit/**/*",
+    "./src/hooks/**/*",
+    "./src/lib/**/*",
+    "./src/pages/**/*",
+    "./src/routerV2/**/*",
+    "./src/router/**/*",
+    "./src/contexts/**/*",
+    "./src/types/**/*",
+    "./src/COMPONENTS.reg.tsx",
+    "./src/global.d.ts"
+  ],
   "exclude": [
     "node_modules",
-    "dist",
-    "scripts/**/*",
-    "services/**/*", 
-    "src/__tests__/**/*",
-    "src/admin/**/*",
-    "src/components/admin/**/*",
-    "src/components/ApiStatus.tsx",
-    "src/components/AppSidebar.tsx", 
-    "src/components/ConsentBanner.tsx",
-    "src/components/DashboardLayout.tsx",
-    "src/components/EmotionMusicRecommendations.tsx",
-    "src/components/GlobalNav.tsx",
-    "src/components/PageLoader.tsx",
-    "src/components/SessionTimeoutAlert.tsx",
-    "src/components/access/**/*",
-    "src/components/accessibility/**/*",
-    "**/*.test.ts",
-    "**/*.test.tsx",
-    "**/*.spec.ts",
-    "**/*.spec.tsx"
-  ],
-  "include": [
-    "./src/**/*.ts",
-    "./src/**/*.tsx"
+    "dist"
   ]
 }
