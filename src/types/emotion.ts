@@ -35,3 +35,11 @@ export interface EmotionAnalysis {
   overallMood: string;
   recommendations: EmotionRecommendation[];
 }
+
+export interface Emotion {
+  id: string;
+  name: string;
+  intensity?: number;
+  category?: string;
+  [key: string]: any;
+}
