@@ -135,15 +135,7 @@ export type Database = {
           record_id?: string
           table_name?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "admin_changelog_admin_user_id_fkey"
-            columns: ["admin_user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       ai_coach_sessions: {
         Row: {
@@ -188,15 +180,7 @@ export type Database = {
           user_id?: string | null
           user_satisfaction?: number | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "ai_coach_sessions_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       ai_generated_content: {
         Row: {
@@ -392,15 +376,7 @@ export type Database = {
           tags?: string[] | null
           user_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "ambition_runs_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       api_integrations: {
         Row: {
@@ -463,15 +439,7 @@ export type Database = {
           ts?: string
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "assessments_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       audio_tracks: {
         Row: {
@@ -666,15 +634,7 @@ export type Database = {
           report_type?: string
           status?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "audit_reports_created_by_fkey"
-            columns: ["created_by"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       backup_edn_items_immersive: {
         Row: {
@@ -899,15 +859,7 @@ export type Database = {
           name?: string
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "badges_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       biovida_analyses: {
         Row: {
@@ -970,15 +922,7 @@ export type Database = {
           status?: string | null
           user_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "bounce_battles_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       bounce_coping_responses: {
         Row: {
@@ -1098,22 +1042,7 @@ export type Database = {
           id?: string
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "buddies_buddy_user_id_fkey"
-            columns: ["buddy_user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "buddies_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       challenges: {
         Row: {
@@ -1250,15 +1179,7 @@ export type Database = {
           details?: Json | null
           id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "cleanup_history_created_by_fkey"
-            columns: ["created_by"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       clinical_consents: {
         Row: {
@@ -1285,15 +1206,7 @@ export type Database = {
           revoked_at?: string | null
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "clinical_consents_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       clinical_feature_flags: {
         Row: {
@@ -1410,15 +1323,7 @@ export type Database = {
           tags?: string[] | null
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "clinical_responses_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       clinical_signals: {
         Row: {
@@ -1431,6 +1336,7 @@ export type Database = {
           module_context: string
           source_instrument: string
           user_id: string
+          window_type: string
         }
         Insert: {
           created_at?: string | null
@@ -1442,6 +1348,7 @@ export type Database = {
           module_context: string
           source_instrument: string
           user_id: string
+          window_type: string
         }
         Update: {
           created_at?: string | null
@@ -1453,16 +1360,9 @@ export type Database = {
           module_context?: string
           source_instrument?: string
           user_id?: string
+          window_type?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "clinical_signals_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       coach_conversations: {
         Row: {
@@ -1598,13 +1498,6 @@ export type Database = {
             referencedRelation: "posts"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "comments_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
         ]
       }
       completeness_alerts: {
@@ -1677,15 +1570,7 @@ export type Database = {
           status?: string
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "data_exports_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       data_integrity_checks: {
         Row: {
@@ -1733,15 +1618,7 @@ export type Database = {
           status?: string
           tables_checked?: string[]
         }
-        Relationships: [
-          {
-            foreignKeyName: "data_integrity_checks_created_by_fkey"
-            columns: ["created_by"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       data_integrity_reports: {
         Row: {
@@ -1917,6 +1794,51 @@ export type Database = {
           sd_id?: number
           updated_at?: string
           url_source?: string | null
+        }
+        Relationships: []
+      }
+      edn_analytics_advanced: {
+        Row: {
+          completion_rate: number | null
+          created_at: string | null
+          engagement_score: number | null
+          id: string
+          item_code: string
+          learning_progress: Json | null
+          performance_metrics: Json | null
+          session_metadata: Json | null
+          session_type: string
+          time_spent_minutes: number | null
+          user_feedback: Json | null
+          user_id: string | null
+        }
+        Insert: {
+          completion_rate?: number | null
+          created_at?: string | null
+          engagement_score?: number | null
+          id?: string
+          item_code: string
+          learning_progress?: Json | null
+          performance_metrics?: Json | null
+          session_metadata?: Json | null
+          session_type: string
+          time_spent_minutes?: number | null
+          user_feedback?: Json | null
+          user_id?: string | null
+        }
+        Update: {
+          completion_rate?: number | null
+          created_at?: string | null
+          engagement_score?: number | null
+          id?: string
+          item_code?: string
+          learning_progress?: Json | null
+          performance_metrics?: Json | null
+          session_metadata?: Json | null
+          session_type?: string
+          time_spent_minutes?: number | null
+          user_feedback?: Json | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -2301,6 +2223,45 @@ export type Database = {
         }
         Relationships: []
       }
+      edn_smart_recommendations: {
+        Row: {
+          confidence_score: number | null
+          created_at: string | null
+          expires_at: string | null
+          id: string
+          is_active: boolean | null
+          metadata: Json | null
+          reasoning: string | null
+          recommendation_type: string
+          recommended_item_code: string
+          user_id: string | null
+        }
+        Insert: {
+          confidence_score?: number | null
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          metadata?: Json | null
+          reasoning?: string | null
+          recommendation_type: string
+          recommended_item_code: string
+          user_id?: string | null
+        }
+        Update: {
+          confidence_score?: number | null
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          metadata?: Json | null
+          reasoning?: string | null
+          recommendation_type?: string
+          recommended_item_code?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       edn_suno_tracks: {
         Row: {
           audio_url: string | null
@@ -2427,15 +2388,7 @@ export type Database = {
           user_id?: string | null
           valence?: number | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "emotion_analysis_logs_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       emotion_metrics: {
         Row: {
@@ -2465,15 +2418,7 @@ export type Database = {
           session_id?: string
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "emotion_metrics_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       emotion_scans: {
         Row: {
@@ -2542,15 +2487,7 @@ export type Database = {
           text?: string | null
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "emotions_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       emotionscare_song_likes: {
         Row: {
@@ -2659,22 +2596,7 @@ export type Database = {
           id?: string
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "emotionsroom_favorites_favorite_user_id_fkey"
-            columns: ["favorite_user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "emotionsroom_favorites_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       emotionsroom_ice_candidates: {
         Row: {
@@ -2776,15 +2698,7 @@ export type Database = {
           total_time_minutes?: number | null
           updated_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "emotionsroom_profiles_id_fkey"
-            columns: ["id"]
-            isOneToOne: true
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       emotionsroom_rooms: {
         Row: {
@@ -2862,13 +2776,6 @@ export type Database = {
             columns: ["room_id"]
             isOneToOne: false
             referencedRelation: "emotionsroom_rooms"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "emotionsroom_sessions_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
             referencedColumns: ["id"]
           },
         ]
@@ -3056,13 +2963,6 @@ export type Database = {
             referencedRelation: "qcm_sessions"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "error_songs_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
         ]
       }
       exports: {
@@ -3087,15 +2987,7 @@ export type Database = {
           status?: string | null
           user_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "exports_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       extraction_events: {
         Row: {
@@ -3235,15 +3127,7 @@ export type Database = {
           session_data?: Json | null
           user_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "gamification_activities_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       generated_ambient_images: {
         Row: {
@@ -3393,15 +3277,7 @@ export type Database = {
           updated_at?: string | null
           user_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "goals_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       google_sheets_integrations: {
         Row: {
@@ -3440,15 +3316,7 @@ export type Database = {
           user_id?: string | null
           webhook_token?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "google_sheets_integrations_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       groups: {
         Row: {
@@ -3589,15 +3457,7 @@ export type Database = {
           total_rows?: number | null
           user_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "import_batches_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       import_raw_data: {
         Row: {
@@ -3911,13 +3771,6 @@ export type Database = {
             referencedRelation: "jam_rooms"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "jam_participants_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
         ]
       }
       jam_rooms: {
@@ -3964,13 +3817,6 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "jam_rooms_creator_id_fkey"
-            columns: ["creator_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "jam_rooms_recording_project_id_fkey"
             columns: ["recording_project_id"]
@@ -4046,15 +3892,7 @@ export type Database = {
           ts?: string | null
           user_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "journal_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       journal_entries: {
         Row: {
@@ -4078,15 +3916,7 @@ export type Database = {
           id?: string
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "journal_entries_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       lyrics_generation_jobs: {
         Row: {
@@ -4251,13 +4081,6 @@ export type Database = {
             referencedRelation: "med_mng_view_library"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "med_mng_audio_access_logs_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
         ]
       }
       med_mng_cancellations: {
@@ -4324,15 +4147,7 @@ export type Database = {
           tokens_used?: number | null
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "med_mng_chat_interactions_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       med_mng_content_ai: {
         Row: {
@@ -4431,15 +4246,7 @@ export type Database = {
           updated_at?: string | null
           views_count?: number | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "med_mng_content_master_approved_by_fkey"
-            columns: ["approved_by"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       med_mng_content_views: {
         Row: {
@@ -4481,15 +4288,7 @@ export type Database = {
           view_duration?: number | null
           viewed_at?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "med_mng_content_views_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       med_mng_generation_alerts: {
         Row: {
@@ -4542,13 +4341,6 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "med_mng_generation_alerts_acknowledged_by_fkey"
-            columns: ["acknowledged_by"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "med_mng_generation_alerts_generation_log_id_fkey"
             columns: ["generation_log_id"]
             isOneToOne: false
@@ -4597,15 +4389,7 @@ export type Database = {
           updated_at?: string | null
           user_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "med_mng_generation_logs_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       med_mng_listening_events: {
         Row: {
@@ -4713,13 +4497,6 @@ export type Database = {
             referencedRelation: "med_mng_view_library"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "med_mng_listening_sessions_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
         ]
       }
       med_mng_lyrics_access_logs: {
@@ -4760,13 +4537,6 @@ export type Database = {
             columns: ["song_id"]
             isOneToOne: false
             referencedRelation: "med_mng_view_library"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "med_mng_lyrics_access_logs_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
             referencedColumns: ["id"]
           },
         ]
@@ -4862,13 +4632,6 @@ export type Database = {
             referencedRelation: "med_mng_view_library"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "med_mng_music_generation_logs_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
         ]
       }
       med_mng_playlist_analytics: {
@@ -4931,13 +4694,6 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "med_mng_playlist_songs_added_by_fkey"
-            columns: ["added_by"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "med_mng_playlist_songs_playlist_id_fkey"
             columns: ["playlist_id"]
             isOneToOne: false
@@ -4991,15 +4747,7 @@ export type Database = {
           updated_at?: string | null
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "med_mng_playlists_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       med_mng_qcm_sessions: {
         Row: {
@@ -5077,13 +4825,6 @@ export type Database = {
             referencedRelation: "med_mng_view_library"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "med_mng_song_likes_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
         ]
       }
       med_mng_songs: {
@@ -5120,15 +4861,7 @@ export type Database = {
           updated_at?: string
           user_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "med_mng_songs_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       med_mng_subscriptions: {
         Row: {
@@ -5167,15 +4900,7 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "med_mng_subscriptions_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: true
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       med_mng_synchronized_lyrics: {
         Row: {
@@ -5289,15 +5014,7 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "med_mng_user_settings_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: true
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       med_mng_user_songs: {
         Row: {
@@ -5333,13 +5050,6 @@ export type Database = {
             referencedRelation: "med_mng_view_library"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "med_mng_user_songs_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
         ]
       }
       medical_learning_analytics: {
@@ -5373,15 +5083,7 @@ export type Database = {
           score?: number | null
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "medical_learning_analytics_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       medilinko_consultations: {
         Row: {
@@ -5435,15 +5137,7 @@ export type Database = {
           ts?: string | null
           user_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "metrics_bubble_beat_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       metrics_emotion_scan: {
         Row: {
@@ -5467,15 +5161,7 @@ export type Database = {
           ts?: string | null
           user_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "metrics_emotion_scan_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       metrics_face_filter: {
         Row: {
@@ -5499,15 +5185,7 @@ export type Database = {
           ts?: string | null
           user_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "metrics_face_filter_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       metrics_flash_glow: {
         Row: {
@@ -5531,15 +5209,7 @@ export type Database = {
           ts?: string | null
           user_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "metrics_flash_glow_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       metrics_vr_breath: {
         Row: {
@@ -5563,15 +5233,7 @@ export type Database = {
           ts?: string | null
           user_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "metrics_vr_breath_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       metrics_vr_galaxy: {
         Row: {
@@ -5595,15 +5257,7 @@ export type Database = {
           ts?: string | null
           user_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "metrics_vr_galaxy_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       monitoring_incidents: {
         Row: {
@@ -5672,15 +5326,31 @@ export type Database = {
           track_id?: string
           user_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "music_completion_logs_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
+      }
+      music_favorites: {
+        Row: {
+          created_at: string
+          id: string
+          meta: Json
+          track_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          meta?: Json
+          track_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          meta?: Json
+          track_id?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       music_generation_logs: {
         Row: {
@@ -5710,15 +5380,7 @@ export type Database = {
           tracks_generated?: number | null
           user_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "music_generation_logs_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       music_generation_usage: {
         Row: {
@@ -5759,13 +5421,6 @@ export type Database = {
             referencedRelation: "user_subscriptions"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "music_generation_usage_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
         ]
       }
       music_play_logs: {
@@ -5793,15 +5448,7 @@ export type Database = {
           track_id?: string
           user_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "music_play_logs_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       music_playlists: {
         Row: {
@@ -5846,15 +5493,34 @@ export type Database = {
           updated_at?: string | null
           user_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "music_playlists_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
+      }
+      music_recent: {
+        Row: {
+          id: string
+          meta: Json
+          position_sec: number
+          track_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          meta?: Json
+          position_sec?: number
+          track_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          meta?: Json
+          position_sec?: number
+          track_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       music_sessions: {
         Row: {
@@ -5878,15 +5544,7 @@ export type Database = {
           suno_track_ids?: string[] | null
           user_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "music_sessions_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       music_skip_logs: {
         Row: {
@@ -5913,15 +5571,7 @@ export type Database = {
           track_id?: string
           user_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "music_skip_logs_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       notification_preferences: {
         Row: {
@@ -5963,15 +5613,7 @@ export type Database = {
           updated_at?: string | null
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "notification_preferences_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       notification_templates: {
         Row: {
@@ -6085,15 +5727,7 @@ export type Database = {
           type?: string
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "notifications_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       official_content_cache: {
         Row: {
@@ -6488,13 +6122,6 @@ export type Database = {
             referencedRelation: "organizations"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "org_memberships_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
         ]
       }
       organizations: {
@@ -6549,15 +6176,7 @@ export type Database = {
           timestamp?: string | null
           user_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "page_analytics_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       pending_corrections: {
         Row: {
@@ -6605,22 +6224,7 @@ export type Database = {
           status?: string | null
           table_name?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "pending_corrections_requested_by_fkey"
-            columns: ["requested_by"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "pending_corrections_reviewed_by_fkey"
-            columns: ["reviewed_by"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       performance_alerts: {
         Row: {
@@ -6665,15 +6269,7 @@ export type Database = {
           severity?: string
           title?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "performance_alerts_acknowledged_by_fkey"
-            columns: ["acknowledged_by"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       performance_budgets: {
         Row: {
@@ -6763,15 +6359,7 @@ export type Database = {
           user_agent?: string | null
           user_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "performance_metrics_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       personalized_recommendations: {
         Row: {
@@ -6881,15 +6469,7 @@ export type Database = {
           reactions?: number | null
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "posts_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       privacy_consents: {
         Row: {
@@ -6925,15 +6505,7 @@ export type Database = {
           source?: string
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "privacy_consents_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       profiles: {
         Row: {
@@ -6996,15 +6568,7 @@ export type Database = {
           updated_at?: string | null
           website?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "profiles_id_fkey"
-            columns: ["id"]
-            isOneToOne: true
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       push_subscriptions: {
         Row: {
@@ -7031,15 +6595,7 @@ export type Database = {
           p256dh?: string
           user_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "push_subscriptions_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       qcm_responses: {
         Row: {
@@ -7134,15 +6690,7 @@ export type Database = {
           updated_at?: string | null
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "qcm_sessions_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       quiz_sessions: {
         Row: {
@@ -7187,15 +6735,7 @@ export type Database = {
           updated_at?: string
           user_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "quiz_sessions_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       rate_limit_counters: {
         Row: {
@@ -7258,15 +6798,7 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "recording_projects_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       rituals: {
         Row: {
@@ -7551,15 +7083,7 @@ export type Database = {
           user_agent?: string | null
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "streaming_access_logs_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       study_sessions: {
         Row: {
@@ -7637,15 +7161,7 @@ export type Database = {
           updated_at?: string
           user_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "subscribers_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       subscription_plans: {
         Row: {
@@ -7726,15 +7242,7 @@ export type Database = {
           priority?: number | null
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "ui_suggestion_cache_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       unified_music_generation: {
         Row: {
@@ -7785,15 +7293,7 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "unified_music_generation_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       urge_gpt_queries: {
         Row: {
@@ -8082,13 +7582,6 @@ export type Database = {
             referencedRelation: "edn_items"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "user_favorite_flashcards_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
         ]
       }
       user_favorite_tracks: {
@@ -8110,15 +7603,7 @@ export type Database = {
           track_id?: string
           user_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "user_favorite_tracks_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       user_generated_music: {
         Row: {
@@ -8157,15 +7642,7 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "user_generated_music_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       user_goals: {
         Row: {
@@ -8246,15 +7723,7 @@ export type Database = {
           updated_at?: string | null
           user_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "user_music_preferences_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: true
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       user_notifications: {
         Row: {
@@ -8341,15 +7810,7 @@ export type Database = {
           updated_at?: string | null
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "user_playlists_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       user_preferences: {
         Row: {
@@ -8418,15 +7879,82 @@ export type Database = {
           user_id?: string | null
           wellbeing_goals?: Json | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "user_preferences_advanced_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: true
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
+      }
+      user_preferences_extended: {
+        Row: {
+          auto_play: boolean
+          binaural_enabled: boolean
+          created_at: string
+          dark_mode: boolean
+          id: string
+          language: string
+          music_volume: number
+          notification_email: boolean
+          notification_push: boolean
+          study_reminders: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          auto_play?: boolean
+          binaural_enabled?: boolean
+          created_at?: string
+          dark_mode?: boolean
+          id?: string
+          language?: string
+          music_volume?: number
+          notification_email?: boolean
+          notification_push?: boolean
+          study_reminders?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          auto_play?: boolean
+          binaural_enabled?: boolean
+          created_at?: string
+          dark_mode?: boolean
+          id?: string
+          language?: string
+          music_volume?: number
+          notification_email?: boolean
+          notification_push?: boolean
+          study_reminders?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_privacy_preferences: {
+        Row: {
+          analytics_opt_in: boolean
+          consent_version: string
+          created_at: string
+          pseudonymized_user_id: string
+          retention_days: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          analytics_opt_in?: boolean
+          consent_version?: string
+          created_at?: string
+          pseudonymized_user_id?: string
+          retention_days?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          analytics_opt_in?: boolean
+          consent_version?: string
+          created_at?: string
+          pseudonymized_user_id?: string
+          retention_days?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       user_profiles: {
         Row: {
@@ -8573,15 +8101,7 @@ export type Database = {
           updated_at?: string | null
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "user_quotas_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: true
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       user_rewards: {
         Row: {
@@ -8653,15 +8173,7 @@ export type Database = {
           user_agent?: string | null
           user_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "user_sessions_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       user_stats: {
         Row: {
@@ -8744,13 +8256,6 @@ export type Database = {
             referencedRelation: "subscription_plans"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "user_subscriptions_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
         ]
       }
       voice_journal_entries: {
@@ -8796,15 +8301,7 @@ export type Database = {
           updated_at?: string
           user_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "voice_journal_entries_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       vr_sessions: {
         Row: {
@@ -8909,7 +8406,6 @@ export type Database = {
       }
       security_violations_summary: {
         Row: {
-          affected_locations: string[] | null
           finding_type: string | null
           last_detection: string | null
           severity: string | null
@@ -8939,30 +8435,20 @@ export type Database = {
       }
       user_activity_summary: {
         Row: {
-          conversations_count: number | null
-          email: string | null
-          id: string | null
-          last_activity: string | null
-          music_generations: number | null
+          metric: string | null
+          period: string | null
+          value: string | null
         }
         Relationships: []
       }
       user_progress_view: {
         Row: {
-          avg_duration: number | null
-          last_session: string | null
-          total_sessions: number | null
+          conversations_count: number | null
+          emotions_count: number | null
+          last_activity: string | null
           user_id: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "ai_coach_sessions_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "user_activity_summary"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       v_competences_parsed: {
         Row: {
@@ -9061,6 +8547,10 @@ export type Database = {
       calculate_sla_metrics: {
         Args: Record<PropertyKey, never>
         Returns: undefined
+      }
+      calculate_user_learning_path: {
+        Args: { p_user_id: string }
+        Returns: Json
       }
       check_music_generation_quota: {
         Args: { user_uuid: string }
@@ -9513,6 +9003,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: Json
       }
+      get_system_health_status: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
+      }
       get_team_analytics: {
         Args: {
           p_end_date?: string
@@ -9531,6 +9025,16 @@ export type Database = {
         Args: { p_user_id?: string }
         Returns: {
           room_id: string
+        }[]
+      }
+      get_user_ai_quota: {
+        Args: { p_user_id?: string }
+        Returns: {
+          credits_used: number
+          remaining_credits: number
+          reset_date: string
+          subscription_type: string
+          total_credits: number
         }[]
       }
       get_user_ia_stats: {
@@ -9669,6 +9173,14 @@ export type Database = {
       log_security_event: {
         Args:
           | { event_details?: Json; event_type: string }
+          | {
+              p_action: string
+              p_finding_type?: string
+              p_metadata?: Json
+              p_record_id?: string
+              p_severity?: string
+              p_table_name?: string
+            }
           | {
               p_event_details?: Json
               p_event_type: string
@@ -9865,6 +9377,10 @@ export type Database = {
           total_rang_b: number
         }[]
       }
+      panic_overlay_get_state: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
+      }
       reset_monthly_quotas: {
         Args: Record<PropertyKey, never>
         Returns: undefined
@@ -9916,6 +9432,23 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: Json
       }
+      set_analytics_opt_in: {
+        Args: {
+          p_consent_version?: string
+          p_opt_in: boolean
+          p_retention_days?: number
+          p_user_id: string
+        }
+        Returns: {
+          analytics_opt_in: boolean
+          consent_version: string
+          created_at: string
+          pseudonymized_user_id: string
+          retention_days: number
+          updated_at: string
+          user_id: string
+        }
+      }
       start_extraction_batch: {
         Args: {
           p_batch_type: string
@@ -9937,6 +9470,16 @@ export type Database = {
         Returns: {
           details: Json
           updated_count: number
+        }[]
+      }
+      update_competences_counters: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          item_code: string
+          rang_a_count: number
+          rang_b_count: number
+          total_count: number
+          updated: boolean
         }[]
       }
       update_edn_items_with_real_specific_content: {
@@ -9971,6 +9514,23 @@ export type Database = {
       validate_music_lyrics: {
         Args: { lyrics_data: Json }
         Returns: boolean
+      }
+      verify_competences_completeness: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          actual_rang_a: number
+          actual_rang_b: number
+          actual_total: number
+          has_missing_rang_a: boolean
+          has_missing_rang_b: boolean
+          item_code: string
+          needs_update: boolean
+          status: string
+          stored_rang_a: number
+          stored_rang_b: number
+          stored_total: number
+          title: string
+        }[]
       }
       verify_integration_success: {
         Args: Record<PropertyKey, never>
