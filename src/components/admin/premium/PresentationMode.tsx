@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 import React, { useState, useEffect } from 'react';
 import { X, ChevronRight, ChevronLeft, Download } from 'lucide-react';

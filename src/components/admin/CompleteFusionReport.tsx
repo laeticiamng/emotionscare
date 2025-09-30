@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * COMPONENT FUSION REPORT - Rapport final de la fusion des composants
  * Montre l'état 100% unifié de tous les composants

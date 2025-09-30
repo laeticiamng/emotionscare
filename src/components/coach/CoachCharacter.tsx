@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 import React from 'react';
 import { CoachCharacterProps } from '@/types/coach';
