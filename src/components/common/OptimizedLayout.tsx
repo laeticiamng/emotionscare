@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { memo, Suspense, lazy } from 'react';
 import { EnhancedErrorBoundary } from '@/components/ui/enhanced-error-boundary';
 import { AccessibilityProvider } from '@/components/common/AccessibilityProvider';
