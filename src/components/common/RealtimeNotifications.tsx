@@ -6,7 +6,7 @@ import { Bell, AlertTriangle, Info, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { fullApiService } from '@/services/api/fullApiService';
-import { useAuth } from '@/contexts/auth';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface Notification {
   id: string;
