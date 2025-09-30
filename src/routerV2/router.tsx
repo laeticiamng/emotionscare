@@ -448,6 +448,9 @@ if (import.meta.env.DEV) {
   // Log unique au démarrage
   if (!window.__routerV2Logged) {
     console.log(`✅ RouterV2 initialisé: ${canonicalRoutes.length} routes canoniques`);
+    const testNyveeRoute = canonicalRoutes.find(r => r.path === '/test-nyvee');
+    console.log('🔍 Route /test-nyvee trouvée:', testNyveeRoute);
+    console.log('🔍 NyveeTestPage dans componentMap:', !!componentMap['NyveeTestPage']);
     window.__routerV2Logged = true;
   }
 }
