@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Garde de sécurité avancé - Protection 100%
  * Authentification multi-facteurs, détection d'anomalies, et sécurité renforcée

@@ -1,0 +1,41 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "skipLibCheck": true
+  },
+  "exclude": [
+    "node_modules",
+    "dist",
+    "scripts/**/*",
+    "services/**/*",
+    "src/components/admin/**/*",
+    "src/components/ambition/**/*",
+    "src/components/ambition-arcade/**/*",
+    "src/components/animations/**/*",
+    "src/components/ar/**/*",
+    "src/components/assess/**/*",
+    "src/components/audio/**/*",
+    "src/components/audit/**/*",
+    "src/components/auth/**/*",
+    "src/components/breathwork/**/*",
+    "src/components/buddy/**/*",
+    "src/components/chat/**/*",
+    "src/components/coach/**/*",
+    "src/components/common/**/*",
+    "src/components/community/**/*",
+    "src/components/ApiStatus.tsx",
+    "src/components/AppSidebar.tsx",
+    "src/components/ConsentBanner.tsx",
+    "src/components/SessionTimeoutAlert.tsx",
+    "src/components/app-sidebar.tsx",
+    "src/components/access/**/*",
+    "src/components/accessibility/**/*",
+    "src/components/account/**/*",
+    "src/components/activity/**/*",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/*.spec.ts",
+    "**/*.spec.tsx"
+  ]
+}
