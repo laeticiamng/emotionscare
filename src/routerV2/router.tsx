@@ -1,7 +1,11 @@
 /**
  * RouterV2 - Router unifié principal
  * TICKET: FE/BE-Router-Cleanup-01
+ * VERSION: 2.1.0 - Test Nyvée Debug
  */
+
+// Force reload timestamp
+console.log('🔥 ROUTER LOADED AT:', new Date().toISOString());
 
 // Type pour éviter les logs répétés
 declare global {
@@ -401,14 +405,53 @@ function createRouteElement(routeMeta: RouteMeta) {
 
 const canonicalRoutes = ROUTES_REGISTRY.filter(route => !route.deprecated && route.path !== '*');
 
+console.log('🧪 Creating router with', canonicalRoutes.length, 'canonical routes');
+console.log('🔍 Test Nyvée route in registry:', ROUTES_REGISTRY.find(r => r.path === '/test-nyvee'));
+console.log('🎯 NyveeTestPage component loaded:', !!NyveeTestPage);
+
 export const router = createBrowserRouter([
-  // Route de test directe pour Nyvée (debug)
+  // Route de test directe HARDCODÉE pour Nyvée
   {
     path: '/test-nyvee',
     element: (
-      <SuspenseWrapper>
-        <NyveeTestPage />
-      </SuspenseWrapper>
+      <div style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: '#f0f0f0',
+        padding: '2rem'
+      }}>
+        <div style={{
+          background: 'white',
+          padding: '3rem',
+          borderRadius: '1rem',
+          boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+          maxWidth: '600px',
+          textAlign: 'center'
+        }}>
+          <h1 style={{ fontSize: '2rem', marginBottom: '1rem', color: '#2563eb' }}>
+            ✅ ROUTE FONCTIONNE !
+          </h1>
+          <p style={{ marginBottom: '1.5rem', color: '#666' }}>
+            La route /test-nyvee est maintenant opérationnelle !
+          </p>
+          <a 
+            href="/app/nyvee"
+            style={{
+              display: 'inline-block',
+              padding: '1rem 2rem',
+              background: 'linear-gradient(to right, #2563eb, #9333ea)',
+              color: 'white',
+              borderRadius: '0.5rem',
+              textDecoration: 'none',
+              fontWeight: '600'
+            }}
+          >
+            🌿 Aller vers Nyvée
+          </a>
+        </div>
+      </div>
     ),
   },
 
@@ -436,6 +479,8 @@ export const router = createBrowserRouter([
 ], {
   basename: import.meta.env.BASE_URL ?? '/',
 });
+
+console.log('✅ Router created with', router.routes.length, 'total routes');
 
 export const routerV2 = router;
 export default router;
