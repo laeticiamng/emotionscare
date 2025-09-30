@@ -1,0 +1,36 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "composite": false,
+    "noEmit": true,
+    "skipLibCheck": true
+  },
+  "include": [
+    "./src/**/*.ts",
+    "./src/**/*.tsx"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "scripts",
+    "services",
+    "ci",
+    "tools",
+    "tests",
+    "test",
+    "supabase",
+    
+    "src/components/ApiStatus.tsx",
+    "src/components/AppSidebar.tsx",
+    "src/components/ConsentBanner.tsx",
+    "src/components/SessionTimeoutAlert.tsx",
+    "src/components/access/**/*",
+    "src/components/accessibility/**/*",
+    "src/components/account/**/*",
+    "src/components/activity/**/*",
+    "src/components/admin/hooks/useUserActivityLogState.ts",
+    "src/components/admin/organization/TeamManagement.tsx",
+    "src/components/admin/premium/**/*",
+    "src/components/admin/settings/**/*"
+  ]
+}
