@@ -709,6 +709,16 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: true,
   },
   {
+    name: 'emotional-park',
+    path: '/app/emotional-park',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app',
+    component: 'EmotionalPark',
+    guard: true,
+    aliases: ['/parc-emotionnel', '/park'],
+  },
+  {
     name: 'settings-notifications',
     path: '/settings/notifications',
     segment: 'consumer',
