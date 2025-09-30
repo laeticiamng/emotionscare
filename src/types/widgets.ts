@@ -34,6 +34,12 @@ export interface DraggableKpiCardsGridProps {
 
 export type KpiCardProps = DraggableCardProps;
 
+export interface KpiCardsGridProps {
+  cards?: DraggableCardProps[];
+  kpiCards?: DraggableCardProps[];
+  className?: string;
+}
+
 export interface DailyInsightCardProps {
   title: string;
   insight: string;

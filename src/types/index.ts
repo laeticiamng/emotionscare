@@ -295,3 +295,10 @@ export interface LoadingState {
 export type { MusicTrack as Track };
 export type { MusicPlaylist as Playlist };
 export type { EmotionResult as Emotion };
+
+// Export des types de widgets et dashboard
+export * from './kpi';
+export * from './dashboard';
+export * from './segment';
+export * from './onboarding';
+export * from './widgets';
