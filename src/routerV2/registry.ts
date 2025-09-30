@@ -700,6 +700,15 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     aliases: ['/privacy-toggles', '/settings/data-privacy'],
   },
   {
+    name: 'how-it-adapts',
+    path: '/app/how-it-adapts',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app',
+    component: 'HowItAdaptsPage',
+    guard: true,
+  },
+  {
     name: 'settings-notifications',
     path: '/settings/notifications',
     segment: 'consumer',

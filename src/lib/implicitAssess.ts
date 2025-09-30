@@ -19,44 +19,44 @@ export interface ImplicitSignal {
 const Q: ImplicitSignal[] = [];
 let t: any = null;
 
-function serializeImplicit(s: ImplicitSignal): string {
+function serializeImplicit(s: ImplicitSignal): number {
   if (s.proxy === 'duration') {
     const n = Number(s.value) || 0;
-    if (n >= 300000) return 'strongly_agree'; // >5min
-    if (n >= 90000) return 'agree';           // 1.5–5min
-    if (n >= 30000) return 'neutral';         // 30–90s
-    return 'disagree';                         // <30s
+    if (n >= 300000) return 5; // >5min = strongly_agree
+    if (n >= 90000) return 4;   // 1.5–5min = agree
+    if (n >= 30000) return 3;   // 30–90s = neutral
+    return 2;                    // <30s = disagree
   }
 
-  if (s.proxy === 'skip') return 'disagree';
-  if (s.proxy === 'repeat') return 'agree';
+  if (s.proxy === 'skip') return 2; // disagree
+  if (s.proxy === 'repeat') return 4; // agree
 
   if (s.proxy === 'choice') {
     const v = String(s.value);
     if (['calm', 'soft', 'slow', 'private', '2d', 'low'].includes(v)) {
-      return 'agree';
+      return 4; // agree
     }
     if (['energize', 'fast', 'public', '3d', 'high'].includes(v)) {
-      return 'neutral';
+      return 3; // neutral
     }
-    return 'neutral';
+    return 3; // neutral default
   }
 
   if (s.proxy === 'cadence_followed') {
     const p = Number(s.value) || 0; // 0..1
-    if (p >= 0.7) return 'agree';
-    if (p >= 0.4) return 'neutral';
-    return 'disagree';
+    if (p >= 0.7) return 4; // agree
+    if (p >= 0.4) return 3; // neutral
+    return 2; // disagree
   }
 
   if (s.proxy === 'completion') {
     const r = Number(s.value) || 0; // 0..1
-    if (r >= 0.8) return 'agree';
-    if (r >= 0.5) return 'neutral';
-    return 'disagree';
+    if (r >= 0.8) return 4; // agree
+    if (r >= 0.5) return 3; // neutral
+    return 2; // disagree
   }
 
-  return String(s.value ?? 'neutral');
+  return 3; // neutral default
 }
 
 export function trackImplicitAssess(s: ImplicitSignal) {

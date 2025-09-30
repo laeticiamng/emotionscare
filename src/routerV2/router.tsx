@@ -66,6 +66,7 @@ const B2CSettingsPage = lazy(() => import('@/pages/B2CSettingsPage'));
 const B2CProfileSettingsPage = lazy(() => import('@/pages/B2CProfileSettingsPage'));
 const B2CPrivacyTogglesPage = lazy(() => import('@/pages/B2CPrivacyTogglesPage'));
 const B2CNotificationsPage = lazy(() => import('@/pages/B2CNotificationsPage'));
+const HowItAdaptsPage = lazy(() => import('@/pages/HowItAdaptsPage'));
 
 // B2B Features - use dedicated pages
 const B2BTeamsPage = lazy(() => import('@/pages/B2BTeamsPage'));
@@ -216,6 +217,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   B2CProfileSettingsPage,
   B2CPrivacyTogglesPage,
   B2CNotificationsPage,
+  HowItAdaptsPage,
   
   // B2B
   B2BTeamsPage,
