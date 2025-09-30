@@ -89,7 +89,7 @@ const ConsentBanner: React.FC = () => {
                   Indispensables pour fournir les fonctionnalités essentielles et sécuriser votre session.
                 </p>
               </div>
-              <Switch id="consent-functional" checked readOnly disabled aria-hidden className="shrink-0" />
+              <Switch id="consent-functional" checked disabled aria-hidden="true" className="shrink-0" />
             </div>
             <div className="flex items-start justify-between gap-4">
               <div className="space-y-1">

@@ -64,10 +64,10 @@ const AccessibilityAudit: React.FC = () => {
                   <Progress value={report.score} className="h-3" />
                 </div>
                 <Badge 
-                  className={`${getComplianceColor(report.compliance)} text-white`}
+                  className={`${getComplianceColor(String(report.compliance))} text-white`}
                 >
-                  {report.compliance === 'AA' ? 'WCAG 2.1 AA' : 
-                   report.compliance === 'A' ? 'WCAG 2.1 A' : 
+                  {String(report.compliance) === 'AA' ? 'WCAG 2.1 AA' : 
+                   String(report.compliance) === 'A' ? 'WCAG 2.1 A' : 
                    'Non conforme'}
                 </Badge>
               </div>

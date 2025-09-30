@@ -40,7 +40,7 @@ async function handleFeed(req: any, reply: any) {
     reply.code(401).send({ ok: false, error: { code: 'unauthorized', message: 'Unauthorized' } });
     return;
   }
-  const entries = await listFeedMock(hash(req.user.sub));
+  const entries = await listFeedMock();
   reply.send({ ok: true, data: { entries, weekly: [] } });
 }
 

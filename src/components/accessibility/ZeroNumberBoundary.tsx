@@ -30,10 +30,11 @@ export function ZeroNumberBoundary<T extends ElementType = 'div'>(
     }
   }, [children]);
 
+  const ElementComponent = Element as React.ComponentType<any>;
   return (
-    <Element ref={containerRef as never} data-zero-number-boundary="true" {...rest}>
+    <ElementComponent ref={containerRef as never} data-zero-number-boundary="true" {...rest}>
       {children}
-    </Element>
+    </ElementComponent>
   );
 }
 
