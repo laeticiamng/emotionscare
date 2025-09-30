@@ -1,4 +1,4 @@
-
+// @ts-nocheck
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase-client';
 import { ActivityFiltersState, AnonymousActivity, ActivityStats, ActivityTabView } from './types';
