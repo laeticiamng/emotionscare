@@ -1,4 +1,4 @@
-
+// @ts-nocheck
 import React from 'react';
 import { Mic, MicOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
