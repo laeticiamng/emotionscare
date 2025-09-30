@@ -31,3 +31,8 @@ export interface EmotionAnalysis {
   overallMood: string;
   recommendations: EmotionRecommendation[];
 }
+
+export interface EmotionalTeamViewProps {
+  teamId?: string;
+  data?: any[];
+}
