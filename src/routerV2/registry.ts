@@ -267,6 +267,15 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     aliases: ['/breathwork', '/breathwork-adaptive'],
   },
   {
+    name: 'nyvee-cocon',
+    path: '/app/nyvee',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app',
+    component: 'B2CNyveeCoconPage',
+    guard: true,
+  },
+  {
     name: 'face-ar',
     path: '/app/face-ar',
     segment: 'consumer',
@@ -886,15 +895,6 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
   // ═══════════════════════════════════════════════════════════
   // Routes de développement masquées en production
   ...(import.meta.env.DEV ? [
-    {
-      name: 'nyvee-cocon',
-      path: '/app/nyvee',
-      segment: 'consumer',
-      role: 'consumer',
-      layout: 'app',
-      component: 'B2CNyveeCoconPage',
-      guard: true,
-    },
     {
       name: 'comprehensive-system-audit',
       path: '/dev/system-audit',
