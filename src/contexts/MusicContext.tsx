@@ -199,6 +199,7 @@ interface MusicContextType {
   // Generation Suno
   generateMusicForEmotion: (emotion: string, prompt?: string) => Promise<MusicTrack | null>;
   checkGenerationStatus: (taskId: string) => Promise<MusicTrack | null>;
+  getEmotionMusicDescription: (emotion: string) => string;
   
   // Therapeutic features
   enableTherapeuticMode: (emotion: string) => void;
@@ -668,6 +669,21 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   }, []);
 
+  const getEmotionMusicDescription = useCallback((emotion: string): string => {
+    const descriptions: Record<string, string> = {
+      calm: 'Musique douce et apaisante pour retrouver la sérénité',
+      energetic: 'Sons dynamiques et motivants pour booster votre énergie',
+      happy: 'Mélodies joyeuses pour célébrer votre bonne humeur',
+      sad: 'Compositions réconfortantes pour traverser les moments difficiles',
+      focused: 'Ambiances propices à la concentration et la productivité',
+      relaxed: 'Atmosphères relaxantes pour décompresser en douceur',
+      anxious: 'Harmonies apaisantes pour calmer l\'anxiété',
+      melancholy: 'Pièces contemplatives pour accompagner la mélancolie',
+    };
+    
+    return descriptions[emotion.toLowerCase()] || 'Musique thérapeutique adaptée à votre état émotionnel';
+  }, []);
+
   // ==================== CONTEXT VALUE ====================
   const contextValue: MusicContextType = {
     state,
@@ -690,6 +706,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     // Generation
     generateMusicForEmotion,
     checkGenerationStatus,
+    getEmotionMusicDescription,
     
     // Therapeutic
     enableTherapeuticMode,

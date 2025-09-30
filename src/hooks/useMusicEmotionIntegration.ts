@@ -6,7 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
 export const useMusicEmotionIntegration = () => {
-  const { state, generateMusicForEmotion, setPlaylist, play } = useMusic();
+  const { state, generateMusicForEmotion, setPlaylist, play, getEmotionMusicDescription } = useMusic();
   const { updateSoundscapeForEmotion } = useSoundscape();
 
   // Activation de la musique basée sur l'émotion
@@ -181,6 +181,7 @@ export const useMusicEmotionIntegration = () => {
     searchExistingTracks,
     getMusicRecommendations,
     analyzeMusicImpact,
+    getEmotionMusicDescription,
     isGenerating: state.isGenerating,
     generationProgress: state.generationProgress,
     currentEmotion: state.emotionTarget,
