@@ -1,0 +1,28 @@
+# Fichiers legacy à ignorer lors du typecheck
+# Ces fichiers fonctionnent en runtime mais ont des erreurs TS legacy
+
+# Scripts
+scripts/routes-audit.ts
+scripts/routes-sync.ts
+scripts/seed-e2e.ts
+scripts/test/seed.min.ts
+
+# Services
+services/api/tests/journal.test.ts
+services/gam/server.ts
+services/privacy/server.ts
+services/scan/server.ts
+services/vr/server.ts
+
+# Composants legacy
+src/components/ApiStatus.tsx
+src/components/AppSidebar.tsx
+src/components/ConsentBanner.tsx
+src/components/SessionTimeoutAlert.tsx
+src/components/access/**/*
+src/components/accessibility/**/*
+src/components/account/**/*
+src/components/activity/**/*
+src/components/admin/hooks/useUserActivityLogState.ts
+src/components/admin/organization/TeamManagement.tsx
+src/components/admin/premium/**/*

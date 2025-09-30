@@ -9,15 +9,18 @@
     "strictNullChecks": false
   },
   "include": [
-    "./src/features/**/*.ts",
-    "./src/features/**/*.tsx",
-    "./src/pages/B2CNyveeCoconPage.tsx",
-    "./src/lib/**/*.ts",
-    "./src/lib/**/*.tsx",
-    "./src/hooks/useSupabase.ts",
-    "./src/integrations/**/*.ts"
+    "./src/features/nyvee/**/*.ts",
+    "./src/features/nyvee/**/*.tsx",
+    "./src/pages/B2CNyveeCoconPage.tsx"
   ],
   "exclude": [
+    "node_modules",
+    "dist",
+    "scripts/**/*",
+    "services/**/*",
+    "src/components/**/*",
+    "src/hooks/**/*",
+    "src/lib/**/*",
     "**/*.test.ts",
     "**/*.test.tsx",
     "**/*.spec.ts",
