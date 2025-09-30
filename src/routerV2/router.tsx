@@ -102,7 +102,7 @@ const B2CAICoachMicroPage = lazy(() => import('@/pages/B2CAICoachMicroPage'));
 const B2CActivitePage = lazy(() => import('@/pages/B2CActivitePage'));
 const SubscribePage = lazy(() => import('@/pages/SubscribePage'));
 const B2CNyveeCoconPage = lazy(() => import('@/pages/B2CNyveeCoconPage'));
-const NyveeTestPage = lazy(() => import('@/pages/NyveeTestPage'));
+const NyveeTestPage = lazy(() => import('@/pages/NyveeTestPage').then(m => ({ default: m.default })));
 const ValidationPage = lazy(() => import('@/pages/ValidationPage'));
 
 // Legal pages
@@ -448,6 +448,9 @@ if (import.meta.env.DEV) {
   // Log unique au démarrage
   if (!window.__routerV2Logged) {
     console.log(`✅ RouterV2 initialisé: ${canonicalRoutes.length} routes canoniques`);
+    const testNyveeRoute = ROUTES_REGISTRY.find(r => r.path === '/test-nyvee');
+    console.log('🔍 Route /test-nyvee dans registry:', testNyveeRoute);
+    console.log('🔍 Component NyveeTestPage dans map:', componentMap['NyveeTestPage']);
     window.__routerV2Logged = true;
   }
 }
