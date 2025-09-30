@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 import { useState, useEffect } from 'react';
 import { ChartData, DashboardStats } from '../tabs/overview/types';

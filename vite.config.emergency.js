@@ -1,10 +1,11 @@
+import tsconfigPaths from 'vite-tsconfig-paths';
 // Configuration Vite d'urgence - JavaScript pur pour éviter TypeScript
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
 
 export default defineConfig({
-  plugins: [
+  plugins: [tsconfigPaths(), 
     react({
       // Pas de TypeScript du tout
       typescript: false,

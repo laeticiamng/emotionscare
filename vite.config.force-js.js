@@ -1,3 +1,4 @@
+import tsconfigPaths from 'vite-tsconfig-paths';
 // Configuration Vite FORCE JavaScript - Bypass COMPLET TypeScript
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
@@ -5,7 +6,7 @@ import { resolve } from 'path';
 import { componentTagger } from "lovable-tagger";
 
 export default defineConfig(() => ({
-  plugins: [
+  plugins: [tsconfigPaths(), 
     react({
       jsxRuntime: 'automatic',
       typescript: false,
