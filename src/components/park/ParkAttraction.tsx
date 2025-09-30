@@ -30,11 +30,17 @@ export const ParkAttraction: React.FC<ParkAttractionProps> = ({
 
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ delay, duration: 0.3 }}
-      whileHover={{ scale: 1.02, y: -4 }}
-      whileTap={{ scale: 0.98 }}
+      initial={{ opacity: 0, scale: 0.95, rotateX: 10 }}
+      animate={{ opacity: 1, scale: 1, rotateX: 0 }}
+      transition={{ delay, duration: 0.4, type: "spring" }}
+      whileHover={{ 
+        scale: 1.03, 
+        y: -8,
+        rotateX: 2,
+        transition: { duration: 0.2 }
+      }}
+      whileTap={{ scale: 0.97 }}
+      className="perspective-1000"
     >
       <Card
         onClick={() => navigate(route)}
@@ -42,22 +48,50 @@ export const ParkAttraction: React.FC<ParkAttractionProps> = ({
           relative overflow-hidden cursor-pointer h-full
           bg-gradient-to-br ${gradient}
           backdrop-blur-sm border-2 border-border/50
-          hover:border-primary/50 transition-all duration-300
+          hover:border-primary/60 hover:shadow-2xl
+          transition-all duration-300
           group
         `}
       >
-        {/* Animated background glow */}
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        {/* Animated background particles */}
+        <div className="absolute inset-0 overflow-hidden">
+          {[...Array(5)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute w-1 h-1 bg-primary/30 rounded-full"
+              style={{
+                left: `${20 + i * 15}%`,
+                top: `${20 + i * 10}%`,
+              }}
+              animate={{
+                y: [0, -20, 0],
+                opacity: [0.3, 0.6, 0.3],
+                scale: [1, 1.5, 1]
+              }}
+              transition={{
+                duration: 2 + i * 0.5,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+            />
+          ))}
+        </div>
+
+        {/* Glow effect on hover */}
+        <motion.div
+          className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-secondary/10 opacity-0 group-hover:opacity-100"
+          transition={{ duration: 0.5 }}
+        />
         
         {/* Sparkles decoration */}
         <motion.div
-          className="absolute top-4 right-4 text-primary/30 group-hover:text-primary/60"
+          className="absolute top-4 right-4 text-primary/40 group-hover:text-primary"
           animate={{
-            rotate: [0, 10, 0],
-            scale: [1, 1.1, 1]
+            rotate: [0, 15, -15, 0],
+            scale: [1, 1.2, 1]
           }}
           transition={{
-            duration: 3,
+            duration: 4,
             repeat: Infinity,
             ease: "easeInOut"
           }}
@@ -86,22 +120,54 @@ export const ParkAttraction: React.FC<ParkAttractionProps> = ({
             {description}
           </p>
 
-          {/* Collection badge */}
-          <div className="pt-2 border-t border-border/50">
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <Sparkles className="h-3 w-3 text-primary/60" />
-              <span className="font-medium">{collection}</span>
+          {/* Collection badge with animation */}
+          <motion.div 
+            className="pt-3 mt-3 border-t border-border/50"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: delay + 0.2 }}
+          >
+            <div className="flex items-center gap-2 text-xs">
+              <motion.div
+                animate={{
+                  rotate: [0, 10, -10, 0],
+                  scale: [1, 1.2, 1]
+                }}
+                transition={{
+                  duration: 3,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+              >
+                <Sparkles className="h-3 w-3 text-primary" />
+              </motion.div>
+              <span className="font-medium text-muted-foreground group-hover:text-foreground transition-colors">
+                {collection}
+              </span>
             </div>
-          </div>
+          </motion.div>
 
-          {/* Hover effect indicator */}
+          {/* Interactive progress bar */}
           <motion.div
-            className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-primary to-secondary"
-            initial={{ scaleX: 0 }}
+            className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-secondary to-primary"
+            initial={{ scaleX: 0, originX: 0 }}
             whileHover={{ scaleX: 1 }}
-            transition={{ duration: 0.3 }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
           />
         </CardContent>
+
+        {/* Pulse effect on hover */}
+        <motion.div
+          className="absolute inset-0 border-2 border-primary/0 group-hover:border-primary/30 rounded-lg pointer-events-none"
+          animate={{
+            scale: [1, 1.02, 1],
+          }}
+          transition={{
+            duration: 2,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        />
       </Card>
     </motion.div>
   );

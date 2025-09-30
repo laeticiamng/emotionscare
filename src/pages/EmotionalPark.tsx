@@ -1,13 +1,17 @@
-import React from 'react';
-import { motion } from 'framer-motion';
-import { Sparkles, Wind, Palette, Music, Leaf, Book, Cloud, Star, Lightbulb, Waves, Mirror, Flask, Sword, Sliders, Users, Trophy, Theater, Sprout } from 'lucide-react';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Sparkles, Wind, Palette, Music, Leaf, Book, Cloud, Star, Lightbulb, Waves, Mirror, Flask, Sword, Sliders, Users, Trophy, Theater, Sprout, Filter, Zap } from 'lucide-react';
 import { ParkAttraction } from '@/components/park/ParkAttraction';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 
 /**
  * Carte du Parc Émotionnel — Monde des Modules
  * Chaque module = une attraction immersive
  */
 export default function EmotionalPark() {
+  const [selectedZone, setSelectedZone] = useState<string>('all');
+
   const attractions = [
     {
       id: 'home',
@@ -221,15 +225,19 @@ export default function EmotionalPark() {
   ];
 
   const zones = {
-    hub: { name: 'Hub Central', color: 'violet' },
-    calm: { name: 'Zone de Sérénité', color: 'blue' },
-    creative: { name: 'Quartier Créatif', color: 'pink' },
-    wisdom: { name: 'Jardin de Sagesse', color: 'emerald' },
-    explore: { name: 'Espace Exploration', color: 'indigo' },
-    energy: { name: 'Zone d\'Énergie', color: 'amber' },
-    challenge: { name: 'Arène des Défis', color: 'red' },
-    social: { name: 'Village Social', color: 'green' }
+    hub: { name: 'Hub Central', color: 'violet', emoji: '🌌' },
+    calm: { name: 'Zone de Sérénité', color: 'blue', emoji: '🫧' },
+    creative: { name: 'Quartier Créatif', color: 'pink', emoji: '🎨' },
+    wisdom: { name: 'Jardin de Sagesse', color: 'emerald', emoji: '🌿' },
+    explore: { name: 'Espace Exploration', color: 'indigo', emoji: '🌠' },
+    energy: { name: 'Zone d\'Énergie', color: 'amber', emoji: '⚡' },
+    challenge: { name: 'Arène des Défis', color: 'red', emoji: '⚔️' },
+    social: { name: 'Village Social', color: 'green', emoji: '🤝' }
   };
+
+  const filteredAttractions = selectedZone === 'all' 
+    ? attractions 
+    : attractions.filter(a => a.zone === selectedZone);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-secondary/5">
@@ -237,16 +245,47 @@ export default function EmotionalPark() {
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="sticky top-0 z-50 backdrop-blur-xl bg-background/80 border-b border-border"
+        className="sticky top-0 z-50 backdrop-blur-xl bg-background/90 border-b border-border/50 shadow-lg"
       >
         <div className="container mx-auto px-4 py-6">
-          <div className="flex items-center gap-3">
-            <Sparkles className="h-8 w-8 text-primary" />
-            <div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                Le Parc Émotionnel
-              </h1>
-              <p className="text-sm text-muted-foreground">Explore tes mondes intérieurs</p>
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <motion.div
+                animate={{ rotate: [0, 10, -10, 0], scale: [1, 1.1, 1] }}
+                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+              >
+                <Sparkles className="h-8 w-8 text-primary" />
+              </motion.div>
+              <div>
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent">
+                  Le Parc Émotionnel
+                </h1>
+                <p className="text-sm text-muted-foreground">19 attractions pour explorer tes mondes intérieurs</p>
+              </div>
+            </div>
+
+            {/* Zone Filter */}
+            <div className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0">
+              <Filter className="h-4 w-4 text-muted-foreground shrink-0" />
+              <Button
+                variant={selectedZone === 'all' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setSelectedZone('all')}
+                className="shrink-0"
+              >
+                Toutes
+              </Button>
+              {Object.entries(zones).map(([key, zone]) => (
+                <Button
+                  key={key}
+                  variant={selectedZone === key ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setSelectedZone(key)}
+                  className="shrink-0"
+                >
+                  {zone.emoji} {zone.name}
+                </Button>
+              ))}
             </div>
           </div>
         </div>
@@ -254,37 +293,78 @@ export default function EmotionalPark() {
 
       {/* Map Grid */}
       <div className="container mx-auto px-4 py-8">
-        {Object.entries(zones).map(([zoneKey, zone]) => {
-          const zoneAttractions = attractions.filter(a => a.zone === zoneKey);
-          if (zoneAttractions.length === 0) return null;
+        <AnimatePresence mode="wait">
+          {selectedZone === 'all' ? (
+            Object.entries(zones).map(([zoneKey, zone]) => {
+              const zoneAttractions = attractions.filter(a => a.zone === zoneKey);
+              if (zoneAttractions.length === 0) return null;
 
-          return (
+              return (
+                <motion.section
+                  key={zoneKey}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.3 }}
+                  className="mb-12"
+                >
+                  <div className="mb-6 flex items-center gap-3">
+                    <span className="text-4xl">{zone.emoji}</span>
+                    <div className="flex-1">
+                      <h2 className="text-2xl font-bold text-foreground mb-1">
+                        {zone.name}
+                      </h2>
+                      <div className="h-1 w-20 bg-gradient-to-r from-primary to-secondary rounded-full" />
+                    </div>
+                    <Badge variant="secondary" className="text-xs">
+                      {zoneAttractions.length} {zoneAttractions.length === 1 ? 'attraction' : 'attractions'}
+                    </Badge>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {zoneAttractions.map((attraction, index) => (
+                      <ParkAttraction
+                        key={attraction.id}
+                        {...attraction}
+                        delay={index * 0.05}
+                      />
+                    ))}
+                  </div>
+                </motion.section>
+              );
+            })
+          ) : (
             <motion.section
-              key={zoneKey}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="mb-12"
+              key={selectedZone}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.3 }}
             >
-              <div className="mb-6">
-                <h2 className="text-2xl font-bold text-foreground mb-1">
-                  {zone.name}
+              <div className="mb-8 text-center">
+                <span className="text-6xl mb-4 inline-block">
+                  {zones[selectedZone as keyof typeof zones].emoji}
+                </span>
+                <h2 className="text-3xl font-bold text-foreground mb-2">
+                  {zones[selectedZone as keyof typeof zones].name}
                 </h2>
-                <div className={`h-1 w-20 bg-gradient-to-r from-${zone.color}-500 to-${zone.color}-300 rounded-full`} />
+                <p className="text-muted-foreground">
+                  {filteredAttractions.length} {filteredAttractions.length === 1 ? 'attraction disponible' : 'attractions disponibles'}
+                </p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {zoneAttractions.map((attraction, index) => (
+                {filteredAttractions.map((attraction, index) => (
                   <ParkAttraction
                     key={attraction.id}
                     {...attraction}
-                    delay={index * 0.1}
+                    delay={index * 0.05}
                   />
                 ))}
               </div>
             </motion.section>
-          );
-        })}
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );
