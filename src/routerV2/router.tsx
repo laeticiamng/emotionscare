@@ -102,6 +102,7 @@ const B2CAICoachMicroPage = lazy(() => import('@/pages/B2CAICoachMicroPage'));
 const B2CActivitePage = lazy(() => import('@/pages/B2CActivitePage'));
 const SubscribePage = lazy(() => import('@/pages/SubscribePage'));
 const B2CNyveeCoconPage = lazy(() => import('@/pages/B2CNyveeCoconPage'));
+const NyveeTestPage = lazy(() => import('@/pages/NyveeTestPage'));
 const ValidationPage = lazy(() => import('@/pages/ValidationPage'));
 
 // Legal pages
@@ -247,6 +248,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   B2CAICoachMicroPage,
   B2CActivitePage,
   B2CNyveeCoconPage,
+  NyveeTestPage,
   ValidationPage,
   
   // Pages nouvellement créées

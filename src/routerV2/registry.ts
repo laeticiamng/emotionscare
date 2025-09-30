@@ -267,6 +267,14 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     aliases: ['/breathwork', '/breathwork-adaptive'],
   },
   {
+    name: 'nyvee-test',
+    path: '/test-nyvee',
+    segment: 'public',
+    layout: 'simple',
+    component: 'NyveeTestPage',
+    guard: false,
+  },
+  {
     name: 'nyvee-cocon',
     path: '/app/nyvee',
     segment: 'consumer',
