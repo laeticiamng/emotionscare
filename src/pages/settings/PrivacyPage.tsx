@@ -5,11 +5,13 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { useNavigate } from "react-router-dom";
 import { usePrivacy } from "@/core/privacy";
-import { Camera, Mic, Heart, Bell } from "lucide-react";
+import { Camera, Mic, Heart, Bell, Sparkles } from "lucide-react";
+import { useImplicitAssessStore } from "@/core/implicitAssessStore";
 
 export default function PrivacyPage() {
   const navigate = useNavigate();
   const privacy = usePrivacy();
+  const implicitAssess = useImplicitAssessStore();
 
   const sensors = [
     {
@@ -60,6 +62,49 @@ export default function PrivacyPage() {
         <AsyncState.Content>
           <div className="space-y-6">
             
+            {/* Personnalisation bien-être */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Sparkles className="h-5 w-5 text-primary" />
+                  Personnalisation bien-être
+                </CardTitle>
+                <CardDescription>
+                  Active ce mode pour que l'app s'adapte à ton ressenti, sans questions ni chiffres
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <Label htmlFor="implicit-assess" className="font-medium">
+                      Adaptation automatique (recommandé)
+                    </Label>
+                    <p className="text-sm text-muted-foreground">
+                      L'app observe tes interactions naturelles pour personnaliser ton expérience
+                    </p>
+                  </div>
+                  <Switch
+                    id="implicit-assess"
+                    checked={implicitAssess.enabled}
+                    onCheckedChange={implicitAssess.toggle}
+                  />
+                </div>
+                <div className="pt-2 border-t">
+                  <p className="text-xs text-muted-foreground mb-2">
+                    Nous captons des signaux implicites (choix, durées, préférences) pour adapter
+                    l'expérience sans questionnaire. Toujours verbal, jamais de scores.
+                  </p>
+                  <Button
+                    variant="link"
+                    className="h-auto p-0 text-xs"
+                    onClick={() => navigate('/app/how-it-adapts')}
+                  >
+                    Comment on adapte ? →
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
             {/* Capteurs */}
             <Card>
               <CardHeader>
