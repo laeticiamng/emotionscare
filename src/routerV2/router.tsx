@@ -402,6 +402,16 @@ function createRouteElement(routeMeta: RouteMeta) {
 const canonicalRoutes = ROUTES_REGISTRY.filter(route => !route.deprecated && route.path !== '*');
 
 export const router = createBrowserRouter([
+  // Route de test directe pour Nyvée (debug)
+  {
+    path: '/test-nyvee',
+    element: (
+      <SuspenseWrapper>
+        <NyveeTestPage />
+      </SuspenseWrapper>
+    ),
+  },
+
   // Routes principales du registry (hors routes dépréciées et wildcard)
   ...canonicalRoutes.map(route => ({
     path: route.path,
