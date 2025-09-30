@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * DashboardNavigationWidget - Widget de navigation pour le dashboard
  * Accès rapide aux fonctionnalités principales

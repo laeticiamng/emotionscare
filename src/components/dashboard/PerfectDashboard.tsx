@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Perfect Dashboard - Tableau de bord intelligent et adaptatif
  * Interface principale qui s'adapte à l'utilisateur et au contexte

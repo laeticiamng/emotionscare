@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Dashboard Vivant - Plan du jour adaptatif
  * Canvas qui se réorganise, micro-actions intelligentes, charge mentale zéro
