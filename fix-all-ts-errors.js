@@ -4,7 +4,7 @@ const path = require('path');
 
 // Répertoires à traiter
 const dirs = [
-  'src/components/dashboard/admin',
+  'src/components/dashboard',
   'src/components/data',
   'src/components/digital-wellness',
   'src/components/discovery',
