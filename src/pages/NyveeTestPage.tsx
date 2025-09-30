@@ -1,49 +1,49 @@
-import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+import React from 'react';
 
 export default function NyveeTestPage() {
-  const navigate = useNavigate();
-  
   return (
-    <div className="flex min-h-screen items-center justify-center p-4 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-blue-950 dark:via-purple-950 dark:to-pink-950">
-      <Card className="max-w-md w-full p-8 space-y-6 text-center shadow-xl">
-        <div className="space-y-2">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            Test Navigation Nyvée
-          </h1>
-          <p className="text-muted-foreground">
-            Cette page de test te permet d'accéder au module Nyvée
-          </p>
-        </div>
-        
-        <div className="space-y-4">
-          <Button 
-            size="lg"
-            onClick={() => navigate('/app/nyvee')}
-            className="w-full text-lg py-6 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-          >
-            🌿 Aller vers Nyvée
-          </Button>
-          
-          <Button 
-            size="lg"
-            variant="outline"
-            onClick={() => window.location.href = '/app/nyvee'}
-            className="w-full text-lg py-6"
-          >
-            🔄 Navigation directe (reload)
-          </Button>
-        </div>
-        
-        <div className="pt-4 text-sm text-muted-foreground">
-          <p>Routes disponibles :</p>
-          <ul className="mt-2 space-y-1 font-mono text-xs">
-            <li>✓ /test-nyvee (page actuelle)</li>
-            <li>✓ /app/nyvee (module Nyvée)</li>
-          </ul>
-        </div>
-      </Card>
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '2rem',
+      background: 'linear-gradient(to bottom right, #dbeafe, #fae8ff, #fce7f3)'
+    }}>
+      <div style={{
+        maxWidth: '28rem',
+        width: '100%',
+        padding: '2rem',
+        textAlign: 'center',
+        background: 'white',
+        borderRadius: '0.5rem',
+        boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)'
+      }}>
+        <h1 style={{
+          fontSize: '2.25rem',
+          fontWeight: 'bold',
+          marginBottom: '1rem'
+        }}>
+          ✅ Page de test Nyvée
+        </h1>
+        <p style={{ marginBottom: '1.5rem', color: '#6b7280' }}>
+          Si tu vois cette page, la route /test-nyvee fonctionne correctement !
+        </p>
+        <a 
+          href="/app/nyvee"
+          style={{
+            display: 'inline-block',
+            padding: '0.75rem 1.5rem',
+            background: 'linear-gradient(to right, #2563eb, #9333ea)',
+            color: 'white',
+            borderRadius: '0.375rem',
+            textDecoration: 'none',
+            fontWeight: '600'
+          }}
+        >
+          🌿 Aller vers Nyvée
+        </a>
+      </div>
     </div>
   );
 }
