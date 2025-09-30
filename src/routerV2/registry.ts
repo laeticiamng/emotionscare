@@ -452,6 +452,30 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
   },
 
   // ═══════════════════════════════════════════════════════════
+  // PARC ÉMOTIONNEL (NAVIGATION & IMMERSION)
+  // ═══════════════════════════════════════════════════════════
+  {
+    name: 'emotional-park',
+    path: '/app/emotional-park',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app',
+    component: 'EmotionalPark',
+    guard: true,
+    aliases: ['/parc', '/park'],
+  },
+  {
+    name: 'park-journey',
+    path: '/app/park-journey',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app',
+    component: 'ParkJourney',
+    guard: true,
+    aliases: ['/voyage', '/journey'],
+  },
+
+  // ═══════════════════════════════════════════════════════════
   // ANALYTICS & DATA (CONSUMER)
   // ═══════════════════════════════════════════════════════════
   {
