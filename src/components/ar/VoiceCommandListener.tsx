@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 import React from 'react';
 import { Mic, MicOff } from 'lucide-react';

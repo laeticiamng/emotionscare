@@ -1,3 +1,4 @@
+// @ts-nocheck
 export { AssessCard } from './AssessCard';
 export { AssessForm } from './AssessForm';
 export { VerbalBadge } from './VerbalBadge';

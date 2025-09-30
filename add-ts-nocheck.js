@@ -4,9 +4,9 @@
  * Usage: node add-ts-nocheck.js
  */
 
-const fs = require('fs');
-const path = require('path');
-const { glob } = require('glob');
+import fs from 'node:fs';
+import path from 'node:path';
+import { glob } from 'glob';
 
 const legacyDirs = [
   'src/components/ambition/**/*.{ts,tsx}',
