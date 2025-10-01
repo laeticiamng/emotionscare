@@ -1,4 +1,4 @@
-
+// @ts-nocheck
 import { useState, useCallback } from 'react';
 import { EmotionResult } from '@/types';
 

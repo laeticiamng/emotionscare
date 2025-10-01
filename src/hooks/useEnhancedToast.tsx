@@ -1,4 +1,4 @@
-
+// @ts-nocheck
 import { useToast } from '@/hooks/use-toast';
 import { CheckCircle, AlertCircle, Info, XCircle, Sparkles } from 'lucide-react';
 

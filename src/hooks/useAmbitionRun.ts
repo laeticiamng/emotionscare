@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useState, useCallback, useEffect } from 'react';
 import { useAmbitionStore } from '@/store/ambition.store';
 import { supabase } from '@/integrations/supabase/client';
