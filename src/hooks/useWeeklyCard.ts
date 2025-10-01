@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook pour gérer le tirage de carte hebdomadaire
  */

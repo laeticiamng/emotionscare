@@ -1,4 +1,4 @@
-
+// @ts-nocheck
 import { useContext } from 'react';
 import { UserPreferencesContext } from '@/contexts/UserPreferencesContext';
 

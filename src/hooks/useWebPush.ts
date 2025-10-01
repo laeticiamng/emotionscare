@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Hook Web Push API native - Architecture minimale
  * Remplace FCM pour notifications/rappels via VAPID

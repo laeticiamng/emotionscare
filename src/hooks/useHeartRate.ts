@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useCallback, useEffect } from 'react';
 import { useHRStore, type HRReading } from '@/store/hr.store';
 

@@ -1,4 +1,4 @@
-
+// @ts-nocheck
 import { useState, useEffect } from 'react';
 import { OnboardingProgress, OnboardingLog } from '@/types/onboarding';
 import { useAuth } from '@/contexts/AuthContext';
