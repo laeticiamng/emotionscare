@@ -6,6 +6,7 @@ interface FeatureFlags {
   FF_NYVEE: boolean;
   FF_DASHBOARD: boolean;
   FF_COACH: boolean;
+  FF_MUSIC: boolean;
   FF_PREMIUM_SUNO: boolean;
   FF_VR: boolean;
   FF_COMMUNITY: boolean;
@@ -63,6 +64,7 @@ const DEFAULT_FLAGS: FeatureFlags = {
   FF_NYVEE: false,
   FF_DASHBOARD: true,
   FF_COACH: false,
+  FF_MUSIC: true,
   FF_PREMIUM_SUNO: true,
   FF_VR: true,
   FF_COMMUNITY: true,
