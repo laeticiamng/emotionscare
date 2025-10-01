@@ -135,3 +135,32 @@ export const isValidAudioUrl = (url: string): boolean => {
     return false;
   }
 };
+
+// ==================== HELPER ALIASES & ACCESSORS ====================
+
+// Alias pour compatibilité
+export const normalizeTrack = normalizeMusicTrack;
+
+// Obtient la cover d'un track
+export const getTrackCover = (track: MusicTrack | null | undefined): string => {
+  if (!track) return getDefaultCoverUrl();
+  return track.coverUrl || getDefaultCoverUrl(track.emotion);
+};
+
+// Obtient le titre d'un track
+export const getTrackTitle = (track: MusicTrack | null | undefined): string => {
+  if (!track) return 'Aucun titre';
+  return track.title || 'Titre inconnu';
+};
+
+// Obtient l'artiste d'un track
+export const getTrackArtist = (track: MusicTrack | null | undefined): string => {
+  if (!track) return 'Aucun artiste';
+  return track.artist || 'Artiste inconnu';
+};
+
+// Obtient l'URL audio d'un track
+export const getTrackUrl = (track: MusicTrack | null | undefined): string => {
+  if (!track) return '';
+  return track.audioUrl || track.url || '';
+};

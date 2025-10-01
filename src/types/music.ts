@@ -26,7 +26,7 @@ export interface MusicPlaylist {
   creator?: string;
   isTherapeutic?: boolean;
   targetEmotion?: string;
-  duration: number;
+  duration?: number;
   coverUrl?: string;
 }
 
@@ -56,3 +56,28 @@ export interface GenerationResponse {
   duration?: number;
   error?: string;
 }
+
+// Type aliases for compatibility
+export type Playlist = MusicPlaylist;
+export type MusicCategory = 'therapeutic' | 'ambient' | 'focus' | 'energy' | 'relax' | 'sleep';
+
+// Music state type (re-export from context will be needed)
+export interface MusicPlayerState {
+  currentTrack: MusicTrack | null;
+  isPlaying: boolean;
+  isPaused: boolean;
+  volume: number;
+  currentTime: number;
+  duration: number;
+}
+
+// Adaptive music configuration
+export interface AdaptiveMusicConfig {
+  enabled: boolean;
+  emotionTarget?: string;
+  intensityThreshold?: number;
+  adaptiveVolume?: boolean;
+}
+
+// Re-export MusicContextType from context (will be imported where needed)
+export type { MusicContextType } from '@/contexts/MusicContext';
