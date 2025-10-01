@@ -12,7 +12,7 @@ import { cn } from '@/lib/utils';
 
 export function AppLayout() {
   return (
-    <SidebarProvider collapsedWidth={64}>
+    <SidebarProvider>
       <div className="flex min-h-screen w-full bg-background">
         <AppSidebar />
         
