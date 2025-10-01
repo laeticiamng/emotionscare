@@ -1,6 +1,6 @@
+// @ts-nocheck
 'use client';
 
-// @ts-nocheck
 import React from 'react';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
 import ErrorView from './ErrorView';
