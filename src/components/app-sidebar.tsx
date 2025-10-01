@@ -21,7 +21,7 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { routes } from '@/routerV2';
+import { routes } from '@/lib/routes';
 import { 
   Heart, 
   Scan, 
@@ -212,11 +212,9 @@ export function AppSidebar() {
   ];
 
   const getNavClassName = (isActive: boolean) =>
-    `group relative flex items-center rounded-xl px-3 py-3 transition-all duration-300 ${
-      isActive 
-        ? "bg-gradient-to-r from-blue-500/10 to-purple-500/10 text-blue-600 shadow-md border border-blue-200/50" 
-        : "hover:bg-slate-100/80 text-slate-600 hover:text-slate-900"
-    }`;
+    isActive 
+      ? "bg-gradient-to-r from-blue-500/10 to-purple-500/10 text-blue-600 shadow-md border border-blue-200/50" 
+      : "hover:bg-slate-100/80 text-slate-600 hover:text-slate-900";
 
   return (
     <Sidebar
@@ -280,7 +278,7 @@ export function AppSidebar() {
                         <SidebarMenuButton asChild>
                           <NavLink 
                             to={item.url} 
-                            className={getNavClassName(isItemActive)}
+                            className={`group relative flex items-center rounded-xl px-3 py-3 transition-all duration-300 ${getNavClassName(isItemActive)}`}
                           >
                             {/* Icon avec gradient si défini */}
                             <div className={`flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg ${
