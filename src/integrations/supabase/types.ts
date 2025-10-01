@@ -446,12 +446,58 @@ export type Database = {
         }
         Relationships: []
       }
+      assessment_sessions: {
+        Row: {
+          answers: Json | null
+          completed_at: string | null
+          context: Json | null
+          created_at: string
+          duration_seconds: number | null
+          id: string
+          instrument: string
+          locale: string
+          metadata: Json | null
+          started_at: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          answers?: Json | null
+          completed_at?: string | null
+          context?: Json | null
+          created_at?: string
+          duration_seconds?: number | null
+          id?: string
+          instrument: string
+          locale?: string
+          metadata?: Json | null
+          started_at?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          answers?: Json | null
+          completed_at?: string | null
+          context?: Json | null
+          created_at?: string
+          duration_seconds?: number | null
+          id?: string
+          instrument?: string
+          locale?: string
+          metadata?: Json | null
+          started_at?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       assessments: {
         Row: {
           created_at: string
           id: string
           instrument: string
           score_json: Json
+          submitted_at: string | null
           ts: string
           user_id: string
         }
@@ -460,6 +506,7 @@ export type Database = {
           id?: string
           instrument: string
           score_json: Json
+          submitted_at?: string | null
           ts?: string
           user_id: string
         }
@@ -468,6 +515,7 @@ export type Database = {
           id?: string
           instrument?: string
           score_json?: Json
+          submitted_at?: string | null
           ts?: string
           user_id?: string
         }
@@ -2899,6 +2947,33 @@ export type Database = {
         }
         Relationships: []
       }
+      emotional_scan_results: {
+        Row: {
+          confidence_score: number | null
+          created_at: string | null
+          emotions_detected: Json
+          id: string
+          scan_data: Json
+          user_id: string
+        }
+        Insert: {
+          confidence_score?: number | null
+          created_at?: string | null
+          emotions_detected?: Json
+          id?: string
+          scan_data?: Json
+          user_id: string
+        }
+        Update: {
+          confidence_score?: number | null
+          created_at?: string | null
+          emotions_detected?: Json
+          id?: string
+          scan_data?: Json
+          user_id?: string
+        }
+        Relationships: []
+      }
       emotions: {
         Row: {
           ai_feedback: string | null
@@ -3913,6 +3988,30 @@ export type Database = {
         }
         Relationships: []
       }
+      implicit_tracking: {
+        Row: {
+          created_at: string | null
+          event_data: Json
+          event_type: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          event_data?: Json
+          event_type: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          event_data?: Json
+          event_type?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       import_batches: {
         Row: {
           completed_at: string | null
@@ -4408,6 +4507,7 @@ export type Database = {
           id: string
           is_precious: boolean | null
           tags: string[] | null
+          text_content: string | null
           updated_at: string | null
           user_id: string
         }
@@ -4422,6 +4522,7 @@ export type Database = {
           id?: string
           is_precious?: boolean | null
           tags?: string[] | null
+          text_content?: string | null
           updated_at?: string | null
           user_id: string
         }
@@ -4436,6 +4537,7 @@ export type Database = {
           id?: string
           is_precious?: boolean | null
           tags?: string[] | null
+          text_content?: string | null
           updated_at?: string | null
           user_id?: string
         }
@@ -4541,6 +4643,53 @@ export type Database = {
             columns: ["previous_version_id"]
             isOneToOne: false
             referencedRelation: "lyrics_texts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      manager_actions: {
+        Row: {
+          action_description: string
+          action_type: string
+          completed: boolean | null
+          completed_at: string | null
+          created_at: string | null
+          id: string
+          manager_id: string
+          org_id: string
+          scheduled_at: string | null
+          team_name: string
+        }
+        Insert: {
+          action_description: string
+          action_type: string
+          completed?: boolean | null
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          manager_id: string
+          org_id: string
+          scheduled_at?: string | null
+          team_name: string
+        }
+        Update: {
+          action_description?: string
+          action_type?: string
+          completed?: boolean | null
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          manager_id?: string
+          org_id?: string
+          scheduled_at?: string | null
+          team_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "manager_actions_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
             referencedColumns: ["id"]
           },
         ]
@@ -6349,6 +6498,33 @@ export type Database = {
         }
         Relationships: []
       }
+      nyvee_sessions: {
+        Row: {
+          assessment_results: Json | null
+          completed_at: string | null
+          created_at: string | null
+          id: string
+          session_data: Json
+          user_id: string
+        }
+        Insert: {
+          assessment_results?: Json | null
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          session_data?: Json
+          user_id: string
+        }
+        Update: {
+          assessment_results?: Json | null
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          session_data?: Json
+          user_id?: string
+        }
+        Relationships: []
+      }
       official_content_cache: {
         Row: {
           content: string
@@ -6810,6 +6986,36 @@ export type Database = {
         }
         Relationships: []
       }
+      orgs: {
+        Row: {
+          created_at: string | null
+          id: string
+          logo_url: string | null
+          name: string
+          settings: Json | null
+          subscription_plan: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          logo_url?: string | null
+          name: string
+          settings?: Json | null
+          subscription_plan?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          logo_url?: string | null
+          name?: string
+          settings?: Json | null
+          subscription_plan?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       page_analytics: {
         Row: {
           id: string
@@ -7180,11 +7386,14 @@ export type Database = {
           job_title: string | null
           location: string | null
           name: string | null
+          org_id: string | null
           phone: string | null
           preferences: Json | null
           role: string | null
           subscription_plan: string | null
+          team_id: string | null
           updated_at: string | null
+          user_role: Database["public"]["Enums"]["app_user_role"] | null
           website: string | null
         }
         Insert: {
@@ -7200,11 +7409,14 @@ export type Database = {
           job_title?: string | null
           location?: string | null
           name?: string | null
+          org_id?: string | null
           phone?: string | null
           preferences?: Json | null
           role?: string | null
           subscription_plan?: string | null
+          team_id?: string | null
           updated_at?: string | null
+          user_role?: Database["public"]["Enums"]["app_user_role"] | null
           website?: string | null
         }
         Update: {
@@ -7220,14 +7432,32 @@ export type Database = {
           job_title?: string | null
           location?: string | null
           name?: string | null
+          org_id?: string | null
           phone?: string | null
           preferences?: Json | null
           role?: string | null
           subscription_plan?: string | null
+          team_id?: string | null
           updated_at?: string | null
+          user_role?: Database["public"]["Enums"]["app_user_role"] | null
           website?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profiles_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       push_subscriptions: {
         Row: {
@@ -7555,6 +7785,66 @@ export type Database = {
           last_updated?: string | null
           page_name?: string
           route_path?: string
+        }
+        Relationships: []
+      }
+      screen_silk_sessions: {
+        Row: {
+          badge: string | null
+          created_at: string | null
+          duration_seconds: number | null
+          hints: Json | null
+          id: string
+          session_id: string
+          user_id: string
+        }
+        Insert: {
+          badge?: string | null
+          created_at?: string | null
+          duration_seconds?: number | null
+          hints?: Json | null
+          id?: string
+          session_id: string
+          user_id: string
+        }
+        Update: {
+          badge?: string | null
+          created_at?: string | null
+          duration_seconds?: number | null
+          hints?: Json | null
+          id?: string
+          session_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      screen_silk_textures: {
+        Row: {
+          asset_url: string | null
+          id: string
+          name: string
+          rarity: string | null
+          texture_id: string
+          unlocked_at: string | null
+          user_id: string
+        }
+        Insert: {
+          asset_url?: string | null
+          id?: string
+          name: string
+          rarity?: string | null
+          texture_id: string
+          unlocked_at?: string | null
+          user_id: string
+        }
+        Update: {
+          asset_url?: string | null
+          id?: string
+          name?: string
+          rarity?: string | null
+          texture_id?: string
+          unlocked_at?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -8157,6 +8447,88 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      team_assessments: {
+        Row: {
+          can_show: boolean
+          color_mood: string | null
+          created_at: string | null
+          hints: Json
+          id: string
+          org_id: string
+          period_end: string
+          period_start: string
+          phrases: Json
+          response_count: number
+          team_name: string
+          updated_at: string | null
+        }
+        Insert: {
+          can_show?: boolean
+          color_mood?: string | null
+          created_at?: string | null
+          hints?: Json
+          id?: string
+          org_id: string
+          period_end: string
+          period_start: string
+          phrases?: Json
+          response_count?: number
+          team_name: string
+          updated_at?: string | null
+        }
+        Update: {
+          can_show?: boolean
+          color_mood?: string | null
+          created_at?: string | null
+          hints?: Json
+          id?: string
+          org_id?: string
+          period_end?: string
+          period_start?: string
+          phrases?: Json
+          response_count?: number
+          team_name?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_assessments_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      teams: {
+        Row: {
+          created_at: string | null
+          id: string
+          name: string
+          org_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          name: string
+          org_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          name?: string
+          org_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "teams_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "orgs"
             referencedColumns: ["id"]
           },
         ]
@@ -9354,6 +9726,81 @@ export type Database = {
         }
         Relationships: []
       }
+      user_settings: {
+        Row: {
+          consent_anonymous_aggregation: boolean | null
+          consent_cbi: boolean | null
+          consent_cvsq: boolean | null
+          consent_panas: boolean | null
+          consent_swemwbs: boolean | null
+          consent_uwes: boolean | null
+          consent_who5: boolean | null
+          created_at: string | null
+          haptics_enabled: boolean | null
+          high_contrast: boolean | null
+          id: string
+          journal_reminders: boolean | null
+          low_stim_mode: boolean | null
+          nyvee_reminders: boolean | null
+          onboarding_completed: boolean | null
+          onboarding_step: number | null
+          reminder_frequency: string | null
+          screen_silk_reminders: boolean | null
+          theme_palette: string | null
+          tts_enabled: boolean | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          consent_anonymous_aggregation?: boolean | null
+          consent_cbi?: boolean | null
+          consent_cvsq?: boolean | null
+          consent_panas?: boolean | null
+          consent_swemwbs?: boolean | null
+          consent_uwes?: boolean | null
+          consent_who5?: boolean | null
+          created_at?: string | null
+          haptics_enabled?: boolean | null
+          high_contrast?: boolean | null
+          id?: string
+          journal_reminders?: boolean | null
+          low_stim_mode?: boolean | null
+          nyvee_reminders?: boolean | null
+          onboarding_completed?: boolean | null
+          onboarding_step?: number | null
+          reminder_frequency?: string | null
+          screen_silk_reminders?: boolean | null
+          theme_palette?: string | null
+          tts_enabled?: boolean | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          consent_anonymous_aggregation?: boolean | null
+          consent_cbi?: boolean | null
+          consent_cvsq?: boolean | null
+          consent_panas?: boolean | null
+          consent_swemwbs?: boolean | null
+          consent_uwes?: boolean | null
+          consent_who5?: boolean | null
+          created_at?: string | null
+          haptics_enabled?: boolean | null
+          high_contrast?: boolean | null
+          id?: string
+          journal_reminders?: boolean | null
+          low_stim_mode?: boolean | null
+          nyvee_reminders?: boolean | null
+          onboarding_completed?: boolean | null
+          onboarding_step?: number | null
+          reminder_frequency?: string | null
+          screen_silk_reminders?: boolean | null
+          theme_palette?: string | null
+          tts_enabled?: boolean | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_stats: {
         Row: {
           completed_challenges: number | null
@@ -9568,6 +10015,69 @@ export type Database = {
           },
         ]
       }
+      weekly_garden: {
+        Row: {
+          created_at: string | null
+          id: string
+          plant_state: Json | null
+          rarity: number | null
+          sky_state: Json | null
+          user_id: string
+          week_iso: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          plant_state?: Json | null
+          rarity?: number | null
+          sky_state?: Json | null
+          user_id: string
+          week_iso: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          plant_state?: Json | null
+          rarity?: number | null
+          sky_state?: Json | null
+          user_id?: string
+          week_iso?: string
+        }
+        Relationships: []
+      }
+      weekly_summary: {
+        Row: {
+          created_at: string | null
+          helps: string[] | null
+          hints: Json | null
+          id: string
+          season: string | null
+          user_id: string
+          verbal_week: string[] | null
+          week_iso: string
+        }
+        Insert: {
+          created_at?: string | null
+          helps?: string[] | null
+          hints?: Json | null
+          id?: string
+          season?: string | null
+          user_id: string
+          verbal_week?: string[] | null
+          week_iso: string
+        }
+        Update: {
+          created_at?: string | null
+          helps?: string[] | null
+          hints?: Json | null
+          id?: string
+          season?: string | null
+          user_id?: string
+          verbal_week?: string[] | null
+          week_iso?: string
+        }
+        Relationships: []
+      }
       who5_assessments: {
         Row: {
           completed: boolean | null
@@ -9607,8 +10117,8 @@ export type Database = {
     }
     Functions: {
       accept_invitation: {
-        Args: { token_param: string }
-        Returns: boolean
+        Args: { invitation_token: string }
+        Returns: Json
       }
       audit_and_correct_edn_content: {
         Args: Record<PropertyKey, never>
@@ -9716,6 +10226,10 @@ export type Database = {
         Returns: Json
       }
       cleanup_expired_clinical_data: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
+      cleanup_expired_invitations: {
         Args: Record<PropertyKey, never>
         Returns: number
       }
@@ -10315,6 +10829,10 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_user_app_role: {
+        Args: Record<PropertyKey, never>
+        Returns: Database["public"]["Enums"]["app_user_role"]
+      }
       get_user_ia_stats: {
         Args: { p_period_days?: number }
         Returns: Json
@@ -10349,11 +10867,8 @@ export type Database = {
       get_user_subscription: {
         Args: { user_uuid: string }
         Returns: {
-          features: Json
           monthly_quota: number
-          plan_id: string
           plan_name: string
-          status: string
         }[]
       }
       increment_aura_interaction: {
@@ -10397,6 +10912,10 @@ export type Database = {
       }
       is_admin: {
         Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
+      is_manager_of_org: {
+        Args: { p_org_id: string }
         Returns: boolean
       }
       log_admin_change: {
@@ -10879,6 +11398,7 @@ export type Database = {
       }
     }
     Enums: {
+      app_user_role: "user_b2c" | "user_b2b" | "manager_b2b" | "admin"
       invitation_status: "pending" | "accepted" | "expired"
     }
     CompositeTypes: {
@@ -11007,6 +11527,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      app_user_role: ["user_b2c", "user_b2b", "manager_b2b", "admin"],
       invitation_status: ["pending", "accepted", "expired"],
     },
   },
