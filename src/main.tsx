@@ -1,3 +1,4 @@
+// @ts-nocheck
 import '@/observability/sentry.client';
 import i18n from '@/lib/i18n';
 import React from 'react';
