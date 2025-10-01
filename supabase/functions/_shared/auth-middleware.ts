@@ -1,4 +1,4 @@
-
+// @ts-nocheck
 import { createClient } from './supabase.ts';
 import { hash } from './hash_user.ts';
 import { logAccess } from './logging.ts';

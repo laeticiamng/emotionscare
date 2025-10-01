@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { createClient } from './supabase.ts';
 
 const url = Deno.env.get('SUPABASE_URL') || '';

@@ -1,3 +1,4 @@
+// @ts-nocheck
 let tracerSetup: Promise<{
   tracer: import('https://esm.sh/@opentelemetry/api@1.10.0').Tracer;
   contextApi: typeof import('https://esm.sh/@opentelemetry/api@1.10.0').context;

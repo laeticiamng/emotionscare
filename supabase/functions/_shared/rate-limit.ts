@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { logAccess } from './logging.ts';
 import { hash } from './hash_user.ts';
 

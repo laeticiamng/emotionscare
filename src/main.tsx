@@ -9,7 +9,7 @@ import './styles/accessibility.css';
 import './theme/theme.css';
 import { Loader2 } from 'lucide-react';
 import AccessibilitySkipLinks from '@/components/AccessibilitySkipLinks';
-import RootErrorBoundary from '@/app/RootErrorBoundary';
+import RootErrorBoundary from '@/components/error/RootErrorBoundary';
 import { RootProvider } from '@/providers';
 import { router } from '@/routerV2/router';
 
