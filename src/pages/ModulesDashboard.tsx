@@ -1,9 +1,10 @@
 // @ts-nocheck
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
   Brain,
   Music,
@@ -23,8 +24,18 @@ import {
   Heart,
   Activity,
   TrendingUp,
+  Search,
+  Filter,
+  Star,
 } from 'lucide-react';
 import { routes } from '@/lib/routes';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 interface Module {
   title: string;
@@ -34,6 +45,7 @@ interface Module {
   category: string;
   status: 'active' | 'beta' | 'coming-soon';
   color: string;
+  featured?: boolean;
 }
 
 const modules: Module[] = [
@@ -46,6 +58,7 @@ const modules: Module[] = [
     category: 'Core',
     status: 'active',
     color: 'from-blue-500 to-cyan-500',
+    featured: true,
   },
   {
     title: 'Musique Adaptative',
@@ -55,6 +68,7 @@ const modules: Module[] = [
     category: 'Core',
     status: 'active',
     color: 'from-purple-500 to-pink-500',
+    featured: true,
   },
   {
     title: 'AI Coach',
@@ -64,6 +78,7 @@ const modules: Module[] = [
     category: 'Core',
     status: 'active',
     color: 'from-green-500 to-emerald-500',
+    featured: true,
   },
   {
     title: 'Journal Émotionnel',
@@ -219,6 +234,34 @@ const categories = [
 ];
 
 export default function ModulesDashboard() {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedStatus, setSelectedStatus] = useState<string>('all');
+
+  // Filtrer les modules
+  const filteredModules = useMemo(() => {
+    return modules.filter(module => {
+      const matchesSearch = module.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          module.description.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesCategory = selectedCategory === 'all' || module.category === selectedCategory;
+      const matchesStatus = selectedStatus === 'all' || module.status === selectedStatus;
+      
+      return matchesSearch && matchesCategory && matchesStatus;
+    });
+  }, [searchQuery, selectedCategory, selectedStatus]);
+
+  // Grouper par catégorie
+  const modulesByCategory = useMemo(() => {
+    const grouped: Record<string, Module[]> = {};
+    filteredModules.forEach(module => {
+      if (!grouped[module.category]) {
+        grouped[module.category] = [];
+      }
+      grouped[module.category].push(module);
+    });
+    return grouped;
+  }, [filteredModules]);
+
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'active':
@@ -235,83 +278,196 @@ export default function ModulesDashboard() {
   return (
     <div className="space-y-8 pb-20">
       {/* Header */}
-      <div className="space-y-2">
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-          Tous les Modules
-        </h1>
-        <p className="text-muted-foreground text-lg">
-          Explorez tous les modules de la plateforme EmotionsCare
-        </p>
+      <div className="space-y-4">
+        <div className="flex items-start justify-between">
+          <div className="space-y-2">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+              Tous les Modules
+            </h1>
+            <p className="text-muted-foreground text-lg">
+              Explorez tous les modules de la plateforme EmotionsCare
+            </p>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <Badge variant="outline" className="text-sm">
+              {filteredModules.length} modules
+            </Badge>
+          </div>
+        </div>
+
+        {/* Filtres et recherche */}
+        <div className="flex flex-col md:flex-row gap-4">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Rechercher un module..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+          
+          <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+            <SelectTrigger className="w-full md:w-48">
+              <Filter className="h-4 w-4 mr-2" />
+              <SelectValue placeholder="Catégorie" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Toutes les catégories</SelectItem>
+              {categories.map(cat => (
+                <SelectItem key={cat.name} value={cat.name}>{cat.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+            <SelectTrigger className="w-full md:w-48">
+              <SelectValue placeholder="Statut" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Tous les statuts</SelectItem>
+              <SelectItem value="active">Actif</SelectItem>
+              <SelectItem value="beta">Beta</SelectItem>
+              <SelectItem value="coming-soon">Bientôt</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
+
+      {/* Modules mis en avant */}
+      {selectedCategory === 'all' && selectedStatus === 'all' && !searchQuery && (
+        <div className="space-y-4">
+          <h2 className="text-2xl font-bold flex items-center gap-2">
+            <Star className="h-6 w-6 text-yellow-500 fill-yellow-500" />
+            Modules mis en avant
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {modules.filter(m => m.featured).map((module) => {
+              const Icon = module.icon;
+              return (
+                <Card 
+                  key={module.title} 
+                  className="group hover:shadow-xl transition-all duration-300 border-2 border-primary/20 hover:border-primary/50 bg-gradient-to-br from-background to-primary/5"
+                >
+                  <CardHeader>
+                    <div className="flex items-start justify-between">
+                      <div className={`p-3 rounded-lg bg-gradient-to-br ${module.color} text-white group-hover:scale-110 transition-transform shadow-lg`}>
+                        <Icon className="h-7 w-7" />
+                      </div>
+                      {getStatusBadge(module.status)}
+                    </div>
+                    <CardTitle className="text-xl mt-4">{module.title}</CardTitle>
+                    <CardDescription>{module.description}</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Link to={module.url}>
+                      <Button 
+                        className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors"
+                        variant="outline"
+                      >
+                        Accéder au module
+                      </Button>
+                    </Link>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Categories Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
-        {categories.map((cat) => (
-          <Card key={cat.name} className="border-2">
-            <CardHeader className="pb-3">
-              <div className={`w-3 h-3 rounded-full ${cat.color} mb-2`} />
-              <CardTitle className="text-sm">{cat.name}</CardTitle>
-              <CardDescription className="text-xs">{cat.description}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold">
-                {modules.filter(m => m.category === cat.name).length}
-              </p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      {selectedCategory === 'all' && selectedStatus === 'all' && !searchQuery && (
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+          {categories.map((cat) => (
+            <Card key={cat.name} className="border-2 hover:border-primary/50 transition-colors cursor-pointer" onClick={() => setSelectedCategory(cat.name)}>
+              <CardHeader className="pb-3">
+                <div className={`w-3 h-3 rounded-full ${cat.color} mb-2`} />
+                <CardTitle className="text-sm">{cat.name}</CardTitle>
+                <CardDescription className="text-xs">{cat.description}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-2xl font-bold">
+                  {modules.filter(m => m.category === cat.name).length}
+                </p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
 
-      {/* Modules by Category */}
-      {categories.map((category) => {
-        const categoryModules = modules.filter(m => m.category === category.name);
-        
-        return (
-          <div key={category.name} className="space-y-4">
-            <div className="flex items-center gap-3">
-              <div className={`w-2 h-8 rounded ${category.color}`} />
-              <h2 className="text-2xl font-bold">{category.name}</h2>
-              <Badge variant="outline" className="ml-auto">
-                {categoryModules.length} modules
-              </Badge>
-            </div>
+      {/* Modules par catégorie */}
+      {Object.keys(modulesByCategory).length === 0 ? (
+        <Card className="p-12 text-center">
+          <p className="text-muted-foreground text-lg">
+            Aucun module ne correspond à vos critères de recherche
+          </p>
+          <Button
+            variant="outline"
+            className="mt-4"
+            onClick={() => {
+              setSearchQuery('');
+              setSelectedCategory('all');
+              setSelectedStatus('all');
+            }}
+          >
+            Réinitialiser les filtres
+          </Button>
+        </Card>
+      ) : (
+        categories
+          .filter(category => modulesByCategory[category.name])
+          .map((category) => {
+            const categoryModules = modulesByCategory[category.name];
+            
+            return (
+              <div key={category.name} className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className={`w-2 h-8 rounded ${category.color}`} />
+                  <h2 className="text-2xl font-bold">{category.name}</h2>
+                  <Badge variant="outline" className="ml-auto">
+                    {categoryModules.length} modules
+                  </Badge>
+                </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {categoryModules.map((module) => {
-                const Icon = module.icon;
-                
-                return (
-                  <Card 
-                    key={module.title} 
-                    className="group hover:shadow-lg transition-all duration-300 border-2 hover:border-primary/50"
-                  >
-                    <CardHeader>
-                      <div className="flex items-start justify-between">
-                        <div className={`p-3 rounded-lg bg-gradient-to-br ${module.color} text-white group-hover:scale-110 transition-transform`}>
-                          <Icon className="h-6 w-6" />
-                        </div>
-                        {getStatusBadge(module.status)}
-                      </div>
-                      <CardTitle className="text-xl">{module.title}</CardTitle>
-                      <CardDescription>{module.description}</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <Link to={module.url}>
-                        <Button 
-                          className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors"
-                          variant="outline"
-                        >
-                          Accéder au module
-                        </Button>
-                      </Link>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
-          </div>
-        );
-      })}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {categoryModules.map((module) => {
+                    const Icon = module.icon;
+                    
+                    return (
+                      <Card 
+                        key={module.title} 
+                        className="group hover:shadow-lg transition-all duration-300 border-2 hover:border-primary/50"
+                      >
+                        <CardHeader>
+                          <div className="flex items-start justify-between">
+                            <div className={`p-3 rounded-lg bg-gradient-to-br ${module.color} text-white group-hover:scale-110 transition-transform`}>
+                              <Icon className="h-6 w-6" />
+                            </div>
+                            {getStatusBadge(module.status)}
+                          </div>
+                          <CardTitle className="text-xl">{module.title}</CardTitle>
+                          <CardDescription>{module.description}</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <Link to={module.url}>
+                            <Button 
+                              className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors"
+                              variant="outline"
+                            >
+                              Accéder au module
+                            </Button>
+                          </Link>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })
+      )}
 
       {/* Stats Summary */}
       <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
