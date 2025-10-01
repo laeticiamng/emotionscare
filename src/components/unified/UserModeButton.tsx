@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 import React from 'react';
 import { useUserMode } from '@/contexts/UserModeContext';

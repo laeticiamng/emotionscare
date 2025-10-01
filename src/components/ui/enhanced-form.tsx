@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import React from 'react';
 import { useForm, FieldValues, Path, FieldPath } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';

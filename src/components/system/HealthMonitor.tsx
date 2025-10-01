@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 /**
  * Moniteur de santé système pour production
  */

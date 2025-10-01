@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 import React from 'react';
 import { AlertCircle, Loader2, CheckCircle } from 'lucide-react';

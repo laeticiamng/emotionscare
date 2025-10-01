@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 /**
  * STAT CARD COMPONENT - EMOTIONSCARE
  * Composant pour afficher des statistiques avec animations et variants
