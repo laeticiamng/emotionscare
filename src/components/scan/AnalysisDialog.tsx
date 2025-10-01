@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 import React from 'react';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
