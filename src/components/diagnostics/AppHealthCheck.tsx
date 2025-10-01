@@ -1,6 +1,5 @@
 // @ts-nocheck
 
-// @ts-nocheck
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckCircle, XCircle, AlertCircle } from 'lucide-react';
