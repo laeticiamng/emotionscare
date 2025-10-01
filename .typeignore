@@ -1,0 +1,4 @@
+supabase/functions/**
+supabase/tests/**
+*.edge.test.ts
+*.test.ts
