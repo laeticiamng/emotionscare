@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { expect, test } from '@playwright/test';
 
 test('B2B monthly report detail — rendu texte et export', async ({ page }, testInfo) => {

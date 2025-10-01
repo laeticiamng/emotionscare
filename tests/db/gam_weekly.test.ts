@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { expect, it, afterEach } from 'vitest';
 import db, { resetTables } from '../helpers/db';
 

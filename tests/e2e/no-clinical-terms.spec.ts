@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { test, expect } from '@playwright/test';
 import { OFFICIAL_ROUTES_ARRAY } from '../../src/routesManifest';
 

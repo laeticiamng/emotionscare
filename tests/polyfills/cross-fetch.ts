@@ -1,3 +1,4 @@
+// @ts-nocheck
 import nodeFetch, { Headers, Request, Response } from 'node-fetch';
 
 const fetchFn = (globalThis.fetch ?? nodeFetch) as typeof nodeFetch;

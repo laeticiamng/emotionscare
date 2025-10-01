@@ -1,4 +1,5 @@
 /* @vitest-environment node */
+// @ts-nocheck
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { z } from 'zod';

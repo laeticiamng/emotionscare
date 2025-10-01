@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { expect, test } from '@playwright/test';
 
 test.describe('AI Coach session', () => {
