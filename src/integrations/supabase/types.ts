@@ -1,4 +1,3 @@
-// @ts-nocheck
 export type Json =
   | string
   | number
@@ -137,6 +136,38 @@ export type Database = {
           table_name?: string
         }
         Relationships: []
+      }
+      ai_chat_messages: {
+        Row: {
+          content: string
+          conversation_id: string
+          created_at: string | null
+          id: string
+          role: string
+        }
+        Insert: {
+          content: string
+          conversation_id: string
+          created_at?: string | null
+          id?: string
+          role: string
+        }
+        Update: {
+          content?: string
+          conversation_id?: string
+          created_at?: string | null
+          id?: string
+          role?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_chat_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "chat_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       ai_coach_sessions: {
         Row: {
@@ -634,6 +665,75 @@ export type Database = {
           recommendations?: Json | null
           report_type?: string
           status?: string
+        }
+        Relationships: []
+      }
+      aura_connections: {
+        Row: {
+          connection_strength: number
+          created_at: string | null
+          id: string
+          interaction_types: Json | null
+          last_interaction_at: string | null
+          user_id_a: string
+          user_id_b: string
+        }
+        Insert: {
+          connection_strength?: number
+          created_at?: string | null
+          id?: string
+          interaction_types?: Json | null
+          last_interaction_at?: string | null
+          user_id_a: string
+          user_id_b: string
+        }
+        Update: {
+          connection_strength?: number
+          created_at?: string | null
+          id?: string
+          interaction_types?: Json | null
+          last_interaction_at?: string | null
+          user_id_a?: string
+          user_id_b?: string
+        }
+        Relationships: []
+      }
+      aura_history: {
+        Row: {
+          color_hue: number
+          created_at: string | null
+          id: string
+          luminosity: number
+          size_scale: number
+          snapshot_data: Json | null
+          user_id: string
+          week_end: string
+          week_start: string
+          who5_badge: string | null
+        }
+        Insert: {
+          color_hue: number
+          created_at?: string | null
+          id?: string
+          luminosity: number
+          size_scale: number
+          snapshot_data?: Json | null
+          user_id: string
+          week_end: string
+          week_start: string
+          who5_badge?: string | null
+        }
+        Update: {
+          color_hue?: number
+          created_at?: string | null
+          id?: string
+          luminosity?: number
+          size_scale?: number
+          snapshot_data?: Json | null
+          user_id?: string
+          week_end?: string
+          week_start?: string
+          who5_badge?: string | null
         }
         Relationships: []
       }
@@ -1430,6 +1530,42 @@ export type Database = {
           },
         ]
       }
+      coach_sessions: {
+        Row: {
+          aaq_score: number | null
+          completed_at: string | null
+          created_at: string
+          flexibility_level: string | null
+          id: string
+          session_duration: number | null
+          thoughts_collected: number | null
+          thoughts_shown: Json | null
+          user_id: string
+        }
+        Insert: {
+          aaq_score?: number | null
+          completed_at?: string | null
+          created_at?: string
+          flexibility_level?: string | null
+          id?: string
+          session_duration?: number | null
+          thoughts_collected?: number | null
+          thoughts_shown?: Json | null
+          user_id: string
+        }
+        Update: {
+          aaq_score?: number | null
+          completed_at?: string | null
+          created_at?: string
+          flexibility_level?: string | null
+          id?: string
+          session_duration?: number | null
+          thoughts_collected?: number | null
+          thoughts_shown?: Json | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       cocon_content: {
         Row: {
           content: string
@@ -1500,6 +1636,258 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      community_badges: {
+        Row: {
+          badge_type: string
+          earned_at: string | null
+          id: string
+          metadata: Json | null
+          user_id: string
+        }
+        Insert: {
+          badge_type: string
+          earned_at?: string | null
+          id?: string
+          metadata?: Json | null
+          user_id: string
+        }
+        Update: {
+          badge_type?: string
+          earned_at?: string | null
+          id?: string
+          metadata?: Json | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      community_comments: {
+        Row: {
+          author_id: string
+          content: string
+          created_at: string | null
+          id: string
+          is_empathy_template: boolean | null
+          likes_count: number | null
+          post_id: string
+        }
+        Insert: {
+          author_id: string
+          content: string
+          created_at?: string | null
+          id?: string
+          is_empathy_template?: boolean | null
+          likes_count?: number | null
+          post_id: string
+        }
+        Update: {
+          author_id?: string
+          content?: string
+          created_at?: string | null
+          id?: string
+          is_empathy_template?: boolean | null
+          likes_count?: number | null
+          post_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "community_comments_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "community_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      community_groups: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          icon: string | null
+          id: string
+          is_private: boolean | null
+          member_count: number | null
+          name: string
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_private?: boolean | null
+          member_count?: number | null
+          name: string
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_private?: boolean | null
+          member_count?: number | null
+          name?: string
+        }
+        Relationships: []
+      }
+      community_house_state: {
+        Row: {
+          acts_of_care: number
+          created_at: string | null
+          id: string
+          last_activity_at: string | null
+          light_intensity: number
+          user_id: string
+        }
+        Insert: {
+          acts_of_care?: number
+          created_at?: string | null
+          id?: string
+          last_activity_at?: string | null
+          light_intensity?: number
+          user_id: string
+        }
+        Update: {
+          acts_of_care?: number
+          created_at?: string | null
+          id?: string
+          last_activity_at?: string | null
+          light_intensity?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      community_posts: {
+        Row: {
+          author_id: string
+          comments_count: number | null
+          content: string
+          created_at: string | null
+          group_id: string | null
+          has_empathy_response: boolean | null
+          id: string
+          likes_count: number | null
+          mood_halo: string | null
+          reply_count: number | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          author_id: string
+          comments_count?: number | null
+          content: string
+          created_at?: string | null
+          group_id?: string | null
+          has_empathy_response?: boolean | null
+          id?: string
+          likes_count?: number | null
+          mood_halo?: string | null
+          reply_count?: number | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          author_id?: string
+          comments_count?: number | null
+          content?: string
+          created_at?: string | null
+          group_id?: string | null
+          has_empathy_response?: boolean | null
+          id?: string
+          likes_count?: number | null
+          mood_halo?: string | null
+          reply_count?: number | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "community_posts_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "community_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      community_room_members: {
+        Row: {
+          badges_earned: string[] | null
+          id: string
+          joined_at: string | null
+          left_at: string | null
+          room_id: string
+          user_id: string
+        }
+        Insert: {
+          badges_earned?: string[] | null
+          id?: string
+          joined_at?: string | null
+          left_at?: string | null
+          room_id: string
+          user_id: string
+        }
+        Update: {
+          badges_earned?: string[] | null
+          id?: string
+          joined_at?: string | null
+          left_at?: string | null
+          room_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "community_room_members_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "community_rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      community_rooms: {
+        Row: {
+          capacity: number | null
+          created_at: string | null
+          created_by: string | null
+          current_participants: number | null
+          ended_at: string | null
+          id: string
+          name: string
+          ritual_stage: string | null
+          scheduled_at: string | null
+          started_at: string | null
+          status: string | null
+        }
+        Insert: {
+          capacity?: number | null
+          created_at?: string | null
+          created_by?: string | null
+          current_participants?: number | null
+          ended_at?: string | null
+          id?: string
+          name: string
+          ritual_stage?: string | null
+          scheduled_at?: string | null
+          started_at?: string | null
+          status?: string | null
+        }
+        Update: {
+          capacity?: number | null
+          created_at?: string | null
+          created_by?: string | null
+          current_participants?: number | null
+          ended_at?: string | null
+          id?: string
+          name?: string
+          ritual_stage?: string | null
+          scheduled_at?: string | null
+          started_at?: string | null
+          status?: string | null
+        }
+        Relationships: []
       }
       completeness_alerts: {
         Row: {
@@ -2391,6 +2779,60 @@ export type Database = {
         }
         Relationships: []
       }
+      emotion_cards: {
+        Row: {
+          animation_config: Json | null
+          code: string
+          color_primary: string
+          color_secondary: string
+          created_at: string | null
+          description: string | null
+          icon_name: string
+          id: string
+          mantra: string
+          mantra_emoji: string
+          rarity: string
+          sound_url: string | null
+          unlock_rewards: Json | null
+          who5_range_max: number
+          who5_range_min: number
+        }
+        Insert: {
+          animation_config?: Json | null
+          code: string
+          color_primary: string
+          color_secondary: string
+          created_at?: string | null
+          description?: string | null
+          icon_name: string
+          id?: string
+          mantra: string
+          mantra_emoji: string
+          rarity?: string
+          sound_url?: string | null
+          unlock_rewards?: Json | null
+          who5_range_max: number
+          who5_range_min: number
+        }
+        Update: {
+          animation_config?: Json | null
+          code?: string
+          color_primary?: string
+          color_secondary?: string
+          created_at?: string | null
+          description?: string | null
+          icon_name?: string
+          id?: string
+          mantra?: string
+          mantra_emoji?: string
+          rarity?: string
+          sound_url?: string | null
+          unlock_rewards?: Json | null
+          who5_range_max?: number
+          who5_range_min?: number
+        }
+        Relationships: []
+      }
       emotion_metrics: {
         Row: {
           confidence_score: number | null
@@ -2832,6 +3274,33 @@ export type Database = {
           offer?: Json
           room_id?: string
           to_peer_id?: string
+        }
+        Relationships: []
+      }
+      empathy_templates: {
+        Row: {
+          category: string | null
+          created_at: string | null
+          emoji: string | null
+          id: string
+          text_en: string
+          text_fr: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string | null
+          emoji?: string | null
+          id?: string
+          text_en: string
+          text_fr: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string | null
+          emoji?: string | null
+          id?: string
+          text_en?: string
+          text_fr?: string
         }
         Relationships: []
       }
@@ -3318,6 +3787,38 @@ export type Database = {
           webhook_token?: string
         }
         Relationships: []
+      }
+      group_memberships: {
+        Row: {
+          group_id: string
+          id: string
+          joined_at: string | null
+          role: string | null
+          user_id: string
+        }
+        Insert: {
+          group_id: string
+          id?: string
+          joined_at?: string | null
+          role?: string | null
+          user_id: string
+        }
+        Update: {
+          group_id?: string
+          id?: string
+          joined_at?: string | null
+          role?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "group_memberships_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "community_groups"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       groups: {
         Row: {
@@ -3897,24 +4398,45 @@ export type Database = {
       }
       journal_entries: {
         Row: {
-          ai_feedback: string | null
+          affect_negative: number | null
+          affect_positive: number | null
+          audio_url: string | null
+          badge_text: string | null
+          color_palette: Json | null
           content: string
-          date: string
+          created_at: string | null
           id: string
+          is_precious: boolean | null
+          tags: string[] | null
+          updated_at: string | null
           user_id: string
         }
         Insert: {
-          ai_feedback?: string | null
+          affect_negative?: number | null
+          affect_positive?: number | null
+          audio_url?: string | null
+          badge_text?: string | null
+          color_palette?: Json | null
           content: string
-          date?: string
+          created_at?: string | null
           id?: string
+          is_precious?: boolean | null
+          tags?: string[] | null
+          updated_at?: string | null
           user_id: string
         }
         Update: {
-          ai_feedback?: string | null
+          affect_negative?: number | null
+          affect_positive?: number | null
+          audio_url?: string | null
+          badge_text?: string | null
+          color_palette?: Json | null
           content?: string
-          date?: string
+          created_at?: string | null
           id?: string
+          is_precious?: boolean | null
+          tags?: string[] | null
+          updated_at?: string | null
           user_id?: string
         }
         Relationships: []
@@ -4066,13 +4588,6 @@ export type Database = {
             columns: ["song_id"]
             isOneToOne: false
             referencedRelation: "med_mng_songs"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "med_mng_audio_access_logs_song_id_fkey"
-            columns: ["song_id"]
-            isOneToOne: false
-            referencedRelation: "med_mng_view_library"
             referencedColumns: ["id"]
           },
         ]
@@ -4484,13 +4999,6 @@ export type Database = {
             referencedRelation: "med_mng_songs"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "med_mng_listening_sessions_song_id_fkey"
-            columns: ["song_id"]
-            isOneToOne: false
-            referencedRelation: "med_mng_view_library"
-            referencedColumns: ["id"]
-          },
         ]
       }
       med_mng_lyrics_access_logs: {
@@ -4524,13 +5032,6 @@ export type Database = {
             columns: ["song_id"]
             isOneToOne: false
             referencedRelation: "med_mng_songs"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "med_mng_lyrics_access_logs_song_id_fkey"
-            columns: ["song_id"]
-            isOneToOne: false
-            referencedRelation: "med_mng_view_library"
             referencedColumns: ["id"]
           },
         ]
@@ -4619,13 +5120,6 @@ export type Database = {
             referencedRelation: "med_mng_songs"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "med_mng_music_generation_logs_song_id_fkey"
-            columns: ["song_id"]
-            isOneToOne: false
-            referencedRelation: "med_mng_view_library"
-            referencedColumns: ["id"]
-          },
         ]
       }
       med_mng_playlist_analytics: {
@@ -4699,13 +5193,6 @@ export type Database = {
             columns: ["song_id"]
             isOneToOne: false
             referencedRelation: "med_mng_songs"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "med_mng_playlist_songs_song_id_fkey"
-            columns: ["song_id"]
-            isOneToOne: false
-            referencedRelation: "med_mng_view_library"
             referencedColumns: ["id"]
           },
         ]
@@ -4810,13 +5297,6 @@ export type Database = {
             columns: ["song_id"]
             isOneToOne: false
             referencedRelation: "med_mng_songs"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "med_mng_song_likes_song_id_fkey"
-            columns: ["song_id"]
-            isOneToOne: false
-            referencedRelation: "med_mng_view_library"
             referencedColumns: ["id"]
           },
         ]
@@ -4929,13 +5409,6 @@ export type Database = {
             referencedRelation: "med_mng_songs"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "med_mng_synchronized_lyrics_song_id_fkey"
-            columns: ["song_id"]
-            isOneToOne: true
-            referencedRelation: "med_mng_view_library"
-            referencedColumns: ["id"]
-          },
         ]
       }
       med_mng_user_analytics: {
@@ -5037,13 +5510,6 @@ export type Database = {
             referencedRelation: "med_mng_songs"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "med_mng_user_songs_song_id_fkey"
-            columns: ["song_id"]
-            isOneToOne: false
-            referencedRelation: "med_mng_view_library"
-            referencedColumns: ["id"]
-          },
         ]
       }
       medical_learning_analytics: {
@@ -5106,6 +5572,45 @@ export type Database = {
           patient_data?: Json
           patient_name?: string
           payment_status?: string | null
+        }
+        Relationships: []
+      }
+      meditation_content: {
+        Row: {
+          audio_url: string | null
+          category: string
+          created_at: string | null
+          description: string | null
+          difficulty_level: string | null
+          duration: number
+          id: string
+          instructor: string | null
+          thumbnail_url: string | null
+          title: string
+        }
+        Insert: {
+          audio_url?: string | null
+          category: string
+          created_at?: string | null
+          description?: string | null
+          difficulty_level?: string | null
+          duration: number
+          id?: string
+          instructor?: string | null
+          thumbnail_url?: string | null
+          title: string
+        }
+        Update: {
+          audio_url?: string | null
+          category?: string
+          created_at?: string | null
+          description?: string | null
+          difficulty_level?: string | null
+          duration?: number
+          id?: string
+          instructor?: string | null
+          thumbnail_url?: string | null
+          title?: string
         }
         Relationships: []
       }
@@ -5295,6 +5800,41 @@ export type Database = {
         }
         Relationships: []
       }
+      mood_entries: {
+        Row: {
+          created_at: string | null
+          emotions: string[] | null
+          id: string
+          mood_level: number
+          notes: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          emotions?: string[] | null
+          id?: string
+          mood_level: number
+          notes?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          emotions?: string[] | null
+          id?: string
+          mood_level?: number
+          notes?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mood_entries_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       music_completion_logs: {
         Row: {
           completion_percentage: number | null
@@ -5345,6 +5885,41 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      music_fragments: {
+        Row: {
+          created_at: string | null
+          id: string
+          rarity: string
+          session_id: string | null
+          unlocked_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          rarity: string
+          session_id?: string | null
+          unlocked_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          rarity?: string
+          session_id?: string | null
+          unlocked_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "music_fragments_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "music_therapy_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       music_generation_logs: {
         Row: {
@@ -5564,6 +6139,57 @@ export type Database = {
           skip_timestamp?: string | null
           track_id?: string
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      music_therapy_sessions: {
+        Row: {
+          badge_verbal: string | null
+          completed_at: string | null
+          created_at: string | null
+          duration_seconds: number | null
+          fragment_rarity: string | null
+          fragment_unlocked: boolean | null
+          id: string
+          interactions_count: number | null
+          mood_state_post: Json | null
+          mood_state_pre: Json | null
+          music_metadata: Json | null
+          music_url: string | null
+          started_at: string | null
+          user_id: string
+        }
+        Insert: {
+          badge_verbal?: string | null
+          completed_at?: string | null
+          created_at?: string | null
+          duration_seconds?: number | null
+          fragment_rarity?: string | null
+          fragment_unlocked?: boolean | null
+          id?: string
+          interactions_count?: number | null
+          mood_state_post?: Json | null
+          mood_state_pre?: Json | null
+          music_metadata?: Json | null
+          music_url?: string | null
+          started_at?: string | null
+          user_id: string
+        }
+        Update: {
+          badge_verbal?: string | null
+          completed_at?: string | null
+          created_at?: string | null
+          duration_seconds?: number | null
+          fragment_rarity?: string | null
+          fragment_unlocked?: boolean | null
+          id?: string
+          interactions_count?: number | null
+          mood_state_post?: Json | null
+          mood_state_pre?: Json | null
+          music_metadata?: Json | null
+          music_url?: string | null
+          started_at?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -6114,6 +6740,45 @@ export type Database = {
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      organization_members: {
+        Row: {
+          id: string
+          joined_at: string | null
+          organization_id: string
+          role: string | null
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          joined_at?: string | null
+          organization_id: string
+          role?: string | null
+          user_id: string
+        }
+        Update: {
+          id?: string
+          joined_at?: string | null
+          organization_id?: string
+          role?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organization_members_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "organization_members_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -6731,6 +7396,45 @@ export type Database = {
         }
         Relationships: []
       }
+      rare_auras_catalog: {
+        Row: {
+          animation_preset: string | null
+          aura_type: string
+          color_palette: Json
+          created_at: string | null
+          description: string | null
+          icon: string | null
+          id: string
+          name: string
+          rarity_level: string
+          unlock_conditions: Json
+        }
+        Insert: {
+          animation_preset?: string | null
+          aura_type: string
+          color_palette: Json
+          created_at?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name: string
+          rarity_level: string
+          unlock_conditions: Json
+        }
+        Update: {
+          animation_preset?: string | null
+          aura_type?: string
+          color_palette?: Json
+          created_at?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name?: string
+          rarity_level?: string
+          unlock_conditions?: Json
+        }
+        Relationships: []
+      }
       rate_limit_counters: {
         Row: {
           created_at: string | null
@@ -7046,6 +7750,228 @@ export type Database = {
         }
         Relationships: []
       }
+      story_acts_catalog: {
+        Row: {
+          act_code: string
+          created_at: string | null
+          description: string | null
+          difficulty_level: string | null
+          duration_minutes: number | null
+          id: string
+          music_palette: Json | null
+          scenes: Json
+          theme: string
+          title: string
+          unlock_conditions: Json | null
+          visual_palette: Json | null
+        }
+        Insert: {
+          act_code: string
+          created_at?: string | null
+          description?: string | null
+          difficulty_level?: string | null
+          duration_minutes?: number | null
+          id?: string
+          music_palette?: Json | null
+          scenes: Json
+          theme: string
+          title: string
+          unlock_conditions?: Json | null
+          visual_palette?: Json | null
+        }
+        Update: {
+          act_code?: string
+          created_at?: string | null
+          description?: string | null
+          difficulty_level?: string | null
+          duration_minutes?: number | null
+          id?: string
+          music_palette?: Json | null
+          scenes?: Json
+          theme?: string
+          title?: string
+          unlock_conditions?: Json | null
+          visual_palette?: Json | null
+        }
+        Relationships: []
+      }
+      story_ambients: {
+        Row: {
+          ambient_code: string
+          created_at: string | null
+          description: string | null
+          id: string
+          music_texture: Json
+          name: string
+          unlocked_at: string | null
+          user_id: string
+          visual_effect: Json | null
+        }
+        Insert: {
+          ambient_code: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          music_texture: Json
+          name: string
+          unlocked_at?: string | null
+          user_id: string
+          visual_effect?: Json | null
+        }
+        Update: {
+          ambient_code?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          music_texture?: Json
+          name?: string
+          unlocked_at?: string | null
+          user_id?: string
+          visual_effect?: Json | null
+        }
+        Relationships: []
+      }
+      story_fragments: {
+        Row: {
+          act_code: string
+          ambient_unlock: string | null
+          created_at: string | null
+          description: string | null
+          fragment_code: string
+          id: string
+          is_favorite: boolean | null
+          rarity: string
+          times_viewed: number | null
+          title: string
+          unlocked_at: string | null
+          user_id: string
+          visual_asset: string | null
+        }
+        Insert: {
+          act_code: string
+          ambient_unlock?: string | null
+          created_at?: string | null
+          description?: string | null
+          fragment_code: string
+          id?: string
+          is_favorite?: boolean | null
+          rarity: string
+          times_viewed?: number | null
+          title: string
+          unlocked_at?: string | null
+          user_id: string
+          visual_asset?: string | null
+        }
+        Update: {
+          act_code?: string
+          ambient_unlock?: string | null
+          created_at?: string | null
+          description?: string | null
+          fragment_code?: string
+          id?: string
+          is_favorite?: boolean | null
+          rarity?: string
+          times_viewed?: number | null
+          title?: string
+          unlocked_at?: string | null
+          user_id?: string
+          visual_asset?: string | null
+        }
+        Relationships: []
+      }
+      story_fragments_catalog: {
+        Row: {
+          act_code: string
+          ambient_data: Json | null
+          created_at: string | null
+          description: string | null
+          fragment_code: string
+          id: string
+          rarity: string
+          title: string
+          unlock_hints: Json | null
+          visual_data: Json
+        }
+        Insert: {
+          act_code: string
+          ambient_data?: Json | null
+          created_at?: string | null
+          description?: string | null
+          fragment_code: string
+          id?: string
+          rarity: string
+          title: string
+          unlock_hints?: Json | null
+          visual_data: Json
+        }
+        Update: {
+          act_code?: string
+          ambient_data?: Json | null
+          created_at?: string | null
+          description?: string | null
+          fragment_code?: string
+          id?: string
+          rarity?: string
+          title?: string
+          unlock_hints?: Json | null
+          visual_data?: Json
+        }
+        Relationships: []
+      }
+      story_sessions: {
+        Row: {
+          act_code: string
+          badge_received: string | null
+          choices: Json | null
+          completed_at: string | null
+          created_at: string | null
+          duration_seconds: number | null
+          ending_reached: string | null
+          fragments_unlocked: Json | null
+          id: string
+          poms_post: Json | null
+          poms_pre: Json | null
+          scenes_completed: number | null
+          session_id: string | null
+          started_at: string | null
+          user_id: string
+        }
+        Insert: {
+          act_code: string
+          badge_received?: string | null
+          choices?: Json | null
+          completed_at?: string | null
+          created_at?: string | null
+          duration_seconds?: number | null
+          ending_reached?: string | null
+          fragments_unlocked?: Json | null
+          id?: string
+          poms_post?: Json | null
+          poms_pre?: Json | null
+          scenes_completed?: number | null
+          session_id?: string | null
+          started_at?: string | null
+          user_id: string
+        }
+        Update: {
+          act_code?: string
+          badge_received?: string | null
+          choices?: Json | null
+          completed_at?: string | null
+          created_at?: string | null
+          duration_seconds?: number | null
+          ending_reached?: string | null
+          fragments_unlocked?: Json | null
+          id?: string
+          poms_post?: Json | null
+          poms_pre?: Json | null
+          scenes_completed?: number | null
+          session_id?: string | null
+          started_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       streaming_access_logs: {
         Row: {
           action: string
@@ -7187,6 +8113,54 @@ export type Database = {
         }
         Relationships: []
       }
+      subscriptions: {
+        Row: {
+          expires_at: string | null
+          features: Json | null
+          id: string
+          organization_id: string | null
+          plan_type: string
+          started_at: string | null
+          status: string | null
+          user_id: string | null
+        }
+        Insert: {
+          expires_at?: string | null
+          features?: Json | null
+          id?: string
+          organization_id?: string | null
+          plan_type: string
+          started_at?: string | null
+          status?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          expires_at?: string | null
+          features?: Json | null
+          id?: string
+          organization_id?: string | null
+          plan_type?: string
+          started_at?: string | null
+          status?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscriptions_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "subscriptions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       therapeutic_classes: {
         Row: {
           created_at: string | null
@@ -7202,6 +8176,125 @@ export type Database = {
           created_at?: string | null
           id?: number
           name?: string
+        }
+        Relationships: []
+      }
+      therapists: {
+        Row: {
+          available: boolean | null
+          avatar_url: string | null
+          bio: string | null
+          created_at: string | null
+          full_name: string
+          id: string
+          languages: string[] | null
+          price_per_session: number
+          rating: number | null
+          specialization: string
+        }
+        Insert: {
+          available?: boolean | null
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string | null
+          full_name: string
+          id?: string
+          languages?: string[] | null
+          price_per_session: number
+          rating?: number | null
+          specialization: string
+        }
+        Update: {
+          available?: boolean | null
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string | null
+          full_name?: string
+          id?: string
+          languages?: string[] | null
+          price_per_session?: number
+          rating?: number | null
+          specialization?: string
+        }
+        Relationships: []
+      }
+      therapy_sessions: {
+        Row: {
+          created_at: string | null
+          duration_minutes: number | null
+          id: string
+          meeting_url: string | null
+          notes: string | null
+          scheduled_at: string
+          status: string | null
+          therapist_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          duration_minutes?: number | null
+          id?: string
+          meeting_url?: string | null
+          notes?: string | null
+          scheduled_at: string
+          status?: string | null
+          therapist_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          duration_minutes?: number | null
+          id?: string
+          meeting_url?: string | null
+          notes?: string | null
+          scheduled_at?: string
+          status?: string | null
+          therapist_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "therapy_sessions_therapist_id_fkey"
+            columns: ["therapist_id"]
+            isOneToOne: false
+            referencedRelation: "therapists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      thought_grimoire: {
+        Row: {
+          category: string
+          collected_at: string
+          id: string
+          is_favorite: boolean | null
+          rarity: string
+          thought_emoji: string | null
+          thought_text: string
+          times_viewed: number | null
+          user_id: string
+        }
+        Insert: {
+          category?: string
+          collected_at?: string
+          id?: string
+          is_favorite?: boolean | null
+          rarity?: string
+          thought_emoji?: string | null
+          thought_text: string
+          times_viewed?: number | null
+          user_id: string
+        }
+        Update: {
+          category?: string
+          collected_at?: string
+          id?: string
+          is_favorite?: boolean | null
+          rarity?: string
+          thought_emoji?: string | null
+          thought_text?: string
+          times_viewed?: number | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -7549,6 +8642,60 @@ export type Database = {
         }
         Relationships: []
       }
+      user_auras: {
+        Row: {
+          animation_speed: number
+          color_hue: number
+          created_at: string | null
+          id: string
+          interactions_count: number
+          is_rare: boolean | null
+          last_who5_at: string | null
+          luminosity: number
+          rare_type: string | null
+          size_scale: number
+          streak_weeks: number
+          unlocked_at: string | null
+          updated_at: string | null
+          user_id: string
+          who5_internal_level: number | null
+        }
+        Insert: {
+          animation_speed?: number
+          color_hue?: number
+          created_at?: string | null
+          id?: string
+          interactions_count?: number
+          is_rare?: boolean | null
+          last_who5_at?: string | null
+          luminosity?: number
+          rare_type?: string | null
+          size_scale?: number
+          streak_weeks?: number
+          unlocked_at?: string | null
+          updated_at?: string | null
+          user_id: string
+          who5_internal_level?: number | null
+        }
+        Update: {
+          animation_speed?: number
+          color_hue?: number
+          created_at?: string | null
+          id?: string
+          interactions_count?: number
+          is_rare?: boolean | null
+          last_who5_at?: string | null
+          luminosity?: number
+          rare_type?: string | null
+          size_scale?: number
+          streak_weeks?: number
+          unlocked_at?: string | null
+          updated_at?: string | null
+          user_id?: string
+          who5_internal_level?: number | null
+        }
+        Relationships: []
+      }
       user_favorite_flashcards: {
         Row: {
           created_at: string | null
@@ -7688,6 +8835,44 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      user_meditation_progress: {
+        Row: {
+          completed: boolean | null
+          completed_at: string | null
+          created_at: string | null
+          id: string
+          meditation_id: string
+          progress_seconds: number | null
+          user_id: string
+        }
+        Insert: {
+          completed?: boolean | null
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          meditation_id: string
+          progress_seconds?: number | null
+          user_id: string
+        }
+        Update: {
+          completed?: boolean | null
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          meditation_id?: string
+          progress_seconds?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_meditation_progress_meditation_id_fkey"
+            columns: ["meditation_id"]
+            isOneToOne: false
+            referencedRelation: "meditation_content"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_music_preferences: {
         Row: {
@@ -8336,66 +9521,89 @@ export type Database = {
         }
         Relationships: []
       }
-    }
-    Views: {
-      med_mng_view_library: {
+      weekly_card_draws: {
         Row: {
+          assessment_session_id: string | null
+          card_id: string
           created_at: string | null
-          id: string | null
-          in_library: boolean | null
-          title: string | null
+          drawn_at: string | null
+          id: string
+          user_id: string
+          viewed: boolean | null
+          week_end: string
+          week_start: string
+          who5_score: number | null
         }
-        Relationships: []
-      }
-      security_violations_summary: {
-        Row: {
-          finding_type: string | null
-          last_detection: string | null
-          severity: string | null
-          unresolved_count: number | null
-          violation_count: number | null
+        Insert: {
+          assessment_session_id?: string | null
+          card_id: string
+          created_at?: string | null
+          drawn_at?: string | null
+          id?: string
+          user_id: string
+          viewed?: boolean | null
+          week_end: string
+          week_start: string
+          who5_score?: number | null
         }
-        Relationships: []
-      }
-      team_emotion_summary: {
-        Row: {
-          avg_confidence: number | null
-          count: number | null
-          date: string | null
-          emotion_type: string | null
-          org_id: string | null
-          team_name: string | null
+        Update: {
+          assessment_session_id?: string | null
+          card_id?: string
+          created_at?: string | null
+          drawn_at?: string | null
+          id?: string
+          user_id?: string
+          viewed?: boolean | null
+          week_end?: string
+          week_start?: string
+          who5_score?: number | null
         }
         Relationships: [
           {
-            foreignKeyName: "org_memberships_org_id_fkey"
-            columns: ["org_id"]
+            foreignKeyName: "weekly_card_draws_card_id_fkey"
+            columns: ["card_id"]
             isOneToOne: false
-            referencedRelation: "organizations"
+            referencedRelation: "emotion_cards"
             referencedColumns: ["id"]
           },
         ]
       }
-      user_activity_summary: {
+      who5_assessments: {
         Row: {
-          last_conversation_date: string | null
-          last_emotion_date: string | null
-          total_conversations: number | null
-          total_emotions: number | null
-          user_id: string | null
+          completed: boolean | null
+          completed_at: string | null
+          created_at: string | null
+          id: string
+          responses: Json | null
+          session_id: string
+          total_score: number | null
+          user_id: string
+        }
+        Insert: {
+          completed?: boolean | null
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          responses?: Json | null
+          session_id?: string
+          total_score?: number | null
+          user_id: string
+        }
+        Update: {
+          completed?: boolean | null
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          responses?: Json | null
+          session_id?: string
+          total_score?: number | null
+          user_id?: string
         }
         Relationships: []
       }
-      user_progress_view: {
-        Row: {
-          avg_points: number | null
-          completed_challenges: number | null
-          total_badges: number | null
-          total_challenges: number | null
-          user_id: string | null
-        }
-        Relationships: []
-      }
+    }
+    Views: {
+      [_ in never]: never
     }
     Functions: {
       accept_invitation: {
@@ -8462,6 +9670,10 @@ export type Database = {
         Args: { p_user_id: string }
         Returns: Json
       }
+      calculate_who5_score: {
+        Args: { responses: Json }
+        Returns: number
+      }
       check_music_generation_quota: {
         Args: { user_uuid: string }
         Returns: {
@@ -8470,6 +9682,10 @@ export type Database = {
           plan_name: string
           quota_limit: number
         }[]
+      }
+      check_rare_aura_unlocks: {
+        Args: { p_user_id: string }
+        Returns: undefined
       }
       check_rate_limit: {
         Args: {
@@ -8577,6 +9793,14 @@ export type Database = {
           details: Json
           updated_count: number
         }[]
+      }
+      complete_story_session: {
+        Args: {
+          p_badge: string
+          p_fragments_to_unlock: string[]
+          p_session_id: string
+        }
+        Returns: Json
       }
       count_all_invitations: {
         Args: Record<PropertyKey, never>
@@ -8850,6 +10074,13 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: string
       }
+      get_current_week_bounds: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          week_end: string
+          week_start: string
+        }[]
+      }
       get_edn_objectifs_rapport: {
         Args: Record<PropertyKey, never>
         Returns: {
@@ -8921,6 +10152,21 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: Json
       }
+      get_or_create_weekly_draw: {
+        Args: { p_user_id: string }
+        Returns: {
+          card_code: string
+          color_primary: string
+          color_secondary: string
+          draw_id: string
+          icon_name: string
+          is_new_draw: boolean
+          mantra: string
+          mantra_emoji: string
+          rarity: string
+          unlock_rewards: Json
+        }[]
+      }
       get_platform_completion_stats: {
         Args: Record<PropertyKey, never>
         Returns: {
@@ -8931,6 +10177,14 @@ export type Database = {
           items_with_50_qcm: number
           total_competences_available: number
           total_items: number
+        }[]
+      }
+      get_platform_statistics: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          active_users: number
+          total_content: number
+          total_users: number
         }[]
       }
       get_platform_stats: {
@@ -9052,6 +10306,15 @@ export type Database = {
           total_credits: number
         }[]
       }
+      get_user_analytics: {
+        Args: { p_user_id?: string }
+        Returns: {
+          last_activity: string
+          total_duration: number
+          total_sessions: number
+          user_id: string
+        }[]
+      }
       get_user_ia_stats: {
         Args: { p_period_days?: number }
         Returns: Json
@@ -9092,6 +10355,14 @@ export type Database = {
           plan_name: string
           status: string
         }[]
+      }
+      increment_aura_interaction: {
+        Args: { p_user_id: string }
+        Returns: undefined
+      }
+      increment_house_light: {
+        Args: { p_acts?: number; p_user_id: string }
+        Returns: undefined
       }
       increment_music_usage: {
         Args: { user_uuid: string }
@@ -9483,6 +10754,10 @@ export type Database = {
           user_id: string
         }
       }
+      snapshot_aura_weekly: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       start_extraction_batch: {
         Args: {
           p_batch_type: string
@@ -9499,12 +10774,20 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: Json
       }
+      unlock_story_fragment: {
+        Args: { p_fragment_code: string; p_user_id: string }
+        Returns: Json
+      }
       update_all_edn_items_unique_content: {
         Args: Record<PropertyKey, never>
         Returns: {
           details: Json
           updated_count: number
         }[]
+      }
+      update_aura_from_who5: {
+        Args: { p_user_id: string; p_who5_score: number }
+        Returns: undefined
       }
       update_competences_counters: {
         Args: Record<PropertyKey, never>
