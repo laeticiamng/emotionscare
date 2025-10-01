@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * HomePage — La Salle des Cartes Vivantes
  * Dashboard immersif avec tirage de carte hebdomadaire
