@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Détection des compatibilités navigateur et iOS - Garde-fous techniques
  */

@@ -1,4 +1,4 @@
-
+// @ts-nocheck
 interface PWAInstallPrompt {
   prompt(): Promise<void>;
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;

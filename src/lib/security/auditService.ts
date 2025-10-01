@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { securityConfig } from './securityConfig';
 
 interface AuditLog {

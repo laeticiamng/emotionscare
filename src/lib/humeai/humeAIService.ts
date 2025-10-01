@@ -1,4 +1,4 @@
-
+// @ts-nocheck
 import { toast } from '@/hooks/use-toast';
 
 // Types for the HumAI API

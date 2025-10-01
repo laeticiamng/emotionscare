@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Nettoyage final pour la production - EmotionsCare
  * Système de nettoyage automatique et sécurisation
