@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 type Handler = (req: Request) => Promise<Response>;

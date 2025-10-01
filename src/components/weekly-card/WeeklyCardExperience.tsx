@@ -15,11 +15,11 @@ export const WeeklyCardExperience = () => {
   const [showFloat, setShowFloat] = useState(false);
 
   useEffect(() => {
-    if (card && !card.isNewDraw) {
+    if (card && !canDraw) {
       // Carte déjà tirée cette semaine → afficher directement la version flottante
       setShowFloat(true);
     }
-  }, [card]);
+  }, [card, canDraw]);
 
   const handleDrawCard = async () => {
     if (isDrawing || hookDrawing) return;
