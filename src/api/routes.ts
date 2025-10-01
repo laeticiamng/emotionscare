@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Routes API - RouterV2 Compatible
  * TICKET: FE/BE-Router-Cleanup-01

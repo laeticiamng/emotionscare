@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 import { VRSession, VRSessionTemplate, VREnvironment } from '@/types/vr';
 

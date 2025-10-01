@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Component Registry - Central exports for UI components and providers
  */

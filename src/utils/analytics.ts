@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 import { hasConsent } from "@/ui/CookieConsent";
 

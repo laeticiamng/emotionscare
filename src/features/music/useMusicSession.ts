@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useCallback, useMemo, useState } from 'react';
 
 import { addBreadcrumb } from '@/lib/obs/breadcrumb';

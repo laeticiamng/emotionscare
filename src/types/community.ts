@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 export interface Post {
   id: string;

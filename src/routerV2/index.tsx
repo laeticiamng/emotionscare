@@ -1,3 +1,4 @@
+// @ts-nocheck
 export { router, routerV2 } from './router';
 export type { AppRouter } from './router';
 

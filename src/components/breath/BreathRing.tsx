@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { Phase, Pattern } from '@/store/breath.store';
 

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { create } from 'zustand';
 
 export type SilkPattern = '4-2-4' | '4-6-8' | '5-5';

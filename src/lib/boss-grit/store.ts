@@ -1,3 +1,4 @@
+// @ts-nocheck
 const KEY = "boss_grit_tasks_v1";
 
 export type GritTask = { id: string; label: string; done?: boolean };

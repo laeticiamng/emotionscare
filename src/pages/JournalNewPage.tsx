@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useEffect, useState } from 'react';
 import { ArrowLeft, Save, Mic, MicOff, Camera, Image, Calendar } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';

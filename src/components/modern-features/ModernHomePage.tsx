@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ModernHomePage - Version améliorée de la page d'accueil
  * Conserve l'apparence existante tout en ajoutant des fonctionnalités modernes

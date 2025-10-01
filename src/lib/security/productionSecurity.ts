@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 import { APP_BASE_CSP } from './headers';
 

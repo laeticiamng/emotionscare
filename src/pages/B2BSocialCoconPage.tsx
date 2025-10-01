@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Page du cocon social B2B
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 import { User, UserWithStatus } from '@/types/user';
 

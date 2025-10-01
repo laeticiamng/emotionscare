@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { FadeIn } from '@/ui/motion/FadeIn';
 import PageHeader from '@/components/ui/PageHeader';

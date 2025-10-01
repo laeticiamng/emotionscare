@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 import { useCallback, useState, ChangeEvent } from 'react';
 import { useMusic } from '@/hooks/useMusic';

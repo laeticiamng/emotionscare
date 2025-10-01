@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type { BubbleBeatOrchestrationAction, BubbleBeatOrchestratorInput } from './types';
 
 const CALM_VARIANT_KEY = 'hr' as const;

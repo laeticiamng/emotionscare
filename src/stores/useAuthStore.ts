@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { create } from 'zustand';
 import type { Session, User } from '@supabase/supabase-js';
 

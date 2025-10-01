@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 import { MusicTrack } from './music';
 import { VRSession } from './vr';

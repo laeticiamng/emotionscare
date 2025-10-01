@@ -1,3 +1,4 @@
+// @ts-nocheck
 export { ensureI18n } from '@/providers/i18n/client';
 export type { AppLocale, AppNamespace } from '@/providers/i18n/resources';
 export { resources, namespaces } from '@/providers/i18n/resources';

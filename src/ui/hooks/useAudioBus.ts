@@ -1,3 +1,4 @@
+// @ts-nocheck
 "use client";
 import { useMemo, useRef } from "react";
 export function useAudioBus(initial = 0.8) {

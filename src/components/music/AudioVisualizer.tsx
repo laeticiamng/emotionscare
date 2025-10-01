@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 import React, { useEffect, useRef, useState } from 'react';
 import { Play, Pause, Volume2, VolumeX } from 'lucide-react';

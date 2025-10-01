@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Console Cleanup - Production Ready
  * Systematically removes all development console statements

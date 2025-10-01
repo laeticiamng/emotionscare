@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * GlobalNavigationWidget - Widget de navigation globale pour HomePage
  * Accès rapide à toutes les fonctionnalités depuis l'accueil

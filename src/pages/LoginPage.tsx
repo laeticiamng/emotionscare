@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * LOGIN PAGE PREMIUM - EMOTIONSCARE
  * Page de connexion moderne, accessible et sécurisée

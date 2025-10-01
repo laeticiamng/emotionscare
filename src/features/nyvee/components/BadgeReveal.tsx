@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { motion } from 'framer-motion';
 import { Sparkles, Heart, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';

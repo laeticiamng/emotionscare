@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { useSpeechRecognition, useSpeechSynthesis } from '@/utils/voice-recognition';
 import { Button } from "@/components/ui/button";

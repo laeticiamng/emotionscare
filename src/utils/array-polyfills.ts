@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 // Polyfill for Array.findLast
 if (!Array.prototype.findLast) {

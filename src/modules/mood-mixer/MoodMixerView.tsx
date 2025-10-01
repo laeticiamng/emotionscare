@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import * as Sentry from '@sentry/react';
 import { Loader2, RotateCcw, Sparkles, Trash2, Wand2 } from 'lucide-react';

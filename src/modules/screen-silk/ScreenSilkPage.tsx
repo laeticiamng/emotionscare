@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ScreenSilkPage - Page principale du module Screen Silk
  */

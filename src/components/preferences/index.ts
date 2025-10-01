@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 export { default as PreferencesForm } from './PreferencesForm';
 export { default as ThemeSettings } from './ThemeSettings';

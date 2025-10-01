@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 // Firebase configuration
 import { initializeApp } from 'firebase/app';

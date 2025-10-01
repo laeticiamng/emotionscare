@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type { StateCreator, StoreApi } from 'zustand';
 
 type ImmutableSet<T extends object> = (

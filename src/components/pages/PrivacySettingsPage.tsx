@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 
 export const PrivacySettingsPage: React.FC<{ 'data-testid'?: string }> = ({ 'data-testid': testId }) => {

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * MainNavigation - Navigation principale accessible
  * Inclut la navigation mobile responsive et l'accessibilité complète

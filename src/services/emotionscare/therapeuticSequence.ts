@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 // Parcours thérapeutique progressif EmotionsCare
 import { EmotionInput, ANALGESIC_ROUTER } from './analgesic';

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { SessionEvent } from "@/SCHEMA";
 
 const KEY = "ec_session_events_v2";

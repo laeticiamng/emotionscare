@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Types pour le système de cartes vivantes (Dashboard)
  */

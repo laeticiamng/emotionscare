@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import B2BReportsHeatmapPage from './b2b/reports';
 

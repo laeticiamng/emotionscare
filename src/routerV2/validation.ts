@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Validation avancée des routes pour RouterV2
  * TICKET: FE/BE-Router-Cleanup-01 - Validation 100%

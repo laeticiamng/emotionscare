@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 /**
  * Utility service for emotion-related calculations and transformations

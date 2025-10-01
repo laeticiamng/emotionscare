@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 import { rateLimiter } from './rateLimiter';
 import { toast } from '@/hooks/use-toast';

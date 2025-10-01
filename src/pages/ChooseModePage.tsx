@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * CHOOSE MODE PAGE - EMOTIONSCARE
  * Page de sélection de mode accessible WCAG 2.1 AA

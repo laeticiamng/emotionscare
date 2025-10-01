@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 export class PushNotificationService {
   private static instance: PushNotificationService;

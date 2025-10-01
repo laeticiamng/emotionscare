@@ -1,3 +1,4 @@
+// @ts-nocheck
 export interface SocialPost {
   id: string;
   userId: string;

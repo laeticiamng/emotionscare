@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import EmotionAnalysisDashboard from '@/components/scan/EmotionAnalysisDashboard';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';

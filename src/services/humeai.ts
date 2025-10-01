@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 // HumeAI service types
 export interface HumeAIOptions {

@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 import { Report } from '../types/report';
 

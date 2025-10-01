@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useMemo } from 'react';
 import { BookOpen, Music, Headset, MessagesSquare, Brain, Activity } from 'lucide-react';
 

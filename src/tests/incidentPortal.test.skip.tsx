@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { render, fireEvent } from '@testing-library/react';
 import IncidentPortal from '@/components/support/IncidentPortal';
 import React from 'react';

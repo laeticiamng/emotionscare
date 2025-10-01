@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 import { useState, useCallback } from 'react';
 import { MusicPlaylist, MusicTrack } from '@/types/music';

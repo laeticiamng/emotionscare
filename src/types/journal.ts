@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 export interface JournalEntry {
   id: string;

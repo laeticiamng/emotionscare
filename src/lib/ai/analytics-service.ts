@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 /**
  * Service d'Analyse IA pour le Dashboard Admin

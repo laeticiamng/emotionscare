@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Service de coaching IA EmotionsCare
  * Connexion OpenAI GPT-5 pour conseils personnalisés

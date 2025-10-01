@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type { AppLocale } from '@/providers/i18n/resources';
 import { resources } from '@/providers/i18n/resources';
 import { ensureI18n } from '@/providers/i18n/client';

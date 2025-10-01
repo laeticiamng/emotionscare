@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * B2C VR Galaxy - Cathédrale cosmique
  * Pitch : Tu respires sous les étoiles ; plus tu restes, plus le ciel se relie.

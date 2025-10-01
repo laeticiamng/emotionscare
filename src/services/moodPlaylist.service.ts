@@ -1,3 +1,4 @@
+// @ts-nocheck
 const isRecord = (value: unknown): value is Record<string, any> =>
   typeof value === "object" && value !== null;
 

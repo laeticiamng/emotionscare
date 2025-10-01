@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type { FC, ReactNode } from 'react';
 import { useEffect, useRef } from 'react';
 

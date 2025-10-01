@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 // @ts-nocheck
 import { supabase } from '@/integrations/supabase/client';

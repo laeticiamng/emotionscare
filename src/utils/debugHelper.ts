@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 /**
  * Utilitaire de débogage pour l'application

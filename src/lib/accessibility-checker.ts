@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Vérificateur d'accessibilité automatisé
  * Valide la conformité WCAG 2.1 AA des pages

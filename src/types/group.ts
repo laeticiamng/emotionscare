@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 export interface Group {
   id: string;

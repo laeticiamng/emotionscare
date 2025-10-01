@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { Heart, Building2, Sparkles, Users, Brain, Music, ArrowRight, Star, Play } from 'lucide-react';

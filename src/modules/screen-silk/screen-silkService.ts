@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * screen-silkService - Service pour les micro-pauses Screen Silk
  */

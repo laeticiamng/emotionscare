@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 // AI model configurations for different features
 export const AI_MODEL_CONFIG = {

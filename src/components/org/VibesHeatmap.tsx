@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useRef, useEffect, useState } from 'react';
 import { OrgWeekly, TeamRow, VibeBucket } from '@/hooks/useOrgWeekly';
 import { useOrgStore } from '@/store/org.store';

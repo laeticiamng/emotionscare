@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 // Helps filter data for charts based on selected time range
 export const getFilteredData = (

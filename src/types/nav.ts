@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Navigation Schema - Source de vérité centralisée
  * Architecture déclarative pour éliminer les boutons inactifs

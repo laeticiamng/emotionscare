@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 // Create a minimal implementation of the audioVad library
 

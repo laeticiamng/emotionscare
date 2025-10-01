@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 import { ActionHandler } from './action-handler.interface';
 

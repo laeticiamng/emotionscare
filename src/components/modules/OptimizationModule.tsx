@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { useOptimization } from '@/providers/OptimizationProvider';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';

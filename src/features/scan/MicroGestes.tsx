@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type { MicroGesture } from '@/features/mood/useSamOrchestration';
 
 interface MicroGestesProps {

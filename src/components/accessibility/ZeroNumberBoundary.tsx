@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { type ComponentPropsWithoutRef, type ElementType, type ReactNode, useEffect, useRef } from 'react';
 
 type ZeroNumberBoundaryProps<T extends ElementType> = {

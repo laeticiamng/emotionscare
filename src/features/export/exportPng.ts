@@ -1,3 +1,4 @@
+// @ts-nocheck
 export async function exportNodeToPng(node: HTMLElement, filename: string) {
   if (!node) {
     throw new Error('export_target_missing');

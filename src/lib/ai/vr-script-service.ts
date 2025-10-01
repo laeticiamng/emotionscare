@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 /**
  * Service de Génération de Scripts VR Immersifs

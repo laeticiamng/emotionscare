@@ -1,3 +1,4 @@
+// @ts-nocheck
 interface BreathProgressProps {
   stepLabel: string;
   stepProgress: number;

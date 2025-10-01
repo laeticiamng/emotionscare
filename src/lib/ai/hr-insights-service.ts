@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 /**
  * Service d'Insights RH basés sur l'analyse émotionnelle

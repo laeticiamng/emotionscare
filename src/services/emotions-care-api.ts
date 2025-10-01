@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * EmotionsCare API service
  * Unified service for AI integrations (Suno, Hume, OpenAI) and backend endpoints

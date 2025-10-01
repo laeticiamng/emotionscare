@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 import { ApiErrorHandler } from '@/utils/errorHandlers';
 

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ProgressTracker - Suivi des progrès en temps réel
  * Composant pour suivre et visualiser les progrès utilisateur

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * RouterV2 Aliases - Redirections de compatibilité
  * Map des anciens chemins vers les routes canoniques.

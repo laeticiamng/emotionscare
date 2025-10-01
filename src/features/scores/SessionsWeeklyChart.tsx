@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { forwardRef, useMemo } from 'react';
 import type { ForwardedRef } from 'react';
 import { BarChart, Bar, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';

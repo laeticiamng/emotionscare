@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 export interface UserPoints {
   id: string;

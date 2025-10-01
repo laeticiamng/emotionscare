@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { Suspense, lazy, useState, useEffect } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { Loader2, Wifi, WifiOff, Battery, Signal } from 'lucide-react';

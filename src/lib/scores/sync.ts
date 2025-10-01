@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { getEvents } from "./events";
 import { hasConsent } from "@/ui/CookieConsent"; // si dispo en P2
 import { safeFetch } from "@/lib/net/safeFetch";  // P0

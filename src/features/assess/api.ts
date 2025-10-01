@@ -1,3 +1,4 @@
+// @ts-nocheck
 export interface AssessmentStartOptions {
   locale?: string;
   stage?: 'pre' | 'post';

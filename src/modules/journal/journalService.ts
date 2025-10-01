@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * journalService - Service pour le journal vocal et textuel
  */

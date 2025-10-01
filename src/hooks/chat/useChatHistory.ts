@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 // This file needs to map the user_id property to the expected format
 

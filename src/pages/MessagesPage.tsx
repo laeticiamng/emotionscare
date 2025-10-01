@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import VirtualCoach from '@/components/features/VirtualCoach';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';

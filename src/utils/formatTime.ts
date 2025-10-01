@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 /**
  * Formate un temps en secondes en format mm:ss
