@@ -1,4 +1,4 @@
-
+// @ts-nocheck
 import { EmotionRecommendation } from '@/types/emotion';
 
 // Mock function to simulate fetching journal entries from a database

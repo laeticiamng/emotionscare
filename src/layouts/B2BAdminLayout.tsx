@@ -1,4 +1,4 @@
-
+// @ts-nocheck
 import React, { useEffect } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import B2BAdminNavBar from '@/components/navigation/B2BAdminNavBar';

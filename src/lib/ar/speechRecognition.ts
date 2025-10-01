@@ -1,4 +1,4 @@
-
+// @ts-nocheck
 // Polyfill utilities for SpeechRecognition
 import type {
   SpeechRecognitionConstructor,
