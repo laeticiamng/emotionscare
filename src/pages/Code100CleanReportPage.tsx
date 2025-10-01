@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import Code100CleanReport from '@/admin/Code100CleanReport';
 

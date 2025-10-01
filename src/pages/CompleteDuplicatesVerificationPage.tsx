@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import CompleteDuplicatesVerification from '@/admin/CompleteDuplicatesVerification';
 

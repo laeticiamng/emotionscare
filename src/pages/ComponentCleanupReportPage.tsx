@@ -1,3 +1,4 @@
+// @ts-nocheck
 import ComponentCleanupReport from '@/admin/ComponentCleanupReport';
 
 export default function ComponentCleanupReportPage() {

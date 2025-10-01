@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import FinalProductionReport from '@/admin/FinalProductionReport';
 

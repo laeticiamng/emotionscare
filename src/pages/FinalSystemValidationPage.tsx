@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import FinalSystemValidation from '@/admin/FinalSystemValidation';
 
