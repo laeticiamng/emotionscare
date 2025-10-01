@@ -1,4 +1,4 @@
-// @ts-nocheck
+// @ts-nocheck - ESM imports from https://esm.sh ne supportent pas les types TypeScript natifs dans Deno
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import OpenAI from "https://esm.sh/openai@4.20.1"
 
@@ -49,12 +49,14 @@ serve(async (req) => {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
 
-  } catch (error) {
-    console.error('Error in openai-moderate function:', error)
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Moderation check failed';
+    const errorDetails = error instanceof Error ? error.stack : String(error);
+    console.error('Error in openai-moderate function:', errorMessage, errorDetails);
     return new Response(
       JSON.stringify({ 
-        error: error.message || 'Moderation check failed',
-        details: error.toString()
+        error: errorMessage,
+        details: errorDetails
       }),
       {
         status: 500,

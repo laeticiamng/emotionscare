@@ -65,13 +65,15 @@ serve(async (req) => {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       }
     );
-  } catch (error) {
-    console.error('Error in text-to-voice function:', error);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error in text-to-voice function';
+    const errorDetails = error instanceof Error ? error.stack : String(error);
+    console.error('Error in text-to-voice function:', errorMessage, errorDetails);
     
     return new Response(
       JSON.stringify({ 
         success: false, 
-        error: error instanceof Error ? error.message : 'Unknown error in text-to-voice function'
+        error: errorMessage
       }),
       {
         status: 500,
