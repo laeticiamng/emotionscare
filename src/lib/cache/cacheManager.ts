@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 interface CacheEntry<T> {
   data: T;

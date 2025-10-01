@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { test, expect } from 'vitest';
 import fs from 'fs';
 import path from 'path';

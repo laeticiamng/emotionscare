@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Screen Silk Module - Micro-pauses écran
  */

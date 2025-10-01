@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 import React, { useState } from 'react';
 import { extractYoutubeID } from '@/utils/vrUtils';

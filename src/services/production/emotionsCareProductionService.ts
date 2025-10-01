@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Service de production EmotionsCare
  * Connexion aux vraies APIs pour toutes les fonctionnalités

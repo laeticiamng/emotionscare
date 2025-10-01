@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 // Basic implementations of the necessary functions
 

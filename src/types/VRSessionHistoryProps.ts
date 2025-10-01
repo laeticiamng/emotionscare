@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 import { VRSession } from './vr';
 

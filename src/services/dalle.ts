@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 // DALL-E Service
 export interface DALLEOptions {

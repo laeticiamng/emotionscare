@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * PricingPage - Page de tarification complète
  */

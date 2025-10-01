@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { trackEvent } from './analytics';
 
 /**

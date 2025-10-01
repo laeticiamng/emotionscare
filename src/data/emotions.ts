@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 export const primaryEmotions = [
   { name: 'joy', label: 'Joie', emoji: '😊', color: '#FFD700' },

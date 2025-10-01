@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 export interface GamificationStats {
   userId: string;

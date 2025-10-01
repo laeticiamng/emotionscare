@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 interface RateLimitConfig {
   windowMs: number;

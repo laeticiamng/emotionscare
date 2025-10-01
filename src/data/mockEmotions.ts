@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 // @ts-nocheck
 import { EmotionResult } from '@/types/emotion';

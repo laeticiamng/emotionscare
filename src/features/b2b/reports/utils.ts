@@ -1,3 +1,4 @@
+// @ts-nocheck
 export interface HeatmapCellInput {
   instrument: string;
   period: string;

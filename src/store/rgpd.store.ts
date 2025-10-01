@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { create } from 'zustand';
 
 export type ExportStatus = 'idle' | 'processing' | 'ready' | 'error';

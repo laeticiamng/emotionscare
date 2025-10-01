@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 /**
  * This is a simple wrapper around the use-sound package

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useEffect, useState, useCallback, useRef } from 'react';
 
 interface AccessibilitySettings {

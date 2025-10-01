@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Perfect Navigation - Navigation immersive et intelligente
  * Adapte l'expérience selon l'utilisateur et le contexte

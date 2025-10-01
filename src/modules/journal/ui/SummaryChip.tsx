@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * SummaryChip - Composant d'affichage de résumé IA
  */

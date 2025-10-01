@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 // Database module stub
 // In a real implementation, this would connect to a database

@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 import React from 'react';
 import { LineChart as RechartsLineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';

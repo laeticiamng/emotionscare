@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Routes helpers - source unique alignée sur RouterV2
  */

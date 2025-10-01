@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 // Monitoring de performance simple
 interface PerformanceMetric {

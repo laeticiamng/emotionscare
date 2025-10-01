@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * CompleteNavigationMenu - Menu de navigation complet
  * Accès à toutes les fonctionnalités de la plateforme

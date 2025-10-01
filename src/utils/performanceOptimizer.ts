@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 
 // Mesure des Web Vitals

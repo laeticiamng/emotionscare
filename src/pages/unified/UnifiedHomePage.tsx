@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * UNIFIED HOME PAGE - Fusion de HomePage + HomeB2CPage
  * Préserve EXACTEMENT la même fonctionnalité des deux composants

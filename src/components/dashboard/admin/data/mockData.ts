@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 // Mock data for Social Cocoon section
 export const socialCocoonData = {

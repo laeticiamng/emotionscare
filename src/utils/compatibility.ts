@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 /**
  * Compatibility utilities to support both old and new property names

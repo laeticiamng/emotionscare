@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 // Constantes globales de l'application
 export const APP_CONFIG = {

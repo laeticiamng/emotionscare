@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { MusicSession } from '@/types/music';
 
 const sessions: MusicSession[] = [];

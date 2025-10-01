@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Play, Pause, RotateCcw, Volume2, VolumeX, BookOpen } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';

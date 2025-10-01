@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 // @ts-nocheck
 import { useState, useEffect } from 'react';

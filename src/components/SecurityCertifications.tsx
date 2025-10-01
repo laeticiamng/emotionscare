@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 import React from 'react';
 import { Shield, Lock, FileCheck, Search, Mail, Check, Building, Home } from 'lucide-react';

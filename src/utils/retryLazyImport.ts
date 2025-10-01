@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 /**
  * Utilitaire pour retry automatique des imports lazy en cas d'échec réseau

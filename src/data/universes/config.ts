@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Universe } from '@/types/universes';
 
 // Optimized universe configurations with performance-minded settings

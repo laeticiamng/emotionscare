@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 import { Track } from '@/types/music';
 

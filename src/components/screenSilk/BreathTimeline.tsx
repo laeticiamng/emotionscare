@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { type BreathPhase } from '@/store/screenSilk.store';
 

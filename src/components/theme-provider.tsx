@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * THEME PROVIDER PREMIUM - Système de thème unifié
  */

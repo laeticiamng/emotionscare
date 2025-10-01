@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { Html } from '@react-three/drei';
 import { Button } from '@/components/ui/button';

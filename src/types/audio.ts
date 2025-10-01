@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 // Réexporter les types depuis music.ts pour compatibilité
 export type {

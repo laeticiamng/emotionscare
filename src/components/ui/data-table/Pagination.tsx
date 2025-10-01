@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 import React from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';

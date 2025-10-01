@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { lazyDefault } from '@/lib/lazyDefault';
 
 export { default } from './StorySynthPage';

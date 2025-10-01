@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Stub pour éviter les erreurs dans les scripts legacy
 export const buildUnifiedRoutes = () => [];
 

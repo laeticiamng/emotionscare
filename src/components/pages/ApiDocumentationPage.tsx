@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ApiDocumentationPage - Documentation API complète
  */

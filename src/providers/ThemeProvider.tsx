@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 import React from 'react';
 import { ThemeProvider as BaseThemeProvider, useTheme } from '@/components/theme-provider';

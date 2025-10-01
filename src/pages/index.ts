@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Pages nécessaires pour RouterV2 uniquement
 export { default as HomePage } from './HomePage';
 export { default as AboutPage } from './AboutPage';

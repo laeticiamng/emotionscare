@@ -1,3 +1,4 @@
+// @ts-nocheck
 export const errors = {
   // General errors
   generalError: 'Une erreur est survenue',

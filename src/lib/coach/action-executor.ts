@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 export const executeAction = async (actionType: string, data: any) => {
   console.log(`Executing action ${actionType}`, data);

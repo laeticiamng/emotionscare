@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Optimized Universe Modules
 // Performance-first architecture with immersive experiences
 

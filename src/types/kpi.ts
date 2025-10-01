@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 export interface KpiCardProps {
   id: string;

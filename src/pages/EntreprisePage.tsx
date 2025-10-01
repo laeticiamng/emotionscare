@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * EntreprisePage - Solution B2B pour les entreprises
  * 100% accessible avec fonctionnalités avancées

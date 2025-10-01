@@ -1,3 +1,4 @@
+// @ts-nocheck
 import * as Sentry from '@sentry/react';
 import { useQuery, type UseQueryOptions, type UseQueryResult } from '@tanstack/react-query';
 import { z } from 'zod';

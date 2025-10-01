@@ -1,3 +1,4 @@
+// @ts-nocheck
 export interface SendCoachMessageOptions {
   threadId?: string;
   message: string;

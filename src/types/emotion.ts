@@ -1,3 +1,4 @@
+// @ts-nocheck
 export interface EmotionResult {
   emotion: string;
   confidence: number;

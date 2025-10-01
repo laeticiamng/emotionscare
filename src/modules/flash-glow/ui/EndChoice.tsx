@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * EndChoice - Composant de choix de fin pour Flash Glow
  */

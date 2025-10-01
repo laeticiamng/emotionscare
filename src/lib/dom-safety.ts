@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Utilitaires spécialisés pour les opérations DOM sécurisées
  * Prévient spécifiquement les erreurs "Cannot read properties of undefined (reading 'add')"

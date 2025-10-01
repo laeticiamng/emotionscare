@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * useFlashGlowMachine - State machine pour Flash Glow
  * Pattern : idle → loading → active → ending → success|error

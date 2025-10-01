@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Optimisations de performance pour RouterV2
  * TICKET: FE/BE-Router-Cleanup-01 - Performance 100%

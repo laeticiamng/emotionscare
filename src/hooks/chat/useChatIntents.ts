@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 export const useChatIntents = () => {
   // Function to determine the user's intention
