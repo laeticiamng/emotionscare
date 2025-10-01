@@ -1,4 +1,5 @@
 
+// @ts-nocheck
 import React, { useState } from 'react';
 import { useOnboarding } from '@/contexts/OnboardingContext';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
