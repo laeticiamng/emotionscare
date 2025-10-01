@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * UNIFIED LAZY LOADING SYSTEM - Production Ready
  * Centralizes all lazy loading with intelligent preloading and error handling

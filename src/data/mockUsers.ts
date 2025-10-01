@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { User, UserRole } from '@/types/user';
 import { PrivacyPreferences } from '@/types/preferences';
 

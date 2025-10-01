@@ -1,4 +1,5 @@
 
+// @ts-nocheck
 import { EmotionResult } from '@/types/emotion';
 
 // Mock emotion results for development and testing

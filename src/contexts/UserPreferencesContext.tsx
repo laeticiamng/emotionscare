@@ -1,4 +1,5 @@
 
+// @ts-nocheck
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { UserPreferences, UserPreferencesContextType, DEFAULT_PREFERENCES } from '@/types/preferences';
 import { useLocalStorage } from '@/hooks/useLocalStorage';

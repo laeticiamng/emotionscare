@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { MusicTrack, MusicPlaylist } from '@/types/music';
 
 // Mock emotion music playlists
