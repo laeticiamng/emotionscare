@@ -1,4 +1,6 @@
 // @ts-nocheck
+// Note: ESM imports don't provide TypeScript types in Deno
+// Types améliorés avec gestion d'erreurs appropriée
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { authenticateRequest } from '../_shared/auth-middleware.ts';
@@ -68,10 +70,11 @@ serve(async (req) => {
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 
-  } catch (error) {
-    console.error('Error in journal-entry:', error);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Internal server error'
+    console.error('Error in journal-entry:', error)
     return new Response(
-      JSON.stringify({ error: 'Internal server error' }),
+      JSON.stringify({ error: errorMessage }),
       { status: 500, headers: corsHeaders }
     );
   }
