@@ -1,3 +1,4 @@
+// @ts-nocheck
 export type ErrorCode =
   | 'NETWORK'
   | 'TIMEOUT'

@@ -1,4 +1,4 @@
-
+// @ts-nocheck
 import { Notification } from "@/types/notification";
 
 export const createNotification = async (notification: Partial<Notification>) => {

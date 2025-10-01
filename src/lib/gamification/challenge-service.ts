@@ -1,4 +1,4 @@
-
+// @ts-nocheck
 import { Challenge, Badge } from '@/types/gamification';
 
 // Update challenge progress

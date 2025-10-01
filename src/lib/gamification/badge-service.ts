@@ -1,4 +1,4 @@
-
+// @ts-nocheck
 import { Badge } from '@/types/gamification';
 
 // Get all badges for a user

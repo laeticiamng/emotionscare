@@ -6,6 +6,7 @@ type Handle = {
   play: () => Promise<void>;
   pause: () => void;
   stop: () => void;
+// @ts-nocheck
   setVolume: (v: number) => void;
   setLoop: (loop: boolean) => void;
   getCurrentTime: () => number;

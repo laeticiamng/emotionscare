@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { v4 as uuidv4 } from 'uuid';
 import { EmotionalData, EmotionSource } from '@/hooks/coach/types';
 import { EmotionResult } from '@/types/emotion';

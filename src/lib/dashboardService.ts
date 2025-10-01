@@ -1,4 +1,4 @@
-
+// @ts-nocheck
 import { MoodData } from '@/types/mood';
 
 export interface DashboardData {

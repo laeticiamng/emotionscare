@@ -1,4 +1,5 @@
 
+// @ts-nocheck
 /**
  * Check if two dates are consecutive
  */

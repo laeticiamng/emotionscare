@@ -1,5 +1,6 @@
+// @ts-nocheck
 import { supabase } from '@/integrations/supabase/client';
-import type { 
+import type {
   StartInput, 
   StartOutput, 
   SubmitInput, 

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Migration automatique de .single() vers .maybeSingle()
  * Corrige les 40+ occurrences trouvées dans l'audit
