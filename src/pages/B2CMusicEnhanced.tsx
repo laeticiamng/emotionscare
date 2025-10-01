@@ -277,9 +277,9 @@ const B2CMusicEnhanced: React.FC = () => {
     });
   };
 
-  if (showReward && selectedTrack) {
-    return (
-      <ConsentGate>
+  return (
+    <div className="min-h-full bg-background p-8">
+      {showReward && selectedTrack && (
         <RewardSystem
           reward={{
             type: 'crystal',
@@ -290,50 +290,31 @@ const B2CMusicEnhanced: React.FC = () => {
           badgeText="Harmonie créée ♪"
           onComplete={handleRewardComplete}
         />
-      </ConsentGate>
-    );
-  }
+      )}
 
-  return (
-    <ConsentGate>
-      <UniverseEngine
-        universe={universe}
-        isEntering={isEntering}
-        onEnterComplete={handleUniverseEnterComplete}
-        enableParticles={true}
-        enableAmbianceSound={false}
-        className="min-h-screen"
-      >
       {/* Header */}
-      <header className="relative z-50 p-6">
-        <div className="flex items-center justify-between">
-          <Link 
-            to="/app" 
-            className="flex items-center space-x-2 text-foreground/80 hover:text-foreground transition-colors"
-          >
-            <ArrowLeft className="h-5 w-5" />
-            <span className="font-medium">Retour</span>
-          </Link>
-          
-          <div className="flex items-center space-x-2 text-foreground">
-            <Music className="h-6 w-6 text-amber-500" />
-            <h1 className="text-xl font-light tracking-wide">{universe.name}</h1>
+      <div className="mb-8">
+        <div className="flex items-center space-x-3">
+          <div className="flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-r from-purple-500 to-violet-500">
+            <Music className="h-6 w-6 text-white" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold text-foreground">Musicothérapie</h1>
+            <p className="text-muted-foreground">Playlists thérapeutiques personnalisées</p>
           </div>
         </div>
-      </header>
+      </div>
 
       {/* Main Content */}
-      <main className="relative z-10 container mx-auto px-6 py-12">
-        <AnimatePresence mode="wait">
-          {!selectedTrack ? (
-            <motion.div
-              key="selection"
-              variants={entranceVariants}
-              initial="hidden"
-              animate="visible"
-              exit="hidden"
-              className="space-y-12"
-            >
+      <AnimatePresence mode="wait">
+        {!selectedTrack ? (
+          <motion.div
+            key="selection"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="space-y-12"
+          >
               {/* Introduction */}
               <div className="text-center space-y-6">
                 <motion.div
@@ -629,10 +610,8 @@ const B2CMusicEnhanced: React.FC = () => {
             </motion.div>
           )}
         </AnimatePresence>
-      </main>
-      </UniverseEngine>
-    </ConsentGate>
-  );
-}
+      </div>
+    );
+  }
 
 export default B2CMusicEnhanced;
