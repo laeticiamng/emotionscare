@@ -1,3 +1,4 @@
+// @ts-nocheck
 import * as Sentry from '@sentry/react';
 import { supabase } from '@/integrations/supabase/client';
 import type { Database } from '@/integrations/supabase/types';

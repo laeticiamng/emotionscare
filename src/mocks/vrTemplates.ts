@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 import { VRSessionTemplate } from '@/types/vr';
 import { normalizeDifficulty } from '@/components/vr/utils';

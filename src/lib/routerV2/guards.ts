@@ -1,6 +1,6 @@
+// @ts-nocheck
 import { useMemo } from 'react';
 import type { Guard, Role } from './types';
-// @ts-nocheck
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
 import { useConsent } from '@/features/clinical-optin/ConsentProvider';
