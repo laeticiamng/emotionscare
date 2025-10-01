@@ -173,6 +173,10 @@ const RedirectToSocialCocon = lazy(() => import('@/components/redirects/Redirect
 const RedirectToEntreprise = lazy(() => import('@/components/redirects/RedirectToEntreprise'));
 const RedirectToMusic = lazy(() => import('@/components/redirects/RedirectToMusic'));
 
+// Pages Dashboard modules
+const ModulesDashboardPage = lazy(() => import('@/pages/ModulesDashboard'));
+const UnifiedModulesDashboardPage = lazy(() => import('@/pages/UnifiedModulesDashboard'));
+
 // ═══════════════════════════════════════════════════════════
 // MAPPING DES COMPOSANTS
 // ═══════════════════════════════════════════════════════════
@@ -312,6 +316,10 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   RedirectToSocialCocon,
   RedirectToEntreprise,
   RedirectToMusic,
+  
+  // Pages Dashboard modules
+  ModulesDashboardPage,
+  UnifiedModulesDashboardPage,
 };
 
 // ═══════════════════════════════════════════════════════════
@@ -334,12 +342,25 @@ const SuspenseWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) 
   </Suspense>
 );
 
+// Import AppLayout pour sidebar
+const AppLayout = lazy(() => import('@/components/layout/AppLayout').then(m => ({ default: m.AppLayout })));
+
 const LayoutWrapper: React.FC<{ 
   children: React.ReactNode; 
-  layout?: 'marketing' | 'app' | 'simple'
+  layout?: 'marketing' | 'app' | 'simple' | 'app-sidebar'
 }> = ({ children, layout = 'app' }) => {
   if (layout === 'marketing' || layout === 'simple') {
     return <>{children}</>;
+  }
+  
+  if (layout === 'app-sidebar') {
+    return (
+      <Suspense fallback={<LoadingState variant="page" />}>
+        <AppLayout>
+          {children}
+        </AppLayout>
+      </Suspense>
+    );
   }
   
   return (

@@ -174,11 +174,20 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
   // MODULES FONCTIONNELS (CONSUMER)
   // ═══════════════════════════════════════════════════════════
   {
+    name: 'modules-dashboard',
+    path: '/app/modules',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app-sidebar',
+    component: 'UnifiedModulesDashboardPage',
+    guard: true,
+  },
+  {
     name: 'scan',
     path: '/app/scan',
     segment: 'consumer',
     role: 'consumer',
-    layout: 'app',
+    layout: 'app-sidebar',
     component: 'B2CScanPage',
     guard: true,
     aliases: ['/scan'],
