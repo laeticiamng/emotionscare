@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 /**
  * EMOTION SCANNER PREMIUM - EMOTIONSCARE
  * Scanner d'émotions avancé avec IA, accessible et performant

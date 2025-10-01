@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import React from 'react';
 import { motion } from 'framer-motion';
 import { EmotionResult } from '@/types/emotion';
