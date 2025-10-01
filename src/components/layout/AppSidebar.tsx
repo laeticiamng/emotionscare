@@ -75,9 +75,11 @@ const settingsModules = [
 ];
 
 export function AppSidebar() {
-  const { collapsed } = useSidebar();
+  const { state, open, setOpenMobile, isMobile } = useSidebar();
   const location = useLocation();
   const currentPath = location.pathname;
+  
+  const collapsed = state === 'collapsed' || !open;
 
   const isActive = (url: string) => currentPath === url || currentPath.startsWith(url);
 
@@ -85,6 +87,13 @@ export function AppSidebar() {
     active
       ? 'bg-primary/10 text-primary font-semibold border-l-4 border-primary'
       : 'hover:bg-muted/50 text-muted-foreground hover:text-foreground transition-colors';
+
+  // Ferme le sidebar mobile après navigation
+  const handleLinkClick = () => {
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+  };
 
   return (
     <Sidebar
@@ -106,6 +115,7 @@ export function AppSidebar() {
                       to={item.url}
                       end
                       className={({ isActive }) => getNavCls(isActive)}
+                      onClick={handleLinkClick}
                     >
                       <item.icon className={collapsed ? 'h-5 w-5' : 'mr-3 h-5 w-5'} />
                       {!collapsed && <span>{item.title}</span>}
@@ -130,6 +140,7 @@ export function AppSidebar() {
                     <NavLink
                       to={item.url}
                       className={({ isActive }) => getNavCls(isActive)}
+                      onClick={handleLinkClick}
                     >
                       <item.icon className={collapsed ? 'h-5 w-5' : 'mr-3 h-5 w-5'} />
                       {!collapsed && <span>{item.title}</span>}
@@ -154,6 +165,7 @@ export function AppSidebar() {
                     <NavLink
                       to={item.url}
                       className={({ isActive }) => getNavCls(isActive)}
+                      onClick={handleLinkClick}
                     >
                       <item.icon className={collapsed ? 'h-5 w-5' : 'mr-3 h-5 w-5'} />
                       {!collapsed && <span>{item.title}</span>}
@@ -178,6 +190,7 @@ export function AppSidebar() {
                     <NavLink
                       to={item.url}
                       className={({ isActive }) => getNavCls(isActive)}
+                      onClick={handleLinkClick}
                     >
                       <item.icon className={collapsed ? 'h-5 w-5' : 'mr-3 h-5 w-5'} />
                       {!collapsed && <span>{item.title}</span>}
@@ -202,6 +215,7 @@ export function AppSidebar() {
                     <NavLink
                       to={item.url}
                       className={({ isActive }) => getNavCls(isActive)}
+                      onClick={handleLinkClick}
                     >
                       <item.icon className={collapsed ? 'h-5 w-5' : 'mr-3 h-5 w-5'} />
                       {!collapsed && <span>{item.title}</span>}
@@ -226,6 +240,7 @@ export function AppSidebar() {
                     <NavLink
                       to={item.url}
                       className={({ isActive }) => getNavCls(isActive)}
+                      onClick={handleLinkClick}
                     >
                       <item.icon className={collapsed ? 'h-5 w-5' : 'mr-3 h-5 w-5'} />
                       {!collapsed && <span>{item.title}</span>}
