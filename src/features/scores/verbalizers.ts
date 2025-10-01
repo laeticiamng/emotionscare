@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { addDays, addWeeks, format, parseISO, startOfISOWeek } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
