@@ -1,9 +1,9 @@
-// @ts-nocheck
 /**
  * Routes helpers - source unique alignée sur RouterV2
  */
 
 import { ROUTES, ROUTE_NAME_BY_PATH, ROUTES_BY_NAME } from './routerV2/routes.config';
+import { logger } from '@/lib/logger';
 
 export type RouteName = (typeof ROUTES)[number]['name'];
 
@@ -39,9 +39,7 @@ function resolveRoutePath(name: string, fallback?: string): string {
     if (fallback) {
       return fallback;
     }
-    if (typeof console !== 'undefined') {
-      console.error(`[routerV2] Route inconnue: "${name}"`, error);
-    }
+    logger.error(`Route inconnue: "${name}"`, error as Error, 'SYSTEM');
     return '/';
   }
 }

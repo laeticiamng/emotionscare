@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Toast Hook - Hook pour afficher des notifications toast
  * Compatible avec shadcn/ui et personnalisable

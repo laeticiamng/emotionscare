@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -25,11 +24,15 @@ const EnhancedShell: React.FC<EnhancedShellProps> = ({
   immersive = false,
   className = '',
 }) => {
-  const { theme, isDarkMode, reduceMotion } = useTheme();
+  const { theme } = useTheme();
   const [scrolled, setScrolled] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
   const location = useLocation();
   const [commandMenuOpen, setCommandMenuOpen] = useState(false);
+  
+  // Compute derived theme properties
+  const isDarkMode = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   
   // Handling scroll effects
   useEffect(() => {
