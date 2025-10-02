@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { musicService, type MusicPreset, type MusicSession } from '@/services/b2c/musicService';
+import { MusicPlayer } from '@/components/b2c/MusicPlayer';
 import { toast } from '@/hooks/use-toast';
 import { Music, Play, Loader2, CheckCircle, XCircle, Clock } from 'lucide-react';
 
@@ -175,37 +176,32 @@ const B2CMusicPage: React.FC = () => {
 
           <div className="space-y-3">
             {sessions.map((session) => (
-              <Card key={session.id} className="p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3 flex-1">
-                    {getStatusIcon(session.status)}
-                    <div className="flex-1">
-                      <p className="font-medium">Session musicale</p>
-                      <p className="text-sm text-muted-foreground">
-                        {new Date(session.ts_start).toLocaleString('fr-FR')}
-                      </p>
+              <Card key={session.id} className="p-4 b2c-card">
+                {session.status === 'completed' && session.artifact_url ? (
+                  <MusicPlayer
+                    audioUrl={session.artifact_url}
+                    title={`Session du ${new Date(session.ts_start).toLocaleDateString('fr-FR')}`}
+                    artist="EmotionsCare Therapy"
+                  />
+                ) : (
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3 flex-1">
+                      {getStatusIcon(session.status)}
+                      <div className="flex-1">
+                        <p className="font-medium">Session musicale</p>
+                        <p className="text-sm text-muted-foreground">
+                          {new Date(session.ts_start).toLocaleString('fr-FR')}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <span className="text-sm px-3 py-1 rounded-full bg-muted">
+                        {getStatusLabel(session.status)}
+                      </span>
                     </div>
                   </div>
-
-                  <div className="flex items-center gap-3">
-                    <span className="text-sm px-3 py-1 rounded-full bg-muted">
-                      {getStatusLabel(session.status)}
-                    </span>
-
-                    {session.status === 'completed' && session.artifact_url && (
-                      <Button size="sm" variant="outline" asChild>
-                        <a 
-                          href={session.artifact_url} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                        >
-                          <Play className="mr-2 h-4 w-4" />
-                          Écouter
-                        </a>
-                      </Button>
-                    )}
-                  </div>
-                </div>
+                )}
               </Card>
             ))}
           </div>

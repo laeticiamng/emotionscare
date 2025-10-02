@@ -8,6 +8,7 @@ import { useUserRole } from '@/hooks/useUserRole';
 import { moodService } from '@/services/b2c/moodService';
 import { musicService } from '@/services/b2c/musicService';
 import { immersiveService } from '@/services/b2c/immersiveService';
+import { MoodVisualizer } from '@/components/b2c/MoodVisualizer';
 import { 
   Heart, 
   Music, 
@@ -96,10 +97,19 @@ const B2CDashboardPage: React.FC = () => {
         </p>
       </div>
 
+      {/* Mood Visualizer */}
+      {moodStats && moodStats.latestMood && (
+        <MoodVisualizer
+          valence={moodStats.latestMood.valence || 0}
+          arousal={moodStats.latestMood.arousal || 0}
+          size="lg"
+        />
+      )}
+
       {/* Stats Cards */}
       <div className="grid md:grid-cols-3 gap-6">
         {/* Mood Stats */}
-        <Card className="p-6">
+        <Card className="p-6 b2c-card">
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <Heart className="h-8 w-8 text-primary" />
