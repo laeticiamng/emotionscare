@@ -145,7 +145,7 @@ const HomePage: React.FC = () => {
                 >
                   <PrimaryCTA 
                     kind="scan"
-                    tone="scan"
+                    tone="neutral"
                   />
                 </motion.div>
               )}
@@ -161,7 +161,7 @@ const HomePage: React.FC = () => {
             >
               <DashboardCards 
                 order={['breathe', 'journal', 'music', 'community']}
-                tone="scan"
+                tone="neutral"
               />
             </motion.div>
           )}
