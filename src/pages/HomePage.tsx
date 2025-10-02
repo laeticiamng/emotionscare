@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * HomePage — La Salle des Cartes Vivantes
  * Dashboard immersif avec tirage de carte hebdomadaire
@@ -145,8 +144,8 @@ const HomePage: React.FC = () => {
                   className="mt-8 text-center"
                 >
                   <PrimaryCTA 
-                    kind="primary"
-                    tone={currentCard.theme}
+                    kind="scan"
+                    tone="scan"
                   />
                 </motion.div>
               )}
@@ -162,7 +161,7 @@ const HomePage: React.FC = () => {
             >
               <DashboardCards 
                 order={['breathe', 'journal', 'music', 'community']}
-                tone={currentCard.theme}
+                tone="scan"
               />
             </motion.div>
           )}

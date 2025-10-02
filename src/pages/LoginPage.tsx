@@ -1,12 +1,10 @@
-// @ts-nocheck
 /**
  * LOGIN PAGE PREMIUM - EMOTIONSCARE
  * Page de connexion moderne, accessible et sécurisée
  */
 
-// @ts-nocheck
 import React, { useState } from 'react';
-import { Link, useSearchParams, Navigate } from 'react-router-dom';
+import { Link, useSearchParams, Navigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
