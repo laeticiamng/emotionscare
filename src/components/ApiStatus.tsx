@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 /**
  * Composant ApiStatus
@@ -7,6 +6,7 @@
  * Utile pour le debugging et la vérification de la connectivité.
  */
 import React, { useState, useEffect } from 'react';
+import { logger } from '@/lib/logger';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -31,7 +31,7 @@ const ApiStatus: React.FC<ApiStatusProps> = ({
       const status = await (apiServices as any).checkAllAPIs?.() || {};
       setApiStatus(status);
     } catch (error) {
-      console.error('Error checking API status:', error);
+      logger.error('Error checking API status', error, 'API');
     } finally {
       setIsChecking(false);
     }

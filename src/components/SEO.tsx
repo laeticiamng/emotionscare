@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Composant SEO réutilisable pour optimiser le référencement
  * Utilise react-helmet-async pour gérer les méta tags dynamiquement
