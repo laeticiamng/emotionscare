@@ -33,14 +33,13 @@ const NavigationPage: React.FC = () => {
   
   // Vérification auth simple sans bloquer le rendu
   let isAuthenticated = false;
-  let userEmail = '';
+  let userEmail = 'Invité';
   try {
-    const { isAuthenticated: authStatus, user } = useAuth();
-    isAuthenticated = authStatus;
-    userEmail = user?.email || '';
-  } catch (error) {
-    // Contexte non disponible - continuer sans auth
-    console.warn('Auth context not available');
+    const auth = useAuth();
+    isAuthenticated = auth?.isAuthenticated || false;
+    userEmail = auth?.user?.email || 'Invité';
+  } catch {
+    // Auth non disponible, mode public
   }
   
   const [navItems] = useState<NavItem[]>([

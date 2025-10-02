@@ -695,11 +695,10 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
   {
     name: 'navigation',
     path: '/navigation',
-    segment: 'consumer',
-    role: 'consumer',
-    layout: 'app-sidebar',
+    segment: 'public',
+    layout: 'simple',
     component: 'NavigationPage',
-    guard: true,
+    guard: false,
   },
   {
     name: 'choose-mode',
