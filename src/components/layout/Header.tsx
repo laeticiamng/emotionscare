@@ -1,10 +1,10 @@
-// @ts-nocheck
 /**
  * HEADER PREMIUM EMOTIONSCARE - Version Complète
  * Navigation principale responsive avec toutes les fonctionnalités premium
  */
 
 import React, { useState, useEffect } from 'react';
+import { logger } from '@/lib/logger';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -80,7 +80,15 @@ const Header: React.FC<HeaderProps> = ({
   }, []);
 
   // Navigation items configuration
-  const guestNavItems = [
+  interface NavItem {
+    label: string;
+    href: string;
+    icon: typeof Heart;
+    badge?: string;
+    children?: Array<{ label: string; href: string }>;
+  }
+
+  const guestNavItems: NavItem[] = [
     { label: 'Accueil', href: '/', icon: Heart },
     { label: 'Personnel (B2C)', href: '/b2c', icon: User },
     { label: 'Entreprise (B2B)', href: '/entreprise', icon: Building2 },
@@ -88,7 +96,7 @@ const Header: React.FC<HeaderProps> = ({
     { label: 'Aide', href: '/help', icon: HelpCircle },
   ];
 
-  const authenticatedNavItems = [
+  const authenticatedNavItems: NavItem[] = [
     { label: 'Dashboard', href: '/app/home', icon: Heart },
     { 
       label: 'Scanner', 
@@ -143,7 +151,7 @@ const Header: React.FC<HeaderProps> = ({
       await signOut();
       navigate('/');
     } catch (error) {
-      console.error('Erreur lors de la déconnexion:', error);
+      logger.error('Erreur lors de la déconnexion', error as Error, 'AUTH');
     }
   };
 
@@ -380,15 +388,15 @@ const Header: React.FC<HeaderProps> = ({
                 {/* User Menu Premium */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="flex items-center space-x-2 h-9">
-                      <Avatar className="h-7 w-7">
-                        <AvatarImage src={user?.user_metadata?.avatar_url} />
-                        <AvatarFallback className="text-xs bg-gradient-to-br from-primary to-primary/70 text-white">
-                          {getUserInitials(user.email)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <ChevronDown className="h-3 w-3" />
-                    </Button>
+                <Button variant="ghost" className="flex items-center space-x-2 h-9">
+                  <Avatar className="h-7 w-7">
+                    <AvatarImage src={user?.user_metadata?.avatar_url} />
+                    <AvatarFallback className="text-xs bg-gradient-to-br from-primary to-primary/70 text-white">
+                      {getUserInitials(user.email)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <ChevronDown className="h-3 w-3" />
+                </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-64">
                     <DropdownMenuLabel>

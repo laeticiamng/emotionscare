@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * B2C VR BREATH GUIDE PAGE - EMOTIONSCARE
  * Page VR respiration accessible WCAG 2.1 AA
@@ -10,6 +9,7 @@ import { Play, Pause, RotateCcw, Eye, EyeOff, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
+import { ConsentGate } from '@/features/clinical-optin/ConsentGate';
 
 interface BreathSession {
   duration: number; // en secondes
