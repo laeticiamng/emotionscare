@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * RouterV2 - Router unifié principal
  * TICKET: FE/BE-Router-Cleanup-01
@@ -128,7 +127,7 @@ const NavigationPage = lazy(() => import('@/pages/NavigationPage'));
 const LeaderboardPage = lazy(() => import('@/pages/LeaderboardPage'));
 const GamificationPage = lazy(() => import('@/pages/GamificationPage'));
 const ScoresPage = lazy(() => import('@/pages/ScoresPage'));
-const PricingPageWorking = lazy(() => import('../pages/PricingPageWorking.jsx'));
+// const PricingPageWorking = lazy(() => import('../pages/PricingPageWorking.jsx'));
 
 // Pages existantes à consolider
 const MessagesPage = lazy(() => import('@/pages/MessagesPage'));
@@ -268,7 +267,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   ReportingPage,
   ExportPage,
   NavigationPage,
-  PricingPageWorking,
+  // PricingPageWorking,
   
   // Pages existantes consolidées
   MessagesPage,
@@ -342,7 +341,7 @@ const SuspenseWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) 
   </Suspense>
 );
 
-// Import AppLayout pour sidebar
+// Import AppLayout for sidebar - uses Outlet instead of children
 const AppLayoutComponent = lazy(() => import('@/components/layout/AppLayout'));
 
 const LayoutWrapper: React.FC<{ 
@@ -353,13 +352,14 @@ const LayoutWrapper: React.FC<{
     return <>{children}</>;
   }
   
+  // Note: app-sidebar layout cannot be used here because AppLayout uses <Outlet />
+  // Routes using app-sidebar should be defined with nested routes in the router
   if (layout === 'app-sidebar') {
     return (
-      <Suspense fallback={<LoadingState variant="page" />}>
-        <AppLayoutComponent>
-          {children}
-        </AppLayoutComponent>
-      </Suspense>
+      <EnhancedShell>
+        {children}
+        <FloatingActionMenu />
+      </EnhancedShell>
     );
   }
   

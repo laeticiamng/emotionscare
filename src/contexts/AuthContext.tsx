@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 /**
  * AuthContext - Gestion de l'authentification centralisée
  * Intégration Supabase avec gestion d'état et persistence
@@ -112,10 +110,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
       }
 
       if (data.user && !data.user.email_confirmed_at) {
-        console.log('Email de confirmation envoyé');
+      console.log('Email de confirmation envoyé');
       }
-
-      return data;
     } catch (error) {
       console.error('Erreur lors de l\'inscription:', error);
       throw error;
@@ -137,7 +133,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
       }
 
       console.log('Connexion réussie pour:', email);
-      return data;
     } catch (error) {
       console.error('Erreur lors de la connexion:', error);
       throw error;

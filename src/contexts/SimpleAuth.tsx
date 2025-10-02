@@ -1,13 +1,20 @@
-// @ts-nocheck
 import React, { createContext, useContext, useState, useEffect } from 'react';
+
+interface User {
+  id: string;
+  email: string;
+  role: string;
+  name: string;
+  [key: string]: unknown;
+}
 
 interface SimpleAuthContextType {
   isAuthenticated: boolean;
-  user: any | null;
+  user: User | null;
   role: string | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string, metadata?: any) => Promise<void>;
+  signUp: (email: string, password: string, metadata?: Record<string, unknown>) => Promise<void>;
   signOut: () => void;
 }
 
@@ -25,7 +32,7 @@ export const useSimpleAuth = () => useContext(SimpleAuthContext);
 
 export const SimpleAuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [user, setUser] = useState<any | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [role, setRole] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false); // Commencer avec false pour éviter de bloquer les champs
 
@@ -80,16 +87,15 @@ export const SimpleAuthProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     }
   };
 
-  const signUp = async (email: string, password: string, metadata?: any) => {
+  const signUp = async (email: string, password: string, metadata?: Record<string, unknown>) => {
     setLoading(true);
     try {
       // Simple mock registration - in real app, this would call your API
-      const mockUser = {
+      const mockUser: User = {
         id: 'user-' + Date.now(),
         email,
         role: metadata?.segment === 'b2b' ? 'employee' : 'consumer',
-        name: metadata?.full_name || 'Nouvel utilisateur',
-        ...metadata
+        name: (metadata?.full_name as string) || 'Nouvel utilisateur',
       };
 
       setUser(mockUser);
