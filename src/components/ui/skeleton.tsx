@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { cn } from "@/lib/utils";
 
 function Skeleton({
