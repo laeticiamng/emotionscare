@@ -24,7 +24,7 @@ export function AppLayout() {
           </header>
           
           {/* Main Content */}
-          <main className="flex-1 p-6" role="main" id="main-content">
+          <main className="flex-1 p-6 bg-background text-foreground" role="main" id="main-content">
             <Outlet />
           </main>
         </div>
