@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { Home, Heart, Gamepad2, Users, BarChart3, Settings, Music, Brain, BookOpen, Sparkles, MessageCircle, Calendar, FileText, Download } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import {
@@ -76,7 +75,7 @@ const navigationItems = [
 ];
 
 export function AppSidebar() {
-  const { collapsed } = useSidebar();
+  const { open } = useSidebar();
   const location = useLocation();
   const currentPath = location.pathname;
 
@@ -88,11 +87,11 @@ export function AppSidebar() {
       : 'hover:bg-accent/50 hover:text-accent-foreground';
 
   return (
-    <Sidebar className={collapsed ? 'w-14' : 'w-60'} collapsible>
+    <Sidebar className={open ? 'w-60' : 'w-14'} collapsible="icon">
       <SidebarContent>
         {navigationItems.map((section) => (
           <SidebarGroup key={section.category}>
-            {!collapsed && (
+            {open && (
               <SidebarGroupLabel className="text-xs font-semibold text-muted-foreground px-4 py-2">
                 {section.category}
               </SidebarGroupLabel>
@@ -104,7 +103,7 @@ export function AppSidebar() {
                     <SidebarMenuButton asChild>
                       <NavLink to={item.url} end className={getNavCls}>
                         <item.icon className="h-4 w-4 shrink-0" />
-                        {!collapsed && <span className="ml-3">{item.title}</span>}
+                        {open && <span className="ml-3">{item.title}</span>}
                       </NavLink>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
