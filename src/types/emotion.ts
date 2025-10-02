@@ -1,4 +1,3 @@
-// @ts-nocheck
 export interface EmotionResult {
   emotion: string;
   confidence: number;
@@ -8,6 +7,10 @@ export interface EmotionResult {
   insight?: string;
   intensity?: number;
   suggestions?: string[];
+  source?: 'text' | 'voice' | 'facial' | 'manual';
+  transcription?: string;
+  sentiment?: string;
+  details?: any;
 }
 
 export interface EmotionRecommendation {

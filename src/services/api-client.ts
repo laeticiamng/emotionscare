@@ -163,10 +163,11 @@ export class ApiClient {
   /**
    * Authentification
    */
-  static async signIn(email: string, password: string) {
-    return this.request(() => 
-      supabase.auth.signInWithPassword({ email, password })
-    );
+  static async signIn(email: string, password: string): Promise<ApiResponse<any>> {
+    return this.request(async () => {
+      const result = await supabase.auth.signInWithPassword({ email, password });
+      return result as { data: any; error: any };
+    });
   }
 
   static async signUp(email: string, password: string, metadata?: any) {
@@ -179,8 +180,11 @@ export class ApiClient {
     );
   }
 
-  static async signOut() {
-    return this.request(() => supabase.auth.signOut());
+  static async signOut(): Promise<ApiResponse<unknown>> {
+    return this.request(async () => {
+      const result = await supabase.auth.signOut();
+      return { data: {}, error: result.error };
+    });
   }
 
   static async resetPassword(email: string) {
@@ -194,9 +198,9 @@ export class ApiClient {
   /**
    * Gestion des profils
    */
-  static async getProfile(userId: string) {
-    return this.request(() => 
-      supabase
+  static async getProfile(userId: string): Promise<ApiResponse<any>> {
+    return this.request(async () => 
+      await supabase
         .from('profiles')
         .select('*')
         .eq('id', userId)
@@ -204,9 +208,9 @@ export class ApiClient {
     );
   }
 
-  static async updateProfile(userId: string, updates: any) {
-    return this.request(() => 
-      supabase
+  static async updateProfile(userId: string, updates: any): Promise<ApiResponse<any>> {
+    return this.request(async () => 
+      await supabase
         .from('profiles')
         .update(updates)
         .eq('id', userId)
@@ -232,9 +236,9 @@ export class ApiClient {
   /**
    * Données métier (exemples)
    */
-  static async getEmotionScans(userId: string, limit = 50) {
-    return this.request(() => 
-      supabase
+  static async getEmotionScans(userId: string, limit = 50): Promise<ApiResponse<any[] | null>> {
+    return this.request(async () => 
+      await supabase
         .from('emotion_scans')
         .select('*')
         .eq('user_id', userId)
@@ -256,8 +260,8 @@ export class ApiClient {
       emotional_balance: scanData.emotional_balance ?? null,
     };
 
-    return this.request(() =>
-      supabase
+    return this.request(async () =>
+      await supabase
         .from('emotion_scans')
         .insert(payload)
         .select()

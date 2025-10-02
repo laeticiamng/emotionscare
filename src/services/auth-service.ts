@@ -69,16 +69,18 @@ export const authService = {
       }
       
       // Transformer la réponse Supabase en User
+      const validRole = (normalizedRole === 'b2b' || normalizedRole === 'b2c') ? normalizedRole : 'b2c';
+      const validLanguage = (preferences.language === 'en' || preferences.language === 'fr') ? preferences.language : 'fr';
+      
       const user: User = {
         id: data.user.id,
         email: data.user.email || email,
         name: name || email.split('@')[0],
-        role: normalizedRole,
-        created_at: data.user.created_at,
+        role: validRole,
+        createdAt: data.user.created_at,
         preferences: {
           theme: 'system',
-          language: 'fr',
-          ...preferences,
+          language: validLanguage,
         }
       };
       setRoleCookie(user.role);
@@ -132,12 +134,15 @@ export const authService = {
         .single();
       
       // Transformer la réponse Supabase en User
+      const rawRole = profileData?.role || data.user.user_metadata?.role || 'b2c';
+      const validRole = (rawRole === 'b2b' || rawRole === 'b2c') ? rawRole : 'b2c';
+      
       const user: User = {
         id: data.user.id,
         email: data.user.email || email,
         name: profileData?.name || data.user.user_metadata?.name || email.split('@')[0],
-        role: (profileData?.role || data.user.user_metadata?.role || 'b2c') as UserRole,
-        created_at: data.user.created_at,
+        role: validRole,
+        createdAt: data.user.created_at,
         preferences: {
           theme: 'system',
           language: 'fr',
@@ -188,12 +193,15 @@ export const authService = {
         .eq('id', data.session.user.id)
         .single();
       
+      const rawRole = profileData?.role || data.session.user.user_metadata?.role || 'b2c';
+      const validRole = (rawRole === 'b2b' || rawRole === 'b2c') ? rawRole : 'b2c';
+      
       const user: User = {
         id: data.session.user.id,
         email: data.session.user.email || '',
         name: profileData?.name || data.session.user.user_metadata?.name || '',
-        role: (profileData?.role || data.session.user.user_metadata?.role || 'b2c') as UserRole,
-        created_at: data.session.user.created_at,
+        role: validRole,
+        createdAt: data.session.user.created_at,
         preferences: {
           theme: 'system',
           language: 'fr',

@@ -14,6 +14,8 @@ export class EmotionService {
       return {
         emotion: data.emotion,
         confidence: data.confidence,
+        valence: data.valence || 0,
+        arousal: data.arousal || 0,
         source: 'text',
         timestamp: new Date(),
         transcription: text,
@@ -39,6 +41,8 @@ export class EmotionService {
       return {
         emotion: data.emotion,
         confidence: data.confidence,
+        valence: data.valence || 0,
+        arousal: data.arousal || 0,
         source: 'voice',
         timestamp: new Date(),
         transcription: data.transcription,
@@ -62,6 +66,8 @@ export class EmotionService {
       return {
         emotion: data.emotion,
         confidence: data.confidence,
+        valence: data.valence || 0,
+        arousal: data.arousal || 0,
         source: 'facial',
         timestamp: new Date(),
         details: data.details
