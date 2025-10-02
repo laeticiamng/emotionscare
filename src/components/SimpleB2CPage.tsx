@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Simple B2C Landing Page - Version Stable
  */

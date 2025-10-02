@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React, { useEffect } from 'react';
 import { useSessionSecurity } from '@/hooks/use-session-security';
 import { Button } from '@/components/ui/button';
