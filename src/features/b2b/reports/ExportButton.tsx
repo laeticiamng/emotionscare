@@ -1,9 +1,9 @@
-// @ts-nocheck
 import React from 'react';
 import * as Sentry from '@sentry/react';
 import { Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { exportNodeToPng } from '@/features/export/exportPng';
+import { logger } from '@/lib/logger';
 
 interface ExportButtonProps {
   targetRef: React.RefObject<HTMLElement>;
@@ -24,7 +24,7 @@ export function ExportButton({ targetRef, fileName = 'heatmap.png', className }:
       await exportNodeToPng(targetRef.current, fileName);
     } catch (error) {
       Sentry.addBreadcrumb({ category: 'b2b:export:png', message: 'error', level: 'error' });
-      console.error('[b2b-export] PNG export failed', error);
+      logger.error('[b2b-export] PNG export failed', { error });
     } finally {
       setIsExporting(false);
     }
