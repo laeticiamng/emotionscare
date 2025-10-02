@@ -1,5 +1,5 @@
-// @ts-nocheck
 import React, { useState, useRef, useCallback } from 'react';
+import { logger } from '@/lib/logger';
 import { motion, useAnimation, useMotionValue, useTransform } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -149,7 +149,7 @@ export const AnimatedButton: React.FC<AnimatedButtonProps> = ({
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 1000);
     } catch (error) {
-      console.error('Button action failed:', error);
+      logger.error('Button action failed', { error }, 'ANIMATIONS');
     } finally {
       setIsPressed(false);
     }
@@ -225,23 +225,26 @@ export const AnimatedButton: React.FC<AnimatedButtonProps> = ({
         )}
       </Button>
 
-      <style jsx>{`
-        .ripple-effect {
-          position: absolute;
-          border-radius: 50%;
-          background: rgba(255, 255, 255, 0.6);
-          transform: scale(0);
-          animation: ripple 0.6s linear;
-          pointer-events: none;
-        }
-
-        @keyframes ripple {
-          to {
-            transform: scale(4);
-            opacity: 0;
+      {/* CSS for ripple effect */}
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          .ripple-effect {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.6);
+            transform: scale(0);
+            animation: ripple 0.6s linear;
+            pointer-events: none;
           }
-        }
-      `}</style>
+
+          @keyframes ripple {
+            to {
+              transform: scale(4);
+              opacity: 0;
+            }
+          }
+        `
+      }} />
     </motion.div>
   );
 };
@@ -486,7 +489,9 @@ export const AnimatedToast: React.FC<AnimatedToastProps> = ({
   React.useEffect(() => {
     const timer = setTimeout(() => {
       setIsVisible(false);
-      setTimeout(onClose, 300);
+      if (onClose) {
+        setTimeout(onClose, 300);
+      }
     }, duration);
 
     return () => clearTimeout(timer);
