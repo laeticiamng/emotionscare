@@ -1,5 +1,5 @@
-// @ts-nocheck
 import React, { useState, useEffect } from 'react';
+import { logger } from '@/lib/logger';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -184,7 +184,7 @@ export const GlobalConfigurationCenter: React.FC = () => {
       setConfig(mockConfig);
       setOriginalConfig(JSON.parse(JSON.stringify(mockConfig)));
     } catch (error) {
-      console.error('Erreur lors du chargement de la configuration:', error);
+      logger.error('Erreur lors du chargement de la configuration', error, 'ADMIN');
       toast.error('Erreur lors du chargement de la configuration');
     } finally {
       setLoading(false);
@@ -285,7 +285,7 @@ export const GlobalConfigurationCenter: React.FC = () => {
       
       toast.success('Configuration sauvegardée avec succès');
     } catch (error) {
-      console.error('Erreur lors de la sauvegarde:', error);
+      logger.error('Erreur lors de la sauvegarde', error, 'ADMIN');
       toast.error('Erreur lors de la sauvegarde de la configuration');
     } finally {
       setSaving(false);
