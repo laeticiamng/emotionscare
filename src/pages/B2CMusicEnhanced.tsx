@@ -104,9 +104,29 @@ const categoryIcons = {
 
 const B2CMusicEnhanced: React.FC = () => {
   const { toast } = useToast();
-  const { state, play, setPlaylist } = useMusic();
   
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  // Protection du contexte Music
+  let musicContext;
+  try {
+    musicContext = useMusic();
+  } catch (error) {
+    console.error('MusicContext not available:', error);
+    return (
+      <div className="min-h-full bg-background p-8 flex items-center justify-center">
+        <Card className="max-w-md">
+          <CardContent className="p-6 text-center space-y-4">
+            <Music className="h-12 w-12 mx-auto text-muted-foreground" />
+            <h2 className="text-xl font-semibold text-foreground">Service musical indisponible</h2>
+            <p className="text-muted-foreground">Le service de musique n'est pas disponible actuellement.</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+  
+  const { state, play, setPlaylist } = musicContext;
+  
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(true);
   const [favorites, setFavorites] = useState<string[]>(() => {
     if (typeof window === 'undefined') return [];
     try {
@@ -219,28 +239,21 @@ const B2CMusicEnhanced: React.FC = () => {
       </div>
 
       {/* Main Content */}
-      <AnimatePresence mode="wait">
+      <div>
         {!playerVisible ? (
-          <motion.div
-            key="selection"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
+          <div
             className="space-y-12"
           >
             {/* Introduction */}
             <div className="text-center space-y-6">
-              <motion.div
-                initial={{ scale: 0, rotate: -180 }}
-                animate={{ scale: 1, rotate: 0 }}
-                transition={{ delay: 0.5, type: "spring" }}
+              <div
                 className="inline-flex items-center justify-center w-20 h-20 rounded-full mb-6"
                 style={{ 
                   background: `linear-gradient(135deg, ${universe.ambiance.colors.primary}, ${universe.ambiance.colors.accent})` 
                 }}
               >
                 <Disc3 className="h-10 w-10 text-white" />
-              </motion.div>
+              </div>
               
               <h2 className="text-4xl font-light text-foreground tracking-wide">
                 Vinyles en Apesanteur
@@ -269,15 +282,7 @@ const B2CMusicEnhanced: React.FC = () => {
                 const Icon = categoryIcons[track.category];
                 
                 return (
-                  <motion.div
-                    key={track.id}
-                    initial={{ opacity: 0, y: 30, rotateY: -30 }}
-                    animate={{ opacity: 1, y: 0, rotateY: 0 }}
-                    transition={{ delay: 0.7 + index * 0.2 }}
-                    whileHover={{ scale: 1.05, rotateY: 15 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="perspective-1000"
-                  >
+                  <div key={track.id}>
                     <Card
                       className="h-full bg-card/90 backdrop-blur-md hover:shadow-lg transition-all duration-300 cursor-pointer group overflow-hidden"
                       onClick={() => startTrack(track)}
@@ -285,11 +290,9 @@ const B2CMusicEnhanced: React.FC = () => {
                       <CardContent className="p-6 space-y-4">
                         {/* Vinyl Disc */}
                         <div className="relative">
-                          <motion.div
-                            className="w-24 h-24 mx-auto rounded-full relative overflow-hidden group-hover:scale-110 transition-transform duration-300"
+                          <div
+                            className="w-24 h-24 mx-auto rounded-full relative overflow-hidden transition-transform duration-300"
                             style={{ background: track.vinylColor }}
-                            whileHover={{ rotateZ: 180 }}
-                            transition={{ duration: 1 }}
                           >
                             {/* Vinyl grooves */}
                             <div className="absolute inset-2 rounded-full border-2 border-black/20" />
@@ -300,7 +303,7 @@ const B2CMusicEnhanced: React.FC = () => {
                             <div className="absolute top-1/2 left-1/2 w-6 h-6 -mt-3 -ml-3 rounded-full bg-card border-2 border-black/30 flex items-center justify-center">
                               <Icon className="w-3 h-3" style={{ color: track.color }} />
                             </div>
-                          </motion.div>
+                          </div>
                           
                           {/* Floating effect */}
                           <div 
@@ -365,17 +368,13 @@ const B2CMusicEnhanced: React.FC = () => {
                         </div>
                       </CardContent>
                     </Card>
-                  </motion.div>
+                  </div>
                 );
               })}
             </div>
-          </motion.div>
+          </div>
         ) : (
-          <motion.div
-            key="player"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
+          <div
             className="max-w-2xl mx-auto space-y-6"
           >
             <Button
@@ -388,9 +387,9 @@ const B2CMusicEnhanced: React.FC = () => {
             </Button>
 
             <UnifiedMusicPlayer />
-          </motion.div>
+          </div>
         )}
-      </AnimatePresence>
+      </div>
     </div>
   );
 };
