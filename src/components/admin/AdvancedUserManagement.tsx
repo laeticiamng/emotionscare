@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -14,6 +13,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 interface User {
   id: string;
@@ -121,7 +121,7 @@ export const AdvancedUserManagement: React.FC = () => {
       });
 
     } catch (error) {
-      console.error('Erreur lors du chargement des utilisateurs:', error);
+      logger.error('Erreur lors du chargement des utilisateurs', error, 'Admin');
       toast.error('Erreur lors du chargement des utilisateurs');
     } finally {
       setLoading(false);
@@ -234,7 +234,7 @@ export const AdvancedUserManagement: React.FC = () => {
           break;
       }
     } catch (error) {
-      console.error('Erreur lors de l\'action utilisateur:', error);
+      logger.error('Erreur lors de l\'action utilisateur', error, 'Admin');
       toast.error('Erreur lors de l\'action');
     }
   };
@@ -267,7 +267,7 @@ export const AdvancedUserManagement: React.FC = () => {
         toast.success(`Export ${format.toUpperCase()} généré avec succès`);
       }
     } catch (error) {
-      console.error('Erreur lors de l\'export:', error);
+      logger.error('Erreur lors de l\'export', error, 'Admin');
       toast.error('Erreur lors de l\'export');
     }
   };
