@@ -1,6 +1,5 @@
-// @ts-nocheck
-
 import React, { useEffect } from 'react';
+import { logger } from '@/lib/logger';
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { MusicTrack, MusicPlaylist } from '@/types/music';
 import { motion } from 'framer-motion';
@@ -37,9 +36,11 @@ const MusicDrawer: React.FC<MusicDrawerProps> = ({
       // Only call the music generation when the drawer is open
       // This is just to demonstrate AI integration
       try {
-        ai.musicgenV1('mood music');
+        if (typeof (ai as any).musicgenV1 === 'function') {
+          (ai as any).musicgenV1('mood music');
+        }
       } catch (error) {
-        console.error('Error generating music:', error);
+        logger.error('Error generating music', error as Error, 'MUSIC');
       }
     }
   }, [ai, isDialogOpen]);
@@ -60,10 +61,10 @@ const MusicDrawer: React.FC<MusicDrawerProps> = ({
           <div className="sticky top-0 z-10 flex items-center justify-between p-4 bg-background/60 backdrop-blur-sm">
             <div className="flex-1">
               <h3 className="text-lg font-semibold">
-                {playlist?.title || 'Lecteur musical'}
+                {(playlist as any)?.title || (playlist as any)?.name || 'Lecteur musical'}
               </h3>
               <p className="text-sm text-muted-foreground">
-                {currentTrack ? `En cours : ${currentTrack.title || currentTrack.name}` : 'Aucune piste en cours'}
+                {currentTrack ? `En cours : ${currentTrack.title}` : 'Aucune piste en cours'}
               </p>
             </div>
             <Button 
