@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import confetti from 'canvas-confetti';
+import { useModuleProgress } from '@/hooks/useModuleProgress';
 
 interface FlashChallenge {
   id: string;
@@ -42,14 +43,32 @@ const flashChallenges: FlashChallenge[] = [
 ];
 
 export default function FlashGlowJourneyPage() {
+  const {
+    progress,
+    currentSession,
+    startSession,
+    endSession,
+    addPoints,
+    incrementStreak,
+    resetStreak,
+    incrementCompleted,
+    updateProgressData,
+    unlockAchievement,
+    isLoading: progressLoading
+  } = useModuleProgress('flash-glow');
+
   const [currentChallengeIndex, setCurrentChallengeIndex] = useState(0);
   const [isActive, setIsActive] = useState(false);
   const [timeLeft, setTimeLeft] = useState(0);
-  const [completedChallenges, setCompletedChallenges] = useState<string[]>([]);
-  const [totalPoints, setTotalPoints] = useState(0);
-  const [streak, setStreak] = useState(0);
-  const [bestStreak, setBestStreak] = useState(0);
-  const [glowLevel, setGlowLevel] = useState(0);
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [sessionStartTime, setSessionStartTime] = useState<number>(0);
+
+  // Get values from backend or use defaults
+  const completedChallenges = (progress?.progress_data?.completed || []) as string[];
+  const totalPoints = progress?.total_points || 0;
+  const streak = progress?.streak || 0;
+  const bestStreak = progress?.progress_data?.bestStreak || 0;
+  const glowLevel = Math.min(100, (totalPoints / 500) * 100);
 
   const currentChallenge = flashChallenges[currentChallengeIndex];
   const progress = currentChallenge ? ((currentChallenge.duration - timeLeft) / currentChallenge.duration) * 100 : 0;
@@ -74,28 +93,53 @@ export default function FlashGlowJourneyPage() {
     };
   }, [isActive, timeLeft]);
 
-  // Update glow level based on points
-  useEffect(() => {
-    setGlowLevel(Math.min(100, (totalPoints / 500) * 100));
-  }, [totalPoints]);
-
-  const startChallenge = () => {
+  const startChallenge = async () => {
     if (!currentChallenge) return;
     setTimeLeft(currentChallenge.duration);
     setIsActive(true);
+    
+    // Start session in backend
+    const id = await startSession({
+      challenge_id: currentChallenge.id,
+      challenge_name: currentChallenge.name
+    });
+    setSessionId(id);
+    setSessionStartTime(Date.now());
   };
 
-  const completeChallenge = () => {
+  const completeChallenge = async () => {
     if (!currentChallenge) return;
     
     setIsActive(false);
-    setCompletedChallenges(prev => [...prev, currentChallenge.id]);
-    setTotalPoints(prev => prev + currentChallenge.points);
-    setStreak(prev => {
-      const newStreak = prev + 1;
-      if (newStreak > bestStreak) setBestStreak(newStreak);
-      return newStreak;
+    
+    // Update backend
+    const newCompleted = [...completedChallenges, currentChallenge.id];
+    await updateProgressData({
+      completed: newCompleted,
+      currentIndex: currentChallengeIndex + 1,
+      bestStreak: Math.max(bestStreak, streak + 1)
     });
+    
+    await addPoints(currentChallenge.points);
+    await incrementStreak();
+    await incrementCompleted();
+    
+    // End session
+    if (sessionId) {
+      const duration = Math.floor((Date.now() - sessionStartTime) / 1000);
+      await endSession(sessionId, currentChallenge.points, duration, true);
+    }
+    
+    // Check for achievements
+    if (newCompleted.length === 5) {
+      await unlockAchievement('first_5', { title: 'Première Série de 5!', emoji: '🎯' });
+    }
+    if (newCompleted.length === 10) {
+      await unlockAchievement('flash_master', { title: 'Flash Master!', emoji: '⚡' });
+    }
+    if (newCompleted.length === 20) {
+      await unlockAchievement('legend', { title: 'Légende du Flash!', emoji: '👑' });
+    }
 
     confetti({
       particleCount: 50 + currentChallenge.difficulty * 10,
@@ -111,20 +155,31 @@ export default function FlashGlowJourneyPage() {
     }, 2000);
   };
 
-  const skipChallenge = () => {
+  const skipChallenge = async () => {
     setIsActive(false);
-    setStreak(0);
+    await resetStreak();
+    
     if (currentChallengeIndex < flashChallenges.length - 1) {
       setCurrentChallengeIndex(prev => prev + 1);
     }
   };
 
-  const resetJourney = () => {
+  const resetJourney = async () => {
     setCurrentChallengeIndex(0);
-    setCompletedChallenges([]);
-    setStreak(0);
+    await updateProgressData({
+      completed: [],
+      currentIndex: 0
+    });
+    await resetStreak();
     setIsActive(false);
   };
+
+  // Load progress on mount
+  useEffect(() => {
+    if (progress?.progress_data?.currentIndex) {
+      setCurrentChallengeIndex(progress.progress_data.currentIndex);
+    }
+  }, [progress]);
 
   const getCategoryColor = (category: FlashChallenge['category']) => {
     const colors = {
