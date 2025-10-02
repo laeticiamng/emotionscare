@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * MUSIC CONTEXT UNIFIÉ - EmotionsCare Premium
  * Gestion centralisée de la musique thérapeutique et génération Suno
@@ -9,6 +8,7 @@ import React, { createContext, useContext, useReducer, useRef, useCallback, useE
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { musicOrchestrationService, type MusicOrchestrationPreset } from '@/services/music/orchestration';
+import { logger } from '@/lib/logger';
 
 // ==================== TYPES ====================
 export interface MusicTrack {
@@ -297,7 +297,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         adaptVolumeToEmotion(track.emotion, 0.7);
       }
     } catch (error) {
-      console.error('Erreur lecture audio:', error);
+      logger.error('Audio playback error', error as Error, 'MUSIC');
       toast.error('Impossible de lire ce fichier audio');
       dispatch({ type: 'SET_PLAYING', payload: false });
     }
@@ -443,7 +443,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     };
 
     bootstrap().catch(error => {
-      console.error('Failed to initialize music orchestration preset:', error);
+      logger.error('Failed to initialize music orchestration preset', error as Error, 'MUSIC');
     });
 
     const handleMoodUpdate = (event: Event) => {
@@ -600,7 +600,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
       return null;
     } catch (error) {
-      console.error('Erreur vérification statut:', error);
+      logger.error('Generation status check error', error as Error, 'MUSIC');
       return null;
     }
   }, []);
@@ -665,7 +665,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       
       return data.tracks || [];
     } catch (error) {
-      console.error('Erreur recommandations:', error);
+      logger.error('Music recommendations error', error as Error, 'MUSIC');
       return [];
     }
   }, []);
@@ -736,4 +736,4 @@ export const useMusic = () => {
 };
 
 // Assurer que tous les exports sont disponibles
-export type { MusicContextType, MusicState, MusicTrack, MusicPlaylist };
+export type { MusicContextType, MusicState };
