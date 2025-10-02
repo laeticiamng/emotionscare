@@ -6,6 +6,7 @@ import LoadingAnimation from '@/components/ui/loading-animation';
 import { routes } from '@/lib/routes';
 import type { Role, Segment } from './schema';
 import { stripUtmParams } from '@/lib/utm';
+import { logger } from '@/lib/logger';
 
 type GuardChildren = { children: React.ReactNode };
 

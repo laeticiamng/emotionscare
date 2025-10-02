@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { logger } from '@/lib/logger';
 
 interface User {
   id: string;
@@ -47,7 +48,7 @@ export const SimpleAuthProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         setIsAuthenticated(true);
         setRole(userData.role || 'consumer');
       } catch (error) {
-        console.error('Error parsing stored user data:', error);
+        logger.error('Error parsing stored user data', error as Error, 'AUTH');
         localStorage.removeItem('simple_auth_user');
       }
     }
@@ -71,17 +72,12 @@ export const SimpleAuthProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       setRole(mockUser.role);
       localStorage.setItem('simple_auth_user', JSON.stringify(mockUser));
 
-      console.log('✅ Connexion réussie, redirection...', mockUser);
-
-      // Redirection immédiate sans setTimeout
-      console.log('🔄 Redirection immédiate vers dashboard...');
+      logger.info('Connexion réussie, redirection', { role: mockUser.role }, 'AUTH');
       
-      // Redirection immédiate avec window.location
-      console.log('🔄 Redirection vers /app/home...');
       window.location.href = '/app/home';
       
     } catch (error) {
-      console.error('SignIn error:', error);
+      logger.error('SignIn error', error as Error, 'AUTH');
       setLoading(false);
       throw error;
     }
@@ -103,19 +99,13 @@ export const SimpleAuthProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       setRole(mockUser.role);
       localStorage.setItem('simple_auth_user', JSON.stringify(mockUser));
 
-      console.log('✅ Inscription réussie, redirection...', mockUser);
+      logger.info('Inscription réussie, redirection', { role: mockUser.role }, 'AUTH');
 
-      // Navigate based on role
       setTimeout(() => {
-        const dashboardRoute = '/app/home'; // Dashboard principal
-        
-        console.log('🔄 Redirection vers:', dashboardRoute);
-        
-        // Forcer la redirection
-        window.location.replace(dashboardRoute);
+        window.location.replace('/app/home');
       }, 500);
     } catch (error) {
-      console.error('SignUp error:', error);
+      logger.error('SignUp error', error as Error, 'AUTH');
       setLoading(false);
       throw error;
     }
@@ -132,7 +122,7 @@ export const SimpleAuthProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         window.location.href = '/';
       }, 100);
     } catch (error) {
-      console.error('SignOut error:', error);
+      logger.error('SignOut error', error as Error, 'AUTH');
     }
   };
 

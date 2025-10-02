@@ -4,8 +4,10 @@
  * VERSION: 2.1.0 - Test Nyvée Debug
  */
 
+import { logger } from '@/lib/logger';
+
 // Force reload timestamp
-console.log('🔥 ROUTER LOADED AT:', new Date().toISOString());
+logger.debug('Router loaded', { timestamp: new Date().toISOString() }, 'SYSTEM');
 
 // Type pour éviter les logs répétés
 declare global {
@@ -427,9 +429,11 @@ function createRouteElement(routeMeta: RouteMeta) {
 
 const canonicalRoutes = ROUTES_REGISTRY.filter(route => !route.deprecated && route.path !== '*');
 
-console.log('🧪 Creating router with', canonicalRoutes.length, 'canonical routes');
-console.log('🔍 Test Nyvée route in registry:', ROUTES_REGISTRY.find(r => r.path === '/test-nyvee'));
-console.log('🎯 NyveeTestPage component loaded:', !!NyveeTestPage);
+logger.debug('Creating router', { 
+  canonicalRoutes: canonicalRoutes.length,
+  hasTestNyveeRoute: !!ROUTES_REGISTRY.find(r => r.path === '/test-nyvee'),
+  nyveeTestPageLoaded: !!NyveeTestPage 
+}, 'SYSTEM');
 
 export const router = createBrowserRouter([
   // Route de test directe HARDCODÉE pour Nyvée
