@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * HomePage - Page d'accueil accessible à tous
  * Accessible même aux utilisateurs connectés
