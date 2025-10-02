@@ -522,11 +522,10 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
   {
     name: 'activity',
     path: '/app/activity',
-    segment: 'consumer',
-    role: 'consumer',
-    layout: 'app-sidebar',
+    segment: 'public',
+    layout: 'simple',
     component: 'B2CActivitePage',
-    guard: true,
+    guard: false,
     aliases: ['/weekly-bars', '/activity-history'],
   },
   {
