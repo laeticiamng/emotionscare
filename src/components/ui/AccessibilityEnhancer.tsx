@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -58,10 +56,17 @@ export function AccessibilityEnhancer() {
     announcements: true
   });
   const [issues, setIssues] = useState<AccessibilityIssue[]>([]);
-  const { announceToScreenReader } = useAccessibility();
   
-  // Functions pour la compatibilité
-  const announce = announceToScreenReader;
+  // Function to announce to screen readers
+  const announce = (message: string) => {
+    const announcer = document.getElementById('announcements');
+    if (announcer) {
+      announcer.textContent = message;
+      setTimeout(() => {
+        announcer.textContent = '';
+      }, 1000);
+    }
+  };
   const handleSkipLink = (id: string) => {
     if (typeof document === 'undefined') return;
     const element = document.getElementById(id);
@@ -82,7 +87,7 @@ export function AccessibilityEnhancer() {
         setSettings(JSON.parse(savedSettings));
       }
     } catch (error) {
-      console.warn('[AccessibilityEnhancer UI] Failed to read settings', error);
+      // Settings read error - non-critical
     }
 
     // Check for accessibility issues
@@ -98,7 +103,7 @@ export function AccessibilityEnhancer() {
         window.localStorage.setItem('accessibility-settings', JSON.stringify(settings));
       }
     } catch (error) {
-      console.warn('[AccessibilityEnhancer UI] Failed to persist settings', error);
+      // Settings persist error - non-critical
     }
   }, [settings]);
 

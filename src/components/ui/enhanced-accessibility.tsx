@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -80,7 +79,7 @@ export const AccessibilityPanel: React.FC = () => {
         const saved = window.localStorage.getItem('accessibility-settings');
         return saved ? JSON.parse(saved) : defaultSettings;
       } catch (error) {
-        console.warn('[AccessibilityPanel] Failed to read settings', error);
+        // Settings read error - non-critical
       }
     }
     return defaultSettings;
@@ -128,7 +127,7 @@ export const AccessibilityPanel: React.FC = () => {
         window.localStorage.setItem('accessibility-settings', JSON.stringify(settings));
       }
     } catch (error) {
-      console.warn('[AccessibilityPanel] Failed to persist settings', error);
+      // Settings persist error - non-critical
     }
   }, [settings]);
 

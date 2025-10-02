@@ -1,7 +1,3 @@
-// @ts-nocheck
-
-// @ts-nocheck
-
 "use client"
 
 import * as React from "react"
@@ -56,10 +52,6 @@ function Calendar({
           "aria-selected:bg-accent aria-selected:text-accent-foreground",
         day_hidden: "invisible",
         ...classNames,
-      }}
-      components={{
-        IconLeft: ({ ...props }) => <ChevronLeft className="h-4 w-4" />,
-        IconRight: ({ ...props }) => <ChevronRight className="h-4 w-4" />,
       }}
       {...props}
     />
