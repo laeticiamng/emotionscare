@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { routes } from '@/routerV2/routes';
@@ -32,8 +30,8 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   }
 
   // If specific roles are required, check if user has one of them
-  if (allowedRoles && allowedRoles.length > 0 && user) {
-    if (!allowedRoles.includes(user.role)) {
+  if (allowedRoles && allowedRoles.length > 0 && user && user.role) {
+    if (!allowedRoles.includes(user.role as any)) {
       // Redirect to forbidden page if user doesn't have required role
       return <Navigate to={routes.special.forbidden()} replace />;
     }
