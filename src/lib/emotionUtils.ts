@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 export const getEmotionIcon = (emotion: string | undefined): string => {
   if (!emotion) return '😐';
   
