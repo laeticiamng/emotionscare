@@ -143,3 +143,9 @@ verify_jwt = true
 
 [functions.music-weekly-user]
 verify_jwt = true
+
+[functions.b2c-immersive-session]
+verify_jwt = true
+
+[functions.b2c-compute-aggregates]
+verify_jwt = true
