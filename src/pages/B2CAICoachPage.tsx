@@ -15,11 +15,11 @@ const B2CAICoachPage = () => {
   }, []);
 
   return (
-    <ConsentGate>
-      <div className="min-h-screen bg-slate-100 dark:bg-slate-950">
+    <div className="min-h-screen bg-slate-100 dark:bg-slate-950" data-testid="page-root">
+      <ConsentGate>
         <CoachView initialMode="b2c" />
-      </div>
-    </ConsentGate>
+      </ConsentGate>
+    </div>
   );
 };
 

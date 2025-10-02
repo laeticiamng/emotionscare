@@ -63,7 +63,7 @@ const DEFAULT_FLAGS: FeatureFlags = {
   FF_JOURNAL: true,
   FF_NYVEE: false,
   FF_DASHBOARD: true,
-  FF_COACH: false,
+  FF_COACH: true,
   FF_MUSIC: true,
   FF_PREMIUM_SUNO: true,
   FF_VR: true,

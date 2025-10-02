@@ -46,8 +46,9 @@ export function ConsentGate({ children, fallback = null, scope = 'clinical' }: C
     return <>{children}</>;
   }
 
+  // Ne pas bloquer l'affichage indéfiniment - afficher le contenu même si le statut est inconnu
   if (consent.status === 'unknown' || consent.loading) {
-    return null;
+    return <>{children}</>;
   }
 
   return (
