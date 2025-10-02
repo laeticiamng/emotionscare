@@ -39,4 +39,11 @@ export interface EmotionAnalysis {
 export interface EmotionalTeamViewProps {
   teamId?: string;
   data?: any[];
+  period?: 'day' | 'week' | 'month' | 'year';
+  anonymized?: boolean;
+  dateRange?: { start: Date; end: Date };
+  showGraph?: boolean;
+  showMembers?: boolean;
+  className?: string;
+  showDetails?: boolean;
 }
