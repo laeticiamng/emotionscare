@@ -252,6 +252,48 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
   },
   
   // ═══════════════════════════════════════════════════════════
+  // B2C INTEGRATION - PARTICULIER ROUTES
+  // ═══════════════════════════════════════════════════════════
+  {
+    name: 'mode-selection',
+    path: '/mode-selection',
+    segment: 'public',
+    layout: 'simple',
+    component: 'ModeSelectionPage',
+    guard: false,
+  },
+  {
+    name: 'b2c-dashboard',
+    path: '/app/particulier',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app-sidebar',
+    component: 'B2CDashboardPage',
+    guard: true,
+    requireAuth: true,
+  },
+  {
+    name: 'b2c-mood',
+    path: '/app/particulier/mood',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app-sidebar',
+    component: 'B2CMoodPage',
+    guard: true,
+    requireAuth: true,
+  },
+  {
+    name: 'b2c-music',
+    path: '/app/particulier/music',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app-sidebar',
+    component: 'B2CMusicPage',
+    guard: true,
+    requireAuth: true,
+  },
+
+  // ═══════════════════════════════════════════════════════════
   // MODULES FUN-FIRST (CONSUMER)
   // ═══════════════════════════════════════════════════════════
   {

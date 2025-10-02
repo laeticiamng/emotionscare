@@ -1,28 +1,37 @@
 // @ts-nocheck
-
-import { useState } from 'react';
-
-interface FeatureFlags {
-  musicModule: boolean;
-  vrSessions: boolean;
-  emotionAnalysis: boolean;
-  coachChat: boolean;
-}
+import { useMemo } from 'react';
+import { useSimpleAuth } from '@/contexts/SimpleAuth';
+import { 
+  FeatureFlags, 
+  FeatureFlagKey, 
+  getFeatureFlagsForRole, 
+  isFeatureEnabled 
+} from '@/config/featureFlags';
 
 export const useFeatureFlags = () => {
-  const [flags] = useState<FeatureFlags>({
-    musicModule: true,
-    vrSessions: true,
-    emotionAnalysis: true,
-    coachChat: true
-  });
+  const { user, role } = useSimpleAuth();
 
-  const isEnabled = (feature: keyof FeatureFlags) => {
-    return flags[feature];
+  const flags = useMemo<FeatureFlags>(() => {
+    if (!user || !role) {
+      return {
+        FF_B2C_PORTAL: false,
+        FF_MUSIC_THERAPY: false,
+        FF_VR: false,
+        FF_COACHING_AI: false,
+        FF_B2B_ANALYTICS: false,
+        FF_IMMERSIVE_SESSIONS: false,
+      };
+    }
+
+    return getFeatureFlagsForRole(role);
+  }, [user, role]);
+
+  const isEnabled = (feature: FeatureFlagKey): boolean => {
+    return isFeatureEnabled(flags, feature);
   };
 
   return {
     flags,
-    isEnabled
+    isEnabled,
   };
 };
