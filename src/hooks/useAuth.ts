@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Hook d'authentification unifié - Compatible avec SimpleAuth
  */
@@ -8,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { routes } from '@/routerV2';
 import { toast } from '@/hooks/use-toast';
 import { useSimpleAuth } from '@/contexts/SimpleAuth';
+import { logger } from '@/lib/logger';
 
 interface LoginData {
   email: string;
@@ -114,7 +114,7 @@ export const useAuthFlow = () => {
     setIsLoading(true);
     
     try {
-      console.log('Password reset for:', email);
+      logger.info('Password reset requested', { email }, 'AUTH');
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       toast({
