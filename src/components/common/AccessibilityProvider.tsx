@@ -1,10 +1,10 @@
-// @ts-nocheck
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import {
   safeClassAdd,
   safeClassRemove,
   safeGetDocumentRoot
 } from '@/lib/safe-helpers';
+import { logger } from '@/lib/logger';
 
 interface AccessibilitySettings {
   fontSize: number;
@@ -51,7 +51,7 @@ export const AccessibilityProvider: React.FC<AccessibilityProviderProps> = ({ ch
           return { ...defaultSettings, ...JSON.parse(saved) };
         }
       } catch (error) {
-        console.warn('[AccessibilityProvider] Failed to read settings from localStorage', error);
+        logger.warn('[AccessibilityProvider] Failed to read settings from localStorage', { error });
       }
     }
     return defaultSettings;
@@ -103,7 +103,7 @@ export const AccessibilityProvider: React.FC<AccessibilityProviderProps> = ({ ch
     try {
       window.localStorage.setItem('accessibility-settings', JSON.stringify(settings));
     } catch (error) {
-      console.warn('[AccessibilityProvider] Failed to persist settings', error);
+      logger.warn('[AccessibilityProvider] Failed to persist settings', { error });
     }
   }, [settings]);
 
@@ -116,7 +116,7 @@ export const AccessibilityProvider: React.FC<AccessibilityProviderProps> = ({ ch
     try {
       window.localStorage.removeItem('accessibility-settings');
     } catch (error) {
-      console.warn('[AccessibilityProvider] Failed to clear settings', error);
+      logger.warn('[AccessibilityProvider] Failed to clear settings', { error });
     }
   };
 
