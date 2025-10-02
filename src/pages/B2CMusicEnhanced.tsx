@@ -23,8 +23,6 @@ import { UniverseEngine } from '@/components/universe/UniverseEngine';
 import { RewardSystem } from '@/components/rewards/RewardSystem';
 import { getOptimizedUniverse } from '@/data/universes/config';
 import { useOptimizedAnimation } from '@/hooks/useOptimizedAnimation';
-import { useClinicalHints } from '@/hooks/useClinicalHints';
-import { ConsentGate } from '@/features/clinical-optin/ConsentGate';
 
 interface VinylTrack {
   id: string;
@@ -94,8 +92,7 @@ const categoryIcons = {
 
 const B2CMusicEnhanced: React.FC = () => {
   const { toast } = useToast();
-  const clinicalHints = useClinicalHints();
-  const musicHints = clinicalHints.moduleCues.music;
+  // Mock clinical hints for music module - not needed for basic player
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const [favorites, setFavorites] = useState<string[]>(() => {
     if (typeof window === 'undefined') return [];
@@ -164,28 +161,6 @@ const B2CMusicEnhanced: React.FC = () => {
   }, [favorites]);
 
   const resumeTrack = lastPlayedId ? vinylTracks.find(track => track.id === lastPlayedId) ?? null : null;
-  const intensityLabel = musicHints
-    ? musicHints.intensity === 'low'
-      ? 'douce'
-      : musicHints.intensity === 'high'
-        ? 'énergique'
-        : 'modérée'
-    : null;
-  const textureLabel = musicHints
-    ? musicHints.texture === 'airy'
-      ? 'aérienne'
-      : musicHints.texture === 'bright'
-        ? 'lumineuse'
-        : 'chaleureuse'
-    : null;
-  const categoryLabel = musicHints
-    ? {
-        doux: 'détente',
-        créatif: 'créativité',
-        énergique: 'énergie',
-        guérison: 'régénération',
-      }[musicHints.recommendedCategory]
-    : null;
 
   const handleToggleFavorite = (trackId: string) => {
     setFavorites(prev => (prev.includes(trackId) ? prev.filter(id => id !== trackId) : [...prev, trackId]));
@@ -336,19 +311,6 @@ const B2CMusicEnhanced: React.FC = () => {
                   Choisis ton vinyle et laisse-le composer ton aura sonore.
                   Chaque mélodie s'adapte à ton état pour créer l'harmonie parfaite.
                 </p>
-                {musicHints && (
-                  <div className="flex flex-wrap items-center justify-center gap-3 text-sm text-muted-foreground" aria-live="polite">
-                    {textureLabel && (
-                      <Badge variant="secondary">Texture {textureLabel}</Badge>
-                    )}
-                    {intensityLabel && (
-                      <Badge variant="outline">Intensité {intensityLabel}</Badge>
-                    )}
-                    {categoryLabel && (
-                      <Badge variant="secondary">Voie {categoryLabel}</Badge>
-                    )}
-                  </div>
-                )}
               </div>
 
               {resumeTrack && (
@@ -358,7 +320,7 @@ const B2CMusicEnhanced: React.FC = () => {
                     onClick={() => startTrack(resumeTrack)}
                     className="px-6"
                   >
-                    {musicHints?.resumeLabel ?? 'Reprise instantanée'}
+                    Reprendre la session
                   </Button>
                 </div>
               )}
@@ -379,9 +341,7 @@ const B2CMusicEnhanced: React.FC = () => {
                       className="perspective-1000"
                     >
                       <Card
-                        className={`h-full bg-card/90 backdrop-blur-md hover:shadow-lg transition-all duration-300 cursor-pointer group overflow-hidden ${
-                          musicHints?.recommendedCategory === track.category ? 'ring-2 ring-yellow-400/50' : ''
-                        }`}
+                        className="h-full bg-card/90 backdrop-blur-md hover:shadow-lg transition-all duration-300 cursor-pointer group overflow-hidden"
                         onClick={() => startTrack(track)}
                       >
                         <CardContent className="p-6 space-y-4">
@@ -429,12 +389,6 @@ const B2CMusicEnhanced: React.FC = () => {
                             >
                               {track.mood}
                             </Badge>
-
-                            {musicHints?.recommendedCategory === track.category && (
-                              <Badge variant="secondary" className="text-[10px] uppercase tracking-wide">
-                                Recommandé
-                              </Badge>
-                            )}
 
                             <p className="text-xs text-muted-foreground leading-relaxed">
                               {track.description}
