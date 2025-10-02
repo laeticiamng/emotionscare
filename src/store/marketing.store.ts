@@ -1,5 +1,5 @@
-// @ts-nocheck
 import { create } from 'zustand';
+import { logger } from '@/lib/logger';
 import { persist } from './utils/createImmutableStore';
 import { createSelectors } from './utils/createSelectors';
 
@@ -31,7 +31,7 @@ const useMarketingStoreBase = create<MarketingState>()(
       setSegment: (segment) => {
         set({ segment });
         // Analytics would be tracked here
-        console.log('Segment switched to:', segment);
+        logger.info('Segment switched', { segment }, 'ANALYTICS');
       },
       
       setUTM: (utm) => set({ utm }),

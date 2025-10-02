@@ -1,5 +1,5 @@
-// @ts-nocheck
 import { create } from 'zustand';
+import { logger } from '@/lib/logger';
 
 export type ExportStatus = 'idle' | 'processing' | 'ready' | 'error';
 
@@ -110,7 +110,7 @@ export const useRGPDStore = create<RGPDState>((set, get) => ({
     if (currentJob) {
       // Optionally call DELETE API to revoke URL
       fetch(`/api/me/export/${currentJob.job_id}`, { method: 'DELETE' })
-        .catch(console.warn);
+        .catch((error) => logger.warn('Failed to delete export job', error, 'SYSTEM'));
     }
     
     set({ job: null, loading: false, error: null });
