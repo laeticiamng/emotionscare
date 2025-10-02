@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React from 'react';
 import { useAuthStore } from '@/stores/useAuthStore';
 
