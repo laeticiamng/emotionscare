@@ -10,9 +10,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { routes } from '@/routerV2';
-import AccessDiagnostic from '@/components/debug/AccessDiagnostic';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface NavItem {
   id: string;
@@ -31,6 +30,18 @@ const NavigationPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  
+  // Vérification auth simple sans bloquer le rendu
+  let isAuthenticated = false;
+  let userEmail = '';
+  try {
+    const { isAuthenticated: authStatus, user } = useAuth();
+    isAuthenticated = authStatus;
+    userEmail = user?.email || '';
+  } catch (error) {
+    // Contexte non disponible - continuer sans auth
+    console.warn('Auth context not available');
+  }
   
   const [navItems] = useState<NavItem[]>([
     // Wellness
@@ -224,16 +235,24 @@ const NavigationPage: React.FC = () => {
 
       <div className="max-w-7xl mx-auto px-4 py-6">
         
-        <Tabs defaultValue="navigation" className="space-y-6">
-          <TabsList>
-            <TabsTrigger value="navigation">Navigation</TabsTrigger>
-            <TabsTrigger value="diagnostic" className="flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4" />
-              Diagnostic
-            </TabsTrigger>
-          </TabsList>
+        {/* Info Utilisateur */}
+        {isAuthenticated && (
+          <Card className="p-4 mb-6 bg-accent/10 border-accent">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                <span className="text-lg font-bold text-primary">
+                  {userEmail?.charAt(0).toUpperCase() || 'U'}
+                </span>
+              </div>
+              <div>
+                <p className="font-medium">{userEmail}</p>
+                <p className="text-sm text-muted-foreground">Utilisateur authentifié</p>
+              </div>
+            </div>
+          </Card>
+        )}
 
-          <TabsContent value="navigation" className="space-y-6">
+        <div className="space-y-6">
             {/* Recherche */}
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
@@ -377,21 +396,16 @@ const NavigationPage: React.FC = () => {
           })}
         </div>
 
-            {filteredItems.length === 0 && (
-              <div className="text-center py-12">
-                <Search className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-medium mb-2">Aucun résultat</h3>
-                <p className="text-muted-foreground">
-                  Essayez de modifier votre recherche ou vos filtres
-                </p>
-              </div>
-            )}
-          </TabsContent>
-
-          <TabsContent value="diagnostic">
-            <AccessDiagnostic />
-          </TabsContent>
-        </Tabs>
+        {filteredItems.length === 0 && (
+          <div className="text-center py-12">
+            <Search className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+            <h3 className="text-lg font-medium mb-2">Aucun résultat</h3>
+            <p className="text-muted-foreground">
+              Essayez de modifier votre recherche ou vos filtres
+            </p>
+          </div>
+        )}
+      </div>
       </div>
     </div>
   );

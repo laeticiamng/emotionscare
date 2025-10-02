@@ -343,7 +343,7 @@ const SuspenseWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) 
 );
 
 // Import AppLayout pour sidebar
-const AppLayout = lazy(() => import('@/components/layout/AppLayout').then(m => ({ default: m.AppLayout })));
+const AppLayoutComponent = lazy(() => import('@/components/layout/AppLayout'));
 
 const LayoutWrapper: React.FC<{ 
   children: React.ReactNode; 
@@ -356,9 +356,9 @@ const LayoutWrapper: React.FC<{
   if (layout === 'app-sidebar') {
     return (
       <Suspense fallback={<LoadingState variant="page" />}>
-        <AppLayout>
+        <AppLayoutComponent>
           {children}
-        </AppLayout>
+        </AppLayoutComponent>
       </Suspense>
     );
   }
