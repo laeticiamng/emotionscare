@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -20,6 +18,7 @@ import {
   TrendingUp
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 
 interface Message {
   id: string;
@@ -118,7 +117,7 @@ const EnhancedAICoach: React.FC = () => {
         suggestions: generateSuggestions(randomEmotion)
       };
     } catch (error) {
-      console.error('Erreur analyse émotionnelle:', error);
+      logger.error('Erreur analyse émotionnelle', { error }, 'AI_COACH');
       return null;
     }
   };
