@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -33,7 +31,7 @@ const ModeSwitcher: React.FC<ModeSwitcherProps> = ({
   const [isOpen, setIsOpen] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const { toast } = useToast();
-  const { user, updateUser } = useAuth();
+  const { user } = useAuth();
   
   // Sync logs were used during development; remove in production
   useEffect(() => {
@@ -52,12 +50,6 @@ const ModeSwitcher: React.FC<ModeSwitcherProps> = ({
     
     // Update UserModeContext
     setUserMode(normalizedMode);
-    
-    // Update user role in AuthContext to keep them in sync
-    if (user && updateUser) {
-      // This ensures role and userMode are consistent
-      await updateUser({ ...user, role: normalizedMode });
-    }
     
     // Update localStorage values
     localStorage.setItem('userMode', normalizedMode);

@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React, { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { Bell, AlertTriangle, Info, CheckCircle } from 'lucide-react';
@@ -7,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { fullApiService } from '@/services/api/fullApiService';
 import { useAuth } from '@/contexts/AuthContext';
+import { logger } from '@/lib/logger';
 
 interface Notification {
   id: string;
@@ -33,14 +32,14 @@ const RealtimeNotifications: React.FC = () => {
       const response = await fullApiService.getNotifications({
         unread_only: false,
         page: 1
-      });
+      }) as any;
       
       if (response.success && response.data) {
         setNotifications(response.data.notifications || []);
         setUnreadCount(response.data.unread_count || 0);
       }
     } catch (error) {
-      console.error('Erreur lors du chargement des notifications:', error);
+      logger.error('Erreur lors du chargement des notifications', { error });
     }
   };
 
@@ -56,7 +55,7 @@ const RealtimeNotifications: React.FC = () => {
       );
       setUnreadCount(prev => Math.max(0, prev - 1));
     } catch (error) {
-      console.error('Erreur lors du marquage comme lu:', error);
+      logger.error('Erreur lors du marquage comme lu', { error });
     }
   };
 
@@ -66,7 +65,7 @@ const RealtimeNotifications: React.FC = () => {
       setNotifications(prev => prev.map(notif => ({ ...notif, read: true })));
       setUnreadCount(0);
     } catch (error) {
-      console.error('Erreur lors du marquage de toutes les notifications:', error);
+      logger.error('Erreur lors du marquage de toutes les notifications', { error });
     }
   };
 

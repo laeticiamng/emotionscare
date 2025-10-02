@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * COMPOSANT LOADING SPINNER - ACCESSIBLE ET OPTIMISÉ
  */
