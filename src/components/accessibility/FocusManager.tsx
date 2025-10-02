@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React, { useEffect, useRef } from 'react';
 
 interface FocusManagerProps {
