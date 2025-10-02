@@ -105,9 +105,9 @@ const ReportingPage: React.FC = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-slate-900 dark:to-slate-800">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="bg-white/80 backdrop-blur-sm border-b sticky top-0 z-10">
+      <div className="bg-card/80 backdrop-blur-sm border-b border-border sticky top-0 z-10">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Button 
@@ -293,15 +293,15 @@ const ReportingPage: React.FC = () => {
         </div>
 
         {/* Rapports Personnalisés */}
-        <Card className="mt-8 p-6 bg-gradient-to-r from-indigo-50 to-purple-50 border-indigo-200">
+        <Card className="mt-8 p-6 bg-accent/20 border-accent">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="font-semibold text-indigo-900">Rapport Personnalisé</h3>
-              <p className="text-sm text-indigo-700 mt-1">
+              <h3 className="font-semibold">Rapport Personnalisé</h3>
+              <p className="text-sm text-muted-foreground mt-1">
                 Créez un rapport sur-mesure selon vos besoins spécifiques
               </p>
             </div>
-            <Button className="bg-indigo-600 hover:bg-indigo-700">
+            <Button>
               Créer un Rapport
             </Button>
           </div>
