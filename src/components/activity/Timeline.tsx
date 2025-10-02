@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 import { ActivityItem } from '@/store/activity.store';
 import { ActivityItemCard } from './ActivityItem';
