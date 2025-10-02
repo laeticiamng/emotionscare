@@ -1,11 +1,10 @@
-// @ts-nocheck
-
 import { supabase } from '@/integrations/supabase/client';
 import { User, UserRole } from '@/types/user';
 import { UserPreferences } from '@/types/preferences';
 import { normalizeUserMode } from '@/utils/userModeHelpers';
 import { isLoginLocked, recordLoginAttempt } from '@/utils/security';
 import { AuthError, AuthErrorCode } from '@/utils/authErrors';
+import { logger } from '@/lib/logger';
 
 // Helper to persist the user role in a secure cookie
 const setRoleCookie = (role: UserRole) => {
@@ -85,9 +84,9 @@ export const authService = {
       setRoleCookie(user.role);
 
       return { user, error: null };
-    } catch (error: any) {
-      console.error('Error signing up:', error);
-      return { user: null, error };
+    } catch (error: unknown) {
+      logger.error('Error signing up', error as Error, 'AUTH');
+      return { user: null, error: error as Error };
     }
   },
   
@@ -149,9 +148,9 @@ export const authService = {
       recordLoginAttempt(email, true);
       setRoleCookie(user.role);
       return { user, error: null };
-    } catch (error: any) {
-      console.error('Error signing in:', error);
-      return { user: null, error };
+    } catch (error: unknown) {
+      logger.error('Error signing in', error as Error, 'AUTH');
+      return { user: null, error: error as Error };
     }
   },
   
@@ -164,9 +163,9 @@ export const authService = {
       if (error) throw error;
       clearRoleCookie();
       return { error: null };
-    } catch (error: any) {
-      console.error('Error signing out:', error);
-      return { error };
+    } catch (error: unknown) {
+      logger.error('Error signing out', error as Error, 'AUTH');
+      return { error: error as Error };
     }
   },
   
@@ -203,9 +202,9 @@ export const authService = {
       };
       
       return { user, error: null };
-    } catch (error: any) {
-      console.error('Error getting current user:', error);
-      return { user: null, error };
+    } catch (error: unknown) {
+      logger.error('Error getting current user', error as Error, 'AUTH');
+      return { user: null, error: error as Error };
     }
   },
   
@@ -239,9 +238,9 @@ export const authService = {
       if (profileUpdateError) throw profileUpdateError;
       
       return { success: true, error: null };
-    } catch (error: any) {
-      console.error('Error updating user profile:', error);
-      return { success: false, error };
+    } catch (error: unknown) {
+      logger.error('Error updating user profile', error as Error, 'AUTH');
+      return { success: false, error: error as Error };
     }
   },
   
@@ -286,9 +285,9 @@ export const authService = {
       if (profileUpdateError) throw profileUpdateError;
       
       return { success: true, error: null };
-    } catch (error: any) {
-      console.error('Error updating user preferences:', error);
-      return { success: false, error };
+    } catch (error: unknown) {
+      logger.error('Error updating user preferences', error as Error, 'AUTH');
+      return { success: false, error: error as Error };
     }
   },
   
@@ -303,9 +302,9 @@ export const authService = {
 
       if (error) throw error;
       return { success: true, error: null };
-    } catch (error: any) {
-      console.error('Error resetting password:', error);
-      return { success: false, error };
+    } catch (error: unknown) {
+      logger.error('Error resetting password', error as Error, 'AUTH');
+      return { success: false, error: error as Error };
     }
   },
 
@@ -323,9 +322,9 @@ export const authService = {
 
       if (error) throw error;
       return { success: true, error: null };
-    } catch (error: any) {
-      console.error('Error sending magic link:', error);
-      return { success: false, error };
+    } catch (error: unknown) {
+      logger.error('Error sending magic link', error as Error, 'AUTH');
+      return { success: false, error: error as Error };
     }
   },
 };

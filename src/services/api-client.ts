@@ -1,10 +1,10 @@
-// @ts-nocheck
 /**
  * Client API centralisé avec gestion d'erreurs robuste
  * Implémente toutes les bonnes pratiques de sécurité et UX
  */
 
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 
 // Types pour la gestion d'erreurs
 export interface ApiError {
@@ -150,12 +150,8 @@ export class ApiClient {
     } catch (error) {
       const apiError = transformError(error);
       
-      // Log pour le debugging (sera nettoyé en production)
-      console.error('API Error:', {
-        original: error,
-        transformed: apiError,
-        timestamp: new Date().toISOString()
-      });
+      // Log pour le debugging
+      logger.error('API Error', error as Error, 'API');
 
       return {
         error: apiError,
