@@ -1,6 +1,5 @@
-// @ts-nocheck
-
 import { APP_BASE_CSP } from './headers';
+import { logger } from '@/lib/logger';
 
 /**
  * Sécurité renforcée pour la production
@@ -20,7 +19,7 @@ export const initProductionSecurity = async (): Promise<void> => {
     // Initialiser le monitoring de sécurité
     initSecurityMonitoring();
     
-    console.log('🛡️ Production security initialized');
+    logger.info('Production security initialized', undefined, 'SYSTEM');
   }
 };
 
@@ -107,7 +106,7 @@ const initSecurityMonitoring = (): void => {
     if (event.error && event.error.stack) {
       const stack = event.error.stack.toLowerCase();
       if (stack.includes('script') || stack.includes('eval') || stack.includes('function')) {
-        console.warn('🚨 Potential XSS attempt detected');
+        logger.warn('Potential XSS attempt detected', undefined, 'SYSTEM');
         // En production, envoyer à un service de monitoring
       }
     }
@@ -121,7 +120,7 @@ const initSecurityMonitoring = (): void => {
           if (node.nodeType === Node.ELEMENT_NODE) {
             const element = node as Element;
             if (element.tagName === 'SCRIPT' && !element.hasAttribute('data-allowed')) {
-              console.warn('🚨 Unauthorized script injection detected');
+              logger.warn('Unauthorized script injection detected', undefined, 'SYSTEM');
               element.remove();
             }
           }
@@ -151,12 +150,12 @@ export const validateEnvironment = (): boolean => {
   });
 
   if (missing.length > 0) {
-    console.error('❌ Missing required environment variables:', missing);
+    logger.error('Missing required environment variables', { missing }, 'SYSTEM');
     return false;
   }
 
   if (exposedForbidden.length > 0) {
-    console.error('❌ Forbidden environment variables exposed in client build:', exposedForbidden);
+    logger.error('Forbidden environment variables exposed in client build', { exposedForbidden }, 'SYSTEM');
     return false;
   }
 

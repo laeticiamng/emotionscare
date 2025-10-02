@@ -1,12 +1,12 @@
-// @ts-nocheck
 /**
  * Nettoyage final pour la production - EmotionsCare
  * Système de nettoyage automatique et sécurisation
  */
 
+import React from 'react';
 import { logger } from '@/lib/logger';
 import { initProductionSecurity, validateEnvironment } from '@/lib/security/productionSecurity';
-import { route } from '@/routes';
+import { routes } from '@/routerV2';
 
 export interface CleanupStats {
   totalFiles: number;
@@ -87,10 +87,8 @@ const optimizePerformance = async (): Promise<boolean> => {
 
     // Préchargement des routes critiques
     const criticalRoutes = [
-      route('home'),
-      route('choose-mode'),
-      route('consumer-home'),
-      route('b2b-selection'),
+      routes.public.home(),
+      routes.b2c.home(),
     ];
     criticalRoutes.forEach(prefetchRoute => {
       const link = document.createElement('link');

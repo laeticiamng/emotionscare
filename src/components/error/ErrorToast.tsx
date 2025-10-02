@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { toast } from 'sonner';
 import i18n from '@/lib/i18n';
 import type { AppError } from '@/lib/errors/types';
@@ -25,10 +24,6 @@ export function toastError(error: AppError) {
   toast(title, {
     description,
     duration: 4000,
-    ariaProps: {
-      role: 'status',
-      'aria-live': 'polite',
-    },
   });
 }
 
