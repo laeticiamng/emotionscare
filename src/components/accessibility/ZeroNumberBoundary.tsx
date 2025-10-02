@@ -1,5 +1,5 @@
-// @ts-nocheck
 import { type ComponentPropsWithoutRef, type ElementType, type ReactNode, useEffect, useRef } from 'react';
+import { logger } from '@/lib/logger';
 
 type ZeroNumberBoundaryProps<T extends ElementType> = {
   as?: T;
@@ -23,9 +23,9 @@ export function ZeroNumberBoundary<T extends ElementType = 'div'>(
     const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
     while (walker.nextNode()) {
       if (hasDigits(walker.currentNode.nodeValue)) {
-        console.warn('ZeroNumberBoundary detected numeric characters', {
+        logger.warn('ZeroNumberBoundary detected numeric characters', {
           snippet: walker.currentNode.nodeValue,
-        });
+        }, 'UI');
         break;
       }
     }

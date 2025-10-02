@@ -1,8 +1,8 @@
-// @ts-nocheck
 import React from 'react';
+import { logger } from '@/lib/logger';
 
 export default function DebugHomePage() {
-  console.log('[DebugHomePage] Component rendered');
+  logger.debug('DebugHomePage component rendered', {}, 'UI');
   
   try {
     return (
@@ -46,7 +46,7 @@ export default function DebugHomePage() {
       </div>
     );
   } catch (error) {
-    console.error('[DebugHomePage] Error in render:', error);
+    logger.error('Error in DebugHomePage render', error, 'UI');
     return (
       <div style={{ padding: '20px', backgroundColor: '#ffebee' }}>
         <h1 style={{ color: '#d32f2f' }}>❌ Error in DebugHomePage</h1>
