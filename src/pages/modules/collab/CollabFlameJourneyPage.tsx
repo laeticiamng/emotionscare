@@ -7,6 +7,7 @@ import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Input } from '@/components/ui/input';
 import confetti from 'canvas-confetti';
+import { useChallengeModule } from '@/hooks/useChallengeModule';
 
 interface TeamMember {
   id: string;
@@ -72,6 +73,15 @@ const challenges: CollabChallenge[] = [
 ];
 
 export default function CollabFlameJourneyPage() {
+  const {
+    activeChallenges,
+    startChallenge: startChallengeHook,
+    completeChallenge,
+    updateProgress: updateChallengeProgress,
+    sessionData,
+    achievements,
+  } = useChallengeModule('collab-flame');
+
   const [currentChallenge, setCurrentChallenge] = useState(0);
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([
     { id: '1', name: 'Toi', avatar: '😊', contribution: 0, mood: 80, lastActive: new Date() },
@@ -158,11 +168,16 @@ export default function CollabFlameJourneyPage() {
     }
   };
 
-  const checkChallengeCompletion = () => {
+  const checkChallengeCompletion = async () => {
     setIsActive(false);
     
     if (totalContributions >= challenge.targetContributions) {
-      // Success!
+      await completeChallenge(challenge.id, {
+        teamSize: teamMembers.length,
+        contributions: totalContributions,
+        teamMood: Math.round(teamMoodAverage)
+      });
+
       confetti({
         particleCount: 200,
         spread: 100,
@@ -180,10 +195,17 @@ export default function CollabFlameJourneyPage() {
     }
   };
 
-  const startChallenge = () => {
+  const startChallenge = async () => {
     setIsActive(true);
     setTotalContributions(0);
     setTeamMembers(prev => prev.map(m => ({ ...m, contribution: 0 })));
+    
+    await startChallengeHook({
+      id: challenge.id,
+      type: 'collaborative',
+      difficulty: 'medium',
+      duration: challenge.duration * 60
+    });
   };
 
   const formatTime = (seconds: number) => {
@@ -394,17 +416,17 @@ export default function CollabFlameJourneyPage() {
                   <span className="text-white font-bold">{currentChallenge + 1}/4</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-white/70">Contributions</span>
-                  <span className="text-white font-bold">{totalContributions}</span>
+                  <span className="text-white/70">Défis complétés</span>
+                  <span className="text-white font-bold">{sessionData.challengesCompleted || 0}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-white/70">Intensité</span>
-                  <span className="text-white font-bold">{Math.round(flameIntensity)}%</span>
+                  <span className="text-white/70">Points</span>
+                  <span className="text-white font-bold">{sessionData.totalPoints || 0}</span>
                 </div>
               </div>
             </Card>
 
-            {currentChallenge === challenges.length - 1 && progress >= 100 && (
+            {achievements.length > 0 && (
               <motion.div
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}

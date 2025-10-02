@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import confetti from 'canvas-confetti';
+import { useJourneyModule } from '@/hooks/useJourneyModule';
 
 interface ScreenBreak {
   id: string;
@@ -84,11 +85,22 @@ const screenBreaks: ScreenBreak[] = [
 ];
 
 export default function ScreenTimeJourneyPage() {
+  const {
+    currentStep,
+    totalSteps,
+    isActive: journeyActive,
+    progress: journeyProgress,
+    startStep,
+    completeStep,
+    skipStep,
+    sessionData,
+    updateProgress,
+    achievements,
+  } = useJourneyModule('screen-time', screenBreaks.length);
+
   const [currentBreak, setCurrentBreak] = useState(0);
   const [isActive, setIsActive] = useState(false);
   const [timeLeft, setTimeLeft] = useState(screenBreaks[0].duration);
-  const [totalBreaks, setTotalBreaks] = useState(0);
-  const [streak, setStreak] = useState(0);
   const [eyeHealth, setEyeHealth] = useState(100);
   const [blinkCount, setBlinkCount] = useState(0);
   const [showBlinkDetector, setShowBlinkDetector] = useState(false);
@@ -126,12 +138,16 @@ export default function ScreenTimeJourneyPage() {
     return () => clearInterval(interval);
   }, [isActive]);
 
-  const completeBreak = () => {
+  const completeBreak = async () => {
     setIsActive(false);
-    setTotalBreaks(prev => prev + 1);
-    setStreak(prev => prev + 1);
     setEyeHealth(prev => Math.min(100, prev + 15));
     
+    await completeStep({
+      completionTime: screenBreaks[currentBreak].duration - timeLeft,
+      performance: Math.round(eyeHealth),
+      metadata: { blinkCount, exercise: screenBreaks[currentBreak].name }
+    });
+
     confetti({
       particleCount: 100,
       spread: 70,
@@ -146,8 +162,9 @@ export default function ScreenTimeJourneyPage() {
     }
   };
 
-  const startBreak = () => {
+  const startBreak = async () => {
     setIsActive(true);
+    await startStep(currentBreak);
     if (currentExercise.name === 'Le Clignement') {
       setShowBlinkDetector(true);
       setBlinkCount(0);
@@ -158,8 +175,8 @@ export default function ScreenTimeJourneyPage() {
     setIsActive(false);
   };
 
-  const skipBreak = () => {
-    setStreak(0);
+  const skipBreak = async () => {
+    await skipStep();
     if (currentBreak < screenBreaks.length - 1) {
       setCurrentBreak(prev => prev + 1);
       setTimeLeft(screenBreaks[currentBreak + 1].duration);
@@ -342,7 +359,7 @@ export default function ScreenTimeJourneyPage() {
                 <Target className="w-8 h-8 text-orange-400" />
                 <span className="text-white/80">Série</span>
               </div>
-              <div className="text-4xl font-bold text-white">{streak} 🔥</div>
+              <div className="text-4xl font-bold text-white">{sessionData.streak || 0} 🔥</div>
             </Card>
 
             {/* Stats */}
@@ -354,15 +371,15 @@ export default function ScreenTimeJourneyPage() {
               <div className="space-y-3">
                 <div className="flex justify-between">
                   <span className="text-white/70">Pauses totales</span>
-                  <span className="text-white font-bold">{totalBreaks}</span>
+                  <span className="text-white font-bold">{sessionData.completedCount || 0}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-white/70">Niveau</span>
                   <span className="text-white font-bold">{currentBreak + 1}/7</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-white/70">Temps économisé</span>
-                  <span className="text-white font-bold">{Math.floor(totalBreaks * 1.5)}min</span>
+                  <span className="text-white/70">Points</span>
+                  <span className="text-white font-bold">{sessionData.totalPoints || 0}</span>
                 </div>
               </div>
             </Card>
@@ -375,7 +392,7 @@ export default function ScreenTimeJourneyPage() {
               </p>
             </Card>
 
-            {currentBreak === screenBreaks.length - 1 && totalBreaks >= 7 && (
+            {achievements.length > 0 && (
               <motion.div
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}

@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import confetti from 'canvas-confetti';
+import { useSocialModule } from '@/hooks/useSocialModule';
 
 interface Lantern {
   id: string;
@@ -39,12 +40,19 @@ const emotionTypes: EmotionType[] = [
 ];
 
 export default function SocialLanternJourneyPage() {
+  const {
+    share,
+    react,
+    getShares,
+    sessionData,
+    communityScore,
+    achievements,
+  } = useSocialModule('social-lantern');
+
   const [lanterns, setLanterns] = useState<Lantern[]>([]);
   const [message, setMessage] = useState('');
   const [selectedEmotion, setSelectedEmotion] = useState<EmotionType>(emotionTypes[0]);
   const [totalReactions, setTotalReactions] = useState(0);
-  const [lanternsLaunched, setLanternsLaunched] = useState(0);
-  const [communityScore, setCommunityScore] = useState(0);
 
   useEffect(() => {
     // Simulate lanterns floating up
@@ -60,7 +68,7 @@ export default function SocialLanternJourneyPage() {
     return () => clearInterval(interval);
   }, []);
 
-  const launchLantern = () => {
+  const launchLantern = async () => {
     if (!message.trim()) return;
 
     const newLantern: Lantern = {
@@ -75,9 +83,14 @@ export default function SocialLanternJourneyPage() {
     };
 
     setLanterns(prev => [newLantern, ...prev.slice(0, 9)]);
-    setLanternsLaunched(prev => prev + 1);
-    setCommunityScore(prev => prev + 10);
     setMessage('');
+
+    await share({
+      type: 'lantern',
+      content: message,
+      emotion: selectedEmotion.name,
+      visibility: 'public'
+    });
 
     confetti({
       particleCount: 50,
@@ -93,7 +106,7 @@ export default function SocialLanternJourneyPage() {
     }, 3000);
   };
 
-  const reactToLantern = (lanternId: string, type: 'heart' | 'star' | 'hug', count: number = 1) => {
+  const reactToLantern = async (lanternId: string, type: 'heart' | 'star' | 'hug', count: number = 1) => {
     setLanterns(prev =>
       prev.map(lantern => {
         if (lantern.id === lanternId) {
@@ -109,7 +122,8 @@ export default function SocialLanternJourneyPage() {
       })
     );
     setTotalReactions(prev => prev + count);
-    setCommunityScore(prev => prev + 5 * count);
+
+    await react(lanternId, type, count);
   };
 
   const getTotalReactionsForLantern = (lantern: Lantern) => {
@@ -273,15 +287,15 @@ export default function SocialLanternJourneyPage() {
               <div className="space-y-3">
                 <div className="flex justify-between">
                   <span className="text-white/70">Lanternes lancées</span>
-                  <span className="text-white font-bold">{lanternsLaunched}</span>
+                  <span className="text-white font-bold">{sessionData.sharesCount || 0}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-white/70">Réactions reçues</span>
-                  <span className="text-white font-bold">{totalReactions}</span>
+                  <span className="text-white font-bold">{sessionData.reactionsReceived || 0}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-white/70">Impact positif</span>
-                  <span className="text-white font-bold">{lanternsLaunched * 10}%</span>
+                  <span className="text-white/70">Points</span>
+                  <span className="text-white font-bold">{sessionData.totalPoints || 0}</span>
                 </div>
               </div>
             </Card>
@@ -297,7 +311,7 @@ export default function SocialLanternJourneyPage() {
               </ul>
             </Card>
 
-            {lanternsLaunched >= 5 && (
+            {achievements.length > 0 && (
               <motion.div
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}

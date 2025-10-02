@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
 import confetti from 'canvas-confetti';
+import { useCollectionModule } from '@/hooks/useCollectionModule';
 
 interface MoodColor {
   name: string;
@@ -113,11 +114,17 @@ const moodRecipes: MoodRecipe[] = [
 ];
 
 export default function MoodMixerJourneyPage() {
+  const {
+    collection,
+    unlockItem,
+    isUnlocked,
+    sessionData,
+    achievements,
+  } = useCollectionModule('mood-mixer', moodRecipes.length);
+
   const [currentMoods, setCurrentMoods] = useState<MoodColor[]>(baseMoods);
   const [mixedColor, setMixedColor] = useState('#808080');
   const [recipes, setRecipes] = useState<MoodRecipe[]>(moodRecipes);
-  const [totalMixes, setTotalMixes] = useState(0);
-  const [perfectMixes, setPerfectMixes] = useState(0);
   const [animationPhase, setAnimationPhase] = useState(0);
 
   useEffect(() => {
@@ -177,12 +184,10 @@ export default function MoodMixerJourneyPage() {
     setCurrentMoods(newMoods);
   };
 
-  const saveMix = () => {
-    setTotalMixes(prev => prev + 1);
-
+  const saveMix = async () => {
     // Check if it matches any locked recipe
     const matchedRecipe = recipes.find(recipe => {
-      if (recipe.unlocked) return false;
+      if (isUnlocked(recipe.id)) return false;
       
       const tolerance = 15;
       return recipe.colors.every(recipeColor => {
@@ -192,7 +197,12 @@ export default function MoodMixerJourneyPage() {
     });
 
     if (matchedRecipe) {
-      setPerfectMixes(prev => prev + 1);
+      await unlockItem(matchedRecipe.id, {
+        recipe: matchedRecipe.name,
+        harmony: Math.round(calculateHarmony()),
+        energy: Math.round(calculateEnergy())
+      });
+
       setRecipes(prev =>
         prev.map(r => r.id === matchedRecipe.id ? { ...r, unlocked: true } : r)
       );
@@ -370,14 +380,14 @@ export default function MoodMixerJourneyPage() {
               </h3>
               <div className="space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-white/70">Mélanges créés</span>
-                  <span className="text-white font-bold">{totalMixes}</span>
-                </div>
-                <div className="flex justify-between">
                   <span className="text-white/70">Recettes débloquées</span>
                   <span className="text-white font-bold">
-                    {recipes.filter(r => r.unlocked).length}/{recipes.length}
+                    {collection.filter(c => c.unlocked).length}/{recipes.length}
                   </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-white/70">Points</span>
+                  <span className="text-white font-bold">{sessionData.totalPoints || 0}</span>
                 </div>
               </div>
             </Card>
@@ -392,18 +402,18 @@ export default function MoodMixerJourneyPage() {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     className={`p-3 rounded-lg cursor-pointer transition-all ${
-                      recipe.unlocked
+                      isUnlocked(recipe.id)
                         ? 'bg-green-500/20 border-2 border-green-400'
                         : 'bg-white/5 border-2 border-white/20'
                     }`}
-                    onClick={() => recipe.unlocked && tryRecipe(recipe)}
+                    onClick={() => isUnlocked(recipe.id) && tryRecipe(recipe)}
                   >
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
                         <span className="text-2xl">{recipe.emoji}</span>
                         <div>
                           <div className="text-white font-medium">{recipe.name}</div>
-                          {recipe.unlocked ? (
+                          {isUnlocked(recipe.id) ? (
                             <div className="text-white/60 text-xs">{recipe.description}</div>
                           ) : (
                             <div className="text-white/40 text-xs">🔒 À découvrir</div>
@@ -411,7 +421,7 @@ export default function MoodMixerJourneyPage() {
                         </div>
                       </div>
                     </div>
-                    {recipe.unlocked && (
+                    {isUnlocked(recipe.id) && (
                       <div className="flex gap-1 mt-2">
                         {recipe.colors.slice(0, 3).map((color, i) => (
                           <div
@@ -427,7 +437,7 @@ export default function MoodMixerJourneyPage() {
               </div>
             </Card>
 
-            {perfectMixes >= 3 && (
+            {achievements.length > 0 && (
               <motion.div
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
