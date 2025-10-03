@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React, { useState } from 'react';
 import { Volume2, VolumeX, Music } from 'lucide-react';
 import { Button } from '@/components/ui/button';

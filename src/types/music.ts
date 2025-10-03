@@ -1,4 +1,3 @@
-// @ts-nocheck
 export interface MusicTrack {
   id: string;
   title: string;
