@@ -80,7 +80,7 @@ export function choosePreset(emotions: HumeEmotionScore[]): EmotionsCarePreset {
       for (const tag of mappedTags) {
         const preset = TAG_TO_PRESET.get(tag);
         if (preset) {
-          console.log(`🎵 EmotionsCare: Selected preset "${tag}" for emotion "${emotionName}" (score: ${emotion.score})`);
+          // Silent: preset selected for emotion
           return preset;
         }
       }
@@ -100,7 +100,7 @@ export function choosePreset(emotions: HumeEmotionScore[]): EmotionsCarePreset {
     }
   }
 
-  console.log(`🎵 EmotionsCare: Fallback preset "${bestMatch.tag}" for emotion "${topEmotion.name}" (similarity: ${bestScore})`);
+  // Silent: fallback preset selected
   return bestMatch;
 }
 

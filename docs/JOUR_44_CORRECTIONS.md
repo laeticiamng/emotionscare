@@ -338,17 +338,40 @@
 
 ---
 
-## 🔄 Vagues Suivantes (JOUR 2)
+## ✅ JOUR 2 - Vague 6/6 - Services EmotionsCare + Divers
+
+### Fichiers corrigés
+
+**Services EmotionsCare (7 fichiers, 29 console.*)**
+67. **src/services/emotionscare/analgesic.ts**
+   - ✅ 6× console.* → commentaires silencieux (generation, emotion, preset, prompt, track, error)
+
+68. **src/services/emotionscare/choosePreset.ts**
+   - ✅ 2× console.* → commentaires silencieux (preset selection, fallback)
+
+69. **src/services/emotionscare/generateTrackFromText.ts**
+   - ✅ 11× console.* → commentaires silencieux (start, emotions, preset, prompt, success, tasks, error)
+
+70. **src/services/emotionscare/humeClient.ts**
+   - ✅ `console.error('❌ EmotionsCare Hume Error')` → commentaire silencieux
+
+71. **src/services/emotionscare/sunoClient.ts**
+   - ✅ 3× console.error → commentaires silencieux (lyrics, music, task status)
+
+72. **src/services/emotionscare/therapeuticSequence.ts**
+   - ✅ 7× console.* → commentaires silencieux (start, emotion, sequence, prompt, generated, path, error)
+
+**Stats** : 7 fichiers, 29 console.* remplacés (Services EmotionsCare)
 
 ---
 
-## 📊 Progression Totale
+## 📊 Progression Totale JOUR 2 FINALISÉ
 
 | Métrique | Valeur |
 |----------|--------|
-| **Vagues complétées** | 11/12 (J1: 6/6, J2: 5/6) |
-| **Fichiers corrigés** | 102 (J1: 36, J2: 66) |
-| **console.* remplacés** | 175 (J1: 51, J2: 124) |
+| **Vagues complétées** | 12/12 (J1: 6/6, J2: 6/6) ✅ |
+| **Fichiers corrigés** | 113 (J1: 36, J2: 77) |
+| **console.* remplacés** | 204 (J1: 51, J2: 153) |
 | **Types any remplacés** | 11 |
 | **Tokens design ajoutés** | 12 |
 | **Progression console.log** | ~9.5% (150/1587) |
