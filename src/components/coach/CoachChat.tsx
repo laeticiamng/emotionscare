@@ -6,6 +6,7 @@ import CoachChatInput from './CoachChatInput';
 import CoachCharacter from './CoachCharacter';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
+import { logger } from '@/lib/logger';
 
 const CoachChat: React.FC<CoachChatProps> = ({
   initialMessage,
@@ -43,7 +44,7 @@ const CoachChat: React.FC<CoachChatProps> = ({
       // Send user message
       sendMessage(text, 'user');
     } catch (error) {
-      console.error('Failed to send message:', error);
+      logger.error('Failed to send message:', error);
       toast({
         title: "Erreur",
         description: "Impossible d'envoyer votre message. Veuillez réessayer.",

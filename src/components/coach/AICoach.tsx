@@ -7,6 +7,7 @@ import { MessageSquare, Send, Bot, User, Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 interface Message {
   id: string;
@@ -95,7 +96,7 @@ const AICoach: React.FC = () => {
         setMessages([welcomeMessage]);
       }
     } catch (error) {
-      console.error('Conversation initialization error:', error);
+      logger.error('Conversation initialization error:', error);
       toast.error('Erreur lors de l\'initialisation de la conversation');
     }
   };
@@ -161,7 +162,7 @@ const AICoach: React.FC = () => {
         .eq('id', conversationId);
 
     } catch (error) {
-      console.error('Send message error:', error);
+      logger.error('Send message error:', error);
       toast.error('Erreur lors de l\'envoi du message');
     } finally {
       setIsLoading(false);

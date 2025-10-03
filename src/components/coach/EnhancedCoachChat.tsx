@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import useOpenAI from '@/hooks/api/useOpenAI';
 import useWhisper from '@/hooks/api/useWhisper';
 import { sanitizeUserContent } from '@/lib/security/sanitize';
+import { logger } from '@/lib/logger';
 
 interface Message {
   id: string;
@@ -104,7 +105,7 @@ const EnhancedCoachChat: React.FC<EnhancedCoachChatProps> = ({
         setMessages(prev => [...prev, newAssistantMessage]);
       }
     } catch (error) {
-      console.error('Error generating response:', error);
+      logger.error('Error generating response:', error);
       toast.error("Désolé, je n'ai pas pu générer de réponse. Veuillez réessayer.");
     } finally {
       setIsLoading(false);

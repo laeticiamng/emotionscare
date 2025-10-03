@@ -7,6 +7,7 @@ import { Send, Bot, User, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import CoachAvatar from './CoachAvatar';
+import { logger } from '@/lib/logger';
 
 interface ChatMessage {
   id: string;
@@ -67,7 +68,7 @@ const CoachChatInterface: React.FC<CoachChatInterfaceProps> = ({
         setLocalMessages(prev => [...prev, coachMessage]);
       }
     } catch (error) {
-      console.error('Erreur envoi message:', error);
+      logger.error('Erreur envoi message:', error);
       const errorMessage: ChatMessage = {
         id: crypto.randomUUID(),
         text: "Désolé, je rencontre un problème technique. Pouvez-vous réessayer ?",
