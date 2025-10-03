@@ -227,6 +227,14 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     aliases: ['/music-therapy-premium'],
   },
   {
+    name: 'music-generate',
+    path: '/app/music/generate',
+    segment: 'consumer',
+    layout: 'simple',
+    component: 'MusicGeneratePage',
+    guard: true,
+  },
+  {
     name: 'coach',
     path: '/app/coach',
     segment: 'consumer',
