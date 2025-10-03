@@ -53,14 +53,8 @@ export const PredictiveAnalyticsProvider: React.FC<{ children: React.ReactNode }
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [currentPredictions, setCurrentPredictions] = useState<Prediction | null>(null);
-  const [isEnabled, setIsEnabled] = useState(() => {
-    const stored = localStorage.getItem('predictiveAnalyticsEnabled');
-    return stored ? JSON.parse(stored) : true;
-  });
-  const [predictionEnabled, setPredictionEnabled] = useState(() => {
-    const stored = localStorage.getItem('predictionEnabled');
-    return stored ? JSON.parse(stored) : true;
-  });
+  const [isEnabled, setIsEnabled] = useState<boolean>(true);
+  const [predictionEnabled, setPredictionEnabled] = useState<boolean>(true);
   const [recommendations, setRecommendations] = useState<PredictionRecommendation[]>([]);
   const { user } = useAuth();
   const { toast } = useToast();
@@ -104,13 +98,48 @@ export const PredictiveAnalyticsProvider: React.FC<{ children: React.ReactNode }
     }
   ]);
 
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    const storedIsEnabled = window.localStorage.getItem('predictiveAnalyticsEnabled');
+    if (storedIsEnabled !== null) {
+      try {
+        setIsEnabled(JSON.parse(storedIsEnabled));
+      } catch (e) {
+        // If parsing fails, fallback to default and clear corrupted value
+        setIsEnabled(true);
+        window.localStorage.removeItem('predictiveAnalyticsEnabled');
+      }
+    }
+
+    const storedPredictionEnabled = window.localStorage.getItem('predictionEnabled');
+    if (storedPredictionEnabled !== null) {
+      try {
+        setPredictionEnabled(JSON.parse(storedPredictionEnabled));
+      } catch (e) {
+        setPredictionEnabled(true);
+        window.localStorage.removeItem('predictionEnabled');
+      }
+    }
+  }, []);
+
   // Store settings in localStorage
   useEffect(() => {
-    localStorage.setItem('predictiveAnalyticsEnabled', JSON.stringify(isEnabled));
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    window.localStorage.setItem('predictiveAnalyticsEnabled', JSON.stringify(isEnabled));
   }, [isEnabled]);
 
   useEffect(() => {
-    localStorage.setItem('predictionEnabled', JSON.stringify(predictionEnabled));
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    window.localStorage.setItem('predictionEnabled', JSON.stringify(predictionEnabled));
   }, [predictionEnabled]);
   
   // Update feature enabled status when predictionEnabled changes
