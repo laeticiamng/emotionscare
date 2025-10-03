@@ -10820,6 +10820,24 @@ export type Database = {
         }
         Relationships: []
       }
+      user_weekly_dashboard: {
+        Row: {
+          assessments_count: number | null
+          avg_coherence: number | null
+          avg_hrv_delta: number | null
+          breath_coherence: number | null
+          breath_hrv: number | null
+          breath_mood: number | null
+          journal_text_count: number | null
+          journal_voice_count: number | null
+          last_activity_at: string | null
+          refreshed_at: string | null
+          user_id: string | null
+          vr_sessions_count: number | null
+          week_start: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       accept_invitation: {
@@ -11929,6 +11947,10 @@ export type Database = {
       panic_overlay_get_state: {
         Args: Record<PropertyKey, never>
         Returns: Json
+      }
+      refresh_analytics_dashboards: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
       }
       refresh_dashboard_stats: {
         Args: Record<PropertyKey, never>
