@@ -177,15 +177,15 @@ export function safeDOM<T>(
 /**
  * Type guard pour vérifier qu'un objet a une méthode add
  */
-export function hasAddMethod<T>(obj: any): obj is { add: (item: T) => any } {
-  return Boolean(obj && typeof obj.add === 'function');
+export function hasAddMethod<T>(obj: unknown): obj is { add: (item: T) => void } {
+  return Boolean(obj && typeof (obj as { add?: unknown }).add === 'function');
 }
 
 /**
  * Ajoute un élément à n'importe quel objet avec une méthode add de manière sécurisée
  */
 export function safeAddToCollection<T>(
-  collection: any,
+  collection: unknown,
   item: T,
   context = 'collection'
 ): boolean {

@@ -9,8 +9,8 @@ import { z } from 'zod';
 export const SafeComponentPropsSchema = z.object({
   className: z.string().default(''),
   id: z.string().optional(),
-  children: z.any().optional(),
-  style: z.record(z.any()).default({}),
+  children: z.unknown().optional(),
+  style: z.record(z.unknown()).default({}),
 }).partial();
 
 // Schéma pour les paramètres de mood mixer
@@ -21,7 +21,7 @@ export const SafeMoodMixerSchema = z.object({
   mixStyle: z.enum(['smooth', 'sharp', 'gradual']).default('smooth'),
   volume: z.number().min(0).max(1).default(0.8),
   isPlaying: z.boolean().default(false),
-  playlist: z.array(z.any()).default([]),
+  playlist: z.array(z.unknown()).default([]),
   settings: z.object({
     autoPlay: z.boolean().default(false),
     loopMode: z.boolean().default(false),
@@ -55,7 +55,7 @@ export const SafeSessionSchema = z.object({
   sessionId: z.string().default(() => `session_${Date.now()}`),
   startTime: z.date().default(() => new Date()),
   endTime: z.date().optional(),
-  activities: z.array(z.any()).default([]),
+  activities: z.array(z.unknown()).default([]),
   metrics: z.object({
     duration: z.number().default(0),
     interactions: z.number().default(0),
@@ -81,7 +81,7 @@ export const SafeErrorSchema = z.object({
   timestamp: z.date().default(() => new Date()),
   context: z.string().optional(),
   stack: z.string().optional(),
-  metadata: z.record(z.any()).default({}),
+  metadata: z.record(z.unknown()).default({}),
 });
 
 // Fonction helper pour parser avec des valeurs par défaut sécurisées

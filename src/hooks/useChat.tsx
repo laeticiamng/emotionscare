@@ -77,7 +77,7 @@ export function useChat({
         onResponse(responseMessage);
       }
     } catch (err) {
-      console.error('Error sending message:', err);
+      // Error handled below - no logging needed
       
       // Set error state
       const error = err instanceof Error ? err : new Error('Failed to send message');
