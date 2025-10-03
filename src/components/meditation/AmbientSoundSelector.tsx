@@ -102,7 +102,7 @@ const AmbientSoundSelector: React.FC = () => {
       });
       elements.clear();
     };
-  }, []);
+  }, [volumes]);
 
   useEffect(() => {
     audioElementsRef.current.forEach((audio, id) => {
