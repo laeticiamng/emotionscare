@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { fullApiService } from '@/services/api/fullApiService';
+import { logger } from '@/lib/logger';
 
 export interface ActivityLogFilters {
   searchTerm: string;
@@ -117,7 +118,7 @@ export const useUserActivityLogState = () => {
         setStats(mockStats);
       }
     } catch (err) {
-      console.error('Error fetching activity data:', err);
+      logger.error('Error fetching activity data:', err);
       setError(err instanceof Error ? err.message : 'Erreur lors du chargement des données');
       
       // Données de fallback pour éviter les erreurs d'affichage
@@ -163,7 +164,7 @@ export const useUserActivityLogState = () => {
       link.click();
       document.body.removeChild(link);
     } catch (err) {
-      console.error('Error exporting data:', err);
+      logger.error('Error exporting data:', err);
       setError('Erreur lors de l\'export des données');
     }
   }, [activeTab, filteredActivities, stats]);

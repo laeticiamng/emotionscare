@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { useRouter } from '@/hooks/router';
 import { useUserMode } from '@/contexts/UserModeContext';
+import { logger } from '@/lib/logger';
 
 const QUICK_ACTIONS = [
   {
@@ -82,7 +83,7 @@ export const QuickActions: React.FC = () => {
     router.push(fullPath);
     
     // Analytics tracking would go here
-    console.log('Quick action clicked:', path);
+    logger.info('Quick action clicked:', { path });
   };
 
   return (
