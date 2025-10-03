@@ -176,11 +176,6 @@ BEGIN
       FOR UPDATE
       USING (auth.uid() = user_id)
       WITH CHECK (auth.uid() = user_id);$$;
-    EXECUTE 'DROP POLICY IF EXISTS "user_stats_update_own" ON public.user_stats';
-    EXECUTE $$CREATE POLICY "user_stats_update_own" ON public.user_stats
-      FOR UPDATE
-      USING (auth.uid() = user_id)
-      WITH CHECK (auth.uid() = user_id);$$;
   END IF;
 END $$;
 
