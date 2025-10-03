@@ -201,8 +201,16 @@ export const useJournalMachine = (config: JournalConfig = {}) => {
     };
   }, [recordingTimer, mediaRecorder]);
 
-  const isProcessing = machineIsLoading || state === 'active' || state === 'ending';
+  /**
+   * Determines if the journal is in a "processing" state.
+   * This includes when the async machine is loading, or when the journal state
+   * is 'active' or 'ending', which represent ongoing processing activities.
+   */
+  function isJournalProcessing(machineIsLoading: boolean, state: string): boolean {
+    return machineIsLoading || state === 'active' || state === 'ending';
+  }
 
+  const isProcessing = isJournalProcessing(machineIsLoading, state);
   return {
     state: state as JournalState,
     data: machineData || {
