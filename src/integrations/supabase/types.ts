@@ -1172,6 +1172,93 @@ export type Database = {
           },
         ]
       }
+      breath_weekly_metrics: {
+        Row: {
+          coherence_avg: number | null
+          created_at: string
+          hrv_stress_idx: number | null
+          id: string
+          mindfulness_avg: number | null
+          mood_score: number | null
+          mvpa_week: number | null
+          relax_idx: number | null
+          updated_at: string
+          user_id: string
+          week_start: string
+        }
+        Insert: {
+          coherence_avg?: number | null
+          created_at?: string
+          hrv_stress_idx?: number | null
+          id?: string
+          mindfulness_avg?: number | null
+          mood_score?: number | null
+          mvpa_week?: number | null
+          relax_idx?: number | null
+          updated_at?: string
+          user_id: string
+          week_start: string
+        }
+        Update: {
+          coherence_avg?: number | null
+          created_at?: string
+          hrv_stress_idx?: number | null
+          id?: string
+          mindfulness_avg?: number | null
+          mood_score?: number | null
+          mvpa_week?: number | null
+          relax_idx?: number | null
+          updated_at?: string
+          user_id?: string
+          week_start?: string
+        }
+        Relationships: []
+      }
+      breath_weekly_org_metrics: {
+        Row: {
+          created_at: string
+          id: string
+          members: number | null
+          org_coherence: number | null
+          org_hrv_idx: number | null
+          org_id: string
+          org_mindfulness: number | null
+          org_mood: number | null
+          org_mvpa: number | null
+          org_relax: number | null
+          updated_at: string
+          week_start: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          members?: number | null
+          org_coherence?: number | null
+          org_hrv_idx?: number | null
+          org_id: string
+          org_mindfulness?: number | null
+          org_mood?: number | null
+          org_mvpa?: number | null
+          org_relax?: number | null
+          updated_at?: string
+          week_start: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          members?: number | null
+          org_coherence?: number | null
+          org_hrv_idx?: number | null
+          org_id?: string
+          org_mindfulness?: number | null
+          org_mood?: number | null
+          org_mvpa?: number | null
+          org_relax?: number | null
+          updated_at?: string
+          week_start?: string
+        }
+        Relationships: []
+      }
       buddies: {
         Row: {
           buddy_user_id: string

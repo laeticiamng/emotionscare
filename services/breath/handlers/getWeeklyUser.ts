@@ -13,7 +13,8 @@ function parseSince(url: string | undefined): Date {
 export async function getWeeklyUser(req: FastifyRequest, reply: FastifyReply) {
   const since = parseSince(req.url);
   const userHash = hash((req as any).user.sub);
-  const rows = listWeekly(userHash, since).map(r => ({
+  const rows = await listWeekly(userHash, since);
+  const mapped = rows.map(r => ({
     week_start: r.week_start,
     glowScore: r.hrv_stress_idx,
     coherence: r.coherence_avg,
@@ -22,5 +23,5 @@ export async function getWeeklyUser(req: FastifyRequest, reply: FastifyReply) {
     mindfulScore: r.mindfulness_avg,
     moodScore: r.mood_score
   }));
-  reply.code(200).send(rows);
+  reply.code(200).send(mapped);
 }
