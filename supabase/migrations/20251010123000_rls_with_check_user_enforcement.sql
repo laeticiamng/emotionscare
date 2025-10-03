@@ -187,11 +187,6 @@ BEGIN
       FOR UPDATE
       USING (auth.uid() = user_id)
       WITH CHECK (auth.uid() = user_id);$$;
-    EXECUTE 'DROP POLICY IF EXISTS "challenges_update_own" ON public.challenges';
-    EXECUTE $$CREATE POLICY "challenges_update_own" ON public.challenges
-      FOR UPDATE
-      USING (auth.uid() = user_id)
-      WITH CHECK (auth.uid() = user_id);$$;
   END IF;
 END $$;
 
