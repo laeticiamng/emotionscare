@@ -109,7 +109,7 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
       return true;
     } catch (error) {
-      console.error('Erreur lors de la finalisation de l\'onboarding:', error);
+      // Onboarding finalization error
       toast({
         title: "Erreur",
         description: "Impossible de finaliser l'onboarding",

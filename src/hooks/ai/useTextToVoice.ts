@@ -97,7 +97,7 @@ export function useTextToVoice(options: TextToVoiceOptions = {}) {
         throw new Error('No audio content returned');
       }
     } catch (err) {
-      console.error('Error generating speech:', err);
+      // Speech generation error
       setError(err instanceof Error ? err.message : 'Error generating speech');
       toast({
         title: "Erreur de synthèse vocale",

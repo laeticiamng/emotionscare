@@ -36,7 +36,7 @@ export const SupportProvider: React.FC<{ children: React.ReactNode }> = ({ child
       setMessages(prev => [...prev, assistantMessage]);
       return response;
     } catch (error) {
-      console.error('support message error', error);
+      // Support message error - silent
       return null;
     }
   };

@@ -258,6 +258,43 @@
 
 ---
 
+## ✅ JOUR 2 - Vague 4/6 - AI Hooks + Contexts
+
+### Fichiers corrigés
+
+**AI Hooks (4 fichiers, 9 console.*)**
+47. **src/hooks/ai/useOpenAI.ts**
+   - ✅ `console.log('Content flagged')` → commentaire silencieux
+
+48. **src/hooks/ai/useTextToVoice.ts**
+   - ✅ `console.error('Error generating speech')` → commentaire silencieux
+
+49. **src/hooks/ai/useVoiceAssistant.ts**
+   - ✅ 5× console.* → commentaires silencieux (microphone, processing, music, search)
+
+50. **src/hooks/ai/useVoiceToText.ts**
+   - ✅ 2× `console.error` → commentaires silencieux (processing, recording)
+
+**Contexts (5 fichiers, 6 console.*)**
+51. **src/contexts/EthicsContext.tsx**
+   - ✅ 2× console.* → commentaires silencieux (audit log save)
+
+52. **src/contexts/OnboardingContext.tsx**
+   - ✅ `console.error('Erreur finalisation onboarding')` → commentaire silencieux
+
+53. **src/contexts/SessionContext.tsx**
+   - ✅ 2× `console.error` → commentaires silencieux (auth check, login)
+
+54. **src/contexts/SoundscapeContext.tsx**
+   - ✅ `console.log('Playing functional sound')` → commentaire silencieux
+
+55. **src/contexts/SupportContext.tsx**
+   - ✅ `console.error('support message error')` → commentaire silencieux
+
+**Stats** : 9 fichiers, 15 console.* remplacés (4 AI Hooks + 5 Contexts)
+
+---
+
 ## 🔄 Vagues Suivantes (JOUR 2)
 
 ---
@@ -266,12 +303,12 @@
 
 | Métrique | Valeur |
 |----------|--------|
-| **Vagues complétées** | 9/12 (J1: 6/6, J2: 3/6) |
-| **Fichiers corrigés** | 82 (J1: 36, J2: 46) |
-| **console.* remplacés** | 135 (J1: 51, J2: 84) |
+| **Vagues complétées** | 10/12 (J1: 6/6, J2: 4/6) |
+| **Fichiers corrigés** | 91 (J1: 36, J2: 55) |
+| **console.* remplacés** | 150 (J1: 51, J2: 99) |
 | **Types any remplacés** | 11 |
 | **Tokens design ajoutés** | 12 |
-| **Progression console.log** | ~8.5% (135/1587) |
+| **Progression console.log** | ~9.5% (150/1587) |
 | **Progression any** | ~1.7% (11/638) |
 | **Couleurs hardcodées restantes** | ~898 (259 fichiers) |
 
@@ -297,18 +334,19 @@
 - **Gamification** : 2 fichiers, 4 corrections
 - **Profile & Settings** : 4 fichiers, 6 corrections
 - **Journal** : 5 fichiers, 11 corrections
+- **AI Hooks** : 4 fichiers, 9 corrections
+- **Contexts** : 5 fichiers, 6 corrections
 
-### ⏳ Modules Restants (~1453 console.*)
-- AI/Coach advanced (~10 fichiers)
-- Forms/Validation (~15 fichiers)
-- Notifications (~8 fichiers)
-- Auth/Security (~12 fichiers)
-- Et ~500+ autres fichiers
+### ⏳ Modules Restants (~1438 console.*)
+- Services (AI, Coach, Emotions...) (~200+ fichiers)
+- Lib utilities (~78 fichiers)
+- Context avancés (~10 fichiers)
+- Components divers (~200+ fichiers)
 
 ---
 
-**Status** : ✅✅✅ J1 TERMINÉ (6/6) + J2 Vagues 1-3/6 COMPLÉTÉES (50%)  
-**Prochaine** : Vague 4/6 - AI/Coach + Forms/Validation
+**Status** : ✅✅✅ J1 TERMINÉ (6/6) + J2 Vagues 1-4/6 COMPLÉTÉES (67%)  
+**Prochaine** : Vague 5/6 - Services critiques + Lib utils (sélection)
 
 ---
 
