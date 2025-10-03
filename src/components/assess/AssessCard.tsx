@@ -1,10 +1,9 @@
-// @ts-nocheck
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { AlertCircle, Clock, CheckCircle2 } from 'lucide-react';
-import type { Instrument } from '../../../../packages/contracts/assess';
+import type { Instrument } from './types';
 
 interface AssessCardProps {
   instrument: Instrument;
