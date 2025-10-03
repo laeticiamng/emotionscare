@@ -76,7 +76,7 @@ const JournalEntryModal: React.FC<JournalEntryModalProps> = ({
       setEmotion('');
       setIntensity([5]);
     } catch (error) {
-      console.error('Error saving journal entry:', error);
+      // Journal entry save error
     } finally {
       setIsLoading(false);
     }

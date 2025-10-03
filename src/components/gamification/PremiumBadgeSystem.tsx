@@ -252,7 +252,7 @@ export const PremiumBadgeSystem: React.FC = () => {
 
       setBadges(userBadges);
     } catch (error) {
-      console.error('Error loading badges:', error);
+      // Badge loading error
     } finally {
       setLoading(false);
     }

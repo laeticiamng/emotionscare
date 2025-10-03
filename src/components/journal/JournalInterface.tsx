@@ -52,7 +52,7 @@ const JournalInterface: React.FC = () => {
 
       setEntries(journalEntries);
     } catch (error) {
-      console.error('Erreur chargement journal:', error);
+      // Journal loading error
       notify(
         {
           code: 'SERVER',
@@ -110,7 +110,7 @@ const JournalInterface: React.FC = () => {
             .eq('id', data.id);
         }
       } catch (analysisError) {
-        console.error('Erreur analyse IA:', analysisError);
+        // AI analysis error
         notify(
           {
             code: 'SERVER',
@@ -132,7 +132,7 @@ const JournalInterface: React.FC = () => {
       setNewEntry('');
       setIsWriting(false);
     } catch (error) {
-      console.error('Erreur sauvegarde:', error);
+      // Journal save error
       notify(
         {
           code: 'SERVER',

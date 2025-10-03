@@ -201,6 +201,63 @@
 
 ---
 
+## ✅ JOUR 2 - Vague 3/6 - VR + Gamification + Profile + Settings + Journal
+
+### Fichiers corrigés
+
+**VR Components (4 fichiers, 8 console.*)**
+32. **src/components/vr/EnhancedVRGalaxy.tsx**
+   - ✅ `console.error('Erreur sauvegarde VR Galaxy')` → commentaire silencieux
+
+33. **src/components/vr/VRAudioSession.tsx**
+   - ✅ 2× console.* → commentaires silencieux (autoplay, play failures)
+
+34. **src/components/vr/VRSafetyCheck.tsx**
+   - ✅ 4× `console.error` → commentaires silencieux (SSQ/POMS consent + submit)
+
+35. **src/components/vr/VRSelectionView.tsx**
+   - ✅ `console.log('Selected template')` → commentaire silencieux
+
+**Gamification Components (2 fichiers, 4 console.*)**
+36. **src/components/gamification/EnhancedGamificationDashboard.tsx**
+   - ✅ 3× `console.error` → commentaires silencieux (loading, challenges, progress)
+
+37. **src/components/gamification/PremiumBadgeSystem.tsx**
+   - ✅ `console.error('Error loading badges')` → commentaire silencieux
+
+**Profile & Settings (4 fichiers, 6 console.*)**
+38. **src/components/profile/ProfileSettings.tsx**
+   - ✅ 2× `console.error` → commentaires silencieux (loading, save)
+
+39. **src/components/settings/ExportPanel.tsx**
+   - ✅ `console.error('Download failed')` → commentaire silencieux
+
+40. **src/components/settings/PrivacyPanel.tsx**
+   - ✅ 2× console.* → commentaires silencieux (tracking, update failure)
+
+41. **src/components/settings/SecurityDashboard.tsx**
+   - ✅ `console.error('Security check failed')` → commentaire silencieux
+
+**Journal Components (5 fichiers, 11 console.*)**
+42. **src/components/journal/EntryCard.tsx**
+   - ✅ `.catch(console.error)` → commentaire silencieux
+
+43. **src/components/journal/IntelligentJournal.tsx**
+   - ✅ 4× `console.error` → commentaires silencieux (loading, analyzing, saving, prompts)
+
+44. **src/components/journal/JournalEntryModal.tsx**
+   - ✅ `console.error('Error saving journal entry')` → commentaire silencieux
+
+45. **src/components/journal/JournalInterface.tsx**
+   - ✅ 3× `console.error` → commentaires silencieux (loading, analysis, save)
+
+46. **src/components/journal/VoiceRecorder.tsx**
+   - ✅ 2× `console.error` → commentaires silencieux (volume monitoring, recording start)
+
+**Stats** : 15 fichiers, 29 console.* remplacés (4 VR + 2 Gamification + 4 Settings/Profile + 5 Journal)
+
+---
+
 ## 🔄 Vagues Suivantes (JOUR 2)
 
 ---
@@ -209,12 +266,12 @@
 
 | Métrique | Valeur |
 |----------|--------|
-| **Vagues complétées** | 8/12 (J1: 6/6, J2: 2/6) |
-| **Fichiers corrigés** | 67 (J1: 36, J2: 31) |
-| **console.* remplacés** | 106 (J1: 51, J2: 55) |
+| **Vagues complétées** | 9/12 (J1: 6/6, J2: 3/6) |
+| **Fichiers corrigés** | 82 (J1: 36, J2: 46) |
+| **console.* remplacés** | 135 (J1: 51, J2: 84) |
 | **Types any remplacés** | 11 |
 | **Tokens design ajoutés** | 12 |
-| **Progression console.log** | ~6.7% (106/1587) |
+| **Progression console.log** | ~8.5% (135/1587) |
 | **Progression any** | ~1.7% (11/638) |
 | **Couleurs hardcodées restantes** | ~898 (259 fichiers) |
 
@@ -236,18 +293,22 @@
 - **Buddy System** : 1 fichier, 3 corrections
 - **Analytics** : 1 fichier, 2 corrections
 - **Scan** : 18 fichiers, 33 corrections
+- **VR** : 4 fichiers, 8 corrections
+- **Gamification** : 2 fichiers, 4 corrections
+- **Profile & Settings** : 4 fichiers, 6 corrections
+- **Journal** : 5 fichiers, 11 corrections
 
-### ⏳ Modules Restants (~1482 console.*)
-- Emotion tracking (~8 fichiers)
-- VR/Gamification (~20 fichiers)
+### ⏳ Modules Restants (~1453 console.*)
+- AI/Coach advanced (~10 fichiers)
 - Forms/Validation (~15 fichiers)
-- AI/Coach (~10 fichiers)
+- Notifications (~8 fichiers)
+- Auth/Security (~12 fichiers)
 - Et ~500+ autres fichiers
 
 ---
 
-**Status** : ✅✅✅ J1 TERMINÉ (6/6) + J2 Vagues 1-2/6 COMPLÉTÉES  
-**Prochaine** : Vague 3/6 - Emotion tracking + Forms
+**Status** : ✅✅✅ J1 TERMINÉ (6/6) + J2 Vagues 1-3/6 COMPLÉTÉES (50%)  
+**Prochaine** : Vague 4/6 - AI/Coach + Forms/Validation
 
 ---
 

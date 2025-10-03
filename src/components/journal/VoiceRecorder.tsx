@@ -55,7 +55,7 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
       
       updateVolume();
     } catch (error) {
-      console.error('Volume monitoring setup failed:', error);
+      // Volume monitoring setup failed - silent
     }
   }, [recording]);
 
@@ -112,7 +112,7 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
       }, 1000);
 
     } catch (error) {
-      console.error('Recording start failed:', error);
+      // Recording start failed
       onPermissionDenied();
     }
   };

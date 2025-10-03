@@ -139,7 +139,7 @@ export const EnhancedGamificationDashboard: React.FC = () => {
       }
 
     } catch (error) {
-      console.error('Error loading gamification data:', error);
+      // Gamification data loading error
       toast({
         title: "Erreur",
         description: "Impossible de charger les données de gamification",
@@ -174,7 +174,7 @@ export const EnhancedGamificationDashboard: React.FC = () => {
         });
       }
     } catch (error) {
-      console.error('Error generating challenges:', error);
+      // Challenge generation error
       toast({
         title: "Erreur",
         description: "Impossible de générer de nouveaux défis",
@@ -234,7 +234,7 @@ export const EnhancedGamificationDashboard: React.FC = () => {
         }
       }
     } catch (error) {
-      console.error('Error updating challenge progress:', error);
+      // Challenge progress update error
       toast({
         title: "Erreur",
         description: "Impossible de mettre à jour le défi",

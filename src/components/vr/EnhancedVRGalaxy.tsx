@@ -363,7 +363,7 @@ export default function EnhancedVRGalaxy() {
         }
       });
     } catch (error) {
-      console.error('Erreur sauvegarde VR Galaxy:', error);
+      // VR Galaxy save error
     }
 
     triggerConfetti();

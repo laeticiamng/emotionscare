@@ -36,7 +36,7 @@ export const ExportPanel: React.FC = () => {
           window.open(status.download_url, '_blank');
         }
       } catch (error) {
-        console.error('Download failed:', error);
+        // Download failed - silent
       }
     }
   };

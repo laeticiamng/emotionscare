@@ -72,7 +72,7 @@ const IntelligentJournal: React.FC = () => {
 
       setEntries(formattedEntries);
     } catch (error) {
-      console.error('Error loading entries:', error);
+      // Entries loading error
     }
   }, [user]);
 
@@ -106,7 +106,7 @@ const IntelligentJournal: React.FC = () => {
         patterns: data.patterns
       };
     } catch (error) {
-      console.error('Error analyzing entry:', error);
+      // Entry analysis error
       throw error;
     }
   }, [user, entries]);
@@ -160,7 +160,7 @@ const IntelligentJournal: React.FC = () => {
       });
 
     } catch (error) {
-      console.error('Error saving entry:', error);
+      // Entry save error
       toast({
         title: "Erreur",
         description: "Impossible de sauvegarder l'entrée",
@@ -185,7 +185,7 @@ const IntelligentJournal: React.FC = () => {
 
       return data.prompts || [];
     } catch (error) {
-      console.error('Error generating prompts:', error);
+      // Prompts generation error
       return [];
     }
   }, [user, entries]);

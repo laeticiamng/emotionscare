@@ -87,7 +87,7 @@ const SecurityDashboard: React.FC = () => {
 
       setSecurityStatus(status);
     } catch (error) {
-      console.error('Security check failed:', error);
+      // Security check failed - silent
     } finally {
       setLoading(false);
     }

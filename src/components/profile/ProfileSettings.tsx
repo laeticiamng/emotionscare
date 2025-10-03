@@ -70,7 +70,7 @@ const ProfileSettings: React.FC = () => {
         }
       });
     } catch (error) {
-      console.error('Erreur chargement profil:', error);
+      // Profile loading error
       toast({
         title: "Erreur",
         description: "Impossible de charger le profil",
@@ -103,7 +103,7 @@ const ProfileSettings: React.FC = () => {
         description: "Vos modifications ont été enregistrées"
       });
     } catch (error) {
-      console.error('Erreur sauvegarde:', error);
+      // Profile save error
       toast({
         title: "Erreur",
         description: "Impossible de sauvegarder le profil",

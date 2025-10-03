@@ -31,7 +31,7 @@ const VR_TEMPLATES = [
 
 const VRSelectionView = () => {
   const handleSelectTemplate = (template: any) => {
-    console.log('Selected template:', template);
+    // Template selected - silent
   };
 
   return (
