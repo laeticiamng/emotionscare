@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Heart, Smile, Meh, Frown, AngryIcon, Send, Sparkles } from 'lucide-react';
+import { logger } from '@/lib/logger';
 
 interface EmotionalCheckinProps {
   onSubmit?: (data: { mood: string; intensity: number; note: string }) => void;
@@ -46,7 +47,7 @@ const EmotionalCheckin: React.FC<EmotionalCheckinProps> = ({
       setIntensity(3);
       setNote('');
     } catch (error) {
-      console.error('Erreur lors de l\'envoi:', error);
+      logger.error('Erreur lors de l\'envoi:', error);
     } finally {
       setIsSubmitting(false);
     }

@@ -5,6 +5,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { Emotion } from '@/types/emotion';
+import { logger } from '@/lib/logger';
 
 const EmotionalCheckIn: React.FC = () => {
   const [emotion, setEmotion] = useState<string>('');
@@ -38,7 +39,7 @@ const EmotionalCheckIn: React.FC = () => {
       setText('');
       setEmotion('');
     } catch (error) {
-      console.error('Error submitting emotion:', error);
+      logger.error('Error submitting emotion:', error);
       toast({
         title: "Erreur",
         description: "Impossible d'enregistrer votre émotion. Veuillez réessayer."

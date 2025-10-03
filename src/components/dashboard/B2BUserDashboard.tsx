@@ -10,6 +10,7 @@ import { Music, Trophy, ChartLine, Bell, BookOpen, Lightbulb } from 'lucide-reac
 import DashboardContainer from '@/components/dashboard/DashboardContainer';
 import { UserModeSelector } from '@/components/ui/user-mode-selector';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 // Import types from unified auth types
 import type { Challenge } from '@/types/badge';
@@ -88,7 +89,7 @@ const B2BUserDashboard: React.FC = () => {
         
         setIsLoading(false);
       } catch (error) {
-        console.error('Erreur lors du chargement du tableau de bord :', error);
+        logger.error('Erreur lors du chargement du tableau de bord :', error);
         setHasError(true);
         setIsLoading(false);
         toast.error('Impossible de charger les données du tableau de bord', {

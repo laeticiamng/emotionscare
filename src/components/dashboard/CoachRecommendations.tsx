@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { AI_MODEL_CONFIG } from '@/lib/coach/types';
+import { logger } from '@/lib/logger';
 
 interface Recommendation {
   id: string;
@@ -57,7 +58,7 @@ const CoachRecommendations = () => {
         setLoading(false);
       }, 1000);
     } catch (error) {
-      console.error("Erreur lors de la récupération des recommandations:", error);
+      logger.error("Erreur lors de la récupération des recommandations:", error);
       toast({
         title: "Erreur",
         description: "Impossible de charger les recommandations",
@@ -71,7 +72,7 @@ const CoachRecommendations = () => {
     setLoading(true);
     try {
       // Utilisons les configurations correctes
-      console.log(`Using model: ${AI_MODEL_CONFIG.coach.model} with max_tokens: ${AI_MODEL_CONFIG.coach.max_tokens}`);
+      logger.info(`Using model: ${AI_MODEL_CONFIG.coach.model} with max_tokens: ${AI_MODEL_CONFIG.coach.max_tokens}`);
       
       // Simuler une génération en environnement de développement
       setTimeout(() => {
@@ -92,7 +93,7 @@ const CoachRecommendations = () => {
         });
       }, 1500);
     } catch (error) {
-      console.error("Erreur lors de la génération de recommandation:", error);
+      logger.error("Erreur lors de la génération de recommandation:", error);
       toast({
         title: "Erreur",
         description: "Impossible de générer une recommandation",

@@ -6,6 +6,7 @@ import { ArrowRight, X } from 'lucide-react';
 import { useRouter } from '@/hooks/router';
 import { useDashboardStore } from '@/store/dashboard.store';
 import { Nudge } from '@/store/dashboard.store';
+import { logger } from '@/lib/logger';
 
 interface NudgeCardProps {
   nudge: Nudge;
@@ -22,7 +23,7 @@ export const NudgeCard: React.FC<NudgeCardProps> = ({ nudge }) => {
     router.push(nudge.deeplink);
     
     // Analytics tracking
-    console.log('Nudge clicked:', nudge.deeplink);
+    logger.info('Nudge clicked:', { deeplink: nudge.deeplink });
     
     // Hide nudge after click
     setNudge(null);
@@ -32,7 +33,7 @@ export const NudgeCard: React.FC<NudgeCardProps> = ({ nudge }) => {
     setNudge(null);
     
     // Analytics tracking
-    console.log('Nudge dismissed');
+    logger.info('Nudge dismissed');
   };
 
   return (

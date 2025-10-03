@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Bell, X, Check, AlertCircle, Info, Heart, Star } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 
 interface Notification {
   id: string;
@@ -57,7 +58,7 @@ const NotificationCenter: React.FC = () => {
       if (error) throw error;
       setNotifications(data || []);
     } catch (error) {
-      console.error('Erreur chargement notifications:', error);
+      logger.error('Erreur chargement notifications:', error);
     } finally {
       setIsLoading(false);
     }
@@ -76,7 +77,7 @@ const NotificationCenter: React.FC = () => {
         )
       );
     } catch (error) {
-      console.error('Erreur marquage lecture:', error);
+      logger.error('Erreur marquage lecture:', error);
     }
   };
 
@@ -91,7 +92,7 @@ const NotificationCenter: React.FC = () => {
         prev.map(notif => ({ ...notif, read: true }))
       );
     } catch (error) {
-      console.error('Erreur marquage toutes lectures:', error);
+      logger.error('Erreur marquage toutes lectures:', error);
     }
   };
 
@@ -104,7 +105,7 @@ const NotificationCenter: React.FC = () => {
 
       setNotifications(prev => prev.filter(notif => notif.id !== id));
     } catch (error) {
-      console.error('Erreur suppression notification:', error);
+      logger.error('Erreur suppression notification:', error);
     }
   };
 
