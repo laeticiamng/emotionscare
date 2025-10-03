@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React from 'react';
 import { Avatar } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
@@ -15,7 +13,7 @@ const CoachMessage: React.FC<CoachMessageProps> = ({
   message,
   isLast = false
 }) => {
-  const isCoach = message.sender === 'coach' || message.sender === 'assistant' || message.role === 'assistant';
+  const isCoach = message.sender === 'assistant' || message.sender === 'system';
   const content = message.content || message.text || '';
   
   return (
