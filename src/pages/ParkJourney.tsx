@@ -4,7 +4,7 @@ import { motion, useInView } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { 
   Sparkles, Wind, Palette, Music, Leaf, Book, Cloud, Star, 
-  Lightbulb, Waves, Mirror, Flask, Sword, Sliders, Users, 
+  Lightbulb, Waves, Scan, Flask, Sword, Sliders, Users, 
   Trophy, Theater, Sprout, ArrowRight, Map
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -241,7 +241,7 @@ export default function ParkJourney() {
     },
     {
       number: 11,
-      icon: Mirror,
+      icon: Scan,
       title: "La Chambre des Reflets",
       subtitle: "AR Filters /app/face-ar",
       narrative: "Tu entres dans une salle de miroirs magiques.\nUn clin d'œil déclenche une pluie d'étoiles, un sourire fait briller ton reflet.\nLes stickers que tu utilises s'illuminent et évoluent, créant un avatar unique.",

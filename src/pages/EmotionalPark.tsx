@@ -1,7 +1,7 @@
 // @ts-nocheck
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, Wind, Palette, Music, Leaf, Book, Cloud, Star, Lightbulb, Waves, Mirror, Flask, Sword, Sliders, Users, Trophy, Theater, Sprout, Filter, Zap } from 'lucide-react';
+import { Sparkles, Wind, Palette, Music, Leaf, Book, Cloud, Star, Lightbulb, Waves, Scan, Flask, Sword, Sliders, Users, Trophy, Theater, Sprout, Filter, Zap } from 'lucide-react';
 import { ParkAttraction } from '@/components/park/ParkAttraction';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -129,7 +129,7 @@ export default function EmotionalPark() {
       title: 'La Chambre des Reflets',
       subtitle: 'AR Filters',
       description: 'Miroirs magiques, stickers réactifs. Clin d\'œil = pluie d\'étoiles.',
-      icon: Mirror,
+      icon: Scan,
       route: '/app/face-ar',
       gradient: 'from-fuchsia-500/20 to-pink-500/20',
       collection: 'Avatars rares issus de tes reflets',
