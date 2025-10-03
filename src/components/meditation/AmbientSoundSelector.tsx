@@ -129,7 +129,7 @@ const AmbientSoundSelector: React.FC = () => {
       audio.volume = (volumes[soundId] ?? 50) / 100;
       audio.currentTime = 0;
       const playPromise = audio.play();
-      if (playPromise?.catch) {
+      if (playPromise) {
         playPromise.catch(() => undefined);
       }
       newPlayingSounds.add(soundId);
