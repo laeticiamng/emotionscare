@@ -10304,6 +10304,108 @@ export type Database = {
         }
         Relationships: []
       }
+      vr_dome_sessions: {
+        Row: {
+          created_at: string
+          group_sync_idx: number | null
+          hr_mean: number | null
+          hr_std: number | null
+          id: string
+          session_id: string
+          synchrony_idx: number | null
+          team_pa: number | null
+          ts: string
+          ts_join: string
+          ts_leave: string | null
+          user_id: string
+          user_id_hash: string | null
+          valence: number | null
+          valence_avg: number | null
+        }
+        Insert: {
+          created_at?: string
+          group_sync_idx?: number | null
+          hr_mean?: number | null
+          hr_std?: number | null
+          id?: string
+          session_id: string
+          synchrony_idx?: number | null
+          team_pa?: number | null
+          ts?: string
+          ts_join?: string
+          ts_leave?: string | null
+          user_id: string
+          user_id_hash?: string | null
+          valence?: number | null
+          valence_avg?: number | null
+        }
+        Update: {
+          created_at?: string
+          group_sync_idx?: number | null
+          hr_mean?: number | null
+          hr_std?: number | null
+          id?: string
+          session_id?: string
+          synchrony_idx?: number | null
+          team_pa?: number | null
+          ts?: string
+          ts_join?: string
+          ts_leave?: string | null
+          user_id?: string
+          user_id_hash?: string | null
+          valence?: number | null
+          valence_avg?: number | null
+        }
+        Relationships: []
+      }
+      vr_nebula_sessions: {
+        Row: {
+          client: string | null
+          coherence_score: number | null
+          created_at: string
+          duration_s: number
+          hrv_post: number | null
+          hrv_pre: number | null
+          id: string
+          resp_rate_avg: number | null
+          rmssd_delta: number | null
+          ts_finish: string | null
+          ts_start: string
+          user_id: string
+          user_id_hash: string | null
+        }
+        Insert: {
+          client?: string | null
+          coherence_score?: number | null
+          created_at?: string
+          duration_s: number
+          hrv_post?: number | null
+          hrv_pre?: number | null
+          id?: string
+          resp_rate_avg?: number | null
+          rmssd_delta?: number | null
+          ts_finish?: string | null
+          ts_start?: string
+          user_id: string
+          user_id_hash?: string | null
+        }
+        Update: {
+          client?: string | null
+          coherence_score?: number | null
+          created_at?: string
+          duration_s?: number
+          hrv_post?: number | null
+          hrv_pre?: number | null
+          id?: string
+          resp_rate_avg?: number | null
+          rmssd_delta?: number | null
+          ts_finish?: string | null
+          ts_start?: string
+          user_id?: string
+          user_id_hash?: string | null
+        }
+        Relationships: []
+      }
       vr_sessions: {
         Row: {
           category: string | null
