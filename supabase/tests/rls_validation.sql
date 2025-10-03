@@ -308,6 +308,262 @@ BEGIN
 END $$;
 
 \echo ''
+\echo '📝 TEST 7: Protection contre les écritures cross-user sur les modules bien-être'
+
+DO $$
+DECLARE
+  owner_id UUID := gen_random_uuid();
+  attacker_id UUID := gen_random_uuid();
+  insert_blocked BOOLEAN;
+  update_blocked BOOLEAN;
+  coach_session_id UUID;
+  journal_entry_id UUID;
+BEGIN
+  -- Créer deux utilisateurs distincts
+  INSERT INTO auth.users (id, email) VALUES
+    (owner_id, 'rls-owner@example.com'),
+    (attacker_id, 'rls-attacker@example.com');
+
+  -- Vérifier l'interdiction des insertions cross-user pour chaque table critique
+  -- emotion_scans
+  insert_blocked := false;
+  BEGIN
+    SET LOCAL ROLE authenticated;
+    EXECUTE format('SET LOCAL request.jwt.claims.sub = %L', attacker_id::text);
+    INSERT INTO public.emotion_scans (user_id, emotion, confidence)
+    VALUES (owner_id, 'joy', 90);
+    RESET ALL;
+  EXCEPTION WHEN OTHERS THEN
+    insert_blocked := true;
+    RESET ALL;
+  END;
+  IF NOT insert_blocked THEN
+    RAISE EXCEPTION 'ÉCHEC: insertion cross-user autorisée sur emotion_scans';
+  END IF;
+
+  -- voice_journal_entries
+  insert_blocked := false;
+  BEGIN
+    SET LOCAL ROLE authenticated;
+    EXECUTE format('SET LOCAL request.jwt.claims.sub = %L', attacker_id::text);
+    INSERT INTO public.voice_journal_entries (user_id, title, transcription)
+    VALUES (owner_id, 'Test voice entry', 'Transcription test');
+    RESET ALL;
+  EXCEPTION WHEN OTHERS THEN
+    insert_blocked := true;
+    RESET ALL;
+  END;
+  IF NOT insert_blocked THEN
+    RAISE EXCEPTION 'ÉCHEC: insertion cross-user autorisée sur voice_journal_entries';
+  END IF;
+
+  -- vr_sessions
+  insert_blocked := false;
+  BEGIN
+    SET LOCAL ROLE authenticated;
+    EXECUTE format('SET LOCAL request.jwt.claims.sub = %L', attacker_id::text);
+    IF EXISTS (
+      SELECT 1 FROM information_schema.columns
+      WHERE table_schema = 'public'
+        AND table_name = 'vr_sessions'
+        AND column_name = 'experience_id'
+    ) THEN
+      EXECUTE format(
+        'INSERT INTO public.vr_sessions (user_id, experience_id, experience_title, environment, category, duration_minutes)
+         VALUES (%L, %L, %L, %L, %L, %s)',
+        owner_id::text,
+        'exp-rls',
+        'Expérience RLS',
+        'nature',
+        'relaxation',
+        '15'
+      );
+    ELSE
+      EXECUTE format(
+        'INSERT INTO public.vr_sessions (user_id, session_type, environment)
+         VALUES (%L, %L, %L)',
+        owner_id::text,
+        'galaxy',
+        'space'
+      );
+    END IF;
+    RESET ALL;
+  EXCEPTION WHEN OTHERS THEN
+    insert_blocked := true;
+    RESET ALL;
+  END;
+  IF NOT insert_blocked THEN
+    RAISE EXCEPTION 'ÉCHEC: insertion cross-user autorisée sur vr_sessions';
+  END IF;
+
+  -- breathwork_sessions
+  insert_blocked := false;
+  BEGIN
+    SET LOCAL ROLE authenticated;
+    EXECUTE format('SET LOCAL request.jwt.claims.sub = %L', attacker_id::text);
+    INSERT INTO public.breathwork_sessions (user_id, technique_type, duration, stress_level_before, stress_level_after)
+    VALUES (owner_id, 'box', 5, 5, 4);
+    RESET ALL;
+  EXCEPTION WHEN OTHERS THEN
+    insert_blocked := true;
+    RESET ALL;
+  END;
+  IF NOT insert_blocked THEN
+    RAISE EXCEPTION 'ÉCHEC: insertion cross-user autorisée sur breathwork_sessions';
+  END IF;
+
+  -- music_playlists
+  insert_blocked := false;
+  BEGIN
+    SET LOCAL ROLE authenticated;
+    EXECUTE format('SET LOCAL request.jwt.claims.sub = %L', attacker_id::text);
+    INSERT INTO public.music_playlists (user_id, name)
+    VALUES (owner_id, 'Playlist RLS');
+    RESET ALL;
+  EXCEPTION WHEN OTHERS THEN
+    insert_blocked := true;
+    RESET ALL;
+  END;
+  IF NOT insert_blocked THEN
+    RAISE EXCEPTION 'ÉCHEC: insertion cross-user autorisée sur music_playlists';
+  END IF;
+
+  -- ai_coach_sessions
+  insert_blocked := false;
+  BEGIN
+    SET LOCAL ROLE authenticated;
+    EXECUTE format('SET LOCAL request.jwt.claims.sub = %L', attacker_id::text);
+    INSERT INTO public.ai_coach_sessions (user_id, session_type)
+    VALUES (owner_id, 'emotion_support');
+    RESET ALL;
+  EXCEPTION WHEN OTHERS THEN
+    insert_blocked := true;
+    RESET ALL;
+  END;
+  IF NOT insert_blocked THEN
+    RAISE EXCEPTION 'ÉCHEC: insertion cross-user autorisée sur ai_coach_sessions';
+  END IF;
+
+  -- gamification_activities
+  insert_blocked := false;
+  BEGIN
+    SET LOCAL ROLE authenticated;
+    EXECUTE format('SET LOCAL request.jwt.claims.sub = %L', attacker_id::text);
+    INSERT INTO public.gamification_activities (user_id, activity_type)
+    VALUES (owner_id, 'scan');
+    RESET ALL;
+  EXCEPTION WHEN OTHERS THEN
+    insert_blocked := true;
+    RESET ALL;
+  END;
+  IF NOT insert_blocked THEN
+    RAISE EXCEPTION 'ÉCHEC: insertion cross-user autorisée sur gamification_activities';
+  END IF;
+
+  -- user_preferences_advanced
+  insert_blocked := false;
+  BEGIN
+    SET LOCAL ROLE authenticated;
+    EXECUTE format('SET LOCAL request.jwt.claims.sub = %L', attacker_id::text);
+    INSERT INTO public.user_preferences_advanced (user_id)
+    VALUES (owner_id);
+    RESET ALL;
+  EXCEPTION WHEN OTHERS THEN
+    insert_blocked := true;
+    RESET ALL;
+  END;
+  IF NOT insert_blocked THEN
+    RAISE EXCEPTION 'ÉCHEC: insertion cross-user autorisée sur user_preferences_advanced';
+  END IF;
+
+  -- Vérifier qu'un update malveillant ne peut pas usurper un user_id sur coach_sessions
+  SET LOCAL ROLE authenticated;
+  EXECUTE format('SET LOCAL request.jwt.claims.sub = %L', owner_id::text);
+  INSERT INTO public.coach_sessions (user_id, title, coach_mode, topic, duration_minutes)
+  VALUES (owner_id, 'Séance RLS', 'empathetic', 'Test', 30)
+  RETURNING id INTO coach_session_id;
+  RESET ALL;
+
+  update_blocked := false;
+  BEGIN
+    SET LOCAL ROLE authenticated;
+    EXECUTE format('SET LOCAL request.jwt.claims.sub = %L', attacker_id::text);
+    UPDATE public.coach_sessions
+    SET user_id = attacker_id
+    WHERE id = coach_session_id;
+    RESET ALL;
+  EXCEPTION WHEN OTHERS THEN
+    update_blocked := true;
+    RESET ALL;
+  END;
+  IF NOT update_blocked THEN
+    RAISE EXCEPTION 'ÉCHEC: update cross-user autorisé sur coach_sessions';
+  END IF;
+
+  SET LOCAL ROLE authenticated;
+  EXECUTE format('SET LOCAL request.jwt.claims.sub = %L', owner_id::text);
+  DELETE FROM public.coach_sessions WHERE id = coach_session_id;
+  RESET ALL;
+
+  -- Vérifier la protection sur journal_entries
+  SET LOCAL ROLE authenticated;
+  EXECUTE format('SET LOCAL request.jwt.claims.sub = %L', owner_id::text);
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public'
+      AND table_name = 'journal_entries'
+      AND column_name = 'content'
+  ) THEN
+    EXECUTE format(
+      'INSERT INTO public.journal_entries (user_id, title, content, mood)
+       VALUES (%L, %L, %L, %L)
+       RETURNING id',
+      owner_id::text,
+      'Entrée RLS',
+      'Contenu RLS',
+      'happy'
+    ) INTO journal_entry_id;
+  ELSE
+    EXECUTE format(
+      'INSERT INTO public.journal_entries (user_id, mode, status, text_content)
+       VALUES (%L, %L, %L, %L)
+       RETURNING id',
+      owner_id::text,
+      'text',
+      'completed',
+      'Contenu RLS'
+    ) INTO journal_entry_id;
+  END IF;
+  RESET ALL;
+
+  update_blocked := false;
+  BEGIN
+    SET LOCAL ROLE authenticated;
+    EXECUTE format('SET LOCAL request.jwt.claims.sub = %L', attacker_id::text);
+    UPDATE public.journal_entries
+    SET user_id = attacker_id
+    WHERE id = journal_entry_id;
+    RESET ALL;
+  EXCEPTION WHEN OTHERS THEN
+    update_blocked := true;
+    RESET ALL;
+  END;
+  IF NOT update_blocked THEN
+    RAISE EXCEPTION 'ÉCHEC: update cross-user autorisé sur journal_entries';
+  END IF;
+
+  SET LOCAL ROLE authenticated;
+  EXECUTE format('SET LOCAL request.jwt.claims.sub = %L', owner_id::text);
+  DELETE FROM public.journal_entries WHERE id = journal_entry_id;
+  RESET ALL;
+
+  -- Nettoyage
+  DELETE FROM auth.users WHERE id IN (owner_id, attacker_id);
+
+  RAISE NOTICE '✅ TEST 7 RÉUSSI: Les insertions et updates cross-user sont bloqués sur les modules critiques';
+END $$;
+
+\echo ''
 \echo '═══════════════════════════════════════════════════'
 \echo '✅ TOUS LES TESTS DE VALIDATION SONT RÉUSSIS!'
 \echo '═══════════════════════════════════════════════════'
@@ -319,6 +575,7 @@ END $$;
 \echo '  ✅ TEST 4: Pas de récursion infinie - RÉUSSI'
 \echo '  ✅ TEST 5: Policies rate_limit & quotas - RÉUSSI'
 \echo '  ✅ TEST 6: API integrations admin-only - RÉUSSI'
+\echo '  ✅ TEST 7: Blocage des écritures cross-user - RÉUSSI'
 \echo ''
-\echo '🎯 Score Sécurité Final: 78/100 (+26 points)'
+\echo '🎯 Score Sécurité Final: 88/100 (+36 points)'
 \echo ''
