@@ -70,6 +70,15 @@ export const useSocialBreakPlanner = (
   const scheduleMutation = useMutation({
     mutationFn: scheduleBreakRequest,
     onSuccess: (plan) => {
+      if (!plan) {
+        toast({
+          title: 'Planification impossible',
+          description: 'Le créneau n’a pas pu être enregistré.',
+          variant: 'destructive',
+        });
+        return;
+      }
+
       setBreaks((prev) => sortByDate([plan, ...prev.filter((existing) => existing.id !== plan.id)]));
       toast({
         title: 'Pause planifiée',
