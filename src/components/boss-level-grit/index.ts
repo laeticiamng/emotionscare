@@ -1,4 +1,3 @@
-// @ts-nocheck
 // Export all Boss Level Grit components
 export { default as ChallengeCard } from './ChallengeCard';
 export { default as ActiveSession } from './ActiveSession';

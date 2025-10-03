@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * AppSidebar - Navigation immersive avec sidebar moderne
  */
@@ -46,7 +45,7 @@ import {
 interface NavigationItem {
   title: string;
   url: string;
-  icon: React.ElementType;
+  icon: React.ComponentType<{ className?: string }>;
   badge?: string;
   gradient?: string;
   description?: string;
@@ -55,14 +54,16 @@ interface NavigationItem {
 interface NavigationGroup {
   label: string;
   items: NavigationItem[];
-  icon?: React.ElementType;
+  icon?: React.ComponentType<{ className?: string }>;
 }
 
 export function AppSidebar() {
-  const { collapsed } = useSidebar();
+  const { state, open } = useSidebar();
   const location = useLocation();
   const currentPath = location.pathname;
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
+  
+  const isCollapsed = state !== "open";
 
   const isActive = (path: string) => currentPath === path;
 
@@ -218,12 +219,12 @@ export function AppSidebar() {
 
   return (
     <Sidebar
-      className={`${collapsed ? "w-16" : "w-80"} transition-all duration-300 border-r-0 shadow-xl bg-white/95 backdrop-blur-lg`}
-      collapsible
+      className={`${isCollapsed ? "w-16" : "w-80"} transition-all duration-300 border-r-0 shadow-xl bg-white/95 backdrop-blur-lg`}
+      collapsible="icon"
     >
       <SidebarContent className="p-4 space-y-6">
         {/* User Profile Section */}
-        {!collapsed && (
+        {!isCollapsed && (
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -253,7 +254,7 @@ export function AppSidebar() {
         {/* Navigation Groups */}
         {navigationGroups.map((group, groupIndex) => (
           <SidebarGroup key={group.label}>
-            {!collapsed && (
+            {!isCollapsed && (
               <SidebarGroupLabel className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 flex items-center">
                 {group.icon && <group.icon className="w-4 h-4 mr-2" />}
                 {group.label}
@@ -293,7 +294,7 @@ export function AppSidebar() {
 
                             {/* Titre et description */}
                             <AnimatePresence>
-                              {!collapsed && (
+                              {!isCollapsed && (
                                 <motion.div
                                   initial={{ opacity: 0, width: 0 }}
                                   animate={{ opacity: 1, width: "auto" }}
@@ -341,7 +342,7 @@ export function AppSidebar() {
         ))}
 
         {/* Quick Actions (mode non-collapsed) */}
-        {!collapsed && (
+        {!isCollapsed && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
