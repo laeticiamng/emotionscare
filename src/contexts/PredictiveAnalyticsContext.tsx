@@ -105,12 +105,23 @@ export const PredictiveAnalyticsProvider: React.FC<{ children: React.ReactNode }
 
     const storedIsEnabled = window.localStorage.getItem('predictiveAnalyticsEnabled');
     if (storedIsEnabled !== null) {
-      setIsEnabled(JSON.parse(storedIsEnabled));
+      try {
+        setIsEnabled(JSON.parse(storedIsEnabled));
+      } catch (e) {
+        // If parsing fails, fallback to default and clear corrupted value
+        setIsEnabled(true);
+        window.localStorage.removeItem('predictiveAnalyticsEnabled');
+      }
     }
 
     const storedPredictionEnabled = window.localStorage.getItem('predictionEnabled');
     if (storedPredictionEnabled !== null) {
-      setPredictionEnabled(JSON.parse(storedPredictionEnabled));
+      try {
+        setPredictionEnabled(JSON.parse(storedPredictionEnabled));
+      } catch (e) {
+        setPredictionEnabled(true);
+        window.localStorage.removeItem('predictionEnabled');
+      }
     }
   }, []);
 
