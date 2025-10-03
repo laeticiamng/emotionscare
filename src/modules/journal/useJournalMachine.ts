@@ -99,10 +99,11 @@ export const useJournalMachine = (config: JournalConfig = {}) => {
 
   const {
     state,
-    data,
+    result: machineData,
     error,
-    run,
-    reset
+    start: startProcessing,
+    reset,
+    isLoading: machineIsLoading
   } = useAsyncMachine<JournalData>({
     run: processVoiceEntry,
     onSuccess: (data) => {
@@ -159,9 +160,9 @@ export const useJournalMachine = (config: JournalConfig = {}) => {
   // Arrêter l'enregistrement et traiter
   const stopRecording = useCallback(() => {
     if (mediaRecorder && isRecording) {
-      run(); // Déclenche le traitement
+      startProcessing(); // Déclenche le traitement
     }
-  }, [mediaRecorder, isRecording, run]);
+  }, [mediaRecorder, isRecording, startProcessing]);
 
   // Traiter une entrée texte
   const submitTextEntry = useCallback(async (text: string) => {
@@ -200,9 +201,19 @@ export const useJournalMachine = (config: JournalConfig = {}) => {
     };
   }, [recordingTimer, mediaRecorder]);
 
+  /**
+   * Determines if the journal is in a "processing" state.
+   * This includes when the async machine is loading, or when the journal state
+   * is 'active' or 'ending', which represent ongoing processing activities.
+   */
+  function isJournalProcessing(machineIsLoading: boolean, state: string): boolean {
+    return machineIsLoading || state === 'active' || state === 'ending';
+  }
+
+  const isProcessing = isJournalProcessing(machineIsLoading, state);
   return {
     state: state as JournalState,
-    data: data || {
+    data: machineData || {
       entries: journalService.getEntries(),
       isRecording,
       recordingDuration
@@ -215,6 +226,7 @@ export const useJournalMachine = (config: JournalConfig = {}) => {
     submitTextEntry,
     burnEntry,
     reset,
+    isLoading: isProcessing,
     canRecord: !!navigator.mediaDevices?.getUserMedia
   };
 };
