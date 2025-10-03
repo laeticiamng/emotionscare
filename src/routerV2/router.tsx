@@ -181,6 +181,13 @@ const VoiceScanPage = lazy(() => import('@/pages/VoiceScanPage'));
 const TextScanPage = lazy(() => import('@/pages/TextScanPage'));
 const MusicGeneratePage = lazy(() => import('@/pages/MusicGeneratePage'));
 const MusicLibraryPage = lazy(() => import('@/pages/MusicLibraryPage'));
+const PricingPageWorking = lazy(() => import('@/pages/PricingPageWorking'));
+const ModeSelectionPage = lazy(() => import('@/pages/ModeSelectionPage'));
+const B2CDashboardPage = lazy(() => import('@/pages/B2CDashboardPage'));
+const B2CMoodPage = lazy(() => import('@/pages/B2CMoodPage'));
+const B2CMusicPage = lazy(() => import('@/pages/B2CMusicPage'));
+const EmotionalPark = lazy(() => import('@/pages/EmotionalPark'));
+const ParkJourney = lazy(() => import('@/pages/ParkJourney'));
 
 // ═══════════════════════════════════════════════════════════
 // MAPPING DES COMPOSANTS
@@ -329,6 +336,13 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   TextScanPage,
   MusicGeneratePage,
   MusicLibraryPage,
+  PricingPageWorking,
+  ModeSelectionPage,
+  B2CDashboardPage,
+  B2CMoodPage,
+  B2CMusicPage,
+  EmotionalPark,
+  ParkJourney,
 };
 
 // ═══════════════════════════════════════════════════════════
