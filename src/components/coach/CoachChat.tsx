@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React, { useState, useEffect, useRef } from 'react';
 import { CoachChatProps } from '@/types/coach';
 import { useCoach } from '@/contexts/coach';
@@ -34,7 +32,7 @@ const CoachChat: React.FC<CoachChatProps> = ({
     // Send initial message from coach if provided
     if (initialMessage && messages.length === 0) {
       // Add initial message from coach to the chat
-      sendMessage(initialMessage, 'coach');
+      sendMessage(initialMessage, 'assistant');
     }
   }, [initialMessage, messages.length, sendMessage]);
   
