@@ -424,10 +424,15 @@ export const scheduleBreak = async (
 
     return mapBreakRecord(data);
   } catch (error) {
-    Sentry.captureException(error, {
+    const normalizedError =
+      error instanceof Error ? error : new Error('schedule_failed');
+
+    Sentry.captureException(normalizedError, {
       tags: { feature: 'social-cocon', action: 'schedule-break' },
+      extra: { basePlan },
     });
-    return basePlan;
+
+    throw normalizedError;
   }
 };
 
