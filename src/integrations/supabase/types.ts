@@ -11166,6 +11166,10 @@ export type Database = {
           plan_name: string
         }[]
       }
+      has_org_role: {
+        Args: { _org_id: string; _role: string; _user_id: string }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

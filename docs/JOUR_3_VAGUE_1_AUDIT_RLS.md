@@ -367,8 +367,8 @@ Exemple: badges_select_own, badges_insert_own
 1. ✅ **[30 min]** Créer enum `app_role` + table `user_roles` - **FAIT**
 2. ✅ **[15 min]** Créer fonction `has_role()` SECURITY DEFINER - **FAIT**
 3. ✅ **[30 min]** Migrer données depuis `profiles.role` - **FAIT**
-4. ⏳ **[2h]** Remplacer toutes policies utilisant `profiles.role` par `has_role()` - **EN COURS**
-5. ⏳ **[1h]** Sécuriser `api_integrations` (retirer `USING (true)`)
+4. ✅ **[2h]** Remplacer toutes policies utilisant `profiles.role` par `has_role()` - **FAIT**
+5. ⏳ **[1h]** Sécuriser `api_integrations` (retirer `USING (true)`) - **PROCHAINE ÉTAPE**
 6. ⏳ **[30 min]** Activer RLS sur tables manquantes
 7. ⏳ **[30 min]** Tests sécurité + validation
 
@@ -496,6 +496,58 @@ AND qual LIKE '%true%';
 - [OWASP Top 10 2021](https://owasp.org/Top10/)
 - [Supabase RLS Best Practices](https://supabase.com/docs/guides/auth/row-level-security)
 - [PostgreSQL RLS Documentation](https://www.postgresql.org/docs/current/ddl-rowsecurity.html)
+
+---
+
+## 📝 VAGUE 1 COMPLÉTÉE (Migrations SQL)
+
+### ✅ Migration 1 - Création infrastructure sécurisée
+**Date** : 2025-10-03 15:37  
+**Fichier** : `20251003153724_bfd27770-6b6a-4ecd-8578-b85684b20903.sql`
+
+**Réalisations** :
+- ✅ Enum `app_role` créé avec valeurs : `'admin'`, `'moderator'`, `'user'`, `'b2c'`
+- ✅ Table `user_roles` créée avec RLS activé
+- ✅ Fonction `has_role(_user_id, _role)` SECURITY DEFINER créée
+- ✅ Politiques RLS pour `user_roles` :
+  - Users voient leurs propres rôles
+  - Admins peuvent gérer tous les rôles
+  - Service role peut tout gérer
+- ✅ Migration automatique : `profiles.role` → `user_roles`
+- ✅ Index de performance créés
+
+### ✅ Migration 2 - Remplacement policies profiles.role
+**Date** : 2025-10-03 15:39  
+**Fichier** : `20251003153928_*.sql`
+
+**Réalisations** :
+- ✅ Fonction `is_admin()` mise à jour pour utiliser `has_role()`
+- ✅ Politiques `admin_changelog` recréées avec `has_role()`
+- ✅ Politiques `cleanup_history` recréées avec `has_role()`
+- ✅ Fonction `has_org_role(_user_id, _org_id, _role)` créée pour organisations
+- ✅ Index `idx_org_memberships_lookup` ajouté pour performances
+
+**Impact Sécurité** :
+```
+✅ Résolution récursion infinie potentielle
+✅ Isolation rôles dans table dédiée
+✅ Utilisation SECURITY DEFINER pour éviter bypass RLS
+✅ Toutes les politiques admin migrées vers has_role()
+```
+
+### 📊 Progression Phase 1
+```
+✅ Étape 1-4 : COMPLÉTÉES (100%)
+⏳ Étape 5 : Sécuriser api_integrations (Prochaine)
+⏳ Étape 6 : Activer RLS tables manquantes
+⏳ Étape 7 : Tests sécurité
+```
+
+**Score Sécurité Actuel** : 🟡 **68/100** (+16 points)
+- ✅ Pas de récursion RLS
+- ✅ Rôles dans table dédiée
+- ⏳ Policies trop permissives à corriger
+- ⏳ Tables sans RLS à sécuriser
 
 ---
 
