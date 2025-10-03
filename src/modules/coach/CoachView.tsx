@@ -132,8 +132,8 @@ export function CoachView({ initialMode = 'b2c' }: { initialMode?: CoachMode }) 
   const controllerRef = useRef<AbortController | null>(null);
   const featureAaqEnabled = flags.FF_ASSESS_AAQ2 !== false;
   const isRigidityHigh = aaqFlexHint === 'rigide';
-  const clinicalHints = useClinicalHints();
-  const nyveeHints = clinicalHints.moduleCues.nyvee;
+  const clinicalHints = useClinicalHints('coach');
+  const nyveeHints = clinicalHints?.hints || [];
 
   useEffect(() => {
     const consentFlag = typeof window !== 'undefined' ? window.localStorage.getItem(CONSENT_STORAGE_KEY) : null;
@@ -278,10 +278,10 @@ export function CoachView({ initialMode = 'b2c' }: { initialMode?: CoachMode }) 
       },
     ];
 
-    if (nyveeHints?.autoGrounding && !cards.some(card => card.id === 'grounding')) {
+    if (nyveeHints.includes('grounding') && !cards.some(card => card.id === 'grounding')) {
       cards.unshift({
         id: 'grounding',
-        title: nyveeHints.groundingLabel,
+        title: 'Ancrage corporel',
         description: 'Prochaine session : repère 5 sensations, 4 éléments à toucher, 3 sons, 2 parfums, 1 mot apaisant.',
         to: '/app/breath',
         tone: 'highlight',
@@ -299,7 +299,7 @@ export function CoachView({ initialMode = 'b2c' }: { initialMode?: CoachMode }) 
     }
 
     return cards;
-  }, [aaqFlexHint, isRigidityHigh, nyveeHints?.autoGrounding, nyveeHints?.groundingLabel]);
+  }, [aaqFlexHint, isRigidityHigh, nyveeHints]);
 
   const handleAnswerChange = useCallback((itemId: string, value: string) => {
     setAaqAnswers(prev => ({ ...prev, [itemId]: value }));
