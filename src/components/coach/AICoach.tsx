@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -90,7 +88,7 @@ const AICoach: React.FC = () => {
         const welcomeMessage: Message = {
           id: 'welcome',
           sender: 'ai',
-          content: `Bonjour ${user.name} ! Je suis votre coach IA personnel. Comment puis-je vous aider avec votre bien-être émotionnel aujourd'hui ?`,
+          content: `Bonjour ! Je suis votre coach IA personnel. Comment puis-je vous aider avec votre bien-être émotionnel aujourd'hui ?`,
           timestamp: new Date()
         };
         
