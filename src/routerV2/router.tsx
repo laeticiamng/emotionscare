@@ -138,7 +138,6 @@ const CalendarPage = lazy(() => import('@/pages/CalendarPage'));
 const Point20Page = lazy(() => import('@/pages/Point20Page'));
 const TestPage = lazy(() => import('@/pages/TestPage'));
 const EmotionsPage = lazy(() => import('@/pages/EmotionsPage'));
-const ProfilePage = lazy(() => import('@/pages/ProfilePage'));
 const GeneralPage = lazy(() => import('@/pages/GeneralPage'));
 const PrivacyPage = lazy(() => import('@/pages/PrivacyPage'));
 
@@ -188,6 +187,9 @@ const B2CMoodPage = lazy(() => import('@/pages/B2CMoodPage'));
 const B2CMusicPage = lazy(() => import('@/pages/B2CMusicPage'));
 const EmotionalPark = lazy(() => import('@/pages/EmotionalPark'));
 const ParkJourney = lazy(() => import('@/pages/ParkJourney'));
+const CoachProgramsPage = lazy(() => import('@/pages/CoachProgramsPage'));
+const CoachSessionsPage = lazy(() => import('@/pages/CoachSessionsPage'));
+const ProfilePage = lazy(() => import('@/pages/ProfilePage'));
 
 // ═══════════════════════════════════════════════════════════
 // MAPPING DES COMPOSANTS
@@ -344,6 +346,8 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   B2CMusicPage,
   EmotionalPark,
   ParkJourney,
+  CoachProgramsPage,
+  CoachSessionsPage,
 };
 
 // ═══════════════════════════════════════════════════════════
