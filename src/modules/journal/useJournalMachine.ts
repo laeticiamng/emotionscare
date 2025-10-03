@@ -99,10 +99,11 @@ export const useJournalMachine = (config: JournalConfig = {}) => {
 
   const {
     state,
-    data,
+    result: machineData,
     error,
-    run,
-    reset
+    start: startProcessing,
+    reset,
+    isLoading: machineIsLoading
   } = useAsyncMachine<JournalData>({
     run: processVoiceEntry,
     onSuccess: (data) => {
@@ -159,9 +160,9 @@ export const useJournalMachine = (config: JournalConfig = {}) => {
   // Arrêter l'enregistrement et traiter
   const stopRecording = useCallback(() => {
     if (mediaRecorder && isRecording) {
-      run(); // Déclenche le traitement
+      startProcessing(); // Déclenche le traitement
     }
-  }, [mediaRecorder, isRecording, run]);
+  }, [mediaRecorder, isRecording, startProcessing]);
 
   // Traiter une entrée texte
   const submitTextEntry = useCallback(async (text: string) => {
@@ -200,9 +201,11 @@ export const useJournalMachine = (config: JournalConfig = {}) => {
     };
   }, [recordingTimer, mediaRecorder]);
 
+  const isProcessing = machineIsLoading || state === 'active' || state === 'ending';
+
   return {
     state: state as JournalState,
-    data: data || {
+    data: machineData || {
       entries: journalService.getEntries(),
       isRecording,
       recordingDuration
@@ -215,6 +218,7 @@ export const useJournalMachine = (config: JournalConfig = {}) => {
     submitTextEntry,
     burnEntry,
     reset,
+    isLoading: isProcessing,
     canRecord: !!navigator.mediaDevices?.getUserMedia
   };
 };
