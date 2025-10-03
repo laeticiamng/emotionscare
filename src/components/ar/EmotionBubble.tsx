@@ -60,7 +60,7 @@ const EmotionBubble: React.FC<EmotionBubbleProps> = ({ emotion, comment, classNa
               setDisplayComment(fallback);
             }
           } catch (err) {
-            console.warn('Failed to fetch comment:', err);
+            // Comment fetch failed, using fallback
             const fallback = defaultComments[emotion][Math.floor(Math.random() * defaultComments[emotion].length)];
             setDisplayComment(fallback);
           }

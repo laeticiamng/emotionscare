@@ -134,7 +134,7 @@ export default function EnhancedCommunityFeed() {
         setPosts(formattedPosts);
       }
     } catch (error) {
-      console.error('Error loading posts:', error);
+      // Posts loading error
     }
   };
 
@@ -174,7 +174,7 @@ export default function EnhancedCommunityFeed() {
         triggerConfetti();
       }
     } catch (error) {
-      console.error('Error creating post:', error);
+      // Post creation error
     }
   };
 
@@ -209,7 +209,7 @@ export default function EnhancedCommunityFeed() {
 
       setSelectedReaction(null);
     } catch (error) {
-      console.error('Error handling reaction:', error);
+      // Reaction handling error
     }
   };
 
@@ -250,7 +250,7 @@ export default function EnhancedCommunityFeed() {
         description: "Votre commentaire a été publié",
       });
     } catch (error) {
-      console.error('Error adding comment:', error);
+      // Comment adding error
     }
   };
 

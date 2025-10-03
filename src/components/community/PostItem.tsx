@@ -51,7 +51,7 @@ const PostItem: React.FC<PostItemProps> = ({
         await onPostUpdated();
       }
     } catch (error) {
-      console.error('Error reacting to post:', error);
+      // Post reaction error
       toast({
         title: "Erreur",
         description: "Impossible d'ajouter votre réaction",

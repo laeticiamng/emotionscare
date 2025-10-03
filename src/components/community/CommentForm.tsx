@@ -57,7 +57,7 @@ const CommentForm: React.FC<CommentFormProps> = ({ postId, onCommentAdded }) => 
         onCommentAdded();
       }
     } catch (error) {
-      console.error('Error posting comment:', error);
+      // Comment posting error
       toast({
         title: "Erreur",
         description: "Impossible de poster votre commentaire",

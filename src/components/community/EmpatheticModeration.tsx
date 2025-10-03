@@ -73,7 +73,7 @@ export const EmpatheticModeration: React.FC<EmpatheticModerationProps> = ({
         onContentCheck(true);
       }
     } catch (error) {
-      console.error("Erreur lors de la vérification du contenu:", error);
+      // Content verification error
       toast({
         title: "Erreur de modération",
         description: "Impossible de vérifier le contenu. Veuillez réessayer.",

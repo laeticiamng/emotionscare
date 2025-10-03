@@ -36,7 +36,7 @@ const ARExperience: React.FC<ARExperienceProps> = ({ emotionData, onComplete }) 
       setPermission(true);
       setIsLoading(false);
     } catch (error) {
-      console.error('Error requesting AR permission:', error);
+      // AR permission request failed
       setPermission(false);
       setIsLoading(false);
     }

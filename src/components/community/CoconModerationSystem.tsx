@@ -156,7 +156,7 @@ export default function CoconModerationSystem() {
         setCoconSpaces(spaces);
       }
     } catch (error) {
-      console.error('Error loading cocon spaces:', error);
+      // Cocon spaces loading error
     }
   };
 
@@ -223,7 +223,7 @@ export default function CoconModerationSystem() {
         }`,
       });
     } catch (error) {
-      console.error('Error handling moderation action:', error);
+      // Moderation action error
     }
   };
 

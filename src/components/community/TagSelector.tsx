@@ -35,7 +35,7 @@ const TagSelector: React.FC<TagSelectorProps> = ({
           const tags = await getRecommendedTags();
           setRecommendations(tags || []);
         } catch (error) {
-          console.error('Failed to load tag recommendations', error);
+          // Tag recommendations loading failed
           setRecommendations([]);
         }
       };

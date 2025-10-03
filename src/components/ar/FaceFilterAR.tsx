@@ -28,7 +28,7 @@ const FaceFilterAR: React.FC<FaceFilterARProps> = ({ onStart, onStop, className 
         onStart();
       }
     } catch (error) {
-      console.error('Failed to start AR session:', error);
+      // AR session start failed
     }
   };
 
