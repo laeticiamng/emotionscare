@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { createContext, useContext, useState } from 'react';
 
 export interface SidebarContextType {
