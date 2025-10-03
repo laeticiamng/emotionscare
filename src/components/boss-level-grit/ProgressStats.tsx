@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -14,6 +13,22 @@ import {
   Dumbbell,
   Sparkles
 } from 'lucide-react';
+
+interface GritAchievement {
+  id: string;
+  title: string;
+  description: string;
+  icon: string;
+  type: 'streak' | 'completion' | 'score' | 'time' | 'category';
+  requirement: number;
+  progress: number;
+  unlocked: boolean;
+  unlockedAt?: Date;
+  reward: {
+    xp: number;
+    features?: string[];
+  };
+}
 
 interface GritStats {
   totalXp: number;
@@ -42,7 +57,7 @@ interface GritStats {
     emotional: number;
     spiritual: number;
   };
-  achievements: any[];
+  achievements: GritAchievement[];
 }
 
 interface ProgressStatsProps {
