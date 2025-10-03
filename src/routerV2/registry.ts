@@ -192,6 +192,14 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     aliases: ['/scan'],
   },
   {
+    name: 'scan-voice',
+    path: '/app/scan/voice',
+    segment: 'consumer',
+    layout: 'simple',
+    component: 'VoiceScanPage',
+    guard: true,
+  },
+  {
     name: 'music',
     path: '/app/music',
     segment: 'public',
