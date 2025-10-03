@@ -40,9 +40,9 @@ export const trackEvent = async (
       // });
     }
 
-    console.debug(`[Analytics] Event tracked: ${eventName}`, properties);
+    // Event tracked silently
   } catch (error) {
-    console.error('[Analytics] Error tracking event:', error);
+    // Analytics error - silent fail
   }
 };
 

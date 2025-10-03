@@ -57,7 +57,7 @@ const AdvancedEmotionalScan: React.FC = () => {
         await videoRef.current.play();
       }
     } catch (error) {
-      console.error('Error accessing camera:', error);
+      // Camera access error
       toast({
         title: "Erreur caméra",
         description: "Impossible d'accéder à la caméra",
@@ -102,7 +102,7 @@ const AdvancedEmotionalScan: React.FC = () => {
         timestamp: new Date().toISOString()
       };
     } catch (error) {
-      console.error('Error analyzing emotions:', error);
+      // Emotion analysis error
       throw error;
     }
   }, [scanMode, calibration]);
@@ -157,7 +157,7 @@ const AdvancedEmotionalScan: React.FC = () => {
       });
 
     } catch (error) {
-      console.error('Calibration error:', error);
+      // Calibration error
       toast({
         title: "Erreur de calibrage",
         description: "Impossible de calibrer le système",
@@ -191,7 +191,7 @@ const AdvancedEmotionalScan: React.FC = () => {
           setEmotionalState(emotions);
           setScanProgress(prev => Math.min(prev + 10, 100));
         } catch (error) {
-          console.error('Scan error:', error);
+          // Scan frame error
         }
       }
     }, 500);

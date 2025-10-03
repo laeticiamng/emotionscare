@@ -18,7 +18,7 @@ const MusicEmotionRecommendation: React.FC<MusicEmotionRecommendationProps> = ({
   
   const handleActivateMusic = async () => {
     try {
-      console.log('🎵 Activation de la musique pour:', emotionResult);
+      // Activating music for emotion
       
       const playlist = await activateMusicForEmotion({
         emotion: emotionResult.emotion.toLowerCase(),
@@ -26,11 +26,11 @@ const MusicEmotionRecommendation: React.FC<MusicEmotionRecommendationProps> = ({
       });
       
       if (playlist) {
-        console.log('✅ Playlist reçue, ouverture du lecteur');
+        // Playlist received, opening player
         setGeneratedPlaylist(playlist);
       }
     } catch (error) {
-      console.error('❌ Erreur lors de l\'activation musicale:', error);
+      // Music activation error - silent
     }
   };
   

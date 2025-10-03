@@ -47,7 +47,7 @@ const UnifiedEmotionCheckin: React.FC = () => {
 
       setRecentEntries(entries);
     } catch (error) {
-      console.error('Erreur chargement entrées:', error);
+      // Entries loading error
     } finally {
       setIsLoading(false);
     }
@@ -72,7 +72,7 @@ const UnifiedEmotionCheckin: React.FC = () => {
       await loadRecentEntries();
       setShowQuickCheckin(false);
     } catch (error) {
-      console.error('Erreur sauvegarde:', error);
+      // Save entry error
     }
   };
 

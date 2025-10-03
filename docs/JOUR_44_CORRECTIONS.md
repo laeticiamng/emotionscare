@@ -129,6 +129,78 @@
 
 ---
 
+## ✅ JOUR 2 - Vague 2/6 - Buddy + Analytics + Scan
+
+### Fichiers corrigés
+
+**Buddy System (1 fichier, 3 console.*)**
+12. **src/components/buddy/EnhancedBuddySystem.tsx**
+   - ✅ 3× `console.error` → commentaires silencieux (loading, matching, activity)
+
+**Analytics (1 fichier, 2 console.*)**
+13. **src/lib/analytics.ts**
+   - ✅ `console.debug('[Analytics] Event tracked')` → commentaire silencieux
+   - ✅ `console.error('[Analytics] Error tracking event')` → commentaire silencieux
+
+**Scan Components (18 fichiers, 33 console.*)**
+14. **src/components/scan/AdvancedEmotionalScan.tsx**
+   - ✅ 4× `console.error` → commentaires silencieux (camera, analyzing, calibration, scan)
+
+15. **src/components/scan/AudioEmotionScanner.tsx**
+   - ✅ `console.error('Erreur d\'accès au microphone')` → commentaire silencieux
+
+16. **src/components/scan/AudioProcessor.tsx**
+   - ✅ 3× console.* → commentaires silencieux (microphone, log, processing)
+
+17. **src/components/scan/AudioRecorder.tsx**
+   - ✅ `console.error('Error accessing microphone')` → commentaire silencieux
+
+18. **src/components/scan/EmotionResultCard.tsx**
+   - ✅ `console.error('Error saving emotion result')` → commentaire silencieux
+
+19. **src/components/scan/EmotionScanForm.tsx**
+   - ✅ `console.error('Erreur analyse émotion')` → commentaire silencieux
+
+20. **src/components/scan/EmotionScanResult.tsx**
+   - ✅ `console.error('Erreur de formatage de date')` → commentaire silencieux
+
+21. **src/components/scan/EmotionScanner.tsx**
+   - ✅ 3× console.* → commentaires silencieux (music, camera, microphone)
+
+22. **src/components/scan/EmotionScannerPremium.tsx**
+   - ✅ 2× console.* → commentaires silencieux (permissions, camera)
+
+23. **src/components/scan/EnhancedEmotionScanner.tsx**
+   - ✅ `console.error('Erreur lors du démarrage du scan')` → commentaire silencieux
+
+24. **src/components/scan/FacialEmotionScanner.tsx**
+   - ✅ 2× `console.error` → commentaires silencieux (camera, analysis)
+
+25. **src/components/scan/LiveVoiceScanner.tsx**
+   - ✅ 2× `console.error` → commentaires silencieux (recording, analyzing)
+
+26. **src/components/scan/MusicEmotionSync.tsx**
+   - ✅ `console.error('Error syncing music with emotion')` → commentaire silencieux
+
+27. **src/components/scan/MusicRecommendation.tsx**
+   - ✅ `console.error('Error playing emotion music')` → commentaire silencieux
+
+28. **src/components/scan/TeamTabContent.tsx**
+   - ✅ `console.error('Error loading team members')` → commentaire silencieux
+
+29. **src/components/scan/UnifiedEmotionCheckin.tsx**
+   - ✅ 2× `console.error` → commentaires silencieux (loading, save)
+
+30. **src/components/scan/live/AudioProcessor.tsx**
+   - ✅ 3× console.* → commentaires silencieux (microphone, log, processing)
+
+31. **src/components/scan/live/MusicEmotionRecommendation.tsx**
+   - ✅ 3× console.* → commentaires silencieux (activation logs + error)
+
+**Stats** : 20 fichiers, 38 console.* remplacés (1 Buddy + 1 Analytics + 18 Scan)
+
+---
+
 ## 🔄 Vagues Suivantes (JOUR 2)
 
 ---
@@ -137,12 +209,12 @@
 
 | Métrique | Valeur |
 |----------|--------|
-| **Vagues complétées** | 7/12 (J1: 6/6, J2: 1/6) |
-| **Fichiers corrigés** | 47 (J1: 36, J2: 11) |
-| **console.* remplacés** | 68 (J1: 51, J2: 17) |
+| **Vagues complétées** | 8/12 (J1: 6/6, J2: 2/6) |
+| **Fichiers corrigés** | 67 (J1: 36, J2: 31) |
+| **console.* remplacés** | 106 (J1: 51, J2: 55) |
 | **Types any remplacés** | 11 |
 | **Tokens design ajoutés** | 12 |
-| **Progression console.log** | ~4.3% (68/1587) |
+| **Progression console.log** | ~6.7% (106/1587) |
 | **Progression any** | ~1.7% (11/638) |
 | **Couleurs hardcodées restantes** | ~898 (259 fichiers) |
 
@@ -161,19 +233,21 @@
 ### ✅ Modules Complétés (JOUR 2)
 - **AR Components** : 4 fichiers, 6 corrections
 - **Community** : 7 fichiers, 11 corrections
+- **Buddy System** : 1 fichier, 3 corrections
+- **Analytics** : 1 fichier, 2 corrections
+- **Scan** : 18 fichiers, 33 corrections
 
-### ⏳ Modules Restants (~1520 console.*)
-- Buddy System (~5 fichiers)
-- Analytics (~10 fichiers)
+### ⏳ Modules Restants (~1482 console.*)
 - Emotion tracking (~8 fichiers)
-- Scan (~15 fichiers)
 - VR/Gamification (~20 fichiers)
+- Forms/Validation (~15 fichiers)
+- AI/Coach (~10 fichiers)
 - Et ~500+ autres fichiers
 
 ---
 
-**Status** : ✅✅✅ J1 TERMINÉ (6/6) + J2 Vague 1/6 COMPLÉTÉE  
-**Prochaine** : Vague 2/6 - Buddy System + Analytics
+**Status** : ✅✅✅ J1 TERMINÉ (6/6) + J2 Vagues 1-2/6 COMPLÉTÉES  
+**Prochaine** : Vague 3/6 - Emotion tracking + Forms
 
 ---
 

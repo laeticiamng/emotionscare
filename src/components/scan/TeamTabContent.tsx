@@ -102,7 +102,7 @@ const TeamTabContent: React.FC<TeamTabContentProps> = ({ teamId }) => {
         
         setMembers(mockMembers);
       } catch (error) {
-        console.error('Error loading team members:', error);
+        // Team members loading error
       } finally {
         setIsLoading(false);
       }

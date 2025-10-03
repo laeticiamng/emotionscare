@@ -35,7 +35,7 @@ const AudioRecorder = ({ audioUrl, setAudioUrl }: AudioRecorderProps) => {
       setRecording(true);
       setMediaRecorder(recorder);
     } catch (error) {
-      console.error('Error accessing microphone:', error);
+      // Microphone access error
       setPermissionError("Impossible d'accéder au microphone. Veuillez vérifier les permissions de votre navigateur.");
     }
   };

@@ -49,7 +49,7 @@ const EmotionScanForm: React.FC<EmotionScanFormProps> = ({ onComplete, onClose }
       setResult(emotionResult);
       setStep(3);
     } catch (error) {
-      console.error('Erreur analyse émotion:', error);
+      // Emotion analysis error
     } finally {
       setIsAnalyzing(false);
     }
