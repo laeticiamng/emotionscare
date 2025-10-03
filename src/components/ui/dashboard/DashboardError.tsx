@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React from 'react';
 import { AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
