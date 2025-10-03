@@ -157,12 +157,6 @@ const AmbientSoundSelector: React.FC = () => {
     setPlayingSounds(new Set());
   };
 
-  useEffect(() => {
-    return () => {
-      stopAllSounds();
-    };
-  }, []);
-
   return (
     <div className="space-y-6">
       <Card>
