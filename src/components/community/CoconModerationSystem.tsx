@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -125,9 +124,9 @@ export default function CoconModerationSystem() {
         .limit(10);
 
       if (data) {
-        const spaces = data.reduce((acc, content) => {
+        const spaces = data.reduce<CoconSpace[]>((acc, content) => {
           const spaceId = content.content_type || 'general';
-          const existing = acc.find(s => s.id === spaceId);
+          const existing = acc.find((s: CoconSpace) => s.id === spaceId);
           
           if (existing) {
             existing.stats.posts++;

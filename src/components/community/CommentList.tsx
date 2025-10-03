@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
