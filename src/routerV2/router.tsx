@@ -180,6 +180,7 @@ const UnifiedModulesDashboardPage = lazy(() => import('@/pages/UnifiedModulesDas
 const VoiceScanPage = lazy(() => import('@/pages/VoiceScanPage'));
 const TextScanPage = lazy(() => import('@/pages/TextScanPage'));
 const MusicGeneratePage = lazy(() => import('@/pages/MusicGeneratePage'));
+const MusicLibraryPage = lazy(() => import('@/pages/MusicLibraryPage'));
 
 // ═══════════════════════════════════════════════════════════
 // MAPPING DES COMPOSANTS
@@ -327,6 +328,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   VoiceScanPage,
   TextScanPage,
   MusicGeneratePage,
+  MusicLibraryPage,
 };
 
 // ═══════════════════════════════════════════════════════════

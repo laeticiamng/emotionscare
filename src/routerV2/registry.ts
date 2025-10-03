@@ -235,6 +235,14 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: true,
   },
   {
+    name: 'music-library',
+    path: '/app/music/library',
+    segment: 'consumer',
+    layout: 'simple',
+    component: 'MusicLibraryPage',
+    guard: true,
+  },
+  {
     name: 'coach',
     path: '/app/coach',
     segment: 'consumer',
