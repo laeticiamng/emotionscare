@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { supabase } from '@/integrations/supabase/client';
 import humeService from './hume.service';
 import openaiService from './openai.service';

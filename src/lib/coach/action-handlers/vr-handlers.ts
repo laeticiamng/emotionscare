@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import { NotificationService } from '@/lib/notifications';
 import { CoachNotification } from '../types';

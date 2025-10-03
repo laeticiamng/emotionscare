@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 /**
  * Utilitaires d'audit pour la mise en production

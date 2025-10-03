@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useCallback, useEffect, useRef } from 'react';
 import { trackImplicitAssess, type ImplicitSignal } from '@/lib/implicitAssess';
 

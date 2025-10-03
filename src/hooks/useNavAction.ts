@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useNavigate } from "react-router-dom";
 import { useCallback } from "react";
 import { NavAction, NavContext, ActionResult } from "@/types/nav";

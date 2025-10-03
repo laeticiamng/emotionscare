@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import { OnboardingStep } from '@/types/onboarding';
 

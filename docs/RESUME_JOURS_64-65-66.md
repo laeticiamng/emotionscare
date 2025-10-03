@@ -65,7 +65,6 @@ hidden={state === "open" || isMobile}
 | Métrique | Valeur |
 |----------|--------|
 | **Fichiers traités** | 18 |
-| **`@ts-nocheck` supprimés** | 18 |
 | **Erreurs TypeScript corrigées** | 1 |
 | **Imports corrigés** | 0 |
 | **`console.*` → `logger.*`** | 0 |

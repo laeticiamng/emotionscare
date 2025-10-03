@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 import { SessionResult } from '@/types/modules';
 import { Button } from '@/components/ui/button';

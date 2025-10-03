@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import { toast } from "@/hooks/use-toast";
 import { NODE_ENV } from "@/lib/env";

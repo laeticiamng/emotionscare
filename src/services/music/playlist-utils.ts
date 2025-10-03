@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import { MusicPlaylist, MusicTrack } from '@/types/music';
 import { getPlaylist } from '@/services/music/playlist-service';

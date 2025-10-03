@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 // Sélecteur de preset EmotionsCare basé sur l'analyse émotionnelle Hume
 import { HumeEmotionScore } from './humeClient';

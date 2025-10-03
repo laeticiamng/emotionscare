@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Code Cleanup Utilities - Production Ready
  * Removes development artifacts and optimizes for production

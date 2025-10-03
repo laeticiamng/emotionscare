@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Page de scan B2C avec infrastructure complète intégrée
  * Utilise validation, observabilité, accessibilité, i18n et performance

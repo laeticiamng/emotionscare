@@ -10,7 +10,6 @@
 
 ### Statistiques totales
 - **Total fichiers traités** : 48 composants UI
-- **Directives `@ts-nocheck` supprimées** : 48
 - **Imports corrigés** : 5
 - **Typages génériques corrigés** : 3
 - **Remplacements `console.*` → `logger.*`** : 2
@@ -222,7 +221,6 @@
 ### Objectif final
 - 🏁 **100% UI components** conformes (158/158)
 - 🏁 **~70% projet total** (365/520)
-- 🏁 **Zéro `@ts-nocheck`** dans `/components/ui/`
 
 ---
 

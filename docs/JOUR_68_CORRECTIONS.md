@@ -21,7 +21,6 @@
 ## 📊 Statistiques
 
 - **Fichiers traités** : 8
-- **`@ts-nocheck` supprimés** : 8
 - **Total UI** : **158/158 (100%)**
 
 ---

@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 // Mappage des émotions vers des types de musique appropriés
 export const EMOTION_TO_MUSIC_MAP: Record<string, string> = {

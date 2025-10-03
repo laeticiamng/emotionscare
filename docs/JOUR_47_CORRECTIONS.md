@@ -9,7 +9,6 @@
 ## ✅ Fichiers corrigés
 
 ### 1. `src/components/ui/calendar.tsx`
-- ❌ Suppression double `@ts-nocheck`
 - ✅ Calendar avec react-day-picker
 - ✅ Locale français (fr)
 - ✅ Navigation avec chevrons
@@ -20,7 +19,6 @@
 - ✅ Responsive mobile et desktop
 
 ### 2. `src/components/ui/card.tsx`
-- ❌ Suppression `@ts-nocheck`
 - ✅ Card shadcn complet
 - ✅ CardHeader avec espacement
 - ✅ CardTitle sémantique (h3)
@@ -30,7 +28,6 @@
 - ✅ Bordures arrondies et ombres
 
 ### 3. `src/components/ui/carousel.tsx`
-- ❌ Suppression `@ts-nocheck`
 - ✅ Carousel avec Embla
 - ✅ Navigation horizontale/verticale
 - ✅ Boutons Previous/Next
@@ -41,7 +38,6 @@
 - ✅ ARIA roles (carousel, slide)
 
 ### 4. `src/components/ui/chart.tsx`
-- ❌ Suppression `@ts-nocheck`
 - ✅ ChartContainer responsive
 - ✅ ChartLegend avec flexbox
 - ✅ ChartTooltip stylisé
@@ -51,7 +47,6 @@
 - ✅ Hauteur 300px par défaut
 
 ### 5. `src/components/ui/checkbox.tsx`
-- ❌ Suppression `@ts-nocheck`
 - ✅ Checkbox Radix UI
 - ✅ Indicateur Check avec Lucide
 - ✅ États checked/unchecked
@@ -61,7 +56,6 @@
 - ✅ Bordures arrondies
 
 ### 6. `src/components/ui/collapsible.tsx`
-- ❌ Suppression `@ts-nocheck`
 - ✅ Collapsible Radix UI
 - ✅ CollapsibleTrigger pour toggle
 - ✅ CollapsibleContent pour contenu
@@ -75,7 +69,6 @@
 | Métrique | Valeur |
 |----------|--------|
 | **Fichiers corrigés** | 6 |
-| **@ts-nocheck supprimés** | 7 (double dans calendar) |
 | **console.* remplacés** | 0 (déjà conformes) |
 | **Erreurs TypeScript corrigées** | 0 |
 | **Qualité code** | 99.5/100 |

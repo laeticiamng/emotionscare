@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useAuthStore } from '@/stores/useAuthStore';
 import { supabase } from '@/integrations/supabase/client';
 

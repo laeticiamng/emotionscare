@@ -24,13 +24,9 @@ function addTsNoCheckToFile(filePath) {
   try {
     const content = fs.readFileSync(filePath, 'utf8');
     
-    // Skip if already has // @ts-nocheck
-    if (content.startsWith('// @ts-nocheck') || content.startsWith('//@ts-nocheck')) {
       return false;
     }
     
-    // Add // @ts-nocheck at the beginning
-    const newContent = '// @ts-nocheck\n' + content;
     fs.writeFileSync(filePath, newContent, 'utf8');
     return true;
   } catch (err) {
@@ -72,14 +68,12 @@ function processDirectory(dirPath) {
   return count;
 }
 
-console.log('🚀 Starting to add // @ts-nocheck to all legacy files...\n');
 
 let totalCount = 0;
 for (const dir of dirs) {
   console.log(`\nProcessing ${dir}...`);
   const count = processDirectory(dir);
   totalCount += count;
-  console.log(`  Added // @ts-nocheck to ${count} files in ${dir}`);
 }
 
 console.log(`\n✨ Done! Total files updated: ${totalCount}`);

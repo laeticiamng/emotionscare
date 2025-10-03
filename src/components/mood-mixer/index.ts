@@ -1,4 +1,3 @@
-// @ts-nocheck
 // Export all Mood Mixer components
 export { default as MoodSelector } from './MoodSelector';
 export { default as MixCreator } from './MixCreator';

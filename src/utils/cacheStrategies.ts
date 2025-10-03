@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 /**
  * Stratégies de cache optimisées pour l'application

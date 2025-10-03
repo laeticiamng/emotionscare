@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { render, screen } from '@/tests/utils';
 import { describe, it, expect } from 'vitest';
 import BreathGauge from '../BreathGauge';

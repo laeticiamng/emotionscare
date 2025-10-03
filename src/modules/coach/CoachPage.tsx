@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { CoachView } from '@/modules/coach/CoachView';
 import { useFlags } from '@/core/flags';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';

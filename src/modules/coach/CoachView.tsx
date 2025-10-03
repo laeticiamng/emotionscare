@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { FormEvent, KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import * as Sentry from '@sentry/react';
 import { Link } from 'react-router-dom';

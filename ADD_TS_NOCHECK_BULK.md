@@ -1,7 +1,5 @@
-# Ajout massif de // @ts-nocheck
 
 Les erreurs TypeScript dans les fichiers legacy bloquent le build. 
-Ajoutez `// @ts-nocheck` en première ligne de tous les fichiers dans ces répertoires :
 
 ```bash
 # Tous les fichiers .ts et .tsx dans :

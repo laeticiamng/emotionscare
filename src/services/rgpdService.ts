@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Service RGPD - Export et suppression des données personnelles
  */

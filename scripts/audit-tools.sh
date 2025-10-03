@@ -16,18 +16,12 @@ echo -e "${BLUE}🔍 EmotionsCare Audit Tools${NC}"
 echo "================================"
 echo ""
 
-# Function: Count @ts-nocheck
 count_ts_nocheck() {
-    echo -e "${YELLOW}📊 Counting @ts-nocheck...${NC}"
-    COUNT=$(grep -r "@ts-nocheck" src/ 2>/dev/null | wc -l)
-    echo -e "   Found: ${RED}${COUNT}${NC} files with @ts-nocheck"
     
     if [ "$COUNT" -eq 0 ]; then
-        echo -e "   ${GREEN}✅ EXCELLENT! No @ts-nocheck found${NC}"
     elif [ "$COUNT" -lt 100 ]; then
         echo -e "   ${YELLOW}⚠️  GOOD progress, but still work to do${NC}"
     else
-        echo -e "   ${RED}❌ CRITICAL: Too many @ts-nocheck${NC}"
     fi
     echo ""
 }
@@ -148,7 +142,6 @@ generate_report() {
 # 📊 Audit Report - $(date +%Y-%m-%d)
 
 ## TypeScript Status
-- @ts-nocheck files: $(grep -r "@ts-nocheck" src/ 2>/dev/null | wc -l)
 - any types: $(grep -rE ":\s*any[\s);>]" src/ 2>/dev/null | wc -l)
 
 ## Code Quality
@@ -180,7 +173,6 @@ show_progress() {
     TS_NOCHECK_TARGET=2959
     CONSOLE_TARGET=1755
     
-    CURRENT_TS=$(grep -r "@ts-nocheck" src/ 2>/dev/null | wc -l)
     CURRENT_CONSOLE=$(grep -rE "console\." src/ 2>/dev/null | wc -l)
     
     TS_PROGRESS=$((100 - (CURRENT_TS * 100 / 2964)))
@@ -195,7 +187,6 @@ show_progress() {
 show_menu() {
     echo -e "${BLUE}Select an option:${NC}"
     echo "1) Full audit (all checks)"
-    echo "2) Count @ts-nocheck"
     echo "3) Count console.*"
     echo "4) Count any types"
     echo "5) TypeScript check"

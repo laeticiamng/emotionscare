@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import * as Sentry from '@sentry/react';
 

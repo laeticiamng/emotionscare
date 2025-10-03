@@ -125,7 +125,6 @@ import { useFeatureFlags } from '@/hooks/useFeatureFlags';
 1. ✅ `src/core/flags.ts` - Système unifié complet
 2. ✅ `src/config/featureFlags.ts` - Alias de compatibilité
 3. ✅ `src/hooks/useFeatureFlags.ts` - Hook mis à jour
-4. ✅ `src/lib/logger/index.ts` - Logger sans `@ts-nocheck`
 
 ## Avantages
 

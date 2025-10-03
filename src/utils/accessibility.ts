@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 // Utilitaires pour l'accessibilité WCAG 2.1
 

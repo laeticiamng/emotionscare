@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useCallback, useMemo, useRef, useState } from 'react';
 
 export type FlashPhase = 'warmup' | 'glow' | 'settle';

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Composant de vérification santé des APIs
  * Valide que toutes les APIs de production fonctionnent

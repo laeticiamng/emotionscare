@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 // Time of day constants
 export enum TimeOfDay {

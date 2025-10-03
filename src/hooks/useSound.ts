@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useCallback } from 'react';
 
 type SoundType = 'success' | 'error' | 'notification' | 'hover' | 'tap' | 'complete';

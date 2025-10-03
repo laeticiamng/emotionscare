@@ -45,7 +45,6 @@
 | Métrique | Valeur |
 |----------|--------|
 | **Fichiers corrigés** | 18 |
-| **@ts-nocheck supprimés** | 18 |
 | **console.* remplacés** | 1 (tooltip) |
 | **Erreurs TypeScript corrigées** | 4 |
 | **Qualité code moyenne** | 99.5/100 |
@@ -80,7 +79,6 @@
 
 ## 🔧 Corrections TypeScript Importantes
 
-### Suppressions `@ts-nocheck` :
 - 18 suppressions (jours 50-51-52)
 
 ### Corrections erreurs :
@@ -156,7 +154,6 @@
 ## 📝 Notes Techniques
 
 ### Patterns TypeScript appliqués :
-- Suppression systématique `@ts-nocheck`
 - ForwardRef sur tous les composants
 - ComponentPropsWithoutRef pour Radix UI
 - ElementRef pour types de ref

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useEffect, useState } from 'react';
 import { type BreathPhase, type SilkPattern, PATTERN_TIMINGS } from '@/store/screenSilk.store';
 

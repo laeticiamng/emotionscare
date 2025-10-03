@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 /**
  * Service API complet pour EmotionsCare - Intégration Backend Production

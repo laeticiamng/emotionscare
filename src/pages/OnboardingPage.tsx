@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * ONBOARDING PAGE - EMOTIONSCARE
  * Page d'onboarding accessible WCAG 2.1 AA

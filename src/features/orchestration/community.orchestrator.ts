@@ -1,4 +1,3 @@
-// @ts-nocheck
 import type { CommunityLevels, Orchestrator, UIHint } from './types';
 
 const isLevelDefined = (value: number | undefined): value is number => typeof value === 'number';

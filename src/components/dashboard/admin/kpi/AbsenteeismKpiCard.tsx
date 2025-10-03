@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 import { CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Users } from 'lucide-react';

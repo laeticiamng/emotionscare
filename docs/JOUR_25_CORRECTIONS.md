@@ -8,24 +8,20 @@
 ## ✅ Fichiers Corrigés
 
 ### 1. **src/components/admin/UserActivityChart.tsx**
-- ❌ Supprimé `@ts-nocheck`
 - ✅ Typage strict activé
 - ℹ️ Graphique d'activité utilisateurs avec recharts (LineChart)
 
 ### 2. **src/components/admin/UserActivityLogTab.tsx**
-- ❌ Supprimé `@ts-nocheck`
 - ✅ Typage strict activé
 - 🔄 `console.log` → `logger.debug` (2×)
 - ℹ️ Onglet de gestion des logs d'activité avec filtres
 
 ### 3. **src/components/admin/UserActivityTimeline.tsx**
-- ❌ Supprimé `@ts-nocheck`
 - ✅ Typage strict activé
 - 🔄 `console.error` → `logger.error` (1×)
 - ℹ️ Timeline d'activité d'un utilisateur spécifique
 
 ### 4. **src/components/admin/activity-logs/ActivityFilters.tsx**
-- ❌ Supprimé `@ts-nocheck`
 - ✅ Typage strict activé
 - ℹ️ Composant de filtres pour les logs d'activité
 
@@ -36,7 +32,6 @@
 | Métrique | Valeur |
 |----------|--------|
 | **Fichiers corrigés** | 4 |
-| **`@ts-nocheck` supprimés** | 4 |
 | **`console.*` remplacés** | 3 |
 | **Erreurs TypeScript corrigées** | 0 |
 

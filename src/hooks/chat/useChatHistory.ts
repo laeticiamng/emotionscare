@@ -1,8 +1,6 @@
-// @ts-nocheck
 
 // This file needs to map the user_id property to the expected format
 
-// @ts-nocheck
 import { useState, useEffect } from 'react';
 import { ChatConversation } from '@/types/chat';
 

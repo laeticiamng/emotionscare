@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { isBrowser } from '@/lib/utils';
 
 type ConsentCategory = 'functional' | 'analytics';

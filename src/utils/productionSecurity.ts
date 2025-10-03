@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 export const initializeProductionSecurity = () => {
   // Configuration de sécurité pour la production

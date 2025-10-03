@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Hook pour les notifications push PWA
  */

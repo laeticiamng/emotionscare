@@ -8,28 +8,23 @@
 ## ✅ Fichiers Corrigés
 
 ### 1. **src/components/a11y/ZeroNumberBoundary.tsx**
-- ❌ Supprimé `@ts-nocheck`
 - ✅ Typage strict activé
 - 🔄 `console.warn` → `logger.warn` (1×)
 - ℹ️ Composant sanitisation des nombres pour a11y
 
 ### 2. **src/components/accessibility/AccessibilityAudit.tsx**
-- ❌ Supprimé `@ts-nocheck`
 - ✅ Typage strict activé
 - ℹ️ Interface d'audit WCAG 2.1 avec rapport détaillé
 
 ### 3. **src/components/accessibility/FocusManager.tsx**
-- ❌ Supprimé `@ts-nocheck`
 - ✅ Typage strict activé
 - ℹ️ Gestionnaire de focus avec auto-focus et restauration
 
 ### 4. **src/components/accessibility/ScreenReaderOnly.tsx**
-- ❌ Supprimé `@ts-nocheck`
 - ✅ Typage strict activé
 - ℹ️ Wrapper pour contenu visible uniquement par lecteur d'écran
 
 ### 5. **src/components/accessibility/SkipToContent.tsx**
-- ❌ Supprimé `@ts-nocheck`
 - ✅ Typage strict activé
 - ℹ️ Lien de navigation rapide vers contenu principal
 
@@ -40,7 +35,6 @@
 | Métrique | Valeur |
 |----------|--------|
 | **Fichiers corrigés** | 5 |
-| **`@ts-nocheck` supprimés** | 5 |
 | **`console.*` remplacés** | 1 |
 | **Erreurs TypeScript corrigées** | 0 |
 

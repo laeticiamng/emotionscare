@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Page de validation complète de la plateforme
  */

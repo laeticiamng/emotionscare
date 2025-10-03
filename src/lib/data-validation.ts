@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Validation centralisée des données avec schémas Zod
  * Implémente la validation côté client et transformation d'erreurs

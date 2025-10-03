@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 export interface Invitation {
   id: string;

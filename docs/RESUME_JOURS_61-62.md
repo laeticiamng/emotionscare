@@ -9,7 +9,6 @@
 
 ### Progression globale
 - **Fichiers traités** : 12 composants UI
-- **Directives `@ts-nocheck` supprimées** : 12
 - **Imports corrigés** : 0
 - **Erreurs TypeScript résolues** : 0
 
@@ -39,7 +38,6 @@
   - Animations framer-motion
 
 ### Statistiques Jour 61
-- **Directives `@ts-nocheck` supprimées** : 6
 - **Erreurs TypeScript** : 0
 - **Conformité** : ✅ 100%
 
@@ -78,7 +76,6 @@
   - Reset automatique à l'ouverture
 
 ### Statistiques Jour 62
-- **Directives `@ts-nocheck` supprimées** : 6
 - **Erreurs TypeScript** : 0
 - **Conformité** : ✅ 100%
 
@@ -88,7 +85,6 @@
 
 ### Réalisations
 - ✅ **12 composants UI** corrigés (loading, modals, unified)
-- ✅ **12 directives `@ts-nocheck`** supprimées
 - ✅ **0 corrections** nécessaires (code déjà propre)
 - ✅ **0 `console.*` restants** (aucun présent)
 - ✅ **100% conformité TypeScript strict**

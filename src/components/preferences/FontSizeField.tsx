@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import React from 'react';
 import { FormField, FormItem, FormLabel, FormControl, FormDescription, FormMessage } from '@/components/ui/form';

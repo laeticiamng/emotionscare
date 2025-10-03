@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 // Types utilisés par les services de musique
 export interface Track {

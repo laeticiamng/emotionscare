@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import { useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';

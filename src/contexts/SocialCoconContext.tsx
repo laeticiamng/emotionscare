@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { SocialPost, SocialComment, Reaction, SocialNotification } from '@/types/social';
 

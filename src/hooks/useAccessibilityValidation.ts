@@ -1,4 +1,3 @@
-// @ts-nocheck
 // Stub pour éviter les erreurs d'import dans AccessibilityAudit
 export const useAccessibilityValidation = () => {
   return {

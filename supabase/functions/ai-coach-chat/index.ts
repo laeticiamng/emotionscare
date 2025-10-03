@@ -1,4 +1,3 @@
-// @ts-nocheck - ESM imports from https://deno.land ne supportent pas les types TypeScript natifs dans Deno
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 

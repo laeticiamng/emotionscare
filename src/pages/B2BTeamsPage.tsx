@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * B2BTeamsPage - Gestion d'équipes B2B
  * TICKET: FE/BE-Router-Cleanup-01

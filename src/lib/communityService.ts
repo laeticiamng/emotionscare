@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import { Post, Comment, Group } from '@/types/community';
 import { User } from '@/types/user';

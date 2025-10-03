@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Composant : Deck de cartes flottantes (pré-tirage)
  */

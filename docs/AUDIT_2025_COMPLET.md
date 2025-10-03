@@ -32,13 +32,11 @@
 
 ```
 📊 Statistiques alarmantes:
-- 2964 fichiers avec @ts-nocheck (97% du code)
 - 1055 utilisations de `any` (contournement du typage)
 - 0% de couverture TypeScript réelle
 ```
 
 **Fichiers les plus problématiques**:
-- `src/App.tsx` - Point d'entrée avec @ts-nocheck
 - `src/AppProviders.tsx` - Providers critiques non typés
 - `src/routerV2/router.tsx` - Router non typé
 - `src/contexts/AuthContext.tsx` - Auth non sécurisée par types
@@ -46,7 +44,6 @@
 **Action requise**:
 ```typescript
 // ❌ ACTUEL (DANGEREUX)
-// @ts-nocheck
 const user: any = getUser();
 
 // ✅ REQUIS (SÉCURISÉ)
@@ -59,10 +56,8 @@ const user: User = getUser();
 ```
 
 **Plan de correction**:
-1. **Semaine 1**: Retirer @ts-nocheck des fichiers critiques (Auth, Router, Contexts)
 2. **Semaine 2-3**: Typer progressivement les composants par ordre de priorité
 3. **Semaine 4**: Activer `strict: true` dans tsconfig.json
-4. **Objectif**: 0 @ts-nocheck d'ici fin février 2025
 
 ---
 
@@ -231,7 +226,6 @@ if (consent.status === 'unknown' || consent.loading) {
 ## 📋 Plan d'Action Prioritaire
 
 ### Sprint 1 (Semaine 1-2) - CRITIQUE
-- [ ] **TypeScript**: Retirer @ts-nocheck de 20 fichiers critiques
 - [ ] **Logs**: Créer logger centralisé et remplacer 100 console.*
 - [ ] **Feature Flags**: Unifier les 2 systèmes en un seul
 - [ ] **Tests**: Fixer les tests cassés (ConsentGate)
@@ -253,7 +247,6 @@ if (consent.status === 'unknown' || consent.loading) {
 ## 🎯 Objectifs Mesurables
 
 ### Fin Sprint 1
-- ✅ 0 @ts-nocheck dans les fichiers critiques
 - ✅ 0 console.* en production
 - ✅ 1 seul système de feature flags
 - ✅ 100% tests e2e passent

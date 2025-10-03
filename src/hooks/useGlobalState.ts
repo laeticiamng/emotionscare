@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 import { useAppStore } from '@/store/appStore';
 import { useError } from '@/contexts';

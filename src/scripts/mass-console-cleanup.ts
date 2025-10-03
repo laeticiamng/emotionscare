@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Script de nettoyage massif des console.log - EmotionsCare
  * Remplace automatiquement tous les console.log par le système de logger sécurisé

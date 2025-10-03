@@ -17,7 +17,6 @@
 | Métrique | Jour 53 | Jour 54 | Jour 55 | **Total** |
 |----------|---------|---------|---------|-----------|
 | Fichiers audités | 6 | 6 | 6 | **18** |
-| `@ts-nocheck` retirés | 1 | 1 | 4 | **6** |
 | `console.*` remplacés | 7 | 0 | 0 | **7** |
 | Erreurs TS corrigées | 0 | 0 | 0 | **0** |
 | Déjà conformes | 5 | 5 | 2 | **12** |
@@ -28,7 +27,6 @@
 
 ### Loading & Error Components (Jour 53)
 ✅ **CriticalErrorBoundary.tsx**
-- Retiré `@ts-nocheck`
 - Remplacé 7 `console.*` par `log.*`
 - Logging structuré avec contexte
 
@@ -44,7 +42,6 @@
 ✅ **PremiumCard.tsx** (déjà conforme)
 ✅ **QuickActionButton.tsx** (déjà conforme)
 ✅ **RouteDebugger.tsx**
-- Retiré `@ts-nocheck`
 
 ✅ **ScrollProgress.tsx** (déjà conforme)
 
@@ -52,17 +49,13 @@
 ✅ **StatCard.tsx** (déjà conforme)
 ✅ **ThemeSwitcher.tsx** (déjà conforme)
 ✅ **UnifiedSidebar.tsx**
-- Retiré `@ts-nocheck`
 - Navigation unifiée production-ready
 
 ✅ **action-button.tsx**
-- Retiré `@ts-nocheck`
 
 ✅ **advanced-pagination.tsx**
-- Retiré `@ts-nocheck`
 
 ✅ **app-sidebar.tsx**
-- Retiré `@ts-nocheck`
 
 ---
 
@@ -105,7 +98,6 @@ import { log } from '@/lib/obs/logger';
 log.error(`🚨 Critical Error`, { error, errorInfo });
 ```
 
-### 2. Directives @ts-nocheck
 **6 fichiers corrigés:**
 - CriticalErrorBoundary.tsx
 - RouteDebugger.tsx

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import type { AppState } from './appStore';
 
 export const selectUser = (state: AppState) => state.user;

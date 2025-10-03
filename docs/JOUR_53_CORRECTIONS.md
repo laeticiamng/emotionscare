@@ -9,14 +9,12 @@
 
 ### 1. `src/components/ui/CriticalErrorBoundary.tsx`
 **Changements:**
-- ❌ Retiré `@ts-nocheck`
 - 🔧 Remplacé `console.group/error/warn/groupEnd` par `log.error/warn`
 - ✅ Ajout import `log` depuis `@/lib/obs/logger`
 - ✅ TypeScript strict activé
 
 **Avant:**
 ```typescript
-// @ts-nocheck
 console.group(`🚨 Critical Error in ${context}`);
 console.error('Error:', error);
 ```
@@ -30,14 +28,12 @@ log.error(`🚨 Critical Error in ${context}`, { error, errorInfo });
 ---
 
 ### 2. `src/components/ui/LoadingAnimation.tsx`
-**Statut:** ✅ Déjà conforme (pas de @ts-nocheck)
 - Composant d'animation de chargement avec motion
 - Pas de changements nécessaires
 
 ---
 
 ### 3. `src/components/ui/LoadingSkeleton.tsx`
-**Statut:** ✅ Déjà conforme (pas de @ts-nocheck)
 - Composant skeleton pour différents types (dashboard, card, table, list)
 - Pas de changements nécessaires
 
@@ -71,7 +67,6 @@ log.error(`🚨 Critical Error in ${context}`, { error, errorInfo });
 | Métrique | Valeur |
 |----------|--------|
 | Fichiers audités | 6 |
-| `@ts-nocheck` retirés | 1 |
 | `console.*` remplacés | 7 |
 | Erreurs TypeScript corrigées | 0 |
 | Déjà conformes | 5 |

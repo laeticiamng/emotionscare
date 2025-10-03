@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Indicateur compact du statut des APIs
  * Affichage discret dans la navigation ou le dashboard

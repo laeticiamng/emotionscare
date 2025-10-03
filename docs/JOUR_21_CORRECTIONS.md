@@ -8,22 +8,18 @@
 ## ✅ Fichiers Corrigés
 
 ### 1. **src/components/activity/ActivityItem.tsx**
-- ❌ Supprimé `@ts-nocheck`
 - ✅ Typage strict activé
 - ℹ️ Card d'activité avec actions (Reprendre, Rejouer)
 
 ### 2. **src/components/activity/FiltersBar.tsx**
-- ❌ Supprimé `@ts-nocheck`
 - ✅ Typage strict activé
 - ℹ️ Barre de filtres (période, recherche, modules)
 
 ### 3. **src/components/activity/GroupHeader.tsx**
-- ❌ Supprimé `@ts-nocheck`
 - ✅ Typage strict activé
 - ℹ️ En-tête de groupe avec formatage date relatif
 
 ### 4. **src/components/activity/Timeline.tsx**
-- ❌ Supprimé `@ts-nocheck`
 - ✅ Typage strict activé
 - ℹ️ Timeline groupée par jour avec tri décroissant
 
@@ -34,7 +30,6 @@
 | Métrique | Valeur |
 |----------|--------|
 | **Fichiers corrigés** | 4 |
-| **`@ts-nocheck` supprimés** | 4 |
 | **`console.*` remplacés** | 0 |
 | **Erreurs TypeScript corrigées** | 2 |
 

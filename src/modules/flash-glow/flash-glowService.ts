@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Flash Glow Service - Gestion des sessions de luminothérapie
  */

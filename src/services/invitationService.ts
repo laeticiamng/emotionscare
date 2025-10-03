@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import { InvitationStats, InvitationFormData } from '@/types';
 

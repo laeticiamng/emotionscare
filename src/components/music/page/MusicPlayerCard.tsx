@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import React, { SyntheticEvent, useRef, useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';

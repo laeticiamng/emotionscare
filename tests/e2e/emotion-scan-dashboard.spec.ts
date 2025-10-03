@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { test, expect } from '@playwright/test';
 
 const POSITIVE_IDS = ['active', 'determined', 'attentive', 'inspired', 'alert'] as const;

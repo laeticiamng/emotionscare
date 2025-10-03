@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 /**
  * Système d'audit complet pour la plateforme EmotionsCare

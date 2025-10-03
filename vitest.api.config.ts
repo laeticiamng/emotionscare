@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { defineConfig } from 'vitest/config';
 import path from 'path';
 import { createRequire } from 'module';

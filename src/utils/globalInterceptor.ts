@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 interface RequestMetrics {
   url: string;

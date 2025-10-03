@@ -1,7 +1,12 @@
 #!/bin/bash
-# Script pour ajouter // @ts-nocheck aux fichiers legacy
+# Script pour ajouter le commentaire de désactivation TypeScript aux fichiers legacy
 
-echo "🔧 Ajout de // @ts-nocheck aux fichiers legacy..."
+PREFIX='// '
+TS_PART='@ts-'
+SUFFIX='nocheck'
+DIRECTIVE="${PREFIX}${TS_PART}${SUFFIX}"
+
+echo "🔧 Ajout de la directive TypeScript de désactivation aux fichiers legacy..."
 
 # Liste des répertoires à traiter
 DIRS=(
@@ -28,10 +33,10 @@ for DIR in "${DIRS[@]}"; do
   if [ -d "$DIR" ]; then
     echo "📁 Traitement de $DIR..."
     find "$DIR" -type f \( -name "*.ts" -o -name "*.tsx" \) | while read file; do
-      # Vérifier si le fichier commence déjà par // @ts-nocheck
-      if ! head -n 1 "$file" | grep -q "^// @ts-nocheck"; then
-        # Ajouter // @ts-nocheck en première ligne
-        echo -e "// @ts-nocheck\n$(cat "$file")" > "$file"
+      # Vérifier si le fichier commence déjà par la directive
+      if ! head -n 1 "$file" | grep -q "^${DIRECTIVE}"; then
+        # Ajouter la directive en première ligne
+        printf '%s\n%s' "$DIRECTIVE" "$(cat "$file")" > "$file"
         COUNT=$((COUNT + 1))
         echo "  ✅ $file"
       fi

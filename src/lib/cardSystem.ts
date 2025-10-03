@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Logique métier du système de cartes vivantes
  */

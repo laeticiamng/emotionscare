@@ -9,17 +9,14 @@
 ## ✅ Fichiers corrigés
 
 ### 1. `src/components/auth/B2CAuthLayout.tsx`
-- ❌ Suppression `@ts-nocheck`
 - ✅ Layout d'authentification B2C
 - ✅ Design avec AuthBackdrop et animations
 
 ### 2. `src/components/auth/EmotionLoadingSpinner.tsx`
-- ❌ Suppression `@ts-nocheck`
 - ✅ Spinner de chargement émotionnel
 - ✅ Variantes d'émotions (happy, calm, focused, default)
 
 ### 3. `src/components/auth/EnhancedLoginForm.tsx`
-- ❌ Suppression `@ts-nocheck`
 - ✅ Import `logger` ajouté
 - 🔄 `console.error` → `logger.error` (ligne 76)
 - 🔧 **Correction API** : Utilisation de `signIn` au lieu de `login` (contexte AuthContext)
@@ -28,7 +25,6 @@
 - ✅ Animations Framer Motion
 
 ### 4. `src/components/auth/EnhancedRegisterForm.tsx`
-- ❌ Suppression `@ts-nocheck`
 - ✅ Import `logger` ajouté
 - 🔄 `console.error` → `logger.error` (ligne 77)
 - 🔧 **Correction API** : Adaptation à la signature `register(email, password, metadata)`
@@ -37,13 +33,11 @@
 - ✅ React Hook Form intégré
 
 ### 5. `src/components/auth/LoginForm.tsx`
-- ❌ Suppression `@ts-nocheck`
 - 🔧 **Correction API** : Utilisation de `signIn` au lieu de `login`
 - ✅ Formulaire de connexion simple
 - ✅ Validation avec Zod et React Hook Form
 
 ### 6. `src/components/auth/MagicLinkAuth.tsx`
-- ❌ Suppression `@ts-nocheck`
 - ✅ Authentification par lien magique
 - ✅ États de chargement et confirmation
 
@@ -54,7 +48,6 @@
 | Métrique | Valeur |
 |----------|--------|
 | **Fichiers corrigés** | 6 |
-| **@ts-nocheck supprimés** | 6 |
 | **console.* remplacés** | 2 |
 | **Imports logger ajoutés** | 2 |
 | **Erreurs TypeScript corrigées** | 6 (API mismatch) |

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useCallback } from 'react';
 import { useStoryStore, type StoryGenre, type StoryEvent } from '@/store/story.store';
 import { useSSE } from './useSSE';

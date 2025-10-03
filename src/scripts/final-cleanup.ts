@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Script de nettoyage final automatique - EmotionsCare
  * Nettoie automatiquement tous les console.log et finalise la production

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * VelvetPulse - Animation de pulse velours pour Flash Glow
  */

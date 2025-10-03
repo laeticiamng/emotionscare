@@ -1,7 +1,6 @@
 # 📊 Résumé Global Jours 56-66 : Audit TypeScript UI Components
 
 **Période** : 2025-10-03  
-**Objectif** : Retirer tous les `@ts-nocheck` et assurer conformité TypeScript strict
 
 ---
 
@@ -43,7 +42,6 @@
 | Métrique | Jours 56-63 | Jours 64-66 | **Total** |
 |----------|-------------|-------------|-----------|
 | **Fichiers traités** | 126 | 18 | **144** |
-| **`@ts-nocheck` supprimés** | 126 | 18 | **144** |
 | **Erreurs TypeScript** | 6 | 1 | **7** |
 | **Imports corrigés** | 4 | 0 | **4** |
 | **`console.*` → `logger.*`** | 4 | 0 | **4** |

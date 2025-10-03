@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import React from 'react';
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';

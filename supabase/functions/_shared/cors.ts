@@ -1,4 +1,3 @@
-// @ts-nocheck
 const normalizeOrigins = (value: string | undefined): string[] =>
   (value ?? '')
     .split(',')

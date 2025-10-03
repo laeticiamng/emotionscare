@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 import * as Sentry from '@sentry/react';
 import dayjs from 'dayjs';

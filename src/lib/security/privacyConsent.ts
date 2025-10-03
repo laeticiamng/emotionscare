@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Gestion des consentements privacy avec horodatage et source
  */

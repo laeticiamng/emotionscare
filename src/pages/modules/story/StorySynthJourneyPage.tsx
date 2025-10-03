@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Book, Sparkles, Image as ImageIcon, ChevronRight, RotateCcw, Award, Heart, Star } from 'lucide-react';

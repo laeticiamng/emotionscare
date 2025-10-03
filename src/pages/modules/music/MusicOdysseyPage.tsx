@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * MUSIC ODYSSEY - Voyage musical thérapeutique immersif
  * Collection évolutive de playlists émotionnelles avec système de découverte

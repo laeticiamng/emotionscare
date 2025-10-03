@@ -1,4 +1,3 @@
-// @ts-nocheck
 const BLOCK_PATTERNS = [
   /ignore (?:all )?previous instructions/i,
   /dis?able safety/i,

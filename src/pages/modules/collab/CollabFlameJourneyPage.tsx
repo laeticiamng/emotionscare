@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Flame, Users, Target, Award, TrendingUp, Zap, Heart, Trophy } from 'lucide-react';

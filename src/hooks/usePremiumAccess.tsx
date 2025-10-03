@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Stripe Premium Gating Hook - Contrôle serveur des fonctionnalités Premium
  */

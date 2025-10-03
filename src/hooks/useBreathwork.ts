@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useEffect, useRef, useCallback } from 'react';
 import { useBreathStore, Pattern, Phase, BreathEvent, BreathMetrics } from '@/store/breath.store';
 

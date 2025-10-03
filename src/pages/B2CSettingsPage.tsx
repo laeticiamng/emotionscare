@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 /**
  * B2C SETTINGS PAGE - EMOTIONSCARE

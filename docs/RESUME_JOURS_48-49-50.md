@@ -38,7 +38,6 @@
 | Métrique | Valeur |
 |----------|--------|
 | **Fichiers corrigés** | 12 |
-| **@ts-nocheck supprimés** | 12 |
 | **console.* remplacés** | 0 |
 | **Erreurs TypeScript corrigées** | 1 (dialog ref) |
 | **Qualité code moyenne** | 99.5/100 |
@@ -73,7 +72,6 @@
 
 ## 🔧 Corrections TypeScript Importantes
 
-### Suppressions `@ts-nocheck` :
 - 12 suppressions (jours 48-49)
 
 ### Corrections erreurs :
@@ -148,7 +146,6 @@
 ## 📝 Notes Techniques
 
 ### Patterns TypeScript appliqués :
-- Suppression systématique `@ts-nocheck`
 - ForwardRef sur tous les composants UI
 - Props TypeScript strictes
 - ComponentPropsWithoutRef pour Radix UI

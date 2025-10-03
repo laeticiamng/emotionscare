@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 /**
  * Service global de gestion d'erreurs pour la production

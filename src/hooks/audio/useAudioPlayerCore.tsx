@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import { useRef, useState, useEffect, useCallback } from 'react';
 import { MusicTrack } from '@/types/music';

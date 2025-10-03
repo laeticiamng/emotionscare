@@ -1,4 +1,3 @@
-// @ts-nocheck
 import type { InstrumentCatalog, InstrumentCode, LocaleCode } from './types';
 
 const CATALOGS: Record<InstrumentCode, Record<LocaleCode, InstrumentCatalog>> = {

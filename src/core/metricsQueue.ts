@@ -1,4 +1,3 @@
-// @ts-nocheck
 const STORAGE_KEY = "es_metrics_queue";
 const MAX_BYTES = 2_000_000; // 2MB
 const TTL_HOURS = 72;

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useCallback, useEffect, useRef } from 'react';
 import { useVRStore, VR_PATTERN_TIMINGS, type VRPattern, type VRBreathPhase } from '@/store/vr.store';
 import { useHRVSilk, type HRVData } from './useHRVSilk';

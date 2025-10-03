@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useMemo } from 'react'
 import DOMPurify from 'dompurify'
 import { Button } from '@/components/ui/button'

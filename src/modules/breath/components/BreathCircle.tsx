@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useEffect } from 'react';
 import { motion, useSpring, useTransform } from 'framer-motion';
 import type { BreathStepKind } from '@/modules/breath/protocols';

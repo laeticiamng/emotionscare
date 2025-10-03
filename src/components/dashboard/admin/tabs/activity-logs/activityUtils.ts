@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import { AnonymousActivity, ActivityStats, ActivityFiltersState, ActivityTabView } from "./types";
 

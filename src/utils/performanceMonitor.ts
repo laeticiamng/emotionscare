@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 /**
  * Moniteur de performance pour l'application

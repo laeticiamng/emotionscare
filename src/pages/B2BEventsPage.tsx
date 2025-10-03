@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Page des événements B2B
  */

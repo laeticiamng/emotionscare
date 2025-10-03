@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 // Types liés aux activités
 export type ActivityTabView = 'daily' | 'stats' | 'all' | 'sessions' | 'emotions' | 'interactions' | 'achievements';

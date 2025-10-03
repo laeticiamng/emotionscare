@@ -9,21 +9,17 @@
 
 ### Services Auth
 - ✅ **`src/services/auth/b2c-auth-service.ts`**
-  - Suppression de `@ts-nocheck` (ligne 1)
   - Aucun `console.*` trouvé
   - Service d'authentification B2C avec gestion d'erreurs conviviales
 
 - ✅ **`src/services/auth/index.ts`**
-  - Déjà conforme (pas de `@ts-nocheck`, pas de `console.*`)
   - Export centralisé du service B2C
 
 ### Services API
 - ✅ **`src/services/api/index.ts`**
-  - Suppression de `@ts-nocheck` (ligne 1)
   - Export centralisé des services API
 
 - ✅ **`src/services/api/httpClient.ts`**
-  - Suppression de `@ts-nocheck` (ligne 1)
   - Import du `logger` ajouté
   - Remplacement de `console.error('API Error:', error)` → `logger.error('API Error', error, 'API')`
   - Ajout de `logger.warn` pour l'erreur 401
@@ -31,7 +27,6 @@
   - Total : 3 `console.*` remplacés
 
 - ✅ **`src/services/api/errorHandler.ts`**
-  - Déjà conforme (pas de `@ts-nocheck`)
   - Utilise déjà le `logger` correctement avec contexte 'API'
 
 ---
@@ -39,12 +34,10 @@
 ## 📊 Statistiques
 
 ### Avant les corrections
-- Fichiers avec `@ts-nocheck` : **3**
 - Fichiers avec `console.*` : **1**
 - Services non conformes : **3**
 
 ### Après les corrections
-- Fichiers avec `@ts-nocheck` : **0** ✅
 - Fichiers avec `console.*` : **0** ✅
 - Services conformes : **100%** ✅
 
@@ -143,7 +136,6 @@ logger.error('Access forbidden', { message: error.message, status: 403 }, 'API')
 
 ## 🏆 Conformité aux règles
 
-✅ **Règle 1** : Suppression de tous les `@ts-nocheck` dans les services  
 ✅ **Règle 2** : Remplacement de tous les `console.*` par `logger.*`  
 ✅ **Règle 3** : Contexte de logging approprié ('API', 'AUTH')  
 ✅ **Règle 4** : TypeScript strict activé et respecté  

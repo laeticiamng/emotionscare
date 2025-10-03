@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 export const initServiceWorker = async () => {
   if ('serviceWorker' in navigator) {

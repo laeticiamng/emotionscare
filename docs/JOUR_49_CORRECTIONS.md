@@ -9,7 +9,6 @@
 ## ✅ Fichiers corrigés
 
 ### 1. `src/components/ui/input.tsx`
-- ❌ Suppression `@ts-nocheck`
 - ✅ Input HTML natif stylisé
 - ✅ Support tous types (text, password, email, etc.)
 - ✅ ForwardRef pour accès direct
@@ -19,7 +18,6 @@
 - ✅ Hauteur 36px (h-9)
 
 ### 2. `src/components/ui/label.tsx`
-- ❌ Suppression `@ts-nocheck`
 - ✅ Label Radix UI accessible
 - ✅ Variant avec class-variance-authority
 - ✅ États peer-disabled automatiques
@@ -28,7 +26,6 @@
 - ✅ Font medium, text-sm
 
 ### 3. `src/components/ui/menubar.tsx`
-- ❌ Suppression `@ts-nocheck`
 - ✅ Menubar Radix UI complet
 - ✅ MenubarMenu, MenubarTrigger
 - ✅ MenubarContent avec portal
@@ -39,7 +36,6 @@
 - ✅ Sub-menus avec SubContent
 
 ### 4. `src/components/ui/navigation-menu.tsx`
-- ❌ Suppression `@ts-nocheck`
 - ✅ NavigationMenu Radix UI
 - ✅ NavigationMenuList horizontal
 - ✅ NavigationMenuItem pour éléments
@@ -50,7 +46,6 @@
 - ✅ navigationMenuTriggerStyle exporté
 
 ### 5. `src/components/ui/popover.tsx`
-- ❌ Suppression `@ts-nocheck`
 - ✅ Popover Radix UI
 - ✅ PopoverTrigger
 - ✅ PopoverContent avec portal
@@ -60,7 +55,6 @@
 - ✅ Shadow et border
 
 ### 6. `src/components/ui/progress.tsx`
-- ❌ Suppression `@ts-nocheck`
 - ✅ Progress bar Radix UI
 - ✅ Indicateur avec transition
 - ✅ Transform translateX pour animation
@@ -76,7 +70,6 @@
 | Métrique | Valeur |
 |----------|--------|
 | **Fichiers corrigés** | 6 |
-| **@ts-nocheck supprimés** | 6 |
 | **console.* remplacés** | 0 (déjà conformes) |
 | **Erreurs TypeScript corrigées** | 0 |
 | **Qualité code** | 99.5/100 |

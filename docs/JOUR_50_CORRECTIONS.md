@@ -9,7 +9,6 @@
 ## ✅ Fichiers corrigés
 
 ### 1. `src/components/ui/radio-group.tsx`
-- ❌ Suppression `@ts-nocheck`
 - ✅ RadioGroup Radix UI
 - ✅ RadioGroupItem avec Circle indicator
 - ✅ Grid layout par défaut
@@ -19,7 +18,6 @@
 - ✅ Disabled avec cursor et opacity
 
 ### 2. `src/components/ui/select.tsx`
-- ❌ Suppression `@ts-nocheck`
 - ✅ Select Radix UI complet
 - ✅ SelectTrigger avec ChevronDown
 - ✅ SelectContent avec portal
@@ -30,7 +28,6 @@
 - ✅ Position popper configurab le
 
 ### 3. `src/components/ui/separator.tsx`
-- ❌ Suppression `@ts-nocheck`
 - ✅ Separator Radix UI
 - ✅ Orientation horizontal/vertical
 - ✅ Decorative par défaut (true)
@@ -39,7 +36,6 @@
 - ✅ Shrink-0 pour éviter compression
 
 ### 4. `src/components/ui/slider.tsx`
-- ❌ Suppression `@ts-nocheck`
 - ✅ Slider Radix UI
 - ✅ Track avec background secondary
 - ✅ Range avec background primary
@@ -49,7 +45,6 @@
 - ✅ Disabled avec opacity
 
 ### 5. `src/components/ui/switch.tsx`
-- ❌ Suppression `@ts-nocheck`
 - ✅ Switch Radix UI toggle
 - ✅ Thumb avec transition smooth
 - ✅ États checked/unchecked
@@ -59,7 +54,6 @@
 - ✅ Translate-x-4 pour animation
 
 ### 6. `src/components/ui/scroll-area.tsx`
-- ❌ Suppression `@ts-nocheck`
 - ✅ ScrollArea Radix UI
 - ✅ ScrollBar customisé
 - ✅ Orientation vertical/horizontal
@@ -75,7 +69,6 @@
 | Métrique | Valeur |
 |----------|--------|
 | **Fichiers corrigés** | 6 |
-| **@ts-nocheck supprimés** | 6 |
 | **console.* remplacés** | 0 (déjà conformes) |
 | **Erreurs TypeScript corrigées** | 1 (sheet ref) |
 | **Qualité code** | 99.5/100 |

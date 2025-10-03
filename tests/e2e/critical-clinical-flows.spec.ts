@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { expect, test } from '@playwright/test';
 
 test.describe('Critical clinical flows', () => {

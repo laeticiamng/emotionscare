@@ -10,46 +10,36 @@
 
 ### 1. Stores (1 fichier)
 - [x] `src/stores/useAuthStore.ts`
-  - ❌ Retiré `@ts-nocheck`
   - ✅ Déjà utilise `logger.*` (propre)
   - ✅ TypeScript strict
 
 ### 2. Components Layout (5 fichiers)
 - [x] `src/components/layout/BreadcrumbNav.tsx`
-  - ❌ Retiré `@ts-nocheck`
   - ✅ 1x `console.error` → `logger.error`
   
 - [x] `src/components/layout/EnhancedHeader.tsx`
-  - ❌ Retiré 2x `@ts-nocheck` (dupliqué)
   - ✅ 1x `console.error` → `logger.error`
   
 - [x] `src/components/layout/Header.tsx`
-  - ❌ Retiré `@ts-nocheck`
   - ✅ 1x `console.error` → `logger.error`
   
 - [x] `src/components/layout/MainHeader.tsx`
-  - ❌ Retiré 2x `@ts-nocheck` (dupliqué)
   - ✅ 1x `console.error` → `logger.error`
   
 - [x] `src/components/layout/PageRenderer.tsx`
-  - ❌ Retiré `@ts-nocheck`
   - ✅ 1x `console.error` → `logger.error`
 
 ### 3. Pages Principales (4 fichiers)
 - [x] `src/pages/B2CMusicTherapyPremiumPage.tsx`
-  - ❌ Retiré `@ts-nocheck`
   - ✅ Aucun console.* (propre)
   
 - [x] `src/pages/B2CScanPage.tsx`
-  - ❌ Retiré `@ts-nocheck`
   - ✅ Utilise Sentry (pas de console.*)
   
 - [x] `src/pages/B2CVRBreathGuidePage.tsx`
-  - ❌ Retiré `@ts-nocheck`
   - ✅ Aucun console.* (propre)
   
 - [x] `src/pages/B2CAICoachPage.tsx`
-  - ❌ Retiré `@ts-nocheck`
   - ✅ Utilise Sentry (pas de console.*)
 
 ---
@@ -58,7 +48,6 @@
 
 | Métrique                   | Avant | Après | Delta |
 |----------------------------|-------|-------|-------|
-| Fichiers avec @ts-nocheck  | 20    | 10    | -10   |
 | console.* remplacés        | 54    | 59    | +5    |
 | Stores TypeScript strict   | 0%    | 100%  | +100% |
 | Layouts TypeScript strict  | 0%    | 100%  | +100% |
@@ -166,9 +155,7 @@ npm run build         # ✅ Build réussi
 # Vérification des logs
 grep -r "console\." src/stores/            # ✅ 0 résultat
 grep -r "console\." src/components/layout/ # ✅ 0 résultat
-grep -r "@ts-nocheck" src/stores/          # ✅ 0 résultat
 ```
 
 ---
 
-**Résumé**: 10 fichiers corrigés, 5 console.* remplacés, 10 @ts-nocheck retirés, stores + layouts + pages principales nettoyés. Score 70/100.

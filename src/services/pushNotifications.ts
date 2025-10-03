@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 export const usePushNotifications = () => {
   const requestPermission = async () => {

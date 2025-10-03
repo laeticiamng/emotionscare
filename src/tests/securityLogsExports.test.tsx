@@ -1,4 +1,3 @@
-// @ts-nocheck
 /* @vitest-environment jsdom */
 
 import test from 'node:test';

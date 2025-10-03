@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * RoleBasedNavigation - Navigation adaptée selon le rôle utilisateur
  * Séparation stricte B2C/B2B selon les spécifications

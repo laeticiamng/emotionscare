@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * MusicVisualizer - Visualiseur audio temps réel
  * Affiche une représentation graphique de la musique en cours

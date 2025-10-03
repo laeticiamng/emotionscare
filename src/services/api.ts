@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { z, type ZodType } from 'zod';
 import { supabase } from '@/integrations/supabase/client';
 import { API_URL } from '@/lib/env';

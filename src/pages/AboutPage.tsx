@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 /**
  * ABOUT PAGE - EMOTIONSCARE

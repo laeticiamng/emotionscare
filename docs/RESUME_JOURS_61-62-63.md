@@ -9,7 +9,6 @@
 
 ### Progression globale
 - **Fichiers traités** : 18 composants UI
-- **Directives `@ts-nocheck` supprimées** : 18
 - **Imports corrigés** : 1 (logger)
 - **Remplacements `console.*` → `logger.*`** : 2
 - **Typages corrigés** : 1
@@ -28,7 +27,6 @@
 6. ✅ `page-title.tsx` - Titre de page avec actions
 
 ### Statistiques Jour 61
-- **Directives `@ts-nocheck` supprimées** : 6
 - **Conformité** : ✅ 100%
 
 ---
@@ -44,7 +42,6 @@
 6. ✅ `unified-page-layout.tsx` - Layout de page complet (350 lignes)
 
 ### Statistiques Jour 62
-- **Directives `@ts-nocheck` supprimées** : 6
 - **Conformité** : ✅ 100%
 
 ---
@@ -66,7 +63,6 @@
   - Correction 4 erreurs TypeScript JSX
 
 ### Statistiques Jour 63
-- **Directives `@ts-nocheck` supprimées** : 6
 - **Imports corrigés** : 1 (logger)
 - **Remplacements console** : 2
 - **Typages corrigés** : 1
@@ -79,7 +75,6 @@
 
 ### Réalisations
 - ✅ **18 composants UI** corrigés (loading, modals, unified, sidebar)
-- ✅ **18 directives `@ts-nocheck`** supprimées
 - ✅ **5 corrections** (imports + console + typages)
 - ✅ **4 erreurs TypeScript** résolues
 - ✅ **100% conformité TypeScript strict**

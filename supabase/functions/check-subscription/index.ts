@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Edge Function: check-subscription
  * Vérification serveur-side des abonnements Stripe

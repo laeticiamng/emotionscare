@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { auth as frAuth } from '@/lib/i18n/locales/fr/auth';
 import { coach as frCoach } from '@/lib/i18n/locales/fr/coach';
 import { common as frCommon } from '@/lib/i18n/locales/fr/common';

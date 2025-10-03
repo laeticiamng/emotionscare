@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, TrendingUp, Users, Calendar, Filter, BarChart3 } from 'lucide-react';

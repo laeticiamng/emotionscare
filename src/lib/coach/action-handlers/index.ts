@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 // Export all action handlers from their respective files
 export * from './emotion-handlers';

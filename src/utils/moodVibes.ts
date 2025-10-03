@@ -1,4 +1,3 @@
-// @ts-nocheck
 export type MoodVibe = 'calm' | 'focus' | 'bright' | 'reset';
 
 function clamp(value: number, min: number, max: number): number {

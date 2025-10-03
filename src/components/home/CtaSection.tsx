@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { Heart, Building2, ArrowRight, CheckCircle, Users, Shield, Award, Zap } from 'lucide-react';

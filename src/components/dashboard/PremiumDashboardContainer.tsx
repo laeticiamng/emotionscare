@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Container de Dashboard Premium - 100% Experience
  * Performances optimisées, widgets avancés, et UX exceptionnelle

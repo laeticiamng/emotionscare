@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Service d'analyse d'émotions EmotionsCare
  * Connecté aux vraies APIs Supabase et Hume

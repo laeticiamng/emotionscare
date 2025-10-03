@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 /**
  * Utilitaire pour détecter et prévenir les doublons de composants

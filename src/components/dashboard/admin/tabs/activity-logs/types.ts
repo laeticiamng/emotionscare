@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 // Activity logs types
 export interface AnonymousActivity {

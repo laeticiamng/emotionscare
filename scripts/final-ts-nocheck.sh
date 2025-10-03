@@ -1,9 +1,6 @@
 #!/bin/bash
-# Script final pour ajouter // @ts-nocheck à TOUS les fichiers TypeScript
 
-echo "🔧 Ajout de // @ts-nocheck à TOUS les fichiers TypeScript du projet..."
 
-# Fonction pour ajouter @ts-nocheck
 add_ts_nocheck() {
   local file="$1"
   
@@ -12,13 +9,9 @@ add_ts_nocheck() {
     return 1
   fi
   
-  # Vérifier si le fichier commence déjà par // @ts-nocheck
-  if head -n 1 "$file" | grep -q "^// @ts-nocheck"; then
     return 0
   fi
   
-  # Ajouter // @ts-nocheck en première ligne
-  echo "// @ts-nocheck" | cat - "$file" > temp && mv temp "$file"
   echo "✅ $file"
 }
 

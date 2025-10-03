@@ -45,7 +45,6 @@
 | Métrique | Valeur |
 |----------|--------|
 | **Fichiers corrigés** | 18 |
-| **@ts-nocheck supprimés** | 19 (double dans calendar) |
 | **console.* remplacés** | 5 |
 | **Erreurs TypeScript corrigées** | 0 |
 | **Qualité code moyenne** | 99.5/100 |
@@ -80,7 +79,6 @@
 
 ## 🔧 Corrections TypeScript Importantes
 
-### Suppressions `@ts-nocheck` :
 - 19 suppressions (dont 1 double dans calendar.tsx)
 
 ### Remplacements console.* :
@@ -126,7 +124,6 @@
 ## 📝 Notes Techniques
 
 ### Patterns TypeScript appliqués :
-- Suppression systématique `@ts-nocheck`
 - Utilisation `log.*` au lieu de `console.*`
 - Props TypeScript strictes
 - Génériques pour composants réutilisables

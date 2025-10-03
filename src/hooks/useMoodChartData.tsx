@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import { useState, useEffect } from 'react';
 import { MoodData } from '@/types/other';

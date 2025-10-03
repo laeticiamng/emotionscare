@@ -9,32 +9,27 @@
 
 ### Stores avec `console.*` remplacés
 - ✅ **`src/store/account.store.ts`**
-  - Suppression de `@ts-nocheck` (ligne 1)
   - Import du `logger` ajouté
   - Remplacement de `console.log('Account status check...')` → `logger.debug('Account status check...', {}, 'SYSTEM')`
   - Remplacement de `console.warn('Failed to check account status...')` → `logger.warn('Failed to check account status', error, 'SYSTEM')`
   - Total : 2 `console.*` remplacés
 
 - ✅ **`src/store/hr.store.ts`**
-  - Suppression de `@ts-nocheck` (ligne 1)
   - Import du `logger` ajouté
   - Remplacement de `console.warn('Invalid BPM value:')` → `logger.warn('Invalid BPM value', { bpm }, 'SYSTEM')`
   - Total : 1 `console.*` remplacé
 
 - ✅ **`src/store/marketing.store.ts`**
-  - Suppression de `@ts-nocheck` (ligne 1)
   - Import du `logger` ajouté
   - Remplacement de `console.log('Segment switched to:')` → `logger.info('Segment switched', { segment }, 'ANALYTICS')`
   - Total : 1 `console.*` remplacé
 
 - ✅ **`src/store/rgpd.store.ts`**
-  - Suppression de `@ts-nocheck` (ligne 1)
   - Import du `logger` ajouté
   - Remplacement de `.catch(console.warn)` → `.catch((error) => logger.warn('Failed to delete export job', error, 'SYSTEM'))`
   - Total : 1 `console.*` remplacé
 
 - ✅ **`src/store/utils/createImmutableStore.ts`**
-  - Suppression de `@ts-nocheck` (ligne 1)
   - Import du `logger` ajouté
   - Remplacement de `console.warn('[zustand:persist] unable to parse...')` → `logger.warn('Unable to parse stored value', error, 'SYSTEM')`
   - Remplacement de `console.warn('[zustand:persist] unable to store...')` → `logger.warn('Unable to store state', { name, error }, 'SYSTEM')`
@@ -42,45 +37,36 @@
 
 ### Stores critiques sans `console.*`
 - ✅ **`src/store/appStore.ts`**
-  - Suppression de `@ts-nocheck` (ligne 1)
   - Store principal de l'application (auth, UI, cache, préférences, modules)
 
 - ✅ **`src/store/mood.store.ts`**
-  - Suppression de `@ts-nocheck` (ligne 1)
   - Store de gestion des sessions d'humeur et blend émotionnel
 
 - ✅ **`src/store/journal.store.ts`**
-  - Suppression de `@ts-nocheck` (ligne 1)
   - Store de journalisation vocale/texte
 
 - ✅ **`src/store/settings.store.ts`**
-  - Suppression de `@ts-nocheck` (ligne 1)
   - Store de paramètres utilisateur (thème, a11y, langue)
 
 - ✅ **`src/store/system.store.ts`**
-  - Suppression de `@ts-nocheck` (ligne 1)
   - Store de santé système et monitoring
 
 - ✅ **`src/stores/useAuthStore.ts`**
-  - Déjà conforme (pas de `@ts-nocheck`, utilise déjà le `logger`)
 
 ---
 
 ## 📊 Statistiques
 
 ### Avant les corrections
-- Stores avec `@ts-nocheck` : **52**
 - Stores avec `console.*` : **5**
 - Stores principaux corrigés : **0**
 
 ### Après les corrections (Phase 1)
-- Stores avec `@ts-nocheck` corrigés : **10** (19% du total)
 - Stores avec `console.*` : **0** ✅
 - Total `console.*` remplacés : **7**
 - Stores principaux conformes : **11** ✅
 
 ### Stores restants (Phase 2 - optionnelle)
-- Stores avec `@ts-nocheck` restants : **42**
 - Principalement : tests, slices, stores secondaires (AR, VR, bounce, collection, etc.)
 
 ---
@@ -213,7 +199,6 @@ logger.warn('Unable to store state', { name: persistOptions.name, error }, 'SYST
 
 ## 🏆 Conformité aux règles
 
-✅ **Règle 1** : Suppression de `@ts-nocheck` dans les 10 stores prioritaires  
 ✅ **Règle 2** : Remplacement de tous les `console.*` par `logger.*`  
 ✅ **Règle 3** : Contextes de logging appropriés ('SYSTEM', 'ANALYTICS', 'AUTH')  
 ✅ **Règle 4** : TypeScript strict activé et respecté  

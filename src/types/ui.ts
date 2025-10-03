@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 export interface Toast {
   id: string;

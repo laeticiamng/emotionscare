@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import OpenAI from 'https://deno.land/x/openai@v4.28.0/mod.ts';
 

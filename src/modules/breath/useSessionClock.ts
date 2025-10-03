@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 export type SessionClockState = 'idle' | 'running' | 'paused' | 'completed';

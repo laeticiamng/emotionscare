@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState, useEffect, useCallback } from 'react';
 import { useSettingsStore, type Profile } from '@/store/settings.store';
 import { toast } from '@/hooks/use-toast';

@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import React, { useState, useRef } from 'react';
 import { Play, Pause, SkipBack, SkipForward, Volume2 } from 'lucide-react';

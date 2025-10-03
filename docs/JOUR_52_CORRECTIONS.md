@@ -9,7 +9,6 @@
 ## ✅ Fichiers corrigés
 
 ### 1. `src/components/ui/toggle.tsx`
-- ❌ Suppression `@ts-nocheck`
 - ✅ Toggle Radix UI
 - ✅ 2 variants (default, outline)
 - ✅ 3 tailles (default, sm, lg)
@@ -19,7 +18,6 @@
 - ✅ Disabled avec opacity
 
 ### 2. `src/components/ui/toggle-group.tsx`
-- ❌ Suppression `@ts-nocheck`
 - ✅ ToggleGroup Radix UI
 - ✅ Context pour partage variant/size
 - ✅ ToggleGroupItem hérite du context
@@ -28,7 +26,6 @@
 - ✅ Multiple items groupés
 
 ### 3. `src/components/ui/tooltip.tsx`
-- ❌ Suppression `@ts-nocheck`
 - ✅ Tooltip Radix UI
 - ✅ TooltipProvider pour context
 - ✅ TooltipTrigger
@@ -39,7 +36,6 @@
 - 🔧 `console.warn` → `log.warn`
 
 ### 4. `src/components/ui/resizable.tsx`
-- ❌ Suppression `@ts-nocheck`
 - ✅ Resizable panels avec react-resizable-panels
 - ✅ ResizablePanelGroup (container)
 - ✅ ResizablePanel (panel individuel)
@@ -49,7 +45,6 @@
 - ✅ Background border sur handle
 
 ### 5. `src/components/ui/sonner.tsx`
-- ❌ Suppression `@ts-nocheck`
 - ✅ Toaster avec Sonner library
 - ✅ Utilise useTheme pour dark mode
 - ✅ Custom classNames pour styling
@@ -58,7 +53,6 @@
 - ✅ Theme auto-adapté
 
 ### 6. `src/components/ui/toaster.tsx`
-- ❌ Suppression `@ts-nocheck`
 - ✅ Toaster avec useToast hook
 - ✅ Map des toasts actifs
 - ✅ ToastProvider wrapper
@@ -73,7 +67,6 @@
 | Métrique | Valeur |
 |----------|--------|
 | **Fichiers corrigés** | 6 |
-| **@ts-nocheck supprimés** | 6 |
 | **console.* remplacés** | 1 (tooltip) |
 | **Erreurs TypeScript corrigées** | 1 (toaster variant cast) |
 | **Qualité code** | 99.5/100 |

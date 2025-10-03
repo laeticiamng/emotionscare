@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 import { Shield, Users } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';

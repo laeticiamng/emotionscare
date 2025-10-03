@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 /**
  * EMOTION SCANNER PREMIUM - EMOTIONSCARE

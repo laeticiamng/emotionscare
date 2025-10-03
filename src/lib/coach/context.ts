@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { getEvents } from "@/lib/scores/events";
 import { computeSnapshot } from "@/lib/scores/compute";
 

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useMemo, useState } from 'react'
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { useToast } from '@/hooks/use-toast'

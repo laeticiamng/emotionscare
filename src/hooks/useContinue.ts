@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useEffect } from 'react';
 import { useDashboardStore } from '@/store/dashboard.store';
 

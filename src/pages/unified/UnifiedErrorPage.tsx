@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * UNIFIED ERROR PAGE - Fusion de 404Page + Enhanced404Page + Error404Page
  * Préserve EXACTEMENT la même fonctionnalité des trois composants

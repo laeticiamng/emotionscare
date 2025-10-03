@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * SCRIPT DE NETTOYAGE DES DOUBLONS - EMOTIONSCARE
  * Supprime automatiquement tous les fichiers dupliqués identifiés

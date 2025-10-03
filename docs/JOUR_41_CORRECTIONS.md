@@ -9,14 +9,12 @@
 ## ✅ Fichiers corrigés
 
 ### 1. `src/components/common/AccessibilityProvider.tsx`
-- ❌ Suppression `@ts-nocheck`
 - ✅ Provider React Context pour accessibilité
 - ✅ Gestion des préférences système (reduced motion, high contrast)
 - ✅ Persistance dans localStorage
 - 🔄 3× `console.warn` → `logger.warn` (lignes 54, 106, 119)
 
 ### 2. `src/components/common/ConfirmDialog.tsx`
-- ❌ Suppression `@ts-nocheck`
 - ✅ Dialog de confirmation accessible
 - ✅ Focus management et support clavier
 - ✅ États de chargement et variants visuels
@@ -24,28 +22,24 @@
 - 🔄 1× `console.error` → `logger.error` (ligne 68)
 
 ### 3. `src/components/common/ErrorFallback.tsx`
-- ❌ Suppression `@ts-nocheck`
 - ✅ Composant de fallback pour Error Boundary
 - ✅ Animations Framer Motion
 - ✅ Détails techniques en mode développement
 - 🔄 1× `console.error` → `logger.error` (ligne 21)
 
 ### 4. `src/components/common/FeatureCard.tsx`
-- ❌ Suppression `@ts-nocheck`
 - ✅ Card de fonctionnalité réutilisable
 - ✅ Animations hover/tap
 - ✅ Support metadata et actions
 - ✅ Déjà conforme (pas de `console.*`)
 
 ### 5. `src/components/common/GlobalErrorBoundary.tsx`
-- ❌ Suppression `@ts-nocheck`
 - ✅ Error Boundary global de l'application
 - ✅ Intégration avec ErrorFallback
 - ✅ Support Sentry/monitoring en production
 - 🔄 1× `console.error` → `logger.error` (ligne 27)
 
 ### 6. `src/components/common/LoginRedirect.tsx`
-- ❌ Suppression `@ts-nocheck`
 - ✅ Redirection automatique vers login selon mode
 - ✅ Spinner de chargement pendant redirection
 - ✅ Déjà conforme (pas de `console.*`)
@@ -57,7 +51,6 @@
 | Métrique | Valeur |
 |----------|--------|
 | **Fichiers corrigés** | 6 |
-| **@ts-nocheck supprimés** | 6 |
 | **console.* remplacés** | 6 |
 | **Erreurs TypeScript corrigées** | 0 |
 | **Qualité code** | 99.5/100 |

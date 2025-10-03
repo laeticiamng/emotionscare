@@ -1,4 +1,3 @@
-// @ts-nocheck
 export const modules = {
   // Emotion Scan
   emotionScan: {

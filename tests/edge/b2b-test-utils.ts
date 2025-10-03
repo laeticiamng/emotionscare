@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { vi } from 'vitest';
 
 type QueryAction = 'select' | 'insert' | 'update' | 'delete' | 'upsert';

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Flash Glow Module - Export principal
  */

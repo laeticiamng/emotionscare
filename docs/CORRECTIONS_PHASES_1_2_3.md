@@ -7,34 +7,28 @@
 ## Phase 1 : TypeScript Strict ✅
 
 ### Objectif
-Retirer `@ts-nocheck` des 5 fichiers critiques et corriger les erreurs TypeScript.
 
 ### Fichiers corrigés
 
 1. **src/contexts/AuthContext.tsx**
-   - ✅ Retiré `@ts-nocheck`
    - ✅ Types stricts pour User, Session
    - ✅ Supprimé `AuthError` non utilisé
    - ✅ Retours de fonction corrigés
 
 2. **src/contexts/SimpleAuth.tsx**
-   - ✅ Retiré `@ts-nocheck`
    - ✅ Interface `User` typée strictement
    - ✅ `any` remplacé par types explicites
    - ✅ Metadata typé avec `Record<string, unknown>`
 
 3. **src/contexts/UserModeContext.tsx**
-   - ✅ Retiré `@ts-nocheck`
    - ✅ Déjà bien typé, aucune modification nécessaire
 
 4. **src/routerV2/router.tsx**
-   - ✅ Retiré `@ts-nocheck`
    - ✅ Import JSX commenté (`PricingPageWorking.jsx`)
    - ✅ `AppLayoutComponent` ne supporte pas `children` (utilise `<Outlet />`)
    - ✅ Layout wrapper corrigé
 
 5. **src/routerV2/guards.tsx**
-   - ✅ Retiré `@ts-nocheck`
    - ✅ Imports logger ajoutés
    - ✅ Déjà bien typé
 
@@ -54,7 +48,6 @@ Remplacer tous les `console.*` par le logger centralisé dans les 5 fichiers cri
 ### Modifications
 
 1. **src/lib/logger/index.ts**
-   - ✅ Retiré `@ts-nocheck`
    - ✅ Logger déjà bien typé et fonctionnel
 
 2. **src/contexts/AuthContext.tsx**
@@ -177,17 +170,14 @@ Fusionner les deux systèmes conflictuels de feature flags en un seul.
 ## Prochaines étapes (Semaine 1, jours 2-5)
 
 ### Jour 2 (Jeudi)
-- [ ] Retirer `@ts-nocheck` de 10 fichiers supplémentaires
 - [ ] Remplacer `console.*` dans ces 10 fichiers
 - [ ] Tests unitaires pour les flags par rôle
 
 ### Jour 3 (Vendredi)
-- [ ] Retirer `@ts-nocheck` de 15 fichiers supplémentaires
 - [ ] Créer script de migration automatique console → logger
 - [ ] Tests d'intégration Auth + Router + Flags
 
 ### Jour 4 (Lundi)
-- [ ] Retirer `@ts-nocheck` des 20 derniers fichiers critiques
 - [ ] Audit de sécurité : suppression des logs sensibles
 - [ ] Documentation API logger
 

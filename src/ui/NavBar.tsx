@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client";
 import { ThemeToggle } from "@/theme/ThemeProvider";
 import { useI18n } from "@/lib/i18n";

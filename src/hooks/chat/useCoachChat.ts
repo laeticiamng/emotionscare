@@ -1,6 +1,4 @@
-// @ts-nocheck
 
-// @ts-nocheck
 import { useState, useCallback } from 'react';
 import { ChatMessage } from '@/types/chat';
 

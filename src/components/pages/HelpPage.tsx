@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * HelpPage - Centre d'aide complet et accessible
  */

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState, useCallback } from 'react';
 import { useGritStore } from '@/store/grit.store';
 import { supabase } from '@/integrations/supabase/client';

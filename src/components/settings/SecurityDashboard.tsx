@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Dashboard de sécurité et conformité - Point de contrôle production
  */

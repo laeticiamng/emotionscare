@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Journal Module - Journal vocal et textuel avec IA
  */

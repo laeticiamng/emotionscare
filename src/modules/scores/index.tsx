@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { lazyDefault } from '@/lib/lazyDefault';
 
 export { default } from './ScoresV2Page';

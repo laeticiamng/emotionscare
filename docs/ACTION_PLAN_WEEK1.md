@@ -14,7 +14,6 @@
 
 1. **src/contexts/AuthContext.tsx**
 ```typescript
-// Retirer @ts-nocheck
 // Typer correctement User, Session, AuthContextType
 // Créer interfaces strictes
 ```
@@ -33,23 +32,19 @@
 
 4. **src/routerV2/router.tsx**
 ```typescript
-// Retirer @ts-nocheck
 // Typer componentMap avec Record<string, LazyExoticComponent>
 // Typer RouteMeta correctement
 ```
 
 5. **src/routerV2/registry.ts**
 ```typescript
-// Retirer @ts-nocheck
 // Assurer que RouteMeta est bien typé
 ```
 
 **Checklist Jour 1-2**:
-- [ ] Retirer @ts-nocheck des 5 fichiers
 - [ ] Corriger toutes les erreurs TypeScript
 - [ ] Tester que l'app compile sans erreurs
 - [ ] Vérifier que les tests passent
-- [ ] Commit: `fix(types): remove @ts-nocheck from critical auth/router files`
 
 ---
 
@@ -264,13 +259,11 @@ describe('Feature Flags', () => {
 ## 📊 Métriques de Succès
 
 ### Avant Sprint 1
-- ❌ 2964 fichiers @ts-nocheck
 - ❌ 1855 console.*
 - ❌ 2 systèmes feature flags
 - ❌ Tests cassés
 
 ### Après Sprint 1 (Objectif)
-- ✅ 5 fichiers critiques sans @ts-nocheck (-2959)
 - ✅ 100 console.* remplacés par logger (-1755)
 - ✅ 1 seul système feature flags unifié
 - ✅ 100% tests passent
@@ -281,8 +274,6 @@ describe('Feature Flags', () => {
 
 ### Vérifier progression TypeScript
 ```bash
-# Compter les @ts-nocheck restants
-grep -r "@ts-nocheck" src/ | wc -l
 
 # Compiler sans erreurs
 npm run typecheck
@@ -315,7 +306,6 @@ npm run typecheck
 
 ```bash
 # TypeScript
-git commit -m "fix(types): remove @ts-nocheck from AuthContext"
 
 # Logger
 git commit -m "feat(logger): replace console.* with centralized logger"
@@ -334,7 +324,6 @@ git commit -m "test: fix ConsentGate and add feature flags tests"
 ### Si TypeScript casse tout
 1. Commenter temporairement les erreurs
 2. Corriger une par une
-3. Ne JAMAIS remettre @ts-nocheck
 
 ### Si les tests cassent
 1. Identifier le test cassé

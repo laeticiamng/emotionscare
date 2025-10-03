@@ -9,33 +9,28 @@
 ## ✅ Fichiers corrigés
 
 ### 1. `src/components/b2b/B2BLandingPageComplete.tsx`
-- ❌ Suppression `@ts-nocheck`
 - ✅ Page de présentation B2B complète
 - ✅ Grille de fonctionnalités avec icônes et badges
 - ✅ Modules disponibles et ROI preview
 - ✅ Section CTA avec liens d'inscription
 
 ### 2. `src/features/b2b/reports/ActionSuggestion.tsx`
-- ❌ Suppression `@ts-nocheck`
 - ✅ Composant de suggestions d'actions
 - ✅ Dérive automatiquement les actions concrètes
 - ✅ Interface utilisateur simple et lisible
 
 ### 3. `src/features/b2b/reports/B2BHeatmap.tsx`
-- ❌ Suppression `@ts-nocheck`
 - ✅ Composant heatmap sophistiqué pour équipes
 - ✅ Normalisation des équipes et périodes
 - ✅ Styles conditionnels par ton émotionnel
 - ✅ Accessibilité complète (ARIA, roles, tabIndex)
 
 ### 4. `src/features/b2b/reports/ExportButton.tsx`
-- ❌ Suppression `@ts-nocheck`
 - ✅ Bouton d'export PNG avec Sentry tracking
 - 🔄 `console.error` → `logger.error` (ligne 27)
 - ✅ Gestion des états de chargement
 
 ### 5. `src/features/b2b/reports/utils.ts`
-- ❌ Suppression `@ts-nocheck`
 - ✅ Utilitaires heatmap (types, patterns, insights)
 - ✅ Normalisation et groupement de cellules
 - ✅ Détection de ton émotionnel par mots-clés
@@ -47,7 +42,6 @@
 | Métrique | Valeur |
 |----------|--------|
 | **Fichiers corrigés** | 5 |
-| **@ts-nocheck supprimés** | 5 |
 | **console.* remplacés** | 1 |
 | **Erreurs TypeScript corrigées** | 0 |
 | **Qualité code** | 99.5/100 |

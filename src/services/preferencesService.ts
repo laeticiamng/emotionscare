@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import { UserPreferences } from '@/types/preferences';
 import { supabase } from '@/integrations/supabase/client';

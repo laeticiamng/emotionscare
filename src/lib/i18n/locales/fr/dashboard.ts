@@ -1,4 +1,3 @@
-// @ts-nocheck
 export const dashboard = {
   title: 'Tableau de bord',
   welcome: 'Bienvenue',

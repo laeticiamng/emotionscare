@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 /**
  * Safely opens a URL or performs an action based on the URL

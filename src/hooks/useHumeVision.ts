@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useCallback, useEffect, useRef } from 'react';
 import { useARStore, type VisionReading } from '@/store/ar.store';
 import { supabase } from '@/integrations/supabase/client';

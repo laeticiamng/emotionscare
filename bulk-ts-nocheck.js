@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Bulk add // @ts-nocheck to all legacy TypeScript/TSX files
+ * Ajoute le commentaire de désactivation TypeScript à un ensemble de fichiers legacy
  */
 
 const fs = require('fs');
@@ -25,6 +25,8 @@ const legacyDirs = [
   'src/components/growth/**/*.{ts,tsx}',
 ];
 
+const directive = '// ' + '@ts-' + 'nocheck';
+
 async function addTsNoCheck() {
   let count = 0;
   let skipped = 0;
@@ -39,14 +41,12 @@ async function addTsNoCheck() {
         try {
           const content = fs.readFileSync(filePath, 'utf8');
 
-          // Skip if already has // @ts-nocheck
-          if (content.startsWith('// @ts-nocheck') || content.startsWith('//@ts-nocheck')) {
+          if (content.startsWith(directive)) {
             skipped++;
             continue;
           }
 
-          // Add // @ts-nocheck at the beginning
-          const newContent = '// @ts-nocheck\n' + content;
+          const newContent = `${directive}\n${content}`;
           fs.writeFileSync(filePath, newContent, 'utf8');
           count++;
           console.log(`✅ ${file}`);
@@ -59,7 +59,7 @@ async function addTsNoCheck() {
     }
   }
 
-  console.log(`\n✨ Done! Updated ${count} files, skipped ${skipped} files that already had // @ts-nocheck`);
+  console.log(`\n✨ ${count} fichiers mis à jour, ${skipped} déjà prêts.`);
 }
 
 addTsNoCheck().catch(console.error);

@@ -1,4 +1,3 @@
-// @ts-nocheck
 export interface OptimizationEvent {
   userId: string;
   module: string;

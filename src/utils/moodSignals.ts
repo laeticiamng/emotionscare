@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { mapMoodToVibe, type MoodVibe } from "@/utils/moodVibes";
 
 export interface MoodPalette {

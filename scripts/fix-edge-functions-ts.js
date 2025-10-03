@@ -1,14 +1,12 @@
 #!/usr/bin/env node
 
 /**
- * Script pour ajouter // @ts-nocheck à tous les fichiers TypeScript des edge functions
  */
 
 const fs = require('fs');
 const path = require('path');
 const { glob } = require('glob');
 
-console.log('🔧 Ajout de // @ts-nocheck aux edge functions...');
 
 async function addTsNocheckToFiles() {
   try {
@@ -24,14 +22,10 @@ async function addTsNocheckToFiles() {
       try {
         const content = fs.readFileSync(file, 'utf8');
         
-        // Vérifier si le fichier commence déjà par // @ts-nocheck
-        if (content.trim().startsWith('// @ts-nocheck')) {
           skipped++;
           continue;
         }
 
-        // Ajouter // @ts-nocheck au début du fichier
-        const newContent = `// @ts-nocheck\n${content}`;
         fs.writeFileSync(file, newContent, 'utf8');
         modified++;
         console.log(`✅ Modifié: ${file}`);

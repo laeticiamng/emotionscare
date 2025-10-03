@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * COACH CONTEXT UNIFIÉ - EmotionsCare
  * Fusion optimisée de toutes les versions de CoachContext

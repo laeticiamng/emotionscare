@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { toast as sonnerToast } from 'sonner'
 import { useCallback } from 'react'
 

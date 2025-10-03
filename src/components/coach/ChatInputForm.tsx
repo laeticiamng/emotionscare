@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import React, { useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';

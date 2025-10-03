@@ -1,4 +1,3 @@
-// @ts-nocheck
 import dayjs from 'dayjs';
 import { useQuery } from '@tanstack/react-query';
 import { GlobalInterceptor } from '@/utils/globalInterceptor';

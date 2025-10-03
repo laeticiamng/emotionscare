@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * BREATH JOURNEY - Parcours de respiration immersif
  * Voyage progressif à travers 7 techniques avec narration guidée

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { MusicTrack } from '@/types/music';
 
 // Assure qu'une valeur est un tableau

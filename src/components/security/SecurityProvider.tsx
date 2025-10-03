@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import React, { createContext, useContext, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';

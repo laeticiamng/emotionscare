@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import { useState, useEffect } from 'react';
 import { Activity, BarChart3, Heart, Calendar, Users } from 'lucide-react';

@@ -5,7 +5,6 @@
 ---
 
 ## Objectif du Jour 2
-Retirer `@ts-nocheck` et remplacer `console.*` de 10 fichiers critiques supplémentaires.
 
 ---
 
@@ -13,7 +12,6 @@ Retirer `@ts-nocheck` et remplacer `console.*` de 10 fichiers critiques supplém
 
 ### 1. **src/hooks/useAuthErrorHandler.ts** ✅
 **Avant** :
-- `// @ts-nocheck`
 - 2× `console.*` (warn + error)
 - Type `any` pour error
 
@@ -24,15 +22,12 @@ Retirer `@ts-nocheck` et remplacer `console.*` de 10 fichiers critiques supplém
 
 ### 2. **src/contexts/ErrorContext.tsx** ✅
 **Avant** :
-- `// @ts-nocheck`
 
 **Après** :
-- Déjà bien typé, juste retiré `@ts-nocheck`
 - Aucun `console.*` à remplacer
 
 ### 3. **src/components/layout/EnhancedShell.tsx** ✅
 **Avant** :
-- `// @ts-nocheck`
 - Propriétés `isDarkMode` et `reduceMotion` manquantes dans ThemeProviderState
 
 **Après** :
@@ -42,7 +37,6 @@ Retirer `@ts-nocheck` et remplacer `console.*` de 10 fichiers critiques supplém
 
 ### 4. **src/components/error/PageErrorBoundary.tsx** ✅
 **Avant** :
-- `// @ts-nocheck`
 - Type `{ componentStack: string }` incompatible avec ErrorInfo
 
 **Après** :
@@ -53,32 +47,25 @@ Retirer `@ts-nocheck` et remplacer `console.*` de 10 fichiers critiques supplém
 
 ### 5. **src/hooks/use-toast.ts** ✅
 **Avant** :
-- `// @ts-nocheck`
 
 **Après** :
-- Déjà bien typé, juste retiré `@ts-nocheck`
 - Aucun `console.*`
 
 ### 6. **src/App.tsx** ✅
 **Avant** :
-- `// @ts-nocheck`
 
 **Après** :
-- Fichier simple, juste retiré `@ts-nocheck`
 - Aucun `console.*`
 
 ### 7. **src/AppProviders.tsx** ✅
 **Avant** :
-- `// @ts-nocheck`
 
 **Après** :
-- Déjà bien typé, juste retiré `@ts-nocheck`
 - Architecture providers propre
 - Aucun `console.*`
 
 ### 8. **src/components/layout/AppLayout.tsx** ✅
 **Avant** :
-- `// @ts-nocheck`
 
 **Après** :
 - Layout avec Outlet (React Router)
@@ -87,7 +74,6 @@ Retirer `@ts-nocheck` et remplacer `console.*` de 10 fichiers critiques supplém
 
 ### 9. **src/lib/routes.ts** ✅
 **Avant** :
-- `// @ts-nocheck`
 - 1× `console.error` dans `resolveRoutePath`
 
 **Après** :
@@ -107,7 +93,6 @@ Retirer `@ts-nocheck` et remplacer `console.*` de 10 fichiers critiques supplém
 
 ### TypeScript
 - **Fichiers corrigés** : 10
-- **@ts-nocheck retirés** : 10
 - **Erreurs TypeScript corrigées** : 4
   - ErrorInfo import (PageErrorBoundary)
   - resetKeys type (PageErrorBoundary) 
@@ -189,7 +174,6 @@ const handleAuthError = useCallback(async (error: unknown) => {
 ## État Global Après Jour 2
 
 ### TypeScript Strict
-- **Fichiers sans @ts-nocheck** : 16 / 2964 (0.54%)
 - **Fichiers critiques corrigés** : 16
   - 6 Contextes (Auth, SimpleAuth, UserMode, Error, Logger, Flags)
   - 4 Router (router.tsx, guards.tsx, routes.ts, index.tsx)
@@ -213,7 +197,6 @@ const handleAuthError = useCallback(async (error: unknown) => {
 ## Prochaines Étapes (Jour 3)
 
 ### Objectif
-Retirer `@ts-nocheck` de 15 fichiers supplémentaires + script de migration automatique.
 
 ### Cibles prioritaires
 1. **Hooks critiques** (15 fichiers)

@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import { Variants } from 'framer-motion';
 

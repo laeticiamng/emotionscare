@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 // Import les données mock
 import mockEmotions from './mockEmotions';

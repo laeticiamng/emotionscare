@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { BookOpen, Moon, Heart, Zap, Play, Pause } from 'lucide-react';

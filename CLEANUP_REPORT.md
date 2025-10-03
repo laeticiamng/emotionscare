@@ -96,7 +96,6 @@
 ## 🔄 Prochaines Étapes Recommandées
 
 ### Phase 2: Corrections TypeScript (Priorité Haute)
-- [ ] Retirer `@ts-nocheck` des 10 edge functions les plus utilisées
 - [ ] Corriger types dans 20 composants UI critiques
 - [ ] Ajouter `@types` manquants pour tests
 

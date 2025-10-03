@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { createContext, useContext, useState } from 'react';
 import { Message, ChatResponse } from '@/types/support';
 import { getSupportResponse } from '@/services/chatService';

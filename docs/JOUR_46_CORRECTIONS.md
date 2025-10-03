@@ -9,7 +9,6 @@
 ## ✅ Fichiers corrigés
 
 ### 1. `src/components/ui/accordion.tsx`
-- ❌ Suppression `@ts-nocheck`
 - ✅ Composant Accordion Radix UI
 - ✅ AccordionItem avec bordure
 - ✅ AccordionTrigger avec icône ChevronDown
@@ -17,7 +16,6 @@
 - ✅ Transitions fluides expand/collapse
 
 ### 2. `src/components/ui/alert-dialog.tsx`
-- ❌ Suppression `@ts-nocheck`
 - ✅ Dialog d'alerte Radix UI complet
 - ✅ Overlay avec backdrop
 - ✅ Portal pour positionnement
@@ -26,7 +24,6 @@
 - ✅ Animations fade et zoom
 
 ### 3. `src/components/ui/alert.tsx`
-- ❌ Suppression `@ts-nocheck`
 - ✅ Composant Alert simple
 - ✅ 2 variants (default, destructive)
 - ✅ AlertTitle et AlertDescription
@@ -34,7 +31,6 @@
 - ✅ Rôle ARIA "alert"
 
 ### 4. `src/components/ui/avatar.tsx`
-- ❌ Suppression `@ts-nocheck`
 - ✅ Avatar Radix UI
 - ✅ AvatarImage avec lazy loading
 - ✅ AvatarFallback pour état vide
@@ -42,7 +38,6 @@
 - ✅ Support decoding async
 
 ### 5. `src/components/ui/badge.tsx`
-- ❌ Suppression `@ts-nocheck`
 - ✅ Badge personnalisable
 - ✅ 4 variants (default, secondary, destructive, outline)
 - ✅ Tailles et couleurs configurables
@@ -50,7 +45,6 @@
 - ✅ Transitions smooth
 
 ### 6. `src/components/ui/button.tsx`
-- ❌ Suppression `@ts-nocheck`
 - ✅ Bouton shadcn complet
 - ✅ 7 variants (default, destructive, outline, secondary, ghost, link, success, warning, info)
 - ✅ 5 tailles (default, sm, lg, xl, icon)
@@ -66,7 +60,6 @@
 | Métrique | Valeur |
 |----------|--------|
 | **Fichiers corrigés** | 6 |
-| **@ts-nocheck supprimés** | 6 |
 | **console.* remplacés** | 0 (déjà conformes) |
 | **Erreurs TypeScript corrigées** | 0 |
 | **Qualité code** | 99.5/100 |

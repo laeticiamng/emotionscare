@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * GLOW QUEST - Quête de micro-bonheurs
  * Collection de mini-jeux émotionnels rapides (30s-3min) ultra-addictifs

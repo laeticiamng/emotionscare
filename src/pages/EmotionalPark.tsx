@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, Wind, Palette, Music, Leaf, Book, Cloud, Star, Lightbulb, Waves, Mirror, Flask, Sword, Sliders, Users, Trophy, Theater, Sprout, Filter, Zap } from 'lucide-react';

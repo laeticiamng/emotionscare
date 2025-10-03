@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 export type { User, UserRole } from './user';
 export type { UserPreferences } from './preferences';

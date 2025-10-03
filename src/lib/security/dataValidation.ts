@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Data validation and sanitization for security
  */

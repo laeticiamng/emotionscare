@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useMemo } from 'react';
 import type { Guard, Role } from './types';
 import { useAuth } from '@/contexts/AuthContext';

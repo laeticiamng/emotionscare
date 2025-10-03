@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * MusicHistory - Historique d'écoute musical
  * Affiche l'historique des morceaux écoutés avec statistiques

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * AuthErrorService - Service de gestion des erreurs d'authentification
  * Traduit les erreurs Supabase en messages utilisateur-friendly

@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import React, { createContext, useContext, useState } from 'react';
 import { Story } from '@/types';

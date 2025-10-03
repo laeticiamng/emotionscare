@@ -10,7 +10,6 @@
 
 ### Statistiques complètes
 - **Total fichiers traités** : 30 composants UI
-- **Directives `@ts-nocheck` supprimées** : 30
 - **Imports corrigés** : 4
 - **Typages génériques corrigés** : 2
 - **Directives `"use client"` corrigées** : 1
@@ -30,7 +29,6 @@
 - `confetti.tsx` - Effet confettis animés
 - `confirmation-modal.tsx` - Modal de confirmation
 
-**Corrections** : Aucune erreur TypeScript, suppression directe des `@ts-nocheck`
 
 ---
 
@@ -194,7 +192,6 @@
 ### Objectif final
 - 🏁 **100% UI components** conformes
 - 🏁 **65-70% projet total** avant passage aux pages
-- 🏁 **Zéro `@ts-nocheck`** dans `/components/ui/`
 
 ---
 

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Service de musique thérapeutique EmotionsCare
  * Connexion Suno AI et recommandations personnalisées

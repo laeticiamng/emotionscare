@@ -9,7 +9,6 @@
 
 ### Progression globale
 - **Fichiers traités** : 18 composants UI
-- **Directives `@ts-nocheck` supprimées** : 18
 - **Imports corrigés** : 2
 - **Directives `"use client"` corrigées** : 1
 
@@ -26,7 +25,6 @@
 6. ✅ `confirmation-modal.tsx` - Modal de confirmation
 
 ### Statistiques Jour 56
-- **Directives `@ts-nocheck` supprimées** : 6
 - **Erreurs TypeScript** : 0
 - **Conformité** : ✅ 100%
 
@@ -47,7 +45,6 @@
 - **`PaginationButtonGroup.tsx`** : Suppression import `usePagination` inutilisé
 
 ### Statistiques Jour 57
-- **Directives `@ts-nocheck` supprimées** : 6
 - **Imports corrigés** : 2
 - **Erreurs TypeScript** : 2
 - **Conformité** : ✅ 100%
@@ -68,7 +65,6 @@
 - **`date-picker-with-range.tsx`** : Correction directive `"use client"`
 
 ### Statistiques Jour 58
-- **Directives `@ts-nocheck` supprimées** : 6
 - **Directives `"use client"` corrigées** : 1
 - **Erreurs TypeScript** : 1
 - **Conformité** : ✅ 100%
@@ -79,7 +75,6 @@
 
 ### Réalisations
 - ✅ **18 composants UI** corrigés (data, dashboard, dates)
-- ✅ **18 directives `@ts-nocheck`** supprimées
 - ✅ **3 corrections d'imports/directives**
 - ✅ **0 `console.*` restants** (aucun présent)
 - ✅ **100% conformité TypeScript strict**

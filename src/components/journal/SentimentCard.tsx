@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 import { Sun, CloudSun, Zap } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';

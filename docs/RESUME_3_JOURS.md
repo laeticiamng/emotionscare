@@ -47,7 +47,6 @@
 | Métrique | Valeur |
 |----------|--------|
 | **Fichiers corrigés** | 20 |
-| **@ts-nocheck supprimés** | 20 |
 | **console.* remplacés** | 3 |
 | **Erreurs TypeScript corrigées** | 5 |
 | **Qualité code moyenne** | 99.5/100 |
@@ -127,7 +126,6 @@
 ## 📝 Notes Techniques
 
 ### Patterns TypeScript appliqués :
-- Suppression systématique `@ts-nocheck`
 - Utilisation `logger` au lieu de `console.*`
 - Cast `as any` pour incompatibilités temporaires
 - Typage strict des props et interfaces

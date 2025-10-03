@@ -7,7 +7,6 @@ L'erreur originale concernant l'import de `src/lib/b2b/reporting.ts` dans l'edge
 Le typecheck TypeScript vérifie les edge functions Supabase lors du build frontend, ce qui génère des erreurs. Ces erreurs sont normales car:
 
 1. Les edge functions utilisent **Deno**, pas Node.js
-2. Elles ont toutes `// @ts-nocheck` en haut pour cette raison
 3. Elles sont déployées séparément par Supabase et n'affectent pas le frontend
 4. Le build frontend ne devrait PAS les vérifier
 
@@ -30,5 +29,4 @@ Toutes les edge functions fonctionnent correctement en production. Les erreurs T
 ## Contact support
 Si ce problème persiste, contacter le support Lovable en mentionnant:
 - Message: "No supabase/functions directory changed"
-- TypeScript vérifie les edge functions malgré `// @ts-nocheck`
 - Build bloqué alors que seules les edge functions ont des erreurs

@@ -1,4 +1,3 @@
-// @ts-nocheck
 export type LocaleCode = 'fr' | 'en' | 'es' | 'de' | 'it';
 export type InstrumentCode = 'WHO5' | 'STAI6' | 'SAM' | 'SUDS';
 

@@ -1,4 +1,3 @@
-// @ts-nocheck
 // Note: ESM imports don't provide TypeScript types in Deno
 // Types améliorés avec gestion d'erreurs appropriée
 import "https://deno.land/x/xhr@0.1.0/mod.ts";

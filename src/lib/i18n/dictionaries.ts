@@ -1,4 +1,3 @@
-// @ts-nocheck
 export const dict = {
   fr: {
     common: {

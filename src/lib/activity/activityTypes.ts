@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 /**
  * Activity types for tracking user actions

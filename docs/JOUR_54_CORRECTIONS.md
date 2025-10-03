@@ -8,7 +8,6 @@
 ## ✅ Fichiers corrigés
 
 ### 1. `src/components/ui/PageHeader.tsx`
-**Statut:** ✅ Déjà conforme (pas de @ts-nocheck)
 - Composant header de page avec animations
 - Badge, subtitle, actions, gradient
 - Props complètement typées
@@ -45,12 +44,10 @@
 
 ### 5. `src/components/ui/RouteDebugger.tsx`
 **Changements:**
-- ❌ Retiré `@ts-nocheck`
 - ✅ TypeScript strict activé
 
 **Avant:**
 ```typescript
-// @ts-nocheck
 import React from 'react';
 ```
 
@@ -74,7 +71,6 @@ import React from 'react';
 | Métrique | Valeur |
 |----------|--------|
 | Fichiers audités | 6 |
-| `@ts-nocheck` retirés | 1 |
 | `console.*` remplacés | 0 |
 | Erreurs TypeScript corrigées | 0 |
 | Déjà conformes | 5 |

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useVRBreathStore } from '@/store/vrbreath.store';
 

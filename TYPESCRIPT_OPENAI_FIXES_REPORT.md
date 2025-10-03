@@ -3,42 +3,34 @@
 ## ✅ Fonctions OpenAI Corrigées (10/10)
 
 ### 1. **openai-moderate** - Modération de contenu
-- ✓ Commentaire `@ts-nocheck` explicatif ajouté
 - ✓ Typage strict des erreurs (`error: unknown`)
 - ✓ Logs détaillés avec stack traces
 
 ### 2. **openai-transcribe** - Transcription audio Whisper
-- ✓ Commentaire `@ts-nocheck` explicatif ajouté
 - ✓ Typage strict des erreurs
 - ✓ Logs améliorés
 
 ### 3. **openai-embeddings** - Génération d'embeddings
-- ✓ Commentaire `@ts-nocheck` explicatif ajouté
 - ✓ Typage strict des erreurs
 - ✓ Logs détaillés
 
 ### 4. **openai-tts** - Text-to-Speech
-- ✓ Commentaire `@ts-nocheck` explicatif ajouté
 - ✓ Typage strict des erreurs
 - ✓ Logs améliorés
 
 ### 5. **analyze-emotion-text** - Analyse émotionnelle
-- ✓ Commentaire `@ts-nocheck` explicatif ajouté
 - ✓ Typage strict des erreurs
 - ✓ Logs détaillés
 
 ### 6. **ai-coach-chat** - Coach IA conversationnel
-- ✓ Commentaire `@ts-nocheck` explicatif ajouté
 - ✓ Typage strict des erreurs
 - ✓ Logs améliorés
 
 ### 7. **chat-coach** - Coach de bien-être
-- ✓ Commentaire `@ts-nocheck` explicatif ajouté
 - ✓ Typage strict des erreurs
 - ✓ Logs détaillés
 
 ### 8. **chat-with-ai** - Chat général IA
-- ✓ Commentaire `@ts-nocheck` explicatif ajouté
 - ✓ Typage strict des erreurs
 - ✓ Logs améliorés
 
@@ -64,7 +56,6 @@
 }
 ```
 
-### Pourquoi `@ts-nocheck` ?
 Les imports ESM depuis `https://esm.sh` et `https://deno.land` ne fournissent pas de types TypeScript natifs dans Deno. Le commentaire explicite la raison technique.
 
 ---
@@ -83,7 +74,6 @@ Les imports ESM depuis `https://esm.sh` et `https://deno.land` ne fournissent pa
 
 1. **Debugging amélioré** - Stack traces complètes dans les logs
 2. **Type safety** - Erreurs typées avec type guards
-3. **Clarté** - Commentaires explicatifs sur `@ts-nocheck`
 4. **Maintenabilité** - Pattern uniforme sur toutes les fonctions OpenAI
 
 ---

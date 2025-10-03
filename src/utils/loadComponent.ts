@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import React, { ComponentType } from 'react';
 

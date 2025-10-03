@@ -1,4 +1,3 @@
-// @ts-nocheck
 interface PerformanceMetrics {
   route: string;
   loadTime: number;

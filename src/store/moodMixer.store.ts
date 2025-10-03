@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { create } from 'zustand';
 
 import { moodPresetsService, MoodPresetPayload } from '@/services/moodPresetsService';

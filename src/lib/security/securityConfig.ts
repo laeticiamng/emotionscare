@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 // Security configuration and utilities
 export const SECURITY_CONFIG = {

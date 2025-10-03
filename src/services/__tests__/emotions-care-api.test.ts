@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { vi, describe, it, expect } from 'vitest';
 import { supabase } from '@/integrations/supabase/client';
 import { emotionsCareApi } from '../emotions-care-api';

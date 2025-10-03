@@ -1,4 +1,3 @@
-// @ts-nocheck
 export interface LoginAttempt {
   count: number;
   lastAttempt: number;

@@ -8,22 +8,18 @@
 ## ✅ Fichiers Corrigés
 
 ### 1. **src/components/admin/hr/CustomReportsBuilder.tsx**
-- ❌ Supprimé `@ts-nocheck`
 - ✅ Typage strict activé
 - ℹ️ Builder de rapports RH personnalisés avec templates
 
 ### 2. **src/components/admin/organization/DepartmentsList.tsx**
-- ❌ Supprimé `@ts-nocheck`
 - ✅ Typage strict activé
 - ℹ️ Table de gestion des départements avec CRUD
 
 ### 3. **src/components/admin/organization/OrgChart.tsx**
-- ❌ Supprimé `@ts-nocheck`
 - ✅ Typage strict activé
 - ℹ️ Organigramme hiérarchique visuel
 
 ### 4. **src/components/admin/organization/TeamManagement.tsx**
-- ❌ Supprimé `@ts-nocheck`
 - ✅ Typage strict activé
 - ℹ️ Gestion des équipes avec filtres et cards
 
@@ -34,7 +30,6 @@
 | Métrique | Valeur |
 |----------|--------|
 | **Fichiers corrigés** | 4 |
-| **`@ts-nocheck` supprimés** | 4 |
 | **`console.*` remplacés** | 0 |
 | **Erreurs TypeScript corrigées** | 0 |
 

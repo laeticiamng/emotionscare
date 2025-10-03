@@ -1,4 +1,3 @@
-// @ts-nocheck
 export type JournalAction =
   | { action: 'pin_themes'; keys: string[] }
   | { action: 'show_banner'; key: 'calm_suggest' }

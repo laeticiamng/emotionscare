@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 /**
  * Type Consistency Check Script

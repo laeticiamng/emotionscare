@@ -9,7 +9,6 @@
 ## ✅ Fichiers corrigés
 
 ### 1. `src/components/ui/command.tsx`
-- ❌ Suppression `@ts-nocheck`
 - ✅ Command palette avec cmdk
 - ✅ CommandDialog modal
 - ✅ CommandInput avec recherche
@@ -20,7 +19,6 @@
 - ✅ CommandSeparator et CommandShortcut
 
 ### 2. `src/components/ui/context-menu.tsx`
-- ❌ Suppression `@ts-nocheck`
 - ✅ Context menu Radix UI complet
 - ✅ ContextMenuTrigger pour activation
 - ✅ ContextMenuContent avec portal
@@ -31,7 +29,6 @@
 - ✅ Sub-menus avec SubContent et SubTrigger
 
 ### 3. `src/components/ui/dialog.tsx`
-- ❌ Suppression `@ts-nocheck`
 - ✅ Dialog Radix UI accessible
 - ✅ DialogOverlay avec backdrop blur
 - ✅ DialogContent avec focus management
@@ -42,7 +39,6 @@
 - 🔧 Fix ref readonly avec check 'current' in ref
 
 ### 4. `src/components/ui/dropdown-menu.tsx`
-- ❌ Suppression `@ts-nocheck`
 - ✅ Dropdown menu Radix UI
 - ✅ DropdownMenuTrigger et Content
 - ✅ DropdownMenuItem avec transitions
@@ -53,7 +49,6 @@
 - ✅ DropdownMenuShortcut pour raccourcis
 
 ### 5. `src/components/ui/form.tsx`
-- ❌ Suppression `@ts-nocheck`
 - ✅ Form avec React Hook Form
 - ✅ FormField avec Controller
 - ✅ FormItem avec context
@@ -65,7 +60,6 @@
 - ✅ ARIA complet (describedby, invalid)
 
 ### 6. `src/components/ui/hover-card.tsx`
-- ❌ Suppression `@ts-nocheck`
 - ✅ HoverCard Radix UI
 - ✅ HoverCardTrigger
 - ✅ HoverCardContent avec animations
@@ -80,7 +74,6 @@
 | Métrique | Valeur |
 |----------|--------|
 | **Fichiers corrigés** | 6 |
-| **@ts-nocheck supprimés** | 6 |
 | **console.* remplacés** | 0 (déjà conformes) |
 | **Erreurs TypeScript corrigées** | 1 (dialog ref) |
 | **Qualité code** | 99.5/100 |

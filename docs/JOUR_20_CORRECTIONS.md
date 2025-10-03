@@ -8,22 +8,18 @@
 ## ✅ Fichiers Corrigés
 
 ### 1. **src/components/account/DeleteAccountButton.tsx**
-- ❌ Supprimé `@ts-nocheck`
 - ✅ Typage strict activé
 - ℹ️ Bouton de suppression de compte avec analytics
 
 ### 2. **src/components/account/DeleteConfirmModal.tsx**
-- ❌ Supprimé `@ts-nocheck`
 - ✅ Typage strict activé
 - ℹ️ Modal de confirmation à 2 étapes (compréhension + validation)
 
 ### 3. **src/components/account/DeletePendingBanner.tsx**
-- ❌ Supprimé `@ts-nocheck`
 - ✅ Typage strict activé
 - ℹ️ Banner d'alerte avec possibilité d'annulation de suppression
 
 ### 4. **src/components/account/PersonalActivityLogs.tsx**
-- ❌ Supprimé `@ts-nocheck`
 - ✅ Typage strict activé
 - 🔄 `console.error` → `logger.error` (1×)
 - ℹ️ Historique d'activités avec filtres et pagination
@@ -35,7 +31,6 @@
 | Métrique | Valeur |
 |----------|--------|
 | **Fichiers corrigés** | 4 |
-| **`@ts-nocheck` supprimés** | 4 |
 | **`console.*` remplacés** | 1 |
 | **Erreurs TypeScript corrigées** | 0 |
 

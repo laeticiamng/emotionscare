@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { resolveCors, preflightResponse, rejectCors, mergeHeaders } from "../_shared/cors.ts";
 import { validateJwt } from "../_shared/auth.ts";

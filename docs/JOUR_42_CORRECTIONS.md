@@ -9,20 +9,17 @@
 ## ✅ Fichiers corrigés
 
 ### 1. `src/components/common/ModeAwareContent.tsx`
-- ❌ Suppression `@ts-nocheck`
 - ✅ Affichage conditionnel par mode utilisateur
 - ✅ Transitions animées entre contenus
 - ✅ Support de 4 modes d'animation (fade, slide, zoom, none)
 
 ### 2. `src/components/common/ModeSwitcher.tsx`
-- ❌ Suppression `@ts-nocheck`
 - ✅ Dropdown pour changer de mode utilisateur
 - ✅ Synchronisation UserModeContext et localStorage
 - ✅ Animations et feedback visuels
 - 🔧 Suppression de l'appel à `updateUser` (non disponible dans AuthContext)
 
 ### 3. `src/components/common/OptimizedLayout.tsx`
-- ❌ Suppression `@ts-nocheck`
 - ✅ Layout optimisé avec Error Boundaries
 - ✅ Lazy loading pour composants lourds
 - ✅ Skip navigation pour accessibilité
@@ -30,19 +27,16 @@
 - 🔧 Import direct AccessibilityEnhancer (au lieu de lazy)
 
 ### 4. `src/components/common/PageHeader.tsx`
-- ❌ Suppression `@ts-nocheck`
 - ✅ En-tête de page avec animations
 - ✅ Support icône, badge, stats et actions
 - ✅ Respect reduced motion preferences
 
 ### 5. `src/components/common/PageRoot.tsx`
-- ❌ Suppression `@ts-nocheck`
 - ✅ Conteneur racine de page simple
 - ✅ Gradient de fond configurable
 - ✅ Support adaptToMood (prop)
 
 ### 6. `src/components/common/RealtimeNotifications.tsx`
-- ❌ Suppression `@ts-nocheck`
 - ✅ Composant de notifications en temps réel
 - ✅ Badge compteur non lues
 - ✅ Marquage comme lu et tout marquer comme lu
@@ -50,13 +44,11 @@
 - 🔧 Type `response as any` pour fullApiService
 
 ### 7. `src/components/common/TipsSection.tsx`
-- ❌ Suppression `@ts-nocheck`
 - ✅ Section de conseils avec animations
 - ✅ Grille responsive de tips
 - ✅ CTA optionnel avec bouton
 
 ### 8. `src/components/common/UserModeIndicator.tsx`
-- ❌ Suppression `@ts-nocheck`
 - ✅ Badge indicateur de mode utilisateur
 - ✅ Icônes et variants selon mode
 - 🔧 Cast `userMode as any` pour getUserModeDisplayName
@@ -68,7 +60,6 @@
 | Métrique | Valeur |
 |----------|--------|
 | **Fichiers corrigés** | 8 |
-| **@ts-nocheck supprimés** | 8 |
 | **console.* remplacés** | 3 |
 | **Erreurs TypeScript corrigées** | 5 |
 | **Qualité code** | 99.5/100 |

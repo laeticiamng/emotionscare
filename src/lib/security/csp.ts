@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 /**
  * Content Security Policy configuration

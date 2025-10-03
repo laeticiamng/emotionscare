@@ -1,10 +1,8 @@
-// @ts-nocheck
 /**
  * GlobalSearchCommand - Recherche globale avec raccourcis clavier
  * Commande palette pour navigation rapide
  */
 
-// @ts-nocheck
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';

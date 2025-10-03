@@ -1,4 +1,3 @@
-// @ts-nocheck
 // ============================================================================
 //  EmotionsCare – UI Component Registry (UI pur uniquement)
 //  Utilisez `npm run generate:ui-registry` après toute modification.

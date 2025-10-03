@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 /**
  * Utility functions for formatting values

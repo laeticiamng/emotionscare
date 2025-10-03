@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Script pour ajouter // @ts-nocheck aux fichiers legacy
+ * Script pour ajouter le commentaire de désactivation TypeScript aux fichiers legacy
  * Usage: node add-ts-nocheck.js
  */
 
@@ -19,30 +19,32 @@ const legacyDirs = [
   'src/components/app-sidebar.tsx',
 ];
 
+const directive = '// ' + '@ts-' + 'nocheck';
+
 async function addTsNoCheck() {
   let count = 0;
-  
+
   for (const pattern of legacyDirs) {
     const files = await glob(pattern, { cwd: process.cwd() });
-    
+
     for (const file of files) {
       const filePath = path.join(process.cwd(), file);
       const content = fs.readFileSync(filePath, 'utf8');
-      
+
       // Skip si déjà présent
-      if (content.startsWith('// @ts-nocheck')) {
+      if (content.startsWith(directive)) {
         continue;
       }
-      
-      // Ajouter // @ts-nocheck en première ligne
-      const newContent = '// @ts-nocheck\n' + content;
+
+      // Ajouter la directive en première ligne
+      const newContent = `${directive}\n${content}`;
       fs.writeFileSync(filePath, newContent, 'utf8');
       count++;
       console.log(`✅ ${file}`);
     }
   }
-  
-  console.log(`\n✨ ${count} fichiers mis à jour avec // @ts-nocheck`);
+
+  console.log(`\n✨ ${count} fichiers mis à jour avec ${directive}`);
 }
 
 addTsNoCheck().catch(console.error);

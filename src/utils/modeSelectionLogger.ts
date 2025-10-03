@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 export const logModeSelection = (selectionType: string, additionalData?: any) => {
   const logData = {

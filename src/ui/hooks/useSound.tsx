@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useRef, useCallback } from 'react';
 
 interface UseSoundOptions {

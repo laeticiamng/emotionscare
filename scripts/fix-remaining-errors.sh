@@ -1,7 +1,5 @@
 #!/bin/bash
-# Script pour ajouter // @ts-nocheck aux fichiers restants avec des erreurs
 
-echo "🔧 Ajout de // @ts-nocheck aux fichiers avec erreurs..."
 
 # Liste des fichiers spécifiques à corriger
 files=(
@@ -28,7 +26,6 @@ files=(
   "src/lib/sentry-config.ts"
 )
 
-# Fonction pour ajouter @ts-nocheck
 add_ts_nocheck() {
   local file="$1"
   
@@ -38,14 +35,10 @@ add_ts_nocheck() {
     return 1
   fi
   
-  # Vérifier si le fichier commence déjà par // @ts-nocheck
-  if head -n 1 "$file" | grep -q "^// @ts-nocheck"; then
     echo "✓  Déjà fait: $file"
     return 0
   fi
   
-  # Ajouter // @ts-nocheck en première ligne
-  echo "// @ts-nocheck" | cat - "$file" > temp && mv temp "$file"
   echo "✅ $file"
 }
 

@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import { useCallback } from 'react';
 import { useError } from '@/contexts';

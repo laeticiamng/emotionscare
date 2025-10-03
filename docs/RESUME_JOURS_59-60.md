@@ -9,7 +9,6 @@
 
 ### Progression globale
 - **Fichiers traités** : 12 composants UI
-- **Directives `@ts-nocheck` supprimées** : 12
 - **Imports corrigés** : 1
 - **Typages génériques corrigés** : 2
 
@@ -33,7 +32,6 @@
   - Suppression import `lazy` non utilisé
 
 ### Statistiques Jour 59
-- **Directives `@ts-nocheck` supprimées** : 6
 - **Imports corrigés** : 1
 - **Typages génériques** : 2
 - **Erreurs TypeScript** : 3
@@ -61,7 +59,6 @@
 - `useEnhancedToast` - Hook pour notifications
 
 ### Statistiques Jour 60
-- **Directives `@ts-nocheck` supprimées** : 6
 - **Imports corrigés** : 0
 - **Erreurs TypeScript** : 0
 - **Conformité** : ✅ 100%
@@ -72,7 +69,6 @@
 
 ### Réalisations
 - ✅ **12 composants UI** corrigés (enhanced + UX)
-- ✅ **12 directives `@ts-nocheck`** supprimées
 - ✅ **3 corrections** (imports + typages génériques)
 - ✅ **0 `console.*` restants** (aucun présent)
 - ✅ **100% conformité TypeScript strict**

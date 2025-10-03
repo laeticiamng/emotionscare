@@ -14,8 +14,6 @@ Améliorer la qualité du code TypeScript des edge functions tout en maintenant 
 
 Vu que les imports ESM depuis `esm.sh` ne fournissent pas de types TypeScript natifs dans Deno, l'approche choisie est :
 
-1. ✅ Conserver `@ts-nocheck` pour les imports ESM (limitation Deno)
-2. ✅ Ajouter commentaires explicatifs sur pourquoi @ts-nocheck est nécessaire
 3. ✅ **Améliorer drastiquement le typage interne** (erreurs, paramètres, etc.)
 4. ✅ Créer types partagés dans `_shared/types.ts`
 
@@ -38,7 +36,6 @@ export type SuccessResponse<T> = { success: boolean; data?: T }
 
 #### ✅ `openai-chat/index.ts`
 **Corrections:**
-- ❌ Retiré: `@ts-nocheck` simple
 - ✅ Ajouté: Typage explicite des erreurs `error: unknown`
 - ✅ Ajouté: Type guard `error instanceof Error`
 - ✅ Amélioré: Gestion erreurs avec fallback
@@ -61,7 +58,6 @@ export type SuccessResponse<T> = { success: boolean; data?: T }
 
 #### ✅ `journal-entry/index.ts`
 **Corrections:**
-- ✅ Ajouté: Commentaire explicatif sur @ts-nocheck
 - ✅ Typage: `error: unknown` avec type guard
 - ✅ Logging: Meilleur contexte d'erreur
 
@@ -103,7 +99,6 @@ export type SuccessResponse<T> = { success: boolean; data?: T }
 ```
 ❌ error.message sur type unknown → Crash potentiel
 ❌ Pas de type guards → Erreurs runtime
-❌ @ts-nocheck sans explication → Confusion dev
 ```
 
 ### Après
@@ -133,13 +128,11 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 |----------|-------------|----------------|
 | Types locaux | ⚠️ Maintenance lourde | Non recommandé |
 | @deno-types | 🟠 Partielle | Complexe |
-| **@ts-nocheck + typage interne** | ✅ Pratique | **✅ Retenue** |
 | Attendre Deno 2.x | 🔮 Future | Long terme |
 
 ### Pattern Adopté
 
 ```typescript
-// @ts-nocheck
 // Note: ESM imports don't provide TypeScript types in Deno
 // Types améliorés avec gestion d'erreurs appropriée
 
@@ -206,7 +199,6 @@ try {
 - [ ] Mesurer couverture
 
 ### Phase 4 - Composants UI (~3h)
-- [ ] Retirer @ts-nocheck de 20 composants critiques
 - [ ] Typer props correctement
 - [ ] Utiliser TypeScript strict
 
@@ -230,7 +222,6 @@ try {
 
 ### 2. Documentation des Limitations
 ```typescript
-// @ts-nocheck
 // Note: ESM imports don't provide TypeScript types in Deno
 // Types améliorés avec gestion d'erreurs appropriée
 ```
@@ -246,13 +237,11 @@ console.error(error)                              // ❌
 ## 🎓 Apprentissages
 
 ### Ce qui fonctionne ✅
-- Typage interne strict même avec @ts-nocheck sur imports
 - Type guards systématiques pour erreurs
 - Pattern uniforme facilite maintenance
 - Documentation inline aide onboarding
 
 ### Limitations Acceptées ⚠️
-- @ts-nocheck requis pour imports ESM dans Deno
 - Types Supabase non disponibles nativement
 - Alternative complexe non justifiée pour le moment
 

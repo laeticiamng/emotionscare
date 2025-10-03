@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { Badge, Challenge, GamificationStats } from '@/types/gamification';
 
 // Mock service for gamification features

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Composant : Galerie/Grimoire des cartes collectées
  */

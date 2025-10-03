@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 /**
  * Utilitaires pour la gestion de la confidentialité et l'anonymisation des données

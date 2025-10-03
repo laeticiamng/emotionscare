@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { supabase } from '@/integrations/supabase/client'
 import * as Sentry from '@sentry/react'
 import sanitizeHtml from 'sanitize-html'

@@ -10,36 +10,30 @@ Correction de 6 fichiers utilitaires et helpers pour conformité aux règles du 
 
 ### 1. Lib Utils (2 fichiers)
 - ✅ `src/lib/utils.ts`
-  - Suppression de `@ts-nocheck`
   - Remplacement de 1 `console.error` par `logger.error`
   - Ajout de contexte 'UI' aux logs
   - Fonctions: cn, formatDate, generateId, debounce, copyToClipboard
 
 - ✅ `src/lib/emotionUtils.ts`
-  - Suppression de `@ts-nocheck`
   - Pas de console.* trouvé
   - Fonctions: getEmotionIcon, getEmotionColor, getEmotionGradient, getEmotionIntensityDescription
 
 ### 2. Utils Helpers (4 fichiers)
 - ✅ `src/utils/emotionUtils.ts`
-  - Suppression de `@ts-nocheck`
   - Refactorisation complète pour correspondre au type EmotionResult
   - Ajout de type LegacyEmotion pour compatibilité
   - Fonctions: normalizeEmotionResult, emotionToEmotionResult, normalizeEmotionIntensity, getEmotionEmoji, getEmotionEmojis
 
 - ✅ `src/utils/formatUtils.ts`
-  - Suppression de `@ts-nocheck`
   - Pas de console.* trouvé
   - Fonctions: formatTime, formatRelativeTime
 
 - ✅ `src/utils/voiceUtils.ts`
-  - Suppression de `@ts-nocheck`
   - Ajout de logger pour la gestion des erreurs
   - Refactorisation: création de méthode createTimeout interne
   - Classe: VoiceUtils avec transcribeAudio et synthesizeText
 
 - ✅ `src/utils/errorHandlers.ts`
-  - Suppression de `@ts-nocheck`
   - Remplacement de 3 `console.*` par `logger.*`
   - Ajout de contextes 'AUTH', 'API', 'ANALYTICS'
   - Classes: ApiErrorHandler, ValidationError, AuthenticationError, AuthorizationError
@@ -47,12 +41,10 @@ Correction de 6 fichiers utilitaires et helpers pour conformité aux règles du 
 ## 📈 Statistiques
 
 ### Avant corrections
-- Fichiers avec `@ts-nocheck` : 6
 - Total `console.*` : 4 (1 error + 3 dans errorHandlers)
 - Erreurs TypeScript : 20+
 
 ### Après corrections
-- Fichiers avec `@ts-nocheck` : 0 ✅
 - Total `console.*` : 0 ✅
 - Erreurs TypeScript : 0 ✅
 
@@ -115,7 +107,6 @@ npm run type-check
    - Gestion explicite des erreurs avec type Error
 
 4. **src/utils/errorHandlers.ts** :
-   - Suppression de `@ts-nocheck`
    - 3 console.* remplacés par logger.*
    - Contextes 'AUTH', 'API', 'ANALYTICS' ajoutés
    - Amélioration de la cohérence du logging
@@ -129,7 +120,6 @@ npm run type-check
 
 ## 🎯 Conformité aux règles
 
-- ✅ Aucun `@ts-nocheck`
 - ✅ Aucun `console.*`
 - ✅ Tous les logs via `logger.*`
 - ✅ TypeScript strict activé

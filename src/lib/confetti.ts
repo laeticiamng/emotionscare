@@ -1,4 +1,3 @@
-// @ts-nocheck
 import confetti from 'canvas-confetti';
 
 export { confetti };

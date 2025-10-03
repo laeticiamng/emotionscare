@@ -10,7 +10,6 @@
 ### Composants d'Accessibilité
 
 - ✅ **`src/components/accessibility/AccessibilityToolbar.tsx`**
-  - Suppression de `@ts-nocheck` (ligne 1)
   - Import du `logger` ajouté
   - Remplacement de `console.warn('[AccessibilityToolbar] Failed to read settings')` → `logger.warn('Failed to read accessibility settings', error, 'UI')`
   - Remplacement de `console.error('Erreur lors du chargement...')` → `logger.error('Error loading accessibility settings', error, 'UI')`
@@ -20,21 +19,18 @@
   - Toolbar d'accessibilité complète avec 8 options (contraste, police, daltonisme, etc.)
 
 - ✅ **`src/components/accessibility/AccessibilityEnhancer.tsx`**
-  - Suppression de `@ts-nocheck` (ligne 1)
   - Import du `logger` ajouté
   - Remplacement de `console.warn('[AccessibilityEnhancer] Failed to persist settings')` → `logger.warn('Failed to persist accessibility settings', error, 'UI')`
   - Total : **1 `console.*` remplacé**
   - Panel simplifié d'accessibilité avec détection automatique des préférences système
 
 - ✅ **`src/components/accessibility/ZeroNumberBoundary.tsx`**
-  - Suppression de `@ts-nocheck` (ligne 1)
   - Import du `logger` ajouté
   - Remplacement de `console.warn('ZeroNumberBoundary detected...')` → `logger.warn('ZeroNumberBoundary detected numeric characters', { snippet }, 'UI')`
   - Total : **1 `console.*` remplacé**
   - Boundary pour détecter les caractères numériques non désirés
 
 - ✅ **`src/components/ZeroNumberBoundary.tsx`**
-  - Suppression de `@ts-nocheck` (ligne 1)
   - Import du `logger` ajouté
   - Remplacement de `console.warn('[ZeroNumberBoundary] Numeric characters...')` → `logger.warn('ZeroNumberBoundary: Numeric characters detected...', {}, 'UI')`
   - Total : **1 `console.*` remplacé**
@@ -43,7 +39,6 @@
 ### Composants de Debug
 
 - ✅ **`src/components/DebugHomePage.tsx`**
-  - Suppression de `@ts-nocheck` (ligne 1)
   - Import du `logger` ajouté
   - Remplacement de `console.log('[DebugHomePage] Component rendered')` → `logger.debug('DebugHomePage component rendered', {}, 'UI')`
   - Remplacement de `console.error('[DebugHomePage] Error in render:')` → `logger.error('Error in DebugHomePage render', error, 'UI')`
@@ -56,12 +51,10 @@
 
 ### Impact Jour 15
 - Composants d'accessibilité corrigés : **5** ✅
-- Total `@ts-nocheck` supprimés : **5**
 - Total `console.*` remplacés : **9**
 - Contexte utilisé : 'UI' pour tous les composants
 
 ### Impact cumulé (Jours 7-15)
-| Jour | Catégorie | Fichiers | @ts-nocheck | console.* |
 |------|-----------|----------|-------------|-----------|
 | J7 | Lib/Utils | 6 | 6 | 1 |
 | J8 | Hooks | 5 | 5 | 0 |
@@ -255,7 +248,6 @@ safeGetDocumentRoot();
 
 ## 🏆 Conformité aux règles
 
-✅ **Règle 1** : Suppression de `@ts-nocheck` dans tous les composants  
 ✅ **Règle 2** : Remplacement de tous les `console.*` par `logger.*`  
 ✅ **Règle 3** : Contexte 'UI' pour tous les logs  
 ✅ **Règle 4** : TypeScript strict activé  

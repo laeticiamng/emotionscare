@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import { usePredictiveAnalytics } from '@/contexts/PredictiveAnalyticsContext';
 import { useState } from 'react';

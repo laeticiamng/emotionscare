@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { Track } from '@/contexts/MusicContext';
 
 export const sampleTrack = (id = '1'): Track => ({

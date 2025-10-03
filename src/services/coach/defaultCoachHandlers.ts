@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { chatCompletion, analyzeEmotion } from '@/services/openai';
 import { ChatMessage } from '@/types/chat';
 

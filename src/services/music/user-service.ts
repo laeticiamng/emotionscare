@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import { supabase } from '@/integrations/supabase/client';
 import { MusicTrack } from '@/types/music';

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Optimisateur de performances intelligent
  * Cache adaptatif, lazy loading et préchargement

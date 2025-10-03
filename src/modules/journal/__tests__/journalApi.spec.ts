@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { SanitizedNote } from '../types'
 import { __testUtils__ } from '@/services/journal/journalApi'

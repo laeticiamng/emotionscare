@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { User } from '@/types';
 import { mockUsers } from '@/data/mockUsers';
 

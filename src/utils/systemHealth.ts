@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 interface HealthCheck {
   name: string;

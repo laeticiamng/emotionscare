@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import React from 'react';
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';

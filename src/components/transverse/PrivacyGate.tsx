@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { usePrivacy } from "@/core/privacy";
 import { NoCamVariant } from "./NoCamVariant";
 import { NoMicVariant } from "./NoMicVariant";

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * GAMIFICATION PAGE - EMOTIONSCARE
  * Page de gamification accessible WCAG 2.1 AA

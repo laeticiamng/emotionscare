@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import { fastForwardTimers } from "@/tests/__mocks__/timers";
 import { describe, it, expect, vi, beforeEach, beforeAll, afterAll } from 'vitest';

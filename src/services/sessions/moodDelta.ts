@@ -1,4 +1,3 @@
-// @ts-nocheck
 export type MoodSnapshot = {
   valence?: number | null
   arousal?: number | null

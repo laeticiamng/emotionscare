@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 /**
  * Validateur de préparation à la production

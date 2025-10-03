@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 // Exports par défaut réexportés comme exports nommés
 export { default as EmotionalWeatherCard } from './EmotionalWeatherCard';

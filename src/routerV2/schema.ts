@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * RouterV2 Schema - Source de vérité unique pour le routing
  * TICKET: FE/BE-Router-Cleanup-01

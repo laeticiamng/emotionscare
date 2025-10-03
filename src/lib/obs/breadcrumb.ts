@@ -1,4 +1,3 @@
-// @ts-nocheck
 import type { Breadcrumb } from '@sentry/types';
 
 import { Sentry } from '@/lib/obs/sentry.web';

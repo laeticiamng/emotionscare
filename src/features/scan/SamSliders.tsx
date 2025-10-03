@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { Slider } from '@/components/ui/slider';

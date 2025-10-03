@@ -1,4 +1,3 @@
-// @ts-nocheck
 import type { UIHint } from './types';
 
 export interface StorySynthOrchestratorInput {

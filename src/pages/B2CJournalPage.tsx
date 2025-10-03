@@ -1,4 +1,3 @@
-// @ts-nocheck
 import PageRoot from '@/components/common/PageRoot'
 import JournalView from './journal/JournalView'
 import { Sparkles } from 'lucide-react'

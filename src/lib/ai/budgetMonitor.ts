@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { supabase } from '@/integrations/supabase/client';
 import { BUDGET_THRESHOLDS, BUDGET_FALLBACKS } from './openai-config';
 

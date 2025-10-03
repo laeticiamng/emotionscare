@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Optimiseur de composants React pour améliorer les performances
  */

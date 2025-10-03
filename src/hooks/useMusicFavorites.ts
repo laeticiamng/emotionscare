@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useCallback } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 

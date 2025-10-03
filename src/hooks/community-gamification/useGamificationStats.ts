@@ -1,6 +1,4 @@
-// @ts-nocheck
 
-// @ts-nocheck
 import { useState, useEffect } from 'react';
 import { Badge, Challenge } from '@/types/badge';
 import { mockBadges, mockChallenges } from './mockData';

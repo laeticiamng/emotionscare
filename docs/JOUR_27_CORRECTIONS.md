@@ -8,28 +8,23 @@
 ## ✅ Fichiers Corrigés
 
 ### 1. **src/components/admin/predictive/PredictiveBurnoutDetection.tsx**
-- ❌ Supprimé `@ts-nocheck`
 - ✅ Typage strict activé
 - ℹ️ Détection prédictive de burnout avec ML
 
 ### 2. **src/components/admin/reports/ReportsDashboard.tsx**
-- ❌ Supprimé `@ts-nocheck`
 - ✅ Typage strict activé
 - 🔄 `alert()` → `toast()` (1×)
 - ℹ️ Dashboard de gestion des rapports RH
 
 ### 3. **src/components/admin/settings/ThemeSettingsTab.tsx**
-- ❌ Supprimé `@ts-nocheck`
 - ✅ Typage strict activé
 - ℹ️ Configuration du thème visuel
 
 ### 4. **src/components/admin/tabs/activity-logs/ActionBar.tsx**
-- ❌ Supprimé `@ts-nocheck`
 - ✅ Typage strict activé
 - ℹ️ Barre d'actions pour export CSV
 
 ### 5. **src/components/admin/tabs/activity-logs/types.ts**
-- ❌ Supprimé `@ts-nocheck`
 - ✅ Typage strict activé
 - ℹ️ Définitions de types pour activity logs
 
@@ -40,7 +35,6 @@
 | Métrique | Valeur |
 |----------|--------|
 | **Fichiers corrigés** | 5 |
-| **`@ts-nocheck` supprimés** | 5 |
 | **`alert()` remplacés** | 1 |
 | **Erreurs TypeScript corrigées** | 0 |
 

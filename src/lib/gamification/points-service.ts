@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 // Award points to a user
 export const awardPoints = async (

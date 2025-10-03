@@ -9,7 +9,6 @@
 ## ✅ Fichiers corrigés
 
 ### 1. `src/components/ui/sheet.tsx`
-- ❌ Suppression `@ts-nocheck`
 - ✅ Sheet (drawer) Radix Dialog
 - ✅ SheetOverlay avec backdrop
 - ✅ SheetContent avec 4 positions (top, bottom, left, right)
@@ -21,7 +20,6 @@
 - 🔧 Fix ref readonly avec check 'current' in ref
 
 ### 2. `src/components/ui/skeleton.tsx`
-- ❌ Suppression `@ts-nocheck`
 - ✅ Skeleton pour loading states
 - ✅ Animate-pulse automatique
 - ✅ Background muted
@@ -30,7 +28,6 @@
 - ✅ Super simple et efficace
 
 ### 3. `src/components/ui/table.tsx`
-- ❌ Suppression `@ts-nocheck`
 - ✅ Table HTML sémantique
 - ✅ TableHeader avec thead
 - ✅ TableBody avec tbody
@@ -42,7 +39,6 @@
 - ✅ Wrapper avec overflow-auto
 
 ### 4. `src/components/ui/tabs.tsx`
-- ❌ Suppression `@ts-nocheck`
 - ✅ Tabs Radix UI
 - ✅ TabsList avec background muted
 - ✅ TabsTrigger avec état active
@@ -52,7 +48,6 @@
 - ✅ Hauteur 40px (h-10)
 
 ### 5. `src/components/ui/textarea.tsx`
-- ❌ Suppression `@ts-nocheck`
 - ✅ Textarea HTML natif
 - ✅ Min hauteur 80px
 - ✅ Resize vertical par défaut
@@ -62,7 +57,6 @@
 - ✅ Border input
 
 ### 6. `src/components/ui/toast.tsx`
-- ❌ Suppression `@ts-nocheck`
 - ✅ Toast Radix UI complet
 - ✅ ToastProvider pour context
 - ✅ ToastViewport pour container
@@ -81,7 +75,6 @@
 | Métrique | Valeur |
 |----------|--------|
 | **Fichiers corrigés** | 6 |
-| **@ts-nocheck supprimés** | 6 |
 | **console.* remplacés** | 1 (tooltip) |
 | **Erreurs TypeScript corrigées** | 2 (sheet ref, toaster variant) |
 | **Qualité code** | 99.5/100 |

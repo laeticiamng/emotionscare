@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 // Générateur de piste EmotionsCare à partir de texte
 import { HumeClient } from './humeClient';

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { forwardRef } from 'react';
 
 import { cn } from '@/lib/utils';

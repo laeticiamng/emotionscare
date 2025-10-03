@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 /**
  * Generic sorting utility functions for table components

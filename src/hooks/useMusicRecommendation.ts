@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useEffect, useState } from 'react';
 import { useMusic, Track, MusicPlaylist } from '@/contexts/MusicContext';
 import { useToast } from '@/hooks/use-toast';

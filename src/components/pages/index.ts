@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Export centralisé des composants de pages - CORRIGÉ
  * Utilise les vrais composants créés

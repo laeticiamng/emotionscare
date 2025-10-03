@@ -1,6 +1,4 @@
-// @ts-nocheck
 
-// @ts-nocheck
 import React from 'react';
 import { motion } from 'framer-motion';
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';

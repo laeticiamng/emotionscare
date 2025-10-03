@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import { EmotionResult, EmotionRecommendation } from '@/types/emotion';
 import { v4 as uuid } from 'uuid';
