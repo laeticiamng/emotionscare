@@ -368,8 +368,8 @@ Exemple: badges_select_own, badges_insert_own
 2. ✅ **[15 min]** Créer fonction `has_role()` SECURITY DEFINER - **FAIT**
 3. ✅ **[30 min]** Migrer données depuis `profiles.role` - **FAIT**
 4. ✅ **[2h]** Remplacer toutes policies utilisant `profiles.role` par `has_role()` - **FAIT**
-5. ⏳ **[1h]** Sécuriser `api_integrations` (retirer `USING (true)`) - **PROCHAINE ÉTAPE**
-6. ⏳ **[30 min]** Activer RLS sur tables manquantes
+5. ✅ **[1h]** Sécuriser `api_integrations` (retirer `USING (true)`) - **FAIT**
+6. ⏳ **[30 min]** Activer RLS sur tables manquantes - **PROCHAINE ÉTAPE**
 7. ⏳ **[30 min]** Tests sécurité + validation
 
 ### Phase 2 : HAUTE PRIORITÉ (J4)
@@ -535,18 +535,37 @@ AND qual LIKE '%true%';
 ✅ Toutes les politiques admin migrées vers has_role()
 ```
 
+### ✅ Migration 3 - Sécurisation api_integrations
+**Date** : 2025-10-03 15:45  
+**Fichier** : `20251003154524_*.sql`
+
+**Réalisations** :
+- ✅ Suppression policies `USING (true)` trop permissives
+- ✅ Création policies admin-only pour api_integrations :
+  - `api_integrations_admin_select`
+  - `api_integrations_admin_insert`
+  - `api_integrations_admin_update`
+  - `api_integrations_admin_delete`
+- ✅ Commentaires de documentation ajoutés
+
+**Impact Sécurité** :
+```
+✅ Configurations API ne sont plus exposées publiquement
+✅ Seuls les admins peuvent gérer les intégrations
+✅ Élimination du risque d'exposition de secrets
+```
+
 ### 📊 Progression Phase 1
 ```
-✅ Étape 1-4 : COMPLÉTÉES (100%)
-⏳ Étape 5 : Sécuriser api_integrations (Prochaine)
-⏳ Étape 6 : Activer RLS tables manquantes
+✅ Étape 1-5 : COMPLÉTÉES (71%)
+⏳ Étape 6 : Activer RLS tables manquantes (Prochaine)
 ⏳ Étape 7 : Tests sécurité
 ```
 
-**Score Sécurité Actuel** : 🟡 **68/100** (+16 points)
+**Score Sécurité Actuel** : 🟡 **72/100** (+20 points)
 - ✅ Pas de récursion RLS
 - ✅ Rôles dans table dédiée
-- ⏳ Policies trop permissives à corriger
+- ✅ API integrations sécurisées
 - ⏳ Tables sans RLS à sécuriser
 
 ---
@@ -555,20 +574,20 @@ AND qual LIKE '%true%';
 
 Avant de clôturer la Vague 1 :
 
-- [ ] Table `user_roles` créée avec enum `app_role`
-- [ ] Fonction `has_role()` SECURITY DEFINER créée
-- [ ] Migration des rôles depuis `profiles` effectuée
-- [ ] Toutes policies `profiles.role` remplacées par `has_role()`
-- [ ] Policies `USING (true)` sur données sensibles sécurisées
-- [ ] RLS activé sur toutes tables sensibles
-- [ ] Tests sécurité passent (4 tests minimum)
-- [ ] Documentation RLS mise à jour
-- [ ] Score sécurité ≥ 75/100
+- [x] Table `user_roles` créée avec enum `app_role` ✅
+- [x] Fonction `has_role()` SECURITY DEFINER créée ✅
+- [x] Migration des rôles depuis `profiles` effectuée ✅
+- [x] Toutes policies `profiles.role` remplacées par `has_role()` ✅
+- [x] Policies `USING (true)` sur données sensibles sécurisées ✅
+- [ ] RLS activé sur toutes tables sensibles ⏳
+- [ ] Tests sécurité passent (4 tests minimum) ⏳
+- [ ] Documentation RLS mise à jour ⏳
+- [ ] Score sécurité ≥ 75/100 ⏳
 
 ---
 
-**Status** : 🔴 EN COURS - Vague 1 démarrée  
-**Prochaine Étape** : Créer migration SQL pour user_roles
+**Status** : 🟡 EN COURS - 71% Phase 1 complétée  
+**Prochaine Étape** : Activer RLS sur tables manquantes (rate_limit_counters, user_quotas)
 
 ---
 
