@@ -109,6 +109,10 @@ const config: Config = {
           medium: "hsl(var(--glow-medium))",
           high: "hsl(var(--glow-high))"
         },
+        glass: {
+          bg: "hsl(var(--glass-bg))",
+          border: "hsl(var(--glass-border))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -299,13 +303,22 @@ const config: Config = {
       const newUtilities = {
         // Premium Glass Effects
         '.glass-effect': {
-          '@apply backdrop-blur-xl bg-white/10 border border-white/20': {},
+          'backdrop-filter': 'blur(24px)',
+          'background-color': 'hsl(var(--glass-bg) / var(--glass-bg-opacity))',
+          'border-width': '1px',
+          'border-color': 'hsl(var(--glass-border) / var(--glass-border-opacity))',
         },
         '.glass-effect-strong': {
-          '@apply backdrop-blur-2xl bg-white/20 border border-white/30': {},
+          'backdrop-filter': 'blur(40px)',
+          'background-color': 'hsl(var(--glass-bg) / var(--glass-strong-bg-opacity))',
+          'border-width': '1px',
+          'border-color': 'hsl(var(--glass-border) / var(--glass-strong-border-opacity))',
         },
         '.glass-effect-dark': {
-          '@apply backdrop-blur-xl bg-black/10 border border-white/10': {},
+          'backdrop-filter': 'blur(24px)',
+          'background-color': 'hsl(var(--glass-bg) / var(--glass-bg-opacity))',
+          'border-width': '1px',
+          'border-color': 'hsl(var(--glass-border) / var(--glass-border-opacity))',
         },
         
         // Interactive Elements

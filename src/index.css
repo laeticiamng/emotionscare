@@ -123,6 +123,14 @@ body {
     --vibe-low: 38 92% 50%;
     --vibe-medium: 45 93% 47%;
     --vibe-high: 142 76% 36%;
+    
+    /* Variables pour effets de verre (glass effects) */
+    --glass-bg: 0 0% 100%;
+    --glass-bg-opacity: 0.1;
+    --glass-border: 0 0% 100%;
+    --glass-border-opacity: 0.2;
+    --glass-strong-bg-opacity: 0.2;
+    --glass-strong-border-opacity: 0.3;
   }
 
   .dark {
@@ -168,6 +176,14 @@ body {
     --vibe-low: 38 92% 60%;
     --vibe-medium: 45 93% 57%;
     --vibe-high: 142 76% 46%;
+    
+    /* Variables pour effets de verre (dark mode) */
+    --glass-bg: 0 0% 0%;
+    --glass-bg-opacity: 0.1;
+    --glass-border: 0 0% 100%;
+    --glass-border-opacity: 0.1;
+    --glass-strong-bg-opacity: 0.2;
+    --glass-strong-border-opacity: 0.3;
   }
   
   /* Support du contraste élevé */
