@@ -47,7 +47,7 @@ const exportButtonVariants = cva(
   }
 );
 
-export interface ExportFormat {
+interface ExportFormat {
   id: string;
   label: string;
   description?: string;
