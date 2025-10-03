@@ -4781,10 +4781,14 @@ export type Database = {
         Row: {
           created_at: string
           emo_vec: number[] | null
+          emo_vec_encrypted: string | null
           id: string
           preview: string | null
+          preview_encrypted: string | null
           styled_html: string | null
+          styled_html_encrypted: string | null
           text_raw: string
+          text_raw_encrypted: string | null
           ts: string
           updated_at: string
           user_hash: string | null
@@ -4794,10 +4798,14 @@ export type Database = {
         Insert: {
           created_at?: string
           emo_vec?: number[] | null
+          emo_vec_encrypted?: string | null
           id?: string
           preview?: string | null
+          preview_encrypted?: string | null
           styled_html?: string | null
+          styled_html_encrypted?: string | null
           text_raw: string
+          text_raw_encrypted?: string | null
           ts?: string
           updated_at?: string
           user_hash?: string | null
@@ -4807,10 +4815,14 @@ export type Database = {
         Update: {
           created_at?: string
           emo_vec?: number[] | null
+          emo_vec_encrypted?: string | null
           id?: string
           preview?: string | null
+          preview_encrypted?: string | null
           styled_html?: string | null
+          styled_html_encrypted?: string | null
           text_raw?: string
+          text_raw_encrypted?: string | null
           ts?: string
           updated_at?: string
           user_hash?: string | null
@@ -4824,11 +4836,15 @@ export type Database = {
           audio_url: string | null
           created_at: string
           crystal_meta: Json | null
+          crystal_meta_encrypted: string | null
           emo_vec: number[] | null
+          emo_vec_encrypted: string | null
           id: string
           pitch_avg: number | null
           summary_120: string | null
+          summary_120_encrypted: string | null
           text_raw: string
+          text_raw_encrypted: string | null
           ts: string
           updated_at: string
           user_hash: string | null
@@ -4839,11 +4855,15 @@ export type Database = {
           audio_url?: string | null
           created_at?: string
           crystal_meta?: Json | null
+          crystal_meta_encrypted?: string | null
           emo_vec?: number[] | null
+          emo_vec_encrypted?: string | null
           id?: string
           pitch_avg?: number | null
           summary_120?: string | null
+          summary_120_encrypted?: string | null
           text_raw: string
+          text_raw_encrypted?: string | null
           ts?: string
           updated_at?: string
           user_hash?: string | null
@@ -4854,11 +4874,15 @@ export type Database = {
           audio_url?: string | null
           created_at?: string
           crystal_meta?: Json | null
+          crystal_meta_encrypted?: string | null
           emo_vec?: number[] | null
+          emo_vec_encrypted?: string | null
           id?: string
           pitch_avg?: number | null
           summary_120?: string | null
+          summary_120_encrypted?: string | null
           text_raw?: string
+          text_raw_encrypted?: string | null
           ts?: string
           updated_at?: string
           user_hash?: string | null
@@ -10715,6 +10739,84 @@ export type Database = {
           last_activity_at: string | null
           meditation_count: number | null
           user_id: string | null
+        }
+        Relationships: []
+      }
+      journal_text_decrypted: {
+        Row: {
+          emo_vec: number[] | null
+          id: string | null
+          preview: string | null
+          styled_html: string | null
+          text_raw: string | null
+          ts: string | null
+          user_hash: string | null
+          user_id: string | null
+          valence: number | null
+        }
+        Insert: {
+          emo_vec?: never
+          id?: string | null
+          preview?: never
+          styled_html?: never
+          text_raw?: never
+          ts?: string | null
+          user_hash?: string | null
+          user_id?: string | null
+          valence?: number | null
+        }
+        Update: {
+          emo_vec?: never
+          id?: string | null
+          preview?: never
+          styled_html?: never
+          text_raw?: never
+          ts?: string | null
+          user_hash?: string | null
+          user_id?: string | null
+          valence?: number | null
+        }
+        Relationships: []
+      }
+      journal_voice_decrypted: {
+        Row: {
+          audio_url: string | null
+          crystal_meta: Json | null
+          emo_vec: number[] | null
+          id: string | null
+          pitch_avg: number | null
+          summary_120: string | null
+          text_raw: string | null
+          ts: string | null
+          user_hash: string | null
+          user_id: string | null
+          valence: number | null
+        }
+        Insert: {
+          audio_url?: string | null
+          crystal_meta?: never
+          emo_vec?: never
+          id?: string | null
+          pitch_avg?: number | null
+          summary_120?: never
+          text_raw?: never
+          ts?: string | null
+          user_hash?: string | null
+          user_id?: string | null
+          valence?: number | null
+        }
+        Update: {
+          audio_url?: string | null
+          crystal_meta?: never
+          emo_vec?: never
+          id?: string | null
+          pitch_avg?: number | null
+          summary_120?: never
+          text_raw?: never
+          ts?: string | null
+          user_hash?: string | null
+          user_id?: string | null
+          valence?: number | null
         }
         Relationships: []
       }
