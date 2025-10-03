@@ -4660,6 +4660,96 @@ export type Database = {
         }
         Relationships: []
       }
+      journal_text: {
+        Row: {
+          created_at: string
+          emo_vec: number[] | null
+          id: string
+          preview: string | null
+          styled_html: string | null
+          text_raw: string
+          ts: string
+          updated_at: string
+          user_hash: string | null
+          user_id: string
+          valence: number | null
+        }
+        Insert: {
+          created_at?: string
+          emo_vec?: number[] | null
+          id?: string
+          preview?: string | null
+          styled_html?: string | null
+          text_raw: string
+          ts?: string
+          updated_at?: string
+          user_hash?: string | null
+          user_id: string
+          valence?: number | null
+        }
+        Update: {
+          created_at?: string
+          emo_vec?: number[] | null
+          id?: string
+          preview?: string | null
+          styled_html?: string | null
+          text_raw?: string
+          ts?: string
+          updated_at?: string
+          user_hash?: string | null
+          user_id?: string
+          valence?: number | null
+        }
+        Relationships: []
+      }
+      journal_voice: {
+        Row: {
+          audio_url: string | null
+          created_at: string
+          crystal_meta: Json | null
+          emo_vec: number[] | null
+          id: string
+          pitch_avg: number | null
+          summary_120: string | null
+          text_raw: string
+          ts: string
+          updated_at: string
+          user_hash: string | null
+          user_id: string
+          valence: number | null
+        }
+        Insert: {
+          audio_url?: string | null
+          created_at?: string
+          crystal_meta?: Json | null
+          emo_vec?: number[] | null
+          id?: string
+          pitch_avg?: number | null
+          summary_120?: string | null
+          text_raw: string
+          ts?: string
+          updated_at?: string
+          user_hash?: string | null
+          user_id: string
+          valence?: number | null
+        }
+        Update: {
+          audio_url?: string | null
+          created_at?: string
+          crystal_meta?: Json | null
+          emo_vec?: number[] | null
+          id?: string
+          pitch_avg?: number | null
+          summary_120?: string | null
+          text_raw?: string
+          ts?: string
+          updated_at?: string
+          user_hash?: string | null
+          user_id?: string
+          valence?: number | null
+        }
+        Relationships: []
+      }
       lyrics_generation_jobs: {
         Row: {
           attempt_count: number
