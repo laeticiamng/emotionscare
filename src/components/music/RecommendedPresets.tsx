@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Play, Music, Disc } from 'lucide-react';
 import { useMusic } from '@/hooks/useMusic';
+import { logger } from '@/lib/logger';
 
 interface RecommendedPresetsProps {
   className?: string;
@@ -33,7 +34,7 @@ const RecommendedPresets: React.FC<RecommendedPresetsProps> = ({
         await loadPlaylistForEmotion(presetId);
       }
     } catch (error) {
-      console.error('Error loading preset:', error);
+      logger.error('Error loading preset:', error);
     } finally {
       setLoading(false);
     }

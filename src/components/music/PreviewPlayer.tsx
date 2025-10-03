@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Pause, Play } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
+import { logger } from '@/lib/logger';
 
 interface PreviewPlayerProps {
   src: string;
@@ -71,7 +72,7 @@ export function PreviewPlayer({ src }: PreviewPlayerProps) {
       await element.play();
       setIsPlaying(true);
     } catch (error) {
-      console.warn('Unable to start preview playback', error);
+      logger.warn('Unable to start preview playback', error);
       setIsPlaying(false);
     }
   };

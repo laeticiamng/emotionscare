@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 import ThreeDVisualizer from './ThreeDVisualizer';
 import AmbientBackground from './AmbientBackground';
 import PremiumMusicPlayer from './PremiumMusicPlayer';
+import { logger } from '@/lib/logger';
 
 interface ImmersiveFullscreenPlayerProps {
   className?: string;
@@ -29,7 +30,7 @@ const ImmersiveFullscreenPlayer: React.FC<ImmersiveFullscreenPlayerProps> = ({ c
         await containerRef.current.requestFullscreen();
         setIsFullscreen(true);
       } catch (error) {
-        console.log('Fullscreen not supported');
+        logger.info('Fullscreen not supported');
       }
     }
   };
@@ -39,7 +40,7 @@ const ImmersiveFullscreenPlayer: React.FC<ImmersiveFullscreenPlayerProps> = ({ c
       await document.exitFullscreen();
       setIsFullscreen(false);
     } catch (error) {
-      console.log('Exit fullscreen error');
+      logger.info('Exit fullscreen error');
     }
   };
 

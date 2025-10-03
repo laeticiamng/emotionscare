@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Play, Pause, SkipForward, Square, Heart, Volume2, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { logger } from '@/lib/logger';
 
 interface SunoPlayerProps {
   src: string | null;
@@ -62,7 +63,7 @@ export const SunoPlayer: React.FC<SunoPlayerProps> = ({
     if (!audio || !src) return;
 
     if (playing) {
-      audio.play().catch(console.error);
+      audio.play().catch(error => logger.error('Audio play error:', error));
     } else {
       audio.pause();
     }

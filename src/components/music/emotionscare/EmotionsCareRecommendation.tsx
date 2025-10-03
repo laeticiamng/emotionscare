@@ -1,6 +1,5 @@
 // @ts-nocheck
 
-// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -11,6 +10,7 @@ import { useMusic } from '@/contexts/MusicContext';
 import { useMusicGeneration } from '@/hooks/useMusicGeneration';
 import { useToast } from '@/hooks/use-toast';
 import type { EmotionResult } from '@/types';
+import { logger } from '@/lib/logger';
 
 interface EmotionsCareRecommendationProps {
   emotionResult: EmotionResult;
@@ -57,7 +57,7 @@ const EmotionsCareRecommendationContent: React.FC<EmotionsCareRecommendationProp
         });
       }
     } catch (err) {
-      console.error('Error generating music:', err);
+      logger.error('Error generating music:', err);
       toast({
         title: "Erreur de génération",
         description: "Impossible de générer la musique. Veuillez réessayer.",
@@ -78,7 +78,7 @@ const EmotionsCareRecommendationContent: React.FC<EmotionsCareRecommendationProp
         setIsPlaying(true);
       }
     } catch (err) {
-      console.error('Error playing track:', err);
+      logger.error('Error playing track:', err);
       toast({
         title: "Erreur de lecture",
         description: "Impossible de lire la musique",
