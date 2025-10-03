@@ -178,6 +178,7 @@ const RedirectToMusic = lazy(() => import('@/components/redirects/RedirectToMusi
 const ModulesDashboardPage = lazy(() => import('@/pages/ModulesDashboard'));
 const UnifiedModulesDashboardPage = lazy(() => import('@/pages/UnifiedModulesDashboard'));
 const VoiceScanPage = lazy(() => import('@/pages/VoiceScanPage'));
+const TextScanPage = lazy(() => import('@/pages/TextScanPage'));
 
 // ═══════════════════════════════════════════════════════════
 // MAPPING DES COMPOSANTS
@@ -323,6 +324,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   ModulesDashboardPage,
   UnifiedModulesDashboardPage,
   VoiceScanPage,
+  TextScanPage,
 };
 
 // ═══════════════════════════════════════════════════════════

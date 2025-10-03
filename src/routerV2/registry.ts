@@ -200,6 +200,14 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: true,
   },
   {
+    name: 'scan-text',
+    path: '/app/scan/text',
+    segment: 'consumer',
+    layout: 'simple',
+    component: 'TextScanPage',
+    guard: true,
+  },
+  {
     name: 'music',
     path: '/app/music',
     segment: 'public',
