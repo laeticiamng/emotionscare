@@ -4,7 +4,7 @@ import { motion, useInView } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { 
   Sparkles, Wind, Palette, Music, Leaf, Book, Cloud, Star, 
-  Lightbulb, Waves, Scan, Flask, Sword, Sliders, Users, 
+  Lightbulb, Waves, Scan, Beaker, Sword, Sliders, Users, 
   Trophy, Theater, Sprout, ArrowRight, Map
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -250,7 +250,7 @@ export default function ParkJourney() {
     },
     {
       number: 12,
-      icon: Flask,
+      icon: Beaker,
       title: "Le Labo des Bulles",
       subtitle: "Bubble Beat /app/bubble-beat",
       narrative: "Dans ce laboratoire coloré, des bulles réagissent à ton stress.\nTendu, elles éclatent vite. Calme, elles flottent doucement.\nChaque session réussie ajoute une bulle rare à ta collection.\nTon laboratoire devient un arc-en-ciel d'émotions.",

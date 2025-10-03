@@ -1,7 +1,7 @@
 // @ts-nocheck
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, Wind, Palette, Music, Leaf, Book, Cloud, Star, Lightbulb, Waves, Scan, Flask, Sword, Sliders, Users, Trophy, Theater, Sprout, Filter, Zap } from 'lucide-react';
+import { Sparkles, Wind, Palette, Music, Leaf, Book, Cloud, Star, Lightbulb, Waves, Scan, Beaker, Sword, Sliders, Users, Trophy, Theater, Sprout, Filter, Zap } from 'lucide-react';
 import { ParkAttraction } from '@/components/park/ParkAttraction';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -140,7 +140,7 @@ export default function EmotionalPark() {
       title: 'Le Labo des Bulles',
       subtitle: 'Bubble Beat',
       description: 'Laboratoire fun de bulles colorées. Fais flotter les bulles le plus longtemps possible.',
-      icon: Flask,
+      icon: Beaker,
       route: '/app/bubble-beat',
       gradient: 'from-cyan-500/20 to-blue-500/20',
       collection: 'Bulles spéciales (couleurs rares)',
