@@ -2911,6 +2911,39 @@ export type Database = {
         }
         Relationships: []
       }
+      emotion_patterns: {
+        Row: {
+          created_at: string | null
+          dominant_emotions: Json
+          emotion_trends: Json | null
+          id: string
+          trigger_patterns: Json | null
+          user_id: string
+          week_end: string
+          week_start: string
+        }
+        Insert: {
+          created_at?: string | null
+          dominant_emotions: Json
+          emotion_trends?: Json | null
+          id?: string
+          trigger_patterns?: Json | null
+          user_id: string
+          week_end: string
+          week_start: string
+        }
+        Update: {
+          created_at?: string | null
+          dominant_emotions?: Json
+          emotion_trends?: Json | null
+          id?: string
+          trigger_patterns?: Json | null
+          user_id?: string
+          week_end?: string
+          week_start?: string
+        }
+        Relationships: []
+      }
       emotion_scans: {
         Row: {
           confidence: number | null
@@ -2971,6 +3004,54 @@ export type Database = {
           id?: string
           scan_data?: Json
           user_id?: string
+        }
+        Relationships: []
+      }
+      emotional_scans: {
+        Row: {
+          audio_url: string | null
+          confidence: number | null
+          created_at: string | null
+          duration_seconds: number | null
+          emotions: Json
+          hume_job_id: string | null
+          id: string
+          scan_type: string
+          text_content: string | null
+          top_emotion: string | null
+          updated_at: string | null
+          user_id: string
+          video_url: string | null
+        }
+        Insert: {
+          audio_url?: string | null
+          confidence?: number | null
+          created_at?: string | null
+          duration_seconds?: number | null
+          emotions?: Json
+          hume_job_id?: string | null
+          id?: string
+          scan_type: string
+          text_content?: string | null
+          top_emotion?: string | null
+          updated_at?: string | null
+          user_id: string
+          video_url?: string | null
+        }
+        Update: {
+          audio_url?: string | null
+          confidence?: number | null
+          created_at?: string | null
+          duration_seconds?: number | null
+          emotions?: Json
+          hume_job_id?: string | null
+          id?: string
+          scan_type?: string
+          text_content?: string | null
+          top_emotion?: string | null
+          updated_at?: string | null
+          user_id?: string
+          video_url?: string | null
         }
         Relationships: []
       }
@@ -3755,6 +3836,42 @@ export type Database = {
           title?: string
           updated_at?: string
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      generated_songs: {
+        Row: {
+          audio_url: string
+          created_at: string | null
+          duration: number
+          emotion_input: string
+          id: string
+          metadata: Json | null
+          style: string
+          suno_job_id: string | null
+          user_id: string
+        }
+        Insert: {
+          audio_url: string
+          created_at?: string | null
+          duration: number
+          emotion_input: string
+          id?: string
+          metadata?: Json | null
+          style: string
+          suno_job_id?: string | null
+          user_id: string
+        }
+        Update: {
+          audio_url?: string
+          created_at?: string | null
+          duration?: number
+          emotion_input?: string
+          id?: string
+          metadata?: Json | null
+          style?: string
+          suno_job_id?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -5904,6 +6021,42 @@ export type Database = {
           session_id?: string | null
           ts?: string | null
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      module_progress: {
+        Row: {
+          created_at: string
+          id: string
+          metadata: Json
+          module_name: string
+          total_xp: number
+          unlocked_items: Json
+          updated_at: string
+          user_id: string
+          user_level: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          metadata?: Json
+          module_name: string
+          total_xp?: number
+          unlocked_items?: Json
+          updated_at?: string
+          user_id: string
+          user_level?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          metadata?: Json
+          module_name?: string
+          total_xp?: number
+          unlocked_items?: Json
+          updated_at?: string
+          user_id?: string
+          user_level?: number
         }
         Relationships: []
       }
@@ -8873,6 +9026,33 @@ export type Database = {
           },
         ]
       }
+      user_activities: {
+        Row: {
+          activity_data: Json | null
+          activity_type: string
+          created_at: string | null
+          duration_seconds: number | null
+          id: string
+          user_id: string
+        }
+        Insert: {
+          activity_data?: Json | null
+          activity_type: string
+          created_at?: string | null
+          duration_seconds?: number | null
+          id?: string
+          user_id: string
+        }
+        Update: {
+          activity_data?: Json | null
+          activity_type?: string
+          created_at?: string | null
+          duration_seconds?: number | null
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_activity_logs: {
         Row: {
           activity_details: Json | null
@@ -9204,6 +9384,45 @@ export type Database = {
           title?: string
           unit?: string | null
           updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_insights: {
+        Row: {
+          action_items: Json | null
+          created_at: string | null
+          description: string
+          expires_at: string | null
+          id: string
+          insight_type: string
+          is_read: boolean | null
+          priority: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          action_items?: Json | null
+          created_at?: string | null
+          description: string
+          expires_at?: string | null
+          id?: string
+          insight_type: string
+          is_read?: boolean | null
+          priority?: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          action_items?: Json | null
+          created_at?: string | null
+          description?: string
+          expires_at?: string | null
+          id?: string
+          insight_type?: string
+          is_read?: boolean | null
+          priority?: string
+          title?: string
           user_id?: string
         }
         Relationships: []
@@ -9654,6 +9873,45 @@ export type Database = {
         }
         Relationships: []
       }
+      user_reports: {
+        Row: {
+          created_at: string | null
+          highlights: Json | null
+          id: string
+          metrics: Json
+          pdf_url: string | null
+          period_end: string
+          period_start: string
+          recommendations: Json | null
+          report_type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          highlights?: Json | null
+          id?: string
+          metrics: Json
+          pdf_url?: string | null
+          period_end: string
+          period_start: string
+          recommendations?: Json | null
+          report_type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          highlights?: Json | null
+          id?: string
+          metrics?: Json
+          pdf_url?: string | null
+          period_end?: string
+          period_start?: string
+          recommendations?: Json | null
+          report_type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_rewards: {
         Row: {
           activity_related: string | null
@@ -9686,6 +9944,33 @@ export type Database = {
           reward_description?: string | null
           reward_name?: string
           reward_type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          notes: string | null
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          notes?: string | null
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          notes?: string | null
+          role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
         }
         Relationships: []
@@ -10113,7 +10398,17 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      dashboard_stats_cache: {
+        Row: {
+          activity_date: string | null
+          chat_count: number | null
+          journal_count: number | null
+          last_activity_at: string | null
+          meditation_count: number | null
+          user_id: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       accept_invitation: {
@@ -10871,6 +11166,13 @@ export type Database = {
           plan_name: string
         }[]
       }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
       increment_aura_interaction: {
         Args: { p_user_id: string }
         Returns: undefined
@@ -11205,6 +11507,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: Json
       }
+      refresh_dashboard_stats: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       reset_monthly_quotas: {
         Args: Record<PropertyKey, never>
         Returns: undefined
@@ -11288,6 +11594,15 @@ export type Database = {
       sync_oic_competences: {
         Args: Record<PropertyKey, never>
         Returns: undefined
+      }
+      track_user_activity: {
+        Args: {
+          p_activity_data?: Json
+          p_activity_type: string
+          p_duration_seconds?: number
+          p_user_id: string
+        }
+        Returns: string
       }
       ultimate_security_validation: {
         Args: Record<PropertyKey, never>
@@ -11398,6 +11713,7 @@ export type Database = {
       }
     }
     Enums: {
+      app_role: "admin" | "moderator" | "user" | "b2c"
       app_user_role: "user_b2c" | "user_b2b" | "manager_b2b" | "admin"
       invitation_status: "pending" | "accepted" | "expired"
     }
@@ -11527,6 +11843,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      app_role: ["admin", "moderator", "user", "b2c"],
       app_user_role: ["user_b2c", "user_b2b", "manager_b2b", "admin"],
       invitation_status: ["pending", "accepted", "expired"],
     },
