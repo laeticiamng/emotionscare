@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React, { useState, useEffect } from 'react';
 import { useOpenAI } from '@/hooks/ai/useOpenAI';
 import { Button } from '@/components/ui/button';
@@ -53,7 +51,7 @@ export const EmpatheticModeration: React.FC<EmpatheticModerationProps> = ({
     
     try {
       // Vérifier le contenu avec le service de modération OpenAI
-      const moderationResult = await moderation.checkContent(content);
+      const moderationResult = await moderation?.checkContent(content);
       
       if (moderationResult.flagged) {
         // Simuler une suggestion améliorée (dans une vraie implémentation, ceci viendrait d'OpenAI)

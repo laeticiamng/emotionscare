@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Group } from '@/types/group';

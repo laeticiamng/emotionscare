@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,8 +8,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { 
   Heart, MessageCircle, Share2, Bookmark, MoreHorizontal, Send, 
-  Image, Video, Mic, MapPin, Smile, Trending, Users, 
-  Fire, Award, Eye, ThumbsUp, Zap, Camera, Paperclip
+  Image, Video, Mic, MapPin, Smile, TrendingUp, Users, 
+  Flame, Award, Eye, ThumbsUp, Zap, Camera, Paperclip
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
@@ -113,7 +112,7 @@ export default function EnhancedCommunityFeed() {
             badge: undefined
           },
           timestamp: formatTimestamp(post.created_at),
-          media: post.media_urls ? post.media_urls.map(url => ({
+          media: post.media_urls ? post.media_urls.map((url: string) => ({
             type: 'image' as const,
             url
           })) : [],
@@ -292,7 +291,7 @@ export default function EnhancedCommunityFeed() {
         <div className="flex flex-wrap justify-center gap-2">
           {[
             { key: 'all', label: 'Tout', icon: Users },
-            { key: 'trending', label: 'Tendances', icon: Trending },
+            { key: 'trending', label: 'Tendances', icon: TrendingUp },
             { key: 'following', label: 'Abonnements', icon: Heart },
             { key: 'featured', label: 'À la une', icon: Award }
           ].map(filterOption => (
@@ -441,7 +440,7 @@ export default function EnhancedCommunityFeed() {
                         <>
                           <span>•</span>
                           <Badge variant="destructive" className="text-xs">
-                            <Fire className="h-3 w-3 mr-1" />
+                            <Flame className="h-3 w-3 mr-1" />
                             Tendance
                           </Badge>
                         </>
@@ -488,7 +487,7 @@ export default function EnhancedCommunityFeed() {
                           controls
                         />
                       )}
-                      {post.media.length > 4 && index === 3 && (
+                      {post.media && post.media.length > 4 && index === 3 && (
                         <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-white font-semibold">
                           +{post.media.length - 4}
                         </div>
