@@ -3547,6 +3547,36 @@ export type Database = {
         }
         Relationships: []
       }
+      encryption_keys: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          key_name: string
+          key_type: string
+          key_value: string
+          rotated_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          key_name: string
+          key_type?: string
+          key_value: string
+          rotated_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          key_name?: string
+          key_type?: string
+          key_value?: string
+          rotated_at?: string | null
+        }
+        Relationships: []
+      }
       enhanced_chat_logs: {
         Row: {
           conversation_id: string
@@ -10935,6 +10965,10 @@ export type Database = {
           | { session_data: Json }
         Returns: string
       }
+      decrypt_sensitive_data: {
+        Args: { p_ciphertext: string; p_key_name?: string }
+        Returns: string
+      }
       detect_and_fix_redundancies: {
         Args: Record<PropertyKey, never>
         Returns: {
@@ -10960,6 +10994,10 @@ export type Database = {
           cleanup_type: string
           records_affected: number
         }[]
+      }
+      encrypt_sensitive_data: {
+        Args: { p_key_name?: string; p_plaintext: string }
+        Returns: string
       }
       enrich_edn_items_with_oic_competences: {
         Args: Record<PropertyKey, never>
