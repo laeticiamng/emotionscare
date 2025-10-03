@@ -129,7 +129,7 @@ const NavigationPage = lazy(() => import('@/pages/NavigationPage'));
 const LeaderboardPage = lazy(() => import('@/pages/LeaderboardPage'));
 const GamificationPage = lazy(() => import('@/pages/GamificationPage'));
 const ScoresPage = lazy(() => import('@/pages/ScoresPage'));
-// const PricingPageWorking = lazy(() => import('../pages/PricingPageWorking.jsx'));
+const PricingPageWorking = lazy(() => import('@/pages/PricingPageWorking'));
 
 // Pages existantes à consolider
 const MessagesPage = lazy(() => import('@/pages/MessagesPage'));
@@ -181,7 +181,6 @@ const VoiceScanPage = lazy(() => import('@/pages/VoiceScanPage'));
 const TextScanPage = lazy(() => import('@/pages/TextScanPage'));
 const MusicGeneratePage = lazy(() => import('@/pages/MusicGeneratePage'));
 const MusicLibraryPage = lazy(() => import('@/pages/MusicLibraryPage'));
-const PricingPageWorking = lazy(() => import('@/pages/PricingPageWorking'));
 const ModeSelectionPage = lazy(() => import('@/pages/ModeSelectionPage'));
 const B2CDashboardPage = lazy(() => import('@/pages/B2CDashboardPage'));
 const B2CMoodPage = lazy(() => import('@/pages/B2CMoodPage'));
