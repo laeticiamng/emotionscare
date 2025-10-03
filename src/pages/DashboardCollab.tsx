@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React, { Suspense } from 'react';
+import React, { Suspense, lazy } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -16,8 +16,10 @@ import {
   HelpCircle,
   Lock,
 } from 'lucide-react';
-import { BreathWeeklyCard } from '@/components/breath/BreathWeeklyCard';
-import { AssessmentHistory } from '@/components/assessment/AssessmentHistory';
+
+// Lazy loading pour composants B2B optimisés
+const BreathWeeklyCard = lazy(() => import('@/components/breath/BreathWeeklyCard').then(m => ({ default: m.BreathWeeklyCard })));
+const AssessmentHistory = lazy(() => import('@/components/assessment/AssessmentHistory').then(m => ({ default: m.AssessmentHistory })));
 
 const DashboardWidgetSkeleton: React.FC = () => (
   <Card className="border-dashed" aria-hidden="true">

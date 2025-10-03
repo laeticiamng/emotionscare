@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React, { Suspense } from 'react';
+import React, { Suspense, lazy } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -16,10 +16,12 @@ import {
   Settings,
   HelpCircle,
 } from 'lucide-react';
-import { JournalTimeline } from '@/components/journal/JournalTimeline';
-import { VRSessionsHistoryList } from '@/components/vr/VRSessionsHistoryList';
-import { BreathWeeklyCard } from '@/components/breath/BreathWeeklyCard';
-import { AssessmentHistory } from '@/components/assessment/AssessmentHistory';
+
+// Lazy loading des composants lourds pour optimiser le bundle initial
+const JournalTimeline = lazy(() => import('@/components/journal/JournalTimeline').then(m => ({ default: m.JournalTimeline })));
+const VRSessionsHistoryList = lazy(() => import('@/components/vr/VRSessionsHistoryList').then(m => ({ default: m.VRSessionsHistoryList })));
+const BreathWeeklyCard = lazy(() => import('@/components/breath/BreathWeeklyCard').then(m => ({ default: m.BreathWeeklyCard })));
+const AssessmentHistory = lazy(() => import('@/components/assessment/AssessmentHistory').then(m => ({ default: m.AssessmentHistory })));
 
 const DashboardWidgetSkeleton: React.FC = () => (
   <Card className="border-dashed" aria-hidden="true">
