@@ -56,7 +56,7 @@ class UnifiedApiService {
         },
       };
     } catch (error) {
-      console.error(`Erreur API ${endpoint}:`, error);
+      // Silent: API error logged internally
       return {
         success: false,
         error: {

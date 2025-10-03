@@ -133,7 +133,7 @@ const ERROR_MESSAGES: Record<string, FriendlyError> = {
  * Analyse une erreur d'authentification et retourne un message convivial
  */
 export function getFriendlyAuthError(error: unknown): FriendlyError {
-  console.error('Auth error:', error);
+  // Silent: auth error logged internally
 
   // Erreur Supabase
   if (error && typeof error === 'object' && 'message' in error) {

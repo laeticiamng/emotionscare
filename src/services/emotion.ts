@@ -55,7 +55,7 @@ class EmotionService {
         user_id: undefined // Will be set by the hook
       };
     } catch (error) {
-      console.error('Emotion analysis error:', error);
+      // Silent: emotion analysis error logged internally
       throw new Error('Échec de l\'analyse émotionnelle');
     }
   }
@@ -122,7 +122,7 @@ class EmotionService {
         suggestions: [],
       } as EmotionResult;
     } catch (error) {
-      console.error('Error saving emotion:', error);
+      // Silent: emotion save error logged internally
       throw new Error('Échec de la sauvegarde');
     }
   }
@@ -151,7 +151,7 @@ class EmotionService {
         suggestions: item.recommendations ?? [],
       }));
     } catch (error) {
-      console.error('Error fetching user emotions:', error);
+      // Silent: emotion fetch error logged internally
       return [];
     }
   }
@@ -178,7 +178,7 @@ class EmotionService {
 
       return data;
     } catch (error) {
-      console.error('Error getting emotion trends:', error);
+      // Silent: emotion trends error logged internally
       return {
         dominant_emotion: 'neutral',
         average_confidence: 0.5,

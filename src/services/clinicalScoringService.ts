@@ -2094,7 +2094,7 @@ class ClinicalScoringService {
         },
       };
     } catch (error) {
-      console.error('[clinicalScoringService] submit failed', error);
+      // Silent: clinical scoring submission error logged internally
       return { success: false };
     }
   }

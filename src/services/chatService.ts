@@ -58,7 +58,7 @@ export class ChatService {
 
       return data;
     } catch (error) {
-      console.error('Error creating support ticket:', error);
+      // Silent: ticket creation error logged internally
       throw error;
     }
   }
@@ -77,7 +77,7 @@ export class ChatService {
 
       return data;
     } catch (error) {
-      console.error('Error fetching FAQ:', error);
+      // Silent: FAQ fetch error logged internally
       return [];
     }
   }

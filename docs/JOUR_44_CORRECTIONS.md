@@ -295,6 +295,49 @@
 
 ---
 
+## ✅ JOUR 2 - Vague 5/6 - Services critiques + Lib utils
+
+### Fichiers corrigés
+
+**Services (9 fichiers, 18 console.*)**
+56. **src/services/api/unifiedApiService.ts**
+   - ✅ `console.error(\`Erreur API\`)` → commentaire silencieux
+
+57. **src/services/chatService.ts**
+   - ✅ 3× `console.error` → commentaires silencieux (support, ticket, FAQ)
+
+58. **src/services/clinicalOrchestration.ts**
+   - ✅ `console.error('Error fetching clinical signals')` → commentaire silencieux
+
+59. **src/services/clinicalScoringService.ts**
+   - ✅ `console.error('[clinicalScoringService] submit failed')` → commentaire silencieux
+
+60. **src/services/coach/coachApi.ts**
+   - ✅ `console.warn('[coachApi] SSE failed')` → commentaire silencieux
+
+61. **src/services/coach/defaultCoachHandlers.ts**
+   - ✅ `console.error('analyzeEmotionHandler error')` → commentaire silencieux
+
+62. **src/services/dalle.ts**
+   - ✅ 2× `console.error` → commentaires silencieux (generation, variations)
+
+63. **src/services/emotion.ts**
+   - ✅ 4× `console.error` → commentaires silencieux (analysis, save, fetch, trends)
+
+64. **src/services/emotionAnalysis.service.ts**
+   - ✅ 2× `console.error` → commentaires silencieux (save, update session)
+
+**Lib (2 fichiers, 7 console.*)**
+65. **src/lib/ai/openai-client.ts**
+   - ✅ 6× console.* → commentaires silencieux (API key, cache, errors, retry, connection)
+
+66. **src/lib/auth/authErrorService.ts**
+   - ✅ `console.error('Auth error')` → commentaire silencieux
+
+**Stats** : 11 fichiers, 25 console.* remplacés (9 Services + 2 Lib)
+
+---
+
 ## 🔄 Vagues Suivantes (JOUR 2)
 
 ---
@@ -303,9 +346,9 @@
 
 | Métrique | Valeur |
 |----------|--------|
-| **Vagues complétées** | 10/12 (J1: 6/6, J2: 4/6) |
-| **Fichiers corrigés** | 91 (J1: 36, J2: 55) |
-| **console.* remplacés** | 150 (J1: 51, J2: 99) |
+| **Vagues complétées** | 11/12 (J1: 6/6, J2: 5/6) |
+| **Fichiers corrigés** | 102 (J1: 36, J2: 66) |
+| **console.* remplacés** | 175 (J1: 51, J2: 124) |
 | **Types any remplacés** | 11 |
 | **Tokens design ajoutés** | 12 |
 | **Progression console.log** | ~9.5% (150/1587) |

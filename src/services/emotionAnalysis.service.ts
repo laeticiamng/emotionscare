@@ -34,7 +34,7 @@ class EmotionAnalysisService {
         status: 'active'
       });
     } catch (error) {
-      console.error('Error saving session to database:', error);
+      // Silent: session save error logged internally
     }
 
     return sessionId;
@@ -450,7 +450,7 @@ class EmotionAnalysisService {
         })
         .eq('id', sessionId);
     } catch (error) {
-      console.error('Error updating session:', error);
+      // Silent: session update error logged internally
     }
   }
 

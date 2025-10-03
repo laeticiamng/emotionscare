@@ -109,7 +109,7 @@ export async function sendMessage(options: SendCoachMessageOptions): Promise<Coa
         };
       });
     } catch (error) {
-      console.warn('[coachApi] SSE failed, falling back to fetch', error);
+      // Silent: SSE failed, proceeding without logging
     }
   }
 
