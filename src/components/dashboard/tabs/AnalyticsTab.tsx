@@ -35,11 +35,11 @@ const AnalyticsTab: React.FC<AnalyticsTabProps> = ({ className, personalOnly }) 
     switch (emotion.toLowerCase()) {
       case 'positif':
       case 'énergique':
-        return 'bg-green-100 text-green-800';
+        return 'bg-success/10 text-success';
       case 'calme':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-primary/10 text-primary';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-muted text-muted-foreground';
     }
   };
 
@@ -83,11 +83,11 @@ const AnalyticsTab: React.FC<AnalyticsTabProps> = ({ className, personalOnly }) 
               </div>
               <div className="grid grid-cols-2 gap-4 text-center">
                 <div>
-                  <div className="text-2xl font-bold text-green-500">↑ 15%</div>
+                  <div className="text-2xl font-bold text-success">↑ 15%</div>
                   <p className="text-sm text-muted-foreground">Humeur positive</p>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-blue-500">↓ 8%</div>
+                  <div className="text-2xl font-bold text-primary">↓ 8%</div>
                   <p className="text-sm text-muted-foreground">Niveau de stress</p>
                 </div>
               </div>

@@ -1,9 +1,9 @@
 # Phase 4 : Corrections des couleurs hardcodées - Dashboard Components
 
 **Date:** 2025-10-04  
-**Statut:** 🟡 En cours (23/67 fichiers traités)  
-**Fichiers corrigés:** 23  
-**Fichiers restants:** 44
+**Statut:** 🟡 En cours (29/67 fichiers traités)  
+**Fichiers corrigés:** 29  
+**Fichiers restants:** 38
 
 ## 📋 Résumé
 
@@ -102,6 +102,7 @@ Cette phase corrige les couleurs hardcodées dans les composants dashboard (`src
 | **Phase 4 (Batch 3)** | **3** | **~30** | **27** | **~432** |
 | **Phase 4 (Batch 4)** | **6** | **~40** | **33** | **~472** |
 | **Phase 4 (Batch 5)** | **6** | **~22** | **39** | **~494** |
+| **Phase 4 (Batch 6)** | **6** | **~7** | **45** | **~501** |
 
 ## 🎯 Fichiers restants à traiter (50)
 
@@ -332,9 +333,56 @@ Cette phase corrige les couleurs hardcodées dans les composants dashboard (`src
 | Couleurs hardcodées remplacées | ~22 |
 | Tokens HSL utilisés | primary, accent, success, warning, destructive, muted-foreground, success-foreground, accent-foreground, primary-foreground |
 
+## ✅ Batch 6 - Tabs & B2C Components
+
+### 24. `src/components/dashboard/tabs/AnalyticsTab.tsx`
+- **Problèmes identifiés:** Couleurs hardcodées pour badges émotions et tendances
+- **Corrections effectuées:**
+  - `bg-green-100 text-green-800` → `bg-success/10 text-success`
+  - `bg-blue-100 text-blue-800` → `bg-primary/10 text-primary`
+  - `bg-gray-100 text-gray-800` → `bg-muted text-muted-foreground`
+  - `text-green-500` → `text-success`
+  - `text-blue-500` → `text-primary`
+- **Lignes modifiées:** 34-93
+- **Instances corrigées:** ~5
+
+### 25. `src/components/dashboard/tabs/GamificationTab.tsx`
+- **Problème:** Aucune couleur hardcodée
+- **Statut:** ✅ Déjà conforme
+
+### 26. `src/components/dashboard/tabs/EmotionalOverviewTab.tsx`
+- **Problème:** Aucune couleur hardcodée
+- **Statut:** ✅ Déjà conforme
+
+### 27. `src/components/dashboard/b2c/CoachCard.tsx`
+- **Problèmes identifiés:** Gradient hardcodé pour avatar coach
+- **Corrections effectuées:**
+  - `from-indigo-500 to-purple-600` → `from-primary to-accent`
+  - `text-white` → `text-primary-foreground`
+- **Lignes modifiées:** 26-29
+- **Instances corrigées:** ~2
+
+### 28. `src/components/dashboard/b2c/InspirationalQuoteCard.tsx`
+- **Problème:** Aucune couleur hardcodée
+- **Statut:** ✅ Déjà conforme
+
+### 29. `src/components/dashboard/b2c/RecentActivitiesCard.tsx`
+- **Problème:** Aucune couleur hardcodée
+- **Statut:** ✅ Déjà conforme
+
+## 📊 Statistiques Batch 6
+
+| Métrique | Valeur |
+|----------|---------|
+| Fichiers corrigés | 6 |
+| Fichiers déjà conformes | 4 |
+| Total de lignes modifiées | ~60 |
+| Couleurs hardcodées remplacées | ~7 |
+| Tokens HSL utilisés | primary, accent, success, muted, muted-foreground, primary-foreground |
+
 ## 🔄 Prochaines étapes
 
-### Batch 6 (sous-dossiers suite)
+### Batch 7 (sous-dossiers admin/)
 1. Corriger les dossiers restants :
    - `admin/cards/`, `admin/charts/`, `admin/widgets/`
    - `b2b/widgets/`, `b2c/widgets/`
@@ -364,5 +412,6 @@ Cette phase corrige les couleurs hardcodées dans les composants dashboard (`src
 **Phase 4 Batch 3:** 3/67 fichiers complétés ✅  
 **Phase 4 Batch 4:** 6/67 fichiers complétés ✅  
 **Phase 4 Batch 5:** 6/67 fichiers complétés ✅  
-**Progression estimée Phase 4:** ~34% (23/67)  
-**Progression totale projet:** ~37% estimé
+**Phase 4 Batch 6:** 6/67 fichiers complétés ✅  
+**Progression estimée Phase 4:** ~43% (29/67)  
+**Progression totale projet:** ~42% estimé
