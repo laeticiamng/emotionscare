@@ -128,10 +128,10 @@ const NotificationCenter: React.FC = () => {
 
   const getTypeColor = (type: string) => {
     switch (type) {
-      case 'success': return 'text-green-500';
-      case 'warning': return 'text-yellow-500';
-      case 'error': return 'text-red-500';
-      default: return 'text-blue-500';
+      case 'success': return 'text-success';
+      case 'warning': return 'text-warning';
+      case 'error': return 'text-destructive';
+      default: return 'text-primary';
     }
   };
 

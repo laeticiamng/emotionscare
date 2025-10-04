@@ -32,8 +32,8 @@ const StatsCard: React.FC<StatsCardProps> = ({
         {description && (
           <p className={cn(
             "text-xs text-muted-foreground mt-1",
-            trend === 'up' && "text-green-500",
-            trend === 'down' && "text-red-500"
+            trend === 'up' && "text-success",
+            trend === 'down' && "text-destructive"
           )}>
             {description}
           </p>

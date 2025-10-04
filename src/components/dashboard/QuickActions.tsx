@@ -21,7 +21,7 @@ const QUICK_ACTIONS = [
     title: 'Flash Glow',
     subtitle: '60 secondes d\'énergie',
     path: 'flash-glow',
-    color: 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200'
+    color: 'bg-warning/10 text-warning hover:bg-warning/20'
   },
   {
     key: 'screen_silk',
@@ -29,7 +29,7 @@ const QUICK_ACTIONS = [
     title: 'Screen-Silk',
     subtitle: 'Micro-pause 90s',
     path: 'screen-silk',
-    color: 'bg-blue-100 text-blue-700 hover:bg-blue-200'
+    color: 'bg-primary/10 text-primary hover:bg-primary/20'
   },
   {
     key: 'journal',
@@ -37,7 +37,7 @@ const QUICK_ACTIONS = [
     title: 'Journal',
     subtitle: 'Écrire une note',
     path: 'journal',
-    color: 'bg-purple-100 text-purple-700 hover:bg-purple-200'
+    color: 'bg-accent/10 text-accent hover:bg-accent/20'
   },
   {
     key: 'music',
@@ -45,7 +45,7 @@ const QUICK_ACTIONS = [
     title: 'Musicothérapie',
     subtitle: 'Session adaptée',
     path: 'music',
-    color: 'bg-pink-100 text-pink-700 hover:bg-pink-200'
+    color: 'bg-accent/10 text-accent hover:bg-accent/20'
   },
   {
     key: 'boss_grit',
@@ -53,7 +53,7 @@ const QUICK_ACTIONS = [
     title: 'Boss Grit',
     subtitle: 'Défi motivation',
     path: 'boss-grit',
-    color: 'bg-orange-100 text-orange-700 hover:bg-orange-200'
+    color: 'bg-warning/10 text-warning hover:bg-warning/20'
   },
   {
     key: 'vr_breath',
@@ -61,7 +61,7 @@ const QUICK_ACTIONS = [
     title: 'VR Respiration',
     subtitle: 'Immersion calme',
     path: 'vr-breath',
-    color: 'bg-green-100 text-green-700 hover:bg-green-200'
+    color: 'bg-success/10 text-success hover:bg-success/20'
   }
 ];
 

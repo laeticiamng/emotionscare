@@ -1,74 +1,94 @@
-# Phase 4 : Corrections des couleurs hardcodées (Coach & Dashboard)
+# Phase 4 : Corrections des couleurs hardcodées - Dashboard Components
 
-**Date:** 2025-01-04  
-**Statut:** ✅ Complété  
-**Fichiers corrigés:** 4
+**Date:** 2025-10-04  
+**Statut:** 🟡 En cours (6/67 fichiers traités)  
+**Fichiers corrigés:** 6  
+**Fichiers restants:** 61
 
 ## 📋 Résumé
 
-Cette phase corrige les composants Coach et Dashboard qui contenaient des couleurs hardcodées dans les interfaces utilisateur.
+Cette phase corrige les couleurs hardcodées dans les composants dashboard (`src/components/dashboard/`). Le scan initial a identifié **394 occurrences** dans **67 fichiers**.
 
-## 🎯 Fichiers corrigés
+## 🎯 Fichiers corrigés (Batch 1)
 
-### 1. `src/components/coach/CoachPreferencesPanel.tsx`
-- **Problèmes identifiés:** Couleurs hardcodées pour les checkboxes et l'icône de sélection
+### 1. `src/components/dashboard/QuickStatsGrid.tsx`
+- **Problèmes identifiés:** Couleurs hardcodées pour les statistiques (mood, sessions, streak, XP)
 - **Corrections effectuées:**
-  - `text-white` → `text-primary-foreground`
-  - `border-gray-300` → `border-input` (2 instances)
-- **Lignes modifiées:** 138-140, 164-184 (24 lignes)
-- **Instances corrigées:** ~3
-
-### 2. `src/components/coach/EnhancedCoachMessage.tsx`
-- **Problèmes identifiés:** Mapping d'émotions avec couleurs hardcodées
-- **Corrections effectuées:**
-  - `bg-yellow-100` → `bg-warning/10`
-  - `bg-orange-100` → `bg-warning/20`
-  - `bg-blue-100` → `bg-primary/10`
-  - `bg-purple-100` → `bg-accent/10`
-  - `bg-gray-100` → `bg-muted`
-- **Lignes modifiées:** 20-28 (9 lignes)
-- **Instances corrigées:** ~5
-
-### 3. `src/components/coach/RecommendationCard.tsx`
-- **Problèmes identifiés:** Fonctions de couleurs pour types et difficultés hardcodées
-- **Corrections effectuées:**
-  - Types d'activités :
-    - `bg-purple-100 text-purple-700` → `bg-accent/10 text-accent`
-    - `bg-blue-100 text-blue-700` → `bg-primary/10 text-primary`
-    - `bg-green-100 text-green-700` → `bg-success/10 text-success`
-    - `bg-orange-100 text-orange-700` → `bg-warning/10 text-warning`
-    - `bg-pink-100 text-pink-700` → `bg-destructive/10 text-destructive`
-    - `bg-gray-100 text-gray-700` → `bg-muted text-muted-foreground`
-  - Niveaux de difficulté :
-    - `bg-green-100 text-green-700` → `bg-success/10 text-success`
-    - `bg-yellow-100 text-yellow-700` → `bg-warning/10 text-warning`
-    - `bg-red-100 text-red-700` → `bg-destructive/10 text-destructive`
-    - `bg-gray-100 text-gray-700` → `bg-muted text-muted-foreground`
-  - Étoiles de notation :
-    - `fill-yellow-400 text-yellow-400` → `fill-warning text-warning`
-- **Lignes modifiées:** 34-52, 127-132 (25 lignes)
-- **Instances corrigées:** ~11
-
-### 4. `src/components/dashboard/BubbleBeatMini.tsx`
-- **Problèmes identifiés:** Couleurs hardcodées dans animations et UI
-- **Corrections effectuées:**
+  - `bg-pink-500` → `bg-accent`
+  - `bg-blue-500` / `bg-blue-600` → `bg-primary`
+  - `bg-green-500` / `bg-green-600` → `bg-success`
+  - `bg-yellow-500` → `bg-warning`
+  - `bg-purple-500` / `bg-purple-600` → `bg-accent`
+  - `bg-orange-500` → `bg-warning`
+  - `bg-emerald-600` → `bg-success`
+  - `text-green-500` → `text-success`
   - `text-red-500` → `text-destructive`
-  - `from-blue-50 to-purple-50` → `from-primary/10 to-accent/10`
-  - `bg-blue-400/30` → `bg-primary/30`
-  - `bg-black/5` → `bg-background/5`
-  - `text-gray-700` → `text-foreground`
-  - `bg-white/80` → `bg-background/80`
-- **Lignes modifiées:** 39-44, 46-82 (43 lignes)
+  - `text-gray-500` → `text-muted-foreground`
+- **Lignes modifiées:** 35-178 (144 lignes)
+- **Instances corrigées:** ~18
+
+### 2. `src/components/dashboard/QuickActions.tsx`
+- **Problèmes identifiés:** Couleurs hardcodées pour les boutons d'actions rapides
+- **Corrections effectuées:**
+  - `bg-yellow-100 text-yellow-700 hover:bg-yellow-200` → `bg-warning/10 text-warning hover:bg-warning/20`
+  - `bg-blue-100 text-blue-700 hover:bg-blue-200` → `bg-primary/10 text-primary hover:bg-primary/20`
+  - `bg-purple-100 text-purple-700 hover:bg-purple-200` → `bg-accent/10 text-accent hover:bg-accent/20`
+  - `bg-pink-100 text-pink-700 hover:bg-pink-200` → `bg-accent/10 text-accent hover:bg-accent/20`
+  - `bg-orange-100 text-orange-700 hover:bg-orange-200` → `bg-warning/10 text-warning hover:bg-warning/20`
+  - `bg-green-100 text-green-700 hover:bg-green-200` → `bg-success/10 text-success hover:bg-success/20`
+- **Lignes modifiées:** 17-66 (50 lignes)
+- **Instances corrigées:** ~18
+
+### 3. `src/components/dashboard/EmotionalCheckin.tsx`
+- **Problèmes identifiés:** Couleurs et gradients hardcodés pour les humeurs
+- **Corrections effectuées:**
+  - `text-red-500` / `text-red-600` → `text-destructive`
+  - `from-red-500 to-pink-500` → `from-destructive to-accent`
+  - `text-green-500` → `text-success`
+  - `from-green-500 to-emerald-500` → `from-success to-success/70`
+  - `text-yellow-500` → `text-warning`
+  - `from-yellow-500 to-amber-500` → `from-warning to-warning/70`
+  - `text-orange-500` → `text-warning`
+  - `from-orange-500 to-red-500` → `from-warning to-destructive`
+  - `from-red-600 to-red-800` → `from-destructive to-destructive/80`
+- **Lignes modifiées:** 25-31 (7 lignes)
+- **Instances corrigées:** ~15
+
+### 4. `src/components/dashboard/NotificationCenter.tsx`
+- **Problèmes identifiés:** Couleurs hardcodées pour les types de notifications
+- **Corrections effectuées:**
+  - `text-green-500` → `text-success`
+  - `text-yellow-500` → `text-warning`
+  - `text-red-500` → `text-destructive`
+  - `text-blue-500` → `text-primary`
+- **Lignes modifiées:** 129-136 (8 lignes)
+- **Instances corrigées:** ~4
+
+### 5. `src/components/dashboard/StatsCard.tsx`
+- **Problèmes identifiés:** Couleurs hardcodées pour les tendances
+- **Corrections effectuées:**
+  - `text-green-500` → `text-success`
+  - `text-red-500` → `text-destructive`
+- **Lignes modifiées:** 32-40 (9 lignes)
+- **Instances corrigées:** ~2
+
+### 6. `src/components/dashboard/GlowGauge.tsx`
+- **Problèmes identifiés:** Couleurs hardcodées pour les niveaux d'état
+- **Corrections effectuées:**
+  - `bg-blue-100` / `text-blue-700` → `bg-primary/10` / `text-primary`
+  - `bg-green-100` / `text-green-700` → `bg-success/10` / `text-success`
+  - `bg-orange-100` / `text-orange-700` → `bg-warning/10` / `text-warning`
+- **Lignes modifiées:** 34-38 (5 lignes)
 - **Instances corrigées:** ~6
 
-## 📊 Statistiques Phase 4
+## 📊 Statistiques Batch 1
 
 | Métrique | Valeur |
 |----------|---------|
-| Fichiers corrigés | 4 |
-| Total de lignes modifiées | ~101 |
-| Couleurs hardcodées remplacées | ~25 |
-| Tokens HSL utilisés | primary, accent, success, warning, destructive, muted, foreground, background, primary-foreground, border-input |
+| Fichiers corrigés | 6 |
+| Total de lignes modifiées | ~223 |
+| Couleurs hardcodées remplacées | ~63 |
+| Tokens HSL utilisés | primary, accent, success, warning, destructive, muted-foreground |
 
 ## 📈 Progression Totale (Phases 1-4)
 
@@ -77,24 +97,65 @@ Cette phase corrige les composants Coach et Dashboard qui contenaient des couleu
 | Phase 1 | 8 | ~225 | 8 | ~225 |
 | Phase 2 | 4 | ~72 | 12 | ~297 |
 | Phase 3 | 4 | ~39 | 16 | ~336 |
-| **Phase 4** | **4** | **~25** | **20** | **~361** |
+| **Phase 4 (Batch 1)** | **6** | **~63** | **22** | **~399** |
 
-## ✅ Validation
+## 🎯 Fichiers restants à traiter (61)
+
+### Sous-dossiers
+- `admin/` - composants administration
+- `b2b/` - composants B2B
+- `b2c/` - composants B2C  
+- `charts/` - graphiques et visualisations
+- `coach/` - composants coach IA
+- `tabs/` - onglets dashboard
+- `widgets/` - widgets dashboard
+
+### Fichiers racine prioritaires
+- `AdminDashboard.tsx`
+- `B2BUserDashboard.tsx`
+- `LivingDashboard.tsx` (gradients complexes)
+- `PerfectDashboard.tsx`
+- `UserDashboard.tsx`
+- `TeamEmotionHeatmap.tsx`
+- `EmotionalTrends.tsx`
+- Et 54 autres fichiers...
+
+## ✅ Validation Batch 1
 
 - [x] Tous les fichiers compilent sans erreurs
-- [x] Aucune couleur hardcodée résiduelle dans les fichiers traités
+- [x] Aucune couleur hardcodée résiduelle dans les 6 fichiers traités
 - [x] Tokens HSL sémantiques utilisés partout
 - [x] Support dark/light mode garanti
 - [x] Code conforme aux règles EmotionsCare
-- [x] Badges et indicateurs visuels cohérents
 
-## 🎯 Prochaines étapes
+## 🔄 Prochaines étapes
 
-- Continuer avec les composants dashboard restants (`NavigationCards.tsx`, `LivingDashboard.tsx`)
-- Vérifier les composants de gamification
-- Auditer les pages principales
+### Batch 2 (prioritaire)
+1. Corriger les dashboards principaux :
+   - `LivingDashboard.tsx` (gradients complexes)
+   - `PerfectDashboard.tsx`
+   - `UserDashboard.tsx`
+   - `AdminDashboard.tsx`
+   - `B2BUserDashboard.tsx`
+
+### Batch 3
+2. Traiter les sous-dossiers :
+   - `charts/` - composants de graphiques
+   - `widgets/` - widgets dashboard
+   - `b2c/` / `b2b/` - composants spécifiques
+
+### Batch 4
+3. Finaliser les composants secondaires et tabs
+
+## 📌 Notes
+
+- Le dossier dashboard contient **394 occurrences** de couleurs hardcodées
+- C'est le plus gros volume de corrections du projet
+- Stratégie : traiter par batches de 5-8 fichiers pour maintenir la qualité
+- Priorité aux composants les plus utilisés (dashboards principaux)
 
 ---
 
-**Phases complétées:** 4/N  
-**Progression estimée:** ~25% du projet
+**Phase 4 Batch 1:** 6/67 fichiers complétés ✅  
+**Progression estimée Phase 4:** ~9% (6/67)  
+**Progression totale projet:** ~25% estimé

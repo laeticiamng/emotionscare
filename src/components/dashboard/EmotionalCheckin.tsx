@@ -23,11 +23,11 @@ const EmotionalCheckin: React.FC<EmotionalCheckinProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const moods = [
-    { name: 'Excellent', icon: Heart, color: 'text-red-500', gradient: 'from-red-500 to-pink-500' },
-    { name: 'Bien', icon: Smile, color: 'text-green-500', gradient: 'from-green-500 to-emerald-500' },
-    { name: 'Neutre', icon: Meh, color: 'text-yellow-500', gradient: 'from-yellow-500 to-amber-500' },
-    { name: 'Difficile', icon: Frown, color: 'text-orange-500', gradient: 'from-orange-500 to-red-500' },
-    { name: 'Très difficile', icon: AngryIcon, color: 'text-red-600', gradient: 'from-red-600 to-red-800' }
+    { name: 'Excellent', icon: Heart, color: 'text-destructive', gradient: 'from-destructive to-accent' },
+    { name: 'Bien', icon: Smile, color: 'text-success', gradient: 'from-success to-success/70' },
+    { name: 'Neutre', icon: Meh, color: 'text-warning', gradient: 'from-warning to-warning/70' },
+    { name: 'Difficile', icon: Frown, color: 'text-warning', gradient: 'from-warning to-destructive' },
+    { name: 'Très difficile', icon: AngryIcon, color: 'text-destructive', gradient: 'from-destructive to-destructive/80' }
   ];
 
   const handleSubmit = useCallback(async () => {
