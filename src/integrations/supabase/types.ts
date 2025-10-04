@@ -3881,6 +3881,104 @@ export type Database = {
         }
         Relationships: []
       }
+      flash_lite_cards: {
+        Row: {
+          answer: string
+          created_at: string
+          difficulty: string | null
+          id: string
+          is_correct: boolean | null
+          question: string
+          response_time_ms: number | null
+          session_id: string
+          user_answer: string | null
+        }
+        Insert: {
+          answer: string
+          created_at?: string
+          difficulty?: string | null
+          id?: string
+          is_correct?: boolean | null
+          question: string
+          response_time_ms?: number | null
+          session_id: string
+          user_answer?: string | null
+        }
+        Update: {
+          answer?: string
+          created_at?: string
+          difficulty?: string | null
+          id?: string
+          is_correct?: boolean | null
+          question?: string
+          response_time_ms?: number | null
+          session_id?: string
+          user_answer?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "flash_lite_cards_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "flash_lite_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      flash_lite_sessions: {
+        Row: {
+          accuracy_percentage: number | null
+          average_response_time: number | null
+          cards_completed: number
+          cards_correct: number
+          cards_total: number
+          category: string | null
+          completed_at: string | null
+          created_at: string
+          duration_seconds: number | null
+          id: string
+          mode: string
+          notes: string | null
+          started_at: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          accuracy_percentage?: number | null
+          average_response_time?: number | null
+          cards_completed?: number
+          cards_correct?: number
+          cards_total?: number
+          category?: string | null
+          completed_at?: string | null
+          created_at?: string
+          duration_seconds?: number | null
+          id?: string
+          mode: string
+          notes?: string | null
+          started_at?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          accuracy_percentage?: number | null
+          average_response_time?: number | null
+          cards_completed?: number
+          cards_correct?: number
+          cards_total?: number
+          category?: string | null
+          completed_at?: string | null
+          created_at?: string
+          duration_seconds?: number | null
+          id?: string
+          mode?: string
+          notes?: string | null
+          started_at?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       gamification_activities: {
         Row: {
           achievements_unlocked: string[] | null
