@@ -58,7 +58,7 @@ const B2BAdminDashboardPage: React.FC = () => {
                 Administrateur RH
               </Badge>
               <div className="flex items-center text-xs text-muted-foreground">
-                <div className="w-2 h-2 bg-green-500 rounded-full mr-1" aria-hidden="true"></div>
+                <div className="w-2 h-2 bg-success rounded-full mr-1" aria-hidden="true"></div>
                 <span>Données anonymisées</span>
               </div>
             </div>
@@ -116,8 +116,8 @@ const B2BAdminDashboardPage: React.FC = () => {
               </CardHeader>
               <CardContent>
                 <div className="flex items-center justify-between">
-                  <div className="text-2xl font-bold text-green-600">Élevé</div>
-                  <TrendingUp className="h-4 w-4 text-green-600" aria-hidden="true" />
+                  <div className="text-2xl font-bold text-success">Élevé</div>
+                  <TrendingUp className="h-4 w-4 text-success" aria-hidden="true" />
                 </div>
                 <Progress value={82} className="mt-2" aria-label="Engagement 82%" />
                 <p className="text-xs text-muted-foreground mt-1">
@@ -135,7 +135,7 @@ const B2BAdminDashboardPage: React.FC = () => {
               <CardContent>
                 <div className="flex items-center justify-between">
                   <div className="text-2xl font-bold">73%</div>
-                  <Users className="h-4 w-4 text-blue-500" aria-hidden="true" />
+                  <Users className="h-4 w-4 text-info" aria-hidden="true" />
                 </div>
                 <Progress value={73} className="mt-2" aria-label="Participation 73%" />
                 <p className="text-xs text-muted-foreground mt-1">
@@ -152,8 +152,8 @@ const B2BAdminDashboardPage: React.FC = () => {
               </CardHeader>
               <CardContent>
                 <div className="flex items-center justify-between">
-                  <div className="text-2xl font-bold text-orange-600">Modéré</div>
-                  <AlertTriangle className="h-4 w-4 text-orange-600" aria-hidden="true" />
+                  <div className="text-2xl font-bold text-warning">Modéré</div>
+                  <AlertTriangle className="h-4 w-4 text-warning" aria-hidden="true" />
                 </div>
                 <Progress value={45} className="mt-2" aria-label="Niveau de stress 45%" />
                 <p className="text-xs text-muted-foreground mt-1">
@@ -225,8 +225,8 @@ const B2BAdminDashboardPage: React.FC = () => {
               <Link to="/reports" className="block" aria-describedby="reports-desc">
                 <CardHeader>
                   <CardTitle className="flex items-center space-x-2">
-                    <div className="p-2 bg-blue-500/10 rounded-lg">
-                      <BarChart3 className="h-5 w-5 text-blue-500" aria-hidden="true" />
+                    <div className="p-2 bg-info/10 rounded-lg">
+                      <BarChart3 className="h-5 w-5 text-info" aria-hidden="true" />
                     </div>
                     <span>Rapports</span>
                     <ChevronRight className="h-4 w-4 ml-auto group-hover:translate-x-1 transition-transform" aria-hidden="true" />
@@ -254,8 +254,8 @@ const B2BAdminDashboardPage: React.FC = () => {
               <Link to="/events" className="block" aria-describedby="events-desc">
                 <CardHeader>
                   <CardTitle className="flex items-center space-x-2">
-                    <div className="p-2 bg-green-500/10 rounded-lg">
-                      <Calendar className="h-5 w-5 text-green-500" aria-hidden="true" />
+                    <div className="p-2 bg-success/10 rounded-lg">
+                      <Calendar className="h-5 w-5 text-success" aria-hidden="true" />
                     </div>
                     <span>Événements</span>
                     <ChevronRight className="h-4 w-4 ml-auto group-hover:translate-x-1 transition-transform" aria-hidden="true" />
@@ -290,17 +290,17 @@ const B2BAdminDashboardPage: React.FC = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
-                  <AlertTriangle className="h-4 w-4 text-orange-500" aria-hidden="true" />
+                  <AlertTriangle className="h-4 w-4 text-warning" aria-hidden="true" />
                   <span>Attention requise</span>
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  <div className="p-3 bg-orange-50 dark:bg-orange-950/50 border border-orange-200 dark:border-orange-800 rounded-lg">
-                    <h4 className="font-medium text-orange-800 dark:text-orange-200 mb-1">
+                  <div className="p-3 bg-warning/10 border border-warning/30 rounded-lg">
+                    <h4 className="font-medium text-warning mb-1">
                       Équipe Commercial
                     </h4>
-                    <p className="text-sm text-orange-700 dark:text-orange-300">
+                    <p className="text-sm text-warning/80">
                       Niveau de stress légèrement élevé cette semaine. 
                       Envisager une session Flash Glow collective.
                     </p>
@@ -312,17 +312,17 @@ const B2BAdminDashboardPage: React.FC = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
-                  <FileText className="h-4 w-4 text-blue-500" aria-hidden="true" />
+                  <FileText className="h-4 w-4 text-info" aria-hidden="true" />
                   <span>Actions recommandées</span>
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  <div className="p-3 bg-blue-50 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-800 rounded-lg">
-                    <h4 className="font-medium text-blue-800 dark:text-blue-200 mb-1">
+                  <div className="p-3 bg-info/10 border border-info/30 rounded-lg">
+                    <h4 className="font-medium text-info mb-1">
                       Bonnes pratiques
                     </h4>
-                    <p className="text-sm text-blue-700 dark:text-blue-300">
+                    <p className="text-sm text-info/80">
                       L'équipe Support affiche d'excellents résultats. 
                       Documenter leurs méthodes pour les partager.
                     </p>

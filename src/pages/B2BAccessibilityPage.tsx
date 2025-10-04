@@ -210,9 +210,9 @@ const B2BAccessibilityPage: React.FC = () => {
         >
           <div className="flex items-center justify-center gap-3 mb-4">
             <div className={`p-3 rounded-full ${
-              enterpriseHighContrast ? 'bg-white text-black' : 'bg-blue-100'
+              enterpriseHighContrast ? 'bg-white text-black' : 'bg-info/10'
             }`}>
-              <Building className={`h-8 w-8 ${enterpriseHighContrast ? 'text-black' : 'text-blue-600'}`} />
+              <Building className={`h-8 w-8 ${enterpriseHighContrast ? 'text-black' : 'text-info'}`} />
             </div>
             <h1 className={`text-4xl font-bold ${
               enterpriseHighContrast 
@@ -240,8 +240,8 @@ const B2BAccessibilityPage: React.FC = () => {
             enterpriseHighContrast ? 'bg-gray-900 border-white border-2' : 'bg-white/80 backdrop-blur-sm'
           }`}>
             <CardContent className="p-4 text-center">
-              <CheckCircle className="h-6 w-6 text-green-600 mx-auto mb-1" />
-              <div className={`text-xl font-bold ${enterpriseHighContrast ? 'text-white' : 'text-green-600'}`}>
+              <CheckCircle className="h-6 w-6 text-success mx-auto mb-1" />
+              <div className={`text-xl font-bold ${enterpriseHighContrast ? 'text-white' : 'text-success'}`}>
                 {accessibilityMetrics.wcagCompliance}%
               </div>
               <p className={`text-xs ${enterpriseHighContrast ? 'text-gray-300' : 'text-gray-600'}`}>
@@ -254,8 +254,8 @@ const B2BAccessibilityPage: React.FC = () => {
             enterpriseHighContrast ? 'bg-gray-900 border-white border-2' : 'bg-white/80 backdrop-blur-sm'
           }`}>
             <CardContent className="p-4 text-center">
-              <Users className="h-6 w-6 text-blue-600 mx-auto mb-1" />
-              <div className={`text-xl font-bold ${enterpriseHighContrast ? 'text-white' : 'text-blue-600'}`}>
+              <Users className="h-6 w-6 text-info mx-auto mb-1" />
+              <div className={`text-xl font-bold ${enterpriseHighContrast ? 'text-white' : 'text-info'}`}>
                 {accessibilityMetrics.accessibilityUsers}
               </div>
               <p className={`text-xs ${enterpriseHighContrast ? 'text-gray-300' : 'text-gray-600'}`}>
@@ -268,8 +268,8 @@ const B2BAccessibilityPage: React.FC = () => {
             enterpriseHighContrast ? 'bg-gray-900 border-white border-2' : 'bg-white/80 backdrop-blur-sm'
           }`}>
             <CardContent className="p-4 text-center">
-              <BarChart3 className="h-6 w-6 text-purple-600 mx-auto mb-1" />
-              <div className={`text-xl font-bold ${enterpriseHighContrast ? 'text-white' : 'text-purple-600'}`}>
+              <BarChart3 className="h-6 w-6 text-accent mx-auto mb-1" />
+              <div className={`text-xl font-bold ${enterpriseHighContrast ? 'text-white' : 'text-accent'}`}>
                 {accessibilityMetrics.userAdoption}%
               </div>
               <p className={`text-xs ${enterpriseHighContrast ? 'text-gray-300' : 'text-gray-600'}`}>
@@ -282,8 +282,8 @@ const B2BAccessibilityPage: React.FC = () => {
             enterpriseHighContrast ? 'bg-gray-900 border-white border-2' : 'bg-white/80 backdrop-blur-sm'
           }`}>
             <CardContent className="p-4 text-center">
-              <Heart className="h-6 w-6 text-pink-600 mx-auto mb-1" />
-              <div className={`text-xl font-bold ${enterpriseHighContrast ? 'text-white' : 'text-pink-600'}`}>
+              <Heart className="h-6 w-6 text-destructive mx-auto mb-1" />
+              <div className={`text-xl font-bold ${enterpriseHighContrast ? 'text-white' : 'text-destructive'}`}>
                 {accessibilityMetrics.employeeSatisfaction}%
               </div>
               <p className={`text-xs ${enterpriseHighContrast ? 'text-gray-300' : 'text-gray-600'}`}>
@@ -296,8 +296,8 @@ const B2BAccessibilityPage: React.FC = () => {
             enterpriseHighContrast ? 'bg-gray-900 border-white border-2' : 'bg-white/80 backdrop-blur-sm'
           }`}>
             <CardContent className="p-4 text-center">
-              <FileText className="h-6 w-6 text-orange-600 mx-auto mb-1" />
-              <div className={`text-xl font-bold ${enterpriseHighContrast ? 'text-white' : 'text-orange-600'}`}>
+              <FileText className="h-6 w-6 text-warning mx-auto mb-1" />
+              <div className={`text-xl font-bold ${enterpriseHighContrast ? 'text-white' : 'text-warning'}`}>
                 {accessibilityMetrics.supportTickets}
               </div>
               <p className={`text-xs ${enterpriseHighContrast ? 'text-gray-300' : 'text-gray-600'}`}>
@@ -310,8 +310,8 @@ const B2BAccessibilityPage: React.FC = () => {
             enterpriseHighContrast ? 'bg-gray-900 border-white border-2' : 'bg-white/80 backdrop-blur-sm'
           }`}>
             <CardContent className="p-4 text-center">
-              <Building className="h-6 w-6 text-indigo-600 mx-auto mb-1" />
-              <div className={`text-xl font-bold ${enterpriseHighContrast ? 'text-white' : 'text-indigo-600'}`}>
+              <Building className="h-6 w-6 text-primary mx-auto mb-1" />
+              <div className={`text-xl font-bold ${enterpriseHighContrast ? 'text-white' : 'text-primary'}`}>
                 {accessibilityMetrics.totalEmployees}
               </div>
               <p className={`text-xs ${enterpriseHighContrast ? 'text-gray-300' : 'text-gray-600'}`}>
@@ -338,7 +338,7 @@ const B2BAccessibilityPage: React.FC = () => {
                 </h2>
                 <Button 
                   onClick={deployToAllUsers}
-                  className="bg-blue-600 hover:bg-blue-700"
+                  className="bg-info hover:bg-info/90"
                 >
                   <Settings className="h-4 w-4 mr-2" />
                   Déployer à Tous
@@ -362,7 +362,7 @@ const B2BAccessibilityPage: React.FC = () => {
                         enterpriseHighContrast ? 'text-white' : 'text-gray-800'
                       }`}>
                         <div className={`p-2 rounded-lg ${
-                          enterpriseHighContrast ? 'bg-white text-black' : 'bg-blue-100 text-blue-600'
+                          enterpriseHighContrast ? 'bg-white text-black' : 'bg-info/10 text-info'
                         }`}>
                           {category.icon}
                         </div>
@@ -518,7 +518,7 @@ const B2BAccessibilityPage: React.FC = () => {
                         </div>
                         <div className="flex items-center gap-2">
                           <CheckCircle className={`h-5 w-5 ${
-                            item.status === 'complete' ? 'text-green-600' : 'text-yellow-600'
+                            item.status === 'complete' ? 'text-success' : 'text-warning'
                           }`} />
                           <Badge variant={item.status === 'complete' ? 'default' : 'secondary'}>
                             {item.status === 'complete' ? 'Conforme' : 'En cours'}
