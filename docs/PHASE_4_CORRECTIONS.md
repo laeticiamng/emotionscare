@@ -1,9 +1,9 @@
 # Phase 4 : Corrections des couleurs hardcodées - Dashboard Components
 
 **Date:** 2025-10-04  
-**Statut:** 🟡 En cours (11/67 fichiers traités)  
-**Fichiers corrigés:** 11  
-**Fichiers restants:** 56
+**Statut:** 🟡 En cours (17/67 fichiers traités)  
+**Fichiers corrigés:** 17  
+**Fichiers restants:** 50
 
 ## 📋 Résumé
 
@@ -100,8 +100,9 @@ Cette phase corrige les couleurs hardcodées dans les composants dashboard (`src
 | **Phase 4 (Batch 1)** | **6** | **~63** | **22** | **~399** |
 | **Phase 4 (Batch 2)** | **2** | **~3** | **24** | **~402** |
 | **Phase 4 (Batch 3)** | **3** | **~30** | **27** | **~432** |
+| **Phase 4 (Batch 4)** | **6** | **~40** | **33** | **~472** |
 
-## 🎯 Fichiers restants à traiter (56)
+## 🎯 Fichiers restants à traiter (50)
 
 ### Sous-dossiers
 - `admin/` - composants administration
@@ -200,16 +201,81 @@ Cette phase corrige les couleurs hardcodées dans les composants dashboard (`src
 | Couleurs hardcodées remplacées | ~30 |
 | Tokens HSL utilisés | primary, accent, success, warning, foreground, muted-foreground, muted |
 
+## ✅ Batch 4 - Sous-dossiers (Widgets, B2C, Admin)
+
+### 12. `src/components/dashboard/widgets/GamificationWidget.tsx`
+- **Problèmes identifiés:** Couleurs hardcodées pour gamification
+- **Corrections effectuées:**
+  - `text-yellow-500` → `text-warning`
+  - `text-green-500` → `text-success`
+  - `text-purple-500` → `text-accent`
+  - `from-yellow-400 to-yellow-600` → `from-warning to-warning/70`
+- **Lignes modifiées:** 43-87
+- **Instances corrigées:** ~6
+
+### 13. `src/components/dashboard/widgets/EmotionalWeatherWidget.tsx`
+- **Problèmes identifiés:** Nombreux gradients et couleurs météo
+- **Corrections effectuées:**
+  - Tous les gradients météo simplifiés vers tokens sémantiques
+  - `text-yellow-500/400` → `text-warning`
+  - `text-blue-400/500/600` → `text-primary/70`
+  - `text-purple-600` → `text-accent`
+  - `bg-yellow-500/400` → `bg-warning/50 bg-warning/70`
+  - `text-emerald-600 / text-rose-600 / text-slate-600` → `text-success / text-destructive / text-muted-foreground`
+  - Tous les gradients de background avec dark mode → tokens sémantiques avec opacités
+- **Lignes modifiées:** 22-177
+- **Instances corrigées:** ~20
+
+### 14. `src/components/dashboard/b2c/EmotionalWeatherCard.tsx`
+- **Problèmes identifiés:** Couleurs météo hardcodées
+- **Corrections effectuées:**
+  - `text-yellow-500` → `text-warning`
+  - `text-gray-500` → `text-muted-foreground`
+  - `text-blue-500/700` → `text-primary`
+- **Lignes modifiées:** 22-64
+- **Instances corrigées:** ~6
+
+### 15. `src/components/dashboard/b2c/MusicTherapyCard.tsx`
+- **Problème:** Aucune couleur hardcodée
+- **Statut:** ✅ Déjà conforme
+
+### 16. `src/components/dashboard/admin/KpiCard.tsx`
+- **Problèmes identifiés:** Couleurs conditionnelles hardcodées
+- **Corrections effectuées:**
+  - `text-emerald-600 dark:text-emerald-400` → `text-success`
+  - `text-rose-600 dark:text-rose-400` → `text-destructive`
+  - `text-gray-600 dark:text-gray-400` → `text-muted-foreground`
+- **Lignes modifiées:** 69-75
+- **Instances corrigées:** ~3
+
+### 17. `src/components/dashboard/admin/EmotionalClimateCard.tsx`
+- **Problèmes identifiés:** Couleurs tendance hardcodées
+- **Corrections effectuées:**
+  - `text-red-500` → `text-destructive`
+  - `text-emerald-500` → `text-success`
+  - `text-red-500` (tendance) → `text-destructive`
+- **Lignes modifiées:** 32-54
+- **Instances corrigées:** ~5
+
+## 📊 Statistiques Batch 4
+
+| Métrique | Valeur |
+|----------|---------|
+| Fichiers corrigés | 6 |
+| Total de lignes modifiées | ~150+ |
+| Couleurs hardcodées remplacées | ~40 |
+| Tokens HSL utilisés | primary, accent, success, warning, destructive, muted-foreground |
+
 ## 🔄 Prochaines étapes
 
-### Batch 4 (prioritaire - sous-dossiers)
-1. Corriger les sous-dossiers prioritaires :
-   - `admin/` - composants administration
-   - `b2b/` - composants B2B
-   - `b2c/` - composants B2C
-   - `widgets/` - widgets dashboard
+### Batch 5 (sous-dossiers suite)
+1. Corriger les dossiers restants :
+   - `admin/cards/`, `admin/charts/`, `admin/widgets/`
+   - `b2b/widgets/`, `b2c/widgets/`
+   - `charts/` - graphiques
+   - `tabs/` - onglets
 
-### Batch 5
+### Batch 6
 2. Traiter les sous-dossiers :
    - `charts/` - composants de graphiques
    - `widgets/` - widgets dashboard
@@ -230,5 +296,6 @@ Cette phase corrige les couleurs hardcodées dans les composants dashboard (`src
 **Phase 4 Batch 1:** 6/67 fichiers complétés ✅  
 **Phase 4 Batch 2:** 2/67 fichiers complétés ✅  
 **Phase 4 Batch 3:** 3/67 fichiers complétés ✅  
-**Progression estimée Phase 4:** ~16% (11/67)  
-**Progression totale projet:** ~28% estimé
+**Phase 4 Batch 4:** 6/67 fichiers complétés ✅  
+**Progression estimée Phase 4:** ~25% (17/67)  
+**Progression totale projet:** ~32% estimé
