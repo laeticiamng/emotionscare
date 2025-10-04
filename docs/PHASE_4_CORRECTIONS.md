@@ -1,9 +1,9 @@
 # Phase 4 : Corrections des couleurs hardcodées - Dashboard Components
 
 **Date:** 2025-10-04  
-**Statut:** 🟡 En cours (17/67 fichiers traités)  
-**Fichiers corrigés:** 17  
-**Fichiers restants:** 50
+**Statut:** 🟡 En cours (23/67 fichiers traités)  
+**Fichiers corrigés:** 23  
+**Fichiers restants:** 44
 
 ## 📋 Résumé
 
@@ -101,6 +101,7 @@ Cette phase corrige les couleurs hardcodées dans les composants dashboard (`src
 | **Phase 4 (Batch 2)** | **2** | **~3** | **24** | **~402** |
 | **Phase 4 (Batch 3)** | **3** | **~30** | **27** | **~432** |
 | **Phase 4 (Batch 4)** | **6** | **~40** | **33** | **~472** |
+| **Phase 4 (Batch 5)** | **6** | **~22** | **39** | **~494** |
 
 ## 🎯 Fichiers restants à traiter (50)
 
@@ -266,9 +267,74 @@ Cette phase corrige les couleurs hardcodées dans les composants dashboard (`src
 | Couleurs hardcodées remplacées | ~40 |
 | Tokens HSL utilisés | primary, accent, success, warning, destructive, muted-foreground |
 
+## ✅ Batch 5 - Charts & Admin Components
+
+### 18. `src/components/dashboard/charts/EmotionPieChart.tsx`
+- **Problèmes identifiés:** Couleur hex hardcodée
+- **Corrections effectuées:**
+  - `fill="#8884d8"` → `fill="hsl(var(--primary))"`
+- **Lignes modifiées:** 20-29 (Pie component)
+- **Instances corrigées:** ~1
+
+### 19. `src/components/dashboard/charts/ProductivityChart.tsx`
+- **Problèmes identifiés:** Nombreuses couleurs hardcodées dans toggle buttons et graphiques
+- **Corrections effectuées:**
+  - `bg-blue-600 text-white` → `bg-primary text-primary-foreground`
+  - `bg-green-600 text-white` → `bg-success text-success-foreground`
+  - `bg-purple-600 text-white` → `bg-accent text-accent-foreground`
+  - `bg-gray-200 text-gray-700` → `bg-muted text-muted-foreground`
+  - `stroke="#3B82F6"` → `stroke="hsl(var(--primary))"`
+  - `stroke="#10B981"` → `stroke="hsl(var(--success))"`
+  - `stroke="#8B5CF6"` → `stroke="hsl(var(--accent))"`
+  - `fill="#3B82F6"` → `fill="hsl(var(--primary) / 0.5)"`
+  - `fill="#10B981"` → `fill="hsl(var(--success) / 0.5)"`
+  - `fill="#8B5CF6"` → `fill="hsl(var(--accent) / 0.5)"`
+- **Lignes modifiées:** 53-107 (buttons + charts)
+- **Instances corrigées:** ~12
+
+### 20. `src/components/dashboard/charts/WeeklyActivityChart.tsx`
+- **Problèmes identifiés:** Couleurs hex hardcodées pour activities stacked bars
+- **Corrections effectuées:**
+  - `fill="#4CAF50"` (journal) → `fill="hsl(var(--success))"`
+  - `fill="#2196F3"` (music) → `fill="hsl(var(--primary))"`
+  - `fill="#FF9800"` (scan) → `fill="hsl(var(--warning))"`
+  - `fill="#9C27B0"` (coach) → `fill="hsl(var(--accent))"`
+- **Lignes modifiées:** 74-113 (stacked bars)
+- **Instances corrigées:** ~4
+
+### 21. `src/components/dashboard/admin/AdminDashboard.tsx`
+- **Problème:** Aucune couleur hardcodée
+- **Statut:** ✅ Déjà conforme
+
+### 22. `src/components/dashboard/admin/GamificationSummaryCard.tsx`
+- **Problèmes identifiés:** Couleurs hardcodées pour icônes
+- **Corrections effectuées:**
+  - `text-amber-500` → `text-warning`
+  - `text-indigo-500` → `text-primary`
+- **Lignes modifiées:** 29-43
+- **Instances corrigées:** ~2
+
+### 23. `src/components/dashboard/admin/StatsCard.tsx`
+- **Problèmes identifiés:** Couleurs hardcodées pour les tendances
+- **Corrections effectuées:**
+  - `text-emerald-600` → `text-success`
+  - `text-rose-600` → `text-destructive`
+  - `text-gray-500` → `text-muted-foreground`
+- **Lignes modifiées:** 31-53 (trend indicators)
+- **Instances corrigées:** ~3
+
+## 📊 Statistiques Batch 5
+
+| Métrique | Valeur |
+|----------|---------|
+| Fichiers corrigés | 6 |
+| Total de lignes modifiées | ~100+ |
+| Couleurs hardcodées remplacées | ~22 |
+| Tokens HSL utilisés | primary, accent, success, warning, destructive, muted-foreground, success-foreground, accent-foreground, primary-foreground |
+
 ## 🔄 Prochaines étapes
 
-### Batch 5 (sous-dossiers suite)
+### Batch 6 (sous-dossiers suite)
 1. Corriger les dossiers restants :
    - `admin/cards/`, `admin/charts/`, `admin/widgets/`
    - `b2b/widgets/`, `b2c/widgets/`
@@ -297,5 +363,6 @@ Cette phase corrige les couleurs hardcodées dans les composants dashboard (`src
 **Phase 4 Batch 2:** 2/67 fichiers complétés ✅  
 **Phase 4 Batch 3:** 3/67 fichiers complétés ✅  
 **Phase 4 Batch 4:** 6/67 fichiers complétés ✅  
-**Progression estimée Phase 4:** ~25% (17/67)  
-**Progression totale projet:** ~32% estimé
+**Phase 4 Batch 5:** 6/67 fichiers complétés ✅  
+**Progression estimée Phase 4:** ~34% (23/67)  
+**Progression totale projet:** ~37% estimé

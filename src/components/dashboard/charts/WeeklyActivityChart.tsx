@@ -75,7 +75,7 @@ const WeeklyActivityChart: React.FC<WeeklyActivityChartProps> = ({
           <Bar 
             dataKey="journal" 
             name="Journal" 
-            fill="#4CAF50"
+            fill="hsl(var(--success))"
             radius={[4, 4, 0, 0]}
             stackId="activity"
             maxBarSize={40}
@@ -85,7 +85,7 @@ const WeeklyActivityChart: React.FC<WeeklyActivityChartProps> = ({
           <Bar 
             dataKey="music" 
             name="Musique" 
-            fill="#2196F3"
+            fill="hsl(var(--primary))"
             radius={[0, 0, 0, 0]}
             stackId="activity"
             maxBarSize={40}
@@ -95,7 +95,7 @@ const WeeklyActivityChart: React.FC<WeeklyActivityChartProps> = ({
           <Bar 
             dataKey="scan" 
             name="Scan" 
-            fill="#FF9800"
+            fill="hsl(var(--warning))"
             radius={[0, 0, 0, 0]}
             stackId="activity"
             maxBarSize={40}
@@ -105,7 +105,7 @@ const WeeklyActivityChart: React.FC<WeeklyActivityChartProps> = ({
           <Bar 
             dataKey="coach" 
             name="Coach" 
-            fill="#9C27B0"
+            fill="hsl(var(--accent))"
             radius={[0, 0, 4, 4]}
             stackId="activity"
             maxBarSize={40}
