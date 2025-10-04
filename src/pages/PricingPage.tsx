@@ -29,7 +29,7 @@ export default function PricingPage() {
       price: { monthly: 0, yearly: 0 },
       badge: null,
       icon: Heart,
-      color: 'text-green-600',
+      color: 'text-success',
       features: [
         '3 séances par jour',
         'Scan émotionnel de base',
@@ -51,7 +51,7 @@ export default function PricingPage() {
       price: { monthly: 19.99, yearly: 199.99 },
       badge: 'Populaire',
       icon: Star,
-      color: 'text-blue-600',
+      color: 'text-info',
       features: [
         'Séances illimitées',
         'Tous les modules disponibles',
@@ -72,7 +72,7 @@ export default function PricingPage() {
       price: { monthly: 49.99, yearly: 499.99 },
       badge: 'Thérapeutes',
       icon: Brain,
-      color: 'text-purple-600',
+      color: 'text-accent',
       features: [
         'Tout Premium inclus',
         'Dashboard multi-patients',
@@ -180,7 +180,7 @@ export default function PricingPage() {
                     <div className="pt-4">
                       <div className="text-4xl font-bold">{getPrice(plan)}</div>
                       {savings && isYearly && (
-                        <p className="text-sm text-green-600 font-medium">
+                        <p className="text-sm text-success font-medium">
                           Économisez {savings.amount}€ ({savings.percentage}%)
                         </p>
                       )}
@@ -205,7 +205,7 @@ export default function PricingPage() {
                         <ul className="space-y-2">
                           {plan.features.map((feature, index) => (
                             <li key={index} className="flex items-start gap-2 text-sm">
-                              <Check className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
+                              <Check className="h-4 w-4 text-success mt-0.5 flex-shrink-0" />
                               <span>{feature}</span>
                             </li>
                           ))}
@@ -232,10 +232,10 @@ export default function PricingPage() {
           </div>
 
           {/* Plan Entreprise */}
-          <Card className="bg-gradient-to-r from-slate-50 to-slate-100 border-slate-200">
+          <Card className="bg-muted/30 border-muted">
             <CardHeader>
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 rounded-lg bg-slate-600 text-white flex items-center justify-center">
+                <div className="w-12 h-12 rounded-lg bg-muted text-muted-foreground flex items-center justify-center">
                   <Building2 className="h-6 w-6" />
                 </div>
                 <div>
@@ -251,7 +251,7 @@ export default function PricingPage() {
                   <div className="grid grid-cols-1 gap-3">
                     {enterpriseFeatures.map((feature, index) => (
                       <div key={index} className="flex items-start gap-2">
-                        <Check className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
+                        <Check className="h-4 w-4 text-success mt-0.5 flex-shrink-0" />
                         <span className="text-sm">{feature}</span>
                       </div>
                     ))}
@@ -287,7 +287,7 @@ export default function PricingPage() {
           {/* FAQ/Garanties */}
           <div className="grid md:grid-cols-3 gap-6 pt-8">
             <div className="text-center space-y-3">
-              <Shield className="h-8 w-8 text-blue-600 mx-auto" />
+              <Shield className="h-8 w-8 text-info mx-auto" />
               <h3 className="font-semibold">30 jours satisfait ou remboursé</h3>
               <p className="text-sm text-muted-foreground">
                 Testez sans risque pendant un mois complet
@@ -295,7 +295,7 @@ export default function PricingPage() {
             </div>
             
             <div className="text-center space-y-3">
-              <Zap className="h-8 w-8 text-yellow-600 mx-auto" />
+              <Zap className="h-8 w-8 text-warning mx-auto" />
               <h3 className="font-semibold">Activation immédiate</h3>
               <p className="text-sm text-muted-foreground">
                 Accès instantané à toutes vos fonctionnalités
@@ -303,7 +303,7 @@ export default function PricingPage() {
             </div>
             
             <div className="text-center space-y-3">
-              <Users className="h-8 w-8 text-green-600 mx-auto" />
+              <Users className="h-8 w-8 text-success mx-auto" />
               <h3 className="font-semibold">Support expert</h3>
               <p className="text-sm text-muted-foreground">
                 Équipe spécialisée en bien-être numérique
