@@ -1,9 +1,9 @@
 # Phase 4 : Corrections des couleurs hardcodées - Dashboard Components
 
 **Date:** 2025-10-04  
-**Statut:** 🟡 En cours (8/67 fichiers traités)  
-**Fichiers corrigés:** 8  
-**Fichiers restants:** 59
+**Statut:** 🟡 En cours (11/67 fichiers traités)  
+**Fichiers corrigés:** 11  
+**Fichiers restants:** 56
 
 ## 📋 Résumé
 
@@ -99,8 +99,9 @@ Cette phase corrige les couleurs hardcodées dans les composants dashboard (`src
 | Phase 3 | 4 | ~39 | 16 | ~336 |
 | **Phase 4 (Batch 1)** | **6** | **~63** | **22** | **~399** |
 | **Phase 4 (Batch 2)** | **2** | **~3** | **24** | **~402** |
+| **Phase 4 (Batch 3)** | **3** | **~30** | **27** | **~432** |
 
-## 🎯 Fichiers restants à traiter (59)
+## 🎯 Fichiers restants à traiter (56)
 
 ### Sous-dossiers
 - `admin/` - composants administration
@@ -155,16 +156,60 @@ Cette phase corrige les couleurs hardcodées dans les composants dashboard (`src
 | Couleurs hardcodées remplacées | ~3 |
 | Tokens HSL utilisés | primary, destructive |
 
+## ✅ Batch 3 - Dashboards Principaux (Gradients Complexes)
+
+### 9. `src/components/dashboard/LivingDashboard.tsx`
+- **Problèmes identifiés:** Nombreux gradients et couleurs hardcodées
+- **Corrections effectuées:**
+  - Tous les gradients d'actions adaptatives convertis vers tokens sémantiques
+  - `from-blue-400 to-purple-500` → `from-primary/70 to-accent/70`
+  - `from-green-400 to-emerald-300` → `from-success/70 to-success/50`
+  - `from-yellow-400 to-orange-300` → `from-warning/70 to-warning/50`
+  - `from-purple-400 to-pink-300` → `from-accent/70 to-accent/50`
+  - `from-indigo-500 to-purple-600` → `from-primary to-accent`
+  - `text-gray-700/600/500` → `text-foreground / text-muted-foreground`
+  - `bg-yellow-50` → `bg-warning/10`
+  - `text-yellow-500/600` → `text-warning`
+  - `bg-gray-50` → `bg-muted/50`
+- **Lignes modifiées:** ~25+ corrections à travers le fichier
+- **Instances corrigées:** ~25
+
+### 10. `src/components/dashboard/PerfectDashboard.tsx`
+- **Problèmes identifiés:** Couleurs orange hardcodées pour progression
+- **Corrections effectuées:**
+  - `border-orange-200 bg-gradient-to-br from-orange-50` → `border-warning/20 bg-gradient-to-br from-warning/5`
+  - `text-orange-600` → `text-warning`
+  - `bg-orange-400` → `bg-warning`
+  - `bg-gray-200` → `bg-muted`
+- **Lignes modifiées:** 321-438 (sections progression et achievements)
+- **Instances corrigées:** ~4
+
+### 11. `src/components/dashboard/TeamEmotionHeatmap.tsx`
+- **Problèmes identifiés:** Couleur rgba hardcodée en noir
+- **Corrections effectuées:**
+  - `rgba(0,0,0,${v})` → `hsl(var(--primary) / ${v})`
+- **Lignes modifiées:** 14-18 (heatmap rendering)
+- **Instances corrigées:** ~1
+
+## 📊 Statistiques Batch 3
+
+| Métrique | Valeur |
+|----------|---------|
+| Fichiers corrigés | 3 |
+| Total de lignes modifiées | ~30+ |
+| Couleurs hardcodées remplacées | ~30 |
+| Tokens HSL utilisés | primary, accent, success, warning, foreground, muted-foreground, muted |
+
 ## 🔄 Prochaines étapes
 
-### Batch 3 (prioritaire)
-1. Corriger les dashboards principaux :
-   - `LivingDashboard.tsx` (gradients complexes)
-   - `PerfectDashboard.tsx`
-   - `UserDashboard.tsx`
-   - `AdminDashboard.tsx`
+### Batch 4 (prioritaire - sous-dossiers)
+1. Corriger les sous-dossiers prioritaires :
+   - `admin/` - composants administration
+   - `b2b/` - composants B2B
+   - `b2c/` - composants B2C
+   - `widgets/` - widgets dashboard
 
-### Batch 4
+### Batch 5
 2. Traiter les sous-dossiers :
    - `charts/` - composants de graphiques
    - `widgets/` - widgets dashboard
@@ -184,5 +229,6 @@ Cette phase corrige les couleurs hardcodées dans les composants dashboard (`src
 
 **Phase 4 Batch 1:** 6/67 fichiers complétés ✅  
 **Phase 4 Batch 2:** 2/67 fichiers complétés ✅  
-**Progression estimée Phase 4:** ~12% (8/67)  
-**Progression totale projet:** ~26% estimé
+**Phase 4 Batch 3:** 3/67 fichiers complétés ✅  
+**Progression estimée Phase 4:** ~16% (11/67)  
+**Progression totale projet:** ~28% estimé
