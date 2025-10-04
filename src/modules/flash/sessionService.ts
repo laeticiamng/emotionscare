@@ -1,4 +1,3 @@
-// @ts-nocheck
 import * as Sentry from '@sentry/react';
 import { supabase } from '@/integrations/supabase/client';
 import type { Database } from '@/integrations/supabase/types';
@@ -187,13 +186,6 @@ export async function logAndJournal(payload: LogAndJournalPayload): Promise<LogA
     content: payload.journalText,
     created_at: nowIso,
     updated_at: nowIso,
-    emotion_analysis: {
-      module: payload.type,
-      mood_delta: moodDelta,
-      duration_sec: duration,
-      mood_before: payload.moodBefore ?? null,
-      mood_after: payload.moodAfter ?? null,
-    },
   };
 
   const { data: journalRows, error: journalError } = await supabase

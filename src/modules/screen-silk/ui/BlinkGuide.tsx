@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * BlinkGuide - Guide de clignements pour Screen Silk
  */

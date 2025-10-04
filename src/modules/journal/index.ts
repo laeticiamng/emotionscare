@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Journal Module - Journal vocal et textuel avec IA
  */
@@ -11,9 +10,5 @@ export { default as BurnSealToggle } from './ui/BurnSealToggle';
 export type { 
   JournalEntry, 
   JournalVoiceEntry, 
-  JournalTextEntry,
-  JournalConfig,
-  JournalData,
-  JournalState 
+  JournalTextEntry
 } from './journalService';
-export type { JournalConfig as JournalMachineConfig } from './useJournalMachine';

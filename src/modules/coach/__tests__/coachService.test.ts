@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { describe, expect, it, vi } from 'vitest';
 
 import { sha256Hex, webCryptoUnavailableMessage } from '@/lib/hash';

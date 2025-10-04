@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * useScreenSilkMachine - State machine pour Screen Silk
  */
@@ -84,9 +83,9 @@ export const useScreenSilkMachine = (config: ScreenSilkConfig) => {
 
   const {
     state,
-    data,
+    result: data,
     error,
-    run: startSession,
+    start: startSession,
     reset
   } = useAsyncMachine<ScreenSilkData>({
     run: runSession,

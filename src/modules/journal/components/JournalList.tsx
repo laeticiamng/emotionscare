@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useMemo } from 'react'
 import DOMPurify from 'dompurify'
 import { Button } from '@/components/ui/button'
@@ -189,7 +188,7 @@ export function SafeNote({ text }: { text: string }) {
     const rendered = renderMarkdown(text)
     return DOMPurify.sanitize(rendered, {
       ALLOWED_TAGS: ['p', 'em', 'strong', 'a', 'ul', 'li', 'code'],
-      ALLOWED_ATTR: { a: ['href', 'target', 'rel'] },
+      ALLOWED_ATTR: { a: ['href', 'target', 'rel'] } as any,
       ADD_ATTR: ['rel'],
     })
   }, [text])

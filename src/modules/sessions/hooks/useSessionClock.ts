@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 type ClockState = 'idle' | 'running' | 'paused' | 'completed'

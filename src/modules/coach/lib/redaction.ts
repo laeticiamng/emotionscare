@@ -1,4 +1,3 @@
-// @ts-nocheck
 const EMAIL_PATTERN = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi;
 const PHONE_PATTERN = /\b(?:\+?\d[\d\s\-]{7,}\d)\b/g;
 const MULTI_SPACE = /\s+/g;
