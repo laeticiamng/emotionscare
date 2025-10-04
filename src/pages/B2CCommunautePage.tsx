@@ -585,7 +585,7 @@ const B2CCommunautePage: React.FC = () => {
                 <Button
                   ref={bannerCtaRef}
                   onClick={() => setShowSocialConfirm(true)}
-                  className="bg-emerald-600 text-white hover:bg-emerald-600/90"
+                  className="bg-emerald-600 text-primary-foreground hover:bg-emerald-600/90"
                 >
                   Écoute 2 min ?
                 </Button>

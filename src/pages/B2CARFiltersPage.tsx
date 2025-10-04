@@ -17,28 +17,28 @@ const B2CARFiltersPage: React.FC = () => {
       name: 'Sérénité',
       description: 'Filtre apaisant aux tons bleus',
       icon: Heart,
-      color: 'bg-blue-500'
+      color: 'bg-info'
     },
     {
       id: 'joy',
       name: 'Joie',
       description: 'Filtre énergisant aux tons dorés',
       icon: Smile,
-      color: 'bg-yellow-500'
+      color: 'bg-warning'
     },
     {
       id: 'focus',
       name: 'Concentration',
       description: 'Filtre favorisant la focus',
       icon: Sparkles,
-      color: 'bg-purple-500'
+      color: 'bg-accent'
     },
     {
       id: 'energy',
       name: 'Énergie',
       description: 'Filtre dynamisant',
       icon: Palette,
-      color: 'bg-red-500'
+      color: 'bg-destructive'
     }
   ];
 
@@ -90,7 +90,7 @@ const B2CARFiltersPage: React.FC = () => {
               <CardContent>
                 <div className="relative bg-muted rounded-lg overflow-hidden aspect-video">
                   <div className="w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center">
-                    <div className="text-center text-white">
+                    <div className="text-center text-primary-foreground">
                       <Camera className="w-12 h-12 mx-auto mb-4 opacity-50" />
                       <p className="text-sm opacity-75">Caméra AR simulée</p>
                     </div>

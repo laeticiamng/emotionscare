@@ -264,7 +264,7 @@ const B2CBubbleBeatPage: React.FC = () => {
           } : { scale: 1, rotate: 0 }}
           transition={{ duration: heartRate ? 60/heartRate : 1, repeat: isPlaying ? Infinity : 0 }}
         >
-          <Heart className="h-8 w-8 text-red-500" />
+          <Heart className="h-8 w-8 text-destructive" />
         </motion.div>
         <div>
           <h1 className="text-3xl font-bold">Bubble Beat Pro 💓</h1>
@@ -279,7 +279,7 @@ const B2CBubbleBeatPage: React.FC = () => {
             <motion.div
               animate={{ scale: [1, 1.1, 1] }}
               transition={{ duration: 60/heartRate, repeat: Infinity }}
-              className="text-2xl font-bold text-red-500"
+              className="text-2xl font-bold text-destructive"
             >
               {Math.round(heartRate)}
             </motion.div>
@@ -288,19 +288,19 @@ const B2CBubbleBeatPage: React.FC = () => {
         </Card>
         <Card>
           <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-blue-500">{currentScore}</div>
+            <div className="text-2xl font-bold text-info">{currentScore}</div>
             <div className="text-sm text-muted-foreground">Score</div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-purple-500">{biometricData.coherenceLevel}%</div>
+            <div className="text-2xl font-bold text-accent">{biometricData.coherenceLevel}%</div>
             <div className="text-sm text-muted-foreground">Cohérence</div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-green-500">{formatTime(sessionTime)}</div>
+            <div className="text-2xl font-bold text-success">{formatTime(sessionTime)}</div>
             <div className="text-sm text-muted-foreground">Temps</div>
           </CardContent>
         </Card>
@@ -324,7 +324,7 @@ const B2CBubbleBeatPage: React.FC = () => {
                   <Button
                     variant={gameMode === key ? "default" : "outline"}
                     className={`w-full h-auto p-6 flex flex-col gap-3 ${
-                      gameMode === key ? `bg-gradient-to-br ${mode.color} text-white` : ''
+                      gameMode === key ? `bg-gradient-to-br ${mode.color} text-primary-foreground` : ''
                     }`}
                     onClick={() => setGameMode(key as typeof gameMode)}
                     disabled={isPlaying}
@@ -440,7 +440,7 @@ const B2CBubbleBeatPage: React.FC = () => {
                     boxShadow: '0 4px 20px rgba(0,0,0,0.3)'
                   }}
                 >
-                  <div className="absolute inset-0 rounded-full bg-white/30" />
+                  <div className="absolute inset-0 rounded-full bg-background/30" />
                 </motion.div>
               ))}
             </AnimatePresence>
@@ -448,12 +448,12 @@ const B2CBubbleBeatPage: React.FC = () => {
             {/* Indicateur de rythme cardiaque */}
             <div className="absolute bottom-4 left-4 right-4">
               <motion.div
-                className="h-2 bg-white/30 rounded-full overflow-hidden"
+                className="h-2 bg-background/30 rounded-full overflow-hidden"
                 animate={{ opacity: [0.5, 1, 0.5] }}
                 transition={{ duration: 60/heartRate, repeat: Infinity }}
               >
                 <motion.div
-                  className="h-full bg-white"
+                  className="h-full bg-background"
                   animate={{ width: [`${heartRate}%`, `${heartRate + 10}%`, `${heartRate}%`] }}
                   transition={{ duration: 60/heartRate, repeat: Infinity }}
                 />
@@ -462,7 +462,7 @@ const B2CBubbleBeatPage: React.FC = () => {
 
             {!isPlaying && (
               <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-center text-white">
+                <div className="text-center text-primary-foreground">
                   <Music className="h-16 w-16 mx-auto mb-4 opacity-50" />
                   <div className="text-lg font-medium">Prêt pour votre session Bubble Beat ?</div>
                   <div className="text-sm opacity-80">Choisissez un mode et appuyez sur Démarrer</div>
@@ -477,7 +477,7 @@ const B2CBubbleBeatPage: React.FC = () => {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Waves className="h-5 w-5 text-blue-500" />
+            <Waves className="h-5 w-5 text-info" />
             Données Biométriques
           </CardTitle>
         </CardHeader>
@@ -502,7 +502,7 @@ const B2CBubbleBeatPage: React.FC = () => {
               <div className="flex items-center gap-2">
                 <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
                   <motion.div
-                    className="h-full bg-gradient-to-r from-green-500 to-red-500"
+                    className="h-full bg-gradient-to-r from-success to-destructive"
                     animate={{ width: `${biometricData.stressLevel}%` }}
                     transition={{ duration: 0.5 }}
                   />
@@ -516,7 +516,7 @@ const B2CBubbleBeatPage: React.FC = () => {
               <div className="flex items-center gap-2">
                 <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
                   <motion.div
-                    className="h-full bg-gradient-to-r from-purple-500 to-pink-500"
+                    className="h-full bg-gradient-to-r from-accent to-accent/50"
                     animate={{ width: `${biometricData.coherenceLevel}%` }}
                     transition={{ duration: 0.5 }}
                   />
