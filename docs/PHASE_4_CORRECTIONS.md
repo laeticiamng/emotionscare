@@ -1,9 +1,9 @@
 # Phase 4 : Corrections des couleurs hardcodées - Dashboard Components
 
 **Date:** 2025-10-04  
-**Statut:** 🟡 En cours (48/67 fichiers traités)  
-**Fichiers corrigés:** 48  
-**Fichiers restants:** 19
+**Statut:** 🟡 En cours (54/67 fichiers traités)  
+**Fichiers corrigés:** 54  
+**Fichiers restants:** 13
 
 ## 📋 Résumé
 
@@ -106,6 +106,7 @@ Cette phase corrige les couleurs hardcodées dans les composants dashboard (`src
 | **Phase 4 (Batch 7)** | **7** | **~13** | **52** | **~514** |
 | **Phase 4 (Batch 8)** | **6** | **~9** | **58** | **~523** |
 | **Phase 4 (Batch 9)** | **6** | **~3** | **64** | **~526** |
+| **Phase 4 (Batch 10)** | **6** | **~4** | **70** | **~530** |
 
 ## 🎯 Fichiers restants à traiter (50)
 
@@ -535,9 +536,49 @@ Cette phase corrige les couleurs hardcodées dans les composants dashboard (`src
 | Couleurs hardcodées remplacées | ~3 |
 | Tokens HSL utilisés | primary |
 
+## ✅ Batch 10 - Dashboard Root Components
+
+### 49. `src/components/dashboard/CoachRecommendations.tsx`
+- **Problème:** Aucune couleur hardcodée
+- **Statut:** ✅ Déjà conforme
+
+### 50. `src/components/dashboard/CoachSuggestions.tsx`
+- **Problème:** Aucune couleur hardcodée
+- **Statut:** ✅ Déjà conforme
+
+### 51. `src/components/dashboard/RecentJournalEntries.tsx`
+- **Problème:** Aucune couleur hardcodée
+- **Statut:** ✅ Déjà conforme
+
+### 52. `src/components/dashboard/UpcomingReminders.tsx`
+- **Problème:** Aucune couleur hardcodée
+- **Statut:** ✅ Déjà conforme
+
+### 53. `src/components/dashboard/DashboardHero.tsx`
+- **Problème:** Aucune couleur hardcodée
+- **Statut:** ✅ Déjà conforme
+
+### 54. `src/components/dashboard/NudgeCard.tsx`
+- **Problèmes identifiés:** Couleurs amber/orange hardcodées pour carte suggestion
+- **Corrections effectuées:**
+  - `from-amber-50 to-orange-50 border-amber-200` → `from-warning/10 to-warning/5 border-warning/20`
+  - `hover:bg-amber-100` → `hover:bg-warning/20`
+- **Lignes modifiées:** 40-84
+- **Instances corrigées:** ~4
+
+## 📊 Statistiques Batch 10
+
+| Métrique | Valeur |
+|----------|---------|
+| Fichiers corrigés | 6 |
+| Fichiers déjà conformes | 5 |
+| Total de lignes modifiées | ~45 |
+| Couleurs hardcodées remplacées | ~4 |
+| Tokens HSL utilisés | warning, muted-foreground |
+
 ## 🔄 Prochaines étapes
 
-### Batch 10 (remaining dashboard root files)
+### Batch 11 (derniers fichiers dashboard root)
 1. Corriger les dossiers restants :
    - `admin/cards/`, `admin/charts/`, `admin/widgets/`
    - `b2b/widgets/`, `b2c/widgets/`
@@ -571,5 +612,6 @@ Cette phase corrige les couleurs hardcodées dans les composants dashboard (`src
 **Phase 4 Batch 7:** 7/67 fichiers complétés ✅  
 **Phase 4 Batch 8:** 6/67 fichiers complétés ✅  
 **Phase 4 Batch 9:** 6/67 fichiers complétés ✅  
-**Progression estimée Phase 4:** ~72% (48/67)  
-**Progression totale projet:** ~60% estimé
+**Phase 4 Batch 10:** 6/67 fichiers complétés ✅  
+**Progression estimée Phase 4:** ~81% (54/67)  
+**Progression totale projet:** ~66% estimé
