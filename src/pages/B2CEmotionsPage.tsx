@@ -46,12 +46,12 @@ const B2CEmotionsPage: React.FC = () => {
   const [isScanning, setIsScanning] = useState(false);
 
   const emotions = [
-    { id: 'joy', name: 'Joie', icon: <Smile className="w-6 h-6" />, color: 'bg-yellow-500', textColor: 'text-yellow-600' },
-    { id: 'sadness', name: 'Tristesse', icon: <Frown className="w-6 h-6" />, color: 'bg-blue-500', textColor: 'text-blue-600' },
-    { id: 'anger', name: 'Colère', icon: <Angry className="w-6 h-6" />, color: 'bg-red-500', textColor: 'text-red-600' },
-    { id: 'fear', name: 'Peur', icon: <AlertCircle className="w-6 h-6" />, color: 'bg-purple-500', textColor: 'text-purple-600' },
-    { id: 'disgust', name: 'Dégoût', icon: <XCircle className="w-6 h-6" />, color: 'bg-green-500', textColor: 'text-green-600' },
-    { id: 'neutral', name: 'Neutre', icon: <Meh className="w-6 h-6" />, color: 'bg-gray-500', textColor: 'text-gray-600' }
+    { id: 'joy', name: 'Joie', icon: <Smile className="w-6 h-6" />, color: 'bg-warning', textColor: 'text-warning' },
+    { id: 'sadness', name: 'Tristesse', icon: <Frown className="w-6 h-6" />, color: 'bg-info', textColor: 'text-info' },
+    { id: 'anger', name: 'Colère', icon: <Angry className="w-6 h-6" />, color: 'bg-destructive', textColor: 'text-destructive' },
+    { id: 'fear', name: 'Peur', icon: <AlertCircle className="w-6 h-6" />, color: 'bg-accent', textColor: 'text-accent' },
+    { id: 'disgust', name: 'Dégoût', icon: <XCircle className="w-6 h-6" />, color: 'bg-success', textColor: 'text-success' },
+    { id: 'neutral', name: 'Neutre', icon: <Meh className="w-6 h-6" />, color: 'bg-muted', textColor: 'text-muted-foreground' }
   ];
 
   const handleEmotionSelect = (emotionId: string) => {
@@ -91,14 +91,14 @@ const B2CEmotionsPage: React.FC = () => {
       description: "Analyse faciale en temps réel",
       icon: <Camera className="w-5 h-5" />,
       action: startAIAnalysis,
-      color: "bg-blue-500"
+      color: "bg-info"
     },
     {
       title: "Journal Vocal",
       description: "Analysez vos émotions par la voix",
       icon: <Mic className="w-5 h-5" />,
       action: () => window.open('/app/voice-journal', '_blank'),
-      color: "bg-purple-500"
+      color: "bg-accent"
     },
     {
       title: "Exercice de Régulation",
@@ -112,7 +112,7 @@ const B2CEmotionsPage: React.FC = () => {
       description: "Voir l'analyse complète",
       icon: <BarChart3 className="w-5 h-5" />,
       action: () => setShowAnalysis(!showAnalysis),
-      color: "bg-green-500"
+      color: "bg-success"
     }
   ];
 
@@ -140,8 +140,8 @@ const B2CEmotionsPage: React.FC = () => {
           className="text-center mb-8"
         >
           <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="p-3 rounded-full bg-gradient-to-r from-purple-500 to-blue-500" aria-hidden="true">
-              <Heart className="w-8 h-8 text-white" />
+            <div className="p-3 rounded-full bg-gradient-to-r from-accent to-info" aria-hidden="true">
+              <Heart className="w-8 h-8 text-primary-foreground" />
             </div>
             <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
               Centre Émotionnel IA
@@ -154,10 +154,10 @@ const B2CEmotionsPage: React.FC = () => {
 
         <main id="main-content" role="main" className="grid gap-8">
           {/* Interface de sélection d'émotion */}
-          <Card className="bg-white/80 backdrop-blur-sm shadow-xl" id="emotion-selector">
+          <Card className="bg-card/80 backdrop-blur-sm shadow-xl" id="emotion-selector">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Heart className="w-5 h-5 text-pink-500" aria-hidden="true" />
+                <Heart className="w-5 h-5 text-accent" aria-hidden="true" />
                 Comment vous sentez-vous maintenant ?
               </CardTitle>
             </CardHeader>
@@ -173,8 +173,8 @@ const B2CEmotionsPage: React.FC = () => {
                       className={cn(
                         "p-4 rounded-xl border-2 cursor-pointer transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary",
                         currentEmotion === emotion.id
-                          ? `${emotion.color} text-white border-white shadow-lg`
-                          : "bg-slate-50 hover:bg-slate-100 border-slate-200 hover:border-blue-300"
+                          ? `${emotion.color} text-primary-foreground border-primary shadow-lg`
+                          : "bg-muted hover:bg-muted/80 border-border hover:border-primary/30"
                       )}
                       onClick={() => handleEmotionSelect(emotion.id)}
                       role="radio"
@@ -207,7 +207,7 @@ const B2CEmotionsPage: React.FC = () => {
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: 'auto' }}
                     exit={{ opacity: 0, height: 0 }}
-                    className="mb-6 p-6 bg-gradient-to-r from-blue-100 to-purple-100 rounded-xl border border-blue-200"
+                    className="mb-6 p-6 bg-gradient-to-r from-info/10 to-accent/10 rounded-xl border border-info/20"
                     role="status"
                     aria-live="polite"
                     aria-label="Analyse IA en cours"
@@ -216,14 +216,14 @@ const B2CEmotionsPage: React.FC = () => {
                       <motion.div
                         animate={{ rotate: 360 }}
                         transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                        className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full"
+                        className="w-12 h-12 border-4 border-info border-t-transparent rounded-full"
                         aria-hidden="true"
                       />
-                      <Brain className="w-8 h-8 text-blue-500 ml-4" aria-hidden="true" />
+                      <Brain className="w-8 h-8 text-info ml-4" aria-hidden="true" />
                     </div>
                     <div className="text-center">
-                      <h3 className="font-semibold text-blue-700 mb-2">Analyse IA en cours...</h3>
-                      <p className="text-sm text-blue-600">L'IA analyse vos expressions et patterns émotionnels</p>
+                      <h3 className="font-semibold text-info mb-2">Analyse IA en cours...</h3>
+                      <p className="text-sm text-muted-foreground">L'IA analyse vos expressions et patterns émotionnels</p>
                     </div>
                   </motion.div>
                 )}
@@ -244,7 +244,7 @@ const B2CEmotionsPage: React.FC = () => {
                       className="w-full h-auto p-4 flex flex-col items-center gap-2 hover:shadow-lg transition-all"
                       disabled={isScanning && index === 0}
                     >
-                      <div className={cn("p-2 rounded-full text-white", action.color)}>
+                      <div className={cn("p-2 rounded-full text-primary-foreground", action.color)}>
                         {action.icon}
                       </div>
                       <div className="text-center">
@@ -260,10 +260,10 @@ const B2CEmotionsPage: React.FC = () => {
 
           <div className="grid lg:grid-cols-3 gap-6">
             {/* Statistiques émotionnelles */}
-            <Card className="lg:col-span-2 bg-white/80 backdrop-blur-sm shadow-xl">
+            <Card className="lg:col-span-2 bg-card/80 backdrop-blur-sm shadow-xl">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Brain className="w-5 h-5 text-blue-500" />
+                  <Brain className="w-5 h-5 text-info" />
                   Équilibre Émotionnel
                 </CardTitle>
               </CardHeader>
@@ -271,39 +271,39 @@ const B2CEmotionsPage: React.FC = () => {
                 <div className="space-y-6">
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <motion.div 
-                      className="text-center p-4 rounded-lg bg-blue-50"
+                      className="text-center p-4 rounded-lg bg-info/10"
                       whileHover={{ scale: 1.05 }}
                     >
-                      <div className="text-2xl font-bold text-blue-600">{emotionStats.balance}%</div>
-                      <div className="text-sm text-slate-600">Équilibre</div>
+                      <div className="text-2xl font-bold text-info">{emotionStats.balance}%</div>
+                      <div className="text-sm text-muted-foreground">Équilibre</div>
                     </motion.div>
                     <motion.div 
-                      className="text-center p-4 rounded-lg bg-green-50"
+                      className="text-center p-4 rounded-lg bg-success/10"
                       whileHover={{ scale: 1.05 }}
                     >
-                      <div className="text-2xl font-bold text-green-600">+{emotionStats.weeklyTrend}%</div>
-                      <div className="text-sm text-slate-600">Cette semaine</div>
+                      <div className="text-2xl font-bold text-success">+{emotionStats.weeklyTrend}%</div>
+                      <div className="text-sm text-muted-foreground">Cette semaine</div>
                     </motion.div>
                     <motion.div 
-                      className="text-center p-4 rounded-lg bg-purple-50"
+                      className="text-center p-4 rounded-lg bg-accent/10"
                       whileHover={{ scale: 1.05 }}
                     >
-                      <div className="text-2xl font-bold text-purple-600">{emotionStats.dailyAverage}</div>
-                      <div className="text-sm text-slate-600">Moy. quotidienne</div>
+                      <div className="text-2xl font-bold text-accent">{emotionStats.dailyAverage}</div>
+                      <div className="text-sm text-muted-foreground">Moy. quotidienne</div>
                     </motion.div>
                     <motion.div 
-                      className="text-center p-4 rounded-lg bg-amber-50"
+                      className="text-center p-4 rounded-lg bg-warning/10"
                       whileHover={{ scale: 1.05 }}
                     >
-                      <div className="text-2xl font-bold text-amber-600">{emotionStats.dominant}</div>
-                      <div className="text-sm text-slate-600">Dominante</div>
+                      <div className="text-2xl font-bold text-warning">{emotionStats.dominant}</div>
+                      <div className="text-sm text-muted-foreground">Dominante</div>
                     </motion.div>
                   </div>
 
                   <div className="space-y-3">
                     <div className="flex justify-between items-center">
                       <span className="text-sm font-medium">Progression hebdomadaire</span>
-                      <Badge className="bg-green-100 text-green-700">
+                      <Badge className="bg-success/10 text-success">
                         <TrendingUp className="w-3 h-3 mr-1" />
                         Amélioration
                       </Badge>
@@ -315,7 +315,7 @@ const B2CEmotionsPage: React.FC = () => {
             </Card>
 
             {/* Actions recommandées */}
-            <Card className="bg-white/80 backdrop-blur-sm shadow-xl">
+            <Card className="bg-card/80 backdrop-blur-sm shadow-xl">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Sparkles className="w-5 h-5 text-purple-500" />
