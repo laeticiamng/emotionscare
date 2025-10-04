@@ -1,4 +1,3 @@
-// @ts-nocheck
 export type BreathStepKind = 'in' | 'hold' | 'out';
 
 export interface Step {

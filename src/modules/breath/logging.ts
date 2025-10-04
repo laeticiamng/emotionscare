@@ -1,4 +1,3 @@
-// @ts-nocheck
 import * as Sentry from '@sentry/react';
 import { supabase } from '@/integrations/supabase/client';
 import { journalService } from '@/modules/journal/journalService';
