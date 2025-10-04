@@ -258,7 +258,7 @@ const PersonalActivityLogs: React.FC = () => {
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-card divide-y divide-border">
                 {paginatedActivities.map((activity) => (
                   <tr key={activity.id}>
                     <td className="px-6 py-4 whitespace-nowrap">
