@@ -56,7 +56,7 @@ const QUICK_ACTIONS: QuickAction[] = [
     description: 'Support immédiat et bienveillant',
     to: '/app/coach',
     icon: MessageCircle,
-    accent: 'bg-purple-500/10 text-purple-600',
+    accent: 'bg-accent/10 text-accent',
   },
   {
     id: 'music',
@@ -64,7 +64,7 @@ const QUICK_ACTIONS: QuickAction[] = [
     description: 'Sons adaptatifs personnalisés',
     to: '/app/music',
     icon: Music,
-    accent: 'bg-blue-500/10 text-blue-600',
+    accent: 'bg-info/10 text-info',
   },
   {
     id: 'ambition',
@@ -72,7 +72,7 @@ const QUICK_ACTIONS: QuickAction[] = [
     description: 'Gamifier vos objectifs positifs',
     to: '/app/ambition-arcade',
     icon: Sparkles,
-    accent: 'bg-amber-500/10 text-amber-600',
+    accent: 'bg-warning/10 text-warning',
   },
   {
     id: 'scan',
@@ -88,7 +88,7 @@ const QUICK_ACTIONS: QuickAction[] = [
     description: 'Consignez vos ressentis',
     to: '/app/journal',
     icon: BookOpen,
-    accent: 'bg-green-500/10 text-green-600',
+    accent: 'bg-success/10 text-success',
   },
 ];
 
@@ -306,7 +306,7 @@ export default function B2CDashboardPage() {
               <CardContent>
                 <div className="flex items-center justify-between">
                   <div className="text-2xl font-bold">3</div>
-                  <TrendingUp className="h-4 w-4 text-green-500" aria-hidden="true" />
+                  <TrendingUp className="h-4 w-4 text-success" aria-hidden="true" />
                 </div>
                 <Progress value={60} className="mt-2" aria-label="Progression 60%" />
                 <p className="text-xs text-muted-foreground mt-1">
@@ -327,7 +327,7 @@ export default function B2CDashboardPage() {
               <CardContent>
                 <div className="flex items-center justify-between">
                   <div className="text-2xl font-bold">25min</div>
-                  <Calendar className="h-4 w-4 text-blue-500" aria-hidden="true" />
+                  <Calendar className="h-4 w-4 text-info" aria-hidden="true" />
                 </div>
                 <Progress value={83} className="mt-2" aria-label="Progression 83%" />
                 <p className="text-xs text-muted-foreground mt-1">
@@ -348,7 +348,7 @@ export default function B2CDashboardPage() {
               <CardContent>
                 <div className="flex items-center justify-between">
                   <div className="text-2xl font-bold">😊</div>
-                  <Target className="h-4 w-4 text-yellow-500" aria-hidden="true" />
+                  <Target className="h-4 w-4 text-warning" aria-hidden="true" />
                 </div>
                 <div className="mt-2">
                   <Badge variant="outline" className="text-xs">
