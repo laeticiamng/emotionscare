@@ -34,17 +34,17 @@ export const CardReveal: React.FC<CardRevealProps> = ({ card, onClose }) => {
   if (!card) return null;
 
   const rarityColors = {
-    common: 'from-blue-500/20 to-purple-500/20',
-    rare: 'from-purple-500/30 to-pink-500/30',
-    epic: 'from-pink-500/40 to-orange-500/40',
-    legendary: 'from-orange-500/50 to-yellow-500/50'
+    common: 'from-primary/20 to-accent/20',
+    rare: 'from-accent/30 to-destructive/30',
+    epic: 'from-destructive/40 to-warning/40',
+    legendary: 'from-warning/50 to-warning/50'
   };
 
   const rarityGlow = {
-    common: 'shadow-lg shadow-blue-500/20',
-    rare: 'shadow-xl shadow-purple-500/30',
-    epic: 'shadow-2xl shadow-pink-500/40',
-    legendary: 'shadow-2xl shadow-orange-500/60 animate-pulse'
+    common: 'shadow-lg shadow-primary/20',
+    rare: 'shadow-xl shadow-accent/30',
+    epic: 'shadow-2xl shadow-destructive/40',
+    legendary: 'shadow-2xl shadow-warning/60 animate-pulse'
   };
 
   return (
