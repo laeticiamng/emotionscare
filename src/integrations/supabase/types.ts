@@ -6111,6 +6111,51 @@ export type Database = {
         }
         Relationships: []
       }
+      meditation_sessions: {
+        Row: {
+          completed_at: string | null
+          config: Json | null
+          created_at: string
+          duration: number
+          id: string
+          mood_after: number | null
+          mood_before: number | null
+          notes: string | null
+          started_at: string
+          technique: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          config?: Json | null
+          created_at?: string
+          duration: number
+          id?: string
+          mood_after?: number | null
+          mood_before?: number | null
+          notes?: string | null
+          started_at?: string
+          technique: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          config?: Json | null
+          created_at?: string
+          duration?: number
+          id?: string
+          mood_after?: number | null
+          mood_before?: number | null
+          notes?: string | null
+          started_at?: string
+          technique?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       metrics_bubble_beat: {
         Row: {
           id: string
@@ -8211,6 +8256,36 @@ export type Database = {
         }
         Relationships: []
       }
+      saved_mood_mixes: {
+        Row: {
+          badge_color: string | null
+          badge_name: string | null
+          created_at: string | null
+          emotions: Json
+          id: string
+          name: string
+          user_id: string
+        }
+        Insert: {
+          badge_color?: string | null
+          badge_name?: string | null
+          created_at?: string | null
+          emotions: Json
+          id?: string
+          name: string
+          user_id: string
+        }
+        Update: {
+          badge_color?: string | null
+          badge_name?: string | null
+          created_at?: string | null
+          emotions?: Json
+          id?: string
+          name?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       screen_silk_sessions: {
         Row: {
           badge: string | null
@@ -9518,6 +9593,36 @@ export type Database = {
         }
         Relationships: []
       }
+      user_collections: {
+        Row: {
+          collection_id: string
+          created_at: string | null
+          id: string
+          item_id: string
+          metadata: Json | null
+          unlocked_at: string | null
+          user_id: string
+        }
+        Insert: {
+          collection_id: string
+          created_at?: string | null
+          id?: string
+          item_id: string
+          metadata?: Json | null
+          unlocked_at?: string | null
+          user_id: string
+        }
+        Update: {
+          collection_id?: string
+          created_at?: string | null
+          id?: string
+          item_id?: string
+          metadata?: Json | null
+          unlocked_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_favorite_flashcards: {
         Row: {
           created_at: string | null
@@ -9856,6 +9961,7 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          nyvee_tutorial_seen: boolean | null
           preferences: Json
           updated_at: string
           user_id: string
@@ -9863,6 +9969,7 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
+          nyvee_tutorial_seen?: boolean | null
           preferences?: Json
           updated_at?: string
           user_id: string
@@ -9870,6 +9977,7 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
+          nyvee_tutorial_seen?: boolean | null
           preferences?: Json
           updated_at?: string
           user_id?: string

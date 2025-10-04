@@ -1,45 +1,70 @@
-import React from 'react';
-import { useWeeklyBars } from '../hooks/useWeeklyBars';
-
-interface WeeklyBarsMainProps {
-  className?: string;
-}
-
 /**
- * Composant principal du module Weekly Bars
- * Visualisation des barres émotionnelles hebdomadaires
+ * Composant principal du module weekly-bars
  */
-export const WeeklyBarsMain: React.FC<WeeklyBarsMainProps> = ({ className = '' }) => {
-  const { weekData, currentWeek } = useWeeklyBars();
+
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { BarChart3 } from 'lucide-react';
+import { useWeeklyBars } from '../useWeeklyBars';
+import { WeeklyBarChart } from '../ui/WeeklyBarChart';
+import { TrendIndicator } from '../ui/TrendIndicator';
+
+export function WeeklyBarsMain() {
+  const { data, status, error } = useWeeklyBars({
+    autoLoad: true,
+    defaultConfig: {
+      metrics: ['mood', 'stress', 'energy'],
+      showAverage: true,
+      showTrend: true
+    }
+  });
+
+  if (status === 'loading') {
+    return (
+      <div className="container max-w-6xl mx-auto py-8">
+        <Card>
+          <CardContent className="py-8 text-center">
+            <p className="text-muted-foreground">Chargement des statistiques...</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (status === 'error') {
+    return (
+      <div className="container max-w-6xl mx-auto py-8">
+        <Card>
+          <CardContent className="py-8 text-center">
+            <p className="text-destructive">{error}</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
-    <div className={`weekly-bars-container ${className}`}>
-      <div className="space-y-6">
-        <h2 className="text-2xl font-bold text-foreground">Barres Hebdomadaires 📊</h2>
-        
-        <div className="space-y-4">
-          <p className="text-muted-foreground">Semaine {currentWeek}</p>
-          
-          <div className="space-y-2">
-            {weekData.map((day, index) => (
-              <div key={index} className="flex items-center gap-3">
-                <span className="text-sm text-muted-foreground w-20">{day.label}</span>
-                <div className="flex-1 bg-muted rounded-full h-8 overflow-hidden">
-                  <div
-                    className="bg-primary h-full transition-all duration-300"
-                    style={{ width: `${day.value}%` }}
-                  />
-                </div>
-                <span className="text-sm font-medium text-foreground w-12 text-right">
-                  {day.value}%
-                </span>
-              </div>
-            ))}
+    <div className="container max-w-6xl mx-auto py-8 space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <BarChart3 className="h-5 w-5 text-primary" />
+            Statistiques hebdomadaires
+          </CardTitle>
+        </CardHeader>
+      </Card>
+
+      <div className="grid grid-cols-1 gap-6">
+        {data.map((metric) => (
+          <div key={metric.type} className="space-y-2">
+            <div className="flex items-center justify-end">
+              <TrendIndicator trend={metric.trend} />
+            </div>
+            <WeeklyBarChart metric={metric} showAverage />
           </div>
-        </div>
+        ))}
       </div>
     </div>
   );
-};
+}
 
 export default WeeklyBarsMain;
