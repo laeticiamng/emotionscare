@@ -146,9 +146,9 @@ const LoginPage: React.FC = () => {
           <div className="flex items-center justify-center gap-3 mb-2">
             <div className="relative">
               <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary/70 rounded-xl flex items-center justify-center shadow-lg">
-                <Heart className="h-6 w-6 text-white" />
+                <Heart className="h-6 w-6 text-primary-foreground" />
               </div>
-              <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-background animate-pulse" />
+              <div className="absolute -top-1 -right-1 w-4 h-4 bg-success rounded-full border-2 border-background animate-pulse" />
             </div>
             <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
               EmotionsCare
@@ -344,7 +344,7 @@ const LoginPage: React.FC = () => {
                 >
                   {isLoading || submitted ? (
                     <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <div className="w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
                       Connexion en cours...
                     </div>
                   ) : (

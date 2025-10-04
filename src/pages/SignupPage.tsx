@@ -95,7 +95,7 @@ const SignupPage: React.FC = () => {
               transition={{ delay: 0.2, type: "spring" }}
               className="mx-auto w-16 h-16 bg-gradient-to-br from-primary to-primary/80 rounded-2xl flex items-center justify-center mb-4"
             >
-              <Heart className="w-8 h-8 text-white" />
+              <Heart className="w-8 h-8 text-primary-foreground" />
             </motion.div>
             <CardTitle className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
               Créer votre compte
@@ -210,10 +210,10 @@ const SignupPage: React.FC = () => {
                 <motion.div
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="flex items-center gap-2 p-3 bg-green-50 text-green-700 rounded-lg border border-green-200"
+                  className="flex items-center gap-2 p-3 bg-success/10 text-success rounded-lg border border-success/20"
                 >
-                  <div className="w-4 h-4 rounded-full bg-green-500 flex items-center justify-center">
-                    <div className="w-2 h-2 bg-white rounded-full"></div>
+                  <div className="w-4 h-4 rounded-full bg-success flex items-center justify-center">
+                    <div className="w-2 h-2 bg-background rounded-full"></div>
                   </div>
                   <p className="text-sm">{success}</p>
                 </motion.div>
@@ -227,7 +227,7 @@ const SignupPage: React.FC = () => {
               >
                 {isLoading ? (
                   <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <div className="w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
                     Création du compte...
                   </div>
                 ) : (

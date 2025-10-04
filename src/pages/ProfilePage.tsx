@@ -43,10 +43,10 @@ const ProfilePage: React.FC = () => {
   ];
 
   const stats = [
-    { label: 'Jours Actifs', value: 89, max: 100, icon: Calendar, color: 'text-blue-500' },
-    { label: 'Sessions Méditation', value: 45, max: 50, icon: Brain, color: 'text-purple-500' },
-    { label: 'Entrées Journal', value: 127, max: 150, icon: Heart, color: 'text-red-500' },
-    { label: 'Heures Musique', value: 23, max: 30, icon: Activity, color: 'text-green-500' }
+    { label: 'Jours Actifs', value: 89, max: 100, icon: Calendar, color: 'text-info' },
+    { label: 'Sessions Méditation', value: 45, max: 50, icon: Brain, color: 'text-accent' },
+    { label: 'Entrées Journal', value: 127, max: 150, icon: Heart, color: 'text-destructive' },
+    { label: 'Heures Musique', value: 23, max: 30, icon: Activity, color: 'text-success' }
   ];
 
   const weeklyProgress = [
@@ -65,7 +65,7 @@ const ProfilePage: React.FC = () => {
         <div className="flex items-center gap-3 mb-2">
           <User className="h-8 w-8 text-primary" />
           <h1 className="text-3xl font-bold tracking-tight">Mon Profil</h1>
-          <Badge variant="outline" className="bg-blue-50 text-blue-700">
+          <Badge variant="info">
             <Star className="h-3 w-3 mr-1" />
             Niveau {profileData.level}
           </Badge>
