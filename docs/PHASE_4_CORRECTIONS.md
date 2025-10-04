@@ -1,9 +1,9 @@
 # Phase 4 : Corrections des couleurs hardcodées - Dashboard Components
 
 **Date:** 2025-10-04  
-**Statut:** 🟡 En cours (6/67 fichiers traités)  
-**Fichiers corrigés:** 6  
-**Fichiers restants:** 61
+**Statut:** 🟡 En cours (8/67 fichiers traités)  
+**Fichiers corrigés:** 8  
+**Fichiers restants:** 59
 
 ## 📋 Résumé
 
@@ -98,8 +98,9 @@ Cette phase corrige les couleurs hardcodées dans les composants dashboard (`src
 | Phase 2 | 4 | ~72 | 12 | ~297 |
 | Phase 3 | 4 | ~39 | 16 | ~336 |
 | **Phase 4 (Batch 1)** | **6** | **~63** | **22** | **~399** |
+| **Phase 4 (Batch 2)** | **2** | **~3** | **24** | **~402** |
 
-## 🎯 Fichiers restants à traiter (61)
+## 🎯 Fichiers restants à traiter (59)
 
 ### Sous-dossiers
 - `admin/` - composants administration
@@ -128,23 +129,48 @@ Cette phase corrige les couleurs hardcodées dans les composants dashboard (`src
 - [x] Support dark/light mode garanti
 - [x] Code conforme aux règles EmotionsCare
 
+## ✅ Batch 2 - Dashboard Components (Suite)
+
+### 7. `src/components/dashboard/B2BUserDashboard.tsx`
+- **Problèmes identifiés:** Couleurs hardcodées pour messages d'erreur
+- **Corrections effectuées:**
+  - `bg-red-100 dark:bg-red-900/20` → `bg-destructive/10`
+  - `text-red-600 dark:text-red-400` → `text-destructive`
+- **Lignes modifiées:** 108-110 (3 lignes)
+- **Instances corrigées:** ~2
+
+### 8. `src/components/dashboard/EmotionalTrends.tsx`
+- **Problèmes identifiés:** Couleur hardcodée hex dans graphique Recharts
+- **Corrections effectuées:**
+  - `stroke="#8884d8"` → `stroke="hsl(var(--primary))"`
+- **Lignes modifiées:** 37-44 (graphique)
+- **Instances corrigées:** ~1
+
+## 📊 Statistiques Batch 2
+
+| Métrique | Valeur |
+|----------|---------|
+| Fichiers corrigés | 2 |
+| Total de lignes modifiées | ~11 |
+| Couleurs hardcodées remplacées | ~3 |
+| Tokens HSL utilisés | primary, destructive |
+
 ## 🔄 Prochaines étapes
 
-### Batch 2 (prioritaire)
+### Batch 3 (prioritaire)
 1. Corriger les dashboards principaux :
    - `LivingDashboard.tsx` (gradients complexes)
    - `PerfectDashboard.tsx`
    - `UserDashboard.tsx`
    - `AdminDashboard.tsx`
-   - `B2BUserDashboard.tsx`
 
-### Batch 3
+### Batch 4
 2. Traiter les sous-dossiers :
    - `charts/` - composants de graphiques
    - `widgets/` - widgets dashboard
    - `b2c/` / `b2b/` - composants spécifiques
 
-### Batch 4
+### Batch 5+
 3. Finaliser les composants secondaires et tabs
 
 ## 📌 Notes
@@ -157,5 +183,6 @@ Cette phase corrige les couleurs hardcodées dans les composants dashboard (`src
 ---
 
 **Phase 4 Batch 1:** 6/67 fichiers complétés ✅  
-**Progression estimée Phase 4:** ~9% (6/67)  
-**Progression totale projet:** ~25% estimé
+**Phase 4 Batch 2:** 2/67 fichiers complétés ✅  
+**Progression estimée Phase 4:** ~12% (8/67)  
+**Progression totale projet:** ~26% estimé

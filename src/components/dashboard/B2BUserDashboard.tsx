@@ -106,8 +106,8 @@ const B2BUserDashboard: React.FC = () => {
     return (
       <DashboardContainer>
         <div className="flex flex-col items-center justify-center p-8">
-          <div className="bg-red-100 dark:bg-red-900/20 p-4 rounded-full mb-4">
-            <ChartLine className="h-8 w-8 text-red-600 dark:text-red-400" />
+          <div className="bg-destructive/10 p-4 rounded-full mb-4">
+            <ChartLine className="h-8 w-8 text-destructive" />
           </div>
           <h2 className="text-2xl font-bold mb-2">Impossible de charger votre tableau de bord</h2>
           <p className="text-muted-foreground mb-6 text-center">

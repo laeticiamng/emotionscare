@@ -37,7 +37,7 @@ const EmotionalTrends: React.FC = () => {
               <Line 
                 type="monotone" 
                 dataKey="score" 
-                stroke="#8884d8" 
+                stroke="hsl(var(--primary))" 
                 strokeWidth={2}
                 dot={{ r: 4 }}
                 activeDot={{ r: 6 }}
