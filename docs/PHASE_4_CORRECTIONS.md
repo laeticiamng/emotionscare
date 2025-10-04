@@ -1,9 +1,9 @@
 # Phase 4 : Corrections des couleurs hardcodées - Dashboard Components
 
 **Date:** 2025-10-04  
-**Statut:** 🟡 En cours (36/67 fichiers traités)  
-**Fichiers corrigés:** 36  
-**Fichiers restants:** 31
+**Statut:** 🟡 En cours (42/67 fichiers traités)  
+**Fichiers corrigés:** 42  
+**Fichiers restants:** 25
 
 ## 📋 Résumé
 
@@ -104,6 +104,7 @@ Cette phase corrige les couleurs hardcodées dans les composants dashboard (`src
 | **Phase 4 (Batch 5)** | **6** | **~22** | **39** | **~494** |
 | **Phase 4 (Batch 6)** | **6** | **~7** | **45** | **~501** |
 | **Phase 4 (Batch 7)** | **7** | **~13** | **52** | **~514** |
+| **Phase 4 (Batch 8)** | **6** | **~9** | **58** | **~523** |
 
 ## 🎯 Fichiers restants à traiter (50)
 
@@ -439,9 +440,61 @@ Cette phase corrige les couleurs hardcodées dans les composants dashboard (`src
 | Couleurs hardcodées remplacées | ~13 |
 | Tokens HSL utilisés | primary, success, warning, destructive, muted |
 
+## ✅ Batch 8 - Widgets & Charts (Suite)
+
+### 37. `src/components/dashboard/widgets/BadgesWidget.tsx`
+- **Problème:** Aucune couleur hardcodée
+- **Statut:** ✅ Déjà conforme
+
+### 38. `src/components/dashboard/widgets/DailyInsightCard.tsx`
+- **Problème:** Aucune couleur hardcodée
+- **Statut:** ✅ Déjà conforme
+
+### 39. `src/components/dashboard/charts/ChartCard.tsx`
+- **Problèmes identifiés:** Couleurs hardcodées pour les tendances
+- **Corrections effectuées:**
+  - `text-green-500` → `text-success`
+  - `text-red-500` → `text-destructive`
+- **Lignes modifiées:** 68-73
+- **Instances corrigées:** ~2
+
+### 40. `src/components/dashboard/charts/AbsenteeismChart.tsx`
+- **Problèmes identifiés:** Couleurs hex hardcodées pour le graphique
+- **Corrections effectuées:**
+  - `stroke="#8884d8" fill="#8884d8"` → `stroke="hsl(var(--primary))" fill="hsl(var(--primary) / 0.5)"`
+- **Lignes modifiées:** 36
+- **Instances corrigées:** ~2
+
+### 41. `src/components/dashboard/widgets/LeaderboardWidget.tsx`
+- **Problèmes identifiés:** Couleurs hardcodées pour les positions du leaderboard
+- **Corrections effectuées:**
+  - `text-yellow-500` → `text-warning`
+  - `text-gray-400` → `text-muted-foreground`
+  - `text-amber-700` → `text-warning/70`
+- **Lignes modifiées:** 35-46
+- **Instances corrigées:** ~3
+
+### 42. `src/components/dashboard/widgets/RecentEmotionScansWidget.tsx`
+- **Problèmes identifiés:** Couleurs hardcodées pour le delta
+- **Corrections effectuées:**
+  - `text-emerald-500` → `text-success`
+  - `text-rose-500` → `text-destructive`
+- **Lignes modifiées:** 83-90
+- **Instances corrigées:** ~2
+
+## 📊 Statistiques Batch 8
+
+| Métrique | Valeur |
+|----------|---------|
+| Fichiers corrigés | 6 |
+| Fichiers déjà conformes | 2 |
+| Total de lignes modifiées | ~50 |
+| Couleurs hardcodées remplacées | ~9 |
+| Tokens HSL utilisés | primary, success, destructive, warning, muted-foreground |
+
 ## 🔄 Prochaines étapes
 
-### Batch 8 (widgets suite & remaining files)
+### Batch 9 (remaining widgets & additional dashboard files)
 1. Corriger les dossiers restants :
    - `admin/cards/`, `admin/charts/`, `admin/widgets/`
    - `b2b/widgets/`, `b2c/widgets/`
@@ -473,5 +526,6 @@ Cette phase corrige les couleurs hardcodées dans les composants dashboard (`src
 **Phase 4 Batch 5:** 6/67 fichiers complétés ✅  
 **Phase 4 Batch 6:** 6/67 fichiers complétés ✅  
 **Phase 4 Batch 7:** 7/67 fichiers complétés ✅  
-**Progression estimée Phase 4:** ~54% (36/67)  
-**Progression totale projet:** ~48% estimé
+**Phase 4 Batch 8:** 6/67 fichiers complétés ✅  
+**Progression estimée Phase 4:** ~63% (42/67)  
+**Progression totale projet:** ~54% estimé

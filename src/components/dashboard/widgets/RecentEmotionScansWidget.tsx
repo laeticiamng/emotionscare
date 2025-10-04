@@ -83,7 +83,7 @@ export default function RecentEmotionScansWidget({ className }: RecentEmotionSca
                 <p
                   className={cn(
                     'mt-1 text-xs font-medium',
-                    delta >= 0 ? 'text-emerald-500' : 'text-rose-500',
+                    delta >= 0 ? 'text-success' : 'text-destructive',
                   )}
                 >
                   {delta >= 0 ? '+' : ''}{Math.round(delta)} pts
