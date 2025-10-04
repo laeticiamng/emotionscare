@@ -6368,6 +6368,45 @@ export type Database = {
           },
         ]
       }
+      mood_tracking: {
+        Row: {
+          context: string | null
+          coping_strategies: Json | null
+          created_at: string
+          emotions: Json | null
+          id: string
+          mood_score: number
+          notes: string | null
+          triggers: Json | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          context?: string | null
+          coping_strategies?: Json | null
+          created_at?: string
+          emotions?: Json | null
+          id?: string
+          mood_score: number
+          notes?: string | null
+          triggers?: Json | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          context?: string | null
+          coping_strategies?: Json | null
+          created_at?: string
+          emotions?: Json | null
+          id?: string
+          mood_score?: number
+          notes?: string | null
+          triggers?: Json | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       music_completion_logs: {
         Row: {
           completion_percentage: number | null
