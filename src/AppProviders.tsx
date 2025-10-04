@@ -5,7 +5,7 @@ import { SimpleAuthProvider } from '@/contexts/SimpleAuth';
 import { UserModeProvider } from '@/contexts/UserModeContext';
 import { ErrorProvider } from '@/contexts';
 import { HelmetProvider } from 'react-helmet-async';
-import { ThemeProvider } from '@/components/theme-provider';
+import { ThemeProvider } from '@/providers/theme';
 import { Toaster } from '@/components/ui/sonner';
 import { MusicProvider } from '@/contexts/MusicContext';
 import { MoodProvider } from '@/contexts/MoodContext';
@@ -28,7 +28,7 @@ const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
       <RootErrorBoundary>
         <ErrorProvider>
           <AccessibilityProvider>
-            <ThemeProvider defaultTheme="light" storageKey="emotions-care-theme">
+            <ThemeProvider defaultTheme="system" storageKey="emotionscare-theme">
               <NotificationProvider>
                 <SimpleAuthProvider>
                   <AuthProvider>

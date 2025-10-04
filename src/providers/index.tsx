@@ -17,7 +17,7 @@ import { I18nProvider } from '@/lib/i18n/i18n';
 import i18n from '@/lib/i18n';
 import { UnifiedProvider } from '@/core/UnifiedStateManager';
 import { MusicProvider } from '@/contexts/MusicContext';
-import { ThemeProvider } from '@/providers/ThemeProvider';
+import { ThemeProvider } from '@/providers/theme';
 
 const createQueryClient = () =>
   new QueryClient({
@@ -113,7 +113,7 @@ export function RootProvider({ children }: RootProviderProps) {
               <AuthProvider>
                 <UserModeProvider>
                   <I18nBootstrap>
-                    <ThemeProvider defaultTheme="light" storageKey="emotions-care-theme">
+                    <ThemeProvider defaultTheme="system" storageKey="emotionscare-theme">
                       <AccessibilityProvider>
                         <NotificationProvider>
                           <TooltipProvider delayDuration={200} skipDelayDuration={100}>

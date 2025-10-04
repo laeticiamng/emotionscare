@@ -19,7 +19,7 @@ import { SimpleAuthProvider } from '@/contexts/SimpleAuth';
 import { UserModeProvider } from '@/contexts/UserModeContext';
 import { MusicProvider } from '@/contexts/MusicContext';
 import { I18nProvider } from '@/lib/i18n/i18n';
-import { ThemeProvider } from '@/providers/ThemeProvider';
+import { ThemeProvider } from '@/providers/theme';
 import { ConsentProvider } from '@/features/clinical-optin/ConsentProvider';
 
 import { ensureI18n, type AppLocale } from './i18n/client';
@@ -42,7 +42,7 @@ export function RootProvider({ children, locale = 'fr' }: RootProviderProps) {
               <AuthProvider>
                 <UserModeProvider>
                   <I18nProvider defaultLang={locale}>
-                    <ThemeProvider defaultTheme="light" storageKey="emotions-care-theme">
+                    <ThemeProvider defaultTheme="system" storageKey="emotionscare-theme">
                       <AccessibilityProvider>
                         <NotificationProvider>
                           <TooltipProvider delayDuration={200} skipDelayDuration={100}>
