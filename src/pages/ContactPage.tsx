@@ -90,7 +90,7 @@ const ContactPage: React.FC = () => {
               transition={{ duration: 0.6 }}
               className="text-center mb-12"
             >
-              <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+              <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
                 Contactez-nous
               </h1>
               <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -120,15 +120,15 @@ const ContactPage: React.FC = () => {
                       <form onSubmit={handleSubmit} className="space-y-6" noValidate>
                         {isSubmitted && submissionResult?.success ? (
                           <div 
-                            className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6"
+                            className="bg-success/10 border border-success/30 rounded-lg p-4 mb-6"
                             role="alert"
                             aria-live="polite"
                           >
                             <div className="flex items-center gap-2 mb-2">
-                              <CheckCircle className="w-5 h-5 text-green-600" aria-hidden="true" />
-                              <h3 className="font-medium text-green-800">Message envoyé avec succès !</h3>
+                              <CheckCircle className="w-5 h-5 text-success" aria-hidden="true" />
+                              <h3 className="font-medium text-success">Message envoyé avec succès !</h3>
                             </div>
-                            <p className="text-sm text-green-700 mb-3">{submissionResult.message}</p>
+                            <p className="text-sm text-success/80 mb-3">{submissionResult.message}</p>
                             {submissionResult.data && (
                               <div className="space-y-2">
                                 <div className="flex items-center gap-2">
@@ -142,15 +142,15 @@ const ContactPage: React.FC = () => {
                         
                         {submissionResult && !submissionResult.success ? (
                           <div 
-                            className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6"
+                            className="bg-destructive/10 border border-destructive/30 rounded-lg p-4 mb-6"
                             role="alert"
                             aria-live="polite"
                           >
                             <div className="flex items-center gap-2 mb-2">
-                              <AlertTriangle className="w-5 h-5 text-red-600" aria-hidden="true" />
-                              <h3 className="font-medium text-red-800">Erreur d'envoi</h3>
+                              <AlertTriangle className="w-5 h-5 text-destructive" aria-hidden="true" />
+                              <h3 className="font-medium text-destructive">Erreur d'envoi</h3>
                             </div>
-                            <p className="text-sm text-red-700">{submissionResult.message}</p>
+                            <p className="text-sm text-destructive/80">{submissionResult.message}</p>
                           </div>
                         ) : null}
                         
@@ -158,7 +158,7 @@ const ContactPage: React.FC = () => {
                           <legend className="sr-only">Informations personnelles</legend>
                           <div>
                             <label htmlFor="name" className="block text-sm font-medium mb-2">
-                              Nom complet <span className="text-red-500" aria-label="requis">*</span>
+                              Nom complet <span className="text-destructive" aria-label="requis">*</span>
                             </label>
                             <Input 
                               id="name" 
@@ -172,7 +172,7 @@ const ContactPage: React.FC = () => {
                           </div>
                           <div>
                             <label htmlFor="email" className="block text-sm font-medium mb-2">
-                              Email <span className="text-red-500" aria-label="requis">*</span>
+                              Email <span className="text-destructive" aria-label="requis">*</span>
                             </label>
                             <Input 
                               id="email" 
@@ -189,7 +189,7 @@ const ContactPage: React.FC = () => {
 
                         <div>
                           <label htmlFor="subject" className="block text-sm font-medium mb-2">
-                            Sujet <span className="text-red-500" aria-label="requis">*</span>
+                            Sujet <span className="text-destructive" aria-label="requis">*</span>
                           </label>
                           <Input 
                             id="subject" 
@@ -204,7 +204,7 @@ const ContactPage: React.FC = () => {
 
                         <div>
                           <label htmlFor="message" className="block text-sm font-medium mb-2">
-                            Message <span className="text-red-500" aria-label="requis">*</span>
+                            Message <span className="text-destructive" aria-label="requis">*</span>
                           </label>
                           <Textarea 
                             id="message" 
