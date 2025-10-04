@@ -83,7 +83,7 @@ export function MeditationMain() {
                 totalSeconds={meditation.config?.duration ? meditation.config.duration * 60 : 0}
               />
               <MeditationProgress progress={meditation.progress} />
-              <Button onClick={meditation.completeSession} className="w-full">
+              <Button onClick={() => meditation.completeSession()} className="w-full">
                 <Square className="h-4 w-4 mr-2" />
                 Terminer
               </Button>
