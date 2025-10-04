@@ -1,9 +1,9 @@
 # Phase 4 : Corrections des couleurs hardcodées - Dashboard Components
 
 **Date:** 2025-10-04  
-**Statut:** 🟡 En cours (29/67 fichiers traités)  
-**Fichiers corrigés:** 29  
-**Fichiers restants:** 38
+**Statut:** 🟡 En cours (36/67 fichiers traités)  
+**Fichiers corrigés:** 36  
+**Fichiers restants:** 31
 
 ## 📋 Résumé
 
@@ -103,6 +103,7 @@ Cette phase corrige les couleurs hardcodées dans les composants dashboard (`src
 | **Phase 4 (Batch 4)** | **6** | **~40** | **33** | **~472** |
 | **Phase 4 (Batch 5)** | **6** | **~22** | **39** | **~494** |
 | **Phase 4 (Batch 6)** | **6** | **~7** | **45** | **~501** |
+| **Phase 4 (Batch 7)** | **7** | **~13** | **52** | **~514** |
 
 ## 🎯 Fichiers restants à traiter (50)
 
@@ -380,9 +381,67 @@ Cette phase corrige les couleurs hardcodées dans les composants dashboard (`src
 | Couleurs hardcodées remplacées | ~7 |
 | Tokens HSL utilisés | primary, accent, success, muted, muted-foreground, primary-foreground |
 
+## ✅ Batch 7 - Admin Components & Widgets
+
+### 30. `src/components/dashboard/admin/UserActivityTimeline.tsx`
+- **Problème:** Aucune couleur hardcodée
+- **Statut:** ✅ Déjà conforme
+
+### 31. `src/components/dashboard/admin/SocialCocoonCard.tsx`
+- **Problèmes identifiés:** Couleur hardcodée pour icône
+- **Corrections effectuées:**
+  - `text-indigo-500` → `text-primary`
+- **Lignes modifiées:** 26-31
+- **Instances corrigées:** ~1
+
+### 32. `src/components/dashboard/admin/EnhancedAdminDashboard.tsx`
+- **Problèmes identifiés:** Couleurs hardcodées pour progress bars
+- **Corrections effectuées:**
+  - `bg-green-500` → `bg-success`
+  - `bg-orange-500` → `bg-warning`
+- **Lignes modifiées:** 169-187
+- **Instances corrigées:** ~2
+
+### 33. `src/components/dashboard/UserDashboard.tsx`
+- **Problème:** Aucune couleur hardcodée (wrapper)
+- **Statut:** ✅ Déjà conforme
+
+### 34. `src/components/dashboard/admin/cards/TeamEmotionCard.tsx`
+- **Problèmes identifiés:** Couleur hex pour trail du CircularProgressbar
+- **Corrections effectuées:**
+  - `trailColor: '#e2e8f0'` → `trailColor: 'hsl(var(--muted))'`
+- **Lignes modifiées:** 39-47
+- **Instances corrigées:** ~1
+
+### 35. `src/components/dashboard/admin/cards/TeamLeaderboardCard.tsx`
+- **Problème:** Aucune couleur hardcodée
+- **Statut:** ✅ Déjà conforme
+
+### 36. `src/components/dashboard/widgets/TeamActivitySummary.tsx`
+- **Problèmes identifiés:** Nombreuses couleurs hardcodées pour mood indicators
+- **Corrections effectuées:**
+  - `bg-green-500` → `bg-success`
+  - `bg-amber-500` → `bg-warning`
+  - `bg-red-500` → `bg-destructive`
+  - `bg-emerald-100 dark:bg-emerald-950` → `bg-success/10`
+  - `bg-amber-100 dark:bg-amber-950` → `bg-warning/10`
+  - `bg-red-100 dark:bg-red-950` → `bg-destructive/10`
+- **Lignes modifiées:** 54-81
+- **Instances corrigées:** ~9
+
+## 📊 Statistiques Batch 7
+
+| Métrique | Valeur |
+|----------|---------|
+| Fichiers corrigés | 7 |
+| Fichiers déjà conformes | 3 |
+| Total de lignes modifiées | ~80 |
+| Couleurs hardcodées remplacées | ~13 |
+| Tokens HSL utilisés | primary, success, warning, destructive, muted |
+
 ## 🔄 Prochaines étapes
 
-### Batch 7 (sous-dossiers admin/)
+### Batch 8 (widgets suite & remaining files)
 1. Corriger les dossiers restants :
    - `admin/cards/`, `admin/charts/`, `admin/widgets/`
    - `b2b/widgets/`, `b2c/widgets/`
@@ -413,5 +472,6 @@ Cette phase corrige les couleurs hardcodées dans les composants dashboard (`src
 **Phase 4 Batch 4:** 6/67 fichiers complétés ✅  
 **Phase 4 Batch 5:** 6/67 fichiers complétés ✅  
 **Phase 4 Batch 6:** 6/67 fichiers complétés ✅  
-**Progression estimée Phase 4:** ~43% (29/67)  
-**Progression totale projet:** ~42% estimé
+**Phase 4 Batch 7:** 7/67 fichiers complétés ✅  
+**Progression estimée Phase 4:** ~54% (36/67)  
+**Progression totale projet:** ~48% estimé

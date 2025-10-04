@@ -42,7 +42,7 @@ const TeamEmotionCard: React.FC<TeamEmotionCardProps> = ({
                   styles={buildStyles({
                     pathColor: dominantEmotion.color,
                     textColor: dominantEmotion.color,
-                    trailColor: '#e2e8f0'
+                    trailColor: 'hsl(var(--muted))'
                   })}
                 />
               </div>
