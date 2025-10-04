@@ -21,6 +21,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { routes } from '@/lib/routes';
+import { LucideIconType } from '@/types/common';
 import { 
   Heart, 
   Scan, 
@@ -45,7 +46,7 @@ import {
 interface NavigationItem {
   title: string;
   url: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: LucideIconType;
   badge?: string;
   gradient?: string;
   description?: string;
@@ -54,7 +55,7 @@ interface NavigationItem {
 interface NavigationGroup {
   label: string;
   items: NavigationItem[];
-  icon?: React.ComponentType<{ className?: string }>;
+  icon?: LucideIconType;
 }
 
 export function AppSidebar() {
@@ -214,12 +215,12 @@ export function AppSidebar() {
 
   const getNavClassName = (isActive: boolean) =>
     isActive 
-      ? "bg-gradient-to-r from-blue-500/10 to-purple-500/10 text-blue-600 shadow-md border border-blue-200/50" 
-      : "hover:bg-slate-100/80 text-slate-600 hover:text-slate-900";
+      ? "bg-gradient-to-r from-primary/10 to-accent/10 text-primary shadow-md border border-primary/20" 
+      : "hover:bg-muted/80 text-muted-foreground hover:text-foreground";
 
   return (
     <Sidebar
-      className={`${isCollapsed ? "w-16" : "w-80"} transition-all duration-300 border-r-0 shadow-xl bg-white/95 backdrop-blur-lg`}
+      className={`${isCollapsed ? "w-16" : "w-80"} transition-all duration-300 border-r-0 shadow-xl bg-card/95 backdrop-blur-lg`}
       collapsible="icon"
     >
       <SidebarContent className="p-4 space-y-6">
@@ -231,20 +232,20 @@ export function AppSidebar() {
             className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-4 border border-blue-100"
           >
             <div className="flex items-center space-x-3">
-              <Avatar className="h-12 w-12 ring-2 ring-blue-200">
-                <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold">
+              <Avatar className="h-12 w-12 ring-2 ring-primary/20">
+                <AvatarFallback className="bg-gradient-to-r from-primary to-accent text-primary-foreground font-semibold">
                   👤
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-slate-900 truncate">
+                <p className="text-sm font-semibold text-foreground truncate">
                   Utilisateur
                 </p>
-                <p className="text-xs text-slate-600">
+                <p className="text-xs text-muted-foreground">
                   Niveau Explorateur
                 </p>
               </div>
-              <Badge className="bg-gradient-to-r from-blue-500 to-purple-500 text-white text-xs">
+              <Badge className="bg-gradient-to-r from-primary to-accent text-primary-foreground text-xs">
                 Pro
               </Badge>
             </div>
@@ -255,7 +256,7 @@ export function AppSidebar() {
         {navigationGroups.map((group, groupIndex) => (
           <SidebarGroup key={group.label}>
             {!isCollapsed && (
-              <SidebarGroupLabel className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 flex items-center">
+              <SidebarGroupLabel className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 flex items-center">
                 {group.icon && <group.icon className="w-4 h-4 mr-2" />}
                 {group.label}
               </SidebarGroupLabel>
@@ -284,10 +285,10 @@ export function AppSidebar() {
                             {/* Icon avec gradient si défini */}
                             <div className={`flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg ${
                               item.gradient 
-                                ? `bg-gradient-to-r ${item.gradient} text-white shadow-lg` 
+                                ? `bg-gradient-to-r ${item.gradient} text-primary-foreground shadow-lg` 
                                 : isItemActive 
-                                  ? "bg-blue-100 text-blue-600" 
-                                  : "bg-slate-100 text-slate-600 group-hover:bg-slate-200"
+                                  ? "bg-primary/10 text-primary" 
+                                  : "bg-muted text-muted-foreground group-hover:bg-muted/80"
                             }`}>
                               <item.icon className="w-4 h-4" />
                             </div>
@@ -304,7 +305,7 @@ export function AppSidebar() {
                                   <div className="flex items-center justify-between">
                                     <span className="font-medium truncate">{item.title}</span>
                                     {item.badge && (
-                                      <Badge variant="secondary" className="ml-2 text-xs bg-blue-100 text-blue-700">
+                                      <Badge variant="secondary" className="ml-2 text-xs bg-primary/10 text-primary">
                                         {item.badge}
                                       </Badge>
                                     )}
@@ -314,7 +315,7 @@ export function AppSidebar() {
                                       initial={{ opacity: 0, height: 0 }}
                                       animate={{ opacity: 1, height: "auto" }}
                                       exit={{ opacity: 0, height: 0 }}
-                                      className="text-xs text-slate-500 mt-1 leading-tight"
+                                      className="text-xs text-muted-foreground mt-1 leading-tight"
                                     >
                                       {item.description}
                                     </motion.p>
@@ -327,7 +328,7 @@ export function AppSidebar() {
                             {isItemActive && (
                               <motion.div
                                 layoutId="activeIndicator"
-                                className="absolute right-0 top-1/2 transform -translate-y-1/2 w-1 h-8 bg-gradient-to-b from-blue-500 to-purple-500 rounded-l-full"
+                                className="absolute right-0 top-1/2 transform -translate-y-1/2 w-1 h-8 bg-gradient-to-b from-primary to-accent rounded-l-full"
                               />
                             )}
                           </NavLink>
@@ -347,9 +348,9 @@ export function AppSidebar() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5 }}
-            className="bg-gradient-to-r from-slate-50 to-blue-50 rounded-2xl p-4 border border-slate-200"
+            className="bg-gradient-to-r from-muted/50 to-primary/5 rounded-2xl p-4 border border-border"
           >
-            <h4 className="text-sm font-semibold text-slate-800 mb-3">Actions Rapides</h4>
+            <h4 className="text-sm font-semibold text-foreground mb-3">Actions Rapides</h4>
             <div className="space-y-2">
               <Button variant="ghost" size="sm" className="w-full justify-start text-xs">
                 <Zap className="w-4 h-4 mr-2" />
