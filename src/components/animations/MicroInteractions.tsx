@@ -55,7 +55,6 @@ export const MicroInteraction: React.FC<MicroInteractionProps> = ({
         return {
           animate: isTriggered ? {
             scale: [1, scale, 1],
-            backgroundColor: ["#ffffff", "#10b981", "#ffffff"],
             transition: { duration: 0.6 }
           } : {}
         };
@@ -159,8 +158,8 @@ export const AnimatedButton: React.FC<AnimatedButtonProps> = ({
     const variants = {
       primary: 'bg-primary hover:bg-primary/90 text-primary-foreground',
       secondary: 'bg-secondary hover:bg-secondary/90 text-secondary-foreground',
-      success: 'bg-green-600 hover:bg-green-700 text-white',
-      danger: 'bg-red-600 hover:bg-red-700 text-white'
+      success: 'bg-success hover:bg-success/90 text-success-foreground',
+      danger: 'bg-destructive hover:bg-destructive/90 text-destructive-foreground'
     };
     return variants[variant];
   };
@@ -179,7 +178,7 @@ export const AnimatedButton: React.FC<AnimatedButtonProps> = ({
           relative overflow-hidden transition-all duration-300
           ${getVariantStyles()}
           ${isPressed ? 'shadow-lg' : 'shadow'}
-          ${showSuccess ? 'bg-green-500' : ''}
+          ${showSuccess ? 'bg-success' : ''}
           ${className}
         `}
       >
@@ -200,7 +199,7 @@ export const AnimatedButton: React.FC<AnimatedButtonProps> = ({
             animate={{ opacity: 1 }}
           >
             <motion.div
-              className="w-4 h-4 border-2 border-white border-t-transparent rounded-full"
+              className="w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full"
               animate={{ rotate: 360 }}
               transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
             />
@@ -209,7 +208,7 @@ export const AnimatedButton: React.FC<AnimatedButtonProps> = ({
 
         {showSuccess && (
           <motion.div
-            className="absolute inset-0 flex items-center justify-center text-white"
+            className="absolute inset-0 flex items-center justify-center text-primary-foreground"
             initial={{ opacity: 0, scale: 0 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ type: "spring", stiffness: 300 }}
@@ -382,11 +381,11 @@ export const FeedbackButton: React.FC<FeedbackProps> = ({
 
   const getColor = () => {
     const colors = {
-      like: 'text-blue-500',
-      love: 'text-red-500',
-      star: 'text-yellow-500',
-      zap: 'text-purple-500',
-      success: 'text-green-500'
+      like: 'text-primary',
+      love: 'text-destructive',
+      star: 'text-warning',
+      zap: 'text-accent',
+      success: 'text-success'
     };
     return colors[type];
   };
@@ -499,10 +498,10 @@ export const AnimatedToast: React.FC<AnimatedToastProps> = ({
 
   const getTypeStyles = () => {
     const styles = {
-      success: 'bg-green-500 text-white',
-      error: 'bg-red-500 text-white',
-      warning: 'bg-yellow-500 text-black',
-      info: 'bg-blue-500 text-white'
+      success: 'bg-success text-success-foreground',
+      error: 'bg-error text-error-foreground',
+      warning: 'bg-warning text-warning-foreground',
+      info: 'bg-info text-info-foreground'
     };
     return styles[type];
   };
@@ -529,7 +528,7 @@ export const AnimatedToast: React.FC<AnimatedToastProps> = ({
         initial={{ width: 0 }}
         animate={{ width: isVisible ? '100%' : 0 }}
         transition={{ duration: duration / 1000 }}
-        className="absolute bottom-0 left-0 h-1 bg-white/30 rounded-full"
+        className="absolute bottom-0 left-0 h-1 bg-foreground/30 rounded-full"
       />
       
       <div className="flex items-center gap-2">

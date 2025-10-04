@@ -274,11 +274,11 @@ export const AdvancedUserManagement: React.FC = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'active': return 'bg-green-100 text-green-800';
-      case 'inactive': return 'bg-gray-100 text-gray-800';
-      case 'suspended': return 'bg-red-100 text-red-800';
-      case 'pending': return 'bg-yellow-100 text-yellow-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'active': return 'bg-success/10 text-success';
+      case 'inactive': return 'bg-muted text-muted-foreground';
+      case 'suspended': return 'bg-destructive/10 text-destructive';
+      case 'pending': return 'bg-warning/10 text-warning';
+      default: return 'bg-muted text-muted-foreground';
     }
   };
 
@@ -295,7 +295,7 @@ export const AdvancedUserManagement: React.FC = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
       </div>
     );
   }
@@ -458,19 +458,19 @@ export const AdvancedUserManagement: React.FC = () => {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -20 }}
                       transition={{ delay: index * 0.05 }}
-                      className="border-b hover:bg-gray-50"
+                      className="border-b hover:bg-muted/50"
                     >
                       <td className="p-4">
                         <div className="flex items-center space-x-3">
-                          <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold">
+                          <div className="w-10 h-10 bg-gradient-to-r from-primary to-accent rounded-full flex items-center justify-center text-primary-foreground font-bold">
                             {(user.name || user.email)[0].toUpperCase()}
                           </div>
                           <div>
-                            <div className="font-medium text-gray-900">
+                            <div className="font-medium text-foreground">
                               {user.name || `${user.profile?.firstName} ${user.profile?.lastName}`}
                             </div>
-                            <div className="text-sm text-gray-500">{user.email}</div>
-                            <div className="text-xs text-gray-400">ID: {user.id.slice(-8)}</div>
+                            <div className="text-sm text-muted-foreground">{user.email}</div>
+                            <div className="text-xs text-muted-foreground">ID: {user.id.slice(-8)}</div>
                           </div>
                         </div>
                       </td>
