@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * WhisperInput - Composant d'entrée vocale pour le journal
  */

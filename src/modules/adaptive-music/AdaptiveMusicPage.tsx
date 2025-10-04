@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import PageHeader from "@/components/ui/PageHeader";

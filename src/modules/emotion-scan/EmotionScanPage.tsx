@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client";
 import React from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -97,20 +96,6 @@ export default function EmotionScanPage() {
     queryFn: () => getEmotionScanHistory(user!.id, 12),
     enabled: Boolean(user?.id),
     staleTime: 60 * 1000,
-    onError: (error: unknown) => {
-      notify(
-        {
-          code: 'SERVER',
-          messageKey: 'errors.emotionScanError',
-          cause: error instanceof Error ? { message: error.message, stack: error.stack } : error,
-          context: {
-            scope: 'emotion-scan-history',
-            userId: user?.id ?? 'anonymous',
-          },
-        },
-        { route: '/app/scan', feature: 'emotion-scan-history' },
-      );
-    },
   });
 
   const historyEntries: EmotionScanHistoryEntry[] = React.useMemo(

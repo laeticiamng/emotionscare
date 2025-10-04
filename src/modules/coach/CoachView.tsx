@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { FormEvent, KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import * as Sentry from '@sentry/react';
 import { Link } from 'react-router-dom';
@@ -9,7 +8,11 @@ import { sha256Hex } from '@/lib/hash';
 import { COACH_DISCLAIMERS, CoachMode } from '@/modules/coach/lib/prompts';
 import { redactForTelemetry } from '@/modules/coach/lib/redaction';
 import { useFlags } from '@/core/flags';
-import { useAssessment, type AssessmentCatalog } from '@/hooks/useAssessment';
+import { useAssessment } from '@/hooks/useAssessment';
+
+type AssessmentCatalog = {
+  items: Array<{ id: string; prompt: string }>;
+};
 import { useToast } from '@/hooks/use-toast';
 import { useClinicalHints } from '@/hooks/useClinicalHints';
 import { Badge } from '@/components/ui/badge';
@@ -345,7 +348,7 @@ export function CoachView({ initialMode = 'b2c' }: { initialMode?: CoachMode }) 
       return;
     }
 
-    const missing = aaqCatalog.items.some(item => !aaqAnswers[item.id]);
+    const missing = aaqCatalog.items.some((item: { id: string }) => !aaqAnswers[item.id]);
     if (missing) {
       toast({
         title: 'Quelques réponses manquent',
@@ -705,7 +708,7 @@ export function CoachView({ initialMode = 'b2c' }: { initialMode?: CoachMode }) 
           </DialogHeader>
 
           <div className="max-h-[60vh] space-y-4 overflow-y-auto pr-1">
-            {aaqCatalog?.items.map(item => (
+            {aaqCatalog?.items.map((item: { id: string; prompt: string }) => (
               <div key={item.id} className="space-y-2">
                 <p className="text-sm font-medium text-slate-800 dark:text-slate-100">{item.prompt}</p>
                 <RadioGroup

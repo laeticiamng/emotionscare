@@ -1,6 +1,6 @@
-// @ts-nocheck
 "use client";
 import React from "react";
+import { Link } from "react-router-dom";
 import PageHeader from "@/components/ui/PageHeader";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -34,9 +34,13 @@ export default function AdminFlagsPage() {
             </li>
           ))}
         </ul>
-        <div style={{ marginTop: 12 }}>
-          <Button href="/modules/scores">Aller aux Scores actuels</Button>
-          <Button href="/modules/scores-v2">Aller aux Scores V2</Button>
+        <div style={{ marginTop: 12, display: "flex", gap: 8 }}>
+          <Button asChild>
+            <Link to="/modules/scores">Aller aux Scores actuels</Link>
+          </Button>
+          <Button asChild>
+            <Link to="/modules/scores-v2">Aller aux Scores V2</Link>
+          </Button>
         </div>
       </Card>
     </main>
