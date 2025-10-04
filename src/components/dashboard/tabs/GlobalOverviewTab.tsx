@@ -19,28 +19,28 @@ const GlobalOverviewTab: React.FC<GlobalOverviewTabProps> = ({ className, userRo
       value: '85%',
       icon: Heart,
       trend: '+5%',
-      color: 'text-green-500'
+      color: 'text-success'
     },
     {
       title: 'Niveau de stress',
       value: 'Faible',
       icon: Brain,
       trend: '-12%',
-      color: 'text-blue-500'
+      color: 'text-primary'
     },
     {
       title: 'Activité quotidienne',
       value: '7/10',
       icon: Activity,
       trend: '+2%',
-      color: 'text-purple-500'
+      color: 'text-accent'
     },
     {
       title: 'Progression',
       value: '92%',
       icon: TrendingUp,
       trend: '+8%',
-      color: 'text-orange-500'
+      color: 'text-warning'
     }
   ];
 
@@ -79,7 +79,7 @@ const GlobalOverviewTab: React.FC<GlobalOverviewTabProps> = ({ className, userRo
             <CardContent>
               <div className="text-2xl font-bold">{stat.value}</div>
               <p className="text-xs text-muted-foreground">
-                <span className="text-green-500">{stat.trend}</span> par rapport à la semaine dernière
+                <span className="text-success">{stat.trend}</span> par rapport à la semaine dernière
               </p>
             </CardContent>
           </Card>
@@ -115,15 +115,15 @@ const GlobalOverviewTab: React.FC<GlobalOverviewTabProps> = ({ className, userRo
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              <div className="p-3 bg-blue-50 dark:bg-blue-950 rounded-lg">
+              <div className="p-3 bg-primary/10 rounded-lg">
                 <p className="text-sm">Prenez une pause VR de 10 minutes pour réduire le stress</p>
               </div>
-              <div className="p-3 bg-green-50 dark:bg-green-950 rounded-lg">
+              <div className="p-3 bg-success/10 rounded-lg">
                 <p className="text-sm">Votre bien-être s'améliore ! Continuez vos bonnes habitudes</p>
               </div>
               {showSoothingReminder && (
-                <div className="rounded-lg border border-amber-200/80 bg-amber-50/80 p-3 dark:border-amber-900/60 dark:bg-amber-950/40">
-                  <p className="text-sm text-amber-900 dark:text-amber-100">
+                <div className="rounded-lg border border-warning/20 bg-warning/10 p-3">
+                  <p className="text-sm text-warning-foreground">
                     Rappel hebdo : programme une respiration apaisante 4-7-8 pour protéger ton sommeil.
                   </p>
                 </div>
