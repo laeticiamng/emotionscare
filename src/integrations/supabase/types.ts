@@ -1259,6 +1259,57 @@ export type Database = {
         }
         Relationships: []
       }
+      breathing_vr_sessions: {
+        Row: {
+          average_pace: number | null
+          completed_at: string | null
+          created_at: string
+          cycles_completed: number | null
+          duration_seconds: number
+          id: string
+          mood_after: number | null
+          mood_before: number | null
+          notes: string | null
+          pattern: string
+          started_at: string
+          updated_at: string
+          user_id: string
+          vr_mode: boolean | null
+        }
+        Insert: {
+          average_pace?: number | null
+          completed_at?: string | null
+          created_at?: string
+          cycles_completed?: number | null
+          duration_seconds: number
+          id?: string
+          mood_after?: number | null
+          mood_before?: number | null
+          notes?: string | null
+          pattern: string
+          started_at?: string
+          updated_at?: string
+          user_id: string
+          vr_mode?: boolean | null
+        }
+        Update: {
+          average_pace?: number | null
+          completed_at?: string | null
+          created_at?: string
+          cycles_completed?: number | null
+          duration_seconds?: number
+          id?: string
+          mood_after?: number | null
+          mood_before?: number | null
+          notes?: string | null
+          pattern?: string
+          started_at?: string
+          updated_at?: string
+          user_id?: string
+          vr_mode?: boolean | null
+        }
+        Relationships: []
+      }
       buddies: {
         Row: {
           buddy_user_id: string
