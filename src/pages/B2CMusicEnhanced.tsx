@@ -228,8 +228,8 @@ const B2CMusicEnhanced: React.FC = () => {
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center space-x-3">
-          <div className="flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-r from-purple-500 to-violet-500">
-            <Music className="h-6 w-6 text-white" />
+          <div className="flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-r from-accent to-accent/80">
+            <Music className="h-6 w-6 text-primary-foreground" />
           </div>
           <div>
             <h1 className="text-3xl font-bold text-foreground">Musicothérapie</h1>
@@ -252,7 +252,7 @@ const B2CMusicEnhanced: React.FC = () => {
                   background: `linear-gradient(135deg, ${universe.ambiance.colors.primary}, ${universe.ambiance.colors.accent})` 
                 }}
               >
-                <Disc3 className="h-10 w-10 text-white" />
+                <Disc3 className="h-10 w-10 text-primary-foreground" />
               </div>
               
               <h2 className="text-4xl font-light text-foreground tracking-wide">
@@ -295,12 +295,12 @@ const B2CMusicEnhanced: React.FC = () => {
                             style={{ background: track.vinylColor }}
                           >
                             {/* Vinyl grooves */}
-                            <div className="absolute inset-2 rounded-full border-2 border-black/20" />
-                            <div className="absolute inset-4 rounded-full border border-black/20" />
-                            <div className="absolute inset-6 rounded-full border border-black/20" />
+                            <div className="absolute inset-2 rounded-full border-2 border-foreground/20" />
+                            <div className="absolute inset-4 rounded-full border border-foreground/20" />
+                            <div className="absolute inset-6 rounded-full border border-foreground/20" />
                             
                             {/* Center hole */}
-                            <div className="absolute top-1/2 left-1/2 w-6 h-6 -mt-3 -ml-3 rounded-full bg-card border-2 border-black/30 flex items-center justify-center">
+                            <div className="absolute top-1/2 left-1/2 w-6 h-6 -mt-3 -ml-3 rounded-full bg-card border-2 border-foreground/30 flex items-center justify-center">
                               <Icon className="w-3 h-3" style={{ color: track.color }} />
                             </div>
                           </div>
@@ -361,7 +361,7 @@ const B2CMusicEnhanced: React.FC = () => {
                                 handleToggleFavorite(track.id);
                               }}
                             >
-                              <Heart className={`h-3 w-3 mr-2 ${favorites.includes(track.id) ? 'fill-current text-red-500' : ''}`} />
+                              <Heart className={`h-3 w-3 mr-2 ${favorites.includes(track.id) ? 'fill-current text-destructive' : ''}`} />
                               {favorites.includes(track.id) ? 'Favori' : 'Ajouter'}
                             </Button>
                           </div>
