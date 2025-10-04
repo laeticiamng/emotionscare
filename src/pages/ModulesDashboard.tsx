@@ -57,7 +57,7 @@ const modules: Module[] = [
     icon: Scan,
     category: 'Core',
     status: 'active',
-    color: 'from-blue-500 to-cyan-500',
+    color: 'from-info to-info/70',
     featured: true,
   },
   {
@@ -67,7 +67,7 @@ const modules: Module[] = [
     icon: Music,
     category: 'Core',
     status: 'active',
-    color: 'from-purple-500 to-pink-500',
+    color: 'from-accent to-accent/70',
     featured: true,
   },
   {
@@ -77,7 +77,7 @@ const modules: Module[] = [
     icon: MessageSquare,
     category: 'Core',
     status: 'active',
-    color: 'from-green-500 to-emerald-500',
+    color: 'from-success to-success/70',
     featured: true,
   },
   {
@@ -87,7 +87,7 @@ const modules: Module[] = [
     icon: BookOpen,
     category: 'Core',
     status: 'active',
-    color: 'from-orange-500 to-red-500',
+    color: 'from-warning to-destructive',
   },
 
   // Wellness Modules
@@ -98,7 +98,7 @@ const modules: Module[] = [
     icon: Wind,
     category: 'Wellness',
     status: 'active',
-    color: 'from-sky-500 to-blue-500',
+    color: 'from-info/80 to-info',
   },
   {
     title: 'VR Galaxy',
@@ -107,7 +107,7 @@ const modules: Module[] = [
     icon: Brain,
     category: 'Wellness',
     status: 'beta',
-    color: 'from-indigo-500 to-purple-500',
+    color: 'from-primary to-accent',
   },
   {
     title: 'Flash Glow',
@@ -116,7 +116,7 @@ const modules: Module[] = [
     icon: Zap,
     category: 'Wellness',
     status: 'active',
-    color: 'from-yellow-500 to-orange-500',
+    color: 'from-warning to-warning/70',
   },
 
   // Fun-First Games
@@ -127,7 +127,7 @@ const modules: Module[] = [
     icon: Palette,
     category: 'Games',
     status: 'active',
-    color: 'from-pink-500 to-rose-500',
+    color: 'from-accent/80 to-accent',
   },
   {
     title: 'Boss Grit',
@@ -136,7 +136,7 @@ const modules: Module[] = [
     icon: Target,
     category: 'Games',
     status: 'active',
-    color: 'from-red-500 to-orange-500',
+    color: 'from-destructive to-warning',
   },
   {
     title: 'Bounce Back Battle',
@@ -145,7 +145,7 @@ const modules: Module[] = [
     icon: Shield,
     category: 'Games',
     status: 'beta',
-    color: 'from-teal-500 to-green-500',
+    color: 'from-success/80 to-success',
   },
   {
     title: 'Bubble Beat',
@@ -154,7 +154,7 @@ const modules: Module[] = [
     icon: Gamepad2,
     category: 'Games',
     status: 'active',
-    color: 'from-cyan-500 to-blue-500',
+    color: 'from-info/70 to-info',
   },
   {
     title: 'Story Synth',
@@ -163,7 +163,7 @@ const modules: Module[] = [
     icon: Sparkles,
     category: 'Games',
     status: 'beta',
-    color: 'from-violet-500 to-purple-500',
+    color: 'from-accent to-primary',
   },
 
   // Social
@@ -174,7 +174,7 @@ const modules: Module[] = [
     icon: Users,
     category: 'Social',
     status: 'active',
-    color: 'from-blue-500 to-indigo-500',
+    color: 'from-info to-primary',
   },
   {
     title: 'Social Cocon',
@@ -183,7 +183,7 @@ const modules: Module[] = [
     icon: Heart,
     category: 'Social',
     status: 'active',
-    color: 'from-rose-500 to-pink-500',
+    color: 'from-destructive/70 to-accent',
   },
   {
     title: 'Leaderboard',
@@ -192,7 +192,7 @@ const modules: Module[] = [
     icon: Trophy,
     category: 'Social',
     status: 'active',
-    color: 'from-amber-500 to-orange-500',
+    color: 'from-warning to-warning/70',
   },
 
   // Analytics
@@ -203,7 +203,7 @@ const modules: Module[] = [
     icon: Activity,
     category: 'Analytics',
     status: 'active',
-    color: 'from-emerald-500 to-green-500',
+    color: 'from-success to-success/70',
   },
   {
     title: 'Heatmap Émotionnelle',
@@ -212,7 +212,7 @@ const modules: Module[] = [
     icon: BarChart3,
     category: 'Analytics',
     status: 'active',
-    color: 'from-blue-500 to-cyan-500',
+    color: 'from-info to-info/70',
   },
   {
     title: 'Gamification',
@@ -221,16 +221,16 @@ const modules: Module[] = [
     icon: TrendingUp,
     category: 'Analytics',
     status: 'active',
-    color: 'from-purple-500 to-pink-500',
+    color: 'from-accent to-accent/70',
   },
 ];
 
 const categories = [
-  { name: 'Core', description: 'Modules principaux', color: 'bg-blue-500' },
-  { name: 'Wellness', description: 'Bien-être et relaxation', color: 'bg-green-500' },
-  { name: 'Games', description: 'Jeux Fun-First', color: 'bg-purple-500' },
-  { name: 'Social', description: 'Connexion et communauté', color: 'bg-pink-500' },
-  { name: 'Analytics', description: 'Suivi et progression', color: 'bg-orange-500' },
+  { name: 'Core', description: 'Modules principaux', color: 'bg-info' },
+  { name: 'Wellness', description: 'Bien-être et relaxation', color: 'bg-success' },
+  { name: 'Games', description: 'Jeux Fun-First', color: 'bg-accent' },
+  { name: 'Social', description: 'Connexion et communauté', color: 'bg-destructive/70' },
+  { name: 'Analytics', description: 'Suivi et progression', color: 'bg-warning' },
 ];
 
 export default function ModulesDashboard() {
@@ -265,7 +265,7 @@ export default function ModulesDashboard() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'active':
-        return <Badge variant="default" className="bg-green-500">Actif</Badge>;
+        return <Badge variant="default" className="bg-success">Actif</Badge>;
       case 'beta':
         return <Badge variant="secondary">Beta</Badge>;
       case 'coming-soon':
@@ -339,7 +339,7 @@ export default function ModulesDashboard() {
       {selectedCategory === 'all' && selectedStatus === 'all' && !searchQuery && (
         <div className="space-y-4">
           <h2 className="text-2xl font-bold flex items-center gap-2">
-            <Star className="h-6 w-6 text-yellow-500 fill-yellow-500" />
+            <Star className="h-6 w-6 text-warning fill-warning" />
             Modules mis en avant
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -483,19 +483,19 @@ export default function ModulesDashboard() {
             <p className="text-sm text-muted-foreground">Modules totaux</p>
           </div>
           <div className="text-center">
-            <p className="text-3xl font-bold text-green-500">
+            <p className="text-3xl font-bold text-success">
               {modules.filter(m => m.status === 'active').length}
             </p>
             <p className="text-sm text-muted-foreground">Modules actifs</p>
           </div>
           <div className="text-center">
-            <p className="text-3xl font-bold text-orange-500">
+            <p className="text-3xl font-bold text-warning">
               {modules.filter(m => m.status === 'beta').length}
             </p>
             <p className="text-sm text-muted-foreground">En beta</p>
           </div>
           <div className="text-center">
-            <p className="text-3xl font-bold text-purple-500">{categories.length}</p>
+            <p className="text-3xl font-bold text-accent">{categories.length}</p>
             <p className="text-sm text-muted-foreground">Catégories</p>
           </div>
         </CardContent>
