@@ -1,9 +1,9 @@
 # Phase 4 : Corrections des couleurs hardcodées - Dashboard Components
 
 **Date:** 2025-10-04  
-**Statut:** 🟡 En cours (42/67 fichiers traités)  
-**Fichiers corrigés:** 42  
-**Fichiers restants:** 25
+**Statut:** 🟡 En cours (48/67 fichiers traités)  
+**Fichiers corrigés:** 48  
+**Fichiers restants:** 19
 
 ## 📋 Résumé
 
@@ -105,6 +105,7 @@ Cette phase corrige les couleurs hardcodées dans les composants dashboard (`src
 | **Phase 4 (Batch 6)** | **6** | **~7** | **45** | **~501** |
 | **Phase 4 (Batch 7)** | **7** | **~13** | **52** | **~514** |
 | **Phase 4 (Batch 8)** | **6** | **~9** | **58** | **~523** |
+| **Phase 4 (Batch 9)** | **6** | **~3** | **64** | **~526** |
 
 ## 🎯 Fichiers restants à traiter (50)
 
@@ -492,9 +493,51 @@ Cette phase corrige les couleurs hardcodées dans les composants dashboard (`src
 | Couleurs hardcodées remplacées | ~9 |
 | Tokens HSL utilisés | primary, success, destructive, warning, muted-foreground |
 
+## ✅ Batch 9 - Tabs & Widget Components
+
+### 43. `src/components/dashboard/widgets/JournalSummaryCard.tsx`
+- **Problème:** Aucune couleur hardcodée
+- **Statut:** ✅ Déjà conforme
+
+### 44. `src/components/dashboard/widgets/WeeklyPlanCard.tsx`
+- **Problème:** Aucune couleur hardcodée
+- **Statut:** ✅ Déjà conforme
+
+### 45. `src/components/dashboard/widgets/QuickActionLinks.tsx`
+- **Problème:** Couleurs hardcodées mais non utilisées (définies dans l'interface mais pas appliquées)
+- **Statut:** ✅ Déjà conforme (bgColor non appliqué)
+
+### 46. `src/components/dashboard/tabs/PersonalDataTab.tsx`
+- **Problèmes identifiés:** Couleurs hardcodées pour zone info
+- **Corrections effectuées:**
+  - `bg-blue-50 dark:bg-blue-950` → `bg-primary/10`
+- **Lignes modifiées:** 69-75
+- **Instances corrigées:** ~1
+
+### 47. `src/components/dashboard/tabs/JournalTab.tsx`
+- **Problèmes identifiés:** Couleurs hardcodées pour badge mood
+- **Corrections effectuées:**
+  - `bg-blue-100 text-blue-800` → `bg-primary/10 text-primary`
+- **Lignes modifiées:** 72-76
+- **Instances corrigées:** ~2
+
+### 48. `src/components/dashboard/tabs/SettingsTab.tsx`
+- **Problème:** Aucune couleur hardcodée
+- **Statut:** ✅ Déjà conforme
+
+## 📊 Statistiques Batch 9
+
+| Métrique | Valeur |
+|----------|---------|
+| Fichiers corrigés | 6 |
+| Fichiers déjà conformes | 4 |
+| Total de lignes modifiées | ~20 |
+| Couleurs hardcodées remplacées | ~3 |
+| Tokens HSL utilisés | primary |
+
 ## 🔄 Prochaines étapes
 
-### Batch 9 (remaining widgets & additional dashboard files)
+### Batch 10 (remaining dashboard root files)
 1. Corriger les dossiers restants :
    - `admin/cards/`, `admin/charts/`, `admin/widgets/`
    - `b2b/widgets/`, `b2c/widgets/`
@@ -527,5 +570,6 @@ Cette phase corrige les couleurs hardcodées dans les composants dashboard (`src
 **Phase 4 Batch 6:** 6/67 fichiers complétés ✅  
 **Phase 4 Batch 7:** 7/67 fichiers complétés ✅  
 **Phase 4 Batch 8:** 6/67 fichiers complétés ✅  
-**Progression estimée Phase 4:** ~63% (42/67)  
-**Progression totale projet:** ~54% estimé
+**Phase 4 Batch 9:** 6/67 fichiers complétés ✅  
+**Progression estimée Phase 4:** ~72% (48/67)  
+**Progression totale projet:** ~60% estimé
