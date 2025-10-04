@@ -53,8 +53,8 @@ const breathingPatterns: BreathingPattern[] = [
     benefits: ['Réduit le stress', 'Améliore la concentration', 'Stabilise la pression artérielle'],
     difficulty: 'beginner',
     icon: Target,
-    color: 'text-blue-600',
-    background: 'from-blue-50 to-blue-100'
+    color: 'text-primary',
+    background: 'from-primary/10 to-primary/20'
   },
   {
     id: 'wim-hof',
@@ -68,8 +68,8 @@ const breathingPatterns: BreathingPattern[] = [
     benefits: ['Booste l\'énergie', 'Renforce l\'immunité', 'Améliore la résistance au froid'],
     difficulty: 'advanced',
     icon: Wind,
-    color: 'text-orange-600',
-    background: 'from-orange-50 to-orange-100'
+    color: 'text-warning',
+    background: 'from-warning/10 to-warning/20'
   },
   {
     id: 'coherence',
@@ -83,8 +83,8 @@ const breathingPatterns: BreathingPattern[] = [
     benefits: ['Équilibre le système nerveux', 'Réduit l\'anxiété', 'Améliore la variabilité cardiaque'],
     difficulty: 'beginner',
     icon: Heart,
-    color: 'text-red-600',
-    background: 'from-red-50 to-red-100'
+    color: 'text-destructive',
+    background: 'from-destructive/10 to-destructive/20'
   },
   {
     id: 'pranayama',
@@ -98,8 +98,8 @@ const breathingPatterns: BreathingPattern[] = [
     benefits: ['Favorise le sommeil', 'Calme l\'esprit', 'Réduit l\'anxiété'],
     difficulty: 'intermediate',
     icon: Brain,
-    color: 'text-purple-600',
-    background: 'from-purple-50 to-purple-100'
+    color: 'text-accent',
+    background: 'from-accent/10 to-accent/20'
   },
   {
     id: 'ocean',
@@ -113,8 +113,8 @@ const breathingPatterns: BreathingPattern[] = [
     benefits: ['Apaise l\'esprit', 'Favorise la méditation', 'Améliore la concentration'],
     difficulty: 'intermediate',
     icon: Waves,
-    color: 'text-cyan-600',
-    background: 'from-cyan-50 to-cyan-100'
+    color: 'text-info',
+    background: 'from-info/10 to-info/20'
   }
 ];
 
