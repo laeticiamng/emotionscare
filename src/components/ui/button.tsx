@@ -20,13 +20,20 @@ const buttonVariants = cva(
           "hover:bg-accent hover:text-accent-foreground active:scale-95",
         link: 
           "text-primary underline-offset-4 hover:underline focus-visible:ring-1",
-        // Nouvelles variantes accessibles
+        // États sémantiques (tokens HSL)
         success:
-          "bg-green-600 text-white shadow hover:bg-green-700 hover:shadow-md active:scale-95",
+          "bg-success text-success-foreground shadow hover:bg-success/90 hover:shadow-md active:scale-95",
         warning:
-          "bg-yellow-600 text-white shadow hover:bg-yellow-700 hover:shadow-md active:scale-95",
+          "bg-warning text-warning-foreground shadow hover:bg-warning/90 hover:shadow-md active:scale-95",
+        error:
+          "bg-error text-error-foreground shadow hover:bg-error/90 hover:shadow-md active:scale-95",
         info:
-          "bg-blue-600 text-white shadow hover:bg-blue-700 hover:shadow-md active:scale-95",
+          "bg-info text-info-foreground shadow hover:bg-info/90 hover:shadow-md active:scale-95",
+        // Variants premium
+        premium:
+          "bg-gradient-to-r from-primary via-primary/90 to-primary text-primary-foreground shadow-glow hover:shadow-glow-lg hover:scale-105 active:scale-100 transition-all duration-300",
+        hero:
+          "bg-gradient-to-br from-primary to-accent text-primary-foreground shadow-premium hover:shadow-premium-lg hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 font-semibold",
       },
       size: {
         default: "h-9 px-4 py-2",
