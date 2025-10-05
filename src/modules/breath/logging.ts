@@ -83,6 +83,7 @@ export async function logAndJournal(payload: LogAndJournalPayload): Promise<LogA
 
     try {
       const entry = await journalService.saveEntry({
+        type: 'text',
         content: payload.journalText,
         summary: 'Session de respiration guidée',
         tone: payload.moodDelta !== undefined && payload.moodDelta !== null && payload.moodDelta < 0 ? 'negative' : 'positive',

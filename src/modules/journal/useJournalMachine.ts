@@ -45,18 +45,21 @@ export const useJournalMachine = (config: JournalConfig = {}) => {
           const result = await journalService.processVoiceEntry(event.data);
           
           const entry = await journalService.saveEntry({
+            type: 'voice',
             content: result.content,
             summary: result.summary,
             tone: result.tone,
-            ephemeral: false, // Par défaut, pas éphémère
+            ephemeral: false,
             voice_url: URL.createObjectURL(event.data),
             duration: recordingDuration
           });
 
           config.onEntryCreated?.(entry);
 
+          const entries = await journalService.getEntries();
+
           resolve({
-            entries: journalService.getEntries(),
+            entries,
             currentEntry: entry,
             isRecording: false,
             recordingDuration: 0
@@ -80,6 +83,7 @@ export const useJournalMachine = (config: JournalConfig = {}) => {
     const result = await journalService.processTextEntry(text);
     
     const entry = await journalService.saveEntry({
+      type: 'text',
       content: result.content,
       summary: result.summary,
       tone: result.tone,
@@ -88,8 +92,10 @@ export const useJournalMachine = (config: JournalConfig = {}) => {
 
     config.onEntryCreated?.(entry);
 
+    const entries = await journalService.getEntries();
+
     return {
-      entries: journalService.getEntries(),
+      entries,
       currentEntry: entry,
       isRecording: false,
       recordingDuration: 0
@@ -177,10 +183,6 @@ export const useJournalMachine = (config: JournalConfig = {}) => {
   // Marquer une entrée comme éphémère
   const burnEntry = useCallback(async (entryId: string) => {
     await journalService.burnEntry(entryId);
-    
-    // Mettre à jour les données
-    const updatedEntries = journalService.getEntries();
-    // Note: Dans une vraie app, on devrait updater le state de l'async machine
   }, []);
 
   // Charger les entrées au montage
@@ -213,7 +215,7 @@ export const useJournalMachine = (config: JournalConfig = {}) => {
   return {
     state: state as JournalState,
     data: machineData || {
-      entries: journalService.getEntries(),
+      entries: [],
       isRecording,
       recordingDuration
     },

@@ -446,6 +446,39 @@ export type Database = {
         }
         Relationships: []
       }
+      ar_filter_sessions: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          duration_seconds: number | null
+          filter_type: string
+          id: string
+          mood_impact: string | null
+          photos_taken: number | null
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          duration_seconds?: number | null
+          filter_type: string
+          id?: string
+          mood_impact?: string | null
+          photos_taken?: number | null
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          duration_seconds?: number | null
+          filter_type?: string
+          id?: string
+          mood_impact?: string | null
+          photos_taken?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       assessment_sessions: {
         Row: {
           answers: Json | null
@@ -1307,6 +1340,42 @@ export type Database = {
           updated_at?: string
           user_id?: string
           vr_mode?: boolean | null
+        }
+        Relationships: []
+      }
+      bubble_beat_sessions: {
+        Row: {
+          bubbles_popped: number | null
+          completed_at: string | null
+          created_at: string
+          difficulty: string | null
+          duration_seconds: number | null
+          id: string
+          rhythm_accuracy: number | null
+          score: number | null
+          user_id: string
+        }
+        Insert: {
+          bubbles_popped?: number | null
+          completed_at?: string | null
+          created_at?: string
+          difficulty?: string | null
+          duration_seconds?: number | null
+          id?: string
+          rhythm_accuracy?: number | null
+          score?: number | null
+          user_id: string
+        }
+        Update: {
+          bubbles_popped?: number | null
+          completed_at?: string | null
+          created_at?: string
+          difficulty?: string | null
+          duration_seconds?: number | null
+          id?: string
+          rhythm_accuracy?: number | null
+          score?: number | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -6562,6 +6631,42 @@ export type Database = {
           },
         ]
       }
+      mood_mixer_sessions: {
+        Row: {
+          activities_selected: string[] | null
+          completed_at: string | null
+          created_at: string
+          duration_seconds: number | null
+          id: string
+          mood_after: string | null
+          mood_before: string | null
+          satisfaction_score: number | null
+          user_id: string
+        }
+        Insert: {
+          activities_selected?: string[] | null
+          completed_at?: string | null
+          created_at?: string
+          duration_seconds?: number | null
+          id?: string
+          mood_after?: string | null
+          mood_before?: string | null
+          satisfaction_score?: number | null
+          user_id: string
+        }
+        Update: {
+          activities_selected?: string[] | null
+          completed_at?: string | null
+          created_at?: string
+          duration_seconds?: number | null
+          id?: string
+          mood_after?: string | null
+          mood_before?: string | null
+          satisfaction_score?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       mood_tracking: {
         Row: {
           context: string | null
@@ -8905,6 +9010,42 @@ export type Database = {
           scenes_completed?: number | null
           session_id?: string | null
           started_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      story_synth_sessions: {
+        Row: {
+          choices_made: Json | null
+          completed_at: string | null
+          created_at: string
+          duration_seconds: number | null
+          emotion_tags: string[] | null
+          id: string
+          story_content: string | null
+          story_theme: string | null
+          user_id: string
+        }
+        Insert: {
+          choices_made?: Json | null
+          completed_at?: string | null
+          created_at?: string
+          duration_seconds?: number | null
+          emotion_tags?: string[] | null
+          id?: string
+          story_content?: string | null
+          story_theme?: string | null
+          user_id: string
+        }
+        Update: {
+          choices_made?: Json | null
+          completed_at?: string | null
+          created_at?: string
+          duration_seconds?: number | null
+          emotion_tags?: string[] | null
+          id?: string
+          story_content?: string | null
+          story_theme?: string | null
           user_id?: string
         }
         Relationships: []

@@ -6,14 +6,17 @@ import { supabase } from '@/integrations/supabase/client';
 
 export interface JournalEntry {
   id: string;
+  type: 'voice' | 'text';
   content: string;
   summary?: string;
   tone?: 'positive' | 'neutral' | 'negative';
   ephemeral: boolean;
   created_at: Date;
   voice_url?: string;
-  duration?: number; // en secondes pour les entrées vocales
+  duration?: number;
   metadata?: Record<string, any>;
+  tags?: string[];
+  user_id?: string;
 }
 
 export interface JournalVoiceEntry {
@@ -94,93 +97,159 @@ class JournalService {
    * Sauvegarder une entrée de journal
    */
   async saveEntry(entry: Omit<JournalEntry, 'id' | 'created_at'>): Promise<JournalEntry> {
-    const newEntry: JournalEntry = {
-      id: Date.now().toString(),
-      created_at: new Date(),
-      ...entry
-    };
-
-    // Stocker localement (simulation, à remplacer par Supabase)
-    const existingEntries = this.getLocalEntries();
-    existingEntries.unshift(newEntry);
-    localStorage.setItem('journal_entries', JSON.stringify(existingEntries));
-
-    // Analytics
-    if (window.gtag) {
-      window.gtag('event', 'journal_entry_saved', {
-        event_category: 'journal',
-        event_label: entry.ephemeral ? 'ephemeral' : 'permanent',
-        value: entry.content.length
-      });
+    const user = await supabase.auth.getUser();
+    const userId = user.data.user?.id;
+    
+    if (!userId) {
+      throw new Error('Utilisateur non authentifié');
     }
 
-    return newEntry;
+    // Sauvegarder dans Supabase selon le type
+    if (entry.type === 'voice') {
+      const { data, error } = await supabase
+        .from('journal_voice')
+        .insert({
+          user_id: userId,
+          content: entry.content,
+          summary: entry.summary,
+          tone: entry.tone,
+          ephemeral: entry.ephemeral || false,
+          tags: entry.tags
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      return {
+        id: data.id,
+        created_at: new Date(data.created_at),
+        type: 'voice',
+        content: data.content,
+        summary: data.summary,
+        tone: data.tone as 'positive' | 'neutral' | 'negative',
+        ephemeral: data.ephemeral,
+        tags: data.tags
+      };
+    } else {
+      const { data, error } = await supabase
+        .from('journal_text')
+        .insert({
+          user_id: userId,
+          content: entry.content,
+          summary: entry.summary,
+          tone: entry.tone,
+          ephemeral: entry.ephemeral || false,
+          tags: entry.tags
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      return {
+        id: data.id,
+        created_at: new Date(data.created_at),
+        type: 'text',
+        content: data.content,
+        summary: data.summary,
+        tone: data.tone as 'positive' | 'neutral' | 'negative',
+        ephemeral: data.ephemeral,
+        tags: data.tags
+      };
+    }
   }
 
   /**
    * Obtenir les entrées de journal
    */
-  getEntries(): JournalEntry[] {
-    return this.getLocalEntries();
+  async getEntries(): Promise<JournalEntry[]> {
+    const user = await supabase.auth.getUser();
+    if (!user.data.user) return [];
+
+    const userId = user.data.user.id;
+
+    // Récupérer les entrées vocales
+    const { data: voiceEntries } = await supabase
+      .from('journal_voice')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+
+    // Récupérer les entrées textuelles
+    const { data: textEntries } = await supabase
+      .from('journal_text')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+
+    const allEntries: JournalEntry[] = [
+      ...(voiceEntries || []).map(e => ({
+        id: e.id,
+        created_at: new Date(e.created_at),
+        type: 'voice' as const,
+        content: e.content,
+        summary: e.summary,
+        tone: e.tone as 'positive' | 'neutral' | 'negative',
+        ephemeral: e.ephemeral,
+        tags: e.tags
+      })),
+      ...(textEntries || []).map(e => ({
+        id: e.id,
+        created_at: new Date(e.created_at),
+        type: 'text' as const,
+        content: e.content,
+        summary: e.summary,
+        tone: e.tone as 'positive' | 'neutral' | 'negative',
+        ephemeral: e.ephemeral,
+        tags: e.tags
+      }))
+    ];
+
+    // Trier par date
+    return allEntries.sort((a, b) => b.created_at.getTime() - a.created_at.getTime());
   }
 
   /**
    * Marquer une entrée comme "à brûler" (24h)
    */
   async burnEntry(entryId: string): Promise<void> {
-    const entries = this.getLocalEntries();
-    const entryIndex = entries.findIndex(e => e.id === entryId);
-    
-    if (entryIndex >= 0) {
-      entries[entryIndex].ephemeral = true;
-      localStorage.setItem('journal_entries', JSON.stringify(entries));
+    // Essayer dans journal_voice
+    const { error: voiceError } = await supabase
+      .from('journal_voice')
+      .update({ ephemeral: true })
+      .eq('id', entryId);
 
-      // Analytics
-      if (window.gtag) {
-        window.gtag('event', 'journal_entry_burned', {
-          event_category: 'journal',
-          event_label: 'burn_toggle'
-        });
-      }
+    if (voiceError) {
+      // Essayer dans journal_text
+      const { error: textError } = await supabase
+        .from('journal_text')
+        .update({ ephemeral: true })
+        .eq('id', entryId);
+
+      if (textError) throw textError;
     }
   }
 
   /**
    * Supprimer les entrées éphémères expirées
    */
-  cleanupEphemeralEntries(): void {
-    const entries = this.getLocalEntries();
-    const now = new Date();
-    const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+  async cleanupEphemeralEntries(): Promise<void> {
+    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
 
-    const filteredEntries = entries.filter(entry => {
-      if (entry.ephemeral && entry.created_at < oneDayAgo) {
-        return false; // Supprimer
-      }
-      return true; // Garder
-    });
+    // Supprimer les entrées vocales éphémères expirées
+    await supabase
+      .from('journal_voice')
+      .delete()
+      .eq('ephemeral', true)
+      .lt('created_at', oneDayAgo);
 
-    if (filteredEntries.length !== entries.length) {
-      localStorage.setItem('journal_entries', JSON.stringify(filteredEntries));
-    }
-  }
-
-  /**
-   * Méthodes privées
-   */
-  private getLocalEntries(): JournalEntry[] {
-    try {
-      const stored = localStorage.getItem('journal_entries');
-      if (!stored) return [];
-      
-      const entries = JSON.parse(stored);
-      return entries.map((entry: any) => ({
-        ...entry,
-        created_at: new Date(entry.created_at)
-      }));
-    } catch {
-      return [];
-    }
+    // Supprimer les entrées textuelles éphémères expirées
+    await supabase
+      .from('journal_text')
+      .delete()
+      .eq('ephemeral', true)
+      .lt('created_at', oneDayAgo);
   }
 
   private generateLocalSummary(text: string): string {

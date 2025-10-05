@@ -125,6 +125,7 @@ export async function createFlashGlowJournalEntry({
 
   try {
     const entry = await journalService.saveEntry({
+      type: 'text',
       content: contentLines.join('\n'),
       summary,
       tone: labelInfo.tone,
