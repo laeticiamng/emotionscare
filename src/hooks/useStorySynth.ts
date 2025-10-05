@@ -25,6 +25,44 @@ export const useStorySynth = (userId: string) => {
     }
   });
 
+  const createStory = useMutation({
+    mutationFn: async ({ 
+      title, 
+      content, 
+      genre, 
+      style,
+      metadata 
+    }: { 
+      title: string; 
+      content: string;
+      genre: string;
+      style: string;
+      metadata: any;
+    }) => {
+      // Créer une session et la compléter immédiatement avec l'histoire
+      const session = await StorySynthService.createSession(userId, genre);
+      await StorySynthService.recordChoice(session.id, {
+        title,
+        content,
+        style,
+        ...metadata
+      });
+      await StorySynthService.completeSession(session.id, 0);
+      return session;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['story-synth-history', userId] });
+      toast({ title: 'Histoire sauvegardée!' });
+    },
+    onError: (error: any) => {
+      toast({
+        title: 'Erreur',
+        description: error.message,
+        variant: 'destructive'
+      });
+    }
+  });
+
   const recordChoice = useMutation({
     mutationFn: ({ sessionId, choice }: { sessionId: string; choice: any }) =>
       StorySynthService.recordChoice(sessionId, choice),
@@ -46,8 +84,10 @@ export const useStorySynth = (userId: string) => {
     history,
     isLoading,
     createSession: createSession.mutate,
+    createStory: createStory.mutate,
     recordChoice: recordChoice.mutate,
     completeSession: completeSession.mutate,
-    isCreating: createSession.isPending
+    isCreating: createSession.isPending,
+    isSavingStory: createStory.isPending
   };
 };

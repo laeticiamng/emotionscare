@@ -1,5 +1,6 @@
-import React from 'react';
-import { useBubbleBeat } from '../hooks/useBubbleBeat';
+import React, { useState } from 'react';
+import { useBubbleBeat } from '@/hooks/useBubbleBeat';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface BubbleBeatMainProps {
   className?: string;
@@ -10,7 +11,48 @@ interface BubbleBeatMainProps {
  * Jeu rythmique anti-stress
  */
 export const BubbleBeatMain: React.FC<BubbleBeatMainProps> = ({ className = '' }) => {
-  const { score, isPlaying, startGame, stopGame } = useBubbleBeat();
+  const { user } = useAuth();
+  const { createSession, updateScore, completeSession, bestScore } = useBubbleBeat(user?.id || '');
+  const [score, setScore] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [startTime, setStartTime] = useState<number | null>(null);
+  const [bubblesPopped, setBubblesPopped] = useState(0);
+
+  const startGame = () => {
+    setIsPlaying(true);
+    setScore(0);
+    setBubblesPopped(0);
+    setStartTime(Date.now());
+    
+    if (user?.id) {
+      createSession({ difficulty: 'normal' }, {
+        onSuccess: (session) => {
+          setSessionId(session.id);
+        }
+      });
+    }
+    
+    // Simuler des points
+    const interval = setInterval(() => {
+      setScore(prev => prev + 10);
+      setBubblesPopped(prev => prev + 1);
+    }, 1000);
+    
+    // @ts-ignore
+    window.bubbleInterval = interval;
+  };
+
+  const stopGame = () => {
+    setIsPlaying(false);
+    // @ts-ignore
+    if (window.bubbleInterval) clearInterval(window.bubbleInterval);
+    
+    if (sessionId && startTime) {
+      const duration = Math.floor((Date.now() - startTime) / 1000);
+      completeSession({ sessionId, duration });
+    }
+  };
 
   return (
     <div className={`bubble-beat-container ${className}`}>

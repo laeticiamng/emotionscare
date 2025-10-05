@@ -1,5 +1,19 @@
-import React from 'react';
-import { useARFilters } from '../hooks/useARFilters';
+import React, { useState } from 'react';
+import { useARFilters } from '@/hooks/useARFilters';
+import { useAuth } from '@/contexts/AuthContext';
+
+interface Filter {
+  name: string;
+  emoji: string;
+  type: string;
+}
+
+const FILTERS: Filter[] = [
+  { name: 'Joyeux', emoji: '😊', type: 'joy' },
+  { name: 'Calme', emoji: '😌', type: 'calm' },
+  { name: 'Énergique', emoji: '⚡', type: 'energetic' },
+  { name: 'Zen', emoji: '🧘', type: 'zen' },
+];
 
 interface ARFiltersMainProps {
   className?: string;
@@ -10,7 +24,37 @@ interface ARFiltersMainProps {
  * Filtres de réalité augmentée émotionnels
  */
 export const ARFiltersMain: React.FC<ARFiltersMainProps> = ({ className = '' }) => {
-  const { currentFilter, isActive, applyFilter, removeFilter } = useARFilters();
+  const { user } = useAuth();
+  const { createSession, incrementPhotosTaken, completeSession } = useARFilters(user?.id || '');
+  const [currentFilter, setCurrentFilter] = useState<Filter>(FILTERS[0]);
+  const [isActive, setIsActive] = useState(false);
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [startTime, setStartTime] = useState<number | null>(null);
+
+  const applyFilter = () => {
+    const randomFilter = FILTERS[Math.floor(Math.random() * FILTERS.length)];
+    setCurrentFilter(randomFilter);
+    setIsActive(true);
+    
+    if (user?.id) {
+      createSession({ filterType: randomFilter.type }, {
+        onSuccess: (session) => {
+          setSessionId(session.id);
+          setStartTime(Date.now());
+        }
+      });
+    }
+  };
+
+  const removeFilter = () => {
+    if (sessionId && startTime) {
+      const duration = Math.floor((Date.now() - startTime) / 1000);
+      completeSession({ sessionId, duration, moodImpact: 'positive' });
+    }
+    setIsActive(false);
+    setSessionId(null);
+    setStartTime(null);
+  };
 
   return (
     <div className={`ar-filters-container ${className}`}>

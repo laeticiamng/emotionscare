@@ -1,5 +1,6 @@
-import React from 'react';
-import { useNyvee } from '../hooks/useNyvee';
+import React, { useState, useEffect } from 'react';
+import { useNyvee } from '@/hooks/useNyvee';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface NyveeMainProps {
   className?: string;
@@ -10,7 +11,39 @@ interface NyveeMainProps {
  * Cocoon émotionnel personnalisé
  */
 export const NyveeMain: React.FC<NyveeMainProps> = ({ className = '' }) => {
-  const { cozyLevel, increaseCozy, resetCozy } = useNyvee();
+  const { user } = useAuth();
+  const { createSession, updateCozyLevel, completeSession, isCreating } = useNyvee(user?.id || '');
+  const [cozyLevel, setCozyLevel] = useState(50);
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [startTime, setStartTime] = useState<number | null>(null);
+
+  const increaseCozy = async () => {
+    const newLevel = Math.min(cozyLevel + 10, 100);
+    setCozyLevel(newLevel);
+    
+    if (!sessionId && user?.id) {
+      // Créer une nouvelle session
+      createSession({ cozyLevel: newLevel }, {
+        onSuccess: (session) => {
+          setSessionId(session.id);
+          setStartTime(Date.now());
+        }
+      });
+    } else if (sessionId) {
+      // Mettre à jour le niveau
+      updateCozyLevel({ sessionId, cozyLevel: newLevel });
+    }
+  };
+
+  const resetCozy = async () => {
+    if (sessionId && startTime) {
+      const duration = Math.floor((Date.now() - startTime) / 1000);
+      completeSession({ sessionId, duration });
+    }
+    setCozyLevel(50);
+    setSessionId(null);
+    setStartTime(null);
+  };
 
   return (
     <div className={`nyvee-container ${className}`}>
