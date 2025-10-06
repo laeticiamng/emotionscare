@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { createHash } from 'crypto';
+import { sha256Hex } from '@/lib/hash';
 
 /**
  * Helpers pour la gestion de la confidentialité et du RGPD
@@ -12,8 +12,9 @@ export interface ConsentOptions {
   dataStorage?: boolean;
 }
 
-export function pseudonymizeUserId(userId: string): string {
-  return createHash('sha256').update(userId).digest('hex').substring(0, 16);
+export async function pseudonymizeUserId(userId: string): Promise<string> {
+  const hash = await sha256Hex(userId);
+  return hash.substring(0, 16);
 }
 
 export function shouldAggregateData(userCount: number, threshold: number = 5): boolean {
@@ -51,9 +52,9 @@ export function checkConsent(requiredConsents: (keyof ConsentOptions)[], userCon
 
 export const CONSENT_VERSION = "1.0.0";
 
-export function generateConsentRecord(userId: string, consents: ConsentOptions) {
+export async function generateConsentRecord(userId: string, consents: ConsentOptions) {
   return {
-    userId: pseudonymizeUserId(userId),
+    userId: await pseudonymizeUserId(userId),
     consents,
     version: CONSENT_VERSION,
     timestamp: new Date().toISOString()
