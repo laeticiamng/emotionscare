@@ -113,9 +113,9 @@ export const useSunoCallback = ({ taskId, onComplete, onError }: UseSunoCallback
           return; // DB a répondu, pas besoin du fallback sur ce tick
         }
 
-        // 2) FALLBACK SUNO throttle — toutes les 5s seulement, après 5s d'attente
-        if (elapsedSeconds > 5 && (pollCount % 5 === 0)) {
-          console.log('⏰ Fallback: polling Suno API directly...');
+        // 2) POLLING SUNO AGRESSIF — toutes les 2s, commence immédiatement
+        if (pollCount % 2 === 0) {
+          console.log('⏰ Polling Suno API directly... (attempt', pollCount / 2, ')');
           
           const { data: pollData } = await supabase.functions.invoke('suno-poll-status', {
             body: { taskId }
@@ -150,7 +150,7 @@ export const useSunoCallback = ({ taskId, onComplete, onError }: UseSunoCallback
       }
     };
 
-    // Poll chaque seconde
+    // Poll toutes les secondes
     pollInterval = setInterval(checkCallback, 1000);
     checkCallback(); // Premier check immédiat
 
