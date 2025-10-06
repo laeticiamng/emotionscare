@@ -1,0 +1,72 @@
+title: "Stress/Overwhelm → Décélération"
+emotion: "stress"
+duration_min: 18
+duration_max: 20
+
+music:
+  bpm: 70
+  mode: "dorian"
+  progression: "i–VII–VI"
+  time_signature: "4/4"
+  style: "lofi swing"
+  instruments: ["Rhodes", "vinyl hiss"]
+  prompt: "Warm lofi 70 BPM, dorian, Rhodes + subtle vinyl, soft FR reminders."
+
+segments:
+  - title: "Respiration 4/6"
+    start: 0
+    end: 120
+    type: "breathing"
+    voiceover: |
+      Inspire par le nez sur 4 temps... 1, 2, 3, 4.
+      Expire par la bouche sur 6 temps... 1, 2, 3, 4, 5, 6.
+      Laisse ton corps ralentir.
+    
+  - title: "Tri des tâches"
+    start: 120
+    end: 300
+    type: "cognitive"
+    voiceover: |
+      Imagine toutes ces tâches devant toi.
+      Trois piles : À faire maintenant. Plus tard. Jeter.
+      Tu choisis l'essentiel.
+    
+  - title: "Recadrage"
+    start: 300
+    end: 540
+    type: "reframing"
+    voiceover: |
+      "Je dois tout faire" devient "Je choisis ce qui compte".
+      "C'est urgent" devient "Qu'est-ce qui est important ?".
+      Tu retrouves ton rythme.
+    
+  - title: "Ancrage respiration"
+    start: 540
+    end: 720
+    type: "anchoring"
+    voiceover: |
+      Main sur le ventre. Compte 10 à 1.
+      À chaque chiffre, tu descends plus profond.
+      Tu es ancré, tu es calme.
+    
+  - title: "Stabilisation"
+    start: 720
+    end: 1080
+    type: "stabilization"
+    voiceover: |
+      Tu ralentis. Tu choisis l'essentiel.
+      Respire. Laisse le reste pour plus tard.
+
+tcm:
+  points: ["LI11", "Yintang"]
+  warnings: []
+  aromatherapy: "Lavande, bergamote"
+
+immersion:
+  light: "ambre"
+  sounds: ["nature bas"]
+  props: []
+
+affirmations:
+  - "Je ralentis, je choisis l'essentiel."
+  - "Un pas à la fois suffit."

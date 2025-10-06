@@ -1,0 +1,71 @@
+title: "Motivation/Énergie → Mise en mouvement"
+emotion: "motivation"
+duration_min: 18
+duration_max: 20
+
+music:
+  bpm: "104–110"
+  mode: "dorian/ionian"
+  style: "afro-house soft"
+  instruments: ["shakers doux", "percussions organiques"]
+  prompt: "Organic house soft 108 BPM, FR action cues, no aggressive drops."
+
+segments:
+  - title: "Intentions Si/Alors"
+    start: 0
+    end: 180
+    type: "planning"
+    voiceover: |
+      "Si je me réveille, alors je bois un verre d'eau."
+      "Si j'ai 10 minutes, alors je fais X."
+      Tu enlèves la décision, tu crées l'automatisme.
+    
+  - title: "Plan 10 minutes"
+    start: 180
+    end: 360
+    type: "behavioral"
+    voiceover: |
+      Une tâche, 10 minutes max.
+      Juste commencer. L'élan vient en marchant.
+      Tu allumes l'étincelle.
+    
+  - title: "Visualisation dynamique"
+    start: 360
+    end: 660
+    type: "imagery"
+    voiceover: |
+      Imagine-toi en train de faire cette action.
+      Ressens l'énergie, le mouvement.
+      Ton corps se prépare, tu te lèves.
+    
+  - title: "Activation comportementale"
+    start: 660
+    end: 900
+    type: "activation"
+    voiceover: |
+      Fais un petit mouvement maintenant.
+      Étire-toi. Lève-toi. Bouge.
+      L'action crée l'énergie.
+    
+  - title: "Consolidation"
+    start: 900
+    end: 1080
+    type: "consolidation"
+    voiceover: |
+      Shakers doux. Percussions organiques.
+      J'allume l'étincelle, j'y vais.
+      L'élan vient en marchant.
+
+tcm:
+  points: ["ST36", "LI11"]
+  warnings: []
+  aromatherapy: "Menthe, citron"
+
+immersion:
+  light: "froide, dynamique"
+  sounds: ["percussions"]
+  props: ["étirements debout"]
+
+affirmations:
+  - "J'allume l'étincelle, j'y vais."
+  - "L'élan vient en marchant."

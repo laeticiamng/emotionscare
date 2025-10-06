@@ -1,0 +1,75 @@
+title: "Hypersensibilité/Overstimulation → Filtration"
+emotion: "hypersensibilite"
+duration_min: 18
+duration_max: 20
+
+music:
+  bpm: "58–62"
+  mode: "aeolian"
+  style: "ambient minimal"
+  instruments: ["textures feutrées", "pas de cymbales"]
+  prompt: "Low-transient ambient 60 BPM, no cymbals, soft FR boundaries cues."
+
+segments:
+  - title: "ACCEPT (DBT)"
+    start: 0
+    end: 180
+    type: "acceptance"
+    voiceover: |
+      Activities : ce que tu peux faire maintenant.
+      Contributing : aide quelqu'un, même petit.
+      Comparisons : avec des moments plus durs.
+      Emotions : accueillir sans juger.
+      Push away : mettre de côté ce qui submerge.
+      Thoughts : laisser passer.
+      Sensations : te concentrer sur une texture douce.
+    
+  - title: "Limites sensorielles"
+    start: 180
+    end: 420
+    type: "boundaries"
+    voiceover: |
+      Tu as le droit de dire "c'est trop".
+      Tu peux baisser le son, éteindre la lumière, sortir.
+      Protéger tes sens, c'est te respecter.
+    
+  - title: "Cocon protecteur (imagerie)"
+    start: 420
+    end: 720
+    type: "imagery"
+    voiceover: |
+      Imagine une bulle autour de toi.
+      Elle filtre ce qui entre. Tu es en sécurité.
+      Les stimuli rebondissent, tu restes calme.
+    
+  - title: "Respiration nasale lente"
+    start: 720
+    end: 900
+    type: "breathing"
+    voiceover: |
+      Inspire lentement par le nez, 4 temps.
+      Expire lentement par le nez, 6 temps.
+      Ton système nerveux se calme.
+    
+  - title: "Consolidation"
+    start: 900
+    end: 1080
+    type: "consolidation"
+    voiceover: |
+      Casque sur les oreilles. Masque sur les yeux.
+      Je filtre, je choisis, je me protège.
+      J'honore ma sensibilité.
+
+tcm:
+  points: ["KD1", "HT7"]
+  warnings: []
+  aromatherapy: "Lavande"
+
+immersion:
+  light: "minimale"
+  sounds: ["silence recommandé"]
+  props: ["casque", "masque yeux"]
+
+affirmations:
+  - "Je filtre, je choisis, je me protège."
+  - "Ma sensibilité est une force, je la respecte."
