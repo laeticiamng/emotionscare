@@ -55,6 +55,13 @@ const ModernHomePage: React.FC = () => {
 
   const quickActions = [
     { 
+      title: 'Musique émotionnelle', 
+      desc: 'Génération musicale par IA',
+      icon: <Activity className="h-5 w-5" />,
+      href: '/app/emotion-music',
+      color: 'bg-pink-500'
+    },
+    { 
       title: 'Démarrer une session', 
       desc: 'Commencer votre parcours bien-être',
       icon: <Zap className="h-5 w-5" />,
