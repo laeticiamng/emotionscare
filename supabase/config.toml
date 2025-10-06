@@ -179,3 +179,9 @@ verify_jwt = false
 
 [functions.parcours-xl-extend]
 verify_jwt = false
+
+[functions.assess-start]
+verify_jwt = true
+
+[functions.assess-submit]
+verify_jwt = true
