@@ -7887,6 +7887,7 @@ export type Database = {
           segment_index: number
           start_seconds: number
           status: string
+          storage_path: string | null
           stream_url: string | null
           suno_task_id: string | null
           title: string
@@ -7903,6 +7904,7 @@ export type Database = {
           segment_index: number
           start_seconds: number
           status?: string
+          storage_path?: string | null
           stream_url?: string | null
           suno_task_id?: string | null
           title: string
@@ -7919,6 +7921,7 @@ export type Database = {
           segment_index?: number
           start_seconds?: number
           status?: string
+          storage_path?: string | null
           stream_url?: string | null
           suno_task_id?: string | null
           title?: string

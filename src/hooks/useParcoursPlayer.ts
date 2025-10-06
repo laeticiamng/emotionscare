@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { useState, useEffect, useRef, useCallback } from 'react';
 import type { ParcoursRun, ParcoursSegment, ParcoursPlayerState } from '@/types/music/parcours';
+import { supabase } from '@/integrations/supabase/client';
 
 export function useParcoursPlayer(run: ParcoursRun | null, segments: ParcoursSegment[]) {
   const [playerState, setPlayerState] = useState<ParcoursPlayerState>({
@@ -56,14 +57,39 @@ export function useParcoursPlayer(run: ParcoursRun | null, segments: ParcoursSeg
     }
   }, [playerState.currentSegmentIndex, segments]);
 
-  const loadSegment = useCallback((index: number) => {
+  const loadSegment = useCallback(async (index: number) => {
     const segment = segments[index];
     if (!segment || !audioRef.current) return;
 
     currentSegmentRef.current = segment;
     
-    // Use stream_url first for fast feedback, then audio_url for final quality
-    const url = segment.audio_url || segment.stream_url;
+    let url: string | null = null;
+    
+    // Priorité 1 : storage_path → signer via edge function
+    if (segment.storage_path) {
+      try {
+        const response = await supabase.functions.invoke('sign-track', {
+          body: { segmentId: segment.id }
+        });
+        
+        if (response.data?.url) {
+          url = response.data.url;
+        }
+      } catch (error) {
+        console.error('Failed to sign storage URL:', error);
+      }
+    }
+    
+    // Fallback 2 : final_url (déprécié, peut expirer)
+    if (!url && segment.audio_url) {
+      url = segment.audio_url;
+    }
+    
+    // Fallback 3 : preview_url (stream)
+    if (!url && segment.stream_url) {
+      url = segment.stream_url;
+    }
+    
     if (!url) {
       console.warn('No audio URL for segment', index);
       return;
