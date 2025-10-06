@@ -19,26 +19,23 @@ serve(async (req: Request) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     );
 
-    const url = new URL(req.url);
     const payload = await req.json().catch(() => ({}));
 
-    // Extraire taskId depuis QS (prioritaire) ou body (fallback)
-    const qsTask = url.searchParams.get('taskId');
-    const bodyTask = payload?.data?.task_id || payload?.taskId || payload?.task_id;
-    const taskId = qsTask || bodyTask;
+    // Suno envoie task_id dans le POST body (PAS dans URL)
+    const taskId = payload?.data?.task_id || payload?.taskId || payload?.task_id;
 
-    if (!taskId) {
-      console.error('❌ No taskId in callback - QS:', qsTask, 'Body:', bodyTask);
+    if (!taskId || taskId === '{__TASK_ID__}') {
+      console.error('❌ Invalid or missing taskId:', { taskId, payload });
       return new Response(
-        JSON.stringify({ error: 'taskId required' }),
+        JSON.stringify({ error: 'Valid taskId required' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' }}
       );
     }
 
-    console.log('🎵 Emotion music callback received:', {
+    console.info(`🎵 Emotion music callback received:`, {
       taskId,
-      source: qsTask ? 'querystring' : 'body',
-      payload: JSON.stringify(payload).substring(0, 200)
+      callbackType: payload?.data?.callbackType,
+      code: payload?.code
     });
 
     // Déterminer stage + URLs (compat snake_case ET camelCase)

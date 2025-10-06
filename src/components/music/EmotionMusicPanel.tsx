@@ -215,20 +215,22 @@ export const EmotionMusicPanel: React.FC = () => {
           <div className="space-y-3">
             <div className="p-3 bg-muted rounded-md text-sm">
               <div className="flex items-center justify-between mb-2">
-                <p className="font-medium">Génération en cours</p>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-muted-foreground">{elapsedTime}s</span>
-                  {isWaiting && (
-                    <Loader2 className="h-4 w-4 animate-spin text-primary" />
-                  )}
-                </div>
+                <p className="font-medium">
+                  {isWaiting 
+                    ? (elapsedTime < 45 ? `Génération en cours... ${elapsedTime}s` : `Finalisation... ${elapsedTime}s`) 
+                    : 'Musique prête'}
+                </p>
+                {isWaiting && (
+                  <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                )}
               </div>
               <p className="text-muted-foreground text-xs font-mono mt-1">
                 ID: {currentTask.substring(0, 16)}...
               </p>
               <p className="text-xs mt-2">
-                {!latestCallback && !manualPollResult && elapsedTime < 30 && '⏳ Préparation...'}
-                {!latestCallback && !manualPollResult && elapsedTime >= 30 && '🔄 Vérification automatique en cours...'}
+                {!latestCallback && !manualPollResult && elapsedTime < 30 && '🎼 Analyse de votre état émotionnel...'}
+                {!latestCallback && !manualPollResult && elapsedTime >= 30 && elapsedTime < 60 && '🎵 Composition musicale en cours...'}
+                {!latestCallback && !manualPollResult && elapsedTime >= 60 && '⏳ Génération presque terminée...'}
                 {latestCallback?.callbackType === 'text' && '📝 Transcription en cours...'}
                 {latestCallback?.callbackType === 'first' && '🎵 Streaming disponible !'}
                 {latestCallback?.callbackType === 'complete' && '✅ Musique prête !'}

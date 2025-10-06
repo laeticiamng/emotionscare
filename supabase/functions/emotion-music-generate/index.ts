@@ -88,12 +88,12 @@ Recommande les meilleurs paramètres musicaux pour apaiser et accompagner cette 
     
     console.log('✅ Paramètres musicaux générés:', musicParams);
 
-    // Étape 2: Générer la musique avec Suno
+    // Étape 2: Générer la musique avec Suno (V3_5 = plus rapide ~30-40s preview)
     console.log('🎵 Appel Suno API pour génération...');
     
     const SUPABASE_URL = Deno.env.get('SUPABASE_URL');
-    // Note: callBackUrl avec query string sera complété avec le vrai taskId après réception
-    const callBackUrl = `${SUPABASE_URL}/functions/v1/emotion-music-callback?taskId={__TASK_ID__}&type=emotion`;
+    // Suno envoie task_id dans le POST body (pas de placeholder requis dans URL)
+    const callBackUrl = `${SUPABASE_URL}/functions/v1/emotion-music-callback`;
     
     console.log('📍 Callback URL configured:', callBackUrl);
     
@@ -106,7 +106,7 @@ Recommande les meilleurs paramètres musicaux pour apaiser et accompagner cette 
       body: JSON.stringify({
         customMode: false,
         instrumental: musicParams.instrumental !== false,
-        model: musicParams.model || 'V4_5',
+        model: 'V3_5', // V3_5 plus rapide que V4/V4_5 (~30-40s preview au lieu de >4min)
         prompt: musicParams.prompt || 'calming therapeutic music',
         style: musicParams.musicStyle || 'ambient, peaceful',
         title: musicParams.title || 'Therapeutic Music',
