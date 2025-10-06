@@ -18,7 +18,7 @@ export const EmotionMusicPanel: React.FC = () => {
   const [manualPollResult, setManualPollResult] = useState<any>(null);
   const [isManualPolling, setIsManualPolling] = useState(false);
   
-  const { latestCallback, isWaiting } = useSunoCallback({
+  const { latestCallback, isWaiting, elapsedTime } = useSunoCallback({
     taskId: currentTask,
     onComplete: (callback) => {
       console.log('✅ Musique complète:', callback);
@@ -191,15 +191,19 @@ export const EmotionMusicPanel: React.FC = () => {
             <div className="p-3 bg-muted rounded-md text-sm">
               <div className="flex items-center justify-between mb-2">
                 <p className="font-medium">Génération en cours</p>
-                {isWaiting && (
-                  <Loader2 className="h-4 w-4 animate-spin text-primary" />
-                )}
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-muted-foreground">{elapsedTime}s</span>
+                  {isWaiting && (
+                    <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                  )}
+                </div>
               </div>
               <p className="text-muted-foreground text-xs font-mono mt-1">
                 ID: {currentTask.substring(0, 16)}...
               </p>
               <p className="text-xs mt-2">
-                {!latestCallback && !manualPollResult && 'Initialisation...'}
+                {!latestCallback && !manualPollResult && elapsedTime < 30 && '⏳ Préparation...'}
+                {!latestCallback && !manualPollResult && elapsedTime >= 30 && '🔄 Vérification automatique en cours...'}
                 {latestCallback?.callbackType === 'text' && '📝 Transcription en cours...'}
                 {latestCallback?.callbackType === 'first' && '🎵 Streaming disponible !'}
                 {latestCallback?.callbackType === 'complete' && '✅ Musique prête !'}

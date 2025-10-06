@@ -56,23 +56,35 @@ serve(async (req) => {
     let duration = null;
 
     if (data.code === 200 && data.data) {
-      const records = Array.isArray(data.data) ? data.data : [data.data];
-      const record = records[0];
+      const status = data.data.status;
+      const response = data.data.response;
       
-      if (record) {
-        // Déterminer le stage selon les URLs disponibles
-        if (record.audio_url) {
-          stage = 'complete';
-          downloadUrl = record.audio_url;
-          duration = record.duration;
-        } else if (record.stream_url) {
-          stage = 'first';
-          streamUrl = record.stream_url;
-        } else {
-          stage = 'processing';
+      // Si status = SUCCESS et qu'on a des sunoData
+      if (status === 'SUCCESS' && response?.sunoData && Array.isArray(response.sunoData)) {
+        const firstTrack = response.sunoData[0];
+        
+        if (firstTrack) {
+          // Priorité aux URLs Suno directes (sourceAudioUrl)
+          downloadUrl = firstTrack.sourceAudioUrl || firstTrack.audioUrl;
+          streamUrl = firstTrack.sourceStreamAudioUrl || firstTrack.streamAudioUrl;
+          duration = firstTrack.duration;
+          
+          if (downloadUrl) {
+            stage = 'complete';
+          } else if (streamUrl) {
+            stage = 'first';
+          } else {
+            stage = 'processing';
+          }
         }
+      } else if (status === 'PENDING' || status === 'PROCESSING') {
+        stage = 'processing';
+      } else if (status === 'FAILED') {
+        stage = 'error';
       }
     }
+
+    console.log('📦 Formatted response:', { stage, streamUrl, downloadUrl, duration });
 
     return new Response(
       JSON.stringify({

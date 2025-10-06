@@ -13,6 +13,7 @@ interface UseSunoCallbackOptions {
 export const useSunoCallback = ({ taskId, onComplete, onError }: UseSunoCallbackOptions) => {
   const [latestCallback, setLatestCallback] = useState<SunoCallback | null>(null);
   const [isWaiting, setIsWaiting] = useState(false);
+  const [elapsedTime, setElapsedTime] = useState(0);
 
   // Poll pour vérifier les callbacks avec fallback API Suno
   useEffect(() => {
@@ -20,8 +21,14 @@ export const useSunoCallback = ({ taskId, onComplete, onError }: UseSunoCallback
 
     setIsWaiting(true);
     let pollInterval: NodeJS.Timeout;
+    let timeInterval: NodeJS.Timeout;
     let pollCount = 0;
     const startTime = Date.now();
+
+    // Timer visible pour l'utilisateur
+    timeInterval = setInterval(() => {
+      setElapsedTime(Math.floor((Date.now() - startTime) / 1000));
+    }, 1000);
 
     const checkCallback = async () => {
       pollCount++;
@@ -128,6 +135,7 @@ export const useSunoCallback = ({ taskId, onComplete, onError }: UseSunoCallback
 
     return () => {
       clearInterval(pollInterval);
+      clearInterval(timeInterval);
       clearTimeout(timeout);
     };
   }, [taskId, onComplete, onError]);
@@ -135,11 +143,13 @@ export const useSunoCallback = ({ taskId, onComplete, onError }: UseSunoCallback
   const reset = useCallback(() => {
     setLatestCallback(null);
     setIsWaiting(false);
+    setElapsedTime(0);
   }, []);
 
   return {
     latestCallback,
     isWaiting,
+    elapsedTime,
     reset
   };
 };
