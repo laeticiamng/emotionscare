@@ -72,8 +72,8 @@ export const useSunoCallback = ({ taskId, onComplete, onError }: UseSunoCallback
           return;
         }
 
-        // Fallback: après 30s sans callback, poll l'API Suno directement
-        if (elapsedSeconds > 30 && pollCount % 3 === 0) {
+        // Fallback: après 10s sans callback, poll l'API Suno directement
+        if (elapsedSeconds > 10 && pollCount % 2 === 0) {
           console.log('⏰ Fallback: polling Suno API directly...');
           
           const { data: pollData, error: pollError } = await supabase.functions.invoke(
@@ -122,8 +122,8 @@ export const useSunoCallback = ({ taskId, onComplete, onError }: UseSunoCallback
       }
     };
 
-    // Poll toutes les 3 secondes
-    pollInterval = setInterval(checkCallback, 3000);
+    // Poll toutes les 2 secondes
+    pollInterval = setInterval(checkCallback, 2000);
     checkCallback(); // Premier check immédiat
 
     // Timeout de 5 minutes max
