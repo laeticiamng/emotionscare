@@ -149,3 +149,6 @@ verify_jwt = true
 
 [functions.b2c-compute-aggregates]
 verify_jwt = true
+
+[functions.suno-music-generation]
+verify_jwt = true
