@@ -9239,6 +9239,33 @@ export type Database = {
           },
         ]
       }
+      suno_callbacks: {
+        Row: {
+          callback_type: string
+          created_at: string | null
+          id: string
+          metadata: Json | null
+          status: string | null
+          task_id: string
+        }
+        Insert: {
+          callback_type: string
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          status?: string | null
+          task_id: string
+        }
+        Update: {
+          callback_type?: string
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          status?: string | null
+          task_id?: string
+        }
+        Relationships: []
+      }
       team_assessments: {
         Row: {
           can_show: boolean
@@ -10127,6 +10154,44 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "meditation_content"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_music_generations: {
+        Row: {
+          created_at: string | null
+          emotion_badge: string | null
+          emotion_state: Json
+          id: string
+          suno_config: Json | null
+          task_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          emotion_badge?: string | null
+          emotion_state: Json
+          id?: string
+          suno_config?: Json | null
+          task_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          emotion_badge?: string | null
+          emotion_state?: Json
+          id?: string
+          suno_config?: Json | null
+          task_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_music_generations_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "suno_callbacks"
+            referencedColumns: ["task_id"]
           },
         ]
       }

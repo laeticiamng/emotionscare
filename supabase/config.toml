@@ -152,3 +152,15 @@ verify_jwt = true
 
 [functions.suno-music-generation]
 verify_jwt = true
+
+[functions.suno-music-extend]
+verify_jwt = true
+
+[functions.suno-add-vocals]
+verify_jwt = true
+
+[functions.suno-music-callback]
+verify_jwt = false
+
+[functions.openai-structured-output]
+verify_jwt = true
