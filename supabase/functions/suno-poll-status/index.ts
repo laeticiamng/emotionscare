@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.7';
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 
 const corsHeaders = {
@@ -30,7 +31,7 @@ serve(async (req) => {
 
     console.log('🔍 Polling Suno status for task:', taskId);
 
-    // Poll l'API Suno pour l'état de la tâche
+    // Poll l'API Suno
     const url = `https://api.sunoapi.org/api/v1/generate/record-info?taskId=${encodeURIComponent(taskId)}`;
     const response = await fetch(url, {
       method: 'GET',
@@ -47,9 +48,9 @@ serve(async (req) => {
     }
 
     const data = await response.json();
-    console.log('✅ Suno status:', data);
+    console.log('✅ Suno status:', JSON.stringify(data).substring(0, 500));
 
-    // Format la réponse pour correspondre au format callback
+    // Parser les deux formats (snake_case ET camelCase)
     let stage = null;
     let streamUrl = null;
     let downloadUrl = null;
@@ -64,13 +65,63 @@ serve(async (req) => {
         const firstTrack = response.sunoData[0];
         
         if (firstTrack) {
-          // Priorité aux URLs Suno directes (sourceAudioUrl)
-          downloadUrl = firstTrack.sourceAudioUrl || firstTrack.audioUrl;
-          streamUrl = firstTrack.sourceStreamAudioUrl || firstTrack.streamAudioUrl;
+          // Priorité aux URLs Suno directes (sourceAudioUrl) sinon fallback
+          downloadUrl = firstTrack.sourceAudioUrl || firstTrack.audio_url || firstTrack.audioUrl;
+          streamUrl = firstTrack.sourceStreamAudioUrl || firstTrack.stream_url || firstTrack.streamAudioUrl;
           duration = firstTrack.duration;
           
           if (downloadUrl) {
             stage = 'complete';
+            
+            // Si complete, télécharger et uploader
+            const supabase = createClient(
+              Deno.env.get('SUPABASE_URL')!,
+              Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+            );
+
+            try {
+              console.log('📥 Downloading final audio from poll:', downloadUrl);
+              const audioResp = await fetch(downloadUrl);
+              
+              if (audioResp.ok) {
+                const bytes = new Uint8Array(await audioResp.arrayBuffer());
+                const filePath = `runs/emotion/${taskId}.mp3`;
+                
+                console.log('📤 Uploading to Storage from poll:', filePath);
+                
+                const { error: uploadErr } = await supabase.storage
+                  .from('parcours-tracks')
+                  .upload(filePath, bytes, {
+                    contentType: 'audio/mpeg',
+                    upsert: true
+                  });
+
+                if (!uploadErr) {
+                  console.log('✅ Audio uploaded from poll, updating emotion_tracks');
+                  
+                  await supabase
+                    .from('emotion_tracks')
+                    .upsert({
+                      task_id: taskId,
+                      storage_path: filePath,
+                      duration_seconds: duration,
+                      metadata: {
+                        audio_url: downloadUrl,
+                        completed_at: new Date().toISOString(),
+                        uploaded_via_poll: true
+                      }
+                    }, {
+                      onConflict: 'task_id'
+                    });
+                  
+                  console.log('✅ emotion_tracks updated from poll for', taskId);
+                } else {
+                  console.error('❌ Upload error from poll:', uploadErr);
+                }
+              }
+            } catch (err) {
+              console.error('❌ Error during poll upload:', err);
+            }
           } else if (streamUrl) {
             stage = 'first';
           } else {

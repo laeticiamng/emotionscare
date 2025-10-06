@@ -3217,6 +3217,45 @@ export type Database = {
         }
         Relationships: []
       }
+      emotion_tracks: {
+        Row: {
+          created_at: string | null
+          duration_seconds: number | null
+          emotion_label: string | null
+          id: string
+          metadata: Json | null
+          source: string | null
+          storage_path: string | null
+          task_id: string | null
+          title: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          duration_seconds?: number | null
+          emotion_label?: string | null
+          id?: string
+          metadata?: Json | null
+          source?: string | null
+          storage_path?: string | null
+          task_id?: string | null
+          title?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          duration_seconds?: number | null
+          emotion_label?: string | null
+          id?: string
+          metadata?: Json | null
+          source?: string | null
+          storage_path?: string | null
+          task_id?: string | null
+          title?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       emotional_scan_results: {
         Row: {
           confidence_score: number | null

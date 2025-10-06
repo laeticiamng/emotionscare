@@ -18,7 +18,7 @@ export const EmotionMusicPanel: React.FC = () => {
   const [manualPollResult, setManualPollResult] = useState<any>(null);
   const [isManualPolling, setIsManualPolling] = useState(false);
   
-  const { latestCallback, isWaiting, elapsedTime } = useSunoCallback({
+  const { latestCallback, isWaiting, elapsedTime, signedUrl } = useSunoCallback({
     taskId: currentTask,
     onComplete: (callback) => {
       console.log('✅ Musique complète:', callback);
@@ -27,6 +27,31 @@ export const EmotionMusicPanel: React.FC = () => {
       console.error('❌ Erreur génération:', error);
     }
   });
+
+  const handleAddToLibrary = async () => {
+    if (!currentTask) return;
+    
+    try {
+      // Upsert dans emotion_tracks
+      const { error } = await supabase
+        .from('emotion_tracks')
+        .upsert({
+          task_id: currentTask,
+          title: emotionBadge || 'Ma musique émotionnelle',
+          emotion_label: emotionBadge
+        }, {
+          onConflict: 'task_id',
+          ignoreDuplicates: false
+        });
+
+      if (error) throw error;
+      
+      toast.success('✅ Ajouté à votre bibliothèque !');
+    } catch (err) {
+      console.error('Error adding to library:', err);
+      toast.error('Erreur lors de l\'ajout à la bibliothèque');
+    }
+  };
 
   const handleManualPoll = async () => {
     if (!currentTask) return;
@@ -234,41 +259,57 @@ export const EmotionMusicPanel: React.FC = () => {
               )}
             </div>
 
-            {/* Audio player si callback disponible */}
-            {latestCallback?.data?.stream_url && (
-              <div className="p-4 bg-primary/5 rounded-md border border-primary/20">
-                <div className="flex items-center gap-3 mb-2">
-                  <Play className="h-5 w-5 text-primary" />
-                  <p className="font-medium text-sm">Écouter le streaming</p>
+            {/* Audio player avec URL signée depuis Storage */}
+            {signedUrl && (
+              <div className="p-4 bg-green-500/5 rounded-md border border-green-500/20">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-3">
+                    <Music className="h-5 w-5 text-green-600" />
+                    <p className="font-medium text-sm">Votre musique émotionnelle</p>
+                  </div>
+                  {latestCallback?.data?.duration && (
+                    <span className="text-xs text-muted-foreground">
+                      {Math.floor(latestCallback.data.duration / 60)}:{String(latestCallback.data.duration % 60).padStart(2, '0')}
+                    </span>
+                  )}
                 </div>
                 <audio 
                   controls 
                   className="w-full"
-                  src={latestCallback.data.stream_url}
-                  autoPlay={true}
+                  src={signedUrl}
+                  crossOrigin="anonymous"
+                  preload="metadata"
                 />
+                <div className="flex gap-2 mt-3">
+                  <Button 
+                    size="sm" 
+                    variant="default" 
+                    className="flex-1"
+                    onClick={handleAddToLibrary}
+                  >
+                    ⭐ Ajouter à ma bibliothèque
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    variant="outline"
+                    onClick={() => window.open(signedUrl, '_blank')}
+                  >
+                    Télécharger
+                  </Button>
+                </div>
               </div>
             )}
 
-            {latestCallback?.data?.audio_url && (
-              <div className="p-4 bg-green-500/5 rounded-md border border-green-500/20">
+            {/* Fallback: afficher URLs Suno directes si pas encore en Storage */}
+            {!signedUrl && latestCallback?.data?.audio_url && (
+              <div className="p-4 bg-yellow-500/5 rounded-md border border-yellow-500/20">
                 <div className="flex items-center gap-3 mb-2">
-                  <Music className="h-5 w-5 text-green-600" />
-                  <p className="font-medium text-sm">Qualité finale disponible</p>
+                  <Music className="h-5 w-5 text-yellow-600" />
+                  <p className="font-medium text-sm">Téléchargement en cours...</p>
                 </div>
-                <audio 
-                  controls 
-                  className="w-full"
-                  src={latestCallback.data.audio_url}
-                />
-                <Button 
-                  size="sm" 
-                  variant="outline" 
-                  className="w-full mt-2"
-                  onClick={() => window.open(latestCallback.data.audio_url, '_blank')}
-                >
-                  Télécharger
-                </Button>
+                <p className="text-xs text-muted-foreground">
+                  L'audio est en cours de sauvegarde sécurisée. Vous pourrez l'écouter dans quelques secondes.
+                </p>
               </div>
             )}
 

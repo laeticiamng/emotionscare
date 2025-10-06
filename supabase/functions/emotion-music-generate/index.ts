@@ -92,7 +92,8 @@ Recommande les meilleurs paramètres musicaux pour apaiser et accompagner cette 
     console.log('🎵 Appel Suno API pour génération...');
     
     const SUPABASE_URL = Deno.env.get('SUPABASE_URL');
-    const callBackUrl = `${SUPABASE_URL}/functions/v1/emotion-music-callback`;
+    // Note: callBackUrl avec query string sera complété avec le vrai taskId après réception
+    const callBackUrl = `${SUPABASE_URL}/functions/v1/emotion-music-callback?taskId={__TASK_ID__}&type=emotion`;
     
     console.log('📍 Callback URL configured:', callBackUrl);
     
