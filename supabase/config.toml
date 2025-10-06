@@ -198,5 +198,8 @@ verify_jwt = true
 [functions.sign-emotion-track]
 verify_jwt = true
 
+[functions.emotion-music-generate]
+verify_jwt = true
+
 [functions.parcours-xl-runner]
 verify_jwt = false

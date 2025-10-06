@@ -3118,6 +3118,36 @@ export type Database = {
         }
         Relationships: []
       }
+      emotion_generations: {
+        Row: {
+          created_at: string | null
+          metadata: Json | null
+          prompt: string | null
+          status: string
+          task_id: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          metadata?: Json | null
+          prompt?: string | null
+          status?: string
+          task_id: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          metadata?: Json | null
+          prompt?: string | null
+          status?: string
+          task_id?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       emotion_metrics: {
         Row: {
           confidence_score: number | null

@@ -19,6 +19,11 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     );
 
+    const adminClient = createClient(
+      Deno.env.get('SUPABASE_URL')!,
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+    );
+
     const payload = await req.json().catch(() => ({}));
 
     // Suno envoie task_id dans le POST body (PAS dans URL)
@@ -62,8 +67,20 @@ serve(async (req) => {
       );
     }
 
+    // Récupérer le user_id depuis emotion_generations
+    const { data: genData } = await adminClient
+      .from('emotion_generations')
+      .select('user_id')
+      .eq('task_id', taskId)
+      .single();
+
+    const userId = genData?.user_id;
+    if (!userId) {
+      console.warn('⚠️ No user_id found for taskId:', taskId);
+    }
+
     // Stocker callback en DB
-    const { error: dbError } = await supabase
+    const { error: dbError } = await adminClient
       .from('suno_callbacks')
       .insert({
         task_id: taskId,
@@ -82,8 +99,19 @@ serve(async (req) => {
       console.log('✅ Callback stored:', stage);
     }
 
+    // Mettre à jour le statut dans emotion_generations
+    if (userId) {
+      await adminClient
+        .from('emotion_generations')
+        .update({ 
+          status: stage === 'complete' ? 'complete' : stage === 'first' ? 'first' : 'creating',
+          updated_at: new Date().toISOString()
+        })
+        .eq('task_id', taskId);
+    }
+
     // Si complete → télécharger et uploader en Storage privé
-    if (audioUrl && stage === 'complete') {
+    if (audioUrl && stage === 'complete' && userId) {
       console.log('📥 Downloading final audio from:', audioUrl);
       
       try {
@@ -94,7 +122,7 @@ serve(async (req) => {
           
           console.log('📤 Uploading to Storage:', filePath, '(',bytes.length, 'bytes)');
           
-          const { error: uploadErr } = await supabase.storage
+          const { error: uploadErr } = await adminClient.storage
             .from('parcours-tracks')
             .upload(filePath, bytes, {
               contentType: 'audio/mpeg',
@@ -104,15 +132,17 @@ serve(async (req) => {
           if (!uploadErr) {
             console.log('✅ Audio uploaded, updating emotion_tracks');
             
-            // Upsert emotion_tracks
-            const { error: trackErr } = await supabase
+            // Upsert emotion_tracks avec user_id (CRITIQUE pour RLS et signing)
+            const { error: trackErr } = await adminClient
               .from('emotion_tracks')
               .upsert({
                 task_id: taskId,
+                user_id: userId, // ESSENTIEL
                 storage_path: filePath,
                 duration_seconds: duration,
                 metadata: {
                   audio_url: audioUrl,
+                  stream_url: streamUrl,
                   completed_at: new Date().toISOString(),
                   uploaded: true
                 }

@@ -22,9 +22,16 @@ export const useSunoCallback = ({ taskId, onComplete, onError }: UseSunoCallback
       const { data, error } = await supabase.functions.invoke('sign-emotion-track', {
         body: { taskId }
       });
-      if (data?.url) setSignedUrl(data.url);
+      if (error) {
+        console.error('Error signing URL:', error);
+        return;
+      }
+      if (data?.url) {
+        console.log('✅ Got signed URL for playback');
+        setSignedUrl(data.url);
+      }
     } catch (err) {
-      console.warn('Could not get signed URL yet');
+      console.warn('Could not get signed URL yet:', err);
     }
   }, []);
 

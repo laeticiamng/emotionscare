@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.7';
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 
 const corsHeaders = {
@@ -25,6 +26,27 @@ serve(async (req) => {
   }
 
   try {
+    // 1) Authentifier l'utilisateur
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      throw new Error('Missing authorization header');
+    }
+
+    const anonClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      { global: { headers: { Authorization: authHeader } }, auth: { persistSession: false } }
+    );
+
+    const { data: authData, error: authError } = await anonClient.auth.getUser();
+    if (authError || !authData?.user) {
+      console.error('Authentication failed:', authError);
+      throw new Error('Unauthorized');
+    }
+
+    const userId = authData.user.id;
+    console.log('🎵 Generating emotion music for user:', userId);
+
     const { emotionState, userContext } = await req.json();
     
     const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
@@ -129,6 +151,33 @@ Recommande les meilleurs paramètres musicaux pour apaiser et accompagner cette 
 
     const sunoTaskId = sunoData.data.taskId;
     console.log('🎵 Generation started with taskId:', sunoTaskId);
+
+    // Étape 3: Créer le mapping user ↔ taskId dans emotion_generations
+    const adminClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
+
+    const { error: genError } = await adminClient
+      .from('emotion_generations')
+      .upsert({
+        task_id: sunoTaskId,
+        user_id: userId,
+        prompt: musicParams.prompt,
+        status: 'creating',
+        metadata: {
+          emotion_state: emotionState,
+          style: musicParams.musicStyle,
+          model: 'V3_5'
+        }
+      });
+
+    if (genError) {
+      console.error('⚠️ Failed to create emotion_generation:', genError);
+      // Non-bloquant, on continue
+    } else {
+      console.log('✅ Created emotion_generation mapping for:', sunoTaskId);
+    }
 
     // Retourner le sunoTaskId (le vrai taskId de Suno)
     return new Response(
