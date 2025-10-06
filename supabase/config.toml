@@ -171,6 +171,9 @@ verify_jwt = false
 [functions.emotion-music-callback]
 verify_jwt = false
 
+[functions.suno-poll-status]
+verify_jwt = false
+
 [functions.parcours-xl-create]
 verify_jwt = true
 

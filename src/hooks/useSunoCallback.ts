@@ -14,15 +14,21 @@ export const useSunoCallback = ({ taskId, onComplete, onError }: UseSunoCallback
   const [latestCallback, setLatestCallback] = useState<SunoCallback | null>(null);
   const [isWaiting, setIsWaiting] = useState(false);
 
-  // Poll pour vérifier les callbacks
+  // Poll pour vérifier les callbacks avec fallback API Suno
   useEffect(() => {
     if (!taskId) return;
 
     setIsWaiting(true);
     let pollInterval: NodeJS.Timeout;
+    let pollCount = 0;
+    const startTime = Date.now();
 
     const checkCallback = async () => {
+      pollCount++;
+      const elapsedSeconds = (Date.now() - startTime) / 1000;
+
       try {
+        // D'abord vérifier si un callback est arrivé en DB
         const { data, error } = await supabase
           .from('suno_callbacks')
           .select('*')
@@ -30,11 +36,6 @@ export const useSunoCallback = ({ taskId, onComplete, onError }: UseSunoCallback
           .order('created_at', { ascending: false })
           .limit(1)
           .single();
-
-        if (error && error.code !== 'PGRST116') {
-          console.error('Error fetching callback:', error);
-          return;
-        }
 
         if (data) {
           const callback: SunoCallback = {
@@ -71,7 +72,60 @@ export const useSunoCallback = ({ taskId, onComplete, onError }: UseSunoCallback
             setIsWaiting(false);
             clearInterval(pollInterval);
           }
+          return;
         }
+
+        // Fallback: après 90s sans callback, poll l'API Suno directement
+        if (elapsedSeconds > 90 && pollCount % 5 === 0) {
+          console.log('⏰ Fallback: polling Suno API directly...');
+          
+          const { data: pollData, error: pollError } = await supabase.functions.invoke(
+            'suno-poll-status',
+            { body: { taskId } }
+          );
+
+          if (pollData && pollData.stage) {
+            console.log('✅ Suno poll result:', pollData);
+
+            // Simuler un callback selon le stage
+            if (pollData.stage === 'first' && pollData.streamUrl) {
+              const simulatedCallback: SunoCallback = {
+                taskId,
+                callbackType: 'first',
+                status: 'success',
+                data: {
+                  stream_url: pollData.streamUrl,
+                  polled: true
+                }
+              };
+              setLatestCallback(simulatedCallback);
+              toast({
+                title: '🎵 Streaming disponible',
+                description: 'Audio preview prêt (via polling)',
+              });
+            } else if (pollData.stage === 'complete' && pollData.downloadUrl) {
+              const simulatedCallback: SunoCallback = {
+                taskId,
+                callbackType: 'complete',
+                status: 'success',
+                data: {
+                  audio_url: pollData.downloadUrl,
+                  duration: pollData.duration,
+                  polled: true
+                }
+              };
+              setLatestCallback(simulatedCallback);
+              toast({
+                title: '✅ Musique prête !',
+                description: 'Audio final disponible (via polling)',
+              });
+              onComplete?.(simulatedCallback);
+              setIsWaiting(false);
+              clearInterval(pollInterval);
+            }
+          }
+        }
+
       } catch (err) {
         console.error('Error checking callback:', err);
       }
@@ -81,8 +135,20 @@ export const useSunoCallback = ({ taskId, onComplete, onError }: UseSunoCallback
     pollInterval = setInterval(checkCallback, 3000);
     checkCallback(); // Premier check immédiat
 
+    // Timeout de 5 minutes max
+    const timeout = setTimeout(() => {
+      clearInterval(pollInterval);
+      setIsWaiting(false);
+      toast({
+        title: '⏱️ Timeout',
+        description: 'La génération prend trop de temps',
+        variant: 'destructive',
+      });
+    }, 5 * 60 * 1000);
+
     return () => {
       clearInterval(pollInterval);
+      clearTimeout(timeout);
     };
   }, [taskId, onComplete, onError]);
 

@@ -91,8 +91,6 @@ Recommande les meilleurs paramètres musicaux pour apaiser et accompagner cette 
     // Étape 2: Générer la musique avec Suno
     console.log('🎵 Appel Suno API pour génération...');
     
-    const CALLBACK_BASE = Deno.env.get('SUPABASE_URL') + '/functions/v1/emotion-music-callback';
-    
     const sunoResponse = await fetch('https://api.sunoapi.org/api/v1/generate', {
       method: 'POST',
       headers: {
@@ -106,7 +104,8 @@ Recommande les meilleurs paramètres musicaux pour apaiser et accompagner cette 
         prompt: musicParams.prompt || 'calming therapeutic music',
         style: musicParams.musicStyle || 'ambient, peaceful',
         title: musicParams.title || 'Therapeutic Music',
-        callBackUrl: CALLBACK_BASE,
+        // Note: callBackUrl n'est pas utilisé pour le moment car l'API ne le supporte pas toujours
+        // On utilise le polling comme fallback
       }),
     });
 
