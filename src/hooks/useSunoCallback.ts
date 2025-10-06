@@ -65,8 +65,8 @@ export const useSunoCallback = ({ taskId, onComplete, onError }: UseSunoCallback
           return;
         }
 
-        // Fallback: après 60s sans callback, poll l'API Suno directement
-        if (elapsedSeconds > 60 && pollCount % 5 === 0) {
+        // Fallback: après 30s sans callback, poll l'API Suno directement
+        if (elapsedSeconds > 30 && pollCount % 3 === 0) {
           console.log('⏰ Fallback: polling Suno API directly...');
           
           const { data: pollData, error: pollError } = await supabase.functions.invoke(

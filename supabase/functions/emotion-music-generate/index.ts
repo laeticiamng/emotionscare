@@ -126,10 +126,13 @@ Recommande les meilleurs paramètres musicaux pour apaiser et accompagner cette 
       throw new Error(sunoData.msg || 'Failed to start generation');
     }
 
-    // Retourner le taskId et les paramètres
+    const sunoTaskId = sunoData.data.taskId;
+    console.log('🎵 Generation started with taskId:', sunoTaskId);
+
+    // Retourner le sunoTaskId (le vrai taskId de Suno)
     return new Response(
       JSON.stringify({
-        taskId: sunoData.data.taskId,
+        taskId: sunoTaskId,
         musicParams,
         emotionBadge: getEmotionBadge(emotionState),
         estimatedDuration: 120
