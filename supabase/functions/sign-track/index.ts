@@ -52,15 +52,24 @@ serve(async (req) => {
 
     const { data: segment, error: segmentError } = await adminClient
       .from('parcours_segments')
-      .select('id, run_id, storage_path')
+      .select('id, run_id, status, storage_path')
       .eq('id', segmentId)
       .single();
 
-    if (segmentError || !segment?.storage_path) {
-      console.error('Segment not found or no storage_path:', segmentError);
+    if (segmentError || !segment) {
+      console.error('Segment not found:', segmentError);
       return new Response(
-        JSON.stringify({ error: 'Segment not found or no audio file' }),
+        JSON.stringify({ error: 'Segment not found' }),
         { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Vérifier que le segment est "complete" avant de signer
+    if (segment.status !== 'complete' || !segment.storage_path) {
+      console.error('Segment not ready for signing:', { status: segment.status, hasPath: !!segment.storage_path });
+      return new Response(
+        JSON.stringify({ error: 'Segment not ready yet' }),
+        { status: 409, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 

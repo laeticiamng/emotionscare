@@ -142,8 +142,10 @@ serve(async (req) => {
       const updateData: any = {
         status: 'complete',
         duration_seconds: payload.duration || null,
+        callback_token: null, // Invalider le token après complete (single-use)
         metadata: {
           ...segment.metadata,
+          suno_download_url: payload.downloadUrl ?? null, // Garder l'URL pour debug/forensics
           complete_received_at: new Date().toISOString()
         }
       };
