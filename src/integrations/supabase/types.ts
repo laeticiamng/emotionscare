@@ -818,6 +818,36 @@ export type Database = {
         }
         Relationships: []
       }
+      b2b_music_aggregates: {
+        Row: {
+          cohort_size: number
+          created_at: string
+          id: string
+          metrics: Json | null
+          org_id: string
+          text_summary: string
+          week_start: string
+        }
+        Insert: {
+          cohort_size: number
+          created_at?: string
+          id?: string
+          metrics?: Json | null
+          org_id: string
+          text_summary: string
+          week_start: string
+        }
+        Update: {
+          cohort_size?: number
+          created_at?: string
+          id?: string
+          metrics?: Json | null
+          org_id?: string
+          text_summary?: string
+          week_start?: string
+        }
+        Relationships: []
+      }
       backup_edn_items_immersive: {
         Row: {
           audio_ambiance: Json | null
@@ -7765,6 +7795,146 @@ export type Database = {
         }
         Relationships: []
       }
+      parcours_presets: {
+        Row: {
+          created_at: string
+          duration_max: number
+          duration_min: number
+          emotion_category: string
+          id: string
+          preset_config: Json
+          preset_key: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          duration_max?: number
+          duration_min?: number
+          emotion_category: string
+          id?: string
+          preset_config: Json
+          preset_key: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          duration_max?: number
+          duration_min?: number
+          emotion_category?: string
+          id?: string
+          preset_config?: Json
+          preset_key?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      parcours_runs: {
+        Row: {
+          created_at: string
+          ended_at: string | null
+          id: string
+          metadata: Json | null
+          notes_encrypted: string | null
+          preset_key: string
+          started_at: string
+          status: string
+          suds_end: number | null
+          suds_mid: number | null
+          suds_start: number | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          ended_at?: string | null
+          id?: string
+          metadata?: Json | null
+          notes_encrypted?: string | null
+          preset_key: string
+          started_at?: string
+          status?: string
+          suds_end?: number | null
+          suds_mid?: number | null
+          suds_start?: number | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          ended_at?: string | null
+          id?: string
+          metadata?: Json | null
+          notes_encrypted?: string | null
+          preset_key?: string
+          started_at?: string
+          status?: string
+          suds_end?: number | null
+          suds_mid?: number | null
+          suds_start?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      parcours_segments: {
+        Row: {
+          audio_url: string | null
+          created_at: string
+          end_seconds: number
+          id: string
+          lyrics: Json | null
+          run_id: string
+          segment_index: number
+          start_seconds: number
+          status: string
+          stream_url: string | null
+          suno_task_id: string | null
+          title: string
+          voiceover_script: string | null
+          voiceover_url: string | null
+        }
+        Insert: {
+          audio_url?: string | null
+          created_at?: string
+          end_seconds: number
+          id?: string
+          lyrics?: Json | null
+          run_id: string
+          segment_index: number
+          start_seconds: number
+          status?: string
+          stream_url?: string | null
+          suno_task_id?: string | null
+          title: string
+          voiceover_script?: string | null
+          voiceover_url?: string | null
+        }
+        Update: {
+          audio_url?: string | null
+          created_at?: string
+          end_seconds?: number
+          id?: string
+          lyrics?: Json | null
+          run_id?: string
+          segment_index?: number
+          start_seconds?: number
+          status?: string
+          stream_url?: string | null
+          suno_task_id?: string | null
+          title?: string
+          voiceover_script?: string | null
+          voiceover_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "parcours_segments_run_id_fkey"
+            columns: ["run_id"]
+            isOneToOne: false
+            referencedRelation: "parcours_runs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pending_corrections: {
         Row: {
           applied_at: string | null
@@ -10156,6 +10326,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_music_consents: {
+        Row: {
+          camera_optin: boolean
+          consent_date: string
+          consent_version: string
+          emotion_analysis_optin: boolean
+          mic_optin: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          camera_optin?: boolean
+          consent_date?: string
+          consent_version?: string
+          emotion_analysis_optin?: boolean
+          mic_optin?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          camera_optin?: boolean
+          consent_date?: string
+          consent_version?: string
+          emotion_analysis_optin?: boolean
+          mic_optin?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       user_music_generations: {
         Row: {

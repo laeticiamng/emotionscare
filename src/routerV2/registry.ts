@@ -217,6 +217,15 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     aliases: ['/music'],
   },
   {
+    name: 'parcours-xl',
+    path: '/app/parcours-xl',
+    segment: 'public',
+    layout: 'simple',
+    component: 'ParcoursXL',
+    guard: false,
+    aliases: ['/parcours-xl'],
+  },
+  {
     name: 'emotion-music',
     path: '/app/emotion-music',
     segment: 'public',

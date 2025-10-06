@@ -191,6 +191,7 @@ const ParkJourney = lazy(() => import('@/pages/ParkJourney'));
 const CoachProgramsPage = lazy(() => import('@/pages/CoachProgramsPage'));
 const CoachSessionsPage = lazy(() => import('@/pages/CoachSessionsPage'));
 const ProfilePage = lazy(() => import('@/pages/ProfilePage'));
+const ParcoursXL = lazy(() => import('@/pages/ParcoursXL'));
 
 // ═══════════════════════════════════════════════════════════
 // MAPPING DES COMPOSANTS
@@ -350,6 +351,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   ParkJourney,
   CoachProgramsPage,
   CoachSessionsPage,
+  ParcoursXL,
 };
 
 // ═══════════════════════════════════════════════════════════
