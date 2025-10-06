@@ -19,7 +19,7 @@ const EMOTION_MAPPING = {
   }
 };
 
-serve(async (req: Request) => {
+serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
