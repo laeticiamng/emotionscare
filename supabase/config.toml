@@ -176,3 +176,6 @@ verify_jwt = false
 
 [functions.parcours-xl-callback]
 verify_jwt = false
+
+[functions.parcours-xl-extend]
+verify_jwt = false

@@ -72,6 +72,13 @@ export interface FeatureFlags {
   FF_ASSESS_CVSQ: boolean;
   FF_ASSESS_SAM: boolean;
   
+  // Parcours XL Features
+  FF_PARCOURS_XL: boolean;
+  FF_AUTO_DETECT_HUME: boolean;
+  FF_VOICEOVER_VOCALS: boolean;
+  FF_PARCOURS_EXTEND: boolean;
+  FF_PARCOURS_FALLBACK: boolean;
+  
   // Special flags
   FF_ZERO_NUMBERS?: boolean;
   FF_REQUIRE_CLINICAL_OPTIN: boolean;
@@ -147,6 +154,13 @@ export const DEFAULT_FLAGS: FeatureFlags = {
   FF_ASSESS_CBI: true,
   FF_ASSESS_CVSQ: true,
   FF_ASSESS_SAM: true,
+  
+  // Parcours XL Features
+  FF_PARCOURS_XL: true,
+  FF_AUTO_DETECT_HUME: true,
+  FF_VOICEOVER_VOCALS: false, // Suno vocals en phase 2
+  FF_PARCOURS_EXTEND: true,
+  FF_PARCOURS_FALLBACK: true,
   
   // Special flags
   FF_ZERO_NUMBERS: true,
