@@ -52,6 +52,7 @@ const AppGatePage = lazy(() => import('@/pages/AppGatePage'));
 // Modules fonctionnels
 const B2CScanPage = lazy(() => import('@/pages/B2CScanPage'));
 const B2CMusicEnhanced = lazy(() => import('@/pages/B2CMusicEnhanced'));
+const EmotionMusicPage = lazy(() => import('@/pages/EmotionMusic'));
 const B2CAICoachPage = lazy(() => import('@/pages/B2CAICoachPage'));
 const B2CJournalPage = lazy(() => import('@/pages/B2CJournalPage'));
 const B2CVRBreathGuidePage = lazy(() => import('@/pages/B2CVRBreathGuidePage'));
@@ -218,6 +219,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   // Modules
   B2CScanPage,
   B2CMusicEnhanced,
+  EmotionMusicPage,
   B2CAICoachPage,
   B2CJournalPage,
   B2CVRBreathGuidePage,

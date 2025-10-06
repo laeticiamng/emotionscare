@@ -3,15 +3,26 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Music, Sparkles, Loader2, AlertCircle } from 'lucide-react';
+import { Music, Sparkles, Loader2, AlertCircle, Play } from 'lucide-react';
 import { useHumeAI } from '@/hooks/useHumeAI';
 import { useEmotionMusic } from '@/hooks/useEmotionMusic';
+import { useSunoCallback } from '@/hooks/useSunoCallback';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export const EmotionMusicPanel: React.FC = () => {
   const [analysisText, setAnalysisText] = useState('');
   const { analyzeEmotion, isProcessing: isAnalyzing, emotionResult } = useHumeAI();
-  const { generateFromEmotion, isGenerating, emotionBadge, currentTask, error, rateLimitStatus } = useEmotionMusic();
+  const { generateFromEmotion, isGenerating, emotionBadge, currentTask, error, rateLimitStatus, reset } = useEmotionMusic();
+  
+  const { latestCallback, isWaiting } = useSunoCallback({
+    taskId: currentTask,
+    onComplete: (callback) => {
+      console.log('✅ Musique complète:', callback);
+    },
+    onError: (error) => {
+      console.error('❌ Erreur génération:', error);
+    }
+  });
 
   const handleAnalyzeAndGenerate = async () => {
     if (!analysisText.trim()) {
@@ -112,16 +123,73 @@ export const EmotionMusicPanel: React.FC = () => {
           )}
         </Button>
 
-        {/* Task ID */}
+        {/* Task ID et Status */}
         {currentTask && (
-          <div className="p-3 bg-muted rounded-md text-sm">
-            <p className="font-medium">Génération en cours</p>
-            <p className="text-muted-foreground text-xs font-mono mt-1">
-              ID: {currentTask.substring(0, 16)}...
-            </p>
-            <p className="text-xs mt-2">
-              Votre musique sera prête dans ~30-40 secondes
-            </p>
+          <div className="space-y-3">
+            <div className="p-3 bg-muted rounded-md text-sm">
+              <div className="flex items-center justify-between mb-2">
+                <p className="font-medium">Génération en cours</p>
+                {isWaiting && (
+                  <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                )}
+              </div>
+              <p className="text-muted-foreground text-xs font-mono mt-1">
+                ID: {currentTask.substring(0, 16)}...
+              </p>
+              <p className="text-xs mt-2">
+                {!latestCallback && 'Initialisation...'}
+                {latestCallback?.callbackType === 'text' && '📝 Transcription en cours...'}
+                {latestCallback?.callbackType === 'first' && '🎵 Streaming disponible !'}
+                {latestCallback?.callbackType === 'complete' && '✅ Musique prête !'}
+              </p>
+            </div>
+
+            {/* Audio player si disponible */}
+            {latestCallback?.data?.streamUrl && (
+              <div className="p-4 bg-primary/5 rounded-md border border-primary/20">
+                <div className="flex items-center gap-3 mb-2">
+                  <Play className="h-5 w-5 text-primary" />
+                  <p className="font-medium text-sm">Écouter le streaming</p>
+                </div>
+                <audio 
+                  controls 
+                  className="w-full"
+                  src={latestCallback.data.streamUrl}
+                  autoPlay={false}
+                />
+              </div>
+            )}
+
+            {latestCallback?.data?.audioUrl && (
+              <div className="p-4 bg-green-500/5 rounded-md border border-green-500/20">
+                <div className="flex items-center gap-3 mb-2">
+                  <Music className="h-5 w-5 text-green-600" />
+                  <p className="font-medium text-sm">Qualité finale disponible</p>
+                </div>
+                <audio 
+                  controls 
+                  className="w-full"
+                  src={latestCallback.data.audioUrl}
+                />
+                <Button 
+                  size="sm" 
+                  variant="outline" 
+                  className="w-full mt-2"
+                  onClick={() => window.open(latestCallback.data.audioUrl, '_blank')}
+                >
+                  Télécharger
+                </Button>
+              </div>
+            )}
+
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={reset}
+              className="w-full"
+            >
+              Nouvelle génération
+            </Button>
           </div>
         )}
 

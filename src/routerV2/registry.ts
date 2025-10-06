@@ -217,6 +217,16 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     aliases: ['/music'],
   },
   {
+    name: 'emotion-music',
+    path: '/app/emotion-music',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app',
+    component: 'EmotionMusicPage',
+    guard: true,
+    aliases: ['/emotion-music'],
+  },
+  {
     name: 'music-premium',
     path: '/app/music-premium',
     segment: 'consumer',

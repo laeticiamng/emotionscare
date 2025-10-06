@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { supabase } from '@/integrations/supabase/client';
 import sunoRequestSchema from '../../schemas/suno-request.schema.json';
+import { applyEmotionMapping } from '@/lib/yaml-loader';
 
 interface EmotionState {
   valence?: number;
@@ -18,6 +19,16 @@ export async function buildSunoRequest(
   emotionState: EmotionState,
   userContext?: UserContext
 ) {
+  // Appliquer le mapping YAML si on a les valeurs nécessaires
+  let mappingConfig;
+  if (emotionState.valence !== undefined && emotionState.arousal !== undefined) {
+    mappingConfig = applyEmotionMapping(
+      emotionState.valence,
+      emotionState.arousal,
+      emotionState.dominantEmotion
+    );
+  }
+
   const systemPrompt = `Tu es un orchestrateur musical expert. À partir d'un état émotionnel, produis un JSON STRICT conforme au schéma SunoRequest.
   
 Règles importantes :
