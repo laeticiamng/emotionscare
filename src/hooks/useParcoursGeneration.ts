@@ -55,8 +55,8 @@ export function useParcoursGeneration() {
 
         if (segError) throw segError;
 
-        // Check if all segments have at least stream_url
-        const readySegments = segments.filter(s => s.stream_url || s.audio_url);
+        // Check if all segments have at least preview_url (first) or final_url (complete)
+        const readySegments = segments.filter(s => s.preview_url || s.final_url || s.storage_path);
         const progress = 30 + (readySegments.length / segments.length) * 60;
         setGenerationProgress(Math.round(progress));
 

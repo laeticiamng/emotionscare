@@ -59,12 +59,13 @@ export interface ParcoursSegment {
   start_seconds: number;
   end_seconds: number;
   suno_task_id?: string;
-  stream_url?: string;
-  audio_url?: string;
+  preview_url?: string;
+  final_url?: string;
+  storage_path?: string;
   lyrics?: string;
   voiceover_text?: string;
   voiceover_url?: string;
-  status: 'pending' | 'generating' | 'ready' | 'failed';
+  status: 'pending' | 'generating' | 'first' | 'complete' | 'failed';
   created_at: string;
 }
 

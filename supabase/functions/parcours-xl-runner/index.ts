@@ -10,6 +10,41 @@ const corsHeaders = {
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
+// Helper: invoke avec retry pour gérer les 429/5xx de Suno
+async function invokeWithRetry(supabase: any, functionName: string, body: any, maxRetries = 3) {
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    try {
+      const { data, error } = await supabase.functions.invoke(functionName, { body });
+      
+      if (!error) {
+        return { data, error: null };
+      }
+      
+      // Retry sur 429 ou 5xx
+      const shouldRetry = 
+        error.message?.includes('429') || 
+        error.status?.toString().startsWith('5');
+      
+      if (shouldRetry && attempt < maxRetries - 1) {
+        const backoffMs = 2000 * (attempt + 1); // 2s, 4s, 6s
+        console.log(`⏳ Retry ${attempt + 1}/${maxRetries} after ${backoffMs}ms`);
+        await delay(backoffMs);
+        continue;
+      }
+      
+      return { data: null, error };
+    } catch (err) {
+      if (attempt < maxRetries - 1) {
+        await delay(2000 * (attempt + 1));
+        continue;
+      }
+      return { data: null, error: err };
+    }
+  }
+  
+  return { data: null, error: new Error('Max retries exceeded') };
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -59,13 +94,12 @@ serve(async (req) => {
 
       console.log(`🎵 Generating segment ${segment.segment_index}...`);
 
-      // Lancer la génération
-      const { error: generateError } = await supabase.functions.invoke('parcours-xl-generate', {
-        body: { 
-          runId, 
-          segmentIndex: segment.segment_index 
-        }
-      });
+      // Lancer la génération avec retry automatique (429/5xx)
+      const { data: generateData, error: generateError } = await invokeWithRetry(
+        supabase,
+        'parcours-xl-generate',
+        { runId, segmentIndex: segment.segment_index }
+      );
 
       if (generateError) {
         console.error(`❌ Failed to generate segment ${segment.segment_index}:`, generateError);
