@@ -2,7 +2,7 @@
 import { useEffect, useCallback, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { SunoCallback } from '@/types/music-generation';
-import { toast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 interface UseSunoCallbackOptions {
   taskId: string | null;
@@ -49,25 +49,15 @@ export const useSunoCallback = ({ taskId, onComplete, onError }: UseSunoCallback
 
           // Notifier selon le type de callback
           if (callback.callbackType === 'first') {
-            toast({
-              title: '🎵 Streaming disponible',
-              description: 'Vous pouvez commencer à écouter',
-            });
+            toast.success('🎵 Streaming disponible - Vous pouvez commencer à écouter');
           } else if (callback.callbackType === 'complete') {
-            toast({
-              title: '✅ Musique prête !',
-              description: 'Votre création musicale est terminée',
-            });
+            toast.success('✅ Musique prête ! Votre création musicale est terminée');
             onComplete?.(callback);
             setIsWaiting(false);
             clearInterval(pollInterval);
           } else if (callback.callbackType === 'error') {
             const errorMsg = 'Erreur lors de la génération musicale';
-            toast({
-              title: '❌ Erreur',
-              description: errorMsg,
-              variant: 'destructive',
-            });
+            toast.error(`❌ ${errorMsg}`);
             onError?.(errorMsg);
             setIsWaiting(false);
             clearInterval(pollInterval);
@@ -99,10 +89,7 @@ export const useSunoCallback = ({ taskId, onComplete, onError }: UseSunoCallback
                 }
               };
               setLatestCallback(simulatedCallback);
-              toast({
-                title: '🎵 Streaming disponible',
-                description: 'Audio preview prêt (via polling)',
-              });
+              toast.success('🎵 Streaming disponible - Audio preview prêt (via polling)');
             } else if (pollData.stage === 'complete' && pollData.downloadUrl) {
               const simulatedCallback: SunoCallback = {
                 taskId,
@@ -115,10 +102,7 @@ export const useSunoCallback = ({ taskId, onComplete, onError }: UseSunoCallback
                 }
               };
               setLatestCallback(simulatedCallback);
-              toast({
-                title: '✅ Musique prête !',
-                description: 'Audio final disponible (via polling)',
-              });
+              toast.success('✅ Musique prête ! Audio final disponible (via polling)');
               onComplete?.(simulatedCallback);
               setIsWaiting(false);
               clearInterval(pollInterval);
@@ -139,11 +123,7 @@ export const useSunoCallback = ({ taskId, onComplete, onError }: UseSunoCallback
     const timeout = setTimeout(() => {
       clearInterval(pollInterval);
       setIsWaiting(false);
-      toast({
-        title: '⏱️ Timeout',
-        description: 'La génération prend trop de temps',
-        variant: 'destructive',
-      });
+      toast.error('⏱️ Timeout - La génération prend trop de temps');
     }, 5 * 60 * 1000);
 
     return () => {
