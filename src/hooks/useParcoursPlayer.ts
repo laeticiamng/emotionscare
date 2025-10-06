@@ -80,14 +80,14 @@ export function useParcoursPlayer(run: ParcoursRun | null, segments: ParcoursSeg
       }
     }
     
-    // Fallback 2 : final_url (déprécié, peut expirer)
-    if (!url && segment.audio_url) {
-      url = segment.audio_url;
+    // Fallback 2 : final_url (deprecated: peut expirer)
+    if (!url && segment.final_url) {
+      url = segment.final_url;
     }
     
     // Fallback 3 : preview_url (stream)
-    if (!url && segment.stream_url) {
-      url = segment.stream_url;
+    if (!url && segment.preview_url) {
+      url = segment.preview_url;
     }
     
     if (!url) {
@@ -95,20 +95,39 @@ export function useParcoursPlayer(run: ParcoursRun | null, segments: ParcoursSeg
       return;
     }
 
-    audioRef.current.src = url;
-    audioRef.current.volume = playerState.volume;
-    
-    if (playerState.isPlaying) {
-      audioRef.current.play().catch(err => {
-        console.error('Audio play error:', err);
-      });
-    }
+    // Smooth crossfade pour éviter les pops
+    await smoothReplace(audioRef.current, url, playerState.volume);
 
     setPlayerState(prev => ({
       ...prev,
       currentSegmentIndex: index,
     }));
   }, [segments, playerState.volume, playerState.isPlaying]);
+
+  // Helper pour smooth crossfade
+  const smoothReplace = async (audio: HTMLAudioElement, newUrl: string, targetVolume: number) => {
+    const oldGain = audio.volume;
+    const step = oldGain / 10;
+    
+    // Fade out
+    for (let i = 0; i < 10; i++) {
+      audio.volume = Math.max(0, audio.volume - step);
+      await new Promise(r => setTimeout(r, 15));
+    }
+    
+    // Replace source
+    audio.src = newUrl;
+    
+    // Play and fade in
+    if (playerState.isPlaying) {
+      await audio.play().catch(err => console.error('Play error:', err));
+    }
+    
+    for (let i = 0; i < 10; i++) {
+      audio.volume = Math.min(targetVolume, audio.volume + step);
+      await new Promise(r => setTimeout(r, 15));
+    }
+  };
 
   const play = useCallback(() => {
     if (!audioRef.current) return;

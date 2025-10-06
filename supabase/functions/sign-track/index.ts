@@ -5,6 +5,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.7';
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
 };
 
 serve(async (req) => {
@@ -22,28 +23,64 @@ serve(async (req) => {
       );
     }
 
-    const supabase = createClient(
+    // 1) Auth côté user (anon/publishable) pour récupérer le user_id
+    const authHeader = req.headers.get('Authorization') ?? '';
+    const anonClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      {
+        global: { headers: { Authorization: authHeader } },
+        auth: { persistSession: false }
+      }
+    );
+
+    const { data: authData, error: authError } = await anonClient.auth.getUser();
+    
+    if (authError || !authData?.user) {
+      console.error('Authentication failed:', authError);
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // 2) Admin client (service_role) pour lire segment + run
+    const adminClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Récupérer le segment avec son storage_path
-    const { data: segment, error } = await supabase
+    const { data: segment, error: segmentError } = await adminClient
       .from('parcours_segments')
       .select('id, run_id, storage_path')
       .eq('id', segmentId)
       .single();
 
-    if (error || !segment?.storage_path) {
-      console.error('Segment not found or no storage_path:', error);
+    if (segmentError || !segment?.storage_path) {
+      console.error('Segment not found or no storage_path:', segmentError);
       return new Response(
         JSON.stringify({ error: 'Segment not found or no audio file' }),
         { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // Créer une URL signée (valide 1h)
-    const { data: signedData, error: signError } = await supabase.storage
+    // 3) Vérifier que l'utilisateur est propriétaire du run
+    const { data: run, error: runError } = await adminClient
+      .from('parcours_runs')
+      .select('user_id')
+      .eq('id', segment.run_id)
+      .single();
+
+    if (runError || run?.user_id !== authData.user.id) {
+      console.error('Access forbidden: user does not own this run');
+      return new Response(
+        JSON.stringify({ error: 'Forbidden: you do not own this run' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // 4) Créer une URL signée (valide 1h)
+    const { data: signedData, error: signError } = await adminClient.storage
       .from('parcours-tracks')
       .createSignedUrl(segment.storage_path, 60 * 60); // 1 heure
 

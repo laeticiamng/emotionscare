@@ -5,6 +5,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.7';
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
 };
 
 // Helper : uploader l'audio vers Supabase Storage et retourner le path
@@ -65,8 +66,8 @@ serve(async (req) => {
     console.log('🎵 Suno callback received:', {
       segmentId,
       stage: payload.stage,
-      hasStreamUrl: !!payload.streamUrl,
-      hasDownloadUrl: !!payload.downloadUrl
+      stream: !!payload.streamUrl,
+      final: !!payload.downloadUrl
     });
 
     const supabase = createClient(
@@ -86,17 +87,10 @@ serve(async (req) => {
       return new Response('Unauthorized', { status: 401, headers: corsHeaders });
     }
 
-    // Idempotence : vérifier la progression d'état
-    const statusOrder: Record<string, number> = {
-      queued: 0,
-      generating: 1,
-      first: 2,
-      complete: 3,
-      failed: 99
-    };
-    
-    const prevStatus = segment.status || 'queued';
-    const nextStatus = payload.stage || 'generating';
+    // Idempotence stricte : vérifier la progression d'état AVANT toute écriture
+    const statusOrder = { queued: 0, generating: 1, first: 2, complete: 3, failed: 99 } as const;
+    const prevStatus = (segment.status ?? 'queued') as keyof typeof statusOrder;
+    const nextStatus = (payload.stage ?? 'generating') as keyof typeof statusOrder;
     
     if (statusOrder[nextStatus] <= statusOrder[prevStatus]) {
       console.log('⏭️ Callback already processed or regression, skipping:', {
@@ -219,8 +213,8 @@ serve(async (req) => {
       });
     }
 
-    // Stage non reconnu
-    console.warn('⚠️ Unknown callback stage:', payload.stage);
+    // Stage non reconnu (ex: 'text') - no-op propre
+    console.log('⚠️ Unknown callback stage (no-op):', payload.stage);
     return new Response(JSON.stringify({ ok: true }), {
       status: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }

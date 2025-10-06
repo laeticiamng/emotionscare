@@ -185,3 +185,9 @@ verify_jwt = true
 
 [functions.assess-submit]
 verify_jwt = true
+
+[functions.sign-track]
+verify_jwt = true
+
+[functions.parcours-xl-runner]
+verify_jwt = false
