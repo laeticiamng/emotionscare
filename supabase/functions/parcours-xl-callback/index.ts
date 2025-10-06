@@ -7,6 +7,58 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Idempotence tracking
+const processedCallbacks = new Set<string>();
+
+// Helper: Upload audio to Storage and get signed URL
+async function uploadToStorage(
+  supabase: any,
+  runId: string,
+  segmentId: string,
+  audioUrl: string
+): Promise<string | null> {
+  try {
+    console.log(`[storage] Downloading audio from ${audioUrl}`);
+    const audioResponse = await fetch(audioUrl);
+    if (!audioResponse.ok) {
+      console.error('[storage] Failed to download audio:', audioResponse.status);
+      return null;
+    }
+
+    const audioBuffer = await audioResponse.arrayBuffer();
+    const filePath = `${runId}/${segmentId}.mp3`;
+
+    console.log(`[storage] Uploading to parcours-tracks/${filePath}`);
+    const { error: uploadError } = await supabase.storage
+      .from('parcours-tracks')
+      .upload(filePath, audioBuffer, {
+        contentType: 'audio/mpeg',
+        upsert: true,
+      });
+
+    if (uploadError) {
+      console.error('[storage] Upload error:', uploadError);
+      return null;
+    }
+
+    // Create signed URL (valid for 7 days)
+    const { data: signedData, error: signError } = await supabase.storage
+      .from('parcours-tracks')
+      .createSignedUrl(filePath, 7 * 24 * 60 * 60);
+
+    if (signError || !signedData) {
+      console.error('[storage] Signed URL error:', signError);
+      return null;
+    }
+
+    console.log(`[storage] ✅ Uploaded and signed: ${filePath}`);
+    return signedData.signedUrl;
+  } catch (error) {
+    console.error('[storage] Fatal error:', error);
+    return null;
+  }
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -34,6 +86,16 @@ serve(async (req) => {
       auth: { persistSession: false }
     });
 
+    // Idempotence check
+    const idempotencyKey = `${segmentId}-${payload.stage}`;
+    if (processedCallbacks.has(idempotencyKey)) {
+      console.log(`[callback] ⏭️ Already processed: ${idempotencyKey}`);
+      return new Response(
+        JSON.stringify({ ok: true, skipped: true }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     // Vérifier le token (anti-replay)
     const { data: segment, error: fetchError } = await supabase
       .from('parcours_segments')
@@ -49,6 +111,9 @@ serve(async (req) => {
         { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+
+    // Mark as processed
+    processedCallbacks.add(idempotencyKey);
 
     // Mettre à jour selon le stage Suno
     const stage = payload.stage; // 'text' | 'first' | 'complete' | 'error'
@@ -67,15 +132,30 @@ serve(async (req) => {
       updateData.status = 'first';
       updateData.preview_url = payload.streamUrl;
     } 
-    // COMPLETE: l'audio final est prêt (2-3 min) - on peut remplacer par l'URL finale
+    // COMPLETE: l'audio final est prêt (2-3 min) - on upload vers Storage et génère URL signée
     else if (stage === 'complete' && payload.downloadUrl) {
       console.log(`[callback] ✅ Final audio ready for segment ${segmentId}: ${payload.downloadUrl}`);
+      
+      // Upload to Storage and get signed URL
+      const signedUrl = await uploadToStorage(
+        supabase,
+        segment.run_id,
+        segmentId,
+        payload.downloadUrl
+      );
+
       updateData.status = 'complete';
-      updateData.final_url = payload.downloadUrl;
+      updateData.final_url = signedUrl || payload.downloadUrl; // Fallback to direct URL if upload fails
+      
       if (payload.duration) {
         updateData.duration_seconds = payload.duration;
       }
-    } 
+
+      if (signedUrl) {
+        updateData.metadata.storage_uploaded = true;
+        updateData.metadata.storage_path = `${segment.run_id}/${segmentId}.mp3`;
+      }
+    }
     // ERROR: quelque chose a planté
     else if (stage === 'error') {
       console.error(`[callback] ❌ Generation failed for segment ${segmentId}:`, payload);

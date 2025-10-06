@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { AVAILABLE_PRESETS } from '@/services/parcours-orchestrator';
 import { useParcoursGeneration } from '@/hooks/useParcoursGeneration';
 import { useParcoursPlayer } from '@/hooks/useParcoursPlayer';
+import { useParcoursRealtime } from '@/hooks/useParcoursRealtime';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -32,6 +33,32 @@ export default function ParcoursXL() {
   
   const { isGenerating, generationProgress, error: genError, createRun, reset } = useParcoursGeneration();
   const { playerState, play, pause, stop, skipToSegment, setVolume, getCurrentSegment } = useParcoursPlayer(currentRun, segments);
+
+  // Listen to real-time updates for segments
+  const { liveSegments } = useParcoursRealtime({
+    runId: currentRun?.id || null,
+    onSegmentUpdate: (segment) => {
+      // Update segments array with new data
+      setSegments((prev) =>
+        prev.map((s) => (s.id === segment.id ? { ...s, ...segment } : s))
+      );
+
+      // Auto-play preview when first audio is ready
+      if (segment.status === 'first' && segment.preview_url && !playerState.isPlaying) {
+        console.log('[ui] 🎵 Auto-playing preview for segment', segment.segment_index);
+        play();
+      }
+
+      // Switch to final URL when complete
+      if (segment.status === 'complete' && segment.final_url) {
+        console.log('[ui] ✅ Switching to final URL for segment', segment.segment_index);
+        // Player will automatically use final_url if available
+      }
+    },
+    onRunComplete: () => {
+      console.log('[ui] 🎉 All segments complete!');
+    },
+  });
 
   const currentPreset = AVAILABLE_PRESETS.find(p => p.key === selectedPreset);
   const currentSegment = getCurrentSegment();
