@@ -168,6 +168,9 @@ verify_jwt = true
 [functions.emotion-music-generate]
 verify_jwt = false
 
+[functions.emotion-music-callback]
+verify_jwt = false
+
 [functions.parcours-xl-create]
 verify_jwt = true
 
