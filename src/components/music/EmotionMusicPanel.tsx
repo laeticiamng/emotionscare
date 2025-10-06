@@ -7,12 +7,15 @@ import { Music, Sparkles, Loader2, AlertCircle, Play } from 'lucide-react';
 import { useHumeAI } from '@/hooks/useHumeAI';
 import { useEmotionMusic } from '@/hooks/useEmotionMusic';
 import { useSunoCallback } from '@/hooks/useSunoCallback';
-import { motion, AnimatePresence } from 'framer-motion';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 export const EmotionMusicPanel: React.FC = () => {
   const [analysisText, setAnalysisText] = useState('');
   const { analyzeEmotion, isProcessing: isAnalyzing, emotionResult } = useHumeAI();
   const { generateFromEmotion, isGenerating, emotionBadge, currentTask, error, rateLimitStatus, reset } = useEmotionMusic();
+  const [manualPollResult, setManualPollResult] = useState<any>(null);
+  const [isManualPolling, setIsManualPolling] = useState(false);
   
   const { latestCallback, isWaiting } = useSunoCallback({
     taskId: currentTask,
@@ -23,6 +26,30 @@ export const EmotionMusicPanel: React.FC = () => {
       console.error('❌ Erreur génération:', error);
     }
   });
+
+  const handleManualPoll = async () => {
+    if (!currentTask) return;
+    
+    setIsManualPolling(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('suno-poll-status', {
+        body: { taskId: currentTask }
+      });
+      
+      if (data && !error) {
+        console.log('✅ Poll manuel résultat:', data);
+        setManualPollResult(data);
+        toast.success('État récupéré depuis Suno !');
+      } else {
+        toast.error('Impossible de récupérer l\'état');
+      }
+    } catch (err) {
+      console.error('Erreur poll manuel:', err);
+      toast.error('Erreur de polling');
+    } finally {
+      setIsManualPolling(false);
+    }
+  };
 
   const handleAnalyzeAndGenerate = async () => {
     if (!analysisText.trim()) {
@@ -171,15 +198,39 @@ export const EmotionMusicPanel: React.FC = () => {
                 ID: {currentTask.substring(0, 16)}...
               </p>
               <p className="text-xs mt-2">
-                {!latestCallback && 'Initialisation...'}
+                {!latestCallback && !manualPollResult && 'Initialisation...'}
                 {latestCallback?.callbackType === 'text' && '📝 Transcription en cours...'}
                 {latestCallback?.callbackType === 'first' && '🎵 Streaming disponible !'}
                 {latestCallback?.callbackType === 'complete' && '✅ Musique prête !'}
+                {manualPollResult?.stage === 'first' && '🎵 Preview récupérée manuellement !'}
+                {manualPollResult?.stage === 'complete' && '✅ Audio final récupéré !'}
               </p>
+              
+              {/* Bouton de polling manuel */}
+              {!latestCallback && !manualPollResult && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={handleManualPoll}
+                  disabled={isManualPolling}
+                  className="w-full mt-3"
+                >
+                  {isManualPolling ? (
+                    <>
+                      <Loader2 className="mr-2 h-3 w-3 animate-spin" />
+                      Vérification...
+                    </>
+                  ) : (
+                    <>
+                      🔍 Forcer la récupération
+                    </>
+                  )}
+                </Button>
+              )}
             </div>
 
-            {/* Audio player si disponible */}
-            {latestCallback?.data?.streamUrl && (
+            {/* Audio player si callback disponible */}
+            {latestCallback?.data?.stream_url && (
               <div className="p-4 bg-primary/5 rounded-md border border-primary/20">
                 <div className="flex items-center gap-3 mb-2">
                   <Play className="h-5 w-5 text-primary" />
@@ -188,13 +239,13 @@ export const EmotionMusicPanel: React.FC = () => {
                 <audio 
                   controls 
                   className="w-full"
-                  src={latestCallback.data.streamUrl}
-                  autoPlay={false}
+                  src={latestCallback.data.stream_url}
+                  autoPlay={true}
                 />
               </div>
             )}
 
-            {latestCallback?.data?.audioUrl && (
+            {latestCallback?.data?.audio_url && (
               <div className="p-4 bg-green-500/5 rounded-md border border-green-500/20">
                 <div className="flex items-center gap-3 mb-2">
                   <Music className="h-5 w-5 text-green-600" />
@@ -203,13 +254,52 @@ export const EmotionMusicPanel: React.FC = () => {
                 <audio 
                   controls 
                   className="w-full"
-                  src={latestCallback.data.audioUrl}
+                  src={latestCallback.data.audio_url}
                 />
                 <Button 
                   size="sm" 
                   variant="outline" 
                   className="w-full mt-2"
-                  onClick={() => window.open(latestCallback.data.audioUrl, '_blank')}
+                  onClick={() => window.open(latestCallback.data.audio_url, '_blank')}
+                >
+                  Télécharger
+                </Button>
+              </div>
+            )}
+
+            {/* Audio player depuis poll manuel */}
+            {manualPollResult?.streamUrl && (
+              <div className="p-4 bg-primary/5 rounded-md border border-primary/20">
+                <div className="flex items-center gap-3 mb-2">
+                  <Play className="h-5 w-5 text-primary" />
+                  <p className="font-medium text-sm">Preview (récupérée manuellement)</p>
+                </div>
+                <audio 
+                  controls 
+                  className="w-full"
+                  src={manualPollResult.streamUrl}
+                  autoPlay={true}
+                />
+              </div>
+            )}
+
+            {manualPollResult?.downloadUrl && (
+              <div className="p-4 bg-green-500/5 rounded-md border border-green-500/20">
+                <div className="flex items-center gap-3 mb-2">
+                  <Music className="h-5 w-5 text-green-600" />
+                  <p className="font-medium text-sm">Audio final (récupéré manuellement)</p>
+                </div>
+                <audio 
+                  controls 
+                  className="w-full"
+                  src={manualPollResult.downloadUrl}
+                  autoPlay={true}
+                />
+                <Button 
+                  size="sm" 
+                  variant="outline" 
+                  className="w-full mt-2"
+                  onClick={() => window.open(manualPollResult.downloadUrl, '_blank')}
                 >
                   Télécharger
                 </Button>
@@ -219,7 +309,10 @@ export const EmotionMusicPanel: React.FC = () => {
             <Button
               size="sm"
               variant="ghost"
-              onClick={reset}
+              onClick={() => {
+                reset();
+                setManualPollResult(null);
+              }}
               className="w-full"
             >
               Nouvelle génération

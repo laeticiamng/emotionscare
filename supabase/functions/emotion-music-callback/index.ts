@@ -15,16 +15,20 @@ serve(async (req: Request) => {
   try {
     const payload = await req.json();
     
+    const url = new URL(req.url);
+    const urlTaskId = url.searchParams.get('taskId');
+    
     console.log('🎵 Emotion music callback received:', {
       stage: payload.stage,
       hasStream: !!payload.streamUrl,
       hasFinal: !!payload.downloadUrl,
-      taskId: payload.taskId
+      urlTaskId,
+      payloadTaskId: payload.taskId,
+      fullUrl: req.url
     });
 
     // Extraire le taskId depuis l'URL ou le payload
-    const url = new URL(req.url);
-    const taskId = url.searchParams.get('taskId') || payload.taskId;
+    const taskId = urlTaskId || payload.taskId;
 
     if (!taskId) {
       console.error('❌ No taskId in callback');
