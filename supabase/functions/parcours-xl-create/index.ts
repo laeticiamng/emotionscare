@@ -1,11 +1,34 @@
 // @ts-nocheck
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import OpenAI from 'https://esm.sh/openai@4.20.1';
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
+// Presets disponibles (en attendant les YAMLs)
+const PRESETS: Record<string, any> = {
+  'universel-reset': {
+    title: 'Reset Universel → Équilibre',
+    emotionLabel: 'Reset/Équilibre',
+    musicStyle: 'Calming 6/8, 68 BPM, dorian, felt piano + handpan',
+    targetDuration: 18,
+  },
+  'panique-anxiete': {
+    title: 'Panique → Calme',
+    emotionLabel: 'Anxiété/Panique',
+    musicStyle: 'A dorian 64 BPM, handpan lull, felt piano',
+    targetDuration: 20,
+  },
+  'tristesse-deuil': {
+    title: 'Tristesse → Lumière',
+    emotionLabel: 'Tristesse/Deuil',
+    musicStyle: 'Cinematic piano & strings 68 BPM, lydian shimmer',
+    targetDuration: 22,
+  },
 };
 
 serve(async (req: Request) => {
@@ -33,54 +56,75 @@ serve(async (req: Request) => {
       throw new Error('Unauthorized');
     }
 
-    console.log('🎭 Création parcours XL:', presetKey, 'pour user:', user.id);
+    console.log(`[create] 🎭 Creating parcours XL: ${presetKey} for user: ${user.id}`);
 
-    // Charger le preset depuis les fichiers YAML (pour MVP, hardcodé)
-    const presets: Record<string, any> = {
-      'universel-reset': {
-        title: 'Reset Universel → Équilibre',
-        duration: 20,
-        segments: [
-          { title: 'Respiration guidée', start_s: 0, end_s: 120 },
-          { title: 'Attention au présent', start_s: 120, end_s: 240 },
-          { title: 'Défusion cognitive', start_s: 240, end_s: 360 },
-          { title: 'Recadrage & Ancrage', start_s: 360, end_s: 600 },
-          { title: 'Retour doux', start_s: 600, end_s: 720 },
-        ],
-        music: { bpm: 68, style: 'Calming 6/8, 68 BPM, dorian, felt piano + handpan' }
-      },
-      'panique-anxiete': {
-        title: 'Panique → Calme',
-        duration: 20,
-        segments: [
-          { title: 'Respiration 4/6', start_s: 0, end_s: 120 },
-          { title: 'Ancrage 5-4-3-2-1', start_s: 120, end_s: 240 },
-          { title: 'Exposition interoceptive', start_s: 240, end_s: 480 },
-          { title: 'Restructuration', start_s: 480, end_s: 720 },
-          { title: 'Consolidation', start_s: 720, end_s: 960 },
-          { title: 'Sortie douce', start_s: 960, end_s: 1200 },
-        ],
-        music: { bpm: 64, style: 'A dorian 64 BPM, handpan lull, felt piano' }
-      },
-      'tristesse-deuil': {
-        title: 'Tristesse → Lumière',
-        duration: 22,
-        segments: [
-          { title: 'Accueil de la tristesse', start_s: 0, end_s: 120 },
-          { title: 'Scan corporel', start_s: 120, end_s: 300 },
-          { title: 'Activation comportementale', start_s: 300, end_s: 600 },
-          { title: 'Recadrage socratique', start_s: 600, end_s: 900 },
-          { title: 'Lumière progressive', start_s: 900, end_s: 1200 },
-          { title: 'Sortie douce', start_s: 1200, end_s: 1320 },
-        ],
-        music: { bpm: 68, style: 'Cinematic piano & strings 68 BPM, lydian shimmer' }
-      }
-    };
-
-    const preset = presets[presetKey];
+    const preset = PRESETS[presetKey];
     if (!preset) {
       throw new Error(`Preset inconnu: ${presetKey}`);
     }
+
+    // Générer le brief avec OpenAI Structured Outputs (JSON Schema strict)
+    const openaiKey = Deno.env.get('OPENAI_API_KEY');
+    if (!openaiKey) {
+      throw new Error('OPENAI_API_KEY not configured');
+    }
+
+    const openai = new OpenAI({ apiKey: openaiKey });
+
+    console.log(`[create] Generating brief for preset: ${presetKey}, emotion: ${preset.emotionLabel}`);
+
+    const briefResponse = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [
+        {
+          role: 'system',
+          content: `Tu es un thérapeute spécialisé en TCC, ACT et DBT. Tu génères des scripts thérapeutiques personnalisés en français.`
+        },
+        {
+          role: 'user',
+          content: `Génère un brief thérapeutique pour un parcours musical de ${preset.targetDuration}-${preset.targetDuration + 4} minutes sur l'émotion "${preset.emotionLabel}". Style musical: ${preset.musicStyle}. Inclus 3-4 segments avec transitions fluides. Chaque segment doit avoir un prompt Suno descriptif.`
+        }
+      ],
+      response_format: {
+        type: 'json_schema',
+        json_schema: {
+          name: 'TherapyBrief',
+          strict: true,
+          schema: {
+            type: 'object',
+            properties: {
+              brief: { type: 'string', description: 'Vue d\'ensemble du parcours thérapeutique' },
+              segments: {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  properties: {
+                    prompt: { type: 'string', description: 'Prompt Suno pour ce segment musical' },
+                    duration_min: { type: 'number', description: 'Durée souhaitée en minutes (4-6 min)' },
+                    technique: { type: 'string', description: 'Technique thérapeutique (TCC/ACT/DBT)' }
+                  },
+                  required: ['prompt', 'duration_min', 'technique'],
+                  additionalProperties: false
+                },
+                minItems: 3,
+                maxItems: 4
+              }
+            },
+            required: ['brief', 'segments'],
+            additionalProperties: false
+          }
+        }
+      },
+      temperature: 0.7,
+    });
+
+    const briefContent = briefResponse.choices[0]?.message?.content;
+    if (!briefContent) {
+      throw new Error('No brief generated');
+    }
+
+    const briefData = JSON.parse(briefContent);
+    console.log(`[create] ✅ Brief generated with ${briefData.segments?.length || 0} segments`);
 
     // Créer la run dans la DB
     const { data: run, error: runError } = await supabase
@@ -88,49 +132,60 @@ serve(async (req: Request) => {
       .insert({
         user_id: user.id,
         preset_key: presetKey,
-        status: 'generating',
-        metadata: { emotion_state: emotionState }
+        emotion_detected: emotionState?.emotion || preset.emotionLabel,
+        status: 'creating',
+        brief: briefData.brief,
+        metadata: { 
+          emotion_state: emotionState,
+          preset: preset 
+        }
       })
       .select()
       .single();
 
-    if (runError) throw runError;
+    if (runError) {
+      console.error('[create] Run creation error:', runError);
+      throw runError;
+    }
 
-    console.log('✅ Run créée:', run.id);
+    console.log(`[create] ✅ Run created: ${run.id}`);
 
-    // Créer les segments (seront générés par une Edge Function séparée)
-    const segmentsToInsert = preset.segments.map((seg: any, index: number) => ({
+    // Créer les segments
+    const segmentsToInsert = briefData.segments.map((seg: any, index: number) => ({
       run_id: run.id,
       segment_index: index,
-      title: seg.title,
-      start_seconds: seg.start_s,
-      end_seconds: seg.end_s,
-      voiceover_script: seg.voiceover || '',
-      status: 'pending'
+      prompt: seg.prompt,
+      status: 'queued',
+      metadata: {
+        technique: seg.technique,
+        target_duration_min: seg.duration_min,
+      }
     }));
 
     const { error: segmentsError } = await supabase
       .from('parcours_segments')
       .insert(segmentsToInsert);
 
-    if (segmentsError) throw segmentsError;
+    if (segmentsError) {
+      console.error('[create] Segments creation error:', segmentsError);
+      throw segmentsError;
+    }
 
-    // Déclencher la génération asynchrone (background task)
-    // Pour MVP, on retourne juste le runId
-    // La génération se fera via un autre appel ou en background
+    console.log(`[create] ✅ ${segmentsToInsert.length} segments created`);
 
     return new Response(
       JSON.stringify({
         runId: run.id,
         title: preset.title,
-        totalDuration: preset.duration * 60,
-        segmentsCount: preset.segments.length
+        brief: briefData.brief,
+        segmentsCount: briefData.segments.length,
+        status: 'creating'
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 
   } catch (error) {
-    console.error('❌ Error:', error);
+    console.error('[create] ❌ Error:', error);
     return new Response(
       JSON.stringify({ error: error.message }),
       { 

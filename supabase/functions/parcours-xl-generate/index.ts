@@ -7,6 +7,9 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// URL publique de callback (doit être accessible par Suno)
+const CALLBACK_BASE = 'https://yaincoxihiqdksxgrsrk.supabase.co/functions/v1/parcours-xl-callback';
+
 interface GenerateSegmentRequest {
   runId: string;
   segmentIndex: number;
@@ -20,11 +23,13 @@ serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const supabase = createClient(supabaseUrl, supabaseKey);
+    const supabase = createClient(supabaseUrl, supabaseKey, {
+      auth: { persistSession: false }
+    });
 
     const { runId, segmentIndex } = await req.json() as GenerateSegmentRequest;
 
-    console.log(`🎵 Génération segment ${segmentIndex} pour run ${runId}`);
+    console.log(`[generate] 🎵 Generating segment ${segmentIndex} for run ${runId}`);
 
     // Récupérer le run et le segment
     const { data: run, error: runError } = await supabase
@@ -34,7 +39,7 @@ serve(async (req) => {
       .single();
 
     if (runError || !run) {
-      throw new Error(`Run non trouvée: ${runError?.message}`);
+      throw new Error(`Run not found: ${runError?.message}`);
     }
 
     const { data: segment, error: segError } = await supabase
@@ -45,44 +50,31 @@ serve(async (req) => {
       .single();
 
     if (segError || !segment) {
-      throw new Error(`Segment non trouvé: ${segError?.message}`);
+      throw new Error(`Segment not found: ${segError?.message}`);
     }
 
-    // Récupérer le preset depuis metadata (ou depuis YAML si implémenté)
-    const presetKey = run.preset_key;
-    
-    // TODO: Charger le YAML preset complet
-    // Pour MVP, on simule avec des données basiques
-    const musicConfig = {
-      bpm: 70,
-      mode: 'dorian',
-      style: 'lofi chill',
-      instrumental: true,
-      durationSeconds: segment.end_seconds - segment.start_seconds
-    };
-
-    // Générer la musique avec Suno
+    // Vérifier la clé API Suno
     const SUNO_API_KEY = Deno.env.get('SUNO_API_KEY');
-    const SUNO_API_BASE = Deno.env.get('SUNO_API_BASE') || 'https://api.sunoapi.org';
-    const PUBLIC_CALLBACK_URL = Deno.env.get('PUBLIC_CALLBACK_URL') || `${supabaseUrl}/functions/v1/parcours-xl-callback`;
-
     if (!SUNO_API_KEY) {
-      throw new Error('SUNO_API_KEY non configurée');
+      throw new Error('SUNO_API_KEY not configured');
     }
 
+    // Construire l'URL de callback avec le token anti-rejeu
+    const callbackUrl = `${CALLBACK_BASE}?segment=${segment.id}&token=${segment.callback_token}`;
+
+    // Préparer le payload Suno (endpoint correct selon la doc)
     const sunoPayload = {
-      customMode: true,
-      instrumental: musicConfig.instrumental,
-      title: segment.title,
-      style: musicConfig.style,
+      customMode: false, // Pour MVP, on utilise le mode simple
+      instrumental: true, // Pas de paroles générées
       model: 'V4_5',
-      durationSeconds: musicConfig.durationSeconds,
-      callBackUrl: `${PUBLIC_CALLBACK_URL}?run_id=${runId}&segment_index=${segmentIndex}`
+      prompt: segment.prompt, // Max 500 chars en mode non-custom
+      callBackUrl: callbackUrl
     };
 
-    console.log('📤 Envoi requête Suno:', sunoPayload);
+    console.log(`[generate] 📤 Calling Suno API with prompt: ${segment.prompt.substring(0, 50)}...`);
 
-    const sunoResponse = await fetch(`${SUNO_API_BASE}/api/v1/music`, {
+    // Appel API Suno (endpoint correct : /api/v1/generate)
+    const sunoResponse = await fetch('https://api.sunoapi.org/api/v1/generate', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${SUNO_API_KEY}`,
@@ -93,36 +85,55 @@ serve(async (req) => {
 
     if (!sunoResponse.ok) {
       const errorText = await sunoResponse.text();
+      console.error(`[generate] Suno API Error: ${sunoResponse.status} - ${errorText}`);
+      
+      // Marquer le segment comme failed
+      await supabase
+        .from('parcours_segments')
+        .update({ 
+          status: 'failed',
+          metadata: {
+            ...segment.metadata,
+            error: `Suno API ${sunoResponse.status}: ${errorText}`
+          }
+        })
+        .eq('id', segment.id);
+      
       throw new Error(`Suno API Error: ${sunoResponse.status} - ${errorText}`);
     }
 
     const sunoResult = await sunoResponse.json();
-    console.log('✅ Suno task créée:', sunoResult);
+    console.log(`[generate] ✅ Suno task created:`, sunoResult);
 
     // Mettre à jour le segment avec le task_id
     await supabase
       .from('parcours_segments')
       .update({
-        suno_task_id: sunoResult.taskId,
-        status: 'generating'
+        suno_task_id: sunoResult?.data?.taskId || sunoResult?.taskId,
+        status: 'generating',
+        metadata: {
+          ...segment.metadata,
+          suno_response: sunoResult,
+          generated_at: new Date().toISOString()
+        }
       })
       .eq('id', segment.id);
 
     return new Response(
       JSON.stringify({
         success: true,
-        taskId: sunoResult.taskId,
+        taskId: sunoResult?.data?.taskId || sunoResult?.taskId,
         segmentIndex,
-        message: 'Génération lancée'
+        message: 'Generation started, waiting for Suno callbacks (first ~40s, complete ~2-3min)'
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       }
     );
   } catch (error: any) {
-    console.error('❌ Erreur génération:', error);
+    console.error('[generate] ❌ Error:', error);
     return new Response(
-      JSON.stringify({ error: error?.message || 'Erreur inconnue' }),
+      JSON.stringify({ error: error?.message || 'Unknown error' }),
       {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

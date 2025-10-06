@@ -13,90 +13,123 @@ serve(async (req) => {
   }
 
   try {
+    const url = new URL(req.url);
+    const segmentId = url.searchParams.get('segment');
+    const token = url.searchParams.get('token');
+
+    if (!segmentId || !token) {
+      console.error('[callback] Missing segment or token');
+      return new Response(
+        JSON.stringify({ error: 'segment and token required' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const payload = await req.json();
+    console.log(`[callback] Received stage: ${payload.stage} for segment: ${segmentId}`);
+    
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const supabase = createClient(supabaseUrl, supabaseKey);
+    const supabase = createClient(supabaseUrl, supabaseKey, {
+      auth: { persistSession: false }
+    });
 
-    // Récupérer les paramètres de l'URL
-    const url = new URL(req.url);
-    const runId = url.searchParams.get('run_id');
-    const segmentIndex = parseInt(url.searchParams.get('segment_index') || '0');
+    // Vérifier le token (anti-replay)
+    const { data: segment, error: fetchError } = await supabase
+      .from('parcours_segments')
+      .select('*')
+      .eq('id', segmentId)
+      .eq('callback_token', token)
+      .single();
 
-    // Récupérer le body du callback Suno
-    const callbackData = await req.json();
-    console.log('📥 Callback Suno reçu:', { runId, segmentIndex, callbackData });
+    if (fetchError || !segment) {
+      console.error('[callback] Invalid segment or token', fetchError);
+      return new Response(
+        JSON.stringify({ error: 'Invalid segment or token' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
-    const { taskId, callbackType, status, data: sunoData } = callbackData;
-
-    // Mettre à jour le segment selon le type de callback
-    if (callbackType === 'first' && sunoData?.audioUrl) {
-      // Premier stream disponible (preview rapide)
-      console.log('⚡ First stream disponible:', sunoData.audioUrl);
-      
-      await supabase
-        .from('parcours_segments')
-        .update({
-          stream_url: sunoData.audioUrl,
-          status: 'streaming'
-        })
-        .eq('run_id', runId)
-        .eq('segment_index', segmentIndex);
-
-    } else if (callbackType === 'complete' && sunoData?.audioUrl) {
-      // Audio final complet
-      console.log('✅ Audio complet disponible:', sunoData.audioUrl);
-      
-      await supabase
-        .from('parcours_segments')
-        .update({
-          audio_url: sunoData.audioUrl,
-          stream_url: sunoData.streamUrl || sunoData.audioUrl,
-          lyrics: sunoData.lyrics || null,
-          status: 'completed'
-        })
-        .eq('run_id', runId)
-        .eq('segment_index', segmentIndex);
-
-      // Vérifier si tous les segments sont complétés
-      const { data: segments } = await supabase
-        .from('parcours_segments')
-        .select('status')
-        .eq('run_id', runId);
-
-      const allCompleted = segments?.every((s: any) => s.status === 'completed');
-      
-      if (allCompleted) {
-        console.log('🎉 Tous les segments complétés pour le run', runId);
-        await supabase
-          .from('parcours_runs')
-          .update({ status: 'ready' })
-          .eq('id', runId);
+    // Mettre à jour selon le stage Suno
+    const stage = payload.stage; // 'text' | 'first' | 'complete' | 'error'
+    
+    const updateData: any = {
+      metadata: {
+        ...segment.metadata,
+        last_callback: payload,
+        last_callback_at: new Date().toISOString()
       }
+    };
 
-    } else if (callbackType === 'error') {
-      console.error('❌ Erreur callback Suno:', sunoData);
-      
-      await supabase
-        .from('parcours_segments')
-        .update({ status: 'failed' })
-        .eq('run_id', runId)
-        .eq('segment_index', segmentIndex);
+    // FIRST: l'audio streaming est dispo (~30-40s) - on peut commencer à jouer
+    if (stage === 'first' && payload.streamUrl) {
+      console.log(`[callback] ⚡ First audio ready for segment ${segmentId}: ${payload.streamUrl}`);
+      updateData.status = 'first';
+      updateData.preview_url = payload.streamUrl;
+    } 
+    // COMPLETE: l'audio final est prêt (2-3 min) - on peut remplacer par l'URL finale
+    else if (stage === 'complete' && payload.downloadUrl) {
+      console.log(`[callback] ✅ Final audio ready for segment ${segmentId}: ${payload.downloadUrl}`);
+      updateData.status = 'complete';
+      updateData.final_url = payload.downloadUrl;
+      if (payload.duration) {
+        updateData.duration_seconds = payload.duration;
+      }
+    } 
+    // ERROR: quelque chose a planté
+    else if (stage === 'error') {
+      console.error(`[callback] ❌ Generation failed for segment ${segmentId}:`, payload);
+      updateData.status = 'failed';
+      updateData.metadata.error = payload.error || 'Unknown error';
+    }
+
+    const { error: updateError } = await supabase
+      .from('parcours_segments')
+      .update(updateData)
+      .eq('id', segmentId);
+
+    if (updateError) {
+      console.error('[callback] Update error:', updateError);
+      return new Response(
+        JSON.stringify({ error: updateError.message }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Vérifier si tous les segments du run sont complete
+    if (stage === 'complete') {
+      const { data: run } = await supabase
+        .from('parcours_runs')
+        .select('id, status')
+        .eq('id', segment.run_id)
+        .single();
+
+      if (run) {
+        const { data: allSegments } = await supabase
+          .from('parcours_segments')
+          .select('status')
+          .eq('run_id', run.id);
+
+        const allComplete = allSegments?.every(s => s.status === 'complete');
+        if (allComplete && run.status !== 'ready') {
+          console.log(`[callback] 🎉 All segments complete for run ${run.id}, marking as ready`);
+          await supabase
+            .from('parcours_runs')
+            .update({ status: 'ready' })
+            .eq('id', run.id);
+        }
+      }
     }
 
     return new Response(
-      JSON.stringify({ success: true, message: 'Callback traité' }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
+      JSON.stringify({ ok: true }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
-  } catch (error: any) {
-    console.error('❌ Erreur callback:', error);
+  } catch (error) {
+    console.error('[callback] Fatal error:', error);
     return new Response(
-      JSON.stringify({ error: error?.message || 'Erreur inconnue' }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
+      JSON.stringify({ error: error.message }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
 });
