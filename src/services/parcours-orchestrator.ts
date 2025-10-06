@@ -1,82 +1,38 @@
 // @ts-nocheck
-/**
- * Orchestrateur pour les parcours musicothérapie longs (18–24 min)
- * Gère la génération multi-segments avec Suno Extend
- */
 
 import { supabase } from '@/integrations/supabase/client';
+import type { ParcoursPreset, ParcoursRun, ParcoursSegment } from '@/types/music/parcours';
 
-export interface ParcoursPreset {
-  preset_key: string;
-  title: string;
-  emotion_category: string;
-  duration_target: number;
-  music: {
-    bpm: number;
-    mode: string;
-    progression: string;
-    instruments: string;
-    model: string;
-  };
-  segments: Array<{
-    title: string;
-    start_s: number;
-    end_s: number;
-    technique: string;
-    voiceover: string;
-  }>;
-  lyrics?: {
-    refrain: string;
-    verses: string[];
-  };
-  tcm?: {
-    points: string[];
-    contraindications: string[];
-    aromatherapy?: string;
-  };
-  immersion?: {
-    tapping: boolean;
-    light_color: string;
-    breathwork_pattern: string;
-    props?: string;
-  };
-  prompt_suno: string;
-}
+export const AVAILABLE_PRESETS: Array<{ key: string; title: string; emotion: string; description: string }> = [
+  { key: '00-universel-reset', title: 'Universel Reset → Équilibre', emotion: 'neutral', description: 'Retour au centre avec cohérence cardiaque' },
+  { key: '01-panique-anxiete', title: 'Panique/Anxiété → Calme', emotion: 'anxiety', description: 'Respiration 4/6 + grounding 5-4-3-2-1' },
+  { key: '02-stress-overwhelm', title: 'Stress/Overwhelm → Décélération', emotion: 'stress', description: 'Tri des tâches + recadrage' },
+  { key: '03-rumination-culpabilite', title: 'Rumination → Clarté', emotion: 'rumination', description: 'Défusion cognitive + créneau souci' },
+  { key: '04-tristesse-deuil', title: 'Tristesse/Deuil → Lumière', emotion: 'sadness', description: 'Validation + activation comportementale' },
+  { key: '05-apathie-demotivation', title: 'Apathie → Élan', emotion: 'apathy', description: 'Activation + intentions Si/Alors' },
+  { key: '06-colere-irritabilite', title: 'Colère → Assertivité', emotion: 'anger', description: 'STOP + DESC + relaxation progressive' },
+  { key: '07-peur-anticipatoire', title: 'Peur/Phobie → Tolérance', emotion: 'fear', description: 'Exposition graduée + safe place' },
+  { key: '08-honte-anxiete-sociale', title: 'Honte → Auto-compassion', emotion: 'shame', description: 'Double standard + script social' },
+  { key: '09-jalousie-envie', title: 'Jalousie → Recentrage', emotion: 'jealousy', description: 'Restructuration + valeurs + gratitude' },
+  { key: '10-solitude-isolement', title: 'Solitude → Connexion', emotion: 'loneliness', description: 'Lettre à un ami + plan micro-contact' },
+  { key: '11-fatigue-mentale', title: 'Burnout → Repos actif', emotion: 'burnout', description: 'Permission repos + scan profond' },
+  { key: '12-hypersensibilite', title: 'Hypersensibilité → Filtration', emotion: 'overstimulation', description: 'ACCEPT + cocon protecteur' },
+  { key: '13-douleur-physique', title: 'Douleur → Apaisement', emotion: 'pain', description: 'Recadrage + déplacement perceptif' },
+  { key: '14-manque-confiance', title: 'Manque confiance → Assurance', emotion: 'insecurity', description: 'Croyances + preuves contraires' },
+  { key: '15-perfectionnisme', title: 'Perfectionnisme → Souplesse', emotion: 'perfectionism', description: 'Expérimentation imparfaite + bambou' },
+  { key: '16-nostalgie-melancolie', title: 'Nostalgie → Douceur présente', emotion: 'nostalgia', description: 'Gratitude présent + pont temporel' },
+  { key: '17-motivation-energie', title: 'Motivation → Mouvement', emotion: 'motivation', description: 'Si/Alors + plan 10 minutes' },
+  { key: '18-concentration-flow', title: 'Concentration → Focus', emotion: 'focus', description: 'Pomodoro 10/2 + tunnel attentionnel' },
+  { key: '19-amour-gratitude', title: 'Gratitude → Expansion', emotion: 'gratitude', description: 'Journal gratitude + cœur rayonnant' },
+];
 
-export interface ParcoursRun {
-  id: string;
-  user_id: string;
-  preset_key: string;
-  started_at: string;
-  status: 'generating' | 'ready' | 'in_progress' | 'completed' | 'failed';
-  segments: ParcoursSegment[];
-}
-
-export interface ParcoursSegment {
-  id: string;
-  run_id: string;
-  segment_index: number;
-  title: string;
-  start_seconds: number;
-  end_seconds: number;
-  audio_url?: string;
-  stream_url?: string;
-  voiceover_script?: string;
-  status: 'pending' | 'generating' | 'ready' | 'failed';
-}
-
-/**
- * Créer une nouvelle run de parcours
- */
 export async function createParcoursRun(
   presetKey: string,
-  userId: string,
   emotionState?: any
 ): Promise<{ runId: string; error?: string }> {
   try {
     console.log('🎭 Création parcours run:', presetKey);
 
-    // Appeler l'Edge Function qui orchestre tout
     const { data, error } = await supabase.functions.invoke('parcours-xl-create', {
       body: {
         presetKey,
@@ -84,13 +40,8 @@ export async function createParcoursRun(
       }
     });
 
-    if (error) {
-      throw error;
-    }
-
-    if (!data?.runId) {
-      throw new Error('No runId returned');
-    }
+    if (error) throw error;
+    if (!data?.runId) throw new Error('No runId returned');
 
     console.log('✅ Run créée:', data.runId);
     return { runId: data.runId };
@@ -104,9 +55,6 @@ export async function createParcoursRun(
   }
 }
 
-/**
- * Récupérer une run et ses segments
- */
 export async function getParcoursRun(runId: string): Promise<ParcoursRun | null> {
   try {
     const { data: run, error: runError } = await supabase
@@ -128,7 +76,7 @@ export async function getParcoursRun(runId: string): Promise<ParcoursRun | null>
     return {
       ...run,
       segments: segments || []
-    };
+    } as ParcoursRun;
 
   } catch (error) {
     console.error('❌ Erreur récupération run:', error);
@@ -136,9 +84,6 @@ export async function getParcoursRun(runId: string): Promise<ParcoursRun | null>
   }
 }
 
-/**
- * Mettre à jour le statut d'une run
- */
 export async function updateRunStatus(
   runId: string,
   status: string,
@@ -161,17 +106,13 @@ export async function updateRunStatus(
   }
 }
 
-/**
- * Sauvegarder le journal de fin de parcours (chiffré)
- */
 export async function saveParcoursJournal(
   runId: string,
   notes: string,
   sudsEnd?: number
 ): Promise<boolean> {
   try {
-    // TODO: Chiffrer les notes avant stockage
-    const notesEncrypted = btoa(notes); // Simple base64 pour MVP, à améliorer
+    const notesEncrypted = btoa(notes);
 
     const { error } = await supabase
       .from('parcours_runs')
@@ -189,29 +130,3 @@ export async function saveParcoursJournal(
     return false;
   }
 }
-
-/**
- * Liste des presets disponibles
- */
-export const AVAILABLE_PRESETS = [
-  { key: 'universel-reset', title: 'Reset Universel', emotion: 'Neutre', duration: '20 min', icon: '⚖️' },
-  { key: 'panique-anxiete', title: 'Calme & Contrôle', emotion: 'Anxiété', duration: '20 min', icon: '🌊' },
-  { key: 'stress-overwhelm', title: 'Décélération', emotion: 'Stress', duration: '18 min', icon: '🐌' },
-  { key: 'rumination-culpabilite', title: 'Clarté', emotion: 'Rumination', duration: '19 min', icon: '🧘' },
-  { key: 'tristesse-deuil', title: 'Lumière', emotion: 'Tristesse', duration: '22 min', icon: '🕯️' },
-  { key: 'apathie-demotivation', title: 'Élan', emotion: 'Apathie', duration: '18 min', icon: '⚡' },
-  { key: 'colere-irritabilite', title: 'Assertivité', emotion: 'Colère', duration: '20 min', icon: '🔥' },
-  { key: 'peur-anticipatoire', title: 'Tolérance', emotion: 'Peur', duration: '20 min', icon: '🦋' },
-  { key: 'honte-anxiete-sociale', title: 'Auto-compassion', emotion: 'Honte', duration: '18 min', icon: '💝' },
-  { key: 'jalousie-envie', title: 'Recentrage', emotion: 'Jalousie', duration: '18 min', icon: '🎯' },
-  { key: 'solitude-isolement', title: 'Connexion', emotion: 'Solitude', duration: '20 min', icon: '🤝' },
-  { key: 'fatigue-burnout', title: 'Repos actif', emotion: 'Burnout', duration: '22 min', icon: '🛌' },
-  { key: 'hypersensibilite', title: 'Filtration', emotion: 'Hypersensibilité', duration: '18 min', icon: '🛡️' },
-  { key: 'douleur-physique', title: 'Apaisement', emotion: 'Douleur', duration: '20 min', icon: '🌿' },
-  { key: 'manque-confiance', title: 'Assurance douce', emotion: 'Doute', duration: '20 min', icon: '💪' },
-  { key: 'perfectionnisme', title: 'Souplesse', emotion: 'Perfectionnisme', duration: '18 min', icon: '🎋' },
-  { key: 'nostalgie', title: 'Douceur présente', emotion: 'Nostalgie', duration: '20 min', icon: '📷' },
-  { key: 'motivation', title: 'Mise en mouvement', emotion: 'Motivation', duration: '18 min', icon: '🚀' },
-  { key: 'concentration', title: 'Focus stable', emotion: 'Concentration', duration: '18 min', icon: '🎯' },
-  { key: 'amour-gratitude', title: 'Expansion', emotion: 'Gratitude', duration: '20 min', icon: '❤️' },
-] as const;
