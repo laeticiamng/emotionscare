@@ -90,6 +90,40 @@ export const EmotionMusicPanel: React.FC = () => {
           )}
         </AnimatePresence>
 
+        {/* Gestion des erreurs améliorée */}
+        <AnimatePresence>
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="p-4 bg-destructive/10 border border-destructive/30 rounded-md"
+            >
+              <div className="flex items-start gap-3">
+                <AlertCircle className="h-5 w-5 text-destructive mt-0.5 flex-shrink-0" />
+                <div className="flex-1 space-y-1">
+                  <p className="font-medium text-destructive">Erreur de génération</p>
+                  <p className="text-sm text-muted-foreground">{error}</p>
+                  {error.includes('not configured') && (
+                    <p className="text-xs text-muted-foreground mt-2 p-2 bg-background rounded border">
+                      💡 <strong>Action requise:</strong> Les clés API (OPENAI_API_KEY, SUNO_API_KEY) 
+                      doivent être configurées dans Supabase Edge Functions secrets.
+                    </p>
+                  )}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={reset}
+                    className="mt-2"
+                  >
+                    Réessayer
+                  </Button>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Rate limit status */}
         <div className="flex items-center justify-between text-xs text-muted-foreground">
           <span>

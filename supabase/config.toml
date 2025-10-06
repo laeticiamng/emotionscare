@@ -164,3 +164,6 @@ verify_jwt = false
 
 [functions.openai-structured-output]
 verify_jwt = true
+
+[functions.emotion-music-generate]
+verify_jwt = false

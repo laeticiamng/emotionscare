@@ -1,9 +1,8 @@
 // @ts-nocheck
 import { useState, useCallback } from 'react';
-import { buildSunoRequest } from '@/services/openai-orchestrator';
-import { generateMusic } from '@/services/suno-client';
+import { supabase } from '@/integrations/supabase/client';
 import { sunoRateLimiter } from '@/services/rate-limit';
-import { getVerbalBadge, sanitizeEmotionData } from '@/services/privacy';
+import { sanitizeEmotionData } from '@/services/privacy';
 import { toast } from 'sonner';
 
 interface EmotionState {
@@ -44,36 +43,43 @@ export const useEmotionMusic = () => {
 
       // 1. Nettoyer et anonymiser les données émotionnelles
       const cleanedEmotion = sanitizeEmotionData(emotionState);
-      
-      // 2. Générer le badge verbal (pas de scores numériques)
-      const badge = getVerbalBadge(cleanedEmotion.valence, cleanedEmotion.arousal);
-      setEmotionBadge(badge);
 
-      // 3. Orchestrer la requête Suno via OpenAI Structured Outputs
-      toast.info('Analyse de votre état émotionnel...');
-      const sunoRequest = await buildSunoRequest(cleanedEmotion, userContext);
-      
-      // 4. Acquérir le rate limit token
+      // 2. Acquérir le rate limit token
       await sunoRateLimiter.acquire();
 
-      // 5. Générer la musique via Suno
-      toast.info('Création de votre musique personnalisée...');
-      const result = await generateMusic(sunoRequest);
+      // 3. Appeler l'Edge Function Supabase qui orchestre tout
+      toast.info('Analyse de votre état émotionnel...');
+      
+      const { data, error: functionError } = await supabase.functions.invoke(
+        'emotion-music-generate',
+        {
+          body: {
+            emotionState: cleanedEmotion,
+            userContext: userContext || {}
+          }
+        }
+      );
 
-      if (!result?.data?.taskId) {
-        throw new Error('Aucun taskId reçu de Suno');
+      if (functionError) {
+        console.error('❌ Edge Function error:', functionError);
+        throw new Error(functionError.message || 'Erreur lors de la génération');
       }
 
-      const taskId = result.data.taskId;
-      setCurrentTask(taskId);
+      if (!data?.taskId) {
+        throw new Error('Aucun taskId reçu');
+      }
 
-      console.log('✅ Génération lancée:', { taskId, badge });
+      const { taskId, emotionBadge, estimatedDuration } = data;
+      setCurrentTask(taskId);
+      setEmotionBadge(emotionBadge);
+
+      console.log('✅ Génération lancée:', { taskId, emotionBadge });
       toast.success('Votre musique est en cours de création !');
 
       return {
         taskId,
-        emotionBadge: badge,
-        estimatedDuration: sunoRequest.durationSeconds || 120
+        emotionBadge,
+        estimatedDuration: estimatedDuration || 120
       };
 
     } catch (err) {
