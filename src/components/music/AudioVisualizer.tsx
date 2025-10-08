@@ -85,7 +85,7 @@ const AudioVisualizer: React.FC<AudioVisualizerProps> = ({
         analyserRef.current = audioContextRef.current.createAnalyser();
         analyserRef.current.fftSize = 256;
         const bufferLength = analyserRef.current.frequencyBinCount;
-        dataArrayRef.current = new Uint8Array(bufferLength);
+        dataArrayRef.current = new Uint8Array(new ArrayBuffer(bufferLength));
         
         // Create source node from audio element
         const source = audioContextRef.current.createMediaElementSource(audioRef.current);
@@ -168,7 +168,7 @@ const AudioVisualizer: React.FC<AudioVisualizerProps> = ({
     ctx.fillRect(0, 0, WIDTH, HEIGHT);
     
     // Get data
-    analyserRef.current.getByteFrequencyData(dataArrayRef.current);
+    analyserRef.current.getByteFrequencyData(dataArrayRef.current as Uint8Array<ArrayBuffer>);
     
     // Choose visualization variant
     switch (variant) {
