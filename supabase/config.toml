@@ -19,6 +19,12 @@ verify_jwt = true
 [functions.journal-weekly]
 verify_jwt = true
 
+[functions.journal-insights]
+verify_jwt = true
+
+[functions.journal-analysis]
+verify_jwt = true
+
 [functions.face-filter-start]
 verify_jwt = true
 
