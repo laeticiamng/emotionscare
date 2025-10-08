@@ -89,6 +89,14 @@ const NavigationPage: React.FC = () => {
       icon: Heart,
       category: 'wellness',
     },
+    {
+      id: 'breathwork',
+      title: 'Breathwork',
+      description: 'Exercices de respiration guidée',
+      path: routes.b2c.breathwork(),
+      icon: Activity,
+      category: 'wellness',
+    },
     
     // Fun Modules
     {
@@ -114,6 +122,39 @@ const NavigationPage: React.FC = () => {
       description: 'Défis de résilience et de persévérance',
       path: routes.b2c.bossLevel(),
       icon: Target,
+      category: 'fun',
+    },
+    {
+      id: 'mood-mixer',
+      title: 'Mood Mixer',
+      description: 'Mixez et explorez vos humeurs',
+      path: routes.b2c.moodMixer(),
+      icon: Heart,
+      category: 'fun',
+      isNew: true,
+    },
+    {
+      id: 'bounce-back',
+      title: 'Bounce Back',
+      description: 'Rebondissez après les défis',
+      path: routes.b2c.bounceBack(),
+      icon: Activity,
+      category: 'fun',
+    },
+    {
+      id: 'story-synth',
+      title: 'Story Synth',
+      description: 'Créez des histoires émotionnelles',
+      path: routes.b2c.storySynth(),
+      icon: Star,
+      category: 'fun',
+    },
+    {
+      id: 'ar-filters',
+      title: 'Filtres AR',
+      description: 'Filtres de réalité augmentée émotionnels',
+      path: routes.b2c.arFilters(),
+      icon: Brain,
       category: 'fun',
     },
     
@@ -147,9 +188,25 @@ const NavigationPage: React.FC = () => {
     {
       id: 'scores',
       title: 'Scores & vibes',
-      description: 'Courbes d’humeur, séances et heatmap quotidienne',
+      description: 'Courbes d\'humeur, séances et heatmap quotidienne',
       path: '/app/scores',
       icon: Brain,
+      category: 'analysis',
+    },
+    {
+      id: 'heatmap',
+      title: 'Heatmap Vibes',
+      description: 'Visualisation thermique de vos émotions',
+      path: routes.b2c.heatmap(),
+      icon: Activity,
+      category: 'analysis',
+    },
+    {
+      id: 'gamification',
+      title: 'Gamification',
+      description: 'Badges, récompenses et progression',
+      path: routes.b2c.gamification(),
+      icon: Star,
       category: 'analysis',
     },
     
