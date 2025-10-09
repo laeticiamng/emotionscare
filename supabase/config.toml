@@ -76,6 +76,9 @@ verify_jwt = true
 [functions.journal]
 verify_jwt = true
 
+[functions.music-therapy]
+verify_jwt = true
+
 [functions.journal-analysis]
 verify_jwt = true
 
