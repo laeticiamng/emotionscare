@@ -25,6 +25,9 @@ verify_jwt = true
 [functions.therapeutic-music]
 verify_jwt = true
 
+[functions.guided-meditation]
+verify_jwt = true
+
 [functions.journal-analysis]
 verify_jwt = true
 
