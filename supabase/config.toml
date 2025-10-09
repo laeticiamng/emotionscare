@@ -67,6 +67,9 @@ verify_jwt = true
 [functions.user-profile]
 verify_jwt = true
 
+[functions.gamification]
+verify_jwt = true
+
 [functions.journal-analysis]
 verify_jwt = true
 
