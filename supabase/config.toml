@@ -55,6 +55,9 @@ verify_jwt = true
 [functions.analytics-insights]
 verify_jwt = true
 
+[functions.smart-notifications]
+verify_jwt = true
+
 [functions.journal-analysis]
 verify_jwt = true
 
