@@ -46,6 +46,9 @@ verify_jwt = true
 [functions.ai-analytics-insights]
 verify_jwt = true
 
+[functions.vr-therapy]
+verify_jwt = true
+
 [functions.journal-analysis]
 verify_jwt = true
 
