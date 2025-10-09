@@ -22,6 +22,9 @@ verify_jwt = true
 [functions.journal-insights]
 verify_jwt = true
 
+[functions.therapeutic-music]
+verify_jwt = true
+
 [functions.journal-analysis]
 verify_jwt = true
 
