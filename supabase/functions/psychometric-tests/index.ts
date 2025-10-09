@@ -7,160 +7,146 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-interface TestAnswer {
-  question_id: string;
-  value: number;
-}
-
-interface TestResult {
-  test_type: string;
-  score: number;
-  severity_level: string;
-  interpretation: string;
-  recommendations: string[];
-}
-
-const calculatePhq9Score = (answers: TestAnswer[]): TestResult => {
-  const totalScore = answers.reduce((sum, answer) => sum + answer.value, 0);
-  let level = 'minimal';
-  let label = 'Symptômes minimaux';
-  
-  if (totalScore > 4 && totalScore <= 9) {
-    level = 'mild';
-    label = 'Dépression légère';
-  } else if (totalScore > 9 && totalScore <= 14) {
-    level = 'moderate';
-    label = 'Dépression modérée';
-  } else if (totalScore > 14 && totalScore <= 19) {
-    level = 'moderately_severe';
-    label = 'Dépression modérément sévère';
-  } else if (totalScore > 19) {
-    level = 'severe';
-    label = 'Dépression sévère';
-  }
-
-  return {
-    test_type: 'phq-9',
-    score: totalScore,
-    severity_level: level,
-    interpretation: label,
-    recommendations: generateRecommendations({ 'phq-9': level })
-  };
-};
-
-const calculateGad7Score = (answers: TestAnswer[]): TestResult => {
-  const totalScore = answers.reduce((sum, answer) => sum + answer.value, 0);
-  let level = 'minimal';
-  let label = 'Anxiété minimale';
-  
-  if (totalScore > 4 && totalScore <= 9) {
-    level = 'mild';
-    label = 'Anxiété légère';
-  } else if (totalScore > 9 && totalScore <= 14) {
-    level = 'moderate';
-    label = 'Anxiété modérée';
-  } else if (totalScore > 14) {
-    level = 'severe';
-    label = 'Anxiété sévère';
-  }
-
-  return {
-    test_type: 'gad-7',
-    score: totalScore,
-    severity_level: level,
-    interpretation: label,
-    recommendations: generateRecommendations({ 'gad-7': level })
-  };
-};
-
-const calculateDass21Score = (answers: TestAnswer[]): TestResult => {
-  const subscaleScores = { depression: 0, anxiety: 0, stress: 0 };
-  
-  const subscaleMap: Record<string, keyof typeof subscaleScores> = {
-    'dass1': 'stress', 'dass2': 'anxiety', 'dass3': 'depression',
-    'dass4': 'anxiety', 'dass5': 'depression', 'dass6': 'stress',
-    'dass7': 'anxiety', 'dass8': 'stress', 'dass9': 'anxiety',
-    'dass10': 'depression', 'dass11': 'stress', 'dass12': 'stress',
-    'dass13': 'depression', 'dass14': 'stress', 'dass15': 'anxiety',
-    'dass16': 'depression', 'dass17': 'depression', 'dass18': 'stress',
-    'dass19': 'anxiety', 'dass20': 'anxiety', 'dass21': 'depression'
-  };
-
-  answers.forEach(answer => {
-    const subscale = subscaleMap[answer.question_id];
-    if (subscale) {
-      subscaleScores[subscale] += answer.value;
+const INSTRUMENTS = {
+  'PHQ-9': {
+    name: 'PHQ-9',
+    fullName: 'Patient Health Questionnaire-9',
+    description: 'Évaluation de la dépression',
+    questions: [
+      'Peu d\'intérêt ou de plaisir à faire les choses',
+      'Se sentir triste, déprimé(e) ou désespéré(e)',
+      'Difficulté à s\'endormir, se réveiller ou trop dormir',
+      'Se sentir fatigué(e) ou manquer d\'énergie',
+      'Peu d\'appétit ou manger trop',
+      'Sentiment de dévalorisation ou culpabilité',
+      'Difficulté à se concentrer',
+      'Bouger ou parler lentement, ou être agité(e)',
+      'Pensées de se faire du mal'
+    ],
+    options: [
+      { label: 'Jamais', value: 0 },
+      { label: 'Plusieurs jours', value: 1 },
+      { label: 'Plus de la moitié du temps', value: 2 },
+      { label: 'Presque tous les jours', value: 3 }
+    ],
+    thresholds: {
+      minimal: [0, 4],
+      mild: [5, 9],
+      moderate: [10, 14],
+      moderatelySevere: [15, 19],
+      severe: [20, 27]
     }
-  });
+  },
+  'GAD-7': {
+    name: 'GAD-7',
+    fullName: 'Generalized Anxiety Disorder-7',
+    description: 'Évaluation de l\'anxiété',
+    questions: [
+      'Se sentir nerveux(se), anxieux(se) ou sur les nerfs',
+      'Ne pas pouvoir arrêter de s\'inquiéter',
+      'S\'inquiéter de trop de choses différentes',
+      'Avoir du mal à se détendre',
+      'Être si agité(e) qu\'il est difficile de tenir en place',
+      'Être facilement ennuyé(e) ou irritable',
+      'Se sentir effrayé(e) comme si quelque chose d\'affreux allait arriver'
+    ],
+    options: [
+      { label: 'Jamais', value: 0 },
+      { label: 'Plusieurs jours', value: 1 },
+      { label: 'Plus de la moitié du temps', value: 2 },
+      { label: 'Presque tous les jours', value: 3 }
+    ],
+    thresholds: {
+      minimal: [0, 4],
+      mild: [5, 9],
+      moderate: [10, 14],
+      severe: [15, 21]
+    }
+  },
+  'PSS-10': {
+    name: 'PSS-10',
+    fullName: 'Perceived Stress Scale-10',
+    description: 'Évaluation du stress perçu',
+    questions: [
+      'Avez-vous été contrarié(e) par quelque chose d\'inattendu?',
+      'Avez-vous senti que vous étiez incapable de contrôler les choses importantes?',
+      'Vous êtes-vous senti(e) nerveux(se) ou stressé(e)?',
+      'Avez-vous géré avec succès les petits problèmes quotidiens?',
+      'Avez-vous senti que vous faisiez face efficacement aux changements?',
+      'Vous êtes-vous senti(e) confiant(e) dans votre capacité à gérer vos problèmes?',
+      'Avez-vous senti que les choses allaient comme vous le vouliez?',
+      'Avez-vous trouvé que vous ne pouviez pas faire face à toutes les choses?',
+      'Avez-vous été capable de contrôler les irritations de votre vie?',
+      'Avez-vous senti que vous maîtrisiez la situation?'
+    ],
+    options: [
+      { label: 'Jamais', value: 0 },
+      { label: 'Presque jamais', value: 1 },
+      { label: 'Parfois', value: 2 },
+      { label: 'Assez souvent', value: 3 },
+      { label: 'Très souvent', value: 4 }
+    ],
+    reverseScored: [3, 4, 5, 6, 8, 9],
+    thresholds: {
+      low: [0, 13],
+      moderate: [14, 26],
+      high: [27, 40]
+    }
+  },
+  'WHO-5': {
+    name: 'WHO-5',
+    fullName: 'WHO-5 Well-Being Index',
+    description: 'Évaluation du bien-être',
+    questions: [
+      'Je me suis senti(e) joyeux(se) et de bonne humeur',
+      'Je me suis senti(e) calme et détendu(e)',
+      'Je me suis senti(e) actif(ve) et vigoureux(se)',
+      'Je me suis réveillé(e) en me sentant frais et dispos',
+      'Ma vie quotidienne a été remplie de choses qui m\'intéressent'
+    ],
+    options: [
+      { label: 'Jamais', value: 0 },
+      { label: 'Rarement', value: 1 },
+      { label: 'Moins de la moitié du temps', value: 2 },
+      { label: 'Plus de la moitié du temps', value: 3 },
+      { label: 'La plupart du temps', value: 4 },
+      { label: 'Tout le temps', value: 5 }
+    ],
+    thresholds: {
+      poor: [0, 12],
+      moderate: [13, 18],
+      good: [19, 25]
+    }
+  }
+};
 
-  subscaleScores.depression *= 2;
-  subscaleScores.anxiety *= 2;
-  subscaleScores.stress *= 2;
-
-  const getLevel = (score: number, type: string) => {
-    if (type === 'depression') {
-      if (score <= 9) return 'normal';
-      if (score <= 13) return 'mild';
-      if (score <= 20) return 'moderate';
-      if (score <= 27) return 'severe';
-      return 'extremely_severe';
-    } else if (type === 'anxiety') {
-      if (score <= 7) return 'normal';
-      if (score <= 9) return 'mild';
-      if (score <= 14) return 'moderate';
-      if (score <= 19) return 'severe';
-      return 'extremely_severe';
+function calculateScore(instrument: string, answers: number[]) {
+  const config = INSTRUMENTS[instrument];
+  let total = 0;
+  
+  answers.forEach((answer, index) => {
+    if (config.reverseScored && config.reverseScored.includes(index)) {
+      const maxValue = Math.max(...config.options.map(o => o.value));
+      total += maxValue - answer;
     } else {
-      if (score <= 14) return 'normal';
-      if (score <= 18) return 'mild';
-      if (score <= 25) return 'moderate';
-      if (score <= 33) return 'severe';
-      return 'extremely_severe';
-    }
-  };
-
-  const interpretations = {
-    depression: getLevel(subscaleScores.depression, 'depression'),
-    anxiety: getLevel(subscaleScores.anxiety, 'anxiety'),
-    stress: getLevel(subscaleScores.stress, 'stress')
-  };
-
-  const totalScore = subscaleScores.depression + subscaleScores.anxiety + subscaleScores.stress;
-
-  return {
-    test_type: 'dass-21',
-    score: totalScore,
-    severity_level: JSON.stringify(interpretations),
-    interpretation: `Dépression: ${interpretations.depression}, Anxiété: ${interpretations.anxiety}, Stress: ${interpretations.stress}`,
-    recommendations: generateRecommendations(interpretations)
-  };
-};
-
-const generateRecommendations = (levels: Record<string, string>): string[] => {
-  const recommendations: string[] = [];
-  
-  Object.entries(levels).forEach(([key, level]) => {
-    if (level === 'severe' || level === 'extremely_severe') {
-      recommendations.push('Consulter un professionnel de santé mentale rapidement');
-      recommendations.push('Envisager un suivi thérapeutique régulier');
-    } else if (level === 'moderate' || level === 'moderately_severe') {
-      recommendations.push('Pratiquer des techniques de relaxation quotidiennes');
-      recommendations.push('Considérer une consultation avec un psychologue');
-      recommendations.push('Maintenir une routine de sommeil régulière');
-    } else if (level === 'mild') {
-      recommendations.push('Pratiquer des exercices de respiration');
-      recommendations.push('Faire de l\'exercice physique régulièrement');
-      recommendations.push('Maintenir des liens sociaux');
+      total += answer;
     }
   });
+  
+  return total;
+}
 
-  if (recommendations.length === 0) {
-    recommendations.push('Continuer à prendre soin de votre bien-être mental');
-    recommendations.push('Pratiquer la méditation et la pleine conscience');
+function getInterpretation(instrument: string, score: number) {
+  const thresholds = INSTRUMENTS[instrument].thresholds;
+  
+  for (const [level, range] of Object.entries(thresholds)) {
+    if (score >= range[0] && score <= range[1]) {
+      return level;
+    }
   }
-
-  return [...new Set(recommendations)];
-};
+  
+  return 'unknown';
+}
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -168,179 +154,161 @@ serve(async (req) => {
   }
 
   try {
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const supabase = createClient(supabaseUrl, supabaseKey);
-
-    const authHeader = req.headers.get('Authorization');
-    if (!authHeader) {
-      throw new Error('Missing Authorization header');
-    }
-
-    const { data: { user }, error: userError } = await supabase.auth.getUser(
-      authHeader.replace('Bearer ', '')
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      {
+        global: {
+          headers: { Authorization: req.headers.get('Authorization')! },
+        },
+      }
     );
 
+    const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
+    
     if (userError || !user) {
-      throw new Error('Unauthorized');
+      return new Response(
+        JSON.stringify({ error: 'Non authentifié' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
-    const url = new URL(req.url);
-    const path = url.pathname.split('/').filter(Boolean);
-    const action = path[path.length - 1];
+    const { action, instrument, answers, sessionId } = await req.json();
 
-    // GET /psychometric-tests/available
-    if (req.method === 'GET' && action === 'available') {
-      const availableTests = [
-        { id: 'phq-9', name: 'PHQ-9 (Patient Health Questionnaire)', description: 'Évaluation de la dépression', question_count: 9 },
-        { id: 'gad-7', name: 'GAD-7 (Generalized Anxiety Disorder)', description: 'Évaluation de l\'anxiété', question_count: 7 },
-        { id: 'dass-21', name: 'DASS-21 (Depression Anxiety Stress Scales)', description: 'Évaluation de la dépression, anxiété et stress', question_count: 21 }
-      ];
+    switch (action) {
+      case 'get-instruments': {
+        const instrumentList = Object.entries(INSTRUMENTS).map(([key, value]) => ({
+          id: key,
+          name: value.name,
+          fullName: value.fullName,
+          description: value.description,
+          questionCount: value.questions.length
+        }));
 
-      return new Response(JSON.stringify(availableTests), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
-    }
+        return new Response(
+          JSON.stringify({ success: true, instruments: instrumentList }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
 
-    // GET /psychometric-tests/test/{testType}
-    if (req.method === 'GET' && path.includes('test')) {
-      const testType = path[path.length - 1];
-      
-      // Retourner la structure du test demandé
-      const tests: Record<string, any> = {
-        'phq-9': {
-          id: 'phq-9',
-          name: 'PHQ-9',
-          description: 'Évaluation de la dépression',
-          questions: Array.from({ length: 9 }, (_, i) => ({
-            id: `phq${i + 1}`,
-            text: `Question PHQ-9 ${i + 1}`
-          })),
-          scale: [
-            { value: 0, label: 'Jamais' },
-            { value: 1, label: 'Plusieurs jours' },
-            { value: 2, label: 'Plus de la moitié du temps' },
-            { value: 3, label: 'Presque tous les jours' }
-          ]
-        },
-        'gad-7': {
-          id: 'gad-7',
-          name: 'GAD-7',
-          description: 'Évaluation de l\'anxiété',
-          questions: Array.from({ length: 7 }, (_, i) => ({
-            id: `gad${i + 1}`,
-            text: `Question GAD-7 ${i + 1}`
-          })),
-          scale: [
-            { value: 0, label: 'Jamais' },
-            { value: 1, label: 'Plusieurs jours' },
-            { value: 2, label: 'Plus de la moitié du temps' },
-            { value: 3, label: 'Presque tous les jours' }
-          ]
-        },
-        'dass-21': {
-          id: 'dass-21',
-          name: 'DASS-21',
-          description: 'Évaluation DASS-21',
-          questions: Array.from({ length: 21 }, (_, i) => ({
-            id: `dass${i + 1}`,
-            text: `Question DASS-21 ${i + 1}`
-          })),
-          scale: [
-            { value: 0, label: 'Ne s\'applique pas du tout' },
-            { value: 1, label: 'S\'applique un peu' },
-            { value: 2, label: 'S\'applique beaucoup' },
-            { value: 3, label: 'S\'applique énormément' }
-          ]
+      case 'get-instrument-details': {
+        const config = INSTRUMENTS[instrument];
+        if (!config) {
+          return new Response(
+            JSON.stringify({ error: 'Instrument invalide' }),
+            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
         }
-      };
 
-      const test = tests[testType];
-      if (!test) {
-        return new Response(JSON.stringify({ error: 'Test not found' }), {
-          status: 404,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        return new Response(
+          JSON.stringify({ success: true, instrument: config }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      case 'submit-test': {
+        const score = calculateScore(instrument, answers);
+        const interpretation = getInterpretation(instrument, score);
+
+        const { data: session, error: sessionError } = await supabaseClient
+          .from('assessment_sessions')
+          .insert({
+            user_id: user.id,
+            instrument,
+            answers: { responses: answers },
+            started_at: new Date().toISOString(),
+            completed_at: new Date().toISOString(),
+            context: {
+              score,
+              interpretation,
+              maxScore: INSTRUMENTS[instrument].questions.length * Math.max(...INSTRUMENTS[instrument].options.map(o => o.value))
+            }
+          })
+          .select()
+          .single();
+
+        if (sessionError) throw sessionError;
+
+        const { error: assessmentError } = await supabaseClient
+          .from('assessments')
+          .insert({
+            user_id: user.id,
+            instrument,
+            score_json: {
+              total: score,
+              interpretation,
+              answers
+            }
+          });
+
+        if (assessmentError) console.error('Assessment insert error:', assessmentError);
+
+        return new Response(
+          JSON.stringify({ 
+            success: true, 
+            session,
+            score,
+            interpretation,
+            message: 'Test soumis avec succès'
+          }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      case 'get-history': {
+        const { data, error } = await supabaseClient
+          .from('assessment_sessions')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(50);
+
+        if (error) throw error;
+
+        return new Response(
+          JSON.stringify({ success: true, history: data }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      case 'get-trends': {
+        const { data, error } = await supabaseClient
+          .from('assessment_sessions')
+          .select('instrument, context, created_at')
+          .eq('user_id', user.id)
+          .gte('created_at', new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString())
+          .order('created_at', { ascending: true });
+
+        if (error) throw error;
+
+        const trends = {};
+        data.forEach(session => {
+          if (!trends[session.instrument]) {
+            trends[session.instrument] = [];
+          }
+          trends[session.instrument].push({
+            date: session.created_at,
+            score: session.context?.score || 0
+          });
         });
+
+        return new Response(
+          JSON.stringify({ success: true, trends }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
       }
 
-      return new Response(JSON.stringify(test), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
+      default:
+        return new Response(
+          JSON.stringify({ error: 'Action invalide' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
     }
-
-    // POST /psychometric-tests/submit
-    if (req.method === 'POST' && action === 'submit') {
-      const { test_type, answers } = await req.json();
-
-      if (!test_type || !answers || !Array.isArray(answers)) {
-        throw new Error('Invalid request body');
-      }
-
-      let result: TestResult;
-      if (test_type === 'phq-9') {
-        result = calculatePhq9Score(answers);
-      } else if (test_type === 'gad-7') {
-        result = calculateGad7Score(answers);
-      } else if (test_type === 'dass-21') {
-        result = calculateDass21Score(answers);
-      } else {
-        throw new Error('Invalid test type');
-      }
-
-      const { data: savedResult, error: saveError } = await supabase
-        .from('psychometric_test_results')
-        .insert({
-          user_id: user.id,
-          test_type: result.test_type,
-          score: result.score,
-          severity_level: result.severity_level,
-          interpretation: result.interpretation,
-          recommendations: result.recommendations,
-          answers: answers
-        })
-        .select()
-        .single();
-
-      if (saveError) {
-        console.error('Error saving test result:', saveError);
-        throw saveError;
-      }
-
-      return new Response(JSON.stringify(savedResult), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
-    }
-
-    // GET /psychometric-tests/history
-    if (req.method === 'GET' && action === 'history') {
-      const { data: history, error: historyError } = await supabase
-        .from('psychometric_test_results')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
-
-      if (historyError) {
-        throw historyError;
-      }
-
-      return new Response(JSON.stringify(history || []), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
-    }
-
-    return new Response(JSON.stringify({ error: 'Not found' }), {
-      status: 404,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-    });
-
   } catch (error) {
     console.error('Error in psychometric-tests function:', error);
     return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      }
+      JSON.stringify({ error: error.message }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
 });
