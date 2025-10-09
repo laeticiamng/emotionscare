@@ -61,6 +61,9 @@ verify_jwt = true
 [functions.therapeutic-journey]
 verify_jwt = true
 
+[functions.b2b-management]
+verify_jwt = true
+
 [functions.journal-analysis]
 verify_jwt = true
 
