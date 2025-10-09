@@ -31,6 +31,9 @@ verify_jwt = true
 [functions.immersive-breathing]
 verify_jwt = true
 
+[functions.ai-coach-chat]
+verify_jwt = true
+
 [functions.journal-analysis]
 verify_jwt = true
 
