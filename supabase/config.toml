@@ -284,3 +284,6 @@ verify_jwt = false
 
 [functions.adaptive-music]
 verify_jwt = true
+
+[functions.ai-coaching]
+verify_jwt = true
