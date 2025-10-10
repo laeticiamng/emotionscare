@@ -281,3 +281,6 @@ verify_jwt = true
 
 [functions.parcours-xl-runner]
 verify_jwt = false
+
+[functions.adaptive-music]
+verify_jwt = true
