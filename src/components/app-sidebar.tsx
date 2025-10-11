@@ -39,7 +39,17 @@ import {
   Zap,
   Star,
   Shield,
-  Sparkles
+  Sparkles,
+  Wind,
+  Cloud,
+  Palette,
+  Globe,
+  Activity,
+  Trophy,
+  Target,
+  FileText,
+  Smile,
+  Waves
 } from "lucide-react";
 
 // Types
@@ -68,7 +78,7 @@ export function AppSidebar() {
 
   const isActive = (path: string) => currentPath === path;
 
-  // Navigation structure pour une expérience immersive
+  // Navigation structure pour une expérience immersive - TOUS LES 22 MODULES
   const navigationGroups: NavigationGroup[] = [
     {
       label: "Dashboard",
@@ -106,7 +116,42 @@ export function AppSidebar() {
           url: routes.b2c.heatmap(),
           icon: BarChart3,
           gradient: "from-orange-500 to-red-500",
-          description: "Courbes d’humeur et heatmap quotidienne"
+          description: "Courbes d'humeur et heatmap quotidienne"
+        },
+        {
+          title: "Barres Hebdomadaires",
+          url: routes.b2c.weeklyBars(),
+          icon: Activity,
+          gradient: "from-teal-500 to-blue-500",
+          description: "Visualisation de votre activité hebdomadaire"
+        }
+      ]
+    },
+    {
+      label: "Respiration & Méditation",
+      icon: Wind,
+      items: [
+        {
+          title: "Exercices de Respiration",
+          url: routes.b2c.breath(),
+          icon: Wind,
+          gradient: "from-sky-500 to-blue-500",
+          description: "Techniques de respiration thérapeutique"
+        },
+        {
+          title: "Méditation Guidée",
+          url: routes.b2c.meditation(),
+          icon: Cloud,
+          gradient: "from-purple-400 to-indigo-500",
+          description: "Sessions de méditation et pleine conscience"
+        },
+        {
+          title: "Respiration VR",
+          url: routes.b2c.vrBreath(),
+          icon: Waves,
+          badge: "VR",
+          gradient: "from-cyan-500 to-blue-600",
+          description: "Respiration immersive en réalité virtuelle"
         }
       ]
     },
@@ -130,12 +175,35 @@ export function AppSidebar() {
           description: "Expériences immersives de relaxation"
         },
         {
+          title: "Galaxie VR",
+          url: routes.b2c.vrGalaxy(),
+          icon: Globe,
+          badge: "Nouveau",
+          gradient: "from-indigo-500 to-purple-600",
+          description: "Exploration de la galaxie en VR"
+        },
+        {
           title: "Flash Glow",
           url: routes.b2c.flashGlow(),
           icon: Zap,
-          badge: "Nouveau",
+          badge: "Express",
           gradient: "from-yellow-500 to-orange-500",
           description: "Boost instantané de bien-être"
+        },
+        {
+          title: "Screen Silk",
+          url: routes.b2c.screenSilk(),
+          icon: Palette,
+          gradient: "from-pink-400 to-rose-500",
+          description: "Pause écran apaisante et créative"
+        },
+        {
+          title: "Filtres AR",
+          url: routes.b2c.arFilters(),
+          icon: Camera,
+          badge: "Beta",
+          gradient: "from-fuchsia-500 to-pink-500",
+          description: "Filtres de réalité augmentée émotionnels"
         }
       ]
     },
@@ -157,32 +225,78 @@ export function AppSidebar() {
           icon: BookOpen,
           gradient: "from-slate-500 to-gray-500",
           description: "Réflexions et suivi personnel"
+        },
+        {
+          title: "Journal Enrichi",
+          url: routes.b2c.journalNew(),
+          icon: FileText,
+          badge: "Nouveau",
+          gradient: "from-emerald-500 to-teal-500",
+          description: "Nouvelle interface journal améliorée"
+        },
+        {
+          title: "Nyvee Cocon",
+          url: routes.b2c.nyvee(),
+          icon: Heart,
+          gradient: "from-rose-500 to-pink-500",
+          description: "Votre cocon émotionnel personnel"
+        },
+        {
+          title: "Story Synth",
+          url: routes.b2c.storySynth(),
+          icon: BookOpen,
+          gradient: "from-violet-500 to-purple-500",
+          description: "Synthèse narrative de vos émotions"
         }
       ]
     },
     {
-      label: "Gamification",
+      label: "Gamification & Défis",
       icon: Gamepad2,
       items: [
-        {
-          title: "Espace Gamification",
-          url: routes.b2c.bossLevel(),
-          icon: Star,
-          badge: "XP",
-          gradient: "from-amber-500 to-yellow-500",
-          description: "Défis et récompenses"
-        },
         {
           title: "Boss Grit",
           url: routes.b2c.bossLevel(),
           icon: Shield,
+          gradient: "from-red-500 to-orange-500",
           description: "Défiez-vous avec nos boss levels"
+        },
+        {
+          title: "Ambition Arcade",
+          url: routes.b2c.ambitionArcade(),
+          icon: Target,
+          badge: "Nouveau",
+          gradient: "from-amber-500 to-yellow-500",
+          description: "Jeu d'objectifs gamifié"
+        },
+        {
+          title: "Bubble Beat",
+          url: routes.b2c.bubbleBeat(),
+          icon: Gamepad2,
+          gradient: "from-blue-400 to-cyan-500",
+          description: "Jeu rythmique anti-stress"
+        },
+        {
+          title: "Bounce Back",
+          url: routes.b2c.bounceBack(),
+          icon: Smile,
+          gradient: "from-green-400 to-emerald-500",
+          description: "Rebondissez face aux défis"
         },
         {
           title: "Mood Mixer",
           url: routes.b2c.moodMixer(),
           icon: Headphones,
+          gradient: "from-violet-400 to-purple-500",
           description: "Créez vos ambiances émotionnelles"
+        },
+        {
+          title: "Leaderboard",
+          url: routes.b2c.leaderboard(),
+          icon: Trophy,
+          badge: "Classement",
+          gradient: "from-yellow-500 to-amber-600",
+          description: "Classement et compétitions"
         }
       ]
     },
@@ -196,6 +310,13 @@ export function AppSidebar() {
           icon: Users,
           gradient: "from-teal-500 to-cyan-500",
           description: "Connectez-vous avec la communauté"
+        },
+        {
+          title: "Activité",
+          url: routes.b2c.activity(),
+          icon: Activity,
+          gradient: "from-blue-500 to-indigo-500",
+          description: "Historique et logs d'activités"
         }
       ]
     },
