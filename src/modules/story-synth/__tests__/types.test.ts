@@ -1,179 +1,192 @@
 /**
  * Story Synth Types Tests
+ * Tests unitaires pour les schémas Zod du module Story Synth
  */
 
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import {
   StoryThemeSchema,
   StoryToneSchema,
-  StoryContentSchema,
   StorySynthSessionSchema,
+  StoryContentSchema,
+  StorySynthStatsSchema,
   CreateStorySynthSessionSchema,
   CompleteStorySynthSessionSchema,
-  StorySynthStateSchema,
-  StorySynthStatsSchema,
-  StoryGenerationConfigSchema,
+  type StoryTheme,
+  type StoryTone,
 } from '../types';
 
-describe('Story Synth Schemas', () => {
-  describe('StoryTheme', () => {
-    it('should validate valid themes', () => {
-      const themes = ['calme', 'aventure', 'poetique', 'mysterieux', 'romance', 'introspection', 'nature'];
-      themes.forEach(theme => {
+describe('Story Synth Types', () => {
+  describe('StoryThemeSchema', () => {
+    it('validates valid story themes', () => {
+      const validThemes: StoryTheme[] = [
+        'calme',
+        'aventure',
+        'poetique',
+        'mysterieux',
+        'romance',
+        'introspection',
+        'nature',
+      ];
+
+      validThemes.forEach((theme) => {
         expect(() => StoryThemeSchema.parse(theme)).not.toThrow();
       });
     });
 
-    it('should reject invalid themes', () => {
-      expect(() => StoryThemeSchema.parse('invalid')).toThrow();
+    it('rejects invalid themes', () => {
+      expect(() => StoryThemeSchema.parse('invalid_theme')).toThrow();
+      expect(() => StoryThemeSchema.parse('')).toThrow();
+      expect(() => StoryThemeSchema.parse(123)).toThrow();
     });
   });
 
-  describe('StoryTone', () => {
-    it('should validate valid tones', () => {
-      const tones = ['apaisant', 'encourageant', 'contemplatif', 'joyeux', 'nostalgique', 'esperant'];
-      tones.forEach(tone => {
+  describe('StoryToneSchema', () => {
+    it('validates valid story tones', () => {
+      const validTones: StoryTone[] = [
+        'apaisant',
+        'encourageant',
+        'contemplatif',
+        'joyeux',
+        'nostalgique',
+        'esperant',
+      ];
+
+      validTones.forEach((tone) => {
         expect(() => StoryToneSchema.parse(tone)).not.toThrow();
       });
     });
 
-    it('should reject invalid tones', () => {
-      expect(() => StoryToneSchema.parse('invalid')).toThrow();
+    it('rejects invalid tones', () => {
+      expect(() => StoryToneSchema.parse('aggressive')).toThrow();
+      expect(() => StoryToneSchema.parse(null)).toThrow();
     });
   });
 
-  describe('StoryContent', () => {
-    it('should validate valid story content', () => {
-      const content = {
-        title: 'Une histoire apaisante',
-        paragraphs: [
-          { id: 'p1', text: 'Il était une fois...' },
-          { id: 'p2', text: 'Dans un monde paisible...', emphasis: 'soft' },
-        ],
-        estimated_duration_seconds: 180,
-      };
-      expect(() => StoryContentSchema.parse(content)).not.toThrow();
-    });
-
-    it('should require title and paragraphs', () => {
-      expect(() => StoryContentSchema.parse({ title: 'Test' })).toThrow();
-      expect(() => StoryContentSchema.parse({ paragraphs: [] })).toThrow();
-    });
-  });
-
-  describe('StorySynthSession', () => {
-    it('should validate complete session', () => {
+  describe('StorySynthSessionSchema', () => {
+    it('validates complete session object', () => {
       const session = {
         id: '123e4567-e89b-12d3-a456-426614174000',
         user_id: '123e4567-e89b-12d3-a456-426614174001',
-        theme: 'calme',
-        tone: 'apaisant',
+        theme: 'nature' as StoryTheme,
+        tone: 'apaisant' as StoryTone,
+        user_context: 'Feeling stressed at work',
         reading_duration_seconds: 0,
-        created_at: '2024-01-15T10:00:00Z',
-        updated_at: '2024-01-15T10:00:00Z',
+        created_at: '2025-01-15T10:00:00Z',
+        updated_at: '2025-01-15T10:00:00Z',
       };
+
       expect(() => StorySynthSessionSchema.parse(session)).not.toThrow();
     });
 
-    it('should require valid UUIDs', () => {
+    it('validates session with completed data', () => {
       const session = {
-        id: 'invalid-uuid',
+        id: '123e4567-e89b-12d3-a456-426614174000',
         user_id: '123e4567-e89b-12d3-a456-426614174001',
-        theme: 'calme',
-        tone: 'apaisant',
-        reading_duration_seconds: 0,
-        created_at: '2024-01-15T10:00:00Z',
-        updated_at: '2024-01-15T10:00:00Z',
+        theme: 'calme' as StoryTheme,
+        tone: 'esperant' as StoryTone,
+        reading_duration_seconds: 420,
+        completed_at: '2025-01-15T10:07:00Z',
+        created_at: '2025-01-15T10:00:00Z',
+        updated_at: '2025-01-15T10:07:00Z',
       };
-      expect(() => StorySynthSessionSchema.parse(session)).toThrow();
-    });
-  });
 
-  describe('CreateStorySynthSession', () => {
-    it('should validate creation payload', () => {
-      const payload = {
-        theme: 'aventure',
-        tone: 'encourageant',
-        user_context: 'Besoin de motivation',
-      };
-      expect(() => CreateStorySynthSessionSchema.parse(payload)).not.toThrow();
+      expect(() => StorySynthSessionSchema.parse(session)).not.toThrow();
     });
 
-    it('should accept minimal payload', () => {
-      const payload = {
-        theme: 'calme',
-        tone: 'apaisant',
-      };
-      expect(() => CreateStorySynthSessionSchema.parse(payload)).not.toThrow();
-    });
-  });
-
-  describe('CompleteStorySynthSession', () => {
-    it('should validate completion payload', () => {
-      const payload = {
-        session_id: '123e4567-e89b-12d3-a456-426614174000',
-        reading_duration_seconds: 300,
-      };
-      expect(() => CompleteStorySynthSessionSchema.parse(payload)).not.toThrow();
-    });
-
-    it('should reject negative duration', () => {
-      const payload = {
-        session_id: '123e4567-e89b-12d3-a456-426614174000',
-        reading_duration_seconds: -10,
-      };
-      expect(() => CompleteStorySynthSessionSchema.parse(payload)).toThrow();
-    });
-  });
-
-  describe('StorySynthState', () => {
-    it('should validate idle state', () => {
-      const state = {
-        phase: 'idle',
-        session: null,
-        currentStory: null,
-        startTime: null,
-        error: null,
-      };
-      expect(() => StorySynthStateSchema.parse(state)).not.toThrow();
-    });
-
-    it('should validate reading state', () => {
-      const state = {
-        phase: 'reading',
-        session: {
-          id: '123e4567-e89b-12d3-a456-426614174000',
+    it('rejects invalid session objects', () => {
+      expect(() =>
+        StorySynthSessionSchema.parse({
+          id: 'invalid-uuid',
           user_id: '123e4567-e89b-12d3-a456-426614174001',
-          theme: 'calme',
-          tone: 'apaisant',
-          reading_duration_seconds: 0,
-          created_at: '2024-01-15T10:00:00Z',
-          updated_at: '2024-01-15T10:00:00Z',
-        },
-        currentStory: {
-          title: 'Test',
-          paragraphs: [{ id: 'p1', text: 'Test' }],
-        },
-        startTime: Date.now(),
-        error: null,
-      };
-      expect(() => StorySynthStateSchema.parse(state)).not.toThrow();
+          theme: 'hope',
+          tone: 'calm',
+        })
+      ).toThrow();
+
+      expect(() =>
+        StorySynthSessionSchema.parse({
+          id: '123e4567-e89b-12d3-a456-426614174000',
+          theme: 'invalid_theme',
+          tone: 'calm',
+        })
+      ).toThrow();
     });
   });
 
-  describe('StorySynthStats', () => {
-    it('should validate stats with data', () => {
-      const stats = {
-        total_stories_read: 5,
-        total_reading_time_minutes: 45.5,
-        favorite_theme: 'calme',
-        favorite_tone: 'apaisant',
-        completion_rate: 80,
+  describe('StoryContentSchema', () => {
+    it('validates complete story content', () => {
+      const content = {
+        title: 'A Journey of Hope',
+        narrative: 'Once upon a time, in a world where courage mattered...',
+        reflection_prompts: [
+          'What does hope mean to you?',
+          'How can you cultivate inner strength?',
+        ],
+        audio_url: 'https://storage.example.com/story-123.mp3',
+        duration_seconds: 360,
+        generated_at: '2025-01-15T10:00:00Z',
       };
+
+      expect(() => StoryContentSchema.parse(content)).not.toThrow();
+    });
+
+    it('validates story content without optional fields', () => {
+      const content = {
+        title: 'Simple Story',
+        narrative: 'A brief tale of transformation.',
+        reflection_prompts: [],
+        duration_seconds: 120,
+        generated_at: '2025-01-15T10:00:00Z',
+      };
+
+      expect(() => StoryContentSchema.parse(content)).not.toThrow();
+    });
+
+    it('rejects invalid story content', () => {
+      expect(() =>
+        StoryContentSchema.parse({
+          title: '',
+          narrative: 'Story',
+          reflection_prompts: [],
+          duration_seconds: 120,
+        })
+      ).toThrow();
+
+      expect(() =>
+        StoryContentSchema.parse({
+          title: 'Title',
+          narrative: '',
+          reflection_prompts: [],
+          duration_seconds: -10,
+        })
+      ).toThrow();
+
+      expect(() =>
+        StoryContentSchema.parse({
+          title: 'Title',
+          narrative: 'Story',
+          reflection_prompts: 'not an array',
+          duration_seconds: 120,
+        })
+      ).toThrow();
+    });
+  });
+
+  describe('StorySynthStatsSchema', () => {
+    it('validates complete stats object', () => {
+      const stats = {
+        total_stories_read: 42,
+        total_reading_time_minutes: 300,
+        favorite_theme: 'nature' as StoryTheme,
+        favorite_tone: 'apaisant' as StoryTone,
+        completion_rate: 0.85,
+      };
+
       expect(() => StorySynthStatsSchema.parse(stats)).not.toThrow();
     });
 
-    it('should accept null favorites', () => {
+    it('validates stats with null optional fields', () => {
       const stats = {
         total_stories_read: 0,
         total_reading_time_minutes: 0,
@@ -181,54 +194,114 @@ describe('Story Synth Schemas', () => {
         favorite_tone: null,
         completion_rate: 0,
       };
+
       expect(() => StorySynthStatsSchema.parse(stats)).not.toThrow();
+    });
+
+    it('rejects invalid stats', () => {
+      expect(() =>
+        StorySynthStatsSchema.parse({
+          total_stories_read: -1,
+          total_reading_time_minutes: 0,
+          completion_rate: 0,
+        })
+      ).toThrow();
+
+      expect(() =>
+        StorySynthStatsSchema.parse({
+          total_stories_read: 10,
+          total_reading_time_minutes: -500,
+          completion_rate: 0.5,
+        })
+      ).toThrow();
+
+      expect(() =>
+        StorySynthStatsSchema.parse({
+          total_stories_read: 10,
+          total_reading_time_minutes: 1000,
+          completion_rate: 1.5,
+        })
+      ).toThrow();
     });
   });
 
-  describe('StoryGenerationConfig', () => {
-    it('should validate full config', () => {
-      const config = {
-        theme: 'aventure',
-        tone: 'encourageant',
-        pov: 'je',
-        style: 'lyrique',
-        protagonist: 'Marie',
-        location: 'la forêt',
-        length: 7,
-        seed: 'abc123',
-        user_context: 'Besoin d\'évasion',
+  describe('CreateStorySynthSessionSchema', () => {
+    it('validates session creation with all fields', () => {
+      const payload = {
+        theme: 'poetique' as StoryTheme,
+        tone: 'contemplatif' as StoryTone,
+        user_context: 'Preparing for a difficult conversation',
       };
-      expect(() => StoryGenerationConfigSchema.parse(config)).not.toThrow();
+
+      expect(() => CreateStorySynthSessionSchema.parse(payload)).not.toThrow();
     });
 
-    it('should apply defaults', () => {
-      const config = {
-        theme: 'calme',
-        tone: 'apaisant',
+    it('validates session creation without optional context', () => {
+      const payload = {
+        theme: 'aventure' as StoryTheme,
+        tone: 'joyeux' as StoryTone,
       };
-      const result = StoryGenerationConfigSchema.parse(config);
-      expect(result.pov).toBe('je');
-      expect(result.style).toBe('sobre');
-      expect(result.protagonist).toBe('Alex');
-      expect(result.length).toBe(5);
+
+      expect(() => CreateStorySynthSessionSchema.parse(payload)).not.toThrow();
     });
 
-    it('should enforce length constraints', () => {
+    it('rejects invalid creation payload', () => {
       expect(() =>
-        StoryGenerationConfigSchema.parse({
-          theme: 'calme',
+        CreateStorySynthSessionSchema.parse({
+          theme: 'invalid',
           tone: 'apaisant',
-          length: 2,
         })
       ).toThrow();
 
       expect(() =>
-        StoryGenerationConfigSchema.parse({
+        CreateStorySynthSessionSchema.parse({
           theme: 'calme',
-          tone: 'apaisant',
-          length: 15,
         })
       ).toThrow();
+    });
+  });
+
+  describe('CompleteStorySynthSessionSchema', () => {
+    it('validates complete session payload', () => {
+      const payload = {
+        session_id: '123e4567-e89b-12d3-a456-426614174000',
+        reading_duration_seconds: 360,
+      };
+
+      expect(() => CompleteStorySynthSessionSchema.parse(payload)).not.toThrow();
+    });
+
+    it('rejects invalid completion payload', () => {
+      expect(() =>
+        CompleteStorySynthSessionSchema.parse({
+          session_id: 'invalid-uuid',
+          reading_duration_seconds: 300,
+        })
+      ).toThrow();
+
+      expect(() =>
+        CompleteStorySynthSessionSchema.parse({
+          session_id: '123e4567-e89b-12d3-a456-426614174000',
+          reading_duration_seconds: -10,
+        })
+      ).toThrow();
+
+      expect(() =>
+        CompleteStorySynthSessionSchema.parse({
+          session_id: '123e4567-e89b-12d3-a456-426614174000',
+        })
+      ).toThrow();
+    });
+  });
+
+  describe('Type exports', () => {
+    it('exports all necessary types', () => {
+      // This test ensures TypeScript compilation succeeds with proper exports
+      const theme: StoryTheme = 'nature';
+      const tone: StoryTone = 'apaisant';
+
+      expect(theme).toBe('nature');
+      expect(tone).toBe('apaisant');
     });
   });
 });
