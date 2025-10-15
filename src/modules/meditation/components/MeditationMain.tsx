@@ -12,7 +12,10 @@ import { useMeditation } from '../useMeditation';
 import { MeditationTimer } from '../ui/MeditationTimer';
 import { TechniqueSelector } from '../ui/TechniqueSelector';
 import { MeditationProgress } from '../ui/MeditationProgress';
+import { MeditationStats } from '../ui/MeditationStats';
+import { MeditationHistory } from '../ui/MeditationHistory';
 import type { MeditationConfig, MeditationTechnique } from '../types';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export function MeditationMain() {
   const [selectedTechnique, setSelectedTechnique] = useState<MeditationTechnique>('mindfulness');
@@ -40,7 +43,7 @@ export function MeditationMain() {
   const isIdle = meditation.state === 'idle';
 
   return (
-    <div className="container max-w-4xl mx-auto py-8 space-y-6">
+    <div className="container max-w-6xl mx-auto py-8 space-y-6">
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -48,47 +51,119 @@ export function MeditationMain() {
             Méditation
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-6">
-          {isIdle && (
-            <>
-              <TechniqueSelector
-                selected={selectedTechnique}
-                onSelect={setSelectedTechnique}
-              />
-              
-              <div>
-                <label className="text-sm font-medium mb-3 block">
-                  Durée : {selectedDuration} minutes
-                </label>
-                <Slider
-                  value={[selectedDuration]}
-                  onValueChange={([value]) => setSelectedDuration(value)}
-                  min={5}
-                  max={30}
-                  step={5}
-                />
-              </div>
+        <CardContent>
+          <Tabs defaultValue="session" className="w-full">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="session">Session</TabsTrigger>
+              <TabsTrigger value="stats">Statistiques</TabsTrigger>
+              <TabsTrigger value="history">Historique</TabsTrigger>
+            </TabsList>
 
-              <Button onClick={handleStart} size="lg" className="w-full">
-                <Play className="h-5 w-5 mr-2" />
-                Démarrer
-              </Button>
-            </>
-          )}
+            <TabsContent value="session" className="space-y-6 mt-6">
+              {isIdle && (
+                <>
+                  <TechniqueSelector
+                    selected={selectedTechnique}
+                    onSelect={setSelectedTechnique}
+                  />
+                  
+                  <div>
+                    <label className="text-sm font-medium mb-3 block">
+                      Durée : {selectedDuration} minutes
+                    </label>
+                    <Slider
+                      value={[selectedDuration]}
+                      onValueChange={([value]) => setSelectedDuration(value)}
+                      min={5}
+                      max={30}
+                      step={5}
+                    />
+                  </div>
 
-          {meditation.state === 'active' && (
-            <>
-              <MeditationTimer
-                elapsedSeconds={meditation.elapsedSeconds}
-                totalSeconds={meditation.config?.duration ? meditation.config.duration * 60 : 0}
+                  <Button onClick={handleStart} size="lg" className="w-full">
+                    <Play className="h-5 w-5 mr-2" />
+                    Démarrer
+                  </Button>
+                </>
+              )}
+
+              {meditation.state === 'active' && (
+                <>
+                  <MeditationTimer
+                    elapsedSeconds={meditation.elapsedSeconds}
+                    totalSeconds={meditation.config?.duration ? meditation.config.duration * 60 : 0}
+                  />
+                  <MeditationProgress progress={meditation.progress} />
+                  <div className="flex gap-3">
+                    <Button 
+                      onClick={() => meditation.pauseSession()} 
+                      variant="outline"
+                      className="flex-1"
+                    >
+                      <Pause className="h-4 w-4 mr-2" />
+                      Pause
+                    </Button>
+                    <Button 
+                      onClick={() => meditation.completeSession()} 
+                      className="flex-1"
+                    >
+                      <Square className="h-4 w-4 mr-2" />
+                      Terminer
+                    </Button>
+                  </div>
+                </>
+              )}
+
+              {meditation.state === 'paused' && (
+                <>
+                  <MeditationTimer
+                    elapsedSeconds={meditation.elapsedSeconds}
+                    totalSeconds={meditation.config?.duration ? meditation.config.duration * 60 : 0}
+                  />
+                  <MeditationProgress progress={meditation.progress} />
+                  <div className="flex gap-3">
+                    <Button 
+                      onClick={() => meditation.resumeSession()} 
+                      className="flex-1"
+                    >
+                      <Play className="h-4 w-4 mr-2" />
+                      Reprendre
+                    </Button>
+                    <Button 
+                      onClick={() => meditation.cancelSession()} 
+                      variant="destructive"
+                      className="flex-1"
+                    >
+                      Annuler
+                    </Button>
+                  </div>
+                </>
+              )}
+            </TabsContent>
+
+            <TabsContent value="stats" className="mt-6">
+              <MeditationStats 
+                stats={meditation.stats || {
+                  totalSessions: 0,
+                  totalDuration: 0,
+                  averageDuration: 0,
+                  favoriteTechnique: null,
+                  completionRate: 0,
+                  currentStreak: 0,
+                  longestStreak: 0,
+                  avgMoodDelta: null,
+                }}
+                isLoading={meditation.statsLoading}
               />
-              <MeditationProgress progress={meditation.progress} />
-              <Button onClick={() => meditation.completeSession()} className="w-full">
-                <Square className="h-4 w-4 mr-2" />
-                Terminer
-              </Button>
-            </>
-          )}
+            </TabsContent>
+
+            <TabsContent value="history" className="mt-6">
+              <MeditationHistory 
+                sessions={meditation.recentSessions || []}
+                isLoading={meditation.sessionsLoading}
+              />
+            </TabsContent>
+          </Tabs>
         </CardContent>
       </Card>
     </div>
