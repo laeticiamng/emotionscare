@@ -18,7 +18,7 @@ export const useStorySynth = (userId: string) => {
   });
 
   const createSession = useMutation({
-    mutationFn: ({ theme, tone }: { theme: 'healing' | 'growth' | 'resilience' | 'acceptance' | 'hope'; tone: 'gentle' | 'empowering' | 'reflective' | 'uplifting' }) =>
+    mutationFn: ({ theme, tone }: { theme: 'calme' | 'aventure' | 'poetique' | 'mysterieux' | 'romance' | 'introspection' | 'nature'; tone: 'apaisant' | 'encourageant' | 'contemplatif' | 'joyeux' | 'nostalgique' | 'esperant' }) =>
       storySynthService.createSession({ theme, tone }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['story-synth-history', userId] });
@@ -40,8 +40,8 @@ export const useStorySynth = (userId: string) => {
       style: string;
       metadata: any;
     }) => {
-      // Legacy functionality - create a session with healing theme
-      const session = await storySynthService.createSession({ theme: 'healing', tone: 'gentle' });
+      // Legacy functionality - create a session with calme theme
+      const session = await storySynthService.createSession({ theme: 'calme', tone: 'apaisant' });
       return session;
     },
     onSuccess: () => {

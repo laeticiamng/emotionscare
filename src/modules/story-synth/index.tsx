@@ -2,9 +2,10 @@
  * Story Synth Module - Narration thérapeutique immersive
  */
 
-export { useStorySynthMachine } from './useStorySynthMachine';
-export * as storySynthService from './storySynthService';
 export * from './types';
+export * as storySynthService from './storySynthService';
+export { useStorySynthMachine } from './useStorySynthMachine';
+export type { StorySynthState, StorySynthPhase } from './types';
 
 import { lazyDefault } from '@/lib/lazyDefault';
 

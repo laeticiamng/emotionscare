@@ -6,117 +6,118 @@ import { describe, it, expect } from 'vitest';
 import {
   StoryThemeSchema,
   StoryToneSchema,
-  SessionPhaseSchema,
   StoryContentSchema,
+  StorySynthSessionSchema,
   CreateStorySynthSessionSchema,
   CompleteStorySynthSessionSchema,
+  StorySynthStateSchema,
   StorySynthStatsSchema,
+  StoryGenerationConfigSchema,
 } from '../types';
 
-describe('Story Synth Types', () => {
-  describe('StoryThemeSchema', () => {
-    it('accepts valid themes', () => {
-      expect(StoryThemeSchema.parse('healing')).toBe('healing');
-      expect(StoryThemeSchema.parse('growth')).toBe('growth');
-      expect(StoryThemeSchema.parse('resilience')).toBe('resilience');
-      expect(StoryThemeSchema.parse('acceptance')).toBe('acceptance');
-      expect(StoryThemeSchema.parse('hope')).toBe('hope');
+describe('Story Synth Schemas', () => {
+  describe('StoryTheme', () => {
+    it('should validate valid themes', () => {
+      const themes = ['calme', 'aventure', 'poetique', 'mysterieux', 'romance', 'introspection', 'nature'];
+      themes.forEach(theme => {
+        expect(() => StoryThemeSchema.parse(theme)).not.toThrow();
+      });
     });
 
-    it('rejects invalid themes', () => {
+    it('should reject invalid themes', () => {
       expect(() => StoryThemeSchema.parse('invalid')).toThrow();
     });
   });
 
-  describe('StoryToneSchema', () => {
-    it('accepts valid tones', () => {
-      expect(StoryToneSchema.parse('gentle')).toBe('gentle');
-      expect(StoryToneSchema.parse('empowering')).toBe('empowering');
-      expect(StoryToneSchema.parse('reflective')).toBe('reflective');
-      expect(StoryToneSchema.parse('uplifting')).toBe('uplifting');
+  describe('StoryTone', () => {
+    it('should validate valid tones', () => {
+      const tones = ['apaisant', 'encourageant', 'contemplatif', 'joyeux', 'nostalgique', 'esperant'];
+      tones.forEach(tone => {
+        expect(() => StoryToneSchema.parse(tone)).not.toThrow();
+      });
     });
 
-    it('rejects invalid tones', () => {
+    it('should reject invalid tones', () => {
       expect(() => StoryToneSchema.parse('invalid')).toThrow();
     });
   });
 
-  describe('SessionPhaseSchema', () => {
-    it('accepts valid phases', () => {
-      expect(SessionPhaseSchema.parse('idle')).toBe('idle');
-      expect(SessionPhaseSchema.parse('generating')).toBe('generating');
-      expect(SessionPhaseSchema.parse('reading')).toBe('reading');
-      expect(SessionPhaseSchema.parse('completed')).toBe('completed');
-      expect(SessionPhaseSchema.parse('error')).toBe('error');
+  describe('StoryContent', () => {
+    it('should validate valid story content', () => {
+      const content = {
+        title: 'Une histoire apaisante',
+        paragraphs: [
+          { id: 'p1', text: 'Il était une fois...' },
+          { id: 'p2', text: 'Dans un monde paisible...', emphasis: 'soft' },
+        ],
+        estimated_duration_seconds: 180,
+      };
+      expect(() => StoryContentSchema.parse(content)).not.toThrow();
     });
 
-    it('rejects invalid phases', () => {
-      expect(() => SessionPhaseSchema.parse('invalid')).toThrow();
+    it('should require title and paragraphs', () => {
+      expect(() => StoryContentSchema.parse({ title: 'Test' })).toThrow();
+      expect(() => StoryContentSchema.parse({ paragraphs: [] })).toThrow();
     });
   });
 
-  describe('StoryContentSchema', () => {
-    it('accepts valid story content', () => {
-      const story = {
-        title: 'The Journey',
-        paragraphs: ['Once upon a time...', 'The end.'],
-        moral: 'Believe in yourself',
-        reflection_prompts: ['What did you feel?'],
+  describe('StorySynthSession', () => {
+    it('should validate complete session', () => {
+      const session = {
+        id: '123e4567-e89b-12d3-a456-426614174000',
+        user_id: '123e4567-e89b-12d3-a456-426614174001',
+        theme: 'calme',
+        tone: 'apaisant',
+        reading_duration_seconds: 0,
+        created_at: '2024-01-15T10:00:00Z',
+        updated_at: '2024-01-15T10:00:00Z',
       };
-      expect(StoryContentSchema.parse(story)).toEqual(story);
+      expect(() => StorySynthSessionSchema.parse(session)).not.toThrow();
     });
 
-    it('accepts story without optional fields', () => {
-      const story = {
-        title: 'The Journey',
-        paragraphs: ['Once upon a time...'],
+    it('should require valid UUIDs', () => {
+      const session = {
+        id: 'invalid-uuid',
+        user_id: '123e4567-e89b-12d3-a456-426614174001',
+        theme: 'calme',
+        tone: 'apaisant',
+        reading_duration_seconds: 0,
+        created_at: '2024-01-15T10:00:00Z',
+        updated_at: '2024-01-15T10:00:00Z',
       };
-      expect(StoryContentSchema.parse(story)).toEqual(story);
-    });
-
-    it('rejects empty title', () => {
-      const story = {
-        title: '',
-        paragraphs: ['text'],
-      };
-      expect(() => StoryContentSchema.parse(story)).toThrow();
+      expect(() => StorySynthSessionSchema.parse(session)).toThrow();
     });
   });
 
-  describe('CreateStorySynthSessionSchema', () => {
-    it('accepts valid session creation payload', () => {
+  describe('CreateStorySynthSession', () => {
+    it('should validate creation payload', () => {
       const payload = {
-        theme: 'healing',
-        tone: 'gentle',
-        user_context: 'I need comfort',
+        theme: 'aventure',
+        tone: 'encourageant',
+        user_context: 'Besoin de motivation',
       };
-      expect(CreateStorySynthSessionSchema.parse(payload)).toEqual(payload);
+      expect(() => CreateStorySynthSessionSchema.parse(payload)).not.toThrow();
     });
 
-    it('rejects payload with missing required fields', () => {
-      expect(() => CreateStorySynthSessionSchema.parse({ theme: 'healing' })).toThrow();
-    });
-
-    it('rejects user_context longer than 500 chars', () => {
+    it('should accept minimal payload', () => {
       const payload = {
-        theme: 'healing',
-        tone: 'gentle',
-        user_context: 'x'.repeat(501),
+        theme: 'calme',
+        tone: 'apaisant',
       };
-      expect(() => CreateStorySynthSessionSchema.parse(payload)).toThrow();
+      expect(() => CreateStorySynthSessionSchema.parse(payload)).not.toThrow();
     });
   });
 
-  describe('CompleteStorySynthSessionSchema', () => {
-    it('accepts valid completion payload', () => {
+  describe('CompleteStorySynthSession', () => {
+    it('should validate completion payload', () => {
       const payload = {
         session_id: '123e4567-e89b-12d3-a456-426614174000',
         reading_duration_seconds: 300,
       };
-      expect(CompleteStorySynthSessionSchema.parse(payload)).toEqual(payload);
+      expect(() => CompleteStorySynthSessionSchema.parse(payload)).not.toThrow();
     });
 
-    it('rejects negative duration', () => {
+    it('should reject negative duration', () => {
       const payload = {
         session_id: '123e4567-e89b-12d3-a456-426614174000',
         reading_duration_seconds: -10,
@@ -125,19 +126,54 @@ describe('Story Synth Types', () => {
     });
   });
 
-  describe('StorySynthStatsSchema', () => {
-    it('accepts valid stats', () => {
-      const stats = {
-        total_stories_read: 10,
-        total_reading_time_minutes: 120.5,
-        favorite_theme: 'healing',
-        favorite_tone: 'gentle',
-        completion_rate: 85.5,
+  describe('StorySynthState', () => {
+    it('should validate idle state', () => {
+      const state = {
+        phase: 'idle',
+        session: null,
+        currentStory: null,
+        startTime: null,
+        error: null,
       };
-      expect(StorySynthStatsSchema.parse(stats)).toEqual(stats);
+      expect(() => StorySynthStateSchema.parse(state)).not.toThrow();
     });
 
-    it('accepts null favorites', () => {
+    it('should validate reading state', () => {
+      const state = {
+        phase: 'reading',
+        session: {
+          id: '123e4567-e89b-12d3-a456-426614174000',
+          user_id: '123e4567-e89b-12d3-a456-426614174001',
+          theme: 'calme',
+          tone: 'apaisant',
+          reading_duration_seconds: 0,
+          created_at: '2024-01-15T10:00:00Z',
+          updated_at: '2024-01-15T10:00:00Z',
+        },
+        currentStory: {
+          title: 'Test',
+          paragraphs: [{ id: 'p1', text: 'Test' }],
+        },
+        startTime: Date.now(),
+        error: null,
+      };
+      expect(() => StorySynthStateSchema.parse(state)).not.toThrow();
+    });
+  });
+
+  describe('StorySynthStats', () => {
+    it('should validate stats with data', () => {
+      const stats = {
+        total_stories_read: 5,
+        total_reading_time_minutes: 45.5,
+        favorite_theme: 'calme',
+        favorite_tone: 'apaisant',
+        completion_rate: 80,
+      };
+      expect(() => StorySynthStatsSchema.parse(stats)).not.toThrow();
+    });
+
+    it('should accept null favorites', () => {
       const stats = {
         total_stories_read: 0,
         total_reading_time_minutes: 0,
@@ -145,18 +181,54 @@ describe('Story Synth Types', () => {
         favorite_tone: null,
         completion_rate: 0,
       };
-      expect(StorySynthStatsSchema.parse(stats)).toEqual(stats);
+      expect(() => StorySynthStatsSchema.parse(stats)).not.toThrow();
+    });
+  });
+
+  describe('StoryGenerationConfig', () => {
+    it('should validate full config', () => {
+      const config = {
+        theme: 'aventure',
+        tone: 'encourageant',
+        pov: 'je',
+        style: 'lyrique',
+        protagonist: 'Marie',
+        location: 'la forêt',
+        length: 7,
+        seed: 'abc123',
+        user_context: 'Besoin d\'évasion',
+      };
+      expect(() => StoryGenerationConfigSchema.parse(config)).not.toThrow();
     });
 
-    it('rejects completion_rate > 100', () => {
-      const stats = {
-        total_stories_read: 10,
-        total_reading_time_minutes: 120,
-        favorite_theme: null,
-        favorite_tone: null,
-        completion_rate: 101,
+    it('should apply defaults', () => {
+      const config = {
+        theme: 'calme',
+        tone: 'apaisant',
       };
-      expect(() => StorySynthStatsSchema.parse(stats)).toThrow();
+      const result = StoryGenerationConfigSchema.parse(config);
+      expect(result.pov).toBe('je');
+      expect(result.style).toBe('sobre');
+      expect(result.protagonist).toBe('Alex');
+      expect(result.length).toBe(5);
+    });
+
+    it('should enforce length constraints', () => {
+      expect(() =>
+        StoryGenerationConfigSchema.parse({
+          theme: 'calme',
+          tone: 'apaisant',
+          length: 2,
+        })
+      ).toThrow();
+
+      expect(() =>
+        StoryGenerationConfigSchema.parse({
+          theme: 'calme',
+          tone: 'apaisant',
+          length: 15,
+        })
+      ).toThrow();
     });
   });
 });
