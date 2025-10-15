@@ -12,7 +12,7 @@ interface BubbleBeatMainProps {
  */
 export const BubbleBeatMain: React.FC<BubbleBeatMainProps> = ({ className = '' }) => {
   const { user } = useAuth();
-  const { createSession, updateScore, completeSession, bestScore } = useBubbleBeat(user?.id || '');
+  const { createSession, completeSession, bestScore } = useBubbleBeat(user?.id || '');
   const [score, setScore] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [sessionId, setSessionId] = useState<string | null>(null);
@@ -26,8 +26,8 @@ export const BubbleBeatMain: React.FC<BubbleBeatMainProps> = ({ className = '' }
     setStartTime(Date.now());
     
     if (user?.id) {
-      createSession({ difficulty: 'normal' }, {
-        onSuccess: (session) => {
+      createSession({ difficulty: 'medium', mood: 'calm' }, {
+        onSuccess: (session: any) => {
           setSessionId(session.id);
         }
       });
@@ -50,7 +50,7 @@ export const BubbleBeatMain: React.FC<BubbleBeatMainProps> = ({ className = '' }
     
     if (sessionId && startTime) {
       const duration = Math.floor((Date.now() - startTime) / 1000);
-      completeSession({ sessionId, duration });
+      completeSession({ sessionId, score, bubblesPopped, duration });
     }
   };
 

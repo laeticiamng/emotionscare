@@ -15,7 +15,7 @@ import { CommunityService } from '@/modules/community/communityService';
 import { nyveeService } from '@/modules/nyvee/nyveeService';
 import { StorySynthService } from '@/modules/story-synth/storySynthService';
 import { MoodMixerService } from '@/modules/mood-mixer/moodMixerService';
-import { BubbleBeatService } from '@/modules/bubble-beat/bubbleBeatService';
+import * as bubbleBeatService from '@/modules/bubble-beat/bubbleBeatService';
 import { ARFiltersService } from '@/modules/ar-filters/arFiltersService';
 import { ScreenSilkService } from '@/modules/screen-silk/screenSilkService';
 
