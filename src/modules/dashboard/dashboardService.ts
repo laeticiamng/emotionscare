@@ -13,7 +13,7 @@ import { VRGalaxyService } from '@/modules/vr-galaxy/vrGalaxyService';
 import { BossGritService } from '@/modules/boss-grit/bossGritService';
 import { CommunityService } from '@/modules/community/communityService';
 import { nyveeService } from '@/modules/nyvee/nyveeService';
-import { StorySynthService } from '@/modules/story-synth/storySynthService';
+import * as storySynthService from '@/modules/story-synth/storySynthService';
 import { MoodMixerService } from '@/modules/mood-mixer/moodMixerService';
 import * as bubbleBeatService from '@/modules/bubble-beat/bubbleBeatService';
 import { ARFiltersService } from '@/modules/ar-filters/arFiltersService';

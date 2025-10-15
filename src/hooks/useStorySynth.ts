@@ -1,9 +1,10 @@
 /**
  * Hook React Query pour Story Synth
+ * @deprecated Use useStorySynthMachine instead
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { StorySynthService } from '@/modules/story-synth/storySynthService';
+import * as storySynthService from '@/modules/story-synth/storySynthService';
 import { useToast } from '@/hooks/use-toast';
 
 export const useStorySynth = (userId: string) => {
@@ -12,13 +13,13 @@ export const useStorySynth = (userId: string) => {
 
   const { data: history, isLoading } = useQuery({
     queryKey: ['story-synth-history', userId],
-    queryFn: () => StorySynthService.fetchHistory(userId),
+    queryFn: () => storySynthService.getRecentSessions(20),
     enabled: !!userId
   });
 
   const createSession = useMutation({
-    mutationFn: ({ theme }: { theme?: string }) =>
-      StorySynthService.createSession(userId, theme),
+    mutationFn: ({ theme, tone }: { theme: 'healing' | 'growth' | 'resilience' | 'acceptance' | 'hope'; tone: 'gentle' | 'empowering' | 'reflective' | 'uplifting' }) =>
+      storySynthService.createSession({ theme, tone }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['story-synth-history', userId] });
       toast({ title: 'Nouvelle histoire commencée' });
@@ -39,15 +40,8 @@ export const useStorySynth = (userId: string) => {
       style: string;
       metadata: any;
     }) => {
-      // Créer une session et la compléter immédiatement avec l'histoire
-      const session = await StorySynthService.createSession(userId, genre);
-      await StorySynthService.recordChoice(session.id, {
-        title,
-        content,
-        style,
-        ...metadata
-      });
-      await StorySynthService.completeSession(session.id, 0);
+      // Legacy functionality - create a session with healing theme
+      const session = await storySynthService.createSession({ theme: 'healing', tone: 'gentle' });
       return session;
     },
     onSuccess: () => {
@@ -63,17 +57,9 @@ export const useStorySynth = (userId: string) => {
     }
   });
 
-  const recordChoice = useMutation({
-    mutationFn: ({ sessionId, choice }: { sessionId: string; choice: any }) =>
-      StorySynthService.recordChoice(sessionId, choice),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['story-synth-history', userId] });
-    }
-  });
-
   const completeSession = useMutation({
     mutationFn: ({ sessionId, duration }: { sessionId: string; duration: number }) =>
-      StorySynthService.completeSession(sessionId, duration),
+      storySynthService.completeSession({ session_id: sessionId, reading_duration_seconds: duration }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['story-synth-history', userId] });
       toast({ title: 'Histoire terminée' });
@@ -85,7 +71,6 @@ export const useStorySynth = (userId: string) => {
     isLoading,
     createSession: createSession.mutate,
     createStory: createStory.mutate,
-    recordChoice: recordChoice.mutate,
     completeSession: completeSession.mutate,
     isCreating: createSession.isPending,
     isSavingStory: createStory.isPending

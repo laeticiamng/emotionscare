@@ -161,10 +161,10 @@ export default function StorySynthPage() {
           <p>Chargement...</p>
         ) : (
           <ul style={{ listStyle:"none", padding:0, display:"grid", gap:8 }}>
-            {history?.map(s => (
+            {history?.map((s: any) => (
               <li key={s.id} style={{ border:"1px solid var(--card)", borderRadius:12, padding:10 }}>
                 <div style={{ display:"flex", justifyContent:"space-between", gap:8 }}>
-                  <strong>{s.story_theme || 'Histoire'}</strong>
+                  <strong>{s.theme || 'Histoire'}</strong>
                   <small>{new Date(s.created_at).toLocaleString()}</small>
                 </div>
                 <p style={{ marginTop:6, opacity:.85 }}>Session du {new Date(s.created_at).toLocaleDateString()}</p>
