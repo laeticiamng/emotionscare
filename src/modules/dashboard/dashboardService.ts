@@ -10,7 +10,6 @@ import { EmotionalScanService } from '@/modules/emotional-scan/emotionalScanServ
 import { MusicTherapyService } from '@/modules/music-therapy/musicTherapyService';
 import { FlashLiteService } from '@/modules/flash-lite/flashLiteService';
 import { VRGalaxyService } from '@/modules/vr-galaxy/vrGalaxyService';
-import { AmbitionArcadeService } from '@/modules/ambition-arcade/ambitionArcadeService';
 import { BossGritService } from '@/modules/boss-grit/bossGritService';
 import { CommunityService } from '@/modules/community/communityService';
 import { nyveeService } from '@/modules/nyvee/nyveeService';
