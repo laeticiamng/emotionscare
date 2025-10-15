@@ -2,9 +2,11 @@
  * Screen Silk Module - Micro-pauses écran
  */
 
-export { screenSilkService } from './screen-silkService';
+export * from './types';
+export * as screenSilkService from './screenSilkServiceUnified';
 export { useScreenSilkMachine } from './useScreenSilkMachine';
 export { default as SilkOverlay } from './ui/SilkOverlay';
 export { default as BlinkGuide } from './ui/BlinkGuide';
-export type { ScreenSilkConfig, ScreenSilkData, ScreenSilkState } from './useScreenSilkMachine';
-export type { ScreenSilkMetrics, ScreenSilkSession } from './screen-silkService';
+
+// Legacy exports (deprecated)
+export { screenSilkService as screenSilkServiceLegacy } from './screen-silkService';
