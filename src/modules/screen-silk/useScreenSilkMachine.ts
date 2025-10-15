@@ -4,7 +4,8 @@
 
 import { useCallback } from 'react';
 import { useAsyncMachine } from '@/hooks/useAsyncMachine';
-import { screenSilkService, ScreenSilkSession } from './screen-silkService';
+import * as screenSilkServiceUnified from './screenSilkServiceUnified';
+import type { ScreenSilkSession } from './types';
 
 export type ScreenSilkState = 'idle' | 'loading' | 'active' | 'ending' | 'success' | 'error';
 
@@ -25,7 +26,9 @@ export interface ScreenSilkConfig {
 
 export const useScreenSilkMachine = (config: ScreenSilkConfig) => {
   const runSession = useCallback(async (signal: AbortSignal): Promise<ScreenSilkData> => {
-    const session = await screenSilkService.startSession(config.duration);
+    const session = await screenSilkServiceUnified.createSession({
+      duration_seconds: config.duration,
+    });
     
     return new Promise<ScreenSilkData>((resolve, reject) => {
       let timeRemaining = config.duration;
@@ -35,7 +38,12 @@ export const useScreenSilkMachine = (config: ScreenSilkConfig) => {
       const interval = setInterval(() => {
         if (signal.aborted) {
           clearInterval(interval);
-          screenSilkService.interruptSession();
+          if (session) {
+            screenSilkServiceUnified.interruptSession({
+              session_id: session.id,
+              blink_count: 0,
+            });
+          }
           reject(new Error('Session interrompue'));
           return;
         }
@@ -64,9 +72,6 @@ export const useScreenSilkMachine = (config: ScreenSilkConfig) => {
 
         // Guide de clignement
         blinkGuideActive = timeRemaining % config.blinkInterval === 0;
-        if (blinkGuideActive) {
-          screenSilkService.incrementBlink();
-        }
 
         // Mise à jour continue (non résolvue pour permettre les updates)
         // Cette promesse se résoudra seulement à la fin
@@ -75,7 +80,12 @@ export const useScreenSilkMachine = (config: ScreenSilkConfig) => {
       // Gestion de l'interruption
       signal.addEventListener('abort', () => {
         clearInterval(interval);
-        screenSilkService.interruptSession();
+        if (session) {
+          screenSilkServiceUnified.interruptSession({
+            session_id: session.id,
+            blink_count: 0,
+          });
+        }
         reject(new Error('Session interrompue'));
       });
     });
@@ -90,8 +100,12 @@ export const useScreenSilkMachine = (config: ScreenSilkConfig) => {
   } = useAsyncMachine<ScreenSilkData>({
     run: runSession,
     onSuccess: (data) => {
-      if (data.timeRemaining <= 0) {
-        screenSilkService.endSession('gain');
+      if (data.timeRemaining <= 0 && data.session) {
+        screenSilkServiceUnified.completeSession({
+          session_id: data.session.id,
+          blink_count: 0,
+          completion_label: 'gain',
+        });
         config.onComplete?.('gain');
       }
     },
@@ -103,15 +117,20 @@ export const useScreenSilkMachine = (config: ScreenSilkConfig) => {
 
   const interrupt = useCallback(() => {
     reset();
-    screenSilkService.interruptSession();
     config.onInterrupt?.();
   }, [reset, config]);
 
   const completeWithLabel = useCallback((label: 'gain' | 'léger' | 'incertain') => {
-    screenSilkService.endSession(label);
+    if (data?.session) {
+      screenSilkServiceUnified.completeSession({
+        session_id: data.session.id,
+        blink_count: 0,
+        completion_label: label,
+      });
+    }
     config.onComplete?.(label);
     reset();
-  }, [config, reset]);
+  }, [config, reset, data]);
 
   return {
     state: state as ScreenSilkState,

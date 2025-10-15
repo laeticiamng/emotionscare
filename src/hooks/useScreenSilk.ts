@@ -1,4 +1,11 @@
 // @ts-nocheck
+/**
+ * @deprecated Ce hook est legacy et utilise un store Zustand différent.
+ * Pour les nouvelles fonctionnalités Screen Silk avec micro-pauses,
+ * utilisez `useScreenSilkMachine` de '@/modules/screen-silk' à la place.
+ * 
+ * Ce hook gère les exercices de respiration avec HRV, pas les micro-pauses écran.
+ */
 import { useCallback, useEffect, useRef } from 'react';
 import { useScreenSilkStore, PATTERN_TIMINGS, type SilkPattern } from '@/store/screenSilk.store';
 import { useHRVSilk, type HRVData } from './useHRVSilk';
@@ -6,6 +13,10 @@ import { usePrivacyPrefs } from './usePrivacyPrefs';
 import { supabase } from '@/integrations/supabase/client';
 
 export const useScreenSilk = () => {
+  console.warn(
+    'useScreenSilk (from @/hooks) is deprecated for micro-break features. ' +
+    'Use useScreenSilkMachine from @/modules/screen-silk for micro-breaks.'
+  );
   const store = useScreenSilkStore();
   const { prefs } = usePrivacyPrefs();
   const hrv = useHRVSilk();

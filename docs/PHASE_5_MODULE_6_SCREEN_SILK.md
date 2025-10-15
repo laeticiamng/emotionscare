@@ -137,9 +137,9 @@ src/modules/screen-silk/
 ### Migration vers
 - `screenSilkServiceUnified.ts` : Service unifié avec architecture modulaire
 
-### Composants à adapter
-- `useScreenSilkMachine.ts` : Doit utiliser `screenSilkServiceUnified`
-- `ScreenSilkPage.tsx` : Doit intégrer le nouveau service
+### Composants adaptés
+- ✅ `useScreenSilkMachine.ts` : Utilise maintenant `screenSilkServiceUnified`
+- 🔄 `ScreenSilkPage.tsx` : À intégrer avec le nouveau service (si nécessaire)
 
 ---
 

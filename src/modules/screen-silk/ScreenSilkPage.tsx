@@ -372,11 +372,11 @@ export const ScreenSilkPage: React.FC = () => {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Clignements:</span>
-                      <span>{data.session.blinkCount}</span>
+                      <span>{data.session.blink_count}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Durée prévue:</span>
-                      <span>{formatTime(data.session.duration)}</span>
+                      <span>{formatTime(data.session.duration_seconds)}</span>
                     </div>
                   </div>
                 )}
