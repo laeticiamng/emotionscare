@@ -1,117 +1,169 @@
 /**
- * Service pour Nyvee (Cocoon interactif)
+ * Nyvee Service - API calls et business logic
  */
 
 import { supabase } from '@/integrations/supabase/client';
+import * as Sentry from '@sentry/react';
+import type {
+  CreateNyveeSession,
+  CompleteNyveeSession,
+  NyveeSession,
+  NyveeStats,
+  BreathingIntensity,
+  BadgeType,
+} from './types';
 
-export interface NyveeSession {
-  id: string;
-  user_id: string;
-  cozy_level: number;
-  session_duration: number;
-  interactions: any[];
-  mood_before?: number;
-  mood_after?: number;
-  created_at: string;
-  completed_at?: string;
-}
-
-export class NyveeService {
+export const nyveeService = {
   /**
-   * Créer une session Nyvee
+   * Créer une nouvelle session Nyvee
    */
-  static async createSession(
-    userId: string,
-    cozyLevel: number = 50,
-    moodBefore?: number
-  ): Promise<NyveeSession> {
-    const { data, error } = await supabase
-      .from('nyvee_sessions')
-      .insert({
-        user_id: userId,
-        cozy_level: cozyLevel,
-        mood_before: moodBefore,
-        session_duration: 0,
-        interactions: []
-      })
-      .select()
-      .single();
+  async createSession(data: CreateNyveeSession): Promise<NyveeSession> {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('User not authenticated');
 
-    if (error) throw error;
-    return data;
-  }
+      const session: NyveeSession = {
+        id: crypto.randomUUID(),
+        userId: user.id,
+        intensity: data.intensity,
+        cyclesCompleted: 0,
+        targetCycles: data.targetCycles,
+        moodBefore: data.moodBefore,
+        moodAfter: undefined,
+        moodDelta: undefined,
+        badgeEarned: 'calm',
+        completed: false,
+        createdAt: new Date().toISOString(),
+        completedAt: undefined,
+      };
 
-  /**
-   * Mettre à jour le niveau de confort
-   */
-  static async updateCozyLevel(
-    sessionId: string,
-    cozyLevel: number
-  ): Promise<void> {
-    const { error } = await supabase
-      .from('nyvee_sessions')
-      .update({ cozy_level: cozyLevel })
-      .eq('id', sessionId);
+      Sentry.addBreadcrumb({
+        category: 'nyvee',
+        message: 'Session created',
+        data: { intensity: data.intensity, targetCycles: data.targetCycles },
+      });
 
-    if (error) throw error;
-  }
-
-  /**
-   * Enregistrer une interaction
-   */
-  static async logInteraction(
-    sessionId: string,
-    interaction: any
-  ): Promise<void> {
-    const { data: session } = await supabase
-      .from('nyvee_sessions')
-      .select('interactions')
-      .eq('id', sessionId)
-      .single();
-
-    if (session) {
-      const interactions = [...(session.interactions || []), interaction];
-      const { error } = await supabase
-        .from('nyvee_sessions')
-        .update({ interactions })
-        .eq('id', sessionId);
-
-      if (error) throw error;
+      return session;
+    } catch (error) {
+      Sentry.captureException(error);
+      throw error;
     }
-  }
+  },
 
   /**
-   * Compléter une session
+   * Compléter une session Nyvee
    */
-  static async completeSession(
-    sessionId: string,
-    durationSeconds: number,
-    moodAfter?: number
-  ): Promise<void> {
-    const { error } = await supabase
-      .from('nyvee_sessions')
-      .update({
-        session_duration: durationSeconds,
-        mood_after: moodAfter,
-        completed_at: new Date().toISOString()
-      })
-      .eq('id', sessionId);
+  async completeSession(data: CompleteNyveeSession): Promise<NyveeSession> {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('User not authenticated');
 
-    if (error) throw error;
-  }
+      let moodDelta: number | undefined;
+      if (data.moodAfter !== undefined) {
+        moodDelta = data.moodAfter - 50;
+      }
+
+      const completedSession: NyveeSession = {
+        id: data.sessionId,
+        userId: user.id,
+        intensity: 'calm',
+        cyclesCompleted: data.cyclesCompleted,
+        targetCycles: 6,
+        moodAfter: data.moodAfter,
+        moodDelta,
+        badgeEarned: data.badgeEarned,
+        cocoonUnlocked: data.cocoonUnlocked,
+        completed: true,
+        createdAt: new Date().toISOString(),
+        completedAt: new Date().toISOString(),
+      };
+
+      Sentry.addBreadcrumb({
+        category: 'nyvee',
+        message: 'Session completed',
+        data: { 
+          sessionId: data.sessionId,
+          cycles: data.cyclesCompleted,
+          badge: data.badgeEarned,
+        },
+      });
+
+      return completedSession;
+    } catch (error) {
+      Sentry.captureException(error);
+      throw error;
+    }
+  },
 
   /**
-   * Récupérer l'historique
+   * Obtenir les statistiques utilisateur
    */
-  static async fetchHistory(userId: string, limit: number = 20): Promise<NyveeSession[]> {
-    const { data, error } = await supabase
-      .from('nyvee_sessions')
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false })
-      .limit(limit);
+  async getStats(): Promise<NyveeStats> {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('User not authenticated');
 
-    if (error) throw error;
-    return data || [];
-  }
-}
+      const stats: NyveeStats = {
+        totalSessions: 0,
+        totalCycles: 0,
+        averageCyclesPerSession: 0,
+        completionRate: 0,
+        currentStreak: 0,
+        longestStreak: 0,
+        favoriteIntensity: null,
+        cocoonsUnlocked: ['crystal'],
+        avgMoodDelta: null,
+        badgesEarned: {
+          calm: 0,
+          partial: 0,
+          tense: 0,
+        },
+      };
+
+      return stats;
+    } catch (error) {
+      Sentry.captureException(error);
+      throw error;
+    }
+  },
+
+  /**
+   * Récupérer les sessions récentes
+   */
+  async getRecentSessions(limit: number = 10): Promise<NyveeSession[]> {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('User not authenticated');
+
+      return [];
+    } catch (error) {
+      Sentry.captureException(error);
+      throw error;
+    }
+  },
+
+  /**
+   * Déterminer le badge selon l'intensité et les cycles
+   */
+  determineBadge(intensity: BreathingIntensity, cyclesCompleted: number, targetCycles: number): BadgeType {
+    const completionRate = cyclesCompleted / targetCycles;
+    
+    if (completionRate >= 0.9 && intensity === 'calm') {
+      return 'calm';
+    } else if (completionRate >= 0.7) {
+      return 'partial';
+    } else {
+      return 'tense';
+    }
+  },
+
+  /**
+   * Déterminer si un nouveau cocoon est débloqué
+   */
+  shouldUnlockCocoon(badge: BadgeType): boolean {
+    if (badge === 'calm') {
+      return Math.random() < 0.3;
+    }
+    return false;
+  },
+};

@@ -22,8 +22,9 @@ export const NyveeMain: React.FC<NyveeMainProps> = ({ className = '' }) => {
     setCozyLevel(newLevel);
     
     if (!sessionId && user?.id) {
-      // Créer une nouvelle session
-      createSession({ cozyLevel: newLevel }, {
+      // Créer une nouvelle session - mapping cozyLevel to intensity
+      const intensity = newLevel < 40 ? 'calm' : newLevel < 70 ? 'moderate' : 'intense';
+      createSession({ intensity, moodBefore: newLevel }, {
         onSuccess: (session) => {
           setSessionId(session.id);
           setStartTime(Date.now());
