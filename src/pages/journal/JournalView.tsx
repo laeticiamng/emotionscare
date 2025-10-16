@@ -9,6 +9,8 @@ import { listFeed } from '@/services/journal/journalApi'
 import type { SanitizedNote } from '@/modules/journal/types'
 import { JournalFeed } from './JournalFeed'
 import { PanasSuggestionsCard } from './PanasSuggestionsCard'
+import { JournalExportPanel } from '@/components/journal/JournalExportPanel'
+import { JournalAnalyticsDashboard } from '@/components/journal/JournalAnalyticsDashboard'
 
 const PAGE_SIZE = 10
 
@@ -84,6 +86,11 @@ export default function JournalView() {
       </Card>
 
       <PanasSuggestionsCard composer={composer} />
+
+      <div className="grid gap-8 lg:grid-cols-2">
+        <JournalAnalyticsDashboard notes={notes} />
+        <JournalExportPanel notes={notes} />
+      </div>
 
       <JournalFeed
         search={search}
