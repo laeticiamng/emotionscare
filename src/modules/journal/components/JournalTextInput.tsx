@@ -6,8 +6,10 @@
 import { memo, useState, useCallback, KeyboardEvent } from 'react';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Send, Loader2 } from 'lucide-react';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Send, Loader2, Sparkles } from 'lucide-react';
+import { JournalPromptCard } from './JournalPromptCard';
+import type { JournalPrompt } from '@/services/journalPrompts';
 
 interface JournalTextInputProps {
   onSubmit: (text: string) => Promise<void>;
@@ -15,6 +17,10 @@ interface JournalTextInputProps {
   placeholder?: string;
   maxLength?: number;
   className?: string;
+  showPromptSuggestion?: boolean;
+  currentPrompt?: JournalPrompt | null;
+  onRequestNewPrompt?: () => void;
+  onDismissPrompt?: () => void;
 }
 
 /**
@@ -26,9 +32,19 @@ export const JournalTextInput = memo<JournalTextInputProps>(({
   placeholder = "Écrivez votre pensée du jour...",
   maxLength = 5000,
   className = '',
+  showPromptSuggestion = false,
+  currentPrompt = null,
+  onRequestNewPrompt,
+  onDismissPrompt,
 }) => {
   const [text, setText] = useState('');
   const [charCount, setCharCount] = useState(0);
+
+  const handleUsePrompt = useCallback((promptText: string) => {
+    setText(promptText);
+    setCharCount(promptText.length);
+    if (onDismissPrompt) onDismissPrompt();
+  }, [onDismissPrompt]);
 
   const handleTextChange = useCallback((value: string) => {
     if (value.length <= maxLength) {
@@ -66,7 +82,29 @@ export const JournalTextInput = memo<JournalTextInputProps>(({
 
   return (
     <Card className={`journal-text-input ${className}`}>
+      {showPromptSuggestion && currentPrompt && (
+        <CardHeader className="pb-4">
+          <JournalPromptCard
+            prompt={currentPrompt}
+            onUsePrompt={handleUsePrompt}
+            onDismiss={onRequestNewPrompt}
+          />
+        </CardHeader>
+      )}
+      
       <CardContent className="pt-6">
+        {showPromptSuggestion && !currentPrompt && onRequestNewPrompt && (
+          <Button
+            variant="outline"
+            className="w-full mb-4 gap-2"
+            onClick={onRequestNewPrompt}
+            disabled={isLoading}
+          >
+            <Sparkles className="h-4 w-4" />
+            Obtenir une suggestion d'écriture
+          </Button>
+        )}
+
         <div className="space-y-3">
           <Textarea
             value={text}
