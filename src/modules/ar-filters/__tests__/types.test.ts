@@ -1,628 +1,370 @@
+/**
+ * Tests unitaires pour les types et schémas Zod du module AR Filters
+ * Day 37 - Module 20: AR Filters
+ */
+
 import { describe, it, expect } from 'vitest';
 import { z } from 'zod';
 
 /**
- * Tests unitaires pour les schémas Zod du module AR Filters
- * 
- * Couverture :
- * - FilterType (5 types)
- * - MoodImpact (3 niveaux)
- * - ARFilterSession (structure complète)
- * - CreateARFilterSession
- * - CompleteARFilterSession
- * - ARFilterStats
- * 
- * Total : ~84 tests
+ * Schémas Zod pour AR Filters
  */
 
-// Schémas Zod pour AR Filters
-const FilterTypeSchema = z.enum([
+// Types de filtres AR disponibles
+export const ARFilterTypeSchema = z.enum([
   'joy',
   'calm',
-  'energy',
+  'energetic',
+  'zen',
   'focus',
-  'creativity'
+  'creative',
+  'motivated',
+  'peaceful'
 ]);
 
-const MoodImpactSchema = z.enum([
+// Impact émotionnel du filtre
+export const MoodImpactSchema = z.enum([
   'positive',
   'neutral',
-  'negative'
+  'negative',
+  'very_positive'
 ]);
 
-const ARFilterSessionSchema = z.object({
+// Configuration d'un filtre AR
+export const ARFilterConfigSchema = z.object({
+  name: z.string().min(1).max(50),
+  emoji: z.string().min(1).max(10),
+  type: ARFilterTypeSchema,
+  description: z.string().max(200).optional(),
+  color: z.string().regex(/^#[0-9A-Fa-f]{6}$/).optional(),
+  effects: z.array(z.string()).optional()
+});
+
+// Session de filtre AR
+export const ARFilterSessionSchema = z.object({
   id: z.string().uuid(),
   user_id: z.string().uuid(),
-  filter_type: FilterTypeSchema,
+  filter_type: ARFilterTypeSchema,
+  duration_seconds: z.number().int().min(0),
+  photos_taken: z.number().int().min(0).default(0),
+  mood_impact: MoodImpactSchema.optional(),
   created_at: z.string().datetime(),
-  duration_seconds: z.number().int().min(0).max(3600),
-  photos_taken: z.number().int().min(0).max(100),
-  mood_impact: MoodImpactSchema.optional(),
-  completed_at: z.string().datetime().optional(),
+  completed_at: z.string().datetime().optional()
 });
 
-const CreateARFilterSessionSchema = z.object({
-  user_id: z.string().uuid(),
-  filter_type: FilterTypeSchema,
+// Création d'une session
+export const CreateARFilterSessionSchema = z.object({
+  filterType: ARFilterTypeSchema
 });
 
-const CompleteARFilterSessionSchema = z.object({
-  session_id: z.string().uuid(),
-  duration_seconds: z.number().int().min(1).max(3600),
-  photos_taken: z.number().int().min(0).max(100).optional(),
-  mood_impact: MoodImpactSchema.optional(),
+// Mise à jour d'une session
+export const UpdateARFilterSessionSchema = z.object({
+  sessionId: z.string().uuid(),
+  duration: z.number().int().min(0).optional(),
+  photosTaken: z.number().int().min(0).optional(),
+  moodImpact: MoodImpactSchema.optional()
 });
 
-const ARFilterStatsSchema = z.object({
-  total_sessions: z.number().int().min(0),
-  total_duration_seconds: z.number().int().min(0),
-  total_photos: z.number().int().min(0),
-  favorite_filter: FilterTypeSchema.optional(),
-  average_duration: z.number().min(0),
-  sessions_by_filter: z.record(FilterTypeSchema, z.number().int().min(0)),
-  positive_mood_count: z.number().int().min(0),
+// Statistiques AR Filters
+export const ARFilterStatsSchema = z.object({
+  totalSessions: z.number().int().min(0),
+  totalPhotosTaken: z.number().int().min(0),
+  favoriteFilter: ARFilterTypeSchema,
+  averageDuration: z.number().min(0),
+  moodImprovementRate: z.number().min(0).max(100).optional()
 });
 
-describe('AR Filters Schemas', () => {
-  describe('FilterTypeSchema', () => {
-    it('valide "joy"', () => {
-      const result = FilterTypeSchema.safeParse('joy');
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data).toBe('joy');
-      }
-    });
+// Historique utilisateur
+export const ARFilterHistorySchema = z.object({
+  sessions: z.array(ARFilterSessionSchema),
+  stats: ARFilterStatsSchema,
+  recentFilters: z.array(ARFilterTypeSchema)
+});
 
-    it('valide "calm"', () => {
-      const result = FilterTypeSchema.safeParse('calm');
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data).toBe('calm');
-      }
-    });
+// Export des types TypeScript
+export type ARFilterType = z.infer<typeof ARFilterTypeSchema>;
+export type MoodImpact = z.infer<typeof MoodImpactSchema>;
+export type ARFilterConfig = z.infer<typeof ARFilterConfigSchema>;
+export type ARFilterSession = z.infer<typeof ARFilterSessionSchema>;
+export type CreateARFilterSession = z.infer<typeof CreateARFilterSessionSchema>;
+export type UpdateARFilterSession = z.infer<typeof UpdateARFilterSessionSchema>;
+export type ARFilterStats = z.infer<typeof ARFilterStatsSchema>;
+export type ARFilterHistory = z.infer<typeof ARFilterHistorySchema>;
 
-    it('valide "energy"', () => {
-      const result = FilterTypeSchema.safeParse('energy');
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data).toBe('energy');
-      }
-    });
-
-    it('valide "focus"', () => {
-      const result = FilterTypeSchema.safeParse('focus');
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data).toBe('focus');
-      }
-    });
-
-    it('valide "creativity"', () => {
-      const result = FilterTypeSchema.safeParse('creativity');
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data).toBe('creativity');
-      }
-    });
-
-    it('rejette un type invalide', () => {
-      const result = FilterTypeSchema.safeParse('invalid');
-      expect(result.success).toBe(false);
-    });
-
-    it('rejette un nombre', () => {
-      const result = FilterTypeSchema.safeParse(123);
-      expect(result.success).toBe(false);
-    });
-
-    it('rejette null', () => {
-      const result = FilterTypeSchema.safeParse(null);
-      expect(result.success).toBe(false);
-    });
+/**
+ * Tests pour ARFilterTypeSchema
+ */
+describe('ARFilterTypeSchema', () => {
+  it('valide les types de filtres valides', () => {
+    expect(ARFilterTypeSchema.parse('joy')).toBe('joy');
+    expect(ARFilterTypeSchema.parse('calm')).toBe('calm');
+    expect(ARFilterTypeSchema.parse('energetic')).toBe('energetic');
+    expect(ARFilterTypeSchema.parse('zen')).toBe('zen');
+    expect(ARFilterTypeSchema.parse('focus')).toBe('focus');
+    expect(ARFilterTypeSchema.parse('creative')).toBe('creative');
+    expect(ARFilterTypeSchema.parse('motivated')).toBe('motivated');
+    expect(ARFilterTypeSchema.parse('peaceful')).toBe('peaceful');
   });
 
-  describe('MoodImpactSchema', () => {
-    it('valide "positive"', () => {
-      const result = MoodImpactSchema.safeParse('positive');
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data).toBe('positive');
-      }
-    });
+  it('rejette les types de filtres invalides', () => {
+    expect(() => ARFilterTypeSchema.parse('invalid')).toThrow();
+    expect(() => ARFilterTypeSchema.parse('')).toThrow();
+    expect(() => ARFilterTypeSchema.parse(123)).toThrow();
+  });
+});
 
-    it('valide "neutral"', () => {
-      const result = MoodImpactSchema.safeParse('neutral');
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data).toBe('neutral');
-      }
-    });
-
-    it('valide "negative"', () => {
-      const result = MoodImpactSchema.safeParse('negative');
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data).toBe('negative');
-      }
-    });
-
-    it('rejette un impact invalide', () => {
-      const result = MoodImpactSchema.safeParse('very_positive');
-      expect(result.success).toBe(false);
-    });
-
-    it('rejette un nombre', () => {
-      const result = MoodImpactSchema.safeParse(1);
-      expect(result.success).toBe(false);
-    });
+/**
+ * Tests pour MoodImpactSchema
+ */
+describe('MoodImpactSchema', () => {
+  it('valide les impacts émotionnels valides', () => {
+    expect(MoodImpactSchema.parse('positive')).toBe('positive');
+    expect(MoodImpactSchema.parse('neutral')).toBe('neutral');
+    expect(MoodImpactSchema.parse('negative')).toBe('negative');
+    expect(MoodImpactSchema.parse('very_positive')).toBe('very_positive');
   });
 
-  describe('ARFilterSessionSchema', () => {
-    const validSession = {
-      id: '550e8400-e29b-41d4-a716-446655440000',
-      user_id: '660e8400-e29b-41d4-a716-446655440001',
-      filter_type: 'joy',
-      created_at: '2025-01-15T10:00:00Z',
-      duration_seconds: 300,
-      photos_taken: 5,
-      mood_impact: 'positive',
-      completed_at: '2025-01-15T10:05:00Z',
+  it('rejette les impacts invalides', () => {
+    expect(() => MoodImpactSchema.parse('invalid')).toThrow();
+    expect(() => MoodImpactSchema.parse('very_negative')).toThrow();
+  });
+});
+
+/**
+ * Tests pour ARFilterConfigSchema
+ */
+describe('ARFilterConfigSchema', () => {
+  const validConfig: ARFilterConfig = {
+    name: 'Joyeux',
+    emoji: '😊',
+    type: 'joy',
+    description: 'Un filtre joyeux pour améliorer l\'humeur',
+    color: '#FFD700',
+    effects: ['brightness', 'saturation']
+  };
+
+  it('valide une configuration complète', () => {
+    expect(ARFilterConfigSchema.parse(validConfig)).toEqual(validConfig);
+  });
+
+  it('valide une configuration minimale', () => {
+    const minimal = {
+      name: 'Calme',
+      emoji: '😌',
+      type: 'calm'
     };
-
-    it('valide une session complète', () => {
-      const result = ARFilterSessionSchema.safeParse(validSession);
-      expect(result.success).toBe(true);
-    });
-
-    it('valide une session sans mood_impact', () => {
-      const { mood_impact, ...sessionWithoutMood } = validSession;
-      const result = ARFilterSessionSchema.safeParse(sessionWithoutMood);
-      expect(result.success).toBe(true);
-    });
-
-    it('valide une session sans completed_at', () => {
-      const { completed_at, ...sessionWithoutCompleted } = validSession;
-      const result = ARFilterSessionSchema.safeParse(sessionWithoutCompleted);
-      expect(result.success).toBe(true);
-    });
-
-    it('rejette un id invalide', () => {
-      const result = ARFilterSessionSchema.safeParse({
-        ...validSession,
-        id: 'not-a-uuid',
-      });
-      expect(result.success).toBe(false);
-    });
-
-    it('rejette un user_id invalide', () => {
-      const result = ARFilterSessionSchema.safeParse({
-        ...validSession,
-        user_id: 'invalid-uuid',
-      });
-      expect(result.success).toBe(false);
-    });
-
-    it('rejette un filter_type invalide', () => {
-      const result = ARFilterSessionSchema.safeParse({
-        ...validSession,
-        filter_type: 'invalid_filter',
-      });
-      expect(result.success).toBe(false);
-    });
-
-    it('rejette duration_seconds négatif', () => {
-      const result = ARFilterSessionSchema.safeParse({
-        ...validSession,
-        duration_seconds: -10,
-      });
-      expect(result.success).toBe(false);
-    });
-
-    it('rejette duration_seconds > 3600', () => {
-      const result = ARFilterSessionSchema.safeParse({
-        ...validSession,
-        duration_seconds: 4000,
-      });
-      expect(result.success).toBe(false);
-    });
-
-    it('valide duration_seconds = 0', () => {
-      const result = ARFilterSessionSchema.safeParse({
-        ...validSession,
-        duration_seconds: 0,
-      });
-      expect(result.success).toBe(true);
-    });
-
-    it('valide duration_seconds = 3600', () => {
-      const result = ARFilterSessionSchema.safeParse({
-        ...validSession,
-        duration_seconds: 3600,
-      });
-      expect(result.success).toBe(true);
-    });
-
-    it('rejette photos_taken négatif', () => {
-      const result = ARFilterSessionSchema.safeParse({
-        ...validSession,
-        photos_taken: -5,
-      });
-      expect(result.success).toBe(false);
-    });
-
-    it('rejette photos_taken > 100', () => {
-      const result = ARFilterSessionSchema.safeParse({
-        ...validSession,
-        photos_taken: 150,
-      });
-      expect(result.success).toBe(false);
-    });
-
-    it('valide photos_taken = 0', () => {
-      const result = ARFilterSessionSchema.safeParse({
-        ...validSession,
-        photos_taken: 0,
-      });
-      expect(result.success).toBe(true);
-    });
-
-    it('valide photos_taken = 100', () => {
-      const result = ARFilterSessionSchema.safeParse({
-        ...validSession,
-        photos_taken: 100,
-      });
-      expect(result.success).toBe(true);
-    });
-
-    it('rejette mood_impact invalide', () => {
-      const result = ARFilterSessionSchema.safeParse({
-        ...validSession,
-        mood_impact: 'super_positive',
-      });
-      expect(result.success).toBe(false);
-    });
-
-    it('rejette created_at invalide', () => {
-      const result = ARFilterSessionSchema.safeParse({
-        ...validSession,
-        created_at: 'not-a-date',
-      });
-      expect(result.success).toBe(false);
-    });
-
-    it('rejette completed_at invalide', () => {
-      const result = ARFilterSessionSchema.safeParse({
-        ...validSession,
-        completed_at: 'invalid-date',
-      });
-      expect(result.success).toBe(false);
-    });
-
-    it('rejette session sans champs requis', () => {
-      const result = ARFilterSessionSchema.safeParse({
-        id: validSession.id,
-      });
-      expect(result.success).toBe(false);
-    });
+    expect(ARFilterConfigSchema.parse(minimal)).toEqual(minimal);
   });
 
-  describe('CreateARFilterSessionSchema', () => {
-    const validCreate = {
-      user_id: '660e8400-e29b-41d4-a716-446655440001',
-      filter_type: 'calm',
-    };
+  it('rejette un nom vide', () => {
+    expect(() => ARFilterConfigSchema.parse({ ...validConfig, name: '' })).toThrow();
+  });
 
-    it('valide une création correcte', () => {
-      const result = CreateARFilterSessionSchema.safeParse(validCreate);
-      expect(result.success).toBe(true);
-    });
+  it('rejette un nom trop long', () => {
+    expect(() => ARFilterConfigSchema.parse({ 
+      ...validConfig, 
+      name: 'a'.repeat(51) 
+    })).toThrow();
+  });
 
-    it('valide tous les types de filtres', () => {
-      const filterTypes = ['joy', 'calm', 'energy', 'focus', 'creativity'];
-      
-      filterTypes.forEach(filterType => {
-        const result = CreateARFilterSessionSchema.safeParse({
-          ...validCreate,
-          filter_type: filterType,
-        });
-        expect(result.success).toBe(true);
-      });
-    });
+  it('rejette une couleur invalide', () => {
+    expect(() => ARFilterConfigSchema.parse({ 
+      ...validConfig, 
+      color: 'invalid' 
+    })).toThrow();
+  });
+});
 
-    it('rejette user_id invalide', () => {
-      const result = CreateARFilterSessionSchema.safeParse({
-        ...validCreate,
-        user_id: 'not-a-uuid',
-      });
-      expect(result.success).toBe(false);
-    });
+/**
+ * Tests pour ARFilterSessionSchema
+ */
+describe('ARFilterSessionSchema', () => {
+  const validSession: ARFilterSession = {
+    id: '123e4567-e89b-12d3-a456-426614174000',
+    user_id: '123e4567-e89b-12d3-a456-426614174001',
+    filter_type: 'joy',
+    duration_seconds: 300,
+    photos_taken: 5,
+    mood_impact: 'positive',
+    created_at: '2024-01-01T10:00:00Z',
+    completed_at: '2024-01-01T10:05:00Z'
+  };
 
-    it('rejette filter_type invalide', () => {
-      const result = CreateARFilterSessionSchema.safeParse({
-        ...validCreate,
-        filter_type: 'unknown',
-      });
-      expect(result.success).toBe(false);
-    });
+  it('valide une session complète', () => {
+    expect(ARFilterSessionSchema.parse(validSession)).toEqual(validSession);
+  });
 
-    it('rejette objet vide', () => {
-      const result = CreateARFilterSessionSchema.safeParse({});
-      expect(result.success).toBe(false);
-    });
+  it('valide une session sans completion', () => {
+    const { completed_at, ...incomplete } = validSession;
+    expect(ARFilterSessionSchema.parse(incomplete)).toEqual(incomplete);
+  });
 
-    it('rejette sans user_id', () => {
-      const result = CreateARFilterSessionSchema.safeParse({
+  it('rejette une durée négative', () => {
+    expect(() => ARFilterSessionSchema.parse({ 
+      ...validSession, 
+      duration_seconds: -1 
+    })).toThrow();
+  });
+
+  it('rejette un nombre de photos négatif', () => {
+    expect(() => ARFilterSessionSchema.parse({ 
+      ...validSession, 
+      photos_taken: -1 
+    })).toThrow();
+  });
+
+  it('rejette un UUID invalide', () => {
+    expect(() => ARFilterSessionSchema.parse({ 
+      ...validSession, 
+      id: 'invalid-uuid' 
+    })).toThrow();
+  });
+});
+
+/**
+ * Tests pour CreateARFilterSessionSchema
+ */
+describe('CreateARFilterSessionSchema', () => {
+  it('valide une création valide', () => {
+    const create: CreateARFilterSession = { filterType: 'joy' };
+    expect(CreateARFilterSessionSchema.parse(create)).toEqual(create);
+  });
+
+  it('rejette un type de filtre invalide', () => {
+    expect(() => CreateARFilterSessionSchema.parse({ 
+      filterType: 'invalid' 
+    })).toThrow();
+  });
+
+  it('rejette un objet vide', () => {
+    expect(() => CreateARFilterSessionSchema.parse({})).toThrow();
+  });
+});
+
+/**
+ * Tests pour UpdateARFilterSessionSchema
+ */
+describe('UpdateARFilterSessionSchema', () => {
+  const validUpdate: UpdateARFilterSession = {
+    sessionId: '123e4567-e89b-12d3-a456-426614174000',
+    duration: 300,
+    photosTaken: 5,
+    moodImpact: 'positive'
+  };
+
+  it('valide une mise à jour complète', () => {
+    expect(UpdateARFilterSessionSchema.parse(validUpdate)).toEqual(validUpdate);
+  });
+
+  it('valide une mise à jour partielle', () => {
+    const partial = { sessionId: validUpdate.sessionId, duration: 100 };
+    expect(UpdateARFilterSessionSchema.parse(partial)).toEqual(partial);
+  });
+
+  it('rejette un sessionId invalide', () => {
+    expect(() => UpdateARFilterSessionSchema.parse({ 
+      ...validUpdate, 
+      sessionId: 'invalid' 
+    })).toThrow();
+  });
+
+  it('rejette une durée négative', () => {
+    expect(() => UpdateARFilterSessionSchema.parse({ 
+      ...validUpdate, 
+      duration: -1 
+    })).toThrow();
+  });
+});
+
+/**
+ * Tests pour ARFilterStatsSchema
+ */
+describe('ARFilterStatsSchema', () => {
+  const validStats: ARFilterStats = {
+    totalSessions: 42,
+    totalPhotosTaken: 156,
+    favoriteFilter: 'joy',
+    averageDuration: 285.5,
+    moodImprovementRate: 87.5
+  };
+
+  it('valide des statistiques complètes', () => {
+    expect(ARFilterStatsSchema.parse(validStats)).toEqual(validStats);
+  });
+
+  it('valide des statistiques sans taux d\'amélioration', () => {
+    const { moodImprovementRate, ...withoutRate } = validStats;
+    expect(ARFilterStatsSchema.parse(withoutRate)).toEqual(withoutRate);
+  });
+
+  it('rejette un nombre de sessions négatif', () => {
+    expect(() => ARFilterStatsSchema.parse({ 
+      ...validStats, 
+      totalSessions: -1 
+    })).toThrow();
+  });
+
+  it('rejette un taux d\'amélioration > 100', () => {
+    expect(() => ARFilterStatsSchema.parse({ 
+      ...validStats, 
+      moodImprovementRate: 101 
+    })).toThrow();
+  });
+
+  it('rejette un taux d\'amélioration négatif', () => {
+    expect(() => ARFilterStatsSchema.parse({ 
+      ...validStats, 
+      moodImprovementRate: -5 
+    })).toThrow();
+  });
+});
+
+/**
+ * Tests pour ARFilterHistorySchema
+ */
+describe('ARFilterHistorySchema', () => {
+  const validHistory: ARFilterHistory = {
+    sessions: [
+      {
+        id: '123e4567-e89b-12d3-a456-426614174000',
+        user_id: '123e4567-e89b-12d3-a456-426614174001',
         filter_type: 'joy',
-      });
-      expect(result.success).toBe(false);
-    });
-
-    it('rejette sans filter_type', () => {
-      const result = CreateARFilterSessionSchema.safeParse({
-        user_id: validCreate.user_id,
-      });
-      expect(result.success).toBe(false);
-    });
-  });
-
-  describe('CompleteARFilterSessionSchema', () => {
-    const validComplete = {
-      session_id: '550e8400-e29b-41d4-a716-446655440000',
-      duration_seconds: 420,
-      photos_taken: 8,
-      mood_impact: 'positive',
-    };
-
-    it('valide une complétion complète', () => {
-      const result = CompleteARFilterSessionSchema.safeParse(validComplete);
-      expect(result.success).toBe(true);
-    });
-
-    it('valide sans photos_taken', () => {
-      const { photos_taken, ...withoutPhotos } = validComplete;
-      const result = CompleteARFilterSessionSchema.safeParse(withoutPhotos);
-      expect(result.success).toBe(true);
-    });
-
-    it('valide sans mood_impact', () => {
-      const { mood_impact, ...withoutMood } = validComplete;
-      const result = CompleteARFilterSessionSchema.safeParse(withoutMood);
-      expect(result.success).toBe(true);
-    });
-
-    it('valide avec seulement les champs requis', () => {
-      const result = CompleteARFilterSessionSchema.safeParse({
-        session_id: validComplete.session_id,
-        duration_seconds: validComplete.duration_seconds,
-      });
-      expect(result.success).toBe(true);
-    });
-
-    it('rejette session_id invalide', () => {
-      const result = CompleteARFilterSessionSchema.safeParse({
-        ...validComplete,
-        session_id: 'invalid-uuid',
-      });
-      expect(result.success).toBe(false);
-    });
-
-    it('rejette duration_seconds = 0', () => {
-      const result = CompleteARFilterSessionSchema.safeParse({
-        ...validComplete,
-        duration_seconds: 0,
-      });
-      expect(result.success).toBe(false);
-    });
-
-    it('rejette duration_seconds négatif', () => {
-      const result = CompleteARFilterSessionSchema.safeParse({
-        ...validComplete,
-        duration_seconds: -100,
-      });
-      expect(result.success).toBe(false);
-    });
-
-    it('rejette duration_seconds > 3600', () => {
-      const result = CompleteARFilterSessionSchema.safeParse({
-        ...validComplete,
-        duration_seconds: 5000,
-      });
-      expect(result.success).toBe(false);
-    });
-
-    it('valide duration_seconds = 1', () => {
-      const result = CompleteARFilterSessionSchema.safeParse({
-        ...validComplete,
-        duration_seconds: 1,
-      });
-      expect(result.success).toBe(true);
-    });
-
-    it('valide duration_seconds = 3600', () => {
-      const result = CompleteARFilterSessionSchema.safeParse({
-        ...validComplete,
-        duration_seconds: 3600,
-      });
-      expect(result.success).toBe(true);
-    });
-
-    it('rejette photos_taken négatif', () => {
-      const result = CompleteARFilterSessionSchema.safeParse({
-        ...validComplete,
-        photos_taken: -1,
-      });
-      expect(result.success).toBe(false);
-    });
-
-    it('rejette photos_taken > 100', () => {
-      const result = CompleteARFilterSessionSchema.safeParse({
-        ...validComplete,
-        photos_taken: 101,
-      });
-      expect(result.success).toBe(false);
-    });
-
-    it('valide photos_taken = 0', () => {
-      const result = CompleteARFilterSessionSchema.safeParse({
-        ...validComplete,
-        photos_taken: 0,
-      });
-      expect(result.success).toBe(true);
-    });
-
-    it('valide photos_taken = 100', () => {
-      const result = CompleteARFilterSessionSchema.safeParse({
-        ...validComplete,
-        photos_taken: 100,
-      });
-      expect(result.success).toBe(true);
-    });
-
-    it('rejette mood_impact invalide', () => {
-      const result = CompleteARFilterSessionSchema.safeParse({
-        ...validComplete,
-        mood_impact: 'excellent',
-      });
-      expect(result.success).toBe(false);
-    });
-
-    it('rejette sans session_id', () => {
-      const result = CompleteARFilterSessionSchema.safeParse({
         duration_seconds: 300,
-      });
-      expect(result.success).toBe(false);
-    });
+        photos_taken: 5,
+        created_at: '2024-01-01T10:00:00Z'
+      }
+    ],
+    stats: {
+      totalSessions: 1,
+      totalPhotosTaken: 5,
+      favoriteFilter: 'joy',
+      averageDuration: 300
+    },
+    recentFilters: ['joy', 'calm', 'zen']
+  };
 
-    it('rejette sans duration_seconds', () => {
-      const result = CompleteARFilterSessionSchema.safeParse({
-        session_id: validComplete.session_id,
-      });
-      expect(result.success).toBe(false);
-    });
+  it('valide un historique complet', () => {
+    expect(ARFilterHistorySchema.parse(validHistory)).toEqual(validHistory);
   });
 
-  describe('ARFilterStatsSchema', () => {
-    const validStats = {
-      total_sessions: 25,
-      total_duration_seconds: 7500,
-      total_photos: 120,
-      favorite_filter: 'joy',
-      average_duration: 300,
-      sessions_by_filter: {
-        joy: 10,
-        calm: 8,
-        energy: 4,
-        focus: 2,
-        creativity: 1,
+  it('valide un historique vide', () => {
+    const empty: ARFilterHistory = {
+      sessions: [],
+      stats: {
+        totalSessions: 0,
+        totalPhotosTaken: 0,
+        favoriteFilter: 'joy',
+        averageDuration: 0
       },
-      positive_mood_count: 18,
+      recentFilters: []
     };
+    expect(ARFilterHistorySchema.parse(empty)).toEqual(empty);
+  });
 
-    it('valide des stats complètes', () => {
-      const result = ARFilterStatsSchema.safeParse(validStats);
-      expect(result.success).toBe(true);
-    });
-
-    it('valide sans favorite_filter', () => {
-      const { favorite_filter, ...withoutFavorite } = validStats;
-      const result = ARFilterStatsSchema.safeParse(withoutFavorite);
-      expect(result.success).toBe(true);
-    });
-
-    it('valide avec total_sessions = 0', () => {
-      const result = ARFilterStatsSchema.safeParse({
-        ...validStats,
-        total_sessions: 0,
-      });
-      expect(result.success).toBe(true);
-    });
-
-    it('rejette total_sessions négatif', () => {
-      const result = ARFilterStatsSchema.safeParse({
-        ...validStats,
-        total_sessions: -5,
-      });
-      expect(result.success).toBe(false);
-    });
-
-    it('rejette total_duration_seconds négatif', () => {
-      const result = ARFilterStatsSchema.safeParse({
-        ...validStats,
-        total_duration_seconds: -100,
-      });
-      expect(result.success).toBe(false);
-    });
-
-    it('rejette total_photos négatif', () => {
-      const result = ARFilterStatsSchema.safeParse({
-        ...validStats,
-        total_photos: -10,
-      });
-      expect(result.success).toBe(false);
-    });
-
-    it('rejette average_duration négatif', () => {
-      const result = ARFilterStatsSchema.safeParse({
-        ...validStats,
-        average_duration: -50,
-      });
-      expect(result.success).toBe(false);
-    });
-
-    it('rejette positive_mood_count négatif', () => {
-      const result = ARFilterStatsSchema.safeParse({
-        ...validStats,
-        positive_mood_count: -3,
-      });
-      expect(result.success).toBe(false);
-    });
-
-    it('rejette favorite_filter invalide', () => {
-      const result = ARFilterStatsSchema.safeParse({
-        ...validStats,
-        favorite_filter: 'unknown',
-      });
-      expect(result.success).toBe(false);
-    });
-
-    it('valide sessions_by_filter avec tous les types', () => {
-      const result = ARFilterStatsSchema.safeParse({
-        ...validStats,
-        sessions_by_filter: {
-          joy: 15,
-          calm: 10,
-          energy: 8,
-          focus: 6,
-          creativity: 4,
-        },
-      });
-      expect(result.success).toBe(true);
-    });
-
-    it('rejette sessions_by_filter avec valeurs négatives', () => {
-      const result = ARFilterStatsSchema.safeParse({
-        ...validStats,
-        sessions_by_filter: {
-          joy: -5,
-          calm: 10,
-        },
-      });
-      expect(result.success).toBe(false);
-    });
-
-    it('valide sessions_by_filter vide', () => {
-      const result = ARFilterStatsSchema.safeParse({
-        ...validStats,
-        sessions_by_filter: {},
-      });
-      expect(result.success).toBe(true);
-    });
-
-    it('rejette sans champs requis', () => {
-      const result = ARFilterStatsSchema.safeParse({
-        total_sessions: 10,
-      });
-      expect(result.success).toBe(false);
-    });
+  it('rejette un historique avec sessions invalides', () => {
+    expect(() => ARFilterHistorySchema.parse({
+      ...validHistory,
+      sessions: [{ invalid: 'session' }]
+    })).toThrow();
   });
 });
