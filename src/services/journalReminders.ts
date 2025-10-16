@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { supabase } from '@/integrations/supabase/client';
 
 export interface JournalReminder {
@@ -36,7 +35,6 @@ export const journalRemindersService = {
       if (error) throw error;
       return data || [];
     } catch (error) {
-      console.error('Erreur lors de la récupération des rappels:', error);
       throw error;
     }
   },
@@ -64,7 +62,6 @@ export const journalRemindersService = {
       if (error) throw error;
       return data;
     } catch (error) {
-      console.error('Erreur lors de la création du rappel:', error);
       throw error;
     }
   },
@@ -87,7 +84,6 @@ export const journalRemindersService = {
       if (error) throw error;
       return data;
     } catch (error) {
-      console.error('Erreur lors de la mise à jour du rappel:', error);
       throw error;
     }
   },
@@ -104,7 +100,6 @@ export const journalRemindersService = {
 
       if (error) throw error;
     } catch (error) {
-      console.error('Erreur lors du toggle du rappel:', error);
       throw error;
     }
   },
@@ -121,7 +116,6 @@ export const journalRemindersService = {
 
       if (error) throw error;
     } catch (error) {
-      console.error('Erreur lors de la suppression du rappel:', error);
       throw error;
     }
   },

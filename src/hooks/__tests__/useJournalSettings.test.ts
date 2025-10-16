@@ -1,25 +1,31 @@
-// @ts-nocheck
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useJournalSettings } from '../useJournalSettings';
-import { journalPromptsService } from '@/services/journalPrompts';
 
-vi.mock('@/services/journalPrompts');
+const mockGetRandomPrompt = vi.fn();
+const mockIncrementUsage = vi.fn();
+const mockCreateReminder = vi.fn();
+const mockUpdateReminder = vi.fn();
+const mockToggleReminder = vi.fn();
+const mockDeleteReminder = vi.fn();
+
+let mockReminders: any[] = [];
+
 vi.mock('@/hooks/useJournalPrompts', () => ({
   useJournalPrompts: () => ({
     prompts: [],
-    getRandomPrompt: vi.fn(),
-    incrementUsage: vi.fn(),
+    getRandomPrompt: mockGetRandomPrompt,
+    incrementUsage: mockIncrementUsage,
   }),
 }));
 
 vi.mock('@/hooks/useJournalReminders', () => ({
   useJournalReminders: () => ({
-    reminders: [],
-    createReminder: vi.fn(),
-    updateReminder: vi.fn(),
-    toggleReminder: vi.fn(),
-    deleteReminder: vi.fn(),
+    reminders: mockReminders,
+    createReminder: mockCreateReminder,
+    updateReminder: mockUpdateReminder,
+    toggleReminder: mockToggleReminder,
+    deleteReminder: mockDeleteReminder,
   }),
 }));
 
@@ -69,18 +75,10 @@ describe('useJournalSettings', () => {
   });
 
   it('détecte les rappels actifs', () => {
-    const mockReminders = [
+    mockReminders = [
       { id: '1', is_active: false },
       { id: '2', is_active: true },
     ];
-
-    vi.mocked(useJournalReminders).mockReturnValue({
-      reminders: mockReminders,
-      createReminder: vi.fn(),
-      updateReminder: vi.fn(),
-      toggleReminder: vi.fn(),
-      deleteReminder: vi.fn(),
-    } as any);
 
     const { result } = renderHook(() => useJournalSettings());
 

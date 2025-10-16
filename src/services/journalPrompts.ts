@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { supabase } from '@/integrations/supabase/client';
 
 export interface JournalPrompt {
@@ -38,7 +37,6 @@ export const journalPromptsService = {
       const randomIndex = Math.floor(Math.random() * data.length);
       return data[randomIndex];
     } catch (error) {
-      console.error('Erreur lors de la récupération du prompt:', error);
       throw error;
     }
   },
@@ -58,7 +56,6 @@ export const journalPromptsService = {
       if (error) throw error;
       return data || [];
     } catch (error) {
-      console.error('Erreur lors de la récupération des prompts:', error);
       throw error;
     }
   },
@@ -90,7 +87,7 @@ export const journalPromptsService = {
         }
       }
     } catch (error) {
-      console.error('Erreur lors de l\'incrémentation du compteur:', error);
+      // Silently fail on increment errors
     }
   },
 };

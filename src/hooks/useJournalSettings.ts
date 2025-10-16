@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState } from 'react';
 import { useJournalPrompts } from '@/hooks/useJournalPrompts';
 import { useJournalReminders } from '@/hooks/useJournalReminders';
