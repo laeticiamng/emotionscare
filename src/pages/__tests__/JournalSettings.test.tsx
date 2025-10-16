@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { JournalSettingsPage } from '../JournalSettings';
+import JournalSettingsPage from '../JournalSettings';
 import { useJournalSettings } from '@/hooks/useJournalSettings';
 
 vi.mock('@/hooks/useJournalSettings');

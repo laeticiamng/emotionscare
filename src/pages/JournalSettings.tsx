@@ -15,7 +15,7 @@ import type { JournalReminder, CreateReminderParams } from '@/services/journalRe
 /**
  * Page de paramètres du journal
  */
-export const JournalSettingsPage = memo(() => {
+const JournalSettingsPage = memo(() => {
   const {
     settings,
     updateSettings,
@@ -184,3 +184,5 @@ export const JournalSettingsPage = memo(() => {
 });
 
 JournalSettingsPage.displayName = 'JournalSettingsPage';
+
+export default JournalSettingsPage;

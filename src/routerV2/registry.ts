@@ -920,6 +920,15 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: true,
     aliases: ['/notifications'],
   },
+  {
+    name: 'settings-journal',
+    path: '/settings/journal',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app-sidebar',
+    component: 'JournalSettingsPage',
+    guard: true,
+  },
 
   // ═══════════════════════════════════════════════════════════
   // B2B FEATURES (EMPLOYEE)

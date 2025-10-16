@@ -126,6 +126,7 @@ const ChooseModePage = lazy(() => import('@/pages/ChooseModePage'));
 const CoachChatPage = lazy(() => import('@/pages/CoachChatPage'));
 const VRSessionsPage = lazy(() => import('@/pages/VRSessionsPage'));
 const JournalNewPage = lazy(() => import('@/pages/JournalNewPage'));
+const JournalSettingsPage = lazy(() => import('@/pages/JournalSettings'));
 const ReportingPage = lazy(() => import('@/pages/ReportingPage'));
 const ExportPage = lazy(() => import('@/pages/ExportPage'));
 const NavigationPage = lazy(() => import('@/pages/NavigationPage'));
@@ -285,6 +286,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   CoachChatPage,
   VRSessionsPage,
   JournalNewPage,
+  JournalSettingsPage,
   ReportingPage,
   ExportPage,
   NavigationPage,
