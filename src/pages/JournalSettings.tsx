@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { memo, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -143,7 +142,7 @@ export const JournalSettingsPage = memo(() => {
             <CardContent>
               <JournalRemindersList
                 reminders={reminders}
-                onToggle={toggleReminder}
+                onToggle={(id, isActive) => toggleReminder({ id, isActive })}
                 onEdit={handleEditReminder}
                 onDelete={deleteReminder}
               />
