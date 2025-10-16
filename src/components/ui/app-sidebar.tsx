@@ -1,5 +1,6 @@
-import { Home, Heart, Gamepad2, Users, BarChart3, Settings, Music, Brain, BookOpen, Sparkles, MessageCircle, Calendar, FileText, Download } from 'lucide-react';
+import { Home, Heart, Gamepad2, Users, BarChart3, Settings, Music, Brain, BookOpen, Sparkles, MessageCircle, Calendar, FileText, Download, ChevronDown, BookText } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
+import { useState } from 'react';
 import {
   Sidebar,
   SidebarContent,
@@ -9,8 +10,16 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubItem,
+  SidebarMenuSubButton,
   useSidebar,
 } from '@/components/ui/sidebar';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible';
 
 const navigationItems = [
   {
@@ -20,7 +29,16 @@ const navigationItems = [
       { title: 'Scan Émotionnel', url: '/app/scan', icon: Sparkles },
       { title: 'Musique Adaptative', url: '/app/music', icon: Music },
       { title: 'Coach IA', url: '/app/coach', icon: Brain },
-      { title: 'Journal', url: '/app/journal', icon: BookOpen },
+      { 
+        title: 'Journal', 
+        url: '/app/journal', 
+        icon: BookOpen,
+        subItems: [
+          { title: 'Mes entrées', url: '/app/journal', icon: BookOpen },
+          { title: 'Nouvelle entrée', url: '/app/journal-new', icon: BookText },
+          { title: 'Paramètres', url: '/settings/journal', icon: Settings },
+        ]
+      },
     ],
   },
   {
@@ -78,8 +96,15 @@ export function AppSidebar() {
   const { open } = useSidebar();
   const location = useLocation();
   const currentPath = location.pathname;
+  const [expandedItems, setExpandedItems] = useState<string[]>([]);
 
   const isActive = (path: string) => currentPath === path;
+  
+  const toggleItem = (title: string) => {
+    setExpandedItems(prev => 
+      prev.includes(title) ? prev.filter(t => t !== title) : [...prev, title]
+    );
+  };
 
   const getNavCls = ({ isActive }: { isActive: boolean }) =>
     isActive
@@ -98,16 +123,60 @@ export function AppSidebar() {
             )}
             <SidebarGroupContent>
               <SidebarMenu>
-                {section.items.map((item) => (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild>
-                      <NavLink to={item.url} end className={getNavCls}>
-                        <item.icon className="h-4 w-4 shrink-0" />
-                        {open && <span className="ml-3">{item.title}</span>}
-                      </NavLink>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
+                {section.items.map((item) => {
+                  const hasSubItems = 'subItems' in item && item.subItems && item.subItems.length > 0;
+                  
+                  if (hasSubItems) {
+                    return (
+                      <Collapsible
+                        key={item.title}
+                        open={expandedItems.includes(item.title)}
+                        onOpenChange={() => toggleItem(item.title)}
+                      >
+                        <SidebarMenuItem>
+                          <CollapsibleTrigger asChild>
+                            <SidebarMenuButton className={getNavCls({ isActive: currentPath.startsWith('/app/journal') || currentPath.startsWith('/settings/journal') })}>
+                              <item.icon className="h-4 w-4 shrink-0" />
+                              {open && (
+                                <>
+                                  <span className="ml-3 flex-1">{item.title}</span>
+                                  <ChevronDown className={`h-4 w-4 transition-transform ${expandedItems.includes(item.title) ? 'rotate-180' : ''}`} />
+                                </>
+                              )}
+                            </SidebarMenuButton>
+                          </CollapsibleTrigger>
+                          {open && (
+                            <CollapsibleContent>
+                              <SidebarMenuSub>
+                                {item.subItems.map((subItem) => (
+                                  <SidebarMenuSubItem key={subItem.title}>
+                                    <SidebarMenuSubButton asChild>
+                                      <NavLink to={subItem.url} className={getNavCls}>
+                                        <subItem.icon className="h-4 w-4 shrink-0" />
+                                        <span className="ml-3">{subItem.title}</span>
+                                      </NavLink>
+                                    </SidebarMenuSubButton>
+                                  </SidebarMenuSubItem>
+                                ))}
+                              </SidebarMenuSub>
+                            </CollapsibleContent>
+                          )}
+                        </SidebarMenuItem>
+                      </Collapsible>
+                    );
+                  }
+                  
+                  return (
+                    <SidebarMenuItem key={item.title}>
+                      <SidebarMenuButton asChild>
+                        <NavLink to={item.url} end className={getNavCls}>
+                          <item.icon className="h-4 w-4 shrink-0" />
+                          {open && <span className="ml-3">{item.title}</span>}
+                        </NavLink>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  );
+                })}
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>

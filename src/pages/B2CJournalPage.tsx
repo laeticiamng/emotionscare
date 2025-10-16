@@ -1,13 +1,42 @@
-// @ts-nocheck
+import { useState, useEffect } from 'react';
 import PageRoot from '@/components/common/PageRoot'
 import JournalView from './journal/JournalView'
 import { Sparkles } from 'lucide-react'
 import { useFlags } from '@/core/flags'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import { JournalSettingsLink } from '@/components/journal/JournalSettingsLink'
+import { JournalOnboarding } from '@/components/journal/JournalOnboarding'
+import { JournalQuickTips } from '@/components/journal/JournalQuickTips'
+
+const ONBOARDING_KEY = 'journal-onboarding-completed';
 
 export default function B2CJournalPage() {
   const { has } = useFlags()
   const journalEnabled = has('FF_JOURNAL')
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showTips, setShowTips] = useState(false);
+
+  useEffect(() => {
+    // Vérifier si l'utilisateur a déjà vu l'onboarding
+    const hasSeenOnboarding = localStorage.getItem(ONBOARDING_KEY);
+    if (!hasSeenOnboarding) {
+      setShowOnboarding(true);
+    } else {
+      // Afficher les conseils pour les utilisateurs qui reviennent
+      setShowTips(true);
+    }
+  }, []);
+
+  const handleOnboardingComplete = () => {
+    localStorage.setItem(ONBOARDING_KEY, 'true');
+    setShowOnboarding(false);
+    setShowTips(true);
+  };
+
+  const handleOnboardingDismiss = () => {
+    localStorage.setItem(ONBOARDING_KEY, 'true');
+    setShowOnboarding(false);
+  };
 
   return (
     <PageRoot>
@@ -24,9 +53,13 @@ export default function B2CJournalPage() {
               </p>
             </div>
           </div>
+          <JournalSettingsLink variant="outline" size="sm" />
         </header>
         {journalEnabled ? (
-          <JournalView />
+          <>
+            {showTips && <JournalQuickTips className="mb-6" />}
+            <JournalView />
+          </>
         ) : (
           <Alert role="status" variant="default" className="border-primary/40 bg-primary/5">
             <AlertDescription>
@@ -36,6 +69,13 @@ export default function B2CJournalPage() {
           </Alert>
         )}
       </section>
+      
+      {showOnboarding && (
+        <JournalOnboarding
+          onComplete={handleOnboardingComplete}
+          onDismiss={handleOnboardingDismiss}
+        />
+      )}
     </PageRoot>
   )
 }
