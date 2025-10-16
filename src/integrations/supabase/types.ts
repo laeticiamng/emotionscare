@@ -5056,9 +5056,13 @@ export type Database = {
           content: string
           created_at: string | null
           id: string
+          is_favorite: boolean | null
           is_precious: boolean | null
+          mode: string | null
+          summary: string | null
           tags: string[] | null
           text_content: string | null
+          transcript: string | null
           updated_at: string | null
           user_id: string
         }
@@ -5071,9 +5075,13 @@ export type Database = {
           content: string
           created_at?: string | null
           id?: string
+          is_favorite?: boolean | null
           is_precious?: boolean | null
+          mode?: string | null
+          summary?: string | null
           tags?: string[] | null
           text_content?: string | null
+          transcript?: string | null
           updated_at?: string | null
           user_id: string
         }
@@ -5086,10 +5094,80 @@ export type Database = {
           content?: string
           created_at?: string | null
           id?: string
+          is_favorite?: boolean | null
           is_precious?: boolean | null
+          mode?: string | null
+          summary?: string | null
           tags?: string[] | null
           text_content?: string | null
+          transcript?: string | null
           updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      journal_prompts: {
+        Row: {
+          category: string
+          created_at: string
+          difficulty: string
+          id: string
+          is_active: boolean | null
+          prompt_text: string
+          tags: string[] | null
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          difficulty: string
+          id?: string
+          is_active?: boolean | null
+          prompt_text: string
+          tags?: string[] | null
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          difficulty?: string
+          id?: string
+          is_active?: boolean | null
+          prompt_text?: string
+          tags?: string[] | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      journal_reminders: {
+        Row: {
+          created_at: string
+          days_of_week: number[]
+          id: string
+          is_active: boolean | null
+          message: string | null
+          reminder_time: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          days_of_week: number[]
+          id?: string
+          is_active?: boolean | null
+          message?: string | null
+          reminder_time: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          days_of_week?: number[]
+          id?: string
+          is_active?: boolean | null
+          message?: string | null
+          reminder_time?: string
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
@@ -11218,6 +11296,59 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: []
+      }
+      voice_processing_jobs: {
+        Row: {
+          audio_url: string
+          completed_at: string | null
+          created_at: string
+          emotion_analysis: Json | null
+          entry_id: string | null
+          id: string
+          processing_error: string | null
+          started_at: string
+          status: string
+          transcription: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          audio_url: string
+          completed_at?: string | null
+          created_at?: string
+          emotion_analysis?: Json | null
+          entry_id?: string | null
+          id?: string
+          processing_error?: string | null
+          started_at?: string
+          status?: string
+          transcription?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          audio_url?: string
+          completed_at?: string | null
+          created_at?: string
+          emotion_analysis?: Json | null
+          entry_id?: string | null
+          id?: string
+          processing_error?: string | null
+          started_at?: string
+          status?: string
+          transcription?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "voice_processing_jobs_entry_id_fkey"
+            columns: ["entry_id"]
+            isOneToOne: false
+            referencedRelation: "journal_entries"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       vr_dome_sessions: {
         Row: {
