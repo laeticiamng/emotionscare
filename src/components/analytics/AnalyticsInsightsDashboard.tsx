@@ -8,6 +8,7 @@ import { Brain, TrendingUp, Sparkles, Target, Activity, AlertCircle, CheckCircle
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { LineChart, Line, BarChart, Bar, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { logger } from '@/lib/logger';
 
 interface Insights {
   emotional_state: string;
@@ -57,7 +58,7 @@ const AnalyticsInsightsDashboard: React.FC = () => {
       setInsights(data.insights);
       toast.success('Insights générés avec succès');
     } catch (error) {
-      console.error('Error generating insights:', error);
+      logger.error('Error generating insights', error as Error, 'UI');
       toast.error('Erreur lors de la génération des insights');
     } finally {
       setLoading(false);
@@ -73,7 +74,7 @@ const AnalyticsInsightsDashboard: React.FC = () => {
       if (error) throw error;
       setTrends(data.trends);
     } catch (error) {
-      console.error('Error loading trends:', error);
+      logger.error('Error loading trends', error as Error, 'UI');
     }
   };
 
@@ -86,7 +87,7 @@ const AnalyticsInsightsDashboard: React.FC = () => {
       if (error) throw error;
       setPrediction(data.prediction);
     } catch (error) {
-      console.error('Error loading prediction:', error);
+      logger.error('Error loading prediction', error as Error, 'UI');
     }
   };
 

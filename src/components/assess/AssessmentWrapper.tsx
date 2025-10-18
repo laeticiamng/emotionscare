@@ -4,6 +4,7 @@ import { AssessCard } from './AssessCard';
 import { AssessForm } from './AssessForm';
 import { VerbalBadge } from './VerbalBadge';
 import type { Instrument } from './types';
+import { logger } from '@/lib/logger';
 
 interface AssessmentWrapperProps {
   instrument: Instrument;
@@ -39,7 +40,7 @@ export function AssessmentWrapper({
       onComplete?.(hints);
     },
     onError: (error) => {
-      console.error('Assessment error:', error);
+      logger.error('Assessment error', error as Error, 'UI');
       // Rester sur le formulaire en cas d'erreur
       // Les toasts sont gérés par le hook
     }

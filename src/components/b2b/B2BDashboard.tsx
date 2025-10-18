@@ -7,6 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Building2, Users, TrendingUp, FileText, Loader2, Download } from 'lucide-react';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useToast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 
 interface B2BDashboardProps {
   orgId: string;
@@ -35,7 +36,7 @@ const B2BDashboard: React.FC<B2BDashboardProps> = ({ orgId }) => {
       if (error) throw error;
       setOverview(data);
     } catch (error) {
-      console.error('Error loading org overview:', error);
+      logger.error('Error loading org overview', error as Error, 'UI');
       toast({
         title: 'Erreur',
         description: 'Impossible de charger les données',
@@ -55,7 +56,7 @@ const B2BDashboard: React.FC<B2BDashboardProps> = ({ orgId }) => {
       if (error) throw error;
       setTeamAnalytics(data);
     } catch (error) {
-      console.error('Error loading team analytics:', error);
+      logger.error('Error loading team analytics', error as Error, 'UI');
     }
   };
 
@@ -73,7 +74,7 @@ const B2BDashboard: React.FC<B2BDashboardProps> = ({ orgId }) => {
         description: 'Le rapport de bien-être organisationnel est prêt',
       });
     } catch (error) {
-      console.error('Error generating report:', error);
+      logger.error('Error generating report', error as Error, 'UI');
       toast({
         title: 'Erreur',
         description: 'Impossible de générer le rapport',

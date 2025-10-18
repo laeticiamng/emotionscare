@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Brain, TrendingUp, Target, Sparkles, Calendar, Activity, AlertCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 export default function AIInsightsEnhanced() {
   const [loading, setLoading] = useState(false);
@@ -36,7 +37,7 @@ export default function AIInsightsEnhanced() {
       if (error) throw error;
       setReportHistory(data || []);
     } catch (error) {
-      console.error('Erreur chargement historique:', error);
+      logger.error('Erreur chargement historique', error as Error, 'UI');
     }
   };
 
@@ -55,7 +56,7 @@ export default function AIInsightsEnhanced() {
         lastAnalysis: data?.[0]?.created_at || null
       });
     } catch (error) {
-      console.error('Erreur chargement stats:', error);
+      logger.error('Erreur chargement stats', error as Error, 'UI');
     }
   };
 
@@ -81,7 +82,7 @@ export default function AIInsightsEnhanced() {
         throw new Error(data.error || 'Erreur génération');
       }
     } catch (error) {
-      console.error('Erreur génération analyse:', error);
+      logger.error('Erreur génération analyse', error as Error, 'UI');
       toast.error('Erreur lors de la génération de l\'analyse');
     } finally {
       setLoading(false);
