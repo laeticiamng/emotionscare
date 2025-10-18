@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client'
 import { useAuth } from '@/contexts/AuthContext'
 import { useToast } from '@/hooks/use-toast'
 import { useAssessment } from '@/hooks/useAssessment'
+import { logger } from '@/lib/logger'
 
 const PROMPT_STORAGE_KEY = 'journal.panas_prompt_last_seen'
 const PROMPT_INTERVAL_MS = 72 * 60 * 60 * 1000 // 72h ≈ 2-3 rappels par semaine

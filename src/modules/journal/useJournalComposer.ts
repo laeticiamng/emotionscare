@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { createCoachDraft, insertText, insertVoice } from '@/services/journal/journalApi'
 import type { SanitizedNote } from './types'
+import { logger } from '@/lib/logger'
 
 type DictationError =
   | 'not_supported'
@@ -199,7 +200,7 @@ export function useJournalComposer(options: UseJournalComposerOptions = {}): Use
         window.localStorage.setItem(PENDING_MEMOS_KEY, JSON.stringify(next))
         return true
       } catch (offlineError) {
-        console.warn('voice memo offline persistence failed', offlineError)
+        logger.warn('Voice memo offline persistence failed', { error: offlineError }, 'JOURNAL');
         return false
       }
     },
@@ -272,7 +273,7 @@ export function useJournalComposer(options: UseJournalComposerOptions = {}): Use
       setDictationError(null)
       setIsDictating(true)
     } catch (dictationIssue) {
-      console.error('Dictation start failed', dictationIssue)
+      logger.error('Dictation start failed', { error: dictationIssue }, 'JOURNAL');
       setDictationError('transcription_error')
       cleanupRecognition()
     }

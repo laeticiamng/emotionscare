@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Send, Loader2, Sparkles } from 'lucide-react';
 import { JournalPromptCard } from './JournalPromptCard';
 import type { JournalPrompt } from '@/services/journalPrompts';
+import { logger } from '@/lib/logger';
 
 interface JournalTextInputProps {
   onSubmit: (text: string) => Promise<void>;
@@ -65,7 +66,7 @@ export const JournalTextInput = memo<JournalTextInputProps>(({
       setText('');
       setCharCount(0);
     } catch (error) {
-      console.error('Erreur soumission:', error);
+      logger.error('Failed to submit journal text', { error }, 'JOURNAL');
     }
   }, [text, isLoading, onSubmit]);
 

@@ -5,6 +5,7 @@
 import { useCallback, useState, useEffect } from 'react';
 import { useAsyncMachine } from '@/hooks/useAsyncMachine';
 import { journalService, JournalEntry, JournalVoiceEntry, JournalTextEntry } from './journalService';
+import { logger } from '@/lib/logger';
 
 export type JournalState = 'idle' | 'loading' | 'recording' | 'processing' | 'success' | 'error';
 
@@ -120,7 +121,7 @@ export const useJournalMachine = (config: JournalConfig = {}) => {
       }
     },
     onError: (error) => {
-      console.error('Erreur journal:', error);
+      logger.error('Journal processing failed', { error }, 'JOURNAL');
       setIsRecording(false);
       setRecordingDuration(0);
       if (recordingTimer) {
@@ -157,7 +158,7 @@ export const useJournalMachine = (config: JournalConfig = {}) => {
         });
       }
     } catch (error) {
-      console.error('Erreur démarrage enregistrement:', error);
+      logger.error('Recording start failed', { error }, 'JOURNAL');
       config.onError?.(error as Error);
     }
   }, [config]);

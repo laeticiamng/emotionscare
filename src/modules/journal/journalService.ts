@@ -333,7 +333,7 @@ class JournalService {
    */
   async cleanupEphemeralEntries(): Promise<void> {
     // No-op - ephemeral notes are no longer supported
-    console.warn('cleanupEphemeralEntries is deprecated and no longer does anything');
+    // Silently skip - no logging needed for deprecated no-op
   }
 }
 
