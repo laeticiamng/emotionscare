@@ -5,6 +5,7 @@ import type {
   SpeechRecognition,
   SpeechRecognitionEvent,
 } from '@/types/voice';
+import { logger } from '@/lib/logger';
 
 type SpeechRecognitionResult = {
   isFinal: boolean;
@@ -73,7 +74,7 @@ export const createSpeechRecognition = (): SpeechRecognition | null => {
   const SpeechRecognitionConstructor = getSpeechRecognition();
   
   if (!SpeechRecognitionConstructor) {
-    console.warn('SpeechRecognition is not supported in this browser');
+    logger.warn('SpeechRecognition is not supported in this browser', {}, 'SYSTEM');
     return null;
   }
   

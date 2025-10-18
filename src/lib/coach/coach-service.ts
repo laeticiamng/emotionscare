@@ -1,5 +1,7 @@
 // @ts-nocheck
 
+import { logger } from '@/lib/logger';
+
 // Basic implementations of the necessary functions
 
 export const getCoachMessages = async () => {
@@ -7,7 +9,7 @@ export const getCoachMessages = async () => {
 };
 
 export const sendCoachMessage = async (message: string) => {
-  console.log("Sending coach message:", message);
+  logger.info("Sending coach message", { message }, 'API');
   return { id: "mock", content: "Response from coach" };
 };
 
@@ -24,7 +26,7 @@ export interface CoachEvent {
 }
 
 export const createConversation = async (title: string) => {
-  console.log("Creating conversation:", title);
+  logger.info("Creating conversation", { title }, 'API');
   return { id: "mock-conv", title };
 };
 
@@ -33,6 +35,6 @@ export const listConversations = async () => {
 };
 
 export const updateConversationTitle = async (id: string, title: string) => {
-  console.log(`Updating conversation ${id} title to ${title}`);
+  logger.info(`Updating conversation title`, { id, title }, 'API');
   return { id, title };
 };

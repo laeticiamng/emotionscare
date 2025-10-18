@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { v4 as uuidv4 } from 'uuid';
+import { logger } from '@/lib/logger';
 import { ChatMessage, ChatConversation } from '@/types/chat';
 
 const STORAGE_KEY = 'chat_history';
@@ -16,7 +17,7 @@ export function getConversations(): ChatConversation[] {
     
     return Array.isArray(conversations) ? conversations : [];
   } catch (error) {
-    console.error('Error retrieving chat history:', error);
+    logger.error('Error retrieving chat history', error as Error, 'API');
     return [];
   }
 }

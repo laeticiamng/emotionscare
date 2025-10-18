@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { isBrowser } from '@/lib/utils';
+import { logger } from '@/lib/logger';
 
 type ConsentCategory = 'functional' | 'analytics';
 
@@ -85,7 +86,7 @@ function readFromStorage(): ConsentPreferences | null {
     const parsed = JSON.parse(raw) as unknown;
     return parseStoredPreferences(parsed);
   } catch (error) {
-    console.warn('[Consent] Impossible de lire les préférences', error);
+    logger.warn('[Consent] Impossible de lire les préférences', error as Error, 'SYSTEM');
     return null;
   }
 }
@@ -98,7 +99,7 @@ function persistPreferences(preferences: ConsentPreferences): void {
   try {
     window.localStorage.setItem(CONSENT_STORAGE_KEY, JSON.stringify(preferences));
   } catch (error) {
-    console.warn('[Consent] Impossible d\'enregistrer les préférences', error);
+    logger.warn('[Consent] Impossible d\'enregistrer les préférences', error as Error, 'SYSTEM');
   }
 }
 
@@ -135,7 +136,7 @@ function notify(preferences: ConsentPreferences): void {
     try {
       listener(clonePreferences(preferences));
     } catch (error) {
-      console.error('[Consent] Listener error', error);
+      logger.error('[Consent] Listener error', error as Error, 'SYSTEM');
     }
   });
 }

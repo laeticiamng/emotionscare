@@ -1,7 +1,9 @@
 // @ts-nocheck
 
+import { logger } from '@/lib/logger';
+
 export const executeAction = async (actionType: string, data: any) => {
-  console.log(`Executing action ${actionType}`, data);
+  logger.info(`Executing action ${actionType}`, data, 'API');
   return { success: true };
 };
 
