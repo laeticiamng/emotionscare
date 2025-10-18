@@ -1,5 +1,6 @@
 // @ts-nocheck
 import type { HumeEmotionDetection } from '@/types/music/parcours';
+import { logger } from '@/lib/logger';
 
 // Exponential Moving Average for emotion smoothing
 class EMAFilter {
@@ -40,7 +41,7 @@ export class HumeEmotionDetector {
         this.ws = new WebSocket(`wss://api.hume.ai/v0/stream/models`);
         
         this.ws.onopen = () => {
-          console.log('Hume WebSocket connected');
+          logger.info('Hume WebSocket connected', undefined, 'Hume');
           this.reconnectAttempts = 0;
           
           // Send auth
@@ -57,17 +58,17 @@ export class HumeEmotionDetector {
             const data = JSON.parse(event.data);
             this.handleMessage(data);
           } catch (error) {
-            console.error('Hume message parse error:', error);
+            logger.error('Hume message parse error', error, 'Hume');
           }
         };
 
         this.ws.onerror = (error) => {
-          console.error('Hume WebSocket error:', error);
+          logger.error('Hume WebSocket error', error, 'Hume');
           reject(error);
         };
 
         this.ws.onclose = () => {
-          console.log('Hume WebSocket closed');
+          logger.info('Hume WebSocket closed', undefined, 'Hume');
           this.attemptReconnect(apiKey);
         };
 
@@ -135,7 +136,7 @@ export class HumeEmotionDetector {
       this.reconnectAttempts++;
       const delay = Math.min(1000 * Math.pow(2, this.reconnectAttempts), 10000);
       
-      console.log(`Attempting Hume reconnect in ${delay}ms (attempt ${this.reconnectAttempts})`);
+      logger.info(`Attempting Hume reconnect in ${delay}ms`, { attempt: this.reconnectAttempts }, 'Hume');
       
       setTimeout(() => {
         if (this.onDetectionCallback) {
@@ -149,7 +150,7 @@ export class HumeEmotionDetector {
     if (this.ws?.readyState === WebSocket.OPEN) {
       // Reject chunks > 5s (arbitrary limit for MVP)
       if (audioData.byteLength > 44100 * 2 * 5) {
-        console.warn('Audio chunk too large, skipping');
+        logger.warn('Audio chunk too large, skipping', { size: audioData.byteLength }, 'Hume');
         return;
       }
       

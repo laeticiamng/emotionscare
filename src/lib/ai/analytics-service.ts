@@ -5,6 +5,7 @@
  */
 import { chatCompletion } from './openai-client';
 import { toast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 
 interface AnalyticsInsight {
   summary: string;
@@ -56,7 +57,7 @@ export async function generateAnalyticsInsights(
           success: true
         };
       } catch (parseError) {
-        console.error('Error parsing analytics JSON:', parseError);
+        logger.error('Error parsing analytics JSON', parseError, 'Analytics');
         throw new Error('Format de rapport invalide');
       }
     } else {
@@ -77,7 +78,7 @@ export async function generateAnalyticsInsights(
       };
     }
   } catch (error) {
-    console.error('Error generating analytics insights:', error);
+    logger.error('Error generating analytics insights', error, 'Analytics');
     toast({
       title: "Erreur d'analyse",
       description: "Impossible de générer le rapport d'analyse.",
