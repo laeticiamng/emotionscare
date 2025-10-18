@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
 import { Play, Pause, RotateCcw, Wind, Brain, Heart, TrendingUp } from 'lucide-react';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 interface Exercise {
   id: string;
@@ -99,7 +100,7 @@ export const BreathingMeditationDashboard: React.FC = () => {
       if (sessionsRes.data?.sessions) setSessions(sessionsRes.data.sessions);
       if (statsRes.data?.stats) setStats(statsRes.data.stats);
     } catch (error: any) {
-      console.error('Error loading data:', error);
+      logger.error('Error loading data', error as Error, 'UI');
       toast.error('Erreur lors du chargement des données');
     } finally {
       setLoading(false);
@@ -151,7 +152,7 @@ export const BreathingMeditationDashboard: React.FC = () => {
       setSessionTime(0);
       toast.success(`Session ${exercise.name} démarrée`);
     } catch (error: any) {
-      console.error('Error starting session:', error);
+      logger.error('Error starting session', error as Error, 'UI');
       toast.error('Erreur lors du démarrage de la session');
     }
   };
@@ -172,7 +173,7 @@ export const BreathingMeditationDashboard: React.FC = () => {
       toast.success('Session terminée avec succès !');
       loadData();
     } catch (error: any) {
-      console.error('Error completing session:', error);
+      logger.error('Error completing session', error as Error, 'UI');
       toast.error('Erreur lors de la finalisation');
     }
   };

@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { Wind, Play, Pause, RotateCcw, TrendingUp } from 'lucide-react';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 interface BreathingPattern {
   id: string;
@@ -103,7 +104,7 @@ export const BreathingExerciseDashboard: React.FC = () => {
         setInsights(data.insights);
       }
     } catch (error) {
-      console.error('Error loading insights:', error);
+      logger.error('Error loading insights', error as Error, 'UI');
     }
   };
 
@@ -130,7 +131,7 @@ export const BreathingExerciseDashboard: React.FC = () => {
       toast.success('Session démarrée');
     } catch (error) {
       toast.error('Erreur lors du démarrage');
-      console.error('Error starting session:', error);
+      logger.error('Error starting session', error as Error, 'UI');
     }
   };
 
@@ -177,7 +178,7 @@ export const BreathingExerciseDashboard: React.FC = () => {
       resetSession();
     } catch (error) {
       toast.error('Erreur lors de la sauvegarde');
-      console.error('Error completing session:', error);
+      logger.error('Error completing session', error as Error, 'UI');
     }
   };
 

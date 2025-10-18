@@ -21,6 +21,7 @@ import {
   Zap
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 interface BreathingPattern {
   id: string;
@@ -135,7 +136,7 @@ const ImmersiveBreathingEnhanced: React.FC = () => {
       // Start animation
       startBreathingAnimation(data.session.visualization_config);
     } catch (error) {
-      console.error('Error starting session:', error);
+      logger.error('Error starting session', error as Error, 'UI');
       toast.error('Erreur lors du démarrage de la session');
     }
   };
@@ -169,7 +170,7 @@ const ImmersiveBreathingEnhanced: React.FC = () => {
         toast.success(`Session terminée ! ${data.insights.performance}`);
         
         // Show detailed insights in a modal or card
-        console.log('AI Insights:', data.insights);
+        logger.info('AI Insights', { insights: data.insights }, 'UI');
       }
 
       setIsActive(false);
@@ -180,7 +181,7 @@ const ImmersiveBreathingEnhanced: React.FC = () => {
       // Refresh history
       loadHistory();
     } catch (error) {
-      console.error('Error stopping session:', error);
+      logger.error('Error stopping session', error as Error, 'UI');
       toast.error('Erreur lors de l\'arrêt de la session');
     }
   };
@@ -206,7 +207,7 @@ const ImmersiveBreathingEnhanced: React.FC = () => {
       setSessions(data.sessions || []);
       setStats(data.stats);
     } catch (error) {
-      console.error('Error loading history:', error);
+      logger.error('Error loading history', error as Error, 'UI');
     } finally {
       setIsLoadingHistory(false);
     }
@@ -224,7 +225,7 @@ const ImmersiveBreathingEnhanced: React.FC = () => {
       if (error) throw error;
       setRecommendations(data.recommendations || []);
     } catch (error) {
-      console.error('Error loading recommendations:', error);
+      logger.error('Error loading recommendations', error as Error, 'UI');
     }
   };
 

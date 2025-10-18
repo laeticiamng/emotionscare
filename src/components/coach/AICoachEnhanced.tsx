@@ -17,6 +17,7 @@ import {
   Loader2,
   Bot
 } from 'lucide-react';
+import { logger } from '@/lib/logger';
 
 interface Message {
   id: string;
@@ -86,7 +87,7 @@ const AICoachEnhanced: React.FC = () => {
         setMessages(formattedMessages);
       }
     } catch (error) {
-      console.error('Error loading conversation:', error);
+      logger.error('Error loading conversation', error as Error, 'UI');
     }
   };
 
@@ -112,7 +113,7 @@ const AICoachEnhanced: React.FC = () => {
         });
       }
     } catch (error) {
-      console.error('Error loading stats:', error);
+      logger.error('Error loading stats', error as Error, 'UI');
     }
   };
 
@@ -164,7 +165,7 @@ const AICoachEnhanced: React.FC = () => {
       });
 
     } catch (error) {
-      console.error('Error sending message:', error);
+      logger.error('Error sending message', error as Error, 'UI');
       toast({
         title: "Erreur",
         description: "Impossible d'envoyer le message. Veuillez réessayer.",

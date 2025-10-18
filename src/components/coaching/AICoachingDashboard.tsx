@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { MessageCircle, Sparkles, Brain, Heart, TrendingUp, Send, Star } from 'lucide-react';
+import { logger } from '@/lib/logger';
 
 interface Message {
   role: 'user' | 'coach';
@@ -59,7 +60,7 @@ export const AICoachingDashboard: React.FC = () => {
         setSessions(response.data.sessions);
       }
     } catch (error) {
-      console.error('Erreur chargement sessions:', error);
+      logger.error('Erreur chargement sessions', error as Error, 'UI');
     }
   };
 
@@ -73,7 +74,7 @@ export const AICoachingDashboard: React.FC = () => {
         setRecommendations(response.data.recommendations);
       }
     } catch (error) {
-      console.error('Erreur chargement recommandations:', error);
+      logger.error('Erreur chargement recommandations', error as Error, 'UI');
     }
   };
 
@@ -180,7 +181,7 @@ export const AICoachingDashboard: React.FC = () => {
       setMessages([]);
       loadSessions();
     } catch (error) {
-      console.error('Erreur fin de session:', error);
+      logger.error('Erreur fin de session', error as Error, 'UI');
     }
   };
 
