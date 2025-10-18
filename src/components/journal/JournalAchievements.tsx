@@ -1,228 +1,171 @@
-import { useMemo } from 'react';
-import { Trophy, Lock } from 'lucide-react';
+import { memo, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { cn } from '@/lib/utils';
+import { Trophy, Target, Flame, Sparkles, BookOpen, Calendar, Award, Star } from 'lucide-react';
 import type { SanitizedNote } from '@/modules/journal/types';
-
-interface Achievement {
-  id: string;
-  icon: string;
-  title: string;
-  description: string;
-  unlocked: boolean;
-  progress: number;
-  maxProgress: number;
-  category: 'streak' | 'volume' | 'exploration' | 'consistency';
-}
 
 interface JournalAchievementsProps {
   notes: SanitizedNote[];
 }
 
-/**
- * Système d'achievements pour gamifier le journaling
- * Encourage différents aspects de la pratique (régularité, volume, exploration)
- */
-export function JournalAchievements({ notes }: JournalAchievementsProps) {
-  const achievements = useMemo((): Achievement[] => {
-    // Calculer les métriques
+interface Achievement {
+  id: string;
+  title: string;
+  description: string;
+  icon: React.ComponentType<{ className?: string }>;
+  progress: number;
+  target: number;
+  unlocked: boolean;
+  tier: 'bronze' | 'silver' | 'gold' | 'platinum';
+}
+
+const tierColors = {
+  bronze: 'bg-orange-500/10 text-orange-700 dark:text-orange-400 border-orange-500/20',
+  silver: 'bg-slate-500/10 text-slate-700 dark:text-slate-400 border-slate-500/20',
+  gold: 'bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border-yellow-500/20',
+  platinum: 'bg-purple-500/10 text-purple-700 dark:text-purple-400 border-purple-500/20',
+};
+
+export const JournalAchievements = memo<JournalAchievementsProps>(({ notes }) => {
+  const achievements = useMemo<Achievement[]>(() => {
     const totalNotes = notes.length;
-    const totalWords = notes.reduce((sum, note) => 
-      sum + note.text.split(/\s+/).filter(Boolean).length, 0
-    );
-    const uniqueTags = new Set(notes.flatMap(note => note.tags)).size;
+    const totalWords = notes.reduce((sum, note) => sum + note.text.split(/\s+/).length, 0);
+    const uniqueTags = new Set(notes.flatMap(n => n.tags)).size;
     
-    // Calculer la série actuelle
-    const daysSet = new Set<string>();
-    notes.forEach(note => {
-      const date = new Date(note.created_at);
-      const dayKey = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
-      daysSet.add(dayKey);
-    });
-    const sortedDays = Array.from(daysSet)
-      .map(key => {
-        const [year, month, day] = key.split('-').map(Number);
-        return new Date(year, month - 1, day);
-      })
-      .sort((a, b) => b.getTime() - a.getTime());
+    const sortedDates = notes
+      .map(n => new Date(n.created_at).toDateString())
+      .sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
+    const uniqueDates = Array.from(new Set(sortedDates));
     
     let currentStreak = 0;
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    let maxStreak = 0;
+    let tempStreak = 1;
     
-    for (let i = 0; i < sortedDays.length; i++) {
-      const expectedDate = new Date(today);
-      expectedDate.setDate(today.getDate() - i);
-      expectedDate.setHours(0, 0, 0, 0);
-      
-      const actualDate = new Date(sortedDays[i]);
-      actualDate.setHours(0, 0, 0, 0);
-      
-      if (actualDate.getTime() === expectedDate.getTime()) {
-        currentStreak++;
+    for (let i = 0; i < uniqueDates.length - 1; i++) {
+      const diff = (new Date(uniqueDates[i]).getTime() - new Date(uniqueDates[i + 1]).getTime()) / (1000 * 60 * 60 * 24);
+      if (diff === 1) {
+        tempStreak++;
       } else {
-        break;
+        maxStreak = Math.max(maxStreak, tempStreak);
+        tempStreak = 1;
+      }
+    }
+    maxStreak = Math.max(maxStreak, tempStreak);
+    
+    if (uniqueDates.length > 0) {
+      const today = new Date().toDateString();
+      const yesterday = new Date(Date.now() - 86400000).toDateString();
+      
+      if (uniqueDates[0] === today || uniqueDates[0] === yesterday) {
+        currentStreak = 1;
+        for (let i = 0; i < uniqueDates.length - 1; i++) {
+          const diff = (new Date(uniqueDates[i]).getTime() - new Date(uniqueDates[i + 1]).getTime()) / (1000 * 60 * 60 * 24);
+          if (diff === 1) {
+            currentStreak++;
+          } else {
+            break;
+          }
+        }
       }
     }
 
     return [
-      // STREAK
       {
-        id: 'first-step',
-        icon: '🌱',
+        id: 'first_note',
         title: 'Premier pas',
         description: 'Écrivez votre première note',
-        unlocked: totalNotes >= 1,
+        icon: BookOpen,
         progress: Math.min(totalNotes, 1),
-        maxProgress: 1,
-        category: 'streak',
+        target: 1,
+        unlocked: totalNotes >= 1,
+        tier: 'bronze',
       },
       {
-        id: 'week-warrior',
-        icon: '🔥',
-        title: 'Guerrier hebdomadaire',
-        description: 'Maintenez une série de 7 jours',
-        unlocked: currentStreak >= 7,
-        progress: Math.min(currentStreak, 7),
-        maxProgress: 7,
-        category: 'streak',
-      },
-      {
-        id: 'month-master',
-        icon: '⚡',
-        title: 'Maître du mois',
-        description: 'Atteignez 30 jours consécutifs',
-        unlocked: currentStreak >= 30,
-        progress: Math.min(currentStreak, 30),
-        maxProgress: 30,
-        category: 'streak',
-      },
-      {
-        id: 'year-legend',
-        icon: '👑',
-        title: 'Légende annuelle',
-        description: 'Une année complète de journaling quotidien',
-        unlocked: currentStreak >= 365,
-        progress: Math.min(currentStreak, 365),
-        maxProgress: 365,
-        category: 'streak',
-      },
-
-      // VOLUME
-      {
-        id: 'ten-notes',
-        icon: '📝',
-        title: 'Décollage',
+        id: 'note_10',
+        title: 'Écrivain régulier',
         description: 'Écrivez 10 notes',
-        unlocked: totalNotes >= 10,
+        icon: Target,
         progress: Math.min(totalNotes, 10),
-        maxProgress: 10,
-        category: 'volume',
+        target: 10,
+        unlocked: totalNotes >= 10,
+        tier: 'bronze',
       },
       {
-        id: 'fifty-notes',
-        icon: '📚',
-        title: 'Bibliothèque naissante',
-        description: 'Atteignez 50 notes',
-        unlocked: totalNotes >= 50,
+        id: 'note_50',
+        title: 'Journaliste confirmé',
+        description: 'Écrivez 50 notes',
+        icon: Award,
         progress: Math.min(totalNotes, 50),
-        maxProgress: 50,
-        category: 'volume',
+        target: 50,
+        unlocked: totalNotes >= 50,
+        tier: 'silver',
       },
       {
-        id: 'hundred-notes',
-        icon: '🎖️',
-        title: 'Centenaire',
+        id: 'note_100',
+        title: 'Maître du journal',
         description: 'Écrivez 100 notes',
-        unlocked: totalNotes >= 100,
+        icon: Trophy,
         progress: Math.min(totalNotes, 100),
-        maxProgress: 100,
-        category: 'volume',
+        target: 100,
+        unlocked: totalNotes >= 100,
+        tier: 'gold',
       },
       {
-        id: 'wordsmith',
-        icon: '✍️',
-        title: 'Maître des mots',
+        id: 'note_500',
+        title: 'Légende vivante',
+        description: 'Écrivez 500 notes',
+        icon: Star,
+        progress: Math.min(totalNotes, 500),
+        target: 500,
+        unlocked: totalNotes >= 500,
+        tier: 'platinum',
+      },
+      {
+        id: 'streak_7',
+        title: 'Une semaine forte',
+        description: 'Écrivez 7 jours d\'affilée',
+        icon: Flame,
+        progress: Math.min(currentStreak, 7),
+        target: 7,
+        unlocked: maxStreak >= 7,
+        tier: 'silver',
+      },
+      {
+        id: 'streak_30',
+        title: 'Mois de constance',
+        description: 'Écrivez 30 jours d\'affilée',
+        icon: Calendar,
+        progress: Math.min(currentStreak, 30),
+        target: 30,
+        unlocked: maxStreak >= 30,
+        tier: 'gold',
+      },
+      {
+        id: 'words_10k',
+        title: 'Romancier en herbe',
         description: 'Écrivez 10 000 mots au total',
-        unlocked: totalWords >= 10000,
+        icon: Sparkles,
         progress: Math.min(totalWords, 10000),
-        maxProgress: 10000,
-        category: 'volume',
-      },
-
-      // EXPLORATION
-      {
-        id: 'tag-explorer',
-        icon: '🏷️',
-        title: 'Explorateur thématique',
-        description: 'Utilisez 10 tags différents',
-        unlocked: uniqueTags >= 10,
-        progress: Math.min(uniqueTags, 10),
-        maxProgress: 10,
-        category: 'exploration',
+        target: 10000,
+        unlocked: totalWords >= 10000,
+        tier: 'silver',
       },
       {
-        id: 'tag-master',
-        icon: '🎯',
-        title: 'Maître des catégories',
-        description: 'Explorez 25 tags uniques',
-        unlocked: uniqueTags >= 25,
-        progress: Math.min(uniqueTags, 25),
-        maxProgress: 25,
-        category: 'exploration',
-      },
-
-      // CONSISTENCY
-      {
-        id: 'morning-ritual',
-        icon: '☀️',
-        title: 'Rituel matinal',
-        description: 'Écrivez 10 notes avant 9h',
-        unlocked: notes.filter(n => new Date(n.created_at).getHours() < 9).length >= 10,
-        progress: Math.min(notes.filter(n => new Date(n.created_at).getHours() < 9).length, 10),
-        maxProgress: 10,
-        category: 'consistency',
-      },
-      {
-        id: 'night-owl',
-        icon: '🌙',
-        title: 'Oiseau de nuit',
-        description: 'Écrivez 10 notes après 21h',
-        unlocked: notes.filter(n => new Date(n.created_at).getHours() >= 21).length >= 10,
-        progress: Math.min(notes.filter(n => new Date(n.created_at).getHours() >= 21).length, 10),
-        maxProgress: 10,
-        category: 'consistency',
+        id: 'tags_20',
+        title: 'Taxonomiste créatif',
+        description: 'Utilisez 20 tags différents',
+        icon: Target,
+        progress: Math.min(uniqueTags, 20),
+        target: 20,
+        unlocked: uniqueTags >= 20,
+        tier: 'bronze',
       },
     ];
   }, [notes]);
 
   const unlockedCount = achievements.filter(a => a.unlocked).length;
   const totalCount = achievements.length;
-  const completionPercentage = Math.round((unlockedCount / totalCount) * 100);
-
-  const categoryLabels = {
-    streak: 'Régularité',
-    volume: 'Volume',
-    exploration: 'Exploration',
-    consistency: 'Constance',
-  };
-
-  const groupedAchievements = useMemo(() => {
-    const groups: Record<string, Achievement[]> = {
-      streak: [],
-      volume: [],
-      exploration: [],
-      consistency: [],
-    };
-
-    achievements.forEach(achievement => {
-      groups[achievement.category].push(achievement);
-    });
-
-    return groups;
-  }, [achievements]);
 
   return (
     <Card>
@@ -230,75 +173,68 @@ export function JournalAchievements({ notes }: JournalAchievementsProps) {
         <div className="flex items-center justify-between">
           <div>
             <CardTitle className="flex items-center gap-2">
-              <Trophy className="h-5 w-5 text-yellow-600" />
+              <Trophy className="h-5 w-5 text-primary" />
               Achievements
             </CardTitle>
             <CardDescription>
-              Déverrouillez des badges en pratiquant régulièrement
+              {unlockedCount} sur {totalCount} débloqués
             </CardDescription>
           </div>
           <div className="text-right">
-            <div className="text-2xl font-bold">{unlockedCount}/{totalCount}</div>
-            <div className="text-xs text-muted-foreground">{completionPercentage}%</div>
+            <div className="text-2xl font-bold text-primary">{Math.round((unlockedCount / totalCount) * 100)}%</div>
+            <div className="text-xs text-muted-foreground">Complété</div>
           </div>
         </div>
-        <Progress value={completionPercentage} className="h-2 mt-4" />
       </CardHeader>
-      <CardContent className="space-y-6">
-        {Object.entries(groupedAchievements).map(([category, categoryAchievements]) => (
-          <div key={category} className="space-y-3">
-            <h4 className="text-sm font-semibold text-muted-foreground">
-              {categoryLabels[category as keyof typeof categoryLabels]}
-            </h4>
-            <div className="space-y-2">
-              {categoryAchievements.map(achievement => (
-                <div
-                  key={achievement.id}
-                  className={cn(
-                    'flex items-start gap-3 p-3 rounded-lg border transition-colors',
-                    achievement.unlocked
-                      ? 'bg-primary/5 border-primary/20'
-                      : 'bg-muted/30 border-muted'
-                  )}
-                >
-                  <div className="text-2xl flex-shrink-0 mt-0.5">
-                    {achievement.unlocked ? achievement.icon : <Lock className="h-5 w-5 text-muted-foreground" />}
-                  </div>
-                  <div className="flex-1 min-w-0 space-y-1">
-                    <div className="flex items-center justify-between gap-2">
-                      <h5 className={cn(
-                        'font-medium text-sm',
-                        !achievement.unlocked && 'text-muted-foreground'
-                      )}>
-                        {achievement.title}
-                      </h5>
-                      {achievement.unlocked && (
-                        <Badge variant="default" className="text-xs">
-                          Débloqué
-                        </Badge>
-                      )}
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      {achievement.description}
-                    </p>
-                    {!achievement.unlocked && (
-                      <div className="flex items-center gap-2 mt-2">
-                        <Progress 
-                          value={(achievement.progress / achievement.maxProgress) * 100} 
-                          className="h-1.5 flex-1"
-                        />
-                        <span className="text-xs text-muted-foreground whitespace-nowrap">
-                          {achievement.progress}/{achievement.maxProgress}
-                        </span>
+
+      <CardContent className="space-y-4">
+        <div className="grid gap-4 sm:grid-cols-2">
+          {achievements.map((achievement) => {
+            const Icon = achievement.icon;
+            const progressPercent = (achievement.progress / achievement.target) * 100;
+
+            return (
+              <Card
+                key={achievement.id}
+                className={`transition-all ${
+                  achievement.unlocked
+                    ? 'border-2 ' + tierColors[achievement.tier]
+                    : 'opacity-60 border-dashed'
+                }`}
+              >
+                <CardHeader className="pb-3">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <Icon className={`h-5 w-5 ${achievement.unlocked ? 'text-primary' : 'text-muted-foreground'}`} />
+                      <div>
+                        <h4 className="font-semibold text-sm">{achievement.title}</h4>
+                        <p className="text-xs text-muted-foreground">{achievement.description}</p>
                       </div>
+                    </div>
+                    {achievement.unlocked && (
+                      <Badge variant="secondary" className="text-xs">
+                        {achievement.tier}
+                      </Badge>
                     )}
                   </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        ))}
+                </CardHeader>
+
+                <CardContent className="pt-0 space-y-2">
+                  <div className="flex items-center justify-between text-xs text-muted-foreground">
+                    <span>Progression</span>
+                    <span>
+                      {achievement.progress} / {achievement.target}
+                    </span>
+                  </div>
+                  <Progress value={progressPercent} className="h-2" />
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
       </CardContent>
     </Card>
   );
-}
+});
+
+JournalAchievements.displayName = 'JournalAchievements';
