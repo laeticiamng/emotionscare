@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 import { 
   Trophy, Star, Zap, Target, CheckCircle, Clock, 
   TrendingUp, Award, Sparkles, Flame, Loader2 
@@ -62,7 +63,7 @@ const GamificationDashboard: React.FC = () => {
         setStats(statsData.stats);
       }
     } catch (error) {
-      console.error('Error loading data:', error);
+      logger.error('Error loading data', error as Error, 'UI');
     }
   };
 

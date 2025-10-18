@@ -4,6 +4,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Heart, Brain, Activity, TrendingUp } from 'lucide-react';
 import { UserRole } from '@/types/user';
+import { logger } from '@/lib/logger';
 
 interface GlobalOverviewTabProps {
   className?: string;
@@ -63,7 +64,7 @@ const GlobalOverviewTab: React.FC<GlobalOverviewTabProps> = ({ className, userRo
         setShowSoothingReminder(true);
       }
     } catch (error) {
-      console.warn('Soothing reminder flag parse failed', error);
+      logger.warn('Soothing reminder flag parse failed', error, 'UI');
     }
   }, []);
 
