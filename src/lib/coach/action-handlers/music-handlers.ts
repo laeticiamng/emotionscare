@@ -1,5 +1,6 @@
 // @ts-nocheck
 
+import { logger } from '@/lib/logger';
 import { NotificationService } from '@/lib/notifications';
 import { CoachNotification } from '../types';
 
@@ -20,7 +21,7 @@ export async function musicRecommendationNotification(
     });
     return true;
   } catch (error) {
-    console.error('Error creating music recommendation notification:', error);
+    logger.error('Error creating music recommendation notification', error as Error, 'API');
     return false;
   }
 }

@@ -1,6 +1,7 @@
 // @ts-nocheck
 
 import { v4 as uuid } from 'uuid';
+import { logger } from '@/lib/logger';
 
 // Types for the mock service
 interface CoachResponse {
@@ -46,7 +47,7 @@ export const mockCoachService = {
   
   // Log an emotional event for coaching
   logEmotionalEvent: async (emotion: string, intensity: number, context: string): Promise<void> => {
-    console.log(`Logged emotional event: ${emotion} (${intensity}/10) - Context: ${context}`);
+    logger.info(`Logged emotional event: ${emotion} (${intensity}/10)`, { context }, 'API');
     await new Promise(resolve => setTimeout(resolve, 300));
     return;
   }

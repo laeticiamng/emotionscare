@@ -1,5 +1,6 @@
 // @ts-nocheck
 
+import { logger } from '@/lib/logger';
 import { NotificationService } from '@/lib/notifications';
 import { CoachNotification } from '../types';
 
@@ -20,7 +21,7 @@ export async function buddyMatchNotification(
     });
     return true;
   } catch (error) {
-    console.error('Error creating buddy match notification:', error);
+    logger.error('Error creating buddy match notification', error as Error, 'API');
     return false;
   }
 }
@@ -42,7 +43,7 @@ export async function buddyReminderNotification(
     });
     return true;
   } catch (error) {
-    console.error('Error creating buddy reminder notification:', error);
+    logger.error('Error creating buddy reminder notification', error as Error, 'API');
     return false;
   }
 }
