@@ -1,345 +1,174 @@
-// @ts-nocheck
-import React, { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { memo } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
-import { Slider } from '@/components/ui/slider';
-import { useToast } from '@/hooks/use-toast';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { 
-  Book, 
-  Mic, 
-  PenLine, 
   TrendingUp, 
-  Calendar,
-  Trash2,
-  Play,
-  Pause
+  Calendar, 
+  Award, 
+  BarChart3,
+  Clock,
+  Tag,
+  Heart,
+  Zap
 } from 'lucide-react';
-import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import type { SanitizedNote } from '@/modules/journal/types';
+import { JournalStreak } from './JournalStreak';
+import { JournalPersonalStats } from './JournalPersonalStats';
+import { JournalEmotionTrends } from './JournalEmotionTrends';
+import { JournalAchievements } from './JournalAchievements';
 
-const emotions = [
-  { value: 'joy', label: 'Joie', color: 'bg-yellow-500' },
-  { value: 'sadness', label: 'Tristesse', color: 'bg-blue-500' },
-  { value: 'anger', label: 'Colère', color: 'bg-red-500' },
-  { value: 'fear', label: 'Peur', color: 'bg-purple-500' },
-  { value: 'calm', label: 'Calme', color: 'bg-green-500' },
-  { value: 'anxiety', label: 'Anxiété', color: 'bg-orange-500' },
-];
+interface JournalDashboardProps {
+  notes: SanitizedNote[];
+  className?: string;
+}
 
-export default function JournalDashboard() {
-  const { toast } = useToast();
-  const [entries, setEntries] = useState([]);
-  const [insights, setInsights] = useState(null);
-  const [loading, setLoading] = useState(false);
+/**
+ * Dashboard principal du journal
+ * Combine plusieurs widgets pour une vue d'ensemble complète
+ */
+export const JournalDashboard = memo<JournalDashboardProps>(({ notes, className = '' }) => {
+  // Calculs de statistiques rapides
+  const totalNotes = notes.length;
+  const totalWords = notes.reduce((sum, note) => sum + note.text.split(/\s+/).length, 0);
+  const uniqueTags = new Set(notes.flatMap(n => n.tags)).size;
   
-  // Form states
-  const [textContent, setTextContent] = useState('');
-  const [selectedEmotion, setSelectedEmotion] = useState('calm');
-  const [intensity, setIntensity] = useState([0.5]);
-  const [moodScore, setMoodScore] = useState([5]);
-  const [isRecording, setIsRecording] = useState(false);
+  const today = new Date().toDateString();
+  const notesToday = notes.filter(n => new Date(n.created_at).toDateString() === today).length;
 
-  useEffect(() => {
-    loadEntries();
-    loadInsights();
-  }, []);
+  // Calcul de la streak actuelle
+  const calculateCurrentStreak = (): number => {
+    if (notes.length === 0) return 0;
 
-  const loadEntries = async () => {
-    try {
-      const { data, error } = await supabase.functions.invoke('journal', {
-        body: { action: 'get_entries', payload: { limit: 50 } }
-      });
+    const sortedDates = notes
+      .map(n => new Date(n.created_at).toDateString())
+      .filter((date, index, self) => self.indexOf(date) === index)
+      .sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
 
-      if (error) throw error;
-      setEntries(data.data.entries);
-    } catch (error) {
-      console.error('Erreur chargement entrées:', error);
-    }
-  };
-
-  const loadInsights = async () => {
-    try {
-      const { data, error } = await supabase.functions.invoke('journal', {
-        body: { action: 'get_insights', payload: { days: 30 } }
-      });
-
-      if (error) throw error;
-      setInsights(data.data);
-    } catch (error) {
-      console.error('Erreur chargement insights:', error);
-    }
-  };
-
-  const handleSaveTextEntry = async () => {
-    if (!textContent.trim()) {
-      toast({
-        title: "Contenu manquant",
-        description: "Veuillez écrire quelque chose dans votre journal.",
-        variant: "destructive"
-      });
-      return;
+    let streak = 0;
+    const today = new Date();
+    
+    for (let i = 0; i < sortedDates.length; i++) {
+      const expectedDate = new Date(today);
+      expectedDate.setDate(today.getDate() - i);
+      
+      if (sortedDates[i] === expectedDate.toDateString()) {
+        streak++;
+      } else {
+        break;
+      }
     }
 
-    setLoading(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('journal', {
-        body: {
-          action: 'save_text_entry',
-          payload: {
-            content: textContent,
-            emotion: selectedEmotion,
-            intensity: intensity[0],
-            mood_score: moodScore[0],
-            tags: []
-          }
-        }
-      });
-
-      if (error) throw error;
-
-      toast({
-        title: "Entrée enregistrée",
-        description: "Votre journal a été mis à jour avec succès.",
-      });
-
-      setTextContent('');
-      setIntensity([0.5]);
-      setMoodScore([5]);
-      loadEntries();
-      loadInsights();
-    } catch (error) {
-      toast({
-        title: "Erreur",
-        description: "Impossible d'enregistrer l'entrée.",
-        variant: "destructive"
-      });
-    } finally {
-      setLoading(false);
-    }
+    return streak;
   };
 
-  const handleDeleteEntry = async (entryId: string, entryType: string) => {
-    try {
-      const { error } = await supabase.functions.invoke('journal', {
-        body: {
-          action: 'delete_entry',
-          payload: { entry_id: entryId, entry_type: entryType }
-        }
-      });
+  const currentStreak = calculateCurrentStreak();
 
-      if (error) throw error;
-
-      toast({
-        title: "Entrée supprimée",
-        description: "L'entrée a été supprimée avec succès.",
+  // Calcul du tag le plus utilisé
+  const getMostUsedTag = (): string => {
+    const tagCount = new Map<string, number>();
+    notes.forEach(note => {
+      note.tags.forEach(tag => {
+        tagCount.set(tag, (tagCount.get(tag) || 0) + 1);
       });
+    });
 
-      loadEntries();
-      loadInsights();
-    } catch (error) {
-      toast({
-        title: "Erreur",
-        description: "Impossible de supprimer l'entrée.",
-        variant: "destructive"
-      });
-    }
+    let maxCount = 0;
+    let mostUsed = '-';
+    tagCount.forEach((count, tag) => {
+      if (count > maxCount) {
+        maxCount = count;
+        mostUsed = tag;
+      }
+    });
+
+    return mostUsed;
   };
 
-  const getEmotionColor = (emotion: string) => {
-    return emotions.find(e => e.value === emotion)?.color || 'bg-gray-500';
-  };
+  const mostUsedTag = getMostUsedTag();
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div className="flex items-center gap-3 mb-6">
-        <Book className="h-8 w-8 text-primary" />
-        <h1 className="text-3xl font-bold">Journal Émotionnel</h1>
-      </div>
-
-      {/* Insights Card */}
-      {insights && (
-        <Card className="p-6 bg-gradient-to-br from-primary/10 to-secondary/10">
-          <div className="flex items-center gap-2 mb-4">
-            <TrendingUp className="h-5 w-5 text-primary" />
-            <h2 className="text-xl font-semibold">Insights des 30 derniers jours</h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="text-center">
-              <p className="text-3xl font-bold text-primary">{insights.total_entries}</p>
-              <p className="text-sm text-muted-foreground">Entrées totales</p>
-            </div>
-            <div className="text-center">
-              <Badge className={`${getEmotionColor(insights.dominant_emotion)} text-white`}>
-                {emotions.find(e => e.value === insights.dominant_emotion)?.label || insights.dominant_emotion}
-              </Badge>
-              <p className="text-sm text-muted-foreground mt-2">Émotion dominante</p>
-            </div>
-            <div className="text-center">
-              <p className="text-3xl font-bold text-primary">{insights.avg_mood}/10</p>
-              <p className="text-sm text-muted-foreground">Humeur moyenne</p>
-            </div>
-            <div className="text-center">
-              <p className="text-3xl font-bold text-primary">{Math.round(insights.entries_by_day * 10) / 10}</p>
-              <p className="text-sm text-muted-foreground">Entrées/jour</p>
-            </div>
-          </div>
-        </Card>
-      )}
-
-      <Tabs defaultValue="write" className="w-full">
+    <div className={className}>
+      <Tabs defaultValue="overview" className="w-full">
         <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="write">
-            <PenLine className="h-4 w-4 mr-2" />
-            Écrire
-          </TabsTrigger>
-          <TabsTrigger value="voice">
-            <Mic className="h-4 w-4 mr-2" />
-            Vocal
-          </TabsTrigger>
-          <TabsTrigger value="history">
-            <Calendar className="h-4 w-4 mr-2" />
-            Historique
-          </TabsTrigger>
+          <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
+          <TabsTrigger value="statistics">Statistiques</TabsTrigger>
+          <TabsTrigger value="achievements">Succès</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="write" className="space-y-4">
-          <Card className="p-6">
-            <h3 className="text-lg font-semibold mb-4">Nouvelle entrée texte</h3>
-            
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-2">Émotion ressentie</label>
-                <div className="flex flex-wrap gap-2">
-                  {emotions.map((emotion) => (
-                    <Badge
-                      key={emotion.value}
-                      className={`cursor-pointer ${
-                        selectedEmotion === emotion.value
-                          ? emotion.color + ' text-white'
-                          : 'bg-secondary'
-                      }`}
-                      onClick={() => setSelectedEmotion(emotion.value)}
-                    >
-                      {emotion.label}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">
-                  Intensité émotionnelle: {Math.round(intensity[0] * 100)}%
-                </label>
-                <Slider
-                  value={intensity}
-                  onValueChange={setIntensity}
-                  min={0}
-                  max={1}
-                  step={0.1}
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">
-                  Humeur générale: {moodScore[0]}/10
-                </label>
-                <Slider
-                  value={moodScore}
-                  onValueChange={setMoodScore}
-                  min={1}
-                  max={10}
-                  step={1}
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">Votre journal</label>
-                <Textarea
-                  value={textContent}
-                  onChange={(e) => setTextContent(e.target.value)}
-                  placeholder="Écrivez librement vos pensées et émotions..."
-                  rows={8}
-                  className="resize-none"
-                />
-              </div>
-
-              <Button 
-                onClick={handleSaveTextEntry} 
-                disabled={loading}
-                className="w-full"
-              >
-                {loading ? 'Enregistrement...' : 'Enregistrer l\'entrée'}
-              </Button>
-            </div>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="voice">
-          <Card className="p-6">
-            <h3 className="text-lg font-semibold mb-4">Enregistrement vocal</h3>
-            <div className="text-center py-12">
-              <Button
-                size="lg"
-                variant={isRecording ? "destructive" : "default"}
-                onClick={() => setIsRecording(!isRecording)}
-                className="rounded-full h-24 w-24"
-              >
-                {isRecording ? <Pause className="h-8 w-8" /> : <Mic className="h-8 w-8" />}
-              </Button>
-              <p className="mt-4 text-sm text-muted-foreground">
-                {isRecording ? 'Enregistrement en cours...' : 'Appuyez pour commencer'}
-              </p>
-            </div>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="history" className="space-y-4">
-          {entries.length === 0 ? (
-            <Card className="p-12 text-center">
-              <Book className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <p className="text-muted-foreground">Aucune entrée pour le moment</p>
+        <TabsContent value="overview" className="space-y-4">
+          {/* Quick stats cards */}
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Notes totales</CardTitle>
+                <BarChart3 className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{totalNotes}</div>
+                <p className="text-xs text-muted-foreground">
+                  {notesToday} aujourd'hui
+                </p>
+              </CardContent>
             </Card>
-          ) : (
-            entries.map((entry) => (
-              <Card key={entry.id} className="p-4">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Badge className={`${getEmotionColor(entry.emotion_type)} text-white`}>
-                        {emotions.find(e => e.value === entry.emotion_type)?.label || entry.emotion_type}
-                      </Badge>
-                      <span className="text-sm text-muted-foreground">
-                        {format(new Date(entry.created_at), 'PPP', { locale: fr })}
-                      </span>
-                      {entry.type === 'voice' && <Mic className="h-4 w-4 text-muted-foreground" />}
-                      {entry.type === 'text' && <PenLine className="h-4 w-4 text-muted-foreground" />}
-                    </div>
-                    <p className="text-sm">
-                      {entry.type === 'text' ? entry.content : entry.transcription || 'Enregistrement vocal'}
-                    </p>
-                    {entry.mood_score && (
-                      <p className="text-xs text-muted-foreground mt-2">
-                        Humeur: {entry.mood_score}/10
-                      </p>
-                    )}
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleDeleteEntry(entry.id, entry.type)}
-                  >
-                    <Trash2 className="h-4 w-4 text-destructive" />
-                  </Button>
-                </div>
-              </Card>
-            ))
-          )}
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Mots écrits</CardTitle>
+                <Heart className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{totalWords.toLocaleString()}</div>
+                <p className="text-xs text-muted-foreground">
+                  {totalNotes > 0 ? Math.round(totalWords / totalNotes) : 0} mots/note
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Série actuelle</CardTitle>
+                <Zap className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{currentStreak}</div>
+                <p className="text-xs text-muted-foreground">
+                  jours consécutifs
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Tags uniques</CardTitle>
+                <Tag className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{uniqueTags}</div>
+                <p className="text-xs text-muted-foreground">
+                  Plus utilisé: {mostUsedTag}
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Main widgets */}
+          <div className="grid gap-4 lg:grid-cols-2">
+            <JournalStreak notes={notes} />
+            <JournalEmotionTrends notes={notes} />
+          </div>
+        </TabsContent>
+
+        <TabsContent value="statistics" className="space-y-4">
+          <JournalPersonalStats notes={notes} />
+        </TabsContent>
+
+        <TabsContent value="achievements" className="space-y-4">
+          <JournalAchievements notes={notes} />
         </TabsContent>
       </Tabs>
     </div>
   );
-}
+});
+
+JournalDashboard.displayName = 'JournalDashboard';
