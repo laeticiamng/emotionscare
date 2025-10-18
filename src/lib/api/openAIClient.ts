@@ -3,6 +3,7 @@
 import OpenAI from 'openai';
 import { ChatCompletion, ChatCompletionChunk } from 'openai/resources/chat/completions';
 import { Stream } from 'openai/streaming';
+import { logger } from '@/lib/logger';
 
 const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
 
@@ -77,7 +78,7 @@ export async function generateChatResponse(
       } : undefined
     };
   } catch (error) {
-    console.error('Error generating chat response:', error);
+    logger.error('Error generating chat response', error as Error, 'API');
     throw error;
   }
 }
@@ -127,7 +128,7 @@ export async function generateStreamingChatResponse(
 
     return;
   } catch (error) {
-    console.error('Error generating streaming chat response:', error);
+    logger.error('Error generating streaming chat response', error as Error, 'API');
     throw error;
   }
 }

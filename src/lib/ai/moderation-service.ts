@@ -2,12 +2,13 @@
 
 import { toast } from "@/hooks/use-toast";
 import { NODE_ENV } from "@/lib/env";
+import { logger } from '@/lib/logger';
 
 const OPENAI_API_KEY = ''; // Clé gérée côté serveur via Supabase Edge Functions
 
 export async function moderateText(input: string): Promise<boolean> {
   if (!OPENAI_API_KEY) {
-    console.warn("OPENAI_API_KEY is not set. Skipping moderation.");
+    logger.warn("OPENAI_API_KEY is not set. Skipping moderation.", undefined, 'API');
     return true;
   }
 
@@ -22,7 +23,7 @@ export async function moderateText(input: string): Promise<boolean> {
     });
 
     if (!response.ok) {
-      console.error("Moderation API error:", response.status, response.statusText);
+      logger.error("Moderation API error", new Error(`${response.status} ${response.statusText}`), 'API');
       return true;
     }
 
@@ -33,17 +34,17 @@ export async function moderateText(input: string): Promise<boolean> {
       return true;
     }
 
-    console.warn("Moderation flags:", result.categories);
+    logger.warn("Moderation flags", result.categories, 'API');
     return false;
   } catch (error) {
-    console.error("Moderation API failed:", error);
+    logger.error("Moderation API failed", error as Error, 'API');
     return true;
   }
 }
 
 export async function checkContentSafety(input: string): Promise<{flagged: boolean, reason?: string}> {
   if (!OPENAI_API_KEY) {
-    console.warn("OPENAI_API_KEY is not set. Skipping content safety check.");
+    logger.warn("OPENAI_API_KEY is not set. Skipping content safety check.", undefined, 'API');
     return { flagged: false };
   }
 
@@ -74,7 +75,7 @@ export async function checkContentSafety(input: string): Promise<{flagged: boole
     
     return { flagged: false };
   } catch (error) {
-    console.error("Content safety check failed:", error);
+    logger.error("Content safety check failed", error as Error, 'API');
     return { flagged: false };
   }
 }
