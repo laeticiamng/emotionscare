@@ -5,6 +5,7 @@
  */
 import { chatCompletion } from './openai-client';
 import { toast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 
 interface VRScriptGenerationResult {
   script: string;
@@ -63,7 +64,7 @@ export async function generateVRScript(
       success: true
     };
   } catch (error) {
-    console.error('Error generating VR script:', error);
+    logger.error('Error generating VR script', error as Error, 'API');
     toast({
       title: "Erreur de génération",
       description: "Impossible de générer le script immersif.",

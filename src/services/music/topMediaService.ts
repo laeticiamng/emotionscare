@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { supabase } from '@/integrations/supabase/client';
 import { MusicTrack, MusicPlaylist } from '@/types/music';
+import { logger } from '@/lib/logger';
 
 // TopMedia AI API configuration
 const API_KEY = '1e4228c100304c658ab1eab4333f54be'; // This should come from environment variables in production
@@ -16,7 +17,7 @@ export class TopMediaMusicService {
    */
   async generateLyrics(prompt: string): Promise<string> {
     try {
-      console.log(`Generating lyrics with prompt: ${prompt}`);
+      logger.debug(`Generating lyrics with prompt: ${prompt}`, undefined, 'MUSIC');
       
       const response = await fetch(`${API_BASE_URL}/lyrics`, {
         method: 'POST',
@@ -34,7 +35,7 @@ export class TopMediaMusicService {
       const data = await response.json();
       return data.lyrics || '';
     } catch (error) {
-      console.error('Error generating lyrics:', error);
+      logger.error('Error generating lyrics', error as Error, 'MUSIC');
       throw error;
     }
   }
@@ -50,7 +51,7 @@ export class TopMediaMusicService {
     instrumental: number;
   }): Promise<{ song_id: string }> {
     try {
-      console.log(`Generating music with parameters:`, params);
+      logger.debug(`Generating music with parameters`, params, 'MUSIC');
       
       const response = await fetch(`${API_BASE_URL}/music`, {
         method: 'POST',
@@ -68,7 +69,7 @@ export class TopMediaMusicService {
       const data = await response.json();
       return { song_id: data.song_id || '' };
     } catch (error) {
-      console.error('Error generating music:', error);
+      logger.error('Error generating music', error as Error, 'MUSIC');
       throw error;
     }
   }
@@ -88,7 +89,7 @@ export class TopMediaMusicService {
     mood?: string;
   }): Promise<{ song_id: string; task_id: string }> {
     try {
-      console.log(`Submitting advanced music generation task:`, params);
+      logger.debug(`Submitting advanced music generation task`, params, 'MUSIC');
       
       // Add mood to description if available
       const enhancedPrompt = params.mood 
@@ -119,7 +120,7 @@ export class TopMediaMusicService {
         task_id: data.task_id || ''
       };
     } catch (error) {
-      console.error('Error submitting music generation task:', error);
+      logger.error('Error submitting music generation task', error as Error, 'MUSIC');
       throw error;
     }
   }
@@ -134,7 +135,7 @@ export class TopMediaMusicService {
     progress?: number;
   }> {
     try {
-      console.log(`Checking status for song_id: ${songId}`);
+      logger.debug(`Checking status for song_id: ${songId}`, undefined, 'MUSIC');
       
       const response = await fetch(`${API_BASE_URL_V2}/query?song_id=${songId}`, {
         method: 'GET',
@@ -156,7 +157,7 @@ export class TopMediaMusicService {
         progress: data.progress
       };
     } catch (error) {
-      console.error('Error checking generation status:', error);
+      logger.error('Error checking generation status', error as Error, 'MUSIC');
       throw error;
     }
   }
@@ -169,7 +170,7 @@ export class TopMediaMusicService {
     status: string;
   }> {
     try {
-      console.log(`Combining songs: ${songIds.join(', ')}`);
+      logger.debug(`Combining songs`, { songIds: songIds.join(', ') }, 'MUSIC');
       
       const response = await fetch(`${API_BASE_URL_V2}/concat`, {
         method: 'POST',
@@ -190,7 +191,7 @@ export class TopMediaMusicService {
         status: data.status || 'pending'
       };
     } catch (error) {
-      console.error('Error concatenating songs:', error);
+      logger.error('Error concatenating songs', error as Error, 'MUSIC');
       throw error;
     }
   }

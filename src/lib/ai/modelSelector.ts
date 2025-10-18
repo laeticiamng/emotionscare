@@ -2,6 +2,7 @@
 
 import { OpenAIModelParams, AI_MODEL_CONFIG, AIModule } from './openai-config';
 import { budgetMonitor } from './budgetMonitor';
+import { logger } from '@/lib/logger';
 
 interface ModelSelectionCriteria {
   textLength?: number;
@@ -25,7 +26,7 @@ export async function selectAIModel(criteria: ModelSelectionCriteria): Promise<O
   
   // Garde-fou budgétaire - toujours utiliser un modèle moins cher si le budget est dépassé
   if (budgetExceeded && criteria.moduleType !== 'scan') {
-    console.log(`Budget dépassé pour ${config.model}, passage à gpt-4o-mini`);
+    logger.info(`Budget dépassé pour ${config.model}, passage à gpt-4o-mini`, undefined, 'API');
     config.model = "gpt-4o-mini";
   }
   

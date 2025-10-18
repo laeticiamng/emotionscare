@@ -3,7 +3,8 @@
 import { MusicPlaylist, MusicTrack } from '@/types/music';
 import { getPlaylist } from '@/services/music/playlist-service';
 import { useToast } from '@/hooks/use-toast';
-import { playlistToMusicPlaylist } from '@/services/music/converters'; 
+import { playlistToMusicPlaylist } from '@/services/music/converters';
+import { logger } from '@/lib/logger';
 
 /**
  * Loads a playlist by ID from the service
@@ -16,7 +17,7 @@ export const loadPlaylistById = async (id: string, onError?: (message: string) =
     }
     return null;
   } catch (err) {
-    console.error('Error loading playlist:', err);
+    logger.error('Error loading playlist', err as Error, 'MUSIC');
     if (onError) {
       onError("Unable to load the playlist");
     }

@@ -5,6 +5,7 @@
  */
 import { chatCompletion } from './openai-client';
 import { toast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 
 interface LyricsGenerationResult {
   lyrics: string;
@@ -58,7 +59,7 @@ export async function generateLyrics(
       success: true
     };
   } catch (error) {
-    console.error('Error generating lyrics:', error);
+    logger.error('Error generating lyrics', error as Error, 'API');
     toast({
       title: "Erreur de génération",
       description: "Impossible de générer les paroles.",
