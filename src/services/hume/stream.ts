@@ -7,6 +7,7 @@
  * - Audio/vidéo : ≤ 5 secondes par chunk
  * - Texte : ≤ 10 000 caractères
  */
+import { logger } from '@/lib/logger';
 
 interface HumeConfig {
   apiKey: string;
@@ -49,13 +50,13 @@ export class HumeStreamClient {
     try {
       // TODO: Remplacer par l'endpoint Hume réel
       // Pour l'instant, simulation
-      console.log('🎭 Connecting to Hume WebSocket...');
+      logger.info('Connecting to Hume WebSocket', null, 'HumeStreamClient.initWebSocket');
       
       // Simulation : générer des émotions aléatoires
       this.simulateEmotionStream();
       
     } catch (error) {
-      console.error('❌ Hume WebSocket error:', error);
+      logger.error('Hume WebSocket error', error, 'HumeStreamClient.initWebSocket');
       this.handleReconnect();
     }
   }
@@ -102,12 +103,12 @@ export class HumeStreamClient {
 
   private handleReconnect() {
     if (this.reconnectAttempts >= (this.config.maxReconnectAttempts || 5)) {
-      console.error('❌ Max reconnect attempts reached');
+      logger.error('Max reconnect attempts reached', null, 'HumeStreamClient.handleReconnect');
       return;
     }
 
     this.reconnectAttempts++;
-    console.log(`🔄 Reconnecting to Hume... Attempt ${this.reconnectAttempts}`);
+    logger.info(`Reconnecting to Hume - Attempt ${this.reconnectAttempts}`, null, 'HumeStreamClient.handleReconnect');
 
     this.reconnectTimer = setTimeout(() => {
       this.initWebSocket();
@@ -116,7 +117,7 @@ export class HumeStreamClient {
 
   sendAudioChunk(audioData: ArrayBuffer) {
     if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
-      console.warn('⚠️ WebSocket not ready');
+      logger.warn('WebSocket not ready', null, 'HumeStreamClient.sendAudioChunk');
       return;
     }
 
@@ -124,7 +125,7 @@ export class HumeStreamClient {
     // Calcul approximatif : 24kHz * 2 bytes * 5s = 240KB
     const maxChunkSize = 240 * 1024;
     if (audioData.byteLength > maxChunkSize) {
-      console.warn('⚠️ Audio chunk too large, splitting required');
+      logger.warn('Audio chunk too large, splitting required', null, 'HumeStreamClient.sendAudioChunk');
       // TODO: Implémenter le splitting automatique
       return;
     }
@@ -142,12 +143,12 @@ export class HumeStreamClient {
 
   sendText(text: string) {
     if (text.length > 10000) {
-      console.warn('⚠️ Text too long, truncating to 10000 chars');
+      logger.warn('Text too long, truncating to 10000 chars', null, 'HumeStreamClient.sendText');
       text = text.substring(0, 10000);
     }
 
     if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
-      console.warn('⚠️ WebSocket not ready');
+      logger.warn('WebSocket not ready', null, 'HumeStreamClient.sendText');
       return;
     }
 
