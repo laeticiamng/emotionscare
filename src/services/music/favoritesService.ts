@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { supabase } from "@/integrations/supabase/client";
+import { logger } from '@/lib/logger';
 
 export interface FavoriteRecord {
   trackId: string;
@@ -20,7 +21,7 @@ const readLocalFallback = (): FavoriteRecord[] => {
     if (!Array.isArray(parsed)) return [];
     return parsed.filter((entry: any) => entry && typeof entry.trackId === "string");
   } catch (error) {
-    console.warn("[favoritesService] unable to read fallback", error);
+    logger.warn("[favoritesService] unable to read fallback", error, 'MUSIC');
     return [];
   }
 };
@@ -30,7 +31,7 @@ const writeLocalFallback = (records: FavoriteRecord[]) => {
   try {
     window.localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(records));
   } catch (error) {
-    console.warn("[favoritesService] unable to persist fallback", error);
+    logger.warn("[favoritesService] unable to persist fallback", error, 'MUSIC');
   }
 };
 
@@ -38,12 +39,12 @@ const getUserId = async (): Promise<string | null> => {
   try {
     const { data, error } = await supabase.auth.getUser();
     if (error) {
-      console.warn("[favoritesService] user lookup error", error);
+      logger.warn("[favoritesService] user lookup error", error, 'MUSIC');
       return null;
     }
     return data.user?.id ?? null;
   } catch (error) {
-    console.warn("[favoritesService] user lookup failure", error);
+    logger.warn("[favoritesService] user lookup failure", error, 'MUSIC');
     return null;
   }
 };
@@ -64,7 +65,7 @@ export const fetchFavoriteRecords = async (): Promise<FavoriteRecord[]> => {
       .limit(24);
 
     if (error) {
-      console.warn("[favoritesService] query error", error);
+      logger.warn("[favoritesService] query error", error, 'MUSIC');
       return fallback;
     }
 
@@ -79,7 +80,7 @@ export const fetchFavoriteRecords = async (): Promise<FavoriteRecord[]> => {
     writeLocalFallback(records);
     return records;
   } catch (error) {
-    console.warn("[favoritesService] unexpected fetch failure", error);
+    logger.warn("[favoritesService] unexpected fetch failure", error, 'MUSIC');
     return fallback;
   }
 };
@@ -136,7 +137,7 @@ export const toggleFavoriteRecord = async (
       });
     }
   } catch (error) {
-    console.warn("[favoritesService] toggle error", error);
+    logger.warn("[favoritesService] toggle error", error, 'MUSIC');
     return fallback;
   }
 

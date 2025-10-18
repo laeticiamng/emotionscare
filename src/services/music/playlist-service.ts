@@ -3,6 +3,7 @@
 import { Playlist } from './types';
 import { playlistToMusicPlaylist } from './converters';
 import { MusicPlaylist } from '@/types/music';
+import { logger } from '@/lib/logger';
 
 // Données mockées de playlists pour le développement
 const mockPlaylists: Record<string, MusicPlaylist> = {
@@ -68,7 +69,7 @@ const mockPlaylists: Record<string, MusicPlaylist> = {
 export const getPlaylist = async (id: string): Promise<Playlist | null> => {
   try {
     // Simuler une requête API
-    console.log(`Récupération de la playlist: ${id}`);
+    logger.debug(`Récupération de la playlist: ${id}`, undefined, 'MUSIC');
     await new Promise(resolve => setTimeout(resolve, 300));
     
     // Dans une implémentation réelle, on ferait un appel à l'API
@@ -88,7 +89,7 @@ export const getPlaylist = async (id: string): Promise<Playlist | null> => {
     
     return null;
   } catch (error) {
-    console.error('Error fetching playlist:', error);
+    logger.error('Error fetching playlist', error as Error, 'MUSIC');
     return null;
   }
 };
@@ -99,7 +100,7 @@ export const getPlaylist = async (id: string): Promise<Playlist | null> => {
 export const getAllPlaylists = async (): Promise<Playlist[]> => {
   try {
     // Simuler une requête API
-    console.log('Récupération de toutes les playlists');
+    logger.debug('Récupération de toutes les playlists', undefined, 'MUSIC');
     await new Promise(resolve => setTimeout(resolve, 500));
     
     // Dans une implémentation réelle, on ferait un appel à l'API
@@ -113,7 +114,7 @@ export const getAllPlaylists = async (): Promise<Playlist[]> => {
       }))
     }));
   } catch (error) {
-    console.error('Error fetching all playlists:', error);
+    logger.error('Error fetching all playlists', error as Error, 'MUSIC');
     return [];
   }
 };
@@ -124,7 +125,7 @@ export const getAllPlaylists = async (): Promise<Playlist[]> => {
 export const getRecommendedPlaylists = async (emotion: string): Promise<Playlist[]> => {
   try {
     // Simuler une requête API
-    console.log(`Récupération des playlists recommandées pour l'émotion: ${emotion}`);
+    logger.debug(`Récupération des playlists recommandées pour l'émotion: ${emotion}`, undefined, 'MUSIC');
     await new Promise(resolve => setTimeout(resolve, 400));
     
     // Dans une implémentation réelle, on ferait un appel à l'API avec l'émotion comme paramètre
@@ -140,7 +141,7 @@ export const getRecommendedPlaylists = async (emotion: string): Promise<Playlist
         }))
       }));
   } catch (error) {
-    console.error('Error fetching recommended playlists:', error);
+    logger.error('Error fetching recommended playlists', error as Error, 'MUSIC');
     return [];
   }
 };

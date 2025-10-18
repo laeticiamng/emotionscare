@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { supabase } from '@/integrations/supabase/client';
 import { ChatResponse, Message } from '@/types/support';
+import { logger } from '@/lib/logger';
 
 export class ChatService {
   static async getSupportResponse(content: string, conversationHistory?: Message[]): Promise<ChatResponse> {
@@ -24,7 +25,7 @@ export class ChatService {
         confidence: data.confidence
       };
     } catch (error) {
-      console.error('Error getting support response:', error);
+      logger.error('Error getting support response', error as Error, 'API');
       
       // Fallback response
       return {
