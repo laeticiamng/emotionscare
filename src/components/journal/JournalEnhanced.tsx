@@ -44,6 +44,7 @@ import {
 } from 'chart.js';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 ChartJS.register(
   CategoryScale,
@@ -188,7 +189,7 @@ const JournalEnhanced: React.FC = () => {
         toast.success('Insights générés avec succès');
       }
     } catch (error) {
-      console.error('Error loading insights:', error);
+      logger.error('Error loading insights', error as Error, 'UI');
       toast.error('Impossible de charger les insights');
     } finally {
       setIsLoadingInsights(false);
@@ -229,7 +230,7 @@ const JournalEnhanced: React.FC = () => {
       setSelectedMood(null);
       toast.success('Entrée sauvegardée avec succès');
     } catch (error) {
-      console.error('Error saving entry:', error);
+      logger.error('Error saving entry', error as Error, 'UI');
       toast.error('Erreur lors de la sauvegarde');
     } finally {
       setIsAnalyzing(false);

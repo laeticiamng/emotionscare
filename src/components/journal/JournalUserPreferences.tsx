@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Slider } from '@/components/ui/slider';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 
 const PREFERENCES_KEY = 'journal-user-preferences';
 
@@ -82,7 +83,7 @@ export function JournalUserPreferences({ onPreferencesChange }: JournalUserPrefe
         setPreferences({ ...DEFAULT_PREFERENCES, ...parsed });
       }
     } catch (error) {
-      console.error('Failed to load preferences:', error);
+      logger.error('Failed to load preferences', error as Error, 'UI');
     }
   }, []);
 

@@ -6,6 +6,7 @@ import { Progress } from '@/components/ui/progress';
 import { supabase } from '@/integrations/supabase/client';
 import { Music, Play, Pause, Clock, Heart, TrendingUp } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 
 interface MusicTrack {
   id: string;
@@ -53,7 +54,7 @@ export const MusicTherapyDashboard: React.FC = () => {
       if (error) throw error;
       setTracks(data.tracks || []);
     } catch (error) {
-      console.error('Erreur chargement musiques:', error);
+      logger.error('Erreur chargement musiques', error as Error, 'UI');
     }
   };
 
@@ -66,7 +67,7 @@ export const MusicTherapyDashboard: React.FC = () => {
       if (error) throw error;
       setInsights(data.insights);
     } catch (error) {
-      console.error('Erreur chargement insights:', error);
+      logger.error('Erreur chargement insights', error as Error, 'UI');
     }
   };
 
@@ -101,7 +102,7 @@ export const MusicTherapyDashboard: React.FC = () => {
       });
       loadInsights();
     } catch (error) {
-      console.error('Erreur log session:', error);
+      logger.error('Erreur log session', error as Error, 'UI');
     }
   };
 

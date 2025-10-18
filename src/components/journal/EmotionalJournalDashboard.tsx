@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { logger } from '@/lib/logger';
 
 interface JournalEntry {
   id: string;
@@ -65,7 +66,7 @@ export const EmotionalJournalDashboard: React.FC = () => {
         setEntries(data.entries);
       }
     } catch (error) {
-      console.error('Erreur chargement entrées:', error);
+      logger.error('Erreur chargement entrées', error as Error, 'UI');
       toast({
         title: 'Erreur',
         description: 'Impossible de charger les entrées',
@@ -85,7 +86,7 @@ export const EmotionalJournalDashboard: React.FC = () => {
         setInsights(data.insights);
       }
     } catch (error) {
-      console.error('Erreur chargement insights:', error);
+      logger.error('Erreur chargement insights', error as Error, 'UI');
     }
   };
 
@@ -131,7 +132,7 @@ export const EmotionalJournalDashboard: React.FC = () => {
       loadEntries();
       loadInsights();
     } catch (error) {
-      console.error('Erreur création entrée:', error);
+      logger.error('Erreur création entrée', error as Error, 'UI');
       toast({
         title: 'Erreur',
         description: 'Impossible de créer l\'entrée',
@@ -158,7 +159,7 @@ export const EmotionalJournalDashboard: React.FC = () => {
       loadEntries();
       loadInsights();
     } catch (error) {
-      console.error('Erreur suppression:', error);
+      logger.error('Erreur suppression', error as Error, 'UI');
       toast({
         title: 'Erreur',
         description: 'Impossible de supprimer l\'entrée',

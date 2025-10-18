@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Line } from 'react-chartjs-2';
+import { logger } from '@/lib/logger';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -97,7 +98,7 @@ export default function TherapeuticMusicEnhanced() {
       .limit(20);
 
     if (error) {
-      console.error('Error loading tracks:', error);
+      logger.error('Error loading tracks', error, 'UI');
       return;
     }
 

@@ -8,6 +8,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Music, Heart, TrendingUp, Clock, Sparkles, Play, History, BarChart3 } from 'lucide-react';
+import { logger } from '@/lib/logger';
 
 interface Track {
   title: string;
@@ -74,7 +75,7 @@ export const EmotionMusicGeneratorEnhanced: React.FC = () => {
         setHistory(data.playlists);
       }
     } catch (error) {
-      console.error('Erreur chargement historique:', error);
+      logger.error('Erreur chargement historique', error as Error, 'UI');
     }
   };
 
@@ -92,7 +93,7 @@ export const EmotionMusicGeneratorEnhanced: React.FC = () => {
         setStats(data.stats);
       }
     } catch (error) {
-      console.error('Erreur chargement analytics:', error);
+      logger.error('Erreur chargement analytics', error as Error, 'UI');
     }
   };
 
@@ -132,7 +133,7 @@ export const EmotionMusicGeneratorEnhanced: React.FC = () => {
         });
       }
     } catch (error: any) {
-      console.error('Erreur génération:', error);
+      logger.error('Erreur génération', error as Error, 'UI');
       toast({
         title: "Erreur",
         description: error.message || "Impossible de générer la playlist",

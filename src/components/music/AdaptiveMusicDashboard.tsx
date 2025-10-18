@@ -5,6 +5,7 @@ import { Slider } from '@/components/ui/slider';
 import { supabase } from '@/integrations/supabase/client';
 import { Music, Play, Pause, SkipForward, Heart, TrendingUp, Clock } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 
 interface MusicTrack {
   id: string;
@@ -78,7 +79,7 @@ export const AdaptiveMusicDashboard: React.FC = () => {
 
       setRecommendations(response.data.recommendations || []);
     } catch (error: any) {
-      console.error('Erreur lors du chargement des recommandations:', error);
+      logger.error('Erreur lors du chargement des recommandations', error as Error, 'UI');
       toast({
         title: 'Erreur',
         description: 'Impossible de charger les recommandations musicales',
@@ -102,7 +103,7 @@ export const AdaptiveMusicDashboard: React.FC = () => {
 
       setStats(response.data);
     } catch (error) {
-      console.error('Erreur lors du chargement des statistiques:', error);
+      logger.error('Erreur lors du chargement des statistiques', error as Error, 'UI');
     }
   };
 
@@ -147,7 +148,7 @@ export const AdaptiveMusicDashboard: React.FC = () => {
 
       loadStats();
     } catch (error) {
-      console.error('Erreur lors de l\'enregistrement de la session:', error);
+      logger.error('Erreur lors de l\'enregistrement de la session', error as Error, 'UI');
     }
 
     setIsPlaying(false);

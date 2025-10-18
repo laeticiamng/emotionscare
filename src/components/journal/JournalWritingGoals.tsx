@@ -9,6 +9,7 @@ import { Target, Check, Edit2, Trash2, Plus } from 'lucide-react';
 import type { SanitizedNote } from '@/modules/journal/types';
 import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, isWithinInterval, parseISO } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { logger } from '@/lib/logger';
 
 interface JournalWritingGoalsProps {
   notes: SanitizedNote[];
@@ -56,7 +57,7 @@ export const JournalWritingGoals = memo<JournalWritingGoalsProps>(({ notes, clas
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(goals));
     } catch (error) {
-      console.error('Failed to save goals:', error);
+      logger.error('Failed to save goals', error as Error, 'UI');
     }
   }, [goals]);
 

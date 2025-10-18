@@ -10,6 +10,7 @@ import { useSunoCallback } from '@/hooks/useSunoCallback';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
+import { logger } from '@/lib/logger';
 
 export const EmotionMusicPanel: React.FC = () => {
   const [analysisText, setAnalysisText] = useState('');
@@ -21,10 +22,10 @@ export const EmotionMusicPanel: React.FC = () => {
   const { latestCallback, isWaiting, elapsedTime, signedUrl } = useSunoCallback({
     taskId: currentTask,
     onComplete: (callback) => {
-      console.log('✅ Musique complète:', callback);
+      logger.info('Musique complète', callback, 'UI');
     },
     onError: (error) => {
-      console.error('❌ Erreur génération:', error);
+      logger.error('Erreur génération', error as Error, 'UI');
     }
   });
 
@@ -48,7 +49,7 @@ export const EmotionMusicPanel: React.FC = () => {
       
       toast.success('✅ Ajouté à votre bibliothèque !');
     } catch (err) {
-      console.error('Error adding to library:', err);
+      logger.error('Error adding to library', err as Error, 'UI');
       toast.error('Erreur lors de l\'ajout à la bibliothèque');
     }
   };
@@ -63,14 +64,14 @@ export const EmotionMusicPanel: React.FC = () => {
       });
       
       if (data && !error) {
-        console.log('✅ Poll manuel résultat:', data);
+        logger.info('Poll manuel résultat', data, 'UI');
         setManualPollResult(data);
         toast.success('État récupéré depuis Suno !');
       } else {
         toast.error('Impossible de récupérer l\'état');
       }
     } catch (err) {
-      console.error('Erreur poll manuel:', err);
+      logger.error('Erreur poll manuel', err as Error, 'UI');
       toast.error('Erreur de polling');
     } finally {
       setIsManualPolling(false);
@@ -98,7 +99,7 @@ export const EmotionMusicPanel: React.FC = () => {
 
       await generateFromEmotion(emotionState);
     } catch (error) {
-      console.error('Erreur:', error);
+      logger.error('Erreur', error as Error, 'UI');
     }
   };
 
