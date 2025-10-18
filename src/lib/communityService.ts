@@ -2,6 +2,7 @@
 
 import { Post, Comment, Group } from '@/types/community';
 import { User } from '@/types/user';
+import { logger } from '@/lib/logger';
 
 // Create a new post
 export const createPost = async (postData: Partial<Post>): Promise<Post> => {
@@ -17,13 +18,13 @@ export const createPost = async (postData: Partial<Post>): Promise<Post> => {
     ...(postData.image_url && { image_url: postData.image_url })
   };
   
-  console.log('Creating post:', newPost);
+  logger.info('Creating post', { post: newPost }, 'API');
   return newPost;
 };
 
 // Add a reaction to a post
 export const reactToPost = async (postId: string, userId: string): Promise<void> => {
-  console.log(`User ${userId} reacted to post ${postId}`);
+  logger.info('User reacted to post', { userId, postId }, 'API');
   // In a real app, this would update the database
 };
 
@@ -37,7 +38,7 @@ export const createComment = async (commentData: Partial<Comment>): Promise<Comm
     content: commentData.content || ''
   };
   
-  console.log('Creating comment:', newComment);
+  logger.info('Creating comment', { comment: newComment }, 'API');
   return newComment;
 };
 
@@ -54,7 +55,7 @@ export const createGroup = async (groupData: Partial<Group>): Promise<Group> => 
     ...(groupData.image_url && { image_url: groupData.image_url })
   };
   
-  console.log('Creating group:', newGroup);
+  logger.info('Creating group', { group: newGroup }, 'API');
   return newGroup;
 };
 

@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { supabase } from '@/lib/supabase-client';
 import { calculateLevel } from './level-service';
+import { logger } from '@/lib/logger';
 
 /**
  * Get gamification data for a user
@@ -14,7 +15,7 @@ export const getGamificationData = async (userId: string) => {
       .single();
       
     if (error && error.code !== 'PGRST116') {
-      console.error('Error fetching gamification data:', error);
+      logger.error('Error fetching gamification data', error as Error, 'API');
       return null;
     }
     
@@ -32,7 +33,7 @@ export const getGamificationData = async (userId: string) => {
     
     return data;
   } catch (error) {
-    console.error('Error in getGamificationData:', error);
+    logger.error('Error in getGamificationData', error as Error, 'API');
     return null;
   }
 };
@@ -58,13 +59,13 @@ export const updateGamificationData = async (
       .eq('user_id', userId);
       
     if (error) {
-      console.error('Error updating gamification data:', error);
+      logger.error('Error updating gamification data', error as Error, 'API');
       return false;
     }
     
     return true;
   } catch (error) {
-    console.error('Error in updateGamificationData:', error);
+    logger.error('Error in updateGamificationData', error as Error, 'API');
     return false;
   }
 };
@@ -87,13 +88,13 @@ export const initializeGamificationData = async (userId: string) => {
       });
       
     if (error) {
-      console.error('Error initializing gamification data:', error);
+      logger.error('Error initializing gamification data', error as Error, 'API');
       return false;
     }
     
     return true;
   } catch (error) {
-    console.error('Error in initializeGamificationData:', error);
+    logger.error('Error in initializeGamificationData', error as Error, 'API');
     return false;
   }
 };

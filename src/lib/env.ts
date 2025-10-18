@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 /**
  * Gestion centralisée des variables d'environnement avec validation stricte.
@@ -89,23 +90,23 @@ const parsedEnv = envSchema.safeParse(rawEnv);
 
 // Debug info in development
 if (rawEnv.MODE === 'development') {
-  console.log('🔍 Raw environment variables:', {
+  logger.debug('Raw environment variables', {
     VITE_SUPABASE_URL: rawEnv.VITE_SUPABASE_URL,
     VITE_SUPABASE_ANON_KEY: rawEnv.VITE_SUPABASE_ANON_KEY ? '[SET]' : '[EMPTY]',
     allViteVars: Object.keys(import.meta.env).filter(k => k.startsWith('VITE_'))
-  });
+  }, 'SYSTEM');
 }
 
 if (!parsedEnv.success) {
-  console.error('❌ Invalid environment configuration:', parsedEnv.error.flatten().fieldErrors);
+  logger.error('Invalid environment configuration', new Error(JSON.stringify(parsedEnv.error.flatten().fieldErrors)), 'SYSTEM');
   
   // In development, provide more helpful error handling
   if (rawEnv.MODE === 'development') {
-    console.warn('⚠️ Development mode: attempting to continue with available variables...');
+    logger.warn('Development mode: attempting to continue with available variables', undefined, 'SYSTEM');
     
     // Check if we at least have the basic Supabase config
     if (!rawEnv.VITE_SUPABASE_URL || !rawEnv.VITE_SUPABASE_ANON_KEY) {
-      console.error('❌ Missing critical Supabase configuration. Please check your .env file.');
+      logger.error('Missing critical Supabase configuration', new Error('Check .env file'), 'SYSTEM');
     }
   }
   
@@ -222,11 +223,11 @@ const missingOptionalKeys = Object.entries({
 
 if (missingOptionalKeys.length > 0) {
   const formatted = missingOptionalKeys.map(([key]) => key).join(', ');
-  console.info(`ℹ️ Variables d'environnement optionnelles manquantes: ${formatted}`);
+  logger.info(`Variables d'environnement optionnelles manquantes: ${formatted}`, undefined, 'SYSTEM');
 }
 
 if (IS_DEV) {
-  console.log('🔧 EmotionsCare Environment:', {
+  logger.info('EmotionsCare Environment', {
     mode: NODE_ENV,
     apiUrl: API_URL,
     webUrl: WEB_URL,
@@ -234,7 +235,7 @@ if (IS_DEV) {
     firebase: ENV_VALIDATION.hasFirebase ? '✅' : '⚠️ optionnel',
     sentry: ENV_VALIDATION.hasSentry ? '✅' : '⚠️ optionnel',
     ai: ENV_VALIDATION.ai,
-  });
+  }, 'SYSTEM');
 }
 
 export default {
