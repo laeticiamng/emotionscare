@@ -1,277 +1,233 @@
 /**
  * journalService - Service pour le journal vocal et textuel
+ * Intégré avec la table journal_notes de Supabase
  */
 
 import { supabase } from '@/integrations/supabase/client';
 
 export interface JournalEntry {
-  id: string;
-  type: 'voice' | 'text';
-  content: string;
+  id?: string;
+  text: string;
+  tags: string[];
   summary?: string;
-  tone?: 'positive' | 'neutral' | 'negative';
-  ephemeral: boolean;
-  created_at: Date;
-  voice_url?: string;
-  duration?: number;
-  metadata?: Record<string, any>;
-  tags?: string[];
-  user_id?: string;
+  mode?: 'text' | 'voice';
+  created_at?: string;
 }
 
 export interface JournalVoiceEntry {
-  content: string;
-  summary: string;
-  tone: 'positive' | 'neutral' | 'negative';
+  audioBlob: Blob;
+  tags?: string[];
+  lang?: string;
 }
 
 export interface JournalTextEntry {
-  content: string;
-  summary: string;
-  tone: 'positive' | 'neutral' | 'negative';
+  text: string;
+  tags?: string[];
 }
 
+/**
+ * Service pour gérer les entrées de journal
+ */
 class JournalService {
   /**
-   * Traiter une entrée vocale avec Whisper + GPT
+   * Créer une nouvelle entrée texte
    */
-  async processVoiceEntry(audioBlob: Blob): Promise<JournalVoiceEntry> {
-    try {
-      // Convertir en base64 pour l'envoi
-      const arrayBuffer = await audioBlob.arrayBuffer();
-      const base64Audio = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+  async createTextEntry(entry: JournalTextEntry): Promise<JournalEntry> {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('User not authenticated');
 
-      const response = await supabase.functions.invoke('journal-voice', {
-        body: {
-          audio_data: base64Audio,
-          format: 'webm' // ou le format du blob
-        }
-      });
+    const { data, error } = await supabase
+      .from('journal_notes')
+      .insert({
+        user_id: user.id,
+        text: entry.text,
+        tags: entry.tags || [],
+        mode: 'text',
+      })
+      .select()
+      .single();
 
-      if (response.error) {
-        throw new Error(`Erreur traitement vocal: ${response.error.message}`);
-      }
+    if (error) throw error;
 
-      return response.data as JournalVoiceEntry;
-    } catch (error) {
-      console.error('Erreur service journal vocal:', error);
-      
-      // Fallback local basique
-      return {
-        content: "Entrée vocale non transcrite (service indisponible)",
-        summary: "Réflexion personnelle enregistrée",
-        tone: 'neutral'
-      };
-    }
+    return {
+      id: data.id,
+      text: data.text,
+      tags: data.tags || [],
+      summary: data.summary || undefined,
+      mode: data.mode || 'text',
+      created_at: data.created_at,
+    };
   }
 
   /**
-   * Traiter une entrée textuelle
+   * Créer une nouvelle entrée vocale (après transcription)
    */
-  async processTextEntry(text: string): Promise<JournalTextEntry> {
-    try {
-      const response = await supabase.functions.invoke('journal-text', {
-        body: {
-          content: text
-        }
-      });
+  async createVoiceEntry(transcription: string, tags?: string[]): Promise<JournalEntry> {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('User not authenticated');
 
-      if (response.error) {
-        throw new Error(`Erreur traitement texte: ${response.error.message}`);
-      }
+    const { data, error } = await supabase
+      .from('journal_notes')
+      .insert({
+        user_id: user.id,
+        text: transcription,
+        tags: tags || [],
+        mode: 'voice',
+      })
+      .select()
+      .single();
 
-      return response.data as JournalTextEntry;
-    } catch (error) {
-      console.error('Erreur service journal texte:', error);
-      
-      // Fallback local
-      return {
-        content: text,
-        summary: this.generateLocalSummary(text),
-        tone: this.analyzeLocalTone(text)
-      };
-    }
+    if (error) throw error;
+
+    return {
+      id: data.id,
+      text: data.text,
+      tags: data.tags || [],
+      summary: data.summary || undefined,
+      mode: data.mode || 'voice',
+      created_at: data.created_at,
+    };
   }
 
   /**
-   * Sauvegarder une entrée de journal
+   * Récupérer toutes les notes de l'utilisateur
    */
-  async saveEntry(entry: Omit<JournalEntry, 'id' | 'created_at'>): Promise<JournalEntry> {
-    const user = await supabase.auth.getUser();
-    const userId = user.data.user?.id;
-    
-    if (!userId) {
-      throw new Error('Utilisateur non authentifié');
-    }
-
-    // Sauvegarder dans Supabase selon le type
-    if (entry.type === 'voice') {
-      const { data, error } = await supabase
-        .from('journal_voice')
-        .insert({
-          user_id: userId,
-          content: entry.content,
-          summary: entry.summary,
-          tone: entry.tone,
-          ephemeral: entry.ephemeral || false,
-          tags: entry.tags
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      return {
-        id: data.id,
-        created_at: new Date(data.created_at),
-        type: 'voice',
-        content: data.content,
-        summary: data.summary,
-        tone: data.tone as 'positive' | 'neutral' | 'negative',
-        ephemeral: data.ephemeral,
-        tags: data.tags
-      };
-    } else {
-      const { data, error } = await supabase
-        .from('journal_text')
-        .insert({
-          user_id: userId,
-          content: entry.content,
-          summary: entry.summary,
-          tone: entry.tone,
-          ephemeral: entry.ephemeral || false,
-          tags: entry.tags
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      return {
-        id: data.id,
-        created_at: new Date(data.created_at),
-        type: 'text',
-        content: data.content,
-        summary: data.summary,
-        tone: data.tone as 'positive' | 'neutral' | 'negative',
-        ephemeral: data.ephemeral,
-        tags: data.tags
-      };
-    }
-  }
-
-  /**
-   * Obtenir les entrées de journal
-   */
-  async getEntries(): Promise<JournalEntry[]> {
-    const user = await supabase.auth.getUser();
-    if (!user.data.user) return [];
-
-    const userId = user.data.user.id;
-
-    // Récupérer les entrées vocales
-    const { data: voiceEntries } = await supabase
-      .from('journal_voice')
+  async getAllNotes(): Promise<JournalEntry[]> {
+    const { data, error } = await supabase
+      .from('journal_notes')
       .select('*')
-      .eq('user_id', userId)
+      .eq('is_archived', false)
       .order('created_at', { ascending: false });
 
-    // Récupérer les entrées textuelles
-    const { data: textEntries } = await supabase
-      .from('journal_text')
+    if (error) throw error;
+
+    return (data || []).map(note => ({
+      id: note.id,
+      text: note.text,
+      tags: note.tags || [],
+      summary: note.summary || undefined,
+      mode: note.mode || undefined,
+      created_at: note.created_at,
+    }));
+  }
+
+  /**
+   * Récupérer les notes par tags
+   */
+  async getNotesByTags(tags: string[]): Promise<JournalEntry[]> {
+    const { data, error } = await supabase
+      .from('journal_notes')
       .select('*')
-      .eq('user_id', userId)
+      .eq('is_archived', false)
+      .contains('tags', tags)
       .order('created_at', { ascending: false });
 
-    const allEntries: JournalEntry[] = [
-      ...(voiceEntries || []).map(e => ({
-        id: e.id,
-        created_at: new Date(e.created_at),
-        type: 'voice' as const,
-        content: e.content,
-        summary: e.summary,
-        tone: e.tone as 'positive' | 'neutral' | 'negative',
-        ephemeral: e.ephemeral,
-        tags: e.tags
-      })),
-      ...(textEntries || []).map(e => ({
-        id: e.id,
-        created_at: new Date(e.created_at),
-        type: 'text' as const,
-        content: e.content,
-        summary: e.summary,
-        tone: e.tone as 'positive' | 'neutral' | 'negative',
-        ephemeral: e.ephemeral,
-        tags: e.tags
-      }))
-    ];
+    if (error) throw error;
 
-    // Trier par date
-    return allEntries.sort((a, b) => b.created_at.getTime() - a.created_at.getTime());
+    return (data || []).map(note => ({
+      id: note.id,
+      text: note.text,
+      tags: note.tags || [],
+      summary: note.summary || undefined,
+      mode: note.mode || undefined,
+      created_at: note.created_at,
+    }));
   }
 
   /**
-   * Marquer une entrée comme "à brûler" (24h)
+   * Rechercher des notes par texte
    */
-  async burnEntry(entryId: string): Promise<void> {
-    // Essayer dans journal_voice
-    const { error: voiceError } = await supabase
-      .from('journal_voice')
-      .update({ ephemeral: true })
-      .eq('id', entryId);
+  async searchNotes(query: string): Promise<JournalEntry[]> {
+    const { data, error } = await supabase
+      .from('journal_notes')
+      .select('*')
+      .eq('is_archived', false)
+      .ilike('text', `%${query}%`)
+      .order('created_at', { ascending: false });
 
-    if (voiceError) {
-      // Essayer dans journal_text
-      const { error: textError } = await supabase
-        .from('journal_text')
-        .update({ ephemeral: true })
-        .eq('id', entryId);
+    if (error) throw error;
 
-      if (textError) throw textError;
-    }
+    return (data || []).map(note => ({
+      id: note.id,
+      text: note.text,
+      tags: note.tags || [],
+      summary: note.summary || undefined,
+      mode: note.mode || undefined,
+      created_at: note.created_at,
+    }));
   }
 
   /**
-   * Supprimer les entrées éphémères expirées
+   * Mettre à jour une note
    */
-  async cleanupEphemeralEntries(): Promise<void> {
-    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+  async updateNote(id: string, updates: Partial<JournalEntry>): Promise<JournalEntry> {
+    const { data, error } = await supabase
+      .from('journal_notes')
+      .update({
+        text: updates.text,
+        tags: updates.tags,
+        summary: updates.summary,
+      })
+      .eq('id', id)
+      .select()
+      .single();
 
-    // Supprimer les entrées vocales éphémères expirées
-    await supabase
-      .from('journal_voice')
-      .delete()
-      .eq('ephemeral', true)
-      .lt('created_at', oneDayAgo);
+    if (error) throw error;
 
-    // Supprimer les entrées textuelles éphémères expirées
-    await supabase
-      .from('journal_text')
-      .delete()
-      .eq('ephemeral', true)
-      .lt('created_at', oneDayAgo);
+    return {
+      id: data.id,
+      text: data.text,
+      tags: data.tags || [],
+      summary: data.summary || undefined,
+      mode: data.mode || undefined,
+      created_at: data.created_at,
+    };
   }
 
-  private generateLocalSummary(text: string): string {
-    if (text.length < 50) return text;
-    
-    // Prendre les premiers mots jusqu'à une limite raisonnable
-    const words = text.split(' ');
-    const summary = words.slice(0, 20).join(' ');
-    return summary + (words.length > 20 ? '...' : '');
+  /**
+   * Supprimer une note
+   */
+  async deleteNote(id: string): Promise<void> {
+    const { error } = await supabase
+      .from('journal_notes')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
   }
 
-  private analyzeLocalTone(text: string): 'positive' | 'neutral' | 'negative' {
-    const positiveWords = ['bien', 'content', 'heureux', 'super', 'génial', 'merci', 'joie'];
-    const negativeWords = ['mal', 'triste', 'difficile', 'problème', 'stress', 'fatigue'];
-    
-    const lowerText = text.toLowerCase();
-    const positiveCount = positiveWords.filter(word => lowerText.includes(word)).length;
-    const negativeCount = negativeWords.filter(word => lowerText.includes(word)).length;
-    
-    if (positiveCount > negativeCount) return 'positive';
-    if (negativeCount > positiveCount) return 'negative';
-    return 'neutral';
+  /**
+   * Archiver une note
+   */
+  async archiveNote(id: string): Promise<void> {
+    const { error } = await supabase
+      .from('journal_notes')
+      .update({ is_archived: true })
+      .eq('id', id);
+
+    if (error) throw error;
+  }
+
+  /**
+   * Récupérer les notes archivées
+   */
+  async getArchivedNotes(): Promise<JournalEntry[]> {
+    const { data, error } = await supabase
+      .from('journal_notes')
+      .select('*')
+      .eq('is_archived', true)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    return (data || []).map(note => ({
+      id: note.id,
+      text: note.text,
+      tags: note.tags || [],
+      summary: note.summary || undefined,
+      mode: note.mode || undefined,
+      created_at: note.created_at,
+    }));
   }
 }
 

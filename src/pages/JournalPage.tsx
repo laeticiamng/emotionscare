@@ -1,10 +1,9 @@
-import { useState } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { JournalSidebar } from '@/components/journal/JournalSidebar';
 import { useJournalComposer } from '@/modules/journal/useJournalComposer';
 import { JournalComposer } from '@/modules/journal';
-import type { SanitizedNote } from '@/modules/journal/types';
+import { useJournalNotes } from '@/hooks/useJournalNotes';
 
 // Pages lazy loaded
 import { JournalNotesPage } from './journal/JournalNotesPage';
@@ -21,7 +20,7 @@ import JournalSettingsPage from './journal/JournalSettingsPage';
  * Intègre tous les composants avec navigation sidebar
  */
 export function JournalPage() {
-  const [notes, setNotes] = useState<SanitizedNote[]>([]);
+  const { notes, isLoading } = useJournalNotes();
   const composer = useJournalComposer();
 
   return (
@@ -40,7 +39,12 @@ export function JournalPage() {
 
           {/* Contenu des routes */}
           <main className="flex-1 overflow-auto">
-            <Routes>
+            {isLoading ? (
+              <div className="flex items-center justify-center h-full">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              </div>
+            ) : (
+              <Routes>
               {/* Route d'écriture (défaut) */}
               <Route
                 index
@@ -64,6 +68,7 @@ export function JournalPage() {
               {/* Fallback */}
               <Route path="*" element={<Navigate to="/journal" replace />} />
             </Routes>
+            )}
           </main>
         </div>
       </div>

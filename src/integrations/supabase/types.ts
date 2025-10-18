@@ -5106,6 +5106,45 @@ export type Database = {
         }
         Relationships: []
       }
+      journal_notes: {
+        Row: {
+          created_at: string
+          id: string
+          is_archived: boolean | null
+          is_favorite: boolean | null
+          mode: string | null
+          summary: string | null
+          tags: string[] | null
+          text: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_archived?: boolean | null
+          is_favorite?: boolean | null
+          mode?: string | null
+          summary?: string | null
+          tags?: string[] | null
+          text: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_archived?: boolean | null
+          is_favorite?: boolean | null
+          mode?: string | null
+          summary?: string | null
+          tags?: string[] | null
+          text?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       journal_prompts: {
         Row: {
           category: string
