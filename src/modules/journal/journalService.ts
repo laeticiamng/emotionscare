@@ -12,6 +12,15 @@ export interface JournalEntry {
   summary?: string;
   mode?: 'text' | 'voice';
   created_at?: string;
+  // Legacy fields for compatibility
+  type?: 'voice' | 'text';
+  content?: string;
+  tone?: 'positive' | 'neutral' | 'negative';
+  ephemeral?: boolean;
+  voice_url?: string;
+  duration?: number;
+  metadata?: Record<string, any>;
+  user_id?: string;
 }
 
 export interface JournalVoiceEntry {
@@ -228,6 +237,103 @@ class JournalService {
       mode: note.mode || undefined,
       created_at: note.created_at,
     }));
+  }
+
+  // ============================================
+  // LEGACY COMPATIBILITY METHODS
+  // For backward compatibility with other modules
+  // ============================================
+
+  /**
+   * @deprecated Use createTextEntry or createVoiceEntry instead
+   */
+  async saveEntry(entry: Partial<JournalEntry>): Promise<JournalEntry> {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('User not authenticated');
+
+    const { data, error } = await supabase
+      .from('journal_notes')
+      .insert({
+        user_id: user.id,
+        text: entry.text || entry.content || '',
+        tags: entry.tags || [],
+        summary: entry.summary,
+        mode: entry.mode || entry.type,
+      })
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    return {
+      id: data.id,
+      text: data.text,
+      content: data.text, // Legacy field
+      tags: data.tags || [],
+      summary: data.summary || undefined,
+      mode: data.mode || undefined,
+      type: data.mode, // Legacy field
+      created_at: data.created_at,
+      tone: 'neutral', // Legacy field - default value
+      ephemeral: false, // Legacy field - not supported anymore
+    };
+  }
+
+  /**
+   * @deprecated Use getAllNotes instead
+   */
+  async getEntries(): Promise<JournalEntry[]> {
+    const notes = await this.getAllNotes();
+    return notes.map(note => ({
+      ...note,
+      content: note.text, // Legacy field
+      type: note.mode, // Legacy field
+      tone: 'neutral', // Legacy field - default value
+      ephemeral: false, // Legacy field - not supported anymore
+    }));
+  }
+
+  /**
+   * @deprecated Voice processing should be handled separately
+   */
+  async processVoiceEntry(audioBlob: Blob): Promise<{ content: string; summary: string; tone: 'positive' | 'neutral' | 'negative' }> {
+    // This is a stub for compatibility
+    // Voice processing should be handled in the component/hook layer
+    return {
+      content: "Voice entry transcribed",
+      summary: "Voice note",
+      tone: 'neutral'
+    };
+  }
+
+  /**
+   * @deprecated Text processing should be handled separately
+   */
+  async processTextEntry(text: string): Promise<{ content: string; summary: string; tone: 'positive' | 'neutral' | 'negative' }> {
+    // This is a stub for compatibility
+    // Text analysis should be handled in the component/hook layer
+    const summary = text.length > 50 ? text.substring(0, 47) + '...' : text;
+    return {
+      content: text,
+      summary,
+      tone: 'neutral'
+    };
+  }
+
+  /**
+   * @deprecated Ephemeral notes are no longer supported, use archiveNote instead
+   */
+  async burnEntry(entryId: string): Promise<void> {
+    // Map to archive functionality
+    await this.archiveNote(entryId);
+  }
+
+  /**
+   * @deprecated Ephemeral cleanup is no longer needed
+   */
+  async cleanupEphemeralEntries(): Promise<void> {
+    // No-op - ephemeral notes are no longer supported
+    console.warn('cleanupEphemeralEntries is deprecated and no longer does anything');
   }
 }
 
