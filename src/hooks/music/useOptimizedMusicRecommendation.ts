@@ -5,6 +5,7 @@ import { MusicPlaylist, EmotionMusicParams } from '@/types/music';
 import { useMusic } from '@/hooks/useMusic';
 import { useMusicCache } from './useMusicCache';
 import { toast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 
 const DEBOUNCE_DELAY = 300;
 
@@ -41,7 +42,7 @@ export const useOptimizedMusicRecommendation = () => {
 
     // Check if already loading
     if (cache.isLoading(params)) {
-      console.log('[MusicRecommendation] Request already in progress');
+      logger.debug('[MusicRecommendation] Request already in progress', undefined, 'UI');
       return null;
     }
 
@@ -75,7 +76,7 @@ export const useOptimizedMusicRecommendation = () => {
       }
     } catch (err: any) {
       if (err.name === 'AbortError') {
-        console.log('[MusicRecommendation] Request aborted');
+        logger.debug('[MusicRecommendation] Request aborted', undefined, 'UI');
         return null;
       }
       

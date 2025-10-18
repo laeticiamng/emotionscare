@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { MusicPlaylist, EmotionMusicParams } from '@/types/music';
+import { logger } from '@/lib/logger';
 
 interface CacheEntry {
   playlist: MusicPlaylist;
@@ -29,12 +30,12 @@ export const useMusicCache = () => {
     const entry = cache.get(key);
     
     if (entry && isCacheValid(entry)) {
-      console.log(`[MusicCache] Cache hit for ${key}`);
+      logger.debug(`[MusicCache] Cache hit for ${key}`, undefined, 'UI');
       return entry.playlist;
     }
     
     if (entry && !isCacheValid(entry)) {
-      console.log(`[MusicCache] Cache expired for ${key}`);
+      logger.debug(`[MusicCache] Cache expired for ${key}`, undefined, 'UI');
       setCache(prev => {
         const newCache = new Map(prev);
         newCache.delete(key);
@@ -63,7 +64,7 @@ export const useMusicCache = () => {
         emotion: params.emotion
       });
       
-      console.log(`[MusicCache] Cached playlist for ${key}`);
+      logger.debug(`[MusicCache] Cached playlist for ${key}`, undefined, 'UI');
       return newCache;
     });
   }, [getCacheKey]);
@@ -86,7 +87,7 @@ export const useMusicCache = () => {
   const clearCache = useCallback(() => {
     setCache(new Map());
     loadingRef.current.clear();
-    console.log('[MusicCache] Cache cleared');
+    logger.info('[MusicCache] Cache cleared', undefined, 'UI');
   }, []);
 
   const getCacheStats = useCallback(() => {

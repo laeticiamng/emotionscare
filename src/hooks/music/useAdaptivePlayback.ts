@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { logger } from '@/lib/logger';
 
 export interface PlaybackState {
   trackId: string;
@@ -33,7 +34,7 @@ const readState = (): PlaybackState | null => {
       wasPlaying: typeof parsed.wasPlaying === "boolean" ? parsed.wasPlaying : false,
     } satisfies PlaybackState;
   } catch (error) {
-    console.warn("[useAdaptivePlayback] unable to restore state", error);
+    logger.warn("[useAdaptivePlayback] unable to restore state", error, 'UI');
     return null;
   }
 };
@@ -47,7 +48,7 @@ const writeState = (snapshot: PlaybackState | null) => {
     }
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(snapshot));
   } catch (error) {
-    console.warn("[useAdaptivePlayback] unable to persist state", error);
+    logger.warn("[useAdaptivePlayback] unable to persist state", error, 'UI');
   }
 };
 

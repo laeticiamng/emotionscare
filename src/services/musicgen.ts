@@ -8,6 +8,7 @@
  */
 import { API_URL } from '@/lib/env';
 import { AudioTrack } from '@/types/audio';
+import { logger } from '@/lib/logger';
 
 // Types pour les options de génération
 export interface MusicGenOptions {
@@ -53,7 +54,7 @@ export async function checkApiConnection(): Promise<boolean> {
     
     return response.ok;
   } catch (error) {
-    console.error('MusicGen API connection check failed:', error);
+    logger.error('MusicGen API connection check failed', error as Error, 'MUSIC');
     return false;
   }
 }
@@ -96,7 +97,7 @@ export async function generateMusic(options: MusicGenOptions): Promise<MusicGenR
     
     return await response.json();
   } catch (error) {
-    console.error('Error generating music:', error);
+    logger.error('Error generating music', error as Error, 'MUSIC');
     throw error;
   }
 }
