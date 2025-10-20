@@ -10,6 +10,7 @@ import { useWebBluetooth } from '@/hooks/useWebBluetooth';
 import { supabase } from '@/integrations/supabase/client';
 import { triggerConfetti } from '@/lib/confetti';
 import { toast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 
 interface BreathingPattern {
   id: string;
@@ -318,7 +319,7 @@ export default function EnhancedFlashGlow() {
         }
       });
     } catch (error) {
-      console.error('Erreur sauvegarde:', error);
+      logger.error('Erreur sauvegarde', error as Error, 'UI');
     }
 
     triggerConfetti();

@@ -28,6 +28,7 @@ import {
   HelpCircle
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 const UserMenu: React.FC = () => {
   const { user, logout } = useAuth();
@@ -39,7 +40,7 @@ const UserMenu: React.FC = () => {
       toast.success('Vous avez été déconnecté avec succès');
       navigate('/');
     } catch (error) {
-      console.error('Logout error:', error);
+      logger.error('Logout error', error as Error, 'UI');
       toast.error('Une erreur est survenue lors de la déconnexion');
     }
   };
