@@ -11,6 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Heart, MessageCircle, Send, Trash2, Users } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
+import { logger } from '@/lib/logger';
 
 interface Post {
   id: string;
@@ -73,7 +74,7 @@ const CommunityDashboard: React.FC = () => {
         setPosts(response.data.posts);
       }
     } catch (error) {
-      console.error('Error loading posts:', error);
+      logger.error('Error loading posts', error, 'UI');
     }
   };
 
@@ -92,7 +93,7 @@ const CommunityDashboard: React.FC = () => {
         setStats(response.data);
       }
     } catch (error) {
-      console.error('Error loading stats:', error);
+      logger.error('Error loading stats', error, 'UI');
     }
   };
 
@@ -111,7 +112,7 @@ const CommunityDashboard: React.FC = () => {
         setComments(response.data.comments);
       }
     } catch (error) {
-      console.error('Error loading comments:', error);
+      logger.error('Error loading comments', error, 'UI');
     }
   };
 
@@ -179,7 +180,7 @@ const CommunityDashboard: React.FC = () => {
 
       loadPosts();
     } catch (error) {
-      console.error('Error liking post:', error);
+      logger.error('Error liking post', error, 'UI');
     }
   };
 
@@ -209,7 +210,7 @@ const CommunityDashboard: React.FC = () => {
         description: 'Commentaire ajouté',
       });
     } catch (error) {
-      console.error('Error adding comment:', error);
+      logger.error('Error adding comment', error, 'UI');
     }
   };
 
@@ -233,7 +234,7 @@ const CommunityDashboard: React.FC = () => {
       loadPosts();
       loadStats();
     } catch (error) {
-      console.error('Error deleting post:', error);
+      logger.error('Error deleting post', error, 'UI');
     }
   };
 

@@ -16,6 +16,7 @@ import {
   Shield,
   Clock
 } from 'lucide-react';
+import { logger } from '@/lib/logger';
 
 interface Post {
   id: string;
@@ -56,8 +57,8 @@ export default function CommunityHubEnhanced() {
 
       if (error) throw error;
       if (data?.posts) setPosts(data.posts);
-    } catch (error: any) {
-      console.error('Erreur chargement posts:', error);
+    } catch (error) {
+      logger.error('Erreur chargement posts', error as Error, 'UI');
     }
   };
 
@@ -69,8 +70,8 @@ export default function CommunityHubEnhanced() {
 
       if (error) throw error;
       if (data?.stats) setStats(data.stats);
-    } catch (error: any) {
-      console.error('Erreur chargement stats:', error);
+    } catch (error) {
+      logger.error('Erreur chargement stats', error as Error, 'UI');
     }
   };
 
