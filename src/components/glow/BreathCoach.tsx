@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Volume2, VolumeX, Vibrate } from 'lucide-react';
 import { type GlowPhase } from '@/store/glow.store';
+import { logger } from '@/lib/logger';
 
 interface BreathCoachProps {
   phase: GlowPhase;
@@ -93,7 +94,7 @@ const BreathCoach: React.FC<BreathCoachProps> = ({
         oscillator.stop(audioContext.currentTime + 0.5);
       }
     } catch (error) {
-      console.warn('Web Audio not supported:', error);
+      logger.warn('Web Audio not supported', error, 'UI');
     }
   };
 

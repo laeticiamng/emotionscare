@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Play, Pause, Square, Flag, AlertCircle } from 'lucide-react';
 import { useGritQuest } from '@/hooks/useGritQuest';
 import { useHumeFaces } from '@/hooks/useHumeFaces';
+import { logger } from '@/lib/logger';
 
 interface GritQuest {
   quest_id: string;
@@ -49,7 +50,7 @@ export const GritTaskRunner: React.FC<GritTaskRunnerProps> = ({
     enabled: humeFacesEnabled,
     frameRate: 1,
     onEmotionDetected: (emotion: string, confidence: number) => {
-      console.log('Emotion detected:', emotion, confidence);
+      logger.debug('Emotion detected', { emotion, confidence }, 'UI');
     },
     onSummaryUpdate: (summary) => {
       setHumeSummary(summary);

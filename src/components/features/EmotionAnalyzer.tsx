@@ -21,6 +21,7 @@ import {
   Square
 } from 'lucide-react';
 import { emotionsCareApi } from '@/services/emotions-care-api';
+import { logger } from '@/lib/logger';
 
 interface EmotionResult {
   emotion: string;
@@ -49,7 +50,7 @@ const EmotionAnalyzer: React.FC = () => {
         timestamp: new Date()
       });
     } catch (error) {
-      console.error('Erreur analyse texte:', error);
+      logger.error('Erreur analyse texte', error as Error, 'UI');
     } finally {
       setIsAnalyzing(false);
     }
@@ -74,7 +75,7 @@ const EmotionAnalyzer: React.FC = () => {
             timestamp: new Date()
           });
         } catch (error) {
-          console.error('Erreur analyse vocale:', error);
+          logger.error('Erreur analyse vocale', error as Error, 'UI');
         } finally {
           setIsAnalyzing(false);
         }

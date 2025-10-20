@@ -24,6 +24,7 @@ import {
   Loader2
 } from 'lucide-react';
 import { emotionsCareApi } from '@/services/emotions-care-api';
+import { logger } from '@/lib/logger';
 
 interface ChatMessage {
   id: string;
@@ -136,7 +137,7 @@ const VirtualCoach: React.FC = () => {
         speechSynthesis.speak(utterance);
       }
     } catch (error) {
-      console.error('Erreur chat coach:', error);
+      logger.error('Erreur chat coach', error as Error, 'UI');
       const errorResponse: ChatMessage = {
         id: (Date.now() + 1).toString(),
         content: 'Je rencontre une petite difficulté technique. Pouvez-vous réessayer ? En attendant, prenez quelques respirations profondes.',

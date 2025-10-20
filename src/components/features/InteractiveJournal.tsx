@@ -21,6 +21,7 @@ import {
   Loader2
 } from 'lucide-react';
 import { emotionsCareApi } from '@/services/emotions-care-api';
+import { logger } from '@/lib/logger';
 
 interface JournalEntry {
   id: string;
@@ -116,7 +117,7 @@ const InteractiveJournal: React.FC = () => {
       setCurrentEntry('');
       setSelectedMood(null);
     } catch (error) {
-      console.error('Erreur sauvegarde journal:', error);
+      logger.error('Erreur sauvegarde journal', error as Error, 'UI');
     } finally {
       setIsAnalyzing(false);
       setIsSaving(false);
