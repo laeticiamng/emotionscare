@@ -7,6 +7,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Progress } from '@/components/ui/progress';
 import { CheckCircle, XCircle, AlertTriangle, RefreshCw, Zap, Music, Brain } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 
 interface ApiTestResult {
   name: string;
@@ -45,7 +46,7 @@ const ApiIntegrationChecker: React.FC = () => {
       setStatus(data);
     } catch (err) {
       setError(`Erreur lors du test: ${err.message}`);
-      console.error('API Integration Test Error:', err);
+      logger.error('API Integration Test Error:', err as Error, 'UI');
     } finally {
       setIsLoading(false);
     }

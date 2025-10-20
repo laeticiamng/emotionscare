@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, Calendar, Bell } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { routes } from '@/lib/routes';
+import { logger } from '@/lib/logger';
 
 interface ComingSoonProps {
   moduleName: string;
@@ -32,7 +33,7 @@ export const ComingSoon: React.FC<ComingSoonProps> = ({
 
   const handleNotify = () => {
     // TODO: Implémenter notification système
-    console.log('Notification demandée pour:', moduleName);
+    logger.info('Notification demandée pour:', { moduleName }, 'UI');
   };
 
   return (

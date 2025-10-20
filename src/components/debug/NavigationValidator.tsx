@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle, XCircle, ExternalLink } from 'lucide-react';
 import { routes } from '@/routerV2';
+import { logger } from '@/lib/logger';
 
 const NavigationValidator: React.FC = () => {
   const navigate = useNavigate();
@@ -64,9 +65,9 @@ const NavigationValidator: React.FC = () => {
   const testNavigation = (path: string, name: string) => {
     try {
       navigate(path);
-      console.log(`✅ Navigation vers ${name} (${path}) réussie`);
+      logger.info(`✅ Navigation vers ${name} (${path}) réussie`, { path, name }, 'UI');
     } catch (error) {
-      console.error(`❌ Erreur navigation vers ${name} (${path}):`, error);
+      logger.error(`❌ Erreur navigation vers ${name} (${path}):`, error as Error, 'UI');
     }
   };
 

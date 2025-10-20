@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { useState, useEffect } from 'react';
 import { useUserPreferences } from '@/contexts/UserPreferencesContext';
+import { logger } from '@/lib/logger';
 
 export const useAmbientSound = () => {
   const { preferences } = useUserPreferences();
@@ -42,7 +43,7 @@ export const useAmbientSound = () => {
     if (!audio) return;
     
     if (preferences.soundEnabled && !isPlaying) {
-      audio.play().catch(err => console.error('Error playing ambient sound:', err));
+      audio.play().catch(err => logger.error('Error playing ambient sound:', err as Error, 'UI'));
       setIsPlaying(true);
     } else if (!preferences.soundEnabled && isPlaying) {
       audio.pause();
@@ -53,7 +54,7 @@ export const useAmbientSound = () => {
   // Méthodes pour contrôler le son
   const play = () => {
     if (!audio) return;
-    audio.play().catch(err => console.error('Error playing ambient sound:', err));
+    audio.play().catch(err => logger.error('Error playing ambient sound:', err as Error, 'UI'));
     setIsPlaying(true);
   };
   
@@ -82,7 +83,7 @@ export const useAmbientSound = () => {
     audio.load();
     
     if (wasPlaying) {
-      audio.play().catch(err => console.error('Error playing ambient sound:', err));
+      audio.play().catch(err => logger.error('Error playing ambient sound:', err as Error, 'UI'));
     }
   };
   
