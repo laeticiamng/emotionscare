@@ -1,6 +1,7 @@
 // @ts-nocheck
 
 import React, { createContext, useContext, ReactNode } from 'react';
+import { logger } from '@/lib/logger';
 
 interface SegmentContextType {
   track: (event: string, properties?: Record<string, any>) => void;
@@ -15,11 +16,11 @@ interface SegmentProviderProps {
 
 export const SegmentProvider: React.FC<SegmentProviderProps> = ({ children }) => {
   const track = (event: string, properties?: Record<string, any>) => {
-    console.log('Segment track:', event, properties);
+    logger.info('Segment track', { event, properties }, 'ANALYTICS');
   };
 
   const identify = (userId: string, traits?: Record<string, any>) => {
-    console.log('Segment identify:', userId, traits);
+    logger.info('Segment identify', { userId, traits }, 'ANALYTICS');
   };
 
   return (
