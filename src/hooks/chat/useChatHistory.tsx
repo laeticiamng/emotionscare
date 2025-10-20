@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { ChatMessage } from '@/types';
 import { useToast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 
 export interface Conversation {
   id: string;
@@ -51,7 +52,7 @@ export const useChatHistory = () => {
       
       setConversations(mockConversations);
     } catch (error) {
-      console.error('Error loading conversations:', error);
+      logger.error('Error loading conversations', error as Error, 'UI');
       setError(error instanceof Error ? error : new Error('Failed to load conversations'));
     } finally {
       setIsLoading(false);
@@ -103,7 +104,7 @@ export const useChatHistory = () => {
       
       return mockMessages;
     } catch (error) {
-      console.error('Error loading messages:', error);
+      logger.error('Error loading messages', error as Error, 'UI');
       setError(error instanceof Error ? error : new Error('Failed to load messages'));
       return [];
     } finally {
@@ -131,7 +132,7 @@ export const useChatHistory = () => {
       
       return newConversation;
     } catch (error) {
-      console.error('Error creating conversation:', error);
+      logger.error('Error creating conversation', error as Error, 'UI');
       setError(error instanceof Error ? error : new Error('Failed to create conversation'));
       throw error;
     } finally {
@@ -159,7 +160,7 @@ export const useChatHistory = () => {
       
       return true;
     } catch (error) {
-      console.error('Error deleting conversation:', error);
+      logger.error('Error deleting conversation', error as Error, 'UI');
       
       toast({
         title: 'Erreur',

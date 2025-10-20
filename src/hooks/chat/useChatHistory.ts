@@ -5,6 +5,7 @@
 // @ts-nocheck
 import { useState, useEffect } from 'react';
 import { ChatConversation } from '@/types/chat';
+import { logger } from '@/lib/logger';
 
 export const useChatHistory = (userId: string) => {
   const [conversations, setConversations] = useState<ChatConversation[]>([]);
@@ -47,7 +48,7 @@ export const useChatHistory = (userId: string) => {
           setIsLoading(false);
         }, 800);
       } catch (error) {
-        console.error('Error fetching conversations:', error);
+        logger.error('Error fetching conversations', error as Error, 'UI');
         setIsLoading(false);
       }
     };

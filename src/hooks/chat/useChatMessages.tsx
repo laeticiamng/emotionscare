@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { ChatMessage } from '@/types/chat';
+import { logger } from '@/lib/logger';
 
 export function useChatMessages(initialMessages: ChatMessage[] = []) {
   const [messages, setMessages] = useState<ChatMessage[]>(initialMessages);
@@ -26,19 +27,19 @@ export function useChatMessages(initialMessages: ChatMessage[] = []) {
 
   const sendMessageHandler = useCallback(async (text: string, previousMessages: ChatMessage[] = []) => {
     // Handle sending message logic
-    console.log('Sending message:', text, 'Previous messages:', previousMessages);
+    logger.debug('Sending message', { text, previousMessagesCount: previousMessages.length }, 'UI');
     return `Response to: ${text}`;
   }, []);
 
   const analyzeEmotionHandler = useCallback(async (text: string) => {
     // Handle emotion analysis logic
-    console.log('Analyzing emotion for:', text);
+    logger.debug('Analyzing emotion', { text }, 'UI');
     return { emotion: 'neutral', score: 0.5 };
   }, []);
 
   const getRecommendationsHandler = useCallback((category: string) => {
     // Handle getting recommendations logic
-    console.log('Getting recommendations for category:', category);
+    logger.debug('Getting recommendations', { category }, 'UI');
     return ['Recommendation 1', 'Recommendation 2'];
   }, []);
 

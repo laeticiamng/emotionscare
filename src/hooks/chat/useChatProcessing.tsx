@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { ChatResponse } from '@/types/chat';
 import useUserContext from './useUserContext';
+import { logger } from '@/lib/logger';
 
 interface UseChatProcessingResult {
   isProcessing: boolean;
@@ -52,7 +53,7 @@ const useChatProcessing = (): UseChatProcessingResult => {
       
       return response;
     } catch (error) {
-      console.error('Error processing message:', error);
+      logger.error('Error processing message', error as Error, 'UI');
       return {
         message: "Une erreur est survenue lors du traitement de votre message. Veuillez réessayer.",
       };

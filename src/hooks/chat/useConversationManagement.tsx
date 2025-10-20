@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { chatHistoryService } from '@/lib/chat/services';
 import { ChatConversation } from '@/types/chat';
+import { logger } from '@/lib/logger';
 
 // Étendons temporairement le service pour ajouter les fonctions manquantes
 const extendedChatHistoryService = {
@@ -12,14 +13,14 @@ const extendedChatHistoryService = {
     // Simuler un délai réseau
     await new Promise(resolve => setTimeout(resolve, 300));
     // Dans une vraie application, mettrait à jour la base de données
-    console.log(`Titre mis à jour pour ${conversationId}: ${title}`);
+    logger.debug('Conversation title updated', { conversationId, title }, 'UI');
     return;
   },
   updateConversation: async (conversationId: string, data: Partial<ChatConversation>): Promise<void> => {
     // Simuler un délai réseau
     await new Promise(resolve => setTimeout(resolve, 300));
     // Dans une vraie application, mettrait à jour la base de données
-    console.log(`Conversation mise à jour ${conversationId}:`, data);
+    logger.debug('Conversation updated', { conversationId, data }, 'UI');
     return;
   }
 };
@@ -80,7 +81,7 @@ export const useConversationManagement = () => {
     try {
       // Dans une vraie application, supprimer de la base de données
       await new Promise(resolve => setTimeout(resolve, 500));
-      console.log(`Conversation supprimée: ${conversationId}`);
+      logger.info('Conversation deleted', { conversationId }, 'UI');
     } catch (e) {
       const err = e instanceof Error ? e : new Error('Failed to delete conversation');
       setError(err);
