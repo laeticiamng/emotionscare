@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 interface Journey {
   id: string;
@@ -73,7 +74,7 @@ const TherapeuticJourneyDashboard: React.FC = () => {
       const active = journeyList.find((j: Journey) => j.status === 'active');
       if (active) setActiveJourney(active);
     } catch (error) {
-      console.error('Erreur chargement parcours:', error);
+      logger.error('Erreur chargement parcours', error as Error, 'UI');
       toast.error('Erreur lors du chargement');
     } finally {
       setLoading(false);
@@ -106,7 +107,7 @@ const TherapeuticJourneyDashboard: React.FC = () => {
       });
       await loadJourneys();
     } catch (error: any) {
-      console.error('Erreur création:', error);
+      logger.error('Erreur création', error as Error, 'UI');
       toast.error('Erreur lors de la création');
     } finally {
       setCreating(false);
@@ -136,7 +137,7 @@ const TherapeuticJourneyDashboard: React.FC = () => {
       toast.success('Parcours adapté selon vos progrès ! 🎯');
       await loadJourneys();
     } catch (error: any) {
-      console.error('Erreur adaptation:', error);
+      logger.error('Erreur adaptation', error as Error, 'UI');
       toast.error('Erreur lors de l\'adaptation');
     } finally {
       setAdapting(false);
@@ -161,7 +162,7 @@ const TherapeuticJourneyDashboard: React.FC = () => {
       toast.success('Progrès mis à jour !');
       await loadJourneys();
     } catch (error) {
-      console.error('Erreur mise à jour:', error);
+      logger.error('Erreur mise à jour', error as Error, 'UI');
       toast.error('Erreur lors de la mise à jour');
     }
   };

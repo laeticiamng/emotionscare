@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 
 interface Meditation {
   id: string;
@@ -104,7 +105,7 @@ export default function GuidedMeditationEnhanced() {
       .limit(20);
 
     if (error) {
-      console.error('Error loading meditations:', error);
+      logger.error('Error loading meditations', error, 'UI');
       return;
     }
 
