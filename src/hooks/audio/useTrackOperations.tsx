@@ -2,6 +2,7 @@
 
 import { useCallback } from 'react';
 import { MusicTrack } from '@/types/music';
+import { logger } from '@/lib/logger';
 
 /**
  * Hook that provides track operation functions (play, pause, next, previous)
@@ -11,35 +12,35 @@ export function useTrackOperations() {
    * Start playing a new track
    */
   const playTrack = useCallback((track: MusicTrack) => {
-    console.log("Playing track:", track.title);
+    logger.info("Playing track", { title: track.title }, 'MUSIC');
   }, []);
 
   /**
    * Pause the currently playing track
    */
   const pauseTrack = useCallback(() => {
-    console.log("Pausing track");
+    logger.info("Pausing track", undefined, 'MUSIC');
   }, []);
 
   /**
    * Resume playback of the current track if available
    */
   const resumeTrack = useCallback(() => {
-    console.log("Resuming track");
+    logger.info("Resuming track", undefined, 'MUSIC');
   }, []);
 
   /**
    * Skip to the next track (placeholder implementation)
    */
   const nextTrack = useCallback(() => {
-    console.log("Next track requested");
+    logger.info("Next track requested", undefined, 'MUSIC');
   }, []);
 
   /**
    * Go back to the previous track (placeholder implementation)
    */
   const previousTrack = useCallback(() => {
-    console.log("Previous track requested");
+    logger.info("Previous track requested", undefined, 'MUSIC');
   }, []);
 
   return {
