@@ -10,6 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { User, Settings, Activity, Download, Loader2, Camera, Globe, Bell, Lock, Sparkles } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { logger } from '@/lib/logger';
 
 const EnhancedProfileDashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
@@ -59,7 +60,7 @@ const EnhancedProfileDashboard: React.FC = () => {
         });
       }
     } catch (error) {
-      console.error('Error loading profile:', error);
+      logger.error('Error loading profile', error as Error, 'UI');
       toast({
         title: 'Erreur',
         description: 'Impossible de charger le profil',
@@ -79,7 +80,7 @@ const EnhancedProfileDashboard: React.FC = () => {
       if (error) throw error;
       setActivityHistory(data.history || []);
     } catch (error) {
-      console.error('Error loading activity history:', error);
+      logger.error('Error loading activity history', error as Error, 'UI');
     }
   };
 
@@ -102,7 +103,7 @@ const EnhancedProfileDashboard: React.FC = () => {
 
       loadProfile();
     } catch (error) {
-      console.error('Error updating profile:', error);
+      logger.error('Error updating profile', error as Error, 'UI');
       toast({
         title: 'Erreur',
         description: 'Impossible de mettre à jour le profil',
@@ -130,7 +131,7 @@ const EnhancedProfileDashboard: React.FC = () => {
         description: 'Vos paramètres ont été sauvegardés',
       });
     } catch (error) {
-      console.error('Error updating preferences:', error);
+      logger.error('Error updating preferences', error as Error, 'UI');
       toast({
         title: 'Erreur',
         description: 'Impossible de mettre à jour les préférences',
@@ -161,7 +162,7 @@ const EnhancedProfileDashboard: React.FC = () => {
         description: 'Vos données ont été téléchargées',
       });
     } catch (error) {
-      console.error('Error exporting data:', error);
+      logger.error('Error exporting data', error as Error, 'UI');
       toast({
         title: 'Erreur',
         description: 'Impossible d\'exporter les données',

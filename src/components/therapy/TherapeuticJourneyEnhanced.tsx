@@ -19,6 +19,7 @@ import {
   TrendingUp,
   Calendar
 } from 'lucide-react';
+import { logger } from '@/lib/logger';
 
 interface JourneySegment {
   title: string;
@@ -93,7 +94,7 @@ export const TherapeuticJourneyEnhanced: React.FC = () => {
         setJourneys(data.journeys);
       }
     } catch (error) {
-      console.error('Error loading journeys:', error);
+      logger.error('Error loading journeys', error as Error, 'UI');
     }
   };
 
@@ -135,7 +136,7 @@ export const TherapeuticJourneyEnhanced: React.FC = () => {
         });
       }
     } catch (error: any) {
-      console.error('Error generating journey:', error);
+      logger.error('Error generating journey', error as Error, 'UI');
       toast({
         title: "Erreur",
         description: error.message || "Impossible de générer le parcours",

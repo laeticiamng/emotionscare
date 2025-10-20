@@ -9,6 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Loader2, Play, Square, Eye, Sparkles, Activity, Clock, TrendingUp } from 'lucide-react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Sky, Environment } from '@react-three/drei';
+import { logger } from '@/lib/logger';
 
 interface VREnvironment {
   id: string;
@@ -76,7 +77,7 @@ const VRTherapyEnhanced: React.FC = () => {
         });
       }
     } catch (error) {
-      console.error('Error loading data:', error);
+      logger.error('Error loading data', error as Error, 'VR');
     }
   };
 
