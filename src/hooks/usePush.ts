@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNotifyStore } from '@/store/notify.store';
 import { toast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 
 interface PushSubscription {
   endpoint: string;
@@ -52,7 +53,7 @@ export const usePush = () => {
       await navigator.serviceWorker.ready;
       return registration;
     } catch (error) {
-      console.error('SW registration failed:', error);
+      logger.error('SW registration failed', error as Error, 'SYSTEM');
       return null;
     }
   }, []);
@@ -132,7 +133,7 @@ export const usePush = () => {
       return true;
 
     } catch (error: any) {
-      console.error('Push subscription failed:', error);
+      logger.error('Push subscription failed', error as Error, 'SYSTEM');
       setError(error.message);
       
       toast({
@@ -184,7 +185,7 @@ export const usePush = () => {
       return true;
 
     } catch (error: any) {
-      console.error('Push unsubscription failed:', error);
+      logger.error('Push unsubscription failed', error as Error, 'SYSTEM');
       setError(error.message);
       
       toast({
@@ -227,7 +228,7 @@ export const usePush = () => {
       });
 
     } catch (error: any) {
-      console.error('Test push failed:', error);
+      logger.error('Test push failed', error as Error, 'SYSTEM');
       toast({
         title: "Erreur",
         description: "Impossible d'envoyer la notification test.",

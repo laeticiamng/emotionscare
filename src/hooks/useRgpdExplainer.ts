@@ -7,6 +7,7 @@ import {
   getGDPRQuestionResponse,
   generateGDPRRequestTemplate 
 } from '@/lib/ai/gdpr-service';
+import { logger } from '@/lib/logger';
 
 export type GdprExplanation = {
   explanation: string;
@@ -52,7 +53,7 @@ export function useRgpdExplainer() {
       setExplanation(result);
       return result;
     } catch (error) {
-      console.error('Erreur explication RGPD:', error);
+      logger.error('Erreur explication RGPD', error as Error, 'SYSTEM');
       toast({
         title: "Erreur",
         description: "Impossible d'obtenir l'explication RGPD",
@@ -89,7 +90,7 @@ export function useRgpdExplainer() {
       
       return result;
     } catch (error) {
-      console.error('Erreur question RGPD:', error);
+      logger.error('Erreur question RGPD', error as Error, 'SYSTEM');
       toast({
         title: "Erreur",
         description: "Impossible d'obtenir une réponse à votre question",
@@ -119,7 +120,7 @@ export function useRgpdExplainer() {
       setRequestTemplate(result);
       return result;
     } catch (error) {
-      console.error('Erreur modèle RGPD:', error);
+      logger.error('Erreur modèle RGPD', error as Error, 'SYSTEM');
       toast({
         title: "Erreur",
         description: "Impossible de générer le modèle de demande",

@@ -4,6 +4,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { logger } from '@/lib/logger';
 
 interface PushNotificationState {
   supported: boolean;
@@ -67,14 +68,14 @@ export const usePushNotifications = () => {
 
   const sendTestNotification = async (): Promise<boolean> => {
     if (!state.supported) {
-      console.warn('[Push] Notifications non supportées');
+      logger.warn('[Push] Notifications non supportées', {}, 'SYSTEM');
       return false;
     }
 
     if (state.permission !== 'granted') {
       const granted = await requestPermission();
       if (!granted) {
-        console.warn('[Push] Permission refusée');
+        logger.warn('[Push] Permission refusée', {}, 'SYSTEM');
         return false;
       }
     }
@@ -89,12 +90,12 @@ export const usePushNotifications = () => {
         requireInteraction: false,
       });
       
-      console.log('[Push] Notification de test envoyée');
+      logger.info('[Push] Notification de test envoyée', {}, 'SYSTEM');
       return true;
     } catch (error) {
-      console.error('[Push] Erreur lors de l\'envoi:', error);
+      logger.error('[Push] Erreur lors de l\'envoi', error as Error, 'SYSTEM');
       setState(prev => ({ 
-        ...prev, 
+        ...prev,
         error: 'Erreur lors de l\'envoi de la notification' 
       }));
       return false;
@@ -109,7 +110,7 @@ export const usePushNotifications = () => {
       : 'Notifications non supportées par ce navigateur';
     
     alert(`📱 Fallback Notification:\n\n${message}\n\nEmotionsCare - Système de fallback activé`);
-    console.log('[Push] Fallback alert affiché:', message);
+    logger.info('[Push] Fallback alert affiché', { message }, 'SYSTEM');
   };
 
   return {
