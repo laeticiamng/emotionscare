@@ -8,6 +8,7 @@ import React, { createContext, useContext, useState, useCallback, useEffect } fr
 import { useQuery } from '@tanstack/react-query';
 import { ChatMessage, ChatConversation } from '@/types/chat';
 import { Suggestion } from '@/types/coach';
+import { logger } from '@/lib/logger';
 
 // Types unifiés
 export interface EmotionAnalysis {
@@ -187,7 +188,7 @@ export const UnifiedCoachProvider: React.FC<{ children: React.ReactNode }> = ({ 
           }
         }
       } catch (err) {
-        console.error('Erreur chargement conversations:', err);
+        logger.error('Erreur chargement conversations', err as Error, 'UI');
         setError('Impossible de charger l\'historique');
       }
     };
@@ -249,7 +250,7 @@ export const UnifiedCoachProvider: React.FC<{ children: React.ReactNode }> = ({ 
           setEmotionConfidence(analysis.confidence);
           setRecommendations(analysis.recommendations);
         } catch (err) {
-          console.warn('Erreur analyse émotion:', err);
+          logger.warn('Erreur analyse émotion', err as Error, 'UI');
         }
       }
 
@@ -283,7 +284,7 @@ export const UnifiedCoachProvider: React.FC<{ children: React.ReactNode }> = ({ 
     } catch (err) {
       const errorMsg = 'Erreur lors de l\'envoi du message';
       setError(errorMsg);
-      console.error('Erreur sendMessage:', err);
+      logger.error('Erreur sendMessage', err as Error, 'UI');
       return 'Désolé, une erreur s\'est produite.';
     } finally {
       setIsProcessing(false);

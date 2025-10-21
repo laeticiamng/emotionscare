@@ -1,6 +1,7 @@
 // @ts-nocheck
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useMemoryOptimization } from '@/hooks/optimization/useMemoryOptimization';
+import { logger } from '@/lib/logger';
 
 interface PerformanceMetrics {
   fcp: number; // First Contentful Paint
@@ -87,7 +88,7 @@ export const PerformanceProvider: React.FC<PerformanceProviderProps> = ({ childr
           newMetrics.fcp = fcpEntry.startTime;
         }
       } catch (e) {
-        console.warn('FCP measurement failed:', e);
+        logger.warn('FCP measurement failed', e as Error, 'SYSTEM');
       } finally {
         checkComplete();
       }
@@ -113,7 +114,7 @@ export const PerformanceProvider: React.FC<PerformanceProviderProps> = ({ childr
             checkComplete();
           }, 3000);
         } catch (e) {
-          console.warn('LCP observer failed:', e);
+          logger.warn('LCP observer failed', e as Error, 'SYSTEM');
           checkComplete();
         }
         
@@ -135,7 +136,7 @@ export const PerformanceProvider: React.FC<PerformanceProviderProps> = ({ childr
             checkComplete();
           }, 3000);
         } catch (e) {
-          console.warn('CLS observer failed:', e);
+          logger.warn('CLS observer failed', e as Error, 'SYSTEM');
           checkComplete();
         }
       } else {
@@ -176,7 +177,7 @@ export const PerformanceProvider: React.FC<PerformanceProviderProps> = ({ childr
         cacheHitRate: Math.min(100, (memoryOptimization.getCacheSize() / 50) * 100)
       }));
     } catch (error) {
-      console.error('Performance measurement failed:', error);
+      logger.error('Performance measurement failed', error as Error, 'SYSTEM');
     }
   }, [measureWebVitals, memoryOptimization]);
   

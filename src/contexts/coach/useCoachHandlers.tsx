@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { ChatMessage } from '@/types/chat';
 import { useToast } from '@/hooks/use-toast';
 import { chatCompletion, analyzeEmotion } from '@/services/openai';
+import { logger } from '@/lib/logger';
 
 // Responses for different emotions
 const emotionResponses: Record<string, string[]> = {
@@ -120,7 +121,7 @@ export function useCoachHandlers() {
     try {
       return await detectEmotionFromText(text);
     } catch (error) {
-      console.error('Error in detectEmotion:', error);
+      logger.error('Error in detectEmotion', error as Error, 'UI');
       return 'neutral';
     }
   }, []);
@@ -131,7 +132,7 @@ export function useCoachHandlers() {
       const activities = emotionActivities[emotion] || emotionActivities.neutral;
       return activities[Math.floor(Math.random() * activities.length)];
     } catch (error) {
-      console.error('Error suggesting activity:', error);
+      logger.error('Error suggesting activity', error as Error, 'UI');
       return "Je vous suggère de prendre un moment pour vous aujourd'hui.";
     }
   }, []);
@@ -182,7 +183,7 @@ export function useCoachHandlers() {
             setMessages(prev => [...prev, responseMessage]);
             setHasUnreadMessages(true);
           } catch (error) {
-            console.error('Error generating coach response:', error);
+            logger.error('Error generating coach response', error as Error, 'UI');
             const responses =
               emotionResponses[currentEmotion || 'neutral'] || emotionResponses.neutral;
             const fallback = responses[Math.floor(Math.random() * responses.length)];

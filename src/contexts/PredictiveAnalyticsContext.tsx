@@ -4,6 +4,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase-client';
 import { useAuth } from './AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 
 // Types for predictions
 export interface PredictiveFeature {
@@ -189,7 +190,7 @@ export const PredictiveAnalyticsProvider: React.FC<{ children: React.ReactNode }
       });
       
     } catch (err) {
-      console.error('Error generating prediction:', err);
+      logger.error('Error generating prediction', err as Error, 'ANALYTICS');
       setError('Erreur lors de la génération des prédictions');
       toast({
         title: "Erreur",

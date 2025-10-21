@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { ChatMessage } from '@/types/chat';
+import { logger } from '@/lib/logger';
 
 export function useCoachLocalStorage(
   messages: ChatMessage[],
@@ -14,7 +15,7 @@ export function useCoachLocalStorage(
       try {
         setMessages(JSON.parse(savedMessages));
       } catch (error) {
-        console.error('Failed to parse saved messages:', error);
+        logger.error('Failed to parse saved messages', error as Error, 'SYSTEM');
       }
     }
   }, [setMessages]);
