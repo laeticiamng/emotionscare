@@ -541,7 +541,7 @@ export const router = createBrowserRouter([
   basename: import.meta.env.BASE_URL ?? '/',
 });
 
-console.log('✅ Router created with', router.routes.length, 'total routes');
+logger.info('Router created', { totalRoutes: router.routes.length }, 'SYSTEM');
 
 export const routerV2 = router;
 export default router;
@@ -558,15 +558,15 @@ if (import.meta.env.DEV) {
     .map(route => `${route.name}: ${route.component}`);
 
   if (missingComponents.length > 0 && !window.__routerV2Logged) {
-    console.error('🚨 RouterV2: composants manquants', missingComponents);
+    logger.error('RouterV2: composants manquants', { missingComponents }, 'SYSTEM');
   }
 
   // Log unique au démarrage
   if (!window.__routerV2Logged) {
-    console.log(`✅ RouterV2 initialisé: ${canonicalRoutes.length} routes canoniques`);
+    logger.info(`RouterV2 initialisé: ${canonicalRoutes.length} routes canoniques`, undefined, 'SYSTEM');
     const testNyveeRoute = canonicalRoutes.find(r => r.path === '/test-nyvee');
-    console.log('🔍 Route /test-nyvee trouvée:', testNyveeRoute);
-    console.log('🔍 NyveeTestPage dans componentMap:', !!componentMap['NyveeTestPage']);
+    logger.debug('Route /test-nyvee trouvée', { found: !!testNyveeRoute }, 'SYSTEM');
+    logger.debug('NyveeTestPage dans componentMap', { exists: !!componentMap['NyveeTestPage'] }, 'SYSTEM');
     window.__routerV2Logged = true;
   }
 }

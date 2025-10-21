@@ -6,6 +6,7 @@
 
 import { useMemo, useCallback, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
+import { logger } from '@/lib/logger';
 
 type RoutePreloader = () => Promise<unknown>;
 
@@ -80,7 +81,7 @@ class RouterPerformanceManager {
       })
       .catch(error => {
         if (import.meta.env.DEV) {
-          console.warn(`[routerV2] Échec du préchargement de ${normalizedPath}`, error);
+          logger.warn(`[routerV2] Échec du préchargement de ${normalizedPath}`, error, 'SYSTEM');
         }
       })
       .finally(() => {

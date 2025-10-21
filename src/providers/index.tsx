@@ -2,6 +2,7 @@
 import React from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { HelmetProvider } from 'react-helmet-async';
+import { logger } from '@/lib/logger';
 
 import { AccessibilityProvider } from '@/components/common/AccessibilityProvider';
 import { NotificationProvider } from '@/components/ui/notification-system';
@@ -46,7 +47,7 @@ const useI18nReady = () => {
 
     // Set a timeout to prevent infinite waiting
     const timeout = setTimeout(() => {
-      console.warn('[i18n] Initialization timeout, proceeding anyway');
+      logger.warn('[i18n] Initialization timeout, proceeding anyway', undefined, 'SYSTEM');
       setReady(true);
     }, 3000); // 3 seconds timeout
 

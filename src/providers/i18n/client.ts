@@ -45,7 +45,7 @@ export function ensureI18n(locale: AppLocale = 'fr') {
         }
       })
       .catch((error) => {
-        console.error('Failed to initialize i18n:', error);
+        logger.error('Failed to initialize i18n', error as Error, 'SYSTEM');
         // Fallback: mark as initialized anyway to prevent infinite loading
         (i18n as any).isInitialized = true;
       });
