@@ -4,6 +4,7 @@
  */
 
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 
 export type ConsentType = 'cam' | 'mic' | 'hr' | 'notify' | 'data_processing';
 export type ConsentSource = 'onboarding' | 'settings';
@@ -127,7 +128,7 @@ class PrivacyConsentManager {
   async checkConsentBeforeAPICall(consentType: ConsentType): Promise<boolean> {
     const hasConsent = await this.hasConsent(consentType);
     if (!hasConsent) {
-      console.warn(`API call blocked: no consent for ${consentType}`);
+      logger.warn(`API call blocked: no consent for ${consentType}`, {}, 'SYSTEM');
       return false;
     }
     return true;

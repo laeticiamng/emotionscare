@@ -3,6 +3,8 @@
  * Rate limiting avancé avec cache et budget monitoring
  */
 
+import { logger } from '@/lib/logger';
+
 interface RateLimitConfig {
   maxRequests: number;
   windowMs: number;
@@ -178,7 +180,7 @@ class AdvancedRateLimiter {
    */
   private resetBudgets(): void {
     this.budgetCurrentCosts.clear();
-    console.log('Budget costs reset');
+    logger.info('Budget costs reset', {}, 'SYSTEM');
   }
 
   /**

@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { User } from '@/types';
 import { mockUsers } from '@/data/mockUsers';
+import { logger } from '@/lib/logger';
 
 export const updateUser = async (updatedUserData: Partial<User>): Promise<User> => {
   // Simulate network delay
@@ -20,7 +21,7 @@ export const updateUser = async (updatedUserData: Partial<User>): Promise<User> 
   };
   
   // In a real implementation, we would update the user in the database here
-  console.log('User updated:', updatedUser);
+  logger.debug('User updated', updatedUser, 'SYSTEM');
   
   return updatedUser as User;
 };

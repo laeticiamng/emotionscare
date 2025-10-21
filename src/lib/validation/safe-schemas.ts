@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 /**
  * Schémas Zod sécurisés avec des valeurs par défaut pour éviter les erreurs undefined
@@ -93,20 +94,17 @@ export function safeParseWithDefaults<T>(
   try {
     return schema.parse(data);
   } catch (error) {
-    console.warn(`[safeParseWithDefaults] Failed to parse ${context}, using defaults`, {
+    logger.warn(`[safeParseWithDefaults] Failed to parse ${context}, using defaults`, {
       error,
       data,
       context
-    });
+    }, 'SYSTEM');
     
     // Retourner un objet par défaut basé sur le schéma
     try {
       return schema.parse({});
     } catch (defaultError) {
-      console.error(`[safeParseWithDefaults] Even defaults failed for ${context}`, {
-        defaultError,
-        schema
-      });
+      logger.error(`[safeParseWithDefaults] Even defaults failed for ${context}`, defaultError as Error, 'SYSTEM');
       
       // Dernier recours : objet vide typé
       return {} as T;
