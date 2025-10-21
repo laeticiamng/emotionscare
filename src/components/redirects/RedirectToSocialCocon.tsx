@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
+import { logger } from '@/lib/logger';
 
 /**
  * Composant de redirection vers /app/social-cocon
@@ -8,7 +9,7 @@ import { Navigate } from 'react-router-dom';
  */
 const RedirectToSocialCocon = () => {
   useEffect(() => {
-    console.log('🔀 Redirection automatique vers /app/social-cocon');
+    logger.info('🔀 Redirection automatique vers /app/social-cocon', {}, 'SYSTEM');
   }, []);
 
   return <Navigate to="/app/social-cocon" replace />;
