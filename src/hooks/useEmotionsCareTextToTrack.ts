@@ -4,6 +4,7 @@
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 
 export interface GenerateTrackRequest {
   text: string;
@@ -39,7 +40,7 @@ export function useEmotionsCareTextToTrack() {
     setIsGenerating(true);
     
     try {
-      console.log('🎵 EmotionsCare: Starting track generation from text:', text.slice(0, 50) + '...');
+      logger.info('🎵 EmotionsCare: Starting track generation from text', { text: text.slice(0, 50) + '...' }, 'MUSIC');
       
       const { data, error } = await supabase.functions.invoke('emotionscare-text-to-track', {
         body: {
@@ -50,7 +51,7 @@ export function useEmotionsCareTextToTrack() {
       });
 
       if (error) {
-        console.error('❌ EmotionsCare: Generation error:', error);
+        logger.error('❌ EmotionsCare: Generation error', error as Error, 'MUSIC');
         throw new Error(error.message || 'Erreur lors de la génération');
       }
 
@@ -75,11 +76,11 @@ export function useEmotionsCareTextToTrack() {
         description: `Génération de "${track.title}" en cours... Preset: ${track.preset.tag}`,
       });
 
-      console.log('✅ EmotionsCare: Track generation initiated:', track);
+      logger.info('✅ EmotionsCare: Track generation initiated', track, 'MUSIC');
       return track;
 
     } catch (error) {
-      console.error('❌ EmotionsCare: Generation failed:', error);
+      logger.error('❌ EmotionsCare: Generation failed', error as Error, 'MUSIC');
       
       toast({
         title: "Erreur de génération",
@@ -97,7 +98,7 @@ export function useEmotionsCareTextToTrack() {
     try {
       // Cette fonction devrait idéalement appeler une edge function
       // qui vérifie le statut des tâches Suno
-      console.log('🔍 EmotionsCare: Checking tasks status...', { lyricsTaskId, musicTaskId });
+      logger.info('🔍 EmotionsCare: Checking tasks status', { lyricsTaskId, musicTaskId }, 'MUSIC');
       
       // Pour l'instant, on retourne un statut simulé
       // En production, cela devrait faire appel à l'API Suno
@@ -109,7 +110,7 @@ export function useEmotionsCareTextToTrack() {
         hasError: false,
       };
     } catch (error) {
-      console.error('❌ EmotionsCare: Failed to check tasks status:', error);
+      logger.error('❌ EmotionsCare: Failed to check tasks status', error as Error, 'MUSIC');
       throw error;
     }
   };

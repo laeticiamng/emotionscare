@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 
 interface UserStats {
   level: number;
@@ -159,7 +160,7 @@ export const useEnhancedGamification = () => {
       setPointsHistory(historyData || []);
 
     } catch (err: any) {
-      console.error('Error loading gamification data:', err);
+      logger.error('Error loading gamification data', err as Error, 'ANALYTICS');
       setError(err.message || 'Failed to load gamification data');
       toast({
         title: "Erreur",
@@ -207,7 +208,7 @@ export const useEnhancedGamification = () => {
       
       return false;
     } catch (error: any) {
-      console.error('Error generating challenges:', error);
+      logger.error('Error generating challenges', error as Error, 'ANALYTICS');
       toast({
         title: "Erreur",
         description: "Impossible de générer de nouveaux défis",
@@ -258,7 +259,7 @@ export const useEnhancedGamification = () => {
 
       return true;
     } catch (error: any) {
-      console.error('Error updating challenge progress:', error);
+      logger.error('Error updating challenge progress', error as Error, 'ANALYTICS');
       toast({
         title: "Erreur",
         description: "Impossible de mettre à jour le défi",
@@ -303,7 +304,7 @@ export const useEnhancedGamification = () => {
 
       return true;
     } catch (error: any) {
-      console.error('Error unlocking achievement:', error);
+      logger.error('Error unlocking achievement', error as Error, 'ANALYTICS');
       return false;
     }
   };

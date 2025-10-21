@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import useOpenAI from './api/useOpenAI';
 import { useMood } from './useMood';
+import { logger } from '@/lib/logger';
 
 interface GritChallenge {
   title: string;
@@ -52,7 +53,7 @@ Le défi doit être réalisable immédiatement et adapté à l'humeur.
       setCurrentChallenge(challenge);
       return challenge;
     } catch (error) {
-      console.error('Erreur parsing défi:', error);
+      logger.error('Erreur parsing défi', error as Error, 'SYSTEM');
       return null;
     }
   };

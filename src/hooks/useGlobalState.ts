@@ -5,6 +5,7 @@ import { useError } from '@/contexts';
 import { useStoreActions, useGlobalStateSlice } from '@/store/hooks';
 import { useErrorHandler } from '@/contexts/ErrorContext';
 import { useCache } from '@/contexts/CacheContext';
+import { logger } from '@/lib/logger';
 
 /**
  * Hook centralisé pour gérer l'état global de l'application
@@ -150,7 +151,7 @@ export const usePersistentState = <T>(
         try {
           localStorage.setItem(key, JSON.stringify(newValue));
         } catch (error) {
-          console.error('Failed to save to localStorage:', error);
+          logger.error('Failed to save to localStorage', error as Error, 'SYSTEM');
         }
       }
       
