@@ -40,6 +40,7 @@ import { Suspense, lazy, useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { withLandingUtm } from "@/lib/utm";
 import { useLazyRender } from "@/hooks/useLazyRender";
+import { logger } from '@/lib/logger';
 
 const Footer = lazy(() => import("@/components/layout/Footer"));
 
@@ -48,7 +49,7 @@ interface UnifiedHomePageProps {
 }
 
 export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePageProps) {
-  console.log('[UnifiedHomePage] Starting render with variant:', variant);
+  logger.debug('[UnifiedHomePage] Starting render', { variant }, 'UI');
   
   // Initialiser les hooks et variables en dehors du try-catch
   const [searchParams] = useSearchParams();
@@ -60,11 +61,11 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
   const testimonialsSection = useLazyRender<HTMLElement>({ rootMargin: '200px' });
   const finalCtaSection = useLazyRender<HTMLElement>({ rootMargin: '200px' });
   
-  console.log('[UnifiedHomePage] Hooks initialized successfully');
+  logger.debug('[UnifiedHomePage] Hooks initialized successfully', undefined, 'UI');
   
   // Détection automatique du variant depuis les params
   const detectedVariant = searchParams.get('variant') === 'simple' ? 'b2c-simple' : variant;
-  console.log('[UnifiedHomePage] Detected variant:', detectedVariant);
+  logger.debug('[UnifiedHomePage] Detected variant', { detectedVariant }, 'UI');
 
   const heroHeadingId = detectedVariant === 'b2c-simple' ? 'b2c-home-hero-title' : 'homepage-hero-title';
 
@@ -206,7 +207,7 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
 
   // Version B2C Simple (comme HomeB2CPage)
   if (detectedVariant === 'b2c-simple') {
-    console.log('[UnifiedHomePage] Rendering B2C simple variant');
+    logger.debug('[UnifiedHomePage] Rendering B2C simple variant', undefined, 'UI');
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50" data-testid="page-root">
         {/* Header */}
@@ -373,7 +374,7 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
   }
 
   // Version Full Marketing (comme HomePage original)
-  console.log('[UnifiedHomePage] Rendering full marketing variant');
+  logger.debug('[UnifiedHomePage] Rendering full marketing variant', undefined, 'UI');
   return (
     <div className="min-h-screen bg-background" data-testid="page-root">
       <Header />

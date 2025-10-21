@@ -3,6 +3,7 @@ import type { SanitizedNote } from '@/modules/journal/types';
 import { JournalExportPanel } from '@/components/journal/JournalExportPanel';
 import { JournalBackup } from '@/components/journal/JournalBackup';
 import { JournalAdvancedExport } from '@/components/journal/JournalAdvancedExport';
+import { logger } from '@/lib/logger';
 
 interface JournalArchivePageProps {
   notes: SanitizedNote[];
@@ -21,7 +22,7 @@ export const JournalArchivePage = memo<JournalArchivePageProps>(({ notes }) => {
       <div className="grid md:grid-cols-2 gap-6">
         <JournalExportPanel notes={notes} />
         <JournalBackup notes={notes} onRestore={async (importedNotes) => {
-          console.log('Restored:', importedNotes);
+          logger.info('Restored notes', { count: importedNotes.length }, 'UI');
         }} />
       </div>
 

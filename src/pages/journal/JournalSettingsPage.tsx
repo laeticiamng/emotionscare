@@ -3,6 +3,7 @@ import { JournalUserPreferences } from '@/components/journal/JournalUserPreferen
 import { JournalTagManager } from '@/components/journal/JournalTagManager';
 import { JournalTemplates } from '@/components/journal/JournalTemplates';
 import type { SanitizedNote } from '@/modules/journal/types';
+import { logger } from '@/lib/logger';
 
 interface JournalSettingsPageProps {
   notes?: SanitizedNote[];
@@ -22,11 +23,11 @@ const JournalSettingsPage = memo<JournalSettingsPageProps>(({ notes = [] }) => {
       
       <JournalTagManager
         notes={notes}
-        onTagRenamed={(oldTag, newTag) => console.log('Renamed:', oldTag, newTag)}
-        onTagDeleted={(tag) => console.log('Deleted:', tag)}
+        onTagRenamed={(oldTag, newTag) => logger.info('Tag renamed', { oldTag, newTag }, 'UI')}
+        onTagDeleted={(tag) => logger.info('Tag deleted', { tag }, 'UI')}
       />
       
-      <JournalTemplates onUseTemplate={(template) => console.log('Using template:', template)} />
+      <JournalTemplates onUseTemplate={(template) => logger.info('Using template', { template }, 'UI')} />
     </div>
   );
 });

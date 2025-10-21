@@ -4,6 +4,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import * as Sentry from '@sentry/react';
 import { Link } from 'react-router-dom';
+import { logger } from '@/lib/logger';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -168,7 +169,7 @@ const storeCooldown = (timestamp: number) => {
   try {
     window.localStorage.setItem('flash_glow_suds_cooldown', String(timestamp));
   } catch (error) {
-    console.error('Impossible de sauvegarder le cooldown SUDS', error);
+    logger.error('Impossible de sauvegarder le cooldown SUDS', error as Error, 'SYSTEM');
   }
 };
 
@@ -179,7 +180,7 @@ const getCooldown = (): number | null => {
     const parsed = Number(raw);
     return Number.isFinite(parsed) ? parsed : null;
   } catch (error) {
-    console.error('Impossible de lire le cooldown SUDS', error);
+    logger.error('Impossible de lire le cooldown SUDS', error as Error, 'SYSTEM');
     return null;
   }
 };
@@ -188,7 +189,7 @@ const storeOptIn = (value: boolean) => {
   try {
     window.localStorage.setItem('flash_glow_suds_opt_in', value ? 'true' : 'false');
   } catch (error) {
-    console.error('Impossible de stocker la préférence SUDS', error);
+    logger.error('Impossible de stocker la préférence SUDS', error as Error, 'SYSTEM');
   }
 };
 
@@ -199,7 +200,7 @@ const readOptIn = (): boolean | null => {
     if (raw === 'false') return false;
     return null;
   } catch (error) {
-    console.error('Impossible de lire la préférence SUDS', error);
+    logger.error('Impossible de lire la préférence SUDS', error as Error, 'SYSTEM');
     return null;
   }
 };
@@ -396,7 +397,7 @@ const FlashGlowView: React.FC = () => {
 
       return true;
     } catch (error) {
-      console.error('Error submitting SUDS measure:', error);
+      logger.error('Error submitting SUDS measure', error as Error, 'SYSTEM');
       toast({
         title: 'Mesure indisponible',
         description: 'Impossible de transmettre le ressenti pour le moment.',
@@ -674,7 +675,7 @@ const FlashGlowView: React.FC = () => {
     try {
       window.localStorage.removeItem('flash_glow_suds_cooldown');
     } catch (error) {
-      console.error('Impossible de nettoyer le cooldown SUDS', error);
+      logger.error('Impossible de nettoyer le cooldown SUDS', error as Error, 'SYSTEM');
     }
   };
 
@@ -960,7 +961,7 @@ const FlashGlowView: React.FC = () => {
                   try {
                     window.localStorage.removeItem('flash_glow_suds_cooldown');
                   } catch (error) {
-                    console.error('Impossible de supprimer le cooldown SUDS', error);
+                    logger.error('Impossible de supprimer le cooldown SUDS', error as Error, 'SYSTEM');
                   }
                 }}
               >
