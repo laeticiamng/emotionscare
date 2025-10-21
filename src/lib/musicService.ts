@@ -2,6 +2,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { MusicTrack, MusicPlaylist } from '@/types/music';
+import { logger } from '@/lib/logger';
 
 // Re-export everything from the service modules
 export { getPlaylist } from '@/services/music/playlist-service';
@@ -37,7 +38,7 @@ export const getAudioSessions = async () => {
       }
     ];
   } catch (error) {
-    console.error('Error fetching audio sessions:', error);
+    logger.error('Error fetching audio sessions', error as Error, 'MUSIC');
     throw error;
   }
 };
@@ -68,7 +69,7 @@ export const getRecommendedTracks = async (emotion: string) => {
       }
     ];
   } catch (error) {
-    console.error('Error fetching recommended tracks:', error);
+    logger.error('Error fetching recommended tracks', error as Error, 'MUSIC');
     throw error;
   }
 };

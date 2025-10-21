@@ -170,7 +170,7 @@ export class AuthenticityDetector {
 
       return count > 0 ? alignmentScore / count : 0.5;
     } catch (error) {
-      console.warn('Erreur checkFacialVoiceAlignment:', error);
+      logger.warn('Erreur checkFacialVoiceAlignment', error as Error, 'ANALYTICS');
       return 0.5;
     }
   }
@@ -208,7 +208,7 @@ export class AuthenticityDetector {
 
       return count > 0 ? alignmentScore / count : 0.5;
     } catch (error) {
-      console.warn('Erreur checkSelfReportAlignment:', error);
+      logger.warn('Erreur checkSelfReportAlignment', error as Error, 'ANALYTICS');
       return 0.5;
     }
   }
@@ -240,7 +240,7 @@ export class AuthenticityDetector {
       if (stdDev > 30) return 0.5; // Trop variable, potentiel réponses aléatoires
       return 0.9; // Variance normale
     } catch (error) {
-      console.warn('Erreur checkTemporalConsistency:', error);
+      logger.warn('Erreur checkTemporalConsistency', error as Error, 'ANALYTICS');
       return 0.5;
     }
   }
@@ -278,7 +278,7 @@ export class AuthenticityDetector {
 
       return (diversityScore * 0.6 + regularityScore * 0.4);
     } catch (error) {
-      console.warn('Erreur checkBehavioralPatterns:', error);
+      logger.warn('Erreur checkBehavioralPatterns', error as Error, 'ANALYTICS');
       return 0.5;
     }
   }
@@ -359,7 +359,7 @@ export class CrossModuleIntelligence {
 
       return null;
     } catch (error) {
-      console.warn('Erreur analyzeVRtoMood:', error);
+      logger.warn('Erreur analyzeVRtoMood', error as Error, 'VR');
       return null;
     }
   }
@@ -405,7 +405,7 @@ export class CrossModuleIntelligence {
 
       return null;
     } catch (error) {
-      console.warn('Erreur analyzeNyveeToStory:', error);
+      logger.warn('Erreur analyzeNyveeToStory', error as Error, 'ANALYTICS');
       return null;
     }
   }
@@ -447,7 +447,7 @@ export class CrossModuleIntelligence {
 
       return null;
     } catch (error) {
-      console.warn('Erreur analyzeMusicToBubble:', error);
+      logger.warn('Erreur analyzeMusicToBubble', error as Error, 'MUSIC');
       return null;
     }
   }
@@ -501,7 +501,7 @@ export class CrossModuleIntelligence {
       }
 
     } catch (error) {
-      console.warn('Erreur analyzeGlobalEngagement:', error);
+      logger.warn('Erreur analyzeGlobalEngagement', error as Error, 'ANALYTICS');
     }
 
     return insights;
