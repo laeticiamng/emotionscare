@@ -4,6 +4,7 @@ import React from "react";
 import * as Sentry from "@sentry/react";
 import { useReducedMotion } from "framer-motion";
 import PageHeader from "@/components/ui/PageHeader";
+import { logger } from '@/lib/logger';
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ConstellationCanvas } from "@/ui/ConstellationCanvas";
@@ -260,7 +261,7 @@ export default function BreathConstellationPage() {
           },
         });
       } catch (error) {
-        console.warn("breath-constellation event", error);
+        logger.warn("breath-constellation event", error, 'SYSTEM');
       }
 
       setSaveStatus("saving");
@@ -313,7 +314,7 @@ export default function BreathConstellationPage() {
           setSaveStatus("error");
           setSaveMessage(error.message);
         } else {
-          console.error("Breathwork session logging failed", error);
+          logger.error("Breathwork session logging failed", error as Error, 'SYSTEM');
           setSaveStatus("error");
           setSaveMessage("Impossible d'enregistrer la session pour le moment.");
         }

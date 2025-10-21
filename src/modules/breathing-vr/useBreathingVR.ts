@@ -8,6 +8,7 @@ import { useBreathingVRMachine } from './useBreathingVRMachine';
 import { BreathingVRService } from './breathingVRService';
 import type { BreathingPattern } from './types';
 import { BREATHING_PATTERNS } from './types';
+import { logger } from '@/lib/logger';
 
 export function useBreathingVR() {
   const { user } = useAuth();
@@ -36,7 +37,7 @@ export function useBreathingVR() {
       const config = BREATHING_PATTERNS[pattern];
       machine.startSession(config, vrMode);
     } catch (error) {
-      console.error('Failed to start breathing session:', error);
+      logger.error('Failed to start breathing session', error as Error, 'VR');
     }
   }, [user?.id, machine]);
 
@@ -56,7 +57,7 @@ export function useBreathingVR() {
 
       machine.completeSession();
     } catch (error) {
-      console.error('Failed to complete breathing session:', error);
+      logger.error('Failed to complete breathing session', error as Error, 'VR');
     }
   }, [machine]);
 

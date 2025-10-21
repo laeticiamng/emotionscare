@@ -5,6 +5,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import * as bounceBackService from './bounceBackService';
 import type { BounceBattle, BattleMode, EventType, CopingQuestion } from './types';
+import { logger } from '@/lib/logger';
 
 type BattlePhase = 'idle' | 'starting' | 'active' | 'paused' | 'completing' | 'completed' | 'error';
 
@@ -121,7 +122,7 @@ export function useBounceBackMachine(): BounceBackMachineState & BounceBackMachi
       isPausedRef.current = true;
       setState((prev) => ({ ...prev, phase: 'paused' }));
     } catch (error) {
-      console.error('Failed to pause battle:', error);
+      logger.error('Failed to pause battle', error as Error, 'SYSTEM');
     }
   }, [state.currentBattle]);
 
@@ -133,7 +134,7 @@ export function useBounceBackMachine(): BounceBackMachineState & BounceBackMachi
       isPausedRef.current = false;
       setState((prev) => ({ ...prev, phase: 'active' }));
     } catch (error) {
-      console.error('Failed to resume battle:', error);
+      logger.error('Failed to resume battle', error as Error, 'SYSTEM');
     }
   }, [state.currentBattle]);
 
@@ -191,7 +192,7 @@ export function useBounceBackMachine(): BounceBackMachineState & BounceBackMachi
         error: null,
       });
     } catch (error) {
-      console.error('Failed to abandon battle:', error);
+      logger.error('Failed to abandon battle', error as Error, 'SYSTEM');
     }
   }, [state.currentBattle]);
 
@@ -209,7 +210,7 @@ export function useBounceBackMachine(): BounceBackMachineState & BounceBackMachi
 
         setState((prev) => ({ ...prev, eventCount: prev.eventCount + 1 }));
       } catch (error) {
-        console.error('Failed to add event:', error);
+        logger.error('Failed to add event', error as Error, 'SYSTEM');
       }
     },
     [state.currentBattle],
@@ -226,7 +227,7 @@ export function useBounceBackMachine(): BounceBackMachineState & BounceBackMachi
           response_value: value,
         });
       } catch (error) {
-        console.error('Failed to add coping response:', error);
+        logger.error('Failed to add coping response', error as Error, 'SYSTEM');
       }
     },
     [state.currentBattle],

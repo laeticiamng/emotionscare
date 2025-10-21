@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAmbitionMachine } from '../useAmbitionMachine';
 import { Button } from '@/components/ui/button';
+import { logger } from '@/lib/logger';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -29,7 +30,7 @@ export const AmbitionArcadeMain: React.FC<AmbitionArcadeMainProps> = ({ classNam
           await machine.loadRun(runs[0].id);
         }
       } catch (err) {
-        console.error('Erreur chargement run actif:', err);
+        logger.error('Erreur chargement run actif', err as Error, 'SYSTEM');
       }
     };
 

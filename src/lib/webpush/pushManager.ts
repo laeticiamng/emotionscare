@@ -4,6 +4,7 @@
  */
 
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 
 interface PushSubscriptionData {
   endpoint: string;
@@ -29,16 +30,16 @@ class WebPushManager {
    */
   async initialize(): Promise<boolean> {
     if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-      console.warn('Push notifications not supported');
+      logger.warn('Push notifications not supported', {}, 'SYSTEM');
       return false;
     }
 
     try {
       this.registration = await navigator.serviceWorker.register('/sw.js');
-      console.log('Service Worker registered');
+      logger.info('Service Worker registered', {}, 'SYSTEM');
       return true;
     } catch (error) {
-      console.error('Service Worker registration failed:', error);
+      logger.error('Service Worker registration failed', error as Error, 'SYSTEM');
       return false;
     }
   }
@@ -81,7 +82,7 @@ class WebPushManager {
 
       return { success: true, subscription: subscriptionData };
     } catch (error) {
-      console.error('Push subscription failed:', error);
+      logger.error('Push subscription failed', error as Error, 'SYSTEM');
       return { success: false, error: (error as Error).message };
     }
   }
@@ -130,13 +131,13 @@ class WebPushManager {
       });
 
       if (error) {
-        console.error('Test notification failed:', error);
+        logger.error('Test notification failed', error as Error, 'SYSTEM');
         return false;
       }
 
       return true;
     } catch (error) {
-      console.error('Test notification error:', error);
+      logger.error('Test notification error', error as Error, 'SYSTEM');
       return false;
     }
   }
@@ -167,7 +168,7 @@ class WebPushManager {
 
       return true;
     } catch (error) {
-      console.error('Failed to update push preferences:', error);
+      logger.error('Failed to update push preferences', error as Error, 'SYSTEM');
       return false;
     }
   }
@@ -212,7 +213,7 @@ class WebPushManager {
 
       return true;
     } catch (error) {
-      console.error('Unsubscribe failed:', error);
+      logger.error('Unsubscribe failed', error as Error, 'SYSTEM');
       return false;
     }
   }

@@ -1,6 +1,7 @@
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import PageHeader from "@/components/ui/PageHeader";
+import { logger } from '@/lib/logger';
 import {
   Card,
   CardHeader,
@@ -322,7 +323,7 @@ const AdaptiveMusicPage: React.FC = () => {
       try {
         await pomsAssessment.submit({ moment: "pre", tension: values.tension, fatigue: values.fatigue });
       } catch (error) {
-        console.warn("[adaptive-music] unable to store pre POMS", error);
+        logger.warn("[adaptive-music] unable to store pre POMS", error, 'MUSIC');
       }
     },
     [pomsAssessment],
@@ -338,7 +339,7 @@ const AdaptiveMusicPage: React.FC = () => {
       try {
         await pomsAssessment.submit({ moment: "post", tension: values.tension, fatigue: values.fatigue });
       } catch (error) {
-        console.warn("[adaptive-music] unable to store post POMS", error);
+        logger.warn("[adaptive-music] unable to store post POMS", error, 'MUSIC');
       }
     },
     [pomsAssessment, prePoms],
