@@ -4,6 +4,8 @@
  * Optimisations de build pour la production
  */
 
+import { logger } from '@/lib/logger';
+
 // Configuration des chunks optimisés
 export const CHUNK_OPTIMIZATION = {
   // Vendors critiques (chargés en priorité)
@@ -155,6 +157,6 @@ export function initBuildOptimizations(): void {
     preloadCriticalResources();
     optimizeNetworkPerformance();
     
-    console.log('⚡ Build optimizations initialized');
+    logger.info('⚡ Build optimizations initialized', undefined, 'SYSTEM');
   }
 }
