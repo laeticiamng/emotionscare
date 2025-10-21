@@ -1,6 +1,6 @@
 // @ts-nocheck
-
 import { useEffect, useRef, useState, useCallback } from 'react';
+import { logger } from '@/lib/logger';
 
 interface PerformanceMetrics {
   renderTime: number;

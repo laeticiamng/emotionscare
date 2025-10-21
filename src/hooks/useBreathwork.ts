@@ -122,7 +122,7 @@ export const useBreathwork = () => {
         }
       }
     } catch (error) {
-      console.warn('Failed to submit breath metrics:', error);
+      logger.warn('Failed to submit breath metrics', error, 'VR');
       // Could implement offline queue here
     }
   }, [state]);
