@@ -12,6 +12,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Bell, BellOff } from 'lucide-react';
 import { pushNotificationService } from '@/lib/notifications/pushNotifications';
+import { logger } from '@/lib/logger';
 
 interface NotificationPermissionDialogProps {
   isOpen: boolean;
@@ -35,7 +36,7 @@ const NotificationPermissionDialog: React.FC<NotificationPermissionDialogProps> 
       }
       onClose();
     } catch (error) {
-      console.error('Erreur lors de la demande de permission:', error);
+      logger.error('Erreur lors de la demande de permission:', error as Error, 'UI');
     } finally {
       setIsRequesting(false);
     }

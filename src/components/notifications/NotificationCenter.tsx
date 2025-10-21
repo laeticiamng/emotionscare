@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Bell, BellOff, Sparkles, Check, Clock, AlertCircle, Heart, Music, Brain } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 interface Notification {
   id: string;
@@ -62,7 +63,7 @@ const NotificationCenter: React.FC = () => {
       if (error) throw error;
       setNotifications(data.notifications || []);
     } catch (error) {
-      console.error('Erreur chargement notifications:', error);
+      logger.error('Erreur chargement notifications:', error as Error, 'UI');
     }
   };
 
@@ -81,7 +82,7 @@ const NotificationCenter: React.FC = () => {
         setPreferences(data);
       }
     } catch (error) {
-      console.error('Erreur chargement préférences:', error);
+      logger.error('Erreur chargement préférences:', error as Error, 'UI');
     }
   };
 
@@ -100,7 +101,7 @@ const NotificationCenter: React.FC = () => {
       toast.success(`${data.notifications?.length || 0} nouvelles notifications générées ! 🎉`);
       await loadNotifications();
     } catch (error: any) {
-      console.error('Erreur génération:', error);
+      logger.error('Erreur génération:', error as Error, 'UI');
       toast.error('Erreur lors de la génération des notifications');
     } finally {
       setGenerating(false);
@@ -120,7 +121,7 @@ const NotificationCenter: React.FC = () => {
         prev.map(n => n.id === notificationId ? { ...n, status: 'read' } : n)
       );
     } catch (error) {
-      console.error('Erreur marquage lu:', error);
+      logger.error('Erreur marquage lu:', error as Error, 'UI');
     }
   };
 
@@ -138,7 +139,7 @@ const NotificationCenter: React.FC = () => {
 
       toast.success('Préférences mises à jour');
     } catch (error) {
-      console.error('Erreur mise à jour préférences:', error);
+      logger.error('Erreur mise à jour préférences:', error as Error, 'UI');
       toast.error('Erreur lors de la mise à jour');
     }
   };

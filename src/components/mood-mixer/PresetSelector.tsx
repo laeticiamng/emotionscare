@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { moodPresetsService } from '@/services/moodPresetsService';
 import { MoodPresetRecord } from '@/types/mood-mixer';
+import { logger } from '@/lib/logger';
 
 interface BlendState {
   joy: number;
@@ -184,7 +185,7 @@ const PresetSelector: React.FC<PresetSelectorProps> = ({
           setPresets(DEFAULT_PRESET_CARDS);
         }
       } catch (error) {
-        console.error('Unable to load mood presets', error);
+        logger.error('Unable to load mood presets', error as Error, 'UI');
         if (isMounted) {
           setPresets(DEFAULT_PRESET_CARDS);
         }

@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { performanceMonitor } from '@/utils/performanceMonitor';
 import { apiCache, imageCache, userCache } from '@/utils/cacheStrategies';
+import { logger } from '@/lib/logger';
 
 const DevTools: React.FC<{ enabled?: boolean }> = ({ enabled = false }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -196,7 +197,7 @@ const DevTools: React.FC<{ enabled?: boolean }> = ({ enabled = false }) => {
                         📊 Log Performance Metrics
                       </Button>
                       <Button 
-                        onClick={() => console.log('Cache Stats:', cacheStats)}
+                        onClick={() => logger.debug('Cache Stats:', cacheStats, 'UI')}
                         variant="outline" 
                         size="sm"
                         className="w-full"

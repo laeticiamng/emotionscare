@@ -27,6 +27,7 @@ import {
   RefreshCw,
   Clock
 } from 'lucide-react';
+import { logger } from '@/lib/logger';
 
 interface EnhancedUserDashboardProps {
   user: User;
@@ -70,21 +71,21 @@ const EnhancedUserDashboard: React.FC<EnhancedUserDashboardProps> = ({ user }) =
       title: 'Nouvelle session', 
       desc: 'Commencer maintenant',
       icon: <TrendingUp className="h-4 w-4" />,
-      action: () => console.log('Nouvelle session'),
+      action: () => logger.debug('Nouvelle session', undefined, 'UI'),
       variant: 'default' as const
     },
     { 
       title: 'Ajouter entrée', 
       desc: 'Journal personnel',
       icon: <Calendar className="h-4 w-4" />,
-      action: () => console.log('Nouveau journal'),
+      action: () => logger.debug('Nouveau journal', undefined, 'UI'),
       variant: 'outline' as const
     },
     { 
       title: 'Voir objectifs', 
       desc: 'Gérer vos buts',
       icon: <Target className="h-4 w-4" />,
-      action: () => console.log('Objectifs'),
+      action: () => logger.debug('Objectifs', undefined, 'UI'),
       variant: 'outline' as const
     }
   ];
@@ -99,7 +100,7 @@ const EnhancedUserDashboard: React.FC<EnhancedUserDashboardProps> = ({ user }) =
 
   const exportData = () => {
     // Simulation de l'export
-    console.log('Export des données...');
+    logger.debug('Export des données...', undefined, 'UI');
   };
 
   useEffect(() => {
