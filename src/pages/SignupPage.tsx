@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
+import { logger } from '@/lib/logger';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -60,7 +61,7 @@ const SignupPage: React.FC = () => {
       });
       setSuccess('Compte créé avec succès ! Vérifiez votre email pour confirmer votre compte.');
     } catch (error: any) {
-      console.error('❌ Erreur d\'inscription:', error);
+      logger.error('Erreur d\'inscription', error as Error, 'AUTH');
       setError(error.message || 'Erreur lors de la création du compte');
     }
   };

@@ -11,7 +11,8 @@ import { Progress } from '@/components/ui/progress';
 import { Slider } from '@/components/ui/slider';
 import { Textarea } from '@/components/ui/textarea';
 import { supabase } from '@/integrations/supabase/client';
-import { 
+import { logger } from '@/lib/logger';
+import {
   Play, 
   Pause, 
   Square, 
@@ -45,18 +46,18 @@ export default function ParcoursXL() {
 
       // Auto-play preview when first audio is ready
       if (segment.status === 'first' && segment.preview_url && !playerState.isPlaying) {
-        console.log('[ui] 🎵 Auto-playing preview for segment', segment.segment_index);
+        logger.info('Auto-playing preview for segment', { segment_index: segment.segment_index }, 'MUSIC');
         play();
       }
 
       // Switch to final URL when complete
       if (segment.status === 'complete' && segment.final_url) {
-        console.log('[ui] ✅ Switching to final URL for segment', segment.segment_index);
+        logger.info('Switching to final URL for segment', { segment_index: segment.segment_index }, 'MUSIC');
         // Player will automatically use final_url if available
       }
     },
     onRunComplete: () => {
-      console.log('[ui] 🎉 All segments complete!');
+      logger.info('All segments complete!', {}, 'MUSIC');
     },
   });
 

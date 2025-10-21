@@ -1,7 +1,8 @@
 // @ts-nocheck
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { 
+import { logger } from '@/lib/logger';
+import {
   ArrowLeft, Download, Filter, Calendar, BarChart3, 
   TrendingUp, Users, Activity, Heart, Brain, Target 
 } from 'lucide-react';
@@ -91,12 +92,12 @@ const ReportingPage: React.FC = () => {
   };
 
   const handleGenerateReport = (reportId: string) => {
-    console.log('Génération du rapport:', reportId);
+    logger.info('Génération du rapport', { reportId }, 'ANALYTICS');
     // Ici, déclencher la génération du rapport
   };
 
   const handleDownloadReport = (reportId: string) => {
-    console.log('Téléchargement du rapport:', reportId);
+    logger.info('Téléchargement du rapport', { reportId }, 'ANALYTICS');
     // Ici, déclencher le téléchargement
   };
 

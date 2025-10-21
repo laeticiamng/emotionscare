@@ -4,7 +4,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
-import { 
+import { logger } from '@/lib/logger';
+import {
   Shield, 
   Download, 
   Trash2, 
@@ -58,7 +59,7 @@ const PrivacyPage: React.FC = () => {
     
     try {
       await new Promise(resolve => setTimeout(resolve, 1000));
-      console.log('Privacy settings updated:', data);
+      logger.info('Privacy settings updated', { data }, 'UI');
       toast.success('Paramètres de confidentialité mis à jour!');
     } catch (error) {
       toast.error('Erreur lors de la mise à jour');

@@ -1,6 +1,7 @@
 // @ts-nocheck
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { logger } from '@/lib/logger';
 
 export default function TestLogin() {
   const navigate = useNavigate();
@@ -8,7 +9,7 @@ export default function TestLogin() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    console.log('Form submitted');
+    logger.info('Test form submitted', {}, 'AUTH');
     
     // Navigation SPA au lieu de window.location
     setTimeout(() => {

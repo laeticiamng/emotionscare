@@ -8,6 +8,7 @@ import { Progress } from '@/components/ui/progress';
 import { supabase } from '@/integrations/supabase/client';
 import { ClipboardList, TrendingUp, AlertCircle, CheckCircle, BarChart3 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 interface Test {
@@ -71,7 +72,7 @@ const PsychometricTestDashboard: React.FC = () => {
       
       setAvailableTests(data || []);
     } catch (error) {
-      console.error('Error loading tests:', error);
+      logger.error('Error loading tests', error as Error, 'UI');
       toast({
         title: 'Erreur',
         description: 'Impossible de charger les tests disponibles',
@@ -88,7 +89,7 @@ const PsychometricTestDashboard: React.FC = () => {
       
       setHistory(data || []);
     } catch (error) {
-      console.error('Error loading history:', error);
+      logger.error('Error loading history', error as Error, 'UI');
     }
   };
 
@@ -103,7 +104,7 @@ const PsychometricTestDashboard: React.FC = () => {
       setCurrentQuestion(0);
       setResult(null);
     } catch (error) {
-      console.error('Error loading test:', error);
+      logger.error('Error loading test', error as Error, 'UI');
       toast({
         title: 'Erreur',
         description: 'Impossible de charger le test',
@@ -156,7 +157,7 @@ const PsychometricTestDashboard: React.FC = () => {
         description: 'Vos résultats ont été enregistrés',
       });
     } catch (error) {
-      console.error('Error submitting test:', error);
+      logger.error('Error submitting test', error as Error, 'UI');
       toast({
         title: 'Erreur',
         description: 'Impossible de soumettre le test',
