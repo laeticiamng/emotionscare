@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { SunoCallback } from '@/types/music-generation';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 interface UseSunoCallbackOptions {
   taskId: string | null;
@@ -23,15 +24,15 @@ export const useSunoCallback = ({ taskId, onComplete, onError }: UseSunoCallback
         body: { taskId }
       });
       if (error) {
-        console.error('Error signing URL:', error);
+        logger.error('Error signing URL', error as Error, 'MUSIC');
         return;
       }
       if (data?.url) {
-        console.log('✅ Got signed URL for playback');
+        logger.info('Got signed URL for playback', { taskId }, 'MUSIC');
         setSignedUrl(data.url);
       }
     } catch (err) {
-      console.warn('Could not get signed URL yet:', err);
+      logger.warn('Could not get signed URL yet', err as Error, 'MUSIC');
     }
   }, []);
 
@@ -86,7 +87,7 @@ export const useSunoCallback = ({ taskId, onComplete, onError }: UseSunoCallback
           }
         }
       } catch (err) {
-        console.error('Poll error:', err);
+        logger.error('Poll error', err as Error, 'MUSIC');
       }
     };
 

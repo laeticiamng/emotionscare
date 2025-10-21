@@ -5,6 +5,7 @@
  */
 
 import { useState, useRef, useCallback, useEffect } from 'react';
+import { logger } from '@/lib/logger';
 
 export interface MediaConstraints {
   video?: boolean | MediaTrackConstraints;
@@ -56,7 +57,7 @@ export const useUserMedia = () => {
         }
       }));
     } catch (error) {
-      console.warn('Impossible de vérifier les permissions média');
+      logger.warn('Impossible de vérifier les permissions média', error as Error, 'SYSTEM');
     }
   }, []);
 

@@ -5,6 +5,7 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
+import { logger } from '@/lib/logger';
 
 export interface PushSubscription {
   endpoint: string;
@@ -186,7 +187,7 @@ export const useWebPush = () => {
         }
       }
     } catch (error) {
-      console.warn('Erreur lors de la vérification d\'abonnement:', error);
+      logger.warn('Erreur lors de la vérification d\'abonnement', error as Error, 'SYSTEM');
     }
   }, [state.isSupported]);
 

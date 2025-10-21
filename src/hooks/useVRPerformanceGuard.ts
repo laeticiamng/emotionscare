@@ -4,6 +4,7 @@ import * as Sentry from '@sentry/react';
 
 import { useToast } from '@/hooks/use-toast';
 import { useVRSafetyStore } from '@/store/vrSafety.store';
+import { logger } from '@/lib/logger';
 
 const FPS_SAMPLE_WINDOW_MS = 3_000;
 const LOW_FPS_THRESHOLD = 28;
@@ -26,7 +27,7 @@ const hasWebGLSupport = (): boolean => {
       return false;
     });
   } catch (error) {
-    console.warn('[useVRPerformanceGuard] webgl detection error', error);
+    logger.warn('WebGL detection error', error as Error, 'VR');
     return false;
   }
 };

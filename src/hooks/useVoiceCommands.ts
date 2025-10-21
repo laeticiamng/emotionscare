@@ -1,6 +1,7 @@
 // @ts-nocheck
 
 import { useState, useEffect } from 'react';
+import { logger } from '@/lib/logger';
 
 export const useVoiceCommands = () => {
   const [isListening, setIsListening] = useState(false);
@@ -8,12 +9,12 @@ export const useVoiceCommands = () => {
 
   const startListening = () => {
     setIsListening(true);
-    console.log('Voice commands: Started listening');
+    logger.info('Voice commands started listening', {}, 'UI');
   };
 
   const stopListening = () => {
     setIsListening(false);
-    console.log('Voice commands: Stopped listening');
+    logger.info('Voice commands stopped listening', {}, 'UI');
   };
 
   const resetTranscript = () => {

@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 
 interface UseVoiceCommandProps {
   commands?: Record<string, () => void>;
@@ -20,7 +21,7 @@ const useVoiceCommand = ({ commands = {}, autoStart = false }: UseVoiceCommandPr
     setIsSupported(hasSpeechRecognition);
     
     if (!hasSpeechRecognition) {
-      console.log('Speech recognition not supported in this browser');
+      logger.info('Speech recognition not supported in this browser', {}, 'UI');
     }
     
     if (autoStart && hasSpeechRecognition) {
@@ -46,7 +47,7 @@ const useVoiceCommand = ({ commands = {}, autoStart = false }: UseVoiceCommandPr
       
       // In a real implementation, this would initialize the WebSpeech API
       // or integrate with Whisper API for voice recognition
-      console.log('Voice recognition started');
+      logger.info('Voice recognition started', {}, 'UI');
       
       // For demo purposes - simulate receiving a command after 3 seconds
       setTimeout(() => {
@@ -58,7 +59,7 @@ const useVoiceCommand = ({ commands = {}, autoStart = false }: UseVoiceCommandPr
       }, 3000);
       
     } catch (error) {
-      console.error('Error starting voice recognition:', error);
+      logger.error('Error starting voice recognition', error as Error, 'UI');
       toast({
         title: 'Erreur',
         description: 'Impossible d\'activer la reconnaissance vocale',
@@ -79,7 +80,7 @@ const useVoiceCommand = ({ commands = {}, autoStart = false }: UseVoiceCommandPr
     
     // In a real implementation, this would stop the WebSpeech API
     // or disconnect from Whisper API
-    console.log('Voice recognition stopped');
+    logger.info('Voice recognition stopped', {}, 'UI');
   }, [isListening, toast]);
 
   const toggleListening = useCallback(() => {

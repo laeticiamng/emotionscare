@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSimpleAuth } from '@/contexts/SimpleAuth';
+import { logger } from '@/lib/logger';
 
 export type AppRole = 'b2c_user' | 'b2b_employee' | 'b2b_rh' | 'admin';
 
@@ -57,7 +58,7 @@ export const useUserRole = () => {
         setPrimaryRole(primary?.role || null);
         setError(null);
       } catch (err) {
-        console.error('Error fetching user roles:', err);
+        logger.error('Error fetching user roles', err as Error, 'AUTH');
         setError(err as Error);
       } finally {
         setLoading(false);

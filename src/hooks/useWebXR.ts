@@ -5,6 +5,7 @@
  */
 
 import { useState, useRef, useCallback, useEffect } from 'react';
+import { logger } from '@/lib/logger';
 
 export interface XRState {
   isSupported: boolean;
@@ -122,7 +123,7 @@ export const useWebXR = () => {
       try {
         await sessionRef.current.end();
       } catch (error) {
-        console.warn('Erreur lors de la fermeture de session:', error);
+        logger.warn('Erreur lors de la fermeture de session', error as Error, 'VR');
       }
     }
   }, []);
@@ -171,7 +172,7 @@ export const useVRGalaxy = () => {
       return { mode: 'vr', session };
     } catch (error) {
       // Fallback vers 2D en cas d'échec
-      console.warn('VR indisponible, passage en mode 2D:', error);
+      logger.warn('VR indisponible, passage en mode 2D', error as Error, 'VR');
       setGalaxyState(prev => ({ ...prev, currentPlanet: 'earth' }));
       return { mode: '2d', session: null };
     }
@@ -229,7 +230,7 @@ export const useVRBreathing = () => {
       return { mode: 'vr', session };
     } catch (error) {
       // Fallback vers 2D
-      console.warn('VR indisponible, passage en mode 2D:', error);
+      logger.warn('VR indisponible, passage en mode 2D', error as Error, 'VR');
       return { mode: '2d', session: null };
     }
   }, [isSupported, startXRSession]);

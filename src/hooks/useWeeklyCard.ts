@@ -8,6 +8,7 @@ import { useAssessment } from '@/components/assess';
 import { WeeklyCard, CardCollection } from '@/types/card';
 import { generateCard, canDrawCard, getWeekNumber } from '@/lib/cardSystem';
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 
 export function useWeeklyCard() {
   const [currentCard, setCurrentCard] = useState<WeeklyCard | null>(null);
@@ -54,7 +55,7 @@ export function useWeeklyCard() {
         setCurrentCard(card);
       }
     } catch (err) {
-      console.error('Erreur chargement carte:', err);
+      logger.error('Erreur chargement carte', err as Error, 'SYSTEM');
       setCanDraw(true);
     }
   }
@@ -83,7 +84,7 @@ export function useWeeklyCard() {
         currentStreak: calculateStreak(cards)
       });
     } catch (err) {
-      console.error('Erreur chargement collection:', err);
+      logger.error('Erreur chargement collection', err as Error, 'SYSTEM');
     }
   }
 
@@ -120,7 +121,7 @@ export function useWeeklyCard() {
       
       return card;
     } catch (err) {
-      console.error('Erreur tirage carte:', err);
+      logger.error('Erreur tirage carte', err as Error, 'SYSTEM');
       return null;
     } finally {
       setIsDrawing(false);

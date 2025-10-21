@@ -2,6 +2,7 @@
 import { useState, useCallback } from 'react';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 
 export type MoodPreset = 'calme' | 'focus' | 'energie_douce' | 'sommeil' | 'uplift' | 'ambient';
 export type Blend = { valence: number; arousal: number };
@@ -179,7 +180,7 @@ export const useSunoSession = () => {
           }
         });
       } catch (error) {
-        console.log('Error stopping session:', error);
+        logger.warn('Error stopping session', error as Error, 'MUSIC');
       }
     }
 

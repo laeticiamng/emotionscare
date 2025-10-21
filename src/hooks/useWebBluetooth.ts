@@ -5,6 +5,7 @@
  */
 
 import { useState, useRef, useCallback, useEffect } from 'react';
+import { logger } from '@/lib/logger';
 
 export interface BluetoothDevice {
   id: string;
@@ -194,7 +195,7 @@ export const useWebBluetooth = () => {
         await characteristicRef.current.stopNotifications();
         characteristicRef.current.removeEventListener('characteristicvaluechanged', handleHeartRateData);
       } catch (error) {
-        console.warn('Erreur lors de l\'arrêt des notifications:', error);
+        logger.warn('Erreur lors de l\'arrêt des notifications', error as Error, 'SYSTEM');
       }
     }
 
@@ -205,7 +206,7 @@ export const useWebBluetooth = () => {
         });
         await bluetoothDevice.gatt?.disconnect();
       } catch (error) {
-        console.warn('Erreur lors de la déconnexion:', error);
+        logger.warn('Erreur lors de la déconnexion', error as Error, 'SYSTEM');
       }
     }
 
@@ -296,7 +297,7 @@ export const useBubbleBeat = () => {
       await connectDevice();
     } catch (error) {
       // Fallback vers simulation en cas d'échec
-      console.warn('Connexion Bluetooth échouée, passage en simulation:', error);
+      logger.warn('Connexion Bluetooth échouée, passage en simulation', error as Error, 'SYSTEM');
       return startSimulation();
     }
   }, [isSupported, connectDevice, startSimulation]);
