@@ -88,8 +88,9 @@ const AppHealthCheck: React.FC = () => {
     const consoleErrors = [];
     const originalError = console.error;
     console.error = (...args) => {
-      consoleErrors.push(args.join(' '));
-      logger.error(args.join(' '), undefined, 'SYSTEM');
+      const errorMessage = args.join(' ');
+      consoleErrors.push(errorMessage);
+      logger.error(errorMessage, undefined, 'SYSTEM');
     };
 
     setTimeout(() => {

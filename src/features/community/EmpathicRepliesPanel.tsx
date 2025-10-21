@@ -6,6 +6,7 @@ import * as Sentry from '@sentry/react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { logger } from '@/lib/logger';
 import {
   Dialog,
   DialogClose,
@@ -100,7 +101,7 @@ export default function EmpathicRepliesPanel(): JSX.Element {
         data: { template: preview.id },
       });
     } catch (error) {
-      console.warn('[EmpathicRepliesPanel] copy failed', error);
+      logger.warn('[EmpathicRepliesPanel] copy failed', error as Error, 'UI');
       toast({
         title: 'Copie impossible',
         description: 'Tu peux sélectionner le texte et le copier manuellement.',

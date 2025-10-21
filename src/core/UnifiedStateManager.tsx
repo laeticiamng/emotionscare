@@ -5,6 +5,7 @@
  */
 
 import React, { createContext, useContext, ReactNode } from 'react';
+import { logger } from '@/lib/logger';
 
 // ==================== TYPES SIMPLIFIÉS ====================
 
@@ -63,7 +64,7 @@ export const UnifiedProvider: React.FC<UnifiedProviderProps> = ({ children }) =>
   // Performance Monitoring
   const recordPerformanceMetric = (name: string, value: number) => {
     if (import.meta.env.DEV) {
-      console.log(`📊 Performance: ${name} = ${value.toFixed(2)}ms`);
+      logger.debug(`Performance: ${name} = ${value.toFixed(2)}ms`, {}, 'SYSTEM');
     }
   };
   
@@ -78,7 +79,7 @@ export const UnifiedProvider: React.FC<UnifiedProviderProps> = ({ children }) =>
       document.body.appendChild(announcement);
       setTimeout(() => document.body.removeChild(announcement), 1000);
     } catch (error) {
-      console.warn('Screen reader announcement failed:', error);
+      logger.warn('Screen reader announcement failed', error as Error, 'UI');
     }
   };
   
@@ -89,7 +90,7 @@ export const UnifiedProvider: React.FC<UnifiedProviderProps> = ({ children }) =>
   // Security
   const logSecurityEvent = (event: string, details?: any) => {
     if (import.meta.env.DEV) {
-      console.warn(`🚨 Security Event: ${event}`, details);
+      logger.warn(`Security Event: ${event}`, details, 'SYSTEM');
     }
   };
   
@@ -100,13 +101,13 @@ export const UnifiedProvider: React.FC<UnifiedProviderProps> = ({ children }) =>
   // Analytics (Privacy-compliant)
   const trackEvent = (event: string, properties?: Record<string, any>) => {
     if (import.meta.env.DEV) {
-      console.log(`📊 Event: ${event}`, properties);
+      logger.info(`Event: ${event}`, properties, 'ANALYTICS');
     }
   };
   
   // Error Handling
   const reportError = (error: Error, context?: string) => {
-    console.error(`❌ Error${context ? ` in ${context}` : ''}:`, error);
+    logger.error(`Error${context ? ` in ${context}` : ''}`, error, 'SYSTEM');
   };
   
   const contextValue: UnifiedContextType = {
@@ -134,10 +135,10 @@ export const useAuth = () => {
     user: null,
     isAuthenticated: false,
     login: async (email: string, password: string) => {
-      console.log('Login attempt:', { email });
+      logger.info('Login attempt', { email }, 'AUTH');
     },
     logout: () => {
-      console.log('Logout');
+      logger.info('Logout', {}, 'AUTH');
     },
     loading: false,
     error: null
