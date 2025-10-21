@@ -20,6 +20,7 @@ import { routes } from "@/routerV2/routes";
 import { useSessionClock } from "@/modules/sessions/hooks/useSessionClock";
 import { logAndJournal } from "@/services/sessions/sessionsApi";
 import { computeMoodDelta } from "@/services/sessions/moodDelta";
+import { logger } from '@/lib/logger';
 
 type Theme = "cyan" | "violet" | "amber" | "emerald";
 type PresetKey = "calme" | "focus" | "recovery";
@@ -277,7 +278,7 @@ export default function FlashGlowUltraPage() {
           moodDelta: snapshot.rawMoodDelta
         });
       } catch (error) {
-        console.warn("flash-glow-ultra journal", error);
+        logger.warn("flash-glow-ultra journal", error, 'MUSIC');
       }
 
       try {
@@ -498,7 +499,7 @@ export default function FlashGlowUltraPage() {
             }
           });
         } catch (error) {
-          console.warn("flash-glow-ultra event", error);
+          logger.warn("flash-glow-ultra event", error, 'MUSIC');
         }
         eventLoggedRef.current = true;
       }
@@ -525,7 +526,7 @@ export default function FlashGlowUltraPage() {
     const reason = completionReasonRef.current ?? "auto_complete";
     finalizeSession(reason)
       .catch((error) => {
-        console.error("Auto-save Flash Glow Ultra session failed", error);
+        logger.error("Auto-save Flash Glow Ultra session failed", error as Error, 'MUSIC');
       })
       .finally(() => {
         completionReasonRef.current = null;
@@ -562,7 +563,7 @@ export default function FlashGlowUltraPage() {
         meta: { preset, bpm, intensity, theme, shape, durationMin }
       });
     } catch (error) {
-      console.warn("flash-glow-ultra start", error);
+      logger.warn("flash-glow-ultra start", error, 'MUSIC');
     }
 
     clock.reset();

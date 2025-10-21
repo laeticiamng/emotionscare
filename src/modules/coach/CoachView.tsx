@@ -9,6 +9,7 @@ import { COACH_DISCLAIMERS, CoachMode } from '@/modules/coach/lib/prompts';
 import { redactForTelemetry } from '@/modules/coach/lib/redaction';
 import { useFlags } from '@/core/flags';
 import { useAssessment } from '@/hooks/useAssessment';
+import { logger } from '@/lib/logger';
 
 type AssessmentCatalog = {
   items: Array<{ id: string; prompt: string }>;
@@ -175,7 +176,7 @@ export function CoachView({ initialMode = 'b2c' }: { initialMode?: CoachMode }) 
               setUserHash(hashed);
             }
           } catch (error) {
-            console.warn('[coach] unable to hash user id', error);
+            logger.warn('[coach] unable to hash user id', error, 'SYSTEM');
           }
         }
 
@@ -184,7 +185,7 @@ export function CoachView({ initialMode = 'b2c' }: { initialMode?: CoachMode }) 
           setMode('b2b');
         }
       } catch (error) {
-        console.warn('[coach] unable to bootstrap user context', error);
+        logger.warn('[coach] unable to bootstrap user context', error, 'SYSTEM');
       }
     }
 
@@ -222,7 +223,7 @@ export function CoachView({ initialMode = 'b2c' }: { initialMode?: CoachMode }) 
         .maybeSingle();
 
       if (error) {
-        console.warn('[coach] unable to load AAQ-II summary', error);
+        logger.warn('[coach] unable to load AAQ-II summary', error, 'SYSTEM');
         setAaqSummary(null);
         setAaqFlexHint('unknown');
         setAaqUpdatedAt(null);
@@ -237,7 +238,7 @@ export function CoachView({ initialMode = 'b2c' }: { initialMode?: CoachMode }) 
       const recordedAt = data?.submitted_at ?? data?.ts ?? null;
       setAaqUpdatedAt(recordedAt ? Date.parse(recordedAt) : null);
     } catch (error) {
-      console.warn('[coach] unable to load AAQ-II summary', error);
+      logger.warn('[coach] unable to load AAQ-II summary', error, 'SYSTEM');
       setAaqSummary(null);
       setAaqFlexHint('unknown');
       setAaqUpdatedAt(null);
@@ -321,7 +322,7 @@ export function CoachView({ initialMode = 'b2c' }: { initialMode?: CoachMode }) 
         setIsAaqDialogOpen(true);
       }
     } catch (error) {
-      console.warn('[coach] unable to start AAQ-II', error);
+      logger.warn('[coach] unable to start AAQ-II', error, 'SYSTEM');
     } finally {
       setIsAaqStarting(false);
     }
@@ -383,7 +384,7 @@ export function CoachView({ initialMode = 'b2c' }: { initialMode?: CoachMode }) 
         });
       }
     } catch (error) {
-      console.error('[coach] AAQ-II submission failed', error);
+      logger.error('[coach] AAQ-II submission failed', error as Error, 'SYSTEM');
       toast({
         title: 'Envoi interrompu',
         description: 'Tu peux réessayer plus tard, à ton rythme.',
@@ -409,7 +410,7 @@ export function CoachView({ initialMode = 'b2c' }: { initialMode?: CoachMode }) 
     try {
       await supabase.auth.updateUser({ data: { coach_consent_at: new Date().toISOString() } });
     } catch (error) {
-      console.warn('[coach] unable to persist consent', error);
+      logger.warn('[coach] unable to persist consent', error, 'SYSTEM');
     }
   }, []);
 

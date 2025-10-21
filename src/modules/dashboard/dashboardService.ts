@@ -3,6 +3,7 @@
  */
 
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 import { BreathingVRService } from '@/modules/breathing-vr/breathingVRService';
 import { meditationService } from '@/modules/meditation/meditationService';
 import { ActivityService } from '@/modules/activity/activityService';
@@ -80,7 +81,7 @@ export class DashboardService {
         streakDays
       };
     } catch (error) {
-      console.error('Erreur récupération stats dashboard:', error);
+      logger.error('Erreur récupération stats dashboard', error, 'ANALYTICS');
       return {
         totalSessions: 0,
         totalMinutes: 0,
@@ -198,7 +199,7 @@ export class DashboardService {
       .limit(5);
 
     if (error) {
-      console.error('Erreur récupération recommandations:', error);
+      logger.error('Erreur récupération recommandations', error, 'ANALYTICS');
       return [];
     }
 

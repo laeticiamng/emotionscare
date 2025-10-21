@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { sha256Hex } from "@/lib/hash";
+import { logger } from '@/lib/logger';
 
 export const COACH_DISCLAIMERS = [
   "Le coach IA ne remplace pas un professionnel de santé ou de santé mentale.",
@@ -229,12 +230,12 @@ async function summarizeConversation(history: CoachHistoryItem[]): Promise<strin
         return [parsed.summary, ...extras.map(signal => `• ${signal}`)].join(" ").trim();
       }
     } catch (err) {
-      console.warn("coachService: unable to parse assistant summary", err);
+      logger.warn("coachService: unable to parse assistant summary", err, 'SYSTEM');
     }
 
     return rawText.trim();
   } catch (error) {
-    console.warn("coachService: summarizeConversation failure", error);
+    logger.warn("coachService: summarizeConversation failure", error, 'SYSTEM');
     return null;
   }
 }
@@ -271,7 +272,7 @@ async function recordAnonymizedCoachLog(params: {
         hashText(params.response),
       ]);
     } catch (error) {
-      console.warn("coachService: unable to hash conversation payload", error);
+      logger.warn("coachService: unable to hash conversation payload", error, 'SYSTEM');
     }
 
     const messagesCount = params.history.filter(item => item.role === "user").length;
@@ -302,10 +303,10 @@ async function recordAnonymizedCoachLog(params: {
 
     const { error } = await supabase.from("ai_coach_sessions").insert(insertPayload);
     if (error) {
-      console.warn("coachService: unable to record anonymized log", error);
+      logger.warn("coachService: unable to record anonymized log", error, 'SYSTEM');
     }
   } catch (error) {
-    console.warn("coachService: unexpected error while logging", error);
+    logger.warn("coachService: unexpected error while logging", error, 'SYSTEM');
   }
 }
 
@@ -336,7 +337,7 @@ export async function requestCoachResponse(options: CoachRequestOptions): Promis
   const parsed = coachFunctionSchema.safeParse(data);
 
   if (!parsed.success) {
-    console.error("coachService: invalid payload", parsed.error.flatten());
+    logger.error("coachService: invalid payload", parsed.error.flatten(), 'SYSTEM');
     throw new Error("Réponse du coach invalide");
   }
 
