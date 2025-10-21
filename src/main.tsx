@@ -16,34 +16,42 @@ import { router } from '@/routerV2/router';
 // Initialiser les services critiques
 logger.info('Application starting', undefined, 'SYSTEM');
 
-// Import Sentry pour le monitoring (pas critique)
-try {
-  const { initSentry } = await import('@/observability/sentry.client');
-  if (initSentry) {
-    initSentry();
+// Initialiser les services de monitoring de manière asynchrone après le render
+const initServices = async () => {
+  // Import Sentry pour le monitoring (pas critique)
+  try {
+    const { initSentry } = await import('@/observability/sentry.client');
+    if (initSentry) {
+      initSentry();
+    }
+    logger.info('Sentry initialized', undefined, 'SYSTEM');
+  } catch (error) {
+    logger.warn('Sentry failed to initialize', error as Error, 'SYSTEM');
   }
-  logger.info('Sentry initialized', undefined, 'SYSTEM');
-} catch (error) {
-  logger.warn('Sentry failed to initialize', error as Error, 'SYSTEM');
-}
 
-// Import monitoring de performance (optionnel)
-try {
-  const { initPerformanceMonitoring } = await import('@/lib/performance');
-  initPerformanceMonitoring();
-  logger.info('Performance monitoring initialized', undefined, 'SYSTEM');
-} catch (error) {
-  logger.warn('Performance monitoring failed', error as Error, 'SYSTEM');
-}
+  // Import monitoring de performance (optionnel)
+  try {
+    const { initPerformanceMonitoring } = await import('@/lib/performance');
+    initPerformanceMonitoring();
+    logger.info('Performance monitoring initialized', undefined, 'SYSTEM');
+  } catch (error) {
+    logger.warn('Performance monitoring failed', error as Error, 'SYSTEM');
+  }
 
-// Import monitoring général (optionnel)
-try {
-  const { initMonitoring } = await import('@/lib/monitoring');
-  initMonitoring();
-  logger.info('Monitoring initialized', undefined, 'SYSTEM');
-} catch (error) {
-  logger.warn('Monitoring failed', error as Error, 'SYSTEM');
-}
+  // Import monitoring général (optionnel)
+  try {
+    const { initMonitoring } = await import('@/lib/monitoring');
+    initMonitoring();
+    logger.info('Monitoring initialized', undefined, 'SYSTEM');
+  } catch (error) {
+    logger.warn('Monitoring failed', error as Error, 'SYSTEM');
+  }
+};
+
+// Démarrer l'initialisation des services après le chargement
+initServices().catch(err => {
+  logger.warn('Services initialization failed', err as Error, 'SYSTEM');
+});
 
 // Ajouter les métadonnées d'accessibilité essentielles
 const addAccessibilityMeta = () => {

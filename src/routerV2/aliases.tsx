@@ -28,6 +28,7 @@ export const ROUTE_ALIASES = {
   '/b2b': '/entreprise',
   '/b2b/selection': '/entreprise',
   '/help-center': '/help',
+  '/tarifs': '/pricing',
 
   // ═══════════════════════════════════════════════════════════
   // DASHBOARDS

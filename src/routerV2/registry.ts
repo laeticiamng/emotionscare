@@ -25,6 +25,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'marketing',
     component: 'PricingPageWorking',
     guard: false,
+    aliases: ['/tarifs'],
   },
   // /home redirect supprimé - confus et inutile
   {
