@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { useAuthStore } from '@/stores/useAuthStore';
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 
 interface SecureAPIOptions {
   requireAuth?: boolean;
@@ -16,7 +17,7 @@ export const useSecureAPI = () => {
   ): Promise<T | null> => {
     // Vérifier l'authentification si requise
     if (options.requireAuth && !isAuthenticated) {
-      console.warn('🚫 API call blocked - authentication required');
+      logger.warn('API call blocked - authentication required', {}, 'AUTH');
       throw new Error('Authentication required for this operation');
     }
 
@@ -26,7 +27,7 @@ export const useSecureAPI = () => {
       const now = Date.now();
       
       if (expiresAt < now) {
-        console.warn('🚫 API call blocked - session expired');
+        logger.warn('API call blocked - session expired', {}, 'AUTH');
         throw new Error('Session expired, please login again');
       }
     }
@@ -34,7 +35,7 @@ export const useSecureAPI = () => {
     try {
       return await apiCall();
     } catch (error) {
-      console.error('❌ Secure API call failed:', error);
+      logger.error('Secure API call failed', error as Error, 'AUTH');
       throw error;
     }
   };
@@ -60,7 +61,7 @@ export const useSecureAPI = () => {
     const { data, error } = await operation();
     
     if (error) {
-      console.error('❌ Supabase operation failed:', error);
+      logger.error('Supabase operation failed', error as Error, 'API');
       throw error;
     }
 
