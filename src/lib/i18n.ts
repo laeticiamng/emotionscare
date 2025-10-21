@@ -2,6 +2,7 @@
 import type { AppLocale } from '@/providers/i18n/resources';
 import { resources } from '@/providers/i18n/resources';
 import { ensureI18n } from '@/providers/i18n/client';
+import { logger } from '@/lib/logger';
 
 const STORAGE_KEY = 'lang';
 const FALLBACK_LANGUAGE: AppLocale = 'fr';
@@ -22,7 +23,7 @@ const readStoredLanguage = (): AppLocale | null => {
     const stored = window.localStorage.getItem(STORAGE_KEY);
     return isSupportedLanguage(stored) ? (stored as AppLocale) : null;
   } catch (error) {
-    console.warn('[i18n] Unable to read language from localStorage', error);
+    logger.warn('[i18n] Unable to read language from localStorage', error as Error, 'SYSTEM');
     return null;
   }
 };
@@ -49,7 +50,7 @@ const persistLanguage = (language: AppLocale) => {
   try {
     window.localStorage.setItem(STORAGE_KEY, language);
   } catch (error) {
-    console.warn('[i18n] Unable to persist language to localStorage', error);
+    logger.warn('[i18n] Unable to persist language to localStorage', error as Error, 'SYSTEM');
   }
 };
 

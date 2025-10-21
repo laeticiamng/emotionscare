@@ -11,6 +11,7 @@
 
 import { trackImplicitAssess, type ImplicitSignal } from './implicitAssess';
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 
 // ============= Types Avancés =============
 
@@ -75,7 +76,7 @@ class EmotionalBaseline {
         this.baseline.set('engagement', 50);
       }
     } catch (error) {
-      console.warn('Erreur chargement baseline:', error);
+      logger.warn('Erreur chargement baseline', error as Error, 'SYSTEM');
     }
   }
 
