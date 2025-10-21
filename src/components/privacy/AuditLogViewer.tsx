@@ -8,6 +8,7 @@ import { Shield, Eye, Download, Trash2, Calendar } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { logger } from '@/lib/logger';
 
 interface AuditLog {
   id: string;

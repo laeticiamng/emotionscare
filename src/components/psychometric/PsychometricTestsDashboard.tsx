@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { ClipboardList, CheckCircle, TrendingUp, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { logger } from '@/lib/logger';
 
 interface Instrument {
   id: string;
@@ -49,7 +50,7 @@ export const PsychometricTestsDashboard: React.FC = () => {
       setInstruments(data.instruments || []);
     } catch (error) {
       toast.error('Erreur lors du chargement des tests');
-      console.error('Error loading instruments:', error);
+      logger.error('Error loading instruments', error as Error, 'UI');
     }
   };
 
@@ -62,7 +63,7 @@ export const PsychometricTestsDashboard: React.FC = () => {
       if (error) throw error;
       setHistory(data.history || []);
     } catch (error) {
-      console.error('Error loading history:', error);
+      logger.error('Error loading history', error as Error, 'UI');
     }
   };
 
@@ -75,7 +76,7 @@ export const PsychometricTestsDashboard: React.FC = () => {
       if (error) throw error;
       setTrends(data.trends || {});
     } catch (error) {
-      console.error('Error loading trends:', error);
+      logger.error('Error loading trends', error as Error, 'UI');
     }
   };
 
@@ -94,7 +95,7 @@ export const PsychometricTestsDashboard: React.FC = () => {
       setTestResult(null);
     } catch (error) {
       toast.error('Erreur lors du chargement du test');
-      console.error('Error loading instrument details:', error);
+      logger.error('Error loading instrument details', error as Error, 'UI');
     }
   };
 
@@ -132,7 +133,7 @@ export const PsychometricTestsDashboard: React.FC = () => {
       loadTrends();
     } catch (error) {
       toast.error('Erreur lors de la soumission du test');
-      console.error('Error submitting test:', error);
+      logger.error('Error submitting test', error as Error, 'UI');
     } finally {
       setIsSubmitting(false);
     }

@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { sunoRateLimiter } from '@/services/rate-limit';
 import { sanitizeEmotionData } from '@/services/privacy';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 interface EmotionState {
   valence: number;
@@ -39,7 +40,7 @@ export const useEmotionMusic = () => {
         await sunoRateLimiter.acquire();
       }
 
-      console.log('🎵 Génération musicale émotionnelle:', emotionState);
+      logger.info('Génération musicale émotionnelle', { emotionState }, 'MUSIC');
 
       // 1. Nettoyer et anonymiser les données émotionnelles
       const cleanedEmotion = sanitizeEmotionData(emotionState);
@@ -61,7 +62,7 @@ export const useEmotionMusic = () => {
       );
 
       if (functionError) {
-        console.error('❌ Edge Function error:', functionError);
+        logger.error('Edge Function error', functionError as Error, 'MUSIC');
         throw new Error(functionError.message || 'Erreur lors de la génération');
       }
 
@@ -73,7 +74,7 @@ export const useEmotionMusic = () => {
       setCurrentTask(taskId);
       setEmotionBadge(emotionBadge);
 
-      console.log('✅ Génération lancée:', { taskId, emotionBadge });
+      logger.info('Génération lancée', { taskId, emotionBadge }, 'MUSIC');
       toast.success('Votre musique est en cours de création !');
 
       return {
@@ -84,7 +85,7 @@ export const useEmotionMusic = () => {
 
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erreur lors de la génération';
-      console.error('❌ Erreur génération musique émotionnelle:', errorMessage);
+      logger.error('Erreur génération musique émotionnelle', err as Error, 'MUSIC');
       setError(errorMessage);
       toast.error(errorMessage);
       return null;

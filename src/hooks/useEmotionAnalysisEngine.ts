@@ -8,6 +8,7 @@ import { useState, useCallback, useRef } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { EmotionResult, EmotionAnalysisConfig, ScanMode } from '@/types';
 import { emotionsCareApi } from '@/services/emotions-care-api';
+import { logger } from '@/lib/logger';
 
 interface EmotionAnalysisState {
   isAnalyzing: boolean;
@@ -49,7 +50,7 @@ export const useEmotionAnalysisEngine = () => {
       history: []
     }));
 
-    console.log('🎭 Session d\'analyse démarrée:', sessionId);
+    logger.info('Session d\'analyse démarrée', { sessionId }, 'SCAN');
     
     toast({
       title: "Session d'analyse démarrée",
@@ -67,7 +68,7 @@ export const useEmotionAnalysisEngine = () => {
     setState(prev => ({ ...prev, isAnalyzing: true, error: null }));
 
     try {
-      console.log('📸 Analyse faciale en cours...');
+      logger.info('Analyse faciale en cours...', {}, 'SCAN');
 
       const result = await emotionsCareApi.analyzeEmotion({
         data: imageData,
@@ -108,7 +109,7 @@ export const useEmotionAnalysisEngine = () => {
 
       return enrichedResult;
     } catch (error) {
-      console.error('❌ Erreur analyse faciale:', error);
+      logger.error('Erreur analyse faciale', error as Error, 'SCAN');
       const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue';
       
       setState(prev => ({
@@ -170,7 +171,7 @@ export const useEmotionAnalysisEngine = () => {
 
       return enrichedResult;
     } catch (error) {
-      console.error('❌ Erreur analyse vocale:', error);
+      logger.error('Erreur analyse vocale', error as Error, 'SCAN');
       const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue';
       
       setState(prev => ({
@@ -197,7 +198,7 @@ export const useEmotionAnalysisEngine = () => {
     setState(prev => ({ ...prev, isAnalyzing: true, error: null }));
 
     try {
-      console.log('💭 Analyse textuelle en cours...');
+      logger.info('Analyse textuelle en cours...', {}, 'SCAN');
 
       const result = await emotionsCareApi.analyzeText({
         text,
@@ -240,7 +241,7 @@ export const useEmotionAnalysisEngine = () => {
 
       return emotionResult;
     } catch (error) {
-      console.error('❌ Erreur analyse textuelle:', error);
+      logger.error('Erreur analyse textuelle', error as Error, 'SCAN');
       const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue';
       
       setState(prev => ({
@@ -271,7 +272,7 @@ export const useEmotionAnalysisEngine = () => {
     setState(prev => ({ ...prev, isAnalyzing: true, error: null }));
 
     try {
-      console.log('🎭 Analyse multimodale en cours...');
+      logger.info('Analyse multimodale en cours...', {}, 'SCAN');
 
       const results: EmotionResult[] = [];
 
@@ -310,7 +311,7 @@ export const useEmotionAnalysisEngine = () => {
 
       return combinedResult;
     } catch (error) {
-      console.error('❌ Erreur analyse multimodale:', error);
+      logger.error('Erreur analyse multimodale', error as Error, 'SCAN');
       setState(prev => ({
         ...prev,
         isAnalyzing: false,
@@ -337,7 +338,7 @@ export const useEmotionAnalysisEngine = () => {
         } : null
       }));
     } catch (error) {
-      console.error('❌ Erreur génération recommandations:', error);
+      logger.error('Erreur génération recommandations', error as Error, 'SCAN');
     }
   }, []);
 
@@ -364,7 +365,7 @@ export const useEmotionAnalysisEngine = () => {
     sessionStartTime.current = null;
     analysisCount.current = 0;
 
-    console.log('🏁 Session terminée:', sessionSummary);
+    logger.info('Session terminée', { sessionSummary }, 'SCAN');
 
     toast({
       title: "Session terminée",

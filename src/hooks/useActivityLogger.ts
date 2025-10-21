@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { useCallback } from 'react';
+import { logger } from '@/lib/logger';
 
 interface ActivityLogData {
   userId?: string;
@@ -19,7 +20,7 @@ export const useActivityLogger = () => {
       };
 
       // In development, just log to console
-      console.log('🔍 Activity Log:', logEntry);
+      logger.debug('Activity Log', logEntry, 'ANALYTICS');
 
       // In production, this would send to your analytics service
       // await fetch('/api/activity-log', {
@@ -30,7 +31,7 @@ export const useActivityLogger = () => {
 
       return { success: true };
     } catch (error) {
-      console.error('Failed to log activity:', error);
+      logger.error('Failed to log activity', error as Error, 'ANALYTICS');
       return { success: false, error };
     }
   }, []);
