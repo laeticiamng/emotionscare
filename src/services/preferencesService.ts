@@ -2,6 +2,7 @@
 
 import { UserPreferences } from '@/types/preferences';
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 
 export class PreferencesService {
   /**
@@ -16,7 +17,7 @@ export class PreferencesService {
 
       if (error) throw error;
     } catch (error) {
-      console.error('Error saving preferences:', error);
+      logger.error('Error saving preferences', error as Error, 'SYSTEM');
       throw error;
     }
   }
@@ -35,7 +36,7 @@ export class PreferencesService {
       if (error) throw error;
       return data?.preferences || null;
     } catch (error) {
-      console.error('Error loading preferences:', error);
+      logger.error('Error loading preferences', error as Error, 'SYSTEM');
       return null;
     }
   }
@@ -59,7 +60,7 @@ export class PreferencesService {
 
       if (error) throw error;
     } catch (error) {
-      console.error('Error deleting preferences:', error);
+      logger.error('Error deleting preferences', error as Error, 'SYSTEM');
       throw error;
     }
   }

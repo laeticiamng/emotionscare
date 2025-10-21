@@ -5,6 +5,8 @@
  * Limite: 20 requêtes / 10 secondes
  */
 
+import { logger } from '@/lib/logger';
+
 interface RateLimitConfig {
   maxRequests: number;
   windowMs: number;
@@ -45,7 +47,7 @@ class RateLimiter {
         this.config.maxBackoffMs
       );
 
-      console.warn(`Rate limit reached. Waiting ${Math.round(totalWait)}ms...`);
+      logger.warn(`Rate limit reached. Waiting ${Math.round(totalWait)}ms`, undefined, 'MUSIC');
       await this.sleep(totalWait);
       
       // Réessayer après l'attente

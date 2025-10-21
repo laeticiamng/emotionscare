@@ -2,6 +2,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import sunoRequestSchema from '../../schemas/suno-request.schema.json';
 import { applyEmotionMapping } from '@/lib/yaml-loader';
+import { logger } from '@/lib/logger';
 
 interface EmotionState {
   valence?: number;
@@ -60,7 +61,7 @@ Génère une configuration musicale Suno adaptée à cet état émotionnel.`;
     
     return data.result;
   } catch (error) {
-    console.error('Error building Suno request:', error);
+    logger.error('Error building Suno request', error as Error, 'MUSIC');
     
     // Fallback configuration
     return {

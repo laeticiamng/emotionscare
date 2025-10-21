@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { supabase } from '@/integrations/supabase/client';
 import type { ApiResponse, MusicRecommendation, EmotionData } from './types';
+import { logger } from '@/lib/logger';
 
 class SunoService {
   private async callEdgeFunction(functionName: string, payload: any): Promise<ApiResponse> {
@@ -10,7 +11,7 @@ class SunoService {
       });
 
       if (error) {
-        console.error(`Suno ${functionName} error:`, error);
+        logger.error(`Suno ${functionName} error`, error as Error, 'MUSIC');
         return {
           success: false,
           error: error.message,
@@ -24,7 +25,7 @@ class SunoService {
         timestamp: new Date()
       };
     } catch (error: any) {
-      console.error(`Suno ${functionName} error:`, error);
+      logger.error(`Suno ${functionName} error`, error as Error, 'MUSIC');
       return {
         success: false,
         error: error.message,

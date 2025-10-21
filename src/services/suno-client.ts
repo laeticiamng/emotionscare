@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 
 export interface SunoGenerateRequest {
   customMode: boolean;
@@ -40,7 +41,7 @@ export async function generateMusic(request: SunoGenerateRequest) {
     if (error) throw error;
     return data;
   } catch (error) {
-    console.error('Error generating music:', error);
+    logger.error('Error generating music', error as Error, 'MUSIC');
     throw error;
   }
 }
@@ -54,7 +55,7 @@ export async function extendMusic(request: SunoExtendRequest) {
     if (error) throw error;
     return data;
   } catch (error) {
-    console.error('Error extending music:', error);
+    logger.error('Error extending music', error as Error, 'MUSIC');
     throw error;
   }
 }
@@ -68,7 +69,7 @@ export async function addVocals(request: SunoAddVocalsRequest) {
     if (error) throw error;
     return data;
   } catch (error) {
-    console.error('Error adding vocals:', error);
+    logger.error('Error adding vocals', error as Error, 'MUSIC');
     throw error;
   }
 }

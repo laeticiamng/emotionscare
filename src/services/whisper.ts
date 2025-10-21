@@ -7,6 +7,7 @@
  * Il permet de transcrire de l'audio en texte.
  */
 import { API_URL } from '@/lib/env';
+import { logger } from '@/lib/logger';
 
 // Types pour les options de transcription
 export interface WhisperOptions {
@@ -86,7 +87,7 @@ export async function transcribeAudio(
 
     return await response.json();
   } catch (error) {
-    console.error('Error transcribing audio:', error);
+    logger.error('Error transcribing audio', error as Error, 'API');
     throw error;
   }
 }
@@ -158,7 +159,7 @@ export async function recordAndTranscribe(options: WhisperOptions = {}): Promise
       };
     });
   } catch (error) {
-    console.error('Error recording audio:', error);
+    logger.error('Error recording audio', error as Error, 'API');
     throw error;
   }
 }
@@ -173,7 +174,7 @@ export async function checkMicrophoneAccess(): Promise<boolean> {
     stream.getTracks().forEach(track => track.stop());
     return true;
   } catch (error) {
-    console.error('Microphone access check failed:', error);
+    logger.error('Microphone access check failed', error as Error, 'SYSTEM');
     return false;
   }
 }

@@ -3,6 +3,8 @@
  * Service RGPD - Export et suppression des données personnelles
  */
 
+import { logger } from '@/lib/logger';
+
 export interface ExportOptions {
   format: 'json' | 'csv' | 'pdf';
   includeData?: string[];
@@ -161,7 +163,7 @@ class RGPDService {
 
       return await response.json();
     } catch (error) {
-      console.error('Account status check failed:', error);
+      logger.error('Account status check failed', error as Error, 'SYSTEM');
       return { status: 'active' };
     }
   }

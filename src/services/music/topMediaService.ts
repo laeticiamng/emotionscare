@@ -284,13 +284,13 @@ export class TopMediaMusicService {
       });
         
       if (error) {
-        console.error('Error saving track to library:', error);
+        logger.error('Error saving track to library', error as Error, 'MUSIC');
         return false;
       }
       
       return true;
     } catch (error) {
-      console.error('Error in saveToUserLibrary:', error);
+      logger.error('Error in saveToUserLibrary', error as Error, 'MUSIC');
       return false;
     }
   }
@@ -306,7 +306,7 @@ export class TopMediaMusicService {
       });
         
       if (error) {
-        console.error('Error fetching user library:', error);
+        logger.error('Error fetching user library', error as Error, 'MUSIC');
         return [];
       }
       
@@ -320,7 +320,7 @@ export class TopMediaMusicService {
         emotion: item.emotion
       }));
     } catch (error) {
-      console.error('Error in getUserLibrary:', error);
+      logger.error('Error in getUserLibrary', error as Error, 'MUSIC');
       return [];
     }
   }

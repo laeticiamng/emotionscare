@@ -2,6 +2,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import type { ParcoursPreset, ParcoursRun, ParcoursSegment } from '@/types/music/parcours';
+import { logger } from '@/lib/logger';
 
 export const AVAILABLE_PRESETS: Array<{ key: string; title: string; emotion: string; description: string }> = [
   { key: '00-universel-reset', title: 'Universel Reset → Équilibre', emotion: 'neutral', description: 'Retour au centre avec cohérence cardiaque' },
@@ -31,7 +32,7 @@ export async function createParcoursRun(
   emotionState?: any
 ): Promise<{ runId: string; error?: string }> {
   try {
-    console.log('🎭 Création parcours run:', presetKey);
+    logger.info('Création parcours run', { presetKey }, 'MUSIC');
 
     const { data, error } = await supabase.functions.invoke('parcours-xl-create', {
       body: {
@@ -43,11 +44,11 @@ export async function createParcoursRun(
     if (error) throw error;
     if (!data?.runId) throw new Error('No runId returned');
 
-    console.log('✅ Run créée:', data.runId);
+    logger.info('Run créée', { runId: data.runId }, 'MUSIC');
     return { runId: data.runId };
 
   } catch (error) {
-    console.error('❌ Erreur création parcours:', error);
+    logger.error('Erreur création parcours', error as Error, 'MUSIC');
     return {
       runId: '',
       error: error instanceof Error ? error.message : 'Erreur inconnue'
@@ -79,7 +80,7 @@ export async function getParcoursRun(runId: string): Promise<ParcoursRun | null>
     } as ParcoursRun;
 
   } catch (error) {
-    console.error('❌ Erreur récupération run:', error);
+    logger.error('Erreur récupération run', error as Error, 'MUSIC');
     return null;
   }
 }
@@ -101,7 +102,7 @@ export async function updateRunStatus(
 
     return !error;
   } catch (error) {
-    console.error('❌ Erreur update run:', error);
+    logger.error('Erreur update run', error as Error, 'MUSIC');
     return false;
   }
 }
@@ -126,7 +127,7 @@ export async function saveParcoursJournal(
 
     return !error;
   } catch (error) {
-    console.error('❌ Erreur sauvegarde journal:', error);
+    logger.error('Erreur sauvegarde journal', error as Error, 'MUSIC');
     return false;
   }
 }

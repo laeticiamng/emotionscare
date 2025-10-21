@@ -1,10 +1,12 @@
 // @ts-nocheck
 
+import { logger } from '@/lib/logger';
+
 export const usePushNotifications = () => {
   const requestPermission = async () => {
     if ('Notification' in window) {
       const permission = await Notification.requestPermission();
-      console.log('Push notification permission:', permission);
+      logger.info('Push notification permission', { permission }, 'SYSTEM');
       return permission === 'granted';
     }
     return false;
