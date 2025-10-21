@@ -114,6 +114,7 @@ export { default as MoodPresetsAdminPage } from './MoodPresetsAdminPage';
 export { default as GamificationPage } from './GamificationPage';
 export { default as ChooseModePage } from './ChooseModePage';
 export { default as AdminFlagsPage } from "@/modules/admin/AdminFlagsPage";
+export { default as TestAccountsPage } from "./dev/TestAccountsPage";
 
 // Coming Soon Pages
 export { MessagesComingSoon } from './coming-soon/MessagesComingSoon';

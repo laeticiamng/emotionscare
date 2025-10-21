@@ -430,6 +430,14 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: false,
   },
   {
+    name: 'test-accounts-dev',
+    path: '/dev/test-accounts',
+    segment: 'public',
+    layout: 'minimal',
+    component: 'TestAccountsPage',
+    guard: false,
+  },
+  {
     name: 'nyvee-cocon',
     path: '/app/nyvee',
     segment: 'consumer',
