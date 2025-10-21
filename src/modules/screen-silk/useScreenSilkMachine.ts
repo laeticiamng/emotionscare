@@ -6,6 +6,7 @@ import { useCallback } from 'react';
 import { useAsyncMachine } from '@/hooks/useAsyncMachine';
 import * as screenSilkServiceUnified from './screenSilkServiceUnified';
 import type { ScreenSilkSession } from './types';
+import { logger } from '@/lib/logger';
 
 export type ScreenSilkState = 'idle' | 'loading' | 'active' | 'ending' | 'success' | 'error';
 
@@ -110,7 +111,7 @@ export const useScreenSilkMachine = (config: ScreenSilkConfig) => {
       }
     },
     onError: (error) => {
-      console.error('Erreur Screen Silk:', error);
+      logger.error('Erreur Screen Silk', error as Error, 'SYSTEM');
       config.onInterrupt?.();
     }
   });

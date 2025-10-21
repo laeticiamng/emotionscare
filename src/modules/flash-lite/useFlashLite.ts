@@ -7,6 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useFlashLiteMachine } from './useFlashLiteMachine';
 import { FlashLiteService } from './flashLiteService';
 import type { FlashLiteMode, FlashCard } from './types';
+import { logger } from '@/lib/logger';
 
 export function useFlashLite() {
   const { user } = useAuth();
@@ -46,7 +47,7 @@ export function useFlashLite() {
       // Démarrer la machine
       machine.startSession({ mode, category, cardsCount }, demoCards);
     } catch (error) {
-      console.error('Failed to start flash lite session:', error);
+      logger.error('Failed to start flash lite session', error as Error, 'SYSTEM');
       machine.state.error = 'Failed to start session';
     }
   }, [user?.id, machine]);
@@ -72,7 +73,7 @@ export function useFlashLite() {
         machine.nextCard(isCorrect);
       }
     } catch (error) {
-      console.error('Failed to record answer:', error);
+      logger.error('Failed to record answer', error as Error, 'SYSTEM');
     }
   }, [machine]);
 
@@ -94,7 +95,7 @@ export function useFlashLite() {
 
       machine.completeSession();
     } catch (error) {
-      console.error('Failed to complete flash lite session:', error);
+      logger.error('Failed to complete flash lite session', error as Error, 'SYSTEM');
     }
   }, [machine]);
 

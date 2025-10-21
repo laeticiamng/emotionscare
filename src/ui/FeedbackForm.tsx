@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { logger } from '@/lib/logger';
 
 export function FeedbackForm() {
   const [name, setName] = useState("");
@@ -12,7 +13,7 @@ export function FeedbackForm() {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    console.log({ name, email, message });
+    logger.info('Feedback submitted', { name, email, message }, 'UI');
     setName("");
     setEmail("");
     setMessage("");

@@ -13,6 +13,7 @@ import type { JournalEntry } from '@/modules/journal/journalService';
 import { useSessionClock } from '@/modules/sessions/hooks/useSessionClock';
 import { logAndJournal } from '@/services/sessions/sessionsApi';
 import { computeMoodDelta } from '@/services/sessions/moodDelta';
+import { logger } from '@/lib/logger';
 
 interface FlashGlowConfig {
   glowType: string;
@@ -159,11 +160,11 @@ export const useFlashGlowMachine = (): FlashGlowMachineReturn => {
       };
     },
     onSuccess: (result) => {
-      console.log('✅ Flash Glow session completed:', result);
+      logger.info('Flash Glow session completed', result, 'MUSIC');
     },
     onError: (error) => {
       clock.reset();
-      console.error('❌ Flash Glow session error:', error);
+      logger.error('Flash Glow session error', error as Error, 'MUSIC');
       toast({
         title: "Session interrompue",
         description: "La session Flash Glow a été interrompue",
@@ -233,7 +234,7 @@ export const useFlashGlowMachine = (): FlashGlowMachineReturn => {
         avgDuration: statsData.avg_duration
       });
     } catch (error) {
-      console.error('Error loading stats:', error);
+      logger.error('Error loading stats', error as Error, 'MUSIC');
     }
   }, []);
 
@@ -375,7 +376,7 @@ export const useFlashGlowMachine = (): FlashGlowMachineReturn => {
       await loadStats();
 
     } catch (error) {
-      console.error('Error completing session:', error);
+      logger.error('Error completing session', error as Error, 'MUSIC');
       Sentry.captureException(error);
       toast({
         title: "Erreur",

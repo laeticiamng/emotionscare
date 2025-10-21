@@ -337,7 +337,7 @@ export function usePanasSuggestions(options: UsePanasSuggestionsOptions = {}): U
         description: 'Nous t’inviterons régulièrement chaque semaine pour un court PANAS.',
       })
     } catch (error) {
-      console.error('PANAS consent error', error)
+      logger.error('PANAS consent error', error as Error, 'SYSTEM');
       toast({
         title: 'Activation indisponible',
         description: "La demande n'a pas pu aboutir. Réessaie dans un instant.",
