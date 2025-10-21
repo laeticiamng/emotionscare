@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useMusic } from '@/hooks/useMusic';
 import { EmotionMusicParams } from '@/types/music';
+import { logger } from '@/lib/logger';
 
 interface UseCommunityAmbienceOptions {
   autoPlay?: boolean;
@@ -41,7 +42,7 @@ export const useCommunityAmbience = (options: UseCommunityAmbienceOptions = {}) 
       }
       return false;
     } catch (error) {
-      console.error("Error loading emotion music:", error);
+      logger.error("Error loading emotion music", error as Error, 'MUSIC');
       return false;
     }
   };

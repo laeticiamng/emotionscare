@@ -5,6 +5,7 @@ import { useState, useCallback } from 'react';
 import { useCoach } from '@/contexts/coach/CoachContextProvider';
 import { v4 as uuidv4 } from 'uuid';
 import { ChatMessage } from '@/types/chat';
+import { logger } from '@/lib/logger';
 
 export const useCoachChat = () => {
   const coach = useCoach();
@@ -45,7 +46,7 @@ export const useCoachChat = () => {
       });
       return response;
     } catch (error) {
-      console.error('Error sending message:', error);
+      logger.error('Error sending message', error as Error, 'UI');
       return '';
     } finally {
       setIsProcessing(false);

@@ -6,6 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { calculateStreakDays } from '@/utils/gamification/emotionCalculator';
 import { EmotionGamificationStats } from '@/types/scan';
+import { logger } from '@/lib/logger';
 
 export const useEmotionalGamification = (userId?: string) => {
   const { user } = useAuth();
@@ -117,7 +118,7 @@ export const useEmotionalGamification = (userId?: string) => {
           });
         }
       } catch (error) {
-        console.error('Error fetching gamification stats:', error);
+        logger.error('Error fetching gamification stats', error as Error, 'ANALYTICS');
         toast({
           title: "Erreur",
           description: "Impossible de charger les statistiques de gamification",

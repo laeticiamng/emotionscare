@@ -2,6 +2,7 @@
 import { useState, useCallback } from 'react';
 import { EmotionResult } from '@/types/emotion';
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 
 export interface UseEmotionAnalysisReturn {
   analyzeText: (text: string) => Promise<EmotionResult | null>;
@@ -60,7 +61,7 @@ export const useEmotionAnalysis = (): UseEmotionAnalysisReturn => {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erreur lors de l\'analyse du texte';
       setError(errorMessage);
-      console.error('Text analysis error:', err);
+      logger.error('Text analysis error', err as Error, 'SCAN');
       
       // Fallback result
       const fallbackResult: EmotionResult = {
@@ -122,7 +123,7 @@ export const useEmotionAnalysis = (): UseEmotionAnalysisReturn => {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erreur lors de l\'analyse faciale';
       setError(errorMessage);
-      console.error('Facial analysis error:', err);
+      logger.error('Facial analysis error', err as Error, 'SCAN');
       
       // Fallback result
       const fallbackResult: EmotionResult = {
@@ -194,7 +195,7 @@ export const useEmotionAnalysis = (): UseEmotionAnalysisReturn => {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erreur lors de l\'analyse vocale';
       setError(errorMessage);
-      console.error('Voice analysis error:', err);
+      logger.error('Voice analysis error', err as Error, 'SCAN');
       
       // Fallback result
       const fallbackResult: EmotionResult = {

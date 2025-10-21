@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { Challenge, Badge } from '@/types/badge';
 import { toast } from '@/hooks/use-toast';
 import { mockBadges, mockChallenges } from './community-gamification/mockData';
+import { logger } from '@/lib/logger';
 
 export const useCommunityGamification = () => {
   const [badges, setBadges] = useState<Badge[]>([]);
@@ -24,7 +25,7 @@ export const useCommunityGamification = () => {
       await new Promise(resolve => setTimeout(resolve, 800)); // Simulate API delay
       setBadges(mockBadges);
     } catch (error) {
-      console.error('Error loading badges:', error);
+      logger.error('Error loading badges', error as Error, 'SYSTEM');
     } finally {
       setIsLoading(false);
     }
@@ -37,7 +38,7 @@ export const useCommunityGamification = () => {
       await new Promise(resolve => setTimeout(resolve, 800)); // Simulate API delay
       setChallenges(mockChallenges);
     } catch (error) {
-      console.error('Error loading challenges:', error);
+      logger.error('Error loading challenges', error as Error, 'SYSTEM');
     } finally {
       setIsLoading(false);
     }
@@ -77,7 +78,7 @@ export const useCommunityGamification = () => {
       
       return true;
     } catch (error) {
-      console.error('Error updating challenge progress:', error);
+      logger.error('Error updating challenge progress', error as Error, 'SYSTEM');
       return false;
     } finally {
       setIsLoading(false);
@@ -119,7 +120,7 @@ export const useCommunityGamification = () => {
       
       return false;
     } catch (error) {
-      console.error('Error unlocking badge:', error);
+      logger.error('Error unlocking badge', error as Error, 'SYSTEM');
       return false;
     } finally {
       setIsLoading(false);

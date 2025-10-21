@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { useEffect } from 'react';
 import { useDashboardStore } from '@/store/dashboard.store';
+import { logger } from '@/lib/logger';
 
 const MOCK_CONTINUE_ITEMS = [
   {
@@ -36,7 +37,7 @@ export const useContinue = () => {
           
         store.setContinueItem(item);
       } catch (error) {
-        console.error('Failed to fetch continue data:', error);
+        logger.error('Failed to fetch continue data', error as Error, 'SYSTEM');
         store.setContinueItem(null);
       } finally {
         store.setLoading('continue', false);

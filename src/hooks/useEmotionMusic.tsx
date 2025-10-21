@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { MusicPlaylist, EmotionMusicParams } from '@/types/music';
 import { useMusic } from '@/hooks/useMusic';
+import { logger } from '@/lib/logger';
 
 export interface UseEmotionMusicReturn {
   recommendation: MusicPlaylist | null;
@@ -56,7 +57,7 @@ export const useEmotionMusic = (initialEmotion?: string): UseEmotionMusicReturn 
       
       return !!playlist;
     } catch (error) {
-      console.error('Error activating music for emotion:', error);
+      logger.error('Error activating music for emotion', error as Error, 'MUSIC');
       setError(error instanceof Error ? error : new Error('Failed to activate emotion music'));
       return false;
     } finally {
