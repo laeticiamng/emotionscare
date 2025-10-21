@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react';
 import { MusicPlaylist } from '@/types/music';
 import { useMusic } from '@/contexts/MusicContext';
 import { demoTracks } from '@/services/music/demo-tracks';
+import { logger } from '@/lib/logger';
 
 export const useMusicEmotionIntegration = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -34,7 +35,7 @@ export const useMusicEmotionIntegration = () => {
       
       return playlist;
     } catch (error) {
-      console.error('Error playing emotion music:', error);
+      logger.error('Error playing emotion music', error as Error, 'MUSIC');
       return null;
     } finally {
       setIsLoading(false);

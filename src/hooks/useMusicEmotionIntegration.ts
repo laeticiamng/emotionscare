@@ -5,6 +5,7 @@ import { useSoundscape } from '@/providers/SoundscapeProvider';
 import { EmotionMusicParams, MusicPlaylist, MusicTrack } from '@/types/music';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 export const useMusicEmotionIntegration = () => {
   const { state, generateMusicForEmotion, setPlaylist, play, getEmotionMusicDescription } = useMusic();
@@ -68,7 +69,7 @@ export const useMusicEmotionIntegration = () => {
 
       return null;
     } catch (error) {
-      console.error('Erreur activation musique émotion:', error);
+      logger.error('Erreur activation musique émotion', error as Error, 'MUSIC');
       toast.error('Impossible d\'activer la musique pour cette émotion');
       return null;
     }
@@ -101,7 +102,7 @@ export const useMusicEmotionIntegration = () => {
         energy: track.energy
       }));
     } catch (error) {
-      console.error('Erreur recherche tracks:', error);
+      logger.error('Erreur recherche tracks', error as Error, 'MUSIC');
       return [];
     }
   }, []);
@@ -148,7 +149,7 @@ export const useMusicEmotionIntegration = () => {
         energy: track.energy
       }));
     } catch (error) {
-      console.error('Erreur recommandations musique:', error);
+      logger.error('Erreur recommandations musique', error as Error, 'MUSIC');
       return [];
     }
   }, []);
@@ -173,7 +174,7 @@ export const useMusicEmotionIntegration = () => {
       });
 
     } catch (error) {
-      console.error('Erreur analyse impact:', error);
+      logger.error('Erreur analyse impact', error as Error, 'ANALYTICS');
     }
   }, []);
 

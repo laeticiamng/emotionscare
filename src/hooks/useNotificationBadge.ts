@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase';
 import { useAuth } from '@/contexts/AuthContext';
+import { logger } from '@/lib/logger';
 
 interface NotificationBadge {
   count: number;
@@ -41,7 +42,7 @@ export const useNotificationBadge = (): NotificationBadge => {
         setNotificationsCount(newNotificationsCount);
         setCount(totalCount);
       } catch (error) {
-        console.error('Error loading notifications:', error);
+        logger.error('Error loading notifications', error as Error, 'SYSTEM');
       } finally {
         setIsLoading(false);
       }

@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 
 export interface ModuleProgress {
   id?: string;
@@ -85,7 +86,7 @@ export const useModuleProgress = (moduleName: string) => {
         setProgress(newProgress);
       }
     } catch (error) {
-      console.error('Error loading progress:', error);
+      logger.error('Error loading progress', error as Error, 'SYSTEM');
     } finally {
       setIsLoading(false);
     }
@@ -108,7 +109,7 @@ export const useModuleProgress = (moduleName: string) => {
       if (error) throw error;
       setSessions(data || []);
     } catch (error) {
-      console.error('Error loading sessions:', error);
+      logger.error('Error loading sessions', error as Error, 'SYSTEM');
     }
   }, [moduleName]);
 
@@ -127,7 +128,7 @@ export const useModuleProgress = (moduleName: string) => {
       if (error) throw error;
       setAchievements(data || []);
     } catch (error) {
-      console.error('Error loading achievements:', error);
+      logger.error('Error loading achievements', error as Error, 'SYSTEM');
     }
   }, [moduleName]);
 
@@ -150,7 +151,7 @@ export const useModuleProgress = (moduleName: string) => {
 
       setProgress(prev => prev ? { ...prev, ...updates } : null);
     } catch (error) {
-      console.error('Error updating progress:', error);
+      logger.error('Error updating progress', error as Error, 'SYSTEM');
       toast({
         title: 'Erreur',
         description: 'Impossible de sauvegarder la progression',
@@ -181,7 +182,7 @@ export const useModuleProgress = (moduleName: string) => {
       setCurrentSession(data.id);
       return data.id;
     } catch (error) {
-      console.error('Error starting session:', error);
+      logger.error('Error starting session', error as Error, 'SYSTEM');
       return null;
     }
   }, [moduleName]);
@@ -209,7 +210,7 @@ export const useModuleProgress = (moduleName: string) => {
       setCurrentSession(null);
       await loadSessions();
     } catch (error) {
-      console.error('Error ending session:', error);
+      logger.error('Error ending session', error as Error, 'SYSTEM');
     }
   }, [loadSessions]);
 
@@ -244,7 +245,7 @@ export const useModuleProgress = (moduleName: string) => {
         description: achievementData.title || achievementType,
       });
     } catch (error) {
-      console.error('Error unlocking achievement:', error);
+      logger.error('Error unlocking achievement', error as Error, 'ANALYTICS');
     }
   }, [moduleName, achievements, loadAchievements, toast]);
 
@@ -340,7 +341,7 @@ export const useUserOverallStats = () => {
       if (error) throw error;
       setStats(data);
     } catch (error) {
-      console.error('Error loading overall stats:', error);
+      logger.error('Error loading overall stats', error as Error, 'ANALYTICS');
     } finally {
       setIsLoading(false);
     }

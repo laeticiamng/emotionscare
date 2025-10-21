@@ -3,6 +3,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { useMoodStore, BlendState, BrsAnswer } from '@/store/mood.store';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 
 interface MoodSessionConfig {
   mode?: 'quick' | 'deep';
@@ -67,7 +68,7 @@ export const useMoodSession = () => {
         });
       }
     } catch (error) {
-      console.error('Error starting mood session:', error);
+      logger.error('Error starting mood session', error as Error, 'MUSIC');
       
       // Fallback offline session
       const fallbackSessionId = `offline-${Date.now()}`;
@@ -118,7 +119,7 @@ export const useMoodSession = () => {
       
       moodStore.reset();
     } catch (error) {
-      console.error('Error ending session:', error);
+      logger.error('Error ending session', error as Error, 'MUSIC');
       
       // Fallback: just show completion message
       toast({
@@ -149,7 +150,7 @@ export const useMoodSession = () => {
         moodStore.setTrackUrl(data.track_url);
       }
     } catch (error) {
-      console.error('Error loading next track:', error);
+      logger.error('Error loading next track', error as Error, 'MUSIC');
       
       // Fallback: cycle through predefined tracks
       const fallbackTracks = [

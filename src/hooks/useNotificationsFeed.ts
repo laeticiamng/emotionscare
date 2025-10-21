@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 interface NotificationItem {
   id: string;
@@ -57,7 +58,7 @@ export const useNotificationsFeed = () => {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erreur lors du chargement des notifications';
       setError(errorMessage);
-      console.error('Error fetching notifications:', err);
+      logger.error('Error fetching notifications', err as Error, 'SYSTEM');
       
       // Fallback with mock data for development
       setNotifications([
@@ -107,7 +108,7 @@ export const useNotificationsFeed = () => {
         )
       );
     } catch (err) {
-      console.error('Error marking notification as read:', err);
+      logger.error('Error marking notification as read', err as Error, 'SYSTEM');
     }
   };
 
@@ -124,7 +125,7 @@ export const useNotificationsFeed = () => {
         window.location.href = '/music';
         break;
       default:
-        console.log('Unknown notification action:', action);
+        logger.debug('Unknown notification action', { action }, 'SYSTEM');
     }
   };
 
@@ -146,7 +147,7 @@ export const useNotificationsFeed = () => {
       setNotifications(prev => [newNotification, ...prev]);
       return newNotification;
     } catch (err) {
-      console.error('Error creating notification:', err);
+      logger.error('Error creating notification', err as Error, 'SYSTEM');
       throw err;
     }
   };

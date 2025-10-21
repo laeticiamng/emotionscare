@@ -3,6 +3,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 export interface NeonChallenge {
   id: string;
@@ -89,7 +90,7 @@ export const useNeonChallenge = (): UseNeonChallengeReturn => {
 
       setChallenges(transformedChallenges);
     } catch (err) {
-      console.error('Error loading neon challenges:', err);
+      logger.error('Error loading neon challenges', err as Error, 'ANALYTICS');
       setError(err instanceof Error ? err.message : 'Erreur de chargement');
       toast.error('Impossible de charger les défis');
     } finally {
@@ -130,7 +131,7 @@ export const useNeonChallenge = (): UseNeonChallengeReturn => {
         await completeChallenge(challengeId);
       }
     } catch (err) {
-      console.error('Error updating challenge progress:', err);
+      logger.error('Error updating challenge progress', err as Error, 'ANALYTICS');
       toast.error('Erreur de mise à jour');
     }
   }, [user, challenges]);
@@ -167,7 +168,7 @@ export const useNeonChallenge = (): UseNeonChallengeReturn => {
 
       toast.success(`🎉 Défi "${challenge.title}" complété !`);
     } catch (err) {
-      console.error('Error completing challenge:', err);
+      logger.error('Error completing challenge', err as Error, 'ANALYTICS');
       toast.error('Erreur lors de la complétion');
     }
   }, [user, challenges]);
@@ -205,7 +206,7 @@ export const useNeonChallenge = (): UseNeonChallengeReturn => {
 
       await loadChallenges();
     } catch (err) {
-      console.error('Error claiming reward:', err);
+      logger.error('Error claiming reward', err as Error, 'ANALYTICS');
       toast.error('Erreur lors de la réclamation');
     }
   }, [user, challenges, loadChallenges]);

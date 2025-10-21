@@ -7,6 +7,7 @@ import {
   type InstrumentCode as ClinicalInstrumentCode,
 } from '@/services/clinicalScoringService';
 import { useToast } from '@/hooks/useToast';
+import { logger } from '@/lib/logger';
 
 export const useModuleSession = () => {
   const [state, setState] = useState<ModuleState>('content');
@@ -76,7 +77,7 @@ export const useModuleSession = () => {
         reward: generateReward(context)
       };
     } catch (error) {
-      console.error('Session end error:', error);
+      logger.error('Session end error', error as Error, 'SYSTEM');
       setIsActive(false);
       
       return {

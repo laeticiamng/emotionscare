@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { useCallback } from 'react';
 import { useOnboardingStore, ProfileDraft, GoalsDraft, SensorsDraft, ModuleSuggestion } from '@/store/onboarding.store';
+import { logger } from '@/lib/logger';
 
 export const useOnboarding = () => {
   const store = useOnboardingStore();
@@ -151,7 +152,7 @@ export const useOnboarding = () => {
               body: JSON.stringify({ subscription }),
             });
           } catch (pushError) {
-            console.warn('Push subscription failed:', pushError);
+            logger.warn('Push subscription failed', { pushError }, 'SYSTEM');
           }
         }
 

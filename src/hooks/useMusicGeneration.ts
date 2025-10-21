@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 
 export interface GeneratedTrack {
   id: string;
@@ -30,7 +31,7 @@ export const useMusicGeneration = () => {
     setError(null);
     
     try {
-      console.log('🎵 Génération de musique EmotionsCare:', { emotion, customPrompt, mood, intensity });
+      logger.info('Génération de musique EmotionsCare', { emotion, customPrompt, mood, intensity }, 'MUSIC');
       
       const { data, error: functionError } = await supabase.functions.invoke('suno-music-generation', {
         body: {
@@ -43,7 +44,7 @@ export const useMusicGeneration = () => {
       });
 
       if (functionError) {
-        console.error('❌ Erreur de la fonction:', functionError);
+        logger.error('Erreur de la fonction', functionError, 'MUSIC');
         throw new Error(functionError.message || 'Erreur lors de la génération');
       }
 
@@ -51,12 +52,12 @@ export const useMusicGeneration = () => {
         throw new Error('Aucune donnée reçue de la génération musicale');
       }
 
-      console.log('✅ Musique générée avec succès:', data);
+      logger.info('Musique générée avec succès', data, 'MUSIC');
       return data as GeneratedTrack;
 
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erreur inconnue lors de la génération musicale';
-      console.error('❌ Erreur génération musique:', errorMessage);
+      logger.error('Erreur génération musique', { errorMessage }, 'MUSIC');
       setError(errorMessage);
       return null;
     } finally {
