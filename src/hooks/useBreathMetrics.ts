@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { ApiService } from '@/services/api';
+import { logger } from '@/lib/logger';
 
 interface BreathMetrics {
   weekly_avg: number;
@@ -25,7 +26,7 @@ export const useBreathMetrics = () => {
       setMetrics(data);
     } catch (err) {
       setError('Erreur lors du chargement des métriques');
-      console.error('Breath metrics error:', err);
+      logger.error('Breath metrics error', err as Error, 'UI');
     } finally {
       setLoading(false);
     }

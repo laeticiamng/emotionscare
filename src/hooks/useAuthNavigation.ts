@@ -7,6 +7,7 @@
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCallback } from 'react';
+import { logger } from '@/lib/logger';
 
 interface NavigationOptions {
   fallback?: string;
@@ -44,7 +45,7 @@ export function useAuthNavigation() {
         if (url.origin === window.location.origin) {
           destination = redirectTo;
         } else {
-          console.warn('Tentative de redirection vers une origine externe bloquée:', redirectTo);
+          logger.warn('Tentative de redirection vers une origine externe bloquée', { redirectTo }, 'AUTH');
           destination = fallback;
         }
       } catch {
@@ -64,7 +65,7 @@ export function useAuthNavigation() {
       }
     }
 
-    console.log('Navigation après connexion vers:', destination);
+    logger.info('Navigation après connexion vers', { destination }, 'AUTH');
     navigate(destination, { replace: true });
   }, [navigate, location, isAuthenticated]);
 

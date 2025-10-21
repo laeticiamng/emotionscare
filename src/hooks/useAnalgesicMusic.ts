@@ -4,6 +4,7 @@
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSunoMusic } from '@/hooks/api/useSunoMusic';
+import { logger } from '@/lib/logger';
 
 export interface AnalgesicTrackRequest {
   text: string;
@@ -50,7 +51,7 @@ export const useAnalgesicMusic = () => {
     setError(null);
     
     try {
-      console.log('🎵 Génération track antalgique:', request);
+      logger.info('🎵 Génération track antalgique', request, 'MUSIC');
       
       const { data, error: supabaseError } = await supabase.functions.invoke('emotionscare-analgesic', {
         body: {
@@ -63,12 +64,12 @@ export const useAnalgesicMusic = () => {
         throw new Error(supabaseError.message);
       }
       
-      console.log('✅ Track antalgique généré:', data);
+      logger.info('✅ Track antalgique généré', data, 'MUSIC');
       return data;
       
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erreur de génération antalgique';
-      console.error('❌ Erreur génération antalgique:', errorMessage);
+      logger.error('❌ Erreur génération antalgique', err as Error, 'MUSIC');
       setError(errorMessage);
       return null;
     } finally {
@@ -81,7 +82,7 @@ export const useAnalgesicMusic = () => {
     setError(null);
     
     try {
-      console.log('🎵 Génération séquence thérapeutique:', request);
+      logger.info('🎵 Génération séquence thérapeutique', request, 'MUSIC');
       
       const { data, error: supabaseError } = await supabase.functions.invoke('emotionscare-analgesic', {
         body: {
@@ -94,12 +95,12 @@ export const useAnalgesicMusic = () => {
         throw new Error(supabaseError.message);
       }
       
-      console.log('✅ Séquence thérapeutique générée:', data);
+      logger.info('✅ Séquence thérapeutique générée', data, 'MUSIC');
       return data;
       
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erreur de génération séquence';
-      console.error('❌ Erreur génération séquence:', errorMessage);
+      logger.error('❌ Erreur génération séquence', err as Error, 'MUSIC');
       setError(errorMessage);
       return null;
     } finally {
@@ -122,7 +123,7 @@ export const useAnalgesicMusic = () => {
       
       return data;
     } catch (err) {
-      console.error('❌ Erreur statut track:', err);
+      logger.error('❌ Erreur statut track', err as Error, 'MUSIC');
       return null;
     }
   };
