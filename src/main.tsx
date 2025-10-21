@@ -13,28 +13,37 @@ import RootErrorBoundary from '@/components/error/RootErrorBoundary';
 import { RootProvider } from '@/providers';
 import { router } from '@/routerV2/router';
 
-// Initialiser le logger en premier
+// Initialiser les services critiques
 logger.info('Application starting', undefined, 'SYSTEM');
 
-// Imports critiques avec error handling (non bloquants)
-import('@/observability/sentry.client')
-  .then(() => logger.info('Sentry client loaded', undefined, 'SYSTEM'))
-  .catch((error) => logger.error('Failed to load Sentry', error as Error, 'SYSTEM'));
+// Import Sentry pour le monitoring (pas critique)
+try {
+  const { initSentry } = await import('@/observability/sentry.client');
+  if (initSentry) {
+    initSentry();
+  }
+  logger.info('Sentry initialized', undefined, 'SYSTEM');
+} catch (error) {
+  logger.warn('Sentry failed to initialize', error as Error, 'SYSTEM');
+}
 
-// Monitoring optionnel - ne doit pas bloquer l'app
-import('@/lib/performance')
-  .then(({ initPerformanceMonitoring }) => {
-    initPerformanceMonitoring();
-    logger.info('Performance monitoring loaded', undefined, 'SYSTEM');
-  })
-  .catch((error) => logger.warn('Performance monitoring failed to load', error as Error, 'SYSTEM'));
+// Import monitoring de performance (optionnel)
+try {
+  const { initPerformanceMonitoring } = await import('@/lib/performance');
+  initPerformanceMonitoring();
+  logger.info('Performance monitoring initialized', undefined, 'SYSTEM');
+} catch (error) {
+  logger.warn('Performance monitoring failed', error as Error, 'SYSTEM');
+}
 
-import('@/lib/monitoring')
-  .then(({ initMonitoring }) => {
-    initMonitoring();
-    logger.info('Monitoring loaded', undefined, 'SYSTEM');
-  })
-  .catch((error) => logger.warn('Monitoring failed to load', error as Error, 'SYSTEM'));
+// Import monitoring général (optionnel)
+try {
+  const { initMonitoring } = await import('@/lib/monitoring');
+  initMonitoring();
+  logger.info('Monitoring initialized', undefined, 'SYSTEM');
+} catch (error) {
+  logger.warn('Monitoring failed', error as Error, 'SYSTEM');
+}
 
 // Ajouter les métadonnées d'accessibilité essentielles
 const addAccessibilityMeta = () => {
