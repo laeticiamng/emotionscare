@@ -37,7 +37,7 @@ const AuditLogViewer: React.FC = () => {
       if (error) throw error;
       setLogs(data || []);
     } catch (error) {
-      console.error('Erreur chargement logs:', error);
+      logger.error('Erreur chargement logs', error as Error, 'SYSTEM');
     } finally {
       setLoading(false);
     }

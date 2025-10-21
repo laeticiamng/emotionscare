@@ -8,6 +8,7 @@ import {
   safeClassRemove,
   safeGetDocumentRoot
 } from '@/lib/safe-helpers';
+import { logger } from '@/lib/logger';
 
 const ThemeButton: React.FC = () => {
   const [theme, setTheme] = useState<'light' | 'dark' | 'system'>('system');
@@ -21,7 +22,7 @@ const ThemeButton: React.FC = () => {
       try {
         savedTheme = window.localStorage.getItem('theme') as 'light' | 'dark' | 'system' | null;
       } catch (error) {
-        console.warn('[ThemeButton] Failed to read theme from localStorage', error);
+        logger.warn('Failed to read theme from localStorage', error as Error, 'UI');
       }
     }
     
@@ -80,7 +81,7 @@ const ThemeButton: React.FC = () => {
         window.localStorage.setItem('theme', newTheme);
       }
     } catch (error) {
-      console.warn('[ThemeButton] Failed to persist theme', error);
+      logger.warn('Failed to persist theme', error as Error, 'UI');
     }
     applyTheme(newTheme);
     
