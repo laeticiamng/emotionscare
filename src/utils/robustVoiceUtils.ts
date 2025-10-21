@@ -2,6 +2,7 @@
 
 import { toast } from '@/hooks/use-toast';
 import { GlobalInterceptor } from './globalInterceptor';
+import { logger } from '@/lib/logger';
 
 /**
  * Utilitaires vocaux ultra-robustes avec gestion d'erreur complète
@@ -78,14 +79,14 @@ export class RobustVoiceUtils {
 
     } catch (error: any) {
       if (error.name === 'AbortError') {
-        console.error(`[Voice] ${functionName} timeout exceeded`);
+        logger.error(`[Voice] ${functionName} timeout exceeded`, error as Error, 'VR');
         toast({
           title: "Timeout vocal",
           description: "La transcription a pris trop de temps",
           variant: "destructive",
         });
       } else {
-        console.error(`[Voice] ${functionName} error:`, error);
+        logger.error(`[Voice] ${functionName} error`, error as Error, 'VR');
       }
       
       this.disableTemporarily(functionName);
@@ -130,14 +131,14 @@ export class RobustVoiceUtils {
 
     } catch (error: any) {
       if (error.name === 'AbortError') {
-        console.error(`[Voice] ${functionName} timeout exceeded`);
+        logger.error(`[Voice] ${functionName} timeout exceeded`, error as Error, 'VR');
         toast({
           title: "Timeout vocal",
           description: "La synthèse vocale a pris trop de temps",
           variant: "destructive",
         });
       } else {
-        console.error(`[Voice] ${functionName} error:`, error);
+        logger.error(`[Voice] ${functionName} error`, error as Error, 'VR');
       }
       
       this.disableTemporarily(functionName);
@@ -161,7 +162,7 @@ export class RobustVoiceUtils {
    */
   static forceEnable(functionName: string): void {
     delete this.disabledUntil[functionName];
-    console.info(`[Voice] ${functionName} forcefully enabled`);
+    logger.info(`[Voice] ${functionName} forcefully enabled`, {}, 'VR');
   }
 
   /**
