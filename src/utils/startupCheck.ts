@@ -1,35 +1,37 @@
 // @ts-nocheck
 
+import { logger } from '@/lib/logger';
+
 export const validateStartup = (): boolean => {
   try {
     // Vérifier que React est disponible
     if (typeof React === 'undefined') {
-      console.error('❌ React is not available globally');
+      logger.error('❌ React is not available globally', new Error('React not available'), 'SYSTEM');
       return false;
     }
 
     // Vérifier que les hooks React sont disponibles
     if (!React.useState || !React.useEffect) {
-      console.error('❌ React hooks are not available');
+      logger.error('❌ React hooks are not available', new Error('React hooks not available'), 'SYSTEM');
       return false;
     }
 
     // Vérifier que le DOM est prêt
     if (!document.getElementById('root')) {
-      console.error('❌ Root element not found');
+      logger.error('❌ Root element not found', new Error('Root element not found'), 'SYSTEM');
       return false;
     }
 
     // Vérifier que les modules React essentiels sont chargés
     if (typeof React.createElement !== 'function') {
-      console.error('❌ React.createElement is not available');
+      logger.error('❌ React.createElement is not available', new Error('React.createElement not available'), 'SYSTEM');
       return false;
     }
 
-    console.log('✅ Startup validation successful');
+    logger.info('✅ Startup validation successful', {}, 'SYSTEM');
     return true;
   } catch (error) {
-    console.error('❌ Startup validation failed:', error);
+    logger.error('❌ Startup validation failed', error as Error, 'SYSTEM');
     return false;
   }
 };

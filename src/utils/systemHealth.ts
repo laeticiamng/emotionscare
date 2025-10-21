@@ -1,5 +1,7 @@
 // @ts-nocheck
 
+import { logger } from '@/lib/logger';
+
 interface HealthCheck {
   name: string;
   status: 'healthy' | 'warning' | 'critical';
@@ -143,8 +145,8 @@ if (import.meta.env.PROD) {
     systemHealthMonitor.runHealthChecks().then(checks => {
       const overallStatus = systemHealthMonitor.getOverallStatus();
       if (overallStatus === 'critical') {
-        console.warn('⚠️ Problèmes critiques détectés:', checks);
+        logger.warn('⚠️ Problèmes critiques détectés', checks, 'SYSTEM');
       }
-    }).catch(console.error);
+    }).catch((error: Error) => logger.error('Health check error', error, 'SYSTEM'));
   }, 5 * 60 * 1000);
 }

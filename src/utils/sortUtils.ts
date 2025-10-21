@@ -5,6 +5,7 @@
  */
 
 import { SortDirection } from "@/components/ui/data-table/SortableTableHead";
+import { logger } from '@/lib/logger';
 
 /**
  * Sort an array of data by a specific field and direction
@@ -151,7 +152,7 @@ export function saveSortToStorage(
       localStorage.removeItem(key);
     }
   } catch (error) {
-    console.error('Error saving sort preferences to localStorage:', error);
+    logger.error('Error saving sort preferences to localStorage', error as Error, 'SYSTEM');
   }
 }
 
@@ -169,7 +170,7 @@ export function loadSortFromStorage(key: string): [string | null, SortDirection]
       return [field, direction];
     }
   } catch (error) {
-    console.error('Error loading sort preferences from localStorage:', error);
+    logger.error('Error loading sort preferences from localStorage', error as Error, 'SYSTEM');
   }
   
   return [null, null];
