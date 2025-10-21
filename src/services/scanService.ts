@@ -1,6 +1,7 @@
 // @ts-nocheck
 
 import { EmotionResult } from '@/types/emotion';
+import { logger } from '@/lib/logger';
 
 interface ScanOptions {
   type: 'voice' | 'text' | 'facial';
@@ -27,7 +28,7 @@ export const scanService = {
         feedback: generateFeedback(selectedEmotion)
       };
     } catch (error) {
-      console.error("Error processing voice emotion:", error);
+      logger.error("Error processing voice emotion", error as Error, 'SCAN');
       throw error;
     }
   },
@@ -50,7 +51,7 @@ export const scanService = {
         feedback: generateFeedback(selectedEmotion)
       };
     } catch (error) {
-      console.error("Error processing text emotion:", error);
+      logger.error("Error processing text emotion", error as Error, 'SCAN');
       throw error;
     }
   },
@@ -72,7 +73,7 @@ export const scanService = {
         feedback: generateFeedback(selectedEmotion)
       };
     } catch (error) {
-      console.error("Error processing facial emotion:", error);
+      logger.error("Error processing facial emotion", error as Error, 'SCAN');
       throw error;
     }
   },
@@ -108,7 +109,7 @@ export const scanService = {
         new Date(a.timestamp as string).getTime() - new Date(b.timestamp as string).getTime()
       );
     } catch (error) {
-      console.error("Error fetching emotional history:", error);
+      logger.error("Error fetching emotional history", error as Error, 'SCAN');
       throw error;
     }
   },
@@ -130,7 +131,7 @@ export const scanService = {
         feedback: generateFeedback(selectedEmotion)
       };
     } catch (error) {
-      console.error("Error getting current emotion:", error);
+      logger.error("Error getting current emotion", error as Error, 'SCAN');
       throw error;
     }
   }

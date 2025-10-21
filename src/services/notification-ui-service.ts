@@ -2,6 +2,7 @@
 
 import { Notification, NotificationType, NotificationPriority } from '@/types/notifications';
 import { pushNotificationService } from '@/lib/notifications/pushNotifications';
+import { logger } from '@/lib/logger';
 
 class NotificationUiService {
   private notifications: Notification[] = [];
@@ -19,7 +20,7 @@ class NotificationUiService {
         this.notifications = JSON.parse(stored);
       }
     } catch (error) {
-      console.error('Error loading notifications:', error);
+      logger.error('Error loading notifications', error as Error, 'SYSTEM');
     }
   }
 
@@ -27,7 +28,7 @@ class NotificationUiService {
     try {
       localStorage.setItem(this.storageKey, JSON.stringify(this.notifications));
     } catch (error) {
-      console.error('Error saving notifications:', error);
+      logger.error('Error saving notifications', error as Error, 'SYSTEM');
     }
   }
 
@@ -76,7 +77,7 @@ class NotificationUiService {
         requireInteraction: notification.priority === 'critical',
       });
     } catch (error) {
-      console.error('Error sending push notification:', error);
+      logger.error('Error sending push notification', error as Error, 'SYSTEM');
     }
   }
 
@@ -85,10 +86,10 @@ class NotificationUiService {
       const audio = new Audio('/sounds/notification.mp3');
       audio.volume = 0.3;
       audio.play().catch(error => {
-        console.log('Unable to play notification sound:', error);
+        logger.debug('Unable to play notification sound', error, 'UI');
       });
     } catch (error) {
-      console.log('Notification sound not available:', error);
+      logger.debug('Notification sound not available', error, 'UI');
     }
   }
 

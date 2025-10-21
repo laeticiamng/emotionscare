@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useVRBreathStore } from '@/store/vrbreath.store';
+import { logger } from '@/lib/logger';
 
 const AMBIENT_TRACKS = [
   '/sounds/ambient-calm.mp3',
@@ -31,7 +32,7 @@ export const useAmbientAudio = () => {
         // Start muted for smooth fade-in
         gainNodeRef.current.gain.setValueAtTime(0, audioContextRef.current.currentTime);
       } catch (error) {
-        console.error('Failed to initialize audio:', error);
+        logger.error('Failed to initialize audio', error as Error, 'UI');
       }
     };
 
@@ -59,7 +60,7 @@ export const useAmbientAudio = () => {
       const arrayBuffer = await response.arrayBuffer();
       return await audioContextRef.current.decodeAudioData(arrayBuffer);
     } catch (error) {
-      console.error('Failed to load audio:', error);
+      logger.error('Failed to load audio', error as Error, 'UI');
       return null;
     }
   };
