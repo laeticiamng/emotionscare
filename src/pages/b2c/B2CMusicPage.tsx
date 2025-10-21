@@ -1,5 +1,6 @@
 // @ts-nocheck
 import React, { useState, useEffect } from 'react';
+import { logger } from '@/lib/logger';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { musicService, type MusicPreset, type MusicSession } from '@/services/b2c/musicService';
@@ -17,7 +18,7 @@ const B2CMusicPage: React.FC = () => {
     loadData();
     const interval = setInterval(() => {
       // Refresh sessions every 10s to check status
-      musicService.getUserMusicSessions(20).then(setSessions).catch(console.error);
+      musicService.getUserMusicSessions(20).then(setSessions).catch((err) => logger.error('Error refreshing sessions', err as Error, 'MUSIC'));
     }, 10000);
 
     return () => clearInterval(interval);
@@ -33,7 +34,7 @@ const B2CMusicPage: React.FC = () => {
       setPresets(presetsData);
       setSessions(sessionsData);
     } catch (error) {
-      console.error('Error loading music data:', error);
+      logger.error('Error loading music data', error as Error, 'MUSIC');
       toast({
         title: 'Erreur',
         description: 'Impossible de charger les données',
@@ -58,7 +59,7 @@ const B2CMusicPage: React.FC = () => {
 
       setSessions([session, ...sessions]);
     } catch (error) {
-      console.error('Error creating session:', error);
+      logger.error('Error creating session', error as Error, 'MUSIC');
       toast({
         title: 'Erreur',
         description: 'Impossible de créer la session',

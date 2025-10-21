@@ -1,6 +1,7 @@
 // @ts-nocheck
 
 import { hasConsent } from "@/ui/CookieConsent";
+import { logger } from '@/lib/logger';
 
 interface TrackEventOptions {
   properties?: Record<string, any>;
@@ -10,7 +11,7 @@ interface TrackEventOptions {
 export const trackEvent = (eventName: string, options: TrackEventOptions = {}) => {
   if (!hasConsent("analytics")) return;
   if (process.env.NODE_ENV === 'development') {
-    console.log('📊 Analytics Event:', eventName, options);
+    logger.info('📊 Analytics Event', { eventName, ...options }, 'ANALYTICS');
   }
 
   // En production, intégrer avec votre service d'analytics

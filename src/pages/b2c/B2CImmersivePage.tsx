@@ -1,5 +1,6 @@
 // @ts-nocheck
 import React, { useState, useEffect } from 'react';
+import { logger } from '@/lib/logger';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -32,7 +33,7 @@ const B2CImmersivePage: React.FC = () => {
       const sessions = await immersiveService.getUserSessions(10);
       setHistory(sessions);
     } catch (error) {
-      console.error('Error loading history:', error);
+      logger.error('Error loading history', error as Error, 'UI');
     }
   };
 
@@ -69,7 +70,7 @@ const B2CImmersivePage: React.FC = () => {
       }, duration * 1000); // Simuler en secondes pour le démo (normalement minutes)
 
     } catch (error) {
-      console.error('Error starting session:', error);
+      logger.error('Error starting session', error as Error, 'UI');
       toast({
         title: 'Erreur',
         description: 'Impossible de démarrer la session',

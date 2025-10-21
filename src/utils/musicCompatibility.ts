@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { MusicTrack } from '@/types/music';
+import { logger } from '@/lib/logger';
 
 // Assure qu'une valeur est un tableau
 export const ensureArray = <T>(value: T | T[] | undefined | null): T[] => {
@@ -46,7 +47,7 @@ export const normalizeMusicTrack = (track: any): MusicTrack | null => {
 
     return validateMusicTrack(normalized) ? normalized : null;
   } catch (error) {
-    console.error('Erreur normalisation track:', error);
+    logger.error('Erreur normalisation track', error as Error, 'MUSIC');
     return null;
   }
 };

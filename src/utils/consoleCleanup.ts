@@ -4,6 +4,8 @@
  * Systematically removes all development console statements
  */
 
+import { logger } from '@/lib/logger';
+
 export const cleanupConsoleStatements = () => {
   if (process.env.NODE_ENV === 'production') {
     // Override all console methods except error and warn for critical issues
@@ -63,12 +65,12 @@ export const logProductionEvent = (event: string, data?: any, level: 'info' | 'w
 // Replace console.log with this in components
 export const devLog = (...args: any[]) => {
   if (process.env.NODE_ENV === 'development') {
-    console.log(...args);
+    logger.debug(String(args[0]), args.slice(1), 'SYSTEM');
   }
 };
 
 export const debugLog = (context: string, data?: any) => {
   if (process.env.NODE_ENV === 'development') {
-    console.log(`[DEBUG-${context}]`, data);
+    logger.debug(`DEBUG-${context}`, data, 'SYSTEM');
   }
 };

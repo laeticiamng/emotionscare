@@ -1,6 +1,7 @@
 // @ts-nocheck
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { logger } from '@/lib/logger';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useFeatureFlags } from '@/hooks/useFeatureFlags';
@@ -53,7 +54,7 @@ const B2CDashboardPage: React.FC = () => {
         setMoodStats(stats);
         setRecentSessions([...music, ...immersive].slice(0, 5));
       } catch (error) {
-        console.error('Error loading B2C dashboard:', error);
+        logger.error('Error loading B2C dashboard', error as Error, 'UI');
         toast({
           title: 'Erreur',
           description: 'Impossible de charger les données',

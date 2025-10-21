@@ -1,5 +1,6 @@
 // @ts-nocheck
 import React, { useState, useEffect } from 'react';
+import { logger } from '@/lib/logger';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -24,7 +25,7 @@ const B2CMoodPage: React.FC = () => {
       const moods = await moodService.getUserMoods(10);
       setRecentMoods(moods);
     } catch (error) {
-      console.error('Error loading moods:', error);
+      logger.error('Error loading moods', error as Error, 'UI');
     }
   };
 
@@ -47,7 +48,7 @@ const B2CMoodPage: React.FC = () => {
       setArousal(0);
       loadRecentMoods();
     } catch (error) {
-      console.error('Error saving mood:', error);
+      logger.error('Error saving mood', error as Error, 'UI');
       toast({
         title: 'Erreur',
         description: 'Impossible d\'enregistrer votre humeur',

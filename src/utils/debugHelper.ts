@@ -1,5 +1,7 @@
 // @ts-nocheck
 
+import { logger } from '@/lib/logger';
+
 /**
  * Utilitaire de débogage pour l'application
  * 
@@ -7,31 +9,31 @@
  */
 
 export const checkEnvironment = () => {
-  console.group('🔍 Vérification de l\'environnement');
-  console.log('NODE_ENV:', import.meta.env.NODE_ENV);
-  console.log('VITE_API_URL:', import.meta.env.VITE_API_URL || 'Non défini');
-  console.log('BASE_URL:', import.meta.env.BASE_URL);
-  console.log('Mode DEV?', import.meta.env.DEV);
-  console.log('Mode PROD?', import.meta.env.PROD);
-  console.groupEnd();
+  logger.info('🔍 Vérification de l\'environnement', {
+    NODE_ENV: import.meta.env.NODE_ENV,
+    VITE_API_URL: import.meta.env.VITE_API_URL || 'Non défini',
+    BASE_URL: import.meta.env.BASE_URL,
+    DEV: import.meta.env.DEV,
+    PROD: import.meta.env.PROD
+  }, 'SYSTEM');
 };
 
 export const checkDOMElement = (id: string) => {
   const element = document.getElementById(id);
-  console.log(`📌 Élément #${id} existe:`, !!element);
+  logger.info(`📌 Élément #${id} existe`, { exists: !!element }, 'UI');
   if (element) {
-    console.log(`📌 Contenu de #${id}:`, element.innerHTML.substring(0, 100) + '...');
+    logger.info(`📌 Contenu de #${id}`, { content: element.innerHTML.substring(0, 100) + '...' }, 'UI');
   }
 };
 
 export const logRouterState = (router: any) => {
   try {
-    console.group('🧭 État du Router');
-    console.log('Routes:', router.routes);
-    console.log('Location actuelle:', window.location.pathname);
-    console.groupEnd();
+    logger.info('🧭 État du Router', {
+      routes: router.routes,
+      location: window.location.pathname
+    }, 'SYSTEM');
   } catch (error) {
-    console.error('Erreur lors de l\'affichage de l\'état du router:', error);
+    logger.error('Erreur lors de l\'affichage de l\'état du router', error as Error, 'SYSTEM');
   }
 };
 

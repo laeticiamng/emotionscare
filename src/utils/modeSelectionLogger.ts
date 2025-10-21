@@ -1,5 +1,7 @@
 // @ts-nocheck
 
+import { logger } from '@/lib/logger';
+
 export const logModeSelection = (selectionType: string, additionalData?: any) => {
   const logData = {
     selection_type: selectionType,
@@ -8,7 +10,7 @@ export const logModeSelection = (selectionType: string, additionalData?: any) =>
     additional_data: additionalData || {}
   };
   
-  console.info('Mode selection logged:', logData);
+  logger.info('Mode selection logged', logData, 'ANALYTICS');
   
   // En production, on pourrait envoyer ça à un service d'analytics
   if (typeof window !== 'undefined' && 'localStorage' in window) {
@@ -21,7 +23,7 @@ export const logModeSelection = (selectionType: string, additionalData?: any) =>
       }
       localStorage.setItem('mode_selections', JSON.stringify(existing));
     } catch (error) {
-      console.error('Failed to log mode selection:', error);
+      logger.error('Failed to log mode selection', error as Error, 'ANALYTICS');
     }
   }
 };
