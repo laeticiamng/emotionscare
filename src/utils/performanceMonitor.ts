@@ -5,6 +5,8 @@
  * Collecte et rapporte les métriques de performance clés
  */
 
+import { logger } from '@/lib/logger';
+
 interface PerformanceMetrics {
   loadTime: number;
   firstContentfulPaint: number;
@@ -167,10 +169,10 @@ class PerformanceMonitor {
    */
   public reportMetrics(): void {
     if (import.meta.env.DEV) {
-      console.group('🔍 Performance Metrics');
-      console.table(this.metrics);
-      console.log('📊 Performance Score:', this.getPerformanceScore());
-      console.groupEnd();
+      logger.info('🔍 Performance Metrics', { 
+        metrics: this.metrics,
+        score: this.getPerformanceScore()
+      }, 'SYSTEM');
     }
   }
 
