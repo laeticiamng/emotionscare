@@ -1,5 +1,5 @@
 // @ts-nocheck
-import '@/observability/sentry.client';
+import { logger } from '@/lib/logger';
 import i18n from '@/lib/i18n';
 import React from 'react';
 import { createRoot } from 'react-dom/client';
@@ -12,8 +12,29 @@ import AccessibilitySkipLinks from '@/components/AccessibilitySkipLinks';
 import RootErrorBoundary from '@/components/error/RootErrorBoundary';
 import { RootProvider } from '@/providers';
 import { router } from '@/routerV2/router';
-import { initPerformanceMonitoring } from '@/lib/performance';
-import { initMonitoring } from '@/lib/monitoring';
+
+// Initialiser le logger en premier
+logger.info('Application starting', undefined, 'SYSTEM');
+
+// Imports critiques avec error handling (non bloquants)
+import('@/observability/sentry.client')
+  .then(() => logger.info('Sentry client loaded', undefined, 'SYSTEM'))
+  .catch((error) => logger.error('Failed to load Sentry', error as Error, 'SYSTEM'));
+
+// Monitoring optionnel - ne doit pas bloquer l'app
+import('@/lib/performance')
+  .then(({ initPerformanceMonitoring }) => {
+    initPerformanceMonitoring();
+    logger.info('Performance monitoring loaded', undefined, 'SYSTEM');
+  })
+  .catch((error) => logger.warn('Performance monitoring failed to load', error as Error, 'SYSTEM'));
+
+import('@/lib/monitoring')
+  .then(({ initMonitoring }) => {
+    initMonitoring();
+    logger.info('Monitoring loaded', undefined, 'SYSTEM');
+  })
+  .catch((error) => logger.warn('Monitoring failed to load', error as Error, 'SYSTEM'));
 
 // Ajouter les métadonnées d'accessibilité essentielles
 const addAccessibilityMeta = () => {
@@ -81,17 +102,18 @@ if (typeof document !== 'undefined') {
 if (typeof window !== 'undefined') {
   document.body.classList.add('enhanced-focus');
   enableGlobalImageOptimizations();
-  
-  // Initialize monitoring and performance tracking
-  initPerformanceMonitoring();
-  initMonitoring();
+  logger.info('Global optimizations enabled', undefined, 'SYSTEM');
 }
 
 const rootElement = document.getElementById('root');
 
 if (!rootElement) {
-  throw new Error('Application root element not found');
+  const error = new Error('Application root element not found');
+  logger.error('Fatal: Root element missing', error, 'SYSTEM');
+  throw error;
 }
+
+logger.info('Root element found, rendering app', undefined, 'SYSTEM');
 
 createRoot(rootElement).render(
   <React.StrictMode>

@@ -34,14 +34,20 @@ const disableDevTools = (): void => {
       onCommitFiberUnmount: () => {},
     };
 
-    // Remplacer console par le logger sécurisé
+    // EN PRODUCTION SEULEMENT : Remplacer console par le logger sécurisé
+    // MAIS garder console.error pour le débogage critique
     if (import.meta.env.PROD) {
       const noop = () => {};
+      const originalError = console.error;
       console.log = noop;
       console.warn = noop;
-      console.error = noop;
       console.info = noop;
       console.debug = noop;
+      // Garder console.error pour voir les erreurs critiques
+      console.error = (...args) => {
+        logger.error('Production error', args[0], 'SYSTEM');
+        originalError(...args);
+      };
     }
   }
 };

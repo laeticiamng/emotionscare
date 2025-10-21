@@ -1,15 +1,18 @@
 /**
  * HomePage - Page d'accueil accessible à tous
- * Accessible même aux utilisateurs connectés
- * Version améliorée avec fonctionnalités modernes
+ * VERSION TEST SIMPLIFIÉE pour diagnostic
  */
 
 import React from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import ModernHomePage from '@/components/modern-features/ModernHomePage';
+import { logger } from '@/lib/logger';
+
+// Utiliser la version simple pour tester
+import SimpleTestHome from './SimpleTestHome';
 
 const HomePage: React.FC = () => {
-  return <ModernHomePage />;
+  logger.info('HomePage rendering (simple test version)', undefined, 'UI');
+  
+  return <SimpleTestHome />;
 };
 
 export default HomePage;
