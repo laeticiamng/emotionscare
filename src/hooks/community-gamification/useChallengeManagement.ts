@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Challenge, Badge } from '@/types/challenge';
 import { updateChallenge, completeChallenge } from '@/lib/gamification/challenge-service';
+import { logger } from '@/lib/logger';
 
 export const useChallengeManagement = () => {
   const [isUpdating, setIsUpdating] = useState(false);
@@ -17,7 +18,7 @@ export const useChallengeManagement = () => {
       const result = await updateChallenge(challengeId, { progress });
       return result;
     } catch (error) {
-      console.error("Error updating challenge progress:", error);
+      logger.error("Error updating challenge progress", error as Error, 'UI');
       return false;
     } finally {
       setIsUpdating(false);
@@ -38,7 +39,7 @@ export const useChallengeManagement = () => {
       
       return result.success;
     } catch (error) {
-      console.error("Error completing challenge:", error);
+      logger.error("Error completing challenge", error as Error, 'UI');
       return false;
     } finally {
       setIsUpdating(false);

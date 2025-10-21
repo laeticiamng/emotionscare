@@ -22,6 +22,7 @@ export { useToast, toast } from './use-toast';
 export { useClinicalHints } from './useClinicalHints';
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { logger } from '@/lib/logger';
 
 // ==================== HOOK MOBILE OPTIMISÉ ====================
 export const useMobile = () => {
@@ -69,7 +70,7 @@ export const useLocalStorage = <T>(key: string, initialValue: T) => {
       const item = window.localStorage.getItem(key);
       return item ? JSON.parse(item) : initialValue;
     } catch (error) {
-      console.warn(`Error reading localStorage key "${key}":`, error);
+      logger.warn(`Error reading localStorage key "${key}"`, { error }, 'SYSTEM');
       return initialValue;
     }
   });
@@ -83,7 +84,7 @@ export const useLocalStorage = <T>(key: string, initialValue: T) => {
         window.localStorage.setItem(key, JSON.stringify(valueToStore));
       }
     } catch (error) {
-      console.warn(`Error setting localStorage key "${key}":`, error);
+      logger.warn(`Error setting localStorage key "${key}"`, { error }, 'SYSTEM');
     }
   }, [key, storedValue]);
 
@@ -183,7 +184,7 @@ export const usePerformanceMonitor = (componentName: string) => {
     if (import.meta.env.DEV) {
       const renderTime = Date.now() - startTime.current;
       if (renderTime > 16) { // > 1 frame at 60fps
-        console.warn(`⚡ Slow render in ${componentName}: ${renderTime}ms (render #${renderCount.current})`);
+        logger.warn(`⚡ Slow render in ${componentName}: ${renderTime}ms (render #${renderCount.current})`, {}, 'SYSTEM');
       }
     }
     
@@ -195,7 +196,7 @@ export const usePerformanceMonitor = (componentName: string) => {
     logSlowRender: (threshold = 16) => {
       const renderTime = Date.now() - startTime.current;
       if (renderTime > threshold) {
-        console.warn(`⚡ Slow render detected: ${renderTime}ms`);
+        logger.warn(`⚡ Slow render detected: ${renderTime}ms`, {}, 'SYSTEM');
       }
     }
   };

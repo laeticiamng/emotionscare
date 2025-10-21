@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useMemo, useCallback, MutableRefObject } from 'react';
 import { toast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 
 export interface AudioTrack {
   id: string;
@@ -79,7 +80,7 @@ const useAudio = (): UseAudioReturn => {
         description: "Impossible de charger l'audio",
         variant: "destructive",
       });
-      console.error("Audio error:", e);
+      logger.error("Audio error", e as Error, 'MUSIC');
     };
     
     audio.addEventListener("timeupdate", handleTimeUpdate);
@@ -106,7 +107,7 @@ const useAudio = (): UseAudioReturn => {
           setIsPlaying(true);
         })
         .catch(err => {
-          console.error("Play error:", err);
+          logger.error("Play error", err as Error, 'MUSIC');
         });
     }
   }, [currentTrack]);
@@ -160,7 +161,7 @@ const useAudio = (): UseAudioReturn => {
           setIsPlaying(true);
         })
         .catch(err => {
-          console.error("Error playing track:", err);
+          logger.error("Error playing track", err as Error, 'MUSIC');
           setLoading(false);
         });
     }

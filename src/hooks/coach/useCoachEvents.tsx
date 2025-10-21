@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 
 export interface CoachEvent {
   id: string;
@@ -22,7 +23,7 @@ export function useCoachEvents() {
       // Mock implementation for now
       setEvents([]);
     } catch (error) {
-      console.error('Error fetching coach events:', error);
+      logger.error('Error fetching coach events', error as Error, 'UI');
     } finally {
       setIsLoading(false);
     }
@@ -42,7 +43,7 @@ export function useCoachEvents() {
       setEvents(prev => [...prev, newEvent]);
       return newEvent;
     } catch (error) {
-      console.error('Error adding coach event:', error);
+      logger.error('Error adding coach event', error as Error, 'UI');
       throw error;
     }
   }, []);
