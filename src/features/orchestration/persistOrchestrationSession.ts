@@ -2,6 +2,7 @@
 import * as Sentry from '@sentry/react';
 
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 
 export type OrchestrationModule = 'community' | 'social_cocon';
 export type OrchestrationMetadata = Record<string, string | undefined>;
@@ -38,7 +39,7 @@ export async function persistOrchestrationSession(
     data: { module, ...sanitized },
   });
 
-  console.info('[orchestration] persist', { module, metadata: sanitized });
+  logger.info('[orchestration] persist', { module, metadata: sanitized }, 'SYSTEM');
 
   try {
     const { error } = await supabase

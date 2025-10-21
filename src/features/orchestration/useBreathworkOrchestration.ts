@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import * as Sentry from '@sentry/react';
 
 import { useAssessment, type UseAssessmentResult } from '@/hooks/useAssessment';
+import { logger } from '@/lib/logger';
 
 export type BreathProfile = 'calm_soft' | 'standard_soft' | 'long_exhale_focus';
 export type Mode = 'default' | 'sleep_preset';
@@ -208,7 +209,7 @@ export const useBreathworkOrchestration = (): BreathworkOrch => {
       }
       await stai.triggerAssessment('STAI6');
     } catch (error) {
-      console.error('[BreathworkOrchestration] unable to start STAI-6', error);
+      logger.error('[BreathworkOrchestration] unable to start STAI-6', error as Error, 'SYSTEM');
       Sentry.captureException(error);
     }
   }, [stai]);
@@ -221,7 +222,7 @@ export const useBreathworkOrchestration = (): BreathworkOrch => {
       }
       await isi.triggerAssessment('ISI');
     } catch (error) {
-      console.error('[BreathworkOrchestration] unable to start ISI', error);
+      logger.error('[BreathworkOrchestration] unable to start ISI', error as Error, 'SYSTEM');
       Sentry.captureException(error);
     }
   }, [isi]);

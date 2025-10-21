@@ -4,6 +4,7 @@ import * as Sentry from '@sentry/react';
 
 import { useAssessment } from '@/hooks/useAssessment';
 import { useFlags } from '@/core/flags';
+import { logger } from '@/lib/logger';
 
 export type CalmProfile = 'silent_anchor' | 'soft_guided' | 'standard';
 export type Guidance = 'none' | 'breath_long_exhale' | 'grounding_soft';
@@ -101,7 +102,7 @@ export const useStai6Orchestration = (): Stai6Orchestration => {
       await assessment.start();
       lastPhaseRef.current = 'pre';
     } catch (error) {
-      console.error('[useStai6Orchestration] unable to start pre STAI-6', error);
+      logger.error('[useStai6Orchestration] unable to start pre STAI-6', error as Error, 'SYSTEM');
     }
   }, [assessment, featureEnabled]);
 
@@ -113,7 +114,7 @@ export const useStai6Orchestration = (): Stai6Orchestration => {
       await assessment.start();
       lastPhaseRef.current = 'post';
     } catch (error) {
-      console.error('[useStai6Orchestration] unable to start post STAI-6', error);
+      logger.error('[useStai6Orchestration] unable to start post STAI-6', error as Error, 'SYSTEM');
     }
   }, [assessment, featureEnabled]);
 

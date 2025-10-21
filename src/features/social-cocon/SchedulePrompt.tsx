@@ -7,6 +7,7 @@ import * as Sentry from '@sentry/react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
+import { logger } from '@/lib/logger';
 import {
   Select,
   SelectContent,
@@ -135,7 +136,7 @@ export default function SchedulePrompt({ highlightRooms = false }: SchedulePromp
 
         setStatus('Pause planifiée, un rappel sera glissé en douceur.');
       } catch (error) {
-        console.warn('[SchedulePrompt] scheduleBreak failed', error);
+        logger.warn('[SchedulePrompt] scheduleBreak failed', error as Error, 'SYSTEM');
         Sentry.captureException(error, {
           tags: { scope: 'social_cocon', action: 'schedule_break' },
         });

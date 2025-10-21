@@ -776,7 +776,7 @@ async function fetchRecentScans(userId?: string): Promise<ScanResult[]> {
     const entries = await getEmotionScanHistory(userId, 12);
     return entries.map(mapHistoryEntryToScan);
   } catch (error) {
-    console.error('Unable to fetch emotion scans', error);
+    logger.error('Unable to fetch emotion scans', error as Error, 'SCAN');
     return [];
   }
 }

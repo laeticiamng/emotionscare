@@ -3,6 +3,7 @@ import * as Sentry from '@sentry/react';
 import { supabase } from '@/integrations/supabase/client';
 import { createSession } from '@/services/sessions/sessionsApi';
 import type { BreathProfile, Mode, Next } from '@/features/orchestration/useBreathworkOrchestration';
+import { logger } from '@/lib/logger';
 
 // Music session types and function
 interface MusicSessionMetadata {
@@ -139,7 +140,7 @@ export const persistBreathSession = async (module: 'breath', payload: PersistBre
       meta,
     });
   } catch (error) {
-    console.error('[Breath] persist session failed', error);
+    logger.error('[Breath] persist session failed', error as Error, 'SYSTEM');
     Sentry.captureException(error);
   }
 };

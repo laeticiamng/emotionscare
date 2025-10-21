@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { FocusTrap } from '@/components/ui/AccessibilityOptimized';
 import { cn } from '@/lib/utils';
+import { logger } from '@/lib/logger';
 
 interface PreCheckProps {
   visible: boolean;
@@ -45,7 +46,7 @@ export const PreCheck: FC<PreCheckProps> = ({
       await onStart();
       setDismissed(true);
     } catch (error) {
-      console.error('[PreCheck] unable to launch STAI-6 pre-check', error);
+      logger.error('[PreCheck] unable to launch STAI-6 pre-check', error as Error, 'SYSTEM');
     } finally {
       setIsStarting(false);
     }

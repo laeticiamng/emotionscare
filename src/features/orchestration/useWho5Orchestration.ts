@@ -8,6 +8,7 @@ import { useAssessment } from '@/hooks/useAssessment';
 import { useAssessmentHistory } from '@/hooks/useAssessmentHistory';
 import { useConsent } from '@/features/clinical-optin/ConsentProvider';
 import { useFlags } from '@/core/flags';
+import { logger } from '@/lib/logger';
 
 export type Who5Tone = 'very_low' | 'low' | 'neutral' | 'high' | 'very_high';
 
@@ -80,7 +81,7 @@ const readStoredSnooze = (): string | null => {
     const value = window.localStorage.getItem(SNOOZE_STORAGE_KEY);
     return value ?? null;
   } catch (error) {
-    console.warn('[who5] unable to read snooze value', error);
+    logger.warn('[who5] unable to read snooze value', error as Error, 'SYSTEM');
     return null;
   }
 };
@@ -96,7 +97,7 @@ const persistSnooze = (value: string | null) => {
     }
     window.localStorage.setItem(SNOOZE_STORAGE_KEY, value);
   } catch (error) {
-    console.warn('[who5] unable to persist snooze value', error);
+    logger.warn('[who5] unable to persist snooze value', error as Error, 'SYSTEM');
   }
 };
 
