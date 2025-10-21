@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 
 interface ParcoursRealtimeOptions {
   runId: string | null;
@@ -19,7 +20,7 @@ export const useParcoursRealtime = ({
   useEffect(() => {
     if (!runId) return;
 
-    console.log(`[realtime] 🔌 Subscribing to run ${runId}`);
+    logger.debug('[realtime] Subscribing to run', { runId }, 'MUSIC');
 
     const channel = supabase
       .channel(`parcours-run-${runId}`)
@@ -33,7 +34,7 @@ export const useParcoursRealtime = ({
         },
         (payload) => {
           const segment = payload.new as any;
-          console.log(`[realtime] 📦 Segment updated:`, segment);
+          logger.debug('[realtime] Segment updated', { segment }, 'MUSIC');
 
           // Update local state
           setLiveSegments((prev) => ({
@@ -76,7 +77,7 @@ export const useParcoursRealtime = ({
         },
         (payload) => {
           const run = payload.new as any;
-          console.log(`[realtime] 🎯 Run updated:`, run);
+          logger.debug('[realtime] Run updated', { run }, 'MUSIC');
 
           if (run.status === 'ready' && onRunComplete) {
             toast({
@@ -88,11 +89,11 @@ export const useParcoursRealtime = ({
         }
       )
       .subscribe((status) => {
-        console.log(`[realtime] Status: ${status}`);
+        logger.debug('[realtime] Status', { status }, 'MUSIC');
       });
 
     return () => {
-      console.log(`[realtime] 🔌 Unsubscribing from run ${runId}`);
+      logger.debug('[realtime] Unsubscribing from run', { runId }, 'MUSIC');
       supabase.removeChannel(channel);
     };
   }, [runId, onSegmentUpdate, onRunComplete]);

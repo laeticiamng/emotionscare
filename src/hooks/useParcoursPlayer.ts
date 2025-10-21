@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import type { ParcoursRun, ParcoursSegment, ParcoursPlayerState } from '@/types/music/parcours';
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 
 export function useParcoursPlayer(run: ParcoursRun | null, segments: ParcoursSegment[]) {
   const [playerState, setPlayerState] = useState<ParcoursPlayerState>({
@@ -76,7 +77,7 @@ export function useParcoursPlayer(run: ParcoursRun | null, segments: ParcoursSeg
           url = response.data.url;
         }
       } catch (error) {
-        console.error('Failed to sign storage URL:', error);
+        logger.error('Failed to sign storage URL', error as Error, 'MUSIC');
       }
     }
     
@@ -91,7 +92,7 @@ export function useParcoursPlayer(run: ParcoursRun | null, segments: ParcoursSeg
     }
     
     if (!url) {
-      console.warn('No audio URL for segment', index);
+      logger.warn('No audio URL for segment', { index }, 'MUSIC');
       return;
     }
 
@@ -120,7 +121,7 @@ export function useParcoursPlayer(run: ParcoursRun | null, segments: ParcoursSeg
     
     // Play and fade in
     if (playerState.isPlaying) {
-      await audio.play().catch(err => console.error('Play error:', err));
+      await audio.play().catch(err => logger.error('Play error', err as Error, 'MUSIC'));
     }
     
     for (let i = 0; i < 10; i++) {
@@ -137,7 +138,7 @@ export function useParcoursPlayer(run: ParcoursRun | null, segments: ParcoursSeg
     }
     
     audioRef.current.play().catch(err => {
-      console.error('Play error:', err);
+      logger.error('Play error', err as Error, 'MUSIC');
     });
     
     setPlayerState(prev => ({ ...prev, isPlaying: true }));

@@ -1,6 +1,7 @@
 // @ts-nocheck
 
 import { useEffect } from 'react';
+import { logger } from '@/lib/logger';
 
 interface PerformanceMetrics {
   loadTime: number;
@@ -16,11 +17,11 @@ export const usePerformanceMonitoring = (componentName: string) => {
     const observer = new PerformanceObserver((list) => {
       for (const entry of list.getEntries()) {
         if (entry.entryType === 'measure') {
-          console.log(`${componentName} performance:`, {
+          logger.debug(`${componentName} performance`, {
             name: entry.name,
             duration: entry.duration,
             startTime: entry.startTime
-          });
+          }, 'SYSTEM');
         }
       }
     });
@@ -38,7 +39,7 @@ export const usePerformanceMonitoring = (componentName: string) => {
         `${componentName}-mount-end`
       );
 
-      console.log(`${componentName} mounted in ${loadTime.toFixed(2)}ms`);
+      logger.info(`${componentName} mounted`, { loadTime: `${loadTime.toFixed(2)}ms` }, 'SYSTEM');
       observer.disconnect();
     };
   }, [componentName]);
@@ -57,14 +58,14 @@ export const logWebVitals = () => {
   // FCP - First Contentful Paint
   new PerformanceObserver((list) => {
     for (const entry of list.getEntries()) {
-      console.log('FCP:', entry.startTime);
+      logger.debug('FCP', { startTime: entry.startTime }, 'SYSTEM');
     }
   }).observe({ entryTypes: ['paint'] });
 
   // LCP - Largest Contentful Paint
   new PerformanceObserver((list) => {
     for (const entry of list.getEntries()) {
-      console.log('LCP:', entry.startTime);
+      logger.debug('LCP', { startTime: entry.startTime }, 'SYSTEM');
     }
   }).observe({ entryTypes: ['largest-contentful-paint'] });
 };

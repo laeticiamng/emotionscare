@@ -2,6 +2,7 @@
 import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { ParcoursRun, ParcoursSegment } from '@/types/music/parcours';
+import { logger } from '@/lib/logger';
 
 export function useParcoursGeneration() {
   const [isGenerating, setIsGenerating] = useState(false);
@@ -76,7 +77,7 @@ export function useParcoursGeneration() {
       throw new Error('Generation timeout - please try again');
 
     } catch (err: any) {
-      console.error('Parcours generation error:', err);
+      logger.error('Parcours generation error', err as Error, 'MUSIC');
       setError(err.message || 'Failed to generate parcours');
       setIsGenerating(false);
       return null;

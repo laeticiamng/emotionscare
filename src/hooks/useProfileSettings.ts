@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useSettingsStore, type Profile } from '@/store/settings.store';
 import { toast } from '@/hooks/use-toast';
 import { useDebounce } from 'react-use';
+import { logger } from '@/lib/logger';
 
 export const useProfileSettings = () => {
   const {
@@ -56,7 +57,7 @@ export const useProfileSettings = () => {
       applyA11y();
       
     } catch (error: any) {
-      console.error('Load profile failed:', error);
+      logger.error('Load profile failed', error as Error, 'AUTH');
       setError(error.message);
       
       // Use stored profile as fallback
@@ -121,7 +122,7 @@ export const useProfileSettings = () => {
       applyTheme();
       applyA11y();
       
-      console.error('Save profile failed:', error);
+      logger.error('Save profile failed', error as Error, 'AUTH');
       setError(error.message);
       
       toast({
