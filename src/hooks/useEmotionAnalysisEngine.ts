@@ -136,7 +136,7 @@ export const useEmotionAnalysisEngine = () => {
     setState(prev => ({ ...prev, isAnalyzing: true, error: null }));
 
     try {
-      console.log('🎤 Analyse vocale en cours...');
+      logger.info('🎤 Analyse vocale en cours...', {}, 'SCAN');
 
       const result = await emotionsCareApi.analyzeEmotion({
         data: audioData,

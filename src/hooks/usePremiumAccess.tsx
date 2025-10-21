@@ -6,6 +6,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 
 interface SubscriptionStatus {
   subscribed: boolean;
@@ -39,7 +40,7 @@ export const usePremiumAccess = () => {
       const { data, error } = await supabase.functions.invoke('check-subscription');
       
       if (error) {
-        console.warn('[Premium] Erreur vérification:', error);
+        logger.warn('[Premium] Erreur vérification', { error }, 'SYSTEM');
         setStatus({
           subscribed: false,
           loading: false,
@@ -55,7 +56,7 @@ export const usePremiumAccess = () => {
         loading: false,
       });
     } catch (err) {
-      console.warn('[Premium] Erreur:', err);
+      logger.warn('[Premium] Erreur', err as Error, 'SYSTEM');
       setStatus({
         subscribed: false,
         loading: false,

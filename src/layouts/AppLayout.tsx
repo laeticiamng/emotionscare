@@ -118,7 +118,7 @@ const AppLayout: React.FC = () => {
     try {
       await signOut();
     } catch (error) {
-      console.error('Erreur lors de la déconnexion:', error);
+      logger.error('Erreur lors de la déconnexion', error as Error, 'AUTH');
     }
   };
 

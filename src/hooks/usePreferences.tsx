@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useToast } from './use-toast';
 import type { UserPreferences } from '@/types/preferences';
+import { logger } from '@/lib/logger';
 
 export function usePreferences() {
   // Dans une app réelle, ceci viendrait de l'API ou du stockage local
@@ -40,7 +41,7 @@ export function usePreferences() {
         description: "Vos préférences ont été enregistrées avec succès"
       });
     } catch (error) {
-      console.error('Error updating preferences:', error);
+      logger.error('Error updating preferences', error as Error, 'UI');
       
       toast({
         title: "Erreur",
@@ -79,7 +80,7 @@ export function usePreferences() {
         description: "Vos préférences ont été réinitialisées aux valeurs par défaut"
       });
     } catch (error) {
-      console.error('Error resetting preferences:', error);
+      logger.error('Error resetting preferences', error as Error, 'UI');
       
       toast({
         title: "Erreur",
