@@ -28,6 +28,7 @@ import {
   Github
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { logger } from '@/lib/logger';
 
 interface LoginFormData {
   email: string;
@@ -80,7 +81,7 @@ const LoginPage: React.FC = () => {
       });
       
     } catch (error: any) {
-      console.error('Erreur de connexion:', error);
+      logger.error('Erreur de connexion', error as Error, 'AUTH');
       
       const errorMessages: Record<string, string> = {
         'Invalid login credentials': 'Email ou mot de passe incorrect',

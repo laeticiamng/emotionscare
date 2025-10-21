@@ -9,6 +9,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import PageRoot from '@/components/common/PageRoot';
+import { logger } from '@/lib/logger';
 
 interface Bubble {
   id: string;
@@ -187,7 +188,7 @@ const B2CBubbleBeatPage: React.FC = () => {
         }
       });
     } catch (error) {
-      console.error('Error starting session:', error);
+      logger.error('Error starting session', error as Error, 'SYSTEM');
     }
 
     // Timer de session
@@ -225,7 +226,7 @@ const B2CBubbleBeatPage: React.FC = () => {
         description: `Score: ${currentScore} points en ${Math.floor(sessionTime / 60)}m ${sessionTime % 60}s`
       });
     } catch (error) {
-      console.error('Error ending session:', error);
+      logger.error('Error ending session', error as Error, 'SYSTEM');
     }
 
     setBubbles([]);

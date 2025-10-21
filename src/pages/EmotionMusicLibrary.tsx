@@ -9,6 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { formatDistance } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { logger } from '@/lib/logger';
 
 interface EmotionTrack {
   id: string;
@@ -43,7 +44,7 @@ const EmotionMusicLibrary: React.FC = () => {
 
       setTracks(data || []);
     } catch (error) {
-      console.error('Error loading tracks:', error);
+      logger.error('Error loading tracks', error as Error, 'MUSIC');
       toast.error('Erreur lors du chargement de la bibliothèque');
     } finally {
       setLoading(false);
@@ -65,7 +66,7 @@ const EmotionMusicLibrary: React.FC = () => {
       setSignedUrls(prev => ({ ...prev, [taskId]: data.url }));
       return data.url;
     } catch (error) {
-      console.error('Error getting signed URL:', error);
+      logger.error('Error getting signed URL', error as Error, 'MUSIC');
       toast.error('Impossible de charger l\'audio');
       return null;
     }
@@ -91,7 +92,7 @@ const EmotionMusicLibrary: React.FC = () => {
         
         audioRef.current.addEventListener('canplay', () => {
           audioRef.current?.play().catch(err => {
-            console.error('Play error:', err);
+            logger.error('Play error', err as Error, 'MUSIC');
             toast.error('Erreur de lecture');
           });
         }, { once: true });
@@ -120,7 +121,7 @@ const EmotionMusicLibrary: React.FC = () => {
         setPlayingTrackId(null);
       }
     } catch (error) {
-      console.error('Error deleting track:', error);
+      logger.error('Error deleting track', error as Error, 'MUSIC');
       toast.error('Erreur lors de la suppression');
     }
   };

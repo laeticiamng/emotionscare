@@ -27,6 +27,7 @@ import { getOptimizedUniverse } from '@/data/universes/config';
 import { useOptimizedAnimation } from '@/hooks/useOptimizedAnimation';
 import { UnifiedMusicPlayer } from '@/components/music/UnifiedMusicPlayer';
 import type { MusicTrack } from '@/types/music';
+import { logger } from '@/lib/logger';
 
 interface VinylTrack extends MusicTrack {
   category: 'doux' | 'énergique' | 'créatif' | 'guérison';
@@ -110,7 +111,7 @@ const B2CMusicEnhanced: React.FC = () => {
   try {
     musicContext = useMusic();
   } catch (error) {
-    console.error('MusicContext not available:', error);
+    logger.error('MusicContext not available', error as Error, 'MUSIC');
     return (
       <div className="min-h-full bg-background p-8 flex items-center justify-center">
         <Card className="max-w-md">

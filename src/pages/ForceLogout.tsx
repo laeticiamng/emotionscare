@@ -1,6 +1,7 @@
 // @ts-nocheck
 import React, { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 
 export default function ForceLogout() {
   const [status, setStatus] = useState('Nettoyage en cours...');
@@ -24,7 +25,7 @@ export default function ForceLogout() {
         }, 1000);
         
       } catch (error) {
-        console.error('Erreur lors du nettoyage:', error);
+        logger.error('Erreur lors du nettoyage', error as Error, 'SYSTEM');
         setStatus('Erreur, redirection forcée...');
         setTimeout(() => {
           navigate('/login?segment=b2c', { replace: true });

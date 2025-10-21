@@ -12,6 +12,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { logger } from '@/lib/logger';
 
 interface ExportOption {
   id: string;
@@ -124,11 +125,7 @@ const ExportPage: React.FC = () => {
       return;
     }
 
-    console.log('Démarrage de l\'export:', {
-      options: selectedOptions,
-      format: selectedFormat,
-      period: selectedPeriod,
-    });
+    logger.info('Démarrage de l\'export', { options: selectedOptions, format: selectedFormat, period: selectedPeriod }, 'SYSTEM');
 
     // Ici, déclencher l'export
   };

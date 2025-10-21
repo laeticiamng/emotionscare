@@ -13,6 +13,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 
 const ContactPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -59,7 +60,7 @@ const ContactPage: React.FC = () => {
       (e.target as HTMLFormElement).reset();
       
     } catch (error) {
-      console.error('Erreur lors de l\'envoi:', error);
+      logger.error('Erreur lors de l\'envoi du formulaire', error as Error, 'SYSTEM');
       setSubmissionResult({
         success: false,
         message: 'Erreur lors de l\'envoi de votre message. Veuillez réessayer.',

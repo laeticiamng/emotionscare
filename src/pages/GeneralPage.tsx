@@ -25,6 +25,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
+import { logger } from '@/lib/logger';
 
 const settingsSchema = z.object({
   displayName: z.string().min(2, 'Le nom doit contenir au moins 2 caractères'),
@@ -66,7 +67,7 @@ const GeneralPage: React.FC = () => {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      console.log('Settings saved:', data);
+      logger.info('Settings saved', { data }, 'SYSTEM');
       setLastSaved(new Date());
       toast.success('Paramètres sauvegardés avec succès!');
     } catch (error) {

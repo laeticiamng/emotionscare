@@ -1,6 +1,7 @@
 // @ts-nocheck
 import React from 'react';
 import { AssessmentWrapper } from '@/components/assess';
+import { logger } from '@/lib/logger';
 
 const AssessmentDemo = () => {
   return (
@@ -24,7 +25,7 @@ const AssessmentDemo = () => {
             context="weekly"
             estimatedTime={2}
             onComplete={(badges) => {
-              console.log('WHO5 badges:', badges);
+              logger.info('WHO5 badges', { badges }, 'UI');
               // Ces badges influencent l'ordre des cartes et le ton
             }}
           />
@@ -37,7 +38,7 @@ const AssessmentDemo = () => {
             context="adhoc"
             estimatedTime={1}
             onComplete={(badges) => {
-              console.log('SAM badges:', badges);
+              logger.info('SAM badges', { badges }, 'UI');
               // Ces badges influencent les couleurs UI et micro-gestes
             }}
           />
@@ -50,7 +51,7 @@ const AssessmentDemo = () => {
             context="pre"
             estimatedTime={2}
             onComplete={(badges) => {
-              console.log('STAI6 badges:', badges);
+              logger.info('STAI6 badges', { badges }, 'UI');
               // Ces badges ajustent les suggestions de techniques
             }}
           />
@@ -63,7 +64,7 @@ const AssessmentDemo = () => {
             context="adhoc"
             estimatedTime={1}
             onComplete={(badges) => {
-              console.log('SUDS badges:', badges);
+              logger.info('SUDS badges', { badges }, 'UI');
               // Ces badges influencent la durée et l'intensité des exercices
             }}
           />

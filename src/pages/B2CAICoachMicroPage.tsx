@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Send, Mic, Zap, Target, Clock, TrendingUp, Sparkles } from 'lucide-react';
 import PageRoot from '@/components/common/PageRoot';
+import { logger } from '@/lib/logger';
 
 interface CoachResponse {
   id: string;
@@ -41,7 +42,7 @@ const B2CAICoachMicroPage: React.FC = () => {
       const response = await generateCoachResponse(currentQuestion);
       setResponses(prev => [...prev, response]);
     } catch (error) {
-      console.error('Erreur:', error);
+      logger.error('Erreur coach AI', error as Error, 'API');
     }
 
     setCurrentQuestion('');

@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ArrowLeft, Shield, FileText, Download, Eye, Trash2, AlertCircle, CheckCircle, Clock, Database, Key, Lock, Globe } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 
 interface DataExport {
   id: string;
@@ -81,7 +82,7 @@ const B2CDataPrivacyPage: React.FC = () => {
       ];
       setDataExports(mockExports);
     } catch (error) {
-      console.error('Erreur chargement données:', error);
+      logger.error('Erreur chargement données', error as Error, 'SYSTEM');
     }
   };
 
@@ -106,7 +107,7 @@ const B2CDataPrivacyPage: React.FC = () => {
       ];
       setDataRequests(mockRequests);
     } catch (error) {
-      console.error('Erreur chargement demandes:', error);
+      logger.error('Erreur chargement demandes', error as Error, 'SYSTEM');
     }
   };
 
@@ -178,7 +179,7 @@ const B2CDataPrivacyPage: React.FC = () => {
       });
 
     } catch (error) {
-      console.error('Erreur export:', error);
+      logger.error('Erreur export', error as Error, 'SYSTEM');
       toast({
         title: "Erreur d'export",
         description: "Impossible de créer l'export. Réessayez plus tard.",
@@ -207,7 +208,7 @@ const B2CDataPrivacyPage: React.FC = () => {
         description: "Votre demande sera traitée dans les 30 jours",
       });
     } catch (error) {
-      console.error('Erreur demande:', error);
+      logger.error('Erreur demande', error as Error, 'SYSTEM');
       toast({
         title: "Erreur de soumission",
         description: "Impossible de soumettre la demande",

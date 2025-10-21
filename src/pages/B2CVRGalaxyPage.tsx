@@ -151,7 +151,7 @@ export default function B2CVRGalaxyPage() {
       mood_delta: null,
       meta,
     }).catch((error) => {
-      console.error('[VRGalaxy] unable to persist session', error);
+      logger.error('VRGalaxy: unable to persist session', error as Error, 'VR');
     });
   }, [activeMode, lastPOMSSummary, lastSSQSummary]);
 

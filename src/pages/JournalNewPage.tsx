@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useMotionPrefs } from '@/hooks/useMotionPrefs';
 import { cn } from '@/lib/utils';
+import { logger } from '@/lib/logger';
 
 const JournalNewPage: React.FC = () => {
   const navigate = useNavigate();
@@ -57,7 +58,7 @@ const JournalNewPage: React.FC = () => {
     };
 
     // Ici, sauvegarder l'entrée dans le store/API
-    console.log('Nouvelle entrée de journal:', entry);
+    logger.info('Nouvelle entrée de journal', { entry }, 'UI');
     
     // Retour vers la page journal avec un message de succès
     navigate('/app/journal', { 

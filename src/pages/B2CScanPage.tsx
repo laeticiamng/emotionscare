@@ -13,6 +13,7 @@ import { ConsentGate } from '@/features/clinical-optin/ConsentGate';
 import { useAssessment } from '@/hooks/useAssessment';
 import { withGuard } from '@/routerV2/withGuard';
 import { AssessmentWrapper } from '@/components/assess';
+import { logger } from '@/lib/logger';
 
 const mapToSamScale = (value: number) => {
   const normalized = Math.max(0, Math.min(100, value));
@@ -201,7 +202,7 @@ const B2CScanPage: React.FC = () => {
             estimatedTime={1}
             onComplete={(badges) => {
               // badges SAM influencent les couleurs UI et micro-gestes
-              console.log('SAM badges:', badges);
+              logger.info('SAM badges', { badges }, 'UI');
             }}
             className="mb-6"
           />
