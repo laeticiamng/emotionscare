@@ -4,6 +4,7 @@
  */
 
 import * as Sentry from '@sentry/react';
+import { logger } from '@/lib/logger';
 
 type AlertSeverity = 'info' | 'warning' | 'error' | 'critical';
 
@@ -53,7 +54,7 @@ export function sendAlert(alert: Alert): void {
       },
       body: JSON.stringify(alert),
     }).catch((err) => {
-      console.warn('Failed to send alert:', err);
+      logger.warn('Failed to send alert', err as Error, 'SYSTEM');
     });
   }
 }
@@ -70,7 +71,7 @@ export function trackMetric(metric: MetricData): void {
 
   // Log in development
   if (import.meta.env.DEV) {
-    console.log(`[Metric] ${metric.name}: ${metric.value}${metric.unit || ''}`, metric.tags);
+    logger.debug(`[Metric] ${metric.name}: ${metric.value}${metric.unit || ''}`, metric.tags, 'ANALYTICS');
   }
 }
 
@@ -189,5 +190,5 @@ export function initMonitoring(): void {
     }
   }, 300000); // Every 5 minutes
 
-  console.log('[Monitoring] System initialized');
+  logger.info('[Monitoring] System initialized', {}, 'SYSTEM');
 }

@@ -3,6 +3,8 @@
  * Performance monitoring utilities for Web Vitals and bundle analysis
  */
 
+import { logger } from '@/lib/logger';
+
 type WebVitalsMetric = {
   name: string;
   value: number;
@@ -54,10 +56,10 @@ function reportWebVitals(metric: PerformanceMetric): void {
 
   // Log in development
   if (import.meta.env.DEV) {
-    console.log(`[Web Vitals] ${name}:`, {
+    logger.debug(`[Web Vitals] ${name}`, {
       value: `${Math.round(value)}ms`,
       rating,
-    });
+    }, 'ANALYTICS');
   }
 
   // Send to Supabase for custom tracking
@@ -71,7 +73,7 @@ function reportWebVitals(metric: PerformanceMetric): void {
       user_agent: navigator.userAgent,
       url: window.location.pathname,
     }).catch((err: Error) => {
-      console.warn('Failed to log performance metric:', err);
+      logger.warn('Failed to log performance metric', err, 'ANALYTICS');
     });
   }
 }
@@ -131,9 +133,9 @@ export function initPerformanceMonitoring(): void {
     });
     fcpObserver.observe({ type: 'paint', buffered: true });
 
-    console.log('[Performance] Web Vitals monitoring initialized');
+    logger.info('[Performance] Web Vitals monitoring initialized', {}, 'SYSTEM');
   } catch (error) {
-    console.warn('[Performance] Failed to initialize monitoring:', error);
+    logger.warn('[Performance] Failed to initialize monitoring', error as Error, 'SYSTEM');
   }
 }
 
@@ -147,7 +149,7 @@ export function measureRender(componentName: string): () => void {
     const duration = performance.now() - start;
     
     if (import.meta.env.DEV && duration > 16) {
-      console.warn(`[Performance] ${componentName} render took ${duration.toFixed(2)}ms (>16ms)`);
+      logger.warn(`[Performance] ${componentName} render took ${duration.toFixed(2)}ms (>16ms)`, {}, 'SYSTEM');
     }
 
     if (window.va) {

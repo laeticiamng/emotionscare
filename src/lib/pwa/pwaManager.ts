@@ -1,4 +1,6 @@
 // @ts-nocheck
+import { logger } from '@/lib/logger';
+
 interface PWAInstallPrompt {
   prompt(): Promise<void>;
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
@@ -40,7 +42,7 @@ class PWAManager {
     if ('serviceWorker' in navigator && import.meta.env.PROD) {
       try {
         const registration = await navigator.serviceWorker.register('/sw.js');
-        console.log('Service Worker enregistré:', registration);
+        logger.info('Service Worker enregistré', { registration }, 'SYSTEM');
 
         // Vérifier les mises à jour
         registration.addEventListener('updatefound', () => {
@@ -54,7 +56,7 @@ class PWAManager {
           }
         });
       } catch (error) {
-        console.error('Erreur Service Worker:', error);
+        logger.error('Erreur Service Worker', error as Error, 'SYSTEM');
       }
     }
   }
@@ -75,7 +77,7 @@ class PWAManager {
       
       return false;
     } catch (error) {
-      console.error('Erreur installation PWA:', error);
+      logger.error('Erreur installation PWA', error as Error, 'SYSTEM');
       return false;
     } finally {
       this.deferredPrompt = null;
