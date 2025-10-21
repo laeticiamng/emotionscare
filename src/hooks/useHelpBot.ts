@@ -3,6 +3,7 @@
 import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 interface ChatMessage {
   id: string;
@@ -79,7 +80,7 @@ export const useHelpBot = () => {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erreur lors de l\'envoi du message';
       setError(errorMessage);
-      console.error('Error sending message to help bot:', err);
+      logger.error('Error sending message to help bot', err as Error, 'SYSTEM');
       
       // Fallback response for development
       const fallbackResponse: HelpBotResponse = {
@@ -137,7 +138,7 @@ export const useHelpBot = () => {
 
       return data.results || [];
     } catch (err) {
-      console.error('Error searching FAQ:', err);
+      logger.error('Error searching FAQ', err as Error, 'SYSTEM');
       return [];
     }
   }, []);

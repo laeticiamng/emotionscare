@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useHelpStore, type Section, type ArticleSummary, type Article, type Feedback } from '@/store/help.store';
 import { toast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 
 export const useHelp = () => {
   const {
@@ -39,7 +40,7 @@ export const useHelp = () => {
       setSections(data.sections || []);
       
     } catch (error: any) {
-      console.error('Load sections failed:', error);
+      logger.error('Load sections failed', error as Error, 'SYSTEM');
       setError(error.message);
       
       // Fallback data for offline/error scenarios
@@ -70,7 +71,7 @@ export const useHelp = () => {
       setArticles(data.articles || []);
       
     } catch (error: any) {
-      console.error('Load articles failed:', error);
+      logger.error('Load articles failed', error as Error, 'SYSTEM');
       setError(error.message);
     } finally {
       setLoading(false);
@@ -100,7 +101,7 @@ export const useHelp = () => {
       }
       
     } catch (error: any) {
-      console.error('Load article failed:', error);
+      logger.error('Load article failed', error as Error, 'SYSTEM');
       setError(error.message);
     } finally {
       setLoading(false);
@@ -137,7 +138,7 @@ export const useHelp = () => {
       }
       
     } catch (error: any) {
-      console.error('Search failed:', error);
+      logger.error('Search failed', error as Error, 'SYSTEM');
       setError(error.message);
       
       // Fallback: show empty results rather than crash
@@ -175,7 +176,7 @@ export const useHelp = () => {
       return true;
 
     } catch (error: any) {
-      console.error('Send feedback failed:', error);
+      logger.error('Send feedback failed', error as Error, 'SYSTEM');
       
       toast({
         title: "Erreur",

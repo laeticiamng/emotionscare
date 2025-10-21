@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
+import { logger } from '@/lib/logger';
 
 const FAVORITES_STORAGE_KEY = 'journal-favorites';
 
@@ -21,7 +22,7 @@ export function useJournalFavorites() {
     try {
       localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(Array.from(favorites)));
     } catch (error) {
-      console.error('Failed to save favorites:', error);
+      logger.error('Failed to save favorites', error as Error, 'UI');
     }
   }, [favorites]);
 

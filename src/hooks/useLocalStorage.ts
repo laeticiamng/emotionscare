@@ -1,6 +1,7 @@
 // @ts-nocheck
 
 import { useState, useEffect } from 'react';
+import { logger } from '@/lib/logger';
 
 export function useLocalStorage<T>(key: string, initialValue: T) {
   // State pour stocker notre valeur
@@ -12,7 +13,7 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
       return item ? JSON.parse(item) : initialValue;
     } catch (error) {
       // Si erreur, retourner la valeur initiale
-      console.log(error);
+      logger.debug('LocalStorage error', { error }, 'SYSTEM');
       return initialValue;
     }
   });
@@ -28,7 +29,7 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
       window.localStorage.setItem(key, JSON.stringify(valueToStore));
     } catch (error) {
       // Une implémentation plus robuste pourrait gérer l'erreur de manière plus nuancée
-      console.log(error);
+      logger.debug('LocalStorage error', { error }, 'SYSTEM');
     }
   };
 

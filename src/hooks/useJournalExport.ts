@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
 import type { SanitizedNote } from '@/modules/journal/types';
+import { logger } from '@/lib/logger';
 
 interface ExportOptions {
   filename: string;
@@ -27,7 +28,7 @@ export const useJournalExport = () => {
       toast.success('Export PDF réussi');
     } catch (error) {
       toast.error('Erreur lors de l\'export PDF');
-      console.error('Export PDF error:', error);
+      logger.error('Export PDF error', error as Error, 'UI');
     } finally {
       setIsExporting(false);
     }
@@ -43,7 +44,7 @@ export const useJournalExport = () => {
       toast.success('Export Markdown réussi');
     } catch (error) {
       toast.error('Erreur lors de l\'export Markdown');
-      console.error('Export Markdown error:', error);
+      logger.error('Export Markdown error', error as Error, 'UI');
     } finally {
       setIsExporting(false);
     }
@@ -59,7 +60,7 @@ export const useJournalExport = () => {
       toast.success('Export JSON réussi');
     } catch (error) {
       toast.error('Erreur lors de l\'export JSON');
-      console.error('Export JSON error:', error);
+      logger.error('Export JSON error', error as Error, 'UI');
     } finally {
       setIsExporting(false);
     }
