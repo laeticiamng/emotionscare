@@ -1,4 +1,5 @@
 // @ts-nocheck
+// BACKUP DU FICHIER MAIN.TSX ORIGINAL
 import { logger } from '@/lib/logger';
 import i18n from '@/lib/i18n';
 import React from 'react';
