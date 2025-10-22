@@ -2,6 +2,7 @@
 import { useCallback } from 'react';
 import { useOnboardingStore, ProfileDraft, GoalsDraft, SensorsDraft, ModuleSuggestion } from '@/store/onboarding.store';
 import { logger } from '@/lib/logger';
+import { supabase } from '@/integrations/supabase/client';
 
 export const useOnboarding = () => {
   const store = useOnboardingStore();
@@ -42,15 +43,18 @@ export const useOnboarding = () => {
     store.setProfileDraft(profile);
     
     try {
-      const response = await fetch('/api/me/profile', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(profile),
-      });
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('User not authenticated');
 
-      if (!response.ok) {
-        throw new Error('Failed to save profile');
-      }
+      const { error } = await supabase
+        .from('profiles')
+        .upsert({
+          id: user.id,
+          ...profile,
+          updated_at: new Date().toISOString(),
+        });
+
+      if (error) throw error;
 
       // Analytics
       if (typeof window !== 'undefined' && window.gtag) {
@@ -60,6 +64,7 @@ export const useOnboarding = () => {
       return true;
     } catch (error) {
       // Keep draft but show error
+      logger.error('Save profile failed', error as Error, 'AUTH');
       store.setError(error instanceof Error ? error.message : 'Erreur de sauvegarde');
       return false;
     }
@@ -100,15 +105,18 @@ export const useOnboarding = () => {
     store.setSensorsDraft(sensors);
     
     try {
-      const response = await fetch('/api/me/privacy_prefs', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(sensors),
-      });
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('User not authenticated');
 
-      if (!response.ok) {
-        throw new Error('Failed to save sensors');
-      }
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          privacy_preferences: sensors,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', user.id);
+
+      if (error) throw error;
 
       // Analytics
       if (typeof window !== 'undefined' && window.gtag) {
@@ -119,6 +127,7 @@ export const useOnboarding = () => {
 
       return true;
     } catch (error) {
+      logger.error('Save sensors failed', error as Error, 'AUTH');
       store.setError(error instanceof Error ? error.message : 'Erreur de sauvegarde');
       return false;
     }

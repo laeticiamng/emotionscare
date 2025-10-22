@@ -6,14 +6,9 @@ import { logger } from '@/lib/logger';
  */
 
 export const initProductionSecurity = async (): Promise<void> => {
-  // DÉSACTIVÉ: Cause des conflits CSP HTTP 412
-  // Sera réactivé une fois le CSP correctement configuré
   if (import.meta.env.PROD) {
     // Désactiver les DevTools en production
     disableDevTools();
-    
-    // NE PAS appliquer les en-têtes de sécurité (conflit avec index.html)
-    // applySecurityHeaders();
     
     // Nettoyer les variables sensibles
     cleanSensitiveData();
@@ -21,7 +16,7 @@ export const initProductionSecurity = async (): Promise<void> => {
     // Initialiser le monitoring de sécurité
     initSecurityMonitoring();
     
-    logger.info('Production security initialized (CSP disabled)', undefined, 'SYSTEM');
+    logger.info('Production security initialized', undefined, 'SYSTEM');
   }
 };
 

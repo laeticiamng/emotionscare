@@ -7,14 +7,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>EmotionsCare | ResiMax™</title>
     <meta name="description" content="Plateforme de bien-être émotionnel en entreprise" />
-    <!-- CSP temporairement désactivé pour permettre le chargement de l'app en développement -->
-    <!-- TODO: Réactiver avec 'unsafe-inline' pour script-src en développement uniquement -->
-    <!--
-    <meta
-      http-equiv="Content-Security-Policy"
-      content="default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; img-src 'self' data: blob:; font-src 'self' https://rsms.me https://fonts.gstatic.com data:; style-src 'self' 'unsafe-inline' https://rsms.me https://fonts.googleapis.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.gpteng.co; connect-src 'self' https://*.supabase.co https://*.supabase.in https://api.emotionscare.com https://api.openai.com https://cdn.gpteng.co https://api.hume.ai https://*.sentry.io https://*.ingest.sentry.io wss://*.supabase.co wss://*.supabase.in; media-src 'self' blob: https://*.supabase.co https://storage.googleapis.com; frame-src 'self'; worker-src 'self' blob:; manifest-src 'self'; object-src 'none'"
-    />
-    -->
+    <!-- Security Headers - CSP Enabled -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.gpteng.co https://www.googletagmanager.com https://unpkg.com; style-src 'self' 'unsafe-inline' https://rsms.me https://fonts.googleapis.com; font-src 'self' https://rsms.me https://fonts.gstatic.com data:; img-src 'self' data: blob: https: https://images.unsplash.com https://cdn.gpteng.co; media-src 'self' blob: data: https://*.supabase.co; connect-src 'self' https://api.openai.com https://*.supabase.co https://api.hume.ai wss://*.supabase.co https://*.sentry.io; frame-src 'self' https://www.youtube.com https://player.vimeo.com; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
     <meta name="referrer" content="strict-origin-when-cross-origin" />
 
     <!-- PWA Manifest -->

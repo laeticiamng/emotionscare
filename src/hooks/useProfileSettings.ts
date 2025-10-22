@@ -4,6 +4,7 @@ import { useSettingsStore, type Profile } from '@/store/settings.store';
 import { toast } from '@/hooks/use-toast';
 import { useDebounce } from 'react-use';
 import { logger } from '@/lib/logger';
+import { supabase } from '@/integrations/supabase/client';
 
 export const useProfileSettings = () => {
   const {
@@ -43,14 +44,30 @@ export const useProfileSettings = () => {
     setError(null);
 
     try {
-      const response = await fetch('/api/me/profile');
+      const { data: { user } } = await supabase.auth.getUser();
       
-      if (!response.ok) {
-        throw new Error('Failed to load profile');
+      if (!user) {
+        // No user logged in, use default settings
+        applyTheme();
+        applyA11y();
+        setInitialized(true);
+        setLoading(false);
+        return;
       }
 
-      const data = await response.json();
-      setProfile(data);
+      const { data, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+      if (profileError && profileError.code !== 'PGRST116') {
+        throw profileError;
+      }
+
+      if (data) {
+        setProfile(data);
+      }
       
       // Apply settings immediately
       applyTheme();
@@ -80,18 +97,21 @@ export const useProfileSettings = () => {
     const originalProfile = { ...profile };
 
     try {
-      const response = await fetch('/api/me/profile', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(changes)
-      });
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('User not authenticated');
 
-      if (!response.ok) {
-        throw new Error('Failed to save profile');
-      }
+      const { error } = await supabase
+        .from('profiles')
+        .upsert({
+          id: user.id,
+          ...changes,
+          updated_at: new Date().toISOString(),
+        });
 
-      const updatedProfile = await response.json();
-      setProfile(updatedProfile);
+      if (error) throw error;
+
+      // Update local state
+      setProfile({ ...profile, ...changes });
 
       // Analytics
       if (typeof window !== 'undefined' && window.gtag) {
