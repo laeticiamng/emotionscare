@@ -44,19 +44,9 @@ export function sendAlert(alert: Alert): void {
     });
   }
 
-  // Send to custom monitoring endpoint
-  if (typeof window !== 'undefined') {
-    fetch('https://yaincoxihiqdksxgrsrk.supabase.co/functions/v1/monitoring-alerts', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhaW5jb3hpaGlxZGtzeGdyc3JrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI4MTE4MjcsImV4cCI6MjA1ODM4NzgyN30.HBfwymB2F9VBvb3uyeTtHBMZFZYXzL0wQmS5fqd65yU',
-      },
-      body: JSON.stringify(alert),
-    }).catch((err) => {
-      logger.warn('Failed to send alert', err as Error, 'SYSTEM');
-    });
-  }
+  // Edge function désactivée temporairement (fonction inexistante)
+  // TODO: Créer l'edge function monitoring-alerts si nécessaire
+  // Pour l'instant, les alertes sont loggées localement et envoyées à Sentry uniquement
 }
 
 /**
