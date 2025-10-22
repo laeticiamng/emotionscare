@@ -160,6 +160,10 @@ const FlashGlowUltraPage = lazy(() => import('@/modules/flash-glow-ultra/FlashGl
 // Pages DEV uniquement
 const ComprehensiveSystemAuditPage = lazy(() => import('@/pages/ComprehensiveSystemAuditPage'));
 const ErrorBoundaryTestPage = lazy(() => import('@/pages/dev/ErrorBoundaryTestPage'));
+const TestAccountsPage = lazy(() => import('@/pages/dev/TestAccountsPage'));
+
+// Analytics & Weekly Bars
+const B2CWeeklyBarsPage = lazy(() => import('@/pages/B2CWeeklyBarsPage'));
 
 // Pages système unifiées
 const UnauthorizedPage = lazy(() => import('@/pages/errors/401/page'));
@@ -331,6 +335,10 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   // Dev-only pages
   ComprehensiveSystemAuditPage,
   ErrorBoundaryTestPage,
+  TestAccountsPage,
+  
+  // Analytics & Weekly Bars
+  B2CWeeklyBarsPage,
   
   // Composants de redirection
   RedirectToScan,
