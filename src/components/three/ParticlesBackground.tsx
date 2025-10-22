@@ -2,7 +2,7 @@
 
 import React, { useRef, useEffect } from 'react';
 import * as THREE from 'three';
-import { useTheme } from '@/components/theme-provider';
+import { useTheme } from '@/providers/theme';
 
 interface ParticlesBackgroundProps {
   count?: number;

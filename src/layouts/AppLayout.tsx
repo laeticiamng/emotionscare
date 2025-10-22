@@ -5,7 +5,7 @@ import { Outlet, Navigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { routes } from '@/routerV2';
 import { useAuth } from '@/contexts/AuthContext';
-import { useTheme } from '@/components/theme-provider';
+import { useTheme } from '@/providers/theme';
 import {
   Loader2,
   Menu,

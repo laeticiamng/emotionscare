@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { Mic, MicOff, Music, Volume2, VolumeX } from 'lucide-react';
-import { useTheme } from '@/components/theme-provider';
+import { useTheme } from '@/providers/theme';
 import '@/styles/immersive-home.css';
 import { VoiceCommandButton } from './voice/VoiceCommandButton';
 import { useToast } from '@/hooks/use-toast';

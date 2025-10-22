@@ -8,7 +8,7 @@ import { Slider } from '@/components/ui/slider';
 import { useOrchestration } from '@/contexts/OrchestrationContext';
 import { Clock, Play, Sun, Moon } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { useTheme } from '@/components/theme-provider';
+import { useTheme } from '@/providers/theme';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Progress } from '@/components/ui/progress';

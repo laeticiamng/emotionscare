@@ -5,7 +5,7 @@
 import React from 'react';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
-import { useTheme } from '@/components/theme-provider';
+import { useTheme } from '@/providers/theme';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Moon, Sun, Monitor, PenTool } from 'lucide-react';
 import { FontSize, FontFamily, ThemeName } from '@/types/theme';
