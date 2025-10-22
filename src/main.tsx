@@ -1,27 +1,30 @@
-import React from 'react';
+import React, { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import { RouterProvider } from 'react-router-dom';
+import { router } from '@/routerV2';
+import { RootProvider } from '@/providers';
+import { logger } from '@/lib/logger';
+import '@/index.css';
 
-console.log('🚀 MAIN.TSX LOADED');
+// Configuration des logs
+logger.info('🚀 EmotionsCare Platform Loading...', undefined, 'SYSTEM');
 
-const App = () => (
-  <div style={{
-    minHeight: '100vh',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    background: '#667eea',
-    color: 'white',
-    fontFamily: 'system-ui',
-    fontSize: '32px',
-    fontWeight: 'bold'
-  }}>
-    ✅ REACT WORKS - EmotionsCare Loading...
-  </div>
+const rootElement = document.getElementById('root');
+
+if (!rootElement) {
+  const error = 'Root element not found';
+  logger.error(error, new Error(error), 'SYSTEM');
+  throw new Error(error);
+}
+
+logger.debug('✅ Root element found', undefined, 'SYSTEM');
+
+createRoot(rootElement).render(
+  <StrictMode>
+    <RootProvider>
+      <RouterProvider router={router} />
+    </RootProvider>
+  </StrictMode>
 );
 
-const root = document.getElementById('root');
-if (!root) throw new Error('No root');
-
-console.log('✅ ROOT FOUND');
-createRoot(root).render(<App />);
-console.log('✅ REACT RENDERED');
+logger.info('✅ Application rendered successfully', undefined, 'SYSTEM');

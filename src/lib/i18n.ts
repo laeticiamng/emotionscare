@@ -1,43 +1,44 @@
 // @ts-nocheck
-import React from 'react';
-import type { AppLocale } from '@/providers/i18n/resources';
-import { ensureI18n } from '@/providers/i18n/client';
+import i18n from 'i18next';
+import { initReactI18next } from 'react-i18next';
+import { resources, namespaces } from '@/providers/i18n/resources';
+import { logger } from '@/lib/logger';
 
-const FALLBACK_LANGUAGE: AppLocale = 'fr';
+// Initialize i18n immediately and synchronously
+let initialized = false;
 
-// Lazy initialization to avoid blocking module load
-let i18nInstance: ReturnType<typeof ensureI18n> | null = null;
+function initializeI18n() {
+  if (initialized) return i18n;
+  
+  const locale = typeof window !== 'undefined' 
+    ? (localStorage.getItem('lang') as 'fr' | 'en' || 'fr')
+    : 'fr';
 
-const getInstance = () => {
-  if (!i18nInstance) {
-    const isBrowser = typeof window !== 'undefined';
-    let initialLang: AppLocale = FALLBACK_LANGUAGE;
-    
-    if (isBrowser) {
-      try {
-        const stored = window.localStorage.getItem('lang');
-        if (stored === 'fr' || stored === 'en') {
-          initialLang = stored;
-        }
-      } catch {
-        // Silently ignore localStorage errors
-      }
-    }
-    
-    i18nInstance = ensureI18n(initialLang);
-  }
-  return i18nInstance;
-};
+  i18n
+    .use(initReactI18next)
+    .init({
+      resources,
+      ns: namespaces,
+      defaultNS: 'common',
+      fallbackNS: ['common'],
+      lng: locale,
+      fallbackLng: 'fr',
+      supportedLngs: ['fr', 'en'],
+      load: 'languageOnly',
+      debug: false,
+      interpolation: { escapeValue: false },
+      react: { useSuspense: false },
+      returnNull: false,
+    })
+    .catch((error) => {
+      logger.error('i18n initialization failed', error, 'SYSTEM');
+    });
 
-// Export a proxy that lazily initializes i18n
-const i18nProxy = new Proxy({} as ReturnType<typeof ensureI18n>, {
-  get(_target, prop) {
-    return getInstance()[prop as keyof ReturnType<typeof ensureI18n>];
-  }
-});
+  initialized = true;
+  return i18n;
+}
 
-export default i18nProxy;
+// Initialize immediately
+const i18nInstance = initializeI18n();
 
-// Export named exports for compatibility
-export const t = (key: string, options?: any) => getInstance().t(key, options);
-export const I18nProvider = ({ children }: { children: React.ReactNode }) => children;
+export default i18nInstance;

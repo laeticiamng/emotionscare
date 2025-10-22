@@ -8,7 +8,7 @@ import {
   Zap, Moon, Sun, Palette, Move, RotateCcw
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useTheme } from '@/components/theme-provider';
+import { useTheme } from '@/providers/theme';
 import {
   safeClassAdd,
   safeClassRemove,

@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Menu, Search } from 'lucide-react';
-import { useTheme } from '@/components/theme-provider';
+import { useTheme } from '@/providers/theme';
 import ThemeSwitcher from '@/components/ui/ThemeSwitcher';
 import NotificationBell from '@/components/notifications/NotificationBell';
 

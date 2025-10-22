@@ -1,6 +1,6 @@
 import React from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { useTheme } from '@/components/theme-provider';
+import { useTheme } from '@/providers/theme';
 
 export interface MoodData {
   date: string;
