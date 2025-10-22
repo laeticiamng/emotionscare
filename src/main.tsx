@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { logger } from '@/lib/logger';
 import i18n from '@/lib/i18n';
 import React from 'react';
@@ -11,7 +10,7 @@ import { Loader2 } from 'lucide-react';
 import AccessibilitySkipLinks from '@/components/AccessibilitySkipLinks';
 import RootErrorBoundary from '@/components/error/RootErrorBoundary';
 import { RootProvider } from '@/providers';
-import { router } from '@/routerV2/router';
+import { router } from './routerV2/router';
 
 // Initialiser les services critiques
 logger.info('Application starting', undefined, 'SYSTEM');
@@ -20,10 +19,7 @@ logger.info('Application starting', undefined, 'SYSTEM');
 const initServices = async () => {
   // Import Sentry pour le monitoring (pas critique)
   try {
-    const { initSentry } = await import('@/observability/sentry.client');
-    if (initSentry) {
-      initSentry();
-    }
+    await import('@/observability/sentry.client');
     logger.info('Sentry initialized', undefined, 'SYSTEM');
   } catch (error) {
     logger.warn('Sentry failed to initialize', error as Error, 'SYSTEM');
