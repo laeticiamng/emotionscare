@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { useSimpleAuth } from '@/contexts/SimpleAuth';
+import { useAuth } from '@/contexts/AuthContext';
 import { 
   FeatureFlags, 
   FeatureFlagKey, 
@@ -9,7 +9,8 @@ import {
 } from '@/core/flags';
 
 export const useFeatureFlags = () => {
-  const { user, role } = useSimpleAuth();
+  const { user } = useAuth();
+  const role = user?.user_metadata?.role || user?.app_metadata?.role;
 
   const flags = useMemo<FeatureFlags>(() => {
     if (!user || !role) {

@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useSimpleAuth } from '@/contexts/SimpleAuth';
+import { useAuth } from '@/contexts/AuthContext';
 import { logger } from '@/lib/logger';
 
 export type AppRole = 'b2c_user' | 'b2b_employee' | 'b2b_rh' | 'admin';
@@ -15,7 +15,7 @@ export interface UserRoleData {
 }
 
 export const useUserRole = () => {
-  const { user, isAuthenticated } = useSimpleAuth();
+  const { user, isAuthenticated } = useAuth();
   const [roles, setRoles] = useState<UserRoleData[]>([]);
   const [primaryRole, setPrimaryRole] = useState<AppRole | null>(null);
   const [loading, setLoading] = useState(true);

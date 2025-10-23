@@ -6,7 +6,7 @@ import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { routes } from '@/routerV2';
 import { toast } from '@/hooks/use-toast';
-import { useSimpleAuth } from '@/contexts/SimpleAuth';
+import { useAuth as useAuthContext } from '@/contexts/AuthContext';
 import { logger } from '@/lib/logger';
 
 interface LoginData {
@@ -34,7 +34,7 @@ interface SignupData {
 export const useAuthFlow = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { signIn: authSignIn, signOut: authSignOut } = useSimpleAuth();
+  const { signIn: authSignIn, signOut: authSignOut } = useAuthContext();
 
   const login = useCallback(async (data: LoginData) => {
     setIsLoading(true);

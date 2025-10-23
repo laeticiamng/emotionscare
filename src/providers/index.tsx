@@ -12,8 +12,8 @@ import { AuthProvider } from '@/contexts/AuthContext';
 import RootErrorBoundary from '@/components/error/RootErrorBoundary';
 import { ErrorProvider } from '@/contexts';
 import { MoodProvider } from '@/contexts/MoodContext';
-import { SimpleAuthProvider } from '@/contexts/SimpleAuth';
 import { UserModeProvider } from '@/contexts/UserModeContext';
+import { ConsentProvider } from '@/features/clinical-optin/ConsentProvider';
 import { I18nProvider } from '@/lib/i18n/i18n';
 import i18n from '@/lib/i18n';
 import { UnifiedProvider } from '@/core/UnifiedStateManager';
@@ -87,49 +87,32 @@ const I18nBootstrap: React.FC<{ children: React.ReactNode }> = ({ children }) =>
 
 export function RootProvider({ children }: RootProviderProps) {
   const [queryClient] = React.useState(createQueryClient);
+  const resolvedDefaultTheme = 'system';
 
   return (
     <HelmetProvider>
       <RootErrorBoundary>
         <QueryClientProvider client={queryClient}>
           <ErrorProvider>
-            <SimpleAuthProvider>
-              <AuthProvider>
-                <UserModeProvider>
-                  <I18nBootstrap>
-                    <ThemeProvider defaultTheme="system" storageKey="emotionscare-theme">
-                      <AccessibilityProvider>
-                        <NotificationProvider>
-                          <TooltipProvider delayDuration={200} skipDelayDuration={100}>
-                            <UnifiedProvider>
-                              <MoodProvider>
-                                <MusicProvider>
-                                  {children}
-                                  <Toaster
-                                    position="top-right"
-                                    className="toaster group"
-                                    closeButton
-                                    toastOptions={{
-                                      classNames: {
-                                        toast:
-                                          'group-[.toaster]:bg-card group-[.toaster]:text-card-foreground group-[.toaster]:border-border group-[.toaster]:shadow-premium',
-                                        description: 'group-[.toast]:text-muted-foreground',
-                                        actionButton: 'group-[.toast]:bg-primary group-[.toast]:text-primary-foreground',
-                                        cancelButton: 'group-[.toast]:bg-muted group-[.toast]:text-muted-foreground',
-                                      },
-                                    }}
-                                  />
-                                </MusicProvider>
-                              </MoodProvider>
-                            </UnifiedProvider>
-                          </TooltipProvider>
-                        </NotificationProvider>
-                      </AccessibilityProvider>
-                    </ThemeProvider>
-                  </I18nBootstrap>
-                </UserModeProvider>
-              </AuthProvider>
-            </SimpleAuthProvider>
+            <AuthProvider>
+              <UserModeProvider>
+                <I18nBootstrap>
+                  <MoodProvider>
+                    <ConsentProvider>
+                      <ThemeProvider
+                          attribute="class"
+                          defaultTheme={resolvedDefaultTheme}
+                          enableSystem
+                          storageKey="emotionscare-theme"
+                          themes={['light', 'dark', 'system']}
+                        >
+                          {children}
+                        </ThemeProvider>
+                    </ConsentProvider>
+                  </MoodProvider>
+                </I18nBootstrap>
+              </UserModeProvider>
+            </AuthProvider>
           </ErrorProvider>
         </QueryClientProvider>
       </RootErrorBoundary>

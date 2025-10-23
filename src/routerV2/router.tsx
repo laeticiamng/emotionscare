@@ -145,14 +145,14 @@ const GeneralPage = lazy(() => import('@/pages/GeneralPage'));
 const PrivacyPage = lazy(() => import('@/pages/PrivacyPage'));
 
 // Import des nouveaux modules optimisés
-const FlashGlowPage = lazy(() => import('@/pages/modules/FlashGlowPage'));
-const JournalPage = lazy(() => import('@/pages/modules/JournalPage'));
-const ScanPage = lazy(() => import('@/pages/modules/ScanPage'));
-const CoachPage = lazy(() => import('@/pages/modules/CoachPage'));
-const MoodMixerPage = lazy(() => import('@/pages/modules/MoodMixerPage'));
+const FlashGlowPage = lazy(() => import('@/pages/flash-glow/index'));
+const JournalPage = lazy(() => import('@/pages/B2CJournalPage'));
+const ScanPage = lazy(() => import('@/pages/B2CScanPage'));
+const CoachPage = lazy(() => import('@/pages/B2CAICoachPage'));
+const MoodMixerPage = lazy(() => import('@/pages/B2CMoodMixerPage'));
 const BossGritPage = lazy(() => import('@/modules/boss-grit/BossGritPage'));
-const BubbleBeatPage = lazy(() => import('@/pages/modules/BubbleBeatPage'));
-const StorySynthPage = lazy(() => import('@/pages/modules/StorySynthPage'));
+const BubbleBeatPage = lazy(() => import('@/pages/B2CBubbleBeatPage'));
+const StorySynthPage = lazy(() => import('@/pages/B2CStorySynthLabPage'));
 const ModulesShowcasePage = lazy(() => import('@/pages/ModulesShowcasePage'));
 const EmotionScanPage = lazy(() => import('@/modules/emotion-scan/EmotionScanPage'));
 const FlashGlowUltraPage = lazy(() => import('@/modules/flash-glow-ultra/FlashGlowUltraPage'));

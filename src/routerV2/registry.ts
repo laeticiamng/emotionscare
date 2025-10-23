@@ -142,13 +142,13 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
   },
   {
     name: 'consumer-home',
-    path: '/app/home',
+    path: '/app/consumer/home',
     segment: 'consumer',
     role: 'consumer',
     layout: 'app',
-    component: 'HomePage',
+    component: 'B2CDashboardPage',
     guard: true,
-    aliases: ['/b2c/dashboard', '/dashboard'],
+    aliases: ['/app/home', '/b2c/dashboard', '/dashboard'],
   },
   {
     name: 'employee-home',
