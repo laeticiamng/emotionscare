@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/dialog';
 import { Slider } from '@/components/ui/slider';
 import { useConsent } from '@/features/clinical-optin/ConsentProvider';
-import { useAssessment } from '@/features/assess/useAssessment';
+import { useAssessment } from '@/hooks/useAssessment';
 import { computeFlashGlowActions } from '@/features/orchestration/flashGlow.orchestrator';
 import { useToast } from '@/hooks/use-toast';
 import { useMotionPrefs } from '@/hooks/useMotionPrefs';
