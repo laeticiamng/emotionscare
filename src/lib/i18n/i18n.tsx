@@ -6,7 +6,6 @@ import { I18nextProvider } from 'react-i18next';
 import type { TOptions } from 'i18next';
 
 import i18n from '@/lib/i18n';
-import { useSettingsStore } from '@/store/settings.store';
 import { logger } from '@/lib/logger';
 
 export type Lang = 'fr' | 'en';
@@ -45,17 +44,17 @@ const updateDocumentLanguage = (lang: Lang) => {
 };
 
 export function I18nProvider({ children, defaultLang = DEFAULT_LANG }: { children: React.ReactNode; defaultLang?: Lang }) {
-  const profileLanguage = useSettingsStore((state) => state.profile.language);
-  const setProfileLanguage = useSettingsStore((state) => state.setLanguage);
-
   const [lang, setLangState] = React.useState<Lang>(() => {
-    const current = (i18n.language?.slice(0, 2) as Lang | undefined) ?? defaultLang;
-    return current === 'en' ? 'en' : 'fr';
+    if (typeof window === 'undefined') {
+      return defaultLang;
+    }
+    
+    const stored = localStorage.getItem(STORAGE_KEY) as Lang | null;
+    return stored ?? defaultLang;
   });
-  const [hydrated, setHydrated] = React.useState(false);
 
   const applyLanguage = React.useCallback(
-    async (nextLang: Lang, persistToProfile: boolean) => {
+    async (nextLang: Lang) => {
       const normalized = nextLang === 'en' ? 'en' : 'fr';
 
       try {
@@ -69,15 +68,11 @@ export function I18nProvider({ children, defaultLang = DEFAULT_LANG }: { childre
           localStorage.setItem(STORAGE_KEY, normalized);
         }
         updateDocumentLanguage(normalized);
-
-        if (persistToProfile && profileLanguage !== normalized) {
-          setProfileLanguage(normalized);
-        }
       } catch (error) {
         logger.error('Unable to switch application language', error, 'i18n');
       }
     },
-    [profileLanguage, setProfileLanguage]
+    []
   );
 
   React.useEffect(() => {
@@ -86,54 +81,18 @@ export function I18nProvider({ children, defaultLang = DEFAULT_LANG }: { childre
     }
 
     const stored = localStorage.getItem(STORAGE_KEY) as Lang | null;
-    const profileSetting = profileLanguage === 'auto' ? undefined : (profileLanguage as Lang | undefined);
-    const initial = stored ?? profileSetting ?? resolveNavigatorLanguage(defaultLang);
+    const initial = stored ?? resolveNavigatorLanguage(defaultLang);
 
-    applyLanguage(initial, false).finally(() => {
-      setHydrated(true);
-    });
-  }, [applyLanguage, defaultLang, profileLanguage]);
-
-  React.useEffect(() => {
-    if (!hydrated) {
-      return;
+    if (initial !== lang) {
+      void applyLanguage(initial);
     }
-
-    const effectiveProfileLang = profileLanguage === 'auto'
-      ? resolveNavigatorLanguage(defaultLang)
-      : (profileLanguage as Lang | undefined);
-
-    if (effectiveProfileLang && effectiveProfileLang !== lang) {
-      void applyLanguage(effectiveProfileLang, false);
-    }
-  }, [applyLanguage, defaultLang, hydrated, lang, profileLanguage]);
-
-  React.useEffect(() => {
-    if (typeof window === 'undefined') {
-      return;
-    }
-
-    let cancelled = false;
-
-    const syncLanguageFromProfile = async () => {
-      // DÉSACTIVÉ: API /api/me/profile inexistante
-      // TODO: Implémenter avec Supabase directement si nécessaire
-      // Pour l'instant, utiliser le localStorage uniquement
-      return;
-    };
-
-    syncLanguageFromProfile();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [profileLanguage, setProfileLanguage]);
+  }, [applyLanguage, defaultLang, lang]);
 
   const contextValue = React.useMemo<I18nContextValue>(
     () => ({
       lang,
       setLang: (next) => {
-        void applyLanguage(next, true);
+        void applyLanguage(next);
       },
     }),
     [applyLanguage, lang]
