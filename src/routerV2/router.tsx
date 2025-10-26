@@ -164,6 +164,7 @@ const TestAccountsPage = lazy(() => import('@/pages/dev/TestAccountsPage'));
 
 // Analytics & Weekly Bars
 const B2CWeeklyBarsPage = lazy(() => import('@/pages/B2CWeeklyBarsPage'));
+const AnalyticsPage = lazy(() => import('@/pages/AnalyticsPage'));
 
 // Pages système unifiées
 const UnauthorizedPage = lazy(() => import('@/pages/errors/401/page'));
@@ -339,6 +340,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   
   // Analytics & Weekly Bars
   B2CWeeklyBarsPage,
+  AnalyticsPage,
   
   // Composants de redirection
   RedirectToScan,

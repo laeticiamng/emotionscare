@@ -659,6 +659,16 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
   // ANALYTICS & DATA (CONSUMER)
   // ═══════════════════════════════════════════════════════════
   {
+    name: 'analytics',
+    path: '/app/analytics',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app-sidebar',
+    component: 'AnalyticsPage',
+    guard: true,
+    aliases: ['/analytics'],
+  },
+  {
     name: 'leaderboard',
     path: '/app/leaderboard',
     segment: 'consumer',
