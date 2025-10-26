@@ -159,17 +159,12 @@ export const ConsentProvider: React.FC<{ children: React.ReactNode }> = ({ child
         data: { scope: CONSENT_SCOPE },
       });
 
-      const response = await fetch('/functions/v1/optin-accept', {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ scope: CONSENT_SCOPE }),
+      const { error } = await supabase.functions.invoke('optin-accept', {
+        body: { scope: CONSENT_SCOPE },
       });
 
-      if (!response.ok) {
-        throw new Error(`optin-accept failed: ${response.status}`);
+      if (error) {
+        throw error;
       }
     },
     onMutate: async () => {
@@ -191,17 +186,12 @@ export const ConsentProvider: React.FC<{ children: React.ReactNode }> = ({ child
         data: { scope: CONSENT_SCOPE },
       });
 
-      const response = await fetch('/functions/v1/optin-revoke', {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ scope: CONSENT_SCOPE }),
+      const { error } = await supabase.functions.invoke('optin-revoke', {
+        body: { scope: CONSENT_SCOPE },
       });
 
-      if (!response.ok) {
-        throw new Error(`optin-revoke failed: ${response.status}`);
+      if (error) {
+        throw error;
       }
     },
     onMutate: async () => {
