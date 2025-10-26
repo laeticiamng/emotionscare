@@ -200,6 +200,27 @@ const CoachSessionsPage = lazy(() => import('@/pages/CoachSessionsPage'));
 const ProfilePage = lazy(() => import('@/pages/ProfilePage'));
 const ParcoursXL = lazy(() => import('@/pages/ParcoursXL'));
 
+// Nouvelles pages créées
+const SessionsPage = lazy(() => import('@/pages/SessionsPage'));
+const SessionDetailPage = lazy(() => import('@/pages/SessionDetailPage'));
+const GoalsPage = lazy(() => import('@/pages/GoalsPage'));
+const GoalDetailPage = lazy(() => import('@/pages/GoalDetailPage'));
+const GoalNewPage = lazy(() => import('@/pages/GoalNewPage'));
+const AchievementsPage = lazy(() => import('@/pages/AchievementsPage'));
+const BadgesPage = lazy(() => import('@/pages/BadgesPage'));
+const RewardsPage = lazy(() => import('@/pages/RewardsPage'));
+const ChallengesPage = lazy(() => import('@/pages/ChallengesPage'));
+const ChallengeDetailPage = lazy(() => import('@/pages/ChallengeDetailPage'));
+const ChallengeCreatePage = lazy(() => import('@/pages/ChallengeCreatePage'));
+const NotificationsCenterPage = lazy(() => import('@/pages/NotificationsCenterPage'));
+const PremiumPage = lazy(() => import('@/pages/PremiumPage'));
+const BillingPage = lazy(() => import('@/pages/BillingPage'));
+const SupportPage = lazy(() => import('@/pages/SupportPage'));
+const FAQPage = lazy(() => import('@/pages/FAQPage'));
+const TicketsPage = lazy(() => import('@/pages/TicketsPage'));
+const InsightsPage = lazy(() => import('@/pages/InsightsPage'));
+const TrendsPage = lazy(() => import('@/pages/TrendsPage'));
+
 // ═══════════════════════════════════════════════════════════
 // MAPPING DES COMPOSANTS
 // ═══════════════════════════════════════════════════════════
@@ -382,6 +403,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   TicketsPage,
   InsightsPage,
   TrendsPage,
+};
 
 // ═══════════════════════════════════════════════════════════
 // WRAPPER COMPONENTS
