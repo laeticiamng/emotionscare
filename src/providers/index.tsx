@@ -98,17 +98,28 @@ export function RootProvider({ children }: RootProviderProps) {
               <UserModeProvider>
                 <I18nBootstrap>
                   <MoodProvider>
-                    <ConsentProvider>
-                      <ThemeProvider
-                          attribute="class"
-                          defaultTheme={resolvedDefaultTheme}
-                          enableSystem
-                          storageKey="emotionscare-theme"
-                          themes={['light', 'dark', 'system']}
-                        >
-                          {children}
-                        </ThemeProvider>
-                    </ConsentProvider>
+                    <MusicProvider>
+                      <UnifiedProvider>
+                        <ConsentProvider>
+                          <AccessibilityProvider>
+                            <ThemeProvider
+                              attribute="class"
+                              defaultTheme={resolvedDefaultTheme}
+                              enableSystem
+                              storageKey="emotionscare-theme"
+                              themes={['light', 'dark', 'system']}
+                            >
+                              <TooltipProvider>
+                                <NotificationProvider>
+                                  {children}
+                                  <Toaster />
+                                </NotificationProvider>
+                              </TooltipProvider>
+                            </ThemeProvider>
+                          </AccessibilityProvider>
+                        </ConsentProvider>
+                      </UnifiedProvider>
+                    </MusicProvider>
                   </MoodProvider>
                 </I18nBootstrap>
               </UserModeProvider>
