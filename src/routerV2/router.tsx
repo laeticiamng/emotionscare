@@ -530,7 +530,15 @@ export const router = createBrowserRouter([
     element: createRouteElement(route),
   })),
 
-  // Aliases de compatibilité
+  // Aliases du registry (créer des routes identiques pour chaque alias)
+  ...canonicalRoutes.flatMap(route => 
+    (route.aliases || []).map(alias => ({
+      path: alias,
+      element: createRouteElement(route),
+    }))
+  ),
+
+  // Aliases de compatibilité (redirections)
   ...ROUTE_ALIAS_ENTRIES.map(alias => ({
     path: alias.from,
     element: <LegacyRedirect from={alias.from} to={alias.to} />,
