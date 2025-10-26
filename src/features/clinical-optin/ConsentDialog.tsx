@@ -28,7 +28,7 @@ export interface ConsentDialogProps {
 }
 
 export function ConsentDialog({ open, status, loading = false, wasRevoked = false, onAccept, onDecline }: ConsentDialogProps) {
-  const { t } = useTranslation();
+  const { t } = useTranslation('consent');
   const descriptionId = useId();
 
   const showRevokedNotice = wasRevoked || status === 'revoked';
@@ -37,9 +37,9 @@ export function ConsentDialog({ open, status, loading = false, wasRevoked = fals
     <AlertDialog open={open}>
       <AlertDialogContent aria-describedby={descriptionId} className="max-w-lg focus-visible:ring-0">
         <AlertDialogHeader>
-          <AlertDialogTitle>{t('consent.title')}</AlertDialogTitle>
+          <AlertDialogTitle>{t('title')}</AlertDialogTitle>
           <AlertDialogDescription id={descriptionId} className="space-y-2 text-left">
-            <p>{t('consent.body')}</p>
+            <p>{t('body')}</p>
             <p>
               <a
                 href="/privacy"
@@ -47,7 +47,7 @@ export function ConsentDialog({ open, status, loading = false, wasRevoked = fals
                 rel="noreferrer"
                 className="text-primary underline underline-offset-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
               >
-                {t('consent.more', { defaultValue: 'En savoir plus' })}
+                {t('more', { defaultValue: 'En savoir plus' })}
               </a>
             </p>
           </AlertDialogDescription>
@@ -55,7 +55,7 @@ export function ConsentDialog({ open, status, loading = false, wasRevoked = fals
 
         {showRevokedNotice ? (
           <div className="rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm font-medium text-destructive">
-            {t('consent.revoked')}
+            {t('revoked')}
           </div>
         ) : null}
 
@@ -70,7 +70,7 @@ export function ConsentDialog({ open, status, loading = false, wasRevoked = fals
             }}
             disabled={loading}
           >
-            {t('consent.decline')}
+            {t('decline')}
           </AlertDialogCancel>
           <AlertDialogAction
             onClick={(event) => {
@@ -84,7 +84,7 @@ export function ConsentDialog({ open, status, loading = false, wasRevoked = fals
             className="min-w-[8rem]"
           >
             {loading ? <Loader2 aria-hidden className="mr-2 h-4 w-4 animate-spin" /> : null}
-            {t('consent.accept')}
+            {t('accept')}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
