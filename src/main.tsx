@@ -4,6 +4,7 @@ import { RouterProvider } from 'react-router-dom';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from '@/providers/queryClient';
 import { router } from '@/routerV2/router';
+import { ErrorProvider, UserModeProvider, ThemeProvider } from '@/contexts';
 import '@/index.css';
 
 console.log('🚀 EmotionsCare - Application démarrage');
@@ -17,9 +18,15 @@ if (!rootElement) {
 
 ReactDOM.createRoot(rootElement).render(
   <React.StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
-    </QueryClientProvider>
+    <ErrorProvider>
+      <ThemeProvider>
+        <UserModeProvider>
+          <QueryClientProvider client={queryClient}>
+            <RouterProvider router={router} />
+          </QueryClientProvider>
+        </UserModeProvider>
+      </ThemeProvider>
+    </ErrorProvider>
   </React.StrictMode>
 );
 
