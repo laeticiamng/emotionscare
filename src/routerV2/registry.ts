@@ -186,10 +186,12 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
   {
     name: 'scan',
     path: '/app/scan',
-    segment: 'public',
+    segment: 'consumer',
+    role: 'consumer',
     layout: 'simple',
     component: 'B2CScanPage',
-    guard: false,
+    guard: true,
+    requireAuth: true,
     aliases: ['/scan'],
   },
   {

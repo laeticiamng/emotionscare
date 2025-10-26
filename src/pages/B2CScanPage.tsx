@@ -228,4 +228,5 @@ const B2CScanPage: React.FC = () => {
   );
 };
 
-export default withGuard(B2CScanPage, [{ type: 'auth', required: true }]);
+// Auth guard géré par le router via registry (guard: true, requireAuth: true)
+export default B2CScanPage;
