@@ -1,34 +1,30 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
+import React, { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
 import { RouterProvider } from 'react-router-dom';
-import { QueryClientProvider } from '@tanstack/react-query';
-import { queryClient } from '@/providers/queryClient';
-import { router } from '@/routerV2/router';
-import { ErrorProvider, UserModeProvider, ThemeProvider } from '@/contexts';
+import { router } from '@/routerV2';
+import { RootProvider } from '@/providers';
+import { logger } from '@/lib/logger';
 import '@/index.css';
 
-console.log('🚀 EmotionsCare - Application démarrage');
+// Configuration des logs
+logger.info('🚀 EmotionsCare Platform Loading...', undefined, 'SYSTEM');
 
 const rootElement = document.getElementById('root');
 
 if (!rootElement) {
-  console.error('❌ ERREUR CRITIQUE: Element root introuvable');
-  throw new Error('Root element not found');
+  const error = 'Root element not found';
+  logger.error(error, new Error(error), 'SYSTEM');
+  throw new Error(error);
 }
 
-ReactDOM.createRoot(rootElement).render(
-  <React.StrictMode>
-    <ErrorProvider>
-      <ThemeProvider>
-        <UserModeProvider>
-          <QueryClientProvider client={queryClient}>
-            <RouterProvider router={router} />
-          </QueryClientProvider>
-        </UserModeProvider>
-      </ThemeProvider>
-    </ErrorProvider>
-  </React.StrictMode>
+logger.debug('✅ Root element found', undefined, 'SYSTEM');
+
+createRoot(rootElement).render(
+  <StrictMode>
+    <RootProvider>
+      <RouterProvider router={router} />
+    </RootProvider>
+  </StrictMode>
 );
 
-console.log('✅ Application React montée avec succès');
-
+logger.info('✅ Application rendered successfully', undefined, 'SYSTEM');

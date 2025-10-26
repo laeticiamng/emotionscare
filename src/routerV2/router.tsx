@@ -31,8 +31,8 @@ import FloatingActionMenu from '@/components/layout/FloatingActionMenu';
 // LAZY IMPORTS DES PAGES
 // ═══════════════════════════════════════════════════════════
 
-// Pages publiques - Version simple fonctionnelle
-const HomePage = lazy(() => import('@/pages/SimpleHomePage'));
+// Pages publiques unifiées 
+const HomePage = lazy(() => import('@/components/HomePage'));
 const UnifiedLoginPage = lazy(() => import('@/pages/unified/UnifiedLoginPage'));
 const SimpleB2CPage = lazy(() => import('@/components/SimpleB2CPage'));
 const AboutPage = lazy(() => import('@/pages/AboutPage'));
