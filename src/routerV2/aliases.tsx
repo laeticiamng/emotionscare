@@ -51,6 +51,8 @@ export const ROUTE_ALIASES = {
   '/voice-journal': '/app/journal',
   '/vr': '/app/vr',
   '/community': '/app/social-cocon',
+  '/app/sessions/new': '/app/coach/sessions',
+  '/app/sessions': '/app/coach/sessions',
 
   // ═══════════════════════════════════════════════════════════
   // MODULES FUN-FIRST
