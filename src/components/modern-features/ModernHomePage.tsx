@@ -94,8 +94,11 @@ const ModernHomePage: React.FC = () => {
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-3">
                 <div className="relative">
-                  <User className="h-8 w-8 p-1 bg-primary/20 rounded-full" />
-                  <div className="absolute -top-1 -right-1 h-3 w-3 bg-green-500 rounded-full border-2 border-white"></div>
+                  <User className="h-8 w-8 p-1 bg-primary/20 rounded-full" aria-hidden="true" />
+                  <div 
+                    className="absolute -top-1 -right-1 h-3 w-3 bg-green-500 rounded-full border-2 border-white"
+                    aria-label="En ligne"
+                  ></div>
                 </div>
                 <div>
                   <div className="flex items-center gap-2 text-sm font-medium">
@@ -110,12 +113,18 @@ const ModernHomePage: React.FC = () => {
 
               <div className="flex items-center gap-3">
                 {/* Notifications */}
-                <Button variant="ghost" size="sm" className="relative">
-                  <Bell className="h-4 w-4" />
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="relative"
+                  aria-label={`Notifications (${notifications} nouvelle${notifications > 1 ? 's' : ''})`}
+                >
+                  <Bell className="h-4 w-4" aria-hidden="true" />
                   {notifications > 0 && (
                     <Badge 
                       variant="destructive" 
                       className="absolute -top-1 -right-1 h-5 w-5 text-xs p-0 flex items-center justify-center"
+                      aria-label={`${notifications} notification${notifications > 1 ? 's' : ''}`}
                     >
                       {notifications}
                     </Badge>
@@ -125,7 +134,7 @@ const ModernHomePage: React.FC = () => {
                 {/* Accès rapide */}
                 <Link to="/app/home">
                   <Button variant="default" size="sm" className="gap-2">
-                    <ArrowRight className="h-4 w-4" />
+                    <ArrowRight className="h-4 w-4" aria-hidden="true" />
                     Accéder à votre espace
                   </Button>
                 </Link>
@@ -193,7 +202,7 @@ const ModernHomePage: React.FC = () => {
                     <Card className="bg-white/30 backdrop-blur-sm border-white/20 hover:bg-white/40 transition-all cursor-pointer">
                       <CardContent className="p-3">
                         <div className="flex items-center gap-3">
-                          <div className={`p-2 rounded-lg ${action.color} text-white`}>
+                          <div className={`p-2 rounded-lg ${action.color} text-white`} aria-hidden="true">
                             {action.icon}
                           </div>
                           <div>
@@ -242,7 +251,7 @@ const ModernHomePage: React.FC = () => {
             {/* Fonctionnalité 1 */}
             <Card className="text-center">
               <CardHeader>
-                <div className="h-12 w-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                <div className="h-12 w-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4" aria-hidden="true">
                   <Activity className="h-6 w-6 text-blue-600" />
                 </div>
                 <CardTitle>Suivi en temps réel</CardTitle>
@@ -261,7 +270,7 @@ const ModernHomePage: React.FC = () => {
             {/* Fonctionnalité 2 */}
             <Card className="text-center">
               <CardHeader>
-                <div className="h-12 w-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                <div className="h-12 w-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-4" aria-hidden="true">
                   <Shield className="h-6 w-6 text-green-600" />
                 </div>
                 <CardTitle>Données sécurisées</CardTitle>
@@ -282,7 +291,7 @@ const ModernHomePage: React.FC = () => {
             {/* Fonctionnalité 3 */}
             <Card className="text-center">
               <CardHeader>
-                <div className="h-12 w-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                <div className="h-12 w-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-4" aria-hidden="true">
                   <Star className="h-6 w-6 text-purple-600" />
                 </div>
                 <CardTitle>Expérience premium</CardTitle>

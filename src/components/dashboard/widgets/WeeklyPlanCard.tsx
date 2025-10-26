@@ -90,15 +90,9 @@ export const WeeklyPlanCard: React.FC = () => {
   }, [flagEnabled, lastSummary, setWellbeingSummary]);
 
   useEffect(() => {
-    let isMounted = true;
-    clinicalScoringService.getCatalog('WHO5').then((data) => {
-      if (isMounted) {
-        setCatalog(data);
-      }
-    });
-    return () => {
-      isMounted = false;
-    };
+    // ✅ FIX: getCatalog is synchronous, not a Promise
+    const data = clinicalScoringService.getCatalog('WHO5');
+    setCatalog(data);
   }, []);
 
   useEffect(() => {
