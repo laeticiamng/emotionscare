@@ -82,7 +82,7 @@ const ContactPage: React.FC = () => {
         Aller au contenu principal
       </a>
 
-      <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5" data-testid="page-root">
+      <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-background/90" data-testid="page-root">
         <div className="container mx-auto px-4 py-16">
           <main id="main-content" role="main">
             <motion.header
@@ -91,7 +91,7 @@ const ContactPage: React.FC = () => {
               transition={{ duration: 0.6 }}
               className="text-center mb-12"
             >
-              <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              <h1 className="text-4xl md:text-5xl font-bold mb-4 text-foreground">
                 Contactez-nous
               </h1>
               <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
