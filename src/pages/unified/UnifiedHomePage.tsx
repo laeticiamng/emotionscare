@@ -761,9 +761,22 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
                   className="bg-gradient-to-br from-primary/5 to-primary/10 rounded-3xl p-8 lg:p-12"
                 >
                   <div className="text-center space-y-6">
-                    <div className="flex justify-center space-x-1 mb-6">
+                    {/* Avatar */}
+                    <div className="flex justify-center mb-4">
+                      <img 
+                        src={testimonials[currentTestimonial].avatar}
+                        alt={testimonials[currentTestimonial].avatarAlt}
+                        className="w-20 h-20 rounded-full object-cover border-4 border-primary/20"
+                        onError={(e) => {
+                          // Fallback si image manquante
+                          e.currentTarget.style.display = 'none';
+                        }}
+                      />
+                    </div>
+
+                    <div className="flex justify-center space-x-1 mb-6" aria-label={`Note: ${testimonials[currentTestimonial].rating} étoiles sur 5`}>
                       {Array.from({ length: testimonials[currentTestimonial].rating }).map((_, i) => (
-                        <Star key={i} className="h-6 w-6 fill-yellow-400 text-yellow-400" />
+                        <Star key={i} className="h-6 w-6 fill-yellow-400 text-yellow-400" aria-hidden="true" />
                       ))}
                     </div>
 
