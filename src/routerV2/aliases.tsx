@@ -51,8 +51,6 @@ export const ROUTE_ALIASES = {
   '/voice-journal': '/app/journal',
   '/vr': '/app/vr',
   '/community': '/app/social-cocon',
-  '/app/sessions/new': '/app/coach/sessions',
-  '/app/sessions': '/app/coach/sessions',
 
   // ═══════════════════════════════════════════════════════════
   // MODULES FUN-FIRST
@@ -76,15 +74,6 @@ export const ROUTE_ALIASES = {
   '/weekly-bars': '/app/activity',
   '/activity-history': '/app/activity',
   '/heatmap-vibes': '/app/scores',
-
-  // ═══════════════════════════════════════════════════════════
-  // PARAMÈTRES
-  // ═══════════════════════════════════════════════════════════
-  '/settings': '/settings/general',
-  '/preferences': '/settings/general',
-  '/profile-settings': '/settings/profile',
-  '/privacy-toggles': '/settings/privacy',
-  '/notifications': '/settings/notifications',
 
   // ═══════════════════════════════════════════════════════════
   // B2B FEATURES

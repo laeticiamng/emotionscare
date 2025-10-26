@@ -327,6 +327,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     component: 'JournalNewPage',
     guard: true,
     requireAuth: true,
+    aliases: ['/journal/new'],
   },
   {
     name: 'weekly-bars',
@@ -727,15 +728,6 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: true,
   },
   {
-    name: 'journal-new',
-    path: '/journal/new',
-    segment: 'consumer',
-    role: 'consumer',
-    layout: 'app-sidebar',
-    component: 'JournalNewPage',
-    guard: true,
-  },
-  {
     name: 'sessions',
     path: '/app/sessions',
     segment: 'consumer',
@@ -975,36 +967,6 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     deprecated: true, // Redirection vers /app/scan
   },
   {
-    name: 'profile-legacy',
-    path: '/profile',
-    segment: 'consumer',
-    role: 'consumer',
-    layout: 'app',
-    component: 'ProfilePage',
-    guard: true,
-    deprecated: true, // Redirection vers /settings/profile
-  },
-  {
-    name: 'settings-legacy',
-    path: '/settings',
-    segment: 'consumer',
-    role: 'consumer',
-    layout: 'app',
-    component: 'GeneralPage',
-    guard: true,
-    deprecated: true, // Redirection vers /settings/general
-  },
-  {
-    name: 'privacy-legacy',
-    path: '/privacy',
-    segment: 'consumer',
-    role: 'consumer',
-    layout: 'app',
-    component: 'PrivacyPage',
-    guard: true,
-    deprecated: true, // Redirection vers /settings/privacy
-  },
-  {
     name: 'reporting',
     path: '/reporting',
     segment: 'consumer',
@@ -1077,6 +1039,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'simple',
     component: 'ProfilePage',
     guard: false,
+    aliases: ['/profile'],
   },
   {
     name: 'settings-privacy',
