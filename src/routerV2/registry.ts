@@ -1352,6 +1352,194 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
   },
 
   // ═══════════════════════════════════════════════════════════
+  // NOUVELLES ROUTES - COMPLEMENTAIRES
+  // ═══════════════════════════════════════════════════════════
+  
+  // Audio & Voice
+  {
+    name: 'journal-audio',
+    path: '/app/journal/audio',
+    segment: 'consumer',
+    layout: 'app-sidebar',
+    component: 'JournalAudioPage',
+    guard: true,
+  },
+  {
+    name: 'voice-analysis',
+    path: '/app/voice-analysis',
+    segment: 'consumer',
+    layout: 'app-sidebar',
+    component: 'VoiceAnalysisPage',
+    guard: true,
+  },
+  
+  // Social
+  {
+    name: 'friends',
+    path: '/app/friends',
+    segment: 'consumer',
+    layout: 'app-sidebar',
+    component: 'FriendsPage',
+    guard: true,
+  },
+  {
+    name: 'groups',
+    path: '/app/groups',
+    segment: 'consumer',
+    layout: 'app-sidebar',
+    component: 'GroupsPage',
+    guard: true,
+  },
+  {
+    name: 'feed',
+    path: '/app/feed',
+    segment: 'consumer',
+    layout: 'app-sidebar',
+    component: 'FeedPage',
+    guard: true,
+  },
+  
+  // Personnalisation
+  {
+    name: 'themes',
+    path: '/app/themes',
+    segment: 'consumer',
+    layout: 'app-sidebar',
+    component: 'ThemesPage',
+    guard: true,
+  },
+  {
+    name: 'customization',
+    path: '/app/customization',
+    segment: 'consumer',
+    layout: 'app-sidebar',
+    component: 'CustomizationPage',
+    guard: true,
+  },
+  {
+    name: 'widgets',
+    path: '/app/widgets',
+    segment: 'consumer',
+    layout: 'app-sidebar',
+    component: 'WidgetsPage',
+    guard: true,
+  },
+  
+  // Événements & Ateliers
+  {
+    name: 'events-calendar',
+    path: '/app/events/calendar',
+    segment: 'consumer',
+    layout: 'app-sidebar',
+    component: 'EventsCalendarPage',
+    guard: true,
+  },
+  {
+    name: 'workshops',
+    path: '/app/workshops',
+    segment: 'consumer',
+    layout: 'app-sidebar',
+    component: 'WorkshopsPage',
+    guard: true,
+  },
+  {
+    name: 'webinars',
+    path: '/app/webinars',
+    segment: 'consumer',
+    layout: 'app-sidebar',
+    component: 'WebinarsPage',
+    guard: true,
+  },
+  
+  // Export & Partage
+  {
+    name: 'export-pdf',
+    path: '/app/export/pdf',
+    segment: 'consumer',
+    layout: 'app-sidebar',
+    component: 'ExportPDFPage',
+    guard: true,
+  },
+  {
+    name: 'export-csv',
+    path: '/app/export/csv',
+    segment: 'consumer',
+    layout: 'app-sidebar',
+    component: 'ExportCSVPage',
+    guard: true,
+  },
+  {
+    name: 'share-data',
+    path: '/app/share',
+    segment: 'consumer',
+    layout: 'app-sidebar',
+    component: 'ShareDataPage',
+    guard: true,
+  },
+  
+  // Intégrations
+  {
+    name: 'integrations',
+    path: '/app/integrations',
+    segment: 'consumer',
+    layout: 'app-sidebar',
+    component: 'IntegrationsPage',
+    guard: true,
+  },
+  {
+    name: 'api-keys',
+    path: '/app/api-keys',
+    segment: 'consumer',
+    layout: 'app-sidebar',
+    component: 'APIKeysPage',
+    guard: true,
+  },
+  {
+    name: 'webhooks',
+    path: '/app/webhooks',
+    segment: 'consumer',
+    layout: 'app-sidebar',
+    component: 'WebhooksPage',
+    guard: true,
+  },
+  
+  // Accessibilité
+  {
+    name: 'accessibility-settings',
+    path: '/app/accessibility-settings',
+    segment: 'consumer',
+    layout: 'app-sidebar',
+    component: 'AccessibilitySettingsPage',
+    guard: true,
+  },
+  {
+    name: 'shortcuts',
+    path: '/app/shortcuts',
+    segment: 'consumer',
+    layout: 'app-sidebar',
+    component: 'ShortcutsPage',
+    guard: true,
+  },
+  
+  // Rapports
+  {
+    name: 'weekly-report',
+    path: '/app/reports/weekly',
+    segment: 'consumer',
+    layout: 'app-sidebar',
+    component: 'WeeklyReportPage',
+    guard: true,
+  },
+  {
+    name: 'monthly-report',
+    path: '/app/reports/monthly',
+    segment: 'consumer',
+    layout: 'app-sidebar',
+    component: 'MonthlyReportPage',
+    guard: true,
+  },
+
+  // ═══════════════════════════════════════════════════════════
   // 404 FALLBACK ROUTE (must be last)
   // ═══════════════════════════════════════════════════════════
   {

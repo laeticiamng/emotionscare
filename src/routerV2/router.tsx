@@ -220,6 +220,27 @@ const FAQPage = lazy(() => import('@/pages/FAQPage'));
 const TicketsPage = lazy(() => import('@/pages/TicketsPage'));
 const InsightsPage = lazy(() => import('@/pages/InsightsPage'));
 const TrendsPage = lazy(() => import('@/pages/TrendsPage'));
+const JournalAudioPage = lazy(() => import('@/pages/JournalAudioPage'));
+const VoiceAnalysisPage = lazy(() => import('@/pages/VoiceAnalysisPage'));
+const FriendsPage = lazy(() => import('@/pages/FriendsPage'));
+const GroupsPage = lazy(() => import('@/pages/GroupsPage'));
+const FeedPage = lazy(() => import('@/pages/FeedPage'));
+const ThemesPage = lazy(() => import('@/pages/ThemesPage'));
+const CustomizationPage = lazy(() => import('@/pages/CustomizationPage'));
+const WidgetsPage = lazy(() => import('@/pages/WidgetsPage'));
+const EventsCalendarPage = lazy(() => import('@/pages/EventsCalendarPage'));
+const WorkshopsPage = lazy(() => import('@/pages/WorkshopsPage'));
+const WebinarsPage = lazy(() => import('@/pages/WebinarsPage'));
+const ExportPDFPage = lazy(() => import('@/pages/ExportPDFPage'));
+const ExportCSVPage = lazy(() => import('@/pages/ExportCSVPage'));
+const ShareDataPage = lazy(() => import('@/pages/ShareDataPage'));
+const IntegrationsPage = lazy(() => import('@/pages/IntegrationsPage'));
+const APIKeysPage = lazy(() => import('@/pages/APIKeysPage'));
+const WebhooksPage = lazy(() => import('@/pages/WebhooksPage'));
+const AccessibilitySettingsPage = lazy(() => import('@/pages/AccessibilitySettingsPage'));
+const ShortcutsPage = lazy(() => import('@/pages/ShortcutsPage'));
+const WeeklyReportPage = lazy(() => import('@/pages/WeeklyReportPage'));
+const MonthlyReportPage = lazy(() => import('@/pages/MonthlyReportPage'));
 
 // ═══════════════════════════════════════════════════════════
 // MAPPING DES COMPOSANTS
@@ -403,6 +424,27 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   TicketsPage,
   InsightsPage,
   TrendsPage,
+  JournalAudioPage,
+  VoiceAnalysisPage,
+  FriendsPage,
+  GroupsPage,
+  FeedPage,
+  ThemesPage,
+  CustomizationPage,
+  WidgetsPage,
+  EventsCalendarPage,
+  WorkshopsPage,
+  WebinarsPage,
+  ExportPDFPage,
+  ExportCSVPage,
+  ShareDataPage,
+  IntegrationsPage,
+  APIKeysPage,
+  WebhooksPage,
+  AccessibilitySettingsPage,
+  ShortcutsPage,
+  WeeklyReportPage,
+  MonthlyReportPage,
 };
 
 // ═══════════════════════════════════════════════════════════
