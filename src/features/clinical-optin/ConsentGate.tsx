@@ -40,7 +40,8 @@ export function ConsentGate({ children, fallback = null, scope = 'clinical' }: C
     return <>{children}</>;
   }
 
-  if (consent.status === 'accepted' || consent.status === 'revoked') {
+  // Laisser passer si accepté, révoqué, ou si l'utilisateur a refusé
+  if (consent.status === 'accepted' || consent.status === 'revoked' || consent.wasRevoked) {
     return <>{children}</>;
   }
 
