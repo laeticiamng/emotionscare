@@ -8968,6 +8968,36 @@ export type Database = {
         }
         Relationships: []
       }
+      security_manual_actions: {
+        Row: {
+          action_type: string
+          completed: boolean | null
+          created_at: string | null
+          dashboard_url: string | null
+          description: string
+          id: string
+          priority: string
+        }
+        Insert: {
+          action_type: string
+          completed?: boolean | null
+          created_at?: string | null
+          dashboard_url?: string | null
+          description: string
+          id?: string
+          priority: string
+        }
+        Update: {
+          action_type?: string
+          completed?: boolean | null
+          created_at?: string | null
+          dashboard_url?: string | null
+          description?: string
+          id?: string
+          priority?: string
+        }
+        Relationships: []
+      }
       sla_metrics: {
         Row: {
           breach_count: number
