@@ -1,27 +1,7 @@
-
 project_id = "yaincoxihiqdksxgrsrk"
-
-[functions.org-dashboard-weekly]
-verify_jwt = true
-
-[functions.org-dashboard-export]
-verify_jwt = true
 
 [functions.journal-voice]
 verify_jwt = true
-
-[functions.journal-weekly]
-verify_jwt = true
-
-[functions.journal-insights]
-verify_jwt = true
-
-[functions.guided-meditation]
-verify_jwt = true
-
-[functions.immersive-breathing]
-verify_jwt = true
-
 
 [functions.therapeutic-journey]
 verify_jwt = true
@@ -33,9 +13,6 @@ verify_jwt = true
 verify_jwt = true
 
 [functions.vr-therapy]
-verify_jwt = true
-
-[functions.gamification-engine]
 verify_jwt = true
 
 [functions.smart-notifications]
@@ -56,19 +33,10 @@ verify_jwt = true
 [functions.journal]
 verify_jwt = true
 
-[functions.music-therapy]
-verify_jwt = true
-
 [functions.breathing-exercises]
 verify_jwt = true
 
 [functions.community]
-verify_jwt = true
-
-[functions.breathing-meditation]
-verify_jwt = true
-
-[functions.journal-analysis]
 verify_jwt = true
 
 [functions.face-filter-start]
@@ -92,8 +60,64 @@ verify_jwt = true
 [functions.dashboard-weekly]
 verify_jwt = true
 
-
 [functions.contact-form]
+verify_jwt = true
+
+[functions.assistant-api]
+verify_jwt = true
+
+[functions.biotune-session]
+verify_jwt = true
+
+[functions.generate-grit-challenge]
+verify_jwt = true
+
+[functions.hume-analysis]
+verify_jwt = true
+
+[functions.mood-mixer]
+verify_jwt = true
+
+[functions.b2c-immersive-session]
+verify_jwt = true
+
+[functions.b2c-compute-aggregates]
+verify_jwt = true
+
+[functions.openai-structured-output]
+verify_jwt = true
+
+[functions.emotion-music-callback]
+verify_jwt = false
+
+[functions.parcours-xl-create]
+verify_jwt = true
+
+[functions.parcours-xl-generate]
+verify_jwt = false
+
+[functions.parcours-xl-callback]
+verify_jwt = false
+
+[functions.parcours-xl-extend]
+verify_jwt = false
+
+[functions.assess-start]
+verify_jwt = true
+
+[functions.assess-submit]
+verify_jwt = true
+
+[functions.sign-track]
+verify_jwt = true
+
+[functions.sign-emotion-track]
+verify_jwt = true
+
+[functions.parcours-xl-runner]
+verify_jwt = false
+
+[functions.adaptive-music]
 verify_jwt = true
 
 [api]
@@ -145,86 +169,3 @@ enable_signup = true
 enable_signup = true
 double_confirm_changes = true
 enable_confirmations = false
-
-[functions.emotionscare-music-generator]
-verify_jwt = true
-
-
-[functions.assistant-api]
-verify_jwt = true
-
-[functions.biotune-session]
-verify_jwt = true
-
-[functions.enhanced-emotion-analyze]
-verify_jwt = true
-
-[functions.generate-grit-challenge]
-verify_jwt = true
-
-[functions.hume-analysis]
-verify_jwt = true
-
-[functions.mood-mixer]
-verify_jwt = true
-
-[functions.music-weekly-org]
-verify_jwt = true
-
-[functions.music-weekly-user]
-verify_jwt = true
-
-[functions.b2c-immersive-session]
-verify_jwt = true
-
-[functions.b2c-compute-aggregates]
-verify_jwt = true
-
-[functions.suno-music-extend]
-verify_jwt = true
-
-[functions.suno-add-vocals]
-verify_jwt = true
-
-[functions.suno-music-callback]
-verify_jwt = false
-
-[functions.openai-structured-output]
-verify_jwt = true
-
-[functions.emotion-music-callback]
-verify_jwt = false
-
-[functions.suno-poll-status]
-verify_jwt = false
-
-[functions.parcours-xl-create]
-verify_jwt = true
-
-[functions.parcours-xl-generate]
-verify_jwt = false
-
-[functions.parcours-xl-callback]
-verify_jwt = false
-
-[functions.parcours-xl-extend]
-verify_jwt = false
-
-[functions.assess-start]
-verify_jwt = true
-
-[functions.assess-submit]
-verify_jwt = true
-
-[functions.sign-track]
-verify_jwt = true
-
-[functions.sign-emotion-track]
-verify_jwt = true
-
-[functions.parcours-xl-runner]
-verify_jwt = false
-
-[functions.adaptive-music]
-verify_jwt = true
-
