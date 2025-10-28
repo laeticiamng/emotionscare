@@ -95,18 +95,20 @@ export function RootProvider({ children }: RootProviderProps) {
     <HelmetProvider>
       <RootErrorBoundary>
         <QueryClientProvider client={queryClient}>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme={resolvedDefaultTheme}
-            enableSystem
-            storageKey="emotionscare-theme"
-            themes={['light', 'dark', 'system']}
-          >
-            <Suspense fallback={<div>Chargement...</div>}>
-              {children}
-            </Suspense>
-            <Toaster />
-          </ThemeProvider>
+          <ErrorProvider>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme={resolvedDefaultTheme}
+              enableSystem
+              storageKey="emotionscare-theme"
+              themes={['light', 'dark', 'system']}
+            >
+              <Suspense fallback={<div>Chargement...</div>}>
+                {children}
+              </Suspense>
+              <Toaster />
+            </ThemeProvider>
+          </ErrorProvider>
         </QueryClientProvider>
       </RootErrorBoundary>
     </HelmetProvider>
