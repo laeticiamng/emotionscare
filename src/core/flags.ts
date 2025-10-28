@@ -225,28 +225,12 @@ export function useFlags() {
   const [flags, setFlags] = useState<FeatureFlags>(flagsCache || DEFAULT_FLAGS);
 
   useEffect(() => {
-    async function loadFlags() {
-      try {
-        // Don't fetch if we already have cached flags
-        if (flagsCache) return;
-
-        const response = await fetch('/me/feature_flags', {
-          credentials: 'include'
-        });
-        
-        if (response.ok) {
-          const data = await response.json();
-          const newFlags = { ...DEFAULT_FLAGS, ...data.flags };
-          flagsCache = newFlags;
-          setFlags(newFlags);
-          logger.debug('Feature flags loaded from API', { flagsCount: Object.keys(newFlags).length }, 'SYSTEM');
-        }
-      } catch (error) {
-        logger.warn('Failed to load feature flags, using defaults', error as Error, 'SYSTEM');
-      }
+    // Feature flags API disabled - using DEFAULT_FLAGS only
+    // TODO: Implement feature flags backend if dynamic flags are needed
+    if (!flagsCache) {
+      flagsCache = DEFAULT_FLAGS;
+      logger.debug('Using default feature flags', { flagsCount: Object.keys(DEFAULT_FLAGS).length }, 'SYSTEM');
     }
-
-    loadFlags();
   }, []);
 
   return {
