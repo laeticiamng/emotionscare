@@ -129,7 +129,6 @@ const JournalNewPage = lazy(() => import('@/pages/JournalNewPage'));
 const JournalSettingsPage = lazy(() => import('@/pages/JournalSettings'));
 const ReportingPage = lazy(() => import('@/pages/ReportingPage'));
 const ExportPage = lazy(() => import('@/pages/ExportPage'));
-const NavigationPage = lazy(() => import('@/pages/NavigationPage'));
 const LeaderboardPage = lazy(() => import('@/pages/LeaderboardPage'));
 const GamificationPage = lazy(() => import('@/pages/GamificationPage'));
 const ScoresPage = lazy(() => import('@/pages/ScoresPage'));
@@ -153,7 +152,6 @@ const MoodMixerPage = lazy(() => import('@/pages/B2CMoodMixerPage'));
 const BossGritPage = lazy(() => import('@/modules/boss-grit/BossGritPage'));
 const BubbleBeatPage = lazy(() => import('@/pages/B2CBubbleBeatPage'));
 const StorySynthPage = lazy(() => import('@/pages/B2CStorySynthLabPage'));
-const ModulesShowcasePage = lazy(() => import('@/pages/ModulesShowcasePage'));
 
 // Pages DEV uniquement
 const ComprehensiveSystemAuditPage = lazy(() => import('@/pages/ComprehensiveSystemAuditPage'));
@@ -334,7 +332,6 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   JournalSettingsPage,
   ReportingPage,
   ExportPage,
-  NavigationPage,
   // PricingPageWorking,
   
   // Pages existantes consolidées
@@ -369,7 +366,6 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   BossGritPage,
   BubbleBeatPage,
   StorySynthPage,
-  ModulesShowcasePage,
 
   // Dev-only pages
   ComprehensiveSystemAuditPage,
