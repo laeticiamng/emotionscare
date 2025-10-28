@@ -7,7 +7,6 @@ import { logger } from '@/lib/logger';
 import { BreathingVRService } from '@/modules/breathing-vr/breathingVRService';
 import { meditationService } from '@/modules/meditation/meditationService';
 import { ActivityService } from '@/modules/activity/activityService';
-import { EmotionalScanService } from '@/modules/emotional-scan/emotionalScanService';
 import { MusicTherapyService } from '@/modules/music-therapy/musicTherapyService';
 import { FlashLiteService } from '@/modules/flash-lite/flashLiteService';
 import { VRGalaxyService } from '@/modules/vr-galaxy/vrGalaxyService';
@@ -128,25 +127,27 @@ export class DashboardService {
    * Calculer le score de bien-être
    */
   private static async calculateWellnessScore(userId: string): Promise<number> {
-    const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-
     try {
-      // Récupérer les scans émotionnels récents
-      const emotionScans = await EmotionalScanService.fetchHistory(userId, 50);
-      const recentScans = emotionScans.filter(
-        s => new Date(s.created_at) >= sevenDaysAgo
-      );
+      // Score basé sur les sessions récentes (7 derniers jours)
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-      if (recentScans.length === 0) return 50; // Score neutre
+      const { data: sessions } = await supabase
+        .from('activity_sessions')
+        .select('mood_before, mood_after')
+        .eq('user_id', userId)
+        .gte('created_at', sevenDaysAgo.toISOString());
 
-      // Calculer la moyenne des scores de confiance
-      const avgConfidence = recentScans.reduce(
-        (sum, s) => sum + s.confidence_score, 0
-      ) / recentScans.length;
+      if (!sessions || sessions.length === 0) return 50; // Score neutre
 
-      // Score entre 0-100
-      return Math.round(avgConfidence * 100);
+      // Calculer la moyenne des améliorations d'humeur
+      const avgMoodDelta = sessions
+        .filter(s => s.mood_before && s.mood_after)
+        .reduce((sum, s) => sum + (s.mood_after - s.mood_before), 0) / sessions.length;
+
+      // Convertir en score 0-100
+      const score = 50 + (avgMoodDelta * 5); // Chaque point d'amélioration = +5 points
+      return Math.max(0, Math.min(100, Math.round(score)));
     } catch {
       return 50;
     }
@@ -231,7 +232,7 @@ export class DashboardService {
       'meditation': '🧘',
       'journal': '📔',
       'music-therapy': '🎵',
-      'emotional-scan': '😊',
+      'scan': '😊',
       'vr-galaxy': '🌌',
       'ambition-arcade': '🎮',
       'boss-grit': '💪',
