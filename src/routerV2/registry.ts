@@ -1495,6 +1495,20 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     component: 'MonthlyReportPage',
     guard: true,
   },
+  
+  // Navigation Hub
+  {
+    name: 'navigation-hub',
+    path: '/navigation',
+    segment: 'consumer',
+    layout: 'simple',
+    component: 'NavigationPage',
+    guard: false,
+    meta: {
+      title: 'Navigation - EmotionsCare',
+      description: 'Explorez toutes les fonctionnalités EmotionsCare',
+    },
+  },
 
   // ═══════════════════════════════════════════════════════════
   // 404 FALLBACK ROUTE (must be last)
