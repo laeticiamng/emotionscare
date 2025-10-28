@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React from 'react';
+import React, { Suspense } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { HelmetProvider } from 'react-helmet-async';
 import { logger } from '@/lib/logger';
@@ -89,42 +89,24 @@ export function RootProvider({ children }: RootProviderProps) {
   const [queryClient] = React.useState(createQueryClient);
   const resolvedDefaultTheme = 'system';
 
+  logger.info('🔍 RootProvider mounting', undefined, 'SYSTEM');
+
   return (
     <HelmetProvider>
       <RootErrorBoundary>
         <QueryClientProvider client={queryClient}>
-          <ErrorProvider>
-            <AuthProvider>
-              <UserModeProvider>
-                <I18nBootstrap>
-                  <MoodProvider>
-                    <MusicProvider>
-                      <UnifiedProvider>
-                        <ConsentProvider>
-                          <AccessibilityProvider>
-                            <ThemeProvider
-                              attribute="class"
-                              defaultTheme={resolvedDefaultTheme}
-                              enableSystem
-                              storageKey="emotionscare-theme"
-                              themes={['light', 'dark', 'system']}
-                            >
-                              <TooltipProvider>
-                                <NotificationProvider>
-                                  {children}
-                                  <Toaster />
-                                </NotificationProvider>
-                              </TooltipProvider>
-                            </ThemeProvider>
-                          </AccessibilityProvider>
-                        </ConsentProvider>
-                      </UnifiedProvider>
-                    </MusicProvider>
-                  </MoodProvider>
-                </I18nBootstrap>
-              </UserModeProvider>
-            </AuthProvider>
-          </ErrorProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme={resolvedDefaultTheme}
+            enableSystem
+            storageKey="emotionscare-theme"
+            themes={['light', 'dark', 'system']}
+          >
+            <Suspense fallback={<div>Chargement...</div>}>
+              {children}
+            </Suspense>
+            <Toaster />
+          </ThemeProvider>
         </QueryClientProvider>
       </RootErrorBoundary>
     </HelmetProvider>
