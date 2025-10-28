@@ -33,7 +33,7 @@ export default function NavigationPage() {
 
   const navigationItems: NavigationItem[] = [
     // Core Features
-    { title: 'Dashboard', description: 'Tableau de bord principal', path: '/app/home', icon: Home, category: 'core' },
+    { title: 'Dashboard', description: 'Tableau de bord principal', path: '/app/consumer/home', icon: Home, category: 'core' },
     { title: 'Scan Émotionnel', description: 'Analyse IA en temps réel', path: '/app/scan', icon: Scan, category: 'core', badge: 'IA' },
     { title: 'Musicothérapie', description: 'Thérapie musicale adaptative', path: '/app/music', icon: Music, category: 'core' },
     { title: 'Coach IA', description: 'Assistant personnel intelligent', path: '/app/coach', icon: Brain, category: 'core', badge: 'IA' },
@@ -42,9 +42,11 @@ export default function NavigationPage() {
     // Wellness & Mindfulness
     { title: 'Flash Glow', description: 'Boost énergétique instantané', path: '/app/flash-glow', icon: Zap, category: 'wellness', isNew: true },
     { title: 'Respiration', description: 'Exercices de breathwork', path: '/app/breath', icon: Wind, category: 'wellness' },
+    { title: 'Méditation', description: 'Sessions guidées de méditation', path: '/app/meditation', icon: Heart, category: 'wellness' },
     { title: 'Réalité Virtuelle', description: 'Immersion thérapeutique', path: '/app/vr', icon: Monitor, category: 'wellness', isPremium: true },
     { title: 'Scan Émotions', description: 'Analyse faciale avancée', path: '/app/emotion-scan', icon: Heart, category: 'wellness', badge: 'IA' },
     { title: 'Journal Vocal', description: 'Expression vocale libre', path: '/app/voice-journal', icon: MessageSquare, category: 'wellness' },
+    { title: 'Parc Émotionnel', description: 'Espace d\'exploration immersif', path: '/app/emotional-park', icon: Sparkles, category: 'wellness', isNew: true },
     
     // Fun & Interactive
     { title: 'Filtres AR', description: 'Réalité augmentée émotionnelle', path: '/app/face-ar', icon: Camera, category: 'fun', badge: 'AR' },
@@ -62,12 +64,13 @@ export default function NavigationPage() {
     { title: 'Activité', description: 'Historique et tendances', path: '/app/activity', icon: BarChart3, category: 'analytics' },
     { title: 'Scores & vibes', description: 'Courbes d\'humeur et heatmap quotidienne', path: '/app/scores', icon: Grid3X3, category: 'analytics' },
     { title: 'Communauté', description: 'Réseau social thérapeutique', path: '/app/community', icon: Users, category: 'analytics' },
+    { title: 'Insights', description: 'Analyses approfondies', path: '/app/insights', icon: BarChart3, category: 'analytics' },
     
     // Settings
-    { title: 'Paramètres', description: 'Configuration générale', path: '/settings/general', icon: Settings, category: 'settings' },
-    { title: 'Profil', description: 'Informations personnelles', path: '/settings/profile', icon: Users, category: 'settings' },
-    { title: 'Confidentialité', description: 'Gestion des données', path: '/settings/privacy', icon: Shield, category: 'settings' },
-    { title: 'Notifications', description: 'Alertes et rappels', path: '/settings/notifications', icon: MessageSquare, category: 'settings' },
+    { title: 'Paramètres', description: 'Configuration générale', path: '/app/settings/general', icon: Settings, category: 'settings' },
+    { title: 'Profil', description: 'Informations personnelles', path: '/app/profile', icon: Users, category: 'settings' },
+    { title: 'Confidentialité', description: 'Gestion des données', path: '/app/settings/privacy', icon: Shield, category: 'settings' },
+    { title: 'Notifications', description: 'Alertes et rappels', path: '/app/notifications', icon: MessageSquare, category: 'settings' },
   ];
 
   const categories = [
