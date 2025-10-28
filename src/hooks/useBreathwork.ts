@@ -1,6 +1,8 @@
 // @ts-nocheck
 import { useEffect, useRef, useCallback } from 'react';
 import { useBreathStore, Pattern, Phase, BreathEvent, BreathMetrics } from '@/store/breath.store';
+import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 
 const PATTERNS = {
   '4-6-8': [
@@ -102,24 +104,23 @@ export const useBreathwork = () => {
     };
 
     try {
-      const response = await fetch('/api/me/breath/metrics', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(metrics),
+      // Use Supabase edge function instead of /api route
+      const { data, error } = await supabase.functions.invoke('breathing-exercises', {
+        body: { 
+          action: 'submit_metrics',
+          metrics 
+        }
       });
 
-      if (response.ok) {
-        const result = await response.json();
-        if (result.badge_id) {
-          state.setBadgeEarned(result.badge_id);
-        }
+      if (error) throw error;
 
-        // Analytics
-        if (typeof window !== 'undefined' && window.gtag) {
-          window.gtag('event', 'breath_metrics_sent');
-        }
+      if (data?.badge_id) {
+        state.setBadgeEarned(data.badge_id);
+      }
+
+      // Analytics
+      if (typeof window !== 'undefined' && window.gtag) {
+        window.gtag('event', 'breath_metrics_sent');
       }
     } catch (error) {
       logger.warn('Failed to submit breath metrics', error, 'VR');

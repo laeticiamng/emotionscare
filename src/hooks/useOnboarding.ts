@@ -12,16 +12,8 @@ export const useOnboarding = () => {
     store.setError(null);
 
     try {
-      const response = await fetch('/api/onboarding/start', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to start onboarding');
-      }
-
-      const { flow_id } = await response.json();
+      // Generate flow_id locally (no backend needed for now)
+      const flow_id = `onboarding_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
       store.setFlowId(flow_id);
       store.setStep(1); // Move to first actual step
 
@@ -74,18 +66,10 @@ export const useOnboarding = () => {
     store.setGoalsDraft(goals);
     
     try {
-      const response = await fetch('/api/onboarding/goals', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(goals),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to save goals');
-      }
-
-      const { recommendations } = await response.json();
-      store.setModuleSuggestions(recommendations || []);
+      // TODO: Implement with Supabase edge function
+      // For now, just save locally and return mock recommendations
+      const recommendations: ModuleSuggestion[] = [];
+      store.setModuleSuggestions(recommendations);
 
       // Analytics
       if (typeof window !== 'undefined' && window.gtag) {
@@ -154,12 +138,9 @@ export const useOnboarding = () => {
               applicationServerKey: null // Add your VAPID key here
             });
 
-            // Send token to backend
-            await fetch('/api/me/notifications/register', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ subscription }),
-            });
+            // TODO: Implement push notification backend
+            // For now, just log locally
+            logger.info('Push subscription registered locally', { subscription }, 'SYSTEM');
           } catch (pushError) {
             logger.warn('Push subscription failed', { pushError }, 'SYSTEM');
           }
@@ -187,15 +168,7 @@ export const useOnboarding = () => {
 
   const complete = useCallback(async () => {
     try {
-      const response = await fetch('/api/onboarding/complete', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to complete onboarding');
-      }
-
+      // Mark onboarding as completed locally
       store.setCompleted(true);
 
       // Analytics

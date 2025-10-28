@@ -30,20 +30,8 @@ export const useHelp = () => {
     setError(null);
 
     try {
-      const response = await fetch('/api/help/sections');
-      
-      if (!response.ok) {
-        throw new Error('Failed to load help sections');
-      }
-
-      const data = await response.json();
-      setSections(data.sections || []);
-      
-    } catch (error: any) {
-      logger.error('Load sections failed', error as Error, 'SYSTEM');
-      setError(error.message);
-      
-      // Fallback data for offline/error scenarios
+      // TODO: Implement with Supabase edge function
+      // For now, use fallback data
       setSections([
         { id: '1', name: 'Modules', slug: 'modules', icon: '🧩' },
         { id: '2', name: 'Compte', slug: 'account', icon: '👤' },

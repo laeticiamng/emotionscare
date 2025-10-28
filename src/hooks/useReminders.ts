@@ -25,14 +25,9 @@ export const useReminders = () => {
     setError(null);
 
     try {
-      const response = await fetch('/api/me/reminders');
-      
-      if (!response.ok) {
-        throw new Error('Failed to load reminders');
-      }
-
-      const data = await response.json();
-      setReminders(data.items || []);
+      // TODO: Implement with Supabase edge function
+      // For now, return empty array (reminders stored locally)
+      setReminders([]);
       
     } catch (error: any) {
       logger.error('Load reminders failed', error as Error, 'SYSTEM');
