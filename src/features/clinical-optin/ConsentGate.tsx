@@ -30,9 +30,7 @@ export function ConsentGate({ children, fallback = null, scope = 'clinical' }: C
         void consent.accept();
       },
       onDecline: () => {
-        if (consent.wasRevoked) {
-          return;
-        }
+        void consent.revoke();
       },
     }),
     [consent],
@@ -42,7 +40,7 @@ export function ConsentGate({ children, fallback = null, scope = 'clinical' }: C
     return <>{children}</>;
   }
 
-  if (consent.status === 'accepted') {
+  if (consent.status === 'accepted' || consent.status === 'revoked') {
     return <>{children}</>;
   }
 
