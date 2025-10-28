@@ -23,13 +23,13 @@ import { useToast } from '@/hooks/use-toast';
 import { useMotionPrefs } from '@/hooks/useMotionPrefs';
 import { useSessionClock } from '@/hooks/useSessionClock';
 import { GlowSurface } from '@/ui/GlowSurface';
-import { useFlashPhases } from '@/modules/flash/useFlashPhases';
+import { useFlashPhases } from '@/modules/flash-glow/useFlashPhases';
 import {
   computeMoodDelta,
   getCurrentMoodSnapshot,
   logAndJournal,
   type MoodSnapshot,
-} from '@/modules/flash/sessionService';
+} from '@/modules/flash-glow/sessionService';
 import useCurrentMood from '@/hooks/useCurrentMood';
 import { ff } from '@/lib/flags/ff';
 import { useClinicalHints } from '@/hooks/useClinicalHints';
