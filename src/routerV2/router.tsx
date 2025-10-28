@@ -237,6 +237,7 @@ const AccessibilitySettingsPage = lazy(() => import('@/pages/AccessibilitySettin
 const ShortcutsPage = lazy(() => import('@/pages/ShortcutsPage'));
 const WeeklyReportPage = lazy(() => import('@/pages/WeeklyReportPage'));
 const MonthlyReportPage = lazy(() => import('@/pages/MonthlyReportPage'));
+const NavigationPage = lazy(() => import('@/pages/NavigationPage'));
 
 // ═══════════════════════════════════════════════════════════
 // MAPPING DES COMPOSANTS
@@ -440,6 +441,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   ShortcutsPage,
   WeeklyReportPage,
   MonthlyReportPage,
+  NavigationPage,
 };
 
 // ═══════════════════════════════════════════════════════════
