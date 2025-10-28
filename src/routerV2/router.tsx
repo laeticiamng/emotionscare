@@ -364,7 +364,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   
   // Import des nouveaux modules optimisés
   FlashGlowPage,
-  JournalPage: JournalPage,
+  JournalPage,
   ScanPage,
   CoachPage,
   MoodMixerPage,
