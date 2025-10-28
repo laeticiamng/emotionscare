@@ -25,7 +25,6 @@ type JournalRow = {
   created_at?: string | null
   updated_at?: string | null
   mode?: string | null
-  is_voice?: boolean | null
 }
 
 const sanitizePlainText = (value: string) =>
@@ -70,7 +69,7 @@ const mapRowToNote = (row: JournalRow): SanitizedNote => {
     row.content ?? row.text_content ?? row.transcript ?? ''
   const text = sanitizePlainText(typeof rawText === 'string' ? rawText : String(rawText))
   const tags = sanitizeTags(row.tags)
-  const mode = row.mode ?? (row.is_voice ? 'voice' : 'text')
+  const mode = row.mode ?? 'text'
   return SanitizedNoteSchema.parse({
     id: row.id,
     text,
@@ -206,7 +205,7 @@ export async function listFeed(query: Partial<FeedQuery> = {}): Promise<Sanitize
 
   let request = supabase
     .from('journal_entries')
-    .select('id, content, text_content, transcript, summary, tags, created_at, mode, is_voice')
+    .select('id, content, text_content, transcript, summary, tags, created_at, mode')
     .order('created_at', { ascending: false })
 
   if (q.q) {
