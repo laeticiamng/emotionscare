@@ -94,7 +94,7 @@ serve(async (req) => {
     .eq('scope', parsed.data.scope)
     .is('revoked_at', null)
     .select('revoked_at')
-    .maybeSingle<{ revoked_at: string | null }>();
+    .maybeSingle();
 
   if (revokeError) {
     console.error('[optin-revoke] failed to revoke consent', { message: revokeError.message });
