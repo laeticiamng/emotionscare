@@ -159,9 +159,23 @@ export const ConsentProvider: React.FC<{ children: React.ReactNode }> = ({ child
         data: { scope: CONSENT_SCOPE },
       });
 
-      const { error } = await supabase.functions.invoke('optin-accept', {
-        body: { scope: CONSENT_SCOPE },
-      });
+      // Vérifier s'il existe déjà un consentement actif
+      const { data: existing } = await supabase
+        .from('clinical_optins')
+        .select('id')
+        .is('revoked_at', null)
+        .maybeSingle();
+
+      if (existing) {
+        return; // Déjà accepté
+      }
+
+      // Insérer un nouveau consentement
+      const { error } = await supabase
+        .from('clinical_optins')
+        .insert({
+          scope: CONSENT_SCOPE,
+        });
 
       if (error) {
         throw error;
@@ -186,9 +200,11 @@ export const ConsentProvider: React.FC<{ children: React.ReactNode }> = ({ child
         data: { scope: CONSENT_SCOPE },
       });
 
-      const { error } = await supabase.functions.invoke('optin-revoke', {
-        body: { scope: CONSENT_SCOPE },
-      });
+      // Marquer tous les consentements actifs comme révoqués
+      const { error } = await supabase
+        .from('clinical_optins')
+        .update({ revoked_at: new Date().toISOString() })
+        .is('revoked_at', null);
 
       if (error) {
         throw error;
