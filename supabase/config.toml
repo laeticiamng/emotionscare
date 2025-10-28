@@ -50,9 +50,6 @@ verify_jwt = true
 [functions.gamification-engine]
 verify_jwt = true
 
-[functions.analytics-insights]
-verify_jwt = true
-
 [functions.smart-notifications]
 verify_jwt = true
 
@@ -118,9 +115,6 @@ verify_jwt = true
 
 
 [functions.contact-form]
-verify_jwt = true
-
-[functions.emotion-analytics]
 verify_jwt = true
 
 [functions.emotion-analysis]

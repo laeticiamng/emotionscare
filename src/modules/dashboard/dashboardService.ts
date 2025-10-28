@@ -6,7 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';
 import { BreathingVRService } from '@/modules/breathing-vr/breathingVRService';
 import { meditationService } from '@/modules/meditation/meditationService';
-import { ActivityService } from '@/modules/activity/activityService';
+import { ActivityService } from '@/modules/activities';
 import { MusicTherapyService } from '@/modules/music-therapy/musicTherapyService';
 import { FlashLiteService } from '@/modules/flash-lite/flashLiteService';
 import { VRGalaxyService } from '@/modules/vr-galaxy/vrGalaxyService';
@@ -42,8 +42,8 @@ export class DashboardService {
    */
   static async getGlobalStats(userId: string): Promise<DashboardStats> {
     try {
-      // Récupérer toutes les activités
-      const activities = await ActivityService.fetchActivities(userId, 1000);
+      // Récupérer toutes les activités utilisateur (historique)
+      const activities = await ActivityService.fetchHistory(userId, 1000);
       
       // Calculer les stats globales
       const totalSessions = activities.length;
@@ -96,7 +96,7 @@ export class DashboardService {
    * Obtenir l'activité par module
    */
   static async getModuleActivities(userId: string): Promise<ModuleActivity[]> {
-    const activities = await ActivityService.fetchActivities(userId, 500);
+    const activities = await ActivityService.fetchHistory(userId, 500);
     
     const moduleMap = new Map<string, ModuleActivity>();
 
@@ -157,7 +157,7 @@ export class DashboardService {
    * Calculer le streak (jours consécutifs d'activité)
    */
   private static async calculateStreak(userId: string): Promise<number> {
-    const activities = await ActivityService.fetchActivities(userId, 365);
+    const activities = await ActivityService.fetchHistory(userId, 365);
     
     if (activities.length === 0) return 0;
 
@@ -263,7 +263,7 @@ export class DashboardService {
     const weekStart = new Date(today);
     weekStart.setDate(today.getDate() - 7);
 
-    const activities = await ActivityService.fetchActivities(userId, 200);
+    const activities = await ActivityService.fetchHistory(userId, 200);
     const weekActivities = activities.filter(
       a => new Date(a.created_at) >= weekStart
     );
