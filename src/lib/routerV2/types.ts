@@ -5,7 +5,7 @@ export type Guard =
   | { type: 'auth'; required: boolean }
   | { type: 'role'; roles: Role[] }
   | { type: 'flag'; key: string }
-  | { type: 'consent'; scope: 'clinical' };
+  | { type: 'consent'; scope: 'coach' };
 
 export interface RouteDef {
   name: string;

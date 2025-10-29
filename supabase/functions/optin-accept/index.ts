@@ -11,7 +11,7 @@ import { createClient } from '../_shared/supabase.ts';
 import { recordEdgeLatencyMetric } from '../_shared/metrics.ts';
 
 const requestSchema = z.object({
-  scope: z.string().min(1).default('clinical'),
+  scope: z.string().min(1).default('coach'),
 });
 
 function getSupabaseClient(req: Request) {

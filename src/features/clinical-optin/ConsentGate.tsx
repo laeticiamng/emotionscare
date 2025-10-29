@@ -10,15 +10,15 @@ import { useFlags } from '@/core/flags';
 export interface ConsentGateProps {
   children: React.ReactNode;
   fallback?: React.ReactNode;
-  scope?: 'clinical';
+  scope?: 'coach';
 }
 
-export function ConsentGate({ children, fallback = null, scope = 'clinical' }: ConsentGateProps) {
+export function ConsentGate({ children, fallback = null, scope = 'coach' }: ConsentGateProps) {
   const { flags } = useFlags();
   const requireOptIn = flags?.FF_REQUIRE_CLINICAL_OPTIN !== false;
   const consent = useConsent();
 
-  const bypassGate = !requireOptIn || scope !== 'clinical';
+  const bypassGate = !requireOptIn || scope !== 'coach';
 
   const dialogProps = useMemo(
     () => ({
