@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useMoodPublisher } from '@/features/mood/useMoodPublisher';
 import { scanAnalytics } from '@/lib/analytics/scanEvents';
+import { supabase } from '@/integrations/supabase/client';
 
 const clampNormalized = (value: number) => {
   if (!Number.isFinite(value)) {
@@ -98,20 +99,35 @@ const CameraSampler: React.FC<CameraSamplerProps> = ({ onPermissionChange, onUna
     scanAnalytics.cameraAnalysisStarted();
     
     try {
-      const response = await fetch('/functions/v1/ai-emotion-analysis', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ mode: 'sam-camera', ts: new Date().toISOString() }),
-        credentials: 'include',
+      if (!videoRef.current) {
+        throw new Error('video_not_ready');
+      }
+
+      // Capture frame from video
+      const canvas = document.createElement('canvas');
+      canvas.width = videoRef.current.videoWidth;
+      canvas.height = videoRef.current.videoHeight;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        throw new Error('canvas_error');
+      }
+      ctx.drawImage(videoRef.current, 0, 0);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+
+      // Call mood-camera edge function
+      const { data, error } = await supabase.functions.invoke('mood-camera', {
+        body: { 
+          frame: dataUrl,
+          timestamp: new Date().toISOString(),
+        },
       });
 
-      if (!response.ok) {
+      if (error) {
         throw new Error('edge_unavailable');
       }
 
-      const payload = await response.json().catch(() => ({}));
-      const rawValence = payload?.valence ?? payload?.data?.valence ?? 0.5;
-      const rawArousal = payload?.arousal ?? payload?.data?.arousal ?? 0.5;
+      const rawValence = (data?.valence ?? 50) / 100; // Convert 0-100 to 0-1
+      const rawArousal = (data?.arousal ?? 50) / 100; // Convert 0-100 to 0-1
 
       publishMood('scan_camera', clampNormalized(rawValence), clampNormalized(rawArousal));
       setEdgeReady(true);

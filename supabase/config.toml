@@ -120,6 +120,9 @@ verify_jwt = false
 [functions.adaptive-music]
 verify_jwt = true
 
+[functions.mood-camera]
+verify_jwt = true
+
 [api]
 enabled = true
 port = 54321
