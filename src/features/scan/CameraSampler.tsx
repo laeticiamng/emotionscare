@@ -230,8 +230,12 @@ const CameraSampler: React.FC<CameraSamplerProps> = ({ onPermissionChange, onUna
       const valencePercent = Math.round(rawValence * 100);
       const arousalPercent = Math.round(rawArousal * 100);
 
+      const emotionLabel = data?.label ? data.label.charAt(0).toUpperCase() + data.label.slice(1) : 'Neutre';
       publishMood('scan_camera', clampNormalized(rawValence), clampNormalized(rawArousal));
       setEdgeReady(true);
+      
+      // Mettre à jour le message avec l'émotion détectée
+      setLiveMessage(emotionLabel);
       
       // Sauvegarder dans clinical_signals
       try {

@@ -39,7 +39,28 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: `Tu es un expert en analyse d'expressions faciales. Analyse l'image et détecte l'émotion avec un large panel comme Hume AI. Retourne UNIQUEMENT un objet JSON avec cette structure exacte:
+            content: `Tu es un expert en analyse d'expressions faciales avec une expertise en diversité morphologique et culturelle.
+
+IMPORTANT - DIVERSITÉ MORPHOLOGIQUE :
+Tu dois analyser les expressions faciales en tenant compte de la grande diversité des traits du visage selon les origines ethniques :
+- Morphologies asiatiques : traits plus fins, forme des yeux spécifique, structure osseuse caractéristique
+- Morphologies africaines : diversité entre Afrique subsaharienne et Afrique du Nord, structure du visage, traits prononcés
+- Morphologies européennes : grande variété (Nord, Sud, Est, Ouest)
+- Morphologies amérindiennes, moyen-orientales, océaniennes, etc.
+- Métissages et variantes individuelles
+
+Chaque morphologie exprime les émotions différemment. Par exemple :
+- Les plis du front varient selon la structure osseuse
+- L'ouverture des yeux diffère selon la forme naturelle
+- Les rides et expressions musculaires sont culturellement et morphologiquement diverses
+
+CONSIGNES D'ANALYSE :
+1. Analyse les micro-expressions UNIVERSELLES (contraction sourcils, ouverture yeux, tension bouche)
+2. Ne te base PAS sur des stéréotypes morphologiques
+3. Tiens compte que certaines expressions neutres peuvent sembler différentes selon l'origine
+4. Concentre-toi sur les CHANGEMENTS d'expression plutôt que sur l'apparence au repos
+
+Retourne UNIQUEMENT un objet JSON avec cette structure exacte:
 {
   "label": "joie" | "tristesse" | "colère" | "peur" | "surprise" | "dégoût" | "neutre" | "calme" | "anxiété" | "stress" | "excitation" | "ennui" | "confusion" | "concentration" | "détermination" | "fatigue" | "satisfaction" | "fierté" | "nostalgie" | "admiration" | "amusement" | "contentement" | "sérénité" | "frustration" | "honte" | "espoir" | "gratitude" | "enthousiasme" | "inquiétude" | "mélancolie" | "irritation" | "émerveillement" | "embarras" | "désir" | "culpabilité" | "jalousie" | "envie" | "mépris" | "déception" | "soulagement" | "tendresse" | "inspiration" | "extase" | "torpeur" | "tourment",
   "scores": {
@@ -48,7 +69,7 @@ serve(async (req) => {
     ...
   }
 }
-Le label doit être l'émotion dominante détectée. Dans scores, inclure les 3-5 émotions les plus présentes avec leurs scores de confiance. Sois précis et nuancé dans ta détection.`
+Le label doit être l'émotion dominante détectée. Dans scores, inclure les 3-5 émotions les plus présentes avec leurs scores de confiance. Sois précis, nuancé et culturellement inclusif dans ta détection.`
           },
           {
             role: 'user',

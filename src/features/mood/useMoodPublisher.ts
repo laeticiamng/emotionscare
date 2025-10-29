@@ -22,11 +22,40 @@ export function quadrant(valence: number, arousal: number): MoodEventDetail['qua
 }
 
 export function summary(valLevel: number, aroLevel: number): string {
-  if (valLevel <= 1 && aroLevel >= 3) return 'tension vive';
-  if (valLevel <= 1 && aroLevel <= 1) return 'ton plus bas';
-  if (valLevel >= 3 && aroLevel >= 3) return 'énergie haute';
-  if (valLevel >= 3 && aroLevel <= 1) return 'calme positif';
-  return 'état mixte';
+  // Négatif + Haute énergie (valence basse, arousal haut)
+  if (valLevel === 0 && aroLevel >= 4) return 'tension intense';
+  if (valLevel === 0 && aroLevel === 3) return 'agitation vive';
+  if (valLevel === 1 && aroLevel >= 3) return 'tension présente';
+  
+  // Négatif + Basse énergie (valence basse, arousal bas)
+  if (valLevel === 0 && aroLevel <= 1) return 'épuisement';
+  if (valLevel === 0 && aroLevel === 2) return 'ton très bas';
+  if (valLevel === 1 && aroLevel <= 1) return 'ton plus bas';
+  if (valLevel === 1 && aroLevel === 2) return 'énergie faible';
+  
+  // Positif + Haute énergie (valence haute, arousal haut)
+  if (valLevel === 4 && aroLevel >= 4) return 'joie intense';
+  if (valLevel === 4 && aroLevel === 3) return 'énergie joyeuse';
+  if (valLevel === 3 && aroLevel >= 3) return 'énergie haute';
+  
+  // Positif + Basse énergie (valence haute, arousal bas)
+  if (valLevel === 4 && aroLevel <= 1) return 'sérénité profonde';
+  if (valLevel === 4 && aroLevel === 2) return 'calme heureux';
+  if (valLevel === 3 && aroLevel <= 1) return 'calme positif';
+  if (valLevel === 3 && aroLevel === 2) return 'détente agréable';
+  
+  // États intermédiaires avec valence moyenne
+  if (valLevel === 2 && aroLevel >= 4) return 'éveil neutre';
+  if (valLevel === 2 && aroLevel === 3) return 'activation modérée';
+  if (valLevel === 2 && aroLevel === 2) return 'état équilibré';
+  if (valLevel === 2 && aroLevel === 1) return 'repos tranquille';
+  if (valLevel === 2 && aroLevel === 0) return 'calme neutre';
+  
+  // États mixtes avec transitions
+  if (valLevel === 1 && aroLevel === 3) return 'tension modérée';
+  if (valLevel === 3 && aroLevel === 3) return 'dynamisme positif';
+  
+  return 'état équilibré';
 }
 
 const clamp01 = (value: number) => {

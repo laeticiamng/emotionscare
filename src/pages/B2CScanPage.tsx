@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import * as Sentry from '@sentry/react';
+import { supabase } from '@/integrations/supabase/client';
 
 import PageRoot from '@/components/common/PageRoot';
 import { Button } from '@/components/ui/button';
@@ -130,7 +131,41 @@ const B2CScanPage: React.FC = () => {
     !samState.hasConsent &&
     samState.consentDecision !== 'declined';
 
+  // Pour la caméra, on veut l'émotion spécifique, pas le résumé du quadrant
+  const [detectedEmotion, setDetectedEmotion] = useState<string | null>(null);
+  
+  // Récupérer l'émotion spécifique depuis l'historique quand disponible
+  useEffect(() => {
+    if (detail?.source === 'scan_camera') {
+      // L'émotion sera disponible dans l'historique, on l'extrait du dernier signal
+      const checkEmotion = async () => {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+        
+        const { data: signals } = await supabase
+          .from('clinical_signals')
+          .select('metadata')
+          .eq('user_id', user.id)
+          .eq('source_instrument', 'scan_camera')
+          .order('created_at', { ascending: false })
+          .limit(1);
+          
+        if (signals && signals.length > 0) {
+          const metadata = signals[0].metadata as any;
+          if (metadata?.summary) {
+            setDetectedEmotion(metadata.summary);
+          }
+        }
+      };
+      checkEmotion();
+    } else if (detail?.source === 'scan_sliders') {
+      // Pour les sliders, utiliser le résumé du quadrant
+      setDetectedEmotion(null);
+    }
+  }, [detail?.source, detail?.ts]);
+  
   const activeSummary = detail?.summary;
+  const displayEmotion = detectedEmotion || activeSummary;
 
   const cameraDisabled = cameraDenied || edgeUnavailable;
 
@@ -262,7 +297,7 @@ const B2CScanPage: React.FC = () => {
             <MicroGestes 
               gestures={gestures} 
               summary={activeSummary}
-              emotion={detail?.summary}
+              emotion={displayEmotion}
               valence={detail?.valence}
               arousal={detail?.arousal}
             />
