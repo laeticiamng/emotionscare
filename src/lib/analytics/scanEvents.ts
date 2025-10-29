@@ -1,5 +1,5 @@
 // @ts-nocheck
-import * as Sentry from '@sentry/react';
+import { Sentry } from '@/lib/obs/sentry.web';
 
 export type ScanEventName =
   | 'onboarding_started'
