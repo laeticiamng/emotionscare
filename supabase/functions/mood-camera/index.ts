@@ -190,7 +190,7 @@ async function analyzeFacialExpression(frameBase64: string) {
       valence: Math.round(Math.max(0, Math.min(100, valence))),
       arousal: Math.round(Math.max(0, Math.min(100, arousal))),
       confidence: 0.6,
-      summary: generateSummary(valence, arousal),
+      summary: 'Neutre',
     };
   }
 
@@ -283,7 +283,7 @@ async function analyzeFacialExpression(frameBase64: string) {
       valence: Math.round(valence),
       arousal: Math.round(arousal),
       confidence: 0.4,
-      summary: generateSummary(valence, arousal),
+      summary: 'Neutre',
     };
   }
 }
