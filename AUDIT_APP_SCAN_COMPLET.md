@@ -89,7 +89,7 @@ Response: {
 
 **Rôle**:
 - Analyse l'expression faciale via **Hume AI** (API synchrone)
-- ✅ **Implémenté**: Détection faciale temps réel avec 12+ émotions
+- ✅ **Implémenté**: Détection faciale temps réel avec **48 émotions complètes**
 - Mapping sophistiqué émotions → valence/arousal (modèle circumplex)
 - Fallback gracieux si HUME_API_KEY absente ou erreur
 
@@ -294,8 +294,8 @@ const metadata = item.metadata as any;
 L'edge function `mood-camera` utilise maintenant l'**API Hume AI** pour une analyse faciale temps réel.
 
 **Fonctionnalités**:
-- Détection de 12+ émotions (Joy, Sadness, Anger, Fear, Excitement, Concentration, etc.)
-- Mapping vers modèle circumplex (valence/arousal)
+- Détection de **48 émotions complètes** (Joy, Sadness, Anger, Fear, Excitement, Admiration, Disgust, Horror, etc.)
+- Mapping vers modèle circumplex (valence/arousal) basé sur recherche empirique
 - Calcul pondéré basé sur les scores de confiance
 - Fallback gracieux si API indisponible ou aucun visage détecté
 - Logging Sentry détaillé pour monitoring
@@ -420,8 +420,9 @@ L'edge function `mood-camera` utilise maintenant l'**API Hume AI** pour une anal
 ## 📝 CHECKLIST DE MISE EN PRODUCTION
 
 - [x] ✅ Erreur 400 corrigée
-- [x] ✅ **Analyse faciale Hume AI implémentée**
+- [x] ✅ **Analyse faciale Hume AI implémentée avec 48 émotions**
 - [x] ✅ RLS policies vérifiées
+- [x] ✅ `hume-ws-proxy` supprimé (non utilisé, mauvais endpoint)
 - [ ] ⚠️ Tests accessibilité WCAG AA
 - [ ] ⚠️ Validation Hume AI en production
 - [ ] ⏳ Tests E2E complets

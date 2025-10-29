@@ -45,8 +45,6 @@ verify_jwt = true
 [functions.face-filter-comment]
 verify_jwt = true
 
-[functions.hume-ws-proxy]
-verify_jwt = true
 
 [functions.metrics]
 verify_jwt = true

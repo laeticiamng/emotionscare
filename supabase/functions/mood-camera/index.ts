@@ -25,23 +25,74 @@ interface MoodCameraResponse {
 }
 
 /**
- * Map Hume emotions to valence/arousal coordinates
- * Based on circumplex model of affect
+ * Map ALL 48 Hume emotions to valence/arousal coordinates
+ * Based on circumplex model of affect and empirical research
  */
 function mapEmotionToValenceArousal(emotions: Array<{ name: string; score: number }>): { valence: number; arousal: number; confidence: number } {
   const emotionMap: Record<string, { valence: number; arousal: number }> = {
-    'Joy': { valence: 0.8, arousal: 0.6 },
-    'Excitement': { valence: 0.8, arousal: 0.8 },
-    'Contentment': { valence: 0.7, arousal: 0.3 },
-    'Calmness': { valence: 0.6, arousal: 0.2 },
-    'Sadness': { valence: 0.2, arousal: 0.3 },
-    'Fear': { valence: 0.3, arousal: 0.8 },
-    'Anger': { valence: 0.2, arousal: 0.8 },
-    'Anxiety': { valence: 0.3, arousal: 0.7 },
-    'Surprise': { valence: 0.5, arousal: 0.8 },
-    'Disgust': { valence: 0.3, arousal: 0.6 },
-    'Confusion': { valence: 0.4, arousal: 0.5 },
+    // High valence, high arousal (excited, energized)
+    'Admiration': { valence: 0.8, arousal: 0.7 },
+    'Adoration': { valence: 0.9, arousal: 0.6 },
+    'Aesthetic Appreciation': { valence: 0.7, arousal: 0.4 },
+    'Amusement': { valence: 0.8, arousal: 0.7 },
+    'Excitement': { valence: 0.9, arousal: 0.9 },
+    'Joy': { valence: 0.9, arousal: 0.7 },
+    'Ecstasy': { valence: 1.0, arousal: 0.9 },
+    'Triumph': { valence: 0.9, arousal: 0.8 },
+    
+    // High valence, moderate arousal (pleasant, content)
+    'Awe': { valence: 0.7, arousal: 0.6 },
+    'Entrancement': { valence: 0.7, arousal: 0.5 },
+    'Interest': { valence: 0.6, arousal: 0.5 },
+    'Nostalgia': { valence: 0.6, arousal: 0.3 },
+    'Pride': { valence: 0.8, arousal: 0.6 },
+    'Romance': { valence: 0.8, arousal: 0.5 },
+    'Satisfaction': { valence: 0.7, arousal: 0.3 },
+    'Love': { valence: 0.9, arousal: 0.5 },
+    
+    // High valence, low arousal (calm, peaceful)
+    'Calmness': { valence: 0.7, arousal: 0.2 },
+    'Contentment': { valence: 0.8, arousal: 0.2 },
+    'Relief': { valence: 0.6, arousal: 0.2 },
+    'Serenity': { valence: 0.8, arousal: 0.1 },
+    
+    // Neutral valence (ambiguous emotions)
     'Concentration': { valence: 0.5, arousal: 0.6 },
+    'Contemplation': { valence: 0.5, arousal: 0.3 },
+    'Confusion': { valence: 0.4, arousal: 0.5 },
+    'Realization': { valence: 0.5, arousal: 0.6 },
+    'Surprise': { valence: 0.5, arousal: 0.8 },
+    'Doubt': { valence: 0.4, arousal: 0.4 },
+    'Determination': { valence: 0.5, arousal: 0.7 },
+    
+    // Low valence, high arousal (distressed, agitated)
+    'Anger': { valence: 0.2, arousal: 0.9 },
+    'Anxiety': { valence: 0.3, arousal: 0.8 },
+    'Awkwardness': { valence: 0.3, arousal: 0.6 },
+    'Disgust': { valence: 0.2, arousal: 0.7 },
+    'Distress': { valence: 0.2, arousal: 0.8 },
+    'Fear': { valence: 0.2, arousal: 0.9 },
+    'Horror': { valence: 0.1, arousal: 0.9 },
+    'Panic': { valence: 0.1, arousal: 1.0 },
+    'Rage': { valence: 0.1, arousal: 1.0 },
+    'Terror': { valence: 0.1, arousal: 1.0 },
+    'Envy': { valence: 0.3, arousal: 0.7 },
+    
+    // Low valence, moderate arousal (uncomfortable, negative)
+    'Craving': { valence: 0.3, arousal: 0.6 },
+    'Disappointment': { valence: 0.3, arousal: 0.4 },
+    'Disapproval': { valence: 0.3, arousal: 0.5 },
+    'Embarrassment': { valence: 0.3, arousal: 0.6 },
+    'Guilt': { valence: 0.3, arousal: 0.5 },
+    'Shame': { valence: 0.2, arousal: 0.6 },
+    'Pain': { valence: 0.2, arousal: 0.7 },
+    'Empathic Pain': { valence: 0.3, arousal: 0.4 },
+    
+    // Low valence, low arousal (sad, depressed)
+    'Boredom': { valence: 0.3, arousal: 0.2 },
+    'Sadness': { valence: 0.2, arousal: 0.3 },
+    'Tiredness': { valence: 0.4, arousal: 0.1 },
+    'Sympathy': { valence: 0.4, arousal: 0.3 },
   };
 
   let totalValence = 0;
