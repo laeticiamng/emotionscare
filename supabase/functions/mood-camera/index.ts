@@ -10,7 +10,7 @@ const corsHeaders = {
  * Map ALL 48 Hume emotions to valence/arousal coordinates
  * Based on circumplex model of affect and empirical research
  */
-function mapEmotionToValenceArousal(emotions: Array<{ name: string; score: number }>): { valence: number; arousal: number; confidence: number } {
+function mapEmotionToValenceArousal(emotions: Array<{ name: string; score: number }>): { valence: number; arousal: number; confidence: number; topEmotion: string } {
   const emotionMap: Record<string, { valence: number; arousal: number }> = {
     // High valence, high arousal (excited, energized)
     'Admiration': { valence: 0.8, arousal: 0.7 },
@@ -77,10 +77,65 @@ function mapEmotionToValenceArousal(emotions: Array<{ name: string; score: numbe
     'Sympathy': { valence: 0.4, arousal: 0.3 },
   };
 
+  // French translations for emotions
+  const emotionTranslations: Record<string, string> = {
+    'Admiration': 'Admiration',
+    'Adoration': 'Adoration',
+    'Aesthetic Appreciation': 'Appreciation esthetique',
+    'Amusement': 'Amusement',
+    'Excitement': 'Excitation',
+    'Joy': 'Joie',
+    'Ecstasy': 'Extase',
+    'Triumph': 'Triomphe',
+    'Awe': 'Emerveillement',
+    'Entrancement': 'Fascination',
+    'Interest': 'Interet',
+    'Nostalgia': 'Nostalgie',
+    'Pride': 'Fierte',
+    'Romance': 'Romance',
+    'Satisfaction': 'Satisfaction',
+    'Love': 'Amour',
+    'Calmness': 'Calme',
+    'Contentment': 'Contentement',
+    'Relief': 'Soulagement',
+    'Serenity': 'Serenite',
+    'Concentration': 'Concentration',
+    'Contemplation': 'Contemplation',
+    'Confusion': 'Confusion',
+    'Realization': 'Realisation',
+    'Surprise': 'Surprise',
+    'Doubt': 'Doute',
+    'Determination': 'Determination',
+    'Anger': 'Colere',
+    'Anxiety': 'Anxiete',
+    'Awkwardness': 'Malaise',
+    'Disgust': 'Degout',
+    'Distress': 'Detresse',
+    'Fear': 'Peur',
+    'Horror': 'Horreur',
+    'Panic': 'Panique',
+    'Rage': 'Rage',
+    'Terror': 'Terreur',
+    'Envy': 'Envie',
+    'Craving': 'Desir intense',
+    'Disappointment': 'Deception',
+    'Disapproval': 'Desapprobation',
+    'Embarrassment': 'Embarras',
+    'Guilt': 'Culpabilite',
+    'Shame': 'Honte',
+    'Pain': 'Douleur',
+    'Empathic Pain': 'Empathie douloureuse',
+    'Boredom': 'Ennui',
+    'Sadness': 'Tristesse',
+    'Tiredness': 'Fatigue',
+    'Sympathy': 'Sympathie',
+  };
+
   let totalValence = 0;
   let totalArousal = 0;
   let totalWeight = 0;
   let maxScore = 0;
+  let topEmotion = '';
 
   emotions.forEach(({ name, score }) => {
     const mapping = emotionMap[name];
@@ -88,12 +143,16 @@ function mapEmotionToValenceArousal(emotions: Array<{ name: string; score: numbe
       totalValence += mapping.valence * score;
       totalArousal += mapping.arousal * score;
       totalWeight += score;
-      maxScore = Math.max(maxScore, score);
+      
+      if (score > maxScore) {
+        maxScore = score;
+        topEmotion = emotionTranslations[name] || name;
+      }
     }
   });
 
   if (totalWeight === 0) {
-    return { valence: 50, arousal: 50, confidence: 0.3 };
+    return { valence: 50, arousal: 50, confidence: 0.3, topEmotion: 'Neutre' };
   }
 
   const valence = (totalValence / totalWeight) * 100;
@@ -103,43 +162,15 @@ function mapEmotionToValenceArousal(emotions: Array<{ name: string; score: numbe
     valence: Math.round(Math.min(100, Math.max(0, valence))),
     arousal: Math.round(Math.min(100, Math.max(0, arousal))),
     confidence: Math.round(maxScore * 100) / 100,
+    topEmotion: topEmotion || 'Neutre',
   };
 }
 
 /**
- * Generate emotion summary based on valence/arousal
- * Using finer granularity for more varied feedback
+ * Generate emotion summary using the top emotion detected
  */
-function generateSummary(valence: number, arousal: number): string {
-  // High arousal (>70)
-  if (arousal > 70) {
-    if (valence > 70) return 'Tres energique';
-    if (valence > 50) return 'Stimule';
-    if (valence > 30) return 'Anxieux';
-    return 'Tres tendu';
-  }
-  
-  // Moderate-high arousal (50-70)
-  if (arousal > 50) {
-    if (valence > 70) return 'Joyeux';
-    if (valence > 50) return 'Actif';
-    if (valence > 30) return 'Preoccupe';
-    return 'Sous tension';
-  }
-  
-  // Moderate-low arousal (30-50)
-  if (arousal > 30) {
-    if (valence > 70) return 'Satisfait';
-    if (valence > 50) return 'Neutre';
-    if (valence > 30) return 'Pensif';
-    return 'Un peu las';
-  }
-  
-  // Low arousal (<30)
-  if (valence > 70) return 'Tres calme';
-  if (valence > 50) return 'Detendu';
-  if (valence > 30) return 'Melancolique';
-  return 'Fatigue';
+function generateSummary(topEmotion: string): string {
+  return topEmotion;
 }
 
 /**
@@ -226,12 +257,12 @@ async function analyzeFacialExpression(frameBase64: string) {
           };
         }
 
-        const { valence, arousal, confidence } = mapEmotionToValenceArousal(predictions.emotions);
+        const { valence, arousal, confidence, topEmotion } = mapEmotionToValenceArousal(predictions.emotions);
         return {
           valence,
           arousal,
           confidence,
-          summary: generateSummary(valence, arousal),
+          summary: generateSummary(topEmotion),
         };
       } else if (result.state === 'FAILED') {
         console.error('[mood-camera] Job failed:', result.message);
