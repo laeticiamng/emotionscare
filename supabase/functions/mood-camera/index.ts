@@ -149,9 +149,13 @@ function generateSummary(valence: number, arousal: number): string {
  *       for lower latency (~50ms vs ~500ms) and better real-time performance
  * 
  * @see https://dev.hume.ai/docs/expression-measurement/websocket
+ * 
+ * Updated: 2025-10-29 - Hume AI integration with 48 emotions
  */
 async function analyzeFacialExpression(frameBase64: string): Promise<MoodCameraResponse> {
   const humeApiKey = Deno.env.get('HUME_API_KEY');
+  
+  console.log('[mood-camera] Analyzing frame, API key present:', !!humeApiKey);
   
   if (!humeApiKey) {
     console.warn('[mood-camera] HUME_API_KEY not configured, using fallback');
