@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import * as Sentry from '@sentry/react';
 import { supabase } from '@/integrations/supabase/client';
+import { Link, useLocation } from 'react-router-dom';
 
 import PageRoot from '@/components/common/PageRoot';
 import { Button } from '@/components/ui/button';
@@ -19,6 +20,7 @@ import { ScanHistory } from '@/components/scan/ScanHistory';
 import { ScanOnboarding, shouldShowOnboarding } from '@/components/scan/ScanOnboarding';
 import { useToast } from '@/hooks/use-toast';
 import { scanAnalytics } from '@/lib/analytics/scanEvents';
+import { Camera, Mic, FileText, Sliders } from 'lucide-react';
 
 const mapToSamScale = (value: number) => {
   const normalized = Math.max(0, Math.min(100, value));
@@ -29,6 +31,7 @@ const mapToSamScale = (value: number) => {
 const B2CScanPage: React.FC = () => {
   const { has } = useFlags();
   const { toast } = useToast();
+  const location = useLocation();
   const { detail, gestures } = useSamOrchestration();
   const { state: samState, submit: submitSam, grantConsent, declineConsent } = useAssessment('SAM');
   const [mode, setMode] = useState<'sliders' | 'camera'>('sliders');
@@ -38,6 +41,39 @@ const B2CScanPage: React.FC = () => {
   const lastSubmittedRef = useRef<string | null>(null);
 
   const featureEnabled = has('FF_SCAN_SAM');
+  
+  const scanModes = [
+    { 
+      id: 'scanner', 
+      label: 'Scanner', 
+      icon: Sliders, 
+      path: '/app/scan',
+      description: 'Curseurs et caméra'
+    },
+    { 
+      id: 'facial', 
+      label: 'Facial', 
+      icon: Camera, 
+      path: '/app/scan/facial',
+      description: 'Reconnaissance faciale IA'
+    },
+    { 
+      id: 'voice', 
+      label: 'Vocal', 
+      icon: Mic, 
+      path: '/app/scan/voice',
+      description: 'Analyse de la voix'
+    },
+    { 
+      id: 'text', 
+      label: 'Texte', 
+      icon: FileText, 
+      path: '/app/scan/text',
+      description: 'Analyse textuelle'
+    },
+  ];
+  
+  const currentMode = scanModes.find(m => m.path === location.pathname) || scanModes[0];
 
   useEffect(() => {
     Sentry.addBreadcrumb({ category: 'scan', level: 'info', message: 'scan:open' });
@@ -196,6 +232,40 @@ const B2CScanPage: React.FC = () => {
         )}
         <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-primary/10">
           <div className="container mx-auto flex flex-col gap-10 px-4 py-10">
+          
+          {/* Navigation des modalités de scan */}
+          <nav className="flex gap-2 overflow-x-auto pb-2">
+            {scanModes.map((scanMode) => {
+              const Icon = scanMode.icon;
+              const isActive = scanMode.path === location.pathname;
+              
+              return (
+                <Link
+                  key={scanMode.id}
+                  to={scanMode.path}
+                  className={`flex items-center gap-3 rounded-2xl px-6 py-4 transition-all hover:scale-[1.02] flex-shrink-0 ${
+                    isActive
+                      ? 'bg-primary text-primary-foreground shadow-lg'
+                      : 'bg-white/5 backdrop-blur border border-white/10 hover:bg-white/10'
+                  }`}
+                  onClick={() => {
+                    if (scanMode.id !== 'scanner') {
+                      scanAnalytics.modeChanged(mode, scanMode.id as any);
+                    }
+                  }}
+                >
+                  <Icon className="h-5 w-5" />
+                  <div className="text-left">
+                    <div className="font-medium">{scanMode.label}</div>
+                    <div className={`text-xs ${isActive ? 'text-primary-foreground/80' : 'text-muted-foreground'}`}>
+                      {scanMode.description}
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
+          </nav>
+          
           <header className="space-y-4">
             <span className="inline-flex w-fit items-center rounded-full bg-primary/10 px-4 py-1 text-xs font-medium text-primary">
               {modeLabel}
