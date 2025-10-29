@@ -3,6 +3,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Music, Sparkles, Brain } from 'lucide-react';
 import EmotionMusicPanel from '@/components/music/EmotionMusicPanel';
+import ClinicalMusicGenerator from '@/components/music/ClinicalMusicGenerator';
 
 const EmotionMusic: React.FC = () => {
   return (
@@ -67,11 +68,20 @@ const EmotionMusic: React.FC = () => {
           </motion.div>
         </div>
 
-        {/* Main Panel */}
+        {/* Clinical Music Generator - Based on history */}
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.4 }}
+        >
+          <ClinicalMusicGenerator />
+        </motion.div>
+
+        {/* Main Panel */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.5 }}
         >
           <EmotionMusicPanel />
         </motion.div>
