@@ -136,6 +136,9 @@ verify_jwt = false
 [functions.emotion-micro-gestures]
 verify_jwt = true
 
+[functions.analyze-voice-hume]
+verify_jwt = false
+
 [api]
 enabled = true
 port = 54321

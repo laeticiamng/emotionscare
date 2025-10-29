@@ -9,6 +9,7 @@ import { EmotionResult } from '@/types/emotion';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Mic } from 'lucide-react';
 import { withGuard } from '@/routerV2/withGuard';
+import { ScanHistory } from '@/components/scan/ScanHistory';
 
 const VoiceScanPage: React.FC = () => {
   const navigate = useNavigate();
@@ -144,6 +145,8 @@ const VoiceScanPage: React.FC = () => {
                     </div>
                   </CardContent>
                 </Card>
+
+                <ScanHistory />
 
                 <Card>
                   <CardHeader>
