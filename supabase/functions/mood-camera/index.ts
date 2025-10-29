@@ -123,34 +123,118 @@ function generateSummary(valence: number, arousal: number): string {
 }
 
 /**
- * Analyze facial expression using Hume AI API
+ * Analyze facial expression using Hume AI HTTP Batch API
  */
 async function analyzeFacialExpression(frameBase64: string) {
   const humeApiKey = Deno.env.get('HUME_API_KEY');
   
   console.log('[mood-camera] Analyzing frame, API key present:', !!humeApiKey);
   
-  // NOTE: Hume AI real-time requires WebSocket Streaming API (wss://api.hume.ai/v0/stream/models)
-  // HTTP Edge Functions cannot use WebSockets, so we use a heuristic fallback
-  // For production: Move emotion detection to client-side with Hume SDK + WebSocket
-  
   if (!humeApiKey) {
     console.warn('[mood-camera] HUME_API_KEY not configured, using fallback');
-  } else {
-    console.warn('[mood-camera] Hume requires WebSocket for real-time, using fallback until client-side integration');
+    const valence = 50 + Math.random() * 40 - 20;
+    const arousal = 50 + Math.random() * 40 - 20;
+    
+    return {
+      valence: Math.round(Math.max(0, Math.min(100, valence))),
+      arousal: Math.round(Math.max(0, Math.min(100, arousal))),
+      confidence: 0.6,
+      summary: generateSummary(valence, arousal),
+    };
   }
-  
-  // Fallback: Generate varied emotional states for testing
-  // In production: Replace with client-side Hume WebSocket SDK
-  const valence = 50 + Math.random() * 40 - 20; // 30-70 range
-  const arousal = 50 + Math.random() * 40 - 20; // 30-70 range
-  
-  return {
-    valence: Math.round(Math.max(0, Math.min(100, valence))),
-    arousal: Math.round(Math.max(0, Math.min(100, arousal))),
-    confidence: 0.6 + Math.random() * 0.2, // 0.6-0.8 range
-    summary: generateSummary(valence, arousal),
-  };
+
+  try {
+    // Clean base64 data
+    const cleanBase64 = frameBase64.replace(/^data:image\/[a-z]+;base64,/, '');
+
+    console.log('[mood-camera] Calling Hume AI Batch API...');
+    
+    // Call Hume AI Batch API for single image analysis
+    const response = await fetch('https://api.hume.ai/v0/batch/jobs', {
+      method: 'POST',
+      headers: {
+        'X-Hume-Api-Key': humeApiKey,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        models: {
+          face: {}
+        },
+        urls: [],
+        files: [{
+          filename: 'frame.jpg',
+          content_type: 'image/jpeg',
+          data: cleanBase64
+        }]
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('[mood-camera] Hume API error:', response.status, errorText.slice(0, 200));
+      throw new Error(`Hume API returned ${response.status}`);
+    }
+
+    const jobData = await response.json();
+    const jobId = jobData.job_id;
+    
+    console.log('[mood-camera] Job created:', jobId);
+    
+    // Poll for results (max 10 seconds)
+    for (let i = 0; i < 20; i++) {
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      const resultResponse = await fetch(`https://api.hume.ai/v0/batch/jobs/${jobId}`, {
+        headers: {
+          'X-Hume-Api-Key': humeApiKey,
+        },
+      });
+      
+      const result = await resultResponse.json();
+      
+      if (result.state === 'COMPLETED') {
+        console.log('[mood-camera] Job completed');
+        
+        const predictions = result.predictions?.[0]?.results?.predictions?.[0];
+        if (!predictions || !predictions.emotions) {
+          console.warn('[mood-camera] No face detected');
+          return {
+            valence: 50,
+            arousal: 50,
+            confidence: 0.3,
+            summary: 'Aucun visage détecté',
+          };
+        }
+
+        const { valence, arousal, confidence } = mapEmotionToValenceArousal(predictions.emotions);
+        return {
+          valence,
+          arousal,
+          confidence,
+          summary: generateSummary(valence, arousal),
+        };
+      } else if (result.state === 'FAILED') {
+        console.error('[mood-camera] Job failed:', result.message);
+        throw new Error('Analysis failed');
+      }
+    }
+    
+    console.warn('[mood-camera] Job timeout');
+    throw new Error('Analysis timeout');
+    
+  } catch (error) {
+    console.error('[mood-camera] Hume analysis failed:', error);
+    
+    // Fallback on error
+    const valence = 50 + Math.random() * 20 - 10;
+    const arousal = 50 + Math.random() * 20 - 10;
+    return {
+      valence: Math.round(valence),
+      arousal: Math.round(arousal),
+      confidence: 0.4,
+      summary: generateSummary(valence, arousal),
+    };
+  }
 }
 
 serve(async (req) => {
