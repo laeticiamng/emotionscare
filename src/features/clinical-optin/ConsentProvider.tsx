@@ -9,7 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useTranslation } from 'react-i18next';
 
-const CONSENT_SCOPE = 'clinical';
+const CONSENT_SCOPE = 'coach';
 const CONSENT_VERSION = 'v1';
 const CONSENT_QUERY_KEY = ['clinical-optin', 'status'] as const;
 
