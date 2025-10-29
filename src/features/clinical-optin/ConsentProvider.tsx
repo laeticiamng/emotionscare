@@ -159,6 +159,12 @@ export const ConsentProvider: React.FC<{ children: React.ReactNode }> = ({ child
         data: { scope: CONSENT_SCOPE },
       });
 
+      // Récupérer l'utilisateur actuel
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        throw new Error('User not authenticated');
+      }
+
       // Vérifier s'il existe déjà un consentement actif
       const { data: existing } = await supabase
         .from('clinical_optins')
@@ -170,10 +176,11 @@ export const ConsentProvider: React.FC<{ children: React.ReactNode }> = ({ child
         return; // Déjà accepté
       }
 
-      // Insérer un nouveau consentement
+      // Insérer un nouveau consentement avec le user_id
       const { error } = await supabase
         .from('clinical_optins')
         .insert({
+          user_id: user.id,
           scope: CONSENT_SCOPE,
         });
 
