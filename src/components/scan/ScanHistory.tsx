@@ -7,7 +7,6 @@ import { useScanHistory } from '@/hooks/useScanHistory';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { ScanHistoryExpanded } from './ScanHistoryExpanded';
 import { scanAnalytics } from '@/lib/analytics/scanEvents';
 
 const getEmotionColor = (valence: number, arousal: number) => {
@@ -26,12 +25,18 @@ const getEmotionLabel = (valence: number, arousal: number) => {
 };
 
 export const ScanHistory: React.FC = () => {
-  const { data: history, isLoading } = useScanHistory(3);
-  const [showExpanded, setShowExpanded] = useState(false);
+  const [limit, setLimit] = useState(3);
+  const { data: history, isLoading } = useScanHistory(limit);
+  const [isExpanded, setIsExpanded] = useState(false);
 
-  const handleViewAll = () => {
-    scanAnalytics.historyViewed(history?.length || 0);
-    setShowExpanded(true);
+  const handleToggleExpanded = () => {
+    if (!isExpanded) {
+      setLimit(10);
+      scanAnalytics.historyViewed(history?.length || 0);
+    } else {
+      setLimit(3);
+    }
+    setIsExpanded(!isExpanded);
   };
 
   // Show skeleton longer to prevent flash
@@ -77,71 +82,70 @@ export const ScanHistory: React.FC = () => {
   }
 
   return (
-    <>
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="flex items-center gap-2">
-                <Clock className="h-5 w-5" />
-                Historique récent
-              </CardTitle>
-              <CardDescription>
-                Vos 3 derniers états émotionnels
-              </CardDescription>
-            </div>
+    <Card>
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="flex items-center gap-2">
+              <Clock className="h-5 w-5" />
+              Historique récent
+            </CardTitle>
+            <CardDescription>
+              {isExpanded ? 'Vos 10 derniers états émotionnels' : 'Vos 3 derniers états émotionnels'}
+            </CardDescription>
+          </div>
+          {history && history.length > 3 && (
             <Button
               variant="ghost"
               size="sm"
-              onClick={handleViewAll}
+              onClick={handleToggleExpanded}
               className="gap-1"
             >
-              Voir tout
-              <ChevronRight className="h-4 w-4" />
+              {isExpanded ? 'Voir moins' : 'Voir plus'}
+              <ChevronRight className={`h-4 w-4 transition-transform ${isExpanded ? 'rotate-90' : ''}`} />
             </Button>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-3">
-        {history.map((scan, index) => {
-          const emotionColor = getEmotionColor(scan.valence, scan.arousal);
-          const emotionLabel = getEmotionLabel(scan.valence, scan.arousal);
-          const timeAgo = formatDistanceToNow(new Date(scan.created_at), {
-            addSuffix: true,
-            locale: fr,
-          });
+          )}
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-3">
+      {history.map((scan, index) => {
+        const emotionColor = getEmotionColor(scan.valence, scan.arousal);
+        const emotionLabel = getEmotionLabel(scan.valence, scan.arousal);
+        const timeAgo = formatDistanceToNow(new Date(scan.created_at), {
+          addSuffix: true,
+          locale: fr,
+        });
 
-          return (
-            <div
-              key={scan.id}
-              className="flex items-center gap-3 rounded-lg border bg-card p-3 transition-colors hover:bg-accent/5"
-            >
-              <div className={`flex-shrink-0 ${emotionColor}`}>
-                {index === 0 ? (
-                  <TrendingUp className="h-5 w-5" />
-                ) : (
-                  <Activity className="h-5 w-5" />
-                )}
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className={`text-sm font-medium ${emotionColor}`}>
-                  {emotionLabel}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {timeAgo}
-                  {scan.summary && ` · ${scan.summary}`}
-                </p>
-              </div>
-              <div className="flex-shrink-0 text-right">
-                <div className="text-xs text-muted-foreground">
-                  V:{Math.round(scan.valence)} A:{Math.round(scan.arousal)}
-                </div>
+        return (
+          <div
+            key={scan.id}
+            className="flex items-center gap-3 rounded-lg border bg-card p-3 transition-colors hover:bg-accent/5"
+          >
+            <div className={`flex-shrink-0 ${emotionColor}`}>
+              {index === 0 ? (
+                <TrendingUp className="h-5 w-5" />
+              ) : (
+                <Activity className="h-5 w-5" />
+              )}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className={`text-sm font-medium ${emotionColor}`}>
+                {emotionLabel}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {timeAgo}
+                {scan.summary && ` · ${scan.summary}`}
+              </p>
+            </div>
+            <div className="flex-shrink-0 text-right">
+              <div className="text-xs text-muted-foreground">
+                V:{Math.round(scan.valence)} A:{Math.round(scan.arousal)}
               </div>
             </div>
-          );
-        })}
-      </CardContent>
-    </Card>
-      <ScanHistoryExpanded open={showExpanded} onClose={() => setShowExpanded(false)} />
-    </>
+          </div>
+        );
+      })}
+    </CardContent>
+  </Card>
   );
 };

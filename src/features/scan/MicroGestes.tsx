@@ -28,23 +28,16 @@ const MicroGestes: React.FC<MicroGestesProps> = ({
   arousal = 50 
 }) => {
   const { isLoading, suggestions, generateSuggestions } = useAIMicroGestures();
-  const [useAI, setUseAI] = useState(false);
   
   const hasGestures = gestures.length > 0;
   const hasAISuggestions = suggestions && suggestions.gestures.length > 0;
 
-  // Générer automatiquement si émotion disponible
+  // Générer automatiquement les suggestions IA dès qu'une émotion est disponible
   useEffect(() => {
-    if (useAI && emotion && !isLoading && !suggestions) {
+    if (emotion && !isLoading && !suggestions) {
       generateSuggestions({ emotion, valence, arousal });
     }
-  }, [useAI, emotion, valence, arousal, isLoading, suggestions, generateSuggestions]);
-
-  const handleEnhanceWithAI = () => {
-    if (!emotion) return;
-    setUseAI(true);
-    generateSuggestions({ emotion, valence, arousal });
-  };
+  }, [emotion, valence, arousal, isLoading, suggestions, generateSuggestions]);
 
   const displayGestures: AIMicroGesture[] | MicroGesture[] = hasAISuggestions 
     ? suggestions.gestures 
@@ -55,29 +48,25 @@ const MicroGestes: React.FC<MicroGestesProps> = ({
   return (
     <section className="rounded-3xl border border-transparent bg-white/5 p-6 shadow-lg backdrop-blur mood-surface dark:bg-slate-800/40">
       <header className="space-y-3">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
           <h2 className="text-lg font-semibold text-foreground">Micro-gestes suggérés</h2>
-          {hasGestures && emotion && !useAI && (
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={handleEnhanceWithAI}
-              disabled={isLoading}
-              className="gap-2"
-            >
-              {isLoading ? (
-                <Loader2 className="h-3 w-3 animate-spin" />
-              ) : (
-                <Sparkles className="h-3 w-3" />
-              )}
-              IA personnalisée
-            </Button>
+          {isLoading && (
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <Loader2 className="h-3 w-3 animate-spin" />
+              <span>Génération en cours...</span>
+            </div>
+          )}
+          {hasAISuggestions && !isLoading && (
+            <div className="flex items-center gap-1.5 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+              <Sparkles className="h-3 w-3" />
+              <span>IA</span>
+            </div>
           )}
         </div>
         
         <p className="text-sm text-muted-foreground">
           {hasAISuggestions 
-            ? 'Suggestions personnalisées générées par IA'
+            ? 'Suggestions personnalisées générées automatiquement par IA en fonction de votre état'
             : 'Des invitations corporelles légères pour accompagner l\'état perçu.'
           }
         </p>
