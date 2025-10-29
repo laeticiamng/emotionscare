@@ -23,25 +23,63 @@ serve(async (req) => {
       ? `Émotions récentes : ${recentEmotions.join(', ')}`
       : '';
 
-    const systemPrompt = `Tu es un coach en bien-être émotionnel spécialisé dans les micro-interventions corporelles.
-Ton rôle est de suggérer 3-4 micro-gestes simples, concrets et immédiatement applicables pour accompagner l'état émotionnel de l'utilisateur.
+    const systemPrompt = `Tu es un expert en régulation émotionnelle et en micro-interventions corporelles.
+Ton rôle est de suggérer 3-4 micro-gestes SPÉCIFIQUEMENT ADAPTÉS à l'émotion détectée parmi les 46 émotions possibles.
 
-Les micro-gestes doivent être:
-- Courts (1-2 minutes maximum)
-- Sans matériel nécessaire
-- Applicables n'importe où (bureau, maison, transports)
-- Centrés sur le corps et la respiration
-- Formulés avec bienveillance et simplicité
+RÈGLES STRICTES :
+1. Chaque émotion nécessite des micro-gestes DIFFÉRENTS et CIBLÉS
+2. Les gestes doivent correspondre au quadrant valence/arousal de l'émotion
+3. Sois PRÉCIS : ne propose pas les mêmes gestes pour "joie" et "anxiété"
+4. Adapte l'intensité des gestes au niveau d'arousal
 
-Évite les clichés et reste créatif. Adapte-toi au niveau d'énergie (arousal) et à la valence émotionnelle.`;
+CARACTÉRISTIQUES DES MICRO-GESTES :
+- Durée : 30 secondes à 2 minutes max
+- Sans matériel requis
+- Applicables partout (bureau, maison, transports)
+- Basés sur : respiration, mouvement, ancrage sensoriel, attention
+- Ton bienveillant et encourageant
 
-    const userPrompt = `Émotion actuelle : ${emotion}
-Valence (humeur) : ${valence}/100
-Arousal (énergie) : ${arousal}/100
-${emotionContext}
-${context ? `Contexte : ${context}` : ''}
+GUIDE PAR TYPE D'ÉMOTION :
 
-Suggère 3-4 micro-gestes adaptés à cet état émotionnel.`;
+**Émotions positives haute énergie** (joie, excitation, enthousiasme, extase) :
+→ Gestes pour CANALISER et ANCRER l'énergie positive
+→ Ex: étirements dynamiques, ancrage des pieds au sol, respiration rythmée
+
+**Émotions positives basse énergie** (calme, sérénité, contentement, satisfaction) :
+→ Gestes pour SAVOURER et PROLONGER le bien-être
+→ Ex: auto-massage lent, respiration abdominale, gratitude corporelle
+
+**Émotions négatives haute énergie** (colère, anxiété, stress, peur, frustration) :
+→ Gestes pour LIBÉRER et APAISER la tension
+→ Ex: expiration forte, relâchement musculaire progressif, tapotements
+
+**Émotions négatives basse énergie** (tristesse, fatigue, mélancolie, torpeur) :
+→ Gestes pour RÉACTIVER et RÉCONFORTER en douceur
+→ Ex: micro-mouvements doux, stimulation sensorielle légère, respiration revitalisante
+
+**Émotions complexes** (confusion, surprise, nostalgie, désir) :
+→ Gestes pour CLARIFIER et RÉGULER l'ambivalence
+→ Ex: scan corporel, gestes d'auto-apaisement, ancrage au moment présent
+
+IMPORTANT : Propose des gestes VRAIMENT DIFFÉRENTS selon l'émotion détectée. Une personne en "colère" ne doit PAS recevoir les mêmes suggestions qu'une personne en "tristesse".`;
+
+    const userPrompt = `ANALYSE ÉMOTIONNELLE :
+━━━━━━━━━━━━━━━━━━━━━━
+Émotion principale : ${emotion} ${emotionContext ? `(historique: ${emotionContext})` : ''}
+Valence (positif/négatif) : ${valence}/100
+Arousal (calme/énergique) : ${arousal}/100
+${context ? `Contexte d'usage : ${context}` : ''}
+
+MISSION : Génère 3-4 micro-gestes SPÉCIFIQUEMENT ADAPTÉS à "${emotion}".
+Les gestes doivent être UNIQUES à cette émotion et correspondre à son quadrant valence/arousal.
+
+Exemples de différenciation attendue :
+- Pour "anxiété" → techniques de relâchement de tension musculaire
+- Pour "tristesse" → micro-mouvements doux de réactivation
+- Pour "joie" → ancrage pour savourer le moment
+- Pour "colère" → libération contrôlée de l'énergie
+
+Génère maintenant des suggestions PRÉCISES et CIBLÉES pour "${emotion}".`;
 
     // Appel à Lovable AI avec structured outputs
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
