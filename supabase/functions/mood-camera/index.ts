@@ -1,28 +1,10 @@
 // @ts-nocheck
-import { serve } from '../_shared/serve.ts';
-import { z } from '../_shared/zod.ts';
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
-import { authenticateRequest, logUnauthorizedAccess } from '../_shared/auth-middleware.ts';
-import { appendCorsHeaders, preflightResponse, rejectCors, resolveCors } from '../_shared/cors.ts';
-import { applySecurityHeaders, json } from '../_shared/http.ts';
-import { hash } from '../_shared/hash_user.ts';
-import { logAccess } from '../_shared/logging.ts';
-import { addSentryBreadcrumb, captureSentryException } from '../_shared/sentry.ts';
-import { traced } from '../_shared/otel.ts';
-import { buildRateLimitResponse, enforceEdgeRateLimit } from '../_shared/rate-limit.ts';
-import { recordEdgeLatencyMetric } from '../_shared/metrics.ts';
-
-const requestSchema = z.object({
-  frame: z.string().min(10), // base64 image data
-  timestamp: z.string().datetime().optional(),
-});
-
-interface MoodCameraResponse {
-  valence: number; // 0-100
-  arousal: number; // 0-100
-  confidence: number; // 0-1
-  summary: string;
-}
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
 
 /**
  * Map ALL 48 Hume emotions to valence/arousal coordinates
@@ -142,17 +124,8 @@ function generateSummary(valence: number, arousal: number): string {
 
 /**
  * Analyze facial expression using Hume AI API
- * Real-time emotion detection from video frame
- * 
- * ⚠️ NOTE: Uses /v0/core/synchronous endpoint (not in official docs)
- * TODO: Consider migrating to WebSocket streaming (wss://api.hume.ai/v0/stream/models)
- *       for lower latency (~50ms vs ~500ms) and better real-time performance
- * 
- * @see https://dev.hume.ai/docs/expression-measurement/websocket
- * 
- * Updated: 2025-10-29 - Hume AI integration with 48 emotions
  */
-async function analyzeFacialExpression(frameBase64: string): Promise<MoodCameraResponse> {
+async function analyzeFacialExpression(frameBase64: string) {
   const humeApiKey = Deno.env.get('HUME_API_KEY');
   
   console.log('[mood-camera] Analyzing frame, API key present:', !!humeApiKey);
@@ -218,15 +191,7 @@ async function analyzeFacialExpression(frameBase64: string): Promise<MoodCameraR
     const { valence, arousal, confidence } = mapEmotionToValenceArousal(emotions);
     const summary = generateSummary(valence, arousal);
 
-    addSentryBreadcrumb({
-      category: 'mood',
-      message: 'mood:camera:hume_analysis',
-      data: { 
-        emotions_count: emotions.length,
-        top_emotion: emotions.sort((a, b) => b.score - a.score)[0]?.name,
-        confidence,
-      },
-    });
+    console.log('[mood-camera] Analysis complete:', { valence, arousal, confidence });
 
     return {
       valence,
@@ -236,7 +201,6 @@ async function analyzeFacialExpression(frameBase64: string): Promise<MoodCameraR
     };
   } catch (error) {
     console.error('[mood-camera] Hume analysis failed:', error);
-    captureSentryException(error, { context: 'hume_facial_analysis' });
     
     // Fallback to neutral state on error
     const valence = 50;
@@ -250,166 +214,66 @@ async function analyzeFacialExpression(frameBase64: string): Promise<MoodCameraR
   }
 }
 
-/**
- * Edge Function: mood-camera
- * Analyzes facial expressions from video frames to determine emotional state
- * 
- * POST /mood-camera
- * Body: { frame: "base64_image_data", timestamp?: "ISO_string" }
- * Response: { valence, arousal, confidence, summary }
- * 
- * Rate limit: 5 requests per minute (camera analysis is expensive)
- * Auth: Required (JWT token)
- */
 serve(async (req) => {
-  const startedAt = Date.now();
-  const cors = resolveCors(req);
-  let hashedUserId: string | null = null;
-
-  const finalize = async (
-    response: Response,
-    metadata: { outcome?: 'success' | 'error' | 'denied'; stage?: string | null; error?: string | null } = {},
-  ) => {
-    await recordEdgeLatencyMetric({
-      route: 'mood-camera',
-      durationMs: Date.now() - startedAt,
-      status: response.status,
-      hashedUserId,
-      outcome: metadata.outcome,
-      stage: metadata.stage ?? null,
-      error: metadata.error ?? null,
-    });
-    return response;
-  };
-
-  // Handle CORS preflight
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return finalize(applySecurityHeaders(preflightResponse(cors), { cacheControl: 'no-store' }));
-  }
-
-  // CORS check
-  if (!cors.allowed) {
-    return finalize(applySecurityHeaders(rejectCors(cors), { cacheControl: 'no-store' }), {
-      outcome: 'denied',
-      error: 'origin_not_allowed',
-      stage: 'cors',
-    });
-  }
-
-  // Method check
-  if (req.method !== 'POST') {
-    const response = appendCorsHeaders(json(405, { error: 'method_not_allowed' }), cors);
-    return finalize(applySecurityHeaders(response, { cacheControl: 'no-store' }), {
-      outcome: 'denied',
-      error: 'method_not_allowed',
-      stage: 'method',
-    });
+    return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    // Optional authentication (for analytics)
-    const auth = await authenticateRequest(req).catch(() => ({ status: 200, user: null, error: null }));
-    hashedUserId = auth.user ? hash(auth.user.id) : 'anonymous';
+    console.log('[mood-camera] Request received');
 
-    // Rate limiting (5 req/min - camera analysis is expensive)
-    const rateDecision = await enforceEdgeRateLimit(req, {
-      route: 'mood-camera',
-      userId: hashedUserId,
-      description: 'facial expression analysis',
-      limit: 5,
-      windowMs: 60_000,
-    });
-
-    if (!rateDecision.allowed) {
-      addSentryBreadcrumb({
-        category: 'mood',
-        message: 'mood:camera:rate_limited',
-        data: { identifier: rateDecision.identifier, retry_after: rateDecision.retryAfterSeconds },
-      });
-      const response = buildRateLimitResponse(rateDecision, cors.headers);
-      return finalize(applySecurityHeaders(response, { cacheControl: 'no-store' }), {
-        outcome: 'denied',
-        error: 'rate_limited',
-        stage: 'rate_limit',
-      });
+    // Method check
+    if (req.method !== 'POST') {
+      return new Response(
+        JSON.stringify({ error: 'method_not_allowed' }),
+        { 
+          status: 405,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
     }
 
     // Parse body
     const body = await req.json().catch(() => null);
-    if (!body) {
-      const response = appendCorsHeaders(json(422, { error: 'invalid_body' }), cors);
-      return finalize(applySecurityHeaders(response, { cacheControl: 'no-store' }), {
-        outcome: 'denied',
-        error: 'invalid_body',
-        stage: 'body_parse',
-      });
+    if (!body || !body.frame) {
+      console.error('[mood-camera] Invalid body:', body);
+      return new Response(
+        JSON.stringify({ error: 'invalid_body', message: 'Missing frame data' }),
+        { 
+          status: 422,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
     }
 
-    // Validate payload
-    const parsed = requestSchema.safeParse(body);
-    if (!parsed.success) {
-      const response = appendCorsHeaders(json(422, { error: 'validation_failed', details: parsed.error.errors }), cors);
-      return finalize(applySecurityHeaders(response, { cacheControl: 'no-store' }), {
-        outcome: 'denied',
-        error: 'validation_failed',
-        stage: 'validation',
-      });
-    }
+    const { frame } = body;
 
-    const { frame, timestamp } = parsed.data;
-
-    addSentryBreadcrumb({
-      category: 'mood',
-      message: 'mood:camera:analysis_started',
-      data: { frame_size: frame.length, timestamp },
-    });
+    console.log('[mood-camera] Analyzing frame, size:', frame.length);
 
     // Analyze facial expression
-    const result = await traced(
-      'analyze.facial_expression',
-      () => analyzeFacialExpression(frame),
-      {
-        attributes: {
-          route: 'mood-camera',
-          user_id: hashedUserId,
-        },
-      },
+    const result = await analyzeFacialExpression(frame);
+
+    console.log('[mood-camera] Analysis result:', result);
+
+    return new Response(
+      JSON.stringify(result),
+      { 
+        status: 200,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      }
     );
-
-    addSentryBreadcrumb({
-      category: 'mood',
-      message: 'mood:camera:analysis_completed',
-      data: { 
-        valence: result.valence, 
-        arousal: result.arousal, 
-        confidence: result.confidence,
-        latency_ms: Date.now() - startedAt,
-      },
-    });
-
-    await logAccess({
-      user_id: hashedUserId,
-      role: auth.user?.user_metadata?.role ?? null,
-      route: 'mood-camera',
-      action: 'mood:camera:analyze',
-      result: 'success',
-      user_agent: 'redacted',
-      details: `v=${result.valence};a=${result.arousal};conf=${result.confidence}`,
-    });
-
-    const response = appendCorsHeaders(json(200, result), cors);
-    return finalize(applySecurityHeaders(response, { cacheControl: 'no-store' }), {
-      outcome: 'success',
-      stage: 'analysis_completed',
-    });
   } catch (error) {
-    captureSentryException(error, { route: 'mood-camera' });
-    console.error('[mood-camera] unexpected error', { message: error instanceof Error ? error.message : 'unknown' });
-    const response = appendCorsHeaders(json(500, { error: 'internal_error' }), cors);
-    return finalize(applySecurityHeaders(response, { cacheControl: 'no-store' }), {
-      outcome: 'error',
-      error: 'internal_error',
-      stage: 'unhandled',
-    });
+    console.error('[mood-camera] Unexpected error:', error);
+    return new Response(
+      JSON.stringify({ 
+        error: 'internal_error',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      }),
+      { 
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      }
+    );
   }
 });
