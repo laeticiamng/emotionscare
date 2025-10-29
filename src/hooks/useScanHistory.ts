@@ -20,7 +20,7 @@ export function useScanHistory(limit = 3) {
 
       const { data, error } = await supabase
         .from('clinical_signals')
-        .select('id, context_data, created_at')
+        .select('id, metadata, created_at')
         .eq('user_id', user.id)
         .in('source_instrument', ['SAM', 'scan_camera', 'scan_sliders'])
         .order('created_at', { ascending: false })
@@ -29,14 +29,14 @@ export function useScanHistory(limit = 3) {
       if (error) throw error;
 
       return (data || []).map((item): ScanHistoryItem => {
-        const context = item.context_data as any;
+        const metadata = item.metadata as any;
         return {
           id: item.id,
-          valence: context?.valence ?? 50,
-          arousal: context?.arousal ?? 50,
-          source: context?.source ?? 'scan',
+          valence: metadata?.valence ?? 50,
+          arousal: metadata?.arousal ?? 50,
+          source: metadata?.source ?? 'scan',
           created_at: item.created_at,
-          summary: context?.summary,
+          summary: metadata?.summary,
         };
       });
     },
