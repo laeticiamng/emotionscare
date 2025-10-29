@@ -447,7 +447,16 @@ L'edge function `mood-camera` utilise maintenant l'**API Hume AI** pour une anal
 
 ---
 
+---
+
+## 📎 DOCUMENTS ASSOCIÉS
+
+- `AUDIT_HUME_AI_INTEGRATION.md` - Audit détaillé de l'intégration Hume AI
+- Tests edge functions: `tests/edge-functions/mood-camera.test.ts`
+
+---
+
 **Audit réalisé par**: Lovable AI  
-**Version**: 1.1  
-**Dernière mise à jour**: 29 octobre 2025 - Hume AI implémenté  
-**Prochaine revue**: Après validation tests accessibilité
+**Version**: 1.2  
+**Dernière mise à jour**: 29 octobre 2025 - Audit Hume AI complet  
+**Prochaine revue**: Après validation endpoint Hume avec support

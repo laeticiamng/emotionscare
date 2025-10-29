@@ -92,6 +92,12 @@ function generateSummary(valence: number, arousal: number): string {
 /**
  * Analyze facial expression using Hume AI API
  * Real-time emotion detection from video frame
+ * 
+ * ⚠️ NOTE: Uses /v0/core/synchronous endpoint (not in official docs)
+ * TODO: Consider migrating to WebSocket streaming (wss://api.hume.ai/v0/stream/models)
+ *       for lower latency (~50ms vs ~500ms) and better real-time performance
+ * 
+ * @see https://dev.hume.ai/docs/expression-measurement/websocket
  */
 async function analyzeFacialExpression(frameBase64: string): Promise<MoodCameraResponse> {
   const humeApiKey = Deno.env.get('HUME_API_KEY');
