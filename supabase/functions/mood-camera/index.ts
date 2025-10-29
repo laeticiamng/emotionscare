@@ -108,18 +108,38 @@ function mapEmotionToValenceArousal(emotions: Array<{ name: string; score: numbe
 
 /**
  * Generate emotion summary based on valence/arousal
+ * Using finer granularity for more varied feedback
  */
 function generateSummary(valence: number, arousal: number): string {
-  if (valence > 60 && arousal > 60) {
-    return 'Énergique et positif';
-  } else if (valence > 60 && arousal <= 60) {
-    return 'Calme et serein';
-  } else if (valence <= 40 && arousal > 60) {
-    return 'Tension ressentie';
-  } else if (valence <= 40 && arousal <= 60) {
-    return 'Apaisement recherché';
+  // High arousal (>70)
+  if (arousal > 70) {
+    if (valence > 70) return 'Très énergique';
+    if (valence > 50) return 'Stimulé·e';
+    if (valence > 30) return 'Anxieux·se';
+    return 'Très tendu·e';
   }
-  return 'État neutre';
+  
+  // Moderate-high arousal (50-70)
+  if (arousal > 50) {
+    if (valence > 70) return 'Joyeux·se';
+    if (valence > 50) return 'Actif·ve';
+    if (valence > 30) return 'Préoccupé·e';
+    return 'Sous tension';
+  }
+  
+  // Moderate-low arousal (30-50)
+  if (arousal > 30) {
+    if (valence > 70) return 'Satisfait·e';
+    if (valence > 50) return 'Neutre';
+    if (valence > 30) return 'Pensif·ve';
+    return 'Un peu las·se';
+  }
+  
+  // Low arousal (<30)
+  if (valence > 70) return 'Très calme';
+  if (valence > 50) return 'Détendu·e';
+  if (valence > 30) return 'Mélancolique';
+  return 'Fatigué·e';
 }
 
 /**
