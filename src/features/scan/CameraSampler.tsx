@@ -70,7 +70,27 @@ const CameraSampler: React.FC<CameraSamplerProps> = ({ onPermissionChange, onUna
         }
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
-          await videoRef.current.play().catch(() => undefined);
+          
+          // Wait for video metadata to load before starting analysis
+          await new Promise<void>((resolve, reject) => {
+            if (!videoRef.current) {
+              reject(new Error('Video ref lost'));
+              return;
+            }
+            
+            const handleLoadedMetadata = () => {
+              resolve();
+            };
+            
+            const handleError = () => {
+              reject(new Error('Video load error'));
+            };
+            
+            videoRef.current.addEventListener('loadedmetadata', handleLoadedMetadata, { once: true });
+            videoRef.current.addEventListener('error', handleError, { once: true });
+            
+            videoRef.current.play().catch(reject);
+          });
         }
         setStatus('streaming');
         onPermissionChange?.('allowed');
@@ -101,13 +121,19 @@ const CameraSampler: React.FC<CameraSamplerProps> = ({ onPermissionChange, onUna
     try {
       if (!videoRef.current) {
         console.error('[CameraSampler] Video ref not ready');
-        throw new Error('video_not_ready');
+        return; // Don't unmount component, just skip this frame
+      }
+
+      // Check if video has loaded metadata
+      if (videoRef.current.readyState < 2) { // HAVE_CURRENT_DATA
+        console.warn('[CameraSampler] Video not ready yet, skipping frame');
+        return; // Don't unmount component, just wait for next frame
       }
 
       // Check if video is actually playing
       if (videoRef.current.videoWidth === 0 || videoRef.current.videoHeight === 0) {
-        console.error('[CameraSampler] Video dimensions are 0');
-        throw new Error('video_not_loaded');
+        console.warn('[CameraSampler] Video dimensions not loaded yet');
+        return; // Don't unmount component, just wait for next frame
       }
 
       // Capture frame from video
@@ -117,12 +143,12 @@ const CameraSampler: React.FC<CameraSamplerProps> = ({ onPermissionChange, onUna
       const ctx = canvas.getContext('2d');
       if (!ctx) {
         console.error('[CameraSampler] Canvas context not available');
-        throw new Error('canvas_error');
+        return; // Don't unmount component, just skip this frame
       }
       ctx.drawImage(videoRef.current, 0, 0);
       const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
       
-      console.log('[CameraSampler] Captured frame, calling mood-camera via direct fetch...', {
+      console.log('[CameraSampler] Captured frame, calling mood-camera...', {
         width: canvas.width,
         height: canvas.height,
         dataLength: dataUrl.length
@@ -140,7 +166,8 @@ const CameraSampler: React.FC<CameraSamplerProps> = ({ onPermissionChange, onUna
 
       if (error) {
         console.error('[CameraSampler] Edge function error:', error);
-        throw new Error('edge_unavailable');
+        setEdgeReady(false);
+        return; // Don't unmount component on transient errors
       }
 
       const rawValence = (data?.valence ?? 50) / 100;
@@ -155,12 +182,11 @@ const CameraSampler: React.FC<CameraSamplerProps> = ({ onPermissionChange, onUna
     } catch (error) {
       console.error('[CameraSampler] Error during analysis:', error);
       setEdgeReady(false);
-      onUnavailable?.('edge');
-      throw error;
+      // Don't call onUnavailable - just log and retry next frame
     } finally {
       setIsAnalyzing(false);
     }
-  }, [onUnavailable, publishMood]);
+  }, [publishMood]);
 
   useEffect(() => {
     if (status !== 'streaming') {
@@ -173,11 +199,9 @@ const CameraSampler: React.FC<CameraSamplerProps> = ({ onPermissionChange, onUna
     const loop = async () => {
       try {
         await sampleFromEdge();
-      } catch {
-        if (!cancelled) {
-          setStatus('error');
-        }
-        return;
+      } catch (error) {
+        console.error('[CameraSampler] Loop error:', error);
+        // Don't stop the loop on errors, just skip this frame
       }
 
       if (cancelled) {
