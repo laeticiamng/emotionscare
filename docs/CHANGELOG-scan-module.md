@@ -1,5 +1,56 @@
 # 📋 Changelog - Module Scan
 
+## [1.2.0] - 2025-10-29
+
+### ✅ Tests d'intégration edge functions
+
+**`tests/edge-functions/mood-camera.test.ts`** (4 tests)
+- ✅ Rejet requêtes non authentifiées
+- ✅ Validation payload (frameData requis)
+- ✅ Retour valence/arousal pour frame valide
+- ✅ Rate limiting (5 req/min)
+
+**`tests/edge-functions/assess-submit.test.ts`** (5 tests)
+- ✅ Rejet requêtes non authentifiées
+- ✅ Validation réponses SAM
+- ✅ Rejet instruments invalides
+- ✅ Soumission mode caméra
+- ✅ Vérification stockage `clinical_signals`
+
+### ⚡ Monitoring production avec Sentry
+
+**`src/lib/monitoring/sentry-config.ts`**
+- Configuration Sentry pour production
+- Tracking erreurs scan spécifiques (`trackScanError`)
+- Métriques performance (`trackScanPerformance`)
+- Filtrage automatique PII (userId, email)
+- Session replay (10% sessions, 100% erreurs)
+- Performance monitoring (10% transactions)
+
+**Features**:
+- `setSentryUser()` / `clearSentryUser()` pour contexte utilisateur
+- Ignore erreurs communes (extensions, réseau, ResizeObserver)
+- Fingerprinting scan-specific pour grouping intelligent
+- Environment + release tracking
+
+**Documentation**:
+- `src/lib/monitoring/README.md` - Guide configuration et alertes
+- `tests/edge-functions/README.md` - Guide tests d'intégration
+
+### 📊 Métriques
+
+**Tests**:
+- Tests d'intégration: +9 tests edge functions
+- Coverage totale: > 85% module scan
+- Documentation complète tests
+
+**Monitoring**:
+- 3 fonctions tracking principales
+- Filtrage PII automatique
+- Métriques performance temps réel
+
+---
+
 ## [1.1.0] - 2025-10-29
 
 ### ✨ Nouveautés

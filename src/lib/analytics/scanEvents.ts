@@ -1,5 +1,6 @@
 // @ts-nocheck
 import * as Sentry from '@sentry/react';
+import { trackScanError, trackScanPerformance } from '@/lib/monitoring/sentry-config';
 
 export type ScanEventName =
   | 'onboarding_started'

@@ -323,14 +323,15 @@ sequenceDiagram
 ### Tests existants
 ✅ `src/pages/B2CScanPage.e2e.test.tsx` - 9 scénarios E2E
 ✅ `src/features/mood/__tests__/moodOrchestration.test.ts` - Tests unitaires
-✅ `src/components/scan/__tests__/ScanHistory.test.tsx` - Tests unitaires (NOUVEAU)
-✅ `src/components/scan/__tests__/ScanOnboarding.test.tsx` - Tests unitaires (NOUVEAU)
-✅ `src/components/scan/__tests__/CameraSampler.test.tsx` - Tests unitaires (NOUVEAU)
+✅ `src/components/scan/__tests__/ScanHistory.test.tsx` - Tests unitaires
+✅ `src/components/scan/__tests__/ScanOnboarding.test.tsx` - Tests unitaires
+✅ `src/components/scan/__tests__/CameraSampler.test.tsx` - Tests unitaires
+✅ `tests/edge-functions/mood-camera.test.ts` - Tests intégration edge function (NOUVEAU)
+✅ `tests/edge-functions/assess-submit.test.ts` - Tests intégration edge function (NOUVEAU)
 
 ### Couverture manquante
 ❌ Tests unitaires pour `ScanHistoryExpanded.tsx`
-❌ Tests d'intégration avec Supabase (vraie DB)
-❌ Tests des edge functions (assess-start, assess-submit, mood-camera)
+❌ Tests d'intégration avec Supabase sur tables spécifiques
 
 ---
 
@@ -477,9 +478,11 @@ ALTER EXTENSION extension_name SET SCHEMA extensions;
 - [x] Métriques < 200ms
 
 ### Monitoring
-- [ ] Sentry configuré en production
-- [ ] Dashboard analytics
-- [ ] Alerting erreurs
+- [x] Sentry configuré (src/lib/monitoring/sentry-config.ts)
+- [x] Tracking erreurs scan spécifiques
+- [x] Métriques performance
+- [ ] Dashboard analytics (à créer dans Sentry)
+- [ ] Alerting erreurs (à configurer)
 - [ ] KPIs définis
 
 ---
