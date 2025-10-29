@@ -4,7 +4,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useMoodPublisher } from '@/features/mood/useMoodPublisher';
 import { scanAnalytics } from '@/lib/analytics/scanEvents';
 import { supabase } from '@/integrations/supabase/client';
-import { useSupabaseUser } from '@/integrations/supabase/auth';
 
 const clampNormalized = (value: number) => {
   if (!Number.isFinite(value)) {
@@ -34,7 +33,6 @@ const prefersMotion = () => {
 
 const CameraSampler: React.FC<CameraSamplerProps> = ({ onPermissionChange, onUnavailable, summary }) => {
   const publishMood = useMoodPublisher();
-  const { user } = useSupabaseUser();
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [status, setStatus] = useState<'idle' | 'starting' | 'streaming' | 'error'>('idle');
   const [edgeReady, setEdgeReady] = useState(true);
@@ -171,8 +169,10 @@ const CameraSampler: React.FC<CameraSamplerProps> = ({ onPermissionChange, onUna
       setEdgeReady(true);
       
       // Sauvegarder dans clinical_signals
-      if (user?.id) {
-        try {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        if (user?.id) {
           const valenceLevel = Math.floor((data?.valence ?? 50) / 20); // 0-4
           const arousalLevel = Math.floor((data?.arousal ?? 50) / 20); // 0-4
           const avgLevel = Math.round((valenceLevel + arousalLevel) / 2);
@@ -202,9 +202,9 @@ const CameraSampler: React.FC<CameraSamplerProps> = ({ onPermissionChange, onUna
           } else {
             console.log('[CameraSampler] Successfully saved to clinical_signals');
           }
-        } catch (saveError) {
-          console.error('[CameraSampler] Exception saving to DB:', saveError);
         }
+      } catch (saveError) {
+        console.error('[CameraSampler] Exception saving to DB:', saveError);
       }
       
       const duration = Date.now() - startTime;
