@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { useMoodPublisher } from '@/features/mood/useMoodPublisher';
 import { scanAnalytics } from '@/lib/analytics/scanEvents';
@@ -33,6 +34,7 @@ const prefersMotion = () => {
 
 const CameraSampler: React.FC<CameraSamplerProps> = ({ onPermissionChange, onUnavailable, summary }) => {
   const publishMood = useMoodPublisher();
+  const queryClient = useQueryClient();
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [status, setStatus] = useState<'idle' | 'starting' | 'streaming' | 'error'>('idle');
   const [edgeReady, setEdgeReady] = useState(true);
@@ -201,6 +203,8 @@ const CameraSampler: React.FC<CameraSamplerProps> = ({ onPermissionChange, onUna
             console.error('[CameraSampler] Error saving to clinical_signals:', insertError);
           } else {
             console.log('[CameraSampler] Successfully saved to clinical_signals');
+            // Invalider le cache pour rafraîchir l'historique
+            queryClient.invalidateQueries({ queryKey: ['scan-history'] });
           }
         }
       } catch (saveError) {
