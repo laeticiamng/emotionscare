@@ -34,12 +34,17 @@ export const ScanHistory: React.FC = () => {
     setShowExpanded(true);
   };
 
+  // Show skeleton longer to prevent flash
   if (isLoading) {
     return (
       <Card>
         <CardHeader>
-          <Skeleton className="h-6 w-40" />
-          <Skeleton className="h-4 w-64" />
+          <div className="flex items-center justify-between">
+            <div className="space-y-2">
+              <Skeleton className="h-6 w-40" />
+              <Skeleton className="h-4 w-64" />
+            </div>
+          </div>
         </CardHeader>
         <CardContent className="space-y-3">
           {[1, 2, 3].map((i) => (

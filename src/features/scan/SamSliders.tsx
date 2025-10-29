@@ -72,6 +72,12 @@ const SamSliders: React.FC<SamSlidersProps> = ({ detail, summary }) => {
       }
       
       setShowFeedback(true);
+      
+      // Haptic feedback on mobile
+      if ('vibrate' in navigator) {
+        navigator.vibrate(10); // 10ms subtle vibration
+      }
+      
       scanAnalytics.sliderAdjusted('valence', Math.round(next * 100));
       scanAnalytics.feedbackShown('badge', 1000);
       
@@ -92,6 +98,12 @@ const SamSliders: React.FC<SamSlidersProps> = ({ detail, summary }) => {
       }
       
       setShowFeedback(true);
+      
+      // Haptic feedback on mobile
+      if ('vibrate' in navigator) {
+        navigator.vibrate(10); // 10ms subtle vibration
+      }
+      
       scanAnalytics.sliderAdjusted('arousal', Math.round(next * 100));
       scanAnalytics.feedbackShown('badge', 1000);
       

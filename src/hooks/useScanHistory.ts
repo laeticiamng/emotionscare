@@ -42,5 +42,6 @@ export function useScanHistory(limit = 3) {
     },
     staleTime: 30_000,
     gcTime: 5 * 60_000,
+    refetchOnMount: false, // Prevent flash by not refetching on mount
   });
 }
