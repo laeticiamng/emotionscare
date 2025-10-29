@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useMoodPublisher } from '@/features/mood/useMoodPublisher';
 import { scanAnalytics } from '@/lib/analytics/scanEvents';
 import { supabase } from '@/integrations/supabase/client';
+import { useSupabaseUser } from '@/integrations/supabase/auth';
 
 const clampNormalized = (value: number) => {
   if (!Number.isFinite(value)) {
@@ -33,6 +34,7 @@ const prefersMotion = () => {
 
 const CameraSampler: React.FC<CameraSamplerProps> = ({ onPermissionChange, onUnavailable, summary }) => {
   const publishMood = useMoodPublisher();
+  const { user } = useSupabaseUser();
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [status, setStatus] = useState<'idle' | 'starting' | 'streaming' | 'error'>('idle');
   const [edgeReady, setEdgeReady] = useState(true);
@@ -167,6 +169,43 @@ const CameraSampler: React.FC<CameraSamplerProps> = ({ onPermissionChange, onUna
 
       publishMood('scan_camera', clampNormalized(rawValence), clampNormalized(rawArousal));
       setEdgeReady(true);
+      
+      // Sauvegarder dans clinical_signals
+      if (user?.id) {
+        try {
+          const valenceLevel = Math.floor((data?.valence ?? 50) / 20); // 0-4
+          const arousalLevel = Math.floor((data?.arousal ?? 50) / 20); // 0-4
+          const avgLevel = Math.round((valenceLevel + arousalLevel) / 2);
+          
+          const now = new Date();
+          const expiresAt = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000); // 7 jours
+
+          const { error: insertError } = await supabase.from('clinical_signals').insert({
+            user_id: user.id,
+            source_instrument: 'scan_camera',
+            domain: 'emotional',
+            level: avgLevel,
+            module_context: 'scan',
+            window_type: 'instant',
+            expires_at: expiresAt.toISOString(),
+            metadata: {
+              valence: data?.valence ?? 50,
+              arousal: data?.arousal ?? 50,
+              confidence: data?.confidence ?? 0,
+              summary: data?.summary || 'Neutre',
+              timestamp: new Date().toISOString(),
+            },
+          });
+
+          if (insertError) {
+            console.error('[CameraSampler] Error saving to clinical_signals:', insertError);
+          } else {
+            console.log('[CameraSampler] Successfully saved to clinical_signals');
+          }
+        } catch (saveError) {
+          console.error('[CameraSampler] Exception saving to DB:', saveError);
+        }
+      }
       
       const duration = Date.now() - startTime;
       console.log('[CameraSampler] Analysis completed in', duration, 'ms');
