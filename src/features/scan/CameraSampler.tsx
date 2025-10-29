@@ -122,29 +122,39 @@ const CameraSampler: React.FC<CameraSamplerProps> = ({ onPermissionChange, onUna
       ctx.drawImage(videoRef.current, 0, 0);
       const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
       
-      console.log('[CameraSampler] Captured frame, calling mood-camera...', {
+      console.log('[CameraSampler] Captured frame, calling mood-camera via direct fetch...', {
         width: canvas.width,
         height: canvas.height,
         dataLength: dataUrl.length
       });
 
-      // Call mood-camera edge function
-      const { data, error } = await supabase.functions.invoke('mood-camera', {
-        body: { 
-          frame: dataUrl,
-          timestamp: new Date().toISOString(),
-        },
-      });
+      // Direct fetch call to edge function (bypass SDK)
+      const response = await fetch(
+        'https://yaincoxihiqdksxgrsrk.supabase.co/functions/v1/mood-camera',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify({
+            frame: dataUrl,
+            timestamp: new Date().toISOString(),
+          }),
+        }
+      );
 
-      if (error) {
-        console.error('[CameraSampler] Edge function error:', error);
-        throw new Error('edge_unavailable');
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('[CameraSampler] Edge function HTTP error:', response.status, errorText);
+        throw new Error(`edge_http_error_${response.status}`);
       }
 
+      const data = await response.json();
       console.log('[CameraSampler] Edge function response:', data);
 
-      const rawValence = (data?.valence ?? 50) / 100; // Convert 0-100 to 0-1
-      const rawArousal = (data?.arousal ?? 50) / 100; // Convert 0-100 to 0-1
+      const rawValence = (data?.valence ?? 50) / 100;
+      const rawArousal = (data?.arousal ?? 50) / 100;
 
       publishMood('scan_camera', clampNormalized(rawValence), clampNormalized(rawArousal));
       setEdgeReady(true);
