@@ -231,8 +231,8 @@ async function analyzeFacialExpression(frameBase64: string) {
     
     console.log('[mood-camera] Job created:', jobId);
     
-    // Poll for results (max 10 seconds)
-    for (let i = 0; i < 20; i++) {
+    // Poll for results (max 30 seconds)
+    for (let i = 0; i < 60; i++) {
       await new Promise(resolve => setTimeout(resolve, 500));
       
       const resultResponse = await fetch(`https://api.hume.ai/v0/batch/jobs/${jobId}`, {
