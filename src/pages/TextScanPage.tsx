@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useEmotionScan } from '@/hooks/useEmotionScan';
 import { EmotionResult } from '@/types';
 import { useToast } from '@/hooks/use-toast';
+import { ScanHistory } from '@/components/scan/ScanHistory';
 
 export default function TextScanPage() {
   const navigate = useNavigate();
@@ -175,6 +176,8 @@ export default function TextScanPage() {
             </CardContent>
           </Card>
         )}
+
+        <ScanHistory />
       </div>
     </main>
   );
