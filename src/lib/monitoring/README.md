@@ -2,63 +2,71 @@
 
 ## Configuration Sentry
 
+Le projet utilise le système Sentry centralisé dans `src/lib/obs/sentry.web.ts`.
+
 ### Initialisation
 
-Dans `src/main.tsx` ou point d'entrée de l'app:
+Sentry est automatiquement initialisé dans `src/main.tsx` :
 
 ```typescript
-import { initSentry, setSentryUser } from '@/lib/monitoring/sentry-config';
+import { ensureSentryClient } from '@/lib/obs/sentry.web';
 
 // Au démarrage de l'app
-initSentry();
-
-// Après authentification
-setSentryUser(user.id, 'consumer');
-
-// À la déconnexion
-clearSentryUser();
+ensureSentryClient();
 ```
+
+Le système gère automatiquement :
+- ✅ Redaction des données sensibles
+- ✅ Configuration des sample rates
+- ✅ Breadcrumbs sécurisés
+- ✅ Tags release et environment
 
 ### Variables d'environnement
 
-Ajouter dans `.env`:
+Voir `.env.example` pour la configuration complète :
 
 ```bash
 VITE_SENTRY_DSN=https://your-sentry-dsn@sentry.io/project-id
-VITE_APP_VERSION=1.0.0
+VITE_SENTRY_ENVIRONMENT=production
+VITE_SENTRY_TRACES_SAMPLE_RATE=0.1
+VITE_SENTRY_REPLAYS_SESSION_SAMPLE_RATE=0.1
+VITE_SENTRY_REPLAYS_ON_ERROR_SAMPLE_RATE=1.0
 ```
 
 ## Tracking des erreurs
 
-### Erreurs scan spécifiques
+### Erreurs avec contexte
 
 ```typescript
-import { trackScanError } from '@/lib/monitoring/sentry-config';
+import { Sentry } from '@/lib/obs/sentry.web';
 
 try {
   await analyzeFacialExpression(frame);
 } catch (error) {
-  trackScanError(error, {
-    mode: 'camera',
-    source: 'facial_analysis',
-    hasConsent: true,
+  Sentry.captureException(error, {
+    tags: {
+      feature: 'scan',
+      mode: 'camera',
+      source: 'facial_analysis',
+    },
+    contexts: {
+      scan: {
+        hasConsent: true,
+      },
+    },
   });
 }
 ```
 
-### Performance tracking
+### Événements avec analytics
+
+Les événements scan utilisent déjà Sentry via `src/lib/analytics/scanEvents.ts` :
 
 ```typescript
-import { trackScanPerformance } from '@/lib/monitoring/sentry-config';
+import { scanAnalytics } from '@/lib/analytics/scanEvents';
 
-const start = Date.now();
-await submitScanData(data);
-const duration = Date.now() - start;
-
-trackScanPerformance('submit_scan', duration, {
-  mode: 'sliders',
-  hasConsent: true,
-});
+// Automatiquement envoyé à Sentry avec contexte
+scanAnalytics.cameraAnalysisStarted();
 ```
 
 ## Métriques clés

@@ -19,23 +19,23 @@
 
 ### ⚡ Monitoring production avec Sentry
 
-**`src/lib/monitoring/sentry-config.ts`**
-- Configuration Sentry pour production
-- Tracking erreurs scan spécifiques (`trackScanError`)
-- Métriques performance (`trackScanPerformance`)
-- Filtrage automatique PII (userId, email)
-- Session replay (10% sessions, 100% erreurs)
-- Performance monitoring (10% transactions)
+**Intégration système existant** :
+- Utilisation du système Sentry centralisé (`src/lib/obs/sentry.web.ts`)
+- Initialisation automatique dans `src/main.tsx`
+- Redaction PII automatique via `src/lib/obs/redact.ts`
+- Analytics scan intégrés avec Sentry
 
-**Features**:
-- `setSentryUser()` / `clearSentryUser()` pour contexte utilisateur
-- Ignore erreurs communes (extensions, réseau, ResizeObserver)
-- Fingerprinting scan-specific pour grouping intelligent
-- Environment + release tracking
+**Configuration** :
+- `.env.example` créé avec variables Sentry
+- Documentation complète dans `docs/INTEGRATION-MONITORING.md`
+- Guide utilisation dans `src/lib/monitoring/README.md`
+- Support Session Replay + Performance Monitoring
 
-**Documentation**:
-- `src/lib/monitoring/README.md` - Guide configuration et alertes
-- `tests/edge-functions/README.md` - Guide tests d'intégration
+**Features existantes** :
+- ✅ Breadcrumbs sécurisés avec redaction
+- ✅ Sample rates configurables par environnement
+- ✅ Tags release/environment automatiques
+- ✅ Tests avec mocks Sentry intégrés
 
 ### 📊 Métriques
 
