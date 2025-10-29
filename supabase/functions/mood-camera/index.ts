@@ -113,33 +113,33 @@ function mapEmotionToValenceArousal(emotions: Array<{ name: string; score: numbe
 function generateSummary(valence: number, arousal: number): string {
   // High arousal (>70)
   if (arousal > 70) {
-    if (valence > 70) return 'Très énergique';
-    if (valence > 50) return 'Stimulé·e';
-    if (valence > 30) return 'Anxieux·se';
-    return 'Très tendu·e';
+    if (valence > 70) return 'Tres energique';
+    if (valence > 50) return 'Stimule';
+    if (valence > 30) return 'Anxieux';
+    return 'Tres tendu';
   }
   
   // Moderate-high arousal (50-70)
   if (arousal > 50) {
-    if (valence > 70) return 'Joyeux·se';
-    if (valence > 50) return 'Actif·ve';
-    if (valence > 30) return 'Préoccupé·e';
+    if (valence > 70) return 'Joyeux';
+    if (valence > 50) return 'Actif';
+    if (valence > 30) return 'Preoccupe';
     return 'Sous tension';
   }
   
   // Moderate-low arousal (30-50)
   if (arousal > 30) {
-    if (valence > 70) return 'Satisfait·e';
+    if (valence > 70) return 'Satisfait';
     if (valence > 50) return 'Neutre';
-    if (valence > 30) return 'Pensif·ve';
-    return 'Un peu las·se';
+    if (valence > 30) return 'Pensif';
+    return 'Un peu las';
   }
   
   // Low arousal (<30)
-  if (valence > 70) return 'Très calme';
-  if (valence > 50) return 'Détendu·e';
-  if (valence > 30) return 'Mélancolique';
-  return 'Fatigué·e';
+  if (valence > 70) return 'Tres calme';
+  if (valence > 50) return 'Detendu';
+  if (valence > 30) return 'Melancolique';
+  return 'Fatigue';
 }
 
 /**
