@@ -231,6 +231,8 @@ const B2CScanPage: React.FC = () => {
             />
           )}
 
+          {/* Temporairement désactivé - problème avec assess-start */}
+          {/* 
           <AssessmentWrapper
             instrument="SAM"
             title="Ressenti instantané"
@@ -238,11 +240,11 @@ const B2CScanPage: React.FC = () => {
             context="adhoc"
             estimatedTime={1}
             onComplete={(badges) => {
-              // badges SAM influencent les couleurs UI et micro-gestes
               logger.info('SAM badges', { badges }, 'UI');
             }}
             className="mb-6"
           />
+          */}
 
           <main className="grid gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
             <div className="space-y-8">
