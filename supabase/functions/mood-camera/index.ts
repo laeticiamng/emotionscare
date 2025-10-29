@@ -307,26 +307,14 @@ serve(async (req) => {
   }
 
   try {
-    // Authenticate
-    const auth = await authenticateRequest(req);
-    if (auth.status !== 200 || !auth.user) {
-      if (auth.status === 401 || auth.status === 403) {
-        await logUnauthorizedAccess(req, auth.error ?? 'unauthorized');
-      }
-      const response = appendCorsHeaders(json(auth.status, { error: 'unauthorized' }), cors);
-      return finalize(applySecurityHeaders(response, { cacheControl: 'no-store' }), {
-        outcome: 'denied',
-        error: 'unauthorized',
-        stage: 'auth',
-      });
-    }
-
-    hashedUserId = hash(auth.user.id);
+    // Optional authentication (for analytics)
+    const auth = await authenticateRequest(req).catch(() => ({ status: 200, user: null, error: null }));
+    hashedUserId = auth.user ? hash(auth.user.id) : 'anonymous';
 
     // Rate limiting (5 req/min - camera analysis is expensive)
     const rateDecision = await enforceEdgeRateLimit(req, {
       route: 'mood-camera',
-      userId: auth.user.id,
+      userId: hashedUserId,
       description: 'facial expression analysis',
       limit: 5,
       windowMs: 60_000,
@@ -401,7 +389,7 @@ serve(async (req) => {
 
     await logAccess({
       user_id: hashedUserId,
-      role: auth.user.user_metadata?.role ?? null,
+      role: auth.user?.user_metadata?.role ?? null,
       route: 'mood-camera',
       action: 'mood:camera:analyze',
       result: 'success',

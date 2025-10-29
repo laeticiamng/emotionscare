@@ -128,30 +128,20 @@ const CameraSampler: React.FC<CameraSamplerProps> = ({ onPermissionChange, onUna
         dataLength: dataUrl.length
       });
 
-      // Direct fetch call to edge function (bypass SDK)
-      const response = await fetch(
-        'https://yaincoxihiqdksxgrsrk.supabase.co/functions/v1/mood-camera',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-          },
-          body: JSON.stringify({
-            frame: dataUrl,
-            timestamp: new Date().toISOString(),
-          }),
-        }
-      );
+      // Call mood-camera using Supabase client
+      const { data, error } = await supabase.functions.invoke('mood-camera', {
+        body: { 
+          frame: dataUrl,
+          timestamp: new Date().toISOString(),
+        },
+      });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('[CameraSampler] Edge function HTTP error:', response.status, errorText);
-        throw new Error(`edge_http_error_${response.status}`);
+      console.log('[CameraSampler] Edge function response:', { data, error });
+
+      if (error) {
+        console.error('[CameraSampler] Edge function error:', error);
+        throw new Error('edge_unavailable');
       }
-
-      const data = await response.json();
-      console.log('[CameraSampler] Edge function response:', data);
 
       const rawValence = (data?.valence ?? 50) / 100;
       const rawArousal = (data?.arousal ?? 50) / 100;

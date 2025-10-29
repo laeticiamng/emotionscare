@@ -119,7 +119,7 @@ verify_jwt = false
 verify_jwt = true
 
 [functions.mood-camera]
-verify_jwt = true
+verify_jwt = false
 
 [api]
 enabled = true
