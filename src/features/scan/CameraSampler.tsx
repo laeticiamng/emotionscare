@@ -163,15 +163,44 @@ const CameraSampler: React.FC<CameraSamplerProps> = ({ onPermissionChange, onUna
         return;
       }
 
-      // Mapper les émotions vers valence/arousal
+      // Mapper les émotions vers valence/arousal (panel élargi comme Hume)
       const emotionToValenceArousal = (label: string) => {
         const map: Record<string, { valence: number; arousal: number }> = {
+          // Émotions positives haute énergie
           'joie': { valence: 0.85, arousal: 0.7 },
-          'tristesse': { valence: 0.2, arousal: 0.3 },
+          'excitation': { valence: 0.8, arousal: 0.85 },
+          'amusement': { valence: 0.8, arousal: 0.65 },
+          'fierté': { valence: 0.75, arousal: 0.6 },
+          'admiration': { valence: 0.7, arousal: 0.55 },
+          'détermination': { valence: 0.7, arousal: 0.7 },
+          
+          // Émotions positives basse énergie
+          'calme': { valence: 0.7, arousal: 0.25 },
+          'sérénité': { valence: 0.75, arousal: 0.2 },
+          'satisfaction': { valence: 0.75, arousal: 0.4 },
+          'contentement': { valence: 0.7, arousal: 0.35 },
+          
+          // Émotions négatives haute énergie
           'colère': { valence: 0.2, arousal: 0.8 },
           'peur': { valence: 0.3, arousal: 0.85 },
+          'anxiété': { valence: 0.3, arousal: 0.75 },
+          'stress': { valence: 0.35, arousal: 0.8 },
+          'frustration': { valence: 0.3, arousal: 0.7 },
+          
+          // Émotions négatives basse énergie
+          'tristesse': { valence: 0.2, arousal: 0.3 },
+          'ennui': { valence: 0.4, arousal: 0.2 },
+          'fatigue': { valence: 0.4, arousal: 0.15 },
+          'honte': { valence: 0.25, arousal: 0.4 },
+          
+          // Émotions mixtes
           'surprise': { valence: 0.6, arousal: 0.75 },
           'dégoût': { valence: 0.25, arousal: 0.5 },
+          'confusion': { valence: 0.45, arousal: 0.5 },
+          'concentration': { valence: 0.55, arousal: 0.6 },
+          'nostalgie': { valence: 0.5, arousal: 0.4 },
+          
+          // Neutre
           'neutre': { valence: 0.5, arousal: 0.5 }
         };
         return map[label] || { valence: 0.5, arousal: 0.5 };

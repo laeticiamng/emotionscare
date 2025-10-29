@@ -39,20 +39,16 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: `Tu es un expert en analyse d'expressions faciales. Analyse l'image et retourne UNIQUEMENT un objet JSON avec cette structure exacte:
+            content: `Tu es un expert en analyse d'expressions faciales. Analyse l'image et détecte l'émotion avec un large panel comme Hume AI. Retourne UNIQUEMENT un objet JSON avec cette structure exacte:
 {
-  "label": "joie" | "tristesse" | "colère" | "peur" | "surprise" | "dégoût" | "neutre",
+  "label": "joie" | "tristesse" | "colère" | "peur" | "surprise" | "dégoût" | "neutre" | "calme" | "anxiété" | "stress" | "excitation" | "ennui" | "confusion" | "concentration" | "détermination" | "fatigue" | "satisfaction" | "fierté" | "nostalgie" | "admiration" | "amusement" | "contentement" | "sérénité" | "frustration" | "honte",
   "scores": {
-    "joie": 0.0-1.0,
-    "tristesse": 0.0-1.0,
-    "colère": 0.0-1.0,
-    "peur": 0.0-1.0,
-    "surprise": 0.0-1.0,
-    "dégoût": 0.0-1.0,
-    "neutre": 0.0-1.0
+    "emotion1": 0.0-1.0,
+    "emotion2": 0.0-1.0,
+    ...
   }
 }
-Le label doit être l'émotion dominante. Les scores doivent totaliser environ 1.0.`
+Le label doit être l'émotion dominante détectée. Dans scores, inclure les 3-5 émotions les plus présentes avec leurs scores de confiance. Sois précis et nuancé dans ta détection.`
           },
           {
             role: 'user',
