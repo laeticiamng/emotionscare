@@ -80,8 +80,8 @@ export const useVisionEmotion = () => {
 
       setIsActive(true);
 
-      // Analyser 1 frame par seconde
-      intervalRef.current = setInterval(analyzeFrame, 1000);
+      // Analyser 1 frame toutes les 15 secondes
+      intervalRef.current = setInterval(analyzeFrame, 15000);
 
       toast.success('Vision activée');
 

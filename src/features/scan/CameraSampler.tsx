@@ -163,7 +163,7 @@ const CameraSampler: React.FC<CameraSamplerProps> = ({ onPermissionChange, onUna
         return;
       }
 
-      // Mapper les émotions vers valence/arousal (panel élargi comme Hume)
+      // Mapper les émotions vers valence/arousal (panel élargi 40+ émotions comme Hume)
       const emotionToValenceArousal = (label: string) => {
         const map: Record<string, { valence: number; arousal: number }> = {
           // Émotions positives haute énergie
@@ -173,12 +173,20 @@ const CameraSampler: React.FC<CameraSamplerProps> = ({ onPermissionChange, onUna
           'fierté': { valence: 0.75, arousal: 0.6 },
           'admiration': { valence: 0.7, arousal: 0.55 },
           'détermination': { valence: 0.7, arousal: 0.7 },
+          'enthousiasme': { valence: 0.85, arousal: 0.8 },
+          'extase': { valence: 0.9, arousal: 0.85 },
+          'émerveillement': { valence: 0.8, arousal: 0.75 },
+          'inspiration': { valence: 0.75, arousal: 0.65 },
           
           // Émotions positives basse énergie
           'calme': { valence: 0.7, arousal: 0.25 },
           'sérénité': { valence: 0.75, arousal: 0.2 },
           'satisfaction': { valence: 0.75, arousal: 0.4 },
           'contentement': { valence: 0.7, arousal: 0.35 },
+          'soulagement': { valence: 0.65, arousal: 0.3 },
+          'tendresse': { valence: 0.75, arousal: 0.35 },
+          'gratitude': { valence: 0.75, arousal: 0.4 },
+          'espoir': { valence: 0.7, arousal: 0.45 },
           
           // Émotions négatives haute énergie
           'colère': { valence: 0.2, arousal: 0.8 },
@@ -186,19 +194,31 @@ const CameraSampler: React.FC<CameraSamplerProps> = ({ onPermissionChange, onUna
           'anxiété': { valence: 0.3, arousal: 0.75 },
           'stress': { valence: 0.35, arousal: 0.8 },
           'frustration': { valence: 0.3, arousal: 0.7 },
+          'irritation': { valence: 0.35, arousal: 0.65 },
+          'jalousie': { valence: 0.25, arousal: 0.7 },
+          'envie': { valence: 0.35, arousal: 0.6 },
+          'tourment': { valence: 0.2, arousal: 0.75 },
           
           // Émotions négatives basse énergie
           'tristesse': { valence: 0.2, arousal: 0.3 },
           'ennui': { valence: 0.4, arousal: 0.2 },
           'fatigue': { valence: 0.4, arousal: 0.15 },
           'honte': { valence: 0.25, arousal: 0.4 },
+          'mélancolie': { valence: 0.35, arousal: 0.3 },
+          'inquiétude': { valence: 0.3, arousal: 0.5 },
+          'culpabilité': { valence: 0.25, arousal: 0.45 },
+          'embarras': { valence: 0.35, arousal: 0.5 },
+          'déception': { valence: 0.3, arousal: 0.35 },
+          'torpeur': { valence: 0.4, arousal: 0.1 },
           
-          // Émotions mixtes
+          // Émotions mixtes/complexes
           'surprise': { valence: 0.6, arousal: 0.75 },
           'dégoût': { valence: 0.25, arousal: 0.5 },
           'confusion': { valence: 0.45, arousal: 0.5 },
           'concentration': { valence: 0.55, arousal: 0.6 },
           'nostalgie': { valence: 0.5, arousal: 0.4 },
+          'mépris': { valence: 0.3, arousal: 0.4 },
+          'désir': { valence: 0.65, arousal: 0.7 },
           
           // Neutre
           'neutre': { valence: 0.5, arousal: 0.5 }

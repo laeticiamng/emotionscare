@@ -41,7 +41,7 @@ serve(async (req) => {
             role: 'system',
             content: `Tu es un expert en analyse d'expressions faciales. Analyse l'image et détecte l'émotion avec un large panel comme Hume AI. Retourne UNIQUEMENT un objet JSON avec cette structure exacte:
 {
-  "label": "joie" | "tristesse" | "colère" | "peur" | "surprise" | "dégoût" | "neutre" | "calme" | "anxiété" | "stress" | "excitation" | "ennui" | "confusion" | "concentration" | "détermination" | "fatigue" | "satisfaction" | "fierté" | "nostalgie" | "admiration" | "amusement" | "contentement" | "sérénité" | "frustration" | "honte",
+  "label": "joie" | "tristesse" | "colère" | "peur" | "surprise" | "dégoût" | "neutre" | "calme" | "anxiété" | "stress" | "excitation" | "ennui" | "confusion" | "concentration" | "détermination" | "fatigue" | "satisfaction" | "fierté" | "nostalgie" | "admiration" | "amusement" | "contentement" | "sérénité" | "frustration" | "honte" | "espoir" | "gratitude" | "enthousiasme" | "inquiétude" | "mélancolie" | "irritation" | "émerveillement" | "embarras" | "désir" | "culpabilité" | "jalousie" | "envie" | "mépris" | "déception" | "soulagement" | "tendresse" | "inspiration" | "extase" | "torpeur" | "tourment",
   "scores": {
     "emotion1": 0.0-1.0,
     "emotion2": 0.0-1.0,
