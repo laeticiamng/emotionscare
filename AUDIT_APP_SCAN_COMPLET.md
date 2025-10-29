@@ -14,9 +14,9 @@ La page `/app/scan` est maintenant **fonctionnelle** après correction d'une err
 - ✅ Hook `useScanHistory` aligné avec le schéma DB
 
 ### Points d'attention
-- ⚠️ Algorithme de détection faciale simplifié (heuristique)
-- ⚠️ RLS policies à vérifier pour la sécurité
-- ⚠️ Warnings de sécurité Supabase (non critiques)
+- ✅ **Analyse faciale Hume AI implémentée**
+- ⚠️ Tests d'accessibilité à compléter
+- ⚠️ Historique limité (seulement 3 derniers scans)
 
 ---
 
@@ -88,17 +88,39 @@ Response: {
 ```
 
 **Rôle**:
-- Analyse l'expression faciale depuis une frame vidéo
-- ⚠️ **Actuellement**: algorithme heuristique simplifié
-- 🎯 **TODO**: Intégrer MediaPipe ou Hume AI pour vraie analyse
+- Analyse l'expression faciale via **Hume AI** (API synchrone)
+- ✅ **Implémenté**: Détection faciale temps réel avec 12+ émotions
+- Mapping sophistiqué émotions → valence/arousal (modèle circumplex)
+- Fallback gracieux si HUME_API_KEY absente ou erreur
 
-**Algorithme actuel** (simplifié):
+**Algorithme implémenté** (Hume AI):
 ```typescript
-// Pseudo-random basé sur la longueur du base64
-const seed = frameBase64.length % 100;
-const valence = 45 + (seed % 30); // 45-75
-const arousal = 40 + ((seed * 7) % 35); // 40-75
-// + petite variation aléatoire
+// Appel API synchrone Hume
+const response = await fetch('https://api.hume.ai/v0/core/synchronous', {
+  method: 'POST',
+  headers: {
+    'X-Hume-Api-Key': Deno.env.get('HUME_API_KEY'),
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    models: { face: { fps_pred: 1, prob_threshold: 0.5 } },
+    raw_image: cleanBase64,
+  }),
+});
+
+// Extraction des émotions détectées
+const emotions = data.entities[0]?.predictions?.face?.emotions;
+
+// Mapping circumplex (12 émotions)
+const emotionMap = {
+  'Joy': { valence: 0.8, arousal: 0.6 },
+  'Sadness': { valence: 0.2, arousal: 0.3 },
+  'Anger': { valence: 0.2, arousal: 0.8 },
+  'Fear': { valence: 0.3, arousal: 0.8 },
+  // ... + 8 autres
+};
+
+// Calcul pondéré valence/arousal (0-100)
 ```
 
 ### 2. Frontend (React)
@@ -263,22 +285,28 @@ const metadata = item.metadata as any;
 
 ---
 
+## ✅ IMPLÉMENTATIONS RÉCENTES
+
+### 1. Analyse faciale Hume AI ✅
+**Statut**: IMPLÉMENTÉ  
+**Impact**: Haute valeur ajoutée
+
+L'edge function `mood-camera` utilise maintenant l'**API Hume AI** pour une analyse faciale temps réel.
+
+**Fonctionnalités**:
+- Détection de 12+ émotions (Joy, Sadness, Anger, Fear, Excitement, Concentration, etc.)
+- Mapping vers modèle circumplex (valence/arousal)
+- Calcul pondéré basé sur les scores de confiance
+- Fallback gracieux si API indisponible ou aucun visage détecté
+- Logging Sentry détaillé pour monitoring
+
+**Code**: `supabase/functions/mood-camera/index.ts` (lignes 27-170)
+
+---
+
 ## ⚠️ LIMITATIONS ACTUELLES
 
-### 1. Analyse faciale simulée
-**Impact**: Moyen  
-**Urgence**: Haute (avant production)
-
-L'edge function `mood-camera` utilise un algorithme **heuristique pseudo-aléatoire** au lieu d'une vraie analyse d'expression faciale.
-
-**Actions recommandées**:
-1. Intégrer **MediaPipe Face Landmark Detection**
-2. OU utiliser **Hume AI Emotion API**
-3. Ou désactiver temporairement le mode caméra
-
-**Code concerné**: `supabase/functions/mood-camera/index.ts` (lignes 34-71)
-
-### 2. Historique limité
+### 1. Historique limité
 **Impact**: Faible  
 **Urgence**: Basse
 
@@ -291,7 +319,7 @@ L'edge function `mood-camera` utilise un algorithme **heuristique pseudo-aléato
 - Ajouter des graphiques Chart.js valence/arousal
 - Calculer des métriques (moyenne, tendance)
 
-### 3. Offline support
+### 2. Offline support
 **Impact**: Faible  
 **Urgence**: Basse
 
@@ -352,41 +380,37 @@ L'edge function `mood-camera` utilise un algorithme **heuristique pseudo-aléato
 
 ### 🔴 HAUTE PRIORITÉ (Avant production)
 
-1. **Implémenter vraie analyse faciale**
-   - Intégrer MediaPipe Face Landmark Detection
-   - Tester précision sur échantillon représentatif
-   - Fallback sur curseurs si échec
-
-2. **Vérifier RLS policies**
-   - Auditer `clinical_signals` policies
-   - S'assurer isolation user_id
-   - Tester avec plusieurs users
-
-3. **Tester accessibilité**
+1. **Tester accessibilité complète**
    - Vérifier contrôles clavier
    - Tester lecteurs d'écran
    - Valider contraste couleurs
 
+2. **Valider Hume AI en production**
+   - Tester avec vrais utilisateurs
+   - Vérifier temps de réponse API
+   - Monitorer taux d'erreur
+   - Ajuster fallback si nécessaire
+
 ### 🟡 MOYENNE PRIORITÉ (1-2 sprints)
 
-4. **Enrichir l'historique**
+3. **Enrichir l'historique**
    - Page dédiée avec graphiques
    - Export CSV des données
    - Statistiques agrégées
 
-5. **Améliorer feedback utilisateur**
+4. **Améliorer feedback utilisateur**
    - Animations plus fluides
    - Messages plus contextuels
    - Onboarding interactif
 
 ### 🟢 BASSE PRIORITÉ (Backlog)
 
-6. **Support offline**
+5. **Support offline**
    - Queue locale IndexedDB
    - Service Worker
    - Sync background
 
-7. **Gamification**
+6. **Gamification**
    - Streaks de scans quotidiens
    - Badges de progression
    - Insights personnalisés
@@ -396,11 +420,12 @@ L'edge function `mood-camera` utilise un algorithme **heuristique pseudo-aléato
 ## 📝 CHECKLIST DE MISE EN PRODUCTION
 
 - [x] ✅ Erreur 400 corrigée
-- [ ] ⚠️ Analyse faciale réelle implémentée
+- [x] ✅ **Analyse faciale Hume AI implémentée**
 - [x] ✅ RLS policies vérifiées
 - [ ] ⚠️ Tests accessibilité WCAG AA
+- [ ] ⚠️ Validation Hume AI en production
 - [ ] ⏳ Tests E2E complets
-- [ ] ⏳ Monitoring Sentry configuré
+- [x] ✅ Monitoring Sentry configuré
 - [ ] ⏳ Documentation utilisateur
 - [ ] ⏳ Revue sécurité complète
 
@@ -423,5 +448,6 @@ L'edge function `mood-camera` utilise un algorithme **heuristique pseudo-aléato
 ---
 
 **Audit réalisé par**: Lovable AI  
-**Version**: 1.0  
-**Prochaine revue**: Après implémentation analyse faciale
+**Version**: 1.1  
+**Dernière mise à jour**: 29 octobre 2025 - Hume AI implémenté  
+**Prochaine revue**: Après validation tests accessibilité

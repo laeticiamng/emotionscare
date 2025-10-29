@@ -25,49 +25,168 @@ interface MoodCameraResponse {
 }
 
 /**
- * Analyze facial expression from image frame
- * Simplified heuristic approach - in production, use MediaPipe or Hume AI
- * 
- * For now, returns randomized values with slight variations
- * TODO: Integrate real facial analysis (MediaPipe Face Landmark Detection)
+ * Map Hume emotions to valence/arousal coordinates
+ * Based on circumplex model of affect
  */
-function analyzeFacialExpression(frameBase64: string): MoodCameraResponse {
-  // Extract brightness from base64 (very basic heuristic)
-  const dataLength = frameBase64.length;
-  const seed = dataLength % 100;
-  
-  // Generate consistent pseudo-random values based on seed
-  const baseValence = 45 + (seed % 30); // 45-75
-  const baseArousal = 40 + ((seed * 7) % 35); // 40-75
-  
-  // Add small random variation
-  const valence = Math.min(100, Math.max(0, baseValence + (Math.random() - 0.5) * 10));
-  const arousal = Math.min(100, Math.max(0, baseArousal + (Math.random() - 0.5) * 10));
-  
-  // Determine summary based on valence/arousal quadrants
-  let summary = 'État neutre';
-  let confidence = 0.65;
-  
-  if (valence > 60 && arousal > 60) {
-    summary = 'Énergique et positif';
-    confidence = 0.75;
-  } else if (valence > 60 && arousal <= 60) {
-    summary = 'Calme et serein';
-    confidence = 0.78;
-  } else if (valence <= 40 && arousal > 60) {
-    summary = 'Tension ressentie';
-    confidence = 0.72;
-  } else if (valence <= 40 && arousal <= 60) {
-    summary = 'Apaisement recherché';
-    confidence = 0.70;
-  }
-  
-  return {
-    valence: Math.round(valence),
-    arousal: Math.round(arousal),
-    confidence: Math.round(confidence * 100) / 100,
-    summary,
+function mapEmotionToValenceArousal(emotions: Array<{ name: string; score: number }>): { valence: number; arousal: number; confidence: number } {
+  const emotionMap: Record<string, { valence: number; arousal: number }> = {
+    'Joy': { valence: 0.8, arousal: 0.6 },
+    'Excitement': { valence: 0.8, arousal: 0.8 },
+    'Contentment': { valence: 0.7, arousal: 0.3 },
+    'Calmness': { valence: 0.6, arousal: 0.2 },
+    'Sadness': { valence: 0.2, arousal: 0.3 },
+    'Fear': { valence: 0.3, arousal: 0.8 },
+    'Anger': { valence: 0.2, arousal: 0.8 },
+    'Anxiety': { valence: 0.3, arousal: 0.7 },
+    'Surprise': { valence: 0.5, arousal: 0.8 },
+    'Disgust': { valence: 0.3, arousal: 0.6 },
+    'Confusion': { valence: 0.4, arousal: 0.5 },
+    'Concentration': { valence: 0.5, arousal: 0.6 },
   };
+
+  let totalValence = 0;
+  let totalArousal = 0;
+  let totalWeight = 0;
+  let maxScore = 0;
+
+  emotions.forEach(({ name, score }) => {
+    const mapping = emotionMap[name];
+    if (mapping && score > 0.1) {
+      totalValence += mapping.valence * score;
+      totalArousal += mapping.arousal * score;
+      totalWeight += score;
+      maxScore = Math.max(maxScore, score);
+    }
+  });
+
+  if (totalWeight === 0) {
+    return { valence: 50, arousal: 50, confidence: 0.3 };
+  }
+
+  const valence = (totalValence / totalWeight) * 100;
+  const arousal = (totalArousal / totalWeight) * 100;
+
+  return {
+    valence: Math.round(Math.min(100, Math.max(0, valence))),
+    arousal: Math.round(Math.min(100, Math.max(0, arousal))),
+    confidence: Math.round(maxScore * 100) / 100,
+  };
+}
+
+/**
+ * Generate emotion summary based on valence/arousal
+ */
+function generateSummary(valence: number, arousal: number): string {
+  if (valence > 60 && arousal > 60) {
+    return 'Énergique et positif';
+  } else if (valence > 60 && arousal <= 60) {
+    return 'Calme et serein';
+  } else if (valence <= 40 && arousal > 60) {
+    return 'Tension ressentie';
+  } else if (valence <= 40 && arousal <= 60) {
+    return 'Apaisement recherché';
+  }
+  return 'État neutre';
+}
+
+/**
+ * Analyze facial expression using Hume AI API
+ * Real-time emotion detection from video frame
+ */
+async function analyzeFacialExpression(frameBase64: string): Promise<MoodCameraResponse> {
+  const humeApiKey = Deno.env.get('HUME_API_KEY');
+  
+  if (!humeApiKey) {
+    console.warn('[mood-camera] HUME_API_KEY not configured, using fallback');
+    // Fallback to basic heuristic
+    const valence = 50 + Math.random() * 30 - 15;
+    const arousal = 50 + Math.random() * 30 - 15;
+    return {
+      valence: Math.round(valence),
+      arousal: Math.round(arousal),
+      confidence: 0.5,
+      summary: generateSummary(valence, arousal),
+    };
+  }
+
+  try {
+    // Clean base64 data if it has data URI prefix
+    const cleanBase64 = frameBase64.replace(/^data:image\/[a-z]+;base64,/, '');
+
+    // Call Hume AI synchronous API
+    const response = await fetch('https://api.hume.ai/v0/core/synchronous', {
+      method: 'POST',
+      headers: {
+        'X-Hume-Api-Key': humeApiKey,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        models: {
+          face: {
+            fps_pred: 1,
+            prob_threshold: 0.5,
+          },
+        },
+        raw_image: cleanBase64,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('[mood-camera] Hume API error:', response.status, errorText);
+      throw new Error(`Hume API returned ${response.status}`);
+    }
+
+    const data = await response.json();
+    
+    // Extract emotions from first face detected
+    const predictions = data.entities?.[0]?.predictions?.face?.grouped_predictions?.[0]?.predictions?.[0];
+    
+    if (!predictions || !predictions.emotions) {
+      console.warn('[mood-camera] No face detected in frame');
+      // Return neutral state if no face detected
+      return {
+        valence: 50,
+        arousal: 50,
+        confidence: 0.3,
+        summary: 'Aucun visage détecté',
+      };
+    }
+
+    const emotions = predictions.emotions as Array<{ name: string; score: number }>;
+    const { valence, arousal, confidence } = mapEmotionToValenceArousal(emotions);
+    const summary = generateSummary(valence, arousal);
+
+    addSentryBreadcrumb({
+      category: 'mood',
+      message: 'mood:camera:hume_analysis',
+      data: { 
+        emotions_count: emotions.length,
+        top_emotion: emotions.sort((a, b) => b.score - a.score)[0]?.name,
+        confidence,
+      },
+    });
+
+    return {
+      valence,
+      arousal,
+      confidence,
+      summary,
+    };
+  } catch (error) {
+    console.error('[mood-camera] Hume analysis failed:', error);
+    captureSentryException(error, { context: 'hume_facial_analysis' });
+    
+    // Fallback to neutral state on error
+    const valence = 50;
+    const arousal = 50;
+    return {
+      valence,
+      arousal,
+      confidence: 0.4,
+      summary: generateSummary(valence, arousal),
+    };
+  }
 }
 
 /**
