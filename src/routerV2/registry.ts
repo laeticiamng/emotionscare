@@ -195,12 +195,22 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     aliases: ['/scan'],
   },
   {
+    name: 'scan-facial',
+    path: '/app/scan/facial',
+    segment: 'consumer',
+    layout: 'simple',
+    component: 'FacialScanPage',
+    guard: true,
+    requireAuth: true,
+  },
+  {
     name: 'scan-voice',
     path: '/app/scan/voice',
     segment: 'consumer',
     layout: 'simple',
     component: 'VoiceScanPage',
     guard: true,
+    requireAuth: true,
   },
   {
     name: 'scan-text',
