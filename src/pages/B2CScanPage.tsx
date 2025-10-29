@@ -14,6 +14,9 @@ import { useAssessment } from '@/hooks/useAssessment';
 import { withGuard } from '@/routerV2/withGuard';
 import { AssessmentWrapper } from '@/components/assess';
 import { logger } from '@/lib/logger';
+import { ScanHistory } from '@/components/scan/ScanHistory';
+import { ScanOnboarding, shouldShowOnboarding } from '@/components/scan/ScanOnboarding';
+import { useToast } from '@/hooks/use-toast';
 
 const mapToSamScale = (value: number) => {
   const normalized = Math.max(0, Math.min(100, value));
@@ -23,11 +26,13 @@ const mapToSamScale = (value: number) => {
 
 const B2CScanPage: React.FC = () => {
   const { has } = useFlags();
+  const { toast } = useToast();
   const { detail, gestures } = useSamOrchestration();
   const { state: samState, submit: submitSam, grantConsent, declineConsent } = useAssessment('SAM');
   const [mode, setMode] = useState<'sliders' | 'camera'>('sliders');
   const [edgeUnavailable, setEdgeUnavailable] = useState(false);
   const [cameraDenied, setCameraDenied] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(shouldShowOnboarding());
   const lastSubmittedRef = useRef<string | null>(null);
 
   const featureEnabled = has('FF_SCAN_SAM');
@@ -65,6 +70,11 @@ const B2CScanPage: React.FC = () => {
             message: 'scan:submit',
             data: { source: detail.source, summary: detail.summary },
           });
+          toast({
+            title: 'État émotionnel enregistré',
+            description: detail.summary || 'Vos données ont été sauvegardées avec succès.',
+            duration: 3000,
+          });
         } else {
           lastSubmittedRef.current = null;
         }
@@ -72,7 +82,7 @@ const B2CScanPage: React.FC = () => {
       .catch(() => {
         lastSubmittedRef.current = null;
       });
-  }, [detail, samState.hasConsent, samState.isFlagEnabled, samState.isSubmitting, submitSam]);
+  }, [detail, samState.hasConsent, samState.isFlagEnabled, samState.isSubmitting, submitSam, toast]);
 
   const handleCameraPermission = useCallback(
     (status: 'allowed' | 'denied') => {
@@ -136,6 +146,9 @@ const B2CScanPage: React.FC = () => {
   return (
     <ConsentGate>
       <PageRoot>
+        {showOnboarding && (
+          <ScanOnboarding onComplete={() => setShowOnboarding(false)} />
+        )}
         <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-primary/10">
           <div className="container mx-auto flex flex-col gap-10 px-4 py-10">
           <header className="space-y-4">
@@ -218,6 +231,7 @@ const B2CScanPage: React.FC = () => {
               ) : (
                 <SamSliders detail={detail} summary={activeSummary} />
               )}
+              <ScanHistory />
             </div>
             <MicroGestes gestures={gestures} summary={activeSummary} />
           </main>

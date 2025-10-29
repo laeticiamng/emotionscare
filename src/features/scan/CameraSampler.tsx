@@ -35,6 +35,7 @@ const CameraSampler: React.FC<CameraSamplerProps> = ({ onPermissionChange, onUna
   const [status, setStatus] = useState<'idle' | 'starting' | 'streaming' | 'error'>('idle');
   const [edgeReady, setEdgeReady] = useState(true);
   const [liveMessage, setLiveMessage] = useState('');
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const motionEnabled = useMemo(() => prefersMotion(), []);
 
   useEffect(() => {
@@ -89,6 +90,7 @@ const CameraSampler: React.FC<CameraSamplerProps> = ({ onPermissionChange, onUna
   }, [onPermissionChange, onUnavailable]);
 
   const sampleFromEdge = useCallback(async () => {
+    setIsAnalyzing(true);
     try {
       const response = await fetch('/functions/v1/ai-emotion-analysis', {
         method: 'POST',
@@ -111,6 +113,8 @@ const CameraSampler: React.FC<CameraSamplerProps> = ({ onPermissionChange, onUna
       setEdgeReady(false);
       onUnavailable?.('edge');
       throw error;
+    } finally {
+      setIsAnalyzing(false);
     }
   }, [onUnavailable, publishMood]);
 
@@ -175,6 +179,12 @@ const CameraSampler: React.FC<CameraSamplerProps> = ({ onPermissionChange, onUna
           className="h-full w-full object-cover opacity-90"
         />
         <div className="absolute inset-0 bg-gradient-to-tr from-background/70 via-background/40 to-transparent" />
+        {isAnalyzing && (
+          <div className="absolute top-4 right-4 flex items-center gap-2 rounded-lg bg-primary/90 px-3 py-2 text-xs font-medium text-primary-foreground animate-pulse">
+            <div className="h-2 w-2 rounded-full bg-white animate-ping" />
+            Analyse en cours...
+          </div>
+        )}
         <div className="absolute bottom-4 left-4 right-4 rounded-2xl bg-background/70 p-4 text-sm text-foreground shadow-lg">
           <p className="font-medium">{statusLabel}</p>
           <p className="mt-1 text-muted-foreground text-sm">

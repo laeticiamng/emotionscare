@@ -1,0 +1,117 @@
+// @ts-nocheck
+import React from 'react';
+import { Clock, TrendingUp, Activity } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useScanHistory } from '@/hooks/useScanHistory';
+import { Skeleton } from '@/components/ui/skeleton';
+import { formatDistanceToNow } from 'date-fns';
+import { fr } from 'date-fns/locale';
+
+const getEmotionColor = (valence: number, arousal: number) => {
+  if (valence > 60 && arousal > 60) return 'text-green-500';
+  if (valence > 60 && arousal <= 60) return 'text-blue-500';
+  if (valence <= 40 && arousal > 60) return 'text-orange-500';
+  return 'text-slate-500';
+};
+
+const getEmotionLabel = (valence: number, arousal: number) => {
+  if (valence > 60 && arousal > 60) return 'Énergique et positif';
+  if (valence > 60 && arousal <= 60) return 'Calme et serein';
+  if (valence <= 40 && arousal > 60) return 'Tension ressentie';
+  if (valence <= 40 && arousal <= 60) return 'Apaisement recherché';
+  return 'État neutre';
+};
+
+export const ScanHistory: React.FC = () => {
+  const { data: history, isLoading } = useScanHistory(3);
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <Skeleton className="h-6 w-40" />
+          <Skeleton className="h-4 w-64" />
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {[1, 2, 3].map((i) => (
+            <Skeleton key={i} className="h-16 w-full" />
+          ))}
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!history || history.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Clock className="h-5 w-5" />
+            Historique récent
+          </CardTitle>
+          <CardDescription>
+            Vos 3 derniers scans apparaîtront ici
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground text-center py-6">
+            Aucun scan enregistré pour le moment
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Clock className="h-5 w-5" />
+          Historique récent
+        </CardTitle>
+        <CardDescription>
+          Vos 3 derniers états émotionnels
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        {history.map((scan, index) => {
+          const emotionColor = getEmotionColor(scan.valence, scan.arousal);
+          const emotionLabel = getEmotionLabel(scan.valence, scan.arousal);
+          const timeAgo = formatDistanceToNow(new Date(scan.created_at), {
+            addSuffix: true,
+            locale: fr,
+          });
+
+          return (
+            <div
+              key={scan.id}
+              className="flex items-center gap-3 rounded-lg border bg-card p-3 transition-colors hover:bg-accent/5"
+            >
+              <div className={`flex-shrink-0 ${emotionColor}`}>
+                {index === 0 ? (
+                  <TrendingUp className="h-5 w-5" />
+                ) : (
+                  <Activity className="h-5 w-5" />
+                )}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className={`text-sm font-medium ${emotionColor}`}>
+                  {emotionLabel}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {timeAgo}
+                  {scan.summary && ` · ${scan.summary}`}
+                </p>
+              </div>
+              <div className="flex-shrink-0 text-right">
+                <div className="text-xs text-muted-foreground">
+                  V:{Math.round(scan.valence)} A:{Math.round(scan.arousal)}
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </CardContent>
+    </Card>
+  );
+};

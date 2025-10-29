@@ -40,6 +40,7 @@ const SamSliders: React.FC<SamSlidersProps> = ({ detail, summary }) => {
   const [valence, setValence] = useState(0.5);
   const [arousal, setArousal] = useState(0.5);
   const [liveMessage, setLiveMessage] = useState('');
+  const [showFeedback, setShowFeedback] = useState(false);
 
   useEffect(() => {
     if (detail && detail.source === 'scan_sliders') {
@@ -62,6 +63,8 @@ const SamSliders: React.FC<SamSlidersProps> = ({ detail, summary }) => {
       const next = clampNormalized((values[0] ?? 50) / 100);
       setValence(next);
       publishMood('scan_sliders', next, arousal);
+      setShowFeedback(true);
+      setTimeout(() => setShowFeedback(false), 1000);
     },
     [arousal, publishMood],
   );
@@ -71,12 +74,19 @@ const SamSliders: React.FC<SamSlidersProps> = ({ detail, summary }) => {
       const next = clampNormalized((values[0] ?? 50) / 100);
       setArousal(next);
       publishMood('scan_sliders', valence, next);
+      setShowFeedback(true);
+      setTimeout(() => setShowFeedback(false), 1000);
     },
     [publishMood, valence],
   );
 
   return (
-    <section className="rounded-3xl border border-transparent bg-white/5 p-6 shadow-lg backdrop-blur mood-surface dark:bg-slate-800/40">
+    <section className="relative rounded-3xl border border-transparent bg-white/5 p-6 shadow-lg backdrop-blur mood-surface dark:bg-slate-800/40">
+      {showFeedback && (
+        <div className="absolute top-4 right-4 rounded-lg bg-primary/10 px-3 py-1 text-xs font-medium text-primary animate-in fade-in slide-in-from-top-2 duration-300">
+          Mis à jour ✓
+        </div>
+      )}
       <div className="space-y-2">
         <h2 className="text-lg font-semibold text-foreground">Réglage sensoriel</h2>
         <p className="text-sm text-muted-foreground">
