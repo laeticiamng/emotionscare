@@ -131,16 +131,13 @@ const SamSliders: React.FC<SamSlidersProps> = ({ detail, summary }) => {
 
       <div className="mt-6 space-y-8">
         <div>
-          <div className="mb-2">
+          <div className="mb-3">
             <div className="flex items-center justify-between mb-1">
               <span className="text-sm font-medium text-foreground">Comment vous sentez-vous ?</span>
-              <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
-                {valencePercent}%
-              </span>
             </div>
-            <div className="flex items-baseline gap-2">
+            <div className="rounded-lg bg-primary/5 px-3 py-2">
               <span className="text-base font-semibold text-foreground">{valenceDescriptor.label}</span>
-              <span className="text-xs text-muted-foreground">· {valenceDescriptor.description}</span>
+              <p className="text-xs text-muted-foreground mt-0.5">{valenceDescriptor.description}</p>
             </div>
           </div>
           <Slider
@@ -160,16 +157,13 @@ const SamSliders: React.FC<SamSlidersProps> = ({ detail, summary }) => {
         </div>
 
         <div>
-          <div className="mb-2">
+          <div className="mb-3">
             <div className="flex items-center justify-between mb-1">
               <span className="text-sm font-medium text-foreground">Quel est votre niveau d'énergie ?</span>
-              <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
-                {arousalPercent}%
-              </span>
             </div>
-            <div className="flex items-baseline gap-2">
+            <div className="rounded-lg bg-primary/5 px-3 py-2">
               <span className="text-base font-semibold text-foreground">{arousalDescriptor.label}</span>
-              <span className="text-xs text-muted-foreground">· {arousalDescriptor.description}</span>
+              <p className="text-xs text-muted-foreground mt-0.5">{arousalDescriptor.description}</p>
             </div>
           </div>
           <Slider
