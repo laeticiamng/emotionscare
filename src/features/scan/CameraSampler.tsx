@@ -1,9 +1,9 @@
 // @ts-nocheck
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { useMoodPublisher } from '@/features/mood/useMoodPublisher';
 import { scanAnalytics } from '@/lib/analytics/scanEvents';
-import { supabase } from '@/integrations/supabase/client';
+import { useHumeWebSocket } from '@/hooks/useHumeWebSocket';
 
 const clampNormalized = (value: number) => {
   if (!Number.isFinite(value)) {
@@ -33,12 +33,23 @@ const prefersMotion = () => {
 
 const CameraSampler: React.FC<CameraSamplerProps> = ({ onPermissionChange, onUnavailable, summary }) => {
   const publishMood = useMoodPublisher();
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-  const [status, setStatus] = useState<'idle' | 'starting' | 'streaming' | 'error'>('idle');
-  const [edgeReady, setEdgeReady] = useState(true);
+  const [status, setStatus] = useState<'idle' | 'starting' | 'streaming' | 'error'>('starting');
   const [liveMessage, setLiveMessage] = useState('');
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const motionEnabled = useMemo(() => prefersMotion(), []);
+  
+  // Use Hume WebSocket for real-time facial analysis
+  const { isConnected, error, latestResult, videoRef } = useHumeWebSocket({
+    enabled: true, // Always enabled when component is mounted
+    onEmotions: (result) => {
+      console.log('[CameraSampler] Hume emotions:', result);
+      scanAnalytics.cameraAnalysisCompleted(500); // approximate
+      
+      // Publish to mood system
+      if (result.valence !== undefined && result.arousal !== undefined) {
+        publishMood('scan_camera', result.valence, result.arousal);
+      }
+    }
+  });
 
   useEffect(() => {
     if (summary) {
@@ -46,196 +57,47 @@ const CameraSampler: React.FC<CameraSamplerProps> = ({ onPermissionChange, onUna
     }
   }, [summary]);
 
+  // Handle connection status
   useEffect(() => {
-    if (typeof navigator === 'undefined' || !navigator.mediaDevices?.getUserMedia) {
+    if (error) {
+      console.error('[CameraSampler] Hume WebSocket error:', error);
       setStatus('error');
-      onPermissionChange?.('denied');
-      onUnavailable?.('hardware');
-      return;
+      onUnavailable?.('edge');
     }
-
-    let active = true;
-    let stream: MediaStream | null = null;
-
-    const start = async () => {
-      setStatus('starting');
-      try {
-        stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: 'user' },
-          audio: false,
-        });
-        if (!active) {
-          stream.getTracks().forEach(track => track.stop());
-          return;
-        }
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-          
-          // Wait for video metadata to load before starting analysis
-          await new Promise<void>((resolve, reject) => {
-            if (!videoRef.current) {
-              reject(new Error('Video ref lost'));
-              return;
-            }
-            
-            const handleLoadedMetadata = () => {
-              resolve();
-            };
-            
-            const handleError = () => {
-              reject(new Error('Video load error'));
-            };
-            
-            videoRef.current.addEventListener('loadedmetadata', handleLoadedMetadata, { once: true });
-            videoRef.current.addEventListener('error', handleError, { once: true });
-            
-            videoRef.current.play().catch(reject);
-          });
-        }
-        setStatus('streaming');
-        onPermissionChange?.('allowed');
-        scanAnalytics.cameraPermissionGranted();
-      } catch (error) {
-        setStatus('error');
-        onPermissionChange?.('denied');
-        onUnavailable?.('hardware');
-        scanAnalytics.cameraPermissionDenied();
-      }
-    };
-
-    start();
-
-    return () => {
-      active = false;
-      if (stream) {
-        stream.getTracks().forEach(track => track.stop());
-      }
-    };
-  }, [onPermissionChange, onUnavailable]);
-
-  const sampleFromEdge = useCallback(async () => {
-    const startTime = Date.now();
-    setIsAnalyzing(true);
-    scanAnalytics.cameraAnalysisStarted();
-    
-    try {
-      if (!videoRef.current) {
-        console.error('[CameraSampler] Video ref not ready');
-        return; // Don't unmount component, just skip this frame
-      }
-
-      // Check if video has loaded metadata
-      if (videoRef.current.readyState < 2) { // HAVE_CURRENT_DATA
-        console.warn('[CameraSampler] Video not ready yet, skipping frame');
-        return; // Don't unmount component, just wait for next frame
-      }
-
-      // Check if video is actually playing
-      if (videoRef.current.videoWidth === 0 || videoRef.current.videoHeight === 0) {
-        console.warn('[CameraSampler] Video dimensions not loaded yet');
-        return; // Don't unmount component, just wait for next frame
-      }
-
-      // Capture frame from video
-      const canvas = document.createElement('canvas');
-      canvas.width = videoRef.current.videoWidth;
-      canvas.height = videoRef.current.videoHeight;
-      const ctx = canvas.getContext('2d');
-      if (!ctx) {
-        console.error('[CameraSampler] Canvas context not available');
-        return; // Don't unmount component, just skip this frame
-      }
-      ctx.drawImage(videoRef.current, 0, 0);
-      const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
-      
-      console.log('[CameraSampler] Captured frame, calling mood-camera...', {
-        width: canvas.width,
-        height: canvas.height,
-        dataLength: dataUrl.length
-      });
-
-      // Call mood-camera using Supabase client
-      const { data, error } = await supabase.functions.invoke('mood-camera', {
-        body: { 
-          frame: dataUrl,
-          timestamp: new Date().toISOString(),
-        },
-      });
-
-      console.log('[CameraSampler] Edge function response:', { data, error });
-
-      if (error) {
-        console.error('[CameraSampler] Edge function error:', error);
-        setEdgeReady(false);
-        return; // Don't unmount component on transient errors
-      }
-
-      const rawValence = (data?.valence ?? 50) / 100;
-      const rawArousal = (data?.arousal ?? 50) / 100;
-
-      publishMood('scan_camera', clampNormalized(rawValence), clampNormalized(rawArousal));
-      setEdgeReady(true);
-      
-      const duration = Date.now() - startTime;
-      console.log('[CameraSampler] Analysis completed in', duration, 'ms');
-      scanAnalytics.cameraAnalysisCompleted(duration);
-    } catch (error) {
-      console.error('[CameraSampler] Error during analysis:', error);
-      setEdgeReady(false);
-      // Don't call onUnavailable - just log and retry next frame
-    } finally {
-      setIsAnalyzing(false);
-    }
-  }, [publishMood]);
-
+  }, [error, onUnavailable]);
+  
+  // Set streaming status when connected
   useEffect(() => {
-    if (status !== 'streaming') {
-      return;
+    if (isConnected) {
+      setStatus('streaming');
+      onPermissionChange?.('allowed');
+      scanAnalytics.cameraPermissionGranted();
     }
+  }, [isConnected, onPermissionChange]);
 
-    let cancelled = false;
-    let timeout: ReturnType<typeof setTimeout> | null = null;
-
-    const loop = async () => {
-      try {
-        await sampleFromEdge();
-      } catch (error) {
-        console.error('[CameraSampler] Loop error:', error);
-        // Don't stop the loop on errors, just skip this frame
-      }
-
-      if (cancelled) {
-        return;
-      }
-
-      timeout = setTimeout(loop, 4000);
-    };
-
-    loop();
-
-    return () => {
-      cancelled = true;
-      if (timeout) {
-        clearTimeout(timeout);
-      }
-    };
-  }, [sampleFromEdge, status]);
+  // Update live message based on latest results
+  useEffect(() => {
+    if (latestResult?.emotions && latestResult.emotions.length > 0) {
+      const topEmotion = latestResult.emotions[0];
+      setLiveMessage(`${topEmotion.name}: ${(topEmotion.score * 100).toFixed(0)}%`);
+    }
+  }, [latestResult]);
 
   const statusLabel = useMemo(() => {
-    if (status === 'error') {
-      return 'Caméra non disponible';
+    if (status === 'error' || error) {
+      return error || 'Caméra non disponible';
     }
-    if (!edgeReady) {
-      return 'Analyse interrompue côté Edge';
+    if (!isConnected && status === 'streaming') {
+      return 'Connexion à Hume AI...';
     }
     if (status === 'starting') {
       return 'Initialisation douce de la caméra';
     }
-    if (status === 'streaming') {
-      return 'Capture en cours, aucune donnée chiffrée.';
+    if (status === 'streaming' && isConnected) {
+      return 'Analyse en temps réel avec Hume AI';
     }
     return 'Caméra prête à écouter les micro-expressions.';
-  }, [edgeReady, status]);
+  }, [error, isConnected, status]);
 
   return (
     <section className="relative overflow-hidden rounded-3xl border border-transparent bg-white/5 shadow-xl backdrop-blur mood-surface dark:bg-slate-800/40">
@@ -247,18 +109,31 @@ const CameraSampler: React.FC<CameraSamplerProps> = ({ onPermissionChange, onUna
           className="h-full w-full object-cover opacity-90"
         />
         <div className="absolute inset-0 bg-gradient-to-tr from-background/70 via-background/40 to-transparent" />
-        {isAnalyzing && (
-          <div className="absolute top-4 right-4 flex items-center gap-2 rounded-lg bg-primary/90 px-3 py-2 text-xs font-medium text-primary-foreground animate-pulse">
-            <div className="h-2 w-2 rounded-full bg-white animate-ping" />
-            Analyse en cours...
+        {isConnected && (
+          <div className="absolute top-4 right-4 flex items-center gap-2 rounded-lg bg-green-600/90 px-3 py-2 text-xs font-medium text-white">
+            <div className="h-2 w-2 rounded-full bg-white animate-pulse" />
+            Hume AI connecté
+          </div>
+        )}
+        {latestResult?.emotions && latestResult.emotions.length > 0 && (
+          <div className="absolute top-16 right-4 rounded-lg bg-background/90 px-3 py-2 text-xs max-w-[200px]">
+            <div className="font-semibold mb-1">Émotions détectées:</div>
+            {latestResult.emotions.slice(0, 3).map((emotion, idx) => (
+              <div key={idx} className="flex justify-between gap-2">
+                <span className="text-muted-foreground">{emotion.name}</span>
+                <span className="font-mono">{(emotion.score * 100).toFixed(0)}%</span>
+              </div>
+            ))}
           </div>
         )}
         <div className="absolute bottom-4 left-4 right-4 rounded-2xl bg-background/70 p-4 text-sm text-foreground shadow-lg">
           <p className="font-medium">{statusLabel}</p>
           <p className="mt-1 text-muted-foreground text-sm">
-            {edgeReady
-              ? 'Le flux reste local : seul le signal émotionnel anonymisé alimente les gestes et les couleurs.'
-              : 'Le relais Edge est indisponible. Repassez sur les curseurs sensoriels pour continuer.'}
+            {isConnected
+              ? 'Analyse faciale en temps réel via WebSocket. Détection de 48 émotions par Hume AI.'
+              : error 
+                ? 'Erreur de connexion. Veuillez réessayer.'
+                : 'Connexion au service d\'analyse émotionnelle...'}
           </p>
         </div>
       </div>
