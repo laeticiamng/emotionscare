@@ -4,11 +4,7 @@ import { RouterProvider } from 'react-router-dom';
 import { router } from '@/routerV2';
 import { RootProvider } from '@/providers';
 import { logger } from '@/lib/logger';
-import { ensureSentryClient } from '@/lib/obs/sentry.web';
 import '@/index.css';
-
-// Initialize monitoring (Sentry)
-ensureSentryClient();
 
 // Configuration des logs
 logger.info('🚀 EmotionsCare Platform Loading...', undefined, 'SYSTEM');
