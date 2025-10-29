@@ -147,12 +147,11 @@ const CameraSampler: React.FC<CameraSamplerProps> = ({ onPermissionChange, onUna
       ctx.drawImage(videoRef.current, 0, 0);
       const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
       
-      console.log('[CameraSampler] Calling mood-camera with Hume AI...');
+      console.log('[CameraSampler] Calling analyze-vision with Lovable AI...');
 
-      const { data, error } = await supabase.functions.invoke('mood-camera', {
+      const { data, error } = await supabase.functions.invoke('analyze-vision', {
         body: { 
-          frame: dataUrl,
-          timestamp: new Date().toISOString(),
+          imageBase64: dataUrl,
         },
       });
 
@@ -164,8 +163,23 @@ const CameraSampler: React.FC<CameraSamplerProps> = ({ onPermissionChange, onUna
         return;
       }
 
-      const rawValence = (data?.valence ?? 50) / 100;
-      const rawArousal = (data?.arousal ?? 50) / 100;
+      // Mapper les émotions vers valence/arousal
+      const emotionToValenceArousal = (label: string) => {
+        const map: Record<string, { valence: number; arousal: number }> = {
+          'joie': { valence: 0.85, arousal: 0.7 },
+          'tristesse': { valence: 0.2, arousal: 0.3 },
+          'colère': { valence: 0.2, arousal: 0.8 },
+          'peur': { valence: 0.3, arousal: 0.85 },
+          'surprise': { valence: 0.6, arousal: 0.75 },
+          'dégoût': { valence: 0.25, arousal: 0.5 },
+          'neutre': { valence: 0.5, arousal: 0.5 }
+        };
+        return map[label] || { valence: 0.5, arousal: 0.5 };
+      };
+
+      const { valence: rawValence, arousal: rawArousal } = emotionToValenceArousal(data.label);
+      const valencePercent = Math.round(rawValence * 100);
+      const arousalPercent = Math.round(rawArousal * 100);
 
       publishMood('scan_camera', clampNormalized(rawValence), clampNormalized(rawArousal));
       setEdgeReady(true);
@@ -175,8 +189,8 @@ const CameraSampler: React.FC<CameraSamplerProps> = ({ onPermissionChange, onUna
         const { data: { user } } = await supabase.auth.getUser();
         
         if (user?.id) {
-          const valenceLevel = Math.floor((data?.valence ?? 50) / 20); // 0-4
-          const arousalLevel = Math.floor((data?.arousal ?? 50) / 20); // 0-4
+          const valenceLevel = Math.floor(valencePercent / 20); // 0-4
+          const arousalLevel = Math.floor(arousalPercent / 20); // 0-4
           const avgLevel = Math.round((valenceLevel + arousalLevel) / 2);
           
           const now = new Date();
@@ -191,10 +205,11 @@ const CameraSampler: React.FC<CameraSamplerProps> = ({ onPermissionChange, onUna
             window_type: 'instant',
             expires_at: expiresAt.toISOString(),
             metadata: {
-              valence: data?.valence ?? 50,
-              arousal: data?.arousal ?? 50,
-              confidence: data?.confidence ?? 0,
-              summary: data?.summary || 'Neutre',
+              valence: valencePercent,
+              arousal: arousalPercent,
+              confidence: data?.confidence ?? 0.8,
+              summary: data?.label ? data.label.charAt(0).toUpperCase() + data.label.slice(1) : 'Neutre',
+              emotion: data?.label,
               timestamp: new Date().toISOString(),
             },
           });
@@ -265,7 +280,7 @@ const CameraSampler: React.FC<CameraSamplerProps> = ({ onPermissionChange, onUna
       return 'Initialisation de la caméra';
     }
     if (status === 'streaming') {
-      return 'Analyse faciale avec Hume AI';
+      return 'Analyse émotionnelle IA en temps réel';
     }
     return 'Préparation...';
   }, [edgeReady, status]);
@@ -290,7 +305,7 @@ const CameraSampler: React.FC<CameraSamplerProps> = ({ onPermissionChange, onUna
           <p className="font-medium">{statusLabel}</p>
           <p className="mt-1 text-muted-foreground text-sm">
             {edgeReady
-              ? 'Analyse faciale en temps réel. Valence et arousal détectés par Hume AI.'
+              ? 'Analyse faciale IA temps réel. Détection précise des émotions.'
               : 'Service temporairement indisponible. Nouvelle tentative...'}
           </p>
         </div>
