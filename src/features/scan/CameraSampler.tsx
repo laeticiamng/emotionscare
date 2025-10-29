@@ -100,7 +100,14 @@ const CameraSampler: React.FC<CameraSamplerProps> = ({ onPermissionChange, onUna
     
     try {
       if (!videoRef.current) {
+        console.error('[CameraSampler] Video ref not ready');
         throw new Error('video_not_ready');
+      }
+
+      // Check if video is actually playing
+      if (videoRef.current.videoWidth === 0 || videoRef.current.videoHeight === 0) {
+        console.error('[CameraSampler] Video dimensions are 0');
+        throw new Error('video_not_loaded');
       }
 
       // Capture frame from video
@@ -109,10 +116,17 @@ const CameraSampler: React.FC<CameraSamplerProps> = ({ onPermissionChange, onUna
       canvas.height = videoRef.current.videoHeight;
       const ctx = canvas.getContext('2d');
       if (!ctx) {
+        console.error('[CameraSampler] Canvas context not available');
         throw new Error('canvas_error');
       }
       ctx.drawImage(videoRef.current, 0, 0);
       const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+      
+      console.log('[CameraSampler] Captured frame, calling mood-camera...', {
+        width: canvas.width,
+        height: canvas.height,
+        dataLength: dataUrl.length
+      });
 
       // Call mood-camera edge function
       const { data, error } = await supabase.functions.invoke('mood-camera', {
@@ -123,8 +137,11 @@ const CameraSampler: React.FC<CameraSamplerProps> = ({ onPermissionChange, onUna
       });
 
       if (error) {
+        console.error('[CameraSampler] Edge function error:', error);
         throw new Error('edge_unavailable');
       }
+
+      console.log('[CameraSampler] Edge function response:', data);
 
       const rawValence = (data?.valence ?? 50) / 100; // Convert 0-100 to 0-1
       const rawArousal = (data?.arousal ?? 50) / 100; // Convert 0-100 to 0-1
@@ -133,8 +150,10 @@ const CameraSampler: React.FC<CameraSamplerProps> = ({ onPermissionChange, onUna
       setEdgeReady(true);
       
       const duration = Date.now() - startTime;
+      console.log('[CameraSampler] Analysis completed in', duration, 'ms');
       scanAnalytics.cameraAnalysisCompleted(duration);
     } catch (error) {
+      console.error('[CameraSampler] Error during analysis:', error);
       setEdgeReady(false);
       onUnavailable?.('edge');
       throw error;
