@@ -133,6 +133,9 @@ verify_jwt = false
 [functions.fuse-emotions]
 verify_jwt = false
 
+[functions.emotion-micro-gestures]
+verify_jwt = true
+
 [api]
 enabled = true
 port = 54321

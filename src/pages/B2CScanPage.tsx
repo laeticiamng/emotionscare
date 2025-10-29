@@ -257,7 +257,13 @@ const B2CScanPage: React.FC = () => {
               )}
               <ScanHistory />
             </div>
-            <MicroGestes gestures={gestures} summary={activeSummary} />
+            <MicroGestes 
+              gestures={gestures} 
+              summary={activeSummary}
+              emotion={detail?.summary}
+              valence={detail?.valence}
+              arousal={detail?.arousal}
+            />
           </main>
           </div>
         </div>
