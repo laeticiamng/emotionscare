@@ -1,58 +1,31 @@
 // @ts-nocheck
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import {
-  EmotionResult,
-  EmotionRecommendation,
-  LiveVoiceScannerProps,
-} from '@/types/emotion';
-import { Mic, Square } from 'lucide-react';
+import { EmotionResult, LiveVoiceScannerProps, normalizeEmotionResult } from '@/types/emotion-unified';
+import { Mic, Square, AlertCircle } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 
-// Helper function to generate a random emotion for mock data
-const randomEmotion = (): string => {
-  const emotions = ['joy', 'calm', 'focused', 'anxious', 'sad'];
-  return emotions[Math.floor(Math.random() * emotions.length)];
-};
-
-// Create a mock result generator function
-const createMockResult = (): EmotionResult => {
-  const detectedEmotion = randomEmotion();
-  const recommendations: EmotionRecommendation[] = [
-    {
-      id: "rec-live-1",
-      emotion: "calm",
-      type: "activity",
-      title: "Exercice de respiration",
-      description: "3 minutes de respiration profonde",
-      category: "relaxation"
-    },
-    {
-      id: "rec-live-2",
-      emotion: "relaxed",
-      type: "music",
-      title: "Playlist recommandée",
-      description: "Musique relaxante pour vous aider à vous détendre",
-      category: "music"
-    }
-  ];
-
-  return {
-    id: `voice-${Date.now()}`,
-    emotion: detectedEmotion,
-    confidence: Math.random() * 0.4 + 0.6,
-    intensity: Math.random() * 0.5 + 0.5,
-    recommendations: recommendations,
-    timestamp: new Date().toISOString(),
-    emojis: ["😌", "🧘‍♀️"],
-    feedback: "Vous semblez calme et détendu. Continuez ainsi!",
-    emotions: { calm: 0.8, happy: 0.2 },
-    source: "live-voice",
-    score: Math.random() * 100
-  };
+/**
+ * Convertit un Blob audio en base64
+ */
+const blobToBase64 = (blob: Blob): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      if (typeof reader.result === 'string') {
+        resolve(reader.result);
+      } else {
+        reject(new Error('Failed to convert blob to base64'));
+      }
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
 };
 
 const LiveVoiceScanner: React.FC<LiveVoiceScannerProps> = ({
@@ -63,39 +36,154 @@ const LiveVoiceScanner: React.FC<LiveVoiceScannerProps> = ({
   autoStart = false,
   scanDuration = 10
 }) => {
+  const { toast } = useToast();
   const [isRecording, setIsRecording] = useState(false);
   const [progress, setProgress] = useState(0);
   const [localIsProcessing, setLocalIsProcessing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
   
   const isProcessing = externalIsProcessing !== undefined ? externalIsProcessing : localIsProcessing;
   const setIsProcessing = externalSetIsProcessing || setLocalIsProcessing;
 
-  const processAudioData = useCallback(() => {
+  /**
+   * Traite l'audio enregistré et appelle l'edge function
+   */
+  const processAudioData = useCallback(async (audioBlob: Blob) => {
     setIsProcessing(true);
+    setError(null);
     
-    // Mock processing delay
-    setTimeout(() => {
-      setIsProcessing(false);
+    try {
+      console.log('[LiveVoiceScanner] Processing audio, size:', audioBlob.size);
       
-      if (onScanComplete || onResult) {
-        // Create mock result
-        const emotionResult = createMockResult();
-        
-        if (onScanComplete) onScanComplete(emotionResult);
-        if (onResult) onResult(emotionResult);
-      }
-    }, 1500);
-  }, [onScanComplete, onResult, setIsProcessing]);
+      // Convertir en base64
+      const audioBase64 = await blobToBase64(audioBlob);
+      
+      // Appeler l'edge function
+      const { data, error: invokeError } = await supabase.functions.invoke('analyze-voice-hume', {
+        body: { audioBase64 }
+      });
 
-  const startRecording = useCallback(() => {
-    setIsRecording(true);
-    setProgress(0);
-  }, []);
+      if (invokeError) {
+        console.error('[LiveVoiceScanner] Edge function error:', invokeError);
+        throw new Error(invokeError.message || 'Failed to analyze voice');
+      }
+
+      if (!data) {
+        throw new Error('No data returned from voice analysis');
+      }
+
+      console.log('[LiveVoiceScanner] Analysis result:', data);
+
+      // Convertir la réponse en EmotionResult unifié
+      const emotionResult: EmotionResult = normalizeEmotionResult({
+        id: crypto.randomUUID(),
+        emotion: data.emotion || 'neutre',
+        valence: (data.valence || 0.5) * 100,
+        arousal: (data.arousal || 0.5) * 100,
+        confidence: (data.confidence || 0.7) * 100,
+        source: 'voice',
+        timestamp: new Date().toISOString(),
+        emotions: data.emotions || {},
+        summary: `Émotion ${data.emotion} détectée dans votre voix`,
+        metadata: {
+          latency_ms: data.latency_ms
+        }
+      });
+
+      // Notifier les callbacks
+      if (onScanComplete) onScanComplete(emotionResult);
+      if (onResult) onResult(emotionResult);
+
+      toast({
+        title: 'Analyse vocale terminée',
+        description: `Émotion détectée: ${emotionResult.emotion}`,
+      });
+
+    } catch (err) {
+      console.error('[LiveVoiceScanner] Error:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Erreur inconnue';
+      setError(errorMessage);
+      
+      toast({
+        title: 'Erreur d\'analyse',
+        description: 'Impossible d\'analyser votre voix. Veuillez réessayer.',
+        variant: 'destructive'
+      });
+    } finally {
+      setIsProcessing(false);
+    }
+  }, [onScanComplete, onResult, setIsProcessing, toast]);
+
+  /**
+   * Démarre l'enregistrement audio
+   */
+  const startRecording = useCallback(async () => {
+    setError(null);
+    audioChunksRef.current = [];
+    
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      
+      // Créer le MediaRecorder avec format approprié
+      const mediaRecorder = new MediaRecorder(stream, {
+        mimeType: 'audio/webm;codecs=opus'
+      });
+      
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
+        }
+      };
+      
+      mediaRecorder.onstop = async () => {
+        // Créer le blob audio
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        console.log('[LiveVoiceScanner] Recording stopped, blob size:', audioBlob.size);
+        
+        // Arrêter tous les tracks
+        stream.getTracks().forEach(track => track.stop());
+        
+        // Traiter l'audio
+        if (audioBlob.size > 0) {
+          await processAudioData(audioBlob);
+        } else {
+          setError('Aucun audio enregistré');
+        }
+      };
+      
+      mediaRecorderRef.current = mediaRecorder;
+      mediaRecorder.start();
+      
+      setIsRecording(true);
+      setProgress(0);
+      
+      console.log('[LiveVoiceScanner] Recording started');
+      
+    } catch (err) {
+      console.error('[LiveVoiceScanner] Failed to start recording:', err);
+      setError('Impossible d\'accéder au microphone');
+      
+      toast({
+        title: 'Accès microphone refusé',
+        description: 'Veuillez autoriser l\'accès au microphone pour utiliser l\'analyse vocale.',
+        variant: 'destructive'
+      });
+    }
+  }, [processAudioData, toast]);
   
+  /**
+   * Arrête l'enregistrement
+   */
   const stopRecording = useCallback(() => {
-    setIsRecording(false);
-    processAudioData();
-  }, [processAudioData]);
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+      console.log('[LiveVoiceScanner] Stopping recording');
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+    }
+  }, []);
 
   useEffect(() => {
     if (autoStart) {
@@ -183,6 +271,13 @@ const LiveVoiceScanner: React.FC<LiveVoiceScannerProps> = ({
             ? "Parlez naturellement pendant que nous analysons votre voix..." 
             : "L'analyse vocale permet de détecter les émotions à travers les modulations et intonations de votre voix."}
         </p>
+        
+        {error && (
+          <div className="flex items-center gap-2 text-sm text-destructive bg-destructive/10 px-3 py-2 rounded-lg">
+            <AlertCircle className="h-4 w-4 flex-shrink-0" />
+            <span>{error}</span>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

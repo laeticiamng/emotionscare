@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useEmotionScan } from '@/hooks/useEmotionScan';
-import { EmotionResult } from '@/types';
+import { EmotionResult } from '@/types/emotion-unified';
 import { useToast } from '@/hooks/use-toast';
 import { ScanHistory } from '@/components/scan/ScanHistory';
 
@@ -136,16 +136,16 @@ export default function TextScanPage() {
                   </p>
                   <p className="mt-1 text-sm text-muted-foreground">
                     Confiance: {typeof scanResult.confidence === 'number' 
-                      ? Math.round(scanResult.confidence * 100) 
+                      ? Math.round(scanResult.confidence) 
                       : Math.round(scanResult.confidence.overall)}%
                   </p>
                 </div>
 
-                {(scanResult.feedback || scanResult.ai_feedback) && (
+                {(scanResult.summary || scanResult.feedback || scanResult.ai_feedback) && (
                   <div className="rounded-lg border p-4">
                     <h3 className="mb-2 font-semibold">Analyse</h3>
                     <p className="text-muted-foreground">
-                      {scanResult.feedback || scanResult.ai_feedback}
+                      {scanResult.summary || scanResult.feedback || scanResult.ai_feedback}
                     </p>
                   </div>
                 )}
@@ -154,12 +154,17 @@ export default function TextScanPage() {
                   <div>
                     <h3 className="mb-3 font-semibold">Recommandations</h3>
                     <ul className="space-y-2">
-                      {scanResult.recommendations.map((recommendation: string, idx: number) => (
-                        <li key={idx} className="flex items-start gap-2">
-                          <Sparkles className="mt-1 h-4 w-4 text-primary" />
-                          <span className="text-sm">{recommendation}</span>
-                        </li>
-                      ))}
+                      {scanResult.recommendations.map((recommendation, idx) => {
+                        const recText = typeof recommendation === 'string' 
+                          ? recommendation 
+                          : recommendation.title + ': ' + recommendation.description;
+                        return (
+                          <li key={idx} className="flex items-start gap-2">
+                            <Sparkles className="mt-1 h-4 w-4 text-primary" />
+                            <span className="text-sm">{recText}</span>
+                          </li>
+                        );
+                      })}
                     </ul>
                   </div>
                 )}

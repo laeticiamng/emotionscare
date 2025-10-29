@@ -5,7 +5,7 @@ import PageRoot from '@/components/common/PageRoot';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import LiveVoiceScanner from '@/components/scan/live/LiveVoiceScanner';
-import { EmotionResult } from '@/types/emotion';
+import { EmotionResult } from '@/types/emotion-unified';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Mic } from 'lucide-react';
 import { withGuard } from '@/routerV2/withGuard';
@@ -99,13 +99,15 @@ const VoiceScanPage: React.FC = () => {
                       <div className="flex items-center justify-between">
                         <span className="text-sm font-medium">Confiance</span>
                         <span className="text-lg font-semibold text-primary">
-                          {Math.round((scanResult.confidence || 0) * 100)}%
+                          {typeof scanResult.confidence === 'number'
+                            ? Math.round(scanResult.confidence)
+                            : Math.round(scanResult.confidence.overall)}%
                         </span>
                       </div>
-                      {scanResult.insight && (
+                      {scanResult.summary && (
                         <div className="rounded-lg bg-muted p-4">
                           <p className="text-sm text-muted-foreground">
-                            {scanResult.insight}
+                            {scanResult.summary}
                           </p>
                         </div>
                       )}
