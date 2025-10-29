@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useMoodPublisher } from '@/features/mood/useMoodPublisher';
+import { scanAnalytics } from '@/lib/analytics/scanEvents';
 
 const clampNormalized = (value: number) => {
   if (!Number.isFinite(value)) {
@@ -72,10 +73,12 @@ const CameraSampler: React.FC<CameraSamplerProps> = ({ onPermissionChange, onUna
         }
         setStatus('streaming');
         onPermissionChange?.('allowed');
+        scanAnalytics.cameraPermissionGranted();
       } catch (error) {
         setStatus('error');
         onPermissionChange?.('denied');
         onUnavailable?.('hardware');
+        scanAnalytics.cameraPermissionDenied();
       }
     };
 
@@ -90,7 +93,10 @@ const CameraSampler: React.FC<CameraSamplerProps> = ({ onPermissionChange, onUna
   }, [onPermissionChange, onUnavailable]);
 
   const sampleFromEdge = useCallback(async () => {
+    const startTime = Date.now();
     setIsAnalyzing(true);
+    scanAnalytics.cameraAnalysisStarted();
+    
     try {
       const response = await fetch('/functions/v1/ai-emotion-analysis', {
         method: 'POST',
@@ -109,6 +115,9 @@ const CameraSampler: React.FC<CameraSamplerProps> = ({ onPermissionChange, onUna
 
       publishMood('scan_camera', clampNormalized(rawValence), clampNormalized(rawArousal));
       setEdgeReady(true);
+      
+      const duration = Date.now() - startTime;
+      scanAnalytics.cameraAnalysisCompleted(duration);
     } catch (error) {
       setEdgeReady(false);
       onUnavailable?.('edge');

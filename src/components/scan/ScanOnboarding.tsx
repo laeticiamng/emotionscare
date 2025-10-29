@@ -4,6 +4,7 @@ import { X, ChevronRight, ChevronLeft, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { logger } from '@/lib/logger';
+import { scanAnalytics } from '@/lib/analytics/scanEvents';
 
 const ONBOARDING_STORAGE_KEY = 'scan-onboarding-completed';
 
@@ -16,13 +17,8 @@ interface OnboardingStep {
 const STEPS: OnboardingStep[] = [
   {
     title: 'Bienvenue sur le Scanner Émotionnel',
-    description: 'Découvrez comment mesurer votre état émotionnel en temps réel, de manière simple et respectueuse de votre vie privée.',
+    description: 'Mesurez votre état émotionnel en temps réel avec deux modes : curseurs sensoriels ou analyse faciale par caméra.',
     illustration: '🎭',
-  },
-  {
-    title: 'Deux modes de scan',
-    description: 'Utilisez les curseurs sensoriels pour un ajustement manuel, ou activez la caméra pour une analyse automatique de vos micro-expressions faciales.',
-    illustration: '🎚️',
   },
   {
     title: 'Valence et Arousal',
@@ -45,6 +41,7 @@ export const ScanOnboarding: React.FC<ScanOnboardingProps> = ({ onComplete }) =>
 
   useEffect(() => {
     logger.info('[Onboarding] Scan onboarding started', {}, 'UI');
+    scanAnalytics.onboardingStarted();
   }, []);
 
   const handleNext = () => {
@@ -64,12 +61,14 @@ export const ScanOnboarding: React.FC<ScanOnboardingProps> = ({ onComplete }) =>
   const handleComplete = () => {
     localStorage.setItem(ONBOARDING_STORAGE_KEY, 'true');
     logger.info('[Onboarding] Scan onboarding completed', {}, 'UI');
+    scanAnalytics.onboardingCompleted(STEPS.length);
     onComplete();
   };
 
   const handleSkip = () => {
     localStorage.setItem(ONBOARDING_STORAGE_KEY, 'true');
     logger.info('[Onboarding] Scan onboarding skipped', {}, 'UI');
+    scanAnalytics.onboardingSkipped(currentStep + 1, STEPS.length);
     onComplete();
   };
 

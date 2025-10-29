@@ -17,6 +17,7 @@ import { logger } from '@/lib/logger';
 import { ScanHistory } from '@/components/scan/ScanHistory';
 import { ScanOnboarding, shouldShowOnboarding } from '@/components/scan/ScanOnboarding';
 import { useToast } from '@/hooks/use-toast';
+import { scanAnalytics } from '@/lib/analytics/scanEvents';
 
 const mapToSamScale = (value: number) => {
   const normalized = Math.max(0, Math.min(100, value));
@@ -70,6 +71,15 @@ const B2CScanPage: React.FC = () => {
             message: 'scan:submit',
             data: { source: detail.source, summary: detail.summary },
           });
+          
+          scanAnalytics.scanSubmitted(
+            detail.source,
+            detail.valence,
+            detail.arousal,
+            samState.hasConsent
+          );
+          scanAnalytics.feedbackShown('toast', 3000);
+          
           toast({
             title: 'État émotionnel enregistré',
             description: detail.summary || 'Vos données ont été sauvegardées avec succès.',
@@ -167,13 +177,21 @@ const B2CScanPage: React.FC = () => {
             <div className="flex flex-wrap gap-3">
               <Button
                 variant={mode === 'sliders' ? 'default' : 'outline'}
-                onClick={() => setMode('sliders')}
+                onClick={() => {
+                  if (mode !== 'sliders') {
+                    scanAnalytics.modeChanged(mode, 'sliders');
+                  }
+                  setMode('sliders');
+                }}
               >
                 Ajuster via les curseurs
               </Button>
               <Button
                 variant={mode === 'camera' ? 'default' : 'outline'}
                 onClick={() => {
+                  if (mode !== 'camera') {
+                    scanAnalytics.modeChanged(mode, 'camera');
+                  }
                   setMode('camera');
                   setEdgeUnavailable(false);
                   setCameraDenied(false);
@@ -200,8 +218,14 @@ const B2CScanPage: React.FC = () => {
               description="Si vous acceptez, une trace anonyme est conservée pour enrichir vos suivis. Vous pouvez changer d’avis à tout moment."
               acceptLabel="Je partage ce ressenti"
               declineLabel="Je préfère rester local"
-              onAccept={grantConsent}
-              onDecline={declineConsent}
+              onAccept={() => {
+                scanAnalytics.consentAccepted('clinical');
+                grantConsent();
+              }}
+              onDecline={() => {
+                scanAnalytics.consentDeclined('clinical');
+                declineConsent();
+              }}
               isProcessing={samState.isConsentLoading}
               error={samState.error}
             />

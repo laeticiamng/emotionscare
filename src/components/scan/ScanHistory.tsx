@@ -1,11 +1,14 @@
 // @ts-nocheck
-import React from 'react';
-import { Clock, TrendingUp, Activity } from 'lucide-react';
+import React, { useState } from 'react';
+import { Clock, TrendingUp, Activity, ChevronRight } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { useScanHistory } from '@/hooks/useScanHistory';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { ScanHistoryExpanded } from './ScanHistoryExpanded';
+import { scanAnalytics } from '@/lib/analytics/scanEvents';
 
 const getEmotionColor = (valence: number, arousal: number) => {
   if (valence > 60 && arousal > 60) return 'text-green-500';
@@ -24,6 +27,12 @@ const getEmotionLabel = (valence: number, arousal: number) => {
 
 export const ScanHistory: React.FC = () => {
   const { data: history, isLoading } = useScanHistory(3);
+  const [showExpanded, setShowExpanded] = useState(false);
+
+  const handleViewAll = () => {
+    scanAnalytics.historyViewed(history?.length || 0);
+    setShowExpanded(true);
+  };
 
   if (isLoading) {
     return (
@@ -63,17 +72,31 @@ export const ScanHistory: React.FC = () => {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Clock className="h-5 w-5" />
-          Historique récent
-        </CardTitle>
-        <CardDescription>
-          Vos 3 derniers états émotionnels
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-3">
+    <>
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <Clock className="h-5 w-5" />
+                Historique récent
+              </CardTitle>
+              <CardDescription>
+                Vos 3 derniers états émotionnels
+              </CardDescription>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleViewAll}
+              className="gap-1"
+            >
+              Voir tout
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-3">
         {history.map((scan, index) => {
           const emotionColor = getEmotionColor(scan.valence, scan.arousal);
           const emotionLabel = getEmotionLabel(scan.valence, scan.arousal);
@@ -113,5 +136,7 @@ export const ScanHistory: React.FC = () => {
         })}
       </CardContent>
     </Card>
+      <ScanHistoryExpanded open={showExpanded} onClose={() => setShowExpanded(false)} />
+    </>
   );
 };

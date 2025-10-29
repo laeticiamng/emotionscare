@@ -1,9 +1,10 @@
 // @ts-nocheck
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 
 import { Slider } from '@/components/ui/slider';
 import { toLevel, useMoodPublisher } from '@/features/mood/useMoodPublisher';
 import type { MoodEventDetail } from '@/features/mood/mood-bus';
+import { scanAnalytics } from '@/lib/analytics/scanEvents';
 
 interface SamSlidersProps {
   detail?: MoodEventDetail | null;
@@ -41,6 +42,7 @@ const SamSliders: React.FC<SamSlidersProps> = ({ detail, summary }) => {
   const [arousal, setArousal] = useState(0.5);
   const [liveMessage, setLiveMessage] = useState('');
   const [showFeedback, setShowFeedback] = useState(false);
+  const feedbackTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (detail && detail.source === 'scan_sliders') {
@@ -63,8 +65,17 @@ const SamSliders: React.FC<SamSlidersProps> = ({ detail, summary }) => {
       const next = clampNormalized((values[0] ?? 50) / 100);
       setValence(next);
       publishMood('scan_sliders', next, arousal);
+      
+      // Clear existing timeout
+      if (feedbackTimeoutRef.current) {
+        clearTimeout(feedbackTimeoutRef.current);
+      }
+      
       setShowFeedback(true);
-      setTimeout(() => setShowFeedback(false), 1000);
+      scanAnalytics.sliderAdjusted('valence', Math.round(next * 100));
+      scanAnalytics.feedbackShown('badge', 1000);
+      
+      feedbackTimeoutRef.current = setTimeout(() => setShowFeedback(false), 1000);
     },
     [arousal, publishMood],
   );
@@ -74,8 +85,17 @@ const SamSliders: React.FC<SamSlidersProps> = ({ detail, summary }) => {
       const next = clampNormalized((values[0] ?? 50) / 100);
       setArousal(next);
       publishMood('scan_sliders', valence, next);
+      
+      // Clear existing timeout
+      if (feedbackTimeoutRef.current) {
+        clearTimeout(feedbackTimeoutRef.current);
+      }
+      
       setShowFeedback(true);
-      setTimeout(() => setShowFeedback(false), 1000);
+      scanAnalytics.sliderAdjusted('arousal', Math.round(next * 100));
+      scanAnalytics.feedbackShown('badge', 1000);
+      
+      feedbackTimeoutRef.current = setTimeout(() => setShowFeedback(false), 1000);
     },
     [publishMood, valence],
   );
