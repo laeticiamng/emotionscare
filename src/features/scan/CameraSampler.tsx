@@ -177,6 +177,7 @@ const CameraSampler: React.FC<CameraSamplerProps> = ({ onPermissionChange, onUna
           'extase': { valence: 0.9, arousal: 0.85 },
           'émerveillement': { valence: 0.8, arousal: 0.75 },
           'inspiration': { valence: 0.75, arousal: 0.65 },
+          'ravissement': { valence: 0.88, arousal: 0.8 },
           
           // Émotions positives basse énergie
           'calme': { valence: 0.7, arousal: 0.25 },
@@ -198,6 +199,7 @@ const CameraSampler: React.FC<CameraSamplerProps> = ({ onPermissionChange, onUna
           'jalousie': { valence: 0.25, arousal: 0.7 },
           'envie': { valence: 0.35, arousal: 0.6 },
           'tourment': { valence: 0.2, arousal: 0.75 },
+          'crainte': { valence: 0.28, arousal: 0.72 },
           
           // Émotions négatives basse énergie
           'tristesse': { valence: 0.2, arousal: 0.3 },
@@ -210,6 +212,7 @@ const CameraSampler: React.FC<CameraSamplerProps> = ({ onPermissionChange, onUna
           'embarras': { valence: 0.35, arousal: 0.5 },
           'déception': { valence: 0.3, arousal: 0.35 },
           'torpeur': { valence: 0.4, arousal: 0.1 },
+          'apathie': { valence: 0.42, arousal: 0.12 },
           
           // Émotions mixtes/complexes
           'surprise': { valence: 0.6, arousal: 0.75 },
