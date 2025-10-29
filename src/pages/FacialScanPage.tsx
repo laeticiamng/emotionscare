@@ -10,6 +10,7 @@ import CameraSampler from '@/features/scan/CameraSampler';
 import { useMoodPublisher } from '@/features/mood/useMoodPublisher';
 import { withGuard } from '@/routerV2/withGuard';
 import { useToast } from '@/hooks/use-toast';
+import { ScanHistory } from '@/components/scan/ScanHistory';
 
 const FacialScanPage: React.FC = () => {
   const navigate = useNavigate();
@@ -139,7 +140,7 @@ const FacialScanPage: React.FC = () => {
                     </div>
                     <div className="space-y-2">
                       <h4 className="font-medium text-foreground">3. Analyse en temps réel</h4>
-                      <p>Notre IA Hume analyse vos micro-expressions pour détecter 48 émotions différentes.</p>
+                      <p>Notre IA analyse vos micro-expressions pour détecter 48 émotions différentes.</p>
                     </div>
                     <div className="space-y-2">
                       <h4 className="font-medium text-foreground">4. Résultats instantanés</h4>
@@ -150,7 +151,7 @@ const FacialScanPage: React.FC = () => {
 
                 <Card>
                   <CardHeader>
-                    <CardTitle>Technologie Hume AI</CardTitle>
+                    <CardTitle>Technologie IA avancée</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-2 text-sm text-muted-foreground">
                     <p>
@@ -167,6 +168,8 @@ const FacialScanPage: React.FC = () => {
                     </p>
                   </CardContent>
                 </Card>
+
+                <ScanHistory />
 
                 <Card>
                   <CardHeader>
