@@ -124,6 +124,15 @@ verify_jwt = false
 [functions.hume-websocket-proxy]
 verify_jwt = false
 
+[functions.analyze-vision]
+verify_jwt = false
+
+[functions.analyze-text]
+verify_jwt = false
+
+[functions.fuse-emotions]
+verify_jwt = false
+
 [api]
 enabled = true
 port = 54321
