@@ -37,7 +37,7 @@ export const useHumeWebSocket = ({ enabled = false, onEmotions }: UseHumeWebSock
 
     try {
       // Get project ID from env
-      const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID || 'yaincoxihiqdksxgrsrk';
+      const projectId = 'yaincoxihiqdksxgrsrk';
       const wsUrl = `wss://${projectId}.supabase.co/functions/v1/hume-websocket-proxy`;
       
       logger.info('Connecting to Hume WebSocket proxy', { wsUrl }, 'HUME');
@@ -89,7 +89,7 @@ export const useHumeWebSocket = ({ enabled = false, onEmotions }: UseHumeWebSock
         }
       };
 
-      wsRef.current.onerror = (event) => {
+      wsRef.current.onerror = () => {
         logger.error('WebSocket error', new Error('Connection failed'), 'HUME');
         setError('Connection error');
         setIsConnected(false);
