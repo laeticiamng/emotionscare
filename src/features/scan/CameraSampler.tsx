@@ -198,7 +198,7 @@ const CameraSampler: React.FC<CameraSamplerProps> = ({ onPermissionChange, onUna
         return;
       }
 
-      timeout = setTimeout(loop, 4000);
+      timeout = setTimeout(loop, 15000);
     };
 
     loop();

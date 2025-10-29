@@ -6,7 +6,7 @@ import { useCamera } from './useCamera';
 import { usePrivacyPrefs } from './usePrivacyPrefs';
 import { logger } from '@/lib/logger';
 
-const FRAME_THROTTLE_MS = 1000; // 1 FPS
+const FRAME_THROTTLE_MS = 15000; // Toutes les 15 secondes
 
 export const useHumeVision = () => {
   const store = useARStore();
