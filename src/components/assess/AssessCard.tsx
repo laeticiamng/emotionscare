@@ -64,6 +64,8 @@ export function AssessCard({
 
   const handleOptIn = () => {
     setHasOptedIn(true);
+    // Démarrer immédiatement l'évaluation après l'opt-in
+    onStart();
   };
 
   const handleStart = () => {
