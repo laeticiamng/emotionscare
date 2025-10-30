@@ -27,17 +27,31 @@ const MicroGestes: React.FC<MicroGestesProps> = ({
   valence = 50,
   arousal = 50 
 }) => {
-  const { isLoading, suggestions, generateSuggestions } = useAIMicroGestures();
+  const { isLoading, suggestions, generateSuggestions, reset } = useAIMicroGestures();
+  const [lastEmotion, setLastEmotion] = useState<string | undefined>(undefined);
   
   const hasGestures = gestures.length > 0;
   const hasAISuggestions = suggestions && suggestions.gestures.length > 0;
 
-  // Générer automatiquement les suggestions IA dès qu'une émotion est disponible
+  // Régénérer automatiquement quand l'émotion change
   useEffect(() => {
-    if (emotion && !isLoading && !suggestions) {
-      generateSuggestions({ emotion, valence, arousal });
+    if (!emotion) {
+      return;
     }
-  }, [emotion, valence, arousal, isLoading, suggestions, generateSuggestions]);
+
+    // Si l'émotion a changé, reset et régénérer
+    if (emotion !== lastEmotion) {
+      setLastEmotion(emotion);
+      reset();
+      
+      // Délai court pour éviter les appels trop rapprochés
+      const timer = setTimeout(() => {
+        generateSuggestions({ emotion, valence, arousal });
+      }, 300);
+
+      return () => clearTimeout(timer);
+    }
+  }, [emotion, valence, arousal, lastEmotion, generateSuggestions, reset]);
 
   const displayGestures: AIMicroGesture[] | MicroGesture[] = hasAISuggestions 
     ? suggestions.gestures 
