@@ -51,8 +51,8 @@ const vinylTracks: VinylTrack[] = [
     color: 'hsl(200, 70%, 60%)',
     vinylColor: 'linear-gradient(135deg, hsl(200, 70%, 60%), hsl(180, 60%, 70%))',
     description: 'Ondes douces qui bercent ton esprit',
-    url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
-    audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
+    url: '/audio/calm.mp3',
+    audioUrl: '/audio/calm.mp3',
     emotion: 'calm'
   },
   {
@@ -65,8 +65,8 @@ const vinylTracks: VinylTrack[] = [
     color: 'hsl(280, 70%, 60%)',
     vinylColor: 'linear-gradient(135deg, hsl(280, 70%, 60%), hsl(320, 60%, 70%))',
     description: 'Stimule ta créativité naturelle',
-    url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
-    audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
+    url: '/audio/creative.mp3',
+    audioUrl: '/audio/creative.mp3',
     emotion: 'creative'
   },
   {
@@ -79,8 +79,8 @@ const vinylTracks: VinylTrack[] = [
     color: 'hsl(30, 80%, 60%)',
     vinylColor: 'linear-gradient(135deg, hsl(30, 80%, 60%), hsl(60, 70%, 70%))',
     description: 'Énergie sans stress',
-    url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
-    audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
+    url: '/audio/energetic.mp3',
+    audioUrl: '/audio/energetic.mp3',
     emotion: 'energetic'
   },
   {
@@ -93,8 +93,8 @@ const vinylTracks: VinylTrack[] = [
     color: 'hsl(140, 60%, 60%)',
     vinylColor: 'linear-gradient(135deg, hsl(140, 60%, 60%), hsl(120, 70%, 70%))',
     description: 'Harmonise ton être intérieur',
-    url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3',
-    audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3',
+    url: '/audio/healing.mp3',
+    audioUrl: '/audio/healing.mp3',
     emotion: 'healing'
   }
 ];
