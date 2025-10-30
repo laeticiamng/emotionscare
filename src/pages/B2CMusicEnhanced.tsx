@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { 
   Play, 
   Music,
@@ -16,7 +17,10 @@ import {
   Brain,
   Zap,
   Sparkles,
-  ArrowLeft
+  ArrowLeft,
+  Loader2,
+  Clock,
+  Star
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useMusic } from '@/hooks/useMusic';
@@ -147,6 +151,16 @@ const B2CMusicEnhanced: React.FC = () => {
 
   const [showReward, setShowReward] = useState(false);
   const [playerVisible, setPlayerVisible] = useState(false);
+  const [loadingTrackId, setLoadingTrackId] = useState<string | null>(null);
+  const [playHistory, setPlayHistory] = useState<string[]>(() => {
+    if (typeof window === 'undefined') return [];
+    try {
+      const raw = window.localStorage.getItem('music:history');
+      return raw ? JSON.parse(raw) : [];
+    } catch {
+      return [];
+    }
+  });
 
   const universe = getOptimizedUniverse('music');
   const { entranceVariants, cleanupAnimation } = useOptimizedAnimation({
@@ -171,6 +185,13 @@ const B2CMusicEnhanced: React.FC = () => {
   }, [favorites]);
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      window.localStorage.setItem('music:history', JSON.stringify(playHistory));
+    } catch {}
+  }, [playHistory]);
+
+  useEffect(() => {
     // Set playlist on mount
     setPlaylist(vinylTracks);
   }, [setPlaylist]);
@@ -190,10 +211,17 @@ const B2CMusicEnhanced: React.FC = () => {
   };
 
   const startTrack = async (track: VinylTrack) => {
+    setLoadingTrackId(track.id);
     try {
       setPlayerVisible(true); // Afficher le player AVANT la lecture
       await play(track);
       setLastPlayedId(track.id);
+      
+      // Ajouter à l'historique
+      setPlayHistory(prev => {
+        const filtered = prev.filter(id => id !== track.id);
+        return [track.id, ...filtered].slice(0, 10); // Max 10 items
+      });
       
       if (typeof window !== 'undefined') {
         try {
@@ -212,6 +240,8 @@ const B2CMusicEnhanced: React.FC = () => {
         description: "Impossible de lire ce vinyle. Essaie un autre.",
         variant: "destructive"
       });
+    } finally {
+      setLoadingTrackId(null);
     }
   };
 
@@ -243,12 +273,11 @@ const B2CMusicEnhanced: React.FC = () => {
       </div>
 
       {/* Main Content */}
-      <div>
-        {!playerVisible ? (
-          <div
-            className="space-y-12"
-          >
-            {/* Introduction */}
+      <TooltipProvider>
+        <div>
+          {!playerVisible ? (
+            <div className="space-y-12">
+              {/* Introduction */}
             <div className="text-center space-y-6">
               <div
                 className="inline-flex items-center justify-center w-20 h-20 rounded-full mb-6"
@@ -268,14 +297,93 @@ const B2CMusicEnhanced: React.FC = () => {
               </p>
             </div>
 
+            {/* Favorites Section */}
+            {favorites.length > 0 && (
+              <div className="max-w-6xl mx-auto">
+                <div className="flex items-center gap-2 mb-4">
+                  <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" />
+                  <h3 className="text-lg font-semibold text-foreground">Tes Favoris</h3>
+                </div>
+                <div className="flex gap-4 overflow-x-auto pb-4">
+                  {vinylTracks.filter(t => favorites.includes(t.id)).map(track => (
+                    <Card
+                      key={track.id}
+                      className="min-w-[200px] cursor-pointer hover:shadow-lg transition-all"
+                      onClick={() => startTrack(track)}
+                    >
+                      <CardContent className="p-4 space-y-2">
+                        <div
+                          className="w-16 h-16 mx-auto rounded-full"
+                          style={{ background: track.vinylColor }}
+                        />
+                        <p className="text-sm font-medium text-center truncate">{track.title}</p>
+                        <Button size="sm" className="w-full" disabled={loadingTrackId === track.id}>
+                          {loadingTrackId === track.id ? (
+                            <Loader2 className="h-3 w-3 animate-spin" />
+                          ) : (
+                            <Play className="h-3 w-3" />
+                          )}
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* History Section */}
+            {playHistory.length > 0 && (
+              <div className="max-w-6xl mx-auto">
+                <div className="flex items-center gap-2 mb-4">
+                  <Clock className="h-5 w-5 text-muted-foreground" />
+                  <h3 className="text-lg font-semibold text-foreground">Récemment Écoutés</h3>
+                </div>
+                <div className="flex gap-4 overflow-x-auto pb-4">
+                  {vinylTracks.filter(t => playHistory.includes(t.id))
+                    .sort((a, b) => playHistory.indexOf(a.id) - playHistory.indexOf(b.id))
+                    .slice(0, 5)
+                    .map(track => (
+                      <Card
+                        key={track.id}
+                        className="min-w-[200px] cursor-pointer hover:shadow-lg transition-all"
+                        onClick={() => startTrack(track)}
+                      >
+                        <CardContent className="p-4 space-y-2">
+                          <div
+                            className="w-16 h-16 mx-auto rounded-full"
+                            style={{ background: track.vinylColor }}
+                          />
+                          <p className="text-sm font-medium text-center truncate">{track.title}</p>
+                          <Button size="sm" className="w-full" disabled={loadingTrackId === track.id}>
+                            {loadingTrackId === track.id ? (
+                              <Loader2 className="h-3 w-3 animate-spin" />
+                            ) : (
+                              <Play className="h-3 w-3" />
+                            )}
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    ))}
+                </div>
+              </div>
+            )}
+
             {resumeTrack && (
               <div className="flex justify-center">
                 <Button
                   variant="secondary"
                   onClick={() => startTrack(resumeTrack)}
                   className="px-6"
+                  disabled={loadingTrackId === resumeTrack.id}
                 >
-                  Reprendre la session
+                  {loadingTrackId === resumeTrack.id ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Chargement...
+                    </>
+                  ) : (
+                    'Reprendre la session'
+                  )}
                 </Button>
               </div>
             )}
@@ -285,46 +393,60 @@ const B2CMusicEnhanced: React.FC = () => {
               {vinylTracks.map((track, index) => {
                 const Icon = categoryIcons[track.category];
                 const isFavorite = favorites.includes(track.id);
+                const isLoading = loadingTrackId === track.id;
                 
                 return (
-                  <div key={track.id}>
-                    <Card
-                      role="button"
-                      tabIndex={0}
-                      aria-label={`Lancer le vinyle ${track.title} de ${track.artist}, catégorie ${track.category}`}
-                      className="h-full bg-card/90 backdrop-blur-md hover:shadow-lg transition-all duration-300 cursor-pointer group overflow-hidden focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2"
-                      onClick={() => startTrack(track)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault();
-                          startTrack(track);
-                        }
-                      }}
-                    >
-                      <CardContent className="p-6 space-y-4">
-                        {/* Vinyl Disc */}
-                        <div className="relative">
-                          <div
-                            className="w-24 h-24 mx-auto rounded-full relative overflow-hidden transition-transform duration-300"
-                            style={{ background: track.vinylColor }}
+                  <Tooltip key={track.id}>
+                    <TooltipTrigger asChild>
+                      <div>
+                        <motion.div
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          <Card
+                            role="button"
+                            tabIndex={0}
+                            aria-label={`Lancer le vinyle ${track.title} de ${track.artist}, catégorie ${track.category}`}
+                            className="h-full bg-card/90 backdrop-blur-md hover:shadow-lg transition-all duration-300 cursor-pointer group overflow-hidden focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2"
+                            onClick={() => !isLoading && startTrack(track)}
+                            onKeyDown={(e) => {
+                              if (!isLoading && (e.key === 'Enter' || e.key === ' ')) {
+                                e.preventDefault();
+                                startTrack(track);
+                              }
+                            }}
                           >
-                            {/* Vinyl grooves */}
-                            <div className="absolute inset-2 rounded-full border-2 border-foreground/20" />
-                            <div className="absolute inset-4 rounded-full border border-foreground/20" />
-                            <div className="absolute inset-6 rounded-full border border-foreground/20" />
-                            
-                            {/* Center hole */}
-                            <div className="absolute top-1/2 left-1/2 w-6 h-6 -mt-3 -ml-3 rounded-full bg-card border-2 border-foreground/30 flex items-center justify-center">
-                              <Icon className="w-3 h-3" style={{ color: track.color }} />
-                            </div>
-                          </div>
-                          
-                          {/* Floating effect */}
-                          <div 
-                            className="absolute -inset-2 rounded-full opacity-30 blur-md"
-                            style={{ background: track.vinylColor }}
-                          />
-                        </div>
+                            <CardContent className="p-6 space-y-4">
+                              {/* Vinyl Disc */}
+                              <div className="relative">
+                                <motion.div
+                                  animate={isLoading ? { rotate: 360 } : {}}
+                                  transition={isLoading ? { duration: 2, repeat: Infinity, ease: "linear" } : {}}
+                                  className="w-24 h-24 mx-auto rounded-full relative overflow-hidden"
+                                  style={{ background: track.vinylColor }}
+                                >
+                                  {/* Vinyl grooves */}
+                                  <div className="absolute inset-2 rounded-full border-2 border-foreground/20" />
+                                  <div className="absolute inset-4 rounded-full border border-foreground/20" />
+                                  <div className="absolute inset-6 rounded-full border border-foreground/20" />
+                                  
+                                  {/* Center hole */}
+                                  <div className="absolute top-1/2 left-1/2 w-6 h-6 -mt-3 -ml-3 rounded-full bg-card border-2 border-foreground/30 flex items-center justify-center">
+                                    {isLoading ? (
+                                      <Loader2 className="w-3 h-3 animate-spin" style={{ color: track.color }} />
+                                    ) : (
+                                      <Icon className="w-3 h-3" style={{ color: track.color }} />
+                                    )}
+                                  </div>
+                                </motion.div>
+                                
+                                {/* Floating effect */}
+                                <div 
+                                  className="absolute -inset-2 rounded-full opacity-30 blur-md"
+                                  style={{ background: track.vinylColor }}
+                                />
+                              </div>
                         
                         <div className="text-center space-y-2">
                           <h3 className="text-lg font-medium text-foreground">
@@ -354,6 +476,7 @@ const B2CMusicEnhanced: React.FC = () => {
                               size="sm"
                               className="w-full"
                               aria-label={`Lancer ${track.title}`}
+                              disabled={isLoading}
                               style={{
                                 backgroundColor: `${track.color}15`,
                                 color: track.color,
@@ -364,8 +487,17 @@ const B2CMusicEnhanced: React.FC = () => {
                                 startTrack(track);
                               }}
                             >
-                              <Play className="h-3 w-3 mr-2" aria-hidden="true" />
-                              Lancer le vinyle
+                              {isLoading ? (
+                                <>
+                                  <Loader2 className="h-3 w-3 mr-2 animate-spin" aria-hidden="true" />
+                                  Chargement...
+                                </>
+                              ) : (
+                                <>
+                                  <Play className="h-3 w-3 mr-2" aria-hidden="true" />
+                                  Lancer le vinyle
+                                </>
+                              )}
                             </Button>
                             <Button
                               variant={isFavorite ? 'secondary' : 'ghost'}
@@ -385,7 +517,22 @@ const B2CMusicEnhanced: React.FC = () => {
                         </div>
                       </CardContent>
                     </Card>
-                  </div>
+                  </motion.div>
+                </div>
+              </TooltipTrigger>
+              <TooltipContent side="top" className="max-w-xs">
+                <div className="space-y-1">
+                  <p className="font-semibold">{track.title}</p>
+                  <p className="text-xs text-muted-foreground">{track.description}</p>
+                  <p className="text-xs">
+                    <span className="font-medium">Mood:</span> {track.mood}
+                  </p>
+                  <p className="text-xs">
+                    <span className="font-medium">Durée:</span> {Math.floor(track.duration / 60)}:{(track.duration % 60).toString().padStart(2, '0')}
+                  </p>
+                </div>
+              </TooltipContent>
+            </Tooltip>
                 );
               })}
             </div>
@@ -407,6 +554,7 @@ const B2CMusicEnhanced: React.FC = () => {
           </div>
         )}
       </div>
+    </TooltipProvider>
     </div>
   );
 };
