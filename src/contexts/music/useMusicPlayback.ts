@@ -22,11 +22,14 @@ export const useMusicPlayback = (
     try {
       if (track) {
         dispatch({ type: 'SET_CURRENT_TRACK', payload: track });
-        audio.src = track.audioUrl || track.url;
+        const audioUrl = track.audioUrl || track.url;
+        logger.info(`Loading audio from: ${audioUrl}`, 'MUSIC');
+        audio.src = audioUrl;
         audio.load();
         dispatch({ type: 'ADD_TO_HISTORY', payload: track });
       }
       
+      logger.info('Starting audio playback', 'MUSIC');
       await audio.play();
       dispatch({ type: 'SET_PLAYING', payload: true });
       
