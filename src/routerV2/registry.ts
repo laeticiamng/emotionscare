@@ -230,24 +230,8 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: false,
     aliases: ['/parcours-xl'],
   },
-  {
-    name: 'emotion-music',
-    path: '/app/emotion-music',
-    segment: 'public',
-    layout: 'simple',
-    component: 'EmotionMusicPage',
-    guard: false,
-    aliases: ['/emotion-music'],
-  },
-  {
-    name: 'emotion-music-library',
-    path: '/app/emotion-music-library',
-    segment: 'public',
-    layout: 'simple',
-    component: 'EmotionMusicLibraryPage',
-    guard: false,
-    aliases: ['/emotion-music-library'],
-  },
+  // emotion-music supprimé - utiliser /app/music
+  // emotion-music-library supprimé - utiliser /app/music
   {
     name: 'music-premium',
     path: '/app/music-premium',
@@ -266,14 +250,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     component: 'MusicGeneratePage',
     guard: true,
   },
-  {
-    name: 'music-library',
-    path: '/app/music/library',
-    segment: 'consumer',
-    layout: 'simple',
-    component: 'MusicLibraryPage',
-    guard: true,
-  },
+  // music-library supprimé - fonctionnalité dans B2CMusicEnhanced
   {
     name: 'coach',
     path: '/app/coach',
@@ -386,16 +363,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: true,
     requireAuth: true,
   },
-  {
-    name: 'b2c-music',
-    path: '/app/particulier/music',
-    segment: 'consumer',
-    role: 'consumer',
-    layout: 'app-sidebar',
-    component: 'B2CMusicPage',
-    guard: true,
-    requireAuth: true,
-  },
+  // b2c-music supprimé - utiliser /app/music avec B2CMusicEnhanced
 
   // ═══════════════════════════════════════════════════════════
   // MODULES FUN-FIRST (CONSUMER)
@@ -702,24 +670,8 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
   },
   
   // Routes supplémentaires
-  {
-    name: 'coach-chat',
-    path: '/coach-chat',
-    segment: 'consumer',
-    role: 'consumer',
-    layout: 'app-sidebar',
-    component: 'CoachChatPage',
-    guard: true,
-  },
-  {
-    name: 'vr-sessions',
-    path: '/vr-sessions',
-    segment: 'consumer',
-    role: 'consumer',
-    layout: 'app-sidebar',
-    component: 'VRSessionsPage',
-    guard: true,
-  },
+  // coach-chat supprimé - utiliser /app/coach
+  // vr-sessions supprimé - fonctionnalité dans B2CVRBreathGuidePage
   {
     name: 'sessions',
     path: '/app/sessions',
@@ -975,14 +927,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'simple',
     component: 'ChooseModePage',
   },
-  {
-    name: 'modules-journal',
-    path: '/modules/journal',
-    segment: 'public',
-    layout: 'app',
-    component: 'JournalPage',
-    guard: false,
-  },
+  // modules-journal supprimé - utiliser /app/journal
 
   // ═══════════════════════════════════════════════════════════
   // PARAMÈTRES & COMPTE
@@ -1295,14 +1240,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
   // ═══════════════════════════════════════════════════════════
   
   // Audio & Voice
-  {
-    name: 'journal-audio',
-    path: '/app/journal/audio',
-    segment: 'consumer',
-    layout: 'app-sidebar',
-    component: 'JournalAudioPage',
-    guard: true,
-  },
+  // journal-audio supprimé - fonctionnalité dans B2CJournalPage
   {
     name: 'voice-analysis',
     path: '/app/voice-analysis',

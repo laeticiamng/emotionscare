@@ -52,13 +52,13 @@ const AppGatePage = lazy(() => import('@/pages/AppGatePage'));
 // Modules fonctionnels
 const B2CScanPage = lazy(() => import('@/pages/B2CScanPage'));
 const B2CMusicEnhanced = lazy(() => import('@/pages/B2CMusicEnhanced'));
-const EmotionMusicPage = lazy(() => import('@/pages/EmotionMusic'));
-const EmotionMusicLibraryPage = lazy(() => import('@/pages/EmotionMusicLibrary'));
+// EmotionMusicPage supprimé - utiliser B2CMusicEnhanced
+// EmotionMusicLibraryPage supprimé - utiliser B2CMusicEnhanced
 const B2CAICoachPage = lazy(() => import('@/pages/B2CAICoachPage'));
 const B2CJournalPage = lazy(() => import('@/pages/B2CJournalPage'));
 const B2CVRBreathGuidePage = lazy(() => import('@/pages/B2CVRBreathGuidePage'));
 const B2CVRGalaxyPage = lazy(() => import('@/pages/B2CVRGalaxyPage'));
-const VRBreathPage = lazy(() => import('@/pages/VRBreathPage'));
+// VRBreathPage supprimé - utiliser B2CVRBreathGuidePage
 
 // Modules Fun-First
 const B2CFlashGlowPage = lazy(() => import('@/pages/B2CFlashGlowPage'));
@@ -123,14 +123,14 @@ const LegalCookiesPage = lazy(() => import('@/pages/LegalCookiesPage'));
 
 // Pages nouvellement créées
 const ChooseModePage = lazy(() => import('@/pages/ChooseModePage'));
-const CoachChatPage = lazy(() => import('@/pages/CoachChatPage'));
-const VRSessionsPage = lazy(() => import('@/pages/VRSessionsPage'));
+// CoachChatPage supprimé - utiliser B2CAICoachPage
+// VRSessionsPage supprimé - fonctionnalité dans B2CVRBreathGuidePage
 const JournalNewPage = lazy(() => import('@/pages/JournalNewPage'));
 const JournalSettingsPage = lazy(() => import('@/pages/JournalSettings'));
 const ReportingPage = lazy(() => import('@/pages/ReportingPage'));
 const ExportPage = lazy(() => import('@/pages/ExportPage'));
 const LeaderboardPage = lazy(() => import('@/pages/LeaderboardPage'));
-const GamificationPage = lazy(() => import('@/pages/GamificationPage'));
+// GamificationPage supprimé - utiliser B2CGamificationPage
 const ScoresPage = lazy(() => import('@/pages/ScoresPage'));
 const PricingPageWorking = lazy(() => import('@/pages/PricingPageWorking'));
 
@@ -145,7 +145,7 @@ const PrivacyPage = lazy(() => import('@/pages/PrivacyPage'));
 
 // Import des nouveaux modules optimisés
 const FlashGlowPage = lazy(() => import('@/pages/flash-glow/index'));
-const JournalPage = lazy(() => import('@/pages/B2CJournalPage'));
+// JournalPage supprimé - utiliser B2CJournalPage
 const ScanPage = lazy(() => import('@/pages/B2CScanPage'));
 const CoachPage = lazy(() => import('@/pages/B2CAICoachPage'));
 const MoodMixerPage = lazy(() => import('@/pages/B2CMoodMixerPage'));
@@ -184,12 +184,12 @@ const UnifiedModulesDashboardPage = lazy(() => import('@/pages/UnifiedModulesDas
 // FacialScanPage supprimé - fusionné dans B2CScanPage
 const VoiceScanPage = lazy(() => import('@/pages/VoiceScanPage'));
 const TextScanPage = lazy(() => import('@/pages/TextScanPage'));
-const MusicGeneratePage = lazy(() => import('@/pages/MusicGeneratePage'));
-const MusicLibraryPage = lazy(() => import('@/pages/MusicLibraryPage'));
+// MusicGeneratePage supprimé - fonctionnalité dans B2CMusicEnhanced
+// MusicLibraryPage supprimé - fonctionnalité dans B2CMusicEnhanced
 const ModeSelectionPage = lazy(() => import('@/pages/ModeSelectionPage'));
 const B2CDashboardPage = lazy(() => import('@/pages/B2CDashboardPage'));
 const B2CMoodPage = lazy(() => import('@/pages/B2CMoodPage'));
-const B2CMusicPage = lazy(() => import('@/pages/B2CMusicPage'));
+// B2CMusicPage supprimé - utiliser B2CMusicEnhanced
 const EmotionalPark = lazy(() => import('@/pages/EmotionalPark'));
 const ParkJourney = lazy(() => import('@/pages/ParkJourney'));
 const CoachProgramsPage = lazy(() => import('@/pages/CoachProgramsPage'));
@@ -217,7 +217,7 @@ const FAQPage = lazy(() => import('@/pages/FAQPage'));
 const TicketsPage = lazy(() => import('@/pages/TicketsPage'));
 const InsightsPage = lazy(() => import('@/pages/InsightsPage'));
 const TrendsPage = lazy(() => import('@/pages/TrendsPage'));
-const JournalAudioPage = lazy(() => import('@/pages/JournalAudioPage'));
+// JournalAudioPage supprimé - fonctionnalité dans B2CJournalPage
 const VoiceAnalysisPage = lazy(() => import('@/pages/VoiceAnalysisPage'));
 const FriendsPage = lazy(() => import('@/pages/FriendsPage'));
 const GroupsPage = lazy(() => import('@/pages/GroupsPage'));
@@ -267,13 +267,13 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   // Modules
   B2CScanPage,
   B2CMusicEnhanced,
-  EmotionMusicPage,
-  EmotionMusicLibraryPage,
+  // EmotionMusicPage supprimé
+  // EmotionMusicLibraryPage supprimé
   B2CAICoachPage,
   B2CJournalPage,
   B2CVRBreathGuidePage,
   B2CVRGalaxyPage,
-  VRBreathPage,
+  // VRBreathPage supprimé
   
   // Fun-First
   B2CFlashGlowPage,
@@ -284,7 +284,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   MeditationPage,
   
   // Analytics & Gamification
-  GamificationPage,
+  // GamificationPage supprimé - utiliser B2CGamificationPage
   LeaderboardPage,
   ScoresPage,
   
@@ -328,8 +328,8 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   
   // Pages nouvellement créées
   ChooseModePage,
-  CoachChatPage,
-  VRSessionsPage,
+  // CoachChatPage supprimé
+  // VRSessionsPage supprimé
   JournalNewPage,
   JournalSettingsPage,
   ReportingPage,
@@ -361,7 +361,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   
   // Import des nouveaux modules optimisés
   FlashGlowPage,
-  JournalPage,
+  // JournalPage supprimé
   ScanPage,
   CoachPage,
   MoodMixerPage,
@@ -391,13 +391,13 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   // FacialScanPage supprimé
   VoiceScanPage,
   TextScanPage,
-  MusicGeneratePage,
-  MusicLibraryPage,
+  // MusicGeneratePage supprimé
+  // MusicLibraryPage supprimé
   PricingPageWorking,
   ModeSelectionPage,
   B2CDashboardPage,
   B2CMoodPage,
-  B2CMusicPage,
+  // B2CMusicPage supprimé
   EmotionalPark,
   ParkJourney,
   ParcoursXL,
@@ -422,7 +422,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   TicketsPage,
   InsightsPage,
   TrendsPage,
-  JournalAudioPage,
+  // JournalAudioPage supprimé
   VoiceAnalysisPage,
   FriendsPage,
   GroupsPage,
