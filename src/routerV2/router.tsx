@@ -139,8 +139,8 @@ const CalendarPage = lazy(() => import('@/pages/CalendarPage'));
 const Point20Page = lazy(() => import('@/pages/Point20Page'));
 const TestPage = lazy(() => import('@/pages/TestPage'));
 // EmotionsPage supprimé - utiliser B2CScanPage
-const GeneralPage = lazy(() => import('@/pages/GeneralPage'));
-const PrivacyPage = lazy(() => import('@/pages/PrivacyPage'));
+// GeneralPage supprimé - doublon de B2CSettingsPage
+// PrivacyPage supprimé - doublon de B2CPrivacyTogglesPage, utiliser LegalPrivacyPage pour /privacy
 
 // Import des nouveaux modules optimisés
 const FlashGlowPage = lazy(() => import('@/pages/flash-glow/index'));
@@ -251,7 +251,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   OnboardingPage,
   UnifiedLoginPage,
   SignupPage,
-  PrivacyPage,
+  // PrivacyPage supprimé - utiliser LegalPrivacyPage
   
   // App & B2B Enterprise
   AppGatePage,
@@ -339,7 +339,8 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   TestPage,
   // EmotionsPage supprimé
   // ProfilePage supprimé - utiliser B2CProfileSettingsPage
-  GeneralPage,
+  // GeneralPage supprimé - doublon
+  // PrivacyPage supprimé - doublon
   
   // Legal pages
   LegalTermsPage,

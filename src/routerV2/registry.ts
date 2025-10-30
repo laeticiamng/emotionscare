@@ -68,7 +68,8 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     path: '/privacy',
     segment: 'public',
     layout: 'marketing',
-    component: 'PrivacyPage',
+    component: 'LegalPrivacyPage',
+    aliases: ['/politique-confidentialite'],
   },
   {
     name: 'b2c-landing',
