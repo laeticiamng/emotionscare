@@ -276,6 +276,7 @@ const CameraSampler: React.FC<CameraSamplerProps> = ({ onPermissionChange, onUna
             console.log('[CameraSampler] Successfully saved to clinical_signals');
             // Invalider le cache pour rafraîchir l'historique
             queryClient.invalidateQueries({ queryKey: ['scan-history'] });
+            window.dispatchEvent(new CustomEvent('scan-saved'));
           }
         }
       } catch (saveError) {

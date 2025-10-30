@@ -17,6 +17,7 @@ import { withGuard } from '@/routerV2/withGuard';
 import { AssessmentWrapper } from '@/components/assess';
 import { logger } from '@/lib/logger';
 import { ScanHistory } from '@/components/scan/ScanHistory';
+import { MultiSourceChart } from '@/components/scan/MultiSourceChart';
 import { ScanOnboarding, shouldShowOnboarding } from '@/components/scan/ScanOnboarding';
 import { useToast } from '@/hooks/use-toast';
 import { scanAnalytics } from '@/lib/analytics/scanEvents';
@@ -363,6 +364,7 @@ const B2CScanPage: React.FC = () => {
                 <SamSliders detail={detail} summary={activeSummary} />
               )}
               <ScanHistory />
+              <MultiSourceChart />
             </div>
             <MicroGestes 
               gestures={gestures} 

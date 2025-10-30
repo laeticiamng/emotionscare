@@ -24,6 +24,21 @@ const getEmotionLabel = (valence: number, arousal: number) => {
   return 'État neutre';
 };
 
+const getSourceLabel = (source: string) => {
+  switch (source) {
+    case 'scan_camera':
+      return '(Vidéo)';
+    case 'SAM':
+      return '(Texte)';
+    case 'scan_sliders':
+      return '(Manuel)';
+    case 'voice':
+      return '(Vocal)';
+    default:
+      return '';
+  }
+};
+
 export const ScanHistory: React.FC = () => {
   const [limit, setLimit] = useState(3);
   const { data: history, isLoading } = useScanHistory(limit);
@@ -111,6 +126,7 @@ export const ScanHistory: React.FC = () => {
       {history.map((scan, index) => {
         const emotionColor = getEmotionColor(scan.valence, scan.arousal);
         const emotionLabel = getEmotionLabel(scan.valence, scan.arousal);
+        const sourceLabel = getSourceLabel(scan.source);
         const timeAgo = formatDistanceToNow(new Date(scan.created_at), {
           addSuffix: true,
           locale: fr,
@@ -130,7 +146,7 @@ export const ScanHistory: React.FC = () => {
             </div>
             <div className="flex-1 min-w-0">
               <p className={`text-sm font-medium ${emotionColor}`}>
-                {emotionLabel}
+                {emotionLabel} <span className="text-xs text-muted-foreground font-normal">{sourceLabel}</span>
               </p>
               <p className="text-xs text-muted-foreground">
                 {timeAgo}

@@ -97,6 +97,48 @@ const LiveVoiceScanner: React.FC<LiveVoiceScannerProps> = ({
       if (onScanComplete) onScanComplete(emotionResult);
       if (onResult) onResult(emotionResult);
 
+      // Sauvegarder dans clinical_signals
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        if (user?.id) {
+          const valenceLevel = Math.floor(emotionResult.valence / 20); // 0-4
+          const arousalLevel = Math.floor(emotionResult.arousal / 20); // 0-4
+          const avgLevel = Math.round((valenceLevel + arousalLevel) / 2);
+          
+          const now = new Date();
+          const expiresAt = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000); // 7 jours
+
+          const { error: insertError } = await supabase.from('clinical_signals').insert({
+            user_id: user.id,
+            source_instrument: 'voice',
+            domain: 'emotional',
+            level: avgLevel,
+            module_context: 'scan',
+            window_type: 'instant',
+            expires_at: expiresAt.toISOString(),
+            metadata: {
+              valence: emotionResult.valence,
+              arousal: emotionResult.arousal,
+              confidence: emotionResult.confidence / 100,
+              summary: emotionResult.summary,
+              emotion: emotionResult.emotion,
+              timestamp: emotionResult.timestamp,
+            },
+          });
+
+          if (insertError) {
+            console.error('[LiveVoiceScanner] Error saving to clinical_signals:', insertError);
+          } else {
+            console.log('[LiveVoiceScanner] Successfully saved to clinical_signals');
+            // Invalider le cache pour rafraîchir l'historique
+            window.dispatchEvent(new CustomEvent('scan-saved'));
+          }
+        }
+      } catch (saveError) {
+        console.error('[LiveVoiceScanner] Exception saving to DB:', saveError);
+      }
+
       toast({
         title: 'Analyse vocale terminée',
         description: `Émotion détectée: ${emotionResult.emotion}`,
