@@ -360,7 +360,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     segment: 'consumer',
     role: 'consumer',
     layout: 'app-sidebar',
-    component: 'B2CMoodPage',
+    component: 'B2CScanPage',
     guard: true,
     requireAuth: true,
   },

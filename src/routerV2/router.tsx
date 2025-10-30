@@ -186,7 +186,7 @@ const TextScanPage = lazy(() => import('@/pages/TextScanPage'));
 // MusicLibraryPage supprimé - fonctionnalité dans B2CMusicEnhanced
 const ModeSelectionPage = lazy(() => import('@/pages/ModeSelectionPage'));
 const B2CDashboardPage = lazy(() => import('@/pages/B2CDashboardPage'));
-const B2CMoodPage = lazy(() => import('@/pages/B2CMoodPage'));
+// B2CMoodPage supprimé - fonctionnalité intégrée dans B2CScanPage
 // B2CMusicPage supprimé - utiliser B2CMusicEnhanced
 const EmotionalPark = lazy(() => import('@/pages/EmotionalPark'));
 const ParkJourney = lazy(() => import('@/pages/ParkJourney'));
@@ -392,7 +392,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   PricingPageWorking,
   ModeSelectionPage,
   B2CDashboardPage,
-  B2CMoodPage,
+  // B2CMoodPage supprimé - fonctionnalité intégrée dans B2CScanPage
   // B2CMusicPage supprimé
   EmotionalPark,
   ParkJourney,
