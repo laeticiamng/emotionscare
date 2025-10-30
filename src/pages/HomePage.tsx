@@ -15,6 +15,7 @@ import { DashboardCards } from '@/features/dashboard/DashboardCards';
 import { PrimaryCTA } from '@/features/dashboard/PrimaryCTA';
 import { WeeklyCard } from '@/types/card';
 import { CARD_THEMES } from '@/types/card';
+import { GamificationStats } from '@/components/dashboard/GamificationStats';
 
 const HomePage: React.FC = () => {
   const { currentCard, collection, canDraw, isDrawing, drawCard } = useWeeklyCard();
@@ -79,6 +80,9 @@ const HomePage: React.FC = () => {
             </div>
             <CardGallery collection={collection} />
           </header>
+
+          {/* Stats de gamification */}
+          <GamificationStats />
 
           {/* Zone principale : Deck ou Carte actuelle */}
           {canDraw ? (
