@@ -17,7 +17,7 @@ import { ConsentProvider } from '@/features/clinical-optin/ConsentProvider';
 import { I18nProvider } from '@/lib/i18n/i18n';
 import i18n from '@/lib/i18n';
 import { UnifiedProvider } from '@/core/UnifiedStateManager';
-import { MusicProvider } from '@/contexts/MusicContext';
+import { MusicProvider } from '@/contexts/music';
 import { ThemeProvider } from '@/providers/theme';
 
 const createQueryClient = () =>
