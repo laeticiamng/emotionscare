@@ -83,7 +83,7 @@ export function buildAdvice(ctx: CoachContext, mode: CoachMode = "soft"): Advice
       key: "do-scan",
       title: "Prends ta météo intérieure (1 min)",
       body: "Fais un mini Emotion Scan pour orienter la séance.",
-      cta: { label: "Ouvrir Emotion Scan", href: "/modules/emotion-scan" },
+      cta: { label: "Ouvrir Emotion Scan", href: "/app/scan" },
       weight: 58,
       tag: "scan"
     });

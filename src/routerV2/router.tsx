@@ -139,7 +139,7 @@ const MessagesPage = lazy(() => import('@/pages/MessagesPage'));
 const CalendarPage = lazy(() => import('@/pages/CalendarPage'));
 const Point20Page = lazy(() => import('@/pages/Point20Page'));
 const TestPage = lazy(() => import('@/pages/TestPage'));
-const EmotionsPage = lazy(() => import('@/pages/EmotionsPage'));
+// EmotionsPage supprimé - utiliser B2CScanPage
 const GeneralPage = lazy(() => import('@/pages/GeneralPage'));
 const PrivacyPage = lazy(() => import('@/pages/PrivacyPage'));
 
@@ -181,7 +181,7 @@ const RedirectToMusic = lazy(() => import('@/components/redirects/RedirectToMusi
 // Pages Dashboard modules
 const ModulesDashboardPage = lazy(() => import('@/pages/ModulesDashboard'));
 const UnifiedModulesDashboardPage = lazy(() => import('@/pages/UnifiedModulesDashboard'));
-const FacialScanPage = lazy(() => import('@/pages/FacialScanPage'));
+// FacialScanPage supprimé - fusionné dans B2CScanPage
 const VoiceScanPage = lazy(() => import('@/pages/VoiceScanPage'));
 const TextScanPage = lazy(() => import('@/pages/TextScanPage'));
 const MusicGeneratePage = lazy(() => import('@/pages/MusicGeneratePage'));
@@ -341,7 +341,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   CalendarPage,
   Point20Page,
   TestPage,
-  EmotionsPage,
+  // EmotionsPage supprimé
   ProfilePage,
   GeneralPage,
   
@@ -388,7 +388,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   // Pages Dashboard modules
   ModulesDashboardPage,
   UnifiedModulesDashboardPage,
-  FacialScanPage,
+  // FacialScanPage supprimé
   VoiceScanPage,
   TextScanPage,
   MusicGeneratePage,

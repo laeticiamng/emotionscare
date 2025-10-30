@@ -194,15 +194,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     requireAuth: true,
     aliases: ['/scan'],
   },
-  {
-    name: 'scan-facial',
-    path: '/app/scan/facial',
-    segment: 'consumer',
-    layout: 'simple',
-    component: 'FacialScanPage',
-    guard: true,
-    requireAuth: true,
-  },
+  // scan-facial supprimé - fusionné dans scan principal (mode caméra)
   {
     name: 'scan-voice',
     path: '/app/scan/voice',
@@ -479,18 +471,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: false,
     aliases: ['/bubble-beat'],
   },
-  // Redirections vers routes principales (garder aliases pour 301)
-  {
-    name: 'emotion-scan-redirect',
-    path: '/app/emotion-scan',
-    segment: 'consumer',
-    role: 'consumer',
-    layout: 'app',
-    component: 'RedirectToScan',
-    guard: true,
-    aliases: ['/emotion-scan'],
-    deprecated: true,
-  },
+  // Redirections obsolètes supprimées - utiliser /app/scan directement
   {
     name: 'voice-journal-redirect',
     path: '/app/voice-journal',
@@ -968,16 +949,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: true,
     deprecated: true, // Redirection vers /app/music
   },
-  {
-    name: 'emotions-legacy',
-    path: '/emotions',
-    segment: 'consumer',
-    role: 'consumer',
-    layout: 'app',
-    component: 'EmotionsPage',
-    guard: true,
-    deprecated: true, // Redirection vers /app/scan
-  },
+  // emotions-legacy supprimé - utiliser /app/scan directement
   {
     name: 'reporting',
     path: '/reporting',

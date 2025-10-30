@@ -45,6 +45,8 @@ export const ROUTE_ALIASES = {
   '/emotions': '/app/scan',
   '/scan': '/app/scan',
   '/emotion-scan': '/app/scan',
+  '/modules/emotion-scan': '/app/scan',
+  '/app/scan/facial': '/app/scan',
   '/music': '/app/music',
   '/coach': '/app/coach',
   '/journal': '/app/journal',

@@ -98,7 +98,7 @@ export default function RecentEmotionScansWidget({ className }: RecentEmotionSca
           <div className="space-y-3 text-sm text-muted-foreground">
             <p>Connectez-vous pour retrouver vos analyses Emotion Scan récentes.</p>
             <Button variant="outline" asChild>
-              <Link to="/login?redirect=/modules/emotion-scan">Se connecter</Link>
+              <Link to="/login?redirect=/app/scan">Se connecter</Link>
             </Button>
           </div>
         ) : isLoading ? (
@@ -119,7 +119,7 @@ export default function RecentEmotionScansWidget({ className }: RecentEmotionSca
           <div className="space-y-3 text-sm text-muted-foreground">
             <p>Aucun scan enregistré pour le moment. Lancez un scan pour alimenter votre tableau de bord.</p>
             <Button asChild>
-              <Link to="/modules/emotion-scan" className="inline-flex items-center gap-1">
+              <Link to="/app/scan" className="inline-flex items-center gap-1">
                 <Activity className="h-4 w-4" /> Lancer un Emotion Scan
               </Link>
             </Button>
@@ -199,7 +199,7 @@ export default function RecentEmotionScansWidget({ className }: RecentEmotionSca
 
             <div className="flex flex-wrap items-center justify-between gap-3">
               <Button variant="ghost" size="sm" asChild>
-                <Link to="/modules/emotion-scan" className="inline-flex items-center gap-1">
+                <Link to="/app/scan" className="inline-flex items-center gap-1">
                   Relancer un scan
                   <ArrowUpRight className="h-4 w-4" />
                 </Link>
