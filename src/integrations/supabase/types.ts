@@ -2498,6 +2498,72 @@ export type Database = {
         }
         Relationships: []
       }
+      edn_items_audit: {
+        Row: {
+          ai_analysis: Json | null
+          audit_date: string
+          competence_details: Json | null
+          completeness_score: number | null
+          created_at: string
+          error_message: string | null
+          expected_competences_rang_a: string[] | null
+          expected_competences_rang_b: string[] | null
+          id: string
+          incomplete_rang_a: string[] | null
+          incomplete_rang_b: string[] | null
+          item_code: string
+          missing_rang_a: string[] | null
+          missing_rang_b: string[] | null
+          rang_a_complete: boolean | null
+          rang_b_complete: boolean | null
+          status: string | null
+          suggestions: string | null
+          updated_at: string
+        }
+        Insert: {
+          ai_analysis?: Json | null
+          audit_date?: string
+          competence_details?: Json | null
+          completeness_score?: number | null
+          created_at?: string
+          error_message?: string | null
+          expected_competences_rang_a?: string[] | null
+          expected_competences_rang_b?: string[] | null
+          id?: string
+          incomplete_rang_a?: string[] | null
+          incomplete_rang_b?: string[] | null
+          item_code: string
+          missing_rang_a?: string[] | null
+          missing_rang_b?: string[] | null
+          rang_a_complete?: boolean | null
+          rang_b_complete?: boolean | null
+          status?: string | null
+          suggestions?: string | null
+          updated_at?: string
+        }
+        Update: {
+          ai_analysis?: Json | null
+          audit_date?: string
+          competence_details?: Json | null
+          completeness_score?: number | null
+          created_at?: string
+          error_message?: string | null
+          expected_competences_rang_a?: string[] | null
+          expected_competences_rang_b?: string[] | null
+          id?: string
+          incomplete_rang_a?: string[] | null
+          incomplete_rang_b?: string[] | null
+          item_code?: string
+          missing_rang_a?: string[] | null
+          missing_rang_b?: string[] | null
+          rang_a_complete?: boolean | null
+          rang_b_complete?: boolean | null
+          status?: string | null
+          suggestions?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       edn_items_complete: {
         Row: {
           audio_ambiance: Json | null
@@ -4395,6 +4461,33 @@ export type Database = {
         }
         Relationships: []
       }
+      idempotency_records: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          operation_key: string
+          result: Json | null
+          status: string
+          user_id: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          operation_key: string
+          result?: Json | null
+          status: string
+          user_id?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          operation_key?: string
+          result?: Json | null
+          status?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       implicit_tracking: {
         Row: {
           created_at: string | null
@@ -5363,6 +5456,13 @@ export type Database = {
             referencedRelation: "med_mng_songs"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "med_mng_audio_access_logs_song_id_fkey"
+            columns: ["song_id"]
+            isOneToOne: false
+            referencedRelation: "med_mng_view_library"
+            referencedColumns: ["id"]
+          },
         ]
       }
       med_mng_cancellations: {
@@ -5772,6 +5872,13 @@ export type Database = {
             referencedRelation: "med_mng_songs"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "med_mng_listening_sessions_song_id_fkey"
+            columns: ["song_id"]
+            isOneToOne: false
+            referencedRelation: "med_mng_view_library"
+            referencedColumns: ["id"]
+          },
         ]
       }
       med_mng_lyrics_access_logs: {
@@ -5805,6 +5912,13 @@ export type Database = {
             columns: ["song_id"]
             isOneToOne: false
             referencedRelation: "med_mng_songs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "med_mng_lyrics_access_logs_song_id_fkey"
+            columns: ["song_id"]
+            isOneToOne: false
+            referencedRelation: "med_mng_view_library"
             referencedColumns: ["id"]
           },
         ]
@@ -5893,6 +6007,13 @@ export type Database = {
             referencedRelation: "med_mng_songs"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "med_mng_music_generation_logs_song_id_fkey"
+            columns: ["song_id"]
+            isOneToOne: false
+            referencedRelation: "med_mng_view_library"
+            referencedColumns: ["id"]
+          },
         ]
       }
       med_mng_playlist_analytics: {
@@ -5966,6 +6087,13 @@ export type Database = {
             columns: ["song_id"]
             isOneToOne: false
             referencedRelation: "med_mng_songs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "med_mng_playlist_songs_song_id_fkey"
+            columns: ["song_id"]
+            isOneToOne: false
+            referencedRelation: "med_mng_view_library"
             referencedColumns: ["id"]
           },
         ]
@@ -6070,6 +6198,13 @@ export type Database = {
             columns: ["song_id"]
             isOneToOne: false
             referencedRelation: "med_mng_songs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "med_mng_song_likes_song_id_fkey"
+            columns: ["song_id"]
+            isOneToOne: false
+            referencedRelation: "med_mng_view_library"
             referencedColumns: ["id"]
           },
         ]
@@ -6182,6 +6317,13 @@ export type Database = {
             referencedRelation: "med_mng_songs"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "med_mng_synchronized_lyrics_song_id_fkey"
+            columns: ["song_id"]
+            isOneToOne: true
+            referencedRelation: "med_mng_view_library"
+            referencedColumns: ["id"]
+          },
         ]
       }
       med_mng_user_analytics: {
@@ -6281,6 +6423,13 @@ export type Database = {
             columns: ["song_id"]
             isOneToOne: false
             referencedRelation: "med_mng_songs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "med_mng_user_songs_song_id_fkey"
+            columns: ["song_id"]
+            isOneToOne: false
+            referencedRelation: "med_mng_view_library"
             referencedColumns: ["id"]
           },
         ]
@@ -6883,6 +7032,75 @@ export type Database = {
           id?: string
           intensity?: number | null
           tracks_generated?: number | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      music_generation_metrics: {
+        Row: {
+          api_response_time_ms: number | null
+          audio_generated: boolean | null
+          audio_url: string | null
+          completed_at: string | null
+          content_type: string
+          created_at: string
+          duration_seconds: number | null
+          error_code: string | null
+          error_message: string | null
+          failed_at: string | null
+          id: string
+          initiated_at: string
+          item_code: string
+          polling_attempts: number | null
+          rang: string
+          status: string
+          style: string
+          track_id: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          api_response_time_ms?: number | null
+          audio_generated?: boolean | null
+          audio_url?: string | null
+          completed_at?: string | null
+          content_type: string
+          created_at?: string
+          duration_seconds?: number | null
+          error_code?: string | null
+          error_message?: string | null
+          failed_at?: string | null
+          id?: string
+          initiated_at?: string
+          item_code: string
+          polling_attempts?: number | null
+          rang: string
+          status?: string
+          style: string
+          track_id: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          api_response_time_ms?: number | null
+          audio_generated?: boolean | null
+          audio_url?: string | null
+          completed_at?: string | null
+          content_type?: string
+          created_at?: string
+          duration_seconds?: number | null
+          error_code?: string | null
+          error_message?: string | null
+          failed_at?: string | null
+          id?: string
+          initiated_at?: string
+          item_code?: string
+          polling_attempts?: number | null
+          rang?: string
+          status?: string
+          style?: string
+          track_id?: string
+          updated_at?: string
           user_id?: string | null
         }
         Relationships: []
@@ -10354,6 +10572,33 @@ export type Database = {
         }
         Relationships: []
       }
+      user_hearts: {
+        Row: {
+          created_at: string
+          hearts: number
+          id: string
+          last_refill_time: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          hearts?: number
+          id?: string
+          last_refill_time?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          hearts?: number
+          id?: string
+          last_refill_time?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_insights: {
         Row: {
           action_items: Json | null
@@ -11679,6 +11924,19 @@ export type Database = {
         }
         Relationships: []
       }
+      med_mng_view_library: {
+        Row: {
+          added_to_library_at: string | null
+          created_at: string | null
+          id: string | null
+          is_liked: boolean | null
+          meta: Json | null
+          suno_audio_id: string | null
+          title: string | null
+          user_id: string | null
+        }
+        Relationships: []
+      }
       profiles_public: {
         Row: {
           avatar_url: string | null
@@ -11913,6 +12171,7 @@ export type Database = {
         }
         Returns: string
       }
+      create_idempotency_table: { Args: never; Returns: undefined }
       create_notification_from_template: {
         Args: {
           target_user_id: string
@@ -12047,6 +12306,7 @@ export type Database = {
           fixed_count: number
         }[]
       }
+      fix_stuck_track_audio: { Args: never; Returns: undefined }
       fusion_complete_finale: {
         Args: never
         Returns: {
@@ -12195,6 +12455,16 @@ export type Database = {
         }[]
       }
       get_medical_dashboard_stats: { Args: never; Returns: Json }
+      get_music_quota: {
+        Args: { p_user_id?: string }
+        Returns: {
+          can_generate: boolean
+          credits_used_this_period: number
+          last_reset_at: string
+          remaining_credits: number
+          total_credits: number
+        }[]
+      }
       get_oic_competences_rapport: {
         Args: never
         Returns: {
@@ -12390,6 +12660,16 @@ export type Database = {
           total_badges: number
           total_challenges: number
           user_id: string
+        }[]
+      }
+      get_user_quota: {
+        Args: { p_user_id?: string }
+        Returns: {
+          can_generate: boolean
+          credits_used_this_period: number
+          last_reset_at: string
+          remaining_credits: number
+          total_credits: number
         }[]
       }
       get_user_subscription: {
@@ -12736,6 +13016,7 @@ export type Database = {
       panic_overlay_get_state: { Args: never; Returns: Json }
       refresh_analytics_dashboards: { Args: never; Returns: undefined }
       refresh_dashboard_stats: { Args: never; Returns: undefined }
+      regenerate_hearts: { Args: never; Returns: undefined }
       reset_monthly_quotas: { Args: never; Returns: undefined }
       run_automated_completeness_audit: { Args: never; Returns: Json }
       run_security_health_check: { Args: never; Returns: Json }
