@@ -24,7 +24,8 @@ export const ROUTE_ALIASES = {
   // ═══════════════════════════════════════════════════════════
   // LANDING PAGES
   // ═══════════════════════════════════════════════════════════
-  '/choose-mode': '/b2c',
+  '/choose-mode': '/mode-selection',
+  '/feed': '/app/communaute',
   '/b2b': '/entreprise',
   '/b2b/selection': '/entreprise',
   '/help-center': '/help',

@@ -180,7 +180,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     segment: 'consumer',
     role: 'consumer',
     layout: 'app-sidebar',
-    component: 'UnifiedModulesDashboardPage',
+    component: 'ModulesDashboard',
     guard: true,
   },
   {
@@ -342,6 +342,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'simple',
     component: 'ModeSelectionPage',
     guard: false,
+    aliases: ['/choose-mode'],
   },
   {
     name: 'b2c-dashboard',
@@ -920,13 +921,6 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     component: 'ExportPage',
     guard: true,
   },
-  {
-    name: 'choose-mode',
-    path: '/choose-mode',
-    segment: 'public',
-    layout: 'simple',
-    component: 'ChooseModePage',
-  },
   // modules-journal supprimé - utiliser /app/journal
 
   // ═══════════════════════════════════════════════════════════
@@ -957,9 +951,9 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     path: '/app/profile',
     segment: 'consumer',
     role: 'consumer',
-    layout: 'simple',
-    component: 'ProfilePage',
-    guard: false,
+    layout: 'app-sidebar',
+    component: 'B2CProfileSettingsPage',
+    guard: true,
     aliases: ['/profile'],
   },
   {
@@ -1272,7 +1266,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     path: '/app/feed',
     segment: 'consumer',
     layout: 'app-sidebar',
-    component: 'FeedPage',
+    component: 'B2CCommunautePage',
     guard: true,
   },
   

@@ -122,7 +122,6 @@ const LegalSalesPage = lazy(() => import('@/pages/LegalSalesPage'));
 const LegalCookiesPage = lazy(() => import('@/pages/LegalCookiesPage'));
 
 // Pages nouvellement créées
-const ChooseModePage = lazy(() => import('@/pages/ChooseModePage'));
 // CoachChatPage supprimé - utiliser B2CAICoachPage
 // VRSessionsPage supprimé - fonctionnalité dans B2CVRBreathGuidePage
 const JournalNewPage = lazy(() => import('@/pages/JournalNewPage'));
@@ -179,8 +178,7 @@ const RedirectToEntreprise = lazy(() => import('@/components/redirects/RedirectT
 const RedirectToMusic = lazy(() => import('@/components/redirects/RedirectToMusic'));
 
 // Pages Dashboard modules
-const ModulesDashboardPage = lazy(() => import('@/pages/ModulesDashboard'));
-const UnifiedModulesDashboardPage = lazy(() => import('@/pages/UnifiedModulesDashboard'));
+const ModulesDashboard = lazy(() => import('@/pages/ModulesDashboard'));
 // FacialScanPage supprimé - fusionné dans B2CScanPage
 const VoiceScanPage = lazy(() => import('@/pages/VoiceScanPage'));
 const TextScanPage = lazy(() => import('@/pages/TextScanPage'));
@@ -194,7 +192,6 @@ const EmotionalPark = lazy(() => import('@/pages/EmotionalPark'));
 const ParkJourney = lazy(() => import('@/pages/ParkJourney'));
 const CoachProgramsPage = lazy(() => import('@/pages/CoachProgramsPage'));
 const CoachSessionsPage = lazy(() => import('@/pages/CoachSessionsPage'));
-const ProfilePage = lazy(() => import('@/pages/ProfilePage'));
 const ParcoursXL = lazy(() => import('@/pages/ParcoursXL'));
 
 // Nouvelles pages créées
@@ -221,7 +218,6 @@ const TrendsPage = lazy(() => import('@/pages/TrendsPage'));
 const VoiceAnalysisPage = lazy(() => import('@/pages/VoiceAnalysisPage'));
 const FriendsPage = lazy(() => import('@/pages/FriendsPage'));
 const GroupsPage = lazy(() => import('@/pages/GroupsPage'));
-const FeedPage = lazy(() => import('@/pages/FeedPage'));
 const ThemesPage = lazy(() => import('@/pages/ThemesPage'));
 const CustomizationPage = lazy(() => import('@/pages/CustomizationPage'));
 const WidgetsPage = lazy(() => import('@/pages/WidgetsPage'));
@@ -327,7 +323,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   ValidationPage,
   
   // Pages nouvellement créées
-  ChooseModePage,
+  // ChooseModePage supprimé - utiliser ModeSelectionPage
   // CoachChatPage supprimé
   // VRSessionsPage supprimé
   JournalNewPage,
@@ -342,7 +338,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   Point20Page,
   TestPage,
   // EmotionsPage supprimé
-  ProfilePage,
+  // ProfilePage supprimé - utiliser B2CProfileSettingsPage
   GeneralPage,
   
   // Legal pages
@@ -386,8 +382,8 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   RedirectToMusic,
   
   // Pages Dashboard modules
-  ModulesDashboardPage,
-  UnifiedModulesDashboardPage,
+  ModulesDashboard,
+  // UnifiedModulesDashboard supprimé - wrapper inutile
   // FacialScanPage supprimé
   VoiceScanPage,
   TextScanPage,
@@ -426,7 +422,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   VoiceAnalysisPage,
   FriendsPage,
   GroupsPage,
-  FeedPage,
+  // FeedPage supprimé - utiliser B2CCommunautePage
   ThemesPage,
   CustomizationPage,
   WidgetsPage,
