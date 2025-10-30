@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -16,7 +16,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Skeleton } from '@/components/ui/skeleton';
-import { TrendingUp } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { TrendingUp, Video, Mic, FileText, TrendingUp as TotalIcon } from 'lucide-react';
 
 ChartJS.register(
   CategoryScale,
@@ -64,11 +65,22 @@ const fetchMultiSourceHistory = async (days = 30) => {
 };
 
 export const MultiSourceChart: React.FC = () => {
+  const [visibleSources, setVisibleSources] = useState({
+    video: true,
+    text: true,
+    voice: true,
+    total: true,
+  });
+
   const { data: scans, isLoading } = useQuery({
     queryKey: ['multi-source-history'],
     queryFn: () => fetchMultiSourceHistory(30),
     staleTime: 60_000,
   });
+
+  const toggleSource = (source: keyof typeof visibleSources) => {
+    setVisibleSources(prev => ({ ...prev, [source]: !prev[source] }));
+  };
 
   const chartData = useMemo(() => {
     if (!scans || scans.length === 0) return null;
@@ -95,8 +107,9 @@ export const MultiSourceChart: React.FC = () => {
     const uniqueDates = Array.from(new Set(allDates));
 
     // Calculer moyenne valence par source et par date
-    const datasets = [
+    const allDatasets = [
       {
+        key: 'video',
         label: 'Vidéo',
         data: uniqueDates.map(date => {
           const filtered = bySource.scan_camera.filter(s => 
@@ -105,12 +118,13 @@ export const MultiSourceChart: React.FC = () => {
           if (filtered.length === 0) return null;
           return filtered.reduce((sum, s) => sum + s.valence, 0) / filtered.length;
         }),
-        borderColor: 'rgb(59, 130, 246)',
-        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+        borderColor: 'hsl(221, 83%, 53%)', // primary
+        backgroundColor: 'hsla(221, 83%, 53%, 0.1)',
         tension: 0.4,
         borderWidth: 2,
       },
       {
+        key: 'text',
         label: 'Texte',
         data: uniqueDates.map(date => {
           const filtered = bySource.SAM.filter(s => 
@@ -119,12 +133,13 @@ export const MultiSourceChart: React.FC = () => {
           if (filtered.length === 0) return null;
           return filtered.reduce((sum, s) => sum + s.valence, 0) / filtered.length;
         }),
-        borderColor: 'rgb(34, 197, 94)',
-        backgroundColor: 'rgba(34, 197, 94, 0.1)',
+        borderColor: 'hsl(142, 76%, 36%)', // green
+        backgroundColor: 'hsla(142, 76%, 36%, 0.1)',
         tension: 0.4,
         borderWidth: 2,
       },
       {
+        key: 'voice',
         label: 'Vocal',
         data: uniqueDates.map(date => {
           const filtered = bySource.voice.filter(s => 
@@ -133,12 +148,13 @@ export const MultiSourceChart: React.FC = () => {
           if (filtered.length === 0) return null;
           return filtered.reduce((sum, s) => sum + s.valence, 0) / filtered.length;
         }),
-        borderColor: 'rgb(168, 85, 247)',
-        backgroundColor: 'rgba(168, 85, 247, 0.1)',
+        borderColor: 'hsl(271, 81%, 56%)', // purple
+        backgroundColor: 'hsla(271, 81%, 56%, 0.1)',
         tension: 0.4,
         borderWidth: 2,
       },
       {
+        key: 'total',
         label: 'Total',
         data: uniqueDates.map(date => {
           const filtered = scans.filter(s => 
@@ -147,19 +163,23 @@ export const MultiSourceChart: React.FC = () => {
           if (filtered.length === 0) return null;
           return filtered.reduce((sum, s) => sum + s.valence, 0) / filtered.length;
         }),
-        borderColor: 'rgb(234, 179, 8)',
-        backgroundColor: 'rgba(234, 179, 8, 0.1)',
+        borderColor: 'hsl(47, 96%, 53%)', // yellow
+        backgroundColor: 'hsla(47, 96%, 53%, 0.1)',
         tension: 0.4,
         borderWidth: 3,
         borderDash: [5, 5],
       },
     ];
 
+    const datasets = allDatasets
+      .filter(ds => visibleSources[ds.key] && ds.data.some(v => v !== null))
+      .map(({ key, ...rest }) => rest);
+
     return {
       labels: uniqueDates,
-      datasets: datasets.filter(ds => ds.data.some(v => v !== null)),
+      datasets,
     };
-  }, [scans]);
+  }, [scans, visibleSources]);
 
   const options: ChartOptions<'line'> = {
     responsive: true,
@@ -269,6 +289,43 @@ export const MultiSourceChart: React.FC = () => {
         <CardDescription>
           Visualisez l'évolution de vos émotions par type d'analyse (30 derniers jours)
         </CardDescription>
+        <div className="flex flex-wrap gap-2 mt-4">
+          <Badge
+            variant={visibleSources.video ? "default" : "outline"}
+            className="cursor-pointer gap-1.5"
+            onClick={() => toggleSource('video')}
+          >
+            <Video className="h-3.5 w-3.5" />
+            Vidéo
+          </Badge>
+          <Badge
+            variant={visibleSources.text ? "default" : "outline"}
+            className="cursor-pointer gap-1.5"
+            onClick={() => toggleSource('text')}
+            style={visibleSources.text ? { backgroundColor: 'hsl(142, 76%, 36%)', borderColor: 'hsl(142, 76%, 36%)' } : {}}
+          >
+            <FileText className="h-3.5 w-3.5" />
+            Texte
+          </Badge>
+          <Badge
+            variant={visibleSources.voice ? "default" : "outline"}
+            className="cursor-pointer gap-1.5"
+            onClick={() => toggleSource('voice')}
+            style={visibleSources.voice ? { backgroundColor: 'hsl(271, 81%, 56%)', borderColor: 'hsl(271, 81%, 56%)' } : {}}
+          >
+            <Mic className="h-3.5 w-3.5" />
+            Vocal
+          </Badge>
+          <Badge
+            variant={visibleSources.total ? "default" : "outline"}
+            className="cursor-pointer gap-1.5"
+            onClick={() => toggleSource('total')}
+            style={visibleSources.total ? { backgroundColor: 'hsl(47, 96%, 53%)', borderColor: 'hsl(47, 96%, 53%)', color: 'hsl(222, 84%, 5%)' } : {}}
+          >
+            <TotalIcon className="h-3.5 w-3.5" />
+            Total
+          </Badge>
+        </div>
       </CardHeader>
       <CardContent>
         <div className="h-[350px]">
