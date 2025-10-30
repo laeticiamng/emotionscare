@@ -21,100 +21,133 @@ serve(async (req) => {
       );
     }
 
-    const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
-    if (!OPENAI_API_KEY) {
-      console.log('[emotion-analysis] OPENAI_API_KEY not configured, returning mock data');
-      
-      // Mock data fallback
-      const mockResult = {
-        emotion: 'neutre',
-        valence: 0.5,
-        arousal: 0.5,
-        confidence: 0.65,
-        summary: 'État émotionnel neutre détecté dans votre texte.',
-        emotions: {
-          'neutre': 0.65,
-          'calme': 0.25,
-          'pensif': 0.10
-        }
-      };
-      
-      return new Response(
-        JSON.stringify(mockResult),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    if (!LOVABLE_API_KEY) {
+      throw new Error('LOVABLE_API_KEY not configured');
     }
 
     const startTime = Date.now();
 
-    // Call OpenAI API for emotion analysis
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    // Système prompt pour l'analyse émotionnelle
+    const systemPrompt = `Tu es un expert en analyse émotionnelle spécialisé dans la détection des émotions à partir de textes.
+
+TÂCHE : Analyser le texte fourni et identifier précisément :
+- L'émotion principale dominante
+- La valence (positif/négatif) sur une échelle 0-1
+- L'arousal (calme/excité) sur une échelle 0-1
+- Le niveau de confiance de ton analyse
+- Un résumé court de l'état émotionnel
+- Les 3 émotions secondaires les plus présentes avec leurs scores
+
+ÉMOTIONS DÉTECTABLES :
+Positives: joie, bonheur, excitation, enthousiasme, sérénité, calme, confiance, espoir, gratitude, fierté
+Négatives: tristesse, colère, peur, anxiété, frustration, dégoût, honte, culpabilité, jalousie, mélancolie
+Neutres: surprise, confusion, curiosité, neutre, pensif
+
+RÈGLES :
+- Valence: 0 = très négatif, 0.5 = neutre, 1 = très positif
+- Arousal: 0 = très calme, 0.5 = modéré, 1 = très excité/agité
+- Confidence: basé sur la clarté et l'intensité des marqueurs émotionnels
+- Summary: 1 phrase courte décrivant l'état émotionnel global`;
+
+    const userPrompt = `Analyse l'émotion dans ce texte : "${text}"`;
+
+    // Call Lovable AI with structured outputs
+    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${OPENAI_API_KEY}`,
+        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'google/gemini-2.5-flash',
         messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt }
+        ],
+        tools: [
           {
-            role: 'system',
-            content: `Tu es un expert en analyse émotionnelle. Analyse le texte fourni et identifie les émotions présentes. 
-            
-Réponds UNIQUEMENT avec un objet JSON valide au format suivant (sans markdown, sans backticks):
-{
-  "emotion": "emotion_principale",
-  "valence": 0.0-1.0,
-  "arousal": 0.0-1.0,
-  "confidence": 0.0-1.0,
-  "summary": "résumé court",
-  "emotions": {
-    "emotion1": score,
-    "emotion2": score,
-    "emotion3": score
-  }
-}
-
-Valence: 0 = négatif, 1 = positif
-Arousal: 0 = calme, 1 = excité
-Confidence: niveau de certitude de l'analyse
-
-Émotions possibles: joie, tristesse, colère, peur, surprise, dégoût, anxiété, calme, excitation, confiance, neutre, frustration, sérénité, espoir, mélancolie`
-          },
-          {
-            role: 'user',
-            content: text
+            type: 'function',
+            function: {
+              name: 'analyze_emotion',
+              description: 'Retourne l\'analyse émotionnelle structurée du texte',
+              parameters: {
+                type: 'object',
+                properties: {
+                  emotion: {
+                    type: 'string',
+                    description: 'Émotion principale détectée'
+                  },
+                  valence: {
+                    type: 'number',
+                    description: 'Score de valence entre 0 (négatif) et 1 (positif)',
+                    minimum: 0,
+                    maximum: 1
+                  },
+                  arousal: {
+                    type: 'number',
+                    description: 'Score d\'arousal entre 0 (calme) et 1 (excité)',
+                    minimum: 0,
+                    maximum: 1
+                  },
+                  confidence: {
+                    type: 'number',
+                    description: 'Confiance de l\'analyse entre 0 et 1',
+                    minimum: 0,
+                    maximum: 1
+                  },
+                  summary: {
+                    type: 'string',
+                    description: 'Résumé court de l\'état émotionnel (1 phrase)'
+                  },
+                  emotions: {
+                    type: 'object',
+                    description: 'Top 3 émotions secondaires avec scores 0-1',
+                    additionalProperties: {
+                      type: 'number',
+                      minimum: 0,
+                      maximum: 1
+                    }
+                  }
+                },
+                required: ['emotion', 'valence', 'arousal', 'confidence', 'summary', 'emotions'],
+                additionalProperties: false
+              }
+            }
           }
         ],
-        temperature: 0.3,
-        max_tokens: 300
+        tool_choice: { type: 'function', function: { name: 'analyze_emotion' } }
       })
     });
 
     if (!response.ok) {
+      if (response.status === 429) {
+        return new Response(
+          JSON.stringify({ error: 'Rate limit dépassée, réessayez dans quelques instants' }),
+          { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      if (response.status === 402) {
+        return new Response(
+          JSON.stringify({ error: 'Crédits insuffisants, veuillez recharger votre compte' }),
+          { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
       const error = await response.text();
-      console.error('[emotion-analysis] OpenAI error:', error);
-      throw new Error(`OpenAI API error: ${response.status}`);
+      console.error('[emotion-analysis] Lovable AI error:', error);
+      throw new Error(`Lovable AI error: ${response.status}`);
     }
 
     const data = await response.json();
-    const content = data.choices[0]?.message?.content;
     
-    if (!content) {
-      throw new Error('No content in OpenAI response');
+    // Extraire les tool calls
+    const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
+    if (!toolCall) {
+      throw new Error('No tool call in response');
     }
 
-    // Parse JSON response
-    let analysisResult;
-    try {
-      // Remove markdown code blocks if present
-      const cleanContent = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-      analysisResult = JSON.parse(cleanContent);
-    } catch (parseError) {
-      console.error('[emotion-analysis] JSON parse error:', parseError, 'Content:', content);
-      throw new Error('Failed to parse OpenAI response as JSON');
-    }
-
+    const analysisResult = JSON.parse(toolCall.function.arguments);
+    
     // Validate result structure
     if (!analysisResult.emotion || typeof analysisResult.valence !== 'number') {
       throw new Error('Invalid analysis result structure');
