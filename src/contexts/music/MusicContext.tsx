@@ -42,9 +42,18 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       }
     };
     
-    const handleError = () => {
+    const handleError = (e: Event) => {
       dispatch({ type: 'SET_PLAYING', payload: false });
-      toast.error('Erreur lors de la lecture du fichier audio');
+      const audioElement = e.target as HTMLAudioElement;
+      const errorCode = audioElement.error?.code;
+      
+      let errorMessage = 'Erreur de lecture audio';
+      if (errorCode === 2) errorMessage = 'Erreur réseau - Fichier introuvable';
+      else if (errorCode === 3) errorMessage = 'Erreur de décodage audio';
+      else if (errorCode === 4) errorMessage = 'Format audio non supporté';
+      
+      toast.error(errorMessage);
+      logger.error('Audio element error', new Error(`Code ${errorCode}: ${errorMessage}`), 'MUSIC');
     };
     
     audio.addEventListener('loadedmetadata', handleLoadedMetadata);

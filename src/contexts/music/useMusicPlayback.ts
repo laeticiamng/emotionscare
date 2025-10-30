@@ -5,6 +5,7 @@
 import { useCallback, MutableRefObject, Dispatch } from 'react';
 import { MusicState, MusicAction, MusicTrack } from './types';
 import { logger } from '@/lib/logger';
+import { toast } from 'sonner';
 
 export const useMusicPlayback = (
   audioRef: MutableRefObject<HTMLAudioElement | null>,
@@ -13,7 +14,10 @@ export const useMusicPlayback = (
 ) => {
   const play = useCallback(async (track?: MusicTrack) => {
     const audio = audioRef.current;
-    if (!audio) return;
+    if (!audio) {
+      toast.error('Lecteur audio non disponible');
+      return;
+    }
 
     try {
       if (track) {
@@ -31,8 +35,20 @@ export const useMusicPlayback = (
         audio.volume = targetVolume;
       }
     } catch (error) {
-      logger.error('Audio playback error', error as Error, 'MUSIC');
+      const err = error as Error;
+      logger.error('Audio playback error', err, 'MUSIC');
       dispatch({ type: 'SET_PLAYING', payload: false });
+      
+      // Messages d'erreur utilisateur
+      if (err.name === 'NotAllowedError') {
+        toast.error('Lecture bloquée par le navigateur. Clique pour autoriser.');
+      } else if (err.name === 'NotSupportedError') {
+        toast.error('Format audio non supporté.');
+      } else {
+        toast.error('Erreur de lecture audio. Réessaye.');
+      }
+      
+      throw error; // Re-throw pour propagation
     }
   }, [audioRef, dispatch, state.therapeuticMode, state.volume]);
 

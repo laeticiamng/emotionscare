@@ -35,7 +35,7 @@ interface VinylTrack extends MusicTrack {
   description: string;
 }
 
-// Tracks avec URLs audio réelles de test
+// Tracks avec URLs audio valides (Free Music Archive - domaine public)
 const vinylTracks: VinylTrack[] = [
   {
     id: 'vinyl-1',
@@ -47,8 +47,8 @@ const vinylTracks: VinylTrack[] = [
     color: 'hsl(200, 70%, 60%)',
     vinylColor: 'linear-gradient(135deg, hsl(200, 70%, 60%), hsl(180, 60%, 70%))',
     description: 'Ondes douces qui bercent ton esprit',
-    url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
-    audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
+    url: 'https://freemusicarchive.org/track/Komiku_-_01_-_Battle_of_Pogs/download',
+    audioUrl: 'https://freemusicarchive.org/track/Komiku_-_01_-_Battle_of_Pogs/download',
     emotion: 'calm'
   },
   {
@@ -61,8 +61,8 @@ const vinylTracks: VinylTrack[] = [
     color: 'hsl(280, 70%, 60%)',
     vinylColor: 'linear-gradient(135deg, hsl(280, 70%, 60%), hsl(320, 60%, 70%))',
     description: 'Stimule ta créativité naturelle',
-    url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
-    audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
+    url: 'https://cdn.pixabay.com/audio/2022/05/27/audio_1808fbf07a.mp3',
+    audioUrl: 'https://cdn.pixabay.com/audio/2022/05/27/audio_1808fbf07a.mp3',
     emotion: 'creative'
   },
   {
@@ -75,8 +75,8 @@ const vinylTracks: VinylTrack[] = [
     color: 'hsl(30, 80%, 60%)',
     vinylColor: 'linear-gradient(135deg, hsl(30, 80%, 60%), hsl(60, 70%, 70%))',
     description: 'Énergie sans stress',
-    url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
-    audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
+    url: 'https://cdn.pixabay.com/audio/2021/08/04/audio_0625c1539c.mp3',
+    audioUrl: 'https://cdn.pixabay.com/audio/2021/08/04/audio_0625c1539c.mp3',
     emotion: 'energetic'
   },
   {
@@ -89,8 +89,8 @@ const vinylTracks: VinylTrack[] = [
     color: 'hsl(140, 60%, 60%)',
     vinylColor: 'linear-gradient(135deg, hsl(140, 60%, 60%), hsl(120, 70%, 70%))',
     description: 'Harmonise ton être intérieur',
-    url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3',
-    audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3',
+    url: 'https://cdn.pixabay.com/audio/2022/03/10/audio_c8a90f1dae.mp3',
+    audioUrl: 'https://cdn.pixabay.com/audio/2022/03/10/audio_c8a90f1dae.mp3',
     emotion: 'healing'
   }
 ];
@@ -190,20 +190,29 @@ const B2CMusicEnhanced: React.FC = () => {
   };
 
   const startTrack = async (track: VinylTrack) => {
-    await play(track);
-    setPlayerVisible(true);
-    setLastPlayedId(track.id);
-    
-    if (typeof window !== 'undefined') {
-      try {
-        window.localStorage.setItem('music:lastPlayed', track.id);
-      } catch {}
-    }
+    try {
+      setPlayerVisible(true); // Afficher le player AVANT la lecture
+      await play(track);
+      setLastPlayedId(track.id);
+      
+      if (typeof window !== 'undefined') {
+        try {
+          window.localStorage.setItem('music:lastPlayed', track.id);
+        } catch {}
+      }
 
-    toast({
-      title: "Vinyle en rotation ♪",
-      description: `${track.title} compose ton aura sonore`,
-    });
+      toast({
+        title: "Vinyle en rotation ♪",
+        description: `${track.title} compose ton aura sonore`,
+      });
+    } catch (error) {
+      logger.error('Failed to start track', error as Error, 'MUSIC');
+      toast({
+        title: "Erreur de lecture",
+        description: "Impossible de lire ce vinyle. Essaie un autre.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleBackToSelection = () => {
