@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * B2C MUSIC ENHANCED - EmotionsCare
  * Interface vinyles thérapeutiques avec player audio unifié
@@ -215,13 +214,8 @@ const B2CMusicEnhanced: React.FC = () => {
     <div className="min-h-full bg-background p-8">
       {showReward && (
         <RewardSystem
-          reward={{
-            type: 'crystal',
-            name: 'Cristal Sonore',
-            description: universe.artifacts.description,
-            moduleId: 'music'
-          }}
-          badgeText="Harmonie créée ♪"
+          type="crystal"
+          message="Harmonie créée ♪"
           onComplete={() => setShowReward(false)}
         />
       )}
@@ -281,12 +275,22 @@ const B2CMusicEnhanced: React.FC = () => {
             <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4 max-w-6xl mx-auto">
               {vinylTracks.map((track, index) => {
                 const Icon = categoryIcons[track.category];
+                const isFavorite = favorites.includes(track.id);
                 
                 return (
                   <div key={track.id}>
                     <Card
-                      className="h-full bg-card/90 backdrop-blur-md hover:shadow-lg transition-all duration-300 cursor-pointer group overflow-hidden"
+                      role="button"
+                      tabIndex={0}
+                      aria-label={`Lancer le vinyle ${track.title} de ${track.artist}, catégorie ${track.category}`}
+                      className="h-full bg-card/90 backdrop-blur-md hover:shadow-lg transition-all duration-300 cursor-pointer group overflow-hidden focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2"
                       onClick={() => startTrack(track)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          startTrack(track);
+                        }
+                      }}
                     >
                       <CardContent className="p-6 space-y-4">
                         {/* Vinyl Disc */}
@@ -340,6 +344,7 @@ const B2CMusicEnhanced: React.FC = () => {
                             <Button
                               size="sm"
                               className="w-full"
+                              aria-label={`Lancer ${track.title}`}
                               style={{
                                 backgroundColor: `${track.color}15`,
                                 color: track.color,
@@ -350,20 +355,22 @@ const B2CMusicEnhanced: React.FC = () => {
                                 startTrack(track);
                               }}
                             >
-                              <Play className="h-3 w-3 mr-2" />
+                              <Play className="h-3 w-3 mr-2" aria-hidden="true" />
                               Lancer le vinyle
                             </Button>
                             <Button
-                              variant={favorites.includes(track.id) ? 'secondary' : 'ghost'}
+                              variant={isFavorite ? 'secondary' : 'ghost'}
                               size="sm"
                               className="w-full"
+                              aria-label={isFavorite ? `Retirer ${track.title} des favoris` : `Ajouter ${track.title} aux favoris`}
+                              aria-pressed={isFavorite}
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleToggleFavorite(track.id);
                               }}
                             >
-                              <Heart className={`h-3 w-3 mr-2 ${favorites.includes(track.id) ? 'fill-current text-destructive' : ''}`} />
-                              {favorites.includes(track.id) ? 'Favori' : 'Ajouter'}
+                              <Heart className={`h-3 w-3 mr-2 ${isFavorite ? 'fill-current text-destructive' : ''}`} aria-hidden="true" />
+                              {isFavorite ? 'Favori' : 'Ajouter'}
                             </Button>
                           </div>
                         </div>

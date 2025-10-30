@@ -1,10 +1,6 @@
-// @ts-nocheck
-// Export unifié du contexte musique
-import { useMusic as useMusicHook, MusicProvider, MusicContext } from '../MusicContext';
+/**
+ * Music Context - Barrel export
+ */
 
-// Réexport avec noms cohérents
-export const useMusic = useMusicHook;
-export { MusicProvider, MusicContext };
-
-// Export par défaut
-export default useMusicHook;
+export { MusicProvider, MusicContext } from './MusicContext';
+export type { MusicContextType, MusicTrack, MusicPlaylist, MusicState } from './types';
