@@ -44,8 +44,10 @@ const OnboardingPage = lazy(() => import('@/pages/OnboardingPage'));
 // Pages légales
 const MentionsLegalesPage = lazy(() => import('@/pages/legal/MentionsLegalesPage'));
 const PrivacyPolicyPage = lazy(() => import('@/pages/legal/PrivacyPolicyPage'));
+const TermsPage = lazy(() => import('@/pages/legal/TermsPage'));
 const SalesTermsPage = lazy(() => import('@/pages/legal/SalesTermsPage'));
 const LicensesPage = lazy(() => import('@/pages/legal/LicensesPage'));
+const CookiesPage = lazy(() => import('@/pages/legal/CookiesPage'));
 
 // Store Shopify
 const StorePage = lazy(() => import('@/pages/StorePage'));
@@ -261,6 +263,14 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   OnboardingPage,
   UnifiedLoginPage,
   SignupPage,
+  
+  // Pages légales
+  MentionsLegalesPage,
+  PrivacyPolicyPage,
+  SalesTermsPage,
+  LicensesPage,
+  CookiesPage,
+  TermsPage,
   // PrivacyPage supprimé - utiliser LegalPrivacyPage
   
   // Store Shopify
