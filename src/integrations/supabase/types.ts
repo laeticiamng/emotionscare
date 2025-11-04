@@ -8267,6 +8267,33 @@ export type Database = {
           },
         ]
       }
+      pending_activations: {
+        Row: {
+          created_at: string | null
+          email: string
+          id: string
+          order_data: Json | null
+          order_id: string
+          status: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          id?: string
+          order_data?: Json | null
+          order_id: string
+          status?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          id?: string
+          order_data?: Json | null
+          order_id?: string
+          status?: string | null
+        }
+        Relationships: []
+      }
       pending_corrections: {
         Row: {
           applied_at: string | null
@@ -8598,31 +8625,25 @@ export type Database = {
       }
       product_module_mapping: {
         Row: {
-          activation_type: string
-          created_at: string
-          description: string | null
+          created_at: string | null
           id: string
+          module_description: string | null
           module_name: string
-          module_path: string
-          product_handle: string
+          shopify_product_id: string
         }
         Insert: {
-          activation_type?: string
-          created_at?: string
-          description?: string | null
+          created_at?: string | null
           id?: string
+          module_description?: string | null
           module_name: string
-          module_path: string
-          product_handle: string
+          shopify_product_id: string
         }
         Update: {
-          activation_type?: string
-          created_at?: string
-          description?: string | null
+          created_at?: string | null
           id?: string
+          module_description?: string | null
           module_name?: string
-          module_path?: string
-          product_handle?: string
+          shopify_product_id?: string
         }
         Relationships: []
       }
@@ -8712,6 +8733,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      purchase_history: {
+        Row: {
+          created_at: string | null
+          currency: string | null
+          id: string
+          modules_activated: string[] | null
+          order_data: Json | null
+          order_id: string
+          status: string | null
+          total_amount: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          currency?: string | null
+          id?: string
+          modules_activated?: string[] | null
+          order_data?: Json | null
+          order_id: string
+          status?: string | null
+          total_amount?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          currency?: string | null
+          id?: string
+          modules_activated?: string[] | null
+          order_data?: Json | null
+          order_id?: string
+          status?: string | null
+          total_amount?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
       }
       push_subscriptions: {
         Row: {
@@ -10933,6 +10993,39 @@ export type Database = {
           },
         ]
       }
+      user_modules: {
+        Row: {
+          activated_at: string | null
+          activation_source: string | null
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          module_name: string
+          order_id: string | null
+          user_id: string
+        }
+        Insert: {
+          activated_at?: string | null
+          activation_source?: string | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          module_name: string
+          order_id?: string | null
+          user_id: string
+        }
+        Update: {
+          activated_at?: string | null
+          activation_source?: string | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          module_name?: string
+          order_id?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_music_consents: {
         Row: {
           camera_optin: boolean
@@ -11754,6 +11847,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_unlocked_modules: {
+        Row: {
+          id: string
+          module_name: string
+          shopify_order_id: string
+          unlocked_at: string | null
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          module_name: string
+          shopify_order_id: string
+          unlocked_at?: string | null
+          user_id: string
+        }
+        Update: {
+          id?: string
+          module_name?: string
+          shopify_order_id?: string
+          unlocked_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
       }
       user_wellness_chests: {
         Row: {
