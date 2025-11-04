@@ -250,22 +250,22 @@ const ModernHomePage: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            {/* Fonctionnalité Store */}
-            <Card className="text-center hover:shadow-lg transition-shadow">
+            {/* Fonctionnalité Store - Mise en avant */}
+            <Card className="text-center hover:shadow-xl transition-all border-2 border-primary/20 hover:border-primary/40 bg-gradient-to-br from-primary/5 to-primary/10">
               <CardHeader>
-                <div className="h-12 w-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4" aria-hidden="true">
-                  <ShoppingBag className="h-6 w-6 text-primary" />
+                <div className="h-14 w-14 bg-primary rounded-lg flex items-center justify-center mx-auto mb-4 shadow-lg" aria-hidden="true">
+                  <ShoppingBag className="h-7 w-7 text-primary-foreground" />
                 </div>
-                <CardTitle>Boutique Bien-être</CardTitle>
+                <CardTitle className="text-xl">EmotionsCare Store</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground mb-4">
-                  Découvrez notre collection de produits premium. Chaque achat débloque un accès digital exclusif.
+                <p className="text-muted-foreground mb-4 text-sm">
+                  Collection premium de produits bien-être : luminothérapie, relaxation, objets sensoriels. Chaque achat débloque l'accès aux modules digitaux correspondants.
                 </p>
                 <Link to="/store">
-                  <Button variant="outline" className="w-full">
+                  <Button className="w-full shadow-md hover:shadow-lg">
                     <Sparkles className="h-4 w-4 mr-2" />
-                    Découvrir
+                    Découvrir la boutique
                   </Button>
                 </Link>
               </CardContent>
