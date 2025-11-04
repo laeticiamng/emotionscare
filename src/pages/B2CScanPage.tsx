@@ -6,6 +6,7 @@ import { Link, useLocation } from 'react-router-dom';
 import PageRoot from '@/components/common/PageRoot';
 import { Button } from '@/components/ui/button';
 import { ClinicalOptIn } from '@/components/consent/ClinicalOptIn';
+import { MedicalDisclaimerDialog } from '@/components/medical/MedicalDisclaimerDialog';
 import { useFlags } from '@/core/flags';
 import CameraSampler from '@/features/scan/CameraSampler';
 import SamSliders from '@/features/scan/SamSliders';
@@ -210,9 +211,8 @@ const B2CScanPage: React.FC = () => {
 
   if (!featureEnabled) {
     return (
-      <ConsentGate>
-        <PageRoot>
-          <div className="min-h-screen bg-gradient-to-br from-background via-background/90 to-primary/10">
+      <PageRoot>
+        <div className="min-h-screen bg-gradient-to-br from-background via-background/90 to-primary/10">
             <div className="mx-auto flex max-w-2xl flex-col gap-6 px-4 py-12">
               <h1 className="text-3xl font-semibold text-foreground">Scanner émotionnel indisponible</h1>
               <p className="text-sm text-muted-foreground">

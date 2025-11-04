@@ -43,6 +43,7 @@ export async function authenticateRequest(req: Request): Promise<AuthResult> {
  * Vérifie si l'utilisateur a le rôle requis
  */
 export async function authorizeRole(req: Request, allowedRoles: string[]): Promise<AuthResult> {
+  // ✅ SÉCURITÉ: Utiliser has_role() pour éviter escalade privilèges
   const authResult = await authenticateRequest(req);
   
   if (authResult.status !== 200 || !authResult.user) {
@@ -50,9 +51,25 @@ export async function authorizeRole(req: Request, allowedRoles: string[]): Promi
   }
 
   // Récupérer le rôle de l'utilisateur depuis les métadonnées
-  const userRole = authResult.user.user_metadata?.role || 'b2c';
-  
-  if (!allowedRoles.includes(userRole)) {
+  // ✅ Vérifier via table user_roles sécurisée
+  const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
+  const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
+  const { createClient } = await import('https://esm.sh/@supabase/supabase-js@2');
+  const supabase = createClient(supabaseUrl, serviceRoleKey);
+
+  let hasValidRole = false;
+  for (const role of allowedRoles) {
+    const { data, error } = await supabase.rpc('has_role', { 
+      _user_id: authResult.user.id, 
+      _role: role 
+    });
+    if (!error && data === true) {
+      hasValidRole = true;
+      break;
+    }
+  }
+
+  if (!hasValidRole) {
     return { 
       user: null, 
       status: 403, 

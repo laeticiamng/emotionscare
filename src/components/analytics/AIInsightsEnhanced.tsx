@@ -102,7 +102,17 @@ export default function AIInsightsEnhanced() {
         return <p key={idx} className="mb-3 pl-4">{section}</p>;
       }
       if (section.includes('**')) {
-        const formatted = section.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        // ✅ SÉCURITÉ: Sanitizer avant dangerouslySetInnerHTML (prévention XSS)
+        const formatted = section.replace(/\*\*(.*?)\*\*/g, (_, text) => {
+          // Échapper les caractères HTML dangereux
+          const escaped = text
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+          return `<strong>${escaped}</strong>`;
+        });
         return <p key={idx} className="mb-3" dangerouslySetInnerHTML={{ __html: formatted }} />;
       }
       return <p key={idx} className="mb-3">{section}</p>;

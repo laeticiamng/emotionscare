@@ -17,7 +17,7 @@ interface MedicalDisclaimerDialogProps {
   open: boolean;
   onAccept: () => void;
   onDecline: () => void;
-  feature?: 'scan' | 'assessment' | 'coach' | 'journal';
+  feature?: 'scan' | 'assessment' | 'coach' | 'journal' | 'ai_coach' | 'emotional_scan' | 'psychological_assessment';
 }
 
 const STORAGE_KEY = 'emotionscare_medical_disclaimer_accepted';
@@ -45,8 +45,11 @@ export const MedicalDisclaimerDialog: React.FC<MedicalDisclaimerDialogProps> = (
 
   const featureLabels = {
     scan: 'le scan émotionnel',
+    emotional_scan: 'le scan émotionnel',
     assessment: 'les évaluations cliniques',
+    psychological_assessment: 'les évaluations psychologiques',
     coach: 'le coaching IA',
+    ai_coach: 'le coaching IA',
     journal: 'le journal émotionnel',
   };
 
@@ -222,7 +225,7 @@ export const MedicalDisclaimerDialog: React.FC<MedicalDisclaimerDialogProps> = (
 /**
  * Hook pour gérer l'affichage du disclaimer
  */
-export const useMedicalDisclaimer = (feature: 'scan' | 'assessment' | 'coach' | 'journal') => {
+export const useMedicalDisclaimer = (feature: 'scan' | 'assessment' | 'coach' | 'journal' | 'ai_coach' | 'emotional_scan' | 'psychological_assessment') => {
   const [showDisclaimer, setShowDisclaimer] = useState(false);
   const [isAccepted, setIsAccepted] = useState(false);
 

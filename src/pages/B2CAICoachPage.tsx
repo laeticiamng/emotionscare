@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import * as Sentry from '@sentry/react';
 import { CoachView } from '@/modules/coach/CoachView';
 import { ConsentGate } from '@/features/clinical-optin/ConsentGate';
+import { MedicalDisclaimerDialog } from '@/components/medical/MedicalDisclaimerDialog';
 
 const B2CAICoachPage = () => {
   useEffect(() => {
@@ -15,6 +16,7 @@ const B2CAICoachPage = () => {
 
   return (
     <div className="min-h-screen bg-slate-100 dark:bg-slate-950" data-testid="page-root">
+      <MedicalDisclaimerDialog feature="ai_coach" />
       <ConsentGate>
         <CoachView initialMode="b2c" />
       </ConsentGate>

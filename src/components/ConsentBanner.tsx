@@ -27,6 +27,17 @@ const ConsentBanner: React.FC = () => {
 
     if (!hasStoredConsentPreferences()) {
       setIsVisible(true);
+      
+      // ✅ OPT-IN STRICT CNIL: Bloquer TOUS les trackers AVANT choix
+      // Conformité Délibération CNIL 2020-091
+      if (typeof document !== 'undefined') {
+        document.documentElement.setAttribute('data-analytics-consent', 'denied');
+      }
+      
+      // Bloquer Google Analytics si présent
+      if (typeof window !== 'undefined') {
+        (window as any)['ga-disable-UA-XXXXX'] = true;
+      }
     }
   }, []);
 

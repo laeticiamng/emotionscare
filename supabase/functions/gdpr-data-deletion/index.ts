@@ -69,13 +69,19 @@ serve(async (req) => {
         ip_address: req.headers.get('x-forwarded-for') || 'unknown'
       });
 
-    // Supprimer les données utilisateur dans l'ordre correct (contraintes FK)
+    // ✅ Supprimer TOUTES les données utilisateur (RGPD Art. 17 - Droit à l'oubli)
+    // Ordre respectant les contraintes FK
     const deletionSteps = [
       { table: 'user_activity_logs', condition: 'user_id' },
+      { table: 'health_data_consents', condition: 'user_id' },
+      { table: 'coach_logs', condition: 'user_id' },
+      { table: 'journal_entries', condition: 'user_id' },
+      { table: 'assessment_results', condition: 'user_id' },
+      { table: 'emotion_scans', condition: 'user_id' },
       { table: 'user_preferences', condition: 'user_id' },
-      { table: 'coach_conversations', condition: 'user_id' },
-      { table: 'emotion_entries', condition: 'user_id' },
       { table: 'data_export_requests', condition: 'user_id' },
+      { table: 'audit_logs', condition: 'user_id' },
+      { table: 'user_roles', condition: 'user_id' },
       { table: 'profiles', condition: 'id' }
     ];
 
