@@ -50,6 +50,22 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     component: 'HelpPage',
   },
   {
+    name: 'store',
+    path: '/store',
+    segment: 'public',
+    layout: 'marketing',
+    component: 'StorePage',
+    guard: false,
+  },
+  {
+    name: 'product-detail',
+    path: '/store/product/:handle',
+    segment: 'public',
+    layout: 'marketing',
+    component: 'ProductDetailPage',
+    guard: false,
+  },
+  {
     name: 'demo',
     path: '/demo',
     segment: 'public',

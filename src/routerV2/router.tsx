@@ -41,6 +41,10 @@ const HelpPage = lazy(() => import('@/pages/HelpPage'));
 const DemoPage = lazy(() => import('@/pages/DemoPage'));
 const OnboardingPage = lazy(() => import('@/pages/OnboardingPage'));
 
+// Store Shopify
+const StorePage = lazy(() => import('@/pages/StorePage'));
+const ProductDetailPage = lazy(() => import('@/pages/ProductDetailPage'));
+
 // Auth & Landing unifiées
 const SignupPage = lazy(() => import('@/pages/SignupPage'));
 
@@ -252,6 +256,10 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   UnifiedLoginPage,
   SignupPage,
   // PrivacyPage supprimé - utiliser LegalPrivacyPage
+  
+  // Store Shopify
+  StorePage,
+  ProductDetailPage,
   
   // App & B2B Enterprise
   AppGatePage,

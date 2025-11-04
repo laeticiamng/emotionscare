@@ -22,7 +22,9 @@ import {
   Shield,
   Star,
   Clock,
-  Activity
+  Activity,
+  ShoppingBag,
+  Sparkles
 } from 'lucide-react';
 
 const ModernHomePage: React.FC = () => {
@@ -247,7 +249,28 @@ const ModernHomePage: React.FC = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            {/* Fonctionnalité Store */}
+            <Card className="text-center hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <div className="h-12 w-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4" aria-hidden="true">
+                  <ShoppingBag className="h-6 w-6 text-primary" />
+                </div>
+                <CardTitle>Boutique Bien-être</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground mb-4">
+                  Découvrez notre collection de produits premium. Chaque achat débloque un accès digital exclusif.
+                </p>
+                <Link to="/store">
+                  <Button variant="outline" className="w-full">
+                    <Sparkles className="h-4 w-4 mr-2" />
+                    Découvrir
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+
             {/* Fonctionnalité 1 */}
             <Card className="text-center">
               <CardHeader>
