@@ -16,6 +16,7 @@ import {
 import { ShoppingCart, Minus, Plus, Trash2, ExternalLink, Loader2 } from "lucide-react";
 import { useCartStore } from "@/stores/cartStore";
 import { createStorefrontCheckout } from "@/lib/shopify";
+import { formatPrice, formatTotal } from "@/lib/currency";
 import { toast } from "sonner";
 
 export const CartDrawer = () => {
@@ -113,7 +114,7 @@ export const CartDrawer = () => {
                           {item.selectedOptions.map(option => option.value).join(' • ')}
                         </p>
                         <p className="font-semibold text-primary">
-                          {item.price.currencyCode} ${parseFloat(item.price.amount).toFixed(2)}
+                          {formatPrice(item.price)}
                         </p>
                       </div>
                       
@@ -160,7 +161,7 @@ export const CartDrawer = () => {
                 <div className="flex justify-between items-center">
                   <span className="text-lg font-semibold">Total</span>
                   <span className="text-xl font-bold">
-                    {items[0]?.price.currencyCode || 'USD'} ${totalPrice.toFixed(2)}
+                    {formatTotal(totalPrice, items[0]?.price.currencyCode || 'USD')}
                   </span>
                 </div>
                 

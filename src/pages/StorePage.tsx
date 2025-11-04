@@ -6,13 +6,14 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Sparkles, Heart, ShoppingBag, Loader2 } from 'lucide-react';
-import { CartDrawer } from '@/components/shop/CartDrawer';
+import { GlobalHeader } from '@/components/layout/GlobalHeader';
 import { useCartStore } from '@/stores/cartStore';
 import { storefrontApiRequest, STOREFRONT_QUERY } from '@/lib/shopify';
+import { formatPrice } from '@/lib/currency';
 import type { ShopifyProduct } from '@/types/shopify';
 import { toast } from 'sonner';
 
@@ -72,24 +73,8 @@ const StorePage: React.FC = () => {
         Aller au contenu
       </a>
 
-      {/* Header */}
-      <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <Link to="/" className="flex items-center space-x-2">
-            <Heart className="h-6 w-6 text-primary" />
-            <span className="font-bold text-xl">EmotionsCare Store</span>
-          </Link>
-          
-          <nav className="flex items-center space-x-4">
-            <Link to="/">
-              <Button variant="ghost" size="sm">
-                Accueil
-              </Button>
-            </Link>
-            <CartDrawer />
-          </nav>
-        </div>
-      </header>
+      {/* Header unifié */}
+      <GlobalHeader />
 
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-b from-primary/5 to-background py-20">
@@ -195,7 +180,7 @@ const StorePage: React.FC = () => {
                     <CardContent>
                       <div className="flex items-center justify-between mb-4">
                         <span className="text-2xl font-bold text-primary">
-                          {price.currencyCode} ${parseFloat(price.amount).toFixed(2)}
+                          {formatPrice(price)}
                         </span>
                         {variant?.availableForSale && (
                           <Badge variant="secondary" className="bg-success/10 text-success">

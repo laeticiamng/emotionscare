@@ -3,15 +3,16 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, ShoppingBag, Heart, Sparkles, Loader2 } from 'lucide-react';
-import { CartDrawer } from '@/components/shop/CartDrawer';
+import { ShoppingBag, Heart, Sparkles, Loader2 } from 'lucide-react';
+import { GlobalHeader } from '@/components/layout/GlobalHeader';
 import { useCartStore } from '@/stores/cartStore';
 import { storefrontApiRequest } from '@/lib/shopify';
+import { formatPrice } from '@/lib/currency';
 import type { ShopifyProduct } from '@/types/shopify';
 import { toast } from 'sonner';
 
@@ -134,25 +135,8 @@ const ProductDetailPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background" data-testid="page-root">
-      {/* Header */}
-      <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <Link to="/store" className="flex items-center space-x-2">
-            <Heart className="h-6 w-6 text-primary" />
-            <span className="font-bold text-xl">EmotionsCare Store</span>
-          </Link>
-          
-          <div className="flex items-center space-x-2">
-            <Link to="/store">
-              <Button variant="ghost" size="sm">
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Retour
-              </Button>
-            </Link>
-            <CartDrawer />
-          </div>
-        </div>
-      </header>
+      {/* Header unifié */}
+      <GlobalHeader />
 
       {/* Product Detail */}
       <main className="container mx-auto px-4 py-12">
@@ -200,7 +184,7 @@ const ProductDetailPage: React.FC = () => {
               <h1 className="text-4xl font-bold mb-4">{product.title}</h1>
               <div className="flex items-center gap-4 mb-6">
                 <span className="text-3xl font-bold text-primary">
-                  {selectedVariant.price.currencyCode} ${parseFloat(selectedVariant.price.amount).toFixed(2)}
+                  {formatPrice(selectedVariant.price)}
                 </span>
                 {selectedVariant.availableForSale && (
                   <Badge variant="secondary" className="bg-success/10 text-success">

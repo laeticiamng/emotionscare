@@ -4,8 +4,13 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { ShoppingBag, Sparkles, ArrowRight } from 'lucide-react';
 import PageSEO from '@/components/seo/PageSEO';
+import { GlobalHeader } from '@/components/layout/GlobalHeader';
 import { ZeroNumberBoundary } from '@/features/dashboard/ZeroNumberBoundary';
 import { useWeeklyCard } from '@/hooks/useWeeklyCard';
 import { CardDeck } from '@/components/dashboard/CardDeck';
@@ -63,6 +68,9 @@ const HomePage: React.FC = () => {
           title="La Salle des Cartes Vivantes" 
           description="Tire ta carte hebdomadaire et découvre ton mantra émotionnel" 
         />
+        
+        {/* Header unifié */}
+        <GlobalHeader />
         
         <main className="mx-auto flex w-full max-w-5xl flex-col gap-8 px-4 py-8 sm:px-6 lg:px-8">
           {/* Header avec galerie */}
@@ -156,12 +164,67 @@ const HomePage: React.FC = () => {
             </motion.div>
           ) : null}
 
+          {/* Section Boutique Premium */}
+          <motion.section
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6 }}
+            className="mt-12"
+          >
+            <Card className="relative overflow-hidden border-primary/20 bg-gradient-to-br from-primary/5 to-background">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl" />
+              <CardHeader>
+                <div className="flex items-center gap-2 mb-2">
+                  <ShoppingBag className="h-5 w-5 text-primary" />
+                  <CardTitle className="text-2xl">Boutique Premium EmotionsCare</CardTitle>
+                </div>
+                <CardDescription className="text-base">
+                  Découvrez notre collection exclusive de produits thérapeutiques et formations digitales. 
+                  Chaque achat débloque un module premium sur la plateforme.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="flex items-start gap-3 p-3 bg-background/50 rounded-lg">
+                    <Sparkles className="h-5 w-5 text-warning flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-medium text-sm">Formations premium</p>
+                      <p className="text-xs text-muted-foreground">Masterclass & coaching</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3 p-3 bg-background/50 rounded-lg">
+                    <Sparkles className="h-5 w-5 text-info flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-medium text-sm">Accès digitaux</p>
+                      <p className="text-xs text-muted-foreground">Abonnements & VIP</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3 p-3 bg-background/50 rounded-lg">
+                    <Sparkles className="h-5 w-5 text-success flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-medium text-sm">Services pro</p>
+                      <p className="text-xs text-muted-foreground">Bilans & analyses</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <Button asChild size="lg" className="w-full sm:w-auto">
+                  <Link to="/store">
+                    Découvrir la boutique
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Link>
+                </Button>
+              </CardContent>
+            </Card>
+          </motion.section>
+
           {/* Modules du dashboard (adaptés au thème) */}
           {currentCard && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.8 }}
+              className="mt-8"
             >
               <DashboardCards 
                 order={['breathe', 'journal', 'music', 'community']}
