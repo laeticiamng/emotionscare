@@ -41,6 +41,12 @@ const HelpPage = lazy(() => import('@/pages/HelpPage'));
 const DemoPage = lazy(() => import('@/pages/DemoPage'));
 const OnboardingPage = lazy(() => import('@/pages/OnboardingPage'));
 
+// Pages légales
+const MentionsLegalesPage = lazy(() => import('@/pages/legal/MentionsLegalesPage'));
+const PrivacyPolicyPage = lazy(() => import('@/pages/legal/PrivacyPolicyPage'));
+const SalesTermsPage = lazy(() => import('@/pages/legal/SalesTermsPage'));
+const LicensesPage = lazy(() => import('@/pages/legal/LicensesPage'));
+
 // Store Shopify
 const StorePage = lazy(() => import('@/pages/StorePage'));
 const ProductDetailPage = lazy(() => import('@/pages/ProductDetailPage'));
