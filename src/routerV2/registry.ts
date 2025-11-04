@@ -259,14 +259,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: true,
     aliases: ['/music-therapy-premium'],
   },
-  {
-    name: 'music-generate',
-    path: '/app/music/generate',
-    segment: 'consumer',
-    layout: 'simple',
-    component: 'MusicGeneratePage',
-    guard: true,
-  },
+  // Route supprimée - fonctionnalité intégrée dans B2CMusicEnhanced
   // music-library supprimé - fonctionnalité dans B2CMusicEnhanced
   {
     name: 'coach',
@@ -521,16 +514,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: true,
     aliases: ['/vr-galactique'],
   },
-  {
-    name: 'vr-breath',
-    path: '/app/vr-breath',
-    segment: 'consumer',
-    role: 'consumer',
-    layout: 'app-sidebar',
-    component: 'VRBreathPage',
-    guard: true,
-    aliases: ['/vr-respiration'],
-  },
+  // Route fusionnée avec vr-breath-guide (ligne 505-513) - utiliser B2CVRBreathGuidePage
   {
     name: 'boss-grit',
     path: '/app/boss-grit',
@@ -664,7 +648,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     segment: 'consumer',
     role: 'consumer',
     layout: 'app-sidebar',
-    component: 'GamificationPage',
+    component: 'B2CGamificationPage',
     guard: true,
   },
   {
