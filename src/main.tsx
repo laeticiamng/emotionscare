@@ -1,38 +1,30 @@
 import React, { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { RouterProvider } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { router } from '@/routerV2';
+import { RootProvider } from '@/providers';
+import { logger } from '@/lib/logger';
 import '@/index.css';
 
-console.log('🚀 EmotionsCare Loading - Step by step...');
+// Configuration des logs
+logger.info('🚀 EmotionsCare Platform Loading...', undefined, 'SYSTEM');
 
 const rootElement = document.getElementById('root');
 
 if (!rootElement) {
-  throw new Error('Root element not found');
+  const error = 'Root element not found';
+  logger.error(error, new Error(error), 'SYSTEM');
+  throw new Error(error);
 }
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 1000 * 60 * 5,
-      retry: 1,
-    },
-  },
-});
-
-console.log('✅ QueryClient created');
+logger.debug('✅ Root element found', undefined, 'SYSTEM');
 
 createRoot(rootElement).render(
   <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <div style={{ padding: '2rem' }}>
-        <h1>Test: QueryClient + Router minimal</h1>
-        <RouterProvider router={router} />
-      </div>
-    </QueryClientProvider>
+    <RootProvider>
+      <RouterProvider router={router} />
+    </RootProvider>
   </StrictMode>
 );
 
-console.log('✅ React mounted');
+logger.info('✅ Application rendered successfully', undefined, 'SYSTEM');

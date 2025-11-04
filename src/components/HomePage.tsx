@@ -1,12 +1,12 @@
 /**
- * HomePage - Wrapper vers la page HomePage principale
+ * HomePage - Page d'accueil accessible à tous
  */
 
 import React from 'react';
-import ActualHomePage from '@/pages/HomePage';
+import ModernHomePage from './modern-features/ModernHomePage';
 
 const HomePage: React.FC = () => {
-  return <ActualHomePage />;
+  return <ModernHomePage />;
 };
 
 export default HomePage;
