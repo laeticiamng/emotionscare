@@ -8596,6 +8596,36 @@ export type Database = {
         }
         Relationships: []
       }
+      product_module_mapping: {
+        Row: {
+          activation_type: string
+          created_at: string
+          description: string | null
+          id: string
+          module_name: string
+          module_path: string
+          product_handle: string
+        }
+        Insert: {
+          activation_type?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          module_name: string
+          module_path: string
+          product_handle: string
+        }
+        Update: {
+          activation_type?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          module_name?: string
+          module_path?: string
+          product_handle?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -9282,6 +9312,57 @@ export type Database = {
           description?: string
           id?: string
           priority?: string
+        }
+        Relationships: []
+      }
+      shopify_purchases: {
+        Row: {
+          activated_at: string | null
+          created_at: string
+          currency_code: string
+          id: string
+          order_id: string
+          price_amount: number
+          product_handle: string
+          product_title: string
+          quantity: number
+          shopify_product_id: string
+          updated_at: string
+          user_id: string | null
+          variant_id: string
+          variant_title: string | null
+        }
+        Insert: {
+          activated_at?: string | null
+          created_at?: string
+          currency_code?: string
+          id?: string
+          order_id: string
+          price_amount: number
+          product_handle: string
+          product_title: string
+          quantity?: number
+          shopify_product_id: string
+          updated_at?: string
+          user_id?: string | null
+          variant_id: string
+          variant_title?: string | null
+        }
+        Update: {
+          activated_at?: string | null
+          created_at?: string
+          currency_code?: string
+          id?: string
+          order_id?: string
+          price_amount?: number
+          product_handle?: string
+          product_title?: string
+          quantity?: number
+          shopify_product_id?: string
+          updated_at?: string
+          user_id?: string | null
+          variant_id?: string
+          variant_title?: string | null
         }
         Relationships: []
       }
@@ -10253,6 +10334,47 @@ export type Database = {
             columns: ["achievement_id"]
             isOneToOne: false
             referencedRelation: "achievements"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_activated_modules: {
+        Row: {
+          activated_via: string
+          created_at: string
+          expires_at: string | null
+          id: string
+          module_name: string
+          module_path: string
+          purchase_id: string | null
+          user_id: string
+        }
+        Insert: {
+          activated_via: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          module_name: string
+          module_path: string
+          purchase_id?: string | null
+          user_id: string
+        }
+        Update: {
+          activated_via?: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          module_name?: string
+          module_path?: string
+          purchase_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_activated_modules_purchase_id_fkey"
+            columns: ["purchase_id"]
+            isOneToOne: false
+            referencedRelation: "shopify_purchases"
             referencedColumns: ["id"]
           },
         ]
