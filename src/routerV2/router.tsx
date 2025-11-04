@@ -33,8 +33,8 @@ import FloatingActionMenu from '@/components/layout/FloatingActionMenu';
 
 // Pages publiques unifiées 
 const HomePage = lazy(() => import('@/components/HomePage'));
-const UnifiedLoginPage = lazy(() => import('@/pages/unified/UnifiedLoginPage'));
-const SimpleB2CPage = lazy(() => import('@/components/SimpleB2CPage'));
+const UnifiedLoginPage = lazy(() => import('@/pages/UnifiedLoginPage'));
+const HomeB2CPage = lazy(() => import('@/pages/HomeB2CPage'));
 const AboutPage = lazy(() => import('@/pages/AboutPage'));
 const ContactPage = lazy(() => import('@/pages/ContactPage'));
 const HelpPage = lazy(() => import('@/pages/HelpPage'));
@@ -159,7 +159,7 @@ const StorySynthPage = lazy(() => import('@/pages/B2CStorySynthLabPage'));
 // Pages DEV uniquement
 const ComprehensiveSystemAuditPage = lazy(() => import('@/pages/ComprehensiveSystemAuditPage'));
 const ErrorBoundaryTestPage = lazy(() => import('@/pages/dev/ErrorBoundaryTestPage'));
-const TestAccountsPage = lazy(() => import('@/pages/dev/TestAccountsPage'));
+const TestAccountsPage = lazy(() => import('@/pages/TestAccountsPage'));
 
 // Analytics & Weekly Bars
 const B2CWeeklyBarsPage = lazy(() => import('@/pages/B2CWeeklyBarsPage'));
@@ -175,10 +175,10 @@ const ServerErrorPage = lazy(() => import('@/pages/errors/500/page'));
 
 
 // Composants de redirection  
-const RedirectToScan = lazy(() => import('@/components/redirects/RedirectToScan'));
-const RedirectToJournal = lazy(() => import('@/components/redirects/RedirectToJournal'));
+const RedirectToScan = lazy(() => import('@/pages/RedirectToScan'));
+const RedirectToJournal = lazy(() => import('@/pages/RedirectToJournal'));
 const RedirectToSocialCocon = lazy(() => import('@/components/redirects/RedirectToSocialCocon'));
-const RedirectToEntreprise = lazy(() => import('@/components/redirects/RedirectToEntreprise'));
+const RedirectToEntreprise = lazy(() => import('@/pages/RedirectToEntreprise'));
 const RedirectToMusic = lazy(() => import('@/components/redirects/RedirectToMusic'));
 
 // Pages Dashboard modules
@@ -247,7 +247,7 @@ const NavigationPage = lazy(() => import('@/pages/NavigationPage'));
 const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType<any>>> = {
   // Public unifiées
   HomePage,
-  HomeB2CPage: SimpleB2CPage,
+  HomeB2CPage,
   AboutPage,
   ContactPage,
   HelpPage,
