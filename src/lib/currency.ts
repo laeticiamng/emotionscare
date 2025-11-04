@@ -2,6 +2,11 @@
  * Currency formatting utilities
  */
 
+/**
+ * Devise par défaut pour la plateforme (France)
+ */
+export const DEFAULT_CURRENCY = 'EUR';
+
 export interface Price {
   amount: string;
   currencyCode: string;

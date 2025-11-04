@@ -161,7 +161,7 @@ export const CartDrawer = () => {
                 <div className="flex justify-between items-center">
                   <span className="text-lg font-semibold">Total</span>
                   <span className="text-xl font-bold">
-                    {formatTotal(totalPrice, items[0]?.price.currencyCode || 'USD')}
+                    {formatTotal(totalPrice, items[0]?.price.currencyCode || 'EUR')}
                   </span>
                 </div>
                 
