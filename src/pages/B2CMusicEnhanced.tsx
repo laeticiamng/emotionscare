@@ -37,9 +37,10 @@ interface VinylTrack extends MusicTrack {
   color: string;
   vinylColor: string;
   description: string;
+  waveform?: number[];
 }
 
-// Tracks avec URLs audio valides (accessible sans CORS)
+// Tracks avec URLs audio valides de SoundHelix (libre de droits)
 const vinylTracks: VinylTrack[] = [
   {
     id: 'vinyl-1',
@@ -48,55 +49,55 @@ const vinylTracks: VinylTrack[] = [
     duration: 180,
     category: 'doux',
     mood: 'Calme océanique',
-    color: 'hsl(200, 70%, 60%)',
-    vinylColor: 'linear-gradient(135deg, hsl(200, 70%, 60%), hsl(180, 60%, 70%))',
-    description: 'Ondes douces qui bercent ton esprit',
-    url: '/audio/calm.mp3',
-    audioUrl: '/audio/calm.mp3',
-    emotion: 'calm'
+    color: 'from-blue-500 to-cyan-400',
+    vinylColor: 'bg-gradient-to-br from-blue-400 via-cyan-300 to-blue-200',
+    description: 'Ambiance douce et apaisante',
+    url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
+    audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
+    waveform: Array.from({ length: 100 }, () => Math.random() * 0.8 + 0.2),
   },
   {
     id: 'vinyl-2',
-    title: 'Éveil Créatif',
-    artist: 'Harmonies Génératives',
-    duration: 240,
-    category: 'créatif',
-    mood: 'Inspiration pure',
-    color: 'hsl(280, 70%, 60%)',
-    vinylColor: 'linear-gradient(135deg, hsl(280, 70%, 60%), hsl(320, 60%, 70%))',
-    description: 'Stimule ta créativité naturelle',
-    url: '/audio/creative.mp3',
-    audioUrl: '/audio/creative.mp3',
-    emotion: 'creative'
+    title: 'Énergie Vibrante',
+    artist: 'Studio EmotionsCare',
+    duration: 210,
+    category: 'énergique',
+    mood: 'Dynamisme positif',
+    color: 'from-orange-500 to-red-400',
+    vinylColor: 'bg-gradient-to-br from-orange-400 via-red-300 to-orange-200',
+    description: 'Boost d\'énergie et motivation',
+    url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
+    audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
+    waveform: Array.from({ length: 100 }, () => Math.random() * 0.9 + 0.3),
   },
   {
     id: 'vinyl-3',
-    title: 'Boost Vital',
-    artist: 'Rythmes Organiques',
-    duration: 150,
-    category: 'énergique',
-    mood: 'Dynamisme zen',
-    color: 'hsl(30, 80%, 60%)',
-    vinylColor: 'linear-gradient(135deg, hsl(30, 80%, 60%), hsl(60, 70%, 70%))',
-    description: 'Énergie sans stress',
-    url: '/audio/energetic.mp3',
-    audioUrl: '/audio/energetic.mp3',
-    emotion: 'energetic'
+    title: 'Focus Mental',
+    artist: 'Studio EmotionsCare',
+    duration: 240,
+    category: 'créatif',
+    mood: 'Concentration pure',
+    color: 'from-purple-500 to-indigo-400',
+    vinylColor: 'bg-gradient-to-br from-purple-400 via-indigo-300 to-purple-200',
+    description: 'Concentration optimale pour créer',
+    url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
+    audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
+    waveform: Array.from({ length: 100 }, () => Math.random() * 0.7 + 0.3),
   },
   {
     id: 'vinyl-4',
-    title: 'Résonance Curative',
-    artist: 'Fréquences Sacrées',
-    duration: 300,
+    title: 'Réparation Émotionnelle',
+    artist: 'Studio EmotionsCare',
+    duration: 270,
     category: 'guérison',
-    mood: 'Régénération',
-    color: 'hsl(140, 60%, 60%)',
-    vinylColor: 'linear-gradient(135deg, hsl(140, 60%, 60%), hsl(120, 70%, 70%))',
-    description: 'Harmonise ton être intérieur',
-    url: '/audio/healing.mp3',
-    audioUrl: '/audio/healing.mp3',
-    emotion: 'healing'
-  }
+    mood: 'Bien-être intérieur',
+    color: 'from-green-500 to-emerald-400',
+    vinylColor: 'bg-gradient-to-br from-green-400 via-emerald-300 to-green-200',
+    description: 'Sons thérapeutiques pour guérir',
+    url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3',
+    audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3',
+    waveform: Array.from({ length: 100 }, () => Math.random() * 0.6 + 0.4),
+  },
 ];
 
 const categoryIcons = {

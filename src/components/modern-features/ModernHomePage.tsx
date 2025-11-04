@@ -143,7 +143,7 @@ const ModernHomePage: React.FC = () => {
 
             {/* Progression et stats rapides */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <Card className="bg-white/50 backdrop-blur-sm border-white/20">
+              <Card className="bg-card/50 backdrop-blur-sm border-border/20">
                 <CardContent className="p-3">
                   <div className="flex items-center justify-between">
                     <div>
@@ -156,38 +156,38 @@ const ModernHomePage: React.FC = () => {
                 </CardContent>
               </Card>
 
-              <Card className="bg-white/50 backdrop-blur-sm border-white/20">
+              <Card className="bg-card/50 backdrop-blur-sm border-border/20">
                 <CardContent className="p-3">
                   <div className="flex items-center justify-between">
                     <div>
                       <div className="text-sm font-medium">Sessions</div>
                       <div className="text-xs text-muted-foreground">Ce mois-ci</div>
                     </div>
-                    <div className="text-lg font-bold text-green-600">{userStats.completedSessions}</div>
+                    <div className="text-lg font-bold text-success">{userStats.completedSessions}</div>
                   </div>
                 </CardContent>
               </Card>
 
-              <Card className="bg-white/50 backdrop-blur-sm border-white/20">
+              <Card className="bg-card/50 backdrop-blur-sm border-border/20">
                 <CardContent className="p-3">
                   <div className="flex items-center justify-between">
                     <div>
                       <div className="text-sm font-medium">Points</div>
                       <div className="text-xs text-muted-foreground">Total</div>
                     </div>
-                    <div className="text-lg font-bold text-purple-600">{userStats.totalPoints.toLocaleString()}</div>
+                    <div className="text-lg font-bold text-primary">{userStats.totalPoints.toLocaleString()}</div>
                   </div>
                 </CardContent>
               </Card>
 
-              <Card className="bg-white/50 backdrop-blur-sm border-white/20">
+              <Card className="bg-card/50 backdrop-blur-sm border-border/20">
                 <CardContent className="p-3">
                   <div className="flex items-center justify-between">
                     <div>
                       <div className="text-sm font-medium">Série</div>
                       <div className="text-xs text-muted-foreground">Jours consécutifs</div>
                     </div>
-                    <div className="text-lg font-bold text-orange-600">{userStats.currentStreak}</div>
+                    <div className="text-lg font-bold text-warning">{userStats.currentStreak}</div>
                   </div>
                 </CardContent>
               </Card>
@@ -199,10 +199,10 @@ const ModernHomePage: React.FC = () => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                 {quickActions.map((action, index) => (
                   <Link key={index} to={action.href}>
-                    <Card className="bg-white/30 backdrop-blur-sm border-white/20 hover:bg-white/40 transition-all cursor-pointer">
+                    <Card className="bg-card/30 backdrop-blur-sm border-border/20 hover:bg-card/40 transition-all cursor-pointer">
                       <CardContent className="p-3">
                         <div className="flex items-center gap-3">
-                          <div className={`p-2 rounded-lg ${action.color} text-white`} aria-hidden="true">
+                          <div className={`p-2 rounded-lg ${action.color} text-primary-foreground`} aria-hidden="true">
                             {action.icon}
                           </div>
                           <div>

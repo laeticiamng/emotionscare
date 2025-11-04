@@ -249,12 +249,12 @@ const B2BAuditPage: React.FC = () => {
 
         <div className="max-w-7xl mx-auto">
           {/* Control Panel */}
-          <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm mb-8">
+          <Card className="shadow-lg border-0 bg-card/80 backdrop-blur-sm mb-8">
             <CardContent className="p-6">
               <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div className="flex items-center gap-6">
                   <div className="text-center">
-                    <p className="text-sm text-gray-600">Dernier audit</p>
+                    <p className="text-sm text-muted-foreground">Dernier audit</p>
                     <p className="font-medium">
                       {auditResults.length > 0 ? 'Maintenant' : 'Jamais'}
                     </p>
@@ -262,14 +262,14 @@ const B2BAuditPage: React.FC = () => {
                   {auditResults.length > 0 && (
                     <>
                       <div className="text-center">
-                        <p className="text-sm text-gray-600">Score Enterprise</p>
+                        <p className="text-sm text-muted-foreground">Score Enterprise</p>
                         <Badge className={auditStats.score >= 90 ? 'bg-success/10 text-success' : 
                                         auditStats.score >= 75 ? 'bg-warning/10 text-warning' : 'bg-destructive/10 text-destructive'}>
                           {auditStats.score}%
                         </Badge>
                       </div>
                       <div className="text-center">
-                        <p className="text-sm text-gray-600">Conformité</p>
+                        <p className="text-sm text-muted-foreground">Conformité</p>
                         <Badge variant="outline">
                           {Math.round(complianceFrameworks.reduce((acc, fw) => acc + fw.score, 0) / complianceFrameworks.length)}%
                         </Badge>
@@ -295,11 +295,11 @@ const B2BAuditPage: React.FC = () => {
               {isRunningAudit && (
                 <div className="mt-6">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm text-gray-600">Progression de l'audit Enterprise</span>
+                    <span className="text-sm text-muted-foreground">Progression de l'audit Enterprise</span>
                     <span className="text-sm font-medium">{Math.round(auditProgress)}%</span>
                   </div>
                   <Progress value={auditProgress} className="h-3" />
-                  <p className="text-xs text-gray-500 mt-2">
+                  <p className="text-xs text-muted-foreground mt-2">
                     Analyse approfondie: sécurité, conformité, performance, gouvernance...
                   </p>
                 </div>
@@ -311,32 +311,32 @@ const B2BAuditPage: React.FC = () => {
             <>
               {/* Statistics Overview */}
               <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
+                <Card className="shadow-lg border-0 bg-card/80 backdrop-blur-sm">
                   <CardContent className="p-6 text-center">
                     <CheckCircle className="h-8 w-8 text-success mx-auto mb-2" />
                     <div className="text-2xl font-bold text-success">{auditStats.passed}</div>
-                    <p className="text-sm text-gray-600">Contrôles Réussis</p>
+                    <p className="text-sm text-muted-foreground">Contrôles Réussis</p>
                   </CardContent>
                 </Card>
-                <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
+                <Card className="shadow-lg border-0 bg-card/80 backdrop-blur-sm">
                   <CardContent className="p-6 text-center">
                     <AlertTriangle className="h-8 w-8 text-warning mx-auto mb-2" />
                     <div className="text-2xl font-bold text-warning">{auditStats.warnings}</div>
-                    <p className="text-sm text-gray-600">À Améliorer</p>
+                    <p className="text-sm text-muted-foreground">À Améliorer</p>
                   </CardContent>
                 </Card>
-                <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
+                <Card className="shadow-lg border-0 bg-card/80 backdrop-blur-sm">
                   <CardContent className="p-6 text-center">
                     <AlertTriangle className="h-8 w-8 text-destructive mx-auto mb-2" />
                     <div className="text-2xl font-bold text-destructive">{auditStats.failed}</div>
-                    <p className="text-sm text-gray-600">Non Conformes</p>
+                    <p className="text-sm text-muted-foreground">Non Conformes</p>
                   </CardContent>
                 </Card>
-                <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
+                <Card className="shadow-lg border-0 bg-card/80 backdrop-blur-sm">
                   <CardContent className="p-6 text-center">
                     <TrendingUp className="h-8 w-8 text-info mx-auto mb-2" />
                     <div className="text-2xl font-bold text-info">{auditStats.score}%</div>
-                    <p className="text-sm text-gray-600">Score Global</p>
+                    <p className="text-sm text-muted-foreground">Score Global</p>
                   </CardContent>
                 </Card>
               </div>
