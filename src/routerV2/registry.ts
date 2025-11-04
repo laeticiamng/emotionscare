@@ -93,7 +93,6 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     segment: 'public',
     layout: 'marketing',
     component: 'HomeB2CPage',
-    aliases: ['/choose-mode'],
   },
   {
     name: 'b2b-landing',
@@ -658,7 +657,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'simple',
     component: 'B2CActivitePage',
     guard: false,
-    aliases: ['/weekly-bars', '/activity-history'],
+    aliases: ['/activity-history'],
   },
   {
     name: 'heatmap',
