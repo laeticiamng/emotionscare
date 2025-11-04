@@ -4,7 +4,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { useAssessment } from '@/components/assess';
+import { useAssessment } from '@/hooks/useAssessment';
 import { WeeklyCard, CardCollection } from '@/types/card';
 import { generateCard, canDrawCard, getWeekNumber } from '@/lib/cardSystem';
 import { supabase } from '@/integrations/supabase/client';
