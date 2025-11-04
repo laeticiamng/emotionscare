@@ -6,7 +6,7 @@ import { Link, useLocation } from 'react-router-dom';
 import PageRoot from '@/components/common/PageRoot';
 import { Button } from '@/components/ui/button';
 import { ClinicalOptIn } from '@/components/consent/ClinicalOptIn';
-import { MedicalDisclaimerDialog } from '@/components/medical/MedicalDisclaimerDialog';
+import { MedicalDisclaimerDialog, useMedicalDisclaimer } from '@/components/medical/MedicalDisclaimerDialog';
 import { useFlags } from '@/core/flags';
 import CameraSampler from '@/features/scan/CameraSampler';
 import SamSliders from '@/features/scan/SamSliders';
@@ -41,6 +41,13 @@ const B2CScanPage: React.FC = () => {
   const [cameraDenied, setCameraDenied] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(shouldShowOnboarding());
   const lastSubmittedRef = useRef<string | null>(null);
+
+  const {
+    showDisclaimer,
+    isAccepted,
+    handleAccept,
+    handleDecline,
+  } = useMedicalDisclaimer('emotional_scan');
 
   const featureEnabled = has('FF_SCAN_SAM');
   
@@ -213,21 +220,27 @@ const B2CScanPage: React.FC = () => {
     return (
       <PageRoot>
         <div className="min-h-screen bg-gradient-to-br from-background via-background/90 to-primary/10">
-            <div className="mx-auto flex max-w-2xl flex-col gap-6 px-4 py-12">
-              <h1 className="text-3xl font-semibold text-foreground">Scanner émotionnel indisponible</h1>
-              <p className="text-sm text-muted-foreground">
-                Cette expérience en temps réel est temporairement désactivée pour votre espace. Aucun signal n’est enregistré.
-              </p>
-            </div>
+          <div className="mx-auto flex max-w-2xl flex-col gap-6 px-4 py-12">
+            <h1 className="text-3xl font-semibold text-foreground">Scanner émotionnel indisponible</h1>
+            <p className="text-sm text-muted-foreground">
+              Cette expérience en temps réel est temporairement désactivée pour votre espace. Aucun signal n'est enregistré.
+            </p>
           </div>
-        </PageRoot>
-      </ConsentGate>
+        </div>
+      </PageRoot>
     );
   }
 
   return (
     <ConsentGate>
-      <PageRoot>
+      <MedicalDisclaimerDialog
+        open={showDisclaimer}
+        onAccept={handleAccept}
+        onDecline={handleDecline}
+        feature="emotional_scan"
+      />
+      {isAccepted && (
+        <PageRoot>
         {showOnboarding && (
           <ScanOnboarding onComplete={() => setShowOnboarding(false)} />
         )}
@@ -276,7 +289,7 @@ const B2CScanPage: React.FC = () => {
                 Scanner émotionnel léger
               </h1>
               <p className="max-w-2xl text-base text-muted-foreground">
-                Valence et activation sont captées en douceur pour colorer l’interface. Aucun chiffre n’apparaît, seules des
+                Valence et activation sont captées en douceur pour colorer l'interface. Aucun chiffre n'apparaît, seules des
                 nuances décrivent le ressenti.
               </p>
             </div>
@@ -313,15 +326,15 @@ const B2CScanPage: React.FC = () => {
             )}
             {cameraDenied && (
               <p className="rounded-2xl border border-dashed border-primary/30 bg-primary/5 px-4 py-3 text-sm text-primary">
-                L’accès caméra a été refusé. Vous pouvez ajuster les curseurs sensoriels quand vous le souhaitez.
+                L'accès caméra a été refusé. Vous pouvez ajuster les curseurs sensoriels quand vous le souhaitez.
               </p>
             )}
           </header>
 
           {shouldPromptConsent && (
             <ClinicalOptIn
-              title="Activer l’enregistrement clinique SAM"
-              description="Si vous acceptez, une trace anonyme est conservée pour enrichir vos suivis. Vous pouvez changer d’avis à tout moment."
+              title="Activer l'enregistrement clinique SAM"
+              description="Si vous acceptez, une trace anonyme est conservée pour enrichir vos suivis. Vous pouvez changer d'avis à tout moment."
               acceptLabel="Je partage ce ressenti"
               declineLabel="Je préfère rester local"
               onAccept={() => {
@@ -377,6 +390,7 @@ const B2CScanPage: React.FC = () => {
           </div>
         </div>
       </PageRoot>
+      )}
     </ConsentGate>
   );
 };
