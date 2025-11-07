@@ -139,6 +139,49 @@ serve(async (req) => {
       includeCategoryDetails,
     });
 
+    // Enregistrer le rapport dans l'historique
+    const authHeader = req.headers.get('Authorization');
+    if (authHeader) {
+      try {
+        const token = authHeader.replace('Bearer ', '');
+        const { data: { user } } = await supabase.auth.getUser(token);
+        
+        if (user) {
+          // Obtenir la prochaine version
+          const { data: latestReport } = await supabase
+            .from('pdf_reports')
+            .select('report_version')
+            .eq('user_id', user.id)
+            .eq('report_type', reportType)
+            .order('report_version', { ascending: false })
+            .limit(1)
+            .single();
+
+          const nextVersion = (latestReport?.report_version || 0) + 1;
+          const scoreGlobal = reportType === 'audit' && reportData.audit?.overall_score 
+            ? reportData.audit.overall_score 
+            : null;
+
+          await supabase.from('pdf_reports').insert({
+            user_id: user.id,
+            report_type: reportType,
+            report_version: nextVersion,
+            title: reportTitle,
+            metadata: {
+              includeGraphs,
+              includeRecommendations,
+              includeCategoryDetails,
+              auditId,
+            },
+            score_global: scoreGlobal,
+          });
+        }
+      } catch (error) {
+        console.error('Error saving to history:', error);
+        // Ne pas bloquer la génération si l'enregistrement échoue
+      }
+    }
+
     // Note: La génération PDF réelle se fait côté client avec jsPDF
     // Ici on retourne les données formatées pour le client
     return new Response(

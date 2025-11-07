@@ -9433,6 +9433,87 @@ export type Database = {
           },
         ]
       }
+      pdf_report_schedules: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean | null
+          last_run_at: string | null
+          next_run_at: string | null
+          options: Json | null
+          recipient_emails: string[]
+          report_type: string
+          schedule_cron: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          last_run_at?: string | null
+          next_run_at?: string | null
+          options?: Json | null
+          recipient_emails: string[]
+          report_type: string
+          schedule_cron: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          last_run_at?: string | null
+          next_run_at?: string | null
+          options?: Json | null
+          recipient_emails?: string[]
+          report_type?: string
+          schedule_cron?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      pdf_reports: {
+        Row: {
+          created_at: string
+          file_size: number | null
+          file_url: string | null
+          id: string
+          metadata: Json | null
+          report_type: string
+          report_version: number
+          score_global: number | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          file_size?: number | null
+          file_url?: string | null
+          id?: string
+          metadata?: Json | null
+          report_type: string
+          report_version?: number
+          score_global?: number | null
+          title: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          file_size?: number | null
+          file_url?: string | null
+          id?: string
+          metadata?: Json | null
+          report_type?: string
+          report_version?: number
+          score_global?: number | null
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       pending_activations: {
         Row: {
           created_at: string | null
@@ -10735,6 +10816,51 @@ export type Database = {
         }
         Relationships: []
       }
+      security_alerts: {
+        Row: {
+          affected_resource: string | null
+          alert_type: string
+          created_at: string
+          description: string
+          id: string
+          metadata: Json | null
+          recommendation: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          severity: string
+          status: string
+          title: string
+        }
+        Insert: {
+          affected_resource?: string | null
+          alert_type: string
+          created_at?: string
+          description: string
+          id?: string
+          metadata?: Json | null
+          recommendation?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity: string
+          status?: string
+          title: string
+        }
+        Update: {
+          affected_resource?: string | null
+          alert_type?: string
+          created_at?: string
+          description?: string
+          id?: string
+          metadata?: Json | null
+          recommendation?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: string
+          status?: string
+          title?: string
+        }
+        Relationships: []
+      }
       security_audit_log: {
         Row: {
           action_taken: string
@@ -10807,6 +10933,51 @@ export type Database = {
           ip_address?: unknown
           user_agent?: string | null
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      security_corrections_history: {
+        Row: {
+          after_state: Json | null
+          applied_at: string
+          applied_by: string | null
+          before_state: Json | null
+          correction_applied: string
+          correction_type: string
+          id: string
+          issue_description: string
+          migration_file: string | null
+          notes: string | null
+          severity: string
+          table_or_function_name: string
+        }
+        Insert: {
+          after_state?: Json | null
+          applied_at?: string
+          applied_by?: string | null
+          before_state?: Json | null
+          correction_applied: string
+          correction_type: string
+          id?: string
+          issue_description: string
+          migration_file?: string | null
+          notes?: string | null
+          severity: string
+          table_or_function_name: string
+        }
+        Update: {
+          after_state?: Json | null
+          applied_at?: string
+          applied_by?: string | null
+          before_state?: Json | null
+          correction_applied?: string
+          correction_type?: string
+          id?: string
+          issue_description?: string
+          migration_file?: string | null
+          notes?: string | null
+          severity?: string
+          table_or_function_name?: string
         }
         Relationships: []
       }
@@ -10915,6 +11086,57 @@ export type Database = {
           description?: string
           id?: string
           priority?: string
+        }
+        Relationships: []
+      }
+      security_metrics_snapshots: {
+        Row: {
+          critical_issues: number
+          functions_with_search_path: number
+          high_issues: number
+          id: string
+          info_issues: number
+          linter_issues: Json | null
+          low_issues: number
+          medium_issues: number
+          recorded_at: string
+          security_score: number
+          tables_with_rls: number
+          total_functions: number
+          total_policies: number
+          total_tables: number
+        }
+        Insert: {
+          critical_issues?: number
+          functions_with_search_path: number
+          high_issues?: number
+          id?: string
+          info_issues?: number
+          linter_issues?: Json | null
+          low_issues?: number
+          medium_issues?: number
+          recorded_at?: string
+          security_score: number
+          tables_with_rls: number
+          total_functions: number
+          total_policies: number
+          total_tables: number
+        }
+        Update: {
+          critical_issues?: number
+          functions_with_search_path?: number
+          high_issues?: number
+          id?: string
+          info_issues?: number
+          linter_issues?: Json | null
+          low_issues?: number
+          medium_issues?: number
+          recorded_at?: string
+          security_score?: number
+          tables_with_rls?: number
+          total_functions?: number
+          total_policies?: number
+          total_tables?: number
         }
         Relationships: []
       }
@@ -14990,6 +15212,25 @@ export type Database = {
           p_window_duration_seconds: number
         }
         Returns: Json
+      }
+      get_rls_policies: {
+        Args: never
+        Returns: {
+          cmd: string
+          policyname: string
+          qual: string
+          roles: string[]
+          tablename: string
+          with_check: string
+        }[]
+      }
+      get_rls_table_summaries: {
+        Args: never
+        Returns: {
+          commands: string[]
+          policy_count: number
+          tablename: string
+        }[]
       }
       get_secure_platform_stats: {
         Args: never

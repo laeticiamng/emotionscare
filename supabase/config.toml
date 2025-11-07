@@ -245,3 +245,12 @@ verify_jwt = true
 
 [functions.generate-audit-pdf]
 verify_jwt = true
+
+[functions.scheduled-pdf-reports]
+verify_jwt = false
+
+[functions.export-csv-email]
+verify_jwt = true
+
+[functions.notifications-email]
+verify_jwt = true
