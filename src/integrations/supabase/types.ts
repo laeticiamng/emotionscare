@@ -2182,6 +2182,42 @@ export type Database = {
         }
         Relationships: []
       }
+      data_archives: {
+        Row: {
+          archived_at: string
+          deleted_at: string | null
+          entity_id: string
+          entity_type: string
+          expires_at: string
+          id: string
+          original_data: Json
+          reason: string | null
+          user_id: string
+        }
+        Insert: {
+          archived_at?: string
+          deleted_at?: string | null
+          entity_id: string
+          entity_type: string
+          expires_at: string
+          id?: string
+          original_data: Json
+          reason?: string | null
+          user_id: string
+        }
+        Update: {
+          archived_at?: string
+          deleted_at?: string | null
+          entity_id?: string
+          entity_type?: string
+          expires_at?: string
+          id?: string
+          original_data?: Json
+          reason?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       data_exports: {
         Row: {
           completed_at: string | null
@@ -2301,6 +2337,42 @@ export type Database = {
           summary?: Json
           tables_scanned?: string[]
           total_records?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      data_retention_rules: {
+        Row: {
+          archive_enabled: boolean
+          auto_delete_enabled: boolean
+          created_at: string
+          created_by: string | null
+          entity_type: string
+          id: string
+          notification_days_before: number
+          retention_days: number
+          updated_at: string
+        }
+        Insert: {
+          archive_enabled?: boolean
+          auto_delete_enabled?: boolean
+          created_at?: string
+          created_by?: string | null
+          entity_type: string
+          id?: string
+          notification_days_before?: number
+          retention_days?: number
+          updated_at?: string
+        }
+        Update: {
+          archive_enabled?: boolean
+          auto_delete_enabled?: boolean
+          created_at?: string
+          created_by?: string | null
+          entity_type?: string
+          id?: string
+          notification_days_before?: number
+          retention_days?: number
           updated_at?: string
         }
         Relationships: []
@@ -7592,6 +7664,51 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_history: {
+        Row: {
+          created_at: string
+          error_message: string | null
+          id: string
+          message_content: string
+          platform: string
+          sent_at: string
+          status: string
+          template_id: string | null
+          test_id: string | null
+          test_name: string | null
+          user_id: string
+          webhook_url: string | null
+        }
+        Insert: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          message_content: string
+          platform: string
+          sent_at?: string
+          status: string
+          template_id?: string | null
+          test_id?: string | null
+          test_name?: string | null
+          user_id: string
+          webhook_url?: string | null
+        }
+        Update: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          message_content?: string
+          platform?: string
+          sent_at?: string
+          status?: string
+          template_id?: string | null
+          test_id?: string | null
+          test_name?: string | null
+          user_id?: string
+          webhook_url?: string | null
+        }
+        Relationships: []
+      }
       notification_preferences: {
         Row: {
           category: string
@@ -7636,37 +7753,37 @@ export type Database = {
       }
       notification_templates: {
         Row: {
-          category: string
-          created_at: string | null
-          default_delivery_methods: string[] | null
-          default_priority: string | null
+          created_at: string
           id: string
-          message_template: string
+          is_default: boolean | null
           name: string
-          title_template: string
-          updated_at: string | null
+          platform: string
+          template_content: string
+          updated_at: string
+          user_id: string
+          variables: Json | null
         }
         Insert: {
-          category: string
-          created_at?: string | null
-          default_delivery_methods?: string[] | null
-          default_priority?: string | null
+          created_at?: string
           id?: string
-          message_template: string
+          is_default?: boolean | null
           name: string
-          title_template: string
-          updated_at?: string | null
+          platform: string
+          template_content: string
+          updated_at?: string
+          user_id: string
+          variables?: Json | null
         }
         Update: {
-          category?: string
-          created_at?: string | null
-          default_delivery_methods?: string[] | null
-          default_priority?: string | null
+          created_at?: string
           id?: string
-          message_template?: string
+          is_default?: boolean | null
           name?: string
-          title_template?: string
-          updated_at?: string | null
+          platform?: string
+          template_content?: string
+          updated_at?: string
+          user_id?: string
+          variables?: Json | null
         }
         Relationships: []
       }
@@ -9214,6 +9331,42 @@ export type Database = {
           key?: string | null
           title?: string
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      retention_notifications: {
+        Row: {
+          acknowledged: boolean | null
+          acknowledged_at: string | null
+          entities_count: number
+          entity_type: string
+          expiration_date: string
+          id: string
+          notification_type: string
+          sent_at: string
+          user_id: string
+        }
+        Insert: {
+          acknowledged?: boolean | null
+          acknowledged_at?: string | null
+          entities_count?: number
+          entity_type: string
+          expiration_date: string
+          id?: string
+          notification_type: string
+          sent_at?: string
+          user_id: string
+        }
+        Update: {
+          acknowledged?: boolean | null
+          acknowledged_at?: string | null
+          entities_count?: number
+          entity_type?: string
+          expiration_date?: string
+          id?: string
+          notification_type?: string
+          sent_at?: string
           user_id?: string
         }
         Relationships: []
@@ -12356,6 +12509,39 @@ export type Database = {
         }
         Relationships: []
       }
+      webhook_settings: {
+        Row: {
+          created_at: string
+          discord_enabled: boolean | null
+          discord_webhook_url: string | null
+          id: string
+          slack_enabled: boolean | null
+          slack_webhook_url: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          discord_enabled?: boolean | null
+          discord_webhook_url?: string | null
+          id?: string
+          slack_enabled?: boolean | null
+          slack_webhook_url?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          discord_enabled?: boolean | null
+          discord_webhook_url?: string | null
+          id?: string
+          slack_enabled?: boolean | null
+          slack_webhook_url?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       weekly_card_draws: {
         Row: {
           assessment_session_id: string | null
@@ -12728,6 +12914,12 @@ export type Database = {
     }
     Functions: {
       accept_invitation: { Args: { invitation_token: string }; Returns: Json }
+      archive_expired_data: {
+        Args: { p_entity_type: string; p_retention_days: number }
+        Returns: {
+          archived_count: number
+        }[]
+      }
       audit_and_correct_edn_content: {
         Args: never
         Returns: {

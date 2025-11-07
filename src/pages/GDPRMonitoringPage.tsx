@@ -17,6 +17,7 @@ import GDPRRealtimeDashboard from '@/components/gdpr/GDPRRealtimeDashboard';
 import GDPRAlertHistory from '@/components/gdpr/GDPRAlertHistory';
 import GDPRAuditTrail from '@/components/gdpr/GDPRAuditTrail';
 import GDPRExecutiveDashboard from '@/components/gdpr/GDPRExecutiveDashboard';
+import { DataRetentionConfig } from '@/components/gdpr/DataRetentionConfig';
 import { useGDPRMonitoring } from '@/hooks/useGDPRMonitoring';
 import { useGDPRComplianceScore } from '@/hooks/useGDPRComplianceScore';
 import { useGDPRRealtimeAlerts } from '@/hooks/useGDPRRealtimeAlerts';
@@ -64,7 +65,7 @@ const GDPRMonitoringPage: React.FC = () => {
         </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-11">
+        <TabsList className="grid w-full grid-cols-12">
           <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
           <TabsTrigger value="executive">Exécutif</TabsTrigger>
           <TabsTrigger value="realtime">Temps réel</TabsTrigger>
@@ -78,6 +79,7 @@ const GDPRMonitoringPage: React.FC = () => {
           </TabsTrigger>
           <TabsTrigger value="history">Historique</TabsTrigger>
           <TabsTrigger value="audit">Audit Trail</TabsTrigger>
+          <TabsTrigger value="retention">Rétention</TabsTrigger>
           <TabsTrigger value="consents">Consentements</TabsTrigger>
           <TabsTrigger value="exports">Exports</TabsTrigger>
           <TabsTrigger value="logs">Logs</TabsTrigger>
@@ -223,6 +225,10 @@ const GDPRMonitoringPage: React.FC = () => {
 
         <TabsContent value="audit" className="space-y-6 mt-6">
           <GDPRAuditTrail />
+        </TabsContent>
+
+        <TabsContent value="retention" className="space-y-6 mt-6">
+          <DataRetentionConfig />
         </TabsContent>
 
         <TabsContent value="consents" className="space-y-6 mt-6">

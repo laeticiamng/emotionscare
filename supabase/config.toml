@@ -212,3 +212,6 @@ verify_jwt = true
 
 [functions.monthly-executive-report]
 verify_jwt = false
+
+[functions.data-retention-processor]
+verify_jwt = true
