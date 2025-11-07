@@ -526,6 +526,78 @@ export type Database = {
         }
         Relationships: []
       }
+      applied_recommendations: {
+        Row: {
+          applied_at: string | null
+          category: string
+          created_at: string | null
+          description: string | null
+          id: string
+          impact_calculated: boolean | null
+          impact_details: Json | null
+          impact_level: string
+          impact_score: number | null
+          metrics_after: Json | null
+          metrics_after_period_end: string | null
+          metrics_after_period_start: string | null
+          metrics_before: Json
+          metrics_before_period_end: string | null
+          metrics_before_period_start: string | null
+          notes: string | null
+          recommendation_id: string
+          status: string | null
+          title: string
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          applied_at?: string | null
+          category: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          impact_calculated?: boolean | null
+          impact_details?: Json | null
+          impact_level: string
+          impact_score?: number | null
+          metrics_after?: Json | null
+          metrics_after_period_end?: string | null
+          metrics_after_period_start?: string | null
+          metrics_before?: Json
+          metrics_before_period_end?: string | null
+          metrics_before_period_start?: string | null
+          notes?: string | null
+          recommendation_id: string
+          status?: string | null
+          title: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          applied_at?: string | null
+          category?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          impact_calculated?: boolean | null
+          impact_details?: Json | null
+          impact_level?: string
+          impact_score?: number | null
+          metrics_after?: Json | null
+          metrics_after_period_end?: string | null
+          metrics_after_period_start?: string | null
+          metrics_before?: Json
+          metrics_before_period_end?: string | null
+          metrics_before_period_start?: string | null
+          notes?: string | null
+          recommendation_id?: string
+          status?: string | null
+          title?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       ar_filter_sessions: {
         Row: {
           completed_at: string | null
@@ -9027,6 +9099,227 @@ export type Database = {
           },
         ]
       }
+      pseudonymization_keys: {
+        Row: {
+          algorithm: string
+          created_at: string
+          expires_at: string | null
+          id: string
+          is_active: boolean
+          key_encrypted: string
+          key_hash: string
+          rotation_count: number
+          rule_id: string
+        }
+        Insert: {
+          algorithm: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          key_encrypted: string
+          key_hash: string
+          rotation_count?: number
+          rule_id: string
+        }
+        Update: {
+          algorithm?: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          key_encrypted?: string
+          key_hash?: string
+          rotation_count?: number
+          rule_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pseudonymization_keys_rule_id_fkey"
+            columns: ["rule_id"]
+            isOneToOne: false
+            referencedRelation: "pseudonymization_rules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pseudonymization_log: {
+        Row: {
+          data_type: string
+          error_message: string | null
+          field_name: string | null
+          id: string
+          ip_address: unknown
+          operation: string
+          performed_at: string
+          performed_by: string | null
+          records_affected: number | null
+          rule_id: string | null
+          success: boolean
+          user_agent: string | null
+        }
+        Insert: {
+          data_type: string
+          error_message?: string | null
+          field_name?: string | null
+          id?: string
+          ip_address?: unknown
+          operation: string
+          performed_at?: string
+          performed_by?: string | null
+          records_affected?: number | null
+          rule_id?: string | null
+          success: boolean
+          user_agent?: string | null
+        }
+        Update: {
+          data_type?: string
+          error_message?: string | null
+          field_name?: string | null
+          id?: string
+          ip_address?: unknown
+          operation?: string
+          performed_at?: string
+          performed_by?: string | null
+          records_affected?: number | null
+          rule_id?: string | null
+          success?: boolean
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pseudonymization_log_rule_id_fkey"
+            columns: ["rule_id"]
+            isOneToOne: false
+            referencedRelation: "pseudonymization_rules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pseudonymization_mapping: {
+        Row: {
+          accessed_count: number
+          created_at: string
+          encrypted_original: string
+          id: string
+          last_accessed_at: string | null
+          original_hash: string
+          pseudonymized_value: string
+          rule_id: string
+        }
+        Insert: {
+          accessed_count?: number
+          created_at?: string
+          encrypted_original: string
+          id?: string
+          last_accessed_at?: string | null
+          original_hash: string
+          pseudonymized_value: string
+          rule_id: string
+        }
+        Update: {
+          accessed_count?: number
+          created_at?: string
+          encrypted_original?: string
+          id?: string
+          last_accessed_at?: string | null
+          original_hash?: string
+          pseudonymized_value?: string
+          rule_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pseudonymization_mapping_rule_id_fkey"
+            columns: ["rule_id"]
+            isOneToOne: false
+            referencedRelation: "pseudonymization_rules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pseudonymization_rules: {
+        Row: {
+          algorithm: string
+          auto_apply: boolean
+          created_at: string
+          created_by: string | null
+          data_type: string
+          description: string | null
+          field_name: string
+          id: string
+          is_active: boolean
+          is_reversible: boolean
+          retention_days: number | null
+          updated_at: string
+        }
+        Insert: {
+          algorithm: string
+          auto_apply?: boolean
+          created_at?: string
+          created_by?: string | null
+          data_type: string
+          description?: string | null
+          field_name: string
+          id?: string
+          is_active?: boolean
+          is_reversible?: boolean
+          retention_days?: number | null
+          updated_at?: string
+        }
+        Update: {
+          algorithm?: string
+          auto_apply?: boolean
+          created_at?: string
+          created_by?: string | null
+          data_type?: string
+          description?: string | null
+          field_name?: string
+          id?: string
+          is_active?: boolean
+          is_reversible?: boolean
+          retention_days?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      pseudonymization_stats: {
+        Row: {
+          avg_processing_time_ms: number | null
+          date: string
+          depseudonymized_count: number
+          failed_count: number
+          id: string
+          pseudonymized_count: number
+          rule_id: string
+        }
+        Insert: {
+          avg_processing_time_ms?: number | null
+          date?: string
+          depseudonymized_count?: number
+          failed_count?: number
+          id?: string
+          pseudonymized_count?: number
+          rule_id: string
+        }
+        Update: {
+          avg_processing_time_ms?: number | null
+          date?: string
+          depseudonymized_count?: number
+          failed_count?: number
+          id?: string
+          pseudonymized_count?: number
+          rule_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pseudonymization_stats_rule_id_fkey"
+            columns: ["rule_id"]
+            isOneToOne: false
+            referencedRelation: "pseudonymization_rules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       purchase_history: {
         Row: {
           created_at: string | null
@@ -9302,6 +9595,66 @@ export type Database = {
           updated_at?: string | null
           window_end?: string
           window_start?: string
+        }
+        Relationships: []
+      }
+      recommendation_alerts: {
+        Row: {
+          alert_triggered: boolean | null
+          alert_triggered_at: string | null
+          applied: boolean | null
+          applied_at: string | null
+          category: string
+          created_at: string
+          description: string
+          dismissed: boolean | null
+          dismissed_at: string | null
+          first_seen_at: string
+          historical_score: number
+          id: string
+          impact: string
+          last_checked_at: string
+          recommendation_id: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          alert_triggered?: boolean | null
+          alert_triggered_at?: string | null
+          applied?: boolean | null
+          applied_at?: string | null
+          category: string
+          created_at?: string
+          description: string
+          dismissed?: boolean | null
+          dismissed_at?: string | null
+          first_seen_at?: string
+          historical_score: number
+          id?: string
+          impact: string
+          last_checked_at?: string
+          recommendation_id: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          alert_triggered?: boolean | null
+          alert_triggered_at?: string | null
+          applied?: boolean | null
+          applied_at?: string | null
+          category?: string
+          created_at?: string
+          description?: string
+          dismissed?: boolean | null
+          dismissed_at?: string | null
+          first_seen_at?: string
+          historical_score?: number
+          id?: string
+          impact?: string
+          last_checked_at?: string
+          recommendation_id?: string
+          title?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -12974,6 +13327,10 @@ export type Database = {
         }
         Returns: string
       }
+      calculate_recommendation_impact: {
+        Args: { rec_id: string }
+        Returns: Json
+      }
       calculate_sla_metrics: { Args: never; Returns: undefined }
       calculate_user_learning_path: {
         Args: { p_user_id: string }
@@ -13002,6 +13359,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      check_recommendation_alerts: { Args: never; Returns: undefined }
       check_slow_generations: { Args: never; Returns: undefined }
       check_wellness_streak: {
         Args: { p_user_id: string }
@@ -13264,6 +13622,17 @@ export type Database = {
           updated_count: number
         }[]
       }
+      get_active_pseudonymization_rules: {
+        Args: { p_data_type?: string }
+        Returns: {
+          algorithm: string
+          auto_apply: boolean
+          data_type: string
+          field_name: string
+          id: string
+          is_reversible: boolean
+        }[]
+      }
       get_activity_stats: {
         Args: { p_end_date?: string; p_start_date?: string }
         Returns: {
@@ -13308,6 +13677,17 @@ export type Database = {
           total_rows: number
           valid_descriptions: number
           valid_titles: number
+        }[]
+      }
+      get_category_effectiveness_scores: {
+        Args: { p_user_id: string }
+        Returns: {
+          avg_impact_score: number
+          avg_success_improvement: number
+          category: string
+          effectiveness_score: number
+          total_applied: number
+          total_measured: number
         }[]
       }
       get_competences_parsed: {
@@ -13448,6 +13828,18 @@ export type Database = {
           metric: string
           unit: string
           value: string
+        }[]
+      }
+      get_pseudonymization_statistics: {
+        Args: { p_end_date?: string; p_rule_id?: string; p_start_date?: string }
+        Returns: {
+          avg_processing_time: number
+          data_type: string
+          field_name: string
+          rule_id: string
+          total_depseudonymized: number
+          total_failed: number
+          total_pseudonymized: number
         }[]
       }
       get_rate_limit_status: {

@@ -221,3 +221,6 @@ verify_jwt = true
 
 [functions.notify-policy-update]
 verify_jwt = false
+
+[functions.pseudonymize-data]
+verify_jwt = true
