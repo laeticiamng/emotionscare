@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
-import { FileText, FileSpreadsheet, FileJson, Download } from 'lucide-react';
+import { Download, FileText, Table, Image, FileJson, FileSpreadsheet, Shield, MessageSquare, Activity, TrendingUp, GraduationCap } from 'lucide-react';
 import { useMultiFormatExport } from '@/hooks/useMultiFormatExport';
 import { useState } from 'react';
 import { ReportSignature } from './ReportSignature';
@@ -15,6 +15,9 @@ import { WebhookManager } from './WebhookManager';
 import { GDPRAssistantChat } from './GDPRAssistantChat';
 import { SecurityPenetrationTest } from './SecurityPenetrationTest';
 import { RealtimeComplianceScore } from './RealtimeComplianceScore';
+import { BlockchainAuditTrail } from './BlockchainAuditTrail';
+import { ExecutiveDashboard } from './ExecutiveDashboard';
+import { TrainingSystem } from './TrainingSystem';
 
 export function MultiFormatExporter() {
   const { exportData, isExporting } = useMultiFormatExport();
@@ -41,7 +44,7 @@ export function MultiFormatExporter() {
 
   return (
     <Tabs defaultValue="export" className="space-y-6">
-      <TabsList className="grid w-full grid-cols-5 lg:grid-cols-9">
+      <TabsList className="grid w-full grid-cols-5 lg:grid-cols-13">
         <TabsTrigger value="export">Export</TabsTrigger>
         <TabsTrigger value="signature">Signature</TabsTrigger>
         <TabsTrigger value="validation">Validation</TabsTrigger>
@@ -51,6 +54,9 @@ export function MultiFormatExporter() {
         <TabsTrigger value="assistant">Assistant IA</TabsTrigger>
         <TabsTrigger value="security">Sécurité</TabsTrigger>
         <TabsTrigger value="realtime-score">Score Temps Réel</TabsTrigger>
+        <TabsTrigger value="blockchain">Blockchain</TabsTrigger>
+        <TabsTrigger value="executive">Dashboard</TabsTrigger>
+        <TabsTrigger value="training">Formation</TabsTrigger>
       </TabsList>
 
       <TabsContent value="export">
@@ -208,6 +214,18 @@ export function MultiFormatExporter() {
 
       <TabsContent value="realtime-score">
         <RealtimeComplianceScore />
+      </TabsContent>
+
+      <TabsContent value="blockchain">
+        <BlockchainAuditTrail />
+      </TabsContent>
+
+      <TabsContent value="executive">
+        <ExecutiveDashboard />
+      </TabsContent>
+
+      <TabsContent value="training">
+        <TrainingSystem />
       </TabsContent>
     </Tabs>
   );

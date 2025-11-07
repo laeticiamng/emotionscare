@@ -278,3 +278,9 @@ verify_jwt = true
 
 [functions.realtime-compliance-scoring]
 verify_jwt = true
+
+[functions.blockchain-audit]
+verify_jwt = true
+
+[functions.executive-dashboard-ai]
+verify_jwt = true
