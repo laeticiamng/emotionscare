@@ -16,6 +16,7 @@ import CriticalAlertsNotification from '@/components/gdpr/CriticalAlertsNotifica
 import GDPRRealtimeDashboard from '@/components/gdpr/GDPRRealtimeDashboard';
 import GDPRAlertHistory from '@/components/gdpr/GDPRAlertHistory';
 import GDPRAuditTrail from '@/components/gdpr/GDPRAuditTrail';
+import GDPRExecutiveDashboard from '@/components/gdpr/GDPRExecutiveDashboard';
 import { useGDPRMonitoring } from '@/hooks/useGDPRMonitoring';
 import { useGDPRComplianceScore } from '@/hooks/useGDPRComplianceScore';
 import { useGDPRRealtimeAlerts } from '@/hooks/useGDPRRealtimeAlerts';
@@ -63,8 +64,9 @@ const GDPRMonitoringPage: React.FC = () => {
         </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-10">
+        <TabsList className="grid w-full grid-cols-11">
           <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
+          <TabsTrigger value="executive">Exécutif</TabsTrigger>
           <TabsTrigger value="realtime">Temps réel</TabsTrigger>
           <TabsTrigger value="compliance">
             <Shield className="h-4 w-4 mr-2" />
@@ -181,6 +183,10 @@ const GDPRMonitoringPage: React.FC = () => {
             <DataExportStatsChart data={exportStats?.timeline || []} isLoading={isLoading} />
             <DataDeletionStatsChart data={deletionStats?.timeline || []} isLoading={isLoading} />
           </div>
+        </TabsContent>
+
+        <TabsContent value="executive" className="space-y-6 mt-6">
+          <GDPRExecutiveDashboard />
         </TabsContent>
 
         <TabsContent value="realtime" className="space-y-6 mt-6">

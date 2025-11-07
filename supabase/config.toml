@@ -206,3 +206,9 @@ verify_jwt = true
 
 [functions.gdpr-scheduled-export]
 verify_jwt = false
+
+[functions.generate-executive-report]
+verify_jwt = true
+
+[functions.monthly-executive-report]
+verify_jwt = false
