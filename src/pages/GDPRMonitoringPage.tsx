@@ -15,6 +15,7 @@ import { ScheduledExportsManager } from '@/components/gdpr/ScheduledExportsManag
 import CriticalAlertsNotification from '@/components/gdpr/CriticalAlertsNotification';
 import GDPRRealtimeDashboard from '@/components/gdpr/GDPRRealtimeDashboard';
 import GDPRAlertHistory from '@/components/gdpr/GDPRAlertHistory';
+import GDPRAuditTrail from '@/components/gdpr/GDPRAuditTrail';
 import { useGDPRMonitoring } from '@/hooks/useGDPRMonitoring';
 import { useGDPRComplianceScore } from '@/hooks/useGDPRComplianceScore';
 import { useGDPRRealtimeAlerts } from '@/hooks/useGDPRRealtimeAlerts';
@@ -62,7 +63,7 @@ const GDPRMonitoringPage: React.FC = () => {
         </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-9">
+        <TabsList className="grid w-full grid-cols-10">
           <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
           <TabsTrigger value="realtime">Temps réel</TabsTrigger>
           <TabsTrigger value="compliance">
@@ -74,9 +75,10 @@ const GDPRMonitoringPage: React.FC = () => {
             Alertes
           </TabsTrigger>
           <TabsTrigger value="history">Historique</TabsTrigger>
+          <TabsTrigger value="audit">Audit Trail</TabsTrigger>
           <TabsTrigger value="consents">Consentements</TabsTrigger>
           <TabsTrigger value="exports">Exports</TabsTrigger>
-          <TabsTrigger value="audit">Audit Logs</TabsTrigger>
+          <TabsTrigger value="logs">Logs</TabsTrigger>
           <TabsTrigger value="scheduled">Planifications</TabsTrigger>
         </TabsList>
 
@@ -213,6 +215,10 @@ const GDPRMonitoringPage: React.FC = () => {
           <GDPRAlertHistory />
         </TabsContent>
 
+        <TabsContent value="audit" className="space-y-6 mt-6">
+          <GDPRAuditTrail />
+        </TabsContent>
+
         <TabsContent value="consents" className="space-y-6 mt-6">
           <ConsentStatsCard stats={consentStats} isLoading={isLoading} />
         </TabsContent>
@@ -227,7 +233,7 @@ const GDPRMonitoringPage: React.FC = () => {
           </div>
         </TabsContent>
 
-        <TabsContent value="audit" className="space-y-6 mt-6">
+        <TabsContent value="logs" className="space-y-6 mt-6">
           <AuditLogsTable logs={auditLogs || []} isLoading={isLoading} />
         </TabsContent>
 
