@@ -30,6 +30,7 @@ import { DSARManager } from '@/components/gdpr/DSARManager';
 import ViolationMonitoringDashboard from '@/components/gdpr/ViolationMonitoringDashboard';
 import { PDFReportHistory } from '@/components/gdpr/PDFReportHistory';
 import { PDFReportScheduler } from '@/components/gdpr/PDFReportScheduler';
+import { MultiFormatExporter } from '@/components/gdpr/MultiFormatExporter';
 import { useGDPRMonitoring } from '@/hooks/useGDPRMonitoring';
 import { useGDPRComplianceScore } from '@/hooks/useGDPRComplianceScore';
 import { useGDPRRealtimeAlerts } from '@/hooks/useGDPRRealtimeAlerts';
@@ -306,6 +307,7 @@ const GDPRMonitoringPage: React.FC = () => {
         </TabsContent>
 
         <TabsContent value="pdf-reports" className="space-y-6 mt-6">
+          <MultiFormatExporter />
           <PDFReportHistory />
         </TabsContent>
 
