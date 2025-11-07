@@ -56,6 +56,86 @@ export type Database = {
         }
         Relationships: []
       }
+      accessibility_report_config: {
+        Row: {
+          created_at: string
+          enabled: boolean
+          frequency: string
+          github_token: string | null
+          id: string
+          last_sent_at: string | null
+          recipients: string[]
+          send_day: number | null
+          send_hour: number | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          enabled?: boolean
+          frequency?: string
+          github_token?: string | null
+          id?: string
+          last_sent_at?: string | null
+          recipients?: string[]
+          send_day?: number | null
+          send_hour?: number | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          enabled?: boolean
+          frequency?: string
+          github_token?: string | null
+          id?: string
+          last_sent_at?: string | null
+          recipients?: string[]
+          send_day?: number | null
+          send_hour?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      accessibility_report_history: {
+        Row: {
+          config_id: string | null
+          created_at: string
+          error_message: string | null
+          id: string
+          recipients: string[]
+          report_data: Json | null
+          sent_at: string
+          status: string
+        }
+        Insert: {
+          config_id?: string | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          recipients: string[]
+          report_data?: Json | null
+          sent_at?: string
+          status: string
+        }
+        Update: {
+          config_id?: string | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          recipients?: string[]
+          report_data?: Json | null
+          sent_at?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "accessibility_report_history_config_id_fkey"
+            columns: ["config_id"]
+            isOneToOne: false
+            referencedRelation: "accessibility_report_config"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       achievements: {
         Row: {
           category: string
@@ -4222,6 +4302,57 @@ export type Database = {
           title?: string
           updated_at?: string
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      gdpr_scheduled_exports: {
+        Row: {
+          admin_emails: string[]
+          created_at: string
+          created_by: string | null
+          day_of_month: number | null
+          day_of_week: number | null
+          format: string
+          frequency: string
+          id: string
+          is_active: boolean
+          last_run_at: string | null
+          next_run_at: string | null
+          org_id: string | null
+          time: string
+          updated_at: string
+        }
+        Insert: {
+          admin_emails: string[]
+          created_at?: string
+          created_by?: string | null
+          day_of_month?: number | null
+          day_of_week?: number | null
+          format: string
+          frequency: string
+          id?: string
+          is_active?: boolean
+          last_run_at?: string | null
+          next_run_at?: string | null
+          org_id?: string | null
+          time?: string
+          updated_at?: string
+        }
+        Update: {
+          admin_emails?: string[]
+          created_at?: string
+          created_by?: string | null
+          day_of_month?: number | null
+          day_of_week?: number | null
+          format?: string
+          frequency?: string
+          id?: string
+          is_active?: boolean
+          last_run_at?: string | null
+          next_run_at?: string | null
+          org_id?: string | null
+          time?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -12641,6 +12772,15 @@ export type Database = {
           p_tableau_b: Json
         }
         Returns: number
+      }
+      calculate_next_run: {
+        Args: {
+          p_day_of_month: number
+          p_day_of_week: number
+          p_frequency: string
+          p_time: string
+        }
+        Returns: string
       }
       calculate_sla_metrics: { Args: never; Returns: undefined }
       calculate_user_learning_path: {

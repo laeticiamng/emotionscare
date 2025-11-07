@@ -203,3 +203,6 @@ verify_jwt = true
 
 [functions.gdpr-compliance-score]
 verify_jwt = true
+
+[functions.gdpr-scheduled-export]
+verify_jwt = false
