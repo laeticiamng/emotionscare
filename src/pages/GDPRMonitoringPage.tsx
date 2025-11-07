@@ -8,12 +8,16 @@ import ExportRequestsTable from '@/components/gdpr/ExportRequestsTable';
 import DataExportStatsChart from '@/components/gdpr/DataExportStatsChart';
 import DataDeletionStatsChart from '@/components/gdpr/DataDeletionStatsChart';
 import GDPRAlerts from '@/components/gdpr/GDPRAlerts';
+import GDPRComplianceGauge from '@/components/gdpr/GDPRComplianceGauge';
+import GDPRRecommendations from '@/components/gdpr/GDPRRecommendations';
 import ExportReportButton from '@/components/gdpr/ExportReportButton';
 import { useGDPRMonitoring } from '@/hooks/useGDPRMonitoring';
+import { useGDPRComplianceScore } from '@/hooks/useGDPRComplianceScore';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const GDPRMonitoringPage: React.FC = () => {
   const { consentStats, auditLogs, exportStats, deletionStats, isLoading } = useGDPRMonitoring();
+  const { data: complianceData, isLoading: isLoadingCompliance } = useGDPRComplianceScore();
   const [activeTab, setActiveTab] = useState('overview');
 
   return (
@@ -32,8 +36,12 @@ const GDPRMonitoringPage: React.FC = () => {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
+          <TabsTrigger value="compliance">
+            <Shield className="h-4 w-4 mr-2" />
+            Conformité
+          </TabsTrigger>
           <TabsTrigger value="alerts">
             <Bell className="h-4 w-4 mr-2" />
             Alertes
@@ -44,6 +52,36 @@ const GDPRMonitoringPage: React.FC = () => {
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6 mt-6">
+          {/* Compliance Score Preview */}
+          {complianceData && !isLoadingCompliance && (
+            <Card className="bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 bg-primary/10 rounded-full">
+                      <Shield className="h-8 w-8 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">Score de conformité RGPD</p>
+                      <div className="flex items-baseline gap-2 mt-1">
+                        <span className="text-4xl font-bold text-foreground">
+                          {complianceData.score}
+                        </span>
+                        <span className="text-lg text-muted-foreground">/ 100</span>
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setActiveTab('compliance')}
+                    className="text-sm text-primary hover:underline font-medium"
+                  >
+                    Voir les détails →
+                  </button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           <GDPRAlerts />
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {isLoading ? (
@@ -111,6 +149,26 @@ const GDPRMonitoringPage: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <DataExportStatsChart data={exportStats?.timeline || []} isLoading={isLoading} />
             <DataDeletionStatsChart data={deletionStats?.timeline || []} isLoading={isLoading} />
+          </div>
+        </TabsContent>
+
+        <TabsContent value="compliance" className="space-y-6 mt-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <GDPRComplianceGauge
+              score={complianceData?.score || 0}
+              breakdown={complianceData?.breakdown || {
+                consentRate: 0,
+                exportSpeed: 0,
+                deletionSpeed: 0,
+                alerts: 0,
+                overdueCompliance: 0,
+              }}
+              isLoading={isLoadingCompliance}
+            />
+            <GDPRRecommendations
+              recommendations={complianceData?.recommendations || []}
+              isLoading={isLoadingCompliance}
+            />
           </div>
         </TabsContent>
 

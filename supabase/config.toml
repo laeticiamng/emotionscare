@@ -194,3 +194,12 @@ enable_confirmations = false
 
 [functions.shopify-webhook]
 verify_jwt = false
+
+[functions.gdpr-alert-detector]
+verify_jwt = true
+
+[functions.gdpr-report-export]
+verify_jwt = true
+
+[functions.gdpr-compliance-score]
+verify_jwt = true
