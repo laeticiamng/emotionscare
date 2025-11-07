@@ -1,5 +1,6 @@
 // @ts-nocheck
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -324,7 +325,15 @@ const B2BSecurityPage: React.FC = () => {
             </TabsContent>
 
             <TabsContent value="monitoring" className="space-y-6">
-              <h2 className="text-2xl font-bold">Monitoring de Sécurité en Temps Réel</h2>
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-2xl font-bold">Monitoring de Sécurité en Temps Réel</h2>
+                <Link to="/gdpr-monitoring">
+                  <Button>
+                    <Shield className="h-4 w-4 mr-2" />
+                    Monitoring RGPD
+                  </Button>
+                </Link>
+              </div>
               
               <div className="space-y-4">
                 {securityEvents.map((event) => (

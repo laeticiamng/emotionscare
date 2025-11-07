@@ -1138,6 +1138,15 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: true,
     aliases: ['/accessibility'],
   },
+  {
+    name: 'gdpr-monitoring',
+    path: '/gdpr-monitoring',
+    segment: 'manager',
+    role: 'manager',
+    layout: 'app',
+    component: 'GDPRMonitoringPage',
+    guard: true,
+  },
 
   
   // ═══════════════════════════════════════════════════════════

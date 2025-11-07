@@ -171,6 +171,7 @@ export const b2bRoutes = {
   security: () => resolveRoutePath('admin-security'),
   audit: () => resolveRoutePath('admin-audit'),
   accessibility: () => resolveRoutePath('admin-accessibility'),
+  gdprMonitoring: () => resolveRoutePath('gdpr-monitoring'),
   user: {
     dashboard: () => resolveRoutePath('employee-home'),
   },
@@ -178,6 +179,7 @@ export const b2bRoutes = {
     dashboard: () => resolveRoutePath('manager-home'),
     analytics: () => resolveRoutePath('admin-optimization'),
     settings: () => resolveRoutePath('admin-security'),
+    gdprMonitoring: () => resolveRoutePath('gdpr-monitoring'),
   },
 } as const;
 

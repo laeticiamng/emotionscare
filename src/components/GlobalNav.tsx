@@ -85,6 +85,9 @@ const GlobalNav: React.FC = () => {
                   <DropdownMenuItem asChild>
                     <Link to={routes.b2b.admin.dashboard()}>Admin Dashboard</Link>
                   </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to={routes.b2b.admin.gdprMonitoring()}>Monitoring RGPD</Link>
+                  </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={logout}>
                     Log out
