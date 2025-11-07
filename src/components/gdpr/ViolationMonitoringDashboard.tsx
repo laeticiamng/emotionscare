@@ -34,6 +34,7 @@ import {
 import { useViolationMonitoring, GDPRViolation, ViolationAlert } from '@/hooks/useViolationMonitoring';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import PDFExportButton from './PDFExportButton';
 
 const ViolationMonitoringDashboard: React.FC = () => {
   const {
@@ -113,6 +114,7 @@ const ViolationMonitoringDashboard: React.FC = () => {
           </p>
         </div>
         <div className="flex gap-2">
+          <PDFExportButton variant="outline" />
           <Button onClick={refresh} variant="outline" disabled={isLoading}>
             <RefreshCw className={`mr-2 h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
             Actualiser

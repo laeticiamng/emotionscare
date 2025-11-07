@@ -242,3 +242,6 @@ verify_jwt = true
 
 [functions.violation-detector]
 verify_jwt = true
+
+[functions.generate-audit-pdf]
+verify_jwt = true

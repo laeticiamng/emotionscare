@@ -6,6 +6,7 @@ import { useDSAR } from '@/hooks/useDSAR';
 import { FileText, Download } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import PDFExportButton from './PDFExportButton';
 
 export const DSARManager = () => {
   const { requests, isLoading, generatePackage } = useDSAR();
@@ -16,6 +17,9 @@ export const DSARManager = () => {
 
   return (
     <div className="space-y-4">
+      <div className="flex justify-end mb-4">
+        <PDFExportButton variant="outline" />
+      </div>
       {requests.map(request => (
         <Card key={request.id}>
           <CardHeader>

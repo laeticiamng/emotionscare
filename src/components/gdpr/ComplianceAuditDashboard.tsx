@@ -10,9 +10,7 @@ import {
   Shield, Play, Download, AlertTriangle, CheckCircle, 
   XCircle, TrendingUp, FileText, Clock
 } from 'lucide-react';
-import { useComplianceAudit } from '@/hooks/useComplianceAudit';
-import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import PDFExportButton from './PDFExportButton';
 import {
   RadialBarChart, RadialBar, Legend, ResponsiveContainer,
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip
@@ -36,11 +34,6 @@ export const ComplianceAuditDashboard = () => {
   } = useComplianceAudit();
 
   const [activeTab, setActiveTab] = useState('overview');
-
-  const handleExportPDF = async () => {
-    // TODO: Implémenter la génération PDF
-    toast.info('Génération du rapport PDF...');
-  };
 
   if (isLoading) {
     return (
@@ -85,10 +78,7 @@ export const ComplianceAuditDashboard = () => {
           )}
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={handleExportPDF} disabled={!audit}>
-            <Download className="h-4 w-4 mr-2" />
-            Exporter PDF
-          </Button>
+          <PDFExportButton auditId={audit?.id} variant="outline" />
           <Button onClick={() => runAudit()} disabled={isRunning}>
             <Play className="h-4 w-4 mr-2" />
             {isRunning ? 'Audit en cours...' : 'Lancer un audit'}
