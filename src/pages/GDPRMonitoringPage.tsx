@@ -12,29 +12,52 @@ import GDPRComplianceGauge from '@/components/gdpr/GDPRComplianceGauge';
 import GDPRRecommendations from '@/components/gdpr/GDPRRecommendations';
 import ExportReportButton from '@/components/gdpr/ExportReportButton';
 import { ScheduledExportsManager } from '@/components/gdpr/ScheduledExportsManager';
+import CriticalAlertsNotification from '@/components/gdpr/CriticalAlertsNotification';
 import { useGDPRMonitoring } from '@/hooks/useGDPRMonitoring';
 import { useGDPRComplianceScore } from '@/hooks/useGDPRComplianceScore';
+import { useGDPRRealtimeAlerts } from '@/hooks/useGDPRRealtimeAlerts';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Badge } from '@/components/ui/badge';
 
 const GDPRMonitoringPage: React.FC = () => {
   const { consentStats, auditLogs, exportStats, deletionStats, isLoading } = useGDPRMonitoring();
   const { data: complianceData, isLoading: isLoadingCompliance } = useGDPRComplianceScore();
+  const { criticalAlerts, isConnected, resolveCriticalAlert } = useGDPRRealtimeAlerts({
+    enableSound: true,
+    enableBrowserNotifications: true,
+  });
   const [activeTab, setActiveTab] = useState('overview');
 
   return (
-    <div className="container mx-auto py-8 px-4 space-y-6">
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
-          <Shield className="h-8 w-8 text-primary" />
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">Monitoring RGPD</h1>
-            <p className="text-muted-foreground">
-              Tableau de bord de conformité et audit des données personnelles
-            </p>
+    <>
+      {/* Bannière de notifications critiques en temps réel */}
+      <CriticalAlertsNotification
+        alerts={criticalAlerts}
+        onResolve={resolveCriticalAlert}
+        onViewAll={() => setActiveTab('alerts')}
+      />
+
+      <div className="container mx-auto py-8 px-4 space-y-6">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <Shield className="h-8 w-8 text-primary" />
+            <div>
+              <div className="flex items-center gap-3">
+                <h1 className="text-3xl font-bold text-foreground">Monitoring RGPD</h1>
+                {isConnected && (
+                  <Badge variant="outline" className="text-xs">
+                    <span className="inline-block w-2 h-2 bg-green-500 rounded-full mr-1 animate-pulse" />
+                    Temps réel actif
+                  </Badge>
+                )}
+              </div>
+              <p className="text-muted-foreground">
+                Tableau de bord de conformité et audit des données personnelles
+              </p>
+            </div>
           </div>
+          <ExportReportButton />
         </div>
-        <ExportReportButton />
-      </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-7">
@@ -200,7 +223,8 @@ const GDPRMonitoringPage: React.FC = () => {
           <ScheduledExportsManager />
         </TabsContent>
       </Tabs>
-    </div>
+      </div>
+    </>
   );
 };
 
