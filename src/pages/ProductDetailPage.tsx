@@ -5,6 +5,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import DOMPurify from 'dompurify';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -196,7 +197,12 @@ const ProductDetailPage: React.FC = () => {
 
             <div 
               className="prose prose-sm max-w-none text-muted-foreground"
-              dangerouslySetInnerHTML={{ __html: product.description || '' }}
+              dangerouslySetInnerHTML={{ 
+                __html: DOMPurify.sanitize(product.description || '', {
+                  ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'ul', 'ol', 'li', 'h3', 'h4'],
+                  ALLOWED_ATTR: []
+                })
+              }}
             />
 
             {/* Variants si présents */}

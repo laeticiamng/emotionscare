@@ -11,9 +11,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useMotionPrefs } from '@/hooks/useMotionPrefs';
 import { cn } from '@/lib/utils';
 import { logger } from '@/lib/logger';
+import { MedicalDisclaimerDialog, useMedicalDisclaimer } from '@/components/medical/MedicalDisclaimerDialog';
 
 const JournalNewPage: React.FC = () => {
   const navigate = useNavigate();
+  const { showDisclaimer, handleAccept, handleDecline } = useMedicalDisclaimer('journal');
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [mood, setMood] = useState('');
@@ -313,6 +315,13 @@ const JournalNewPage: React.FC = () => {
           </ul>
         </Card>
       </div>
+      
+      <MedicalDisclaimerDialog 
+        feature="journal"
+        open={showDisclaimer}
+        onAccept={handleAccept}
+        onDecline={handleDecline}
+      />
     </div>
   );
 };

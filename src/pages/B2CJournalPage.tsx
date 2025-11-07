@@ -7,6 +7,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { JournalSettingsLink } from '@/components/journal/JournalSettingsLink'
 import { JournalOnboarding } from '@/components/journal/JournalOnboarding'
 import { JournalQuickTips } from '@/components/journal/JournalQuickTips'
+import { MedicalDisclaimerDialog, useMedicalDisclaimer } from '@/components/medical/MedicalDisclaimerDialog'
 
 const ONBOARDING_KEY = 'journal-onboarding-completed';
 
@@ -15,6 +16,7 @@ export default function B2CJournalPage() {
   const journalEnabled = has('FF_JOURNAL')
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showTips, setShowTips] = useState(false);
+  const { showDisclaimer, handleAccept, handleDecline } = useMedicalDisclaimer('journal');
 
   useEffect(() => {
     // Vérifier si l'utilisateur a déjà vu l'onboarding
@@ -76,6 +78,13 @@ export default function B2CJournalPage() {
           onDismiss={handleOnboardingDismiss}
         />
       )}
+      
+      <MedicalDisclaimerDialog 
+        feature="journal"
+        open={showDisclaimer}
+        onAccept={handleAccept}
+        onDecline={handleDecline}
+      />
     </PageRoot>
   )
 }
