@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Shield, FileText, Download, Trash2 } from 'lucide-react';
+import { Shield, FileText, Download, Trash2, Bell } from 'lucide-react';
 import ConsentStatsCard from '@/components/gdpr/ConsentStatsCard';
 import AuditLogsTable from '@/components/gdpr/AuditLogsTable';
 import DataExportStatsChart from '@/components/gdpr/DataExportStatsChart';
 import DataDeletionStatsChart from '@/components/gdpr/DataDeletionStatsChart';
+import GDPRAlerts from '@/components/gdpr/GDPRAlerts';
 import { useGDPRMonitoring } from '@/hooks/useGDPRMonitoring';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -26,14 +27,19 @@ const GDPRMonitoringPage: React.FC = () => {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
+          <TabsTrigger value="alerts">
+            <Bell className="h-4 w-4 mr-2" />
+            Alertes
+          </TabsTrigger>
           <TabsTrigger value="consents">Consentements</TabsTrigger>
           <TabsTrigger value="exports">Exports</TabsTrigger>
           <TabsTrigger value="audit">Audit Logs</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6 mt-6">
+          <GDPRAlerts />
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {isLoading ? (
               <>
@@ -101,6 +107,10 @@ const GDPRMonitoringPage: React.FC = () => {
             <DataExportStatsChart data={exportStats?.timeline || []} isLoading={isLoading} />
             <DataDeletionStatsChart data={deletionStats?.timeline || []} isLoading={isLoading} />
           </div>
+        </TabsContent>
+
+        <TabsContent value="alerts" className="space-y-6 mt-6">
+          <GDPRAlerts />
         </TabsContent>
 
         <TabsContent value="consents" className="space-y-6 mt-6">
