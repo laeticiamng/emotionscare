@@ -233,3 +233,6 @@ verify_jwt = false
 
 [functions.compliance-audit]
 verify_jwt = true
+
+[functions.scheduled-audits]
+verify_jwt = false

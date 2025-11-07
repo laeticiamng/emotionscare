@@ -759,6 +759,69 @@ export type Database = {
           },
         ]
       }
+      audit_alerts: {
+        Row: {
+          alert_type: string
+          audit_id: string
+          created_at: string
+          current_score: number | null
+          id: string
+          is_sent: boolean
+          message: string
+          previous_score: number | null
+          schedule_id: string | null
+          score_drop: number | null
+          sent_at: string | null
+          severity: string
+          title: string
+        }
+        Insert: {
+          alert_type: string
+          audit_id: string
+          created_at?: string
+          current_score?: number | null
+          id?: string
+          is_sent?: boolean
+          message: string
+          previous_score?: number | null
+          schedule_id?: string | null
+          score_drop?: number | null
+          sent_at?: string | null
+          severity?: string
+          title: string
+        }
+        Update: {
+          alert_type?: string
+          audit_id?: string
+          created_at?: string
+          current_score?: number | null
+          id?: string
+          is_sent?: boolean
+          message?: string
+          previous_score?: number | null
+          schedule_id?: string | null
+          score_drop?: number | null
+          sent_at?: string | null
+          severity?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audit_alerts_audit_id_fkey"
+            columns: ["audit_id"]
+            isOneToOne: false
+            referencedRelation: "compliance_audits"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "audit_alerts_schedule_id_fkey"
+            columns: ["schedule_id"]
+            isOneToOne: false
+            referencedRelation: "audit_schedules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audit_fixes: {
         Row: {
           applied: boolean | null
@@ -865,6 +928,47 @@ export type Database = {
           },
         ]
       }
+      audit_notifications: {
+        Row: {
+          alert_id: string
+          created_at: string
+          error_message: string | null
+          id: string
+          notification_type: string
+          recipient_email: string
+          sent_at: string | null
+          status: string
+        }
+        Insert: {
+          alert_id: string
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          notification_type: string
+          recipient_email: string
+          sent_at?: string | null
+          status?: string
+        }
+        Update: {
+          alert_id?: string
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          notification_type?: string
+          recipient_email?: string
+          sent_at?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audit_notifications_alert_id_fkey"
+            columns: ["alert_id"]
+            isOneToOne: false
+            referencedRelation: "audit_alerts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audit_reports: {
         Row: {
           completed_at: string | null
@@ -898,6 +1002,57 @@ export type Database = {
           recommendations?: Json | null
           report_type?: string
           status?: string
+        }
+        Relationships: []
+      }
+      audit_schedules: {
+        Row: {
+          alert_recipients: Json | null
+          alert_threshold: number | null
+          created_at: string
+          created_by: string | null
+          day_of_month: number | null
+          day_of_week: number | null
+          frequency: string
+          id: string
+          is_active: boolean
+          last_run_at: string | null
+          name: string
+          next_run_at: string | null
+          time_of_day: string
+          updated_at: string
+        }
+        Insert: {
+          alert_recipients?: Json | null
+          alert_threshold?: number | null
+          created_at?: string
+          created_by?: string | null
+          day_of_month?: number | null
+          day_of_week?: number | null
+          frequency: string
+          id?: string
+          is_active?: boolean
+          last_run_at?: string | null
+          name: string
+          next_run_at?: string | null
+          time_of_day?: string
+          updated_at?: string
+        }
+        Update: {
+          alert_recipients?: Json | null
+          alert_threshold?: number | null
+          created_at?: string
+          created_by?: string | null
+          day_of_month?: number | null
+          day_of_week?: number | null
+          frequency?: string
+          id?: string
+          is_active?: boolean
+          last_run_at?: string | null
+          name?: string
+          next_run_at?: string | null
+          time_of_day?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -14037,6 +14192,15 @@ export type Database = {
         }
         Returns: number
       }
+      calculate_next_audit_run: {
+        Args: {
+          p_day_of_month: number
+          p_day_of_week: number
+          p_frequency: string
+          p_time_of_day: string
+        }
+        Returns: string
+      }
       calculate_next_run: {
         Args: {
           p_day_of_month: number
@@ -14200,6 +14364,7 @@ export type Database = {
       }
       detect_data_inconsistencies: { Args: never; Returns: Json }
       detect_edn_duplicates: { Args: never; Returns: Json }
+      detect_score_drops: { Args: { p_audit_id: string }; Returns: undefined }
       emergency_security_cleanup: {
         Args: never
         Returns: {
@@ -14429,6 +14594,15 @@ export type Database = {
         Returns: {
           week_end: string
           week_start: string
+        }[]
+      }
+      get_due_audit_schedules: {
+        Args: never
+        Returns: {
+          frequency: string
+          last_run: string
+          schedule_id: string
+          schedule_name: string
         }[]
       }
       get_edn_objectifs_rapport: {
