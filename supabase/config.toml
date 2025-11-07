@@ -1,5 +1,8 @@
 project_id = "yaincoxihiqdksxgrsrk"
 
+[functions.unified-api]
+verify_jwt = true
+
 [functions.journal-voice]
 verify_jwt = true
 
