@@ -172,6 +172,9 @@ export const b2bRoutes = {
   audit: () => resolveRoutePath('admin-audit'),
   accessibility: () => resolveRoutePath('admin-accessibility'),
   gdprMonitoring: () => resolveRoutePath('gdpr-monitoring'),
+  gdprDashboard: () => resolveRoutePath('gdpr-dashboard'),
+  cronMonitoring: () => resolveRoutePath('gdpr-cron-monitoring'),
+  blockchainBackups: () => resolveRoutePath('gdpr-blockchain-backups'),
   user: {
     dashboard: () => resolveRoutePath('employee-home'),
   },
@@ -180,6 +183,9 @@ export const b2bRoutes = {
     analytics: () => resolveRoutePath('admin-optimization'),
     settings: () => resolveRoutePath('admin-security'),
     gdprMonitoring: () => resolveRoutePath('gdpr-monitoring'),
+    gdprDashboard: () => resolveRoutePath('gdpr-dashboard'),
+    cronMonitoring: () => resolveRoutePath('gdpr-cron-monitoring'),
+    blockchainBackups: () => resolveRoutePath('gdpr-blockchain-backups'),
   },
 } as const;
 

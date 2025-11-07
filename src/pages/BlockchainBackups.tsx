@@ -22,7 +22,7 @@ import { BlockchainRestore } from '@/components/BlockchainRestore';
 /**
  * Page complète de gestion des backups blockchain
  */
-export const BlockchainBackups = () => {
+const BlockchainBackups = () => {
   const {
     backups,
     integrityStats,
@@ -346,3 +346,5 @@ export const BlockchainBackups = () => {
     </div>
   );
 };
+
+export default BlockchainBackups;

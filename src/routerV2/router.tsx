@@ -103,6 +103,11 @@ const B2BSecurityPage = lazy(() => import('@/pages/B2BSecurityPage'));
 const B2BAuditPage = lazy(() => import('@/pages/B2BAuditPage'));
 const B2BAccessibilityPage = lazy(() => import('@/pages/B2BAccessibilityPage'));
 
+// GDPR & Compliance pages
+const GDPRDashboard = lazy(() => import('@/pages/GDPRDashboard'));
+const CronMonitoring = lazy(() => import('@/pages/CronMonitoring'));
+const BlockchainBackups = lazy(() => import('@/pages/BlockchainBackups'));
+
 // Pages Fun-First intégrées
 const B2CAmbitionArcadePage = lazy(() => import('@/pages/B2CAmbitionArcadePage'));
 const B2CBossLevelGritPage = lazy(() => import('@/pages/B2CBossLevelGritPage'));
@@ -465,6 +470,11 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   WeeklyReportPage,
   MonthlyReportPage,
   NavigationPage,
+  
+  // GDPR & Compliance
+  GDPRDashboard,
+  CronMonitoring,
+  BlockchainBackups,
 };
 
 // ═══════════════════════════════════════════════════════════

@@ -1147,6 +1147,34 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     component: 'GDPRMonitoringPage',
     guard: true,
   },
+  {
+    name: 'gdpr-dashboard',
+    path: '/gdpr/dashboard',
+    segment: 'manager',
+    role: 'manager',
+    layout: 'app',
+    component: 'GDPRDashboard',
+    guard: true,
+    aliases: ['/gdpr'],
+  },
+  {
+    name: 'gdpr-cron-monitoring',
+    path: '/gdpr/cron-monitoring',
+    segment: 'manager',
+    role: 'manager',
+    layout: 'app',
+    component: 'CronMonitoring',
+    guard: true,
+  },
+  {
+    name: 'gdpr-blockchain-backups',
+    path: '/gdpr/blockchain-backups',
+    segment: 'manager',
+    role: 'manager',
+    layout: 'app',
+    component: 'BlockchainBackups',
+    guard: true,
+  },
 
   
   // ═══════════════════════════════════════════════════════════

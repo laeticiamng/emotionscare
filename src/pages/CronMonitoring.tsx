@@ -9,7 +9,7 @@ import { useState } from 'react';
 /**
  * Page de monitoring des jobs cron en temps réel
  */
-export const CronMonitoring = () => {
+const CronMonitoring = () => {
   const [selectedJob, setSelectedJob] = useState<'scheduled-pdf-reports' | 'pdf-notifications'>('scheduled-pdf-reports');
   
   const { data: pdfReportsLogs, isLoading: loadingPdfReports, refetch: refetchPdfReports } = useEdgeFunctionLogs('scheduled-pdf-reports');
@@ -289,3 +289,5 @@ export const CronMonitoring = () => {
     </div>
   );
 };
+
+export default CronMonitoring;

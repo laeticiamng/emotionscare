@@ -86,7 +86,13 @@ const GlobalNav: React.FC = () => {
                     <Link to={routes.b2b.admin.dashboard()}>Admin Dashboard</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link to={routes.b2b.admin.gdprMonitoring()}>Monitoring RGPD</Link>
+                    <Link to={routes.b2b.admin.gdprDashboard()}>Dashboard RGPD</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to={routes.b2b.admin.cronMonitoring()}>Monitoring Cron</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to={routes.b2b.admin.blockchainBackups()}>Backups Blockchain</Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={logout}>
