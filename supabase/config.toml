@@ -249,6 +249,9 @@ verify_jwt = true
 [functions.scheduled-pdf-reports]
 verify_jwt = false
 
+[functions.pdf-notifications]
+verify_jwt = false
+
 [functions.export-csv-email]
 verify_jwt = true
 

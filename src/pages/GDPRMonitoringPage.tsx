@@ -28,6 +28,8 @@ import { ComplianceAuditDashboard } from '@/components/gdpr/ComplianceAuditDashb
 import { ScheduledAuditsManager } from '@/components/gdpr/ScheduledAuditsManager';
 import { DSARManager } from '@/components/gdpr/DSARManager';
 import ViolationMonitoringDashboard from '@/components/gdpr/ViolationMonitoringDashboard';
+import { PDFReportHistory } from '@/components/gdpr/PDFReportHistory';
+import { PDFReportScheduler } from '@/components/gdpr/PDFReportScheduler';
 import { useGDPRMonitoring } from '@/hooks/useGDPRMonitoring';
 import { useGDPRComplianceScore } from '@/hooks/useGDPRComplianceScore';
 import { useGDPRRealtimeAlerts } from '@/hooks/useGDPRRealtimeAlerts';
@@ -75,7 +77,7 @@ const GDPRMonitoringPage: React.FC = () => {
         </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-8 lg:grid-cols-19">
+        <TabsList className="grid w-full grid-cols-8 lg:grid-cols-21">
           <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
           <TabsTrigger value="executive">Exécutif</TabsTrigger>
           <TabsTrigger value="realtime">Temps réel</TabsTrigger>
@@ -104,6 +106,11 @@ const GDPRMonitoringPage: React.FC = () => {
           <TabsTrigger value="scheduled">Planifications</TabsTrigger>
           <TabsTrigger value="dsar">Demandes DSAR</TabsTrigger>
           <TabsTrigger value="violations">Monitoring Violations</TabsTrigger>
+          <TabsTrigger value="pdf-reports">
+            <FileText className="h-4 w-4 mr-2" />
+            Rapports PDF
+          </TabsTrigger>
+          <TabsTrigger value="pdf-scheduler">Planification PDF</TabsTrigger>
           <TabsTrigger value="exports">Exports</TabsTrigger>
           <TabsTrigger value="logs">Logs</TabsTrigger>
           <TabsTrigger value="scheduled-exports">Exports planifiés</TabsTrigger>
@@ -296,6 +303,14 @@ const GDPRMonitoringPage: React.FC = () => {
 
         <TabsContent value="violations" className="space-y-6 mt-6">
           <ViolationMonitoringDashboard />
+        </TabsContent>
+
+        <TabsContent value="pdf-reports" className="space-y-6 mt-6">
+          <PDFReportHistory />
+        </TabsContent>
+
+        <TabsContent value="pdf-scheduler" className="space-y-6 mt-6">
+          <PDFReportScheduler />
         </TabsContent>
 
         <TabsContent value="exports" className="space-y-6 mt-6">
