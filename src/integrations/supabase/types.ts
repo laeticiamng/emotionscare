@@ -2299,6 +2299,236 @@ export type Database = {
         }
         Relationships: []
       }
+      compliance_audits: {
+        Row: {
+          audit_date: string
+          audit_type: string
+          completed_at: string | null
+          created_at: string
+          id: string
+          metadata: Json | null
+          overall_score: number
+          report_url: string | null
+          status: string
+          triggered_by: string | null
+        }
+        Insert: {
+          audit_date?: string
+          audit_type?: string
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          overall_score?: number
+          report_url?: string | null
+          status?: string
+          triggered_by?: string | null
+        }
+        Update: {
+          audit_date?: string
+          audit_type?: string
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          overall_score?: number
+          report_url?: string | null
+          status?: string
+          triggered_by?: string | null
+        }
+        Relationships: []
+      }
+      compliance_categories: {
+        Row: {
+          code: string
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          max_score: number
+          name: string
+          weight: number
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          max_score?: number
+          name: string
+          weight?: number
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          max_score?: number
+          name?: string
+          weight?: number
+        }
+        Relationships: []
+      }
+      compliance_checks: {
+        Row: {
+          category_id: string
+          check_code: string
+          check_name: string
+          created_at: string
+          description: string | null
+          expected_result: string | null
+          id: string
+          is_active: boolean
+          query_function: string | null
+        }
+        Insert: {
+          category_id: string
+          check_code: string
+          check_name: string
+          created_at?: string
+          description?: string | null
+          expected_result?: string | null
+          id?: string
+          is_active?: boolean
+          query_function?: string | null
+        }
+        Update: {
+          category_id?: string
+          check_code?: string
+          check_name?: string
+          created_at?: string
+          description?: string | null
+          expected_result?: string | null
+          id?: string
+          is_active?: boolean
+          query_function?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "compliance_checks_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "compliance_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      compliance_recommendations: {
+        Row: {
+          audit_id: string
+          category_id: string | null
+          created_at: string
+          description: string
+          id: string
+          impact: string | null
+          priority: number
+          remediation: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          severity: string
+          status: string
+          title: string
+        }
+        Insert: {
+          audit_id: string
+          category_id?: string | null
+          created_at?: string
+          description: string
+          id?: string
+          impact?: string | null
+          priority?: number
+          remediation?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity: string
+          status?: string
+          title: string
+        }
+        Update: {
+          audit_id?: string
+          category_id?: string | null
+          created_at?: string
+          description?: string
+          id?: string
+          impact?: string | null
+          priority?: number
+          remediation?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: string
+          status?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "compliance_recommendations_audit_id_fkey"
+            columns: ["audit_id"]
+            isOneToOne: false
+            referencedRelation: "compliance_audits"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "compliance_recommendations_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "compliance_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      compliance_scores: {
+        Row: {
+          audit_id: string
+          category_id: string
+          checks_passed: number
+          checks_total: number
+          created_at: string
+          findings: Json | null
+          id: string
+          max_score: number
+          score: number
+        }
+        Insert: {
+          audit_id: string
+          category_id: string
+          checks_passed?: number
+          checks_total?: number
+          created_at?: string
+          findings?: Json | null
+          id?: string
+          max_score?: number
+          score?: number
+        }
+        Update: {
+          audit_id?: string
+          category_id?: string
+          checks_passed?: number
+          checks_total?: number
+          created_at?: string
+          findings?: Json | null
+          id?: string
+          max_score?: number
+          score?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "compliance_scores_audit_id_fkey"
+            columns: ["audit_id"]
+            isOneToOne: false
+            referencedRelation: "compliance_audits"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "compliance_scores_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "compliance_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       consent_channels: {
         Row: {
           channel_code: string
@@ -9019,6 +9249,66 @@ export type Database = {
         }
         Relationships: []
       }
+      performance_degradation_alerts: {
+        Row: {
+          acknowledged: boolean | null
+          acknowledged_at: string | null
+          category: string
+          created_at: string | null
+          current_period_end: string
+          current_period_start: string
+          current_score: number
+          degradation_percentage: number
+          dismissed: boolean | null
+          dismissed_at: string | null
+          id: string
+          previous_period_end: string
+          previous_period_start: string
+          previous_score: number
+          severity: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          acknowledged?: boolean | null
+          acknowledged_at?: string | null
+          category: string
+          created_at?: string | null
+          current_period_end: string
+          current_period_start: string
+          current_score: number
+          degradation_percentage: number
+          dismissed?: boolean | null
+          dismissed_at?: string | null
+          id?: string
+          previous_period_end: string
+          previous_period_start: string
+          previous_score: number
+          severity: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          acknowledged?: boolean | null
+          acknowledged_at?: string | null
+          category?: string
+          created_at?: string | null
+          current_period_end?: string
+          current_period_start?: string
+          current_score?: number
+          degradation_percentage?: number
+          dismissed?: boolean | null
+          dismissed_at?: string | null
+          id?: string
+          previous_period_end?: string
+          previous_period_start?: string
+          previous_score?: number
+          severity?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       performance_metrics: {
         Row: {
           connection_type: string | null
@@ -13712,6 +14002,9 @@ export type Database = {
           updated_count: number
         }[]
       }
+      audit_consent_compliance: { Args: never; Returns: Json }
+      audit_retention_compliance: { Args: never; Returns: Json }
+      audit_security_compliance: { Args: never; Returns: Json }
       audit_tableau_duplicates: {
         Args: never
         Returns: {
@@ -13723,6 +14016,7 @@ export type Database = {
           severity: string
         }[]
       }
+      audit_user_rights_compliance: { Args: never; Returns: Json }
       auto_security_maintenance: { Args: never; Returns: Json }
       backup_critical_data: { Args: never; Returns: undefined }
       calculate_completeness_score:
@@ -14163,6 +14457,14 @@ export type Database = {
           started_at: string
           status: string
           total_items: number
+        }[]
+      }
+      get_latest_compliance_audit: {
+        Args: never
+        Returns: {
+          audit: Json
+          categories: Json
+          recommendations: Json
         }[]
       }
       get_latest_lyrics_texts: {

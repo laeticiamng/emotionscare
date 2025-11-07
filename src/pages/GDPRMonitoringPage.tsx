@@ -24,6 +24,7 @@ import { PseudonymizationManager } from '@/components/gdpr/PseudonymizationManag
 import { ConsentManagementPanel } from '@/components/gdpr/ConsentManagementPanel';
 import { ConsentAnalyticsDashboard } from '@/components/gdpr/ConsentAnalyticsDashboard';
 import { WebhookManager } from '@/components/gdpr/WebhookManager';
+import { ComplianceAuditDashboard } from '@/components/gdpr/ComplianceAuditDashboard';
 import { useGDPRMonitoring } from '@/hooks/useGDPRMonitoring';
 import { useGDPRComplianceScore } from '@/hooks/useGDPRComplianceScore';
 import { useGDPRRealtimeAlerts } from '@/hooks/useGDPRRealtimeAlerts';
@@ -71,7 +72,7 @@ const GDPRMonitoringPage: React.FC = () => {
         </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-8 lg:grid-cols-17">
+        <TabsList className="grid w-full grid-cols-8 lg:grid-cols-18">
           <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
           <TabsTrigger value="executive">Exécutif</TabsTrigger>
           <TabsTrigger value="realtime">Temps réel</TabsTrigger>
@@ -96,6 +97,7 @@ const GDPRMonitoringPage: React.FC = () => {
           <TabsTrigger value="consent-analytics">Analytics Consentements</TabsTrigger>
           <TabsTrigger value="consents">Stats Consentements</TabsTrigger>
           <TabsTrigger value="webhooks">Webhooks</TabsTrigger>
+          <TabsTrigger value="audit">Audit Conformité</TabsTrigger>
           <TabsTrigger value="exports">Exports</TabsTrigger>
           <TabsTrigger value="logs">Logs</TabsTrigger>
           <TabsTrigger value="scheduled">Planifications</TabsTrigger>
@@ -272,6 +274,10 @@ const GDPRMonitoringPage: React.FC = () => {
 
         <TabsContent value="webhooks" className="space-y-6 mt-6">
           <WebhookManager />
+        </TabsContent>
+
+        <TabsContent value="audit" className="space-y-6 mt-6">
+          <ComplianceAuditDashboard />
         </TabsContent>
 
         <TabsContent value="exports" className="space-y-6 mt-6">
