@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Shield, FileText, Download, Trash2, Bell } from 'lucide-react';
 import ConsentStatsCard from '@/components/gdpr/ConsentStatsCard';
 import AuditLogsTable from '@/components/gdpr/AuditLogsTable';
+import ExportRequestsTable from '@/components/gdpr/ExportRequestsTable';
 import DataExportStatsChart from '@/components/gdpr/DataExportStatsChart';
 import DataDeletionStatsChart from '@/components/gdpr/DataDeletionStatsChart';
 import GDPRAlerts from '@/components/gdpr/GDPRAlerts';
@@ -124,52 +125,10 @@ const GDPRMonitoringPage: React.FC = () => {
         <TabsContent value="exports" className="space-y-6 mt-6">
           <div className="grid grid-cols-1 gap-6">
             <DataExportStatsChart data={exportStats?.timeline || []} isLoading={isLoading} />
-            <Card>
-              <CardHeader>
-                <CardTitle>Demandes d'export récentes</CardTitle>
-                <CardDescription>
-                  Historique des demandes d'exportation de données personnelles
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {isLoading ? (
-                  <div className="space-y-2">
-                    <Skeleton className="h-12" />
-                    <Skeleton className="h-12" />
-                    <Skeleton className="h-12" />
-                  </div>
-                ) : exportStats?.recentRequests?.length ? (
-                  <div className="space-y-2">
-                    {exportStats.recentRequests.map((request: any) => (
-                      <div
-                        key={request.id}
-                        className="flex items-center justify-between p-3 border border-border rounded-lg"
-                      >
-                        <div>
-                          <p className="font-medium">{request.user_email || 'Utilisateur'}</p>
-                          <p className="text-sm text-muted-foreground">
-                            {new Date(request.created_at).toLocaleDateString('fr-FR')}
-                          </p>
-                        </div>
-                        <span
-                          className={`text-xs px-2 py-1 rounded ${
-                            request.status === 'completed'
-                              ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100'
-                              : request.status === 'pending'
-                              ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100'
-                              : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100'
-                          }`}
-                        >
-                          {request.status}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-muted-foreground text-center py-8">Aucune demande d'export</p>
-                )}
-              </CardContent>
-            </Card>
+            <ExportRequestsTable 
+              requests={exportStats?.recentRequests || []} 
+              isLoading={isLoading} 
+            />
           </div>
         </TabsContent>
 

@@ -1,6 +1,5 @@
 import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -12,58 +11,59 @@ import { Search, Calendar as CalendarIcon, X } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
-import type { AuditLog } from '@/hooks/useGDPRMonitoring';
 
-interface AuditLogsTableProps {
-  logs: AuditLog[];
+interface ExportRequest {
+  id: string;
+  user_email?: string;
+  status: 'pending' | 'completed' | 'failed';
+  created_at: string;
+  finished_at?: string;
+}
+
+interface ExportRequestsTableProps {
+  requests: ExportRequest[];
   isLoading: boolean;
 }
 
-const AuditLogsTable: React.FC<AuditLogsTableProps> = ({ logs, isLoading }) => {
+const ExportRequestsTable: React.FC<ExportRequestsTableProps> = ({ requests, isLoading }) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [eventTypeFilter, setEventTypeFilter] = useState<string>('all');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
   const [dateFrom, setDateFrom] = useState<Date | undefined>();
   const [dateTo, setDateTo] = useState<Date | undefined>();
 
-  // Extract unique event types for filter
-  const eventTypes = useMemo(() => {
-    const types = new Set(logs.map((log) => log.event));
-    return Array.from(types).sort();
-  }, [logs]);
-
-  const filteredLogs = useMemo(() => {
-    return logs.filter((log) => {
+  const filteredRequests = useMemo(() => {
+    return requests.filter((request) => {
       // Search filter
-      const matchesSearch = !searchTerm ||
-        log.event.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        log.target?.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesSearch = !searchTerm || 
+        request.user_email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        request.id.toLowerCase().includes(searchTerm.toLowerCase());
 
-      // Event type filter
-      const matchesEventType = eventTypeFilter === 'all' || log.event === eventTypeFilter;
+      // Status filter
+      const matchesStatus = statusFilter === 'all' || request.status === statusFilter;
 
       // Date range filter
-      const logDate = new Date(log.occurred_at);
-      const matchesDateFrom = !dateFrom || logDate >= dateFrom;
-      const matchesDateTo = !dateTo || logDate <= dateTo;
+      const requestDate = new Date(request.created_at);
+      const matchesDateFrom = !dateFrom || requestDate >= dateFrom;
+      const matchesDateTo = !dateTo || requestDate <= dateTo;
 
-      return matchesSearch && matchesEventType && matchesDateFrom && matchesDateTo;
+      return matchesSearch && matchesStatus && matchesDateFrom && matchesDateTo;
     });
-  }, [logs, searchTerm, eventTypeFilter, dateFrom, dateTo]);
+  }, [requests, searchTerm, statusFilter, dateFrom, dateTo]);
 
-  const getEventBadgeVariant = (event: string): 'default' | 'destructive' | 'secondary' => {
-    if (event.includes('deletion') || event.includes('delete')) return 'destructive';
-    if (event.includes('export') || event.includes('download')) return 'secondary';
-    return 'default';
+  const getStatusBadgeVariant = (status: string): 'default' | 'destructive' | 'secondary' => {
+    if (status === 'completed') return 'default';
+    if (status === 'failed') return 'destructive';
+    return 'secondary';
   };
 
   const clearFilters = () => {
     setSearchTerm('');
-    setEventTypeFilter('all');
+    setStatusFilter('all');
     setDateFrom(undefined);
     setDateTo(undefined);
   };
 
-  const hasActiveFilters = searchTerm || eventTypeFilter !== 'all' || dateFrom || dateTo;
+  const hasActiveFilters = searchTerm || statusFilter !== 'all' || dateFrom || dateTo;
 
   if (isLoading) {
     return (
@@ -82,9 +82,9 @@ const AuditLogsTable: React.FC<AuditLogsTableProps> = ({ logs, isLoading }) => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Journal d'audit RGPD</CardTitle>
+        <CardTitle>Demandes d'export</CardTitle>
         <CardDescription>
-          Événements RGPD ({filteredLogs.length} événements)
+          Historique des demandes d'exportation ({filteredRequests.length} demandes)
         </CardDescription>
 
         {/* Filters */}
@@ -94,25 +94,23 @@ const AuditLogsTable: React.FC<AuditLogsTableProps> = ({ logs, isLoading }) => {
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Rechercher un événement..."
+                placeholder="Rechercher..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
               />
             </div>
 
-            {/* Event Type Filter */}
-            <Select value={eventTypeFilter} onValueChange={setEventTypeFilter}>
+            {/* Status Filter */}
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger>
-                <SelectValue placeholder="Type d'événement" />
+                <SelectValue placeholder="Statut" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Tous les types</SelectItem>
-                {eventTypes.map((type) => (
-                  <SelectItem key={type} value={type}>
-                    {type}
-                  </SelectItem>
-                ))}
+                <SelectItem value="all">Tous les statuts</SelectItem>
+                <SelectItem value="pending">En attente</SelectItem>
+                <SelectItem value="completed">Complété</SelectItem>
+                <SelectItem value="failed">Échoué</SelectItem>
               </SelectContent>
             </Select>
 
@@ -181,50 +179,41 @@ const AuditLogsTable: React.FC<AuditLogsTableProps> = ({ logs, isLoading }) => {
           )}
         </div>
       </CardHeader>
+
       <CardContent>
-        {filteredLogs.length === 0 ? (
+        {filteredRequests.length === 0 ? (
           <p className="text-muted-foreground text-center py-8">
-            {hasActiveFilters ? 'Aucun événement ne correspond aux filtres' : 'Aucun événement trouvé'}
+            {hasActiveFilters ? 'Aucune demande ne correspond aux filtres' : 'Aucune demande d\'export'}
           </p>
         ) : (
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Horodatage</TableHead>
-                  <TableHead>Événement</TableHead>
-                  <TableHead>Cible</TableHead>
-                  <TableHead>Acteur</TableHead>
-                  <TableHead>Détails</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredLogs.map((log) => (
-                  <TableRow key={log.id}>
-                    <TableCell className="font-mono text-xs">
-                      {new Date(log.occurred_at).toLocaleString('fr-FR', {
-                        dateStyle: 'short',
-                        timeStyle: 'medium',
-                      })}
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={getEventBadgeVariant(log.event)}>
-                        {log.event}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-sm">{log.target || '-'}</TableCell>
-                    <TableCell className="text-sm font-mono truncate max-w-[120px]">
-                      {log.actor_id?.substring(0, 8)}...
-                    </TableCell>
-                    <TableCell className="text-sm text-muted-foreground max-w-[200px] truncate">
-                      {typeof log.details === 'object'
-                        ? JSON.stringify(log.details)
-                        : log.details || '-'}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+          <div className="space-y-2">
+            {filteredRequests.map((request) => (
+              <div
+                key={request.id}
+                className="flex items-center justify-between p-3 border border-border rounded-lg hover:bg-accent/50 transition-colors"
+              >
+                <div className="flex-1">
+                  <p className="font-medium text-foreground">
+                    {request.user_email || 'Utilisateur inconnu'}
+                  </p>
+                  <div className="flex items-center gap-4 mt-1">
+                    <p className="text-sm text-muted-foreground">
+                      Créé le {format(new Date(request.created_at), 'dd/MM/yyyy à HH:mm', { locale: fr })}
+                    </p>
+                    {request.finished_at && (
+                      <p className="text-sm text-muted-foreground">
+                        Terminé le {format(new Date(request.finished_at), 'dd/MM/yyyy à HH:mm', { locale: fr })}
+                      </p>
+                    )}
+                  </div>
+                </div>
+                <Badge variant={getStatusBadgeVariant(request.status)}>
+                  {request.status === 'pending' && 'En attente'}
+                  {request.status === 'completed' && 'Complété'}
+                  {request.status === 'failed' && 'Échoué'}
+                </Badge>
+              </div>
+            ))}
           </div>
         )}
       </CardContent>
@@ -232,4 +221,4 @@ const AuditLogsTable: React.FC<AuditLogsTableProps> = ({ logs, isLoading }) => {
   );
 };
 
-export default AuditLogsTable;
+export default ExportRequestsTable;
