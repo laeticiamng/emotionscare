@@ -1447,6 +1447,51 @@ export type Database = {
         }
         Relationships: []
       }
+      campaign_consents: {
+        Row: {
+          campaign_id: string
+          can_contact: boolean
+          consent_preference_id: string | null
+          consent_validated_at: string
+          id: string
+          user_id: string
+          validation_notes: string | null
+        }
+        Insert: {
+          campaign_id: string
+          can_contact?: boolean
+          consent_preference_id?: string | null
+          consent_validated_at?: string
+          id?: string
+          user_id: string
+          validation_notes?: string | null
+        }
+        Update: {
+          campaign_id?: string
+          can_contact?: boolean
+          consent_preference_id?: string | null
+          consent_validated_at?: string
+          id?: string
+          user_id?: string
+          validation_notes?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "campaign_consents_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "marketing_campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "campaign_consents_consent_preference_id_fkey"
+            columns: ["consent_preference_id"]
+            isOneToOne: false
+            referencedRelation: "user_consent_preferences"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       challenges: {
         Row: {
           category: string
@@ -2251,6 +2296,126 @@ export type Database = {
           resolved_at?: string | null
           resolved_by?: string | null
           severity?: string
+        }
+        Relationships: []
+      }
+      consent_channels: {
+        Row: {
+          channel_code: string
+          channel_name: string
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+        }
+        Insert: {
+          channel_code: string
+          channel_name: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+        }
+        Update: {
+          channel_code?: string
+          channel_name?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+        }
+        Relationships: []
+      }
+      consent_history: {
+        Row: {
+          change_type: string
+          channel_id: string
+          created_at: string
+          id: string
+          ip_address: unknown
+          new_consent: boolean
+          notes: string | null
+          previous_consent: boolean | null
+          purpose_id: string
+          source: string | null
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          change_type: string
+          channel_id: string
+          created_at?: string
+          id?: string
+          ip_address?: unknown
+          new_consent: boolean
+          notes?: string | null
+          previous_consent?: boolean | null
+          purpose_id: string
+          source?: string | null
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          change_type?: string
+          channel_id?: string
+          created_at?: string
+          id?: string
+          ip_address?: unknown
+          new_consent?: boolean
+          notes?: string | null
+          previous_consent?: boolean | null
+          purpose_id?: string
+          source?: string | null
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "consent_history_channel_id_fkey"
+            columns: ["channel_id"]
+            isOneToOne: false
+            referencedRelation: "consent_channels"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "consent_history_purpose_id_fkey"
+            columns: ["purpose_id"]
+            isOneToOne: false
+            referencedRelation: "consent_purposes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      consent_purposes: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          is_required: boolean
+          legal_basis: string | null
+          purpose_code: string
+          purpose_name: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          is_required?: boolean
+          legal_basis?: string | null
+          purpose_code: string
+          purpose_name: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          is_required?: boolean
+          legal_basis?: string | null
+          purpose_code?: string
+          purpose_name?: string
         }
         Relationships: []
       }
@@ -5796,6 +5961,69 @@ export type Database = {
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      marketing_campaigns: {
+        Row: {
+          campaign_code: string
+          campaign_name: string
+          channel_id: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          end_date: string | null
+          id: string
+          purpose_id: string
+          start_date: string
+          status: string
+          target_audience: Json | null
+          updated_at: string
+        }
+        Insert: {
+          campaign_code: string
+          campaign_name: string
+          channel_id: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          purpose_id: string
+          start_date: string
+          status?: string
+          target_audience?: Json | null
+          updated_at?: string
+        }
+        Update: {
+          campaign_code?: string
+          campaign_name?: string
+          channel_id?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          purpose_id?: string
+          start_date?: string
+          status?: string
+          target_audience?: Json | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "marketing_campaigns_channel_id_fkey"
+            columns: ["channel_id"]
+            isOneToOne: false
+            referencedRelation: "consent_channels"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "marketing_campaigns_purpose_id_fkey"
+            columns: ["purpose_id"]
+            isOneToOne: false
+            referencedRelation: "consent_purposes"
             referencedColumns: ["id"]
           },
         ]
@@ -11373,6 +11601,66 @@ export type Database = {
         }
         Relationships: []
       }
+      user_consent_preferences: {
+        Row: {
+          channel_id: string
+          consent_date: string | null
+          consent_given: boolean
+          created_at: string
+          id: string
+          ip_address: unknown
+          purpose_id: string
+          source: string | null
+          updated_at: string
+          user_agent: string | null
+          user_id: string
+          withdrawal_date: string | null
+        }
+        Insert: {
+          channel_id: string
+          consent_date?: string | null
+          consent_given?: boolean
+          created_at?: string
+          id?: string
+          ip_address?: unknown
+          purpose_id: string
+          source?: string | null
+          updated_at?: string
+          user_agent?: string | null
+          user_id: string
+          withdrawal_date?: string | null
+        }
+        Update: {
+          channel_id?: string
+          consent_date?: string | null
+          consent_given?: boolean
+          created_at?: string
+          id?: string
+          ip_address?: unknown
+          purpose_id?: string
+          source?: string | null
+          updated_at?: string
+          user_agent?: string | null
+          user_id?: string
+          withdrawal_date?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_consent_preferences_channel_id_fkey"
+            columns: ["channel_id"]
+            isOneToOne: false
+            referencedRelation: "consent_channels"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_consent_preferences_purpose_id_fkey"
+            columns: ["purpose_id"]
+            isOneToOne: false
+            referencedRelation: "consent_purposes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_emotional_energy: {
         Row: {
           created_at: string
@@ -13954,6 +14242,18 @@ export type Database = {
         Args: never
         Returns: Database["public"]["Enums"]["app_user_role"]
       }
+      get_user_consent_status: {
+        Args: { p_user_id: string }
+        Returns: {
+          channel_code: string
+          channel_name: string
+          consent_date: string
+          consent_given: boolean
+          last_updated: string
+          purpose_code: string
+          purpose_name: string
+        }[]
+      }
       get_user_ia_stats: { Args: { p_period_days?: number }; Returns: Json }
       get_user_medical_stats: { Args: { p_user_id?: string }; Returns: Json }
       get_user_music_library: {
@@ -14457,6 +14757,14 @@ export type Database = {
           p_processed_items: number
         }
         Returns: undefined
+      }
+      validate_campaign_consents: {
+        Args: { p_campaign_id: string }
+        Returns: {
+          can_contact: boolean
+          reason: string
+          user_id: string
+        }[]
       }
       validate_edn_item_data: { Args: { item_data: Json }; Returns: boolean }
       validate_music_lyrics: { Args: { lyrics_data: Json }; Returns: boolean }

@@ -21,6 +21,7 @@ import { DataRetentionConfig } from '@/components/gdpr/DataRetentionConfig';
 import { AnomalyDetectionDashboard } from '@/components/gdpr/AnomalyDetectionDashboard';
 import { PrivacyPolicyManager } from '@/components/gdpr/PrivacyPolicyManager';
 import { PseudonymizationManager } from '@/components/gdpr/PseudonymizationManager';
+import { ConsentManagementPanel } from '@/components/gdpr/ConsentManagementPanel';
 import { useGDPRMonitoring } from '@/hooks/useGDPRMonitoring';
 import { useGDPRComplianceScore } from '@/hooks/useGDPRComplianceScore';
 import { useGDPRRealtimeAlerts } from '@/hooks/useGDPRRealtimeAlerts';
@@ -68,7 +69,7 @@ const GDPRMonitoringPage: React.FC = () => {
         </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-15">
+        <TabsList className="grid w-full grid-cols-8 lg:grid-cols-16">
           <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
           <TabsTrigger value="executive">Exécutif</TabsTrigger>
           <TabsTrigger value="realtime">Temps réel</TabsTrigger>
@@ -89,7 +90,8 @@ const GDPRMonitoringPage: React.FC = () => {
             Politiques
           </TabsTrigger>
           <TabsTrigger value="pseudonymization">Pseudonymisation</TabsTrigger>
-          <TabsTrigger value="consents">Consentements</TabsTrigger>
+          <TabsTrigger value="consent-management">Gestion Consentements</TabsTrigger>
+          <TabsTrigger value="consents">Stats Consentements</TabsTrigger>
           <TabsTrigger value="exports">Exports</TabsTrigger>
           <TabsTrigger value="logs">Logs</TabsTrigger>
           <TabsTrigger value="scheduled">Planifications</TabsTrigger>
@@ -250,6 +252,10 @@ const GDPRMonitoringPage: React.FC = () => {
 
         <TabsContent value="pseudonymization" className="space-y-6 mt-6">
           <PseudonymizationManager />
+        </TabsContent>
+
+        <TabsContent value="consent-management" className="space-y-6 mt-6">
+          <ConsentManagementPanel />
         </TabsContent>
 
         <TabsContent value="consents" className="space-y-6 mt-6">

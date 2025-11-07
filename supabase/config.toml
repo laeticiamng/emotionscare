@@ -224,3 +224,6 @@ verify_jwt = false
 
 [functions.pseudonymize-data]
 verify_jwt = true
+
+[functions.consent-manager]
+verify_jwt = true
