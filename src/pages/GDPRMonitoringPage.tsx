@@ -22,6 +22,7 @@ import { AnomalyDetectionDashboard } from '@/components/gdpr/AnomalyDetectionDas
 import { PrivacyPolicyManager } from '@/components/gdpr/PrivacyPolicyManager';
 import { PseudonymizationManager } from '@/components/gdpr/PseudonymizationManager';
 import { ConsentManagementPanel } from '@/components/gdpr/ConsentManagementPanel';
+import { ConsentAnalyticsDashboard } from '@/components/gdpr/ConsentAnalyticsDashboard';
 import { useGDPRMonitoring } from '@/hooks/useGDPRMonitoring';
 import { useGDPRComplianceScore } from '@/hooks/useGDPRComplianceScore';
 import { useGDPRRealtimeAlerts } from '@/hooks/useGDPRRealtimeAlerts';
@@ -91,6 +92,7 @@ const GDPRMonitoringPage: React.FC = () => {
           </TabsTrigger>
           <TabsTrigger value="pseudonymization">Pseudonymisation</TabsTrigger>
           <TabsTrigger value="consent-management">Gestion Consentements</TabsTrigger>
+          <TabsTrigger value="consent-analytics">Analytics Consentements</TabsTrigger>
           <TabsTrigger value="consents">Stats Consentements</TabsTrigger>
           <TabsTrigger value="exports">Exports</TabsTrigger>
           <TabsTrigger value="logs">Logs</TabsTrigger>
@@ -256,6 +258,10 @@ const GDPRMonitoringPage: React.FC = () => {
 
         <TabsContent value="consent-management" className="space-y-6 mt-6">
           <ConsentManagementPanel />
+        </TabsContent>
+
+        <TabsContent value="consent-analytics" className="space-y-6 mt-6">
+          <ConsentAnalyticsDashboard />
         </TabsContent>
 
         <TabsContent value="consents" className="space-y-6 mt-6">
