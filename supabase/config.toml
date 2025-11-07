@@ -236,3 +236,6 @@ verify_jwt = true
 
 [functions.scheduled-audits]
 verify_jwt = false
+
+[functions.dsar-handler]
+verify_jwt = true

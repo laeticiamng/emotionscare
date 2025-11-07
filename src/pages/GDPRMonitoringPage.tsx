@@ -26,6 +26,7 @@ import { ConsentAnalyticsDashboard } from '@/components/gdpr/ConsentAnalyticsDas
 import { WebhookManager } from '@/components/gdpr/WebhookManager';
 import { ComplianceAuditDashboard } from '@/components/gdpr/ComplianceAuditDashboard';
 import { ScheduledAuditsManager } from '@/components/gdpr/ScheduledAuditsManager';
+import { DSARManager } from '@/components/gdpr/DSARManager';
 import { useGDPRMonitoring } from '@/hooks/useGDPRMonitoring';
 import { useGDPRComplianceScore } from '@/hooks/useGDPRComplianceScore';
 import { useGDPRRealtimeAlerts } from '@/hooks/useGDPRRealtimeAlerts';
@@ -100,6 +101,7 @@ const GDPRMonitoringPage: React.FC = () => {
           <TabsTrigger value="webhooks">Webhooks</TabsTrigger>
           <TabsTrigger value="audit">Audit Conformité</TabsTrigger>
           <TabsTrigger value="scheduled">Planifications</TabsTrigger>
+          <TabsTrigger value="dsar">Demandes DSAR</TabsTrigger>
           <TabsTrigger value="exports">Exports</TabsTrigger>
           <TabsTrigger value="logs">Logs</TabsTrigger>
           <TabsTrigger value="scheduled-exports">Exports planifiés</TabsTrigger>
@@ -284,6 +286,10 @@ const GDPRMonitoringPage: React.FC = () => {
 
         <TabsContent value="scheduled" className="space-y-6 mt-6">
           <ScheduledAuditsManager />
+        </TabsContent>
+
+        <TabsContent value="dsar" className="space-y-6 mt-6">
+          <DSARManager />
         </TabsContent>
 
         <TabsContent value="exports" className="space-y-6 mt-6">

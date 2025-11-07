@@ -3023,6 +3023,101 @@ export type Database = {
         }
         Relationships: []
       }
+      dsar_approvals: {
+        Row: {
+          approval_level: number
+          approver_id: string
+          created_at: string
+          decided_at: string | null
+          decision_notes: string | null
+          id: string
+          request_id: string
+          status: string
+        }
+        Insert: {
+          approval_level?: number
+          approver_id: string
+          created_at?: string
+          decided_at?: string | null
+          decision_notes?: string | null
+          id?: string
+          request_id: string
+          status?: string
+        }
+        Update: {
+          approval_level?: number
+          approver_id?: string
+          created_at?: string
+          decided_at?: string | null
+          decision_notes?: string | null
+          id?: string
+          request_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dsar_approvals_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "dsar_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dsar_requests: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          completed_at: string | null
+          created_at: string
+          id: string
+          justification: string | null
+          legal_deadline: string
+          notes: string | null
+          package_url: string | null
+          priority: string
+          request_type: string
+          requested_data: Json | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          justification?: string | null
+          legal_deadline: string
+          notes?: string | null
+          package_url?: string | null
+          priority?: string
+          request_type: string
+          requested_data?: Json | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          justification?: string | null
+          legal_deadline?: string
+          notes?: string | null
+          package_url?: string | null
+          priority?: string
+          request_type?: string
+          requested_data?: Json | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       ecos_scenarios: {
         Row: {
           clinical_case: string
