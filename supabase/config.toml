@@ -227,3 +227,6 @@ verify_jwt = true
 
 [functions.consent-manager]
 verify_jwt = true
+
+[functions.webhook-processor]
+verify_jwt = false

@@ -13150,6 +13150,143 @@ export type Database = {
         }
         Relationships: []
       }
+      webhook_deliveries: {
+        Row: {
+          attempts: number
+          created_at: string
+          delivered_at: string | null
+          error_message: string | null
+          event_type: string
+          http_status: number | null
+          id: string
+          max_attempts: number
+          next_retry_at: string | null
+          payload: Json
+          response_body: string | null
+          status: string
+          updated_at: string
+          webhook_id: string
+        }
+        Insert: {
+          attempts?: number
+          created_at?: string
+          delivered_at?: string | null
+          error_message?: string | null
+          event_type: string
+          http_status?: number | null
+          id?: string
+          max_attempts?: number
+          next_retry_at?: string | null
+          payload: Json
+          response_body?: string | null
+          status?: string
+          updated_at?: string
+          webhook_id: string
+        }
+        Update: {
+          attempts?: number
+          created_at?: string
+          delivered_at?: string | null
+          error_message?: string | null
+          event_type?: string
+          http_status?: number | null
+          id?: string
+          max_attempts?: number
+          next_retry_at?: string | null
+          payload?: Json
+          response_body?: string | null
+          status?: string
+          updated_at?: string
+          webhook_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "webhook_deliveries_webhook_id_fkey"
+            columns: ["webhook_id"]
+            isOneToOne: false
+            referencedRelation: "webhook_endpoints"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      webhook_endpoints: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          events: string[]
+          headers: Json | null
+          id: string
+          is_active: boolean
+          name: string
+          retry_config: Json | null
+          secret_key: string
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          events?: string[]
+          headers?: Json | null
+          id?: string
+          is_active?: boolean
+          name: string
+          retry_config?: Json | null
+          secret_key: string
+          updated_at?: string
+          url: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          events?: string[]
+          headers?: Json | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          retry_config?: Json | null
+          secret_key?: string
+          updated_at?: string
+          url?: string
+        }
+        Relationships: []
+      }
+      webhook_events: {
+        Row: {
+          created_at: string
+          entity_id: string | null
+          entity_type: string
+          event_data: Json
+          event_type: string
+          id: string
+          processed: boolean
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          entity_id?: string | null
+          entity_type: string
+          event_data: Json
+          event_type: string
+          id?: string
+          processed?: boolean
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string
+          event_data?: Json
+          event_type?: string
+          id?: string
+          processed?: boolean
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       webhook_settings: {
         Row: {
           created_at: string
@@ -14294,6 +14431,29 @@ export type Database = {
           plan_id: string
           plan_name: string
           status: string
+        }[]
+      }
+      get_webhook_statistics: {
+        Args: { p_webhook_id?: string }
+        Returns: {
+          avg_delivery_time_seconds: number
+          failed_deliveries: number
+          pending_deliveries: number
+          success_rate: number
+          successful_deliveries: number
+          total_deliveries: number
+          webhook_id: string
+          webhook_name: string
+        }[]
+      }
+      get_webhooks_for_event: {
+        Args: { p_event_type: string }
+        Returns: {
+          retry_config: Json
+          webhook_headers: Json
+          webhook_id: string
+          webhook_secret: string
+          webhook_url: string
         }[]
       }
       has_org_role: {
