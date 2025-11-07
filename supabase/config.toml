@@ -239,3 +239,6 @@ verify_jwt = false
 
 [functions.dsar-handler]
 verify_jwt = true
+
+[functions.violation-detector]
+verify_jwt = true

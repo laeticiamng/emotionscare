@@ -5145,6 +5145,66 @@ export type Database = {
         }
         Relationships: []
       }
+      gdpr_violations: {
+        Row: {
+          affected_data_types: string[] | null
+          affected_users_count: number | null
+          created_at: string | null
+          description: string
+          detected_at: string | null
+          id: string
+          metadata: Json | null
+          ml_confidence: number | null
+          resolution_notes: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          risk_score: number
+          severity: string
+          status: string | null
+          title: string
+          updated_at: string | null
+          violation_type: string
+        }
+        Insert: {
+          affected_data_types?: string[] | null
+          affected_users_count?: number | null
+          created_at?: string | null
+          description: string
+          detected_at?: string | null
+          id?: string
+          metadata?: Json | null
+          ml_confidence?: number | null
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          risk_score: number
+          severity: string
+          status?: string | null
+          title: string
+          updated_at?: string | null
+          violation_type: string
+        }
+        Update: {
+          affected_data_types?: string[] | null
+          affected_users_count?: number | null
+          created_at?: string | null
+          description?: string
+          detected_at?: string | null
+          id?: string
+          metadata?: Json | null
+          ml_confidence?: number | null
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          risk_score?: number
+          severity?: string
+          status?: string | null
+          title?: string
+          updated_at?: string | null
+          violation_type?: string
+        }
+        Relationships: []
+      }
       generated_ambient_images: {
         Row: {
           created_at: string
@@ -7897,6 +7957,39 @@ export type Database = {
           severity?: string
           status?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      monitoring_metrics: {
+        Row: {
+          id: string
+          is_anomaly: boolean | null
+          metadata: Json | null
+          metric_name: string
+          metric_unit: string | null
+          metric_value: number
+          recorded_at: string | null
+          threshold_value: number | null
+        }
+        Insert: {
+          id?: string
+          is_anomaly?: boolean | null
+          metadata?: Json | null
+          metric_name: string
+          metric_unit?: string | null
+          metric_value: number
+          recorded_at?: string | null
+          threshold_value?: number | null
+        }
+        Update: {
+          id?: string
+          is_anomaly?: boolean | null
+          metadata?: Json | null
+          metric_name?: string
+          metric_unit?: string | null
+          metric_value?: number
+          recorded_at?: string | null
+          threshold_value?: number | null
         }
         Relationships: []
       }
@@ -13451,6 +13544,57 @@ export type Database = {
         }
         Relationships: []
       }
+      violation_alerts: {
+        Row: {
+          alert_type: string
+          confidence_score: number | null
+          created_at: string | null
+          expires_at: string | null
+          id: string
+          is_dismissed: boolean | null
+          is_read: boolean | null
+          message: string
+          predicted_impact: string | null
+          recommendations: string[] | null
+          risk_indicators: Json | null
+          severity: string
+          title: string
+          triggered_at: string | null
+        }
+        Insert: {
+          alert_type: string
+          confidence_score?: number | null
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          is_dismissed?: boolean | null
+          is_read?: boolean | null
+          message: string
+          predicted_impact?: string | null
+          recommendations?: string[] | null
+          risk_indicators?: Json | null
+          severity: string
+          title: string
+          triggered_at?: string | null
+        }
+        Update: {
+          alert_type?: string
+          confidence_score?: number | null
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          is_dismissed?: boolean | null
+          is_read?: boolean | null
+          message?: string
+          predicted_impact?: string | null
+          recommendations?: string[] | null
+          risk_indicators?: Json | null
+          severity?: string
+          title?: string
+          triggered_at?: string | null
+        }
+        Relationships: []
+      }
       voice_journal_entries: {
         Row: {
           ai_insights: string | null
@@ -14309,6 +14453,7 @@ export type Database = {
         Args: { rec_id: string }
         Returns: Json
       }
+      calculate_risk_score: { Args: never; Returns: number }
       calculate_sla_metrics: { Args: never; Returns: undefined }
       calculate_user_learning_path: {
         Args: { p_user_id: string }
@@ -15002,6 +15147,17 @@ export type Database = {
           plan_id: string
           plan_name: string
           status: string
+        }[]
+      }
+      get_violation_stats: {
+        Args: { days?: number }
+        Returns: {
+          avg_resolution_time: unknown
+          critical_violations: number
+          high_violations: number
+          resolved_violations: number
+          total_violations: number
+          trend_direction: string
         }[]
       }
       get_webhook_statistics: {
