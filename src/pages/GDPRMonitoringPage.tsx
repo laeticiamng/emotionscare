@@ -19,6 +19,7 @@ import GDPRAuditTrail from '@/components/gdpr/GDPRAuditTrail';
 import GDPRExecutiveDashboard from '@/components/gdpr/GDPRExecutiveDashboard';
 import { DataRetentionConfig } from '@/components/gdpr/DataRetentionConfig';
 import { AnomalyDetectionDashboard } from '@/components/gdpr/AnomalyDetectionDashboard';
+import { PrivacyPolicyManager } from '@/components/gdpr/PrivacyPolicyManager';
 import { useGDPRMonitoring } from '@/hooks/useGDPRMonitoring';
 import { useGDPRComplianceScore } from '@/hooks/useGDPRComplianceScore';
 import { useGDPRRealtimeAlerts } from '@/hooks/useGDPRRealtimeAlerts';
@@ -66,7 +67,7 @@ const GDPRMonitoringPage: React.FC = () => {
         </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-13">
+        <TabsList className="grid w-full grid-cols-14">
           <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
           <TabsTrigger value="executive">Exécutif</TabsTrigger>
           <TabsTrigger value="realtime">Temps réel</TabsTrigger>
@@ -82,6 +83,10 @@ const GDPRMonitoringPage: React.FC = () => {
           <TabsTrigger value="audit">Audit Trail</TabsTrigger>
           <TabsTrigger value="retention">Rétention</TabsTrigger>
           <TabsTrigger value="anomalies">Anomalies ML</TabsTrigger>
+          <TabsTrigger value="policies">
+            <FileText className="h-4 w-4 mr-2" />
+            Politiques
+          </TabsTrigger>
           <TabsTrigger value="consents">Consentements</TabsTrigger>
           <TabsTrigger value="exports">Exports</TabsTrigger>
           <TabsTrigger value="logs">Logs</TabsTrigger>
@@ -235,6 +240,10 @@ const GDPRMonitoringPage: React.FC = () => {
 
         <TabsContent value="anomalies" className="space-y-6 mt-6">
           <AnomalyDetectionDashboard />
+        </TabsContent>
+
+        <TabsContent value="policies" className="space-y-6 mt-6">
+          <PrivacyPolicyManager />
         </TabsContent>
 
         <TabsContent value="consents" className="space-y-6 mt-6">

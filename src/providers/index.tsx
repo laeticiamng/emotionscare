@@ -19,6 +19,7 @@ import i18n from '@/lib/i18n';
 import { UnifiedProvider } from '@/core/UnifiedStateManager';
 import { MusicProvider } from '@/contexts/music';
 import { ThemeProvider } from '@/providers/theme';
+import { PolicyAcceptanceModal } from '@/components/gdpr/PolicyAcceptanceModal';
 
 const createQueryClient = () =>
   new QueryClient({
@@ -113,6 +114,7 @@ export function RootProvider({ children }: RootProviderProps) {
                                 <NotificationProvider>
                                   {children}
                                   <Toaster />
+                                  <PolicyAcceptanceModal />
                                 </NotificationProvider>
                               </TooltipProvider>
                             </ThemeProvider>
