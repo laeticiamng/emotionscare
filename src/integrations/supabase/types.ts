@@ -15552,6 +15552,26 @@ export type Database = {
           url_source: string
         }[]
       }
+      get_cron_job_history: {
+        Args: never
+        Returns: {
+          execution_count: number
+          job_name: string
+          last_run: string
+          next_run: string
+          status: string
+        }[]
+      }
+      get_cron_jobs_list: {
+        Args: never
+        Returns: {
+          active: boolean
+          jobid: number
+          jobname: string
+          last_run: string
+          schedule: string
+        }[]
+      }
       get_current_user_role: { Args: never; Returns: string }
       get_current_week_bounds: {
         Args: never
