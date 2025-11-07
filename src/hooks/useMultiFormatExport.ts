@@ -13,6 +13,7 @@ export interface ExportOptions {
 export const useMultiFormatExport = () => {
   const exportMutation = useMutation({
     mutationFn: async (options: ExportOptions) => {
+      const startTime = Date.now();
       console.log('Exporting with options:', options);
 
       if (options.format === 'pdf') {
@@ -62,10 +63,20 @@ export const useMultiFormatExport = () => {
         document.body.removeChild(link);
         window.URL.revokeObjectURL(url);
 
-        return { success: true };
+        return { success: true, size: blob.size };
       }
     },
-    onSuccess: (_, variables) => {
+    onSuccess: async (data, variables) => {
+      const duration = Date.now() - (performance.now() - performance.now());
+      
+      // Log export for analytics
+      await supabase.from('export_logs').insert({
+        format: variables.format,
+        template: variables.template,
+        file_size: data.size || 0,
+        duration_ms: duration,
+      });
+
       toast.success(`Export ${variables.format.toUpperCase()} généré avec succès`);
     },
     onError: (error: Error) => {

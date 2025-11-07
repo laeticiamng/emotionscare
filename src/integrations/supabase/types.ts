@@ -4787,6 +4787,36 @@ export type Database = {
           },
         ]
       }
+      export_logs: {
+        Row: {
+          created_at: string
+          duration_ms: number | null
+          file_size: number | null
+          format: string
+          id: string
+          template: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          duration_ms?: number | null
+          file_size?: number | null
+          format: string
+          id?: string
+          template?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          duration_ms?: number | null
+          file_size?: number | null
+          format?: string
+          id?: string
+          template?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       exports: {
         Row: {
           created_at: string | null
@@ -9514,6 +9544,39 @@ export type Database = {
         }
         Relationships: []
       }
+      pdf_templates: {
+        Row: {
+          created_at: string
+          id: string
+          logo_url: string | null
+          name: string
+          primary_color: string | null
+          sections: Json
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          logo_url?: string | null
+          name: string
+          primary_color?: string | null
+          sections?: Json
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          logo_url?: string | null
+          name?: string
+          primary_color?: string | null
+          sections?: Json
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       pending_activations: {
         Row: {
           created_at: string | null
@@ -10627,6 +10690,36 @@ export type Database = {
           title?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      report_signatures: {
+        Row: {
+          certificate_id: string
+          created_at: string
+          id: string
+          report_id: string
+          signature_hash: string
+          timestamp: string
+          user_id: string | null
+        }
+        Insert: {
+          certificate_id: string
+          created_at?: string
+          id?: string
+          report_id: string
+          signature_hash: string
+          timestamp?: string
+          user_id?: string | null
+        }
+        Update: {
+          certificate_id?: string
+          created_at?: string
+          id?: string
+          report_id?: string
+          signature_hash?: string
+          timestamp?: string
+          user_id?: string | null
         }
         Relationships: []
       }

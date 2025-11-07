@@ -6,6 +6,10 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { FileText, FileSpreadsheet, FileJson, Download } from 'lucide-react';
 import { useMultiFormatExport } from '@/hooks/useMultiFormatExport';
 import { useState } from 'react';
+import { ReportSignature } from './ReportSignature';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ExportAnalyticsDashboard } from './ExportAnalyticsDashboard';
+import { TemplateEditor } from './TemplateEditor';
 
 export function MultiFormatExporter() {
   const { exportData, isExporting } = useMultiFormatExport();
@@ -31,7 +35,16 @@ export function MultiFormatExporter() {
   const FormatIcon = formatIcons[format];
 
   return (
-    <Card className="p-6 space-y-6">
+    <Tabs defaultValue="export" className="space-y-6">
+      <TabsList>
+        <TabsTrigger value="export">Export</TabsTrigger>
+        <TabsTrigger value="signature">Signature</TabsTrigger>
+        <TabsTrigger value="analytics">Analytics</TabsTrigger>
+        <TabsTrigger value="templates">Templates</TabsTrigger>
+      </TabsList>
+
+      <TabsContent value="export">
+        <Card className="p-6 space-y-6">
       <div className="flex items-center gap-4">
         <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
           <FormatIcon className="w-6 h-6 text-primary" />
@@ -143,6 +156,20 @@ export function MultiFormatExporter() {
         <p><strong>JSON:</strong> Format structuré pour intégrations API</p>
         <p><strong>CSV:</strong> Format tabulaire simple pour import</p>
       </div>
-    </Card>
+        </Card>
+      </TabsContent>
+
+      <TabsContent value="signature">
+        <ReportSignature reportId="current-report" />
+      </TabsContent>
+
+      <TabsContent value="analytics">
+        <ExportAnalyticsDashboard />
+      </TabsContent>
+
+      <TabsContent value="templates">
+        <TemplateEditor />
+      </TabsContent>
+    </Tabs>
   );
 }
