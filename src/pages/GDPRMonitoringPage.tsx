@@ -7,6 +7,7 @@ import AuditLogsTable from '@/components/gdpr/AuditLogsTable';
 import DataExportStatsChart from '@/components/gdpr/DataExportStatsChart';
 import DataDeletionStatsChart from '@/components/gdpr/DataDeletionStatsChart';
 import GDPRAlerts from '@/components/gdpr/GDPRAlerts';
+import ExportReportButton from '@/components/gdpr/ExportReportButton';
 import { useGDPRMonitoring } from '@/hooks/useGDPRMonitoring';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -16,14 +17,17 @@ const GDPRMonitoringPage: React.FC = () => {
 
   return (
     <div className="container mx-auto py-8 px-4 space-y-6">
-      <div className="flex items-center gap-3 mb-6">
-        <Shield className="h-8 w-8 text-primary" />
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">Monitoring RGPD</h1>
-          <p className="text-muted-foreground">
-            Tableau de bord de conformité et audit des données personnelles
-          </p>
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-3">
+          <Shield className="h-8 w-8 text-primary" />
+          <div>
+            <h1 className="text-3xl font-bold text-foreground">Monitoring RGPD</h1>
+            <p className="text-muted-foreground">
+              Tableau de bord de conformité et audit des données personnelles
+            </p>
+          </div>
         </div>
+        <ExportReportButton />
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
