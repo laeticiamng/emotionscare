@@ -263,3 +263,9 @@ verify_jwt = true
 
 [functions.notifications-email]
 verify_jwt = true
+
+[functions.validate-report-ai]
+verify_jwt = true
+
+[functions.trigger-webhooks]
+verify_jwt = false

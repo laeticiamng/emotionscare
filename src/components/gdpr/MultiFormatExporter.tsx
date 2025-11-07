@@ -10,6 +10,8 @@ import { ReportSignature } from './ReportSignature';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ExportAnalyticsDashboard } from './ExportAnalyticsDashboard';
 import { TemplateEditor } from './TemplateEditor';
+import { ReportValidation } from './ReportValidation';
+import { WebhookManager } from './WebhookManager';
 
 export function MultiFormatExporter() {
   const { exportData, isExporting } = useMultiFormatExport();
@@ -36,11 +38,13 @@ export function MultiFormatExporter() {
 
   return (
     <Tabs defaultValue="export" className="space-y-6">
-      <TabsList>
+      <TabsList className="grid w-full grid-cols-6">
         <TabsTrigger value="export">Export</TabsTrigger>
         <TabsTrigger value="signature">Signature</TabsTrigger>
+        <TabsTrigger value="validation">Validation IA</TabsTrigger>
         <TabsTrigger value="analytics">Analytics</TabsTrigger>
         <TabsTrigger value="templates">Templates</TabsTrigger>
+        <TabsTrigger value="webhooks">Webhooks</TabsTrigger>
       </TabsList>
 
       <TabsContent value="export">
@@ -169,6 +173,23 @@ export function MultiFormatExporter() {
 
       <TabsContent value="templates">
         <TemplateEditor />
+      </TabsContent>
+
+      <TabsContent value="validation">
+        <ReportValidation reportData={{
+          complianceScore: 75,
+          totalConsents: 100,
+          activeConsents: 80,
+          pendingExports: 3,
+          criticalAlerts: 1,
+          completedDeletions: 15,
+          dsarResponseRate: 95,
+          reportId: 'current-report',
+        }} />
+      </TabsContent>
+
+      <TabsContent value="webhooks">
+        <WebhookManager />
       </TabsContent>
     </Tabs>
   );

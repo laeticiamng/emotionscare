@@ -5,6 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Palette, Save, Eye } from 'lucide-react';
 import { useState } from 'react';
+import { TemplateVersioning } from './TemplateVersioning';
 
 interface TemplateConfig {
   name: string;
@@ -32,9 +33,11 @@ export function TemplateEditor() {
       recommendations: true,
     },
   });
+  const [templateId] = useState('current-template-id'); // Replace with actual ID
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -131,6 +134,9 @@ export function TemplateEditor() {
           </div>
         </CardContent>
       </Card>
+      </div>
+
+      <TemplateVersioning templateId={templateId} />
     </div>
   );
 }

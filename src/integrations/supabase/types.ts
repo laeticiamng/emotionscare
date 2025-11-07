@@ -5235,6 +5235,42 @@ export type Database = {
         }
         Relationships: []
       }
+      gdpr_webhooks: {
+        Row: {
+          created_at: string
+          event_type: string
+          id: string
+          is_active: boolean | null
+          last_triggered_at: string | null
+          secret: string
+          trigger_count: number | null
+          url: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_type: string
+          id?: string
+          is_active?: boolean | null
+          last_triggered_at?: string | null
+          secret: string
+          trigger_count?: number | null
+          url: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_type?: string
+          id?: string
+          is_active?: boolean | null
+          last_triggered_at?: string | null
+          secret?: string
+          trigger_count?: number | null
+          url?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       generated_ambient_images: {
         Row: {
           created_at: string
@@ -10723,6 +10759,39 @@ export type Database = {
         }
         Relationships: []
       }
+      report_validations: {
+        Row: {
+          compliance_checks: Json
+          created_at: string
+          id: string
+          immediate_actions: Json | null
+          overall_assessment: string
+          recommendations: Json
+          report_id: string
+          user_id: string | null
+        }
+        Insert: {
+          compliance_checks: Json
+          created_at?: string
+          id?: string
+          immediate_actions?: Json | null
+          overall_assessment: string
+          recommendations: Json
+          report_id: string
+          user_id?: string | null
+        }
+        Update: {
+          compliance_checks?: Json
+          created_at?: string
+          id?: string
+          immediate_actions?: Json | null
+          overall_assessment?: string
+          recommendations?: Json
+          report_id?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       retention_notifications: {
         Row: {
           acknowledged: boolean | null
@@ -11912,6 +11981,44 @@ export type Database = {
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "orgs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      template_versions: {
+        Row: {
+          change_description: string | null
+          config: Json
+          created_at: string
+          created_by: string | null
+          id: string
+          template_id: string | null
+          version_number: number
+        }
+        Insert: {
+          change_description?: string | null
+          config: Json
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          template_id?: string | null
+          version_number: number
+        }
+        Update: {
+          change_description?: string | null
+          config?: Json
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          template_id?: string | null
+          version_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "template_versions_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "pdf_templates"
             referencedColumns: ["id"]
           },
         ]
@@ -14285,6 +14392,50 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: []
+      }
+      webhook_logs: {
+        Row: {
+          created_at: string
+          error_message: string | null
+          event_type: string
+          id: string
+          payload: Json | null
+          response_body: string | null
+          status_code: number | null
+          success: boolean | null
+          webhook_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          error_message?: string | null
+          event_type: string
+          id?: string
+          payload?: Json | null
+          response_body?: string | null
+          status_code?: number | null
+          success?: boolean | null
+          webhook_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          error_message?: string | null
+          event_type?: string
+          id?: string
+          payload?: Json | null
+          response_body?: string | null
+          status_code?: number | null
+          success?: boolean | null
+          webhook_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "webhook_logs_webhook_id_fkey"
+            columns: ["webhook_id"]
+            isOneToOne: false
+            referencedRelation: "gdpr_webhooks"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       webhook_settings: {
         Row: {
