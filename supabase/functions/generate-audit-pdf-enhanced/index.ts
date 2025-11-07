@@ -90,67 +90,150 @@ serve(async (req) => {
 });
 
 function generateChartsData(audit: any, history: any[]) {
-  // Trend chart data
-  const trendChart = {
-    type: 'line',
-    labels: history.map(h => new Date(h.audit_date).toLocaleDateString('fr-FR', { month: 'short', year: 'numeric' })),
-    datasets: [{
-      label: 'Score de Conformité',
-      data: history.map(h => h.overall_score),
-      borderColor: '#3b82f6',
-      backgroundColor: 'rgba(59, 130, 246, 0.1)',
-      tension: 0.4,
-      fill: true,
-    }],
-  };
+  const trendSVG = generateTrendChartSVG(history);
+  const radarSVG = generateRadarChartSVG(audit.scores);
+  const barSVG = generateSeverityBarChartSVG(audit.recommendations);
 
-  // Category scores radar chart
-  const categoryScores = audit.scores?.map((s: any) => ({
-    category: s.compliance_categories?.category_code || 'N/A',
-    score: s.score,
-  })) || [];
+  return { trendSVG, radarSVG, barSVG };
+}
 
-  const radarChart = {
-    type: 'radar',
-    labels: categoryScores.map((c: any) => c.category),
-    datasets: [{
-      label: 'Scores par Catégorie',
-      data: categoryScores.map((c: any) => c.score),
-      borderColor: '#8b5cf6',
-      backgroundColor: 'rgba(139, 92, 246, 0.2)',
-      pointBackgroundColor: '#8b5cf6',
-    }],
-  };
+function generateTrendChartSVG(history: any[]): string {
+  if (!history || history.length === 0) return '';
+  
+  const width = 800;
+  const height = 300;
+  const padding = 60;
+  const maxScore = 100;
+  
+  const points = history.map((h, i) => ({
+    x: padding + (i / (history.length - 1)) * (width - 2 * padding),
+    y: height - padding - ((h.overall_score / maxScore) * (height - 2 * padding)),
+    score: h.overall_score,
+  }));
 
-  // Recommendations by severity (bar chart)
-  const severityCounts = {
-    critical: 0,
-    high: 0,
-    medium: 0,
-    low: 0,
-  };
+  const pathD = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x},${p.y}`).join(' ');
+  const areaD = `${pathD} L ${width - padding},${height - padding} L ${padding},${height - padding} Z`;
 
-  audit.recommendations?.forEach((rec: any) => {
+  return `
+    <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="areaGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:0.4"/>
+          <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:0.05"/>
+        </linearGradient>
+      </defs>
+      <text x="${width/2}" y="25" text-anchor="middle" font-size="18" font-weight="600" fill="#1f2937">
+        Évolution du Score (${history.length} derniers audits)
+      </text>
+      ${[0, 25, 50, 75, 100].map(val => {
+        const y = height - padding - ((val / maxScore) * (height - 2 * padding));
+        return `
+          <line x1="${padding}" y1="${y}" x2="${width - padding}" y2="${y}" stroke="#e5e7eb" stroke-width="1"/>
+          <text x="${padding - 10}" y="${y + 5}" text-anchor="end" font-size="12" fill="#6b7280">${val}</text>
+        `;
+      }).join('')}
+      <path d="${areaD}" fill="url(#areaGradient)"/>
+      <path d="${pathD}" fill="none" stroke="#3b82f6" stroke-width="3"/>
+      ${points.map(p => `
+        <circle cx="${p.x}" cy="${p.y}" r="5" fill="#3b82f6" stroke="white" stroke-width="2"/>
+      `).join('')}
+      <text x="${padding}" y="${height - 10}" font-size="12" fill="#6b7280">Anciens</text>
+      <text x="${width - padding}" y="${height - 10}" text-anchor="end" font-size="12" fill="#6b7280">Récent</text>
+    </svg>
+  `;
+}
+
+function generateRadarChartSVG(scores: any[]): string {
+  if (!scores || scores.length === 0) return '';
+  
+  const size = 400;
+  const center = size / 2;
+  const radius = 150;
+  const categories = scores.slice(0, 6);
+  const angleStep = (2 * Math.PI) / categories.length;
+
+  const points = categories.map((s, i) => {
+    const angle = -Math.PI / 2 + i * angleStep;
+    const normalized = (s.score || 0) / 100;
+    return {
+      x: center + radius * normalized * Math.cos(angle),
+      y: center + radius * normalized * Math.sin(angle),
+      labelX: center + (radius + 40) * Math.cos(angle),
+      labelY: center + (radius + 40) * Math.sin(angle),
+      name: s.compliance_categories?.category_code || 'N/A',
+    };
+  });
+
+  const pathD = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x},${p.y}`).join(' ') + ' Z';
+
+  return `
+    <svg width="${size}" height="${size}" xmlns="http://www.w3.org/2000/svg">
+      <text x="${center}" y="25" text-anchor="middle" font-size="18" font-weight="600" fill="#1f2937">
+        Scores par Catégorie
+      </text>
+      ${[0.2, 0.4, 0.6, 0.8, 1].map(factor => {
+        const r = radius * factor;
+        const hexPoints = categories.map((_, i) => {
+          const angle = -Math.PI / 2 + i * angleStep;
+          return `${center + r * Math.cos(angle)},${center + r * Math.sin(angle)}`;
+        }).join(' ');
+        return `<polygon points="${hexPoints}" fill="none" stroke="#e5e7eb" stroke-width="1"/>`;
+      }).join('')}
+      <path d="${pathD}" fill="rgba(139, 92, 246, 0.3)" stroke="#8b5cf6" stroke-width="2"/>
+      ${points.map(p => `
+        <circle cx="${p.x}" cy="${p.y}" r="4" fill="#8b5cf6" stroke="white" stroke-width="2"/>
+        <text x="${p.labelX}" y="${p.labelY}" text-anchor="middle" font-size="11" fill="#374151" font-weight="500">
+          ${p.name}
+        </text>
+      `).join('')}
+    </svg>
+  `;
+}
+
+function generateSeverityBarChartSVG(recommendations: any[]): string {
+  if (!recommendations || recommendations.length === 0) return '';
+  
+  const width = 600;
+  const height = 300;
+  const padding = 60;
+  
+  const severityCounts = { critical: 0, high: 0, medium: 0, low: 0 };
+  recommendations.forEach((rec: any) => {
     if (severityCounts.hasOwnProperty(rec.severity)) {
       severityCounts[rec.severity as keyof typeof severityCounts]++;
     }
   });
 
-  const barChart = {
-    type: 'bar',
-    labels: ['Critique', 'Haute', 'Moyenne', 'Basse'],
-    datasets: [{
-      label: 'Recommandations par Sévérité',
-      data: [severityCounts.critical, severityCounts.high, severityCounts.medium, severityCounts.low],
-      backgroundColor: ['#ef4444', '#f59e0b', '#fbbf24', '#10b981'],
-    }],
-  };
+  const data = [
+    { label: 'Critique', count: severityCounts.critical, color: '#ef4444' },
+    { label: 'Haute', count: severityCounts.high, color: '#f59e0b' },
+    { label: 'Moyenne', count: severityCounts.medium, color: '#fbbf24' },
+    { label: 'Basse', count: severityCounts.low, color: '#10b981' },
+  ];
 
-  return {
-    trendChart,
-    radarChart,
-    barChart,
-  };
+  const maxCount = Math.max(...data.map(d => d.count), 1);
+  const barWidth = (width - 2 * padding) / data.length - 20;
+
+  return `
+    <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+      <text x="${width/2}" y="25" text-anchor="middle" font-size="18" font-weight="600" fill="#1f2937">
+        Recommandations par Sévérité
+      </text>
+      ${data.map((d, i) => {
+        const x = padding + i * ((width - 2 * padding) / data.length);
+        const barHeight = (d.count / maxCount) * (height - 2 * padding);
+        const y = height - padding - barHeight;
+        return `
+          <rect x="${x}" y="${y}" width="${barWidth}" height="${barHeight}" 
+                fill="${d.color}" rx="4"/>
+          <text x="${x + barWidth/2}" y="${y - 10}" text-anchor="middle" 
+                font-size="16" font-weight="600" fill="#1f2937">${d.count}</text>
+          <text x="${x + barWidth/2}" y="${height - padding + 25}" text-anchor="middle" 
+                font-size="13" fill="#6b7280">${d.label}</text>
+        `;
+      }).join('')}
+    </svg>
+  `;
 }
 
 function generateEnhancedHTML(audit: any, chartsData: any, template: string): string {
@@ -161,12 +244,14 @@ function generateEnhancedHTML(audit: any, chartsData: any, template: string): st
       <meta charset="UTF-8">
       <title>Rapport RGPD - EmotionsCare</title>
       <style>
+        @page { size: A4; margin: 1cm; }
         body {
           font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
           padding: 40px;
           color: #1f2937;
           max-width: 1200px;
           margin: 0 auto;
+          line-height: 1.6;
         }
         .header {
           text-align: center;
@@ -199,83 +284,21 @@ function generateEnhancedHTML(audit: any, chartsData: any, template: string): st
           background: #f9fafb;
           border-radius: 12px;
           border: 1px solid #e5e7eb;
-        }
-        .chart-title {
-          font-size: 20px;
-          font-weight: 600;
-          margin-bottom: 20px;
-          color: #374151;
+          text-align: center;
+          page-break-inside: avoid;
         }
         .chart-svg {
-          width: 100%;
+          max-width: 100%;
           height: auto;
         }
-        .categories-grid {
-          display: grid;
-          grid-template-columns: repeat(2, 1fr);
-          gap: 20px;
-          margin: 30px 0;
-        }
-        .category-card {
-          padding: 20px;
-          background: white;
-          border-radius: 8px;
-          border-left: 4px solid #3b82f6;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-        .category-name {
-          font-weight: 600;
-          font-size: 16px;
-          margin-bottom: 8px;
-          color: #1f2937;
-        }
-        .category-score {
-          font-size: 24px;
-          font-weight: bold;
-          color: #3b82f6;
-        }
-        .recommendations-section {
-          margin: 40px 0;
-        }
-        .recommendation-card {
-          padding: 20px;
-          margin: 15px 0;
-          background: #fef3c7;
-          border-left: 4px solid #f59e0b;
-          border-radius: 8px;
-        }
-        .recommendation-card.critical {
-          background: #fee2e2;
-          border-left-color: #ef4444;
-        }
-        .recommendation-card.high {
-          background: #fed7aa;
-          border-left-color: #f97316;
-        }
-        .badge {
-          display: inline-block;
-          padding: 4px 12px;
-          border-radius: 12px;
-          font-size: 11px;
-          font-weight: 600;
-          text-transform: uppercase;
-        }
-        .badge-critical { background: #ef4444; color: white; }
-        .badge-high { background: #f97316; color: white; }
-        .badge-medium { background: #f59e0b; color: white; }
-        .badge-low { background: #10b981; color: white; }
       </style>
     </head>
     <body>
       <div class="header">
-        <h1>Rapport d'Audit RGPD</h1>
+        <h1>📊 Rapport d'Audit RGPD - Haute Qualité</h1>
         <p style="font-size: 14px; color: #6b7280;">
-          EmotionsCare - Généré le ${new Date().toLocaleDateString('fr-FR', { 
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
+          EmotionsCare - ${new Date().toLocaleDateString('fr-FR', { 
+            year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
           })}
         </p>
       </div>
@@ -283,18 +306,22 @@ function generateEnhancedHTML(audit: any, chartsData: any, template: string): st
       <div class="score-banner">
         <div style="font-size: 16px; opacity: 0.9;">Score Global de Conformité</div>
         <div class="score-value">${audit.overall_score}<span style="font-size: 36px;">/100</span></div>
-        <div style="font-size: 14px; opacity: 0.9;">
-          ${audit.overall_score >= 80 ? '✓ Conforme' : audit.overall_score >= 50 ? '⚠️ À améliorer' : '✗ Non conforme'}
-        </div>
+      </div>
+
+      <div class="chart-container">
+        ${chartsData.trendSVG}
+      </div>
+
+      <div class="chart-container">
+        ${chartsData.radarSVG}
+      </div>
+
+      <div class="chart-container">
+        ${chartsData.barSVG}
       </div>
 
       ${template !== 'minimal' ? generateCategoriesSection(audit) : ''}
       ${template === 'standard' || template === 'technical' ? generateRecommendationsSection(audit) : ''}
-      
-      <!-- Charts Data for Client-Side Rendering -->
-      <script type="application/json" id="charts-data">
-        ${JSON.stringify(chartsData)}
-      </script>
     </body>
     </html>
   `;
