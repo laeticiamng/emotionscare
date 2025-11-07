@@ -215,3 +215,6 @@ verify_jwt = false
 
 [functions.data-retention-processor]
 verify_jwt = true
+
+[functions.anomaly-detector]
+verify_jwt = true
