@@ -2635,54 +2635,39 @@ export type Database = {
       }
       compliance_scores: {
         Row: {
-          audit_id: string
-          category_id: string
-          checks_passed: number
-          checks_total: number
+          affected_areas: string[] | null
           created_at: string
-          findings: Json | null
+          event_data: Json | null
+          event_type: string
           id: string
-          max_score: number
+          impact: number | null
+          previous_score: number | null
           score: number
+          user_id: string | null
         }
         Insert: {
-          audit_id: string
-          category_id: string
-          checks_passed?: number
-          checks_total?: number
+          affected_areas?: string[] | null
           created_at?: string
-          findings?: Json | null
+          event_data?: Json | null
+          event_type: string
           id?: string
-          max_score?: number
-          score?: number
+          impact?: number | null
+          previous_score?: number | null
+          score: number
+          user_id?: string | null
         }
         Update: {
-          audit_id?: string
-          category_id?: string
-          checks_passed?: number
-          checks_total?: number
+          affected_areas?: string[] | null
           created_at?: string
-          findings?: Json | null
+          event_data?: Json | null
+          event_type?: string
           id?: string
-          max_score?: number
+          impact?: number | null
+          previous_score?: number | null
           score?: number
+          user_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "compliance_scores_audit_id_fkey"
-            columns: ["audit_id"]
-            isOneToOne: false
-            referencedRelation: "compliance_audits"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "compliance_scores_category_id_fkey"
-            columns: ["category_id"]
-            isOneToOne: false
-            referencedRelation: "compliance_categories"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       consent_channels: {
         Row: {
@@ -2801,6 +2786,108 @@ export type Database = {
           legal_basis?: string | null
           purpose_code?: string
           purpose_name?: string
+        }
+        Relationships: []
+      }
+      cvss_assessments: {
+        Row: {
+          assessed_at: string | null
+          assessed_by: string | null
+          attack_complexity: string
+          attack_vector: string
+          availability_impact: string
+          availability_requirement: string | null
+          base_score: number | null
+          base_severity: string | null
+          confidentiality_impact: string
+          confidentiality_requirement: string | null
+          created_at: string | null
+          cve_id: string | null
+          description: string | null
+          environmental_score: number | null
+          exploit_code_maturity: string | null
+          id: string
+          integrity_impact: string
+          integrity_requirement: string | null
+          notes: string | null
+          patch_deadline: string | null
+          patch_priority: number | null
+          patched: boolean | null
+          privileges_required: string
+          remediation_level: string | null
+          report_confidence: string | null
+          scope: string
+          temporal_score: number | null
+          updated_at: string | null
+          user_interaction: string
+          vector_string: string | null
+          vulnerability_name: string
+        }
+        Insert: {
+          assessed_at?: string | null
+          assessed_by?: string | null
+          attack_complexity: string
+          attack_vector: string
+          availability_impact: string
+          availability_requirement?: string | null
+          base_score?: number | null
+          base_severity?: string | null
+          confidentiality_impact: string
+          confidentiality_requirement?: string | null
+          created_at?: string | null
+          cve_id?: string | null
+          description?: string | null
+          environmental_score?: number | null
+          exploit_code_maturity?: string | null
+          id?: string
+          integrity_impact: string
+          integrity_requirement?: string | null
+          notes?: string | null
+          patch_deadline?: string | null
+          patch_priority?: number | null
+          patched?: boolean | null
+          privileges_required: string
+          remediation_level?: string | null
+          report_confidence?: string | null
+          scope: string
+          temporal_score?: number | null
+          updated_at?: string | null
+          user_interaction: string
+          vector_string?: string | null
+          vulnerability_name: string
+        }
+        Update: {
+          assessed_at?: string | null
+          assessed_by?: string | null
+          attack_complexity?: string
+          attack_vector?: string
+          availability_impact?: string
+          availability_requirement?: string | null
+          base_score?: number | null
+          base_severity?: string | null
+          confidentiality_impact?: string
+          confidentiality_requirement?: string | null
+          created_at?: string | null
+          cve_id?: string | null
+          description?: string | null
+          environmental_score?: number | null
+          exploit_code_maturity?: string | null
+          id?: string
+          integrity_impact?: string
+          integrity_requirement?: string | null
+          notes?: string | null
+          patch_deadline?: string | null
+          patch_priority?: number | null
+          patched?: boolean | null
+          privileges_required?: string
+          remediation_level?: string | null
+          report_confidence?: string | null
+          scope?: string
+          temporal_score?: number | null
+          updated_at?: string | null
+          user_interaction?: string
+          vector_string?: string | null
+          vulnerability_name?: string
         }
         Relationships: []
       }
@@ -10915,6 +11002,39 @@ export type Database = {
           id?: string
           name?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      scheduled_reports: {
+        Row: {
+          created_at: string | null
+          enabled: boolean | null
+          id: string
+          last_sent_at: string | null
+          next_scheduled_at: string | null
+          recipients: string[]
+          report_type: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          enabled?: boolean | null
+          id?: string
+          last_sent_at?: string | null
+          next_scheduled_at?: string | null
+          recipients: string[]
+          report_type: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          enabled?: boolean | null
+          id?: string
+          last_sent_at?: string | null
+          next_scheduled_at?: string | null
+          recipients?: string[]
+          report_type?: string
+          updated_at?: string | null
         }
         Relationships: []
       }

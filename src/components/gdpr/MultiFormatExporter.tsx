@@ -12,6 +12,9 @@ import { ExportAnalyticsDashboard } from './ExportAnalyticsDashboard';
 import { TemplateEditor } from './TemplateEditor';
 import { ReportValidation } from './ReportValidation';
 import { WebhookManager } from './WebhookManager';
+import { GDPRAssistantChat } from './GDPRAssistantChat';
+import { SecurityPenetrationTest } from './SecurityPenetrationTest';
+import { RealtimeComplianceScore } from './RealtimeComplianceScore';
 
 export function MultiFormatExporter() {
   const { exportData, isExporting } = useMultiFormatExport();
@@ -38,13 +41,16 @@ export function MultiFormatExporter() {
 
   return (
     <Tabs defaultValue="export" className="space-y-6">
-      <TabsList className="grid w-full grid-cols-6">
+      <TabsList className="grid w-full grid-cols-5 lg:grid-cols-9">
         <TabsTrigger value="export">Export</TabsTrigger>
         <TabsTrigger value="signature">Signature</TabsTrigger>
-        <TabsTrigger value="validation">Validation IA</TabsTrigger>
+        <TabsTrigger value="validation">Validation</TabsTrigger>
         <TabsTrigger value="analytics">Analytics</TabsTrigger>
         <TabsTrigger value="templates">Templates</TabsTrigger>
         <TabsTrigger value="webhooks">Webhooks</TabsTrigger>
+        <TabsTrigger value="assistant">Assistant IA</TabsTrigger>
+        <TabsTrigger value="security">Sécurité</TabsTrigger>
+        <TabsTrigger value="realtime-score">Score Temps Réel</TabsTrigger>
       </TabsList>
 
       <TabsContent value="export">
@@ -190,6 +196,18 @@ export function MultiFormatExporter() {
 
       <TabsContent value="webhooks">
         <WebhookManager />
+      </TabsContent>
+
+      <TabsContent value="assistant">
+        <GDPRAssistantChat />
+      </TabsContent>
+
+      <TabsContent value="security">
+        <SecurityPenetrationTest />
+      </TabsContent>
+
+      <TabsContent value="realtime-score">
+        <RealtimeComplianceScore />
       </TabsContent>
     </Tabs>
   );

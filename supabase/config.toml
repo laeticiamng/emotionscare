@@ -269,3 +269,12 @@ verify_jwt = true
 
 [functions.trigger-webhooks]
 verify_jwt = false
+
+[functions.gdpr-assistant-chat]
+verify_jwt = true
+
+[functions.security-penetration-test]
+verify_jwt = true
+
+[functions.realtime-compliance-scoring]
+verify_jwt = true
