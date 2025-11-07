@@ -14,6 +14,7 @@ import ExportReportButton from '@/components/gdpr/ExportReportButton';
 import { ScheduledExportsManager } from '@/components/gdpr/ScheduledExportsManager';
 import CriticalAlertsNotification from '@/components/gdpr/CriticalAlertsNotification';
 import GDPRRealtimeDashboard from '@/components/gdpr/GDPRRealtimeDashboard';
+import GDPRAlertHistory from '@/components/gdpr/GDPRAlertHistory';
 import { useGDPRMonitoring } from '@/hooks/useGDPRMonitoring';
 import { useGDPRComplianceScore } from '@/hooks/useGDPRComplianceScore';
 import { useGDPRRealtimeAlerts } from '@/hooks/useGDPRRealtimeAlerts';
@@ -61,7 +62,7 @@ const GDPRMonitoringPage: React.FC = () => {
         </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-8">
+        <TabsList className="grid w-full grid-cols-9">
           <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
           <TabsTrigger value="realtime">Temps réel</TabsTrigger>
           <TabsTrigger value="compliance">
@@ -72,6 +73,7 @@ const GDPRMonitoringPage: React.FC = () => {
             <Bell className="h-4 w-4 mr-2" />
             Alertes
           </TabsTrigger>
+          <TabsTrigger value="history">Historique</TabsTrigger>
           <TabsTrigger value="consents">Consentements</TabsTrigger>
           <TabsTrigger value="exports">Exports</TabsTrigger>
           <TabsTrigger value="audit">Audit Logs</TabsTrigger>
@@ -205,6 +207,10 @@ const GDPRMonitoringPage: React.FC = () => {
 
         <TabsContent value="alerts" className="space-y-6 mt-6">
           <GDPRAlerts />
+        </TabsContent>
+
+        <TabsContent value="history" className="space-y-6 mt-6">
+          <GDPRAlertHistory />
         </TabsContent>
 
         <TabsContent value="consents" className="space-y-6 mt-6">
