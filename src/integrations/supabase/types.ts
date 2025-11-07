@@ -1275,6 +1275,48 @@ export type Database = {
         }
         Relationships: []
       }
+      blockchain_backups: {
+        Row: {
+          backup_date: string
+          block_count: number
+          checksum: string
+          created_at: string
+          encryption_key_hash: string | null
+          file_path: string
+          file_size_bytes: number | null
+          id: string
+          metadata: Json | null
+          restored_at: string | null
+          status: string
+        }
+        Insert: {
+          backup_date?: string
+          block_count: number
+          checksum: string
+          created_at?: string
+          encryption_key_hash?: string | null
+          file_path: string
+          file_size_bytes?: number | null
+          id?: string
+          metadata?: Json | null
+          restored_at?: string | null
+          status?: string
+        }
+        Update: {
+          backup_date?: string
+          block_count?: number
+          checksum?: string
+          created_at?: string
+          encryption_key_hash?: string | null
+          file_path?: string
+          file_size_bytes?: number | null
+          id?: string
+          metadata?: Json | null
+          restored_at?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
       bounce_battles: {
         Row: {
           created_at: string | null
@@ -2632,6 +2674,57 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      compliance_reports: {
+        Row: {
+          created_at: string
+          email_sent: boolean | null
+          email_sent_at: string | null
+          generated_at: string
+          html_content: string | null
+          id: string
+          metadata: Json | null
+          pdf_url: string | null
+          period_end: string
+          period_start: string
+          report_type: string
+          status: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email_sent?: boolean | null
+          email_sent_at?: string | null
+          generated_at?: string
+          html_content?: string | null
+          id?: string
+          metadata?: Json | null
+          pdf_url?: string | null
+          period_end: string
+          period_start: string
+          report_type: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email_sent?: boolean | null
+          email_sent_at?: string | null
+          generated_at?: string
+          html_content?: string | null
+          id?: string
+          metadata?: Json | null
+          pdf_url?: string | null
+          period_end?: string
+          period_start?: string
+          report_type?: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
       }
       compliance_scores: {
         Row: {
@@ -10723,6 +10816,51 @@ export type Database = {
           updated_at?: string | null
           window_end?: string
           window_start?: string
+        }
+        Relationships: []
+      }
+      realtime_notifications: {
+        Row: {
+          action_url: string | null
+          created_at: string
+          expires_at: string | null
+          id: string
+          message: string
+          metadata: Json | null
+          read: boolean
+          read_at: string | null
+          severity: string
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          action_url?: string | null
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          message: string
+          metadata?: Json | null
+          read?: boolean
+          read_at?: string | null
+          severity: string
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          action_url?: string | null
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          message?: string
+          metadata?: Json | null
+          read?: boolean
+          read_at?: string | null
+          severity?: string
+          title?: string
+          type?: string
+          user_id?: string
         }
         Relationships: []
       }
