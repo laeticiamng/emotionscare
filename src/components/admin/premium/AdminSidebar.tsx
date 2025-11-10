@@ -13,7 +13,8 @@ import {
   UserCog,
   Globe,
   Zap,
-  Database
+  Database,
+  DollarSign
 } from 'lucide-react';
 
 interface AdminSidebarProps {
@@ -89,6 +90,12 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ currentPath }) => {
       href: '/b2b/admin/compliance',
       icon: Shield,
       description: 'Sécurité et conformité'
+    },
+    {
+      title: 'Monitoring APIs',
+      href: '/admin/api-monitoring',
+      icon: DollarSign,
+      description: 'OpenAI & Hume (coûts)'
     },
     {
       title: 'Paramètres',

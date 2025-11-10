@@ -105,6 +105,7 @@ const B2BAccessibilityPage = lazy(() => import('@/pages/B2BAccessibilityPage'));
 
 // GDPR & Compliance pages
 const UnifiedGDPRDashboard = lazy(() => import('@/pages/admin/UnifiedGDPRDashboard'));
+const APIMonitoringDashboard = lazy(() => import('@/pages/admin/APIMonitoringDashboard'));
 const CronMonitoring = lazy(() => import('@/pages/CronMonitoring'));
 const BlockchainBackups = lazy(() => import('@/pages/BlockchainBackups'));
 
@@ -474,6 +475,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   
   // GDPR & Compliance
   UnifiedGDPRDashboard,
+  APIMonitoringDashboard,
   CronMonitoring,
   BlockchainBackups,
   
