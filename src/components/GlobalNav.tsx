@@ -86,7 +86,7 @@ const GlobalNav: React.FC = () => {
                     <Link to={routes.b2b.admin.dashboard()}>Admin Dashboard</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link to={routes.b2b.admin.gdprDashboard()}>Dashboard RGPD</Link>
+                    <Link to={routes.b2b.admin.gdprDashboard()}>Dashboard RGPD Unifié</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link to={routes.b2b.admin.cronMonitoring()}>Monitoring Cron</Link>
