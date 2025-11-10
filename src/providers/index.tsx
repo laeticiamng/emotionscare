@@ -20,6 +20,7 @@ import { UnifiedProvider } from '@/core/UnifiedStateManager';
 import { MusicProvider } from '@/contexts/music';
 import { ThemeProvider } from '@/providers/theme';
 import { PolicyAcceptanceModal } from '@/components/gdpr/PolicyAcceptanceModal';
+import AccessibilitySkipLinks from '@/components/AccessibilitySkipLinks';
 
 const createQueryClient = () =>
   new QueryClient({
@@ -112,6 +113,7 @@ export function RootProvider({ children }: RootProviderProps) {
                             >
                               <TooltipProvider>
                                 <NotificationProvider>
+                                  <AccessibilitySkipLinks />
                                   {children}
                                   <Toaster />
                                   <PolicyAcceptanceModal />

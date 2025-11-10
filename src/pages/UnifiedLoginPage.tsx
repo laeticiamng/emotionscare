@@ -1,27 +1,35 @@
-import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { loginSchema, type LoginFormData } from '@/lib/validations/auth';
+import { sanitizeInput } from '@/lib/validation/validator';
 
 export default function UnifiedLoginPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+  
+  const form = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: '',
+      password: ''
+    }
+  });
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-
+  const handleLogin = async (values: LoginFormData) => {
     try {
+      // Sanitize email before sending
+      const sanitizedEmail = sanitizeInput(values.email);
+      
       const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+        email: sanitizedEmail,
+        password: values.password,
       });
 
       if (error) throw error;
@@ -38,8 +46,6 @@ export default function UnifiedLoginPage() {
         description: error.message,
         variant: 'destructive',
       });
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -47,48 +53,81 @@ export default function UnifiedLoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background to-secondary/20 p-4">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle>Connexion</CardTitle>
+          <CardTitle id="login-title">Connexion</CardTitle>
           <CardDescription>
             Connectez-vous à votre compte EmotionsCare
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                placeholder="votre@email.fr"
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(handleLogin)} className="space-y-4" noValidate aria-labelledby="login-title">
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel htmlFor="login-email">
+                      Email <span className="text-destructive" aria-label="requis">*</span>
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        id="login-email"
+                        type="email"
+                        placeholder="votre@email.fr"
+                        autoComplete="email"
+                        aria-required="true"
+                        aria-invalid={!!form.formState.errors.email}
+                        aria-describedby={form.formState.errors.email ? "login-email-error" : undefined}
+                      />
+                    </FormControl>
+                    <FormMessage id="login-email-error" />
+                  </FormItem>
+                )}
               />
-            </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="password">Mot de passe</Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                placeholder="••••••••"
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel htmlFor="login-password">
+                      Mot de passe <span className="text-destructive" aria-label="requis">*</span>
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        id="login-password"
+                        type="password"
+                        placeholder="••••••••"
+                        autoComplete="current-password"
+                        aria-required="true"
+                        aria-invalid={!!form.formState.errors.password}
+                        aria-describedby={form.formState.errors.password ? "login-password-error" : undefined}
+                      />
+                    </FormControl>
+                    <FormMessage id="login-password-error" />
+                  </FormItem>
+                )}
               />
-            </div>
 
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? 'Connexion...' : 'Se connecter'}
-            </Button>
+              <Button 
+                type="submit" 
+                className="w-full" 
+                disabled={form.formState.isSubmitting}
+                aria-busy={form.formState.isSubmitting}
+              >
+                {form.formState.isSubmitting ? 'Connexion...' : 'Se connecter'}
+              </Button>
 
-            <div className="text-center text-sm text-muted-foreground">
-              Pas encore de compte ?{' '}
-              <Link to="/signup" className="text-primary hover:underline">
-                S'inscrire
-              </Link>
-            </div>
-          </form>
+              <div className="text-center text-sm text-muted-foreground">
+                Pas encore de compte ?{' '}
+                <Link to="/signup" className="text-primary hover:underline focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded">
+                  S'inscrire
+                </Link>
+              </div>
+            </form>
+          </Form>
         </CardContent>
       </Card>
     </div>
