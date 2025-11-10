@@ -1,6 +1,9 @@
 // @ts-nocheck - ESM imports from https://esm.sh ne supportent pas les types TypeScript natifs dans Deno
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import OpenAI from "https://esm.sh/openai@4.20.1"
+import { authenticateRequest } from '../_shared/auth-middleware.ts';
+import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
+import { createErrorResponse } from '../_shared/validation.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -14,6 +17,30 @@ serve(async (req) => {
   }
 
   try {
+    // 🔒 SÉCURITÉ: Authentification obligatoire
+    const authResult = await authenticateRequest(req);
+    if (authResult.status !== 200 || !authResult.user) {
+      console.warn('[openai-transcribe] Unauthorized access attempt');
+      return createErrorResponse(authResult.error || 'Authentication required', authResult.status, corsHeaders);
+    }
+
+    // 🛡️ SÉCURITÉ: Rate limiting strict (20 req/min - Whisper transcription)
+    const rateLimit = await enforceEdgeRateLimit(req, {
+      route: 'openai-transcribe',
+      userId: authResult.user.id,
+      limit: 20,
+      windowMs: 60_000,
+      description: 'OpenAI Whisper transcription'
+    });
+
+    if (!rateLimit.allowed) {
+      console.warn('[openai-transcribe] Rate limit exceeded', { userId: authResult.user.id });
+      return buildRateLimitResponse(rateLimit, corsHeaders, {
+        errorCode: 'rate_limit_exceeded',
+        message: `Trop de transcriptions. Réessayez dans ${rateLimit.retryAfterSeconds}s.`
+      });
+    }
+
     const openaiApiKey = Deno.env.get('OPENAI_API_KEY')
     if (!openaiApiKey) {
       throw new Error('OPENAI_API_KEY not configured')
@@ -22,8 +49,18 @@ serve(async (req) => {
     const formData = await req.formData()
     const audioFile = formData.get('audio') as File
     
+    // ✅ VALIDATION: Vérification du fichier audio
     if (!audioFile) {
-      throw new Error('Audio file is required')
+      return createErrorResponse('Audio file is required', 400, corsHeaders);
+    }
+
+    if (audioFile.size > 25 * 1024 * 1024) {
+      return createErrorResponse('Audio file too large (max 25MB)', 400, corsHeaders);
+    }
+
+    const allowedTypes = ['audio/webm', 'audio/wav', 'audio/mp3', 'audio/mpeg', 'audio/mp4'];
+    if (!allowedTypes.includes(audioFile.type)) {
+      return createErrorResponse(`Invalid audio format. Allowed: ${allowedTypes.join(', ')}`, 400, corsHeaders);
     }
 
     console.log('Transcribing audio file:', audioFile.name, 'Size:', audioFile.size)

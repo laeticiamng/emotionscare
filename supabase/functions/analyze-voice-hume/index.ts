@@ -1,6 +1,9 @@
 // @ts-nocheck
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { authenticateRequest } from '../_shared/auth-middleware.ts';
+import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
+import { validateRequest, createErrorResponse, VoiceAnalysisSchema } from '../_shared/validation.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -13,14 +16,37 @@ serve(async (req) => {
   }
 
   try {
-    const { audioBase64 } = await req.json();
-    
-    if (!audioBase64) {
-      return new Response(
-        JSON.stringify({ error: 'Audio base64 is required' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+    // 🔒 SÉCURITÉ: Authentification obligatoire
+    const authResult = await authenticateRequest(req);
+    if (authResult.status !== 200 || !authResult.user) {
+      console.warn('[analyze-voice-hume] Unauthorized access attempt');
+      return createErrorResponse(authResult.error || 'Authentication required', authResult.status, corsHeaders);
     }
+
+    // 🛡️ SÉCURITÉ: Rate limiting strict (10 req/min - Whisper + Lovable AI)
+    const rateLimit = await enforceEdgeRateLimit(req, {
+      route: 'analyze-voice-hume',
+      userId: authResult.user.id,
+      limit: 10,
+      windowMs: 60_000,
+      description: 'Voice analysis - OpenAI Whisper + Lovable AI'
+    });
+
+    if (!rateLimit.allowed) {
+      console.warn('[analyze-voice-hume] Rate limit exceeded', { userId: authResult.user.id });
+      return buildRateLimitResponse(rateLimit, corsHeaders, {
+        errorCode: 'rate_limit_exceeded',
+        message: `Trop de requêtes vocales. Réessayez dans ${rateLimit.retryAfterSeconds}s.`
+      });
+    }
+
+    // ✅ VALIDATION: Validation Zod des entrées
+    const validation = await validateRequest(req, VoiceAnalysisSchema);
+    if (!validation.success) {
+      return createErrorResponse(validation.error, validation.status, corsHeaders);
+    }
+
+    const { audioBase64 } = validation.data;
 
     const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');

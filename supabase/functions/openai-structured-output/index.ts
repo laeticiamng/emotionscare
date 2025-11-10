@@ -1,6 +1,9 @@
 // @ts-nocheck
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
+import { authenticateRequest } from '../_shared/auth-middleware.ts';
+import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
+import { validateRequest, createErrorResponse, StructuredOutputRequestSchema } from '../_shared/validation.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -13,7 +16,37 @@ serve(async (req) => {
   }
 
   try {
-    const { systemPrompt, userPrompt, schema, schemaName } = await req.json();
+    // 🔒 SÉCURITÉ: Authentification obligatoire
+    const authResult = await authenticateRequest(req);
+    if (authResult.status !== 200 || !authResult.user) {
+      console.warn('[openai-structured-output] Unauthorized access attempt');
+      return createErrorResponse(authResult.error || 'Authentication required', authResult.status, corsHeaders);
+    }
+
+    // 🛡️ SÉCURITÉ: Rate limiting strict (15 req/min - structured output GPT-4)
+    const rateLimit = await enforceEdgeRateLimit(req, {
+      route: 'openai-structured-output',
+      userId: authResult.user.id,
+      limit: 15,
+      windowMs: 60_000,
+      description: 'OpenAI structured output generation'
+    });
+
+    if (!rateLimit.allowed) {
+      console.warn('[openai-structured-output] Rate limit exceeded', { userId: authResult.user.id });
+      return buildRateLimitResponse(rateLimit, corsHeaders, {
+        errorCode: 'rate_limit_exceeded',
+        message: `Trop de requêtes structured output. Réessayez dans ${rateLimit.retryAfterSeconds}s.`
+      });
+    }
+
+    // ✅ VALIDATION: Validation Zod des entrées
+    const validation = await validateRequest(req, StructuredOutputRequestSchema);
+    if (!validation.success) {
+      return createErrorResponse(validation.error, validation.status, corsHeaders);
+    }
+
+    const { systemPrompt, userPrompt, schema, schemaName } = validation.data;
     
     const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
     if (!OPENAI_API_KEY) {
