@@ -34,3 +34,32 @@ jobs:
           curl -fsSL "${BASE_URL}/healthz.html" | grep -F "EMOTIONSCARE_HEALTHCHECK_OK"
 
           echo "Toutes les sondes HTTP sont passées avec succès."
+
+  load-tests:
+    name: Tests de charge K6
+    runs-on: ubuntu-latest
+    needs: pre-deploy-smoke
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install K6
+        run: |
+          sudo gpg -k
+          sudo gpg --no-default-keyring --keyring /usr/share/keyrings/k6-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
+          echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
+          sudo apt-get update
+          sudo apt-get install k6
+
+      - name: Execute K6 load tests
+        env:
+          BASE_URL: ${{ inputs.base_url }}
+        run: |
+          k6 run tests/load/k6-edge-functions-rgpd.js --env BASE_URL="${BASE_URL}"
+
+      - name: Upload K6 report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: k6-report
+          path: k6-summary.json

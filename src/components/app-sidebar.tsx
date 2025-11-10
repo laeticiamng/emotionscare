@@ -49,7 +49,8 @@ import {
   Target,
   FileText,
   Smile,
-  Waves
+  Waves,
+  HeartPulse
 } from "lucide-react";
 
 // Types
@@ -295,6 +296,20 @@ export function AppSidebar() {
           url: routes.b2c.settings(),
           icon: Settings,
           description: "Personnalisez votre expérience"
+        }
+      ]
+    },
+    {
+      label: "Système",
+      icon: HeartPulse,
+      items: [
+        {
+          title: "Santé Système",
+          url: "/system-health",
+          icon: HeartPulse,
+          badge: "Monitoring",
+          gradient: "from-green-500 to-emerald-500",
+          description: "Dashboard de santé système"
         }
       ]
     }

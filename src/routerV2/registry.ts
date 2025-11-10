@@ -1510,6 +1510,22 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
   },
 
   // ═══════════════════════════════════════════════════════════
+  // SYSTEM & MONITORING
+  // ═══════════════════════════════════════════════════════════
+  {
+    name: 'system-health',
+    path: '/system-health',
+    segment: 'public',
+    layout: 'app',
+    component: 'SystemHealthPage',
+    guard: false,
+    meta: {
+      title: 'Santé Système - EmotionsCare',
+      description: 'Monitoring et santé du système',
+    },
+  },
+
+  // ═══════════════════════════════════════════════════════════
   // 404 FALLBACK ROUTE (must be last)
   // ═══════════════════════════════════════════════════════════
   {

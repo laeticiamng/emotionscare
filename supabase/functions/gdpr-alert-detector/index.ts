@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { serve } from 'https://deno.land/std@0.208.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { withMonitoring } from '../_shared/monitoring-wrapper.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -19,7 +20,7 @@ interface Consent {
   created_at: string;
 }
 
-serve(async (req) => {
+const handler = withMonitoring('gdpr-alert-detector', async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }
@@ -203,3 +204,5 @@ serve(async (req) => {
     );
   }
 });
+
+serve(handler);
