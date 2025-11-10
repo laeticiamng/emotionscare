@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { withMonitoring, logger } from '../_shared/monitoring-wrapper.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -154,12 +155,7 @@ function calculateComplianceScore(metrics: ComplianceMetrics): {
   };
 }
 
-Deno.serve(async (req) => {
-  // Handle CORS preflight requests
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
-
+const handler = withMonitoring('gdpr-compliance-score', async (req, context) => {
   try {
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
@@ -181,7 +177,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    console.log('Calculating GDPR compliance score for user:', user.id);
+    logger.info('Calculating GDPR compliance score for user', context, { userId: user.id });
 
     // Fetch consents data
     const { data: consents, error: consentsError } = await supabaseClient
@@ -189,7 +185,7 @@ Deno.serve(async (req) => {
       .select('consent_type, granted, created_at');
 
     if (consentsError) {
-      console.error('Error fetching consents:', consentsError);
+      logger.warn('Error fetching consents', context, consentsError);
     }
 
     const totalUsers = consents?.length || 1;
@@ -202,7 +198,7 @@ Deno.serve(async (req) => {
       .select('created_at, finished_at, status');
 
     if (exportsError) {
-      console.error('Error fetching exports:', exportsError);
+      logger.warn('Error fetching exports', context, exportsError);
     }
 
     const completedExports = exports?.filter(e => e.status === 'completed' && e.finished_at) || [];
@@ -228,7 +224,7 @@ Deno.serve(async (req) => {
       .eq('event', 'data_deletion_requested');
 
     if (deletionsError) {
-      console.error('Error fetching deletions:', deletionsError);
+      logger.warn('Error fetching deletions', context, deletionsError);
     }
 
     const completedDeletions = deletions?.filter(d => d.details?.status === 'completed') || [];
@@ -256,7 +252,7 @@ Deno.serve(async (req) => {
       .is('resolved_at', null);
 
     if (alertsError) {
-      console.error('Error fetching alerts:', alertsError);
+      logger.warn('Error fetching alerts', context, alertsError);
     }
 
     const criticalAlertsCount = alerts?.length || 0;
@@ -273,33 +269,22 @@ Deno.serve(async (req) => {
 
     const result = calculateComplianceScore(metrics);
 
-    console.log('Compliance score calculated:', result.score);
-    console.log('Recommendations:', result.recommendations.length);
+    logger.info('Compliance score calculated', context, { 
+      score: result.score, 
+      recommendations: result.recommendations.length 
+    });
 
-    return new Response(
-      JSON.stringify({
-        score: result.score,
-        breakdown: result.breakdown,
-        recommendations: result.recommendations,
-        metrics,
-        calculatedAt: new Date().toISOString(),
-      }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200,
-      }
-    );
-  } catch (error) {
-    console.error('Error in gdpr-compliance-score:', error);
-    return new Response(
-      JSON.stringify({ 
-        error: 'Internal server error',
-        details: error instanceof Error ? error.message : 'Unknown error'
-      }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
-    );
+    return {
+      score: result.score,
+      breakdown: result.breakdown,
+      recommendations: result.recommendations,
+      metrics,
+      calculatedAt: new Date().toISOString(),
+    };
+  } catch (error: any) {
+    logger.error('Error calculating compliance score', error, context);
+    throw error;
   }
 });
+
+Deno.serve(handler);

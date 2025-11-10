@@ -255,16 +255,7 @@ verify_jwt = false
 [functions.pdf-notifications]
 verify_jwt = false
 
-[functions.generate-export]
-verify_jwt = true
-
 [functions.generate-audit-pdf-enhanced]
-verify_jwt = true
-
-[functions.export-csv-email]
-verify_jwt = true
-
-[functions.notifications-email]
 verify_jwt = true
 
 [functions.validate-report-ai]

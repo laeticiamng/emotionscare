@@ -1,18 +1,9 @@
 // @ts-nocheck
 import { serve } from 'https://deno.land/std@0.208.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { withMonitoring, logger } from '../_shared/monitoring-wrapper.ts';
 
-serve(async (req) => {
-  const corsHeaders = {
-    'Access-Control-Allow-Origin': req.headers.get('Origin') || '*',
-    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  };
-
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
-  }
-
+const handler = withMonitoring('data-retention-processor', async (req, context) => {
   try {
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
@@ -21,7 +12,7 @@ serve(async (req) => {
 
     const { manual } = await req.json().catch(() => ({ manual: false }));
 
-    console.log(`[Data Retention] Starting ${manual ? 'manual' : 'automatic'} process`);
+    logger.info(`Starting ${manual ? 'manual' : 'automatic'} retention process`, context);
 
     // Fetch all retention rules
     const { data: rules, error: rulesError } = await supabase
@@ -35,7 +26,7 @@ serve(async (req) => {
     const results = [];
 
     for (const rule of rules || []) {
-      console.log(`[Data Retention] Processing rule for ${rule.entity_type}`);
+      logger.debug(`Processing rule for ${rule.entity_type}`, context);
 
       // Step 1: Archive expired data if archive_enabled
       if (rule.archive_enabled) {
@@ -49,7 +40,7 @@ serve(async (req) => {
 
         if (!archiveError && archiveResult?.[0]?.archived_count) {
           totalArchived += archiveResult[0].archived_count;
-          console.log(`[Data Retention] Archived ${archiveResult[0].archived_count} ${rule.entity_type}`);
+          logger.info(`Archived ${archiveResult[0].archived_count} ${rule.entity_type}`, context);
         }
       }
 
@@ -97,7 +88,7 @@ serve(async (req) => {
               notification_type: 'warning',
             });
 
-            console.log(`[Data Retention] Notification sent to user ${userId} for ${items.length} ${rule.entity_type}`);
+            logger.info(`Notification sent to user ${userId} for ${items.length} ${rule.entity_type}`, context);
           }
         }
       }
@@ -111,7 +102,7 @@ serve(async (req) => {
           .lt('created_at', new Date(Date.now() - rule.retention_days * 24 * 60 * 60 * 1000).toISOString());
 
         if (!deleteError) {
-          console.log(`[Data Retention] Auto-deleted expired ${rule.entity_type}`);
+          logger.info(`Auto-deleted expired ${rule.entity_type}`, context);
         }
 
         // Mark archives as deleted
@@ -125,7 +116,7 @@ serve(async (req) => {
 
         if (!markDeletedError && deletedArchives) {
           totalDeleted += deletedArchives.length;
-          console.log(`[Data Retention] Marked ${deletedArchives.length} archives as deleted`);
+          logger.info(`Marked ${deletedArchives.length} archives as deleted`, context);
         }
       }
 
@@ -149,27 +140,18 @@ serve(async (req) => {
       },
     });
 
-    console.log(`[Data Retention] Process completed: ${totalArchived} archived, ${totalDeleted} deleted`);
+    logger.info(`Process completed: ${totalArchived} archived, ${totalDeleted} deleted`, context);
 
-    return new Response(
-      JSON.stringify({
-        success: true,
-        archived: totalArchived,
-        deleted: totalDeleted,
-        results,
-      }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
-    );
-  } catch (error) {
-    console.error('[Data Retention] Error:', error);
-    return new Response(
-      JSON.stringify({ error: error.message }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
-    );
+    return {
+      success: true,
+      archived: totalArchived,
+      deleted: totalDeleted,
+      results,
+    };
+  } catch (error: any) {
+    logger.error('Data retention process failed', error, context);
+    throw error;
   }
 });
+
+serve(handler);

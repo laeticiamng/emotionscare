@@ -2,6 +2,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 // @ts-ignore
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { withMonitoring, logger } from '../_shared/monitoring-wrapper.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -10,7 +11,7 @@ const corsHeaders = {
 
 interface DetectionRequest {
   action: 'analyze' | 'scan' | 'predict';
-  context?: Record<string, any>;
+  requestContext?: Record<string, any>;
 }
 
 interface ViolationData {
@@ -36,11 +37,7 @@ interface AlertData {
   confidence_score: number;
 }
 
-serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
-
+const handler = withMonitoring('violation-detector', async (req, context) => {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
@@ -52,9 +49,9 @@ serve(async (req) => {
 
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    const { action, context }: DetectionRequest = await req.json();
+    const { action, requestContext }: DetectionRequest = await req.json();
 
-    console.log(`Violation detector action: ${action}`);
+    logger.info(`Violation detector action: ${action}`, context);
 
     // Récupérer les données système pour l'analyse
     const systemData = await gatherSystemData(supabase);
@@ -83,7 +80,7 @@ Données système:
 ${JSON.stringify(systemData, null, 2)}
 
 Action demandée: ${action}
-Contexte additionnel: ${JSON.stringify(context || {}, null, 2)}
+Contexte additionnel: ${JSON.stringify(requestContext || {}, null, 2)}
 
 Retourne une analyse détaillée avec:
 1. Violations détectées (avec type, sévérité, description, données affectées, nombre d'utilisateurs, score de risque 0-100)
@@ -142,7 +139,7 @@ Format JSON structuré.`
           .single();
 
         if (violationError) {
-          console.error('Error inserting violation:', violationError);
+          logger.warn('Error inserting violation', context, { error: violationError });
         } else {
           violations.push(insertedViolation);
         }
@@ -170,7 +167,7 @@ Format JSON structuré.`
           .single();
 
         if (alertError) {
-          console.error('Error inserting alert:', alertError);
+          logger.warn('Error inserting alert', context, { error: alertError });
         } else {
           alerts.push(insertedAlert);
         }
@@ -191,25 +188,26 @@ Format JSON structuré.`
       }
     }
 
-    return new Response(
-      JSON.stringify({
-        success: true,
-        violations,
-        alerts,
-        metrics: analysis.metrics || [],
-        analysis_summary: analysis.summary || {},
-      }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+    logger.info('Violation detection completed', context, {
+      violationsCount: violations.length,
+      alertsCount: alerts.length,
+      metricsCount: analysis.metrics?.length || 0,
+    });
 
+    return {
+      success: true,
+      violations,
+      alerts,
+      metrics: analysis.metrics || [],
+      analysis_summary: analysis.summary || {},
+    };
   } catch (error: any) {
-    console.error('Error in violation-detector:', error);
-    return new Response(
-      JSON.stringify({ error: error.message || 'Unknown error' }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+    logger.error('Violation detection failed', error, context);
+    throw error;
   }
 });
+
+serve(handler);
 
 async function gatherSystemData(supabase: any) {
   // Récupérer les données système pour l'analyse

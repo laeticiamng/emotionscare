@@ -69,7 +69,7 @@ serve(async (req) => {
       includeAuditLogs = true,
     }: ExportRequest = await req.json();
 
-    console.log('[GDPR Report Export] Generating report:', {
+    logger.info('Generating GDPR report', context, {
       format,
       startDate,
       endDate,
@@ -175,6 +175,9 @@ serve(async (req) => {
     // Générer le format demandé
     if (format === 'csv') {
       const csv = generateCSV(reportData);
+      
+      logger.info('CSV report generated successfully', context);
+      
       return new Response(csv, {
         status: 200,
         headers: {
@@ -186,21 +189,19 @@ serve(async (req) => {
     }
 
     // Par défaut, retourner JSON
+    logger.info('JSON report generated successfully', context);
+    
     return new Response(JSON.stringify(reportData), {
       status: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error: any) {
-    console.error('[GDPR Report Export] Error:', error);
-    return new Response(
-      JSON.stringify({ error: error?.message || 'Unknown error' }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
-    );
+    logger.error('Failed to generate GDPR report', error, context);
+    throw error;
   }
 });
+
+serve(handler);
 
 function generateCSV(reportData: any): string {
   const lines: string[] = [];
