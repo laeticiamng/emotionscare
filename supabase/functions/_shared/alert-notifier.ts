@@ -118,28 +118,34 @@ export async function sendEmailAlert(alert: AlertPayload): Promise<void> {
     return;
   }
 
-  const emailPayload: EmailPayload = {
-    to: emailTo,
-    subject: `[${alert.severity.toUpperCase()}] ${alert.title}`,
-    html: generateEmailHTML(alert),
-  };
-
   try {
-    // Utiliser edge function send-email (à créer si nécessaire)
+    // Utiliser edge function send-email avec templates professionnels
     const supabaseUrl = Deno.env.get('SUPABASE_URL');
-    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY');
 
     const response = await fetch(`${supabaseUrl}/functions/v1/send-email`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${supabaseServiceKey}`,
+        'Authorization': `Bearer ${supabaseAnonKey}`,
+        'apikey': supabaseAnonKey || '',
       },
-      body: JSON.stringify(emailPayload),
+      body: JSON.stringify({
+        to: emailTo,
+        subject: `[${alert.severity.toUpperCase()}] ${alert.title}`,
+        template: 'alert',
+        data: {
+          title: alert.title,
+          message: alert.message,
+          metrics: alert.context,
+          actionUrl: `${supabaseUrl}/dashboard/compliance`,
+        },
+      }),
     });
 
     if (!response.ok) {
-      throw new Error(`Email API error: ${response.status}`);
+      const errorText = await response.text().catch(() => 'Unknown error');
+      throw new Error(`Email API error: ${response.status} - ${errorText}`);
     }
 
     console.log('[Alert] Email notification sent successfully');
