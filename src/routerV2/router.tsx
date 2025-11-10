@@ -108,8 +108,9 @@ const GDPRDashboard = lazy(() => import('@/pages/GDPRDashboard'));
 const CronMonitoring = lazy(() => import('@/pages/CronMonitoring'));
 const BlockchainBackups = lazy(() => import('@/pages/BlockchainBackups'));
 
-// System Health
+// System Health & Analytics
 const SystemHealthPage = lazy(() => import('@/pages/SystemHealthPage'));
+const K6AnalyticsDashboard = lazy(() => import('@/pages/K6AnalyticsDashboard'));
 
 // Pages Fun-First intégrées
 const B2CAmbitionArcadePage = lazy(() => import('@/pages/B2CAmbitionArcadePage'));
@@ -479,8 +480,9 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   CronMonitoring,
   BlockchainBackups,
   
-  // System Health
+  // System Health & Analytics
   SystemHealthPage,
+  K6AnalyticsDashboard,
 };
 
 // ═══════════════════════════════════════════════════════════

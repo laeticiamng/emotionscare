@@ -2,6 +2,7 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { withMonitoring } from '../_shared/monitoring-wrapper.ts';
+import { sendAlert, checkComplianceThreshold } from '../_shared/alert-notifier.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -102,6 +103,30 @@ const handler = withMonitoring('compliance-audit', async (req) => {
 
       // Calculer le score global
       const overallScore = totalWeight > 0 ? totalWeightedScore / totalWeight : 0;
+
+      // Vérifier les seuils et envoyer alertes si nécessaire
+      await checkComplianceThreshold(
+        'overall_compliance_score',
+        overallScore,
+        80, // Seuil: 80%
+        'compliance-audit',
+        { audit_id: audit.id, categories: categories.length }
+      );
+
+      // Alerte critique si score < 60
+      if (overallScore < 60) {
+        await sendAlert({
+          severity: 'critical',
+          title: 'Score de conformité RGPD critique',
+          message: `Le score global de conformité est de ${overallScore.toFixed(1)}%, en dessous du seuil critique de 60%.`,
+          functionName: 'compliance-audit',
+          context: {
+            audit_id: audit.id,
+            overall_score: overallScore,
+            recommendations_count: recommendations.length,
+          },
+        });
+      }
 
       // Enregistrer les recommandations
       if (recommendations.length > 0) {

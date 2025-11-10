@@ -55,9 +55,18 @@ jobs:
         env:
           BASE_URL: ${{ inputs.base_url }}
         run: |
-          k6 run tests/load/k6-edge-functions-rgpd.js --env BASE_URL="${BASE_URL}"
+          k6 run tests/load/k6-edge-functions-rgpd.js --env BASE_URL="${BASE_URL}" --summary-export=k6-summary.json
 
-      - name: Upload K6 report
+      - name: Upload K6 metrics to Supabase
+        if: success()
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          npm install @supabase/supabase-js
+          node tests/load/k6-results-uploader.js k6-summary.json
+
+      - name: Upload K6 report artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:

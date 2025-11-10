@@ -1524,6 +1524,18 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
       description: 'Monitoring et santé du système',
     },
   },
+  {
+    name: 'k6-analytics',
+    path: '/k6-analytics',
+    segment: 'public',
+    layout: 'app',
+    component: 'K6AnalyticsDashboard',
+    guard: false,
+    meta: {
+      title: 'K6 Analytics - EmotionsCare',
+      description: 'Dashboard analytics des tests de charge K6',
+    },
+  },
 
   // ═══════════════════════════════════════════════════════════
   // 404 FALLBACK ROUTE (must be last)
