@@ -4,16 +4,12 @@ import OpenAI from 'https://deno.land/x/openai@v4.28.0/mod.ts';
 import { authenticateRequest } from '../_shared/auth-middleware.ts';
 import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
 import { validateRequest, createErrorResponse, EmotionAnalysisSchema } from '../_shared/validation.ts';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { getCorsHeaders, handleCors } from '../_shared/cors.ts';
 
 serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
-  }
+  const corsHeaders = getCorsHeaders(req);
+  const corsResponse = handleCors(req);
+  if (corsResponse) return corsResponse;
 
   try {
     // 🔒 SÉCURITÉ: Authentification obligatoire
