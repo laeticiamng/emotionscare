@@ -4,10 +4,25 @@ import { RouterProvider } from 'react-router-dom';
 import { router } from '@/routerV2';
 import { RootProvider } from '@/providers';
 import { logger } from '@/lib/logger';
+import { registerServiceWorker } from '@/lib/serviceWorkerRegistration';
+import { initWebVitals } from '@/lib/webVitals';
 import '@/index.css';
 
 // Configuration des logs
 logger.info('🚀 EmotionsCare Platform Loading...', undefined, 'SYSTEM');
+
+// Initialiser Web Vitals tracking
+initWebVitals();
+
+// Enregistrer le Service Worker
+registerServiceWorker({
+  onSuccess: () => {
+    logger.info('✅ Service Worker ready for offline use', {}, 'SYSTEM');
+  },
+  onUpdate: () => {
+    logger.info('🔄 New version available', {}, 'SYSTEM');
+  },
+});
 
 const rootElement = document.getElementById('root');
 

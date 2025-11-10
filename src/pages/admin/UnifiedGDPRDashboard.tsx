@@ -19,6 +19,7 @@ import { ComplianceAuditDashboard } from '@/components/gdpr/ComplianceAuditDashb
 // Components from RgpdMonitoring
 import { MetricCard } from '@/components/admin/MetricCard';
 import { FunctionMetricsTable } from '@/components/admin/FunctionMetricsTable';
+import { CacheStatusCard } from '@/components/admin/CacheStatusCard';
 
 // Hooks
 import { useGDPRMonitoring } from '@/hooks/useGDPRMonitoring';
@@ -251,6 +252,11 @@ export default function UnifiedGDPRDashboard() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <DataExportStatsChart data={exportStats?.timeline || []} isLoading={isLoadingGDPR} />
             <DataDeletionStatsChart data={deletionStats?.timeline || []} isLoading={isLoadingGDPR} />
+          </div>
+
+          {/* Cache Status */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <CacheStatusCard />
           </div>
 
           {/* Compliance Preview */}
