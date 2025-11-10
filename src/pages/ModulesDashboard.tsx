@@ -1,6 +1,7 @@
 // @ts-nocheck
 import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import { usePageSEO } from '@/hooks/usePageSEO';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -234,6 +235,12 @@ const categories = [
 ];
 
 export default function ModulesDashboard() {
+  usePageSEO({
+    title: 'Modules Bien-être - Toutes les fonctionnalités',
+    description: 'Découvrez tous les modules EmotionsCare : scan émotions, musicothérapie, coach IA, journal, VR, jeux bien-être et plus encore.',
+    keywords: 'modules bien-être, fonctionnalités, scan, musique, coach, journal, VR'
+  });
+
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');

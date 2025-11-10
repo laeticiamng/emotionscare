@@ -3,8 +3,15 @@ import * as Sentry from '@sentry/react';
 import { CoachView } from '@/modules/coach/CoachView';
 import { ConsentGate } from '@/features/clinical-optin/ConsentGate';
 import { MedicalDisclaimerDialog, useMedicalDisclaimer } from '@/components/medical/MedicalDisclaimerDialog';
+import { usePageSEO } from '@/hooks/usePageSEO';
 
 const B2CAICoachPage = () => {
+  usePageSEO({
+    title: 'Coach IA Émotionnel - Conseils personnalisés',
+    description: 'Discutez avec votre coach émotionnel IA 24/7. Conseils bien-être, gestion du stress, développement personnel avec intelligence artificielle.',
+    keywords: 'coach IA, intelligence émotionnelle, conseils bien-être, développement personnel'
+  });
+
   const {
     showDisclaimer,
     isAccepted,

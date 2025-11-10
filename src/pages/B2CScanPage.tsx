@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import * as Sentry from '@sentry/react';
 import { supabase } from '@/integrations/supabase/client';
 import { Link, useLocation } from 'react-router-dom';
+import { usePageSEO } from '@/hooks/usePageSEO';
 
 import PageRoot from '@/components/common/PageRoot';
 import { Button } from '@/components/ui/button';
@@ -31,6 +32,12 @@ const mapToSamScale = (value: number) => {
 };
 
 const B2CScanPage: React.FC = () => {
+  usePageSEO({
+    title: 'Scan Émotionnel - Analyse IA',
+    description: 'Analysez vos émotions en temps réel avec notre IA : scan facial, vocal, image ou texte. Obtenez des insights personnalisés et recommandations musicales.',
+    keywords: 'scan émotions, analyse faciale, reconnaissance vocale, IA émotionnelle'
+  });
+
   const { has } = useFlags();
   const { toast } = useToast();
   const location = useLocation();

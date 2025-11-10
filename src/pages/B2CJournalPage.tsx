@@ -8,10 +8,17 @@ import { JournalSettingsLink } from '@/components/journal/JournalSettingsLink'
 import { JournalOnboarding } from '@/components/journal/JournalOnboarding'
 import { JournalQuickTips } from '@/components/journal/JournalQuickTips'
 import { MedicalDisclaimerDialog, useMedicalDisclaimer } from '@/components/medical/MedicalDisclaimerDialog'
+import { usePageSEO } from '@/hooks/usePageSEO';
 
 const ONBOARDING_KEY = 'journal-onboarding-completed';
 
 export default function B2CJournalPage() {
+  usePageSEO({
+    title: 'Journal Émotionnel - Suivi quotidien',
+    description: 'Tenez votre journal émotionnel quotidien avec analyse IA. Texte, vocal ou image. Suivez votre évolution et insights personnalisés.',
+    keywords: 'journal émotionnel, diary, suivi humeur, analyse émotions, développement personnel'
+  });
+
   const { has } = useFlags()
   const journalEnabled = has('FF_JOURNAL')
   const [showOnboarding, setShowOnboarding] = useState(false);

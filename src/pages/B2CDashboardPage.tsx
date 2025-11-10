@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
+import { usePageSEO } from '@/hooks/usePageSEO';
 import {
   Brain,
   Music,
@@ -174,6 +175,12 @@ export default function B2CDashboardPage() {
     () => (shouldReduceMotion ? { duration: 0 } : { duration: 0.28, ease: 'easeOut' }),
     [shouldReduceMotion],
   );
+
+  usePageSEO({
+    title: 'Dashboard Particulier',
+    description: 'Suivez vos émotions, accédez à vos modules bien-être et progressez avec EmotionsCare. Scan émotions, musicothérapie, coach IA, journal.',
+    keywords: 'dashboard, émotions, scan, musicothérapie, coach IA, bien-être'
+  });
 
   useEffect(() => {
     // Audit d'accessibilité en développement

@@ -5,7 +5,7 @@
  */
 
 export type Segment = 'public' | 'consumer' | 'employee' | 'manager';
-export type Role = 'consumer' | 'employee' | 'manager';
+export type Role = 'consumer' | 'employee' | 'manager' | 'admin';
 export type LayoutType = 'marketing' | 'app' | 'simple' | 'app-sidebar';
 
 export interface RouteMeta {

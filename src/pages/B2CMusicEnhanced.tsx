@@ -5,6 +5,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { usePageSEO } from '@/hooks/usePageSEO';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -108,6 +109,12 @@ const categoryIcons = {
 };
 
 const B2CMusicEnhanced: React.FC = () => {
+  usePageSEO({
+    title: 'Musicothérapie IA - Musique personnalisée',
+    description: 'Écoutez des musiques générées par IA adaptées à vos émotions. Bibliothèque personnalisée, playlists bien-être, recommandations intelligentes.',
+    keywords: 'musicothérapie, musique IA, playlists émotions, bien-être musical'
+  });
+
   const { toast } = useToast();
   
   // Protection du contexte Music
