@@ -104,6 +104,7 @@ const B2BAuditPage = lazy(() => import('@/pages/B2BAuditPage'));
 const B2BAccessibilityPage = lazy(() => import('@/pages/B2BAccessibilityPage'));
 
 // GDPR & Compliance pages
+const UnifiedGDPRDashboard = lazy(() => import('@/pages/admin/UnifiedGDPRDashboard'));
 const GDPRDashboard = lazy(() => import('@/pages/GDPRDashboard'));
 const GDPRMonitoringPage = lazy(() => import('@/pages/GDPRMonitoringPage'));
 const RgpdMonitoring = lazy(() => import('@/pages/admin/RgpdMonitoring'));
@@ -137,12 +138,7 @@ const B2CNyveeCoconPage = lazy(() => import('@/pages/B2CNyveeCoconPage'));
 const NyveeTestPage = lazy(() => import('@/pages/NyveeTestPage'));
 const ValidationPage = lazy(() => import('@/pages/ValidationPage'));
 
-// Legal pages
-const LegalTermsPage = lazy(() => import('@/pages/LegalTermsPage'));
-const LegalPrivacyPage = lazy(() => import('@/pages/LegalPrivacyPage'));
-const LegalMentionsPage = lazy(() => import('@/pages/LegalMentionsPage'));
-const LegalSalesPage = lazy(() => import('@/pages/LegalSalesPage'));
-const LegalCookiesPage = lazy(() => import('@/pages/LegalCookiesPage'));
+// Legal pages - SUPPRIMÉ car doublons, voir lignes 45-50
 
 // Pages nouvellement créées
 // CoachChatPage supprimé - utiliser B2CAICoachPage
@@ -377,12 +373,14 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   // GeneralPage supprimé - doublon
   // PrivacyPage supprimé - doublon
   
-  // Legal pages
-  LegalTermsPage,
-  LegalPrivacyPage,
-  LegalMentionsPage,
-  LegalSalesPage,
-  LegalCookiesPage,
+  // Legal pages - déjà définis plus haut lignes 275-280
+  // Ajouter alias pour compatibilité registry.ts
+  PrivacyPage: PrivacyPolicyPage,
+  LegalTermsPage: TermsPage,
+  LegalPrivacyPage: PrivacyPolicyPage,
+  LegalMentionsPage: MentionsLegalesPage,
+  LegalSalesPage: SalesTermsPage,
+  LegalCookiesPage: CookiesPage,
   
   // System unifiées
   UnauthorizedPage,
@@ -478,6 +476,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   NavigationPage,
   
   // GDPR & Compliance
+  UnifiedGDPRDashboard,
   GDPRDashboard,
   GDPRMonitoringPage,
   RgpdMonitoring,

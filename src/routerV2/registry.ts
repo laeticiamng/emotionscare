@@ -84,7 +84,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     path: '/privacy',
     segment: 'public',
     layout: 'marketing',
-    component: 'LegalPrivacyPage',
+    component: 'PrivacyPage',
     aliases: ['/politique-confidentialite'],
   },
   {
@@ -1139,18 +1139,28 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     aliases: ['/accessibility'],
   },
   {
-    name: 'admin-rgpd-monitoring',
-    path: '/admin/rgpd-monitoring',
+    name: 'admin-gdpr-unified',
+    path: '/admin/gdpr',
+    segment: 'manager',
+    role: 'manager',
+    layout: 'app',
+    component: 'UnifiedGDPRDashboard',
+    guard: true,
+    requireAuth: true,
+    aliases: ['/gdpr', '/rgpd-monitoring', '/admin/rgpd-monitoring'],
+  },
+  {
+    name: 'admin-rgpd-monitoring-old',
+    path: '/admin/rgpd-monitoring-old',
     segment: 'manager',
     role: 'manager',
     layout: 'app',
     component: 'RgpdMonitoring',
     guard: true,
-    requireAuth: true,
-    aliases: ['/rgpd-monitoring'],
+    deprecated: true,
   },
   {
-    name: 'gdpr-monitoring',
+    name: 'gdpr-monitoring-old',
     path: '/gdpr-monitoring-old',
     segment: 'manager',
     role: 'manager',
@@ -1160,14 +1170,14 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     deprecated: true,
   },
   {
-    name: 'gdpr-dashboard',
-    path: '/gdpr/dashboard',
+    name: 'gdpr-dashboard-old',
+    path: '/gdpr/dashboard-old',
     segment: 'manager',
     role: 'manager',
     layout: 'app',
     component: 'GDPRDashboard',
     guard: true,
-    aliases: ['/gdpr'],
+    deprecated: true,
   },
   {
     name: 'gdpr-cron-monitoring',
@@ -1270,48 +1280,8 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
   },
   
   // ═══════════════════════════════════════════════════════════
-  // LEGAL & COMPLIANCE PAGES
+  // LEGAL & COMPLIANCE PAGES - Déjà défini aux lignes 91-136
   // ═══════════════════════════════════════════════════════════
-  {
-    name: 'legal-terms',
-    path: '/legal/terms',
-    segment: 'public',
-    layout: 'marketing',
-    component: 'LegalTermsPage',
-    aliases: ['/terms', '/conditions'],
-  },
-  {
-    name: 'legal-privacy',
-    path: '/legal/privacy',
-    segment: 'public',
-    layout: 'marketing',
-    component: 'LegalPrivacyPage',
-    aliases: ['/privacy-policy'],
-  },
-  {
-    name: 'legal-mentions',
-    path: '/legal/mentions',
-    segment: 'public',
-    layout: 'marketing',
-    component: 'LegalMentionsPage',
-    aliases: ['/mentions-legales', '/legal'],
-  },
-  {
-    name: 'legal-sales',
-    path: '/legal/sales',
-    segment: 'public',
-    layout: 'marketing',
-    component: 'LegalSalesPage',
-    aliases: ['/cgv', '/conditions-ventes'],
-  },
-  {
-    name: 'legal-cookies',
-    path: '/legal/cookies',
-    segment: 'public',
-    layout: 'marketing',
-    component: 'LegalCookiesPage',
-    aliases: ['/cookies-policy', '/cookies'],
-  },
   
   // ═══════════════════════════════════════════════════════════
   // BILLING & SUBSCRIPTION
