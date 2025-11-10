@@ -46,7 +46,7 @@ export default defineConfig({
       name: 'b2b_admin-chromium',
       use: {
         ...devices['Desktop Chrome'],
-        storageState: 'tests/e2b/_setup/state-b2b_admin.json',
+        storageState: 'tests/e2e/_setup/state-b2b_admin.json',
       },
     },
     {

@@ -148,7 +148,7 @@ export default function APIMonitoringDashboard() {
   const totalRateLimited = metrics.reduce((sum, m) => sum + m.rate_limited_calls, 0);
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <div className="container mx-auto p-6 space-y-6" data-testid="page-root">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Monitoring APIs Payantes</h1>
@@ -161,7 +161,7 @@ export default function APIMonitoringDashboard() {
 
       {/* Alertes */}
       {alerts.length > 0 && (
-        <div className="space-y-2">
+        <div className="space-y-2" data-testid="alerts-list">
           {alerts.map((alert, i) => (
             <Alert key={i} variant={alert.level === 'error' ? 'destructive' : 'default'}>
               <AlertTriangle className="h-4 w-4" />
@@ -175,7 +175,7 @@ export default function APIMonitoringDashboard() {
 
       {/* KPIs */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
+        <Card data-testid="kpi-total-cost">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Coût Total 24h</CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
@@ -186,7 +186,7 @@ export default function APIMonitoringDashboard() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card data-testid="kpi-total-calls">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Appels API</CardTitle>
             <Activity className="h-4 w-4 text-muted-foreground" />
@@ -197,7 +197,7 @@ export default function APIMonitoringDashboard() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card data-testid="kpi-rate-limited">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Rate Limited</CardTitle>
             <AlertTriangle className="h-4 w-4 text-muted-foreground" />
@@ -208,7 +208,7 @@ export default function APIMonitoringDashboard() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card data-testid="kpi-avg-latency">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Coût Moyen/Appel</CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
@@ -236,7 +236,7 @@ export default function APIMonitoringDashboard() {
               <CardDescription>Classé par nombre d'appels (24h)</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
+              <div className="space-y-4" data-testid="functions-list">
                 {metrics.map((metric) => (
                   <div key={metric.function_name} className="flex items-center justify-between border-b pb-3">
                     <div className="space-y-1">
@@ -269,6 +269,7 @@ export default function APIMonitoringDashboard() {
             <CardContent>
               {dailyCosts.length > 0 && (
                 <Line
+                  data-testid="chart-daily-cost"
                   data={{
                     labels: dailyCosts.map(d => d.date),
                     datasets: [{
