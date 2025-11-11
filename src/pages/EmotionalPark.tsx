@@ -1,7 +1,7 @@
 // @ts-nocheck
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, Wind, Palette, Music, Leaf, Book, Cloud, Star, Lightbulb, Waves, Scan, Beaker, Sword, Sliders, Users, Trophy, Theater, Sprout, Filter, Zap } from 'lucide-react';
+import { Sparkles, Wind, Palette, Music, Leaf, Book, Cloud, Star, Lightbulb, Waves, Scan, Beaker, Sword, Sliders, Users, Trophy, Theater, Sprout, Filter, Zap, Home, Brain, Calendar, Heart, Monitor, Camera, Shield, MessageSquare, BarChart3, Grid3X3, Settings, Bell } from 'lucide-react';
 import { ParkAttraction } from '@/components/park/ParkAttraction';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -14,6 +14,17 @@ export default function EmotionalPark() {
   const [selectedZone, setSelectedZone] = useState<string>('all');
 
   const attractions = [
+    {
+      id: 'dashboard',
+      title: 'Le Hall d\'Accueil',
+      subtitle: 'Dashboard principal',
+      description: 'Centre de contrôle de ton voyage émotionnel avec vue d\'ensemble personnalisée.',
+      icon: Home,
+      route: '/app/consumer/home',
+      gradient: 'from-violet-500/20 to-indigo-500/20',
+      collection: 'Tableau de bord personnalisé',
+      zone: 'hub'
+    },
     {
       id: 'home',
       title: 'La Salle des Cartes Vivantes',
@@ -81,6 +92,17 @@ export default function EmotionalPark() {
       zone: 'wisdom'
     },
     {
+      id: 'voice-journal',
+      title: 'L\'Écho des Paroles',
+      subtitle: 'Journal vocal',
+      description: 'Exprime-toi librement à voix haute, tes mots deviennent des vagues sonores.',
+      icon: MessageSquare,
+      route: '/app/voice-journal',
+      gradient: 'from-orange-500/20 to-yellow-500/20',
+      collection: 'Archives vocales',
+      zone: 'wisdom'
+    },
+    {
       id: 'vr-breath',
       title: 'Le Temple de l\'Air',
       subtitle: 'VR Breath',
@@ -125,14 +147,47 @@ export default function EmotionalPark() {
       zone: 'calm'
     },
     {
+      id: 'meditation',
+      title: 'Le Sanctuaire du Silence',
+      subtitle: 'Méditation guidée',
+      description: 'Espace sacré de silence et méditation guidée avec ambiances zen.',
+      icon: Heart,
+      route: '/app/meditation',
+      gradient: 'from-rose-500/20 to-pink-500/20',
+      collection: 'Collection de méditations',
+      zone: 'calm'
+    },
+    {
+      id: 'vr-standard',
+      title: 'Le Portail Immersif',
+      subtitle: 'VR Standard',
+      description: 'Réalité virtuelle thérapeutique pour une immersion totale.',
+      icon: Monitor,
+      route: '/app/vr',
+      gradient: 'from-purple-500/20 to-indigo-500/20',
+      collection: 'Expériences VR premium',
+      zone: 'calm'
+    },
+    {
       id: 'face-ar',
       title: 'La Chambre des Reflets',
       subtitle: 'AR Filters',
       description: 'Miroirs magiques, stickers réactifs. Clin d\'œil = pluie d\'étoiles.',
-      icon: Scan,
+      icon: Camera,
       route: '/app/face-ar',
       gradient: 'from-fuchsia-500/20 to-pink-500/20',
       collection: 'Avatars rares issus de tes reflets',
+      zone: 'creative'
+    },
+    {
+      id: 'emotion-scan',
+      title: 'L\'Analyseur d\'Émotions',
+      subtitle: 'Scan facial avancé',
+      description: 'IA de reconnaissance faciale qui lit tes émotions en temps réel.',
+      icon: Scan,
+      route: '/app/emotion-scan',
+      gradient: 'from-blue-500/20 to-purple-500/20',
+      collection: 'Historique de scans',
       zone: 'creative'
     },
     {
@@ -144,6 +199,17 @@ export default function EmotionalPark() {
       route: '/app/bubble-beat',
       gradient: 'from-cyan-500/20 to-blue-500/20',
       collection: 'Bulles spéciales (couleurs rares)',
+      zone: 'energy'
+    },
+    {
+      id: 'screen-silk',
+      title: 'Le Cocon Digital',
+      subtitle: 'Pause écran',
+      description: 'Protège tes yeux avec des pauses intelligentes et des visuels apaisants.',
+      icon: Shield,
+      route: '/app/screen-silk',
+      gradient: 'from-teal-500/20 to-cyan-500/20',
+      collection: 'Thèmes de pause',
       zone: 'energy'
     },
     {
@@ -213,6 +279,17 @@ export default function EmotionalPark() {
       zone: 'wisdom'
     },
     {
+      id: 'bounce-back',
+      title: 'Le Rebond Résilient',
+      subtitle: 'Bounce Back Battle',
+      description: 'Combat l\'adversité dans ce jeu de résilience émotionnelle.',
+      icon: Shield,
+      route: '/app/bounce-back',
+      gradient: 'from-blue-500/20 to-indigo-500/20',
+      collection: 'Médailles de résilience',
+      zone: 'challenge'
+    },
+    {
       id: 'activity',
       title: 'Le Jardin des Saisons',
       subtitle: 'Activité hebdomadaire',
@@ -221,6 +298,72 @@ export default function EmotionalPark() {
       route: '/app/activity',
       gradient: 'from-green-500/20 to-lime-500/20',
       collection: 'Galerie de plantes rares',
+      zone: 'hub'
+    },
+    {
+      id: 'scores',
+      title: 'La Carte des Humeurs',
+      subtitle: 'Scores & vibes',
+      description: 'Courbes d\'humeur et heatmap quotidienne de ton état émotionnel.',
+      icon: Grid3X3,
+      route: '/app/scores',
+      gradient: 'from-purple-500/20 to-pink-500/20',
+      collection: 'Historique d\'humeurs',
+      zone: 'hub'
+    },
+    {
+      id: 'insights',
+      title: 'L\'Observatoire des Patterns',
+      subtitle: 'Analyses approfondies',
+      description: 'Découvre les patterns cachés de ton bien-être émotionnel.',
+      icon: BarChart3,
+      route: '/app/insights',
+      gradient: 'from-cyan-500/20 to-blue-500/20',
+      collection: 'Rapports détaillés',
+      zone: 'hub'
+    },
+    {
+      id: 'settings',
+      title: 'Le Pavillon de Configuration',
+      subtitle: 'Paramètres',
+      description: 'Personnalise ton expérience dans le parc émotionnel.',
+      icon: Settings,
+      route: '/app/settings/general',
+      gradient: 'from-gray-500/20 to-slate-500/20',
+      collection: 'Préférences personnelles',
+      zone: 'hub'
+    },
+    {
+      id: 'profile',
+      title: 'Le Miroir de l\'Identité',
+      subtitle: 'Profil personnel',
+      description: 'Ton identité dans le parc, tes informations et ton avatar.',
+      icon: Users,
+      route: '/app/profile',
+      gradient: 'from-indigo-500/20 to-purple-500/20',
+      collection: 'Profil personnalisé',
+      zone: 'hub'
+    },
+    {
+      id: 'privacy',
+      title: 'Le Coffre-Fort des Secrets',
+      subtitle: 'Confidentialité',
+      description: 'Contrôle total sur tes données personnelles et ta vie privée.',
+      icon: Shield,
+      route: '/app/settings/privacy',
+      gradient: 'from-emerald-500/20 to-teal-500/20',
+      collection: 'Paramètres de confidentialité',
+      zone: 'hub'
+    },
+    {
+      id: 'notifications',
+      title: 'La Tour des Messages',
+      subtitle: 'Notifications',
+      description: 'Gère tes alertes et rappels pour ne rien manquer.',
+      icon: Bell,
+      route: '/app/notifications',
+      gradient: 'from-yellow-500/20 to-orange-500/20',
+      collection: 'Centre de notifications',
       zone: 'hub'
     }
   ];
@@ -261,7 +404,7 @@ export default function EmotionalPark() {
                 <h1 className="text-3xl font-bold bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent">
                   Le Parc Émotionnel
                 </h1>
-                <p className="text-sm text-muted-foreground">19 attractions pour explorer tes mondes intérieurs</p>
+                <p className="text-sm text-muted-foreground">{attractions.length} attractions pour explorer tes mondes intérieurs</p>
               </div>
             </div>
 
