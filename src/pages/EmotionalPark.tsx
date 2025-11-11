@@ -10,6 +10,9 @@ import { Input } from '@/components/ui/input';
 import { useAttractionProgress } from '@/hooks/useAttractionProgress';
 import { BadgeUnlockModal } from '@/components/park/BadgeUnlockModal';
 import { ZoneProgressCard } from '@/components/park/ZoneProgressCard';
+import { useGuidedTour } from '@/hooks/useGuidedTour';
+import { GuidedTourModal } from '@/components/park/GuidedTourModal';
+import { TourStepOverlay } from '@/components/park/TourStepOverlay';
 
 /**
  * Carte du Parc Émotionnel — Monde des Modules
@@ -32,6 +35,27 @@ export default function EmotionalPark() {
     addSearchHistory,
     getSearchSuggestions
   } = useAttractionProgress();
+
+  const {
+    tourActive,
+    currentStep,
+    currentStepIndex,
+    totalSteps,
+    tourCompleted,
+    startTour,
+    nextStep,
+    previousStep,
+    skipTour
+  } = useGuidedTour();
+
+  // Show tour modal for first-time users
+  const [showTourModal, setShowTourModal] = useState(false);
+
+  useEffect(() => {
+    if (!tourCompleted && Object.keys(visitedAttractions).length === 0) {
+      setShowTourModal(true);
+    }
+  }, [tourCompleted, visitedAttractions]);
 
   const attractions = [
     {
@@ -494,6 +518,32 @@ export default function EmotionalPark() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-secondary/5">
+      {/* Guided Tour Modal */}
+      <GuidedTourModal
+        isOpen={showTourModal}
+        onStart={(profile) => {
+          setShowTourModal(false);
+          startTour(profile);
+        }}
+        onSkip={() => {
+          setShowTourModal(false);
+          skipTour();
+        }}
+      />
+
+      {/* Tour Step Overlay */}
+      {tourActive && currentStep && (
+        <TourStepOverlay
+          step={currentStep}
+          currentStepIndex={currentStepIndex}
+          totalSteps={totalSteps}
+          highlightedAttractionId={currentStep.attractionId}
+          onNext={nextStep}
+          onPrevious={previousStep}
+          onSkip={skipTour}
+        />
+      )}
+
       {/* Badge Unlock Modal */}
       {unlockedZoneInfo && (
         <BadgeUnlockModal
@@ -683,8 +733,9 @@ export default function EmotionalPark() {
                       return (
                         <div
                           key={attraction.id}
+                          id={`attraction-${attraction.id}`}
                           onClick={() => handleAttractionClick(attraction)}
-                          className="relative"
+                          className={`relative ${tourActive && currentStep?.attractionId === attraction.id ? 'ring-4 ring-primary rounded-xl animate-pulse' : ''}`}
                         >
                           <ParkAttraction
                             {...attraction}
