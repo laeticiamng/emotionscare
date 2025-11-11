@@ -2,10 +2,11 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 import { componentTagger } from "lovable-tagger";
+import dyadComponentTagger from '@dyad-sh/react-vite-component-tagger';
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
-  plugins: [
+  plugins: [dyadComponentTagger(), 
     react({
       // Désactiver le fast refresh pour les edge functions
       exclude: /supabase\/functions/,

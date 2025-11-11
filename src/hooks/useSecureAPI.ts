@@ -1,43 +1,56 @@
 // @ts-nocheck
-import { useAuthStore } from '@/stores/useAuthStore';
-import { supabase } from '@/integrations/supabase/client';
-import { logger } from '@/lib/logger';
+import { useCallback } from 'react';
+import { GlobalInterceptor } from '@/utils/globalInterceptor';
+import { SecureAnalytics } from '@/utils/secureAnalytics';
 
-interface SecureAPIOptions {
-  requireAuth?: boolean;
-  allowAnonymous?: boolean;
-}
+/**
+ * Hook pour effectuer des appels API sécurisés avec gestion d'erreur globale
+ */
+export const useSecureApi = () => {
+  
+  /**
+   * Appel API sécurisé avec gestion d'erreur automatique
+   */
+  const secureCall = useCallback(async (
+    url: string,
+    options: RequestInit = {}
+  ): Promise<Response | null> => {
+    return GlobalInterceptor.secureFetch(url, options);
+  }, []);
 
-export const useSecureAPI = () => {
-  const { session, isAuthenticated } = useAuthStore();
+  /**
+   * Appel analytics sécurisé (ne bloque jamais l'UI)
+   */
+  const trackEvent = useCallback(async (
+    event: string,
+    data?: any,
+    userId?: string
+  ): Promise<void> => {
+    await SecureAnalytics.trackEvent({ event, data, userId });
+  }, []);
 
-  const secureCall = async <T>(
-    apiCall: () => Promise<T>,
-    options: SecureAPIOptions = { requireAuth: true }
-  ): Promise<T | null> => {
-    // Vérifier l'authentification si requise
-    if (options.requireAuth && !isAuthenticated) {
-      logger.warn('API call blocked - authentication required', {}, 'AUTH');
-      throw new Error('Authentication required for this operation');
-    }
+  /**
+   * Vérification du statut de session
+   */
+  const checkSession = useCallback(async (): Promise<boolean> => {
+    return GlobalInterceptor.checkSessionStatus();
+  }, []);
 
-    // Vérifier que la session est valide
-    if (options.requireAuth && session) {
-      const expiresAt = session.expires_at * 1000;
-      const now = Date.now();
-      
-      if (expiresAt < now) {
-        logger.warn('API call blocked - session expired', {}, 'AUTH');
-        throw new Error('Session expired, please login again');
-      }
-    }
+  /**
+   * Get analytics service status
+   */
+  const getAnalyticsStatus = useCallback(() => {
+    return SecureAnalytics.getStatus();
+  }, []);
 
-    try {
-      return await apiCall();
-    } catch (error) {
-      logger.error('Secure API call failed', error as Error, 'AUTH');
-      throw error;
-    }
+  return {
+    secureCall,
+    trackEvent,
+    checkSession,
+    getAnalyticsStatus,
+  };
+};
+  }
   };
 
   const getAuthHeaders = () => {
