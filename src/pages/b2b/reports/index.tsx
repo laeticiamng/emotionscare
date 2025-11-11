@@ -3,9 +3,11 @@ import React from 'react';
 import * as Sentry from '@sentry/react';
 import dayjs from 'dayjs';
 import 'dayjs/locale/fr';
-import { Printer } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Printer, Activity } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useFlags } from '@/core/flags';
+import { hasRolePermission } from '@/lib/role-mappings';
 import { B2BHeatmap } from '@/features/b2b/reports/B2BHeatmap';
 import { ExportButton } from '@/features/b2b/reports/ExportButton';
 import { DEFAULT_INSTRUMENTS, useHeatmapMatrix } from '@/services/b2b/reportsApi';
@@ -55,6 +57,7 @@ const PERIOD_OPTIONS = Array.from({ length: PERIOD_OPTION_COUNT }).map((_, index
 export default function B2BReportsHeatmapPage() {
   const { user } = useAuth();
   const { has } = useFlags();
+  const navigate = useNavigate();
   const heatmapRef = React.useRef<HTMLDivElement>(null);
   const [anchorPeriod, setAnchorPeriod] = React.useState<string>(PERIOD_OPTIONS[0]);
   const [selectedTeam, setSelectedTeam] = React.useState<string>('all');
@@ -62,6 +65,8 @@ export default function B2BReportsHeatmapPage() {
 
   const orgId = user?.user_metadata?.org_id as string | undefined;
   const orgName = (user?.user_metadata?.org_name as string | undefined) ?? 'Votre organisation';
+  const userRole = (user?.user_metadata?.role as string | undefined) ?? 'consumer';
+  const isAdmin = hasRolePermission(userRole as any, 'admin');
   const visiblePeriods = React.useMemo(() => buildPeriods(anchorPeriod), [anchorPeriod]);
 
   React.useEffect(() => {
@@ -203,6 +208,17 @@ export default function B2BReportsHeatmapPage() {
             <p className="text-xs text-slate-500">Dernière consultation : {todayLabel}</p>
           </div>
           <div className="no-print flex flex-wrap gap-2">
+            {isAdmin && (
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => navigate('/admin/system-health')}
+                className="gap-2"
+              >
+                <Activity className="h-4 w-4" aria-hidden="true" />
+                System Health
+              </Button>
+            )}
             <ExportButton targetRef={heatmapRef as React.RefObject<HTMLElement>} fileName={`heatmap-${visiblePeriods[0]}.png`} />
             <Button type="button" variant="outline" onClick={handlePrint}>
               <Printer className="mr-2 h-4 w-4" aria-hidden="true" />
