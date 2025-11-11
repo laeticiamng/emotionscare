@@ -43,30 +43,26 @@ export const useCronJobsList = () => {
 };
 
 /**
- * Hook pour récupérer les logs des edge functions
+ * Hook pour récupérer les logs des edge functions de gamification
  */
-export const useEdgeFunctionLogs = (functionName: string) => {
+export const useGamificationLogs = (functionName: string) => {
   return useQuery({
-    queryKey: ['edge-function-logs', functionName],
+    queryKey: ['gamification-logs', functionName],
     queryFn: async () => {
-      // Récupérer les logs depuis la table compliance_reports pour scheduled-pdf-reports
-      // et depuis realtime_notifications pour pdf-notifications
-      
-      if (functionName === 'scheduled-pdf-reports') {
+      if (functionName === 'generate-daily-challenges') {
         const { data, error } = await supabase
-          .from('compliance_reports')
+          .from('daily_challenges')
           .select('*')
-          .order('created_at', { ascending: false })
+          .order('challenge_date', { ascending: false })
           .limit(50);
 
         if (error) throw error;
         return data;
-      } else if (functionName === 'pdf-notifications') {
+      } else if (functionName === 'calculate-rankings') {
         const { data, error } = await supabase
-          .from('realtime_notifications')
+          .from('user_leaderboard')
           .select('*')
-          .eq('type', 'report_ready')
-          .order('created_at', { ascending: false })
+          .order('last_updated', { ascending: false })
           .limit(50);
 
         if (error) throw error;

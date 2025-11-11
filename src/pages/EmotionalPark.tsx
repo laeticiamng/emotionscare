@@ -1,7 +1,7 @@
 // @ts-nocheck
 import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, Wind, Palette, Music, Leaf, Book, Cloud, Star, Lightbulb, Waves, Scan, Beaker, Sword, Sliders, Users, Trophy, Theater, Sprout, Filter, Zap, Home, Brain, Calendar, Heart, Monitor, Camera, Shield, MessageSquare, BarChart3, Grid3X3, Settings, Bell, Search, X, TrendingUp } from 'lucide-react';
+import { Sparkles, Wind, Palette, Music, Leaf, Book, Cloud, Star, Lightbulb, Waves, Scan, Beaker, Sword, Sliders, Users, Trophy, Theater, Sprout, Filter, Zap, Home, Brain, Calendar, Heart, Monitor, Camera, Shield, MessageSquare, BarChart3, Grid3X3, Settings, Bell, Search, X, TrendingUp, Target, Award } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { ParkAttraction } from '@/components/park/ParkAttraction';
 import { Button } from '@/components/ui/button';
@@ -667,6 +667,39 @@ export default function EmotionalPark() {
           </div>
         </div>
       </motion.div>
+
+      {/* Navigation Buttons */}
+      <div className="container mx-auto px-4 py-4">
+        <div className="flex items-center gap-3 flex-wrap">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => navigate('/app/leaderboard')}
+            className="flex items-center gap-2"
+          >
+            <Trophy className="h-4 w-4" />
+            Classement
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => navigate('/app/daily-challenges')}
+            className="flex items-center gap-2"
+          >
+            <Target className="h-4 w-4" />
+            Défis
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => navigate('/app/achievements')}
+            className="flex items-center gap-2"
+          >
+            <Award className="h-4 w-4" />
+            Succès
+          </Button>
+        </div>
+      </div>
 
       {/* Zone Progress Dashboard */}
       {selectedZone === 'all' && !searchTerm && (

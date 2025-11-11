@@ -147,6 +147,7 @@ const JournalSettingsPage = lazy(() => import('@/pages/JournalSettings'));
 const ReportingPage = lazy(() => import('@/pages/ReportingPage'));
 const ExportPage = lazy(() => import('@/pages/ExportPage'));
 const LeaderboardPage = lazy(() => import('@/pages/LeaderboardPage'));
+const DailyChallengesPage = lazy(() => import('@/pages/DailyChallengesPage'));
 const B2CGamificationPage = lazy(() => import('@/pages/B2CGamificationPage'));
 const ScoresPage = lazy(() => import('@/pages/ScoresPage'));
 const PricingPageWorking = lazy(() => import('@/pages/PricingPageWorking'));
@@ -312,6 +313,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   // Analytics & Gamification
   B2CGamificationPage,
   LeaderboardPage,
+  DailyChallengesPage,
   ScoresPage,
   
   // Settings

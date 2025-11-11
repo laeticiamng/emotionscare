@@ -785,6 +785,15 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: true,
   },
   {
+    name: 'daily-challenges',
+    path: '/app/daily-challenges',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app-sidebar',
+    component: 'DailyChallengesPage',
+    guard: true,
+  },
+  {
     name: 'badges',
     path: '/app/badges',
     segment: 'consumer',

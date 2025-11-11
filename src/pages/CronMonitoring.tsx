@@ -2,7 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useEdgeFunctionLogs } from '@/hooks/useCronJobs';
+import { useGamificationLogs } from '@/hooks/useCronJobs';
 import { Clock, CheckCircle, XCircle, AlertCircle, RefreshCw, Calendar } from 'lucide-react';
 import { useState } from 'react';
 
@@ -12,8 +12,8 @@ import { useState } from 'react';
 const CronMonitoring = () => {
   const [selectedJob, setSelectedJob] = useState<'scheduled-pdf-reports' | 'pdf-notifications'>('scheduled-pdf-reports');
   
-  const { data: pdfReportsLogs, isLoading: loadingPdfReports, refetch: refetchPdfReports } = useEdgeFunctionLogs('scheduled-pdf-reports');
-  const { data: notificationsLogs, isLoading: loadingNotifications, refetch: refetchNotifications } = useEdgeFunctionLogs('pdf-notifications');
+  const { data: pdfReportsLogs, isLoading: loadingPdfReports, refetch: refetchPdfReports } = useGamificationLogs('scheduled-pdf-reports');
+  const { data: notificationsLogs, isLoading: loadingNotifications, refetch: refetchNotifications } = useGamificationLogs('pdf-notifications');
 
   const jobs = [
     {
@@ -91,8 +91,8 @@ const CronMonitoring = () => {
           const minutesUntilNext = Math.floor((timeUntilNext % (1000 * 60 * 60)) / (1000 * 60));
 
           const recentLogs = job.logs?.slice(0, 5) || [];
-          const successCount = recentLogs.filter(log => log.status === 'completed').length;
-          const failureCount = recentLogs.filter(log => log.status === 'failed').length;
+          const successCount = recentLogs.filter((log: any) => log.status === 'completed').length;
+          const failureCount = recentLogs.filter((log: any) => log.status === 'failed').length;
 
           return (
             <Card 
