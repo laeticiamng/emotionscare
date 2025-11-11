@@ -3,11 +3,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Calendar } from '@/components/ui/calendar';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { useChallengesHistory } from '@/hooks/useChallengesHistory';
-import { Loader2, Trophy, TrendingUp, Calendar as CalendarIcon, Target, Flame } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { Loader2, Trophy, TrendingUp, Calendar as CalendarIcon, Target, Flame, Download } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { Bar, Doughnut, Line } from 'react-chartjs-2';
+import { toast } from 'sonner';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -36,6 +39,37 @@ ChartJS.register(
 const ChallengesHistory = () => {
   const { history, stats, loading } = useChallengesHistory();
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  const [exportLoading, setExportLoading] = useState(false);
+
+  const handleExportPDF = async () => {
+    try {
+      setExportLoading(true);
+      
+      const { data, error } = await supabase.functions.invoke('export-gamification-pdf', {
+        method: 'POST',
+      });
+
+      if (error) throw error;
+
+      // Create blob and download
+      const blob = new Blob([data], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `emotionscare-gamification-${Date.now()}.html`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      toast.success('Export généré avec succès !');
+    } catch (error: any) {
+      console.error('Export error:', error);
+      toast.error('Erreur lors de l\'export');
+    } finally {
+      setExportLoading(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -147,11 +181,21 @@ const ChallengesHistory = () => {
   return (
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Historique des Défis</h1>
-        <Badge variant="outline" className="text-lg px-4 py-2">
-          <Trophy className="h-5 w-5 mr-2" />
-          {stats?.totalCompleted || 0} complétés
-        </Badge>
+        <div>
+          <h1 className="text-3xl font-bold">Historique des Défis</h1>
+          <Badge variant="outline" className="text-lg px-4 py-2 mt-2">
+            <Trophy className="h-5 w-5 mr-2" />
+            {stats?.totalCompleted || 0} complétés
+          </Badge>
+        </div>
+        <Button 
+          onClick={handleExportPDF} 
+          disabled={exportLoading}
+          size="lg"
+        >
+          <Download className="h-5 w-5 mr-2" />
+          {exportLoading ? 'Export...' : 'Exporter PDF'}
+        </Button>
       </div>
 
       {/* Stats Grid */}

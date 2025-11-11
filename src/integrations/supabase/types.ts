@@ -2986,6 +2986,60 @@ export type Database = {
         }
         Relationships: []
       }
+      custom_challenges: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          emotional_profile: string
+          end_date: string | null
+          id: string
+          is_active: boolean | null
+          objective: string
+          reward_type: string
+          reward_value: Json
+          start_date: string | null
+          target_value: number | null
+          title: string
+          type: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          emotional_profile: string
+          end_date?: string | null
+          id?: string
+          is_active?: boolean | null
+          objective: string
+          reward_type: string
+          reward_value: Json
+          start_date?: string | null
+          target_value?: number | null
+          title: string
+          type: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          emotional_profile?: string
+          end_date?: string | null
+          id?: string
+          is_active?: boolean | null
+          objective?: string
+          reward_type?: string
+          reward_value?: Json
+          start_date?: string | null
+          target_value?: number | null
+          title?: string
+          type?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       cvss_assessments: {
         Row: {
           assessed_at: string | null
@@ -13102,6 +13156,48 @@ export type Database = {
           updated_at?: string | null
           user_id?: string
           who5_internal_level?: number | null
+        }
+        Relationships: []
+      }
+      user_badges: {
+        Row: {
+          badge_category: string | null
+          badge_description: string | null
+          badge_icon: string | null
+          badge_id: string
+          badge_name: string
+          earned_at: string | null
+          id: string
+          progress: Json | null
+          shared_on_social: boolean | null
+          unlocked: boolean | null
+          user_id: string | null
+        }
+        Insert: {
+          badge_category?: string | null
+          badge_description?: string | null
+          badge_icon?: string | null
+          badge_id: string
+          badge_name: string
+          earned_at?: string | null
+          id?: string
+          progress?: Json | null
+          shared_on_social?: boolean | null
+          unlocked?: boolean | null
+          user_id?: string | null
+        }
+        Update: {
+          badge_category?: string | null
+          badge_description?: string | null
+          badge_icon?: string | null
+          badge_id?: string
+          badge_name?: string
+          earned_at?: string | null
+          id?: string
+          progress?: Json | null
+          shared_on_social?: boolean | null
+          unlocked?: boolean | null
+          user_id?: string | null
         }
         Relationships: []
       }
