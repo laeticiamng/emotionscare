@@ -15919,6 +15919,27 @@ export type Database = {
           total_items: number
         }[]
       }
+      get_gamification_cron_history: {
+        Args: never
+        Returns: {
+          end_time: string
+          job_name: string
+          jobid: number
+          return_message: string
+          start_time: string
+          status: string
+        }[]
+      }
+      get_gamification_cron_jobs: {
+        Args: never
+        Returns: {
+          active: boolean
+          database: string
+          jobid: number
+          jobname: string
+          schedule: string
+        }[]
+      }
       get_latest_compliance_audit: {
         Args: never
         Returns: {

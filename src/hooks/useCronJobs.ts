@@ -1,5 +1,6 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/hooks/use-toast';
 
 /**
  * Hook pour récupérer les statistiques des jobs cron depuis Supabase
@@ -19,6 +20,108 @@ export const useCronJobs = () => {
       return jobRuns || [];
     },
     refetchInterval: 30000, // Rafraîchir toutes les 30 secondes
+  });
+};
+
+/**
+ * Hook pour récupérer l'historique des jobs cron de gamification
+ */
+export const useGamificationCronHistory = () => {
+  return useQuery({
+    queryKey: ['gamification-cron-history'],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc('get_gamification_cron_history');
+
+      if (error) {
+        console.error('Error fetching gamification cron history:', error);
+        throw error;
+      }
+
+      return data || [];
+    },
+    refetchInterval: 10000, // Rafraîchir toutes les 10 secondes
+  });
+};
+
+/**
+ * Hook pour récupérer la configuration des jobs cron de gamification
+ */
+export const useGamificationCronJobs = () => {
+  return useQuery({
+    queryKey: ['gamification-cron-jobs'],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc('get_gamification_cron_jobs');
+
+      if (error) {
+        console.error('Error fetching gamification cron jobs:', error);
+        throw error;
+      }
+
+      return data || [];
+    },
+    refetchInterval: 60000, // Rafraîchir toutes les minutes
+  });
+};
+
+/**
+ * Hook pour trigger manuellement la génération de défis quotidiens
+ */
+export const useTriggerDailyChallenges = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async () => {
+      const { data, error } = await supabase.functions.invoke('generate-daily-challenges');
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      toast({
+        title: '✅ Défis générés',
+        description: 'Les défis quotidiens ont été générés avec succès',
+      });
+      queryClient.invalidateQueries({ queryKey: ['gamification-cron-history'] });
+      queryClient.invalidateQueries({ queryKey: ['daily-challenges'] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: '❌ Erreur',
+        description: error.message || 'Erreur lors de la génération des défis',
+        variant: 'destructive',
+      });
+    },
+  });
+};
+
+/**
+ * Hook pour trigger manuellement le calcul des rankings
+ */
+export const useTriggerRankings = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async () => {
+      const { data, error } = await supabase.functions.invoke('calculate-rankings');
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      toast({
+        title: '✅ Rankings calculés',
+        description: 'Le classement a été recalculé avec succès',
+      });
+      queryClient.invalidateQueries({ queryKey: ['gamification-cron-history'] });
+      queryClient.invalidateQueries({ queryKey: ['leaderboard'] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: '❌ Erreur',
+        description: error.message || 'Erreur lors du calcul des rankings',
+        variant: 'destructive',
+      });
+    },
   });
 };
 

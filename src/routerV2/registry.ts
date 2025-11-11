@@ -1177,6 +1177,16 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     requireAuth: true,
   },
   {
+    name: 'admin-cron-monitoring',
+    path: '/admin/cron-monitoring',
+    segment: 'manager',
+    role: 'manager',
+    layout: 'app',
+    component: 'GamificationCronMonitoring',
+    guard: true,
+    requireAuth: true,
+  },
+  {
     name: 'admin-system-health',
     path: '/admin/system-health',
     segment: 'admin',
