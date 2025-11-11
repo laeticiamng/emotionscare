@@ -1,17 +1,37 @@
 // @ts-nocheck
-import React, { useState } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, Wind, Palette, Music, Leaf, Book, Cloud, Star, Lightbulb, Waves, Scan, Beaker, Sword, Sliders, Users, Trophy, Theater, Sprout, Filter, Zap, Home, Brain, Calendar, Heart, Monitor, Camera, Shield, MessageSquare, BarChart3, Grid3X3, Settings, Bell } from 'lucide-react';
+import { Sparkles, Wind, Palette, Music, Leaf, Book, Cloud, Star, Lightbulb, Waves, Scan, Beaker, Sword, Sliders, Users, Trophy, Theater, Sprout, Filter, Zap, Home, Brain, Calendar, Heart, Monitor, Camera, Shield, MessageSquare, BarChart3, Grid3X3, Settings, Bell, Search, X, TrendingUp } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { ParkAttraction } from '@/components/park/ParkAttraction';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { useAttractionProgress } from '@/hooks/useAttractionProgress';
+import { BadgeUnlockModal } from '@/components/park/BadgeUnlockModal';
+import { ZoneProgressCard } from '@/components/park/ZoneProgressCard';
 
 /**
  * Carte du Parc Émotionnel — Monde des Modules
  * Chaque module = une attraction immersive
  */
 export default function EmotionalPark() {
+  const navigate = useNavigate();
   const [selectedZone, setSelectedZone] = useState<string>('all');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  
+  const {
+    visitedAttractions,
+    unlockedBadges,
+    newlyUnlockedZone,
+    markVisited,
+    checkZoneCompletion,
+    clearNewlyUnlocked,
+    getZoneProgress,
+    addSearchHistory,
+    getSearchSuggestions
+  } = useAttractionProgress();
 
   const attractions = [
     {
@@ -379,12 +399,112 @@ export default function EmotionalPark() {
     social: { name: 'Village Social', color: 'green', emoji: '🤝' }
   };
 
-  const filteredAttractions = selectedZone === 'all' 
-    ? attractions 
-    : attractions.filter(a => a.zone === selectedZone);
+  // Filter attractions based on search and zone
+  const filteredAttractions = useMemo(() => {
+    let filtered = attractions;
+    
+    // Apply zone filter
+    if (selectedZone !== 'all') {
+      filtered = filtered.filter(a => a.zone === selectedZone);
+    }
+    
+    // Apply search filter
+    if (searchTerm.trim()) {
+      const lowerSearch = searchTerm.toLowerCase();
+      filtered = filtered.filter(a =>
+        a.title.toLowerCase().includes(lowerSearch) ||
+        a.subtitle.toLowerCase().includes(lowerSearch) ||
+        a.description.toLowerCase().includes(lowerSearch)
+      );
+    }
+    
+    return filtered;
+  }, [selectedZone, searchTerm, attractions]);
+
+  // Get search suggestions
+  const suggestions = useMemo(() => {
+    if (!searchTerm.trim() || searchTerm.length < 2) return [];
+    return getSearchSuggestions(searchTerm, attractions);
+  }, [searchTerm, attractions, getSearchSuggestions]);
+
+  // Handle search
+  const handleSearch = (value: string) => {
+    setSearchTerm(value);
+    setShowSuggestions(value.length >= 2);
+    
+    if (value.length >= 2) {
+      const results = attractions.filter(a =>
+        a.title.toLowerCase().includes(value.toLowerCase()) ||
+        a.subtitle.toLowerCase().includes(value.toLowerCase()) ||
+        a.description.toLowerCase().includes(value.toLowerCase())
+      );
+      addSearchHistory(value, results.length);
+    }
+  };
+
+  // Handle attraction click
+  const handleAttractionClick = (attraction: any) => {
+    markVisited(attraction.id);
+    
+    // Check zone completion
+    const zoneAttractions = attractions
+      .filter(a => a.zone === attraction.zone)
+      .map(a => a.id);
+    
+    checkZoneCompletion(
+      attraction.zone,
+      zones[attraction.zone as keyof typeof zones].name,
+      zoneAttractions
+    );
+    
+    // Navigate to attraction
+    navigate(attraction.route);
+  };
+
+  // Calculate zone progress for each zone
+  const zoneProgressData = useMemo(() => {
+    return Object.entries(zones).map(([key, zone]) => {
+      const zoneAttractions = attractions
+        .filter(a => a.zone === key)
+        .map(a => a.id);
+      
+      const progress = getZoneProgress(zoneAttractions);
+      const isUnlocked = unlockedBadges.some(b => b.zoneKey === key);
+      
+      return {
+        key,
+        ...zone,
+        ...progress,
+        isUnlocked
+      };
+    });
+  }, [attractions, zones, getZoneProgress, unlockedBadges]);
+
+  // Get newly unlocked zone info
+  const unlockedZoneInfo = useMemo(() => {
+    if (!newlyUnlockedZone) return null;
+    const zone = zones[newlyUnlockedZone as keyof typeof zones];
+    const zoneAttractions = attractions.filter(a => a.zone === newlyUnlockedZone);
+    return {
+      name: zone.name,
+      emoji: zone.emoji,
+      totalAttractions: zoneAttractions.length
+    };
+  }, [newlyUnlockedZone, zones, attractions]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-secondary/5">
+      {/* Badge Unlock Modal */}
+      {unlockedZoneInfo && (
+        <BadgeUnlockModal
+          isOpen={!!newlyUnlockedZone}
+          onClose={clearNewlyUnlocked}
+          zoneName={unlockedZoneInfo.name}
+          zoneEmoji={unlockedZoneInfo.emoji}
+          totalAttractions={unlockedZoneInfo.totalAttractions}
+        />
+      )}
+
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -392,24 +512,87 @@ export default function EmotionalPark() {
         className="sticky top-0 z-50 backdrop-blur-xl bg-background/90 border-b border-border/50 shadow-lg"
       >
         <div className="container mx-auto px-4 py-6">
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <motion.div
-                animate={{ rotate: [0, 10, -10, 0], scale: [1, 1.1, 1] }}
-                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-              >
-                <Sparkles className="h-8 w-8 text-primary" />
-              </motion.div>
-              <div>
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent">
-                  Le Parc Émotionnel
-                </h1>
-                <p className="text-sm text-muted-foreground">{attractions.length} attractions pour explorer tes mondes intérieurs</p>
+          <div className="flex flex-col gap-4">
+            {/* Title and Stats */}
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <motion.div
+                  animate={{ rotate: [0, 10, -10, 0], scale: [1, 1.1, 1] }}
+                  transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                >
+                  <Sparkles className="h-8 w-8 text-primary" />
+                </motion.div>
+                <div>
+                  <h1 className="text-3xl font-bold bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent">
+                    Le Parc Émotionnel
+                  </h1>
+                  <p className="text-sm text-muted-foreground">
+                    {attractions.length} attractions • {Object.keys(visitedAttractions).length} visitées • {unlockedBadges.length}/{Object.keys(zones).length} badges
+                  </p>
+                </div>
               </div>
+              
+              <Badge variant="secondary" className="gap-2">
+                <Trophy className="h-3 w-3" />
+                {unlockedBadges.length} Badges
+              </Badge>
+            </div>
+
+            {/* Search Bar */}
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                value={searchTerm}
+                onChange={(e) => handleSearch(e.target.value)}
+                onFocus={() => setShowSuggestions(searchTerm.length >= 2)}
+                onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                placeholder="Rechercher une attraction par nom ou description..."
+                className="pl-10 pr-10 h-12"
+              />
+              {searchTerm && (
+                <button
+                  onClick={() => {
+                    setSearchTerm('');
+                    setShowSuggestions(false);
+                  }}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+              
+              {/* Search Suggestions */}
+              <AnimatePresence>
+                {showSuggestions && suggestions.length > 0 && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="absolute top-full mt-2 w-full bg-background border border-border rounded-lg shadow-xl p-2 z-50"
+                  >
+                    <div className="flex items-center gap-2 px-2 py-1 text-xs text-muted-foreground mb-1">
+                      <TrendingUp className="h-3 w-3" />
+                      Suggestions
+                    </div>
+                    {suggestions.map((suggestion, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => {
+                          setSearchTerm(suggestion);
+                          setShowSuggestions(false);
+                        }}
+                        className="w-full text-left px-3 py-2 rounded-md hover:bg-accent transition-colors text-sm"
+                      >
+                        {suggestion}
+                      </button>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
 
             {/* Zone Filter */}
-            <div className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0">
+            <div className="flex items-center gap-2 overflow-x-auto pb-2">
               <Filter className="h-4 w-4 text-muted-foreground shrink-0" />
               <Button
                 variant={selectedZone === 'all' ? 'default' : 'outline'}
@@ -434,6 +617,35 @@ export default function EmotionalPark() {
           </div>
         </div>
       </motion.div>
+
+      {/* Zone Progress Dashboard */}
+      {selectedZone === 'all' && !searchTerm && (
+        <div className="container mx-auto px-4 py-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-8"
+          >
+            <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+              <Trophy className="h-5 w-5 text-primary" />
+              Progression des Zones
+            </h2>
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3">
+              {zoneProgressData.map((zone) => (
+                <ZoneProgressCard
+                  key={zone.key}
+                  zoneName={zone.name}
+                  zoneEmoji={zone.emoji}
+                  visited={zone.visited}
+                  total={zone.total}
+                  percentage={zone.percentage}
+                  isUnlocked={zone.isUnlocked}
+                />
+              ))}
+            </div>
+          </motion.div>
+        </div>
+      )}
 
       {/* Map Grid */}
       <div className="container mx-auto px-4 py-8">
@@ -466,13 +678,30 @@ export default function EmotionalPark() {
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {zoneAttractions.map((attraction, index) => (
-                      <ParkAttraction
-                        key={attraction.id}
-                        {...attraction}
-                        delay={index * 0.05}
-                      />
-                    ))}
+                    {zoneAttractions.map((attraction, index) => {
+                      const isVisited = !!visitedAttractions[attraction.id];
+                      return (
+                        <div
+                          key={attraction.id}
+                          onClick={() => handleAttractionClick(attraction)}
+                          className="relative"
+                        >
+                          <ParkAttraction
+                            {...attraction}
+                            delay={index * 0.05}
+                          />
+                          {isVisited && (
+                            <motion.div
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              className="absolute top-3 right-3 bg-primary text-primary-foreground rounded-full p-1.5 shadow-lg z-10"
+                            >
+                              <Star className="h-3 w-3 fill-current" />
+                            </motion.div>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 </motion.section>
               );
@@ -498,17 +727,58 @@ export default function EmotionalPark() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredAttractions.map((attraction, index) => (
-                  <ParkAttraction
-                    key={attraction.id}
-                    {...attraction}
-                    delay={index * 0.05}
-                  />
-                ))}
+                {filteredAttractions.map((attraction, index) => {
+                  const isVisited = !!visitedAttractions[attraction.id];
+                  return (
+                    <div
+                      key={attraction.id}
+                      onClick={() => handleAttractionClick(attraction)}
+                      className="relative"
+                    >
+                      <ParkAttraction
+                        {...attraction}
+                        delay={index * 0.05}
+                      />
+                      {isVisited && (
+                        <motion.div
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          className="absolute top-3 right-3 bg-primary text-primary-foreground rounded-full p-1.5 shadow-lg z-10"
+                        >
+                          <Star className="h-3 w-3 fill-current" />
+                        </motion.div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </motion.section>
           )}
         </AnimatePresence>
+
+        {/* No Results Message */}
+        {filteredAttractions.length === 0 && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-center py-16"
+          >
+            <Search className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+            <h3 className="text-xl font-semibold mb-2">Aucune attraction trouvée</h3>
+            <p className="text-muted-foreground">
+              Essayez de modifier votre recherche ou changez de zone
+            </p>
+            {searchTerm && (
+              <Button
+                onClick={() => setSearchTerm('')}
+                variant="outline"
+                className="mt-4"
+              >
+                Effacer la recherche
+              </Button>
+            )}
+          </motion.div>
+        )}
       </div>
     </div>
   );
