@@ -1187,6 +1187,16 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     requireAuth: true,
   },
   {
+    name: 'challenges-history',
+    path: '/app/challenges/history',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app',
+    component: 'ChallengesHistory',
+    guard: true,
+    requireAuth: true,
+  },
+  {
     name: 'admin-system-health',
     path: '/admin/system-health',
     segment: 'admin',

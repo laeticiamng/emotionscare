@@ -92,6 +92,11 @@ Deno.serve(async (req: Request) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  const startTime = Date.now();
+  const timestamp = new Date().toISOString();
+  
+  console.log(`[generate-daily-challenges] ${timestamp} - Action: START`);
+
   try {
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
@@ -100,7 +105,7 @@ Deno.serve(async (req: Request) => {
 
     const today = new Date().toISOString().split('T')[0];
 
-    console.log(`Generating daily challenges for ${today}`);
+    console.log(`[generate-daily-challenges] ${timestamp} - Action: CHECK_EXISTING - Date: ${today}`);
 
     const { data: existingChallenges, error: checkError } = await supabaseClient
       .from('daily_challenges')
@@ -108,16 +113,20 @@ Deno.serve(async (req: Request) => {
       .eq('challenge_date', today);
 
     if (checkError) {
+      console.error(`[generate-daily-challenges] ${timestamp} - Action: CHECK_EXISTING - Error: ${checkError.message}`);
       throw checkError;
     }
 
     if (existingChallenges && existingChallenges.length > 0) {
-      console.log('Challenges already exist for today');
+      const duration = Date.now() - startTime;
+      console.log(`[generate-daily-challenges] ${timestamp} - Action: SKIP - Result: Challenges exist (${existingChallenges.length}) - Duration: ${duration}ms`);
       return new Response(
         JSON.stringify({ message: 'Challenges already exist for today', count: existingChallenges.length }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
       );
     }
+
+    console.log(`[generate-daily-challenges] ${timestamp} - Action: GENERATE - Profiles: ${profiles.length}`);
 
     const challengesToCreate = [];
     const profiles = ['stress', 'energy', 'creativity', 'calm', 'social', 'all'];
@@ -146,22 +155,28 @@ Deno.serve(async (req: Request) => {
       .select();
 
     if (insertError) {
+      const duration = Date.now() - startTime;
+      console.error(`[generate-daily-challenges] ${timestamp} - Action: INSERT - Error: ${insertError.message} - Duration: ${duration}ms`);
       throw insertError;
     }
 
-    console.log(`Created ${insertedChallenges?.length || 0} challenges`);
+    const duration = Date.now() - startTime;
+    const count = insertedChallenges?.length || 0;
+    console.log(`[generate-daily-challenges] ${timestamp} - Action: SUCCESS - Result: Created ${count} challenges - Duration: ${duration}ms`);
 
     return new Response(
       JSON.stringify({
         success: true,
         challenges: insertedChallenges,
-        count: insertedChallenges?.length || 0
+        count: count
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
     );
 
   } catch (error: any) {
-    console.error('Error generating challenges:', error);
+    const duration = Date.now() - startTime;
+    const errorTimestamp = new Date().toISOString();
+    console.error(`[generate-daily-challenges] ${errorTimestamp} - Action: ERROR - Error: ${error.message} - Duration: ${duration}ms - Stack: ${error.stack}`);
     return new Response(
       JSON.stringify({ error: error.message }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
