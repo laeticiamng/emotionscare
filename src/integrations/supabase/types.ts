@@ -369,6 +369,50 @@ export type Database = {
         }
         Relationships: []
       }
+      alert_score_history: {
+        Row: {
+          age_score: number | null
+          alert_id: string | null
+          calculated_at: string | null
+          cvss_normalized_score: number | null
+          factors: Json | null
+          frequency_score: number | null
+          id: string
+          pagerduty_score: number | null
+          unified_score: number
+        }
+        Insert: {
+          age_score?: number | null
+          alert_id?: string | null
+          calculated_at?: string | null
+          cvss_normalized_score?: number | null
+          factors?: Json | null
+          frequency_score?: number | null
+          id?: string
+          pagerduty_score?: number | null
+          unified_score: number
+        }
+        Update: {
+          age_score?: number | null
+          alert_id?: string | null
+          calculated_at?: string | null
+          cvss_normalized_score?: number | null
+          factors?: Json | null
+          frequency_score?: number | null
+          id?: string
+          pagerduty_score?: number | null
+          unified_score?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "alert_score_history_alert_id_fkey"
+            columns: ["alert_id"]
+            isOneToOne: false
+            referencedRelation: "unified_alerts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ambition_artifacts: {
         Row: {
           description: string | null
@@ -1641,6 +1685,66 @@ export type Database = {
           date?: string
           id?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      cache_config: {
+        Row: {
+          cache_key: string
+          created_at: string | null
+          description: string | null
+          hit_count: number | null
+          id: string
+          last_invalidated_at: string | null
+          miss_count: number | null
+          ttl_seconds: number
+          updated_at: string | null
+        }
+        Insert: {
+          cache_key: string
+          created_at?: string | null
+          description?: string | null
+          hit_count?: number | null
+          id?: string
+          last_invalidated_at?: string | null
+          miss_count?: number | null
+          ttl_seconds: number
+          updated_at?: string | null
+        }
+        Update: {
+          cache_key?: string
+          created_at?: string | null
+          description?: string | null
+          hit_count?: number | null
+          id?: string
+          last_invalidated_at?: string | null
+          miss_count?: number | null
+          ttl_seconds?: number
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      cache_metrics: {
+        Row: {
+          cache_key: string
+          created_at: string | null
+          id: string
+          operation: string
+          response_time_ms: number | null
+        }
+        Insert: {
+          cache_key: string
+          created_at?: string | null
+          id?: string
+          operation: string
+          response_time_ms?: number | null
+        }
+        Update: {
+          cache_key?: string
+          created_at?: string | null
+          id?: string
+          operation?: string
+          response_time_ms?: number | null
         }
         Relationships: []
       }
@@ -2984,6 +3088,39 @@ export type Database = {
         }
         Relationships: []
       }
+      daily_challenges: {
+        Row: {
+          challenge_date: string
+          created_at: string | null
+          emotional_profile: string | null
+          id: string
+          objective: string
+          reward_type: string
+          reward_value: Json
+          type: string
+        }
+        Insert: {
+          challenge_date?: string
+          created_at?: string | null
+          emotional_profile?: string | null
+          id?: string
+          objective: string
+          reward_type: string
+          reward_value: Json
+          type: string
+        }
+        Update: {
+          challenge_date?: string
+          created_at?: string | null
+          emotional_profile?: string | null
+          id?: string
+          objective?: string
+          reward_type?: string
+          reward_value?: Json
+          type?: string
+        }
+        Relationships: []
+      }
       data_archives: {
         Row: {
           archived_at: string
@@ -3968,6 +4105,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      email_logs: {
+        Row: {
+          created_at: string
+          id: string
+          recipients: string[]
+          report_data: Json | null
+          resend_id: string | null
+          sent_at: string
+          type: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          recipients: string[]
+          report_data?: Json | null
+          resend_id?: string | null
+          sent_at?: string
+          type: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          recipients?: string[]
+          report_data?: Json | null
+          resend_id?: string | null
+          sent_at?: string
+          type?: string
+        }
+        Relationships: []
       }
       email_templates: {
         Row: {
@@ -12451,6 +12618,60 @@ export type Database = {
         }
         Relationships: []
       }
+      unified_alerts: {
+        Row: {
+          created_at: string | null
+          cvss_score: number | null
+          description: string | null
+          external_id: string
+          id: string
+          metadata: Json | null
+          occurrence_count: number | null
+          resolved_at: string | null
+          severity: string
+          source: string
+          status: string | null
+          title: string
+          unified_score: number | null
+          updated_at: string | null
+          url: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          cvss_score?: number | null
+          description?: string | null
+          external_id: string
+          id?: string
+          metadata?: Json | null
+          occurrence_count?: number | null
+          resolved_at?: string | null
+          severity: string
+          source: string
+          status?: string | null
+          title: string
+          unified_score?: number | null
+          updated_at?: string | null
+          url?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          cvss_score?: number | null
+          description?: string | null
+          external_id?: string
+          id?: string
+          metadata?: Json | null
+          occurrence_count?: number | null
+          resolved_at?: string | null
+          severity?: string
+          source?: string
+          status?: string | null
+          title?: string
+          unified_score?: number | null
+          updated_at?: string | null
+          url?: string | null
+        }
+        Relationships: []
+      }
       unified_music_generation: {
         Row: {
           audio_url: string | null
@@ -12884,6 +13105,50 @@ export type Database = {
         }
         Relationships: []
       }
+      user_challenges_progress: {
+        Row: {
+          challenge_id: string
+          completed: boolean | null
+          completed_at: string | null
+          created_at: string | null
+          id: string
+          progress: Json
+          streak_days: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          challenge_id: string
+          completed?: boolean | null
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          progress?: Json
+          streak_days?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          challenge_id?: string
+          completed?: boolean | null
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          progress?: Json
+          streak_days?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_challenges_progress_challenge_id_fkey"
+            columns: ["challenge_id"]
+            isOneToOne: false
+            referencedRelation: "daily_challenges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_collections: {
         Row: {
           collection_id: string
@@ -13235,6 +13500,42 @@ export type Database = {
           priority?: string
           title?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      user_leaderboard: {
+        Row: {
+          created_at: string | null
+          id: string
+          last_updated: string | null
+          monthly_badge: boolean | null
+          pseudo_anonyme: string
+          rank: number | null
+          total_badges: number
+          user_id: string
+          zones_completed: Json
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          last_updated?: string | null
+          monthly_badge?: boolean | null
+          pseudo_anonyme: string
+          rank?: number | null
+          total_badges?: number
+          user_id: string
+          zones_completed?: Json
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          last_updated?: string | null
+          monthly_badge?: boolean | null
+          pseudo_anonyme?: string
+          rank?: number | null
+          total_badges?: number
+          user_id?: string
+          zones_completed?: Json
         }
         Relationships: []
       }
@@ -15444,6 +15745,7 @@ export type Database = {
           items_traites: number
         }[]
       }
+      generate_anonymous_pseudo: { Args: never; Returns: string }
       generate_audit_report: {
         Args: { report_type_param?: string }
         Returns: string

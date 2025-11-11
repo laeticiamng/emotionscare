@@ -1,143 +1,144 @@
 // @ts-nocheck
-import { useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useGamificationStore, Scope, Period, LeaderboardEntry, MyGamification } from '@/store/gamification.store';
 
-interface UseLeaderboardProps {
-  scope: Scope;
-  period: Period;
+export interface LeaderboardEntry {
+  id: string;
+  pseudo_anonyme: string;
+  total_badges: number;
+  rank: number | null;
+  monthly_badge: boolean;
+  zones_completed: any[];
 }
 
-interface LeaderboardResponse {
-  entries: LeaderboardEntry[];
-  next_cursor?: string;
-  min_n?: number;
-}
+export const useLeaderboard = () => {
+  const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
+  const [myEntry, setMyEntry] = useState<LeaderboardEntry | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-interface MyGamificationResponse extends MyGamification {}
-
-export const useLeaderboard = ({ scope, period }: UseLeaderboardProps) => {
-  const {
-    myRank,
-    entries,
-    nextCursor,
-    loading,
-    error,
-    setMyRank,
-    setEntries,
-    appendEntries,
-    setLoading,
-    setError,
-    setNextCursor,
-  } = useGamificationStore();
-
-  // Fetch user's personal rank data
-  const { data: myData, error: myError } = useQuery({
-    queryKey: ['gamification', 'me', period],
-    queryFn: async () => {
-      const { data, error } = await supabase.functions.invoke('gamification-me', {
-        body: { period }
-      });
-      if (error) throw error;
-      return data as MyGamificationResponse;
-    },
-    staleTime: 5 * 60 * 1000, // 5 min cache
-    refetchInterval: 5 * 60 * 1000,
-  });
-
-  // Fetch leaderboard data
-  const { data: leaderboardData, error: leaderboardError, isFetching } = useQuery({
-    queryKey: ['leaderboard', scope, period],
-    queryFn: async () => {
-      const { data, error } = await supabase.functions.invoke('gamification-leaderboard', {
-        body: { 
-          scope, 
-          period,
-          cursor: undefined // Start fresh
-        }
-      });
-      if (error) throw error;
-      return data as LeaderboardResponse;
-    },
-    staleTime: 5 * 60 * 1000,
-    refetchInterval: 5 * 60 * 1000,
-  });
-
-  // Update store when data changes
-  useEffect(() => {
-    if (myData) {
-      setMyRank(myData);
-    }
-  }, [myData, setMyRank]);
-
-  useEffect(() => {
-    if (leaderboardData) {
-      setEntries(leaderboardData.entries);
-      setNextCursor(leaderboardData.next_cursor || null);
-    }
-  }, [leaderboardData, setEntries, setNextCursor]);
-
-  useEffect(() => {
-    setLoading(isFetching);
-  }, [isFetching, setLoading]);
-
-  useEffect(() => {
-    const errorMsg = myError?.message || leaderboardError?.message || null;
-    setError(errorMsg);
-  }, [myError, leaderboardError, setError]);
-
-  // Fetch more entries for pagination
-  const fetchNext = async () => {
-    if (!nextCursor || loading) return;
-
+  const fetchLeaderboard = async () => {
     try {
       setLoading(true);
       
-      const { data, error } = await supabase.functions.invoke('gamification-leaderboard', {
-        body: { 
-          scope, 
-          period,
-          cursor: nextCursor
+      const { data: topEntries, error: fetchError } = await supabase
+        .from('user_leaderboard')
+        .select('*')
+        .order('rank', { ascending: true })
+        .limit(100);
+
+      if (fetchError) throw fetchError;
+
+      setEntries(topEntries || []);
+
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: userEntry, error: userError } = await supabase
+          .from('user_leaderboard')
+          .select('*')
+          .eq('user_id', user.id)
+          .single();
+
+        if (userError && userError.code !== 'PGRST116') {
+          console.error('Error fetching user entry:', userError);
+        } else if (userEntry) {
+          setMyEntry(userEntry);
         }
-      });
-
-      if (error) throw error;
-
-      const response = data as LeaderboardResponse;
-      appendEntries(response.entries);
-      setNextCursor(response.next_cursor || null);
-      
-      // Analytics
-      if (typeof window !== 'undefined' && window.gtag) {
-        window.gtag('event', 'gami_leaderboard_page', {
-          custom_cursor: nextCursor
-        });
       }
 
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erreur de chargement');
+      setError(null);
+    } catch (err: any) {
+      console.error('Error fetching leaderboard:', err);
+      setError(err.message);
     } finally {
       setLoading(false);
     }
   };
 
-  // Analytics on view
-  useEffect(() => {
-    if (typeof window !== 'undefined' && window.gtag) {
-      window.gtag('event', 'gami_leaderboard_view', {
-        custom_scope: scope,
-        custom_period: period
-      });
+  const updateMyEntry = async (totalBadges: number, zonesCompleted: any[]) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data: existing } = await supabase
+        .from('user_leaderboard')
+        .select('id, pseudo_anonyme')
+        .eq('user_id', user.id)
+        .single();
+
+      if (existing) {
+        const { data, error } = await supabase
+          .from('user_leaderboard')
+          .update({
+            total_badges: totalBadges,
+            zones_completed: zonesCompleted,
+            last_updated: new Date().toISOString()
+          })
+          .eq('user_id', user.id)
+          .select()
+          .single();
+
+        if (error) throw error;
+        setMyEntry(data);
+      } else {
+        const { data: pseudoData, error: pseudoError } = await supabase
+          .rpc('generate_anonymous_pseudo');
+
+        if (pseudoError) throw pseudoError;
+
+        const { data, error } = await supabase
+          .from('user_leaderboard')
+          .insert({
+            user_id: user.id,
+            pseudo_anonyme: pseudoData || `User${Math.floor(Math.random() * 9999)}`,
+            total_badges: totalBadges,
+            zones_completed: zonesCompleted
+          })
+          .select()
+          .single();
+
+        if (error) throw error;
+        setMyEntry(data);
+      }
+
+      await supabase.functions.invoke('calculate-rankings');
+      
+      await fetchLeaderboard();
+    } catch (err: any) {
+      console.error('Error updating leaderboard entry:', err);
+      setError(err.message);
     }
-  }, [scope, period]);
+  };
+
+  useEffect(() => {
+    fetchLeaderboard();
+
+    const channel = supabase
+      .channel('leaderboard-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'user_leaderboard'
+        },
+        () => {
+          fetchLeaderboard();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
 
   return {
-    me: myRank,
-    leaderboard: entries,
-    next: nextCursor,
+    entries,
+    myEntry,
     loading,
     error,
-    fetchNext,
+    updateMyEntry,
+    refresh: fetchLeaderboard
   };
 };

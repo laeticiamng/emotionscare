@@ -776,6 +776,15 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: true,
   },
   {
+    name: 'leaderboard',
+    path: '/app/leaderboard',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app-sidebar',
+    component: 'LeaderboardPage',
+    guard: true,
+  },
+  {
     name: 'badges',
     path: '/app/badges',
     segment: 'consumer',
