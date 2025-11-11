@@ -111,6 +111,7 @@ const BlockchainBackups = lazy(() => import('@/pages/BlockchainBackups'));
 
 // System Health & Analytics
 const SystemHealthPage = lazy(() => import('@/pages/SystemHealthPage'));
+const AdminSystemHealthPage = lazy(() => import('@/pages/AdminSystemHealthPage'));
 const K6AnalyticsDashboard = lazy(() => import('@/pages/K6AnalyticsDashboard'));
 
 // Pages Fun-First intégrées
@@ -481,6 +482,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   
   // System Health & Analytics
   SystemHealthPage,
+  AdminSystemHealthPage,
   K6AnalyticsDashboard,
 };
 
