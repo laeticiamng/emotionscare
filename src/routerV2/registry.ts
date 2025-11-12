@@ -1207,6 +1207,16 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     requireAuth: true,
   },
   {
+    name: 'challenges-dashboard',
+    path: '/admin/challenges',
+    segment: 'manager',
+    role: 'manager',
+    layout: 'app',
+    component: 'ChallengesDashboard',
+    guard: true,
+    requireAuth: true,
+  },
+  {
     name: 'achievements',
     path: '/app/achievements',
     segment: 'consumer',
