@@ -3,7 +3,7 @@
  * Navigation principale responsive avec toutes les fonctionnalités premium
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { logger } from '@/lib/logger';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -50,6 +50,45 @@ import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/providers/theme';
+import { supabase } from '@/integrations/supabase/client';
+
+const clamp = (value: number, min = 0, max = 1) => Math.min(Math.max(value, min), max);
+
+const getXpRequirementForLevel = (level: number) => {
+  const base = 120;
+  const increment = 80;
+  return Math.max(base, Math.round(base + (level - 1) * increment));
+};
+
+interface LevelStats {
+  level: number;
+  xpIntoLevel: number;
+  xpForNextLevel: number;
+  progress: number;
+}
+
+const calculateLevelStats = (rawXp: number): LevelStats => {
+  const totalXp = Number.isFinite(rawXp) ? Math.max(0, Math.floor(rawXp)) : 0;
+
+  let level = 1;
+  let xpRemaining = totalXp;
+  let requirement = getXpRequirementForLevel(level);
+
+  while (xpRemaining >= requirement) {
+    xpRemaining -= requirement;
+    level += 1;
+    requirement = getXpRequirementForLevel(level);
+  }
+
+  const progress = requirement > 0 ? xpRemaining / requirement : 0;
+
+  return {
+    level,
+    xpIntoLevel: Math.max(0, Math.floor(xpRemaining)),
+    xpForNextLevel: Math.max(1, Math.floor(requirement)),
+    progress: clamp(progress),
+  };
+};
 
 interface HeaderProps {
   className?: string;
@@ -64,10 +103,15 @@ const Header: React.FC<HeaderProps> = ({
   const [isScrolled, setIsScrolled] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [notifications, setNotifications] = useState(3);
+  const [xp, setXp] = useState<number>(0);
+  const [isLoadingXp, setIsLoadingXp] = useState(false);
   const { user, signOut, isAuthenticated } = useAuth();
   const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
+  const xpStats = useMemo(() => calculateLevelStats(xp), [xp]);
+  const xpFormatter = useMemo(() => new Intl.NumberFormat('fr-FR'), []);
+  const xpProgressPercent = useMemo(() => Math.round(xpStats.progress * 100), [xpStats.progress]);
 
   // Scroll detection
   useEffect(() => {
@@ -78,6 +122,80 @@ const Header: React.FC<HeaderProps> = ({
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const parseXpValue = (value: unknown) => {
+      if (typeof value === 'number') return value;
+      if (typeof value === 'string') {
+        const parsed = parseInt(value, 10);
+        return Number.isFinite(parsed) ? parsed : 0;
+      }
+      return 0;
+    };
+
+    const loadXp = async () => {
+      if (!isAuthenticated || !user?.id) {
+        if (isMounted) {
+          setXp(0);
+          setIsLoadingXp(false);
+        }
+        return;
+      }
+
+      setIsLoadingXp(true);
+
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('xp')
+          .eq('id', user.id)
+          .single();
+
+        if (error) {
+          throw error;
+        }
+
+        if (data && isMounted) {
+          setXp(parseXpValue(data.xp));
+        }
+      } catch (error) {
+        logger.error('Erreur lors du chargement des points XP', error as Error, 'AUTH');
+      } finally {
+        if (isMounted) {
+          setIsLoadingXp(false);
+        }
+      }
+    };
+
+    loadXp();
+
+    if (isAuthenticated && user?.id) {
+      const channel = supabase
+        .channel(`xp-tracker-${user.id}`)
+        .on(
+          'postgres_changes',
+          { event: 'UPDATE', schema: 'public', table: 'profiles', filter: `id=eq.${user.id}` },
+          (payload) => {
+            const newXp = parseXpValue((payload.new as Record<string, unknown>)?.xp);
+            if (isMounted) {
+              setXp(newXp);
+            }
+          }
+        )
+        .subscribe();
+
+      return () => {
+        isMounted = false;
+        supabase.removeChannel(channel);
+      };
+    }
+
+    return () => {
+      isMounted = false;
+    };
+  }, [isAuthenticated, user?.id]);
 
   // Navigation items configuration
   interface NavItem {
@@ -322,10 +440,34 @@ const Header: React.FC<HeaderProps> = ({
               </div>
             )}
 
+            {isAuthenticated && (
+              <div className="hidden xl:flex flex-col items-start justify-center min-w-[180px]">
+                <div className="flex w-full items-center justify-between text-[11px] text-muted-foreground">
+                  <span>Niveau {xpStats.level}</span>
+                  <span>{xpProgressPercent}%</span>
+                </div>
+                <div className="relative mt-1 h-2 w-full overflow-hidden rounded-full bg-muted">
+                  {isLoadingXp ? (
+                    <div className="absolute inset-0 animate-pulse bg-muted-foreground/20" />
+                  ) : (
+                    <motion.div
+                      className="h-full bg-gradient-to-r from-primary to-primary/70"
+                      initial={{ width: 0 }}
+                      animate={{ width: `${xpProgressPercent}%` }}
+                      transition={{ type: 'spring', stiffness: 120, damping: 20 }}
+                    />
+                  )}
+                </div>
+                <div className="mt-1 text-[11px] text-muted-foreground">
+                  {xpFormatter.format(xpStats.xpIntoLevel)} / {xpFormatter.format(xpStats.xpForNextLevel)} XP
+                </div>
+              </div>
+            )}
+
             {/* Theme Switcher */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button 
+                <Button
                   variant="ghost" 
                   size="sm"
                   className="w-9 h-9 p-0"
@@ -567,7 +709,29 @@ const Header: React.FC<HeaderProps> = ({
                       </p>
                     </div>
                   </div>
-                  
+
+                  <div className="mx-3 rounded-lg border border-border/50 bg-muted/40 px-3 py-3">
+                    <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+                      <span>Niveau {xpStats.level}</span>
+                      <span>{xpProgressPercent}%</span>
+                    </div>
+                    <div className="relative mt-2 h-2 w-full overflow-hidden rounded-full bg-background/40">
+                      {isLoadingXp ? (
+                        <div className="absolute inset-0 animate-pulse bg-muted-foreground/20" />
+                      ) : (
+                        <motion.div
+                          className="h-full rounded-full bg-gradient-to-r from-primary via-primary/80 to-primary/60"
+                          initial={{ width: 0 }}
+                          animate={{ width: `${xpProgressPercent}%` }}
+                          transition={{ type: 'spring', stiffness: 120, damping: 22 }}
+                        />
+                      )}
+                    </div>
+                    <div className="mt-2 text-[11px] text-muted-foreground">
+                      {xpFormatter.format(xpStats.xpIntoLevel)} / {xpFormatter.format(xpStats.xpForNextLevel)} XP
+                    </div>
+                  </div>
+
                   <Link
                     to="/app/profile"
                     onClick={() => setIsMenuOpen(false)}
