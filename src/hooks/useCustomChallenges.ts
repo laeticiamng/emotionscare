@@ -78,9 +78,11 @@ export const useCustomChallenges = () => {
 
       toast.success('Défi mis à jour');
       fetchChallenges();
+      return true;
     } catch (error: any) {
       console.error('Error updating challenge:', error);
       toast.error(error.message || 'Erreur lors de la mise à jour');
+      return false;
     }
   };
 

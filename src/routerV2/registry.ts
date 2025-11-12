@@ -1207,6 +1207,16 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     requireAuth: true,
   },
   {
+    name: 'edit-custom-challenge',
+    path: '/admin/challenges/edit/:id',
+    segment: 'manager',
+    role: 'manager',
+    layout: 'app',
+    component: 'EditCustomChallenge',
+    guard: true,
+    requireAuth: true,
+  },
+  {
     name: 'challenges-dashboard',
     path: '/admin/challenges',
     segment: 'manager',
