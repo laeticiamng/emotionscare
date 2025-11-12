@@ -1,5 +1,8 @@
 project_id = "yaincoxihiqdksxgrsrk"
 
+[functions.auto-unlock-badges]
+verify_jwt = false
+
 [functions.unified-api]
 verify_jwt = true
 
