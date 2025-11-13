@@ -148,35 +148,34 @@ serve(async (req) => {
     }
 
     // Add action buttons
-    blocks.push(
-      {
-        type: "divider"
-      },
-      {
-        type: "actions",
-        elements: [
-          {
-            type: "button",
-            text: {
-              type: "plain_text",
-              text: "📊 Voir le Dashboard",
-              emoji: true
-            },
-            url: dashboardUrl,
-            style: "primary"
+    blocks.push({
+      type: "divider"
+    });
+    
+    blocks.push({
+      type: "actions",
+      elements: [
+        {
+          type: "button",
+          text: {
+            type: "plain_text",
+            text: "📊 Voir le Dashboard",
+            emoji: true
           },
-          {
-            type: "button",
-            text: {
-              type: "plain_text",
-              text: "🔍 Détails de l'erreur",
-              emoji: true
-            },
-            url: `${dashboardUrl}?error=${alertData.errorId}`,
-          }
-        ]
-      }
-    );
+          url: dashboardUrl,
+          style: "primary"
+        },
+        {
+          type: "button",
+          text: {
+            type: "plain_text",
+            text: "🔍 Détails de l'erreur",
+            emoji: true
+          },
+          url: `${dashboardUrl}?error=${alertData.errorId}`,
+        }
+      ]
+    } as any);
 
     // Send to Slack
     const slackResponse = await fetch(alertData.webhookUrl, {
