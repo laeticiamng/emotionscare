@@ -217,6 +217,30 @@ Réponds uniquement au format JSON avec:
       console.error('Error saving ticket:', ticketError);
     }
 
+    console.log(`Ticket créé: ${ticketKey} (ID: ${createdTicket?.id})`);
+
+    // ─────────────────────────────────────────────────────────────
+    // INTÉGRATION PROACTIVE: Générer rapport d'incident si critique
+    // ─────────────────────────────────────────────────────────────
+    if (alert.severity === 'critical') {
+      try {
+        console.log('Generating incident report for critical alert...');
+        await supabase.functions.invoke('generate-incident-report', {
+          body: {
+            title: `Alerte Critique: ${alert.alert_type}`,
+            severity: 'critical',
+            alertId: alert.id,
+            affectedSystems: [alert.source || 'Unknown'],
+            impactDescription: alert.message || 'Alerte critique avec création automatique de ticket'
+          }
+        });
+        console.log('Incident report generation triggered');
+      } catch (incidentError) {
+        console.error('Failed to generate incident report:', incidentError);
+        // Non-bloquant: le ticket est créé même si l'incident échoue
+      }
+    }
+
     // Send notification
     try {
       await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/send-notification`, {
