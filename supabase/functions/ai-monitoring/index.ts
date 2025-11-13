@@ -89,11 +89,17 @@ Réponds UNIQUEMENT en JSON valide.`;
     const data = await response.json();
     let content = data.choices[0]?.message?.content || "{}";
     
-    // Clean markdown code blocks if present
+    // Nettoyer les blocs markdown si présents
     content = content.replace(/```json\s*/g, '').replace(/```\s*$/g, '').trim();
     
     // Parse JSON response
-    const analysis = JSON.parse(content);
+    let analysis;
+    try {
+      analysis = JSON.parse(content);
+    } catch (parseError) {
+      console.error('Failed to parse OpenAI response:', content);
+      throw new Error(`JSON parse error: ${parseError instanceof Error ? parseError.message : 'Unknown'}`);
+    }
     
     return {
       isKnownIssue: analysis.isKnownIssue || false,
