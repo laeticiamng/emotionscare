@@ -1723,6 +1723,15 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: 'role',
     allowedRoles: ['admin'],
   },
+  {
+    name: 'admin-notification-webhooks',
+    path: '/admin/escalation/webhooks',
+    segment: 'admin',
+    layout: 'admin',
+    component: 'NotificationWebhooksConfig',
+    guard: 'role',
+    allowedRoles: ['admin'],
+  },
 
   // ═══════════════════════════════════════════════════════════
   // SYSTEM & MONITORING

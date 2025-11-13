@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { InteractiveTutorial } from '@/components/monitoring/InteractiveTutorial';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -15,7 +16,8 @@ import {
   RefreshCw,
   Brain,
   BarChart3,
-  MessageCircle
+  MessageCircle,
+  GraduationCap
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
@@ -24,6 +26,7 @@ import { MonitoringChatbot } from '@/components/monitoring/MonitoringChatbot';
 const EscalationMonitoringDashboard: React.FC = () => {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [selectedEscalation, setSelectedEscalation] = useState<any>(null);
+  const [isTutorialOpen, setIsTutorialOpen] = useState(false);
 
   // Fetch active escalations
   const { data: activeEscalations, refetch: refetchEscalations } = useQuery({
@@ -161,6 +164,14 @@ const EscalationMonitoringDashboard: React.FC = () => {
           </p>
         </div>
         <div className="flex gap-2">
+          <Button 
+            onClick={() => setIsTutorialOpen(true)} 
+            variant="outline"
+            className="gap-2"
+          >
+            <GraduationCap className="h-4 w-4" />
+            Tutoriel
+          </Button>
           <Button 
             onClick={triggerMLAnalysis} 
             disabled={isRefreshing}
@@ -517,13 +528,9 @@ const EscalationMonitoringDashboard: React.FC = () => {
             <MonitoringChatbot />
           </div>
         </TabsContent>
-
-        <TabsContent value="chatbot">
-          <div className="h-[600px]">
-            <MonitoringChatbot />
-          </div>
-        </TabsContent>
       </Tabs>
+
+      <InteractiveTutorial isOpen={isTutorialOpen} onClose={() => setIsTutorialOpen(false)} />
     </div>
   );
 };
