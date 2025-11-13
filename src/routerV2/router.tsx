@@ -108,6 +108,8 @@ const UnifiedGDPRDashboard = lazy(() => import('@/pages/admin/UnifiedGDPRDashboa
 const APIMonitoringDashboard = lazy(() => import('@/pages/admin/APIMonitoringDashboard'));
 const AIMonitoringDashboard = lazy(() => import('@/pages/admin/AIMonitoringDashboard'));
 const AlertConfigurationPage = lazy(() => import('@/pages/admin/AlertConfigurationPage'));
+const AlertAnalyticsDashboard = lazy(() => import('@/pages/admin/AlertAnalyticsDashboard'));
+const AlertTemplatesPage = lazy(() => import('@/pages/admin/AlertTemplatesPage'));
 const GamificationCronMonitoring = lazy(() => import('@/pages/admin/GamificationCronMonitoring'));
 const MusicQueueAdminPage = lazy(() => import('@/pages/admin/MusicQueueAdminPage'));
 const MusicQueueMetricsPage = lazy(() => import('@/pages/admin/MusicQueueMetricsPage'));
@@ -494,6 +496,8 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   APIMonitoringDashboard,
   AIMonitoringDashboard,
   AlertConfigurationPage,
+  AlertAnalyticsDashboard,
+  AlertTemplatesPage,
   GamificationCronMonitoring,
   MusicQueueAdminPage,
   MusicQueueMetricsPage,

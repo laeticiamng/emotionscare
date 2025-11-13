@@ -302,7 +302,7 @@ function shouldTriggerAlert(
   }
 
   // Check minimum priority
-  const priorityLevels = { low: 0, medium: 1, high: 2, urgent: 3 };
+  const priorityLevels: Record<string, number> = { low: 0, medium: 1, high: 2, urgent: 3 };
   const eventPriority = priorityLevels[analysis.priority] || 0;
   const minPriority = priorityLevels[config.min_priority] || 0;
   
@@ -311,7 +311,7 @@ function shouldTriggerAlert(
   }
 
   // Check minimum severity
-  const severityLevels = { low: 0, medium: 1, high: 2, critical: 3 };
+  const severityLevels: Record<string, number> = { low: 0, medium: 1, high: 2, critical: 3 };
   const eventSeverity = severityLevels[event.severity] || 0;
   const minSeverity = severityLevels[config.min_severity] || 0;
   
