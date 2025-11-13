@@ -1,5 +1,8 @@
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
+// @ts-ignore
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+// @ts-ignore
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+// @ts-ignore
 import { Resend } from "npm:resend@2.0.0";
 
 const corsHeaders = {
@@ -69,11 +72,11 @@ const handler = async (req: Request): Promise<Response> => {
 
     if (rolesError) throw rolesError;
 
-    const adminUserIds = new Set(adminRoles?.map(r => r.user_id) || []);
+    const adminUserIds = new Set(adminRoles?.map((r: any) => r.user_id) || []);
     const adminEmails = users
-      .filter(u => adminUserIds.has(u.id))
-      .map(u => u.email)
-      .filter((email): email is string => email !== undefined);
+      .filter((u: any) => adminUserIds.has(u.id))
+      .map((u: any) => u.email)
+      .filter((email: any): email is string => email !== undefined);
 
     // Analyze data
     const reportData = analyzeData(auditLogs || [], alerts || [], users);
@@ -81,7 +84,7 @@ const handler = async (req: Request): Promise<Response> => {
     console.log(`Sending report to ${adminEmails.length} admins`);
 
     // Send email to each admin
-    const emailPromises = adminEmails.map(async (email) => {
+    const emailPromises = adminEmails.map(async (email: string) => {
       const htmlContent = generateEmailHTML(reportData, startDate, endDate);
 
       return resend.emails.send({
@@ -94,8 +97,8 @@ const handler = async (req: Request): Promise<Response> => {
 
     const results = await Promise.allSettled(emailPromises);
     
-    const successful = results.filter(r => r.status === "fulfilled").length;
-    const failed = results.filter(r => r.status === "rejected").length;
+    const successful = results.filter((r: any) => r.status === "fulfilled").length;
+    const failed = results.filter((r: any) => r.status === "rejected").length;
 
     console.log(`Report sent: ${successful} successful, ${failed} failed`);
 
