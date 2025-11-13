@@ -5438,6 +5438,116 @@ export type Database = {
         }
         Relationships: []
       }
+      focus_session_tracks: {
+        Row: {
+          created_at: string | null
+          duration_seconds: number | null
+          emotion: string | null
+          generation_status: string | null
+          id: string
+          phase: string
+          pomodoro_index: number
+          sequence_order: number
+          session_id: string
+          suno_task_id: string | null
+          target_tempo: number
+          track_title: string | null
+          track_url: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          duration_seconds?: number | null
+          emotion?: string | null
+          generation_status?: string | null
+          id?: string
+          phase: string
+          pomodoro_index: number
+          sequence_order: number
+          session_id: string
+          suno_task_id?: string | null
+          target_tempo: number
+          track_title?: string | null
+          track_url?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          duration_seconds?: number | null
+          emotion?: string | null
+          generation_status?: string | null
+          id?: string
+          phase?: string
+          pomodoro_index?: number
+          sequence_order?: number
+          session_id?: string
+          suno_task_id?: string | null
+          target_tempo?: number
+          track_title?: string | null
+          track_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "focus_session_tracks_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "focus_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      focus_sessions: {
+        Row: {
+          break_duration: number
+          completed_at: string | null
+          created_at: string | null
+          duration_minutes: number
+          end_tempo: number
+          id: string
+          mode: string
+          peak_tempo: number
+          pomodoro_duration: number
+          pomodoros_completed: number | null
+          start_tempo: number
+          started_at: string | null
+          tracks_generated: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          break_duration?: number
+          completed_at?: string | null
+          created_at?: string | null
+          duration_minutes?: number
+          end_tempo?: number
+          id?: string
+          mode: string
+          peak_tempo?: number
+          pomodoro_duration?: number
+          pomodoros_completed?: number | null
+          start_tempo?: number
+          started_at?: string | null
+          tracks_generated?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          break_duration?: number
+          completed_at?: string | null
+          created_at?: string | null
+          duration_minutes?: number
+          end_tempo?: number
+          id?: string
+          mode?: string
+          peak_tempo?: number
+          pomodoro_duration?: number
+          pomodoros_completed?: number | null
+          start_tempo?: number
+          started_at?: string | null
+          tracks_generated?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       gamification_activities: {
         Row: {
           achievements_unlocked: string[] | null

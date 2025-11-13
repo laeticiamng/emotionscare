@@ -33,6 +33,7 @@ import { UnifiedMusicPlayer } from '@/components/music/UnifiedMusicPlayer';
 import { EmotionalMusicGenerator } from '@/components/music/EmotionalMusicGenerator';
 import { MusicJourneyPlayer } from '@/components/music/MusicJourneyPlayer';
 import { AutoMixPlayer } from '@/components/music/AutoMixPlayer';
+import { FocusFlowPlayer } from '@/components/music/FocusFlowPlayer';
 import { PushNotificationSetup } from '@/components/notifications/PushNotificationSetup';
 import type { MusicTrack } from '@/types/music';
 import { logger } from '@/lib/logger';
@@ -423,6 +424,11 @@ const B2CMusicEnhanced: React.FC = () => {
             {/* AutoMix Section */}
             <div className="max-w-4xl mx-auto">
               <AutoMixPlayer />
+            </div>
+
+            {/* Focus Flow Section */}
+            <div className="max-w-4xl mx-auto">
+              <FocusFlowPlayer />
             </div>
 
             {/* Push Notifications */}
