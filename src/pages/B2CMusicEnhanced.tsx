@@ -34,6 +34,7 @@ import { EmotionalMusicGenerator } from '@/components/music/EmotionalMusicGenera
 import { MusicJourneyPlayer } from '@/components/music/MusicJourneyPlayer';
 import { AutoMixPlayer } from '@/components/music/AutoMixPlayer';
 import { FocusFlowPlayer } from '@/components/music/FocusFlowPlayer';
+import { CollaborativeSessionLobby } from '@/components/focus/CollaborativeSessionLobby';
 import { PushNotificationSetup } from '@/components/notifications/PushNotificationSetup';
 import type { MusicTrack } from '@/types/music';
 import { logger } from '@/lib/logger';
@@ -429,6 +430,11 @@ const B2CMusicEnhanced: React.FC = () => {
             {/* Focus Flow Section */}
             <div className="max-w-4xl mx-auto">
               <FocusFlowPlayer />
+            </div>
+
+            {/* Collaborative Focus Section */}
+            <div className="max-w-6xl mx-auto">
+              <CollaborativeSessionLobby />
             </div>
 
             {/* Push Notifications */}

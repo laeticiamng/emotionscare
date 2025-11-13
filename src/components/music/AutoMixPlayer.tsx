@@ -27,9 +27,11 @@ import {
   Zap,
   Loader2,
   ThumbsUp,
-  ThumbsDown
+  ThumbsDown,
+  Share2
 } from 'lucide-react';
 import { useAutoMix } from '@/hooks/useAutoMix';
+import { PlaylistShareModal } from './PlaylistShareModal';
 
 const TimeIcons = {
   morning: Sunrise,
@@ -63,6 +65,7 @@ export const AutoMixPlayer: React.FC = () => {
   const [trackCount, setTrackCount] = useState(7);
   const [weatherSensitivity, setWeatherSensitivity] = useState(true);
   const [feedbackGiven, setFeedbackGiven] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
 
   useEffect(() => {
     if (activePlaylist) {
@@ -200,6 +203,14 @@ export const AutoMixPlayer: React.FC = () => {
               <Button size="icon" variant="outline">
                 <SkipForward className="h-5 w-5" />
               </Button>
+              <Button 
+                size="icon" 
+                variant="outline"
+                onClick={() => setShowShareModal(true)}
+                className="ml-2"
+              >
+                <Share2 className="h-5 w-5" />
+              </Button>
             </div>
 
             <div className="space-y-2">
@@ -258,6 +269,16 @@ export const AutoMixPlayer: React.FC = () => {
             </CardContent>
           </Card>
         </motion.div>
+      )}
+
+      {/* Modal de partage */}
+      {activePlaylist && (
+        <PlaylistShareModal
+          isOpen={showShareModal}
+          onClose={() => setShowShareModal(false)}
+          playlistId={activePlaylist.id}
+          playlistName={activePlaylist.name}
+        />
       )}
     </div>
   );

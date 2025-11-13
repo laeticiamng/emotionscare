@@ -5512,6 +5512,39 @@ export type Database = {
         }
         Relationships: []
       }
+      focus_leaderboard: {
+        Row: {
+          id: string
+          last_session_at: string | null
+          streak_days: number | null
+          total_minutes: number | null
+          total_pomodoros: number | null
+          total_sessions: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          last_session_at?: string | null
+          streak_days?: number | null
+          total_minutes?: number | null
+          total_pomodoros?: number | null
+          total_sessions?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          last_session_at?: string | null
+          streak_days?: number | null
+          total_minutes?: number | null
+          total_pomodoros?: number | null
+          total_sessions?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       focus_session_tracks: {
         Row: {
           created_at: string | null
@@ -5621,6 +5654,56 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      focus_team_sessions: {
+        Row: {
+          created_at: string
+          creator_id: string
+          current_phase: string | null
+          duration_minutes: number
+          id: string
+          mode: string
+          participant_count: number | null
+          phase_started_at: string | null
+          playlist_id: string | null
+          team_name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          creator_id: string
+          current_phase?: string | null
+          duration_minutes: number
+          id?: string
+          mode: string
+          participant_count?: number | null
+          phase_started_at?: string | null
+          playlist_id?: string | null
+          team_name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          creator_id?: string
+          current_phase?: string | null
+          duration_minutes?: number
+          id?: string
+          mode?: string
+          participant_count?: number | null
+          phase_started_at?: string | null
+          playlist_id?: string | null
+          team_name?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "focus_team_sessions_playlist_id_fkey"
+            columns: ["playlist_id"]
+            isOneToOne: false
+            referencedRelation: "automix_playlists"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       gamification_activities: {
         Row: {
@@ -10621,6 +10704,44 @@ export type Database = {
         }
         Relationships: []
       }
+      playlist_listen_stats: {
+        Row: {
+          completed: boolean | null
+          duration_seconds: number | null
+          id: string
+          listened_at: string
+          playlist_id: string
+          track_index: number | null
+          user_id: string | null
+        }
+        Insert: {
+          completed?: boolean | null
+          duration_seconds?: number | null
+          id?: string
+          listened_at?: string
+          playlist_id: string
+          track_index?: number | null
+          user_id?: string | null
+        }
+        Update: {
+          completed?: boolean | null
+          duration_seconds?: number | null
+          id?: string
+          listened_at?: string
+          playlist_id?: string
+          track_index?: number | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "playlist_listen_stats_playlist_id_fkey"
+            columns: ["playlist_id"]
+            isOneToOne: false
+            referencedRelation: "automix_playlists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       points_history: {
         Row: {
           challenge_id: string | null
@@ -12182,6 +12303,50 @@ export type Database = {
         }
         Relationships: []
       }
+      shared_playlists: {
+        Row: {
+          created_at: string
+          expires_at: string | null
+          id: string
+          is_public: boolean | null
+          playlist_id: string
+          qr_code_url: string | null
+          share_token: string
+          user_id: string
+          view_count: number | null
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          is_public?: boolean | null
+          playlist_id: string
+          qr_code_url?: string | null
+          share_token: string
+          user_id: string
+          view_count?: number | null
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          is_public?: boolean | null
+          playlist_id?: string
+          qr_code_url?: string | null
+          share_token?: string
+          user_id?: string
+          view_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shared_playlists_playlist_id_fkey"
+            columns: ["playlist_id"]
+            isOneToOne: false
+            referencedRelation: "automix_playlists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       shopify_purchases: {
         Row: {
           activated_at: string | null
@@ -12832,6 +12997,115 @@ export type Database = {
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      team_challenges: {
+        Row: {
+          created_at: string
+          created_by: string
+          current_value: number | null
+          description: string | null
+          ends_at: string
+          goal_type: string
+          goal_value: number
+          id: string
+          is_active: boolean | null
+          name: string
+          starts_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          current_value?: number | null
+          description?: string | null
+          ends_at: string
+          goal_type: string
+          goal_value: number
+          id?: string
+          is_active?: boolean | null
+          name: string
+          starts_at: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          current_value?: number | null
+          description?: string | null
+          ends_at?: string
+          goal_type?: string
+          goal_value?: number
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          starts_at?: string
+        }
+        Relationships: []
+      }
+      team_session_chat: {
+        Row: {
+          created_at: string
+          id: string
+          message: string
+          session_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message: string
+          session_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string
+          session_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_session_chat_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "focus_team_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      team_session_participants: {
+        Row: {
+          id: string
+          is_active: boolean | null
+          joined_at: string
+          pomodoros_completed: number | null
+          session_id: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          is_active?: boolean | null
+          joined_at?: string
+          pomodoros_completed?: number | null
+          session_id: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          is_active?: boolean | null
+          joined_at?: string
+          pomodoros_completed?: number | null
+          session_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_session_participants_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "focus_team_sessions"
             referencedColumns: ["id"]
           },
         ]
@@ -16147,6 +16421,10 @@ export type Database = {
             Args: { p_ip_address?: unknown; p_user_agent?: string }
             Returns: string
           }
+      decrement_participant_count: {
+        Args: { session_id: string }
+        Returns: undefined
+      }
       decrypt_sensitive_data: {
         Args: { p_ciphertext: string; p_key_name?: string }
         Returns: string
@@ -16824,6 +17102,10 @@ export type Database = {
         Returns: undefined
       }
       increment_music_usage: { Args: { user_uuid: string }; Returns: boolean }
+      increment_participant_count: {
+        Args: { session_id: string }
+        Returns: undefined
+      }
       increment_rate_limit_counter: {
         Args: {
           p_identifier: string
