@@ -4,7 +4,7 @@ import { Mic, MicOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useVoiceCommands } from '@/hooks/useVoiceCommands';
-import { useMusic } from '@/contexts/music/MusicContext';
+import { useMusic } from '@/hooks/useMusic';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
