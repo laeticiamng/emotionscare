@@ -178,6 +178,29 @@ async function analyzeTest(supabase: any, testId: string) {
     } catch (notifError) {
       console.error('Failed to send notification:', notifError);
     }
+
+    // ─────────────────────────────────────────────────────────────
+    // INTÉGRATION PROACTIVE: Détecter résultats négatifs significatifs
+    // ─────────────────────────────────────────────────────────────
+    const performanceImprovement = ((variantScore - controlScore) / Math.abs(controlScore)) * 100;
+    const isNegativeSignificant = isSignificant && performanceImprovement < -10; // -10% ou pire
+    
+    if (isNegativeSignificant) {
+      try {
+        console.log('Detected significant negative A/B test result, generating incident report...');
+        await supabase.functions.invoke('generate-incident-report', {
+          body: {
+            title: `Test A/B Négatif Significatif: ${test.test_name}`,
+            severity: performanceImprovement < -20 ? 'high' : 'medium',
+            affectedSystems: ['A/B Testing System', test.variant_name],
+            impactDescription: `Le test A/B "${test.test_name}" montre une dégradation significative de performance de ${performanceImprovement.toFixed(1)}% avec une confiance de ${(confidence * 100).toFixed(1)}%. Le variant ${test.variant_name} performe significativement moins bien que le contrôle.`
+          }
+        });
+        console.log('Incident report generation triggered for negative A/B test');
+      } catch (incidentError) {
+        console.error('Failed to generate incident report for negative test:', incidentError);
+      }
+    }
   }
 
   return {
