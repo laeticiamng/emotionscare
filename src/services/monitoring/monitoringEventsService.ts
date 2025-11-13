@@ -1,8 +1,23 @@
 import { supabase } from '@/integrations/supabase/client';
-import type { Database } from '@/integrations/supabase/types';
 
-export type MonitoringEvent = Database['public']['Tables']['monitoring_events']['Row'];
-export type MonitoringEventInsert = Database['public']['Tables']['monitoring_events']['Insert'];
+// Type definitions for monitoring_events table (until types are regenerated)
+export type MonitoringEvent = {
+  id: string;
+  timestamp: string;
+  event_type: 'error' | 'warning' | 'info' | 'performance' | 'user_action';
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  message: string;
+  context: string;
+  ai_analysis?: any;
+  metadata?: any;
+  user_id?: string | null;
+  created_at: string;
+};
+
+export type MonitoringEventInsert = Omit<MonitoringEvent, 'id' | 'created_at'> & {
+  id?: string;
+  created_at?: string;
+};
 
 export type EventType = 'error' | 'warning' | 'info' | 'performance' | 'user_action';
 export type EventSeverity = 'low' | 'medium' | 'high' | 'critical';
