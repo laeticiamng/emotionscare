@@ -4,7 +4,7 @@
  */
 
 import { z } from 'zod';
-import * as Sentry from '@sentry/react';
+import { captureException } from '@/lib/ai-monitoring';
 import { supabase } from '@/integrations/supabase/client';
 import {
   BounceBattle,

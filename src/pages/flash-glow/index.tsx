@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import * as Sentry from '@sentry/react';
+import { captureException } from '@/lib/ai-monitoring';
 import { Link } from 'react-router-dom';
 import { logger } from '@/lib/logger';
 import { Button } from '@/components/ui/button';

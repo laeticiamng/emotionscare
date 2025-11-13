@@ -3,7 +3,7 @@
  * Gère les sessions VR de respiration et cohérence cardiaque
  */
 
-import * as Sentry from '@sentry/react';
+import { captureException } from '@/lib/ai-monitoring';
 import { supabase } from '@/integrations/supabase/client';
 import {
   VRNebulaSession,

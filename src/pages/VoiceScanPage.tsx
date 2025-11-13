@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import * as Sentry from '@sentry/react';
+import { captureException } from '@/lib/ai-monitoring';
 import { PageErrorBoundary } from '@/components/error/PageErrorBoundary';
 import PageRoot from '@/components/common/PageRoot';
 import { Button } from '@/components/ui/button';

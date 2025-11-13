@@ -3,7 +3,7 @@
  * Gère les micro-pauses écran et le repos visuel
  */
 
-import * as Sentry from '@sentry/react';
+import { captureException } from '@/lib/ai-monitoring';
 import { supabase } from '@/integrations/supabase/client';
 import {
   ScreenSilkSession,
