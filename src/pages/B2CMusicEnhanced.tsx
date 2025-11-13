@@ -30,6 +30,7 @@ import { RewardSystem } from '@/components/rewards/RewardSystem';
 import { getOptimizedUniverse } from '@/data/universes/config';
 import { useOptimizedAnimation } from '@/hooks/useOptimizedAnimation';
 import { UnifiedMusicPlayer } from '@/components/music/UnifiedMusicPlayer';
+import { EmotionalMusicGenerator } from '@/components/music/EmotionalMusicGenerator';
 import type { MusicTrack } from '@/types/music';
 import { logger } from '@/lib/logger';
 
@@ -303,6 +304,11 @@ const B2CMusicEnhanced: React.FC = () => {
                 Choisis ton vinyle et laisse-le composer ton aura sonore.
                 Chaque mélodie s'adapte à ton état pour créer l'harmonie parfaite.
               </p>
+            </div>
+
+            {/* AI Emotional Music Generator */}
+            <div className="max-w-4xl mx-auto">
+              <EmotionalMusicGenerator />
             </div>
 
             {/* Favorites Section */}
