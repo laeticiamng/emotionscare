@@ -148,6 +148,38 @@ async function analyzeTest(supabase: any, testId: string) {
     })
     .eq('id', testId);
 
+  const isSignificant = hasMinSample && confidence >= (test.confidence_level || 0.95);
+  
+  // Send notification if significant
+  if (isSignificant && winner !== 'inconclusive') {
+    try {
+      await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/send-notification`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${Deno.env.get('SUPABASE_ANON_KEY')}`
+        },
+        body: JSON.stringify({
+          event_type: 'ab_test_significant',
+          title: `Test A/B Significatif: ${test.name}`,
+          message: `Le test "${test.name}" a atteint la significativité statistique. Le ${winner === 'control' ? 'contrôle' : 'variant'} est significativement meilleur (confiance: ${(confidence * 100).toFixed(1)}%)`,
+          severity: 'success',
+          data: {
+            'Test': test.name,
+            'Gagnant': winner === 'control' ? 'Contrôle' : 'Variant',
+            'Confiance': `${(confidence * 100).toFixed(1)}%`,
+            'Taux contrôle': `${(controlMetrics.resolution_rate * 100).toFixed(1)}%`,
+            'Taux variant': `${(variantMetrics.resolution_rate * 100).toFixed(1)}%`,
+            'Échantillon': sampleSize.toString()
+          }
+        })
+      });
+      console.log('Notification sent for significant A/B test');
+    } catch (notifError) {
+      console.error('Failed to send notification:', notifError);
+    }
+  }
+
   return {
     test_id: testId,
     test_name: test.name,
