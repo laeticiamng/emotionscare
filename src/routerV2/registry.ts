@@ -1741,6 +1741,33 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: 'role',
     allowedRoles: ['admin'],
   },
+  {
+    name: 'admin-executive',
+    path: '/admin/executive',
+    segment: 'admin',
+    layout: 'admin',
+    component: 'ExecutiveDashboard',
+    guard: 'role',
+    allowedRoles: ['admin', 'b2b-admin'],
+  },
+  {
+    name: 'admin-incidents',
+    path: '/admin/incidents',
+    segment: 'admin',
+    layout: 'admin',
+    component: 'IncidentReportsPage',
+    guard: 'role',
+    allowedRoles: ['admin', 'b2b-admin'],
+  },
+  {
+    name: 'admin-unified-dashboard',
+    path: '/admin/unified',
+    segment: 'admin',
+    layout: 'admin',
+    component: 'UnifiedAdminDashboard',
+    guard: 'role',
+    allowedRoles: ['admin', 'b2b-admin'],
+  },
 
   // ═══════════════════════════════════════════════════════════
   // SYSTEM & MONITORING
