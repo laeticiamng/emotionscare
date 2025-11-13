@@ -3,11 +3,12 @@
  * Panel gamification spécifique musique
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { 
   Trophy, 
   Star, 
@@ -15,12 +16,26 @@ import {
   Music2,
   Zap,
   Gift,
-  Award
+  Award,
+  Share2
 } from 'lucide-react';
 import { useGamification } from '@/hooks/useGamification';
+import { BadgeShareDialog } from './BadgeShareDialog';
 
 export const MusicGamificationPanel: React.FC = () => {
   const { userStats, achievements, loading } = useGamification();
+  const [shareDialogOpen, setShareDialogOpen] = useState(false);
+  const [selectedAchievement, setSelectedAchievement] = useState<any>(null);
+
+  const handleShareClick = (achievement: any) => {
+    setSelectedAchievement({
+      id: achievement.id,
+      title: achievement.title,
+      description: achievement.description,
+      rarity: achievement.rarity
+    });
+    setShareDialogOpen(true);
+  };
 
   if (loading) {
     return (
@@ -136,9 +151,19 @@ export const MusicGamificationPanel: React.FC = () => {
                     </div>
                   </div>
                   {achievement.unlocked && (
-                    <Badge variant="secondary" className="text-xs">
-                      +{achievement.points} pts
-                    </Badge>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="secondary" className="text-xs">
+                        +{achievement.points} pts
+                      </Badge>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => handleShareClick(achievement)}
+                        className="h-8 w-8 p-0"
+                      >
+                        <Share2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   )}
                 </motion.div>
               ))}
@@ -146,6 +171,12 @@ export const MusicGamificationPanel: React.FC = () => {
           </CardContent>
         </Card>
       )}
+
+      <BadgeShareDialog
+        open={shareDialogOpen}
+        onOpenChange={setShareDialogOpen}
+        achievement={selectedAchievement}
+      />
 
       {/* Message encouragement */}
       <Card className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 border-purple-500/20">
