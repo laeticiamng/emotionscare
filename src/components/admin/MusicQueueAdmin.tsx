@@ -12,13 +12,18 @@ import {
   cancelQueueItem,
   getAllQueueItems
 } from '@/services/musicQueueService';
-import { Loader2, Play, XCircle, RefreshCw, Activity, Clock, CheckCircle, AlertCircle } from 'lucide-react';
+import { Loader2, Play, XCircle, RefreshCw, Activity, Clock, CheckCircle, AlertCircle, BarChart3 } from 'lucide-react';
 import { toast } from 'sonner';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { PremiumBadge } from '@/components/music/PremiumBadge';
+import { getRolePriority } from '@/services/userRolesService';
+import { useNavigate } from 'react-router-dom';
+import { routes } from '@/lib/routes';
 
 export default function MusicQueueAdmin() {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
 
   // Récupérer toutes les demandes de la queue
@@ -112,18 +117,28 @@ export default function MusicQueueAdmin() {
             Gestion et monitoring des générations musicales
           </p>
         </div>
-        <Button 
-          onClick={() => triggerWorkerMutation.mutate()}
-          disabled={triggerWorkerMutation.isPending}
-          size="lg"
-        >
-          {triggerWorkerMutation.isPending ? (
-            <Loader2 className="h-4 w-4 animate-spin mr-2" />
-          ) : (
-            <Play className="h-4 w-4 mr-2" />
-          )}
-          Lancer le Worker
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button 
+            onClick={() => navigate(routes.b2b.admin.musicMetrics())}
+            variant="outline"
+            size="lg"
+          >
+            <BarChart3 className="h-4 w-4 mr-2" />
+            Métriques
+          </Button>
+          <Button 
+            onClick={() => triggerWorkerMutation.mutate()}
+            disabled={triggerWorkerMutation.isPending}
+            size="lg"
+          >
+            {triggerWorkerMutation.isPending ? (
+              <Loader2 className="h-4 w-4 animate-spin mr-2" />
+            ) : (
+              <Play className="h-4 w-4 mr-2" />
+            )}
+            Lancer le Worker
+          </Button>
+        </div>
       </div>
 
       {/* Statistiques */}
@@ -251,12 +266,23 @@ export default function MusicQueueAdmin() {
                   className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors"
                 >
                   <div className="flex-1 space-y-1">
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 flex-wrap">
                       {getStatusBadge(item.status)}
+                      {item.priority >= 50 && (
+                        <PremiumBadge 
+                          role={item.priority >= 100 ? 'admin' : item.priority >= 75 ? 'moderator' : 'premium'} 
+                          size="sm"
+                        />
+                      )}
                       <span className="font-medium">Émotion : {item.emotion}</span>
                       <span className="text-sm text-muted-foreground">
                         Intensité : {item.intensity}
                       </span>
+                      {item.priority > 0 && (
+                        <span className="text-xs text-muted-foreground">
+                          Priorité : {item.priority}
+                        </span>
+                      )}
                     </div>
                     
                     {item.user_context && (

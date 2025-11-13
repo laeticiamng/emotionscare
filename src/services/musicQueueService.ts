@@ -17,6 +17,7 @@ export interface QueueItem {
   error_message?: string;
   retry_count: number;
   max_retries: number;
+  priority: number;
   created_at: string;
   started_at?: string;
   completed_at?: string;

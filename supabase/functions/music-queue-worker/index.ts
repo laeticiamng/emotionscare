@@ -40,10 +40,12 @@ serve(async (req) => {
     }
 
     // Récupérer les éléments en attente (max 5 à la fois)
+    // Tri par priorité décroissante (premium d'abord), puis par date de création
     const { data: queueItems, error: fetchError } = await supabase
       .from('music_generation_queue')
       .select('*')
       .eq('status', 'pending')
+      .order('priority', { ascending: false })
       .order('created_at', { ascending: true })
       .limit(5);
 

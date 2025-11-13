@@ -1206,6 +1206,16 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     requireAuth: true,
   },
   {
+    name: 'admin-music-metrics',
+    path: '/admin/music-metrics',
+    segment: 'manager',
+    role: 'manager',
+    layout: 'app',
+    component: 'MusicQueueMetricsPage',
+    guard: true,
+    requireAuth: true,
+  },
+  {
     name: 'challenges-history',
     path: '/app/challenges/history',
     segment: 'consumer',
