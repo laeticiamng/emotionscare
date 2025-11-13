@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Music2 } from 'lucide-react';
 
-import useMusicFavorites from '@/hooks/useMusicFavorites';
+import { useMusicFavorites } from '@/hooks/useMusicFavorites';
 
 interface MusicTherapyCardProps {
   className?: string;
