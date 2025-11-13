@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { useCallback, useState } from 'react';
 import type { RefObject } from 'react';
-import * as Sentry from '@sentry/react';
+import { captureException } from '@/lib/ai-monitoring';
 import { Download } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';

@@ -1,6 +1,6 @@
 // @ts-nocheck
 import React from 'react';
-import * as Sentry from '@sentry/react';
+import { captureException } from '@/lib/ai-monitoring';
 
 interface ErrorBoundaryProps {
   children: React.ReactNode;

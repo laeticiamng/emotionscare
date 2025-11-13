@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import * as Sentry from '@sentry/react';
+import { captureException } from '@/lib/ai-monitoring';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';

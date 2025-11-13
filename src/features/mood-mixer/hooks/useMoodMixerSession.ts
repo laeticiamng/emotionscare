@@ -3,7 +3,7 @@
 
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { useReducedMotion } from 'framer-motion';
-import * as Sentry from '@sentry/react';
+import { captureException } from '@/lib/ai-monitoring';
 
 import { useFlags } from '@/core/flags';
 import { useToast } from '@/components/ui/use-toast';
