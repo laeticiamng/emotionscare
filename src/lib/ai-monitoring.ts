@@ -21,11 +21,13 @@ interface MonitoringEvent {
 interface AIAnalysisResult {
   isKnownIssue: boolean;
   suggestedFix: string;
+  autoFixCode: string | null;
   relatedErrors: string[];
   priority: 'urgent' | 'high' | 'medium' | 'low';
   category: string;
   needsAlert: boolean;
   analysis: string;
+  preventionTips: string[];
 }
 
 class AIMonitoring {
@@ -190,28 +192,65 @@ class AIMonitoring {
       }
 
       if (data?.analysis) {
-        const analysis = data.analysis as AIAnalysisResult;
-        logger.info(
-          `🤖 AI Analysis: ${analysis.category} - ${analysis.priority}`,
-          { suggestedFix: analysis.suggestedFix, needsAlert: analysis.needsAlert },
-          'MONITORING'
+        const analysis: AIAnalysisResult = data.analysis;
+        
+        // Afficher l'analyse dans la console de manière structurée
+        console.groupCollapsed(
+          `%c🤖 AI Analysis: ${analysis.category.toUpperCase()} [${analysis.priority}]`,
+          `color: ${this.getPriorityColor(analysis.priority)}; font-weight: bold; font-size: 12px`
         );
-
-        // Si l'analyse suggère une alerte, la logger
-        if (analysis.needsAlert) {
-          logger.warn(
-            `⚠️ Alert needed: ${event.message}`,
-            { analysis, event },
-            'MONITORING'
-          );
+        
+        console.log('%c📊 Diagnostic:', 'font-weight: bold; color: #3b82f6', analysis.analysis);
+        
+        if (analysis.isKnownIssue) {
+          console.log('%c✅ Issue connue', 'color: #10b981');
         }
+        
+        console.log('%c💡 Solution suggérée:', 'font-weight: bold; color: #8b5cf6', analysis.suggestedFix);
+        
+        if (analysis.autoFixCode) {
+          console.log('%c🔧 Code de correction automatique:', 'font-weight: bold; color: #f59e0b');
+          console.log(analysis.autoFixCode);
+        }
+        
+        if (analysis.relatedErrors.length > 0) {
+          console.log('%c🔗 Erreurs similaires:', 'font-weight: bold; color: #ec4899', analysis.relatedErrors);
+        }
+        
+        if (analysis.preventionTips.length > 0) {
+          console.log('%c🛡️ Conseils de prévention:', 'font-weight: bold; color: #14b8a6');
+          analysis.preventionTips.forEach((tip, i) => {
+            console.log(`  ${i + 1}. ${tip}`);
+          });
+        }
+        
+        if (analysis.needsAlert) {
+          console.warn('%c⚠️ ATTENTION: Cette erreur nécessite une intervention immédiate!', 'font-weight: bold; color: #ef4444; font-size: 13px');
+        }
+        
+        console.groupEnd();
       }
     } catch (error) {
-      // Log sans déclencher de recursion
+      // Ne pas logger ici pour éviter la recursion
       console.error('[AI-Monitoring] Failed to send event to AI monitoring:', error);
-      
-      // Ne pas utiliser logger.error pour éviter la boucle infinie
-      // logger.error('Failed to send event to AI monitoring', error as Error, 'MONITORING');
+    }
+  }
+
+  /**
+   * Obtenir la couleur selon la priorité
+   */
+  private getPriorityColor(priority: string): string {
+    switch (priority) {
+      case 'urgent':
+        return '#ef4444';
+      case 'high':
+        return '#f59e0b';
+      case 'medium':
+        return '#3b82f6';
+      case 'low':
+        return '#10b981';
+      default:
+        return '#6b7280';
     }
   }
 
