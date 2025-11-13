@@ -40,7 +40,7 @@ import { PushNotificationSetup } from '@/components/notifications/PushNotificati
 import { VoiceCoach } from '@/components/coach/VoiceCoach';
 import VoiceCommands from '@/components/voice/VoiceCommands';
 import { MLRecommendationsPanel } from '@/components/ml/MLRecommendationsPanel';
-import GamificationPanel from '@/components/gamification/GamificationPanel';
+import MusicGamificationPanel from '@/components/gamification/MusicGamificationPanel';
 import type { MusicTrack } from '@/types/music';
 import { logger } from '@/lib/logger';
 import { useMusicJourney } from '@/hooks/useMusicJourney';
@@ -350,7 +350,7 @@ const B2CMusicEnhanced: React.FC = () => {
 
             {/* Gamification Panel */}
             <div className="max-w-4xl mx-auto mt-8">
-              <GamificationPanel />
+              <MusicGamificationPanel />
             </div>
 
             {/* Journey Section */}

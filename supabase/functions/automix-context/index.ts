@@ -134,7 +134,7 @@ Réponds en JSON avec cette structure exacte :
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-5-mini-2025-08-07',
+        model: 'gpt-4o-mini',
         messages: [
           { role: 'system', content: 'Tu es un assistant expert en musicothérapie. Réponds uniquement en JSON valide.' },
           { role: 'user', content: contextPrompt }
