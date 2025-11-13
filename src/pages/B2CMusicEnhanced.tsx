@@ -38,6 +38,7 @@ import { CollaborativeSessionLobby } from '@/components/focus/CollaborativeSessi
 import { FocusAnalyticsDashboard } from '@/components/analytics/FocusAnalyticsDashboard';
 import { PushNotificationSetup } from '@/components/notifications/PushNotificationSetup';
 import { VoiceCoach } from '@/components/coach/VoiceCoach';
+import VoiceCommands from '@/components/voice/VoiceCommands';
 import type { MusicTrack } from '@/types/music';
 import { logger } from '@/lib/logger';
 import { useMusicJourney } from '@/hooks/useMusicJourney';
@@ -714,6 +715,8 @@ const B2CMusicEnhanced: React.FC = () => {
         enabled={voiceCoachEnabled}
         onToggle={setVoiceCoachEnabled}
       />
+      
+      <VoiceCommands />
     </TooltipProvider>
     </div>
   );
