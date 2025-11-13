@@ -4,6 +4,7 @@
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { captureException } from '@/lib/ai-monitoring';
+import { Sentry } from '@/lib/errors/sentry-compat';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';

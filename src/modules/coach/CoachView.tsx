@@ -1,5 +1,6 @@
 import { FormEvent, KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { captureException } from '@/lib/ai-monitoring';
+import { Sentry } from '@/lib/errors/sentry-compat';
 import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { sendMessage } from '@/services/coach/coachApi';
@@ -198,7 +199,7 @@ export function CoachView({ initialMode = 'b2c' }: { initialMode?: CoachMode }) 
   useEffect(() => {
     const client = Sentry.getCurrentHub().getClient();
     if (client) {
-      Sentry.configureScope(scope => {
+      Sentry.configureScope((scope: any) => {
         scope.setTag('coach_mode', mode);
       });
     }
@@ -426,7 +427,7 @@ export function CoachView({ initialMode = 'b2c' }: { initialMode?: CoachMode }) 
     controllerRef.current = controller;
 
     const hintActive = isRigidityHigh;
-    Sentry.configureScope(scope => {
+    Sentry.configureScope((scope: any) => {
       scope.setTag('aaq2_hint_used', hintActive ? 'true' : 'false');
     });
 

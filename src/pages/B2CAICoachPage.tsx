@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { captureException } from '@/lib/ai-monitoring';
+import { Sentry } from '@/lib/errors/sentry-compat';
 import { CoachView } from '@/modules/coach/CoachView';
 import { ConsentGate } from '@/features/clinical-optin/ConsentGate';
 import { MedicalDisclaimerDialog, useMedicalDisclaimer } from '@/components/medical/MedicalDisclaimerDialog';
@@ -22,7 +23,7 @@ const B2CAICoachPage = () => {
   useEffect(() => {
     const client = Sentry.getCurrentHub().getClient();
     if (client) {
-      Sentry.configureScope(scope => {
+      Sentry.configureScope((scope: any) => {
         scope.setTag('coach_entry', 'b2c');
       });
     }
