@@ -2,7 +2,6 @@
 
 import { createClient } from '@supabase/supabase-js';
 import { SUPABASE_URL, SUPABASE_ANON_KEY, IS_DEV } from '@/lib/env';
-import { logger } from '@/lib/logger';
 
 // Client Supabase configuré avec validation d'environnement
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
@@ -26,7 +25,7 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
 
 // Log de connexion en développement
 if (IS_DEV) {
-  logger.info('🔌 Supabase client initialized', {}, 'SYSTEM');
+  console.info('[SYSTEM] 🔌 Supabase client initialized');
 }
 
 export default supabase;
