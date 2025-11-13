@@ -117,6 +117,7 @@ const AITemplateSuggestions = lazy(() => import('@/pages/admin/AITemplateSuggest
 const EscalationMonitoringDashboard = lazy(() => import('@/pages/admin/EscalationMonitoringDashboard'));
 const TicketIntegrationConfig = lazy(() => import('@/pages/admin/TicketIntegrationConfig'));
 const ABTestManager = lazy(() => import('@/pages/admin/ABTestManager'));
+const NotificationWebhooksConfig = lazy(() => import('@/pages/admin/NotificationWebhooksConfig'));
 const GamificationCronMonitoring = lazy(() => import('@/pages/admin/GamificationCronMonitoring'));
 const MusicQueueAdminPage = lazy(() => import('@/pages/admin/MusicQueueAdminPage'));
 const MusicQueueMetricsPage = lazy(() => import('@/pages/admin/MusicQueueMetricsPage'));

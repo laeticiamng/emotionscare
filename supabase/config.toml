@@ -75,6 +75,9 @@ verify_jwt = true
 [functions.ab-test-manager]
 verify_jwt = true
 
+[functions.send-notification]
+verify_jwt = false
+
 [api]
 enabled = true
 port = 54321
