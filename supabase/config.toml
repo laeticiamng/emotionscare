@@ -66,6 +66,15 @@ verify_jwt = false
 [functions.optimize-escalation-rules]
 verify_jwt = false
 
+[functions.monitoring-chatbot]
+verify_jwt = true
+
+[functions.create-ticket]
+verify_jwt = true
+
+[functions.ab-test-manager]
+verify_jwt = true
+
 [api]
 enabled = true
 port = 54321

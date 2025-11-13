@@ -14,10 +14,12 @@ import {
   CheckCircle2, 
   RefreshCw,
   Brain,
-  BarChart3
+  BarChart3,
+  MessageCircle
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
+import { MonitoringChatbot } from '@/components/monitoring/MonitoringChatbot';
 
 const EscalationMonitoringDashboard: React.FC = () => {
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -508,6 +510,18 @@ const EscalationMonitoringDashboard: React.FC = () => {
               )}
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="chatbot">
+          <div className="h-[600px]">
+            <MonitoringChatbot />
+          </div>
+        </TabsContent>
+
+        <TabsContent value="chatbot">
+          <div className="h-[600px]">
+            <MonitoringChatbot />
+          </div>
         </TabsContent>
       </Tabs>
     </div>
