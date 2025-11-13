@@ -1306,6 +1306,16 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     requireAuth: true,
   },
   {
+    name: 'admin-alert-config',
+    path: '/admin/alert-config',
+    segment: 'admin',
+    role: 'admin',
+    layout: 'app',
+    component: 'AlertConfigurationPage',
+    guard: true,
+    requireAuth: true,
+  },
+  {
     name: 'gdpr-cron-monitoring',
     path: '/gdpr/cron-monitoring',
     segment: 'manager',

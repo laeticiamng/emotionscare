@@ -39,6 +39,15 @@ verify_jwt = false
 [functions.send-weekly-report]
 verify_jwt = false
 
+[functions.send-error-alert]
+verify_jwt = false
+
+[functions.send-slack-alert]
+verify_jwt = false
+
+[functions.send-discord-alert]
+verify_jwt = false
+
 [api]
 enabled = true
 port = 54321
