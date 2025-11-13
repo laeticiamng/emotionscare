@@ -7,6 +7,41 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Fonction retry avec backoff exponentiel pour gérer les erreurs temporaires
+async function fetchWithRetry(url: string, options: RequestInit, maxRetries = 3): Promise<Response> {
+  let lastError: Error | null = null;
+  
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    try {
+      const response = await fetch(url, options);
+      
+      // Si succès ou erreur non-temporaire, retourner directement
+      if (response.ok || ![502, 503, 504, 429].includes(response.status)) {
+        return response;
+      }
+      
+      // Erreur temporaire, on va retry
+      lastError = new Error(`Temporary error ${response.status}`);
+      
+      // Attendre avant de retry (backoff exponentiel: 1s, 2s, 4s)
+      if (attempt < maxRetries - 1) {
+        const delay = Math.pow(2, attempt) * 1000;
+        console.log(`[emotion-music-ai] Retry ${attempt + 1}/${maxRetries} after ${delay}ms for status ${response.status}`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+    } catch (error) {
+      lastError = error as Error;
+      if (attempt < maxRetries - 1) {
+        const delay = Math.pow(2, attempt) * 1000;
+        console.log(`[emotion-music-ai] Retry ${attempt + 1}/${maxRetries} after ${delay}ms for error:`, error);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+    }
+  }
+  
+  throw lastError || new Error('Max retries exceeded');
+}
+
 const PROFILES = {
   joy: { prompt: "Uplifting bright energetic therapeutic music", tempo: 120, desc: "Musique joyeuse" },
   calm: { prompt: "Peaceful ambient soft relaxing music", tempo: 60, desc: "Musique apaisante" },
@@ -99,11 +134,14 @@ serve(async (req) => {
       const profile = PROFILES[emotion] || PROFILES.neutral;
       const prompt = customPrompt || profile.prompt;
 
-      const sunoRes = await fetch('https://api.suno.ai/v1/generate', {
+      console.log(`[emotion-music-ai] Generating music for emotion: ${emotion}`);
+      
+      // Utiliser fetchWithRetry pour gérer les erreurs temporaires
+      const sunoRes = await fetchWithRetry('https://api.suno.ai/v1/generate', {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${sunoKey}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt, make_instrumental: true, wait_audio: false })
-      });
+      }, 3);
 
       if (!sunoRes.ok) {
         const errorBody = await sunoRes.text().catch(() => 'No error details');
@@ -111,18 +149,39 @@ serve(async (req) => {
         
         // Erreurs temporaires (service unavailable, rate limit, gateway error)
         if ([502, 503, 504, 429].includes(sunoRes.status)) {
-          throw new Error(`Le service de génération musicale est temporairement indisponible (${sunoRes.status}). Veuillez réessayer dans quelques instants.`);
+          return new Response(JSON.stringify({ 
+            error: 'SERVICE_UNAVAILABLE',
+            message: 'Le service de génération musicale est temporairement indisponible. Veuillez réessayer dans quelques instants.',
+            status: sunoRes.status
+          }), {
+            status: 503,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          });
         }
         
         // Erreur d'authentification
         if (sunoRes.status === 401 || sunoRes.status === 403) {
-          throw new Error('Erreur d\'authentification avec le service de génération musicale.');
+          return new Response(JSON.stringify({ 
+            error: 'AUTH_ERROR',
+            message: 'Erreur d\'authentification avec le service de génération musicale.'
+          }), {
+            status: 401,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          });
         }
         
         // Autres erreurs
-        throw new Error(`Erreur du service de génération musicale: ${sunoRes.status}`);
+        return new Response(JSON.stringify({ 
+          error: 'GENERATION_ERROR',
+          message: `Erreur du service de génération musicale: ${sunoRes.status}`
+        }), {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
       }
+      
       const sunoData = await sunoRes.json();
+      console.log(`[emotion-music-ai] Suno generation started:`, sunoData.id);
 
       const { data: track } = await supabaseClient
         .from('generated_music_tracks')

@@ -131,7 +131,54 @@ export const useEmotionalMusicAI = () => {
         }
       });
 
-      if (error) throw error;
+      if (error) {
+        // Gérer spécifiquement l'erreur 503 avec fallback
+        const errorMessage = error?.message || '';
+        
+        if (errorMessage.includes('503') || errorMessage.includes('temporairement indisponible')) {
+          logger.warn('⚠️ Service unavailable, using fallback tracks', { emotion }, 'MUSIC');
+          
+          toast.info('Service temporairement indisponible', {
+            description: 'Nous proposons des morceaux déjà générés en attendant.',
+            duration: 5000,
+          });
+          
+          // Fallback: récupérer des tracks existantes pour cette émotion
+          const { data: existingTracks } = await supabase
+            .from('generated_music_tracks')
+            .select('*')
+            .eq('emotion', emotion)
+            .eq('generation_status', 'completed')
+            .not('audio_url', 'is', null)
+            .order('created_at', { ascending: false })
+            .limit(1);
+          
+          if (existingTracks && existingTracks.length > 0) {
+            const track = existingTracks[0];
+            const fallbackData = {
+              success: true,
+              taskId: track.original_task_id,
+              trackId: track.id,
+              sessionId: null,
+              emotion: track.emotion,
+              profile: { description: `Musique ${emotion} (morceaux déjà générés)` },
+              status: 'complete',
+              isFallback: true
+            };
+            
+            setCurrentGeneration(fallbackData);
+            setGenerationProgress(100);
+            
+            toast.success('Morceau proposé', {
+              description: `Un morceau ${emotion} existant est disponible en attendant le retour du service.`
+            });
+            
+            return fallbackData;
+          }
+        }
+        
+        throw error;
+      }
 
       logger.info('✅ Music generation started', data, 'MUSIC');
       setCurrentGeneration(data);
@@ -151,7 +198,7 @@ export const useEmotionalMusicAI = () => {
       
       if (errorMessage.includes('temporairement indisponible') || errorMessage.includes('503')) {
         toast.error('Service temporairement indisponible', {
-          description: 'Le service de génération musicale est en maintenance. Réessayez dans quelques instants.',
+          description: 'Le service de génération musicale est en maintenance. Aucun morceau de secours disponible.',
           duration: 5000
         });
       } else if (errorMessage.includes('authentification') || errorMessage.includes('401')) {
