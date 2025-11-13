@@ -22,53 +22,37 @@ interface SuspiciousActivityAlert {
 }
 
 async function checkSuspiciousActivity(): Promise<SuspiciousActivityAlert[]> {
-  const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
-  
-  // Récupérer les logs de la dernière heure
-  const { data: recentLogs, error } = await supabase
-    .from('role_audit_logs')
-    .select('*')
-    .gte('changed_at', oneHourAgo)
-    .order('changed_at', { ascending: false });
+  // Utiliser la fonction SQL qui lit les seuils configurables
+  const { data: suspiciousActivities, error } = await supabase.rpc('check_suspicious_role_activity');
 
   if (error) {
-    console.error('Error fetching recent logs:', error);
+    console.error('Error checking suspicious activity:', error);
     return [];
   }
 
-  const alerts: SuspiciousActivityAlert[] = [];
-
-  // Vérifier les ajouts de rôles premium
-  const premiumAdds = recentLogs.filter(
-    log => (log.action === 'add' || log.action === 'update') && 
-           (log.role === 'premium' || log.new_role === 'premium')
-  );
-
-  if (premiumAdds.length > 10) {
-    alerts.push({
-      count: premiumAdds.length,
-      action: 'Ajout de rôles premium',
-      timeWindow: 'dernière heure',
-      logs: premiumAdds,
-    });
+  if (!suspiciousActivities || suspiciousActivities.length === 0) {
+    console.log('No suspicious activity detected');
+    return [];
   }
 
-  // Vérifier les suppressions de rôles premium
-  const premiumRemoves = recentLogs.filter(
-    log => (log.action === 'remove' || log.action === 'update') && 
-           (log.role === 'premium' || log.old_role === 'premium')
-  );
-
-  if (premiumRemoves.length > 10) {
-    alerts.push({
-      count: premiumRemoves.length,
-      action: 'Suppression de rôles premium',
-      timeWindow: 'dernière heure',
-      logs: premiumRemoves,
-    });
-  }
+  const alerts: SuspiciousActivityAlert[] = suspiciousActivities.map((activity: any) => ({
+    count: Number(activity.count),
+    action: getActionLabel(activity.alert_type),
+    timeWindow: `${activity.time_window_minutes} dernières minutes`,
+    logs: activity.logs || [],
+  }));
 
   return alerts;
+}
+
+function getActionLabel(alertType: string): string {
+  const labels: Record<string, string> = {
+    'premium_role_add': 'Ajouts massifs de rôles premium',
+    'premium_role_remove': 'Suppressions massives de rôles premium',
+    'admin_role_change': 'Changements de rôles admin',
+    'bulk_role_changes': 'Changements de rôles en masse',
+  };
+  return labels[alertType] || alertType;
 }
 
 async function getAdminEmails(): Promise<string[]> {
