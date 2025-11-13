@@ -165,7 +165,14 @@ export const MedicalDisclaimerDialog: React.FC<MedicalDisclaimerDialogProps> = (
 
         {/* Checkboxes de consentement */}
         <div className="space-y-4 border-t pt-4">
-          <div className="flex items-start gap-3">
+          <p className="text-sm font-semibold text-foreground mb-3">
+            ✓ Veuillez cocher les 2 cases ci-dessous pour continuer :
+          </p>
+          
+          <div className={cn(
+            "flex items-start gap-3 p-3 rounded-lg border-2 transition-all",
+            hasReadAll ? "border-green-500 bg-green-50 dark:bg-green-950/20" : "border-border bg-background"
+          )}>
             <Checkbox
               id="disclaimer-read"
               checked={hasReadAll}
@@ -174,13 +181,17 @@ export const MedicalDisclaimerDialog: React.FC<MedicalDisclaimerDialogProps> = (
             />
             <Label
               htmlFor="disclaimer-read"
-              className="text-sm font-normal cursor-pointer leading-relaxed"
+              className="text-sm font-medium cursor-pointer leading-relaxed"
             >
-              J'ai lu et compris l'intégralité de cet avertissement médical
+              <span className="font-semibold">1.</span> J'ai lu et compris l'intégralité de cet avertissement médical
             </Label>
           </div>
 
-          <div className="flex items-start gap-3">
+          <div className={cn(
+            "flex items-start gap-3 p-3 rounded-lg border-2 transition-all",
+            !hasReadAll && "opacity-50",
+            hasUnderstood ? "border-green-500 bg-green-50 dark:bg-green-950/20" : "border-border bg-background"
+          )}>
             <Checkbox
               id="disclaimer-understand"
               checked={hasUnderstood}
@@ -191,14 +202,21 @@ export const MedicalDisclaimerDialog: React.FC<MedicalDisclaimerDialogProps> = (
             <Label
               htmlFor="disclaimer-understand"
               className={cn(
-                'text-sm font-normal leading-relaxed',
-                hasReadAll ? 'cursor-pointer' : 'cursor-not-allowed opacity-50'
+                'text-sm font-medium leading-relaxed',
+                hasReadAll ? 'cursor-pointer' : 'cursor-not-allowed'
               )}
             >
-              Je comprends qu'EmotionsCare <strong>ne remplace pas</strong> un avis médical ou 
+              <span className="font-semibold">2.</span> Je comprends qu'EmotionsCare <strong>ne remplace pas</strong> un avis médical ou 
               psychologique et que je dois consulter un professionnel en cas de détresse
             </Label>
           </div>
+          
+          {hasReadAll && !hasUnderstood && (
+            <div className="flex items-center gap-2 text-sm text-muted-foreground animate-pulse">
+              <span>👆</span>
+              <span>Cochez également la case 2 pour continuer</span>
+            </div>
+          )}
         </div>
 
         <DialogFooter className="flex-col sm:flex-row gap-2">
