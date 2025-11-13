@@ -43,6 +43,7 @@ import { MLRecommendationsPanel } from '@/components/ml/MLRecommendationsPanel';
 import MusicGamificationPanel from '@/components/gamification/MusicGamificationPanel';
 import { QuestsPanel } from '@/components/gamification/QuestsPanel';
 import { LeaderboardPanel } from '@/components/gamification/LeaderboardPanel';
+import { SunoServiceStatus } from '@/components/music/SunoServiceStatus';
 import type { MusicTrack } from '@/types/music';
 import { logger } from '@/lib/logger';
 import { useMusicJourney } from '@/hooks/useMusicJourney';
@@ -328,6 +329,11 @@ const B2CMusicEnhanced: React.FC = () => {
                 Choisis ton vinyle et laisse-le composer ton aura sonore.
                 Chaque mélodie s'adapte à ton état pour créer l'harmonie parfaite.
               </p>
+            </div>
+
+            {/* Suno Service Status */}
+            <div className="max-w-4xl mx-auto mb-8">
+              <SunoServiceStatus />
             </div>
 
             {/* AI Emotional Music Generator */}

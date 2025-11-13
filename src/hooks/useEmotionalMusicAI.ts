@@ -168,6 +168,7 @@ export const useEmotionalMusicAI = () => {
             
             setCurrentGeneration(fallbackData);
             setGenerationProgress(100);
+            setIsGenerating(false);
             
             toast.success('Morceau proposé', {
               description: `Un morceau ${emotion} existant est disponible en attendant le retour du service.`
@@ -178,6 +179,21 @@ export const useEmotionalMusicAI = () => {
         }
         
         throw error;
+      }
+
+      if (!data) {
+        throw new Error('Aucune donnée reçue');
+      }
+
+      // Vérifier si la demande a été mise en queue
+      if (data.queued) {
+        toast.info('Service surchargé', {
+          description: `Votre demande est en file d'attente. Temps d'attente estimé: ${data.estimatedWaitMinutes} min`,
+          duration: 5000,
+        });
+        logger.info('🕐 Demande mise en queue', { queueId: data.queueId }, 'MUSIC_AI');
+        setIsGenerating(false);
+        return null;
       }
 
       logger.info('✅ Music generation started', data, 'MUSIC');

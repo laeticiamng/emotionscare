@@ -71,9 +71,48 @@ serve(async (req) => {
     }
 
     const body = await req.json();
-    const { action, emotion, customPrompt, sunoTaskId, trackId } = body;
+    const { action, emotion, customPrompt, sunoTaskId, trackId, skipQueue = false } = body;
     const sunoKey = Deno.env.get('SUNO_API_KEY');
     if (!sunoKey) throw new Error('SUNO_API_KEY not configured');
+
+    // Vérifier le statut de l'API si pas en mode skipQueue
+    if (!skipQueue && action === 'generate') {
+      const { data: apiStatus } = await supabaseClient
+        .from('suno_api_status')
+        .select('*')
+        .order('last_check', { ascending: false })
+        .limit(1)
+        .single();
+
+      // Si l'API est indisponible, ajouter à la queue
+      if (apiStatus && !apiStatus.is_available && apiStatus.consecutive_failures >= 2) {
+        console.log('[emotion-music-ai] API unavailable, adding to queue');
+
+        const { data: queueItem, error: queueError } = await supabaseClient
+          .from('music_generation_queue')
+          .insert({
+            user_id: user.id,
+            emotion,
+            intensity: 0.5,
+            mood: customPrompt,
+            status: 'pending',
+          })
+          .select()
+          .single();
+
+        if (queueError) throw queueError;
+
+        return new Response(JSON.stringify({
+          success: true,
+          queued: true,
+          queueId: queueItem.id,
+          message: 'Demande ajoutée à la file d\'attente',
+          estimatedWaitMinutes: 2,
+        }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+    }
 
     // Analyser émotions
     if (action === 'analyze-emotions') {
