@@ -6,11 +6,26 @@ import { useState, useEffect, useCallback } from 'react';
 import { getSunoApiStatus, getUserQueueItems, getQueuePosition } from '@/services/musicQueueService';
 import type { SunoApiStatus, QueueItem } from '@/services/musicQueueService';
 import { logger } from '@/lib/logger';
+import { useMusicQueueNotifications } from '@/hooks/useMusicQueueNotifications';
+import { supabase } from '@/integrations/supabase/client';
 
 export const useSunoServiceStatus = () => {
   const [status, setStatus] = useState<SunoApiStatus | null>(null);
   const [queueItems, setQueueItems] = useState<QueueItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [userId, setUserId] = useState<string | undefined>(undefined);
+
+  // Récupérer l'ID de l'utilisateur connecté
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUserId(user?.id);
+    };
+    fetchUser();
+  }, []);
+
+  // Activer les notifications en temps réel
+  useMusicQueueNotifications(userId);
 
   const fetchStatus = useCallback(async () => {
     try {

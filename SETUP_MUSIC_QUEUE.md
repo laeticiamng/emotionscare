@@ -4,6 +4,8 @@
 
 Le système de file d'attente pour la génération musicale permet de gérer les demandes lorsque l'API Suno est surchargée ou indisponible. Les demandes sont automatiquement mises en queue et traitées dès que le service redevient disponible.
 
+**✨ Nouveauté : Notifications en temps réel** - Les utilisateurs reçoivent maintenant des notifications instantanées via WebSocket quand leur génération musicale est terminée !
+
 ## Architecture
 
 ### Composants
@@ -19,7 +21,16 @@ Le système de file d'attente pour la génération musicale permet de gérer les
 
 3. **Frontend** :
    - `SunoServiceStatus` : Indicateur visuel du statut de l'API
-   - `MusicQueueAdmin` : Panneau d'administration complet
+   - `MusicQueueAdmin` : Panneau d'administration complet à `/admin/music-queue`
+   - `useMusicQueueNotifications` : Hook pour notifications en temps réel
+
+4. **Notifications en Temps Réel** :
+   - Utilise **Supabase Realtime** (WebSocket)
+   - Les utilisateurs sont notifiés instantanément quand :
+     - Leur génération est ajoutée à la queue
+     - Le traitement commence
+     - La génération est terminée avec succès
+     - Une erreur survient
 
 ## Installation
 
@@ -37,9 +48,15 @@ SELECT * FROM cron.job WHERE jobname = 'music-queue-worker-every-minute';
 
 ### 2. Accéder au Panneau d'Administration
 
-Le panneau d'administration est accessible à l'URL : `/admin/music-queue`
+Le panneau d'administration est accessible à l'URL : **`/admin/music-queue`**
 
-**Note** : Vous devrez peut-être ajouter cette route à votre système de routing selon votre configuration.
+**Protection** : Cette route est protégée par authentification et nécessite le rôle `manager` ou `admin`.
+
+### 3. Notifications en Temps Réel
+
+Les notifications sont **automatiquement activées** pour tous les utilisateurs connectés. Elles utilisent Supabase Realtime pour envoyer des mises à jour instantanées via WebSocket.
+
+**Aucune configuration supplémentaire n'est nécessaire** - le système est prêt à l'emploi !
 
 ## Fonctionnement
 
@@ -48,9 +65,43 @@ Le panneau d'administration est accessible à l'URL : `/admin/music-queue`
 1. Un utilisateur demande une génération musicale
 2. Si l'API Suno est disponible, génération immédiate
 3. Si l'API Suno est indisponible (503, 502, etc.), ajout à la queue
+   - 🔔 **Notification** : "Demande ajoutée à la file"
 4. Le cron job exécute le worker toutes les minutes
 5. Le worker traite jusqu'à 5 demandes en attente
+   - 🔔 **Notification** : "Génération en cours..."
 6. Rate limiting : 2 secondes entre chaque génération
+7. Quand terminé :
+   - 🎵 **Notification** : "Votre musique est prête !" avec bouton "Écouter"
+
+### Notifications en Temps Réel
+
+Le système envoie 4 types de notifications :
+
+1. **Ajout à la queue** (toast info, 4s) :
+   ```
+   🎼 Demande ajoutée à la file
+   Émotion : joie - En attente de traitement
+   ```
+
+2. **Début du traitement** (toast info, 4s) :
+   ```
+   ⏳ Génération en cours...
+   Émotion : joie
+   ```
+
+3. **Génération réussie** (toast success, 8s) :
+   ```
+   🎵 Votre musique est prête !
+   Émotion : joie - Intensité : 8
+   [Bouton : Écouter]
+   ```
+
+4. **Erreur** (toast error, 6s) :
+   ```
+   ❌ Génération échouée
+   Une erreur s'est produite
+   [Bouton : Réessayer]
+   ```
 
 ### Système de Retry
 
@@ -66,6 +117,12 @@ Le système vérifie automatiquement le statut de l'API Suno :
 - Indicateur visuel en temps réel pour les utilisateurs
 
 ## Panneau d'Administration
+
+### Accès
+
+**URL** : `/admin/music-queue`
+
+**Permissions** : Rôle `manager` ou `admin` requis
 
 ### Fonctionnalités
 
@@ -136,6 +193,13 @@ LIMIT 20;
 2. Sélectionnez `music-queue-worker`
 3. Consultez les logs en temps réel
 
+### Logs des Notifications
+
+Les notifications utilisent le système de logging standard :
+- Catégorie : `MUSIC_QUEUE`
+- Tous les événements WebSocket sont loggés
+- Vérifiez la console du navigateur pour le debug
+
 ### Métriques Clés
 
 - **Pending** : Nombre de demandes en attente
@@ -185,6 +249,18 @@ Si des demandes restent en statut "processing" trop longtemps :
 2. Utilisez le bouton "Annuler"
 3. Puis "Relancer" si nécessaire
 
+#### Les notifications ne fonctionnent pas
+
+1. Vérifier que l'utilisateur est connecté
+2. Vérifier la console du navigateur pour les erreurs WebSocket
+3. Vérifier que Supabase Realtime est activé pour la table :
+```sql
+SELECT schemaname, tablename 
+FROM pg_publication_tables 
+WHERE pubname = 'supabase_realtime' 
+AND tablename = 'music_generation_queue';
+```
+
 #### Taux d'échec élevé
 
 Si le taux d'échec dépasse 20% :
@@ -230,12 +306,22 @@ await delay(2000); // 2 secondes entre chaque génération
 
 Modifiez cette valeur selon vos besoins et les limites de l'API Suno.
 
+### Personnaliser les Notifications
+
+Dans `src/hooks/useMusicQueueNotifications.ts`, vous pouvez personnaliser :
+- Les durées d'affichage des toasts
+- Les messages de notification
+- Les actions des boutons
+- Les conditions de déclenchement
+
 ## Sécurité
 
 - ✅ Le cron job utilise la clé `anon` (lecture/écriture limitée)
 - ✅ Les Edge Functions vérifient les permissions
-- ✅ Le panneau admin doit être protégé par authentification
-- ⚠️ Ajoutez des RLS policies appropriées sur `music_generation_queue`
+- ✅ Le panneau admin est protégé par authentification
+- ✅ RLS activée sur `music_generation_queue` (filtre par `user_id`)
+- ✅ Realtime filtre les événements par `user_id`
+- ⚠️ Assurez-vous que les RLS policies sont correctement configurées
 
 ## Support
 
@@ -244,10 +330,12 @@ Pour toute question ou problème :
 1. Consultez les logs dans Supabase Dashboard
 2. Vérifiez le statut de l'API Suno : https://status.suno.ai
 3. Consultez la documentation pg_cron : https://supabase.com/docs/guides/database/extensions/pg_cron
+4. Consultez la documentation Supabase Realtime : https://supabase.com/docs/guides/realtime
 
 ## Prochaines Améliorations
 
-- [ ] Notifications en temps réel (WebSocket) pour les demandes terminées
+- [x] Notifications en temps réel (WebSocket) pour les demandes terminées ✅
+- [x] Route admin protégée pour gérer la queue ✅
 - [ ] Export des statistiques en CSV
 - [ ] Alertes automatiques si le taux d'échec dépasse un seuil
 - [ ] Dashboard de métriques avancées avec graphiques
