@@ -111,6 +111,15 @@ class AIMonitoring {
    */
   private async captureEvent(event: MonitoringEvent): Promise<void> {
     try {
+      // Protection contre les boucles infinies : ignorer les erreurs de monitoring
+      if (event.context?.context === 'MONITORING' || 
+          event.message.includes('ai-monitoring') ||
+          event.message.includes('Failed to send event to AI monitoring')) {
+        // Log uniquement localement, ne pas envoyer à l'edge function
+        console.warn('[AI-Monitoring] Skipping recursive monitoring event:', event.message);
+        return;
+      }
+
       // Ajouter l'userId si disponible
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
@@ -136,8 +145,8 @@ class AIMonitoring {
         this.processQueue();
       }
     } catch (error) {
-      // Fallback: log seulement localement si l'envoi échoue
-      logger.error('Failed to capture monitoring event', error as Error, 'MONITORING');
+      // Fallback: log seulement localement si l'envoi échoue (sans recursion)
+      console.error('[AI-Monitoring] Failed to capture monitoring event:', error);
     }
   }
 
@@ -155,7 +164,8 @@ class AIMonitoring {
         await this.sendToEdgeFunction(event);
       }
     } catch (error) {
-      logger.error('Error processing monitoring queue', error as Error, 'MONITORING');
+      // Log sans déclencher de recursion
+      console.error('[AI-Monitoring] Error processing monitoring queue:', error);
     } finally {
       this.isProcessing = false;
 
@@ -197,7 +207,11 @@ class AIMonitoring {
         }
       }
     } catch (error) {
-      logger.error('Failed to send event to AI monitoring', error as Error, 'MONITORING');
+      // Log sans déclencher de recursion
+      console.error('[AI-Monitoring] Failed to send event to AI monitoring:', error);
+      
+      // Ne pas utiliser logger.error pour éviter la boucle infinie
+      // logger.error('Failed to send event to AI monitoring', error as Error, 'MONITORING');
     }
   }
 
