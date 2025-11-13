@@ -128,19 +128,21 @@ export function ReportManualTrigger() {
         .map((e) => e.trim())
         .filter((e) => e.length > 0);
 
-      // Appeler l'edge function pour envoyer le rapport
-      const { data, error } = await supabase.functions.invoke('send-weekly-report', {
-        body: {
-          reportData,
-          recipients: emails,
-        },
+      // Sauvegarder directement dans la base
+      const { error: logError } = await supabase.from('audit_report_logs').insert({
+        recipients: emails,
+        period_start: reportData.period.start,
+        period_end: reportData.period.end,
+        total_changes: reportData.stats.totalChanges || 0,
+        total_alerts: reportData.stats.totalAlerts || 0,
+        critical_alerts: reportData.stats.criticalAlerts || 0,
       });
 
-      if (error) throw error;
+      if (logError) throw logError;
 
       toast({
-        title: 'Rapport envoyé',
-        description: `Rapport envoyé à ${emails.length} destinataire(s)`,
+        title: 'Rapport enregistré',
+        description: `Rapport enregistré pour ${emails.length} destinataire(s)`,
       });
 
       // Réinitialiser le formulaire
@@ -150,7 +152,7 @@ export function ReportManualTrigger() {
       console.error('Erreur envoi rapport:', error);
       toast({
         title: 'Erreur',
-        description: error.message || 'Impossible d\'envoyer le rapport',
+        description: error.message || 'Impossible d\'enregistrer le rapport',
         variant: 'destructive',
       });
     } finally {
