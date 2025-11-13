@@ -5,6 +5,7 @@
 
 import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { captureException } from '@/lib/ai-monitoring';
+import { Sentry } from '@/lib/errors/sentry-compat';
 import { useAsyncMachine } from '@/hooks/useAsyncMachine';
 import { flashGlowService, FlashGlowSession } from './flash-glowService';
 import { toast } from '@/hooks/use-toast';

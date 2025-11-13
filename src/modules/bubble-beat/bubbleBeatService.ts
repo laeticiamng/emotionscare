@@ -4,6 +4,7 @@
  */
 
 import { captureException } from '@/lib/ai-monitoring';
+import { Sentry } from '@/lib/errors/sentry-compat';
 import { supabase } from '@/integrations/supabase/client';
 import {
   BubbleBeatSession,
