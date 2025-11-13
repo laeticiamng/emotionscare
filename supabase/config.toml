@@ -3,6 +3,9 @@ project_id = "yaincoxihiqdksxgrsrk"
 [functions.realtime-voice-commands]
 verify_jwt = false
 
+[functions.ml-recommendations]
+verify_jwt = false
+
 [functions.generate-suno-prompt]
 verify_jwt = true
 
