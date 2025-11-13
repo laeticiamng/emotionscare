@@ -295,8 +295,8 @@ const AdaptiveMusicPage: React.FC = () => {
   const favoriteControls = React.useMemo(() => {
     if (!selectedTrack) return undefined;
     return {
-      active: isFavorite(selectedTrack.id),
-      onToggle: () => toggleFavorite({
+      active: favorites.isFavorite(selectedTrack.id),
+      onToggle: () => favorites.toggleFavorite({
         id: selectedTrack.id,
         title: selectedTrack.title,
         artist: selectedTrack.artist || 'Unknown',
@@ -308,7 +308,7 @@ const AdaptiveMusicPage: React.FC = () => {
       addLabel: "Garder cette bulle",
       removeLabel: "Retirer de mes bulles",
     };
-  }, [isFavorite, toggleFavorite, selectedTrack]);
+  }, [favorites, selectedTrack]);
 
   React.useEffect(() => {
     if (!pomsOptIn) return;
@@ -367,7 +367,9 @@ const AdaptiveMusicPage: React.FC = () => {
     );
   }
 
-  const favoriteEntries = favorites.favorites.slice(0, 3);
+  const favoriteEntries = playlist?.tracks
+    .filter(track => favorites.favorites.includes(track.id))
+    .slice(0, 3) ?? [];
   const resumeTrack = playback.snapshot && playlist?.tracks.find(track => track.id === playback.snapshot?.trackId);
 
   return (
@@ -489,9 +491,9 @@ const AdaptiveMusicPage: React.FC = () => {
               </div>
               {favoriteEntries.length ? (
                 <ul className="mt-2 space-y-2 text-sm">
-                  {favoriteEntries.map((entry: { trackId: string; title?: string }) => (
+                  {favoriteEntries.map(entry => (
                     <li
-                      key={entry.trackId}
+                      key={entry.id}
                       className="rounded-md border bg-background px-3 py-2 text-xs text-muted-foreground"
                     >
                       <span className="block font-medium text-foreground">
