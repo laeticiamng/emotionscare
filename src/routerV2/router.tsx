@@ -117,6 +117,7 @@ const ChallengesDashboard = lazy(() => import('@/pages/admin/ChallengesDashboard
 const Achievements = lazy(() => import('@/pages/app/Achievements'));
 const CronMonitoring = lazy(() => import('@/pages/CronMonitoring'));
 const BlockchainBackups = lazy(() => import('@/pages/BlockchainBackups'));
+const MonitoringDashboard = lazy(() => import('@/pages/admin/MonitoringDashboard'));
 
 // System Health & Analytics
 const SystemHealthPage = lazy(() => import('@/pages/SystemHealthPage'));
@@ -498,6 +499,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   Achievements,
   CronMonitoring,
   BlockchainBackups,
+  MonitoringDashboard,
   
   // System Health & Analytics
   SystemHealthPage,

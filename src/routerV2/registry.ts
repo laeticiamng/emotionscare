@@ -1286,6 +1286,16 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     requireAuth: true,
   },
   {
+    name: 'admin-monitoring-dashboard',
+    path: '/admin/monitoring',
+    segment: 'admin',
+    role: 'admin',
+    layout: 'app',
+    component: 'MonitoringDashboard',
+    guard: true,
+    requireAuth: true,
+  },
+  {
     name: 'gdpr-cron-monitoring',
     path: '/gdpr/cron-monitoring',
     segment: 'manager',
