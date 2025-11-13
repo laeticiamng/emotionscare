@@ -1,6 +1,5 @@
 // @ts-nocheck
 import { z } from 'zod';
-import { logger } from '@/lib/logger';
 
 /**
  * Gestion centralisée des variables d'environnement avec validation stricte.
@@ -90,23 +89,23 @@ const parsedEnv = envSchema.safeParse(rawEnv);
 
 // Debug info in development
 if (rawEnv.MODE === 'development') {
-  logger.debug('Raw environment variables', {
+  console.debug('[SYSTEM] Raw environment variables', {
     VITE_SUPABASE_URL: rawEnv.VITE_SUPABASE_URL,
     VITE_SUPABASE_ANON_KEY: rawEnv.VITE_SUPABASE_ANON_KEY ? '[SET]' : '[EMPTY]',
     allViteVars: Object.keys(import.meta.env).filter(k => k.startsWith('VITE_'))
-  }, 'SYSTEM');
+  });
 }
 
 if (!parsedEnv.success) {
-  logger.error('Invalid environment configuration', new Error(JSON.stringify(parsedEnv.error.flatten().fieldErrors)), 'SYSTEM');
+  console.error('[SYSTEM] Invalid environment configuration', JSON.stringify(parsedEnv.error.flatten().fieldErrors));
   
   // In development, provide more helpful error handling
   if (rawEnv.MODE === 'development') {
-    logger.warn('Development mode: attempting to continue with available variables', undefined, 'SYSTEM');
+    console.warn('[SYSTEM] Development mode: attempting to continue with available variables');
     
     // Check if we at least have the basic Supabase config
     if (!rawEnv.VITE_SUPABASE_URL || !rawEnv.VITE_SUPABASE_ANON_KEY) {
-      logger.error('Missing critical Supabase configuration', new Error('Check .env file'), 'SYSTEM');
+      console.error('[SYSTEM] Missing critical Supabase configuration - Check .env file');
     }
   }
   
@@ -223,11 +222,11 @@ const missingOptionalKeys = Object.entries({
 
 if (missingOptionalKeys.length > 0) {
   const formatted = missingOptionalKeys.map(([key]) => key).join(', ');
-  logger.info(`Variables d'environnement optionnelles manquantes: ${formatted}`, undefined, 'SYSTEM');
+  console.info(`[SYSTEM] Variables d'environnement optionnelles manquantes: ${formatted}`);
 }
 
 if (IS_DEV) {
-  logger.info('EmotionsCare Environment', {
+  console.info('[SYSTEM] EmotionsCare Environment', {
     mode: NODE_ENV,
     apiUrl: API_URL,
     webUrl: WEB_URL,
@@ -235,7 +234,7 @@ if (IS_DEV) {
     firebase: ENV_VALIDATION.hasFirebase ? '✅' : '⚠️ optionnel',
     sentry: ENV_VALIDATION.hasSentry ? '✅' : '⚠️ optionnel',
     ai: ENV_VALIDATION.ai,
-  }, 'SYSTEM');
+  });
 }
 
 export default {

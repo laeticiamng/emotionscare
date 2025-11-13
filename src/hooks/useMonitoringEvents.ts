@@ -80,6 +80,7 @@ export function useInsertMonitoringEvent() {
       metadata?: any;
     }) => {
       return mutation.mutate({
+        timestamp: new Date().toISOString(),
         event_type: params.eventType,
         severity: params.severity,
         message: params.message,
