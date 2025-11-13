@@ -150,7 +150,7 @@ export const useEmotionalMusicAI = () => {
       const { data, error } = await supabase.functions.invoke('emotion-music-ai', {
         body: {
           action: 'check-status',
-          taskId,
+          sunoTaskId: taskId,
           trackId
         }
       });
