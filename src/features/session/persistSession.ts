@@ -1,5 +1,5 @@
 // @ts-nocheck
-import * as Sentry from '@sentry/react';
+import { Sentry } from '@/lib/errors/sentry-compat';
 import { supabase } from '@/integrations/supabase/client';
 import { createSession } from '@/services/sessions/sessionsApi';
 import type { BreathProfile, Mode, Next } from '@/features/orchestration/useBreathworkOrchestration';
@@ -23,7 +23,7 @@ interface PersistMusicSessionInput {
 export async function persistMusicSession(input: PersistMusicSessionInput): Promise<void> {
   const { module, metadata, durationSec = 0 } = input;
   try {
-    Sentry.addBreadcrumb({ category: 'session', message: 'session:persist:music', level: 'info', data: { module } });
+    logger.info('session:persist:music', { module }, 'SESSION');
     await createSession({
       type: module,
       duration_sec: Math.max(0, Math.round(durationSec)),
@@ -68,17 +68,12 @@ const sanitizeFlashGlowPayload = (payload: FlashGlowSessionMetadata) => ({
 export async function persistFlashGlowSession(module: 'flash_glow', payload: FlashGlowSessionMetadata): Promise<PersistSessionResult> {
   const sanitized = sanitizeFlashGlowPayload(payload);
 
-  Sentry.addBreadcrumb({
-    category: 'session',
-    message: 'session:persist:flash_glow',
-    level: 'info',
-    data: {
-      module,
-      exit: sanitized.exit,
-      post_cta: sanitized.post_cta,
-      variant: sanitized.variant,
-    },
-  });
+  logger.info('session:persist:flash_glow', {
+    module,
+    exit: sanitized.exit,
+    post_cta: sanitized.post_cta,
+    variant: sanitized.variant,
+  }, 'SESSION');
 
   try {
     const timestamp = new Date().toISOString();
@@ -125,12 +120,7 @@ export const persistBreathSession = async (module: 'breath', payload: PersistBre
     summary: payload.summary ?? 'respiration apaisante',
   } as const;
 
-  Sentry.addBreadcrumb({
-    category: 'session',
-    message: 'breath:session:persist',
-    level: 'info',
-    data: meta,
-  });
+  logger.info('breath:session:persist', meta, 'SESSION');
 
   try {
     await createSession({

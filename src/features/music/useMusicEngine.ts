@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { captureException } from '@/lib/ai-monitoring';
+import { logger } from '@/lib/logger';
 
 import type { MusicBpmProfile, MusicIntensityKey, MusicTextureKey } from '@/features/orchestration/music.orchestrator';
 
@@ -26,9 +27,7 @@ const DEFAULT_STATE: EngineState = {
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const logBreadcrumb = (message: string, data?: Record<string, unknown>) => {
-  const client = Sentry.getCurrentHub().getClient();
-  if (!client) return;
-  Sentry.addBreadcrumb({ category: 'music', level: 'info', message, data });
+  logger.info(message, data, 'MUSIC');
 };
 
 export function useMusicEngine() {

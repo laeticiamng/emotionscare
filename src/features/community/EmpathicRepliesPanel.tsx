@@ -67,12 +67,7 @@ export default function EmpathicRepliesPanel(): JSX.Element {
 
     setPreview({ id: template.id, text: template.suggestion });
     setCopySuccess(null);
-    Sentry.addBreadcrumb({
-      category: 'social',
-      level: 'info',
-      message: 'social:replies_preview_open',
-      data: { template: templateId },
-    });
+    logger.info('social:replies_preview_open', { template: templateId }, 'SOCIAL');
   }, []);
 
   const closePreview = useCallback(() => {
@@ -94,12 +89,7 @@ export default function EmpathicRepliesPanel(): JSX.Element {
         description: 'Le message est dans le presse-papiers. Tu peux encore l’adapter.',
         variant: 'success',
       });
-      Sentry.addBreadcrumb({
-        category: 'social',
-        level: 'info',
-        message: 'social:reply_copied',
-        data: { template: preview.id },
-      });
+      logger.info('social:reply_copied', { template: preview.id }, 'SOCIAL');
     } catch (error) {
       logger.warn('[EmpathicRepliesPanel] copy failed', error as Error, 'UI');
       toast({

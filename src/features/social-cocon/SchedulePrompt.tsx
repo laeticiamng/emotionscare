@@ -2,7 +2,6 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import * as Sentry from '@sentry/react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -127,17 +126,12 @@ export default function SchedulePrompt({ highlightRooms = false }: SchedulePromp
           throw new Error('schedule_failed');
         }
 
-        Sentry.addBreadcrumb({
-          category: 'social',
-          level: 'info',
-          message: 'social:break_planned',
-          data: { roomId, deliveryChannel },
-        });
+        logger.info('social:break_planned', { roomId, deliveryChannel }, 'SOCIAL');
 
         setStatus('Pause planifiée, un rappel sera glissé en douceur.');
       } catch (error) {
         logger.warn('[SchedulePrompt] scheduleBreak failed', error as Error, 'SYSTEM');
-        Sentry.captureException(error, {
+        captureException(error, {
           tags: { scope: 'social_cocon', action: 'schedule_break' },
         });
         setStatus('Impossible de planifier automatiquement. Tu peux ajouter la pause à ton agenda.');

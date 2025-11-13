@@ -1,29 +1,18 @@
 // @ts-nocheck
 import React from 'react';
 import { captureException } from '@/lib/ai-monitoring';
+import { logger } from '@/lib/logger';
 
 interface ErrorBoundaryProps {
   children: React.ReactNode;
 }
 
 const logErrorBreadcrumb = (error: Error) => {
-  Sentry.addBreadcrumb({
-    category: 'error-boundary',
-    level: 'error',
-    message: 'error:boundary',
-    data: {
-      name: error.name,
-      message: error.message,
-    },
-  });
+  logger.error('error:boundary', { name: error.name, message: error.message }, 'ERROR_BOUNDARY');
 };
 
 const handleReload = () => {
-  Sentry.addBreadcrumb({
-    category: 'error-boundary',
-    level: 'info',
-    message: 'user:reload',
-  });
+  logger.info('user:reload', undefined, 'ERROR_BOUNDARY');
 
   if (typeof window !== 'undefined') {
     window.location.reload();
@@ -38,14 +27,7 @@ interface ErrorFallbackProps {
 const GlobalErrorFallback: React.FC<ErrorFallbackProps> = ({ error, resetError }) => {
   React.useEffect(() => {
     if (error) {
-      Sentry.addBreadcrumb({
-        category: 'error-boundary',
-        level: 'info',
-        message: 'error:boundary:fallback-shown',
-        data: {
-          name: error.name,
-        },
-      });
+      logger.info('error:boundary:fallback-shown', { name: error.name }, 'ERROR_BOUNDARY');
     }
   }, [error]);
 
@@ -101,7 +83,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     logErrorBreadcrumb(error);
 
-    Sentry.captureException(error, {
+    captureException(error, {
       tags: {
         origin: 'app-error-boundary',
       },
@@ -112,11 +94,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
   }
 
   resetError = () => {
-    Sentry.addBreadcrumb({
-      category: 'error-boundary',
-      level: 'info',
-      message: 'user:reset',
-    });
+    logger.info('user:reset', undefined, 'ERROR_BOUNDARY');
     this.setState({ hasError: false, error: null });
   };
 

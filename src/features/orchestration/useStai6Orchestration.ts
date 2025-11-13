@@ -57,12 +57,7 @@ export const sanitizeSummaryLabel = (label: string | null | undefined, level: nu
 };
 
 const logBreadcrumb = (message: string, data?: Record<string, unknown>) => {
-  Sentry.addBreadcrumb({
-    category: 'nyvee',
-    level: 'info',
-    message,
-    data,
-  });
+  logger.info(message, data, 'NYVEE');
 };
 
 export const useStai6Orchestration = (): Stai6Orchestration => {

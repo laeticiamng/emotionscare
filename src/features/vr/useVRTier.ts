@@ -1,6 +1,5 @@
 // @ts-nocheck
 import { useEffect, useMemo, useState } from 'react';
-import * as Sentry from '@sentry/react';
 
 import { useMotionPrefs } from '@/hooks/useMotionPrefs';
 import { logger } from '@/lib/logger';
@@ -168,11 +167,7 @@ export const useVRTier = () => {
             : null;
 
       if (!xrSupported) {
-        Sentry.addBreadcrumb({
-          category: 'vr',
-          level: 'warning',
-          message: 'vr:capability:xr_unsupported',
-        });
+        logger.warn('vr:capability:xr_unsupported', undefined, 'VR');
       }
 
       setState({

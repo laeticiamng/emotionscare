@@ -29,12 +29,7 @@ export function ExportButton({ targetRef, fileName, label, className, onError, o
     try {
       setIsExporting(true);
       onStart?.();
-      Sentry.addBreadcrumb({
-        category: 'scores',
-        message: 'scores:export:png',
-        data: { fileName },
-        level: 'info',
-      });
+      logger.info('scores:export:png', { fileName }, 'SCORES');
       await exportElementToPng(container, {
         fileName,
         backgroundColor: '#ffffff',
