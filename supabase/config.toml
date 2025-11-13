@@ -1,5 +1,8 @@
 project_id = "yaincoxihiqdksxgrsrk"
 
+[functions.ai-monitoring]
+verify_jwt = false
+
 [functions.emotion-music-ai]
 verify_jwt = true
 
