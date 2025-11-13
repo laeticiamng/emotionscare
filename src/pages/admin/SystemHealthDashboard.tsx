@@ -8,9 +8,11 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Activity, AlertTriangle, CheckCircle2, Clock, TrendingUp, Settings, Zap } from 'lucide-react';
 import { toast } from 'sonner';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
+import { SystemHealthHistoryCharts } from '@/components/monitoring/SystemHealthHistoryCharts';
 
 const SystemHealthDashboard: React.FC = () => {
   const queryClient = useQueryClient();
@@ -299,6 +301,9 @@ const SystemHealthDashboard: React.FC = () => {
           );
         })}
       </div>
+
+      {/* Historical Performance Charts */}
+      <SystemHealthHistoryCharts thresholds={thresholds} />
 
       {/* Threshold Configuration Dialog */}
       <Dialog open={isThresholdDialogOpen} onOpenChange={setIsThresholdDialogOpen}>
