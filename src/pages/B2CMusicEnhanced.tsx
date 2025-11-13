@@ -40,9 +40,11 @@ import { PushNotificationSetup } from '@/components/notifications/PushNotificati
 import { VoiceCoach } from '@/components/coach/VoiceCoach';
 import VoiceCommands from '@/components/voice/VoiceCommands';
 import { MLRecommendationsPanel } from '@/components/ml/MLRecommendationsPanel';
+import GamificationPanel from '@/components/gamification/GamificationPanel';
 import type { MusicTrack } from '@/types/music';
 import { logger } from '@/lib/logger';
 import { useMusicJourney } from '@/hooks/useMusicJourney';
+import { useGamification } from '@/hooks/useGamification';
 
 interface VinylTrack extends MusicTrack {
   category: 'doux' | 'énergique' | 'créatif' | 'guérison';
@@ -146,6 +148,8 @@ const B2CMusicEnhanced: React.FC = () => {
       </div>
     );
   }
+
+  const { updateChallengeProgress } = useGamification();
   
   const { state, play, setPlaylist } = musicContext;
   const { createJourney, getUserJourneys } = useMusicJourney();
@@ -253,6 +257,9 @@ const B2CMusicEnhanced: React.FC = () => {
         } catch {}
       }
 
+      // Gamification: incrémenter défi d'écoute quotidienne
+      await updateChallengeProgress('1', 1);
+
       toast({
         title: "Vinyle en rotation ♪",
         description: `${track.title} compose ton aura sonore`,
@@ -339,6 +346,11 @@ const B2CMusicEnhanced: React.FC = () => {
                   logger.info('Suno params applied', params, 'ML');
                 }}
               />
+            </div>
+
+            {/* Gamification Panel */}
+            <div className="max-w-4xl mx-auto mt-8">
+              <GamificationPanel />
             </div>
 
             {/* Journey Section */}
