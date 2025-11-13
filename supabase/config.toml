@@ -97,6 +97,12 @@ verify_jwt = true
 [functions.emotion-music-callback]
 verify_jwt = false
 
+[functions.automix-context]
+verify_jwt = true
+
+[functions.send-push-notification]
+verify_jwt = true
+
 [functions.parcours-xl-create]
 verify_jwt = true
 

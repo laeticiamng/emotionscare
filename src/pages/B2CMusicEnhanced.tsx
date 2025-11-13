@@ -32,6 +32,8 @@ import { useOptimizedAnimation } from '@/hooks/useOptimizedAnimation';
 import { UnifiedMusicPlayer } from '@/components/music/UnifiedMusicPlayer';
 import { EmotionalMusicGenerator } from '@/components/music/EmotionalMusicGenerator';
 import { MusicJourneyPlayer } from '@/components/music/MusicJourneyPlayer';
+import { AutoMixPlayer } from '@/components/music/AutoMixPlayer';
+import { PushNotificationSetup } from '@/components/notifications/PushNotificationSetup';
 import type { MusicTrack } from '@/types/music';
 import { logger } from '@/lib/logger';
 import { useMusicJourney } from '@/hooks/useMusicJourney';
@@ -417,6 +419,16 @@ const B2CMusicEnhanced: React.FC = () => {
                 ) : null}
               </CardContent>
             </Card>
+
+            {/* AutoMix Section */}
+            <div className="max-w-4xl mx-auto">
+              <AutoMixPlayer />
+            </div>
+
+            {/* Push Notifications */}
+            <div className="max-w-4xl mx-auto">
+              <PushNotificationSetup />
+            </div>
 
             {/* Favorites Section */}
             {favorites.length > 0 && (
