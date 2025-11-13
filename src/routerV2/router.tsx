@@ -339,6 +339,9 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   DailyChallengesPage,
   ScoresPage,
   
+  // Admin Escalation & Monitoring
+  NotificationWebhooksConfig,
+  
   // Settings
   B2CSettingsPage,
   B2CProfileSettingsPage,

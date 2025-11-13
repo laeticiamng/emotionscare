@@ -217,6 +217,33 @@ Réponds uniquement au format JSON avec:
       console.error('Error saving ticket:', ticketError);
     }
 
+    // Send notification
+    try {
+      await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/send-notification`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${Deno.env.get('SUPABASE_ANON_KEY')}`
+        },
+        body: JSON.stringify({
+          event_type: 'ticket_created',
+          title: 'Ticket Créé Automatiquement',
+          message: `Un ticket ${ticketKey} a été créé dans ${integration.integration_type.toUpperCase()} et assigné à ${suggestedAssignee}`,
+          severity: 'info',
+          data: {
+            'Ticket': ticketKey,
+            'Assigné à': suggestedAssignee,
+            'Confiance ML': `${(mlConfidence * 100).toFixed(0)}%`,
+            'Intégration': integration.name,
+            'URL': ticketUrl
+          }
+        })
+      });
+      console.log('Notification sent for ticket creation');
+    } catch (notifError) {
+      console.error('Failed to send notification:', notifError);
+    }
+
     return new Response(
       JSON.stringify({
         success: true,
