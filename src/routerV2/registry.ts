@@ -1768,6 +1768,42 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: 'role',
     allowedRoles: ['admin', 'b2b-admin'],
   },
+  {
+    name: 'admin-cron-setup',
+    path: '/admin/cron-setup',
+    segment: 'admin',
+    layout: 'admin',
+    component: 'CronJobsSetupPage',
+    guard: 'role',
+    allowedRoles: ['admin'],
+  },
+  {
+    name: 'admin-alert-tester',
+    path: '/admin/alert-tester',
+    segment: 'admin',
+    layout: 'admin',
+    component: 'AlertTesterPage',
+    guard: 'role',
+    allowedRoles: ['admin'],
+  },
+  {
+    name: 'admin-ml-assignment-rules',
+    path: '/admin/ml-assignment-rules',
+    segment: 'admin',
+    layout: 'admin',
+    component: 'MLAssignmentRulesPage',
+    guard: 'role',
+    allowedRoles: ['admin'],
+  },
+  {
+    name: 'admin-team-skills',
+    path: '/admin/team-skills',
+    segment: 'admin',
+    layout: 'admin',
+    component: 'TeamMemberSkillsPage',
+    guard: 'role',
+    allowedRoles: ['admin'],
+  },
 
   // ═══════════════════════════════════════════════════════════
   // SYSTEM & MONITORING
