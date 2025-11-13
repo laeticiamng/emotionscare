@@ -1,6 +1,6 @@
 // @ts-nocheck
 import React from 'react';
-import * as Sentry from '@sentry/react';
+import { captureException } from '@/lib/ai-monitoring';
 import dayjs from 'dayjs';
 import 'dayjs/locale/fr';
 import { useParams, Link, useLocation } from 'react-router-dom';

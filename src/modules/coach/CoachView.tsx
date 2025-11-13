@@ -1,5 +1,5 @@
 import { FormEvent, KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import * as Sentry from '@sentry/react';
+import { captureException } from '@/lib/ai-monitoring';
 import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { sendMessage } from '@/services/coach/coachApi';

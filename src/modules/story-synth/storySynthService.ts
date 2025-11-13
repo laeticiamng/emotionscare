@@ -3,7 +3,7 @@
  * Gère les sessions de narration thérapeutique et la génération de stories
  */
 
-import * as Sentry from '@sentry/react';
+import { captureException } from '@/lib/ai-monitoring';
 import { supabase } from '@/integrations/supabase/client';
 import {
   StorySynthSession,

@@ -1,5 +1,6 @@
 // @ts-nocheck
-import * as Sentry from '@sentry/react';
+import { captureException } from '@/lib/ai-monitoring';
+import { logger } from '@/lib/logger';
 
 export type ScanEventName =
   | 'onboarding_started'

@@ -1,4 +1,4 @@
-import * as Sentry from '@sentry/react';
+import { captureException } from '@/lib/ai-monitoring';
 import { supabase } from '@/integrations/supabase/client';
 import { journalService } from '@/modules/journal/journalService';
 import type { JournalEntry } from '@/modules/journal/journalService';

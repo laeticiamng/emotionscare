@@ -4,7 +4,7 @@
  */
 
 import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
-import * as Sentry from '@sentry/react';
+import { captureException } from '@/lib/ai-monitoring';
 import { useAsyncMachine } from '@/hooks/useAsyncMachine';
 import { flashGlowService, FlashGlowSession } from './flash-glowService';
 import { toast } from '@/hooks/use-toast';

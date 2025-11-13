@@ -3,7 +3,7 @@
  * Gère les sessions, scores et statistiques du jeu Bubble Beat
  */
 
-import * as Sentry from '@sentry/react';
+import { captureException } from '@/lib/ai-monitoring';
 import { supabase } from '@/integrations/supabase/client';
 import {
   BubbleBeatSession,

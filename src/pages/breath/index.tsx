@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useCallback, useEffect, useState } from 'react';
-import * as Sentry from '@sentry/react';
+import { captureException } from '@/lib/ai-monitoring';
 import { Loader2 } from 'lucide-react';
 
 import PageHeader from '@/components/ui/PageHeader';

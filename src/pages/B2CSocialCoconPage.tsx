@@ -17,7 +17,7 @@ import {
   Volume2,
 } from 'lucide-react';
 import { motion, useReducedMotion } from 'framer-motion';
-import * as Sentry from '@sentry/react';
+import { captureException } from '@/lib/ai-monitoring';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
