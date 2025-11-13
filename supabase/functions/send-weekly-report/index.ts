@@ -18,45 +18,47 @@ serve(async (req: Request) => {
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Date range: last 7 days
-    const endDate = new Date();
-    const startDate = new Date();
-    startDate.setDate(startDate.getDate() - 7);
+    const { reportData, recipients } = await req.json();
 
-    console.log("Fetching weekly report data...");
+    console.log("Sending report to:", recipients);
 
-    // Fetch audit logs count
-    const { count: auditCount, error: auditError } = await supabase
-      .from("role_audit_logs")
-      .select("*", { count: "exact", head: true })
-      .gte("changed_at", startDate.toISOString())
-      .lte("changed_at", endDate.toISOString());
+    if (!reportData || !recipients || !Array.isArray(recipients)) {
+      return new Response(
+        JSON.stringify({ error: "Missing reportData or recipients" }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json", ...corsHeaders },
+        }
+      );
+    }
 
-    if (auditError) throw auditError;
+    // Générer le HTML du rapport
+    const htmlContent = generateReportHTML(reportData);
 
-    // Fetch security alerts count
-    const { count: alertsCount, error: alertsError } = await supabase
-      .from("security_alerts")
-      .select("*", { count: "exact", head: true })
-      .gte("created_at", startDate.toISOString())
-      .lte("created_at", endDate.toISOString());
+    // Note: Pour l'envoi d'emails, il faudrait intégrer Resend
+    // Pour l'instant, on log simplement l'action
+    console.log("Report generated successfully for recipients:", recipients.join(", "));
+    console.log("Report data summary:", {
+      totalChanges: reportData.stats.totalChanges,
+      totalAlerts: reportData.stats.totalAlerts,
+      criticalAlerts: reportData.stats.criticalAlerts,
+    });
 
-    if (alertsError) throw alertsError;
-
-    console.log(`Weekly report: ${auditCount} audit logs, ${alertsCount} alerts`);
+    // Sauvegarder dans les logs
+    await supabase.from("audit_report_logs").insert({
+      recipients: recipients,
+      period_start: reportData.period.start,
+      period_end: reportData.period.end,
+      total_changes: reportData.stats.totalChanges,
+      total_alerts: reportData.stats.totalAlerts,
+      critical_alerts: reportData.stats.criticalAlerts,
+    });
 
     return new Response(
       JSON.stringify({
         success: true,
-        period: {
-          start: startDate.toISOString(),
-          end: endDate.toISOString(),
-        },
-        stats: {
-          totalAuditLogs: auditCount || 0,
-          totalAlerts: alertsCount || 0,
-        },
-        message: "Report data collected successfully. Email sending feature pending configuration.",
+        sent: recipients.length,
+        message: "Report prepared successfully. Email integration pending.",
       }),
       {
         status: 200,
@@ -74,3 +76,45 @@ serve(async (req: Request) => {
     );
   }
 });
+
+function generateReportHTML(data: any): string {
+  const { period, stats } = data;
+  const startDate = new Date(period.start).toLocaleDateString('fr-FR');
+  const endDate = new Date(period.end).toLocaleDateString('fr-FR');
+
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+    .header { background: #3b82f6; color: white; padding: 20px; border-radius: 8px 8px 0 0; }
+    .content { background: white; padding: 20px; border: 1px solid #e5e7eb; }
+    .stat { background: #f3f4f6; padding: 15px; margin: 10px 0; border-radius: 4px; }
+    .stat-value { font-size: 32px; font-weight: bold; color: #1f2937; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>📊 Rapport d'audit hebdomadaire</h1>
+    <p>Période : ${startDate} au ${endDate}</p>
+  </div>
+  <div class="content">
+    <div class="stat">
+      <div class="stat-value">${stats.totalChanges}</div>
+      <p>Total modifications</p>
+    </div>
+    <div class="stat">
+      <div class="stat-value">${stats.totalAlerts}</div>
+      <p>Alertes totales</p>
+    </div>
+    <div class="stat">
+      <div class="stat-value">${stats.criticalAlerts}</div>
+      <p>Alertes critiques</p>
+    </div>
+  </div>
+</body>
+</html>
+  `.trim();
+}

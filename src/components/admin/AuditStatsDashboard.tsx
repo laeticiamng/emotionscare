@@ -25,6 +25,7 @@ import { MonthComparisonChart } from './MonthComparisonChart';
 import { AlertSettingsManager } from './AlertSettingsManager';
 import { AuditReportExporter } from './AuditReportExporter';
 import { SecurityAlertsPanel } from './SecurityAlertsPanel';
+import { ReportManualTrigger } from './ReportManualTrigger';
 import { useState } from 'react';
 
 ChartJS.register(
@@ -254,11 +255,13 @@ export function AuditStatsDashboard() {
   return (
     <div className="space-y-6">
       <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="overview">Vue générale</TabsTrigger>
           <TabsTrigger value="advanced">Filtres avancés</TabsTrigger>
-          <TabsTrigger value="comparison">Comparaison mensuelle</TabsTrigger>
-          <TabsTrigger value="settings">Paramètres d'alerte</TabsTrigger>
+          <TabsTrigger value="comparison">Comparaison</TabsTrigger>
+          <TabsTrigger value="security">Alertes</TabsTrigger>
+          <TabsTrigger value="reports">Rapports</TabsTrigger>
+          <TabsTrigger value="settings">Paramètres</TabsTrigger>
         </TabsList>
 
         {/* Onglet Vue générale */}
@@ -394,6 +397,16 @@ export function AuditStatsDashboard() {
             isLoading={monthComparisonLoading}
             error={monthComparisonError}
           />
+        </TabsContent>
+
+        {/* Onglet Alertes sécurité */}
+        <TabsContent value="security" className="space-y-6">
+          <SecurityAlertsPanel />
+        </TabsContent>
+
+        {/* Onglet Rapports manuels */}
+        <TabsContent value="reports" className="space-y-6">
+          <ReportManualTrigger />
         </TabsContent>
 
         {/* Onglet Paramètres d'alerte */}
