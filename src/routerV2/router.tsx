@@ -119,6 +119,9 @@ const TicketIntegrationConfig = lazy(() => import('@/pages/admin/TicketIntegrati
 const ABTestManager = lazy(() => import('@/pages/admin/ABTestManager'));
 const NotificationWebhooksConfig = lazy(() => import('@/pages/admin/NotificationWebhooksConfig'));
 const SystemHealthDashboard = lazy(() => import('@/pages/admin/SystemHealthDashboard'));
+const ExecutiveDashboard = lazy(() => import('@/pages/admin/ExecutiveDashboard'));
+const IncidentReportsPage = lazy(() => import('@/pages/admin/IncidentReportsPage'));
+const UnifiedAdminDashboard = lazy(() => import('@/pages/admin/UnifiedAdminDashboard'));
 const GamificationCronMonitoring = lazy(() => import('@/pages/admin/GamificationCronMonitoring'));
 const MusicQueueAdminPage = lazy(() => import('@/pages/admin/MusicQueueAdminPage'));
 const MusicQueueMetricsPage = lazy(() => import('@/pages/admin/MusicQueueMetricsPage'));
@@ -343,6 +346,9 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   // Admin Escalation & Monitoring
   NotificationWebhooksConfig,
   SystemHealthDashboard,
+  ExecutiveDashboard,
+  IncidentReportsPage,
+  UnifiedAdminDashboard,
   
   // Settings
   B2CSettingsPage,
