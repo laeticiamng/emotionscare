@@ -21,3 +21,4 @@ export const useMusic = (): MusicContextType => {
 };
 
 export default useMusic;
+
