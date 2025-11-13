@@ -54,6 +54,12 @@ verify_jwt = false
 [functions.check-scheduled-reports]
 verify_jwt = false
 
+[functions.check-alert-escalation]
+verify_jwt = false
+
+[functions.analyze-error-patterns]
+verify_jwt = false
+
 [api]
 enabled = true
 port = 54321

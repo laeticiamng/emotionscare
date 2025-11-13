@@ -112,6 +112,8 @@ const AlertAnalyticsDashboard = lazy(() => import('@/pages/admin/AlertAnalyticsD
 const AlertTemplatesPage = lazy(() => import('@/pages/admin/AlertTemplatesPage'));
 const AlertTemplatePlayground = lazy(() => import('@/pages/admin/AlertTemplatePlayground'));
 const ScheduledReportsPage = lazy(() => import('@/pages/admin/ScheduledReportsPage'));
+const AlertEscalationConfig = lazy(() => import('@/pages/admin/AlertEscalationConfig'));
+const AITemplateSuggestions = lazy(() => import('@/pages/admin/AITemplateSuggestions'));
 const GamificationCronMonitoring = lazy(() => import('@/pages/admin/GamificationCronMonitoring'));
 const MusicQueueAdminPage = lazy(() => import('@/pages/admin/MusicQueueAdminPage'));
 const MusicQueueMetricsPage = lazy(() => import('@/pages/admin/MusicQueueMetricsPage'));
@@ -502,6 +504,8 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   AlertTemplatesPage,
   AlertTemplatePlayground,
   ScheduledReportsPage,
+  AlertEscalationConfig,
+  AITemplateSuggestions,
   GamificationCronMonitoring,
   MusicQueueAdminPage,
   MusicQueueMetricsPage,
