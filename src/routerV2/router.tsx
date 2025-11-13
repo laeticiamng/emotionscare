@@ -110,6 +110,7 @@ const AIMonitoringDashboard = lazy(() => import('@/pages/admin/AIMonitoringDashb
 const AlertConfigurationPage = lazy(() => import('@/pages/admin/AlertConfigurationPage'));
 const AlertAnalyticsDashboard = lazy(() => import('@/pages/admin/AlertAnalyticsDashboard'));
 const AlertTemplatesPage = lazy(() => import('@/pages/admin/AlertTemplatesPage'));
+const ScheduledReportsPage = lazy(() => import('@/pages/admin/ScheduledReportsPage'));
 const GamificationCronMonitoring = lazy(() => import('@/pages/admin/GamificationCronMonitoring'));
 const MusicQueueAdminPage = lazy(() => import('@/pages/admin/MusicQueueAdminPage'));
 const MusicQueueMetricsPage = lazy(() => import('@/pages/admin/MusicQueueMetricsPage'));

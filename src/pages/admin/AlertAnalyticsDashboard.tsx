@@ -30,6 +30,7 @@ import {
 } from 'lucide-react';
 import { format, subDays } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { ExportReportButtons } from '@/components/admin/ExportReportButtons';
 
 interface AlertAnalytics {
   date: string;
@@ -189,11 +190,14 @@ const AlertAnalyticsDashboard = () => {
 
   return (
     <div className="container mx-auto py-6 space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Analytics des Alertes AI</h1>
-        <p className="text-muted-foreground">
-          Analyse détaillée des erreurs et tendances sur les 30 derniers jours
-        </p>
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold">Analytics des Alertes AI</h1>
+          <p className="text-muted-foreground">
+            Analyse des tendances, résolutions et catégories d'erreurs
+          </p>
+        </div>
+        <ExportReportButtons dateRangeDays={7} />
       </div>
 
       {/* KPI Cards */}
