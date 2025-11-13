@@ -1696,6 +1696,33 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
       description: 'Explorez toutes les fonctionnalités EmotionsCare',
     },
   },
+  {
+    name: 'admin-ai-template-suggestions',
+    path: '/admin/alerts/ai-suggestions',
+    segment: 'admin',
+    layout: 'admin',
+    component: 'AITemplateSuggestions',
+    guard: 'role',
+    allowedRoles: ['admin'],
+  },
+  {
+    name: 'admin-ticket-integration',
+    path: '/admin/tickets/integrations',
+    segment: 'admin',
+    layout: 'admin',
+    component: 'TicketIntegrationConfig',
+    guard: 'role',
+    allowedRoles: ['admin'],
+  },
+  {
+    name: 'admin-ab-test-manager',
+    path: '/admin/escalation/ab-tests',
+    segment: 'admin',
+    layout: 'admin',
+    component: 'ABTestManager',
+    guard: 'role',
+    allowedRoles: ['admin'],
+  },
 
   // ═══════════════════════════════════════════════════════════
   // SYSTEM & MONITORING
