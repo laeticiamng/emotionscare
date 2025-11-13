@@ -457,19 +457,21 @@ export const MusicAnalyticsDashboard: React.FC = () => {
               <p className="text-sm text-muted-foreground">Taux de complétion</p>
               <p className="text-2xl font-bold">
                 {metrics.journeyStats.total > 0 
-                  ? ((metrics.journeyStats.completed / metrics.journeyStats.total) * 100).toFixed(1)
-                  : 0}%
-              </p>
-            </div>
-            <div className="space-y-2">
-              <p className="text-sm text-muted-foreground">Progression moyenne</p>
-              <p className="text-2xl font-bold">
-                {metrics.journeyStats.avgCompletion.toFixed(1)}%
-              </p>
-            </div>
+                ? ((metrics.journeyStats.completed / metrics.journeyStats.total) * 100).toFixed(1)
+                : 0}%
+            </p>
           </div>
-        </CardContent>
-      </Card>
-    </div>
+          <div className="space-y-2">
+            <p className="text-sm text-muted-foreground">Progression moyenne</p>
+            <p className="text-2xl font-bold">
+              {metrics.journeyStats.avgCompletion.toFixed(1)}%
+            </p>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  </div>
   );
 };
+
+export default MusicAnalyticsDashboard;

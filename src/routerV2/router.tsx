@@ -114,6 +114,7 @@ const ChallengesHistory = lazy(() => import('@/pages/app/ChallengesHistory'));
 const CreateCustomChallenge = lazy(() => import('@/pages/admin/CreateCustomChallenge'));
 const EditCustomChallenge = lazy(() => import('@/pages/admin/EditCustomChallenge'));
 const ChallengesDashboard = lazy(() => import('@/pages/admin/ChallengesDashboard'));
+const MusicAnalyticsDashboard = lazy(() => import('@/pages/admin/MusicAnalyticsDashboard'));
 const Achievements = lazy(() => import('@/pages/app/Achievements'));
 const CronMonitoring = lazy(() => import('@/pages/CronMonitoring'));
 const BlockchainBackups = lazy(() => import('@/pages/BlockchainBackups'));
@@ -496,6 +497,8 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   ChallengesHistory,
   CreateCustomChallenge,
   EditCustomChallenge,
+  ChallengesDashboard,
+  MusicAnalyticsDashboard,
   Achievements,
   CronMonitoring,
   BlockchainBackups,
