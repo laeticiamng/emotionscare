@@ -44,22 +44,53 @@ serve(async (req) => {
     if (action === 'analyze-emotions') {
       const { data: scans } = await supabaseClient
         .from('emotion_scans')
-        .select('emotion_primary, emotion_intensity')
+        .select('emotions, confidence, mood')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(10);
 
       const freq: Record<string, number> = {};
+      let totalIntensity = 0;
+      let count = 0;
+
       (scans || []).forEach(s => {
-        const e = s.emotion_primary || 'neutral';
-        freq[e] = (freq[e] || 0) + 1;
+        // emotions est un objet JSON avec les émotions détectées
+        if (s.emotions && typeof s.emotions === 'object') {
+          // Prendre l'émotion dominante du scan
+          const emotionEntries = Object.entries(s.emotions);
+          if (emotionEntries.length > 0) {
+            // Trouver l'émotion avec la plus haute valeur
+            const [topEmotion, intensity] = emotionEntries.reduce((a, b) => 
+              (a[1] as number) > (b[1] as number) ? a : b
+            );
+            freq[topEmotion] = (freq[topEmotion] || 0) + 1;
+            totalIntensity += (intensity as number);
+            count++;
+          }
+        } else if (s.mood) {
+          // Fallback sur mood si emotions n'est pas disponible
+          const mood = s.mood.toLowerCase();
+          freq[mood] = (freq[mood] || 0) + 1;
+          totalIntensity += (s.confidence || 0.5);
+          count++;
+        }
       });
 
       const dominant = Object.entries(freq).sort((a, b) => b[1] - a[1])[0]?.[0] || 'neutral';
+      const avgIntensity = count > 0 ? totalIntensity / count : 0.5;
+      const profile = PROFILES[dominant] || PROFILES.neutral;
+
       return new Response(JSON.stringify({
         dominantEmotion: dominant,
+        avgIntensity,
         emotionFrequency: freq,
-        recommendation: PROFILES[dominant] || PROFILES.neutral
+        recentScans: scans?.length || 0,
+        musicProfile: {
+          prompt: profile.prompt,
+          tempo: profile.tempo,
+          tags: [dominant, 'therapeutic', 'ai-generated'],
+          description: profile.desc
+        }
       }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
 
