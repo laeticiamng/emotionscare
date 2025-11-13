@@ -51,6 +51,9 @@ verify_jwt = false
 [functions.generate-analytics-report]
 verify_jwt = false
 
+[functions.check-scheduled-reports]
+verify_jwt = false
+
 [api]
 enabled = true
 port = 54321
