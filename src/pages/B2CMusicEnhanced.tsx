@@ -35,6 +35,7 @@ import { MusicJourneyPlayer } from '@/components/music/MusicJourneyPlayer';
 import { AutoMixPlayer } from '@/components/music/AutoMixPlayer';
 import { FocusFlowPlayer } from '@/components/music/FocusFlowPlayer';
 import { CollaborativeSessionLobby } from '@/components/focus/CollaborativeSessionLobby';
+import { FocusAnalyticsDashboard } from '@/components/analytics/FocusAnalyticsDashboard';
 import { PushNotificationSetup } from '@/components/notifications/PushNotificationSetup';
 import type { MusicTrack } from '@/types/music';
 import { logger } from '@/lib/logger';
@@ -435,6 +436,11 @@ const B2CMusicEnhanced: React.FC = () => {
             {/* Collaborative Focus Section */}
             <div className="max-w-6xl mx-auto">
               <CollaborativeSessionLobby />
+            </div>
+
+            {/* Focus Analytics Dashboard */}
+            <div className="max-w-6xl mx-auto">
+              <FocusAnalyticsDashboard />
             </div>
 
             {/* Push Notifications */}
