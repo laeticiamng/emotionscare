@@ -1,5 +1,7 @@
 # Système d'Audit Log pour les Rôles Utilisateurs
 
+> **📋 Complément** : Voir aussi [SETUP_SUSPICIOUS_ACTIVITY_ALERTS.md](./SETUP_SUSPICIOUS_ACTIVITY_ALERTS.md) pour les alertes automatiques et le dashboard de statistiques.
+
 ## Vue d'ensemble
 
 Le système d'audit log enregistre automatiquement tous les changements de rôles dans la table `role_audit_logs`, permettant une traçabilité complète des modifications.
