@@ -25,6 +25,8 @@ import {
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useMusic } from '@/hooks/useMusic';
+import { useMusicFavorites } from '@/hooks/useMusicFavorites';
+import { getPublicMusicUrl } from '@/services/music/storage-service';
 import { UniverseEngine } from '@/components/universe/UniverseEngine';
 import { RewardSystem } from '@/components/rewards/RewardSystem';
 import { getOptimizedUniverse } from '@/data/universes/config';
@@ -132,6 +134,7 @@ const B2CMusicEnhanced: React.FC = () => {
   });
 
   const { toast } = useToast();
+  const musicFavorites = useMusicFavorites();
   
   // Protection du contexte Music
   let musicContext;
@@ -209,20 +212,6 @@ const B2CMusicEnhanced: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-    try {
-      window.localStorage.setItem('music:favorites', JSON.stringify(favorites));
-    } catch {}
-  }, [favorites]);
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    try {
-      window.localStorage.setItem('music:history', JSON.stringify(playHistory));
-    } catch {}
-  }, [playHistory]);
-
-  useEffect(() => {
     // Set playlist on mount
     setPlaylist(vinylTracks);
   }, [setPlaylist]);
@@ -233,26 +222,12 @@ const B2CMusicEnhanced: React.FC = () => {
 
   const resumeTrack = lastPlayedId ? vinylTracks.find(track => track.id === lastPlayedId) ?? null : null;
 
-  const handleToggleFavorite = (trackId: string) => {
-    setFavorites(prev => (
-      prev.includes(trackId) 
-        ? prev.filter(id => id !== trackId) 
-        : [...prev, trackId]
-    ));
-  };
-
   const startTrack = async (track: VinylTrack) => {
     setLoadingTrackId(track.id);
     try {
       setPlayerVisible(true); // Afficher le player AVANT la lecture
       await play(track);
       setLastPlayedId(track.id);
-      
-      // Ajouter à l'historique
-      setPlayHistory(prev => {
-        const filtered = prev.filter(id => id !== track.id);
-        return [track.id, ...filtered].slice(0, 10); // Max 10 items
-      });
       
       if (typeof window !== 'undefined') {
         try {
@@ -495,14 +470,14 @@ const B2CMusicEnhanced: React.FC = () => {
             </div>
 
             {/* Favorites Section */}
-            {favorites.length > 0 && (
+            {musicFavorites.favorites.length > 0 && (
               <div className="max-w-6xl mx-auto">
                 <div className="flex items-center gap-2 mb-4">
                   <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" />
                   <h3 className="text-lg font-semibold text-foreground">Tes Favoris</h3>
                 </div>
                 <div className="flex gap-4 overflow-x-auto pb-4">
-                  {vinylTracks.filter(t => favorites.includes(t.id)).map(track => (
+                  {vinylTracks.filter(t => musicFavorites.isFavorite(t.id)).map(track => (
                     <Card
                       key={track.id}
                       className="min-w-[200px] cursor-pointer hover:shadow-lg transition-all"
@@ -589,7 +564,7 @@ const B2CMusicEnhanced: React.FC = () => {
             <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4 max-w-6xl mx-auto">
               {vinylTracks.map((track, index) => {
                 const Icon = categoryIcons[track.category];
-                const isFavorite = favorites.includes(track.id);
+                const isFavorite = musicFavorites.isFavorite(track.id);
                 const isLoading = loadingTrackId === track.id;
                 
                 return (
@@ -702,9 +677,10 @@ const B2CMusicEnhanced: React.FC = () => {
                               className="w-full"
                               aria-label={isFavorite ? `Retirer ${track.title} des favoris` : `Ajouter ${track.title} aux favoris`}
                               aria-pressed={isFavorite}
+                              disabled={musicFavorites.isLoading}
                               onClick={(e) => {
                                 e.stopPropagation();
-                                handleToggleFavorite(track.id);
+                                musicFavorites.toggleFavorite(track);
                               }}
                             >
                               <Heart className={`h-3 w-3 mr-2 ${isFavorite ? 'fill-current text-destructive' : ''}`} aria-hidden="true" />
