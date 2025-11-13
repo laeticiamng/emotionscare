@@ -86,15 +86,10 @@ export function useMoodPublisher() {
       };
 
       publishMoodUpdated(detail);
-      Sentry.addBreadcrumb({
-        category: 'scan',
-        level: 'info',
-        message: 'scan:sam:update',
-        data: {
-          source: detail.source,
-          summary: detail.summary,
-        },
-      });
+      logger.info('scan:sam:update', {
+        source: detail.source,
+        summary: detail.summary,
+      }, 'SCAN');
 
       return detail;
     },

@@ -32,12 +32,7 @@ export async function persistOrchestrationSession(
 
   const createdAt = new Date().toISOString();
 
-  Sentry.addBreadcrumb({
-    category: 'session',
-    message: 'session:persist:orchestration',
-    level: 'info',
-    data: { module, ...sanitized },
-  });
+  logger.info('session:persist:orchestration', { module, ...sanitized }, 'SESSION');
 
   logger.info('[orchestration] persist', { module, metadata: sanitized }, 'SYSTEM');
 
@@ -54,7 +49,7 @@ export async function persistOrchestrationSession(
       throw error;
     }
   } catch (error) {
-    Sentry.captureException(error, {
+    captureException(error, {
       tags: { module, scope: 'orchestration' },
       extra: { metadata: sanitized },
     });

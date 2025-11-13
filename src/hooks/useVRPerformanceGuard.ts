@@ -1,6 +1,5 @@
 // @ts-nocheck
 import { useEffect, useRef } from 'react';
-import * as Sentry from '@sentry/react';
 
 import { useToast } from '@/hooks/use-toast';
 import { useVRSafetyStore } from '@/store/vrSafety.store';
@@ -43,12 +42,7 @@ export const useVRPerformanceGuard = (module: 'vr_breath' | 'vr_galaxy') => {
   useEffect(() => {
     if (!hasWebGLSupport()) {
       markFallback('webgl_unavailable');
-      Sentry.addBreadcrumb({
-        category: 'vr',
-        message: 'vr:fallback2d',
-        level: 'warning',
-        data: { module, reason: 'webgl' },
-      });
+      logger.warn('vr:fallback2d', { module, reason: 'webgl' }, 'VR');
       return;
     }
 
@@ -56,12 +50,7 @@ export const useVRPerformanceGuard = (module: 'vr_breath' | 'vr_galaxy') => {
       const memory = Number((navigator as unknown as { deviceMemory?: number }).deviceMemory);
       if (Number.isFinite(memory) && memory > 0 && memory < 2) {
         markFallback('low_memory');
-        Sentry.addBreadcrumb({
-          category: 'vr',
-          message: 'vr:fallback2d',
-          level: 'warning',
-          data: { module, reason: 'memory', deviceMemory: memory },
-        });
+        logger.warn('vr:fallback2d', { module, reason: 'memory', deviceMemory: memory }, 'VR');
       }
     }
 
@@ -81,12 +70,7 @@ export const useVRPerformanceGuard = (module: 'vr_breath' | 'vr_galaxy') => {
         recordPerformanceSample(fps);
         if (fps < LOW_FPS_THRESHOLD) {
           markFallback('low_fps');
-          Sentry.addBreadcrumb({
-            category: 'vr',
-            message: 'vr:fallback2d',
-            level: 'warning',
-            data: { module, reason: 'fps', fps: Number(fps.toFixed(1)) },
-          });
+          logger.warn('vr:fallback2d', { module, reason: 'fps', fps: Number(fps.toFixed(1)) }, 'VR');
         }
         frames = 0;
         start = timestamp;

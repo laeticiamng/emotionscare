@@ -28,7 +28,7 @@ export const PostCheck: FC<PostCheckProps> = ({
 
   useEffect(() => {
     if (visible && !dismissed) {
-      Sentry.addBreadcrumb({ category: 'stai6', level: 'info', message: 'stai6:post:shown' });
+      logger.info('stai6:post:shown', undefined, 'STAI6');
       setAnnouncement('Préparer un retour doux sur le ressenti après Nyvée.');
     }
   }, [visible, dismissed]);

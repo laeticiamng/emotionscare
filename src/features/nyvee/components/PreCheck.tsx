@@ -28,7 +28,7 @@ export const PreCheck: FC<PreCheckProps> = ({
 
   useEffect(() => {
     if (visible && !dismissed) {
-      Sentry.addBreadcrumb({ category: 'stai6', level: 'info', message: 'stai6:pre:shown' });
+      logger.info('stai6:pre:shown', undefined, 'STAI6');
       setAnnouncement('Invitation disponible pour ressentir le niveau de tension.');
     }
   }, [visible, dismissed]);

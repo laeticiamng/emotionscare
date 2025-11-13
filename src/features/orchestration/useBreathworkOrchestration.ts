@@ -101,12 +101,7 @@ const isEveningNow = () => {
 };
 
 const addBreadcrumb = (message: string, data?: Record<string, unknown>) => {
-  Sentry.addBreadcrumb({
-    category: 'breath',
-    level: 'info',
-    message,
-    data,
-  });
+  logger.info(message, data, 'BREATH');
 };
 
 export const useBreathworkOrchestration = (): BreathworkOrch => {

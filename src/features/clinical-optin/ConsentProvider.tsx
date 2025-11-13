@@ -152,12 +152,7 @@ export const ConsentProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const acceptMutation = useMutation({
     mutationFn: async () => {
-      Sentry.addBreadcrumb({
-        category: 'consent',
-        level: 'info',
-        message: 'optin.accept.click',
-        data: { scope: CONSENT_SCOPE },
-      });
+      logger.info('optin.accept.click', { scope: CONSENT_SCOPE }, 'CONSENT');
 
       // Récupérer l'utilisateur actuel
       const { data: { user } } = await supabase.auth.getUser();
@@ -200,12 +195,7 @@ export const ConsentProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const revokeMutation = useMutation({
     mutationFn: async () => {
-      Sentry.addBreadcrumb({
-        category: 'consent',
-        level: 'info',
-        message: 'optin.revoke.click',
-        data: { scope: CONSENT_SCOPE },
-      });
+      logger.info('optin.revoke.click', { scope: CONSENT_SCOPE }, 'CONSENT');
 
       // Marquer tous les consentements actifs comme révoqués
       const { error } = await supabase
