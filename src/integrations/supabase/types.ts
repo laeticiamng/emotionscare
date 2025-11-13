@@ -1169,6 +1169,80 @@ export type Database = {
         }
         Relationships: []
       }
+      automix_feedback: {
+        Row: {
+          context_snapshot: Json
+          created_at: string
+          feedback_notes: string | null
+          id: string
+          playlist_id: string
+          rating: number
+          user_id: string
+        }
+        Insert: {
+          context_snapshot: Json
+          created_at?: string
+          feedback_notes?: string | null
+          id?: string
+          playlist_id: string
+          rating: number
+          user_id: string
+        }
+        Update: {
+          context_snapshot?: Json
+          created_at?: string
+          feedback_notes?: string | null
+          id?: string
+          playlist_id?: string
+          rating?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "automix_feedback_playlist_id_fkey"
+            columns: ["playlist_id"]
+            isOneToOne: false
+            referencedRelation: "automix_playlists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      automix_playlists: {
+        Row: {
+          context_rules: Json
+          created_at: string
+          generated_tracks: Json | null
+          id: string
+          is_active: boolean | null
+          name: string
+          tempo_range: Json | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          context_rules?: Json
+          created_at?: string
+          generated_tracks?: Json | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          tempo_range?: Json | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          context_rules?: Json
+          created_at?: string
+          generated_tracks?: Json | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          tempo_range?: Json | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       b2b_music_aggregates: {
         Row: {
           cohort_size: number
@@ -13661,6 +13735,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_context_preferences: {
+        Row: {
+          afternoon_mood: string | null
+          created_at: string
+          evening_mood: string | null
+          feedback_summary: Json | null
+          id: string
+          morning_mood: string | null
+          updated_at: string
+          user_id: string
+          weather_sensitivity: boolean | null
+        }
+        Insert: {
+          afternoon_mood?: string | null
+          created_at?: string
+          evening_mood?: string | null
+          feedback_summary?: Json | null
+          id?: string
+          morning_mood?: string | null
+          updated_at?: string
+          user_id: string
+          weather_sensitivity?: boolean | null
+        }
+        Update: {
+          afternoon_mood?: string | null
+          created_at?: string
+          evening_mood?: string | null
+          feedback_summary?: Json | null
+          id?: string
+          morning_mood?: string | null
+          updated_at?: string
+          user_id?: string
+          weather_sensitivity?: boolean | null
+        }
+        Relationships: []
       }
       user_emotional_energy: {
         Row: {

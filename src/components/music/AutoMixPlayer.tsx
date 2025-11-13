@@ -25,7 +25,9 @@ import {
   Sunset,
   Moon,
   Zap,
-  Loader2
+  Loader2,
+  ThumbsUp,
+  ThumbsDown
 } from 'lucide-react';
 import { useAutoMix } from '@/hooks/useAutoMix';
 
@@ -52,16 +54,25 @@ export const AutoMixPlayer: React.FC = () => {
     isGenerating,
     generateAutoMix,
     fetchContext,
-    saveContextPreferences
+    saveContextPreferences,
+    submitFeedback
   } = useAutoMix();
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [trackCount, setTrackCount] = useState(7);
   const [weatherSensitivity, setWeatherSensitivity] = useState(true);
+  const [feedbackGiven, setFeedbackGiven] = useState(false);
+
+  useEffect(() => {
+    if (activePlaylist) {
+      setFeedbackGiven(false);
+    }
+  }, [activePlaylist?.id]);
 
   const handleGenerate = async () => {
     await generateAutoMix(trackCount);
+    setFeedbackGiven(false);
   };
 
   const TimeIcon = context ? TimeIcons[context.timeContext as keyof typeof TimeIcons] || Sun : Sun;
@@ -206,6 +217,47 @@ export const AutoMixPlayer: React.FC = () => {
             </div>
           </CardContent>
         </Card>
+      )}
+
+      {/* Feedback Section */}
+      {activePlaylist && !feedbackGiven && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="fixed bottom-6 right-6 z-50"
+        >
+          <Card className="bg-card/95 backdrop-blur-lg border-primary/20 shadow-xl">
+            <CardContent className="p-4">
+              <p className="text-sm mb-3 font-medium">Comment trouvez-vous cette playlist ?</p>
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="gap-2"
+                  onClick={async () => {
+                    await submitFeedback(activePlaylist.id, 1);
+                    setFeedbackGiven(true);
+                  }}
+                >
+                  <ThumbsUp className="h-4 w-4" />
+                  J'adore
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="gap-2"
+                  onClick={async () => {
+                    await submitFeedback(activePlaylist.id, -1);
+                    setFeedbackGiven(true);
+                  }}
+                >
+                  <ThumbsDown className="h-4 w-4" />
+                  Pas mon style
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
       )}
     </div>
   );

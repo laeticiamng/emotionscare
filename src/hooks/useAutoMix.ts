@@ -198,6 +198,103 @@ export const useAutoMix = () => {
     }
   }, [user]);
 
+  /**
+   * Soumettre un feedback like/dislike sur une session Auto-mix
+   */
+  const submitFeedback = useCallback(async (
+    playlistId: string,
+    rating: -1 | 1,
+    feedbackNotes?: string
+  ) => {
+    if (!user) return;
+
+    try {
+      const contextSnapshot = context || await fetchContext();
+
+      const { error } = await supabase
+        .from('automix_feedback')
+        .insert({
+          user_id: user.id,
+          playlist_id: playlistId,
+          rating,
+          context_snapshot: contextSnapshot,
+          feedback_notes: feedbackNotes
+        });
+
+      if (error) throw error;
+
+      // Mettre à jour le résumé de feedback
+      await updateFeedbackSummary(rating, contextSnapshot);
+
+      toast.success(rating === 1 ? '👍 Merci ! Les futures recommandations seront adaptées.' : '👎 Merci ! Nous allons améliorer les suggestions.');
+      logger.info('✅ Feedback submitted', { playlistId, rating }, 'AUTOMIX');
+
+    } catch (error) {
+      logger.error('❌ Feedback submission failed', error as Error, 'AUTOMIX');
+      toast.error('Erreur lors de l\'envoi du feedback');
+    }
+  }, [user, context, fetchContext]);
+
+  /**
+   * Mettre à jour le résumé de feedback dans les préférences utilisateur
+   */
+  const updateFeedbackSummary = async (rating: -1 | 1, contextSnapshot: any) => {
+    if (!user) return;
+
+    try {
+      const { data: prefs } = await supabase
+        .from('user_context_preferences')
+        .select('feedback_summary')
+        .eq('user_id', user.id)
+        .single();
+
+      const summary = prefs?.feedback_summary || {
+        total_likes: 0,
+        total_dislikes: 0,
+        preferred_moods: [],
+        avoided_moods: [],
+        preferred_tempos: [],
+        weather_correlations: {}
+      };
+
+      // Mise à jour progressive
+      if (rating === 1) {
+        summary.total_likes += 1;
+        if (!summary.preferred_moods.includes(contextSnapshot.recommendedMood)) {
+          summary.preferred_moods.push(contextSnapshot.recommendedMood);
+        }
+        if (!summary.preferred_tempos.includes(contextSnapshot.recommendedTempo)) {
+          summary.preferred_tempos.push(contextSnapshot.recommendedTempo);
+        }
+      } else {
+        summary.total_dislikes += 1;
+        if (!summary.avoided_moods.includes(contextSnapshot.recommendedMood)) {
+          summary.avoided_moods.push(contextSnapshot.recommendedMood);
+        }
+      }
+
+      // Corrélation météo
+      const weatherKey = contextSnapshot.weatherContext;
+      if (!summary.weather_correlations[weatherKey]) {
+        summary.weather_correlations[weatherKey] = { likes: 0, dislikes: 0 };
+      }
+      rating === 1 
+        ? summary.weather_correlations[weatherKey].likes += 1
+        : summary.weather_correlations[weatherKey].dislikes += 1;
+
+      await supabase
+        .from('user_context_preferences')
+        .upsert({
+          user_id: user.id,
+          feedback_summary: summary,
+          updated_at: new Date().toISOString()
+        });
+
+    } catch (error) {
+      logger.error('❌ Feedback summary update failed', error as Error, 'AUTOMIX');
+    }
+  };
+
   useEffect(() => {
     if (user) {
       fetchContext();
@@ -212,7 +309,8 @@ export const useAutoMix = () => {
     generateAutoMix,
     fetchContext,
     saveContextPreferences,
-    loadActivePlaylist
+    loadActivePlaylist,
+    submitFeedback
   };
 };
 

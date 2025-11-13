@@ -68,12 +68,20 @@ serve(async (req) => {
       }
     }
 
-    // Récupérer les préférences utilisateur
+    // Récupérer les préférences utilisateur et historique de feedback
     const { data: prefs } = await supabaseClient
       .from('user_context_preferences')
       .select('*')
       .eq('user_id', user.id)
       .single();
+
+    // Récupérer les 10 derniers feedbacks pour affiner les recommandations
+    const { data: recentFeedback } = await supabaseClient
+      .from('automix_feedback')
+      .select('rating, context_snapshot')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+      .limit(10);
 
     // Utiliser OpenAI pour analyser le contexte et générer des recommandations
     const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
@@ -81,6 +89,7 @@ serve(async (req) => {
       throw new Error('OPENAI_API_KEY not configured');
     }
 
+    const feedbackSummary = prefs?.feedback_summary || {};
     const contextPrompt = `Tu es un expert en musicothérapie et recommandations musicales personnalisées.
 
 Contexte actuel :
@@ -88,10 +97,28 @@ Contexte actuel :
 - Météo : ${weatherContext}, ${temperature}°C
 - Préférences utilisateur : ${prefs ? JSON.stringify(prefs, null, 2) : 'Aucune préférence définie'}
 
-Analyse ce contexte et recommande :
+Historique de feedback utilisateur (apprentissage progressif) :
+- Total likes : ${feedbackSummary.total_likes || 0}
+- Total dislikes : ${feedbackSummary.total_dislikes || 0}
+- Humeurs préférées : ${feedbackSummary.preferred_moods?.join(', ') || 'Non défini'}
+- Humeurs évitées : ${feedbackSummary.avoided_moods?.join(', ') || 'Non défini'}
+- Tempos préférés : ${feedbackSummary.preferred_tempos?.join(', ') || 'Non défini'}
+- Corrélations météo : ${JSON.stringify(feedbackSummary.weather_correlations || {})}
+
+Feedbacks récents (contexte détaillé) :
+${recentFeedback?.map(f => `- ${f.rating === 1 ? '👍' : '👎'} ${JSON.stringify(f.context_snapshot)}`).join('\n') || 'Aucun feedback'}
+
+INSTRUCTIONS CRITIQUES :
+1. Utilise IMPÉRATIVEMENT l'historique de feedback pour affiner ta recommandation
+2. Évite les humeurs et tempos qui ont reçu des dislikes
+3. Favorise les combinaisons qui ont reçu des likes
+4. Prends en compte les corrélations météo apprises
+5. Adapte-toi progressivement aux préférences uniques de l'utilisateur
+
+Recommande :
 1. L'émotion/mood musicale idéale (calm, energetic, joyful, melancholic, relaxing, focused, creative, healing)
 2. Le tempo optimal (BPM entre 60-140)
-3. Une brève explication de ton choix (1 phrase)
+3. Une brève explication de ton choix basée sur l'apprentissage (1 phrase)
 
 Réponds en JSON avec cette structure exacte :
 {
