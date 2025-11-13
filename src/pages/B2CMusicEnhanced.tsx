@@ -41,6 +41,8 @@ import { VoiceCoach } from '@/components/coach/VoiceCoach';
 import VoiceCommands from '@/components/voice/VoiceCommands';
 import { MLRecommendationsPanel } from '@/components/ml/MLRecommendationsPanel';
 import MusicGamificationPanel from '@/components/gamification/MusicGamificationPanel';
+import { QuestsPanel } from '@/components/gamification/QuestsPanel';
+import { LeaderboardPanel } from '@/components/gamification/LeaderboardPanel';
 import type { MusicTrack } from '@/types/music';
 import { logger } from '@/lib/logger';
 import { useMusicJourney } from '@/hooks/useMusicJourney';
@@ -349,8 +351,14 @@ const B2CMusicEnhanced: React.FC = () => {
             </div>
 
             {/* Gamification Panel */}
-            <div className="max-w-4xl mx-auto mt-8">
+            <div className="max-w-4xl mx-auto mt-8 space-y-6">
               <MusicGamificationPanel />
+              
+              {/* Quêtes quotidiennes et hebdomadaires */}
+              <QuestsPanel />
+              
+              {/* Leaderboard social */}
+              <LeaderboardPanel />
             </div>
 
             {/* Journey Section */}
