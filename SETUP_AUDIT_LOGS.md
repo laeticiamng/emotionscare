@@ -63,7 +63,12 @@ DELETE FROM user_roles WHERE user_id='xxx' AND role='premium';
 
 **Fonctionnalités** :
 - Affichage de tous les logs d'audit
-- Filtrage par action (ajouté, retiré, modifié)
+- **Filtres avancés** :
+  - Recherche par email utilisateur
+  - Filtrage par action (ajouté, retiré, modifié)
+  - Sélection de période (date de début et date de fin)
+  - Bouton "Réinitialiser les filtres"
+- **Export CSV** avec filtres appliqués
 - Pagination (50 résultats par page)
 - Actualisation en temps réel (toutes les 30s)
 - Affichage de l'email de l'utilisateur et de l'administrateur
@@ -76,7 +81,31 @@ DELETE FROM user_roles WHERE user_id='xxx' AND role='premium';
 - Détails (ancien → nouveau)
 - Changé par (email ou "Système")
 
-### 2.3 Fonctions SQL disponibles
+### 2.3 Export CSV
+
+**Bouton** : "Exporter CSV" en haut à droite
+
+**Format du CSV** :
+```csv
+Date,Email Utilisateur,Action,Rôle,Ancien Rôle,Nouveau Rôle,Modifié Par
+2025-01-13 14:30:00,user@example.com,add,premium,-,-,admin@example.com
+2025-01-13 15:45:00,user2@example.com,remove,premium,-,-,Système
+```
+
+**Fonctionnalités** :
+- Respect des filtres actifs (date, action, email)
+- Encodage UTF-8 avec BOM (compatible Excel)
+- Nom de fichier automatique : `audit-logs_2025-01-13_14-30-00.csv`
+- Toast de confirmation avec nombre de logs exportés
+- Limitation à 10 000 logs maximum
+
+**Utilisation** :
+1. Appliquer les filtres souhaités
+2. Cliquer sur "Exporter CSV"
+3. Le fichier se télécharge automatiquement
+4. Ouvrir avec Excel, Numbers ou LibreOffice
+
+### 2.4 Fonctions SQL disponibles
 
 #### `get_user_role_audit_history(_user_id, _limit)`
 
@@ -104,7 +133,53 @@ SELECT * FROM get_all_role_audit_logs(100, 0);
 
 ---
 
-## 3. Sécurité RLS
+## 3. Cas d'usage pratiques
+
+### 3.1 Audit de conformité RGPD
+
+**Scénario** : Prouver qui a accédé aux données d'un utilisateur spécifique
+
+1. Aller sur `/admin/user-roles` → Onglet "Historique d'audit"
+2. Saisir l'email de l'utilisateur dans la recherche
+3. Sélectionner la période (ex: dernier trimestre)
+4. Cliquer sur "Exporter CSV"
+5. Fournir le rapport aux autorités
+
+### 3.2 Détection d'activités suspectes
+
+**Scénario** : Identifier les suppressions massives de rôles
+
+1. Filtrer par action : "Retiré"
+2. Sélectionner période : dernières 24h
+3. Vérifier si un admin a retiré plus de 10 rôles
+4. Si suspect → exporter CSV et investiguer
+
+### 3.3 Rapport mensuel pour la direction
+
+**Scénario** : Statistiques des changements de rôles du mois
+
+1. Sélectionner date de début : 1er du mois
+2. Sélectionner date de fin : dernier jour du mois
+3. Exporter CSV
+4. Analyser dans Excel :
+   - Nombre de rôles premium ajoutés
+   - Nombre de rôles retirés
+   - Admins les plus actifs
+
+### 3.4 Vérification de la conformité Stripe
+
+**Scénario** : S'assurer que les webhooks Stripe fonctionnent
+
+1. Rechercher par email d'un utilisateur qui a payé
+2. Vérifier présence d'une ligne :
+   - Action : "Ajouté"
+   - Rôle : "premium"
+   - Modifié par : "Système"
+3. Vérifier la date correspond au paiement
+
+---
+
+## 4. Sécurité RLS
 
 ### Politiques activées
 
@@ -137,7 +212,64 @@ SELECT * FROM get_all_role_audit_logs(100, 0);
 
 ---
 
-## 4. Cas d'usage
+---
+
+## 5. API d'export programmatique
+
+### Service `roleAuditExportService.ts`
+
+#### `fetchAuditLogsWithFilters(filters, limit)`
+
+Récupère les logs avec filtres :
+
+```typescript
+import { fetchAuditLogsWithFilters } from '@/services/roleAuditExportService';
+
+const logs = await fetchAuditLogsWithFilters({
+  startDate: new Date('2025-01-01'),
+  endDate: new Date('2025-01-31'),
+  action: 'add',
+  userEmail: 'user@example.com'
+}, 1000);
+```
+
+#### `exportAuditLogsToCSV(filters)`
+
+Exporte directement en CSV :
+
+```typescript
+import { exportAuditLogsToCSV } from '@/services/roleAuditExportService';
+
+await exportAuditLogsToCSV({
+  startDate: new Date('2025-01-01'),
+  action: 'remove'
+});
+// Télécharge automatiquement le CSV
+```
+
+#### `getAuditLogsStats(filters)`
+
+Récupère les statistiques :
+
+```typescript
+import { getAuditLogsStats } from '@/services/roleAuditExportService';
+
+const stats = await getAuditLogsStats({
+  startDate: new Date('2025-01-01')
+});
+
+console.log(stats);
+// {
+//   total: 150,
+//   byAction: { add: 100, remove: 50 },
+//   byRole: { premium: 120, moderator: 30 },
+//   dateRange: { start: '2025-01-01', end: '2025-01-31' }
+// }
+```
+
+---
+
+## 6. Cas d'usage SQL
 
 ### 4.1 Suivre qui a donné le rôle premium
 
@@ -216,7 +348,9 @@ routes.b2b.admin.userRoles() // → /admin/user-roles
 
 ---
 
-## 6. Métriques et analyses
+---
+
+## 7. Métriques et analyses
 
 ### Requêtes utiles
 
@@ -259,7 +393,9 @@ ORDER BY count DESC;
 
 ---
 
-## 7. Performance
+---
+
+## 8. Performance
 
 ### Index créés
 
@@ -285,7 +421,9 @@ CREATE INDEX idx_role_audit_logs_action ON role_audit_logs(action);
 
 ---
 
-## 8. Maintenance
+---
+
+## 9. Maintenance
 
 ### Purge des anciens logs (optionnel)
 
@@ -300,13 +438,21 @@ WHERE changed_at < NOW() - INTERVAL '1 year';
 ### Export CSV (via l'interface)
 
 L'interface admin permet d'exporter l'historique d'audit en CSV :
-- Bouton "Exporter" en haut à droite
-- Filtrage par période possible
-- Format : `user_email,action,role,changed_by,changed_at`
+- **Bouton "Exporter CSV"** en haut à droite de l'onglet "Historique d'audit"
+- **Filtrage avancé** : période, action, email utilisateur
+- **Format standardisé** : Compatible Excel, Numbers, LibreOffice
+- **Encodage UTF-8** avec BOM pour compatibilité maximale
+- **Limite** : 10 000 logs par export
+
+**Workflow recommandé pour audit de conformité** :
+1. Sélectionner la période concernée (ex: dernier trimestre)
+2. Appliquer les filtres pertinents (ex: action = "remove")
+3. Exporter en CSV
+4. Analyser dans Excel avec tableaux croisés dynamiques
 
 ---
 
-## 9. Webhooks Stripe et Audit
+## 10. Webhooks Stripe et Audit
 
 Les changements effectués automatiquement par le webhook Stripe (`stripe-webhook`) sont également enregistrés :
 
@@ -327,11 +473,13 @@ role_audit_logs (changed_by = NULL → "Système")
 ## Résumé
 
 ✅ **Enregistrement automatique** de tous les changements de rôles  
-✅ **Interface admin complète** avec onglet dédié  
+✅ **Interface admin complète** avec onglet dédié et filtres avancés  
+✅ **Export CSV** avec sélection de période et filtres multiples  
 ✅ **Sécurité RLS** stricte (users voient leurs logs, admins voient tout)  
 ✅ **Fonctions SQL** pour analyses avancées  
 ✅ **Navigation améliorée** avec liens Shield dans les menus admin  
 ✅ **Performance optimisée** avec index appropriés  
 ✅ **Intégration Stripe** automatique via webhooks  
+✅ **Conformité RGPD** : traçabilité complète pour audits  
 
-Le système d'audit est maintenant opérationnel et accessible à `/admin/user-roles` (onglet "Historique d'audit").
+Le système d'audit est maintenant opérationnel et accessible à `/admin/user-roles` (onglet "Historique d'audit") avec export CSV complet.
