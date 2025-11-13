@@ -1147,6 +1147,15 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     aliases: ['/audit'],
   },
   {
+    name: 'admin-music-analytics',
+    path: '/app/admin/music-analytics',
+    segment: 'manager',
+    role: 'manager',
+    layout: 'app',
+    component: 'MusicAnalyticsDashboard',
+    guard: true,
+  },
+  {
     name: 'admin-accessibility',
     path: '/app/accessibility',
     segment: 'manager',

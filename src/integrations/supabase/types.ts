@@ -8803,6 +8803,111 @@ export type Database = {
           },
         ]
       }
+      music_journey_tracks: {
+        Row: {
+          created_at: string
+          emotion_after: string | null
+          emotion_level: string
+          id: string
+          is_completed: boolean | null
+          journey_id: string
+          played_at: string | null
+          step_number: number
+          track_id: string | null
+          user_rating: number | null
+        }
+        Insert: {
+          created_at?: string
+          emotion_after?: string | null
+          emotion_level: string
+          id?: string
+          is_completed?: boolean | null
+          journey_id: string
+          played_at?: string | null
+          step_number: number
+          track_id?: string | null
+          user_rating?: number | null
+        }
+        Update: {
+          created_at?: string
+          emotion_after?: string | null
+          emotion_level?: string
+          id?: string
+          is_completed?: boolean | null
+          journey_id?: string
+          played_at?: string | null
+          step_number?: number
+          track_id?: string | null
+          user_rating?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "music_journey_tracks_journey_id_fkey"
+            columns: ["journey_id"]
+            isOneToOne: false
+            referencedRelation: "music_journeys"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "music_journey_tracks_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "generated_music_tracks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      music_journeys: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          current_step: number
+          description: string | null
+          emotion_start: string
+          emotion_target: string
+          id: string
+          progress_percentage: number | null
+          started_at: string
+          status: string
+          title: string
+          total_steps: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          current_step?: number
+          description?: string | null
+          emotion_start: string
+          emotion_target: string
+          id?: string
+          progress_percentage?: number | null
+          started_at?: string
+          status?: string
+          title: string
+          total_steps?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          current_step?: number
+          description?: string | null
+          emotion_start?: string
+          emotion_target?: string
+          id?: string
+          progress_percentage?: number | null
+          started_at?: string
+          status?: string
+          title?: string
+          total_steps?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       music_play_logs: {
         Row: {
           emotion_context: string | null
