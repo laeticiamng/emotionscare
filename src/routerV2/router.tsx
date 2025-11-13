@@ -106,6 +106,7 @@ const B2BAccessibilityPage = lazy(() => import('@/pages/B2BAccessibilityPage'));
 // GDPR & Compliance pages
 const UnifiedGDPRDashboard = lazy(() => import('@/pages/admin/UnifiedGDPRDashboard'));
 const APIMonitoringDashboard = lazy(() => import('@/pages/admin/APIMonitoringDashboard'));
+const AIMonitoringDashboard = lazy(() => import('@/pages/admin/AIMonitoringDashboard'));
 const GamificationCronMonitoring = lazy(() => import('@/pages/admin/GamificationCronMonitoring'));
 const MusicQueueAdminPage = lazy(() => import('@/pages/admin/MusicQueueAdminPage'));
 const MusicQueueMetricsPage = lazy(() => import('@/pages/admin/MusicQueueMetricsPage'));
@@ -490,6 +491,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   // GDPR & Compliance
   UnifiedGDPRDashboard,
   APIMonitoringDashboard,
+  AIMonitoringDashboard,
   GamificationCronMonitoring,
   MusicQueueAdminPage,
   MusicQueueMetricsPage,

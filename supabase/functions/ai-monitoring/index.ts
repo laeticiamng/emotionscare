@@ -1,5 +1,6 @@
 // @ts-ignore
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -154,32 +155,87 @@ Réponds UNIQUEMENT en JSON valide, sans markdown.`;
   }
 }
 
-async function storeMonitoringEvent(event: MonitoringEvent, analysis: AIAnalysis) {
-  // Store in a monitoring table for tracking
-  console.log("📊 Monitoring Event:", {
-    type: event.type,
-    severity: event.severity,
-    message: event.message,
-    analysis: analysis.analysis,
-    suggestedFix: analysis.suggestedFix,
-    needsAlert: analysis.needsAlert
-  });
-  
-  // TODO: Store in database for historical analysis
-  // await supabase.from('monitoring_events').insert({ event, analysis });
+async function storeMonitoringEvent(event: MonitoringEvent, analysis: AIAnalysis): Promise<string | null> {
+  try {
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    const { data, error } = await supabase
+      .from('ai_monitoring_errors')
+      .insert({
+        error_type: event.type,
+        severity: event.severity,
+        message: event.message,
+        stack: event.stack,
+        url: event.url,
+        user_agent: event.userAgent,
+        context: event.context || {},
+        user_id: event.userId,
+        ai_analysis: analysis,
+        is_known_issue: analysis.isKnownIssue,
+        priority: analysis.priority,
+        category: analysis.category,
+        needs_alert: analysis.needsAlert,
+      })
+      .select('id')
+      .single();
+
+    if (error) {
+      console.error("Failed to store monitoring event:", error);
+      return null;
+    }
+
+    console.log("✅ Monitoring event stored:", data.id);
+    return data.id;
+  } catch (error) {
+    console.error("Error storing monitoring event:", error);
+    return null;
+  }
 }
 
-async function sendAlertIfNeeded(event: MonitoringEvent, analysis: AIAnalysis) {
+async function sendAlertIfNeeded(
+  event: MonitoringEvent, 
+  analysis: AIAnalysis, 
+  errorId: string
+) {
   if (!analysis.needsAlert) return;
 
-  console.warn("🚨 ALERT NEEDED:", {
-    severity: event.severity,
-    priority: analysis.priority,
-    message: event.message,
-    suggestedFix: analysis.suggestedFix
-  });
+  try {
+    const adminEmail = Deno.env.get('ADMIN_EMAIL') || 'admin@emotionscare.com';
+    
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-  // TODO: Implement alert system (email, webhook, etc.)
+    console.log("🚨 Sending critical error alert to:", adminEmail);
+
+    // Call send-error-alert edge function
+    const { data, error } = await supabase.functions.invoke('send-error-alert', {
+      body: {
+        errorMessage: event.message,
+        severity: event.severity,
+        priority: analysis.priority,
+        category: analysis.category,
+        analysis: analysis.analysis,
+        suggestedFix: analysis.suggestedFix,
+        autoFixCode: analysis.autoFixCode,
+        preventionTips: analysis.preventionTips,
+        url: event.url,
+        timestamp: event.timestamp,
+        errorId: errorId,
+        recipientEmail: adminEmail,
+      },
+    });
+
+    if (error) {
+      console.error("Failed to send alert:", error);
+    } else {
+      console.log("✅ Alert email sent:", data);
+    }
+  } catch (error) {
+    console.error("Error sending alert:", error);
+  }
 }
 
 serve(async (req: Request) => {
@@ -195,11 +251,13 @@ serve(async (req: Request) => {
     // Analyze with AI
     const analysis = await analyzeWithOpenAI(event);
 
-    // Store event
-    await storeMonitoringEvent(event, analysis);
+    // Store event in database
+    const errorId = await storeMonitoringEvent(event, analysis);
 
-    // Send alert if critical
-    await sendAlertIfNeeded(event, analysis);
+    // Send alert if needed
+    if (errorId && analysis.needsAlert) {
+      await sendAlertIfNeeded(event, analysis, errorId);
+    }
 
     return new Response(
       JSON.stringify({
