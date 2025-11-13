@@ -1,10 +1,11 @@
 // @ts-nocheck
 /**
- * AutoMix Context - Récupération du contexte utilisateur
- * Météo, heure, localisation pour générer playlist adaptée
+ * AutoMix Context - Analyse contextuelle intelligente via OpenAI
+ * Météo, heure, localisation pour générer recommandations musicales
  */
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.43.4";
 
 const corsHeaders = {
@@ -74,36 +75,75 @@ serve(async (req) => {
       .eq('user_id', user.id)
       .single();
 
-    // Déterminer l'émotion recommandée basée sur le contexte
-    let recommendedMood = 'calm';
-    let recommendedTempo = 90;
+    // Utiliser OpenAI pour analyser le contexte et générer des recommandations
+    const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
+    if (!OPENAI_API_KEY) {
+      throw new Error('OPENAI_API_KEY not configured');
+    }
 
-    if (prefs) {
-      if (timeContext === 'morning') {
-        recommendedMood = prefs.morning_mood || 'energetic';
-        recommendedTempo = prefs.preferred_tempo_morning || 120;
-      } else if (timeContext === 'afternoon') {
-        recommendedMood = prefs.afternoon_mood || 'calm';
-        recommendedTempo = prefs.preferred_tempo_afternoon || 90;
-      } else {
-        recommendedMood = prefs.evening_mood || 'relaxing';
-        recommendedTempo = prefs.preferred_tempo_evening || 70;
-      }
+    const contextPrompt = `Tu es un expert en musicothérapie et recommandations musicales personnalisées.
 
-      // Ajuster selon la météo si activé
-      if (prefs.weather_sensitivity) {
-        if (weatherContext === 'rainy') recommendedMood = 'melancholic';
-        else if (weatherContext === 'sunny' && temperature > 25) recommendedMood = 'energetic';
-        else if (weatherContext === 'stormy') recommendedMood = 'intense';
-      }
+Contexte actuel :
+- Heure : ${hour}h (${timeContext})
+- Météo : ${weatherContext}, ${temperature}°C
+- Préférences utilisateur : ${prefs ? JSON.stringify(prefs, null, 2) : 'Aucune préférence définie'}
+
+Analyse ce contexte et recommande :
+1. L'émotion/mood musicale idéale (calm, energetic, joyful, melancholic, relaxing, focused, creative, healing)
+2. Le tempo optimal (BPM entre 60-140)
+3. Une brève explication de ton choix (1 phrase)
+
+Réponds en JSON avec cette structure exacte :
+{
+  "recommendedMood": "...",
+  "recommendedTempo": 90,
+  "reasoning": "..."
+}`;
+
+    const aiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${OPENAI_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-5-mini-2025-08-07',
+        messages: [
+          { role: 'system', content: 'Tu es un assistant expert en musicothérapie. Réponds uniquement en JSON valide.' },
+          { role: 'user', content: contextPrompt }
+        ],
+        max_completion_tokens: 200,
+      }),
+    });
+
+    if (!aiResponse.ok) {
+      throw new Error(`OpenAI API error: ${aiResponse.status}`);
+    }
+
+    const aiData = await aiResponse.json();
+    const aiContent = aiData.choices[0].message.content;
+    
+    // Parser la réponse JSON
+    let aiRecommendation;
+    try {
+      aiRecommendation = JSON.parse(aiContent);
+    } catch (e) {
+      console.error('Failed to parse AI response:', aiContent);
+      // Fallback en cas d'échec
+      aiRecommendation = {
+        recommendedMood: 'calm',
+        recommendedTempo: 90,
+        reasoning: 'Recommandation par défaut'
+      };
     }
 
     return new Response(JSON.stringify({
       timeContext,
       weatherContext,
       temperature,
-      recommendedMood,
-      recommendedTempo,
+      recommendedMood: aiRecommendation.recommendedMood,
+      recommendedTempo: aiRecommendation.recommendedTempo,
+      reasoning: aiRecommendation.reasoning,
       hour,
       contextDescription: `${timeContext} • ${weatherContext} • ${temperature}°C`
     }), {
