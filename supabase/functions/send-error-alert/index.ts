@@ -1,4 +1,4 @@
-// @ts-ignore
+// @ts-nocheck
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import React from 'npm:react@18.3.1';
 import { Resend } from 'npm:resend@4.0.0';
