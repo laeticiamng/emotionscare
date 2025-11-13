@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Table,
   TableBody,
@@ -31,9 +32,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Search, Crown, Shield, User, Trash2, Plus } from 'lucide-react';
+import { Search, Crown, Shield, User, Trash2, Plus, History } from 'lucide-react';
 import { AppRole, getRoleLabel, getRoleColor } from '@/services/userRolesService';
 import { logger } from '@/lib/logger';
+import { RoleAuditLogsViewer } from './RoleAuditLogsViewer';
 
 interface UserWithRoles {
   id: string;
@@ -221,7 +223,7 @@ export const UserRolesManager = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <Tabs defaultValue="users" className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -231,6 +233,21 @@ export const UserRolesManager = () => {
           </p>
         </div>
       </div>
+
+      {/* Tabs Navigation */}
+      <TabsList>
+        <TabsTrigger value="users" className="flex items-center gap-2">
+          <User className="h-4 w-4" />
+          Utilisateurs
+        </TabsTrigger>
+        <TabsTrigger value="audit" className="flex items-center gap-2">
+          <History className="h-4 w-4" />
+          Historique d'audit
+        </TabsTrigger>
+      </TabsList>
+
+      {/* Tab: Users Management */}
+      <TabsContent value="users" className="space-y-6">
 
       {/* Recherche et actions en masse */}
       <div className="flex flex-col sm:flex-row gap-4">
@@ -421,6 +438,12 @@ export const UserRolesManager = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
+      </TabsContent>
+
+      {/* Tab: Audit History */}
+      <TabsContent value="audit">
+        <RoleAuditLogsViewer />
+      </TabsContent>
+    </Tabs>
   );
 };

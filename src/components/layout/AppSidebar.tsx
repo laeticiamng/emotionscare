@@ -74,6 +74,12 @@ const settingsModules = [
   { title: 'Profil', url: routes.b2c.profile(), icon: FileText },
 ];
 
+const adminModules = [
+  { title: 'Gestion des Rôles', url: routes.b2b.admin.userRoles(), icon: Shield },
+  { title: 'Queue Musicale', url: routes.b2b.admin.musicQueue(), icon: Music },
+  { title: 'Métriques Musique', url: routes.b2b.admin.musicMetrics(), icon: BarChart3 },
+];
+
 export function AppSidebar() {
   const { state, open, setOpenMobile, isMobile } = useSidebar();
   const location = useLocation();
@@ -251,6 +257,33 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        {/* Admin Tools (conditionally rendered) */}
+        {currentPath.includes('/admin') && (
+          <SidebarGroup>
+            <SidebarGroupLabel className={collapsed ? 'px-2' : ''}>
+              {!collapsed && 'Administration'}
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {adminModules.map((item) => (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild>
+                      <NavLink
+                        to={item.url}
+                        className={({ isActive }) => getNavCls(isActive)}
+                        onClick={handleLinkClick}
+                      >
+                        <item.icon className={collapsed ? 'h-5 w-5' : 'mr-3 h-5 w-5'} />
+                        {!collapsed && <span>{item.title}</span>}
+                      </NavLink>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
       </SidebarContent>
     </Sidebar>
   );
