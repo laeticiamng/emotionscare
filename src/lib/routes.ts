@@ -186,6 +186,7 @@ export const b2bRoutes = {
     gdprDashboard: () => resolveRoutePath('admin-gdpr'),
     cronMonitoring: () => resolveRoutePath('gdpr-cron-monitoring'),
     blockchainBackups: () => resolveRoutePath('gdpr-blockchain-backups'),
+    musicQueue: () => resolveRoutePath('admin-music-queue'),
   },
 } as const;
 

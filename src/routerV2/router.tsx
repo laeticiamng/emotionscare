@@ -107,6 +107,7 @@ const B2BAccessibilityPage = lazy(() => import('@/pages/B2BAccessibilityPage'));
 const UnifiedGDPRDashboard = lazy(() => import('@/pages/admin/UnifiedGDPRDashboard'));
 const APIMonitoringDashboard = lazy(() => import('@/pages/admin/APIMonitoringDashboard'));
 const GamificationCronMonitoring = lazy(() => import('@/pages/admin/GamificationCronMonitoring'));
+const MusicQueueAdminPage = lazy(() => import('@/pages/admin/MusicQueueAdminPage'));
 const ChallengesHistory = lazy(() => import('@/pages/app/ChallengesHistory'));
 const CreateCustomChallenge = lazy(() => import('@/pages/admin/CreateCustomChallenge'));
 const EditCustomChallenge = lazy(() => import('@/pages/admin/EditCustomChallenge'));
@@ -486,6 +487,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   UnifiedGDPRDashboard,
   APIMonitoringDashboard,
   GamificationCronMonitoring,
+  MusicQueueAdminPage,
   ChallengesHistory,
   CreateCustomChallenge,
   EditCustomChallenge,

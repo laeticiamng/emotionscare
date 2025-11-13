@@ -1196,6 +1196,16 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     requireAuth: true,
   },
   {
+    name: 'admin-music-queue',
+    path: '/admin/music-queue',
+    segment: 'manager',
+    role: 'manager',
+    layout: 'app',
+    component: 'MusicQueueAdminPage',
+    guard: true,
+    requireAuth: true,
+  },
+  {
     name: 'challenges-history',
     path: '/app/challenges/history',
     segment: 'consumer',
