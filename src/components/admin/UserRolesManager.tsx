@@ -36,6 +36,7 @@ import { Search, Crown, Shield, User, Trash2, Plus, History } from 'lucide-react
 import { AppRole, getRoleLabel, getRoleColor } from '@/services/userRolesService';
 import { logger } from '@/lib/logger';
 import { RoleAuditLogsViewer } from './RoleAuditLogsViewer';
+import { AuditStatsDashboard } from './AuditStatsDashboard';
 
 interface UserWithRoles {
   id: string;
@@ -244,6 +245,10 @@ export const UserRolesManager = () => {
           <History className="h-4 w-4" />
           Historique d'audit
         </TabsTrigger>
+        <TabsTrigger value="stats" className="flex items-center gap-2">
+          <Shield className="h-4 w-4" />
+          Statistiques
+        </TabsTrigger>
       </TabsList>
 
       {/* Tab: Users Management */}
@@ -443,6 +448,11 @@ export const UserRolesManager = () => {
       {/* Tab: Audit History */}
       <TabsContent value="audit">
         <RoleAuditLogsViewer />
+      </TabsContent>
+
+      {/* Tab: Statistics */}
+      <TabsContent value="stats">
+        <AuditStatsDashboard />
       </TabsContent>
     </Tabs>
   );
