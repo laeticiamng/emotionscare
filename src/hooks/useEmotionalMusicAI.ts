@@ -81,9 +81,22 @@ export const useEmotionalMusicAI = () => {
       setEmotionAnalysis(data);
       return data;
 
-    } catch (error) {
+    } catch (error: any) {
       logger.error('❌ Emotion analysis failed', error as Error, 'MUSIC');
-      toast.error('Erreur lors de l\'analyse émotionnelle');
+      
+      // Gestion des erreurs spécifiques
+      const errorMessage = error?.message || error?.error || 'Erreur lors de l\'analyse émotionnelle';
+      
+      if (errorMessage.includes('temporairement indisponible') || errorMessage.includes('503')) {
+        toast.error('Service temporairement indisponible', {
+          description: 'Le service d\'analyse est en cours de maintenance. Réessayez dans quelques instants.'
+        });
+      } else {
+        toast.error('Erreur lors de l\'analyse émotionnelle', {
+          description: 'Une erreur s\'est produite lors de l\'analyse de vos émotions.'
+        });
+      }
+      
       return null;
     } finally {
       setIsAnalyzing(false);
@@ -130,9 +143,27 @@ export const useEmotionalMusicAI = () => {
 
       return data;
 
-    } catch (error) {
+    } catch (error: any) {
       logger.error('❌ Music generation failed', error as Error, 'MUSIC');
-      toast.error('Erreur lors de la génération');
+      
+      // Gestion des erreurs spécifiques
+      const errorMessage = error?.message || error?.error || '';
+      
+      if (errorMessage.includes('temporairement indisponible') || errorMessage.includes('503')) {
+        toast.error('Service temporairement indisponible', {
+          description: 'Le service de génération musicale est en maintenance. Réessayez dans quelques instants.',
+          duration: 5000
+        });
+      } else if (errorMessage.includes('authentification') || errorMessage.includes('401')) {
+        toast.error('Erreur d\'authentification', {
+          description: 'Veuillez vous reconnecter pour générer de la musique.'
+        });
+      } else {
+        toast.error('Erreur lors de la génération', {
+          description: 'Une erreur s\'est produite. Veuillez réessayer.'
+        });
+      }
+      
       return null;
     } finally {
       setIsGenerating(false);
@@ -168,8 +199,17 @@ export const useEmotionalMusicAI = () => {
 
       return data;
 
-    } catch (error) {
+    } catch (error: any) {
       logger.error('❌ Status check failed', error as Error, 'MUSIC');
+      
+      const errorMessage = error?.message || error?.error || '';
+      
+      // Ne pas afficher de toast pour les erreurs de status check (polling silencieux)
+      // mais logger pour le debug
+      if (errorMessage.includes('temporairement indisponible') || errorMessage.includes('503')) {
+        logger.warn('Service temporairement indisponible lors du check status', {}, 'MUSIC');
+      }
+      
       return null;
     }
   }, []);
