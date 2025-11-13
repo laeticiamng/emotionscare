@@ -37,6 +37,7 @@ import { FocusFlowPlayer } from '@/components/music/FocusFlowPlayer';
 import { CollaborativeSessionLobby } from '@/components/focus/CollaborativeSessionLobby';
 import { FocusAnalyticsDashboard } from '@/components/analytics/FocusAnalyticsDashboard';
 import { PushNotificationSetup } from '@/components/notifications/PushNotificationSetup';
+import { VoiceCoach } from '@/components/coach/VoiceCoach';
 import type { MusicTrack } from '@/types/music';
 import { logger } from '@/lib/logger';
 import { useMusicJourney } from '@/hooks/useMusicJourney';
@@ -180,6 +181,8 @@ const B2CMusicEnhanced: React.FC = () => {
       return [];
     }
   });
+  const [voiceCoachEnabled, setVoiceCoachEnabled] = useState(true);
+  const [sessionState, setSessionState] = useState<'idle' | 'active' | 'break' | 'completed'>('idle');
 
   const universe = getOptimizedUniverse('music');
   const { entranceVariants, cleanupAnimation } = useOptimizedAnimation({
@@ -705,6 +708,12 @@ const B2CMusicEnhanced: React.FC = () => {
           </div>
         )}
       </div>
+
+      <VoiceCoach
+        sessionState={sessionState}
+        enabled={voiceCoachEnabled}
+        onToggle={setVoiceCoachEnabled}
+      />
     </TooltipProvider>
     </div>
   );
