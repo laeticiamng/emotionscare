@@ -23,6 +23,8 @@ import { getStatsByRole, getMonthToMonthComparison, type AdvancedFilters } from 
 import { AdvancedAuditFilters } from './AdvancedAuditFilters';
 import { MonthComparisonChart } from './MonthComparisonChart';
 import { AlertSettingsManager } from './AlertSettingsManager';
+import { AuditReportExporter } from './AuditReportExporter';
+import { SecurityAlertsPanel } from './SecurityAlertsPanel';
 import { useState } from 'react';
 
 ChartJS.register(
