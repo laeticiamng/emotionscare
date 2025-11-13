@@ -109,6 +109,7 @@ const APIMonitoringDashboard = lazy(() => import('@/pages/admin/APIMonitoringDas
 const GamificationCronMonitoring = lazy(() => import('@/pages/admin/GamificationCronMonitoring'));
 const MusicQueueAdminPage = lazy(() => import('@/pages/admin/MusicQueueAdminPage'));
 const MusicQueueMetricsPage = lazy(() => import('@/pages/admin/MusicQueueMetricsPage'));
+const UserRolesPage = lazy(() => import('@/pages/admin/UserRolesPage'));
 const ChallengesHistory = lazy(() => import('@/pages/app/ChallengesHistory'));
 const CreateCustomChallenge = lazy(() => import('@/pages/admin/CreateCustomChallenge'));
 const EditCustomChallenge = lazy(() => import('@/pages/admin/EditCustomChallenge'));
@@ -490,6 +491,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   GamificationCronMonitoring,
   MusicQueueAdminPage,
   MusicQueueMetricsPage,
+  UserRolesPage,
   ChallengesHistory,
   CreateCustomChallenge,
   EditCustomChallenge,

@@ -3,14 +3,14 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { logger } from '@/lib/logger';
+import { AppRole, getUserHighestRole, hasRole, isPremiumOrHigher } from '@/services/userRolesService';
 
-export type AppRole = 'b2c_user' | 'b2b_employee' | 'b2b_rh' | 'admin';
+export type { AppRole } from '@/services/userRolesService';
 
 export interface UserRoleData {
   id: string;
   user_id: string;
   role: AppRole;
-  organization_id?: string;
   created_at: string;
 }
 
@@ -18,6 +18,7 @@ export const useUserRole = () => {
   const { user, isAuthenticated } = useAuth();
   const [roles, setRoles] = useState<UserRoleData[]>([]);
   const [primaryRole, setPrimaryRole] = useState<AppRole | null>(null);
+  const [isPremium, setIsPremium] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
@@ -25,6 +26,7 @@ export const useUserRole = () => {
     if (!isAuthenticated || !user) {
       setRoles([]);
       setPrimaryRole(null);
+      setIsPremium(false);
       setLoading(false);
       return;
     }
@@ -32,6 +34,8 @@ export const useUserRole = () => {
     const fetchRoles = async () => {
       try {
         setLoading(true);
+        
+        // Récupérer les rôles
         const { data, error: fetchError } = await supabase
           .from('user_roles')
           .select('*')
@@ -42,20 +46,14 @@ export const useUserRole = () => {
         const userRoles = (data || []) as UserRoleData[];
         setRoles(userRoles);
 
-        // Définir le rôle principal (priorité: admin > b2b_rh > b2b_employee > b2c_user)
-        const rolePriority: Record<AppRole, number> = {
-          admin: 4,
-          b2b_rh: 3,
-          b2b_employee: 2,
-          b2c_user: 1,
-        };
+        // Récupérer le rôle le plus élevé via le service
+        const highest = await getUserHighestRole(user.id);
+        setPrimaryRole(highest);
 
-        const primary = userRoles.reduce<UserRoleData | null>((acc, curr) => {
-          if (!acc) return curr;
-          return rolePriority[curr.role] > rolePriority[acc.role] ? curr : acc;
-        }, null);
+        // Vérifier si premium ou plus
+        const premium = await isPremiumOrHigher(user.id);
+        setIsPremium(premium);
 
-        setPrimaryRole(primary?.role || null);
         setError(null);
       } catch (err) {
         logger.error('Error fetching user roles', err as Error, 'AUTH');
@@ -68,35 +66,32 @@ export const useUserRole = () => {
     fetchRoles();
   }, [isAuthenticated, user]);
 
-  const hasRole = (role: AppRole): boolean => {
-    return roles.some((r) => r.role === role);
-  };
-
-  const isB2C = (): boolean => {
-    return hasRole('b2c_user');
-  };
-
-  const isB2B = (): boolean => {
-    return hasRole('b2b_employee') || hasRole('b2b_rh');
+  const checkRole = async (role: AppRole): Promise<boolean> => {
+    if (!user) return false;
+    return hasRole(role, user.id);
   };
 
   const isAdmin = (): boolean => {
-    return hasRole('admin');
+    return primaryRole === 'admin';
   };
 
-  const isRH = (): boolean => {
-    return hasRole('b2b_rh');
+  const isModerator = (): boolean => {
+    return primaryRole === 'moderator' || primaryRole === 'admin';
+  };
+
+  const isPremiumUser = (): boolean => {
+    return isPremium;
   };
 
   return {
     roles,
     primaryRole,
+    isPremium,
     loading,
     error,
-    hasRole,
-    isB2C,
-    isB2B,
+    hasRole: checkRole,
     isAdmin,
-    isRH,
+    isModerator,
+    isPremiumUser,
   };
 };
