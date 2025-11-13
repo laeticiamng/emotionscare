@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { useCallback } from 'react';
-import * as Sentry from '@sentry/react';
+import { captureException } from '@/lib/ai-monitoring';
 
 import { MOOD_UPDATED, publishMoodUpdated, type MoodEventDetail } from './mood-bus';
 

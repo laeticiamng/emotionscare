@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import * as Sentry from '@sentry/react';
+import { captureException } from '@/lib/ai-monitoring';
 
 import { addBreadcrumb } from '@/lib/obs/breadcrumb';
 import { logger } from '@/lib/logger';

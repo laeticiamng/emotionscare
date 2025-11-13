@@ -1,7 +1,7 @@
 // @ts-nocheck
 import type { FC } from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import * as Sentry from '@sentry/react';
+import { captureException } from '@/lib/ai-monitoring';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';

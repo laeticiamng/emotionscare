@@ -1,6 +1,6 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { AlertTriangle, RefreshCw, Home, Bug } from 'lucide-react';
-import * as Sentry from '@sentry/react';
+import { captureException } from '@/lib/ai-monitoring';
 import { log } from '@/lib/obs/logger';
 
 interface Props {
@@ -95,24 +95,16 @@ export class CriticalErrorBoundary extends Component<Props, State> {
 
   private reportError(error: Error, errorInfo: ErrorInfo, context?: string) {
     try {
-      if (Sentry.getCurrentHub().getClient()) {
-        Sentry.captureException(error, {
-          contexts: {
-            react: {
-              componentStack: errorInfo.componentStack
-            }
-          },
-          tags: {
-            errorBoundary: context || 'CriticalErrorBoundary',
-            feature: 'error-boundary',
-            errorType: error.message.includes("reading 'add'") ? 'reading_add' : 'unknown'
-          },
-          extra: {
-            errorInfo,
-            retryCount: this.retryCount
-          }
-        });
-      }
+      captureException(error, {
+        react: {
+          componentStack: errorInfo.componentStack
+        },
+        errorBoundary: context || 'CriticalErrorBoundary',
+        feature: 'error-boundary',
+        errorType: error.message.includes("reading 'add'") ? 'reading_add' : 'unknown',
+        errorInfo,
+        retryCount: this.retryCount
+      });
 
       // Log local pour développement
       const errorReport = {

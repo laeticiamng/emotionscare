@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { useCallback, useMemo, useRef, useState } from 'react';
-import * as Sentry from '@sentry/react';
+import { captureException } from '@/lib/ai-monitoring';
 
 import type { MusicBpmProfile, MusicIntensityKey, MusicTextureKey } from '@/features/orchestration/music.orchestrator';
 

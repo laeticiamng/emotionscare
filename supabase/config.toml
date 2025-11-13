@@ -3,6 +3,15 @@ project_id = "yaincoxihiqdksxgrsrk"
 [functions.ai-monitoring]
 verify_jwt = false
 
+[functions.send-weekly-email]
+verify_jwt = true
+
+[functions.send-notification-email]
+verify_jwt = true
+
+[functions.track-email-open]
+verify_jwt = false
+
 [functions.emotion-music-ai]
 verify_jwt = true
 

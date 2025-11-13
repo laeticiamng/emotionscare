@@ -3,7 +3,7 @@
  * Production monitoring and alerting utilities
  */
 
-import * as Sentry from '@sentry/react';
+import { aiMonitoring, captureMessage } from '@/lib/ai-monitoring';
 import { logger } from '@/lib/logger';
 
 type AlertSeverity = 'info' | 'warning' | 'error' | 'critical';
@@ -34,14 +34,13 @@ export function sendAlert(alert: Alert): void {
     );
   }
 
-  // Send to Sentry
+  // Send to AI Monitoring
   if (alert.severity === 'error' || alert.severity === 'critical') {
-    Sentry.captureMessage(alert.message, {
-      level: alert.severity === 'critical' ? 'fatal' : 'error',
-      contexts: {
-        alert: alert.context || {},
-      },
-    });
+    aiMonitoring.captureMessage(
+      alert.message,
+      alert.severity,
+      alert.context
+    );
   }
 
   // Edge function désactivée temporairement (fonction inexistante)
@@ -53,10 +52,10 @@ export function sendAlert(alert: Alert): void {
  * Track custom metric
  */
 export function trackMetric(metric: MetricData): void {
-  // Send to Sentry
-  Sentry.metrics.distribution(metric.name, metric.value, {
+  // Send to AI Monitoring as performance metric
+  aiMonitoring.capturePerformance(metric.name, metric.value, {
     unit: metric.unit,
-    tags: metric.tags,
+    ...metric.tags,
   });
 
   // Log in development
@@ -141,7 +140,7 @@ export async function checkSystemHealth(): Promise<{
  * Initialize monitoring system
  */
 export function initMonitoring(): void {
-  // Initialize Sentry
+  // Initialize AI Monitoring
   if (!import.meta.env.DEV) {
     Sentry.init({
       dsn: import.meta.env.VITE_SENTRY_DSN,
