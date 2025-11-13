@@ -1,3 +1,9 @@
+/**
+ * MUSIC TYPES - SOURCE DE VÉRITÉ UNIQUE
+ * Tous les types music doivent être importés depuis ce fichier
+ * @see ANALYSE_APP_MUSIC.md - Phase 2: Consolidation types
+ */
+
 export interface MusicTrack {
   id: string;
   title: string;
@@ -15,6 +21,10 @@ export interface MusicTrack {
   bpm?: number;
   key?: string;
   energy?: number;
+  // Ajout pour compatibilité avec ancien système
+  cover?: string;
+  name?: string;
+  audio_url?: string;
 }
 
 export interface MusicPlaylist {
@@ -59,6 +69,7 @@ export interface GenerationResponse {
 
 // Type aliases for compatibility
 export type Playlist = MusicPlaylist;
+export type Track = MusicTrack; // Alias pour rétrocompatibilité avec services/music/types.ts
 export type MusicCategory = 'therapeutic' | 'ambient' | 'focus' | 'energy' | 'relax' | 'sleep';
 
 // Music state type (re-export from context will be needed)

@@ -1,5 +1,4 @@
 import { supabase } from '@/integrations/supabase/client';
-import { MusicTrack, MusicPlaylist } from '@/types/music';
 import { logger } from '@/lib/logger';
 
 // Re-export everything from the service modules
@@ -11,7 +10,8 @@ export {
   musicTrackToTrack,
   musicPlaylistToPlaylist 
 } from '@/services/music/converters';
-export type { Track, Playlist } from '@/services/music/types';
+// Import depuis la source unique (consolidation Phase 2)
+export type { MusicTrack as Track, MusicPlaylist as Playlist } from '@/types/music';
 
 // Fonctions pour les VR audio sessions
 export const getAudioSessions = async () => {

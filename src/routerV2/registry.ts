@@ -279,10 +279,12 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
   {
     name: 'music',
     path: '/app/music',
-    segment: 'public',
-    layout: 'simple',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app',
     component: 'B2CMusicEnhanced',
-    guard: false,
+    guard: true,
+    requireAuth: true,
     aliases: ['/music'],
   },
   {
