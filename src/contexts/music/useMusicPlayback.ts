@@ -2,16 +2,21 @@
  * Music Playback Hook - Contrôles lecture audio
  */
 
-import { useCallback, MutableRefObject, Dispatch } from 'react';
+import { useCallback, useRef, MutableRefObject, Dispatch } from 'react';
 import { MusicState, MusicAction, MusicTrack } from './types';
 import { logger } from '@/lib/logger';
 import { toast } from 'sonner';
+import { saveHistoryEntry, calculateCompletionRate } from '@/services/music/history-service';
 
 export const useMusicPlayback = (
   audioRef: MutableRefObject<HTMLAudioElement | null>,
   state: MusicState,
   dispatch: Dispatch<MusicAction>
 ) => {
+  // Tracker pour calcul de durée d'écoute
+  const playStartTime = useRef<number | null>(null);
+  const currentTrackId = useRef<string | null>(null);
+
   const play = useCallback(async (track?: MusicTrack) => {
     const audio = audioRef.current;
     if (!audio) {
@@ -27,6 +32,17 @@ export const useMusicPlayback = (
         audio.src = audioUrl;
         audio.load();
         dispatch({ type: 'ADD_TO_HISTORY', payload: track });
+        
+        // Sauvegarder dans DB au démarrage de la lecture
+        currentTrackId.current = track.id;
+        playStartTime.current = Date.now();
+        
+        // Save initial history entry (sera mis à jour à la fin)
+        await saveHistoryEntry({
+          track,
+          device: undefined, // Auto-détecté
+          source: 'player',
+        });
       }
       
       logger.info('Starting audio playback', 'MUSIC');

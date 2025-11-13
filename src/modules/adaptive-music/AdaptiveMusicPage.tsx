@@ -19,7 +19,7 @@ import { Heart, Music2, Sparkles } from "lucide-react";
 import { useFlags } from "@/core/flags";
 import { useAssessment } from "@/hooks/useAssessment";
 import useCurrentMood from "@/hooks/useCurrentMood";
-import useMusicFavorites from "@/hooks/useMusicFavorites";
+import { useMusicFavorites } from "@/hooks/useMusicFavorites";
 import { useAdaptivePlayback } from "@/hooks/music/useAdaptivePlayback";
 import {
   requestMoodPlaylist,
@@ -295,17 +295,20 @@ const AdaptiveMusicPage: React.FC = () => {
   const favoriteControls = React.useMemo(() => {
     if (!selectedTrack) return undefined;
     return {
-      active: favorites.isFavorite(selectedTrack.id),
-      onToggle: () =>
-        favorites.toggleFavorite(selectedTrack.id, recommendation.presetId, {
-          title: selectedTrack.title,
-          url: selectedTrack.url,
-        }),
-      busy: favorites.isToggling,
+      active: isFavorite(selectedTrack.id),
+      onToggle: () => toggleFavorite({
+        id: selectedTrack.id,
+        title: selectedTrack.title,
+        artist: selectedTrack.artist || 'Unknown',
+        url: selectedTrack.url,
+        audioUrl: selectedTrack.url,
+        duration: selectedTrack.duration || 0,
+      }),
+      busy: false,
       addLabel: "Garder cette bulle",
       removeLabel: "Retirer de mes bulles",
     };
-  }, [favorites, recommendation.presetId, selectedTrack]);
+  }, [isFavorite, toggleFavorite, selectedTrack]);
 
   React.useEffect(() => {
     if (!pomsOptIn) return;
@@ -486,7 +489,7 @@ const AdaptiveMusicPage: React.FC = () => {
               </div>
               {favoriteEntries.length ? (
                 <ul className="mt-2 space-y-2 text-sm">
-                  {favoriteEntries.map(entry => (
+                  {favoriteEntries.map((entry: { trackId: string; title?: string }) => (
                     <li
                       key={entry.trackId}
                       className="rounded-md border bg-background px-3 py-2 text-xs text-muted-foreground"
