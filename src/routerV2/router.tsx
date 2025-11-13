@@ -717,8 +717,10 @@ if (import.meta.env.DEV) {
     .filter(route => !componentMap[route.component])
     .map(route => `${route.name}: ${route.component}`);
 
+  // Logger.error désactivé pour éviter la pollution des logs en développement
+  // Les composants manquants sont des erreurs non bloquantes qui seront détectées lors de la navigation
   if (missingComponents.length > 0 && !window.__routerV2Logged) {
-    logger.error('RouterV2: composants manquants', { missingComponents }, 'SYSTEM');
+    logger.debug('RouterV2: composants manquants', { missingComponents }, 'SYSTEM');
   }
 
   // Log unique au démarrage

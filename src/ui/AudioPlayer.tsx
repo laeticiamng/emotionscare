@@ -2,7 +2,7 @@
 "use client";
 
 import React from "react";
-import * as Sentry from "@sentry/react";
+import { Sentry } from "@/lib/errors/sentry-compat";
 
 import { useMotionPrefs } from "@/hooks/useMotionPrefs";
 import { clamp01 } from "@/lib/audio/utils";
