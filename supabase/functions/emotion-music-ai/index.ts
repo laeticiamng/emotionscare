@@ -105,7 +105,23 @@ serve(async (req) => {
         body: JSON.stringify({ prompt, make_instrumental: true, wait_audio: false })
       });
 
-      if (!sunoRes.ok) throw new Error(`Suno API error: ${sunoRes.status}`);
+      if (!sunoRes.ok) {
+        const errorBody = await sunoRes.text().catch(() => 'No error details');
+        console.error(`[emotion-music-ai] Suno API error ${sunoRes.status}:`, errorBody);
+        
+        // Erreurs temporaires (service unavailable, rate limit, gateway error)
+        if ([502, 503, 504, 429].includes(sunoRes.status)) {
+          throw new Error(`Le service de génération musicale est temporairement indisponible (${sunoRes.status}). Veuillez réessayer dans quelques instants.`);
+        }
+        
+        // Erreur d'authentification
+        if (sunoRes.status === 401 || sunoRes.status === 403) {
+          throw new Error('Erreur d\'authentification avec le service de génération musicale.');
+        }
+        
+        // Autres erreurs
+        throw new Error(`Erreur du service de génération musicale: ${sunoRes.status}`);
+      }
       const sunoData = await sunoRes.json();
 
       const { data: track } = await supabaseClient
@@ -144,7 +160,16 @@ serve(async (req) => {
         headers: { 'Authorization': `Bearer ${sunoKey}` }
       });
 
-      if (!statusRes.ok) throw new Error('Status check failed');
+      if (!statusRes.ok) {
+        console.error(`[emotion-music-ai] Status check failed: ${statusRes.status}`);
+        
+        // Erreurs temporaires
+        if ([502, 503, 504, 429].includes(statusRes.status)) {
+          throw new Error('Le service de génération musicale est temporairement indisponible. Réessayez dans quelques instants.');
+        }
+        
+        throw new Error(`Erreur lors de la vérification du statut: ${statusRes.status}`);
+      }
       const statusData = await statusRes.json();
 
       if (statusData.status === 'complete' && statusData.audio_url && trackId) {
@@ -189,9 +214,33 @@ serve(async (req) => {
     });
 
   } catch (error) {
-    console.error('[emotion-music-ai]', error);
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
+    console.error('[emotion-music-ai] Error:', error);
+    
+    // Déterminer le code de statut approprié
+    let statusCode = 500;
+    let errorMessage = error.message || 'Une erreur inattendue s\'est produite';
+    
+    // Erreurs temporaires du service
+    if (errorMessage.includes('temporairement indisponible') || errorMessage.includes('503')) {
+      statusCode = 503;
+      errorMessage = 'Le service de génération musicale est temporairement indisponible. Veuillez réessayer dans quelques instants.';
+    }
+    // Erreur d'authentification
+    else if (error.message?.includes('Unauthorized') || error.message?.includes('401')) {
+      statusCode = 401;
+    }
+    // Erreur de configuration
+    else if (error.message?.includes('not configured')) {
+      statusCode = 500;
+      errorMessage = 'Le service de génération musicale n\'est pas correctement configuré.';
+    }
+    
+    return new Response(JSON.stringify({ 
+      error: errorMessage,
+      code: statusCode,
+      details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    }), {
+      status: statusCode,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     });
   }
