@@ -1336,6 +1336,16 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     requireAuth: true,
   },
   {
+    name: 'admin-alert-playground',
+    path: '/admin/alert-playground',
+    segment: 'admin',
+    role: 'admin',
+    layout: 'app',
+    component: 'AlertTemplatePlayground',
+    guard: true,
+    requireAuth: true,
+  },
+  {
     name: 'admin-scheduled-reports',
     path: '/admin/scheduled-reports',
     segment: 'admin',
