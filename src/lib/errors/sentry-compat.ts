@@ -11,6 +11,12 @@ export const Sentry = {
     aiCaptureException(error, options);
   },
   
+  captureMessage(message: string, options?: any) {
+    const level = options?.level || 'info';
+    const logFn = logger[level as 'debug' | 'info' | 'warn' | 'error'] || logger.info;
+    logFn(message, options || {}, 'SENTRY');
+  },
+  
   addBreadcrumb(breadcrumb: any) {
     const level = breadcrumb.level || 'info';
     const category = breadcrumb.category || 'APP';
@@ -45,5 +51,20 @@ export const Sentry = {
       setLevel: () => {},
       setFingerprint: () => {},
     });
+  },
+  
+  metrics: {
+    increment(_name: string, _value?: number, _tags?: any) {
+      // No-op: AI Monitoring doesn't use metrics
+    },
+    distribution(_name: string, _value: number, _tags?: any) {
+      // No-op: AI Monitoring doesn't use metrics
+    },
+    gauge(_name: string, _value: number, _tags?: any) {
+      // No-op: AI Monitoring doesn't use metrics
+    },
+    set(_name: string, _value: number | string, _tags?: any) {
+      // No-op: AI Monitoring doesn't use metrics
+    },
   },
 };

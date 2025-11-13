@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { supabase } from '@/integrations/supabase/client'
-import * as Sentry from '@sentry/react'
+import { Sentry } from '@/lib/errors/sentry-compat'
 import sanitizeHtml from 'sanitize-html'
 import {
   FeedQuerySchema,

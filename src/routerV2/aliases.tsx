@@ -6,7 +6,7 @@
 
 import React, { useEffect } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import * as Sentry from '@sentry/react';
+import { Sentry } from '@/lib/errors/sentry-compat';
 import { routes } from '@/lib/routes';
 
 export const ROUTE_ALIASES = {

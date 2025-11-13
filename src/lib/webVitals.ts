@@ -3,7 +3,7 @@
  * Intégration avec Sentry pour monitoring production
  */
 
-import * as Sentry from '@sentry/react';
+import { Sentry } from '@/lib/errors/sentry-compat';
 import { logger } from '@/lib/logger';
 
 export interface WebVitalMetric {
