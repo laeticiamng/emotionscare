@@ -134,17 +134,19 @@ export const EmotionalMusicGenerator: React.FC = () => {
                 </Badge>
               </div>
 
-              <div className="p-4 rounded-lg bg-muted/50">
-                <p className="text-sm text-muted-foreground mb-2">Profil musical recommandé</p>
-                <p className="text-sm">{emotionAnalysis.musicProfile.description}</p>
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {emotionAnalysis.musicProfile.tags.map((tag) => (
-                    <Badge key={tag} variant="outline" className="text-xs">
-                      {tag}
-                    </Badge>
-                  ))}
+              {emotionAnalysis.musicProfile && (
+                <div className="p-4 rounded-lg bg-muted/50">
+                  <p className="text-sm text-muted-foreground mb-2">Profil musical recommandé</p>
+                  <p className="text-sm">{emotionAnalysis.musicProfile.description}</p>
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {emotionAnalysis.musicProfile.tags?.map((tag) => (
+                      <Badge key={tag} variant="outline" className="text-xs">
+                        {tag}
+                      </Badge>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
 
               <Button
                 onClick={handleGenerate}
