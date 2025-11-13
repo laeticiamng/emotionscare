@@ -81,6 +81,9 @@ verify_jwt = false
 [functions.send-weekly-monitoring-report]
 verify_jwt = false
 
+[functions.collect-system-metrics]
+verify_jwt = false
+
 [api]
 enabled = true
 port = 54321

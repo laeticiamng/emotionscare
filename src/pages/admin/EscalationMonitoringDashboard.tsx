@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { InteractiveTutorial } from '@/components/monitoring/InteractiveTutorial';
 import { ABTestPerformanceCharts } from '@/components/monitoring/ABTestPerformanceCharts';
 import { NotificationSettings } from '@/components/monitoring/NotificationSettings';
+import { ExportPerformanceReport } from '@/components/monitoring/ExportPerformanceReport';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -29,6 +30,7 @@ const EscalationMonitoringDashboard: React.FC = () => {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [selectedEscalation, setSelectedEscalation] = useState<any>(null);
   const [isTutorialOpen, setIsTutorialOpen] = useState(false);
+  const chartsContainerRef = React.useRef<HTMLDivElement>(null);
 
   // Fetch active escalations
   const { data: activeEscalations, refetch: refetchEscalations } = useQuery({
@@ -181,6 +183,12 @@ const EscalationMonitoringDashboard: React.FC = () => {
           </p>
         </div>
         <div className="flex gap-2">
+          <ExportPerformanceReport 
+            testData={abTests || []}
+            metricsData={performanceMetrics || []}
+            mlPredictions={mlPredictions || []}
+            chartsContainerRef={chartsContainerRef}
+          />
           <Button 
             onClick={() => setIsTutorialOpen(true)} 
             variant="outline"
@@ -365,10 +373,12 @@ const EscalationMonitoringDashboard: React.FC = () => {
 
         {/* Graphiques de Performance A/B Tests */}
         <TabsContent value="charts" className="space-y-4">
-          <ABTestPerformanceCharts 
-            testData={abTests || []} 
-            metricsData={performanceMetrics || []} 
-          />
+          <div ref={chartsContainerRef}>
+            <ABTestPerformanceCharts 
+              testData={abTests || []} 
+              metricsData={performanceMetrics || []} 
+            />
+          </div>
         </TabsContent>
 
         {/* Heatmap */}

@@ -1732,6 +1732,15 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: 'role',
     allowedRoles: ['admin'],
   },
+  {
+    name: 'admin-system-health',
+    path: '/admin/system-health',
+    segment: 'admin',
+    layout: 'admin',
+    component: 'SystemHealthDashboard',
+    guard: 'role',
+    allowedRoles: ['admin'],
+  },
 
   // ═══════════════════════════════════════════════════════════
   // SYSTEM & MONITORING
