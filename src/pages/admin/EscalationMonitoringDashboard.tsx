@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { InteractiveTutorial } from '@/components/monitoring/InteractiveTutorial';
+import { ABTestPerformanceCharts } from '@/components/monitoring/ABTestPerformanceCharts';
+import { NotificationSettings } from '@/components/monitoring/NotificationSettings';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -86,6 +88,21 @@ const EscalationMonitoringDashboard: React.FC = () => {
         .select('*')
         .gte('occurred_at', sevenDaysAgo.toISOString())
         .order('occurred_at', { ascending: false });
+      
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  // Fetch A/B tests for charts
+  const { data: abTests } = useQuery({
+    queryKey: ['ab-tests-charts'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('ab_test_configurations')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(10);
       
       if (error) throw error;
       return data;
@@ -255,9 +272,12 @@ const EscalationMonitoringDashboard: React.FC = () => {
       <Tabs defaultValue="timeline" className="space-y-4">
         <TabsList>
           <TabsTrigger value="timeline">Timeline Interactive</TabsTrigger>
+          <TabsTrigger value="charts">Graphiques Performance</TabsTrigger>
           <TabsTrigger value="heatmap">Heatmap Patterns</TabsTrigger>
           <TabsTrigger value="predictions">Prédictions ML</TabsTrigger>
           <TabsTrigger value="performance">Performance</TabsTrigger>
+          <TabsTrigger value="notifications">Notifications</TabsTrigger>
+          <TabsTrigger value="chatbot">Chatbot IA</TabsTrigger>
         </TabsList>
 
         {/* Timeline Interactive */}
@@ -341,6 +361,14 @@ const EscalationMonitoringDashboard: React.FC = () => {
               )}
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* Graphiques de Performance A/B Tests */}
+        <TabsContent value="charts" className="space-y-4">
+          <ABTestPerformanceCharts 
+            testData={abTests || []} 
+            metricsData={performanceMetrics || []} 
+          />
         </TabsContent>
 
         {/* Heatmap */}
@@ -521,6 +549,11 @@ const EscalationMonitoringDashboard: React.FC = () => {
               )}
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* Notifications Settings */}
+        <TabsContent value="notifications">
+          <NotificationSettings />
         </TabsContent>
 
         <TabsContent value="chatbot">
