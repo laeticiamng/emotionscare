@@ -87,7 +87,10 @@ Réponds UNIQUEMENT en JSON valide.`;
     }
 
     const data = await response.json();
-    const content = data.choices[0]?.message?.content || "{}";
+    let content = data.choices[0]?.message?.content || "{}";
+    
+    // Clean markdown code blocks if present
+    content = content.replace(/```json\s*/g, '').replace(/```\s*$/g, '').trim();
     
     // Parse JSON response
     const analysis = JSON.parse(content);
