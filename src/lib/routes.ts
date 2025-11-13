@@ -187,6 +187,7 @@ export const b2bRoutes = {
     cronMonitoring: () => resolveRoutePath('gdpr-cron-monitoring'),
     blockchainBackups: () => resolveRoutePath('gdpr-blockchain-backups'),
     musicQueue: () => resolveRoutePath('admin-music-queue'),
+    musicMetrics: () => resolveRoutePath('admin-music-metrics'),
   },
 } as const;
 

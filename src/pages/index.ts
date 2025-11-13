@@ -81,6 +81,7 @@ export { default as B2CEmotionsPage } from './B2CEmotionsPage';
 export { default as OnboardingPage } from './OnboardingPage';
 export { default as ApiMonitoringPage } from './ApiMonitoringPage';
 export { default as MusicQueueAdminPage } from './admin/MusicQueueAdminPage';
+export { default as MusicQueueMetricsPage } from './admin/MusicQueueMetricsPage';
 export { default as SubscribePage } from './SubscribePage';
 export { default as DemoPage } from './DemoPage';
 
