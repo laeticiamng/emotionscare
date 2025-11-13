@@ -353,6 +353,10 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   ExecutiveDashboard,
   IncidentReportsPage,
   UnifiedAdminDashboard,
+  CronJobsSetupPage,
+  AlertTesterPage,
+  MLAssignmentRulesPage,
+  TeamMemberSkillsPage,
   
   // Settings
   B2CSettingsPage,
