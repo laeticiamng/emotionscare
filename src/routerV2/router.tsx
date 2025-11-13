@@ -122,6 +122,10 @@ const SystemHealthDashboard = lazy(() => import('@/pages/admin/SystemHealthDashb
 const ExecutiveDashboard = lazy(() => import('@/pages/admin/ExecutiveDashboard'));
 const IncidentReportsPage = lazy(() => import('@/pages/admin/IncidentReportsPage'));
 const UnifiedAdminDashboard = lazy(() => import('@/pages/admin/UnifiedAdminDashboard'));
+const CronJobsSetupPage = lazy(() => import('@/pages/admin/CronJobsSetupPage'));
+const AlertTesterPage = lazy(() => import('@/pages/admin/AlertTesterPage'));
+const MLAssignmentRulesPage = lazy(() => import('@/pages/admin/MLAssignmentRulesPage'));
+const TeamMemberSkillsPage = lazy(() => import('@/pages/admin/TeamMemberSkillsPage'));
 const GamificationCronMonitoring = lazy(() => import('@/pages/admin/GamificationCronMonitoring'));
 const MusicQueueAdminPage = lazy(() => import('@/pages/admin/MusicQueueAdminPage'));
 const MusicQueueMetricsPage = lazy(() => import('@/pages/admin/MusicQueueMetricsPage'));
