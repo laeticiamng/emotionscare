@@ -39,6 +39,7 @@ import { FocusAnalyticsDashboard } from '@/components/analytics/FocusAnalyticsDa
 import { PushNotificationSetup } from '@/components/notifications/PushNotificationSetup';
 import { VoiceCoach } from '@/components/coach/VoiceCoach';
 import VoiceCommands from '@/components/voice/VoiceCommands';
+import { MLRecommendationsPanel } from '@/components/ml/MLRecommendationsPanel';
 import type { MusicTrack } from '@/types/music';
 import { logger } from '@/lib/logger';
 import { useMusicJourney } from '@/hooks/useMusicJourney';
@@ -323,6 +324,21 @@ const B2CMusicEnhanced: React.FC = () => {
             {/* AI Emotional Music Generator */}
             <div className="max-w-4xl mx-auto">
               <EmotionalMusicGenerator />
+            </div>
+
+            {/* ML Recommendations Panel */}
+            <div className="max-w-4xl mx-auto mt-8">
+              <MLRecommendationsPanel 
+                currentEmotion={state.currentTrack?.emotion || 'calm'}
+                userId="demo-user"
+                onApplySunoParams={(params) => {
+                  toast({
+                    title: 'Paramètres Suno appliqués',
+                    description: `Style: ${params.optimalStyle}, BPM: ${params.optimalBpm}`,
+                  });
+                  logger.info('Suno params applied', params, 'ML');
+                }}
+              />
             </div>
 
             {/* Journey Section */}
