@@ -264,4 +264,5 @@ export const useAdvancedLeaderboard = (): UseAdvancedLeaderboardResult => {
   };
 };
 
-export { PERIODS, LeaderboardPeriod };
+export { PERIODS };
+export type { LeaderboardPeriod };

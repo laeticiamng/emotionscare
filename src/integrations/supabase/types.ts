@@ -10367,6 +10367,79 @@ export type Database = {
           },
         ]
       }
+      policy_acceptances: {
+        Row: {
+          accepted_at: string
+          id: string
+          ip_address: string | null
+          policy_id: string
+          policy_version: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          accepted_at?: string
+          id?: string
+          ip_address?: string | null
+          policy_id: string
+          policy_version: string
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          accepted_at?: string
+          id?: string
+          ip_address?: string | null
+          policy_id?: string
+          policy_version?: string
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "policy_acceptances_policy_id_fkey"
+            columns: ["policy_id"]
+            isOneToOne: false
+            referencedRelation: "privacy_policies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      policy_changes: {
+        Row: {
+          change_description: string | null
+          change_type: string
+          changed_at: string
+          changed_by: string | null
+          id: string
+          policy_id: string
+        }
+        Insert: {
+          change_description?: string | null
+          change_type: string
+          changed_at?: string
+          changed_by?: string | null
+          id?: string
+          policy_id: string
+        }
+        Update: {
+          change_description?: string | null
+          change_type?: string
+          changed_at?: string
+          changed_by?: string | null
+          id?: string
+          policy_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "policy_changes_policy_id_fkey"
+            columns: ["policy_id"]
+            isOneToOne: false
+            referencedRelation: "privacy_policies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       posts: {
         Row: {
           content: string
@@ -10430,6 +10503,45 @@ export type Database = {
         }
         Relationships: []
       }
+      privacy_policies: {
+        Row: {
+          content: string
+          created_at: string
+          created_by: string | null
+          effective_date: string
+          id: string
+          is_current: boolean
+          status: string
+          summary: string | null
+          updated_at: string
+          version: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          created_by?: string | null
+          effective_date: string
+          id?: string
+          is_current?: boolean
+          status?: string
+          summary?: string | null
+          updated_at?: string
+          version: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          created_by?: string | null
+          effective_date?: string
+          id?: string
+          is_current?: boolean
+          status?: string
+          summary?: string | null
+          updated_at?: string
+          version?: string
+        }
+        Relationships: []
+      }
       product_module_mapping: {
         Row: {
           created_at: string | null
@@ -10477,7 +10589,6 @@ export type Database = {
           updated_at: string | null
           user_role: Database["public"]["Enums"]["app_user_role"] | null
           website: string | null
-          xp: number
         }
         Insert: {
           avatar_url?: string | null
@@ -10501,7 +10612,6 @@ export type Database = {
           updated_at?: string | null
           user_role?: Database["public"]["Enums"]["app_user_role"] | null
           website?: string | null
-          xp?: number
         }
         Update: {
           avatar_url?: string | null
@@ -10525,7 +10635,6 @@ export type Database = {
           updated_at?: string | null
           user_role?: Database["public"]["Enums"]["app_user_role"] | null
           website?: string | null
-          xp?: number
         }
         Relationships: [
           {

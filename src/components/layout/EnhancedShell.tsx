@@ -8,6 +8,7 @@ import CommandMenu from './CommandMenu';
 import NotificationToast from './NotificationToast';
 import MainNavigationHub from '@/components/navigation/MainNavigationHub';
 import SkipLinks from './SkipLinks';
+import { InAppNotificationCenter } from '@/components/InAppNotificationCenter';
 import { cn } from '@/lib/utils';
 
 interface EnhancedShellProps {
@@ -156,6 +157,9 @@ const EnhancedShell: React.FC<EnhancedShellProps> = ({
       
       {/* Navigation Hub */}
       <MainNavigationHub />
+      
+      {/* In-App Notification Center */}
+      <InAppNotificationCenter />
     </div>
   );
 };

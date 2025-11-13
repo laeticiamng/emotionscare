@@ -767,8 +767,8 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: true,
   },
   {
-    name: 'achievements',
-    path: '/app/achievements',
+    name: 'park-achievements',
+    path: '/app/park/achievements',
     segment: 'consumer',
     role: 'consumer',
     layout: 'app-sidebar',
