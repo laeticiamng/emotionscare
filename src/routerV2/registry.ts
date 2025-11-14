@@ -288,6 +288,16 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     aliases: ['/music'],
   },
   {
+    name: 'music-analytics',
+    path: '/app/music/analytics',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app',
+    component: 'MusicAnalyticsPage',
+    guard: true,
+    requireAuth: true,
+  },
+  {
     name: 'parcours-xl',
     path: '/app/parcours-xl',
     segment: 'public',
