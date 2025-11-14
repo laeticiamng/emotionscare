@@ -61,6 +61,8 @@ import { PersonalizedPlaylistRecommendations } from '@/components/music/Personal
 import { WeeklyInsightsDashboard } from '@/components/music/WeeklyInsightsDashboard';
 import { MusicBadgesDisplay } from '@/components/music/MusicBadgesDisplay';
 import { getUserListeningHistory } from '@/services/music/user-service';
+import { Link } from 'react-router-dom';
+import { User } from 'lucide-react';
 
 interface VinylTrack extends MusicTrack {
   category: 'doux' | 'énergique' | 'créatif' | 'guérison';
@@ -371,6 +373,18 @@ const B2CMusicEnhanced: React.FC = () => {
             <TrendingUp className="h-4 w-4" />
             Analytics
           </Button>
+          
+          {/* Profile Button */}
+          <Link to="/app/music/profile">
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-2"
+            >
+              <User className="h-4 w-4" />
+              Mon Profil
+            </Button>
+          </Link>
         </div>
       </div>
 

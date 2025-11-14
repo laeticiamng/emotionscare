@@ -298,6 +298,16 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     requireAuth: true,
   },
   {
+    name: 'music-profile',
+    path: '/app/music/profile',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app',
+    component: 'MusicProfilePage',
+    guard: true,
+    requireAuth: true,
+  },
+  {
     name: 'parcours-xl',
     path: '/app/parcours-xl',
     segment: 'public',
