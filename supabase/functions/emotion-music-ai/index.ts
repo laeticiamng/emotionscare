@@ -52,6 +52,38 @@ const PROFILES = {
   neutral: { prompt: "Balanced peaceful harmonious music", tempo: 90, desc: "Musique équilibrée" }
 };
 
+// Helper functions for match score calculation
+function extractBpmFromTags(tags: string): number | null {
+  const bpmMatch = tags.match(/(\d+)\s*bpm/i);
+  return bpmMatch ? parseInt(bpmMatch[1]) : null;
+}
+
+function estimateEnergyLevel(tags: string, style: string, bpm?: number): number {
+  let energy = 50; // Default neutral
+
+  const highEnergyKeywords = ['energetic', 'fast', 'intense', 'powerful', 'dynamic', 'upbeat'];
+  const lowEnergyKeywords = ['calm', 'slow', 'peaceful', 'relaxing', 'gentle', 'soft'];
+
+  const combinedText = `${tags} ${style}`.toLowerCase();
+
+  if (highEnergyKeywords.some(kw => combinedText.includes(kw))) {
+    energy += 20;
+  }
+  if (lowEnergyKeywords.some(kw => combinedText.includes(kw))) {
+    energy -= 20;
+  }
+
+  // BPM influence
+  if (bpm) {
+    if (bpm < 80) energy -= 15;
+    else if (bpm < 100) energy -= 5;
+    else if (bpm > 140) energy += 15;
+    else if (bpm > 120) energy += 5;
+  }
+
+  return Math.max(0, Math.min(100, energy));
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
 
@@ -293,14 +325,96 @@ serve(async (req) => {
     // Recommendations
     if (action === 'get-recommendations') {
       const [prefs, tracks, sessions] = await Promise.all([
-        supabaseClient.from('user_music_preferences').select('*').eq('user_id', user.id).single(),
-        supabaseClient.from('generated_music_tracks').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(10),
+        supabaseClient.from('user_music_preferences').select('*').eq('user_id', user.id).maybeSingle(),
+        supabaseClient.from('music_generation_queue').select('*').eq('user_id', user.id).eq('generation_status', 'completed').order('created_at', { ascending: false }).limit(20),
         supabaseClient.from('music_therapy_sessions').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(5)
       ]);
+
+      // Calculate personalized recommendations if preferences exist
+      let personalizedRecommendations = [];
+      if (prefs.data && tracks.data && tracks.data.length > 0) {
+        const preferences = {
+          favorite_genres: prefs.data.favorite_genres || [],
+          preferred_tempos: prefs.data.preferred_tempos || { min: 80, max: 140 },
+          favorite_moods: prefs.data.favorite_moods || [],
+          listening_contexts: prefs.data.listening_contexts || [],
+          preferred_energy_level: prefs.data.preferred_energy_level,
+          instrumental_preference: prefs.data.instrumental_preference,
+        };
+
+        personalizedRecommendations = tracks.data
+          .map(track => {
+            let score = 0;
+            const reasons = [];
+            const metadata = track.metadata || {};
+            const tags = (metadata.tags || '').toLowerCase();
+            const style = (metadata.style || '').toLowerCase();
+
+            // Genre matching (40% weight)
+            const genreMatch = preferences.favorite_genres.some(genre => 
+              tags.includes(genre.toLowerCase()) || style.includes(genre.toLowerCase())
+            );
+            if (genreMatch) {
+              score += 0.4;
+              reasons.push('Genre corresponds à vos favoris');
+            }
+
+            // Tempo matching (20% weight)
+            const bpm = metadata.bpm || extractBpmFromTags(tags);
+            if (bpm && preferences.preferred_tempos) {
+              const { min, max } = preferences.preferred_tempos;
+              if (bpm >= min && bpm <= max) {
+                score += 0.2;
+                reasons.push(`Tempo ${bpm} BPM dans votre plage`);
+              }
+            }
+
+            // Mood matching (20% weight)
+            const moodMatch = preferences.favorite_moods.some(mood =>
+              tags.includes(mood.toLowerCase())
+            );
+            if (moodMatch) {
+              score += 0.2;
+              reasons.push('Ambiance correspond à vos moods');
+            }
+
+            // Energy level matching (10% weight)
+            if (preferences.preferred_energy_level !== undefined) {
+              const trackEnergy = estimateEnergyLevel(tags, style, bpm);
+              const energyDiff = Math.abs(trackEnergy - preferences.preferred_energy_level);
+              const energyScore = Math.max(0, 1 - energyDiff / 100);
+              score += energyScore * 0.1;
+              if (energyScore > 0.7) {
+                reasons.push(`Niveau d'énergie ${trackEnergy}%`);
+              }
+            }
+
+            // Instrumental preference (10% weight)
+            if (preferences.instrumental_preference && preferences.instrumental_preference !== 'both') {
+              const hasVocals = tags.includes('vocal') || tags.includes('singing') || tags.includes('voice');
+              const prefersInstrumental = preferences.instrumental_preference === 'instrumental';
+              
+              if ((prefersInstrumental && !hasVocals) || (!prefersInstrumental && hasVocals)) {
+                score += 0.1;
+                reasons.push(prefersInstrumental ? 'Format instrumental' : 'Avec voix');
+              }
+            }
+
+            return {
+              track,
+              matchScore: Math.round(score * 100) / 100,
+              matchReasons: reasons,
+            };
+          })
+          .filter(result => result.matchScore > 0.3) // Only decent matches
+          .sort((a, b) => b.matchScore - a.matchScore)
+          .slice(0, 10);
+      }
 
       return new Response(JSON.stringify({
         preferences: prefs.data,
         recentTracks: tracks.data || [],
+        personalizedRecommendations,
         sessions: sessions.data || [],
         totalGenerated: tracks.data?.length || 0
       }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
