@@ -132,6 +132,26 @@ class TournamentService {
     }
   }
 
+  async getMatch(matchId: string): Promise<TournamentMatch | null> {
+    try {
+      const { data, error } = await supabase
+        .from('tournament_matches')
+        .select(`
+          *,
+          player1:player1_id(display_name, avatar_url),
+          player2:player2_id(display_name, avatar_url)
+        `)
+        .eq('id', matchId)
+        .single();
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      logger.error('Error fetching match', error as Error, 'TournamentService');
+      return null;
+    }
+  }
+
   async getTournamentParticipants(tournamentId: string): Promise<TournamentRegistration[]> {
     try {
       const { data, error } = await supabase

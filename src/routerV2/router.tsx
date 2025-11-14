@@ -185,6 +185,8 @@ const GuildListPage = lazy(() => import('@/pages/GuildListPage'));
 const GuildPage = lazy(() => import('@/pages/GuildPage'));
 const PremiumRewardsPage = lazy(() => import('@/pages/PremiumRewardsPage'));
 const TournamentsPage = lazy(() => import('@/pages/TournamentsPage'));
+const MatchSpectatorPage = lazy(() => import('@/pages/MatchSpectatorPage'));
+const CompetitiveSeasonsPage = lazy(() => import('@/pages/CompetitiveSeasonsPage'));
 const DailyChallengesPage = lazy(() => import('@/pages/DailyChallengesPage'));
 const B2CGamificationPage = lazy(() => import('@/pages/B2CGamificationPage'));
 const ScoresPage = lazy(() => import('@/pages/ScoresPage'));
@@ -358,6 +360,8 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   GuildPage,
   PremiumRewardsPage,
   TournamentsPage,
+  MatchSpectatorPage,
+  CompetitiveSeasonsPage,
   DailyChallengesPage,
   ScoresPage,
   
