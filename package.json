@@ -63,7 +63,11 @@
     "seed:ci": "tsx scripts/seed-e2e.ts",
     "lhci": "lhci autorun",
     "scan:no-clinical-terms": "node tools/scanners/no-clinical-terms.cjs",
-    "scan:no-raw-numbers": "node tools/scanners/no-raw-numbers.cjs"
+    "scan:no-raw-numbers": "node tools/scanners/no-raw-numbers.cjs",
+    "build:analyze": "vite build --mode analyze",
+    "build:stats": "npm run build && node scripts/bundle-stats.js",
+    "perf:lighthouse": "lhci autorun",
+    "perf:sourcemap": "source-map-explorer dist/assets/*.js --html dist/sourcemap.html"
   },
   "dependencies": {
     "@axe-core/playwright": "^4.10.2",
