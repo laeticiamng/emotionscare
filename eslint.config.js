@@ -113,6 +113,13 @@ export default [
   },
   {
     files: ["services/**/*.{ts,tsx,js,jsx,mjs,cjs}", "supabase/functions/**/*.{ts,tsx,js,jsx,mjs,cjs}"],
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: { ecmaVersion: "latest", sourceType: "module", ecmaFeatures: { jsx: true } }
+    },
+    plugins: {
+      "@typescript-eslint": tsEslintPlugin,
+    },
     rules: {
       "no-restricted-imports": "off",
       "ec/no-node-builtins-client": "off",

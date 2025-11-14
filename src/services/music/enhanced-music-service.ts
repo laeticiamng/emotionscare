@@ -97,6 +97,8 @@ class EnhancedMusicService {
     const incremented = await quotaService.incrementUsage(user.id);
     if (!incremented) {
       throw new Error('Impossible d\'incrémenter le quota');
+    }
+
     // Validation des entrées
     if (!request.title || request.title.trim().length === 0) {
       throw new Error('Title is required');
