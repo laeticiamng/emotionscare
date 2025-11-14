@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Play, Heart, Loader2 } from 'lucide-react';
 import { generatePersonalizedPlaylists, togglePlaylistFavorite, PersonalizedPlaylist } from '@/services/music/recommendations-service';
-import { useMusic } from '@/contexts/MusicContext';
+import { useMusic } from '@/hooks/useMusic';
 import { useToast } from '@/hooks/use-toast';
 
 interface PersonalizedPlaylistRecommendationsProps {

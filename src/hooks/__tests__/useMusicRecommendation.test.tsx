@@ -4,11 +4,11 @@ import { act, waitFor } from '@testing-library/react';
 import { renderHookWithMusicProvider } from '@/tests/utils';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useMusicRecommendation } from '@/hooks/useMusicRecommendation';
-import { useMusic } from '@/contexts/MusicContext';
+import { useMusic } from '@/hooks/useMusic';
 import { useToast } from '@/hooks/use-toast';
 
 // Mock des hooks externes
-vi.mock('@/contexts/MusicContext');
+vi.mock('@/hooks/useMusic');
 vi.mock('@/hooks/use-toast');
 
 const mockUseMusic = vi.mocked(useMusic);

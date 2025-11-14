@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
 import { Play, Pause, RotateCcw, Heart, Sparkles } from 'lucide-react';
-import { useMusic } from '@/contexts/MusicContext';
+import { useMusic } from '@/hooks/useMusic';
 import { useMusicGeneration } from '@/hooks/useMusicGeneration';
 import { useToast } from '@/hooks/use-toast';
 import type { EmotionResult } from '@/types';

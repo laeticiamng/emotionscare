@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { Track } from '@/contexts/MusicContext';
+import { Track } from '@/contexts/music';
 
 export const sampleTrack = (id = '1'): Track => ({
   id,

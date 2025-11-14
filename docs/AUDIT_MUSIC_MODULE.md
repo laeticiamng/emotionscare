@@ -50,15 +50,15 @@ src/pages/B2CMusicEnhanced.tsx (398 lignes)
 **Actuel:**
 ```tsx
 // src/hooks/useMusic.ts
-export { useMusic } from '@/contexts/MusicContext';
+export { useMusic } from '@/contexts/music';
 ```
 
 **Recommandation:** Implémenter correctement le hook avec validation :
 
 ```tsx
 import { useContext } from 'react';
-import { MusicContext } from '@/contexts/MusicContext';
-import type { MusicContextType } from '@/contexts/MusicContext';
+import { MusicContext } from '@/contexts/music';
+import type { MusicContextType } from '@/contexts/music';
 
 export const useMusic = (): MusicContextType => {
   const context = useContext(MusicContext);
@@ -456,7 +456,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { axe } from '@axe-core/playwright';
 import B2CMusicEnhanced from '../B2CMusicEnhanced';
-import { MusicProvider } from '@/contexts/MusicContext';
+import { MusicProvider } from '@/contexts/music';
 
 const renderWithProviders = (ui: React.ReactElement) => {
   return render(
@@ -542,7 +542,7 @@ describe('B2CMusicEnhanced', () => {
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { UnifiedMusicPlayer } from '../UnifiedMusicPlayer';
-import { MusicProvider } from '@/contexts/MusicContext';
+import { MusicProvider } from '@/contexts/music';
 
 const mockTrack = {
   id: 'test-1',

@@ -1,8 +1,8 @@
 // @ts-nocheck
 
 import { renderHook } from '@/tests/utils';
-import { MusicProvider } from '@/contexts/MusicContext';
-import { useMusic } from '../useMusic';
+import { MusicProvider } from '@/contexts/music';
+import { useMusic } from '@/hooks/useMusic';
 import { vi } from 'vitest';
 
 const mockAudio = {

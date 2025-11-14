@@ -3,7 +3,8 @@
 import React from 'react';
 import { render, act, waitFor, renderHook } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { MusicProvider, useMusic, Track } from '@/contexts/MusicContext';
+import { MusicProvider, Track } from '@/contexts/music';
+import { useMusic } from '@/hooks/useMusic';
 import { createPlaylist } from '../../../tests/utils/musicMock';
 
 // Mock Audio API

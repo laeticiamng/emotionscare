@@ -33,8 +33,26 @@ export const useMusicPlaylist = (
   }, [dispatch]);
 
   const getRecommendationsForEmotion = useCallback(async (emotion: string): Promise<MusicTrack[]> => {
-    // TODO: Appeler edge function adaptive-music
-    return [];
+    try {
+      const { supabase } = await import('@/integrations/supabase/client');
+      const { logger } = await import('@/lib/logger');
+
+      const { data, error } = await supabase.functions.invoke('emotionscare-music-generator', {
+        body: {
+          emotion,
+          type: 'recommendations',
+          count: 10
+        }
+      });
+
+      if (error) throw error;
+
+      return data.tracks || [];
+    } catch (error) {
+      const { logger } = await import('@/lib/logger');
+      logger.error('Music recommendations error', error as Error, 'MUSIC');
+      return [];
+    }
   }, []);
 
   return {

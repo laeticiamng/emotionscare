@@ -7,10 +7,20 @@ import type { MusicTrack, MusicPlaylist } from '@/types/music';
 
 export type { MusicTrack, MusicPlaylist };
 
+export type MusicOrchestrationPresetId = 'ambient_soft' | 'focus' | 'bright';
+
 export interface MusicOrchestrationPreset {
-  id: string;
-  name?: string;
-  description?: string;
+  id: MusicOrchestrationPresetId;
+  label: string;
+  description: string;
+  texture: 'soft' | 'focused' | 'radiant';
+  intensity: 'low' | 'medium' | 'high';
+  volume: number;
+  playbackRate: number;
+  crossfadeMs: number;
+  source: 'resume' | 'clinical' | 'mood';
+  hints: string[];
+  reason: string;
 }
 
 export interface MusicState {

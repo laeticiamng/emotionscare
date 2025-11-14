@@ -1,5 +1,5 @@
 import React, { ReactNode, useState } from 'react';
-import { MusicContext } from '@/contexts/MusicContext';
+import { MusicContext } from '@/contexts/music';
 import { vi as vitestVi } from 'vitest';
 
 const spy = typeof vitestVi !== 'undefined' ? vitestVi.fn : (globalThis as any).jest?.fn?.() ?? (() => {});

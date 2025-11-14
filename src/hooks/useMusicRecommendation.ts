@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { useEffect, useState } from 'react';
-import { useMusic, Track, MusicPlaylist } from '@/contexts/MusicContext';
+import { useMusic } from '@/hooks/useMusic';
+import { Track, MusicPlaylist } from '@/contexts/music';
 import { useToast } from '@/hooks/use-toast';
 
 export const EMOTION_TO_MUSIC: Record<string, string> = {

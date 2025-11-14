@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { MusicPlaylist } from '@/types/music';
-import { useMusic } from '@/contexts/MusicContext';
+import { useMusic } from '@/hooks/useMusic';
 import { demoTracks } from '@/services/music/demo-tracks';
 import { logger } from '@/lib/logger';
 

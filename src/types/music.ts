@@ -91,4 +91,4 @@ export interface AdaptiveMusicConfig {
 }
 
 // Re-export MusicContextType from context (will be imported where needed)
-export type { MusicContextType } from '@/contexts/MusicContext';
+export type { MusicContextType } from '@/contexts/music';
