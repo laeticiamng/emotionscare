@@ -57,6 +57,10 @@ import { MusicAnalyticsDashboard } from '@/components/music/analytics/MusicAnaly
 import { useMusicPreferencesLearning } from '@/hooks/useMusicPreferencesLearning';
 import { useTasteChangeNotifications } from '@/hooks/useTasteChangeNotifications';
 import { TasteChangeNotification } from '@/components/music/TasteChangeNotification';
+import { PersonalizedPlaylistRecommendations } from '@/components/music/PersonalizedPlaylistRecommendations';
+import { WeeklyInsightsDashboard } from '@/components/music/WeeklyInsightsDashboard';
+import { MusicBadgesDisplay } from '@/components/music/MusicBadgesDisplay';
+import { getUserListeningHistory } from '@/services/music/user-service';
 
 interface VinylTrack extends MusicTrack {
   category: 'doux' | 'énergique' | 'créatif' | 'guérison';
@@ -231,6 +235,15 @@ const B2CMusicEnhanced: React.FC = () => {
   const [showPreferencesModal, setShowPreferencesModal] = useState(false);
   const { insights, isAnalyzing, analyzePreferences } = useMusicPreferencesLearning();
   const { notifications, dismissNotification } = useTasteChangeNotifications();
+  const [listeningHistory, setListeningHistory] = useState<any[]>([]);
+  
+  useEffect(() => {
+    const loadHistory = async () => {
+      const history = await getUserListeningHistory('user-123');
+      setListeningHistory(history);
+    };
+    loadHistory();
+  }, []);
   
   // Notifications changements de goût
   useEffect(() => {
