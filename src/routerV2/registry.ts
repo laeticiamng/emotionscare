@@ -1771,6 +1771,22 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: true,
   },
   {
+    name: 'match-spectator',
+    path: '/app/match/:matchId/spectate',
+    segment: 'b2c',
+    layout: 'app-sidebar',
+    component: 'MatchSpectatorPage',
+    guard: true,
+  },
+  {
+    name: 'competitive-seasons',
+    path: '/app/competitive-seasons',
+    segment: 'b2c',
+    layout: 'app-sidebar',
+    component: 'CompetitiveSeasonsPage',
+    guard: true,
+  },
+  {
     name: 'admin-ai-template-suggestions',
     path: '/admin/alerts/ai-suggestions',
     segment: 'admin',
