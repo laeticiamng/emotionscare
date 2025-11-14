@@ -12,6 +12,10 @@ export interface AudioUrlMapping {
   [trackId: string]: string;
 }
 
+export interface AudioUrlSource {
+  [trackId: string]: 'supabase' | 'fallback';
+}
+
 interface AudioUrlConfig {
   fileName: string;
   fallbackUrl: string;
@@ -84,6 +88,7 @@ export function useAudioUrls(
   config: Record<string, AudioUrlConfig>
 ): {
   urls: AudioUrlMapping;
+  sources: AudioUrlSource;
   isLoading: boolean;
   error: string | null;
 } {
@@ -101,6 +106,15 @@ export function useAudioUrls(
       fallbackUrls[trackId] = fallbackUrl;
     });
     return fallbackUrls;
+  });
+  
+  const [sources, setSources] = useState<AudioUrlSource>(() => {
+    // Initialiser toutes les sources comme fallback
+    const initialSources: AudioUrlSource = {};
+    Object.keys(config).forEach(trackId => {
+      initialSources[trackId] = 'fallback';
+    });
+    return initialSources;
   });
   
   const [isLoading, setIsLoading] = useState(false);
@@ -123,6 +137,8 @@ export function useAudioUrls(
       let successCount = 0;
       let failCount = 0;
       
+      const urlSources: AudioUrlSource = {};
+      
       try {
         // Charger toutes les URLs en parallèle
         const promises = Object.entries(config).map(async ([trackId, { fileName, fallbackUrl }]) => {
@@ -130,14 +146,17 @@ export function useAudioUrls(
             const supabaseUrl = await getPublicMusicUrl(fileName);
             if (supabaseUrl) {
               supabaseUrls[trackId] = supabaseUrl;
+              urlSources[trackId] = 'supabase';
               successCount++;
             } else {
               supabaseUrls[trackId] = fallbackUrl;
+              urlSources[trackId] = 'fallback';
               failCount++;
             }
           } catch (err) {
             logger.warn(`Failed to load Supabase URL for ${fileName}`, err as Error, 'MUSIC');
             supabaseUrls[trackId] = fallbackUrl;
+            urlSources[trackId] = 'fallback';
             failCount++;
           }
         });
@@ -149,6 +168,7 @@ export function useAudioUrls(
         // Si au moins une URL Supabase a fonctionné, mettre à jour
         if (successCount > 0) {
           setUrls(supabaseUrls);
+          setSources(urlSources);
           writeCache(supabaseUrls);
           logger.info(
             'Audio URLs loaded from Supabase Storage',
@@ -192,7 +212,7 @@ export function useAudioUrls(
     };
   }, [config]);
 
-  return { urls, isLoading, error };
+  return { urls, sources, isLoading, error };
 }
 
 /**
