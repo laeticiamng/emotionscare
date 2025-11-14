@@ -258,7 +258,15 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     requireAuth: true,
     aliases: ['/scan'],
   },
-  // scan-facial supprimé - fusionné dans scan principal (mode caméra)
+  {
+    name: 'scan-facial',
+    path: '/app/scan/facial',
+    segment: 'consumer',
+    layout: 'simple',
+    component: 'FacialScanPage',
+    guard: true,
+    requireAuth: true,
+  },
   {
     name: 'scan-voice',
     path: '/app/scan/voice',
@@ -275,6 +283,15 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'simple',
     component: 'TextScanPage',
     guard: true,
+  },
+  {
+    name: 'scan-emoji',
+    path: '/app/scan/emoji',
+    segment: 'consumer',
+    layout: 'simple',
+    component: 'EmojiScanPage',
+    guard: true,
+    requireAuth: true,
   },
   {
     name: 'music',
