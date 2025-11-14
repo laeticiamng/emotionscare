@@ -3,6 +3,7 @@
  */
 
 import { logger } from '@/lib/logger';
+import { supabase } from '@/integrations/supabase/client';
 
 export interface MusicBadge {
   id: string;
@@ -247,9 +248,35 @@ export async function checkAndUnlockBadges(
  */
 function calculateStreak(listeningHistory: any[]): number {
   if (listeningHistory.length === 0) return 0;
-  
-  // Simplification : retourner un streak mock
-  return 5; // TODO: implémenter calcul réel basé sur timestamps
+
+  // Trier par date décroissante
+  const sortedHistory = [...listeningHistory].sort((a, b) =>
+    new Date(b.created_at || b.timestamp || b.date).getTime() -
+    new Date(a.created_at || a.timestamp || a.date).getTime()
+  );
+
+  let streak = 0;
+  let currentDate = new Date();
+  currentDate.setHours(0, 0, 0, 0);
+
+  // Parcourir l'historique pour compter les jours consécutifs
+  for (const entry of sortedHistory) {
+    const entryDate = new Date(entry.created_at || entry.timestamp || entry.date);
+    entryDate.setHours(0, 0, 0, 0);
+
+    const diffDays = Math.floor((currentDate.getTime() - entryDate.getTime()) / (1000 * 60 * 60 * 24));
+
+    // Si c'est aujourd'hui ou hier, incrémenter le streak
+    if (diffDays === streak) {
+      streak++;
+      currentDate.setDate(currentDate.getDate() - 1);
+    } else if (diffDays > streak) {
+      // Jour manquant, fin du streak
+      break;
+    }
+  }
+
+  return streak;
 }
 
 /**
@@ -257,10 +284,32 @@ function calculateStreak(listeningHistory: any[]): number {
  */
 export async function getUserMusicBadges(userId: string): Promise<MusicBadge[]> {
   try {
-    // TODO: Récupérer depuis Supabase
-    return MUSIC_BADGES.map(badge => ({ ...badge }));
+    // Récupérer les badges utilisateur depuis Supabase
+    const { data: userBadges, error } = await supabase
+      .from('user_music_badges')
+      .select('*')
+      .eq('user_id', userId);
+
+    if (error) {
+      logger.error('Failed to fetch user badges from DB', error as Error, 'MUSIC');
+      // Fallback sur les badges par défaut
+      return MUSIC_BADGES.map(badge => ({ ...badge }));
+    }
+
+    // Mapper les badges avec leur statut de déverrouillage
+    const badgeMap = new Map(userBadges?.map(ub => [ub.badge_id, ub]) || []);
+
+    return MUSIC_BADGES.map(badge => {
+      const userBadge = badgeMap.get(badge.id);
+      return {
+        ...badge,
+        unlocked: userBadge?.is_unlocked || false,
+        progress: userBadge?.progress || 0,
+        unlockedAt: userBadge?.earned_at,
+      };
+    });
   } catch (error) {
     logger.error('Failed to get user badges', error as Error, 'MUSIC');
-    return [];
+    return MUSIC_BADGES.map(badge => ({ ...badge }));
   }
 }

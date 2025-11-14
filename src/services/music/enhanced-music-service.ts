@@ -72,6 +72,20 @@ class EnhancedMusicService {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
+    // Validation des entrées
+    if (!request.title || request.title.trim().length === 0) {
+      throw new Error('Title is required');
+    }
+    if (!request.style || request.style.trim().length === 0) {
+      throw new Error('Style is required');
+    }
+    if (request.title.length > 200) {
+      throw new Error('Title too long (max 200 characters)');
+    }
+    if (request.prompt && request.prompt.length > 1000) {
+      throw new Error('Prompt too long (max 1000 characters)');
+    }
+
     // Créer l'entrée dans la DB
     const { data: generation, error: dbError } = await supabase
       .from('music_generations')
@@ -521,7 +535,14 @@ class EnhancedMusicService {
   }
 
   private generateShareToken(): string {
-    return `share_${Math.random().toString(36).substring(2, 15)}${Math.random().toString(36).substring(2, 15)}`;
+    // Génère un token sécurisé avec crypto API si disponible
+    if (typeof window !== 'undefined' && window.crypto && window.crypto.getRandomValues) {
+      const array = new Uint8Array(32);
+      window.crypto.getRandomValues(array);
+      return `share_${Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('')}`;
+    }
+    // Fallback pour environnements sans crypto API
+    return `share_${Math.random().toString(36).substring(2, 15)}${Math.random().toString(36).substring(2, 15)}${Date.now().toString(36)}`;
   }
 }
 
