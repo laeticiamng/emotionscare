@@ -3,29 +3,32 @@
  * Conserve l'apparence existante tout en ajoutant des fonctionnalités modernes
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import UnifiedHomePage from '@/pages/unified/UnifiedHomePage';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
 import { Link } from 'react-router-dom';
-import { useUserStats } from '@/hooks/useUserStats';
+import { useUserStatsQuery, useUserStatsRealtime } from '@/hooks/useUserStatsQuery';
+import { useOnlineUsers } from '@/hooks/useOnlineUsers';
+import { StatsCard, StatsGrid } from '@/components/common/StatsCard';
 import { 
   ArrowRight, 
   User, 
   Bell, 
-  Bookmark,
   TrendingUp,
   Zap,
-  Shield,
-  Star,
-  Clock,
   Activity,
+  Target,
+  Flame,
+  Trophy,
   ShoppingBag,
-  Sparkles
+  Sparkles,
+  Shield,
+  Star
 } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
 
 interface Achievement {
   name: string;
@@ -43,19 +46,12 @@ interface QuickAction {
 
 const ModernHomePage: React.FC = () => {
   const { isAuthenticated, user } = useAuth();
-  const { stats: userStats, loading: statsLoading } = useUserStats();
+  const { stats: userStats, loading: statsLoading } = useUserStatsQuery();
+  const { onlineCount } = useOnlineUsers();
   const [notifications] = useState<number>(3);
-  const [userProgress] = useState<number>(75);
-  const [onlineUsers, setOnlineUsers] = useState<number>(1247);
-
-  // Simulation d'activité en temps réel
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setOnlineUsers(prev => prev + Math.floor(Math.random() * 10) - 5);
-    }, 5000);
-    
-    return () => clearInterval(interval);
-  }, []);
+  
+  // Écouter les changements en temps réel pour auto-refresh
+  useUserStatsRealtime();
 
   const recentAchievements: Achievement[] = [
     { name: 'Semaine productive', icon: '🎯', date: 'Aujourd\'hui' },
@@ -116,7 +112,7 @@ const ModernHomePage: React.FC = () => {
                     <Badge variant="secondary" className="text-xs">Pro</Badge>
                   </div>
                   <div className="text-xs text-muted-foreground">
-                    Dernière connexion: Aujourd'hui • {onlineUsers.toLocaleString()} utilisateurs en ligne
+                    Dernière connexion: Aujourd'hui • {onlineCount > 0 ? `${onlineCount} utilisateur${onlineCount > 1 ? 's' : ''} en ligne` : 'Chargement...'}
                   </div>
                 </div>
               </div>
@@ -151,57 +147,60 @@ const ModernHomePage: React.FC = () => {
               </div>
             </div>
 
-            {/* Progression et stats rapides */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <Card className="bg-card/50 backdrop-blur-sm border-border/20">
-                <CardContent className="p-3">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="text-sm font-medium">Progression</div>
-                      <div className="text-xs text-muted-foreground">Cette semaine</div>
-                    </div>
-                    <div className="text-lg font-bold text-primary">{userProgress}%</div>
-                  </div>
-                  <Progress value={userProgress} className="mt-2 h-2" />
-                </CardContent>
-              </Card>
-
-              <Card className="bg-card/50 backdrop-blur-sm border-border/20">
-                <CardContent className="p-3">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="text-sm font-medium">Sessions</div>
-                      <div className="text-xs text-muted-foreground">Ce mois-ci</div>
-                    </div>
-                    <div className="text-lg font-bold text-success">{userStats.completedSessions}</div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-card/50 backdrop-blur-sm border-border/20">
-                <CardContent className="p-3">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="text-sm font-medium">Points</div>
-                      <div className="text-xs text-muted-foreground">Total</div>
-                    </div>
-                    <div className="text-lg font-bold text-primary">{userStats.totalPoints.toLocaleString()}</div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-card/50 backdrop-blur-sm border-border/20">
-                <CardContent className="p-3">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="text-sm font-medium">Série</div>
-                      <div className="text-xs text-muted-foreground">Jours consécutifs</div>
-                    </div>
-                    <div className="text-lg font-bold text-warning">{userStats.currentStreak}</div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+            {/* Stats rapides avec composants réutilisables */}
+            <StatsGrid columns={4}>
+              <StatsCard
+                label="Objectifs"
+                subtitle="Cette semaine"
+                value={userStats.weeklyGoals}
+                icon={Target}
+                iconColor="text-blue-500"
+                valueColor="text-blue-600"
+                loading={statsLoading}
+                variant="gradient"
+                size="sm"
+                delay={0}
+              />
+              
+              <StatsCard
+                label="Sessions"
+                subtitle="Complétées"
+                value={userStats.completedSessions}
+                icon={Activity}
+                iconColor="text-green-500"
+                valueColor="text-green-600"
+                loading={statsLoading}
+                variant="gradient"
+                size="sm"
+                delay={1}
+              />
+              
+              <StatsCard
+                label="Points"
+                subtitle={`Niveau ${userStats.level}`}
+                value={userStats.totalPoints}
+                icon={Trophy}
+                iconColor="text-yellow-500"
+                valueColor="text-yellow-600"
+                loading={statsLoading}
+                variant="gradient"
+                size="sm"
+                delay={2}
+              />
+              
+              <StatsCard
+                label="Série"
+                subtitle="Jours consécutifs"
+                value={userStats.currentStreak}
+                icon={Flame}
+                iconColor="text-orange-500"
+                valueColor="text-orange-600"
+                loading={statsLoading}
+                variant="gradient"
+                size="sm"
+                delay={3}
+              />
+            </StatsGrid>
 
             {/* Actions rapides */}
             <div className="mt-4">
@@ -348,7 +347,7 @@ const ModernHomePage: React.FC = () => {
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             <div>
-              <div className="text-3xl font-bold text-primary">{onlineUsers.toLocaleString()}</div>
+              <div className="text-3xl font-bold text-primary">{onlineCount > 0 ? onlineCount.toLocaleString() : '...'}</div>
               <div className="text-sm text-muted-foreground">Utilisateurs actifs</div>
             </div>
             <div>
