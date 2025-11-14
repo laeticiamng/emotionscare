@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { LazyMotionWrapper, m, AnimatePresence } from '@/utils/lazy-motion';
+import { LazyMotionWrapper, m } from '@/utils/lazy-motion';
 import {
   Dialog,
   DialogContent,
