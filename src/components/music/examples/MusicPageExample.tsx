@@ -17,7 +17,7 @@
  */
 
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { LazyMotionWrapper, m } from '@/utils/lazy-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -33,7 +33,7 @@ import { useUserQuota } from '@/hooks/music/useUserQuota';
 import { UnifiedMusicPlayer } from '@/components/music/UnifiedMusicPlayer';
 import { enhancedMusicService } from '@/services/music/enhanced-music-service';
 import { validateInput, MusicGenerationInputSchema } from '@/validators/music';
-import { Music, Sparkles, Info } from 'lucide-react';
+import { Music, Sparkles, Info } from '@/components/music/icons';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
 export function MusicPageExample() {
