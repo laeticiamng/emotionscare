@@ -11,6 +11,7 @@ import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { logger } from '@/lib/logger';
+import { supabase } from '@/lib/supabase';
 
 interface JournalVoiceRecorderProps {
   onTranscriptionComplete: (text: string, audioUrl: string) => void;
@@ -146,21 +147,37 @@ export const JournalVoiceRecorder: React.FC<JournalVoiceRecorderProps> = ({
 
     setIsTranscribing(true);
     try {
-      // TODO: Intégration avec service de transcription (Whisper API, etc.)
-      // Pour l'instant, simulation
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      logger.info('Transcription démarrée', { duration, size: audioBlob.size }, 'JOURNAL');
 
-      const simulatedTranscription = `[Transcription automatique de ${formatDuration(duration)}]\n\nCeci est une transcription simulée de votre enregistrement vocal. Dans la version production, cette fonctionnalité utilisera l'API OpenAI Whisper ou un service similaire pour transcrire automatiquement votre audio en texte.`;
+      // Appeler l'edge function pour transcrire avec Whisper API
+      const formData = new FormData();
+      formData.append('audio', audioBlob, 'recording.webm');
+      formData.append('language', 'fr'); // French language hint
+      formData.append('duration', duration.toString());
 
-      setTranscription(simulatedTranscription);
-      onTranscriptionComplete(simulatedTranscription, audioUrl);
+      const { data, error } = await supabase.functions.invoke('transcribe-audio', {
+        body: formData,
+      });
+
+      if (error) {
+        throw new Error(`Transcription failed: ${error.message}`);
+      }
+
+      const transcription = data?.text || data?.transcription || '';
+
+      if (!transcription) {
+        throw new Error('No transcription returned');
+      }
+
+      setTranscription(transcription);
+      onTranscriptionComplete(transcription, audioUrl);
 
       toast({
         title: 'Transcription terminée',
         description: 'Votre enregistrement a été converti en texte.',
       });
 
-      logger.info('Transcription vocal réussie', { duration, textLength: simulatedTranscription.length }, 'JOURNAL');
+      logger.info('Transcription vocal réussie', { duration, textLength: transcription.length }, 'JOURNAL');
     } catch (error) {
       logger.error('Erreur transcription', { error }, 'JOURNAL');
       toast({
