@@ -1,12 +1,19 @@
-// @ts-nocheck
-
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';
 
 // TopMedia AI API configuration
-const API_KEY = '1e4228c100304c658ab1eab4333f54be';
+const API_KEY = import.meta.env.VITE_TOPMEDIA_API_KEY;
 const API_BASE_URL = 'https://api.topmusicai.com/v1';
 const API_BASE_URL_V2 = 'https://api.topmusicai.com/v2';
+
+// Validate API key is configured
+if (!API_KEY) {
+  logger.error(
+    'TopMedia API key not configured',
+    new Error('VITE_TOPMEDIA_API_KEY environment variable is missing'),
+    'MUSIC'
+  );
+}
 
 /**
  * Generate lyrics based on a theme or mood

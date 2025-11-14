@@ -6,6 +6,7 @@
 import { MusicTrack } from '@/types/music';
 import { analyzeMusicBehavior } from './preferences-learning-service';
 import { logger } from '@/lib/logger';
+import { supabase } from '@/integrations/supabase/client';
 
 export interface PersonalizedPlaylist {
   id: string;
@@ -131,15 +132,50 @@ function generateMockTracks(theme: string, count: number): MusicTrack[] {
 }
 
 /**
- * Ajoute une playlist aux favoris
+ * Ajoute ou retire une playlist des favoris
  */
 export async function togglePlaylistFavorite(
   userId: string,
   playlistId: string
 ): Promise<boolean> {
   try {
-    // TODO: Implémenter avec Supabase
-    logger.info('Toggled playlist favorite', { userId, playlistId }, 'MUSIC');
+    // Vérifier si la playlist existe déjà dans les favoris
+    const { data: existing, error: checkError } = await supabase
+      .from('music_playlists')
+      .select('id, tags')
+      .eq('id', playlistId)
+      .eq('user_id', userId)
+      .single();
+
+    if (checkError) {
+      logger.error('Failed to check playlist favorite status', checkError as Error, 'MUSIC');
+      return false;
+    }
+
+    // Toggle le statut favori via les tags
+    const currentTags = existing.tags || [];
+    const isFavorite = currentTags.includes('favorite');
+    const newTags = isFavorite
+      ? currentTags.filter((tag: string) => tag !== 'favorite')
+      : [...currentTags, 'favorite'];
+
+    const { error: updateError } = await supabase
+      .from('music_playlists')
+      .update({ tags: newTags })
+      .eq('id', playlistId)
+      .eq('user_id', userId);
+
+    if (updateError) {
+      logger.error('Failed to toggle playlist favorite', updateError as Error, 'MUSIC');
+      return false;
+    }
+
+    logger.info('Toggled playlist favorite', {
+      userId,
+      playlistId,
+      isFavorite: !isFavorite
+    }, 'MUSIC');
+
     return true;
   } catch (error) {
     logger.error('Failed to toggle favorite', error as Error, 'MUSIC');
