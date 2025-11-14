@@ -50,6 +50,12 @@ export { default as Check } from 'lucide-react/dist/esm/icons/check';
 export { default as Edit2 } from 'lucide-react/dist/esm/icons/edit-2';
 export { default as Save } from 'lucide-react/dist/esm/icons/save';
 export { default as Search } from 'lucide-react/dist/esm/icons/search';
+export { default as Copy } from 'lucide-react/dist/esm/icons/copy';
+
+// Social media icons
+export { default as Twitter } from 'lucide-react/dist/esm/icons/twitter';
+export { default as Facebook } from 'lucide-react/dist/esm/icons/facebook';
+export { default as Instagram } from 'lucide-react/dist/esm/icons/instagram';
 
 // Info and status
 export { default as Info } from 'lucide-react/dist/esm/icons/info';
@@ -105,6 +111,17 @@ export { default as Palette } from 'lucide-react/dist/esm/icons/palette';
 export { default as Wand2 } from 'lucide-react/dist/esm/icons/wand-2';
 export { default as Type } from 'lucide-react/dist/esm/icons/type';
 export { default as Moon } from 'lucide-react/dist/esm/icons/moon';
+
+// Weather and time
+export { default as Sun } from 'lucide-react/dist/esm/icons/sun';
+export { default as Sunrise } from 'lucide-react/dist/esm/icons/sunrise';
+export { default as Sunset } from 'lucide-react/dist/esm/icons/sunset';
+export { default as CloudRain } from 'lucide-react/dist/esm/icons/cloud-rain';
+export { default as CloudSnow } from 'lucide-react/dist/esm/icons/cloud-snow';
+
+// Feedback and reactions
+export { default as ThumbsUp } from 'lucide-react/dist/esm/icons/thumbs-up';
+export { default as ThumbsDown } from 'lucide-react/dist/esm/icons/thumbs-down';
 
 // Other
 export { default as Lock } from 'lucide-react/dist/esm/icons/lock';
