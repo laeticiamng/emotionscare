@@ -106,7 +106,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
       });
 
       if (error) {
-        throw error;
+        logger.error('Erreur lors de l\'inscription', error as Error, 'AUTH');
+        throw error; // Lancer l'erreur pour que le composant puisse la gérer
       }
 
       if (data.user && !data.user.email_confirmed_at) {
@@ -114,7 +115,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       }
     } catch (error) {
       logger.error('Erreur lors de l\'inscription', error as Error, 'AUTH');
-      throw error;
+      throw error; // Relancer pour compatibilité avec les composants existants
     } finally {
       setIsLoading(false);
     }
@@ -129,13 +130,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
       });
 
       if (error) {
-        throw error;
+        logger.error('Erreur lors de la connexion', error as Error, 'AUTH');
+        throw error; // Lancer l'erreur pour que le composant puisse la gérer
       }
 
       logger.info('Connexion réussie', { email }, 'AUTH');
     } catch (error) {
       logger.error('Erreur lors de la connexion', error as Error, 'AUTH');
-      throw error;
+      throw error; // Relancer pour compatibilité avec les composants existants
     } finally {
       setIsLoading(false);
     }

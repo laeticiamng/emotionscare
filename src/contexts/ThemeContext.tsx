@@ -133,7 +133,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
       const theme = allThemes.find((t) => t.id === themeId);
       if (!theme) {
-        throw new Error('Theme not found');
+        logger.error('Theme not found', new Error(`Theme ${themeId} not found`), 'THEME');
+        return; // Retourner au lieu de throw pour éviter le crash
       }
 
       setActiveTheme(theme);
@@ -145,7 +146,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         const newPreferences = await themeService.getUserThemePreferences(user.id);
         setPreferences(newPreferences);
       } catch (error) {
-        console.error('Failed to activate theme:', error);
+        logger.error('Failed to activate theme', error as Error, 'THEME');
       }
     },
     [user?.id, allThemes]
@@ -153,11 +154,19 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   const createTheme = useCallback(
     async (theme: Omit<CustomTheme, 'id' | 'userId' | 'createdAt' | 'updatedAt'>) => {
-      if (!user?.id) throw new Error('User not authenticated');
+      if (!user?.id) {
+        logger.error('User not authenticated', new Error('User not authenticated'), 'THEME');
+        return null; // Retourner null au lieu de throw
+      }
 
-      const newTheme = await themeService.createCustomTheme(user.id, theme);
-      setAllThemes((prev) => [...prev, newTheme]);
-      return newTheme;
+      try {
+        const newTheme = await themeService.createCustomTheme(user.id, theme);
+        setAllThemes((prev) => [...prev, newTheme]);
+        return newTheme;
+      } catch (error) {
+        logger.error('Failed to create theme', error as Error, 'THEME');
+        return null;
+      }
     },
     [user?.id]
   );
@@ -185,47 +194,84 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   const duplicateTheme = useCallback(
     async (themeId: string, newName: string) => {
-      if (!user?.id) throw new Error('User not authenticated');
+      if (!user?.id) {
+        logger.error('User not authenticated', new Error('User not authenticated'), 'THEME');
+        return null; // Retourner null au lieu de throw
+      }
 
-      const duplicated = await themeService.duplicateTheme(user.id, themeId, newName);
-      setAllThemes((prev) => [...prev, duplicated]);
-      return duplicated;
+      try {
+        const duplicated = await themeService.duplicateTheme(user.id, themeId, newName);
+        setAllThemes((prev) => [...prev, duplicated]);
+        return duplicated;
+      } catch (error) {
+        logger.error('Failed to duplicate theme', error as Error, 'THEME');
+        return null;
+      }
     },
     [user?.id]
   );
 
   const exportTheme = useCallback((themeId: string) => {
     const theme = allThemes.find((t) => t.id === themeId);
-    if (!theme) throw new Error('Theme not found');
+    if (!theme) {
+      logger.error('Theme not found for export', new Error(`Theme ${themeId} not found`), 'THEME');
+      return; // Retourner au lieu de throw
+    }
 
-    const exported = themeService.exportTheme(theme);
-    const blob = new Blob([JSON.stringify(exported, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `${theme.name.toLowerCase().replace(/\s+/g, '-')}.theme.json`;
-    link.click();
-    URL.revokeObjectURL(url);
+    // Vérification SSR
+    if (typeof document === 'undefined' || typeof Blob === 'undefined') {
+      logger.error('Export not available in SSR context', new Error('Document API unavailable'), 'THEME');
+      return;
+    }
+
+    try {
+      const exported = themeService.exportTheme(theme);
+      const blob = new Blob([JSON.stringify(exported, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${theme.name.toLowerCase().replace(/\s+/g, '-')}.theme.json`;
+      link.click();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      logger.error('Failed to export theme', error as Error, 'THEME');
+    }
   }, [allThemes]);
 
   const importTheme = useCallback(
     async (file: File) => {
-      if (!user?.id) throw new Error('User not authenticated');
+      if (!user?.id) {
+        logger.error('User not authenticated', new Error('User not authenticated'), 'THEME');
+        return null; // Retourner null au lieu de throw
+      }
 
-      const content = await file.text();
-      const themeExport = JSON.parse(content);
-      const imported = await themeService.importTheme(user.id, themeExport);
-      setAllThemes((prev) => [...prev, imported]);
+      try {
+        const content = await file.text();
+        const themeExport = JSON.parse(content);
+        const imported = await themeService.importTheme(user.id, themeExport);
+        setAllThemes((prev) => [...prev, imported]);
+        return imported;
+      } catch (error) {
+        logger.error('Failed to import theme', error as Error, 'THEME');
+        return null;
+      }
     },
     [user?.id]
   );
 
   const updatePreferences = useCallback(
     async (updates: Partial<UserThemePreferences>) => {
-      if (!user?.id) throw new Error('User not authenticated');
+      if (!user?.id) {
+        logger.error('User not authenticated', new Error('User not authenticated'), 'THEME');
+        return; // Retourner au lieu de throw
+      }
 
-      const updated = await themeService.updateUserThemePreferences(user.id, updates);
-      setPreferences(updated);
+      try {
+        const updated = await themeService.updateUserThemePreferences(user.id, updates);
+        setPreferences(updated);
+      } catch (error) {
+        logger.error('Failed to update preferences', error as Error, 'THEME');
+      }
     },
     [user?.id]
   );
