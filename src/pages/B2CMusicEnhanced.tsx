@@ -52,6 +52,8 @@ import { useMusicJourney } from '@/hooks/useMusicJourney';
 import { useGamification } from '@/hooks/useGamification';
 import { useUserMusicPreferences } from '@/hooks/useUserMusicPreferences';
 import { MusicPreferencesModal } from '@/components/music/MusicPreferencesModal';
+import { MusicAnalyticsDashboard } from '@/components/music/analytics/MusicAnalyticsDashboard';
+import { useMusicPreferencesLearning } from '@/hooks/useMusicPreferencesLearning';
 
 interface VinylTrack extends MusicTrack {
   category: 'doux' | 'énergique' | 'créatif' | 'guérison';
