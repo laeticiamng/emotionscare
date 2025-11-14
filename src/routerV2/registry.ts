@@ -1728,6 +1728,40 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
       description: 'Explorez toutes les fonctionnalités EmotionsCare',
     },
   },
+  
+  // Gamification avancée
+  {
+    name: 'leaderboard',
+    path: '/app/leaderboard',
+    segment: 'b2c',
+    layout: 'app-sidebar',
+    component: 'LeaderboardPage',
+    guard: true,
+  },
+  {
+    name: 'guilds',
+    path: '/app/guilds',
+    segment: 'b2c',
+    layout: 'app-sidebar',
+    component: 'GuildListPage',
+    guard: true,
+  },
+  {
+    name: 'guild-detail',
+    path: '/app/guilds/:guildId',
+    segment: 'b2c',
+    layout: 'app-sidebar',
+    component: 'GuildPage',
+    guard: true,
+  },
+  {
+    name: 'premium-rewards',
+    path: '/app/rewards',
+    segment: 'b2c',
+    layout: 'app-sidebar',
+    component: 'PremiumRewardsPage',
+    guard: true,
+  },
   {
     name: 'admin-ai-template-suggestions',
     path: '/admin/alerts/ai-suggestions',
