@@ -277,7 +277,7 @@ export function setupRovingTabindex(container: HTMLElement, itemSelector: string
 
     if (currentItem === -1) return;
 
-    let nextIndex = currentIndex;
+    let nextIndex: number;
 
     switch (event.key) {
       case 'ArrowDown':
