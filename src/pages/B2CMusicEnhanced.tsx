@@ -50,6 +50,8 @@ import type { MusicTrack } from '@/types/music';
 import { logger } from '@/lib/logger';
 import { useMusicJourney } from '@/hooks/useMusicJourney';
 import { useGamification } from '@/hooks/useGamification';
+import { useUserMusicPreferences } from '@/hooks/useUserMusicPreferences';
+import { MusicPreferencesModal } from '@/components/music/MusicPreferencesModal';
 
 interface VinylTrack extends MusicTrack {
   category: 'doux' | 'énergique' | 'créatif' | 'guérison';
@@ -218,6 +220,21 @@ const B2CMusicEnhanced: React.FC = () => {
     }
   });
   const [voiceCoachEnabled, setVoiceCoachEnabled] = useState(true);
+  
+  // Music preferences
+  const { hasPreferences, isLoading: prefsLoading, refreshPreferences } = useUserMusicPreferences();
+  const [showPreferencesModal, setShowPreferencesModal] = useState(false);
+
+  // Afficher modal au premier lancement si pas de préférences
+  useEffect(() => {
+    if (!prefsLoading && !hasPreferences) {
+      // Petit délai pour laisser la page se charger
+      const timer = setTimeout(() => {
+        setShowPreferencesModal(true);
+      }, 800);
+      return () => clearTimeout(timer);
+    }
+  }, [prefsLoading, hasPreferences]);
   const [sessionState, setSessionState] = useState<'idle' | 'active' | 'break' | 'completed'>('idle');
 
   const universe = getOptimizedUniverse('music');
@@ -298,12 +315,36 @@ const B2CMusicEnhanced: React.FC = () => {
           <div className="flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-r from-accent to-accent/80">
             <Music className="h-6 w-6 text-primary-foreground" />
           </div>
-          <div>
+          <div className="flex-1">
             <h1 className="text-3xl font-bold text-foreground">Musicothérapie</h1>
             <p className="text-muted-foreground">Playlists thérapeutiques personnalisées</p>
           </div>
+          {hasPreferences && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowPreferencesModal(true)}
+              className="gap-2"
+            >
+              <Sparkles className="h-4 w-4" />
+              Modifier mes préférences
+            </Button>
+          )}
         </div>
       </div>
+
+      {/* Music Preferences Modal */}
+      <MusicPreferencesModal
+        open={showPreferencesModal}
+        onClose={() => setShowPreferencesModal(false)}
+        onComplete={() => {
+          refreshPreferences();
+          toast({
+            title: 'Préférences enregistrées !',
+            description: 'Vos recommandations seront personnalisées.',
+          });
+        }}
+      />
 
       {/* Main Content */}
       <TooltipProvider>
