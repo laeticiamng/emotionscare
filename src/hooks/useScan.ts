@@ -21,6 +21,12 @@ interface ScanState {
 
 const compressImage = (file: File, maxWidth = 1280, quality = 0.7): Promise<string> => {
   return new Promise((resolve, reject) => {
+    // Vérification SSR
+    if (typeof document === 'undefined' || typeof Image === 'undefined') {
+      reject(new Error('Document/Image API not available (SSR)'));
+      return;
+    }
+
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
     const img = new Image();
@@ -51,14 +57,22 @@ const compressImage = (file: File, maxWidth = 1280, quality = 0.7): Promise<stri
 };
 
 const captureFrameFromVideo = (video: HTMLVideoElement): string => {
+  // Vérification SSR
+  if (typeof document === 'undefined') {
+    throw new Error('Document API not available (SSR)');
+  }
+
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
-  
-  if (!ctx) throw new Error('Canvas context not available');
+
+  if (!ctx) {
+    logger.error('Canvas context not available', new Error('Canvas context unavailable'), 'SCAN');
+    throw new Error('Canvas context not available');
+  }
 
   canvas.width = video.videoWidth;
   canvas.height = video.videoHeight;
-  
+
   ctx.drawImage(video, 0, 0);
   return canvas.toDataURL('image/jpeg', 0.7);
 };

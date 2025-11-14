@@ -519,7 +519,12 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         }
       });
 
-      if (error) throw error;
+      if (error) {
+        logger.error('Suno music generation invoke error', error as Error, 'MUSIC');
+        dispatch({ type: 'SET_GENERATION_ERROR', payload: 'Erreur lors de la génération de musique' });
+        toast.error('Erreur lors de la génération de musique');
+        return null;
+      }
 
       dispatch({ type: 'SET_GENERATION_PROGRESS', payload: 50 });
 
@@ -529,23 +534,34 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         const maxAttempts = 30; // 5 minutes max
 
         while (attempts < maxAttempts) {
-          const statusData = await checkGenerationStatus(taskId);
-          
-          if (statusData) {
-            dispatch({ type: 'SET_GENERATION_PROGRESS', payload: 100 });
-            return statusData;
+          try {
+            const statusData = await checkGenerationStatus(taskId);
+
+            if (statusData) {
+              dispatch({ type: 'SET_GENERATION_PROGRESS', payload: 100 });
+              return statusData;
+            }
+
+            dispatch({
+              type: 'SET_GENERATION_PROGRESS',
+              payload: 50 + (attempts / maxAttempts) * 45
+            });
+
+            await new Promise(resolve => setTimeout(resolve, 10000)); // Attendre 10s
+            attempts++;
+          } catch (error) {
+            logger.error('Error checking generation status', error as Error, 'MUSIC');
+            // Continue polling même en cas d'erreur temporaire
+            await new Promise(resolve => setTimeout(resolve, 10000));
+            attempts++;
           }
-          
-          dispatch({ 
-            type: 'SET_GENERATION_PROGRESS', 
-            payload: 50 + (attempts / maxAttempts) * 45 
-          });
-          
-          await new Promise(resolve => setTimeout(resolve, 10000)); // Attendre 10s
-          attempts++;
         }
-        
-        throw new Error('Timeout - Génération trop longue');
+
+        // Timeout - retourner null au lieu de throw
+        logger.error('Music generation timeout', new Error('Timeout - Génération trop longue'), 'MUSIC');
+        dispatch({ type: 'SET_GENERATION_ERROR', payload: 'Timeout - Génération trop longue' });
+        toast.error('La génération prend trop de temps, veuillez réessayer');
+        return null;
       };
 
       const generatedTrack = await checkStatus(data.taskId);
@@ -576,7 +592,10 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         }
       });
 
-      if (error) throw error;
+      if (error) {
+        logger.error('Error checking generation status', error as Error, 'MUSIC');
+        return null;
+      }
 
       if (data.status === 'completed' && data.audioUrl) {
         const track: MusicTrack = {

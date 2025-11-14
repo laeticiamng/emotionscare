@@ -21,6 +21,11 @@ export const useCamera = () => {
 
   // Get available camera devices
   const getDevices = useCallback(async () => {
+    // Vérification SSR
+    if (typeof navigator === 'undefined' || !navigator.mediaDevices) {
+      return [];
+    }
+
     try {
       const mediaDevices = await navigator.mediaDevices.enumerateDevices();
       const videoDevices = mediaDevices.filter(device => device.kind === 'videoinput');
@@ -123,6 +128,8 @@ export const useCamera = () => {
 
   // Capture frame from video
   const captureFrame = useCallback((): string | null => {
+    // Vérification SSR
+    if (typeof document === 'undefined') return null;
     if (!videoRef.current || !stream) return null;
 
     try {
@@ -136,7 +143,7 @@ export const useCamera = () => {
       if (!ctx) return null;
 
       ctx.drawImage(video, 0, 0);
-      
+
       // Convert to JPEG with 60% quality for efficiency
       return canvas.toDataURL('image/jpeg', 0.6);
     } catch (error) {
@@ -147,6 +154,12 @@ export const useCamera = () => {
 
   // Check camera permission status
   const checkPermission = useCallback(async () => {
+    // Vérification SSR
+    if (typeof navigator === 'undefined') {
+      store.setCameraPermission('prompt');
+      return 'prompt';
+    }
+
     try {
       if (!navigator.permissions) {
         store.setCameraPermission('prompt');
