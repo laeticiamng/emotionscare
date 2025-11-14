@@ -149,7 +149,7 @@ const B2CMusicEnhanced: React.FC = () => {
   const musicFavorites = useMusicFavorites();
   
   // Charger les URLs audio de manière asynchrone avec fallback
-  const { urls: audioUrls, isLoading: audioUrlsLoading } = useAudioUrls(AUDIO_URL_CONFIG);
+  const { urls: audioUrls, sources: audioSources, isLoading: audioUrlsLoading } = useAudioUrls(AUDIO_URL_CONFIG);
   
   // Créer les tracks avec les URLs chargées
   const vinylTracks: VinylTrack[] = useMemo(() => {
@@ -590,6 +590,7 @@ const B2CMusicEnhanced: React.FC = () => {
                 const Icon = categoryIcons[track.category];
                 const isFavorite = musicFavorites.isFavorite(track.id);
                 const isLoading = loadingTrackId === track.id;
+                const audioSource = audioSources[track.id] || 'fallback';
                 
                 return (
                   <Tooltip key={track.id}>
@@ -662,6 +663,47 @@ const B2CMusicEnhanced: React.FC = () => {
                           >
                             {track.mood}
                           </Badge>
+
+                          {/* Source indicator badge */}
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Badge
+                                variant={audioSource === 'supabase' ? 'default' : 'outline'}
+                                className="text-xs cursor-help"
+                              >
+                                {audioSource === 'supabase' ? (
+                                  <>
+                                    <Sparkles className="h-3 w-3 mr-1" />
+                                    Cloud
+                                  </>
+                                ) : (
+                                  <>
+                                    <Clock className="h-3 w-3 mr-1" />
+                                    Backup
+                                  </>
+                                )}
+                              </Badge>
+                            </TooltipTrigger>
+                            <TooltipContent side="top" className="max-w-xs">
+                              {audioSource === 'supabase' ? (
+                                <div className="space-y-1">
+                                  <p className="font-semibold text-xs">✨ Source Cloud</p>
+                                  <p className="text-xs">Audio hébergé sur Supabase Storage</p>
+                                  <p className="text-xs text-muted-foreground">
+                                    Optimisé, sécurisé, et sous contrôle total
+                                  </p>
+                                </div>
+                              ) : (
+                                <div className="space-y-1">
+                                  <p className="font-semibold text-xs">🔄 Source Backup</p>
+                                  <p className="text-xs">Audio depuis serveur externe</p>
+                                  <p className="text-xs text-muted-foreground">
+                                    Fallback automatique (Storage non disponible)
+                                  </p>
+                                </div>
+                              )}
+                            </TooltipContent>
+                          </Tooltip>
 
                           <p className="text-xs text-muted-foreground leading-relaxed">
                             {track.description}
