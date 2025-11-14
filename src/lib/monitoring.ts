@@ -5,6 +5,7 @@
 
 import { aiMonitoring, captureMessage } from '@/lib/ai-monitoring';
 import { logger } from '@/lib/logger';
+import { initializeSentryAlerts, trackErrorRateAlert, trackPerformanceAlert, alertOnCriticalException } from '@/lib/sentry-alerts-config';
 
 type AlertSeverity = 'info' | 'warning' | 'error' | 'critical';
 
@@ -34,13 +35,23 @@ export function sendAlert(alert: Alert): void {
     );
   }
 
-  // Send to AI Monitoring
+  // Send to AI Monitoring and Sentry
   if (alert.severity === 'error' || alert.severity === 'critical') {
     aiMonitoring.captureMessage(
       alert.message,
       alert.severity,
       alert.context
     );
+
+    // Also send to Sentry alerts system for configured integrations
+    if (alert.severity === 'critical') {
+      const { captureAlertEvent, AlertSeverity } = require('@/lib/sentry-alerts-config');
+      captureAlertEvent(
+        alert.message,
+        AlertSeverity.CRITICAL,
+        alert.context
+      );
+    }
   }
 
   // Edge function désactivée temporairement (fonction inexistante)
@@ -155,13 +166,49 @@ export function initMonitoring(): void {
     });
   }
 
+  // Initialize Sentry alerts
+  initializeSentryAlerts();
+
   // Initialize business metrics
   initBusinessMetrics();
+
+  // Track error rate for alerting
+  let errorCount = 0;
+  let totalCount = 0;
+  const trackErrorRate = () => {
+    if (totalCount > 0 && totalCount % 50 === 0) {
+      // Check error rate every 50 requests
+      trackErrorRateAlert(errorCount, totalCount, 0.05); // Alert if > 5%
+      errorCount = 0;
+      totalCount = 0;
+    }
+  };
+
+  // Track all API calls for error rate
+  if (typeof window !== 'undefined') {
+    // Intercept fetch calls
+    const originalFetch = window.fetch;
+    window.fetch = async (...args) => {
+      totalCount++;
+      try {
+        const response = await originalFetch(...args);
+        if (!response.ok) {
+          errorCount++;
+        }
+        trackErrorRate();
+        return response;
+      } catch (error) {
+        errorCount++;
+        trackErrorRate();
+        throw error;
+      }
+    };
+  }
 
   // Periodic health checks
   setInterval(async () => {
     const health = await checkSystemHealth();
-    
+
     if (health.status === 'degraded') {
       sendAlert({
         severity: 'warning',
@@ -179,5 +226,27 @@ export function initMonitoring(): void {
     }
   }, 300000); // Every 5 minutes
 
-  logger.info('[Monitoring] System initialized', {}, 'SYSTEM');
+  // Performance monitoring with alerts
+  if (typeof PerformanceObserver !== 'undefined') {
+    const perfObserver = new PerformanceObserver((list) => {
+      for (const entry of list.getEntries()) {
+        if (entry.entryType === 'measure' && entry.duration > 1000) {
+          // Alert on operations taking > 1s
+          trackPerformanceAlert(
+            entry.name,
+            entry.duration,
+            1000,
+            'ms'
+          );
+        }
+      }
+    });
+    try {
+      perfObserver.observe({ entryTypes: ['measure', 'navigation'] });
+    } catch (e) {
+      // PerformanceObserver not supported
+    }
+  }
+
+  logger.info('[Monitoring] System initialized with Sentry alerting', {}, 'SYSTEM');
 }
