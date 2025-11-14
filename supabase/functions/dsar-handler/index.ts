@@ -62,15 +62,40 @@ const handler = withMonitoring('dsar-handler', async (req) => {
 
       // Générer le JSON
       const packageData = JSON.stringify(userData, null, 2);
-      
-      // TODO: Uploader sur storage et obtenir URL
-      const packageUrl = `data:application/json;base64,${btoa(packageData)}`;
+
+      // Uploader sur Supabase Storage
+      const fileName = `dsar-${request.user_id}-${requestId}-${Date.now()}.json`;
+      const { data: uploadData, error: uploadError } = await supabase
+        .storage
+        .from('gdpr-exports')
+        .upload(fileName, packageData, {
+          contentType: 'application/json',
+          cacheControl: '3600',
+          upsert: false
+        });
+
+      if (uploadError) {
+        throw new Error(`Storage upload failed: ${uploadError.message}`);
+      }
+
+      // Générer une URL signée valide 7 jours (GDPR compliance)
+      const { data: signedUrlData, error: signedUrlError } = await supabase
+        .storage
+        .from('gdpr-exports')
+        .createSignedUrl(fileName, 7 * 24 * 60 * 60); // 7 days
+
+      if (signedUrlError) {
+        throw new Error(`Signed URL generation failed: ${signedUrlError.message}`);
+      }
+
+      const packageUrl = signedUrlData.signedUrl;
 
       await supabase
         .from('dsar_requests')
         .update({
           status: 'completed',
           package_url: packageUrl,
+          storage_path: fileName,
           completed_at: new Date().toISOString(),
         })
         .eq('id', requestId);

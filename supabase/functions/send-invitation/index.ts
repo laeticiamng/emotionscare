@@ -4,6 +4,7 @@ import { serve } from 'https://deno.land/std@0.208.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { authorizeRole, logUnauthorizedAccess } from '../_shared/auth-middleware.ts';
 import { buildRateLimitResponse, enforceEdgeRateLimit } from '../_shared/rate-limit.ts';
+import { sendEmail, generateInvitationEmail } from '../_shared/email-service.ts';
 
 serve(async (req) => {
   const corsHeaders = {
@@ -104,13 +105,62 @@ serve(async (req) => {
       );
     }
 
-    // TODO: Envoyer l'email d'invitation (nécessite configuration SMTP)
-    console.log(`Invitation créée pour ${email} avec le rôle ${role}`);
+    // Récupérer les informations de l'organisation et de l'inviteur
+    const { data: organization } = await supabase
+      .from('organizations')
+      .select('name')
+      .eq('id', organizationId)
+      .single();
+
+    const { data: inviter } = await supabase
+      .from('profiles')
+      .select('full_name, email')
+      .eq('id', authResult.user.id)
+      .single();
+
+    // Générer l'URL d'invitation
+    const frontendUrl = Deno.env.get('FRONTEND_URL') || 'https://app.emotionscare.com';
+    const inviteUrl = `${frontendUrl}/accept-invitation/${invitation.id}`;
+
+    // Générer et envoyer l'email d'invitation
+    const emailContent = generateInvitationEmail({
+      inviterName: inviter?.full_name || inviter?.email,
+      organizationName: organization?.name || 'EmotionsCare',
+      role: role === 'b2b_admin' ? 'Administrateur' : 'Utilisateur',
+      inviteUrl,
+      expiresAt: invitation.expires_at
+    });
+
+    const emailResult = await sendEmail({
+      to: email,
+      subject: `✉️ Invitation à rejoindre ${organization?.name || 'une équipe'} sur EmotionsCare`,
+      html: emailContent.html,
+      text: emailContent.text
+    });
+
+    if (!emailResult.success) {
+      console.error(`Failed to send invitation email to ${email}:`, emailResult.error);
+      // Marquer l'invitation comme failed
+      await supabase
+        .from('invitations')
+        .update({ status: 'failed', error_message: emailResult.error })
+        .eq('id', invitation.id);
+
+      return new Response(
+        JSON.stringify({
+          error: 'Invitation créée mais l\'email n\'a pas pu être envoyé. Veuillez contacter le support.',
+          invitationId: invitation.id
+        }),
+        { status: 500, headers: corsHeaders }
+      );
+    }
+
+    console.log(`Invitation créée et email envoyé pour ${email} avec le rôle ${role}`);
 
     return new Response(
-      JSON.stringify({ 
+      JSON.stringify({
         message: 'Invitation envoyée avec succès',
-        invitationId: invitation.id 
+        invitationId: invitation.id
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );

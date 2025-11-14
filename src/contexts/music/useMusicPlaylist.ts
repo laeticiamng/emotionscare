@@ -4,6 +4,8 @@
 
 import { useCallback, Dispatch } from 'react';
 import { MusicState, MusicAction, MusicTrack } from './types';
+import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 
 export const useMusicPlaylist = (
   state: MusicState,
@@ -32,9 +34,60 @@ export const useMusicPlaylist = (
     dispatch({ type: 'TOGGLE_FAVORITE', payload: trackId });
   }, [dispatch]);
 
-  const getRecommendationsForEmotion = useCallback(async (emotion: string): Promise<MusicTrack[]> => {
-    // TODO: Appeler edge function adaptive-music
-    return [];
+  const getRecommendationsForEmotion = useCallback(async (emotion: string, intensity: number = 5): Promise<MusicTrack[]> => {
+    try {
+      // Get current session for auth token
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        logger.warn('No session - cannot fetch music recommendations', {}, 'MUSIC');
+        return [];
+      }
+
+      // Construct URL with query params
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const url = new URL(`${supabaseUrl}/functions/v1/adaptive-music/recommendations`);
+      url.searchParams.set('emotion', emotion);
+      url.searchParams.set('intensity', intensity.toString());
+
+      // Call edge function directly with fetch
+      const response = await fetch(url.toString(), {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        logger.error('Failed to get music recommendations', { status: response.status }, 'MUSIC');
+        return [];
+      }
+
+      const data = await response.json();
+
+      // Transform edge function response to MusicTrack format
+      const tracks: MusicTrack[] = (data?.recommendations || []).map((track: any) => ({
+        id: track.id,
+        title: track.title,
+        artist: track.artist,
+        duration: track.duration,
+        url: track.url,
+        emotion_tags: track.emotion_tags,
+        bpm: track.bpm,
+        energy_level: track.energy_level,
+      }));
+
+      logger.info('Music recommendations fetched', {
+        emotion,
+        intensity,
+        count: tracks.length
+      }, 'MUSIC');
+
+      return tracks;
+    } catch (error) {
+      logger.error('Exception fetching music recommendations', error as Error, 'MUSIC');
+      return [];
+    }
   }, []);
 
   return {

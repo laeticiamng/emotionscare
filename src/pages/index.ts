@@ -119,11 +119,6 @@ export { default as ChooseModePage } from './ChooseModePage';
 export { default as AdminFlagsPage } from "@/modules/admin/AdminFlagsPage";
 export { default as TestAccountsPage } from "./dev/TestAccountsPage";
 
-// Coming Soon Pages
-export { MessagesComingSoon } from './coming-soon/MessagesComingSoon';
-export { CalendarComingSoon } from './coming-soon/CalendarComingSoon';
-export { Point20ComingSoon } from './coming-soon/Point20ComingSoon';
-
 // Legal Pages (nouvelles)
 export { TermsPage } from './legal/TermsPage';
 export { PrivacyPage as PrivacyPageNew } from './legal/PrivacyPage';
