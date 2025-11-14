@@ -43,7 +43,7 @@ export const fetchLatestEmotion = async (userId: string): Promise<EmotionResult 
   }
 };
 
-export const createEmotionEntry = async (emotion: Partial<EmotionResult>): Promise<EmotionResult> => {
+export const createEmotionEntry = async (emotion: Partial<EmotionResult>): Promise<EmotionResult | null> => {
   try {
     const { data, error } = await supabase
       .from('emotions')
@@ -63,7 +63,10 @@ export const createEmotionEntry = async (emotion: Partial<EmotionResult>): Promi
       .select('*')
       .single();
 
-    if (error) throw error;
+    if (error) {
+      logger.error('Error creating emotion entry', error, 'SCAN');
+      return null;
+    }
 
     return {
       id: data.id,
@@ -82,7 +85,7 @@ export const createEmotionEntry = async (emotion: Partial<EmotionResult>): Promi
     };
   } catch (error) {
     logger.error('Error creating emotion entry', error as Error, 'SCAN');
-    throw error;
+    return null;
   }
 };
 
