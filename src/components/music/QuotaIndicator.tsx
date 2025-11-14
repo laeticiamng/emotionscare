@@ -259,7 +259,7 @@ export function QuotaBadge({ className = '' }: { className?: string }) {
  * Composant d'avertissement quand quota insuffisant
  */
 export function QuotaWarning({ className = '' }: { className?: string }) {
-  const { remaining, canGenerate, formattedResetDate, tier } = useQuotaUI();
+  const { canGenerate, formattedResetDate, tier } = useQuotaUI();
 
   if (canGenerate) {
     return null;

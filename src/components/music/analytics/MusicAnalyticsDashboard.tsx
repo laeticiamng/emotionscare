@@ -8,7 +8,7 @@ import { LazyMotionWrapper, m } from '@/utils/lazy-motion';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { TrendingUp, Music, Users, Target, BarChart3, Clock } from '@/components/music/icons';
+import { TrendingUp, Music, Target, BarChart3, Clock } from '@/components/music/icons';
 import { GenreDistributionChart } from './GenreDistributionChart';
 import { MoodPopularityChart } from './MoodPopularityChart';
 import { TempoTrendsChart } from './TempoTrendsChart';
