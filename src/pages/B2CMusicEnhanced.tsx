@@ -226,6 +226,17 @@ const B2CMusicEnhanced: React.FC = () => {
   // Music preferences
   const { hasPreferences, isLoading: prefsLoading, refreshPreferences } = useUserMusicPreferences();
   const [showPreferencesModal, setShowPreferencesModal] = useState(false);
+  const { insights, isAnalyzing, analyzePreferences } = useMusicPreferencesLearning();
+  
+  // Notifications changements de goût
+  useEffect(() => {
+    if (insights?.tasteChangeDetected && insights.confidence > 0.7) {
+      toast({
+        title: '🎵 Évolution de vos goûts détectée',
+        description: 'Vos préférences musicales ont évolué. Consultez Analytics pour plus de détails.',
+      });
+    }
+  }, [insights, toast]);
 
   // Afficher modal au premier lancement si pas de préférences
   useEffect(() => {
