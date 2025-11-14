@@ -142,7 +142,7 @@
     "dompurify": "^3.2.7",
     "dotenv": "^16.5.0",
     "embla-carousel-react": "^8.3.0",
-    "esbuild": "^0.25.10",
+    "esbuild": "^0.25.12",
     "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-jsx-a11y": "^6.8.0",
     "eslint-plugin-react": "^7.34.1",
@@ -213,7 +213,7 @@
   },
   "devDependencies": {
     "@edge-runtime/vm": "^5.0.0",
-    "@esbuild/linux-x64": "^0.25.10",
+    "@esbuild/linux-x64": "^0.25.12",
     "@eslint/js": "^9.0.0",
     "@playwright/test": "^1.55.0",
     "@rollup/rollup-linux-x64-gnu": "^4.50.1",

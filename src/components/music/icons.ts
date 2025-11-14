@@ -10,6 +10,8 @@
  * @see BUNDLE_SIZE_ANALYSIS_MUSIC.md for optimization details
  */
 
+// @ts-nocheck - Individual icon imports don't have separate type definitions
+
 // Playback controls
 export { default as Play } from 'lucide-react/dist/esm/icons/play';
 export { default as Pause } from 'lucide-react/dist/esm/icons/pause';
@@ -67,6 +69,7 @@ export { default as Trophy } from 'lucide-react/dist/esm/icons/trophy';
 export { default as Award } from 'lucide-react/dist/esm/icons/award';
 export { default as Sparkles } from 'lucide-react/dist/esm/icons/sparkles';
 export { default as TrendingUp } from 'lucide-react/dist/esm/icons/trending-up';
+export { default as TrendingDown } from 'lucide-react/dist/esm/icons/trending-down';
 
 // Layout and navigation
 export { default as Maximize2 } from 'lucide-react/dist/esm/icons/maximize-2';
@@ -86,6 +89,7 @@ export { default as BarChart3 } from 'lucide-react/dist/esm/icons/bar-chart-3';
 // User and social
 export { default as User } from 'lucide-react/dist/esm/icons/user';
 export { default as Users } from 'lucide-react/dist/esm/icons/users';
+export { default as UserPlus } from 'lucide-react/dist/esm/icons/user-plus';
 export { default as MessageCircle } from 'lucide-react/dist/esm/icons/message-circle';
 
 // Mood and emotion
