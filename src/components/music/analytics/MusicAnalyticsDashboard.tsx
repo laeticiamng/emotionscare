@@ -4,11 +4,11 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { LazyMotionWrapper, m } from '@/utils/lazy-motion';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { TrendingUp, Music, Users, Target, BarChart3, Clock } from 'lucide-react';
+import { TrendingUp, Music, Users, Target, BarChart3, Clock } from '@/components/music/icons';
 import { GenreDistributionChart } from './GenreDistributionChart';
 import { MoodPopularityChart } from './MoodPopularityChart';
 import { TempoTrendsChart } from './TempoTrendsChart';
@@ -84,13 +84,14 @@ export const MusicAnalyticsDashboard: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex items-center justify-between"
-      >
+    <LazyMotionWrapper>
+      <div className="space-y-6">
+        {/* Header */}
+        <m.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex items-center justify-between"
+        >
         <div>
           <h2 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
             Analytics Musicales
@@ -103,7 +104,7 @@ export const MusicAnalyticsDashboard: React.FC = () => {
           <Clock className="w-3 h-3 mr-1" />
           Mis à jour maintenant
         </Badge>
-      </motion.div>
+      </m.div>
 
       {/* Stats Cards */}
       {stats && (
@@ -225,6 +226,7 @@ export const MusicAnalyticsDashboard: React.FC = () => {
         </TabsContent>
       </Tabs>
     </div>
+    </LazyMotionWrapper>
   );
 };
 
@@ -237,7 +239,7 @@ interface StatsCardProps {
 }
 
 const StatsCard: React.FC<StatsCardProps> = ({ icon, label, value, color, isText }) => (
-  <motion.div
+  <m.div
     initial={{ opacity: 0, scale: 0.9 }}
     animate={{ opacity: 1, scale: 1 }}
     whileHover={{ scale: 1.05 }}
@@ -254,5 +256,5 @@ const StatsCard: React.FC<StatsCardProps> = ({ icon, label, value, color, isText
         </div>
       </CardContent>
     </Card>
-  </motion.div>
+  </m.div>
 );

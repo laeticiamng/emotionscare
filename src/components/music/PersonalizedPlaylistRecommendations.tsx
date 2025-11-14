@@ -3,11 +3,11 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { LazyMotionWrapper, m } from '@/utils/lazy-motion';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Play, Heart, Loader2 } from 'lucide-react';
+import { Play, Heart, Loader2 } from '@/components/music/icons';
 import { generatePersonalizedPlaylists, togglePlaylistFavorite, PersonalizedPlaylist } from '@/services/music/recommendations-service';
 import { useMusic } from '@/contexts/MusicContext';
 import { useToast } from '@/hooks/use-toast';
@@ -91,9 +91,10 @@ export const PersonalizedPlaylistRecommendations: React.FC<PersonalizedPlaylistR
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold text-foreground mb-2">Playlists pour vous</h2>
+    <LazyMotionWrapper>
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-2xl font-bold text-foreground mb-2">Playlists pour vous</h2>
         <p className="text-muted-foreground">
           Basées sur votre historique d'écoute et vos préférences
         </p>
@@ -101,7 +102,7 @@ export const PersonalizedPlaylistRecommendations: React.FC<PersonalizedPlaylistR
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {playlists.map((playlist, index) => (
-          <motion.div
+          <m.div
             key={playlist.id}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -158,9 +159,10 @@ export const PersonalizedPlaylistRecommendations: React.FC<PersonalizedPlaylistR
                 </Button>
               </div>
             </Card>
-          </motion.div>
+          </m.div>
         ))}
       </div>
     </div>
+    </LazyMotionWrapper>
   );
 };

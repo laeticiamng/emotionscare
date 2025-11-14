@@ -27,6 +27,7 @@
  * @see BUNDLE_SIZE_ANALYSIS_MUSIC.md for optimization details
  */
 
+import React from 'react';
 import { LazyMotion, domAnimation, m as motion, AnimatePresence as FramerAnimatePresence } from 'framer-motion';
 import type { LazyMotionProps } from 'framer-motion';
 

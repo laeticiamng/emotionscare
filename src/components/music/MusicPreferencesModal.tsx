@@ -3,7 +3,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { LazyMotionWrapper, m, AnimatePresence } from '@/utils/lazy-motion';
 import {
   Dialog,
   DialogContent,
@@ -17,7 +17,7 @@ import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Sparkles, Music2, Heart, MapPin, Volume2, Check } from 'lucide-react';
+import { Sparkles, Music2, Heart, MapPin, Volume2, Check } from '@/components/music/icons';
 import { saveUserPreferences, MUSIC_PREFERENCES_OPTIONS, type PreferencesFormData } from '@/services/music/preferences-service';
 import { toast } from 'sonner';
 import { logger } from '@/lib/logger';
@@ -30,7 +30,7 @@ interface MusicPreferencesModalProps {
 }
 
 const SelectableBadge: React.FC<{isSelected: boolean; onClick: () => void; icon: string; label: string}> = ({ isSelected, onClick, icon, label }) => (
-  <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+  <m.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
     <Badge
       variant={isSelected ? 'default' : 'outline'}
       className="cursor-pointer py-3 w-full justify-center text-base transition-all relative"
@@ -38,9 +38,9 @@ const SelectableBadge: React.FC<{isSelected: boolean; onClick: () => void; icon:
     >
       <span className="mr-2">{icon}</span>
       {label}
-      {isSelected && <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="absolute top-1 right-1"><Check className="w-4 h-4" /></motion.div>}
+      {isSelected && <m.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="absolute top-1 right-1"><Check className="w-4 h-4" /></m.div>}
     </Badge>
-  </motion.div>
+  </m.div>
 );
 
 export const MusicPreferencesModal: React.FC<MusicPreferencesModalProps> = ({
@@ -105,10 +105,11 @@ export const MusicPreferencesModal: React.FC<MusicPreferencesModalProps> = ({
   };
 
   return (
-    <>
-      <ConfettiCelebration trigger={showConfetti} duration={3000} />
-      <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
-        <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
+    <LazyMotionWrapper>
+      <>
+        <ConfettiCelebration trigger={showConfetti} duration={3000} />
+        <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
+          <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <div className="flex items-center gap-2 mb-2">
               <Sparkles className="h-5 w-5 text-primary animate-pulse" />
@@ -116,12 +117,12 @@ export const MusicPreferencesModal: React.FC<MusicPreferencesModalProps> = ({
             </div>
             <DialogDescription>Étape {step} sur 5</DialogDescription>
             <div className="w-full bg-secondary rounded-full h-2 mt-4">
-              <motion.div className="bg-primary h-2 rounded-full" animate={{ width: `${(step / 5) * 100}%` }} transition={{ duration: 0.3 }} />
+              <m.div className="bg-primary h-2 rounded-full" animate={{ width: `${(step / 5) * 100}%` }} transition={{ duration: 0.3 }} />
             </div>
           </DialogHeader>
 
           <AnimatePresence mode="wait">
-            <motion.div key={step} initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -50 }} className="space-y-6 py-4">
+            <m.div key={step} initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -50 }} className="space-y-6 py-4">
               {step === 1 && (
                 <div className="space-y-4">
                   <div className="flex items-center gap-2"><Music2 className="h-5 w-5" /><Label className="text-base font-medium">Quels genres musicaux préférez-vous ?</Label></div>
@@ -178,7 +179,7 @@ export const MusicPreferencesModal: React.FC<MusicPreferencesModalProps> = ({
                   </div>
                 </div>
               )}
-            </motion.div>
+            </m.div>
           </AnimatePresence>
 
           <DialogFooter className="flex flex-row justify-between">
@@ -192,5 +193,6 @@ export const MusicPreferencesModal: React.FC<MusicPreferencesModalProps> = ({
         </DialogContent>
       </Dialog>
     </>
+    </LazyMotionWrapper>
   );
 };

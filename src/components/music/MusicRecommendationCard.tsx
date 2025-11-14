@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Play, Headphones } from 'lucide-react';
+import { Play, Headphones } from '@/components/music/icons';
 import { useMusicEmotionIntegration } from '@/hooks/useMusicEmotionIntegration';
 import { EmotionMusicParams } from '@/types/music';
-import { motion } from 'framer-motion';
+import { LazyMotionWrapper, m } from '@/utils/lazy-motion';
 
 interface MusicRecommendationCardProps {
   emotion: string;
@@ -34,13 +34,14 @@ export const MusicRecommendationCard: React.FC<MusicRecommendationCardProps> = (
   };
 
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, ease: "easeOut" }}
-      className="h-full"
-    >
-      <Card className="h-full bg-card overflow-hidden relative group hover:shadow-lg transition-all duration-300">
+    <LazyMotionWrapper>
+      <m.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, ease: "easeOut" }}
+        className="h-full"
+      >
+        <Card className="h-full bg-card overflow-hidden relative group hover:shadow-lg transition-all duration-300">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-primary/5 opacity-90 group-hover:opacity-100 transition-opacity duration-300" />
         
         <CardHeader>
@@ -77,7 +78,8 @@ export const MusicRecommendationCard: React.FC<MusicRecommendationCardProps> = (
           </div>
         </CardContent>
       </Card>
-    </motion.div>
+    </m.div>
+    </LazyMotionWrapper>
   );
 };
 

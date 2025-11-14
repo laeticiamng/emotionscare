@@ -4,8 +4,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Play, Pause, SkipForward, Square, Heart, Volume2, Loader2 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Play, Pause, SkipForward, Square, Heart, Volume2, Loader2 } from '@/components/music/icons';
+import { LazyMotionWrapper, m } from '@/utils/lazy-motion';
 import { logger } from '@/lib/logger';
 
 interface SunoPlayerProps {
@@ -131,8 +131,9 @@ export const SunoPlayer: React.FC<SunoPlayerProps> = ({
   };
 
   return (
-    <Card className="overflow-hidden">
-      <CardContent className="p-6">
+    <LazyMotionWrapper>
+      <Card className="overflow-hidden">
+        <CardContent className="p-6">
         {src && (
           <audio
             ref={audioRef}
@@ -241,13 +242,13 @@ export const SunoPlayer: React.FC<SunoPlayerProps> = ({
 
           {/* Visualisation audio simple */}
           {playing && (
-            <motion.div 
+            <m.div
               className="flex justify-center gap-1"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
             >
               {[1, 2, 3, 4, 5].map((i) => (
-                <motion.div
+                <m.div
                   key={i}
                   className="w-1 bg-primary rounded-full"
                   animate={{
@@ -260,7 +261,7 @@ export const SunoPlayer: React.FC<SunoPlayerProps> = ({
                   }}
                 />
               ))}
-            </motion.div>
+            </m.div>
           )}
 
           {/* Raccourcis */}
@@ -272,5 +273,6 @@ export const SunoPlayer: React.FC<SunoPlayerProps> = ({
         </div>
       </CardContent>
     </Card>
+    </LazyMotionWrapper>
   );
 };

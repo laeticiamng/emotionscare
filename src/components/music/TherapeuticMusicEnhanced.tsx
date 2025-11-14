@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Music, Play, Pause, SkipForward, SkipBack, Volume2, Heart, Download, Sparkles, TrendingUp } from 'lucide-react';
+import { LazyMotionWrapper, m, AnimatePresence } from '@/utils/lazy-motion';
+import { Music, Play, Pause, SkipForward, SkipBack, Volume2, Heart, Download, Sparkles, TrendingUp } from '@/components/music/icons';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
@@ -190,14 +190,15 @@ export default function TherapeuticMusicEnhanced() {
   } : null;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center space-y-2"
-        >
+    <LazyMotionWrapper>
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 p-6">
+        <div className="max-w-7xl mx-auto space-y-6">
+          {/* Header */}
+          <m.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center space-y-2"
+          >
           <h1 className="text-4xl font-bold flex items-center justify-center gap-3">
             <Music className="h-10 w-10 text-primary" />
             Musique Thérapeutique
@@ -205,10 +206,10 @@ export default function TherapeuticMusicEnhanced() {
           <p className="text-muted-foreground">
             Compositions personnalisées pour votre bien-être émotionnel
           </p>
-        </motion.div>
+        </m.div>
 
         {/* Stats Overview */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="grid grid-cols-1 md:grid-cols-4 gap-4"
@@ -260,7 +261,7 @@ export default function TherapeuticMusicEnhanced() {
               </div>
             </CardContent>
           </Card>
-        </motion.div>
+        </m.div>
 
         <Tabs defaultValue="player" className="space-y-6">
           <TabsList className="grid w-full grid-cols-3">
@@ -440,7 +441,7 @@ export default function TherapeuticMusicEnhanced() {
           <TabsContent value="library" className="space-y-6">
             <div className="grid gap-4">
               {tracks.map((track) => (
-                <motion.div
+                <m.div
                   key={track.id}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
@@ -481,12 +482,13 @@ export default function TherapeuticMusicEnhanced() {
                       </div>
                     </CardContent>
                   </Card>
-                </motion.div>
+                </m.div>
               ))}
             </div>
           </TabsContent>
         </Tabs>
       </div>
     </div>
+    </LazyMotionWrapper>
   );
 }

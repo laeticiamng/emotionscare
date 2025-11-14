@@ -3,13 +3,13 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Music, Sparkles, Loader2, AlertCircle, Play } from 'lucide-react';
+import { Music, Sparkles, Loader2, AlertCircle, Play } from '@/components/music/icons';
 import { useHumeAI } from '@/hooks/useHumeAI';
 import { useEmotionMusic } from '@/hooks/useEmotionMusic';
 import { useSunoCallback } from '@/hooks/useSunoCallback';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { motion, AnimatePresence } from 'framer-motion';
+import { LazyMotionWrapper, m, AnimatePresence } from '@/utils/lazy-motion';
 import { logger } from '@/lib/logger';
 
 export const EmotionMusicPanel: React.FC = () => {
@@ -104,7 +104,8 @@ export const EmotionMusicPanel: React.FC = () => {
   };
 
   return (
-    <Card className="w-full max-w-2xl mx-auto">
+    <LazyMotionWrapper>
+      <Card className="w-full max-w-2xl mx-auto">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Music className="h-5 w-5 text-primary" />
@@ -131,7 +132,7 @@ export const EmotionMusicPanel: React.FC = () => {
         {/* Badge émotionnel */}
         <AnimatePresence>
           {emotionBadge && (
-            <motion.div
+            <m.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
@@ -140,14 +141,14 @@ export const EmotionMusicPanel: React.FC = () => {
                 <Sparkles className="h-4 w-4 mr-2" />
                 {emotionBadge}
               </Badge>
-            </motion.div>
+            </m.div>
           )}
         </AnimatePresence>
 
         {/* Gestion des erreurs améliorée */}
         <AnimatePresence>
           {error && (
-            <motion.div
+            <m.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
@@ -174,7 +175,7 @@ export const EmotionMusicPanel: React.FC = () => {
                   </Button>
                 </div>
               </div>
-            </motion.div>
+            </m.div>
           )}
         </AnimatePresence>
 
@@ -371,7 +372,7 @@ export const EmotionMusicPanel: React.FC = () => {
 
         {/* Erreurs */}
         {error && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             className="flex items-start gap-2 p-3 bg-destructive/10 border border-destructive/20 rounded-md"
@@ -380,7 +381,7 @@ export const EmotionMusicPanel: React.FC = () => {
             <div className="flex-1 text-sm text-destructive">
               {error}
             </div>
-          </motion.div>
+          </m.div>
         )}
 
         {/* Informations RGPD */}
@@ -391,6 +392,7 @@ export const EmotionMusicPanel: React.FC = () => {
         </div>
       </CardContent>
     </Card>
+    </LazyMotionWrapper>
   );
 };
 

@@ -2,8 +2,8 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Music } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Music } from '@/components/music/icons';
+import { LazyMotionWrapper, m } from '@/utils/lazy-motion';
 
 interface SessionHeaderProps {
   cover?: string | null;
@@ -17,12 +17,13 @@ export const SessionHeader: React.FC<SessionHeaderProps> = ({
   preset
 }) => {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-    >
-      <Card className="overflow-hidden bg-gradient-to-br from-primary/5 to-secondary/5 border-primary/10">
+    <LazyMotionWrapper>
+      <m.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <Card className="overflow-hidden bg-gradient-to-br from-primary/5 to-secondary/5 border-primary/10">
         <CardContent className="p-6">
           <div className="flex items-center gap-4">
             <div className="relative">
@@ -64,6 +65,7 @@ export const SessionHeader: React.FC<SessionHeaderProps> = ({
           </div>
         </CardContent>
       </Card>
-    </motion.div>
+    </m.div>
+    </LazyMotionWrapper>
   );
 };
