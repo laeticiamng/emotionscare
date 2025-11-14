@@ -250,7 +250,9 @@ const B2CDashboardPage = lazy(() => import('@/pages/B2CDashboardPage'));
 const EmotionalPark = lazy(() => import('@/pages/EmotionalPark'));
 const ParkJourney = lazy(() => import('@/pages/ParkJourney'));
 const CoachProgramsPage = lazy(() => import('@/pages/CoachProgramsPage'));
+const CoachProgramDetailPage = lazy(() => import('@/pages/CoachProgramDetailPage'));
 const CoachSessionsPage = lazy(() => import('@/pages/CoachSessionsPage'));
+const CoachAnalyticsPage = lazy(() => import('@/pages/CoachAnalyticsPage'));
 const ParcoursXL = lazy(() => import('@/pages/ParcoursXL'));
 
 // Nouvelles pages créées
@@ -493,7 +495,9 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   ParkJourney,
   ParcoursXL,
   CoachProgramsPage,
+  CoachProgramDetailPage,
   CoachSessionsPage,
+  CoachAnalyticsPage,
   SessionsPage,
   SessionDetailPage,
   GoalsPage,

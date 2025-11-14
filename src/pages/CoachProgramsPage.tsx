@@ -1,83 +1,13 @@
 import { useNavigate } from 'react-router-dom';
-import { Brain, Target, Heart, Sparkles, Clock, Users, ArrowLeft, Play } from 'lucide-react';
+import { Clock, Users, ArrowLeft, Play, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { coachPrograms } from '@/data/coachPrograms';
 
 export default function CoachProgramsPage() {
   const navigate = useNavigate();
-
-  const programs = [
-    {
-      id: 'stress-management',
-      title: 'Gestion du Stress',
-      description: 'Apprenez à identifier et gérer votre stress quotidien',
-      icon: Brain,
-      duration: '4 semaines',
-      sessions: 12,
-      level: 'Débutant',
-      color: 'bg-blue-500/10 text-blue-600',
-      progress: 0,
-      lessons: [
-        'Comprendre le stress',
-        'Techniques de respiration',
-        'Méditation guidée',
-        'Gestion des émotions',
-      ],
-    },
-    {
-      id: 'emotional-intelligence',
-      title: 'Intelligence Émotionnelle',
-      description: 'Développez votre conscience émotionnelle et empathie',
-      icon: Heart,
-      duration: '6 semaines',
-      sessions: 18,
-      level: 'Intermédiaire',
-      color: 'bg-pink-500/10 text-pink-600',
-      progress: 35,
-      lessons: [
-        'Reconnaissance des émotions',
-        'Communication non-violente',
-        'Empathie et écoute active',
-        'Régulation émotionnelle',
-      ],
-    },
-    {
-      id: 'goal-setting',
-      title: 'Atteinte des Objectifs',
-      description: 'Définissez et atteignez vos objectifs personnels',
-      icon: Target,
-      duration: '8 semaines',
-      sessions: 24,
-      level: 'Avancé',
-      color: 'bg-green-500/10 text-green-600',
-      progress: 0,
-      lessons: [
-        'Définir des objectifs SMART',
-        'Planification stratégique',
-        'Surmonter les obstacles',
-        'Maintenir la motivation',
-      ],
-    },
-    {
-      id: 'mindfulness',
-      title: 'Pleine Conscience',
-      description: 'Cultivez la présence et la sérénité au quotidien',
-      icon: Sparkles,
-      duration: '6 semaines',
-      sessions: 15,
-      level: 'Tous niveaux',
-      color: 'bg-purple-500/10 text-purple-600',
-      progress: 60,
-      lessons: [
-        'Introduction à la pleine conscience',
-        'Méditation quotidienne',
-        'Pleine conscience au travail',
-        'Pratiques avancées',
-      ],
-    },
-  ];
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-background via-background to-muted p-6">
@@ -94,7 +24,7 @@ export default function CoachProgramsPage() {
           </Button>
           <div className="flex items-center gap-3">
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-              <Brain className="h-6 w-6 text-primary" />
+              <Sparkles className="h-6 w-6 text-primary" />
             </div>
             <div>
               <h1 className="text-3xl font-bold">Programmes de Coaching</h1>
@@ -107,7 +37,7 @@ export default function CoachProgramsPage() {
 
         {/* Programs Grid */}
         <div className="grid gap-6 md:grid-cols-2">
-          {programs.map((program) => {
+          {coachPrograms.map((program) => {
             const Icon = program.icon;
             const isStarted = program.progress > 0;
             
@@ -148,12 +78,17 @@ export default function CoachProgramsPage() {
                   <div className="space-y-2">
                     <p className="text-sm font-medium">Contenu du programme :</p>
                     <ul className="space-y-1">
-                      {program.lessons.map((lesson, idx) => (
-                        <li key={idx} className="flex items-start gap-2 text-sm text-muted-foreground">
+                      {program.lessons.slice(0, 4).map((lesson) => (
+                        <li key={lesson.id} className="flex items-start gap-2 text-sm text-muted-foreground">
                           <Sparkles className="mt-0.5 h-3 w-3 flex-shrink-0 text-primary" />
-                          <span>{lesson}</span>
+                          <span>{lesson.title}</span>
                         </li>
                       ))}
+                      {program.lessons.length > 4 && (
+                        <li className="text-sm text-muted-foreground">
+                          + {program.lessons.length - 4} autres leçons
+                        </li>
+                      )}
                     </ul>
                   </div>
 
