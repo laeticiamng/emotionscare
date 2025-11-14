@@ -62,13 +62,84 @@ serve(async (req) => {
 
       if (subError) throw subError;
 
-      // TODO: Implémenter l'envoi via service push (FCM, APNs, etc.)
-      // Pour l'instant, on retourne succès
-      console.log('Sending notification to:', subscriptions?.length, 'devices');
-      
-      return new Response(JSON.stringify({ 
-        success: true, 
-        sent: subscriptions?.length || 0 
+      // Envoyer via Firebase Cloud Messaging (FCM)
+      const fcmApiKey = Deno.env.get('FIREBASE_FCM_API_KEY');
+      if (!fcmApiKey) {
+        console.warn('FIREBASE_FCM_API_KEY not configured, FCM disabled');
+        return new Response(JSON.stringify({
+          success: false,
+          error: 'FCM not configured',
+          sent: 0
+        }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      const results = [];
+      for (const sub of subscriptions || []) {
+        try {
+          const fcmResponse = await fetch(
+            'https://fcm.googleapis.com/fcm/send',
+            {
+              method: 'POST',
+              headers: {
+                'Authorization': `key=${fcmApiKey}`,
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                to: sub.token,
+                notification: {
+                  title: body.title,
+                  body: body.body || '',
+                  icon: '/icon-192x192.png',
+                  badge: '/badge-96x96.png',
+                  click_action: body.click_action || '/',
+                },
+                data: body.data || {
+                  type: body.type || 'notification',
+                  timestamp: new Date().toISOString(),
+                },
+                priority: body.priority || 'high',
+              }),
+            }
+          );
+
+          const fcmData = await fcmResponse.json();
+          const success = fcmResponse.ok && fcmData.success === 1;
+
+          results.push({
+            token: sub.token.substring(0, 20) + '...',
+            success,
+            messageId: fcmData.message_id,
+          });
+
+          // Désactiver le token si erreur (par exemple: InvalidRegistrationToken)
+          if (!success && fcmData.results?.[0]?.error === 'InvalidRegistrationToken') {
+            await supabaseClient
+              .from('push_subscriptions')
+              .update({ enabled: false })
+              .eq('token', sub.token);
+          }
+        } catch (error) {
+          console.error('FCM send failed:', error);
+          results.push({
+            token: sub.token.substring(0, 20) + '...',
+            success: false,
+            error: error.message,
+          });
+        }
+      }
+
+      const successCount = results.filter(r => r.success).length;
+
+      console.log('Sending notification to:', subscriptions?.length, 'devices, success:', successCount);
+
+      return new Response(JSON.stringify({
+        success: successCount > 0,
+        sent: successCount,
+        total: subscriptions?.length || 0,
+        results: results.slice(0, 5), // Limiter à 5 résultats pour la réponse
       }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
