@@ -4,6 +4,22 @@ import { useOnboardingStore, ProfileDraft, GoalsDraft, SensorsDraft, ModuleSugge
 import { logger } from '@/lib/logger';
 import { supabase } from '@/integrations/supabase/client';
 
+// Helper function to convert VAPID key from base64 to Uint8Array
+function urlBase64ToUint8Array(base64String: string): Uint8Array {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding)
+    .replace(/\-/g, '+')
+    .replace(/_/g, '/');
+
+  const rawData = window.atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+
+  for (let i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i);
+  }
+  return outputArray;
+}
+
 export const useOnboarding = () => {
   const store = useOnboardingStore();
 
@@ -64,22 +80,54 @@ export const useOnboarding = () => {
 
   const saveGoals = useCallback(async (goals: GoalsDraft) => {
     store.setGoalsDraft(goals);
-    
+
     try {
-      // TODO: Implement with Supabase edge function
-      // For now, just save locally and return mock recommendations
-      const recommendations: ModuleSuggestion[] = [];
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('User not authenticated');
+
+      // Generate module recommendations based on objectives
+      const { data: recommendationsData, error: rpcError } = await supabase
+        .rpc('generate_module_recommendations', {
+          user_objectives: goals.objectives
+        });
+
+      if (rpcError) {
+        logger.warn('Failed to generate recommendations', { error: rpcError }, 'ONBOARDING');
+      }
+
+      const recommendations = recommendationsData || [];
+
+      // Save goals and recommendations to database
+      const { error } = await supabase
+        .from('onboarding_goals')
+        .upsert({
+          user_id: user.id,
+          objectives: goals.objectives,
+          module_suggestions: recommendations,
+          updated_at: new Date().toISOString()
+        });
+
+      if (error) throw error;
+
+      // Update store with recommendations
       store.setModuleSuggestions(recommendations);
 
       // Analytics
       if (typeof window !== 'undefined' && window.gtag) {
         window.gtag('event', 'onboarding_goals_saved', {
-          custom_goals: goals.objectives.join(',')
+          custom_goals: goals.objectives.join(','),
+          recommendations_count: recommendations.length
         });
       }
 
+      logger.info('Goals saved successfully', {
+        objectives: goals.objectives,
+        recommendationsCount: recommendations.length
+      }, 'ONBOARDING');
+
       return true;
     } catch (error) {
+      logger.error('Save goals failed', error as Error, 'ONBOARDING');
       store.setError(error instanceof Error ? error.message : 'Erreur de sauvegarde');
       return false;
     }
@@ -125,24 +173,42 @@ export const useOnboarding = () => {
 
     try {
       const permission = await Notification.requestPermission();
-      
+
       if (permission === 'granted') {
         store.setNotificationsEnabled(true);
-        
+
         // Register for push notifications if service worker available
         if ('serviceWorker' in navigator) {
           try {
+            const vapidPublicKey = import.meta.env.VITE_VAPID_PUBLIC_KEY;
+
+            if (!vapidPublicKey) {
+              logger.warn('VAPID public key not configured - push notifications disabled', {}, 'SYSTEM');
+              return true; // Continue onboarding even without push
+            }
+
             const registration = await navigator.serviceWorker.ready;
             const subscription = await registration.pushManager.subscribe({
               userVisibleOnly: true,
-              applicationServerKey: null // Add your VAPID key here
+              applicationServerKey: urlBase64ToUint8Array(vapidPublicKey)
             });
 
-            // TODO: Implement push notification backend
-            // For now, just log locally
-            logger.info('Push subscription registered locally', { subscription }, 'SYSTEM');
+            // Send subscription to backend
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user) {
+              await supabase
+                .from('push_subscriptions')
+                .upsert({
+                  user_id: user.id,
+                  subscription: subscription.toJSON(),
+                  updated_at: new Date().toISOString()
+                });
+            }
+
+            logger.info('Push subscription registered', { subscription }, 'SYSTEM');
           } catch (pushError) {
             logger.warn('Push subscription failed', { pushError }, 'SYSTEM');
+            // Don't fail onboarding if push subscription fails
           }
         }
 
