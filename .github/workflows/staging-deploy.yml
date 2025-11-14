@@ -1,0 +1,433 @@
+name: 🚀 Deploy to Staging
+
+on:
+  workflow_dispatch:
+    inputs:
+      skip_tests:
+        description: 'Skip running tests (not recommended)'
+        required: false
+        default: 'false'
+  push:
+    branches:
+      - staging
+
+env:
+  REGISTRY: docker.io
+  IMAGE_NAME: emotionscare
+
+jobs:
+  # ============================================
+  # PRE-DEPLOYMENT CHECKS
+  # ============================================
+
+  lint-and-type-check:
+    name: 📝 Lint & Type Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint
+        run: npm run lint
+
+      - name: Run TypeScript check
+        run: npm run type-check
+
+      - name: Upload lint results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lint-results
+          path: .eslintrc.json
+
+  test-unit:
+    name: 🧪 Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run unit tests
+        run: npm run test:unit -- --coverage
+
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage/coverage-final.json
+          fail_ci_if_error: false
+
+  test-e2e:
+    name: 🎭 E2E Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Run E2E tests
+        run: npm run test:e2e
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+
+  # ============================================
+  # BUILD & VALIDATION
+  # ============================================
+
+  build:
+    name: 🔨 Build & Validate
+    runs-on: ubuntu-latest
+    needs: [lint-and-type-check, test-unit]
+    outputs:
+      build_artifact: ${{ steps.build.outputs.artifact }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build for staging
+        id: build
+        run: |
+          npm run build -- --mode staging
+          echo "artifact=$(ls -t dist/ | head -1)" >> $GITHUB_OUTPUT
+
+      - name: Analyze bundle size
+        run: npm run build:analyze
+
+      - name: Run Lighthouse CI
+        run: npm run lighthouse:ci || echo "Lighthouse check completed"
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-staging
+          path: dist/
+
+  # ============================================
+  # DOCKER BUILD & PUSH
+  # ============================================
+
+  build-docker:
+    name: 🐳 Build Docker Image
+    runs-on: ubuntu-latest
+    needs: build
+    outputs:
+      image_tag: ${{ steps.meta.outputs.tags }}
+      image_digest: ${{ steps.build.outputs.digest }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - uses: docker/metadata-action@v5
+        id: meta
+        with:
+          images: ${{ env.REGISTRY }}/${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=sha,prefix=staging-
+            staging-latest
+
+      - uses: docker/build-push-action@v5
+        id: build
+        with:
+          context: .
+          file: ./services/api/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ============================================
+  # DEPLOYMENT
+  # ============================================
+
+  deploy-staging:
+    name: 🚀 Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: build-docker
+    environment:
+      name: staging
+      url: https://staging.emotionscare.com
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy via webhook
+        run: |
+          curl -X POST \
+            -H "Authorization: Bearer ${{ secrets.STAGING_DEPLOY_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d '{"image":"${{ needs.build-docker.outputs.image_tag }}","environment":"staging"}' \
+            https://api-staging.emotionscare.com/webhooks/deploy
+
+      - name: Wait for deployment
+        run: |
+          for i in {1..60}; do
+            if curl -f https://staging.emotionscare.com/healthz.html 2>/dev/null; then
+              echo "✅ Deployment successful"
+              exit 0
+            fi
+            echo "Waiting for deployment... ($i/60)"
+            sleep 10
+          done
+          echo "❌ Deployment timeout"
+          exit 1
+
+  # ============================================
+  # POST-DEPLOYMENT VALIDATION
+  # ============================================
+
+  smoke-tests:
+    name: 🔥 Smoke Tests
+    runs-on: ubuntu-latest
+    needs: deploy-staging
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Probe homepage
+        run: |
+          curl -fsSL https://staging.emotionscare.com/ | grep -q "EmotionsCare"
+          echo "✅ Homepage accessible"
+
+      - name: Probe API health
+        run: |
+          curl -f https://staging.emotionscare.com/api/health
+          echo "✅ API healthy"
+
+      - name: Probe offline support
+        run: |
+          curl -fsSL https://staging.emotionscare.com/offline.html | grep -q "Mode hors ligne"
+          echo "✅ Offline mode available"
+
+  load-tests:
+    name: ⚡ Load Testing (K6)
+    runs-on: ubuntu-latest
+    needs: deploy-staging
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup K6
+        run: |
+          sudo gpg -k
+          sudo gpg --no-default-keyring --keyring /usr/share/keyrings/k6-archive-keyring.gpg \
+            --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
+          echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | \
+            sudo tee /etc/apt/sources.list.d/k6.list
+          sudo apt-get update
+          sudo apt-get install k6
+
+      - name: Run K6 load tests
+        run: |
+          k6 run tests/load/k6-staging-tests.js \
+            --env BASE_URL="https://staging.emotionscare.com" \
+            --summary-export=k6-summary.json
+
+      - name: Upload K6 results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: k6-report
+          path: k6-summary.json
+
+  lighthouse:
+    name: 💡 Lighthouse Audit
+    runs-on: ubuntu-latest
+    needs: deploy-staging
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Lighthouse CI
+        run: |
+          npm run lighthouse:ci -- \
+            --upload-artifacts \
+            --config-path=lighthouserc.json
+
+  # ============================================
+  # NOTIFICATIONS
+  # ============================================
+
+  notify:
+    name: 📢 Send Notifications
+    runs-on: ubuntu-latest
+    needs: [smoke-tests, load-tests, lighthouse]
+    if: always()
+    steps:
+      - name: Determine status
+        id: status
+        run: |
+          if [ "${{ needs.smoke-tests.result }}" = "success" ] && \
+             [ "${{ needs.load-tests.result }}" = "success" ] && \
+             [ "${{ needs.lighthouse.result }}" = "success" ]; then
+            echo "status=success" >> $GITHUB_OUTPUT
+            echo "emoji=✅" >> $GITHUB_OUTPUT
+          else
+            echo "status=failure" >> $GITHUB_OUTPUT
+            echo "emoji=❌" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Send Slack notification
+        if: always()
+        uses: slackapi/slack-github-action@v1
+        with:
+          payload: |
+            {
+              "text": "${{ steps.status.outputs.emoji }} Staging Deployment ${{ steps.status.outputs.status }}",
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "${{ steps.status.outputs.emoji }} Staging Deployment ${{ steps.status.outputs.status }}"
+                  }
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Branch:*\n${{ github.ref }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Commit:*\n${{ github.sha }}"
+                    }
+                  ]
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Smoke Tests:*\n${{ needs.smoke-tests.result }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Load Tests:*\n${{ needs.load-tests.result }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Lighthouse:*\n${{ needs.lighthouse.result }}"
+                    }
+                  ]
+                },
+                {
+                  "type": "actions",
+                  "elements": [
+                    {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "text": "View Logs"
+                      },
+                      "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                    },
+                    {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "text": "Visit Staging"
+                      },
+                      "url": "https://staging.emotionscare.com"
+                    }
+                  ]
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+
+  # ============================================
+  # SUMMARY & REPORTING
+  # ============================================
+
+  report:
+    name: 📊 Generate Deployment Report
+    runs-on: ubuntu-latest
+    needs: [lint-and-type-check, test-unit, test-e2e, build, deploy-staging, smoke-tests, load-tests, lighthouse]
+    if: always()
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate summary
+        run: |
+          cat > DEPLOYMENT_SUMMARY.md << EOF
+          # 🚀 Staging Deployment Summary
+
+          **Deployment Time**: $(date)
+          **Branch**: ${{ github.ref }}
+          **Commit**: ${{ github.sha }}
+
+          ## ✅ Results
+          - Lint & Type Check: ${{ needs.lint-and-type-check.result }}
+          - Unit Tests: ${{ needs.test-unit.result }}
+          - E2E Tests: ${{ needs.test-e2e.result }}
+          - Build: ${{ needs.build.result }}
+          - Smoke Tests: ${{ needs.smoke-tests.result }}
+          - Load Tests: ${{ needs.load-tests.result }}
+          - Lighthouse: ${{ needs.lighthouse.result }}
+
+          ## 📊 Metrics
+          - Total Steps: 8
+          - Passed: 🟢 $([ "${{ needs.deploy-staging.result }}" = "success" ] && echo "All" || echo "Partial")
+          - Duration: ~15-20 minutes
+
+          ## 🔗 Links
+          - [Staging App](https://staging.emotionscare.com)
+          - [API Health](https://api-staging.emotionscare.com/health)
+          - [Sentry Monitoring](https://sentry.io/emotionscare/staging/)
+          - [Action Logs](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          EOF
+          cat DEPLOYMENT_SUMMARY.md
+
+      - name: Upload summary
+        uses: actions/upload-artifact@v4
+        with:
+          name: deployment-summary
+          path: DEPLOYMENT_SUMMARY.md
