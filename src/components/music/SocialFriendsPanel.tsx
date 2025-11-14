@@ -12,7 +12,6 @@ import {
   Users,
   TrendingUp,
   TrendingDown,
-  Music,
   Trophy,
   Share2,
   UserPlus
