@@ -11,13 +11,13 @@
  */
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { LazyMotionWrapper, m } from '@/utils/lazy-motion';
 import { useQuotaUI } from '@/hooks/music/useUserQuota';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Zap, TrendingUp, AlertCircle, Clock, Sparkles } from 'lucide-react';
+import { Zap, TrendingUp, AlertCircle, Clock, Sparkles } from '@/components/music/icons';
 import { UserTier } from '@/services/music/quota-service';
 import { Link } from 'react-router-dom';
 
@@ -116,11 +116,12 @@ export function QuotaIndicator({
 
   // Variante par défaut (complète)
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-    >
+    <LazyMotionWrapper>
+      <m.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+      >
       <Card className={className}>
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
@@ -220,7 +221,8 @@ export function QuotaIndicator({
           )}
         </CardContent>
       </Card>
-    </motion.div>
+      </m.div>
+    </LazyMotionWrapper>
   );
 }
 
