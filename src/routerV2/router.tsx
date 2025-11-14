@@ -82,6 +82,11 @@ const B2CARFiltersPage = lazy(() => import('@/pages/B2CARFiltersPage'));
 const B2CBubbleBeatPage = lazy(() => import('@/pages/B2CBubbleBeatPage'));
 const B2CScreenSilkBreakPage = lazy(() => import('@/pages/B2CScreenSilkBreakPage'));
 const MeditationPage = lazy(() => import('@/pages/MeditationPage'));
+const AdvancedAnalyticsPage = lazy(() => import('@/pages/AdvancedAnalyticsPage'));
+const LeaderboardPage = lazy(() => import('@/pages/LeaderboardPage'));
+const GuildListPage = lazy(() => import('@/pages/GuildListPage'));
+const GuildPage = lazy(() => import('@/pages/GuildPage'));
+const PremiumRewardsPage = lazy(() => import('@/pages/PremiumRewardsPage'));
 
 // Analytics - nettoyage (pages non utilisées dans registry)
 
