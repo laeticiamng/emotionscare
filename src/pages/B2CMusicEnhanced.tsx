@@ -3,7 +3,7 @@
  * Interface vinyles thérapeutiques avec player audio unifié
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePageSEO } from '@/hooks/usePageSEO';
 import { Button } from '@/components/ui/button';
@@ -26,7 +26,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { useMusic } from '@/hooks/useMusic';
 import { useMusicFavorites } from '@/hooks/useMusicFavorites';
-import { getPublicMusicUrl } from '@/services/music/storage-service';
+import { useAudioUrls } from '@/hooks/useAudioUrls';
 import { UniverseEngine } from '@/components/universe/UniverseEngine';
 import { RewardSystem } from '@/components/rewards/RewardSystem';
 import { getOptimizedUniverse } from '@/data/universes/config';
@@ -59,8 +59,28 @@ interface VinylTrack extends MusicTrack {
   waveform?: number[];
 }
 
-// Tracks avec URLs audio valides de SoundHelix (libre de droits)
-const vinylTracks: VinylTrack[] = [
+// Configuration des URLs audio avec mapping Supabase + fallback
+const AUDIO_URL_CONFIG = {
+  'vinyl-1': {
+    fileName: 'ambient-soft.mp3',
+    fallbackUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'
+  },
+  'vinyl-2': {
+    fileName: 'focus-clarity.mp3',
+    fallbackUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3'
+  },
+  'vinyl-3': {
+    fileName: 'creative-flow.mp3',
+    fallbackUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3'
+  },
+  'vinyl-4': {
+    fileName: 'healing-waves.mp3',
+    fallbackUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3'
+  }
+} as const;
+
+// Tracks de base (sans URLs, seront ajoutées dynamiquement)
+const vinylTracksBase: Omit<VinylTrack, 'url' | 'audioUrl'>[] = [
   {
     id: 'vinyl-1',
     title: 'Sérénité Fluide',
@@ -71,8 +91,6 @@ const vinylTracks: VinylTrack[] = [
     color: 'from-blue-500 to-cyan-400',
     vinylColor: 'bg-gradient-to-br from-blue-400 via-cyan-300 to-blue-200',
     description: 'Ambiance douce et apaisante',
-    url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
-    audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
     waveform: Array.from({ length: 100 }, () => Math.random() * 0.8 + 0.2),
   },
   {
@@ -85,8 +103,6 @@ const vinylTracks: VinylTrack[] = [
     color: 'from-orange-500 to-red-400',
     vinylColor: 'bg-gradient-to-br from-orange-400 via-red-300 to-orange-200',
     description: 'Boost d\'énergie et motivation',
-    url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
-    audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
     waveform: Array.from({ length: 100 }, () => Math.random() * 0.9 + 0.3),
   },
   {
@@ -99,8 +115,6 @@ const vinylTracks: VinylTrack[] = [
     color: 'from-purple-500 to-indigo-400',
     vinylColor: 'bg-gradient-to-br from-purple-400 via-indigo-300 to-purple-200',
     description: 'Concentration optimale pour créer',
-    url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
-    audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
     waveform: Array.from({ length: 100 }, () => Math.random() * 0.7 + 0.3),
   },
   {
@@ -113,8 +127,6 @@ const vinylTracks: VinylTrack[] = [
     color: 'from-green-500 to-emerald-400',
     vinylColor: 'bg-gradient-to-br from-green-400 via-emerald-300 to-green-200',
     description: 'Sons thérapeutiques pour guérir',
-    url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3',
-    audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3',
     waveform: Array.from({ length: 100 }, () => Math.random() * 0.6 + 0.4),
   },
 ];
@@ -135,6 +147,18 @@ const B2CMusicEnhanced: React.FC = () => {
 
   const { toast } = useToast();
   const musicFavorites = useMusicFavorites();
+  
+  // Charger les URLs audio de manière asynchrone avec fallback
+  const { urls: audioUrls, isLoading: audioUrlsLoading } = useAudioUrls(AUDIO_URL_CONFIG);
+  
+  // Créer les tracks avec les URLs chargées
+  const vinylTracks: VinylTrack[] = useMemo(() => {
+    return vinylTracksBase.map(track => ({
+      ...track,
+      url: audioUrls[track.id] || AUDIO_URL_CONFIG[track.id as keyof typeof AUDIO_URL_CONFIG]?.fallbackUrl || '',
+      audioUrl: audioUrls[track.id] || AUDIO_URL_CONFIG[track.id as keyof typeof AUDIO_URL_CONFIG]?.fallbackUrl || ''
+    }));
+  }, [audioUrls]);
   
   // Protection du contexte Music
   let musicContext;
