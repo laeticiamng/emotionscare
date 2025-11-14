@@ -90,19 +90,69 @@ export const usePlaylistShare = () => {
    * Exporter vers Spotify (nécessite OAuth Spotify)
    */
   const exportToSpotify = useCallback(async (playlistId: string) => {
-    // TODO: Implémenter l'authentification Spotify OAuth et l'export
-    toast.info('Export Spotify bientôt disponible !');
-    logger.info('🎵 Export to Spotify requested', { playlistId }, 'SHARE');
-  }, []);
+    if (!user) {
+      toast.error('Veuillez vous connecter');
+      return;
+    }
+
+    try {
+      logger.info('🎵 Initiating Spotify export', { playlistId }, 'SHARE');
+
+      // Lancer le processus OAuth via edge function
+      const response = await supabase.functions.invoke('spotify-auth-callback', {
+        body: {
+          action: 'init_auth',
+          userId: user.id,
+          playlistId,
+          redirectUri: `${window.location.origin}/auth/spotify/callback`,
+        },
+      });
+
+      if (response.error) {
+        throw new Error(response.error.message);
+      }
+
+      const { authUrl } = response.data;
+
+      // Rediriger vers Spotify pour l'authentification
+      window.location.href = authUrl;
+    } catch (error) {
+      logger.error('❌ Spotify export failed', error as Error, 'SHARE');
+      toast.error('Erreur lors de la connexion à Spotify');
+    }
+  }, [user]);
 
   /**
    * Exporter vers Apple Music
    */
   const exportToAppleMusic = useCallback(async (playlistId: string) => {
-    // TODO: Implémenter l'authentification Apple Music et l'export
-    toast.info('Export Apple Music bientôt disponible !');
-    logger.info('🍎 Export to Apple Music requested', { playlistId }, 'SHARE');
-  }, []);
+    if (!user) {
+      toast.error('Veuillez vous connecter');
+      return;
+    }
+
+    try {
+      logger.info('🍎 Exporting to Apple Music', { playlistId }, 'SHARE');
+
+      // Appeler l'edge function pour exporter vers Apple Music
+      const response = await supabase.functions.invoke('apple-music-export', {
+        body: {
+          userId: user.id,
+          playlistId,
+        },
+      });
+
+      if (response.error) {
+        throw new Error(response.error.message);
+      }
+
+      toast.success('Playlist exportée vers Apple Music !');
+      logger.info('✅ Apple Music export successful', { playlistId }, 'SHARE');
+    } catch (error) {
+      logger.error('❌ Apple Music export failed', error as Error, 'SHARE');
+      toast.error('Erreur lors de l\'export Apple Music');
+    }
+  }, [user]);
 
   /**
    * Enregistrer une écoute pour les statistiques

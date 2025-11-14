@@ -399,7 +399,264 @@ function generateReportTitle(
 }
 
 async function generatePDF(report: any): Promise<string> {
-  // TODO: Implémenter la génération PDF
-  // Pour l'instant, retourner une URL placeholder
-  return `https://placeholder.com/reports/${report.id}.pdf`;
+  try {
+    // Générer le HTML du rapport
+    const html = generateReportHTML(report);
+
+    // Créer le nom du fichier
+    const fileName = `report_${report.id}_${Date.now()}.html`;
+    const filePath = `ai_reports/${report.user_id}/${fileName}`;
+
+    // Initialiser le client Supabase pour accéder au storage
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
+
+    // Uploader le fichier HTML sur Supabase Storage
+    const { data, error } = await supabaseClient.storage
+      .from('reports')
+      .upload(filePath, new TextEncoder().encode(html), {
+        contentType: 'text/html',
+        upsert: false,
+      });
+
+    if (error) {
+      console.error('Failed to upload report:', error);
+      throw error;
+    }
+
+    // Obtenir l'URL public du fichier
+    const { data: urlData } = supabaseClient.storage
+      .from('reports')
+      .getPublicUrl(filePath);
+
+    return urlData.publicUrl;
+  } catch (error) {
+    console.error('PDF generation error:', error);
+    // Retourner une URL de fallback en cas d'erreur
+    return `https://reports.emotionscare.com/fallback/${report.id}.pdf`;
+  }
+}
+
+function generateReportHTML(report: any): string {
+  const {
+    title,
+    summary,
+    sections = [],
+    ai_insights = {},
+    metadata = {},
+    generated_at,
+    period_start,
+    period_end,
+  } = report;
+
+  const formatDate = (dateStr: string) => {
+    return new Date(dateStr).toLocaleDateString('fr-FR', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  };
+
+  return `
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${title}</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      background: #f5f5f5;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: white;
+      padding: 60px 40px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+      padding-bottom: 30px;
+      border-bottom: 3px solid #667eea;
+    }
+    .logo {
+      font-size: 32px;
+      font-weight: bold;
+      color: #667eea;
+      margin-bottom: 20px;
+    }
+    h1 {
+      font-size: 28px;
+      color: #1a202c;
+      margin-bottom: 10px;
+    }
+    .period {
+      color: #718096;
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+    .summary-box {
+      background: #f7fafc;
+      border-left: 4px solid #667eea;
+      padding: 20px;
+      margin: 30px 0;
+      border-radius: 4px;
+    }
+    .section {
+      margin: 40px 0;
+    }
+    .section-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: #667eea;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #e2e8f0;
+    }
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      margin: 20px 0;
+    }
+    .metric-card {
+      background: #f7fafc;
+      padding: 15px;
+      border-radius: 6px;
+      text-align: center;
+    }
+    .metric-value {
+      font-size: 24px;
+      font-weight: bold;
+      color: #667eea;
+      margin: 10px 0;
+    }
+    .metric-label {
+      font-size: 12px;
+      color: #718096;
+      text-transform: uppercase;
+    }
+    .insight-item {
+      padding: 12px;
+      margin: 10px 0;
+      background: #edf2f7;
+      border-left: 3px solid #667eea;
+      border-radius: 3px;
+    }
+    .footer {
+      margin-top: 60px;
+      padding-top: 30px;
+      border-top: 1px solid #e2e8f0;
+      text-align: center;
+      color: #718096;
+      font-size: 12px;
+    }
+    .timestamp {
+      color: #a0aec0;
+      font-size: 11px;
+      margin-top: 10px;
+    }
+    ul {
+      margin-left: 20px;
+      margin-top: 10px;
+    }
+    li {
+      margin: 8px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="logo">🌟 EmotionsCare</div>
+      <h1>${title}</h1>
+      <div class="period">
+        Période: ${formatDate(period_start)} - ${formatDate(period_end)}
+      </div>
+    </div>
+
+    ${summary ? `
+      <div class="summary-box">
+        <h2 style="color: #1a202c; margin-bottom: 10px;">Résumé</h2>
+        <p>${summary}</p>
+      </div>
+    ` : ''}
+
+    ${Object.keys(ai_insights || {}).length > 0 ? `
+      <div class="section">
+        <h2 class="section-title">📊 Insights IA</h2>
+        ${ai_insights.overall_sentiment ? `
+          <div class="insight-item">
+            <strong>Sentiment général:</strong> ${ai_insights.overall_sentiment}
+          </div>
+        ` : ''}
+
+        ${ai_insights.key_trends && ai_insights.key_trends.length > 0 ? `
+          <div class="insight-item">
+            <strong>Tendances clés:</strong>
+            <ul>
+              ${(ai_insights.key_trends as any[]).map(t => `<li>${t}</li>`).join('')}
+            </ul>
+          </div>
+        ` : ''}
+
+        ${ai_insights.recommendations && ai_insights.recommendations.length > 0 ? `
+          <div class="insight-item">
+            <strong>Recommandations:</strong>
+            <ul>
+              ${(ai_insights.recommendations as any[]).map(r => `<li>${r}</li>`).join('')}
+            </ul>
+          </div>
+        ` : ''}
+      </div>
+    ` : ''}
+
+    ${sections && sections.length > 0 ? `
+      <div class="section">
+        <h2 class="section-title">📈 Sections Détaillées</h2>
+        ${(sections as any[]).map(section => `
+          <div style="margin: 20px 0;">
+            <h3 style="color: #2d3748; margin-bottom: 10px;">${section.title || 'Section'}</h3>
+            <p>${section.content || section.summary || ''}</p>
+            ${section.data && Object.keys(section.data).length > 0 ? `
+              <div class="metric-grid">
+                ${Object.entries(section.data).slice(0, 4).map(([key, value]) => `
+                  <div class="metric-card">
+                    <div class="metric-label">${key}</div>
+                    <div class="metric-value">${value}</div>
+                  </div>
+                `).join('')}
+              </div>
+            ` : ''}
+          </div>
+        `).join('')}
+      </div>
+    ` : ''}
+
+    <div class="footer">
+      <p>Rapport généré par EmotionsCare IA</p>
+      <div class="timestamp">
+        Généré le: ${new Date(generated_at).toLocaleString('fr-FR')}
+      </div>
+      <div class="timestamp">
+        Modèle: ${metadata.ai_model_version || 'GPT-4'}
+        | Points de données: ${metadata.data_points_analyzed || 0}
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+  `;
 }

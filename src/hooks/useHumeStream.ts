@@ -19,10 +19,12 @@ export const useHumeStream = () => {
 
   const connect = useCallback(() => {
     try {
-      // Pour l'instant, utiliser une simulation
-      // TODO: Remplacer par la vraie clé API Hume
-      const apiKey = 'simulation-key';
-      
+      const apiKey = import.meta.env.VITE_HUME_API_KEY;
+
+      if (!apiKey) {
+        throw new Error('Hume API key not configured. Please set VITE_HUME_API_KEY in your environment variables.');
+      }
+
       clientRef.current = new HumeStreamClient({ apiKey });
       
       clientRef.current.connect((emotion: EmotionData) => {

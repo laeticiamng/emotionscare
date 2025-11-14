@@ -10,6 +10,7 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { logger } from '@/lib/logger';
+import { supabase } from '@/lib/supabase';
 
 interface JournalPhotoUploadProps {
   onPhotoAdded: (photoUrl: string, analysis?: PhotoAnalysis) => void;
@@ -76,15 +77,35 @@ export const JournalPhotoUpload: React.FC<JournalPhotoUploadProps> = ({
   const analyzePhoto = async (file: File, photoUrl: string) => {
     setIsAnalyzing(true);
     try {
-      // TODO: Intégration avec API d'analyse d'image (GPT-4 Vision, etc.)
-      // Simulation pour l'instant
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      logger.info('Analyse photo démarrée', { fileName: file.name }, 'JOURNAL');
+
+      // Convertir l'image en base64 pour l'envoyer à l'API
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+
+      const base64Image = await new Promise<string>((resolve, reject) => {
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = reject;
+      });
+
+      // Appeler l'edge function pour analyser avec GPT-4 Vision
+      const { data, error } = await supabase.functions.invoke('analyze-image', {
+        body: {
+          image: base64Image,
+          fileName: file.name,
+          mimeType: file.type,
+        },
+      });
+
+      if (error) {
+        throw new Error(`Image analysis failed: ${error.message}`);
+      }
 
       const analysis: PhotoAnalysis = {
-        emotions: ['Joie', 'Calme', 'Sérénité'],
-        description: 'Photo montrant un moment de tranquillité. L\'image évoque la paix et la détente.',
-        mood: 'calm',
-        tags: ['nature', 'bien-être', 'relaxation']
+        emotions: data?.emotions || [],
+        description: data?.description || '',
+        mood: data?.mood || 'neutral',
+        tags: data?.tags || [],
       };
 
       setPhotoAnalysis(analysis);

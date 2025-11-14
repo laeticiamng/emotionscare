@@ -48,11 +48,28 @@ export default function CoachProgramDetailPage() {
   const progressPercentage = Math.round((completedLessons / program.lessons.length) * 100);
 
   const handleStartLesson = (lessonId: string) => {
+    // Find the lesson in the program
+    const lesson = program?.lessons.find(l => l.id === lessonId);
+
+    if (!lesson) {
+      toast({
+        title: 'Erreur',
+        description: 'Leçon introuvable',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    // Mark as started and navigate to lesson page
     toast({
-      title: 'Leçon en cours de chargement',
-      description: 'La leçon va démarrer dans un instant...',
+      title: 'Leçon démarrée! 🎓',
+      description: `Vous commencez: ${lesson.title}`,
     });
-    // TODO: Navigate to lesson detail page
+
+    // Navigate to lesson detail page with program and lesson context
+    navigate(`/app/coach/programs/${programId}/lessons/${lessonId}`, {
+      state: { lesson, program }
+    });
   };
 
   const handleEnroll = () => {

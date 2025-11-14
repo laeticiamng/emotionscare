@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Brain, Clock, Play, Pause, RotateCcw, ArrowLeft, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -14,6 +14,7 @@ export default function MeditationPage() {
   const [selectedDuration, setSelectedDuration] = useState(5);
   const [currentTime, setCurrentTime] = useState(0);
   const [selectedProgram, setSelectedProgram] = useState<string | null>(null);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const programs = [
     {
@@ -53,7 +54,6 @@ export default function MeditationPage() {
     }
     setIsPlaying(true);
     setCurrentTime(0);
-    // TODO: Implement actual meditation timer logic
   };
 
   const handlePause = () => {
@@ -64,6 +64,32 @@ export default function MeditationPage() {
     setIsPlaying(false);
     setCurrentTime(0);
   };
+
+  // Timer logic for meditation session
+  useEffect(() => {
+    if (isPlaying && currentTime < selectedDuration * 60) {
+      timerRef.current = setInterval(() => {
+        setCurrentTime(prev => {
+          const newTime = prev + 1;
+          // Auto-complete when time is up
+          if (newTime >= selectedDuration * 60) {
+            setIsPlaying(false);
+            toast({
+              title: 'Méditation terminée! 🧘',
+              description: `Vous avez complété votre session de ${selectedDuration} minutes.`,
+            });
+          }
+          return newTime;
+        });
+      }, 1000);
+    } else {
+      if (timerRef.current) clearInterval(timerRef.current);
+    }
+
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [isPlaying, selectedDuration, currentTime]);
 
   const progress = (currentTime / (selectedDuration * 60)) * 100;
 

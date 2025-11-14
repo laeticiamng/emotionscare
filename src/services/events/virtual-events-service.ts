@@ -515,7 +515,8 @@ class VirtualEventsService {
   // ============================================
 
   /**
-   * Créer une réunion Zoom
+   * Créer une réunion Zoom via API avec OAuth Server-to-Server
+   * Utilise l'edge function create-zoom-meeting pour gérer l'authentification
    */
   private async createZoomMeeting(params: {
     topic: string;
@@ -523,9 +524,6 @@ class VirtualEventsService {
     duration: number;
     timezone: string;
   }): Promise<any> {
-    // TODO: Implémenter l'intégration avec Zoom API
-    // Nécessite ZOOM_API_KEY et ZOOM_API_SECRET dans les variables d'environnement
-
     const zoomApiKey = import.meta.env.VITE_ZOOM_API_KEY;
     const zoomApiSecret = import.meta.env.VITE_ZOOM_API_SECRET;
 
@@ -540,12 +538,14 @@ class VirtualEventsService {
     }
 
     try {
-      // Appel réel à l'API Zoom via edge function
+      // Appel à l'edge function qui gère l'authentification Zoom Server-to-Server OAuth
       const { data, error } = await supabase.functions.invoke('create-zoom-meeting', {
         body: params
       });
 
       if (error) throw error;
+
+      logger.info('Zoom meeting created successfully', { meetingId: data.id }, 'EVENTS');
       return data;
     } catch (error) {
       logger.error('Failed to create Zoom meeting', error as Error, 'EVENTS');
@@ -554,16 +554,14 @@ class VirtualEventsService {
   }
 
   /**
-   * Créer une réunion Google Meet
+   * Créer une réunion Google Meet via Google Calendar API
+   * Utilise l'edge function create-google-meet pour gérer l'authentification OAuth
    */
   private async createGoogleMeetMeeting(params: {
     summary: string;
     start: string;
     end: string;
   }): Promise<any> {
-    // TODO: Implémenter l'intégration avec Google Calendar API
-    // Nécessite Google OAuth credentials
-
     const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
     if (!googleClientId) {
@@ -575,12 +573,14 @@ class VirtualEventsService {
     }
 
     try {
-      // Appel à l'API Google Calendar via edge function
+      // Appel à l'edge function qui gère l'authentification Google OAuth
       const { data, error } = await supabase.functions.invoke('create-google-meet', {
         body: params
       });
 
       if (error) throw error;
+
+      logger.info('Google Meet created successfully', { hangoutLink: data.hangoutLink }, 'EVENTS');
       return data;
     } catch (error) {
       logger.error('Failed to create Google Meet', error as Error, 'EVENTS');
