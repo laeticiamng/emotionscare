@@ -1,42 +1,54 @@
 /**
  * UNIFIED MUSIC PLAYER - EmotionsCare
  * Player audio unifié utilisant MusicContext
+ * Enhanced with full accessibility support (ARIA, keyboard navigation, screen reader)
  */
 
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useDebouncedCallback } from '@/hooks/useDebounce';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
-import { 
-  Play, 
-  Pause, 
-  SkipBack, 
-  SkipForward, 
-  Volume2, 
+import {
+  Play,
+  Pause,
+  SkipBack,
+  SkipForward,
+  Volume2,
   VolumeX,
   Music
 } from 'lucide-react';
 import { useMusic } from '@/hooks/useMusic';
 import { cn } from '@/lib/utils';
+import {
+  setupMusicKeyboardNavigation,
+  announceTrackChange,
+  announcePlaybackState,
+  announceVolumeChange,
+  getPlayerAriaAttributes,
+  getPlayButtonAriaAttributes,
+  getVolumeSliderAriaAttributes,
+  getProgressAriaAttributes,
+  formatTimeForScreenReader
+} from '@/utils/music-a11y';
 
 interface UnifiedMusicPlayerProps {
   className?: string;
   compact?: boolean;
 }
 
-export const UnifiedMusicPlayer: React.FC<UnifiedMusicPlayerProps> = ({ 
-  className, 
-  compact = false 
+export const UnifiedMusicPlayer: React.FC<UnifiedMusicPlayerProps> = ({
+  className,
+  compact = false
 }) => {
-  const { 
-    state, 
-    play, 
-    pause, 
-    next, 
-    previous, 
-    seek, 
-    setVolume 
+  const {
+    state,
+    play,
+    pause,
+    next,
+    previous,
+    seek,
+    setVolume
   } = useMusic();
 
   const {
@@ -46,6 +58,22 @@ export const UnifiedMusicPlayer: React.FC<UnifiedMusicPlayerProps> = ({
     currentTime,
     duration,
   } = state;
+
+  const playerRef = useRef<HTMLDivElement>(null);
+
+  // Announce track changes to screen readers
+  useEffect(() => {
+    if (currentTrack) {
+      announceTrackChange(currentTrack);
+    }
+  }, [currentTrack?.id]);
+
+  // Announce playback state changes
+  useEffect(() => {
+    if (currentTrack) {
+      announcePlaybackState(isPlaying, currentTrack);
+    }
+  }, [isPlaying, currentTrack?.id]);
 
   const formatTime = (seconds: number) => {
     if (!seconds || isNaN(seconds)) return '0:00';
@@ -72,8 +100,44 @@ export const UnifiedMusicPlayer: React.FC<UnifiedMusicPlayerProps> = ({
   }, 100);
 
   const handleVolumeChange = (value: number[]) => {
-    setVolume(value[0] / 100);
+    const newVolume = value[0] / 100;
+    setVolume(newVolume);
+    announceVolumeChange(newVolume);
   };
+
+  const handleVolumeUp = () => {
+    const newVolume = Math.min(1, volume + 0.1);
+    setVolume(newVolume);
+    announceVolumeChange(newVolume);
+  };
+
+  const handleVolumeDown = () => {
+    const newVolume = Math.max(0, volume - 0.1);
+    setVolume(newVolume);
+    announceVolumeChange(newVolume);
+  };
+
+  const handleMute = () => {
+    const newVolume = volume > 0 ? 0 : 0.7;
+    setVolume(newVolume);
+    announceVolumeChange(newVolume);
+  };
+
+  // Setup keyboard navigation
+  useEffect(() => {
+    if (!playerRef.current) return;
+
+    const cleanup = setupMusicKeyboardNavigation(playerRef.current, {
+      onPlayPause: handlePlayPause,
+      onNext: next,
+      onPrev: previous,
+      onVolumeUp: handleVolumeUp,
+      onVolumeDown: handleVolumeDown,
+      onMute: handleMute
+    });
+
+    return cleanup;
+  }, [handlePlayPause, next, previous]);
 
   if (!currentTrack) {
     return (
@@ -125,7 +189,11 @@ export const UnifiedMusicPlayer: React.FC<UnifiedMusicPlayerProps> = ({
   }
 
   return (
-    <Card className={cn("bg-card/90 backdrop-blur-md", className)}>
+    <Card
+      ref={playerRef}
+      {...getPlayerAriaAttributes(isPlaying, currentTrack)}
+      className={cn("bg-card/90 backdrop-blur-md", className)}
+    >
       <CardContent className="p-6 space-y-6">
         {/* Track Info */}
         <div className="text-center space-y-2">
@@ -139,11 +207,7 @@ export const UnifiedMusicPlayer: React.FC<UnifiedMusicPlayerProps> = ({
         {/* Progress Bar */}
         <div className="space-y-2">
           <Slider
-            aria-label="Progression de la piste"
-            aria-valuemin={0}
-            aria-valuemax={100}
-            aria-valuenow={progress}
-            aria-valuetext={`${formatTime(currentTime)} sur ${formatTime(duration)}`}
+            {...getProgressAriaAttributes(currentTime, duration)}
             value={[progress]}
             max={100}
             step={0.1}
@@ -151,8 +215,12 @@ export const UnifiedMusicPlayer: React.FC<UnifiedMusicPlayerProps> = ({
             className="w-full"
           />
           <div className="flex justify-between text-xs text-muted-foreground">
-            <span aria-label="Temps écoulé">{formatTime(currentTime)}</span>
-            <span aria-label="Durée totale">{formatTime(duration)}</span>
+            <span aria-label={`Temps écoulé: ${formatTimeForScreenReader(currentTime)}`}>
+              {formatTime(currentTime)}
+            </span>
+            <span aria-label={`Durée totale: ${formatTimeForScreenReader(duration)}`}>
+              {formatTime(duration)}
+            </span>
           </div>
         </div>
 
@@ -176,7 +244,7 @@ export const UnifiedMusicPlayer: React.FC<UnifiedMusicPlayerProps> = ({
           <Button
             size="icon"
             onClick={handlePlayPause}
-            aria-label={isPlaying ? 'Mettre en pause' : 'Lancer la lecture'}
+            {...getPlayButtonAriaAttributes(isPlaying)}
             className="h-14 w-14 rounded-full"
           >
             {isPlaying ? (
@@ -202,7 +270,7 @@ export const UnifiedMusicPlayer: React.FC<UnifiedMusicPlayerProps> = ({
           <Button
             size="icon"
             variant="ghost"
-            onClick={() => setVolume(volume > 0 ? 0 : 0.7)}
+            onClick={handleMute}
             aria-label={volume === 0 ? 'Activer le son' : 'Couper le son'}
             className="h-8 w-8"
           >
@@ -213,19 +281,29 @@ export const UnifiedMusicPlayer: React.FC<UnifiedMusicPlayerProps> = ({
             )}
           </Button>
           <Slider
-            aria-label="Volume"
-            aria-valuemin={0}
-            aria-valuemax={100}
-            aria-valuenow={Math.round(volume * 100)}
+            {...getVolumeSliderAriaAttributes(volume)}
             value={[volume * 100]}
             max={100}
             step={1}
             onValueChange={handleVolumeChange}
             className="w-full"
           />
-          <span className="text-xs text-muted-foreground w-12 text-right" aria-label={`Volume actuel ${Math.round(volume * 100)} pourcent`}>
+          <span
+            className="text-xs text-muted-foreground w-12 text-right"
+            aria-label={`Volume actuel: ${Math.round(volume * 100)} pourcent`}
+          >
             {Math.round(volume * 100)}%
           </span>
+        </div>
+
+        {/* Keyboard Shortcuts Help */}
+        <div className="text-xs text-center text-muted-foreground pt-2 border-t">
+          <p>
+            Raccourcis: <kbd className="px-1 py-0.5 bg-muted rounded">Espace</kbd> Lecture/Pause •{' '}
+            <kbd className="px-1 py-0.5 bg-muted rounded">↑/↓</kbd> Volume •{' '}
+            <kbd className="px-1 py-0.5 bg-muted rounded">←/→</kbd> Piste •{' '}
+            <kbd className="px-1 py-0.5 bg-muted rounded">M</kbd> Muet
+          </p>
         </div>
       </CardContent>
     </Card>
