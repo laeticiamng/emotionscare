@@ -5,24 +5,31 @@ interface PageSEOOptions {
   description?: string;
   keywords?: string;
   ogImage?: string;
+  structuredData?: Record<string, any>;
 }
 
 /**
  * Hook pour gérer le SEO d'une page
- * Ajoute automatiquement title, meta description, et balises Open Graph
+ * Ajoute automatiquement title, meta description, balises Open Graph et JSON-LD structured data
  * 
  * @example
  * usePageSEO({
  *   title: 'Dashboard Particulier',
  *   description: 'Suivez vos émotions et progressez avec EmotionsCare',
- *   keywords: 'émotions, bien-être, dashboard'
+ *   keywords: 'émotions, bien-être, dashboard',
+ *   structuredData: {
+ *     '@context': 'https://schema.org',
+ *     '@type': 'WebApplication',
+ *     name: 'EmotionsCare'
+ *   }
  * });
  */
 export const usePageSEO = ({ 
   title, 
   description, 
   keywords,
-  ogImage 
+  ogImage,
+  structuredData
 }: PageSEOOptions) => {
   useEffect(() => {
     // Title
@@ -54,7 +61,12 @@ export const usePageSEO = ({
     if (description) {
       updateOrCreateMeta('twitter:description', description);
     }
-  }, [title, description, keywords, ogImage]);
+
+    // Structured Data (JSON-LD)
+    if (structuredData) {
+      updateOrCreateStructuredData(structuredData);
+    }
+  }, [title, description, keywords, ogImage, structuredData]);
 };
 
 function updateOrCreateMeta(
@@ -71,6 +83,20 @@ function updateOrCreateMeta(
   }
   
   meta.setAttribute('content', content);
+}
+
+function updateOrCreateStructuredData(data: Record<string, any>) {
+  // Supprimer l'ancien script JSON-LD s'il existe
+  const existingScript = document.querySelector('script[type="application/ld+json"]');
+  if (existingScript) {
+    existingScript.remove();
+  }
+
+  // Créer le nouveau script JSON-LD
+  const script = document.createElement('script');
+  script.type = 'application/ld+json';
+  script.textContent = JSON.stringify(data, null, 2);
+  document.head.appendChild(script);
 }
 
 export default usePageSEO;

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * ModernHomePage - Version améliorée de la page d'accueil
  * Conserve l'apparence existante tout en ajoutant des fonctionnalités modernes
@@ -12,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Link } from 'react-router-dom';
+import { useUserStats } from '@/hooks/useUserStats';
 import { 
   ArrowRight, 
   User, 
@@ -27,11 +27,26 @@ import {
   Sparkles
 } from 'lucide-react';
 
+interface Achievement {
+  name: string;
+  icon: string;
+  date: string;
+}
+
+interface QuickAction {
+  title: string;
+  desc: string;
+  icon: React.ReactNode;
+  href: string;
+  color: string;
+}
+
 const ModernHomePage: React.FC = () => {
   const { isAuthenticated, user } = useAuth();
-  const [notifications, setNotifications] = useState(3);
-  const [userProgress, setUserProgress] = useState(75);
-  const [onlineUsers, setOnlineUsers] = useState(1247);
+  const { stats: userStats, loading: statsLoading } = useUserStats();
+  const [notifications] = useState<number>(3);
+  const [userProgress] = useState<number>(75);
+  const [onlineUsers, setOnlineUsers] = useState<number>(1247);
 
   // Simulation d'activité en temps réel
   useEffect(() => {
@@ -42,20 +57,13 @@ const ModernHomePage: React.FC = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const userStats = {
-    weeklyGoals: 4,
-    completedSessions: 12,
-    totalPoints: 2450,
-    currentStreak: 7
-  };
-
-  const recentAchievements = [
+  const recentAchievements: Achievement[] = [
     { name: 'Semaine productive', icon: '🎯', date: 'Aujourd\'hui' },
     { name: 'Premier badge', icon: '🏆', date: 'Hier' },
     { name: 'Connexion quotidienne', icon: '🔥', date: 'Il y a 2 jours' }
   ];
 
-  const quickActions = [
+  const quickActions: QuickAction[] = [
     { 
       title: 'Musique émotionnelle', 
       desc: 'Génération musicale par IA',
