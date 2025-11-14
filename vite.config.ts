@@ -4,10 +4,18 @@ import path from 'path';
 import { componentTagger } from "lovable-tagger";
 import dyadComponentTagger from '@dyad-sh/react-vite-component-tagger';
 import { VitePWA } from 'vite-plugin-pwa';
+import { visualizer } from 'rollup-plugin-visualizer';
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
   plugins: [
+    mode === 'analyze' && visualizer({
+      open: true,
+      filename: 'dist/stats.html',
+      gzipSize: true,
+      brotliSize: true,
+      template: 'treemap', // sunburst, treemap, network
+    }),
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
@@ -187,9 +195,59 @@ export default defineConfig(({ mode }) => ({
   },
   build: {
     target: 'esnext',
+    minify: 'terser',
+    sourcemap: mode === 'production' ? false : true,
+    chunkSizeWarningLimit: 500, // 500KB warning
     // Ignorer les erreurs TypeScript des edge functions
     rollupOptions: {
       external: (id) => id.includes('supabase/functions') || id.includes('supabase/tests'),
+      output: {
+        manualChunks: {
+          // Vendor chunks - Core React
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+
+          // UI framework chunks
+          'ui-radix': [
+            '@radix-ui/react-dialog',
+            '@radix-ui/react-slider',
+            '@radix-ui/react-progress',
+            '@radix-ui/react-tabs',
+            '@radix-ui/react-toast',
+            '@radix-ui/react-select',
+            '@radix-ui/react-dropdown-menu',
+          ],
+
+          // Data management
+          'data-vendor': ['@tanstack/react-query', '@supabase/supabase-js', 'zod'],
+
+          // Animation
+          'animation-vendor': ['framer-motion'],
+
+          // Charts
+          'charts-vendor': ['chart.js', 'react-chartjs-2', 'recharts'],
+
+          // Music module chunks
+          'music-player': [
+            './src/components/music/UnifiedMusicPlayer',
+            './src/hooks/music/useAudioPlayer',
+          ],
+          'music-generator': [
+            './src/components/music/EmotionalMusicGenerator',
+            './src/services/music/enhanced-music-service',
+          ],
+          'music-quota': [
+            './src/services/music/quota-service',
+            './src/hooks/music/useUserQuota',
+            './src/components/music/QuotaIndicator',
+          ],
+        },
+      },
+    },
+    terserOptions: {
+      compress: {
+        drop_console: mode === 'production',
+        drop_debugger: mode === 'production',
+      },
     },
   },
   // Désactiver le typecheck strict pour ne pas bloquer sur les edge functions

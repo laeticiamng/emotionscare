@@ -3,20 +3,20 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { LazyMotionWrapper, m } from '@/utils/lazy-motion';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { 
-  Users, 
-  TrendingUp, 
-  TrendingDown, 
-  Music, 
+import {
+  Users,
+  TrendingUp,
+  TrendingDown,
+  Music,
   Trophy,
   Share2,
   UserPlus
-} from 'lucide-react';
+} from '@/components/music/icons';
 import { 
   getFriends, 
   compareFriendStats, 
@@ -207,8 +207,9 @@ export const SocialFriendsPanel: React.FC<SocialFriendsPanelProps> = ({ userId }
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
+    <LazyMotionWrapper>
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
         <div>
           <h3 className="text-xl font-bold text-foreground">Vos Amis</h3>
           <p className="text-sm text-muted-foreground">
@@ -223,7 +224,7 @@ export const SocialFriendsPanel: React.FC<SocialFriendsPanelProps> = ({ userId }
 
       <div className="space-y-3">
         {friends.map((friend, index) => (
-          <motion.div
+          <m.div
             key={friend.id}
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -258,10 +259,11 @@ export const SocialFriendsPanel: React.FC<SocialFriendsPanelProps> = ({ userId }
                 </Button>
               </div>
             </Card>
-          </motion.div>
+          </m.div>
         ))}
       </div>
     </div>
+    </LazyMotionWrapper>
   );
 };
 

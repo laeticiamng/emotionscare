@@ -4,8 +4,8 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { X, TrendingUp, Sparkles, ExternalLink } from 'lucide-react';
+import { LazyMotionWrapper, m, AnimatePresence } from '@/utils/lazy-motion';
+import { X, TrendingUp, Sparkles, ExternalLink } from '@/components/music/icons';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -51,15 +51,16 @@ export const TasteChangeNotification: React.FC<TasteChangeNotificationProps> = (
   };
 
   return (
-    <AnimatePresence>
-      {isVisible && (
-        <motion.div
-          initial={{ opacity: 0, y: -20, scale: 0.95 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: -20, scale: 0.95 }}
-          transition={{ duration: 0.3, ease: 'easeOut' }}
-          className="fixed top-4 right-4 z-50 max-w-md"
-        >
+    <LazyMotionWrapper>
+      <AnimatePresence>
+        {isVisible && (
+          <m.div
+            initial={{ opacity: 0, y: -20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -20, scale: 0.95 }}
+            transition={{ duration: 0.3, ease: 'easeOut' }}
+            className="fixed top-4 right-4 z-50 max-w-md"
+          >
           <Card className="border-2 border-primary/20 bg-gradient-to-br from-primary/10 to-purple-500/10 shadow-xl">
             <CardContent className="p-4">
               <div className="flex items-start gap-3">
@@ -116,7 +117,7 @@ export const TasteChangeNotification: React.FC<TasteChangeNotificationProps> = (
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
                       <span>Confiance :</span>
                       <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
-                        <motion.div
+                        <m.div
                           initial={{ width: 0 }}
                           animate={{ width: `${confidence * 100}%` }}
                           transition={{ duration: 0.8, ease: 'easeOut' }}
@@ -150,8 +151,9 @@ export const TasteChangeNotification: React.FC<TasteChangeNotificationProps> = (
               </div>
             </CardContent>
           </Card>
-        </motion.div>
+        </m.div>
       )}
     </AnimatePresence>
+    </LazyMotionWrapper>
   );
 };

@@ -3,13 +3,13 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { LazyMotionWrapper, m } from '@/utils/lazy-motion';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Clock, Star, Trophy, CheckCircle2 } from 'lucide-react';
+import { Clock, Star, Trophy, CheckCircle2 } from '@/components/music/icons';
 import { getUserChallenges, completeChallenge, type MusicChallenge } from '@/services/music/challenges-service';
 import { useToast } from '@/hooks/use-toast';
 import confetti from 'canvas-confetti';
@@ -96,7 +96,7 @@ export const DailyChallengesPanel: React.FC<DailyChallengesPanelProps> = ({
     const hoursLeft = Math.floor(timeLeft / (1000 * 60 * 60));
     
     return (
-      <motion.div
+      <m.div
         key={challenge.id}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -156,7 +156,7 @@ export const DailyChallengesPanel: React.FC<DailyChallengesPanelProps> = ({
             )}
           </div>
         </Card>
-      </motion.div>
+      </m.div>
     );
   };
 
@@ -173,9 +173,10 @@ export const DailyChallengesPanel: React.FC<DailyChallengesPanelProps> = ({
   }
 
   return (
-    <div className="space-y-4">
-      <div>
-        <h3 className="text-xl font-bold text-foreground mb-2">Défis Actifs</h3>
+    <LazyMotionWrapper>
+      <div className="space-y-4">
+        <div>
+          <h3 className="text-xl font-bold text-foreground mb-2">Défis Actifs</h3>
         <p className="text-sm text-muted-foreground">
           Complétez les défis pour gagner de l'XP et débloquer des badges exclusifs
         </p>
@@ -212,5 +213,6 @@ export const DailyChallengesPanel: React.FC<DailyChallengesPanelProps> = ({
         </TabsContent>
       </Tabs>
     </div>
+    </LazyMotionWrapper>
   );
 };

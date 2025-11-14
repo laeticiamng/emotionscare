@@ -3,12 +3,12 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { LazyMotionWrapper, m, AnimatePresence } from '@/utils/lazy-motion';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Award, Lock, TrendingUp } from 'lucide-react';
+import { Award, Lock, TrendingUp } from '@/components/music/icons';
 import { checkAndUnlockBadges, getUserMusicBadges, MusicBadge } from '@/services/music/badges-service';
 import { useToast } from '@/hooks/use-toast';
 import confetti from 'canvas-confetti';
@@ -81,9 +81,10 @@ export const MusicBadgesDisplay: React.FC<MusicBadgesDisplayProps> = ({
   const progressPercentage = (unlockedCount / badges.length) * 100;
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold text-foreground mb-2 flex items-center">
+    <LazyMotionWrapper>
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-2xl font-bold text-foreground mb-2 flex items-center">
           <Award className="h-6 w-6 mr-2 text-primary" />
           Vos badges musicaux
         </h2>
@@ -110,7 +111,7 @@ export const MusicBadgesDisplay: React.FC<MusicBadgesDisplayProps> = ({
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         <AnimatePresence mode="popLayout">
           {filteredBadges.map((badge, index) => (
-            <motion.div
+            <m.div
               key={badge.id}
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -164,10 +165,11 @@ export const MusicBadgesDisplay: React.FC<MusicBadgesDisplayProps> = ({
                   </Badge>
                 )}
               </Card>
-            </motion.div>
+            </m.div>
           ))}
         </AnimatePresence>
       </div>
     </div>
+    </LazyMotionWrapper>
   );
 };

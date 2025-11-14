@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { LazyMotionWrapper, m } from '@/utils/lazy-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -29,7 +29,7 @@ import {
   ThumbsUp,
   ThumbsDown,
   Share2
-} from 'lucide-react';
+} from '@/components/music/icons';
 import { useAutoMix } from '@/hooks/useAutoMix';
 import { PlaylistShareModal } from './PlaylistShareModal';
 
@@ -82,7 +82,8 @@ export const AutoMixPlayer: React.FC = () => {
   const WeatherIcon = context ? WeatherIcons[context.weatherContext as keyof typeof WeatherIcons] || Cloud : Cloud;
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto">
+    <LazyMotionWrapper>
+      <div className="space-y-6 max-w-4xl mx-auto">
       {/* Contexte en temps réel */}
       <Card className="bg-gradient-to-br from-blue-500/10 to-purple-500/10 border-blue-500/20">
         <CardHeader>
@@ -219,7 +220,7 @@ export const AutoMixPlayer: React.FC = () => {
                 <Badge variant="secondary">Crossfade 3s</Badge>
               </div>
               <div className="h-2 bg-muted rounded-full overflow-hidden">
-                <motion.div
+                <m.div
                   className="h-full bg-primary"
                   initial={{ width: 0 }}
                   animate={{ width: `${((currentIndex + 1) / (activePlaylist.generated_tracks?.length || 1)) * 100}%` }}
@@ -232,7 +233,7 @@ export const AutoMixPlayer: React.FC = () => {
 
       {/* Feedback Section */}
       {activePlaylist && !feedbackGiven && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="fixed bottom-6 right-6 z-50"
@@ -268,7 +269,7 @@ export const AutoMixPlayer: React.FC = () => {
               </div>
             </CardContent>
           </Card>
-        </motion.div>
+        </m.div>
       )}
 
       {/* Modal de partage */}
@@ -281,5 +282,6 @@ export const AutoMixPlayer: React.FC = () => {
         />
       )}
     </div>
+    </LazyMotionWrapper>
   );
 };

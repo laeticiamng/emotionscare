@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { LazyMotionWrapper, m, AnimatePresence } from '@/utils/lazy-motion';
 import {
   Dialog,
   DialogContent,
@@ -26,7 +26,7 @@ import {
   TrendingUp,
   Clock,
   Users,
-} from 'lucide-react';
+} from '@/components/music/icons';
 import { usePlaylistShare } from '@/hooks/usePlaylistShare';
 import { toast } from 'sonner';
 
@@ -72,8 +72,9 @@ export const PlaylistShareModal: React.FC<PlaylistShareModalProps> = ({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl">
+    <LazyMotionWrapper>
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Share2 className="h-5 w-5 text-primary" />
@@ -87,7 +88,7 @@ export const PlaylistShareModal: React.FC<PlaylistShareModalProps> = ({
         <div className="space-y-6 mt-4">
           {/* QR Code */}
           {shareData?.shareUrl && (
-            <motion.div
+            <m.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               className="flex flex-col items-center gap-4"
@@ -104,7 +105,7 @@ export const PlaylistShareModal: React.FC<PlaylistShareModalProps> = ({
                 </CardContent>
               </Card>
               <p className="text-xs text-muted-foreground">Scannez pour accéder à la playlist</p>
-            </motion.div>
+            </m.div>
           )}
 
           {/* Lien de partage */}
@@ -195,5 +196,6 @@ export const PlaylistShareModal: React.FC<PlaylistShareModalProps> = ({
         </div>
       </DialogContent>
     </Dialog>
+    </LazyMotionWrapper>
   );
 };

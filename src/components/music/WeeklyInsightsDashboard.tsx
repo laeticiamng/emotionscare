@@ -3,11 +3,11 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { LazyMotionWrapper, m } from '@/utils/lazy-motion';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { TrendingUp, Music, Clock, Sparkles, Share2, Download } from 'lucide-react';
+import { TrendingUp, Music, Clock, Sparkles, Share2, Download } from '@/components/music/icons';
 import { analyzeMusicBehavior } from '@/services/music/preferences-learning-service';
 import { useToast } from '@/hooks/use-toast';
 import html2canvas from 'html2canvas';
@@ -133,8 +133,9 @@ export const WeeklyInsightsDashboard: React.FC<WeeklyInsightsDashboardProps> = (
   if (!insights) return null;
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <LazyMotionWrapper>
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-foreground mb-2">
             Votre semaine musicale
@@ -158,7 +159,7 @@ export const WeeklyInsightsDashboard: React.FC<WeeklyInsightsDashboardProps> = (
       <div id="weekly-insights" className="space-y-4">
         {/* Statistiques principales */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <motion.div
+          <m.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.1 }}
@@ -173,9 +174,9 @@ export const WeeklyInsightsDashboard: React.FC<WeeklyInsightsDashboardProps> = (
               </p>
               <p className="text-sm text-muted-foreground">Temps d'écoute</p>
             </Card>
-          </motion.div>
+          </m.div>
 
-          <motion.div
+          <m.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.2 }}
@@ -190,9 +191,9 @@ export const WeeklyInsightsDashboard: React.FC<WeeklyInsightsDashboardProps> = (
               </p>
               <p className="text-sm text-muted-foreground">Genre favori</p>
             </Card>
-          </motion.div>
+          </m.div>
 
-          <motion.div
+          <m.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.3 }}
@@ -207,7 +208,7 @@ export const WeeklyInsightsDashboard: React.FC<WeeklyInsightsDashboardProps> = (
               </p>
               <p className="text-sm text-muted-foreground">Nouveaux genres</p>
             </Card>
-          </motion.div>
+          </m.div>
         </div>
 
         {/* Distribution des genres */}
@@ -228,7 +229,7 @@ export const WeeklyInsightsDashboard: React.FC<WeeklyInsightsDashboardProps> = (
                   </span>
                 </div>
                 <div className="h-2 bg-secondary/20 rounded-full overflow-hidden">
-                  <motion.div
+                  <m.div
                     initial={{ width: 0 }}
                     animate={{ width: `${genre.count}%` }}
                     transition={{ delay: 0.5 + index * 0.1, duration: 0.5 }}
@@ -294,5 +295,6 @@ export const WeeklyInsightsDashboard: React.FC<WeeklyInsightsDashboardProps> = (
         </Card>
       </div>
     </div>
+    </LazyMotionWrapper>
   );
 };

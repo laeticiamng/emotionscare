@@ -5,22 +5,22 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { LazyMotionWrapper, m, AnimatePresence } from '@/utils/lazy-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Slider } from '@/components/ui/slider';
-import { 
-  Play, 
-  Pause, 
-  SkipForward, 
-  Star, 
+import {
+  Play,
+  Pause,
+  SkipForward,
+  Star,
   CheckCircle2,
   Music2,
   TrendingUp,
   Sparkles
-} from 'lucide-react';
+} from '@/components/music/icons';
 import { useMusicJourney, type MusicJourney } from '@/hooks/useMusicJourney';
 
 interface Props {
@@ -105,7 +105,8 @@ export const MusicJourneyPlayer: React.FC<Props> = ({ journeyId, onComplete }) =
   const progressPercent = ((currentTrackIndex + 1) / activeJourney.total_steps) * 100;
 
   return (
-    <div className="space-y-6 w-full max-w-4xl mx-auto">
+    <LazyMotionWrapper>
+      <div className="space-y-6 w-full max-w-4xl mx-auto">
       {/* En-tête du parcours */}
       <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
         <CardHeader>
@@ -138,9 +139,9 @@ export const MusicJourneyPlayer: React.FC<Props> = ({ journeyId, onComplete }) =
           <div className="flex items-center justify-between mb-8">
             {activeJourney.tracks?.map((track, index) => (
               <div key={track.id} className="flex flex-col items-center gap-2 flex-1">
-                <motion.div
+                <m.div
                   initial={{ scale: 0.8, opacity: 0.5 }}
-                  animate={{ 
+                  animate={{
                     scale: index === currentTrackIndex ? 1.2 : 1,
                     opacity: index <= currentTrackIndex ? 1 : 0.4
                   }}
@@ -161,7 +162,7 @@ export const MusicJourneyPlayer: React.FC<Props> = ({ journeyId, onComplete }) =
                   ) : (
                     <span className="text-xs font-bold">{index + 1}</span>
                   )}
-                </motion.div>
+                </m.div>
                 <p className="text-xs text-center capitalize font-medium">
                   {track.emotion_level}
                 </p>
@@ -177,7 +178,7 @@ export const MusicJourneyPlayer: React.FC<Props> = ({ journeyId, onComplete }) =
       {/* Lecteur actuel */}
       <AnimatePresence mode="wait">
         {currentTrack && (
-          <motion.div
+          <m.div
             key={currentTrack.id}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -247,9 +248,10 @@ export const MusicJourneyPlayer: React.FC<Props> = ({ journeyId, onComplete }) =
                 )}
               </CardContent>
             </Card>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     </div>
+    </LazyMotionWrapper>
   );
 };
