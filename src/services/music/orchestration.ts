@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { supabase } from '@/integrations/supabase/client';
 import type { ClinicalSignal } from '@/services/clinicalOrchestration';
 import { logger } from '@/lib/logger';

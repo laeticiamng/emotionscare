@@ -97,6 +97,18 @@ class EnhancedMusicService {
     const incremented = await quotaService.incrementUsage(user.id);
     if (!incremented) {
       throw new Error('Impossible d\'incrémenter le quota');
+    // Validation des entrées
+    if (!request.title || request.title.trim().length === 0) {
+      throw new Error('Title is required');
+    }
+    if (!request.style || request.style.trim().length === 0) {
+      throw new Error('Style is required');
+    }
+    if (request.title.length > 200) {
+      throw new Error('Title too long (max 200 characters)');
+    }
+    if (request.prompt && request.prompt.length > 1000) {
+      throw new Error('Prompt too long (max 1000 characters)');
     }
 
     // Créer l'entrée dans la DB
@@ -597,7 +609,14 @@ class EnhancedMusicService {
   }
 
   private generateShareToken(): string {
-    return `share_${Math.random().toString(36).substring(2, 15)}${Math.random().toString(36).substring(2, 15)}`;
+    // Génère un token sécurisé avec crypto API si disponible
+    if (typeof window !== 'undefined' && window.crypto && window.crypto.getRandomValues) {
+      const array = new Uint8Array(32);
+      window.crypto.getRandomValues(array);
+      return `share_${Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('')}`;
+    }
+    // Fallback pour environnements sans crypto API
+    return `share_${Math.random().toString(36).substring(2, 15)}${Math.random().toString(36).substring(2, 15)}${Date.now().toString(36)}`;
   }
 }
 

@@ -9,6 +9,10 @@ import type { FastifyBaseLogger } from 'fastify';
 
 import { createServer } from '../lib/server';
 import { moodPlaylistRequestSchema, buildMoodPlaylistResponse } from './music';
+import { registerAssessmentRoutes } from './routes/assessments';
+import { registerScanRoutes } from './routes/scans';
+import { registerCoachRoutes } from './routes/coach';
+import { registerGoalRoutes } from './routes/goals';
 
 type MaybePromise<T> = T | Promise<T>;
 
@@ -418,6 +422,12 @@ export function createApp(options: CreateAppOptions = {}) {
 
   return createServer({
     registerRoutes(app) {
+      // Register modular API routes
+      registerAssessmentRoutes(app);
+      registerScanRoutes(app);
+      registerCoachRoutes(app);
+      registerGoalRoutes(app);
+
       const sendHealth = async (request: any, reply: any) => {
         applyHealthCors(request, reply);
         reply.header('cache-control', 'no-store');

@@ -46,9 +46,10 @@ export async function generateChatResponse(
     temperature?: number;
     maxTokens?: number;
   } = {}
-): Promise<ChatResponse> {
+): Promise<ChatResponse | null> {
   if (!isApiKeyAvailable()) {
-    throw new Error('OpenAI API key not available. Please add it to your .env file.');
+    logger.error('OpenAI API key not available', new Error('API key missing'), 'API');
+    return null;
   }
 
   try {
@@ -79,7 +80,7 @@ export async function generateChatResponse(
     };
   } catch (error) {
     logger.error('Error generating chat response', error as Error, 'API');
-    throw error;
+    return null;
   }
 }
 
@@ -97,9 +98,10 @@ export async function generateStreamingChatResponse(
     temperature?: number;
     maxTokens?: number;
   } = {}
-): Promise<void> {
+): Promise<boolean> {
   if (!isApiKeyAvailable()) {
-    throw new Error('OpenAI API key not available. Please add it to your .env file.');
+    logger.error('OpenAI API key not available', new Error('API key missing'), 'API');
+    return false;
   }
 
   try {
@@ -126,10 +128,10 @@ export async function generateStreamingChatResponse(
       }
     }
 
-    return;
+    return true;
   } catch (error) {
     logger.error('Error generating streaming chat response', error as Error, 'API');
-    throw error;
+    return false;
   }
 }
 
