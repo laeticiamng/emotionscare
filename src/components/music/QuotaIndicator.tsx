@@ -40,8 +40,7 @@ export function QuotaIndicator({
     formattedResetDate,
     quotaColor,
     tier,
-    isLoading,
-    canGenerate
+    isLoading
   } = useQuotaUI();
 
   if (isLoading) {
