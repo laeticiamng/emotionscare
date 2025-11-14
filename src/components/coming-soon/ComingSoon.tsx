@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Calendar, Bell } from 'lucide-react';
+import { ArrowLeft, Calendar, Bell, Check } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { routes } from '@/lib/routes';
 import { logger } from '@/lib/logger';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/lib/supabase';
 
 interface ComingSoonProps {
   moduleName: string;
@@ -30,10 +32,60 @@ export const ComingSoon: React.FC<ComingSoonProps> = ({
   className = '',
 }) => {
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const [isNotifying, setIsNotifying] = useState(false);
+  const [hasNotified, setHasNotified] = useState(false);
 
-  const handleNotify = () => {
-    // TODO: Implémenter notification système
-    logger.info('Notification demandée pour:', { moduleName }, 'UI');
+  const handleNotify = async () => {
+    try {
+      setIsNotifying(true);
+
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (!user) {
+        toast({
+          title: 'Connectez-vous d\'abord',
+          description: 'Vous devez être connecté pour recevoir des notifications.',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      // Enregistrer la notification dans la base de données
+      const { error } = await supabase
+        .from('coming_soon_notifications')
+        .insert({
+          user_id: user.id,
+          module_name: moduleName,
+          email: user.email,
+        })
+        .select()
+        .single();
+
+      if (error) {
+        if (error.code !== '23505') { // Ignore duplicate key error
+          throw error;
+        }
+      }
+
+      setHasNotified(true);
+
+      toast({
+        title: 'ça marche! 🎉',
+        description: `Vous serez averti dès que ${moduleName} sera disponible.`,
+      });
+
+      logger.info('Notification enregistrée pour:', { moduleName, userId: user.id }, 'UI');
+    } catch (error) {
+      logger.error('Erreur enregistrement notification', error as Error, 'UI');
+      toast({
+        title: 'Erreur',
+        description: 'Impossible d\'enregistrer votre notification.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsNotifying(false);
+    }
   };
 
   return (
@@ -84,9 +136,23 @@ export const ComingSoon: React.FC<ComingSoonProps> = ({
             </Button>
 
             {notifyEnabled && (
-              <Button onClick={handleNotify} variant="default" className="flex-1">
-                <Bell className="mr-2 h-4 w-4" />
-                Me prévenir
+              <Button
+                onClick={handleNotify}
+                variant="default"
+                className="flex-1"
+                disabled={hasNotified || isNotifying}
+              >
+                {hasNotified ? (
+                  <>
+                    <Check className="mr-2 h-4 w-4" />
+                    Notification enregistrée
+                  </>
+                ) : (
+                  <>
+                    <Bell className="mr-2 h-4 w-4" />
+                    {isNotifying ? 'En cours...' : 'Me prévenir'}
+                  </>
+                )}
               </Button>
             )}
           </div>
