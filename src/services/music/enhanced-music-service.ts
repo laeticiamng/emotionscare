@@ -6,6 +6,8 @@
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';
 import { generateMusic, extendMusic, addVocals, type SunoGenerateRequest } from '../suno-client';
+import { validateInput, CreatePlaylistSchema, ShareMusicSchema, AddToPlaylistSchema } from '@/validators/music';
+import { quotaService } from './quota-service';
 
 export interface MusicGeneration {
   id: string;
@@ -72,6 +74,31 @@ class EnhancedMusicService {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
+    // 1. Vérifier le quota utilisateur
+    const quotaCheck = await quotaService.checkQuota(user.id);
+    if (!quotaCheck.canGenerate) {
+      throw new Error(quotaCheck.reason || 'Quota de générations épuisé');
+    }
+
+    // 2. Vérifier la durée demandée
+    const duration = request.durationSeconds || 180;
+    const durationCheck = await quotaService.canGenerateWithDuration(user.id, duration);
+    if (!durationCheck.canGenerate) {
+      throw new Error(durationCheck.reason || 'Durée trop longue pour votre tier');
+    }
+
+    // 3. Vérifier les générations concurrentes
+    const concurrentCheck = await quotaService.checkConcurrentGenerations(user.id);
+    if (!concurrentCheck.canGenerate) {
+      throw new Error(concurrentCheck.reason || 'Trop de générations en cours');
+    }
+
+    // 4. Incrémenter le quota
+    const incremented = await quotaService.incrementUsage(user.id);
+    if (!incremented) {
+      throw new Error('Impossible d\'incrémenter le quota');
+    }
+
     // Créer l'entrée dans la DB
     const { data: generation, error: dbError } = await supabase
       .from('music_generations')
@@ -95,7 +122,11 @@ class EnhancedMusicService {
       .select()
       .single();
 
-    if (dbError) throw dbError;
+    if (dbError) {
+      // Décrémenter le quota en cas d'erreur
+      await quotaService.decrementUsage(user.id);
+      throw dbError;
+    }
 
     try {
       // Appeler Suno API
@@ -121,6 +152,9 @@ class EnhancedMusicService {
         .from('music_generations')
         .update({ status: 'failed' })
         .eq('id', generation.id);
+
+      // Décrémenter le quota en cas d'échec
+      await quotaService.decrementUsage(user.id);
 
       logger.error('Failed to generate music', error as Error, 'MUSIC');
       throw error;
@@ -173,19 +207,35 @@ class EnhancedMusicService {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
+    // Valider les données
+    const validation = validateInput(CreatePlaylistSchema, {
+      name,
+      description,
+      isPublic,
+      tags
+    });
+
+    if (!validation.success) {
+      throw new Error(`Invalid playlist data: ${validation.errors.join(', ')}`);
+    }
+
+    const validData = validation.data;
+
     const { data, error } = await supabase
       .from('music_playlists')
       .insert({
         user_id: user.id,
-        name,
-        description,
-        is_public: isPublic,
-        tags
+        name: validData.name,
+        description: validData.description,
+        is_public: validData.isPublic,
+        tags: validData.tags
       })
       .select()
       .single();
 
     if (error) throw error;
+
+    logger.info('Playlist created', { playlistId: data.id, name: validData.name }, 'MUSIC');
 
     return this.mapToPlaylist(data);
   }
@@ -230,6 +280,16 @@ class EnhancedMusicService {
    * Ajouter une musique à une playlist
    */
   async addToPlaylist(playlistId: string, musicGenerationId: string): Promise<void> {
+    // Valider les IDs
+    const validation = validateInput(AddToPlaylistSchema, {
+      playlistId,
+      musicGenerationId
+    });
+
+    if (!validation.success) {
+      throw new Error(`Invalid data: ${validation.errors.join(', ')}`);
+    }
+
     // Récupérer la position maximale
     const { data: tracks } = await supabase
       .from('playlist_tracks')
@@ -255,6 +315,8 @@ class EnhancedMusicService {
       .from('music_playlists')
       .update({ updated_at: new Date().toISOString() })
       .eq('id', playlistId);
+
+    logger.info('Track added to playlist', { playlistId, musicGenerationId }, 'MUSIC');
   }
 
   /**
@@ -401,26 +463,40 @@ class EnhancedMusicService {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
-    const shareToken = options.isPublic ? this.generateShareToken() : undefined;
-    const expiresAt = options.expiresInDays
-      ? new Date(Date.now() + options.expiresInDays * 24 * 60 * 60 * 1000).toISOString()
+    // Valider les données de partage
+    const validation = validateInput(ShareMusicSchema, {
+      musicGenerationId,
+      ...options
+    });
+
+    if (!validation.success) {
+      throw new Error(`Invalid share data: ${validation.errors.join(', ')}`);
+    }
+
+    const validData = validation.data;
+
+    const shareToken = validData.isPublic ? this.generateShareToken() : undefined;
+    const expiresAt = validData.expiresInDays
+      ? new Date(Date.now() + validData.expiresInDays * 24 * 60 * 60 * 1000).toISOString()
       : undefined;
 
     const { data, error } = await supabase
       .from('music_shares')
       .insert({
-        music_generation_id: musicGenerationId,
+        music_generation_id: validData.musicGenerationId,
         shared_by: user.id,
-        shared_with: options.sharedWith,
-        is_public: options.isPublic || false,
+        shared_with: validData.sharedWith,
+        is_public: validData.isPublic,
         share_token: shareToken,
-        message: options.message,
+        message: validData.message,
         expires_at: expiresAt
       })
       .select()
       .single();
 
     if (error) throw error;
+
+    logger.info('Music shared', { musicGenerationId: validData.musicGenerationId, isPublic: validData.isPublic }, 'MUSIC');
 
     return this.mapToMusicShare(data);
   }
