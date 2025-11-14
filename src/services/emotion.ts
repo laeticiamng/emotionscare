@@ -29,7 +29,7 @@ class EmotionService {
   /**
    * Analyse d'émotion via API Hume
    */
-  async analyzeEmotion(request: EmotionAnalysisRequest): Promise<EmotionAnalysisResponse> {
+  async analyzeEmotion(request: EmotionAnalysisRequest): Promise<EmotionAnalysisResponse | null> {
     try {
       const { data, error } = await supabase.functions.invoke('enhanced-emotion-analyze', {
         body: {
@@ -39,7 +39,10 @@ class EmotionService {
         }
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Emotion analysis error:', error);
+        return null;
+      }
 
       return {
         id: data.id,
@@ -55,15 +58,15 @@ class EmotionService {
         user_id: undefined // Will be set by the hook
       };
     } catch (error) {
-      // Silent: emotion analysis error logged internally
-      throw new Error('Échec de l\'analyse émotionnelle');
+      console.error('Unexpected error in emotion analysis:', error);
+      return null;
     }
   }
 
   /**
    * Analyse d'émotion textuelle
    */
-  async analyzeText(text: string, context?: string): Promise<EmotionAnalysisResponse> {
+  async analyzeText(text: string, context?: string): Promise<EmotionAnalysisResponse | null> {
     return this.analyzeEmotion({
       type: 'text',
       data: text,
@@ -74,7 +77,7 @@ class EmotionService {
   /**
    * Analyse d'émotion vocale
    */
-  async analyzeVoice(audioFile: File): Promise<EmotionAnalysisResponse> {
+  async analyzeVoice(audioFile: File): Promise<EmotionAnalysisResponse | null> {
     return this.analyzeEmotion({
       type: 'voice',
       data: audioFile
@@ -84,7 +87,7 @@ class EmotionService {
   /**
    * Analyse d'émotion via image
    */
-  async analyzeImage(imageFile: File): Promise<EmotionAnalysisResponse> {
+  async analyzeImage(imageFile: File): Promise<EmotionAnalysisResponse | null> {
     return this.analyzeEmotion({
       type: 'image',
       data: imageFile
@@ -94,7 +97,7 @@ class EmotionService {
   /**
    * Sauvegarde d'une analyse d'émotion
    */
-  async saveEmotionResult(emotion: EmotionAnalysisResponse, userId: string): Promise<EmotionResult> {
+  async saveEmotionResult(emotion: EmotionAnalysisResponse, userId: string): Promise<EmotionResult | null> {
     try {
       const balance = computeBalanceFromScores(emotion.emotions);
       const { error } = await supabase
@@ -110,7 +113,10 @@ class EmotionService {
           emotional_balance: balance,
         });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error saving emotion result:', error);
+        return null;
+      }
 
       return {
         emotion: emotion.emotion,
@@ -122,8 +128,8 @@ class EmotionService {
         suggestions: [],
       } as EmotionResult;
     } catch (error) {
-      // Silent: emotion save error logged internally
-      throw new Error('Échec de la sauvegarde');
+      console.error('Unexpected error saving emotion result:', error);
+      return null;
     }
   }
 
@@ -139,7 +145,10 @@ class EmotionService {
         .order('created_at', { ascending: false })
         .limit(limit);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching user emotions:', error);
+        return [];
+      }
 
       return (data ?? []).map(item => ({
         emotion: item.mood ?? 'Indéterminé',
@@ -151,7 +160,7 @@ class EmotionService {
         suggestions: item.recommendations ?? [],
       }));
     } catch (error) {
-      // Silent: emotion fetch error logged internally
+      console.error('Unexpected error fetching user emotions:', error);
       return [];
     }
   }
@@ -174,11 +183,19 @@ class EmotionService {
         }
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching emotion trends:', error);
+        return {
+          dominant_emotion: 'neutral',
+          average_confidence: 0.5,
+          emotion_distribution: { neutral: 1.0 },
+          trend: 'stable'
+        };
+      }
 
       return data;
     } catch (error) {
-      // Silent: emotion trends error logged internally
+      console.error('Unexpected error fetching emotion trends:', error);
       return {
         dominant_emotion: 'neutral',
         average_confidence: 0.5,

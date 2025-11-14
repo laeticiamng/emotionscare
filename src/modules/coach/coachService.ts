@@ -310,73 +310,80 @@ async function recordAnonymizedCoachLog(params: {
   }
 }
 
-export async function requestCoachResponse(options: CoachRequestOptions): Promise<CoachResponsePayload> {
-  const trimmedMessage = options.message.trim();
-  if (!trimmedMessage) {
-    throw new Error("Message vide");
-  }
+export async function requestCoachResponse(options: CoachRequestOptions): Promise<CoachResponsePayload | null> {
+  try {
+    const trimmedMessage = options.message.trim();
+    if (!trimmedMessage) {
+      logger.warn("coachService: empty message provided", undefined, 'SYSTEM');
+      return null;
+    }
 
-  const limitedHistory = clampHistory(options.history, HISTORY_LIMIT);
+    const limitedHistory = clampHistory(options.history, HISTORY_LIMIT);
 
-  const { data, error } = await supabase.functions.invoke("ai-coach", {
-    body: {
-      message: trimmedMessage,
-      emotion: options.emotion,
+    const { data, error } = await supabase.functions.invoke("ai-coach", {
+      body: {
+        message: trimmedMessage,
+        emotion: options.emotion,
+        audience: options.audience,
+        consent: true,
+        consentToken: options.consentToken,
+        history: limitedHistory,
+        personality: options.personality,
+      },
+    });
+
+    if (error) {
+      logger.error("coachService: unable to contact AI coach", error, 'SYSTEM');
+      return null;
+    }
+
+    const parsed = coachFunctionSchema.safeParse(data);
+
+    if (!parsed.success) {
+      logger.error("coachService: invalid payload", parsed.error.flatten(), 'SYSTEM');
+      return null;
+    }
+
+    const meta: CoachFunctionMeta = parsed.data.meta ?? {};
+    const normalizedEmotion = normalizeEmotionLabel(meta.emotion ?? options.emotion);
+
+    const message = parsed.data.response.trim();
+    const suggestions = (parsed.data.suggestions ?? []).filter(Boolean);
+    const disclaimers = parsed.data.disclaimers?.length ? parsed.data.disclaimers : [...COACH_DISCLAIMERS];
+
+    const logHistory: CoachHistoryItem[] = [
+      ...options.history,
+      { role: "assistant", content: message },
+    ];
+
+    await recordAnonymizedCoachLog({
       audience: options.audience,
-      consent: true,
       consentToken: options.consentToken,
-      history: limitedHistory,
-      personality: options.personality,
-    },
-  });
-
-  if (error) {
-    throw new Error(error.message || "Impossible de contacter le coach IA");
-  }
-
-  const parsed = coachFunctionSchema.safeParse(data);
-
-  if (!parsed.success) {
-    logger.error("coachService: invalid payload", parsed.error.flatten(), 'SYSTEM');
-    throw new Error("Réponse du coach invalide");
-  }
-
-  const meta: CoachFunctionMeta = parsed.data.meta ?? {};
-  const normalizedEmotion = normalizeEmotionLabel(meta.emotion ?? options.emotion);
-
-  const message = parsed.data.response.trim();
-  const suggestions = (parsed.data.suggestions ?? []).filter(Boolean);
-  const disclaimers = parsed.data.disclaimers?.length ? parsed.data.disclaimers : [...COACH_DISCLAIMERS];
-
-  const logHistory: CoachHistoryItem[] = [
-    ...options.history,
-    { role: "assistant", content: message },
-  ];
-
-  await recordAnonymizedCoachLog({
-    audience: options.audience,
-    consentToken: options.consentToken,
-    history: logHistory,
-    response: message,
-    suggestions,
-    emotion: normalizedEmotion,
-    personality: options.personality,
-    conversationId: options.conversationId,
-    userId: options.userId,
-    startedAt: options.startedAt,
-  });
-
-  return {
-    message,
-    suggestions,
-    disclaimers,
-    meta: {
+      history: logHistory,
+      response: message,
+      suggestions,
       emotion: normalizedEmotion,
-      source: meta.source ?? "fallback",
-      timestamp: meta.timestamp ?? new Date().toISOString(),
-      audience: meta.audience ?? options.audience,
-    },
-  };
+      personality: options.personality,
+      conversationId: options.conversationId,
+      userId: options.userId,
+      startedAt: options.startedAt,
+    });
+
+    return {
+      message,
+      suggestions,
+      disclaimers,
+      meta: {
+        emotion: normalizedEmotion,
+        source: meta.source ?? "fallback",
+        timestamp: meta.timestamp ?? new Date().toISOString(),
+        audience: meta.audience ?? options.audience,
+      },
+    };
+  } catch (error) {
+    logger.error("coachService: unexpected error", error as Error, 'SYSTEM');
+    return null;
+  }
 }
 
 export const __coachInternals = {
