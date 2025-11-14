@@ -18,10 +18,10 @@ afterEach(() => {
   server.close();
 });
 
-// TODO: Réactiver après implémentation vues matérialisées Supabase
-describe.skip('GET /me/vr/weekly', () => {
+// ✅ Activated - materialized views implemented
+describe('GET /me/vr/weekly', () => {
   it('user fetches own VR KPI', async () => {
-    // Weekly aggregates seront implémentés via vues matérialisées Supabase
+    // Weekly aggregates now using materialized views
     const res = await fetch(url + '/me/vr/weekly', {
       headers: { 'Authorization': 'Bearer hashU1' }
     });
@@ -31,9 +31,9 @@ describe.skip('GET /me/vr/weekly', () => {
   });
 });
 
-describe.skip('GET /org/:orgId/vr/weekly', () => {
+describe('GET /org/:orgId/vr/weekly', () => {
   it('admin fetches org KPI', async () => {
-    // Weekly aggregates seront implémentés via vues matérialisées Supabase
+    // Weekly aggregates now using materialized views
     const res = await fetch(url + '/org/acme/vr/weekly', {
       headers: { 'Authorization': 'Bearer admin:acme' }
     });

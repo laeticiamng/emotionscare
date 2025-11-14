@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { sendEmail, generateAuditAlertEmail } from '../_shared/email-service.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -153,6 +154,23 @@ async function processAlerts(supabase: any) {
         continue;
       }
 
+      // Récupérer les détails de l'audit pour l'email
+      const { data: audit } = await supabase
+        .from('compliance_audits')
+        .select('audit_date, overall_score')
+        .eq('id', alert.audit_id)
+        .single();
+
+      // Générer le contenu de l'email
+      const dashboardUrl = `${Deno.env.get('FRONTEND_URL') || 'https://app.emotionscare.com'}/dashboard/compliance`;
+      const emailContent = generateAuditAlertEmail({
+        auditDate: audit?.audit_date || new Date().toISOString(),
+        overallScore: audit?.overall_score || 0,
+        severity: alert.severity,
+        message: alert.message,
+        dashboardUrl
+      });
+
       // Créer des notifications pour chaque destinataire
       const notifications = recipients.map((email: string) => ({
         alert_id: alert.id,
@@ -165,22 +183,51 @@ async function processAlerts(supabase: any) {
         .from('audit_notifications')
         .insert(notifications);
 
-      // TODO: Intégrer avec un service d'email (SendGrid, AWS SES, etc.)
-      // Pour l'instant, on simule l'envoi
+      // Envoyer les emails
+      let sentCount = 0;
+      for (const email of recipients) {
+        const result = await sendEmail({
+          to: email,
+          subject: `🔔 Alerte Audit de Conformité - ${alert.severity.toUpperCase()}`,
+          html: emailContent.html,
+          text: emailContent.text
+        });
 
-      // Marquer l'alerte comme envoyée
-      await supabase
-        .from('audit_alerts')
-        .update({ is_sent: true, sent_at: new Date().toISOString() })
-        .eq('id', alert.id);
+        if (result.success) {
+          sentCount++;
+          // Marquer la notification individuelle comme envoyée
+          await supabase
+            .from('audit_notifications')
+            .update({
+              status: 'sent',
+              sent_at: new Date().toISOString(),
+              message_id: result.messageId
+            })
+            .eq('alert_id', alert.id)
+            .eq('recipient_email', email);
+        } else {
+          console.error(`[ScheduledAudits] Failed to send email to ${email}:`, result.error);
+          // Marquer comme failed
+          await supabase
+            .from('audit_notifications')
+            .update({
+              status: 'failed',
+              error_message: result.error
+            })
+            .eq('alert_id', alert.id)
+            .eq('recipient_email', email);
+        }
+      }
 
-      // Marquer les notifications comme envoyées
-      await supabase
-        .from('audit_notifications')
-        .update({ status: 'sent', sent_at: new Date().toISOString() })
-        .eq('alert_id', alert.id);
+      // Marquer l'alerte comme envoyée si au moins un email est parti
+      if (sentCount > 0) {
+        await supabase
+          .from('audit_alerts')
+          .update({ is_sent: true, sent_at: new Date().toISOString() })
+          .eq('id', alert.id);
+      }
 
-      console.log(`[ScheduledAudits] Processed alert ${alert.id} for ${recipients.length} recipients`);
+      console.log(`[ScheduledAudits] Processed alert ${alert.id} - sent ${sentCount}/${recipients.length} emails`);
 
     } catch (error) {
       console.error(`[ScheduledAudits] Error processing alert ${alert.id}:`, error);

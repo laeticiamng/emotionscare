@@ -35,8 +35,8 @@ const ConsentBanner: React.FC = () => {
       }
       
       // Bloquer Google Analytics si présent
-      if (typeof window !== 'undefined') {
-        (window as any)['ga-disable-UA-XXXXX'] = true;
+      if (typeof window !== 'undefined' && import.meta.env.VITE_GA_MEASUREMENT_ID) {
+        (window as any)[`ga-disable-${import.meta.env.VITE_GA_MEASUREMENT_ID}`] = true;
       }
     }
   }, []);

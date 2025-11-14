@@ -125,13 +125,44 @@ export async function listDome(userId: string, since: Date): Promise<VrDomeSessi
   }));
 }
 
-// Weekly aggregates - Ces données viendront des vues matérialisées ultérieurement
-export function listWeekly(userHash: string, since: Date): VrWeeklyRow[] {
-  // TODO: Implémenter avec vues matérialisées Supabase
-  return [];
+// Weekly aggregates - Using materialized views
+export async function listWeekly(userId: string, since: Date): Promise<VrWeeklyRow[]> {
+  const { data, error } = await supabase
+    .from('vr_combined_weekly_user')
+    .select('*')
+    .eq('user_id', userId)
+    .gte('week_start', since.toISOString())
+    .order('week_start', { ascending: false });
+
+  if (error) throw error;
+
+  // Map to expected VrWeeklyRow format
+  return (data || []).map(row => ({
+    user_id_hash: userId, // Using user_id as hash for now
+    week_start: row.week_start,
+    hrv_gain_median: row.avg_coherence_score || 0, // Using coherence as proxy for HRV gain
+    coherence_avg: row.avg_coherence_score || 0
+  }));
 }
 
-export function listWeeklyOrg(orgId: string, since: Date): VrWeeklyOrgRow[] {
-  // TODO: Implémenter avec vues matérialisées Supabase
-  return [];
+export async function listWeeklyOrg(orgId: string, since: Date): Promise<VrWeeklyOrgRow[]> {
+  const { data, error } = await supabase
+    .from('vr_weekly_org')
+    .select('*')
+    .eq('organization_id', orgId)
+    .gte('week_start', since.toISOString())
+    .order('week_start', { ascending: false });
+
+  if (error) throw error;
+
+  // Map to expected VrWeeklyOrgRow format
+  return (data || []).map(row => ({
+    org_id: orgId,
+    week_start: row.week_start,
+    members: row.active_users || 0,
+    org_hrv_gain: row.avg_coherence_score || 0,
+    org_coherence: row.avg_coherence_score || 0,
+    org_sync_idx: row.avg_synchrony_idx || 0,
+    org_team_pa: row.avg_team_pa || 0
+  }));
 }
