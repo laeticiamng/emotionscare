@@ -287,8 +287,52 @@ serve(async (req) => {
 
       if (userError) throw userError;
 
-      // Simulate AI response (in production, call AI service)
-      const aiResponse = 'Je comprends ce que vous ressentez. Parlons-en davantage...';
+      // Get conversation history for context
+      const { data: historyMessages } = await supabaseClient
+        .from('coach_messages')
+        .select('role, content')
+        .eq('session_id', body.session_id)
+        .order('timestamp', { ascending: true })
+        .limit(10);
+
+      // Generate AI response using OpenAI
+      let aiResponse: string;
+      let emotionDetected: string = 'neutral';
+      let suggestions: string[] = [];
+
+      try {
+        // Call ai-coach-response Edge Function for real AI response
+        const coachApiUrl = Deno.env.get('SUPABASE_URL') || '';
+        const authToken = req.headers.get('Authorization');
+
+        const aiCoachResponse = await fetch(`${coachApiUrl}/functions/v1/ai-coach-response`, {
+          method: 'POST',
+          headers: {
+            'Authorization': authToken || '',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            message: body.message,
+            conversationHistory: historyMessages || [],
+            userEmotion: body.context?.emotion || 'neutral',
+            coachPersonality: 'empathetic',
+            context: body.context?.situation || '',
+          }),
+        });
+
+        if (aiCoachResponse.ok) {
+          const aiResult = await aiCoachResponse.json();
+          aiResponse = aiResult.response || 'Je comprends ce que vous ressentez. Parlons-en davantage...';
+          emotionDetected = aiResult.emotion || 'supportive';
+          suggestions = aiResult.techniques?.slice(0, 3) || [];
+        } else {
+          throw new Error('AI Coach service unavailable');
+        }
+      } catch (error) {
+        console.warn('⚠️ AI Coach failed, using fallback:', error);
+        aiResponse = 'Je comprends ce que vous ressentez. Parlons-en davantage. Comment puis-je mieux vous accompagner ?';
+        suggestions = ['Prenez une pause', 'Respirez profondément', 'Parlez de ce qui vous préoccupe'];
+      }
 
       const { data: assistantMessage, error: assistantError } = await supabaseClient
         .from('coach_messages')
@@ -297,8 +341,8 @@ serve(async (req) => {
           role: 'assistant',
           content: aiResponse,
           timestamp: new Date().toISOString(),
-          emotion_detected: body.context?.emotion,
-          suggestions: ['Technique de respiration', 'Méditation guidée'],
+          emotion_detected: emotionDetected,
+          suggestions: suggestions,
         })
         .select()
         .single();
@@ -307,10 +351,18 @@ serve(async (req) => {
 
       // Update session message count
       if (body.session_id) {
-        await supabaseClient
+        const { data: currentSession } = await supabaseClient
           .from('coach_sessions')
-          .update({ message_count: supabaseClient.rpc('increment', { row_id: body.session_id }) })
-          .eq('id', body.session_id);
+          .select('message_count')
+          .eq('id', body.session_id)
+          .single();
+
+        if (currentSession) {
+          await supabaseClient
+            .from('coach_sessions')
+            .update({ message_count: (currentSession.message_count || 0) + 2 })
+            .eq('id', body.session_id);
+        }
       }
 
       return new Response(JSON.stringify(assistantMessage), {
