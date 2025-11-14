@@ -12,6 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Link } from 'react-router-dom';
 import { useUserStatsQuery, useUserStatsRealtime } from '@/hooks/useUserStatsQuery';
 import { useOnlineUsers } from '@/hooks/useOnlineUsers';
+import { useStatsNotifications } from '@/hooks/useStatsNotifications';
 import { StatsCard, StatsGrid } from '@/components/common/StatsCard';
 import { 
   ArrowRight, 
@@ -52,6 +53,9 @@ const ModernHomePage: React.FC = () => {
   
   // Écouter les changements en temps réel pour auto-refresh
   useUserStatsRealtime();
+  
+  // Activer les notifications automatiques pour les changements de stats
+  useStatsNotifications(userStats, statsLoading);
 
   const recentAchievements: Achievement[] = [
     { name: 'Semaine productive', icon: '🎯', date: 'Aujourd\'hui' },

@@ -443,6 +443,16 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: true,
     requireAuth: true,
   },
+  {
+    name: 'advanced-analytics',
+    path: '/app/analytics/advanced',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app-sidebar',
+    component: 'AdvancedAnalyticsPage',
+    guard: true,
+    requireAuth: true,
+  },
   // b2c-music supprimé - utiliser /app/music avec B2CMusicEnhanced
 
   // ═══════════════════════════════════════════════════════════
