@@ -21,7 +21,8 @@ import {
   ArrowLeft,
   Loader2,
   Clock,
-  Star
+  Star,
+  TrendingUp
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useMusic } from '@/hooks/useMusic';
@@ -54,6 +55,8 @@ import { useUserMusicPreferences } from '@/hooks/useUserMusicPreferences';
 import { MusicPreferencesModal } from '@/components/music/MusicPreferencesModal';
 import { MusicAnalyticsDashboard } from '@/components/music/analytics/MusicAnalyticsDashboard';
 import { useMusicPreferencesLearning } from '@/hooks/useMusicPreferencesLearning';
+import { useTasteChangeNotifications } from '@/hooks/useTasteChangeNotifications';
+import { TasteChangeNotification } from '@/components/music/TasteChangeNotification';
 
 interface VinylTrack extends MusicTrack {
   category: 'doux' | 'énergique' | 'créatif' | 'guérison';
@@ -227,6 +230,7 @@ const B2CMusicEnhanced: React.FC = () => {
   const { hasPreferences, isLoading: prefsLoading, refreshPreferences } = useUserMusicPreferences();
   const [showPreferencesModal, setShowPreferencesModal] = useState(false);
   const { insights, isAnalyzing, analyzePreferences } = useMusicPreferencesLearning();
+  const { notifications, dismissNotification } = useTasteChangeNotifications();
   
   // Notifications changements de goût
   useEffect(() => {
@@ -343,6 +347,17 @@ const B2CMusicEnhanced: React.FC = () => {
               Modifier mes préférences
             </Button>
           )}
+          
+          {/* Analytics Button */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => window.location.href = '/app/music/analytics'}
+            className="gap-2"
+          >
+            <TrendingUp className="h-4 w-4" />
+            Analytics
+          </Button>
         </div>
       </div>
 
@@ -358,6 +373,19 @@ const B2CMusicEnhanced: React.FC = () => {
           });
         }}
       />
+
+      {/* Taste Change Notifications */}
+      {notifications.map(notification => (
+        <TasteChangeNotification
+          key={notification.id}
+          suggestedGenres={notification.suggestedGenres}
+          confidence={notification.confidence}
+          onDismiss={() => dismissNotification(notification.id)}
+          onViewAnalytics={() => {
+            window.location.href = '/app/music/analytics';
+          }}
+        />
+      ))}
 
       {/* Main Content */}
       <TooltipProvider>
