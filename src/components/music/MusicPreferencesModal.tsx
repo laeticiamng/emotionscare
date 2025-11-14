@@ -1,8 +1,9 @@
 /**
- * Modal questionnaire préférences musicales
+ * Modal questionnaire préférences musicales avec animations
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Dialog,
   DialogContent,
@@ -16,16 +17,31 @@ import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Sparkles, Music2, Heart, MapPin, Volume2 } from 'lucide-react';
+import { Sparkles, Music2, Heart, MapPin, Volume2, Check } from 'lucide-react';
 import { saveUserPreferences, MUSIC_PREFERENCES_OPTIONS, type PreferencesFormData } from '@/services/music/preferences-service';
 import { toast } from 'sonner';
 import { logger } from '@/lib/logger';
+import ConfettiCelebration from '@/components/effects/ConfettiCelebration';
 
 interface MusicPreferencesModalProps {
   open: boolean;
   onClose: () => void;
   onComplete: () => void;
 }
+
+const SelectableBadge: React.FC<{isSelected: boolean; onClick: () => void; icon: string; label: string}> = ({ isSelected, onClick, icon, label }) => (
+  <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+    <Badge
+      variant={isSelected ? 'default' : 'outline'}
+      className="cursor-pointer py-3 w-full justify-center text-base transition-all relative"
+      onClick={onClick}
+    >
+      <span className="mr-2">{icon}</span>
+      {label}
+      {isSelected && <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="absolute top-1 right-1"><Check className="w-4 h-4" /></motion.div>}
+    </Badge>
+  </motion.div>
+);
 
 export const MusicPreferencesModal: React.FC<MusicPreferencesModalProps> = ({
   open,
@@ -34,8 +50,7 @@ export const MusicPreferencesModal: React.FC<MusicPreferencesModalProps> = ({
 }) => {
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // Form state
+  const [showConfetti, setShowConfetti] = useState(false);
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
   const [tempoRange, setTempoRange] = useState<[number, number]>([80, 140]);
   const [selectedMoods, setSelectedMoods] = useState<string[]>([]);
@@ -52,263 +67,130 @@ export const MusicPreferencesModal: React.FC<MusicPreferencesModalProps> = ({
   };
 
   const handleSubmit = async () => {
-    // Validation
-    if (selectedGenres.length === 0) {
-      toast.error('Sélectionnez au moins un genre musical');
-      return;
-    }
-    if (selectedMoods.length === 0) {
-      toast.error('Sélectionnez au moins un mood');
-      return;
-    }
-    if (selectedContexts.length === 0) {
-      toast.error('Sélectionnez au moins un contexte d\'écoute');
+    if (selectedGenres.length === 0 || selectedMoods.length === 0 || selectedContexts.length === 0) {
+      toast.error('Complétez toutes les étapes');
       return;
     }
 
     setIsSubmitting(true);
-
     try {
-      const preferences: PreferencesFormData = {
+      const result = await saveUserPreferences({
         genres: selectedGenres,
         tempoRange: { min: tempoRange[0], max: tempoRange[1] },
         moods: selectedMoods,
         contexts: selectedContexts,
         energyLevel,
         instrumentalPreference: instrumentalPref,
-      };
-
-      const result = await saveUserPreferences(preferences);
+      });
 
       if (result.success) {
-        toast.success('Préférences sauvegardées avec succès !');
-        logger.info('Music preferences saved successfully', { 
-          genresCount: selectedGenres.length,
-          moodsCount: selectedMoods.length 
-        }, 'MUSIC');
-        onComplete();
-        onClose();
+        setShowConfetti(true);
+        toast.success('🎉 Préférences sauvegardées !');
+        setTimeout(() => { onComplete(); onClose(); }, 2000);
       } else {
         toast.error(`Erreur : ${result.error}`);
       }
     } catch (error) {
       toast.error('Une erreur est survenue');
-      logger.error('Failed to save preferences', error as Error, 'MUSIC');
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const canGoNext = () => {
-    switch (step) {
-      case 1:
-        return selectedGenres.length > 0;
-      case 2:
-        return true; // Tempo has default values
-      case 3:
-        return selectedMoods.length > 0;
-      case 4:
-        return selectedContexts.length > 0;
-      case 5:
-        return true; // Energy + instrumental have defaults
-      default:
-        return false;
-    }
+    if (step === 1) return selectedGenres.length > 0;
+    if (step === 3) return selectedMoods.length > 0;
+    if (step === 4) return selectedContexts.length > 0;
+    return true;
   };
 
   return (
-    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <div className="flex items-center gap-2 mb-2">
-            <Sparkles className="h-5 w-5 text-primary" />
-            <DialogTitle>Personnalisons votre expérience musicale</DialogTitle>
-          </div>
-          <DialogDescription>
-            Étape {step} sur 5 - Aidez-nous à vous recommander la musique parfaite
-          </DialogDescription>
-        </DialogHeader>
-
-        <div className="space-y-6 py-4">
-          {/* STEP 1: Genres */}
-          {step === 1 && (
-            <div className="space-y-4">
-              <div className="flex items-center gap-2">
-                <Music2 className="h-5 w-5 text-muted-foreground" />
-                <Label className="text-base font-medium">Quels genres musicaux préférez-vous ?</Label>
-              </div>
-              <p className="text-sm text-muted-foreground">Sélectionnez tous ceux qui vous plaisent</p>
-              <div className="grid grid-cols-2 gap-3">
-                {MUSIC_PREFERENCES_OPTIONS.genres.map((genre) => (
-                  <Badge
-                    key={genre.value}
-                    variant={selectedGenres.includes(genre.value) ? 'default' : 'outline'}
-                    className="cursor-pointer py-3 justify-center text-base transition-all hover:scale-105"
-                    onClick={() => toggleSelection(genre.value, selectedGenres, setSelectedGenres)}
-                  >
-                    <span className="mr-2">{genre.icon}</span>
-                    {genre.label}
-                  </Badge>
-                ))}
-              </div>
+    <>
+      <ConfettiCelebration trigger={showConfetti} duration={3000} />
+      <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
+        <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <div className="flex items-center gap-2 mb-2">
+              <Sparkles className="h-5 w-5 text-primary animate-pulse" />
+              <DialogTitle>Personnalisons votre expérience musicale</DialogTitle>
             </div>
-          )}
-
-          {/* STEP 2: Tempo */}
-          {step === 2 && (
-            <div className="space-y-4">
-              <div className="flex items-center gap-2">
-                <Volume2 className="h-5 w-5 text-muted-foreground" />
-                <Label className="text-base font-medium">Quel tempo préférez-vous ?</Label>
-              </div>
-              <p className="text-sm text-muted-foreground">
-                De {tempoRange[0]} à {tempoRange[1]} BPM
-              </p>
-              <div className="pt-6 pb-2">
-                <Slider
-                  value={tempoRange}
-                  onValueChange={(value) => setTempoRange(value as [number, number])}
-                  min={60}
-                  max={180}
-                  step={10}
-                  minStepsBetweenThumbs={2}
-                  className="w-full"
-                />
-              </div>
-              <div className="flex justify-between text-xs text-muted-foreground">
-                <span>Lent (60 BPM)</span>
-                <span>Modéré (120 BPM)</span>
-                <span>Rapide (180 BPM)</span>
-              </div>
+            <DialogDescription>Étape {step} sur 5</DialogDescription>
+            <div className="w-full bg-secondary rounded-full h-2 mt-4">
+              <motion.div className="bg-primary h-2 rounded-full" animate={{ width: `${(step / 5) * 100}%` }} transition={{ duration: 0.3 }} />
             </div>
-          )}
+          </DialogHeader>
 
-          {/* STEP 3: Moods */}
-          {step === 3 && (
-            <div className="space-y-4">
-              <div className="flex items-center gap-2">
-                <Heart className="h-5 w-5 text-muted-foreground" />
-                <Label className="text-base font-medium">Quels moods recherchez-vous ?</Label>
-              </div>
-              <p className="text-sm text-muted-foreground">Choisissez vos ambiances favorites</p>
-              <div className="grid grid-cols-2 gap-3">
-                {MUSIC_PREFERENCES_OPTIONS.moods.map((mood) => (
-                  <Badge
-                    key={mood.value}
-                    variant={selectedMoods.includes(mood.value) ? 'default' : 'outline'}
-                    className="cursor-pointer py-3 justify-center text-base transition-all hover:scale-105"
-                    onClick={() => toggleSelection(mood.value, selectedMoods, setSelectedMoods)}
-                  >
-                    <span className="mr-2">{mood.icon}</span>
-                    {mood.label}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-          )}
+          <AnimatePresence mode="wait">
+            <motion.div key={step} initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -50 }} className="space-y-6 py-4">
+              {step === 1 && (
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2"><Music2 className="h-5 w-5" /><Label className="text-base font-medium">Quels genres musicaux préférez-vous ?</Label></div>
+                  <div className="grid grid-cols-2 gap-3">
+                    {MUSIC_PREFERENCES_OPTIONS.genres.map((genre) => (
+                      <SelectableBadge key={genre.value} isSelected={selectedGenres.includes(genre.value)} onClick={() => toggleSelection(genre.value, selectedGenres, setSelectedGenres)} icon={genre.icon} label={genre.label} />
+                    ))}
+                  </div>
+                </div>
+              )}
+              {step === 2 && (
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2"><Volume2 className="h-5 w-5" /><Label>Quel tempo préférez-vous ?</Label></div>
+                  <p className="text-sm text-muted-foreground">De {tempoRange[0]} à {tempoRange[1]} BPM</p>
+                  <Slider value={tempoRange} onValueChange={(value) => setTempoRange(value as [number, number])} min={60} max={180} step={10} minStepsBetweenThumbs={2} />
+                </div>
+              )}
+              {step === 3 && (
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2"><Heart className="h-5 w-5" /><Label>Quels moods recherchez-vous ?</Label></div>
+                  <div className="grid grid-cols-2 gap-3">
+                    {MUSIC_PREFERENCES_OPTIONS.moods.map((mood) => (
+                      <SelectableBadge key={mood.value} isSelected={selectedMoods.includes(mood.value)} onClick={() => toggleSelection(mood.value, selectedMoods, setSelectedMoods)} icon={mood.icon} label={mood.label} />
+                    ))}
+                  </div>
+                </div>
+              )}
+              {step === 4 && (
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2"><MapPin className="h-5 w-5" /><Label>Dans quels contextes écoutez-vous ?</Label></div>
+                  <div className="grid grid-cols-2 gap-3">
+                    {MUSIC_PREFERENCES_OPTIONS.contexts.map((ctx) => (
+                      <SelectableBadge key={ctx.value} isSelected={selectedContexts.includes(ctx.value)} onClick={() => toggleSelection(ctx.value, selectedContexts, setSelectedContexts)} icon={ctx.icon} label={ctx.label} />
+                    ))}
+                  </div>
+                </div>
+              )}
+              {step === 5 && (
+                <div className="space-y-6">
+                  <div className="space-y-4">
+                    <Label>Niveau d'énergie préféré: {energyLevel}%</Label>
+                    <Slider value={[energyLevel]} onValueChange={(v) => setEnergyLevel(v[0])} min={0} max={100} step={5} />
+                  </div>
+                  <div className="space-y-4">
+                    <Label>Préférence vocale</Label>
+                    <RadioGroup value={instrumentalPref} onValueChange={(v: any) => setInstrumentalPref(v)}>
+                      {MUSIC_PREFERENCES_OPTIONS.instrumentalPreference.map((p) => (
+                        <div key={p.value} className="flex items-center space-x-2">
+                          <RadioGroupItem value={p.value} id={p.value} />
+                          <Label htmlFor={p.value} className="cursor-pointer">{p.icon} {p.label}</Label>
+                        </div>
+                      ))}
+                    </RadioGroup>
+                  </div>
+                </div>
+              )}
+            </motion.div>
+          </AnimatePresence>
 
-          {/* STEP 4: Contexts */}
-          {step === 4 && (
-            <div className="space-y-4">
-              <div className="flex items-center gap-2">
-                <MapPin className="h-5 w-5 text-muted-foreground" />
-                <Label className="text-base font-medium">Dans quels contextes écoutez-vous ?</Label>
-              </div>
-              <p className="text-sm text-muted-foreground">Sélectionnez vos situations d'écoute</p>
-              <div className="grid grid-cols-2 gap-3">
-                {MUSIC_PREFERENCES_OPTIONS.contexts.map((context) => (
-                  <Badge
-                    key={context.value}
-                    variant={selectedContexts.includes(context.value) ? 'default' : 'outline'}
-                    className="cursor-pointer py-3 justify-center text-base transition-all hover:scale-105"
-                    onClick={() => toggleSelection(context.value, selectedContexts, setSelectedContexts)}
-                  >
-                    <span className="mr-2">{context.icon}</span>
-                    {context.label}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* STEP 5: Energy + Instrumental */}
-          {step === 5 && (
-            <div className="space-y-6">
-              <div className="space-y-4">
-                <Label className="text-base font-medium">Niveau d'énergie préféré</Label>
-                <p className="text-sm text-muted-foreground">
-                  {energyLevel}% - {energyLevel < 33 ? 'Calme' : energyLevel < 66 ? 'Modéré' : 'Énergique'}
-                </p>
-                <Slider
-                  value={[energyLevel]}
-                  onValueChange={(value) => setEnergyLevel(value[0])}
-                  min={0}
-                  max={100}
-                  step={10}
-                  className="w-full"
-                />
-              </div>
-
-              <div className="space-y-4">
-                <Label className="text-base font-medium">Préférence voix/instrumental</Label>
-                <RadioGroup value={instrumentalPref} onValueChange={(val) => setInstrumentalPref(val as typeof instrumentalPref)}>
-                  {MUSIC_PREFERENCES_OPTIONS.instrumentalPreference.map((pref) => (
-                    <div key={pref.value} className="flex items-center space-x-3 cursor-pointer">
-                      <RadioGroupItem value={pref.value} id={pref.value} />
-                      <Label htmlFor={pref.value} className="cursor-pointer text-base">
-                        <span className="mr-2">{pref.icon}</span>
-                        {pref.label}
-                      </Label>
-                    </div>
-                  ))}
-                </RadioGroup>
-              </div>
-            </div>
-          )}
-        </div>
-
-        <DialogFooter className="flex-row gap-2 sm:gap-0">
-          {step > 1 && (
-            <Button
-              variant="outline"
-              onClick={() => setStep(step - 1)}
-              disabled={isSubmitting}
-            >
-              Précédent
-            </Button>
-          )}
-          
-          {step < 5 ? (
-            <Button
-              onClick={() => setStep(step + 1)}
-              disabled={!canGoNext()}
-              className="sm:ml-auto"
-            >
-              Suivant
-            </Button>
-          ) : (
-            <Button
-              onClick={handleSubmit}
-              disabled={isSubmitting || !canGoNext()}
-              className="sm:ml-auto"
-            >
-              {isSubmitting ? 'Enregistrement...' : 'Terminer'}
-            </Button>
-          )}
-        </DialogFooter>
-
-        {/* Progress indicator */}
-        <div className="flex gap-1 justify-center mt-4">
-          {[1, 2, 3, 4, 5].map((s) => (
-            <div
-              key={s}
-              className={`h-1.5 w-12 rounded-full transition-colors ${
-                s <= step ? 'bg-primary' : 'bg-muted'
-              }`}
-            />
-          ))}
-        </div>
-      </DialogContent>
-    </Dialog>
+          <DialogFooter className="flex flex-row justify-between">
+            <Button variant="outline" onClick={() => setStep(step - 1)} disabled={step === 1}>Précédent</Button>
+            {step < 5 ? (
+              <Button onClick={() => setStep(step + 1)} disabled={!canGoNext()}>Suivant</Button>
+            ) : (
+              <Button onClick={handleSubmit} disabled={isSubmitting || !canGoNext()}>{isSubmitting ? 'Enregistrement...' : 'Terminer'}</Button>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
