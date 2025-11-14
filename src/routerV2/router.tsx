@@ -82,11 +82,6 @@ const B2CARFiltersPage = lazy(() => import('@/pages/B2CARFiltersPage'));
 const B2CBubbleBeatPage = lazy(() => import('@/pages/B2CBubbleBeatPage'));
 const B2CScreenSilkBreakPage = lazy(() => import('@/pages/B2CScreenSilkBreakPage'));
 const MeditationPage = lazy(() => import('@/pages/MeditationPage'));
-const AdvancedAnalyticsPage = lazy(() => import('@/pages/AdvancedAnalyticsPage'));
-const LeaderboardPage = lazy(() => import('@/pages/LeaderboardPage'));
-const GuildListPage = lazy(() => import('@/pages/GuildListPage'));
-const GuildPage = lazy(() => import('@/pages/GuildPage'));
-const PremiumRewardsPage = lazy(() => import('@/pages/PremiumRewardsPage'));
 
 // Analytics - nettoyage (pages non utilisées dans registry)
 
@@ -186,6 +181,10 @@ const JournalSettingsPage = lazy(() => import('@/pages/JournalSettings'));
 const ReportingPage = lazy(() => import('@/pages/ReportingPage'));
 const ExportPage = lazy(() => import('@/pages/ExportPage'));
 const LeaderboardPage = lazy(() => import('@/pages/LeaderboardPage'));
+const GuildListPage = lazy(() => import('@/pages/GuildListPage'));
+const GuildPage = lazy(() => import('@/pages/GuildPage'));
+const PremiumRewardsPage = lazy(() => import('@/pages/PremiumRewardsPage'));
+const TournamentsPage = lazy(() => import('@/pages/TournamentsPage'));
 const DailyChallengesPage = lazy(() => import('@/pages/DailyChallengesPage'));
 const B2CGamificationPage = lazy(() => import('@/pages/B2CGamificationPage'));
 const ScoresPage = lazy(() => import('@/pages/ScoresPage'));
@@ -355,6 +354,10 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   // Analytics & Gamification
   B2CGamificationPage,
   LeaderboardPage,
+  GuildListPage,
+  GuildPage,
+  PremiumRewardsPage,
+  TournamentsPage,
   DailyChallengesPage,
   ScoresPage,
   

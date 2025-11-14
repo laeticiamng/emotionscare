@@ -1763,6 +1763,14 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: true,
   },
   {
+    name: 'tournaments',
+    path: '/app/tournaments',
+    segment: 'b2c',
+    layout: 'app-sidebar',
+    component: 'TournamentsPage',
+    guard: true,
+  },
+  {
     name: 'admin-ai-template-suggestions',
     path: '/admin/alerts/ai-suggestions',
     segment: 'admin',
