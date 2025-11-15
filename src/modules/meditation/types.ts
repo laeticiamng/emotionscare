@@ -67,6 +67,16 @@ export const CompleteMeditationSessionSchema = z.object({
 
 export type CompleteMeditationSession = z.infer<typeof CompleteMeditationSessionSchema>;
 
+/**
+ * Données de mise à jour pour compléter une session
+ */
+export interface SessionCompletionData {
+  completed: boolean;
+  completed_duration: number;
+  completed_at: string;
+  mood_after?: number;
+}
+
 // Stats utilisateur
 export const MeditationStatsSchema = z.object({
   totalSessions: z.number(),

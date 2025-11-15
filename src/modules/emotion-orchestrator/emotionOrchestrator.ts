@@ -6,6 +6,7 @@
  */
 
 import { v4 as uuidv4 } from 'uuid';
+import { supabase } from '@/integrations/supabase/client';
 import type {
   EmotionalState,
   UserContext,
@@ -483,10 +484,30 @@ export class EmotionOrchestrator {
    * Enregistre le feedback sur une recommandation
    */
   async submitFeedback(feedback: RecommendationFeedback): Promise<boolean> {
-    // TODO: Intégrer avec Supabase pour persister le feedback
-    // Pour l'instant, retourne succès
-    console.log('Feedback received:', feedback);
-    return true;
+    try {
+      const { error } = await supabase
+        .from('module_recommendation_feedback')
+        .insert({
+          user_id: feedback.userId,
+          recommendation_id: feedback.recommendationId,
+          module_type: feedback.moduleType,
+          was_helpful: feedback.wasHelpful,
+          was_followed: feedback.wasFollowed,
+          rating: feedback.rating,
+          comment: feedback.comment,
+          created_at: new Date().toISOString(),
+        });
+
+      if (error) {
+        console.error('Failed to save feedback:', error);
+        return false;
+      }
+
+      return true;
+    } catch (err) {
+      console.error('Error submitting feedback:', err);
+      return false;
+    }
   }
 
   /**
@@ -498,16 +519,51 @@ export class EmotionOrchestrator {
     startDate: Date,
     endDate: Date
   ): Promise<RecommendationStats> {
-    // TODO: Implémenter avec vraies données Supabase
-    // Pour l'instant, retourne des statistiques mockées
-    return {
-      user_id: userId,
-      module,
-      total_recommendations: 0,
-      follow_through_rate: 0,
-      period_start: startDate.toISOString(),
-      period_end: endDate.toISOString(),
-    };
+    try {
+      const { data, error } = await supabase
+        .from('module_recommendation_feedback')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('module_type', module)
+        .gte('created_at', startDate.toISOString())
+        .lte('created_at', endDate.toISOString());
+
+      if (error) {
+        console.error('Failed to fetch stats:', error);
+        return {
+          user_id: userId,
+          module,
+          total_recommendations: 0,
+          follow_through_rate: 0,
+          period_start: startDate.toISOString(),
+          period_end: endDate.toISOString(),
+        };
+      }
+
+      const totalRecommendations = data?.length || 0;
+      const followedCount = data?.filter((f) => f.was_followed).length || 0;
+      const followThroughRate =
+        totalRecommendations > 0 ? (followedCount / totalRecommendations) * 100 : 0;
+
+      return {
+        user_id: userId,
+        module,
+        total_recommendations: totalRecommendations,
+        follow_through_rate: followThroughRate,
+        period_start: startDate.toISOString(),
+        period_end: endDate.toISOString(),
+      };
+    } catch (err) {
+      console.error('Error fetching stats:', err);
+      return {
+        user_id: userId,
+        module,
+        total_recommendations: 0,
+        follow_through_rate: 0,
+        period_start: startDate.toISOString(),
+        period_end: endDate.toISOString(),
+      };
+    }
   }
 }
 

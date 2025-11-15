@@ -3,25 +3,13 @@
  */
 
 import { supabase } from '@/integrations/supabase/client';
-
-export interface BounceBattle {
-  id: string;
-  user_id: string;
-  mode: 'standard' | 'challenge' | 'timed';
-  status: 'created' | 'in_progress' | 'completed';
-  duration_seconds?: number;
-  started_at?: string;
-  ended_at?: string;
-  created_at: string;
-}
-
-export interface CopingResponse {
-  id: string;
-  battle_id: string;
-  question_id: string;
-  response_value: number;
-  created_at: string;
-}
+import type {
+  BounceBattle,
+  CopingResponse,
+  BattleMode,
+  BounceEventType,
+  BounceEventData
+} from './types';
 
 export class BossGritService {
   /**
@@ -29,7 +17,7 @@ export class BossGritService {
    */
   static async createBattle(
     userId: string,
-    mode: 'standard' | 'challenge' | 'timed' = 'standard'
+    mode: BattleMode = 'standard'
   ): Promise<BounceBattle> {
     const { data, error } = await supabase
       .from('bounce_battles')
@@ -84,8 +72,8 @@ export class BossGritService {
    */
   static async logEvent(
     battleId: string,
-    eventType: string,
-    eventData?: any
+    eventType: BounceEventType,
+    eventData?: BounceEventData
   ): Promise<void> {
     const { error } = await supabase
       .from('bounce_events')
