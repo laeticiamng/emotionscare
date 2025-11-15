@@ -188,9 +188,18 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     name: 'signup',
     path: '/signup',
     segment: 'public',
-    layout: 'marketing', 
+    layout: 'marketing',
     component: 'SignupPage',
     aliases: ['/register', '/b2c/register', '/b2b/user/register'],
+  },
+  {
+    name: 'exam-mode',
+    path: '/exam-mode',
+    segment: 'public',
+    layout: 'marketing',
+    component: 'ExamModePage',
+    guard: false, // SSO géré dans le composant
+    aliases: ['/mode/exams', '/examens'],
   },
 
   // ═══════════════════════════════════════════════════════════

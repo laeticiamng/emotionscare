@@ -335,6 +335,62 @@ export const authService = {
       return { success: false, error: error as Error };
     }
   },
+
+  /**
+   * Connexion SSO via tokens (access_token + refresh_token)
+   * Utilisé pour le SSO depuis Med MNG
+   */
+  async signInWithTokens(accessToken: string, refreshToken?: string): Promise<AuthResponse> {
+    try {
+      // Établir la session avec les tokens fournis
+      const { data, error } = await supabase.auth.setSession({
+        access_token: accessToken,
+        refresh_token: refreshToken || '',
+      });
+
+      if (error) {
+        logger.error('Error setting session with tokens', error, 'AUTH_SSO');
+        throw new AuthError(AuthErrorCode.INVALID_CREDENTIALS, 'Session invalide ou expirée');
+      }
+
+      if (!data.session?.user) {
+        return {
+          user: null,
+          error: new AuthError(AuthErrorCode.UNKNOWN, 'No session data returned')
+        };
+      }
+
+      // Récupérer le profil complet depuis la table profiles
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', data.session.user.id)
+        .single();
+
+      const rawRole = profileData?.role || data.session.user.user_metadata?.role || 'b2c';
+      const validRole = (rawRole === 'b2b' || rawRole === 'b2c') ? rawRole : 'b2c';
+
+      const user: User = {
+        id: data.session.user.id,
+        email: data.session.user.email || '',
+        name: profileData?.name || data.session.user.user_metadata?.name || '',
+        role: validRole,
+        createdAt: data.session.user.created_at,
+        preferences: {
+          theme: 'system',
+          language: 'fr',
+          ...(profileData?.preferences || data.session.user.user_metadata?.preferences || {}),
+        }
+      };
+
+      setRoleCookie(user.role);
+      logger.info('SSO login successful', 'AUTH_SSO');
+      return { user, error: null };
+    } catch (error: unknown) {
+      logger.error('Error signing in with tokens', error as Error, 'AUTH_SSO');
+      return { user: null, error: error as Error };
+    }
+  },
 };
 
 export default authService;
