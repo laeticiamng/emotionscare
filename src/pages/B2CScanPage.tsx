@@ -16,7 +16,6 @@ import MicroGestes from '@/features/scan/MicroGestes';
 import { useSamOrchestration } from '@/features/mood/useSamOrchestration';
 import { ConsentGate } from '@/features/clinical-optin/ConsentGate';
 import { useAssessment } from '@/hooks/useAssessment';
-import { withGuard } from '@/routerV2/withGuard';
 import { AssessmentWrapper } from '@/components/assess';
 import { logger } from '@/lib/logger';
 import { ScanHistory } from '@/components/scan/ScanHistory';
