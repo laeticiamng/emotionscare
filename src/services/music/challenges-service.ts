@@ -3,6 +3,7 @@
  */
 
 import { logger } from '@/lib/logger';
+import { supabase } from '@/integrations/supabase/client';
 import { MusicBadge } from './badges-service';
 
 export type ChallengeFrequency = 'daily' | 'weekly';
@@ -114,30 +115,77 @@ export async function getUserChallenges(userId: string): Promise<MusicChallenge[
     const now = new Date();
     const today = now.toISOString().split('T')[0];
     const weekStart = getWeekStart(now);
-    
-    // Générer les défis quotidiens
-    const dailyChallenges = DAILY_CHALLENGES.map((template, index) => ({
-      ...template,
-      id: `daily-${today}-${index}`,
-      currentValue: Math.floor(Math.random() * template.targetValue), // Mock progress
-      status: 'active' as ChallengeStatus,
-      expiresAt: getEndOfDay(now).toISOString(),
-      startedAt: now.toISOString()
-    }));
-    
-    // Générer les défis hebdomadaires
-    const weeklyChallenges = WEEKLY_CHALLENGES.map((template, index) => ({
-      ...template,
-      id: `weekly-${weekStart}-${index}`,
-      currentValue: Math.floor(Math.random() * template.targetValue), // Mock progress
-      status: 'active' as ChallengeStatus,
-      expiresAt: getEndOfWeek(now).toISOString(),
-      startedAt: weekStart
-    }));
-    
+
+    // Récupérer les défis de l'utilisateur depuis Supabase
+    const { data: userChallenges, error } = await supabase
+      .from('user_music_challenges')
+      .select('*')
+      .eq('user_id', userId)
+      .gte('expires_at', now.toISOString());
+
+    if (error && error.code !== 'PGRST116') {
+      // PGRST116 = Not found, c'est normal si la table ou les données n'existent pas
+      throw error;
+    }
+
+    const existingChallenges = userChallenges || [];
+    const challengeMap = new Map(existingChallenges.map(c => [c.challenge_id, c]));
+
+    // Créer les défis quotidiens
+    const dailyChallenges = DAILY_CHALLENGES.map((template, index) => {
+      const id = `daily-${today}-${index}`;
+      const existing = challengeMap.get(id);
+      return {
+        ...template,
+        id,
+        currentValue: existing?.current_value ?? 0,
+        status: (existing?.status ?? 'active') as ChallengeStatus,
+        expiresAt: getEndOfDay(now).toISOString(),
+        startedAt: existing?.started_at ?? now.toISOString()
+      };
+    });
+
+    // Créer les défis hebdomadaires
+    const weeklyChallenges = WEEKLY_CHALLENGES.map((template, index) => {
+      const id = `weekly-${weekStart}-${index}`;
+      const existing = challengeMap.get(id);
+      return {
+        ...template,
+        id,
+        currentValue: existing?.current_value ?? 0,
+        status: (existing?.status ?? 'active') as ChallengeStatus,
+        expiresAt: getEndOfWeek(now).toISOString(),
+        startedAt: existing?.started_at ?? weekStart
+      };
+    });
+
+    // Créer les nouveaux défis dans Supabase s'ils n'existent pas
     const allChallenges = [...dailyChallenges, ...weeklyChallenges];
-    
-    logger.info('Fetched user challenges', { count: allChallenges.length }, 'MUSIC');
+    const newChallenges = allChallenges.filter(c => !challengeMap.has(c.id));
+
+    if (newChallenges.length > 0) {
+      const { error: insertError } = await supabase
+        .from('user_music_challenges')
+        .insert(
+          newChallenges.map(challenge => ({
+            user_id: userId,
+            challenge_id: challenge.id,
+            challenge_type: challenge.type,
+            current_value: challenge.currentValue,
+            target_value: challenge.targetValue,
+            status: challenge.status,
+            started_at: challenge.startedAt,
+            expires_at: challenge.expiresAt,
+            xp_reward: challenge.xpReward
+          }))
+        );
+
+      if (insertError && insertError.code !== 'PGRST116') {
+        logger.warn('Failed to insert new challenges', insertError, 'MUSIC');
+      }
+    }
+
+    logger.info('Fetched user challenges', { count: allChallenges.length, userId }, 'MUSIC');
     return allChallenges;
   } catch (error) {
     logger.error('Failed to fetch challenges', error as Error, 'MUSIC');
@@ -154,14 +202,54 @@ export async function updateChallengeProgress(
   increment: number
 ): Promise<{ success: boolean; completed: boolean; xpEarned: number }> {
   try {
-    // TODO: Implémenter avec Supabase
-    logger.info('Updated challenge progress', { challengeId, increment }, 'MUSIC');
-    
-    // Simulation
-    const completed = Math.random() > 0.5;
-    const xpEarned = completed ? 50 : 0;
-    
-    return { success: true, completed, xpEarned };
+    // Récupérer le défi actuel
+    const { data: challengeData, error: fetchError } = await supabase
+      .from('user_music_challenges')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('challenge_id', challengeId)
+      .single();
+
+    if (fetchError) {
+      logger.warn('Challenge not found', { userId, challengeId }, 'MUSIC');
+      return { success: false, completed: false, xpEarned: 0 };
+    }
+
+    const currentValue = (challengeData?.current_value || 0) + increment;
+    const targetValue = challengeData?.target_value || 0;
+    const isCompleted = currentValue >= targetValue;
+
+    // Mettre à jour la progression dans Supabase
+    const { error: updateError } = await supabase
+      .from('user_music_challenges')
+      .update({
+        current_value: currentValue,
+        status: isCompleted ? 'completed' : 'active',
+        updated_at: new Date().toISOString()
+      })
+      .eq('user_id', userId)
+      .eq('challenge_id', challengeId);
+
+    if (updateError) {
+      throw updateError;
+    }
+
+    const xpEarned = isCompleted ? (challengeData?.xp_reward || 0) : 0;
+
+    logger.info('Updated challenge progress', {
+      userId,
+      challengeId,
+      currentValue,
+      targetValue,
+      completed: isCompleted,
+      xpEarned
+    }, 'MUSIC');
+
+    return {
+      success: true,
+      completed: isCompleted,
+      xpEarned
+    };
   } catch (error) {
     logger.error('Failed to update challenge progress', error as Error, 'MUSIC');
     return { success: false, completed: false, xpEarned: 0 };
@@ -176,13 +264,61 @@ export async function completeChallenge(
   challenge: MusicChallenge
 ): Promise<{ xpEarned: number; badgeUnlocked?: MusicBadge }> {
   try {
-    logger.info('Challenge completed', { 
+    // Marquer le défi comme complété dans Supabase
+    const { error: updateError } = await supabase
+      .from('user_music_challenges')
+      .update({
+        status: 'completed',
+        completed_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      })
+      .eq('user_id', userId)
+      .eq('challenge_id', challenge.id);
+
+    if (updateError) {
+      throw updateError;
+    }
+
+    // Ajouter l'XP au profil utilisateur
+    const { data: userProfile, error: profileError } = await supabase
+      .from('user_profiles')
+      .select('music_xp')
+      .eq('id', userId)
+      .single();
+
+    if (!profileError && userProfile) {
+      await supabase
+        .from('user_profiles')
+        .update({
+          music_xp: (userProfile.music_xp || 0) + challenge.xpReward
+        })
+        .eq('id', userId);
+    }
+
+    // Si un badge est récompensé, l'ajouter aussi
+    if (challenge.badgeReward) {
+      const { error: badgeError } = await supabase
+        .from('user_music_badges')
+        .insert({
+          user_id: userId,
+          badge_id: challenge.badgeReward.id,
+          badge_name: challenge.badgeReward.name,
+          unlocked_at: new Date().toISOString()
+        });
+
+      if (badgeError && badgeError.code !== '23505') {
+        // 23505 = duplicate key, c'est normal si le badge est déjà déverrouillé
+        logger.warn('Failed to insert badge', badgeError, 'MUSIC');
+      }
+    }
+
+    logger.info('Challenge completed', {
+      userId,
       challengeId: challenge.id,
-      xpReward: challenge.xpReward 
+      xpReward: challenge.xpReward,
+      badgeUnlocked: challenge.badgeReward?.name
     }, 'MUSIC');
-    
-    // TODO: Sauvegarder dans Supabase
-    
+
     return {
       xpEarned: challenge.xpReward,
       badgeUnlocked: challenge.badgeReward
