@@ -424,7 +424,7 @@ export function getPlayerAriaAttributes(isPlaying: boolean, track?: MusicTrack) 
     'role': 'region',
     'aria-label': 'Lecteur audio',
     'aria-live': 'polite' as const,
-    'aria-atomic': 'true',
+    'aria-atomic': true,
     'aria-busy': !track,
     'aria-describedby': track ? `track-${track.id}` : undefined
   };

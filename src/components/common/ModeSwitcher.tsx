@@ -50,7 +50,7 @@ const ModeSwitcher: React.FC<ModeSwitcherProps> = ({
     
     // Update UserModeContext
     if (normalizedMode) {
-      setUserMode(normalizedMode);
+      setUserMode(normalizedMode as any);
     }
     
     // Update localStorage values

@@ -205,7 +205,7 @@ export function HealthIntegrationsManager() {
               <CardContent className="pt-6">
                 {isConnected ? (
                   <div className="space-y-4">
-                    {connection.last_sync_at && (
+                    {connection?.last_sync_at && (
                       <div className="text-sm text-muted-foreground">
                         Dernière sync:{' '}
                         {new Date(connection.last_sync_at).toLocaleString('fr-FR')}
@@ -242,10 +242,10 @@ export function HealthIntegrationsManager() {
                       </Button>
                     </div>
 
-                    <div className="space-y-2">
+                      <div className="space-y-2">
                       <div className="text-sm font-medium">Types de données</div>
                       <div className="flex flex-wrap gap-1">
-                        {connection.enabled_data_types.map((type) => (
+                        {connection?.enabled_data_types?.map((type) => (
                           <Badge key={type} variant="secondary" className="text-xs">
                             {type}
                           </Badge>
