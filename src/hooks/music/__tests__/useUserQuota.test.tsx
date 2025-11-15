@@ -91,14 +91,14 @@ describe('useUserQuota Hooks', () => {
     it('should return default values when loading', () => {
       const mockStats = {
         quota: {
-          user_id: mockUserId,
-          generations_used: 5,
-          generations_limit: 10,
-          reset_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-          is_premium: false,
-          concurrent_generations_limit: 1,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          userId: mockUserId,
+          tier: UserTier.FREE,
+          generationsUsed: 5,
+          generationsLimit: 10,
+          resetDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+          isPremium: false,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
         } as UserQuota,
         status: {
           canGenerate: true,
@@ -130,14 +130,14 @@ describe('useUserQuota Hooks', () => {
     it('should fetch and return quota stats', async () => {
       const mockStats = {
         quota: {
-          user_id: mockUserId,
-          generations_used: 5,
-          generations_limit: 10,
-          reset_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-          is_premium: false,
-          concurrent_generations_limit: 1,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          userId: mockUserId,
+          tier: UserTier.FREE,
+          generationsUsed: 5,
+          generationsLimit: 10,
+          resetDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+          isPremium: false,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
         } as UserQuota,
         status: {
           canGenerate: true,
@@ -175,14 +175,14 @@ describe('useUserQuota Hooks', () => {
     it('should handle quota exhausted', async () => {
       const mockStats = {
         quota: {
-          user_id: mockUserId,
-          generations_used: 10,
-          generations_limit: 10,
-          reset_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-          is_premium: false,
-          concurrent_generations_limit: 1,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          userId: mockUserId,
+          tier: UserTier.FREE,
+          generationsUsed: 10,
+          generationsLimit: 10,
+          resetDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+          isPremium: false,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
         } as UserQuota,
         status: {
           canGenerate: false,
@@ -218,14 +218,14 @@ describe('useUserQuota Hooks', () => {
     it('should handle premium user', async () => {
       const mockStats = {
         quota: {
-          user_id: mockUserId,
-          generations_used: 50,
-          generations_limit: 100,
-          reset_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-          is_premium: true,
-          concurrent_generations_limit: 3,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          userId: mockUserId,
+          tier: UserTier.PREMIUM,
+          generationsUsed: 50,
+          generationsLimit: 100,
+          resetDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+          isPremium: true,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
         } as UserQuota,
         status: {
           canGenerate: true,
@@ -294,14 +294,14 @@ describe('useUserQuota Hooks', () => {
     it('should provide refetch function', async () => {
       const mockStats = {
         quota: {
-          user_id: mockUserId,
-          generations_used: 5,
-          generations_limit: 10,
-          reset_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-          is_premium: false,
-          concurrent_generations_limit: 1,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          userId: mockUserId,
+          tier: UserTier.FREE,
+          generationsUsed: 5,
+          generationsLimit: 10,
+          resetDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+          isPremium: false,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
         } as UserQuota,
         status: {
           canGenerate: true,
@@ -464,14 +464,14 @@ describe('useUserQuota Hooks', () => {
     it('should return tier limits for FREE', async () => {
       const mockStats = {
         quota: {
-          user_id: mockUserId,
-          generations_used: 5,
-          generations_limit: 10,
-          reset_date: new Date().toISOString(),
-          is_premium: false,
-          concurrent_generations_limit: 1,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          userId: mockUserId,
+          tier: UserTier.FREE,
+          generationsUsed: 5,
+          generationsLimit: 10,
+          resetDate: new Date().toISOString(),
+          isPremium: false,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
         } as UserQuota,
         status: {
           canGenerate: true,
@@ -512,14 +512,14 @@ describe('useUserQuota Hooks', () => {
     it('should return tier limits for PREMIUM', async () => {
       const mockStats = {
         quota: {
-          user_id: mockUserId,
-          generations_used: 50,
-          generations_limit: 100,
-          reset_date: new Date().toISOString(),
-          is_premium: true,
-          concurrent_generations_limit: 3,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          userId: mockUserId,
+          tier: UserTier.PREMIUM,
+          generationsUsed: 50,
+          generationsLimit: 100,
+          resetDate: new Date().toISOString(),
+          isPremium: true,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
         } as UserQuota,
         status: {
           canGenerate: true,
@@ -577,14 +577,14 @@ describe('useUserQuota Hooks', () => {
 
       const mockStats = {
         quota: {
-          user_id: mockUserId,
-          generations_used: 5,
-          generations_limit: 10,
-          reset_date: resetDate.toISOString(),
-          is_premium: false,
-          concurrent_generations_limit: 1,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          userId: mockUserId,
+          tier: UserTier.FREE,
+          generationsUsed: 5,
+          generationsLimit: 10,
+          resetDate: resetDate.toISOString(),
+          isPremium: false,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
         } as UserQuota,
         status: {
           canGenerate: true,
@@ -617,14 +617,14 @@ describe('useUserQuota Hooks', () => {
 
       const mockStats = {
         quota: {
-          user_id: mockUserId,
-          generations_used: 5,
-          generations_limit: 10,
-          reset_date: resetDate.toISOString(),
-          is_premium: false,
-          concurrent_generations_limit: 1,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          userId: mockUserId,
+          tier: UserTier.FREE,
+          generationsUsed: 5,
+          generationsLimit: 10,
+          resetDate: resetDate.toISOString(),
+          isPremium: false,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
         } as UserQuota,
         status: {
           canGenerate: true,
@@ -657,14 +657,14 @@ describe('useUserQuota Hooks', () => {
 
       const mockStats = {
         quota: {
-          user_id: mockUserId,
-          generations_used: 5,
-          generations_limit: 10,
-          reset_date: resetDate.toISOString(),
-          is_premium: false,
-          concurrent_generations_limit: 1,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          userId: mockUserId,
+          tier: UserTier.FREE,
+          generationsUsed: 5,
+          generationsLimit: 10,
+          resetDate: resetDate.toISOString(),
+          isPremium: false,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
         } as UserQuota,
         status: {
           canGenerate: true,
@@ -697,14 +697,14 @@ describe('useUserQuota Hooks', () => {
 
       const mockStats = {
         quota: {
-          user_id: mockUserId,
-          generations_used: 5,
-          generations_limit: 10,
-          reset_date: resetDate.toISOString(),
-          is_premium: false,
-          concurrent_generations_limit: 1,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          userId: mockUserId,
+          tier: UserTier.FREE,
+          generationsUsed: 5,
+          generationsLimit: 10,
+          resetDate: resetDate.toISOString(),
+          isPremium: false,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
         } as UserQuota,
         status: {
           canGenerate: true,
@@ -855,14 +855,14 @@ describe('useUserQuota Hooks', () => {
 
       const mockStats = {
         quota: {
-          user_id: mockUserId,
-          generations_used: 5,
-          generations_limit: 10,
-          reset_date: resetDate.toISOString(),
-          is_premium: false,
-          concurrent_generations_limit: 1,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          userId: mockUserId,
+          tier: UserTier.FREE,
+          generationsUsed: 5,
+          generationsLimit: 10,
+          resetDate: resetDate.toISOString(),
+          isPremium: false,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
         } as UserQuota,
         status: {
           canGenerate: true,

@@ -14,29 +14,40 @@
 // PROTOCOLS
 // ============================================================================
 
-export {
-  breathProtocols,
-  type BreathProtocol,
-  type BreathPhase,
-} from './protocols';
+// Note: These exports are commented out as the original exports don't exist in protocols.ts
+// export {
+//   breathProtocols,
+//   type BreathProtocol,
+//   type BreathPhase,
+// } from './protocols';
+
+export type { BreathStepKind, Step, ProtocolPreset, ProtocolOverrides, ProtocolConfig } from './protocols';
+export { makeProtocol, getTotalDuration, getCycleDuration } from './protocols';
 
 // ============================================================================
 // MOOD TRACKING
 // ============================================================================
 
-export {
-  getBreathingMoodSuggestion,
-  type BreathingMoodSuggestion,
-} from './mood';
+// Note: These exports are commented out as the original exports don't exist in mood.ts
+// export {
+//   getBreathingMoodSuggestion,
+//   type BreathingMoodSuggestion,
+// } from './mood';
+
+export { sanitizeMoodScore, computeMoodDelta } from './mood';
 
 // ============================================================================
 // LOGGING
 // ============================================================================
 
-export {
-  logBreathingSession,
-  type BreathingSessionLog,
-} from './logging';
+// Note: These exports are commented out as the original exports don't exist in logging.ts
+// export {
+//   logBreathingSession,
+//   type BreathingSessionLog,
+// } from './logging';
+
+export type { LogAndJournalPayload, LogAndJournalResult } from './logging';
+export { logAndJournal } from './logging';
 
 // ============================================================================
 // HOOKS

@@ -13,7 +13,6 @@
 export {
   BreathUnifiedService,
   breathUnifiedService,
-  default as breathUnifiedServiceDefault,
 } from './breathUnifiedService';
 
 // ============================================================================
