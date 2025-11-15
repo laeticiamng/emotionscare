@@ -63,6 +63,7 @@ import { MusicBadgesDisplay } from '@/components/music/MusicBadgesDisplay';
 import { getUserListeningHistory } from '@/services/music/user-service';
 import { Link } from 'react-router-dom';
 import { User } from 'lucide-react';
+import { FloatingMiniPlayer } from '@/components/music/FloatingMiniPlayer';
 
 interface VinylTrack extends MusicTrack {
   category: 'doux' | 'énergique' | 'créatif' | 'guérison';
@@ -908,8 +909,32 @@ const B2CMusicEnhanced: React.FC = () => {
         enabled={voiceCoachEnabled}
         onToggle={setVoiceCoachEnabled}
       />
-      
+
       <VoiceCommands />
+
+      {/* Floating Mini Player */}
+      <FloatingMiniPlayer
+        currentTrack={state.currentTrack}
+        isPlaying={state.isPlaying}
+        progress={state.progress}
+        onPlayPause={() => {
+          if (state.currentTrack) {
+            if (state.isPlaying) {
+              // Pause logic
+            } else {
+              play(state.currentTrack);
+            }
+          }
+        }}
+        onNext={() => {
+          // Next track logic
+        }}
+        onPrevious={() => {
+          // Previous track logic
+        }}
+        onExpand={() => setPlayerVisible(true)}
+        isDocked={playerVisible}
+      />
     </TooltipProvider>
     </div>
   );
