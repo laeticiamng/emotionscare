@@ -29,11 +29,11 @@ export function toastError(error: AppError) {
 
 function resolveDescription(error: AppError): string | undefined {
   if (error.code === 'RATE_LIMIT') {
-    return i18n.t('errors.tryAgain');
+    return i18n.t('tryAgain', { ns: 'errors' });
   }
 
   if (error.code === 'SERVER' || error.code === 'NETWORK' || error.code === 'TIMEOUT') {
-    return i18n.t('errors.tryAgain');
+    return i18n.t('tryAgain', { ns: 'errors' });
   }
 
   return undefined;

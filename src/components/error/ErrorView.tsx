@@ -18,20 +18,20 @@ export default function ErrorView({ type, onRetry, actions, className }: ErrorVi
 
   const labels: Record<ErrorViewType, { title: string; description: string }> = {
     '401': {
-      title: t('errors.notAuthenticated'),
-      description: t('errors.sessionExpired'),
+      title: t('notAuthenticated'),
+      description: t('sessionExpired'),
     },
     '403': {
-      title: t('errors.accessDenied'),
-      description: t('errors.forbidden'),
+      title: t('accessDenied'),
+      description: t('forbidden'),
     },
     '404': {
-      title: t('errors.notFound'),
-      description: t('errors.somethingWentWrong'),
+      title: t('notFound'),
+      description: t('somethingWentWrong'),
     },
     '500': {
-      title: t('errors.internalServerError'),
-      description: t('errors.contactSupport'),
+      title: t('internalServerError'),
+      description: t('contactSupport'),
     },
   };
 
