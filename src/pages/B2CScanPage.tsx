@@ -23,7 +23,12 @@ import { MultiSourceChart } from '@/components/scan/MultiSourceChart';
 import { ScanOnboarding, shouldShowOnboarding } from '@/components/scan/ScanOnboarding';
 import { useToast } from '@/hooks/use-toast';
 import { scanAnalytics } from '@/lib/analytics/scanEvents';
-import { Camera, Mic, FileText, Sliders } from 'lucide-react';
+import { Camera, Mic, FileText, Sliders, BarChart3, Lightbulb, Download, Settings } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import EnhancedScanDashboard from '@/components/scan/EnhancedScanDashboard';
+import EmotionComparisonView from '@/components/scan/EmotionComparisonView';
+import SmartRecommendations from '@/components/scan/SmartRecommendations';
+import ScanExportPanel from '@/components/scan/ScanExportPanel';
 
 const mapToSamScale = (value: number) => {
   const normalized = Math.max(0, Math.min(100, value));
@@ -47,6 +52,7 @@ const B2CScanPage: React.FC = () => {
   const [edgeUnavailable, setEdgeUnavailable] = useState(false);
   const [cameraDenied, setCameraDenied] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(shouldShowOnboarding());
+  const [mainViewTab, setMainViewTab] = useState<'scanner' | 'dashboard' | 'comparison' | 'insights' | 'export'>('scanner');
   const lastSubmittedRef = useRef<string | null>(null);
 
   const {
@@ -372,27 +378,78 @@ const B2CScanPage: React.FC = () => {
           />
           */}
 
-          <main className="grid gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
-            <div className="space-y-8">
-              {mode === 'camera' && !cameraDisabled ? (
-                <CameraSampler
-                  summary={activeSummary}
-                  onPermissionChange={handleCameraPermission}
-                  onUnavailable={handleUnavailable}
-                />
-              ) : (
-                <SamSliders detail={detail} summary={activeSummary} />
-              )}
-              <ScanHistory />
-              <MultiSourceChart />
-            </div>
-            <MicroGestes 
-              gestures={gestures} 
-              summary={activeSummary}
-              emotion={displayEmotion}
-              valence={detail?.valence}
-              arousal={detail?.arousal}
-            />
+          <main className="space-y-8">
+            {/* Onglets pour les différentes vues */}
+            <Tabs value={mainViewTab} onValueChange={(v) => setMainViewTab(v as any)} className="w-full">
+              <TabsList className="grid w-full grid-cols-5 lg:grid-cols-5">
+                <TabsTrigger value="scanner" className="gap-1.5">
+                  <Sliders className="w-4 h-4" />
+                  <span className="hidden sm:inline">Scanner</span>
+                </TabsTrigger>
+                <TabsTrigger value="dashboard" className="gap-1.5">
+                  <BarChart3 className="w-4 h-4" />
+                  <span className="hidden sm:inline">Dashboard</span>
+                </TabsTrigger>
+                <TabsTrigger value="comparison" className="gap-1.5">
+                  <BarChart3 className="w-4 h-4" />
+                  <span className="hidden sm:inline">Comparaison</span>
+                </TabsTrigger>
+                <TabsTrigger value="insights" className="gap-1.5">
+                  <Lightbulb className="w-4 h-4" />
+                  <span className="hidden sm:inline">Insights</span>
+                </TabsTrigger>
+                <TabsTrigger value="export" className="gap-1.5">
+                  <Download className="w-4 h-4" />
+                  <span className="hidden sm:inline">Export</span>
+                </TabsTrigger>
+              </TabsList>
+
+              {/* Onglet Scanner (Vue principale) */}
+              <TabsContent value="scanner" className="mt-6">
+                <div className="grid gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+                  <div className="space-y-8">
+                    {mode === 'camera' && !cameraDisabled ? (
+                      <CameraSampler
+                        summary={activeSummary}
+                        onPermissionChange={handleCameraPermission}
+                        onUnavailable={handleUnavailable}
+                      />
+                    ) : (
+                      <SamSliders detail={detail} summary={activeSummary} />
+                    )}
+                    <ScanHistory />
+                    <MultiSourceChart />
+                  </div>
+                  <MicroGestes
+                    gestures={gestures}
+                    summary={activeSummary}
+                    emotion={displayEmotion}
+                    valence={detail?.valence}
+                    arousal={detail?.arousal}
+                  />
+                </div>
+              </TabsContent>
+
+              {/* Onglet Dashboard */}
+              <TabsContent value="dashboard" className="mt-6">
+                <EnhancedScanDashboard />
+              </TabsContent>
+
+              {/* Onglet Comparaison */}
+              <TabsContent value="comparison" className="mt-6">
+                <EmotionComparisonView />
+              </TabsContent>
+
+              {/* Onglet Insights */}
+              <TabsContent value="insights" className="mt-6">
+                <SmartRecommendations />
+              </TabsContent>
+
+              {/* Onglet Export */}
+              <TabsContent value="export" className="mt-6">
+                <ScanExportPanel />
+              </TabsContent>
+            </Tabs>
           </main>
           </div>
         </div>
