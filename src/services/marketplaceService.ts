@@ -48,6 +48,7 @@ export interface MarketplaceItem {
   tags?: string[];
   version: string;
   license: string;
+  file_size?: number;
   created_at: string;
   updated_at: string;
   published_at?: string;

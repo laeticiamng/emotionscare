@@ -11,6 +11,8 @@ import {
 } from '@/services/longTermPredictionsService';
 import { logger } from '@/lib/logger';
 
+export type { TimeframeType } from '@/services/longTermPredictionsService';
+
 export interface PredictionState {
   forecast: EmotionalForecast | null;
   loading: boolean;

@@ -80,6 +80,9 @@ export function MusicPageExample() {
     try {
       await enhancedMusicService.generateMusicWithTracking({
         ...validation.data,
+        instrumental: validation.data.instrumental ?? true,
+        negativeTags: validation.data.negativeTags?.join(','),
+        customMode: true,
         model: 'V4'
       });
 

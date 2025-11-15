@@ -36,7 +36,7 @@ export function MusicTherapyAR({
   className
 }: MusicTherapyARProps) {
   const { currentVisualTheme, setCurrentVisualTheme } = useAR();
-  const { startMusicSession, updateMetrics, isPlaying, setIsMusicPlaying, nextTrack, previousTrack } =
+  const { startMusicSession, updateMetrics, isPlaying, togglePlayPause, nextTrack, previousTrack } =
     useMusicAR(userId);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
@@ -312,7 +312,7 @@ export function MusicTherapyAR({
               </button>
 
               <button
-                onClick={() => setIsMusicPlaying(!isPlaying)}
+                onClick={() => togglePlayPause()}
                 className="pointer-events-auto p-3 bg-indigo-600 hover:bg-indigo-700 rounded-full transition-colors text-white"
               >
                 {isPlaying ? (

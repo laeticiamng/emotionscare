@@ -85,11 +85,7 @@ export function useRealtimeNotifications(): UseRealtimeNotificationsReturn {
             toast({
               title: newNotification.title,
               description: newNotification.message,
-              action: newNotification.action_url ? {
-                label: 'Voir',
-                onClick: () => {
-                  window.location.href = newNotification.action_url!;
-                }
+            });
               } : undefined
             });
           }

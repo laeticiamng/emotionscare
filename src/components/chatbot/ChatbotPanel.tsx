@@ -169,9 +169,6 @@ export function ChatbotPanel({ userId, className }: ChatbotPanelProps) {
                       Note donnée: {conversation.user_satisfaction}/5
                     </span>
                   </div>
-                  {conversation.satisfaction_feedback && (
-                    <p className="text-xs text-green-700">{conversation.satisfaction_feedback}</p>
-                  )}
                 </div>
               )}
 
