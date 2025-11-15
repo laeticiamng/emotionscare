@@ -18,6 +18,7 @@ import {
   UpdateCoachSessionSchema,
   AddCoachMessage,
   AddCoachMessageSchema,
+  SessionUpdateData,
   SendCoachMessage,
   SendCoachMessageSchema,
   CompleteCoachSession,
@@ -66,7 +67,7 @@ export async function updateSession(payload: UpdateCoachSession): Promise<CoachS
   try {
     const validated = UpdateCoachSessionSchema.parse(payload);
 
-    const updateData: any = {
+    const updateData: SessionUpdateData = {
       updated_at: new Date().toISOString(),
     };
 

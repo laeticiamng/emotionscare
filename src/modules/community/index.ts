@@ -18,6 +18,9 @@ export {
 // TYPES
 // ============================================================================
 
+// Export des types
+export * from './types';
+
 // Re-export des types depuis le service
 export type {
   CommunityPost,

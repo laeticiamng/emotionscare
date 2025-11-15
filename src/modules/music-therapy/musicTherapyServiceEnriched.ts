@@ -3,6 +3,7 @@
  */
 
 import { supabase } from '@/integrations/supabase/client';
+import type { ListeningPatterns, HistorySummary } from './types';
 
 export interface MusicSession {
   id: string;
@@ -284,8 +285,8 @@ export class MusicTherapyServiceEnriched {
   /**
    * Analyser les patterns d'écoute
    */
-  private static analyzeListeningPatterns(history: MusicSession[]): any {
-    const patterns: any = {
+  private static analyzeListeningPatterns(history: MusicSession[]): ListeningPatterns {
+    const patterns: ListeningPatterns = {
       preferredDurations: [],
       moodResponses: {},
       therapeuticEffectiveness: {},
@@ -314,7 +315,7 @@ export class MusicTherapyServiceEnriched {
   /**
    * Résumer l'historique pour le contexte IA
    */
-  private static summarizeHistory(history: MusicSession[]): any {
+  private static summarizeHistory(history: MusicSession[]): HistorySummary {
     return {
       totalSessions: history.length,
       avgImprovement: this.calculateAverageMoodImprovement(history),

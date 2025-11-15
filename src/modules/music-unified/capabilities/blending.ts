@@ -150,14 +150,106 @@ function getEmotionFrequency(emotion: string): number {
 }
 
 /**
+ * Interface pour le profil émotionnel
+ */
+interface EmotionalProfile {
+  dominant_emotions: string[];
+  emotional_range: number;
+  stability: number;
+}
+
+/**
  * Récupérer le profil émotionnel de l'utilisateur
  */
-async function getUserEmotionalProfile(userId: string): Promise<any> {
-  // TODO: Implémenter avec vraies données
+async function getUserEmotionalProfile(userId: string): Promise<EmotionalProfile> {
+  try {
+    // Récupérer les entrées de journal récentes pour analyser les émotions
+    const { data: journalEntries, error: journalError } = await supabase
+      .from('journal_entries')
+      .select('mood_score, emotions')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false })
+      .limit(30);
+
+    if (journalError) {
+      console.error('Failed to fetch journal entries:', journalError);
+      return getDefaultProfile();
+    }
+
+    // Récupérer les sessions de méditation pour la stabilité
+    const { data: meditationSessions, error: meditationError } = await supabase
+      .from('meditation_sessions')
+      .select('mood_before, mood_after')
+      .eq('user_id', userId)
+      .not('mood_before', 'is', null)
+      .not('mood_after', 'is', null)
+      .order('created_at', { ascending: false })
+      .limit(20);
+
+    if (meditationError) {
+      console.error('Failed to fetch meditation sessions:', meditationError);
+    }
+
+    // Analyser les émotions dominantes
+    const emotionCounts: Record<string, number> = {};
+    const moodScores: number[] = [];
+
+    journalEntries?.forEach((entry) => {
+      if (entry.mood_score !== null && entry.mood_score !== undefined) {
+        moodScores.push(entry.mood_score);
+      }
+      if (entry.emotions && Array.isArray(entry.emotions)) {
+        entry.emotions.forEach((emotion: string) => {
+          emotionCounts[emotion] = (emotionCounts[emotion] || 0) + 1;
+        });
+      }
+    });
+
+    // Calculer les émotions dominantes
+    const dominantEmotions = Object.entries(emotionCounts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3)
+      .map(([emotion]) => emotion);
+
+    // Calculer la plage émotionnelle (variation des humeurs)
+    const emotionalRange =
+      moodScores.length > 1
+        ? (Math.max(...moodScores) - Math.min(...moodScores)) / 100
+        : 0.5;
+
+    // Calculer la stabilité (constance des améliorations en méditation)
+    let stability = 0.5;
+    if (meditationSessions && meditationSessions.length > 0) {
+      const improvements = meditationSessions
+        .map((s) => (s.mood_after || 0) - (s.mood_before || 0))
+        .filter((imp) => !isNaN(imp));
+
+      if (improvements.length > 0) {
+        const avgImprovement = improvements.reduce((a, b) => a + b, 0) / improvements.length;
+        stability = Math.min(Math.max(avgImprovement / 50, 0), 1);
+      }
+    }
+
+    return {
+      dominant_emotions:
+        dominantEmotions.length > 0 ? dominantEmotions : ['calm', 'neutral'],
+      emotional_range: Math.min(Math.max(emotionalRange, 0), 1),
+      stability: Math.min(Math.max(stability, 0), 1),
+    };
+  } catch (error) {
+    console.error('Error fetching emotional profile:', error);
+    return getDefaultProfile();
+  }
+}
+
+/**
+ * Retourner un profil émotionnel par défaut
+ */
+function getDefaultProfile(): EmotionalProfile {
   return {
-    dominant_emotions: ['calm', 'happy'],
-    emotional_range: 0.7,
-    stability: 0.8,
+    dominant_emotions: ['calm', 'neutral'],
+    emotional_range: 0.5,
+    stability: 0.5,
   };
 }
 

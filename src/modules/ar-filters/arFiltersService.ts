@@ -3,17 +3,7 @@
  */
 
 import { supabase } from '@/integrations/supabase/client';
-
-export interface ARFilterSession {
-  id: string;
-  user_id: string;
-  filter_type: string;
-  duration_seconds: number;
-  photos_taken: number;
-  mood_impact?: string;
-  created_at: string;
-  completed_at?: string;
-}
+import type { ARFilterSession, ARFilterStats } from './types';
 
 export class ARFiltersService {
   /**
@@ -96,12 +86,7 @@ export class ARFiltersService {
   /**
    * Obtenir des statistiques
    */
-  static async getStats(userId: string): Promise<{
-    totalSessions: number;
-    totalPhotosTaken: number;
-    favoriteFilter: string;
-    averageDuration: number;
-  }> {
+  static async getStats(userId: string): Promise<ARFilterStats> {
     const sessions = await this.fetchHistory(userId, 100);
 
     const totalSessions = sessions.length;

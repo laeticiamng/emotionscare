@@ -3,20 +3,7 @@
  */
 
 import { supabase } from '@/integrations/supabase/client';
-
-export interface VRNebulaSession {
-  id: string;
-  user_id: string;
-  session_id: string;
-  hrv_pre?: number;
-  hrv_post?: number;
-  rmssd_delta?: number;
-  resp_rate_avg?: number;
-  coherence_score?: number;
-  duration_seconds: number;
-  created_at: string;
-  completed_at?: string;
-}
+import type { VRNebulaSession, BiometricMetrics } from './types';
 
 export class VRGalaxyService {
   /**
@@ -42,11 +29,7 @@ export class VRGalaxyService {
    */
   static async updateBiometrics(
     sessionId: string,
-    metrics: {
-      hrv_pre?: number;
-      hrv_post?: number;
-      resp_rate_avg?: number;
-    }
+    metrics: BiometricMetrics
   ): Promise<void> {
     const { error } = await supabase
       .from('vr_nebula_sessions')

@@ -11,6 +11,7 @@ import type {
   MeditationSession,
   MeditationStats,
   MeditationTechnique,
+  SessionCompletionData,
 } from './types';
 
 export const meditationService = {
@@ -72,7 +73,7 @@ export const meditationService = {
    */
   async completeSession(data: CompleteMeditationSession): Promise<MeditationSession> {
     try {
-      const updateData: any = {
+      const updateData: SessionCompletionData = {
         completed: true,
         completed_duration: data.completedDuration,
         completed_at: new Date().toISOString(),

@@ -3,6 +3,7 @@
  */
 
 import { supabase } from '@/integrations/supabase/client';
+import type { CommunityStats } from './types';
 
 export interface AuraConnection {
   id: string;
@@ -748,14 +749,8 @@ export class CommunityService {
   /**
    * Récupérer les statistiques de la communauté
    */
-  static async getCommunityStats(userId?: string): Promise<{
-    totalPosts: number;
-    totalComments: number;
-    totalLikes: number;
-    myPosts?: number;
-    myComments?: number;
-  }> {
-    const stats: any = {
+  static async getCommunityStats(userId?: string): Promise<CommunityStats> {
+    const stats: CommunityStats = {
       totalPosts: 0,
       totalComments: 0,
       totalLikes: 0

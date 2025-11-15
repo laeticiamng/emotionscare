@@ -152,3 +152,21 @@ export type SendCoachMessage = z.infer<typeof SendCoachMessageSchema>;
 export type CompleteCoachSession = z.infer<typeof CompleteCoachSessionSchema>;
 
 export type CoachStats = z.infer<typeof CoachStatsSchema>;
+
+// ─────────────────────────────────────────────────────────────
+// Internal Types
+// ─────────────────────────────────────────────────────────────
+
+/**
+ * Données partielles pour mise à jour de session
+ */
+export interface SessionUpdateData {
+  updated_at: string;
+  session_duration?: number;
+  messages_count?: number;
+  emotions_detected?: EmotionDetected[];
+  techniques_suggested?: TechniqueType[];
+  resources_provided?: ResourceProvided[];
+  user_satisfaction?: number;
+  session_notes?: string;
+}

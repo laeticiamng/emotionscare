@@ -3,52 +3,20 @@
  */
 
 import { supabase } from '@/integrations/supabase/client';
-
-export interface VRGalaxySession {
-  id: string;
-  user_id: string;
-  session_id: string;
-  galaxy_explored?: string;
-  planets_visited?: string[];
-  discoveries?: Discovery[];
-  hrv_pre?: number;
-  hrv_post?: number;
-  rmssd_delta?: number;
-  resp_rate_avg?: number;
-  coherence_score?: number;
-  duration_seconds: number;
-  created_at: string;
-  completed_at?: string;
-  achievements_unlocked?: string[];
-  exploration_depth?: number;
-}
-
-export interface Discovery {
-  type: 'planet' | 'nebula' | 'constellation' | 'phenomenon';
-  name: string;
-  coordinates: { x: number; y: number; z: number };
-  description: string;
-  therapeutic_value: number;
-  timestamp: number;
-}
-
-export interface GalaxyEnvironment {
-  name: string;
-  theme: string;
-  stars_density: number;
-  color_palette: string[];
-  ambient_sounds: string[];
-  therapeutic_elements: string[];
-  difficulty_level: number;
-}
-
-export interface BiometricInsight {
-  metric: string;
-  value: number;
-  trend: 'improving' | 'stable' | 'needs_attention';
-  recommendation: string;
-  confidence: number;
-}
+import type {
+  VRGalaxySession,
+  Discovery,
+  GalaxyEnvironment,
+  BiometricInsight,
+  BiometricMetrics,
+  ExplorationPreferences,
+  SessionCurrentState,
+  AdaptiveRecommendation,
+  SessionCompletion,
+  SessionCompletionResult,
+  DiscoveryResult,
+  CosmicProgressionStats,
+} from './types';
 
 export class VRGalaxyServiceEnriched {
   /**
@@ -56,11 +24,7 @@ export class VRGalaxyServiceEnriched {
    */
   static async createExplorationSession(
     userId: string,
-    preferences: {
-      galaxyType?: string;
-      difficultyLevel?: number;
-      therapeuticGoal?: string;
-    }
+    preferences: ExplorationPreferences
   ): Promise<VRGalaxySession> {
     const galaxy = await this.selectOptimalGalaxy(userId, preferences);
     
@@ -87,7 +51,7 @@ export class VRGalaxyServiceEnriched {
    */
   static async selectOptimalGalaxy(
     userId: string,
-    preferences: any
+    preferences: ExplorationPreferences
   ): Promise<GalaxyEnvironment> {
     const history = await this.fetchHistory(userId, 10);
     const biometricData = await this.getLatestBiometrics(userId);
@@ -123,7 +87,7 @@ export class VRGalaxyServiceEnriched {
   static async recordDiscovery(
     sessionId: string,
     discovery: Discovery
-  ): Promise<{ achievements: string[]; xpGained: number }> {
+  ): Promise<DiscoveryResult> {
     const { data: session } = await supabase
       .from('vr_nebula_sessions')
       .select('discoveries, exploration_depth')
@@ -161,12 +125,7 @@ export class VRGalaxyServiceEnriched {
    */
   static async updateBiometricsWithAnalysis(
     sessionId: string,
-    metrics: {
-      hrv_pre?: number;
-      hrv_post?: number;
-      resp_rate_avg?: number;
-      current_stress_level?: number;
-    }
+    metrics: BiometricMetrics
   ): Promise<BiometricInsight[]> {
     const { error } = await supabase
       .from('vr_nebula_sessions')
@@ -188,17 +147,8 @@ export class VRGalaxyServiceEnriched {
    */
   static async getAdaptiveRecommendations(
     sessionId: string,
-    currentState: {
-      timeElapsed: number;
-      hrvCurrent: number;
-      stressLevel: number;
-      explorationsCount: number;
-    }
-  ): Promise<{
-    action: string;
-    reason: string;
-    urgency: number;
-  }[]> {
+    currentState: SessionCurrentState
+  ): Promise<AdaptiveRecommendation[]> {
     const { data, error } = await supabase.functions.invoke('vr-adaptive-coach', {
       body: { sessionId, currentState }
     });
@@ -212,16 +162,8 @@ export class VRGalaxyServiceEnriched {
    */
   static async completeSessionWithReport(
     sessionId: string,
-    completion: {
-      durationSeconds: number;
-      finalBiometrics?: any;
-      userFeedback?: string;
-    }
-  ): Promise<{
-    report: any;
-    achievements: string[];
-    nextSteps: string[];
-  }> {
+    completion: SessionCompletion
+  ): Promise<SessionCompletionResult> {
     const { error } = await supabase
       .from('vr_nebula_sessions')
       .update({
@@ -296,14 +238,7 @@ export class VRGalaxyServiceEnriched {
   /**
    * Obtenir les statistiques de progression cosmique
    */
-  static async getCosmicProgressionStats(userId: string): Promise<{
-    totalExplorations: number;
-    galaxiesVisited: Set<string>;
-    totalDiscoveries: number;
-    averageCoherenceScore: number;
-    hrvImprovement: number;
-    unlockedAchievements: string[];
-  }> {
+  static async getCosmicProgressionStats(userId: string): Promise<CosmicProgressionStats> {
     const history = await this.fetchHistory(userId, 100);
     
     const galaxiesVisited = new Set(history.map(s => s.galaxy_explored).filter((g): g is string => Boolean(g)));
