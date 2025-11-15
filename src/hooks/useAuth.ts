@@ -141,3 +141,6 @@ export const useAuthFlow = () => {
     isLoading
   };
 };
+
+// Export as useAuth for backward compatibility
+export const useAuth = useAuthFlow;
