@@ -266,7 +266,16 @@ export class ScreenSilkServiceEnriched {
       };
     }
 
-    return {};
+    // Fallback : paramètres par défaut équilibrés
+    // Raison inconnue : on ajuste légèrement vers des valeurs moyennes
+    console.warn(`[Screen Silk] Unknown adaptation reason: ${analysis.reason}. Using balanced defaults.`);
+
+    return {
+      pattern_complexity: Math.max(3, Math.min(7, current.pattern_complexity)),
+      movement_speed: Math.max(0.7, Math.min(1.3, current.movement_speed)),
+      therapeutic_intensity: Math.max(0.5, Math.min(0.8, current.therapeutic_intensity)),
+      color_palette: this.generateNewColorPalette()
+    };
   }
 
   /**
