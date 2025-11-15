@@ -67,6 +67,7 @@ export const useMusicGeneration = (dispatch: Dispatch<MusicAction>) => {
         artist: 'EmotionsCare AI',
         emotion,
         url: data?.audio_url || '',
+        audioUrl: data?.audio_url || '',
         duration: data?.duration || 0,
         status: 'generating',
       };
@@ -106,6 +107,7 @@ export const useMusicGeneration = (dispatch: Dispatch<MusicAction>) => {
         artist: 'EmotionsCare AI',
         emotion: 'neutral',
         url: data?.audio_url || '',
+        audioUrl: data?.audio_url || '',
         duration: data?.duration || 0,
         status: data?.status || 'pending',
       };

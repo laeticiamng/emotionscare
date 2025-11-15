@@ -41,7 +41,7 @@ const ModeSwitcher: React.FC<ModeSwitcherProps> = ({
   const handleSwitchMode = async (mode: string) => {
     const normalizedMode = normalizeUserMode(mode);
     
-    if (normalizedMode === normalizeUserMode(userMode)) {
+    if (userMode && normalizedMode === normalizeUserMode(userMode)) {
       return; // Do nothing if selecting the same mode
     }
     
@@ -49,10 +49,12 @@ const ModeSwitcher: React.FC<ModeSwitcherProps> = ({
     setIsTransitioning(true);
     
     // Update UserModeContext
-    setUserMode(normalizedMode);
+    if (normalizedMode) {
+      setUserMode(normalizedMode);
+    }
     
     // Update localStorage values
-    localStorage.setItem('userMode', normalizedMode);
+    localStorage.setItem('userMode', normalizedMode || mode);
     localStorage.setItem('user_role', normalizedMode);
     
     setIsOpen(false);

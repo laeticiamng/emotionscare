@@ -21,6 +21,7 @@ export interface MusicTrack {
   bpm?: number;
   key?: string;
   energy?: number;
+  status?: 'pending' | 'generating' | 'completed' | 'failed';
   // Ajout pour compatibilité avec ancien système
   cover?: string;
   name?: string;
