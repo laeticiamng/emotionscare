@@ -14,10 +14,10 @@ import { useUserStatsQuery, useUserStatsRealtime } from '@/hooks/useUserStatsQue
 import { useOnlineUsers } from '@/hooks/useOnlineUsers';
 import { useStatsNotifications } from '@/hooks/useStatsNotifications';
 import { StatsCard, StatsGrid } from '@/components/common/StatsCard';
-import { 
-  ArrowRight, 
-  User, 
-  Bell, 
+import {
+  ArrowRight,
+  User,
+  Bell,
   TrendingUp,
   Zap,
   Activity,
@@ -30,6 +30,12 @@ import {
   Star
 } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
+import EnrichedHeroSection from '@/components/home/EnrichedHeroSection';
+import OnboardingGuide from '@/components/home/OnboardingGuide';
+import ActivityFeed from '@/components/home/ActivityFeed';
+import FAQSection from '@/components/home/FAQSection';
+import QuickStartModules from '@/components/home/QuickStartModules';
+import CommunityEngagement from '@/components/home/CommunityEngagement';
 
 interface Achievement {
   name: string;
@@ -105,7 +111,7 @@ const ModernHomePage: React.FC = () => {
               <div className="flex items-center gap-3">
                 <div className="relative">
                   <User className="h-8 w-8 p-1 bg-primary/20 rounded-full" aria-hidden="true" />
-                  <div 
+                  <div
                     className="absolute -top-1 -right-1 h-3 w-3 bg-green-500 rounded-full border-2 border-white"
                     aria-label="En ligne"
                   ></div>
@@ -123,16 +129,16 @@ const ModernHomePage: React.FC = () => {
 
               <div className="flex items-center gap-3">
                 {/* Notifications */}
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
+                <Button
+                  variant="ghost"
+                  size="sm"
                   className="relative"
                   aria-label={`Notifications (${notifications} nouvelle${notifications > 1 ? 's' : ''})`}
                 >
                   <Bell className="h-4 w-4" aria-hidden="true" />
                   {notifications > 0 && (
-                    <Badge 
-                      variant="destructive" 
+                    <Badge
+                      variant="destructive"
                       className="absolute -top-1 -right-1 h-5 w-5 text-xs p-0 flex items-center justify-center"
                       aria-label={`${notifications} notification${notifications > 1 ? 's' : ''}`}
                     >
@@ -165,7 +171,7 @@ const ModernHomePage: React.FC = () => {
                 size="sm"
                 delay={0}
               />
-              
+
               <StatsCard
                 label="Sessions"
                 subtitle="Complétées"
@@ -178,7 +184,7 @@ const ModernHomePage: React.FC = () => {
                 size="sm"
                 delay={1}
               />
-              
+
               <StatsCard
                 label="Points"
                 subtitle={`Niveau ${userStats.level}`}
@@ -191,7 +197,7 @@ const ModernHomePage: React.FC = () => {
                 size="sm"
                 delay={2}
               />
-              
+
               <StatsCard
                 label="Série"
                 subtitle="Jours consécutifs"
@@ -246,11 +252,26 @@ const ModernHomePage: React.FC = () => {
           </div>
         </div>
       )}
-      
-      {/* Page d'accueil unifiée originale */}
+
+      {/* SECTION 1: Section héro enrichie */}
+      <EnrichedHeroSection />
+
+      {/* SECTION 2: Guide de démarrage */}
+      <OnboardingGuide />
+
+      {/* SECTION 3: Modules rapides */}
+      <QuickStartModules />
+
+      {/* SECTION 4: Flux d'activité en direct */}
+      <ActivityFeed />
+
+      {/* SECTION 5: Engagement communautaire */}
+      <CommunityEngagement />
+
+      {/* SECTION 6: Page d'accueil unifiée originale */}
       <UnifiedHomePage variant="full" />
 
-      {/* Section fonctionnalités modernes (pour tous les utilisateurs) */}
+      {/* SECTION 7: Section fonctionnalités modernes (pour tous les utilisateurs) */}
       <div className="bg-gradient-to-b from-muted/20 to-background py-16">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
@@ -345,6 +366,9 @@ const ModernHomePage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* SECTION 8: FAQ */}
+      <FAQSection />
 
       {/* Statistiques globales */}
       <div className="bg-primary/5 py-8">
