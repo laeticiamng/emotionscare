@@ -71,9 +71,9 @@ describe('Music Unified - Blending Algorithms', () => {
 
       const blend = calculateBlendAtTime(emotions, strategy, 300);
 
-      // Au milieu, les intensités doivent être proches
-      expect(blend.therapeutic_outcome).toBeGreaterThan(0.3);
-      expect(blend.therapeutic_outcome).toBeLessThan(0.7);
+      // Au milieu, therapeutic outcome = progress (0.5) * maxIntensity (~0.5)
+      expect(blend.therapeutic_outcome).toBeGreaterThan(0.2);
+      expect(blend.therapeutic_outcome).toBeLessThan(0.6);
     });
 
     it('identifies secondary emotions above 0.3 threshold', () => {

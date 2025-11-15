@@ -274,7 +274,7 @@ describe('useSessionsStore', () => {
         type: 'music',
       });
 
-      const activeSession = useSessionsStore((state) => state.activeSession);
+      const activeSession = useSessionsStore.getState().activeSession;
       expect(activeSession?.id).toBe('session-123');
     });
 
@@ -307,7 +307,7 @@ describe('useSessionsStore', () => {
         duration: 600,
       });
 
-      const recentSessions = useSessionsStore((state) => state.recentSessions);
+      const recentSessions = useSessionsStore.getState().recentSessions;
       expect(recentSessions).toHaveLength(1);
     });
   });
