@@ -87,6 +87,8 @@ export function useMusicVisualization(
   const sourceRef = useRef<MediaElementAudioSourceNode | null>(null);
   const animationFrameRef = useRef<number | null>(null);
   const beatDetectorRef = useRef<BeatDetector | null>(null);
+  const previousFrequencyDataRef = useRef<Uint8Array | null>(null);
+  const frequencyHistoryRef = useRef<Uint8Array[]>([]);
 
   // State
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -150,7 +152,21 @@ export function useMusicVisualization(
         }
 
         // Calculer les features
-        const features = calculateAudioFeatures(floatTimeDomain, frequencyData);
+        const features = calculateAudioFeatures(
+          floatTimeDomain,
+          frequencyData,
+          previousFrequencyDataRef.current,
+          frequencyHistoryRef.current
+        );
+
+        // Mettre à jour l'historique de fréquence
+        previousFrequencyDataRef.current = new Uint8Array(frequencyData);
+        frequencyHistoryRef.current.push(new Uint8Array(frequencyData));
+
+        // Garder seulement les 10 derniers frames pour l'historique
+        if (frequencyHistoryRef.current.length > 10) {
+          frequencyHistoryRef.current.shift();
+        }
 
         // Détection de beat
         let beatDetection: BeatDetection | null = null;
@@ -212,6 +228,8 @@ export function useMusicVisualization(
     }
 
     beatDetectorRef.current = null;
+    previousFrequencyDataRef.current = null;
+    frequencyHistoryRef.current = [];
     setVisualizationData(null);
 
     logger.debug('Music visualization reset', undefined, 'useMusicVisualization');
@@ -275,7 +293,9 @@ export function useMusicVisualization(
 
 function calculateAudioFeatures(
   timeDomain: Float32Array,
-  frequencyData: Uint8Array
+  frequencyData: Uint8Array,
+  previousFrequencyData: Uint8Array | null = null,
+  frequencyHistory: Uint8Array[] = []
 ): AudioFeatures {
   // RMS (Root Mean Square)
   let sumSquares = 0;
@@ -322,8 +342,25 @@ function calculateAudioFeatures(
   }
 
   // Spectral Flux (différence avec frame précédente)
-  // Note: Simplified version, would need to store previous frame
-  const spectralFlux = 0; // TODO: implement with frame history
+  // Mesure le changement dans le spectre entre frames consécutifs
+  let spectralFlux = 0;
+  if (previousFrequencyData && previousFrequencyData.length === frequencyData.length) {
+    let sumSquaredDifferences = 0;
+    for (let i = 0; i < frequencyData.length; i++) {
+      const diff = (frequencyData[i] - previousFrequencyData[i]) / 255;
+      sumSquaredDifferences += diff * diff;
+    }
+    spectralFlux = Math.sqrt(sumSquaredDifferences / frequencyData.length);
+  } else if (frequencyHistory.length > 1) {
+    // Fallback: calculer à partir de l'historique complet
+    const prev = frequencyHistory[frequencyHistory.length - 2];
+    let sumSquaredDifferences = 0;
+    for (let i = 0; i < Math.min(prev.length, frequencyData.length); i++) {
+      const diff = (frequencyData[i] - prev[i]) / 255;
+      sumSquaredDifferences += diff * diff;
+    }
+    spectralFlux = Math.sqrt(sumSquaredDifferences / frequencyData.length);
+  }
 
   return {
     rms,

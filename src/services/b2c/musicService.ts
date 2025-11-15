@@ -61,8 +61,20 @@ export const musicService = {
 
     if (error) throw error;
 
-    // TODO: Déclencher le traitement via Edge Function
-    // await supabase.functions.invoke('process-music-session', { body: { sessionId: data.id } });
+    // Déclencher le traitement via Edge Function
+    try {
+      await supabase.functions.invoke('process-music-session', {
+        body: {
+          sessionId: data.id,
+          presetId: input.preset_id,
+          metadata: input.metadata || {}
+        }
+      });
+    } catch (edgeFunctionError) {
+      // Log l'erreur mais ne pas échouer la création de session
+      console.error('Edge Function invocation failed:', edgeFunctionError);
+      // La session est créée, le traitement se fera en arrière-plan
+    }
 
     return data as MusicSession;
   },
