@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useBubbleBeat } from '@/hooks/useBubbleBeat';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -19,6 +19,19 @@ export const BubbleBeatMain: React.FC<BubbleBeatMainProps> = ({ className = '' }
   const [startTime, setStartTime] = useState<number | null>(null);
   const [bubblesPopped, setBubblesPopped] = useState(0);
 
+  // Ref pour stocker l'interval (type-safe, pas de @ts-ignore)
+  const bubbleIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Cleanup de l'interval au unmount du composant
+  useEffect(() => {
+    return () => {
+      if (bubbleIntervalRef.current) {
+        clearInterval(bubbleIntervalRef.current);
+        bubbleIntervalRef.current = null;
+      }
+    };
+  }, []);
+
   const startGame = () => {
     setIsPlaying(true);
     setScore(0);
@@ -38,15 +51,18 @@ export const BubbleBeatMain: React.FC<BubbleBeatMainProps> = ({ className = '' }
       setScore(prev => prev + 10);
       setBubblesPopped(prev => prev + 1);
     }, 1000);
-    
-    // @ts-ignore
-    window.bubbleInterval = interval;
+
+    // Stocker dans ref (type-safe ✅)
+    bubbleIntervalRef.current = interval;
   };
 
   const stopGame = () => {
     setIsPlaying(false);
-    // @ts-ignore
-    if (window.bubbleInterval) clearInterval(window.bubbleInterval);
+    // Nettoyer l'interval (type-safe ✅)
+    if (bubbleIntervalRef.current) {
+      clearInterval(bubbleIntervalRef.current);
+      bubbleIntervalRef.current = null;
+    }
     
     if (sessionId && startTime) {
       const duration = Math.floor((Date.now() - startTime) / 1000);
