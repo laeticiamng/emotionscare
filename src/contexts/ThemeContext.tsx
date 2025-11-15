@@ -8,6 +8,7 @@ import type { CustomTheme, UserThemePreferences } from '@/types/themes';
 import * as themeService from '@/services/themes.service';
 import { THEME_PRESETS } from '@/features/themes/presets';
 import { useAuth } from './AuthContext';
+import { logger } from '@/lib/logger';
 
 interface ThemeContextValue {
   activeTheme: CustomTheme | null;
@@ -15,12 +16,12 @@ interface ThemeContextValue {
   preferences: UserThemePreferences | null;
   loading: boolean;
   activateTheme: (themeId: string) => Promise<void>;
-  createTheme: (theme: Omit<CustomTheme, 'id' | 'userId' | 'createdAt' | 'updatedAt'>) => Promise<CustomTheme>;
+  createTheme: (theme: Omit<CustomTheme, 'id' | 'userId' | 'createdAt' | 'updatedAt'>) => Promise<CustomTheme | null>;
   updateTheme: (themeId: string, updates: Partial<CustomTheme>) => Promise<CustomTheme>;
   deleteTheme: (themeId: string) => Promise<void>;
-  duplicateTheme: (themeId: string, newName: string) => Promise<CustomTheme>;
+  duplicateTheme: (themeId: string, newName: string) => Promise<CustomTheme | null>;
   exportTheme: (themeId: string) => void;
-  importTheme: (file: File) => Promise<void>;
+  importTheme: (file: File) => Promise<CustomTheme | null>;
   updatePreferences: (preferences: Partial<UserThemePreferences>) => Promise<void>;
   refreshThemes: () => Promise<void>;
 }
@@ -52,6 +53,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       const now = new Date();
       const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
 
+      if (!preferences.switchTime) return;
       const { lightModeStart, darkModeStart } = preferences.switchTime;
 
       if (currentTime >= darkModeStart && preferences.darkThemeId) {

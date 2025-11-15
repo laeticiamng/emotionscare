@@ -145,7 +145,7 @@ export function ARDebugPanel({ className }: ARDebugPanelProps) {
                     : 'Desktop'}
               </div>
               <div>
-                Memory: {navigator.deviceMemory || 'unknown'} GB
+                Memory: {(navigator as any).deviceMemory || 'unknown'} GB
               </div>
               <div>
                 WebXR: {navigator.xr ? '✓' : '✗'}
