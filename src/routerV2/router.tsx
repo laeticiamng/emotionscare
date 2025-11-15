@@ -55,6 +55,7 @@ const ProductDetailPage = lazy(() => import('@/pages/ProductDetailPage'));
 
 // Auth & Landing unifiées
 const SignupPage = lazy(() => import('@/pages/SignupPage'));
+const ExamModePage = lazy(() => import('@/pages/ExamModePage'));
 
 // Dashboards B2B
 const B2BCollabDashboard = lazy(() => import('@/pages/B2BCollabDashboard'));
@@ -312,7 +313,8 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   OnboardingPage,
   UnifiedLoginPage,
   SignupPage,
-  
+  ExamModePage,
+
   // Pages légales
   MentionsLegalesPage,
   PrivacyPolicyPage,
