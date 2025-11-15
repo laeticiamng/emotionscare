@@ -86,8 +86,6 @@ export function useRealtimeNotifications(): UseRealtimeNotificationsReturn {
               title: newNotification.title,
               description: newNotification.message,
             });
-              } : undefined
-            });
           }
         )
         .on(

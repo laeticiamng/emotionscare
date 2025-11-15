@@ -24,6 +24,18 @@ import {
   announceToScreenReader,
 } from '@/utils/accessibility';
 
+interface AccessibilityCheck {
+  passed: boolean;
+  name: string;
+  details?: string;
+}
+
+interface AccessibilityReport {
+  score: number;
+  level?: string;
+  checks: AccessibilityCheck[];
+}
+
 export function AccessibilityPanel() {
   const [preferences, setPreferences] = useState({
     fontSize: 16,
@@ -37,7 +49,7 @@ export function AccessibilityPanel() {
     textToSpeech: false,
   });
 
-  const [report, setReport] = useState<any | null>(null);
+  const [report, setReport] = useState<AccessibilityReport | null>(null);
 
   useEffect(() => {
     // Charger les préférences système

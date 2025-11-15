@@ -162,6 +162,7 @@ export const AmbitionPage: React.FC = () => {
             run_id: run.id,
             title: task,
             flavor: level.description,
+            est_minutes: 15,
             xp_reward: level.points,
           })
         )
@@ -197,6 +198,8 @@ export const AmbitionPage: React.FC = () => {
         run_id: selectedRun.id,
         title: newQuestTitle.trim(),
         flavor: newQuestDetails.trim() || undefined,
+        est_minutes: 15,
+        xp_reward: 25,
       });
 
       toast({

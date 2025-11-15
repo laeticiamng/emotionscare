@@ -29,7 +29,6 @@
 
 import React from 'react';
 import { LazyMotion, domAnimation, m as motion, AnimatePresence as FramerAnimatePresence } from 'framer-motion';
-import type { LazyMotionProps } from 'framer-motion';
 
 /**
  * Pre-configured LazyMotion wrapper
@@ -191,4 +190,4 @@ export function createVariants(
 /**
  * Type exports
  */
-export type { LazyMotionProps, Variant, Variants, Transition } from 'framer-motion';
+export type { Variant, Variants, Transition } from 'framer-motion';
