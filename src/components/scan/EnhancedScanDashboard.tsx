@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   TrendingUp, Activity, Target, Brain, Zap, Heart, Clock,
-  ChevronRight, Filter, Download, Share2, Settings
+  ChevronRight, Filter, Download, Share2, Settings, Scan
 } from 'lucide-react';
 import { useScanHistory } from '@/hooks/useScanHistory';
 import { formatDistanceToNow } from 'date-fns';
@@ -216,6 +216,32 @@ export const EnhancedScanDashboard: React.FC = () => {
               <div key={i} className="h-12 bg-muted rounded animate-pulse" />
             ))}
           </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (history.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Brain className="h-5 w-5" />
+            Dashboard Émotionnel
+          </CardTitle>
+          <CardDescription>Analyse approfondie de vos états émotionnels</CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-col items-center justify-center py-12 text-center">
+          <Scan className="h-16 w-16 text-muted-foreground mb-4" />
+          <h3 className="text-xl font-semibold mb-2">Aucun scan émotionnel</h3>
+          <p className="text-sm text-muted-foreground max-w-md mb-6">
+            Vous n'avez pas encore effectué de scan émotionnel.
+            Commencez votre premier scan pour voir vos analyses apparaître ici.
+          </p>
+          <Button onClick={() => window.location.href = '/scan'}>
+            <Activity className="h-4 w-4 mr-2" />
+            Faire mon premier scan
+          </Button>
         </CardContent>
       </Card>
     );

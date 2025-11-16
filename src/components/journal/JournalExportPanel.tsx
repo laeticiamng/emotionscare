@@ -1,7 +1,7 @@
 import { memo, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Download, FileText, FileJson, FileType } from 'lucide-react';
+import { Download, FileText, FileJson, FileType, FileWarning } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import type { SanitizedNote } from '@/modules/journal/types';
 
@@ -158,40 +158,47 @@ export const JournalExportPanel = memo<JournalExportPanelProps>(({ notes }) => {
       </CardHeader>
 
       <CardContent className="space-y-3">
-        <Button
-          onClick={exportAsJSON}
-          disabled={!hasNotes || isExporting}
-          className="w-full justify-start"
-          variant="outline"
-        >
-          <FileJson className="h-4 w-4 mr-2" />
-          Exporter en JSON
-        </Button>
+        {!hasNotes ? (
+          <div className="flex flex-col items-center justify-center py-8 text-center">
+            <FileWarning className="h-12 w-12 text-muted-foreground mb-4" />
+            <h3 className="text-lg font-semibold mb-2">Aucune note à exporter</h3>
+            <p className="text-sm text-muted-foreground max-w-sm">
+              Vous n'avez pas encore créé de notes dans votre journal.
+              Commencez à écrire pour pouvoir exporter vos données.
+            </p>
+          </div>
+        ) : (
+          <>
+            <Button
+              onClick={exportAsJSON}
+              disabled={isExporting}
+              className="w-full justify-start"
+              variant="outline"
+            >
+              <FileJson className="h-4 w-4 mr-2" />
+              Exporter en JSON ({notes.length} notes)
+            </Button>
 
-        <Button
-          onClick={exportAsMarkdown}
-          disabled={!hasNotes || isExporting}
-          className="w-full justify-start"
-          variant="outline"
-        >
-          <FileText className="h-4 w-4 mr-2" />
-          Exporter en Markdown
-        </Button>
+            <Button
+              onClick={exportAsMarkdown}
+              disabled={isExporting}
+              className="w-full justify-start"
+              variant="outline"
+            >
+              <FileText className="h-4 w-4 mr-2" />
+              Exporter en Markdown ({notes.length} notes)
+            </Button>
 
-        <Button
-          onClick={exportAsText}
-          disabled={!hasNotes || isExporting}
-          className="w-full justify-start"
-          variant="outline"
-        >
-          <FileType className="h-4 w-4 mr-2" />
-          Exporter en Texte brut
-        </Button>
-
-        {!hasNotes && (
-          <p className="text-xs text-muted-foreground text-center pt-2">
-            Aucune note à exporter
-          </p>
+            <Button
+              onClick={exportAsText}
+              disabled={isExporting}
+              className="w-full justify-start"
+              variant="outline"
+            >
+              <FileType className="h-4 w-4 mr-2" />
+              Exporter en Texte brut ({notes.length} notes)
+            </Button>
+          </>
         )}
       </CardContent>
     </Card>
