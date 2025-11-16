@@ -3,7 +3,8 @@
 
 import React, { useCallback, useEffect, useState } from 'react';
 import { captureException } from '@/lib/ai-monitoring';
-import { Loader2 } from 'lucide-react';
+import { Sentry } from '@/lib/errors/sentry-compat';
+import { Loader2, Wind, BookOpen, Zap, Trophy } from 'lucide-react';
 
 import PageHeader from '@/components/ui/PageHeader';
 import { Button } from '@/components/ui/button';
@@ -20,7 +21,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
+
+import BreathSessionStats from '@/components/breath/BreathSessionStats';
+import { BreathingTechniquesLibrary } from '@/components/breath/BreathingTechniquesLibrary';
+import { BreathingProgramsLibrary } from '@/components/breath/BreathingProgramsLibrary';
+import { BreathSessionFeedback } from '@/components/breath/BreathSessionFeedback';
+import { BreathProgressMilestones } from '@/components/breath/BreathProgressMilestones';
+import { useBreathSessions } from '@/hooks/useBreathSessions';
 
 import ZeroNumberBoundary from '@/components/a11y/ZeroNumberBoundary';
 import BreathFlowController from '@/features/breath/BreathFlowController';
@@ -199,8 +208,13 @@ const BreathPage: React.FC = () => {
   const orchestration = useBreathworkOrchestration();
   const [sessionActive, setSessionActive] = useState(false);
   const [sleepMode, setSleepMode] = useState(orchestration.mode === 'sleep_preset');
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const [lastSessionDuration, setLastSessionDuration] = useState(0);
+  const [activeTab, setActiveTab] = useState('session');
+
   const staiAssessment = orchestration.assessments.stai;
   const isiAssessment = orchestration.assessments.isi;
+  const { stats } = useBreathSessions();
 
   useEffect(() => {
     if (orchestration.mode === 'sleep_preset') {
@@ -221,6 +235,9 @@ const BreathPage: React.FC = () => {
   const handleSessionFinish = useCallback(
     ({ durationSec }: { durationSec: number }) => {
       setSessionActive(false);
+      setLastSessionDuration(durationSec);
+      setFeedbackOpen(true);
+
       Sentry.addBreadcrumb({
         category: 'breath',
         message: 'breath:session:end',
@@ -247,77 +264,130 @@ const BreathPage: React.FC = () => {
   return (
     <ConsentGate>
       <ZeroNumberBoundary className="min-h-screen bg-slate-950 py-10 text-slate-100">
-        <div className="mx-auto flex max-w-4xl flex-col gap-8 px-4 sm:px-6">
+        <div className="mx-auto flex max-w-5xl flex-col gap-8 px-4 sm:px-6">
           <PageHeader
             title="Respiration orchestrée"
             description="Une bulle de calme qui s'ajuste à ton état intérieur, sans chiffres ni pression."
           />
 
-          <Card className="border-slate-800/70 bg-slate-950/60" data-zero-number-check="true">
-            <CardHeader>
-              <CardTitle className="text-xl font-semibold text-slate-100">Ton atmosphère du moment</CardTitle>
-              <CardDescription className="text-sm text-slate-200/80">
-                {orchestration.summaryLabel}
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="flex flex-wrap gap-3">
-              <span className="rounded-full bg-amber-400/10 px-4 py-1 text-sm text-amber-200/90">
-                Cadence : {orchestration.profile === 'long_exhale_focus' ? 'expirations très longues' : orchestration.profile === 'standard_soft' ? 'équilibre doux' : 'souffle ample'}
-              </span>
-              <span className="rounded-full bg-slate-800/60 px-4 py-1 text-sm text-slate-200/80">
-                Ambiance : {sleepMode ? 'Sommeil' : 'Classique'}
-              </span>
-            </CardContent>
-          </Card>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full space-y-6">
+            <TabsList className="grid w-full grid-cols-5 bg-slate-900/50 border border-slate-800/50">
+              <TabsTrigger value="session" className="flex items-center gap-1 text-xs sm:text-sm">
+                <Wind className="h-4 w-4" />
+                <span className="hidden sm:inline">Séance</span>
+              </TabsTrigger>
+              <TabsTrigger value="stats" className="flex items-center gap-1 text-xs sm:text-sm">
+                <Zap className="h-4 w-4" />
+                <span className="hidden sm:inline">Stats</span>
+              </TabsTrigger>
+              <TabsTrigger value="techniques" className="flex items-center gap-1 text-xs sm:text-sm">
+                <BookOpen className="h-4 w-4" />
+                <span className="hidden sm:inline">Tech</span>
+              </TabsTrigger>
+              <TabsTrigger value="programs" className="flex items-center gap-1 text-xs sm:text-sm">
+                <Zap className="h-4 w-4" />
+                <span className="hidden sm:inline">Prog</span>
+              </TabsTrigger>
+              <TabsTrigger value="progress" className="flex items-center gap-1 text-xs sm:text-sm">
+                <Trophy className="h-4 w-4" />
+                <span className="hidden sm:inline">Exploits</span>
+              </TabsTrigger>
+            </TabsList>
 
-          {showStaiPrompt ? (
-            <AssessmentPrompt
-              title="Envie d'un court check-in ?"
-              description="Réponds à quelques ressentis pour ajuster la cadence."
-              cta="Partager mon ressenti"
-              onStart={() => {
-                void orchestration.startStaiPre();
-              }}
-              onSkip={skipAssessment}
-            />
-          ) : null}
+            {/* Session Tab */}
+            <TabsContent value="session" className="space-y-6">
+              <Card className="border-slate-800/70 bg-slate-950/60" data-zero-number-check="true">
+                <CardHeader>
+                  <CardTitle className="text-xl font-semibold text-slate-100">Ton atmosphère du moment</CardTitle>
+                  <CardDescription className="text-sm text-slate-200/80">
+                    {orchestration.summaryLabel}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="flex flex-wrap gap-3">
+                  <span className="rounded-full bg-amber-400/10 px-4 py-1 text-sm text-amber-200/90">
+                    Cadence : {orchestration.profile === 'long_exhale_focus' ? 'expirations très longues' : orchestration.profile === 'standard_soft' ? 'équilibre doux' : 'souffle ample'}
+                  </span>
+                  <span className="rounded-full bg-slate-800/60 px-4 py-1 text-sm text-slate-200/80">
+                    Ambiance : {sleepMode ? 'Sommeil' : 'Classique'}
+                  </span>
+                </CardContent>
+              </Card>
 
-          {showIsiPrompt ? (
-            <AssessmentPrompt
-              title="Suivi discret du sommeil"
-              description="Quelques questions sur ton repos cette semaine pour optimiser la routine d'endormissement."
-              cta="Répondre rapidement"
-              onStart={() => {
-                void orchestration.startIsi();
-              }}
-              onSkip={skipAssessment}
-            />
-          ) : null}
+              {showStaiPrompt ? (
+                <AssessmentPrompt
+                  title="Envie d'un court check-in ?"
+                  description="Réponds à quelques ressentis pour ajuster la cadence."
+                  cta="Partager mon ressenti"
+                  onStart={() => {
+                    void orchestration.startStaiPre();
+                  }}
+                  onSkip={skipAssessment}
+                />
+              ) : null}
 
-          {sessionActive ? (
-            sleepMode ? (
-              <SleepPreset onSessionFinish={handleSessionFinish} />
-            ) : (
-              <BreathFlowController
-                profile={orchestration.profile}
-                onSessionFinish={handleSessionFinish}
+              {showIsiPrompt ? (
+                <AssessmentPrompt
+                  title="Suivi discret du sommeil"
+                  description="Quelques questions sur ton repos cette semaine pour optimiser la routine d'endormissement."
+                  cta="Répondre rapidement"
+                  onStart={() => {
+                    void orchestration.startIsi();
+                  }}
+                  onSkip={skipAssessment}
+                />
+              ) : null}
+
+              {sessionActive ? (
+                sleepMode ? (
+                  <SleepPreset onSessionFinish={handleSessionFinish} />
+                ) : (
+                  <BreathFlowController
+                    profile={orchestration.profile}
+                    onSessionFinish={handleSessionFinish}
+                  />
+                )
+              ) : (
+                <Card className="border-slate-800/60 bg-slate-950/40" data-zero-number-check="true">
+                  <CardHeader>
+                    <CardTitle className="text-lg font-medium text-slate-100">Prêt pour ta séance ?</CardTitle>
+                    <CardDescription className="text-sm text-slate-300/80">
+                      Lance une session adaptée à ton état du moment.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Button size="lg" onClick={handleStartSession} className="w-full">
+                      Démarrer la séance
+                    </Button>
+                  </CardContent>
+                </Card>
+              )}
+            </TabsContent>
+
+            {/* Stats Tab */}
+            <TabsContent value="stats">
+              <BreathSessionStats />
+            </TabsContent>
+
+            {/* Techniques Tab */}
+            <TabsContent value="techniques">
+              <BreathingTechniquesLibrary />
+            </TabsContent>
+
+            {/* Programs Tab */}
+            <TabsContent value="programs">
+              <BreathingProgramsLibrary />
+            </TabsContent>
+
+            {/* Progress Tab */}
+            <TabsContent value="progress">
+              <BreathProgressMilestones
+                totalSessions={stats.totalSessions}
+                totalMinutes={stats.totalMinutes}
+                currentStreak={stats.currentStreak}
+                weeklyMinutes={stats.weeklyMinutes}
               />
-            )
-          ) : (
-            <Card className="border-slate-800/60 bg-slate-950/40" data-zero-number-check="true">
-              <CardHeader>
-                <CardTitle className="text-lg font-medium text-slate-100">Prêt pour ta séance ?</CardTitle>
-                <CardDescription className="text-sm text-slate-300/80">
-                  Lance une session adaptée à ton état du moment.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button size="lg" onClick={handleStartSession} className="w-full">
-                  Démarrer la séance
-                </Button>
-              </CardContent>
-            </Card>
-          )}
+            </TabsContent>
+          </Tabs>
 
           <AssessmentDialog
             assessment={staiAssessment}
@@ -333,6 +403,12 @@ const BreathPage: React.FC = () => {
             label="Suivi sommeil (ISI)"
             description="Questions sur la qualité de ton repos cette semaine."
             onClose={() => void orchestration.assessments.isi.reset()}
+          />
+
+          <BreathSessionFeedback
+            open={feedbackOpen}
+            sessionDurationSec={lastSessionDuration}
+            onClose={() => setFeedbackOpen(false)}
           />
         </div>
       </ZeroNumberBoundary>
