@@ -108,7 +108,7 @@ export interface EmotionPredictions {
 // Extension de EmotionResult avec les nouveaux champs
 export interface EmotionResultExtended extends EmotionResult {
   id?: string;
-  confidence: number | EmotionConfidence;
+  confidence: number;
   vector?: EmotionVector;
   biometrics?: BiometricData;
   scanMode?: ScanMode;

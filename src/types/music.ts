@@ -26,6 +26,11 @@ export interface MusicTrack {
   cover?: string;
   name?: string;
   audio_url?: string;
+  // Compatibilité MusicSearchAndFilter & vinylColor
+  color?: string;
+  vinylColor?: string;
+  description?: string;
+  category?: string;
 }
 
 export interface MusicPlaylist {

@@ -269,8 +269,8 @@ class EmotionAnalysisServiceClass {
         ...data,
         metadata: {
           ...data.metadata,
-          source,
-          timestamp: new Date().toISOString(),
+          source: (data.metadata?.source || source) as EmotionAnalysisResult['metadata']['source'],
+          timestamp: data.metadata?.timestamp || new Date().toISOString(),
         },
       };
     }

@@ -20,6 +20,7 @@ export interface MusicState {
   volume: number;
   currentTime: number;
   duration: number;
+  progress: number;
   activePreset: MusicOrchestrationPreset;
   lastPresetChange: string | null;
   playlist: MusicTrack[];
