@@ -246,7 +246,7 @@ export default function ExamModePage() {
             {user && (
               <Badge variant="outline" className="gap-2">
                 <Star className="w-3 h-3" />
-                {user.name || user.email}
+                {user.email}
               </Badge>
             )}
           </div>
@@ -275,7 +275,7 @@ export default function ExamModePage() {
         {/* Experiences Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {EXAM_EXPERIENCES.map((experience, index) => {
-            const Icon = experience.icon;
+            const IconComponent = experience.icon as React.ComponentType<{className?: string}>;
 
             return (
               <motion.div
@@ -287,7 +287,7 @@ export default function ExamModePage() {
                 <Card className="h-full hover:shadow-lg transition-all duration-300 cursor-pointer group">
                   <CardHeader>
                     <div className={`w-16 h-16 rounded-full bg-gradient-to-br ${experience.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
-                      <Icon className="w-8 h-8 text-white" />
+                      <IconComponent className="w-8 h-8 text-white" />
                     </div>
                     <CardTitle className="text-xl">{experience.title}</CardTitle>
                     <CardDescription className="text-sm">

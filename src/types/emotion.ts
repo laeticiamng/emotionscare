@@ -1,4 +1,5 @@
 export interface EmotionResult {
+  id?: string;
   emotion: string;
   confidence: number;
   valence: number;

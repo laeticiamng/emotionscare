@@ -29,6 +29,7 @@ export interface CoachProgram {
   sessions: number;
   level: string;
   color: string;
+  rating?: number;
   progress: number;
   lessons: ProgramLesson[];
   benefits: string[];
