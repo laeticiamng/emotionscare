@@ -17,6 +17,7 @@ import { useMusic } from '@/contexts/MusicContext';
 import { cn } from '@/lib/utils';
 import PageRoot from '@/components/common/PageRoot';
 import { ConsentGate } from '@/features/clinical-optin/ConsentGate';
+import { SoundForestVisualizer } from '@/components/music/SoundForestVisualizer';
 
 interface PremiumTrack {
   id: string;
@@ -82,6 +83,37 @@ const B2CMusicTherapyPremiumPage: React.FC = () => {
                   Thérapie musicale avancée avec fréquences binaurales et compositions exclusives
                 </p>
               </div>
+
+              {/* Sound Forest 3D Visualizer */}
+              {selectedTrack && (
+                <div className="mb-8 rounded-2xl overflow-hidden border border-emerald-500/20">
+                  <div className="h-[400px]">
+                    <SoundForestVisualizer isPlaying={isPlaying} />
+                  </div>
+                  <div className="bg-slate-900/90 backdrop-blur-sm p-4 border-t border-emerald-500/20">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-emerald-300">{selectedTrack.title}</p>
+                        <p className="text-xs text-emerald-300/60">{selectedTrack.artist}</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handlePlayPause(selectedTrack)}
+                          className="h-8 w-8 rounded-full p-0"
+                        >
+                          {isPlaying ? (
+                            <Pause className="h-4 w-4" />
+                          ) : (
+                            <Play className="h-4 w-4 ml-0.5" />
+                          )}
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               <div className="grid gap-6">
                 {PREMIUM_TRACKS.map(track => (

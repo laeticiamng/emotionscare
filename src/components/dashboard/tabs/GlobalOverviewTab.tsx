@@ -5,6 +5,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Heart, Brain, Activity, TrendingUp } from 'lucide-react';
 import { UserRole } from '@/types/user';
 import { logger } from '@/lib/logger';
+import { useDashboard } from '@/hooks/useDashboard';
+import { useDashboardWeekly } from '@/hooks/useDashboardWeekly';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface GlobalOverviewTabProps {
   className?: string;
@@ -14,31 +17,43 @@ interface GlobalOverviewTabProps {
 const SLEEP_REMINDER_STORAGE_KEY = 'breath:isi:status';
 
 const GlobalOverviewTab: React.FC<GlobalOverviewTabProps> = ({ className, userRole }) => {
+  const { user } = useAuth();
+  const { stats: dashboardStats, weeklySummary } = useDashboard(user?.id || '');
+  const { data: weeklyData } = useDashboardWeekly();
+
+  // Calculate stats from real API data
+  const wellnessScore = dashboardStats?.wellnessScore || 0;
+  const stressLevel = wellnessScore > 70 ? 'Faible' : wellnessScore > 40 ? 'Modéré' : 'Élevé';
+  const dailyActivity = weeklyData?.today?.glow_score
+    ? `${Math.round(weeklyData.today.glow_score / 10)}/10`
+    : '0/10';
+  const progression = wellnessScore;
+
   const stats = [
     {
       title: 'Bien-être général',
-      value: '85%',
+      value: `${wellnessScore}%`,
       icon: Heart,
       trend: '+5%',
       color: 'text-success'
     },
     {
       title: 'Niveau de stress',
-      value: 'Faible',
+      value: stressLevel,
       icon: Brain,
-      trend: '-12%',
+      trend: wellnessScore > 60 ? '-12%' : '+3%',
       color: 'text-primary'
     },
     {
       title: 'Activité quotidienne',
-      value: '7/10',
+      value: dailyActivity,
       icon: Activity,
       trend: '+2%',
       color: 'text-accent'
     },
     {
       title: 'Progression',
-      value: '92%',
+      value: `${progression}%`,
       icon: TrendingUp,
       trend: '+8%',
       color: 'text-warning'
@@ -95,16 +110,22 @@ const GlobalOverviewTab: React.FC<GlobalOverviewTabProps> = ({ className, userRo
           <CardContent>
             <div className="space-y-4">
               <div className="flex justify-between items-center">
-                <span>Analyses émotionnelles</span>
-                <span className="font-medium">12</span>
+                <span>Sessions totales</span>
+                <span className="font-medium">{weeklySummary?.totalSessions || 0}</span>
               </div>
               <div className="flex justify-between items-center">
-                <span>Sessions VR</span>
-                <span className="font-medium">5</span>
+                <span>Temps total</span>
+                <span className="font-medium">
+                  {weeklySummary?.totalMinutes
+                    ? `${Math.floor(weeklySummary.totalMinutes / 60)}h ${weeklySummary.totalMinutes % 60}min`
+                    : '0min'}
+                </span>
               </div>
               <div className="flex justify-between items-center">
-                <span>Écoute musicale</span>
-                <span className="font-medium">8h 30min</span>
+                <span>Modules favoris</span>
+                <span className="font-medium">
+                  {weeklySummary?.topModules?.[0] || 'Aucun'}
+                </span>
               </div>
             </div>
           </CardContent>
@@ -116,12 +137,21 @@ const GlobalOverviewTab: React.FC<GlobalOverviewTabProps> = ({ className, userRo
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              <div className="p-3 bg-primary/10 rounded-lg">
-                <p className="text-sm">Prenez une pause VR de 10 minutes pour réduire le stress</p>
-              </div>
-              <div className="p-3 bg-success/10 rounded-lg">
-                <p className="text-sm">Votre bien-être s'améliore ! Continuez vos bonnes habitudes</p>
-              </div>
+              {wellnessScore >= 70 && (
+                <div className="p-3 bg-success/10 rounded-lg">
+                  <p className="text-sm">Excellent ! Votre bien-être est optimal. Continuez vos bonnes habitudes !</p>
+                </div>
+              )}
+              {wellnessScore < 70 && wellnessScore >= 40 && (
+                <div className="p-3 bg-primary/10 rounded-lg">
+                  <p className="text-sm">Prenez une pause de 10 minutes pour améliorer votre bien-être</p>
+                </div>
+              )}
+              {wellnessScore < 40 && (
+                <div className="p-3 bg-warning/10 rounded-lg">
+                  <p className="text-sm">Votre niveau de stress semble élevé. Essayez une session de respiration ou de méditation.</p>
+                </div>
+              )}
               {showSoothingReminder && (
                 <div className="rounded-lg border border-warning/20 bg-warning/10 p-3">
                   <p className="text-sm text-warning-foreground">

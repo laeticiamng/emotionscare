@@ -23,6 +23,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useMotionPrefs } from '@/hooks/useMotionPrefs';
 import { useSessionClock } from '@/hooks/useSessionClock';
 import { GlowSurface } from '@/ui/GlowSurface';
+import { WallOfLights } from '@/components/flashglow/WallOfLights';
 import { useFlashPhases } from '@/modules/flash-glow/useFlashPhases';
 import {
   computeMoodDelta,
@@ -794,23 +795,12 @@ const FlashGlowView: React.FC = () => {
 
   const appearance = PHASE_APPEARANCE[snapshot.phase.key] ?? PHASE_APPEARANCE.warmup;
 
-  const phaseSurface = softEffects || motion.prefersReducedMotion ? (
-    <div
-      aria-label="Surface lumineuse douce"
-      className="h-64 w-full rounded-2xl border"
-      style={{
-        background: `radial-gradient(circle at 50% 30%, ${currentMood.palette.surface}, transparent 70%)`,
-        borderColor: currentMood.palette.border,
-        transition: 'opacity 240ms ease-in-out',
-        opacity: 0.6 + (snapshot.progress ?? 0) * 0.3,
-      }}
-    />
-  ) : (
-    <GlowSurface
-      phase01={snapshot.progress}
+  const phaseSurface = (
+    <WallOfLights
+      phase={snapshot.phase.key as 'warmup' | 'glow' | 'settle'}
+      progress={snapshot.progress ?? 0}
       theme={appearance.theme}
       intensity={appearance.intensity}
-      shape={appearance.shape}
     />
   );
 

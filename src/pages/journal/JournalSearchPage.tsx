@@ -2,6 +2,7 @@ import { memo, useState } from 'react';
 import type { SanitizedNote } from '@/modules/journal/types';
 import { JournalAdvancedSearch } from '@/components/journal/JournalAdvancedSearch';
 import { Card, CardContent } from '@/components/ui/card';
+import { Search } from 'lucide-react';
 
 interface JournalSearchPageProps {
   notes: SanitizedNote[];
@@ -9,6 +10,12 @@ interface JournalSearchPageProps {
 
 export const JournalSearchPage = memo<JournalSearchPageProps>(({ notes }) => {
   const [searchResults, setSearchResults] = useState<SanitizedNote[]>(notes);
+  const [hasSearched, setHasSearched] = useState(false);
+
+  const handleResultsChange = (results: SanitizedNote[]) => {
+    setSearchResults(results);
+    setHasSearched(true);
+  };
 
   return (
     <div className="container max-w-6xl mx-auto p-6 space-y-6">
@@ -19,9 +26,9 @@ export const JournalSearchPage = memo<JournalSearchPageProps>(({ notes }) => {
         </p>
       </div>
 
-      <JournalAdvancedSearch notes={notes} onResultsChange={setSearchResults} />
+      <JournalAdvancedSearch notes={notes} onResultsChange={handleResultsChange} />
 
-      {searchResults.length > 0 && (
+      {searchResults.length > 0 ? (
         <div className="space-y-4">
           <h3 className="text-lg font-semibold">
             {searchResults.length} résultat{searchResults.length > 1 ? 's' : ''}
@@ -45,7 +52,18 @@ export const JournalSearchPage = memo<JournalSearchPageProps>(({ notes }) => {
             ))}
           </div>
         </div>
-      )}
+      ) : hasSearched ? (
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-12 text-center">
+            <Search className="h-12 w-12 text-muted-foreground mb-4" />
+            <h3 className="text-lg font-semibold mb-2">Aucun résultat trouvé</h3>
+            <p className="text-sm text-muted-foreground max-w-md">
+              Aucune note ne correspond à vos critères de recherche.
+              Essayez de modifier vos filtres ou votre recherche.
+            </p>
+          </CardContent>
+        </Card>
+      ) : null}
     </div>
   );
 });
