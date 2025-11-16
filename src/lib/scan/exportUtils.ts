@@ -1,10 +1,11 @@
 /**
  * Utilitaires pour exporter les données de scan émotionnel
- * Supporte les formats: JSON, CSV, PDF (via jsPDF)
+ * Supporte les formats: JSON, CSV
  */
 
-import { jsPDF } from 'jspdf';
-import 'jspdf-autotable';
+// PDF export disabled - jspdf module not available
+// import { jsPDF } from 'jspdf';
+// import 'jspdf-autotable';
 
 interface ScanData {
   id: string;

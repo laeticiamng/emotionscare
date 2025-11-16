@@ -222,7 +222,7 @@ class JournalTemplatesService {
       .insert({
         user_id: user.id,
         template_id: templateId,
-        journal_note_id: journalNote.id,
+        journal_note_id: journalNote?.id || null,
         responses,
         completion_percentage: completionPercentage,
         mood_score: moodScore

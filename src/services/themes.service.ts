@@ -233,7 +233,7 @@ export async function importTheme(
  */
 export async function activateTheme(userId: string, themeId: string): Promise<void> {
   await updateUserThemePreferences(userId, {
-    active_theme_id: themeId,
+    activeThemeId: themeId,
   });
 }
 
