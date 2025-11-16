@@ -5,6 +5,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import type {
+import { logger } from '@/lib/logger';
   EmotionComponent,
   MixingStrategy,
   EmotionBlend,
@@ -172,7 +173,7 @@ async function getUserEmotionalProfile(userId: string): Promise<EmotionalProfile
       .limit(30);
 
     if (journalError) {
-      console.error('Failed to fetch journal entries:', journalError);
+      logger.error('Failed to fetch journal entries:', journalError, 'MODULE');
       return getDefaultProfile();
     }
 
@@ -187,7 +188,7 @@ async function getUserEmotionalProfile(userId: string): Promise<EmotionalProfile
       .limit(20);
 
     if (meditationError) {
-      console.error('Failed to fetch meditation sessions:', meditationError);
+      logger.error('Failed to fetch meditation sessions:', meditationError, 'MODULE');
     }
 
     // Analyser les émotions dominantes
@@ -237,7 +238,7 @@ async function getUserEmotionalProfile(userId: string): Promise<EmotionalProfile
       stability: Math.min(Math.max(stability, 0), 1),
     };
   } catch (error) {
-    console.error('Error fetching emotional profile:', error);
+    logger.error('Error fetching emotional profile:', error, 'MODULE');
     return getDefaultProfile();
   }
 }

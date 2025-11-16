@@ -5,6 +5,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import type {
+import { logger } from '@/lib/logger';
   UserProfile,
   UpdateUserProfile,
   UserSettings,
@@ -43,13 +44,13 @@ export class UserPreferencesService {
 
       if (error) {
         if (error.code === 'PGRST116') return null; // Not found
-        console.error('[UserPreferencesService] Get profile error:', error);
+        logger.error('[UserPreferencesService] Get profile error:', error, 'MODULE');
         throw new Error(`Failed to get user profile: ${error.message}`);
       }
 
       return data as UserProfile;
     } catch (error) {
-      console.error('[UserPreferencesService] Get profile failed:', error);
+      logger.error('[UserPreferencesService] Get profile failed:', error, 'MODULE');
       throw error;
     }
   }
@@ -73,13 +74,13 @@ export class UserPreferencesService {
         .single();
 
       if (error) {
-        console.error('[UserPreferencesService] Update profile error:', error);
+        logger.error('[UserPreferencesService] Update profile error:', error, 'MODULE');
         throw new Error(`Failed to update user profile: ${error.message}`);
       }
 
       return data as UserProfile;
     } catch (error) {
-      console.error('[UserPreferencesService] Update profile failed:', error);
+      logger.error('[UserPreferencesService] Update profile failed:', error, 'MODULE');
       throw error;
     }
   }
@@ -118,7 +119,7 @@ export class UserPreferencesService {
 
       return { url: publicUrl, error: null };
     } catch (error) {
-      console.error('[UserPreferencesService] Upload avatar failed:', error);
+      logger.error('[UserPreferencesService] Upload avatar failed:', error, 'MODULE');
       return {
         url: '',
         error: error instanceof Error ? error : new Error('Unknown error')
@@ -148,7 +149,7 @@ export class UserPreferencesService {
         ...(profile.preferences as Partial<UserSettings>)
       };
     } catch (error) {
-      console.error('[UserPreferencesService] Get settings failed:', error);
+      logger.error('[UserPreferencesService] Get settings failed:', error, 'MODULE');
       return this.getDefaultSettings();
     }
   }
@@ -170,7 +171,7 @@ export class UserPreferencesService {
 
       return newSettings;
     } catch (error) {
-      console.error('[UserPreferencesService] Update settings failed:', error);
+      logger.error('[UserPreferencesService] Update settings failed:', error, 'MODULE');
       throw error;
     }
   }
@@ -316,13 +317,13 @@ export class UserPreferencesService {
       const { data, error } = await query;
 
       if (error) {
-        console.error('[UserPreferencesService] Get notifications error:', error);
+        logger.error('[UserPreferencesService] Get notifications error:', error, 'MODULE');
         throw new Error(`Failed to get notifications: ${error.message}`);
       }
 
       return (data as Notification[]) || [];
     } catch (error) {
-      console.error('[UserPreferencesService] Get notifications failed:', error);
+      logger.error('[UserPreferencesService] Get notifications failed:', error, 'MODULE');
       return [];
     }
   }
@@ -347,13 +348,13 @@ export class UserPreferencesService {
         .single();
 
       if (error) {
-        console.error('[UserPreferencesService] Create notification error:', error);
+        logger.error('[UserPreferencesService] Create notification error:', error, 'MODULE');
         throw new Error(`Failed to create notification: ${error.message}`);
       }
 
       return data as Notification;
     } catch (error) {
-      console.error('[UserPreferencesService] Create notification failed:', error);
+      logger.error('[UserPreferencesService] Create notification failed:', error, 'MODULE');
       throw error;
     }
   }
@@ -372,11 +373,11 @@ export class UserPreferencesService {
         .eq('id', notificationId);
 
       if (error) {
-        console.error('[UserPreferencesService] Mark as read error:', error);
+        logger.error('[UserPreferencesService] Mark as read error:', error, 'MODULE');
         throw new Error(`Failed to mark notification as read: ${error.message}`);
       }
     } catch (error) {
-      console.error('[UserPreferencesService] Mark as read failed:', error);
+      logger.error('[UserPreferencesService] Mark as read failed:', error, 'MODULE');
       throw error;
     }
   }
@@ -396,11 +397,11 @@ export class UserPreferencesService {
         .eq('read', false);
 
       if (error) {
-        console.error('[UserPreferencesService] Mark all as read error:', error);
+        logger.error('[UserPreferencesService] Mark all as read error:', error, 'MODULE');
         throw new Error(`Failed to mark all as read: ${error.message}`);
       }
     } catch (error) {
-      console.error('[UserPreferencesService] Mark all as read failed:', error);
+      logger.error('[UserPreferencesService] Mark all as read failed:', error, 'MODULE');
       throw error;
     }
   }
@@ -416,11 +417,11 @@ export class UserPreferencesService {
         .eq('id', notificationId);
 
       if (error) {
-        console.error('[UserPreferencesService] Delete notification error:', error);
+        logger.error('[UserPreferencesService] Delete notification error:', error, 'MODULE');
         throw new Error(`Failed to delete notification: ${error.message}`);
       }
     } catch (error) {
-      console.error('[UserPreferencesService] Delete notification failed:', error);
+      logger.error('[UserPreferencesService] Delete notification failed:', error, 'MODULE');
       throw error;
     }
   }
@@ -436,11 +437,11 @@ export class UserPreferencesService {
         .eq('id', notificationId);
 
       if (error) {
-        console.error('[UserPreferencesService] Archive notification error:', error);
+        logger.error('[UserPreferencesService] Archive notification error:', error, 'MODULE');
         throw new Error(`Failed to archive notification: ${error.message}`);
       }
     } catch (error) {
-      console.error('[UserPreferencesService] Archive notification failed:', error);
+      logger.error('[UserPreferencesService] Archive notification failed:', error, 'MODULE');
       throw error;
     }
   }
@@ -457,13 +458,13 @@ export class UserPreferencesService {
         .eq('read', false);
 
       if (error) {
-        console.error('[UserPreferencesService] Count unread error:', error);
+        logger.error('[UserPreferencesService] Count unread error:', error, 'MODULE');
         return 0;
       }
 
       return count || 0;
     } catch (error) {
-      console.error('[UserPreferencesService] Count unread failed:', error);
+      logger.error('[UserPreferencesService] Count unread failed:', error, 'MODULE');
       return 0;
     }
   }
@@ -572,7 +573,7 @@ export class UserPreferencesService {
         };
       }
     } catch (error) {
-      console.error('[UserPreferencesService] Account deletion failed:', error);
+      logger.error('[UserPreferencesService] Account deletion failed:', error, 'MODULE');
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error'

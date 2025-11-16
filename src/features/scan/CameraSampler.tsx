@@ -5,6 +5,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useMoodPublisher } from '@/features/mood/useMoodPublisher';
 import { scanAnalytics } from '@/lib/analytics/scanEvents';
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 
 const clampNormalized = (value: number) => {
   if (!Number.isFinite(value)) {
@@ -121,17 +122,17 @@ const CameraSampler: React.FC<CameraSamplerProps> = ({ onPermissionChange, onUna
     
     try {
       if (!videoRef.current) {
-        console.error('[CameraSampler] Video ref not ready');
+        logger.error(new Error('[CameraSampler] Video ref not ready'), 'FEATURE');
         return;
       }
 
       if (videoRef.current.readyState < 2) {
-        console.warn('[CameraSampler] Video not ready yet, skipping frame');
+        logger.warn('[CameraSampler] Video not ready yet, skipping frame', 'FEATURE');
         return;
       }
 
       if (videoRef.current.videoWidth === 0 || videoRef.current.videoHeight === 0) {
-        console.warn('[CameraSampler] Video dimensions not loaded yet');
+        logger.warn('[CameraSampler] Video dimensions not loaded yet', 'FEATURE');
         return;
       }
 
@@ -141,13 +142,13 @@ const CameraSampler: React.FC<CameraSamplerProps> = ({ onPermissionChange, onUna
       canvas.height = videoRef.current.videoHeight;
       const ctx = canvas.getContext('2d');
       if (!ctx) {
-        console.error('[CameraSampler] Canvas context not available');
+        logger.error(new Error('[CameraSampler] Canvas context not available'), 'FEATURE');
         return;
       }
       ctx.drawImage(videoRef.current, 0, 0);
       const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
       
-      console.log('[CameraSampler] Calling analyze-vision with Lovable AI...');
+      logger.debug('[CameraSampler] Calling analyze-vision with Lovable AI...', 'FEATURE');
 
       const { data, error } = await supabase.functions.invoke('analyze-vision', {
         body: { 
@@ -155,10 +156,10 @@ const CameraSampler: React.FC<CameraSamplerProps> = ({ onPermissionChange, onUna
         },
       });
 
-      console.log('[CameraSampler] Response:', { data, error });
+      logger.debug('[CameraSampler] Response:', { data, error }, 'FEATURE');
 
       if (error) {
-        console.error('[CameraSampler] Edge function error:', error);
+        logger.error('[CameraSampler] Edge function error:', error, 'FEATURE');
         setEdgeReady(false);
         return;
       }
@@ -271,23 +272,23 @@ const CameraSampler: React.FC<CameraSamplerProps> = ({ onPermissionChange, onUna
           });
 
           if (insertError) {
-            console.error('[CameraSampler] Error saving to clinical_signals:', insertError);
+            logger.error('[CameraSampler] Error saving to clinical_signals:', insertError, 'FEATURE');
           } else {
-            console.log('[CameraSampler] Successfully saved to clinical_signals');
+            logger.debug('[CameraSampler] Successfully saved to clinical_signals', 'FEATURE');
             // Invalider le cache pour rafraîchir l'historique
             queryClient.invalidateQueries({ queryKey: ['scan-history'] });
             window.dispatchEvent(new CustomEvent('scan-saved'));
           }
         }
       } catch (saveError) {
-        console.error('[CameraSampler] Exception saving to DB:', saveError);
+        logger.error('[CameraSampler] Exception saving to DB:', saveError, 'FEATURE');
       }
       
       const duration = Date.now() - startTime;
-      console.log('[CameraSampler] Analysis completed in', duration, 'ms');
+      logger.debug('[CameraSampler] Analysis completed in', duration, 'ms', 'FEATURE');
       scanAnalytics.cameraAnalysisCompleted(duration);
     } catch (error) {
-      console.error('[CameraSampler] Error during analysis:', error);
+      logger.error('[CameraSampler] Error during analysis:', error, 'FEATURE');
       setEdgeReady(false);
     } finally {
       setIsAnalyzing(false);
@@ -306,7 +307,7 @@ const CameraSampler: React.FC<CameraSamplerProps> = ({ onPermissionChange, onUna
       try {
         await sampleFromEdge();
       } catch (error) {
-        console.error('[CameraSampler] Loop error:', error);
+        logger.error('[CameraSampler] Loop error:', error, 'FEATURE');
       }
 
       if (cancelled) {

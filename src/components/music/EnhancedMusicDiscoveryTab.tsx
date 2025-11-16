@@ -14,6 +14,7 @@ import { AdvancedMusicQueue } from './AdvancedMusicQueue';
 import { MusicSearchAndFilter } from './MusicSearchAndFilter';
 import { CollaborativePlaylistUI } from './CollaborativePlaylistUI';
 import type { MusicTrack } from '@/types/music';
+import { logger } from '@/lib/logger';
 
 interface Collaborator {
   id: string;
@@ -310,7 +311,7 @@ export const EnhancedMusicDiscoveryTab: React.FC<EnhancedMusicDiscoveryTabProps>
               currentUserId={currentUserId}
               isPublic={false}
               onAddCollaborator={(email, role) => {
-                console.log(`Invite ${email} as ${role}`);
+                logger.debug(`Invite ${email} as ${role}`, 'COMPONENT');
               }}
             />
           </motion.div>

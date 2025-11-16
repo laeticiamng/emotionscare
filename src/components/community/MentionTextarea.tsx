@@ -3,6 +3,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { logger } from '@/lib/logger';
 
 interface User {
   id: string;
@@ -52,7 +53,7 @@ export function MentionTextarea({
       if (error) throw error;
       setSuggestions(data || []);
     } catch (error) {
-      console.error('Error searching users:', error);
+      logger.error('Error searching users:', error, 'COMPONENT');
       setSuggestions([]);
     }
   };

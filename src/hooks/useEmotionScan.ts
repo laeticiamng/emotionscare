@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { EmotionResult, normalizeEmotionResult } from '@/types/emotion-unified';
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 
 export const useEmotionScan = () => {
   const [isScanning, setIsScanning] = useState(false);
@@ -18,7 +19,7 @@ export const useEmotionScan = () => {
         });
 
         if (error) {
-          console.error('[useEmotionScan] Text analysis error:', error);
+          logger.error('[useEmotionScan] Text analysis error:', error, 'HOOK');
           throw new Error(error.message || 'Failed to analyze text');
         }
 
@@ -50,7 +51,7 @@ export const useEmotionScan = () => {
       }
       
     } catch (error) {
-      console.error('[useEmotionScan] Error:', error);
+      logger.error('[useEmotionScan] Error:', error, 'HOOK');
       throw error;
     } finally {
       setIsScanning(false);

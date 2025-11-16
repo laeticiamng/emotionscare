@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { logger } from '@/lib/logger';
 import {
   Target,
   Trophy,
@@ -82,7 +83,7 @@ export const AmbitionPage: React.FC = () => {
         setSelectedRun(runsData[0]);
       }
     } catch (error) {
-      console.error('Error loading data:', error);
+      logger.error('Error loading data:', error, 'COMPONENT');
       toast({
         title: 'Erreur',
         description: 'Impossible de charger les données',
@@ -98,7 +99,7 @@ export const AmbitionPage: React.FC = () => {
       const questsData = await fetchQuests(runId);
       setQuests(questsData);
     } catch (error) {
-      console.error('Error loading quests:', error);
+      logger.error('Error loading quests:', error, 'COMPONENT');
     }
   };
 
@@ -121,7 +122,7 @@ export const AmbitionPage: React.FC = () => {
       await loadData();
       setSelectedRun(run);
     } catch (error) {
-      console.error('Error creating run:', error);
+      logger.error('Error creating run:', error, 'COMPONENT');
       toast({
         title: 'Erreur',
         description: 'Impossible de créer le run',
@@ -179,7 +180,7 @@ export const AmbitionPage: React.FC = () => {
       await loadData();
       setSelectedRun(run);
     } catch (error) {
-      console.error('Error generating game:', error);
+      logger.error('Error generating game:', error, 'COMPONENT');
       toast({
         title: 'Erreur',
         description: 'Impossible de générer le jeu',
@@ -211,7 +212,7 @@ export const AmbitionPage: React.FC = () => {
       setNewQuestDetails('');
       await loadQuests(selectedRun.id);
     } catch (error) {
-      console.error('Error creating quest:', error);
+      logger.error('Error creating quest:', error, 'COMPONENT');
       toast({
         title: 'Erreur',
         description: 'Impossible de créer la quête',
@@ -234,7 +235,7 @@ export const AmbitionPage: React.FC = () => {
       }
       await loadData(); // Refresh stats
     } catch (error) {
-      console.error('Error completing quest:', error);
+      logger.error('Error completing quest:', error, 'COMPONENT');
       toast({
         title: 'Erreur',
         description: 'Impossible de compléter la quête',

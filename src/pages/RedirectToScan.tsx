@@ -1,9 +1,10 @@
 import { useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
+import { logger } from '@/lib/logger';
 
 export default function RedirectToScan() {
   useEffect(() => {
-    console.log('Redirection vers /app/scan');
+    logger.debug('Redirection vers /app/scan', 'PAGE');
   }, []);
 
   return <Navigate to="/app/scan" replace />;

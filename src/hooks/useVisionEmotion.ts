@@ -2,6 +2,7 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { VisionEmotionResult } from '@/types/realtime-emotion';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 export const useVisionEmotion = () => {
   const [isActive, setIsActive] = useState(false);
@@ -52,7 +53,7 @@ export const useVisionEmotion = () => {
       setLastResult(result);
 
     } catch (error) {
-      console.error('[useVisionEmotion] Error:', error);
+      logger.error('[useVisionEmotion] Error:', error, 'HOOK');
     }
   }, [captureFrame]);
 
@@ -86,7 +87,7 @@ export const useVisionEmotion = () => {
       toast.success('Vision activée');
 
     } catch (error) {
-      console.error('[useVisionEmotion] Start error:', error);
+      logger.error('[useVisionEmotion] Start error:', error, 'HOOK');
       toast.error('Erreur d\'accès à la caméra');
     }
   }, [analyzeFrame]);

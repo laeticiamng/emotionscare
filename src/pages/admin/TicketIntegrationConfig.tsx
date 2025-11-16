@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Ticket, Plus, Edit, Trash2, ExternalLink } from 'lucide-react';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 const TicketIntegrationConfig: React.FC = () => {
   const queryClient = useQueryClient();
@@ -68,7 +69,7 @@ const TicketIntegrationConfig: React.FC = () => {
       resetForm();
     },
     onError: (error) => {
-      console.error('Create integration error:', error);
+      logger.error('Create integration error:', error, 'PAGE');
       toast.error('Erreur lors de la création');
     }
   });
@@ -88,7 +89,7 @@ const TicketIntegrationConfig: React.FC = () => {
       resetForm();
     },
     onError: (error) => {
-      console.error('Update integration error:', error);
+      logger.error('Update integration error:', error, 'PAGE');
       toast.error('Erreur lors de la mise à jour');
     }
   });
@@ -107,7 +108,7 @@ const TicketIntegrationConfig: React.FC = () => {
       toast.success('Intégration supprimée');
     },
     onError: (error) => {
-      console.error('Delete integration error:', error);
+      logger.error('Delete integration error:', error, 'PAGE');
       toast.error('Erreur lors de la suppression');
     }
   });

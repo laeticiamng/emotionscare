@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Camera, TrendingUp, Heart, Zap, Loader2 } from 'lucide-react';
 import { useHumeWebSocket } from '@/hooks/useHumeWebSocket';
 import { useToast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 
 export default function VoiceAnalysisPage() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -12,7 +13,7 @@ export default function VoiceAnalysisPage() {
   const { isConnected, error, latestResult } = useHumeWebSocket({
     enabled: isAnalyzing,
     onEmotions: (result) => {
-      console.log('Emotions detected:', result);
+      logger.debug('Emotions detected:', result, 'PAGE');
     }
   });
 

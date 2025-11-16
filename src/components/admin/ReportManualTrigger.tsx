@@ -10,6 +10,7 @@ import { Send, Eye, Calendar, Loader2, CheckCircle, AlertCircle } from 'lucide-r
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { generateReportHTML, generateReportPreview, type ReportData } from '@/services/reportTemplateService';
+import { logger } from '@/lib/logger';
 
 export function ReportManualTrigger() {
   const { toast } = useToast();
@@ -91,7 +92,7 @@ export function ReportManualTrigger() {
         description: 'Le rapport a été généré avec succès',
       });
     } catch (error: any) {
-      console.error('Erreur génération rapport:', error);
+      logger.error('Erreur génération rapport:', error, 'COMPONENT');
       toast({
         title: 'Erreur',
         description: error.message || 'Impossible de générer la prévisualisation',
@@ -149,7 +150,7 @@ export function ReportManualTrigger() {
       setRecipientEmails('');
       setReportData(null);
     } catch (error: any) {
-      console.error('Erreur envoi rapport:', error);
+      logger.error('Erreur envoi rapport:', error, 'COMPONENT');
       toast({
         title: 'Erreur',
         description: error.message || 'Impossible d\'enregistrer le rapport',

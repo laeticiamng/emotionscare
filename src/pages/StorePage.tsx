@@ -16,6 +16,7 @@ import { storefrontApiRequest, STOREFRONT_QUERY } from '@/lib/shopify';
 import { formatPrice } from '@/lib/currency';
 import type { ShopifyProduct } from '@/types/shopify';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 const StorePage: React.FC = () => {
   const [products, setProducts] = useState<ShopifyProduct[]>([]);
@@ -31,7 +32,7 @@ const StorePage: React.FC = () => {
           setProducts(data.data.products.edges);
         }
       } catch (error) {
-        console.error('Error fetching products:', error);
+        logger.error('Error fetching products:', error, 'PAGE');
         toast.error("Erreur de chargement", {
           description: "Impossible de charger les produits"
         });

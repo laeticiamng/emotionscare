@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
+import { logger } from '@/lib/logger';
 
 export interface ConversationMessage {
   id: string;
@@ -52,7 +53,7 @@ export const useCoachConversations = (): UseCoachConversationsReturn => {
           setConversations(JSON.parse(stored));
         }
       } catch (err) {
-        console.error('Failed to load conversations from storage:', err);
+        logger.error('Failed to load conversations from storage:', err, 'HOOK');
       }
     };
 
@@ -64,7 +65,7 @@ export const useCoachConversations = (): UseCoachConversationsReturn => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(conversations));
     } catch (err) {
-      console.error('Failed to save conversations to storage:', err);
+      logger.error('Failed to save conversations to storage:', err, 'HOOK');
     }
   }, [conversations]);
 

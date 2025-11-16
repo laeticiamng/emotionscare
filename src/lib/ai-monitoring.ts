@@ -118,7 +118,7 @@ class AIMonitoring {
           event.message.includes('ai-monitoring') ||
           event.message.includes('Failed to send event to AI monitoring')) {
         // Log uniquement localement, ne pas envoyer à l'edge function
-        console.warn('[AI-Monitoring] Skipping recursive monitoring event:', event.message);
+        logger.warn('[AI-Monitoring] Skipping recursive monitoring event:', event.message, 'LIB');
         return;
       }
 
@@ -148,7 +148,7 @@ class AIMonitoring {
       }
     } catch (error) {
       // Fallback: log seulement localement si l'envoi échoue (sans recursion)
-      console.error('[AI-Monitoring] Failed to capture monitoring event:', error);
+      logger.error('[AI-Monitoring] Failed to capture monitoring event:', error, 'LIB');
     }
   }
 
@@ -167,7 +167,7 @@ class AIMonitoring {
       }
     } catch (error) {
       // Log sans déclencher de recursion
-      console.error('[AI-Monitoring] Error processing monitoring queue:', error);
+      logger.error('[AI-Monitoring] Error processing monitoring queue:', error, 'LIB');
     } finally {
       this.isProcessing = false;
 
@@ -203,14 +203,14 @@ class AIMonitoring {
         console.log('%c📊 Diagnostic:', 'font-weight: bold; color: #3b82f6', analysis.analysis);
         
         if (analysis.isKnownIssue) {
-          console.log('%c✅ Issue connue', 'color: #10b981');
+          logger.debug('%c✅ Issue connue', 'color: #10b981', 'LIB');
         }
         
         console.log('%c💡 Solution suggérée:', 'font-weight: bold; color: #8b5cf6', analysis.suggestedFix);
         
         if (analysis.autoFixCode) {
           console.log('%c🔧 Code de correction automatique:', 'font-weight: bold; color: #f59e0b');
-          console.log(analysis.autoFixCode);
+          logger.debug(analysis.autoFixCode, 'LIB');
         }
         
         if (analysis.relatedErrors.length > 0) {
@@ -220,7 +220,7 @@ class AIMonitoring {
         if (analysis.preventionTips.length > 0) {
           console.log('%c🛡️ Conseils de prévention:', 'font-weight: bold; color: #14b8a6');
           analysis.preventionTips.forEach((tip, i) => {
-            console.log(`  ${i + 1}. ${tip}`);
+            logger.debug(`  ${i + 1}. ${tip}`, 'LIB');
           });
         }
         
@@ -232,7 +232,7 @@ class AIMonitoring {
       }
     } catch (error) {
       // Ne pas logger ici pour éviter la recursion
-      console.error('[AI-Monitoring] Failed to send event to AI monitoring:', error);
+      logger.error('[AI-Monitoring] Failed to send event to AI monitoring:', error, 'LIB');
     }
   }
 

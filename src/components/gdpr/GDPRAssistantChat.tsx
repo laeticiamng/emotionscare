@@ -7,6 +7,7 @@ import { useState, useRef, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
+import { logger } from '@/lib/logger';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -98,7 +99,7 @@ export function GDPRAssistantChat() {
         }
       }
     } catch (error: any) {
-      console.error('Chat error:', error);
+      logger.error('Chat error:', error, 'COMPONENT');
       toast.error('Erreur: ' + error.message);
       setMessages(prev => prev.slice(0, -1)); // Retirer le message vide
     } finally {

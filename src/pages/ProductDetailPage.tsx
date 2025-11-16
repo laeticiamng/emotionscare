@@ -16,6 +16,7 @@ import { storefrontApiRequest } from '@/lib/shopify';
 import { formatPrice } from '@/lib/currency';
 import type { ShopifyProduct } from '@/types/shopify';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 const PRODUCT_QUERY = `
   query GetProduct($handle: String!) {
@@ -85,7 +86,7 @@ const ProductDetailPage: React.FC = () => {
           navigate('/store');
         }
       } catch (error) {
-        console.error('Error fetching product:', error);
+        logger.error('Error fetching product:', error, 'PAGE');
         toast.error("Erreur de chargement");
         navigate('/store');
       } finally {

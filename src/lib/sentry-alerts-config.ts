@@ -4,6 +4,7 @@
  */
 
 import * as Sentry from '@sentry/react';
+import { logger } from '@/lib/logger';
 
 /**
  * Alert severity levels
@@ -159,7 +160,7 @@ export const SENTRY_ALERT_RULES: AlertRule[] = [
  */
 export function initializeSentryAlerts(): void {
   if (!Sentry.getCurrentHub().getClient()) {
-    console.warn('[Sentry Alerts] Sentry client not initialized, skipping alert setup');
+    logger.warn('[Sentry Alerts] Sentry client not initialized, skipping alert setup', 'LIB');
     return;
   }
 
@@ -181,8 +182,8 @@ export function initializeSentryAlerts(): void {
   });
 
   if (import.meta.env.DEV) {
-    console.log('[Sentry Alerts] Configuration loaded');
-    console.log(`[Sentry Alerts] ${SENTRY_ALERT_RULES.filter(r => r.enabled).length} alert rules enabled`);
+    logger.debug('[Sentry Alerts] Configuration loaded', 'LIB');
+    logger.debug(`[Sentry Alerts] ${SENTRY_ALERT_RULES.filter(r => r.enabled).length} alert rules enabled`, 'LIB');
   }
 }
 

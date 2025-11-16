@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 
 export interface DailyChallenge {
   id: string;
@@ -64,7 +65,7 @@ export const useDailyChallenges = (emotionalProfile: string = 'all') => {
 
       setError(null);
     } catch (err: any) {
-      console.error('Error fetching challenges:', err);
+      logger.error('Error fetching challenges:', err, 'HOOK');
       setError(err.message);
     } finally {
       setLoading(false);
@@ -131,7 +132,7 @@ export const useDailyChallenges = (emotionalProfile: string = 'all') => {
         }));
       }
     } catch (err: any) {
-      console.error('Error updating challenge progress:', err);
+      logger.error('Error updating challenge progress:', err, 'HOOK');
       setError(err.message);
     }
   };
@@ -143,7 +144,7 @@ export const useDailyChallenges = (emotionalProfile: string = 'all') => {
       
       await fetchChallenges();
     } catch (err: any) {
-      console.error('Error generating challenges:', err);
+      logger.error('Error generating challenges:', err, 'HOOK');
       setError(err.message);
     }
   };

@@ -1,6 +1,7 @@
 // @ts-nocheck
 
 import { useCallback } from 'react';
+import { logger } from '@/lib/logger';
 
 type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 
@@ -46,13 +47,13 @@ export const useLogger = (context: string): Logger => {
         console.debug(prefix, message, ...args);
         break;
       case 'info':
-        console.info(prefix, message, ...args);
+        logger.info(prefix, message, ...args, 'HOOK');
         break;
       case 'warn':
-        console.warn(prefix, message, ...args);
+        logger.warn(prefix, message, ...args, 'HOOK');
         break;
       case 'error':
-        console.error(prefix, message, ...args);
+        logger.error(prefix, message, ...args, 'HOOK');
         break;
     }
   }, [context, currentLogLevel]);

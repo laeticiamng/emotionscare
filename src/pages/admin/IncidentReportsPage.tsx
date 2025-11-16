@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { logger } from '@/lib/logger';
 import { 
   AlertTriangle, 
   Clock, 
@@ -103,7 +104,7 @@ const IncidentReportsPage: React.FC = () => {
         toast.success('PDF généré');
       }
     } catch (error) {
-      console.error('Export error:', error);
+      logger.error('Export error:', error, 'PAGE');
       toast.error('Erreur lors de l\'export');
     }
   };

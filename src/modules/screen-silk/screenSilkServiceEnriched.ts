@@ -3,6 +3,7 @@
  */
 
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 
 export interface ScreenSilkSession {
   id: string;
@@ -268,7 +269,7 @@ export class ScreenSilkServiceEnriched {
 
     // Fallback : paramètres par défaut équilibrés
     // Raison inconnue : on ajuste légèrement vers des valeurs moyennes
-    console.warn(`[Screen Silk] Unknown adaptation reason: ${analysis.reason}. Using balanced defaults.`);
+    logger.warn(`[Screen Silk] Unknown adaptation reason: ${analysis.reason}. Using balanced defaults.`, 'MODULE');
 
     return {
       pattern_complexity: Math.max(3, Math.min(7, current.pattern_complexity)),

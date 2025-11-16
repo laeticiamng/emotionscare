@@ -7,6 +7,7 @@
  */
 
 import { supabase } from '@/lib/supabase';
+import { logger } from '@/lib/logger';
 import type {
   HealthConnection,
   HealthMetric,
@@ -101,7 +102,7 @@ export async function syncAppleHealthData(
       const typeMetrics = await getAppleHealthData(dataType, startTime, new Date());
       metrics.push(...typeMetrics.map(m => ({ ...m, user_id: userId })));
     } catch (error) {
-      console.error(`Failed to sync ${dataType} from Apple Health:`, error);
+      logger.error(`Failed to sync ${dataType} from Apple Health:`, error, 'SERVICE');
     }
   }
 
@@ -109,7 +110,7 @@ export async function syncAppleHealthData(
   if (metrics.length > 0) {
     const { error } = await supabase.from('health_metrics').insert(metrics);
     if (error) {
-      console.error('Failed to save Apple Health metrics:', error);
+      logger.error('Failed to save Apple Health metrics:', error, 'SERVICE');
     }
   }
 

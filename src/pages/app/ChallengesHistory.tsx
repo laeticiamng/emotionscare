@@ -11,6 +11,7 @@ import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { Bar, Doughnut, Line } from 'react-chartjs-2';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -64,7 +65,7 @@ const ChallengesHistory = () => {
 
       toast.success('Export généré avec succès !');
     } catch (error: any) {
-      console.error('Export error:', error);
+      logger.error('Export error:', error, 'PAGE');
       toast.error('Erreur lors de l\'export');
     } finally {
       setExportLoading(false);

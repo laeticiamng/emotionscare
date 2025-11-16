@@ -6,6 +6,8 @@
 
 // ============= Types et interfaces =============
 
+import { logger } from '@/lib/logger';
+
 export interface LogEntry {
   timestamp: string;
   level: 'debug' | 'info' | 'warn' | 'error';
@@ -145,7 +147,7 @@ class Logger {
     this.storage.addLog(entry);
     
     if (CONFIG.enableConsoleLog) {
-      console.info(`[${category}] ${message}`, context);
+      logger.info(`[${category}] ${message}`, context, 'LIB');
     }
   }
 
@@ -154,7 +156,7 @@ class Logger {
     this.storage.addLog(entry);
     
     if (CONFIG.enableConsoleLog) {
-      console.warn(`[${category}] ${message}`, context);
+      logger.warn(`[${category}] ${message}`, context, 'LIB');
     }
   }
 
@@ -169,7 +171,7 @@ class Logger {
     this.storage.addError(errorEntry);
     
     if (CONFIG.enableConsoleLog) {
-      console.error(`[${category}] ${message}`, error, context);
+      logger.error(`[${category}] ${message}`, error, context, 'LIB');
     }
   }
 

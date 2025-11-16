@@ -12,6 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Brain, Plus, Edit, Trash2, TrendingUp } from 'lucide-react';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 const MLAssignmentRulesPage: React.FC = () => {
   const queryClient = useQueryClient();
@@ -91,7 +92,7 @@ const MLAssignmentRulesPage: React.FC = () => {
       resetForm();
     },
     onError: (error) => {
-      console.error('Create rule error:', error);
+      logger.error('Create rule error:', error, 'PAGE');
       toast.error('Erreur lors de la création');
     }
   });
@@ -111,7 +112,7 @@ const MLAssignmentRulesPage: React.FC = () => {
       resetForm();
     },
     onError: (error) => {
-      console.error('Update rule error:', error);
+      logger.error('Update rule error:', error, 'PAGE');
       toast.error('Erreur lors de la mise à jour');
     }
   });
@@ -130,7 +131,7 @@ const MLAssignmentRulesPage: React.FC = () => {
       toast.success('Règle supprimée');
     },
     onError: (error) => {
-      console.error('Delete rule error:', error);
+      logger.error('Delete rule error:', error, 'PAGE');
       toast.error('Erreur lors de la suppression');
     }
   });

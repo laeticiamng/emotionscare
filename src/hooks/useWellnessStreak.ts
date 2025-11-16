@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 
 interface StreakData {
   currentStreak: number;
@@ -47,7 +48,7 @@ export const useWellnessStreak = () => {
         });
       }
     } catch (err) {
-      console.error('Error loading streak:', err);
+      logger.error('Error loading streak:', err, 'HOOK');
     } finally {
       setIsLoading(false);
     }
@@ -96,7 +97,7 @@ export const useWellnessStreak = () => {
         broken: result.streak_broken
       };
     } catch (err) {
-      console.error('Error checking in:', err);
+      logger.error('Error checking in:', err, 'HOOK');
       return { success: false, newStreak: 0, broken: false };
     }
   }, [user, loadStreak]);
@@ -130,7 +131,7 @@ export const useWellnessStreak = () => {
 
       return true;
     } catch (err) {
-      console.error('Error freezing streak:', err);
+      logger.error('Error freezing streak:', err, 'HOOK');
       return false;
     }
   }, [user, streak]);

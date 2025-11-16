@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 
 type LeaderboardPeriod = 'week' | 'month' | 'all';
 
@@ -188,7 +189,7 @@ export const useAdvancedLeaderboard = (): UseAdvancedLeaderboardResult => {
       setEntries(mapped);
       setError(null);
     } catch (err: any) {
-      console.error('Erreur lors du chargement du leaderboard avancé:', err);
+      logger.error('Erreur lors du chargement du leaderboard avancé:', err, 'HOOK');
       setError(err.message ?? 'Une erreur inattendue est survenue');
     } finally {
       setLoading(false);

@@ -2,6 +2,8 @@
  * Utilitaires pour exporter les conversations du coach
  */
 
+import { logger } from '@/lib/logger';
+
 interface ExportConversation {
   id: string;
   title: string;
@@ -224,7 +226,7 @@ export const generatePDFExport = async (
 export const validateExportOptions = (options: Partial<ExportOptions>): boolean => {
   const validFormats = ['json', 'pdf', 'txt', 'markdown'];
   if (options.format && !validFormats.includes(options.format)) {
-    console.error(`Invalid format: ${options.format}`);
+    logger.error(new Error(`Invalid format: ${options.format}`), 'LIB');
     return false;
   }
   return true;

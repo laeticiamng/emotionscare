@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { logger } from '@/lib/logger';
 import {
   Dialog,
   DialogContent,
@@ -181,7 +182,7 @@ export const CoachQuickActions = () => {
 
   const handleSendTemplate = (template: string) => {
     // Logique pour envoyer le template comme message
-    console.log('Sending template:', template);
+    logger.debug('Sending template:', template, 'COMPONENT');
     setSelectedTemplate(null);
   };
 

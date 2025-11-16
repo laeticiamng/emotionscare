@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 
 interface HarmonyPointsData {
   totalPoints: number;
@@ -62,7 +63,7 @@ export const useHarmonyPoints = () => {
         });
       }
     } catch (err) {
-      console.error('Error loading harmony points:', err);
+      logger.error('Error loading harmony points:', err, 'HOOK');
     } finally {
       setIsLoading(false);
     }
@@ -117,7 +118,7 @@ export const useHarmonyPoints = () => {
 
       return true;
     } catch (err) {
-      console.error('Error earning points:', err);
+      logger.error('Error earning points:', err, 'HOOK');
       return false;
     }
   }, [user, points]);
@@ -172,7 +173,7 @@ export const useHarmonyPoints = () => {
 
       return true;
     } catch (err) {
-      console.error('Error spending points:', err);
+      logger.error('Error spending points:', err, 'HOOK');
       return false;
     }
   }, [user, points]);

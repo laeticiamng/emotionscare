@@ -24,7 +24,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 
-import BreathSessionStats from '@/components/breath/BreathSessionStats';
+import { BreathSessionStats } from '@/components/breath/BreathSessionStats';
 import { BreathingTechniquesLibrary } from '@/components/breath/BreathingTechniquesLibrary';
 import { BreathingProgramsLibrary } from '@/components/breath/BreathingProgramsLibrary';
 import { BreathSessionFeedback } from '@/components/breath/BreathSessionFeedback';

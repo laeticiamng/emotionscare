@@ -7,6 +7,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { EmotionResult } from '@/types/emotion';
 import { computeBalanceFromScores } from './emotionScan.service';
+import { logger } from '@/lib/logger';
 
 export interface EmotionAnalysisRequest {
   type: 'text' | 'voice' | 'image';
@@ -40,7 +41,7 @@ class EmotionService {
       });
 
       if (error) {
-        console.error('Emotion analysis error:', error);
+        logger.error('Emotion analysis error:', error, 'SERVICE');
         return null;
       }
 
@@ -58,7 +59,7 @@ class EmotionService {
         user_id: undefined // Will be set by the hook
       };
     } catch (error) {
-      console.error('Unexpected error in emotion analysis:', error);
+      logger.error('Unexpected error in emotion analysis:', error, 'SERVICE');
       return null;
     }
   }
@@ -114,7 +115,7 @@ class EmotionService {
         });
 
       if (error) {
-        console.error('Error saving emotion result:', error);
+        logger.error('Error saving emotion result:', error, 'SERVICE');
         return null;
       }
 
@@ -128,7 +129,7 @@ class EmotionService {
         suggestions: [],
       } as EmotionResult;
     } catch (error) {
-      console.error('Unexpected error saving emotion result:', error);
+      logger.error('Unexpected error saving emotion result:', error, 'SERVICE');
       return null;
     }
   }
@@ -146,7 +147,7 @@ class EmotionService {
         .limit(limit);
 
       if (error) {
-        console.error('Error fetching user emotions:', error);
+        logger.error('Error fetching user emotions:', error, 'SERVICE');
         return [];
       }
 
@@ -160,7 +161,7 @@ class EmotionService {
         suggestions: item.recommendations ?? [],
       }));
     } catch (error) {
-      console.error('Unexpected error fetching user emotions:', error);
+      logger.error('Unexpected error fetching user emotions:', error, 'SERVICE');
       return [];
     }
   }
@@ -184,7 +185,7 @@ class EmotionService {
       });
 
       if (error) {
-        console.error('Error fetching emotion trends:', error);
+        logger.error('Error fetching emotion trends:', error, 'SERVICE');
         return {
           dominant_emotion: 'neutral',
           average_confidence: 0.5,
@@ -195,7 +196,7 @@ class EmotionService {
 
       return data;
     } catch (error) {
-      console.error('Unexpected error fetching emotion trends:', error);
+      logger.error('Unexpected error fetching emotion trends:', error, 'SERVICE');
       return {
         dominant_emotion: 'neutral',
         average_confidence: 0.5,

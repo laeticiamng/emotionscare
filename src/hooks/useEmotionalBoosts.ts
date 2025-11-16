@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useEmotionalEnergy } from './useEmotionalEnergy';
+import { logger } from '@/lib/logger';
 
 interface EmotionalBoost {
   id: string;
@@ -45,7 +46,7 @@ export const useEmotionalBoosts = () => {
         content: b.content
       })));
     } catch (err) {
-      console.error('Error loading boosts:', err);
+      logger.error('Error loading boosts:', err, 'HOOK');
     } finally {
       setIsLoading(false);
     }

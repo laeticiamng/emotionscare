@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Users, Plus, Edit, Trash2, Award, TrendingUp } from 'lucide-react';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 const TeamMemberSkillsPage: React.FC = () => {
   const queryClient = useQueryClient();
@@ -73,7 +74,7 @@ const TeamMemberSkillsPage: React.FC = () => {
       resetForm();
     },
     onError: (error) => {
-      console.error('Create member error:', error);
+      logger.error('Create member error:', error, 'PAGE');
       toast.error('Erreur lors de l\'ajout');
     }
   });
@@ -96,7 +97,7 @@ const TeamMemberSkillsPage: React.FC = () => {
       resetForm();
     },
     onError: (error) => {
-      console.error('Update member error:', error);
+      logger.error('Update member error:', error, 'PAGE');
       toast.error('Erreur lors de la mise à jour');
     }
   });
@@ -115,7 +116,7 @@ const TeamMemberSkillsPage: React.FC = () => {
       toast.success('Membre supprimé');
     },
     onError: (error) => {
-      console.error('Delete member error:', error);
+      logger.error('Delete member error:', error, 'PAGE');
       toast.error('Erreur lors de la suppression');
     }
   });

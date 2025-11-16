@@ -6,6 +6,7 @@ import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { logger } from '@/lib/logger';
 import { 
   Mail, MessageSquare, Bell, Phone, MapPin,
   Check, X, History, TrendingUp, Shield, Info
@@ -61,7 +62,7 @@ export const ConsentManagementPanel = () => {
         consentGiven: !currentValue,
       });
     } catch (error) {
-      console.error('Error updating consent:', error);
+      logger.error('Error updating consent:', error, 'COMPONENT');
     }
   };
 

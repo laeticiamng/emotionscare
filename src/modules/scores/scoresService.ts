@@ -5,6 +5,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import type {
+import { logger } from '@/lib/logger';
   UserScore,
   ScoreHistory,
   VibeMetrics,
@@ -119,7 +120,7 @@ export class ScoresService {
 
       return result;
     } catch (error) {
-      console.error('[ScoresService] Calculate scores error:', error);
+      logger.error('[ScoresService] Calculate scores error:', error, 'MODULE');
       throw error;
     }
   }
@@ -140,7 +141,7 @@ export class ScoresService {
       .limit(weeks);
 
     if (error) {
-      console.error('[ScoresService] Get user scores error:', error);
+      logger.error('[ScoresService] Get user scores error:', error, 'MODULE');
       return [];
     }
 
@@ -220,7 +221,7 @@ export class ScoresService {
 
       return vibeAnalysis;
     } catch (error) {
-      console.error('[ScoresService] Get current vibe error:', error);
+      logger.error('[ScoresService] Get current vibe error:', error, 'MODULE');
       // Retourner un vibe neutre par défaut
       return {
         current_vibe: 'neutral',
@@ -334,7 +335,7 @@ export class ScoresService {
           .slice(0, 3)
       };
     } catch (error) {
-      console.error('[ScoresService] Generate insights error:', error);
+      logger.error('[ScoresService] Generate insights error:', error, 'MODULE');
       return {
         insights: [],
         overall_sentiment: 'neutral',

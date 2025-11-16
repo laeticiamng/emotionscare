@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 
 export interface PrivacyPolicy {
   id: string;
@@ -59,7 +60,7 @@ export const usePrivacyPolicyVersions = () => {
       if (error) throw error;
       setPolicies(data || []);
     } catch (error: any) {
-      console.error('Error loading policies:', error);
+      logger.error('Error loading policies:', error, 'HOOK');
       toast({
         title: 'Erreur',
         description: 'Impossible de charger les politiques',
@@ -99,7 +100,7 @@ export const usePrivacyPolicyVersions = () => {
         }
       }
     } catch (error: any) {
-      console.error('Error loading current policy:', error);
+      logger.error('Error loading current policy:', error, 'HOOK');
     } finally {
       setLoading(false);
     }
@@ -129,7 +130,7 @@ export const usePrivacyPolicyVersions = () => {
       await loadPolicies();
       return data;
     } catch (error: any) {
-      console.error('Error creating policy:', error);
+      logger.error('Error creating policy:', error, 'HOOK');
       toast({
         title: 'Erreur',
         description: error.message || 'Impossible de créer la politique',
@@ -161,7 +162,7 @@ export const usePrivacyPolicyVersions = () => {
       await loadPolicies();
       await loadCurrentPolicy();
     } catch (error: any) {
-      console.error('Error publishing policy:', error);
+      logger.error('Error publishing policy:', error, 'HOOK');
       toast({
         title: 'Erreur',
         description: error.message || 'Impossible de publier la politique',
@@ -189,7 +190,7 @@ export const usePrivacyPolicyVersions = () => {
 
       if (error) throw error;
     } catch (error: any) {
-      console.error('Error logging changes:', error);
+      logger.error('Error logging changes:', error, 'HOOK');
     }
   }, []);
 
@@ -217,7 +218,7 @@ export const usePrivacyPolicyVersions = () => {
 
       await loadCurrentPolicy();
     } catch (error: any) {
-      console.error('Error accepting policy:', error);
+      logger.error('Error accepting policy:', error, 'HOOK');
       toast({
         title: 'Erreur',
         description: error.message || 'Impossible d\'accepter la politique',
@@ -238,7 +239,7 @@ export const usePrivacyPolicyVersions = () => {
       if (error) throw error;
       return data || [];
     } catch (error: any) {
-      console.error('Error loading policy changes:', error);
+      logger.error('Error loading policy changes:', error, 'HOOK');
       return [];
     }
   }, []);
@@ -262,7 +263,7 @@ export const usePrivacyPolicyVersions = () => {
         percentage: totalUsers ? ((acceptedUsers || 0) / totalUsers) * 100 : 0,
       };
     } catch (error: any) {
-      console.error('Error loading acceptance stats:', error);
+      logger.error('Error loading acceptance stats:', error, 'HOOK');
       return { total: 0, accepted: 0, pending: 0, percentage: 0 };
     }
   }, []);

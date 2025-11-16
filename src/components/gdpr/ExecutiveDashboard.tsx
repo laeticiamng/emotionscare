@@ -5,6 +5,7 @@ import { TrendingUp, TrendingDown, AlertTriangle, CheckCircle, Activity, Refresh
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Progress } from '@/components/ui/progress';
+import { logger } from '@/lib/logger';
 
 interface ExecutiveKPI {
   id: string;
@@ -38,7 +39,7 @@ export const ExecutiveDashboard = () => {
       .single();
 
     if (error && error.code !== 'PGRST116') {
-      console.error('Error loading KPI:', error);
+      logger.error('Error loading KPI:', error, 'COMPONENT');
       return;
     }
 

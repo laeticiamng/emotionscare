@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { RealtimeChannel } from '@supabase/supabase-js';
+import { logger } from '@/lib/logger';
 
 export interface InAppNotification {
   id: string;
@@ -39,7 +40,7 @@ export const useInAppNotifications = () => {
         setNotifications(notifs);
         setUnreadCount(notifs.filter(n => !n.read).length);
       } catch (error) {
-        console.error('Error fetching notifications:', error);
+        logger.error('Error fetching notifications:', error, 'HOOK');
       } finally {
         setLoading(false);
       }
@@ -60,7 +61,7 @@ export const useInAppNotifications = () => {
             filter: `user_id=eq.${user.id}`,
           },
           (payload) => {
-            console.log('Notification change received:', payload);
+            logger.debug('Notification change received:', payload, 'HOOK');
             
             if (payload.eventType === 'INSERT') {
               setNotifications(prev => [payload.new as InAppNotification, ...prev.slice(0, 9)]);
@@ -102,7 +103,7 @@ export const useInAppNotifications = () => {
 
       if (error) throw error;
     } catch (error) {
-      console.error('Error marking notification as read:', error);
+      logger.error('Error marking notification as read:', error, 'HOOK');
     }
   };
 
@@ -122,7 +123,7 @@ export const useInAppNotifications = () => {
       setNotifications(prev => prev.map(n => ({ ...n, read: true })));
       setUnreadCount(0);
     } catch (error) {
-      console.error('Error marking all as read:', error);
+      logger.error('Error marking all as read:', error, 'HOOK');
     }
   };
 
@@ -135,7 +136,7 @@ export const useInAppNotifications = () => {
 
       if (error) throw error;
     } catch (error) {
-      console.error('Error deleting notification:', error);
+      logger.error('Error deleting notification:', error, 'HOOK');
     }
   };
 

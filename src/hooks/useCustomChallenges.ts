@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 export interface CustomChallenge {
   id: string;
@@ -34,7 +35,7 @@ export const useCustomChallenges = () => {
       if (error) throw error;
       setChallenges(data || []);
     } catch (error) {
-      console.error('Error fetching custom challenges:', error);
+      logger.error('Error fetching custom challenges:', error, 'HOOK');
       toast.error('Erreur lors du chargement des défis');
     } finally {
       setLoading(false);
@@ -61,7 +62,7 @@ export const useCustomChallenges = () => {
       fetchChallenges();
       return data;
     } catch (error: any) {
-      console.error('Error creating challenge:', error);
+      logger.error('Error creating challenge:', error, 'HOOK');
       toast.error(error.message || 'Erreur lors de la création du défi');
       return null;
     }
@@ -80,7 +81,7 @@ export const useCustomChallenges = () => {
       fetchChallenges();
       return true;
     } catch (error: any) {
-      console.error('Error updating challenge:', error);
+      logger.error('Error updating challenge:', error, 'HOOK');
       toast.error(error.message || 'Erreur lors de la mise à jour');
       return false;
     }
@@ -98,7 +99,7 @@ export const useCustomChallenges = () => {
       toast.success('Défi supprimé');
       fetchChallenges();
     } catch (error: any) {
-      console.error('Error deleting challenge:', error);
+      logger.error('Error deleting challenge:', error, 'HOOK');
       toast.error(error.message || 'Erreur lors de la suppression');
     }
   };

@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { TextEmotionResult } from '@/types/realtime-emotion';
+import { logger } from '@/lib/logger';
 
 export const useTextEmotion = () => {
   const [latency, setLatency] = useState(0);
@@ -32,7 +33,7 @@ export const useTextEmotion = () => {
       return result;
 
     } catch (error) {
-      console.error('[useTextEmotion] Error:', error);
+      logger.error('[useTextEmotion] Error:', error, 'HOOK');
       throw error;
     } finally {
       setIsAnalyzing(false);

@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useCustomChallenges } from '@/hooks/useCustomChallenges';
 import { ArrowLeft, Plus } from 'lucide-react';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 const CreateCustomChallenge = () => {
   const navigate = useNavigate();
@@ -70,7 +71,7 @@ const CreateCustomChallenge = () => {
         navigate('/admin/challenges');
       }
     } catch (error) {
-      console.error('Error creating challenge:', error);
+      logger.error('Error creating challenge:', error, 'PAGE');
     } finally {
       setLoading(false);
     }

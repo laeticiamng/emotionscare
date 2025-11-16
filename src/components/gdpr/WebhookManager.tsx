@@ -8,6 +8,7 @@ import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { logger } from '@/lib/logger';
 import { 
   Webhook, Plus, Trash2, Edit, Play, RefreshCw, 
   CheckCircle, XCircle, Clock, Activity, TrendingUp
@@ -76,7 +77,7 @@ export const WebhookManager = () => {
       setIsDialogOpen(false);
       resetForm();
     } catch (error) {
-      console.error('Error saving webhook:', error);
+      logger.error('Error saving webhook:', error, 'COMPONENT');
     }
   };
 

@@ -8,6 +8,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import { supabase } from '@/integrations/supabase/client';
 import type {
+import { logger } from '@/lib/logger';
   EmotionalState,
   UserContext,
   ModuleRecommendation,
@@ -501,13 +502,13 @@ export class EmotionOrchestrator {
         });
 
       if (error) {
-        console.error('Failed to save feedback:', error);
+        logger.error('Failed to save feedback:', error, 'MODULE');
         return false;
       }
 
       return true;
     } catch (err) {
-      console.error('Error submitting feedback:', err);
+      logger.error('Error submitting feedback:', err, 'MODULE');
       return false;
     }
   }
@@ -531,7 +532,7 @@ export class EmotionOrchestrator {
         .lte('created_at', endDate.toISOString());
 
       if (error) {
-        console.error('Failed to fetch stats:', error);
+        logger.error('Failed to fetch stats:', error, 'MODULE');
         return {
           user_id: userId,
           module,
@@ -556,7 +557,7 @@ export class EmotionOrchestrator {
         period_end: endDate.toISOString(),
       };
     } catch (err) {
-      console.error('Error fetching stats:', err);
+      logger.error('Error fetching stats:', err, 'MODULE');
       return {
         user_id: userId,
         module,

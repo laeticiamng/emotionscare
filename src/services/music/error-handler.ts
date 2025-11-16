@@ -508,7 +508,7 @@ class MusicErrorHandlerService {
   private notifyUser(error: MusicError): void {
     // Cette fonction devrait être connectée au système de notifications UI
     // Pour l'instant, on log simplement
-    console.error(`[USER NOTIFICATION] ${error.userMessage}`);
+    logger.error(`[USER NOTIFICATION] ${error.userMessage}`, 'SERVICE');
 
     // Si vous avez un toast/notification system:
     // toastService.error(error.userMessage);

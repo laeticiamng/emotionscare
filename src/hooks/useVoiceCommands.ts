@@ -45,7 +45,7 @@ class AudioQueue {
       source.onended = () => this.playNext();
       source.start(0);
     } catch (error) {
-      console.error('❌ Error playing audio:', error);
+      logger.error('❌ Error playing audio:', error, 'HOOK');
       this.playNext();
     }
   }
@@ -126,7 +126,7 @@ class AudioRecorder {
       this.source.connect(this.processor);
       this.processor.connect(this.audioContext.destination);
     } catch (error) {
-      console.error('❌ Error accessing microphone:', error);
+      logger.error('❌ Error accessing microphone:', error, 'HOOK');
       throw error;
     }
   }
@@ -183,7 +183,7 @@ export const useVoiceCommands = ({ onCommand, onTranscript }: VoiceCommandsConfi
 
   const startListening = useCallback(async () => {
     try {
-      console.log('🎤 Starting voice commands...');
+      logger.debug('🎤 Starting voice commands...', 'HOOK');
       
       // Initialize audio context and queue
       if (!audioContextRef.current) {
@@ -197,7 +197,7 @@ export const useVoiceCommands = ({ onCommand, onTranscript }: VoiceCommandsConfi
       );
 
       ws.onopen = async () => {
-        console.log('✅ WebSocket connected');
+        logger.debug('✅ WebSocket connected', 'HOOK');
         setIsConnected(true);
         
         // Start recording
@@ -218,7 +218,7 @@ export const useVoiceCommands = ({ onCommand, onTranscript }: VoiceCommandsConfi
 
       ws.onmessage = async (event) => {
         const data = JSON.parse(event.data);
-        console.log('📨 Message reçu:', data.type);
+        logger.debug('📨 Message reçu:', data.type, 'HOOK');
 
         // Handle audio response
         if (data.type === 'response.audio.delta' && data.delta) {
@@ -238,7 +238,7 @@ export const useVoiceCommands = ({ onCommand, onTranscript }: VoiceCommandsConfi
         // Handle transcripts
         if (data.type === 'conversation.item.input_audio_transcription.completed') {
           const transcript = data.transcript || '';
-          console.log('📝 Transcription:', transcript);
+          logger.debug('📝 Transcription:', transcript, 'HOOK');
           currentTranscriptRef.current = transcript;
           onTranscript(transcript, true);
         }
@@ -251,7 +251,7 @@ export const useVoiceCommands = ({ onCommand, onTranscript }: VoiceCommandsConfi
         if (data.type === 'response.function_call_arguments.done') {
           try {
             const args = JSON.parse(data.arguments);
-            console.log('🔧 Function call:', data.name, args);
+            logger.debug('🔧 Function call:', data.name, args, 'HOOK');
             
             if (data.name === 'control_music_player') {
               onCommand('player', args);
@@ -259,18 +259,18 @@ export const useVoiceCommands = ({ onCommand, onTranscript }: VoiceCommandsConfi
               onCommand('generate', args);
             }
           } catch (error) {
-            console.error('❌ Error parsing function args:', error);
+            logger.error('❌ Error parsing function args:', error, 'HOOK');
           }
         }
       };
 
       ws.onerror = (error) => {
-        console.error('❌ WebSocket error:', error);
+        logger.error('❌ WebSocket error:', error, 'HOOK');
         toast.error('Erreur de connexion');
       };
 
       ws.onclose = () => {
-        console.log('🔌 WebSocket closed');
+        logger.debug('🔌 WebSocket closed', 'HOOK');
         setIsConnected(false);
         setIsListening(false);
       };
@@ -284,7 +284,7 @@ export const useVoiceCommands = ({ onCommand, onTranscript }: VoiceCommandsConfi
   }, [onCommand, onTranscript]);
 
   const stopListening = useCallback(() => {
-    console.log('🛑 Stopping voice commands...');
+    logger.debug('🛑 Stopping voice commands...', 'HOOK');
     
     recorderRef.current?.stop();
     wsRef.current?.close();

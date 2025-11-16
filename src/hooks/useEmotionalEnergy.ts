@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 
 interface EmotionalEnergyData {
   currentEnergy: number;
@@ -71,7 +72,7 @@ export const useEmotionalEnergy = () => {
         });
       }
     } catch (err) {
-      console.error('Error loading emotional energy:', err);
+      logger.error('Error loading emotional energy:', err, 'HOOK');
     } finally {
       setIsLoading(false);
     }
@@ -122,7 +123,7 @@ export const useEmotionalEnergy = () => {
 
       return true;
     } catch (err) {
-      console.error('Error spending energy:', err);
+      logger.error('Error spending energy:', err, 'HOOK');
       return false;
     }
   }, [user, energy]);
@@ -177,7 +178,7 @@ export const useEmotionalEnergy = () => {
 
       return true;
     } catch (err) {
-      console.error('Error gaining energy:', err);
+      logger.error('Error gaining energy:', err, 'HOOK');
       return false;
     }
   }, [user, energy]);
@@ -215,7 +216,7 @@ export const useEmotionalEnergy = () => {
         window.gtag('event', 'energy_refilled');
       }
     } catch (err) {
-      console.error('Error refilling energy:', err);
+      logger.error('Error refilling energy:', err, 'HOOK');
     }
   }, [user, energy]);
 

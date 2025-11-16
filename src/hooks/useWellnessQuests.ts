@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useEmotionalEnergy } from './useEmotionalEnergy';
 import { useHarmonyPoints } from './useHarmonyPoints';
 import { toast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 
 interface Quest {
   id: string;
@@ -76,7 +77,7 @@ export const useWellnessQuests = () => {
 
       setQuests(questsWithProgress);
     } catch (err) {
-      console.error('Error loading quests:', err);
+      logger.error('Error loading quests:', err, 'HOOK');
     } finally {
       setIsLoading(false);
     }
@@ -118,7 +119,7 @@ export const useWellnessQuests = () => {
       await loadQuests();
       return true;
     } catch (err) {
-      console.error('Error updating quest progress:', err);
+      logger.error('Error updating quest progress:', err, 'HOOK');
       return false;
     }
   }, [user, quests, loadQuests]);
@@ -165,7 +166,7 @@ export const useWellnessQuests = () => {
       await loadQuests();
       return true;
     } catch (err) {
-      console.error('Error claiming reward:', err);
+      logger.error('Error claiming reward:', err, 'HOOK');
       return false;
     }
   }, [user, quests, gainEnergy, earnPoints, loadQuests]);

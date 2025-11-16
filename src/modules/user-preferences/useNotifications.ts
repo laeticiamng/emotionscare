@@ -5,6 +5,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { UserPreferencesService } from './userPreferencesService';
 import type { Notification, CreateNotification } from './types';
+import { logger } from '@/lib/logger';
 
 interface UseNotificationsOptions {
   userId: string;
@@ -51,7 +52,7 @@ export const useNotifications = (options: UseNotificationsOptions) => {
       );
       setUnreadCount(count);
     } catch (err) {
-      console.error('Failed to load unread count:', err);
+      logger.error('Failed to load unread count:', err, 'MODULE');
     }
   }, [userId]);
 

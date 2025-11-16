@@ -7,6 +7,7 @@ import { useVoiceCommands } from '@/hooks/useVoiceCommands';
 import { useMusic } from '@/hooks/useMusic';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 const VoiceCommands = () => {
   const { play, pause, next, previous, stop } = useMusic();
@@ -14,7 +15,7 @@ const VoiceCommands = () => {
   const [assistantResponse, setAssistantResponse] = useState<string>('');
 
   const handleCommand = async (command: string, params?: any) => {
-    console.log('🎯 Executing command:', command, params);
+    logger.debug('🎯 Executing command:', command, params, 'COMPONENT');
 
     if (command === 'player') {
       switch (params.action) {
@@ -40,7 +41,7 @@ const VoiceCommands = () => {
           break;
       }
     } else if (command === 'generate') {
-      console.log('🎵 Generating music for:', params.emotion, 'intensity:', params.intensity);
+      logger.debug('🎵 Generating music for:', params.emotion, 'intensity:', params.intensity, 'COMPONENT');
       toast.success(`Génération de musique ${params.emotion}...`);
     }
   };

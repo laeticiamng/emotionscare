@@ -11,6 +11,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { AlertTriangle, Play, CheckCircle2, Clock, ExternalLink } from 'lucide-react';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 const AlertTesterPage: React.FC = () => {
   const queryClient = useQueryClient();
@@ -86,7 +87,7 @@ const AlertTesterPage: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['recent-test-tickets'] });
     },
     onError: (error: any) => {
-      console.error('Create test alert error:', error);
+      logger.error('Create test alert error:', error, 'PAGE');
       toast.error(`❌ Erreur: ${error.message}`);
     }
   });

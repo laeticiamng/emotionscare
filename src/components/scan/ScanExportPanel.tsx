@@ -2,6 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { logger } from '@/lib/logger';
 import {
   Download, FileJson, FileText, FileUp, Copy, Share2,
   CheckCircle2, AlertCircle, Loader2
@@ -93,7 +94,7 @@ export const ScanExportPanel: React.FC = () => {
           duration: 3000
         });
       } catch (error) {
-        console.error('Erreur lors de l\'export:', error);
+        logger.error('Erreur lors de l\'export:', error, 'COMPONENT');
         toast({
           title: 'Erreur d\'export',
           description: 'Une erreur s\'est produite lors de l\'export.',

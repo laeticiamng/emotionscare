@@ -1,5 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import type {
+import { logger } from '@/lib/logger';
   Achievement,
   AchievementStats,
   CreateAchievement,
@@ -270,7 +271,7 @@ export const achievementsService = {
       .eq('user_id', userId);
 
     if (error) {
-      console.error('Failed to grant XP:', error);
+      logger.error('Failed to grant XP:', error, 'MODULE');
     }
   },
 

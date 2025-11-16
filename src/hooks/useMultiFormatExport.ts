@@ -2,6 +2,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 export interface ExportOptions {
   format: 'pdf' | 'excel' | 'json' | 'csv';
@@ -15,7 +16,7 @@ export const useMultiFormatExport = () => {
   const exportMutation = useMutation({
     mutationFn: async (options: ExportOptions) => {
       const startTime = Date.now();
-      console.log('Exporting with options:', options);
+      logger.debug('Exporting with options:', options, 'HOOK');
 
       if (options.format === 'pdf') {
         // Use existing PDF generation
@@ -85,7 +86,7 @@ export const useMultiFormatExport = () => {
       toast.success(`Export ${variables.format.toUpperCase()} généré avec succès`);
     },
     onError: (error: Error) => {
-      console.error('Export error:', error);
+      logger.error('Export error:', error, 'HOOK');
       toast.error(`Erreur lors de l'export: ${error.message}`);
     },
   });
