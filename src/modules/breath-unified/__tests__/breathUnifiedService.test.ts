@@ -246,7 +246,7 @@ describe('BreathUnifiedService', () => {
         });
 
         expect(recommendation.duration_minutes).toBeLessThanOrEqual(5);
-        expect(recommendation.protocol_config.duration_minutes).toBeLessThanOrEqual(5);
+        expect(recommendation.protocol_config?.duration_minutes).toBeLessThanOrEqual(5);
       });
 
       it('caps duration at 15 minutes', async () => {
@@ -283,8 +283,8 @@ describe('BreathUnifiedService', () => {
         const recommendation = await service.getRecommendation('user-123', 8, 2);
 
         expect(recommendation.protocol_config).toBeDefined();
-        expect(recommendation.protocol_config.protocol).toBe(recommendation.protocol);
-        expect(recommendation.protocol_config.duration_minutes).toBe(
+        expect(recommendation.protocol_config?.protocol).toBe(recommendation.protocol);
+        expect(recommendation.protocol_config?.duration_minutes).toBe(
           recommendation.duration_minutes
         );
       });

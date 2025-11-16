@@ -12,10 +12,7 @@
 // SERVICE
 // ============================================================================
 
-export {
-  dashboardService,
-  default as dashboardServiceDefault,
-} from './dashboardService';
+export { DashboardService } from './dashboardService';
 
 // ============================================================================
 // TYPES
@@ -24,8 +21,5 @@ export {
 // Re-export des types depuis le service
 export type {
   DashboardStats,
-  DashboardWidget,
-  ActivitySummary,
-  ProgressMetrics,
-  WellnessScore,
+  ModuleActivity,
 } from './dashboardService';

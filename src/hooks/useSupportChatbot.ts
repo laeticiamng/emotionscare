@@ -55,7 +55,7 @@ export function useSupportChatbot(userId: string | undefined) {
 
       // Si pas de conversation ouverte, en créer une
       if (!conversation) {
-        conversation = await supportChatbotService.createConversation(userId);
+        conversation = await supportChatbotService.createConversation(userId) ?? undefined;
       }
 
       if (!conversation) {

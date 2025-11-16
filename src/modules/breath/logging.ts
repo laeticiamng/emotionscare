@@ -84,7 +84,9 @@ export async function logAndJournal(payload: LogAndJournalPayload): Promise<LogA
 
       result.journalEntry = entry;
 
-      logger.info('journal:auto:success', { entryId: entry.id }, 'JOURNAL');
+      if (entry) {
+        logger.info('journal:auto:success', { entryId: entry.id }, 'JOURNAL');
+      }
     } catch (error) {
       const normalizedError = error instanceof Error ? error : new Error('Unknown journal error');
       result.errors.journal = normalizedError;

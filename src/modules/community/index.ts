@@ -9,10 +9,7 @@
 // SERVICE
 // ============================================================================
 
-export {
-  communityService,
-  default as communityServiceDefault,
-} from './communityService';
+export { CommunityService } from './communityService';
 
 // ============================================================================
 // TYPES
@@ -23,10 +20,11 @@ export * from './types';
 
 // Re-export des types depuis le service
 export type {
-  CommunityPost,
-  CommunityComment,
-  CommunityReaction,
-  CommunityMember,
-  CommunityEvent,
-  CommunityChallenge,
+  AuraConnection,
+  Buddy,
+  Post,
+  Comment,
+  Group,
+  Reaction,
+  NotificationPayload,
 } from './communityService';

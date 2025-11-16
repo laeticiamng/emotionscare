@@ -5,6 +5,7 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 import {
+  ARService,
   arService,
   ARSessionConfig,
   AuraVisualization,
@@ -31,7 +32,7 @@ export function useARSession(options: UseARSessionOptions = {}) {
   useEffect(() => {
     const checkARSupport = async () => {
       try {
-        const supported = await arService.constructor.isARSupported();
+        const supported = await ARService.isARSupported();
         setIsARSupported(supported);
       } catch (err) {
         const errorMsg = err instanceof Error ? err.message : String(err);
@@ -431,7 +432,7 @@ export function useARCapabilities() {
   useEffect(() => {
     const fetchCapabilities = async () => {
       try {
-        const caps = await arService.constructor.getARCapabilities();
+        const caps = await ARService.getARCapabilities();
         setCapabilities(caps);
       } catch (err) {
         const errorMsg = err instanceof Error ? err.message : String(err);

@@ -255,6 +255,7 @@ export function getErrorMessage(
 export class ScanError extends Error {
   public readonly code: ErrorCode;
   public readonly localizedMessage: ErrorMessage;
+  public cause?: unknown;
 
   constructor(code: ErrorCode, language: Language = 'fr', cause?: unknown) {
     const localizedMessage = getErrorMessage(code, language);
