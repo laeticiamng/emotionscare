@@ -1,4 +1,3 @@
-// @ts-nocheck
 export { PageRoot } from './PageRoot';
 export { PageHeader } from './PageHeader';
 export { UnifiedPageLayout as PageLayout } from '../ui/unified-page-layout';
@@ -10,3 +9,4 @@ export { UserModeIndicator } from './UserModeIndicator';
 export { LoginRedirect } from './LoginRedirect';
 export { RealtimeNotifications } from './RealtimeNotifications';
 export { TipsSection } from './TipsSection';
+export { ErrorBoundary, withErrorBoundary } from './ErrorBoundary';
