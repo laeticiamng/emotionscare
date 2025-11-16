@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import {
   Trophy,
-  Fire,
+  Flame,
   Users,
   Target,
   Medal,
@@ -48,7 +48,7 @@ const challenges: Challenge[] = [
     description: '7 sessions de scan émotionnel consécutives',
     participants: 3421,
     progress: 65,
-    icon: <Fire className="h-5 w-5" />,
+    icon: <Flame className="h-5 w-5" />,
     color: 'bg-orange-500',
     reward: '+100 points',
   },
@@ -258,7 +258,7 @@ const CommunityEngagement: React.FC = () => {
                           {entry.badge && <span className="text-lg">{entry.badge}</span>}
                         </div>
                         <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                          <Fire className="h-3 w-3" />
+                          <Flame className="h-3 w-3" />
                           <span>{entry.streak} jours</span>
                         </div>
                       </div>
