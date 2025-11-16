@@ -11,6 +11,8 @@ import { JournalFeed } from './JournalFeed'
 import { PanasSuggestionsCard } from './PanasSuggestionsCard'
 import { JournalExportPanel } from '@/components/journal/JournalExportPanel'
 import { JournalAnalyticsDashboard } from '@/components/journal/JournalAnalyticsDashboard'
+import { JournalWordCloud } from '@/components/journal/JournalWordCloud'
+import { LivingPagesAnimation } from '@/components/journal/LivingPagesAnimation'
 
 const PAGE_SIZE = 10
 
@@ -90,6 +92,12 @@ export default function JournalView() {
       <div className="grid gap-8 lg:grid-cols-2">
         <JournalAnalyticsDashboard notes={notes} />
         <JournalExportPanel notes={notes} />
+      </div>
+
+      {/* Visualizations */}
+      <div className="grid gap-8 lg:grid-cols-2">
+        <LivingPagesAnimation notes={notes} maxPages={12} />
+        <JournalWordCloud notes={notes} maxWords={50} />
       </div>
 
       <JournalFeed
