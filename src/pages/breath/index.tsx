@@ -26,6 +26,7 @@ import { cn } from '@/lib/utils';
 
 import BreathSessionStats from '@/components/breath/BreathSessionStats';
 import { BreathingTechniquesLibrary } from '@/components/breath/BreathingTechniquesLibrary';
+import { BreathingProgramsLibrary } from '@/components/breath/BreathingProgramsLibrary';
 import { BreathSessionFeedback } from '@/components/breath/BreathSessionFeedback';
 import { BreathProgressMilestones } from '@/components/breath/BreathProgressMilestones';
 import { useBreathSessions } from '@/hooks/useBreathSessions';
@@ -270,20 +271,24 @@ const BreathPage: React.FC = () => {
           />
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full space-y-6">
-            <TabsList className="grid w-full grid-cols-4 bg-slate-900/50 border border-slate-800/50">
-              <TabsTrigger value="session" className="flex items-center gap-2">
+            <TabsList className="grid w-full grid-cols-5 bg-slate-900/50 border border-slate-800/50">
+              <TabsTrigger value="session" className="flex items-center gap-1 text-xs sm:text-sm">
                 <Wind className="h-4 w-4" />
                 <span className="hidden sm:inline">Séance</span>
               </TabsTrigger>
-              <TabsTrigger value="stats" className="flex items-center gap-2">
+              <TabsTrigger value="stats" className="flex items-center gap-1 text-xs sm:text-sm">
                 <Zap className="h-4 w-4" />
                 <span className="hidden sm:inline">Stats</span>
               </TabsTrigger>
-              <TabsTrigger value="techniques" className="flex items-center gap-2">
+              <TabsTrigger value="techniques" className="flex items-center gap-1 text-xs sm:text-sm">
                 <BookOpen className="h-4 w-4" />
-                <span className="hidden sm:inline">Techniques</span>
+                <span className="hidden sm:inline">Tech</span>
               </TabsTrigger>
-              <TabsTrigger value="progress" className="flex items-center gap-2">
+              <TabsTrigger value="programs" className="flex items-center gap-1 text-xs sm:text-sm">
+                <Zap className="h-4 w-4" />
+                <span className="hidden sm:inline">Prog</span>
+              </TabsTrigger>
+              <TabsTrigger value="progress" className="flex items-center gap-1 text-xs sm:text-sm">
                 <Trophy className="h-4 w-4" />
                 <span className="hidden sm:inline">Exploits</span>
               </TabsTrigger>
@@ -366,6 +371,11 @@ const BreathPage: React.FC = () => {
             {/* Techniques Tab */}
             <TabsContent value="techniques">
               <BreathingTechniquesLibrary />
+            </TabsContent>
+
+            {/* Programs Tab */}
+            <TabsContent value="programs">
+              <BreathingProgramsLibrary />
             </TabsContent>
 
             {/* Progress Tab */}
