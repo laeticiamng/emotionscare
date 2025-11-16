@@ -14,6 +14,7 @@ export const initialState: MusicState = {
   volume: 0.7,
   currentTime: 0,
   duration: 0,
+  progress: 0,
   activePreset: initialPreset,
   lastPresetChange: null,
   playlist: [],

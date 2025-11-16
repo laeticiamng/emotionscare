@@ -23,8 +23,16 @@ export const Sentry = {
     const message = breadcrumb.message || '';
     const data = breadcrumb.data;
     
-    const logLevel = level === 'warning' ? 'warn' : level;
-    logger[logLevel as keyof typeof logger](message, data, category.toUpperCase());
+    // Map level to logger method
+    if (level === 'debug') {
+      logger.debug(message, data, category.toUpperCase());
+    } else if (level === 'warning' || level === 'warn') {
+      logger.warn(message, data, category.toUpperCase());
+    } else if (level === 'error') {
+      logger.error(message, data, category.toUpperCase());
+    } else {
+      logger.info(message, data, category.toUpperCase());
+    }
   },
   
   getCurrentHub() {

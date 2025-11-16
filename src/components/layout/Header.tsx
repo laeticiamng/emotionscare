@@ -147,15 +147,9 @@ const Header: React.FC<HeaderProps> = ({
       setIsLoadingXp(true);
 
       try {
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('xp')
-          .eq('id', user.id)
-          .single();
-
-        if (error) {
-          throw error;
-        }
+        // Note: xp column does not exist in profiles table
+        // Using default value for now
+        const data = { xp: 0 };
 
         if (data && isMounted) {
           setXp(parseXpValue(data.xp));
