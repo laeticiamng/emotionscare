@@ -1,8 +1,7 @@
-// @ts-nocheck
-
 /**
  * B2C SETTINGS PAGE - EMOTIONSCARE
  * Page des paramètres B2C accessible WCAG 2.1 AA
+ * Avec persistance réelle via useUserSettings
  */
 
 import React, { useState, useEffect } from 'react';
@@ -11,18 +10,95 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Settings, Bell, Eye, Shield, Palette, Heart } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Settings, Bell, Palette, Heart, Shield, Loader2, AlertCircle } from "lucide-react";
+import { useUserSettings } from "@/hooks/useUserSettings";
+import { useToast } from "@/hooks/use-toast";
 
 const B2CSettingsPage = () => {
-  const [notifications, setNotifications] = useState(true);
-  const [darkMode, setDarkMode] = useState(false);
-  const [autoScan, setAutoScan] = useState(false);
-  const [privacyMode, setPrivacyMode] = useState(false);
+  const { settings, loading, saving, updateSettings, resetSettings, error: settingsError } = useUserSettings();
+  const { toast } = useToast();
+
+  // Local state pour les modifications non sauvegardées
+  const [localSettings, setLocalSettings] = useState({
+    notifications: true,
+    darkMode: false,
+    autoScan: false,
+    privacyMode: false,
+    language: 'fr',
+  });
+
+  // Charger les settings dans le state local quand ils arrivent
+  useEffect(() => {
+    if (settings?.preferences) {
+      setLocalSettings({
+        notifications: settings.preferences.notifications ?? true,
+        darkMode: settings.preferences.theme === 'dark',
+        autoScan: settings.preferences.auto_scan ?? false,
+        privacyMode: settings.preferences.privacy_mode ?? false,
+        language: settings.preferences.language ?? 'fr',
+      });
+    }
+  }, [settings]);
 
   // Focus management pour l'accessibilité
   useEffect(() => {
     document.title = "Paramètres | EmotionsCare - Personnalisation";
   }, []);
+
+  // Vérifier si des changements ont été faits
+  const hasChanges = settings?.preferences ? (
+    localSettings.notifications !== (settings.preferences.notifications ?? true) ||
+    localSettings.darkMode !== (settings.preferences.theme === 'dark') ||
+    localSettings.autoScan !== (settings.preferences.auto_scan ?? false) ||
+    localSettings.privacyMode !== (settings.preferences.privacy_mode ?? false) ||
+    localSettings.language !== (settings.preferences.language ?? 'fr')
+  ) : false;
+
+  const handleSave = async () => {
+    try {
+      await updateSettings({
+        preferences: {
+          notifications: localSettings.notifications,
+          theme: localSettings.darkMode ? 'dark' : 'light',
+          auto_scan: localSettings.autoScan,
+          privacy_mode: localSettings.privacyMode,
+          language: localSettings.language,
+        }
+      });
+
+      toast({
+        title: "Paramètres sauvegardés",
+        description: "Vos modifications ont été enregistrées avec succès",
+      });
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de sauvegarder les paramètres",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleReset = async () => {
+    if (!window.confirm("Êtes-vous sûr de vouloir réinitialiser tous les paramètres aux valeurs par défaut ?")) {
+      return;
+    }
+
+    try {
+      await resetSettings();
+      toast({
+        title: "Paramètres réinitialisés",
+        description: "Tous les paramètres ont été restaurés aux valeurs par défaut",
+      });
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de réinitialiser les paramètres",
+        variant: "destructive",
+      });
+    }
+  };
 
   const handleKeyDown = (event: React.KeyboardEvent, action: () => void) => {
     if (event.key === 'Enter' || event.key === ' ') {
@@ -30,6 +106,15 @@ const B2CSettingsPage = () => {
       action();
     }
   };
+
+  if (loading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <span className="ml-2">Chargement des paramètres...</span>
+      </div>
+    );
+  }
 
   const settingsCategories = [
     {
@@ -41,16 +126,9 @@ const B2CSettingsPage = () => {
           id: "push-notifications",
           label: "Notifications push",
           description: "Recevoir des notifications sur votre appareil",
-          value: notifications,
-          onChange: setNotifications
+          value: localSettings.notifications,
+          onChange: (value: boolean) => setLocalSettings(prev => ({ ...prev, notifications: value }))
         },
-        {
-          id: "email-notifications", 
-          label: "Notifications email",
-          description: "Recevoir des résumés par email",
-          value: false,
-          onChange: () => {}
-        }
       ]
     },
     {
@@ -62,8 +140,8 @@ const B2CSettingsPage = () => {
           id: "dark-mode",
           label: "Mode sombre",
           description: "Utiliser le thème sombre",
-          value: darkMode,
-          onChange: setDarkMode
+          value: localSettings.darkMode,
+          onChange: (value: boolean) => setLocalSettings(prev => ({ ...prev, darkMode: value }))
         }
       ]
     },
@@ -76,8 +154,8 @@ const B2CSettingsPage = () => {
           id: "auto-scan",
           label: "Scan automatique",
           description: "Scanner vos émotions automatiquement",
-          value: autoScan,
-          onChange: setAutoScan
+          value: localSettings.autoScan,
+          onChange: (value: boolean) => setLocalSettings(prev => ({ ...prev, autoScan: value }))
         }
       ]
     },
@@ -89,9 +167,9 @@ const B2CSettingsPage = () => {
         {
           id: "privacy-mode",
           label: "Mode privé",
-          description: "Anonymiser vos données",
-          value: privacyMode,
-          onChange: setPrivacyMode
+          description: "Ne pas stocker l'historique des scans",
+          value: localSettings.privacyMode,
+          onChange: (value: boolean) => setLocalSettings(prev => ({ ...prev, privacyMode: value }))
         }
       ]
     }
@@ -99,103 +177,116 @@ const B2CSettingsPage = () => {
 
   return (
     <>
-      {/* Skip Links pour l'accessibilité */}
-      <a 
-        href="#main-content" 
-        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-primary text-primary-foreground px-4 py-2 rounded-md z-50"
-        tabIndex={0}
-      >
-        Aller au contenu principal
-      </a>
-
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6" data-testid="page-root">
-        <div className="max-w-4xl mx-auto space-y-6">
-          <main id="main-content" role="main">
-            {/* Header */}
-            <header className="text-center mb-8">
-              <h1 className="text-4xl font-bold text-gray-900 mb-4">
-                <Settings className="inline-block mr-3 text-blue-600" aria-hidden="true" />
+      <div className="min-h-screen bg-gradient-to-b from-background via-background to-secondary/5">
+        <div className="container mx-auto px-4 py-8 max-w-4xl">
+          <header className="mb-8">
+            <div className="flex items-center gap-3 mb-2">
+              <Settings className="w-8 h-8 text-primary" aria-hidden="true" />
+              <h1 className="text-3xl font-bold text-foreground">
                 Paramètres
               </h1>
-              <p className="text-xl text-gray-600">
-                Personnalisez votre expérience EmotionsCare
-              </p>
-            </header>
-
-            {/* Paramètres par catégorie */}
-            <div className="space-y-6">
-              {settingsCategories.map((category, index) => (
-                <section key={index} aria-labelledby={`category-${index}-title`}>
-                  <Card className="shadow-lg">
-                    <CardHeader>
-                      <CardTitle id={`category-${index}-title`} className="flex items-center gap-3">
-                        <div 
-                          className="p-2 bg-blue-100 rounded-lg text-blue-600"
-                          role="img"
-                          aria-label={`Icône ${category.title}`}
-                        >
-                          {category.icon}
-                        </div>
-                        {category.title}
-                      </CardTitle>
-                      <CardDescription>{category.description}</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <fieldset className="space-y-4">
-                        <legend className="sr-only">Paramètres {category.title}</legend>
-                        {category.settings.map((setting) => (
-                          <div 
-                            key={setting.id} 
-                            className="flex items-center justify-between p-4 border rounded-lg focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2"
-                          >
-                            <div className="flex-1">
-                              <h3 className="font-medium text-gray-900">{setting.label}</h3>
-                              <p className="text-sm text-gray-600" id={`${setting.id}-desc`}>
-                                {setting.description}
-                              </p>
-                            </div>
-                            <Switch
-                              checked={setting.value}
-                              onCheckedChange={setting.onChange}
-                              aria-labelledby={`${setting.id}-label`}
-                              aria-describedby={`${setting.id}-desc`}
-                              className="focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                            />
-                            <label 
-                              id={`${setting.id}-label`}
-                              htmlFor={setting.id}
-                              className="sr-only"
-                            >
-                              {setting.label}
-                            </label>
-                          </div>
-                        ))}
-                      </fieldset>
-                    </CardContent>
-                  </Card>
-                </section>
-              ))}
             </div>
+            <p className="text-muted-foreground">
+              Personnalisez votre expérience EmotionsCare
+            </p>
+          </header>
 
-            {/* Préférences générales */}
-            <section aria-labelledby="general-preferences-title">
-              <Card className="shadow-lg">
+          <main>
+            {/* Alerte d'erreur */}
+            {settingsError && (
+              <Alert variant="destructive" className="mb-6">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{settingsError}</AlertDescription>
+              </Alert>
+            )}
+
+            {/* Alerte de modifications non sauvegardées */}
+            {hasChanges && (
+              <Alert className="mb-6 bg-blue-50 border-blue-200">
+                <AlertCircle className="h-4 w-4 text-blue-600" />
+                <AlertDescription className="text-blue-900">
+                  Vous avez des modifications non sauvegardées
+                </AlertDescription>
+              </Alert>
+            )}
+
+            {/* Catégories de paramètres */}
+            {settingsCategories.map((category, index) => (
+              <section
+                key={index}
+                className="mb-6"
+                aria-labelledby={`category-${index}-title`}
+              >
+                <Card>
+                  <CardHeader>
+                    <div className="flex items-center gap-2">
+                      <div className="text-primary" aria-hidden="true">
+                        {category.icon}
+                      </div>
+                      <div>
+                        <CardTitle id={`category-${index}-title`}>
+                          {category.title}
+                        </CardTitle>
+                        <CardDescription>
+                          {category.description}
+                        </CardDescription>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {category.settings.map((setting) => (
+                      <div
+                        key={setting.id}
+                        className="flex items-center justify-between p-4 rounded-lg hover:bg-secondary/50 transition-colors"
+                      >
+                        <div className="flex-1">
+                          <label
+                            htmlFor={setting.id}
+                            className="font-medium text-foreground cursor-pointer"
+                          >
+                            {setting.label}
+                          </label>
+                          <p className="text-sm text-muted-foreground">
+                            {setting.description}
+                          </p>
+                        </div>
+                        <Switch
+                          id={setting.id}
+                          checked={setting.value}
+                          onCheckedChange={setting.onChange}
+                          aria-label={setting.label}
+                          className="ml-4"
+                          onKeyDown={(e) => handleKeyDown(e, () => setting.onChange(!setting.value))}
+                        />
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+              </section>
+            ))}
+
+            {/* Préférences linguistiques */}
+            <section className="mb-6" aria-labelledby="language-title">
+              <Card>
                 <CardHeader>
-                  <CardTitle id="general-preferences-title" className="flex items-center gap-3">
-                    <Eye className="w-5 h-5 text-purple-600" aria-hidden="true" />
-                    Préférences générales
+                  <CardTitle id="language-title">
+                    Langue et Région
                   </CardTitle>
+                  <CardDescription>
+                    Sélectionnez votre langue préférée
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
                       <h3 className="font-medium">Langue</h3>
-                      <p className="text-sm text-gray-600" id="language-desc">
-                        Choisir la langue de l'interface
-                      </p>
+                      <p className="text-sm text-muted-foreground">Choisir la langue de l'interface</p>
                     </div>
-                    <Select defaultValue="fr" aria-describedby="language-desc">
-                      <SelectTrigger className="w-32 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2">
+                    <Select
+                      value={localSettings.language}
+                      onValueChange={(value) => setLocalSettings(prev => ({ ...prev, language: value }))}
+                    >
+                      <SelectTrigger className="w-40" aria-label="Sélectionner la langue">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -208,7 +299,7 @@ const B2CSettingsPage = () => {
                   <div className="flex items-center justify-between">
                     <div>
                       <h3 className="font-medium">Fuseau horaire</h3>
-                      <p className="text-sm text-gray-600">Votre fuseau horaire local</p>
+                      <p className="text-sm text-muted-foreground">Votre fuseau horaire local</p>
                     </div>
                     <Badge variant="secondary" role="status" aria-label="Fuseau horaire actuel">
                       Europe/Paris
@@ -220,20 +311,30 @@ const B2CSettingsPage = () => {
 
             {/* Actions */}
             <nav aria-label="Actions des paramètres" className="flex gap-4 justify-center">
-              <Button 
+              <Button
                 variant="outline"
+                onClick={handleReset}
+                disabled={saving}
                 className="focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                 aria-label="Réinitialiser tous les paramètres aux valeurs par défaut"
-                tabIndex={0}
               >
+                {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
                 Réinitialiser
               </Button>
-              <Button 
+              <Button
+                onClick={handleSave}
+                disabled={!hasChanges || saving}
                 className="focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                 aria-label="Sauvegarder toutes les modifications des paramètres"
-                tabIndex={0}
               >
-                Sauvegarder les modifications
+                {saving ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    Sauvegarde...
+                  </>
+                ) : (
+                  'Sauvegarder les modifications'
+                )}
               </Button>
             </nav>
           </main>

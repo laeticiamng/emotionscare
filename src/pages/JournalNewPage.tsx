@@ -1,6 +1,5 @@
-// @ts-nocheck
 import React, { useEffect, useState } from 'react';
-import { ArrowLeft, Save, Mic, MicOff, Camera, Image, Calendar } from 'lucide-react';
+import { ArrowLeft, Save, Mic, MicOff, Camera, Image, Calendar, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,10 +11,14 @@ import { useMotionPrefs } from '@/hooks/useMotionPrefs';
 import { cn } from '@/lib/utils';
 import { logger } from '@/lib/logger';
 import { MedicalDisclaimerDialog, useMedicalDisclaimer } from '@/components/medical/MedicalDisclaimerDialog';
+import { useJournalMutations } from '@/hooks/useJournalMutations';
+import { useToast } from '@/hooks/use-toast';
 
 const JournalNewPage: React.FC = () => {
   const navigate = useNavigate();
   const { showDisclaimer, handleAccept, handleDecline } = useMedicalDisclaimer('journal');
+  const { createEntry, loading } = useJournalMutations();
+  const { toast } = useToast();
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [mood, setMood] = useState('');
@@ -42,30 +45,42 @@ const JournalNewPage: React.FC = () => {
     'amis', 'lecture', 'nature', 'méditation', 'objectifs', 'défis'
   ];
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!title.trim() || !content.trim()) {
-      alert('Veuillez remplir au moins le titre et le contenu');
+      toast({
+        title: "Erreur",
+        description: 'Veuillez remplir au moins le titre et le contenu',
+        variant: "destructive",
+      });
       return;
     }
 
-    const entry = {
-      id: Date.now().toString(),
-      title,
-      content,
-      mood,
-      tags,
-      isPrivate,
-      date: selectedDate,
-      createdAt: new Date().toISOString(),
-    };
+    try {
+      await createEntry({
+        title: title.trim(),
+        content: content.trim(),
+        mood,
+        tags,
+        is_private: isPrivate,
+      });
 
-    // Ici, sauvegarder l'entrée dans le store/API
-    logger.info('Nouvelle entrée de journal', { entry }, 'UI');
-    
-    // Retour vers la page journal avec un message de succès
-    navigate('/app/journal', { 
-      state: { message: 'Entrée sauvegardée avec succès!' } 
-    });
+      toast({
+        title: "Entrée sauvegardée",
+        description: "Votre entrée de journal a été sauvegardée avec succès",
+      });
+
+      logger.info('Journal entry saved successfully', { title }, 'UI');
+
+      // Retour vers la page journal
+      navigate('/app/journal');
+    } catch (error) {
+      logger.error('Failed to save journal entry', error as Error, 'UI');
+      toast({
+        title: "Erreur",
+        description: "Impossible de sauvegarder l'entrée. Veuillez réessayer.",
+        variant: "destructive",
+      });
+    }
   };
 
   const addTag = (tag: string) => {
@@ -125,9 +140,18 @@ const JournalNewPage: React.FC = () => {
             </div>
           </div>
           
-          <Button onClick={handleSave} className="flex items-center gap-2">
-            <Save className="w-4 h-4" />
-            Sauvegarder
+          <Button onClick={handleSave} disabled={loading || !title.trim() || !content.trim()} className="flex items-center gap-2">
+            {loading ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Sauvegarde...
+              </>
+            ) : (
+              <>
+                <Save className="w-4 h-4" />
+                Sauvegarder
+              </>
+            )}
           </Button>
         </div>
       </div>
