@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { BREATHING_TECHNIQUES, BreathingTechnique } from '@/features/breath/techniques/breathingTechniquesDB';
-import { ChevronDown, Lightbulb, Clock, Zap } from 'lucide-react';
+import { ChevronDown, Lightbulb, Clock, Zap, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const getDifficultyColor = (difficulty: string) => {

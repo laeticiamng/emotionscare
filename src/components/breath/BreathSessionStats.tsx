@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useBreathSessions } from '@/hooks/useBreathSessions';
 import { Activity, Flame, Target, Clock } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { cn } from '@/lib/utils';
 
 const StatCard = ({ icon: Icon, label, value, unit = '' }: {
   icon: React.ReactNode;
