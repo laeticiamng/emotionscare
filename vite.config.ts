@@ -191,6 +191,7 @@ export default defineConfig(({ mode }) => ({
     alias: {
       '@': path.resolve(__dirname, './src'),
       '@types': path.resolve(__dirname, './types'),
+      '@emotionscare/contracts': path.resolve(__dirname, './packages/contracts/index.ts'),
     },
   },
   build: {

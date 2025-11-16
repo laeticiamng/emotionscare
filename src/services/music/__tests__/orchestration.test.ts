@@ -187,18 +187,19 @@ describe('MusicOrchestrationService', () => {
       const mockSignals: ClinicalSignal[] = [
         {
           id: 'signal-1',
-          user_id: 'user-123',
           source_instrument: 'SAM',
           domain: 'mood',
           level: 2,
+          module_context: 'music',
+          expires_at: new Date(Date.now() + 3600000).toISOString(),
           metadata: {
             scores: {
               valence: 70,
               arousal: 60
             }
           },
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          expires_at: new Date(Date.now() + 3600000).toISOString(),
+          created_at: new Date().toISOString()
         }
       ];
 
@@ -243,13 +244,16 @@ describe('MusicOrchestrationService', () => {
       const mockSignals: ClinicalSignal[] = [
         {
           id: 'signal-1',
-          user_id: 'user-123',
+          // user_id removed for type compliance
           source_instrument: 'WHO5',
           domain: 'anxiety',
           level: 4, // >= 3
+          module_context: 'music',
+          expires_at: new Date(Date.now() + 3600000).toISOString(),
           metadata: {},
+          expires_at: new Date(Date.now() + 3600000).toISOString(),
           created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          // updated_at removed for type compliance
         }
       ];
 
@@ -271,13 +275,15 @@ describe('MusicOrchestrationService', () => {
       const mockSignals: ClinicalSignal[] = [
         {
           id: 'signal-1',
-          user_id: 'user-123',
+          // user_id removed for type compliance
           source_instrument: 'WHO5',
           domain: 'wellbeing',
           level: 1, // <= 1
+          module_context: 'music',
+          expires_at: new Date(Date.now() + 3600000).toISOString(),
           metadata: {},
           created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          // updated_at removed for type compliance
         }
       ];
 
@@ -299,15 +305,17 @@ describe('MusicOrchestrationService', () => {
       const mockSignals: ClinicalSignal[] = [
         {
           id: 'signal-1',
-          user_id: 'user-123',
+          // user_id removed for type compliance
           source_instrument: 'WHO5',
           domain: 'wellbeing',
           level: 3,
+          module_context: 'music',
+          expires_at: new Date(Date.now() + 3600000).toISOString(),
           metadata: {
             hints: ['gentle_tone', 'reduce_intensity']
           },
           created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          // updated_at removed for type compliance
         }
       ];
 
@@ -332,15 +340,17 @@ describe('MusicOrchestrationService', () => {
       const mockSignals: ClinicalSignal[] = [
         {
           id: 'signal-1',
-          user_id: 'user-123',
+          // user_id removed for type compliance
           source_instrument: 'WHO5',
           domain: 'activity',
           level: 3,
+          module_context: 'music',
+          expires_at: new Date(Date.now() + 3600000).toISOString(),
           metadata: {
             hints: ['encourage_movement']
           },
           created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          // updated_at removed for type compliance
         }
       ];
 
@@ -363,15 +373,17 @@ describe('MusicOrchestrationService', () => {
       const mockSignals: ClinicalSignal[] = [
         {
           id: 'signal-1',
-          user_id: 'user-123',
+          // user_id removed for type compliance
           source_instrument: 'WHO5',
           domain: 'wellbeing',
           level: 3,
+          module_context: 'music',
+          expires_at: new Date(Date.now() + 3600000).toISOString(),
           metadata: {
             actions: ['gentle_tone', 'prefer_silence']
           },
           created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          // updated_at removed for type compliance
         }
       ];
 
@@ -394,10 +406,12 @@ describe('MusicOrchestrationService', () => {
       const mockSignals: ClinicalSignal[] = [
         {
           id: 'signal-1',
-          user_id: 'user-123',
+          // user_id removed for type compliance
           source_instrument: 'WHO5',
           domain: 'wellbeing',
           level: 3,
+          module_context: 'music',
+          expires_at: new Date(Date.now() + 3600000).toISOString(),
           metadata: {
             hints: [
               { action: 'gentle_tone', priority: 'high' },
@@ -405,7 +419,7 @@ describe('MusicOrchestrationService', () => {
             ]
           },
           created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          // updated_at removed for type compliance
         }
       ];
 
@@ -428,10 +442,12 @@ describe('MusicOrchestrationService', () => {
       const mockSignals: ClinicalSignal[] = [
         {
           id: 'signal-1',
-          user_id: 'user-123',
+          // user_id removed for type compliance
           source_instrument: 'SAM',
           domain: 'mood',
           level: 2,
+          module_context: 'music',
+          expires_at: new Date(Date.now() + 3600000).toISOString(),
           metadata: {
             scores: {
               valence: 75,
@@ -439,7 +455,7 @@ describe('MusicOrchestrationService', () => {
             }
           },
           created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          // updated_at removed for type compliance
         }
       ];
 
@@ -463,10 +479,12 @@ describe('MusicOrchestrationService', () => {
       const mockSignals: ClinicalSignal[] = [
         {
           id: 'signal-1',
-          user_id: 'user-123',
+          // user_id removed for type compliance
           source_instrument: 'SAM',
           domain: 'mood',
           level: 2,
+          module_context: 'music',
+          expires_at: new Date(Date.now() + 3600000).toISOString(),
           metadata: {
             scores: {
               valence: 150, // Should clamp to 100
@@ -474,7 +492,7 @@ describe('MusicOrchestrationService', () => {
             }
           },
           created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          // updated_at removed for type compliance
         }
       ];
 
@@ -497,16 +515,18 @@ describe('MusicOrchestrationService', () => {
       const mockSignals: ClinicalSignal[] = [
         {
           id: 'signal-1',
-          user_id: 'user-123',
+          // user_id removed for type compliance
           source_instrument: 'SAM',
           domain: 'mood',
           level: 2,
+          module_context: 'music',
+          expires_at: new Date(Date.now() + 3600000).toISOString(),
           metadata: {
             valence_score: 70,
             arousal_score: 60
           },
           created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          // updated_at removed for type compliance
         }
       ];
 
@@ -528,13 +548,15 @@ describe('MusicOrchestrationService', () => {
       const mockSignals: ClinicalSignal[] = [
         {
           id: 'signal-1',
-          user_id: 'user-123',
+          // user_id removed for type compliance
           source_instrument: 'WHO5',
           domain: 'wellbeing',
           level: 3,
+          module_context: 'music',
+          expires_at: new Date(Date.now() + 3600000).toISOString(),
           metadata: {},
           created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          // updated_at removed for type compliance
         }
       ];
 
@@ -662,13 +684,15 @@ describe('MusicOrchestrationService', () => {
       const mockSignals: ClinicalSignal[] = [
         {
           id: 'signal-1',
-          user_id: 'user-123',
+          // user_id removed for type compliance
           source_instrument: 'WHO5',
           domain: 'wellbeing',
           level: 3,
+          module_context: 'music',
+          expires_at: new Date(Date.now() + 3600000).toISOString(),
           metadata: null as any,
           created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          // updated_at removed for type compliance
         }
       ];
 
@@ -690,10 +714,12 @@ describe('MusicOrchestrationService', () => {
       const mockSignals: ClinicalSignal[] = [
         {
           id: 'signal-1',
-          user_id: 'user-123',
+          // user_id removed for type compliance
           source_instrument: 'SAM',
           domain: 'mood',
           level: 2,
+          module_context: 'music',
+          expires_at: new Date(Date.now() + 3600000).toISOString(),
           metadata: {
             scores: {
               valence: 'invalid' as any,
@@ -701,7 +727,7 @@ describe('MusicOrchestrationService', () => {
             }
           },
           created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          // updated_at removed for type compliance
         }
       ];
 
