@@ -4,11 +4,9 @@
  */
 
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
-import { createClient } from '@supabase/supabase-js';
 import { z } from 'zod';
 
-const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || '';
-const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || '';
+import { getSupabaseClient } from '../lib/supabase';
 
 const createAssessmentSchema = z.object({
   instrument: z.string(),
@@ -42,6 +40,120 @@ type AssessmentListRequest = FastifyRequest<{
   };
 }>;
 
+export type CreateAssessmentInput = z.infer<typeof createAssessmentSchema>;
+export type SubmitAssessmentInput = z.infer<typeof submitAssessmentSchema>;
+
+type AssessmentRecord = Record<string, any>;
+
+export interface AssessmentRepository {
+  createAssessment: (userId: string, payload: CreateAssessmentInput) => Promise<AssessmentRecord>;
+  listAssessments: (
+    userId: string,
+    filters: { instrument?: string; limit: number; offset: number },
+  ) => Promise<AssessmentRecord[]>;
+  getAssessment: (id: string, userId: string) => Promise<AssessmentRecord | null>;
+  submitAssessment: (
+    id: string,
+    userId: string,
+    payload: SubmitAssessmentInput,
+  ) => Promise<AssessmentRecord | null>;
+  getActiveAssessment: (userId: string) => Promise<AssessmentRecord | null>;
+  listInstruments: () => Promise<AssessmentRecord[]>;
+}
+
+const createAssessmentRepository = (): AssessmentRepository => {
+  const supabase = getSupabaseClient();
+
+  return {
+    async createAssessment(userId, payload) {
+      const { data, error } = await supabase
+        .from('assessments')
+        .insert({
+          user_id: userId,
+          instrument: payload.instrument,
+          score_json: payload.score_json || {},
+          submitted_at: payload.submitted_at || null,
+        })
+        .select('*')
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    async listAssessments(userId, { instrument, limit, offset }) {
+      let query = supabase
+        .from('assessments')
+        .select('*')
+        .eq('user_id', userId)
+        .order('ts', { ascending: false })
+        .range(offset, offset + limit - 1);
+
+      if (instrument) {
+        query = query.eq('instrument', instrument);
+      }
+
+      const { data, error } = await query;
+      if (error) throw error;
+      return data ?? [];
+    },
+    async getAssessment(id, userId) {
+      const { data, error } = await supabase
+        .from('assessments')
+        .select('*')
+        .eq('id', id)
+        .eq('user_id', userId)
+        .single();
+
+      if (error) {
+        if (error.code === 'PGRST116') {
+          return null;
+        }
+        throw error;
+      }
+      return data ?? null;
+    },
+    async submitAssessment(id, userId, payload) {
+      const { data, error } = await supabase
+        .from('assessments')
+        .update({
+          score_json: payload.score_json || payload.responses,
+          submitted_at: new Date().toISOString(),
+        })
+        .eq('id', id)
+        .eq('user_id', userId)
+        .select('*')
+        .single();
+
+      if (error) {
+        if (error.code === 'PGRST116') {
+          return null;
+        }
+        throw error;
+      }
+
+      return data ?? null;
+    },
+    async getActiveAssessment(userId) {
+      const { data, error } = await supabase
+        .from('assessments')
+        .select('*')
+        .eq('user_id', userId)
+        .is('submitted_at', null)
+        .order('ts', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (error) throw error;
+      return data ?? null;
+    },
+    async listInstruments() {
+      const { data, error } = await supabase.from('clinical_instruments').select('*').order('name', { ascending: true });
+      if (error) throw error;
+      return data ?? [];
+    },
+  };
+};
+
 const ensureUser = (req: any, reply: FastifyReply) => {
   if (!req.user) {
     reply.code(401).send({
@@ -53,7 +165,25 @@ const ensureUser = (req: any, reply: FastifyReply) => {
   return req.user;
 };
 
-export function registerAssessmentRoutes(app: FastifyInstance) {
+export type AssessmentRoutesOptions = {
+  repository?: AssessmentRepository;
+};
+
+const parseLimit = (value?: string) => {
+  const parsed = Number.parseInt(value ?? '20', 10);
+  if (Number.isNaN(parsed)) return 20;
+  return Math.min(Math.max(parsed, 1), 100);
+};
+
+const parseOffset = (value?: string) => {
+  const parsed = Number.parseInt(value ?? '0', 10);
+  if (Number.isNaN(parsed) || parsed < 0) return 0;
+  return parsed;
+};
+
+export function registerAssessmentRoutes(app: FastifyInstance, options: AssessmentRoutesOptions = {}) {
+  const repository = options.repository ?? createAssessmentRepository();
+
   // POST /api/v1/assessments - Créer une nouvelle évaluation
   app.post('/api/v1/assessments', async (req: AssessmentRequest, reply: FastifyReply) => {
     const user = ensureUser(req, reply);
@@ -61,28 +191,7 @@ export function registerAssessmentRoutes(app: FastifyInstance) {
 
     try {
       const data = createAssessmentSchema.parse(req.body);
-      const supabase = createClient(supabaseUrl, supabaseKey);
-
-      const { data: assessment, error } = await supabase
-        .from('assessments')
-        .insert({
-          user_id: user.sub,
-          instrument: data.instrument,
-          score_json: data.score_json || {},
-          submitted_at: data.submitted_at || null,
-        })
-        .select()
-        .single();
-
-      if (error) {
-        app.log.error({ error }, 'Failed to create assessment');
-        reply.code(500).send({
-          ok: false,
-          error: { code: 'database_error', message: 'Failed to create assessment' },
-        });
-        return;
-      }
-
+      const assessment = await repository.createAssessment(user.sub, data);
       reply.code(201).send({ ok: true, data: assessment });
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -111,30 +220,14 @@ export function registerAssessmentRoutes(app: FastifyInstance) {
     if (!user) return;
 
     try {
-      const { instrument, limit = '20', offset = '0' } = req.query;
-      const supabase = createClient(supabaseUrl, supabaseKey);
-
-      let query = supabase
-        .from('assessments')
-        .select('*')
-        .eq('user_id', user.sub)
-        .order('ts', { ascending: false })
-        .range(parseInt(offset), parseInt(offset) + parseInt(limit) - 1);
-
-      if (instrument) {
-        query = query.eq('instrument', instrument);
-      }
-
-      const { data: assessments, error } = await query;
-
-      if (error) {
-        app.log.error({ error }, 'Failed to fetch assessments');
-        reply.code(500).send({
-          ok: false,
-          error: { code: 'database_error', message: 'Failed to fetch assessments' },
-        });
-        return;
-      }
+      const { instrument, limit, offset } = req.query;
+      const limitNum = parseLimit(limit);
+      const offsetNum = parseOffset(offset);
+      const assessments = await repository.listAssessments(user.sub, {
+        instrument,
+        limit: limitNum,
+        offset: offsetNum,
+      });
 
       reply.send({ ok: true, data: assessments });
     } catch (error) {
@@ -153,16 +246,9 @@ export function registerAssessmentRoutes(app: FastifyInstance) {
 
     try {
       const { id } = req.params;
-      const supabase = createClient(supabaseUrl, supabaseKey);
+      const assessment = await repository.getAssessment(id, user.sub);
 
-      const { data: assessment, error } = await supabase
-        .from('assessments')
-        .select('*')
-        .eq('id', id)
-        .eq('user_id', user.sub)
-        .single();
-
-      if (error || !assessment) {
+      if (!assessment) {
         reply.code(404).send({
           ok: false,
           error: { code: 'not_found', message: 'Assessment not found' },
@@ -188,20 +274,9 @@ export function registerAssessmentRoutes(app: FastifyInstance) {
     try {
       const { id } = req.params;
       const data = submitAssessmentSchema.parse(req.body);
-      const supabase = createClient(supabaseUrl, supabaseKey);
+      const assessment = await repository.submitAssessment(id, user.sub, data);
 
-      const { data: assessment, error } = await supabase
-        .from('assessments')
-        .update({
-          score_json: data.score_json || data.responses,
-          submitted_at: new Date().toISOString(),
-        })
-        .eq('id', id)
-        .eq('user_id', user.sub)
-        .select()
-        .single();
-
-      if (error || !assessment) {
+      if (!assessment) {
         reply.code(404).send({
           ok: false,
           error: { code: 'not_found', message: 'Assessment not found' },
@@ -237,26 +312,7 @@ export function registerAssessmentRoutes(app: FastifyInstance) {
     if (!user) return;
 
     try {
-      const supabase = createClient(supabaseUrl, supabaseKey);
-
-      const { data: assessment, error } = await supabase
-        .from('assessments')
-        .select('*')
-        .eq('user_id', user.sub)
-        .is('submitted_at', null)
-        .order('ts', { ascending: false })
-        .limit(1)
-        .maybeSingle();
-
-      if (error) {
-        app.log.error({ error }, 'Failed to fetch active assessment');
-        reply.code(500).send({
-          ok: false,
-          error: { code: 'database_error', message: 'Failed to fetch active assessment' },
-        });
-        return;
-      }
-
+      const assessment = await repository.getActiveAssessment(user.sub);
       reply.send({ ok: true, data: assessment });
     } catch (error) {
       app.log.error({ error }, 'Unexpected error fetching active assessment');
@@ -273,22 +329,7 @@ export function registerAssessmentRoutes(app: FastifyInstance) {
     if (!user) return;
 
     try {
-      const supabase = createClient(supabaseUrl, supabaseKey);
-
-      const { data: instruments, error } = await supabase
-        .from('clinical_instruments')
-        .select('*')
-        .order('name', { ascending: true });
-
-      if (error) {
-        app.log.error({ error }, 'Failed to fetch instruments');
-        reply.code(500).send({
-          ok: false,
-          error: { code: 'database_error', message: 'Failed to fetch instruments' },
-        });
-        return;
-      }
-
+      const instruments = await repository.listInstruments();
       reply.send({ ok: true, data: instruments });
     } catch (error) {
       app.log.error({ error }, 'Unexpected error fetching instruments');

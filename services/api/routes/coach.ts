@@ -4,11 +4,9 @@
  */
 
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
-import { createClient } from '@supabase/supabase-js';
 import { z } from 'zod';
 
-const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || '';
-const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || '';
+import { getSupabaseClient } from '../lib/supabase';
 
 const createSessionSchema = z.object({
   title: z.string().optional(),
@@ -53,6 +51,163 @@ type MessageListRequest = FastifyRequest<{
   Params: { sessionId: string };
 }>;
 
+type SessionRecord = Record<string, any>;
+type MessageRecord = Record<string, any>;
+
+export type CreateSessionInput = z.infer<typeof createSessionSchema>;
+export type UpdateSessionInput = z.infer<typeof updateSessionSchema>;
+export type CreateMessageInput = z.infer<typeof createMessageSchema>;
+
+export interface CoachRepository {
+  createSession: (userId: string, payload: CreateSessionInput) => Promise<SessionRecord>;
+  listSessions: (userId: string) => Promise<SessionRecord[]>;
+  getSession: (id: string, userId: string) => Promise<SessionRecord | null>;
+  updateSession: (id: string, userId: string, payload: UpdateSessionInput) => Promise<SessionRecord | null>;
+  deleteSession: (id: string, userId: string) => Promise<void>;
+  verifySessionOwnership: (sessionId: string, userId: string) => Promise<boolean>;
+  createMessage: (userId: string, payload: CreateMessageInput) => Promise<MessageRecord>;
+  listMessages: (sessionId: string, userId: string) => Promise<MessageRecord[]>;
+  listSessionsWithMood: (userId: string, limit: number) => Promise<SessionRecord[]>;
+}
+
+const createCoachRepository = (): CoachRepository => {
+  const supabase = getSupabaseClient();
+
+  return {
+    async createSession(userId, payload) {
+      const { data, error } = await supabase
+        .from('coach_sessions')
+        .insert({
+          user_id: userId,
+          title: payload.title || 'Session de coaching',
+          coach_mode: payload.coach_mode || 'empathetic',
+          topic: payload.topic,
+          mood_before: payload.mood_before,
+        })
+        .select('*')
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    async listSessions(userId) {
+      const { data, error } = await supabase
+        .from('coach_sessions')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      return data ?? [];
+    },
+    async getSession(id, userId) {
+      const { data, error } = await supabase
+        .from('coach_sessions')
+        .select('*')
+        .eq('id', id)
+        .eq('user_id', userId)
+        .single();
+
+      if (error) {
+        if (error.code === 'PGRST116') {
+          return null;
+        }
+        throw error;
+      }
+
+      return data ?? null;
+    },
+    async updateSession(id, userId, payload) {
+      const { data, error } = await supabase
+        .from('coach_sessions')
+        .update(payload)
+        .eq('id', id)
+        .eq('user_id', userId)
+        .select('*')
+        .single();
+
+      if (error) {
+        if (error.code === 'PGRST116') {
+          return null;
+        }
+        throw error;
+      }
+
+      return data ?? null;
+    },
+    async deleteSession(id, userId) {
+      const { error } = await supabase
+        .from('coach_sessions')
+        .delete()
+        .eq('id', id)
+        .eq('user_id', userId);
+
+      if (error) throw error;
+    },
+    async verifySessionOwnership(sessionId, userId) {
+      const { data } = await supabase
+        .from('coach_sessions')
+        .select('id')
+        .eq('id', sessionId)
+        .eq('user_id', userId)
+        .single();
+
+      return Boolean(data);
+    },
+    async createMessage(userId, payload) {
+      const { data, error } = await supabase
+        .from('coach_messages')
+        .insert({
+          session_id: payload.session_id,
+          user_id: userId,
+          sender: payload.sender,
+          content: payload.content,
+          message_type: payload.message_type || 'text',
+          emotions_detected: payload.emotions_detected || {},
+        })
+        .select('*')
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    async listMessages(sessionId, userId) {
+      const { data: session } = await supabase
+        .from('coach_sessions')
+        .select('id')
+        .eq('id', sessionId)
+        .eq('user_id', userId)
+        .single();
+
+      if (!session) {
+        return [];
+      }
+
+      const { data, error } = await supabase
+        .from('coach_messages')
+        .select('*')
+        .eq('session_id', sessionId)
+        .order('created_at', { ascending: true });
+
+      if (error) throw error;
+      return data ?? [];
+    },
+    async listSessionsWithMood(userId, limit) {
+      const { data, error } = await supabase
+        .from('coach_sessions')
+        .select('*')
+        .eq('user_id', userId)
+        .not('mood_before', 'is', null)
+        .not('mood_after', 'is', null)
+        .order('created_at', { ascending: false })
+        .limit(limit);
+
+      if (error) throw error;
+      return data ?? [];
+    },
+  };
+};
+
 const ensureUser = (req: any, reply: FastifyReply) => {
   if (!req.user) {
     reply.code(401).send({
@@ -64,7 +219,13 @@ const ensureUser = (req: any, reply: FastifyReply) => {
   return req.user;
 };
 
-export function registerCoachRoutes(app: FastifyInstance) {
+export type CoachRoutesOptions = {
+  repository?: CoachRepository;
+};
+
+export function registerCoachRoutes(app: FastifyInstance, options: CoachRoutesOptions = {}) {
+  const repository = options.repository ?? createCoachRepository();
+
   // POST /api/v1/coach/sessions - Créer une nouvelle session de coaching
   app.post('/api/v1/coach/sessions', async (req: SessionRequest, reply: FastifyReply) => {
     const user = ensureUser(req, reply);
@@ -72,29 +233,7 @@ export function registerCoachRoutes(app: FastifyInstance) {
 
     try {
       const data = createSessionSchema.parse(req.body);
-      const supabase = createClient(supabaseUrl, supabaseKey);
-
-      const { data: session, error } = await supabase
-        .from('coach_sessions')
-        .insert({
-          user_id: user.sub,
-          title: data.title || 'Session de coaching',
-          coach_mode: data.coach_mode || 'empathetic',
-          topic: data.topic,
-          mood_before: data.mood_before,
-        })
-        .select()
-        .single();
-
-      if (error) {
-        app.log.error({ error }, 'Failed to create coach session');
-        reply.code(500).send({
-          ok: false,
-          error: { code: 'database_error', message: 'Failed to create coach session' },
-        });
-        return;
-      }
-
+      const session = await repository.createSession(user.sub, data);
       reply.code(201).send({ ok: true, data: session });
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -123,23 +262,7 @@ export function registerCoachRoutes(app: FastifyInstance) {
     if (!user) return;
 
     try {
-      const supabase = createClient(supabaseUrl, supabaseKey);
-
-      const { data: sessions, error } = await supabase
-        .from('coach_sessions')
-        .select('*')
-        .eq('user_id', user.sub)
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        app.log.error({ error }, 'Failed to fetch coach sessions');
-        reply.code(500).send({
-          ok: false,
-          error: { code: 'database_error', message: 'Failed to fetch coach sessions' },
-        });
-        return;
-      }
-
+      const sessions = await repository.listSessions(user.sub);
       reply.send({ ok: true, data: sessions });
     } catch (error) {
       app.log.error({ error }, 'Unexpected error fetching coach sessions');
@@ -157,16 +280,9 @@ export function registerCoachRoutes(app: FastifyInstance) {
 
     try {
       const { id } = req.params;
-      const supabase = createClient(supabaseUrl, supabaseKey);
+      const session = await repository.getSession(id, user.sub);
 
-      const { data: session, error } = await supabase
-        .from('coach_sessions')
-        .select('*')
-        .eq('id', id)
-        .eq('user_id', user.sub)
-        .single();
-
-      if (error || !session) {
+      if (!session) {
         reply.code(404).send({
           ok: false,
           error: { code: 'not_found', message: 'Session not found' },
@@ -192,17 +308,9 @@ export function registerCoachRoutes(app: FastifyInstance) {
     try {
       const { id } = req.params;
       const data = updateSessionSchema.parse(req.body);
-      const supabase = createClient(supabaseUrl, supabaseKey);
+      const session = await repository.updateSession(id, user.sub, data);
 
-      const { data: session, error } = await supabase
-        .from('coach_sessions')
-        .update(data)
-        .eq('id', id)
-        .eq('user_id', user.sub)
-        .select()
-        .single();
-
-      if (error || !session) {
+      if (!session) {
         reply.code(404).send({
           ok: false,
           error: { code: 'not_found', message: 'Session not found' },
@@ -239,23 +347,7 @@ export function registerCoachRoutes(app: FastifyInstance) {
 
     try {
       const { id } = req.params;
-      const supabase = createClient(supabaseUrl, supabaseKey);
-
-      const { error } = await supabase
-        .from('coach_sessions')
-        .delete()
-        .eq('id', id)
-        .eq('user_id', user.sub);
-
-      if (error) {
-        app.log.error({ error }, 'Failed to delete coach session');
-        reply.code(500).send({
-          ok: false,
-          error: { code: 'database_error', message: 'Failed to delete coach session' },
-        });
-        return;
-      }
-
+      await repository.deleteSession(id, user.sub);
       reply.code(204).send();
     } catch (error) {
       app.log.error({ error }, 'Unexpected error deleting coach session');
@@ -273,17 +365,9 @@ export function registerCoachRoutes(app: FastifyInstance) {
 
     try {
       const data = createMessageSchema.parse(req.body);
-      const supabase = createClient(supabaseUrl, supabaseKey);
+      const ownsSession = await repository.verifySessionOwnership(data.session_id, user.sub);
 
-      // Vérifier que la session appartient à l'utilisateur
-      const { data: session } = await supabase
-        .from('coach_sessions')
-        .select('id')
-        .eq('id', data.session_id)
-        .eq('user_id', user.sub)
-        .single();
-
-      if (!session) {
+      if (!ownsSession) {
         reply.code(404).send({
           ok: false,
           error: { code: 'not_found', message: 'Session not found' },
@@ -291,28 +375,7 @@ export function registerCoachRoutes(app: FastifyInstance) {
         return;
       }
 
-      const { data: message, error } = await supabase
-        .from('coach_messages')
-        .insert({
-          session_id: data.session_id,
-          user_id: user.sub,
-          sender: data.sender,
-          content: data.content,
-          message_type: data.message_type || 'text',
-          emotions_detected: data.emotions_detected || {},
-        })
-        .select()
-        .single();
-
-      if (error) {
-        app.log.error({ error }, 'Failed to create coach message');
-        reply.code(500).send({
-          ok: false,
-          error: { code: 'database_error', message: 'Failed to create coach message' },
-        });
-        return;
-      }
-
+      const message = await repository.createMessage(user.sub, data);
       reply.code(201).send({ ok: true, data: message });
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -342,17 +405,9 @@ export function registerCoachRoutes(app: FastifyInstance) {
 
     try {
       const { sessionId } = req.params;
-      const supabase = createClient(supabaseUrl, supabaseKey);
+      const ownsSession = await repository.verifySessionOwnership(sessionId, user.sub);
 
-      // Vérifier que la session appartient à l'utilisateur
-      const { data: session } = await supabase
-        .from('coach_sessions')
-        .select('id')
-        .eq('id', sessionId)
-        .eq('user_id', user.sub)
-        .single();
-
-      if (!session) {
+      if (!ownsSession) {
         reply.code(404).send({
           ok: false,
           error: { code: 'not_found', message: 'Session not found' },
@@ -360,21 +415,7 @@ export function registerCoachRoutes(app: FastifyInstance) {
         return;
       }
 
-      const { data: messages, error } = await supabase
-        .from('coach_messages')
-        .select('*')
-        .eq('session_id', sessionId)
-        .order('created_at', { ascending: true });
-
-      if (error) {
-        app.log.error({ error }, 'Failed to fetch coach messages');
-        reply.code(500).send({
-          ok: false,
-          error: { code: 'database_error', message: 'Failed to fetch coach messages' },
-        });
-        return;
-      }
-
+      const messages = await repository.listMessages(sessionId, user.sub);
       reply.send({ ok: true, data: messages });
     } catch (error) {
       app.log.error({ error }, 'Unexpected error fetching coach messages');
@@ -426,27 +467,7 @@ export function registerCoachRoutes(app: FastifyInstance) {
     if (!user) return;
 
     try {
-      const supabase = createClient(supabaseUrl, supabaseKey);
-
-      // Récupérer les sessions récentes pour générer des insights
-      const { data: sessions, error } = await supabase
-        .from('coach_sessions')
-        .select('*')
-        .eq('user_id', user.sub)
-        .not('mood_before', 'is', null)
-        .not('mood_after', 'is', null)
-        .order('created_at', { ascending: false })
-        .limit(10);
-
-      if (error) {
-        app.log.error({ error }, 'Failed to fetch sessions for insights');
-        reply.code(500).send({
-          ok: false,
-          error: { code: 'database_error', message: 'Failed to fetch sessions for insights' },
-        });
-        return;
-      }
-
+      const sessions = await repository.listSessionsWithMood(user.sub, 10);
       // Calculer des insights basiques
       const insights = [];
       if (sessions && sessions.length > 0) {

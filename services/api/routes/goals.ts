@@ -4,11 +4,9 @@
  */
 
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
-import { createClient } from '@supabase/supabase-js';
 import { z } from 'zod';
 
-const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || '';
-const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || '';
+import { getSupabaseClient } from '../lib/supabase';
 
 const createGoalSchema = z.object({
   title: z.string(),
@@ -51,6 +49,178 @@ type ProgressRequest = FastifyRequest<{
   Body: z.infer<typeof progressUpdateSchema>;
 }>;
 
+type GoalRecord = Record<string, any>;
+
+export type CreateGoalInput = z.infer<typeof createGoalSchema>;
+export type UpdateGoalInput = z.infer<typeof updateGoalSchema>;
+export type ProgressInput = z.infer<typeof progressUpdateSchema>;
+
+export interface GoalRepository {
+  createGoal: (userId: string, payload: CreateGoalInput) => Promise<GoalRecord>;
+  listGoals: (userId: string) => Promise<GoalRecord[]>;
+  getGoal: (id: string, userId: string) => Promise<GoalRecord | null>;
+  updateGoal: (id: string, userId: string, payload: UpdateGoalInput) => Promise<GoalRecord | null>;
+  deleteGoal: (id: string, userId: string) => Promise<void>;
+  completeGoal: (id: string, userId: string) => Promise<GoalRecord | null>;
+  updateProgress: (id: string, userId: string, payload: ProgressInput) => Promise<GoalRecord | null>;
+  listActiveGoals: (userId: string) => Promise<GoalRecord[]>;
+  listCompletedGoals: (userId: string) => Promise<GoalRecord[]>;
+  listAllGoals: (userId: string) => Promise<GoalRecord[]>;
+}
+
+const createGoalRepository = (): GoalRepository => {
+  const supabase = getSupabaseClient();
+
+  return {
+    async createGoal(userId, payload) {
+      const { data, error } = await supabase
+        .from('personal_goals')
+        .insert({
+          user_id: userId,
+          title: payload.title,
+          description: payload.description,
+          category: payload.category,
+          target_date: payload.target_date,
+          target_value: payload.target_value,
+          current_value: payload.current_value || 0,
+          unit: payload.unit,
+        })
+        .select('*')
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    async listGoals(userId) {
+      const { data, error } = await supabase
+        .from('personal_goals')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      return data ?? [];
+    },
+    async getGoal(id, userId) {
+      const { data, error } = await supabase
+        .from('personal_goals')
+        .select('*')
+        .eq('id', id)
+        .eq('user_id', userId)
+        .single();
+
+      if (error) {
+        if (error.code === 'PGRST116') {
+          return null;
+        }
+        throw error;
+      }
+
+      return data ?? null;
+    },
+    async updateGoal(id, userId, payload) {
+      const { data, error } = await supabase
+        .from('personal_goals')
+        .update(payload)
+        .eq('id', id)
+        .eq('user_id', userId)
+        .select('*')
+        .single();
+
+      if (error) {
+        if (error.code === 'PGRST116') {
+          return null;
+        }
+        throw error;
+      }
+
+      return data ?? null;
+    },
+    async deleteGoal(id, userId) {
+      const { error } = await supabase
+        .from('personal_goals')
+        .delete()
+        .eq('id', id)
+        .eq('user_id', userId);
+
+      if (error) throw error;
+    },
+    async completeGoal(id, userId) {
+      const { data, error } = await supabase
+        .from('personal_goals')
+        .update({
+          completed: true,
+          completed_at: new Date().toISOString(),
+        })
+        .eq('id', id)
+        .eq('user_id', userId)
+        .select('*')
+        .single();
+
+      if (error) {
+        if (error.code === 'PGRST116') {
+          return null;
+        }
+        throw error;
+      }
+
+      return data ?? null;
+    },
+    async updateProgress(id, userId, payload) {
+      const { data, error } = await supabase
+        .from('personal_goals')
+        .update({
+          current_value: payload.current_value,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', id)
+        .eq('user_id', userId)
+        .select('*')
+        .single();
+
+      if (error) {
+        if (error.code === 'PGRST116') {
+          return null;
+        }
+        throw error;
+      }
+
+      return data ?? null;
+    },
+    async listActiveGoals(userId) {
+      const { data, error } = await supabase
+        .from('personal_goals')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('completed', false)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      return data ?? [];
+    },
+    async listCompletedGoals(userId) {
+      const { data, error } = await supabase
+        .from('personal_goals')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('completed', true)
+        .order('completed_at', { ascending: false });
+
+      if (error) throw error;
+      return data ?? [];
+    },
+    async listAllGoals(userId) {
+      const { data, error } = await supabase
+        .from('personal_goals')
+        .select('*')
+        .eq('user_id', userId);
+
+      if (error) throw error;
+      return data ?? [];
+    },
+  };
+};
+
 const ensureUser = (req: any, reply: FastifyReply) => {
   if (!req.user) {
     reply.code(401).send({
@@ -62,7 +232,13 @@ const ensureUser = (req: any, reply: FastifyReply) => {
   return req.user;
 };
 
-export function registerGoalRoutes(app: FastifyInstance) {
+export type GoalRoutesOptions = {
+  repository?: GoalRepository;
+};
+
+export function registerGoalRoutes(app: FastifyInstance, options: GoalRoutesOptions = {}) {
+  const repository = options.repository ?? createGoalRepository();
+
   // POST /api/v1/goals - Créer un nouvel objectif
   app.post('/api/v1/goals', async (req: GoalRequest, reply: FastifyReply) => {
     const user = ensureUser(req, reply);
@@ -70,32 +246,7 @@ export function registerGoalRoutes(app: FastifyInstance) {
 
     try {
       const data = createGoalSchema.parse(req.body);
-      const supabase = createClient(supabaseUrl, supabaseKey);
-
-      const { data: goal, error } = await supabase
-        .from('personal_goals')
-        .insert({
-          user_id: user.sub,
-          title: data.title,
-          description: data.description,
-          category: data.category,
-          target_date: data.target_date,
-          target_value: data.target_value,
-          current_value: data.current_value || 0,
-          unit: data.unit,
-        })
-        .select()
-        .single();
-
-      if (error) {
-        app.log.error({ error }, 'Failed to create goal');
-        reply.code(500).send({
-          ok: false,
-          error: { code: 'database_error', message: 'Failed to create goal' },
-        });
-        return;
-      }
-
+      const goal = await repository.createGoal(user.sub, data);
       reply.code(201).send({ ok: true, data: goal });
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -124,23 +275,7 @@ export function registerGoalRoutes(app: FastifyInstance) {
     if (!user) return;
 
     try {
-      const supabase = createClient(supabaseUrl, supabaseKey);
-
-      const { data: goals, error } = await supabase
-        .from('personal_goals')
-        .select('*')
-        .eq('user_id', user.sub)
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        app.log.error({ error }, 'Failed to fetch goals');
-        reply.code(500).send({
-          ok: false,
-          error: { code: 'database_error', message: 'Failed to fetch goals' },
-        });
-        return;
-      }
-
+      const goals = await repository.listGoals(user.sub);
       reply.send({ ok: true, data: goals });
     } catch (error) {
       app.log.error({ error }, 'Unexpected error fetching goals');
@@ -158,16 +293,9 @@ export function registerGoalRoutes(app: FastifyInstance) {
 
     try {
       const { id } = req.params;
-      const supabase = createClient(supabaseUrl, supabaseKey);
+      const goal = await repository.getGoal(id, user.sub);
 
-      const { data: goal, error } = await supabase
-        .from('personal_goals')
-        .select('*')
-        .eq('id', id)
-        .eq('user_id', user.sub)
-        .single();
-
-      if (error || !goal) {
+      if (!goal) {
         reply.code(404).send({
           ok: false,
           error: { code: 'not_found', message: 'Goal not found' },
@@ -193,17 +321,9 @@ export function registerGoalRoutes(app: FastifyInstance) {
     try {
       const { id } = req.params;
       const data = updateGoalSchema.parse(req.body);
-      const supabase = createClient(supabaseUrl, supabaseKey);
+      const goal = await repository.updateGoal(id, user.sub, data);
 
-      const { data: goal, error } = await supabase
-        .from('personal_goals')
-        .update(data)
-        .eq('id', id)
-        .eq('user_id', user.sub)
-        .select()
-        .single();
-
-      if (error || !goal) {
+      if (!goal) {
         reply.code(404).send({
           ok: false,
           error: { code: 'not_found', message: 'Goal not found' },
@@ -240,23 +360,7 @@ export function registerGoalRoutes(app: FastifyInstance) {
 
     try {
       const { id } = req.params;
-      const supabase = createClient(supabaseUrl, supabaseKey);
-
-      const { error } = await supabase
-        .from('personal_goals')
-        .delete()
-        .eq('id', id)
-        .eq('user_id', user.sub);
-
-      if (error) {
-        app.log.error({ error }, 'Failed to delete goal');
-        reply.code(500).send({
-          ok: false,
-          error: { code: 'database_error', message: 'Failed to delete goal' },
-        });
-        return;
-      }
-
+      await repository.deleteGoal(id, user.sub);
       reply.code(204).send();
     } catch (error) {
       app.log.error({ error }, 'Unexpected error deleting goal');
@@ -274,20 +378,9 @@ export function registerGoalRoutes(app: FastifyInstance) {
 
     try {
       const { id } = req.params;
-      const supabase = createClient(supabaseUrl, supabaseKey);
+      const goal = await repository.completeGoal(id, user.sub);
 
-      const { data: goal, error } = await supabase
-        .from('personal_goals')
-        .update({
-          completed: true,
-          completed_at: new Date().toISOString(),
-        })
-        .eq('id', id)
-        .eq('user_id', user.sub)
-        .select()
-        .single();
-
-      if (error || !goal) {
+      if (!goal) {
         reply.code(404).send({
           ok: false,
           error: { code: 'not_found', message: 'Goal not found' },
@@ -313,21 +406,9 @@ export function registerGoalRoutes(app: FastifyInstance) {
     try {
       const { id } = req.params;
       const data = progressUpdateSchema.parse(req.body);
-      const supabase = createClient(supabaseUrl, supabaseKey);
+      const goal = await repository.updateProgress(id, user.sub, data);
 
-      // Mettre à jour la valeur actuelle
-      const { data: goal, error } = await supabase
-        .from('personal_goals')
-        .update({
-          current_value: data.current_value,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', id)
-        .eq('user_id', user.sub)
-        .select()
-        .single();
-
-      if (error || !goal) {
+      if (!goal) {
         reply.code(404).send({
           ok: false,
           error: { code: 'not_found', message: 'Goal not found' },
@@ -363,24 +444,7 @@ export function registerGoalRoutes(app: FastifyInstance) {
     if (!user) return;
 
     try {
-      const supabase = createClient(supabaseUrl, supabaseKey);
-
-      const { data: goals, error } = await supabase
-        .from('personal_goals')
-        .select('*')
-        .eq('user_id', user.sub)
-        .eq('completed', false)
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        app.log.error({ error }, 'Failed to fetch active goals');
-        reply.code(500).send({
-          ok: false,
-          error: { code: 'database_error', message: 'Failed to fetch active goals' },
-        });
-        return;
-      }
-
+      const goals = await repository.listActiveGoals(user.sub);
       reply.send({ ok: true, data: goals });
     } catch (error) {
       app.log.error({ error }, 'Unexpected error fetching active goals');
@@ -397,24 +461,7 @@ export function registerGoalRoutes(app: FastifyInstance) {
     if (!user) return;
 
     try {
-      const supabase = createClient(supabaseUrl, supabaseKey);
-
-      const { data: goals, error } = await supabase
-        .from('personal_goals')
-        .select('*')
-        .eq('user_id', user.sub)
-        .eq('completed', true)
-        .order('completed_at', { ascending: false });
-
-      if (error) {
-        app.log.error({ error }, 'Failed to fetch completed goals');
-        reply.code(500).send({
-          ok: false,
-          error: { code: 'database_error', message: 'Failed to fetch completed goals' },
-        });
-        return;
-      }
-
+      const goals = await repository.listCompletedGoals(user.sub);
       reply.send({ ok: true, data: goals });
     } catch (error) {
       app.log.error({ error }, 'Unexpected error fetching completed goals');
@@ -431,21 +478,7 @@ export function registerGoalRoutes(app: FastifyInstance) {
     if (!user) return;
 
     try {
-      const supabase = createClient(supabaseUrl, supabaseKey);
-
-      const { data: goals, error } = await supabase
-        .from('personal_goals')
-        .select('*')
-        .eq('user_id', user.sub);
-
-      if (error) {
-        app.log.error({ error }, 'Failed to fetch goals stats');
-        reply.code(500).send({
-          ok: false,
-          error: { code: 'database_error', message: 'Failed to fetch goals stats' },
-        });
-        return;
-      }
+      const goals = await repository.listAllGoals(user.sub);
 
       const total = goals.length;
       const completed = goals.filter((g: any) => g.completed).length;
