@@ -19,16 +19,7 @@ import {
   Heart,
   Brain,
 } from 'lucide-react';
-
-interface MusicTrack {
-  id: string;
-  title: string;
-  artist: string;
-  duration: number;
-  mood: string;
-  category: string;
-  color: string;
-}
+import type { MusicTrack } from '@/types/music';
 
 interface FilterOptions {
   mood: string[];
@@ -79,14 +70,14 @@ export const MusicSearchAndFilter: React.FC<MusicSearchAndFilterProps> = ({
       // Mood filter
       const matchesMood =
         filters.mood.length === 0 ||
-        filters.mood.some((mood: string) =>
-          track.mood.toLowerCase().includes(mood.toLowerCase())
-        );
+        (track.mood && filters.mood.some((mood: string) =>
+          track.mood!.toLowerCase().includes(mood.toLowerCase())
+        ));
 
       // Category filter
       const matchesCategory =
         filters.category.length === 0 ||
-        filters.category.includes(track.category);
+        (track.category && filters.category.includes(track.category));
 
       // Duration filter
       const trackDuration = Math.floor(track.duration / 60);

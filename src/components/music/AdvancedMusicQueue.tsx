@@ -30,8 +30,8 @@ interface QueueTrack {
   title: string;
   artist: string;
   duration: number;
-  mood: string;
-  color: string;
+  mood?: string;
+  color?: string;
 }
 
 type RepeatMode = 'off' | 'all' | 'one';
