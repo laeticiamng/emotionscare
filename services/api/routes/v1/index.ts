@@ -1,7 +1,7 @@
 import { FastifyPluginAsync } from 'fastify';
 import journalRoutes from './journal';
 import healthRoutes from './health';
-// import musicRoutes from './music';
+import musicRoutes from './music';
 // import assessmentRoutes from './assessments';
 
 /**
@@ -16,7 +16,7 @@ export const v1Routes: FastifyPluginAsync = async app => {
 
   // Protected routes (require authentication)
   await app.register(journalRoutes, { prefix: '/journal' });
-  // await app.register(musicRoutes, { prefix: '/music' });
+  await app.register(musicRoutes, { prefix: '/music' });
   // await app.register(assessmentRoutes, { prefix: '/assessments' });
 
   app.log.info('API v1 routes registered');
