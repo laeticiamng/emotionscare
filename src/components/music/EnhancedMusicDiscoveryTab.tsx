@@ -13,19 +13,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { AdvancedMusicQueue } from './AdvancedMusicQueue';
 import { MusicSearchAndFilter } from './MusicSearchAndFilter';
 import { CollaborativePlaylistUI } from './CollaborativePlaylistUI';
-
-interface MusicTrack {
-  id: string;
-  title: string;
-  artist: string;
-  mood: string;
-  category: 'doux' | 'énergique' | 'créatif' | 'guérison';
-  color: string;
-  vinylColor: string;
-  duration: number;
-  description: string;
-  waveform?: number[];
-}
+import type { MusicTrack } from '@/types/music';
 
 interface Collaborator {
   id: string;

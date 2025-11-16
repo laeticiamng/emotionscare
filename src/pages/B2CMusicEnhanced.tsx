@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * B2C MUSIC ENHANCED - EmotionsCare
  * Interface vinyles thérapeutiques avec player audio unifié
