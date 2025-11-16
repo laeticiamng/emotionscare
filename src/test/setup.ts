@@ -75,6 +75,7 @@ vi.mock('react-router-dom', () => ({
   useLocation: vi.fn(() => ({ pathname: '/' })),
   Link: ({ children, to }: any) => React.createElement('a', { href: to }, children),
   BrowserRouter: ({ children }: any) => React.createElement('div', null, children),
+  MemoryRouter: ({ children }: any) => React.createElement('div', null, children),
   Navigate: ({ to, children }: any) => React.createElement('a', { href: to }, children),
   createBrowserRouter: vi.fn(() => ({ routes: [] })),
 }));

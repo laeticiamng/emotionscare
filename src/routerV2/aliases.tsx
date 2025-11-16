@@ -60,7 +60,6 @@ export const ROUTE_ALIASES = {
   '/app/journal/audio': '/app/journal',
   '/vr-sessions': '/app/breath',
   '/breath': '/app/breath',
-  '/gamification': '/app/gamification',
   '/voice-journal': '/app/journal',
   '/vr': '/app/vr',
   '/community': '/app/social-cocon',
@@ -99,6 +98,9 @@ export const ROUTE_ALIASES = {
   '/security': '/app/security',
   '/audit': '/app/audit',
   '/accessibility': '/app/accessibility',
+  '/settings': '/settings/general',
+  '/preferences': '/settings/general',
+  '/notifications': '/settings/notifications',
 } as const;
 
 export type LegacyPath = keyof typeof ROUTE_ALIASES;
