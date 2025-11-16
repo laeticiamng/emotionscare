@@ -44,7 +44,7 @@ const MICRO_INTERACTIONS: MicroInteraction[] = [
     description: 'Vous êtes à 7 jours consécutifs! Continuez!',
     icon: <Flame className="w-6 h-6" />,
     action: 'Maintenir la série',
-    reward: null,
+    reward: undefined,
     emoji: '🔥',
   },
   {
