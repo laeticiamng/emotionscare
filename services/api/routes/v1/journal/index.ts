@@ -7,6 +7,7 @@ import {
   journalStatsSchema,
 } from '@emotionscare/contracts';
 import type { JournalEntry } from '@emotionscare/contracts';
+import * as journalDb from '../../../lib/db/journal';
 
 /**
  * Journal API Routes
@@ -28,20 +29,16 @@ export const journalRoutes: FastifyPluginAsync = async app => {
       const filters = listJournalEntriesSchema.parse(req.query);
       const userId = (req as any).user.id;
 
-      // TODO: Implement database query
-      // const entries = await db.journal.list(userId, filters);
-
-      // Placeholder response
-      const entries: JournalEntry[] = [];
+      const result = await journalDb.listJournalEntries(userId, filters);
 
       return {
         ok: true,
-        data: entries,
+        data: result.entries,
         meta: {
-          total: entries.length,
+          total: result.total,
           limit: filters.limit,
           offset: filters.offset,
-          hasMore: false,
+          hasMore: result.hasMore,
         },
       };
     } catch (err) {
@@ -57,16 +54,7 @@ export const journalRoutes: FastifyPluginAsync = async app => {
       const input = createJournalEntrySchema.parse(req.body);
       const userId = (req as any).user.id;
 
-      // TODO: Implement database insert
-      // const entry = await db.journal.create(userId, input);
-
-      // Placeholder response
-      const entry: JournalEntry = {
-        id: crypto.randomUUID(),
-        ...input,
-        date: new Date().toISOString(),
-        user_id: userId,
-      };
+      const entry = await journalDb.createJournalEntry(userId, input);
 
       reply.code(201);
       return {
@@ -85,16 +73,22 @@ export const journalRoutes: FastifyPluginAsync = async app => {
       const { id } = req.params as { id: string };
       const userId = (req as any).user.id;
 
-      // TODO: Implement database query
-      // const entry = await db.journal.get(id, userId);
+      const entry = await journalDb.getJournalEntry(id, userId);
 
-      // Placeholder
+      if (!entry) {
+        reply.code(404);
+        return {
+          ok: false,
+          error: {
+            code: 'not_found',
+            message: 'Journal entry not found',
+          },
+        };
+      }
+
       return {
-        ok: false,
-        error: {
-          code: 'not_found',
-          message: 'Journal entry not found',
-        },
+        ok: true,
+        data: entry,
       };
     } catch (err) {
       app.log.error({ err, id: (req.params as any).id }, 'Failed to get journal entry');
@@ -109,15 +103,11 @@ export const journalRoutes: FastifyPluginAsync = async app => {
       const input = updateJournalEntrySchema.parse(req.body);
       const userId = (req as any).user.id;
 
-      // TODO: Implement database update
-      // const entry = await db.journal.update(id, userId, input);
+      const entry = await journalDb.updateJournalEntry(id, userId, input);
 
       return {
-        ok: false,
-        error: {
-          code: 'not_found',
-          message: 'Journal entry not found',
-        },
+        ok: true,
+        data: entry,
       };
     } catch (err) {
       app.log.error({ err, id: (req.params as any).id }, 'Failed to update journal entry');
@@ -131,8 +121,7 @@ export const journalRoutes: FastifyPluginAsync = async app => {
       const { id } = req.params as { id: string };
       const userId = (req as any).user.id;
 
-      // TODO: Implement database delete
-      // await db.journal.delete(id, userId);
+      await journalDb.deleteJournalEntry(id, userId);
 
       reply.code(204);
       return;
@@ -147,22 +136,11 @@ export const journalRoutes: FastifyPluginAsync = async app => {
     try {
       const userId = (req as any).user.id;
 
-      // TODO: Implement database query
-      // const stats = await db.journal.stats(userId);
-
-      // Placeholder
-      const stats = {
-        totalEntries: 0,
-        averageMoodScore: 0,
-        mostCommonMood: undefined,
-        mostUsedTags: [],
-        entriesThisWeek: 0,
-        entriesThisMonth: 0,
-      };
+      const stats = await journalDb.getJournalStats(userId);
 
       return {
         ok: true,
-        data: journalStatsSchema.parse(stats),
+        data: stats,
       };
     } catch (err) {
       app.log.error({ err }, 'Failed to get journal stats');
