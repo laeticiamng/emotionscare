@@ -1,27 +1,40 @@
-// @ts-nocheck
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Play, Pause, Camera, Brain, Heart, Sparkles, Zap, 
-  ChevronRight, ArrowRight, CheckCircle, Star, 
-  Volume2, Users, Shield, Headphones
+import {
+  Play, Pause, Camera, Brain, Heart, Sparkles, Zap,
+  ChevronRight, ArrowRight, CheckCircle, Star,
+  Volume2, Users, Shield, Headphones,
+  LucideIcon
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { routes } from '@/routerV2';
+import { usePageSEO } from '@/hooks/usePageSEO';
 
 interface DemoStep {
   id: string;
   title: string;
   description: string;
-  icon: React.ReactNode;
+  icon: LucideIcon;
   color: string;
   preview: React.ReactNode;
 }
 
+interface Benefit {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+}
+
 const DemoPage: React.FC = () => {
+  usePageSEO({
+    title: 'Démonstration EmotionsCare - Découvrez nos fonctionnalités',
+    description: 'Explorez nos fonctionnalités révolutionnaires: scan émotionnel IA, musicothérapie, coach IA empathique. Découvrez comment EmotionsCare transforme votre bien-être émotionnel.',
+    keywords: 'démo emotionscare, scan émotionnel, musicothérapie, coach ia, bien-être mental'
+  });
+
   const [activeStep, setActiveStep] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -31,7 +44,7 @@ const DemoPage: React.FC = () => {
       id: 'scan',
       title: 'Scan Émotionnel IA',
       description: 'Analysez instantanément votre état émotionnel grâce à notre technologie de reconnaissance faciale avancée.',
-      icon: <Camera className="w-6 h-6" />,
+      icon: Camera,
       color: 'from-blue-500 to-cyan-500',
       preview: (
         <div className="relative bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-6">
@@ -60,7 +73,7 @@ const DemoPage: React.FC = () => {
       id: 'music',
       title: 'Thérapie Musicale Personnalisée',
       description: 'Générez des playlists thérapeutiques adaptées à votre humeur avec des fréquences binaurales.',
-      icon: <Headphones className="w-6 h-6" />,
+      icon: Headphones,
       color: 'from-purple-500 to-pink-500',
       preview: (
         <div className="relative bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-6">
@@ -91,7 +104,7 @@ const DemoPage: React.FC = () => {
       id: 'coach',
       title: 'Coach IA Empathique',
       description: 'Conversez avec notre IA thérapeutique disponible 24/7 pour un soutien personnalisé.',
-      icon: <Brain className="w-6 h-6" />,
+      icon: Brain,
       color: 'from-emerald-500 to-teal-500',
       preview: (
         <div className="relative bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl p-6">
@@ -129,7 +142,7 @@ const DemoPage: React.FC = () => {
       id: 'analytics',
       title: 'Insights & Progrès',
       description: 'Suivez votre évolution émotionnelle avec des analyses détaillées et des recommandations IA.',
-      icon: <Zap className="w-6 h-6" />,
+      icon: Zap,
       color: 'from-orange-500 to-red-500',
       preview: (
         <div className="relative bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-6">
@@ -157,7 +170,7 @@ const DemoPage: React.FC = () => {
     }
   ];
 
-  const benefits = [
+  const benefits: Benefit[] = [
     {
       icon: <Shield className="w-5 h-5" />,
       title: "100% Sécurisé",
@@ -258,20 +271,22 @@ const DemoPage: React.FC = () => {
           <div className="grid lg:grid-cols-2 gap-8 max-w-7xl mx-auto">
             {/* Steps Navigation */}
             <div className="space-y-4">
-              {demoSteps.map((step, index) => (
+              {demoSteps.map((step, index) => {
+                const StepIcon = step.icon;
+                return (
                 <motion.div
                   key={step.id}
                   whileHover={{ scale: 1.02 }}
                   onClick={() => setActiveStep(index)}
                   className={`p-6 rounded-xl cursor-pointer transition-all ${
-                    activeStep === index 
-                      ? 'bg-white shadow-lg border-2 border-blue-200' 
+                    activeStep === index
+                      ? 'bg-white shadow-lg border-2 border-blue-200'
                       : 'bg-white/60 hover:bg-white/80 shadow-md'
                   }`}
                 >
                   <div className="flex items-start space-x-4">
                     <div className={`p-3 rounded-lg bg-gradient-to-r ${step.color} text-white flex-shrink-0`}>
-                      {step.icon}
+                      <StepIcon className="w-6 h-6" />
                     </div>
                     <div className="flex-1">
                       <h3 className="text-xl font-semibold mb-2 text-gray-800">{step.title}</h3>
@@ -289,32 +304,38 @@ const DemoPage: React.FC = () => {
                     </div>
                   </div>
                 </motion.div>
-              ))}
+                );
+              })}
             </div>
 
             {/* Active Step Preview */}
             <div className="lg:sticky lg:top-8">
               <AnimatePresence mode="wait">
-                <motion.div
-                  key={activeStep}
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  transition={{ duration: 0.3 }}
-                  className="bg-white rounded-2xl shadow-xl overflow-hidden"
-                >
-                  <div className="p-6">
-                    <div className="flex items-center space-x-3 mb-4">
-                      <div className={`p-2 rounded-lg bg-gradient-to-r ${demoSteps[activeStep].color} text-white`}>
-                        {demoSteps[activeStep].icon}
+                {(() => {
+                  const ActiveStepIcon = demoSteps[activeStep].icon;
+                  return (
+                    <motion.div
+                      key={activeStep}
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -20 }}
+                      transition={{ duration: 0.3 }}
+                      className="bg-white rounded-2xl shadow-xl overflow-hidden"
+                    >
+                      <div className="p-6">
+                        <div className="flex items-center space-x-3 mb-4">
+                          <div className={`p-2 rounded-lg bg-gradient-to-r ${demoSteps[activeStep].color} text-white`}>
+                            <ActiveStepIcon className="w-6 h-6" />
+                          </div>
+                          <h3 className="text-xl font-semibold text-gray-800">
+                            {demoSteps[activeStep].title}
+                          </h3>
+                        </div>
+                        {demoSteps[activeStep].preview}
                       </div>
-                      <h3 className="text-xl font-semibold text-gray-800">
-                        {demoSteps[activeStep].title}
-                      </h3>
-                    </div>
-                    {demoSteps[activeStep].preview}
-                  </div>
-                </motion.div>
+                    </motion.div>
+                  );
+                })()}
               </AnimatePresence>
             </div>
           </div>
