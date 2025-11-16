@@ -5,7 +5,7 @@ import { PageErrorBoundary } from '@/components/error/PageErrorBoundary';
 import PageRoot from '@/components/common/PageRoot';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { EmojiEmotionScanner } from '@/components/scan/EmojiEmotionScanner';
+import EmojiEmotionScanner from '@/components/scan/EmojiEmotionScanner';
 import { EmotionResult } from '@/types/emotion-unified';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Smile, Sparkles, Heart, ThumbsUp } from 'lucide-react';

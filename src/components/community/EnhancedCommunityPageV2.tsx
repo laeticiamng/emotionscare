@@ -7,7 +7,7 @@ import {
   Shield,
   Sparkles,
   Users,
-  Tabs,
+  LayoutGrid,
   BarChart3,
 } from 'lucide-react';
 

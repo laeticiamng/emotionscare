@@ -210,14 +210,10 @@ const QuickStartModules: React.FC = () => {
 
                   {/* Hover indicator */}
                   <motion.div
-                    className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r"
-                    style={{
-                      backgroundImage: `linear-gradient(to right, var(--tw-gradient-from), var(--tw-gradient-to))`,
-                    }}
+                    className={`absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r ${module.gradient}`}
                     initial={{ scaleX: 0 }}
                     animate={{ scaleX: hoveredId === module.id ? 1 : 0 }}
                     transition={{ duration: 0.3 }}
-                    className={`bg-gradient-to-r ${module.gradient}`}
                   />
                 </Card>
               </motion.div>

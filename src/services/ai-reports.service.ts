@@ -139,11 +139,12 @@ export async function createReportSchedule(
   userId: string,
   schedule: Omit<ReportSchedule, 'id' | 'userId' | 'createdAt' | 'updatedAt'>
 ): Promise<ReportSchedule> {
+  const { user_id, ...scheduleWithoutUserId } = schedule as any;
   const { data, error } = await supabase
     .from('report_schedules')
     .insert({
       user_id: userId,
-      ...schedule,
+      ...scheduleWithoutUserId,
     })
     .select()
     .single();

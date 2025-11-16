@@ -154,7 +154,7 @@ export const SharePostButton: React.FC<SharePostButtonProps> = ({
           <span>Copier le texte</span>
         </DropdownMenuItem>
 
-        {navigator.share && (
+        {typeof navigator !== 'undefined' && 'share' in navigator && (
           <>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleNativeShare} className="cursor-pointer">

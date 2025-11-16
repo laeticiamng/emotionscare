@@ -9,15 +9,12 @@
 // SERVICE
 // ============================================================================
 
-export {
-  musicTherapyService,
-  default as musicTherapyServiceDefault,
-} from './musicTherapyService';
+export { MusicTherapyService } from './musicTherapyService';
+export { MusicTherapyService as musicTherapyService } from './musicTherapyService';
 
 // Export du service enrichi (version avancée)
-export {
-  musicTherapyServiceEnriched,
-} from './musicTherapyServiceEnriched';
+export { MusicTherapyServiceEnriched } from './musicTherapyServiceEnriched';
+export { MusicTherapyServiceEnriched as musicTherapyServiceEnriched } from './musicTherapyServiceEnriched';
 
 // ============================================================================
 // TYPES
@@ -25,11 +22,4 @@ export {
 
 // Export des types
 export * from './types';
-
-// Re-export des types depuis le service
-export type {
-  MoodType,
-  TherapySession,
-  MusicRecommendation,
-  TherapyPlaylist,
-} from './musicTherapyService';
+export type { MusicSession } from './musicTherapyService';
