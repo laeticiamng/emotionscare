@@ -19,14 +19,14 @@ export { CoachQuickActions } from './CoachQuickActions';
 export { CoachMicroInteractions } from './CoachMicroInteractions';
 
 // Composants existants
-export { CoachChat } from './CoachChat';
-export { CoachChatInput } from './CoachChatInput';
-export { CoachMessage } from './CoachMessage';
-export { ChatMessageList } from './ChatMessageList';
-export { ChatHeader } from './ChatHeader';
-export { ChatInputForm } from './ChatInputForm';
-export { CoachAvatar } from './CoachAvatar';
-export { CoachCharacter } from './CoachCharacter';
-export { CoachRecommendations } from './CoachRecommendations';
-export { CoachInsights } from './CoachInsights';
-export { ConversationHistory } from './ConversationHistory';
+export { default as CoachChat } from './CoachChat';
+export { default as CoachChatInput } from './CoachChatInput';
+export { default as CoachMessage } from './CoachMessage';
+export { default as ChatMessageList } from './ChatMessageList';
+export { default as ChatHeader } from './ChatHeader';
+export { default as ChatInputForm } from './ChatInputForm';
+export { default as CoachAvatar } from './CoachAvatar';
+export { default as CoachCharacter } from './CoachCharacter';
+export { default as CoachRecommendations } from './CoachRecommendations';
+export { default as CoachInsights } from './CoachInsights';
+export { default as ConversationHistory } from './ConversationHistory';

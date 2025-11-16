@@ -9,18 +9,4 @@
 // HOOKS
 // ============================================================================
 
-export {
-  useSessionClock,
-  default as useSessionClockDefault,
-} from './hooks/useSessionClock';
-
-// ============================================================================
-// TYPES
-// ============================================================================
-
-// Re-export des types depuis les hooks
-export type {
-  SessionClockState,
-  SessionClockActions,
-  SessionConfig,
-} from './hooks/useSessionClock';
+export { useSessionClock } from './hooks/useSessionClock';

@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
-  Lightbulb, Brain, Heart, Zap, Music, Meditation, Coffee,
+  Lightbulb, Brain, Heart, Zap, Music, Sparkles, Coffee,
   UtensilsCrossed, Dumbbell, Moon, BookOpen, Users, ChevronRight
 } from 'lucide-react';
 import { useScanHistory } from '@/hooks/useScanHistory';
@@ -59,7 +59,7 @@ const RECOMMENDATIONS: { [key: string]: Recommendation[] } = {
       id: 'breathing',
       title: 'Respiration contrôlée',
       description: 'Pratiquez la respiration 4-7-8 pour calmer votre système nerveux.',
-      icon: <Meditation className="w-5 h-5" />,
+      icon: <Sparkles className="w-5 h-5" />,
       category: 'wellness',
       priority: 'high',
       duration: '5 min'

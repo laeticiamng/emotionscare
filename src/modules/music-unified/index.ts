@@ -13,7 +13,6 @@
 export {
   MusicUnifiedService,
   musicUnifiedService,
-  default as musicUnifiedServiceDefault,
 } from './musicUnifiedService';
 
 // ============================================================================

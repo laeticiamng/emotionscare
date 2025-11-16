@@ -71,7 +71,7 @@ export const BREATHING_TECHNIQUES: Record<string, BreathingTechnique> = {
       'C\'est un cycle. Recommence immédiatement',
       'Répète 4 fois (total ~2 minutes)',
     ],
-    contraindications: 'Évite si tu as des problèmes respiratoires',
+    contraindications: ['Évite si tu as des problèmes respiratoires'],
     scientific_basis: 'Développée par le Dr Andrew Weil pour induire le sommeil',
   },
 

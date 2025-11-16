@@ -31,8 +31,8 @@ interface MusicTrack {
 }
 
 interface FilterOptions {
-  moods: string[];
-  categories: string[];
+  mood: string[];
+  category: string[];
   durationRange: [number, number]; // in minutes
 }
 
@@ -62,8 +62,8 @@ export const MusicSearchAndFilter: React.FC<MusicSearchAndFilterProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState<FilterOptions>({
-    moods: [],
-    categories: [],
+    mood: [],
+    category: [],
     durationRange: [0, 600], // 0 to 10 minutes
   });
 
@@ -78,15 +78,15 @@ export const MusicSearchAndFilter: React.FC<MusicSearchAndFilterProps> = ({
 
       // Mood filter
       const matchesMood =
-        filters.moods.length === 0 ||
-        filters.moods.some((mood) =>
+        filters.mood.length === 0 ||
+        filters.mood.some((mood: string) =>
           track.mood.toLowerCase().includes(mood.toLowerCase())
         );
 
       // Category filter
       const matchesCategory =
-        filters.categories.length === 0 ||
-        filters.categories.includes(track.category);
+        filters.category.length === 0 ||
+        filters.category.includes(track.category);
 
       // Duration filter
       const trackDuration = Math.floor(track.duration / 60);
@@ -117,14 +117,14 @@ export const MusicSearchAndFilter: React.FC<MusicSearchAndFilterProps> = ({
   const resetFilters = () => {
     setSearchQuery('');
     setFilters({
-      moods: [],
-      categories: [],
+      mood: [],
+      category: [],
       durationRange: [0, 600],
     });
   };
 
   const activeFilterCount =
-    filters.moods.length + filters.categories.length +
+    filters.mood.length + filters.category.length +
     (filters.durationRange[0] > 0 || filters.durationRange[1] < 600 ? 1 : 0);
 
   return (
@@ -197,7 +197,7 @@ export const MusicSearchAndFilter: React.FC<MusicSearchAndFilterProps> = ({
                       key={mood}
                       size="sm"
                       variant={
-                        filters.moods.includes(mood) ? 'default' : 'outline'
+                        filters.mood.includes(mood) ? 'default' : 'outline'
                       }
                       onClick={() => toggleFilter('mood', mood)}
                       className="gap-1"
@@ -229,7 +229,7 @@ export const MusicSearchAndFilter: React.FC<MusicSearchAndFilterProps> = ({
                         key={category}
                         size="sm"
                         variant={
-                          filters.categories.includes(category)
+                          filters.category.includes(category)
                             ? 'default'
                             : 'outline'
                         }
