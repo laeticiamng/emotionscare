@@ -1,6 +1,5 @@
 // @ts-nocheck
 import { z } from 'zod';
-import { logger } from '@/lib/logger';
 
 /**
  * Gestion centralisée des variables d'environnement avec validation stricte.
@@ -98,18 +97,18 @@ if (rawEnv.MODE === 'development') {
 }
 
 if (!parsedEnv.success) {
-  logger.error('[SYSTEM] Invalid environment configuration', JSON.stringify(parsedEnv.error.flatten().fieldErrors), 'LIB');
-  
+  console.error('[SYSTEM] Invalid environment configuration', JSON.stringify(parsedEnv.error.flatten().fieldErrors));
+
   // In development, provide more helpful error handling
   if (rawEnv.MODE === 'development') {
-    logger.warn('[SYSTEM] Development mode: attempting to continue with available variables', 'LIB');
-    
+    console.warn('[SYSTEM] Development mode: attempting to continue with available variables');
+
     // Check if we at least have the basic Supabase config
     if (!rawEnv.VITE_SUPABASE_URL || !rawEnv.VITE_SUPABASE_ANON_KEY) {
-      logger.error(new Error('[SYSTEM] Missing critical Supabase configuration - Check .env file'), 'LIB');
+      console.error('[SYSTEM] Missing critical Supabase configuration - Check .env file');
     }
   }
-  
+
   throw new Error('Environment validation failed. Vérifiez les variables manquantes ou invalides.');
 }
 
@@ -223,7 +222,7 @@ const missingOptionalKeys = Object.entries({
 
 if (missingOptionalKeys.length > 0) {
   const formatted = missingOptionalKeys.map(([key]) => key).join(', ');
-  logger.info(`[SYSTEM] Variables d'environnement optionnelles manquantes: ${formatted}`, 'LIB');
+  console.info(`[SYSTEM] Variables d'environnement optionnelles manquantes: ${formatted}`);
 }
 
 if (IS_DEV) {
