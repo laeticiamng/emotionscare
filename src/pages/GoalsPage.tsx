@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,9 +6,19 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Plus, Target, TrendingUp, Calendar } from 'lucide-react';
 
+interface Goal {
+  id: number;
+  title: string;
+  progress: number;
+  deadline: string;
+  category: string;
+}
+
 export default function GoalsPage() {
   const navigate = useNavigate();
-  const [goals] = useState([
+
+  // TODO: Replace with real API call
+  const [goals] = useState<Goal[]>([
     { id: 1, title: 'Méditer 5 fois par semaine', progress: 60, deadline: '2025-11-30', category: 'Bien-être' },
     { id: 2, title: 'Améliorer score émotionnel', progress: 75, deadline: '2025-12-15', category: 'Émotions' },
     { id: 3, title: 'Compléter 10 sessions VR', progress: 40, deadline: '2025-11-20', category: 'Immersion' },

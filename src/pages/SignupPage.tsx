@@ -6,16 +6,22 @@ import { logger } from '@/lib/logger';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { 
-  Heart, 
-  Mail, 
-  Lock, 
-  Eye, 
-  EyeOff, 
-  ArrowLeft, 
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
+import {
+  Heart,
+  Mail,
+  Lock,
+  Eye,
+  EyeOff,
+  ArrowLeft,
   UserPlus,
-  AlertCircle
+  AlertCircle,
+  Chrome,
+  Github
 } from 'lucide-react';
+import { toast } from '@/hooks/use-toast';
 
 const SignupPage: React.FC = () => {
   const navigate = useNavigate();
@@ -25,9 +31,11 @@ const SignupPage: React.FC = () => {
   const [fullName, setFullName] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [acceptTerms, setAcceptTerms] = useState(false);
+  const [acceptPrivacy, setAcceptPrivacy] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  
+
   const { signUp, isLoading, isAuthenticated } = useAuth();
 
   // Redirection automatique si déjà connecté
@@ -41,8 +49,19 @@ const SignupPage: React.FC = () => {
     e.preventDefault();
     setError('');
     setSuccess('');
-    
+
     if (isLoading) return;
+
+    // Validation CGU/Privacy (RGPD obligatoire)
+    if (!acceptTerms) {
+      setError('Vous devez accepter les Conditions Générales d\'Utilisation');
+      return;
+    }
+
+    if (!acceptPrivacy) {
+      setError('Vous devez accepter la Politique de Confidentialité');
+      return;
+    }
 
     // Validation des mots de passe
     if (password !== confirmPassword) {
@@ -219,6 +238,96 @@ const SignupPage: React.FC = () => {
                   <p className="text-sm">{success}</p>
                 </motion.div>
               )}
+
+              {/* Checkboxes CGU/Privacy - RGPD */}
+              <div className="space-y-3 pt-2">
+                <div className="flex items-start space-x-3">
+                  <Checkbox
+                    id="terms"
+                    checked={acceptTerms}
+                    onCheckedChange={(checked) => setAcceptTerms(checked as boolean)}
+                    disabled={isLoading}
+                    className="mt-0.5"
+                  />
+                  <Label
+                    htmlFor="terms"
+                    className="text-sm leading-relaxed cursor-pointer"
+                  >
+                    J'accepte les{' '}
+                    <Link to="/legal/terms" className="text-primary hover:underline font-medium" target="_blank">
+                      Conditions Générales d'Utilisation
+                    </Link>
+                    {' '}*
+                  </Label>
+                </div>
+
+                <div className="flex items-start space-x-3">
+                  <Checkbox
+                    id="privacy"
+                    checked={acceptPrivacy}
+                    onCheckedChange={(checked) => setAcceptPrivacy(checked as boolean)}
+                    disabled={isLoading}
+                    className="mt-0.5"
+                  />
+                  <Label
+                    htmlFor="privacy"
+                    className="text-sm leading-relaxed cursor-pointer"
+                  >
+                    J'accepte la{' '}
+                    <Link to="/legal/privacy" className="text-primary hover:underline font-medium" target="_blank">
+                      Politique de Confidentialité
+                    </Link>
+                    {' '}et le traitement de mes données personnelles *
+                  </Label>
+                </div>
+
+                <p className="text-xs text-muted-foreground">
+                  * Champs obligatoires conformément au RGPD
+                </p>
+              </div>
+
+              {/* Social Login Options */}
+              <div className="space-y-3">
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <Separator className="w-full" />
+                  </div>
+                  <div className="relative flex justify-center text-xs">
+                    <span className="bg-card px-2 text-muted-foreground">
+                      OU CONTINUER AVEC
+                    </span>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => toast({
+                      title: "Bientôt disponible",
+                      description: "Connexion via Google sera disponible prochainement"
+                    })}
+                    disabled={isLoading}
+                    className="h-11 hover:bg-muted/50"
+                  >
+                    <Chrome className="w-4 h-4 mr-2" />
+                    Google
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => toast({
+                      title: "Bientôt disponible",
+                      description: "Connexion via GitHub sera disponible prochainement"
+                    })}
+                    disabled={isLoading}
+                    className="h-11 hover:bg-muted/50"
+                  >
+                    <Github className="w-4 h-4 mr-2" />
+                    GitHub
+                  </Button>
+                </div>
+              </div>
 
               {/* Submit Button */}
               <Button 
