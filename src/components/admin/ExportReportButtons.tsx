@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { logger } from '@/lib/logger';
 import { 
   DropdownMenu,
   DropdownMenuContent,
@@ -63,7 +64,7 @@ export function ExportReportButtons({ dateRangeDays = 7 }: ExportReportButtonsPr
       toast.dismiss();
       toast.success(`Rapport ${format.toUpperCase()} généré avec succès`);
     } catch (error) {
-      console.error('Export error:', error);
+      logger.error('Export error:', error, 'COMPONENT');
       toast.dismiss();
       toast.error(error instanceof Error ? error.message : 'Erreur lors de l\'export');
     } finally {

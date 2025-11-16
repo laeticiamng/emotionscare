@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { usePDFReportHistory } from '@/hooks/usePDFReportHistory';
+import { logger } from '@/lib/logger';
 import { 
   Clock, 
   Plus, 
@@ -82,7 +83,7 @@ export const PDFReportScheduler: React.FC = () => {
       setDialogOpen(false);
       resetForm();
     } catch (error) {
-      console.error('Error saving schedule:', error);
+      logger.error('Error saving schedule:', error, 'COMPONENT');
     }
   };
 

@@ -10,12 +10,13 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { 
-  Activity, 
-  TrendingUp, 
-  Clock, 
-  AlertTriangle, 
-  CheckCircle2, 
+import { logger } from '@/lib/logger';
+import {
+  Activity,
+  TrendingUp,
+  Clock,
+  AlertTriangle,
+  CheckCircle2,
   RefreshCw,
   Brain,
   BarChart3,
@@ -122,7 +123,7 @@ const EscalationMonitoringDashboard: React.FC = () => {
         window.location.reload();
       }, 2000);
     } catch (error) {
-      console.error('ML analysis error:', error);
+      logger.error('ML analysis error:', error, 'PAGE');
       toast.error('Erreur lors de l\'analyse ML');
     } finally {
       setIsRefreshing(false);
@@ -140,7 +141,7 @@ const EscalationMonitoringDashboard: React.FC = () => {
         window.location.reload();
       }, 2000);
     } catch (error) {
-      console.error('Optimization error:', error);
+      logger.error('Optimization error:', error, 'PAGE');
       toast.error('Erreur lors de l\'optimisation');
     } finally {
       setIsRefreshing(false);

@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { Line } from 'react-chartjs-2';
 import { AlertTriangle, DollarSign, TrendingUp, Activity } from 'lucide-react';
+import { logger } from '@/lib/logger';
 
 interface APIUsageMetric {
   function_name: string;
@@ -77,7 +78,7 @@ export default function APIMonitoringDashboard() {
 
       setLoading(false);
     } catch (error) {
-      console.error('Error fetching metrics:', error);
+      logger.error('Error fetching metrics:', error, 'PAGE');
       setLoading(false);
     }
   };

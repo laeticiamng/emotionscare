@@ -8,6 +8,7 @@ import { EmotionResult, LiveVoiceScannerProps, normalizeEmotionResult } from '@/
 import { Mic, Square, AlertCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 
 
 /**
@@ -56,7 +57,7 @@ const LiveVoiceScanner: React.FC<LiveVoiceScannerProps> = ({
     setError(null);
     
     try {
-      console.log('[LiveVoiceScanner] Processing audio, size:', audioBlob.size);
+      logger.debug('[LiveVoiceScanner] Processing audio, size:', audioBlob.size, 'COMPONENT');
       
       // Convertir en base64
       const audioBase64 = await blobToBase64(audioBlob);
@@ -67,7 +68,7 @@ const LiveVoiceScanner: React.FC<LiveVoiceScannerProps> = ({
       });
 
       if (invokeError) {
-        console.error('[LiveVoiceScanner] Edge function error:', invokeError);
+        logger.error('[LiveVoiceScanner] Edge function error:', invokeError, 'COMPONENT');
         throw new Error(invokeError.message || 'Failed to analyze voice');
       }
 
@@ -75,7 +76,7 @@ const LiveVoiceScanner: React.FC<LiveVoiceScannerProps> = ({
         throw new Error('No data returned from voice analysis');
       }
 
-      console.log('[LiveVoiceScanner] Analysis result:', data);
+      logger.debug('[LiveVoiceScanner] Analysis result:', data, 'COMPONENT');
 
       // Convertir la réponse en EmotionResult unifié
       const emotionResult: EmotionResult = normalizeEmotionResult({
@@ -128,15 +129,15 @@ const LiveVoiceScanner: React.FC<LiveVoiceScannerProps> = ({
           });
 
           if (insertError) {
-            console.error('[LiveVoiceScanner] Error saving to clinical_signals:', insertError);
+            logger.error('[LiveVoiceScanner] Error saving to clinical_signals:', insertError, 'COMPONENT');
           } else {
-            console.log('[LiveVoiceScanner] Successfully saved to clinical_signals');
+            logger.debug('[LiveVoiceScanner] Successfully saved to clinical_signals', 'COMPONENT');
             // Invalider le cache pour rafraîchir l'historique
             window.dispatchEvent(new CustomEvent('scan-saved'));
           }
         }
       } catch (saveError) {
-        console.error('[LiveVoiceScanner] Exception saving to DB:', saveError);
+        logger.error('[LiveVoiceScanner] Exception saving to DB:', saveError, 'COMPONENT');
       }
 
       toast({
@@ -145,7 +146,7 @@ const LiveVoiceScanner: React.FC<LiveVoiceScannerProps> = ({
       });
 
     } catch (err) {
-      console.error('[LiveVoiceScanner] Error:', err);
+      logger.error('[LiveVoiceScanner] Error:', err, 'COMPONENT');
       const errorMessage = err instanceof Error ? err.message : 'Erreur inconnue';
       setError(errorMessage);
       
@@ -183,7 +184,7 @@ const LiveVoiceScanner: React.FC<LiveVoiceScannerProps> = ({
       mediaRecorder.onstop = async () => {
         // Créer le blob audio
         const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-        console.log('[LiveVoiceScanner] Recording stopped, blob size:', audioBlob.size);
+        logger.debug('[LiveVoiceScanner] Recording stopped, blob size:', audioBlob.size, 'COMPONENT');
         
         // Arrêter tous les tracks
         stream.getTracks().forEach(track => track.stop());
@@ -202,10 +203,10 @@ const LiveVoiceScanner: React.FC<LiveVoiceScannerProps> = ({
       setIsRecording(true);
       setProgress(0);
       
-      console.log('[LiveVoiceScanner] Recording started');
+      logger.debug('[LiveVoiceScanner] Recording started', 'COMPONENT');
       
     } catch (err) {
-      console.error('[LiveVoiceScanner] Failed to start recording:', err);
+      logger.error('[LiveVoiceScanner] Failed to start recording:', err, 'COMPONENT');
       setError('Impossible d\'accéder au microphone');
       
       toast({
@@ -221,7 +222,7 @@ const LiveVoiceScanner: React.FC<LiveVoiceScannerProps> = ({
    */
   const stopRecording = useCallback(() => {
     if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
-      console.log('[LiveVoiceScanner] Stopping recording');
+      logger.debug('[LiveVoiceScanner] Stopping recording', 'COMPONENT');
       mediaRecorderRef.current.stop();
       setIsRecording(false);
     }

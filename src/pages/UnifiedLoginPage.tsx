@@ -1,6 +1,6 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
@@ -12,6 +12,7 @@ import { sanitizeInput } from '@/lib/validation/validator';
 
 export default function UnifiedLoginPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
   
   const form = useForm<LoginFormData>({
@@ -39,7 +40,9 @@ export default function UnifiedLoginPage() {
         description: 'Vous êtes maintenant connecté',
       });
 
-      navigate('/app');
+      // Rediriger vers la page initialement demandée ou vers /app par défaut
+      const from = (location.state as any)?.from || '/app';
+      navigate(from, { replace: true });
     } catch (error: any) {
       toast({
         title: 'Erreur de connexion',

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 
 export interface ChallengeHistoryEntry {
   id: string;
@@ -60,7 +61,7 @@ export const useChallengesHistory = () => {
       // Calculate stats
       calculateStats(historyData);
     } catch (error) {
-      console.error('Error fetching challenges history:', error);
+      logger.error('Error fetching challenges history:', error, 'HOOK');
     } finally {
       setLoading(false);
     }

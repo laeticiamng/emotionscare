@@ -5,6 +5,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import type {
+import { logger } from '@/lib/logger';
   EmotionScanDB,
   CreateEmotionScan,
   UpdateEmotionScan,
@@ -37,7 +38,7 @@ export class EmotionScanService {
       .single();
 
     if (error) {
-      console.error('[EmotionScanService] Create scan error:', error);
+      logger.error('[EmotionScanService] Create scan error:', error, 'MODULE');
       throw new Error(`Failed to create emotion scan: ${error.message}`);
     }
 
@@ -56,7 +57,7 @@ export class EmotionScanService {
 
     if (error) {
       if (error.code === 'PGRST116') return null; // Not found
-      console.error('[EmotionScanService] Get scan error:', error);
+      logger.error('[EmotionScanService] Get scan error:', error, 'MODULE');
       throw new Error(`Failed to get emotion scan: ${error.message}`);
     }
 
@@ -90,7 +91,7 @@ export class EmotionScanService {
       .range(offset, offset + limit - 1);
 
     if (error) {
-      console.error('[EmotionScanService] Get user scans error:', error);
+      logger.error('[EmotionScanService] Get user scans error:', error, 'MODULE');
       throw new Error(`Failed to get user scans: ${error.message}`);
     }
 
@@ -112,7 +113,7 @@ export class EmotionScanService {
       .single();
 
     if (error) {
-      console.error('[EmotionScanService] Update scan error:', error);
+      logger.error('[EmotionScanService] Update scan error:', error, 'MODULE');
       throw new Error(`Failed to update emotion scan: ${error.message}`);
     }
 
@@ -129,7 +130,7 @@ export class EmotionScanService {
       .eq('id', scanId);
 
     if (error) {
-      console.error('[EmotionScanService] Delete scan error:', error);
+      logger.error('[EmotionScanService] Delete scan error:', error, 'MODULE');
       throw new Error(`Failed to delete emotion scan: ${error.message}`);
     }
   }
@@ -158,7 +159,7 @@ export class EmotionScanService {
       );
 
       if (error) {
-        console.error('[EmotionScanService] Text analysis error:', error);
+        logger.error('[EmotionScanService] Text analysis error:', error, 'MODULE');
         throw new Error(error.message || 'Failed to analyze text');
       }
 
@@ -195,7 +196,7 @@ export class EmotionScanService {
 
       return result;
     } catch (error) {
-      console.error('[EmotionScanService] Text analysis failed:', error);
+      logger.error('[EmotionScanService] Text analysis failed:', error, 'MODULE');
       throw error;
     }
   }
@@ -241,7 +242,7 @@ export class EmotionScanService {
 
       return mockResult;
     } catch (error) {
-      console.error('[EmotionScanService] Facial analysis failed:', error);
+      logger.error('[EmotionScanService] Facial analysis failed:', error, 'MODULE');
       throw error;
     }
   }
@@ -292,7 +293,7 @@ export class EmotionScanService {
 
       return mockResult;
     } catch (error) {
-      console.error('[EmotionScanService] Voice analysis failed:', error);
+      logger.error('[EmotionScanService] Voice analysis failed:', error, 'MODULE');
       throw error;
     }
   }
@@ -388,7 +389,7 @@ export class EmotionScanService {
         last_scan_date: scans[0]?.created_at || new Date().toISOString()
       };
     } catch (error) {
-      console.error('[EmotionScanService] Get stats error:', error);
+      logger.error('[EmotionScanService] Get stats error:', error, 'MODULE');
       throw error;
     }
   }
@@ -447,7 +448,7 @@ export class EmotionScanService {
 
       return trendArray.sort((a, b) => a.date.localeCompare(b.date));
     } catch (error) {
-      console.error('[EmotionScanService] Get trends error:', error);
+      logger.error('[EmotionScanService] Get trends error:', error, 'MODULE');
       throw error;
     }
   }
@@ -470,7 +471,7 @@ export class EmotionScanService {
       .eq('user_id', userId);
 
     if (error) {
-      console.error('[EmotionScanService] Count scans error:', error);
+      logger.error('[EmotionScanService] Count scans error:', error, 'MODULE');
       return 0;
     }
 

@@ -4,6 +4,7 @@
  */
 
 import { aiMonitoring, captureMessage } from '@/lib/ai-monitoring';
+import { logger } from '@/lib/logger';
 
 type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 
@@ -124,7 +125,7 @@ class Logger {
       });
     } catch (err) {
       if (this.isDevelopment) {
-        console.warn('[Logger] Failed to report to monitoring service', err);
+        logger.warn('[Logger] Failed to report to monitoring service', err, 'LIB');
       }
     }
   }
@@ -160,17 +161,17 @@ class Logger {
         break;
       case 'info':
         if (this.isDevelopment) {
-          console.info(...args);
+          logger.info(...args, 'LIB');
         }
         break;
       case 'warn':
-        console.warn(...args);
+        logger.warn(...args, 'LIB');
         break;
       case 'error':
-        console.error(...args);
+        logger.error(new Error(...args), 'LIB');
         break;
       default:
-        console.log(...args);
+        logger.debug(...args, 'LIB');
     }
   }
 

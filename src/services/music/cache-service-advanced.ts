@@ -659,7 +659,7 @@ export function useAdvancedMusicCache() {
  *
  * ```typescript
  * const stats = await advancedMusicCache.getStats();
- * console.log(`Hit rate: ${(stats.hitRate * 100).toFixed(2)}%`);
- * console.log(`Total size: ${(stats.totalSize / 1024 / 1024).toFixed(2)}MB`);
+ * logger.debug(`Hit rate: ${(stats.hitRate * 100).toFixed(2)}%`, 'SERVICE');
+ * logger.debug(`Total size: ${(stats.totalSize / 1024 / 1024).toFixed(2)}MB`, 'SERVICE');
  * ```
  */

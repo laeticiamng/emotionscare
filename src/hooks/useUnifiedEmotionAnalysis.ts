@@ -78,8 +78,7 @@ export interface UseUnifiedEmotionAnalysisOptions {
  * ```tsx
  * const { analyzeText, result, isAnalyzing } = useUnifiedEmotionAnalysis({
  *   showSuccessToast: true,
- *   onSuccess: (result) => console.log('Analysé:', result)
- * });
+ *   onSuccess: (result) => logger.debug('Analysé:', result, 'HOOK');
  *
  * const handleAnalyze = async () => {
  *   await analyzeText({ text: 'Je suis très heureux aujourd\'hui!' });

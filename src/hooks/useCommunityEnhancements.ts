@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { logger } from '@/lib/logger';
 
 const BOOKMARKS_KEY = 'community_bookmarks';
 const REACTIONS_KEY = 'community_reactions';
@@ -42,7 +43,7 @@ export const useCommunityEnhancements = () => {
         }
       }
     } catch (error) {
-      console.error('Error loading community enhancements:', error);
+      logger.error('Error loading community enhancements:', error, 'HOOK');
     } finally {
       setIsLoading(false);
     }

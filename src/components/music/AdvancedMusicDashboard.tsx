@@ -7,6 +7,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { logger } from '@/lib/logger';
 import {
   WifiOff,
   Volume2,
@@ -180,7 +181,7 @@ export const AdvancedMusicDashboard: React.FC<AdvancedMusicDashboardProps> = ({
               currentWeather={currentWeather}
               userActivityLevel={userActivityLevel}
               onPlaylistSelect={(playlist) => {
-                console.log('Selected playlist:', playlist);
+                logger.debug('Selected playlist:', playlist, 'COMPONENT');
               }}
             />
           </motion.div>
@@ -297,10 +298,10 @@ export const AdvancedMusicDashboard: React.FC<AdvancedMusicDashboardProps> = ({
             <OfflineModeManager
               tracks={tracks}
               onDownload={(trackId) => {
-                console.log('Downloaded track:', trackId);
+                logger.debug('Downloaded track:', trackId, 'COMPONENT');
               }}
               onRemoveFromCache={(trackId) => {
-                console.log('Removed from cache:', trackId);
+                logger.debug('Removed from cache:', trackId, 'COMPONENT');
               }}
             />
           </motion.div>

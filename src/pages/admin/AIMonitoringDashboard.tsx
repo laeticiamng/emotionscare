@@ -13,6 +13,7 @@ import { toast } from '@/hooks/use-toast';
 import { AlertTriangle, CheckCircle2, Clock, Filter, RefreshCw, TrendingUp, XCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { logger } from '@/lib/logger';
 
 interface AIMonitoringError {
   id: string;
@@ -144,7 +145,7 @@ const AIMonitoringDashboard = () => {
         title: 'Erreur',
         description: 'Impossible de marquer l\'erreur comme résolue.',
       });
-      console.error(error);
+      logger.error(error, 'PAGE');
     },
   });
 

@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { CreateMusicGenerationInput, MusicGenerationSession } from '@emotionscare/contracts';
 import { musicApi } from '../services/musicApi';
+import { logger } from '@/lib/logger';
 
 /**
  * Hook to create a new music generation request
@@ -9,7 +10,7 @@ import { musicApi } from '../services/musicApi';
  * ```tsx
  * const { mutate, isPending } = useCreateMusic({
  *   onSuccess: (session) => {
- *     console.log('Music generation started:', session.id);
+ *     logger.debug('Music generation started:', session.id, 'HOOK');
  *   },
  * });
  *

@@ -8,6 +8,7 @@
 import { useState, useCallback } from 'react';
 import { emotionOrchestrator } from './emotionOrchestrator';
 import type {
+import { logger } from '@/lib/logger';
   EmotionalState,
   UserContext,
   OrchestrationResponse,
@@ -44,7 +45,7 @@ interface UseEmotionOrchestratorReturn {
  *   });
  *
  *   if (response) {
- *     console.log('Top recommendation:', response.recommendations[0]);
+ *     logger.debug('Top recommendation:', response.recommendations[0], 'MODULE');
  *   }
  * };
  * ```

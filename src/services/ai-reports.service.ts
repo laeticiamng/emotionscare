@@ -4,6 +4,7 @@
  */
 
 import { supabase } from '@/lib/supabase';
+import { logger } from '@/lib/logger';
 import type {
   AIReport,
   ReportSchedule,
@@ -257,7 +258,7 @@ export async function trackReportView(reportId: string): Promise<void> {
     p_report_id: reportId,
   });
 
-  if (error) console.error('Failed to track report view:', error);
+  if (error) logger.error('Failed to track report view:', error, 'SERVICE');
 }
 
 /**
@@ -268,7 +269,7 @@ export async function trackReportDownload(reportId: string): Promise<void> {
     p_report_id: reportId,
   });
 
-  if (error) console.error('Failed to track report download:', error);
+  if (error) logger.error('Failed to track report download:', error, 'SERVICE');
 }
 
 /**

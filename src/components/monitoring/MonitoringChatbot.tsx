@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { MessageCircle, Send, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 interface Message {
   id: string;
@@ -66,7 +67,7 @@ export const MonitoringChatbot: React.FC = () => {
       setMessages(prev => [...prev, assistantMessage]);
 
     } catch (err) {
-      console.error('Chatbot error:', err);
+      logger.error('Chatbot error:', err, 'COMPONENT');
       toast.error('Erreur lors de la communication avec le chatbot');
       
       const errorMessage: Message = {

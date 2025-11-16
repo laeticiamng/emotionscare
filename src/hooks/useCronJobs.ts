@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 
 /**
  * Hook pour récupérer les statistiques des jobs cron depuis Supabase
@@ -13,7 +14,7 @@ export const useCronJobs = () => {
       const { data: jobRuns, error } = await supabase.rpc('get_cron_job_history');
 
       if (error) {
-        console.error('Error fetching cron jobs:', error);
+        logger.error('Error fetching cron jobs:', error, 'HOOK');
         throw error;
       }
 
@@ -33,7 +34,7 @@ export const useGamificationCronHistory = () => {
       const { data, error } = await supabase.rpc('get_gamification_cron_history');
 
       if (error) {
-        console.error('Error fetching gamification cron history:', error);
+        logger.error('Error fetching gamification cron history:', error, 'HOOK');
         throw error;
       }
 
@@ -53,7 +54,7 @@ export const useGamificationCronJobs = () => {
       const { data, error } = await supabase.rpc('get_gamification_cron_jobs');
 
       if (error) {
-        console.error('Error fetching gamification cron jobs:', error);
+        logger.error('Error fetching gamification cron jobs:', error, 'HOOK');
         throw error;
       }
 
@@ -135,7 +136,7 @@ export const useCronJobsList = () => {
       const { data, error } = await supabase.rpc('get_cron_jobs_list');
 
       if (error) {
-        console.error('Error fetching cron jobs list:', error);
+        logger.error('Error fetching cron jobs list:', error, 'HOOK');
         throw error;
       }
 

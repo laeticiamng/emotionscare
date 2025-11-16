@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { logger } from '@/lib/logger';
 import {
   Dialog,
   DialogContent,
@@ -56,7 +57,7 @@ const ExportReportButton: React.FC = () => {
 
       setIsOpen(false);
     } catch (error) {
-      console.error('Error exporting report:', error);
+      logger.error('Error exporting report:', error, 'COMPONENT');
       toast.error('Erreur lors de l\'export du rapport');
     } finally {
       setIsExporting(false);

@@ -51,7 +51,7 @@ export function trackScanEvent(
 
   // Log to console in development
   if (import.meta.env.DEV) {
-    console.log('[Analytics]', eventName, properties);
+    logger.debug('[Analytics]', eventName, properties, 'LIB');
   }
 
   // TODO: Add integration with analytics platform (Google Analytics, Mixpanel, etc.)

@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 
 export interface MusicPreset {
   id: string;
@@ -72,7 +73,7 @@ export const musicService = {
       });
     } catch (edgeFunctionError) {
       // Log l'erreur mais ne pas échouer la création de session
-      console.error('Edge Function invocation failed:', edgeFunctionError);
+      logger.error('Edge Function invocation failed:', edgeFunctionError, 'SERVICE');
       // La session est créée, le traitement se fera en arrière-plan
     }
 

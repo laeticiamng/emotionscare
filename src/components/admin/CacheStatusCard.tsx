@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Trash2, RefreshCw, Database, Wifi, WifiOff } from 'lucide-react';
 import { getCacheStatus, clearServiceWorkerCache, syncGDPRMetrics } from '@/lib/serviceWorkerRegistration';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 interface CacheInfo {
   name: string;
@@ -48,7 +49,7 @@ export const CacheStatusCard: React.FC = () => {
       const status = await getCacheStatus();
       setCacheStatus(status);
     } catch (error) {
-      console.error('Failed to load cache status', error);
+      logger.error('Failed to load cache status', error, 'COMPONENT');
     } finally {
       setIsLoading(false);
     }

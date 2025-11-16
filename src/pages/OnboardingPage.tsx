@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * ONBOARDING PAGE - EMOTIONSCARE
  * Page d'onboarding accessible WCAG 2.1 AA
@@ -11,11 +10,15 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Progress } from '@/components/ui/progress';
-import { Heart, Brain, Users, Sparkles, ArrowRight, Check } from 'lucide-react';
+import { Heart, Brain, Users, Sparkles, ArrowRight, Check, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useOnboarding } from '@/hooks/useOnboarding';
+import { useToast } from '@/hooks/use-toast';
 
 const OnboardingPage: React.FC = () => {
   const navigate = useNavigate();
+  const { createUserProfile, loading } = useOnboarding();
+  const { toast } = useToast();
   const [currentStep, setCurrentStep] = useState(0);
   const [userProfile, setUserProfile] = useState({
     goals: [] as string[],
@@ -107,12 +110,31 @@ const OnboardingPage: React.FC = () => {
     }));
   };
 
-  const nextStep = () => {
+  const nextStep = async () => {
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
-      // Terminer l'onboarding
-      navigate('/app/home');
+      // Terminer l'onboarding en sauvegardant le profil
+      try {
+        await createUserProfile({
+          goals: userProfile.goals,
+          experience: userProfile.experience,
+          preferences: userProfile.preferences,
+        });
+
+        toast({
+          title: "Bienvenue sur EmotionsCare !",
+          description: "Votre profil a été créé avec succès",
+        });
+
+        navigate('/app/home');
+      } catch (error) {
+        toast({
+          title: "Erreur",
+          description: "Impossible de sauvegarder votre profil. Veuillez réessayer.",
+          variant: "destructive",
+        });
+      }
     }
   };
 
@@ -373,13 +395,22 @@ const OnboardingPage: React.FC = () => {
                 <Button
                   onClick={nextStep}
                   onKeyDown={(e) => handleKeyDown(e, nextStep)}
-                  disabled={!isStepValid()}
+                  disabled={!isStepValid() || loading}
                   className="bg-accent hover:bg-accent/90 focus:ring-2 focus:ring-accent focus:ring-offset-2"
                   aria-label={currentStep === steps.length - 1 ? 'Terminer l\'onboarding' : 'Étape suivante'}
                   tabIndex={0}
                 >
-                  {currentStep === steps.length - 1 ? 'Terminer' : 'Suivant'}
-                  <ArrowRight className="w-4 h-4 ml-2" aria-hidden="true" />
+                  {loading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Sauvegarde...
+                    </>
+                  ) : (
+                    <>
+                      {currentStep === steps.length - 1 ? 'Terminer' : 'Suivant'}
+                      <ArrowRight className="w-4 h-4 ml-2" aria-hidden="true" />
+                    </>
+                  )}
                 </Button>
               </nav>
             </CardContent>

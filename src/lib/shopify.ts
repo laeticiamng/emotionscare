@@ -4,6 +4,7 @@
 
 import { toast } from 'sonner';
 import type { CartItem } from '@/stores/cartStore';
+import { logger } from '@/lib/logger';
 
 const SHOPIFY_API_VERSION = '2025-07';
 const SHOPIFY_STORE_PERMANENT_DOMAIN = 'emotions-care-fie94.myshopify.com';
@@ -177,7 +178,7 @@ export async function createStorefrontCheckout(items: CartItem[]): Promise<strin
     
     return checkoutUrl;
   } catch (error) {
-    console.error('Error creating storefront checkout:', error);
+    logger.error('Error creating storefront checkout:', error, 'LIB');
     throw error;
   }
 }

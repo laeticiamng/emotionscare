@@ -271,7 +271,7 @@ export function measureComponentRender(componentName: string, duration: number):
   });
 
   if (import.meta.env.DEV) {
-    console.log(`[Performance] ${componentName} rendered in ${duration.toFixed(2)}ms`);
+    logger.debug(`[Performance] ${componentName} rendered in ${duration.toFixed(2)}ms`, 'LIB');
   }
 }
 

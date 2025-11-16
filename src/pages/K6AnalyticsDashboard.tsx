@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { K6MetricsChart } from '@/components/analytics/K6MetricsChart';
 import { Activity, TrendingUp, AlertTriangle, CheckCircle, Clock, Zap } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 
 interface K6Metrics {
   timestamp: string;
@@ -82,7 +83,7 @@ export default function K6AnalyticsDashboard() {
 
       setEdgeFunctionStats(Array.from(statsMap.values()));
     } catch (error) {
-      console.error('Error loading K6 metrics:', error);
+      logger.error('Error loading K6 metrics:', error, 'PAGE');
     } finally {
       setLoading(false);
     }

@@ -106,7 +106,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         themeService.applyThemeToDOM(theme);
       }
     } catch (error) {
-      console.error('Failed to load themes:', error);
+      logger.error('Failed to load themes:', error, 'CONTEXT');
     } finally {
       setLoading(false);
     }

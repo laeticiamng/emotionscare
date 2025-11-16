@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { logger } from '@/lib/logger';
 import {
   Dialog,
   DialogContent,
@@ -71,7 +72,7 @@ export function CommunitySearch() {
 
       setResults(posts);
     } catch (error) {
-      console.error('Search error:', error);
+      logger.error('Search error:', error, 'COMPONENT');
       setResults([]);
     } finally {
       setLoading(false);

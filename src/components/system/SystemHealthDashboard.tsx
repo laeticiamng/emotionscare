@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 import { 
   Activity, 
   Database, 
@@ -264,7 +265,7 @@ export const SystemHealthDashboard: React.FC = () => {
         lastUpdate: new Date(),
       });
     } catch (error) {
-      console.error('Erreur lors des checks de santé:', error);
+      logger.error('Erreur lors des checks de santé:', error, 'COMPONENT');
     } finally {
       setIsChecking(false);
     }

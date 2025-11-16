@@ -3,6 +3,8 @@
  * Système de logging unifié avec niveaux et contexte
  */
 
+import { logger } from '@/lib/logger';
+
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error' | 'critical';
 export type LogContext = 'AUTH' | 'API' | 'UI' | 'SCAN' | 'VR' | 'MUSIC' | 'ANALYTICS' | 'SYSTEM' | 'ERROR_BOUNDARY' | 'SESSION' | 'CONSENT' | 'SOCIAL' | 'NYVEE' | 'WHO5' | 'STAI6' | 'BREATH' | 'FLASH' | 'MIXER' | 'SCORES' | 'COACH';
 
@@ -45,40 +47,7 @@ class Logger {
   }
 
   error(message: string, error?: Error | any, context: LogContext = 'SYSTEM'): void {
-    console.error(`[${context}] ${message}`, error || '')
-  }
-
-  critical(message: string, error?: Error | any, context: LogContext = 'SYSTEM'): void {
-    console.error(`[CRITICAL] [${context}] ${message}`, error || '')
-  }
-}
-
-// Instance singleton
-export const logger = new Logger()
-
-// Hook React pour utiliser le logger
-import { useCallback } from 'react'
-
-export function useLogger() {
-  const logDebug = useCallback((message: string, data?: any, context: LogContext = 'UI') => {
-    logger.debug(message, data, context)
-  }, [])
-
-  const logInfo = useCallback((message: string, data?: any, context: LogContext = 'UI') => {
-    logger.info(message, data, context)
-  }, [])
-
-  const logWarn = useCallback((message: string, data?: any, context: LogContext = 'UI') => {
-    logger.warn(message, data, context)
-  }, [])
-
-  const logError = useCallback((message: string, error?: Error | any, context: LogContext = 'UI') => {
-    logger.error(message, error, context)
-  }, [])
-
-  const logCritical = useCallback((message: string, error?: Error | any, context: LogContext = 'UI') => {
-    logger.critical(message, error, context)
-  }, [])
+    logger.error(`[${context}] ${message}`, error || '', 'LIB');
 
   return {
     debug: logDebug,

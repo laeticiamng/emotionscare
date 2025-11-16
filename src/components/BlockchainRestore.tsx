@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { toast } from 'sonner';
 import { Download, RefreshCw, CheckCircle, AlertCircle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { logger } from '@/lib/logger';
 
 /**
  * Composant pour restaurer les backups blockchain en un clic
@@ -45,7 +46,7 @@ export const BlockchainRestore = () => {
       const text = await fileData.text();
       const blockchainData = JSON.parse(text);
 
-      console.log(`🔄 Restoring ${blockchainData.length} blocks...`);
+      logger.debug(`🔄 Restoring ${blockchainData.length} blocks...`, 'COMPONENT');
 
       // Supprimer tous les blocs existants
       const { error: deleteError } = await supabase
@@ -78,7 +79,7 @@ export const BlockchainRestore = () => {
       setSelectedBackupId(null);
     },
     onError: (error: Error) => {
-      console.error('Restore error:', error);
+      logger.error('Restore error:', error, 'COMPONENT');
       toast.error(`Erreur lors de la restauration: ${error.message}`);
     },
   });

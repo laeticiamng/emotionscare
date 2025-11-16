@@ -4,6 +4,7 @@ import { EmotionState, FusedMoodResult } from '@/types/realtime-emotion';
 import { useVisionEmotion } from './useVisionEmotion';
 import { useVoiceEmotion } from './useVoiceEmotion';
 import { useTextEmotion } from './useTextEmotion';
+import { logger } from '@/lib/logger';
 
 export const useEmotionFusion = () => {
   const vision = useVisionEmotion();
@@ -74,7 +75,7 @@ export const useEmotionFusion = () => {
       }));
 
     } catch (error) {
-      console.error('[useEmotionFusion] Fusion error:', error);
+      logger.error('[useEmotionFusion] Fusion error:', error, 'HOOK');
     }
   }, [vision.lastResult, voice.lastResult, text.lastResult]);
 

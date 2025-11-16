@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
+import { logger } from '@/lib/logger';
 import {
   Download,
   Wifi,
@@ -114,7 +115,7 @@ export const OfflineModeManager: React.FC<OfflineModeManagerProps> = ({
           setTotalCacheSize(size);
         }
       } catch (error) {
-        console.error('Error loading cached tracks:', error);
+        logger.error('Error loading cached tracks:', error, 'COMPONENT');
       }
     };
 

@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { VoiceEmotionResult } from '@/types/realtime-emotion';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 export const useVoiceEmotion = () => {
   const [isActive, setIsActive] = useState(false);
@@ -38,7 +39,7 @@ export const useVoiceEmotion = () => {
       wsRef.current = new WebSocket(wsUrl);
 
       wsRef.current.onopen = () => {
-        console.log('[useVoiceEmotion] WebSocket connected');
+        logger.debug('[useVoiceEmotion] WebSocket connected', 'HOOK');
         toast.success('Connexion Hume établie');
       };
 
@@ -47,7 +48,7 @@ export const useVoiceEmotion = () => {
           const data = JSON.parse(event.data);
           
           if (data.type === 'connected') {
-            console.log('[useVoiceEmotion] Hume connected');
+            logger.debug('[useVoiceEmotion] Hume connected', 'HOOK');
             return;
           }
 
@@ -64,17 +65,17 @@ export const useVoiceEmotion = () => {
             setLatency(data.latency_ms || 0);
           }
         } catch (error) {
-          console.error('[useVoiceEmotion] Parse error:', error);
+          logger.error('[useVoiceEmotion] Parse error:', error, 'HOOK');
         }
       };
 
       wsRef.current.onerror = (error) => {
-        console.error('[useVoiceEmotion] WebSocket error:', error);
+        logger.error('[useVoiceEmotion] WebSocket error:', error, 'HOOK');
         toast.error('Erreur de connexion Hume');
       };
 
       wsRef.current.onclose = () => {
-        console.log('[useVoiceEmotion] WebSocket closed');
+        logger.debug('[useVoiceEmotion] WebSocket closed', 'HOOK');
       };
 
       // Démarrer la capture audio
@@ -114,7 +115,7 @@ export const useVoiceEmotion = () => {
       toast.success('Micro activé');
 
     } catch (error) {
-      console.error('[useVoiceEmotion] Start error:', error);
+      logger.error('[useVoiceEmotion] Start error:', error, 'HOOK');
       toast.error('Erreur d\'accès au micro');
     }
   }, []);

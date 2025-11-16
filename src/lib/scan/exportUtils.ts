@@ -7,6 +7,8 @@
 // import { jsPDF } from 'jspdf';
 // import 'jspdf-autotable';
 
+import { logger } from '@/lib/logger';
+
 interface ScanData {
   id: string;
   valence: number;
@@ -131,7 +133,7 @@ export const exportAsPDF = async (
 
   try {
     // PDF export temporarily disabled - jsPDF package needs to be added
-    console.warn('PDF export feature temporarily disabled');
+    logger.warn('PDF export feature temporarily disabled', 'LIB');
     throw new Error('PDF export not yet implemented - please use CSV or JSON export');
     
     /* 
@@ -234,7 +236,7 @@ export const exportAsPDF = async (
       doc.save(filename);
     */
   } catch (error) {
-    console.error('Erreur lors de la génération du PDF:', error);
+    logger.error('Erreur lors de la génération du PDF:', error, 'LIB');
     throw error;
   }
 };
@@ -312,7 +314,7 @@ export const copyToClipboard = async (text: string): Promise<boolean> => {
     await navigator.clipboard.writeText(text);
     return true;
   } catch (error) {
-    console.error('Erreur lors de la copie au presse-papiers:', error);
+    logger.error('Erreur lors de la copie au presse-papiers:', error, 'LIB');
     return false;
   }
 };
@@ -336,7 +338,7 @@ export const shareData = async (
     });
     return true;
   } catch (error) {
-    console.error('Erreur lors du partage:', error);
+    logger.error('Erreur lors du partage:', error, 'LIB');
     return false;
   }
 };
@@ -370,7 +372,7 @@ export const exportAll = async (
       filename: `${baseFilename}.pdf`
     });
   } catch (error) {
-    console.error('Erreur lors de l\'export:', error);
+    logger.error('Erreur lors de l\'export:', error, 'LIB');
     throw error;
   }
 };

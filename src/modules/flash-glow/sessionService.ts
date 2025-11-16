@@ -2,6 +2,8 @@
  * Service pour gérer les sessions Flash Glow
  */
 
+import { logger } from '@/lib/logger';
+
 export interface MoodSnapshot {
   value: number;
   timestamp: number;
@@ -57,13 +59,13 @@ export const logAndJournal = async (data: {
     });
 
     if (!response.ok) {
-      console.error('Failed to log session');
+      logger.error(new Error('Failed to log session'), 'MODULE');
       return null;
     }
 
     return await response.json();
   } catch (error) {
-    console.error('Error logging session:', error);
+    logger.error('Error logging session:', error, 'MODULE');
     return null;
   }
 };

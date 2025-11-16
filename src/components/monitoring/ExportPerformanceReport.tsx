@@ -8,6 +8,7 @@ import { FileDown, FileSpreadsheet, Loader2, Printer } from 'lucide-react';
 import { downloadExcel, generatePrintablePDF } from '@/lib/exportUtils';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
+import { logger } from '@/lib/logger';
 
 interface ExportPerformanceReportProps {
   testData: any[];
@@ -130,7 +131,7 @@ export const ExportPerformanceReport: React.FC<ExportPerformanceReportProps> = (
       toast.success('Fenêtre d\'impression ouverte - Enregistrez comme PDF');
       setIsDialogOpen(false);
     } catch (error) {
-      console.error('Export PDF error:', error);
+      logger.error('Export PDF error:', error, 'COMPONENT');
       toast.error('Erreur lors de la génération du PDF');
     } finally {
       setIsExporting(false);
@@ -155,7 +156,7 @@ export const ExportPerformanceReport: React.FC<ExportPerformanceReportProps> = (
       toast.success('Rapport Excel généré avec succès');
       setIsDialogOpen(false);
     } catch (error) {
-      console.error('Export Excel error:', error);
+      logger.error('Export Excel error:', error, 'COMPONENT');
       toast.error('Erreur lors de la génération du fichier Excel');
     } finally {
       setIsExporting(false);

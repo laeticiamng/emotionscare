@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 
 export interface LeaderboardEntry {
   id: string;
@@ -40,7 +41,7 @@ export const useLeaderboard = () => {
           .single();
 
         if (userError && userError.code !== 'PGRST116') {
-          console.error('Error fetching user entry:', userError);
+          logger.error('Error fetching user entry:', userError, 'HOOK');
         } else if (userEntry) {
           setMyEntry(userEntry);
         }
@@ -48,7 +49,7 @@ export const useLeaderboard = () => {
 
       setError(null);
     } catch (err: any) {
-      console.error('Error fetching leaderboard:', err);
+      logger.error('Error fetching leaderboard:', err, 'HOOK');
       setError(err.message);
     } finally {
       setLoading(false);
@@ -105,7 +106,7 @@ export const useLeaderboard = () => {
       
       await fetchLeaderboard();
     } catch (err: any) {
-      console.error('Error updating leaderboard entry:', err);
+      logger.error('Error updating leaderboard entry:', err, 'HOOK');
       setError(err.message);
     }
   };

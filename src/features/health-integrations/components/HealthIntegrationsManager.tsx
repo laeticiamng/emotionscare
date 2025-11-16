@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/components/ui/use-toast';
+import { logger } from '@/lib/logger';
 import {
   Activity,
   Heart,
@@ -67,7 +68,7 @@ export function HealthIntegrationsManager() {
       const data = await healthService.getHealthConnections(user.id);
       setConnections(data);
     } catch (error) {
-      console.error('Failed to load connections:', error);
+      logger.error('Failed to load connections:', error, 'COMPONENT');
       toast({
         title: 'Erreur',
         description: 'Impossible de charger les intégrations santé',
@@ -96,7 +97,7 @@ export function HealthIntegrationsManager() {
         });
       }
     } catch (error) {
-      console.error('Failed to connect:', error);
+      logger.error('Failed to connect:', error, 'COMPONENT');
       toast({
         title: 'Erreur de connexion',
         description: error instanceof Error ? error.message : 'Une erreur est survenue',
@@ -116,7 +117,7 @@ export function HealthIntegrationsManager() {
         description: `${PROVIDER_CONFIG[provider].name} a été déconnecté`,
       });
     } catch (error) {
-      console.error('Failed to disconnect:', error);
+      logger.error('Failed to disconnect:', error, 'COMPONENT');
       toast({
         title: 'Erreur',
         description: 'Impossible de déconnecter le service',
@@ -139,7 +140,7 @@ export function HealthIntegrationsManager() {
 
       await loadConnections();
     } catch (error) {
-      console.error('Failed to sync:', error);
+      logger.error('Failed to sync:', error, 'COMPONENT');
       toast({
         title: 'Erreur de synchronisation',
         description: error instanceof Error ? error.message : 'Une erreur est survenue',

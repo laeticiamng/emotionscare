@@ -5,6 +5,7 @@
 
 import { supabase } from '@/lib/supabase';
 import { nanoid } from 'nanoid';
+import { logger } from '@/lib/logger';
 
 export interface APIKey {
   id: string;
@@ -200,7 +201,7 @@ export async function checkRateLimit(
   });
 
   if (error) {
-    console.error('Failed to check rate limit:', error);
+    logger.error('Failed to check rate limit:', error, 'SERVICE');
     return { allowed: true, remaining: 1000, resetAt: new Date() };
   }
 

@@ -5,6 +5,7 @@
  */
 
 import { supabase } from '@/lib/supabase';
+import { logger } from '@/lib/logger';
 import type {
   HealthProvider,
   HealthConnection,
@@ -141,7 +142,7 @@ export async function syncAllProviders(userId: string): Promise<HealthSyncResult
       const result = await syncProvider(userId, connection.provider, connection.enabled_data_types);
       results.push(result);
     } catch (error) {
-      console.error(`Failed to sync ${connection.provider}:`, error);
+      logger.error(`Failed to sync ${connection.provider}:`, error, 'SERVICE');
       results.push({
         provider: connection.provider,
         success: false,

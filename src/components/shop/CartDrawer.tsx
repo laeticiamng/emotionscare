@@ -5,6 +5,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { logger } from '@/lib/logger';
 import {
   Sheet,
   SheetContent,
@@ -50,7 +51,7 @@ export const CartDrawer = () => {
       
       setIsOpen(false);
     } catch (error) {
-      console.error('Checkout failed:', error);
+      logger.error('Checkout failed:', error, 'COMPONENT');
       toast.error("Erreur lors du checkout", {
         description: error instanceof Error ? error.message : "Veuillez réessayer"
       });

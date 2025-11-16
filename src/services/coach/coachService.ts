@@ -4,6 +4,7 @@
  */
 
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 
 export interface CoachMessage {
   id: string;
@@ -64,7 +65,7 @@ export const fetchUserConversations = async (
     if (error) throw error;
     return data || [];
   } catch (error) {
-    console.error('Error fetching conversations:', error);
+    logger.error('Error fetching conversations:', error, 'SERVICE');
     throw error;
   }
 };
@@ -97,7 +98,7 @@ export const fetchConversation = async (
       messages: messages || [],
     };
   } catch (error) {
-    console.error('Error fetching conversation:', error);
+    logger.error('Error fetching conversation:', error, 'SERVICE');
     throw error;
   }
 };
@@ -129,7 +130,7 @@ export const createConversation = async (
     if (error) throw error;
     return data;
   } catch (error) {
-    console.error('Error creating conversation:', error);
+    logger.error('Error creating conversation:', error, 'SERVICE');
     throw error;
   }
 };
@@ -171,7 +172,7 @@ export const addMessageToConversation = async (
 
     return data;
   } catch (error) {
-    console.error('Error adding message:', error);
+    logger.error('Error adding message:', error, 'SERVICE');
     throw error;
   }
 };
@@ -194,7 +195,7 @@ export const updateConversationTitle = async (
 
     if (error) throw error;
   } catch (error) {
-    console.error('Error updating conversation title:', error);
+    logger.error('Error updating conversation title:', error, 'SERVICE');
     throw error;
   }
 };
@@ -215,7 +216,7 @@ export const deleteConversation = async (conversationId: string): Promise<void> 
 
     if (error) throw error;
   } catch (error) {
-    console.error('Error deleting conversation:', error);
+    logger.error('Error deleting conversation:', error, 'SERVICE');
     throw error;
   }
 };
@@ -243,7 +244,7 @@ export const logEmotionalData = async (
     if (error) throw error;
     return saved;
   } catch (error) {
-    console.error('Error logging emotional data:', error);
+    logger.error('Error logging emotional data:', error, 'SERVICE');
     throw error;
   }
 };
@@ -269,7 +270,7 @@ export const fetchEmotionalData = async (
     if (error) throw error;
     return data || [];
   } catch (error) {
-    console.error('Error fetching emotional data:', error);
+    logger.error('Error fetching emotional data:', error, 'SERVICE');
     throw error;
   }
 };
@@ -318,7 +319,7 @@ export const fetchUserAnalytics = async (userId: string): Promise<CoachAnalytics
       lastInteraction,
     };
   } catch (error) {
-    console.error('Error fetching user analytics:', error);
+    logger.error('Error fetching user analytics:', error, 'SERVICE');
     throw error;
   }
 };
@@ -349,7 +350,7 @@ export const exportConversation = async (
 
     throw new Error('Unsupported export format');
   } catch (error) {
-    console.error('Error exporting conversation:', error);
+    logger.error('Error exporting conversation:', error, 'SERVICE');
     throw error;
   }
 };
@@ -369,7 +370,7 @@ export const fetchCoachPrograms = async (userId?: string) => {
     if (error) throw error;
     return data || [];
   } catch (error) {
-    console.error('Error fetching coach programs:', error);
+    logger.error('Error fetching coach programs:', error, 'SERVICE');
     throw error;
   }
 };
@@ -392,7 +393,7 @@ export const updateProgramProgress = async (
 
     if (error) throw error;
   } catch (error) {
-    console.error('Error updating program progress:', error);
+    logger.error('Error updating program progress:', error, 'SERVICE');
     throw error;
   }
 };

@@ -5,6 +5,7 @@ import {
   listMusicSessionsSchema,
 } from '@emotionscare/contracts';
 import type { MusicGenerationSession } from '@emotionscare/contracts';
+import * as musicDb from '../../../lib/db/music';
 
 /**
  * Music Generation API Routes
@@ -24,20 +25,16 @@ export const musicRoutes: FastifyPluginAsync = async app => {
       const filters = listMusicSessionsSchema.parse(req.query);
       const userId = (req as any).user.id;
 
-      // TODO: Implement database query
-      // const sessions = await db.music.listSessions(userId, filters);
-
-      // Placeholder response
-      const sessions: MusicGenerationSession[] = [];
+      const result = await musicDb.listMusicSessions(userId, filters);
 
       return {
         ok: true,
-        data: sessions,
+        data: result.sessions,
         meta: {
-          total: sessions.length,
+          total: result.total,
           limit: filters.limit,
           offset: filters.offset,
-          hasMore: false,
+          hasMore: result.hasMore,
         },
       };
     } catch (err) {
@@ -52,26 +49,14 @@ export const musicRoutes: FastifyPluginAsync = async app => {
       const input = createMusicGenerationSchema.parse(req.body);
       const userId = (req as any).user.id;
 
-      // TODO: Implement music generation flow
       // 1. Create session in database
-      // 2. Call Suno API
-      // 3. Return session with taskId for polling
-      // const session = await musicService.createGeneration(userId, input);
+      const session = await musicDb.createMusicSession(userId, input);
 
-      // Placeholder response
-      const session: MusicGenerationSession = {
-        id: crypto.randomUUID(),
-        userId,
-        taskId: `task_${Date.now()}`,
-        emotionState: input.emotionState,
-        emotionBadge: input.emotionBadge,
-        sunoConfig: input.config,
-        result: {
-          taskId: `task_${Date.now()}`,
-          status: 'pending',
-        },
-        createdAt: new Date(),
-      };
+      // TODO: 2. Call Suno API (to be implemented when Suno API is available)
+      // await sunoService.generateMusic(session.task_id, input.config);
+
+      // For now, session is created with 'pending' status
+      // The Suno webhook will update it when generation is complete
 
       reply.code(201);
       return {
@@ -90,16 +75,33 @@ export const musicRoutes: FastifyPluginAsync = async app => {
       const { id } = req.params as { id: string };
       const userId = (req as any).user.id;
 
-      // TODO: Implement database query and status check
-      // const session = await db.music.getSession(id, userId);
-      // If status is pending/processing, check Suno API for updates
+      const session = await musicDb.getMusicSession(id, userId);
+
+      if (!session) {
+        reply.code(404);
+        return {
+          ok: false,
+          error: {
+            code: 'not_found',
+            message: 'Music session not found',
+          },
+        };
+      }
+
+      // TODO: If status is pending/processing, check Suno API for updates
+      // if (session.status === 'pending' || session.status === 'processing') {
+      //   const sunoStatus = await sunoService.checkStatus(session.task_id);
+      //   if (sunoStatus.status !== session.status) {
+      //     session = await musicDb.updateMusicSession(id, userId, {
+      //       status: sunoStatus.status,
+      //       result: sunoStatus.result,
+      //     });
+      //   }
+      // }
 
       return {
-        ok: false,
-        error: {
-          code: 'not_found',
-          message: 'Music session not found',
-        },
+        ok: true,
+        data: session,
       };
     } catch (err) {
       app.log.error({ err, id: (req.params as any).id }, 'Failed to get music session');
@@ -113,12 +115,43 @@ export const musicRoutes: FastifyPluginAsync = async app => {
       const { id } = req.params as { id: string };
       const userId = (req as any).user.id;
 
-      // TODO: Implement cancellation
       // 1. Check session exists and belongs to user
+      const session = await musicDb.getMusicSession(id, userId);
+
+      if (!session) {
+        reply.code(404);
+        return {
+          ok: false,
+          error: {
+            code: 'not_found',
+            message: 'Music session not found',
+          },
+        };
+      }
+
       // 2. Check status is pending or processing
-      // 3. Cancel on Suno API if needed
+      if (session.status !== 'pending' && session.status !== 'processing') {
+        reply.code(400);
+        return {
+          ok: false,
+          error: {
+            code: 'invalid_status',
+            message: `Cannot cancel session with status: ${session.status}`,
+          },
+        };
+      }
+
+      // 3. TODO: Cancel on Suno API if needed
+      // await sunoService.cancel(session.task_id);
+
       // 4. Update status to 'cancelled'
-      // await musicService.cancelGeneration(id, userId);
+      await musicDb.updateMusicSession(id, userId, {
+        status: 'failed', // Using 'failed' as 'cancelled' is not in the schema
+        result: {
+          taskId: session.task_id,
+          status: 'failed',
+        },
+      });
 
       return {
         ok: true,
@@ -136,8 +169,7 @@ export const musicRoutes: FastifyPluginAsync = async app => {
       const { id } = req.params as { id: string };
       const userId = (req as any).user.id;
 
-      // TODO: Implement deletion
-      // await db.music.deleteSession(id, userId);
+      await musicDb.deleteMusicSession(id, userId);
 
       reply.code(204);
       return;

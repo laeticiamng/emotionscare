@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
+import { logger } from '@/lib/logger';
 
 interface TrainingModule {
   id: string;
@@ -59,7 +60,7 @@ export const TrainingSystem = () => {
       .order('order_number', { ascending: true });
 
     if (error) {
-      console.error('Error loading modules:', error);
+      logger.error('Error loading modules:', error, 'COMPONENT');
       return;
     }
 
@@ -76,7 +77,7 @@ export const TrainingSystem = () => {
       .eq('user_id', user.id);
 
     if (error) {
-      console.error('Error loading certifications:', error);
+      logger.error('Error loading certifications:', error, 'COMPONENT');
       return;
     }
 
