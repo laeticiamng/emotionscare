@@ -34,7 +34,7 @@ interface SignupData {
 export const useAuthFlow = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { signIn: authSignIn, signOut: authSignOut } = useAuthContext();
+  const { signIn: authSignIn, signOut: authSignOut, user, isAuthenticated } = useAuthContext();
 
   const login = useCallback(async (data: LoginData) => {
     setIsLoading(true);
@@ -138,7 +138,9 @@ export const useAuthFlow = () => {
     signup,
     logout,
     resetPassword,
-    isLoading
+    isLoading,
+    user,
+    isAuthenticated
   };
 };
 

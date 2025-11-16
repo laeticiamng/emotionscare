@@ -130,6 +130,12 @@ export const exportAsPDF = async (
   } = options;
 
   try {
+    // PDF export temporarily disabled - jsPDF package needs to be added
+    console.warn('PDF export feature temporarily disabled');
+    throw new Error('PDF export not yet implemented - please use CSV or JSON export');
+    
+    /* 
+    // TODO: Enable once jsPDF is installed
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
@@ -225,7 +231,8 @@ export const exportAsPDF = async (
       }
     }
 
-    doc.save(filename);
+      doc.save(filename);
+    */
   } catch (error) {
     console.error('Erreur lors de la génération du PDF:', error);
     throw error;

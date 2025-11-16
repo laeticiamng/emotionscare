@@ -32,7 +32,7 @@ export const getSupabaseClient = (): SupabaseClient => {
   return cachedClient;
 };
 
-export const setSupabaseClientFactory = (factory?: () => SupabaseClient | null) => {
+export const setSupabaseClientFactory = (factory?: () => SupabaseClient) => {
   customFactory = factory ?? null;
   cachedClient = null;
 };
