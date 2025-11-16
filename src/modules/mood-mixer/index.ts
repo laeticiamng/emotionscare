@@ -9,51 +9,25 @@
 // COMPONENTS
 // ============================================================================
 
-export {
-  MoodMixerView,
-  default as MoodMixerViewDefault,
-} from './MoodMixerView';
+export { MoodMixerView } from './MoodMixerView';
 
 // ============================================================================
 // SERVICES
 // ============================================================================
 
-export {
-  moodMixerService,
-  default as moodMixerServiceDefault,
-} from './moodMixerService';
-
-// Export du service enrichi (version avancée)
-export {
-  moodMixerServiceEnriched,
-} from './moodMixerServiceEnriched';
+export { MoodMixerService } from './moodMixerService';
+export { MoodMixerServiceEnriched } from './moodMixerServiceEnriched';
 
 // ============================================================================
 // HOOKS
 // ============================================================================
 
-export {
-  useMoodMixer,
-} from './useMoodMixer';
+export { useMoodMixer } from './useMoodMixer';
 
 // ============================================================================
 // TYPES
 // ============================================================================
 
 export type {
-  Mood,
-  MoodMix,
-  EmotionWeight,
-  MixedPlaylist,
-  MoodTransition,
-} from './types';
-
-// ============================================================================
-// UTILITIES
-// ============================================================================
-
-export {
-  blendMoods,
-  calculateMoodIntensity,
-  generateMoodGradient,
-} from './utils';
+  MoodMixerSession,
+} from './moodMixerService';

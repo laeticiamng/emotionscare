@@ -58,7 +58,7 @@ const INTENSITY_DURATION_MAP = {
 /**
  * Modules par catégorie thérapeutique
  */
-const THERAPEUTIC_CATEGORIES = {
+const THERAPEUTIC_CATEGORIES: Record<string, ModuleType[]> = {
   stress_relief: ['breath', 'breath-constellation', 'breathing-vr', 'bubble-beat'],
   mood_enhancement: ['music-therapy', 'mood-mixer', 'adaptive-music', 'audio-studio'],
   emotional_support: ['ai-coach', 'coach', 'community', 'journal'],
@@ -488,14 +488,16 @@ export class EmotionOrchestrator {
       const { error } = await supabase
         .from('module_recommendation_feedback')
         .insert({
-          user_id: feedback.userId,
-          recommendation_id: feedback.recommendationId,
-          module_type: feedback.moduleType,
-          was_helpful: feedback.wasHelpful,
-          was_followed: feedback.wasFollowed,
-          rating: feedback.rating,
-          comment: feedback.comment,
-          created_at: new Date().toISOString(),
+          user_id: feedback.user_id,
+          recommendation_id: feedback.recommendation_id,
+          module_type: feedback.recommendation_id.split('-')[0], // Extract module type from recommendation
+          was_helpful: undefined, // Not in RecommendationFeedback type
+          was_followed: feedback.was_followed,
+          satisfaction_rating: feedback.satisfaction_rating,
+          perceived_benefit: feedback.perceived_benefit,
+          actual_duration: feedback.actual_duration,
+          comments: feedback.comments,
+          timestamp: feedback.timestamp,
         });
 
       if (error) {

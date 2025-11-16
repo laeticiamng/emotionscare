@@ -12,7 +12,6 @@
 export {
   EmotionOrchestrator,
   emotionOrchestrator,
-  default as emotionOrchestratorDefault,
 } from './emotionOrchestrator';
 
 // ============================================================================

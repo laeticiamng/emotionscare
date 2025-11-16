@@ -55,13 +55,15 @@ export const useJournalMachine = (config: JournalConfig = {}) => {
             duration: recordingDuration
           });
 
-          config.onEntryCreated?.(entry);
+          if (entry) {
+            config.onEntryCreated?.(entry);
+          }
 
           const entries = await journalService.getEntries();
 
           resolve({
             entries,
-            currentEntry: entry,
+            currentEntry: entry || undefined,
             isRecording: false,
             recordingDuration: 0
           });
@@ -91,13 +93,15 @@ export const useJournalMachine = (config: JournalConfig = {}) => {
       ephemeral: false
     });
 
-    config.onEntryCreated?.(entry);
+    if (entry) {
+      config.onEntryCreated?.(entry);
+    }
 
     const entries = await journalService.getEntries();
 
     return {
       entries,
-      currentEntry: entry,
+      currentEntry: entry || undefined,
       isRecording: false,
       recordingDuration: 0
     };
