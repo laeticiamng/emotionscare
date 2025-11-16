@@ -2,14 +2,69 @@
 
 Ce document propose une architecture améliorée pour le projet EmotionsCare, basée sur un audit complet du code et des meilleures pratiques de développement.
 
+> **État d'implémentation** : ✅ Phase 1 et 2 complétées (Sécurité, Contracts, Routes API, Tests)
+
 ## Table des matières
 
-1. [Vision générale](#vision-générale)
-2. [Structure proposée](#structure-proposée)
-3. [Améliorations de sécurité](#améliorations-de-sécurité)
-4. [Organisation du code](#organisation-du-code)
-5. [Recommandations par couche](#recommandations-par-couche)
-6. [Migration progressive](#migration-progressive)
+1. [État d'implémentation](#état-dimplémentation)
+2. [Vision générale](#vision-générale)
+3. [Structure proposée](#structure-proposée)
+4. [Améliorations de sécurité](#améliorations-de-sécurité)
+5. [Organisation du code](#organisation-du-code)
+6. [Recommandations par couche](#recommandations-par-couche)
+7. [Migration progressive](#migration-progressive)
+8. [Fichiers créés](#fichiers-créés)
+
+---
+
+## État d'implémentation
+
+### ✅ Complété
+
+#### Sécurité
+- [x] Plugin de validation d'environnement (`services/lib/plugins/env.ts`)
+  - Validation Zod de toutes les variables critiques
+  - Warnings en production si variables optionnelles manquantes
+  - Export `getEnv()` pour accès type-safe aux variables validées
+- [x] Plugin de sécurité (`services/lib/plugins/security.ts`)
+  - Helmet configuré pour headers HTTP sécurisés
+  - CORS configuré via `ALLOWED_ORIGINS`
+- [x] Plugin de rate limiting (`services/lib/plugins/rateLimit.ts`)
+  - Limite configurable par IP ou user ID
+  - Allow-list pour IPs internes
+  - Support Redis optionnel
+
+#### Contracts Package
+- [x] Structure complète du package `packages/contracts/`
+  - Schemas Zod pour journal, music, assessments
+  - Types API communs (ApiResponse, PaginatedResponse, etc.)
+  - Configuration TypeScript et package.json
+
+#### Routes API
+- [x] Structure v1 des routes (`services/api/routes/v1/`)
+  - Routes journal avec validation Zod
+  - Health check endpoints
+  - Documentation et exemples
+
+#### Tests
+- [x] Tests unitaires pour plugins de sécurité
+  - `env.test.ts` : 7 test cases
+  - `security.test.ts` : 6 test cases
+
+#### Frontend
+- [x] Structure exemple feature-based (`src/features/journal/`)
+  - Hooks (useJournalEntries)
+  - Services (journalApi)
+  - Documentation
+
+### 🔜 À faire
+
+- [ ] Implémenter la logique métier dans les routes (actuellement placeholders)
+- [ ] Créer les services de base de données (JournalService, MusicService, etc.)
+- [ ] Migrer progressivement les features existantes vers `src/features/`
+- [ ] Configurer tRPC ou GraphQL pour type-safety end-to-end
+- [ ] Ajouter tests d'intégration pour les routes API
+- [ ] Configurer CI/CD avec les nouveaux tests
 
 ---
 
@@ -528,14 +583,89 @@ app.get('/health', async () => {
 
 ---
 
+## Fichiers créés
+
+Cette section liste tous les fichiers créés ou modifiés lors de l'implémentation de cette architecture.
+
+### Plugins de sécurité
+
+```
+services/lib/plugins/
+├── env.ts                    # ✅ Validation d'environnement avec Zod
+├── env.test.ts              # ✅ Tests unitaires (7 tests)
+├── security.ts              # ✅ Helmet + CORS
+├── security.test.ts         # ✅ Tests unitaires (6 tests)
+└── rateLimit.ts             # ✅ Rate limiting configurable
+```
+
+### Package Contracts
+
+```
+packages/contracts/
+├── package.json             # ✅ Configuration du package
+├── tsconfig.json            # ✅ Configuration TypeScript
+├── index.ts                 # ✅ Export principal
+├── schemas/
+│   ├── index.ts            # ✅ Export de tous les schémas
+│   ├── assess.ts           # ✅ Schémas d'évaluation (existant, déplacé)
+│   ├── journal.ts          # ✅ Schémas journal (nouveau)
+│   └── music.ts            # ✅ Schémas musique (nouveau)
+└── types/
+    ├── index.ts            # ✅ Export de tous les types
+    └── api.ts              # ✅ Types API communs (nouveau)
+```
+
+### Routes API v1
+
+```
+services/api/routes/
+├── README.md                # ✅ Documentation des routes
+└── v1/
+    ├── index.ts            # ✅ Agrégateur de routes v1
+    ├── journal/
+    │   └── index.ts        # ✅ Routes journal
+    └── health/
+        └── index.ts        # ✅ Health checks
+```
+
+### Feature Journal (exemple)
+
+```
+src/features/journal/
+├── README.md                # ✅ Documentation de la feature
+├── index.ts                 # ✅ Exports publics
+├── hooks/
+│   └── useJournalEntries.ts # ✅ Hook React Query
+└── services/
+    └── journalApi.ts        # ✅ Client API
+```
+
+### Fichiers modifiés
+
+```
+services/lib/server.ts       # ✅ Enregistrement des nouveaux plugins
+package.json                 # ✅ Ajout de @fastify/helmet, @fastify/cors, @fastify/rate-limit
+.env.example                 # ✅ Variables ALLOWED_ORIGINS, RATE_LIMIT_*, etc.
+ARCHITECTURE_IMPROVED.md     # ✅ Ce document
+```
+
+---
+
 ## Conclusion
 
 Cette architecture améliorée vise à renforcer la **sécurité**, **maintenabilité** et **scalabilité** du projet EmotionsCare. La migration peut se faire **progressivement** sans bloquer le développement actuel.
 
-**Prochaines étapes** :
-1. Installer les dépendances manquantes (`@fastify/helmet`, `@fastify/cors`)
-2. Ajouter `ALLOWED_ORIGINS` à `.env.example`
-3. Créer le package `contracts`
-4. Commencer la migration d'un domaine pilote (ex: journal)
+### ✅ Déjà fait
+1. ~~Installer les dépendances manquantes (`@fastify/helmet`, `@fastify/cors`)~~
+2. ~~Ajouter `ALLOWED_ORIGINS` à `.env.example`~~
+3. ~~Créer le package `contracts`~~
+4. ~~Commencer la migration d'un domaine pilote (ex: journal)~~
+
+### 🔜 Prochaines étapes
+1. Installer les dépendances : `npm install`
+2. Mettre à jour `.env` avec les nouvelles variables (voir `.env.example`)
+3. Lancer les tests : `npm run test:api`
+4. Implémenter la logique métier dans les routes API
+5. Migrer progressivement les autres features vers `src/features/`
 
 Pour toute question ou discussion, n'hésitez pas à ouvrir une issue ou contacter l'équipe architecture.
