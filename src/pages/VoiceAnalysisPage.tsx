@@ -36,22 +36,34 @@ export default function VoiceAnalysisPage() {
   // Calculate emotion state from valence/arousal
   const getEmotionState = () => {
     if (!latestResult) return { state: 'Neutre', color: 'text-muted-foreground' };
-    
+
     const { valence = 0.5, arousal = 0.5 } = latestResult;
-    
+
     if (valence > 0.6 && arousal > 0.6) return { state: 'Joyeux', color: 'text-green-600' };
     if (valence > 0.6 && arousal < 0.4) return { state: 'Calme', color: 'text-blue-600' };
     if (valence < 0.4 && arousal > 0.6) return { state: 'Stressé', color: 'text-red-600' };
     if (valence < 0.4 && arousal < 0.4) return { state: 'Triste', color: 'text-gray-600' };
-    
+
     return { state: 'Neutre', color: 'text-muted-foreground' };
   };
 
   const getEnergyLevel = () => {
-    if (!latestResult?.arousal) return 'Moyen';
+    if (!latestResult) return 'Moyen';
+    if (!latestResult.arousal) return 'Moyen';
+
     if (latestResult.arousal > 0.7) return 'Élevé';
     if (latestResult.arousal < 0.3) return 'Faible';
     return 'Moyen';
+  };
+
+  const getArousalPercentage = (): number => {
+    if (!latestResult) return 50;
+    return latestResult.arousal ? latestResult.arousal * 100 : 50;
+  };
+
+  const getValencePercentage = (): number => {
+    if (!latestResult) return 50;
+    return latestResult.valence ? latestResult.valence * 100 : 50;
   };
 
   const emotionState = getEmotionState();
@@ -93,7 +105,7 @@ export default function VoiceAnalysisPage() {
           <h3 className="font-semibold">Niveau d'énergie</h3>
           <p className="text-2xl font-bold">{energyLevel}</p>
           <p className="text-sm text-muted-foreground">
-            Arousal: {latestResult?.arousal ? (latestResult.arousal * 100).toFixed(0) : '50'}%
+            Arousal: {getArousalPercentage().toFixed(0)}%
           </p>
         </Card>
 
@@ -103,7 +115,7 @@ export default function VoiceAnalysisPage() {
           </div>
           <h3 className="font-semibold">Valence</h3>
           <p className="text-2xl font-bold">
-            {latestResult?.valence ? (latestResult.valence * 100).toFixed(0) : '50'}%
+            {getValencePercentage().toFixed(0)}%
           </p>
           <p className="text-sm text-muted-foreground">Positivité émotionnelle</p>
         </Card>
@@ -113,14 +125,14 @@ export default function VoiceAnalysisPage() {
         <Card className="p-6">
           <h3 className="font-semibold mb-4">Émotions détectées</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {latestResult.emotions.slice(0, 8).map((emotion, idx) => (
-              <div key={idx} className="space-y-1">
+            {latestResult.emotions.slice(0, 8).map((emotion) => (
+              <div key={emotion.name} className="space-y-1">
                 <div className="flex justify-between text-sm">
                   <span>{emotion.name}</span>
                   <span className="font-mono">{(emotion.score * 100).toFixed(0)}%</span>
                 </div>
                 <div className="h-2 bg-muted rounded-full overflow-hidden">
-                  <div 
+                  <div
                     className="h-full bg-primary transition-all duration-300"
                     style={{ width: `${emotion.score * 100}%` }}
                   />

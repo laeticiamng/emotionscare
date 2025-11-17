@@ -9,6 +9,28 @@ import { EmotionResult } from '@/types/emotion-unified';
 import { useToast } from '@/hooks/use-toast';
 import { ScanHistory } from '@/components/scan/ScanHistory';
 
+/**
+ * Type guard to check if confidence is a number
+ */
+function isNumberConfidence(confidence: unknown): confidence is number {
+  return typeof confidence === 'number';
+}
+
+/**
+ * Safely extracts confidence value from EmotionResult
+ */
+function getConfidenceValue(confidence: EmotionResult['confidence']): number {
+  if (isNumberConfidence(confidence)) {
+    return Math.round(confidence);
+  }
+
+  if (confidence && typeof confidence === 'object' && 'overall' in confidence) {
+    return Math.round(confidence.overall);
+  }
+
+  return 0;
+}
+
 export default function TextScanPage() {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -135,9 +157,7 @@ export default function TextScanPage() {
                     {scanResult.emotion}
                   </p>
                   <p className="mt-1 text-sm text-muted-foreground">
-                    Confiance: {typeof scanResult.confidence === 'number' 
-                      ? Math.round(scanResult.confidence) 
-                      : Math.round(scanResult.confidence.overall)}%
+                    Confiance: {getConfidenceValue(scanResult.confidence)}%
                   </p>
                 </div>
 
@@ -154,12 +174,15 @@ export default function TextScanPage() {
                   <div>
                     <h3 className="mb-3 font-semibold">Recommandations</h3>
                     <ul className="space-y-2">
-                      {scanResult.recommendations.map((recommendation, idx) => {
-                        const recText = typeof recommendation === 'string' 
-                          ? recommendation 
-                          : recommendation.title + ': ' + recommendation.description;
+                      {scanResult.recommendations.map((recommendation) => {
+                        const recText = typeof recommendation === 'string'
+                          ? recommendation
+                          : `${recommendation.title}: ${recommendation.description}`;
+                        const uniqueKey = typeof recommendation === 'string'
+                          ? recommendation
+                          : `${recommendation.title}-${recommendation.description}`;
                         return (
-                          <li key={idx} className="flex items-start gap-2">
+                          <li key={uniqueKey} className="flex items-start gap-2">
                             <Sparkles className="mt-1 h-4 w-4 text-primary" />
                             <span className="text-sm">{recText}</span>
                           </li>
