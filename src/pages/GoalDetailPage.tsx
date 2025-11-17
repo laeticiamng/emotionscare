@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,11 +5,28 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { ArrowLeft, Target, Calendar, TrendingUp } from 'lucide-react';
 
+interface Milestone {
+  date: string;
+  label: string;
+  completed: boolean;
+}
+
+interface Goal {
+  id: string | undefined;
+  title: string;
+  description: string;
+  progress: number;
+  deadline: string;
+  category: string;
+  startDate: string;
+  milestones: Milestone[];
+}
+
 export default function GoalDetailPage() {
-  const { id } = useParams();
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  const goal = {
+  const goal: Goal = {
     id,
     title: 'Méditer 5 fois par semaine',
     description: 'Pratiquer la méditation guidée au moins 5 fois par semaine pour améliorer mon bien-être mental',
