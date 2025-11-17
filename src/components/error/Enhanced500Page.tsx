@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Page 500 améliorée avec actions de récupération
  */

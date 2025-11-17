@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Page de gestion des données utilisateur - Remplace TODO
  * Conformité RGPD et export/suppression des données
