@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 import { captureException } from '@/lib/ai-monitoring';
 import dayjs from 'dayjs';
