@@ -128,11 +128,13 @@ const TestAccountsPage: React.FC = () => {
       });
 
       return data;
-    } catch (error: any) {
+    } catch (error) {
       logger.error('Failed to create test account', error as Error, 'AUTH');
-      
+
+      const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue';
+
       // Si le compte existe déjà, on le marque comme créé
-      if (error.message?.includes('already registered')) {
+      if (errorMessage.includes('already registered')) {
         setCreatedAccounts(prev => new Set([...prev, account.email]));
         toast({
           title: "Compte déjà existant",
@@ -142,7 +144,7 @@ const TestAccountsPage: React.FC = () => {
       } else {
         toast({
           title: "Erreur",
-          description: error.message || "Impossible de créer le compte",
+          description: errorMessage || "Impossible de créer le compte",
           variant: "destructive",
         });
       }

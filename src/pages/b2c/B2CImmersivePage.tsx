@@ -12,6 +12,15 @@ import { VRViewer } from '@/components/b2c/VRViewer';
 
 type SessionType = 'vr' | 'ambilight' | 'audio';
 
+interface ImmersiveSession {
+  id: string;
+  type: SessionType;
+  ts_start: string;
+  ts_end?: string;
+  outcome_text?: string;
+  params?: Record<string, unknown>;
+}
+
 const B2CImmersivePage: React.FC = () => {
   const { toast } = useToast();
   const [type, setType] = useState<SessionType>('vr');
@@ -21,7 +30,7 @@ const B2CImmersivePage: React.FC = () => {
   const [isStarting, setIsStarting] = useState(false);
   const [isActive, setIsActive] = useState(false);
   const [currentOutcome, setCurrentOutcome] = useState<string | null>(null);
-  const [history, setHistory] = useState<any[]>([]);
+  const [history, setHistory] = useState<ImmersiveSession[]>([]);
 
   useEffect(() => {
     loadHistory();

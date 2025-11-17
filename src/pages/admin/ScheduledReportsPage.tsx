@@ -65,6 +65,21 @@ interface ScheduledReport {
   created_at: string;
 }
 
+interface ScheduledReportFormData {
+  name: string;
+  description: string | null;
+  recipient_emails: string[];
+  frequency: string;
+  day_of_week: number | null;
+  day_of_month: number | null;
+  time_of_day: string;
+  timezone: string;
+  include_charts: boolean;
+  date_range_days: number;
+  format: string;
+  is_active: boolean;
+}
+
 const DAYS_OF_WEEK = [
   { value: 0, label: 'Dimanche' },
   { value: 1, label: 'Lundi' },
@@ -111,7 +126,7 @@ export default function ScheduledReportsPage() {
   });
 
   const createMutation = useMutation({
-    mutationFn: async (data: any) => {
+    mutationFn: async (data: ScheduledReportFormData) => {
       const { error } = await supabase.from('scheduled_reports').insert([data]);
       if (error) throw error;
     },
@@ -127,7 +142,7 @@ export default function ScheduledReportsPage() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: any }) => {
+    mutationFn: async ({ id, data }: { id: string; data: ScheduledReportFormData }) => {
       const { error } = await supabase
         .from('scheduled_reports')
         .update(data)

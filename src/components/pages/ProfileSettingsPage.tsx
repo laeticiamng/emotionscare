@@ -106,7 +106,7 @@ export const ProfileSettingsPage: React.FC<ProfileSettingsPageProps> = ({ 'data-
     }
   };
 
-  const handleInputChange = (field: string, value: any) => {
+  const handleInputChange = (field: string, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 

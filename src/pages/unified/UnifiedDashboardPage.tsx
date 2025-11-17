@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * UNIFIED DASHBOARD PAGE - Fusion de DashboardPage + CompleteDashboardPage
  * Préserve EXACTEMENT la même fonctionnalité des deux composants
