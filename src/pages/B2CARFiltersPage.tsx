@@ -171,7 +171,7 @@ const B2CARFiltersPage: React.FC = () => {
                           <div className={`w-3 h-3 rounded-full ${filter.color}`} />
                           <Icon className="w-4 h-4" />
                           <span className="font-medium">{filter.name}</span>
-                          {isActive && <Badge size="sm" className="ml-auto">Actif</Badge>}
+                          {isActive && <Badge className="ml-auto text-xs">Actif</Badge>}
                         </div>
                         <p className="text-xs text-muted-foreground text-left">
                           {filter.description}

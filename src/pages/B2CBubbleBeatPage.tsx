@@ -199,9 +199,15 @@ const B2CBubbleBeatPage: React.FC = () => {
 
   const stopSession = async () => {
     setIsPlaying(false);
-    
+
     if (oscillatorRef.current) {
-      oscillatorRef.current.stop();
+      try {
+        oscillatorRef.current.stop();
+        oscillatorRef.current.disconnect();
+      } catch (e) {
+        // Oscillator already stopped or disconnected
+        logger.error('Error stopping oscillator', e as Error, 'AUDIO');
+      }
       oscillatorRef.current = null;
     }
 
