@@ -1,14 +1,13 @@
-// @ts-nocheck
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { 
-  TestTube, 
-  CheckCircle, 
-  AlertTriangle, 
+import {
+  TestTube,
+  CheckCircle,
+  AlertTriangle,
   Info,
   Zap,
   Activity,
@@ -17,15 +16,35 @@ import {
   Cpu
 } from 'lucide-react';
 
+interface SystemStatus {
+  ai: { status: string; latency: string; uptime: number };
+  emotion: { status: string; accuracy: number; processed: number };
+  security: { status: string; lastScan: string; threats: number };
+  database: { status: string; queries: number; cache: number };
+}
+
+interface Test {
+  name: string;
+  passed: boolean;
+  duration: string;
+  error?: string;
+}
+
+interface TestCategory {
+  category: string;
+  status: 'success' | 'warning' | 'error';
+  tests: Test[];
+}
+
 const TestPage: React.FC = () => {
-  const [systemStatus] = React.useState({
+  const [systemStatus] = React.useState<SystemStatus>({
     ai: { status: 'operational', latency: '45ms', uptime: 99.9 },
     emotion: { status: 'operational', accuracy: 98.7, processed: 1250 },
     security: { status: 'secure', lastScan: '2 min ago', threats: 0 },
     database: { status: 'healthy', queries: 847, cache: 94 }
   });
 
-  const testResults = [
+  const testResults: TestCategory[] = [
     {
       category: 'Interface Utilisateur',
       status: 'success',
@@ -189,7 +208,7 @@ const TestPage: React.FC = () => {
           </Button>
         </div>
 
-        {testResults.map((category, index) => (
+        {testResults.map((category) => (
           <Card key={category.category}>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -202,7 +221,7 @@ const TestPage: React.FC = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {category.tests.map((test, testIndex) => (
+                {category.tests.map((test) => (
                   <div key={test.name} className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
                     <div className="flex items-center gap-3">
                       {test.passed ? (

@@ -24,17 +24,25 @@ const TournamentsPage: React.FC = () => {
   });
 
   const handleRegister = async (tournamentId: string) => {
-    const success = await tournamentService.registerForTournament(tournamentId);
-    if (success) {
-      toast({
-        title: 'Inscription réussie !',
-        description: 'Vous êtes maintenant inscrit au tournoi.',
-      });
-      refetch();
-    } else {
+    try {
+      const success = await tournamentService.registerForTournament(tournamentId);
+      if (success) {
+        toast({
+          title: 'Inscription réussie !',
+          description: 'Vous êtes maintenant inscrit au tournoi.',
+        });
+        refetch();
+      } else {
+        toast({
+          title: 'Erreur',
+          description: 'Impossible de s\'inscrire au tournoi.',
+          variant: 'destructive',
+        });
+      }
+    } catch (error) {
       toast({
         title: 'Erreur',
-        description: 'Impossible de s\'inscrire au tournoi.',
+        description: 'Une erreur est survenue lors de l\'inscription.',
         variant: 'destructive',
       });
     }
@@ -81,7 +89,7 @@ const TournamentsPage: React.FC = () => {
         </div>
 
         {/* Filters */}
-        <Tabs value={selectedStatus} onValueChange={(v) => setSelectedStatus(v as any)}>
+        <Tabs value={selectedStatus} onValueChange={(v) => setSelectedStatus(v as 'upcoming' | 'registration' | 'in_progress' | 'all')}>
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="all">Tous</TabsTrigger>
             <TabsTrigger value="upcoming">À venir</TabsTrigger>
@@ -93,7 +101,7 @@ const TournamentsPage: React.FC = () => {
             {isLoading ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {[...Array(6)].map((_, i) => (
-                  <Card key={i} className="p-6">
+                  <Card key={`skeleton-${i}`} className="p-6">
                     <Skeleton className="h-40 w-full mb-4" />
                     <Skeleton className="h-6 w-3/4 mb-2" />
                     <Skeleton className="h-4 w-full mb-4" />
@@ -160,7 +168,7 @@ const TournamentsPage: React.FC = () => {
                             <p className="text-sm font-semibold mb-2">Récompenses :</p>
                             <div className="flex flex-wrap gap-2">
                               {tournament.prize_pool.slice(0, 3).map((prize, idx) => (
-                                <Badge key={idx} variant="outline" className="gap-1">
+                                <Badge key={`${tournament.id}-prize-${idx}-${prize.xp || prize.label}`} variant="outline" className="gap-1">
                                   <Medal className="w-3 h-3" />
                                   {prize.label || `${prize.xp} XP`}
                                 </Badge>

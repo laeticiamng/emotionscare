@@ -1,18 +1,51 @@
-// @ts-nocheck
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Plus, MessageSquare, Clock, CheckCircle } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+
+/**
+ * Validates a route path before navigation
+ */
+function isValidRoute(path: string): boolean {
+  // Check if path is a valid string and starts with /
+  if (!path || typeof path !== 'string' || !path.startsWith('/')) {
+    return false;
+  }
+
+  // Check for dangerous patterns
+  if (path.includes('..') || path.includes('//')) {
+    return false;
+  }
+
+  return true;
+}
 
 export default function TicketsPage() {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [tickets] = useState([
     { id: 1, subject: 'Problème de connexion', status: 'open', date: '2025-10-25', replies: 2 },
     { id: 2, subject: 'Question sur l\'abonnement', status: 'answered', date: '2025-10-20', replies: 5 },
     { id: 3, subject: 'Bug scan émotionnel', status: 'closed', date: '2025-10-15', replies: 3 },
   ]);
+
+  /**
+   * Safely navigates to a route after validation
+   */
+  const safeNavigate = (path: string) => {
+    if (!isValidRoute(path)) {
+      toast({
+        title: 'Erreur de navigation',
+        description: 'Le chemin demandé n\'est pas valide',
+        variant: 'destructive',
+      });
+      return;
+    }
+    navigate(path);
+  };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -48,7 +81,7 @@ export default function TicketsPage() {
             <h1 className="text-3xl font-bold">Mes Tickets</h1>
             <p className="text-muted-foreground">Suivez vos demandes de support</p>
           </div>
-          <Button onClick={() => navigate('/app/support')}>
+          <Button onClick={() => safeNavigate('/app/support')}>
             <Plus className="h-4 w-4 mr-2" />
             Nouveau Ticket
           </Button>
@@ -102,7 +135,7 @@ export default function TicketsPage() {
                 <div
                   key={ticket.id}
                   className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 cursor-pointer"
-                  onClick={() => navigate(`/app/tickets/${ticket.id}`)}
+                  onClick={() => safeNavigate(`/app/tickets/${ticket.id}`)}
                 >
                   <div className="flex items-center gap-4">
                     {getStatusIcon(ticket.status)}

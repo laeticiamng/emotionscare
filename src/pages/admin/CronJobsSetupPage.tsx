@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,8 +10,10 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Clock, Copy, CheckCircle2, AlertTriangle, Play, Database } from 'lucide-react';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 const CronJobsSetupPage: React.FC = () => {
+  const navigate = useNavigate();
   const [projectId, setProjectId] = useState('');
   const [anonKey, setAnonKey] = useState('');
   const [copiedScript, setCopiedScript] = useState<string | null>(null);
@@ -127,11 +130,16 @@ FROM cron.job
 ORDER BY jobname;`;
   };
 
-  const copyToClipboard = (text: string, scriptName: string) => {
-    navigator.clipboard.writeText(text);
-    setCopiedScript(scriptName);
-    toast.success(`Script ${scriptName} copié dans le presse-papiers`);
-    setTimeout(() => setCopiedScript(null), 3000);
+  const copyToClipboard = async (text: string, scriptName: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedScript(scriptName);
+      toast.success(`Script ${scriptName} copié dans le presse-papiers`);
+      setTimeout(() => setCopiedScript(null), 3000);
+    } catch (error) {
+      logger.error('Failed to copy to clipboard:', error, 'PAGE');
+      toast.error('Erreur lors de la copie dans le presse-papiers');
+    }
   };
 
   const hasConfiguration = projectId && anonKey;
@@ -248,7 +256,14 @@ ORDER BY jobname;`;
 
                 <Button
                   variant="outline"
-                  onClick={() => window.open('https://supabase.com/dashboard/project/_/sql/new', '_blank')}
+                  onClick={() => {
+                    try {
+                      window.open('https://supabase.com/dashboard/project/_/sql/new', '_blank', 'noopener,noreferrer');
+                    } catch (error) {
+                      logger.error('Failed to open Supabase SQL Editor:', error, 'PAGE');
+                      toast.error('Impossible d\'ouvrir l\'éditeur SQL Supabase');
+                    }
+                  }}
                 >
                   <Database className="h-4 w-4 mr-2" />
                   Ouvrir SQL Editor Supabase
@@ -287,7 +302,14 @@ ORDER BY jobname;`;
 
                 <Button
                   variant="outline"
-                  onClick={() => window.open('https://supabase.com/dashboard/project/_/sql/new', '_blank')}
+                  onClick={() => {
+                    try {
+                      window.open('https://supabase.com/dashboard/project/_/sql/new', '_blank', 'noopener,noreferrer');
+                    } catch (error) {
+                      logger.error('Failed to open Supabase SQL Editor:', error, 'PAGE');
+                      toast.error('Impossible d\'ouvrir l\'éditeur SQL Supabase');
+                    }
+                  }}
                 >
                   <Database className="h-4 w-4 mr-2" />
                   Ouvrir SQL Editor Supabase
@@ -344,12 +366,12 @@ ORDER BY jobname;`;
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid md:grid-cols-2 gap-4">
-            <Button variant="outline" onClick={() => window.location.href = '/admin/unified'}>
+            <Button variant="outline" onClick={() => navigate('/admin/unified')}>
               <Play className="h-4 w-4 mr-2" />
               Voir Dashboard Unifié
             </Button>
 
-            <Button variant="outline" onClick={() => window.location.href = '/admin/alert-tester'}>
+            <Button variant="outline" onClick={() => navigate('/admin/alert-tester')}>
               <AlertTriangle className="h-4 w-4 mr-2" />
               Tester avec Alerte Critique
             </Button>

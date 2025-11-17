@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { TrendingUp, TrendingDown, Calendar } from 'lucide-react';
@@ -23,8 +22,8 @@ export default function TrendsPage() {
         </header>
 
         <div className="grid gap-6 md:grid-cols-2">
-          {trends.map((trend, idx) => (
-            <Card key={idx}>
+          {trends.map((trend) => (
+            <Card key={trend.metric}>
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-lg">{trend.metric}</CardTitle>
