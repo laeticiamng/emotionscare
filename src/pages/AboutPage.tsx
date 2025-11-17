@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 /**
  * ABOUT PAGE - EMOTIONSCARE
  * Page À propos accessible WCAG 2.1 AA
