@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Unified Login Page - Page de connexion unifiée B2C/B2B
  */
