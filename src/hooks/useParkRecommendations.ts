@@ -1,28 +1,15 @@
-// @ts-nocheck
 /**
  * Hook pour les recommandations intelligentes du parc émotionnel
  * Basé sur le mood, l'historique de visite et les préférences
  */
 
 import { useAttractionProgress } from './useAttractionProgress';
-
-interface Attraction {
-  id: string;
-  title: string;
-  zone: string;
-  icon?: any;
-}
-
-interface RecommendationData {
-  attraction: Attraction;
-  score: number;
-  reason: string;
-}
+import { Attraction, RecommendationData, MoodValue } from '@/types/park';
 
 export const useParkRecommendations = () => {
   const { visitedAttractions } = useAttractionProgress();
 
-  const getRecommendations = (attractions: Attraction[], currentMood?: string): RecommendationData[] => {
+  const getRecommendations = (attractions: Attraction[], currentMood?: MoodValue | string): RecommendationData[] => {
     const recommendations: RecommendationData[] = [];
 
     attractions.forEach((attraction) => {
