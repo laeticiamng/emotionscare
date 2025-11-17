@@ -1,13 +1,12 @@
-// @ts-nocheck
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
-import { 
-  BarChart, 
-  TrendingUp, 
+import {
+  BarChart,
+  TrendingUp,
   Calendar,
   Target,
   Heart,
@@ -18,17 +17,39 @@ import {
 } from 'lucide-react';
 import { Header } from '@/components/layout';
 
-export default function AnalyticsPage() {
-  const [timeRange, setTimeRange] = useState('7d');
+interface MoodData {
+  average: number;
+  trend: string;
+  sessions: number;
+  streakDays: number;
+}
 
-  const moodData = {
+interface ModuleStat {
+  name: string;
+  usage: number;
+  sessions: number;
+  avgDuration: string;
+}
+
+interface WeeklyMood {
+  day: string;
+  mood: number;
+  energy: number;
+}
+
+export default function AnalyticsPage() {
+  // TODO: Connect to real API and use timeRange
+  const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d'>('7d');
+
+  // TODO: Replace with real data from API
+  const moodData: MoodData = {
     average: 7.2,
     trend: '+5%',
     sessions: 28,
     streakDays: 12
   };
 
-  const moduleStats = [
+  const moduleStats: ModuleStat[] = [
     { name: 'Scan Émotionnel', usage: 85, sessions: 15, avgDuration: '3m' },
     { name: 'Musique Thérapeutique', usage: 72, sessions: 12, avgDuration: '15m' },
     { name: 'Coach IA', usage: 68, sessions: 8, avgDuration: '8m' },
@@ -36,7 +57,7 @@ export default function AnalyticsPage() {
     { name: 'Journal', usage: 45, sessions: 10, avgDuration: '5m' }
   ];
 
-  const weeklyMoods = [
+  const weeklyMoods: WeeklyMood[] = [
     { day: 'Lun', mood: 6.5, energy: 7.0 },
     { day: 'Mar', mood: 7.2, energy: 6.8 },
     { day: 'Mer', mood: 8.1, energy: 8.2 },

@@ -363,21 +363,6 @@ const B2CScanPage: React.FC = () => {
             />
           )}
 
-          {/* Temporairement désactivé - problème avec assess-start */}
-          {/* 
-          <AssessmentWrapper
-            instrument="SAM"
-            title="Ressenti instantané"
-            description="2 curseurs pour colorer l'interface selon votre état"
-            context="adhoc"
-            estimatedTime={1}
-            onComplete={(badges) => {
-              logger.info('SAM badges', { badges }, 'UI');
-            }}
-            className="mb-6"
-          />
-          */}
-
           <main className="space-y-8">
             {/* Onglets pour les différentes vues */}
             <Tabs value={mainViewTab} onValueChange={(v) => setMainViewTab(v as any)} className="w-full">
