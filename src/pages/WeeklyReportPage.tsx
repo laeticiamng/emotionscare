@@ -386,9 +386,9 @@ export default function WeeklyReportPage() {
       <Card className="p-6 space-y-4">
         <h3 className="font-semibold text-lg">Activités quotidiennes</h3>
         <div className="space-y-3">
-          {dailyActivities.map((activity, index) => (
+          {dailyActivities.map((activity) => (
             <div
-              key={index}
+              key={activity.date}
               className="flex items-center justify-between p-3 rounded-lg bg-muted/50"
             >
               <div>

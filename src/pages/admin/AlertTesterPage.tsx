@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,9 +14,25 @@ import { AlertTriangle, Play, CheckCircle2, Clock, ExternalLink } from 'lucide-r
 import { toast } from 'sonner';
 import { logger } from '@/lib/logger';
 
+interface AlertMetadata {
+  test: boolean;
+  created_by: string;
+  purpose: string;
+  [key: string]: string | boolean | number;
+}
+
 const AlertTesterPage: React.FC = () => {
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    alert_type: string;
+    severity: string;
+    title: string;
+    message: string;
+    source: string;
+    tags: string[];
+    metadata: AlertMetadata;
+  }>({
     alert_type: 'database_error',
     severity: 'critical',
     title: 'Test Critical Database Error',
@@ -225,7 +242,7 @@ const AlertTesterPage: React.FC = () => {
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={() => window.location.href = `/admin/incidents`}
+                      onClick={() => navigate('/admin/incidents')}
                     >
                       <ExternalLink className="h-3 w-3" />
                     </Button>
@@ -285,7 +302,14 @@ const AlertTesterPage: React.FC = () => {
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => window.open(ticket.external_ticket_url, '_blank')}
+                        onClick={() => {
+                          try {
+                            window.open(ticket.external_ticket_url, '_blank', 'noopener,noreferrer');
+                          } catch (error) {
+                            logger.error('Failed to open external ticket URL:', error, 'PAGE');
+                            toast.error('Impossible d\'ouvrir le lien du ticket');
+                          }
+                        }}
                       >
                         <ExternalLink className="h-3 w-3" />
                       </Button>
@@ -313,13 +337,13 @@ const AlertTesterPage: React.FC = () => {
           </ol>
 
           <div className="mt-4 flex gap-2">
-            <Button variant="outline" onClick={() => window.location.href = '/admin/unified'}>
+            <Button variant="outline" onClick={() => navigate('/admin/unified')}>
               Dashboard Unifié
             </Button>
-            <Button variant="outline" onClick={() => window.location.href = '/admin/incidents'}>
+            <Button variant="outline" onClick={() => navigate('/admin/incidents')}>
               Tous les Incidents
             </Button>
-            <Button variant="outline" onClick={() => window.location.href = '/admin/tickets/integrations'}>
+            <Button variant="outline" onClick={() => navigate('/admin/tickets/integrations')}>
               Configuration Tickets
             </Button>
           </div>

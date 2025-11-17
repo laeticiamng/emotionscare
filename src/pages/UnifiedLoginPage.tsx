@@ -10,6 +10,10 @@ import { supabase } from '@/integrations/supabase/client';
 import { loginSchema, type LoginFormData } from '@/lib/validations/auth';
 import { sanitizeInput } from '@/lib/validation/validator';
 
+interface LocationState {
+  from?: string;
+}
+
 export default function UnifiedLoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -41,7 +45,7 @@ export default function UnifiedLoginPage() {
       });
 
       // Rediriger vers la page initialement demandée ou vers /app par défaut
-      const from = (location.state as any)?.from || '/app';
+      const from = (location.state as LocationState)?.from || '/app';
       navigate(from, { replace: true });
     } catch (error: any) {
       toast({

@@ -110,7 +110,7 @@ const AlertTemplatesPage = () => {
     if (editingTemplate.id) {
       updateMutation.mutate(editingTemplate as Partial<AlertTemplate> & { id: string });
     } else {
-      createMutation.mutate(editingTemplate as any);
+      createMutation.mutate(editingTemplate as Omit<AlertTemplate, 'id' | 'created_at' | 'updated_at'>);
     }
   };
 
