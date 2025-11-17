@@ -4,8 +4,20 @@ import { BarChart, LineChart, TrendingUp, Users, Activity, Clock } from 'lucide-
 
 /**
  * Page d'analytics B2B pour les organisations
+ *
+ * NOTE: Cette page contient des données hardcodées pour la démonstration.
+ * TODO: Connecter les statistiques à de vraies données provenant de l'API/base de données.
+ * Les métriques suivantes doivent être récupérées dynamiquement :
+ * - Nombre d'utilisateurs actifs
+ * - Sessions totales
+ * - Temps moyen par session
+ * - Taux d'engagement/adoption
+ * - Répartition de l'utilisation par module
  */
 export default function AnalyticsPage() {
+  // TODO: Remplacer par des appels API réels pour récupérer les analytics
+  // Exemple: const { data: analytics } = useQuery({ queryKey: ['b2b-analytics'], queryFn: fetchAnalytics });
+
   return (
     <div className="container mx-auto p-6">
       <div className="mb-6">
@@ -18,6 +30,7 @@ export default function AnalyticsPage() {
         </p>
       </div>
 
+      {/* Statistiques principales - DONNÉES DE DÉMONSTRATION */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
         <Card>
           <CardHeader className="pb-2">
@@ -88,6 +101,7 @@ export default function AnalyticsPage() {
         </Card>
       </div>
 
+      {/* Détails analytics - DONNÉES DE DÉMONSTRATION */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
@@ -96,6 +110,7 @@ export default function AnalyticsPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
+              {/* TODO: Remplacer par des données réelles de répartition des modules */}
               {[
                 { name: 'Coach IA', value: 45, color: 'bg-blue-500' },
                 { name: 'Journal', value: 30, color: 'bg-green-500' },

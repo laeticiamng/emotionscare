@@ -8,14 +8,38 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Users, Plus, Edit, Trash2, Award, TrendingUp } from 'lucide-react';
 import { toast } from 'sonner';
 import { logger } from '@/lib/logger';
 
+interface TeamMember {
+  id: string;
+  name: string;
+  email: string;
+  skills: string[] | string;
+  specializations: string[];
+  max_concurrent_tickets: number;
+  performance_score: number;
+  current_workload?: number;
+  is_active: boolean;
+}
+
 const TeamMemberSkillsPage: React.FC = () => {
   const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingMember, setEditingMember] = useState<any>(null);
+  const [editingMember, setEditingMember] = useState<TeamMember | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [memberToDelete, setMemberToDelete] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -160,13 +184,39 @@ const TeamMemberSkillsPage: React.FC = () => {
     }
   };
 
-  const handleEdit = (member: any) => {
+  const handleEdit = (member: TeamMember) => {
     setEditingMember(member);
+    let parsedSkills: string[] = [];
+
+    if (Array.isArray(member.skills)) {
+      parsedSkills = member.skills;
+    } else if (typeof member.skills === 'string') {
+      try {
+        parsedSkills = JSON.parse(member.skills);
+      } catch (error) {
+        logger.error('Failed to parse member skills', error as Error, 'UI');
+        parsedSkills = [];
+      }
+    }
+
     setFormData({
       ...member,
-      skills: Array.isArray(member.skills) ? member.skills : JSON.parse(member.skills || '[]')
+      skills: parsedSkills
     });
     setIsDialogOpen(true);
+  };
+
+  const handleDeleteClick = (memberId: string) => {
+    setMemberToDelete(memberId);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (memberToDelete) {
+      deleteMutation.mutate(memberToDelete);
+      setDeleteDialogOpen(false);
+      setMemberToDelete(null);
+    }
   };
 
   const addSkill = () => {
@@ -344,7 +394,17 @@ const TeamMemberSkillsPage: React.FC = () => {
           </Card>
         ) : (
           teamMembers.map((member) => {
-            const skills = Array.isArray(member.skills) ? member.skills : JSON.parse(member.skills || '[]');
+            let skills: string[] = [];
+            if (Array.isArray(member.skills)) {
+              skills = member.skills;
+            } else if (typeof member.skills === 'string') {
+              try {
+                skills = JSON.parse(member.skills);
+              } catch (error) {
+                logger.error('Failed to parse member skills for display', error as Error, 'UI');
+                skills = [];
+              }
+            }
             return (
               <Card key={member.id}>
                 <CardHeader>
@@ -360,11 +420,7 @@ const TeamMemberSkillsPage: React.FC = () => {
                       <Button
                         size="sm"
                         variant="ghost"
-                        onClick={() => {
-                          if (confirm('Supprimer ce membre?')) {
-                            deleteMutation.mutate(member.id);
-                          }
-                        }}
+                        onClick={() => handleDeleteClick(member.id)}
                       >
                         <Trash2 className="h-3 w-3" />
                       </Button>
@@ -456,6 +512,30 @@ const TeamMemberSkillsPage: React.FC = () => {
           </CardContent>
         </Card>
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmer la suppression</AlertDialogTitle>
+            <AlertDialogDescription>
+              Êtes-vous sûr de vouloir supprimer ce membre de l'équipe ?
+              Cette action est irréversible.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setMemberToDelete(null)}>
+              Annuler
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteConfirm}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Supprimer
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
