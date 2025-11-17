@@ -10,14 +10,45 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Brain, Plus, Edit, Trash2, TrendingUp } from 'lucide-react';
 import { toast } from 'sonner';
 import { logger } from '@/lib/logger';
 
+interface MLAssignmentRule {
+  id: string;
+  rule_name: string;
+  alert_type: string;
+  alert_category: string;
+  priority_level: string[];
+  matching_conditions: Record<string, unknown>;
+  use_ml_recommendation: boolean;
+  ml_confidence_threshold: number;
+  preferred_assignees: string[];
+  fallback_assignees: string[];
+  auto_assign: boolean;
+  respect_availability: boolean;
+  respect_workload: boolean;
+  max_response_time_minutes: number | null;
+  is_active: boolean;
+  priority: number;
+}
+
 const MLAssignmentRulesPage: React.FC = () => {
   const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingRule, setEditingRule] = useState<any>(null);
+  const [editingRule, setEditingRule] = useState<MLAssignmentRule | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [ruleToDelete, setRuleToDelete] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     rule_name: '',
@@ -166,10 +197,23 @@ const MLAssignmentRulesPage: React.FC = () => {
     }
   };
 
-  const handleEdit = (rule: any) => {
+  const handleEdit = (rule: MLAssignmentRule) => {
     setEditingRule(rule);
     setFormData(rule);
     setIsDialogOpen(true);
+  };
+
+  const handleDeleteClick = (ruleId: string) => {
+    setRuleToDelete(ruleId);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (ruleToDelete) {
+      deleteMutation.mutate(ruleToDelete);
+      setDeleteDialogOpen(false);
+      setRuleToDelete(null);
+    }
   };
 
   return (
@@ -245,8 +289,11 @@ const MLAssignmentRulesPage: React.FC = () => {
                   value={JSON.stringify(formData.matching_conditions, null, 2)}
                   onChange={(e) => {
                     try {
-                      setFormData(prev => ({ ...prev, matching_conditions: JSON.parse(e.target.value) }));
-                    } catch {}
+                      const parsed = JSON.parse(e.target.value);
+                      setFormData(prev => ({ ...prev, matching_conditions: parsed }));
+                    } catch (error) {
+                      logger.warn('Invalid JSON in matching conditions', error as Error, 'UI');
+                    }
                   }}
                   placeholder='{"severity": "critical", "tags": ["database"]}'
                   rows={3}
@@ -373,11 +420,7 @@ const MLAssignmentRulesPage: React.FC = () => {
                     <Button
                       size="sm"
                       variant="destructive"
-                      onClick={() => {
-                        if (confirm('Supprimer cette règle?')) {
-                          deleteMutation.mutate(rule.id);
-                        }
-                      }}
+                      onClick={() => handleDeleteClick(rule.id)}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -440,6 +483,30 @@ const MLAssignmentRulesPage: React.FC = () => {
           )}
         </CardContent>
       </Card>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmer la suppression</AlertDialogTitle>
+            <AlertDialogDescription>
+              Êtes-vous sûr de vouloir supprimer cette règle d'assignation ML ?
+              Cette action est irréversible.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setRuleToDelete(null)}>
+              Annuler
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteConfirm}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Supprimer
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

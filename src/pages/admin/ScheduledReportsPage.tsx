@@ -24,6 +24,16 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import {
   Table,
   TableBody,
   TableCell,
@@ -68,6 +78,8 @@ const DAYS_OF_WEEK = [
 export default function ScheduledReportsPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingReport, setEditingReport] = useState<ScheduledReport | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [reportToDelete, setReportToDelete] = useState<string | null>(null);
   const queryClient = useQueryClient();
 
   const [formData, setFormData] = useState({
@@ -241,6 +253,19 @@ export default function ScheduledReportsPage() {
       updateMutation.mutate({ id: editingReport.id, data: reportData });
     } else {
       createMutation.mutate(reportData);
+    }
+  };
+
+  const handleDeleteClick = (reportId: string) => {
+    setReportToDelete(reportId);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (reportToDelete) {
+      deleteMutation.mutate(reportToDelete);
+      setDeleteDialogOpen(false);
+      setReportToDelete(null);
     }
   };
 
@@ -533,11 +558,7 @@ export default function ScheduledReportsPage() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => {
-                            if (confirm('Êtes-vous sûr de vouloir supprimer ce rapport ?')) {
-                              deleteMutation.mutate(report.id);
-                            }
-                          }}
+                          onClick={() => handleDeleteClick(report.id)}
                         >
                           <Trash2 className="h-4 w-4 text-destructive" />
                         </Button>
@@ -554,6 +575,30 @@ export default function ScheduledReportsPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmer la suppression</AlertDialogTitle>
+            <AlertDialogDescription>
+              Êtes-vous sûr de vouloir supprimer ce rapport programmé ?
+              Cette action est irréversible.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setReportToDelete(null)}>
+              Annuler
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteConfirm}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Supprimer
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
