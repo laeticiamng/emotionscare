@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { WellnessGamificationPanel } from '@/components/gamification/WellnessGamificationPanel';
 import { WellnessStreakDisplay } from '@/components/gamification/WellnessStreakDisplay';
 import { Card, CardContent } from '@/components/ui/card';

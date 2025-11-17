@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * B2C VR Galaxy - Cathédrale cosmique
  * Pitch : Tu respires sous les étoiles ; plus tu restes, plus le ciel se relie.
@@ -6,7 +5,9 @@
  */
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import * as Sentry from '@sentry/react';
 import { captureException } from '@/lib/ai-monitoring';
+import { logger } from '@/lib/logger';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Star, Play, Pause, RotateCcw, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -318,7 +319,7 @@ export default function B2CVRGalaxyPage() {
 
   return (
     <ConsentGate>
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900/30 to-slate-900 p-4 relative overflow-hidden">
+      <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900/30 to-slate-900 p-4 relative overflow-hidden">
       {/* Background Stars */}
       <div className="absolute inset-0 pointer-events-none">
         {backgroundStars.map((star) => (

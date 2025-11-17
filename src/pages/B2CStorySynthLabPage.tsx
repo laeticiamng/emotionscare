@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Play, Pause, RotateCcw, Volume2, VolumeX, BookOpen } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -138,7 +137,7 @@ const B2CStorySynthLabPage: React.FC = () => {
   const canGenerate = validIntentions.length > 0 && !isGenerating;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-muted/20 p-4">
+    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-background via-background/95 to-muted/20 p-4">
       {/* Header */}
       <div className="flex items-center gap-4 mb-8">
         <Button 

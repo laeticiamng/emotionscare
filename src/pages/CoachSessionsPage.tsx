@@ -74,7 +74,7 @@ export default function CoachSessionsPage() {
   const upcomingCount = sessions.filter((s) => s.status === 'upcoming').length;
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-background via-background to-muted p-6">
+    <main data-testid="page-root" className="min-h-screen bg-gradient-to-b from-background via-background to-muted p-6">
       <div className="mx-auto max-w-5xl space-y-6">
         <header className="space-y-2">
           <Button
