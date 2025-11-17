@@ -107,7 +107,7 @@ const CoachEnhancedPage = () => {
   const activeItem = NAV_ITEMS.find((item) => item.id === activeTab);
 
   return (
-    <div className="min-h-screen bg-slate-100 dark:bg-slate-950" data-testid="coach-enhanced-page">
+    <div className="min-h-screen bg-slate-100 dark:bg-slate-950" data-testid="page-root">
       <MedicalDisclaimerDialog
         open={showDisclaimer}
         onAccept={handleAccept}

@@ -80,7 +80,7 @@ export default function CoachProgramDetailPage() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-background via-background to-muted">
+    <main data-testid="page-root" className="min-h-screen bg-gradient-to-b from-background via-background to-muted">
       {/* Header */}
       <div className="border-b bg-card/50 backdrop-blur-sm">
         <div className="mx-auto max-w-6xl px-6 py-6">

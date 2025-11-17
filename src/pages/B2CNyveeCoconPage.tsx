@@ -56,7 +56,7 @@ const B2CNyveeCoconPage: FC = () => {
 
   const handleBreathingComplete = () => {
     setSessionPhase('badge');
-    
+
     // Déterminer le badge selon le niveau
     if (intensity === 'calm') {
       setBadgeType('calm');
@@ -71,9 +71,18 @@ const B2CNyveeCoconPage: FC = () => {
     } else {
       setBadgeType('tense');
     }
-    
-    setTimeout(() => setSessionPhase('complete'), 3000);
   };
+
+  // Effect pour gérer le timeout avec cleanup
+  useEffect(() => {
+    let timeout: NodeJS.Timeout | undefined;
+    if (sessionPhase === 'badge') {
+      timeout = setTimeout(() => setSessionPhase('complete'), 3000);
+    }
+    return () => {
+      if (timeout) clearTimeout(timeout);
+    };
+  }, [sessionPhase]);
 
   const handleStartSession = () => {
     setSessionPhase('breathing');
@@ -89,6 +98,7 @@ const B2CNyveeCoconPage: FC = () => {
       <ZeroNumberBoundary
         enabled={zeroNumbersActive}
         className="min-h-screen bg-gradient-to-b from-slate-950 via-indigo-950 to-slate-950"
+        data-testid="page-root"
       >
         <div className="mx-auto flex w-full max-w-4xl flex-col gap-8 px-4 py-10">
           {/* Header */}

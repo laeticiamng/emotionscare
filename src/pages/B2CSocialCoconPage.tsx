@@ -1,6 +1,7 @@
 // @ts-nocheck
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import * as Sentry from '@sentry/react';
 import {
   ArrowLeft,
   Bell,
@@ -350,7 +351,7 @@ const B2CSocialCoconPage: React.FC = () => {
       };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-rose-50 to-slate-100">
+    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-slate-50 via-rose-50 to-slate-100">
       <div className="max-w-6xl mx-auto px-4 py-8 space-y-8">
         <header className="flex items-center justify-between">
           <Button variant="ghost" className="rounded-full" onClick={() => navigate(-1)}>
