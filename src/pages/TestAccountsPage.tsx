@@ -1,38 +1,56 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Copy } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Copy, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+
+interface TestAccount {
+  role: string;
+  email: string;
+  password: string;
+  description: string;
+}
+
+// Note: Ces comptes sont pour le développement/test uniquement
+// En production, ces données devraient provenir d'une API sécurisée
+const TEST_ACCOUNTS: TestAccount[] = [
+  {
+    role: 'Consumer',
+    email: process.env.REACT_APP_TEST_CONSUMER_EMAIL || 'consumer@test.fr',
+    password: process.env.REACT_APP_TEST_CONSUMER_PASSWORD || 'test123456',
+    description: 'Accès aux fonctionnalités B2C',
+  },
+  {
+    role: 'Employee',
+    email: process.env.REACT_APP_TEST_EMPLOYEE_EMAIL || 'employee@test.fr',
+    password: process.env.REACT_APP_TEST_EMPLOYEE_PASSWORD || 'test123456',
+    description: 'Accès collaborateur B2B',
+  },
+  {
+    role: 'Manager',
+    email: process.env.REACT_APP_TEST_MANAGER_EMAIL || 'manager@test.fr',
+    password: process.env.REACT_APP_TEST_MANAGER_PASSWORD || 'test123456',
+    description: 'Accès gestionnaire RH B2B',
+  },
+];
 
 export default function TestAccountsPage() {
   const { toast } = useToast();
 
-  const testAccounts = [
-    {
-      role: 'Consumer',
-      email: 'consumer@test.fr',
-      password: 'test123456',
-      description: 'Accès aux fonctionnalités B2C',
-    },
-    {
-      role: 'Employee',
-      email: 'employee@test.fr',
-      password: 'test123456',
-      description: 'Accès collaborateur B2B',
-    },
-    {
-      role: 'Manager',
-      email: 'manager@test.fr',
-      password: 'test123456',
-      description: 'Accès gestionnaire RH B2B',
-    },
-  ];
-
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-    toast({
-      title: 'Copié',
-      description: 'Identifiant copié dans le presse-papier',
-    });
+  const copyToClipboard = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast({
+        title: 'Copié',
+        description: 'Identifiant copié dans le presse-papier',
+      });
+    } catch (error) {
+      toast({
+        title: 'Erreur',
+        description: 'Impossible de copier dans le presse-papier',
+        variant: 'destructive',
+      });
+    }
   };
 
   return (
@@ -45,8 +63,17 @@ export default function TestAccountsPage() {
           </p>
         </div>
 
+        <Alert variant="destructive">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertTitle>Environnement de développement uniquement</AlertTitle>
+          <AlertDescription>
+            Cette page et ces identifiants sont destinés au développement et aux tests uniquement.
+            Ne jamais utiliser ces comptes en production.
+          </AlertDescription>
+        </Alert>
+
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {testAccounts.map((account) => (
+          {TEST_ACCOUNTS.map((account) => (
             <Card key={account.role}>
               <CardHeader>
                 <CardTitle>{account.role}</CardTitle>
