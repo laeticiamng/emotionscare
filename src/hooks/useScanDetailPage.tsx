@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState, useEffect } from 'react';
 import type { User } from '@/types/user';
 import type { Emotion } from '@/types/emotion';
@@ -111,8 +110,9 @@ export function useScanDetailPage(scanId: string): UseScanDetailPageReturn {
 
   useEffect(() => {
     if (scanId) {
-      fetchUserAndLatestEmotion();
+      void fetchUserAndLatestEmotion();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scanId]);
 
   return { 

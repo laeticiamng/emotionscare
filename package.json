@@ -67,7 +67,9 @@
     "build:analyze": "vite build --mode analyze",
     "build:stats": "npm run build && node scripts/bundle-stats.js",
     "perf:lighthouse": "lhci autorun",
-    "perf:sourcemap": "source-map-explorer dist/assets/*.js --html dist/sourcemap.html"
+    "perf:sourcemap": "source-map-explorer dist/assets/*.js --html dist/sourcemap.html",
+    "pages:distribute": "bash scripts/distribute-pages.sh",
+    "pages:validate": "bash scripts/validate-distribution.sh"
   },
   "dependencies": {
     "@axe-core/playwright": "^4.10.2",
