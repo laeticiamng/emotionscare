@@ -1,5 +1,5 @@
-// @ts-nocheck
 import { useState, useEffect } from 'react';
+import { Attraction } from '@/types/park';
 
 export interface AttractionVisit {
   id: string;
@@ -133,7 +133,7 @@ export const useAttractionProgress = () => {
   };
 
   // Get search suggestions
-  const getSearchSuggestions = (query: string, allAttractions: any[]) => {
+  const getSearchSuggestions = (query: string, allAttractions: Attraction[]) => {
     const lowerQuery = query.toLowerCase();
     
     // Prioritize search history

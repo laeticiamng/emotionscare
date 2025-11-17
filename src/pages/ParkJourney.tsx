@@ -1,23 +1,16 @@
-// @ts-nocheck
 import React, { useEffect, useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { 
-  Sparkles, Wind, Palette, Music, Leaf, Book, Cloud, Star, 
-  Lightbulb, Waves, Scan, Beaker, Sword, Sliders, Users, 
+import {
+  Sparkles, Wind, Palette, Music, Leaf, Book, Cloud, Star,
+  Lightbulb, Waves, Scan, Beaker, Sword, Sliders, Users,
   Trophy, Theater, Sprout, ArrowRight, Map
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { JourneyAttraction } from '@/types/park';
 
-interface AttractionStopProps {
-  number: number;
-  icon: React.ElementType;
-  title: string;
-  subtitle: string;
-  narrative: string;
-  gradient: string;
-  route: string;
+interface AttractionStopProps extends JourneyAttraction {
   delay?: number;
 }
 
@@ -148,7 +141,7 @@ const AttractionStop: React.FC<AttractionStopProps> = ({
 export default function ParkJourney() {
   const navigate = useNavigate();
 
-  const attractions: Omit<AttractionStopProps, 'delay'>[] = [
+  const attractions: JourneyAttraction[] = [
     {
       number: 1,
       icon: Sparkles,

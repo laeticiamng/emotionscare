@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, Wind, Palette, Music, Leaf, Book, Cloud, Star, Lightbulb, Waves, Scan, Beaker, Sword, Sliders, Users, Trophy, Theater, Sprout, Filter, Zap, Home, Brain, Calendar, Heart, Monitor, Camera, Shield, MessageSquare, BarChart3, Grid3X3, Settings, Bell, Search, X, TrendingUp, Target, Award, ChevronDown } from 'lucide-react';
@@ -16,6 +15,7 @@ import { TourStepOverlay } from '@/components/park/TourStepOverlay';
 import { useParkRecommendations } from '@/hooks/useParkRecommendations';
 import { AttractionRecommendations } from '@/components/park/AttractionRecommendations';
 import { ParkStatistics, ProgressStage } from '@/components/park/ParkStatistics';
+import { Attraction, Zone, ZoneKey, ZoneProgressData, ParkStat, MoodOption } from '@/types/park';
 
 /**
  * Carte du Parc Émotionnel — Monde des Modules
@@ -64,7 +64,7 @@ export default function EmotionalPark() {
     }
   }, [tourCompleted, visitedAttractions]);
 
-  const attractions = [
+  const attractions: Attraction[] = [
     {
       id: 'dashboard',
       title: 'Le Hall d\'Accueil',
@@ -419,7 +419,7 @@ export default function EmotionalPark() {
     }
   ];
 
-  const zones = {
+  const zones: Record<ZoneKey, Zone> = {
     hub: { name: 'Hub Central', color: 'violet', emoji: '🌌' },
     calm: { name: 'Zone de Sérénité', color: 'blue', emoji: '🫧' },
     creative: { name: 'Quartier Créatif', color: 'pink', emoji: '🎨' },
@@ -528,7 +528,7 @@ export default function EmotionalPark() {
   };
 
   // Handle attraction click
-  const handleAttractionClick = (attraction: any) => {
+  const handleAttractionClick = (attraction: Attraction) => {
     markVisited(attraction.id);
     
     // Check zone completion
@@ -841,13 +841,13 @@ export default function EmotionalPark() {
             Comment te sens-tu en ce moment?
           </p>
           <div className="flex flex-wrap gap-2">
-            {[
+            {([
               { value: 'happy', emoji: '😊', label: 'Heureux' },
               { value: 'calm', emoji: '😌', label: 'Calme' },
               { value: 'anxious', emoji: '😰', label: 'Anxieux' },
               { value: 'sad', emoji: '😢', label: 'Triste' },
               { value: 'excited', emoji: '🤩', label: 'Excité' }
-            ].map(mood => (
+            ] as const).map(mood => (
               <Button
                 key={mood.value}
                 variant={currentMood === mood.value ? 'default' : 'outline'}
