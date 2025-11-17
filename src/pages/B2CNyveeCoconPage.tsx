@@ -1,4 +1,3 @@
-// @ts-nocheck
 import type { FC } from 'react';
 import { useMemo, useState } from 'react';
 
