@@ -795,13 +795,16 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
                   <div className="text-center space-y-6">
                     {/* Avatar */}
                     <div className="flex justify-center mb-4">
-                      <img 
+                      <img
                         src={testimonials[currentTestimonial].avatar}
                         alt={testimonials[currentTestimonial].avatarAlt}
                         className="w-20 h-20 rounded-full object-cover border-4 border-primary/20"
+                        loading="lazy"
                         onError={(e) => {
-                          // Fallback si image manquante
-                          e.currentTarget.style.display = 'none';
+                          // Fallback avec placeholder
+                          const target = e.currentTarget;
+                          target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="80" height="80"%3E%3Crect fill="%23ddd" width="80" height="80"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-size="32"%3E👤%3C/text%3E%3C/svg%3E';
+                          target.onerror = null;
                         }}
                       />
                     </div>

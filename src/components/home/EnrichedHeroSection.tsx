@@ -8,38 +8,46 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Link } from 'react-router-dom';
 import { Play, ArrowRight, Sparkles, Zap, Heart } from 'lucide-react';
+import { useReducedMotion, getAnimationVariants } from '@/hooks/useReducedMotion';
 
 const EnrichedHeroSection: React.FC = () => {
+  const prefersReducedMotion = useReducedMotion();
+  const animations = getAnimationVariants(prefersReducedMotion);
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.2,
-        delayChildren: 0.1,
+        staggerChildren: prefersReducedMotion ? 0.05 : 0.2,
+        delayChildren: prefersReducedMotion ? 0 : 0.1,
       },
     },
   };
 
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.8, ease: 'easeOut' },
-    },
-  };
+  const itemVariants = prefersReducedMotion
+    ? animations.fadeIn
+    : {
+        hidden: { opacity: 0, y: 20 },
+        visible: {
+          opacity: 1,
+          y: 0,
+          transition: { duration: 0.8, ease: 'easeOut' },
+        },
+      };
 
-  const floatingVariants = {
-    animate: {
-      y: [0, -20, 0],
-      transition: {
-        duration: 4,
-        repeat: Infinity,
-        ease: 'easeInOut',
-      },
-    },
-  };
+  const floatingVariants = prefersReducedMotion
+    ? { animate: {} }
+    : {
+        animate: {
+          y: [0, -20, 0],
+          transition: {
+            duration: 4,
+            repeat: Infinity,
+            ease: 'easeInOut',
+          },
+        },
+      };
 
   return (
     <section className="relative overflow-hidden py-20 lg:py-32 bg-gradient-to-br from-background via-background/80 to-primary/5">

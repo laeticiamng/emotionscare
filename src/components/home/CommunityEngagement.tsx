@@ -20,6 +20,7 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { cn } from '@/lib/utils';
 
 interface Challenge {
   id: string;
@@ -308,10 +309,5 @@ const CommunityEngagement: React.FC = () => {
     </section>
   );
 };
-
-// Helper function
-function cn(...classes: (string | false | null | undefined)[]): string {
-  return classes.filter(Boolean).join(' ');
-}
 
 export default CommunityEngagement;
