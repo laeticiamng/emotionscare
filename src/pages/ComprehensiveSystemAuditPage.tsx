@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 import ComprehensiveSystemAudit from '@/admin/ComprehensiveSystemAudit';
 

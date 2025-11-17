@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,10 +9,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { ArrowLeft, Target } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
+interface GoalFormData {
+  title: string;
+  description: string;
+  category: string;
+  deadline: string;
+}
+
 export default function GoalNewPage() {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<GoalFormData>({
     title: '',
     description: '',
     category: '',

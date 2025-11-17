@@ -1,14 +1,23 @@
-// @ts-nocheck
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Search, HelpCircle } from 'lucide-react';
 
+interface FAQQuestion {
+  q: string;
+  a: string;
+}
+
+interface FAQCategory {
+  category: string;
+  questions: FAQQuestion[];
+}
+
 export default function FAQPage() {
   const [searchTerm, setSearchTerm] = useState('');
 
-  const faqs = [
+  const faqs: FAQCategory[] = [
     {
       category: 'Général',
       questions: [

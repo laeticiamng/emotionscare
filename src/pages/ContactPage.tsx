@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * CONTACT PAGE - EMOTIONSCARE
  * Page de contact accessible WCAG 2.1 AA
@@ -20,9 +19,19 @@ import { logger } from '@/lib/logger';
 import { contactFormSchema, type ContactFormInput } from '@/lib/validation/schemas';
 import { sanitizeInput } from '@/lib/validation/validator';
 
+interface SubmissionResult {
+  success: boolean;
+  message: string;
+  error?: string;
+  data?: {
+    ticketId: string;
+    estimatedResponse: string;
+  };
+}
+
 const ContactPage: React.FC = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [submissionResult, setSubmissionResult] = useState<any>(null);
+  const [submissionResult, setSubmissionResult] = useState<SubmissionResult | null>(null);
 
   const form = useForm<ContactFormInput>({
     resolver: zodResolver(contactFormSchema),
