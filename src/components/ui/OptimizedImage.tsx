@@ -56,13 +56,18 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
     ${isLoaded ? 'opacity-100' : 'opacity-0'}
   `.trim();
 
+  // Calculer l'aspect ratio pour éviter le CLS
+  const aspectRatio = width && height ? (height / width) * 100 : undefined;
+
   return (
-    <div className="relative overflow-hidden">
+    <div
+      className="relative overflow-hidden"
+      style={aspectRatio ? { paddingBottom: `${aspectRatio}%` } : undefined}
+    >
       {/* Skeleton de chargement */}
       {!isLoaded && !imageError && (
-        <div 
+        <div
           className="absolute inset-0 bg-muted animate-pulse rounded"
-          style={{ width: width || 'auto', height: height || 'auto' }}
         />
       )}
 
@@ -77,7 +82,7 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
         <img
           src={imageError ? '/placeholder.svg' : sources.fallback}
           alt={alt}
-          className={imageClasses}
+          className={`${imageClasses} ${aspectRatio ? 'absolute inset-0 w-full h-full object-cover' : ''}`}
           width={width}
           height={height}
           loading={priority ? 'eager' : 'lazy'}
