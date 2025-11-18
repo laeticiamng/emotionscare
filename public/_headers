@@ -1,0 +1,27 @@
+# Headers pour optimisation Lighthouse et performances
+
+/*
+  # Security Headers
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  X-XSS-Protection: 1; mode=block
+  Referrer-Policy: strict-origin-when-cross-origin
+
+  # Performance - Resource Hints
+  Link: </fonts/inter-var.woff2>; rel=preload; as=font; type=font/woff2; crossorigin
+  Link: </og-image.jpg>; rel=preload; as=image
+
+  # Cache Control
+  Cache-Control: public, max-age=31536000, immutable
+
+/static/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/*.js
+  Cache-Control: public, max-age=31536000, immutable
+
+/*.css
+  Cache-Control: public, max-age=31536000, immutable
+
+/index.html
+  Cache-Control: public, max-age=0, must-revalidate

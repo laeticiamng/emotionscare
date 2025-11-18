@@ -5,12 +5,21 @@
 import React from 'react';
 import ModernHomePage from './modern-features/ModernHomePage';
 import { usePageSEO } from '@/hooks/usePageSEO';
+import HomePageErrorBoundary from './error/HomePageErrorBoundary';
 
 const HomePage: React.FC = () => {
   usePageSEO({
     title: 'Accueil - Intelligence émotionnelle et bien-être',
     description: 'EmotionsCare : plateforme d\'intelligence émotionnelle pour particuliers et entreprises. Scan émotions, musicothérapie IA, coach virtuel, VR bien-être.',
     keywords: 'émotions, bien-être, intelligence émotionnelle, musicothérapie, coach IA, santé mentale',
+    // Open Graph pour partage social
+    ogType: 'website',
+    ogImage: '/og-image.jpg',
+    ogImageAlt: 'EmotionsCare - Plateforme d\'intelligence émotionnelle',
+    // Twitter Cards
+    twitterCard: 'summary_large_image',
+    twitterImage: '/twitter-card.jpg',
+    // Structured Data
     structuredData: {
       '@context': 'https://schema.org',
       '@type': 'WebApplication',
@@ -40,7 +49,11 @@ const HomePage: React.FC = () => {
     }
   });
 
-  return <ModernHomePage />;
+  return (
+    <HomePageErrorBoundary>
+      <ModernHomePage />
+    </HomePageErrorBoundary>
+  );
 };
 
 export default HomePage;

@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import React from 'react';
 import { Heart, Headphones, MessageCircle, Video } from 'lucide-react';

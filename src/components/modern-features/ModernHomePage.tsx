@@ -3,7 +3,7 @@
  * Conserve l'apparence existante tout en ajoutant des fonctionnalités modernes
  */
 
-import React, { useState } from 'react';
+import React, { useState, lazy, Suspense } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import UnifiedHomePage from '@/pages/unified/UnifiedHomePage';
 import { Button } from '@/components/ui/button';
@@ -32,10 +32,29 @@ import {
 import { Progress } from '@/components/ui/progress';
 import EnrichedHeroSection from '@/components/home/EnrichedHeroSection';
 import OnboardingGuide from '@/components/home/OnboardingGuide';
-import ActivityFeed from '@/components/home/ActivityFeed';
-import FAQSection from '@/components/home/FAQSection';
 import QuickStartModules from '@/components/home/QuickStartModules';
 import CommunityEngagement from '@/components/home/CommunityEngagement';
+
+// Code splitting : lazy load des sections non critiques
+const ActivityFeed = lazy(() => import('@/components/home/ActivityFeed'));
+const FAQSection = lazy(() => import('@/components/home/FAQSection'));
+
+// Skeleton de chargement pour sections lazy
+const SectionSkeleton = () => (
+  <div className="py-16 bg-background">
+    <div className="container">
+      <div className="space-y-4 animate-pulse">
+        <div className="h-8 bg-muted rounded w-1/3 mx-auto" />
+        <div className="h-4 bg-muted rounded w-2/3 mx-auto" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="h-32 bg-muted rounded" />
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+);
 
 interface Achievement {
   name: string;
@@ -262,8 +281,10 @@ const ModernHomePage: React.FC = () => {
       {/* SECTION 3: Modules rapides */}
       <QuickStartModules />
 
-      {/* SECTION 4: Flux d'activité en direct */}
-      <ActivityFeed />
+      {/* SECTION 4: Flux d'activité en direct (lazy loaded) */}
+      <Suspense fallback={<SectionSkeleton />}>
+        <ActivityFeed />
+      </Suspense>
 
       {/* SECTION 5: Engagement communautaire */}
       <CommunityEngagement />
@@ -367,8 +388,10 @@ const ModernHomePage: React.FC = () => {
         </div>
       </div>
 
-      {/* SECTION 8: FAQ */}
-      <FAQSection />
+      {/* SECTION 8: FAQ (lazy loaded) */}
+      <Suspense fallback={<SectionSkeleton />}>
+        <FAQSection />
+      </Suspense>
 
       {/* Statistiques globales */}
       <div className="bg-primary/5 py-8">

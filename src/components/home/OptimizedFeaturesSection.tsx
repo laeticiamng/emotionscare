@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useMemo, useCallback } from 'react';
 import { motion, useReducedMotion, useInView } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
