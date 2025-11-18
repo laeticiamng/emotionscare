@@ -7,8 +7,8 @@
 
 import { useState, useCallback } from 'react';
 import { emotionOrchestrator } from './emotionOrchestrator';
-import type {
 import { logger } from '@/lib/logger';
+import type {
   EmotionalState,
   UserContext,
   OrchestrationResponse,

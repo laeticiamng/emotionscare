@@ -3,8 +3,6 @@
  * Système de logging unifié avec niveaux et contexte
  */
 
-import { logger } from '@/lib/logger';
-
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error' | 'critical';
 export type LogContext = 'AUTH' | 'API' | 'UI' | 'SCAN' | 'VR' | 'MUSIC' | 'ANALYTICS' | 'SYSTEM' | 'ERROR_BOUNDARY' | 'SESSION' | 'CONSENT' | 'SOCIAL' | 'NYVEE' | 'WHO5' | 'STAI6' | 'BREATH' | 'FLASH' | 'MIXER' | 'SCORES' | 'COACH';
 
@@ -47,15 +45,27 @@ class Logger {
   }
 
   error(message: string, error?: Error | any, context: LogContext = 'SYSTEM'): void {
-    logger.error(`[${context}] ${message}`, error || '', 'LIB');
+    console.error(`[${context}] ${message}`, error || '')
+    
+    // En production, on pourrait envoyer à un service de monitoring
+    if (!this.isDevelopment && error instanceof Error) {
+      // TODO: Envoyer à Sentry, LogRocket, etc.
+    }
+  }
 
-  return {
-    debug: logDebug,
-    info: logInfo,
-    warn: logWarn,
-    error: logError,
-    critical: logCritical
+  critical(message: string, error?: Error | any, context: LogContext = 'SYSTEM'): void {
+    console.error(`[${context}] CRITICAL: ${message}`, error || '')
+    
+    // En production, alert immédiate
+    if (!this.isDevelopment) {
+      // TODO: Alert système critique
+    }
+  }
+
+  getSessionId(): string {
+    return this.sessionId
   }
 }
 
+export const logger = new Logger()
 export default logger
