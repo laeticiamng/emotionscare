@@ -264,7 +264,7 @@ export async function getJournalStats(userId: string): Promise<JournalStats> {
       entriesThisMonth,
     };
   } catch (error) {
-    logger.error(error as Error, 'DB');
+    logger.error('Error getting journal stats', error as Error, 'DB');
     throw error;
   }
 }
