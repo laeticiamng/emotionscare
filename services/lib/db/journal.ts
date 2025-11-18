@@ -47,7 +47,7 @@ export async function listJournalEntries(
     const { data, error, count } = await query;
 
     if (error) {
-      logger.error(error, 'DB');
+      logger.error('Failed to list journal entries', error, 'DB');
       throw new Error(`Failed to list journal entries: ${error.message}`);
     }
 
@@ -57,7 +57,7 @@ export async function listJournalEntries(
       hasMore: (count || 0) > filters.offset + filters.limit,
     };
   } catch (error) {
-    logger.error(error as Error, 'DB');
+    logger.error('Error listing journal entries', error as Error, 'DB');
     throw error;
   }
 }
