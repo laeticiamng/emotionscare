@@ -289,13 +289,14 @@ const TicketIntegrationConfig: React.FC = () => {
                   <p className="text-sm text-muted-foreground mt-1">{integration.project_key}</p>
                 </div>
                 <div className="flex gap-2">
-                  <Button variant="ghost" size="icon" onClick={() => handleEdit(integration)}>
+                  <Button variant="ghost" size="icon" onClick={() => handleEdit(integration)} aria-label="Modifier l'intégration">
                     <Edit className="h-4 w-4" />
                   </Button>
                   <Button
                     variant="ghost"
                     size="icon"
                     onClick={() => deleteMutation.mutate(integration.id)}
+                    aria-label="Supprimer l'intégration"
                   >
                     <Trash2 className="h-4 w-4 text-destructive" />
                   </Button>

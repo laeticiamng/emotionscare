@@ -19,12 +19,11 @@ const rawEnv = {
     import.meta.env.VITE_COMMIT_SHA,
   VITE_SUPABASE_URL:
     import.meta.env.VITE_SUPABASE_URL ??
-    'https://yaincoxihiqdksxgrsrk.supabase.co',
+    import.meta.env.SUPABASE_URL,
   VITE_SUPABASE_ANON_KEY:
     import.meta.env.VITE_SUPABASE_ANON_KEY ??
     import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ??
-    import.meta.env.SUPABASE_ANON_KEY ??
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhaW5jb3hpaGlxZGtzeGdyc3JrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI4MTE4MjcsImV4cCI6MjA1ODM4NzgyN30.HBfwymB2F9VBvb3uyeTtHBMZFZYXzL0wQmS5fqd65yU',
+    import.meta.env.SUPABASE_ANON_KEY,
   VITE_API_URL: import.meta.env.VITE_API_URL,
   VITE_WEB_URL: import.meta.env.VITE_WEB_URL,
   VITE_SENTRY_DSN: import.meta.env.VITE_SENTRY_DSN,

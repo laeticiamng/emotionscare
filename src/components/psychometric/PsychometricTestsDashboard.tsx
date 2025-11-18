@@ -363,20 +363,26 @@ export const PsychometricTestsDashboard: React.FC = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {instruments.map((instrument) => (
-          <Card key={instrument.id} className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => selectInstrument(instrument.id)}>
-            <CardHeader>
-              <CardTitle>{instrument.name}</CardTitle>
-              <CardDescription>{instrument.fullName}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground mb-4">{instrument.description}</p>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">
-                  {instrument.questionCount} questions
-                </span>
-                <Button>Commencer</Button>
-              </div>
-            </CardContent>
+          <button
+            key={instrument.id}
+            onClick={() => selectInstrument(instrument.id)}
+            className="text-left w-full"
+            aria-label={`Commencer le test ${instrument.name} - ${instrument.fullName}`}
+          >
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer h-full">
+              <CardHeader>
+                <CardTitle>{instrument.name}</CardTitle>
+                <CardDescription>{instrument.fullName}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground mb-4">{instrument.description}</p>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">
+                    {instrument.questionCount} questions
+                  </span>
+                  <Button>Commencer</Button>
+                </div>
+              </CardContent>
           </Card>
         ))}
       </div>

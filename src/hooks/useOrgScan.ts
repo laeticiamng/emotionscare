@@ -1,5 +1,4 @@
-// @ts-nocheck
-import dayjs from 'dayjs';
+import { subWeeks, format } from 'date-fns';
 import { useQuery } from '@tanstack/react-query';
 import { GlobalInterceptor } from '@/utils/globalInterceptor';
 
@@ -13,11 +12,11 @@ export interface OrgScanRow {
 
 export const useOrgScan = (
   orgId: string,
-  since: dayjs.Dayjs = dayjs().subtract(8, 'week')
+  since: Date = subWeeks(new Date(), 8)
 ) => {
   return useQuery(['orgScan', orgId, since], async () => {
     const res = await GlobalInterceptor.secureFetch(
-      `/org/${orgId}/scan/weekly?since=${since.format('YYYY-MM-DD')}`
+      `/org/${orgId}/scan/weekly?since=${format(since, 'yyyy-MM-dd')}`
     );
     if (!res) throw new Error('Request failed');
     const { data } = await res.json();

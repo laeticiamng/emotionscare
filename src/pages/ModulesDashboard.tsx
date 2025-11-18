@@ -312,6 +312,7 @@ export default function ModulesDashboard() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10"
+              aria-label="Rechercher un module"
             />
           </div>
           
@@ -388,18 +389,25 @@ export default function ModulesDashboard() {
       {selectedCategory === 'all' && selectedStatus === 'all' && !searchQuery && (
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
           {categories.map((cat) => (
-            <Card key={cat.name} className="border-2 hover:border-primary/50 transition-colors cursor-pointer" onClick={() => setSelectedCategory(cat.name)}>
-              <CardHeader className="pb-3">
-                <div className={`w-3 h-3 rounded-full ${cat.color} mb-2`} />
-                <CardTitle className="text-sm">{cat.name}</CardTitle>
-                <CardDescription className="text-xs">{cat.description}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-2xl font-bold">
-                  {modules.filter(m => m.category === cat.name).length}
-                </p>
-              </CardContent>
-            </Card>
+            <button
+              key={cat.name}
+              onClick={() => setSelectedCategory(cat.name)}
+              className="text-left w-full"
+              aria-label={`Sélectionner la catégorie ${cat.name} - ${cat.description}`}
+            >
+              <Card className="border-2 hover:border-primary/50 transition-colors cursor-pointer h-full">
+                <CardHeader className="pb-3">
+                  <div className={`w-3 h-3 rounded-full ${cat.color} mb-2`} />
+                  <CardTitle className="text-sm">{cat.name}</CardTitle>
+                  <CardDescription className="text-xs">{cat.description}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-2xl font-bold">
+                    {modules.filter(m => m.category === cat.name).length}
+                  </p>
+                </CardContent>
+              </Card>
+            </button>
           ))}
         </div>
       )}

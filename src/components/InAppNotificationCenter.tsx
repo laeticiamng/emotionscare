@@ -109,7 +109,7 @@ export const InAppNotificationCenter: React.FC = () => {
                 ) : (
                   <AnimatePresence mode="popLayout">
                     {notifications.map((notification) => (
-                      <motion.div
+                      <motion.button
                         key={notification.id}
                         layout
                         initial={{ opacity: 0, y: -20 }}
@@ -117,9 +117,10 @@ export const InAppNotificationCenter: React.FC = () => {
                         exit={{ opacity: 0, x: 100 }}
                         onClick={() => handleNotificationClick(notification)}
                         className={cn(
-                          'p-4 border-b border-border cursor-pointer hover:bg-muted/50 transition-colors relative',
+                          'w-full text-left p-4 border-b border-border cursor-pointer hover:bg-muted/50 transition-colors relative',
                           !notification.read && 'bg-primary/5'
                         )}
+                        aria-label={`Notification: ${notification.title}${!notification.read ? ' (non lue)' : ''}`}
                       >
                         <div className="flex items-start gap-3">
                           <div className="mt-0.5">{getIcon(notification.type)}</div>
@@ -155,7 +156,7 @@ export const InAppNotificationCenter: React.FC = () => {
                             <X className="w-3 h-3" />
                           </button>
                         </div>
-                      </motion.div>
+                      </motion.button>
                     ))}
                   </AnimatePresence>
                 )}

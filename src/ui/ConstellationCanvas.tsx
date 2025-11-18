@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client";
 import React, { useEffect, useRef } from "react";
 import { motion, useMotionValue, useTransform, animate, useReducedMotion } from "framer-motion";
@@ -171,20 +170,59 @@ export function ConstellationCanvas({
     ctx.lineWidth = shouldReduceMotion ? 0.4 : 0.6;
     ctx.strokeStyle = "rgba(200,210,255,0.8)";
 
-    for (let i = 0; i < stars.length; i++) {
-      for (let j = i + 1; j < stars.length; j++) {
-        const a = stars[i];
-        const b = stars[j];
-        const dx = a.x - b.x;
-        const dy = a.y - b.y;
-        const dist2 = dx * dx + dy * dy;
-        if (dist2 < linkDistance * linkDistance) {
-          const intensity = Math.max(0.05, baseLinkAlpha * (1 - Math.sqrt(dist2) / linkDistance));
-          ctx.globalAlpha = intensity;
-          ctx.beginPath();
-          ctx.moveTo(a.x, a.y);
-          ctx.lineTo(b.x, b.y);
-          ctx.stroke();
+    // ⚡ PERFORMANCE OPTIMIZATION: Spatial hash grid reduces O(n²) to O(n)
+    // Instead of comparing all stars (48,400 comparisons for 220 stars),
+    // we only compare stars in nearby grid cells (~10-20 comparisons per star)
+    const cellSize = linkDistance;
+    const grid = new Map<string, Star[]>();
+
+    // Build spatial hash grid
+    for (const star of stars) {
+      const cellX = Math.floor(star.x / cellSize);
+      const cellY = Math.floor(star.y / cellSize);
+      const key = `${cellX},${cellY}`;
+      if (!grid.has(key)) {
+        grid.set(key, []);
+      }
+      grid.get(key)!.push(star);
+    }
+
+    // Draw links only between stars in adjacent cells
+    const drawnPairs = new Set<string>();
+    for (const star of stars) {
+      const cellX = Math.floor(star.x / cellSize);
+      const cellY = Math.floor(star.y / cellSize);
+
+      // Check this cell and 8 adjacent cells
+      for (let dx = -1; dx <= 1; dx++) {
+        for (let dy = -1; dy <= 1; dy++) {
+          const neighborKey = `${cellX + dx},${cellY + dy}`;
+          const neighbors = grid.get(neighborKey);
+          if (!neighbors) continue;
+
+          for (const neighbor of neighbors) {
+            // Skip self and already drawn pairs
+            if (star === neighbor) continue;
+
+            const pairKey = star.x < neighbor.x || (star.x === neighbor.x && star.y < neighbor.y)
+              ? `${star.x},${star.y}-${neighbor.x},${neighbor.y}`
+              : `${neighbor.x},${neighbor.y}-${star.x},${star.y}`;
+
+            if (drawnPairs.has(pairKey)) continue;
+            drawnPairs.add(pairKey);
+
+            const dx = star.x - neighbor.x;
+            const dy = star.y - neighbor.y;
+            const dist2 = dx * dx + dy * dy;
+            if (dist2 < linkDistance * linkDistance) {
+              const intensity = Math.max(0.05, baseLinkAlpha * (1 - Math.sqrt(dist2) / linkDistance));
+              ctx.globalAlpha = intensity;
+              ctx.beginPath();
+              ctx.moveTo(star.x, star.y);
+              ctx.lineTo(neighbor.x, neighbor.y);
+              ctx.stroke();
+            }
+          }
         }
       }
     }
