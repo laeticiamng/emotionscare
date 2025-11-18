@@ -33,7 +33,7 @@ export async function listMusicSessions(
     const { data, error, count } = await query;
 
     if (error) {
-      logger.error(error, 'DB');
+      logger.error('Failed to list music sessions', error, 'DB');
       throw new Error(`Failed to list music sessions: ${error.message}`);
     }
 
@@ -43,7 +43,7 @@ export async function listMusicSessions(
       hasMore: (count || 0) > filters.offset + filters.limit,
     };
   } catch (error) {
-    logger.error(error as Error, 'DB');
+    logger.error('Error listing music sessions', error as Error, 'DB');
     throw error;
   }
 }
@@ -73,13 +73,13 @@ export async function createMusicSession(
       .single();
 
     if (error) {
-      logger.error(error, 'DB');
+      logger.error('Failed to create music session', error, 'DB');
       throw new Error(`Failed to create music session: ${error.message}`);
     }
 
     return data as MusicGenerationSession;
   } catch (error) {
-    logger.error(error as Error, 'DB');
+    logger.error('Error creating music session', error as Error, 'DB');
     throw error;
   }
 }
@@ -104,13 +104,13 @@ export async function getMusicSession(
         // Not found
         return null;
       }
-      logger.error(error, 'DB');
+      logger.error('Failed to get music session', error, 'DB');
       throw new Error(`Failed to get music session: ${error.message}`);
     }
 
     return data as MusicGenerationSession;
   } catch (error) {
-    logger.error(error as Error, 'DB');
+    logger.error('Error getting music session', error as Error, 'DB');
     throw error;
   }
 }
@@ -133,13 +133,13 @@ export async function updateMusicSession(
       .single();
 
     if (error) {
-      logger.error(error, 'DB');
+      logger.error('Failed to update music session', error, 'DB');
       throw new Error(`Failed to update music session: ${error.message}`);
     }
 
     return data as MusicGenerationSession;
   } catch (error) {
-    logger.error(error as Error, 'DB');
+    logger.error('Error updating music session', error as Error, 'DB');
     throw error;
   }
 }
@@ -159,11 +159,11 @@ export async function deleteMusicSession(
       .eq('user_id', userId);
 
     if (error) {
-      logger.error(error, 'DB');
+      logger.error('Failed to delete music session', error, 'DB');
       throw new Error(`Failed to delete music session: ${error.message}`);
     }
   } catch (error) {
-    logger.error(error as Error, 'DB');
+    logger.error('Error deleting music session', error as Error, 'DB');
     throw error;
   }
 }

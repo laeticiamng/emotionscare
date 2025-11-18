@@ -59,7 +59,7 @@ export const logAndJournal = async (data: {
     });
 
     if (!response.ok) {
-      logger.error(new Error('Failed to log session'), 'MODULE');
+      logger.error('Failed to log session', undefined, 'MODULE');
       return null;
     }
 
