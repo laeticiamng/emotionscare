@@ -10,11 +10,21 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { toast } from '@/hooks/use-toast';
-import { 
-  Download, 
-  Trash2, 
-  Shield, 
-  Database, 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import {
+  Download,
+  Trash2,
+  Shield,
+  Database,
   FileText,
   AlertTriangle,
   CheckCircle,
@@ -38,6 +48,7 @@ interface DataExport {
 export const DataSettingsPage: React.FC<DataSettingsPageProps> = ({ 'data-testid': testId }) => {
   const [isExporting, setIsExporting] = React.useState(false);
   const [isDeleting, setIsDeleting] = React.useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = React.useState(false);
   const [exports, setExports] = React.useState<DataExport[]>([
     {
       id: '1',
@@ -114,19 +125,17 @@ export const DataSettingsPage: React.FC<DataSettingsPageProps> = ({ 'data-testid
   };
 
   const handleDeleteAccount = async () => {
-    if (!confirm('Êtes-vous sûr de vouloir supprimer définitivement votre compte ? Cette action est irréversible.')) {
-      return;
-    }
-
     setIsDeleting(true);
     try {
       // Simulate account deletion
       await new Promise(resolve => setTimeout(resolve, 3000));
-      
+
       toast({
         title: "Suppression programmée",
         description: "Votre compte sera supprimé dans 30 jours. Vous pouvez annuler cette action en vous reconnectant.",
       });
+
+      setShowDeleteDialog(false);
     } catch (error) {
       toast({
         title: "Erreur",
@@ -335,9 +344,9 @@ export const DataSettingsPage: React.FC<DataSettingsPageProps> = ({ 'data-testid
               Cette action supprimera définitivement votre compte et toutes les données associées.
               Vous avez 30 jours pour annuler cette action en vous reconnectant.
             </p>
-            <Button 
-              variant="destructive" 
-              onClick={handleDeleteAccount}
+            <Button
+              variant="destructive"
+              onClick={() => setShowDeleteDialog(true)}
               disabled={isDeleting}
             >
               {isDeleting ? 'Suppression...' : 'Supprimer définitivement mon compte'}
@@ -345,6 +354,40 @@ export const DataSettingsPage: React.FC<DataSettingsPageProps> = ({ 'data-testid
           </div>
         </CardContent>
       </Card>
+
+      {/* Dialog de confirmation de suppression */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-destructive">
+              Supprimer définitivement votre compte ?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Cette action est irréversible. Votre compte sera désactivé immédiatement et
+              supprimé définitivement après 30 jours. Durant cette période, vous pouvez
+              annuler la suppression en vous reconnectant.
+              <br /><br />
+              <strong>Toutes vos données seront supprimées :</strong>
+              <ul className="list-disc list-inside mt-2">
+                <li>Profil et informations personnelles</li>
+                <li>Scans émotionnels et journal</li>
+                <li>Historique et statistiques</li>
+                <li>Préférences et paramètres</li>
+              </ul>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteAccount}
+              disabled={isDeleting}
+              className="bg-destructive hover:bg-destructive/90"
+            >
+              {isDeleting ? 'Suppression...' : 'Confirmer la suppression'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

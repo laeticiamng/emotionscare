@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 import { Bell, Mail, Clock, Loader2, CheckCircle2, AlertTriangle } from 'lucide-react';
 
 interface NotificationSettings {
@@ -75,7 +76,7 @@ export const NotificationSettingsPage: React.FC<{ 'data-testid'?: string }> = ({
         });
       }
     } catch (error) {
-      console.error('Error loading notification settings:', error);
+      logger.error('Error loading notification settings', error as Error, 'COMPONENT');
       toast({
         title: 'Erreur',
         description: 'Impossible de charger vos paramètres',
@@ -115,7 +116,7 @@ export const NotificationSettingsPage: React.FC<{ 'data-testid'?: string }> = ({
         description: 'Vos préférences de notification ont été mises à jour',
       });
     } catch (error) {
-      console.error('Error saving notification settings:', error);
+      logger.error('Error saving notification settings', error as Error, 'COMPONENT');
       toast({
         title: 'Erreur',
         description: 'Impossible de sauvegarder vos paramètres',

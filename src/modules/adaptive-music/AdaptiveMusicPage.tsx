@@ -123,11 +123,11 @@ const describeTrend = (summary: PomsTrendSummary | null): string => {
   return "Le ressenti reste stable, la sélection conserve cette caresse sonore.";
 };
 
-const TrackCard: React.FC<{
+const TrackCard = React.memo<{
   track: MoodPlaylistTrack;
   active: boolean;
   onSelect: () => void;
-}> = ({ track, active, onSelect }) => {
+}>(({ track, active, onSelect }) => {
   return (
     <li className="flex flex-col gap-3 rounded-lg border border-muted/60 bg-background/50 p-4 shadow-sm">
       <div className="flex items-center justify-between">
@@ -162,7 +162,7 @@ const TrackCard: React.FC<{
       </div>
     </li>
   );
-};
+});
 
 const AdaptiveMusicPage: React.FC = () => {
   const { has } = useFlags();
@@ -345,7 +345,7 @@ const AdaptiveMusicPage: React.FC = () => {
         logger.warn("[adaptive-music] unable to store post POMS", error, 'MUSIC');
       }
     },
-    [pomsAssessment, prePoms],
+    [pomsAssessment, prePoms, buildSummary],
   );
 
   const presetDetail = PRESET_DETAILS[recommendation.presetId];
