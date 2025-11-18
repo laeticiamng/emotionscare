@@ -51,44 +51,61 @@ const EnrichedHeroSection: React.FC = () => {
 
   return (
     <section className="relative overflow-hidden py-20 lg:py-32 bg-gradient-to-br from-background via-background/80 to-primary/5">
-      {/* Animated background elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <motion.div
-          className="absolute top-20 left-10 w-72 h-72 bg-primary/20 rounded-full mix-blend-multiply filter blur-3xl"
-          animate={{
-            y: [0, 100, 0],
-            x: [0, 50, 0],
-          }}
-          transition={{
-            duration: 8,
-            repeat: Infinity,
-            ease: 'easeInOut',
-          }}
-        />
-        <motion.div
-          className="absolute -bottom-8 right-20 w-72 h-72 bg-blue-500/20 rounded-full mix-blend-multiply filter blur-3xl"
-          animate={{
-            y: [0, -100, 0],
-            x: [0, -50, 0],
-          }}
-          transition={{
-            duration: 10,
-            repeat: Infinity,
-            ease: 'easeInOut',
-          }}
-        />
-        <motion.div
-          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-purple-500/10 rounded-full mix-blend-multiply filter blur-3xl"
-          animate={{
-            scale: [1, 1.2, 1],
-            opacity: [0.3, 0.5, 0.3],
-          }}
-          transition={{
-            duration: 6,
-            repeat: Infinity,
-            ease: 'easeInOut',
-          }}
-        />
+      {/* Animated background elements - optimized with will-change and conditional animations */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+        {!prefersReducedMotion ? (
+          <>
+            <motion.div
+              className="absolute top-20 left-10 w-72 h-72 bg-primary/20 rounded-full mix-blend-multiply filter blur-3xl"
+              style={{ willChange: 'transform' }}
+              animate={{
+                y: [0, 100, 0],
+                x: [0, 50, 0],
+              }}
+              transition={{
+                duration: 8,
+                repeat: Infinity,
+                ease: 'easeInOut',
+                repeatType: 'mirror'
+              }}
+            />
+            <motion.div
+              className="absolute -bottom-8 right-20 w-72 h-72 bg-blue-500/20 rounded-full mix-blend-multiply filter blur-3xl"
+              style={{ willChange: 'transform' }}
+              animate={{
+                y: [0, -100, 0],
+                x: [0, -50, 0],
+              }}
+              transition={{
+                duration: 10,
+                repeat: Infinity,
+                ease: 'easeInOut',
+                repeatType: 'mirror'
+              }}
+            />
+            <motion.div
+              className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-purple-500/10 rounded-full mix-blend-multiply filter blur-3xl"
+              style={{ willChange: 'transform, opacity' }}
+              animate={{
+                scale: [1, 1.2, 1],
+                opacity: [0.3, 0.5, 0.3],
+              }}
+              transition={{
+                duration: 6,
+                repeat: Infinity,
+                ease: 'easeInOut',
+                repeatType: 'mirror'
+              }}
+            />
+          </>
+        ) : (
+          /* Static background elements for reduced motion preference */
+          <>
+            <div className="absolute top-20 left-10 w-72 h-72 bg-primary/20 rounded-full mix-blend-multiply filter blur-3xl" />
+            <div className="absolute -bottom-8 right-20 w-72 h-72 bg-blue-500/20 rounded-full mix-blend-multiply filter blur-3xl" />
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-purple-500/10 rounded-full mix-blend-multiply filter blur-3xl opacity-40" />
+          </>
+        )}
       </div>
 
       <div className="container relative z-10">
