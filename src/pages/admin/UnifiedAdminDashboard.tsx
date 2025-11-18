@@ -171,7 +171,7 @@ const UnifiedAdminDashboard: React.FC = () => {
           <h1 className="text-3xl font-bold text-foreground">Dashboard Unifié</h1>
           <p className="text-muted-foreground mt-1">Vue consolidée des performances de la plateforme</p>
         </div>
-        <Button variant="outline" size="icon" onClick={() => window.location.reload()}>
+        <Button variant="outline" size="icon" onClick={() => window.location.reload()} aria-label="Recharger la page">
           <RefreshCw className="h-4 w-4" />
         </Button>
       </div>

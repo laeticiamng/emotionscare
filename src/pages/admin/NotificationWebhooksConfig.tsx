@@ -281,13 +281,14 @@ const NotificationWebhooksConfig: React.FC = () => {
                     </Badge>
                   </div>
                   <div className="flex gap-2">
-                    <Button variant="outline" size="icon" onClick={() => handleEdit(webhook)}>
+                    <Button variant="outline" size="icon" onClick={() => handleEdit(webhook)} aria-label="Modifier le webhook">
                       <Edit className="h-4 w-4" />
                     </Button>
                     <Button
                       variant="destructive"
                       size="icon"
                       onClick={() => deleteMutation.mutate(webhook.id)}
+                      aria-label="Supprimer le webhook"
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>

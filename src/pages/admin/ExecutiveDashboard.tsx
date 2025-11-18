@@ -234,7 +234,7 @@ const ExecutiveDashboard: React.FC = () => {
               <TabsTrigger value="12months">12 mois</TabsTrigger>
             </TabsList>
           </Tabs>
-          <Button variant="outline" size="icon" onClick={() => refetch()}>
+          <Button variant="outline" size="icon" onClick={() => refetch()} aria-label="Actualiser les données">
             <RefreshCw className="h-4 w-4" />
           </Button>
           <Button variant="outline" onClick={() => handleExport('excel')} disabled={isExporting}>
