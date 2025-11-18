@@ -1,0 +1,56 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <defs>
+    <linearGradient id="logoBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6366f1;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:1" />
+    </linearGradient>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <!-- Rounded square background -->
+  <rect width="512" height="512" rx="128" fill="url(#logoBg)"/>
+
+  <!-- Main icon - Heart + Brain fusion -->
+  <g transform="translate(256, 256)">
+    <!-- Outer glow -->
+    <circle cx="0" cy="0" r="140" fill="#fff" opacity="0.1"/>
+
+    <!-- Heart shape -->
+    <g transform="translate(0, -20)">
+      <path d="M 0 20 C 0 -10, -30 -40, -60 -40 C -100 -40, -120 -10, -120 30 C -120 80, -60 120, 0 180 C 60 120, 120 80, 120 30 C 120 -10, 100 -40, 60 -40 C 30 -40, 0 -10, 0 20 Z"
+            fill="#fff"
+            filter="url(#shadow)"/>
+    </g>
+
+    <!-- Brain circuit overlay -->
+    <g transform="translate(0, -10)">
+      <!-- Left hemisphere -->
+      <circle cx="-45" cy="0" r="12" fill="#6366f1" opacity="0.8"/>
+      <circle cx="-45" cy="-35" r="8" fill="#6366f1" opacity="0.6"/>
+      <circle cx="-45" cy="35" r="8" fill="#6366f1" opacity="0.6"/>
+      <line x1="-45" y1="-35" x2="-45" y2="35" stroke="#6366f1" stroke-width="3" opacity="0.5"/>
+
+      <!-- Right hemisphere -->
+      <circle cx="45" cy="0" r="12" fill="#ec4899" opacity="0.8"/>
+      <circle cx="45" cy="-35" r="8" fill="#ec4899" opacity="0.6"/>
+      <circle cx="45" cy="35" r="8" fill="#ec4899" opacity="0.6"/>
+      <line x1="45" y1="-35" x2="45" y2="35" stroke="#ec4899" stroke-width="3" opacity="0.5"/>
+
+      <!-- Connection between hemispheres -->
+      <line x1="-45" y1="0" x2="45" y2="0" stroke="#fff" stroke-width="4" opacity="0.6"/>
+      <circle cx="0" cy="0" r="6" fill="#fff" opacity="0.8"/>
+    </g>
+
+    <!-- Pulse rings -->
+    <circle cx="0" cy="0" r="110" fill="none" stroke="#fff" stroke-width="2" opacity="0.3"/>
+    <circle cx="0" cy="0" r="130" fill="none" stroke="#fff" stroke-width="1" opacity="0.2"/>
+  </g>
+
+  <!-- Text at bottom -->
+  <text x="256" y="440" font-family="'Inter', sans-serif" font-size="48" font-weight="700" fill="#fff" text-anchor="middle" opacity="0.9">
+    EmotionsCare
+  </text>
+</svg>

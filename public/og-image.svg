@@ -1,0 +1,69 @@
+<svg width="1200" height="630" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background gradient -->
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6366f1;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#8b5cf6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ec4899;stop-opacity:1" />
+    </linearGradient>
+    <filter id="blur">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="60" />
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- Decorative circles -->
+  <circle cx="200" cy="150" r="100" fill="#fff" opacity="0.1" filter="url(#blur)"/>
+  <circle cx="1000" cy="480" r="120" fill="#fff" opacity="0.1" filter="url(#blur)"/>
+  <circle cx="600" cy="315" r="180" fill="#fff" opacity="0.05" filter="url(#blur)"/>
+
+  <!-- Logo/Icon (Heart + Brain fusion) -->
+  <g transform="translate(150, 200)">
+    <!-- Heart shape -->
+    <path d="M 50 30 C 50 20, 40 10, 30 10 C 10 10, 0 20, 0 35 C 0 55, 20 70, 50 100 C 80 70, 100 55, 100 35 C 100 20, 90 10, 70 10 C 60 10, 50 20, 50 30 Z" fill="#fff" opacity="0.9"/>
+    <!-- Brain circuit lines -->
+    <circle cx="30" cy="40" r="5" fill="#6366f1"/>
+    <circle cx="70" cy="40" r="5" fill="#ec4899"/>
+    <line x1="30" y1="40" x2="70" y2="40" stroke="#fff" stroke-width="2" opacity="0.6"/>
+  </g>
+
+  <!-- Main content -->
+  <text x="350" y="260" font-family="'Inter', sans-serif" font-size="72" font-weight="800" fill="#fff">
+    EmotionsCare
+  </text>
+
+  <text x="350" y="330" font-family="'Inter', sans-serif" font-size="32" font-weight="600" fill="#fff" opacity="0.9">
+    Intelligence émotionnelle par IA
+  </text>
+
+  <text x="350" y="380" font-family="'Inter', sans-serif" font-size="24" font-weight="400" fill="#fff" opacity="0.8">
+    Scan émotions · Musicothérapie · Coach IA · VR Thérapie
+  </text>
+
+  <!-- CTA Badge -->
+  <g transform="translate(350, 430)">
+    <rect width="280" height="50" rx="25" fill="#fff" opacity="0.2"/>
+    <rect width="280" height="50" rx="25" fill="none" stroke="#fff" stroke-width="2"/>
+    <text x="140" y="33" font-family="'Inter', sans-serif" font-size="20" font-weight="600" fill="#fff" text-anchor="middle">
+      ✨ Essai gratuit 30 jours
+    </text>
+  </g>
+
+  <!-- Stats badges -->
+  <g transform="translate(750, 430)">
+    <text x="0" y="0" font-family="'Inter', sans-serif" font-size="18" font-weight="600" fill="#fff" opacity="0.9">
+      ⭐ 4.8/5
+    </text>
+    <text x="100" y="0" font-family="'Inter', sans-serif" font-size="18" font-weight="600" fill="#fff" opacity="0.9">
+      👥 50K+ users
+    </text>
+    <text x="240" y="0" font-family="'Inter', sans-serif" font-size="18" font-weight="600" fill="#fff" opacity="0.9">
+      🔒 RGPD
+    </text>
+  </g>
+
+  <!-- Bottom gradient overlay -->
+  <rect y="530" width="1200" height="100" fill="url(#bg)" opacity="0.3"/>
+</svg>

@@ -14,29 +14,38 @@ const HomePage: React.FC = () => {
     keywords: 'émotions, bien-être, intelligence émotionnelle, musicothérapie, coach IA, santé mentale',
     // Open Graph pour partage social
     ogType: 'website',
-    ogImage: '/og-image.jpg',
-    ogImageAlt: 'EmotionsCare - Plateforme d\'intelligence émotionnelle',
+    ogImage: '/og-image.svg',
+    ogImageAlt: 'EmotionsCare - Plateforme d\'intelligence émotionnelle avec dashboard et outils',
     // Twitter Cards
     twitterCard: 'summary_large_image',
-    twitterImage: '/twitter-card.jpg',
+    twitterImage: '/twitter-card.svg',
+    // Canonical URL
+    canonical: 'https://emotionscare.app/',
+    // Inclure le schema Organization
+    includeOrganization: true,
     // Structured Data
     structuredData: {
       '@context': 'https://schema.org',
       '@type': 'WebApplication',
+      '@id': 'https://emotionscare.app/#webapp',
       name: 'EmotionsCare',
+      url: 'https://emotionscare.app',
       applicationCategory: 'HealthApplication',
       operatingSystem: 'Web',
+      browserRequirements: 'Requires JavaScript. Requires HTML5.',
       offers: {
         '@type': 'Offer',
         price: '0',
         priceCurrency: 'EUR',
-        description: 'Essai gratuit 30 jours'
+        description: 'Essai gratuit 30 jours',
+        availability: 'https://schema.org/InStock'
       },
       aggregateRating: {
         '@type': 'AggregateRating',
         ratingValue: '4.8',
         ratingCount: '2847',
-        bestRating: '5'
+        bestRating: '5',
+        worstRating: '1'
       },
       featureList: [
         'Analyse émotionnelle par IA',
