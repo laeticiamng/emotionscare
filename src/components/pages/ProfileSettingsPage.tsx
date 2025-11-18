@@ -107,9 +107,9 @@ export const ProfileSettingsPage: React.FC<ProfileSettingsPageProps> = ({ 'data-
     }
   };
 
-  const handleInputChange = (field: string, value: string | boolean) => {
+  const handleInputChange = React.useCallback((field: string, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-  };
+  }, []);
 
   return (
     <div className="container max-w-4xl mx-auto py-8 space-y-6" data-testid={testId}>

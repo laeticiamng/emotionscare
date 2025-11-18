@@ -94,10 +94,10 @@ export const PrivacySettingsPage: React.FC<{ 'data-testid'?: string }> = ({
     }
   };
 
-  const handleSettingChange = (key: keyof PrivacySettings, value: boolean) => {
+  const handleSettingChange = React.useCallback((key: keyof PrivacySettings, value: boolean) => {
     setSettings(prev => ({ ...prev, [key]: value }));
     setHasChanges(true);
-  };
+  }, []);
 
   const saveSettings = async () => {
     if (!user) return;

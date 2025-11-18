@@ -7,6 +7,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Heart, Brain, Music, Camera, MessageCircle, Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
+// Constant array to avoid re-creating on each render
+const STAR_RATING_INDICES = [0, 1, 2, 3, 4];
+
 const SimpleB2CPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
@@ -117,7 +120,7 @@ const SimpleB2CPage: React.FC = () => {
             <Card>
               <CardContent className="p-6">
                 <div className="flex items-center mb-4">
-                  {[...Array(5)].map((_, i) => (
+                  {STAR_RATING_INDICES.map((i) => (
                     <Star key={i} className="h-4 w-4 text-yellow-400 fill-current" />
                   ))}
                 </div>
@@ -132,7 +135,7 @@ const SimpleB2CPage: React.FC = () => {
             <Card>
               <CardContent className="p-6">
                 <div className="flex items-center mb-4">
-                  {[...Array(5)].map((_, i) => (
+                  {STAR_RATING_INDICES.map((i) => (
                     <Star key={i} className="h-4 w-4 text-yellow-400 fill-current" />
                   ))}
                 </div>
@@ -147,7 +150,7 @@ const SimpleB2CPage: React.FC = () => {
             <Card>
               <CardContent className="p-6">
                 <div className="flex items-center mb-4">
-                  {[...Array(5)].map((_, i) => (
+                  {STAR_RATING_INDICES.map((i) => (
                     <Star key={i} className="h-4 w-4 text-yellow-400 fill-current" />
                   ))}
                 </div>
