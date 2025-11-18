@@ -7,6 +7,7 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 import {
   Shield, Download, Trash2, Edit, CheckCircle2,
   AlertTriangle, Loader2, FileText, Mail
@@ -82,7 +83,7 @@ export const PrivacySettingsPage: React.FC<{ 'data-testid'?: string }> = ({
         });
       }
     } catch (error) {
-      console.error('Error loading privacy settings:', error);
+      logger.error('Error loading privacy settings', error as Error, 'COMPONENT');
       toast({
         title: 'Erreur',
         description: 'Impossible de charger vos paramètres',
@@ -93,10 +94,10 @@ export const PrivacySettingsPage: React.FC<{ 'data-testid'?: string }> = ({
     }
   };
 
-  const handleSettingChange = (key: keyof PrivacySettings, value: boolean) => {
+  const handleSettingChange = React.useCallback((key: keyof PrivacySettings, value: boolean) => {
     setSettings(prev => ({ ...prev, [key]: value }));
     setHasChanges(true);
-  };
+  }, []);
 
   const saveSettings = async () => {
     if (!user) return;
@@ -119,7 +120,7 @@ export const PrivacySettingsPage: React.FC<{ 'data-testid'?: string }> = ({
         description: 'Vos préférences de confidentialité ont été mises à jour',
       });
     } catch (error) {
-      console.error('Error saving privacy settings:', error);
+      logger.error('Error saving privacy settings', error as Error, 'COMPONENT');
       toast({
         title: 'Erreur',
         description: 'Impossible de sauvegarder vos paramètres',
@@ -179,7 +180,7 @@ export const PrivacySettingsPage: React.FC<{ 'data-testid'?: string }> = ({
         description: 'Vos données ont été téléchargées',
       });
     } catch (error) {
-      console.error('Error exporting data:', error);
+      logger.error('Error exporting data', error as Error, 'COMPONENT');
       toast({
         title: 'Erreur',
         description: 'Impossible d\'exporter vos données',
@@ -217,7 +218,7 @@ export const PrivacySettingsPage: React.FC<{ 'data-testid'?: string }> = ({
       await supabase.auth.signOut();
 
     } catch (error) {
-      console.error('Error deleting account:', error);
+      logger.error('Error deleting account', error as Error, 'COMPONENT');
       toast({
         title: 'Erreur',
         description: 'Impossible de supprimer votre compte',
@@ -422,7 +423,7 @@ export const PrivacySettingsPage: React.FC<{ 'data-testid'?: string }> = ({
               <Button
                 variant="outline"
                 className="w-full justify-start h-auto py-4"
-                onClick={() => window.location.href = '/support?subject=correction'}
+                onClick={() => { window.location.href = '/support?subject=correction'; }}
               >
                 <Edit className="mr-3 h-5 w-5" />
                 <div className="text-left">

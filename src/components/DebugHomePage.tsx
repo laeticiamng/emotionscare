@@ -1,5 +1,5 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { logger } from '@/lib/logger';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,13 +9,16 @@ import { AlertCircle, CheckCircle, Home } from 'lucide-react';
 const isDevelopment = import.meta.env.DEV || import.meta.env.MODE === 'development';
 
 export default function DebugHomePage() {
+  const navigate = useNavigate();
+
   logger.debug('DebugHomePage component rendered', {}, 'UI');
 
   // Redirect to home in production
-  if (!isDevelopment) {
-    window.location.href = '/';
-    return null;
-  }
+  useEffect(() => {
+    if (!isDevelopment) {
+      navigate('/');
+    }
+  }, [isDevelopment, navigate]);
 
   try {
     return (

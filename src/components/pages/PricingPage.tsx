@@ -130,7 +130,7 @@ const faqs = [
 export const PricingPage: React.FC<PricingPageProps> = ({ 'data-testid': testId }) => {
   const [isAnnual, setIsAnnual] = React.useState(false);
 
-  const getPrice = (basePrice: string) => {
+  const getPrice = React.useCallback((basePrice: string) => {
     if (basePrice === '0€' || basePrice === 'Sur mesure') return basePrice;
     if (isAnnual) {
       const monthly = parseInt(basePrice.replace('€', ''));
@@ -138,7 +138,7 @@ export const PricingPage: React.FC<PricingPageProps> = ({ 'data-testid': testId 
       return `${Math.round(annual / 12)}€`;
     }
     return basePrice;
-  };
+  }, [isAnnual]);
 
   return (
     <main className="min-h-screen bg-background" data-testid={testId}>

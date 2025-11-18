@@ -51,20 +51,20 @@ export default function AdminFlagsPage() {
     void checkAdminAccess();
   }, [user, navigate]);
 
-  function setOn(k: string) {
+  const setOn = React.useCallback((k: string) => {
     setOverride(k, true);
     setOv(getOverrides());
-  }
+  }, []);
 
-  function setOff(k: string) {
+  const setOff = React.useCallback((k: string) => {
     setOverride(k, false);
     setOv(getOverrides());
-  }
+  }, []);
 
-  function reset(k: string) {
+  const reset = React.useCallback((k: string) => {
     clearOverride(k);
     setOv(getOverrides());
-  }
+  }, []);
 
   if (!isAdmin) {
     return (

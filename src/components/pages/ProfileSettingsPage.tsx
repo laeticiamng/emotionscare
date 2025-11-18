@@ -13,6 +13,7 @@ import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import { useAppStore } from '@/store/unified.store';
 import { useToast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 import { User, Mail, Phone, MapPin, Calendar, Shield } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -95,7 +96,7 @@ export const ProfileSettingsPage: React.FC<ProfileSettingsPageProps> = ({ 'data-
         description: "Vos modifications ont été sauvegardées avec succès.",
       });
     } catch (error) {
-      console.error('Error saving profile:', error);
+      logger.error('Error saving profile', error as Error, 'COMPONENT');
       toast({
         title: "Erreur",
         description: "Impossible de sauvegarder les modifications.",
@@ -106,9 +107,9 @@ export const ProfileSettingsPage: React.FC<ProfileSettingsPageProps> = ({ 'data-
     }
   };
 
-  const handleInputChange = (field: string, value: string | boolean) => {
+  const handleInputChange = React.useCallback((field: string, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-  };
+  }, []);
 
   return (
     <div className="container max-w-4xl mx-auto py-8 space-y-6" data-testid={testId}>
