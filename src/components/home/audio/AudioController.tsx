@@ -8,7 +8,8 @@ import { useMusic } from '@/hooks/useMusic';
 const AudioController: React.FC = () => {
   const [isMuted, setIsMuted] = useState(false);
   const { toast } = useToast();
-  const { isPlaying, volume, setVolume, play, pause, currentTrack } = useMusic();
+  const { state, play, pause, setVolume: setMusicVolume } = useMusic();
+  const { isPlaying, volume, currentTrack } = state;
 
   const togglePlayback = () => {
     if (isPlaying) {
@@ -25,14 +26,14 @@ const AudioController: React.FC = () => {
   const toggleMute = () => {
     setIsMuted(!isMuted);
     if (!isMuted) {
-      setVolume(0);
+      setMusicVolume(0);
     } else {
-      setVolume(0.5);
+      setMusicVolume(0.5);
     }
   };
 
   const handleVolumeChange = (value: number[]) => {
-    setVolume(value[0]);
+    setMusicVolume(value[0]);
     setIsMuted(value[0] === 0);
   };
 

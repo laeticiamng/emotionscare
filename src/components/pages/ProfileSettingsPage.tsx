@@ -137,7 +137,7 @@ export const ProfileSettingsPage: React.FC<ProfileSettingsPageProps> = ({ 'data-
               <Avatar className="h-20 w-20">
                 <AvatarImage src={user?.user_metadata?.avatar_url} />
                 <AvatarFallback className="text-lg">
-                  {formData.displayName.split(' ').map(n => n[0]).join('').toUpperCase() || user?.email?.[0]?.toUpperCase()}
+                  {formData.displayName.split(' ').map((n: string) => n[0]).join('').toUpperCase() || user?.email?.[0]?.toUpperCase()}
                 </AvatarFallback>
               </Avatar>
               <div className="space-y-2">

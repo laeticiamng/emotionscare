@@ -62,17 +62,17 @@ export const VoiceCommandButton: React.FC<VoiceCommandButtonProps> = ({
           setIsListening(false);
         };
         
-        recognitionInstance.onerror = (event) => {
-          logger.error('Speech recognition error', new Error(event.error), 'UI');
+        recognitionInstance.onerror = (event: any) => {
+          logger.error('Speech recognition error', new Error(event.error || 'Unknown error'), 'UI');
           setIsListening(false);
           toast({
             title: "Erreur de reconnaissance vocale",
-            description: event.error,
+            description: event.error || 'Erreur inconnue',
             variant: "destructive",
           });
         };
         
-        setRecognition(recognitionInstance);
+        setRecognition(recognitionInstance as any);
       }
     }
     
