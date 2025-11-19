@@ -1,7 +1,6 @@
-// @ts-nocheck
 /**
  * Client WebSocket Hume AI pour analyse émotionnelle temps réel
- * 
+ *
  * Limitations Hume :
  * - Timeout : 1 minute d'inactivité → reconnect
  * - Audio/vidéo : ≤ 5 secondes par chunk
@@ -48,13 +47,49 @@ export class HumeStreamClient {
 
   private initWebSocket() {
     try {
-      // TODO: Remplacer par l'endpoint Hume réel
-      // Pour l'instant, simulation
       logger.info('Connecting to Hume WebSocket', null, 'HumeStreamClient.initWebSocket');
-      
-      // Simulation : générer des émotions aléatoires
-      this.simulateEmotionStream();
-      
+
+      // Hume AI WebSocket endpoint v0
+      const wsUrl = `wss://api.hume.ai/v0/stream/models?apiKey=${this.config.apiKey}`;
+
+      this.ws = new WebSocket(wsUrl);
+
+      this.ws.onopen = () => {
+        logger.info('Hume WebSocket connected', null, 'HumeStreamClient.onopen');
+        this.reconnectAttempts = 0;
+
+        // Configurer les modèles pour analyse émotionnelle
+        this.ws?.send(JSON.stringify({
+          models: {
+            face: {},
+            prosody: {},
+            language: {}
+          }
+        }));
+      };
+
+      this.ws.onmessage = (event) => {
+        try {
+          const response = JSON.parse(event.data);
+
+          if (response.face?.predictions || response.prosody?.predictions || response.language?.predictions) {
+            const emotionData = this.parseHumeResponse(response);
+            this.onEmotionCallback?.(emotionData);
+          }
+        } catch (error) {
+          logger.error('Error parsing Hume response', error, 'HumeStreamClient.onmessage');
+        }
+      };
+
+      this.ws.onerror = (error) => {
+        logger.error('Hume WebSocket error', error, 'HumeStreamClient.onerror');
+      };
+
+      this.ws.onclose = () => {
+        logger.info('Hume WebSocket closed', null, 'HumeStreamClient.onclose');
+        this.handleReconnect();
+      };
+
     } catch (error) {
       logger.error('Hume WebSocket error', error, 'HumeStreamClient.initWebSocket');
       this.handleReconnect();
@@ -87,6 +122,87 @@ export class HumeStreamClient {
       clearInterval(interval);
       this.handleReconnect();
     }, 60000);
+  }
+
+  private parseHumeResponse(response: any): EmotionData {
+    // Extraer emociones de las predicciones de Hume
+    let emotions: any[] = [];
+
+    // Combinar predicciones de todos los modelos
+    if (response.face?.predictions?.[0]?.emotions) {
+      emotions = response.face.predictions[0].emotions;
+    } else if (response.prosody?.predictions?.[0]?.emotions) {
+      emotions = response.prosody.predictions[0].emotions;
+    } else if (response.language?.predictions?.[0]?.emotions) {
+      emotions = response.language.predictions[0].emotions;
+    }
+
+    // Si no hay emociones, retornar neutral
+    if (emotions.length === 0) {
+      return {
+        valence: 0.5,
+        arousal: 0.5,
+        dominantEmotion: 'neutral',
+        confidence: 0,
+        timestamp: Date.now()
+      };
+    }
+
+    // Encontrar emoción dominante (la de mayor score)
+    const dominant = emotions.reduce((max, em) =>
+      em.score > max.score ? em : max
+    , emotions[0]);
+
+    // Calcular valence y arousal basado en las emociones de Hume
+    const { valence, arousal } = this.calculateValenceArousal(emotions);
+
+    // Aplicar suavizado EMA
+    this.smoothedValence = this.ema(this.smoothedValence, valence);
+    this.smoothedArousal = this.ema(this.smoothedArousal, arousal);
+
+    return {
+      valence: this.smoothedValence,
+      arousal: this.smoothedArousal,
+      dominantEmotion: dominant.name,
+      confidence: dominant.score,
+      timestamp: Date.now()
+    };
+  }
+
+  private calculateValenceArousal(emotions: any[]): { valence: number; arousal: number } {
+    // Mapeo de emociones de Hume a valence/arousal
+    const emotionMap: Record<string, { valence: number; arousal: number }> = {
+      joy: { valence: 0.9, arousal: 0.7 },
+      excitement: { valence: 0.9, arousal: 0.9 },
+      contentment: { valence: 0.7, arousal: 0.3 },
+      calmness: { valence: 0.6, arousal: 0.2 },
+      sadness: { valence: 0.2, arousal: 0.3 },
+      anger: { valence: 0.2, arousal: 0.9 },
+      fear: { valence: 0.1, arousal: 0.8 },
+      anxiety: { valence: 0.3, arousal: 0.8 },
+      surprise: { valence: 0.5, arousal: 0.8 },
+      disgust: { valence: 0.2, arousal: 0.6 },
+      neutral: { valence: 0.5, arousal: 0.5 }
+    };
+
+    // Calcular valence/arousal ponderado por scores
+    let totalValence = 0;
+    let totalArousal = 0;
+    let totalWeight = 0;
+
+    emotions.forEach(emotion => {
+      const mapped = emotionMap[emotion.name.toLowerCase()] || { valence: 0.5, arousal: 0.5 };
+      const weight = emotion.score;
+
+      totalValence += mapped.valence * weight;
+      totalArousal += mapped.arousal * weight;
+      totalWeight += weight;
+    });
+
+    return {
+      valence: totalWeight > 0 ? totalValence / totalWeight : 0.5,
+      arousal: totalWeight > 0 ? totalArousal / totalWeight : 0.5
+    };
   }
 
   private ema(previous: number, current: number): number {
@@ -126,19 +242,39 @@ export class HumeStreamClient {
     const maxChunkSize = 240 * 1024;
     if (audioData.byteLength > maxChunkSize) {
       logger.warn('Audio chunk too large, splitting required', null, 'HumeStreamClient.sendAudioChunk');
-      // TODO: Implémenter le splitting automatique
+      // Split le chunk en morceaux plus petits
+      const chunks = this.splitAudioChunk(audioData, maxChunkSize);
+      chunks.forEach(chunk => this.sendSingleAudioChunk(chunk));
       return;
     }
 
-    // Encoder en base64 et envoyer
+    this.sendSingleAudioChunk(audioData);
+  }
+
+  private sendSingleAudioChunk(audioData: ArrayBuffer) {
+    // Encoder en base64 pour Hume API
     const base64Audio = btoa(
       String.fromCharCode(...new Uint8Array(audioData))
     );
-    
-    this.ws.send(JSON.stringify({
-      type: 'audio',
-      data: base64Audio
+
+    // Format Hume API pour streaming audio
+    this.ws?.send(JSON.stringify({
+      data: base64Audio,
+      models: {
+        prosody: {}
+      }
     }));
+  }
+
+  private splitAudioChunk(audioData: ArrayBuffer, maxSize: number): ArrayBuffer[] {
+    const chunks: ArrayBuffer[] = [];
+    const view = new Uint8Array(audioData);
+
+    for (let i = 0; i < view.length; i += maxSize) {
+      chunks.push(view.slice(i, i + maxSize).buffer);
+    }
+
+    return chunks;
   }
 
   sendText(text: string) {
@@ -152,9 +288,12 @@ export class HumeStreamClient {
       return;
     }
 
+    // Format Hume API pour analyse de texte
     this.ws.send(JSON.stringify({
-      type: 'text',
-      data: text
+      data: text,
+      models: {
+        language: {}
+      }
     }));
   }
 

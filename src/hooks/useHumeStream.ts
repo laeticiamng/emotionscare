@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { HumeStreamClient } from '@/services/hume/stream';
 import { toast } from '@/hooks/use-toast';
