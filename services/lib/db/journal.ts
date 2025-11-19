@@ -89,13 +89,13 @@ export async function createJournalEntry(
       .single();
 
     if (error) {
-      logger.error(error, 'DB');
+      logger.error('Failed to create journal entry', error, 'DB');
       throw new Error(`Failed to create journal entry: ${error.message}`);
     }
 
     return data as JournalEntry;
   } catch (error) {
-    logger.error(error as Error, 'DB');
+    logger.error('Error creating journal entry', error as Error, 'DB');
     throw error;
   }
 }
@@ -120,13 +120,13 @@ export async function getJournalEntry(
         // Not found
         return null;
       }
-      logger.error(error, 'DB');
+      logger.error('Failed to get journal entry', error, 'DB');
       throw new Error(`Failed to get journal entry: ${error.message}`);
     }
 
     return data as JournalEntry;
   } catch (error) {
-    logger.error(error as Error, 'DB');
+    logger.error('Error getting journal entry', error as Error, 'DB');
     throw error;
   }
 }
@@ -149,13 +149,13 @@ export async function updateJournalEntry(
       .single();
 
     if (error) {
-      logger.error(error, 'DB');
+      logger.error('Failed to update journal entry', error, 'DB');
       throw new Error(`Failed to update journal entry: ${error.message}`);
     }
 
     return data as JournalEntry;
   } catch (error) {
-    logger.error(error as Error, 'DB');
+    logger.error('Error updating journal entry', error as Error, 'DB');
     throw error;
   }
 }
@@ -175,11 +175,11 @@ export async function deleteJournalEntry(
       .eq('user_id', userId);
 
     if (error) {
-      logger.error(error, 'DB');
+      logger.error('Failed to delete journal entry', error, 'DB');
       throw new Error(`Failed to delete journal entry: ${error.message}`);
     }
   } catch (error) {
-    logger.error(error as Error, 'DB');
+    logger.error('Error deleting journal entry', error as Error, 'DB');
     throw error;
   }
 }
@@ -196,7 +196,7 @@ export async function getJournalStats(userId: string): Promise<JournalStats> {
       .eq('user_id', userId);
 
     if (error) {
-      logger.error(error, 'DB');
+      logger.error('Failed to get journal stats', error, 'DB');
       throw new Error(`Failed to get journal stats: ${error.message}`);
     }
 
@@ -264,7 +264,7 @@ export async function getJournalStats(userId: string): Promise<JournalStats> {
       entriesThisMonth,
     };
   } catch (error) {
-    logger.error(error as Error, 'DB');
+    logger.error('Error getting journal stats', error as Error, 'DB');
     throw error;
   }
 }
