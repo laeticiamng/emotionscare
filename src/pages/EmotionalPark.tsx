@@ -8,7 +8,7 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Filter, Search, X, TrendingUp, Target, Award, ChevronDown } from 'lucide-react';
+import { Filter, Search, X, TrendingUp, Target, Award, ChevronDown, Star, Calendar, Sparkles, Trophy, Zap, BarChart3 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { ParkAttraction } from '@/components/park/ParkAttraction';
 import { Button } from '@/components/ui/button';
@@ -72,16 +72,6 @@ export default function EmotionalPark() {
   // Use imported attractions and zones
   const attractions = parkAttractions;
   const zones = parkZones;
-  const zones: Record<ZoneKey, Zone> = {
-    hub: { name: 'Hub Central', color: 'violet', emoji: '🌌' },
-    calm: { name: 'Zone de Sérénité', color: 'blue', emoji: '🫧' },
-    creative: { name: 'Quartier Créatif', color: 'pink', emoji: '🎨' },
-    wisdom: { name: 'Jardin de Sagesse', color: 'emerald', emoji: '🌿' },
-    explore: { name: 'Espace Exploration', color: 'indigo', emoji: '🌠' },
-    energy: { name: 'Zone d\'Énergie', color: 'amber', emoji: '⚡' },
-    challenge: { name: 'Arène des Défis', color: 'red', emoji: '⚔️' },
-    social: { name: 'Village Social', color: 'green', emoji: '🤝' }
-  };
 
   // Filter attractions based on search and zone
   const filteredAttractions = useMemo(() => {
