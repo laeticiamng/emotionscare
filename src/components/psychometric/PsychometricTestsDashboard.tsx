@@ -383,7 +383,8 @@ export const PsychometricTestsDashboard: React.FC = () => {
                   <Button>Commencer</Button>
                 </div>
               </CardContent>
-          </Card>
+            </Card>
+          </button>
         ))}
       </div>
     </div>
