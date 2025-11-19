@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Email Service - Support multiple email providers
  * Supported: Resend, SendGrid, AWS SES, SMTP

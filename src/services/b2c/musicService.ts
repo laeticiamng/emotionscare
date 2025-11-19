@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';
 
@@ -122,7 +121,7 @@ export const musicService = {
     duration_sec?: number
   ): Promise<void> {
     const updates: Partial<MusicSession> = { status };
-    
+
     if (status === 'completed') {
       updates.ts_end = new Date().toISOString();
       updates.artifact_url = artifact_url;
@@ -135,5 +134,77 @@ export const musicService = {
       .eq('id', id);
 
     if (error) throw error;
+  },
+
+  /**
+   * Polling pour vérifier le statut d'une session en cours
+   * Retourne la session quand elle est completed ou failed
+   */
+  async pollSessionStatus(
+    sessionId: string,
+    options: {
+      maxAttempts?: number;
+      intervalMs?: number;
+      onProgress?: (attempt: number) => void;
+    } = {}
+  ): Promise<MusicSession> {
+    const maxAttempts = options.maxAttempts || 30; // 30 tentatives par défaut
+    const intervalMs = options.intervalMs || 10000; // 10 secondes par défaut
+
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      options.onProgress?.(attempt);
+
+      const session = await this.getMusicSession(sessionId);
+
+      if (!session) {
+        throw new Error(`Session ${sessionId} not found`);
+      }
+
+      // Statuts terminaux
+      if (session.status === 'completed') {
+        logger.info('Music session completed', { sessionId }, 'musicService.pollSessionStatus');
+        return session;
+      }
+
+      if (session.status === 'failed') {
+        logger.error('Music session failed', { sessionId }, 'musicService.pollSessionStatus');
+        throw new Error('Music generation failed');
+      }
+
+      // Si pas encore terminé, attendre
+      if (attempt < maxAttempts) {
+        await new Promise(resolve => setTimeout(resolve, intervalMs));
+      }
+    }
+
+    throw new Error('Music generation timeout - exceeded maximum polling attempts');
+  },
+
+  /**
+   * Subscribe to music session updates via Supabase Realtime
+   */
+  subscribeToSession(
+    sessionId: string,
+    callback: (session: MusicSession) => void
+  ) {
+    const channel = supabase
+      .channel(`music_session:${sessionId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'music_sessions',
+          filter: `id=eq.${sessionId}`,
+        },
+        (payload) => {
+          callback(payload.new as MusicSession);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   },
 };
