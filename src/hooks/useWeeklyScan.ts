@@ -14,12 +14,15 @@ export interface WeeklyScanRow {
 export const useWeeklyScan = (
   since: Date = subWeeks(new Date(), 8)
 ) => {
-  return useQuery(['scanWeekly', since], async () => {
-    const res = await GlobalInterceptor.secureFetch(
-      `/me/scan/weekly?since=${format(since, 'yyyy-MM-dd')}`
-    );
-    if (!res) throw new Error('Request failed');
-    const { data } = await res.json();
-    return data as WeeklyScanRow[];
+  return useQuery({
+    queryKey: ['scanWeekly', since],
+    queryFn: async () => {
+      const res = await GlobalInterceptor.secureFetch(
+        `/me/scan/weekly?since=${format(since, 'yyyy-MM-dd')}`
+      );
+      if (!res) throw new Error('Request failed');
+      const { data } = await res.json();
+      return data as WeeklyScanRow[];
+    }
   });
 };

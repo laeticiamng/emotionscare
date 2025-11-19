@@ -36,31 +36,27 @@ export const rateLimitPlugin: FastifyPluginAsync = async app => {
     // Optional: Use Redis for distributed rate limiting
     // redis: process.env.REDIS_URL ? new Redis(process.env.REDIS_URL) : undefined,
 
-    errorResponseBuilder: (req, context) => ({
-      ok: false,
-      error: {
-        code: 'rate_limit_exceeded',
-        message: `Too many requests. Please try again later.`,
-        statusCode: 429,
-        details: {
-          limit: context.max,
-          remaining: context.max - context.current,
-          reset: new Date(Date.now() + context.ttl),
+    errorResponseBuilder: (req, context) => {
+      const remaining = context.max && context.ttl ? Math.max(0, context.max - (req as any).rateLimit?.current || 0) : 0;
+      return {
+        ok: false,
+        error: {
+          code: 'rate_limit_exceeded',
+          message: `Too many requests. Please try again later.`,
+          statusCode: 429,
+          details: {
+            limit: context.max,
+            remaining,
+            reset: new Date(Date.now() + (context.ttl || 0)),
+          },
         },
-      },
-    }),
-
-    // Custom key generator (default is IP address)
-    keyGenerator: req => {
-      // Use authenticated user ID if available, otherwise IP
-      return (req as any).user?.id || req.ip;
+      };
     },
 
-    // Skip rate limiting for specific routes
-    skip: req => {
-      const skipPaths = ['/health', '/healthz'];
-      const path = req.routerPath || req.url.split('?')[0];
-      return skipPaths.includes(path);
+    // Custom key generator (default is IP address)
+    keyGenerator: (req: any) => {
+      // Use authenticated user ID if available, otherwise IP
+      return req.user?.id || req.ip;
     },
   });
 
