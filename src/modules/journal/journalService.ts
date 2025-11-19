@@ -5,6 +5,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';
+import { aiAnalysisService } from '@/services/aiAnalysisService';
 
 export interface JournalEntry {
   id?: string;
@@ -389,29 +390,79 @@ class JournalService {
 
   /**
    * @deprecated Voice processing should be handled separately
+   * Transcrit et analyse un audio avec AI
    */
   async processVoiceEntry(audioBlob: Blob): Promise<{ content: string; summary: string; tone: 'positive' | 'neutral' | 'negative' }> {
-    // This is a stub for compatibility
-    // Voice processing should be handled in the component/hook layer
-    return {
-      content: "Voice entry transcribed",
-      summary: "Voice note",
-      tone: 'neutral'
-    };
+    try {
+      // Transcription avec Whisper
+      const transcription = await aiAnalysisService.transcribeAudio(audioBlob);
+
+      if (!transcription.text || transcription.text.trim() === '') {
+        logger.warn('Empty transcription result', undefined, 'JOURNAL');
+        return {
+          content: "[Enregistrement vocal - transcription vide]",
+          summary: "Note vocale",
+          tone: 'neutral'
+        };
+      }
+
+      // Analyse du sentiment
+      const sentiment = await aiAnalysisService.analyzeSentiment(transcription.text);
+
+      // Génération d'un résumé
+      const summary = await aiAnalysisService.generateSummary(transcription.text, 100);
+
+      return {
+        content: transcription.text,
+        summary: summary || "Note vocale",
+        tone: sentiment.tone
+      };
+    } catch (error) {
+      logger.error('Error processing voice entry', error as Error, 'JOURNAL');
+      return {
+        content: "[Erreur lors du traitement de l'audio]",
+        summary: "Note vocale",
+        tone: 'neutral'
+      };
+    }
   }
 
   /**
    * @deprecated Text processing should be handled separately
+   * Analyse un texte avec AI pour déterminer le sentiment
    */
   async processTextEntry(text: string): Promise<{ content: string; summary: string; tone: 'positive' | 'neutral' | 'negative' }> {
-    // This is a stub for compatibility
-    // Text analysis should be handled in the component/hook layer
-    const summary = text.length > 50 ? text.substring(0, 47) + '...' : text;
-    return {
-      content: text,
-      summary,
-      tone: 'neutral'
-    };
+    try {
+      if (!text || text.trim() === '') {
+        logger.warn('Empty text entry', undefined, 'JOURNAL');
+        return {
+          content: text,
+          summary: '',
+          tone: 'neutral'
+        };
+      }
+
+      // Analyse du sentiment avec AI
+      const sentiment = await aiAnalysisService.analyzeSentiment(text);
+
+      // Génération d'un résumé intelligent
+      const summary = await aiAnalysisService.generateSummary(text, 100);
+
+      return {
+        content: text,
+        summary: summary || (text.length > 50 ? text.substring(0, 47) + '...' : text),
+        tone: sentiment.tone
+      };
+    } catch (error) {
+      logger.error('Error processing text entry', error as Error, 'JOURNAL');
+      // Fallback simple en cas d'erreur
+      const summary = text.length > 50 ? text.substring(0, 47) + '...' : text;
+      return {
+        content: text,
+        summary,
+        tone: 'neutral'
+      };
+    }
   }
 
   /**
