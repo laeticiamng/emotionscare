@@ -398,7 +398,7 @@ const B2BAccessibilityPage: React.FC = () => {
                                 <Switch
                                   checked={feature.enabled}
                                   onCheckedChange={(checked) => {
-                                    feature.onToggle(checked);
+                                    feature.onToggle?.(checked);
                                     handleFeatureToggle(feature.title, checked);
                                   }}
                                 />
@@ -422,7 +422,7 @@ const B2BAccessibilityPage: React.FC = () => {
                                 <span className={`text-sm font-medium ${
                                   enterpriseHighContrast ? 'text-white' : 'text-gray-800'
                                 }`}>
-                                  {feature.value[0]}{feature.unit}
+                                  {feature.value?.[0]}{feature.unit}
                                 </span>
                               </div>
                               <Slider

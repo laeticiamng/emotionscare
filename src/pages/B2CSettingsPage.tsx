@@ -30,13 +30,13 @@ const B2CSettingsPage = () => {
 
   // Charger les settings dans le state local quand ils arrivent
   useEffect(() => {
-    if (settings?.preferences) {
+    if (settings) {
       setLocalSettings({
-        notifications: settings.preferences.notifications ?? true,
-        darkMode: settings.preferences.theme === 'dark',
-        autoScan: settings.preferences.auto_scan ?? false,
-        privacyMode: settings.preferences.privacy_mode ?? false,
-        language: settings.preferences.language ?? 'fr',
+        notifications: settings.email_notifications ?? true,
+        darkMode: settings.theme === 'dark',
+        autoScan: settings.auto_suggestions ?? false,
+        privacyMode: settings.profile_visibility === 'private',
+        language: settings.language ?? 'fr',
       });
     }
   }, [settings]);
@@ -47,24 +47,22 @@ const B2CSettingsPage = () => {
   }, []);
 
   // Vérifier si des changements ont été faits
-  const hasChanges = settings?.preferences ? (
-    localSettings.notifications !== (settings.preferences.notifications ?? true) ||
-    localSettings.darkMode !== (settings.preferences.theme === 'dark') ||
-    localSettings.autoScan !== (settings.preferences.auto_scan ?? false) ||
-    localSettings.privacyMode !== (settings.preferences.privacy_mode ?? false) ||
-    localSettings.language !== (settings.preferences.language ?? 'fr')
+  const hasChanges = settings ? (
+    localSettings.notifications !== (settings.email_notifications ?? true) ||
+    localSettings.darkMode !== (settings.theme === 'dark') ||
+    localSettings.autoScan !== (settings.auto_suggestions ?? false) ||
+    localSettings.privacyMode !== (settings.profile_visibility === 'private') ||
+    localSettings.language !== (settings.language ?? 'fr')
   ) : false;
 
   const handleSave = async () => {
     try {
       await updateSettings({
-        preferences: {
-          notifications: localSettings.notifications,
-          theme: localSettings.darkMode ? 'dark' : 'light',
-          auto_scan: localSettings.autoScan,
-          privacy_mode: localSettings.privacyMode,
-          language: localSettings.language,
-        }
+        email_notifications: localSettings.notifications,
+        theme: localSettings.darkMode ? 'dark' : 'light',
+        auto_suggestions: localSettings.autoScan,
+        profile_visibility: localSettings.privacyMode ? 'private' : 'friends',
+        language: localSettings.language,
       });
 
       toast({

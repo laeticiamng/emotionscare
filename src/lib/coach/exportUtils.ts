@@ -226,7 +226,7 @@ export const generatePDFExport = async (
 export const validateExportOptions = (options: Partial<ExportOptions>): boolean => {
   const validFormats = ['json', 'pdf', 'txt', 'markdown'];
   if (options.format && !validFormats.includes(options.format)) {
-    logger.error(new Error(`Invalid format: ${options.format}`), 'LIB');
+    logger.error(`Invalid format: ${options.format}`, undefined, 'LIB');
     return false;
   }
   return true;

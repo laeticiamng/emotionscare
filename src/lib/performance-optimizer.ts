@@ -195,17 +195,17 @@ class PerformanceOptimizer {
     // @ts-ignore - experimental API
     if ('connection' in navigator) {
       // @ts-ignore
-      const connection = navigator.connection;
+      const connection = navigator.connection as any;
 
-      if (connection.effectiveType === '4g' && connection.downlink > 10) {
+      if (connection?.effectiveType === '4g' && connection?.downlink > 10) {
         this.networkQuality = 'fast';
       } else {
         this.networkQuality = 'slow';
       }
 
       logger.info('performance', 'Network quality detected', {
-        effectiveType: connection.effectiveType,
-        downlink: connection.downlink,
+        effectiveType: connection?.effectiveType,
+        downlink: connection?.downlink,
         quality: this.networkQuality,
       });
     }
@@ -372,7 +372,7 @@ class PerformanceOptimizer {
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting && !loaded && !loading) {
-          this.load();
+          load();
         }
       });
     }, { rootMargin: '50px', ...options });
