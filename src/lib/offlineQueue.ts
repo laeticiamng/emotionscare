@@ -38,7 +38,7 @@ const DB_VERSION = 2;
 const QUEUE_STORE = 'offlineQueue';
 const METADATA_STORE = 'metadata';
 
-class OfflineQueueManager {
+export class OfflineQueueManager {
   private db: IDBDatabase | null = null;
   private isInitialized = false;
   private listeners: Set<(stats: QueueStats) => void> = new Set();

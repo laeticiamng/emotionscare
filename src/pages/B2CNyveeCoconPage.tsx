@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 
 import ZeroNumberBoundary from '@/components/ZeroNumberBoundary';
 import { Button } from '@/components/ui/button';
