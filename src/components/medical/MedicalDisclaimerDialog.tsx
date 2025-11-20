@@ -43,13 +43,14 @@ export const MedicalDisclaimerDialog: React.FC<MedicalDisclaimerDialogProps> = (
     }
   }, [open]);
 
-  const featureLabels = {
+  const featureLabels: Record<string, string> = {
     scan: 'le scan émotionnel',
     emotional_scan: 'le scan émotionnel',
     assessment: 'les évaluations cliniques',
     psychological_assessment: 'les évaluations psychologiques',
     coach: 'le coaching IA',
     ai_coach: 'le coaching IA',
+    ai_coach_enhanced: 'le coaching IA avancé',
     journal: 'le journal émotionnel',
   };
 

@@ -4,7 +4,7 @@
 
 import { useState, useEffect } from 'react';
 
-type FeatureType = 'ai_coach' | 'assessment' | 'coach' | 'emotional_scan' | 'journal' | 'psychological_assessment' | 'scan' | 'ai_coach_enhanced';
+type FeatureType = 'ai_coach' | 'ai_coach_enhanced' | 'assessment' | 'coach' | 'emotional_scan' | 'journal' | 'psychological_assessment' | 'scan';
 
 export const useMedicalDisclaimer = (feature: FeatureType) => {
   const [showDisclaimer, setShowDisclaimer] = useState(false);
