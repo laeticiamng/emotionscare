@@ -2,8 +2,8 @@
 // Phase 3 - Excellence
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { OpenAI } from 'https://esm.sh/openai@4';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.43.4';
+import { OpenAI } from 'https://esm.sh/openai@4.100.0';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -105,10 +105,11 @@ serve(async (req) => {
     );
   } catch (error) {
     console.error('Report generation error:', error);
+    const err = error as Error;
     return new Response(
       JSON.stringify({
         success: false,
-        error: error.message,
+        error: err.message,
       }),
       {
         status: 400,

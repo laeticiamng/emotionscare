@@ -37,9 +37,10 @@ export async function sendEmail(options: EmailOptions): Promise<EmailResponse> {
     }
   } catch (error) {
     console.error('[EmailService] Error sending email:', error);
+    const err = error as Error;
     return {
       success: false,
-      error: error.message || 'Failed to send email'
+      error: err.message || 'Failed to send email'
     };
   }
 }

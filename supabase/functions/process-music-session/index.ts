@@ -154,6 +154,7 @@ serve(async (req) => {
 
   } catch (error) {
     console.error('Error in process-music-session:', error);
+    const err = error as Error;
 
     // Intentar marcar la sesión como failed
     try {
@@ -170,7 +171,7 @@ serve(async (req) => {
             .update({
               status: 'failed',
               ts_end: new Date().toISOString(),
-              metadata: { error: error.message }
+              metadata: { error: err.message }
             })
             .eq('id', sessionId);
         }
@@ -181,7 +182,7 @@ serve(async (req) => {
 
     return new Response(JSON.stringify({
       success: false,
-      error: error.message
+      error: err.message
     }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

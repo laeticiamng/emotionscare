@@ -1,6 +1,6 @@
 // Edge function pour créer une réunion Google Meet
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.43.4'
 
 const GOOGLE_CALENDAR_API = 'https://www.googleapis.com/calendar/v3'
 
@@ -124,7 +124,8 @@ serve(async (req) => {
 
   } catch (error) {
     console.error('Error creating Google Meet:', error)
-    return new Response(JSON.stringify({ error: error.message }), {
+    const err = error as Error;
+    return new Response(JSON.stringify({ error: err.message }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }
     })
