@@ -76,7 +76,10 @@ const AIMonitoringDashboard = () => {
         .from('ai_monitoring_stats')
         .select('*')
         .single();
-      if (error) throw error;
+      if (error) {
+        logger.error('Failed to fetch AI monitoring stats', { error }, 'ADMIN');
+        throw error;
+      }
       return data as MonitoringStats;
     },
   });
@@ -110,7 +113,10 @@ const AIMonitoringDashboard = () => {
       }
 
       const { data, error } = await query;
-      if (error) throw error;
+      if (error) {
+        logger.error('Failed to fetch AI monitoring errors', { error }, 'ADMIN');
+        throw error;
+      }
       return data as AIMonitoringError[];
     },
   });

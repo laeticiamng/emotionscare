@@ -154,5 +154,5 @@ const B2BReportsPage: React.FC = () => {
 
 export default withGuard(B2BReportsPage, [
   { type: 'auth', required: true },
-  { type: 'role', role: ['manager', 'org', 'admin'] },
+  { type: 'role', role: 'manager', required: true },
 ]);

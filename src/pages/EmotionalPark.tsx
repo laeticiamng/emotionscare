@@ -11,6 +11,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Filter, Search, X, TrendingUp, Target, Award, ChevronDown, Star, Calendar, Sparkles, Trophy, Zap, BarChart3 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { ParkAttraction } from '@/components/park/ParkAttraction';
+import type { Attraction } from '@/types/park';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';

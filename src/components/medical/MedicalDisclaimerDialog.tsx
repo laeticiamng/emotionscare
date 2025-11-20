@@ -17,7 +17,7 @@ interface MedicalDisclaimerDialogProps {
   open: boolean;
   onAccept: () => void;
   onDecline: () => void;
-  feature?: 'scan' | 'assessment' | 'coach' | 'journal' | 'ai_coach' | 'emotional_scan' | 'psychological_assessment';
+  feature?: 'scan' | 'assessment' | 'coach' | 'journal' | 'ai_coach' | 'ai_coach_enhanced' | 'emotional_scan' | 'psychological_assessment';
 }
 
 const STORAGE_KEY = 'emotionscare_medical_disclaimer_accepted';
