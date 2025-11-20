@@ -51,7 +51,7 @@ const B2CImmersivePage: React.FC = () => {
       setIsActive(true);
       setCurrentOutcome(null);
 
-      const result = await immersiveService.startSession({
+      const result = await immersiveService.createSession({
         type,
         params: {
           duration_minutes: duration,
@@ -67,7 +67,7 @@ const B2CImmersivePage: React.FC = () => {
 
       // Simuler la durée de la session
       setTimeout(() => {
-        setCurrentOutcome(result.outcome);
+        setCurrentOutcome(result.outcome_text || 'Session terminée');
         setIsActive(false);
         loadHistory();
         

@@ -12,7 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { HumeAIRealtimeScanner } from '@/components/scan/HumeAIRealtimeScanner';
 import { Camera, Mic, Type, Info, Sparkles, AlertTriangle } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { EmotionScanService } from '@/services/EmotionScanService';
+import { emotionScanService } from '@/services/emotion/scan-service';
 import { useToast } from '@/hooks/use-toast';
 import type { HumeEmotionResult } from '@/services/ai/HumeAIWebSocketService';
 
@@ -30,10 +30,13 @@ export default function HumeAIRealtimePage() {
 
     // Save the emotion scan to database
     try {
-      await EmotionScanService.createScan(user.id, {
+      await emotionService.saveEmotionResult({
+        id: crypto.randomUUID(),
+        user_id: user.id,
         emotion: result.topEmotion.name,
         confidence: result.topEmotion.score,
         source: selectedMode === 'face' ? 'facial' : selectedMode === 'prosody' ? 'voice' : 'text',
+        timestamp: new Date().toISOString(),
         analysis_data: {
           emotions: result.emotions,
           prosody: result.prosody,

@@ -50,7 +50,23 @@ const MLAssignmentRulesPage: React.FC = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [ruleToDelete, setRuleToDelete] = useState<string | null>(null);
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    rule_name: string;
+    alert_type: string;
+    alert_category: string;
+    priority_level: string[];
+    matching_conditions: Record<string, unknown>;
+    use_ml_recommendation: boolean;
+    ml_confidence_threshold: number;
+    preferred_assignees: string[];
+    fallback_assignees: string[];
+    auto_assign: boolean;
+    respect_availability: boolean;
+    respect_workload: boolean;
+    max_response_time_minutes: number | null;
+    is_active: boolean;
+    priority: number;
+  }>({
     rule_name: '',
     alert_type: '',
     alert_category: '',
@@ -63,7 +79,7 @@ const MLAssignmentRulesPage: React.FC = () => {
     auto_assign: true,
     respect_availability: true,
     respect_workload: true,
-    max_response_time_minutes: null as number | null,
+    max_response_time_minutes: null,
     is_active: true,
     priority: 100
   });
