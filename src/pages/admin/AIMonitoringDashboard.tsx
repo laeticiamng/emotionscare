@@ -114,7 +114,7 @@ const AIMonitoringDashboard = () => {
 
       const { data, error } = await query;
       if (error) {
-        logger.error('Failed to fetch AI monitoring errors', { error }, 'ADMIN');
+        logger.error('Failed to fetch errors from AI monitoring', error as Error, 'ADMIN');
         throw error;
       }
       return data as AIMonitoringError[];
@@ -151,7 +151,7 @@ const AIMonitoringDashboard = () => {
         title: 'Erreur',
         description: 'Impossible de marquer l\'erreur comme résolue.',
       });
-      logger.error(error, 'PAGE');
+      logger.error('Failed to resolve error', error as Error, 'PAGE');
     },
   });
 
