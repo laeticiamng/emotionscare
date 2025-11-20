@@ -158,7 +158,7 @@ serve(async (req) => {
       let totalIntensity = 0;
       let count = 0;
 
-      (scans || []).forEach(s => {
+      (scans || []).forEach((s: any) => {
         // emotions est un objet JSON avec les émotions détectées
         if (s.emotions && typeof s.emotions === 'object') {
           // Prendre l'émotion dominante du scan
@@ -183,7 +183,7 @@ serve(async (req) => {
 
       const dominant = Object.entries(freq).sort((a, b) => b[1] - a[1])[0]?.[0] || 'neutral';
       const avgIntensity = count > 0 ? totalIntensity / count : 0.5;
-      const profile = PROFILES[dominant] || PROFILES.neutral;
+      const profile = PROFILES[dominant as keyof typeof PROFILES] || PROFILES.neutral;
 
       return new Response(JSON.stringify({
         dominantEmotion: dominant,
@@ -201,7 +201,7 @@ serve(async (req) => {
 
     // Générer musique
     if (action === 'generate-music') {
-      const profile = PROFILES[emotion] || PROFILES.neutral;
+      const profile = PROFILES[emotion as keyof typeof PROFILES] || PROFILES.neutral;
       const prompt = customPrompt || profile.prompt;
 
       console.log(`[emotion-music-ai] Generating music for emotion: ${emotion}`);
@@ -342,7 +342,7 @@ serve(async (req) => {
         };
 
         personalizedRecommendations = tracks.data
-          .map(track => {
+          .map((track: any) => {
             let score = 0;
             const reasons = [];
             const metadata = track.metadata || {};
@@ -350,7 +350,7 @@ serve(async (req) => {
             const style = (metadata.style || '').toLowerCase();
 
             // Genre matching (40% weight)
-            const genreMatch = preferences.favorite_genres.some(genre => 
+            const genreMatch = preferences.favorite_genres.some((genre: string) =>
               tags.includes(genre.toLowerCase()) || style.includes(genre.toLowerCase())
             );
             if (genreMatch) {
@@ -369,7 +369,7 @@ serve(async (req) => {
             }
 
             // Mood matching (20% weight)
-            const moodMatch = preferences.favorite_moods.some(mood =>
+            const moodMatch = preferences.favorite_moods.some((mood: string) =>
               tags.includes(mood.toLowerCase())
             );
             if (moodMatch) {
@@ -405,8 +405,8 @@ serve(async (req) => {
               matchReasons: reasons,
             };
           })
-          .filter(result => result.matchScore > 0.3) // Only decent matches
-          .sort((a, b) => b.matchScore - a.matchScore)
+          .filter((result: any) => result.matchScore > 0.3) // Only decent matches
+          .sort((a: any, b: any) => b.matchScore - a.matchScore)
           .slice(0, 10);
       }
 
@@ -426,10 +426,11 @@ serve(async (req) => {
 
   } catch (error) {
     console.error('[emotion-music-ai] Error:', error);
+    const err = error as Error;
     
     // Déterminer le code de statut approprié
     let statusCode = 500;
-    let errorMessage = error.message || 'Une erreur inattendue s\'est produite';
+    let errorMessage = err.message || 'Une erreur inattendue s\'est produite';
     
     // Erreurs temporaires du service
     if (errorMessage.includes('temporairement indisponible') || errorMessage.includes('503')) {
@@ -437,11 +438,11 @@ serve(async (req) => {
       errorMessage = 'Le service de génération musicale est temporairement indisponible. Veuillez réessayer dans quelques instants.';
     }
     // Erreur d'authentification
-    else if (error.message?.includes('Unauthorized') || error.message?.includes('401')) {
+    else if (err.message?.includes('Unauthorized') || err.message?.includes('401')) {
       statusCode = 401;
     }
     // Erreur de configuration
-    else if (error.message?.includes('not configured')) {
+    else if (err.message?.includes('not configured')) {
       statusCode = 500;
       errorMessage = 'Le service de génération musicale n\'est pas correctement configuré.';
     }
@@ -449,7 +450,7 @@ serve(async (req) => {
     return new Response(JSON.stringify({ 
       error: errorMessage,
       code: statusCode,
-      details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      details: process.env.NODE_ENV === 'development' ? err.stack : undefined
     }), {
       status: statusCode,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }

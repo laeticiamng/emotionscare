@@ -87,10 +87,11 @@ serve(async (req) => {
       }
     );
   } catch (error) {
+    const err = error as Error;
     return new Response(
       JSON.stringify({
         success: false,
-        error: error.message,
+        error: err.message,
       }),
       {
         status: 400,

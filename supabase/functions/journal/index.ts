@@ -94,7 +94,7 @@ serve(async (req) => {
             .range(offset, offset + limit - 1);
           
           if (voiceData) {
-            entries.push(...voiceData.map(e => ({ ...e, type: 'voice' })));
+            entries.push(...voiceData.map((e: any) => ({ ...e, type: 'voice' })));
           }
         }
 
@@ -107,7 +107,7 @@ serve(async (req) => {
             .range(offset, offset + limit - 1);
           
           if (textData) {
-            entries.push(...textData.map(e => ({ ...e, type: 'text' })));
+            entries.push(...textData.map((e: any) => ({ ...e, type: 'text' })));
           }
         }
 
@@ -137,21 +137,21 @@ serve(async (req) => {
           .gte('created_at', startDate.toISOString());
 
         const allEntries = [
-          ...(voiceData || []).map(e => ({ ...e, type: 'voice' })),
-          ...(textData || []).map(e => ({ ...e, type: 'text' }))
+          ...(voiceData || []).map((e: any) => ({ ...e, type: 'voice' })),
+          ...(textData || []).map((e: any) => ({ ...e, type: 'text' }))
         ];
 
-        const emotionCounts = allEntries.reduce((acc, entry) => {
+        const emotionCounts: Record<string, number> = allEntries.reduce((acc: any, entry: any) => {
           acc[entry.emotion_type] = (acc[entry.emotion_type] || 0) + 1;
           return acc;
         }, {});
 
         const avgIntensity = allEntries.length > 0
-          ? allEntries.reduce((sum, e) => sum + (e.intensity || 0), 0) / allEntries.length
+          ? allEntries.reduce((sum: number, e: any) => sum + (e.intensity || 0), 0) / allEntries.length
           : 0;
 
         const avgMood = textData && textData.length > 0
-          ? textData.reduce((sum, e) => sum + (e.mood_score || 5), 0) / textData.length
+          ? textData.reduce((sum: number, e: any) => sum + (e.mood_score || 5), 0) / textData.length
           : 5;
 
         const insights = {
@@ -195,8 +195,9 @@ serve(async (req) => {
     }
   } catch (error) {
     console.error('Erreur journal:', error);
+    const err = error as Error;
     return new Response(
-      JSON.stringify({ ok: false, error: error.message }),
+      JSON.stringify({ ok: false, error: err.message }),
       { 
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 

@@ -136,9 +136,10 @@ serve(async (req) => {
 
   } catch (error) {
     console.error('Error in html-to-pdf function:', error);
+    const err = error as Error;
     return new Response(JSON.stringify({
       success: false,
-      error: error.message,
+      error: err.message,
     }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
