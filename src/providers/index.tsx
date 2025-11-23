@@ -11,7 +11,6 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import { AuthProvider } from '@/contexts/AuthContext';
 import RootErrorBoundary from '@/components/error/RootErrorBoundary';
 import { ErrorProvider } from '@/contexts';
-import { MoodProvider } from '@/contexts/MoodContext';
 import { UserModeProvider } from '@/contexts/UserModeContext';
 import { ConsentProvider } from '@/features/clinical-optin/ConsentProvider';
 import { I18nProvider } from '@/lib/i18n/i18n';
@@ -99,32 +98,30 @@ export function RootProvider({ children }: RootProviderProps) {
             <AuthProvider>
               <UserModeProvider>
                 <I18nBootstrap>
-                  <MoodProvider>
-                    <MusicProvider>
-                      <UnifiedProvider>
-                        <ConsentProvider>
-                          <AccessibilityProvider>
-                            <ThemeProvider
-                              attribute="class"
-                              defaultTheme={resolvedDefaultTheme}
-                              enableSystem
-                              storageKey="emotionscare-theme"
-                              themes={['light', 'dark', 'system']}
-                            >
-                              <TooltipProvider>
-                                <NotificationProvider>
-                                  <AccessibilitySkipLinks />
-                                  {children}
-                                  <Toaster />
-                                  <PolicyAcceptanceModal />
-                                </NotificationProvider>
-                              </TooltipProvider>
-                            </ThemeProvider>
-                          </AccessibilityProvider>
-                        </ConsentProvider>
-                      </UnifiedProvider>
-                    </MusicProvider>
-                  </MoodProvider>
+                  <MusicProvider>
+                    <UnifiedProvider>
+                      <ConsentProvider>
+                        <AccessibilityProvider>
+                          <ThemeProvider
+                            attribute="class"
+                            defaultTheme={resolvedDefaultTheme}
+                            enableSystem
+                            storageKey="emotionscare-theme"
+                            themes={['light', 'dark', 'system']}
+                          >
+                            <TooltipProvider>
+                              <NotificationProvider>
+                                <AccessibilitySkipLinks />
+                                {children}
+                                <Toaster />
+                                <PolicyAcceptanceModal />
+                              </NotificationProvider>
+                            </TooltipProvider>
+                          </ThemeProvider>
+                        </AccessibilityProvider>
+                      </ConsentProvider>
+                    </UnifiedProvider>
+                  </MusicProvider>
                 </I18nBootstrap>
               </UserModeProvider>
             </AuthProvider>

@@ -1,13 +1,11 @@
-// @ts-nocheck
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Sun, Cloud, CloudRain, CloudSun, Heart } from 'lucide-react';
-import { useMood } from '@/contexts/MoodContext';
+import { useMoodStore } from '@/hooks/useMood';
 import { getVibeEmoji, getVibeLabel, type MoodVibe } from '@/utils/moodVibes';
 
 export const WeatherMoodWidget: React.FC = () => {
-  const { currentMood } = useMood();
+  const currentMood = useMoodStore();
 
   const vibeVisuals: Record<MoodVibe, {
     icon: React.ComponentType<{ className?: string }>;
