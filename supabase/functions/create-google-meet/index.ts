@@ -1,6 +1,6 @@
 // Edge function pour créer une réunion Google Meet
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.43.4'
+import { createClient } from '../_shared/supabase.ts'
 
 const GOOGLE_CALENDAR_API = 'https://www.googleapis.com/calendar/v3'
 
