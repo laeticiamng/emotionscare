@@ -18,7 +18,7 @@ import {
   type LoginFormData,
   unifiedRegisterSchema,
   type UnifiedRegisterFormData
-} from '@/lib/validations/auth';
+} from '@/lib/validation/auth';
 import { B2CLoginPage } from '@/pages/b2c/login';
 
 const UnifiedLoginPage: React.FC = () => {

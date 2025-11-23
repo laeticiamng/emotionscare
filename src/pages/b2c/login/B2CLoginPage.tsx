@@ -11,7 +11,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import B2CAuthLayout from '@/components/auth/B2CAuthLayout';
-import { loginSchema, type LoginFormData } from '@/lib/validations/auth';
+import { loginSchema, type LoginFormData } from '@/lib/validation/auth';
 import { b2cAuthService } from '@/services/auth';
 import { toast } from '@/hooks/use-toast';
 import { routes } from '@/lib/routes';

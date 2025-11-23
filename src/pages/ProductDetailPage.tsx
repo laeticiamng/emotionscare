@@ -11,7 +11,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ShoppingBag, Heart, Sparkles, Loader2 } from 'lucide-react';
 import { GlobalHeader } from '@/components/layout/GlobalHeader';
-import { useCartStore } from '@/stores/cartStore';
+import { useCartStore } from '@/store/cartStore';
 import { storefrontApiRequest } from '@/lib/shopify';
 import { formatPrice } from '@/lib/currency';
 import type { ShopifyProduct } from '@/types/shopify';
