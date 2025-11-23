@@ -1,7 +1,7 @@
 // @ts-nocheck
 
 import { useState } from 'react';
-import { EmotionResult } from '@/types/emotions';
+import { EmotionResult } from '@/types/emotion';
 
 const useHumeAI = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);

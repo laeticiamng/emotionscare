@@ -11,7 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Sparkles, Heart, ShoppingBag, Loader2 } from 'lucide-react';
 import { GlobalHeader } from '@/components/layout/GlobalHeader';
-import { useCartStore } from '@/stores/cartStore';
+import { useCartStore } from '@/store/cartStore';
 import { storefrontApiRequest, STOREFRONT_QUERY } from '@/lib/shopify';
 import { formatPrice } from '@/lib/currency';
 import type { ShopifyProduct } from '@/types/shopify';

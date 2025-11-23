@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { registerSchema, type RegisterFormData } from '@/lib/validations/auth';
+import { registerSchema, type RegisterFormData } from '@/lib/validation/auth';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
 import { getFriendlyAuthError } from '@/lib/auth/authErrorService';

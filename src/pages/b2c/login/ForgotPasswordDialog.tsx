@@ -19,7 +19,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import {
   resetPasswordSchema,
   type ResetPasswordFormData,
-} from '@/lib/validations/auth';
+} from '@/lib/validation/auth';
 import { b2cAuthService } from '@/services/auth';
 
 interface ForgotPasswordDialogProps {

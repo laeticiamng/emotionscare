@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { EmotionResult, EmotionScanOptions } from '@/types/emotions';
+import { EmotionResult, EmotionScanOptions } from '@/types/emotion';
 
 export const analyzeEmotion = async (options: EmotionScanOptions): Promise<EmotionResult> => {
   // Simulate emotion analysis
