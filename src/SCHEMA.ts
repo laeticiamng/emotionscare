@@ -29,14 +29,30 @@ export const BreathConstellationPrefs = z.object({
   haptics: z.boolean().optional(),
 });
 export type BreathConstellationPrefs = z.infer<typeof BreathConstellationPrefs>;
-export const BubbleBeatPrefs = z.object({}).optional();
+export const BubbleBeatPrefs = z.object({
+  defaultDifficulty: z.enum(["easy", "medium", "hard"]).optional(), // Difficulté par défaut
+  defaultMood: z.enum(["calm", "energetic", "focus"]).optional(),   // Mood musical par défaut
+  soundEnabled: z.boolean().optional(),                              // Sons activés
+  hapticFeedback: z.boolean().optional(),                            // Retour haptique
+  autoSave: z.boolean().optional(),                                  // Sauvegarde automatique des sessions
+  showTutorial: z.boolean().optional()                               // Afficher le tutoriel au démarrage
+}).optional();
 export type BubbleBeatPrefs = z.infer<typeof BubbleBeatPrefs>;
 export const CoachPrefs = z.object({
   mode: z.enum(["soft","boost"]).optional(),   // intensité des suggestions
   dailyGoalMin: z.number().int().min(1).max(60).optional()
 });
 export type CoachPrefs = z.infer<typeof CoachPrefs>;
-export const EmotionScanPrefs = z.object({}).optional();
+export const EmotionScanPrefs = z.object({
+  preferredMode: z.enum(["text", "voice", "image", "facial", "realtime"]).optional(), // Mode de scan préféré
+  sensitivity: z.number().min(0).max(1).optional(),                                    // Sensibilité de détection (0.0-1.0)
+  enableBiometric: z.boolean().optional(),                                             // Activer les données biométriques
+  enableFacialLandmarks: z.boolean().optional(),                                       // Activer la détection des points faciaux
+  minConfidence: z.number().min(0).max(1).optional(),                                  // Confiance minimale pour validation
+  autoSaveResults: z.boolean().optional(),                                             // Sauvegarde automatique des résultats
+  language: z.string().optional(),                                                     // Langue pour l'analyse textuelle
+  notificationsEnabled: z.boolean().optional()                                         // Notifications après analyse
+}).optional();
 export type EmotionScanPrefs = z.infer<typeof EmotionScanPrefs>;
 export const FlashGlowUltraPrefs = z.object({
   bpm: z.number().int().min(2).max(12).optional(),       // sûr pour le visuel
@@ -47,11 +63,36 @@ export const FlashGlowUltraPrefs = z.object({
   audioCues: z.boolean().optional()
 });
 export type FlashGlowUltraPrefs = z.infer<typeof FlashGlowUltraPrefs>;
-export const JournalPrefs = z.object({}).optional();
+export const JournalPrefs = z.object({
+  defaultMode: z.enum(["text", "voice"]).optional(),        // Mode de saisie par défaut
+  autoSummary: z.boolean().optional(),                      // Générer automatiquement un résumé IA
+  voiceLanguage: z.string().optional(),                     // Langue pour la reconnaissance vocale
+  reminderEnabled: z.boolean().optional(),                  // Activer les rappels quotidiens
+  reminderTime: z.string().optional(),                      // Heure du rappel (format HH:mm)
+  defaultTags: z.array(z.string()).optional(),              // Tags par défaut
+  burnSealMode: z.boolean().optional(),                     // Mode "scellé/brûlé" pour la confidentialité
+  autoSave: z.boolean().optional(),                         // Sauvegarde automatique
+  maxEntryLength: z.number().int().min(100).max(10000).optional() // Longueur max d'une entrée
+}).optional();
 export type JournalPrefs = z.infer<typeof JournalPrefs>;
-export const MoodMixerPrefs = z.object({}).optional();
+export const MoodMixerPrefs = z.object({
+  autoPlay: z.boolean().optional(),                         // Lecture automatique au lancement
+  defaultVolume: z.number().min(0).max(1).optional(),       // Volume par défaut (0.0-1.0)
+  crossfadeDuration: z.number().int().min(0).max(5000).optional(), // Durée du crossfade en ms
+  savePresets: z.boolean().optional(),                      // Sauvegarder les presets personnalisés
+  hapticFeedback: z.boolean().optional(),                   // Retour haptique sur les sliders
+  visualizations: z.boolean().optional(),                   // Afficher les visualisations
+  defaultPresetId: z.string().optional()                    // ID du preset par défaut
+}).optional();
 export type MoodMixerPrefs = z.infer<typeof MoodMixerPrefs>;
-export const ScanPrefs = z.object({}).optional();
+export const ScanPrefs = z.object({
+  quickScan: z.boolean().optional(),                        // Mode scan rapide
+  detailedAnalysis: z.boolean().optional(),                 // Analyse détaillée des résultats
+  shareResults: z.boolean().optional(),                     // Autoriser le partage des résultats
+  notificationsEnabled: z.boolean().optional(),             // Notifications de fin de scan
+  autoArchive: z.boolean().optional(),                      // Archivage automatique des anciens scans
+  retentionDays: z.number().int().min(7).max(365).optional() // Durée de conservation des scans (jours)
+}).optional();
 export type ScanPrefs = z.infer<typeof ScanPrefs>;
 export const StorySynthPrefs = z.object({
   defaultGenre: z.enum(["calme","aventure","poetique","mysterieux","romance"]).optional(),
