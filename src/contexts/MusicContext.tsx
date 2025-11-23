@@ -756,3 +756,4 @@ export const useMusic = () => {
 
 // Assurer que tous les exports sont disponibles
 export type { MusicContextType, MusicState };
+export type { MusicTrack as Track };
