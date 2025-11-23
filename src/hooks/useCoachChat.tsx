@@ -2,7 +2,7 @@
 
 // Fix missing parameters in useCoachChat.tsx
 import { useState, useCallback } from 'react';
-import { useCoach } from '@/contexts/coach/CoachContextProvider';
+import { useCoach } from '@/contexts/coach';
 import { v4 as uuidv4 } from 'uuid';
 import { ChatMessage } from '@/types/chat';
 import { logger } from '@/lib/logger';

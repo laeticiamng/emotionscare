@@ -1,7 +1,7 @@
 // @ts-nocheck
 
 import { useState, useCallback } from 'react';
-import { useCoach } from '@/contexts/coach/CoachContextProvider';
+import { useCoach } from '@/contexts/coach';
 import { useAI } from '@/hooks/useAI';
 import { v4 as uuidv4 } from 'uuid';
 import { ChatMessage } from '@/types/chat';
