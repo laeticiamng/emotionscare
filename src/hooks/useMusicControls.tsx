@@ -1,21 +1,12 @@
-// @ts-nocheck
-
 import { useCallback, useState, ChangeEvent } from 'react';
-import { useMusic } from '@/hooks/useMusic';
+import { useMusicCompat } from '@/hooks/useMusicCompat';
 import { MusicTrack } from '@/types/music';
 import { logger } from '@/lib/logger';
 
 export const useMusicControls = () => {
-  const {
-    currentTrack,
-    isPlaying,
-    volume,
-    playTrack,
-    pauseTrack,
-    nextTrack,
-    previousTrack,
-    setVolume
-  } = useMusic();
+  const music = useMusicCompat();
+  const { currentTrack, isPlaying, volume } = music.state;
+  const { play, pause, next, previous, setVolume } = music;
 
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -35,17 +26,17 @@ export const useMusicControls = () => {
 
   // Handle track selection
   const handleTrackSelect = useCallback((track: MusicTrack) => {
-    playTrack(track);
-  }, [playTrack]);
+    play(track);
+  }, [play]);
 
   // Toggle play/pause
   const togglePlayPause = useCallback(() => {
     if (isPlaying) {
-      pauseTrack();
+      pause();
     } else if (currentTrack) {
-      playTrack(currentTrack);
+      play(currentTrack);
     }
-  }, [isPlaying, currentTrack, pauseTrack, playTrack]);
+  }, [isPlaying, currentTrack, pause, play]);
 
   // Handle seeking
   const handleSeek = useCallback((time: number) => {
@@ -93,8 +84,8 @@ export const useMusicControls = () => {
     handleTimeUpdate,
     handleDurationLoaded,
     handleVolumeChange,
-    nextTrack,
-    previousTrack
+    nextTrack: next,
+    previousTrack: previous
   };
 };
 

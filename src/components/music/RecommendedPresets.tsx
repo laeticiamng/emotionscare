@@ -1,10 +1,9 @@
-// @ts-nocheck
 
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Play, Music, Disc } from 'lucide-react';
-import { useMusic } from '@/hooks/useMusic';
+import { useMusic } from '@/hooks/useMusicCompat';
 import { logger } from '@/lib/logger';
 
 interface RecommendedPresetsProps {

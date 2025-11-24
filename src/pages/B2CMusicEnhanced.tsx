@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * B2C MUSIC ENHANCED - EmotionsCare
  * Interface vinyles thérapeutiques avec player audio unifié
@@ -11,8 +10,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { 
-  Play, 
+import {
+  Play,
   Music,
   Disc3,
   Heart,
@@ -26,7 +25,7 @@ import {
   TrendingUp
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { useMusic } from '@/hooks/useMusic';
+import { useMusicCompat } from '@/hooks/useMusicCompat';
 import { useMusicFavorites } from '@/hooks/useMusicFavorites';
 import { useAudioUrls } from '@/hooks/useAudioUrls';
 import { UniverseEngine } from '@/components/universe/UniverseEngine';
@@ -178,7 +177,7 @@ const B2CMusicEnhanced: React.FC = () => {
   // Protection du contexte Music
   let musicContext;
   try {
-    musicContext = useMusic();
+    musicContext = useMusicCompat();
   } catch (error) {
     logger.error('MusicContext not available', error as Error, 'MUSIC');
     return (
@@ -195,8 +194,9 @@ const B2CMusicEnhanced: React.FC = () => {
   }
 
   const { updateChallengeProgress } = useGamification();
-  
-  const { state, play, setPlaylist } = musicContext;
+
+  const { play, setPlaylist } = musicContext;
+  const state = musicContext.state;
   const { createJourney, getUserJourneys } = useMusicJourney();
   
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(true);

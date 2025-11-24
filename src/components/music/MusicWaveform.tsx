@@ -1,6 +1,5 @@
-// @ts-nocheck
 import React, { useRef, useEffect } from 'react';
-import { useMusic } from '@/hooks/useMusic';
+import { useMusic } from '@/hooks/useMusicCompat';
 import { getTrackUrl } from '@/utils/musicCompatibility';
 import { cn } from '@/lib/utils';
 

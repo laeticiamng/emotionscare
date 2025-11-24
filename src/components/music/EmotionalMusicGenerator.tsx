@@ -11,7 +11,7 @@ import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Sparkles, Brain, Music2, Heart, Zap, Loader2, Play, Download } from '@/components/music/icons';
 import { useEmotionalMusicAI } from '@/hooks/useEmotionalMusicAI';
-import { useMusic } from '@/hooks/useMusic';
+import { useMusicCompat } from '@/hooks/useMusicCompat';
 import { cn } from '@/lib/utils';
 
 const emotionIcons: Record<string, any> = {
@@ -47,7 +47,7 @@ export const EmotionalMusicGenerator: React.FC = () => {
     pollGenerationStatus,
   } = useEmotionalMusicAI();
 
-  const { play } = useMusic();
+  const { play } = useMusicCompat();
   const [completedTrack, setCompletedTrack] = useState<any>(null);
 
   // Analyser automatiquement au montage

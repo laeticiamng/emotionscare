@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { useToast } from '@/hooks/use-toast';
 import { Play, Pause, Volume1, Volume2, VolumeX } from 'lucide-react';
-import { useMusic } from '@/hooks/useMusic';
+import { useMusic } from '@/hooks/useMusicCompat';
 
 const AudioController: React.FC = () => {
   const [isMuted, setIsMuted] = useState(false);

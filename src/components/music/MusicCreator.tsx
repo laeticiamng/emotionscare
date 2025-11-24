@@ -1,47 +1,43 @@
-// @ts-nocheck
 import React, { useState } from 'react';
 import { logger } from '@/lib/logger';
-import { useMusic } from '@/hooks/useMusic';
+import { useMusicCompat } from '@/hooks/useMusicCompat';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2, MusicIcon, Wand2 } from 'lucide-react';
-import { MusicContextType, MusicTrack } from '@/types/music';
+import { MusicTrack } from '@/types/music';
 import { normalizeTrack } from '@/utils/musicCompatibility';
 
 const MusicCreator = () => {
   const [prompt, setPrompt] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
-  const music = useMusic() as MusicContextType;
+  const music = useMusicCompat();
+  const { play, generateMusicForEmotion } = music;
   
   const handleGenerate = async () => {
     if (!prompt.trim()) return;
-    
+
     setIsGenerating(true);
-    
+
     try {
-      // If music context has generate method, use it
-      let generatedTrack: MusicTrack | null = null;
-      
-      if (typeof (music as any).generateMusic === 'function') {
-        const result = await (music as any).generateMusic(prompt);
-        if (result && result.tracks && result.tracks.length > 0) {
-          generatedTrack = normalizeTrack(result.tracks[0]);
-        } else {
-          generatedTrack = createFallbackTrack(prompt);
-        }
+      // Try using generateMusicForEmotion with the prompt
+      const generatedTrack = await generateMusicForEmotion('creative', prompt);
+
+      if (generatedTrack) {
+        play(generatedTrack);
       } else {
-        generatedTrack = createFallbackTrack(prompt);
+        // Fallback track if generation fails
+        const fallbackTrack = createFallbackTrack(prompt);
+        play(fallbackTrack);
       }
-      
-      if (generatedTrack && typeof (music as any).playTrack === 'function') {
-        (music as any).playTrack(generatedTrack);
-      }
-      
+
       setPrompt('');
     } catch (error) {
       logger.error('Error generating music', error as Error, 'MUSIC');
+      // Play fallback on error
+      const fallbackTrack = createFallbackTrack(prompt);
+      play(fallbackTrack);
     } finally {
       setIsGenerating(false);
     }

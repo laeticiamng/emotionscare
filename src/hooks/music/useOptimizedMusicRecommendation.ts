@@ -1,8 +1,6 @@
-// @ts-nocheck
-
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { MusicPlaylist, EmotionMusicParams } from '@/types/music';
-import { useMusic } from '@/hooks/useMusic';
+import { useMusicCompat } from '@/hooks/useMusicCompat';
 import { useMusicCache } from './useMusicCache';
 import { toast } from '@/hooks/use-toast';
 import { logger } from '@/lib/logger';
@@ -13,8 +11,8 @@ export const useOptimizedMusicRecommendation = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [currentPlaylist, setCurrentPlaylist] = useState<MusicPlaylist | null>(null);
   const [error, setError] = useState<string | null>(null);
-  
-  const { loadPlaylistForEmotion } = useMusic();
+
+  const { loadPlaylistForEmotion } = useMusicCompat();
   const cache = useMusicCache();
   const debounceRef = useRef<NodeJS.Timeout>();
   const abortControllerRef = useRef<AbortController>();

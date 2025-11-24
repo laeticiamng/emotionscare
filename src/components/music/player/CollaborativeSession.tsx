@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -7,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Users, Share2, Music, MessageCircle, Crown, Volume2 } from 'lucide-react';
-import { useMusic } from '@/hooks/useMusic';
+import { useMusicCompat } from '@/hooks/useMusicCompat';
 import { cn } from '@/lib/utils';
 
 interface CollaborativeUser {
@@ -40,7 +38,7 @@ const CollaborativeSession: React.FC<CollaborativeSessionProps> = ({ className }
   const [newMessage, setNewMessage] = useState('');
   const [isConnected, setIsConnected] = useState(false);
   
-  const { currentTrack, isPlaying } = useMusic();
+  const { currentTrack, isPlaying } = useMusicCompat().state;
 
   // Simulation d'une session collaborative
   useEffect(() => {

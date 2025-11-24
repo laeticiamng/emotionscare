@@ -1,6 +1,5 @@
-// @ts-nocheck
 import React, { useState, useEffect } from 'react';
-import { useMusic } from '@/hooks/useMusic';
+import { useMusic } from '@/hooks/useMusicCompat';
 import { useMusicEmotionIntegration } from '@/hooks/useMusicEmotionIntegration';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
