@@ -54,11 +54,15 @@ export function trackScanEvent(
     logger.debug('[Analytics]', eventName, properties, 'LIB');
   }
 
-  // TODO: Add integration with analytics platform (Google Analytics, Mixpanel, etc.)
-  // Example:
-  // if (window.gtag) {
-  //   window.gtag('event', eventName, properties);
-  // }
+  // Analytics platform integration
+  import('@/lib/analytics/analyticsIntegration').then(({ analytics }) => {
+    analytics.track(`scan_${eventName}`, {
+      category: 'scan',
+      ...properties,
+    });
+  }).catch(() => {
+    // Analytics module not available, continue silently
+  });
 }
 
 /**
