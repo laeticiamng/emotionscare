@@ -1,10 +1,9 @@
-// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { RotateCcw } from 'lucide-react';
-import { useMusic } from '@/hooks/useMusic';
+import { useMusicCompat } from '@/hooks/useMusicCompat';
 
 interface AudioEqualizerProps {
   className?: string;
@@ -15,7 +14,8 @@ interface AudioEqualizerProps {
  * Compatible avec l'API Web Audio
  */
 const AudioEqualizer: React.FC<AudioEqualizerProps> = ({ className }) => {
-  const { currentTrack } = useMusic();
+  const music = useMusicCompat();
+  const { currentTrack } = music.state;
   const [equalizerEnabled, setEqualizerEnabled] = useState(false);
   const [bands, setBands] = useState([
     { name: 'Bass', freq: 60, gain: 0 },
