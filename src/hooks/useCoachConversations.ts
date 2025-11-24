@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { logger } from '@/lib/logger';
+import { supabase } from '@/integrations/supabase/client';
 
 export interface ConversationMessage {
   id: string;
@@ -208,22 +209,60 @@ export const useCoachConversations = (): UseCoachConversationsReturn => {
   );
 
   const loadConversations = useCallback(async (): Promise<void> => {
-    // Conversations are already loaded from localStorage on mount
-    // This is a placeholder for future API integration
     setIsLoading(true);
     setError(null);
 
     try {
-      // TODO: Fetch conversations from API
-      // const response = await fetchConversations();
-      // setConversations(response);
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (!user) {
+        logger.warn('User not authenticated, using localStorage only', undefined, 'HOOK');
+        return;
+      }
+
+      // Fetch conversations from Supabase
+      const { data, error: fetchError } = await supabase
+        .from('coach_conversations')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('updated_at', { ascending: false });
+
+      if (fetchError) {
+        // If table doesn't exist, keep using localStorage
+        if (fetchError.code === '42P01') {
+          logger.warn('Coach conversations table does not exist, using localStorage', undefined, 'HOOK');
+          return;
+        }
+        throw fetchError;
+      }
+
+      // Merge with localStorage conversations
+      const localConversations = conversations;
+      const apiConversations = (data || []).map(conv => ({
+        id: conv.id,
+        title: conv.title || 'Conversation',
+        messages: (conv.messages || []) as ConversationMessage[],
+        createdAt: conv.created_at,
+        updatedAt: conv.updated_at,
+        emoji: conv.emoji,
+        emotion: conv.emotion,
+      }));
+
+      // Combine, preferring API data
+      const combinedIds = new Set(apiConversations.map(c => c.id));
+      const uniqueLocal = localConversations.filter(c => !combinedIds.has(c.id));
+
+      setConversations([...apiConversations, ...uniqueLocal]);
+      logger.info('Loaded conversations from API', { count: apiConversations.length }, 'HOOK');
+
     } catch (err) {
       const error = err instanceof Error ? err : new Error('Failed to load conversations');
       setError(error);
+      logger.error('Failed to load conversations from API', error, 'HOOK');
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [conversations]);
 
   const clearCurrentConversation = useCallback(() => {
     setCurrentConversation(null);

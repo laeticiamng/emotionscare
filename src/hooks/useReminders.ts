@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNotifyStore, type Reminder } from '@/store/notify.store';
 import { toast } from '@/hooks/use-toast';
 import { logger } from '@/lib/logger';
+import { supabase } from '@/integrations/supabase/client';
 
 export const useReminders = () => {
   const {
@@ -19,19 +20,43 @@ export const useReminders = () => {
 
   const [initialized, setInitialized] = useState(false);
 
-  // Load reminders from API
+  // Load reminders from Supabase
   const loadReminders = useCallback(async () => {
     setLoading(true);
     setError(null);
 
     try {
-      // TODO: Implement with Supabase edge function
-      // For now, return empty array (reminders stored locally)
-      setReminders([]);
-      
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (!user) {
+        setReminders([]);
+        return;
+      }
+
+      // Fetch reminders from Supabase
+      // Note: If reminders table doesn't exist yet, we'll handle the error gracefully
+      const { data, error } = await supabase
+        .from('reminders')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        // If table doesn't exist, just use empty array
+        if (error.code === '42P01') {
+          logger.warn('Reminders table does not exist yet', undefined, 'SYSTEM');
+          setReminders([]);
+        } else {
+          throw error;
+        }
+      } else {
+        setReminders(data || []);
+      }
+
     } catch (error: any) {
       logger.error('Load reminders failed', error as Error, 'SYSTEM');
       setError(error.message);
+      setReminders([]);
     } finally {
       setLoading(false);
       setInitialized(true);
@@ -44,19 +69,40 @@ export const useReminders = () => {
     setError(null);
 
     try {
-      const response = await fetch('/api/me/reminders', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(reminderData)
-      });
+      const { data: { user } } = await supabase.auth.getUser();
 
-      if (!response.ok) {
-        throw new Error('Failed to create reminder');
+      if (!user) {
+        throw new Error('User not authenticated');
       }
 
-      const result = await response.json();
-      const newReminder = { ...reminderData, id: result.id };
-      
+      // Create reminder in Supabase
+      const { data, error } = await supabase
+        .from('reminders')
+        .insert({
+          ...reminderData,
+          user_id: user.id,
+        })
+        .select()
+        .single();
+
+      if (error) {
+        // If table doesn't exist, add to store only
+        if (error.code === '42P01') {
+          logger.warn('Reminders table does not exist, storing locally only', undefined, 'SYSTEM');
+          const localReminder = { ...reminderData, id: crypto.randomUUID() };
+          addReminder(localReminder);
+
+          toast({
+            title: "Rappel créé ✨",
+            description: `Rappel ${reminderData.kind} programmé avec succès (local).`,
+          });
+
+          return localReminder;
+        }
+        throw error;
+      }
+
+      const newReminder = data as Reminder;
       addReminder(newReminder);
 
       toast({
@@ -76,13 +122,13 @@ export const useReminders = () => {
     } catch (error: any) {
       logger.error('Create reminder failed', error as Error, 'SYSTEM');
       setError(error.message);
-      
+
       toast({
         title: "Erreur",
         description: "Impossible de créer le rappel.",
         variant: "destructive"
       });
-      
+
       return null;
     } finally {
       setLoading(false);
@@ -98,14 +144,24 @@ export const useReminders = () => {
     updateReminder(id, updates);
 
     try {
-      const response = await fetch(`/api/me/reminders/${id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updates)
-      });
+      const { error } = await supabase
+        .from('reminders')
+        .update(updates)
+        .eq('id', id);
 
-      if (!response.ok) {
-        throw new Error('Failed to update reminder');
+      if (error) {
+        // If table doesn't exist, keep optimistic update
+        if (error.code === '42P01') {
+          logger.warn('Reminders table does not exist, local update only', undefined, 'SYSTEM');
+
+          toast({
+            title: "Rappel mis à jour",
+            description: "Vos modifications ont été enregistrées (local).",
+          });
+
+          return true;
+        }
+        throw error;
       }
 
       toast({
@@ -125,16 +181,16 @@ export const useReminders = () => {
     } catch (error: any) {
       // Rollback on error
       await loadReminders();
-      
+
       logger.error('Update reminder failed', error as Error, 'SYSTEM');
       setError(error.message);
-      
+
       toast({
         title: "Erreur",
         description: "Impossible de mettre à jour le rappel.",
         variant: "destructive"
       });
-      
+
       return false;
     } finally {
       setLoading(false);
@@ -148,17 +204,29 @@ export const useReminders = () => {
 
     // Store for potential rollback
     const reminder = reminders.find(r => r.id === id);
-    
+
     // Optimistic removal
     removeReminder(id);
 
     try {
-      const response = await fetch(`/api/me/reminders/${id}`, {
-        method: 'DELETE'
-      });
+      const { error } = await supabase
+        .from('reminders')
+        .delete()
+        .eq('id', id);
 
-      if (!response.ok) {
-        throw new Error('Failed to delete reminder');
+      if (error) {
+        // If table doesn't exist, keep optimistic update
+        if (error.code === '42P01') {
+          logger.warn('Reminders table does not exist, local delete only', undefined, 'SYSTEM');
+
+          toast({
+            title: "Rappel supprimé",
+            description: "Le rappel a été supprimé avec succès (local).",
+          });
+
+          return true;
+        }
+        throw error;
       }
 
       toast({
@@ -180,16 +248,16 @@ export const useReminders = () => {
       if (reminder) {
         addReminder(reminder);
       }
-      
+
       logger.error('Delete reminder failed', error as Error, 'SYSTEM');
       setError(error.message);
-      
+
       toast({
         title: "Erreur",
         description: "Impossible de supprimer le rappel.",
         variant: "destructive"
       });
-      
+
       return false;
     } finally {
       setLoading(false);

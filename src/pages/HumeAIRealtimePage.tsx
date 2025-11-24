@@ -12,8 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { HumeAIRealtimeScanner } from '@/components/scan/HumeAIRealtimeScanner';
 import { Camera, Mic, Type, Info, Sparkles, AlertTriangle } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-// Service temporarily disabled - using console.log
-// import { emotionScanService } from '@/services/emotion/scan-service';
+import { EmotionScanService } from '@/modules/emotion-scan/emotionScanService';
 import { useToast } from '@/hooks/use-toast';
 import type { HumeEmotionResult } from '@/services/ai/HumeAIWebSocketService';
 
@@ -32,10 +31,44 @@ export default function HumeAIRealtimePage() {
     // Save the emotion scan to database
     try {
       console.log('Emotion detected:', result.topEmotion.name, result.topEmotion.score);
-      // TODO: Implement save to database
+
+      // Calculate mood score from top emotion score (0-100)
+      const moodScore = Math.round(result.topEmotion.score * 100);
+
+      // Build emotion results array
+      const emotions = result.emotions.map(emotion => ({
+        name: emotion.name,
+        score: emotion.score
+      }));
+
+      // Save to database
+      await EmotionScanService.createScan({
+        user_id: user.id,
+        mood_score: moodScore,
+        payload: {
+          mode: selectedMode,
+          topEmotion: result.topEmotion,
+          emotions,
+          timestamp: new Date().toISOString(),
+          source: 'hume_ai_realtime',
+        }
+      });
+
       setScanCount((prev) => prev + 1);
+
+      // Show success toast
+      toast({
+        title: `Émotion détectée: ${result.topEmotion.name}`,
+        description: `Score: ${moodScore}% - Scan sauvegardé avec succès`,
+      });
+
     } catch (error) {
       console.error('Failed to save emotion scan', error);
+      toast({
+        title: 'Erreur',
+        description: 'Impossible de sauvegarder le scan émotionnel',
+        variant: 'destructive',
+      });
     }
   };
 

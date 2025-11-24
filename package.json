@@ -160,6 +160,7 @@
     "imagemin-webp": "^8.0.0",
     "input-otp": "^1.2.4",
     "jose": "^5.10.0",
+    "jspdf": "^3.0.4",
     "kysely": "^0.27.2",
     "lottie-react": "^2.4.1",
     "lucide-react": "^0.369.0",

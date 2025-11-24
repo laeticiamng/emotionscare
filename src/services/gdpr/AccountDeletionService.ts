@@ -5,6 +5,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';
+import { emailClientService } from '@/services/email/emailClientService';
 
 export interface DeletionRequest {
   id: string;
@@ -60,7 +61,7 @@ export class AccountDeletionService {
         scheduledDate: scheduledDate.toISOString(),
       }, 'GDPR');
 
-      // TODO: Send confirmation email to user
+      // Send confirmation email to user
       await this.sendDeletionConfirmationEmail(userId, scheduledDate);
 
       return data as DeletionRequest;
@@ -88,7 +89,7 @@ export class AccountDeletionService {
 
       logger.info('Account deletion cancelled', { userId }, 'GDPR');
 
-      // TODO: Send cancellation confirmation email
+      // Send cancellation confirmation email
       await this.sendCancellationEmail(userId);
     } catch (error) {
       logger.error('Failed to cancel account deletion', error, 'GDPR');
@@ -250,21 +251,94 @@ export class AccountDeletionService {
     userId: string,
     scheduledDate: Date
   ): Promise<void> {
-    // TODO: Implement email sending
-    // This should send an email to the user confirming the deletion request
-    // and informing them of the grace period
-    logger.info('Deletion confirmation email sent', {
-      userId,
-      scheduledDate: scheduledDate.toISOString(),
-    }, 'GDPR');
+    try {
+      // Get user email
+      const userEmail = await emailClientService.getUserEmail(userId);
+      if (!userEmail) {
+        logger.warn('Cannot send deletion email - user email not found', { userId }, 'GDPR');
+        return;
+      }
+
+      // Get user name from profile
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('name')
+        .eq('id', userId)
+        .single();
+
+      const userName = profile?.name || 'Utilisateur';
+
+      // Build cancel URL
+      const baseUrl = import.meta.env.VITE_WEB_URL || window.location.origin;
+      const cancelUrl = `${baseUrl}/settings/account?cancel_deletion=true`;
+
+      // Send email
+      const result = await emailClientService.sendDeletionConfirmation(
+        userEmail,
+        userName,
+        scheduledDate,
+        cancelUrl
+      );
+
+      if (result.success) {
+        logger.info('Deletion confirmation email sent', {
+          userId,
+          scheduledDate: scheduledDate.toISOString(),
+          messageId: result.messageId,
+        }, 'GDPR');
+      } else {
+        logger.error('Failed to send deletion confirmation email',
+          new Error(result.error), 'GDPR');
+      }
+    } catch (error) {
+      logger.error('Error sending deletion confirmation email', error as Error, 'GDPR');
+    }
   }
 
   /**
    * Send cancellation confirmation email
    */
   private static async sendCancellationEmail(userId: string): Promise<void> {
-    // TODO: Implement email sending
-    logger.info('Cancellation confirmation email sent', { userId }, 'GDPR');
+    try {
+      // Get user email
+      const userEmail = await emailClientService.getUserEmail(userId);
+      if (!userEmail) {
+        logger.warn('Cannot send cancellation email - user email not found', { userId }, 'GDPR');
+        return;
+      }
+
+      // Get user name from profile
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('name')
+        .eq('id', userId)
+        .single();
+
+      const userName = profile?.name || 'Utilisateur';
+
+      // Build app URL
+      const baseUrl = import.meta.env.VITE_WEB_URL || window.location.origin;
+      const appUrl = `${baseUrl}/dashboard`;
+
+      // Send email
+      const result = await emailClientService.sendCancellationConfirmation(
+        userEmail,
+        userName,
+        appUrl
+      );
+
+      if (result.success) {
+        logger.info('Cancellation confirmation email sent', {
+          userId,
+          messageId: result.messageId,
+        }, 'GDPR');
+      } else {
+        logger.error('Failed to send cancellation confirmation email',
+          new Error(result.error), 'GDPR');
+      }
+    } catch (error) {
+      logger.error('Error sending cancellation confirmation email', error as Error, 'GDPR');
+    }
   }
 
   /**
@@ -272,12 +346,53 @@ export class AccountDeletionService {
    * Should be called by a scheduled job (e.g., 7 days before deletion)
    */
   static async sendGracePeriodReminder(deletionRequest: DeletionRequest): Promise<void> {
-    const remainingDays = this.getRemainingDays(deletionRequest);
+    try {
+      const remainingDays = this.getRemainingDays(deletionRequest);
+      const userId = deletionRequest.user_id;
 
-    // TODO: Implement email sending
-    logger.info('Grace period reminder sent', {
-      userId: deletionRequest.user_id,
-      remainingDays,
-    }, 'GDPR');
+      // Get user email
+      const userEmail = await emailClientService.getUserEmail(userId);
+      if (!userEmail) {
+        logger.warn('Cannot send grace period reminder - user email not found', { userId }, 'GDPR');
+        return;
+      }
+
+      // Get user name from profile
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('name')
+        .eq('id', userId)
+        .single();
+
+      const userName = profile?.name || 'Utilisateur';
+
+      // Build cancel URL
+      const baseUrl = import.meta.env.VITE_WEB_URL || window.location.origin;
+      const cancelUrl = `${baseUrl}/settings/account?cancel_deletion=true`;
+
+      const deletionDate = new Date(deletionRequest.scheduled_deletion_at);
+
+      // Send email
+      const result = await emailClientService.sendGracePeriodReminder(
+        userEmail,
+        userName,
+        remainingDays,
+        cancelUrl,
+        deletionDate
+      );
+
+      if (result.success) {
+        logger.info('Grace period reminder sent', {
+          userId,
+          remainingDays,
+          messageId: result.messageId,
+        }, 'GDPR');
+      } else {
+        logger.error('Failed to send grace period reminder',
+          new Error(result.error), 'GDPR');
+      }
+    } catch (error) {
+      logger.error('Error sending grace period reminder', error as Error, 'GDPR');
+    }
   }
 }

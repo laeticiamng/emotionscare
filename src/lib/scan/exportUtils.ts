@@ -1,12 +1,9 @@
 /**
  * Utilitaires pour exporter les données de scan émotionnel
- * Supporte les formats: JSON, CSV
+ * Supporte les formats: JSON, CSV, PDF
  */
 
-// PDF export disabled - jspdf module not available
-// import { jsPDF } from 'jspdf';
-// import 'jspdf-autotable';
-
+import { jsPDF } from 'jspdf';
 import { logger } from '@/lib/logger';
 
 interface ScanData {
@@ -78,42 +75,30 @@ export const exportAsCSV = (
   }
 
   // Lignes
-  const rows = scans.map(scan => {
+  const rows = scans.map((scan) => {
     const date = new Date(scan.created_at);
-    const dateStr = date.toLocaleDateString('fr-FR');
-    const timeStr = date.toLocaleTimeString('fr-FR', {
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit'
-    });
-
     const row = [
-      dateStr,
-      timeStr,
-      scan.valence.toFixed(1),
-      scan.arousal.toFixed(1),
-      scan.summary || 'Neutre',
-      scan.source || 'Manuel'
+      date.toLocaleDateString('fr-FR'),
+      date.toLocaleTimeString('fr-FR'),
+      scan.valence.toString(),
+      scan.arousal.toString(),
+      scan.summary || '',
+      scan.source || ''
     ];
 
     if (includeMetadata && scan.metadata) {
       row.push(JSON.stringify(scan.metadata));
     }
 
-    // Échapper les guillemets et les virgules
-    return row
-      .map(field => {
-        const str = String(field);
-        if (str.includes(',') || str.includes('"') || str.includes('\n')) {
-          return `"${str.replace(/"/g, '""')}"`;
-        }
-        return str;
-      })
-      .join(',');
+    return row.map((cell) => {
+      // Échapper les guillemets et virgules
+      const escaped = String(cell).replace(/"/g, '""');
+      return `"${escaped}"`;
+    }).join(',');
   });
 
   const csvContent = [
-    headers.join(','),
+    headers.map(h => `"${h}"`).join(','),
     ...rows
   ].join('\n');
 
@@ -132,12 +117,6 @@ export const exportAsPDF = async (
   } = options;
 
   try {
-    // PDF export temporarily disabled - jsPDF package needs to be added
-    logger.warn('PDF export feature temporarily disabled', 'LIB');
-    throw new Error('PDF export not yet implemented - please use CSV or JSON export');
-    
-    /* 
-    // TODO: Enable once jsPDF is installed
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
@@ -200,41 +179,45 @@ export const exportAsPDF = async (
         ];
       });
 
-      // @ts-ignore - jsPDF-autoTable
-      doc.autoTable({
-        startY: yPosition,
-        head: [['Date', 'Heure', 'Valence', 'Arousal', 'Émotion', 'Source']],
-        body: tableData,
-        theme: 'grid',
-        styles: {
-          fontSize: 9,
-          cellPadding: 3
-        },
-        headStyles: {
-          fillColor: [59, 130, 246],
-          textColor: 255,
-          fontStyle: 'bold'
-        },
-        margin: { left: 20, right: 20 }
+      // Simple table without autoTable (since it's not installed)
+      doc.setFontSize(8);
+      let tableY = yPosition + 5;
+      const colWidths = [25, 20, 20, 20, 30, 30];
+      const headers = ['Date', 'Heure', 'Valence', 'Arousal', 'Émotion', 'Source'];
+
+      // Headers
+      let xPos = 20;
+      headers.forEach((header, i) => {
+        doc.text(header, xPos, tableY);
+        xPos += colWidths[i];
       });
 
-      // Pied de page
-      const pageCount = (doc as any).internal.pages.length - 1;
-      for (let i = 1; i <= pageCount; i++) {
-        doc.setPage(i);
-        doc.setFontSize(8);
-        doc.setTextColor(150);
-        doc.text(
-          `Page ${i} / ${pageCount}`,
-          pageWidth / 2,
-          pageHeight - 10,
-          { align: 'center' }
-        );
-      }
+      tableY += 5;
+
+      // Data rows (max 20 for space)
+      tableData.slice(0, 20).forEach((row) => {
+        xPos = 20;
+        row.forEach((cell, i) => {
+          doc.text(String(cell), xPos, tableY);
+          xPos += colWidths[i];
+        });
+        tableY += 5;
+      });
     }
 
-      doc.save(filename);
-    */
+    // Pied de page
+    doc.setFontSize(8);
+    doc.setTextColor(150);
+    doc.text(
+      'EmotionsCare - Rapport d\'analyse émotionnelle',
+      pageWidth / 2,
+      pageHeight - 10,
+      { align: 'center' }
+    );
+
+    // Sauvegarder le PDF
+    doc.save(filename);
+    logger.info('PDF exported successfully', { filename }, 'LIB');
   } catch (error) {
     logger.error('Erreur lors de la génération du PDF:', error, 'LIB');
     throw error;

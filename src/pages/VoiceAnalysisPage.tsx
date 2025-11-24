@@ -4,16 +4,48 @@ import { Button } from '@/components/ui/button';
 import { Camera, TrendingUp, Heart, Zap, Loader2 } from 'lucide-react';
 import { useHumeWebSocket } from '@/hooks/useHumeWebSocket';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
+import { EmotionScanService } from '@/modules/emotion-scan/emotionScanService';
 import { logger } from '@/lib/logger';
 
 export default function VoiceAnalysisPage() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const { toast } = useToast();
+  const { user } = useAuth();
+  const [saveCount, setSaveCount] = useState(0);
 
   const { isConnected, error, latestResult } = useHumeWebSocket({
     enabled: isAnalyzing,
-    onEmotions: (result) => {
+    onEmotions: async (result) => {
       logger.debug('Emotions detected:', result, 'PAGE');
+
+      // Save to database every 10 seconds to avoid too many writes
+      if (user?.id && saveCount % 10 === 0) {
+        try {
+          // Calculate mood score from valence (0-100)
+          const moodScore = Math.round((result.valence || 0.5) * 100);
+
+          // Save to database
+          await EmotionScanService.createScan({
+            user_id: user.id,
+            mood_score: moodScore,
+            payload: {
+              mode: 'facial',
+              emotions: result.emotions,
+              valence: result.valence,
+              arousal: result.arousal,
+              timestamp: new Date().toISOString(),
+              source: 'voice_analysis_page',
+            }
+          });
+
+          logger.info('Emotion scan saved', { moodScore }, 'PAGE');
+        } catch (error) {
+          logger.error('Failed to save emotion scan', error as Error, 'PAGE');
+        }
+      }
+
+      setSaveCount(prev => prev + 1);
     }
   });
 
