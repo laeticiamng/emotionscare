@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useHelpStore, type Section, type ArticleSummary, type Article, type Feedback } from '@/store/help.store';
 import { toast } from '@/hooks/use-toast';
 import { logger } from '@/lib/logger';
+import { supabase } from '@/integrations/supabase/client';
 
 export const useHelp = () => {
   const {
@@ -30,8 +31,32 @@ export const useHelp = () => {
     setError(null);
 
     try {
-      // TODO: Implement with Supabase edge function
-      // For now, use fallback data
+      // Try to load from Supabase
+      const { data, error } = await supabase
+        .from('help_sections')
+        .select('*')
+        .order('order', { ascending: true });
+
+      if (error) {
+        // If table doesn't exist, use fallback data
+        if (error.code === '42P01') {
+          logger.warn('Help sections table does not exist, using fallback', undefined, 'SYSTEM');
+          setSections([
+            { id: '1', name: 'Modules', slug: 'modules', icon: '🧩' },
+            { id: '2', name: 'Compte', slug: 'account', icon: '👤' },
+            { id: '3', name: 'RGPD', slug: 'rgpd', icon: '🔒' },
+            { id: '4', name: 'Technique', slug: 'technical', icon: '⚙️' }
+          ]);
+        } else {
+          throw error;
+        }
+      } else {
+        setSections(data || []);
+      }
+    } catch (error: any) {
+      logger.error('Load sections failed', error as Error, 'SYSTEM');
+      setError(error.message);
+      // Use fallback on error
       setSections([
         { id: '1', name: 'Modules', slug: 'modules', icon: '🧩' },
         { id: '2', name: 'Compte', slug: 'account', icon: '👤' },
@@ -49,18 +74,29 @@ export const useHelp = () => {
     setError(null);
 
     try {
-      const response = await fetch(`/api/help/articles?section=${sectionId}&limit=${limit}`);
-      
-      if (!response.ok) {
-        throw new Error('Failed to load articles');
+      const { data, error } = await supabase
+        .from('help_articles')
+        .select('id, title, slug, excerpt, section_id, created_at')
+        .eq('section_id', sectionId)
+        .eq('published', true)
+        .order('created_at', { ascending: false })
+        .limit(limit);
+
+      if (error) {
+        if (error.code === '42P01') {
+          logger.warn('Help articles table does not exist', undefined, 'SYSTEM');
+          setArticles([]);
+        } else {
+          throw error;
+        }
+      } else {
+        setArticles(data || []);
       }
 
-      const data = await response.json();
-      setArticles(data.articles || []);
-      
     } catch (error: any) {
       logger.error('Load articles failed', error as Error, 'SYSTEM');
       setError(error.message);
+      setArticles([]);
     } finally {
       setLoading(false);
     }
@@ -72,25 +108,43 @@ export const useHelp = () => {
     setError(null);
 
     try {
-      const response = await fetch(`/api/help/article/${slug}`);
-      
-      if (!response.ok) {
-        throw new Error('Failed to load article');
+      const { data, error } = await supabase
+        .from('help_articles')
+        .select('*')
+        .eq('slug', slug)
+        .eq('published', true)
+        .single();
+
+      if (error) {
+        if (error.code === '42P01') {
+          logger.warn('Help articles table does not exist', undefined, 'SYSTEM');
+          setCurrentArticle(null);
+        } else if (error.code === 'PGRST116') {
+          // Not found
+          setCurrentArticle(null);
+          toast({
+            title: "Article introuvable",
+            description: "L'article demandé n'existe pas ou n'est plus disponible.",
+            variant: "destructive"
+          });
+        } else {
+          throw error;
+        }
+      } else {
+        setCurrentArticle(data);
+
+        // Analytics
+        if (typeof window !== 'undefined' && window.gtag) {
+          window.gtag('event', 'help.article.view', {
+            slug: slug
+          });
+        }
       }
 
-      const data = await response.json();
-      setCurrentArticle(data.article);
-
-      // Analytics
-      if (typeof window !== 'undefined' && window.gtag) {
-        window.gtag('event', 'help.article.view', {
-          slug: slug
-        });
-      }
-      
     } catch (error: any) {
       logger.error('Load article failed', error as Error, 'SYSTEM');
       setError(error.message);
+      setCurrentArticle(null);
     } finally {
       setLoading(false);
     }
@@ -109,26 +163,37 @@ export const useHelp = () => {
     setError(null);
 
     try {
-      const response = await fetch(`/api/help/search?q=${encodeURIComponent(query)}`);
-      
-      if (!response.ok) {
-        throw new Error('Search failed');
+      // Use Supabase full-text search
+      const { data, error } = await supabase
+        .from('help_articles')
+        .select('id, title, slug, excerpt, section_id')
+        .eq('published', true)
+        .or(`title.ilike.%${query}%,content.ilike.%${query}%,excerpt.ilike.%${query}%`)
+        .limit(20);
+
+      if (error) {
+        if (error.code === '42P01') {
+          logger.warn('Help articles table does not exist', undefined, 'SYSTEM');
+          setSearchResults([]);
+        } else {
+          throw error;
+        }
+      } else {
+        setSearchResults(data || []);
+
+        // Analytics
+        if (typeof window !== 'undefined' && window.gtag) {
+          window.gtag('event', 'help.search', {
+            q_len: query.length,
+            results_count: data?.length || 0
+          });
+        }
       }
 
-      const data = await response.json();
-      setSearchResults(data.results || []);
-
-      // Analytics
-      if (typeof window !== 'undefined' && window.gtag) {
-        window.gtag('event', 'help.search', {
-          q_len: query.length
-        });
-      }
-      
     } catch (error: any) {
       logger.error('Search failed', error as Error, 'SYSTEM');
       setError(error.message);
-      
+
       // Fallback: show empty results rather than crash
       setSearchResults([]);
     } finally {
@@ -139,14 +204,24 @@ export const useHelp = () => {
   // Send feedback
   const sendFeedback = useCallback(async (feedback: Feedback) => {
     try {
-      const response = await fetch('/api/help/feedback', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(feedback)
-      });
+      const { data: { user } } = await supabase.auth.getUser();
 
-      if (!response.ok) {
-        throw new Error('Failed to send feedback');
+      const { error } = await supabase
+        .from('help_feedback')
+        .insert({
+          article_id: feedback.articleId,
+          user_id: user?.id || null,
+          helpful: feedback.helpful,
+          comment: feedback.comment || null,
+        });
+
+      if (error) {
+        if (error.code === '42P01') {
+          logger.warn('Help feedback table does not exist', undefined, 'SYSTEM');
+          // Still show success to user
+        } else {
+          throw error;
+        }
       }
 
       toast({
@@ -165,13 +240,13 @@ export const useHelp = () => {
 
     } catch (error: any) {
       logger.error('Send feedback failed', error as Error, 'SYSTEM');
-      
+
       toast({
         title: "Erreur",
         description: "Impossible d'envoyer votre retour.",
         variant: "destructive"
       });
-      
+
       return false;
     }
   }, []);

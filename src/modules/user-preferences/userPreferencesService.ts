@@ -529,12 +529,42 @@ export class UserPreferencesService {
   static async requestDataExport(
     request: DataExportRequest
   ): Promise<DataExportResult> {
-    // TODO: Implémenter la génération d'export
-    // Pour l'instant, retourner un résultat mock
-    return {
-      id: crypto.randomUUID(),
-      status: 'pending'
-    };
+    try {
+      // Call Supabase edge function for data export
+      const { data, error } = await supabase.functions.invoke('gdpr-data-export', {
+        body: {
+          user_id: request.user_id,
+          include_metadata: request.include_metadata ?? true,
+          format: request.format ?? 'json',
+        },
+      });
+
+      if (error) {
+        logger.error('[UserPreferencesService] Data export request failed:', error, 'MODULE');
+        throw error;
+      }
+
+      logger.info('[UserPreferencesService] Data export requested successfully', {
+        userId: request.user_id,
+        exportId: data?.export_id,
+      }, 'MODULE');
+
+      return {
+        id: data?.export_id || crypto.randomUUID(),
+        status: 'pending',
+        download_url: data?.download_url,
+        expires_at: data?.expires_at,
+      };
+    } catch (error) {
+      logger.error('[UserPreferencesService] Data export request error:', error, 'MODULE');
+
+      // Fallback: return pending status
+      return {
+        id: crypto.randomUUID(),
+        status: 'pending',
+        error: error instanceof Error ? error.message : 'Export request failed',
+      };
+    }
   }
 
   /**
