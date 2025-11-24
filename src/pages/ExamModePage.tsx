@@ -172,19 +172,18 @@ export default function ExamModePage() {
     });
 
     // Rediriger vers la page appropriée selon le type
-    // TODO: Adapter selon les vraies routes de l'app
     switch (experience.type) {
       case 'pre-exam':
-        navigate('/b2c/music-enhanced'); // Page musique existante
+        navigate('/app/music'); // Page musique thérapeutique
         break;
       case 'post-exam':
-        navigate('/b2c/music-enhanced'); // Page musique existante
+        navigate('/app/music'); // Page musique thérapeutique
         break;
       case 'stress-relief':
-        navigate('/breath'); // Page respiration existante
+        navigate('/app/breath'); // Page respiration/breathwork
         break;
       default:
-        navigate('/b2c/dashboard');
+        navigate('/app/dashboard');
     }
   };
 
