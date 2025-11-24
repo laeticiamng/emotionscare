@@ -1,6 +1,5 @@
-// @ts-nocheck
 import { useCallback } from 'react';
-import { useMusic } from '@/hooks/useMusic';
+import { useMusicCompat } from '@/hooks/useMusicCompat';
 import { useSoundscape } from '@/providers/SoundscapeProvider';
 import { EmotionMusicParams, MusicPlaylist, MusicTrack } from '@/types/music';
 import { supabase } from '@/integrations/supabase/client';
@@ -8,7 +7,9 @@ import { toast } from 'sonner';
 import { logger } from '@/lib/logger';
 
 export const useMusicEmotionIntegration = () => {
-  const { state, generateMusicForEmotion, setPlaylist, play, getEmotionMusicDescription } = useMusic();
+  const music = useMusicCompat();
+  const { generateMusicForEmotion, setPlaylist, play, getEmotionMusicDescription } = music;
+  const { isGenerating, generationProgress, emotionTarget, therapeuticMode } = music.state;
   const { updateSoundscapeForEmotion } = useSoundscape();
 
   // Activation de la musique basée sur l'émotion
@@ -184,9 +185,9 @@ export const useMusicEmotionIntegration = () => {
     getMusicRecommendations,
     analyzeMusicImpact,
     getEmotionMusicDescription,
-    isGenerating: state.isGenerating,
-    generationProgress: state.generationProgress,
-    currentEmotion: state.emotionTarget,
-    therapeuticMode: state.therapeuticMode
+    isGenerating,
+    generationProgress,
+    currentEmotion: emotionTarget,
+    therapeuticMode
   };
 };

@@ -1,10 +1,9 @@
-// @ts-nocheck
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Maximize2, Minimize2, Settings, Palette, Sparkles, Waves } from 'lucide-react';
-import { useMusic } from '@/hooks/useMusic';
+import { useMusicCompat } from '@/hooks/useMusicCompat';
 import { cn } from '@/lib/utils';
 import ThreeDVisualizer from './ThreeDVisualizer';
 import AmbientBackground from './AmbientBackground';
@@ -21,7 +20,7 @@ const ImmersiveFullscreenPlayer: React.FC<ImmersiveFullscreenPlayerProps> = ({ c
   const [showControls, setShowControls] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
   const hideControlsTimeoutRef = useRef<NodeJS.Timeout>();
-  const { currentTrack, isPlaying } = useMusic();
+  const { currentTrack, isPlaying } = useMusicCompat().state;
 
   // Gestion du mode plein écran
   const enterFullscreen = async () => {

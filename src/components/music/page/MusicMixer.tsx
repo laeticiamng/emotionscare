@@ -1,22 +1,20 @@
-// @ts-nocheck
-
 import React, { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
-import { 
-  Music, 
-  Save, 
-  RefreshCw, 
-  Headphones, 
-  Volume2, 
+import {
+  Music,
+  Save,
+  RefreshCw,
+  Headphones,
+  Volume2,
   Music2,
-  Play 
+  Play
 } from 'lucide-react';
 import AudioEqualizer from '@/components/music/AudioEqualizer';
 import MusicMoodVisualization from './MusicMoodVisualization';
 import { useToast } from '@/hooks/use-toast';
-import { useMusic } from '@/hooks/useMusic';
+import { useMusicCompat } from '@/hooks/useMusicCompat';
 
 interface MixPreset {
   id: string;
@@ -33,7 +31,9 @@ interface MixPreset {
 
 const MusicMixer: React.FC = () => {
   const { toast } = useToast();
-  const { currentTrack, playTrack } = useMusic();
+  const music = useMusicCompat();
+  const { currentTrack } = music.state;
+  const { play } = music;
   const [selectedMood, setSelectedMood] = useState<string>('calm');
   const [mixSettings, setMixSettings] = useState({
     bass: 50,
@@ -124,9 +124,9 @@ const MusicMixer: React.FC = () => {
   // Apply the mix and start playing
   const applyMix = () => {
     if (currentTrack) {
-      playTrack(currentTrack);
+      play(currentTrack);
     }
-    
+
     toast({
       title: "Mix appliqué",
       description: "Vos paramètres de mixage sont maintenant actifs"

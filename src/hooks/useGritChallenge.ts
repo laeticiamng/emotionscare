@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState } from 'react';
 import useOpenAI from './api/useOpenAI';
 import { useMood } from './useMood';
@@ -16,7 +15,7 @@ interface GritChallenge {
 export const useGritChallenge = () => {
   const [currentChallenge, setCurrentChallenge] = useState<GritChallenge | null>(null);
   const { generateText, isLoading } = useOpenAI();
-  const { mood } = useMood();
+  const mood = useMood();
 
   const generateChallenge = async (objective?: string): Promise<GritChallenge | null> => {
     const moodContext = mood ? `Humeur actuelle: valence ${mood.valence}, énergie ${mood.arousal}` : '';

@@ -1,7 +1,6 @@
-// @ts-nocheck
 import { useState, useEffect, useCallback } from 'react';
 import { MusicPlaylist, EmotionMusicParams } from '@/types/music';
-import { useMusic } from '@/hooks/useMusic';
+import { useMusicCompat } from '@/hooks/useMusicCompat';
 import { logger } from '@/lib/logger';
 
 export interface UseEmotionMusicReturn {
@@ -32,29 +31,27 @@ export const useEmotionMusic = (initialEmotion?: string): UseEmotionMusicReturn 
   const [recommendation, setRecommendation] = useState<MusicPlaylist | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<Error | null>(null);
-  const { setEmotion, setOpenDrawer, loadPlaylistForEmotion } = useMusic();
+  const { setEmotion, setOpenDrawer, loadPlaylistForEmotion } = useMusicCompat();
 
   // Function to activate music for a specific emotion
   const activateMusicForEmotion = async (params: EmotionMusicParams): Promise<boolean> => {
     try {
       setIsLoading(true);
       setError(null);
-      
+
       // Set the emotion in the music context
-      if (setEmotion) setEmotion(params.emotion);
-      
+      setEmotion(params.emotion);
+
       // Load playlist for this emotion
       const playlist = await loadPlaylistForEmotion(params);
-      
+
       if (playlist) {
         setRecommendation(playlist);
       }
-      
+
       // Open the music drawer
-      if (setOpenDrawer) {
-        setOpenDrawer(true);
-      }
-      
+      setOpenDrawer(true);
+
       return !!playlist;
     } catch (error) {
       logger.error('Error activating music for emotion', error as Error, 'MUSIC');

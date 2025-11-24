@@ -1,11 +1,10 @@
-// @ts-nocheck
 import { useState } from 'react';
-import { useMusic } from '@/hooks/useMusic';
+import { useMusicCompat } from '@/hooks/useMusicCompat';
 import { MusicTrack, MusicPlaylist } from '@/types/music';
 import { useToast } from '@/hooks/use-toast';
 
 export const useMusicMutation = () => {
-  const music = useMusic();
+  const music = useMusicCompat();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);

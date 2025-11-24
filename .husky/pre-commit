@@ -1,0 +1,57 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# ===== PRE-COMMIT HOOK =====
+# Bloque les commits avec @ts-nocheck ou @ts-ignore dans les NOUVEAUX fichiers
+
+echo "🔍 Vérification TypeScript strictness..."
+
+# Récupère tous les fichiers staged TypeScript/TSX
+STAGED_TS_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(ts|tsx)$' || true)
+
+if [ -z "$STAGED_TS_FILES" ]; then
+  echo "✅ Aucun fichier TypeScript modifié"
+  exit 0
+fi
+
+# Compte le nombre de fichiers avec @ts-nocheck ou @ts-ignore
+VIOLATIONS=0
+VIOLATION_FILES=""
+
+for FILE in $STAGED_TS_FILES; do
+  if [ -f "$FILE" ]; then
+    # Vérifie les premières lignes pour @ts-nocheck
+    if head -n 5 "$FILE" | grep -q '@ts-nocheck'; then
+      VIOLATIONS=$((VIOLATIONS + 1))
+      VIOLATION_FILES="${VIOLATION_FILES}\n  - ${FILE} (contient @ts-nocheck)"
+    fi
+
+    # Vérifie tout le fichier pour @ts-ignore (plus permissif)
+    TS_IGNORE_COUNT=$(grep -c '@ts-ignore' "$FILE" || echo "0")
+    if [ "$TS_IGNORE_COUNT" -gt 3 ]; then
+      VIOLATIONS=$((VIOLATIONS + 1))
+      VIOLATION_FILES="${VIOLATION_FILES}\n  - ${FILE} (contient ${TS_IGNORE_COUNT} @ts-ignore)"
+    fi
+  fi
+done
+
+if [ $VIOLATIONS -gt 0 ]; then
+  echo "❌ COMMIT BLOQUÉ !"
+  echo ""
+  echo "Les fichiers suivants contiennent des suppressions TypeScript :"
+  echo -e "$VIOLATION_FILES"
+  echo ""
+  echo "🔧 Pour corriger :"
+  echo "  1. Supprimez les @ts-nocheck et @ts-ignore"
+  echo "  2. Corrigez les erreurs TypeScript"
+  echo "  3. Ou ajoutez des types explicites"
+  echo ""
+  echo "⚠️  Si vous devez VRAIMENT commiter un fichier legacy :"
+  echo "  git commit --no-verify"
+  echo "  (mais documentez pourquoi dans le message de commit)"
+  echo ""
+  exit 1
+fi
+
+echo "✅ Tous les fichiers TypeScript sont conformes !"
+exit 0

@@ -1,14 +1,10 @@
-// @ts-nocheck
-
 import React, { useState, useEffect } from 'react';
-import { useMusic } from '@/hooks/useMusic';
+import { useMusicCompat } from '@/hooks/useMusicCompat';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Play, Pause, SkipBack, SkipForward, Heart, Volume, VolumeX } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
 import { getTrackCover, getTrackTitle, getTrackArtist } from '@/utils/musicCompatibility';
-import { MusicContextType } from '@/types/music';
-import { logger } from '@/lib/logger';
 
 interface PlayerTabProps {
   className?: string;
@@ -19,25 +15,24 @@ const PlayerTab: React.FC<PlayerTabProps> = ({ className = '' }) => {
   const [localVolume, setLocalVolume] = useState(80);
   const [localMute, setLocalMute] = useState(false);
   const [progress, setProgress] = useState(0);
-  
-  const music = useMusic() as MusicContextType;
-  const { 
-    currentTrack, 
+
+  const music = useMusicCompat();
+  const {
+    currentTrack,
     isPlaying,
-    togglePlay,
-    playTrack,
-    pauseTrack,
-    resumeTrack,
-    nextTrack,
-    playlist,
+    currentTime,
+    duration,
+    playlist
+  } = music.state;
+
+  const {
+    play,
+    pause,
+    next,
+    previous,
+    seek,
+    setVolume
   } = music;
-  
-  // Fallback values if they don't exist in the context
-  const previousTrack = music.previousTrack || (() => logger.info('Previous track not available'));
-  const setCurrentTrack = music.setCurrentTrack || ((track) => logger.info('Set current track not available', { track }));
-  const currentTime = music.currentTime || 0;
-  const duration = music.duration || 0;
-  const seekTo = music.seekTo || ((time: number) => logger.info('Seek not available', { time }));
 
   const formatTime = (seconds: number) => {
     if (isNaN(seconds)) return '0:00';
@@ -54,25 +49,33 @@ const PlayerTab: React.FC<PlayerTabProps> = ({ className = '' }) => {
   
   const handleVolumeChange = (values: number[]) => {
     setLocalVolume(values[0]);
-    music.setVolume && music.setVolume(values[0] / 100);
+    setVolume(values[0] / 100);
   };
-  
+
   const handleToggleMute = () => {
     setLocalMute(!localMute);
-    music.toggleMute && music.toggleMute();
+    setVolume(localMute ? localVolume / 100 : 0);
   };
-  
+
   const handleProgressChange = (values: number[]) => {
     const newPosition = (values[0] / 100) * (duration || 0);
-    seekTo(newPosition);
+    seek(newPosition);
   };
-  
+
+  const handlePlayPause = () => {
+    if (isPlaying) {
+      pause();
+    } else if (currentTrack) {
+      play(currentTrack);
+    }
+  };
+
   if (!currentTrack) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[300px]">
         <p className="text-muted-foreground">Aucune piste en cours de lecture</p>
-        <Button onClick={() => playlist && playlist.tracks.length > 0 ? 
-          playTrack(playlist.tracks[0]) : null} className="mt-4">
+        <Button onClick={() => playlist && playlist.length > 0 ?
+          play(playlist[0]) : null} className="mt-4">
           Démarrer la lecture
         </Button>
       </div>
@@ -125,16 +128,16 @@ const PlayerTab: React.FC<PlayerTabProps> = ({ className = '' }) => {
         <Button
           variant="ghost"
           size="icon"
-          onClick={previousTrack}
+          onClick={previous}
           className="h-12 w-12 rounded-full hover:bg-blue-100 dark:hover:bg-blue-900/30"
         >
           <SkipBack className="h-6 w-6" />
         </Button>
-        
+
         <Button
           variant="default"
           size="icon"
-          onClick={togglePlay}
+          onClick={handlePlayPause}
           className="h-16 w-16 rounded-full bg-primary hover:bg-primary/90"
         >
           {isPlaying ? (
@@ -143,11 +146,11 @@ const PlayerTab: React.FC<PlayerTabProps> = ({ className = '' }) => {
             <Play className="h-8 w-8 ml-1 text-primary-foreground" />
           )}
         </Button>
-        
+
         <Button
           variant="ghost"
           size="icon"
-          onClick={nextTrack}
+          onClick={next}
           className="h-12 w-12 rounded-full hover:bg-blue-100 dark:hover:bg-blue-900/30"
         >
           <SkipForward className="h-6 w-6" />

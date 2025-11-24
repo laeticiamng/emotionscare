@@ -1,6 +1,5 @@
-// @ts-nocheck
 import { useEffect, useState } from 'react';
-import { useMusic } from '@/hooks/useMusic';
+import { useMusicCompat } from '@/hooks/useMusicCompat';
 import { EmotionMusicParams } from '@/types/music';
 import { logger } from '@/lib/logger';
 
@@ -11,7 +10,8 @@ interface UseCommunityAmbienceOptions {
 
 export const useCommunityAmbience = (options: UseCommunityAmbienceOptions = {}) => {
   const { autoPlay = false, defaultEmotion = 'calm' } = options;
-  const music = useMusic();
+  const music = useMusicCompat();
+  const { currentTrack, currentTime, duration } = music.state;
   const [currentEmotion, setCurrentEmotion] = useState(defaultEmotion);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -49,24 +49,20 @@ export const useCommunityAmbience = (options: UseCommunityAmbienceOptions = {}) 
   
   const playEmotionMusic = async (emotion: string, intensity?: number) => {
     const success = await loadEmotionMusic(emotion, intensity);
-    if (success && music.currentTrack) {
-      music.playTrack(music.currentTrack);
+    if (success && currentTrack) {
+      music.play(currentTrack);
       setIsPlaying(true);
     }
     return success;
   };
-  
+
   const pauseMusic = () => {
-    music.pauseTrack();
+    music.pause();
     setIsPlaying(false);
   };
-  
+
   const resumeMusic = () => {
-    if (music.resumeTrack) {
-      music.resumeTrack();
-    } else {
-      music.togglePlay();
-    }
+    music.play();
     setIsPlaying(true);
   };
   
@@ -83,23 +79,23 @@ export const useCommunityAmbience = (options: UseCommunityAmbienceOptions = {}) 
     if (isPlaying) {
       pauseMusic();
     }
-    
+
     // Create valid EmotionMusicParams object for the API
     const params: EmotionMusicParams = {
       emotion
     };
-    
+
     await music.loadPlaylistForEmotion(params);
-    
-    if (music.currentTrack) {
-      music.playTrack(music.currentTrack);
+
+    if (currentTrack) {
+      music.play(currentTrack);
       setIsPlaying(true);
       setCurrentEmotion(emotion);
       return true;
     }
     return false;
   };
-  
+
   return {
     currentEmotion,
     isPlaying,
@@ -111,8 +107,8 @@ export const useCommunityAmbience = (options: UseCommunityAmbienceOptions = {}) 
     togglePlayback,
     matchMusicToEmotion,
     setVolume: music.setVolume,
-    currentTrack: music.currentTrack,
-    progress: music.currentTime / (music.duration || 1),
+    currentTrack,
+    progress: currentTime / (duration || 1),
   };
 };
 

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -11,7 +10,7 @@ import { motion } from 'framer-motion';
 import { useToast } from '@/hooks/use-toast';
 import EmotionCircleSelector from './EmotionCircleSelector';
 import { useMusicEmotionIntegration } from '@/hooks/useMusicEmotionIntegration';
-import { useMusic } from '@/hooks/useMusic';
+import { useMusic } from '@/hooks/useMusicCompat';
 
 interface JournalEntryFormProps {
   onSubmit: (data: any) => void;

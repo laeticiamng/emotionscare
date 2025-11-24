@@ -1,11 +1,9 @@
-// @ts-nocheck
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Sparkles, TrendingUp, Heart, Clock, Zap } from 'lucide-react';
-import { useMusic } from '@/hooks/useMusic';
+import { useMusicCompat } from '@/hooks/useMusicCompat';
 import { MusicTrack, MusicPlaylist } from '@/types/music';
 
 interface AIRecommendation {
@@ -32,7 +30,8 @@ const AIRecommendationEngine: React.FC<AIRecommendationEngineProps> = ({ classNa
     timeContext: 'evening'
   });
   
-  const { currentTrack, playlists } = useMusic();
+  const music = useMusicCompat();
+  const { currentTrack, playlist } = music.state;
 
   // Simulation d'IA générant des recommandations
   const generateAIRecommendations = async () => {

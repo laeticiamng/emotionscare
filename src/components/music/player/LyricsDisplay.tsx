@@ -1,13 +1,11 @@
-// @ts-nocheck
 
-// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Type, Download, Share2, Heart } from 'lucide-react';
-import { useMusic } from '@/hooks/useMusic';
+import { useMusicCompat } from '@/hooks/useMusicCompat';
 import { cn } from '@/lib/utils';
 
 interface LyricLine {
@@ -37,7 +35,7 @@ const mockLyrics: LyricLine[] = [
 ];
 
 const LyricsDisplay: React.FC<LyricsDisplayProps> = ({ className }) => {
-  const { currentTrack, isPlaying } = useMusic();
+  const { currentTrack, isPlaying } = useMusicCompat().state;
   const [currentTime, setCurrentTime] = useState(0);
   const [showTranslation, setShowTranslation] = useState(false);
   const [fontSize, setFontSize] = useState('md');

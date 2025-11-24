@@ -96,5 +96,5 @@ export interface AdaptiveMusicConfig {
   adaptiveVolume?: boolean;
 }
 
-// Re-export MusicContextType from context (will be imported where needed)
-export type { MusicContextType } from '@/contexts/MusicContext';
+// Note: MusicContextType removed as part of Zustand migration
+// Use useMusicCompat() or useMusicStore() directly instead

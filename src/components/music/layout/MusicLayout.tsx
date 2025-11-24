@@ -1,7 +1,6 @@
-// @ts-nocheck
 
 import React from 'react';
-import { useMusic } from '@/hooks/useMusic';
+import { useMusic } from '@/hooks/useMusicCompat';
 import { Button } from '@/components/ui/button';
 import { Loader2, Music } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';

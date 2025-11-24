@@ -1,11 +1,9 @@
-// @ts-nocheck
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { BarChart3, Activity, Zap, Music2, Headphones } from 'lucide-react';
-import { useMusic } from '@/hooks/useMusic';
+import { useMusicCompat } from '@/hooks/useMusicCompat';
 
 interface AudioAnalysis {
   bpm: number;
@@ -27,7 +25,7 @@ interface AudioAnalysisDisplayProps {
 const AudioAnalysisDisplay: React.FC<AudioAnalysisDisplayProps> = ({ className }) => {
   const [analysis, setAnalysis] = useState<AudioAnalysis | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const { currentTrack } = useMusic();
+  const { currentTrack } = useMusicCompat().state;
 
   // Simulation d'analyse audio avancée
   useEffect(() => {
