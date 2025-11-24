@@ -18,7 +18,7 @@ import {
   VolumeX,
   Music
 } from 'lucide-react';
-import { useMusic } from '@/hooks/useMusic';
+import { useMusicCompat } from '@/hooks/useMusicCompat';
 import { cn } from '@/lib/utils';
 import {
   setupMusicKeyboardNavigation,
@@ -41,15 +41,7 @@ export const UnifiedMusicPlayer: React.FC<UnifiedMusicPlayerProps> = ({
   className,
   compact = false
 }) => {
-  const {
-    state,
-    play,
-    pause,
-    next,
-    previous,
-    seek,
-    setVolume
-  } = useMusic();
+  const music = useMusicCompat();
 
   const {
     currentTrack,
@@ -57,7 +49,16 @@ export const UnifiedMusicPlayer: React.FC<UnifiedMusicPlayerProps> = ({
     volume,
     currentTime,
     duration,
-  } = state;
+  } = music.state;
+
+  const {
+    play,
+    pause,
+    next,
+    previous,
+    seek,
+    setVolume
+  } = music;
 
   const playerRef = useRef<HTMLDivElement>(null);
 

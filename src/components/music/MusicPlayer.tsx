@@ -3,7 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, Music } from 'lucide-react';
-import { useMusic } from '@/hooks/useMusic';
+import { useMusicCompat } from '@/hooks/useMusicCompat';
 import { MusicTrack } from '@/types/music';
 
 interface MusicPlayerProps {
@@ -37,14 +37,14 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({
   showProgress = true,
   className = ''
 }) => {
-  const musicContext = useMusic();
-  
+  const music = useMusicCompat();
+
   // Use props if provided, otherwise fall back to context
-  const currentTrack = propTrack || musicContext.state.currentTrack;
-  const isPlaying = propIsPlaying !== undefined ? propIsPlaying : musicContext.state.isPlaying;
-  const volume = propVolume !== undefined ? propVolume : musicContext.state.volume || 0.7;
-  const currentTime = propCurrentTime !== undefined ? propCurrentTime : musicContext.state.currentTime || 0;
-  const duration = musicContext.state.duration || 0;
+  const currentTrack = propTrack || music.state.currentTrack;
+  const isPlaying = propIsPlaying !== undefined ? propIsPlaying : music.state.isPlaying;
+  const volume = propVolume !== undefined ? propVolume : music.state.volume || 0.7;
+  const currentTime = propCurrentTime !== undefined ? propCurrentTime : music.state.currentTime || 0;
+  const duration = music.state.duration || 0;
   
   const [isMuted, setIsMuted] = React.useState(false);
 
@@ -59,14 +59,14 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({
     if (isPlaying) {
       if (onPause) {
         onPause();
-      } else if (musicContext.pause) {
-        musicContext.pause();
+      } else {
+        music.pause();
       }
     } else {
       if (onPlay) {
         onPlay();
-      } else if (musicContext.play && currentTrack) {
-        musicContext.play(currentTrack);
+      } else if (currentTrack) {
+        music.play(currentTrack);
       }
     }
   };
@@ -75,8 +75,8 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({
     const newTime = (value[0] / 100) * duration;
     if (onSeek) {
       onSeek(newTime);
-    } else if (musicContext.seek) {
-      musicContext.seek(newTime);
+    } else {
+      music.seek(newTime);
     }
   };
 
@@ -84,8 +84,8 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({
     const newVolume = value[0] / 100;
     if (onVolumeChange) {
       onVolumeChange(newVolume);
-    } else if (musicContext.setVolume) {
-      musicContext.setVolume(newVolume);
+    } else {
+      music.setVolume(newVolume);
     }
     setIsMuted(newVolume === 0);
   };
@@ -93,16 +93,16 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({
   const handleNext = () => {
     if (onNext) {
       onNext();
-    } else if (musicContext.next) {
-      musicContext.next();
+    } else {
+      music.next();
     }
   };
 
   const handlePrevious = () => {
     if (onPrevious) {
       onPrevious();
-    } else if (musicContext.previous) {
-      musicContext.previous();
+    } else {
+      music.previous();
     }
   };
 
@@ -111,15 +111,15 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({
       const newVolume = 0.7;
       if (onVolumeChange) {
         onVolumeChange(newVolume);
-      } else if (musicContext.setVolume) {
-        musicContext.setVolume(newVolume);
+      } else {
+        music.setVolume(newVolume);
       }
       setIsMuted(false);
     } else {
       if (onVolumeChange) {
         onVolumeChange(0);
-      } else if (musicContext.setVolume) {
-        musicContext.setVolume(0);
+      } else {
+        music.setVolume(0);
       }
       setIsMuted(true);
     }
