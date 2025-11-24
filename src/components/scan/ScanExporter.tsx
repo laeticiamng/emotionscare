@@ -15,6 +15,8 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { logger } from '@/lib/logger';
+import { supabase } from '@/integrations/supabase/client';
+import { emailClientService } from '@/services/email/emailClientService';
 
 interface ScanData {
   id: string;
@@ -106,21 +108,74 @@ export const ScanExporter: React.FC<ScanExporterProps> = ({ scans, onExport }) =
 
     setIsSharing(true);
     try {
-      // TODO: Implémenter partage sécurisé via API
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        throw new Error('User not authenticated');
+      }
 
-      toast({
-        title: 'Partage envoyé',
-        description: `Un lien sécurisé a été envoyé à ${shareEmail}.`,
+      // Create shareable token with expiration (7 days)
+      const shareToken = crypto.randomUUID();
+      const expiresAt = new Date();
+      expiresAt.setDate(expiresAt.getDate() + 7);
+
+      // Filter scans based on current options
+      const filteredScans = filterScansByDateRange(scans, exportOptions);
+
+      // Store share link in database (if table exists)
+      try {
+        await supabase.from('scan_shares').insert({
+          user_id: user.id,
+          token: shareToken,
+          recipient_email: shareEmail,
+          scan_data: filteredScans,
+          expires_at: expiresAt.toISOString(),
+        });
+      } catch (dbError: any) {
+        // If table doesn't exist, continue with email-only sharing
+        if (dbError.code !== '42P01') {
+          throw dbError;
+        }
+        logger.warn('scan_shares table not found, sending email without database record', undefined, 'SCAN');
+      }
+
+      // Generate secure share link
+      const baseUrl = window.location.origin;
+      const shareUrl = `${baseUrl}/share/scan/${shareToken}`;
+
+      // Send email with share link
+      const result = await emailClientService.sendEmail({
+        to: shareEmail,
+        subject: '📊 Partage de rapport émotionnel - EmotionsCare',
+        template: 'scan_share',
+        data: {
+          shareUrl,
+          expiresAt: expiresAt.toLocaleDateString('fr-FR'),
+          scanCount: filteredScans.length,
+        },
       });
 
-      logger.info('Partage scan envoyé', { email: shareEmail }, 'SCAN');
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to send email');
+      }
+
+      toast({
+        title: 'Partage envoyé ✉️',
+        description: `Un lien sécurisé (valide 7 jours) a été envoyé à ${shareEmail}.`,
+      });
+
+      logger.info('Partage scan envoyé', {
+        email: shareEmail,
+        token: shareToken,
+        scanCount: filteredScans.length
+      }, 'SCAN');
+
       setShareEmail('');
     } catch (error) {
-      logger.error('Erreur partage scan', { error }, 'SCAN');
+      logger.error('Erreur partage scan', error as Error, 'SCAN');
       toast({
         title: 'Erreur de partage',
-        description: 'Impossible d\'envoyer le partage. Veuillez réessayer.',
+        description: error instanceof Error ? error.message : 'Impossible d\'envoyer le partage. Veuillez réessayer.',
         variant: 'destructive',
       });
     } finally {

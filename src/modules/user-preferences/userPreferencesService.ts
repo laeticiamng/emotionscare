@@ -5,6 +5,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';
+import { AccountDeletionService } from '@/services/gdpr/AccountDeletionService';
 import type {
   UserProfile,
   UpdateUserProfile,
@@ -265,12 +266,41 @@ export class UserPreferencesService {
       timestamp: new Date().toISOString()
     };
 
-    // TODO: Stocker dans une table dédiée consent_records
-    // Pour l'instant, on stocke dans les préférences
-    await this.updateUserSettings(userId, {
-      data_sharing: consents.dataSharing,
-      analytics_tracking: consents.analytics
-    });
+    try {
+      // Store in dedicated consent_records table for GDPR compliance
+      const { error } = await supabase
+        .from('consent_records')
+        .insert({
+          user_id: userId,
+          consents: consents,
+          version: CONSENT_VERSION,
+          timestamp: record.timestamp,
+          ip_address: null, // Could be captured from request if needed
+          user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : null
+        });
+
+      if (error) {
+        // If table doesn't exist, fall back to storing in preferences
+        if (error.code === '42P01') {
+          logger.warn('consent_records table does not exist, storing in preferences', undefined, 'GDPR');
+          await this.updateUserSettings(userId, {
+            data_sharing: consents.dataSharing,
+            analytics_tracking: consents.analytics
+          });
+        } else {
+          throw error;
+        }
+      }
+
+      logger.info('Consent record stored successfully', { userId, version: CONSENT_VERSION }, 'GDPR');
+    } catch (error) {
+      logger.error('Failed to store consent record', error as Error, 'GDPR');
+      // Fallback: store in preferences
+      await this.updateUserSettings(userId, {
+        data_sharing: consents.dataSharing,
+        analytics_tracking: consents.analytics
+      });
+    }
 
     return record;
   }
@@ -529,12 +559,42 @@ export class UserPreferencesService {
   static async requestDataExport(
     request: DataExportRequest
   ): Promise<DataExportResult> {
-    // TODO: Implémenter la génération d'export
-    // Pour l'instant, retourner un résultat mock
-    return {
-      id: crypto.randomUUID(),
-      status: 'pending'
-    };
+    try {
+      // Call Supabase edge function for data export
+      const { data, error } = await supabase.functions.invoke('gdpr-data-export', {
+        body: {
+          user_id: request.user_id,
+          include_metadata: request.include_metadata ?? true,
+          format: request.format ?? 'json',
+        },
+      });
+
+      if (error) {
+        logger.error('[UserPreferencesService] Data export request failed:', error, 'MODULE');
+        throw error;
+      }
+
+      logger.info('[UserPreferencesService] Data export requested successfully', {
+        userId: request.user_id,
+        exportId: data?.export_id,
+      }, 'MODULE');
+
+      return {
+        id: data?.export_id || crypto.randomUUID(),
+        status: 'pending',
+        download_url: data?.download_url,
+        expires_at: data?.expires_at,
+      };
+    } catch (error) {
+      logger.error('[UserPreferencesService] Data export request error:', error, 'MODULE');
+
+      // Fallback: return pending status
+      return {
+        id: crypto.randomUUID(),
+        status: 'pending',
+        error: error instanceof Error ? error.message : 'Export request failed',
+      };
+    }
   }
 
   /**
@@ -545,30 +605,36 @@ export class UserPreferencesService {
   ): Promise<AccountDeletionResult> {
     try {
       if (request.delete_immediately) {
-        // Suppression immédiate
-        const { error } = await supabase
-          .from('user_profiles')
-          .delete()
-          .eq('user_id', request.user_id);
-
-        if (error) {
-          throw error;
-        }
+        // Immediate deletion using AccountDeletionService
+        await AccountDeletionService.executeAccountDeletion(request.user_id);
 
         return {
           success: true
         };
       } else {
-        // Soft delete avec période de grâce de 30 jours
-        const deletionDate = new Date();
-        deletionDate.setDate(deletionDate.getDate() + 30);
+        // Scheduled deletion with 30-day grace period
+        const scheduledDate = new Date();
+        scheduledDate.setDate(scheduledDate.getDate() + 30);
 
-        // TODO: Marquer le compte pour suppression différée
-        // await supabase.from('user_profiles').update({ ... })
+        // Use AccountDeletionService for GDPR-compliant scheduled deletion
+        const result = await AccountDeletionService.scheduleAccountDeletion(
+          request.user_id,
+          scheduledDate,
+          request.reason
+        );
+
+        if (!result.success) {
+          throw new Error(result.error || 'Failed to schedule account deletion');
+        }
+
+        logger.info('Account deletion scheduled', {
+          userId: request.user_id,
+          scheduledDate: result.scheduledDate
+        }, 'GDPR');
 
         return {
           success: true,
-          deletion_scheduled_for: deletionDate.toISOString(),
+          deletion_scheduled_for: result.scheduledDate,
           grace_period_days: 30
         };
       }

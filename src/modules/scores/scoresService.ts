@@ -241,8 +241,119 @@ export class ScoresService {
     week: number,
     year: number
   ): Promise<WeeklyMetrics | null> {
-    // TODO: Implémenter la récupération depuis la DB ou calculer
-    return null;
+    try {
+      // Calculate date range for the week
+      const startDate = new Date(year, 0, 1 + (week - 1) * 7);
+      const endDate = new Date(startDate);
+      endDate.setDate(endDate.getDate() + 6);
+
+      // Fetch emotion scans for the week
+      const { data: scans, error: scansError } = await supabase
+        .from('emotion_scans')
+        .select('*')
+        .eq('user_id', userId)
+        .gte('created_at', startDate.toISOString())
+        .lte('created_at', endDate.toISOString());
+
+      if (scansError && scansError.code !== '42P01') {
+        throw scansError;
+      }
+
+      // Fetch module sessions for the week
+      const { data: sessions, error: sessionsError } = await supabase
+        .from('module_sessions')
+        .select('*')
+        .eq('user_id', userId)
+        .gte('created_at', startDate.toISOString())
+        .lte('created_at', endDate.toISOString());
+
+      if (sessionsError && sessionsError.code !== '42P01') {
+        throw sessionsError;
+      }
+
+      const emotionScans = scans || [];
+      const moduleSessions = sessions || [];
+
+      // If no data, return null
+      if (emotionScans.length === 0 && moduleSessions.length === 0) {
+        return null;
+      }
+
+      // Calculate metrics
+      const moodScores = emotionScans.map(s => s.mood_score || 50);
+      const emotionCounts: Record<string, number> = {};
+
+      emotionScans.forEach(scan => {
+        const emotion = scan.payload?.topEmotion?.name || scan.payload?.dominantEmotion;
+        if (emotion) {
+          emotionCounts[emotion] = (emotionCounts[emotion] || 0) + 1;
+        }
+      });
+
+      // Calculate dominant emotions
+      const totalEmotions = Object.values(emotionCounts).reduce((a, b) => a + b, 0);
+      const dominantEmotions = Object.entries(emotionCounts)
+        .map(([emotion, count]) => ({
+          emotion,
+          percentage: Math.round((count / totalEmotions) * 100)
+        }))
+        .sort((a, b) => b.percentage - a.percentage)
+        .slice(0, 3);
+
+      // Find best day
+      const dailyScores: Record<string, { total: number; count: number }> = {};
+      emotionScans.forEach(scan => {
+        const date = new Date(scan.created_at).toISOString().split('T')[0];
+        if (!dailyScores[date]) {
+          dailyScores[date] = { total: 0, count: 0 };
+        }
+        dailyScores[date].total += scan.mood_score || 50;
+        dailyScores[date].count += 1;
+      });
+
+      const bestDay = Object.entries(dailyScores)
+        .map(([date, { total, count }]) => ({
+          date,
+          score: Math.round(total / count)
+        }))
+        .sort((a, b) => b.score - a.score)[0] || { date: startDate.toISOString(), score: 0 };
+
+      // Calculate scores (average of mood scores)
+      const avgMoodScore = moodScores.length > 0
+        ? Math.round(moodScores.reduce((a, b) => a + b, 0) / moodScores.length)
+        : 0;
+
+      // Total minutes from sessions
+      const totalMinutes = moduleSessions.reduce((total, session) => {
+        return total + (session.duration_seconds || 0) / 60;
+      }, 0);
+
+      // Unique modules used
+      const modulesUsed = [...new Set(moduleSessions.map(s => s.module_name))];
+
+      return {
+        week_number: week,
+        year: year,
+        emotional_score: avgMoodScore,
+        wellbeing_score: avgMoodScore, // Could be calculated differently
+        engagement_score: Math.min(100, Math.round((moduleSessions.length / 7) * 20)), // Sessions per day * 20
+        total_sessions: moduleSessions.length,
+        total_minutes: Math.round(totalMinutes),
+        modules_used: modulesUsed,
+        achievements_unlocked: 0, // Would need achievements table
+        mood_range: {
+          min: moodScores.length > 0 ? Math.min(...moodScores) : 0,
+          max: moodScores.length > 0 ? Math.max(...moodScores) : 0,
+          average: avgMoodScore
+        },
+        dominant_emotions: dominantEmotions,
+        best_day: bestDay,
+        challenges_faced: 0 // Would need challenges table
+      };
+    } catch (error) {
+      logger.error('Failed to get weekly metrics', error as Error, 'SCORES');
+      return null;
+    }
   }
 
   /**

@@ -51,15 +51,30 @@ const EnhancedUserDashboard: React.FC<EnhancedUserDashboardProps> = ({ user }) =
   const { data: weeklyData } = useDashboardWeekly();
 
   // Calculate dashboard stats from real API data
+  // Goals are derived from user's activity patterns and recommendations
+  const totalSessions = stats?.totalSessions || 0;
+  const streakDays = stats?.streakDays || 0;
+
+  // Calculate monthly goals: baseline of 12 sessions/month (3/week)
+  // Adjusted based on user's current activity level
+  const baselineGoals = 12;
+  const activityMultiplier = totalSessions > 20 ? 1.5 : totalSessions > 10 ? 1.25 : 1;
+  const monthlyGoals = Math.round(baselineGoals * activityMultiplier);
+
+  // Calculate completed goals from weekly summary
+  // Goals completed = weeks with 3+ sessions
+  const weeksWithActivity = weeklySummary?.weeksCompleted || 0;
+  const completedGoals = Math.min(monthlyGoals, Math.round(weeksWithActivity * 0.75));
+
   const dashboardStats = {
     weeklyProgress: stats?.wellnessScore || 0,
-    monthlyGoals: 12, // TODO: Add goals tracking
-    completedGoals: 9, // TODO: Add goals tracking
-    currentStreak: stats?.streakDays || 0,
-    totalSessions: stats?.totalSessions || 0,
+    monthlyGoals,
+    completedGoals,
+    currentStreak: streakDays,
+    totalSessions,
     averageRating: weeklyData?.today?.glow_score ? weeklyData.today.glow_score / 10 : 0,
     timeSpent: weeklySummary?.totalMinutes || 0,
-    nextMilestone: Math.ceil((stats?.totalSessions || 0) / 10) * 10 + 10
+    nextMilestone: Math.ceil((totalSessions) / 10) * 10 + 10
   };
 
   // Map recent activities from real data

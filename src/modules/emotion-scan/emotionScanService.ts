@@ -5,6 +5,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';
+import { aiAnalysisService } from '@/services/aiAnalysisService';
 import type {
   EmotionScanDB,
   CreateEmotionScan,
@@ -203,6 +204,12 @@ export class EmotionScanService {
 
   /**
    * Analyser l'émotion depuis une image (facial analysis)
+   *
+   * Note: Real-time facial analysis is available via useHumeWebSocket hook.
+   * This method is for static image analysis and requires configuration of:
+   * - VITE_HUME_API_KEY for Hume AI Batch API, or
+   * - AWS Rekognition credentials, or
+   * - Azure Face API credentials
    */
   static async analyzeFacial(
     userId: string,
@@ -212,8 +219,15 @@ export class EmotionScanService {
     const { includeLandmarks = false } = options || {};
 
     try {
-      // TODO: Intégrer avec un service de facial analysis (Hume AI, AWS Rekognition, etc.)
-      // Pour l'instant, retourner une analyse mock
+      // Facial analysis service not yet configured for static images
+      // For real-time analysis, use useHumeWebSocket hook with video stream
+      logger.warn(
+        'Static facial analysis requires API configuration (Hume AI Batch/AWS Rekognition/Azure Face)',
+        { userId },
+        'MODULE'
+      );
+
+      // Return mock result for now
       const mockResult: FacialAnalysisResult = {
         emotion_scores: [
           { emotion: 'neutral', score: 0.7, confidence: 0.8 },
@@ -258,20 +272,30 @@ export class EmotionScanService {
     const { language = 'fr' } = options || {};
 
     try {
-      // TODO: Intégrer avec un service d'analyse vocale
-      // Pour l'instant, retourner une analyse mock
-      const mockResult: EmotionResult = {
+      // Transcribe audio using OpenAI Whisper
+      const transcription = await aiAnalysisService.transcribeAudio(audioData);
+
+      // Analyze sentiment and emotions from transcribed text
+      const sentiment = await aiAnalysisService.analyzeSentiment(transcription.text);
+      const emotionAnalysis = await aiAnalysisService.analyzeEmotions(transcription.text);
+
+      // Convert to EmotionResult format
+      const valence = sentiment.tone === 'positive' ? 70 : sentiment.tone === 'negative' ? 30 : 50;
+      const arousal = Math.abs(sentiment.score) * 50 + 50; // Convert -1 to 1 scale to 0-100
+      const confidence = Math.round(sentiment.confidence * 100);
+
+      const result: EmotionResult = {
         id: crypto.randomUUID(),
-        emotion: 'calm',
-        valence: 60,
-        arousal: 40,
-        confidence: 75,
+        emotion: emotionAnalysis.dominantEmotion || 'neutral',
+        valence,
+        arousal,
+        confidence,
         source: 'voice',
         timestamp: new Date().toISOString(),
-        summary: 'Voice analysis detected calm emotion with moderate confidence',
+        summary: `Voice analysis: "${transcription.text.substring(0, 100)}${transcription.text.length > 100 ? '...' : ''}"`,
         emotions: {
-          calm: 0.75,
-          neutral: 0.5,
+          ...emotionAnalysis.emotions,
+          neutral: emotionAnalysis.emotions.joy ? undefined : 0.5,
           tired: 0.3
         },
         metadata: {
@@ -284,14 +308,18 @@ export class EmotionScanService {
       await this.createScan({
         user_id: userId,
         payload: {
-          result: mockResult,
+          result,
           type: 'voice',
-          audio_size: audioData.size
+          audio_size: audioData.size,
+          transcription: transcription.text,
+          language: transcription.language
         },
-        mood_score: Math.round(mockResult.valence)
+        mood_score: Math.round(result.valence)
       });
 
-      return mockResult;
+      logger.info('Voice analysis completed', { userId, confidence, emotion: result.emotion }, 'MODULE');
+
+      return result;
     } catch (error) {
       logger.error('[EmotionScanService] Voice analysis failed:', error, 'MODULE');
       throw error;
