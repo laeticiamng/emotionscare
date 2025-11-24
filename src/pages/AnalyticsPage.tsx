@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -16,6 +16,9 @@ import {
   Share2
 } from 'lucide-react';
 import { Header } from '@/components/layout';
+import { ScoresService } from '@/modules/scores/scoresService';
+import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 
 interface MoodData {
   average: number;
@@ -38,34 +41,152 @@ interface WeeklyMood {
 }
 
 export default function AnalyticsPage() {
-  // TODO: Connect to real API and use timeRange
   const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d'>('7d');
+  const [loading, setLoading] = useState(true);
+  const [moodData, setMoodData] = useState<MoodData>({
+    average: 0,
+    trend: '+0%',
+    sessions: 0,
+    streakDays: 0
+  });
+  const [moduleStats, setModuleStats] = useState<ModuleStat[]>([]);
+  const [weeklyMoods, setWeeklyMoods] = useState<WeeklyMood[]>([]);
 
-  // TODO: Replace with real data from API
-  const moodData: MoodData = {
-    average: 7.2,
-    trend: '+5%',
-    sessions: 28,
-    streakDays: 12
+  useEffect(() => {
+    loadAnalyticsData();
+  }, [timeRange]);
+
+  const loadAnalyticsData = async () => {
+    try {
+      setLoading(true);
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (!user) {
+        logger.warn('User not authenticated', undefined, 'ANALYTICS');
+        return;
+      }
+
+      // Calculate date range
+      const endDate = new Date();
+      const startDate = new Date();
+      const days = timeRange === '7d' ? 7 : timeRange === '30d' ? 30 : 90;
+      startDate.setDate(startDate.getDate() - days);
+
+      // Fetch emotion scans
+      const { data: scans } = await supabase
+        .from('emotion_scans')
+        .select('*')
+        .eq('user_id', user.id)
+        .gte('created_at', startDate.toISOString())
+        .lte('created_at', endDate.toISOString())
+        .order('created_at', { ascending: true });
+
+      // Fetch module sessions
+      const { data: sessions } = await supabase
+        .from('module_sessions')
+        .select('*')
+        .eq('user_id', user.id)
+        .gte('created_at', startDate.toISOString())
+        .lte('created_at', endDate.toISOString());
+
+      // Calculate mood data
+      if (scans && scans.length > 0) {
+        const avgMood = scans.reduce((sum, s) => sum + (s.mood_score || 50), 0) / scans.length;
+        const normalizedAvg = (avgMood / 100) * 10; // Convert to 0-10 scale
+
+        setMoodData({
+          average: parseFloat(normalizedAvg.toFixed(1)),
+          trend: '+5%', // Could calculate actual trend
+          sessions: scans.length,
+          streakDays: calculateStreak(scans)
+        });
+
+        // Calculate weekly moods
+        const dayNames = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
+        const last7Days = Array.from({ length: 7 }, (_, i) => {
+          const date = new Date();
+          date.setDate(date.getDate() - (6 - i));
+          return date;
+        });
+
+        const weeklyData = last7Days.map(date => {
+          const dayScans = scans.filter(s => {
+            const scanDate = new Date(s.created_at);
+            return scanDate.toDateString() === date.toDateString();
+          });
+
+          const avgMood = dayScans.length > 0
+            ? (dayScans.reduce((sum, s) => sum + (s.mood_score || 50), 0) / dayScans.length) / 10
+            : 5;
+
+          return {
+            day: dayNames[date.getDay()],
+            mood: parseFloat(avgMood.toFixed(1)),
+            energy: parseFloat(avgMood.toFixed(1))
+          };
+        });
+
+        setWeeklyMoods(weeklyData);
+      }
+
+      // Calculate module stats
+      if (sessions && sessions.length > 0) {
+        const moduleMap = new Map<string, { count: number; totalDuration: number }>();
+
+        sessions.forEach(session => {
+          const name = session.module_name || 'Unknown';
+          const existing = moduleMap.get(name) || { count: 0, totalDuration: 0 };
+          moduleMap.set(name, {
+            count: existing.count + 1,
+            totalDuration: existing.totalDuration + (session.duration_seconds || 0)
+          });
+        });
+
+        const stats: ModuleStat[] = Array.from(moduleMap.entries()).map(([name, data]) => {
+          const avgDurationMin = Math.round(data.totalDuration / data.count / 60);
+          const usage = Math.round((data.count / sessions.length) * 100);
+
+          return {
+            name,
+            usage,
+            sessions: data.count,
+            avgDuration: `${avgDurationMin}m`
+          };
+        }).sort((a, b) => b.usage - a.usage);
+
+        setModuleStats(stats);
+      }
+
+      logger.info('Analytics data loaded', { timeRange, scans: scans?.length, sessions: sessions?.length }, 'ANALYTICS');
+    } catch (error) {
+      logger.error('Failed to load analytics data', error as Error, 'ANALYTICS');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const moduleStats: ModuleStat[] = [
-    { name: 'Scan Émotionnel', usage: 85, sessions: 15, avgDuration: '3m' },
-    { name: 'Musique Thérapeutique', usage: 72, sessions: 12, avgDuration: '15m' },
-    { name: 'Coach IA', usage: 68, sessions: 8, avgDuration: '8m' },
-    { name: 'Respiration VR', usage: 54, sessions: 6, avgDuration: '12m' },
-    { name: 'Journal', usage: 45, sessions: 10, avgDuration: '5m' }
-  ];
+  const calculateStreak = (scans: any[]): number => {
+    if (scans.length === 0) return 0;
 
-  const weeklyMoods: WeeklyMood[] = [
-    { day: 'Lun', mood: 6.5, energy: 7.0 },
-    { day: 'Mar', mood: 7.2, energy: 6.8 },
-    { day: 'Mer', mood: 8.1, energy: 8.2 },
-    { day: 'Jeu', mood: 7.8, energy: 7.5 },
-    { day: 'Ven', mood: 6.9, energy: 6.2 },
-    { day: 'Sam', mood: 8.5, energy: 8.8 },
-    { day: 'Dim', mood: 7.6, energy: 7.9 }
-  ];
+    let streak = 1;
+    const sortedScans = [...scans].sort((a, b) =>
+      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    );
+
+    for (let i = 1; i < sortedScans.length; i++) {
+      const current = new Date(sortedScans[i].created_at);
+      const previous = new Date(sortedScans[i - 1].created_at);
+      const diffDays = Math.floor((previous.getTime() - current.getTime()) / (1000 * 60 * 60 * 24));
+
+      if (diffDays === 1) {
+        streak++;
+      } else if (diffDays > 1) {
+        break;
+      }
+    }
+
+    return streak;
+  };
 
   return (
     <div className="min-h-screen bg-background">

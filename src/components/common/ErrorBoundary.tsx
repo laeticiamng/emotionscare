@@ -2,6 +2,7 @@ import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { logger } from '@/lib/logger';
 
 interface Props {
   children: ReactNode;
@@ -58,8 +59,12 @@ export class ErrorBoundary extends Component<Props, State> {
       errorInfo,
     });
 
-    // TODO: Log to error reporting service (Sentry, LogRocket, etc.)
-    // Example: Sentry.captureException(error, { contexts: { react: { componentStack: errorInfo.componentStack } } });
+    // Log to Sentry in production
+    logger.critical(
+      `React Error Boundary caught error: ${error.message}`,
+      error,
+      'ERROR_BOUNDARY'
+    );
   }
 
   private handleReset = () => {
