@@ -13,7 +13,7 @@ import { Slider } from '@/components/ui/slider';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
-import { useMusic } from '@/contexts/MusicContext';
+import { useMusicCompat } from '@/hooks/useMusicCompat';
 import { cn } from '@/lib/utils';
 import PageRoot from '@/components/common/PageRoot';
 import { ConsentGate } from '@/features/clinical-optin/ConsentGate';

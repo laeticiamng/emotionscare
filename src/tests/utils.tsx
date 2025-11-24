@@ -6,7 +6,6 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { UserModeProvider } from '@/contexts/UserModeContext';
-import { MusicProvider } from '@/contexts/MusicContext';
 import { ThemeProvider } from '@/providers/theme';
 import { renderHook, RenderHookOptions } from '@testing-library/react';
 import { vi } from 'vitest';
@@ -27,9 +26,7 @@ const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
         <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
           <AuthProvider>
             <UserModeProvider>
-              <MusicProvider>
-                {children}
-              </MusicProvider>
+              {children}
             </UserModeProvider>
           </AuthProvider>
         </ThemeProvider>
