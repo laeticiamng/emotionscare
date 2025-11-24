@@ -9,19 +9,27 @@ interface ErrorFallbackProps {
   error: Error;
   resetErrorBoundary: () => void;
   errorInfo?: React.ErrorInfo;
+  errorId?: string;
 }
 
-const ErrorFallback: React.FC<ErrorFallbackProps> = ({ 
-  error, 
+const ErrorFallback: React.FC<ErrorFallbackProps> = ({
+  error,
   resetErrorBoundary,
-  errorInfo 
+  errorInfo,
+  errorId
 }) => {
   const handleReportError = () => {
-    // In production, send error to monitoring service
-    logger.error('Error reported', { error, errorInfo });
-    
-    // Example: Send to Sentry, LogRocket, etc.
-    // errorReportingService.report({ error, errorInfo });
+    // Log error report action
+    logger.error('Error reported by user', { error, errorInfo, errorId });
+
+    // Copier l'ID d'erreur dans le presse-papier
+    if (errorId && navigator.clipboard) {
+      navigator.clipboard.writeText(errorId).catch(() => {});
+    }
+
+    // Ouvrir le formulaire de contact avec l'ID d'erreur
+    const supportUrl = `/contact?error_id=${errorId || 'unknown'}`;
+    window.location.href = supportUrl;
   };
 
   const goHome = () => {
@@ -60,9 +68,15 @@ const ErrorFallback: React.FC<ErrorFallbackProps> = ({
           
           <PremiumCardContent className="space-y-4">
             <p className="text-muted-foreground text-sm">
-              Nous sommes désolés, mais quelque chose s'est mal passé. 
+              Nous sommes désolés, mais quelque chose s'est mal passé.
               L'équipe technique a été automatiquement notifiée.
             </p>
+
+            {errorId && (
+              <div className="text-xs text-muted-foreground bg-muted/50 rounded px-2 py-1">
+                ID d'erreur : <code className="font-mono">{errorId}</code>
+              </div>
+            )}
             
             {process.env.NODE_ENV === 'development' && (
               <details className="text-left">
