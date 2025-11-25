@@ -120,7 +120,7 @@ export const ScanExporter: React.FC<ScanExporterProps> = ({ scans, onExport }) =
       expiresAt.setDate(expiresAt.getDate() + 7);
 
       // Filter scans based on current options
-      const filteredScans = filterScansByDateRange(scans, exportOptions);
+      const filteredScans = filterScansByDateRange(scans, options);
 
       // Store share link in database (if table exists)
       try {
