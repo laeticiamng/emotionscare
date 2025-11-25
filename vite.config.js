@@ -32,9 +32,17 @@ export default defineConfig(({ mode }) => ({
     target: 'esnext',
     minify: 'esbuild',
     rollupOptions: {
+      external: [
+        'mixpanel-browser',
+        'amplitude-js',
+        'posthog-js',
+        'canvg',
+        '@canvg/canvg',
+      ],
       onwarn(warning, warn) {
         if (warning.code === 'MODULE_LEVEL_DIRECTIVE') return;
         if (warning.code === 'UNUSED_EXTERNAL_IMPORT') return;
+        if (warning.code === 'UNRESOLVED_IMPORT') return;
         warn(warning);
       }
     }

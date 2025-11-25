@@ -338,4 +338,7 @@ export const useMusicCompat = () => {
   };
 };
 
+// Alias for backward compatibility
+export const useMusic = useMusicCompat;
+
 export default useMusicCompat;

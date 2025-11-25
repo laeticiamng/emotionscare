@@ -201,7 +201,14 @@ export default defineConfig(({ mode }) => ({
     chunkSizeWarningLimit: 500, // 500KB warning
     // Ignorer les erreurs TypeScript des edge functions
     rollupOptions: {
-      external: (id) => id.includes('supabase/functions') || id.includes('supabase/tests'),
+      external: (id) =>
+        id.includes('supabase/functions') ||
+        id.includes('supabase/tests') ||
+        id === 'mixpanel-browser' ||
+        id === 'amplitude-js' ||
+        id === 'posthog-js' ||
+        id === 'canvg' ||
+        id === '@canvg/canvg',
       output: {
         manualChunks: {
           // Vendor chunks - Core React
