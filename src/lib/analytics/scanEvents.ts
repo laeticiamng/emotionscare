@@ -51,6 +51,16 @@ export function trackScanEvent(
   if (import.meta.env.DEV) {
     logger.debug('[Analytics]', eventName, properties, 'LIB');
   }
+
+  // Analytics platform integration
+  import('@/lib/analytics/analyticsIntegration').then(({ analytics }) => {
+    analytics.track(`scan_${eventName}`, {
+      category: 'scan',
+      ...properties,
+    });
+  }).catch(() => {
+    // Analytics module not available, continue silently
+  });
 }
 
 /**
