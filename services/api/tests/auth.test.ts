@@ -5,7 +5,7 @@ import { signJwt } from '../../lib/jwt';
 let app: any;
 let url: string;
 beforeAll(async () => {
-  process.env.JWT_SECRETS = 'test-secret';
+  // JWT_SECRETS is already set in setup.ts with 32+ characters
   process.env.HASH_PEPPER = 'pepper';
   app = createApp();
   await app.listen({ port: 0 });

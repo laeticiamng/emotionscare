@@ -7,7 +7,7 @@ let url: string;
 let token: string;
 
 beforeAll(async () => {
-  process.env.JWT_SECRETS = 'test-secret';
+  // JWT_SECRETS is already set in setup.ts with 32+ characters
   process.env.HASH_PEPPER = 'pepper';
   token = await signJwt({ sub: 'user-1', role: 'b2c', aud: 'test-suite' });
 
