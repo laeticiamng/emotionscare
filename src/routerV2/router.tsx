@@ -64,7 +64,7 @@ const AppGatePage = lazy(() => import('@/pages/AppGatePage'));
 
 // Modules fonctionnels
 const B2CScanPage = lazy(() => import('@/pages/B2CScanPage'));
-const B2CMusicEnhanced = lazy(() => import('@/pages/B2CMusicEnhanced'));
+// const B2CMusicEnhanced = lazy(() => import('@/pages/B2CMusicEnhanced')); // Removed - file deleted
 const MusicAnalyticsPage = lazy(() => import('@/pages/MusicAnalyticsPage'));
 const MusicProfilePage = lazy(() => import('@/pages/MusicProfilePage'));
 const AdvancedAnalyticsPage = lazy(() => import('@/pages/AdvancedAnalyticsPage'));
@@ -87,7 +87,7 @@ const MeditationPage = lazy(() => import('@/pages/MeditationPage'));
 // Analytics - nettoyage (pages non utilisées dans registry)
 
 // Paramètres
-const B2CSettingsPage = lazy(() => import('@/pages/B2CSettingsPage'));
+// const B2CSettingsPage = lazy(() => import('@/pages/B2CSettingsPage')); // Removed
 const B2CProfileSettingsPage = lazy(() => import('@/pages/B2CProfileSettingsPage'));
 const B2CPrivacyTogglesPage = lazy(() => import('@/pages/B2CPrivacyTogglesPage'));
 const B2CNotificationsPage = lazy(() => import('@/pages/B2CNotificationsPage'));
@@ -337,7 +337,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   
   // Modules
   B2CScanPage,
-  B2CMusicEnhanced,
+  // B2CMusicEnhanced, // Removed
   MusicAnalyticsPage,
   MusicProfilePage,
   AdvancedAnalyticsPage,
@@ -381,7 +381,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   TeamMemberSkillsPage,
   
   // Settings
-  B2CSettingsPage,
+  // B2CSettingsPage, // Removed
   B2CProfileSettingsPage,
   B2CPrivacyTogglesPage,
   B2CNotificationsPage,

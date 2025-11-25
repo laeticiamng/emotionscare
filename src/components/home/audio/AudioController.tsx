@@ -3,12 +3,12 @@ import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { useToast } from '@/hooks/use-toast';
 import { Play, Pause, Volume1, Volume2, VolumeX } from 'lucide-react';
-import { useMusic } from '@/hooks/useMusicCompat';
+import useMusicCompat from '@/hooks/useMusicCompat';
 
 const AudioController: React.FC = () => {
   const [isMuted, setIsMuted] = useState(false);
   const { toast } = useToast();
-  const { state, play, pause, setVolume: setMusicVolume } = useMusic();
+  const { state, play, pause, setVolume: setMusicVolume } = useMusicCompat();
   const { isPlaying, volume, currentTrack } = state;
 
   const togglePlayback = () => {

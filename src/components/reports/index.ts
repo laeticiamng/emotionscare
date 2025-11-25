@@ -8,4 +8,4 @@ export { default as PerformanceMetrics } from './PerformanceMetrics';
 export { default as ReportDataCards } from './ReportDataCards';
 export { default as ReportsFilters } from './ReportsFilters';
 export { default as ReportTimeline } from './ReportTimeline';
-export { default as ReportPrivacyBadge } from './ReportPrivacyBadge';
+// export { default as ReportPrivacyBadge } from './ReportPrivacyBadge'; // Removed
