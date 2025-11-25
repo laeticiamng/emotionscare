@@ -20,6 +20,7 @@ export default defineConfig({
     globals: true,
     environment: 'node',
     include: ['services/api/tests/**/*.test.ts'],
+    setupFiles: ['./services/api/tests/setup.ts'],
     maxThreads: 1,
     minThreads: 1,
     sequence: { hooks: 'list', files: 'serial' },

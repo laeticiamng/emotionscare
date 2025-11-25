@@ -382,6 +382,27 @@ export const GOALS_ENDPOINTS = {
   GET_STATS: '/goals/stats',
 } as const;
 
+/**
+ * ════════════════════════════════════════════════════════════════
+ * BREATHWORK / RESPIRATION
+ * ════════════════════════════════════════════════════════════════
+ */
+export const BREATHWORK_ENDPOINTS = {
+  // Sessions de respiration
+  CREATE_SESSION: '/breath/sessions',
+  LIST_SESSIONS: '/breath/sessions',
+  GET_SESSION: '/breath/sessions/:id',
+  UPDATE_SESSION: '/breath/sessions/:id',
+  DELETE_SESSION: '/breath/sessions/:id',
+
+  // Métriques
+  GET_WEEKLY: '/breath/weekly',
+  GET_STATS: '/breath/stats',
+
+  // Techniques disponibles
+  GET_TECHNIQUES: '/breath/techniques',
+} as const;
+
 export const WELLNESS_ENDPOINTS = {
   // Quêtes
   CREATE_QUEST: '/wellness/quests',
@@ -834,6 +855,7 @@ export const API_ENDPOINTS = {
   COACH: COACH_ENDPOINTS,
   JOURNAL: JOURNAL_ENDPOINTS,
   VR: VR_ENDPOINTS,
+  BREATHWORK: BREATHWORK_ENDPOINTS,
   COMMUNITY: COMMUNITY_ENDPOINTS,
   FRIENDS: FRIENDS_ENDPOINTS,
   MESSAGES: MESSAGES_ENDPOINTS,
