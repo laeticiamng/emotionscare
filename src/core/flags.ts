@@ -220,25 +220,149 @@ export const isFeatureEnabled = (
 };
 
 let flagsCache: FeatureFlags | null = null;
+let flagsFetchPromise: Promise<FeatureFlags> | null = null;
+
+/**
+ * Fetch feature flags from Supabase
+ */
+async function fetchFeatureFlags(userId?: string, role?: string): Promise<FeatureFlags> {
+  try {
+    const { supabase } = await import('@/integrations/supabase/client');
+
+    // Récupérer les flags globaux
+    const { data: globalFlags, error: globalError } = await supabase
+      .from('feature_flags')
+      .select('flag_name, enabled')
+      .eq('is_global', true);
+
+    if (globalError) {
+      logger.warn('Failed to fetch global feature flags', globalError, 'SYSTEM');
+      return DEFAULT_FLAGS;
+    }
+
+    // Construire les flags depuis la base de données
+    const dbFlags: Partial<FeatureFlags> = {};
+    if (globalFlags) {
+      globalFlags.forEach((flag: { flag_name: string; enabled: boolean }) => {
+        dbFlags[flag.flag_name as FeatureFlagKey] = flag.enabled;
+      });
+    }
+
+    // Si on a un utilisateur, récupérer ses flags personnalisés
+    if (userId) {
+      const { data: userFlags, error: userError } = await supabase
+        .from('user_feature_flags')
+        .select('flag_name, enabled')
+        .eq('user_id', userId);
+
+      if (!userError && userFlags) {
+        userFlags.forEach((flag: { flag_name: string; enabled: boolean }) => {
+          dbFlags[flag.flag_name as FeatureFlagKey] = flag.enabled;
+        });
+      }
+    }
+
+    // Appliquer les flags de rôle
+    const roleFlags = role ? ROLE_FEATURE_FLAGS[role] || {} : {};
+
+    // Fusionner: DEFAULT < DB < ROLE < USER
+    return {
+      ...DEFAULT_FLAGS,
+      ...dbFlags,
+      ...roleFlags,
+    };
+  } catch (error) {
+    logger.warn('Feature flags fetch failed, using defaults', error, 'SYSTEM');
+    return DEFAULT_FLAGS;
+  }
+}
 
 export function useFlags() {
   const [flags, setFlags] = useState<FeatureFlags>(flagsCache || DEFAULT_FLAGS);
+  const [isLoading, setIsLoading] = useState(!flagsCache);
 
   useEffect(() => {
-    // Feature flags API disabled - using DEFAULT_FLAGS only
-    // TODO: Implement feature flags backend if dynamic flags are needed
-    if (!flagsCache) {
-      flagsCache = DEFAULT_FLAGS;
-      logger.debug('Using default feature flags', { flagsCount: Object.keys(DEFAULT_FLAGS).length }, 'SYSTEM');
-    }
+    const loadFlags = async () => {
+      // Si déjà en cache, ne pas recharger
+      if (flagsCache) {
+        setFlags(flagsCache);
+        setIsLoading(false);
+        return;
+      }
+
+      // Si une requête est déjà en cours, attendre
+      if (flagsFetchPromise) {
+        const result = await flagsFetchPromise;
+        setFlags(result);
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        // Tenter de récupérer l'utilisateur courant
+        const { supabase } = await import('@/integrations/supabase/client');
+        const { data: { user } } = await supabase.auth.getUser();
+
+        // Récupérer le rôle depuis le profil si disponible
+        let userRole: string | undefined;
+        if (user) {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', user.id)
+            .maybeSingle();
+          userRole = profile?.role;
+        }
+
+        // Lancer la récupération des flags
+        flagsFetchPromise = fetchFeatureFlags(user?.id, userRole);
+        const result = await flagsFetchPromise;
+
+        flagsCache = result;
+        setFlags(result);
+        logger.debug('Feature flags loaded', { flagsCount: Object.keys(result).length }, 'SYSTEM');
+      } catch (error) {
+        logger.warn('Failed to load feature flags, using defaults', error, 'SYSTEM');
+        flagsCache = DEFAULT_FLAGS;
+        setFlags(DEFAULT_FLAGS);
+      } finally {
+        flagsFetchPromise = null;
+        setIsLoading(false);
+      }
+    };
+
+    loadFlags();
   }, []);
 
   return {
     flags,
+    isLoading,
     has: (flagName: string) => flags[flagName as FeatureFlagKey] === true,
     refresh: async () => {
+      setIsLoading(true);
       flagsCache = null;
-      setFlags(DEFAULT_FLAGS);
+      flagsFetchPromise = null;
+      try {
+        const { supabase } = await import('@/integrations/supabase/client');
+        const { data: { user } } = await supabase.auth.getUser();
+        let userRole: string | undefined;
+        if (user) {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', user.id)
+            .maybeSingle();
+          userRole = profile?.role;
+        }
+        const newFlags = await fetchFeatureFlags(user?.id, userRole);
+        flagsCache = newFlags;
+        setFlags(newFlags);
+      } catch (error) {
+        logger.warn('Failed to refresh feature flags', error, 'SYSTEM');
+        setFlags(DEFAULT_FLAGS);
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 }
