@@ -1,8 +1,7 @@
 // @ts-nocheck
 
 import React from 'react';
-import { Line } from 'recharts';
-import { LineChart, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { Line, LineChart, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { EmotionResult } from '@/types/emotion';
 
 interface EmotionTrendChartProps {

@@ -17,7 +17,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
-import { TrendingUp, Video, Mic, FileText, TrendingUp as TotalIcon } from 'lucide-react';
+import { TrendingUp, Video, Mic, FileText } from 'lucide-react';
 
 ChartJS.register(
   CategoryScale,
@@ -322,7 +322,7 @@ export const MultiSourceChart: React.FC = () => {
             onClick={() => toggleSource('total')}
             style={visibleSources.total ? { backgroundColor: 'hsl(47, 96%, 53%)', borderColor: 'hsl(47, 96%, 53%)', color: 'hsl(222, 84%, 5%)' } : {}}
           >
-            <TotalIcon className="h-3.5 w-3.5" />
+            <TrendingUp className="h-3.5 w-3.5" />
             Total
           </Badge>
         </div>
