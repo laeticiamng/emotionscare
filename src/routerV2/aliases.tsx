@@ -34,6 +34,7 @@ export const ROUTE_ALIASES = {
   // ═══════════════════════════════════════════════════════════
   // DASHBOARDS
   // ═══════════════════════════════════════════════════════════
+  '/app/consumer/home': '/app/home',
   '/b2c/dashboard': '/app/home',
   '/dashboard': '/app/home',
   '/home': '/app/home',

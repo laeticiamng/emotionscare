@@ -19,7 +19,7 @@ export const parkAttractions: Attraction[] = [
     subtitle: 'Dashboard principal',
     description: 'Centre de contrôle de ton voyage émotionnel avec vue d\'ensemble personnalisée.',
     icon: Home,
-    route: '/app/consumer/home',
+    route: '/app/home',
     gradient: 'from-violet-500/20 to-indigo-500/20',
     collection: 'Tableau de bord personnalisé',
     zone: 'hub'

@@ -1,10 +1,11 @@
+import tsconfigPaths from 'vite-tsconfig-paths';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
 import { componentTagger } from "lovable-tagger";
 
 export default defineConfig(({ mode }) => ({
-  plugins: [
+  plugins: [tsconfigPaths(), 
     react({
       jsxRuntime: 'automatic',
       typescript: false, // Disable TS type checking in Vite - use esbuild only for transformation
