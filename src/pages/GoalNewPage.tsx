@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ArrowLeft, Target } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useGoals } from '@/hooks/useGoals';
 
 interface GoalFormData {
   title: string;
@@ -19,20 +20,43 @@ interface GoalFormData {
 export default function GoalNewPage() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { createGoal } = useGoals();
   const [formData, setFormData] = useState<GoalFormData>({
     title: '',
     description: '',
     category: '',
     deadline: '',
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast({
-      title: 'Objectif créé !',
-      description: 'Votre nouvel objectif a été ajouté avec succès.',
+    if (isSubmitting) return;
+
+    setIsSubmitting(true);
+
+    const createdGoal = await createGoal({
+      title: formData.title,
+      description: formData.description,
+      category: formData.category,
+      target_date: formData.deadline,
     });
-    navigate('/app/goals');
+
+    if (createdGoal) {
+      toast({
+        title: 'Objectif créé !',
+        description: 'Votre nouvel objectif a été ajouté avec succès.',
+      });
+      navigate(`/app/goals/${createdGoal.id}`);
+    } else {
+      toast({
+        title: 'Création impossible',
+        description: 'Merci de vérifier vos informations et de réessayer.',
+        variant: 'destructive',
+      });
+    }
+
+    setIsSubmitting(false);
   };
 
   return (
@@ -111,8 +135,8 @@ export default function GoalNewPage() {
               </div>
 
               <div className="flex gap-4">
-                <Button type="submit" className="flex-1">
-                  Créer l'Objectif
+                <Button type="submit" className="flex-1" disabled={isSubmitting}>
+                  {isSubmitting ? 'Création...' : "Créer l'Objectif"}
                 </Button>
                 <Button type="button" variant="outline" onClick={() => navigate('/app/goals')} className="flex-1">
                   Annuler

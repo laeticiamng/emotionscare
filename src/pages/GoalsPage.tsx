@@ -126,7 +126,7 @@ export default function GoalsPage() {
                           </p>
                         )}
                         <p className="text-sm text-muted-foreground mt-1">
-                          Échéance: {new Date(goal.deadline).toLocaleDateString('fr-FR')}
+                          Échéance: {goal.deadline ? new Date(goal.deadline).toLocaleDateString('fr-FR') : 'Non définie'}
                         </p>
                       </div>
                       <Badge variant="secondary">{goal.category}</Badge>
