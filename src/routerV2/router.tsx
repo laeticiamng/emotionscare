@@ -574,6 +574,91 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   SystemHealthPage,
   AdminSystemHealthPage,
   K6AnalyticsDashboard,
+
+  // ═══════════════════════════════════════════════════════════
+  // ALIASES FOR REGISTRY COMPATIBILITY
+  // Registry uses "Page" suffix that may differ from lazy import names
+  // ═══════════════════════════════════════════════════════════
+
+  // Dashboard aliases
+  B2BCollabDashboardPage: B2BCollabDashboard,
+  B2BRHDashboardPage: B2BRHDashboard,
+  ModulesDashboardPage: ModulesDashboard,
+
+  // Page suffix aliases
+  PricingPageWorkingPage: PricingPageWorking,
+  ParcoursXLPage: ParcoursXL,
+  CronMonitoringPage: CronMonitoring,
+  BlockchainBackupsPage: BlockchainBackups,
+
+  // Admin pages aliases
+  UnifiedGDPRDashboardPage: UnifiedGDPRDashboard,
+  APIMonitoringDashboardPage: APIMonitoringDashboard,
+  AIMonitoringDashboardPage: AIMonitoringDashboard,
+  AlertConfigurationPagePage: AlertConfigurationPage,
+  AlertAnalyticsDashboardPage: AlertAnalyticsDashboard,
+  AlertTemplatePlaygroundPage: AlertTemplatePlayground,
+  AlertEscalationConfigPage: AlertEscalationConfig,
+  AITemplateSuggestionsPage: AITemplateSuggestions,
+  EscalationMonitoringDashboardPage: EscalationMonitoringDashboard,
+  TicketIntegrationConfigPage: TicketIntegrationConfig,
+  ABTestManagerPage: ABTestManager,
+  NotificationWebhooksConfigPage: NotificationWebhooksConfig,
+  SystemHealthDashboardPage: SystemHealthDashboard,
+  ExecutiveDashboardPage: ExecutiveDashboard,
+  UnifiedAdminDashboardPage: UnifiedAdminDashboard,
+  GamificationCronMonitoringPage: GamificationCronMonitoring,
+  // MusicQueueMetricsPage already defined above
+  MusicAnalyticsDashboardPage: MusicAnalyticsDashboard,
+  MonitoringDashboardPage: MonitoringDashboard,
+
+  // Challenges aliases
+  ChallengesHistoryPage: ChallengesHistory,
+  CreateCustomChallengePage: CreateCustomChallenge,
+  EditCustomChallengePage: EditCustomChallenge,
+  ChallengesDashboardPage: ChallengesDashboard,
+
+  // Settings alias - map to profile settings since B2CSettingsPage was removed
+  B2CSettingsPage: B2CProfileSettingsPage,
+
+  // Music alias - B2CMusicEnhanced was removed, redirect to MusicAnalyticsPage
+  B2CMusicEnhancedPage: MusicAnalyticsPage,
+
+  // Redirect page aliases
+  RedirectToEntreprisePage: RedirectToEntreprise,
+  RedirectToScanPage: RedirectToScan,
+  RedirectToJournalPage: RedirectToJournal,
+
+  // Park pages aliases
+  EmotionalParkPage: EmotionalPark,
+  ParkJourneyPage: ParkJourney,
+
+  // System health alias
+  K6AnalyticsDashboardPage: K6AnalyticsDashboard,
+
+  // Scan pages - FacialScanPage doesn't exist, use B2CScanPage
+  FacialScanPage: B2CScanPage,
+  EmojiScanPage: B2CScanPage,
+
+  // Journal sub-pages - map to main journal
+  JournalActivityPage: B2CJournalPage,
+  JournalAnalyticsPage: B2CJournalPage,
+  JournalArchivePage: B2CJournalPage,
+  JournalFavoritesPage: B2CJournalPage,
+  JournalGoalsPage: B2CJournalPage,
+  JournalNotesPage: B2CJournalPage,
+  JournalSearchPage: B2CJournalPage,
+
+  // Missing admin pages - stub to existing pages
+  RecommendationEngineAdminPage: UnifiedAdminDashboard,
+  SupportChatbotPage: SupportPage,
+  PublicAPIPage: HelpPage,
+  B2BAnalyticsPage: B2BReportsPage,
+  B2BUserCoachPage: B2CAICoachPage,
+  UnifiedDashboardPage: B2CDashboardPage,
+  UnifiedHomePage: HomePage,
+  B2CImmersivePage: B2CVRGalaxyPage,
+  ActivityLogsPage: AnalyticsPage,
 };
 
 // ═══════════════════════════════════════════════════════════
