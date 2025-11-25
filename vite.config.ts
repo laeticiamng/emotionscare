@@ -201,7 +201,18 @@ export default defineConfig(({ mode }) => ({
     chunkSizeWarningLimit: 500, // 500KB warning
     // Ignorer les erreurs TypeScript des edge functions
     rollupOptions: {
-      external: (id) => id.includes('supabase/functions') || id.includes('supabase/tests'),
+      external: (id) => {
+        // Exclude supabase functions/tests
+        if (id.includes('supabase/functions') || id.includes('supabase/tests')) return true;
+        // Exclude optional dependencies (not installed, loaded dynamically if available)
+        const optionalDeps = [
+          'mixpanel-browser',
+          '@amplitude/analytics-browser',
+          'posthog-js',
+          'canvg',  // optional jspdf peer dep for SVG support
+        ];
+        return optionalDeps.some(pkg => id === pkg || id.startsWith(pkg + '/'));
+      },
       output: {
         manualChunks: {
           // Vendor chunks - Core React

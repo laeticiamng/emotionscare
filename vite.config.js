@@ -32,6 +32,18 @@ export default defineConfig(({ mode }) => ({
     target: 'esnext',
     minify: 'esbuild',
     rollupOptions: {
+      external: (id) => {
+        // Exclude supabase functions/tests
+        if (id.includes('supabase/functions') || id.includes('supabase/tests')) return true;
+        // Exclude optional dependencies (not installed, loaded dynamically if available)
+        const optionalDeps = [
+          'mixpanel-browser',
+          '@amplitude/analytics-browser',
+          'posthog-js',
+          'canvg',  // optional jspdf peer dep for SVG support
+        ];
+        return optionalDeps.some(pkg => id === pkg || id.startsWith(pkg + '/'));
+      },
       onwarn(warning, warn) {
         if (warning.code === 'MODULE_LEVEL_DIRECTIVE') return;
         if (warning.code === 'UNUSED_EXTERNAL_IMPORT') return;
