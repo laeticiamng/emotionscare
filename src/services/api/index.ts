@@ -7,8 +7,8 @@ export * from '@/types/api';
 export * from './endpoints';
 
 // Services API Backend
-export { scansApi } from './scansApi';
-export type { ScanCreatePayload, ScanRecord, ScanListFilters, ScanStats } from './scansApi';
+export { scansApi, emotionsApi } from './scansApi';
+export type { ScanCreatePayload, ScanRecord, ScanListFilters, ScanStats, EmotionCheckinPayload, EmotionRecord } from './scansApi';
 
 export { goalsApi } from './goalsApi';
 export type { GoalCreatePayload, GoalUpdatePayload, GoalRecord, GoalStats } from './goalsApi';

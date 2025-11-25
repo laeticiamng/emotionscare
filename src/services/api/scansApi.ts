@@ -242,4 +242,121 @@ export const scansApi = {
   },
 };
 
-export type { ScanCreatePayload, ScanRecord, ScanListFilters, ScanStats };
+// =====================================================
+// Emotions Table API (legacy table support)
+// =====================================================
+
+interface EmotionCheckinPayload {
+  emojis?: string;
+  primary_emotion?: string;
+  score?: number;
+  intensity?: number;
+  text?: string;
+  source?: string;
+  ai_feedback?: string;
+}
+
+interface EmotionRecord {
+  id: string;
+  user_id: string;
+  emojis?: string;
+  primary_emotion?: string;
+  score?: number;
+  intensity?: number;
+  text?: string;
+  source?: string;
+  ai_feedback?: string;
+  date: string;
+  created_at?: string;
+}
+
+export const emotionsApi = {
+  /**
+   * Quick emotion check-in
+   */
+  async checkin(payload: EmotionCheckinPayload): Promise<EmotionRecord> {
+    if (!API_BASE) {
+      throw new Error('API_URL non configurée');
+    }
+
+    const headers = await getAuthHeaders();
+    const response = await fetchWithRetry(`${API_BASE}/api/v1/emotions/checkin`, {
+      method: 'POST',
+      headers,
+      json: payload,
+      timeoutMs: 10000,
+      retries: 2,
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({}));
+      logger.error('Failed to create emotion checkin', { status: response.status, error }, 'emotionsApi');
+      throw new Error(error?.error?.message || `Failed to create checkin: ${response.status}`);
+    }
+
+    const result: ApiResponse<EmotionRecord> = await response.json();
+    if (!result.ok || !result.data) {
+      throw new Error(result.error?.message || 'Failed to create checkin');
+    }
+
+    return result.data;
+  },
+
+  /**
+   * Get recent emotion entries
+   */
+  async getRecent(limit: number = 7): Promise<EmotionRecord[]> {
+    if (!API_BASE) {
+      throw new Error('API_URL non configurée');
+    }
+
+    const headers = await getAuthHeaders();
+    const response = await fetchWithRetry(`${API_BASE}/api/v1/emotions/recent?limit=${limit}`, {
+      method: 'GET',
+      headers,
+      timeoutMs: 10000,
+      retries: 2,
+    });
+
+    if (!response.ok) {
+      logger.error('Failed to get recent emotions', { status: response.status }, 'emotionsApi');
+      throw new Error(`Failed to get recent emotions: ${response.status}`);
+    }
+
+    const result: ApiResponse<EmotionRecord[]> = await response.json();
+    return result.data ?? [];
+  },
+
+  /**
+   * Create full emotion record (for scanners)
+   */
+  async create(payload: EmotionCheckinPayload): Promise<EmotionRecord> {
+    if (!API_BASE) {
+      throw new Error('API_URL non configurée');
+    }
+
+    const headers = await getAuthHeaders();
+    const response = await fetchWithRetry(`${API_BASE}/api/v1/emotions`, {
+      method: 'POST',
+      headers,
+      json: payload,
+      timeoutMs: 10000,
+      retries: 2,
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({}));
+      logger.error('Failed to create emotion record', { status: response.status, error }, 'emotionsApi');
+      throw new Error(error?.error?.message || `Failed to create emotion: ${response.status}`);
+    }
+
+    const result: ApiResponse<EmotionRecord> = await response.json();
+    if (!result.ok || !result.data) {
+      throw new Error(result.error?.message || 'Failed to create emotion');
+    }
+
+    return result.data;
+  },
+};
+
+export type { ScanCreatePayload, ScanRecord, ScanListFilters, ScanStats, EmotionCheckinPayload, EmotionRecord };

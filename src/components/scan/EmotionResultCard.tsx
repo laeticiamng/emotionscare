@@ -8,8 +8,9 @@ import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { Check, Download, Music, Play, Share2, User } from 'lucide-react';
 import { toast } from 'sonner';
-import { supabase } from '@/integrations/supabase/client';
+import { emotionsApi } from '@/services/api/scansApi';
 import { useAuth } from '@/contexts/AuthContext';
+import { logger } from '@/lib/logger';
 
 interface EmotionResultCardProps {
   result: EmotionResult;
@@ -58,15 +59,20 @@ const EmotionResultCard: React.FC<EmotionResultCardProps> = ({
     }
 
     try {
-      const saveResult = { ...result, user_id: user.id };
-      const { error } = await supabase.from('emotions').insert(saveResult);
+      await emotionsApi.create({
+        emojis: result.emojis,
+        primary_emotion: result.primary_emotion || result.emotion,
+        score: result.score,
+        intensity: result.intensity,
+        text: result.text,
+        source: result.source || 'result_card',
+        ai_feedback: result.ai_feedback,
+      });
 
-      if (error) throw error;
-      
       toast.success('Résultat sauvegardé avec succès');
       if (onSave) onSave();
     } catch (error) {
-      // Save emotion result error
+      logger.error('Failed to save emotion result', error as Error, 'UI');
       toast.error('Erreur lors de la sauvegarde du résultat');
     }
   };

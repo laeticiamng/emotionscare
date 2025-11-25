@@ -4,14 +4,15 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { 
-  Camera, Mic, MicOff, Video, VideoOff, 
+import {
+  Camera, Mic, MicOff, Video, VideoOff,
   Brain, Heart, Smile, Frown, Meh,
   Play, Square, RotateCcw, Sparkles,
   Loader2, CheckCircle, AlertCircle
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { emotionsApi } from '@/services/api/scansApi';
 import { useAuth } from '@/contexts/AuthContext';
 import type { EmotionResult } from '@/types/emotion';
 
@@ -124,9 +125,8 @@ const EmotionScannerPremium: React.FC<EmotionScannerPremiumProps> = ({
         insight: scanResult.insight,
       };
 
-      // Store in database
-      await supabase.from('emotions').insert({
-        user_id: user.id,
+      // Store in database via API
+      await emotionsApi.create({
         primary_emotion: emotionResult.emotion,
         intensity: emotionResult.intensity,
         score: Math.round(emotionResult.confidence * 100),
