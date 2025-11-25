@@ -56,6 +56,14 @@ interface VRExperience {
   thumbnail_url?: string;
 }
 
+interface VREnvironment {
+  id: string;
+  name: string;
+  description: string;
+  environment_config: Record<string, unknown>;
+  created_at: string;
+}
+
 interface VRStats {
   total_sessions: number;
   completed_sessions: number;
@@ -315,6 +323,31 @@ export const vrSessionsApi = {
     const result: ApiResponse<VRExperience[]> = await response.json();
     return result.data ?? [];
   },
+
+  /**
+   * Obtenir les environnements VR générés
+   */
+  async getEnvironments(): Promise<VREnvironment[]> {
+    if (!API_BASE) {
+      throw new Error('API_URL non configurée');
+    }
+
+    const headers = await getAuthHeaders();
+    const response = await fetchWithRetry(`${API_BASE}/api/v1/vr/environments`, {
+      method: 'GET',
+      headers,
+      timeoutMs: 10000,
+      retries: 2,
+    });
+
+    if (!response.ok) {
+      logger.error('Failed to get VR environments', { status: response.status }, 'vrSessionsApi');
+      throw new Error(`Failed to get environments: ${response.status}`);
+    }
+
+    const result: ApiResponse<VREnvironment[]> = await response.json();
+    return result.data ?? [];
+  },
 };
 
 export type {
@@ -322,5 +355,6 @@ export type {
   VRSessionUpdatePayload,
   VRSessionRecord,
   VRExperience,
+  VREnvironment,
   VRStats
 };

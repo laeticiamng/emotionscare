@@ -29,6 +29,7 @@ export type {
   VRSessionUpdatePayload,
   VRSessionRecord,
   VRExperience,
+  VREnvironment,
   VRStats
 } from './vrSessionsApi';
 
@@ -49,5 +50,6 @@ export type {
   BreathworkSessionRecord,
   BreathworkTechnique,
   BreathworkStats,
-  BreathworkWeeklyMetrics
+  BreathworkWeeklyMetrics,
+  BreathworkFeedbackPayload
 } from './breathworkApi';

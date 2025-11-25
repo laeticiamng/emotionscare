@@ -411,4 +411,62 @@ export function registerBreathworkRoutes(app: FastifyInstance, options: Breathwo
 
     reply.send({ ok: true, data: techniques });
   });
+
+  // POST /api/v1/breath/feedback - Soumettre un feedback de session
+  const feedbackSchema = z.object({
+    session_id: z.string().uuid().optional(),
+    rating: z.number().int().min(1).max(5),
+    felt_calm: z.boolean().optional(),
+    felt_focused: z.boolean().optional(),
+    felt_relaxed: z.boolean().optional(),
+    notes: z.string().max(1000).optional().nullable(),
+  });
+
+  type FeedbackRequest = FastifyRequest<{
+    Body: z.infer<typeof feedbackSchema>;
+  }>;
+
+  app.post('/api/v1/breath/feedback', async (req: FeedbackRequest, reply: FastifyReply) => {
+    const user = ensureUser(req, reply);
+    if (!user) return;
+
+    try {
+      const data = feedbackSchema.parse(req.body);
+      const supabase = getSupabaseClient();
+
+      const { error } = await supabase
+        .from('breath_session_feedback')
+        .insert({
+          user_id: user.sub,
+          session_id: data.session_id || null,
+          rating: data.rating,
+          felt_calm: data.felt_calm,
+          felt_focused: data.felt_focused,
+          felt_relaxed: data.felt_relaxed,
+          notes: data.notes,
+        });
+
+      if (error) throw error;
+
+      reply.code(201).send({ ok: true });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        reply.code(422).send({
+          ok: false,
+          error: {
+            code: 'validation_error',
+            message: 'Invalid input',
+            details: error.flatten(),
+          },
+        });
+        return;
+      }
+
+      app.log.error({ error }, 'Unexpected error submitting breath feedback');
+      reply.code(500).send({
+        ok: false,
+        error: { code: 'internal_error', message: 'Internal server error' },
+      });
+    }
+  });
 }

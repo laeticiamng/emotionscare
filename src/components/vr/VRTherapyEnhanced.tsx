@@ -5,18 +5,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Slider } from '@/components/ui/slider';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
+import { vrSessionsApi, type VREnvironment as VREnvType } from '@/services/api/vrSessionsApi';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Play, Square, Eye, Sparkles, Activity, Clock, TrendingUp } from 'lucide-react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Sky, Environment } from '@react-three/drei';
 import { logger } from '@/lib/logger';
 
-interface VREnvironment {
-  id: string;
-  name: string;
-  description: string;
-  environment_config: any;
-  created_at: string;
+interface VREnvironment extends VREnvType {
+  environment_config: Record<string, unknown>;
 }
 
 interface VRSession {
@@ -47,16 +44,15 @@ const VRTherapyEnhanced: React.FC = () => {
 
   const loadData = async () => {
     try {
-      // Charger les environnements
-      const { data: envData } = await supabase
-        .from('vr_environments')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(10);
+      // Charger les environnements via API
+      try {
+        const envData = await vrSessionsApi.getEnvironments();
+        if (envData) setEnvironments(envData as VREnvironment[]);
+      } catch (envError) {
+        logger.warn('Could not load environments from API, skipping', {}, 'VR');
+      }
 
-      if (envData) setEnvironments(envData);
-
-      // Charger les sessions
+      // Charger les sessions via edge function
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
@@ -66,13 +62,13 @@ const VRTherapyEnhanced: React.FC = () => {
 
       if (sessionData?.sessions) {
         setSessions(sessionData.sessions);
-        
+
         // Calculer les stats
-        const completed = sessionData.sessions.filter((s: any) => s.status === 'completed').length;
+        const completed = sessionData.sessions.filter((s: VRSession) => s.status === 'completed').length;
         setStats({
           total: sessionData.sessions.length,
           completed,
-          avgDuration: completed > 0 ? Math.round(sessionData.sessions.reduce((acc: number, s: any) => 
+          avgDuration: completed > 0 ? Math.round(sessionData.sessions.reduce((acc: number, s: VRSession) =>
             s.completed_at ? acc + (new Date(s.completed_at).getTime() - new Date(s.created_at).getTime()) / 60000 : acc, 0) / completed) : 0
         });
       }

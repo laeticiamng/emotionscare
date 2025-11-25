@@ -73,6 +73,7 @@ export interface VRRepository {
   deleteSession: (id: string, userId: string) => Promise<void>;
   getStats: (userId: string) => Promise<SessionRecord>;
   getExperiences: () => Promise<SessionRecord[]>;
+  getEnvironments: () => Promise<SessionRecord[]>;
 }
 
 const createVRRepository = (): VRRepository => {
@@ -248,6 +249,17 @@ const createVRRepository = (): VRRepository => {
           features: ['breathwork', 'biofeedback', 'guided'],
         },
       ];
+    },
+
+    async getEnvironments() {
+      const { data, error } = await supabase
+        .from('vr_environments')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(20);
+
+      if (error) throw error;
+      return data ?? [];
     },
   };
 };
@@ -430,6 +442,20 @@ export function registerVRRoutes(app: FastifyInstance, options: VRRoutesOptions 
       reply.send({ ok: true, data: experiences });
     } catch (error) {
       app.log.error({ error }, 'Unexpected error fetching VR experiences');
+      reply.code(500).send({
+        ok: false,
+        error: { code: 'internal_error', message: 'Internal server error' },
+      });
+    }
+  });
+
+  // GET /api/v1/vr/environments - Liste des environnements VR générés
+  app.get('/api/v1/vr/environments', async (_req: FastifyRequest, reply: FastifyReply) => {
+    try {
+      const environments = await repository.getEnvironments();
+      reply.send({ ok: true, data: environments });
+    } catch (error) {
+      app.log.error({ error }, 'Unexpected error fetching VR environments');
       reply.code(500).send({
         ok: false,
         error: { code: 'internal_error', message: 'Internal server error' },

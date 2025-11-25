@@ -6,12 +6,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
+import { coachSessionsApi, type CoachAnalytics } from '@/services/api/coachSessionsApi';
 import { useToast } from '@/hooks/use-toast';
-import { 
-  Send, 
-  Sparkles, 
-  Heart, 
-  Brain, 
+import {
+  Send,
+  Sparkles,
+  Heart,
+  Brain,
   TrendingUp,
   MessageCircle,
   Loader2,
@@ -93,27 +94,24 @@ const AICoachEnhanced: React.FC = () => {
 
   const loadStats = async () => {
     try {
-      const { data, error } = await supabase
-        .from('ai_coach_sessions')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(10);
+      // Try to load analytics from API
+      const analytics = await coachSessionsApi.getAnalytics();
 
-      if (error) throw error;
-
-      if (data && data.length > 0) {
-        const totalSessions = data.length;
-        const totalMessages = data.reduce((sum, s) => sum + (s.messages_count || 0), 0);
-        
-        setStats({
-          totalSessions,
-          totalMessages,
-          favoriteTopics: ['Gestion du stress', 'Anxiété', 'Motivation'],
-          emotionalProgress: 75
-        });
-      }
+      setStats({
+        totalSessions: analytics.total_sessions,
+        totalMessages: analytics.total_messages,
+        favoriteTopics: ['Gestion du stress', 'Anxiété', 'Motivation'],
+        emotionalProgress: analytics.average_satisfaction ? analytics.average_satisfaction * 20 : 75
+      });
     } catch (error) {
-      logger.error('Error loading stats', error as Error, 'UI');
+      // Fallback to default stats if API fails
+      logger.warn('Could not load coach analytics from API', {}, 'UI');
+      setStats({
+        totalSessions: 0,
+        totalMessages: 0,
+        favoriteTopics: ['Gestion du stress', 'Anxiété', 'Motivation'],
+        emotionalProgress: 0
+      });
     }
   };
 

@@ -92,7 +92,40 @@ async function getAuthHeaders(): Promise<Record<string, string>> {
   return headers;
 }
 
+interface BreathworkFeedbackPayload {
+  session_id?: string;
+  rating: 1 | 2 | 3 | 4 | 5;
+  felt_calm?: boolean;
+  felt_focused?: boolean;
+  felt_relaxed?: boolean;
+  notes?: string;
+}
+
 export const breathworkApi = {
+  /**
+   * Soumettre le feedback d'une session de respiration
+   */
+  async submitFeedback(payload: BreathworkFeedbackPayload): Promise<void> {
+    if (!API_BASE) {
+      throw new Error('API_URL non configurée');
+    }
+
+    const headers = await getAuthHeaders();
+    const response = await fetchWithRetry(`${API_BASE}/api/v1/breath/feedback`, {
+      method: 'POST',
+      headers,
+      json: payload,
+      timeoutMs: 10000,
+      retries: 2,
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({}));
+      logger.error('Failed to submit breathwork feedback', { status: response.status, error }, 'breathworkApi');
+      throw new Error(error?.error?.message || `Failed to submit feedback: ${response.status}`);
+    }
+  },
+
   /**
    * Créer une nouvelle session de respiration
    */
@@ -323,5 +356,6 @@ export type {
   BreathworkSessionRecord,
   BreathworkTechnique,
   BreathworkStats,
-  BreathworkWeeklyMetrics
+  BreathworkWeeklyMetrics,
+  BreathworkFeedbackPayload
 };
