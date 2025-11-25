@@ -68,13 +68,16 @@ const createScanRepository = (): ScanRepository => {
 
   return {
     async createScan(userId, payload) {
+      // Map to existing + new columns for compatibility
       const { data, error } = await supabase
         .from('emotion_scans')
         .insert({
           user_id: userId,
           emotions: payload.emotions,
           dominant_emotion: payload.dominant_emotion,
-          confidence_score: payload.confidence_score,
+          mood: payload.dominant_emotion, // existing column
+          confidence: payload.confidence_score, // existing column
+          confidence_score: payload.confidence_score, // new column
           scan_type: payload.scan_type,
           context: payload.context || {},
           notes: payload.notes,
@@ -150,13 +153,18 @@ const createScanRepository = (): ScanRepository => {
       const threshold = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
       const { data, error } = await supabase
         .from('emotion_scans')
-        .select('dominant_emotion, created_at, confidence_score')
+        .select('dominant_emotion, mood, created_at, confidence_score, confidence')
         .eq('user_id', userId)
         .gte('created_at', threshold.toISOString())
         .order('created_at', { ascending: true });
 
       if (error) throw error;
-      return data ?? [];
+      // Map to consistent format
+      return (data ?? []).map((scan: any) => ({
+        dominant_emotion: scan.dominant_emotion || scan.mood,
+        created_at: scan.created_at,
+        confidence_score: scan.confidence_score ?? scan.confidence,
+      }));
     },
   };
 };
@@ -367,6 +375,156 @@ export function registerScanRoutes(app: FastifyInstance, options: ScanRoutesOpti
       reply.send({ ok: true, data: scans });
     } catch (error) {
       app.log.error({ error }, 'Unexpected error fetching scan trends');
+      reply.code(500).send({
+        ok: false,
+        error: { code: 'internal_error', message: 'Internal server error' },
+      });
+    }
+  });
+
+  // =====================================================
+  // Emotions Table Endpoints (legacy table support)
+  // =====================================================
+
+  const emotionCheckinSchema = z.object({
+    emojis: z.string().optional(),
+    primary_emotion: z.string().optional(),
+    score: z.number().min(1).max(10).optional(),
+    intensity: z.number().min(1).max(10).optional(),
+    text: z.string().max(500).optional(),
+    source: z.string().optional(),
+    ai_feedback: z.string().optional(),
+  });
+
+  type EmotionCheckinRequest = FastifyRequest<{
+    Body: z.infer<typeof emotionCheckinSchema>;
+  }>;
+
+  type EmotionListRequest = FastifyRequest<{
+    Querystring: {
+      limit?: string;
+    };
+  }>;
+
+  // POST /api/v1/emotions/checkin - Quick emotion check-in
+  app.post('/api/v1/emotions/checkin', async (req: EmotionCheckinRequest, reply: FastifyReply) => {
+    const user = ensureUser(req, reply);
+    if (!user) return;
+
+    try {
+      const data = emotionCheckinSchema.parse(req.body);
+      const supabase = getSupabaseClient();
+
+      const { data: result, error } = await supabase
+        .from('emotions')
+        .insert({
+          user_id: user.sub,
+          emojis: data.emojis || data.primary_emotion,
+          primary_emotion: data.primary_emotion,
+          score: data.score || data.intensity,
+          intensity: data.intensity || data.score,
+          text: data.text,
+          source: data.source || 'checkin',
+          ai_feedback: data.ai_feedback,
+          date: new Date().toISOString(),
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      reply.code(201).send({ ok: true, data: result });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        reply.code(422).send({
+          ok: false,
+          error: {
+            code: 'validation_error',
+            message: 'Invalid input',
+            details: error.flatten(),
+          },
+        });
+        return;
+      }
+
+      app.log.error({ error }, 'Unexpected error creating emotion checkin');
+      reply.code(500).send({
+        ok: false,
+        error: { code: 'internal_error', message: 'Internal server error' },
+      });
+    }
+  });
+
+  // GET /api/v1/emotions/recent - Get recent emotion entries
+  app.get('/api/v1/emotions/recent', async (req: EmotionListRequest, reply: FastifyReply) => {
+    const user = ensureUser(req, reply);
+    if (!user) return;
+
+    try {
+      const limit = parseLimit(req.query.limit);
+      const supabase = getSupabaseClient();
+
+      const { data, error } = await supabase
+        .from('emotions')
+        .select('*')
+        .eq('user_id', user.sub)
+        .order('date', { ascending: false })
+        .limit(limit);
+
+      if (error) throw error;
+
+      reply.send({ ok: true, data: data ?? [] });
+    } catch (error) {
+      app.log.error({ error }, 'Unexpected error fetching recent emotions');
+      reply.code(500).send({
+        ok: false,
+        error: { code: 'internal_error', message: 'Internal server error' },
+      });
+    }
+  });
+
+  // POST /api/v1/emotions - Create full emotion record (for scanners)
+  app.post('/api/v1/emotions', async (req: EmotionCheckinRequest, reply: FastifyReply) => {
+    const user = ensureUser(req, reply);
+    if (!user) return;
+
+    try {
+      const data = emotionCheckinSchema.parse(req.body);
+      const supabase = getSupabaseClient();
+
+      const { data: result, error } = await supabase
+        .from('emotions')
+        .insert({
+          user_id: user.sub,
+          emojis: data.emojis,
+          primary_emotion: data.primary_emotion,
+          score: data.score,
+          intensity: data.intensity,
+          text: data.text,
+          source: data.source,
+          ai_feedback: data.ai_feedback,
+          date: new Date().toISOString(),
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      reply.code(201).send({ ok: true, data: result });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        reply.code(422).send({
+          ok: false,
+          error: {
+            code: 'validation_error',
+            message: 'Invalid input',
+            details: error.flatten(),
+          },
+        });
+        return;
+      }
+
+      app.log.error({ error }, 'Unexpected error creating emotion record');
       reply.code(500).send({
         ok: false,
         error: { code: 'internal_error', message: 'Internal server error' },

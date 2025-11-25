@@ -76,7 +76,7 @@ const createCoachRepository = (): CoachRepository => {
   return {
     async createSession(userId, payload) {
       const { data, error } = await supabase
-        .from('coach_sessions')
+        .from('coach_api_sessions')
         .insert({
           user_id: userId,
           title: payload.title || 'Session de coaching',
@@ -92,7 +92,7 @@ const createCoachRepository = (): CoachRepository => {
     },
     async listSessions(userId) {
       const { data, error } = await supabase
-        .from('coach_sessions')
+        .from('coach_api_sessions')
         .select('*')
         .eq('user_id', userId)
         .order('created_at', { ascending: false });
@@ -102,7 +102,7 @@ const createCoachRepository = (): CoachRepository => {
     },
     async getSession(id, userId) {
       const { data, error } = await supabase
-        .from('coach_sessions')
+        .from('coach_api_sessions')
         .select('*')
         .eq('id', id)
         .eq('user_id', userId)
@@ -119,7 +119,7 @@ const createCoachRepository = (): CoachRepository => {
     },
     async updateSession(id, userId, payload) {
       const { data, error } = await supabase
-        .from('coach_sessions')
+        .from('coach_api_sessions')
         .update(payload)
         .eq('id', id)
         .eq('user_id', userId)
@@ -137,7 +137,7 @@ const createCoachRepository = (): CoachRepository => {
     },
     async deleteSession(id, userId) {
       const { error } = await supabase
-        .from('coach_sessions')
+        .from('coach_api_sessions')
         .delete()
         .eq('id', id)
         .eq('user_id', userId);
@@ -146,7 +146,7 @@ const createCoachRepository = (): CoachRepository => {
     },
     async verifySessionOwnership(sessionId, userId) {
       const { data } = await supabase
-        .from('coach_sessions')
+        .from('coach_api_sessions')
         .select('id')
         .eq('id', sessionId)
         .eq('user_id', userId)
@@ -156,7 +156,7 @@ const createCoachRepository = (): CoachRepository => {
     },
     async createMessage(userId, payload) {
       const { data, error } = await supabase
-        .from('coach_messages')
+        .from('coach_api_messages')
         .insert({
           session_id: payload.session_id,
           user_id: userId,
@@ -173,7 +173,7 @@ const createCoachRepository = (): CoachRepository => {
     },
     async listMessages(sessionId, userId) {
       const { data: session } = await supabase
-        .from('coach_sessions')
+        .from('coach_api_sessions')
         .select('id')
         .eq('id', sessionId)
         .eq('user_id', userId)
@@ -184,7 +184,7 @@ const createCoachRepository = (): CoachRepository => {
       }
 
       const { data, error } = await supabase
-        .from('coach_messages')
+        .from('coach_api_messages')
         .select('*')
         .eq('session_id', sessionId)
         .order('created_at', { ascending: true });
@@ -194,7 +194,7 @@ const createCoachRepository = (): CoachRepository => {
     },
     async listSessionsWithMood(userId, limit) {
       const { data, error } = await supabase
-        .from('coach_sessions')
+        .from('coach_api_sessions')
         .select('*')
         .eq('user_id', userId)
         .not('mood_before', 'is', null)

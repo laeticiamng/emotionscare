@@ -73,6 +73,7 @@ export interface VRRepository {
   deleteSession: (id: string, userId: string) => Promise<void>;
   getStats: (userId: string) => Promise<SessionRecord>;
   getExperiences: () => Promise<SessionRecord[]>;
+  getEnvironments: () => Promise<SessionRecord[]>;
 }
 
 const createVRRepository = (): VRRepository => {
@@ -80,12 +81,17 @@ const createVRRepository = (): VRRepository => {
 
   return {
     async createSession(userId, payload) {
+      // Map API fields to existing table columns
       const { data, error } = await supabase
         .from('vr_sessions')
         .insert({
           user_id: userId,
+          experience_id: payload.experience_type,
+          experience_title: payload.experience_type.charAt(0).toUpperCase() + payload.experience_type.slice(1),
           experience_type: payload.experience_type,
+          duration_minutes: Math.round(payload.duration_seconds / 60),
           duration_seconds: payload.duration_seconds,
+          category: payload.vr_tier || 'medium',
           vr_tier: payload.vr_tier,
           profile: payload.profile,
           mood_before: payload.mood_before,
@@ -109,7 +115,7 @@ const createVRRepository = (): VRRepository => {
         .range(offset, offset + limit - 1);
 
       if (experienceType) {
-        query = query.eq('experience_type', experienceType);
+        query = query.or(`experience_type.eq.${experienceType},experience_id.eq.${experienceType}`);
       }
 
       const { data, error } = await query;
@@ -135,9 +141,15 @@ const createVRRepository = (): VRRepository => {
     },
 
     async updateSession(id, userId, payload) {
+      const updateData: Record<string, unknown> = { ...payload };
+      // Map duration_seconds to duration_minutes for backwards compatibility
+      if (payload.duration_seconds !== undefined) {
+        updateData.duration_minutes = Math.round(payload.duration_seconds / 60);
+      }
+
       const { data, error } = await supabase
         .from('vr_sessions')
-        .update(payload)
+        .update(updateData)
         .eq('id', id)
         .eq('user_id', userId)
         .select('*')
@@ -164,7 +176,7 @@ const createVRRepository = (): VRRepository => {
     async getStats(userId) {
       const { data, error } = await supabase
         .from('vr_sessions')
-        .select('id, experience_type, duration_seconds, completed, mood_before, mood_after, created_at')
+        .select('id, experience_type, experience_id, duration_seconds, duration_minutes, completed, mood_before, mood_after, created_at')
         .eq('user_id', userId);
 
       if (error) throw error;
@@ -172,12 +184,18 @@ const createVRRepository = (): VRRepository => {
       const sessions = data ?? [];
       const totalSessions = sessions.length;
       const completedSessions = sessions.filter(s => s.completed).length;
-      const totalDuration = sessions.reduce((acc, s) => acc + (s.duration_seconds || 0), 0);
+      // Use duration_seconds if available, otherwise convert from duration_minutes
+      const totalDuration = sessions.reduce((acc, s) => {
+        if (s.duration_seconds) return acc + s.duration_seconds;
+        if (s.duration_minutes) return acc + (s.duration_minutes * 60);
+        return acc;
+      }, 0);
 
       const experienceCount: Record<string, number> = {};
       for (const s of sessions) {
-        if (s.experience_type) {
-          experienceCount[s.experience_type] = (experienceCount[s.experience_type] || 0) + 1;
+        const expType = s.experience_type || s.experience_id;
+        if (expType) {
+          experienceCount[expType] = (experienceCount[expType] || 0) + 1;
         }
       }
 
@@ -231,6 +249,17 @@ const createVRRepository = (): VRRepository => {
           features: ['breathwork', 'biofeedback', 'guided'],
         },
       ];
+    },
+
+    async getEnvironments() {
+      const { data, error } = await supabase
+        .from('vr_environments')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(20);
+
+      if (error) throw error;
+      return data ?? [];
     },
   };
 };
@@ -413,6 +442,20 @@ export function registerVRRoutes(app: FastifyInstance, options: VRRoutesOptions 
       reply.send({ ok: true, data: experiences });
     } catch (error) {
       app.log.error({ error }, 'Unexpected error fetching VR experiences');
+      reply.code(500).send({
+        ok: false,
+        error: { code: 'internal_error', message: 'Internal server error' },
+      });
+    }
+  });
+
+  // GET /api/v1/vr/environments - Liste des environnements VR générés
+  app.get('/api/v1/vr/environments', async (_req: FastifyRequest, reply: FastifyReply) => {
+    try {
+      const environments = await repository.getEnvironments();
+      reply.send({ ok: true, data: environments });
+    } catch (error) {
+      app.log.error({ error }, 'Unexpected error fetching VR environments');
       reply.code(500).send({
         ok: false,
         error: { code: 'internal_error', message: 'Internal server error' },

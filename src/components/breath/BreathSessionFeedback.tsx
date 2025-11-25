@@ -14,7 +14,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Heart, Lightbulb, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { supabase } from '@/integrations/supabase/client';
+import { breathworkApi } from '@/services/api/breathworkApi';
 import { Sentry } from '@/lib/errors/sentry-compat';
 import { logger } from '@/lib/logger';
 
@@ -86,26 +86,14 @@ export const BreathSessionFeedback: React.FC<BreathSessionFeedbackProps> = ({
     setSubmitting(true);
 
     try {
-      const { data: { session: authSession } } = await supabase.auth.getSession();
-      if (!authSession?.user?.id) {
-        logger.warn('No authenticated session for feedback', {}, 'SESSION');
-        onClose();
-        return;
-      }
-
-      // Store feedback in database
-      const { error } = await supabase
-        .from('breath_session_feedback')
-        .insert({
-          user_id: authSession.user.id,
-          rating,
-          felt_calm: feltCalm,
-          felt_focused: feltFocused,
-          felt_relaxed: feltRelaxed,
-          notes: notes || null,
-        });
-
-      if (error) throw error;
+      // Submit feedback via API service
+      await breathworkApi.submitFeedback({
+        rating,
+        felt_calm: feltCalm,
+        felt_focused: feltFocused,
+        felt_relaxed: feltRelaxed,
+        notes: notes || undefined,
+      });
 
       logger.info('session:feedback:submitted', { rating }, 'SESSION');
 

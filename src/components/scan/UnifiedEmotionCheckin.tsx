@@ -6,9 +6,10 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Heart, TrendingUp, Calendar, BarChart3 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { supabase } from '@/integrations/supabase/client';
+import { emotionsApi, type EmotionRecord } from '@/services/api/scansApi';
 import EmotionSelector from '@/components/emotion/EmotionSelector';
 import MoodTracker from '@/components/emotion/MoodTracker';
+import { logger } from '@/lib/logger';
 
 interface EmotionEntry {
   id: string;
@@ -29,25 +30,19 @@ const UnifiedEmotionCheckin: React.FC = () => {
 
   const loadRecentEntries = async () => {
     try {
-      const { data, error } = await supabase
-        .from('emotions')
-        .select('*')
-        .order('date', { ascending: false })
-        .limit(7);
+      const data = await emotionsApi.getRecent(7);
 
-      if (error) throw error;
-
-      const entries = data?.map(entry => ({
+      const entries = data?.map((entry: EmotionRecord) => ({
         id: entry.id,
-        emotion: entry.emojis || 'neutral',
-        intensity: entry.score || 5,
+        emotion: entry.emojis || entry.primary_emotion || 'neutral',
+        intensity: entry.score || entry.intensity || 5,
         timestamp: entry.date,
         ai_feedback: entry.ai_feedback
       })) || [];
 
       setRecentEntries(entries);
     } catch (error) {
-      // Entries loading error
+      logger.warn('Could not load emotion entries from API', {}, 'UI');
     } finally {
       setIsLoading(false);
     }
@@ -55,24 +50,20 @@ const UnifiedEmotionCheckin: React.FC = () => {
 
   const handleQuickCheckin = async (emotion: any) => {
     try {
-      const { data, error } = await supabase
-        .from('emotions')
-        .insert([{
-          emojis: emotion.name,
-          score: emotion.intensity,
-          text: `Check-in rapide: ${emotion.name}`,
-          date: new Date().toISOString()
-        }])
-        .select()
-        .single();
-
-      if (error) throw error;
+      await emotionsApi.checkin({
+        emojis: emotion.name,
+        primary_emotion: emotion.name,
+        score: emotion.intensity,
+        intensity: emotion.intensity,
+        text: `Check-in rapide: ${emotion.name}`,
+        source: 'quick_checkin'
+      });
 
       // Recharger les entrées
       await loadRecentEntries();
       setShowQuickCheckin(false);
     } catch (error) {
-      // Save entry error
+      logger.error('Failed to save emotion checkin', error as Error, 'UI');
     }
   };
 
