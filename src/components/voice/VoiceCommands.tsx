@@ -3,7 +3,7 @@ import { Mic, MicOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useVoiceCommands } from '@/hooks/useVoiceCommands';
-import { useMusic } from '@/hooks/useMusicCompat';
+import { useMusicCompat as useMusic } from '@/hooks/useMusicCompat';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { logger } from '@/lib/logger';
