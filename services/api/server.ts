@@ -13,6 +13,8 @@ import { registerAssessmentRoutes } from './routes/assessments';
 import { registerScanRoutes } from './routes/scans';
 import { registerCoachRoutes } from './routes/coach';
 import { registerGoalRoutes } from './routes/goals';
+import { registerBreathworkRoutes } from './routes/breathwork';
+import { registerVRRoutes } from './routes/vr';
 import { v1Routes } from './routes/v1';
 
 type MaybePromise<T> = T | Promise<T>;
@@ -431,6 +433,8 @@ export function createApp(options: CreateAppOptions = {}) {
       registerScanRoutes(app);
       registerCoachRoutes(app);
       registerGoalRoutes(app);
+      registerBreathworkRoutes(app);
+      registerVRRoutes(app);
 
       const sendHealth = async (request: any, reply: any) => {
         applyHealthCors(request, reply);
