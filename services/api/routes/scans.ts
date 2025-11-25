@@ -68,13 +68,16 @@ const createScanRepository = (): ScanRepository => {
 
   return {
     async createScan(userId, payload) {
+      // Map to existing + new columns for compatibility
       const { data, error } = await supabase
         .from('emotion_scans')
         .insert({
           user_id: userId,
           emotions: payload.emotions,
           dominant_emotion: payload.dominant_emotion,
-          confidence_score: payload.confidence_score,
+          mood: payload.dominant_emotion, // existing column
+          confidence: payload.confidence_score, // existing column
+          confidence_score: payload.confidence_score, // new column
           scan_type: payload.scan_type,
           context: payload.context || {},
           notes: payload.notes,
@@ -150,13 +153,18 @@ const createScanRepository = (): ScanRepository => {
       const threshold = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
       const { data, error } = await supabase
         .from('emotion_scans')
-        .select('dominant_emotion, created_at, confidence_score')
+        .select('dominant_emotion, mood, created_at, confidence_score, confidence')
         .eq('user_id', userId)
         .gte('created_at', threshold.toISOString())
         .order('created_at', { ascending: true });
 
       if (error) throw error;
-      return data ?? [];
+      // Map to consistent format
+      return (data ?? []).map((scan: any) => ({
+        dominant_emotion: scan.dominant_emotion || scan.mood,
+        created_at: scan.created_at,
+        confidence_score: scan.confidence_score ?? scan.confidence,
+      }));
     },
   };
 };
