@@ -30,6 +30,11 @@ interface GoalUpdatePayload {
   completed?: boolean;
 }
 
+interface GoalProgressPayload {
+  current_value: number;
+  notes?: string;
+}
+
 interface GoalRecord {
   id: string;
   user_id: string;
@@ -47,11 +52,10 @@ interface GoalRecord {
 }
 
 interface GoalStats {
-  total_goals: number;
-  completed_goals: number;
-  active_goals: number;
+  total: number;
+  completed: number;
+  active: number;
   completion_rate: number;
-  categories: Record<string, number>;
 }
 
 interface ApiResponse<T> {
@@ -253,7 +257,7 @@ export const goalsApi = {
   /**
    * Mettre à jour la progression d'un objectif
    */
-  async updateProgress(id: string, current_value: number): Promise<GoalRecord> {
+  async updateProgress(id: string, payload: GoalProgressPayload): Promise<GoalRecord> {
     if (!API_BASE) {
       throw new Error('API_URL non configurée');
     }
@@ -262,7 +266,7 @@ export const goalsApi = {
     const response = await fetchWithRetry(`${API_BASE}/api/v1/goals/${id}/progress`, {
       method: 'POST',
       headers,
-      json: { current_value },
+      json: payload,
       timeoutMs: 10000,
       retries: 2,
     });

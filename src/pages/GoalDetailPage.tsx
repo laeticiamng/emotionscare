@@ -1,45 +1,76 @@
+import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { ArrowLeft, Target, Calendar, TrendingUp } from 'lucide-react';
-
-interface Milestone {
-  date: string;
-  label: string;
-  completed: boolean;
-}
-
-interface Goal {
-  id: string | undefined;
-  title: string;
-  description: string;
-  progress: number;
-  deadline: string;
-  category: string;
-  startDate: string;
-  milestones: Milestone[];
-}
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { ArrowLeft, Target, Calendar, TrendingUp, Loader2 } from 'lucide-react';
+import { useGoals, type Goal } from '@/hooks/useGoals';
 
 export default function GoalDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { fetchGoalById, completeGoal } = useGoals();
+  const [goal, setGoal] = useState<Goal | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const goal: Goal = {
-    id,
-    title: 'Méditer 5 fois par semaine',
-    description: 'Pratiquer la méditation guidée au moins 5 fois par semaine pour améliorer mon bien-être mental',
-    progress: 60,
-    deadline: '2025-11-30',
-    category: 'Bien-être',
-    startDate: '2025-10-01',
-    milestones: [
-      { date: '2025-10-15', label: 'Premier mois', completed: true },
-      { date: '2025-11-01', label: 'Deuxième mois', completed: false },
-      { date: '2025-11-30', label: 'Objectif final', completed: false },
-    ],
+  useEffect(() => {
+    if (!id) return;
+
+    const loadGoal = async () => {
+      setIsLoading(true);
+      const result = await fetchGoalById(id);
+      if (!result) {
+        setError("Objectif introuvable ou inaccessible.");
+        setGoal(null);
+      } else {
+        setGoal(result);
+        setError(null);
+      }
+      setIsLoading(false);
+    };
+
+    void loadGoal();
+  }, [id, fetchGoalById]);
+
+  const handleComplete = async () => {
+    if (!goal?.id) return;
+    const updated = await completeGoal(goal.id);
+    if (updated) {
+      setGoal(updated);
+    }
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background p-6" data-testid="page-root">
+        <div className="max-w-4xl mx-auto flex items-center justify-center h-96">
+          <div className="flex flex-col items-center gap-4">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <p className="text-muted-foreground">Chargement de l'objectif...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!goal) {
+    return (
+      <div className="min-h-screen bg-background p-6" data-testid="page-root">
+        <div className="max-w-4xl mx-auto space-y-4">
+          <Button variant="ghost" onClick={() => navigate('/app/goals')}>
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Retour
+          </Button>
+          <Alert variant="destructive">
+            <AlertDescription>{error ?? "Aucun objectif trouvé."}</AlertDescription>
+          </Alert>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background p-6" data-testid="page-root">
@@ -52,26 +83,39 @@ export default function GoalDetailPage() {
         <header className="space-y-2">
           <div className="flex items-center gap-2">
             <h1 className="text-3xl font-bold">{goal.title}</h1>
-            <Badge variant="secondary">{goal.category}</Badge>
+            <Badge variant="secondary">{goal.category ?? 'Non catégorisé'}</Badge>
           </div>
-          <p className="text-muted-foreground">{goal.description}</p>
+          {goal.description && <p className="text-muted-foreground">{goal.description}</p>}
         </header>
 
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <TrendingUp className="h-5 w-5" />
-              Progression Globale
+              Progression
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
               <span className="text-2xl font-bold">{goal.progress}%</span>
-              <span className="text-sm text-muted-foreground">
-                Début: {goal.startDate} • Échéance: {goal.deadline}
+              <span className="text-sm text-muted-foreground flex items-center gap-2">
+                <Calendar className="h-4 w-4" />
+                {goal.target_date
+                  ? new Date(goal.target_date).toLocaleDateString('fr-FR')
+                  : 'Aucune échéance définie'}
               </span>
             </div>
             <Progress value={goal.progress} className="h-3" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+              <div className="space-y-1">
+                <p className="text-muted-foreground">Valeur actuelle</p>
+                <p className="font-semibold">{goal.current_value ?? 0}{goal.unit ? ` ${goal.unit}` : ''}</p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-muted-foreground">Objectif cible</p>
+                <p className="font-semibold">{goal.target_value ?? 'Non défini'}{goal.unit ? ` ${goal.unit}` : ''}</p>
+              </div>
+            </div>
           </CardContent>
         </Card>
 
@@ -79,44 +123,35 @@ export default function GoalDetailPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Target className="h-5 w-5" />
-              Jalons
+              Détails
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {goal.milestones.map((milestone, index) => (
-                <div
-                  key={index}
-                  className={`flex items-center justify-between p-4 border rounded-lg ${
-                    milestone.completed ? 'bg-success/10 border-success' : ''
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className={`h-8 w-8 rounded-full flex items-center justify-center ${
-                      milestone.completed ? 'bg-success text-success-foreground' : 'bg-muted'
-                    }`}>
-                      {milestone.completed ? '✓' : index + 1}
-                    </div>
-                    <div>
-                      <p className="font-medium">{milestone.label}</p>
-                      <p className="text-sm text-muted-foreground">{milestone.date}</p>
-                    </div>
-                  </div>
-                  {milestone.completed && (
-                    <Badge variant="secondary">Complété</Badge>
-                  )}
-                </div>
-              ))}
+          <CardContent className="space-y-3 text-sm">
+            <div className="flex items-center justify-between">
+              <span className="text-muted-foreground">Statut</span>
+              <Badge variant={goal.completed ? 'secondary' : 'outline'}>
+                {goal.completed ? 'Terminé' : 'En cours'}
+              </Badge>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-muted-foreground">Créé le</span>
+              <span className="font-medium">{new Date(goal.created_at).toLocaleDateString('fr-FR')}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-muted-foreground">Dernière mise à jour</span>
+              <span className="font-medium">{new Date(goal.updated_at).toLocaleDateString('fr-FR')}</span>
             </div>
           </CardContent>
         </Card>
 
-        <div className="flex gap-4">
-          <Button onClick={() => navigate('/app/scan')} className="flex-1">
-            Continuer la Progression
-          </Button>
-          <Button variant="outline" onClick={() => navigate('/app/goals')} className="flex-1">
-            Voir Tous les Objectifs
+        <div className="flex flex-wrap gap-4">
+          {!goal.completed && (
+            <Button onClick={handleComplete} className="flex-1 min-w-[180px]">
+              Marquer comme terminé
+            </Button>
+          )}
+          <Button variant="outline" onClick={() => navigate('/app/goals')} className="flex-1 min-w-[180px]">
+            Voir tous les objectifs
           </Button>
         </div>
       </div>

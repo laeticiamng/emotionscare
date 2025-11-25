@@ -1,22 +1,13 @@
-import { useState, useEffect, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { goalsApi, type GoalRecord, type GoalCreatePayload, type GoalUpdatePayload } from '@/services/api';
 
-export interface Goal {
-  id: string;
-  user_id: string;
-  title: string;
-  description?: string;
-  category: string;
+export type Goal = GoalRecord & {
   progress: number;
-  target_value?: number;
-  current_value?: number;
-  deadline: string;
-  status: 'active' | 'completed' | 'archived';
-  created_at: string;
-  updated_at: string;
-}
+  deadline?: string;
+  status: 'active' | 'completed';
+};
 
 export interface GoalStats {
   totalGoals: number;
@@ -24,6 +15,23 @@ export interface GoalStats {
   completedGoals: number;
   successRate: number;
 }
+
+const mapGoalRecordToView = (record: GoalRecord): Goal => {
+  const progressFromValues =
+    record.target_value && record.target_value > 0
+      ? Math.min(100, Math.round(((record.current_value ?? 0) / record.target_value) * 100))
+      : 0;
+
+  const status: Goal['status'] = record.completed ? 'completed' : 'active';
+  const progress = record.completed ? 100 : progressFromValues;
+
+  return {
+    ...record,
+    progress,
+    deadline: record.target_date ?? undefined,
+    status,
+  };
+};
 
 export const useGoals = () => {
   const { user } = useAuth();
@@ -38,9 +46,19 @@ export const useGoals = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch goals from Supabase
+  const calculateStats = useCallback((goalList: Goal[]) => {
+    const totalGoals = goalList.length;
+    const completedGoals = goalList.filter(goal => goal.completed || goal.status === 'completed').length;
+    const activeGoals = totalGoals - completedGoals;
+    const successRate = totalGoals > 0 ? (completedGoals / totalGoals) * 100 : 0;
+
+    setStats({ totalGoals, activeGoals, completedGoals, successRate });
+  }, []);
+
   const fetchGoals = useCallback(async () => {
     if (!user) {
+      setGoals([]);
+      setStats({ totalGoals: 0, activeGoals: 0, completedGoals: 0, successRate: 0 });
       setIsLoading(false);
       return;
     }
@@ -49,29 +67,24 @@ export const useGoals = () => {
       setIsLoading(true);
       setError(null);
 
-      const { data, error: fetchError } = await supabase
-        .from('user_goals')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
+      const [goalResponse, statsResponse] = await Promise.all([
+        goalsApi.listGoals(),
+        goalsApi.getStats().catch(() => null),
+      ]);
 
-      if (fetchError) throw fetchError;
+      const mappedGoals = goalResponse.map(mapGoalRecordToView);
+      setGoals(mappedGoals);
 
-      const goalsData = data as Goal[];
-      setGoals(goalsData);
-
-      // Calculate stats
-      const totalGoals = goalsData.length;
-      const activeGoals = goalsData.filter(g => g.status === 'active').length;
-      const completedGoals = goalsData.filter(g => g.status === 'completed').length;
-      const successRate = totalGoals > 0 ? (completedGoals / totalGoals) * 100 : 0;
-
-      setStats({
-        totalGoals,
-        activeGoals,
-        completedGoals,
-        successRate,
-      });
+      if (statsResponse) {
+        setStats({
+          totalGoals: statsResponse.total,
+          activeGoals: statsResponse.active,
+          completedGoals: statsResponse.completed,
+          successRate: statsResponse.completion_rate,
+        });
+      } else {
+        calculateStats(mappedGoals);
+      }
     } catch (err) {
       console.error('Error fetching goals:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch goals');
@@ -83,156 +96,198 @@ export const useGoals = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [user, toast]);
+  }, [user, toast, calculateStats]);
 
-  // Create a new goal
-  const createGoal = async (goalData: Omit<Goal, 'id' | 'user_id' | 'created_at' | 'updated_at'>) => {
-    if (!user) {
-      toast({
-        title: 'Erreur',
-        description: 'Vous devez être connecté pour créer un objectif',
-        variant: 'destructive',
-      });
-      return null;
-    }
+  const createGoal = useCallback(
+    async (goalData: GoalCreatePayload): Promise<Goal | null> => {
+      if (!user) {
+        toast({
+          title: 'Erreur',
+          description: 'Vous devez être connecté pour créer un objectif',
+          variant: 'destructive',
+        });
+        return null;
+      }
 
-    try {
-      const { data, error: createError } = await supabase
-        .from('user_goals')
-        .insert({
-          ...goalData,
-          user_id: user.id,
-        })
-        .select()
-        .single();
+      try {
+        const record = await goalsApi.createGoal(goalData);
+        const mapped = mapGoalRecordToView(record);
+        setGoals(current => {
+          const updated = [mapped, ...current];
+          calculateStats(updated);
+          return updated;
+        });
 
-      if (createError) throw createError;
+        toast({
+          title: 'Objectif créé',
+          description: `"${goalData.title}" a été ajouté à vos objectifs`,
+        });
 
-      toast({
-        title: 'Objectif créé',
-        description: `"${goalData.title}" a été ajouté à vos objectifs`,
-      });
+        return mapped;
+      } catch (err) {
+        console.error('Error creating goal:', err);
+        toast({
+          title: 'Erreur',
+          description: "Impossible de créer l'objectif",
+          variant: 'destructive',
+        });
+        return null;
+      }
+    },
+    [user, toast, calculateStats],
+  );
 
-      // Refresh goals list
-      await fetchGoals();
+  const updateGoal = useCallback(
+    async (goalId: string, updates: GoalUpdatePayload): Promise<Goal | null> => {
+      if (!user) return null;
 
-      return data as Goal;
-    } catch (err) {
-      console.error('Error creating goal:', err);
-      toast({
-        title: 'Erreur',
-        description: 'Impossible de créer l\'objectif',
-        variant: 'destructive',
-      });
-      return null;
-    }
-  };
+      try {
+        const record = await goalsApi.updateGoal(goalId, updates);
+        const mapped = mapGoalRecordToView(record);
+        setGoals(current => {
+          const updated = current.map(goal => (goal.id === goalId ? mapped : goal));
+          calculateStats(updated);
+          return updated;
+        });
 
-  // Update a goal
-  const updateGoal = async (goalId: string, updates: Partial<Goal>) => {
-    if (!user) return null;
+        toast({
+          title: 'Objectif mis à jour',
+          description: 'Les modifications ont été sauvegardées',
+        });
 
-    try {
-      const { data, error: updateError } = await supabase
-        .from('user_goals')
-        .update({
-          ...updates,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', goalId)
-        .eq('user_id', user.id)
-        .select()
-        .single();
+        return mapped;
+      } catch (err) {
+        console.error('Error updating goal:', err);
+        toast({
+          title: 'Erreur',
+          description: "Impossible de mettre à jour l'objectif",
+          variant: 'destructive',
+        });
+        return null;
+      }
+    },
+    [user, toast, calculateStats],
+  );
 
-      if (updateError) throw updateError;
+  const updateProgress = useCallback(
+    async (goalId: string, currentValue: number, notes?: string): Promise<Goal | null> => {
+      if (!user) return null;
 
-      toast({
-        title: 'Objectif mis à jour',
-        description: 'Les modifications ont été sauvegardées',
-      });
+      try {
+        const record = await goalsApi.updateProgress(goalId, { current_value: currentValue, notes });
+        const mapped = mapGoalRecordToView(record);
+        setGoals(current => {
+          const updated = current.map(goal => (goal.id === goalId ? mapped : goal));
+          calculateStats(updated);
+          return updated;
+        });
+        return mapped;
+      } catch (err) {
+        console.error('Error updating goal progress:', err);
+        toast({
+          title: 'Erreur',
+          description: 'Impossible de mettre à jour la progression',
+          variant: 'destructive',
+        });
+        return null;
+      }
+    },
+    [user, toast, calculateStats],
+  );
 
-      // Refresh goals list
-      await fetchGoals();
+  const deleteGoal = useCallback(
+    async (goalId: string) => {
+      if (!user) return false;
 
-      return data as Goal;
-    } catch (err) {
-      console.error('Error updating goal:', err);
-      toast({
-        title: 'Erreur',
-        description: 'Impossible de mettre à jour l\'objectif',
-        variant: 'destructive',
-      });
-      return null;
-    }
-  };
+      try {
+        await goalsApi.deleteGoal(goalId);
+        setGoals(current => {
+          const updated = current.filter(goal => goal.id !== goalId);
+          calculateStats(updated);
+          return updated;
+        });
 
-  // Update goal progress
-  const updateProgress = async (goalId: string, progress: number) => {
-    const goal = goals.find(g => g.id === goalId);
-    if (!goal) return null;
+        toast({
+          title: 'Objectif supprimé',
+          description: "L'objectif a été supprimé",
+        });
 
-    const status = progress >= 100 ? 'completed' : 'active';
+        return true;
+      } catch (err) {
+        console.error('Error deleting goal:', err);
+        toast({
+          title: 'Erreur',
+          description: "Impossible de supprimer l'objectif",
+          variant: 'destructive',
+        });
+        return false;
+      }
+    },
+    [user, toast, calculateStats],
+  );
 
-    return updateGoal(goalId, {
-      progress,
-      status,
-      ...(progress >= 100 && { current_value: goal.target_value }),
-    });
-  };
+  const completeGoal = useCallback(
+    async (goalId: string) => {
+      if (!user) return null;
+      try {
+        const record = await goalsApi.completeGoal(goalId);
+        const mapped = mapGoalRecordToView(record);
+        setGoals(current => {
+          const updated = current.map(goal => (goal.id === goalId ? mapped : goal));
+          calculateStats(updated);
+          return updated;
+        });
+        return mapped;
+      } catch (err) {
+        console.error('Error completing goal:', err);
+        toast({
+          title: 'Erreur',
+          description: "Impossible de marquer l'objectif comme terminé",
+          variant: 'destructive',
+        });
+        return null;
+      }
+    },
+    [user, toast, calculateStats],
+  );
 
-  // Delete a goal
-  const deleteGoal = async (goalId: string) => {
-    if (!user) return false;
+  const fetchGoalById = useCallback(
+    async (goalId: string): Promise<Goal | null> => {
+      if (!user) return null;
+      try {
+        const record = await goalsApi.getGoal(goalId);
+        return record ? mapGoalRecordToView(record) : null;
+      } catch (err) {
+        console.error('Error fetching goal detail:', err);
+        toast({
+          title: 'Erreur',
+          description: "Impossible de charger l'objectif demandé",
+          variant: 'destructive',
+        });
+        return null;
+      }
+    },
+    [user, toast],
+  );
 
-    try {
-      const { error: deleteError } = await supabase
-        .from('user_goals')
-        .delete()
-        .eq('id', goalId)
-        .eq('user_id', user.id);
-
-      if (deleteError) throw deleteError;
-
-      toast({
-        title: 'Objectif supprimé',
-        description: 'L\'objectif a été supprimé',
-      });
-
-      // Refresh goals list
-      await fetchGoals();
-
-      return true;
-    } catch (err) {
-      console.error('Error deleting goal:', err);
-      toast({
-        title: 'Erreur',
-        description: 'Impossible de supprimer l\'objectif',
-        variant: 'destructive',
-      });
-      return false;
-    }
-  };
-
-  // Archive a goal
-  const archiveGoal = async (goalId: string) => {
-    return updateGoal(goalId, { status: 'archived' });
-  };
-
-  // Load goals on mount
   useEffect(() => {
     fetchGoals();
   }, [fetchGoals]);
+
+  const isEmpty = useMemo(() => !isLoading && goals.length === 0, [goals.length, isLoading]);
 
   return {
     goals,
     stats,
     isLoading,
     error,
+    isEmpty,
     createGoal,
     updateGoal,
     updateProgress,
     deleteGoal,
-    archiveGoal,
+    completeGoal,
     refreshGoals: fetchGoals,
+    fetchGoalById,
   };
 };
