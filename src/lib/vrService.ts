@@ -1,127 +1,182 @@
 // @ts-nocheck
 
 import { VRSession, VRSessionTemplate, VREnvironment } from '@/types/vr';
+import { GlobalInterceptor } from '@/utils/globalInterceptor';
+import { buildEndpoint, VR_ENDPOINTS } from '@/services/api/apiEndpoints';
 
-// Simulated VR service
+const API_BASE = import.meta.env.VITE_API_URL || '/api/v1';
+
+// Fallback templates for offline/error scenarios
+const FALLBACK_TEMPLATES: VRSessionTemplate[] = [
+  {
+    id: 'template-1',
+    name: 'Calm Beach',
+    title: 'Calm Beach Meditation',
+    description: 'Relax on a serene beach with gentle waves and soothing sounds',
+    duration: 600,
+    thumbnailUrl: '/images/vr/beach-thumb.jpg',
+    environmentId: 'env-beach',
+    category: 'relaxation',
+    intensity: 2,
+    difficulty: 'easy',
+    immersionLevel: 'medium',
+    goalType: 'relaxation',
+    interactive: false,
+    tags: ['calm', 'beach', 'nature'],
+    recommendedMood: 'calm'
+  },
+  {
+    id: 'template-2',
+    name: 'Forest Adventure',
+    title: 'Forest Adventure',
+    description: 'Explore a lush forest with ambient sounds and wildlife',
+    duration: 900,
+    thumbnailUrl: '/images/vr/forest-thumb.jpg',
+    environmentId: 'env-forest',
+    category: 'exploration',
+    intensity: 4,
+    difficulty: 'medium',
+    immersionLevel: 'high',
+    goalType: 'mindfulness',
+    interactive: true,
+    tags: ['forest', 'nature', 'adventure'],
+    recommendedMood: 'curious'
+  }
+];
+
 const VRService = {
   // Get available VR session templates
   getTemplates: async (): Promise<VRSessionTemplate[]> => {
-    // This would fetch from an API in a real implementation
-    const mockTemplates: VRSessionTemplate[] = [
-      {
-        id: 'template-1',
-        name: 'Calm Beach',
-        title: 'Calm Beach Meditation',
-        description: 'Relax on a serene beach with gentle waves and soothing sounds',
-        duration: 600, // 10 minutes
-        thumbnailUrl: '/images/vr/beach-thumb.jpg',
-        environmentId: 'env-beach',
-        category: 'relaxation',
-        intensity: 2,
-        difficulty: 'easy',
-        immersionLevel: 'medium',
-        goalType: 'relaxation',
-        interactive: false,
-        tags: ['calm', 'beach', 'nature'],
-        recommendedMood: 'calm'
-      },
-      {
-        id: 'template-2',
-        name: 'Forest Adventure',
-        title: 'Forest Adventure',
-        description: 'Explore a lush forest with ambient sounds and wildlife',
-        duration: 900, // 15 minutes
-        thumbnailUrl: '/images/vr/forest-thumb.jpg',
-        environmentId: 'env-forest',
-        category: 'exploration',
-        intensity: 4,
-        difficulty: 'medium',
-        immersionLevel: 'high',
-        goalType: 'mindfulness',
-        interactive: true,
-        tags: ['forest', 'nature', 'adventure'],
-        recommendedMood: 'curious'
+    try {
+      const res = await GlobalInterceptor.secureFetch(`${API_BASE}${VR_ENDPOINTS.LIST_TEMPLATES}`);
+      if (!res || !res.ok) {
+        return FALLBACK_TEMPLATES;
       }
-    ];
-    
-    return mockTemplates;
+      const { data } = await res.json();
+      return data || FALLBACK_TEMPLATES;
+    } catch {
+      return FALLBACK_TEMPLATES;
+    }
   },
-  
+
   // Get user's VR session history
   getUserSessions: async (userId: string): Promise<VRSession[]> => {
-    // This would fetch from an API in a real implementation
-    const mockSessions: VRSession[] = [
-      {
-        id: 'session-1',
-        templateId: 'template-1',
-        userId: userId,
-        startTime: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-        endTime: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000 + 600000).toISOString(),
-        duration: 600,
-        completed: true,
-        progress: 1,
-        feedback: {
-          id: 'feedback-1',
-          sessionId: 'session-1',
-          userId: userId,
-          timestamp: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000 + 600000).toISOString(),
-          rating: 4,
-          emotionBefore: 'stressed',
-          emotionAfter: 'calm',
-          comment: 'Very relaxing experience'
-        },
-        metrics: {
-          heartRate: [72, 70, 68, 65, 64],
-          stressLevel: 0.3,
-          focusLevel: 0.8
-        }
+    try {
+      const res = await GlobalInterceptor.secureFetch(
+        `${API_BASE}${VR_ENDPOINTS.LIST_SESSIONS}?user_id=${userId}`
+      );
+      if (!res || !res.ok) {
+        return [];
       }
-    ];
-    
-    return mockSessions;
+      const { data } = await res.json();
+      return data || [];
+    } catch {
+      return [];
+    }
   },
-  
+
   // Start a new VR session
   startSession: async (userId: string, templateId: string): Promise<VRSession> => {
-    // This would call an API to start a session in a real implementation
-    const newSession: VRSession = {
-      id: `session-${Date.now()}`,
-      templateId: templateId,
-      userId: userId,
-      startTime: new Date().toISOString(),
-      duration: 0,
-      completed: false,
-      progress: 0
-    };
-    
-    return newSession;
+    const res = await GlobalInterceptor.secureFetch(`${API_BASE}${VR_ENDPOINTS.CREATE_SESSION}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        user_id: userId,
+        template_id: templateId,
+        started_at: new Date().toISOString()
+      })
+    });
+
+    if (!res || !res.ok) {
+      throw new Error('Failed to start VR session');
+    }
+
+    const { data } = await res.json();
+    return data;
   },
-  
+
   // End an active VR session
   endSession: async (sessionId: string, feedback?: any): Promise<VRSession> => {
-    // This would call an API to end a session in a real implementation
-    const mockSession: VRSession = {
-      id: sessionId,
-      templateId: 'template-1',
-      userId: 'user-1',
-      startTime: new Date(Date.now() - 600000).toISOString(),
-      endTime: new Date().toISOString(),
-      duration: 600,
-      completed: true,
-      progress: 1,
-      feedback: feedback ? {
-        id: `feedback-${Date.now()}`,
-        sessionId: sessionId,
-        userId: 'user-1',
-        timestamp: new Date().toISOString(),
-        rating: feedback.rating || 5,
-        emotionBefore: feedback.emotionBefore || 'neutral',
-        emotionAfter: feedback.emotionAfter || 'calm',
-        comment: feedback.comment || ''
-      } : undefined
-    };
-    
-    return mockSession;
+    const endpoint = buildEndpoint(VR_ENDPOINTS.COMPLETE_SESSION, { id: sessionId });
+    const res = await GlobalInterceptor.secureFetch(`${API_BASE}${endpoint}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        ended_at: new Date().toISOString(),
+        completed: true,
+        feedback: feedback || null
+      })
+    });
+
+    if (!res || !res.ok) {
+      throw new Error('Failed to end VR session');
+    }
+
+    const { data } = await res.json();
+    return data;
+  },
+
+  // Get session by ID
+  getSession: async (sessionId: string): Promise<VRSession | null> => {
+    try {
+      const endpoint = buildEndpoint(VR_ENDPOINTS.GET_SESSION, { id: sessionId });
+      const res = await GlobalInterceptor.secureFetch(`${API_BASE}${endpoint}`);
+      if (!res || !res.ok) {
+        return null;
+      }
+      const { data } = await res.json();
+      return data;
+    } catch {
+      return null;
+    }
+  },
+
+  // Update session progress
+  updateSession: async (sessionId: string, updates: Partial<VRSession>): Promise<VRSession | null> => {
+    try {
+      const endpoint = buildEndpoint(VR_ENDPOINTS.UPDATE_SESSION, { id: sessionId });
+      const res = await GlobalInterceptor.secureFetch(`${API_BASE}${endpoint}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates)
+      });
+      if (!res || !res.ok) {
+        return null;
+      }
+      const { data } = await res.json();
+      return data;
+    } catch {
+      return null;
+    }
+  },
+
+  // Delete session
+  deleteSession: async (sessionId: string): Promise<boolean> => {
+    try {
+      const endpoint = buildEndpoint(VR_ENDPOINTS.DELETE_SESSION, { id: sessionId });
+      const res = await GlobalInterceptor.secureFetch(`${API_BASE}${endpoint}`, {
+        method: 'DELETE'
+      });
+      return res?.ok ?? false;
+    } catch {
+      return false;
+    }
+  },
+
+  // Get VR stats for user
+  getStats: async (userId: string): Promise<any> => {
+    try {
+      const res = await GlobalInterceptor.secureFetch(
+        `${API_BASE}/vr/stats?user_id=${userId}`
+      );
+      if (!res || !res.ok) {
+        return { total_sessions: 0, total_duration: 0 };
+      }
+      const { data } = await res.json();
+      return data;
+    } catch {
+      return { total_sessions: 0, total_duration: 0 };
+    }
   }
 };
 
