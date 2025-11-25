@@ -297,7 +297,7 @@ export class EmotionScanService {
           ...emotionAnalysis.emotions,
           neutral: emotionAnalysis.emotions.joy ? undefined : 0.5,
           tired: 0.3
-        },
+        } as Record<string, number>,
         metadata: {
           duration_ms: audioData.size / 16, // Rough estimate
           language

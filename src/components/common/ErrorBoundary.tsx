@@ -59,8 +59,8 @@ export class ErrorBoundary extends Component<Props, State> {
       errorInfo,
     });
 
-    // Log to Sentry in production
-    logger.critical(
+    // Log to monitoring
+    logger.error(
       `React Error Boundary caught error: ${error.message}`,
       error,
       'ERROR_BOUNDARY'

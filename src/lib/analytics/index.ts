@@ -219,11 +219,12 @@ const sentryAnalytics = {
 
   identify: (userId: string, properties?: AnalyticsUserProperties) => {
     try {
-      Sentry.setUser({
-        id: userId,
-        email: properties?.email as string | undefined,
-        ...properties,
-      });
+      // Sentry user identification disabled - setUser not available in compat mode
+      // Sentry.setUser({
+      //   id: userId,
+      //   email: properties?.email as string | undefined,
+      //   ...properties,
+      // });
     } catch (error) {
       logger.warn('Sentry identify failed', error, 'ANALYTICS');
     }
@@ -338,7 +339,7 @@ export function reset(): void {
   }
 
   if (config.providers.sentry) {
-    Sentry.setUser(null);
+    // Sentry.setUser(null); // disabled - not available in compat mode
   }
 
   // Clear session ID
