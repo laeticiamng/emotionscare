@@ -1,7 +1,7 @@
 // @ts-nocheck
-import { captureException } from '@/lib/ai-monitoring';
 import { logger } from '@/lib/logger';
 import { Sentry } from '@/lib/errors/sentry-compat';
+import { track } from './index';
 
 export type ScanEventName =
   | 'onboarding_started'
@@ -26,6 +26,7 @@ interface ScanEventProperties {
 
 /**
  * Track scan-related analytics events
+ * Uses the unified analytics system with fallback to Sentry
  */
 export function trackScanEvent(
   eventName: ScanEventName,
@@ -39,14 +40,11 @@ export function trackScanEvent(
     data: properties,
   });
 
-  // Track with Sentry custom event
-  Sentry.captureMessage(`Analytics: ${eventName}`, {
-    level: 'info',
-    tags: {
-      event_category: 'scan',
-      event_name: eventName,
-    },
-    extra: properties,
+  // Track via unified analytics system (handles GA, Mixpanel, Sentry)
+  track('custom_event', {
+    event_category: 'scan',
+    event_name: eventName,
+    ...properties,
   });
 
   // Log to console in development
