@@ -1,6 +1,8 @@
 // Edge function pour créer une réunion Zoom
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-import { createClient } from '../_shared/supabase.ts'
+import { authorizeRole } from '../_shared/auth.ts';
+import { cors, preflightResponse, rejectCors } from '../_shared/cors.ts';
+import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
 
 const ZOOM_API_BASE = 'https://api.zoom.us/v2'
 
@@ -12,31 +14,45 @@ interface ZoomMeetingRequest {
 }
 
 serve(async (req) => {
+  const corsResult = cors(req);
+  const corsHeaders = {
+    ...corsResult.headers,
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+  };
+
+  if (req.method === 'OPTIONS') {
+    return preflightResponse(corsResult);
+  }
+
+  if (!corsResult.allowed) {
+    return rejectCors(corsResult);
+  }
+
+  const { user, status } = await authorizeRole(req, ['b2c', 'b2b_user', 'b2b_admin', 'admin']);
+  if (!user) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
+
+  const rateLimit = await enforceEdgeRateLimit(req, {
+    route: 'create-zoom-meeting',
+    userId: user.id,
+    limit: 10,
+    windowMs: 60_000,
+    description: 'Zoom meeting creation API',
+  });
+
+  if (!rateLimit.allowed) {
+    return buildRateLimitResponse(rateLimit, corsHeaders, {
+      error: 'Too many requests',
+      retryAfter: rateLimit.retryAfter,
+    });
+  }
+
   try {
-    // Vérifier l'authentification
-    const authHeader = req.headers.get('Authorization')
-    if (!authHeader) {
-      return new Response(JSON.stringify({ error: 'Missing authorization header' }), {
-        status: 401,
-        headers: { 'Content-Type': 'application/json' }
-      })
-    }
-
-    // Créer client Supabase pour vérifier l'utilisateur
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      { global: { headers: { Authorization: authHeader } } }
-    )
-
-    const { data: { user }, error: userError } = await supabaseClient.auth.getUser()
-    if (userError || !user) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-        status: 401,
-        headers: { 'Content-Type': 'application/json' }
-      })
-    }
-
     // Récupérer les paramètres
     const params: ZoomMeetingRequest = await req.json()
 
@@ -105,7 +121,7 @@ serve(async (req) => {
 
     return new Response(JSON.stringify(meeting), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     })
 
   } catch (error) {
@@ -113,7 +129,7 @@ serve(async (req) => {
     const err = error as Error;
     return new Response(JSON.stringify({ error: err.message }), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     })
   }
 })

@@ -6,6 +6,7 @@ import {
   isSuiteEnabled,
   jsonResponse,
 } from '../_shared/b2b.ts';
+import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
 
 const serviceSecret = Deno.env.get('B2B_KEY_ROTATION_SECRET') ?? '';
 
@@ -16,8 +17,14 @@ function enforceSuiteEnabled(req: Request) {
 }
 
 serve(async (req) => {
+  const corsHeaders = {
+    ...buildCorsHeaders(req),
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+  };
+
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: buildCorsHeaders(req) });
+    return new Response('ok', { headers: corsHeaders });
   }
 
   try {
@@ -41,6 +48,21 @@ serve(async (req) => {
 
     if (!hasServiceSecret && auth.orgRole !== 'admin') {
       return jsonResponse(req, 403, { error: 'forbidden' });
+    }
+
+    const rateLimit = await enforceEdgeRateLimit(req, {
+      route: 'b2b-security-rotate-keys',
+      userId: auth.userId,
+      limit: 5,
+      windowMs: 60_000,
+      description: 'B2B security key rotation',
+    });
+
+    if (!rateLimit.allowed) {
+      return buildRateLimitResponse(rateLimit, corsHeaders, {
+        error: 'Too many requests',
+        retryAfter: rateLimit.retryAfter,
+      });
     }
 
     await appendAuditLog({

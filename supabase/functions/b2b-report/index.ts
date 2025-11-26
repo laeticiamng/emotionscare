@@ -12,6 +12,7 @@ import {
 } from '../_shared/b2b.ts';
 import { sanitizeAggregateText } from '../_shared/clinical_text.ts';
 import { addSentryBreadcrumb } from '../_shared/sentry.ts';
+import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
 // Reporting utilities (copied from src/lib/b2b/reporting.ts)
 type Bucket = 'low' | 'mid' | 'high' | 'unknown';
 
@@ -175,8 +176,14 @@ function ensureThreeSentences(sentences: string[]): string[] {
 }
 
 serve(async (req) => {
+  const corsHeaders = {
+    ...buildCorsHeaders(req),
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+  };
+
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: buildCorsHeaders(req) });
+    return new Response('ok', { headers: corsHeaders });
   }
 
   try {
@@ -197,6 +204,21 @@ serve(async (req) => {
 
     if (auth.orgRole !== 'admin' && auth.orgRole !== 'manager') {
       return jsonResponse(req, 403, { error: 'forbidden' });
+    }
+
+    const rateLimit = await enforceEdgeRateLimit(req, {
+      route: 'b2b-report',
+      userId: auth.userId,
+      limit: 30,
+      windowMs: 60_000,
+      description: 'B2B report API',
+    });
+
+    if (!rateLimit.allowed) {
+      return buildRateLimitResponse(rateLimit, corsHeaders, {
+        error: 'Too many requests',
+        retryAfter: rateLimit.retryAfter,
+      });
     }
 
     const url = new URL(req.url);

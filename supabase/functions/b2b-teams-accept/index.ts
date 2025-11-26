@@ -8,6 +8,7 @@ import {
   serviceClient,
   sha256,
 } from '../_shared/b2b.ts';
+import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
 
 type AcceptPayload = {
   token: string;
@@ -20,8 +21,14 @@ function enforceSuiteEnabled(req: Request) {
 }
 
 serve(async (req) => {
+  const corsHeaders = {
+    ...buildCorsHeaders(req),
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+  };
+
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: buildCorsHeaders(req) });
+    return new Response('ok', { headers: corsHeaders });
   }
 
   try {
@@ -38,6 +45,21 @@ serve(async (req) => {
 
     if (user instanceof Response) {
       return user;
+    }
+
+    const rateLimit = await enforceEdgeRateLimit(req, {
+      route: 'b2b-teams-accept',
+      userId: user.id,
+      limit: 10,
+      windowMs: 60_000,
+      description: 'B2B team invite acceptance',
+    });
+
+    if (!rateLimit.allowed) {
+      return buildRateLimitResponse(rateLimit, corsHeaders, {
+        error: 'Too many requests',
+        retryAfter: rateLimit.retryAfter,
+      });
     }
 
     const body = (await req.json().catch(() => null)) as AcceptPayload | null;

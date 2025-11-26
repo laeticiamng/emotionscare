@@ -6,12 +6,9 @@
 
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@14.21.0";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+import { authorizeRole } from '../_shared/auth.ts';
+import { cors, preflightResponse, rejectCors } from '../_shared/cors.ts';
+import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
 
 const logStep = (step: string, details?: any) => {
   const timestamp = new Date().toISOString();
@@ -20,8 +17,43 @@ const logStep = (step: string, details?: any) => {
 };
 
 serve(async (req) => {
+  const corsResult = cors(req);
+  const corsHeaders = {
+    ...corsResult.headers,
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+  };
+
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    return preflightResponse(corsResult);
+  }
+
+  if (!corsResult.allowed) {
+    return rejectCors(corsResult);
+  }
+
+  const { user, status } = await authorizeRole(req, ['b2c', 'b2b_user', 'b2b_admin', 'admin']);
+  if (!user) {
+    // Return subscribed: false for unauthenticated users (maintains original behavior)
+    return new Response(JSON.stringify({ subscribed: false }), {
+      status: 200,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
+
+  const rateLimit = await enforceEdgeRateLimit(req, {
+    route: 'check-subscription',
+    userId: user.id,
+    limit: 30,
+    windowMs: 60_000,
+    description: 'Subscription check API',
+  });
+
+  if (!rateLimit.allowed) {
+    return buildRateLimitResponse(rateLimit, corsHeaders, {
+      error: 'Too many requests',
+      retryAfter: rateLimit.retryAfter,
+    });
   }
 
   try {
@@ -29,57 +61,27 @@ serve(async (req) => {
 
     // Variables d'environnement
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
-    const supabaseUrl = Deno.env.get("SUPABASE_URL");
-    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 
     if (!stripeKey) {
       logStep("ERROR: STRIPE_SECRET_KEY manquante");
-      return new Response(JSON.stringify({ 
-        subscribed: false, 
-        error: "Configuration Stripe manquante" 
+      return new Response(JSON.stringify({
+        subscribed: false,
+        error: "Configuration Stripe manquante"
       }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 500,
       });
     }
 
-    if (!supabaseUrl || !supabaseServiceKey) {
-      logStep("ERROR: Variables Supabase manquantes");
-      return new Response(JSON.stringify({ 
-        subscribed: false, 
-        error: "Configuration Supabase manquante" 
-      }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 500,
-      });
-    }
-
-    // Auth utilisateur
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader) {
-      logStep("WARNING: Pas d'auth header - utilisateur non connecté");
+    // User already authenticated via authorizeRole
+    if (!user?.email) {
+      logStep("WARNING: User email not available");
       return new Response(JSON.stringify({ subscribed: false }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,
       });
     }
 
-    const supabaseClient = createClient(supabaseUrl, supabaseServiceKey, {
-      auth: { persistSession: false }
-    });
-
-    const token = authHeader.replace("Bearer ", "");
-    const { data: userData, error: userError } = await supabaseClient.auth.getUser(token);
-    
-    if (userError || !userData.user?.email) {
-      logStep("WARNING: Utilisateur non authentifié");
-      return new Response(JSON.stringify({ subscribed: false }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 200,
-      });
-    }
-
-    const user = userData.user;
     logStep("User authenticated", { userId: user.id, email: user.email });
 
     // Stripe
