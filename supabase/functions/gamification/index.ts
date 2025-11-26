@@ -1,19 +1,36 @@
 // @ts-ignore
+/**
+ * gamification - Système de gamification (XP, niveaux, achievements)
+ *
+ * 🔒 SÉCURISÉ: Auth + Rate limit 20/min + CORS restrictif
+ */
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 // @ts-ignore
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { cors, preflightResponse, rejectCors } from '../_shared/cors.ts';
+import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
 
 serve(async (req) => {
+  // 1. CORS check
+  const corsResult = cors(req);
+  const corsHeaders = {
+    ...corsResult.headers,
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+  };
+
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return preflightResponse(corsResult);
+  }
+
+  // Vérification CORS stricte
+  if (!corsResult.allowed) {
+    console.warn('[gamification] CORS rejected - origin not allowed');
+    return rejectCors(corsResult);
   }
 
   try {
+    // 2. Auth via Supabase
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
@@ -26,11 +43,31 @@ serve(async (req) => {
 
     const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
     if (userError || !user) {
+      console.warn('[gamification] Unauthorized access attempt');
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
+
+    // 3. 🛡️ Rate limiting
+    const rateLimit = await enforceEdgeRateLimit(req, {
+      route: 'gamification',
+      userId: user.id,
+      limit: 20,
+      windowMs: 60_000,
+      description: 'Gamification operations',
+    });
+
+    if (!rateLimit.allowed) {
+      console.warn('[gamification] Rate limit exceeded', { userId: user.id });
+      return buildRateLimitResponse(rateLimit, corsHeaders, {
+        errorCode: 'rate_limit_exceeded',
+        message: `Trop de requêtes. Réessayez dans ${rateLimit.retryAfterSeconds}s.`,
+      });
+    }
+
+    console.log(`[gamification] Processing for user: ${user.id}`);
 
     const { action, data } = await req.json();
 

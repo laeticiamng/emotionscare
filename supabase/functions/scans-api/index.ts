@@ -2,6 +2,8 @@
 /**
  * Scans API - Gestion complète des scans émotionnels
  *
+ * 🔒 SÉCURISÉ: Auth user + Rate limit 60/min + CORS restrictif
+ *
  * Endpoints:
  * - POST   /scans           - Créer un scan
  * - GET    /scans           - Liste des scans (avec filtres)
@@ -22,11 +24,8 @@
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { cors, preflightResponse, rejectCors } from '../_shared/cors.ts';
+import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
 
 interface ScanData {
   scan_type: 'text' | 'voice' | 'facial' | 'emoji';
@@ -42,9 +41,19 @@ interface ScanData {
 }
 
 serve(async (req) => {
-  // Handle CORS preflight
+  const corsResult = cors(req);
+  const corsHeaders = {
+    ...corsResult.headers,
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+  };
+
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return preflightResponse(corsResult);
+  }
+
+  if (!corsResult.allowed) {
+    return rejectCors(corsResult);
   }
 
   try {
@@ -66,6 +75,22 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: 'Non autorisé' }), {
         status: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Rate limiting per-user
+    const rateLimit = await enforceEdgeRateLimit(req, {
+      route: 'scans-api',
+      userId: user.id,
+      limit: 60,
+      windowMs: 60_000,
+      description: 'Scans API operations',
+    });
+
+    if (!rateLimit.allowed) {
+      return buildRateLimitResponse(rateLimit, corsHeaders, {
+        errorCode: 'rate_limit_exceeded',
+        message: `Trop de requêtes. Réessayez dans ${rateLimit.retryAfterSeconds}s.`,
       });
     }
 

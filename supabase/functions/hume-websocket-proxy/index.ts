@@ -1,19 +1,58 @@
 // @ts-nocheck
+/**
+ * hume-websocket-proxy - Proxy WebSocket pour Hume AI
+ *
+ * 🔒 SÉCURISÉ: Auth vérifié avant upgrade + CORS restrictif
+ */
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, upgrade, sec-websocket-key, sec-websocket-version',
-};
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { cors, preflightResponse, rejectCors } from '../_shared/cors.ts';
 
 serve(async (req) => {
+  const corsResult = cors(req);
+  const corsHeaders = {
+    ...corsResult.headers,
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, upgrade, sec-websocket-key, sec-websocket-version',
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+  };
+
   console.log('[hume-proxy] Request received:', req.method, req.url);
-  
+
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     console.log('[hume-proxy] OPTIONS request, returning CORS headers');
-    return new Response(null, { headers: corsHeaders });
+    return preflightResponse(corsResult);
   }
+
+  if (!corsResult.allowed) {
+    return rejectCors(corsResult);
+  }
+
+  // Verify authentication before WebSocket upgrade
+  const authHeader = req.headers.get('Authorization');
+  if (!authHeader) {
+    return new Response(JSON.stringify({ error: 'Authorization required' }), {
+      status: 401,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
+
+  const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
+  const supabaseKey = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
+  const supabase = createClient(supabaseUrl, supabaseKey);
+
+  const token = authHeader.replace('Bearer ', '');
+  const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+
+  if (authError || !user) {
+    return new Response(JSON.stringify({ error: 'Invalid token' }), {
+      status: 401,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
+
+  console.log('[hume-proxy] User authenticated:', user.id);
 
   const { headers } = req;
   const upgradeHeader = headers.get("upgrade") || "";

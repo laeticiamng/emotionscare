@@ -1,11 +1,13 @@
-// @ts-nocheck
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+/**
+ * consent-manager - Gestion des consentements RGPD
+ *
+ * 🔒 SÉCURISÉ: Auth + Rate limit 30/min + CORS restrictif
+ */
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+// @ts-nocheck
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { cors, preflightResponse, rejectCors } from '../_shared/cors.ts';
+import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
 
 interface ConsentUpdate {
   channelId: string;
@@ -14,12 +16,27 @@ interface ConsentUpdate {
   source?: string;
 }
 
-serve(async (req) => {
+Deno.serve(async (req) => {
+  // 1. CORS check
+  const corsResult = cors(req);
+  const corsHeaders = {
+    ...corsResult.headers,
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+  };
+
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return preflightResponse(corsResult);
+  }
+
+  // Vérification CORS stricte
+  if (!corsResult.allowed) {
+    console.warn('[consent-manager] CORS rejected - origin not allowed');
+    return rejectCors(corsResult);
   }
 
   try {
+    // 2. Authentification via Supabase
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
@@ -28,11 +45,31 @@ serve(async (req) => {
 
     const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
     if (authError || !user) {
+      console.warn('[consent-manager] Unauthorized access attempt');
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
+
+    // 3. 🛡️ Rate limiting
+    const rateLimit = await enforceEdgeRateLimit(req, {
+      route: 'consent-manager',
+      userId: user.id,
+      limit: 30,
+      windowMs: 60_000,
+      description: 'Consent management operations',
+    });
+
+    if (!rateLimit.allowed) {
+      console.warn('[consent-manager] Rate limit exceeded', { userId: user.id });
+      return buildRateLimitResponse(rateLimit, corsHeaders, {
+        errorCode: 'rate_limit_exceeded',
+        message: `Trop de requêtes. Réessayez dans ${rateLimit.retryAfterSeconds}s.`,
+      });
+    }
+
+    console.log(`[consent-manager] Processing for user: ${user.id}`);
 
     const url = new URL(req.url);
     const path = url.pathname.split('/').filter(Boolean);

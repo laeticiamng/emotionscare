@@ -1,14 +1,15 @@
+// @ts-nocheck
 /**
  * Shopify Webhook Handler - EmotionsCare Store
  * Gère l'activation automatique des modules après achat
+ *
+ * 🔒 SÉCURISÉ: HMAC signature Shopify + Rate limit IP 50/min + CORS restrictif
+ * Note: Auth par signature HMAC Shopify (x-shopify-hmac-sha256)
  */
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-shopify-hmac-sha256, x-shopify-shop-domain, x-shopify-topic',
-};
+import { cors, preflightResponse, rejectCors } from '../_shared/cors.ts';
+import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
 
 interface ShopifyOrder {
   id: number;
@@ -34,9 +35,36 @@ interface ShopifyOrder {
 }
 
 serve(async (req) => {
-  // Handle CORS
+  const corsResult = cors(req);
+  const corsHeaders = {
+    ...corsResult.headers,
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+  };
+
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return preflightResponse(corsResult);
+  }
+
+  if (!corsResult.allowed) {
+    return rejectCors(corsResult);
+  }
+
+  // Rate limit IP-based pour webhooks Shopify
+  const clientIp = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+  const rateLimit = await enforceEdgeRateLimit(req, {
+    route: 'shopify-webhook',
+    userId: `ip:${clientIp}`,
+    limit: 50,
+    windowMs: 60_000,
+    description: 'Shopify webhook handler',
+  });
+
+  if (!rateLimit.allowed) {
+    return buildRateLimitResponse(rateLimit, corsHeaders, {
+      errorCode: 'rate_limit_exceeded',
+      message: `Too many requests. Retry in ${rateLimit.retryAfterSeconds}s.`,
+    });
   }
 
   try {

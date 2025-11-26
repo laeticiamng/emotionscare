@@ -1,11 +1,14 @@
 // @ts-nocheck
+/**
+ * pseudonymize-data - Pseudonymisation/dépseudonymisation RGPD
+ *
+ * 🔒 SÉCURISÉ: Auth admin + Rate limit 10/min + CORS restrictif
+ */
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.43.4';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { authorizeRole } from '../_shared/auth.ts';
+import { cors, preflightResponse, rejectCors } from '../_shared/cors.ts';
+import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
 
 interface PseudonymizeRequest {
   operation: 'pseudonymize' | 'depseudonymize' | 'rotate_key' | 'test';
@@ -146,20 +149,58 @@ class PseudonymizationService {
 }
 
 serve(async (req) => {
+  // 1. CORS check
+  const corsResult = cors(req);
+  const corsHeaders = {
+    ...corsResult.headers,
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+  };
+
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return preflightResponse(corsResult);
   }
+
+  // Vérification CORS stricte
+  if (!corsResult.allowed) {
+    console.warn('[pseudonymize-data] CORS rejected - origin not allowed');
+    return rejectCors(corsResult);
+  }
+
+  // 2. 🔒 SÉCURITÉ: Auth admin obligatoire (données sensibles)
+  const { user, status } = await authorizeRole(req, ['admin']);
+  if (!user) {
+    console.warn('[pseudonymize-data] Unauthorized access attempt');
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
+
+  // 3. 🛡️ Rate limiting strict
+  const rateLimit = await enforceEdgeRateLimit(req, {
+    route: 'pseudonymize-data',
+    userId: user.id,
+    limit: 10,
+    windowMs: 60_000,
+    description: 'Pseudonymization - Admin only',
+  });
+
+  if (!rateLimit.allowed) {
+    console.warn('[pseudonymize-data] Rate limit exceeded', { userId: user.id });
+    return buildRateLimitResponse(rateLimit, corsHeaders, {
+      errorCode: 'rate_limit_exceeded',
+      message: `Trop de requêtes. Réessayez dans ${rateLimit.retryAfterSeconds}s.`,
+    });
+  }
+
+  console.log(`[pseudonymize-data] Processing for admin: ${user.id}`);
 
   try {
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
-
-    const authHeader = req.headers.get('Authorization');
-    if (!authHeader) {
-      throw new Error('Missing authorization header');
-    }
 
     const body = await req.json() as PseudonymizeRequest;
     const service = new PseudonymizationService();

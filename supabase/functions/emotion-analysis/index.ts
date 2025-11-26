@@ -1,17 +1,55 @@
+// @ts-nocheck
+/**
+ * emotion-analysis - Analyse émotionnelle de texte via IA
+ *
+ * 🔒 SÉCURISÉ: Auth + Rate limit 30/min + CORS restrictif
+ */
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { authenticateRequest } from '../_shared/auth-middleware.ts';
+import { cors, preflightResponse, rejectCors } from '../_shared/cors.ts';
+import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
 
 serve(async (req) => {
+  const corsResult = cors(req);
+  const corsHeaders = {
+    ...corsResult.headers,
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+  };
+
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return preflightResponse(corsResult);
+  }
+
+  if (!corsResult.allowed) {
+    return rejectCors(corsResult);
   }
 
   try {
+    const authResult = await authenticateRequest(req);
+    if (authResult.status !== 200 || !authResult.user) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: authResult.status,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const rateLimit = await enforceEdgeRateLimit(req, {
+      route: 'emotion-analysis',
+      userId: authResult.user.id,
+      limit: 30,
+      windowMs: 60_000,
+      description: 'Emotion analysis AI',
+    });
+
+    if (!rateLimit.allowed) {
+      return buildRateLimitResponse(rateLimit, corsHeaders, {
+        errorCode: 'rate_limit_exceeded',
+        message: `Trop de requêtes. Réessayez dans ${rateLimit.retryAfterSeconds}s.`,
+      });
+    }
+
     const { text, language = 'fr' } = await req.json();
     
     if (!text || typeof text !== 'string' || text.trim().length === 0) {

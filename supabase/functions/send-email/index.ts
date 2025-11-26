@@ -1,8 +1,16 @@
+/**
+ * send-email - Envoi d'emails via Resend
+ *
+ * 🔒 SÉCURISÉ: Auth + Rate limit 20/min + CORS restrictif
+ */
+
 // @ts-nocheck
-import { serve } from 'https://deno.land/std@0.208.0/http/server.ts';
 import { z } from 'https://deno.land/x/zod@v3.22.2/mod.ts';
 import { supabase } from '../_shared/supa_client.ts';
 import { emailTemplates } from './templates.ts';
+import { cors, preflightResponse, rejectCors } from '../_shared/cors.ts';
+import { authenticateRequest, logUnauthorizedAccess } from '../_shared/auth-middleware.ts';
+import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
 
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY');
 const FROM_EMAIL = Deno.env.get('FROM_EMAIL') || 'noreply@emotionscare.com';
@@ -90,13 +98,56 @@ async function sendWithResend(
   }
 }
 
-serve(async (req) => {
+Deno.serve(async (req) => {
+  // 1. CORS check
+  const corsResult = cors(req);
+  const corsHeaders = {
+    ...corsResult.headers,
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+  };
+
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: { 'Access-Control-Allow-Origin': '*' } });
+    return preflightResponse(corsResult);
+  }
+
+  // Vérification CORS stricte
+  if (!corsResult.allowed) {
+    console.warn('[send-email] CORS rejected - origin not allowed');
+    return rejectCors(corsResult);
   }
 
   try {
-    // Validation du payload
+    // 2. 🔒 Authentification obligatoire
+    const authResult = await authenticateRequest(req);
+    if (authResult.status !== 200 || !authResult.user) {
+      await logUnauthorizedAccess(req, authResult.error || 'Authentication failed');
+      return new Response(JSON.stringify({ error: 'Authentication required' }), {
+        status: authResult.status,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // 3. 🛡️ Rate limiting (éviter spam)
+    const rateLimit = await enforceEdgeRateLimit(req, {
+      route: 'send-email',
+      userId: authResult.user.id,
+      limit: 20,
+      windowMs: 60_000,
+      description: 'Email sending - Resend API',
+    });
+
+    if (!rateLimit.allowed) {
+      console.warn('[send-email] Rate limit exceeded', { userId: authResult.user.id });
+      return buildRateLimitResponse(rateLimit, corsHeaders, {
+        errorCode: 'rate_limit_exceeded',
+        message: `Trop d'emails. Réessayez dans ${rateLimit.retryAfterSeconds}s.`,
+      });
+    }
+
+    console.log(`[send-email] Processing for user: ${authResult.user.id}`);
+
+    // 4. Validation du payload
     const body = await req.json();
     const payload: EmailPayload = SendEmailSchema.parse(body);
 

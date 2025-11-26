@@ -1,24 +1,68 @@
-// Edge Function: Générer un rapport enrichi IA
-// Phase 3 - Excellence
-
+// @ts-nocheck
+/**
+ * ai-reports-generate - Génération de rapports IA enrichis
+ *
+ * 🔒 SÉCURISÉ: Auth + Rate limit 5/min + CORS restrictif
+ */
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from '../_shared/supabase.ts';
+import { authenticateRequest } from '../_shared/auth-middleware.ts';
+import { cors, preflightResponse, rejectCors } from '../_shared/cors.ts';
+import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
 // @ts-ignore
 import OpenAI from 'https://esm.sh/openai@4.100.0';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
 
 const openai = new OpenAI({
   apiKey: Deno.env.get('OPENAI_API_KEY') || '',
 });
 
 serve(async (req) => {
+  // 1. CORS check
+  const corsResult = cors(req);
+  const corsHeaders = {
+    ...corsResult.headers,
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+  };
+
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
+    return preflightResponse(corsResult);
   }
+
+  // Vérification CORS stricte
+  if (!corsResult.allowed) {
+    console.warn('[ai-reports-generate] CORS rejected - origin not allowed');
+    return rejectCors(corsResult);
+  }
+
+  // 2. 🔒 SÉCURITÉ: Authentification obligatoire
+  const authResult = await authenticateRequest(req);
+  if (authResult.status !== 200 || !authResult.user) {
+    console.warn('[ai-reports-generate] Unauthorized access attempt');
+    return new Response(JSON.stringify({ error: authResult.error || 'Authentication required' }), {
+      status: authResult.status,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
+
+  // 3. 🛡️ Rate limiting strict (rapports AI coûteux)
+  const rateLimit = await enforceEdgeRateLimit(req, {
+    route: 'ai-reports-generate',
+    userId: authResult.user.id,
+    limit: 5,
+    windowMs: 60_000,
+    description: 'AI report generation',
+  });
+
+  if (!rateLimit.allowed) {
+    console.warn('[ai-reports-generate] Rate limit exceeded', { userId: authResult.user.id });
+    return buildRateLimitResponse(rateLimit, corsHeaders, {
+      errorCode: 'rate_limit_exceeded',
+      message: `Trop de requêtes. Réessayez dans ${rateLimit.retryAfterSeconds}s.`,
+    });
+  }
+
+  console.log(`[ai-reports-generate] Processing for user: ${authResult.user.id}`);
 
   try {
     const { user_id, type, period_start, period_end, format = 'html', options = {} } =
@@ -26,6 +70,15 @@ serve(async (req) => {
 
     if (!user_id || !type || !period_start || !period_end) {
       throw new Error('Missing required parameters');
+    }
+
+    // Vérifier que l'utilisateur ne peut générer que ses propres rapports
+    if (user_id !== authResult.user.id) {
+      console.warn('[ai-reports-generate] User attempting to access another user data');
+      return new Response(JSON.stringify({ error: 'Forbidden - cannot access other user data' }), {
+        status: 403,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
     const supabaseClient = createClient(

@@ -1,10 +1,13 @@
 // @ts-nocheck
+/**
+ * mood-camera - Analyse faciale des émotions via Hume AI
+ *
+ * 🔒 SÉCURISÉ: Auth multi-rôle + Rate limit 30/min + CORS restrictif
+ */
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { authorizeRole } from '../_shared/auth.ts';
+import { cors, preflightResponse, rejectCors } from '../_shared/cors.ts';
+import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
 
 /**
  * Map ALL 48 Hume emotions to valence/arousal coordinates
@@ -289,9 +292,42 @@ async function analyzeFacialExpression(frameBase64: string) {
 }
 
 serve(async (req) => {
-  // Handle CORS preflight requests
+  const corsResult = cors(req);
+  const corsHeaders = {
+    ...corsResult.headers,
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+  };
+
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return preflightResponse(corsResult);
+  }
+
+  if (!corsResult.allowed) {
+    return rejectCors(corsResult);
+  }
+
+  const { user, status } = await authorizeRole(req, ['b2c', 'b2b_user', 'b2b_admin', 'admin']);
+  if (!user) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
+
+  const rateLimit = await enforceEdgeRateLimit(req, {
+    route: 'mood-camera',
+    userId: user.id,
+    limit: 30,
+    windowMs: 60_000,
+    description: 'Mood camera analysis',
+  });
+
+  if (!rateLimit.allowed) {
+    return buildRateLimitResponse(rateLimit, corsHeaders, {
+      errorCode: 'rate_limit_exceeded',
+      message: `Trop de requêtes. Réessayez dans ${rateLimit.retryAfterSeconds}s.`,
+    });
   }
 
   try {
@@ -301,7 +337,7 @@ serve(async (req) => {
     if (req.method !== 'POST') {
       return new Response(
         JSON.stringify({ error: 'method_not_allowed' }),
-        { 
+        {
           status: 405,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         }
@@ -314,7 +350,7 @@ serve(async (req) => {
       console.error('[mood-camera] Invalid body:', body);
       return new Response(
         JSON.stringify({ error: 'invalid_body', message: 'Missing frame data' }),
-        { 
+        {
           status: 422,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         }

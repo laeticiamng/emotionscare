@@ -1,11 +1,14 @@
-// @ts-nocheck
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+/**
+ * send-notification - Envoi de notifications via webhooks (Slack, Discord)
+ *
+ * 🔒 SÉCURISÉ: Auth + Rate limit 30/min + CORS restrictif
+ */
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+// @ts-nocheck
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { cors, preflightResponse, rejectCors } from '../_shared/cors.ts';
+import { authenticateRequest, logUnauthorizedAccess } from '../_shared/auth-middleware.ts';
+import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
 
 interface NotificationPayload {
   event_type: 'ab_test_significant' | 'ticket_created' | 'alert_critical' | 'escalation_high';
@@ -19,12 +22,55 @@ const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
 const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-serve(async (req) => {
+Deno.serve(async (req) => {
+  // 1. CORS check
+  const corsResult = cors(req);
+  const corsHeaders = {
+    ...corsResult.headers,
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+  };
+
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return preflightResponse(corsResult);
+  }
+
+  // Vérification CORS stricte
+  if (!corsResult.allowed) {
+    console.warn('[send-notification] CORS rejected - origin not allowed');
+    return rejectCors(corsResult);
   }
 
   try {
+    // 2. 🔒 Authentification obligatoire
+    const authResult = await authenticateRequest(req);
+    if (authResult.status !== 200 || !authResult.user) {
+      await logUnauthorizedAccess(req, authResult.error || 'Authentication failed');
+      return new Response(JSON.stringify({ error: 'Authentication required' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // 3. 🛡️ Rate limiting
+    const rateLimit = await enforceEdgeRateLimit(req, {
+      route: 'send-notification',
+      userId: authResult.user.id,
+      limit: 30,
+      windowMs: 60_000,
+      description: 'Notification sending - Webhooks',
+    });
+
+    if (!rateLimit.allowed) {
+      console.warn('[send-notification] Rate limit exceeded', { userId: authResult.user.id });
+      return buildRateLimitResponse(rateLimit, corsHeaders, {
+        errorCode: 'rate_limit_exceeded',
+        message: `Trop de notifications. Réessayez dans ${rateLimit.retryAfterSeconds}s.`,
+      });
+    }
+
+    console.log(`[send-notification] Processing for user: ${authResult.user.id}`);
+
     const payload: NotificationPayload = await req.json();
 
     console.log('Sending notification:', payload);

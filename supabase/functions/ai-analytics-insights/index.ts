@@ -1,18 +1,35 @@
 // @ts-nocheck
+/**
+ * ai-analytics-insights - Génération d'insights IA
+ *
+ * 🔒 SÉCURISÉ: Auth + Rate limit 10/min + CORS restrictif
+ */
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { cors, preflightResponse, rejectCors } from '../_shared/cors.ts';
+import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
 
 serve(async (req) => {
+  // 1. CORS check
+  const corsResult = cors(req);
+  const corsHeaders = {
+    ...corsResult.headers,
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+  };
+
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return preflightResponse(corsResult);
+  }
+
+  // Vérification CORS stricte
+  if (!corsResult.allowed) {
+    console.warn('[ai-analytics-insights] CORS rejected - origin not allowed');
+    return rejectCors(corsResult);
   }
 
   try {
+    // 2. Auth via Supabase
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? ''
@@ -23,11 +40,31 @@ serve(async (req) => {
     const { data: { user }, error: authError } = await supabaseClient.auth.getUser(token);
 
     if (authError || !user) {
+      console.warn('[ai-analytics-insights] Unauthorized access attempt');
       return new Response(JSON.stringify({ error: 'Non autorisé' }), {
         status: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     }
+
+    // 3. 🛡️ Rate limiting (AI coûteux)
+    const rateLimit = await enforceEdgeRateLimit(req, {
+      route: 'ai-analytics-insights',
+      userId: user.id,
+      limit: 10,
+      windowMs: 60_000,
+      description: 'AI analytics insights generation',
+    });
+
+    if (!rateLimit.allowed) {
+      console.warn('[ai-analytics-insights] Rate limit exceeded', { userId: user.id });
+      return buildRateLimitResponse(rateLimit, corsHeaders, {
+        errorCode: 'rate_limit_exceeded',
+        message: `Trop de requêtes. Réessayez dans ${rateLimit.retryAfterSeconds}s.`,
+      });
+    }
+
+    console.log(`[ai-analytics-insights] Processing for user: ${user.id}`);
 
     const { action, period = '30', analysisType = 'comprehensive' } = await req.json();
 

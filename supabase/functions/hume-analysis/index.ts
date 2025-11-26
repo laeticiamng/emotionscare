@@ -1,19 +1,34 @@
 
+/**
+ * hume-analysis - Analyse émotionnelle via Hume AI
+ *
+ * 🔒 SÉCURISÉ: Auth + Rate limit 15/min + CORS restrictif + Validation Zod
+ */
+
 // @ts-nocheck
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { authenticateRequest } from '../_shared/auth-middleware.ts';
 import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
 import { validateRequest, createErrorResponse, HumeAnalysisSchema } from '../_shared/validation.ts';
+import { cors, preflightResponse, rejectCors } from '../_shared/cors.ts';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+Deno.serve(async (req) => {
+  // 1. CORS check
+  const corsResult = cors(req);
+  const corsHeaders = {
+    ...corsResult.headers,
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+  };
 
-serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return preflightResponse(corsResult);
+  }
+
+  // Vérification CORS stricte
+  if (!corsResult.allowed) {
+    console.warn('[hume-analysis] CORS rejected - origin not allowed');
+    return rejectCors(corsResult);
   }
 
   try {

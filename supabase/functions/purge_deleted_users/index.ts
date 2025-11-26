@@ -1,12 +1,16 @@
 // @ts-nocheck
+/**
+ * purge_deleted_users - Suppression définitive des utilisateurs (RGPD Art. 17)
+ *
+ * 🔒 SÉCURISÉ: Auth admin UNIQUEMENT + Rate limit 2/min + CORS restrictif
+ * ⚠️ FONCTION CRITIQUE: Supprime définitivement les données utilisateurs
+ */
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { withMonitoring } from '../_shared/monitoring-wrapper.ts';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { authorizeRole } from '../_shared/auth.ts';
+import { cors, preflightResponse, rejectCors } from '../_shared/cors.ts';
+import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
 
 /**
  * GDPR Article 17 - Right to Erasure (Right to be Forgotten)
@@ -23,15 +27,58 @@ const corsHeaders = {
  *    - Log the deletion for audit trail
  *    - Remove the delete_request
  *
- * Security: Requires SERVICE_ROLE_KEY (should only run as scheduled job)
+ * Security: Requires admin authentication + SERVICE_ROLE_KEY
  */
 const handler = withMonitoring('purge_deleted_users', async (req) => {
+  // 1. CORS check
+  const corsResult = cors(req);
+  const corsHeaders = {
+    ...corsResult.headers,
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+  };
+
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return preflightResponse(corsResult);
   }
 
+  // Vérification CORS stricte
+  if (!corsResult.allowed) {
+    console.warn('[purge_deleted_users] CORS rejected - origin not allowed');
+    return rejectCors(corsResult);
+  }
+
+  // 2. 🔒 SÉCURITÉ CRITIQUE: Auth admin UNIQUEMENT
+  const { user, status } = await authorizeRole(req, ['admin']);
+  if (!user) {
+    console.warn('[purge_deleted_users] CRITICAL: Unauthorized purge attempt');
+    return new Response(JSON.stringify({ error: 'Unauthorized - Admin only' }), {
+      status,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
+
+  // 3. 🛡️ Rate limiting TRÈS strict (fonction destructive)
+  const rateLimit = await enforceEdgeRateLimit(req, {
+    route: 'purge_deleted_users',
+    userId: user.id,
+    limit: 2,
+    windowMs: 60_000,
+    description: 'CRITICAL: User purge - Admin only',
+  });
+
+  if (!rateLimit.allowed) {
+    console.warn('[purge_deleted_users] Rate limit exceeded', { userId: user.id });
+    return buildRateLimitResponse(rateLimit, corsHeaders, {
+      errorCode: 'rate_limit_exceeded',
+      message: `Fonction critique limitée. Réessayez dans ${rateLimit.retryAfterSeconds}s.`,
+    });
+  }
+
+  console.log(`[purge_deleted_users] CRITICAL: Admin ${user.id} initiating user purge`);
+
   try {
-    // This function should only be called with service role
+    // This function uses service role for database operations
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',

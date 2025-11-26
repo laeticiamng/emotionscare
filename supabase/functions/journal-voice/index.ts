@@ -1,26 +1,63 @@
+/**
+ * journal-voice - Entrée de journal vocale avec analyse émotionnelle
+ *
+ * 🔒 SÉCURISÉ: Auth + Rate limit 10/min + CORS restrictif
+ */
+
 // @ts-nocheck
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { authenticateRequest } from '../_shared/auth-middleware.ts';
+import { authenticateRequest, logUnauthorizedAccess } from '../_shared/auth-middleware.ts';
+import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
+import { cors, preflightResponse, rejectCors } from '../_shared/cors.ts';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+Deno.serve(async (req) => {
+  // 1. CORS check
+  const corsResult = cors(req);
+  const corsHeaders = {
+    ...corsResult.headers,
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+  };
 
-serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
+    return preflightResponse(corsResult);
+  }
+
+  // Vérification CORS stricte
+  if (!corsResult.allowed) {
+    console.warn('[journal-voice] CORS rejected - origin not allowed');
+    return rejectCors(corsResult);
   }
 
   try {
+    // 2. 🔒 Authentification obligatoire
     const authResult = await authenticateRequest(req);
-    if (authResult.status !== 200) {
+    if (authResult.status !== 200 || !authResult.user) {
+      await logUnauthorizedAccess(req, authResult.error || 'Authentication failed');
       return new Response(
         JSON.stringify({ error: 'Authentication required' }),
-        { status: authResult.status, headers: corsHeaders }
+        { status: authResult.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+
+    // 3. 🛡️ Rate limiting (création de journal = action coûteuse)
+    const rateLimit = await enforceEdgeRateLimit(req, {
+      route: 'journal-voice',
+      userId: authResult.user.id,
+      limit: 10,
+      windowMs: 60_000,
+      description: 'Voice journal entry creation',
+    });
+
+    if (!rateLimit.allowed) {
+      console.warn('[journal-voice] Rate limit exceeded', { userId: authResult.user.id });
+      return buildRateLimitResponse(rateLimit, corsHeaders, {
+        errorCode: 'rate_limit_exceeded',
+        message: `Trop d'entrées vocales. Réessayez dans ${rateLimit.retryAfterSeconds}s.`,
+      });
+    }
+
+    console.log(`[journal-voice] Processing for user: ${authResult.user.id}`);
 
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',

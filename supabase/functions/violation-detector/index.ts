@@ -1,13 +1,16 @@
 // @ts-ignore
+/**
+ * violation-detector - Détection de violations RGPD via ML
+ *
+ * 🔒 SÉCURISÉ: Auth admin + Rate limit 5/min + CORS restrictif
+ */
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 // @ts-ignore
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { withMonitoring, logger } from '../_shared/monitoring-wrapper.ts';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { authorizeRole } from '../_shared/auth.ts';
+import { cors, preflightResponse, rejectCors } from '../_shared/cors.ts';
+import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
 
 interface DetectionRequest {
   action: 'analyze' | 'scan' | 'predict';
@@ -38,6 +41,53 @@ interface AlertData {
 }
 
 const handler = withMonitoring('violation-detector', async (req, context) => {
+  // 1. CORS check
+  const corsResult = cors(req);
+  const corsHeaders = {
+    ...corsResult.headers,
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+  };
+
+  if (req.method === 'OPTIONS') {
+    return preflightResponse(corsResult);
+  }
+
+  // Vérification CORS stricte
+  if (!corsResult.allowed) {
+    console.warn('[violation-detector] CORS rejected - origin not allowed');
+    return rejectCors(corsResult);
+  }
+
+  // 2. 🔒 SÉCURITÉ: Auth admin obligatoire
+  const { user, status } = await authorizeRole(req, ['admin']);
+  if (!user) {
+    console.warn('[violation-detector] Unauthorized access attempt');
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
+
+  // 3. 🛡️ Rate limiting strict
+  const rateLimit = await enforceEdgeRateLimit(req, {
+    route: 'violation-detector',
+    userId: user.id,
+    limit: 5,
+    windowMs: 60_000,
+    description: 'GDPR violation detection - Admin only',
+  });
+
+  if (!rateLimit.allowed) {
+    console.warn('[violation-detector] Rate limit exceeded', { userId: user.id });
+    return buildRateLimitResponse(rateLimit, corsHeaders, {
+      errorCode: 'rate_limit_exceeded',
+      message: `Trop de requêtes. Réessayez dans ${rateLimit.retryAfterSeconds}s.`,
+    });
+  }
+
+  console.log(`[violation-detector] Processing for admin: ${user.id}`);
+
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;

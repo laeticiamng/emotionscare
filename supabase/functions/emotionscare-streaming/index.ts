@@ -1,19 +1,49 @@
 // @ts-nocheck
+/**
+ * emotionscare-streaming - Streaming et gestion de la bibliothèque musicale
+ *
+ * 🔒 SÉCURISÉ: Auth partielle + Rate limit 60/min + CORS restrictif
+ */
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
+import { cors, preflightResponse, rejectCors } from '../_shared/cors.ts'
+import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts'
 
 const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? ''
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
 const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
 serve(async (req) => {
+  const corsResult = cors(req)
+  const corsHeaders = {
+    ...corsResult.headers,
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+  }
+
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders })
+    return preflightResponse(corsResult)
+  }
+
+  if (!corsResult.allowed) {
+    return rejectCors(corsResult)
+  }
+
+  // Rate limiting basé sur IP pour cette fonction
+  const clientIp = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
+  const rateLimit = await enforceEdgeRateLimit(req, {
+    route: 'emotionscare-streaming',
+    userId: `ip:${clientIp}`,
+    limit: 60,
+    windowMs: 60_000,
+    description: 'EmotionsCare streaming API',
+  })
+
+  if (!rateLimit.allowed) {
+    return buildRateLimitResponse(rateLimit, corsHeaders, {
+      errorCode: 'rate_limit_exceeded',
+      message: `Trop de requêtes. Réessayez dans ${rateLimit.retryAfterSeconds}s.`,
+    })
   }
 
   try {

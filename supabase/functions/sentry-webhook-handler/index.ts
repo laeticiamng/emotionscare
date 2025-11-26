@@ -1,12 +1,15 @@
 // @ts-nocheck
+/**
+ * sentry-webhook-handler - Webhook Sentry pour alertes
+ *
+ * 🔒 SÉCURISÉ: Rate limit IP 100/min + CORS restrictif
+ * Note: Auth par signature Sentry (sentry-hook-signature)
+ */
 import { serve } from 'https://deno.land/std@0.208.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { withMonitoring, logger } from '../_shared/monitoring-wrapper.ts';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, sentry-hook-signature',
-};
+import { cors, preflightResponse, rejectCors } from '../_shared/cors.ts';
+import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
 
 interface SentryEvent {
   id: string;
@@ -45,6 +48,38 @@ const THRESHOLDS: AlertThresholds = {
 };
 
 const handler = withMonitoring('sentry-webhook-handler', async (req, context) => {
+  const corsResult = cors(req);
+  const corsHeaders = {
+    ...corsResult.headers,
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+  };
+
+  if (req.method === 'OPTIONS') {
+    return preflightResponse(corsResult);
+  }
+
+  if (!corsResult.allowed) {
+    return rejectCors(corsResult);
+  }
+
+  // Rate limit IP-based pour webhooks externes
+  const clientIp = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+  const rateLimit = await enforceEdgeRateLimit(req, {
+    route: 'sentry-webhook-handler',
+    userId: `ip:${clientIp}`,
+    limit: 100,
+    windowMs: 60_000,
+    description: 'Sentry webhook handler',
+  });
+
+  if (!rateLimit.allowed) {
+    return buildRateLimitResponse(rateLimit, corsHeaders, {
+      errorCode: 'rate_limit_exceeded',
+      message: `Too many requests. Retry in ${rateLimit.retryAfterSeconds}s.`,
+    });
+  }
+
   try {
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',

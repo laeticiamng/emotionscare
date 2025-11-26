@@ -1,22 +1,38 @@
-// @ts-nocheck
 /**
- * Stripe Webhook Handler
- * Gère les événements Stripe et attribue/retire automatiquement le rôle premium
+ * stripe-webhook - Gestion des événements Stripe
+ *
+ * 🔒 SÉCURISÉ: Signature Stripe + Rate limit 100/min
+ * Note: Pas de CORS restrictif car Stripe doit pouvoir appeler ce webhook
  */
 
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+// @ts-nocheck
 import Stripe from "https://esm.sh/stripe@14.21.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
 
 const logStep = (step: string, details?: any) => {
   const timestamp = new Date().toISOString();
   const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
-  console.log(`[${timestamp}] [STRIPE-WEBHOOK] ${step}${detailsStr}`);
+  console.log(`[${timestamp}] [stripe-webhook] ${step}${detailsStr}`);
 };
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   try {
     logStep("Webhook received");
+
+    // 🛡️ Rate limiting pour prévenir les abus
+    const rateLimit = await enforceEdgeRateLimit(req, {
+      route: 'stripe-webhook',
+      userId: null,
+      limit: 100,
+      windowMs: 60_000,
+      description: 'Stripe webhook events',
+    });
+
+    if (!rateLimit.allowed) {
+      logStep("Rate limit exceeded");
+      return buildRateLimitResponse(rateLimit, { 'Content-Type': 'application/json' });
+    }
 
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
     const webhookSecret = Deno.env.get("STRIPE_WEBHOOK_SECRET");

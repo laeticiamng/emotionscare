@@ -1,26 +1,26 @@
 // @ts-nocheck
 /**
  * 🎯 API Orchestrator - Gestionnaire Intelligent des APIs
- * 
+ *
  * Optimise les appels aux APIs externes:
  * - OpenAI (GPT-5, Whisper, DALL-E, TTS)
  * - Hume AI (Face, Voice, Prosody)
  * - Suno/MusicGen
- * 
+ *
  * Fonctionnalités:
  * - Caching intelligent
  * - Batch processing
  * - Rate limiting adaptatif
  * - Fallback local
  * - Cost tracking
+ *
+ * 🔒 SÉCURISÉ: Auth admin + Rate limit 30/min + CORS restrictif
  */
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { authorizeRole } from '../_shared/auth.ts';
+import { cors, preflightResponse, rejectCors } from '../_shared/cors.ts';
+import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
 
 // ============= Configuration =============
 
@@ -405,8 +405,42 @@ async function smartAPICall(api: string, model: string, input: any, options: {
 // ============= Endpoint Principal =============
 
 serve(async (req) => {
+  const corsResult = cors(req);
+  const corsHeaders = {
+    ...corsResult.headers,
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+  };
+
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return preflightResponse(corsResult);
+  }
+
+  if (!corsResult.allowed) {
+    return rejectCors(corsResult);
+  }
+
+  const { user, status } = await authorizeRole(req, ['admin']);
+  if (!user) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
+
+  const rateLimit = await enforceEdgeRateLimit(req, {
+    route: 'api-orchestrator',
+    userId: user.id,
+    limit: 30,
+    windowMs: 60_000,
+    description: 'API Orchestrator - Admin only',
+  });
+
+  if (!rateLimit.allowed) {
+    return buildRateLimitResponse(rateLimit, corsHeaders, {
+      errorCode: 'rate_limit_exceeded',
+      message: `Trop de requêtes. Réessayez dans ${rateLimit.retryAfterSeconds}s.`,
+    });
   }
 
   try {

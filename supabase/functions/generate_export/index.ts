@@ -1,12 +1,14 @@
 // @ts-nocheck
+/**
+ * generate_export - Génération d'exports de données utilisateur
+ *
+ * 🔒 SÉCURISÉ: Auth utilisateur + Rate limit 10/min + CORS restrictif
+ */
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { withMonitoring } from '../_shared/monitoring-wrapper.ts';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { cors, preflightResponse, rejectCors } from '../_shared/cors.ts';
+import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
 
 interface ExportRequest {
   export_type: 'analytics' | 'vr_sessions' | 'breath_sessions' | 'music_history' | 'emotional_logs' | 'custom';
@@ -22,8 +24,19 @@ interface ExportRequest {
  * Use cases: analytics exports, custom reports, data analysis
  */
 const handler = withMonitoring('generate_export', async (req) => {
+  const corsResult = cors(req);
+  const corsHeaders = {
+    ...corsResult.headers,
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+  };
+
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return preflightResponse(corsResult);
+  }
+
+  if (!corsResult.allowed) {
+    return rejectCors(corsResult);
   }
 
   try {
@@ -49,6 +62,21 @@ const handler = withMonitoring('generate_export', async (req) => {
       return new Response(JSON.stringify({ error: 'Invalid token' }), {
         status: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const rateLimit = await enforceEdgeRateLimit(req, {
+      route: 'generate_export',
+      userId: user.id,
+      limit: 10,
+      windowMs: 60_000,
+      description: 'User data export generation',
+    });
+
+    if (!rateLimit.allowed) {
+      return buildRateLimitResponse(rateLimit, corsHeaders, {
+        errorCode: 'rate_limit_exceeded',
+        message: `Trop de requêtes. Réessayez dans ${rateLimit.retryAfterSeconds}s.`,
       });
     }
 

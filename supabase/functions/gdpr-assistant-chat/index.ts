@@ -1,16 +1,32 @@
 // @ts-ignore
+/**
+ * gdpr-assistant-chat - Assistant IA pour conformité RGPD
+ *
+ * 🔒 SÉCURISÉ: Auth + Rate limit 10/min + CORS restrictif
+ */
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 // @ts-ignore
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { cors, preflightResponse, rejectCors } from '../_shared/cors.ts';
+import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
 
 serve(async (req: Request) => {
+  // 1. CORS check
+  const corsResult = cors(req);
+  const corsHeaders = {
+    ...corsResult.headers,
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+  };
+
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return preflightResponse(corsResult);
+  }
+
+  // Vérification CORS stricte
+  if (!corsResult.allowed) {
+    console.warn('[gdpr-assistant-chat] CORS rejected - origin not allowed');
+    return rejectCors(corsResult);
   }
 
   try {
@@ -21,13 +37,37 @@ serve(async (req: Request) => {
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     if (!LOVABLE_API_KEY) throw new Error('LOVABLE_API_KEY not configured');
 
+    // 2. Auth
     const authHeader = req.headers.get('Authorization')!;
     const token = authHeader.replace('Bearer ', '');
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
 
     if (authError || !user) {
-      throw new Error('Unauthorized');
+      console.warn('[gdpr-assistant-chat] Unauthorized access attempt');
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
+
+    // 3. 🛡️ Rate limiting (AI calls are expensive)
+    const rateLimit = await enforceEdgeRateLimit(req, {
+      route: 'gdpr-assistant-chat',
+      userId: user.id,
+      limit: 10,
+      windowMs: 60_000,
+      description: 'GDPR Assistant Chat - AI API calls',
+    });
+
+    if (!rateLimit.allowed) {
+      console.warn('[gdpr-assistant-chat] Rate limit exceeded', { userId: user.id });
+      return buildRateLimitResponse(rateLimit, corsHeaders, {
+        errorCode: 'rate_limit_exceeded',
+        message: `Trop de requêtes. Réessayez dans ${rateLimit.retryAfterSeconds}s.`,
+      });
+    }
+
+    console.log(`[gdpr-assistant-chat] Processing for user: ${user.id}`);
 
     const { conversationId, message } = await req.json();
 

@@ -1,12 +1,14 @@
 // @ts-nocheck
+/**
+ * parcours-xl-callback - Webhook Suno pour parcours XL
+ *
+ * 🔒 SÉCURISÉ: Token validation + Rate limit IP 100/min + CORS restrictif
+ * Note: Auth token-based car callback externe de Suno
+ */
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.7';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
-};
+import { cors, preflightResponse, rejectCors } from '../_shared/cors.ts';
+import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
 
 // Helper : uploader l'audio vers Supabase Storage et retourner le path
 async function uploadToStorage(
@@ -48,8 +50,36 @@ async function uploadToStorage(
 }
 
 serve(async (req) => {
+  const corsResult = cors(req);
+  const corsHeaders = {
+    ...corsResult.headers,
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+  };
+
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return preflightResponse(corsResult);
+  }
+
+  if (!corsResult.allowed) {
+    return rejectCors(corsResult);
+  }
+
+  // Rate limit IP-based pour webhooks externes
+  const clientIp = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+  const rateLimit = await enforceEdgeRateLimit(req, {
+    route: 'parcours-xl-callback',
+    userId: `ip:${clientIp}`,
+    limit: 100,
+    windowMs: 60_000,
+    description: 'Suno webhook callback',
+  });
+
+  if (!rateLimit.allowed) {
+    return buildRateLimitResponse(rateLimit, corsHeaders, {
+      errorCode: 'rate_limit_exceeded',
+      message: `Too many requests. Retry in ${rateLimit.retryAfterSeconds}s.`,
+    });
   }
 
   try {
@@ -57,7 +87,7 @@ serve(async (req) => {
     const segmentId = url.searchParams.get('segment');
     const token = url.searchParams.get('token');
     const payload = await req.json();
-    
+
     if (!segmentId || !token) {
       console.error('❌ Missing segment or token');
       return new Response('Bad Request', { status: 400, headers: corsHeaders });

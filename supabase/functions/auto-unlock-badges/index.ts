@@ -1,10 +1,12 @@
 // @ts-nocheck
+/**
+ * auto-unlock-badges - Déverrouillage automatique des badges via webhook
+ *
+ * 🔒 SÉCURISÉ: Webhook signature validation + Rate limit 30/min + CORS restrictif
+ */
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { cors, preflightResponse, rejectCors } from '../_shared/cors.ts';
+import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
 
 interface WebhookPayload {
   type: 'INSERT' | 'UPDATE' | 'DELETE';
@@ -14,13 +16,52 @@ interface WebhookPayload {
 }
 
 Deno.serve(async (req) => {
+  const corsResult = cors(req);
+  const corsHeaders = {
+    ...corsResult.headers,
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+  };
+
   console.log('[auto-unlock-badges] Request received', {
     timestamp: new Date().toISOString(),
     method: req.method,
   });
 
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return preflightResponse(corsResult);
+  }
+
+  if (!corsResult.allowed) {
+    return rejectCors(corsResult);
+  }
+
+  // Validate webhook secret for internal calls
+  const webhookSecret = req.headers.get('x-webhook-secret');
+  const expectedSecret = Deno.env.get('WEBHOOK_SECRET');
+  if (!expectedSecret || webhookSecret !== expectedSecret) {
+    console.warn('[auto-unlock-badges] Invalid webhook secret');
+    return new Response(JSON.stringify({ error: 'Invalid webhook secret' }), {
+      status: 401,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
+
+  // IP-based rate limiting for webhooks
+  const clientIp = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+  const rateLimit = await enforceEdgeRateLimit(req, {
+    route: 'auto-unlock-badges',
+    userId: `webhook:${clientIp}`,
+    limit: 30,
+    windowMs: 60_000,
+    description: 'Auto unlock badges webhook',
+  });
+
+  if (!rateLimit.allowed) {
+    return buildRateLimitResponse(rateLimit, corsHeaders, {
+      errorCode: 'rate_limit_exceeded',
+      message: `Trop de requêtes. Réessayez dans ${rateLimit.retryAfterSeconds}s.`,
+    });
   }
 
   try {

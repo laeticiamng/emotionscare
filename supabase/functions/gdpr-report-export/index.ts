@@ -1,11 +1,13 @@
 // @ts-nocheck
+/**
+ * gdpr-report-export - Export des rapports RGPD (CSV/JSON)
+ *
+ * 🔒 SÉCURISÉ: Auth admin + Rate limit 5/min + CORS restrictif
+ */
 import { serve } from 'https://deno.land/std@0.208.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { cors, preflightResponse, rejectCors } from '../_shared/cors.ts';
+import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
 
 interface ExportRequest {
   format: 'csv' | 'json';
@@ -18,8 +20,19 @@ interface ExportRequest {
 }
 
 serve(async (req) => {
+  const corsResult = cors(req);
+  const corsHeaders = {
+    ...corsResult.headers,
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+  };
+
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
+    return preflightResponse(corsResult);
+  }
+
+  if (!corsResult.allowed) {
+    return rejectCors(corsResult);
   }
 
   try {
@@ -59,6 +72,21 @@ serve(async (req) => {
       });
     }
 
+    const rateLimit = await enforceEdgeRateLimit(req, {
+      route: 'gdpr-report-export',
+      userId: user.id,
+      limit: 5,
+      windowMs: 60_000,
+      description: 'GDPR report export - Admin only',
+    });
+
+    if (!rateLimit.allowed) {
+      return buildRateLimitResponse(rateLimit, corsHeaders, {
+        errorCode: 'rate_limit_exceeded',
+        message: `Trop de requêtes. Réessayez dans ${rateLimit.retryAfterSeconds}s.`,
+      });
+    }
+
     const {
       format = 'csv',
       startDate,
@@ -69,7 +97,7 @@ serve(async (req) => {
       includeAuditLogs = true,
     }: ExportRequest = await req.json();
 
-    logger.info('Generating GDPR report', context, {
+    console.log('[gdpr-report-export] Generating GDPR report', {
       format,
       startDate,
       endDate,
@@ -176,8 +204,8 @@ serve(async (req) => {
     if (format === 'csv') {
       const csv = generateCSV(reportData);
       
-      logger.info('CSV report generated successfully', context);
-      
+      console.log('[gdpr-report-export] CSV report generated successfully');
+
       return new Response(csv, {
         status: 200,
         headers: {
@@ -189,19 +217,20 @@ serve(async (req) => {
     }
 
     // Par défaut, retourner JSON
-    logger.info('JSON report generated successfully', context);
-    
+    console.log('[gdpr-report-export] JSON report generated successfully');
+
     return new Response(JSON.stringify(reportData), {
       status: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error: any) {
-    logger.error('Failed to generate GDPR report', error, context);
-    throw error;
+    console.error('[gdpr-report-export] Failed to generate GDPR report', error);
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   }
 });
-
-serve(handler);
 
 function generateCSV(reportData: any): string {
   const lines: string[] = [];

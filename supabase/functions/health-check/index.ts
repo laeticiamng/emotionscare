@@ -1,13 +1,13 @@
 // @ts-nocheck
+/**
+ * health-check - Vérification de santé du système
+ *
+ * 🔒 SÉCURISÉ: Public (monitoring) + Rate limit IP 30/min + CORS restrictif
+ */
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'GET,OPTIONS',
-  'Cache-Control': 'no-store, max-age=0',
-};
+import { cors, preflightResponse, rejectCors } from '../_shared/cors.ts';
+import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
 
 const SUPABASE_LATENCY_SLO_MS = 1200;
 
@@ -55,8 +55,42 @@ const resolveRegion = () =>
   'unknown';
 
 serve(async (req) => {
+  const corsResult = cors(req);
+  const corsHeaders = {
+    ...corsResult.headers,
+    'Access-Control-Allow-Methods': 'GET,OPTIONS',
+    'Cache-Control': 'no-store, max-age=0',
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+  };
+
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return preflightResponse(corsResult);
+  }
+
+  if (!corsResult.allowed) {
+    return rejectCors(corsResult);
+  }
+
+  // IP-based rate limiting for public health check
+  const clientIP = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+                   req.headers.get('cf-connecting-ip') ||
+                   req.headers.get('x-real-ip') ||
+                   'unknown';
+
+  const rateLimit = await enforceEdgeRateLimit(req, {
+    route: 'health-check',
+    userId: `ip:${clientIP}`,
+    limit: 30,
+    windowMs: 60_000,
+    description: 'Health check - IP based rate limit',
+  });
+
+  if (!rateLimit.allowed) {
+    return buildRateLimitResponse(rateLimit, corsHeaders, {
+      errorCode: 'rate_limit_exceeded',
+      message: `Too many requests. Retry after ${rateLimit.retryAfterSeconds}s.`,
+    });
   }
 
   const timestamp = new Date().toISOString();
