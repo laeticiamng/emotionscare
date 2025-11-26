@@ -88,7 +88,6 @@ function estimateEnergyLevel(tags: string, style: string, bpm?: number): number 
   return Math.max(0, Math.min(100, energy));
 }
 
-// @ts-ignore - Deno.serve available at runtime in Edge Functions
 Deno.serve(async (req: Request) => {
   // 1. CORS check
   const corsResult = cors(req);
@@ -371,7 +370,7 @@ Deno.serve(async (req: Request) => {
       ]);
 
       // Calculate personalized recommendations if preferences exist
-      let personalizedRecommendations = [];
+      let personalizedRecommendations: Array<{ track: any; matchScore: number; matchReasons: string[] }> = [];
       if (prefs.data && tracks.data && tracks.data.length > 0) {
         const preferences = {
           favorite_genres: prefs.data.favorite_genres || [],

@@ -18,7 +18,6 @@ const RequestSchema = z.object({
   text: z.string().min(1, 'Text required').max(5000, 'Text too long (max 5000 chars)'),
 });
 
-// @ts-ignore - Deno.serve available at runtime in Edge Functions
 Deno.serve(async (req: Request) => {
   // 1. CORS check
   const corsResult = cors(req);

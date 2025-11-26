@@ -15,7 +15,6 @@ import { cors, preflightResponse, rejectCors } from '../_shared/cors.ts';
 
 const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25MB max pour Whisper
 
-// @ts-ignore - Deno.serve available at runtime in Edge Functions
 Deno.serve(async (req: Request) => {
   // 1. CORS check
   const corsResult = cors(req);

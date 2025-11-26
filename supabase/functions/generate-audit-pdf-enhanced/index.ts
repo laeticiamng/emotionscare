@@ -1,11 +1,9 @@
-// @ts-ignore
 /**
  * generate-audit-pdf-enhanced - Génération PDF d'audit améliorée avec graphiques
  *
  * 🔒 SÉCURISÉ: Auth admin + Rate limit 5/min + CORS restrictif
  */
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-// @ts-ignore
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { authorizeRole } from '../_shared/auth.ts';
 import { cors, preflightResponse, rejectCors } from '../_shared/cors.ts';
@@ -78,7 +76,7 @@ serve(async (req) => {
     if (auditError) throw auditError;
 
     // Fetch history for trend charts
-    let historyData = [];
+    let historyData: Array<{ audit_date: string; overall_score: number; status: string }> = [];
     if (includeHistory) {
       const { data: history } = await supabase
         .from('compliance_audits')

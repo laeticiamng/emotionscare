@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * ai-reports-generate - Génération de rapports IA enrichis
  *
@@ -9,7 +8,6 @@ import { createClient } from '../_shared/supabase.ts';
 import { authenticateRequest } from '../_shared/auth-middleware.ts';
 import { cors, preflightResponse, rejectCors } from '../_shared/cors.ts';
 import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
-// @ts-ignore
 import OpenAI from 'https://esm.sh/openai@4.100.0';
 
 const openai = new OpenAI({

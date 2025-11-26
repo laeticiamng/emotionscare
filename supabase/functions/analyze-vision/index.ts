@@ -18,7 +18,6 @@ const RequestSchema = z.object({
   imageBase64: z.string().min(100, 'Image data required'),
 });
 
-// @ts-ignore - Deno.serve available at runtime in Edge Functions
 Deno.serve(async (req: Request) => {
   // 1. CORS check
   const corsResult = cors(req);

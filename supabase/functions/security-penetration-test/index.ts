@@ -1,11 +1,9 @@
-// @ts-ignore
 /**
  * security-penetration-test - Tests de sécurité automatisés
  *
  * 🔒 SÉCURISÉ: Auth admin + Rate limit 3/min + CORS restrictif
  */
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-// @ts-ignore
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { authorizeRole } from '../_shared/auth.ts';
 import { cors, preflightResponse, rejectCors } from '../_shared/cors.ts';

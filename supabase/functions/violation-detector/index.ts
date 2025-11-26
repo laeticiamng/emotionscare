@@ -1,11 +1,9 @@
-// @ts-ignore
 /**
  * violation-detector - Détection de violations RGPD via ML
  *
  * 🔒 SÉCURISÉ: Auth admin + Rate limit 5/min + CORS restrictif
  */
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-// @ts-ignore
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { withMonitoring, logger } from '../_shared/monitoring-wrapper.ts';
 import { authorizeRole } from '../_shared/auth.ts';
