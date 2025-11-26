@@ -24,6 +24,12 @@ interface VRSession {
   completed_at?: string;
 }
 
+const getTherapeuticBenefits = (config: VREnvironment['environment_config']): string[] => {
+  const safeConfig = config as { therapeutic_benefits?: unknown } | null | undefined;
+  const benefits = (safeConfig?.therapeutic_benefits ?? []) as unknown;
+  return Array.isArray(benefits) ? (benefits as string[]) : [];
+};
+
 const VRTherapyEnhanced: React.FC = () => {
   const { toast } = useToast();
   const [isGenerating, setIsGenerating] = useState(false);
@@ -357,7 +363,7 @@ const VRTherapyEnhanced: React.FC = () => {
                       </p>
                     </div>
                     <div className="flex gap-2">
-                      {env.environment_config?.therapeutic_benefits?.slice(0, 2).map((benefit: string, i: number) => (
+                      {getTherapeuticBenefits(env.environment_config).slice(0, 2).map((benefit, i) => (
                         <Badge key={i} variant="secondary" className="text-xs">
                           {benefit}
                         </Badge>
