@@ -5,6 +5,14 @@
 import { logger } from '@/lib/logger';
 import { supabase } from '@/integrations/supabase/client';
 
+const normalizeError = (error: unknown): Error => (
+  error instanceof Error
+    ? error
+    : new Error(typeof error === 'object' && error !== null && 'message' in error
+      ? String((error as { message?: unknown }).message ?? 'Unknown error')
+      : 'Unknown error')
+);
+
 export interface MusicBadge {
   id: string;
   name: string;
@@ -238,7 +246,7 @@ export async function checkAndUnlockBadges(
     logger.info('Checked music badges', { unlocked: unlockedBadges.length }, 'MUSIC');
     return unlockedBadges;
   } catch (error) {
-    logger.error('Failed to check badges', error as Error, 'MUSIC');
+    logger.error('Failed to check badges', normalizeError(error), 'MUSIC');
     return [];
   }
 }
@@ -291,7 +299,7 @@ export async function getUserMusicBadges(userId: string): Promise<MusicBadge[]> 
       .eq('user_id', userId);
 
     if (error) {
-      logger.error('Failed to fetch user badges from DB', error as Error, 'MUSIC');
+      logger.error('Failed to fetch user badges from DB', normalizeError(error), 'MUSIC');
       // Fallback sur les badges par défaut
       return MUSIC_BADGES.map(badge => ({ ...badge }));
     }
@@ -309,7 +317,7 @@ export async function getUserMusicBadges(userId: string): Promise<MusicBadge[]> 
       };
     });
   } catch (error) {
-    logger.error('Failed to get user badges', error as Error, 'MUSIC');
+    logger.error('Failed to get user badges', normalizeError(error), 'MUSIC');
     return MUSIC_BADGES.map(badge => ({ ...badge }));
   }
 }
