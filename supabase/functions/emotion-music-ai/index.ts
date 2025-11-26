@@ -1,10 +1,15 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from '../_shared/supabase.ts';
+/**
+ * emotion-music-ai - Generation de musique basée sur les émotions
+ *
+ * 🔒 SÉCURISÉ:
+ * - Authentification JWT obligatoire
+ * - Rate limiting: 10 req/min (API Suno coûteuse)
+ * - CORS restrictif (ALLOWED_ORIGINS)
+ */
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { createClient } from '../_shared/supabase.ts';
+import { cors, preflightResponse, rejectCors } from '../_shared/cors.ts';
+import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
 
 // Fonction retry avec backoff exponentiel pour gérer les erreurs temporaires
 async function fetchWithRetry(url: string, options: RequestInit, maxRetries = 3): Promise<Response> {
@@ -83,10 +88,27 @@ function estimateEnergyLevel(tags: string, style: string, bpm?: number): number 
   return Math.max(0, Math.min(100, energy));
 }
 
-serve(async (req) => {
-  if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
+Deno.serve(async (req) => {
+  // 1. CORS check
+  const corsResult = cors(req);
+  const corsHeaders = {
+    ...corsResult.headers,
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+  };
+
+  if (req.method === 'OPTIONS') {
+    return preflightResponse(corsResult);
+  }
+
+  // Vérification CORS stricte
+  if (!corsResult.allowed) {
+    console.warn('[emotion-music-ai] CORS rejected - origin not allowed');
+    return rejectCors(corsResult);
+  }
 
   try {
+    // 2. Authentification via Supabase
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
@@ -95,9 +117,27 @@ serve(async (req) => {
 
     const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
     if (userError || !user) {
+      console.warn('[emotion-music-ai] Unauthorized access attempt');
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // 3. 🛡️ Rate limiting (API Suno coûteuse)
+    const rateLimit = await enforceEdgeRateLimit(req, {
+      route: 'emotion-music-ai',
+      userId: user.id,
+      limit: 10,
+      windowMs: 60_000,
+      description: 'Emotion-based music generation - Suno API',
+    });
+
+    if (!rateLimit.allowed) {
+      console.warn('[emotion-music-ai] Rate limit exceeded', { userId: user.id });
+      return buildRateLimitResponse(rateLimit, corsHeaders, {
+        errorCode: 'rate_limit_exceeded',
+        message: `Trop de requêtes. Réessayez dans ${rateLimit.retryAfterSeconds}s.`,
       });
     }
 

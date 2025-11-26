@@ -1,37 +1,114 @@
+/**
+ * chat-with-ai - Coach IA conversationnel EmotionsCare
+ *
+ * 🔒 SÉCURISÉ:
+ * - Authentification JWT obligatoire
+ * - Rate limiting: 20 req/min
+ * - CORS restrictif (ALLOWED_ORIGINS)
+ * - Validation inputs
+ */
 
-// @ts-nocheck - ESM imports from https://deno.land ne supportent pas les types TypeScript natifs dans Deno
-import "https://deno.land/x/xhr@0.1.0/mod.ts";
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { cors, preflightResponse, rejectCors } from '../_shared/cors.ts';
+import { authenticateRequest, logUnauthorizedAccess } from '../_shared/auth-middleware.ts';
+import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
+import { z } from '../_shared/zod.ts';
 
 const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+// Schema de validation
+const RequestSchema = z.object({
+  message: z.string().min(1, 'Message required').max(2000, 'Message too long'),
+  conversationHistory: z
+    .array(
+      z.object({
+        role: z.enum(['user', 'assistant', 'system']),
+        content: z.string().max(2000),
+      })
+    )
+    .max(20, 'History too long')
+    .optional()
+    .default([]),
+  userContext: z.string().max(500).optional(),
+});
 
-serve(async (req) => {
+Deno.serve(async (req) => {
+  // 1. CORS check
+  const corsResult = cors(req);
+  const corsHeaders = {
+    ...corsResult.headers,
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+  };
+
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
+    return preflightResponse(corsResult);
+  }
+
+  // Vérification CORS stricte
+  if (!corsResult.allowed) {
+    console.warn('[chat-with-ai] CORS rejected - origin not allowed');
+    return rejectCors(corsResult);
   }
 
   try {
-    const { message, conversationHistory, userContext } = await req.json();
+    // 2. 🔒 Authentification obligatoire
+    const authResult = await authenticateRequest(req);
+    if (authResult.status !== 200 || !authResult.user) {
+      await logUnauthorizedAccess(req, authResult.error || 'Authentication failed');
+      return new Response(JSON.stringify({ error: authResult.error || 'Authentication required' }), {
+        status: authResult.status,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // 3. 🛡️ Rate limiting
+    const rateLimit = await enforceEdgeRateLimit(req, {
+      route: 'chat-with-ai',
+      userId: authResult.user.id,
+      limit: 20,
+      windowMs: 60_000,
+      description: 'AI Chat - OpenAI API',
+    });
+
+    if (!rateLimit.allowed) {
+      console.warn('[chat-with-ai] Rate limit exceeded', { userId: authResult.user.id });
+      return buildRateLimitResponse(rateLimit, corsHeaders, {
+        errorCode: 'rate_limit_exceeded',
+        message: `Trop de messages. Réessayez dans ${rateLimit.retryAfterSeconds}s.`,
+      });
+    }
+
+    // 4. ✅ Validation du body
+    const rawBody = await req.json();
+    const parseResult = RequestSchema.safeParse(rawBody);
+
+    if (!parseResult.success) {
+      const errors = parseResult.error.errors.map((e) => `${e.path.join('.')}: ${e.message}`).join(', ');
+      return new Response(JSON.stringify({ error: `Invalid input: ${errors}` }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const { message, conversationHistory, userContext } = parseResult.data;
 
     if (!openAIApiKey) {
       // Fallback response when no API key
       return new Response(
-        JSON.stringify({ 
-          response: "Je suis votre coach bien-être EmotionsCare. Comment puis-je vous aider aujourd'hui ? (Mode démo - API non configurée)",
-          conversationId: 'demo-' + Date.now()
+        JSON.stringify({
+          response:
+            "Je suis votre coach bien-être EmotionsCare. Comment puis-je vous aider aujourd'hui ? (Mode démo - API non configurée)",
+          conversationId: 'demo-' + Date.now(),
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
+    console.log(`[chat-with-ai] Processing message for user: ${authResult.user.id}`);
+
     // Build conversation context
-    const systemPrompt = `Tu es un coach en bien-être empathique et professionnel pour EmotionsCare. 
-    
+    const systemPrompt = `Tu es un coach en bien-être empathique et professionnel pour EmotionsCare.
+
 Ton rôle :
 - Écouter avec bienveillance les préoccupations émotionnelles
 - Proposer des conseils pratiques et des exercices de bien-être
@@ -50,14 +127,14 @@ Contexte utilisateur : ${userContext || 'Utilisateur EmotionsCare cherchant du s
 
     const messages = [
       { role: 'system', content: systemPrompt },
-      ...(conversationHistory || []),
-      { role: 'user', content: message }
+      ...conversationHistory,
+      { role: 'user', content: message },
     ];
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${openAIApiKey}`,
+        Authorization: `Bearer ${openAIApiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -76,23 +153,18 @@ Contexte utilisateur : ${userContext || 'Utilisateur EmotionsCare cherchant du s
     const aiResponse = data.choices[0].message.content;
 
     return new Response(
-      JSON.stringify({ 
+      JSON.stringify({
         response: aiResponse,
-        conversationId: Date.now().toString()
+        conversationId: Date.now().toString(),
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
-
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error in chat-with-ai';
-    const errorDetails = error instanceof Error ? error.stack : String(error);
-    console.error('Error in chat-with-ai:', errorMessage, errorDetails);
-    return new Response(
-      JSON.stringify({ error: errorMessage }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
-    );
+    console.error('[chat-with-ai] Error:', errorMessage);
+    return new Response(JSON.stringify({ error: errorMessage }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   }
 });
