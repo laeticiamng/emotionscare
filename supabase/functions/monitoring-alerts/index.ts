@@ -1,10 +1,13 @@
 // @ts-nocheck
+/**
+ * monitoring-alerts - Gestion des alertes de monitoring
+ *
+ * 🔒 SÉCURISÉ: Auth admin + Rate limit 30/min + CORS restrictif
+ */
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.43.4';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { authorizeRole } from '../_shared/auth.ts';
+import { cors, preflightResponse, rejectCors } from '../_shared/cors.ts';
+import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
 
 interface Alert {
   severity: 'info' | 'warning' | 'error' | 'critical';
@@ -14,9 +17,42 @@ interface Alert {
 }
 
 Deno.serve(async (req) => {
-  // Handle CORS preflight
+  const corsResult = cors(req);
+  const corsHeaders = {
+    ...corsResult.headers,
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+  };
+
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return preflightResponse(corsResult);
+  }
+
+  if (!corsResult.allowed) {
+    return rejectCors(corsResult);
+  }
+
+  const { user, status } = await authorizeRole(req, ['admin']);
+  if (!user) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
+
+  const rateLimit = await enforceEdgeRateLimit(req, {
+    route: 'monitoring-alerts',
+    userId: user.id,
+    limit: 30,
+    windowMs: 60_000,
+    description: 'Monitoring alerts - Admin only',
+  });
+
+  if (!rateLimit.allowed) {
+    return buildRateLimitResponse(rateLimit, corsHeaders, {
+      errorCode: 'rate_limit_exceeded',
+      message: `Trop de requêtes. Réessayez dans ${rateLimit.retryAfterSeconds}s.`,
+    });
   }
 
   try {
