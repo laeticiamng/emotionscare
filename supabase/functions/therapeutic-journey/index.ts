@@ -1,40 +1,59 @@
+// @ts-nocheck
+/**
+ * therapeutic-journey - Parcours thérapeutiques personnalisés
+ *
+ * 🔒 SÉCURISÉ: Auth user + Rate limit 10/min + CORS restrictif
+ */
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { authorizeRole } from '../_shared/auth.ts';
+import { cors, preflightResponse, rejectCors } from '../_shared/cors.ts';
+import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
 
 serve(async (req) => {
+  const corsResult = cors(req);
+  const corsHeaders = {
+    ...corsResult.headers,
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+  };
+
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return preflightResponse(corsResult);
+  }
+
+  if (!corsResult.allowed) {
+    return rejectCors(corsResult);
+  }
+
+  const { user, status } = await authorizeRole(req, ['b2c', 'b2b_user', 'b2b_admin', 'admin']);
+  if (!user) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
+
+  const rateLimit = await enforceEdgeRateLimit(req, {
+    route: 'therapeutic-journey',
+    userId: user.id,
+    limit: 10,
+    windowMs: 60_000,
+    description: 'Therapeutic journey with AI',
+  });
+
+  if (!rateLimit.allowed) {
+    return buildRateLimitResponse(rateLimit, corsHeaders, {
+      errorCode: 'rate_limit_exceeded',
+      message: `Trop de requêtes. Réessayez dans ${rateLimit.retryAfterSeconds}s.`,
+    });
   }
 
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
     const lovableApiKey = Deno.env.get('LOVABLE_API_KEY');
-    
-    const authHeader = req.headers.get('Authorization');
-    if (!authHeader) {
-      throw new Error('No authorization header');
-    }
 
-    const token = authHeader.replace('Bearer ', '');
-    
-    // Verify JWT and get user
-    const userResponse = await fetch(`${supabaseUrl}/auth/v1/user`, {
-      headers: { Authorization: authHeader }
-    });
-    
-    if (!userResponse.ok) {
-      throw new Error('Unauthorized');
-    }
-    
-    const user = await userResponse.json();
-    if (!user?.id) {
-      throw new Error('Invalid user');
-    }
+    const authHeader = req.headers.get('Authorization');
 
     const { action, emotion, intensity, duration, journeyId } = await req.json();
 
