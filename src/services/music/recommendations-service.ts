@@ -8,6 +8,14 @@ import { analyzeMusicBehavior } from './preferences-learning-service';
 import { logger } from '@/lib/logger';
 import { supabase } from '@/integrations/supabase/client';
 
+const normalizeError = (error: unknown): Error => (
+  error instanceof Error
+    ? error
+    : new Error(typeof error === 'object' && error !== null && 'message' in error
+      ? String((error as { message?: unknown }).message ?? 'Unknown error')
+      : 'Unknown error')
+);
+
 export interface PersonalizedPlaylist {
   id: string;
   name: string;
@@ -148,7 +156,7 @@ export async function togglePlaylistFavorite(
       .single();
 
     if (checkError) {
-      logger.error('Failed to check playlist favorite status', checkError as Error, 'MUSIC');
+      logger.error('Failed to check playlist favorite status', normalizeError(checkError), 'MUSIC');
       return false;
     }
 
@@ -166,7 +174,7 @@ export async function togglePlaylistFavorite(
       .eq('user_id', userId);
 
     if (updateError) {
-      logger.error('Failed to toggle playlist favorite', updateError as Error, 'MUSIC');
+      logger.error('Failed to toggle playlist favorite', normalizeError(updateError), 'MUSIC');
       return false;
     }
 
@@ -178,7 +186,7 @@ export async function togglePlaylistFavorite(
 
     return true;
   } catch (error) {
-    logger.error('Failed to toggle favorite', error as Error, 'MUSIC');
+    logger.error('Failed to toggle favorite', normalizeError(error), 'MUSIC');
     return false;
   }
 }

@@ -168,7 +168,7 @@ const AudioVisualizer: React.FC<AudioVisualizerProps> = ({
     ctx.fillRect(0, 0, WIDTH, HEIGHT);
     
     // Get data
-    analyserRef.current.getByteFrequencyData(dataArrayRef.current as Uint8Array<ArrayBuffer>);
+    analyserRef.current.getByteFrequencyData(dataArrayRef.current);
     
     // Choose visualization variant
     switch (variant) {

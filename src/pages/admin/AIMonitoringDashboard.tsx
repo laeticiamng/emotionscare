@@ -15,6 +15,14 @@ import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { logger } from '@/lib/logger';
 
+const normalizeError = (error: unknown): Error => (
+  error instanceof Error
+    ? error
+    : new Error(typeof error === 'object' && error !== null && 'message' in error
+      ? String((error as { message?: unknown }).message ?? 'Unknown error')
+      : 'Unknown error')
+);
+
 interface AIMonitoringError {
   id: string;
   created_at: string;
@@ -114,7 +122,7 @@ const AIMonitoringDashboard = () => {
 
       const { data, error } = await query;
       if (error) {
-        logger.error('Failed to fetch errors from AI monitoring', error as Error, 'ADMIN');
+        logger.error('Failed to fetch errors from AI monitoring', normalizeError(error), 'ADMIN');
         throw error;
       }
       return data as AIMonitoringError[];
@@ -151,7 +159,7 @@ const AIMonitoringDashboard = () => {
         title: 'Erreur',
         description: 'Impossible de marquer l\'erreur comme résolue.',
       });
-      logger.error('Failed to resolve error', error as Error, 'PAGE');
+      logger.error('Failed to resolve error', normalizeError(error), 'PAGE');
     },
   });
 
