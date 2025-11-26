@@ -1,11 +1,13 @@
 // @ts-nocheck
+/**
+ * gdpr-compliance-score - Score de conformité RGPD
+ *
+ * 🔒 SÉCURISÉ: Auth + Rate limit 10/min + CORS restrictif
+ */
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { withMonitoring, logger } from '../_shared/monitoring-wrapper.ts';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
+import { cors, preflightResponse, rejectCors } from '../_shared/cors.ts';
+import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
 
 interface ComplianceMetrics {
   consentRate: number;
@@ -156,6 +158,21 @@ function calculateComplianceScore(metrics: ComplianceMetrics): {
 }
 
 const handler = withMonitoring('gdpr-compliance-score', async (req, context) => {
+  const corsResult = cors(req);
+  const corsHeaders = {
+    ...corsResult.headers,
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+  };
+
+  if (req.method === 'OPTIONS') {
+    return preflightResponse(corsResult);
+  }
+
+  if (!corsResult.allowed) {
+    return rejectCors(corsResult);
+  }
+
   try {
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
@@ -175,6 +192,21 @@ const handler = withMonitoring('gdpr-compliance-score', async (req, context) => 
         JSON.stringify({ error: 'Unauthorized' }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
+    }
+
+    const rateLimit = await enforceEdgeRateLimit(req, {
+      route: 'gdpr-compliance-score',
+      userId: user.id,
+      limit: 10,
+      windowMs: 60_000,
+      description: 'GDPR compliance score API',
+    });
+
+    if (!rateLimit.allowed) {
+      return buildRateLimitResponse(rateLimit, corsHeaders, {
+        errorCode: 'rate_limit_exceeded',
+        message: `Trop de requêtes. Réessayez dans ${rateLimit.retryAfterSeconds}s.`,
+      });
     }
 
     logger.info('Calculating GDPR compliance score for user', context, { userId: user.id });
