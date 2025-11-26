@@ -22,7 +22,6 @@ const RequestSchema = z.object({
   trackIds: z.array(z.string()).max(10).optional(),
 });
 
-// @ts-ignore - Deno.serve available at runtime in Edge Functions
 Deno.serve(async (req: Request) => {
   // 1. CORS check
   const corsResult = cors(req);

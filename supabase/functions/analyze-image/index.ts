@@ -20,7 +20,6 @@ const RequestSchema = z.object({
   mimeType: z.string().max(50).optional().default('image/jpeg'),
 });
 
-// @ts-ignore - Deno.serve available at runtime in Edge Functions
 Deno.serve(async (req: Request) => {
   // 1. CORS check
   const corsResult = cors(req);
