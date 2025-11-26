@@ -1,12 +1,14 @@
 // @ts-nocheck
+/**
+ * parcours-xl-runner - Orchestrateur de génération de parcours
+ *
+ * 🔒 SÉCURISÉ: Auth user + Rate limit 5/min + CORS restrictif
+ */
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.7';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
-};
+import { authorizeRole } from '../_shared/auth.ts';
+import { cors, preflightResponse, rejectCors } from '../_shared/cors.ts';
+import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -15,23 +17,23 @@ async function invokeWithRetry(supabase: any, functionName: string, body: any, m
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     try {
       const { data, error } = await supabase.functions.invoke(functionName, { body });
-      
+
       if (!error) {
         return { data, error: null };
       }
-      
+
       // Retry sur 429 ou 5xx
-      const shouldRetry = 
-        error.message?.includes('429') || 
+      const shouldRetry =
+        error.message?.includes('429') ||
         error.status?.toString().startsWith('5');
-      
+
       if (shouldRetry && attempt < maxRetries - 1) {
         const backoffMs = 2000 * (attempt + 1); // 2s, 4s, 6s
         console.log(`⏳ Retry ${attempt + 1}/${maxRetries} after ${backoffMs}ms`);
         await delay(backoffMs);
         continue;
       }
-      
+
       return { data: null, error };
     } catch (err) {
       if (attempt < maxRetries - 1) {
@@ -41,18 +43,52 @@ async function invokeWithRetry(supabase: any, functionName: string, body: any, m
       return { data: null, error: err };
     }
   }
-  
+
   return { data: null, error: new Error('Max retries exceeded') };
 }
 
 serve(async (req) => {
+  const corsResult = cors(req);
+  const corsHeaders = {
+    ...corsResult.headers,
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+  };
+
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return preflightResponse(corsResult);
+  }
+
+  if (!corsResult.allowed) {
+    return rejectCors(corsResult);
+  }
+
+  const { user, status } = await authorizeRole(req, ['b2c', 'b2b_user', 'b2b_admin', 'admin']);
+  if (!user) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
+
+  const rateLimit = await enforceEdgeRateLimit(req, {
+    route: 'parcours-xl-runner',
+    userId: user.id,
+    limit: 5,
+    windowMs: 60_000,
+    description: 'Parcours XL orchestration',
+  });
+
+  if (!rateLimit.allowed) {
+    return buildRateLimitResponse(rateLimit, corsHeaders, {
+      errorCode: 'rate_limit_exceeded',
+      message: `Trop de requêtes. Réessayez dans ${rateLimit.retryAfterSeconds}s.`,
+    });
   }
 
   try {
     const { runId } = await req.json();
-    
+
     if (!runId) {
       return new Response(
         JSON.stringify({ error: 'Missing runId' }),
