@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { useCallback } from 'react';
 import { logger } from '@/lib/logger';
 
@@ -47,13 +45,13 @@ export const useLogger = (context: string): Logger => {
         console.debug(prefix, message, ...args);
         break;
       case 'info':
-        logger.info(prefix, message, ...args, 'HOOK');
+        logger.info(String(prefix), undefined, 'HOOK');
         break;
       case 'warn':
-        logger.warn(prefix, message, ...args, 'HOOK');
+        logger.warn(String(prefix), undefined, 'HOOK');
         break;
       case 'error':
-        logger.error(prefix, message, ...args, 'HOOK');
+        logger.error(String(prefix), args[0] instanceof Error ? args[0] as Error : undefined, 'HOOK');
         break;
     }
   }, [context, currentLogLevel]);
