@@ -1,11 +1,9 @@
 // @ts-nocheck
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { authorizeRole } from '../_shared/auth.ts';
+import { cors, preflightResponse, rejectCors } from '../_shared/cors.ts';
+import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
 
 interface VRGenerateRequest {
   emotion: string;
@@ -22,8 +20,42 @@ interface VRSessionRequest {
 }
 
 serve(async (req) => {
+  const corsResult = cors(req);
+  const corsHeaders = {
+    ...corsResult.headers,
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+  };
+
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return preflightResponse(corsResult);
+  }
+
+  if (!corsResult.allowed) {
+    return rejectCors(corsResult);
+  }
+
+  const { user, status } = await authorizeRole(req, ['b2c', 'b2b_user', 'b2b_admin', 'admin']);
+  if (!user) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
+
+  const rateLimit = await enforceEdgeRateLimit(req, {
+    route: 'vr-therapy',
+    userId: user.id,
+    limit: 15,
+    windowMs: 60_000,
+    description: 'VR therapy API',
+  });
+
+  if (!rateLimit.allowed) {
+    return buildRateLimitResponse(rateLimit, corsHeaders, {
+      error: 'Too many requests',
+      retryAfter: rateLimit.retryAfter,
+    });
   }
 
   try {
@@ -36,14 +68,6 @@ serve(async (req) => {
         },
       }
     );
-
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) {
-      return new Response(JSON.stringify({ error: 'Non autorisé' }), {
-        status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
 
     const body = await req.json();
 

@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { serve } from 'https://deno.land/std@0.208.0/http/server.ts';
 import { buildCorsHeaders, getAuthContext, isSuiteEnabled, jsonResponse, serviceClient } from '../_shared/b2b.ts';
+import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
 
 function isHeatmapEnabled(): boolean {
   return (Deno.env.get('FF_B2B_HEATMAP') ?? 'false').toLowerCase() === 'true';
@@ -9,8 +10,14 @@ function isHeatmapEnabled(): boolean {
 const PERIOD_PATTERN = /^[0-9]{4}-(0[1-9]|1[0-2])$/;
 
 serve(async (req) => {
+  const corsHeaders = {
+    ...buildCorsHeaders(req),
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+  };
+
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: buildCorsHeaders(req) });
+    return new Response('ok', { headers: corsHeaders });
   }
 
   try {
@@ -33,6 +40,21 @@ serve(async (req) => {
 
     if (auth.orgRole !== 'admin' && auth.orgRole !== 'manager') {
       return jsonResponse(req, 403, { error: 'forbidden' });
+    }
+
+    const rateLimit = await enforceEdgeRateLimit(req, {
+      route: 'b2b-heatmap-periods',
+      userId: auth.userId,
+      limit: 30,
+      windowMs: 60_000,
+      description: 'B2B heatmap periods API',
+    });
+
+    if (!rateLimit.allowed) {
+      return buildRateLimitResponse(rateLimit, corsHeaders, {
+        error: 'Too many requests',
+        retryAfter: rateLimit.retryAfter,
+      });
     }
 
     const { data, error } = await serviceClient
