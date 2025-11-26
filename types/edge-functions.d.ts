@@ -7,6 +7,7 @@ declare const Deno: {
   test(name: string, fn: () => void | Promise<void>): void;
   readTextFile(path: string): Promise<string>;
   cwd(): string;
+  serve(handler: (req: Request) => Response | Promise<Response>): void;
 };
 
 declare type InstrumentCatalog = any;

@@ -1,3 +1,2 @@
-// Direct import for Deno runtime (Supabase Edge Functions)
-const mod = await import('https://deno.land/x/zod@v3.22.4/mod.ts');
-export const z = (mod as any).z;
+// @ts-ignore - Deno import from URL
+export { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
