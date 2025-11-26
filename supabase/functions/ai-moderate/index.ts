@@ -1,17 +1,63 @@
+/**
+ * ai-moderate - Modération de contenu via OpenAI
+ *
+ * 🔒 SÉCURISÉ: Auth + Rate limit 30/min + CORS restrictif
+ */
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { authenticateRequest } from '../_shared/auth-middleware.ts';
+import { cors, preflightResponse, rejectCors } from '../_shared/cors.ts';
+import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
 
 const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
-
 serve(async (req) => {
+  // 1. CORS check
+  const corsResult = cors(req);
+  const corsHeaders = {
+    ...corsResult.headers,
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+  };
+
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return preflightResponse(corsResult);
   }
+
+  // Vérification CORS stricte
+  if (!corsResult.allowed) {
+    console.warn('[ai-moderate] CORS rejected - origin not allowed');
+    return rejectCors(corsResult);
+  }
+
+  // 2. 🔒 SÉCURITÉ: Authentification obligatoire
+  const authResult = await authenticateRequest(req);
+  if (authResult.status !== 200 || !authResult.user) {
+    console.warn('[ai-moderate] Unauthorized access attempt');
+    return new Response(JSON.stringify({ error: authResult.error || 'Authentication required' }), {
+      status: authResult.status,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
+
+  // 3. 🛡️ Rate limiting
+  const rateLimit = await enforceEdgeRateLimit(req, {
+    route: 'ai-moderate',
+    userId: authResult.user.id,
+    limit: 30,
+    windowMs: 60_000,
+    description: 'AI content moderation',
+  });
+
+  if (!rateLimit.allowed) {
+    console.warn('[ai-moderate] Rate limit exceeded', { userId: authResult.user.id });
+    return buildRateLimitResponse(rateLimit, corsHeaders, {
+      errorCode: 'rate_limit_exceeded',
+      message: `Trop de requêtes. Réessayez dans ${rateLimit.retryAfterSeconds}s.`,
+    });
+  }
+
+  console.log(`[ai-moderate] Processing for user: ${authResult.user.id}`);
 
   if (!openAIApiKey) {
     console.error('OpenAI API key not found');

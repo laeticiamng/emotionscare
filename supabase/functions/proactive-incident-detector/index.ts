@@ -1,12 +1,15 @@
 // @ts-nocheck
+/**
+ * proactive-incident-detector - Détection proactive d'incidents
+ *
+ * 🔒 SÉCURISÉ: Auth admin + Rate limit 5/min + CORS restrictif
+ */
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.43.4';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { authorizeRole } from '../_shared/auth.ts';
+import { cors, preflightResponse, rejectCors } from '../_shared/cors.ts';
+import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
 
 /**
  * Proactive Incident Detector
@@ -23,9 +26,52 @@ const corsHeaders = {
  */
 
 serve(async (req) => {
+  // 1. CORS check
+  const corsResult = cors(req);
+  const corsHeaders = {
+    ...corsResult.headers,
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+  };
+
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return preflightResponse(corsResult);
   }
+
+  // Vérification CORS stricte
+  if (!corsResult.allowed) {
+    console.warn('[proactive-incident-detector] CORS rejected - origin not allowed');
+    return rejectCors(corsResult);
+  }
+
+  // 2. 🔒 SÉCURITÉ: Auth admin obligatoire
+  const { user, status } = await authorizeRole(req, ['admin']);
+  if (!user) {
+    console.warn('[proactive-incident-detector] Unauthorized access attempt');
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
+
+  // 3. 🛡️ Rate limiting strict
+  const rateLimit = await enforceEdgeRateLimit(req, {
+    route: 'proactive-incident-detector',
+    userId: user.id,
+    limit: 5,
+    windowMs: 60_000,
+    description: 'Incident detection - Admin only',
+  });
+
+  if (!rateLimit.allowed) {
+    console.warn('[proactive-incident-detector] Rate limit exceeded', { userId: user.id });
+    return buildRateLimitResponse(rateLimit, corsHeaders, {
+      errorCode: 'rate_limit_exceeded',
+      message: `Trop de requêtes. Réessayez dans ${rateLimit.retryAfterSeconds}s.`,
+    });
+  }
+
+  console.log(`[proactive-incident-detector] Processing for admin: ${user.id}`);
 
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL');

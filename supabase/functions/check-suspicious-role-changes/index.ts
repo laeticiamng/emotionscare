@@ -1,6 +1,14 @@
 // @ts-nocheck
+/**
+ * check-suspicious-role-changes - Détection d'activités suspectes sur les rôles
+ *
+ * 🔒 SÉCURISÉ: Auth admin + Rate limit 5/min + CORS restrictif
+ */
 import { serve } from 'https://deno.land/std@0.208.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.43.4';
+import { authorizeRole } from '../_shared/auth.ts';
+import { cors, preflightResponse, rejectCors } from '../_shared/cors.ts';
+import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
 
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY');
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL');
@@ -8,11 +16,6 @@ const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
 const FROM_EMAIL = Deno.env.get('FROM_EMAIL') || 'noreply@emotionscare.com';
 
 const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!);
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
 
 interface SuspiciousActivityAlert {
   count: number;
@@ -154,9 +157,52 @@ async function sendAlertEmail(to: string, alerts: SuspiciousActivityAlert[]) {
 }
 
 serve(async (req) => {
+  // 1. CORS check
+  const corsResult = cors(req);
+  const corsHeaders = {
+    ...corsResult.headers,
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+  };
+
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
+    return preflightResponse(corsResult);
   }
+
+  // Vérification CORS stricte
+  if (!corsResult.allowed) {
+    console.warn('[check-suspicious-role-changes] CORS rejected - origin not allowed');
+    return rejectCors(corsResult);
+  }
+
+  // 2. 🔒 SÉCURITÉ: Auth admin obligatoire
+  const { user, status } = await authorizeRole(req, ['admin']);
+  if (!user) {
+    console.warn('[check-suspicious-role-changes] Unauthorized access attempt');
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
+
+  // 3. 🛡️ Rate limiting strict (fonction sensible)
+  const rateLimit = await enforceEdgeRateLimit(req, {
+    route: 'check-suspicious-role-changes',
+    userId: user.id,
+    limit: 5,
+    windowMs: 60_000,
+    description: 'Security scan - Admin only',
+  });
+
+  if (!rateLimit.allowed) {
+    console.warn('[check-suspicious-role-changes] Rate limit exceeded', { userId: user.id });
+    return buildRateLimitResponse(rateLimit, corsHeaders, {
+      errorCode: 'rate_limit_exceeded',
+      message: `Trop de requêtes. Réessayez dans ${rateLimit.retryAfterSeconds}s.`,
+    });
+  }
+
+  console.log(`[check-suspicious-role-changes] Processing for admin: ${user.id}`);
 
   try {
     console.log('Checking for suspicious role changes...');
