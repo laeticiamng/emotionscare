@@ -6,6 +6,7 @@
 import { aiMonitoring, captureMessage } from '@/lib/ai-monitoring';
 import { logger } from '@/lib/logger';
 import { initializeSentryAlerts, trackErrorRateAlert, trackPerformanceAlert, alertOnCriticalException } from '@/lib/sentry-alerts-config';
+import { supabase } from '@/integrations/supabase/client';
 
 type AlertSeverity = 'info' | 'warning' | 'error' | 'critical';
 
@@ -117,14 +118,14 @@ export async function checkSystemHealth(): Promise<{
 
   // Check Supabase connection
   try {
-    const response = await fetch('https://yaincoxihiqdksxgrsrk.supabase.co/rest/v1/', {
-      method: 'HEAD',
-      headers: {
-        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhaW5jb3hpaGlxZGtzeGdyc3JrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI4MTE4MjcsImV4cCI6MjA1ODM4NzgyN30.HBfwymB2F9VBvb3uyeTtHBMZFZYXzL0wQmS5fqd65yU',
-      },
-    });
-    checks.supabase = response.ok;
-  } catch {
+    const { error } = await supabase
+      .from('profiles')
+      .select('id', { head: true, count: 'exact' })
+      .limit(1);
+
+    checks.supabase = !error;
+  } catch (error) {
+    logger.error('Supabase health check failed', error as Error, 'HEALTH');
     checks.supabase = false;
   }
 
