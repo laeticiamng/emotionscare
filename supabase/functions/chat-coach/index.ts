@@ -1,17 +1,54 @@
-// @ts-nocheck - ESM imports from https://deno.land ne supportent pas les types TypeScript natifs dans Deno
+// @ts-nocheck
+/**
+ * chat-coach - Coach IA en bien-être émotionnel
+ *
+ * 🔒 SÉCURISÉ: Auth + Rate limit 20/min + CORS restrictif
+ */
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { authenticateRequest } from '../_shared/auth-middleware.ts';
+import { cors, preflightResponse, rejectCors } from '../_shared/cors.ts';
+import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
 
 serve(async (req) => {
+  const corsResult = cors(req);
+  const corsHeaders = {
+    ...corsResult.headers,
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+  };
+
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return preflightResponse(corsResult);
+  }
+
+  if (!corsResult.allowed) {
+    return rejectCors(corsResult);
   }
 
   try {
+    const authResult = await authenticateRequest(req);
+    if (authResult.status !== 200 || !authResult.user) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: authResult.status,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const rateLimit = await enforceEdgeRateLimit(req, {
+      route: 'chat-coach',
+      userId: authResult.user.id,
+      limit: 20,
+      windowMs: 60_000,
+      description: 'Chat coach AI',
+    });
+
+    if (!rateLimit.allowed) {
+      return buildRateLimitResponse(rateLimit, corsHeaders, {
+        errorCode: 'rate_limit_exceeded',
+        message: `Trop de requêtes. Réessayez dans ${rateLimit.retryAfterSeconds}s.`,
+      });
+    }
+
     const openaiApiKey = Deno.env.get('OPENAI_API_KEY');
     if (!openaiApiKey) {
       throw new Error('OpenAI API key not configured');
