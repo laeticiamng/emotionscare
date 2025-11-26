@@ -1,21 +1,36 @@
+/**
+ * openai-chat - Chat completions via OpenAI GPT
+ *
+ * 🔒 SÉCURISÉ: Auth + Rate limit 10/min + CORS restrictif + Validation Zod
+ */
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import "https://deno.land/x/xhr@0.1.0/mod.ts"
 import { authenticateRequest } from '../_shared/auth-middleware.ts';
 import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
 import { validateRequest, createErrorResponse, OpenAIChatRequestSchema } from '../_shared/validation.ts';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
+import { cors, preflightResponse, rejectCors } from '../_shared/cors.ts';
 
 serve(async (req) => {
+  // 1. CORS check
+  const corsResult = cors(req);
+  const corsHeaders = {
+    ...corsResult.headers,
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+  };
+
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
+    return preflightResponse(corsResult);
+  }
+
+  // Vérification CORS stricte
+  if (!corsResult.allowed) {
+    console.warn('[openai-chat] CORS rejected - origin not allowed');
+    return rejectCors(corsResult);
   }
 
   try {
-    // 🔒 SÉCURITÉ: Authentification obligatoire
+    // 2. 🔒 SÉCURITÉ: Authentification obligatoire
     const authResult = await authenticateRequest(req);
     if (authResult.status !== 200 || !authResult.user) {
       console.warn('[openai-chat] Unauthorized access attempt');

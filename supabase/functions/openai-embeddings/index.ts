@@ -1,23 +1,37 @@
 // @ts-nocheck - ESM imports from https://esm.sh ne supportent pas les types TypeScript natifs dans Deno
+/**
+ * openai-embeddings - Génération d'embeddings via OpenAI
+ *
+ * 🔒 SÉCURISÉ: Auth + Rate limit 30/min + CORS restrictif + Validation Zod
+ */
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import OpenAI from "https://esm.sh/openai@4.20.1"
 import { authenticateRequest } from '../_shared/auth-middleware.ts';
 import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
 import { validateRequest, createErrorResponse, EmbeddingsRequestSchema } from '../_shared/validation.ts';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
+import { cors, preflightResponse, rejectCors } from '../_shared/cors.ts';
 
 serve(async (req) => {
-  // Handle CORS preflight requests
+  // 1. CORS check
+  const corsResult = cors(req);
+  const corsHeaders = {
+    ...corsResult.headers,
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+  };
+
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
+    return preflightResponse(corsResult);
+  }
+
+  // Vérification CORS stricte
+  if (!corsResult.allowed) {
+    console.warn('[openai-embeddings] CORS rejected - origin not allowed');
+    return rejectCors(corsResult);
   }
 
   try {
-    // 🔒 SÉCURITÉ: Authentification obligatoire
+    // 2. 🔒 SÉCURITÉ: Authentification obligatoire
     const authResult = await authenticateRequest(req);
     if (authResult.status !== 200 || !authResult.user) {
       console.warn('[openai-embeddings] Unauthorized access attempt');
