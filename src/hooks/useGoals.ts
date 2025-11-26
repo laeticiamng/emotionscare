@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { goalsApi, type GoalRecord, type GoalCreatePayload, type GoalUpdatePayload } from '@/services/api';
+import { goalsApi, type GoalRecord, type GoalCreatePayload, type GoalUpdatePayload } from '@/services/api/goalsApi';
 
 export type Goal = GoalRecord & {
   progress: number;
