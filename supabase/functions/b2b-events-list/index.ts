@@ -7,6 +7,7 @@ import {
   jsonResponse,
   serviceClient,
 } from '../_shared/b2b.ts';
+import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
 
 function enforceSuiteEnabled(req: Request) {
   if (!isSuiteEnabled()) {
@@ -15,8 +16,14 @@ function enforceSuiteEnabled(req: Request) {
 }
 
 serve(async (req) => {
+  const corsHeaders = {
+    ...buildCorsHeaders(req),
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+  };
+
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: buildCorsHeaders(req) });
+    return new Response('ok', { headers: corsHeaders });
   }
 
   try {
@@ -33,6 +40,21 @@ serve(async (req) => {
 
     if (auth instanceof Response) {
       return auth;
+    }
+
+    const rateLimit = await enforceEdgeRateLimit(req, {
+      route: 'b2b-events-list',
+      userId: auth.userId,
+      limit: 30,
+      windowMs: 60_000,
+      description: 'B2B events list API',
+    });
+
+    if (!rateLimit.allowed) {
+      return buildRateLimitResponse(rateLimit, corsHeaders, {
+        error: 'Too many requests',
+        retryAfter: rateLimit.retryAfter,
+      });
     }
 
     const { data, error } = await serviceClient
