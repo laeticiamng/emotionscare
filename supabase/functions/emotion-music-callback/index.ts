@@ -1,16 +1,57 @@
 // @ts-nocheck
+/**
+ * emotion-music-callback - Callback webhook Suno pour génération musicale
+ *
+ * 🔒 SÉCURISÉ: Webhook validation + Rate limit 60/min + CORS restrictif
+ */
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.7';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST,OPTIONS',
-};
+import { cors, preflightResponse, rejectCors } from '../_shared/cors.ts';
+import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
 
 serve(async (req) => {
+  const corsResult = cors(req);
+  const corsHeaders = {
+    ...corsResult.headers,
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+    'Access-Control-Allow-Methods': 'POST,OPTIONS',
+  };
+
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return preflightResponse(corsResult);
+  }
+
+  if (!corsResult.allowed) {
+    return rejectCors(corsResult);
+  }
+
+  // Validate webhook secret for external callbacks
+  const webhookSecret = req.headers.get('x-webhook-secret');
+  const expectedSecret = Deno.env.get('SUNO_WEBHOOK_SECRET') || Deno.env.get('WEBHOOK_SECRET');
+  if (expectedSecret && webhookSecret !== expectedSecret) {
+    console.warn('[emotion-music-callback] Invalid webhook secret');
+    return new Response(JSON.stringify({ error: 'Invalid webhook secret' }), {
+      status: 401,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
+
+  // IP-based rate limiting for webhooks
+  const clientIp = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+  const rateLimit = await enforceEdgeRateLimit(req, {
+    route: 'emotion-music-callback',
+    userId: `webhook:${clientIp}`,
+    limit: 60,
+    windowMs: 60_000,
+    description: 'Emotion music callback webhook',
+  });
+
+  if (!rateLimit.allowed) {
+    return buildRateLimitResponse(rateLimit, corsHeaders, {
+      errorCode: 'rate_limit_exceeded',
+      message: `Trop de requêtes. Réessayez dans ${rateLimit.retryAfterSeconds}s.`,
+    });
   }
 
   try {
