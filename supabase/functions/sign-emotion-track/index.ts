@@ -1,21 +1,33 @@
 // @ts-nocheck
+/**
+ * sign-emotion-track - Signature d'URL pour tracks émotionnels
+ *
+ * 🔒 SÉCURISÉ: Auth user + Rate limit 30/min + CORS restrictif
+ */
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.7';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST,OPTIONS',
-};
+import { cors, preflightResponse, rejectCors } from '../_shared/cors.ts';
+import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
 
 serve(async (req) => {
+  const corsResult = cors(req);
+  const corsHeaders = {
+    ...corsResult.headers,
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+  };
+
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return preflightResponse(corsResult);
+  }
+
+  if (!corsResult.allowed) {
+    return rejectCors(corsResult);
   }
 
   try {
     const { taskId } = await req.json();
-    
+
     if (!taskId) {
       return new Response(
         JSON.stringify({ error: 'Missing taskId' }),
@@ -35,13 +47,29 @@ serve(async (req) => {
     );
 
     const { data: authData, error: authError } = await anonClient.auth.getUser();
-    
+
     if (authError || !authData?.user) {
       console.error('Authentication failed:', authError);
       return new Response(
         JSON.stringify({ error: 'Unauthorized' }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
+    }
+
+    // Rate limiting per-user
+    const rateLimit = await enforceEdgeRateLimit(req, {
+      route: 'sign-emotion-track',
+      userId: authData.user.id,
+      limit: 30,
+      windowMs: 60_000,
+      description: 'Emotion track URL signing',
+    });
+
+    if (!rateLimit.allowed) {
+      return buildRateLimitResponse(rateLimit, corsHeaders, {
+        errorCode: 'rate_limit_exceeded',
+        message: `Trop de requêtes. Réessayez dans ${rateLimit.retryAfterSeconds}s.`,
+      });
     }
 
     // 2) Admin client pour lire emotion_tracks
