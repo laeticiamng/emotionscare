@@ -40,7 +40,7 @@ export interface SecureHandlerOptions<T = unknown> {
   };
 
   /** Schéma Zod pour valider le body JSON */
-  bodySchema?: z.ZodSchema<T>;
+  bodySchema?: any; // z.ZodSchema<T>
 
   /** Méthodes HTTP autorisées (défaut: ['POST']) */
   allowedMethods?: string[];
@@ -245,7 +245,7 @@ export function secureHandler<T = unknown>(
 
           if (!parseResult.success) {
             const errors = parseResult.error.errors
-              .map((e) => `${e.path.join('.')}: ${e.message}`)
+              .map((e: any) => `${e.path.join('.')}: ${e.message}`)
               .join(', ');
             console.warn(`[${route}] Validation failed:`, errors);
             return createErrorResponse(`Invalid input: ${errors}`, 400, corsHeaders);

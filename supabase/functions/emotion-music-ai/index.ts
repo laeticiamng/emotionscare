@@ -88,7 +88,8 @@ function estimateEnergyLevel(tags: string, style: string, bpm?: number): number 
   return Math.max(0, Math.min(100, energy));
 }
 
-Deno.serve(async (req) => {
+// @ts-ignore - Deno.serve available at runtime in Edge Functions
+Deno.serve(async (req: Request) => {
   // 1. CORS check
   const corsResult = cors(req);
   const corsHeaders = {

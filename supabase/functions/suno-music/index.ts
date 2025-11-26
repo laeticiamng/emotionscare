@@ -22,7 +22,8 @@ const RequestSchema = z.object({
   trackIds: z.array(z.string()).max(10).optional(),
 });
 
-Deno.serve(async (req) => {
+// @ts-ignore - Deno.serve available at runtime in Edge Functions
+Deno.serve(async (req: Request) => {
   // 1. CORS check
   const corsResult = cors(req);
   const corsHeaders = {
@@ -74,7 +75,7 @@ Deno.serve(async (req) => {
     const parseResult = RequestSchema.safeParse(rawBody);
 
     if (!parseResult.success) {
-      const errors = parseResult.error.errors.map((e) => `${e.path.join('.')}: ${e.message}`).join(', ');
+      const errors = parseResult.error.errors.map((e: any) => `${e.path.join('.')}: ${e.message}`).join(', ');
       return new Response(
         JSON.stringify({ success: false, error: `Invalid input: ${errors}` }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
