@@ -1,16 +1,29 @@
 // @ts-nocheck
+/**
+ * smart-notifications - Notifications intelligentes via IA
+ *
+ * 🔒 SÉCURISÉ: Auth user + Rate limit 15/min + CORS restrictif
+ */
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { cors, preflightResponse, rejectCors } from '../_shared/cors.ts';
+import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
 
 serve(async (req) => {
+  const corsResult = cors(req);
+  const corsHeaders = {
+    ...corsResult.headers,
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+  };
+
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return preflightResponse(corsResult);
+  }
+
+  if (!corsResult.allowed) {
+    return rejectCors(corsResult);
   }
 
   try {
@@ -29,6 +42,21 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: 'Non autorisé' }), {
         status: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const rateLimit = await enforceEdgeRateLimit(req, {
+      route: 'smart-notifications',
+      userId: user.id,
+      limit: 15,
+      windowMs: 60_000,
+      description: 'Smart notifications with AI',
+    });
+
+    if (!rateLimit.allowed) {
+      return buildRateLimitResponse(rateLimit, corsHeaders, {
+        errorCode: 'rate_limit_exceeded',
+        message: `Trop de requêtes. Réessayez dans ${rateLimit.retryAfterSeconds}s.`,
       });
     }
 
