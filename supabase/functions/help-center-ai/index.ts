@@ -1,10 +1,14 @@
+// @ts-nocheck
+/**
+ * help-center-ai - Centre d'aide avec recherche IA
+ *
+ * 🔒 SÉCURISÉ: Public (read) / Auth (feedback) + Rate limit IP 30/min + CORS restrictif
+ */
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from '../_shared/supabase.ts';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { authenticateRequest } from '../_shared/auth-middleware.ts';
+import { cors, preflightResponse, rejectCors } from '../_shared/cors.ts';
+import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
 
 // Données fallback pour le centre d'aide
 const HELP_SECTIONS = [
@@ -46,8 +50,40 @@ const HELP_SECTIONS = [
 ];
 
 serve(async (req) => {
+  const corsResult = cors(req);
+  const corsHeaders = {
+    ...corsResult.headers,
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+  };
+
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return preflightResponse(corsResult);
+  }
+
+  if (!corsResult.allowed) {
+    return rejectCors(corsResult);
+  }
+
+  // IP-based rate limiting for public help center
+  const clientIP = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+                   req.headers.get('cf-connecting-ip') ||
+                   req.headers.get('x-real-ip') ||
+                   'unknown';
+
+  const rateLimit = await enforceEdgeRateLimit(req, {
+    route: 'help-center-ai',
+    userId: `ip:${clientIP}`,
+    limit: 30,
+    windowMs: 60_000,
+    description: 'Help center access - IP based',
+  });
+
+  if (!rateLimit.allowed) {
+    return buildRateLimitResponse(rateLimit, corsHeaders, {
+      errorCode: 'rate_limit_exceeded',
+      message: `Trop de requêtes. Réessayez dans ${rateLimit.retryAfterSeconds}s.`,
+    });
   }
 
   try {
@@ -112,15 +148,25 @@ serve(async (req) => {
       });
     }
 
-    // POST /help-center-ai/feedback
+    // POST /help-center-ai/feedback (requires authentication)
     if (req.method === 'POST' && path.endsWith('/feedback')) {
+      // Authenticate user for feedback submission
+      const { user: authUser, error: authError } = await authenticateRequest(req);
+      if (authError || !authUser) {
+        return new Response(JSON.stringify({ error: 'Authentication required for feedback' }), {
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
       const supabase = createClient(
         Deno.env.get('SUPABASE_URL') ?? '',
         Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
       );
 
       const body = await req.json();
-      const { article_id, article_slug, rating, comment, user_id } = body;
+      const { article_id, article_slug, rating, comment } = body;
+      const user_id = authUser.id; // Use authenticated user's ID
 
       // Validate input
       if (!article_slug || !rating) {
