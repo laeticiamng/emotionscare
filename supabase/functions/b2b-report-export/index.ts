@@ -12,6 +12,7 @@ import {
 } from '../_shared/b2b.ts';
 import { sanitizeAggregateText } from '../_shared/clinical_text.ts';
 import { addSentryBreadcrumb } from '../_shared/sentry.ts';
+import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
 
 const EXPORT_BUCKET = Deno.env.get('B2B_REPORTS_BUCKET') ?? 'b2b-reports-exports';
 const SUPPORTED_INSTRUMENTS = ['WEMWBS', 'SWEMWBS', 'CBI', 'UWES'] as const;
@@ -53,8 +54,14 @@ function buildCsv(rows: ExportRow[]): string {
 }
 
 serve(async (req) => {
+  const corsHeaders = {
+    ...buildCorsHeaders(req),
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+  };
+
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: buildCorsHeaders(req) });
+    return new Response('ok', { headers: corsHeaders });
   }
 
   try {
@@ -75,6 +82,21 @@ serve(async (req) => {
 
     if (auth.orgRole !== 'admin' && auth.orgRole !== 'manager') {
       return jsonResponse(req, 403, { error: 'forbidden' });
+    }
+
+    const rateLimit = await enforceEdgeRateLimit(req, {
+      route: 'b2b-report-export',
+      userId: auth.userId,
+      limit: 20,
+      windowMs: 60_000,
+      description: 'B2B report export API',
+    });
+
+    if (!rateLimit.allowed) {
+      return buildRateLimitResponse(rateLimit, corsHeaders, {
+        error: 'Too many requests',
+        retryAfter: rateLimit.retryAfter,
+      });
     }
 
     const body = (await req.json().catch(() => null)) as { period?: string; team_id?: string | null } | null;
