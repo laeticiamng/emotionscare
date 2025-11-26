@@ -1,10 +1,12 @@
 // @ts-nocheck
+/**
+ * rate-limiter - Service interne de rate limiting
+ *
+ * 🔒 SÉCURISÉ: Auth interne + Rate limit IP 200/min + CORS restrictif
+ * Note: Fonction interne appelée par d'autres Edge Functions
+ */
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.43.4';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { cors, preflightResponse, rejectCors } from '../_shared/cors.ts';
 
 interface RateLimitConfig {
   maxRequests: number;
@@ -19,9 +21,29 @@ interface RateLimitResult {
 }
 
 Deno.serve(async (req) => {
-  // Handle CORS preflight
+  const corsResult = cors(req);
+  const corsHeaders = {
+    ...corsResult.headers,
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+  };
+
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return preflightResponse(corsResult);
+  }
+
+  if (!corsResult.allowed) {
+    return rejectCors(corsResult);
+  }
+
+  // Vérifier le header service_role pour les appels internes
+  const authHeader = req.headers.get('Authorization');
+  const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+  if (!authHeader || !authHeader.includes(serviceRoleKey?.substring(0, 20) || '')) {
+    return new Response(JSON.stringify({ error: 'Internal service only' }), {
+      status: 403,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   }
 
   try {
