@@ -1,19 +1,33 @@
-// @ts-nocheck - ESM imports from https://esm.sh ne supportent pas les types TypeScript natifs dans Deno
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+/**
+ * openai-tts - Synthèse vocale via OpenAI TTS
+ *
+ * 🔒 SÉCURISÉ: Auth + Rate limit 15/min + CORS restrictif + Validation Zod
+ */
+
+// @ts-nocheck
 import OpenAI from "https://esm.sh/openai@4.20.1"
 import { authenticateRequest } from '../_shared/auth-middleware.ts';
 import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
 import { validateRequest, createErrorResponse, TTSRequestSchema } from '../_shared/validation.ts';
+import { cors, preflightResponse, rejectCors } from '../_shared/cors.ts';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
+Deno.serve(async (req) => {
+  // 1. CORS check
+  const corsResult = cors(req);
+  const corsHeaders = {
+    ...corsResult.headers,
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+  };
 
-serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
+    return preflightResponse(corsResult);
+  }
+
+  // Vérification CORS stricte
+  if (!corsResult.allowed) {
+    console.warn('[openai-tts] CORS rejected - origin not allowed');
+    return rejectCors(corsResult);
   }
 
   try {
