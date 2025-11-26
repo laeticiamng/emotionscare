@@ -1,19 +1,64 @@
-// @ts-ignore
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-// @ts-ignore
+/**
+ * b2b-management - API de gestion B2B (organisations, équipes, rapports)
+ *
+ * 🔒 SÉCURISÉ: Auth + Rate limit 30/min + CORS restrictif
+ */
+
+// @ts-nocheck
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { cors, preflightResponse, rejectCors } from '../_shared/cors.ts';
+import { authenticateRequest, logUnauthorizedAccess } from '../_shared/auth-middleware.ts';
+import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+Deno.serve(async (req) => {
+  // 1. CORS check
+  const corsResult = cors(req);
+  const corsHeaders = {
+    ...corsResult.headers,
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+  };
 
-serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return preflightResponse(corsResult);
+  }
+
+  // Vérification CORS stricte
+  if (!corsResult.allowed) {
+    console.warn('[b2b-management] CORS rejected - origin not allowed');
+    return rejectCors(corsResult);
   }
 
   try {
+    // 2. 🔒 Authentification obligatoire
+    const authResult = await authenticateRequest(req);
+    if (authResult.status !== 200 || !authResult.user) {
+      await logUnauthorizedAccess(req, authResult.error || 'Authentication failed');
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const user = authResult.user;
+
+    // 3. 🛡️ Rate limiting
+    const rateLimit = await enforceEdgeRateLimit(req, {
+      route: 'b2b-management',
+      userId: user.id,
+      limit: 30,
+      windowMs: 60_000,
+      description: 'B2B management API',
+    });
+
+    if (!rateLimit.allowed) {
+      console.warn('[b2b-management] Rate limit exceeded', { userId: user.id });
+      return buildRateLimitResponse(rateLimit, corsHeaders, {
+        errorCode: 'rate_limit_exceeded',
+        message: `Trop de requêtes. Réessayez dans ${rateLimit.retryAfterSeconds}s.`,
+      });
+    }
+
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
@@ -24,10 +69,7 @@ serve(async (req) => {
       }
     );
 
-    const { data: { user } } = await supabaseClient.auth.getUser();
-    if (!user) {
-      throw new Error('Unauthorized');
-    }
+    console.log(`[b2b-management] Processing for user: ${user.id}`);
 
     const { action, orgId, teamData, period } = await req.json();
 
