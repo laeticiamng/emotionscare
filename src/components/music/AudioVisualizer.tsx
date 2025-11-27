@@ -34,7 +34,7 @@ const AudioVisualizer: React.FC<AudioVisualizerProps> = ({
   const animationRef = useRef<number>();
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
-  const dataArrayRef = useRef<Uint8Array | null>(null);
+  const dataArrayRef = useRef<Uint8Array<ArrayBuffer> | null>(null);
   
   // Initialize audio on mount
   useEffect(() => {
@@ -85,7 +85,7 @@ const AudioVisualizer: React.FC<AudioVisualizerProps> = ({
         analyserRef.current = audioContextRef.current.createAnalyser();
         analyserRef.current.fftSize = 256;
         const bufferLength = analyserRef.current.frequencyBinCount;
-        dataArrayRef.current = new Uint8Array(new ArrayBuffer(bufferLength));
+        dataArrayRef.current = new Uint8Array(bufferLength);
         
         // Create source node from audio element
         const source = audioContextRef.current.createMediaElementSource(audioRef.current);
