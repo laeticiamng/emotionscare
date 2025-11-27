@@ -7,23 +7,18 @@ import ModernHomePage from './modern-features/ModernHomePage';
 import { usePageSEO } from '@/hooks/usePageSEO';
 import HomePageErrorBoundary from './error/HomePageErrorBoundary';
 
-const HomePage: React.FC = () => {
+const HomePage = () => {
   usePageSEO({
     title: 'Accueil - Intelligence émotionnelle et bien-être',
     description: 'EmotionsCare : plateforme d\'intelligence émotionnelle pour particuliers et entreprises. Scan émotions, musicothérapie IA, coach virtuel, VR bien-être.',
     keywords: 'émotions, bien-être, intelligence émotionnelle, musicothérapie, coach IA, santé mentale',
-    // Open Graph pour partage social
     ogType: 'website',
     ogImage: '/og-image.svg',
     ogImageAlt: 'EmotionsCare - Plateforme d\'intelligence émotionnelle avec dashboard et outils',
-    // Twitter Cards
     twitterCard: 'summary_large_image',
     twitterImage: '/twitter-card.svg',
-    // Canonical URL
     canonical: 'https://emotionscare.app/',
-    // Inclure le schema Organization
     includeOrganization: true,
-    // Structured Data
     structuredData: {
       '@context': 'https://schema.org',
       '@type': 'WebApplication',
