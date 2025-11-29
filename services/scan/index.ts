@@ -1,7 +1,10 @@
 import { createApp } from './server';
 
 const app = createApp();
-const port = process.env.PORT || 3002;
-app.listen(port, () => {
-  console.log(`scan api listening on ${port}`);
+const port = Number(process.env.PORT) || 3002;
+app.listen({ port, host: '0.0.0.0' }).then(() => {
+  app.log.info(`scan api listening on ${port}`);
+}).catch(err => {
+  app.log.error(err);
+  process.exit(1);
 });

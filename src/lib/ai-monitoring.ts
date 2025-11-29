@@ -6,6 +6,11 @@
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';
 
+// Helper to safely access browser globals
+const isBrowser = typeof window !== 'undefined';
+const getLocationHref = () => isBrowser ? window.location.href : 'server';
+const getUserAgent = () => isBrowser ? navigator.userAgent : 'node';
+
 interface MonitoringEvent {
   type: 'error' | 'performance' | 'user_feedback' | 'custom';
   severity: 'critical' | 'high' | 'medium' | 'low';
@@ -44,8 +49,8 @@ class AIMonitoring {
       severity: this.determineSeverity(error, context),
       message: error.message,
       stack: error.stack,
-      url: window.location.href,
-      userAgent: navigator.userAgent,
+      url: getLocationHref(),
+      userAgent: getUserAgent(),
       timestamp: new Date().toISOString(),
       context,
     };
@@ -69,8 +74,8 @@ class AIMonitoring {
       type: 'custom',
       severity,
       message,
-      url: window.location.href,
-      userAgent: navigator.userAgent,
+      url: getLocationHref(),
+      userAgent: getUserAgent(),
       timestamp: new Date().toISOString(),
       context,
     };

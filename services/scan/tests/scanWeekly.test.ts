@@ -2,23 +2,21 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { createApp } from '../server';
 import { insertWeekly, insertWeeklyOrg, clear } from '../lib/db';
 import { hash } from '../../journal/lib/hash';
+import type { FastifyInstance } from 'fastify';
 
-let server: any;
+let server: FastifyInstance;
 let url: string;
 
 beforeEach(async () => {
   clear();
-  await new Promise<void>(resolve => {
-    server = createApp().listen(0, () => {
-      const { port } = server.address();
-      url = `http://localhost:${port}`;
-      resolve();
-    });
-  });
+  server = createApp();
+  await server.listen({ port: 0 });
+  const address = server.addresses()[0];
+  url = `http://localhost:${address.port}`;
 });
 
-afterEach(() => {
-  server.close();
+afterEach(async () => {
+  await server.close();
 });
 
 describe('GET /me/scan/weekly', () => {
