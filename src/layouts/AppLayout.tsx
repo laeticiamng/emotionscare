@@ -1,11 +1,10 @@
-// @ts-nocheck
-
 import React, { useState, useEffect } from 'react';
 import { Outlet, Navigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { routes } from '@/routerV2';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/providers/theme';
+import { logger } from '@/lib/logger';
 import {
   Loader2,
   Menu,

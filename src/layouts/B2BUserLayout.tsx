@@ -1,8 +1,7 @@
-// @ts-nocheck
 import React, { useState } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
-import { 
-  Home, BarChart3, BookOpen, Music, MessageCircle, Settings, LogOut, Menu, X, ChevronRight, User 
+import {
+  Home, BarChart3, BookOpen, Music, MessageCircle, Settings, LogOut, Menu, X, ChevronRight, User
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
@@ -14,6 +13,7 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 
 interface NavItemProps {
   to: string;
