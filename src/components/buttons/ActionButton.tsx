@@ -57,9 +57,9 @@ const ActionButton: React.FC<ActionButtonProps> = ({
         `}
       >
         {isLoading ? (
-          <Loader2 className="w-4 h-4 animate-spin mr-2" />
+          <Loader2 className="w-4 h-4 animate-spin mr-2" aria-hidden="true" />
         ) : (
-          icon && <span className="mr-2">{icon}</span>
+          icon && <span className="mr-2" aria-hidden="true">{icon}</span>
         )}
         {children}
       </Button>
