@@ -4,7 +4,6 @@
  */
 
 import { supabase } from '@/integrations/supabase/client';
-import { logger } from '@/lib/logger';
 
 interface MonitoringEvent {
   type: 'error' | 'performance' | 'user_feedback' | 'custom';
@@ -118,7 +117,7 @@ class AIMonitoring {
           event.message.includes('ai-monitoring') ||
           event.message.includes('Failed to send event to AI monitoring')) {
         // Log uniquement localement, ne pas envoyer à l'edge function
-        logger.warn('[AI-Monitoring] Skipping recursive monitoring event:', event.message, 'LIB');
+        console.warn('[AI-Monitoring] Skipping recursive monitoring event:', event.message);
         return;
       }
 
@@ -129,7 +128,9 @@ class AIMonitoring {
       }
 
       // Log local
-      logger.debug(`📊 Monitoring event captured: ${event.type} - ${event.severity}`, event, 'MONITORING');
+      if (import.meta.env.MODE === 'development') {
+        console.debug(`📊 Monitoring event captured: ${event.type} - ${event.severity}`, event);
+      }
 
       // Ajouter à la queue
       this.queue.push(event);
@@ -148,7 +149,7 @@ class AIMonitoring {
       }
     } catch (error) {
       // Fallback: log seulement localement si l'envoi échoue (sans recursion)
-      logger.error('[AI-Monitoring] Failed to capture monitoring event:', error, 'LIB');
+      console.error('[AI-Monitoring] Failed to capture monitoring event:', error);
     }
   }
 
@@ -167,7 +168,7 @@ class AIMonitoring {
       }
     } catch (error) {
       // Log sans déclencher de recursion
-      logger.error('[AI-Monitoring] Error processing monitoring queue:', error, 'LIB');
+      console.error('[AI-Monitoring] Error processing monitoring queue:', error);
     } finally {
       this.isProcessing = false;
 
@@ -203,14 +204,14 @@ class AIMonitoring {
         console.log('%c📊 Diagnostic:', 'font-weight: bold; color: #3b82f6', analysis.analysis);
         
         if (analysis.isKnownIssue) {
-          logger.debug('%c✅ Issue connue', 'color: #10b981', 'LIB');
+          console.debug('%c✅ Issue connue', 'color: #10b981');
         }
         
         console.log('%c💡 Solution suggérée:', 'font-weight: bold; color: #8b5cf6', analysis.suggestedFix);
         
         if (analysis.autoFixCode) {
           console.log('%c🔧 Code de correction automatique:', 'font-weight: bold; color: #f59e0b');
-          logger.debug(analysis.autoFixCode, 'LIB');
+          console.debug(analysis.autoFixCode);
         }
         
         if (analysis.relatedErrors.length > 0) {
@@ -220,7 +221,7 @@ class AIMonitoring {
         if (analysis.preventionTips.length > 0) {
           console.log('%c🛡️ Conseils de prévention:', 'font-weight: bold; color: #14b8a6');
           analysis.preventionTips.forEach((tip, i) => {
-            logger.debug(`  ${i + 1}. ${tip}`, 'LIB');
+            console.debug(`  ${i + 1}. ${tip}`);
           });
         }
         
@@ -232,7 +233,7 @@ class AIMonitoring {
       }
     } catch (error) {
       // Ne pas logger ici pour éviter la recursion
-      logger.error('[AI-Monitoring] Failed to send event to AI monitoring:', error, 'LIB');
+      console.error('[AI-Monitoring] Failed to send event to AI monitoring:', error);
     }
   }
 
@@ -292,21 +293,27 @@ class AIMonitoring {
    * Configurer le contexte utilisateur
    */
   setUser(user: { id: string; email?: string; username?: string }): void {
-    logger.debug('User context set for monitoring', { userId: user.id }, 'MONITORING');
+    if (import.meta.env.MODE === 'development') {
+      console.debug('User context set for monitoring', { userId: user.id });
+    }
   }
 
   /**
    * Ajouter des tags au contexte
    */
   setTags(tags: Record<string, string>): void {
-    logger.debug('Tags set for monitoring', tags, 'MONITORING');
+    if (import.meta.env.MODE === 'development') {
+      console.debug('Tags set for monitoring', tags);
+    }
   }
 
   /**
    * Ajouter un contexte supplémentaire
    */
   setContext(name: string, context: Record<string, any>): void {
-    logger.debug(`Context set: ${name}`, context, 'MONITORING');
+    if (import.meta.env.MODE === 'development') {
+      console.debug(`Context set: ${name}`, context);
+    }
   }
 }
 
