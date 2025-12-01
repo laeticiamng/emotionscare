@@ -363,15 +363,15 @@ export default function EnhancedCommunityFeed() {
                 <Video className="h-4 w-4 mr-2" />
                 Vidéo
               </Button>
-              <Button variant="ghost" size="sm">
+              <Button variant="ghost" size="sm" aria-label="Ajouter un audio">
                 <Mic className="h-4 w-4 mr-2" />
                 Audio
               </Button>
-              <Button variant="ghost" size="sm">
+              <Button variant="ghost" size="sm" aria-label="Ajouter un lieu">
                 <MapPin className="h-4 w-4 mr-2" />
                 Lieu
               </Button>
-              <Button variant="ghost" size="sm">
+              <Button variant="ghost" size="sm" aria-label="Ajouter une humeur">
                 <Smile className="h-4 w-4 mr-2" />
                 Humeur
               </Button>
@@ -448,7 +448,7 @@ export default function EnhancedCommunityFeed() {
                     </div>
                   </div>
                 </div>
-                <Button variant="ghost" size="sm">
+                <Button variant="ghost" size="sm" aria-label="Plus d'options">
                   <MoreHorizontal className="h-4 w-4" />
                 </Button>
               </div>
@@ -565,7 +565,7 @@ export default function EnhancedCommunityFeed() {
                     <Share2 className="h-4 w-4 mr-2" />
                     Partager
                   </Button>
-                  <Button variant="ghost" size="sm">
+                  <Button variant="ghost" size="sm" aria-label="Sauvegarder">
                     <Bookmark className="h-4 w-4 mr-2" />
                     Sauver
                   </Button>
@@ -612,7 +612,7 @@ export default function EnhancedCommunityFeed() {
                           </div>
                           <div className="flex items-center gap-4 mt-1 text-xs text-muted-foreground">
                             <span>{comment.timestamp}</span>
-                            <Button variant="ghost" size="sm" className="h-auto p-0 text-xs">
+                            <Button variant="ghost" size="sm" className="h-auto p-0 text-xs" aria-label="Répondre au commentaire">
                               Répondre
                             </Button>
                           </div>

@@ -146,7 +146,7 @@ const EmotionsCarePlayerWithLyrics: React.FC<EmotionsCarePlayerWithLyricsProps> 
           <CardTitle className="text-xl font-bold text-primary">
             🎵 {song.title}
           </CardTitle>
-          <Button variant="ghost" size="icon" onClick={onClose}>
+          <Button variant="ghost" size="icon" onClick={onClose} aria-label="Fermer le lecteur">
             <X className="w-5 h-5" />
           </Button>
         </CardHeader>
@@ -167,6 +167,7 @@ const EmotionsCarePlayerWithLyrics: React.FC<EmotionsCarePlayerWithLyricsProps> 
                 variant="ghost" 
                 size="icon"
                 onClick={() => seekTo(currentTime - 10)}
+                aria-label="Reculer de 10 secondes"
               >
                 <SkipBack className="w-5 h-5" />
               </Button>
@@ -176,6 +177,7 @@ const EmotionsCarePlayerWithLyrics: React.FC<EmotionsCarePlayerWithLyricsProps> 
                 size="icon"
                 onClick={togglePlayPause}
                 className="h-12 w-12 rounded-full bg-primary hover:bg-primary/90"
+                aria-label={isPlaying ? "Pause" : "Lecture"}
               >
                 {isPlaying ? (
                   <Pause className="w-6 w-6" />
@@ -188,6 +190,7 @@ const EmotionsCarePlayerWithLyrics: React.FC<EmotionsCarePlayerWithLyricsProps> 
                 variant="ghost" 
                 size="icon"
                 onClick={() => seekTo(currentTime + 10)}
+                aria-label="Avancer de 10 secondes"
               >
                 <SkipForward className="w-5 h-5" />
               </Button>
