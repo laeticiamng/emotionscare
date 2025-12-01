@@ -516,7 +516,7 @@ export const AdvancedAnalyticsDashboard: React.FC = () => {
                         <p className="font-medium">{track.plays} écoutes</p>
                         <p className="text-xs text-muted-foreground">{track.duration}</p>
                       </div>
-                      <Button variant="ghost" size="icon">
+                      <Button variant="ghost" size="icon" aria-label={`Lire ${track.title}`}>
                         <Play className="h-4 w-4" />
                       </Button>
                     </div>

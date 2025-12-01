@@ -132,10 +132,10 @@ const TeamManagement: React.FC<TeamManagementProps> = ({ teams, departments }) =
                     </div>
                   </div>
                   <div className="space-x-1">
-                    <Button variant="ghost" size="icon" onClick={() => handleEditTeam(team)}>
+                    <Button variant="ghost" size="icon" onClick={() => handleEditTeam(team)} aria-label={`Modifier l'équipe ${team.name}`}>
                       <PenSquare className="h-4 w-4" />
                     </Button>
-                    <Button variant="ghost" size="icon" onClick={() => handleDeleteTeam(team)}>
+                    <Button variant="ghost" size="icon" onClick={() => handleDeleteTeam(team)} aria-label={`Supprimer l'équipe ${team.name}`}>
                       <Trash2 className="h-4 w-4 text-destructive" />
                     </Button>
                   </div>

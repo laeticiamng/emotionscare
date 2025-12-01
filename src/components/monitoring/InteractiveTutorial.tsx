@@ -161,7 +161,7 @@ export const InteractiveTutorial: React.FC<InteractiveTutorialProps> = ({ isOpen
         <DialogHeader>
           <div className="flex items-center justify-between">
             <DialogTitle className="text-2xl">{step.title}</DialogTitle>
-            <Button variant="ghost" size="icon" onClick={handleClose}>
+            <Button variant="ghost" size="icon" onClick={handleClose} aria-label="Fermer le tutoriel">
               <X className="h-4 w-4" />
             </Button>
           </div>

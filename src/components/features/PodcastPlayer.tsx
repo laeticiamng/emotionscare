@@ -93,10 +93,10 @@ const PodcastPlayer: React.FC = () => {
                   <p className="text-sm text-muted-foreground">{activePodcastData?.host}</p>
                 </div>
                 <div className="flex gap-1">
-                  <Button variant="ghost" size="icon" className="h-8 w-8">
+                  <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Ajouter aux favoris">
                     <Heart className="h-4 w-4" />
                   </Button>
-                  <Button variant="ghost" size="icon" className="h-8 w-8">
+                  <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Partager">
                     <Share2 className="h-4 w-4" />
                   </Button>
                 </div>
@@ -108,6 +108,7 @@ const PodcastPlayer: React.FC = () => {
                     variant="outline" 
                     size="icon" 
                     className="h-8 w-8 rounded-full"
+                    aria-label="Piste précédente"
                   >
                     <SkipBack className="h-4 w-4" />
                   </Button>
@@ -117,6 +118,7 @@ const PodcastPlayer: React.FC = () => {
                     size="icon" 
                     className="h-10 w-10 rounded-full"
                     onClick={() => setIsPlaying(!isPlaying)}
+                    aria-label={isPlaying ? "Pause" : "Lecture"}
                   >
                     {isPlaying ? (
                       <Pause className="h-5 w-5" />
@@ -129,6 +131,7 @@ const PodcastPlayer: React.FC = () => {
                     variant="outline" 
                     size="icon" 
                     className="h-8 w-8 rounded-full"
+                    aria-label="Piste suivante"
                   >
                     <SkipForward className="h-4 w-4" />
                   </Button>
