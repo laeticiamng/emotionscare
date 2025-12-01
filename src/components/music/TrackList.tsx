@@ -49,11 +49,16 @@ const TrackList: React.FC<TrackListProps> = ({
                   e.stopPropagation();
                   onTrackSelect?.(track);
                 }}
+                aria-label={
+                  isCurrent && isPlaying 
+                    ? `Mettre en pause ${track.title}` 
+                    : `Lire ${track.title}`
+                }
               >
                 {isCurrent && isPlaying ? (
-                  <Pause className="h-4 w-4" />
+                  <Pause className="h-4 w-4" aria-hidden="true" />
                 ) : (
-                  <Play className="h-4 w-4" />
+                  <Play className="h-4 w-4" aria-hidden="true" />
                 )}
               </Button>
             </div>

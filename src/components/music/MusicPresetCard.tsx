@@ -58,8 +58,9 @@ const MusicPresetCard: React.FC<MusicPresetCardProps> = ({
           onSelect(preset);
         }}
         className="h-8 w-8 p-0 rounded-full"
+        aria-label={`Lire ${preset.name}`}
       >
-        <Play className="h-4 w-4" />
+        <Play className="h-4 w-4" aria-hidden="true" />
       </Button>
     </div>
   );
