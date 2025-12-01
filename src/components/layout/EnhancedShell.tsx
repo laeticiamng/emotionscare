@@ -81,6 +81,11 @@ const EnhancedShell: React.FC<EnhancedShellProps> = ({
       <div 
         className="fixed top-0 left-0 h-1 bg-primary z-50 transition-transform duration-200 ease-in-out origin-left"
         style={{ transform: `scaleX(${scrollProgress})` }}
+        role="progressbar"
+        aria-label="Progression de la page"
+        aria-valuenow={Math.round(scrollProgress * 100)}
+        aria-valuemin={0}
+        aria-valuemax={100}
       />
 
       {/* Background Gradient Effects */}
@@ -125,13 +130,13 @@ const EnhancedShell: React.FC<EnhancedShellProps> = ({
 
       {/* Header */}
       {!hideNav && (
-        <div id="main-navigation">
+        <header id="main-navigation" role="banner">
           <EnhancedHeader scrolled={scrolled} />
-        </div>
+        </header>
       )}
 
       {/* Main Content */}
-      <main id="main-content" className="flex-1 w-full mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 relative mt-16">
+      <main id="main-content" role="main" className="flex-1 w-full mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 relative mt-16">
         <AnimatePresence mode="sync">{/* Fixed multiple children warning */}
           <motion.div
             key={location.pathname}

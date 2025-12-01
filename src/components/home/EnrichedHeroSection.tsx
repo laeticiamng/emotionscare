@@ -50,7 +50,10 @@ const EnrichedHeroSection: React.FC = () => {
       };
 
   return (
-    <section className="relative overflow-hidden py-20 lg:py-32 bg-gradient-to-br from-background via-background/80 to-primary/5">
+    <section 
+      className="relative overflow-hidden py-20 lg:py-32 bg-gradient-to-br from-background via-background/80 to-primary/5"
+      aria-labelledby="hero-heading"
+    >
       {/* Animated background elements - optimized with will-change and conditional animations */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
         {!prefersReducedMotion ? (
@@ -120,15 +123,17 @@ const EnrichedHeroSection: React.FC = () => {
             <Badge
               variant="secondary"
               className="mb-4 px-4 py-2 text-sm font-medium bg-gradient-to-r from-primary/10 to-blue-500/10 border-primary/20 backdrop-blur-sm"
+              role="status"
+              aria-label="Nouveauté"
             >
-              <Sparkles className="h-3 w-3 mr-2" />
+              <Sparkles className="h-3 w-3 mr-2" aria-hidden="true" />
               Nouveau : Expériences immersives débloquées
             </Badge>
           </motion.div>
 
           {/* Main Heading */}
           <motion.div variants={itemVariants} className="space-y-4">
-            <h1 className="text-5xl lg:text-7xl font-bold leading-tight">
+            <h1 id="hero-heading" className="text-5xl lg:text-7xl font-bold leading-tight">
               <span className="bg-gradient-to-r from-primary via-primary/80 to-blue-500 bg-clip-text text-transparent">
                 Transformez votre bien-être
               </span>
@@ -159,9 +164,9 @@ const EnrichedHeroSection: React.FC = () => {
               asChild
             >
               <Link to="/signup">
-                <Play className="h-5 w-5 mr-2 group-hover:scale-110 transition-transform" />
+                <Play className="h-5 w-5 mr-2 group-hover:scale-110 transition-transform" aria-hidden="true" />
                 <span>Essai gratuit 30 jours</span>
-                <ArrowRight className="h-5 w-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="h-5 w-5 ml-2 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
               </Link>
             </Button>
 
@@ -172,7 +177,7 @@ const EnrichedHeroSection: React.FC = () => {
               asChild
             >
               <Link to="/demo">
-                <Zap className="h-5 w-5 mr-2" />
+                <Zap className="h-5 w-5 mr-2" aria-hidden="true" />
                 <span>Voir la démo interactive</span>
               </Link>
             </Button>
@@ -212,8 +217,10 @@ const EnrichedHeroSection: React.FC = () => {
               variants={floatingVariants}
               animate="animate"
               className="bg-gradient-to-br from-blue-500/10 to-blue-500/5 backdrop-blur-sm rounded-xl p-4 border border-blue-500/20"
+              role="article"
+              aria-label="Fonctionnalité Musique Thérapeutique"
             >
-              <div className="text-2xl mb-2">🎵</div>
+              <div className="text-2xl mb-2" role="img" aria-label="Icône musique">🎵</div>
               <p className="text-sm font-medium">Musique Thérapeutique</p>
               <p className="text-xs text-muted-foreground">Générée par IA en temps réel</p>
             </motion.div>
@@ -223,8 +230,10 @@ const EnrichedHeroSection: React.FC = () => {
               animate="animate"
               transition={{ delay: 0.2 }}
               className="bg-gradient-to-br from-green-500/10 to-green-500/5 backdrop-blur-sm rounded-xl p-4 border border-green-500/20"
+              role="article"
+              aria-label="Fonctionnalité Analyse Émotions"
             >
-              <div className="text-2xl mb-2">👁️</div>
+              <div className="text-2xl mb-2" role="img" aria-label="Icône analyse visuelle">👁️</div>
               <p className="text-sm font-medium">Analyse Émotions</p>
               <p className="text-xs text-muted-foreground">99% de précision avec IA</p>
             </motion.div>
@@ -234,8 +243,10 @@ const EnrichedHeroSection: React.FC = () => {
               animate="animate"
               transition={{ delay: 0.4 }}
               className="bg-gradient-to-br from-purple-500/10 to-purple-500/5 backdrop-blur-sm rounded-xl p-4 border border-purple-500/20"
+              role="article"
+              aria-label="Fonctionnalité Coach Personnel"
             >
-              <div className="text-2xl mb-2">🧠</div>
+              <div className="text-2xl mb-2" role="img" aria-label="Icône coach">🧠</div>
               <p className="text-sm font-medium">Coach Personnel</p>
               <p className="text-xs text-muted-foreground">Support 24/7 personnalisé</p>
             </motion.div>

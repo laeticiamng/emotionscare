@@ -95,7 +95,7 @@ const EnhancedHeader: React.FC<EnhancedHeaderProps> = ({ scrolled = false, class
         </div>
 
         {/* Desktop Navigation */}
-        <nav className="hidden lg:flex items-center space-x-1">
+        <nav className="hidden lg:flex items-center space-x-1" aria-label="Navigation principale">
             {navigationItems.map((item) => (
               <NavLink
                 key={item.to}
