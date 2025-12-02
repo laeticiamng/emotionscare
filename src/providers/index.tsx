@@ -105,7 +105,6 @@ export function RootProvider({ children }: RootProviderProps) {
                           defaultTheme={resolvedDefaultTheme}
                           enableSystem
                           storageKey="emotionscare-theme"
-                          themes={['light', 'dark', 'system']}
                         >
                           <TooltipProvider>
                             <NotificationProvider>
