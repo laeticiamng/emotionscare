@@ -245,7 +245,7 @@ const InteractiveJournal: React.FC = () => {
                   </span>
                 </div>
                 
-                <p className="text-sm leading-relaxed text-foreground/90 mb-3">
+                <p className="text-sm leading-relaxed text-foreground mb-3">
                   {entry.content}
                 </p>
                 

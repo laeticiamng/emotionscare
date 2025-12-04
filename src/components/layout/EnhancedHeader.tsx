@@ -104,7 +104,7 @@ const EnhancedHeader: React.FC<EnhancedHeaderProps> = ({ scrolled = false, class
                   "relative px-3 py-2 rounded-md text-sm font-medium transition-all flex items-center",
                   isActive
                     ? "text-primary"
-                    : "text-foreground/70 hover:text-foreground hover:bg-accent/50"
+                    : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
                 )}
               >
                 {({ isActive }) => (

@@ -198,7 +198,7 @@ export function HealthIntegrationsManager() {
                   )}
                 </div>
                 <CardTitle className="mt-4">{config.name}</CardTitle>
-                <CardDescription className="text-foreground/70">
+                <CardDescription className="text-muted-foreground">
                   {config.description}
                 </CardDescription>
               </CardHeader>

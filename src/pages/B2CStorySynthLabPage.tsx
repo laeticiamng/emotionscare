@@ -234,7 +234,7 @@ const B2CStorySynthLabPage: React.FC = () => {
 
             {/* Texte de l'histoire */}
             <div className="bg-background/30 rounded-lg p-4 mb-4 max-h-40 overflow-y-auto">
-              <p className="text-sm text-foreground/90 leading-relaxed">
+              <p className="text-sm text-foreground leading-relaxed">
                 {currentStory.content}
               </p>
             </div>

@@ -56,7 +56,7 @@ export const GamificationStats = () => {
             <div className="space-y-2">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <p className="text-sm font-medium text-foreground/80">
+                  <p className="text-sm font-medium text-foreground">
                     {stat.label}
                   </p>
                   <p className="text-xs text-muted-foreground">

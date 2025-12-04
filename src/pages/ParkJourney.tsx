@@ -100,7 +100,7 @@ const AttractionStop: React.FC<AttractionStopProps> = ({
                 initial={{ opacity: 0, y: 10 }}
                 animate={isInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ delay: delay + 0.2 + (i * 0.1) }}
-                className="text-foreground/90 leading-relaxed"
+                className="text-foreground leading-relaxed"
               >
                 {line}
               </motion.p>

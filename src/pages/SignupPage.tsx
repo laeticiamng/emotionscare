@@ -129,7 +129,7 @@ const SignupPage: React.FC = () => {
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Nom complet */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground/80">
+                <label className="text-sm font-medium text-foreground">
                   Nom complet
                 </label>
                 <Input
@@ -145,7 +145,7 @@ const SignupPage: React.FC = () => {
 
               {/* Email */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground/80">
+                <label className="text-sm font-medium text-foreground">
                   Email
                 </label>
                 <div className="relative">
@@ -164,7 +164,7 @@ const SignupPage: React.FC = () => {
 
               {/* Mot de passe */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground/80">
+                <label className="text-sm font-medium text-foreground">
                   Mot de passe
                 </label>
                 <div className="relative">
@@ -190,7 +190,7 @@ const SignupPage: React.FC = () => {
 
               {/* Confirmation mot de passe */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground/80">
+                <label className="text-sm font-medium text-foreground">
                   Confirmer le mot de passe
                 </label>
                 <div className="relative">

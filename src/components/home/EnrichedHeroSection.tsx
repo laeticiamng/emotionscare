@@ -138,7 +138,7 @@ const EnrichedHeroSection: React.FC = () => {
                 Transformez votre bien-être
               </span>
               <br />
-              <span className="text-3xl lg:text-5xl text-foreground/90 font-medium">
+              <span className="text-3xl lg:text-5xl text-foreground font-medium">
                 Avec intelligence émotionnelle
               </span>
             </h1>

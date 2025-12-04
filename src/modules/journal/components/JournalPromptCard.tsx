@@ -56,7 +56,7 @@ export const JournalPromptCard = memo<JournalPromptCardProps>(({
       </CardHeader>
 
       <CardContent className="pb-4">
-        <p className="text-base leading-relaxed text-foreground/90">
+        <p className="text-base leading-relaxed text-foreground">
           {prompt.prompt_text}
         </p>
       </CardContent>
