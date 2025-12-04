@@ -61,7 +61,8 @@ const WorldMapView: React.FC = () => {
   const [clusters, setClusters] = useState<EmotionCluster[]>([]);
   const [selectedCluster, setSelectedCluster] = useState<string | null>(null);
   const [zoomLevel, setZoomLevel] = useState(1);
-  const { isDarkMode } = useTheme();
+  const { resolvedTheme } = useTheme();
+  const isDarkMode = resolvedTheme === 'dark';
   
   const mapBackground = isDarkMode 
     ? "bg-slate-900 bg-opacity-50 bg-[url('/images/world-map-dark.svg')]" 

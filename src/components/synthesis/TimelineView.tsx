@@ -54,7 +54,8 @@ const TimelineView: React.FC = () => {
   const { events, addEvent } = useOrchestration();
   const [isLoading, setIsLoading] = useState(true);
   const [zoomLevel, setZoomLevel] = useState(1);
-  const { isDarkMode } = useTheme();
+  const { resolvedTheme } = useTheme();
+  const isDarkMode = resolvedTheme === 'dark';
 
   // Simulate loading state
   useEffect(() => {

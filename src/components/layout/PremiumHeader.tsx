@@ -25,7 +25,8 @@ const PremiumHeader: React.FC<PremiumHeaderProps> = ({
 }) => {
   const [searchOpen, setSearchOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const { theme, isDarkMode } = useTheme();
+  const { theme, resolvedTheme } = useTheme();
+  const isDarkMode = resolvedTheme === 'dark';
   const { scrollY } = useScroll();
   
   const headerBgOpacity = useTransform(scrollY, [0, 50], [0.5, 0.95]);
