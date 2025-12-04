@@ -2191,7 +2191,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
   // ═══════════════════════════════════════════════════════════
   {
     name: 'catch-all',
-    path: '/:path*',
+    path: '*',
     segment: 'public',
     layout: 'simple',
     component: 'UnifiedErrorPage',
