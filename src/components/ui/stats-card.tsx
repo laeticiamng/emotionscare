@@ -42,22 +42,22 @@ const StatsCard: React.FC<StatsCardProps> = ({
   const getTrendColor = (type: string) => {
     switch (type) {
       case 'increase':
-        return 'text-green-600 bg-green-50';
+        return 'text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/50';
       case 'decrease':
-        return 'text-red-600 bg-red-50';
+        return 'text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/50';
       default:
-        return 'text-gray-600 bg-gray-50';
+        return 'text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900/50';
     }
   };
 
   const getVariantStyles = (variant: string) => {
     switch (variant) {
       case 'success':
-        return 'border-green-200 bg-green-50/50';
+        return 'border-green-200 dark:border-green-800 bg-green-50/50 dark:bg-green-900/30';
       case 'warning':
-        return 'border-yellow-200 bg-yellow-50/50';
+        return 'border-yellow-200 dark:border-yellow-800 bg-yellow-50/50 dark:bg-yellow-900/30';
       case 'error':
-        return 'border-red-200 bg-red-50/50';
+        return 'border-red-200 dark:border-red-800 bg-red-50/50 dark:bg-red-900/30';
       default:
         return '';
     }
