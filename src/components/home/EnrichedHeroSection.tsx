@@ -192,19 +192,19 @@ const EnrichedHeroSection: React.FC = () => {
               <div className="h-8 w-8 bg-green-500/20 rounded-full flex items-center justify-center">
                 <Heart className="h-4 w-4 text-green-600 dark:text-green-400" aria-hidden="true" />
               </div>
-              <span className="text-foreground/80 font-medium">Confiance de 25K+ utilisateurs</span>
+              <span className="text-foreground font-medium">Confiance de 25K+ utilisateurs</span>
             </div>
             <div className="flex items-center space-x-2">
               <div className="h-8 w-8 bg-blue-500/20 rounded-full flex items-center justify-center">
                 <Sparkles className="h-4 w-4 text-blue-600 dark:text-blue-400" aria-hidden="true" />
               </div>
-              <span className="text-foreground/80 font-medium">100% sécurisé RGPD</span>
+              <span className="text-foreground font-medium">100% sécurisé RGPD</span>
             </div>
             <div className="flex items-center space-x-2">
               <div className="h-8 w-8 bg-purple-500/20 rounded-full flex items-center justify-center">
                 <Zap className="h-4 w-4 text-purple-600 dark:text-purple-400" aria-hidden="true" />
               </div>
-              <span className="text-foreground/80 font-medium">Installation instantanée</span>
+              <span className="text-foreground font-medium">Installation instantanée</span>
             </div>
           </motion.div>
 
