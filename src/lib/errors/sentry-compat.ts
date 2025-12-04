@@ -13,8 +13,20 @@ export const Sentry = {
   
   captureMessage(message: string, options?: any) {
     const level = options?.level || 'info';
-    const logFn = logger[level as 'debug' | 'info' | 'warn' | 'error'] || logger.info;
-    logFn(message, options || {}, 'SENTRY');
+    switch (level) {
+      case 'debug':
+        logger.debug(message, options || {}, 'SENTRY');
+        break;
+      case 'warning':
+      case 'warn':
+        logger.warn(message, options || {}, 'SENTRY');
+        break;
+      case 'error':
+        logger.error(message, options || {}, 'SENTRY');
+        break;
+      default:
+        logger.info(message, options || {}, 'SENTRY');
+    }
   },
   
   addBreadcrumb(breadcrumb: any) {
