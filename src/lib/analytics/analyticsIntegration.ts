@@ -130,73 +130,38 @@ class AnalyticsIntegration {
 
   /**
    * Initialize Mixpanel
+   * Note: Requires 'mixpanel-browser' package to be installed
    */
   private async initMixpanel(): Promise<void> {
     const token = this.config.mixpanelToken;
     if (!token) return;
 
-    // Dynamic import for Mixpanel
-    try {
-      const mixpanel = await import('mixpanel-browser');
-      mixpanel.default.init(token, {
-        debug: this.config.debug,
-        track_pageview: false,
-        persistence: 'localStorage',
-        ignore_dnt: false,
-      });
-      window.mixpanel = mixpanel.default;
-      this.log('Mixpanel initialized');
-    } catch (error) {
-      this.log('Mixpanel SDK not available, using fallback');
-    }
+    // Mixpanel SDK not installed - log and skip
+    this.log('Mixpanel SDK not installed, skipping initialization. Install with: npm install mixpanel-browser');
   }
 
   /**
    * Initialize Amplitude
+   * Note: Requires '@amplitude/analytics-browser' package to be installed
    */
   private async initAmplitude(): Promise<void> {
     const apiKey = this.config.amplitudeApiKey;
     if (!apiKey) return;
 
-    try {
-      const amplitude = await import('@amplitude/analytics-browser');
-      amplitude.init(apiKey, undefined, {
-        logLevel: this.config.debug ? 1 : 0,
-        defaultTracking: {
-          sessions: true,
-          pageViews: false,
-          formInteractions: false,
-          fileDownloads: false,
-        },
-      });
-      window.amplitude = amplitude;
-      this.log('Amplitude initialized');
-    } catch (error) {
-      this.log('Amplitude SDK not available, using fallback');
-    }
+    // Amplitude SDK not installed - log and skip
+    this.log('Amplitude SDK not installed, skipping initialization. Install with: npm install @amplitude/analytics-browser');
   }
 
   /**
    * Initialize Posthog
+   * Note: Requires 'posthog-js' package to be installed
    */
   private async initPosthog(): Promise<void> {
     const apiKey = this.config.posthogApiKey;
     if (!apiKey) return;
 
-    try {
-      const posthog = await import('posthog-js');
-      posthog.default.init(apiKey, {
-        api_host: this.config.posthogHost || 'https://app.posthog.com',
-        capture_pageview: false,
-        capture_pageleave: true,
-        autocapture: false,
-        persistence: 'localStorage',
-      });
-      window.posthog = posthog.default;
-      this.log('Posthog initialized');
-    } catch (error) {
-      this.log('Posthog SDK not available, using fallback');
-    }
+    // Posthog SDK not installed - log and skip
+    this.log('Posthog SDK not installed, skipping initialization. Install with: npm install posthog-js');
   }
 
   /**
