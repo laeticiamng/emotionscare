@@ -357,17 +357,17 @@ const EnhancedUserDashboard: React.FC<EnhancedUserDashboardProps> = ({ user }) =
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="p-4 bg-blue-50 rounded-lg border-l-4 border-blue-500">
-              <h4 className="font-medium text-blue-900">Prochain objectif suggéré</h4>
-              <p className="text-sm text-blue-700 mt-1">
-                Vous approchez de votre {dashboardStats.nextMilestone}e session ! 
+            <div className="p-4 bg-blue-50 dark:bg-blue-900/30 rounded-lg border-l-4 border-blue-500">
+              <h4 className="font-medium text-blue-900 dark:text-blue-100">Prochain objectif suggéré</h4>
+              <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
+                Vous approchez de votre {dashboardStats.nextMilestone}e session !
                 Continuez sur cette lancée pour débloquer de nouveaux badges.
               </p>
             </div>
-            <div className="p-4 bg-green-50 rounded-lg border-l-4 border-green-500">
-              <h4 className="font-medium text-green-900">Habitude en formation</h4>
-              <p className="text-sm text-green-700 mt-1">
-                Votre série de {dashboardStats.currentStreak} jours est excellente ! 
+            <div className="p-4 bg-green-50 dark:bg-green-900/30 rounded-lg border-l-4 border-green-500">
+              <h4 className="font-medium text-green-900 dark:text-green-100">Habitude en formation</h4>
+              <p className="text-sm text-green-700 dark:text-green-300 mt-1">
+                Votre série de {dashboardStats.currentStreak} jours est excellente !
                 Maintenez le rythme pour atteindre la série de 7 jours.
               </p>
             </div>

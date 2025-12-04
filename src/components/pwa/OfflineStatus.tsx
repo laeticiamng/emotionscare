@@ -222,21 +222,21 @@ const OfflineStatus: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           className="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:max-w-sm z-40"
         >
-          <Card className="bg-blue-50 border-blue-200">
+          <Card className="bg-blue-50 dark:bg-blue-900/30 border-blue-200 dark:border-blue-800">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
-                  <Cloud className="h-5 w-5 text-blue-600" />
-                  <span className="font-semibold text-blue-900">
+                  <Cloud className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                  <span className="font-semibold text-blue-900 dark:text-blue-100">
                     Synchronisation
                   </span>
                 </div>
-                <Badge variant="outline" className="text-blue-700">
+                <Badge variant="outline" className="text-blue-700 dark:text-blue-300">
                   {getPendingCount()} éléments
                 </Badge>
               </div>
-              
-              <p className="text-sm text-blue-700 mb-3">
+
+              <p className="text-sm text-blue-700 dark:text-blue-300 mb-3">
                 Dernière sync : {getLastSyncText()}
               </p>
               
