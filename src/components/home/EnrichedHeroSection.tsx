@@ -186,25 +186,25 @@ const EnrichedHeroSection: React.FC = () => {
           {/* Trust Indicators */}
           <motion.div
             variants={itemVariants}
-            className="flex flex-col sm:flex-row gap-6 justify-center items-center text-sm text-muted-foreground pt-8 border-t border-border/50"
+            className="flex flex-col sm:flex-row gap-6 justify-center items-center text-sm pt-8 border-t border-border/50"
           >
             <div className="flex items-center space-x-2">
               <div className="h-8 w-8 bg-green-500/20 rounded-full flex items-center justify-center">
-                <Heart className="h-4 w-4 text-green-500" aria-hidden="true" />
+                <Heart className="h-4 w-4 text-green-600 dark:text-green-400" aria-hidden="true" />
               </div>
-              <span>Confiance de 25K+ utilisateurs</span>
+              <span className="text-foreground/80 font-medium">Confiance de 25K+ utilisateurs</span>
             </div>
             <div className="flex items-center space-x-2">
               <div className="h-8 w-8 bg-blue-500/20 rounded-full flex items-center justify-center">
-                <Sparkles className="h-4 w-4 text-blue-500" aria-hidden="true" />
+                <Sparkles className="h-4 w-4 text-blue-600 dark:text-blue-400" aria-hidden="true" />
               </div>
-              <span>100% sécurisé RGPD</span>
+              <span className="text-foreground/80 font-medium">100% sécurisé RGPD</span>
             </div>
             <div className="flex items-center space-x-2">
               <div className="h-8 w-8 bg-purple-500/20 rounded-full flex items-center justify-center">
-                <Zap className="h-4 w-4 text-purple-500" aria-hidden="true" />
+                <Zap className="h-4 w-4 text-purple-600 dark:text-purple-400" aria-hidden="true" />
               </div>
-              <span>Installation instantanée</span>
+              <span className="text-foreground/80 font-medium">Installation instantanée</span>
             </div>
           </motion.div>
 
@@ -216,39 +216,39 @@ const EnrichedHeroSection: React.FC = () => {
             <motion.div
               variants={floatingVariants}
               animate="animate"
-              className="bg-gradient-to-br from-blue-500/10 to-blue-500/5 backdrop-blur-sm rounded-xl p-4 border border-blue-500/20"
+              className="bg-gradient-to-br from-blue-500/15 to-blue-500/5 backdrop-blur-sm rounded-xl p-5 border border-blue-500/30 shadow-lg"
               role="article"
               aria-label="Fonctionnalité Musique Thérapeutique"
             >
-              <div className="text-2xl mb-2" role="img" aria-label="Icône musique">🎵</div>
-              <p className="text-sm font-medium">Musique Thérapeutique</p>
-              <p className="text-xs text-muted-foreground">Générée par IA en temps réel</p>
+              <div className="text-3xl mb-2" role="img" aria-label="Icône musique">🎵</div>
+              <p className="text-sm font-semibold text-foreground">Musique Thérapeutique</p>
+              <p className="text-xs text-muted-foreground mt-1">Générée par IA en temps réel</p>
             </motion.div>
 
             <motion.div
               variants={floatingVariants}
               animate="animate"
               transition={{ delay: 0.2 }}
-              className="bg-gradient-to-br from-green-500/10 to-green-500/5 backdrop-blur-sm rounded-xl p-4 border border-green-500/20"
+              className="bg-gradient-to-br from-green-500/15 to-green-500/5 backdrop-blur-sm rounded-xl p-5 border border-green-500/30 shadow-lg"
               role="article"
               aria-label="Fonctionnalité Analyse Émotions"
             >
-              <div className="text-2xl mb-2" role="img" aria-label="Icône analyse visuelle">👁️</div>
-              <p className="text-sm font-medium">Analyse Émotions</p>
-              <p className="text-xs text-muted-foreground">99% de précision avec IA</p>
+              <div className="text-3xl mb-2" role="img" aria-label="Icône analyse visuelle">👁️</div>
+              <p className="text-sm font-semibold text-foreground">Analyse Émotions</p>
+              <p className="text-xs text-muted-foreground mt-1">99% de précision avec IA</p>
             </motion.div>
 
             <motion.div
               variants={floatingVariants}
               animate="animate"
               transition={{ delay: 0.4 }}
-              className="bg-gradient-to-br from-purple-500/10 to-purple-500/5 backdrop-blur-sm rounded-xl p-4 border border-purple-500/20"
+              className="bg-gradient-to-br from-purple-500/15 to-purple-500/5 backdrop-blur-sm rounded-xl p-5 border border-purple-500/30 shadow-lg"
               role="article"
               aria-label="Fonctionnalité Coach Personnel"
             >
-              <div className="text-2xl mb-2" role="img" aria-label="Icône coach">🧠</div>
-              <p className="text-sm font-medium">Coach Personnel</p>
-              <p className="text-xs text-muted-foreground">Support 24/7 personnalisé</p>
+              <div className="text-3xl mb-2" role="img" aria-label="Icône coach">🧠</div>
+              <p className="text-sm font-semibold text-foreground">Coach Personnel</p>
+              <p className="text-xs text-muted-foreground mt-1">Support 24/7 personnalisé</p>
             </motion.div>
           </motion.div>
         </motion.div>

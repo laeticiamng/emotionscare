@@ -684,11 +684,33 @@ const SuspenseWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) 
 // Import AppLayout for sidebar - uses Outlet instead of children
 const AppLayoutComponent = lazy(() => import('@/components/layout/AppLayout'));
 
+// Import Marketing layout components
+const MarketingHeader = lazy(() => import('@/components/layout/MarketingHeader'));
+const MarketingFooter = lazy(() => import('@/components/layout/MarketingFooter'));
+
 const LayoutWrapper: React.FC<{ 
   children: React.ReactNode; 
   layout?: 'marketing' | 'app' | 'simple' | 'app-sidebar'
 }> = ({ children, layout = 'app' }) => {
-  if (layout === 'marketing' || layout === 'simple') {
+  // Marketing layout with header and footer
+  if (layout === 'marketing') {
+    return (
+      <div className="flex flex-col min-h-screen">
+        <Suspense fallback={<div className="h-16" />}>
+          <MarketingHeader />
+        </Suspense>
+        <main className="flex-1 pt-16">
+          {children}
+        </main>
+        <Suspense fallback={null}>
+          <MarketingFooter />
+        </Suspense>
+      </div>
+    );
+  }
+  
+  // Simple layout without any wrapper
+  if (layout === 'simple') {
     return <>{children}</>;
   }
   
