@@ -145,7 +145,7 @@ const MarketingHeader: React.FC<MarketingHeaderProps> = ({ className }) => {
                 </Button>
               ) : (
                 <>
-                  <Button variant="ghost" asChild className="text-muted-foreground">
+                  <Button variant="ghost" asChild className="text-foreground/80 hover:text-foreground">
                     <Link to="/login">Connexion</Link>
                   </Button>
                   <Button asChild className="bg-gradient-to-r from-primary to-primary/80 shadow-md hover:shadow-lg">
