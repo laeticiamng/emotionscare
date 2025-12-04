@@ -297,7 +297,7 @@ const ModernHomePage: React.FC = () => {
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4">Découvrez nos fonctionnalités</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-foreground/70 max-w-2xl mx-auto">
               Une expérience complète pour votre bien-être émotionnel avec des outils modernes et intuitifs
             </p>
           </div>
@@ -312,7 +312,7 @@ const ModernHomePage: React.FC = () => {
                 <CardTitle className="text-xl">EmotionsCare Store</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground mb-4 text-sm">
+                <p className="text-foreground/70 mb-4 text-sm">
                   Collection premium de produits bien-être : luminothérapie, relaxation, objets sensoriels. Chaque achat débloque l'accès aux modules digitaux correspondants.
                 </p>
                 <Link to="/store">
@@ -333,12 +333,12 @@ const ModernHomePage: React.FC = () => {
                 <CardTitle>Suivi en temps réel</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground">
-                  Moniteur vos émotions et votre bien-être avec des analyses en temps réel et des insights personnalisés.
+                <p className="text-foreground/70">
+                  Monitorer vos émotions et votre bien-être avec des analyses en temps réel et des insights personnalisés.
                 </p>
                 <div className="mt-4">
                   <Progress value={85} className="h-2" />
-                  <div className="text-sm text-muted-foreground mt-1">85% de satisfaction utilisateur</div>
+                  <div className="text-sm text-foreground/60 mt-1">85% de satisfaction utilisateur</div>
                 </div>
               </CardContent>
             </Card>
@@ -352,7 +352,7 @@ const ModernHomePage: React.FC = () => {
                 <CardTitle>Données sécurisées</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground">
+                <p className="text-foreground/70">
                   Vos données sont protégées par un chiffrement de niveau bancaire et une conformité RGPD totale.
                 </p>
                 <div className="flex items-center justify-center gap-2 mt-4">
@@ -373,14 +373,14 @@ const ModernHomePage: React.FC = () => {
                 <CardTitle>Expérience premium</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground">
+                <p className="text-foreground/70">
                   Interface moderne, responsive et accessible, conçue pour une expérience utilisateur exceptionnelle.
                 </p>
                 <div className="flex items-center justify-center gap-1 mt-4">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <Star key={star} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                   ))}
-                  <span className="text-sm text-muted-foreground ml-2">(4.9/5)</span>
+                  <span className="text-sm text-foreground/60 ml-2">(4.9/5)</span>
                 </div>
               </CardContent>
             </Card>
@@ -399,19 +399,19 @@ const ModernHomePage: React.FC = () => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             <div>
               <div className="text-3xl font-bold text-primary">{onlineCount > 0 ? onlineCount.toLocaleString() : '...'}</div>
-              <div className="text-sm text-muted-foreground">Utilisateurs actifs</div>
+              <div className="text-sm text-foreground/70">Utilisateurs actifs</div>
             </div>
             <div>
               <div className="text-3xl font-bold text-green-600">98.7%</div>
-              <div className="text-sm text-muted-foreground">Satisfaction</div>
+              <div className="text-sm text-foreground/70">Satisfaction</div>
             </div>
             <div>
               <div className="text-3xl font-bold text-purple-600">24/7</div>
-              <div className="text-sm text-muted-foreground">Support disponible</div>
+              <div className="text-sm text-foreground/70">Support disponible</div>
             </div>
             <div>
               <div className="text-3xl font-bold text-orange-600">150k+</div>
-              <div className="text-sm text-muted-foreground">Sessions complétées</div>
+              <div className="text-sm text-foreground/70">Sessions complétées</div>
             </div>
           </div>
         </div>
