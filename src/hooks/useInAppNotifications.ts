@@ -25,7 +25,10 @@ export const useInAppNotifications = () => {
     const fetchNotifications = async () => {
       try {
         const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
+        if (!user) {
+          setLoading(false);
+          return;
+        }
 
         const { data, error } = await supabase
           .from('in_app_notifications')
@@ -34,13 +37,18 @@ export const useInAppNotifications = () => {
           .order('created_at', { ascending: false })
           .limit(10);
 
-        if (error) throw error;
+        if (error) {
+          // Table might not exist - log warning and continue with empty state
+          logger.warn('Notifications table not available:', error.message, 'HOOK');
+          setLoading(false);
+          return;
+        }
         
         const notifs = data || [];
         setNotifications(notifs);
         setUnreadCount(notifs.filter(n => !n.read).length);
       } catch (error) {
-        logger.error('Error fetching notifications:', error, 'HOOK');
+        logger.warn('Error fetching notifications (table may not exist):', error, 'HOOK');
       } finally {
         setLoading(false);
       }
@@ -101,9 +109,11 @@ export const useInAppNotifications = () => {
         .update({ read: true })
         .eq('id', notificationId);
 
-      if (error) throw error;
+      if (error) {
+        logger.warn('Error marking notification as read (table may not exist):', error.message, 'HOOK');
+      }
     } catch (error) {
-      logger.error('Error marking notification as read:', error, 'HOOK');
+      logger.warn('Error marking notification as read:', error, 'HOOK');
     }
   };
 
@@ -118,12 +128,15 @@ export const useInAppNotifications = () => {
         .eq('user_id', user.id)
         .eq('read', false);
 
-      if (error) throw error;
+      if (error) {
+        logger.warn('Error marking all as read (table may not exist):', error.message, 'HOOK');
+        return;
+      }
 
       setNotifications(prev => prev.map(n => ({ ...n, read: true })));
       setUnreadCount(0);
     } catch (error) {
-      logger.error('Error marking all as read:', error, 'HOOK');
+      logger.warn('Error marking all as read:', error, 'HOOK');
     }
   };
 
@@ -134,9 +147,11 @@ export const useInAppNotifications = () => {
         .delete()
         .eq('id', notificationId);
 
-      if (error) throw error;
+      if (error) {
+        logger.warn('Error deleting notification (table may not exist):', error.message, 'HOOK');
+      }
     } catch (error) {
-      logger.error('Error deleting notification:', error, 'HOOK');
+      logger.warn('Error deleting notification:', error, 'HOOK');
     }
   };
 
