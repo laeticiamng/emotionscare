@@ -24,7 +24,9 @@ const PremiumShell: React.FC<PremiumShellProps> = ({
 }) => {
   const [isCommandOpen, setIsCommandOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const { isDarkMode, reduceMotion } = useTheme();
+  const { resolvedTheme } = useTheme();
+  const isDarkMode = resolvedTheme === 'dark';
+  const reduceMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   
   // Track command+K keyboard shortcut
   useEffect(() => {

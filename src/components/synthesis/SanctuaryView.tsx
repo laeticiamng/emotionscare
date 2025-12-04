@@ -27,7 +27,8 @@ const SanctuaryView: React.FC = () => {
   const [timerActive, setTimerActive] = useState(false);
   const [timerDuration, setTimerDuration] = useState(300); // 5 minutes in seconds
   const [timerRemaining, setTimerRemaining] = useState(300);
-  const { isDarkMode } = useTheme();
+  const { resolvedTheme } = useTheme();
+  const isDarkMode = resolvedTheme === 'dark';
 
   // Simulate loading widgets from API
   useEffect(() => {
