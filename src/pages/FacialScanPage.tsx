@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Sentry } from '@/lib/errors/sentry-compat';
 import { PageErrorBoundary } from '@/components/error/PageErrorBoundary';
 import PageRoot from '@/components/common/PageRoot';
@@ -7,7 +7,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import CameraSampler from '@/features/scan/CameraSampler';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Camera } from 'lucide-react';
-import { withGuard } from '@/routerV2/withGuard';
 import { ScanHistory } from '@/components/scan/ScanHistory';
 import { MultiSourceChart } from '@/components/scan/MultiSourceChart';
 
@@ -154,4 +153,4 @@ const FacialScanPage: React.FC = () => {
   );
 };
 
-export default withGuard(FacialScanPage, [{ type: 'auth', required: true }]);
+export default FacialScanPage;

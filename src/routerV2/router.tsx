@@ -239,7 +239,7 @@ const RedirectToMusic = lazy(() => import('@/components/redirects/RedirectToMusi
 
 // Pages Dashboard modules
 const ModulesDashboard = lazy(() => import('@/pages/ModulesDashboard'));
-// FacialScanPage supprimé - fusionné dans B2CScanPage
+const FacialScanPage = lazy(() => import('@/pages/FacialScanPage'));
 const VoiceScanPage = lazy(() => import('@/pages/VoiceScanPage'));
 const TextScanPage = lazy(() => import('@/pages/TextScanPage'));
 // MusicGeneratePage supprimé - fonctionnalité dans B2CMusicEnhanced
@@ -482,8 +482,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   
   // Pages Dashboard modules
   ModulesDashboard,
-  // UnifiedModulesDashboard supprimé - wrapper inutile
-  // FacialScanPage supprimé
+  FacialScanPage,
   VoiceScanPage,
   TextScanPage,
   // MusicGeneratePage supprimé
@@ -636,8 +635,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   // System health alias
   K6AnalyticsDashboardPage: K6AnalyticsDashboard,
 
-  // Scan pages - FacialScanPage doesn't exist, use B2CScanPage
-  FacialScanPage: B2CScanPage,
+  // Scan pages aliases
   EmojiScanPage: B2CScanPage,
 
   // Journal sub-pages - map to main journal
