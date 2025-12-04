@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import * as THREE from 'three';
 import { useTheme } from '@/providers/theme';
 
@@ -18,7 +18,17 @@ const ParticlesBackground: React.FC<ParticlesBackgroundProps> = ({
   className = ''
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const { theme, reduceMotion } = useTheme();
+  const { resolvedTheme } = useTheme();
+  const [reduceMotion, setReduceMotion] = useState(() => 
+    typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  );
+  
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const handleChange = (e: MediaQueryListEvent) => setReduceMotion(e.matches);
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, []);
   
   useEffect(() => {
     if (!containerRef.current) return;
@@ -48,17 +58,9 @@ const ParticlesBackground: React.FC<ParticlesBackgroundProps> = ({
     containerRef.current.appendChild(renderer.domElement);
     
     // Couleurs adaptées au thème
-    let particleColor;
-    switch (theme) {
-      case 'dark':
-        particleColor = new THREE.Color(0x3b82f6); // Bleu vif sur fond sombre
-        break;
-      case 'pastel':
-        particleColor = new THREE.Color(0x60a5fa); // Bleu pastel
-        break;
-      default:
-        particleColor = new THREE.Color(0x2563eb); // Bleu standard
-    }
+    const particleColor = resolvedTheme === 'dark' 
+      ? new THREE.Color(0x3b82f6) // Bleu vif sur fond sombre
+      : new THREE.Color(0x2563eb); // Bleu standard
     
     // Création des particules
     const particlesGeometry = new THREE.BufferGeometry();
@@ -147,7 +149,7 @@ const ParticlesBackground: React.FC<ParticlesBackgroundProps> = ({
       particlesMaterial.dispose();
       renderer.dispose();
     };
-  }, [count, size, speed, theme, reduceMotion]);
+  }, [count, size, speed, resolvedTheme, reduceMotion]);
   
   return (
     <div 
