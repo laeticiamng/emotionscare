@@ -448,7 +448,7 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
                     EmotionsCare
                   </span>
                   <br />
-                  <span className="text-3xl lg:text-5xl text-foreground/90 font-medium">
+                  <span className="text-3xl lg:text-5xl text-foreground font-medium">
                     L'IA qui comprend vos émotions
                   </span>
                 </h1>
