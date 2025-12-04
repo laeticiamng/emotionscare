@@ -64,7 +64,7 @@ const AppGatePage = lazy(() => import('@/pages/AppGatePage'));
 
 // Modules fonctionnels
 const B2CScanPage = lazy(() => import('@/pages/B2CScanPage'));
-// const B2CMusicEnhanced = lazy(() => import('@/pages/B2CMusicEnhanced')); // Removed - file deleted
+const B2CMusicEnhanced = lazy(() => import('@/pages/B2CMusicEnhanced'));
 const MusicAnalyticsPage = lazy(() => import('@/pages/MusicAnalyticsPage'));
 const MusicProfilePage = lazy(() => import('@/pages/MusicProfilePage'));
 const AdvancedAnalyticsPage = lazy(() => import('@/pages/AdvancedAnalyticsPage'));
@@ -337,7 +337,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   
   // Modules
   B2CScanPage,
-  // B2CMusicEnhanced, // Removed
+  B2CMusicEnhanced,
   MusicAnalyticsPage,
   MusicProfilePage,
   AdvancedAnalyticsPage,
@@ -620,8 +620,8 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   // Settings alias - map to profile settings since B2CSettingsPage was removed
   B2CSettingsPage: B2CProfileSettingsPage,
 
-  // Music alias - B2CMusicEnhanced was removed, redirect to MusicAnalyticsPage
-  B2CMusicEnhancedPage: MusicAnalyticsPage,
+  // Music alias - main music page
+  B2CMusicEnhancedPage: B2CMusicEnhanced,
 
   // Redirect page aliases
   RedirectToEntreprisePage: RedirectToEntreprise,
