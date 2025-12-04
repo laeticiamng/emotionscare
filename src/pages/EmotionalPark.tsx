@@ -453,10 +453,7 @@ export default function EmotionalPark() {
                       initial={{ opacity: 0, scale: 0.95 }}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ delay: index * 0.05 }}
-                      className="relative overflow-hidden rounded-lg bg-gradient-to-br p-4 border border-border/50 hover:border-primary/50 transition-all"
-                      style={{
-                        backgroundImage: `linear-gradient(to bottom right, var(--${stat.gradient.split(' ')[1].split('-')[0]}), var(--${stat.gradient.split(' ')[3].split('-')[0]}))`
-                      }}
+                      className={`relative overflow-hidden rounded-lg bg-gradient-to-br ${stat.gradient} p-4 border border-border/50 hover:border-primary/50 transition-all`}
                     >
                       <div className="flex items-start justify-between mb-2">
                         <stat.icon className="h-4 w-4 text-primary opacity-50" />
