@@ -1,9 +1,9 @@
 // @ts-nocheck
 import React from 'react';
 import { motion } from 'framer-motion';
-import { 
-  TrendingUp, TrendingDown, Activity, Heart, 
-  Brain, Zap, Target, Award, Clock, Star 
+import {
+  TrendingUp, TrendingDown, Activity, Heart,
+  Brain, Zap, Target, Award, Clock, Star, Sparkles
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -191,7 +191,7 @@ const QuickStatsGrid: React.FC<QuickStatsGridProps> = ({ userRole = 'consumer' }
             <CardContent className="p-6">
               {/* Header avec icône et titre */}
               <div className="flex items-center justify-between mb-4">
-                <div className={`p-3 rounded-xl ${stat.color} bg-opacity-20 text-white`}>
+                <div className={`p-3 rounded-xl ${stat.color} bg-opacity-20`}>
                   <div className={stat.color}>
                     {stat.icon}
                   </div>

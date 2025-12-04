@@ -262,7 +262,7 @@ const LivingDashboard: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
         >
           <div className={`inline-block p-6 rounded-full bg-gradient-to-br ${aura.color} opacity-${Math.floor(aura.glow/10)*10}`}>
-            <div className="w-16 h-16 rounded-full bg-white/30 flex items-center justify-center">
+            <div className="w-16 h-16 rounded-full bg-background/30 dark:bg-white/20 flex items-center justify-center">
               <span className="text-2xl">✨</span>
             </div>
           </div>
@@ -298,7 +298,7 @@ const LivingDashboard: React.FC = () => {
                 >
                   <CardContent className="p-6">
                     <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${action.color} mb-4 flex items-center justify-center`}>
-                      <action.icon className="w-6 h-6 text-white" />
+                      <action.icon className="w-6 h-6 text-primary-foreground" />
                     </div>
                     <h3 className="font-medium text-foreground mb-1">{action.title}</h3>
                     <p className="text-muted-foreground text-sm mb-3">{action.subtitle}</p>
@@ -313,7 +313,7 @@ const LivingDashboard: React.FC = () => {
         </div>
 
         {/* Pépites du jour */}
-        <Card className="bg-white/50 border-0 shadow-sm">
+        <Card className="bg-card/50 dark:bg-card/30 border-0 shadow-sm">
           <CardContent className="p-6">
             <div className="flex items-center gap-2 mb-4">
               <Sparkles className="w-5 h-5 text-warning" />
@@ -366,7 +366,7 @@ const LivingDashboard: React.FC = () => {
             }}
             onMouseEnter={() => playMicroSound('hover')}
           >
-            <Star className="w-8 h-8 text-white" />
+            <Star className="w-8 h-8 text-primary-foreground" />
           </Button>
         </motion.div>
 
@@ -378,7 +378,7 @@ const LivingDashboard: React.FC = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-            <div className="bg-white/90 backdrop-blur-sm p-4 rounded-full shadow-lg">
+            <div className="bg-background/90 dark:bg-card/90 backdrop-blur-sm p-4 rounded-full shadow-lg">
               <motion.div
                 animate={{ rotate: 360 }}
                 transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
