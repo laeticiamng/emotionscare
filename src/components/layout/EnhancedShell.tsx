@@ -26,15 +26,22 @@ const EnhancedShell: React.FC<EnhancedShellProps> = ({
   immersive = false,
   className = '',
 }) => {
-  const { theme } = useTheme();
+  const { resolvedTheme } = useTheme();
   const [scrolled, setScrolled] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
   const location = useLocation();
   const [commandMenuOpen, setCommandMenuOpen] = useState(false);
-  
-  // Compute derived theme properties
-  const isDarkMode = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const [reduceMotion, setReduceMotion] = useState(false);
+
+  // Compute derived theme properties (SSR-safe)
+  const isDarkMode = resolvedTheme === 'dark';
+
+  // SSR-safe reduced motion detection
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setReduceMotion(window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    }
+  }, []);
   
   // Handling scroll effects
   useEffect(() => {

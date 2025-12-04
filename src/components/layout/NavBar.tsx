@@ -1,16 +1,16 @@
 // @ts-nocheck
 
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { routes } from '@/routerV2';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Home, 
-  Brain, 
-  Music, 
-  BookOpen, 
-  MessageCircle, 
+import {
+  Home,
+  Brain,
+  Music,
+  BookOpen,
+  MessageCircle,
   User,
   Menu,
   X,
@@ -22,6 +22,7 @@ import {
 
 const NavBar: React.FC = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navItems = [
@@ -108,16 +109,16 @@ const NavBar: React.FC = () => {
             </div>
 
             <Button
-              onClick={() => window.location.href = '/auth'}
+              onClick={() => navigate('/auth')}
               variant="outline"
               className="border-white/30 text-white hover:bg-white/10 backdrop-blur-sm"
             >
               <User className="h-4 w-4 mr-2" />
               Connexion
             </Button>
-            
+
             <Button
-              onClick={() => window.location.href = '/choose-mode'}
+              onClick={() => navigate('/choose-mode')}
               className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-xl hover:shadow-blue-500/25"
             >
               Commencer
@@ -169,7 +170,7 @@ const NavBar: React.FC = () => {
               <div className="border-t border-white/10 pt-4 space-y-3">
                 <Button
                   onClick={() => {
-                    window.location.href = '/auth';
+                    navigate('/auth');
                     setMobileMenuOpen(false);
                   }}
                   variant="outline"
@@ -178,10 +179,10 @@ const NavBar: React.FC = () => {
                   <User className="h-4 w-4 mr-2" />
                   Connexion
                 </Button>
-                
+
                 <Button
                   onClick={() => {
-                    window.location.href = '/choose-mode';
+                    navigate('/choose-mode');
                     setMobileMenuOpen(false);
                   }}
                   className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
