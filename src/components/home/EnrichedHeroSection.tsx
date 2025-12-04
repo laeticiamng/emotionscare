@@ -134,11 +134,11 @@ const EnrichedHeroSection: React.FC = () => {
           {/* Main Heading */}
           <motion.div variants={itemVariants} className="space-y-4">
             <h1 id="hero-heading" className="text-5xl lg:text-7xl font-bold leading-tight">
-              <span className="bg-gradient-to-r from-primary via-primary/80 to-blue-500 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-primary via-blue-600 to-primary bg-clip-text text-transparent drop-shadow-sm">
                 Transformez votre bien-être
               </span>
               <br />
-              <span className="text-3xl lg:text-5xl text-foreground font-medium">
+              <span className="text-3xl lg:text-5xl text-foreground/90 font-semibold">
                 Avec intelligence émotionnelle
               </span>
             </h1>
@@ -147,10 +147,10 @@ const EnrichedHeroSection: React.FC = () => {
           {/* Subheading */}
           <motion.p
             variants={itemVariants}
-            className="text-xl lg:text-2xl text-muted-foreground max-w-4xl mx-auto leading-relaxed"
+            className="text-xl lg:text-2xl text-foreground/70 max-w-4xl mx-auto leading-relaxed"
           >
             Découvrez la première plateforme d'IA qui comprend vos émotions.
-            <strong className="text-foreground"> Musicothérapie, scan émotionnel, coaching personnalisé</strong> et expériences immersives.
+            <strong className="text-foreground font-semibold"> Musicothérapie, scan émotionnel, coaching personnalisé</strong> et expériences immersives.
           </motion.p>
 
           {/* CTA Buttons */}
