@@ -14033,6 +14033,39 @@ export type Database = {
         }
         Relationships: []
       }
+      scan_history: {
+        Row: {
+          created_at: string
+          dominant_emotion: string | null
+          emotions: Json | null
+          id: string
+          intensity: number | null
+          metadata: Json | null
+          scan_data: Json
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          dominant_emotion?: string | null
+          emotions?: Json | null
+          id?: string
+          intensity?: number | null
+          metadata?: Json | null
+          scan_data: Json
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          dominant_emotion?: string | null
+          emotions?: Json | null
+          id?: string
+          intensity?: number | null
+          metadata?: Json | null
+          scan_data?: Json
+          user_id?: string
+        }
+        Relationships: []
+      }
       scheduled_reports: {
         Row: {
           created_at: string | null
@@ -17196,6 +17229,7 @@ export type Database = {
       user_goals: {
         Row: {
           category: string
+          completed: boolean | null
           created_at: string | null
           current_progress: number | null
           description: string | null
@@ -17212,6 +17246,7 @@ export type Database = {
         }
         Insert: {
           category: string
+          completed?: boolean | null
           created_at?: string | null
           current_progress?: number | null
           description?: string | null
@@ -17228,6 +17263,7 @@ export type Database = {
         }
         Update: {
           category?: string
+          completed?: boolean | null
           created_at?: string | null
           current_progress?: number | null
           description?: string | null
@@ -17806,6 +17842,7 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          language: string | null
           nyvee_tutorial_seen: boolean | null
           preferences: Json
           updated_at: string
@@ -17814,6 +17851,7 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
+          language?: string | null
           nyvee_tutorial_seen?: boolean | null
           preferences?: Json
           updated_at?: string
@@ -17822,6 +17860,7 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
+          language?: string | null
           nyvee_tutorial_seen?: boolean | null
           preferences?: Json
           updated_at?: string

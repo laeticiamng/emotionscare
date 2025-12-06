@@ -489,6 +489,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   // MusicGeneratePage supprimé
   // MusicLibraryPage supprimé
   PricingPageWorking,
+  PricingPageWorkingPage: PricingPageWorking, // Alias pour registry
   ModeSelectionPage,
   B2CDashboardPage,
   // B2CMoodPage supprimé - fonctionnalité intégrée dans B2CScanPage
