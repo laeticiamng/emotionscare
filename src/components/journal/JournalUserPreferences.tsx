@@ -186,6 +186,7 @@ export function JournalUserPreferences({ onPreferencesChange }: JournalUserPrefe
                 step={5}
                 value={[preferences.notesPerPage]}
                 onValueChange={([v]) => updatePreference('notesPerPage', v)}
+                aria-label="Nombre de notes par page"
               />
             </div>
 
@@ -255,6 +256,7 @@ export function JournalUserPreferences({ onPreferencesChange }: JournalUserPrefe
                   step={10}
                   value={[preferences.autoSaveDelay]}
                   onValueChange={([v]) => updatePreference('autoSaveDelay', v)}
+                  aria-label="Délai de sauvegarde automatique"
                 />
               </div>
             )}

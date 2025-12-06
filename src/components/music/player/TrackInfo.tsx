@@ -31,8 +31,8 @@ const TrackInfo: React.FC<TrackInfoProps> = ({
           className="w-12 h-12 rounded-md object-cover"
         />
       ) : (
-        <div className="w-12 h-12 bg-primary/10 rounded-md flex items-center justify-center">
-          <Music className="h-6 w-6 text-primary" />
+        <div className="w-12 h-12 bg-primary/10 rounded-md flex items-center justify-center" aria-hidden="true">
+          <Music className="h-6 w-6 text-primary" aria-hidden="true" />
         </div>
       )}
       

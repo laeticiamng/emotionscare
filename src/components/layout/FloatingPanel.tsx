@@ -88,11 +88,12 @@ const FloatingPanel: React.FC<FloatingPanelProps> = ({
                         size="icon"
                         className="h-6 w-6"
                         onClick={() => setIsMinimized(!isMinimized)}
+                        aria-label={isMinimized ? "Agrandir le panneau" : "Réduire le panneau"}
                       >
                         {isMinimized ? (
-                          <Maximize2 className="h-3 w-3" />
+                          <Maximize2 className="h-3 w-3" aria-hidden="true" />
                         ) : (
-                          <Minimize2 className="h-3 w-3" />
+                          <Minimize2 className="h-3 w-3" aria-hidden="true" />
                         )}
                       </Button>
                     )}
@@ -102,8 +103,9 @@ const FloatingPanel: React.FC<FloatingPanelProps> = ({
                         size="icon"
                         className="h-6 w-6"
                         onClick={onClose}
+                        aria-label="Fermer le panneau"
                       >
-                        <X className="h-3 w-3" />
+                        <X className="h-3 w-3" aria-hidden="true" />
                       </Button>
                     )}
                   </div>

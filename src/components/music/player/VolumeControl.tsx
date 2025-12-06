@@ -47,6 +47,10 @@ const VolumeControl: React.FC<VolumeControlProps> = ({
           step={0.1}
           onValueChange={handleVolumeChange}
           className="w-full"
+          aria-label="Contrôle du volume"
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={Math.round((isMuted ? 0 : volume) * 100)}
         />
       </div>
     </div>

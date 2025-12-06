@@ -284,6 +284,7 @@ const AdvancedMusicGenerator: React.FC = () => {
                       max={300}
                       step={30}
                       className="w-full"
+                      aria-label="Réglage de la durée"
                     />
                   </div>
 
@@ -296,6 +297,7 @@ const AdvancedMusicGenerator: React.FC = () => {
                       max={1}
                       step={0.1}
                       className="w-full"
+                      aria-label="Réglage de l'intensité"
                     />
                   </div>
 
@@ -376,6 +378,7 @@ const AdvancedMusicGenerator: React.FC = () => {
                       min={0}
                       max={1}
                       step={0.1}
+                      aria-label="Réglage de la valence (positivité)"
                     />
                   </div>
 
@@ -387,6 +390,7 @@ const AdvancedMusicGenerator: React.FC = () => {
                       min={0}
                       max={1}
                       step={0.1}
+                      aria-label="Réglage de l'éveil (arousal)"
                     />
                   </div>
 
@@ -398,6 +402,7 @@ const AdvancedMusicGenerator: React.FC = () => {
                       min={0}
                       max={1}
                       step={0.1}
+                      aria-label="Réglage de la dominance (contrôle)"
                     />
                   </div>
                 </div>
@@ -411,6 +416,7 @@ const AdvancedMusicGenerator: React.FC = () => {
                       min={0}
                       max={1}
                       step={0.1}
+                      aria-label="Réglage du niveau de stress"
                     />
                   </div>
 
@@ -422,6 +428,7 @@ const AdvancedMusicGenerator: React.FC = () => {
                       min={0}
                       max={1}
                       step={0.1}
+                      aria-label="Réglage du niveau d'énergie"
                     />
                   </div>
 
@@ -480,6 +487,7 @@ const AdvancedMusicGenerator: React.FC = () => {
                     min={40}
                     max={180}
                     step={10}
+                    aria-label="Réglage du BPM (tempo)"
                   />
                 </div>
               </div>
