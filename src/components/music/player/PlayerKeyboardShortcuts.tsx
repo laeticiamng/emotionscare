@@ -1,5 +1,6 @@
+
 import React, { useEffect } from 'react';
-import { useMusicCompat } from '@/hooks/useMusicCompat';
+import { useMusic } from '@/hooks/useMusic';
 import { toast } from '@/hooks/use-toast';
 
 interface PlayerKeyboardShortcutsProps {
@@ -11,9 +12,15 @@ const PlayerKeyboardShortcuts: React.FC<PlayerKeyboardShortcutsProps> = ({
   enabled = true,
   showTooltips = false
 }) => {
-  const music = useMusicCompat();
-  const { isPlaying, volume } = music.state;
-  const { play, pause, next, previous, setVolume } = music;
+  const {
+    isPlaying,
+    volume,
+    play,
+    pause,
+    next,
+    previous,
+    setVolume
+  } = useMusic();
 
   useEffect(() => {
     if (!enabled) return;

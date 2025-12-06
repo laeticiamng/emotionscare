@@ -1,10 +1,7 @@
-// @ts-nocheck
-
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { Volume2, VolumeX, Play, Pause } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
-import { logger } from '@/lib/logger';
 
 interface AudioDirectorProps {
   src?: string;
@@ -51,7 +48,7 @@ const AudioDirector: React.FC<AudioDirectorProps> = ({
       nextAudioRef.current.src = nextSrc;
       nextAudioRef.current.load();
     } catch (err) {
-      logger.warn('Failed to preload next audio segment', err as Error, 'MUSIC');
+      console.warn('Failed to preload next audio segment:', err);
     }
   }, [memoryUsage]);
 
@@ -99,7 +96,7 @@ const AudioDirector: React.FC<AudioDirectorProps> = ({
       setError(null);
       
     } catch (err) {
-      logger.error('Crossfade failed', err as Error, 'MUSIC');
+      console.error('Crossfade failed:', err);
       setError('Transition audio échouée');
     } finally {
       setIsLoading(false);
@@ -117,14 +114,14 @@ const AudioDirector: React.FC<AudioDirectorProps> = ({
       
       if (autoPlay && !isPlaying) {
         audioRef.current?.play().catch(err => {
-          logger.warn('Auto-play blocked', err as Error, 'MUSIC');
+          console.warn('Auto-play blocked:', err);
           setError('Lecture automatique bloquée');
         });
       }
     };
 
     const handleError = (e: Event) => {
-      logger.error('Audio load error', e as Error, 'MUSIC');
+      console.error('Audio load error:', e);
       setError('Impossible de charger l\'audio');
       setIsLoading(false);
     };
@@ -212,7 +209,7 @@ const AudioDirector: React.FC<AudioDirectorProps> = ({
         await audioRef.current.play();
       }
     } catch (err) {
-      logger.error('Play/pause failed', err as Error, 'MUSIC');
+      console.error('Play/pause failed:', err);
       setError('Contrôle audio impossible');
     }
   }, [isPlaying]);

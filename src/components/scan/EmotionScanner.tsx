@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import React, { useState, useRef, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -56,9 +55,7 @@ const EmotionScanner: React.FC<EmotionScannerProps> = ({
     activateMusicForEmotion({
       emotion: result.emotion,
       intensity: result.confidence
-    }).catch(() => {
-      // Music activation failed - silent
-    });
+    }).catch(console.error);
     
     toast({
       title: "Analyse terminée",
@@ -94,7 +91,7 @@ const EmotionScanner: React.FC<EmotionScannerProps> = ({
         streamRef.current = stream;
       }
     } catch (err) {
-      // Camera access error
+      console.error('Error accessing camera:', err);
       toast({
         title: "Erreur caméra",
         description: "Impossible d'accéder à la caméra",
@@ -175,7 +172,7 @@ const EmotionScanner: React.FC<EmotionScannerProps> = ({
         description: "Parlez maintenant...",
       });
     } catch (err) {
-      // Microphone access error
+      console.error('Error accessing microphone:', err);
       toast({
         title: "Erreur microphone",
         description: "Impossible d'accéder au microphone",

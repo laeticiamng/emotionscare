@@ -1,46 +1,35 @@
-// @ts-nocheck
-/**
- * useLocalStorage - Hook avec chiffrement automatique
- * Utilise secureStorage en interne pour protection RGPD Art. 32
- * Compatible drop-in avec l'ancienne API localStorage
- */
 
 import { useState, useEffect } from 'react';
-import { getSecureItem, setSecureItem } from '@/lib/secureStorage';
-import { logger } from '@/lib/logger';
 
 export function useLocalStorage<T>(key: string, initialValue: T) {
-  const [storedValue, setStoredValue] = useState<T>(initialValue);
-  const [isLoading, setIsLoading] = useState(true);
-
-  // Chargement initial depuis secure storage
-  useEffect(() => {
-    const loadValue = async () => {
-      try {
-        const item = await getSecureItem<T>(key);
-        if (item !== null) {
-          setStoredValue(item);
-        }
-      } catch (error) {
-        logger.warn(`[useLocalStorage] Failed to load ${key}`, error as Error, 'SYSTEM');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadValue();
-  }, [key]);
-
-  // Setter avec chiffrement automatique
-  const setValue = async (value: T | ((val: T) => T)) => {
+  // State pour stocker notre valeur
+  const [storedValue, setStoredValue] = useState<T>(() => {
     try {
-      const valueToStore = value instanceof Function ? value(storedValue) : value;
-      setStoredValue(valueToStore);
-      await setSecureItem(key, valueToStore);
+      // Récupérer depuis localStorage
+      const item = window.localStorage.getItem(key);
+      // Parser le JSON stocké ou retourner la valeur initiale
+      return item ? JSON.parse(item) : initialValue;
     } catch (error) {
-      logger.error(`[useLocalStorage] Failed to save ${key}`, error as Error, 'SYSTEM');
+      // Si erreur, retourner la valeur initiale
+      console.log(error);
+      return initialValue;
+    }
+  });
+
+  // Retourner une version wrappée de useState qui persiste la nouvelle valeur dans localStorage
+  const setValue = (value: T | ((val: T) => T)) => {
+    try {
+      // Permettre à value d'être une fonction pour avoir la même API que useState
+      const valueToStore = value instanceof Function ? value(storedValue) : value;
+      // Sauvegarder l'état
+      setStoredValue(valueToStore);
+      // Sauvegarder dans localStorage
+      window.localStorage.setItem(key, JSON.stringify(valueToStore));
+    } catch (error) {
+      // Une implémentation plus robuste pourrait gérer l'erreur de manière plus nuancée
+      console.log(error);
     }
   };
 
-  return [storedValue, setValue, isLoading] as const;
+  return [storedValue, setValue] as const;
 }

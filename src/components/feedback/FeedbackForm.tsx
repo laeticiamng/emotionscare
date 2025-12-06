@@ -1,19 +1,15 @@
+
 import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Badge } from '@/components/ui/badge';
 import { Camera, Mic, Star, Send, Bug, Lightbulb, Heart, Plus } from 'lucide-react';
 import { FeedbackEntry } from '@/types/feedback';
 import { toast } from '@/hooks/use-toast';
-import { feedbackSchema, type FeedbackInput } from '@/lib/validation/schemas';
-import { sanitizeInput } from '@/lib/validation/validator';
 
 interface FeedbackFormProps {
   onSubmit: (feedback: Partial<FeedbackEntry>) => void;
@@ -21,21 +17,18 @@ interface FeedbackFormProps {
 }
 
 const FeedbackForm: React.FC<FeedbackFormProps> = ({ onSubmit, module }) => {
+  const [feedback, setFeedback] = useState<Partial<FeedbackEntry>>({
+    module,
+    type: 'suggestion',
+    rating: 5,
+    title: '',
+    description: '',
+    priority: 'medium',
+    tags: []
+  });
+
   const [isRecording, setIsRecording] = useState(false);
   const [newTag, setNewTag] = useState('');
-  
-  const form = useForm<FeedbackInput>({
-    resolver: zodResolver(feedbackSchema),
-    defaultValues: {
-      module,
-      type: 'suggestion',
-      rating: 5,
-      title: '',
-      description: '',
-      priority: 'medium',
-      tags: []
-    }
-  });
 
   const feedbackTypes = [
     { value: 'bug', label: 'Bug Report', icon: Bug, color: 'text-red-500' },
@@ -51,17 +44,19 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ onSubmit, module }) => {
     { value: 'critical', label: 'Critique', color: 'bg-red-100 text-red-800' }
   ];
 
-  const handleSubmit = (values: FeedbackInput) => {
-    // Sanitize text inputs
-    const sanitizedData = {
-      ...values,
-      title: sanitizeInput(values.title),
-      description: sanitizeInput(values.description),
-      tags: values.tags?.map(tag => sanitizeInput(tag))
-    };
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!feedback.title || !feedback.description) {
+      toast({
+        title: "Erreur",
+        description: "Veuillez remplir tous les champs obligatoires",
+        variant: "destructive"
+      });
+      return;
+    }
 
     onSubmit({
-      ...sanitizedData,
+      ...feedback,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
       status: 'pending'
@@ -72,20 +67,33 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ onSubmit, module }) => {
       description: "Merci pour votre retour ! Notre équipe va l'examiner.",
     });
 
-    form.reset();
+    // Reset form
+    setFeedback({
+      module,
+      type: 'suggestion',
+      rating: 5,
+      title: '',
+      description: '',
+      priority: 'medium',
+      tags: []
+    });
   };
 
   const addTag = () => {
-    const currentTags = form.getValues('tags') || [];
-    if (newTag && !currentTags.includes(newTag)) {
-      form.setValue('tags', [...currentTags, sanitizeInput(newTag)]);
+    if (newTag && !feedback.tags?.includes(newTag)) {
+      setFeedback(prev => ({
+        ...prev,
+        tags: [...(prev.tags || []), newTag]
+      }));
       setNewTag('');
     }
   };
 
   const removeTag = (tagToRemove: string) => {
-    const currentTags = form.getValues('tags') || [];
-    form.setValue('tags', currentTags.filter(tag => tag !== tagToRemove));
+    setFeedback(prev => ({
+      ...prev,
+      tags: prev.tags?.filter(tag => tag !== tagToRemove) || []
+    }));
   };
 
   const toggleRecording = () => {
@@ -111,229 +119,151 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ onSubmit, module }) => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6" noValidate>
-              {/* Type de feedback */}
-              <FormField
-                control={form.control}
-                name="type"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Type de feedback</FormLabel>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2" role="group" aria-label="Type de feedback">
-                      {feedbackTypes.map((type) => (
-                        <motion.button
-                          key={type.value}
-                          type="button"
-                          onClick={() => field.onChange(type.value)}
-                          className={`p-3 rounded-lg border-2 transition-all ${
-                            field.value === type.value
-                              ? 'border-primary bg-primary/10'
-                              : 'border-border hover:border-primary/50'
-                          }`}
-                          whileHover={{ scale: 1.02 }}
-                          whileTap={{ scale: 0.98 }}
-                          aria-pressed={field.value === type.value}
-                          aria-label={`${type.label}`}
-                        >
-                          <type.icon className={`h-5 w-5 mx-auto mb-1 ${type.color}`} aria-hidden="true" />
-                          <div className="text-xs font-medium">{type.label}</div>
-                        </motion.button>
-                      ))}
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Note */}
-              <FormField
-                control={form.control}
-                name="rating"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Note globale</FormLabel>
-                    <div className="flex gap-1" role="group" aria-label="Note sur 5 étoiles">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <motion.button
-                          key={star}
-                          type="button"
-                          onClick={() => field.onChange(star)}
-                          whileHover={{ scale: 1.1 }}
-                          whileTap={{ scale: 0.9 }}
-                          aria-label={`${star} étoile${star > 1 ? 's' : ''}`}
-                          aria-pressed={field.value === star}
-                        >
-                          <Star
-                            className={`h-6 w-6 ${
-                              star <= (field.value || 0)
-                                ? 'text-yellow-400 fill-current'
-                                : 'text-gray-300'
-                            }`}
-                            aria-hidden="true"
-                          />
-                        </motion.button>
-                      ))}
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Titre */}
-              <FormField
-                control={form.control}
-                name="title"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel htmlFor="feedback-title">
-                      Titre <span className="text-destructive" aria-label="requis">*</span>
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        id="feedback-title"
-                        placeholder="Résumé de votre feedback"
-                        aria-required="true"
-                        aria-invalid={!!form.formState.errors.title}
-                        aria-describedby={form.formState.errors.title ? "feedback-title-error" : undefined}
-                      />
-                    </FormControl>
-                    <FormMessage id="feedback-title-error" />
-                  </FormItem>
-                )}
-              />
-
-              {/* Description */}
-              <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel htmlFor="feedback-description">
-                      Description <span className="text-destructive" aria-label="requis">*</span>
-                    </FormLabel>
-                    <FormControl>
-                      <Textarea
-                        {...field}
-                        id="feedback-description"
-                        placeholder="Décrivez votre expérience en détail..."
-                        rows={4}
-                        aria-required="true"
-                        aria-invalid={!!form.formState.errors.description}
-                        aria-describedby={form.formState.errors.description ? "feedback-description-error" : undefined}
-                      />
-                    </FormControl>
-                    <FormMessage id="feedback-description-error" />
-                  </FormItem>
-                )}
-              />
-
-              {/* Priorité */}
-              <FormField
-                control={form.control}
-                name="priority"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel htmlFor="feedback-priority">Priorité</FormLabel>
-                    <Select
-                      value={field.value}
-                      onValueChange={field.onChange}
-                    >
-                      <FormControl>
-                        <SelectTrigger id="feedback-priority" aria-label="Sélectionner la priorité">
-                          <SelectValue />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {priorities.map((priority) => (
-                          <SelectItem key={priority.value} value={priority.value}>
-                            <Badge className={priority.color}>
-                              {priority.label}
-                            </Badge>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Tags */}
-              <div>
-                <label className="text-sm font-medium mb-2 block">Tags</label>
-                <div className="flex gap-2 mb-2">
-                  <Input
-                    value={newTag}
-                    onChange={(e) => setNewTag(e.target.value)}
-                    placeholder="Ajouter un tag"
-                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
-                    aria-label="Nouveau tag"
-                  />
-                  <Button 
-                    type="button" 
-                    onClick={addTag} 
-                    size="sm"
-                    aria-label="Ajouter le tag"
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Type de feedback */}
+            <div>
+              <label className="text-sm font-medium mb-2 block">Type de feedback</label>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                {feedbackTypes.map((type) => (
+                  <motion.button
+                    key={type.value}
+                    type="button"
+                    onClick={() => setFeedback(prev => ({ ...prev, type: type.value as any }))}
+                    className={`p-3 rounded-lg border-2 transition-all ${
+                      feedback.type === type.value
+                        ? 'border-primary bg-primary/10'
+                        : 'border-border hover:border-primary/50'
+                    }`}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                   >
-                    <Plus className="h-4 w-4" aria-hidden="true" />
-                  </Button>
-                </div>
-                <div className="flex flex-wrap gap-2" role="list" aria-label="Tags sélectionnés">
-                  {form.watch('tags')?.map((tag) => (
-                    <Badge
-                      key={tag}
-                      variant="secondary"
-                      className="cursor-pointer"
-                      onClick={() => removeTag(tag)}
-                      role="listitem"
-                      tabIndex={0}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault();
-                          removeTag(tag);
-                        }
-                      }}
-                      aria-label={`Supprimer le tag ${tag}`}
-                    >
-                      {tag} ×
-                    </Badge>
-                  ))}
-                </div>
+                    <type.icon className={`h-5 w-5 mx-auto mb-1 ${type.color}`} />
+                    <div className="text-xs font-medium">{type.label}</div>
+                  </motion.button>
+                ))}
               </div>
+            </div>
 
-              {/* Actions multimédias */}
-              <div className="flex gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={toggleRecording}
-                  className={isRecording ? 'bg-red-50 border-red-200' : ''}
-                  aria-label={isRecording ? "Arrêter l'enregistrement" : "Démarrer l'enregistrement"}
-                  aria-pressed={isRecording}
-                >
-                  <Mic className={`h-4 w-4 mr-2 ${isRecording ? 'text-red-500' : ''}`} aria-hidden="true" />
-                  {isRecording ? 'Arrêter' : 'Enregistrer'}
-                </Button>
-                <Button type="button" variant="outline" aria-label="Prendre une capture d'écran">
-                  <Camera className="h-4 w-4 mr-2" aria-hidden="true" />
-                  Capture d'écran
-                </Button>
+            {/* Note */}
+            <div>
+              <label className="text-sm font-medium mb-2 block">Note globale</label>
+              <div className="flex gap-1">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <motion.button
+                    key={star}
+                    type="button"
+                    onClick={() => setFeedback(prev => ({ ...prev, rating: star }))}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                  >
+                    <Star
+                      className={`h-6 w-6 ${
+                        star <= (feedback.rating || 0)
+                          ? 'text-yellow-400 fill-current'
+                          : 'text-gray-300'
+                      }`}
+                    />
+                  </motion.button>
+                ))}
               </div>
+            </div>
 
-              {/* Submit */}
-              <Button 
-                type="submit" 
-                className="w-full"
-                disabled={form.formState.isSubmitting}
-                aria-busy={form.formState.isSubmitting}
+            {/* Titre */}
+            <div>
+              <label className="text-sm font-medium mb-2 block">Titre *</label>
+              <Input
+                value={feedback.title}
+                onChange={(e) => setFeedback(prev => ({ ...prev, title: e.target.value }))}
+                placeholder="Résumé de votre feedback"
+                required
+              />
+            </div>
+
+            {/* Description */}
+            <div>
+              <label className="text-sm font-medium mb-2 block">Description *</label>
+              <Textarea
+                value={feedback.description}
+                onChange={(e) => setFeedback(prev => ({ ...prev, description: e.target.value }))}
+                placeholder="Décrivez votre expérience en détail..."
+                rows={4}
+                required
+              />
+            </div>
+
+            {/* Priorité */}
+            <div>
+              <label className="text-sm font-medium mb-2 block">Priorité</label>
+              <Select
+                value={feedback.priority}
+                onValueChange={(value: any) => setFeedback(prev => ({ ...prev, priority: value }))}
               >
-                <Send className="h-4 w-4 mr-2" aria-hidden="true" />
-                {form.formState.isSubmitting ? 'Envoi...' : 'Envoyer le feedback'}
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {priorities.map((priority) => (
+                    <SelectItem key={priority.value} value={priority.value}>
+                      <Badge className={priority.color}>
+                        {priority.label}
+                      </Badge>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Tags */}
+            <div>
+              <label className="text-sm font-medium mb-2 block">Tags</label>
+              <div className="flex gap-2 mb-2">
+                <Input
+                  value={newTag}
+                  onChange={(e) => setNewTag(e.target.value)}
+                  placeholder="Ajouter un tag"
+                  onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
+                />
+                <Button type="button" onClick={addTag} size="sm">
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {feedback.tags?.map((tag) => (
+                  <Badge
+                    key={tag}
+                    variant="secondary"
+                    className="cursor-pointer"
+                    onClick={() => removeTag(tag)}
+                  >
+                    {tag} ×
+                  </Badge>
+                ))}
+              </div>
+            </div>
+
+            {/* Actions multimédias */}
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={toggleRecording}
+                className={isRecording ? 'bg-red-50 border-red-200' : ''}
+              >
+                <Mic className={`h-4 w-4 mr-2 ${isRecording ? 'text-red-500' : ''}`} />
+                {isRecording ? 'Arrêter' : 'Enregistrer'}
               </Button>
-            </form>
-          </Form>
+              <Button type="button" variant="outline">
+                <Camera className="h-4 w-4 mr-2" />
+                Capture d'écran
+              </Button>
+            </div>
+
+            {/* Submit */}
+            <Button type="submit" className="w-full">
+              <Send className="h-4 w-4 mr-2" />
+              Envoyer le feedback
+            </Button>
+          </form>
         </CardContent>
       </Card>
     </motion.div>

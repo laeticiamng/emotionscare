@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -23,7 +24,7 @@ const AuthFlow: React.FC<AuthFlowProps> = ({ children }) => {
 
   // Si l'utilisateur est connecté, rediriger vers son tableau de bord
   if (isAuthenticated && userMode) {
-    const dashboardPath = getModeDashboardPath(userMode as any);
+    const dashboardPath = getModeDashboardPath(userMode);
     return <Navigate to={dashboardPath} replace />;
   }
 

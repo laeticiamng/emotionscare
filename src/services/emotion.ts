@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Service d'analyse d'émotions EmotionsCare
  * Connecté aux vraies APIs Supabase et Hume
@@ -7,7 +6,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import { EmotionResult } from '@/types/emotion';
 import { computeBalanceFromScores } from './emotionScan.service';
-import { logger } from '@/lib/logger';
 
 export interface EmotionAnalysisRequest {
   type: 'text' | 'voice' | 'image';
@@ -30,7 +28,7 @@ class EmotionService {
   /**
    * Analyse d'émotion via API Hume
    */
-  async analyzeEmotion(request: EmotionAnalysisRequest): Promise<EmotionAnalysisResponse | null> {
+  async analyzeEmotion(request: EmotionAnalysisRequest): Promise<EmotionAnalysisResponse> {
     try {
       const { data, error } = await supabase.functions.invoke('enhanced-emotion-analyze', {
         body: {
@@ -40,10 +38,7 @@ class EmotionService {
         }
       });
 
-      if (error) {
-        logger.error('Emotion analysis error:', error, 'SERVICE');
-        return null;
-      }
+      if (error) throw error;
 
       return {
         id: data.id,
@@ -59,15 +54,15 @@ class EmotionService {
         user_id: undefined // Will be set by the hook
       };
     } catch (error) {
-      logger.error('Unexpected error in emotion analysis:', error, 'SERVICE');
-      return null;
+      console.error('Emotion analysis error:', error);
+      throw new Error('Échec de l\'analyse émotionnelle');
     }
   }
 
   /**
    * Analyse d'émotion textuelle
    */
-  async analyzeText(text: string, context?: string): Promise<EmotionAnalysisResponse | null> {
+  async analyzeText(text: string, context?: string): Promise<EmotionAnalysisResponse> {
     return this.analyzeEmotion({
       type: 'text',
       data: text,
@@ -78,7 +73,7 @@ class EmotionService {
   /**
    * Analyse d'émotion vocale
    */
-  async analyzeVoice(audioFile: File): Promise<EmotionAnalysisResponse | null> {
+  async analyzeVoice(audioFile: File): Promise<EmotionAnalysisResponse> {
     return this.analyzeEmotion({
       type: 'voice',
       data: audioFile
@@ -88,7 +83,7 @@ class EmotionService {
   /**
    * Analyse d'émotion via image
    */
-  async analyzeImage(imageFile: File): Promise<EmotionAnalysisResponse | null> {
+  async analyzeImage(imageFile: File): Promise<EmotionAnalysisResponse> {
     return this.analyzeEmotion({
       type: 'image',
       data: imageFile
@@ -98,7 +93,7 @@ class EmotionService {
   /**
    * Sauvegarde d'une analyse d'émotion
    */
-  async saveEmotionResult(emotion: EmotionAnalysisResponse, userId: string): Promise<EmotionResult | null> {
+  async saveEmotionResult(emotion: EmotionAnalysisResponse, userId: string): Promise<EmotionResult> {
     try {
       const balance = computeBalanceFromScores(emotion.emotions);
       const { error } = await supabase
@@ -114,10 +109,7 @@ class EmotionService {
           emotional_balance: balance,
         });
 
-      if (error) {
-        logger.error('Error saving emotion result:', error, 'SERVICE');
-        return null;
-      }
+      if (error) throw error;
 
       return {
         emotion: emotion.emotion,
@@ -129,8 +121,8 @@ class EmotionService {
         suggestions: [],
       } as EmotionResult;
     } catch (error) {
-      logger.error('Unexpected error saving emotion result:', error, 'SERVICE');
-      return null;
+      console.error('Error saving emotion:', error);
+      throw new Error('Échec de la sauvegarde');
     }
   }
 
@@ -146,10 +138,7 @@ class EmotionService {
         .order('created_at', { ascending: false })
         .limit(limit);
 
-      if (error) {
-        logger.error('Error fetching user emotions:', error, 'SERVICE');
-        return [];
-      }
+      if (error) throw error;
 
       return (data ?? []).map(item => ({
         emotion: item.mood ?? 'Indéterminé',
@@ -161,7 +150,7 @@ class EmotionService {
         suggestions: item.recommendations ?? [],
       }));
     } catch (error) {
-      logger.error('Unexpected error fetching user emotions:', error, 'SERVICE');
+      console.error('Error fetching user emotions:', error);
       return [];
     }
   }
@@ -184,19 +173,11 @@ class EmotionService {
         }
       });
 
-      if (error) {
-        logger.error('Error fetching emotion trends:', error, 'SERVICE');
-        return {
-          dominant_emotion: 'neutral',
-          average_confidence: 0.5,
-          emotion_distribution: { neutral: 1.0 },
-          trend: 'stable'
-        };
-      }
+      if (error) throw error;
 
       return data;
     } catch (error) {
-      logger.error('Unexpected error fetching emotion trends:', error, 'SERVICE');
+      console.error('Error getting emotion trends:', error);
       return {
         dominant_emotion: 'neutral',
         average_confidence: 0.5,

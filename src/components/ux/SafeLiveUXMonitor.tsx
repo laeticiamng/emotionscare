@@ -1,8 +1,6 @@
-// @ts-nocheck
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import LiveUXMonitor from './LiveUXMonitor';
-import { logger } from '@/lib/logger';
 
 const SafeLiveUXMonitor: React.FC = () => {
   try {
@@ -11,7 +9,7 @@ const SafeLiveUXMonitor: React.FC = () => {
     return <LiveUXMonitor />;
   } catch (error) {
     // Si useLocation() échoue, on ne rend rien
-    logger.warn('LiveUXMonitor: Router context not available yet', {}, 'UI');
+    console.warn('LiveUXMonitor: Router context not available yet');
     return null;
   }
 };

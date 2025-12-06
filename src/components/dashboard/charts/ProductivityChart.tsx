@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -52,19 +51,19 @@ export const ProductivityChart: React.FC<ProductivityChartProps> = ({ data = def
       <CardContent>
         <div className="flex flex-wrap gap-2 mb-4">
           <button
-            className={`px-2 py-1 text-xs rounded ${visibleMetrics.productivity ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}
+            className={`px-2 py-1 text-xs rounded ${visibleMetrics.productivity ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'}`}
             onClick={() => toggleMetric('productivity')}
           >
             Productivité
           </button>
           <button
-            className={`px-2 py-1 text-xs rounded ${visibleMetrics.focus ? 'bg-success text-success-foreground' : 'bg-muted text-muted-foreground'}`}
+            className={`px-2 py-1 text-xs rounded ${visibleMetrics.focus ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-700'}`}
             onClick={() => toggleMetric('focus')}
           >
             Concentration
           </button>
           <button
-            className={`px-2 py-1 text-xs rounded ${visibleMetrics.satisfaction ? 'bg-accent text-accent-foreground' : 'bg-muted text-muted-foreground'}`}
+            className={`px-2 py-1 text-xs rounded ${visibleMetrics.satisfaction ? 'bg-purple-600 text-white' : 'bg-gray-200 text-gray-700'}`}
             onClick={() => toggleMetric('satisfaction')}
           >
             Satisfaction
@@ -80,13 +79,13 @@ export const ProductivityChart: React.FC<ProductivityChartProps> = ({ data = def
               <Tooltip />
               <Legend />
               {visibleMetrics.productivity && (
-                <Line type="monotone" dataKey="productivity" stroke="hsl(var(--primary))" name="Productivité" />
+                <Line type="monotone" dataKey="productivity" stroke="#3B82F6" name="Productivité" />
               )}
               {visibleMetrics.focus && (
-                <Line type="monotone" dataKey="focus" stroke="hsl(var(--success))" name="Concentration" />
+                <Line type="monotone" dataKey="focus" stroke="#10B981" name="Concentration" />
               )}
               {visibleMetrics.satisfaction && (
-                <Line type="monotone" dataKey="satisfaction" stroke="hsl(var(--accent))" name="Satisfaction" />
+                <Line type="monotone" dataKey="satisfaction" stroke="#8B5CF6" name="Satisfaction" />
               )}
             </LineChart>
           ) : (
@@ -97,13 +96,13 @@ export const ProductivityChart: React.FC<ProductivityChartProps> = ({ data = def
               <Tooltip />
               <Legend />
               {visibleMetrics.productivity && (
-                <Area type="monotone" dataKey="productivity" stroke="hsl(var(--primary))" fill="hsl(var(--primary) / 0.5)" name="Productivité" hide={!visibleMetrics.productivity} />
+                <Area type="monotone" dataKey="productivity" stroke="#3B82F6" fill="#3B82F6" name="Productivité" hide={!visibleMetrics.productivity} />
               )}
               {visibleMetrics.focus && (
-                <Area type="monotone" dataKey="focus" stroke="hsl(var(--success))" fill="hsl(var(--success) / 0.5)" name="Concentration" hide={!visibleMetrics.focus} />
+                <Area type="monotone" dataKey="focus" stroke="#10B981" fill="#10B981" name="Concentration" hide={!visibleMetrics.focus} />
               )}
               {visibleMetrics.satisfaction && (
-                <Area type="monotone" dataKey="satisfaction" stroke="hsl(var(--accent))" fill="hsl(var(--accent) / 0.5)" name="Satisfaction" hide={!visibleMetrics.satisfaction} />
+                <Area type="monotone" dataKey="satisfaction" stroke="#8B5CF6" fill="#8B5CF6" name="Satisfaction" hide={!visibleMetrics.satisfaction} />
               )}
             </AreaChart>
           )}

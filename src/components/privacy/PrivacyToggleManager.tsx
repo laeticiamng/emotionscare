@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -7,7 +6,6 @@ import { Badge } from '@/components/ui/badge';
 import { Camera, Mic, Heart, MapPin, Users, Coins, Shield, Info } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { analyticsService } from '@/services/analyticsService';
-import { logger } from '@/lib/logger';
 
 interface PrivacyPreferences {
   cam: boolean;
@@ -42,7 +40,7 @@ export const PrivacyToggleManager: React.FC = () => {
         setPreferences(JSON.parse(savedPrefs));
       }
     } catch (error) {
-      logger.error('Error loading preferences', error as Error, 'SYSTEM');
+      console.error('Error loading preferences:', error);
     }
   };
 

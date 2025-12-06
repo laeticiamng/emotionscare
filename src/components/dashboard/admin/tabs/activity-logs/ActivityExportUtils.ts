@@ -1,13 +1,11 @@
-// @ts-nocheck
 
 import { saveAs } from 'file-saver';
 import * as XLSX from 'xlsx';
-import { logger } from '@/lib/logger';
 
 export const exportActivityData = (data: any[], format: 'csv' | 'xlsx' = 'xlsx', filename = 'activity-logs') => {
   try {
     if (!data || data.length === 0) {
-      logger.error('No data to export', undefined, 'UI');
+      console.error('No data to export');
       return false;
     }
 
@@ -37,11 +35,11 @@ export const exportActivityData = (data: any[], format: 'csv' | 'xlsx' = 'xlsx',
       }
       
       default:
-        logger.error('Unsupported format', undefined, 'UI');
+        console.error('Unsupported format');
         return false;
     }
   } catch (error) {
-    logger.error('Error exporting data:', error as Error, 'UI');
+    console.error('Error exporting data:', error);
     return false;
   }
 };

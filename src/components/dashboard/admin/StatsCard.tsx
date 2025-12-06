@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
@@ -31,21 +30,21 @@ const StatsCard: React.FC<StatsCardProps> = ({
     switch (trend.direction) {
       case 'up':
         return (
-          <div className="flex items-center text-success">
+          <div className="flex items-center text-emerald-600">
             <ArrowUp className="h-3 w-3 mr-1" />
             <span className="text-xs">+{trend.value}%</span>
           </div>
         );
       case 'down':
         return (
-          <div className="flex items-center text-destructive">
+          <div className="flex items-center text-rose-600">
             <ArrowDown className="h-3 w-3 mr-1" />
             <span className="text-xs">-{trend.value}%</span>
           </div>
         );
       default:
         return (
-          <div className="flex items-center text-muted-foreground">
+          <div className="flex items-center text-gray-500">
             <Minus className="h-3 w-3 mr-1" />
             <span className="text-xs">{trend.value}%</span>
           </div>

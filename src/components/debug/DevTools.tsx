@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { performanceMonitor } from '@/utils/performanceMonitor';
 import { apiCache, imageCache, userCache } from '@/utils/cacheStrategies';
-import { logger } from '@/lib/logger';
 
 const DevTools: React.FC<{ enabled?: boolean }> = ({ enabled = false }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -197,7 +195,7 @@ const DevTools: React.FC<{ enabled?: boolean }> = ({ enabled = false }) => {
                         📊 Log Performance Metrics
                       </Button>
                       <Button 
-                        onClick={() => logger.debug('Cache Stats:', cacheStats, 'UI')}
+                        onClick={() => console.log('Cache Stats:', cacheStats)}
                         variant="outline" 
                         size="sm"
                         className="w-full"

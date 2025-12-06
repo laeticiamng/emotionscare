@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * RoleBasedNavigation - Navigation adaptée selon le rôle utilisateur
  * Séparation stricte B2C/B2B selon les spécifications
@@ -144,7 +143,6 @@ const RoleBasedNavigation: React.FC = () => {
     {
       title: "Outils RH",
       items: [
-        { label: "Gestion des Rôles", path: routes.b2b.admin.userRoles(), icon: Shield, description: "Attribution rôles" },
         { label: "Rapports", path: "/b2b/admin/reports", icon: BarChart3, description: "Données anonymisées" },
         { label: "Événements", path: "/b2b/admin/events", icon: Calendar, description: "Organisation" },
         { label: "Optimisation", path: "/b2b/admin/optimisation", icon: TrendingUp, description: "Amélioration continue" },

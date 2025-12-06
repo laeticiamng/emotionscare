@@ -1,4 +1,3 @@
-// @ts-nocheck
 type Bucket = 'low' | 'mid' | 'high' | 'unknown';
 
 function normalizeText(value: string): string {

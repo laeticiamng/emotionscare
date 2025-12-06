@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 /**
  * Service pour générer des recommandations basées sur les émotions

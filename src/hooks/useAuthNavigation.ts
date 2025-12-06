@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * useAuthNavigation - Hook pour la navigation après authentification
  * Gère les redirections intelligentes basées sur le contexte utilisateur
@@ -7,7 +6,6 @@
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCallback } from 'react';
-import { logger } from '@/lib/logger';
 
 interface NavigationOptions {
   fallback?: string;
@@ -45,7 +43,7 @@ export function useAuthNavigation() {
         if (url.origin === window.location.origin) {
           destination = redirectTo;
         } else {
-          logger.warn('Tentative de redirection vers une origine externe bloquée', { redirectTo }, 'AUTH');
+          console.warn('Tentative de redirection vers une origine externe bloquée:', redirectTo);
           destination = fallback;
         }
       } catch {
@@ -65,7 +63,7 @@ export function useAuthNavigation() {
       }
     }
 
-    logger.info('Navigation après connexion vers', { destination }, 'AUTH');
+    console.log('Navigation après connexion vers:', destination);
     navigate(destination, { replace: true });
   }, [navigate, location, isAuthenticated]);
 

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { Shield, AlertTriangle, CheckCircle, Eye, Lock, Key, Globe, Database } from 'lucide-react';
 

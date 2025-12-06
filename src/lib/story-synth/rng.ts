@@ -1,4 +1,3 @@
-// @ts-nocheck
 // RNG déterministe (mulberry32 + hash simple)
 export function hashSeed(s: string) {
   let h = 1779033703 ^ s.length;

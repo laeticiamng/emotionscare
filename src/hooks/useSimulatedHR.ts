@@ -1,7 +1,5 @@
-// @ts-nocheck
 import { useCallback, useEffect, useRef } from 'react';
 import { useHRStore, type HRReading } from '@/store/hr.store';
-import { logger } from '@/lib/logger';
 
 // Realistic BPM ranges for demo
 const RESTING_BPM_RANGE = [60, 90];
@@ -48,7 +46,7 @@ export const useSimulatedHR = () => {
   const startSimulation = useCallback(() => {
     if (intervalRef.current) return; // Already running
     
-    logger.debug('Starting simulated heart rate', {}, 'SYSTEM');
+    console.log('Starting simulated heart rate');
     store.setSource('sim');
     store.setConnected(true);
     store.startSession();
@@ -85,7 +83,7 @@ export const useSimulatedHR = () => {
     store.setBpm(null);
     store.endSession();
     
-    logger.debug('Simulated heart rate stopped', {}, 'SYSTEM');
+    console.log('Simulated heart rate stopped');
   }, [store]);
 
   // Set activity level for more realistic simulation
@@ -98,7 +96,7 @@ export const useSimulatedHR = () => {
     };
     
     baselineRef.current = baselines[level];
-    logger.debug('Simulated activity level', { level, baseline: baselineRef.current }, 'SYSTEM');
+    console.log('Simulated activity level:', level, 'baseline:', baselineRef.current);
   }, []);
 
   // Simulate specific BPM for testing

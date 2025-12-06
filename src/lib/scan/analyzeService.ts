@@ -1,4 +1,4 @@
-// @ts-nocheck
+
 import { EmotionPrediction, EmotionAnalysis } from '@/types/mood';
 
 // Analyze audio and extract emotions

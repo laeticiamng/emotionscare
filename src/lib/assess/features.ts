@@ -1,6 +1,4 @@
-// @ts-nocheck
 import { supabase } from '@/integrations/supabase/client';
-import { logger } from '@/lib/logger';
 import type { Instrument } from '../../../packages/contracts/assess';
 
 /**
@@ -22,7 +20,7 @@ export async function isAssessmentEnabled(instrument: Instrument): Promise<boole
       .maybeSingle();
       
     if (error) {
-      logger.warn('Error checking feature flag', error as Error, 'API');
+      console.warn('Error checking feature flag:', error);
       return false; // Par défaut désactivé en cas d'erreur
     }
     
@@ -32,7 +30,7 @@ export async function isAssessmentEnabled(instrument: Instrument): Promise<boole
     
     return data.is_enabled;
   } catch (error) {
-    logger.warn('Feature flag check failed', error as Error, 'API');
+    console.warn('Feature flag check failed:', error);
     return false;
   }
 }
@@ -48,7 +46,7 @@ export async function getEnabledAssessments(instruments: Instrument[]): Promise<
       .eq('is_enabled', true);
       
     if (error) {
-      logger.warn('Error fetching enabled assessments', error as Error, 'API');
+      console.warn('Error fetching enabled assessments:', error);
       return [];
     }
     
@@ -61,7 +59,7 @@ export async function getEnabledAssessments(instruments: Instrument[]): Promise<
       .filter(instrument => instruments.includes(instrument));
       
   } catch (error) {
-    logger.warn('Failed to get enabled assessments', error as Error, 'API');
+    console.warn('Failed to get enabled assessments:', error);
     return [];
   }
 }

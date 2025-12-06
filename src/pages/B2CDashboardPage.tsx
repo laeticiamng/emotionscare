@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { usePageSEO } from '@/hooks/usePageSEO';
 import {
   Brain,
   Music,
@@ -57,7 +56,7 @@ const QUICK_ACTIONS: QuickAction[] = [
     description: 'Support immédiat et bienveillant',
     to: '/app/coach',
     icon: MessageCircle,
-    accent: 'bg-accent/10 text-accent',
+    accent: 'bg-purple-500/10 text-purple-600',
   },
   {
     id: 'music',
@@ -65,7 +64,7 @@ const QUICK_ACTIONS: QuickAction[] = [
     description: 'Sons adaptatifs personnalisés',
     to: '/app/music',
     icon: Music,
-    accent: 'bg-info/10 text-info',
+    accent: 'bg-blue-500/10 text-blue-600',
   },
   {
     id: 'ambition',
@@ -73,7 +72,7 @@ const QUICK_ACTIONS: QuickAction[] = [
     description: 'Gamifier vos objectifs positifs',
     to: '/app/ambition-arcade',
     icon: Sparkles,
-    accent: 'bg-warning/10 text-warning',
+    accent: 'bg-amber-500/10 text-amber-600',
   },
   {
     id: 'scan',
@@ -89,7 +88,7 @@ const QUICK_ACTIONS: QuickAction[] = [
     description: 'Consignez vos ressentis',
     to: '/app/journal',
     icon: BookOpen,
-    accent: 'bg-success/10 text-success',
+    accent: 'bg-green-500/10 text-green-600',
   },
 ];
 
@@ -135,9 +134,9 @@ export default function B2CDashboardPage() {
   const setEphemeralSignal = useDashboardStore((state) => state.setEphemeralSignal);
   const [activeTone, setActiveTone] = useState(summaryTone);
   const shouldReduceMotion = useReducedMotion();
-  const clinicalHints = useClinicalHints('dashboard');
-  const clinicalTone = summaryTone;
-  const dashboardCta = null;
+  const clinicalHints = useClinicalHints();
+  const clinicalTone = clinicalHints.moduleCues.dashboard?.tone ?? clinicalHints.tone;
+  const dashboardCta = clinicalHints.moduleCues.dashboard?.cta ?? null;
 
   const musicSnapshot = playback.snapshot;
   const presetLabel = musicSnapshot?.presetId && musicSnapshot.presetId in PRESET_DETAILS
@@ -175,12 +174,6 @@ export default function B2CDashboardPage() {
     () => (shouldReduceMotion ? { duration: 0 } : { duration: 0.28, ease: 'easeOut' }),
     [shouldReduceMotion],
   );
-
-  usePageSEO({
-    title: 'Dashboard Particulier',
-    description: 'Suivez vos émotions, accédez à vos modules bien-être et progressez avec EmotionsCare. Scan émotions, musicothérapie, coach IA, journal.',
-    keywords: 'dashboard, émotions, scan, musicothérapie, coach IA, bien-être'
-  });
 
   useEffect(() => {
     // Audit d'accessibilité en développement
@@ -313,7 +306,7 @@ export default function B2CDashboardPage() {
               <CardContent>
                 <div className="flex items-center justify-between">
                   <div className="text-2xl font-bold">3</div>
-                  <TrendingUp className="h-4 w-4 text-success" aria-hidden="true" />
+                  <TrendingUp className="h-4 w-4 text-green-500" aria-hidden="true" />
                 </div>
                 <Progress value={60} className="mt-2" aria-label="Progression 60%" />
                 <p className="text-xs text-muted-foreground mt-1">
@@ -334,7 +327,7 @@ export default function B2CDashboardPage() {
               <CardContent>
                 <div className="flex items-center justify-between">
                   <div className="text-2xl font-bold">25min</div>
-                  <Calendar className="h-4 w-4 text-info" aria-hidden="true" />
+                  <Calendar className="h-4 w-4 text-blue-500" aria-hidden="true" />
                 </div>
                 <Progress value={83} className="mt-2" aria-label="Progression 83%" />
                 <p className="text-xs text-muted-foreground mt-1">
@@ -355,7 +348,7 @@ export default function B2CDashboardPage() {
               <CardContent>
                 <div className="flex items-center justify-between">
                   <div className="text-2xl font-bold">😊</div>
-                  <Target className="h-4 w-4 text-warning" aria-hidden="true" />
+                  <Target className="h-4 w-4 text-yellow-500" aria-hidden="true" />
                 </div>
                 <div className="mt-2">
                   <Badge variant="outline" className="text-xs">
@@ -375,9 +368,21 @@ export default function B2CDashboardPage() {
           <h2 id="actions-title" className="text-xl font-semibold mb-4">
             Actions rapides adaptées
           </h2>
+          {dashboardCta && (
+            <div className="mb-4">
+              <Button asChild variant="outline" className="w-full md:w-auto">
+                <Link to={dashboardCta.to}>{dashboardCta.label}</Link>
+              </Button>
+              <p className="mt-2 text-sm text-muted-foreground">
+                {clinicalHints.summaries.wellbeing
+                  ? `${clinicalHints.summaries.wellbeing} — prenons une minute pour respirer ensemble.`
+                  : 'Une respiration guidée est disponible pour adoucir le rythme.'}
+              </p>
+            </div>
+          )}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {orderedQuickActions.map((action) => {
-              const ActionIcon = action.icon as React.ComponentType<{ className?: string }>;
+              const ActionIcon = action.icon;
               return (
                 <motion.div key={action.id} layout transition={quickActionTransition} className="h-full">
                   <Card className="group hover:shadow-md transition-shadow cursor-pointer h-full">

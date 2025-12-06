@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 // Service client Hume AI pour EmotionsCare avec cache LRU
 export interface HumeEmotionScore {
@@ -54,7 +53,7 @@ export class HumeClient {
       this.cache.set(key, emotions);
       return emotions;
     } catch (error) {
-      // Silent: Hume emotion detection error logged internally
+      console.error('❌ EmotionsCare Hume Error:', error);
       throw error;
     }
   }

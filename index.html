@@ -7,12 +7,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>EmotionsCare | ResiMax™</title>
     <meta name="description" content="Plateforme de bien-être émotionnel en entreprise" />
-    <!-- Security Headers - Désactivés pour Lovable iframe -->
-    <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.gpteng.co https://rsms.me https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://rsms.me https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://rsms.me https://fonts.gstatic.com; connect-src 'self' https://yaincoxihiqdksxgrsrk.supabase.co https://*.hume.ai wss://*.hume.ai; media-src 'self' blob:; frame-src 'self' https:; worker-src 'self' blob:;"> -->
-    <!-- <meta http-equiv="X-Frame-Options" content="SAMEORIGIN"> -->
-    <!-- <meta http-equiv="X-Content-Type-Options" content="nosniff"> -->
-    <!-- <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin"> -->
-    <!-- <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=()"> -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; img-src 'self' data: blob:; font-src 'self' https://rsms.me https://fonts.gstatic.com data:; style-src 'self' 'unsafe-inline' https://rsms.me https://fonts.googleapis.com; script-src 'self' https://cdn.gpteng.co; connect-src 'self' https://*.supabase.co https://*.supabase.in https://api.emotionscare.com https://api.openai.com https://cdn.gpteng.co https://api.hume.ai https://*.sentry.io https://*.ingest.sentry.io wss://*.supabase.co wss://*.supabase.in; media-src 'self' blob: https://*.supabase.co https://storage.googleapis.com; frame-src 'self'; worker-src 'self' blob:; manifest-src 'self'; object-src 'none'"
+    />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
 
     <!-- PWA Manifest -->
     <link rel="manifest" href="/manifest.json" />
@@ -33,9 +32,8 @@
     <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
     
     <!-- Preload critical resources -->
-    <link rel="preconnect" href="https://rsms.me" crossorigin>
+    <link rel="preconnect" href="https://rsms.me">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preload" as="audio" href="/audio/lofi-120.mp3" />
   </head>
   <body>
@@ -43,5 +41,6 @@
     <!-- Required Lovable script tag for new features -->
     <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
     <script type="module" src="/src/main.tsx"></script>
+    <script type="module" src="/scripts/dom-prune.js"></script>
   </body>
 </html>

@@ -1,9 +1,7 @@
-// @ts-nocheck
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { Sentry } from '@/lib/errors/sentry-compat';
+import * as Sentry from '@sentry/react';
 import { useToast } from '@/hooks/use-toast';
-import { logger } from '@/lib/logger';
 import {
   createSocialRoom,
   fetchSocialRooms,
@@ -172,17 +170,32 @@ export const useSocialRooms = (options?: UseSocialRoomsOptions): UseSocialRoomsR
   });
 
   const createRoom = useCallback(async (payload: CreateSocialRoomPayload) => {
-    logger.info('social:create', { allowAudio: payload.allowAudio }, 'SOCIAL');
+    Sentry.addBreadcrumb({
+      category: 'social',
+      message: 'social:create',
+      data: { allowAudio: payload.allowAudio },
+      level: 'info',
+    });
     await createRoomMutation.mutateAsync(payload);
   }, [createRoomMutation]);
 
   const joinRoom = useCallback(async (payload: JoinSocialRoomPayload) => {
-    logger.info('social:join', { roomId: payload.roomId }, 'SOCIAL');
+    Sentry.addBreadcrumb({
+      category: 'social',
+      message: 'social:join',
+      data: { roomId: payload.roomId },
+      level: 'info',
+    });
     await joinRoomMutation.mutateAsync(payload);
   }, [joinRoomMutation]);
 
   const leaveRoom = useCallback(async (payload: LeaveSocialRoomPayload) => {
-    logger.info('social:leave', { roomId: payload.roomId }, 'SOCIAL');
+    Sentry.addBreadcrumb({
+      category: 'social',
+      message: 'social:leave',
+      data: { roomId: payload.roomId },
+      level: 'info',
+    });
     await leaveRoomMutation.mutateAsync(payload);
   }, [leaveRoomMutation]);
 

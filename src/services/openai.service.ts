@@ -1,7 +1,5 @@
-// @ts-nocheck
 import { supabase } from '@/integrations/supabase/client';
 import type { ApiResponse } from './types';
-import { logger } from '@/lib/logger';
 
 class OpenAIService {
   private async callEdgeFunction(functionName: string, payload: any): Promise<ApiResponse> {
@@ -11,7 +9,7 @@ class OpenAIService {
       });
 
       if (error) {
-        logger.error(`OpenAI ${functionName} error`, error as Error, 'API');
+        console.error(`OpenAI ${functionName} error:`, error);
         return {
           success: false,
           error: error.message,
@@ -25,7 +23,7 @@ class OpenAIService {
         timestamp: new Date()
       };
     } catch (error: any) {
-      logger.error(`OpenAI ${functionName} error`, error as Error, 'API');
+      console.error(`OpenAI ${functionName} error:`, error);
       return {
         success: false,
         error: error.message,

@@ -1,8 +1,6 @@
-// @ts-nocheck
 
 import { useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { logger } from '@/lib/logger';
 
 export interface UseActivityOptions {
   anonymize?: boolean;
@@ -27,7 +25,7 @@ export function useActivity(options: UseActivityOptions = {}) {
     };
 
     // In a real app, this would send to an API or analytics service
-    logger.info('Activity logged', activityData, 'ANALYTICS');
+    console.log('Activity logged:', activityData);
     
     // You could implement actual API calls here
     // Example: api.post('/activity-logs', activityData);

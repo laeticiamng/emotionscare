@@ -10,7 +10,6 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { logger } from '@/lib/logger';
 
 interface ConfirmDialogProps {
   open: boolean;
@@ -65,7 +64,7 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
       await onConfirm();
       onOpenChange(false);
     } catch (error) {
-      logger.error('Erreur lors de la confirmation', { error });
+      console.error('Erreur lors de la confirmation:', error);
     } finally {
       setIsProcessing(false);
     }

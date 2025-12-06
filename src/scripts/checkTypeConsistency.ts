@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 /**
  * Type Consistency Check Script
@@ -10,7 +9,6 @@
 import fs from 'fs';
 import path from 'path';
 import * as ts from 'typescript';
-import { logger } from '@/lib/logger';
 
 const PROJECT_ROOT = path.resolve(__dirname, '../..');
 
@@ -37,7 +35,7 @@ function findTypeDefinitions(directory: string, fileExtensions: string[]): strin
 }
 
 function analyzeTypeFiles(files: string[]): void {
-  logger.debug(`Analyzing ${files.length} type files...`, 'SYSTEM');
+  console.log(`Analyzing ${files.length} type files...`);
   
   // Create a map of type names to their definitions
   const typeDefinitions = new Map<string, { file: string; content: string }>();
@@ -66,9 +64,9 @@ function analyzeTypeFiles(files: string[]): void {
         const nodeText = content.substring(node.pos, node.end);
         
         if (typeDefinitions.has(typeName)) {
-          logger.warn(`⚠️  Duplicate type found: ${typeName}`, 'SYSTEM');
-          logger.warn(`   - First defined in: ${typeDefinitions.get(typeName)!.file}`, 'SYSTEM');
-          logger.warn(`   - Also defined in: ${file}`, 'SYSTEM');
+          console.warn(`⚠️  Duplicate type found: ${typeName}`);
+          console.warn(`   - First defined in: ${typeDefinitions.get(typeName)!.file}`);
+          console.warn(`   - Also defined in: ${file}`);
         } else {
           typeDefinitions.set(typeName, { file, content: nodeText });
         }
@@ -76,11 +74,11 @@ function analyzeTypeFiles(files: string[]): void {
     });
   }
   
-  logger.debug(`Found ${typeDefinitions.size} unique type definitions.`, 'SYSTEM');
+  console.log(`Found ${typeDefinitions.size} unique type definitions.`);
 }
 
 // Main execution
-logger.debug('Starting type consistency check...', 'SYSTEM');
+console.log('Starting type consistency check...');
 const typeFiles = findTypeDefinitions(path.join(PROJECT_ROOT, 'src'), ['.ts', '.tsx']);
 analyzeTypeFiles(typeFiles);
-logger.debug('Type consistency check completed.', 'SYSTEM');
+console.log('Type consistency check completed.');

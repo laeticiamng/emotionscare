@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button, ButtonProps } from '@/components/ui/button';

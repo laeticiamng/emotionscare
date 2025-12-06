@@ -10,7 +10,6 @@ import { useUserMode } from '@/contexts/UserModeContext';
 import { routes } from '@/routerV2';
 import LoadingAnimation from '@/components/ui/loading-animation';
 import { stripUtmParams } from '@/lib/utm';
-import { logger } from '@/lib/logger';
 
 const AppGatePage: React.FC = () => {
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
@@ -57,7 +56,7 @@ const AppGatePage: React.FC = () => {
     
     default:
       // Par défaut, rediriger vers B2C
-      logger.warn(`Rôle inconnu: ${role}, redirection vers B2C`, undefined, 'SYSTEM');
+      console.warn(`[AppGatePage] Rôle inconnu: ${role}, redirection vers B2C`);
       return <Navigate to={routes.b2c.dashboard()} replace />;
   }
 };

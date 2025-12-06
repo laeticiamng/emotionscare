@@ -1,144 +1,80 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
-import { logger } from '@/lib/logger';
+import { useGamificationStore, Badge } from '@/store/gamification.store';
 
-export interface Badge {
-  id: string;
-  user_id: string;
-  badge_id: string;
-  badge_name: string;
-  badge_description?: string;
-  badge_icon?: string;
-  badge_category: string;
-  earned_at: string;
-  progress?: {
-    current: number;
-    target: number;
-  };
-  unlocked: boolean;
-  shared_on_social: boolean;
+interface BadgesResponse {
+  unlocked: Badge[];
+  locked: Badge[];
 }
 
 export const useBadges = () => {
-  const [badges, setBadges] = useState<Badge[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { badges, setBadges, setError } = useGamificationStore();
 
-  const fetchBadges = async () => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const { data, error } = await supabase
-        .from('user_badges')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('earned_at', { ascending: false });
-
+  const { data, error, isFetching } = useQuery({
+    queryKey: ['gamification', 'badges'],
+    queryFn: async () => {
+      const { data, error } = await supabase.functions.invoke('gamification-badges');
       if (error) throw error;
-      setBadges(data || []);
-    } catch (error) {
-      logger.error('Error fetching badges:', error, 'HOOK');
-    } finally {
-      setLoading(false);
+      return data as BadgesResponse;
+    },
+    staleTime: 10 * 60 * 1000, // 10 min cache (badges change less frequently)
+    refetchInterval: 10 * 60 * 1000,
+  });
+
+  // Update store when data changes
+  useEffect(() => {
+    if (data) {
+      setBadges(data);
     }
-  };
-
-  const unlockBadge = async (badgeId: string) => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const { error } = await supabase
-        .from('user_badges')
-        .update({ unlocked: true })
-        .eq('user_id', user.id)
-        .eq('badge_id', badgeId);
-
-      if (error) throw error;
-
-      toast.success('Badge débloqué ! 🎉');
-      fetchBadges();
-    } catch (error: any) {
-      logger.error('Error unlocking badge:', error, 'HOOK');
-      toast.error('Erreur lors du déblocage du badge');
-    }
-  };
-
-  const updateBadgeProgress = async (badgeId: string, current: number, target: number) => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const progress = { current, target };
-      const unlocked = current >= target;
-
-      const { error } = await supabase
-        .from('user_badges')
-        .update({ 
-          progress,
-          unlocked
-        })
-        .eq('user_id', user.id)
-        .eq('badge_id', badgeId);
-
-      if (error) throw error;
-
-      if (unlocked) {
-        toast.success('Badge débloqué ! 🎉');
-      }
-
-      fetchBadges();
-    } catch (error: any) {
-      logger.error('Error updating badge progress:', error, 'HOOK');
-    }
-  };
-
-  const shareBadgeOnSocial = async (badgeId: string, platform: 'twitter' | 'linkedin') => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const badge = badges.find(b => b.badge_id === badgeId);
-      if (!badge) return;
-
-      const text = `Je viens de débloquer le badge "${badge.badge_name}" sur EmotionsCare ! ${badge.badge_icon || '🏆'}`;
-      const url = window.location.origin + '/app/achievements';
-
-      let shareUrl = '';
-      if (platform === 'twitter') {
-        shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
-      } else if (platform === 'linkedin') {
-        shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
-      }
-
-      window.open(shareUrl, '_blank', 'width=600,height=400');
-
-      // Mark as shared
-      await supabase
-        .from('user_badges')
-        .update({ shared_on_social: true })
-        .eq('user_id', user.id)
-        .eq('badge_id', badgeId);
-
-      toast.success('Badge partagé !');
-      fetchBadges();
-    } catch (error: any) {
-      logger.error('Error sharing badge:', error, 'HOOK');
-      toast.error('Erreur lors du partage');
-    }
-  };
+  }, [data, setBadges]);
 
   useEffect(() => {
-    fetchBadges();
-  }, []);
+    if (error) {
+      setError(error.message);
+    }
+  }, [error, setError]);
+
+  // Redeem a badge (if applicable)
+  const redeemBadge = async (badgeId: string) => {
+    try {
+      const { error } = await supabase.functions.invoke('gamification-redeem', {
+        body: { badge_id: badgeId }
+      });
+
+      if (error) throw error;
+
+      // Refetch badges to update state
+      // The query will automatically update due to cache invalidation
+      
+      // Analytics
+      if (typeof window !== 'undefined' && window.gtag) {
+        window.gtag('event', 'gami_badge_redeem', {
+          custom_badge_id: badgeId
+        });
+      }
+
+      return true;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erreur de récupération');
+      return false;
+    }
+  };
+
+  // View badge analytics
+  const viewBadge = (badgeId: string) => {
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('event', 'gami_badge_view', {
+        custom_badge_id: badgeId
+      });
+    }
+  };
 
   return {
     badges,
-    loading,
-    unlockBadge,
-    updateBadgeProgress,
-    shareBadgeOnSocial,
-    refetch: fetchBadges,
+    loading: isFetching,
+    error,
+    redeemBadge,
+    viewBadge,
   };
 };

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Dashboard de sécurité et conformité - Point de contrôle production
  */
@@ -87,7 +86,7 @@ const SecurityDashboard: React.FC = () => {
 
       setSecurityStatus(status);
     } catch (error) {
-      // Security check failed - silent
+      console.error('Security check failed:', error);
     } finally {
       setLoading(false);
     }

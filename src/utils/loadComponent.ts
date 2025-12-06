@@ -1,7 +1,5 @@
-// @ts-nocheck
 
 import React, { ComponentType } from 'react';
-import { logger } from '@/lib/logger';
 
 /**
  * Charge un composant de manière asynchrone en vérifiant à la fois l'export default
@@ -31,10 +29,10 @@ export async function loadComponent<P = {}>(
       return Component as ComponentType<P>;
     }
     
-    logger.error('Component not found in module', { module }, 'SYSTEM');
+    console.error('Component not found in module:', module);
     return null;
   } catch (error) {
-    logger.error('Failed to load component', error as Error, 'SYSTEM');
+    console.error('Failed to load component:', error);
     return null;
   }
 }

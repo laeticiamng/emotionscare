@@ -1,11 +1,8 @@
-// @ts-nocheck
 
 // This file needs to map the user_id property to the expected format
 
-// @ts-nocheck
 import { useState, useEffect } from 'react';
 import { ChatConversation } from '@/types/chat';
-import { logger } from '@/lib/logger';
 
 export const useChatHistory = (userId: string) => {
   const [conversations, setConversations] = useState<ChatConversation[]>([]);
@@ -48,7 +45,7 @@ export const useChatHistory = (userId: string) => {
           setIsLoading(false);
         }, 800);
       } catch (error) {
-        logger.error('Error fetching conversations', error as Error, 'UI');
+        console.error('Error fetching conversations:', error);
         setIsLoading(false);
       }
     };

@@ -1,6 +1,5 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { useSystemStore, Healthz, HealthState } from '@/store/system.store';
-import { supabase } from '@/integrations/supabase/client';
 
 export const useHealthcheck = () => {
   const store = useSystemStore();
@@ -33,16 +32,19 @@ export const useHealthcheck = () => {
     store.setLoading(true);
 
     try {
-      // Use Supabase edge function
-      const { data, error } = await supabase.functions.invoke('health-check', {
-        body: {}
+      const response = await fetch('/api/healthz', {
+        method: 'GET',
+        signal: timeoutRef.current.signal,
+        // 3 second timeout
+        headers: { 'Cache-Control': 'no-cache' }
       });
 
-      if (error) {
-        throw new Error(error.message);
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
       }
 
-      store.updateHealth(data as Healthz);
+      const data: Healthz = await response.json();
+      store.updateHealth(data);
     } catch (error) {
       if (error instanceof Error && error.name === 'AbortError') {
         return; // Request was cancelled, ignore

@@ -3,7 +3,7 @@
  * Replaces console.log calls with a structured logging system
  */
 
-import { aiMonitoring, captureMessage } from '@/lib/ai-monitoring';
+import * as Sentry from '@sentry/react';
 
 type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 
@@ -111,16 +111,27 @@ class Logger {
 
   private reportToMonitoring(entry: LogEntry) {
     try {
-      const levelMap: Record<LogLevel, 'critical' | 'high' | 'medium' | 'low'> = {
-        debug: 'low',
-        info: 'low',
-        warn: 'medium',
-        error: 'high',
-      };
+      const client = Sentry.getCurrentHub().getClient();
+      if (!client) {
+        return;
+      }
 
-      aiMonitoring.captureMessage(entry.message, levelMap[entry.level], {
-        context: entry.context,
-        data: entry.data,
+      Sentry.withScope((scope) => {
+        if (entry.context) {
+          scope.setTag('logger.context', entry.context);
+        }
+        if (entry.data) {
+          scope.setExtras({ data: entry.data });
+        }
+
+        const levelMap: Record<LogLevel, Sentry.SeverityLevel> = {
+          debug: 'debug',
+          info: 'info',
+          warn: 'warning',
+          error: 'error',
+        };
+
+        Sentry.captureMessage(entry.message, levelMap[entry.level]);
       });
     } catch (err) {
       if (this.isDevelopment) {
@@ -170,7 +181,7 @@ class Logger {
         console.error(...args);
         break;
       default:
-        console.debug(...args);
+        console.log(...args);
     }
   }
 

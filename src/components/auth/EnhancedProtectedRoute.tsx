@@ -49,8 +49,8 @@ const EnhancedProtectedRoute: React.FC<EnhancedProtectedRouteProps> = ({
   }
 
   // Vérification des rôles requis
-  if (allowedRoles && allowedRoles.length > 0 && user && user.role) {
-    if (!allowedRoles.includes(user.role as any)) {
+  if (allowedRoles && allowedRoles.length > 0 && user) {
+    if (!allowedRoles.includes(user.role)) {
       return (
         <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-orange-50 flex items-center justify-center">
           <Card className="w-full max-w-md">

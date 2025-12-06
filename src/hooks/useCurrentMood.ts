@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 
-import { useMoodStore } from "@/hooks/useMood";
+import { useMood } from "@/contexts/MoodContext";
 import { getVibeEmoji, getVibeLabel, type MoodVibe } from "@/utils/moodVibes";
 import type { MoodPalette } from "@/utils/moodSignals";
 
@@ -54,7 +54,7 @@ export interface CurrentMoodSnapshot {
 }
 
 export const useCurrentMood = (): CurrentMoodSnapshot => {
-  const currentMood = useMoodStore();
+  const { currentMood } = useMood();
 
   const valence = Number.isFinite(currentMood.valence)
     ? (currentMood.valence as number)

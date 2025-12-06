@@ -1,75 +1,44 @@
-// @ts-nocheck
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { useAuth } from '@/contexts/AuthContext';
-import { EmotionScanService } from '@/modules/emotion-scan/emotionScanService';
-import { Loader2 } from 'lucide-react';
 
 interface AnalyticsTabProps {
   className?: string;
   personalOnly?: boolean;
 }
 
-interface EmotionAnalysis {
-  date: string;
-  emotion: string;
-  score: number;
-  type: string;
-}
-
 const AnalyticsTab: React.FC<AnalyticsTabProps> = ({ className, personalOnly }) => {
-  const { user } = useAuth();
-  const [recentAnalyses, setRecentAnalyses] = useState<EmotionAnalysis[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchAnalyses = async () => {
-      if (!user?.id) return;
-
-      setIsLoading(true);
-      try {
-        const scans = await EmotionScanService.getUserScans(user.id, {
-          limit: 10,
-          orderBy: 'created_at',
-          ascending: false
-        });
-
-        const analyses = scans.slice(0, 5).map((scan) => {
-          const emotion = scan.payload?.dominant_emotion || scan.payload?.emotion || 'Neutre';
-          const score = scan.mood_score || 7.0;
-          const type = scan.payload?.analysis_type || 'Scan';
-
-          return {
-            date: new Date(scan.created_at).toLocaleDateString('fr-FR'),
-            emotion: emotion.charAt(0).toUpperCase() + emotion.slice(1),
-            score: score,
-            type: type.charAt(0).toUpperCase() + type.slice(1)
-          };
-        });
-
-        setRecentAnalyses(analyses);
-      } catch (error) {
-        console.error('Error fetching analyses:', error);
-        setRecentAnalyses([]);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchAnalyses();
-  }, [user?.id]);
+  const recentAnalyses = [
+    {
+      date: '2024-01-15',
+      emotion: 'Positif',
+      score: 8.5,
+      type: 'Texte'
+    },
+    {
+      date: '2024-01-14',
+      emotion: 'Calme',
+      score: 7.2,
+      type: 'Audio'
+    },
+    {
+      date: '2024-01-13',
+      emotion: 'Énergique',
+      score: 9.1,
+      type: 'Image'
+    }
+  ];
 
   const getEmotionColor = (emotion: string) => {
     switch (emotion.toLowerCase()) {
       case 'positif':
       case 'énergique':
-        return 'bg-success/10 text-success';
+        return 'bg-green-100 text-green-800';
       case 'calme':
-        return 'bg-primary/10 text-primary';
+        return 'bg-blue-100 text-blue-800';
       default:
-        return 'bg-muted text-muted-foreground';
+        return 'bg-gray-100 text-gray-800';
     }
   };
 
@@ -81,18 +50,8 @@ const AnalyticsTab: React.FC<AnalyticsTabProps> = ({ className, personalOnly }) 
             <CardTitle>Analyses récentes</CardTitle>
           </CardHeader>
           <CardContent>
-            {isLoading ? (
-              <div className="flex items-center justify-center py-8">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-              </div>
-            ) : recentAnalyses.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
-                <p>Aucune analyse récente</p>
-                <p className="text-sm mt-2">Commencez votre première analyse émotionnelle !</p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {recentAnalyses.map((analysis, index) => (
+            <div className="space-y-4">
+              {recentAnalyses.map((analysis, index) => (
                 <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
@@ -108,8 +67,7 @@ const AnalyticsTab: React.FC<AnalyticsTabProps> = ({ className, personalOnly }) 
                   </div>
                 </div>
               ))}
-              </div>
-            )}
+            </div>
           </CardContent>
         </Card>
 
@@ -124,11 +82,11 @@ const AnalyticsTab: React.FC<AnalyticsTabProps> = ({ className, personalOnly }) 
               </div>
               <div className="grid grid-cols-2 gap-4 text-center">
                 <div>
-                  <div className="text-2xl font-bold text-success">↑ 15%</div>
+                  <div className="text-2xl font-bold text-green-500">↑ 15%</div>
                   <p className="text-sm text-muted-foreground">Humeur positive</p>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-primary">↓ 8%</div>
+                  <div className="text-2xl font-bold text-blue-500">↓ 8%</div>
                   <p className="text-sm text-muted-foreground">Niveau de stress</p>
                 </div>
               </div>

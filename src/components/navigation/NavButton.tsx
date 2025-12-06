@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -8,7 +7,6 @@ import { useNavAction } from '@/hooks/useNavAction';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
 import * as Icons from 'lucide-react';
-import { logger } from '@/lib/logger';
 
 interface NavButtonProps {
   node: NavNode;
@@ -57,8 +55,9 @@ export function NavButton({
       await executeAction(node.action);
     } else if (hasChildren) {
       // Ouvrir sous-menu ou naviguer vers la première action disponible
-      logger.debug('Navigation action', { type, path, nodeId: node.id }, 'UI');
+      console.log('Navigation action for:', type, path);
       if (path) window.location.href = path;
+      console.log('Opening submenu for:', node.id);
     } else {
       // Fallback pour les actions non encore implémentées
       handleFallbackAction(node);
@@ -190,7 +189,7 @@ Voulez-vous :
 
   if (confirm(message)) {
     // Ouvrir modal de feedback ou newsletter
-    logger.info('Community action triggered', null, 'UI');
+    console.log('Community action triggered');
     // Simulation d'ouverture de modal
     window.alert('Rejoignez notre communauté ! Fonctionnalité bientôt disponible.');
     window.location.href = '/help-center';

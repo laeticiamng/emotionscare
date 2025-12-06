@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 export interface VRSessionTemplate {
   id: string;

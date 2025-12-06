@@ -1,10 +1,8 @@
-// @ts-nocheck
 import { useCallback } from 'react';
 import { useStoryStore, type StoryGenre, type StoryEvent } from '@/store/story.store';
 import { useSSE } from './useSSE';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
-import { logger } from '@/lib/logger';
 
 interface StartStoryParams {
   genre: StoryGenre;
@@ -30,7 +28,7 @@ export const useStorySession = () => {
         data = JSON.parse(event.data);
       }
 
-      logger.debug('Story SSE event', { data }, 'SYSTEM');
+      console.log('Story SSE event:', data);
 
       switch (data.type) {
         case 'chapter':
@@ -44,13 +42,13 @@ export const useStorySession = () => {
           break;
         case 'prompt':
           // Micro-prompt narratif - peut être utilisé pour des interactions subtiles
-          logger.debug('Narrative prompt', { payload: data.payload }, 'SYSTEM');
+          console.log('Narrative prompt:', data.payload);
           break;
         default:
-          logger.warn('Unknown SSE event type', { type: data.type }, 'SYSTEM');
+          console.warn('Unknown SSE event type:', data.type);
       }
     } catch (error) {
-      logger.error('Error parsing SSE message', error as Error, 'SYSTEM');
+      console.error('Error parsing SSE message:', error, event.data);
     }
   }, [store]);
 
@@ -94,7 +92,7 @@ export const useStorySession = () => {
         throw new Error('Réponse invalide du serveur');
       }
     } catch (error) {
-      logger.error('Error starting story', error as Error, 'SYSTEM');
+      console.error('Error starting story:', error);
       store.setError('Impossible de lancer l\'histoire');
       store.setPhase('idle');
       toast({
@@ -108,7 +106,7 @@ export const useStorySession = () => {
   // Envoyer un choix utilisateur
   const sendChoice = useCallback(async (choiceId: string) => {
     if (!store.sessionId) {
-      logger.error('No session ID available', new Error('Missing session ID'), 'SYSTEM');
+      console.error('No session ID available');
       return;
     }
 
@@ -134,7 +132,7 @@ export const useStorySession = () => {
       }
 
     } catch (error) {
-      logger.error('Error sending choice', error as Error, 'SYSTEM');
+      console.error('Error sending choice:', error);
       toast({
         title: "Erreur",
         description: "Impossible d'envoyer votre choix. Réessayez.",
@@ -147,7 +145,7 @@ export const useStorySession = () => {
   // Exporter l'histoire en podcast
   const exportStory = useCallback(async (format: 'mp3' = 'mp3', includeArtwork = true) => {
     if (!store.sessionId) {
-      logger.error('No session ID available for export', new Error('Missing session ID'), 'SYSTEM');
+      console.error('No session ID available for export');
       return;
     }
 
@@ -182,7 +180,7 @@ export const useStorySession = () => {
         throw new Error('URL de téléchargement manquante');
       }
     } catch (error) {
-      logger.error('Error exporting story', error as Error, 'SYSTEM');
+      console.error('Error exporting story:', error);
       store.setPhase('choosing');
       toast({
         title: "Erreur d'export",

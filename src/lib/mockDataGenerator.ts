@@ -1,4 +1,4 @@
-// @ts-nocheck
+
 import { MoodData } from '@/types/emotion';
 
 // Update the generator to use the correct properties

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Mic, Square, Loader2 } from 'lucide-react';
@@ -55,7 +54,7 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
       
       updateVolume();
     } catch (error) {
-      // Volume monitoring setup failed - silent
+      console.error('Volume monitoring setup failed:', error);
     }
   }, [recording]);
 
@@ -112,7 +111,7 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
       }, 1000);
 
     } catch (error) {
-      // Recording start failed
+      console.error('Recording start failed:', error);
       onPermissionDenied();
     }
   };

@@ -1,6 +1,5 @@
 import React from 'react';
-import { captureException } from '@/lib/ai-monitoring';
-import { Sentry } from '@/lib/errors/sentry-compat';
+import * as Sentry from '@sentry/react';
 import dayjs from 'dayjs';
 import 'dayjs/locale/fr';
 import { useParams, Link, useLocation } from 'react-router-dom';

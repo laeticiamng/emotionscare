@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import { Notification, NotificationFilter, NotificationType } from '@/types/notifications';
 

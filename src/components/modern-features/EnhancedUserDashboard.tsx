@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * EnhancedUserDashboard - Version améliorée du tableau de bord utilisateur
  * Ajoute des fonctionnalités modernes tout en conservant la structure existante
@@ -15,23 +14,18 @@ import AnalyticsTab from '../dashboard/tabs/AnalyticsTab';
 import JournalTab from '../dashboard/tabs/JournalTab';
 import PersonalDataTab from '../dashboard/tabs/PersonalDataTab';
 import { User } from '@/types/user';
-import {
-  TrendingUp,
-  Target,
-  Calendar,
+import { 
+  TrendingUp, 
+  Target, 
+  Calendar, 
   Award,
   Bell,
   Settings,
   Download,
   Share2,
   RefreshCw,
-  Clock,
-  Loader2
+  Clock
 } from 'lucide-react';
-import { logger } from '@/lib/logger';
-import { useDashboard } from '@/hooks/useDashboard';
-import { useDashboardWeekly } from '@/hooks/useDashboardWeekly';
-import { useQueryClient } from '@tanstack/react-query';
 
 interface EnhancedUserDashboardProps {
   user: User;
@@ -41,100 +35,70 @@ const EnhancedUserDashboard: React.FC<EnhancedUserDashboardProps> = ({ user }) =
   const [lastUpdate, setLastUpdate] = useState(new Date());
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
-  const queryClient = useQueryClient();
 
   // Les collaborateurs B2B n'ont accès qu'à leurs données personnelles
   const isB2BUser = user.role === 'b2b_user';
 
-  // Fetch real dashboard data via hooks
-  const { stats, weeklySummary, recommendations, isLoading } = useDashboard(user.id);
-  const { data: weeklyData } = useDashboardWeekly();
-
-  // Calculate dashboard stats from real API data
-  // Goals are derived from user's activity patterns and recommendations
-  const totalSessions = stats?.totalSessions || 0;
-  const streakDays = stats?.streakDays || 0;
-
-  // Calculate monthly goals: baseline of 12 sessions/month (3/week)
-  // Adjusted based on user's current activity level
-  const baselineGoals = 12;
-  const activityMultiplier = totalSessions > 20 ? 1.5 : totalSessions > 10 ? 1.25 : 1;
-  const monthlyGoals = Math.round(baselineGoals * activityMultiplier);
-
-  // Calculate completed goals from weekly summary
-  // Goals completed = weeks with 3+ sessions
-  const weeksWithActivity = weeklySummary?.weeksCompleted || 0;
-  const completedGoals = Math.min(monthlyGoals, Math.round(weeksWithActivity * 0.75));
-
+  // Données simulées pour l'aperçu amélioré
   const dashboardStats = {
-    weeklyProgress: stats?.wellnessScore || 0,
-    monthlyGoals,
-    completedGoals,
-    currentStreak: streakDays,
-    totalSessions,
-    averageRating: weeklyData?.today?.glow_score ? weeklyData.today.glow_score / 10 : 0,
-    timeSpent: weeklySummary?.totalMinutes || 0,
-    nextMilestone: Math.ceil((totalSessions) / 10) * 10 + 10
+    weeklyProgress: 78,
+    monthlyGoals: 12,
+    completedGoals: 9,
+    currentStreak: 5,
+    totalSessions: 47,
+    averageRating: 4.6,
+    timeSpent: 142, // en minutes cette semaine
+    nextMilestone: 50 // prochaine session milestone
   };
 
-  // Map recent activities from real data
-  const recentActivities = stats?.recentActivity?.slice(0, 4).map((activity: any) => ({
-    type: activity.module_name,
-    title: `Session ${activity.module_name}`,
-    time: new Date(activity.created_at).toLocaleDateString('fr-FR'),
-    status: 'completed'
-  })) || [];
+  const recentActivities = [
+    { type: 'session', title: 'Session de méditation', time: '2h ago', status: 'completed' },
+    { type: 'journal', title: 'Entrée de journal', time: '5h ago', status: 'draft' },
+    { type: 'goal', title: 'Objectif atteint: Exercice quotidien', time: '1d ago', status: 'achieved' },
+    { type: 'assessment', title: 'Auto-évaluation hebdomadaire', time: '2d ago', status: 'pending' }
+  ];
 
-  const upcomingReminders = recommendations?.slice(0, 3).map((rec: any) => ({
-    title: rec.title || 'Recommandation',
-    time: rec.suggested_timing || 'Bientôt',
-    type: rec.module_name || 'session'
-  })) || [];
+  const upcomingReminders = [
+    { title: 'Session planifiée', time: 'Dans 2h', type: 'session' },
+    { title: 'Rappel journal', time: 'Ce soir 20h', type: 'journal' },
+    { title: 'Bilan hebdomadaire', time: 'Vendredi', type: 'assessment' }
+  ];
 
   const quickActions = [
     { 
       title: 'Nouvelle session', 
       desc: 'Commencer maintenant',
       icon: <TrendingUp className="h-4 w-4" />,
-      action: () => logger.debug('Nouvelle session', undefined, 'UI'),
+      action: () => console.log('Nouvelle session'),
       variant: 'default' as const
     },
     { 
       title: 'Ajouter entrée', 
       desc: 'Journal personnel',
       icon: <Calendar className="h-4 w-4" />,
-      action: () => logger.debug('Nouveau journal', undefined, 'UI'),
+      action: () => console.log('Nouveau journal'),
       variant: 'outline' as const
     },
     { 
       title: 'Voir objectifs', 
       desc: 'Gérer vos buts',
       icon: <Target className="h-4 w-4" />,
-      action: () => logger.debug('Objectifs', undefined, 'UI'),
+      action: () => console.log('Objectifs'),
       variant: 'outline' as const
     }
   ];
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    try {
-      // Invalidate all dashboard queries to refetch fresh data
-      await queryClient.invalidateQueries({ queryKey: ['dashboard'] });
-      await queryClient.invalidateQueries({ queryKey: ['dashboard-stats'] });
-      await queryClient.invalidateQueries({ queryKey: ['dashboard-weekly'] });
-      await queryClient.invalidateQueries({ queryKey: ['dashboard-modules'] });
-      await queryClient.invalidateQueries({ queryKey: ['dashboard-recommendations'] });
-      setLastUpdate(new Date());
-    } catch (error) {
-      logger.error('Erreur lors du rafraîchissement', error, 'UI');
-    } finally {
-      setIsRefreshing(false);
-    }
+    // Simulation du rechargement des données
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    setLastUpdate(new Date());
+    setIsRefreshing(false);
   };
 
   const exportData = () => {
     // Simulation de l'export
-    logger.debug('Export des données...', undefined, 'UI');
+    console.log('Export des données...');
   };
 
   useEffect(() => {
@@ -145,21 +109,9 @@ const EnhancedUserDashboard: React.FC<EnhancedUserDashboardProps> = ({ user }) =
     return () => clearInterval(interval);
   }, []);
 
-  // Show loading state while fetching data
-  if (isLoading) {
-    return (
-      <div className="container mx-auto px-4 py-6 flex items-center justify-center min-h-[400px]">
-        <div className="text-center">
-          <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto mb-4" />
-          <p className="text-muted-foreground">Chargement de votre tableau de bord...</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="container mx-auto px-4 py-6 space-y-6">
-
+      
       {/* En-tête amélioré */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
@@ -357,17 +309,17 @@ const EnhancedUserDashboard: React.FC<EnhancedUserDashboardProps> = ({ user }) =
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="p-4 bg-blue-50 dark:bg-blue-900/30 rounded-lg border-l-4 border-blue-500">
-              <h4 className="font-medium text-blue-900 dark:text-blue-100">Prochain objectif suggéré</h4>
-              <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
-                Vous approchez de votre {dashboardStats.nextMilestone}e session !
+            <div className="p-4 bg-blue-50 rounded-lg border-l-4 border-blue-500">
+              <h4 className="font-medium text-blue-900">Prochain objectif suggéré</h4>
+              <p className="text-sm text-blue-700 mt-1">
+                Vous approchez de votre {dashboardStats.nextMilestone}e session ! 
                 Continuez sur cette lancée pour débloquer de nouveaux badges.
               </p>
             </div>
-            <div className="p-4 bg-green-50 dark:bg-green-900/30 rounded-lg border-l-4 border-green-500">
-              <h4 className="font-medium text-green-900 dark:text-green-100">Habitude en formation</h4>
-              <p className="text-sm text-green-700 dark:text-green-300 mt-1">
-                Votre série de {dashboardStats.currentStreak} jours est excellente !
+            <div className="p-4 bg-green-50 rounded-lg border-l-4 border-green-500">
+              <h4 className="font-medium text-green-900">Habitude en formation</h4>
+              <p className="text-sm text-green-700 mt-1">
+                Votre série de {dashboardStats.currentStreak} jours est excellente ! 
                 Maintenez le rythme pour atteindre la série de 7 jours.
               </p>
             </div>

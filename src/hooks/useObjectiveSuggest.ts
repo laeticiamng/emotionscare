@@ -1,7 +1,5 @@
-// @ts-nocheck
 import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { logger } from '@/lib/logger';
 
 interface ObjectiveSuggestion {
   text: string;
@@ -41,7 +39,7 @@ export const useObjectiveSuggest = () => {
       }
       
     } catch (error) {
-      logger.error('Error generating suggestions', error as Error, 'SYSTEM');
+      console.error('Error generating suggestions:', error);
       setError('Erreur lors de la génération des suggestions');
       
       // Always provide fallback suggestions

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { supabase } from '@/integrations/supabase/client';
 import { invokeSupabaseEdge } from '@/lib/network/supabaseEdge';
 
@@ -2094,7 +2093,7 @@ class ClinicalScoringService {
         },
       };
     } catch (error) {
-      // Silent: clinical scoring submission error logged internally
+      console.error('[clinicalScoringService] submit failed', error);
       return { success: false };
     }
   }

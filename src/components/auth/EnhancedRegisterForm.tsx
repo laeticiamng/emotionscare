@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
@@ -14,7 +15,6 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import LoadingAnimation from '@/components/ui/LoadingAnimation';
-import { logger } from '@/lib/logger';
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -38,7 +38,7 @@ const EnhancedRegisterForm: React.FC = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   
   const navigate = useNavigate();
-  const { register } = useAuth();
+  const { register, error: authError, clearError } = useAuth();
   const { toast } = useToast();
   const { theme } = useTheme();
   
@@ -53,8 +53,11 @@ const EnhancedRegisterForm: React.FC = () => {
   });
   
   useEffect(() => {
-    // Clean up on unmount
-  }, []);
+    // Clean up error on unmount
+    return () => {
+      if (clearError) clearError();
+    };
+  }, [clearError]);
   
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsLoading(true);
@@ -64,8 +67,10 @@ const EnhancedRegisterForm: React.FC = () => {
       navigator.vibrate(50);
     }
     
+    if (clearError) clearError();
+    
     try {
-      await register(values.email, values.password, { name: values.name });
+      const user = await register(values.name, values.email, values.password);
       
       // Success toast notification
       toast({
@@ -80,7 +85,7 @@ const EnhancedRegisterForm: React.FC = () => {
       }, 500);
       
     } catch (error: any) {
-      logger.error("Erreur d'inscription", { error }, 'AUTH');
+      console.error("Erreur d'inscription:", error);
       
       toast({
         title: "Inscription impossible",
@@ -278,7 +283,16 @@ const EnhancedRegisterForm: React.FC = () => {
                   />
                 </motion.div>
                 
-                {/* No auth error display needed - using toast */}
+                {authError && (
+                  <motion.div 
+                    className="p-3 rounded-md bg-destructive/10 text-destructive text-sm border border-destructive/20"
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    {authError}
+                  </motion.div>
+                )}
                 
                 <motion.div variants={itemVariants}>
                   <Button

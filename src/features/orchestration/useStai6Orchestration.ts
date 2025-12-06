@@ -1,10 +1,8 @@
-// @ts-nocheck
 import { useCallback, useEffect, useMemo, useRef } from 'react';
-import { captureException } from '@/lib/ai-monitoring';
+import * as Sentry from '@sentry/react';
 
 import { useAssessment } from '@/hooks/useAssessment';
 import { useFlags } from '@/core/flags';
-import { logger } from '@/lib/logger';
 
 export type CalmProfile = 'silent_anchor' | 'soft_guided' | 'standard';
 export type Guidance = 'none' | 'breath_long_exhale' | 'grounding_soft';
@@ -57,7 +55,12 @@ export const sanitizeSummaryLabel = (label: string | null | undefined, level: nu
 };
 
 const logBreadcrumb = (message: string, data?: Record<string, unknown>) => {
-  logger.info(message, data, 'NYVEE');
+  Sentry.addBreadcrumb({
+    category: 'nyvee',
+    level: 'info',
+    message,
+    data,
+  });
 };
 
 export const useStai6Orchestration = (): Stai6Orchestration => {
@@ -97,7 +100,7 @@ export const useStai6Orchestration = (): Stai6Orchestration => {
       await assessment.start();
       lastPhaseRef.current = 'pre';
     } catch (error) {
-      logger.error('[useStai6Orchestration] unable to start pre STAI-6', error as Error, 'SYSTEM');
+      console.error('[useStai6Orchestration] unable to start pre STAI-6', error);
     }
   }, [assessment, featureEnabled]);
 
@@ -109,7 +112,7 @@ export const useStai6Orchestration = (): Stai6Orchestration => {
       await assessment.start();
       lastPhaseRef.current = 'post';
     } catch (error) {
-      logger.error('[useStai6Orchestration] unable to start post STAI-6', error as Error, 'SYSTEM');
+      console.error('[useStai6Orchestration] unable to start post STAI-6', error);
     }
   }, [assessment, featureEnabled]);
 

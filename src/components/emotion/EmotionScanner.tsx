@@ -1,5 +1,5 @@
+
 import React, { useState, useRef } from 'react';
-import { logger } from '@/lib/logger';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -121,7 +121,7 @@ const EmotionScanner: React.FC<EmotionScannerProps> = ({ onScanComplete, onClose
       toast.success('Analyse émotionnelle terminée !');
       
     } catch (error) {
-      logger.error('Error analyzing text emotion', error as Error, 'EMOTION');
+      console.error('Error analyzing text emotion:', error);
       toast.error('Erreur lors de l\'analyse émotionnelle');
     } finally {
       setIsProcessing(false);
@@ -169,7 +169,7 @@ const EmotionScanner: React.FC<EmotionScannerProps> = ({ onScanComplete, onClose
       toast.success('Analyse vocale terminée !');
       
     } catch (error) {
-      logger.error('Error analyzing audio emotion', error as Error, 'EMOTION');
+      console.error('Error analyzing audio emotion:', error);
       toast.error('Erreur lors de l\'analyse vocale');
     } finally {
       setIsProcessing(false);
@@ -210,7 +210,7 @@ const EmotionScanner: React.FC<EmotionScannerProps> = ({ onScanComplete, onClose
       toast.success('Analyse des émojis terminée !');
       
     } catch (error) {
-      logger.error('Error analyzing emoji emotion', error as Error, 'EMOTION');
+      console.error('Error analyzing emoji emotion:', error);
       toast.error('Erreur lors de l\'analyse des émojis');
     } finally {
       setIsProcessing(false);

@@ -1,6 +1,5 @@
 "use client";
 import React from "react";
-import { Link } from "react-router-dom";
 import PageHeader from "@/components/ui/PageHeader";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,9 +12,7 @@ export default function ScoresV2Page() {
       <Card>
         <ScoresV2Panel />
         <div style={{ marginTop: 12 }}>
-          <Button asChild>
-            <Link to="/app/scores">Accéder à la page principale</Link>
-          </Button>
+          <Button href="/app/scores">Accéder à la page principale</Button>
         </div>
       </Card>
     </main>

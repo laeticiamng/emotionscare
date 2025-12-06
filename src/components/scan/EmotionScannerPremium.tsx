@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 /**
  * EMOTION SCANNER PREMIUM - EMOTIONSCARE
  * Scanner d'émotions avancé avec IA, accessible et performant
@@ -142,7 +140,7 @@ const EmotionScannerPremium: React.FC<EmotionScannerPremiumProps> = ({
       setHasPermissions(true);
     } catch (error) {
       setHasPermissions(false);
-      // Missing permissions - silent warning
+      console.warn('Permissions manquantes:', error);
     }
   };
 
@@ -193,7 +191,7 @@ const EmotionScannerPremium: React.FC<EmotionScannerPremiumProps> = ({
         videoRef.current.srcObject = stream;
       }
     } catch (error) {
-      // Camera error
+      console.error('Erreur caméra:', error);
       throw error;
     }
   };

@@ -1,7 +1,6 @@
-// @ts-nocheck
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { Sentry } from '@/lib/errors/sentry-compat';
+import * as Sentry from '@sentry/react';
 import { useToast } from '@/hooks/use-toast';
 import {
   cancelScheduledBreak,

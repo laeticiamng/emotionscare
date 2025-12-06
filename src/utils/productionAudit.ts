@@ -1,10 +1,7 @@
-// @ts-nocheck
 
 /**
  * Utilitaires d'audit pour la mise en production
  */
-
-import { logger } from '@/lib/logger';
 
 export interface ProductionAuditResult {
   isReady: boolean;
@@ -55,13 +52,25 @@ export const runProductionAudit = (): ProductionAuditResult => {
 export const logProductionAudit = () => {
   const audit = runProductionAudit();
   
-  logger.info('🔍 AUDIT DE PRODUCTION', {
-    score: audit.score,
-    isReady: audit.isReady,
-    critical: audit.critical,
-    warnings: audit.warnings,
-    recommendations: audit.recommendations
-  }, 'SYSTEM');
+  console.log('🔍 AUDIT DE PRODUCTION');
+  console.log('======================');
+  console.log(`Score: ${audit.score}/100`);
+  console.log(`Prêt pour production: ${audit.isReady ? '✅' : '❌'}`);
+  
+  if (audit.critical.length > 0) {
+    console.log('\n❌ PROBLÈMES CRITIQUES:');
+    audit.critical.forEach(issue => console.log(`  - ${issue}`));
+  }
+  
+  if (audit.warnings.length > 0) {
+    console.log('\n⚠️ AVERTISSEMENTS:');
+    audit.warnings.forEach(warning => console.log(`  - ${warning}`));
+  }
+  
+  if (audit.recommendations.length > 0) {
+    console.log('\n💡 RECOMMANDATIONS:');
+    audit.recommendations.forEach(rec => console.log(`  - ${rec}`));
+  }
   
   return audit;
 };

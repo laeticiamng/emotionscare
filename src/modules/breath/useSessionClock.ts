@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { logger } from '@/lib/logger';
 
 export type SessionClockState = 'idle' | 'running' | 'paused' | 'completed';
 
@@ -60,7 +59,7 @@ export function useSessionClock({ durationMs, tickMs = 200 }: UseSessionClockOpt
       try {
         handler(value);
       } catch (error) {
-        logger.error('SessionClock tick handler failed', { error }, 'BREATH');
+        console.error('SessionClock tick handler failed', error);
       }
     });
   }, []);

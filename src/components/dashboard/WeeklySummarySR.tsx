@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 import { type GlowBucket } from '@/hooks/useDashboardWeekly';
 import { useTranslation } from 'react-i18next';

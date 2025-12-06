@@ -1,7 +1,5 @@
-// @ts-nocheck
 
 import React, { createContext, useContext, useState } from 'react';
-import { logger } from '@/lib/logger';
 
 type SoundscapeType = 'nature' | 'urban' | 'meditation' | 'focus' | 'none';
 type SoundVolume = 'low' | 'medium' | 'high' | 'mute';
@@ -38,11 +36,11 @@ export const SoundscapeProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   
   const playFunctionalSound = (soundType: 'success' | 'error' | 'notification' | 'click' | 'transition') => {
     // Mock implementation - would play a sound based on type
-    logger.debug(`Playing ${soundType} sound`, undefined, 'MUSIC');
+    console.log(`Playing ${soundType} sound`);
   };
   
   const updateSoundscapeForEmotion = (emotion: string) => {
-    logger.info(`Updating soundscape for emotion: ${emotion}`, undefined, 'MUSIC');
+    console.log(`Updating soundscape for emotion: ${emotion}`);
     // Map emotions to soundscape types
     const emotionToSoundscape: Record<string, SoundscapeType> = {
       'happy': 'nature',

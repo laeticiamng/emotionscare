@@ -1,52 +1,14 @@
-// @ts-nocheck
-/**
- * openai-integration-test - Test d'intégration OpenAI
- *
- * 🔒 SÉCURISÉ: Auth admin + Rate limit 5/min + CORS restrictif
- */
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
-import { authorizeRole } from '../_shared/auth.ts';
-import { cors, preflightResponse, rejectCors } from '../_shared/cors.ts';
-import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
 
 serve(async (req) => {
-  const corsResult = cors(req);
-  const corsHeaders = {
-    ...corsResult.headers,
-    'X-Content-Type-Options': 'nosniff',
-    'X-Frame-Options': 'DENY',
-  };
-
   if (req.method === 'OPTIONS') {
-    return preflightResponse(corsResult);
-  }
-
-  if (!corsResult.allowed) {
-    return rejectCors(corsResult);
-  }
-
-  const { user, status } = await authorizeRole(req, ['admin']);
-  if (!user) {
-    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-      status,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
-  }
-
-  const rateLimit = await enforceEdgeRateLimit(req, {
-    route: 'openai-integration-test',
-    userId: user.id,
-    limit: 5,
-    windowMs: 60_000,
-    description: 'OpenAI integration test - Admin only',
-  });
-
-  if (!rateLimit.allowed) {
-    return buildRateLimitResponse(rateLimit, corsHeaders, {
-      errorCode: 'rate_limit_exceeded',
-      message: `Trop de requêtes. Réessayez dans ${rateLimit.retryAfterSeconds}s.`,
-    });
+    return new Response(null, { headers: corsHeaders });
   }
 
   try {

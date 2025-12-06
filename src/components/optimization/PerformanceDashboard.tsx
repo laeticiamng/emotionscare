@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -25,7 +23,6 @@ import {
 import { usePerformanceMonitor } from '@/hooks/usePerformanceMonitor';
 import { useServiceWorker, useCacheManager } from '@/hooks/optimization/useServiceWorker';
 import { performanceMonitor } from '@/lib/performance/performanceMonitor';
-import { logger } from '@/lib/logger';
 
 interface PerformanceMetric {
   name: string;
@@ -200,7 +197,7 @@ const PerformanceDashboard: React.FC = () => {
         
         setTimeout(() => observer.disconnect(), 5000);
       } catch (error) {
-        logger.warn('PerformanceObserver non supporté', error as Error, 'SYSTEM');
+        console.warn('PerformanceObserver non supporté:', error);
       }
     }
     

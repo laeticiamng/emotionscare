@@ -8,8 +8,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { 
   Heart, MessageCircle, Share2, Bookmark, MoreHorizontal, Send, 
-  Image, Video, Mic, MapPin, Smile, TrendingUp, Users, 
-  Flame, Award, Eye, ThumbsUp, Zap, Camera, Paperclip
+  Image, Video, Mic, MapPin, Smile, Trending, Users, 
+  Fire, Award, Eye, ThumbsUp, Zap, Camera, Paperclip
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
@@ -112,7 +112,7 @@ export default function EnhancedCommunityFeed() {
             badge: undefined
           },
           timestamp: formatTimestamp(post.created_at),
-          media: post.media_urls ? post.media_urls.map((url: string) => ({
+          media: post.media_urls ? post.media_urls.map(url => ({
             type: 'image' as const,
             url
           })) : [],
@@ -134,7 +134,7 @@ export default function EnhancedCommunityFeed() {
         setPosts(formattedPosts);
       }
     } catch (error) {
-      // Posts loading error
+      console.error('Error loading posts:', error);
     }
   };
 
@@ -174,7 +174,7 @@ export default function EnhancedCommunityFeed() {
         triggerConfetti();
       }
     } catch (error) {
-      // Post creation error
+      console.error('Error creating post:', error);
     }
   };
 
@@ -209,7 +209,7 @@ export default function EnhancedCommunityFeed() {
 
       setSelectedReaction(null);
     } catch (error) {
-      // Reaction handling error
+      console.error('Error handling reaction:', error);
     }
   };
 
@@ -250,7 +250,7 @@ export default function EnhancedCommunityFeed() {
         description: "Votre commentaire a été publié",
       });
     } catch (error) {
-      // Comment adding error
+      console.error('Error adding comment:', error);
     }
   };
 
@@ -291,7 +291,7 @@ export default function EnhancedCommunityFeed() {
         <div className="flex flex-wrap justify-center gap-2">
           {[
             { key: 'all', label: 'Tout', icon: Users },
-            { key: 'trending', label: 'Tendances', icon: TrendingUp },
+            { key: 'trending', label: 'Tendances', icon: Trending },
             { key: 'following', label: 'Abonnements', icon: Heart },
             { key: 'featured', label: 'À la une', icon: Award }
           ].map(filterOption => (
@@ -363,15 +363,15 @@ export default function EnhancedCommunityFeed() {
                 <Video className="h-4 w-4 mr-2" />
                 Vidéo
               </Button>
-              <Button variant="ghost" size="sm" aria-label="Ajouter un audio">
+              <Button variant="ghost" size="sm">
                 <Mic className="h-4 w-4 mr-2" />
                 Audio
               </Button>
-              <Button variant="ghost" size="sm" aria-label="Ajouter un lieu">
+              <Button variant="ghost" size="sm">
                 <MapPin className="h-4 w-4 mr-2" />
                 Lieu
               </Button>
-              <Button variant="ghost" size="sm" aria-label="Ajouter une humeur">
+              <Button variant="ghost" size="sm">
                 <Smile className="h-4 w-4 mr-2" />
                 Humeur
               </Button>
@@ -440,7 +440,7 @@ export default function EnhancedCommunityFeed() {
                         <>
                           <span>•</span>
                           <Badge variant="destructive" className="text-xs">
-                            <Flame className="h-3 w-3 mr-1" />
+                            <Fire className="h-3 w-3 mr-1" />
                             Tendance
                           </Badge>
                         </>
@@ -448,7 +448,7 @@ export default function EnhancedCommunityFeed() {
                     </div>
                   </div>
                 </div>
-                <Button variant="ghost" size="sm" aria-label="Plus d'options">
+                <Button variant="ghost" size="sm">
                   <MoreHorizontal className="h-4 w-4" />
                 </Button>
               </div>
@@ -487,7 +487,7 @@ export default function EnhancedCommunityFeed() {
                           controls
                         />
                       )}
-                      {post.media && post.media.length > 4 && index === 3 && (
+                      {post.media.length > 4 && index === 3 && (
                         <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-white font-semibold">
                           +{post.media.length - 4}
                         </div>
@@ -565,7 +565,7 @@ export default function EnhancedCommunityFeed() {
                     <Share2 className="h-4 w-4 mr-2" />
                     Partager
                   </Button>
-                  <Button variant="ghost" size="sm" aria-label="Sauvegarder">
+                  <Button variant="ghost" size="sm">
                     <Bookmark className="h-4 w-4 mr-2" />
                     Sauver
                   </Button>
@@ -612,7 +612,7 @@ export default function EnhancedCommunityFeed() {
                           </div>
                           <div className="flex items-center gap-4 mt-1 text-xs text-muted-foreground">
                             <span>{comment.timestamp}</span>
-                            <Button variant="ghost" size="sm" className="h-auto p-0 text-xs" aria-label="Répondre au commentaire">
+                            <Button variant="ghost" size="sm" className="h-auto p-0 text-xs">
                               Répondre
                             </Button>
                           </div>

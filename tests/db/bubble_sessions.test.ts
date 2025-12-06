@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { sql } from 'kysely';
 import { expect, test, afterEach } from 'vitest';
 import { db, resetTables } from '../helpers/db';

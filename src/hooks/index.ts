@@ -1,11 +1,10 @@
-// @ts-nocheck
 /**
  * HOOKS UNIFIÉS - Index central pour tous les hooks
  * Architecture premium avec accessibilité WCAG AAA
  */
 
 // Export du store unifié
-export {
+export { 
   useUnifiedStore, 
   useUnifiedContext,
   useAuth,
@@ -22,7 +21,6 @@ export { useToast, toast } from './use-toast';
 export { useClinicalHints } from './useClinicalHints';
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { logger } from '@/lib/logger';
 
 // ==================== HOOK MOBILE OPTIMISÉ ====================
 export const useMobile = () => {
@@ -70,7 +68,7 @@ export const useLocalStorage = <T>(key: string, initialValue: T) => {
       const item = window.localStorage.getItem(key);
       return item ? JSON.parse(item) : initialValue;
     } catch (error) {
-      logger.warn(`Error reading localStorage key "${key}"`, { error }, 'SYSTEM');
+      console.warn(`Error reading localStorage key "${key}":`, error);
       return initialValue;
     }
   });
@@ -84,7 +82,7 @@ export const useLocalStorage = <T>(key: string, initialValue: T) => {
         window.localStorage.setItem(key, JSON.stringify(valueToStore));
       }
     } catch (error) {
-      logger.warn(`Error setting localStorage key "${key}"`, { error }, 'SYSTEM');
+      console.warn(`Error setting localStorage key "${key}":`, error);
     }
   }, [key, storedValue]);
 
@@ -184,7 +182,7 @@ export const usePerformanceMonitor = (componentName: string) => {
     if (import.meta.env.DEV) {
       const renderTime = Date.now() - startTime.current;
       if (renderTime > 16) { // > 1 frame at 60fps
-        logger.warn(`⚡ Slow render in ${componentName}: ${renderTime}ms (render #${renderCount.current})`, {}, 'SYSTEM');
+        console.warn(`⚡ Slow render in ${componentName}: ${renderTime}ms (render #${renderCount.current})`);
       }
     }
     
@@ -196,7 +194,7 @@ export const usePerformanceMonitor = (componentName: string) => {
     logSlowRender: (threshold = 16) => {
       const renderTime = Date.now() - startTime.current;
       if (renderTime > threshold) {
-        logger.warn(`⚡ Slow render detected: ${renderTime}ms`, {}, 'SYSTEM');
+        console.warn(`⚡ Slow render detected: ${renderTime}ms`);
       }
     }
   };

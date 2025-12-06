@@ -1,6 +1,4 @@
-// @ts-nocheck
 import { useState, useEffect } from 'react';
-import { logger } from '@/lib/logger';
 
 interface PrivacyPrefs {
   camera: boolean;
@@ -31,7 +29,7 @@ export const usePrivacyPrefs = () => {
         setPrefs({ ...DEFAULT_PREFS, ...parsedPrefs });
       }
     } catch (error) {
-      logger.warn('Failed to load privacy preferences', error as Error, 'SYSTEM');
+      console.warn('Failed to load privacy preferences:', error);
     } finally {
       setIsLoaded(true);
     }
@@ -45,7 +43,7 @@ export const usePrivacyPrefs = () => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedPrefs));
     } catch (error) {
-      logger.warn('Failed to save privacy preferences', error as Error, 'SYSTEM');
+      console.warn('Failed to save privacy preferences:', error);
     }
   };
 
@@ -55,7 +53,7 @@ export const usePrivacyPrefs = () => {
     try {
       localStorage.removeItem(STORAGE_KEY);
     } catch (error) {
-      logger.warn('Failed to reset privacy preferences', error as Error, 'SYSTEM');
+      console.warn('Failed to reset privacy preferences:', error);
     }
   };
 

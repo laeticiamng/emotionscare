@@ -1,7 +1,5 @@
-// @ts-nocheck
 
 import { useState, useEffect } from 'react';
-import { logger } from '@/lib/logger';
 
 // Hook for persistent storage using localStorage
 export function useLocalStorage<T>(key: string, initialValue: T): [T, (value: T | ((val: T) => T)) => void] {
@@ -18,7 +16,7 @@ export function useLocalStorage<T>(key: string, initialValue: T): [T, (value: T 
       return item ? JSON.parse(item) : initialValue;
     } catch (error) {
       // If error, return initialValue
-      logger.error('Error reading from localStorage', error as Error, 'SYSTEM');
+      console.error('Error reading from localStorage:', error);
       return initialValue;
     }
   });
@@ -39,7 +37,7 @@ export function useLocalStorage<T>(key: string, initialValue: T): [T, (value: T 
         window.localStorage.setItem(key, JSON.stringify(valueToStore));
       }
     } catch (error) {
-      logger.error('Error writing to localStorage', error as Error, 'SYSTEM');
+      console.error('Error writing to localStorage:', error);
     }
   };
   
@@ -52,7 +50,7 @@ export function useLocalStorage<T>(key: string, initialValue: T): [T, (value: T 
         const newValue = e.newValue ? JSON.parse(e.newValue) as T : initialValue;
         setStoredValue(newValue);
       } catch (error) {
-        logger.error('Error parsing localStorage change', error as Error, 'SYSTEM');
+        console.error('Error parsing localStorage change:', error);
       }
     };
     

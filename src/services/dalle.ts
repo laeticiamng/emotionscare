@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 // DALL-E Service
 export interface DALLEOptions {
@@ -37,7 +36,7 @@ const generateImage = async (prompt: string, options: DALLEOptions = {}): Promis
     const data = await response.json();
     return data.data[0].url;
   } catch (error) {
-    // Silent: DALL-E generation error logged internally
+    console.error('Error generating image with DALL-E:', error);
     throw error;
   }
 };
@@ -48,7 +47,7 @@ const generateVariations = async (imageUrl: string, options: DALLEOptions = {}):
     // This is a simplified mock implementation
     return [imageUrl];
   } catch (error) {
-    // Silent: DALL-E variations error logged internally
+    console.error('Error generating image variations with DALL-E:', error);
     throw error;
   }
 };

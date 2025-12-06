@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { CoachCharacterProps } from '@/types/coach';
 import { cn } from '@/lib/utils';

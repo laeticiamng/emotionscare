@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -33,7 +32,7 @@ export const AbsenteeismChart: React.FC<AbsenteeismChartProps> = ({ data = defau
             <XAxis dataKey="date" />
             <YAxis />
             <Tooltip />
-            <Area type="monotone" dataKey="value" stroke="hsl(var(--primary))" fill="hsl(var(--primary) / 0.5)" />
+            <Area type="monotone" dataKey="value" stroke="#8884d8" fill="#8884d8" />
           </AreaChart>
         </ResponsiveContainer>
       </CardContent>

@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -25,7 +24,7 @@ const SocialCocoonCard: React.FC<SocialCocoonCardProps> = ({
     <Card>
       <CardHeader className="pb-2">
         <CardTitle className="text-lg flex items-center">
-          <Users className="h-5 w-5 mr-2 text-primary" />
+          <Users className="h-5 w-5 mr-2 text-indigo-500" />
           Social Cocoon
         </CardTitle>
       </CardHeader>

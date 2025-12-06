@@ -1,7 +1,5 @@
-// @ts-nocheck
 import React, { useEffect, useState } from 'react';
 import { Activity } from 'lucide-react';
-import { logger } from '@/lib/logger';
 
 export const PerformanceMonitor: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -26,7 +24,7 @@ export const PerformanceMonitor: React.FC = () => {
     try {
       observer.observe({ entryTypes: ['paint'] });
     } catch (error) {
-      logger.warn('Performance Observer not supported', error as Error, 'SYSTEM');
+      console.warn('Performance Observer not supported');
     }
 
     return () => observer.disconnect();

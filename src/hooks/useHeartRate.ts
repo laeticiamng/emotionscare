@@ -1,7 +1,5 @@
-// @ts-nocheck
 import { useCallback, useEffect } from 'react';
 import { useHRStore, type HRReading } from '@/store/hr.store';
-import { logger } from '@/lib/logger';
 
 const HEART_RATE_SERVICE_UUID = 'heart_rate';
 const HEART_RATE_MEASUREMENT_UUID = 'heart_rate_measurement';
@@ -40,7 +38,7 @@ export const useHeartRate = () => {
     
     // Validate range
     if (heartRate < 30 || heartRate > 220) {
-      logger.warn('Invalid heart rate reading', { heartRate }, 'SYSTEM');
+      console.warn('Invalid heart rate reading:', heartRate);
       return 0;
     }
     
@@ -58,7 +56,7 @@ export const useHeartRate = () => {
     store.setError(null);
 
     try {
-      logger.info('Requesting Bluetooth device', undefined, 'SYSTEM');
+      console.log('Requesting Bluetooth device...');
       
       // Request device with heart rate service
       const device = await navigator.bluetooth.requestDevice({
@@ -66,26 +64,26 @@ export const useHeartRate = () => {
         optionalServices: ['device_information']
       });
 
-      logger.info('Device selected', { deviceName: device.name }, 'SYSTEM');
+      console.log('Device selected:', device.name);
       store.setDevice(device);
 
       // Connect to GATT server
       const server = await device.gatt!.connect();
-      logger.info('Connected to GATT server', undefined, 'SYSTEM');
+      console.log('Connected to GATT server');
 
       // Get heart rate service
       const service = await server.getPrimaryService(HEART_RATE_SERVICE_UUID);
-      logger.info('Heart rate service obtained', undefined, 'SYSTEM');
+      console.log('Heart rate service obtained');
 
       // Get heart rate measurement characteristic
       const characteristic = await service.getCharacteristic(HEART_RATE_MEASUREMENT_UUID);
-      logger.info('Heart rate measurement characteristic obtained', undefined, 'SYSTEM');
+      console.log('Heart rate measurement characteristic obtained');
 
       store.setCharacteristic(characteristic);
 
       // Set up notifications
       await characteristic.startNotifications();
-      logger.info('Notifications started', undefined, 'SYSTEM');
+      console.log('Notifications started');
 
       // Listen for heart rate measurements
       characteristic.addEventListener('characteristicvaluechanged', (event) => {
@@ -104,13 +102,13 @@ export const useHeartRate = () => {
           store.setBpm(heartRate);
           store.addReading(reading);
           
-          logger.info('Heart rate', { heartRate, unit: 'BPM' }, 'SYSTEM');
+          console.log('Heart rate:', heartRate, 'BPM');
         }
       });
 
       // Handle device disconnection
       device.addEventListener('gattserverdisconnected', () => {
-        logger.info('Device disconnected', undefined, 'SYSTEM');
+        console.log('Device disconnected');
         store.setConnected(false);
         store.setBpm(null);
         store.setDevice(null);
@@ -121,11 +119,11 @@ export const useHeartRate = () => {
       store.setSource('ble');
       store.startSession();
       
-      logger.info('Heart rate monitoring started', undefined, 'SYSTEM');
+      console.log('Heart rate monitoring started');
       return true;
 
     } catch (error: any) {
-      logger.error('Error connecting to heart rate device', error as Error, 'SYSTEM');
+      console.error('Error connecting to heart rate device:', error);
       
       let errorMessage = 'Failed to connect to heart rate device';
       
@@ -161,9 +159,9 @@ export const useHeartRate = () => {
       store.setCharacteristic(null);
       store.endSession();
       
-      logger.info('Disconnected from heart rate device', undefined, 'SYSTEM');
+      console.log('Disconnected from heart rate device');
     } catch (error) {
-      logger.error('Error disconnecting', error as Error, 'SYSTEM');
+      console.error('Error disconnecting:', error);
     }
   }, [store]);
 
@@ -185,9 +183,9 @@ export const useHeartRate = () => {
         })
       });
       
-      logger.info('HR metrics sent', { duration, avgBpm: store.avgBpm }, 'ANALYTICS');
+      console.log('HR metrics sent:', { duration, avgBpm: store.avgBpm });
     } catch (error) {
-      logger.warn('Failed to send HR metrics', { error }, 'ANALYTICS');
+      console.warn('Failed to send HR metrics:', error);
     }
   }, [store.sessionStart, store.avgBpm, store.source]);
 

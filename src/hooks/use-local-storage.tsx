@@ -1,7 +1,5 @@
-// @ts-nocheck
 
 import { useState, useEffect } from 'react';
-import { logger } from '@/lib/logger';
 
 export function useLocalStorage<T>(key: string, initialValue: T): [T, (value: T) => void] {
   // State to store our value
@@ -16,7 +14,7 @@ export function useLocalStorage<T>(key: string, initialValue: T): [T, (value: T)
       return item ? JSON.parse(item) : initialValue;
     } catch (error) {
       // If error also return initialValue
-      logger.debug('Error reading localStorage', error, 'SYSTEM');
+      console.log(error);
       return initialValue;
     }
   });
@@ -34,7 +32,7 @@ export function useLocalStorage<T>(key: string, initialValue: T): [T, (value: T)
       }
     } catch (error) {
       // A more advanced implementation would handle the error case
-      logger.debug('Error writing localStorage', error, 'SYSTEM');
+      console.log(error);
     }
   };
 
@@ -47,7 +45,7 @@ export function useLocalStorage<T>(key: string, initialValue: T): [T, (value: T)
           setStoredValue(JSON.parse(item));
         }
       } catch (error) {
-        logger.debug('Error reading localStorage on storage event', error, 'SYSTEM');
+        console.log(error);
       }
     }
 

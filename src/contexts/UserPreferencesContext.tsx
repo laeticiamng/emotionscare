@@ -1,10 +1,7 @@
-// @ts-nocheck
 
-// @ts-nocheck
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { UserPreferences, UserPreferencesContextType, DEFAULT_PREFERENCES } from '@/types/preferences';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
-import { logger } from '@/lib/logger';
 
 const UserPreferencesContext = createContext<UserPreferencesContextType | undefined>(undefined);
 
@@ -33,10 +30,10 @@ export const UserPreferencesProvider: React.FC<UserPreferencesProviderProps> = (
       
       // Sync with Supabase when user is authenticated
       if (preferences.userId) {
-        logger.info('Syncing preferences with Supabase', { userId: preferences.userId }, 'SYSTEM');
+        console.log('Syncing preferences with Supabase for user:', preferences.userId);
         // API call will be implemented when backend is ready
       }
-      logger.info('Preferences updated', updated, 'SYSTEM');
+      console.log('Preferences updated:', updated);
     } catch (err) {
       setError(err instanceof Error ? err : new Error('Failed to update preferences'));
       throw err;

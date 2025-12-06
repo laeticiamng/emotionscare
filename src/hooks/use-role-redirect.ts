@@ -1,11 +1,9 @@
-// @ts-nocheck
 
 import { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { UserRole } from '@/types/user';
 import { normalizeUserMode, getModeDashboardPath } from '@/utils/userModeHelpers';
-import { logger } from '@/lib/logger';
 
 /**
  * Get the home path for a specific user role
@@ -40,7 +38,7 @@ export function useRoleRedirect() {
       location.pathname === '/b2b/admin/login';
     
     if (isAuthenticated && user && isExplicitLoginPage) {
-      logger.info('[useRoleRedirect] Redirecting authenticated user to', { path: getModeDashboardPath(normalizeUserMode(user.role)) }, 'AUTH');
+      console.log('[useRoleRedirect] Redirecting authenticated user to:', getModeDashboardPath(normalizeUserMode(user.role)));
       navigate(getModeDashboardPath(normalizeUserMode(user.role)));
     }
   }, [isAuthenticated, user, isLoading, navigate, location.pathname]);

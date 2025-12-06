@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import { useState } from 'react';
 import { OpenAIMessage, OpenAIHookResult } from '@/types/openai';
@@ -141,7 +140,7 @@ export const useOpenAI = (): OpenAIHookResult => {
       try {
         // Mock implementation
         await new Promise(resolve => setTimeout(resolve, 600));
-        // Content flagged silently
+        console.log(`Content ${contentId} flagged for ${reason}`);
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Failed to flag content';
         setError(errorMessage);

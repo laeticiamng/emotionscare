@@ -1,14 +1,12 @@
-// @ts-nocheck
-/**
- * flash-glow-metrics - Métriques Flash Glow sessions
- *
- * 🔒 SÉCURISÉ: Auth + Rate limit 30/min + CORS restrictif
- */
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { cors, preflightResponse, rejectCors } from '../_shared/cors.ts';
-import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
+};
 
 const computeSatisfactionScore = (moodDelta: number | null): number | null => {
   if (moodDelta === null || Number.isNaN(moodDelta)) {
@@ -23,20 +21,8 @@ const computeSatisfactionScore = (moodDelta: number | null): number | null => {
 };
 
 serve(async (req) => {
-  const corsResult = cors(req);
-  const corsHeaders = {
-    ...corsResult.headers,
-    'X-Content-Type-Options': 'nosniff',
-    'X-Frame-Options': 'DENY',
-    'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
-  };
-
   if (req.method === 'OPTIONS') {
-    return preflightResponse(corsResult);
-  }
-
-  if (!corsResult.allowed) {
-    return rejectCors(corsResult);
+    return new Response(null, { headers: corsHeaders });
   }
 
   try {
@@ -60,21 +46,6 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
-
-    const rateLimit = await enforceEdgeRateLimit(req, {
-      route: 'flash-glow-metrics',
-      userId: user.id,
-      limit: 30,
-      windowMs: 60_000,
-      description: 'Flash Glow metrics API',
-    });
-
-    if (!rateLimit.allowed) {
-      return buildRateLimitResponse(rateLimit, corsHeaders, {
-        errorCode: 'rate_limit_exceeded',
-        message: `Trop de requêtes. Réessayez dans ${rateLimit.retryAfterSeconds}s.`,
       });
     }
 

@@ -1,8 +1,7 @@
-// @ts-nocheck
+
 import { useState, useCallback } from 'react';
 import { EmotionResult } from '@/types/emotion';
 import { supabase } from '@/integrations/supabase/client';
-import { logger } from '@/lib/logger';
 
 export interface UseEmotionAnalysisReturn {
   analyzeText: (text: string) => Promise<EmotionResult | null>;
@@ -28,30 +27,32 @@ export const useEmotionAnalysis = (): UseEmotionAnalysisReturn => {
 
   const analyzeText = useCallback(async (text: string): Promise<EmotionResult | null> => {
     if (!text.trim()) return null;
-
+    
     setIsAnalyzing(true);
     setError(null);
-
+    
     try {
-      // Call Lovable AI-powered emotion analysis (Gemini 2.5 Flash)
-      const { data, error: apiError } = await supabase.functions.invoke('emotion-analysis', {
+      const { data, error: apiError } = await supabase.functions.invoke('enhanced-emotion-analyze', {
         body: {
-          text,
-          language: 'fr'
+          type: 'text',
+          data: text,
+          options: {
+            language: 'fr',
+            includeRecommendations: true
+          }
         }
       });
 
       if (apiError) throw apiError;
 
-      // Parse Lovable AI response format
       const result: EmotionResult = {
-        emotion: data.emotion || 'neutral',
+        emotion: data.dominantEmotion || 'neutral',
         confidence: data.confidence || 0.75,
         timestamp: new Date().toISOString(),
         source: 'text',
         emotions: data.emotions || {},
-        sentiment: data.valence > 0.6 ? 'positive' : data.valence < 0.4 ? 'negative' : 'neutral',
-        recommendations: []
+        sentiment: data.sentiment || 'neutral',
+        recommendations: data.recommendations || []
       };
 
       setLastResult(result);
@@ -59,8 +60,8 @@ export const useEmotionAnalysis = (): UseEmotionAnalysisReturn => {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erreur lors de l\'analyse du texte';
       setError(errorMessage);
-      logger.error('Text analysis error', err as Error, 'SCAN');
-
+      console.error('Text analysis error:', err);
+      
       // Fallback result
       const fallbackResult: EmotionResult = {
         emotion: 'neutral',
@@ -70,7 +71,7 @@ export const useEmotionAnalysis = (): UseEmotionAnalysisReturn => {
         emotions: { neutral: 0.5, calm: 0.3, content: 0.2 },
         sentiment: 'neutral'
       };
-
+      
       setLastResult(fallbackResult);
       return fallbackResult;
     } finally {
@@ -95,32 +96,25 @@ export const useEmotionAnalysis = (): UseEmotionAnalysisReturn => {
 
       const { data, error: apiError } = await supabase.functions.invoke('hume-analysis', {
         body: {
-          audioData: base64,
-          analysisType: 'facial'
+          type: 'facial',
+          image: base64,
+          options: {
+            returnFaceDetails: true,
+            language: 'fr'
+          }
         }
       });
 
       if (apiError) throw apiError;
 
-      // Parse Hume AI Batch API response
-      const analysis = data.analysis;
-
-      // Convert emotions array to object format
-      const emotionsObj: Record<string, number> = {};
-      if (analysis.emotions) {
-        analysis.emotions.forEach((e: any) => {
-          emotionsObj[e.name] = e.confidence;
-        });
-      }
-
       const result: EmotionResult = {
-        emotion: analysis.dominant_emotion || 'neutral',
-        confidence: analysis.confidence_score || 0.7,
+        emotion: data.dominantEmotion || 'neutral',
+        confidence: data.confidence || 0.7,
         timestamp: new Date().toISOString(),
         source: 'facial',
-        emotions: emotionsObj,
-        sentiment: analysis.overall_sentiment || 'neutral',
-        facialFeatures: analysis.face_details
+        emotions: data.emotions || {},
+        sentiment: data.sentiment || 'neutral',
+        facialFeatures: data.facialFeatures
       };
 
       setLastResult(result);
@@ -128,7 +122,7 @@ export const useEmotionAnalysis = (): UseEmotionAnalysisReturn => {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erreur lors de l\'analyse faciale';
       setError(errorMessage);
-      logger.error('Facial analysis error', err as Error, 'SCAN');
+      console.error('Facial analysis error:', err);
       
       // Fallback result
       const fallbackResult: EmotionResult = {
@@ -169,36 +163,30 @@ export const useEmotionAnalysis = (): UseEmotionAnalysisReturn => {
 
       if (transcriptionError) throw transcriptionError;
 
-      // Then analyze emotions from voice using Hume AI
+      // Then analyze emotions from voice
       const { data, error: apiError } = await supabase.functions.invoke('hume-analysis', {
         body: {
-          audioData: base64,
-          analysisType: 'voice'
+          type: 'voice',
+          audio: base64,
+          text: transcriptionData.text,
+          options: {
+            language: 'fr',
+            includeProsody: true
+          }
         }
       });
 
       if (apiError) throw apiError;
 
-      // Parse Hume AI Batch API response
-      const analysis = data.analysis;
-
-      // Convert emotions array to object format
-      const emotionsObj: Record<string, number> = {};
-      if (analysis.emotions) {
-        analysis.emotions.forEach((e: any) => {
-          emotionsObj[e.name] = e.confidence;
-        });
-      }
-
       const result: EmotionResult = {
-        emotion: analysis.dominant_emotion || 'neutral',
-        confidence: analysis.confidence_score || 0.75,
+        emotion: data.dominantEmotion || 'neutral',
+        confidence: data.confidence || 0.75,
         timestamp: new Date().toISOString(),
         source: 'voice',
-        emotions: emotionsObj,
-        sentiment: analysis.overall_sentiment || 'neutral',
-        transcription: transcriptionData?.text || '',
-        prosody: analysis.prosody
+        emotions: data.emotions || {},
+        sentiment: data.sentiment || 'neutral',
+        transcription: transcriptionData.text,
+        prosody: data.prosody
       };
 
       setLastResult(result);
@@ -206,7 +194,7 @@ export const useEmotionAnalysis = (): UseEmotionAnalysisReturn => {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erreur lors de l\'analyse vocale';
       setError(errorMessage);
-      logger.error('Voice analysis error', err as Error, 'SCAN');
+      console.error('Voice analysis error:', err);
       
       // Fallback result
       const fallbackResult: EmotionResult = {

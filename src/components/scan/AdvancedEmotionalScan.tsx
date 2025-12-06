@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -57,7 +56,7 @@ const AdvancedEmotionalScan: React.FC = () => {
         await videoRef.current.play();
       }
     } catch (error) {
-      // Camera access error
+      console.error('Error accessing camera:', error);
       toast({
         title: "Erreur caméra",
         description: "Impossible d'accéder à la caméra",
@@ -102,7 +101,7 @@ const AdvancedEmotionalScan: React.FC = () => {
         timestamp: new Date().toISOString()
       };
     } catch (error) {
-      // Emotion analysis error
+      console.error('Error analyzing emotions:', error);
       throw error;
     }
   }, [scanMode, calibration]);
@@ -157,7 +156,7 @@ const AdvancedEmotionalScan: React.FC = () => {
       });
 
     } catch (error) {
-      // Calibration error
+      console.error('Calibration error:', error);
       toast({
         title: "Erreur de calibrage",
         description: "Impossible de calibrer le système",
@@ -191,7 +190,7 @@ const AdvancedEmotionalScan: React.FC = () => {
           setEmotionalState(emotions);
           setScanProgress(prev => Math.min(prev + 10, 100));
         } catch (error) {
-          // Scan frame error
+          console.error('Scan error:', error);
         }
       }
     }, 500);

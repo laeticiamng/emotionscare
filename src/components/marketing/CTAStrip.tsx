@@ -1,10 +1,8 @@
-// @ts-nocheck
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Play, Calendar } from 'lucide-react';
 import { Segment } from '@/store/marketing.store';
 import { useRouter } from '@/hooks/router';
-import { logger } from '@/lib/logger';
 
 interface CTAStripProps {
   segment: Segment;
@@ -18,7 +16,7 @@ export const CTAStrip: React.FC<CTAStripProps> = ({ segment }) => {
 
   const handleCTA = (action: string) => {
     // Analytics tracking
-    logger.info('Final CTA clicked', { action, segment }, 'UI');
+    console.log(`Final CTA clicked: ${action} (${segment})`);
     
     switch (action) {
       case 'signup':

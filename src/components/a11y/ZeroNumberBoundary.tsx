@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { logger } from '@/lib/logger';
+
 import { cn } from '@/lib/utils';
 
 interface ZeroNumberBoundaryProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -23,7 +23,7 @@ export const ZeroNumberBoundary: React.FC<ZeroNumberBoundaryProps> = ({
     if (!node) return;
     const textContent = node.textContent;
     if (textContent && /\d/.test(textContent)) {
-      logger.warn('[ZeroNumberBoundary] detected numerical characters, sanitizing output', 'UI');
+      console.warn('[ZeroNumberBoundary] detected numerical characters, sanitizing output');
       node.querySelectorAll('[data-zero-number-check="true"]').forEach((element) => {
         if (element instanceof HTMLElement) {
           const sanitized = sanitizeText(element.textContent);

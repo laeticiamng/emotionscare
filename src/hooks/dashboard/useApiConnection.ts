@@ -1,8 +1,6 @@
-// @ts-nocheck
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { logger } from '@/lib/logger';
 
 export function useApiConnection() {
   const [apiReady, setApiReady] = useState(false);
@@ -25,7 +23,7 @@ export function useApiConnection() {
         
         setApiReady(true);
       } catch (error) {
-        logger.error('API connection check failed', error as Error, 'SYSTEM');
+        console.error('API connection check failed:', error);
         setApiError('Failed to connect to API');
         setApiReady(false);
       } finally {
@@ -50,7 +48,7 @@ export function useApiConnection() {
       
       setApiReady(true);
     } catch (error) {
-      logger.error('API reconnection attempt failed', error as Error, 'SYSTEM');
+      console.error('API reconnection attempt failed:', error);
       setApiError('Failed to reconnect to API');
       setApiReady(false);
     } finally {

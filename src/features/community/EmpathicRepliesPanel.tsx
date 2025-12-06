@@ -1,12 +1,10 @@
-// @ts-nocheck
 'use client';
 
 import { useCallback, useMemo, useState } from 'react';
-import { captureException } from '@/lib/ai-monitoring';
+import * as Sentry from '@sentry/react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { logger } from '@/lib/logger';
 import {
   Dialog,
   DialogClose,
@@ -67,7 +65,12 @@ export default function EmpathicRepliesPanel(): JSX.Element {
 
     setPreview({ id: template.id, text: template.suggestion });
     setCopySuccess(null);
-    logger.info('social:replies_preview_open', { template: templateId }, 'SOCIAL');
+    Sentry.addBreadcrumb({
+      category: 'social',
+      level: 'info',
+      message: 'social:replies_preview_open',
+      data: { template: templateId },
+    });
   }, []);
 
   const closePreview = useCallback(() => {
@@ -89,9 +92,14 @@ export default function EmpathicRepliesPanel(): JSX.Element {
         description: 'Le message est dans le presse-papiers. Tu peux encore l’adapter.',
         variant: 'success',
       });
-      logger.info('social:reply_copied', { template: preview.id }, 'SOCIAL');
+      Sentry.addBreadcrumb({
+        category: 'social',
+        level: 'info',
+        message: 'social:reply_copied',
+        data: { template: preview.id },
+      });
     } catch (error) {
-      logger.warn('[EmpathicRepliesPanel] copy failed', error as Error, 'UI');
+      console.warn('[EmpathicRepliesPanel] copy failed', error);
       toast({
         title: 'Copie impossible',
         description: 'Tu peux sélectionner le texte et le copier manuellement.',

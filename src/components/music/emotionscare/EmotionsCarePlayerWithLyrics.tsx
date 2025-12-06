@@ -1,11 +1,9 @@
-// @ts-nocheck
 
 import React, { useEffect, useRef, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { X, Pause, Play, SkipBack, SkipForward } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { logger } from '@/lib/logger';
 
 interface LyricLine {
   time: number;
@@ -59,7 +57,7 @@ const EmotionsCarePlayerWithLyrics: React.FC<EmotionsCarePlayerWithLyricsProps> 
           ]);
         }
       } catch (error) {
-        logger.error('Erreur fetch lyrics:', error);
+        console.error('Erreur fetch lyrics:', error);
         setLyrics([
           { time: 0, text: "🎵 Musique EmotionsCare" },
           { time: 5, text: "Détendez-vous et profitez" }
@@ -146,7 +144,7 @@ const EmotionsCarePlayerWithLyrics: React.FC<EmotionsCarePlayerWithLyricsProps> 
           <CardTitle className="text-xl font-bold text-primary">
             🎵 {song.title}
           </CardTitle>
-          <Button variant="ghost" size="icon" onClick={onClose} aria-label="Fermer le lecteur">
+          <Button variant="ghost" size="icon" onClick={onClose}>
             <X className="w-5 h-5" />
           </Button>
         </CardHeader>
@@ -167,7 +165,6 @@ const EmotionsCarePlayerWithLyrics: React.FC<EmotionsCarePlayerWithLyricsProps> 
                 variant="ghost" 
                 size="icon"
                 onClick={() => seekTo(currentTime - 10)}
-                aria-label="Reculer de 10 secondes"
               >
                 <SkipBack className="w-5 h-5" />
               </Button>
@@ -177,7 +174,6 @@ const EmotionsCarePlayerWithLyrics: React.FC<EmotionsCarePlayerWithLyricsProps> 
                 size="icon"
                 onClick={togglePlayPause}
                 className="h-12 w-12 rounded-full bg-primary hover:bg-primary/90"
-                aria-label={isPlaying ? "Pause" : "Lecture"}
               >
                 {isPlaying ? (
                   <Pause className="w-6 w-6" />
@@ -190,7 +186,6 @@ const EmotionsCarePlayerWithLyrics: React.FC<EmotionsCarePlayerWithLyricsProps> 
                 variant="ghost" 
                 size="icon"
                 onClick={() => seekTo(currentTime + 10)}
-                aria-label="Avancer de 10 secondes"
               >
                 <SkipForward className="w-5 h-5" />
               </Button>

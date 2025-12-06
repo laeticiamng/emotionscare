@@ -1,7 +1,5 @@
-// @ts-nocheck
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { logger } from '@/lib/logger';
 
 export interface Blend {
   valence: number; // 0-1
@@ -59,7 +57,7 @@ export const useHumeEmotions = ({ enabled = false, sampleRate = 1 }: UseHumeEmot
 
     } catch (err) {
       setError('Camera permission denied');
-      logger.error('Error accessing camera', err as Error, 'SYSTEM');
+      console.error('Error accessing camera:', err);
     }
   };
 
@@ -95,7 +93,7 @@ export const useHumeEmotions = ({ enabled = false, sampleRate = 1 }: UseHumeEmot
       setBlend(newBlend);
       
     } catch (err) {
-      logger.error('Error analyzing frame', err as Error, 'SCAN');
+      console.error('Error analyzing frame:', err);
     }
   };
 

@@ -1,60 +1,18 @@
-/**
- * openai-transcribe - Transcription audio via OpenAI Whisper
- *
- * 🔒 SÉCURISÉ: Auth + Rate limit 20/min + CORS restrictif + Validation
- */
-
-// @ts-nocheck
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import OpenAI from "https://esm.sh/openai@4.20.1"
-import { authenticateRequest } from '../_shared/auth-middleware.ts';
-import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
-import { createErrorResponse } from '../_shared/validation.ts';
-import { cors, preflightResponse, rejectCors } from '../_shared/cors.ts';
 
-Deno.serve(async (req) => {
-  // 1. CORS check
-  const corsResult = cors(req);
-  const corsHeaders = {
-    ...corsResult.headers,
-    'X-Content-Type-Options': 'nosniff',
-    'X-Frame-Options': 'DENY',
-  };
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
 
+serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return preflightResponse(corsResult);
-  }
-
-  // Vérification CORS stricte
-  if (!corsResult.allowed) {
-    console.warn('[openai-transcribe] CORS rejected - origin not allowed');
-    return rejectCors(corsResult);
+    return new Response('ok', { headers: corsHeaders })
   }
 
   try {
-    // 🔒 SÉCURITÉ: Authentification obligatoire
-    const authResult = await authenticateRequest(req);
-    if (authResult.status !== 200 || !authResult.user) {
-      console.warn('[openai-transcribe] Unauthorized access attempt');
-      return createErrorResponse(authResult.error || 'Authentication required', authResult.status, corsHeaders);
-    }
-
-    // 🛡️ SÉCURITÉ: Rate limiting strict (20 req/min - Whisper transcription)
-    const rateLimit = await enforceEdgeRateLimit(req, {
-      route: 'openai-transcribe',
-      userId: authResult.user.id,
-      limit: 20,
-      windowMs: 60_000,
-      description: 'OpenAI Whisper transcription'
-    });
-
-    if (!rateLimit.allowed) {
-      console.warn('[openai-transcribe] Rate limit exceeded', { userId: authResult.user.id });
-      return buildRateLimitResponse(rateLimit, corsHeaders, {
-        errorCode: 'rate_limit_exceeded',
-        message: `Trop de transcriptions. Réessayez dans ${rateLimit.retryAfterSeconds}s.`
-      });
-    }
-
     const openaiApiKey = Deno.env.get('OPENAI_API_KEY')
     if (!openaiApiKey) {
       throw new Error('OPENAI_API_KEY not configured')
@@ -63,18 +21,8 @@ Deno.serve(async (req) => {
     const formData = await req.formData()
     const audioFile = formData.get('audio') as File
     
-    // ✅ VALIDATION: Vérification du fichier audio
     if (!audioFile) {
-      return createErrorResponse('Audio file is required', 400, corsHeaders);
-    }
-
-    if (audioFile.size > 25 * 1024 * 1024) {
-      return createErrorResponse('Audio file too large (max 25MB)', 400, corsHeaders);
-    }
-
-    const allowedTypes = ['audio/webm', 'audio/wav', 'audio/mp3', 'audio/mpeg', 'audio/mp4'];
-    if (!allowedTypes.includes(audioFile.type)) {
-      return createErrorResponse(`Invalid audio format. Allowed: ${allowedTypes.join(', ')}`, 400, corsHeaders);
+      throw new Error('Audio file is required')
     }
 
     console.log('Transcribing audio file:', audioFile.name, 'Size:', audioFile.size)
@@ -102,14 +50,12 @@ Deno.serve(async (req) => {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
 
-  } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Transcription failed';
-    const errorDetails = error instanceof Error ? error.stack : String(error);
-    console.error('Error in openai-transcribe function:', errorMessage, errorDetails);
+  } catch (error) {
+    console.error('Error in openai-transcribe function:', error)
     return new Response(
       JSON.stringify({ 
-        error: errorMessage,
-        details: errorDetails
+        error: error.message || 'Transcription failed',
+        details: error.toString()
       }),
       {
         status: 500,

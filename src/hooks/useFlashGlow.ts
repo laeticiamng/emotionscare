@@ -1,9 +1,7 @@
-// @ts-nocheck
 import { useCallback, useEffect, useRef } from 'react';
 import { useGlowStore, type GlowPattern, type SelfReport } from '@/store/glow.store';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
-import { logger } from '@/lib/logger';
 
 interface PatternConfig {
   inhale: number;
@@ -182,7 +180,7 @@ export const useFlashGlow = () => {
       });
 
       if (error) {
-        logger.error('Error submitting Flash Glow metrics', error as Error, 'ANALYTICS');
+        console.error('Error submitting Flash Glow metrics:', error);
         // Fire-and-forget : ne pas bloquer l'UI
         return;
       }
@@ -204,7 +202,7 @@ export const useFlashGlow = () => {
       }
 
     } catch (error) {
-      logger.error('Network error submitting metrics', error as Error, 'ANALYTICS');
+      console.error('Network error submitting metrics:', error);
       // Silencieux en cas d'offline - sera re-essayé plus tard
     }
   }, [store]);

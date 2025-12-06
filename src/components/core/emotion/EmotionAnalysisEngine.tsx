@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -22,7 +21,6 @@ import {
   Eye,
   MessageSquare
 } from 'lucide-react';
-import { logger } from '@/lib/logger';
 
 interface EmotionResult {
   emotion: string;
@@ -176,7 +174,7 @@ const EmotionAnalysisEngine: React.FC<EmotionAnalysisEngineProps> = ({
         }, 10000);
         
       } catch (error) {
-        logger.error('Erreur accès microphone', error as Error, 'UI');
+        console.error('Erreur accès microphone:', error);
       }
     } else {
       mediaRecorderRef.current?.stop();
@@ -193,7 +191,7 @@ const EmotionAnalysisEngine: React.FC<EmotionAnalysisEngineProps> = ({
         videoRef.current.play();
       }
     } catch (error) {
-      logger.error('Erreur accès caméra', error as Error, 'UI');
+      console.error('Erreur accès caméra:', error);
     }
   };
 

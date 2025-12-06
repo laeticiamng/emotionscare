@@ -1,3 +1,4 @@
+
 import * as React from "react";
 import * as SheetPrimitive from "@radix-ui/react-dialog";
 import { cva, type VariantProps } from "class-variance-authority";
@@ -55,7 +56,7 @@ const SheetContent = React.forwardRef<
   React.ElementRef<typeof SheetPrimitive.Content>,
   SheetContentProps
 >(({ side = "right", className, children, onOpenAutoFocus, onCloseAutoFocus, ...props }, forwardedRef) => {
-  const contentRef = React.useRef<React.ElementRef<typeof SheetPrimitive.Content> | null>(null);
+  const contentRef = React.useRef<React.ElementRef<typeof SheetPrimitive.Content>>(null);
 
   React.useEffect(() => {
     const previouslyFocused = document.activeElement as HTMLElement | null;
@@ -66,12 +67,10 @@ const SheetContent = React.forwardRef<
 
   const setRefs = React.useCallback(
     (node: React.ElementRef<typeof SheetPrimitive.Content> | null) => {
-      if (contentRef) {
-        contentRef.current = node;
-      }
+      contentRef.current = node;
       if (typeof forwardedRef === "function") {
         forwardedRef(node);
-      } else if (forwardedRef && 'current' in forwardedRef) {
+      } else if (forwardedRef) {
         (forwardedRef as React.MutableRefObject<React.ElementRef<typeof SheetPrimitive.Content> | null>).current = node;
       }
     },

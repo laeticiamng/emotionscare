@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Service de production EmotionsCare
  * Connexion aux vraies APIs pour toutes les fonctionnalités
@@ -64,7 +63,7 @@ class EmotionsCareProductionService {
         ]
       };
     } catch (error) {
-      logger.error('Journal analysis error', error as Error, 'API');
+      console.error('Journal analysis error:', error);
       
       // Fallback analysis
       return {
@@ -107,7 +106,7 @@ class EmotionsCareProductionService {
 
       return savedEntry;
     } catch (error) {
-      logger.error('Error saving journal entry', error as Error, 'API');
+      console.error('Error saving journal entry:', error);
       throw error;
     }
   }
@@ -135,7 +134,7 @@ class EmotionsCareProductionService {
         therapeutic_insights: await this.getTherapeuticInsights(result.emotion, result.confidence)
       };
     } catch (error) {
-      logger.error('Emotion analysis error', error as Error, 'API');
+      console.error('Emotion analysis error:', error);
       throw error;
     }
   }
@@ -158,7 +157,7 @@ class EmotionsCareProductionService {
 
       return track;
     } catch (error) {
-      logger.error('Music generation error', error as Error, 'MUSIC');
+      console.error('Music generation error:', error);
       throw error;
     }
   }
@@ -187,7 +186,7 @@ class EmotionsCareProductionService {
 
       return session;
     } catch (error) {
-      logger.error('Coaching session error', error as Error, 'API');
+      console.error('Coaching session error:', error);
       throw error;
     }
   }
@@ -203,7 +202,7 @@ class EmotionsCareProductionService {
       const response = await coachService.sendMessage(sessionId, message, user.id);
       return response.coachResponse;
     } catch (error) {
-      logger.error('Coach message error', error as Error, 'API');
+      console.error('Coach message error:', error);
       throw error;
     }
   }
@@ -216,7 +215,7 @@ class EmotionsCareProductionService {
       const recommendations = await musicService.getRecommendationsForEmotion(emotion, count);
       return recommendations;
     } catch (error) {
-      logger.error('Music recommendations error', error as Error, 'MUSIC');
+      console.error('Music recommendations error:', error);
       return [];
     }
   }
@@ -245,7 +244,7 @@ class EmotionsCareProductionService {
         coaching: coachingProgress
       };
     } catch (error) {
-      logger.error('User analytics error', error as Error, 'ANALYTICS');
+      console.error('User analytics error:', error);
       return {
         emotions: null,
         music: null,
@@ -272,7 +271,7 @@ class EmotionsCareProductionService {
 
       return playlist;
     } catch (error) {
-      logger.error('Adaptive playlist error', error as Error, 'MUSIC');
+      console.error('Adaptive playlist error:', error);
       throw error;
     }
   }
@@ -314,7 +313,7 @@ class EmotionsCareProductionService {
         filename
       };
     } catch (error) {
-      logger.error('Export error', error as Error, 'SYSTEM');
+      console.error('Export error:', error);
       throw error;
     }
   }

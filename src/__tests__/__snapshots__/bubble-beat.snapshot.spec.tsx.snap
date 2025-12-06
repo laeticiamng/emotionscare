@@ -1,0 +1,19 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`BubbleBeat Page > rend la page 1`] = `
+<div>
+  <main
+    class="p-4 space-y-4"
+  >
+    <div>
+      BubbleBeat
+    </div>
+    <p>
+      Bienvenue dans le module BubbleBeat.
+    </p>
+    <button>
+      Commencer
+    </button>
+  </main>
+</div>
+`;

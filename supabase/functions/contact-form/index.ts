@@ -1,14 +1,10 @@
-// @ts-nocheck
-/**
- * contact-form - Formulaire de contact public
- *
- * 🔒 SÉCURISÉ: Rate limit 5/min par IP + CORS restrictif (pas d'auth - public)
- * Note: Rate limit strict pour prévenir le spam
- */
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
-import { cors, preflightResponse, rejectCors } from '../_shared/cors.ts';
-import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
 
 interface ContactFormData {
   name: string;
@@ -20,48 +16,11 @@ interface ContactFormData {
 }
 
 serve(async (req: Request) => {
-  // 1. CORS check
-  const corsResult = cors(req);
-  const corsHeaders = {
-    ...corsResult.headers,
-    'X-Content-Type-Options': 'nosniff',
-    'X-Frame-Options': 'DENY',
-  };
-
   if (req.method === 'OPTIONS') {
-    return preflightResponse(corsResult);
-  }
-
-  // Vérification CORS stricte
-  if (!corsResult.allowed) {
-    console.warn('[contact-form] CORS rejected - origin not allowed');
-    return rejectCors(corsResult);
+    return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    // 2. 🛡️ Rate limiting strict (anti-spam) - par IP car public
-    const clientIp = req.headers.get('x-forwarded-for') ||
-                     req.headers.get('x-real-ip') ||
-                     'anonymous';
-
-    const rateLimit = await enforceEdgeRateLimit(req, {
-      route: 'contact-form',
-      userId: `ip:${clientIp}`, // Rate limit par IP
-      limit: 5,
-      windowMs: 60_000,
-      description: 'Contact form - Public (anti-spam)',
-    });
-
-    if (!rateLimit.allowed) {
-      console.warn('[contact-form] Rate limit exceeded', { ip: clientIp });
-      return buildRateLimitResponse(rateLimit, corsHeaders, {
-        errorCode: 'rate_limit_exceeded',
-        message: `Trop de messages. Réessayez dans ${rateLimit.retryAfterSeconds}s.`,
-      });
-    }
-
-    console.log(`[contact-form] Processing from IP: ${clientIp}`);
-
     const formData: ContactFormData = await req.json();
 
     console.log('📧 Nouvelle demande de contact:', {

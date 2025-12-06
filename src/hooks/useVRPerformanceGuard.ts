@@ -1,9 +1,8 @@
-// @ts-nocheck
 import { useEffect, useRef } from 'react';
+import * as Sentry from '@sentry/react';
 
 import { useToast } from '@/hooks/use-toast';
 import { useVRSafetyStore } from '@/store/vrSafety.store';
-import { logger } from '@/lib/logger';
 
 const FPS_SAMPLE_WINDOW_MS = 3_000;
 const LOW_FPS_THRESHOLD = 28;
@@ -26,7 +25,7 @@ const hasWebGLSupport = (): boolean => {
       return false;
     });
   } catch (error) {
-    logger.warn('WebGL detection error', error as Error, 'VR');
+    console.warn('[useVRPerformanceGuard] webgl detection error', error);
     return false;
   }
 };
@@ -42,7 +41,12 @@ export const useVRPerformanceGuard = (module: 'vr_breath' | 'vr_galaxy') => {
   useEffect(() => {
     if (!hasWebGLSupport()) {
       markFallback('webgl_unavailable');
-      logger.warn('vr:fallback2d', { module, reason: 'webgl' }, 'VR');
+      Sentry.addBreadcrumb({
+        category: 'vr',
+        message: 'vr:fallback2d',
+        level: 'warning',
+        data: { module, reason: 'webgl' },
+      });
       return;
     }
 
@@ -50,7 +54,12 @@ export const useVRPerformanceGuard = (module: 'vr_breath' | 'vr_galaxy') => {
       const memory = Number((navigator as unknown as { deviceMemory?: number }).deviceMemory);
       if (Number.isFinite(memory) && memory > 0 && memory < 2) {
         markFallback('low_memory');
-        logger.warn('vr:fallback2d', { module, reason: 'memory', deviceMemory: memory }, 'VR');
+        Sentry.addBreadcrumb({
+          category: 'vr',
+          message: 'vr:fallback2d',
+          level: 'warning',
+          data: { module, reason: 'memory', deviceMemory: memory },
+        });
       }
     }
 
@@ -70,7 +79,12 @@ export const useVRPerformanceGuard = (module: 'vr_breath' | 'vr_galaxy') => {
         recordPerformanceSample(fps);
         if (fps < LOW_FPS_THRESHOLD) {
           markFallback('low_fps');
-          logger.warn('vr:fallback2d', { module, reason: 'fps', fps: Number(fps.toFixed(1)) }, 'VR');
+          Sentry.addBreadcrumb({
+            category: 'vr',
+            message: 'vr:fallback2d',
+            level: 'warning',
+            data: { module, reason: 'fps', fps: Number(fps.toFixed(1)) },
+          });
         }
         frames = 0;
         start = timestamp;

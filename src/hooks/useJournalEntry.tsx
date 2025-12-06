@@ -1,10 +1,9 @@
-// @ts-nocheck
+
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { saveJournalEntry } from '@/lib/journalService';
 import { useToast } from '@/hooks/use-toast';
 import { useMusicEmotionIntegration } from '@/hooks/useMusicEmotionIntegration';
-import { logger } from '@/lib/logger';
 
 export function useJournalEntry() {
   const [isSaving, setIsSaving] = useState(false);
@@ -54,13 +53,13 @@ export function useJournalEntry() {
         });
       }
       
-      logger.info('Journal entry saved', { result }, 'UI');
+      console.log('Journal entry saved:', result);
       toast({
         title: "Journal enregistré",
         description: "Votre note a été sauvegardée avec succès"
       });
     } catch (error) {
-      logger.error('Error saving journal entry', error as Error, 'UI');
+      console.error('Error saving journal entry:', error);
       toast({
         title: "Erreur",
         description: "Impossible d'enregistrer votre entrée de journal",

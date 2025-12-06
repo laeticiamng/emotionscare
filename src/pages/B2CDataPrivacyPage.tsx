@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,7 +8,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ArrowLeft, Shield, FileText, Download, Eye, Trash2, AlertCircle, CheckCircle, Clock, Database, Key, Lock, Globe } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { logger } from '@/lib/logger';
 
 interface DataExport {
   id: string;
@@ -82,7 +80,7 @@ const B2CDataPrivacyPage: React.FC = () => {
       ];
       setDataExports(mockExports);
     } catch (error) {
-      logger.error('Erreur chargement données', error as Error, 'SYSTEM');
+      console.error('Erreur chargement données:', error);
     }
   };
 
@@ -107,7 +105,7 @@ const B2CDataPrivacyPage: React.FC = () => {
       ];
       setDataRequests(mockRequests);
     } catch (error) {
-      logger.error('Erreur chargement demandes', error as Error, 'SYSTEM');
+      console.error('Erreur chargement demandes:', error);
     }
   };
 
@@ -179,7 +177,7 @@ const B2CDataPrivacyPage: React.FC = () => {
       });
 
     } catch (error) {
-      logger.error('Erreur export', error as Error, 'SYSTEM');
+      console.error('Erreur export:', error);
       toast({
         title: "Erreur d'export",
         description: "Impossible de créer l'export. Réessayez plus tard.",
@@ -208,7 +206,7 @@ const B2CDataPrivacyPage: React.FC = () => {
         description: "Votre demande sera traitée dans les 30 jours",
       });
     } catch (error) {
-      logger.error('Erreur demande', error as Error, 'SYSTEM');
+      console.error('Erreur demande:', error);
       toast({
         title: "Erreur de soumission",
         description: "Impossible de soumettre la demande",
@@ -236,19 +234,19 @@ const B2CDataPrivacyPage: React.FC = () => {
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'ready': case 'completed': return <CheckCircle className="w-4 h-4 text-success" />;
-      case 'processing': case 'pending': return <Clock className="w-4 h-4 text-warning" />;
-      case 'expired': case 'rejected': return <AlertCircle className="w-4 h-4 text-destructive" />;
+      case 'ready': case 'completed': return <CheckCircle className="w-4 h-4 text-green-400" />;
+      case 'processing': case 'pending': return <Clock className="w-4 h-4 text-yellow-400" />;
+      case 'expired': case 'rejected': return <AlertCircle className="w-4 h-4 text-red-400" />;
       default: return null;
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'ready': case 'completed': return 'border-success text-success';
-      case 'processing': case 'pending': return 'border-warning text-warning';
-      case 'expired': case 'rejected': return 'border-destructive text-destructive';
-      default: return 'border-muted text-muted-foreground';
+      case 'ready': case 'completed': return 'border-green-500 text-green-300';
+      case 'processing': case 'pending': return 'border-yellow-500 text-yellow-300';
+      case 'expired': case 'rejected': return 'border-red-500 text-red-300';
+      default: return 'border-gray-500 text-gray-300';
     }
   };
 
@@ -256,9 +254,9 @@ const B2CDataPrivacyPage: React.FC = () => {
     <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
       <div className="max-w-6xl mx-auto p-6 space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between text-primary-foreground">
+        <div className="flex items-center justify-between text-white">
           <div className="flex items-center gap-4">
-            <Button variant="ghost" onClick={() => navigate('/app/home')} className="text-primary-foreground hover:bg-background/10">
+            <Button variant="ghost" onClick={() => navigate('/app/home')} className="text-white hover:bg-white/10">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Retour
             </Button>
@@ -271,68 +269,68 @@ const B2CDataPrivacyPage: React.FC = () => {
           </div>
           <div className="flex items-center gap-4">
             <div className="text-right">
-              <div className="text-sm text-muted-foreground">Score RGPD</div>
-              <div className="text-3xl font-bold text-success">
+              <div className="text-sm text-gray-300">Score RGPD</div>
+              <div className="text-3xl font-bold text-green-400">
                 {privacyScore}%
               </div>
             </div>
-            <Shield className="w-8 h-8 text-success" />
+            <Shield className="w-8 h-8 text-green-400" />
           </div>
         </div>
 
         {/* Stats Overview */}
         <div className="grid md:grid-cols-4 gap-4">
-          <Card className="bg-gradient-to-br from-info/30 to-info/20 backdrop-blur-sm border-info/30">
+          <Card className="bg-gradient-to-br from-blue-900/30 to-cyan-900/30 backdrop-blur-sm border-blue-500/30">
             <CardContent className="p-4 text-center">
-              <Database className="w-8 h-8 mx-auto mb-2 text-info" />
-              <div className="text-2xl font-bold text-foreground">{dataStats.totalRecords}</div>
-              <div className="text-sm text-muted-foreground">Enregistrements totaux</div>
+              <Database className="w-8 h-8 mx-auto mb-2 text-blue-400" />
+              <div className="text-2xl font-bold text-white">{dataStats.totalRecords}</div>
+              <div className="text-sm text-gray-300">Enregistrements totaux</div>
             </CardContent>
           </Card>
           
-          <Card className="bg-gradient-to-br from-accent/30 to-accent/20 backdrop-blur-sm border-accent/30">
+          <Card className="bg-gradient-to-br from-purple-900/30 to-pink-900/30 backdrop-blur-sm border-purple-500/30">
             <CardContent className="p-4 text-center">
-              <Key className="w-8 h-8 mx-auto mb-2 text-accent" />
-              <div className="text-2xl font-bold text-foreground">{dataStats.personalData}</div>
-              <div className="text-sm text-muted-foreground">Données personnelles</div>
+              <Key className="w-8 h-8 mx-auto mb-2 text-purple-400" />
+              <div className="text-2xl font-bold text-white">{dataStats.personalData}</div>
+              <div className="text-sm text-gray-300">Données personnelles</div>
             </CardContent>
           </Card>
           
-          <Card className="bg-gradient-to-br from-success/30 to-success/20 backdrop-blur-sm border-success/30">
+          <Card className="bg-gradient-to-br from-green-900/30 to-emerald-900/30 backdrop-blur-sm border-green-500/30">
             <CardContent className="p-4 text-center">
-              <Lock className="w-8 h-8 mx-auto mb-2 text-success" />
-              <div className="text-2xl font-bold text-foreground">{dataStats.anonymizedData}</div>
-              <div className="text-sm text-muted-foreground">Données anonymisées</div>
+              <Lock className="w-8 h-8 mx-auto mb-2 text-green-400" />
+              <div className="text-2xl font-bold text-white">{dataStats.anonymizedData}</div>
+              <div className="text-sm text-gray-300">Données anonymisées</div>
             </CardContent>
           </Card>
           
-          <Card className="bg-gradient-to-br from-warning/30 to-destructive/20 backdrop-blur-sm border-warning/30">
+          <Card className="bg-gradient-to-br from-orange-900/30 to-red-900/30 backdrop-blur-sm border-orange-500/30">
             <CardContent className="p-4 text-center">
-              <Globe className="w-8 h-8 mx-auto mb-2 text-warning" />
-              <div className="text-2xl font-bold text-foreground">{dataStats.sharedData}</div>
-              <div className="text-sm text-muted-foreground">Données partagées</div>
+              <Globe className="w-8 h-8 mx-auto mb-2 text-orange-400" />
+              <div className="text-2xl font-bold text-white">{dataStats.sharedData}</div>
+              <div className="text-sm text-gray-300">Données partagées</div>
             </CardContent>
           </Card>
         </div>
 
         <Tabs defaultValue="exports" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 bg-card/50 border border-info/30">
-            <TabsTrigger value="exports" className="data-[state=active]:bg-info/20 data-[state=active]:text-info">
+          <TabsList className="grid w-full grid-cols-3 bg-black/50 border border-blue-500/30">
+            <TabsTrigger value="exports" className="data-[state=active]:bg-blue-500/20 data-[state=active]:text-blue-300">
               Exports de données
             </TabsTrigger>
-            <TabsTrigger value="requests" className="data-[state=active]:bg-accent/20 data-[state=active]:text-accent">
+            <TabsTrigger value="requests" className="data-[state=active]:bg-purple-500/20 data-[state=active]:text-purple-300">
               Mes demandes
             </TabsTrigger>
-            <TabsTrigger value="rights" className="data-[state=active]:bg-success/20 data-[state=active]:text-success">
+            <TabsTrigger value="rights" className="data-[state=active]:bg-green-500/20 data-[state=active]:text-green-300">
               Droits RGPD
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="exports" className="space-y-6">
             {/* Export Actions */}
-            <Card className="bg-card/50 backdrop-blur-sm border-info/30">
+            <Card className="bg-black/50 backdrop-blur-sm border-blue-500/30">
               <CardHeader>
-                <CardTitle className="text-foreground flex items-center gap-2">
+                <CardTitle className="text-white flex items-center gap-2">
                   <Download className="w-5 h-5" />
                   Exporter mes données
                 </CardTitle>
@@ -352,7 +350,7 @@ const B2CDataPrivacyPage: React.FC = () => {
                     onClick={() => requestDataExport('all')}
                     disabled={isExporting}
                     variant="outline" 
-                    className="p-6 h-auto flex-col bg-transparent border-info text-info hover:bg-info/10"
+                    className="p-6 h-auto flex-col bg-transparent border-blue-500 text-blue-300 hover:bg-blue-500/10"
                   >
                     <FileText className="w-8 h-8 mb-2" />
                     <span className="font-medium">Export complet</span>
@@ -363,7 +361,7 @@ const B2CDataPrivacyPage: React.FC = () => {
                     onClick={() => requestDataExport('personal')}
                     disabled={isExporting}
                     variant="outline" 
-                    className="p-6 h-auto flex-col bg-transparent border-accent text-accent hover:bg-accent/10"
+                    className="p-6 h-auto flex-col bg-transparent border-purple-500 text-purple-300 hover:bg-purple-500/10"
                   >
                     <Key className="w-8 h-8 mb-2" />
                     <span className="font-medium">Données personnelles</span>
@@ -374,7 +372,7 @@ const B2CDataPrivacyPage: React.FC = () => {
                     onClick={() => requestDataExport('activity')}
                     disabled={isExporting}
                     variant="outline" 
-                    className="p-6 h-auto flex-col bg-transparent border-success text-success hover:bg-success/10"
+                    className="p-6 h-auto flex-col bg-transparent border-green-500 text-green-300 hover:bg-green-500/10"
                   >
                     <Database className="w-8 h-8 mb-2" />
                     <span className="font-medium">Historique d'activité</span>
@@ -385,7 +383,7 @@ const B2CDataPrivacyPage: React.FC = () => {
                     onClick={() => requestDataExport('analytics')}
                     disabled={isExporting}
                     variant="outline" 
-                    className="p-6 h-auto flex-col bg-transparent border-warning text-warning hover:bg-warning/10"
+                    className="p-6 h-auto flex-col bg-transparent border-orange-500 text-orange-300 hover:bg-orange-500/10"
                   >
                     <Globe className="w-8 h-8 mb-2" />
                     <span className="font-medium">Données analytiques</span>
@@ -396,19 +394,19 @@ const B2CDataPrivacyPage: React.FC = () => {
             </Card>
 
             {/* Previous Exports */}
-            <Card className="bg-card/50 backdrop-blur-sm border-info/30">
+            <Card className="bg-black/50 backdrop-blur-sm border-blue-500/30">
               <CardHeader>
-                <CardTitle className="text-foreground">Exports précédents</CardTitle>
+                <CardTitle className="text-white">Exports précédents</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
                   {dataExports.map(exportItem => (
-                    <div key={exportItem.id} className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
+                    <div key={exportItem.id} className="flex items-center justify-between p-4 bg-gray-800/50 rounded-lg">
                       <div className="flex items-center gap-3">
-                        <FileText className="w-5 h-5 text-info" />
+                        <FileText className="w-5 h-5 text-blue-400" />
                         <div>
-                          <div className="font-medium text-foreground">{exportItem.type}</div>
-                          <div className="text-sm text-muted-foreground">
+                          <div className="font-medium text-white">{exportItem.type}</div>
+                          <div className="text-sm text-gray-400">
                             {exportItem.size} • {new Date(exportItem.date).toLocaleDateString('fr-FR')}
                           </div>
                         </div>
@@ -446,16 +444,16 @@ const B2CDataPrivacyPage: React.FC = () => {
 
           <TabsContent value="requests" className="space-y-6">
             {/* New Request */}
-            <Card className="bg-card/50 backdrop-blur-sm border-accent/30">
+            <Card className="bg-black/50 backdrop-blur-sm border-purple-500/30">
               <CardHeader>
-                <CardTitle className="text-foreground">Nouvelle demande RGPD</CardTitle>
+                <CardTitle className="text-white">Nouvelle demande RGPD</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid md:grid-cols-2 gap-4">
                   <Button 
                     onClick={() => submitDataRequest('access', 'Demande d\'accès à mes données personnelles')}
                     variant="outline" 
-                    className="p-4 h-auto flex-col bg-transparent border-info text-info hover:bg-info/10"
+                    className="p-4 h-auto flex-col bg-transparent border-blue-500 text-blue-300 hover:bg-blue-500/10"
                   >
                     <Eye className="w-6 h-6 mb-2" />
                     <span>Droit d'accès</span>
@@ -464,7 +462,7 @@ const B2CDataPrivacyPage: React.FC = () => {
                   <Button 
                     onClick={() => submitDataRequest('rectification', 'Demande de rectification de données')}
                     variant="outline" 
-                    className="p-4 h-auto flex-col bg-transparent border-warning text-warning hover:bg-warning/10"
+                    className="p-4 h-auto flex-col bg-transparent border-yellow-500 text-yellow-300 hover:bg-yellow-500/10"
                   >
                     <FileText className="w-6 h-6 mb-2" />
                     <span>Droit de rectification</span>
@@ -473,7 +471,7 @@ const B2CDataPrivacyPage: React.FC = () => {
                   <Button 
                     onClick={() => submitDataRequest('portability', 'Demande de portabilité des données')}
                     variant="outline" 
-                    className="p-4 h-auto flex-col bg-transparent border-success text-success hover:bg-success/10"
+                    className="p-4 h-auto flex-col bg-transparent border-green-500 text-green-300 hover:bg-green-500/10"
                   >
                     <Download className="w-6 h-6 mb-2" />
                     <span>Droit de portabilité</span>
@@ -482,7 +480,7 @@ const B2CDataPrivacyPage: React.FC = () => {
                   <Button 
                     onClick={() => submitDataRequest('deletion', 'Demande de suppression de données')}
                     variant="outline" 
-                    className="p-4 h-auto flex-col bg-transparent border-destructive text-destructive hover:bg-destructive/10"
+                    className="p-4 h-auto flex-col bg-transparent border-red-500 text-red-300 hover:bg-red-500/10"
                   >
                     <Trash2 className="w-6 h-6 mb-2" />
                     <span>Droit à l'effacement</span>

@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 /**
  * Système d'audit complet pour la plateforme EmotionsCare
@@ -6,7 +5,6 @@
  */
 
 import { supabase } from '@/integrations/supabase/client';
-import { logger } from '@/lib/logger';
 
 export interface AuditResult {
   category: string;
@@ -19,7 +17,7 @@ export class EmotionsCareAudit {
   private results: AuditResult[] = [];
 
   async runCompleteAudit(): Promise<AuditResult[]> {
-    logger.info('🎯 Démarrage de l\'audit complet EmotionsCare...', undefined, 'SYSTEM');
+    console.log('🎯 Démarrage de l\'audit complet EmotionsCare...');
     
     this.results = [];
     
@@ -42,7 +40,7 @@ export class EmotionsCareAudit {
   }
 
   private async auditBackendIntegration() {
-    logger.info('🛠 Audit intégration back-end...', undefined, 'SYSTEM');
+    console.log('🛠 Audit intégration back-end...');
     
     // Test endpoints critiques
     const endpoints = [
@@ -84,7 +82,7 @@ export class EmotionsCareAudit {
   }
 
   private async auditFunctionalFlow() {
-    logger.info('🔍 Audit flux fonctionnel...', undefined, 'SYSTEM');
+    console.log('🔍 Audit flux fonctionnel...');
     
     // Vérification des routes principales
     const routes = [
@@ -126,7 +124,7 @@ export class EmotionsCareAudit {
   }
 
   private async auditPerformance() {
-    logger.info('⚡ Audit performance...', undefined, 'SYSTEM');
+    console.log('⚡ Audit performance...');
     
     // Mesure des Core Web Vitals
     if ('performance' in window) {
@@ -158,7 +156,7 @@ export class EmotionsCareAudit {
   }
 
   private async auditAccessibility() {
-    logger.info('♿ Audit accessibilité...', undefined, 'SYSTEM');
+    console.log('♿ Audit accessibilité...');
     
     // Vérification des contrastes
     const elements = document.querySelectorAll('*');
@@ -181,7 +179,7 @@ export class EmotionsCareAudit {
   }
 
   private async auditSecurity() {
-    logger.info('🔐 Audit sécurité...', undefined, 'SYSTEM');
+    console.log('🔐 Audit sécurité...');
     
     // Vérification CSP
     const cspMeta = document.querySelector('meta[http-equiv="Content-Security-Policy"]');
@@ -259,6 +257,6 @@ export const runEmotionsCareAudit = async () => {
   const results = await audit.runCompleteAudit();
   const report = audit.generateReport();
   
-  logger.info(report, undefined, 'SYSTEM');
+  console.log(report);
   return { results, report };
 };

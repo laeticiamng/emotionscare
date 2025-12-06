@@ -1,6 +1,3 @@
-// @ts-nocheck
-
-import { logger } from '@/lib/logger';
 
 /**
  * Production readiness validator
@@ -54,10 +51,10 @@ export const logProductionStatus = () => {
   const result = checkProductionReadiness();
   
   if (result.isReady) {
-    logger.info(`🚀 Production ready! Score: ${result.score}/100`, {}, 'SYSTEM');
+    console.log(`🚀 Production ready! Score: ${result.score}/100`);
   } else {
-    logger.warn(`⚠️ Production issues found. Score: ${result.score}/100`, {}, 'SYSTEM');
-    result.issues.forEach(issue => logger.warn(`- ${issue}`, {}, 'SYSTEM'));
+    console.warn(`⚠️ Production issues found. Score: ${result.score}/100`);
+    result.issues.forEach(issue => console.warn(`- ${issue}`));
   }
 
   return result;

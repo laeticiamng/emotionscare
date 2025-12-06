@@ -1,10 +1,7 @@
-// @ts-nocheck
 /**
  * Code Cleanup Utilities - Production Ready
  * Removes development artifacts and optimizes for production
  */
-
-import { logger } from '@/lib/logger';
 
 export const cleanupDevelopmentCode = () => {
   if (typeof window !== 'undefined' && process.env.NODE_ENV === 'production') {
@@ -45,9 +42,9 @@ export const logProductionEvent = (event: string, data?: any) => {
     // In production, send to analytics service instead of console
     // For now, we'll just track critical events
     if (event.includes('error') || event.includes('critical')) {
-      logger.error('Production Event', { event, ...data }, 'SYSTEM');
+      console.error('Production Event:', event, data);
     }
   } else {
-    logger.info('Development Event', { event, ...data }, 'SYSTEM');
+    console.log('Development Event:', event, data);
   }
 };

@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -84,7 +83,7 @@ export function useVoiceAssistant(options: VoiceAssistantOptions = {}) {
       });
       
     } catch (error) {
-      // Microphone access error
+      console.error('Erreur lors de l\'accès au microphone:', error);
       toast({
         title: "Erreur microphone",
         description: "L'accès au microphone a été refusé ou n'est pas disponible.",
@@ -177,7 +176,7 @@ export function useVoiceAssistant(options: VoiceAssistantOptions = {}) {
             throw new Error(data.error || "Erreur de traitement");
           }
         } catch (error) {
-          // Audio processing error
+          console.error('Erreur lors du traitement audio:', error);
           toast({
             title: "Échec de traitement",
             description: "Je n'ai pas pu comprendre votre commande.",
@@ -189,7 +188,7 @@ export function useVoiceAssistant(options: VoiceAssistantOptions = {}) {
         }
       };
     } catch (error) {
-      // Audio processing error fallback
+      console.error('Erreur lors du traitement audio:', error);
       setIsProcessing(false);
       setAudioChunks([]);
     }
@@ -208,7 +207,8 @@ export function useVoiceAssistant(options: VoiceAssistantOptions = {}) {
       
       case 'play_music':
         navigate('/music');
-        // Music started with params - silent
+        // Déclencher la lecture de musique avec les paramètres
+        console.log('Starting music with params:', params);
         return `🎵 Lecture de musique démarrée avec les paramètres: ${JSON.stringify(params)}`;
         break;
       
@@ -225,7 +225,8 @@ export function useVoiceAssistant(options: VoiceAssistantOptions = {}) {
         break;
       
       case 'search_content':
-        // Search with params - silent
+        // Implémenter la recherche avec les paramètres
+        console.log('Performing search with params:', params);
         return `🔍 Recherche effectuée avec les paramètres: ${JSON.stringify(params)}`;
         navigate('/search');
         break;

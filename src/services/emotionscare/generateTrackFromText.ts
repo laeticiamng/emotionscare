@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 // Générateur de piste EmotionsCare à partir de texte
 import { HumeClient } from './humeClient';
@@ -32,7 +31,7 @@ export async function generateTrackFromText({
   userId,
 }: GenerateTrackRequest): Promise<GenerateTrackResponse> {
   
-  // Silent: starting track generation
+  console.log(`🎵 EmotionsCare: Starting track generation for text: "${text.slice(0, 50)}..."`);
   
   try {
     // 1. Analyser les émotions avec Hume AI
@@ -44,16 +43,18 @@ export async function generateTrackFromText({
     const hume = new HumeClient(humeApiKey);
     const emotions = await hume.detectEmotion(text);
     
-    // Silent: emotions detected
+    console.log(`🎭 EmotionsCare: Detected emotions:`, emotions.slice(0, 3).map(e => `${e.name}(${e.score.toFixed(2)})`));
     
     // 2. Choisir le preset approprié
     const preset = choosePreset(emotions);
-    // Silent: preset selected
+    console.log(`🎨 EmotionsCare: Selected preset: "${preset.tag}" with style "${preset.style}"`);
+    
     // 3. Assembler le prompt optimisé
     const themeText = text.slice(0, 80).replace(/[^\w\s]/gi, '');
     const prompt = `${language} | ${preset.style} | mood ${preset.tag} | theme: ${themeText}`;
     
-    // Silent: prompt generated
+    console.log(`📝 EmotionsCare: Generated prompt: "${prompt}"`);
+    
     // 4. Générer les paroles et la musique avec Suno
     const sunoApiKey = process.env.SUNO_API_KEY;
     if (!sunoApiKey) {
@@ -92,12 +93,14 @@ export async function generateTrackFromText({
       },
     };
     
-    // Silent: track generation initiated successfully
+    console.log(`✅ EmotionsCare: Track generation initiated successfully`);
+    console.log(`📋 Lyrics Task ID: ${response.lyricsTask}`);
+    console.log(`🎵 Music Task ID: ${response.musicTask}`);
     
     return response;
     
   } catch (error) {
-    // Silent: track generation error logged internally
+    console.error('❌ EmotionsCare: Track generation failed:', error);
     throw new Error(`Track generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
@@ -125,7 +128,7 @@ export async function getTasksStatus(lyricsTaskId: string, musicTaskId: string) 
       hasError: lyricsStatus.status === 'error' || musicStatus.status === 'error',
     };
   } catch (error) {
-    // Silent: failed to get tasks status
+    console.error('❌ EmotionsCare: Failed to get tasks status:', error);
     throw error;
   }
 }

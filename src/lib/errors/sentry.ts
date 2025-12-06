@@ -1,5 +1,4 @@
-import { Sentry } from '@/lib/errors/sentry-compat';
-import { logger } from '@/lib/logger';
+import * as Sentry from '@sentry/react';
 import type { AppError } from './types';
 
 export function captureHandledError(error: AppError, context?: Record<string, unknown>) {
@@ -7,7 +6,7 @@ export function captureHandledError(error: AppError, context?: Record<string, un
     return;
   }
 
-  Sentry.withScope((scope: any) => {
+  Sentry.withScope(scope => {
     scope.setTag('app.error_code', error.code);
     if (error.httpStatus) {
       scope.setTag('http.status', String(error.httpStatus));
@@ -49,7 +48,16 @@ export function captureHandledError(error: AppError, context?: Record<string, un
 }
 
 export function addErrorBreadcrumb(message: string, data?: Record<string, unknown>) {
-  logger.error(message, data, 'ERROR');
+  if (!Sentry.getCurrentHub().getClient()) {
+    return;
+  }
+
+  Sentry.addBreadcrumb({
+    category: 'error',
+    level: 'error',
+    message,
+    data,
+  });
 }
 
 export function applyErrorTags(tags: Record<string, string | number | boolean | undefined>) {
@@ -57,7 +65,7 @@ export function applyErrorTags(tags: Record<string, string | number | boolean | 
     return;
   }
 
-  Sentry.configureScope((scope: any) => {
+  Sentry.configureScope(scope => {
     Object.entries(tags).forEach(([key, value]) => {
       if (value === undefined) {
         return;

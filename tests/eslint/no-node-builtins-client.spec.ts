@@ -1,5 +1,4 @@
 /* @vitest-environment node */
-// @ts-nocheck
 
 import { describe, expect, it, vi } from 'vitest';
 import rule from '../../tools/eslint-plugin-ec/lib/rules/no-node-builtins-client.js';

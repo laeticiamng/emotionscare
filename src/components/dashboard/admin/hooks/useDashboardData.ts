@@ -1,8 +1,7 @@
-// @ts-nocheck
+
 import { useState, useEffect } from 'react';
 import { ChartData, DashboardStats } from '../tabs/overview/types';
 import { useSegment } from '@/contexts/SegmentContext';
-import { logger } from '@/lib/logger';
 
 // Mock function implementations to replace imported functions
 const fetchReports = async (reportTypes: string[], timePeriod: number): Promise<{[key: string]: ChartData[]}> => {
@@ -54,7 +53,7 @@ export const useDashboardData = (timePeriod: string) => {
       setAbsenteeismData(reportsData.absenteeism || []);
       setProductivityData(reportsData.productivity || []);
     } catch (error) {
-      logger.error("Error fetching dashboard data:", error as Error, 'UI');
+      console.error("Error fetching dashboard data:", error);
     } finally {
       setIsLoading(false);
     }
@@ -94,7 +93,7 @@ export const useEmotionalScoreTrend = () => {
       
       setData(mockData);
     } catch (error) {
-      logger.error("Error fetching emotional score trend:", error as Error, 'UI');
+      console.error("Error fetching emotional score trend:", error);
     } finally {
       setIsLoading(false);
     }
@@ -144,7 +143,7 @@ export const useDashboardStats = () => {
         emotionalScore: { current: avgScore, trend: 2 }
       });
     } catch (error) {
-      logger.error("Error fetching dashboard stats:", error as Error, 'UI');
+      console.error("Error fetching dashboard stats:", error);
     } finally {
       setIsLoading(false);
     }

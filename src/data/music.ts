@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { MusicTrack, MusicPlaylist } from '@/types/music';
 
 export const musicTracks: MusicTrack[] = [

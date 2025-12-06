@@ -1,18 +1,16 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { logger } from '@/lib/logger';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import {
-  Camera, Mic, MicOff, Video, VideoOff,
+import { 
+  Camera, Mic, MicOff, Video, VideoOff, 
   Brain, Heart, Smile, Frown, Meh,
   Play, Square, RotateCcw, Sparkles,
   Loader2, CheckCircle, AlertCircle
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { emotionsApi } from '@/services/api/scansApi';
 import { useAuth } from '@/contexts/AuthContext';
 import type { EmotionResult } from '@/types/emotion';
 
@@ -108,25 +106,22 @@ const EmotionScannerPremium: React.FC<EmotionScannerPremiumProps> = ({
       setScanProgress(100);
 
       // Create emotion result
-      const sourceMap: Record<ScanMode, 'facial' | 'voice' | 'text' | 'manual'> = {
-        'face': 'facial',
-        'voice': 'voice',
-        'mood_cards': 'manual'
-      };
-      
       const emotionResult: EmotionResult = {
-        timestamp: new Date(),
+        id: `scan-${Date.now()}`,
+        timestamp: new Date().toISOString(),
         emotion: scanResult.currentMood?.emotion || 'neutral',
         intensity: scanResult.currentMood?.intensity || 0.5,
         confidence: scanResult.confidence || 0.8,
-        source: sourceMap[scanMode],
+        source: scanMode,
         valence: scanResult.mood?.valence || 0.5,
         arousal: scanResult.mood?.arousal || 0.5,
         insight: scanResult.insight,
+        recommendations: scanResult.recommendations || [],
       };
 
-      // Store in database via API
-      await emotionsApi.create({
+      // Store in database
+      await supabase.from('emotions').insert({
+        user_id: user.id,
         primary_emotion: emotionResult.emotion,
         intensity: emotionResult.intensity,
         score: Math.round(emotionResult.confidence * 100),
@@ -142,7 +137,7 @@ const EmotionScannerPremium: React.FC<EmotionScannerPremiumProps> = ({
       });
 
     } catch (error) {
-      logger.error('Scan error', error as Error, 'EMOTION');
+      console.error('Scan error:', error);
       toast({
         title: "Erreur d'analyse",
         description: "Une erreur est survenue lors de l'analyse. Veuillez réessayer.",
@@ -177,7 +172,7 @@ const EmotionScannerPremium: React.FC<EmotionScannerPremiumProps> = ({
       }, 10000);
       
     } catch (error) {
-      logger.error('Voice recording error', error as Error, 'EMOTION');
+      console.error('Voice recording error:', error);
       toast({
         title: "Erreur microphone",
         description: "Impossible d'accéder au microphone.",
@@ -196,7 +191,7 @@ const EmotionScannerPremium: React.FC<EmotionScannerPremiumProps> = ({
         videoRef.current.play();
       }
     } catch (error) {
-      logger.error('Camera error', error as Error, 'EMOTION');
+      console.error('Camera error:', error);
       toast({
         title: "Erreur caméra",
         description: "Impossible d'accéder à la caméra.",

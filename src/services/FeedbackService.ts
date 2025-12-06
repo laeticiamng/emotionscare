@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { FeedbackEntry, ImprovementSuggestion, AuditLog, QualityMetrics } from '@/types/feedback';
 import { v4 as uuidv4 } from 'uuid';

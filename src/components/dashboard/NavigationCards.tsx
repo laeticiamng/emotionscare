@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * NavigationCards - Cartes de navigation pour le dashboard
  * Accès à toutes les fonctionnalités principales
@@ -35,7 +34,7 @@ const navigationCards: NavigationCard[] = [
     description: 'Analysez vos émotions en temps réel',
     path: '/app/scan',
     icon: Brain,
-    color: 'from-destructive to-destructive/80',
+    color: 'from-pink-500 to-rose-500',
     category: 'Core'
   },
   {
@@ -43,7 +42,7 @@ const navigationCards: NavigationCard[] = [
     description: 'Musique personnalisée par IA',
     path: '/app/music',
     icon: Music,
-    color: 'from-accent to-primary',
+    color: 'from-purple-500 to-indigo-500',
     category: 'Core',
     premium: true
   },
@@ -52,7 +51,7 @@ const navigationCards: NavigationCard[] = [
     description: 'Assistant empathique personnalisé',
     path: '/app/coach',
     icon: Sparkles,
-    color: 'from-primary to-info',
+    color: 'from-blue-500 to-cyan-500',
     category: 'Core',
     premium: true
   },
@@ -61,7 +60,7 @@ const navigationCards: NavigationCard[] = [
     description: 'Journal personnel intelligent',
     path: '/app/journal',
     icon: FileText,
-    color: 'from-success to-success/80',
+    color: 'from-green-500 to-emerald-500',
     category: 'Core'
   },
   {
@@ -69,7 +68,7 @@ const navigationCards: NavigationCard[] = [
     description: 'Immersion thérapeutique',
     path: '/app/vr',
     icon: Monitor,
-    color: 'from-warning to-destructive',
+    color: 'from-orange-500 to-red-500',
     category: 'Core'
   },
   
@@ -79,7 +78,7 @@ const navigationCards: NavigationCard[] = [
     description: 'Thérapie lumière instantanée',
     path: '/app/flash-glow',
     icon: Zap,
-    color: 'from-warning to-warning/80',
+    color: 'from-yellow-500 to-orange-500',
     category: 'Fun-First'
   },
   {
@@ -87,7 +86,7 @@ const navigationCards: NavigationCard[] = [
     description: 'Techniques de respiration guidées',
     path: '/app/breath',
     icon: Wind,
-    color: 'from-success/80 to-success',
+    color: 'from-teal-500 to-green-500',
     category: 'Fun-First'
   },
   {
@@ -95,7 +94,7 @@ const navigationCards: NavigationCard[] = [
     description: 'Filtres émotionnels AR',
     path: '/app/face-ar',
     icon: Camera,
-    color: 'from-primary to-accent',
+    color: 'from-indigo-500 to-purple-500',
     category: 'Fun-First',
     new: true
   },
@@ -104,7 +103,7 @@ const navigationCards: NavigationCard[] = [
     description: 'Jeu rythmique interactif',
     path: '/app/bubble-beat',
     icon: Waves,
-    color: 'from-info to-primary',
+    color: 'from-cyan-500 to-blue-500',
     category: 'Fun-First'
   },
   {
@@ -112,7 +111,7 @@ const navigationCards: NavigationCard[] = [
     description: 'Exploration spatiale 3D',
     path: '/app/vr-galaxy',
     icon: Star,
-    color: 'from-accent to-accent/80',
+    color: 'from-violet-500 to-purple-500',
     category: 'Fun-First'
   },
   
@@ -122,7 +121,7 @@ const navigationCards: NavigationCard[] = [
     description: 'Partage et entraide',
     path: '/app/community',
     icon: Users,
-    color: 'from-success to-info',
+    color: 'from-green-500 to-teal-500',
     category: 'Social'
   },
   {
@@ -130,7 +129,7 @@ const navigationCards: NavigationCard[] = [
     description: 'Niveaux et achievements',
     path: '/app/leaderboard',
     icon: Trophy,
-    color: 'from-warning to-warning/80',
+    color: 'from-amber-500 to-yellow-500',
     category: 'Social'
   },
   {
@@ -138,7 +137,7 @@ const navigationCards: NavigationCard[] = [
     description: 'Espaces privés sécurisés',
     path: '/app/social-cocon',
     icon: Heart,
-    color: 'from-destructive to-destructive/80',
+    color: 'from-pink-500 to-rose-500',
     category: 'Social'
   },
   
@@ -148,7 +147,7 @@ const navigationCards: NavigationCard[] = [
     description: 'Historique et insights',
     path: '/app/activity',
     icon: BarChart3,
-    color: 'from-primary to-primary/80',
+    color: 'from-blue-500 to-indigo-500',
     category: 'Analytics'
   },
   {
@@ -156,7 +155,7 @@ const navigationCards: NavigationCard[] = [
     description: 'Courbes d’humeur et heatmap quotidienne',
     path: '/app/scores',
     icon: Filter,
-    color: 'from-accent to-destructive',
+    color: 'from-purple-500 to-pink-500',
     category: 'Analytics'
   },
   
@@ -166,7 +165,7 @@ const navigationCards: NavigationCard[] = [
     description: 'Configuration personnalisée',
     path: '/settings/general',
     icon: Settings,
-    color: 'from-muted to-muted-foreground',
+    color: 'from-gray-500 to-slate-500',
     category: 'Settings'
   }
 ];
@@ -210,7 +209,7 @@ export default function NavigationCards({ maxCards, showAllButton = true }: Navi
                     <div className={cn(
                       "p-3 rounded-xl bg-gradient-to-br shadow-lg",
                       card.color,
-                      "text-primary-foreground group-hover:scale-110 transition-transform duration-300"
+                      "text-white group-hover:scale-110 transition-transform duration-300"
                     )}>
                       <card.icon className="h-6 w-6" />
                     </div>
@@ -221,7 +220,7 @@ export default function NavigationCards({ maxCards, showAllButton = true }: Navi
                         </Badge>
                       )}
                       {card.new && (
-                        <Badge variant="default" className="text-xs font-medium bg-gradient-to-r from-success to-success/80">
+                        <Badge variant="default" className="text-xs font-medium bg-gradient-to-r from-green-500 to-emerald-500">
                           Nouveau
                         </Badge>
                       )}

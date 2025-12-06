@@ -1,6 +1,3 @@
-// @ts-nocheck
-import { logger } from '@/lib/logger';
-
 export async function exportNodeToPng(node: HTMLElement, filename: string) {
   if (!node) {
     throw new Error('export_target_missing');
@@ -26,7 +23,7 @@ export async function exportNodeToPng(node: HTMLElement, filename: string) {
     link.click();
     document.body.removeChild(link);
   } catch (error) {
-    logger.error('Export failed', error as Error, 'SYSTEM');
+    console.error('Export failed:', error);
     throw (error instanceof Error ? error : new Error('png_export_failed'));
   }
 }

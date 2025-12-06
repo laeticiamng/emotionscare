@@ -6,11 +6,11 @@ import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { Progress } from '@/components/ui/progress';
 import { ChevronLeft, ChevronRight, Send } from 'lucide-react';
-import type { StartOutput } from './types';
+import type { StartOutput } from '../../../../packages/contracts/assess';
 
 interface AssessFormProps {
   session: StartOutput;
-  onSubmit: (answers: Array<{id: string, value: number}>, meta?: Record<string, unknown>) => void;
+  onSubmit: (answers: Array<{id: string, value: number}>, meta?: any) => void;
   onCancel?: () => void;
   isSubmitting?: boolean;
   className?: string;
@@ -30,7 +30,7 @@ export function AssessForm({
 }: AssessFormProps) {
   const [currentItemIndex, setCurrentItemIndex] = useState(0);
   const [answers, setAnswers] = useState<FormAnswer[]>(
-    session.items.map((item) => ({ id: item.id, value: null }))
+    session.items.map(item => ({ id: item.id, value: null }))
   );
   const [startTime] = useState(Date.now());
 
@@ -98,7 +98,7 @@ export function AssessForm({
           onValueChange={(value) => handleAnswerChange(Number(value))}
           className="space-y-3"
         >
-          {currentItem.choices.map((choice: string, index: number) => (
+          {currentItem.choices.map((choice, index) => (
             <div key={index} className="flex items-center space-x-2">
               <RadioGroupItem 
                 value={index.toString()} 

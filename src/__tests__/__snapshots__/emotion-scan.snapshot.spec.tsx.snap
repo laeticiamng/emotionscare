@@ -1,0 +1,795 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`EmotionScanPage > rend la page et le CTA Calculer 1`] = `
+<div>
+  <main
+    aria-label="Emotion Scan"
+  >
+    <div>
+      Emotion Scan
+    </div>
+    <div>
+      <form>
+        <fieldset>
+          <legend>
+            Émotions positives
+          </legend>
+          <div
+            style="display: grid; grid-template-columns: 1fr auto auto auto auto auto; align-items: center; gap: 6px; padding-block: 4px;"
+          >
+            <label
+              for="active-3"
+              style="white-space: nowrap;"
+            >
+              Actif(ve)
+            </label>
+            <label
+              aria-label="Actif(ve) 1"
+              style="display: grid; place-items: center;"
+            >
+              <input
+                id="active-1"
+                name="active"
+                type="radio"
+              />
+              <small>
+                1
+              </small>
+            </label>
+            <label
+              aria-label="Actif(ve) 2"
+              style="display: grid; place-items: center;"
+            >
+              <input
+                id="active-2"
+                name="active"
+                type="radio"
+              />
+              <small>
+                2
+              </small>
+            </label>
+            <label
+              aria-label="Actif(ve) 3"
+              style="display: grid; place-items: center;"
+            >
+              <input
+                id="active-3"
+                name="active"
+                type="radio"
+              />
+              <small>
+                3
+              </small>
+            </label>
+            <label
+              aria-label="Actif(ve) 4"
+              style="display: grid; place-items: center;"
+            >
+              <input
+                id="active-4"
+                name="active"
+                type="radio"
+              />
+              <small>
+                4
+              </small>
+            </label>
+            <label
+              aria-label="Actif(ve) 5"
+              style="display: grid; place-items: center;"
+            >
+              <input
+                id="active-5"
+                name="active"
+                type="radio"
+              />
+              <small>
+                5
+              </small>
+            </label>
+          </div>
+          <div
+            style="display: grid; grid-template-columns: 1fr auto auto auto auto auto; align-items: center; gap: 6px; padding-block: 4px;"
+          >
+            <label
+              for="determined-3"
+              style="white-space: nowrap;"
+            >
+              Déterminé(e)
+            </label>
+            <label
+              aria-label="Déterminé(e) 1"
+              style="display: grid; place-items: center;"
+            >
+              <input
+                id="determined-1"
+                name="determined"
+                type="radio"
+              />
+              <small>
+                1
+              </small>
+            </label>
+            <label
+              aria-label="Déterminé(e) 2"
+              style="display: grid; place-items: center;"
+            >
+              <input
+                id="determined-2"
+                name="determined"
+                type="radio"
+              />
+              <small>
+                2
+              </small>
+            </label>
+            <label
+              aria-label="Déterminé(e) 3"
+              style="display: grid; place-items: center;"
+            >
+              <input
+                id="determined-3"
+                name="determined"
+                type="radio"
+              />
+              <small>
+                3
+              </small>
+            </label>
+            <label
+              aria-label="Déterminé(e) 4"
+              style="display: grid; place-items: center;"
+            >
+              <input
+                id="determined-4"
+                name="determined"
+                type="radio"
+              />
+              <small>
+                4
+              </small>
+            </label>
+            <label
+              aria-label="Déterminé(e) 5"
+              style="display: grid; place-items: center;"
+            >
+              <input
+                id="determined-5"
+                name="determined"
+                type="radio"
+              />
+              <small>
+                5
+              </small>
+            </label>
+          </div>
+          <div
+            style="display: grid; grid-template-columns: 1fr auto auto auto auto auto; align-items: center; gap: 6px; padding-block: 4px;"
+          >
+            <label
+              for="attentive-3"
+              style="white-space: nowrap;"
+            >
+              Attentif(ve)
+            </label>
+            <label
+              aria-label="Attentif(ve) 1"
+              style="display: grid; place-items: center;"
+            >
+              <input
+                id="attentive-1"
+                name="attentive"
+                type="radio"
+              />
+              <small>
+                1
+              </small>
+            </label>
+            <label
+              aria-label="Attentif(ve) 2"
+              style="display: grid; place-items: center;"
+            >
+              <input
+                id="attentive-2"
+                name="attentive"
+                type="radio"
+              />
+              <small>
+                2
+              </small>
+            </label>
+            <label
+              aria-label="Attentif(ve) 3"
+              style="display: grid; place-items: center;"
+            >
+              <input
+                id="attentive-3"
+                name="attentive"
+                type="radio"
+              />
+              <small>
+                3
+              </small>
+            </label>
+            <label
+              aria-label="Attentif(ve) 4"
+              style="display: grid; place-items: center;"
+            >
+              <input
+                id="attentive-4"
+                name="attentive"
+                type="radio"
+              />
+              <small>
+                4
+              </small>
+            </label>
+            <label
+              aria-label="Attentif(ve) 5"
+              style="display: grid; place-items: center;"
+            >
+              <input
+                id="attentive-5"
+                name="attentive"
+                type="radio"
+              />
+              <small>
+                5
+              </small>
+            </label>
+          </div>
+          <div
+            style="display: grid; grid-template-columns: 1fr auto auto auto auto auto; align-items: center; gap: 6px; padding-block: 4px;"
+          >
+            <label
+              for="inspired-3"
+              style="white-space: nowrap;"
+            >
+              Inspiré(e)
+            </label>
+            <label
+              aria-label="Inspiré(e) 1"
+              style="display: grid; place-items: center;"
+            >
+              <input
+                id="inspired-1"
+                name="inspired"
+                type="radio"
+              />
+              <small>
+                1
+              </small>
+            </label>
+            <label
+              aria-label="Inspiré(e) 2"
+              style="display: grid; place-items: center;"
+            >
+              <input
+                id="inspired-2"
+                name="inspired"
+                type="radio"
+              />
+              <small>
+                2
+              </small>
+            </label>
+            <label
+              aria-label="Inspiré(e) 3"
+              style="display: grid; place-items: center;"
+            >
+              <input
+                id="inspired-3"
+                name="inspired"
+                type="radio"
+              />
+              <small>
+                3
+              </small>
+            </label>
+            <label
+              aria-label="Inspiré(e) 4"
+              style="display: grid; place-items: center;"
+            >
+              <input
+                id="inspired-4"
+                name="inspired"
+                type="radio"
+              />
+              <small>
+                4
+              </small>
+            </label>
+            <label
+              aria-label="Inspiré(e) 5"
+              style="display: grid; place-items: center;"
+            >
+              <input
+                id="inspired-5"
+                name="inspired"
+                type="radio"
+              />
+              <small>
+                5
+              </small>
+            </label>
+          </div>
+          <div
+            style="display: grid; grid-template-columns: 1fr auto auto auto auto auto; align-items: center; gap: 6px; padding-block: 4px;"
+          >
+            <label
+              for="alert-3"
+              style="white-space: nowrap;"
+            >
+              Alerte
+            </label>
+            <label
+              aria-label="Alerte 1"
+              style="display: grid; place-items: center;"
+            >
+              <input
+                id="alert-1"
+                name="alert"
+                type="radio"
+              />
+              <small>
+                1
+              </small>
+            </label>
+            <label
+              aria-label="Alerte 2"
+              style="display: grid; place-items: center;"
+            >
+              <input
+                id="alert-2"
+                name="alert"
+                type="radio"
+              />
+              <small>
+                2
+              </small>
+            </label>
+            <label
+              aria-label="Alerte 3"
+              style="display: grid; place-items: center;"
+            >
+              <input
+                id="alert-3"
+                name="alert"
+                type="radio"
+              />
+              <small>
+                3
+              </small>
+            </label>
+            <label
+              aria-label="Alerte 4"
+              style="display: grid; place-items: center;"
+            >
+              <input
+                id="alert-4"
+                name="alert"
+                type="radio"
+              />
+              <small>
+                4
+              </small>
+            </label>
+            <label
+              aria-label="Alerte 5"
+              style="display: grid; place-items: center;"
+            >
+              <input
+                id="alert-5"
+                name="alert"
+                type="radio"
+              />
+              <small>
+                5
+              </small>
+            </label>
+          </div>
+        </fieldset>
+        <fieldset
+          style="margin-top: 12px;"
+        >
+          <legend>
+            Émotions négatives
+          </legend>
+          <div
+            style="display: grid; grid-template-columns: 1fr auto auto auto auto auto; align-items: center; gap: 6px; padding-block: 4px;"
+          >
+            <label
+              for="upset-3"
+              style="white-space: nowrap;"
+            >
+              Contrarié(e)
+            </label>
+            <label
+              aria-label="Contrarié(e) 1"
+              style="display: grid; place-items: center;"
+            >
+              <input
+                id="upset-1"
+                name="upset"
+                type="radio"
+              />
+              <small>
+                1
+              </small>
+            </label>
+            <label
+              aria-label="Contrarié(e) 2"
+              style="display: grid; place-items: center;"
+            >
+              <input
+                id="upset-2"
+                name="upset"
+                type="radio"
+              />
+              <small>
+                2
+              </small>
+            </label>
+            <label
+              aria-label="Contrarié(e) 3"
+              style="display: grid; place-items: center;"
+            >
+              <input
+                id="upset-3"
+                name="upset"
+                type="radio"
+              />
+              <small>
+                3
+              </small>
+            </label>
+            <label
+              aria-label="Contrarié(e) 4"
+              style="display: grid; place-items: center;"
+            >
+              <input
+                id="upset-4"
+                name="upset"
+                type="radio"
+              />
+              <small>
+                4
+              </small>
+            </label>
+            <label
+              aria-label="Contrarié(e) 5"
+              style="display: grid; place-items: center;"
+            >
+              <input
+                id="upset-5"
+                name="upset"
+                type="radio"
+              />
+              <small>
+                5
+              </small>
+            </label>
+          </div>
+          <div
+            style="display: grid; grid-template-columns: 1fr auto auto auto auto auto; align-items: center; gap: 6px; padding-block: 4px;"
+          >
+            <label
+              for="hostile-3"
+              style="white-space: nowrap;"
+            >
+              Hostile
+            </label>
+            <label
+              aria-label="Hostile 1"
+              style="display: grid; place-items: center;"
+            >
+              <input
+                id="hostile-1"
+                name="hostile"
+                type="radio"
+              />
+              <small>
+                1
+              </small>
+            </label>
+            <label
+              aria-label="Hostile 2"
+              style="display: grid; place-items: center;"
+            >
+              <input
+                id="hostile-2"
+                name="hostile"
+                type="radio"
+              />
+              <small>
+                2
+              </small>
+            </label>
+            <label
+              aria-label="Hostile 3"
+              style="display: grid; place-items: center;"
+            >
+              <input
+                id="hostile-3"
+                name="hostile"
+                type="radio"
+              />
+              <small>
+                3
+              </small>
+            </label>
+            <label
+              aria-label="Hostile 4"
+              style="display: grid; place-items: center;"
+            >
+              <input
+                id="hostile-4"
+                name="hostile"
+                type="radio"
+              />
+              <small>
+                4
+              </small>
+            </label>
+            <label
+              aria-label="Hostile 5"
+              style="display: grid; place-items: center;"
+            >
+              <input
+                id="hostile-5"
+                name="hostile"
+                type="radio"
+              />
+              <small>
+                5
+              </small>
+            </label>
+          </div>
+          <div
+            style="display: grid; grid-template-columns: 1fr auto auto auto auto auto; align-items: center; gap: 6px; padding-block: 4px;"
+          >
+            <label
+              for="ashamed-3"
+              style="white-space: nowrap;"
+            >
+              Honteux(se)
+            </label>
+            <label
+              aria-label="Honteux(se) 1"
+              style="display: grid; place-items: center;"
+            >
+              <input
+                id="ashamed-1"
+                name="ashamed"
+                type="radio"
+              />
+              <small>
+                1
+              </small>
+            </label>
+            <label
+              aria-label="Honteux(se) 2"
+              style="display: grid; place-items: center;"
+            >
+              <input
+                id="ashamed-2"
+                name="ashamed"
+                type="radio"
+              />
+              <small>
+                2
+              </small>
+            </label>
+            <label
+              aria-label="Honteux(se) 3"
+              style="display: grid; place-items: center;"
+            >
+              <input
+                id="ashamed-3"
+                name="ashamed"
+                type="radio"
+              />
+              <small>
+                3
+              </small>
+            </label>
+            <label
+              aria-label="Honteux(se) 4"
+              style="display: grid; place-items: center;"
+            >
+              <input
+                id="ashamed-4"
+                name="ashamed"
+                type="radio"
+              />
+              <small>
+                4
+              </small>
+            </label>
+            <label
+              aria-label="Honteux(se) 5"
+              style="display: grid; place-items: center;"
+            >
+              <input
+                id="ashamed-5"
+                name="ashamed"
+                type="radio"
+              />
+              <small>
+                5
+              </small>
+            </label>
+          </div>
+          <div
+            style="display: grid; grid-template-columns: 1fr auto auto auto auto auto; align-items: center; gap: 6px; padding-block: 4px;"
+          >
+            <label
+              for="nervous-3"
+              style="white-space: nowrap;"
+            >
+              Nerveux(se)
+            </label>
+            <label
+              aria-label="Nerveux(se) 1"
+              style="display: grid; place-items: center;"
+            >
+              <input
+                id="nervous-1"
+                name="nervous"
+                type="radio"
+              />
+              <small>
+                1
+              </small>
+            </label>
+            <label
+              aria-label="Nerveux(se) 2"
+              style="display: grid; place-items: center;"
+            >
+              <input
+                id="nervous-2"
+                name="nervous"
+                type="radio"
+              />
+              <small>
+                2
+              </small>
+            </label>
+            <label
+              aria-label="Nerveux(se) 3"
+              style="display: grid; place-items: center;"
+            >
+              <input
+                id="nervous-3"
+                name="nervous"
+                type="radio"
+              />
+              <small>
+                3
+              </small>
+            </label>
+            <label
+              aria-label="Nerveux(se) 4"
+              style="display: grid; place-items: center;"
+            >
+              <input
+                id="nervous-4"
+                name="nervous"
+                type="radio"
+              />
+              <small>
+                4
+              </small>
+            </label>
+            <label
+              aria-label="Nerveux(se) 5"
+              style="display: grid; place-items: center;"
+            >
+              <input
+                id="nervous-5"
+                name="nervous"
+                type="radio"
+              />
+              <small>
+                5
+              </small>
+            </label>
+          </div>
+          <div
+            style="display: grid; grid-template-columns: 1fr auto auto auto auto auto; align-items: center; gap: 6px; padding-block: 4px;"
+          >
+            <label
+              for="afraid-3"
+              style="white-space: nowrap;"
+            >
+              Effrayé(e)
+            </label>
+            <label
+              aria-label="Effrayé(e) 1"
+              style="display: grid; place-items: center;"
+            >
+              <input
+                id="afraid-1"
+                name="afraid"
+                type="radio"
+              />
+              <small>
+                1
+              </small>
+            </label>
+            <label
+              aria-label="Effrayé(e) 2"
+              style="display: grid; place-items: center;"
+            >
+              <input
+                id="afraid-2"
+                name="afraid"
+                type="radio"
+              />
+              <small>
+                2
+              </small>
+            </label>
+            <label
+              aria-label="Effrayé(e) 3"
+              style="display: grid; place-items: center;"
+            >
+              <input
+                id="afraid-3"
+                name="afraid"
+                type="radio"
+              />
+              <small>
+                3
+              </small>
+            </label>
+            <label
+              aria-label="Effrayé(e) 4"
+              style="display: grid; place-items: center;"
+            >
+              <input
+                id="afraid-4"
+                name="afraid"
+                type="radio"
+              />
+              <small>
+                4
+              </small>
+            </label>
+            <label
+              aria-label="Effrayé(e) 5"
+              style="display: grid; place-items: center;"
+            >
+              <input
+                id="afraid-5"
+                name="afraid"
+                type="radio"
+              />
+              <small>
+                5
+              </small>
+            </label>
+          </div>
+        </fieldset>
+        <div
+          style="display: grid; gap: 8px; margin-top: 12px;"
+        >
+          <div>
+            progress 
+            0
+          </div>
+          <button
+            aria-disabled="true"
+            data-ui="primary-cta"
+            disabled=""
+            type="submit"
+          >
+            Calculer
+          </button>
+        </div>
+      </form>
+    </div>
+  </main>
+</div>
+`;

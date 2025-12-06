@@ -1,5 +1,5 @@
+
 import React, { useState, useRef } from 'react';
-import { logger } from '@/lib/logger';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
@@ -95,7 +95,7 @@ const MusicTherapy: React.FC = () => {
       toast.success('Musique personnalisée générée avec succès !');
       
     } catch (error) {
-      logger.error('Music generation error', error as Error, 'MUSIC');
+      console.error('Music generation error:', error);
       toast.error('Erreur lors de la génération de musique');
     } finally {
       setIsGenerating(false);
@@ -158,11 +158,11 @@ const MusicTherapy: React.FC = () => {
                 
                 {/* Contrôles de lecture */}
                 <div className="flex items-center space-x-4 mt-3">
-                  <Button variant="ghost" size="icon" aria-label="Piste précédente">
+                  <Button variant="ghost" size="icon">
                     <SkipBack className="h-4 w-4" />
                   </Button>
                   
-                  <Button onClick={togglePlayPause} size="icon" aria-label={isPlaying ? "Pause" : "Lecture"}>
+                  <Button onClick={togglePlayPause} size="icon">
                     {isPlaying ? (
                       <Pause className="h-4 w-4" />
                     ) : (
@@ -170,7 +170,7 @@ const MusicTherapy: React.FC = () => {
                     )}
                   </Button>
                   
-                  <Button variant="ghost" size="icon" aria-label="Piste suivante">
+                  <Button variant="ghost" size="icon">
                     <SkipForward className="h-4 w-4" />
                   </Button>
                   
@@ -317,7 +317,6 @@ const MusicTherapy: React.FC = () => {
                     variant="ghost"
                     size="icon"
                     onClick={() => playTrack(track)}
-                    aria-label={`Lire ${track.title}`}
                   >
                     <Play className="h-4 w-4" />
                   </Button>

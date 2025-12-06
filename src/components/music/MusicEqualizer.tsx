@@ -1,5 +1,6 @@
+
 import React, { useEffect, useState, useRef } from 'react';
-import { useMusicCompat } from '@/hooks/useMusicCompat';
+import { useMusic } from '@/hooks/useMusic';
 import { cn } from '@/lib/utils';
 
 interface MusicEqualizerProps {
@@ -17,8 +18,7 @@ const MusicEqualizer: React.FC<MusicEqualizerProps> = ({
   inactiveColor = 'bg-primary/30',
   size = 'md'
 }) => {
-  const music = useMusicCompat();
-  const { isPlaying } = music.state;
+  const { isPlaying } = useMusic();
   const [active, setActive] = useState(false);
   const timeout = useRef<NodeJS.Timeout | null>(null);
   

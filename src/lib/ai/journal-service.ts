@@ -1,6 +1,5 @@
-// @ts-nocheck
+
 import { EmotionRecommendation } from '@/types/emotion';
-import { logger } from '@/lib/logger';
 
 // Mock function to simulate fetching journal entries from a database
 const mockJournalEntries = [
@@ -59,14 +58,14 @@ export const getJournalEntryById = (id: string) => {
 // Function to simulate saving a journal entry
 export const saveJournalEntry = (entry: any) => {
   // In a real application, this would save the entry to a database
-  logger.info('Saving journal entry', { id: entry.id }, 'API');
+  console.log('Saving journal entry:', entry);
   return { ...entry, id: Math.random().toString(36).substring(7) }; // Simulate ID generation
 };
 
 // Function to simulate deleting a journal entry
 export const deleteJournalEntry = (id: string) => {
   // In a real application, this would delete the entry from a database
-  logger.info('Deleting journal entry with ID', { id }, 'API');
+  console.log('Deleting journal entry with ID:', id);
   return true;
 };
 

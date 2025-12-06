@@ -4,7 +4,6 @@
  */
 
 import { supabase } from '@/integrations/supabase/client';
-import { logger } from '@/lib/logger';
 
 // Types pour la gestion d'erreurs
 export interface ApiError {
@@ -150,8 +149,12 @@ export class ApiClient {
     } catch (error) {
       const apiError = transformError(error);
       
-      // Log pour le debugging
-      logger.error('API Error', error as Error, 'API');
+      // Log pour le debugging (sera nettoyé en production)
+      console.error('API Error:', {
+        original: error,
+        transformed: apiError,
+        timestamp: new Date().toISOString()
+      });
 
       return {
         error: apiError,
@@ -163,11 +166,10 @@ export class ApiClient {
   /**
    * Authentification
    */
-  static async signIn(email: string, password: string): Promise<ApiResponse<any>> {
-    return this.request(async () => {
-      const result = await supabase.auth.signInWithPassword({ email, password });
-      return result as { data: any; error: any };
-    });
+  static async signIn(email: string, password: string) {
+    return this.request(() => 
+      supabase.auth.signInWithPassword({ email, password })
+    );
   }
 
   static async signUp(email: string, password: string, metadata?: any) {
@@ -180,11 +182,8 @@ export class ApiClient {
     );
   }
 
-  static async signOut(): Promise<ApiResponse<unknown>> {
-    return this.request(async () => {
-      const result = await supabase.auth.signOut();
-      return { data: {}, error: result.error };
-    });
+  static async signOut() {
+    return this.request(() => supabase.auth.signOut());
   }
 
   static async resetPassword(email: string) {
@@ -198,9 +197,9 @@ export class ApiClient {
   /**
    * Gestion des profils
    */
-  static async getProfile(userId: string): Promise<ApiResponse<any>> {
-    return this.request(async () => 
-      await supabase
+  static async getProfile(userId: string) {
+    return this.request(() => 
+      supabase
         .from('profiles')
         .select('*')
         .eq('id', userId)
@@ -208,9 +207,9 @@ export class ApiClient {
     );
   }
 
-  static async updateProfile(userId: string, updates: any): Promise<ApiResponse<any>> {
-    return this.request(async () => 
-      await supabase
+  static async updateProfile(userId: string, updates: any) {
+    return this.request(() => 
+      supabase
         .from('profiles')
         .update(updates)
         .eq('id', userId)
@@ -236,9 +235,9 @@ export class ApiClient {
   /**
    * Données métier (exemples)
    */
-  static async getEmotionScans(userId: string, limit = 50): Promise<ApiResponse<any[] | null>> {
-    return this.request(async () => 
-      await supabase
+  static async getEmotionScans(userId: string, limit = 50) {
+    return this.request(() => 
+      supabase
         .from('emotion_scans')
         .select('*')
         .eq('user_id', userId)
@@ -260,8 +259,8 @@ export class ApiClient {
       emotional_balance: scanData.emotional_balance ?? null,
     };
 
-    return this.request(async () =>
-      await supabase
+    return this.request(() =>
+      supabase
         .from('emotion_scans')
         .insert(payload)
         .select()

@@ -1,9 +1,6 @@
-// @ts-nocheck
 /**
  * Queue offline IndexedDB pour POST /metrics/* avec TTL et dédup
  */
-
-import { logger } from '@/lib/logger';
 
 interface QueuedRequest {
   id: string;
@@ -28,7 +25,7 @@ class OfflineQueueManager {
    */
   async initialize(): Promise<boolean> {
     if (!('indexedDB' in window)) {
-      logger.warn('IndexedDB not supported', undefined, 'SYSTEM');
+      console.warn('IndexedDB not supported');
       return false;
     }
 
@@ -66,7 +63,7 @@ class OfflineQueueManager {
     // Vérifier si déjà en queue (dédup)
     const existing = await this.getRequest(requestId);
     if (existing) {
-      logger.info('Request already queued, skipping', { requestId }, 'SYSTEM');
+      console.log('Request already queued, skipping:', requestId);
       return;
     }
 
@@ -91,7 +88,7 @@ class OfflineQueueManager {
       request.onerror = () => reject(request.error);
     });
 
-    logger.info('Request queued for offline sync', { requestId }, 'SYSTEM');
+    console.log('Request queued for offline sync:', requestId);
   }
 
   /**
@@ -122,7 +119,7 @@ class OfflineQueueManager {
         if (response.ok) {
           await this.removeRequest(request.id);
           processed++;
-          logger.info('Offline request synced', { id: request.id }, 'SYSTEM');
+          console.log('Offline request synced:', request.id);
         } else if (response.status >= 400 && response.status < 500) {
           // Erreur client, abandon
           await this.removeRequest(request.id);
@@ -136,7 +133,7 @@ class OfflineQueueManager {
           }
         }
       } catch (error) {
-        logger.error('Failed to sync request', error as Error, 'SYSTEM');
+        console.error('Failed to sync request:', request.id, error);
         request.retries++;
         if (request.retries > 3) {
           await this.removeRequest(request.id);
@@ -166,7 +163,7 @@ class OfflineQueueManager {
       }
     }
 
-    logger.info(`Cleaned ${cleaned} expired offline requests`, { cleaned }, 'SYSTEM');
+    console.log(`Cleaned ${cleaned} expired offline requests`);
     return cleaned;
   }
 
@@ -275,7 +272,7 @@ export const offlineQueueManager = new OfflineQueueManager();
  */
 if (typeof window !== 'undefined') {
   window.addEventListener('online', () => {
-    logger.info('Back online, processing queue...', undefined, 'SYSTEM');
+    console.log('Back online, processing queue...');
     offlineQueueManager.processQueue();
   });
 

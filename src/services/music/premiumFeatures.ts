@@ -1,7 +1,5 @@
-// @ts-nocheck
 import topMediaMusicService from './topMediaService';
 import { MusicTrack, MusicPlaylist } from '@/types/music';
-import { logger } from '@/lib/logger';
 
 /**
  * Coach musical IA contextuel
@@ -24,7 +22,7 @@ export async function generateContextualMusic(emotion: string, options: { stress
     }
     return null;
   } catch (error) {
-    logger.error('generateContextualMusic error', error as Error, 'MUSIC');
+    console.error('generateContextualMusic error', error);
     return null;
   }
 }
@@ -79,7 +77,7 @@ export async function createTeamTrack(teamId: string, prompts: string[]): Promis
     }
     return null;
   } catch (error) {
-    logger.error('createTeamTrack error', error as Error, 'MUSIC');
+    console.error('createTeamTrack error', error);
     return null;
   }
 }
@@ -122,7 +120,7 @@ export async function generateCustomMusic(options: { tempo?: number; key?: strin
     }
     return null;
   } catch (error) {
-    logger.error('generateCustomMusic error', error as Error, 'MUSIC');
+    console.error('generateCustomMusic error', error);
     return null;
   }
 }
@@ -135,7 +133,7 @@ export async function exportMidi(trackId: string): Promise<string | null> {
     // Placeholder implementation; would call TopMedia or storage service
     return `${trackId}.midi`;
   } catch (error) {
-    logger.error('exportMidi error', error as Error, 'MUSIC');
+    console.error('exportMidi error', error);
     return null;
   }
 }
@@ -173,7 +171,7 @@ export async function remixTrack(trackId: string, prompt: string): Promise<Music
     }
     return null;
   } catch (error) {
-    logger.error('remixTrack error', error as Error, 'MUSIC');
+    console.error('remixTrack error', error);
     return null;
   }
 }

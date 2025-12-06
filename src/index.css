@@ -37,7 +37,7 @@ body {
     height: 100%;
     margin: 0;
     padding: 0;
-    background: hsl(var(--background));
+    background: #0B1C3A; /* Same as hero gradient base */
     scrollbar-gutter: stable both-edges; /* Prevent layout shift */
   }
 
@@ -96,14 +96,6 @@ body {
     --ring: 221.2 83.2% 53.3%;
     --radius: 0.75rem;
     
-    /* Sidebar variables */
-    --sidebar: 0 0% 98%;
-    --sidebar-foreground: 222.2 84% 4.9%;
-    --sidebar-border: 214.3 31.8% 91.4%;
-    --sidebar-accent: 210 40% 96%;
-    --sidebar-accent-foreground: 222.2 84% 4.9%;
-    --sidebar-ring: 221.2 83.2% 53.3%;
-    
     /* Variables d'accessibilité */
     --focus-ring-color: 221.2 83.2% 53.3%;
     --focus-ring-width: 2px;
@@ -123,31 +115,6 @@ body {
     --vibe-low: 38 92% 50%;
     --vibe-medium: 45 93% 47%;
     --vibe-high: 142 76% 36%;
-    
-    /* Variables pour effets de verre (glass effects) */
-    --glass-bg: 0 0% 100%;
-    --glass-bg-opacity: 0.1;
-    --glass-border: 0 0% 100%;
-    --glass-border-opacity: 0.2;
-    --glass-strong-bg-opacity: 0.2;
-    --glass-strong-border-opacity: 0.3;
-    
-    /* Variables sémantiques d'état */
-    --success: 142 76% 36%;
-    --success-foreground: 210 40% 98%;
-    --warning: 38 92% 50%;
-    --warning-foreground: 222.2 84% 4.9%;
-    --error: 0 84.2% 60.2%;
-    --error-foreground: 210 40% 98%;
-    --info: 199 89% 48%;
-    --info-foreground: 210 40% 98%;
-    
-    /* Variables pour charts */
-    --chart-1: 221.2 83.2% 53.3%;
-    --chart-2: 142 76% 36%;
-    --chart-3: 38 92% 50%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 82% 52%;
   }
 
   .dark {
@@ -171,14 +138,6 @@ body {
     --input: 217.2 32.6% 17.5%;
     --ring: 224.3 76.3% 94.1%;
     
-    /* Sidebar variables (dark mode) */
-    --sidebar: 222.2 84% 4.9%;
-    --sidebar-foreground: 210 40% 98%;
-    --sidebar-border: 217.2 32.6% 17.5%;
-    --sidebar-accent: 217.2 32.6% 17.5%;
-    --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-ring: 224.3 76.3% 94.1%;
-    
     --focus-ring-color: 217.2 91.2% 59.8%;
     --high-contrast-bg: 0 0% 0%;
     --high-contrast-fg: 0 0% 100%;
@@ -193,31 +152,6 @@ body {
     --vibe-low: 38 92% 60%;
     --vibe-medium: 45 93% 57%;
     --vibe-high: 142 76% 46%;
-    
-    /* Variables pour effets de verre (dark mode) */
-    --glass-bg: 0 0% 0%;
-    --glass-bg-opacity: 0.1;
-    --glass-border: 0 0% 100%;
-    --glass-border-opacity: 0.1;
-    --glass-strong-bg-opacity: 0.2;
-    --glass-strong-border-opacity: 0.3;
-    
-    /* Variables sémantiques d'état (dark mode) */
-    --success: 142 76% 46%;
-    --success-foreground: 210 40% 98%;
-    --warning: 38 92% 60%;
-    --warning-foreground: 222.2 84% 4.9%;
-    --error: 0 62.8% 50%;
-    --error-foreground: 210 40% 98%;
-    --info: 199 89% 58%;
-    --info-foreground: 210 40% 98%;
-    
-    /* Variables pour charts (dark mode) */
-    --chart-1: 217.2 91.2% 59.8%;
-    --chart-2: 142 76% 46%;
-    --chart-3: 38 92% 60%;
-    --chart-4: 280 65% 70%;
-    --chart-5: 340 82% 62%;
   }
   
   /* Support du contraste élevé */

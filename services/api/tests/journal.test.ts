@@ -40,7 +40,7 @@ async function handleFeed(req: any, reply: any) {
     reply.code(401).send({ ok: false, error: { code: 'unauthorized', message: 'Unauthorized' } });
     return;
   }
-  const entries = await listFeedMock();
+  const entries = await listFeedMock(hash(req.user.sub));
   reply.send({ ok: true, data: { entries, weekly: [] } });
 }
 
@@ -89,7 +89,8 @@ describe('journal API routes', () => {
     await handleFeed({ user: { sub: 'user-123' } }, reply);
 
     expect(reply.statusCode).toBe(200);
-    expect(listFeedMock).toHaveBeenCalled();
+    const expectedHash = hash('user-123');
+    expect(listFeedMock).toHaveBeenCalledWith(expectedHash);
 
     expect(reply.payload).toEqual({
       ok: true,

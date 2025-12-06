@@ -1,9 +1,7 @@
-// @ts-nocheck
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { captureException } from '@/lib/ai-monitoring';
+import * as Sentry from '@sentry/react';
 
 import { useAssessment, type UseAssessmentResult } from '@/hooks/useAssessment';
-import { logger } from '@/lib/logger';
 
 export type BreathProfile = 'calm_soft' | 'standard_soft' | 'long_exhale_focus';
 export type Mode = 'default' | 'sleep_preset';
@@ -101,7 +99,12 @@ const isEveningNow = () => {
 };
 
 const addBreadcrumb = (message: string, data?: Record<string, unknown>) => {
-  logger.info(message, data, 'BREATH');
+  Sentry.addBreadcrumb({
+    category: 'breath',
+    level: 'info',
+    message,
+    data,
+  });
 };
 
 export const useBreathworkOrchestration = (): BreathworkOrch => {
@@ -204,7 +207,7 @@ export const useBreathworkOrchestration = (): BreathworkOrch => {
       }
       await stai.triggerAssessment('STAI6');
     } catch (error) {
-      logger.error('[BreathworkOrchestration] unable to start STAI-6', error as Error, 'SYSTEM');
+      console.error('[BreathworkOrchestration] unable to start STAI-6', error);
       Sentry.captureException(error);
     }
   }, [stai]);
@@ -217,7 +220,7 @@ export const useBreathworkOrchestration = (): BreathworkOrch => {
       }
       await isi.triggerAssessment('ISI');
     } catch (error) {
-      logger.error('[BreathworkOrchestration] unable to start ISI', error as Error, 'SYSTEM');
+      console.error('[BreathworkOrchestration] unable to start ISI', error);
       Sentry.captureException(error);
     }
   }, [isi]);

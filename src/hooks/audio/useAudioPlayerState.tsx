@@ -1,8 +1,6 @@
-// @ts-nocheck
 
 import { useState, useEffect, useCallback } from 'react';
 import { MusicTrack } from '@/types/music';
-import { logger } from '@/lib/logger';
 
 interface UseAudioPlayerStateReturn {
   track: MusicTrack | null;
@@ -33,11 +31,11 @@ export function useAudioPlayerState(): UseAudioPlayerStateReturn {
   const [mutedState, setMutedState] = useState(false);
 
   useEffect(() => {
-    logger.debug('Current track', trackState, 'MUSIC');
+    console.log('Current track:', trackState);
   }, [trackState]);
 
   useEffect(() => {
-    logger.debug('Is playing', { isPlaying: isPlayingState }, 'MUSIC');
+    console.log('Is playing:', isPlayingState);
   }, [isPlayingState]);
 
   // Fix the type mismatch between MusicTrack types

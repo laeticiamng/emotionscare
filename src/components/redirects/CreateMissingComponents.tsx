@@ -1,7 +1,5 @@
-// @ts-nocheck
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { logger } from '@/lib/logger';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
@@ -18,7 +16,7 @@ export default function CreateMissingComponents() {
   const createBasicComponent = async (componentName: string) => {
     // Ici on simulerait la création du composant
     // En réalité, cela nécessiterait un appel API ou un système de génération de fichiers
-    logger.info(`Création simulée de ${componentName}`, {}, 'SYSTEM');
+    console.log(`Création simulée de ${componentName}`);
     setCreatedComponents(prev => [...prev, componentName]);
   };
 

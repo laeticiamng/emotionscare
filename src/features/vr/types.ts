@@ -1,4 +1,3 @@
-// @ts-nocheck
 export type VRTier = 'low' | 'mid' | 'high';
 
 export type ComfortKey = 'very_low' | 'low' | 'medium';

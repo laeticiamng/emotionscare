@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -21,7 +20,6 @@ import {
   Loader2
 } from 'lucide-react';
 import { emotionsCareApi } from '@/services/emotions-care-api';
-import { logger } from '@/lib/logger';
 
 interface JournalEntry {
   id: string;
@@ -117,7 +115,7 @@ const InteractiveJournal: React.FC = () => {
       setCurrentEntry('');
       setSelectedMood(null);
     } catch (error) {
-      logger.error('Erreur sauvegarde journal', error as Error, 'UI');
+      console.error('Erreur sauvegarde journal:', error);
     } finally {
       setIsAnalyzing(false);
       setIsSaving(false);
@@ -245,7 +243,7 @@ const InteractiveJournal: React.FC = () => {
                   </span>
                 </div>
                 
-                <p className="text-sm leading-relaxed text-foreground mb-3">
+                <p className="text-sm leading-relaxed text-foreground/90 mb-3">
                   {entry.content}
                 </p>
                 

@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Eye, Maximize2, Minimize2, Palette } from 'lucide-react';
-import { useMusicCompat } from '@/hooks/useMusicCompat';
+import { useMusic } from '@/hooks/useMusic';
 import { cn } from '@/lib/utils';
 
 interface VisualizationProps {
@@ -31,7 +31,7 @@ const ImmersiveVisualization: React.FC<VisualizationProps> = ({
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationFrameRef = useRef<number>();
-  const { isPlaying, currentTrack } = useMusicCompat().state;
+  const { isPlaying, currentTrack } = useMusic();
   
   const [visualizationType, setVisualizationType] = useState<VisualizationType>('spectrum');
   const [colorTheme, setColorTheme] = useState<ColorTheme>('neon');

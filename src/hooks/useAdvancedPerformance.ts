@@ -1,6 +1,5 @@
-// @ts-nocheck
+
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { logger } from '@/lib/logger';
 
 interface PerformanceMetrics {
   renderTime: number;
@@ -227,11 +226,11 @@ export const useAdvancedPerformance = (
   // Log automatique des performances critiques
   useEffect(() => {
     if (metrics && warnings.length > 0) {
-      logger.warn(`Performance issues in ${componentName}`, {
+      console.warn(`Performance issues in ${componentName}:`, {
         warnings,
         metrics,
         score: performanceScore
-      }, 'SYSTEM');
+      });
     }
   }, [componentName, warnings, metrics, performanceScore]);
 

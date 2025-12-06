@@ -1,10 +1,8 @@
-// @ts-nocheck
 
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useToast } from '@/hooks/use-toast';
-import { logger } from '@/lib/logger';
 
 export interface SearchResult {
   id?: string | number;
@@ -95,7 +93,7 @@ export function useGlobalSearch() {
       
       setResults(mockResults);
     } catch (error) {
-      logger.error('Error fetching search results', error as Error, 'UI');
+      console.error('Error fetching search results:', error);
       toast({
         title: 'Erreur de recherche',
         description: 'Impossible de charger les résultats. Veuillez réessayer.',

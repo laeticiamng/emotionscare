@@ -1,5 +1,4 @@
 /* @vitest-environment node */
-// @ts-nocheck
 
 import { afterAll, describe, expect, it } from 'vitest';
 import { Pool } from 'pg';

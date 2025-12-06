@@ -22,7 +22,7 @@ interface VerbalBadgeProps {
   className?: string;
 }
 
-const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
+const iconMap: Record<string, React.ElementType> = {
   // Mots-clés positifs
   'apais': Leaf,
   'calme': Leaf,
@@ -64,7 +64,7 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   'victoire': CheckCircle2
 };
 
-const getIconForHint = (hint: string): React.ComponentType<{ className?: string }> => {
+const getIconForHint = (hint: string): React.ElementType => {
   const lowerHint = hint.toLowerCase();
   
   for (const [keyword, Icon] of Object.entries(iconMap)) {

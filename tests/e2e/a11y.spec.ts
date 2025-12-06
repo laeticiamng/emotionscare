@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { expect, test } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import manifest from '../../scripts/routes/ROUTES_MANIFEST.json';

@@ -1,11 +1,9 @@
-// @ts-nocheck
 
 /**
  * Service d'Insights RH basés sur l'analyse émotionnelle
  */
 import { chatCompletion } from './openai-client';
 import { toast } from '@/hooks/use-toast';
-import { logger } from '@/lib/logger';
 
 interface HRInsight {
   summary: string;
@@ -66,7 +64,7 @@ export async function generateHRInsights(
           success: true
         };
       } catch (parseError) {
-        logger.error('Error parsing HR insights JSON', parseError as Error, 'API');
+        console.error('Error parsing HR insights JSON:', parseError);
         throw new Error('Format de rapport invalide');
       }
     } else {
@@ -88,7 +86,7 @@ export async function generateHRInsights(
       };
     }
   } catch (error) {
-    logger.error('Error generating HR insights', error as Error, 'API');
+    console.error('Error generating HR insights:', error);
     toast({
       title: "Erreur d'analyse RH",
       description: "Impossible de générer le rapport RH.",

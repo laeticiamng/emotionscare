@@ -9,7 +9,6 @@ import { Play, Pause, RotateCcw, Eye, EyeOff, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { ConsentGate } from '@/features/clinical-optin/ConsentGate';
 
 interface BreathSession {
   duration: number; // en secondes
@@ -229,19 +228,19 @@ export default function B2CVRBreathGuidePage() {
                     
                     <div className="grid grid-cols-3 gap-4 text-sm" role="group" aria-label="Rythme de respiration">
                       <div className="text-center">
-                        <div className="text-info font-medium" aria-label={`${session.inhaleTime} secondes`}>
+                        <div className="text-blue-500 font-medium" aria-label={`${session.inhaleTime} secondes`}>
                           {session.inhaleTime}s
                         </div>
                         <div className="text-muted-foreground">Inspire</div>
                       </div>
                       <div className="text-center">
-                        <div className="text-warning font-medium" aria-label={`${session.holdTime} secondes`}>
+                        <div className="text-yellow-500 font-medium" aria-label={`${session.holdTime} secondes`}>
                           {session.holdTime}s
                         </div>
                         <div className="text-muted-foreground">Retiens</div>
                       </div>
                       <div className="text-center">
-                        <div className="text-success font-medium" aria-label={`${session.exhaleTime} secondes`}>
+                        <div className="text-green-500 font-medium" aria-label={`${session.exhaleTime} secondes`}>
                           {session.exhaleTime}s
                         </div>
                         <div className="text-muted-foreground">Expire</div>
@@ -412,9 +411,9 @@ export default function B2CVRBreathGuidePage() {
                             variant={rating === level ? 'default' : 'outline'}
                             size="sm"
                             className={`capitalize focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
-                              level === 'élevée' ? 'hover:bg-success/20' :
-                              level === 'ok' ? 'hover:bg-warning/20' :
-                              'hover:bg-destructive/20'
+                              level === 'élevée' ? 'hover:bg-green-500/20' :
+                              level === 'ok' ? 'hover:bg-yellow-500/20' :
+                              'hover:bg-red-500/20'
                             }`}
                             role="radio"
                             aria-checked={rating === level}

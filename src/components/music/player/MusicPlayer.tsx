@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
@@ -9,7 +8,6 @@ import VolumeControl from './VolumeControl';
 import { useMusicControls } from '@/hooks/useMusicControls';
 import { MusicTrack } from '@/types/music';
 import { Loader2 } from 'lucide-react';
-import { logger } from '@/lib/logger';
 
 interface MusicPlayerProps {
   track?: MusicTrack | null;
@@ -32,11 +30,11 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ track, className }) => {
   } = useMusicControls();
 
   const handlePrevious = () => {
-    logger.info('Previous track');
+    console.log('Previous track');
   };
 
   const handleNext = () => {
-    logger.info('Next track');
+    console.log('Next track');
   };
 
   return (

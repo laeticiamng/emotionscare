@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { ChatMessage } from '@/types/chat';
 import { format } from 'date-fns';
@@ -19,11 +20,11 @@ interface EnhancedCoachMessageProps {
 
 // Mapping for emotional responses
 const emotionAvatars: Record<string, { emoji: string, color: string }> = {
-  happy: { emoji: '😊', color: 'bg-warning/10' },
-  excited: { emoji: '🎉', color: 'bg-warning/20' },
-  calm: { emoji: '😌', color: 'bg-primary/10' },
-  thoughtful: { emoji: '🤔', color: 'bg-accent/10' },
-  concerned: { emoji: '😟', color: 'bg-muted' },
+  happy: { emoji: '😊', color: 'bg-yellow-100' },
+  excited: { emoji: '🎉', color: 'bg-orange-100' },
+  calm: { emoji: '😌', color: 'bg-blue-100' },
+  thoughtful: { emoji: '🤔', color: 'bg-purple-100' },
+  concerned: { emoji: '😟', color: 'bg-gray-100' },
   default: { emoji: '🧠', color: 'bg-primary/10' },
 };
 

@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useAudioPlayer } from '@/hooks/useAudioPlayer';
@@ -19,7 +20,6 @@ const AudioPlayerSection: React.FC<AudioPlayerSectionProps> = ({ audioUrl, title
     title,
     artist: artist || 'Unknown Artist',
     url: audioUrl,
-    audioUrl,
     duration: 0,
   };
   
@@ -38,7 +38,10 @@ const AudioPlayerSection: React.FC<AudioPlayerSectionProps> = ({ audioUrl, title
   const [isMuted, setIsMuted] = useState(false);
   const prevVolume = React.useRef(volume);
 
-  // Track is now just informational, no need to set it on the player
+  useEffect(() => {
+    // Setup the audio track
+    audioPlayer.setTrack(track);
+  }, [track, audioPlayer]);
 
   const togglePlay = () => {
     if (isPlaying) {
@@ -59,7 +62,7 @@ const AudioPlayerSection: React.FC<AudioPlayerSectionProps> = ({ audioUrl, title
   };
 
   const handleSeek = (value: number[]) => {
-    audioPlayer.seek(value[0]);
+    audioPlayer.setCurrentTime(value[0]);
   };
 
   const formatTime = (seconds: number): string => {

@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 export interface Report {
   id: string;

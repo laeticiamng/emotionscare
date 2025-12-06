@@ -1,4 +1,3 @@
-// @ts-nocheck
 export type MusicTextureKey = 'ambient_very_low' | 'calm_low' | 'warm_soft' | 'neutral';
 export type MusicIntensityKey = 'very_low' | 'low' | 'medium';
 export type MusicBpmProfile = 'slow' | 'neutral';

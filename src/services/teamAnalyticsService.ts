@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { TeamAnalytics } from '@types/analytics';
 
 /**

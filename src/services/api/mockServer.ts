@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { ApiResponse, EmotionAnalysisResult, UserProfile, JournalEntry } from '@/types/api';
 
 /**

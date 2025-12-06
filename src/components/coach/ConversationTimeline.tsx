@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { ChatConversation } from '@/types/chat';
 import { format } from 'date-fns';
@@ -22,13 +23,11 @@ const ConversationTimeline: React.FC<ConversationTimelineProps> = ({
   // Group conversations by date
   const groupedConversations = conversations.reduce<Record<string, ChatConversation[]>>(
     (acc, conversation) => {
-      const dateStr = conversation.createdAt instanceof Date 
-        ? conversation.createdAt.toISOString().split('T')[0]
-        : new Date(conversation.createdAt).toISOString().split('T')[0]; // YYYY-MM-DD
-      if (!acc[dateStr]) {
-        acc[dateStr] = [];
+      const date = conversation.createdAt.split('T')[0]; // YYYY-MM-DD
+      if (!acc[date]) {
+        acc[date] = [];
       }
-      acc[dateStr].push(conversation);
+      acc[date].push(conversation);
       return acc;
     },
     {}
@@ -93,7 +92,7 @@ const ConversationTimeline: React.FC<ConversationTimelineProps> = ({
                         {emotionalTone}
                       </Badge>
                       <p className="text-xs text-muted-foreground truncate">
-                        {conversation.messages?.[conversation.messages.length - 1]?.content || "Nouvelle conversation"}
+                        {conversation.lastMessage || "Nouvelle conversation"}
                       </p>
                     </div>
                   </div>

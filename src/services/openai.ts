@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 /**
  * Service OpenAI
@@ -8,7 +7,6 @@
  */
 import { API_URL } from '@/lib/env';
 import { ChatMessage } from '@/types/chat';
-import { logger } from '@/lib/logger';
 
 // Types
 export interface OpenAITextGenerationOptions {
@@ -68,13 +66,13 @@ async function callOpenAI<T>(endpoint: string, body: any): Promise<T> {
 
     if (!response.ok) {
       const error = await response.json();
-      logger.error('OpenAI API Error', error as Error, 'API');
+      console.error('OpenAI API Error:', error);
       throw new Error(error?.error?.message || 'Unknown error from OpenAI API');
     }
 
     return await response.json() as T;
   } catch (error) {
-    logger.error('Error calling OpenAI API', error as Error, 'API');
+    console.error('Error calling OpenAI API:', error);
     throw error;
   }
 }
@@ -266,7 +264,7 @@ export async function analyzeEmotion(text: string): Promise<{
     try {
       return JSON.parse(response);
     } catch (e) {
-      logger.error("Failed to parse OpenAI emotion analysis as JSON", e as Error, 'API');
+      console.error("Failed to parse OpenAI emotion analysis as JSON:", e);
       // Valeurs par défaut si le parsing échoue
       return {
         primaryEmotion: "neutral",
@@ -276,7 +274,7 @@ export async function analyzeEmotion(text: string): Promise<{
       };
     }
   } catch (error) {
-    logger.error("Error analyzing emotion", error as Error, 'API');
+    console.error("Error analyzing emotion:", error);
     throw error;
   }
 }
@@ -292,7 +290,7 @@ export async function checkApiConnection(): Promise<boolean> {
     });
     return true;
   } catch (error) {
-    logger.error("OpenAI connection check failed", error as Error, 'API');
+    console.error("OpenAI connection check failed:", error);
     return false;
   }
 }

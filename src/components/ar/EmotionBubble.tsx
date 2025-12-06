@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { supabase } from '@/integrations/supabase/client';
@@ -60,7 +59,7 @@ const EmotionBubble: React.FC<EmotionBubbleProps> = ({ emotion, comment, classNa
               setDisplayComment(fallback);
             }
           } catch (err) {
-            // Comment fetch failed, using fallback
+            console.warn('Failed to fetch comment:', err);
             const fallback = defaultComments[emotion][Math.floor(Math.random() * defaultComments[emotion].length)];
             setDisplayComment(fallback);
           }

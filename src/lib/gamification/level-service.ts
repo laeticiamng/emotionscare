@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 /**
  * Calculates user level based on points

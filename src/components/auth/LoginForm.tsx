@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -5,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { loginSchema, type LoginFormData } from '@/lib/validation/auth';
+import { loginSchema, type LoginFormData } from '@/lib/validations/auth';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
 
@@ -14,7 +15,7 @@ interface LoginFormProps {
 }
 
 const LoginForm: React.FC<LoginFormProps> = ({ onToggleMode }) => {
-  const { signIn } = useAuth();
+  const { login } = useAuth();
   const [rememberMe, setRememberMe] = useState(false);
   
   const form = useForm<LoginFormData>({
@@ -27,7 +28,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onToggleMode }) => {
 
   const onSubmit = async (data: LoginFormData) => {
     try {
-      await signIn(data.email, data.password);
+      await login(data.email, data.password);
     } catch (error: any) {
       toast({
         title: "Erreur de connexion",

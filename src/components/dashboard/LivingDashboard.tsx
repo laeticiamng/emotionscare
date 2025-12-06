@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Dashboard Vivant - Plan du jour adaptatif
  * Canvas qui se réorganise, micro-actions intelligentes, charge mentale zéro
@@ -42,7 +41,7 @@ const LivingDashboard: React.FC = () => {
   
   const [currentActions, setCurrentActions] = useState<MicroAction[]>([]);
   const [pepites, setPepites] = useState<Pepite[]>([]);
-  const [aura, setAura] = useState({ glow: 65, color: 'from-primary/70 to-accent/70' });
+  const [aura, setAura] = useState({ glow: 65, color: 'from-blue-400 to-purple-500' });
   const [isReorganizing, setIsReorganizing] = useState(false);
   
   // Micro-sons feutrés
@@ -98,7 +97,7 @@ const LivingDashboard: React.FC = () => {
         icon: Eye,
         path: '/app/scan',
         tone: 'soft',
-        color: 'from-primary/70 to-primary/50',
+        color: 'from-blue-400 to-cyan-300',
         urgency: isMorning ? 2 : 6
       },
       {
@@ -109,7 +108,7 @@ const LivingDashboard: React.FC = () => {
         icon: Wind,
         path: '/app/breath',
         tone: 'center',
-        color: 'from-success/70 to-success/50',
+        color: 'from-green-400 to-emerald-300',
         urgency: isMorning ? 3 : 7
       },
       
@@ -122,7 +121,7 @@ const LivingDashboard: React.FC = () => {
         icon: Zap,
         path: '/app/flash-glow',
         tone: 'energize',
-        color: 'from-warning/70 to-warning/50',
+        color: 'from-yellow-400 to-orange-300',
         urgency: isAfternoon ? 2 : 5
       },
       {
@@ -133,7 +132,7 @@ const LivingDashboard: React.FC = () => {
         icon: Circle,
         path: '/app/screen-silk',
         tone: 'soft',
-        color: 'from-muted-foreground/70 to-muted-foreground/50',
+        color: 'from-slate-400 to-gray-300',
         urgency: isAfternoon ? 3 : 6
       },
       
@@ -146,7 +145,7 @@ const LivingDashboard: React.FC = () => {
         icon: Waves,
         path: '/app/mood-mixer',
         tone: 'soft',
-        color: 'from-accent/70 to-accent/50',
+        color: 'from-purple-400 to-pink-300',
         urgency: isEvening ? 2 : 7
       },
       {
@@ -157,7 +156,7 @@ const LivingDashboard: React.FC = () => {
         icon: Heart,
         path: '/app/journal',
         tone: 'soft',
-        color: 'from-accent/70 to-accent/50',
+        color: 'from-rose-400 to-pink-300',
         urgency: isEvening ? 3 : 8
       },
       
@@ -170,7 +169,7 @@ const LivingDashboard: React.FC = () => {
         icon: Star,
         path: '/app/scan',
         tone: 'soft',
-        color: 'from-primary/70 to-accent/70',
+        color: 'from-indigo-400 to-purple-400',
         urgency: 1 // Toujours prioritaire
       }
     ];
@@ -247,12 +246,12 @@ const LivingDashboard: React.FC = () => {
     setAura(prev => ({ 
       ...prev, 
       glow: Math.min(100, prev.glow + 5),
-      color: prev.glow > 80 ? 'from-warning/70 to-warning/50' : prev.color
+      color: prev.glow > 80 ? 'from-gold-400 to-yellow-300' : prev.color
     }));
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 p-4">
       <div className="max-w-4xl mx-auto space-y-6">
         
         {/* Aura utilisateur */}
@@ -262,14 +261,14 @@ const LivingDashboard: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
         >
           <div className={`inline-block p-6 rounded-full bg-gradient-to-br ${aura.color} opacity-${Math.floor(aura.glow/10)*10}`}>
-            <div className="w-16 h-16 rounded-full bg-background/30 dark:bg-white/20 flex items-center justify-center">
+            <div className="w-16 h-16 rounded-full bg-white/30 flex items-center justify-center">
               <span className="text-2xl">✨</span>
             </div>
           </div>
-          <h1 className="text-2xl font-light mt-4 text-foreground">
+          <h1 className="text-2xl font-light mt-4 text-gray-700">
             Bonjour {user?.email?.split('@')[0] || 'ami'}
           </h1>
-          <p className="text-muted-foreground text-sm mt-1">
+          <p className="text-gray-500 text-sm mt-1">
             Ton plan du jour s'adapte à toi
           </p>
         </motion.div>
@@ -298,10 +297,10 @@ const LivingDashboard: React.FC = () => {
                 >
                   <CardContent className="p-6">
                     <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${action.color} mb-4 flex items-center justify-center`}>
-                      <action.icon className="w-6 h-6 text-primary-foreground" />
+                      <action.icon className="w-6 h-6 text-white" />
                     </div>
-                    <h3 className="font-medium text-foreground mb-1">{action.title}</h3>
-                    <p className="text-muted-foreground text-sm mb-3">{action.subtitle}</p>
+                    <h3 className="font-medium text-gray-800 mb-1">{action.title}</h3>
+                    <p className="text-gray-600 text-sm mb-3">{action.subtitle}</p>
                     <Badge variant="secondary" className="text-xs">
                       {action.duration}
                     </Badge>
@@ -313,11 +312,11 @@ const LivingDashboard: React.FC = () => {
         </div>
 
         {/* Pépites du jour */}
-        <Card className="bg-card/50 dark:bg-card/30 border-0 shadow-sm">
+        <Card className="bg-white/50 border-0 shadow-sm">
           <CardContent className="p-6">
             <div className="flex items-center gap-2 mb-4">
-              <Sparkles className="w-5 h-5 text-warning" />
-              <h2 className="font-medium text-foreground">Pépites du jour</h2>
+              <Sparkles className="w-5 h-5 text-yellow-500" />
+              <h2 className="font-medium text-gray-800">Pépites du jour</h2>
             </div>
             
             <div className="space-y-3">
@@ -326,8 +325,8 @@ const LivingDashboard: React.FC = () => {
                   key={pepite.id}
                   className={`p-4 rounded-lg transition-all duration-300 cursor-pointer ${
                     pepite.completed 
-                      ? 'bg-warning/10 border border-warning/20' 
-                      : 'bg-muted/50 hover:bg-warning/10'
+                      ? 'bg-yellow-50 border border-yellow-200' 
+                      : 'bg-gray-50 hover:bg-yellow-50'
                   }`}
                   onClick={() => !pepite.completed && completePepite(pepite.id)}
                   whileHover={{ scale: 1.01 }}
@@ -337,13 +336,13 @@ const LivingDashboard: React.FC = () => {
                       : 'none'
                   }}
                 >
-                  <p className="text-foreground text-sm leading-relaxed">
+                  <p className="text-gray-700 text-sm leading-relaxed">
                     {pepite.text}
                   </p>
                   {pepite.completed && (
                     <div className="flex items-center gap-2 mt-2">
-                      <div className="w-2 h-2 bg-warning rounded-full animate-pulse"></div>
-                      <span className="text-xs text-warning">Intégrée</span>
+                      <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
+                      <span className="text-xs text-yellow-600">Intégrée</span>
                     </div>
                   )}
                 </motion.div>
@@ -359,14 +358,14 @@ const LivingDashboard: React.FC = () => {
           whileTap={{ scale: 0.95 }}
         >
           <Button
-            className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-accent shadow-lg hover:shadow-xl"
+            className="w-16 h-16 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 shadow-lg hover:shadow-xl"
             onClick={() => {
               playMicroSound('tap');
               navigate('/app/scan');
             }}
             onMouseEnter={() => playMicroSound('hover')}
           >
-            <Star className="w-8 h-8 text-primary-foreground" />
+            <Star className="w-8 h-8 text-white" />
           </Button>
         </motion.div>
 
@@ -378,12 +377,12 @@ const LivingDashboard: React.FC = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-            <div className="bg-background/90 dark:bg-card/90 backdrop-blur-sm p-4 rounded-full shadow-lg">
+            <div className="bg-white/90 backdrop-blur-sm p-4 rounded-full shadow-lg">
               <motion.div
                 animate={{ rotate: 360 }}
                 transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
               >
-                <Sparkles className="w-6 h-6 text-accent" />
+                <Sparkles className="w-6 h-6 text-purple-500" />
               </motion.div>
             </div>
           </motion.div>

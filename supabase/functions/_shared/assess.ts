@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Shared assessment utilities for Edge Functions
  */

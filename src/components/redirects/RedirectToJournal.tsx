@@ -1,7 +1,5 @@
-// @ts-nocheck
 import { useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
-import { logger } from '@/lib/logger';
 
 /**
  * Composant de redirection vers /app/journal
@@ -9,7 +7,7 @@ import { logger } from '@/lib/logger';
  */
 const RedirectToJournal = () => {
   useEffect(() => {
-    logger.info('🔀 Redirection automatique vers /app/journal', {}, 'SYSTEM');
+    console.log('🔀 Redirection automatique vers /app/journal');
   }, []);
 
   return <Navigate to="/app/journal" replace />;

@@ -3,12 +3,12 @@ import React from "react";
 import PageHeader from "@/components/ui/PageHeader";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { AudioPlayer } from "@/ui/AudioPlayer";
+import { AudioPlayer } from "@/ui/AudioPlayer"; // AudioPlayer (P5) si dispo
 import { synthParagraphs } from "@/lib/story-synth/templates";
+import { addStory, loadStories } from "@/lib/story-synth/store";
 import { downloadText } from "@/lib/story-synth/export";
 import { ff } from "@/lib/flags/ff";
-import { useStorySynth } from '@/hooks/useStorySynth';
-import { useAuth } from '@/contexts/AuthContext';
+import { recordEvent } from "@/lib/scores/events"; // P6 (toléré si absent)
 
 type Genre = "calme"|"aventure"|"poetique"|"mysterieux"|"romance";
 type Pov = "je"|"il"|"elle"|"nous";
@@ -20,9 +20,6 @@ const AMBIENTS: Record<string, string> = {
 };
 
 export default function StorySynthPage() {
-  const { user } = useAuth();
-  const { history, createStory, isLoading } = useStorySynth(user?.id || '');
-  
   const [genre, setGenre] = React.useState<Genre>("calme");
   const [pov, setPov] = React.useState<Pov>("je");
   const [hero, setHero] = React.useState("Alex");
@@ -34,12 +31,23 @@ export default function StorySynthPage() {
 
   const [title, setTitle] = React.useState("Petite histoire");
   const [story, setStory] = React.useState<string[]>([]);
+  const [lib, setLib] = React.useState(() => loadStories());
 
   const newAudio = ff?.("new-audio-engine") ?? false;
 
   function onGenerate() {
     const paragraphs = synthParagraphs({ genre, pov, hero, place, length, style, seed });
     setStory(paragraphs);
+    try {
+      recordEvent?.({
+        module: "story-synth",
+        startedAt: new Date().toISOString(),
+        endedAt: new Date().toISOString(),
+        durationSec: 10 + length * 3,
+        score: Math.min(10, 2 + length),
+        meta: { genre, pov, style }
+      });
+    } catch {}
   }
 
   function onContinue() {
@@ -48,18 +56,27 @@ export default function StorySynthPage() {
   }
 
   function onSave() {
-    if (!story.length || !user?.id) return;
-    
-    const content = story.join('\n\n');
-    const metadata = { genre, pov, style, hero, place };
-    
-    createStory({ 
-      title: title.trim() || "Histoire", 
-      content,
-      genre,
-      style,
-      metadata 
-    });
+    if (!story.length) return;
+    const rec = {
+      id: crypto.randomUUID?.() || String(Date.now()),
+      createdAt: new Date().toISOString(),
+      title: title.trim() || "Histoire",
+      content: story,
+      tags: [genre, style],
+      mood: genre
+    };
+    addStory(rec);
+    setLib(loadStories());
+    try {
+      recordEvent?.({
+        module: "story-synth",
+        startedAt: rec.createdAt,
+        endedAt: new Date().toISOString(),
+        durationSec: Math.max(15, story.join(" ").length / 20),
+        score: Math.min(10, Math.round(story.length / 2)),
+        meta: { saved: true }
+      });
+    } catch {}
   }
 
   function onExport() {
@@ -69,7 +86,7 @@ export default function StorySynthPage() {
 
   return (
     <main aria-label="Story Synth">
-      <PageHeader title="Story Synth" subtitle="Génère une courte histoire à partir d'un brief" />
+      <PageHeader title="Story Synth" subtitle="Génère une courte histoire à partir d’un brief" />
       <Card>
         <section style={{ display:"grid", gap: 10 }}>
           <div style={{ display:"grid", gap: 8 }}>
@@ -156,23 +173,19 @@ export default function StorySynthPage() {
       </Card>
 
       <Card style={{ marginTop: 12 }}>
-        <h2>Bibliothèque</h2>
-        {isLoading ? (
-          <p>Chargement...</p>
-        ) : (
-          <ul style={{ listStyle:"none", padding:0, display:"grid", gap:8 }}>
-            {history?.map((s: any) => (
-              <li key={s.id} style={{ border:"1px solid var(--card)", borderRadius:12, padding:10 }}>
-                <div style={{ display:"flex", justifyContent:"space-between", gap:8 }}>
-                  <strong>{s.theme || 'Histoire'}</strong>
-                  <small>{new Date(s.created_at).toLocaleString()}</small>
-                </div>
-                <p style={{ marginTop:6, opacity:.85 }}>Session du {new Date(s.created_at).toLocaleDateString()}</p>
-              </li>
-            ))}
-            {!history?.length && <em>Aucune histoire enregistrée pour l'instant.</em>}
-          </ul>
-        )}
+        <h2>Bibliothèque (local)</h2>
+        <ul style={{ listStyle:"none", padding:0, display:"grid", gap:8 }}>
+          {lib.map(s => (
+            <li key={s.id} style={{ border:"1px solid var(--card)", borderRadius:12, padding:10 }}>
+              <div style={{ display:"flex", justifyContent:"space-between", gap:8 }}>
+                <strong>{s.title}</strong>
+                <small>{new Date(s.createdAt).toLocaleString()}</small>
+              </div>
+              <p style={{ marginTop:6, opacity:.85 }}>{(s.content[0] || "").slice(0,120)}…</p>
+            </li>
+          ))}
+          {!lib.length && <em>Aucune histoire enregistrée pour l’instant.</em>}
+        </ul>
       </Card>
     </main>
   );

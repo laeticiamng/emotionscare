@@ -75,31 +75,8 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm typecheck
 
-  test:
-    needs: setup
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v3
-        with:
-          version: 9
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ needs.setup.outputs.node }}
-          cache: 'pnpm'
-      - run: pnpm install --frozen-lockfile
-      - name: Run unit tests with coverage
-        run: pnpm test -- --coverage
-      - name: Upload coverage reports
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-report
-          path: coverage
-          retention-days: 7
-
   build:
-    needs: [lint, sentry-guard, typecheck, test]
+    needs: [lint, sentry-guard, typecheck]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

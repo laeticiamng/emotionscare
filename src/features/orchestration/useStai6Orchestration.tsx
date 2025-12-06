@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
 
 import type { AssessmentComputation } from '@/services/clinicalScoringService';

@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import { ReactNode } from 'react';
 import { LucideIcon } from 'lucide-react';
@@ -34,12 +33,6 @@ export interface DraggableKpiCardsGridProps {
 }
 
 export type KpiCardProps = DraggableCardProps;
-
-export interface KpiCardsGridProps {
-  cards?: DraggableCardProps[];
-  kpiCards?: DraggableCardProps[];
-  className?: string;
-}
 
 export interface DailyInsightCardProps {
   title: string;

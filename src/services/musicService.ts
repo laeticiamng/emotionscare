@@ -1,7 +1,5 @@
-// @ts-nocheck
 
 import { supabase } from '@/integrations/supabase/client';
-import { logger } from '@/lib/logger';
 
 export interface MusicTrack {
   id: string;
@@ -33,7 +31,7 @@ export class MusicService {
         mood
       };
     } catch (error) {
-      logger.error('Erreur génération musique', error as Error, 'MUSIC');
+      console.error('Erreur génération musique:', error);
       throw new Error('Erreur lors de la génération musicale');
     }
   }
@@ -48,7 +46,7 @@ export class MusicService {
 
       return data.tracks || [];
     } catch (error) {
-      logger.error('Erreur recommandations', error as Error, 'MUSIC');
+      console.error('Erreur recommandations:', error);
       return [];
     }
   }
@@ -64,7 +62,7 @@ export class MusicService {
 
       if (error) throw error;
     } catch (error) {
-      logger.error('Erreur sauvegarde favori', error as Error, 'MUSIC');
+      console.error('Erreur sauvegarde favori:', error);
       throw new Error('Erreur lors de la sauvegarde');
     }
   }
@@ -81,7 +79,7 @@ export class MusicService {
       // En production, on récupérerait les détails des tracks
       return [];
     } catch (error) {
-      logger.error('Erreur récupération favoris', error as Error, 'MUSIC');
+      console.error('Erreur récupération favoris:', error);
       return [];
     }
   }

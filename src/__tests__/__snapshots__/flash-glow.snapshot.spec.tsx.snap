@@ -1,0 +1,19 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`FlashGlowPage > rend la page 1`] = `
+<div>
+  <main
+    class="p-4 space-y-4"
+  >
+    <div>
+      Flash Glow
+    </div>
+    <p>
+      Bienvenue dans le module Flash Glow.
+    </p>
+    <button>
+      Commencer
+    </button>
+  </main>
+</div>
+`;

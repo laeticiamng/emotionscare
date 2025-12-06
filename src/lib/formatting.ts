@@ -1,6 +1,3 @@
-// @ts-nocheck
-
-import { logger } from '@/lib/logger';
 
 /**
  * Utility functions for formatting values
@@ -42,7 +39,7 @@ export const formatDate = (date: Date | string, includeTime = false): string => 
     
     return dateObj.toLocaleDateString('fr-FR', options);
   } catch (error) {
-    logger.error('Error formatting date', error as Error, 'SYSTEM');
+    console.error('Error formatting date:', error);
     return 'Date invalide';
   }
 };

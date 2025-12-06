@@ -1,6 +1,4 @@
-// @ts-nocheck
 
-// @ts-nocheck
 import React from 'react';
 import { VRSession, VRSessionTemplate } from '@/types/vr';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';

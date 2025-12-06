@@ -1,8 +1,7 @@
-// @ts-nocheck
+
 import { v4 as uuidv4 } from 'uuid';
 import { ChatMessage } from '@/types/chat';
 import { conversationsService } from './conversationsService';
-import { logger } from '@/lib/logger';
 
 class ChatHistoryService {
   private messages: Record<string, ChatMessage[]> = {};
@@ -19,7 +18,7 @@ class ChatHistoryService {
         this.messages[conversation.id] = conversation.messages || [];
       });
     } catch (err) {
-      logger.error('Error initializing messages from conversations', err as Error, 'SYSTEM');
+      console.error('Error initializing messages from conversations:', err);
     }
   }
 

@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import { PredictiveAnalyticsProvider as ContextProvider } from '@/contexts/PredictiveAnalyticsContext';
 

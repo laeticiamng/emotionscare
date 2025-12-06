@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import { z } from 'zod';
 import { toast } from '@/hooks/use-toast';

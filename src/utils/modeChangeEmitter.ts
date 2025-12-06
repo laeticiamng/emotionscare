@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 /**
  * Utility to emit mode change events

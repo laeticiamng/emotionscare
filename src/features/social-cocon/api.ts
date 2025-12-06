@@ -1,7 +1,5 @@
-// @ts-nocheck
-import { Sentry } from '@/lib/errors/sentry-compat';
+import * as Sentry from '@sentry/react';
 import { supabase } from '@/integrations/supabase/client';
-import { logger } from '@/lib/logger';
 import {
   type CreateSocialRoomPayload,
   type JoinSocialRoomPayload,
@@ -173,7 +171,7 @@ const anonymizeIdentifier = async (value: string): Promise<string> => {
         .join('');
       return hash;
     } catch (error) {
-      logger.warn('[social-cocon] Unable to hash identifier', error as Error, 'SYSTEM');
+      console.warn('[social-cocon] Unable to hash identifier', error);
     }
   }
 
@@ -193,7 +191,7 @@ const logSocialEvent = async (
     });
   } catch (error) {
     if (import.meta.env.DEV) {
-      logger.info('[social-cocon] Event log skipped', { event, error }, 'SYSTEM');
+      console.info('[social-cocon] Event log skipped', event, error);
     }
   }
 };
@@ -210,7 +208,7 @@ export const fetchSocialRooms = async (): Promise<SocialRoom[]> => {
 
     if (error || !data) {
       if (import.meta.env.DEV) {
-        logger.info('[social-cocon] Falling back to demo rooms', { errorMessage: error?.message }, 'SYSTEM');
+        console.info('[social-cocon] Falling back to demo rooms', error?.message);
       }
       return FALLBACK_ROOMS;
     }
@@ -218,7 +216,7 @@ export const fetchSocialRooms = async (): Promise<SocialRoom[]> => {
     return data.map(mapRoomRecord);
   } catch (error) {
     if (import.meta.env.DEV) {
-      logger.warn('[social-cocon] Failed to load rooms', error as Error, 'SYSTEM');
+      console.warn('[social-cocon] Failed to load rooms', error);
     }
     return FALLBACK_ROOMS;
   }
@@ -327,7 +325,7 @@ export const leaveSocialRoom = async (
     await logSocialEvent('leave', { roomId: payload.roomId });
   } catch (error) {
     if (import.meta.env.DEV) {
-      logger.info('[social-cocon] Leave room fallback', { error }, 'SYSTEM');
+      console.info('[social-cocon] Leave room fallback', error);
     }
   }
 };
@@ -350,7 +348,7 @@ export const toggleSoftMode = async (
     return Boolean(data?.soft_mode_enabled ?? payload.softMode);
   } catch (error) {
     if (import.meta.env.DEV) {
-      logger.info('[social-cocon] Soft mode fallback', { error }, 'SYSTEM');
+      console.info('[social-cocon] Soft mode fallback', error);
     }
     return payload.softMode;
   }
@@ -372,7 +370,7 @@ export const fetchUpcomingBreaks = async (): Promise<SocialBreakPlan[]> => {
     return data.map(mapBreakRecord);
   } catch (error) {
     if (import.meta.env.DEV) {
-      logger.info('[social-cocon] Breaks fallback', { error }, 'SYSTEM');
+      console.info('[social-cocon] Breaks fallback', error);
     }
     return FALLBACK_BREAKS;
   }
@@ -425,15 +423,10 @@ export const scheduleBreak = async (
 
     return mapBreakRecord(data);
   } catch (error) {
-    const normalizedError =
-      error instanceof Error ? error : new Error('schedule_failed');
-
-    Sentry.captureException(normalizedError, {
+    Sentry.captureException(error, {
       tags: { feature: 'social-cocon', action: 'schedule-break' },
-      extra: { basePlan },
     });
-
-    throw normalizedError;
+    return basePlan;
   }
 };
 
@@ -442,7 +435,7 @@ export const cancelScheduledBreak = async (breakId: string): Promise<void> => {
     await supabase.from('social_room_breaks').delete().eq('id', breakId);
   } catch (error) {
     if (import.meta.env.DEV) {
-      logger.info('[social-cocon] Cancel break fallback', { error }, 'SYSTEM');
+      console.info('[social-cocon] Cancel break fallback', error);
     }
   }
 };
@@ -465,7 +458,7 @@ export const fetchQuietHours = async (): Promise<QuietHoursSettings> => {
     };
   } catch (error) {
     if (import.meta.env.DEV) {
-      logger.info('[social-cocon] Quiet hours fallback', { error }, 'SYSTEM');
+      console.info('[social-cocon] Quiet hours fallback', error);
     }
     return FALLBACK_QUIET_HOURS;
   }
@@ -492,7 +485,7 @@ export const fetchMspssSummary = async (): Promise<MspssSummary> => {
     };
   } catch (error) {
     if (import.meta.env.DEV) {
-      logger.info('[social-cocon] MSPSS summary fallback', { error }, 'SYSTEM');
+      console.info('[social-cocon] MSPSS summary fallback', error);
     }
     return FALLBACK_MSPSS;
   }

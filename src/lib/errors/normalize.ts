@@ -150,7 +150,7 @@ function isTimeoutError(error: unknown): boolean {
     return false;
   }
   const candidate = error as { name?: string; code?: string; message?: string };
-  return candidate.name === 'TimeoutError' || candidate.code === 'ETIMEDOUT' || (candidate.message?.toLowerCase().includes('timeout') ?? false);
+  return candidate.name === 'TimeoutError' || candidate.code === 'ETIMEDOUT' || candidate.message?.toLowerCase().includes('timeout');
 }
 
 function isNetworkError(error: unknown): boolean {
@@ -158,7 +158,7 @@ function isNetworkError(error: unknown): boolean {
     return false;
   }
   const candidate = error as { name?: string; message?: string };
-  return candidate.name === 'TypeError' || (candidate.message?.toLowerCase().includes('network') ?? false);
+  return candidate.name === 'TypeError' || candidate.message?.toLowerCase().includes('network');
 }
 
 function extractStatus(error: unknown): number | undefined {

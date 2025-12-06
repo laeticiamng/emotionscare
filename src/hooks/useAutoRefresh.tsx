@@ -1,7 +1,5 @@
-// @ts-nocheck
 
 import { useState, useEffect, useCallback } from 'react';
-import { logger } from '@/lib/logger';
 
 type AutoRefreshPreferences = {
   enabled: boolean;
@@ -27,7 +25,7 @@ export function useAutoRefresh({
         return JSON.parse(saved);
       }
     } catch (error) {
-      logger.error('Error loading auto-refresh preferences', error as Error, 'SYSTEM');
+      console.error('Error loading auto-refresh preferences:', error);
     }
     return { enabled: defaultEnabled, interval: defaultInterval };
   };
@@ -65,7 +63,7 @@ export function useAutoRefresh({
       try {
         await onRefresh();
       } catch (error) {
-        logger.error('Error during auto-refresh', error as Error, 'SYSTEM');
+        console.error('Error during auto-refresh:', error);
       } finally {
         setRefreshing(false);
       }

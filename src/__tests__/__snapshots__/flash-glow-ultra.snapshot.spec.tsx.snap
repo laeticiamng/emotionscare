@@ -1,0 +1,380 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`FlashGlowUltraPage > rend la page et le CTA Démarrer 1`] = `
+<div>
+  <main
+    aria-label="Flash Glow Ultra"
+  >
+    <header>
+      <h1>
+        Flash Glow Ultra
+      </h1>
+      <p>
+        Glow respiratoire avancé, sûr et personnalisable
+      </p>
+    </header>
+    <section>
+      <section
+        style="display: grid; gap: 16px;"
+      >
+        <div
+          style="display: grid; gap: 8px;"
+        >
+          <label>
+            Preset
+            <select>
+              <option
+                value="calme"
+              >
+                Calme (6 bpm, emerald)
+              </option>
+              <option
+                value="focus"
+              >
+                Focus (8 bpm, cyan)
+              </option>
+              <option
+                value="recovery"
+              >
+                Recovery (4 bpm, violet)
+              </option>
+            </select>
+          </label>
+          <label>
+            BPM visuel : 
+            6
+            <input
+              max="12"
+              min="2"
+              step="1"
+              type="range"
+              value="6"
+            />
+          </label>
+          <label>
+            Intensité : 
+            60
+            %
+            <input
+              max="1"
+              min="0.2"
+              step="0.05"
+              type="range"
+              value="0.6"
+            />
+          </label>
+          <label>
+            Thème
+            <select>
+              <option
+                value="emerald"
+              >
+                Émeraude
+              </option>
+              <option
+                value="cyan"
+              >
+                Cyan
+              </option>
+              <option
+                value="violet"
+              >
+                Violet
+              </option>
+              <option
+                value="amber"
+              >
+                Ambre
+              </option>
+            </select>
+          </label>
+          <label>
+            Forme
+            <select>
+              <option
+                value="ring"
+              >
+                Anneau
+              </option>
+              <option
+                value="full"
+              >
+                Plein
+              </option>
+            </select>
+          </label>
+          <label>
+            Durée (min) : 
+            2
+            <input
+              max="10"
+              min="1"
+              step="1"
+              type="range"
+              value="2"
+            />
+          </label>
+        </div>
+        <div
+          style="display: grid; gap: 8px; background: rgba(255, 255, 255, 0.02); border-radius: 16px; padding: 16px;"
+        >
+          <label>
+            Humeur avant séance : 
+            50
+            /100
+            <input
+              max="100"
+              min="0"
+              step="1"
+              type="range"
+              value="50"
+            />
+          </label>
+          <label>
+            Humeur après séance : 
+            50
+            /100
+            <input
+              max="100"
+              min="0"
+              step="1"
+              type="range"
+              value="50"
+            />
+          </label>
+        </div>
+        <div
+          style="display: grid; gap: 12px; background: rgba(255, 255, 255, 0.04); border-radius: 16px; padding: 16px;"
+        >
+          <div
+            style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px;"
+          >
+            <div
+              style="min-width: 140px;"
+            >
+              <div
+                style="font-size: 12px; opacity: 0.7;"
+              >
+                Phase active
+              </div>
+              <div
+                style="font-weight: 600;"
+              >
+                Ancrage
+              </div>
+            </div>
+            <div
+              style="min-width: 140px;"
+            >
+              <div
+                style="font-size: 12px; opacity: 0.7;"
+              >
+                Phase restante
+              </div>
+              <div
+                style="font-weight: 600;"
+              >
+                0:24
+              </div>
+            </div>
+            <div
+              style="min-width: 140px;"
+            >
+              <div
+                style="font-size: 12px; opacity: 0.7;"
+              >
+                Session restante
+              </div>
+              <div
+                style="font-weight: 600;"
+              >
+                2:00
+              </div>
+            </div>
+          </div>
+          <div>
+            progress:
+            0
+          </div>
+          <div
+            style="display: flex; justify-content: space-between; font-size: 12px; opacity: 0.8;"
+          >
+            <span>
+              Écoulé : 
+              0:00
+            </span>
+            <span>
+              0
+              %
+            </span>
+            <span>
+              Objectif : 
+              2:00
+            </span>
+          </div>
+          <div
+            style="display: grid; gap: 8px; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));"
+          >
+            <div
+              style="padding: 12px; border-radius: 14px; background: rgba(249, 115, 22, 0.12); transition: all .3s ease;"
+            >
+              <div
+                style="display: flex; justify-content: space-between; align-items: center; gap: 8px;"
+              >
+                <span
+                  style="font-size: 13px; font-weight: 600;"
+                >
+                  1
+                  . 
+                  Ancrage
+                </span>
+                <span
+                  style="font-size: 12px; opacity: 0.7;"
+                >
+                  0:24
+                </span>
+              </div>
+              <div
+                style="margin-top: 8px; height: 4px; border-radius: 4px; background: rgba(255, 255, 255, 0.12); overflow: hidden;"
+              >
+                <div
+                  style="width: 0%; height: 100%; opacity: 1; transition: width .4s ease;"
+                />
+              </div>
+              <p
+                style="margin-top: 8px; font-size: 12px; line-height: 1.4; opacity: 0.7;"
+              >
+                Stabilisez votre respiration et trouvez votre rythme de base.
+              </p>
+            </div>
+            <div
+              style="padding: 12px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255, 255, 255, 0.04); transition: all .3s ease;"
+            >
+              <div
+                style="display: flex; justify-content: space-between; align-items: center; gap: 8px;"
+              >
+                <span
+                  style="font-size: 13px; font-weight: 600;"
+                >
+                  2
+                  . 
+                  Impulsion
+                </span>
+                <span
+                  style="font-size: 12px; opacity: 0.7;"
+                >
+                  0:36
+                </span>
+              </div>
+              <div
+                style="margin-top: 8px; height: 4px; border-radius: 4px; background: rgba(255, 255, 255, 0.12); overflow: hidden;"
+              >
+                <div
+                  style="width: 0%; height: 100%; opacity: 0.5; transition: width .4s ease;"
+                />
+              </div>
+              <p
+                style="margin-top: 8px; font-size: 12px; line-height: 1.4; opacity: 0.7;"
+              >
+                Augmentez progressivement l'intensité lumineuse.
+              </p>
+            </div>
+            <div
+              style="padding: 12px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255, 255, 255, 0.04); transition: all .3s ease;"
+            >
+              <div
+                style="display: flex; justify-content: space-between; align-items: center; gap: 8px;"
+              >
+                <span
+                  style="font-size: 13px; font-weight: 600;"
+                >
+                  3
+                  . 
+                  Rayonnement
+                </span>
+                <span
+                  style="font-size: 12px; opacity: 0.7;"
+                >
+                  0:36
+                </span>
+              </div>
+              <div
+                style="margin-top: 8px; height: 4px; border-radius: 4px; background: rgba(255, 255, 255, 0.12); overflow: hidden;"
+              >
+                <div
+                  style="width: 0%; height: 100%; opacity: 0.5; transition: width .4s ease;"
+                />
+              </div>
+              <p
+                style="margin-top: 8px; font-size: 12px; line-height: 1.4; opacity: 0.7;"
+              >
+                Diffusez l'énergie dans tout le corps.
+              </p>
+            </div>
+            <div
+              style="padding: 12px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255, 255, 255, 0.04); transition: all .3s ease;"
+            >
+              <div
+                style="display: flex; justify-content: space-between; align-items: center; gap: 8px;"
+              >
+                <span
+                  style="font-size: 13px; font-weight: 600;"
+                >
+                  4
+                  . 
+                  Intégration
+                </span>
+                <span
+                  style="font-size: 12px; opacity: 0.7;"
+                >
+                  0:24
+                </span>
+              </div>
+              <div
+                style="margin-top: 8px; height: 4px; border-radius: 4px; background: rgba(255, 255, 255, 0.12); overflow: hidden;"
+              >
+                <div
+                  style="width: 0%; height: 100%; opacity: 0.5; transition: width .4s ease;"
+                />
+              </div>
+              <p
+                style="margin-top: 8px; font-size: 12px; line-height: 1.4; opacity: 0.7;"
+              >
+                Revenez en douceur et ancrez les sensations.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div>
+          glow
+        </div>
+        <div
+          style="display: grid; gap: 4px;"
+        >
+          <div
+            aria-live="polite"
+            role="status"
+            style="font-size: 12px; opacity: 0.85;"
+          >
+            Séance prête.
+          </div>
+          <div
+            style="display: flex; gap: 8px;"
+          >
+            <button
+              data-ui="primary-cta"
+            >
+              Démarrer
+            </button>
+          </div>
+        </div>
+        <small
+          style="opacity: 0.75;"
+        >
+          Sécurité anti-flash activée (≤3 Hz). Si tu utilises “Réduction des animations” sur ton appareil, l’animation devient très douce.
+        </small>
+      </section>
+    </section>
+  </main>
+</div>
+`;

@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { useFlags } from '@/core/flags';
-import { useMoodStore } from '@/hooks/useMood';
+import { useMood } from '@/contexts/MoodContext';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
@@ -55,8 +55,7 @@ const getSecondaryTextColor = (textColor: string) => {
 };
 
 const SamInstantMood: React.FC = () => {
-  const currentMood = useMoodStore();
-  const { updateMood } = currentMood;
+  const { updateMood, currentMood } = useMood();
   const { has } = useFlags();
 
   const isScanEnabled = has('FF_SCAN');

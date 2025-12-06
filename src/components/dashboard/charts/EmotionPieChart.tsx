@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import React from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
@@ -23,7 +22,7 @@ const EmotionPieChart: React.FC<EmotionPieChartProps> = ({ data }) => {
           cy="50%"
           labelLine={false}
           outerRadius={80}
-          fill="hsl(var(--primary))"
+          fill="#8884d8"
           dataKey="value"
           nameKey="name"
         >

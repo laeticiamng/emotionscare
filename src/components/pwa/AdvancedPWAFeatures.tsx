@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,7 +7,6 @@ import { Progress } from '@/components/ui/progress';
 import { Smartphone, Download, Wifi, Bell, Share, Home, Zap } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
-import { logger } from '@/lib/logger';
 
 export const AdvancedPWAFeatures: React.FC = () => {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
@@ -74,7 +72,7 @@ export const AdvancedPWAFeatures: React.FC = () => {
           url: window.location.origin
         });
       } catch (error) {
-        logger.info('Partage annulé', {}, 'UI');
+        console.log('Partage annulé');
       }
     } else {
       navigator.clipboard.writeText(window.location.origin);

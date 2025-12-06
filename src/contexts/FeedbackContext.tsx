@@ -1,9 +1,7 @@
-// @ts-nocheck
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
-import { logger } from '@/lib/logger';
 
 interface FeedbackEntry {
   id: string;
@@ -180,9 +178,9 @@ export const FeedbackProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         processAISuggestions();
       }, 2000);
 
-      logger.info('Feedback soumis avec succès', newFeedback, 'UI');
+      console.log('Feedback soumis avec succès:', newFeedback);
     } catch (error) {
-      logger.error('Erreur lors de la soumission du feedback', error as Error, 'UI');
+      console.error('Erreur lors de la soumission du feedback:', error);
     } finally {
       setLoading(false);
     }
@@ -211,9 +209,9 @@ export const FeedbackProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         feedbackVolume: prev.feedbackVolume + 1
       }));
 
-      logger.info('Suggestion IA générée', newSuggestion, 'UI');
+      console.log('Suggestion IA générée:', newSuggestion);
     } catch (error) {
-      logger.error('Erreur lors du traitement IA', error as Error, 'UI');
+      console.error('Erreur lors du traitement IA:', error);
     } finally {
       setLoading(false);
     }
@@ -251,7 +249,7 @@ ${suggestions
 3. Maintenir le taux de résolution au-dessus de 90%
       `;
 
-      logger.info('Rapport d\'amélioration généré', undefined, 'UI');
+      console.log('Rapport d\'amélioration généré');
       return report.trim();
     } finally {
       setLoading(false);
@@ -277,9 +275,9 @@ ${suggestions
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
 
-      logger.info('Données de feedback exportées', undefined, 'UI');
+      console.log('Données de feedback exportées');
     } catch (error) {
-      logger.error('Erreur lors de l\'export', error as Error, 'UI');
+      console.error('Erreur lors de l\'export:', error);
     }
   };
 

@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 export { GlowEmptyState } from './GlowEmptyState';
 export { GlowKpiCard } from './GlowKpiCard';

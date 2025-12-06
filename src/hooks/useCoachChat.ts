@@ -1,9 +1,7 @@
-// @ts-nocheck
 import { useState, useCallback, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { coachService, CoachingSession, CoachMessage, CoachingRecommendation } from '@/services/coach';
 import { v4 as uuidv4 } from 'uuid';
-import { logger } from '@/lib/logger';
 
 export interface CoachChatState {
   currentSession: CoachingSession | null;
@@ -73,8 +71,8 @@ export const useCoachChat = () => {
       }));
 
     } catch (error) {
-      logger.error('Error starting coaching session', error as Error, 'UI');
-      setState(prev => ({
+      console.error('Error starting coaching session:', error);
+      setState(prev => ({ 
         ...prev, 
         error: 'Impossible de démarrer la session de coaching',
         isProcessing: false 
@@ -130,7 +128,7 @@ export const useCoachChat = () => {
 
       return response.coachResponse;
     } catch (error) {
-      logger.error('Error sending message to coach', error as Error, 'UI');
+      console.error('Error sending message to coach:', error);
       setState(prev => ({ 
         ...prev, 
         error: 'Impossible d\'envoyer le message',
@@ -160,7 +158,7 @@ export const useCoachChat = () => {
       setState(prev => ({ ...prev, recommendations }));
       return recommendations;
     } catch (error) {
-      logger.error('Error getting recommendations', error as Error, 'UI');
+      console.error('Error getting recommendations:', error);
       return [];
     }
   }, []);
@@ -172,7 +170,7 @@ export const useCoachChat = () => {
     try {
       return await coachService.getUserCoachingSessions(user.id, limit);
     } catch (error) {
-      logger.error('Error loading session history', error as Error, 'UI');
+      console.error('Error loading session history:', error);
       return [];
     }
   }, [user?.id]);
@@ -184,7 +182,7 @@ export const useCoachChat = () => {
     try {
       return await coachService.getCoachingProgress(user.id, days);
     } catch (error) {
-      logger.error('Error getting coaching progress', error as Error, 'UI');
+      console.error('Error getting coaching progress:', error);
       return null;
     }
   }, [user?.id]);
@@ -209,7 +207,7 @@ export const useCoachChat = () => {
         }));
       }
     } catch (error) {
-      logger.error('Error resuming session', error as Error, 'UI');
+      console.error('Error resuming session:', error);
       setState(prev => ({ 
         ...prev, 
         error: 'Impossible de reprendre la session',

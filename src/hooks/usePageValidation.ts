@@ -1,10 +1,9 @@
-// @ts-nocheck
+
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
 import { validateRouteAccess, RouteValidationResult } from '@/utils/routeValidation';
-import { logger } from '@/lib/logger';
 
 export const usePageValidation = () => {
   const location = useLocation();
@@ -30,12 +29,12 @@ export const usePageValidation = () => {
     setIsValidating(false);
     
     // Log de validation pour le debug
-    logger.debug('Page validation', {
+    console.log('Page validation:', {
       path: location.pathname,
       user: user?.role || userMode,
       authenticated: isAuthenticated,
       result
-    }, 'SYSTEM');
+    });
   }, [location.pathname, isAuthenticated, user?.role, userMode]);
 
   return {

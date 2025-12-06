@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -52,7 +51,7 @@ const JournalInterface: React.FC = () => {
 
       setEntries(journalEntries);
     } catch (error) {
-      // Journal loading error
+      console.error('Erreur chargement journal:', error);
       notify(
         {
           code: 'SERVER',
@@ -110,7 +109,7 @@ const JournalInterface: React.FC = () => {
             .eq('id', data.id);
         }
       } catch (analysisError) {
-        // AI analysis error
+        console.error('Erreur analyse IA:', analysisError);
         notify(
           {
             code: 'SERVER',
@@ -132,7 +131,7 @@ const JournalInterface: React.FC = () => {
       setNewEntry('');
       setIsWriting(false);
     } catch (error) {
-      // Journal save error
+      console.error('Erreur sauvegarde:', error);
       notify(
         {
           code: 'SERVER',

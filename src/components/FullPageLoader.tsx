@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -72,7 +73,7 @@ const FullPageLoader: React.FC<FullPageLoaderProps> = ({
               />
             )}
             
-            <p className="text-lg font-medium text-foreground">{message}</p>
+            <p className="text-lg font-medium text-foreground/80">{message}</p>
           </div>
         </motion.div>
       )}

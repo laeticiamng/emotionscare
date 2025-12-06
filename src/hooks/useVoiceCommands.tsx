@@ -1,9 +1,7 @@
-// @ts-nocheck
 
 import { useState, useEffect, useCallback } from 'react';
 import { useToast } from './use-toast';
 import type { SpeechRecognition } from '@/types/speech';
-import { logger } from '@/lib/logger';
 
 declare global {
   interface Window {
@@ -24,7 +22,7 @@ export function useVoiceCommands() {
     setSupported(hasRecognition);
     
     if (!hasRecognition) {
-      logger.warn('Speech recognition not supported in this browser', {}, 'UI');
+      console.warn('Speech recognition not supported in this browser');
     }
   }, []);
 
@@ -74,7 +72,7 @@ export function useVoiceCommands() {
           };
           
           recognition.onerror = (event: any) => {
-            logger.error('Error in speech recognition', new Error(event.error), 'UI');
+            console.error('Error in speech recognition:', event.error);
             toast({
               title: "Erreur de reconnaissance vocale",
               description: `${event.error || "Impossible d'activer la reconnaissance vocale"}`,
@@ -89,7 +87,7 @@ export function useVoiceCommands() {
           recognition.start();
         }
       } catch (error) {
-        logger.error('Error starting voice recognition', error as Error, 'UI');
+        console.error('Error starting voice recognition:', error);
         toast({
           title: "Erreur de reconnaissance vocale",
           description: "Impossible d'activer la reconnaissance vocale",

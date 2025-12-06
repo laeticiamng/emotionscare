@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -8,7 +7,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { Music, Loader2, CheckCircle, XCircle } from 'lucide-react';
-import { logger } from '@/lib/logger';
 
 const MusicGenerationTest: React.FC = () => {
   const [isGenerating, setIsGenerating] = useState(false);
@@ -38,7 +36,7 @@ const MusicGenerationTest: React.FC = () => {
       setResult(data);
     } catch (err: any) {
       setError(err.message || 'Erreur lors du test de génération');
-      logger.error('Erreur test génération:', err);
+      console.error('Erreur test génération:', err);
     } finally {
       setIsGenerating(false);
     }

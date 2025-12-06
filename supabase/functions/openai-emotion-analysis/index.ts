@@ -1,48 +1,18 @@
-// @ts-nocheck
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import OpenAI from 'https://deno.land/x/openai@v4.28.0/mod.ts';
-import { authenticateRequest } from '../_shared/auth-middleware.ts';
-import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
-import { validateRequest, createErrorResponse, EmotionAnalysisSchema } from '../_shared/validation.ts';
-import { getCorsHeaders, handleCors } from '../_shared/cors.ts';
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
 
 serve(async (req) => {
-  const corsHeaders = getCorsHeaders(req);
-  const corsResponse = handleCors(req);
-  if (corsResponse) return corsResponse;
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders });
+  }
 
   try {
-    // 🔒 SÉCURITÉ: Authentification obligatoire
-    const authResult = await authenticateRequest(req);
-    if (authResult.status !== 200 || !authResult.user) {
-      console.warn('[openai-emotion-analysis] Unauthorized access attempt');
-      return createErrorResponse(authResult.error || 'Authentication required', authResult.status, corsHeaders);
-    }
-
-    // 🛡️ SÉCURITÉ: Rate limiting strict (10 req/min par utilisateur)
-    const rateLimit = await enforceEdgeRateLimit(req, {
-      route: 'openai-emotion-analysis',
-      userId: authResult.user.id,
-      limit: 10,
-      windowMs: 60_000,
-      description: 'OpenAI emotion analysis - GPT-4 API calls'
-    });
-
-    if (!rateLimit.allowed) {
-      console.warn('[openai-emotion-analysis] Rate limit exceeded', { userId: authResult.user.id });
-      return buildRateLimitResponse(rateLimit, corsHeaders, {
-        errorCode: 'rate_limit_exceeded',
-        message: `Trop de requêtes. Réessayez dans ${rateLimit.retryAfterSeconds}s.`
-      });
-    }
-
-    // ✅ VALIDATION: Validation Zod des entrées
-    const validation = await validateRequest(req, EmotionAnalysisSchema);
-    if (!validation.success) {
-      return createErrorResponse(validation.error, validation.status, corsHeaders);
-    }
-
-    const { type, data, model } = validation.data;
+    const { type, data, model = 'gpt-4.1-2025-04-14' } = await req.json();
     
     const openaiApiKey = Deno.env.get('OPENAI_API_KEY');
     if (!openaiApiKey) {

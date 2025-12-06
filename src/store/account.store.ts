@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { logger } from '@/lib/logger';
 
 import { persist } from './utils/createImmutableStore';
 import { createSelectors } from './utils/createSelectors';
@@ -128,9 +127,9 @@ const accountStoreBase = create<AccountState>()(
       },
       checkStatus: async () => {
         try {
-          logger.debug('Account status check skipped in demo mode', {}, 'SYSTEM');
+          console.log('Account status check skipped in demo mode');
         } catch (error) {
-          logger.warn('Failed to check account status', error, 'SYSTEM');
+          console.warn('Failed to check account status:', error);
         }
       },
       reset: () => set(initialState),

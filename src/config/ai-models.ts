@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 // Configuration for AI models used in different parts of the application
 export const AI_MODEL_CONFIG = {

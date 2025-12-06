@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import { Moon, Sun, Laptop } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -8,7 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useTheme } from '@/providers/theme';
+import { useTheme } from '@/components/theme-provider';
 
 export function ModeToggle() {
   const { theme, setTheme } = useTheme();

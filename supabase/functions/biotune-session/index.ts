@@ -1,55 +1,17 @@
-// @ts-nocheck
-/**
- * biotune-session - Sessions de biofeedback personnalisées via IA
- *
- * 🔒 SÉCURISÉ: Auth + Rate limit 15/min + CORS restrictif
- */
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import "https://deno.land/x/xhr@0.1.0/mod.ts"
-import { authenticateRequest } from '../_shared/auth-middleware.ts';
-import { cors, preflightResponse, rejectCors } from '../_shared/cors.ts';
-import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
 
 serve(async (req) => {
-  const corsResult = cors(req);
-  const corsHeaders = {
-    ...corsResult.headers,
-    'X-Content-Type-Options': 'nosniff',
-    'X-Frame-Options': 'DENY',
-  };
-
   if (req.method === 'OPTIONS') {
-    return preflightResponse(corsResult);
-  }
-
-  if (!corsResult.allowed) {
-    return rejectCors(corsResult);
+    return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const authResult = await authenticateRequest(req);
-    if (authResult.status !== 200 || !authResult.user) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-        status: authResult.status,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
-
-    const rateLimit = await enforceEdgeRateLimit(req, {
-      route: 'biotune-session',
-      userId: authResult.user.id,
-      limit: 15,
-      windowMs: 60_000,
-      description: 'Biotune session generation',
-    });
-
-    if (!rateLimit.allowed) {
-      return buildRateLimitResponse(rateLimit, corsHeaders, {
-        errorCode: 'rate_limit_exceeded',
-        message: `Trop de requêtes. Réessayez dans ${rateLimit.retryAfterSeconds}s.`,
-      });
-    }
-
     const { emotion, biometric_data, session_type } = await req.json();
     const openaiApiKey = Deno.env.get('OPENAI_API_KEY');
 

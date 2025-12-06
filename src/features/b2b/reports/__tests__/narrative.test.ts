@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { describe, expect, it } from 'vitest';
 import { generateMonthlyNarrative } from '../narrative';
 import type { AggregateSummary } from '@/services/b2b/reportsApi';

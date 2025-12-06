@@ -1,18 +1,15 @@
-// @ts-nocheck
-/**
- * team-management - Gestion des équipes (admin)
- *
- * 🔒 SÉCURISÉ: Auth admin + Rate limit 20/min + CORS restrictif
- */
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { authorizeRole } from '../_shared/auth.ts';
-import { cors, preflightResponse, rejectCors } from '../_shared/cors.ts';
-import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
 
 const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
 const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
 const supabase = createClient(supabaseUrl, supabaseKey);
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
 
 async function listTeams() {
   const { data, error } = await supabase.from('teams').select('*');
@@ -46,52 +43,17 @@ async function logAction(userId: string, action: string, details: string) {
 }
 
 serve(async (req) => {
-  // 1. CORS check
-  const corsResult = cors(req);
-  const corsHeaders = {
-    ...corsResult.headers,
-    'X-Content-Type-Options': 'nosniff',
-    'X-Frame-Options': 'DENY',
-  };
-
   if (req.method === 'OPTIONS') {
-    return preflightResponse(corsResult);
+    return new Response(null, { headers: corsHeaders });
   }
 
-  // Vérification CORS stricte
-  if (!corsResult.allowed) {
-    console.warn('[team-management] CORS rejected - origin not allowed');
-    return rejectCors(corsResult);
-  }
-
-  // 2. Auth admin
   const { user, status } = await authorizeRole(req, ['b2b_admin', 'admin']);
   if (!user) {
-    console.warn('[team-management] Unauthorized access attempt');
     return new Response(JSON.stringify({ error: 'Unauthorized' }), {
       status,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }
-
-  // 3. 🛡️ Rate limiting
-  const rateLimit = await enforceEdgeRateLimit(req, {
-    route: 'team-management',
-    userId: user.id,
-    limit: 20,
-    windowMs: 60_000,
-    description: 'Team management - Admin only',
-  });
-
-  if (!rateLimit.allowed) {
-    console.warn('[team-management] Rate limit exceeded', { userId: user.id });
-    return buildRateLimitResponse(rateLimit, corsHeaders, {
-      errorCode: 'rate_limit_exceeded',
-      message: `Trop de requêtes. Réessayez dans ${rateLimit.retryAfterSeconds}s.`,
-    });
-  }
-
-  console.log(`[team-management] Processing for admin: ${user.id}`);
 
   try {
     const { action, payload } = await req.json();
@@ -130,10 +92,9 @@ serve(async (req) => {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
     }
-  } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Server error'
-    console.error('team-management error:', error)
-    return new Response(JSON.stringify({ error: 'Server error', message: errorMessage }), {
+  } catch (error) {
+    console.error('team-management error:', error);
+    return new Response(JSON.stringify({ error: 'Server error', message: error.message }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });

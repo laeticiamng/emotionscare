@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Service de musique thérapeutique EmotionsCare
  * Connexion Suno AI et recommandations personnalisées
@@ -6,7 +5,6 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { MusicTrack } from '@/contexts/MusicContext';
-import { logger } from '@/lib/logger';
 
 export interface MusicGenerationRequest {
   emotion: string;
@@ -63,7 +61,7 @@ class MusicService {
 
       return track;
     } catch (error) {
-      logger.error('Music generation error', error as Error, 'MUSIC');
+      console.error('Music generation error:', error);
       throw new Error('Échec de la génération musicale');
     }
   }
@@ -101,7 +99,7 @@ class MusicService {
         suggested_duration: rec.suggested_duration
       }));
     } catch (error) {
-      logger.error('Music recommendations error', error as Error, 'MUSIC');
+      console.error('Music recommendations error:', error);
       // Fallback recommendations
       return this.getFallbackRecommendations(emotion);
     }
@@ -149,7 +147,7 @@ class MusicService {
         total_duration: data.total_duration
       };
     } catch (error) {
-      logger.error('Therapeutic playlist error', error as Error, 'MUSIC');
+      console.error('Therapeutic playlist error:', error);
       throw new Error('Échec de la création de playlist thérapeutique');
     }
   }
@@ -183,7 +181,7 @@ class MusicService {
 
       return data;
     } catch (error) {
-      logger.error('Music preferences analysis error', error as Error, 'MUSIC');
+      console.error('Music preferences analysis error:', error);
       return {
         preferred_emotions: ['calm', 'happy'],
         preferred_styles: ['ambient', 'therapeutic'],
@@ -225,7 +223,7 @@ class MusicService {
 
       if (error) throw error;
     } catch (error) {
-      logger.error('Error logging listening session', error as Error, 'MUSIC');
+      console.error('Error logging listening session:', error);
     }
   }
 
@@ -268,7 +266,7 @@ class MusicService {
         steps: data.transition_steps
       };
     } catch (error) {
-      logger.error('Adaptive music error', error as Error, 'MUSIC');
+      console.error('Adaptive music error:', error);
       throw new Error('Échec de la génération adaptative');
     }
   }

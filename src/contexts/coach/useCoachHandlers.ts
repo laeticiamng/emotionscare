@@ -1,8 +1,6 @@
-// @ts-nocheck
 
 import { useState, useCallback } from 'react';
 import { ChatMessage } from '@/types/chat';
-import { logger } from '@/lib/logger';
 
 interface CoachHandlerProps {
   coachCharacter: {
@@ -38,7 +36,7 @@ export const useCoachHandlers = ({
       const responseType = coachCharacter.personality || 'empathetic';
       return responses[responseType as keyof typeof responses] || responses.empathetic;
     } catch (error) {
-      logger.error('Error getting coach response', error as Error, 'UI');
+      console.error('Error getting coach response:', error);
       return "Je suis désolé, je n'ai pas pu traiter votre message.";
     } finally {
       setIsTyping(false);
@@ -75,7 +73,7 @@ export const useCoachHandlers = ({
       
       return { emotion: detectedEmotion, score: Math.min(highestScore, 1.0) };
     } catch (error) {
-      logger.error('Error analyzing emotion', error as Error, 'UI');
+      console.error('Error analyzing emotion:', error);
       return { emotion: 'neutral', score: 0.5 };
     }
   }, []);

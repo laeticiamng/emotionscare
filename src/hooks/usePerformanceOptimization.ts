@@ -1,6 +1,5 @@
-// @ts-nocheck
-import { useCallback, useMemo, useRef, useEffect, useState } from 'react';
-import { logger } from '@/lib/logger';
+
+import { useCallback, useMemo, useRef, useEffect } from 'react';
 
 interface PerformanceMetrics {
   renderTime: number;
@@ -28,7 +27,7 @@ export const usePerformanceOptimization = (componentName: string) => {
 
     // Log les performances en développement
     if (import.meta.env.DEV && renderTime > 100) {
-      logger.warn(`Slow render detected in ${componentName}`, { renderTime: `${renderTime}ms` }, 'SYSTEM');
+      console.warn(`⚡ Slow render detected in ${componentName}: ${renderTime}ms`);
     }
   }, [componentName]);
 
@@ -81,7 +80,7 @@ export const useConditionalLazyLoad = (shouldLoad: boolean, importFn: () => Prom
           setLoading(false);
         })
         .catch((error) => {
-          logger.error('Lazy loading failed', error as Error, 'SYSTEM');
+          console.error('Lazy loading failed:', error);
           setLoading(false);
         });
     }

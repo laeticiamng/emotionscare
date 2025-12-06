@@ -1,7 +1,5 @@
-// @ts-nocheck
 import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { logger } from '@/lib/logger';
 
 export interface SunoMusicRequest {
   prompt: string;
@@ -53,7 +51,7 @@ export const useSunoMusic = () => {
     setState(prev => ({ ...prev, isGenerating: true, error: null }));
 
     try {
-      logger.info('🎵 Generating music with Suno', request, 'MUSIC');
+      console.log('🎵 Generating music with Suno:', request);
 
       const { data, error } = await supabase.functions.invoke('suno-music-generation', {
         body: request
@@ -72,12 +70,12 @@ export const useSunoMusic = () => {
         error: null
       }));
 
-      logger.info('✅ Music generation completed', response, 'MUSIC');
+      console.log('✅ Music generation completed:', response);
       return response;
 
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to generate music';
-      logger.error('❌ Music generation failed', err as Error, 'MUSIC');
+      console.error('❌ Music generation failed:', errorMessage);
       
       setState(prev => ({ 
         ...prev, 

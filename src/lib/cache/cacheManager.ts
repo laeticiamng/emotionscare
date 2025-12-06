@@ -1,6 +1,3 @@
-// @ts-nocheck
-
-import { logger } from '@/lib/logger';
 
 interface CacheEntry<T> {
   data: T;
@@ -120,7 +117,7 @@ class CacheManager<T> {
           const data = await loader();
           this.set(key, data, ttl);
         } catch (error) {
-          logger.warn(`Failed to preload cache key: ${key}`, error as Error, 'SYSTEM');
+          console.warn(`Failed to preload cache key: ${key}`, error);
         }
       }
     });

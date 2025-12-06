@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 export function formatDate(date: string | Date): string {
   if (!date) return 'Date inconnue';

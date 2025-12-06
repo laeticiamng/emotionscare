@@ -1,7 +1,5 @@
-// @ts-nocheck
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { HRVSummary } from '@/store/bounce.store';
-import { logger } from '@/lib/logger';
 
 interface HRVConfig {
   enabled: boolean;
@@ -21,7 +19,7 @@ export const useHRV = (config: HRVConfig) => {
 
   const startCapture = useCallback(async () => {
     if (!config.enabled) {
-      logger.info('HRV disabled by config', undefined, 'SYSTEM');
+      console.log('HRV disabled by config');
       return;
     }
 
@@ -57,14 +55,14 @@ export const useHRV = (config: HRVConfig) => {
         
       } else {
         // Fallback: simulation for web/testing
-        logger.info('HRV simulation mode (no native health APIs available)', undefined, 'SYSTEM');
+        console.log('HRV simulation mode (no native health APIs available)');
         startTimeRef.current = Date.now();
         setIsActive(true);
         startHRVSimulation();
       }
       
     } catch (error) {
-      logger.error('Error starting HRV capture', error as Error, 'SYSTEM');
+      console.error('Error starting HRV capture:', error);
       setError('Impossible d\'accéder aux capteurs de fréquence cardiaque');
     }
   }, [config]);
@@ -112,7 +110,7 @@ export const useHRV = (config: HRVConfig) => {
           config.onHRVUpdate?.(hrv);
         }
       } catch (error) {
-        logger.error('Error collecting HRV sample', error as Error, 'SYSTEM');
+        console.error('Error collecting HRV sample:', error);
       }
     }, interval);
   }, [config, baseline]);

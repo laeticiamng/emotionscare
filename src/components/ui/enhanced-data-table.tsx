@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -8,8 +9,8 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Search, Filter, Download, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import AdvancedPagination from './advanced-pagination';
-import { LoadingSpinner } from './LoadingSpinner';
 import EmptyState from './empty-state';
+import LoadingSpinner from './loading-spinner';
 
 interface Column<T> {
   key: keyof T;

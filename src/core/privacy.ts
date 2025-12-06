@@ -1,6 +1,4 @@
-// @ts-nocheck
 import { useState, useEffect } from 'react';
-import { logger } from '@/lib/logger';
 
 interface PrivacyPrefs {
   cam: boolean;
@@ -33,7 +31,7 @@ export function usePrivacy() {
           setPrefs({ ...DEFAULT_PREFS, ...data.prefs });
         }
       } catch (error) {
-        logger.warn('Failed to load privacy preferences', error as Error, 'SYSTEM');
+        console.warn('Failed to load privacy preferences:', error);
       } finally {
         setLoading(false);
       }
@@ -76,7 +74,7 @@ export function usePrivacy() {
         });
       }
     } catch (error) {
-      logger.warn(`Failed to enable ${sensor} sensor`, error as Error, 'SYSTEM');
+      console.warn(`Failed to enable ${sensor} sensor:`, error);
     }
   };
 
@@ -92,7 +90,7 @@ export function usePrivacy() {
         body: JSON.stringify({ [sensor]: false })
       });
     } catch (error) {
-      logger.warn(`Failed to disable ${sensor} sensor`, error as Error, 'SYSTEM');
+      console.warn(`Failed to disable ${sensor} sensor:`, error);
     }
   };
 

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState, useCallback } from 'react';
 import { sunoService } from '@/services';
 import type { ApiResponse, MusicRecommendation, EmotionData } from '@/services/types';

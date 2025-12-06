@@ -1,7 +1,5 @@
-// @ts-nocheck
 import { supabase } from '@/integrations/supabase/client';
-import { logger } from '@/lib/logger';
-import type {
+import type { 
   StartInput, 
   StartOutput, 
   SubmitInput, 
@@ -21,7 +19,7 @@ export async function startAssess(body: StartInput): Promise<StartOutput> {
   });
   
   if (error) {
-    logger.error('Assessment start error', error as Error, 'API');
+    console.error('Assessment start error:', error);
     throw new Error(`assess_start_failed: ${error.message}`);
   }
   
@@ -52,7 +50,7 @@ export async function submitAssess(body: SubmitInput): Promise<SubmitOutput> {
       throw new Error('assess_unauthorized');
     }
     
-    logger.error('Assessment submit error', error as Error, 'API');
+    console.error('Assessment submit error:', error);
     throw new Error(`assess_submit_failed: ${error.message}`);
   }
   
@@ -69,7 +67,7 @@ export async function aggregateAssess(body: AggregateInput): Promise<AggregateOu
   });
   
   if (error) {
-    logger.error('Assessment aggregate error', error as Error, 'API');
+    console.error('Assessment aggregate error:', error);
     throw new Error(`assess_aggregate_failed: ${error.message}`);
   }
   

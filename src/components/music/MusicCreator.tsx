@@ -1,43 +1,49 @@
+
 import React, { useState } from 'react';
-import { logger } from '@/lib/logger';
-import { useMusicCompat } from '@/hooks/useMusicCompat';
+import { useMusic } from '@/hooks/useMusic';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2, MusicIcon, Wand2 } from 'lucide-react';
-import { MusicTrack } from '@/types/music';
+import { MusicContextType, MusicTrack } from '@/types/music';
 import { normalizeTrack } from '@/utils/musicCompatibility';
 
 const MusicCreator = () => {
   const [prompt, setPrompt] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
-  const music = useMusicCompat();
-  const { play, generateMusicForEmotion } = music;
+  const music = useMusic() as MusicContextType;
   
   const handleGenerate = async () => {
     if (!prompt.trim()) return;
-
+    
     setIsGenerating(true);
-
+    
     try {
-      // Try using generateMusicForEmotion with the prompt
-      const generatedTrack = await generateMusicForEmotion('creative', prompt);
-
-      if (generatedTrack) {
-        play(generatedTrack);
+      // If generateMusic isn't available, simulate music creation
+      let generatedTrack: MusicTrack;
+      
+      if (music.generateMusic) {
+        const result = await music.generateMusic(prompt);
+        if (result && result.tracks && result.tracks.length > 0) {
+          // Get the first track from the playlist
+          generatedTrack = normalizeTrack(result.tracks[0]);
+        } else {
+          // Fallback if no tracks were generated
+          generatedTrack = createFallbackTrack(prompt);
+        }
       } else {
-        // Fallback track if generation fails
-        const fallbackTrack = createFallbackTrack(prompt);
-        play(fallbackTrack);
+        // Simulation of generation
+        generatedTrack = createFallbackTrack(prompt);
       }
-
+      
+      if (music.playTrack) {
+        music.playTrack(generatedTrack);
+      }
+      
       setPrompt('');
     } catch (error) {
-      logger.error('Error generating music', error as Error, 'MUSIC');
-      // Play fallback on error
-      const fallbackTrack = createFallbackTrack(prompt);
-      play(fallbackTrack);
+      console.error('Error generating music:', error);
     } finally {
       setIsGenerating(false);
     }
@@ -51,6 +57,7 @@ const MusicCreator = () => {
       artist: 'IA Music Generator',
       audioUrl: '/audio/generated-sample.mp3',
       url: '/audio/generated-sample.mp3',
+      cover: '/images/covers/generated.jpg',
       coverUrl: '/images/covers/generated.jpg',
       duration: 180,
     };

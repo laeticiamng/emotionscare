@@ -1,4 +1,3 @@
-// @ts-nocheck
 import type { AdaptiveIntensity, AdaptivePresetId } from "@/services/music/presetMapper";
 
 export const PRESET_DETAILS: Record<

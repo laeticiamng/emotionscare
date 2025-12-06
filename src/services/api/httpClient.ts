@@ -1,6 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
 import { ApiResponse, RequestConfig, ErrorInterceptor, RequestInterceptor } from '@/types/api';
-import { logger } from '@/lib/logger';
 
 /**
  * Client HTTP centralisé avec intercepteurs pour auth/erreurs
@@ -34,18 +33,17 @@ class HttpClient {
 
     // Intercepteur de gestion d'erreurs
     this.addErrorInterceptor((error) => {
-      logger.error('API Error', error, 'API');
+      console.error('API Error:', error);
       
       // Gestion des erreurs d'authentification
       if (error.status === 401) {
-        logger.warn('Unauthorized access - signing out', { status: 401 }, 'API');
         supabase.auth.signOut();
         window.location.href = '/auth';
       }
       
       // Gestion des erreurs de permissions
       if (error.status === 403) {
-        logger.error('Access forbidden', { message: error.message, status: 403 }, 'API');
+        console.error('Access forbidden:', error.message);
       }
       
       return Promise.reject(error);

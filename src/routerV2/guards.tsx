@@ -6,13 +6,10 @@ import LoadingAnimation from '@/components/ui/loading-animation';
 import { routes } from '@/lib/routes';
 import type { Role, Segment } from './schema';
 import { stripUtmParams } from '@/lib/utm';
-import { logger } from '@/lib/logger';
-import { normalizeRole as normalizeRoleUtil, roleToMode, ROLE_TO_MODE } from '@/lib/role-mappings';
-import type { UserMode as UserModeType } from '@/lib/role-mappings';
 
 type GuardChildren = { children: React.ReactNode };
 
-type UserModeValue = UserModeType;
+type UserModeValue = 'b2c' | 'b2b_user' | 'b2b_admin' | null;
 
 const SEGMENT_TO_MODE: Record<Segment, UserModeValue> = {
   public: null,
@@ -27,7 +24,7 @@ const FORCED_SEGMENT_TO_MODE: Record<string, UserModeValue> = {
   b2b: 'b2b_user',
   employee: 'b2b_user',
   manager: 'b2b_admin',
-  admin: 'admin',
+  admin: 'b2b_admin',
 };
 
 const LoadingFallback = () => (
@@ -153,9 +150,23 @@ export const ModeGuard: React.FC<ModeGuardProps> = ({ children, segment }) => {
   return <>{children}</>;
 };
 
-// Utilise la fonction centralisée de lib/role-mappings.ts
 function normalizeRole(role?: string | null): Role {
-  return normalizeRoleUtil(role);
+  switch (role) {
+    case 'b2c':
+    case 'consumer':
+      return 'consumer';
+    case 'b2b_user':
+    case 'employee':
+      return 'employee';
+    case 'b2b_admin':
+    case 'manager':
+    case 'org_admin':
+    case 'org_owner':
+    case 'owner':
+      return 'manager';
+    default:
+      return 'consumer';
+  }
 }
 
 interface RouteGuardProps extends GuardChildren {

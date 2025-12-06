@@ -1,7 +1,5 @@
-// @ts-nocheck
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { HumeSummary } from '@/store/grit.store';
-import { logger } from '@/lib/logger';
 
 interface HumeFacesConfig {
   enabled: boolean;
@@ -23,7 +21,7 @@ export const useHumeFaces = (config: HumeFacesConfig) => {
 
   const startCapture = useCallback(async () => {
     if (!config.enabled) {
-      logger.info('Hume faces disabled by config', undefined, 'SYSTEM');
+      console.log('Hume faces disabled by config');
       return;
     }
 
@@ -57,7 +55,7 @@ export const useHumeFaces = (config: HumeFacesConfig) => {
       wsRef.current = new WebSocket(wsUrl);
       
       wsRef.current.onopen = () => {
-        logger.info('Hume WebSocket connected', undefined, 'SYSTEM');
+        console.log('Hume WebSocket connected');
         setIsActive(true);
         startFrameCapture();
       };
@@ -84,7 +82,7 @@ export const useHumeFaces = (config: HumeFacesConfig) => {
             updateSummary();
           }
         } catch (error) {
-          logger.error('Error parsing Hume response', error as Error, 'SYSTEM');
+          console.error('Error parsing Hume response:', error);
         }
       };
 
@@ -94,7 +92,7 @@ export const useHumeFaces = (config: HumeFacesConfig) => {
       };
 
     } catch (error) {
-      logger.error('Error starting Hume capture', error as Error, 'SYSTEM');
+      console.error('Error starting Hume capture:', error);
       setError('Impossible d\'accéder à la caméra');
     }
   }, [config]);

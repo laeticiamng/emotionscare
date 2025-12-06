@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Validation centralisée des données avec schémas Zod
  * Implémente la validation côté client et transformation d'erreurs
@@ -60,11 +59,10 @@ export const ProfileUpdateSchema = z.object({
 // ============= Schémas métier =============
 
 export const EmotionScanSchema = z.object({
-  scan_type: z.string().min(1, 'Type de scan requis'),
-  emotions: z.record(z.number()).optional(),
-  confidence: z.number().min(0).max(1, 'La confiance doit être entre 0 et 1').optional(),
-  mood: z.string().optional(),
-  recommendations: z.record(z.any()).optional(),
+  emotion_primary: z.string().min(1, 'Émotion principale requise'),
+  intensity: z.number().min(0).max(1, 'L\'intensité doit être entre 0 et 1'),
+  context: z.string().max(500, 'Le contexte ne peut pas dépasser 500 caractères').optional(),
+  tags: z.array(z.string()).max(10, 'Maximum 10 tags').optional(),
 });
 
 export const JournalEntrySchema = z.object({

@@ -1,8 +1,6 @@
-// @ts-nocheck
 
 import { supabase } from '@/integrations/supabase/client';
 import { NotificationSettings, NotificationCategory } from '@/types/notification';
-import { logger } from '@/lib/logger';
 
 /**
  * Service for managing notifications using Supabase
@@ -23,7 +21,7 @@ export const notificationService = {
       
       return { notifications: data || [], error: null };
     } catch (error: any) {
-      logger.error('Error fetching notifications', error as Error, 'SYSTEM');
+      console.error('Error fetching notifications:', error);
       return { notifications: [], error };
     }
   },
@@ -43,7 +41,7 @@ export const notificationService = {
       
       return { notification: data, error: null };
     } catch (error: any) {
-      logger.error('Error creating notification', error as Error, 'SYSTEM');
+      console.error('Error creating notification:', error);
       return { notification: null, error };
     }
   },
@@ -62,7 +60,7 @@ export const notificationService = {
       
       return { success: true, error: null };
     } catch (error: any) {
-      logger.error('Error marking notification as read', error as Error, 'SYSTEM');
+      console.error('Error marking notification as read:', error);
       return { success: false, error };
     }
   },
@@ -82,7 +80,7 @@ export const notificationService = {
       
       return { success: true, error: null };
     } catch (error: any) {
-      logger.error('Error marking all notifications as read', error as Error, 'SYSTEM');
+      console.error('Error marking all notifications as read:', error);
       return { success: false, error };
     }
   },
@@ -101,7 +99,7 @@ export const notificationService = {
       
       return { success: true, error: null };
     } catch (error: any) {
-      logger.error('Error deleting notification', error as Error, 'SYSTEM');
+      console.error('Error deleting notification:', error);
       return { success: false, error };
     }
   },
@@ -121,7 +119,7 @@ export const notificationService = {
       
       return { count: count || 0, error: null };
     } catch (error: any) {
-      logger.error('Error getting unread count', error as Error, 'SYSTEM');
+      console.error('Error getting unread count:', error);
       return { count: 0, error };
     }
   },
@@ -167,7 +165,7 @@ export const notificationService = {
         total: count || 0
       };
     } catch (error: any) {
-      logger.error('Error fetching filtered notifications', error as Error, 'SYSTEM');
+      console.error('Error fetching filtered notifications:', error);
       return { 
         notifications: [], 
         error,

@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,7 +8,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import EmotionsCareSongCard from './EmotionsCareSongCard';
 import EmotionsCarePlayerWithLyrics from './EmotionsCarePlayerWithLyrics';
-import { logger } from '@/lib/logger';
 
 interface EmotionsCareSong {
   id: string;
@@ -74,7 +72,7 @@ const EmotionsCareLibrary: React.FC = () => {
         .order('created_at', { ascending: false });
 
       if (error) {
-        logger.error('Erreur fetch library:', error);
+        console.error('Erreur fetch library:', error);
         toast({
           title: "Erreur",
           description: "Impossible de charger votre bibliothèque",
@@ -105,7 +103,7 @@ const EmotionsCareLibrary: React.FC = () => {
 
       setSongs(formattedSongs);
     } catch (error) {
-      logger.error('Erreur générale:', error);
+      console.error('Erreur générale:', error);
       toast({
         title: "Erreur",
         description: "Une erreur inattendue s'est produite",

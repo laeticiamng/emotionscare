@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -37,7 +36,7 @@ const EmotionalTrends: React.FC = () => {
               <Line 
                 type="monotone" 
                 dataKey="score" 
-                stroke="hsl(var(--primary))" 
+                stroke="#8884d8" 
                 strokeWidth={2}
                 dot={{ r: 4 }}
                 activeDot={{ r: 6 }}

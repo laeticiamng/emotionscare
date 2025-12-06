@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Bell, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -20,12 +21,12 @@ const PremiumAdminHeader: React.FC<PremiumAdminHeaderProps> = ({
       <h1 className="text-xl font-semibold">{pageTitle}</h1>
       
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" className="relative" aria-label="Notifications">
+        <Button variant="ghost" size="icon" className="relative">
           <Bell size={20} />
           <span className="absolute top-1 right-1 bg-red-500 rounded-full w-2 h-2"></span>
         </Button>
         
-        <Button variant="ghost" size="icon" onClick={onSettingsClick} aria-label="Paramètres">
+        <Button variant="ghost" size="icon" onClick={onSettingsClick}>
           <Settings size={20} />
         </Button>
         
@@ -36,7 +37,7 @@ const PremiumAdminHeader: React.FC<PremiumAdminHeaderProps> = ({
           </div>
           
           <Avatar>
-            <AvatarImage src={user?.avatar} />
+            <AvatarImage src={user?.avatar_url || user?.avatar} />
             <AvatarFallback>{user?.name?.charAt(0) || 'A'}</AvatarFallback>
           </Avatar>
         </div>

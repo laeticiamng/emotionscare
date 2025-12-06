@@ -1,7 +1,5 @@
-// @ts-nocheck
 
 import { QueryClient } from '@tanstack/react-query';
-import { logger } from '@/lib/logger';
 
 // Cache intelligent avec différentes stratégies
 export class EnhancedCache {
@@ -44,7 +42,7 @@ export class EnhancedCache {
           ttl: config.ttl
         }));
       } catch (error) {
-        logger.warn('Failed to save to localStorage', error as Error, 'SYSTEM');
+        console.warn('Failed to save to localStorage:', error);
       }
     }
   }
@@ -69,7 +67,7 @@ export class EnhancedCache {
           }
         }
       } catch (error) {
-        logger.warn('Failed to read from localStorage', error as Error, 'SYSTEM');
+        console.warn('Failed to read from localStorage:', error);
       }
     }
 

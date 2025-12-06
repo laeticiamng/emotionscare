@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { captureException } from '@/lib/ai-monitoring';
+import * as Sentry from '@sentry/react';
 import ErrorView from './ErrorView';
 
 interface RootErrorBoundaryState {
@@ -20,10 +20,12 @@ export default class RootErrorBoundary extends React.Component<RootErrorBoundary
   }
 
   componentDidCatch(error: Error, info: React.ErrorInfo) {
-    captureException(error, {
-      boundary: 'root',
-      componentStack: info.componentStack,
-    });
+    if (Sentry.getCurrentHub().getClient()) {
+      Sentry.captureException(error, {
+        tags: { boundary: 'root' },
+        extra: { componentStack: info.componentStack },
+      });
+    }
   }
 
   private handleRetry = () => {

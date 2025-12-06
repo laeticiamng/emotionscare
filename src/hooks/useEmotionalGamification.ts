@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -6,7 +5,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { calculateStreakDays } from '@/utils/gamification/emotionCalculator';
 import { EmotionGamificationStats } from '@/types/scan';
-import { logger } from '@/lib/logger';
 
 export const useEmotionalGamification = (userId?: string) => {
   const { user } = useAuth();
@@ -118,7 +116,7 @@ export const useEmotionalGamification = (userId?: string) => {
           });
         }
       } catch (error) {
-        logger.error('Error fetching gamification stats', error as Error, 'ANALYTICS');
+        console.error('Error fetching gamification stats:', error);
         toast({
           title: "Erreur",
           description: "Impossible de charger les statistiques de gamification",

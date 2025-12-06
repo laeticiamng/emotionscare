@@ -1,11 +1,9 @@
-// @ts-nocheck
 /**
  * Utilitaires spécialisés pour les opérations DOM sécurisées
  * Prévient spécifiquement les erreurs "Cannot read properties of undefined (reading 'add')"
  */
 
 import { safeClassAdd, safeClassRemove, safeClassToggle, safeGetDocumentRoot } from './safe-helpers';
-import { logger } from '@/lib/logger';
 
 /**
  * Interface pour les opérations DOM sécurisées
@@ -39,10 +37,10 @@ class DOMSafetyManager {
     this.errorCount++;
     
     if (this.errorCount <= this.maxErrors) {
-      logger.warn(`[DOMSafety] ${operation} failed`, { error, context, errorCount: this.errorCount }, 'SYSTEM');
+      console.warn(`[DOMSafety] ${operation} failed`, { error, context, errorCount: this.errorCount });
       
       if (this.errorCount === this.maxErrors) {
-        logger.warn('[DOMSafety] Maximum error count reached, suppressing further warnings', undefined, 'SYSTEM');
+        console.warn('[DOMSafety] Maximum error count reached, suppressing further warnings');
       }
     }
   }
@@ -137,14 +135,14 @@ class DOMSafetyManager {
 
       // Initialiser html element si manquant
       if (!document.documentElement) {
-        logger.warn('[DOMSafety] documentElement missing, creating fallback', undefined, 'SYSTEM');
+        console.warn('[DOMSafety] documentElement missing, creating fallback');
         const html = document.createElement('html');
         document.appendChild(html);
       }
 
       // Initialiser body si manquant
       if (!document.body) {
-        logger.warn('[DOMSafety] body missing, creating fallback', undefined, 'SYSTEM');
+        console.warn('[DOMSafety] body missing, creating fallback');
         const body = document.createElement('body');
         document.documentElement.appendChild(body);
       }
@@ -164,9 +162,9 @@ class DOMSafetyManager {
   cleanup(): void {
     try {
       this.errorCount = 0;
-      logger.info('[DOMSafety] Cleanup completed', undefined, 'SYSTEM');
+      console.log('[DOMSafety] Cleanup completed');
     } catch (error) {
-      logger.error('[DOMSafety] Cleanup failed', error as Error, 'SYSTEM');
+      console.error('[DOMSafety] Cleanup failed', error);
     }
   }
 
@@ -214,7 +212,7 @@ export const safeDOMOps: SafeDOMOperations = {
     try {
       return element.classList.contains(className);
     } catch (error) {
-      logger.warn('[safeDOMOps.hasClass] Failed', { error, element, className }, 'SYSTEM');
+      console.warn('[safeDOMOps.hasClass] Failed', { error, element, className });
       return false;
     }
   },
@@ -226,7 +224,7 @@ export const safeDOMOps: SafeDOMOperations = {
     try {
       return element.getAttribute(name);
     } catch (error) {
-      logger.warn('[safeDOMOps.getAttribute] Failed', { error, element, name }, 'SYSTEM');
+      console.warn('[safeDOMOps.getAttribute] Failed', { error, element, name });
       return null;
     }
   },
@@ -238,7 +236,7 @@ export const safeDOMOps: SafeDOMOperations = {
     try {
       element.setAttribute(name, value);
     } catch (error) {
-      logger.warn('[safeDOMOps.setAttribute] Failed', { error, element, name, value }, 'SYSTEM');
+      console.warn('[safeDOMOps.setAttribute] Failed', { error, element, name, value });
     }
   },
   
@@ -249,7 +247,7 @@ export const safeDOMOps: SafeDOMOperations = {
     try {
       element.style.setProperty(property, value);
     } catch (error) {
-      logger.warn('[safeDOMOps.setStyle] Failed', { error, element, property, value }, 'SYSTEM');
+      console.warn('[safeDOMOps.setStyle] Failed', { error, element, property, value });
     }
   }
 };

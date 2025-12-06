@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
@@ -58,9 +57,8 @@ const MusicPresetCard: React.FC<MusicPresetCardProps> = ({
           onSelect(preset);
         }}
         className="h-8 w-8 p-0 rounded-full"
-        aria-label={`Lire ${preset.name}`}
       >
-        <Play className="h-4 w-4" aria-hidden="true" />
+        <Play className="h-4 w-4" />
       </Button>
     </div>
   );

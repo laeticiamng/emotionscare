@@ -1,13 +1,13 @@
+
 import { useCallback } from 'react';
-import { logger } from '@/lib/logger';
 
 type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 
 interface Logger {
-  debug: (message: string, ...args: unknown[]) => void;
-  info: (message: string, ...args: unknown[]) => void;
-  warn: (message: string, ...args: unknown[]) => void;
-  error: (message: string, ...args: unknown[]) => void;
+  debug: (message: string, ...args: any[]) => void;
+  info: (message: string, ...args: any[]) => void;
+  warn: (message: string, ...args: any[]) => void;
+  error: (message: string, ...args: any[]) => void;
 }
 
 const LOG_LEVELS: Record<LogLevel, number> = {
@@ -32,7 +32,7 @@ const getCurrentLogLevel = (): number => {
 export const useLogger = (context: string): Logger => {
   const currentLogLevel = getCurrentLogLevel();
   
-  const log = useCallback((level: LogLevel, message: string, ...args: unknown[]) => {
+  const log = useCallback((level: LogLevel, message: string, ...args: any[]) => {
     if (LOG_LEVELS[level] < currentLogLevel) {
       return;
     }
@@ -45,22 +45,22 @@ export const useLogger = (context: string): Logger => {
         console.debug(prefix, message, ...args);
         break;
       case 'info':
-        logger.info(String(prefix), undefined, 'HOOK');
+        console.info(prefix, message, ...args);
         break;
       case 'warn':
-        logger.warn(String(prefix), undefined, 'HOOK');
+        console.warn(prefix, message, ...args);
         break;
       case 'error':
-        logger.error(String(prefix), args[0] instanceof Error ? args[0] as Error : undefined, 'HOOK');
+        console.error(prefix, message, ...args);
         break;
     }
   }, [context, currentLogLevel]);
   
   return {
-    debug: (message: string, ...args: unknown[]) => log('debug', message, ...args),
-    info: (message: string, ...args: unknown[]) => log('info', message, ...args),
-    warn: (message: string, ...args: unknown[]) => log('warn', message, ...args),
-    error: (message: string, ...args: unknown[]) => log('error', message, ...args),
+    debug: (message: string, ...args: any[]) => log('debug', message, ...args),
+    info: (message: string, ...args: any[]) => log('info', message, ...args),
+    warn: (message: string, ...args: any[]) => log('warn', message, ...args),
+    error: (message: string, ...args: any[]) => log('error', message, ...args),
   };
 };
 

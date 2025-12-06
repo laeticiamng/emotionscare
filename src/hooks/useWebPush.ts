@@ -1,11 +1,9 @@
-// @ts-nocheck
 /**
  * Hook Web Push API native - Architecture minimale
  * Remplace FCM pour notifications/rappels via VAPID
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import { logger } from '@/lib/logger';
 
 export interface PushSubscription {
   endpoint: string;
@@ -187,7 +185,7 @@ export const useWebPush = () => {
         }
       }
     } catch (error) {
-      logger.warn('Erreur lors de la vérification d\'abonnement', error as Error, 'SYSTEM');
+      console.warn('Erreur lors de la vérification d\'abonnement:', error);
     }
   }, [state.isSupported]);
 

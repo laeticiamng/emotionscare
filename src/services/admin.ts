@@ -4,7 +4,6 @@
  */
 
 import { supabase } from '@/integrations/supabase/client';
-import { logger } from '@/lib/logger';
 
 export interface ApiUsageStats {
   totalCalls: number;
@@ -93,7 +92,7 @@ class AdminService {
         activities: data.activities
       };
     } catch (error) {
-      logger.error('Error fetching API usage stats', error as Error, 'API');
+      console.error('Error fetching API usage stats:', error);
       
       // Fallback avec données réalistes
       const days = period === 'day' ? 1 : period === 'week' ? 7 : 30;
@@ -157,7 +156,7 @@ class AdminService {
 
       return data;
     } catch (error) {
-      logger.error('Error fetching user stats', error as Error, 'API');
+      console.error('Error fetching user stats:', error);
 
       // Fallback - récupération directe depuis les tables
       try {
@@ -190,7 +189,7 @@ class AdminService {
           }
         };
       } catch (fallbackError) {
-        logger.error('Fallback user stats failed', fallbackError as Error, 'API');
+        console.error('Fallback user stats failed:', fallbackError);
         return {
           totalUsers: 0,
           activeUsers: 0,
@@ -222,7 +221,7 @@ class AdminService {
 
       return data;
     } catch (error) {
-      logger.error('Error fetching security metrics', error as Error, 'API');
+      console.error('Error fetching security metrics:', error);
 
       return {
         securityScore: 87,
@@ -259,7 +258,7 @@ class AdminService {
         }
       };
     } catch (error) {
-      logger.error('Error fetching system health', error as Error, 'API');
+      console.error('Error fetching system health:', error);
 
       return {
         status: 'warning',
@@ -340,7 +339,7 @@ class AdminService {
         totalPages: Math.ceil((count || 0) / limit)
       };
     } catch (error) {
-      logger.error('Error fetching users', error as Error, 'API');
+      console.error('Error fetching users:', error);
       return {
         users: [],
         total: 0,
@@ -364,7 +363,7 @@ class AdminService {
 
       return true;
     } catch (error) {
-      logger.error('Error updating user role', error as Error, 'API');
+      console.error('Error updating user role:', error);
       return false;
     }
   }
@@ -386,7 +385,7 @@ class AdminService {
 
       return true;
     } catch (error) {
-      logger.error('Error updating user status', error as Error, 'API');
+      console.error('Error updating user status:', error);
       return false;
     }
   }
@@ -416,7 +415,7 @@ class AdminService {
 
       return data;
     } catch (error) {
-      logger.error('Error fetching app analytics', error as Error, 'ANALYTICS');
+      console.error('Error fetching app analytics:', error);
 
       // Fallback analytics
       const pageViews = Array.from({ length: days }, (_, i) => {
@@ -462,7 +461,7 @@ class AdminService {
 
       return data;
     } catch (error) {
-      logger.error('Error fetching system config', error as Error, 'SYSTEM');
+      console.error('Error fetching system config:', error);
       return {};
     }
   }
@@ -483,7 +482,7 @@ class AdminService {
 
       return true;
     } catch (error) {
-      logger.error('Error updating system config', error as Error, 'SYSTEM');
+      console.error('Error updating system config:', error);
       return false;
     }
   }

@@ -1,6 +1,4 @@
-// @ts-nocheck
 
-// @ts-nocheck
 import React from 'react';
 import { JournalEntry } from '@/types';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';

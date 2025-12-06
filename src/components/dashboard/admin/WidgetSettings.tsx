@@ -1,9 +1,7 @@
-// @ts-nocheck
 
 import React, { useState, useEffect } from 'react';
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
-import { logger } from '@/lib/logger';
 import { 
   Drawer,
   DrawerClose, 
@@ -56,7 +54,7 @@ const WidgetSettings: React.FC<WidgetSettingsProps> = ({ open, onOpenChange }) =
           setEnabledWidgets(defaultWidgets);
         }
       } catch (error) {
-        logger.error('Error loading widget preferences', error as Error, 'UI');
+        console.error('Error loading widget preferences:', error);
         // Fallback to all widgets enabled
         setEnabledWidgets(widgetCatalog.map(w => w.key));
       }
@@ -97,7 +95,7 @@ const WidgetSettings: React.FC<WidgetSettingsProps> = ({ open, onOpenChange }) =
       
       onOpenChange(false);
     } catch (error) {
-      logger.error('Error saving widget preferences', error as Error, 'UI');
+      console.error('Error saving widget preferences:', error);
       toast.error("Impossible de sauvegarder", {
         description: "Veuillez réessayer."
       });

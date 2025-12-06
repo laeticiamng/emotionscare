@@ -1,4 +1,4 @@
-// @ts-nocheck
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { RefreshCcw } from 'lucide-react';

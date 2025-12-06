@@ -1,9 +1,6 @@
-// @ts-nocheck
 /**
  * Service RGPD - Export et suppression des données personnelles
  */
-
-import { logger } from '@/lib/logger';
 
 export interface ExportOptions {
   format: 'json' | 'csv' | 'pdf';
@@ -163,7 +160,7 @@ class RGPDService {
 
       return await response.json();
     } catch (error) {
-      logger.error('Account status check failed', error as Error, 'SYSTEM');
+      console.error('Account status check failed:', error);
       return { status: 'active' };
     }
   }

@@ -1,10 +1,7 @@
-// @ts-nocheck
 
-// @ts-nocheck
 import { supabase } from '@/integrations/supabase/client';
 import { EmotionResult } from '@/types/emotion';
 import { v4 as uuid } from 'uuid';
-import { logger } from '@/lib/logger';
 
 export const fetchLatestEmotion = async (userId: string): Promise<EmotionResult | null> => {
   try {
@@ -38,12 +35,12 @@ export const fetchLatestEmotion = async (userId: string): Promise<EmotionResult 
     
     return null;
   } catch (error) {
-    logger.error('Error fetching latest emotion', error as Error, 'SCAN');
+    console.error('Error fetching latest emotion:', error);
     return null;
   }
 };
 
-export const createEmotionEntry = async (emotion: Partial<EmotionResult>): Promise<EmotionResult | null> => {
+export const createEmotionEntry = async (emotion: Partial<EmotionResult>): Promise<EmotionResult> => {
   try {
     const { data, error } = await supabase
       .from('emotions')
@@ -63,10 +60,7 @@ export const createEmotionEntry = async (emotion: Partial<EmotionResult>): Promi
       .select('*')
       .single();
 
-    if (error) {
-      logger.error('Error creating emotion entry', error, 'SCAN');
-      return null;
-    }
+    if (error) throw error;
 
     return {
       id: data.id,
@@ -84,8 +78,8 @@ export const createEmotionEntry = async (emotion: Partial<EmotionResult>): Promi
       timestamp: data.date
     };
   } catch (error) {
-    logger.error('Error creating emotion entry', error as Error, 'SCAN');
-    return null;
+    console.error('Error creating emotion entry:', error);
+    throw error;
   }
 };
 
@@ -116,7 +110,7 @@ export const analyzeEmotion = async (text: string, userId?: string): Promise<Emo
     
     return result;
   } catch (error) {
-    logger.error('Error analyzing emotion', error as Error, 'SCAN');
+    console.error('Error analyzing emotion:', error);
     return null;
   }
 };
@@ -152,7 +146,7 @@ export const fetchEmotionHistory = async (userId: string, limit = 10): Promise<E
     
     return [];
   } catch (error) {
-    logger.error('Error fetching emotion history', error as Error, 'SCAN');
+    console.error('Error fetching emotion history:', error);
     return [];
   }
 };

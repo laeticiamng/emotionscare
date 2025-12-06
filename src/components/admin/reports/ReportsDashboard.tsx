@@ -1,5 +1,5 @@
+
 import React, { useState } from 'react';
-import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -8,7 +8,6 @@ import { DatePickerWithRange } from '@/components/ui/date-picker-with-range';
 import { DateRange } from 'react-day-picker';
 
 const ReportsDashboard: React.FC = () => {
-  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState('recent');
   const [dateRange, setDateRange] = useState<DateRange>({
     from: new Date(new Date().setDate(new Date().getDate() - 30)),
@@ -16,10 +15,7 @@ const ReportsDashboard: React.FC = () => {
   });
 
   const handleGenerateReport = () => {
-    toast({
-      title: "Rapport en cours de création",
-      description: "Cette fonctionnalité sera bientôt disponible"
-    });
+    alert("Fonctionnalité en cours de développement");
   };
 
   return (

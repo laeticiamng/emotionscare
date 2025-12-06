@@ -1,12 +1,9 @@
-// @ts-nocheck
 /**
  * Observabilité et monitoring centralisé
  * Logs, métriques, traces et analyses d'erreurs
  */
 
 // ============= Types et interfaces =============
-
-import { logger } from '@/lib/logger';
 
 export interface LogEntry {
   timestamp: string;
@@ -147,7 +144,7 @@ class Logger {
     this.storage.addLog(entry);
     
     if (CONFIG.enableConsoleLog) {
-      logger.info(`[${category}] ${message}`, context, 'LIB');
+      console.info(`[${category}] ${message}`, context);
     }
   }
 
@@ -156,7 +153,7 @@ class Logger {
     this.storage.addLog(entry);
     
     if (CONFIG.enableConsoleLog) {
-      logger.warn(`[${category}] ${message}`, context, 'LIB');
+      console.warn(`[${category}] ${message}`, context);
     }
   }
 
@@ -171,7 +168,7 @@ class Logger {
     this.storage.addError(errorEntry);
     
     if (CONFIG.enableConsoleLog) {
-      logger.error(`[${category}] ${message}`, error, context, 'LIB');
+      console.error(`[${category}] ${message}`, error, context);
     }
   }
 

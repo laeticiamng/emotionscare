@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -122,7 +120,7 @@ const EnhancedEmotionScanner: React.FC<EnhancedEmotionScannerProps> = ({
     try {
       await startScan(scanMode, scanMode === 'text' ? { text: textInput } : undefined);
     } catch (error) {
-      // Scan start error
+      console.error('Erreur lors du démarrage du scan:', error);
     }
   }, [startScan, scanMode, textInput]);
 

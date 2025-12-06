@@ -3,33 +3,24 @@ import { motion } from 'framer-motion';
 import { AlertTriangle, RefreshCw, Home, Bug } from 'lucide-react';
 import { EnhancedButton } from '@/components/ui/enhanced-button';
 import { PremiumCard, PremiumCardContent, PremiumCardHeader, PremiumCardTitle } from '@/components/ui/premium-card';
-import { logger } from '@/lib/logger';
 
 interface ErrorFallbackProps {
   error: Error;
   resetErrorBoundary: () => void;
   errorInfo?: React.ErrorInfo;
-  errorId?: string;
 }
 
-const ErrorFallback: React.FC<ErrorFallbackProps> = ({
-  error,
+const ErrorFallback: React.FC<ErrorFallbackProps> = ({ 
+  error, 
   resetErrorBoundary,
-  errorInfo,
-  errorId
+  errorInfo 
 }) => {
   const handleReportError = () => {
-    // Log error report action
-    logger.error('Error reported by user', { error, errorInfo, errorId });
-
-    // Copier l'ID d'erreur dans le presse-papier
-    if (errorId && navigator.clipboard) {
-      navigator.clipboard.writeText(errorId).catch(() => {});
-    }
-
-    // Ouvrir le formulaire de contact avec l'ID d'erreur
-    const supportUrl = `/contact?error_id=${errorId || 'unknown'}`;
-    window.location.href = supportUrl;
+    // In production, send error to monitoring service
+    console.error('Error reported:', { error, errorInfo });
+    
+    // Example: Send to Sentry, LogRocket, etc.
+    // errorReportingService.report({ error, errorInfo });
   };
 
   const goHome = () => {
@@ -68,15 +59,9 @@ const ErrorFallback: React.FC<ErrorFallbackProps> = ({
           
           <PremiumCardContent className="space-y-4">
             <p className="text-muted-foreground text-sm">
-              Nous sommes désolés, mais quelque chose s'est mal passé.
+              Nous sommes désolés, mais quelque chose s'est mal passé. 
               L'équipe technique a été automatiquement notifiée.
             </p>
-
-            {errorId && (
-              <div className="text-xs text-muted-foreground bg-muted/50 rounded px-2 py-1">
-                ID d'erreur : <code className="font-mono">{errorId}</code>
-              </div>
-            )}
             
             {process.env.NODE_ENV === 'development' && (
               <details className="text-left">

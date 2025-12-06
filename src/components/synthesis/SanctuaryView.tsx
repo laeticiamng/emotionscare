@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -8,7 +7,7 @@ import { Slider } from '@/components/ui/slider';
 import { useOrchestration } from '@/contexts/OrchestrationContext';
 import { Clock, Play, Sun, Moon } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { useTheme } from '@/providers/theme';
+import { useTheme } from '@/components/theme-provider';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Progress } from '@/components/ui/progress';
@@ -27,8 +26,7 @@ const SanctuaryView: React.FC = () => {
   const [timerActive, setTimerActive] = useState(false);
   const [timerDuration, setTimerDuration] = useState(300); // 5 minutes in seconds
   const [timerRemaining, setTimerRemaining] = useState(300);
-  const { resolvedTheme } = useTheme();
-  const isDarkMode = resolvedTheme === 'dark';
+  const { isDarkMode } = useTheme();
 
   // Simulate loading widgets from API
   useEffect(() => {

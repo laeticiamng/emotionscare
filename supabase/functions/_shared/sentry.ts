@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { hash } from './hash_user.ts';
 
 const SENTRY_DSN = Deno.env.get('SENTRY_DSN');

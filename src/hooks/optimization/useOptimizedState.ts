@@ -1,6 +1,4 @@
-// @ts-nocheck
 import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
-import { logger } from '@/lib/logger';
 
 /**
  * Hook d'état optimisé avec debounce et cache automatique
@@ -40,7 +38,7 @@ export function useOptimizedState<T>(
       
       // Validation
       if (validator && !validator(nextValue)) {
-        logger.warn('Invalid state value rejected', { nextValue }, 'SYSTEM');
+        console.warn('Invalid state value rejected:', nextValue);
         return prev;
       }
       

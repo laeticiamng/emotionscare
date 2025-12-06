@@ -1,10 +1,8 @@
-// @ts-nocheck
 
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { faker } from '@faker-js/faker';
-import { logger } from '@/lib/logger';
 
 export function useAssistant() {
   const [isLoading, setIsLoading] = useState(false);
@@ -45,7 +43,7 @@ export function useAssistant() {
       setThreadId(threadData.thread.id);
       
     } catch (error) {
-      logger.error('Error initializing assistant', error as Error, 'UI');
+      console.error('Error initializing assistant:', error);
       toast({
         title: "Erreur d'initialisation",
         description: "Impossible de créer un assistant IA pour le moment.",
@@ -123,7 +121,7 @@ export function useAssistant() {
       return messagesData.messages.data;
       
     } catch (error) {
-      logger.error('Error sending message to assistant', error as Error, 'UI');
+      console.error('Error sending message to assistant:', error);
       toast({
         title: "Erreur de communication",
         description: "Impossible de communiquer avec l'assistant IA.",

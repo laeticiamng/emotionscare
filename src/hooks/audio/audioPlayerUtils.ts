@@ -1,7 +1,5 @@
-// @ts-nocheck
 
 import { MusicTrack } from '@/types/music';
-import { logger } from '@/lib/logger';
 
 /**
  * Format seconds to mm:ss format
@@ -27,7 +25,7 @@ export const getTrackAudioUrl = (track: MusicTrack): string => {
  * Handle play errors
  */
 export const handlePlayError = (error: Error): string => {
-  logger.error('Audio playback error', error, 'MUSIC');
+  console.error('Audio playback error:', error);
   
   // Check for common error types
   if (error.name === 'NotAllowedError') {

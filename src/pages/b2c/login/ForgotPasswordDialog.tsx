@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -19,7 +18,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import {
   resetPasswordSchema,
   type ResetPasswordFormData,
-} from '@/lib/validation/auth';
+} from '@/lib/validations/auth';
 import { b2cAuthService } from '@/services/auth';
 
 interface ForgotPasswordDialogProps {

@@ -1,5 +1,5 @@
+
 import React from 'react';
-import { logger } from '@/lib/logger';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import DailyActivityTable from "@/components/dashboard/admin/tabs/activity-logs/DailyActivityTable";
@@ -9,7 +9,7 @@ import ActivityFilters from "./activity-logs/ActivityFilters";
 import { useUserActivityLogState } from "./hooks/useUserActivityLogState";
 
 const UserActivityLogTab: React.FC = () => {
-  logger.debug("Rendering UserActivityLogTab", {}, 'ADMIN');
+  console.log("Rendering UserActivityLogTab");
   
   const {
     activeTab,
@@ -24,13 +24,13 @@ const UserActivityLogTab: React.FC = () => {
     handleExport
   } = useUserActivityLogState();
 
-  logger.debug("Activity log state", { 
+  console.log("Activity log state:", { 
     activeTab, 
     activitiesCount: filteredActivities?.length,
     statsCount: stats?.length,
     isLoading, 
     error 
-  }, 'ADMIN');
+  });
 
   return (
     <div className="space-y-4">

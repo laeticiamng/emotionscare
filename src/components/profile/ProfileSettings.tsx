@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -70,7 +69,7 @@ const ProfileSettings: React.FC = () => {
         }
       });
     } catch (error) {
-      // Profile loading error
+      console.error('Erreur chargement profil:', error);
       toast({
         title: "Erreur",
         description: "Impossible de charger le profil",
@@ -103,7 +102,7 @@ const ProfileSettings: React.FC = () => {
         description: "Vos modifications ont été enregistrées"
       });
     } catch (error) {
-      // Profile save error
+      console.error('Erreur sauvegarde:', error);
       toast({
         title: "Erreur",
         description: "Impossible de sauvegarder le profil",

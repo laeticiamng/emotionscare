@@ -7,13 +7,7 @@ declare module 'fastify' {
   }
 }
 
-const PUBLIC_PATHS = new Set([
-  '/health',
-  '/healthz',
-  '/api/healthz',
-  '/api/v1/health',
-  '/api/v1/health/healthz',
-]);
+const PUBLIC_PATHS = new Set(['/health', '/healthz', '/api/healthz']);
 
 export const authPlugin: FastifyPluginAsync = async app => {
   app.decorateRequest('user', null);

@@ -1,4 +1,3 @@
-// @ts-nocheck
 const KEY = "ec_story_synth_v1";
 
 export type StoryRecord = {

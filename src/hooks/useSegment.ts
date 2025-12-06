@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useMarketingStore, Segment, UTMParams } from '@/store/marketing.store';

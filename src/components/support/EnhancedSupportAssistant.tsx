@@ -1,7 +1,5 @@
-// @ts-nocheck
 
 import React, { useState, useRef, useEffect } from 'react';
-import { logger } from '@/lib/logger';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -47,7 +45,7 @@ const EnhancedSupportAssistant: React.FC = () => {
         scrollToBottom();
       }, 1000);
     } catch (error) {
-      logger.error('Error sending message', error as Error, 'UI');
+      console.error('Error sending message:', error);
       toast({
         title: "Une erreur est survenue",
         description: "Impossible d'envoyer votre message. Veuillez réessayer.",

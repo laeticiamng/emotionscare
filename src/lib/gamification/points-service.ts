@@ -1,6 +1,3 @@
-// @ts-nocheck
-
-import { logger } from '@/lib/logger';
 
 // Award points to a user
 export const awardPoints = async (
@@ -9,14 +6,14 @@ export const awardPoints = async (
   reason: string
 ): Promise<boolean> => {
   try {
-    logger.info('Awarding points', { points, userId, reason }, 'API');
+    console.log(`Awarding ${points} points to user ${userId} for: ${reason}`);
     
     // In a real implementation, this would make an API call
     // For now, we'll simulate a successful points award
     
     return true;
   } catch (error) {
-    logger.error('Error awarding points', error as Error, 'API');
+    console.error('Error awarding points:', error);
     return false;
   }
 };
@@ -27,7 +24,7 @@ export const getUserPointHistory = async (
   limit: number = 10
 ): Promise<PointHistoryEntry[]> => {
   try {
-    logger.info('Fetching point history', { userId, limit }, 'API');
+    console.log(`Fetching point history for user ${userId}, limit ${limit}`);
     
     // In a real implementation, this would fetch from an API
     // For now we'll return mock data
@@ -59,7 +56,7 @@ export const getUserPointHistory = async (
     return mockHistory.slice(0, limit);
     
   } catch (error) {
-    logger.error('Error fetching point history', error as Error, 'API');
+    console.error('Error fetching point history:', error);
     return [];
   }
 };

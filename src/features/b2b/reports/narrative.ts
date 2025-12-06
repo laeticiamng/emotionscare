@@ -1,4 +1,3 @@
-// @ts-nocheck
 import type { AggregateSummary } from '@/services/b2b/reportsApi';
 
 type NarrativeTone = 'posee' | 'tendue' | 'stable';

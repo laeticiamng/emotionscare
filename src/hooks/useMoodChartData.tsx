@@ -1,10 +1,8 @@
-// @ts-nocheck
 
 import { useState, useEffect } from 'react';
 import { MoodData } from '@/types/other';
 import { format, subDays, startOfDay } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { logger } from '@/lib/logger';
 
 export function useMoodChartData(period: 'day' | 'week' | 'month' = 'week') {
   const [moodData, setMoodData] = useState<MoodData[]>([]);
@@ -49,7 +47,7 @@ export function useMoodChartData(period: 'day' | 'week' | 'month' = 'week') {
         
         setMoodData(mockData.sort((a, b) => a.date && b.date ? a.date.localeCompare(b.date) : 0));
       } catch (error) {
-        logger.error('Erreur lors du chargement des données', error as Error, 'UI');
+        console.error('Erreur lors du chargement des données:', error);
       } finally {
         setLoading(false);
       }

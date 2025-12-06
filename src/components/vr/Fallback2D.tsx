@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useEffect, useRef } from 'react';
 import { VRBreathPattern } from '@/store/vrbreath.store';
 import { Button } from '@/components/ui/button';

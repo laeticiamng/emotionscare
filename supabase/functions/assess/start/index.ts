@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { serve } from '../../_shared/serve.ts';
 import { z } from '../../_shared/zod.ts';
 import { authenticateRequest, logUnauthorizedAccess } from '../../_shared/auth-middleware.ts';

@@ -60,7 +60,7 @@ export function EnhancedForm<T extends FieldValues>({
     reset
   } = useForm<T>({
     resolver: zodResolver(schema),
-    defaultValues: defaultValues as any,
+    defaultValues,
     mode: 'onBlur'
   });
 
@@ -103,7 +103,7 @@ export function EnhancedForm<T extends FieldValues>({
 
   return (
     <form
-      onSubmit={handleSubmit(handleFormSubmit as any)}
+      onSubmit={handleSubmit(handleFormSubmit)}
       className={cn('space-y-6', className)}
       noValidate
     >

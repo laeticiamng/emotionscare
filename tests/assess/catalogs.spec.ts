@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { describe, expect, it } from 'vitest';
 
 import { getAllCatalogs, getCatalog } from '../../src/lib/assess/catalogs.ts';

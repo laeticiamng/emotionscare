@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import { z } from 'zod';
 
@@ -114,40 +113,6 @@ export const invitationSchema = z.object({
   message: z.string().max(500, { message: 'Le message ne peut pas dépasser 500 caractères' }).optional()
 });
 
-// Contact form schema
-export const contactFormSchema = z.object({
-  name: nameSchema,
-  email: emailSchema,
-  subject: z.string()
-    .min(3, { message: 'Le sujet doit contenir au moins 3 caractères' })
-    .max(200, { message: 'Le sujet ne peut pas dépasser 200 caractères' }),
-  message: z.string()
-    .min(10, { message: 'Le message doit contenir au moins 10 caractères' })
-    .max(2000, { message: 'Le message ne peut pas dépasser 2000 caractères' })
-});
-
-// Feedback schema
-export const feedbackSchema = z.object({
-  module: z.string().min(1, { message: 'Le module est requis' }),
-  type: z.enum(['bug', 'suggestion', 'compliment', 'feature_request'], { 
-    message: 'Type de feedback invalide' 
-  }),
-  rating: z.number()
-    .min(1, { message: 'La note doit être entre 1 et 5' })
-    .max(5, { message: 'La note doit être entre 1 et 5' })
-    .optional(),
-  title: z.string()
-    .min(3, { message: 'Le titre doit contenir au moins 3 caractères' })
-    .max(200, { message: 'Le titre ne peut pas dépasser 200 caractères' }),
-  description: z.string()
-    .min(10, { message: 'La description doit contenir au moins 10 caractères' })
-    .max(2000, { message: 'La description ne peut pas dépasser 2000 caractères' }),
-  priority: z.enum(['low', 'medium', 'high', 'critical'], {
-    message: 'Priorité invalide'
-  }).optional(),
-  tags: z.array(z.string().max(50)).max(10, { message: 'Maximum 10 tags autorisés' }).optional()
-});
-
 // File upload schemas
 export const fileUploadSchema = z.object({
   file: z.instanceof(File, { message: 'Fichier requis' }),
@@ -170,5 +135,3 @@ export type CommentInput = z.infer<typeof commentSchema>;
 export type SearchInput = z.infer<typeof searchSchema>;
 export type InvitationInput = z.infer<typeof invitationSchema>;
 export type FileUploadInput = z.infer<typeof fileUploadSchema>;
-export type ContactFormInput = z.infer<typeof contactFormSchema>;
-export type FeedbackInput = z.infer<typeof feedbackSchema>;

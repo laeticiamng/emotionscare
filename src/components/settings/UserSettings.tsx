@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -6,7 +5,7 @@ import ThemeSettingsTab from './ThemeSettingsTab';
 import AccountSettingsTab from './AccountSettingsTab';
 import NotificationsSettingsTab from './NotificationsSettingsTab';
 import PrivacySettingsTab from './PrivacySettingsTab';
-import { useTheme } from '@/providers/theme';
+import { useTheme } from '@/components/theme-provider';
 import { ThemeName } from '@/types/theme';
 
 const UserSettings = () => {

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -60,7 +59,7 @@ const B2BCollabDashboard: React.FC = () => {
                 Collaborateur
               </Badge>
               <div className="flex items-center text-xs text-muted-foreground">
-                <div className="w-2 h-2 bg-success rounded-full mr-1" aria-hidden="true"></div>
+                <div className="w-2 h-2 bg-green-500 rounded-full mr-1" aria-hidden="true"></div>
                 <span>Données privées</span>
               </div>
             </div>
@@ -307,7 +306,7 @@ const B2BCollabDashboard: React.FC = () => {
             </CardHeader>
             <CardContent>
               <div className="grid md:grid-cols-2 gap-4" role="list" aria-label="Liste des suggestions personnalisées">
-                <div className="p-4 bg-info/10 rounded-lg" role="listitem">
+                <div className="p-4 bg-blue-50 dark:bg-blue-950/50 rounded-lg" role="listitem">
                   <h4 className="font-medium mb-2">💙 Moment de calme</h4>
                   <p className="text-sm text-muted-foreground mb-3">
                     Votre journée semble chargée. Que diriez-vous d'une pause Screen-Silk ?
@@ -320,7 +319,7 @@ const B2BCollabDashboard: React.FC = () => {
                   </p>
                 </div>
                 
-                <div className="p-4 bg-success/10 rounded-lg" role="listitem">
+                <div className="p-4 bg-green-50 dark:bg-green-950/50 rounded-lg" role="listitem">
                   <h4 className="font-medium mb-2">🎵 Boost d'énergie</h4>
                   <p className="text-sm text-muted-foreground mb-3">
                     Un peu de Mood Mixer pour dynamiser cette fin d'après-midi ?

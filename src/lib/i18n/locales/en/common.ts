@@ -1,4 +1,3 @@
-// @ts-nocheck
 export const common = {
   // General actions
   save: 'Save',

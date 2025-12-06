@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 import { motion } from 'framer-motion';
 import {
@@ -776,7 +775,7 @@ async function fetchRecentScans(userId?: string): Promise<ScanResult[]> {
     const entries = await getEmotionScanHistory(userId, 12);
     return entries.map(mapHistoryEntryToScan);
   } catch (error) {
-    logger.error('Unable to fetch emotion scans', error as Error, 'SCAN');
+    console.error('Unable to fetch emotion scans', error);
     return [];
   }
 }

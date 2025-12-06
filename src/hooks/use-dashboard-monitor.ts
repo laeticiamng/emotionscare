@@ -1,9 +1,7 @@
-// @ts-nocheck
 
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
-import { logger } from '@/lib/logger';
 
 /**
  * Hook qui surveille les problèmes d'accès aux dashboards et
@@ -22,16 +20,16 @@ export function useDashboardMonitor() {
       
     // Logger des infos utiles pour comprendre les problèmes de routage
     if (isDashboardPath) {
-      logger.info('[DashboardMonitor] Accès à un tableau de bord', {
+      console.log('[DashboardMonitor] Accès à un tableau de bord:', {
         path: location.pathname,
         search: location.search,
         hash: location.hash,
         state: location.state
-      }, 'UI');
+      });
       
       // Détecter les URL malformées comme souvent rapporté dans les audits
       if (location.pathname.includes('//') || location.pathname.endsWith('//')) {
-        logger.warn('[DashboardMonitor] URL malformée détectée', { pathname: location.pathname }, 'UI');
+        console.warn('[DashboardMonitor] URL malformée détectée:', location.pathname);
         
         toast({
           title: "URL malformée détectée",

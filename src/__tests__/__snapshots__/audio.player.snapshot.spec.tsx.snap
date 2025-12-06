@@ -1,0 +1,54 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`AudioPlayer > renders and exposes volume slider 1`] = `
+<div>
+  <div
+    aria-label="Test"
+    style="display: grid; gap: 8px;"
+  >
+    <div
+      style="display: grid; gap: 6px;"
+    >
+      <strong>
+        Test
+      </strong>
+      <div
+        style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center;"
+      >
+        <button
+          aria-pressed="false"
+          data-ui="primary-cta"
+          type="button"
+        >
+          Lecture
+        </button>
+        <button
+          aria-pressed="true"
+          data-ui="favorite-toggle"
+          type="button"
+        >
+          Retirer des favoris
+        </button>
+      </div>
+    </div>
+    <label
+      style="display: flex; gap: 8px; align-items: center;"
+    >
+      Volume
+      <input
+        data-ui="volume-slider"
+        max="1"
+        min="0"
+        step="0.01"
+        type="range"
+        value="0.8"
+      />
+    </label>
+    <small
+      style="opacity: 0.75;"
+    >
+      Sauvegardé dans vos favoris locaux.
+    </small>
+  </div>
+</div>
+`;

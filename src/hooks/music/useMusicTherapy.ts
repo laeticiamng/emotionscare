@@ -1,8 +1,6 @@
-// @ts-nocheck
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { musicTherapyService } from '@/services';
 import type { ApiResponse, EmotionData, MusicRecommendation } from '@/services/types';
-import { logger } from '@/lib/logger';
 
 interface MusicTherapyHook {
   // État de session
@@ -85,7 +83,7 @@ export const useMusicTherapy = (): MusicTherapyHook => {
     };
 
     const handleError = (e: any) => {
-      logger.error('Audio error', e, 'useMusicTherapy.handleError');
+      console.error('Audio error:', e);
       setError('Erreur lors de la lecture audio');
       setIsPlaying(false);
     };
@@ -225,7 +223,7 @@ export const useMusicTherapy = (): MusicTherapyHook => {
             audioRef.current.load();
             
             if (wasPlaying) {
-              audioRef.current.play().catch((err) => logger.error('Play error', err, 'useMusicTherapy.updateSession'));
+              audioRef.current.play().catch(console.error);
             }
           }
 
@@ -317,7 +315,7 @@ export const useMusicTherapy = (): MusicTherapyHook => {
       setIsPlaying(true);
       setError(null);
     } catch (err: any) {
-      logger.error('Erreur de lecture', err, 'useMusicTherapy.play');
+      console.error('Erreur de lecture:', err);
       setError('Impossible de lire la piste');
     }
   }, [currentTrack]);
@@ -360,7 +358,7 @@ export const useMusicTherapy = (): MusicTherapyHook => {
       audioRef.current.load();
       
       if (wasPlaying) {
-        audioRef.current.play().catch((err) => logger.error('Play error', err, 'useMusicTherapy.nextTrack'));
+        audioRef.current.play().catch(console.error);
       }
     }
   }, [playlist, currentTrackIndex, isPlaying]);
@@ -380,7 +378,7 @@ export const useMusicTherapy = (): MusicTherapyHook => {
       audioRef.current.load();
       
       if (wasPlaying) {
-        audioRef.current.play().catch((err) => logger.error('Play error', err, 'useMusicTherapy.previousTrack'));
+        audioRef.current.play().catch(console.error);
       }
     }
   }, [playlist, currentTrackIndex, isPlaying]);

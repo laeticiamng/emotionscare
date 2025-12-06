@@ -1,8 +1,6 @@
-// @ts-nocheck
 import React, { Suspense, lazy, ComponentType, memo } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import LoadingAnimation from '@/components/ui/loading-animation';
-import { logger } from '@/lib/logger';
 
 interface LazyRouteProps {
   factory: () => Promise<{ default: ComponentType<any> }>;
@@ -27,7 +25,7 @@ const LazyRoute = memo<LazyRouteProps>(({
   React.useEffect(() => {
     if (preload) {
       factory().catch(error => {
-        logger.warn('Failed to preload component', error as Error, 'SYSTEM');
+        console.warn('Failed to preload component:', error);
       });
     }
   }, [factory, preload]);
@@ -57,7 +55,7 @@ const LazyRoute = memo<LazyRouteProps>(({
     <ErrorBoundary
       FallbackComponent={ErrorFallback || defaultErrorFallback}
       onError={(error, errorInfo) => {
-        logger.error('LazyRoute Error', error as Error, 'SYSTEM');
+        console.error('LazyRoute Error:', error, errorInfo);
       }}
     >
       <Suspense 
@@ -91,7 +89,7 @@ export const createLazyRoute = (
 export const usePreloadRoute = (factory: () => Promise<{ default: ComponentType<any> }>) => {
   const preload = React.useCallback(() => {
     factory().catch(error => {
-      logger.warn('Failed to preload route', error as Error, 'SYSTEM');
+      console.warn('Failed to preload route:', error);
     });
   }, [factory]);
   

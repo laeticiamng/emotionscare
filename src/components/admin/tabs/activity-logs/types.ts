@@ -1,3 +1,4 @@
+
 export type ActivityTabView = 'daily' | 'stats';
 
 export interface ActivityFiltersState {

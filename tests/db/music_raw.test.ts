@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { beforeAll, afterAll, expect, it, afterEach } from 'vitest';
 import { createClient } from '@supabase/supabase-js';
 import 'dotenv/config';

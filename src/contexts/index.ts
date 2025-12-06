@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import React from 'react';
 
@@ -7,7 +6,7 @@ import React from 'react';
 // Contextes principaux avec implémentations complètes
 export { AuthProvider, useAuth } from './AuthContext';
 export { UserModeProvider, useUserMode } from './UserModeContext';
-export { ThemeProvider, useTheme } from '@/providers/theme';
+export { ThemeProvider, useTheme } from '@/components/theme-provider';
 
 // Contextes unifiés optimisés  
 export { UnifiedCacheProvider as CacheProvider, useUnifiedCache as useCache } from './UnifiedCacheContext';

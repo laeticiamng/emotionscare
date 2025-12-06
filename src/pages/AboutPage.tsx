@@ -1,3 +1,4 @@
+
 /**
  * ABOUT PAGE - EMOTIONSCARE
  * Page À propos accessible WCAG 2.1 AA
@@ -149,9 +150,9 @@ const AboutPage: React.FC = () => {
                 transition={{ duration: 0.5 }}
               >
                 <h1 
-                id="hero-title"
-                className="text-5xl font-bold mb-6 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent"
-              >
+                  id="hero-title"
+                  className="text-5xl font-bold mb-6 bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent"
+                >
                   À Propos d'EmotionsCare
                 </h1>
                 <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
@@ -163,7 +164,7 @@ const AboutPage: React.FC = () => {
                     size="lg" 
                     onClick={() => navigate('/auth')}
                     onKeyDown={(e) => handleKeyDown(e, () => navigate('/auth'))}
-                    className="bg-gradient-to-r from-primary to-accent focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                    className="bg-gradient-to-r from-primary to-purple-600 focus:ring-2 focus:ring-primary focus:ring-offset-2"
                     aria-label="Commencer gratuitement avec EmotionsCare"
                     tabIndex={0}
                   >
@@ -223,7 +224,7 @@ const AboutPage: React.FC = () => {
           transition={{ delay: 0.4 }}
           className="mb-16"
         >
-          <Card className="bg-gradient-to-r from-primary/5 to-accent/5 border-primary/20">
+          <Card className="bg-gradient-to-r from-primary/5 to-purple-500/5 border-primary/20">
             <CardContent className="p-8">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
                 <div>
@@ -232,23 +233,23 @@ const AboutPage: React.FC = () => {
                     Démocratiser l'accès au bien-être émotionnel en rendant les outils de santé mentale 
                     intelligents, accessibles et efficaces pour tous, partout dans le monde.
                   </p>
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-3">
-                        <CheckCircle className="h-5 w-5 text-success" />
-                        <span>Technologie de pointe au service de la santé mentale</span>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <CheckCircle className="h-5 w-5 text-success" />
-                        <span>Approche scientifique et validation clinique</span>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <CheckCircle className="h-5 w-5 text-success" />
-                        <span>Respect absolu de la vie privée</span>
-                      </div>
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3">
+                      <CheckCircle className="h-5 w-5 text-green-500" />
+                      <span>Technologie de pointe au service de la santé mentale</span>
                     </div>
+                    <div className="flex items-center gap-3">
+                      <CheckCircle className="h-5 w-5 text-green-500" />
+                      <span>Approche scientifique et validation clinique</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <CheckCircle className="h-5 w-5 text-green-500" />
+                      <span>Respect absolu de la vie privée</span>
+                    </div>
+                  </div>
                 </div>
                 <div className="relative">
-                  <div className="bg-gradient-to-br from-primary to-accent rounded-2xl p-8 text-primary-foreground">
+                  <div className="bg-gradient-to-br from-primary to-purple-600 rounded-2xl p-8 text-white">
                     <h3 className="text-2xl font-bold mb-4">Vision 2030</h3>
                     <p className="mb-4">
                       Devenir la référence mondiale en matière de bien-être émotionnel numérique, 
@@ -358,7 +359,7 @@ const AboutPage: React.FC = () => {
             {team.map((member, index) => (
               <Card key={index} className="text-center hover:shadow-lg transition-shadow">
                 <CardHeader>
-                  <div className="w-20 h-20 bg-gradient-to-br from-primary to-accent rounded-full mx-auto mb-4 flex items-center justify-center text-primary-foreground text-2xl font-bold">
+                  <div className="w-20 h-20 bg-gradient-to-br from-primary to-purple-600 rounded-full mx-auto mb-4 flex items-center justify-center text-white text-2xl font-bold">
                     {member.name.split(' ').map(n => n[0]).join('')}
                   </div>
                   <h3 className="font-semibold text-lg mb-2">{member.name}</h3>
@@ -430,7 +431,7 @@ const AboutPage: React.FC = () => {
                         size="lg"
                         onClick={() => navigate('/auth')}
                         onKeyDown={(e) => handleKeyDown(e, () => navigate('/auth'))}
-                        className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                        className="bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90 focus:ring-2 focus:ring-primary focus:ring-offset-2"
                         aria-label="Commencer maintenant avec EmotionsCare"
                         tabIndex={0}
                       >

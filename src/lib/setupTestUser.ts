@@ -1,7 +1,5 @@
-// @ts-nocheck
 
 import { supabase } from './supabase-client';
-import { logger } from '@/lib/logger';
 
 async function seedTestUser() {
   // Check if the user already exists in our profiles or a similar table
@@ -14,12 +12,12 @@ async function seedTestUser() {
   if (selectErr) {
     // If the error is not "no rows returned", it's a real error
     if (selectErr.code !== 'PGRST116') {
-      logger.error('Impossible de vérifier l\'existence du test user', selectErr as Error, 'SYSTEM');
+      console.error('Impossible de vérifier l\'existence du test user :', selectErr);
     }
     
     // Continue to try creating the user as it might not exist
   } else if (existing) {
-    logger.info('🟢 Utilisateur PersonnelTest déjà présent, rien à faire.', {}, 'SYSTEM');
+    console.log('🟢 Utilisateur PersonnelTest déjà présent, rien à faire.');
     return;
   }
 
@@ -37,13 +35,13 @@ async function seedTestUser() {
     .single();
 
   if (insertErr || !data) {
-    logger.error('❌ Échec création PersonnelTest', insertErr as Error, 'SYSTEM');
+    console.error('❌ Échec création PersonnelTest :', insertErr);
   } else {
-    logger.info('✅ Test user créé', data, 'SYSTEM');
+    console.log('✅ Test user créé :', data);
   }
 }
 
 // Run at app startup to seed
 seedTestUser()
-  .then(() => logger.info('Seed terminé', {}, 'SYSTEM'))
-  .catch((err: Error) => logger.error('Seed error', err, 'SYSTEM'));
+  .then(() => console.log('Seed terminé'))
+  .catch(console.error);

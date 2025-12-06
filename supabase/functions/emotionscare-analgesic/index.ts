@@ -1,14 +1,6 @@
-// @ts-nocheck
-/**
- * emotionscare-analgesic - Génération musicale thérapeutique via Hume + Suno
- *
- * 🔒 SÉCURISÉ: Auth + Rate limit 10/min + CORS restrictif
- */
+
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { authenticateRequest } from '../_shared/auth-middleware.ts';
-import { cors, preflightResponse, rejectCors } from '../_shared/cors.ts';
-import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
 
 // Types
 interface EmotionInput {
@@ -29,6 +21,12 @@ interface HumeEmotionScore {
   name: string;
   score: number;
 }
+
+// CORS headers
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
 
 // Routeur antalgique
 const ANALGESIC_ROUTER = (emo: EmotionInput): AnalgesicPreset => {
@@ -89,45 +87,11 @@ const THERAPEUTIC_PATHS: Record<string, string[]> = {
 
 // Fonction principale
 serve(async (req) => {
-  const corsResult = cors(req);
-  const corsHeaders = {
-    ...corsResult.headers,
-    'X-Content-Type-Options': 'nosniff',
-    'X-Frame-Options': 'DENY',
-  };
-
   if (req.method === 'OPTIONS') {
-    return preflightResponse(corsResult);
-  }
-
-  if (!corsResult.allowed) {
-    return rejectCors(corsResult);
+    return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const authResult = await authenticateRequest(req);
-    if (authResult.status !== 200 || !authResult.user) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-        status: authResult.status,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
-
-    const rateLimit = await enforceEdgeRateLimit(req, {
-      route: 'emotionscare-analgesic',
-      userId: authResult.user.id,
-      limit: 10,
-      windowMs: 60_000,
-      description: 'EmotionsCare Analgesic music generation',
-    });
-
-    if (!rateLimit.allowed) {
-      return buildRateLimitResponse(rateLimit, corsHeaders, {
-        errorCode: 'rate_limit_exceeded',
-        message: `Trop de requêtes. Réessayez dans ${rateLimit.retryAfterSeconds}s.`,
-      });
-    }
-
     const { action, text, language = "Français", taskId } = await req.json();
     
     console.log(`🎵 EmotionsCare Antalgique - Action: ${action}`);

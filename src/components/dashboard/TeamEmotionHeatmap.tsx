@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 
 interface TeamEmotionHeatmapProps {
@@ -14,7 +13,7 @@ export const TeamEmotionHeatmap: React.FC<TeamEmotionHeatmapProps> = ({ data }) 
             <div
               key={j}
               className="w-3 h-3 rounded"
-              style={{ backgroundColor: `hsl(var(--primary) / ${v})` }}
+              style={{ backgroundColor: `rgba(0,0,0,${v})` }}
             ></div>
           ))}
         </div>

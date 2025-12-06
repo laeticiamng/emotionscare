@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -109,7 +108,7 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
       return true;
     } catch (error) {
-      // Onboarding finalization error
+      console.error('Erreur lors de la finalisation de l\'onboarding:', error);
       toast({
         title: "Erreur",
         description: "Impossible de finaliser l'onboarding",

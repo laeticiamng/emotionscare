@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { captureException } from '@/lib/ai-monitoring';
-import { Sentry } from '@/lib/errors/sentry-compat';
+import * as Sentry from '@sentry/react';
 import { Loader2, RotateCcw, Sparkles, Trash2, Wand2 } from 'lucide-react';
 import { ZodError } from 'zod';
 

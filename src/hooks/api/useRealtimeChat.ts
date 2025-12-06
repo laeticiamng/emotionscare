@@ -1,6 +1,4 @@
-// @ts-nocheck
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { logger } from '@/lib/logger';
 
 export interface RealtimeChatMessage {
   id: string;
@@ -29,7 +27,7 @@ export class AudioRecorder {
 
   async start() {
     try {
-      logger.debug('Starting audio recording', undefined, 'RealtimeChat');
+      console.log('🎤 Starting audio recording...');
       this.stream = await navigator.mediaDevices.getUserMedia({
         audio: {
           sampleRate: 24000,
@@ -55,15 +53,15 @@ export class AudioRecorder {
       this.source.connect(this.processor);
       this.processor.connect(this.audioContext.destination);
       
-      logger.info('Audio recording started successfully', undefined, 'RealtimeChat');
+      console.log('✅ Audio recording started successfully');
     } catch (error) {
-      logger.error('Error accessing microphone', error, 'RealtimeChat');
+      console.error('❌ Error accessing microphone:', error);
       throw error;
     }
   }
 
   stop() {
-    logger.debug('Stopping audio recording', undefined, 'RealtimeChat');
+    console.log('🛑 Stopping audio recording...');
     if (this.source) {
       this.source.disconnect();
       this.source = null;
@@ -140,7 +138,7 @@ class AudioQueue {
       source.onended = () => this.playNext();
       source.start(0);
     } catch (error) {
-      logger.error('Error playing audio', error, 'RealtimeChat');
+      console.error('❌ Error playing audio:', error);
       this.playNext(); // Continue with next segment even if current fails
     }
   }
@@ -213,7 +211,7 @@ export const useRealtimeChat = () => {
     if (!audioContextRef.current) {
       audioContextRef.current = new AudioContext({ sampleRate: 24000 });
       audioQueueRef.current = new AudioQueue(audioContextRef.current);
-      logger.debug('Audio context initialized', undefined, 'RealtimeChat');
+      console.log('🔊 Audio context initialized');
     }
   }, []);
 
@@ -225,12 +223,12 @@ export const useRealtimeChat = () => {
       setState(prev => ({ ...prev, connectionStatus: 'connecting' }));
       await initializeAudio();
 
-      logger.info('Connecting to realtime chat', undefined, 'RealtimeChat');
+      console.log('🔗 Connecting to realtime chat...');
       const wsUrl = 'wss://yaincoxihiqdksxgrsrk.functions.supabase.co/functions/v1/openai-realtime';
       wsRef.current = new WebSocket(wsUrl);
 
       wsRef.current.onopen = () => {
-        logger.info('WebSocket connected', undefined, 'RealtimeChat');
+        console.log('✅ WebSocket connected');
         setState(prev => ({ 
           ...prev, 
           isConnected: true, 
@@ -240,7 +238,7 @@ export const useRealtimeChat = () => {
 
       wsRef.current.onmessage = async (event) => {
         const data = JSON.parse(event.data);
-        logger.debug('Received message', { type: data.type }, 'RealtimeChat');
+        console.log('📥 Received:', data.type, data);
 
         switch (data.type) {
           case 'response.audio.delta':
@@ -291,14 +289,14 @@ export const useRealtimeChat = () => {
             break;
 
           case 'response.function_call_arguments.done':
-            logger.debug('Function call received', data.arguments, 'RealtimeChat');
+            console.log('🛠️ Function call:', data.arguments);
             // Handle function calls here
             break;
         }
       };
 
       wsRef.current.onerror = (error) => {
-        logger.error('WebSocket error', error, 'RealtimeChat');
+        console.error('❌ WebSocket error:', error);
         setState(prev => ({ 
           ...prev, 
           connectionStatus: 'error',
@@ -307,7 +305,7 @@ export const useRealtimeChat = () => {
       };
 
       wsRef.current.onclose = () => {
-        logger.info('WebSocket disconnected', undefined, 'RealtimeChat');
+        console.log('🔌 WebSocket disconnected');
         setState(prev => ({ 
           ...prev, 
           isConnected: false,
@@ -318,7 +316,7 @@ export const useRealtimeChat = () => {
       };
 
     } catch (error) {
-      logger.error('Connection error', error, 'RealtimeChat');
+      console.error('❌ Connection error:', error);
       setState(prev => ({ ...prev, connectionStatus: 'error' }));
     }
   }, [state.connectionStatus, initializeAudio]);
@@ -341,7 +339,7 @@ export const useRealtimeChat = () => {
       await recorderRef.current.start();
       setState(prev => ({ ...prev, isRecording: true }));
     } catch (error) {
-      logger.error('Error starting recording', error, 'RealtimeChat');
+      console.error('❌ Error starting recording:', error);
     }
   }, [state.isConnected]);
 

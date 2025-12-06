@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import { User, UserRole } from "@/types/user";
 import { UserModeType } from "@/types/userMode";

@@ -1,8 +1,6 @@
-// @ts-nocheck
 
 import { supabase } from '@/integrations/supabase/client';
 import { UserPoints, UserBadge, Achievement, Streak, Badge } from '@/types/gamification';
-import { logger } from '@/lib/logger';
 
 class GamificationService {
   async getUserPoints(): Promise<UserPoints | null> {
@@ -41,7 +39,7 @@ class GamificationService {
 
       return data;
     } catch (error) {
-      logger.error('Erreur lors de la récupération des points', error, 'GamificationService.getUserPoints');
+      console.error('Erreur lors de la récupération des points:', error);
       return null;
     }
   }
@@ -63,7 +61,7 @@ class GamificationService {
       if (error) throw error;
       return data || [];
     } catch (error) {
-      logger.error('Erreur lors de la récupération des badges', error, 'GamificationService.getUserBadges');
+      console.error('Erreur lors de la récupération des badges:', error);
       return [];
     }
   }
@@ -82,7 +80,7 @@ class GamificationService {
       if (error) throw error;
       return data || [];
     } catch (error) {
-      logger.error('Erreur lors de la récupération des succès', error, 'GamificationService.getUserAchievements');
+      console.error('Erreur lors de la récupération des succès:', error);
       return [];
     }
   }
@@ -100,7 +98,7 @@ class GamificationService {
       if (error) throw error;
       return data || [];
     } catch (error) {
-      logger.error('Erreur lors de la récupération des séries', error, 'GamificationService.getUserStreaks');
+      console.error('Erreur lors de la récupération des séries:', error);
       return [];
     }
   }
@@ -143,7 +141,7 @@ class GamificationService {
 
       return data;
     } catch (error) {
-      logger.error('Erreur lors de l\'attribution des points', error, 'GamificationService.awardPoints');
+      console.error('Erreur lors de l\'attribution des points:', error);
       throw error;
     }
   }
@@ -176,7 +174,7 @@ class GamificationService {
 
       return newAchievements;
     } catch (error) {
-      logger.error('Erreur lors de la vérification des succès', error, 'GamificationService.checkAndAwardAchievements');
+      console.error('Erreur lors de la vérification des succès:', error);
       return [];
     }
   }
@@ -250,7 +248,7 @@ class GamificationService {
         return data;
       }
     } catch (error) {
-      logger.error('Erreur lors de la mise à jour de la série', error, 'GamificationService.updateStreak');
+      console.error('Erreur lors de la mise à jour de la série:', error);
       throw error;
     }
   }
@@ -311,7 +309,7 @@ class GamificationService {
 
       return data;
     } catch (error) {
-      logger.error('Erreur lors de la création du succès', error, 'GamificationService.createAchievement');
+      console.error('Erreur lors de la création du succès:', error);
       return null;
     }
   }
@@ -341,7 +339,7 @@ class GamificationService {
         rank: index + 1
       })) || [];
     } catch (error) {
-      logger.error('Erreur lors de la récupération du classement', error, 'GamificationService.getLeaderboard');
+      console.error('Erreur lors de la récupération du classement:', error);
       return [];
     }
   }

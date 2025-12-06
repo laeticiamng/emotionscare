@@ -1,7 +1,5 @@
-// @ts-nocheck
 
 import { supabase } from '@/integrations/supabase/client';
-import { logger } from '@/lib/logger';
 
 // Define activity log structure
 interface ActivityLog {
@@ -29,7 +27,8 @@ export async function logActivity(
   details: Record<string, any> = {}
 ): Promise<boolean> {
   try {
-    logger.info(`Activity logged: ${activityType} by user ${userId}`, details, 'ActivityLog');
+    // Log to console for development
+    console.log(`Activity logged: ${activityType} by user ${userId}`, details);
     
     // In a real implementation, this would insert into a database table
     // Since we don't have a user_activity table accessible in the types,
@@ -37,7 +36,7 @@ export async function logActivity(
     
     return true;
   } catch (error) {
-    logger.error('Error logging activity', error, 'ActivityLog');
+    console.error('Error logging activity:', error);
     return false;
   }
 }
@@ -60,7 +59,7 @@ export async function getUserActivities(
       activity_details: { source: 'mock' }
     }];
   } catch (error) {
-    logger.error('Error fetching user activities', error, 'ActivityLog');
+    console.error('Error fetching user activities:', error);
     return [];
   }
 }

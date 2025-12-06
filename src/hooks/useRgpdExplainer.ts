@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import { useState } from 'react';
 import { toast } from '@/hooks/use-toast';
@@ -7,7 +6,6 @@ import {
   getGDPRQuestionResponse,
   generateGDPRRequestTemplate 
 } from '@/lib/ai/gdpr-service';
-import { logger } from '@/lib/logger';
 
 export type GdprExplanation = {
   explanation: string;
@@ -53,7 +51,7 @@ export function useRgpdExplainer() {
       setExplanation(result);
       return result;
     } catch (error) {
-      logger.error('Erreur explication RGPD', error as Error, 'SYSTEM');
+      console.error('Erreur explication RGPD:', error);
       toast({
         title: "Erreur",
         description: "Impossible d'obtenir l'explication RGPD",
@@ -90,7 +88,7 @@ export function useRgpdExplainer() {
       
       return result;
     } catch (error) {
-      logger.error('Erreur question RGPD', error as Error, 'SYSTEM');
+      console.error('Erreur question RGPD:', error);
       toast({
         title: "Erreur",
         description: "Impossible d'obtenir une réponse à votre question",
@@ -120,7 +118,7 @@ export function useRgpdExplainer() {
       setRequestTemplate(result);
       return result;
     } catch (error) {
-      logger.error('Erreur modèle RGPD', error as Error, 'SYSTEM');
+      console.error('Erreur modèle RGPD:', error);
       toast({
         title: "Erreur",
         description: "Impossible de générer le modèle de demande",

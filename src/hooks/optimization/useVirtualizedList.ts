@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 
 interface VirtualizedListConfig {

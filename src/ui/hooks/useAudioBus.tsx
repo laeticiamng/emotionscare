@@ -1,6 +1,4 @@
-// @ts-nocheck
 import { useCallback, useRef } from 'react';
-import { logger } from '@/lib/logger';
 
 interface AudioBusControls {
   playSound: (soundId: string, src: string) => Promise<void>;
@@ -33,7 +31,7 @@ export function useAudioBus(): AudioBusControls {
       audio.currentTime = 0;
       await audio.play();
     } catch (error) {
-      logger.warn(`Failed to play sound ${soundId}`, error, 'UI');
+      console.warn(`Failed to play sound ${soundId}:`, error);
     }
   }, []);
 

@@ -1,6 +1,6 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { fullApiService } from '@/services/api/fullApiService';
-import { logger } from '@/lib/logger';
 
 export interface ActivityLogFilters {
   searchTerm: string;
@@ -43,82 +43,48 @@ export const useUserActivityLogState = () => {
     
     try {
       if (activeTab === 'daily') {
-        // Mock data for daily activities
-        const mockActivities: AnonymousActivity[] = [
-          {
-            id: '1',
-            activity_type: 'login',
-            category: 'authentication',
-            count: 25,
-            timestamp_day: '2025-10-01'
-          },
-          {
-            id: '2',
-            activity_type: 'scan_emotion',
-            category: 'wellness',
-            count: 18,
-            timestamp_day: '2025-10-01'
-          },
-          {
-            id: '3',
-            activity_type: 'journal_entry',
-            category: 'wellness',
-            count: 12,
-            timestamp_day: '2025-10-02'
-          }
-        ];
+        // Utiliser les nouveaux endpoints backend
+        const params: any = {
+          page: 1,
+          limit: 50
+        };
         
-        // Apply filters
-        let filtered = [...mockActivities];
+        if (filters.startDate) params.date_from = filters.startDate;
+        if (filters.endDate) params.date_to = filters.endDate;
+        if (filters.activityType !== 'all') params.activity_type = filters.activityType;
+        if (filters.searchTerm) params.search_term = filters.searchTerm;
+
+        const response = await fullApiService.request('/admin/audit/logs', {
+          method: 'GET',
+        });
         
-        if (filters.searchTerm) {
-          filtered = filtered.filter(item => 
-            item.activity_type.toLowerCase().includes(filters.searchTerm.toLowerCase()) ||
-            item.category.toLowerCase().includes(filters.searchTerm.toLowerCase())
-          );
-        }
+        // Transformer les données pour correspondre au format attendu
+        const activities = response.data?.logs?.map((log: any) => ({
+          id: log.id,
+          activity_type: log.action,
+          category: log.resource_type || 'Système',
+          count: 1,
+          timestamp_day: new Date(log.created_at).toISOString().split('T')[0]
+        })) || [];
         
-        if (filters.activityType && filters.activityType !== 'all') {
-          filtered = filtered.filter(item => item.activity_type === filters.activityType);
-        }
-        
-        if (filters.startDate) {
-          filtered = filtered.filter(item => 
-            new Date(item.timestamp_day) >= new Date(filters.startDate)
-          );
-        }
-        
-        if (filters.endDate) {
-          filtered = filtered.filter(item => 
-            new Date(item.timestamp_day) <= new Date(filters.endDate)
-          );
-        }
-        
-        setFilteredActivities(filtered);
+        setFilteredActivities(activities);
       } else {
-        // Mock stats data
-        const mockStats: ActivityStats[] = [
-          {
-            activity_type: 'login',
-            total_count: 125,
-            percentage: 40.5
-          },
-          {
-            activity_type: 'scan_emotion',
-            total_count: 82,
-            percentage: 26.5
-          },
-          {
-            activity_type: 'journal_entry',
-            total_count: 65,
-            percentage: 21.0
-          }
-        ];
+        // Récupérer les statistiques d'utilisation
+        const response = await fullApiService.getUsageStatistics({
+          period: '30d'
+        });
         
-        setStats(mockStats);
+        const statsData = response.data?.feature_usage ? 
+          Object.entries(response.data.feature_usage).map(([key, value]: [string, any]) => ({
+            activity_type: key,
+            total_count: value.total || 0,
+            percentage: value.percentage || 0
+          })) : [];
+        
+        setStats(statsData);
       }
     } catch (err) {
-      logger.error('Error fetching activity data:', err);
+      console.error('Error fetching activity data:', err);
       setError(err instanceof Error ? err.message : 'Erreur lors du chargement des données');
       
       // Données de fallback pour éviter les erreurs d'affichage
@@ -142,32 +108,21 @@ export const useUserActivityLogState = () => {
 
   const handleExport = useCallback(async () => {
     try {
-      // Simple CSV export from current data
-      const data = activeTab === 'daily' ? filteredActivities : stats;
-      const csv = activeTab === 'daily'
-        ? [
-            'ID,Type,Catégorie,Compte,Date',
-            ...filteredActivities.map(a => `${a.id},${a.activity_type},${a.category},${a.count},${a.timestamp_day}`)
-          ].join('\n')
-        : [
-            'Type,Total,Pourcentage',
-            ...stats.map(s => `${s.activity_type},${s.total_count},${s.percentage}`)
-          ].join('\n');
+      const reportType = activeTab === 'daily' ? 'activity_logs' : 'usage_statistics';
+      const response = await fullApiService.generateReport(
+        reportType,
+        { filters, period: '30d' },
+        'csv'
+      );
       
-      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.setAttribute('href', url);
-      link.setAttribute('download', `activity-${activeTab}-${new Date().toISOString().split('T')[0]}.csv`);
-      link.style.visibility = 'hidden';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      if (response.data?.download_url) {
+        window.open(response.data.download_url, '_blank');
+      }
     } catch (err) {
-      logger.error('Error exporting data:', err);
+      console.error('Error exporting data:', err);
       setError('Erreur lors de l\'export des données');
     }
-  }, [activeTab, filteredActivities, stats]);
+  }, [activeTab, filters]);
 
   useEffect(() => {
     fetchActivityData();

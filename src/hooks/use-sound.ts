@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 /**
  * This is a simple wrapper around the use-sound package
@@ -6,7 +5,6 @@
  */
 
 import { useRef, useEffect } from 'react';
-import { logger } from '@/lib/logger';
 
 type PlayFunction = () => void;
 
@@ -50,7 +48,7 @@ export default function useSound(
       audioRef.current.currentTime = 0;
       audioRef.current.play().catch(e => {
         // Ignore autoplay errors - common in browsers requiring user interaction
-        logger.debug('Audio playback error (likely autoplay restriction)', e, 'UI');
+        console.debug('Audio playback error (likely autoplay restriction):', e);
       });
     }
   };

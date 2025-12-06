@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
@@ -57,9 +58,9 @@ const ActionButton: React.FC<ActionButtonProps> = ({
         `}
       >
         {isLoading ? (
-          <Loader2 className="w-4 h-4 animate-spin mr-2" aria-hidden="true" />
+          <Loader2 className="w-4 h-4 animate-spin mr-2" />
         ) : (
-          icon && <span className="mr-2" aria-hidden="true">{icon}</span>
+          icon && <span className="mr-2">{icon}</span>
         )}
         {children}
       </Button>

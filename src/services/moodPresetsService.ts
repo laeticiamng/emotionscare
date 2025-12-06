@@ -1,8 +1,6 @@
-// @ts-nocheck
 import { supabase } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
 import { MoodPresetBlend, MoodPresetRecord } from '@/types/mood-mixer';
-import { logger } from '@/lib/logger';
 
 export type MoodPresetRow = Database['public']['Tables']['mood_presets']['Row'];
 export type MoodPresetInsert = Database['public']['Tables']['mood_presets']['Insert'];
@@ -131,7 +129,7 @@ export const moodPresetsService = {
       .order('name');
 
     if (error) {
-      logger.error('Error fetching mood presets', error as Error, 'API');
+      console.error('Error fetching mood presets:', error);
       return [];
     }
 
@@ -146,7 +144,7 @@ export const moodPresetsService = {
       .single();
 
     if (error) {
-      logger.error('Error fetching mood preset', error as Error, 'API');
+      console.error('Error fetching mood preset:', error);
       return null;
     }
 
@@ -161,7 +159,7 @@ export const moodPresetsService = {
       .single();
 
     if (error) {
-      logger.error('Error creating mood preset', error as Error, 'API');
+      console.error('Error creating mood preset:', error);
       throw error;
     }
 
@@ -177,7 +175,7 @@ export const moodPresetsService = {
       .single();
 
     if (error) {
-      logger.error('Error updating mood preset', error as Error, 'API');
+      console.error('Error updating mood preset:', error);
       throw error;
     }
 
@@ -191,7 +189,7 @@ export const moodPresetsService = {
       .eq('id', id);
 
     if (error) {
-      logger.error('Error deleting mood preset', error as Error, 'API');
+      console.error('Error deleting mood preset:', error);
       throw error;
     }
 

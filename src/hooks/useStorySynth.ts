@@ -1,78 +1,99 @@
-/**
- * Hook React Query pour Story Synth
- * @deprecated Use useStorySynthMachine instead
- */
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import * as storySynthService from '@/modules/story-synth/storySynthService';
-import { useToast } from '@/hooks/use-toast';
+import { useState } from 'react';
+import useOpenAI from './api/useOpenAI';
+import { logger } from '@/lib/logger';
 
-export const useStorySynth = (userId: string) => {
-  const queryClient = useQueryClient();
-  const { toast } = useToast();
+interface StoryChapter {
+  id: string;
+  title: string;
+  content: string;
+  imagePrompt?: string;
+  choices?: { text: string; nextChapter: string }[];
+}
 
-  const { data: history, isLoading } = useQuery({
-    queryKey: ['story-synth-history', userId],
-    queryFn: () => storySynthService.getRecentSessions(20),
-    enabled: !!userId
-  });
+interface Story {
+  id: string;
+  title: string;
+  chapters: StoryChapter[];
+  currentChapterIndex: number;
+}
 
-  const createSession = useMutation({
-    mutationFn: ({ theme, tone }: { theme: 'calme' | 'aventure' | 'poetique' | 'mysterieux' | 'romance' | 'introspection' | 'nature'; tone: 'apaisant' | 'encourageant' | 'contemplatif' | 'joyeux' | 'nostalgique' | 'esperant' }) =>
-      storySynthService.createSession({ theme, tone }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['story-synth-history', userId] });
-      toast({ title: 'Nouvelle histoire commencée' });
+export const useStorySynth = () => {
+  const [currentStory, setCurrentStory] = useState<Story | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const { generateText, isLoading } = useOpenAI();
+
+  const createStory = async (imageFile?: File, prompt?: string): Promise<Story | null> => {
+    setIsGenerating(true);
+
+    const basePrompt = prompt || "Crée une histoire interactive courte et inspirante";
+    const fullPrompt = `
+Crée une histoire interactive en 3 chapitres avec des choix.
+Thème: ${basePrompt}
+
+Réponds en JSON strict :
+{
+  "title": "Titre de l'histoire",
+  "chapters": [
+    {
+      "id": "ch1",
+      "title": "Titre chapitre 1",
+      "content": "Contenu narratif engageant (2-3 phrases)",
+      "imagePrompt": "Description visuelle pour génération d'image",
+      "choices": [
+        {"text": "Choix A", "nextChapter": "ch2a"},
+        {"text": "Choix B", "nextChapter": "ch2b"}
+      ]
     }
-  });
+  ]
+}
 
-  const createStory = useMutation({
-    mutationFn: async ({ 
-      title, 
-      content, 
-      genre, 
-      style,
-      metadata 
-    }: { 
-      title: string; 
-      content: string;
-      genre: string;
-      style: string;
-      metadata: any;
-    }) => {
-      // Legacy functionality - create a session with calme theme
-      const session = await storySynthService.createSession({ theme: 'calme', tone: 'apaisant' });
-      return session;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['story-synth-history', userId] });
-      toast({ title: 'Histoire sauvegardée!' });
-    },
-    onError: (error: any) => {
-      toast({
-        title: 'Erreur',
-        description: error.message,
-        variant: 'destructive'
+Histoire positive, interactive, sans violence.
+`;
+
+    try {
+      const response = await generateText({ prompt: fullPrompt });
+      if (!response) return null;
+
+      const jsonMatch = response.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) throw new Error('Format JSON invalide');
+
+      const storyData = JSON.parse(jsonMatch[0]);
+      const story: Story = {
+        id: `story-${Date.now()}`,
+        title: storyData.title,
+        chapters: storyData.chapters,
+        currentChapterIndex: 0
+      };
+
+      setCurrentStory(story);
+      return story;
+    } catch (error) {
+      logger.error('Story creation failed', error, 'SYSTEM');
+      return null;
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const navigateToChapter = (chapterIndex: number) => {
+    if (currentStory && chapterIndex < currentStory.chapters.length) {
+      setCurrentStory({
+        ...currentStory,
+        currentChapterIndex: chapterIndex
       });
     }
-  });
+  };
 
-  const completeSession = useMutation({
-    mutationFn: ({ sessionId, duration }: { sessionId: string; duration: number }) =>
-      storySynthService.completeSession({ session_id: sessionId, reading_duration_seconds: duration }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['story-synth-history', userId] });
-      toast({ title: 'Histoire terminée' });
-    }
-  });
+  const resetStory = () => {
+    setCurrentStory(null);
+  };
 
   return {
-    history,
-    isLoading,
-    createSession: createSession.mutate,
-    createStory: createStory.mutate,
-    completeSession: completeSession.mutate,
-    isCreating: createSession.isPending,
-    isSavingStory: createStory.isPending
+    currentStory,
+    createStory,
+    navigateToChapter,
+    resetStory,
+    isGenerating: isGenerating || isLoading
   };
 };

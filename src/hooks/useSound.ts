@@ -1,6 +1,4 @@
-// @ts-nocheck
 import { useCallback } from 'react';
-import { logger } from '@/lib/logger';
 
 type SoundType = 'success' | 'error' | 'notification' | 'hover' | 'tap' | 'complete';
 
@@ -40,18 +38,18 @@ export default function useSound(): UseSound {
         const fallbackAudio = new Audio(soundFallbacks[type]);
         fallbackAudio.volume = 0.3;
         fallbackAudio.play().catch(() => {
-          logger.warn('Could not play sound', { type }, 'UI');
+          console.warn(`Could not play sound: ${type}`);
         });
       });
     } catch (error) {
-      logger.warn('Error playing sound', error as Error, 'UI');
+      console.warn(`Error playing sound: ${error}`);
     }
   }, []);
 
   const stopSound = useCallback((type: SoundType) => {
     // This would require keeping references to active Audio objects
     // For simplicity, we're just implementing the interface
-    logger.debug('Stop sound', { type }, 'UI');
+    console.log(`Stop sound: ${type}`);
   }, []);
 
   return { playSound, stopSound };

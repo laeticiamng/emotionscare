@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 

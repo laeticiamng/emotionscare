@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useEffect, useCallback, useRef } from 'react';
 
 interface PerformanceOptimizerProps {

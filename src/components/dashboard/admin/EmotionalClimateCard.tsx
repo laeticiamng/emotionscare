@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -31,7 +30,7 @@ const EmotionalClimateCard: React.FC<EmotionalClimateCardProps> = ({
     <Card>
       <CardHeader className="pb-2">
         <CardTitle className="text-lg flex items-center">
-          <Heart className="h-5 w-5 mr-2 text-destructive" />
+          <Heart className="h-5 w-5 mr-2 text-red-500" />
           Climat émotionnel
         </CardTitle>
       </CardHeader>
@@ -46,7 +45,7 @@ const EmotionalClimateCard: React.FC<EmotionalClimateCardProps> = ({
           <div className="bg-muted/20 rounded-lg p-4 text-center">
             <div className="text-sm text-muted-foreground">Tendance</div>
             <div className={`text-3xl font-bold mt-1 ${
-              changeDirection === 'up' ? 'text-success' : 'text-destructive'
+              changeDirection === 'up' ? 'text-emerald-500' : 'text-red-500'
             }`}>
               {changeDirection === 'up' ? '↑' : '↓'} {Math.abs(scoreChange).toFixed(1)}
             </div>

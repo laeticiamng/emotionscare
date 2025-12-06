@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -7,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { useOrchestration } from '@/contexts/OrchestrationContext';
 import { Globe, ZoomIn, ZoomOut, Map } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { useTheme } from '@/providers/theme';
+import { useTheme } from '@/components/theme-provider';
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface EmotionCluster {
@@ -61,8 +60,7 @@ const WorldMapView: React.FC = () => {
   const [clusters, setClusters] = useState<EmotionCluster[]>([]);
   const [selectedCluster, setSelectedCluster] = useState<string | null>(null);
   const [zoomLevel, setZoomLevel] = useState(1);
-  const { resolvedTheme } = useTheme();
-  const isDarkMode = resolvedTheme === 'dark';
+  const { isDarkMode } = useTheme();
   
   const mapBackground = isDarkMode 
     ? "bg-slate-900 bg-opacity-50 bg-[url('/images/world-map-dark.svg')]" 

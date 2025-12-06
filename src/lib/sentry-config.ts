@@ -1,11 +1,9 @@
-// @ts-nocheck
 import * as Sentry from '@sentry/react';
 import { BrowserTracing } from '@sentry/react';
 import { Replay } from '@sentry/replay';
 import type { Breadcrumb, Event as SentryEvent } from '@sentry/types';
 import { BUILD_INFO, SENTRY_CONFIG } from '@/lib/env';
 import { hasConsent } from '@/lib/consent';
-import { logger } from '@/lib/logger';
 
 declare const __APP_COMMIT_SHA__: string | undefined;
 
@@ -468,7 +466,7 @@ export function initializeSentry(): boolean {
 
   if (!hasConsent('analytics')) {
     if (import.meta.env.DEV) {
-      logger.info('[Sentry] Initialisation différée : consentement analytics absent.', 'LIB');
+      console.info('[Sentry] Initialisation différée : consentement analytics absent.');
     }
     return false;
   }
@@ -477,7 +475,7 @@ export function initializeSentry(): boolean {
 
   if (!dsn) {
     if (import.meta.env.DEV) {
-      logger.info('[Sentry] DSN non configuré, instrumentation désactivée.', 'LIB');
+      console.info('[Sentry] DSN non configuré, instrumentation désactivée.');
     }
     return false;
   }
@@ -575,7 +573,7 @@ export function initializeSentry(): boolean {
 
   if (import.meta.env.DEV) {
     const dntMessage = doNotTrackEnabled ? ' (respect do-not-track activé)' : '';
-    logger.debug(`[Sentry] Observabilité initialisée${dntMessage}`, 'LIB');
+    console.log(`[Sentry] Observabilité initialisée${dntMessage}`);
   }
 
   return true;
@@ -584,7 +582,7 @@ export function initializeSentry(): boolean {
 export function reportReadingAddError(error: Error, context: SentryContextOptions): void {
   if (!hasSentryClient()) {
     if (import.meta.env.DEV) {
-      logger.warn('[Sentry] Client inactif, impossible de reporter l\'erreur.', 'LIB');
+      console.warn('[Sentry] Client inactif, impossible de reporter l\'erreur.');
     }
     return;
   }
@@ -644,7 +642,7 @@ export function monitorDOMErrors(): void {
   domMonitoringAttached = true;
 
   if (import.meta.env.DEV) {
-    logger.debug('[Sentry] Surveillance DOM activée', 'LIB');
+    console.log('[Sentry] Surveillance DOM activée');
   }
 }
 

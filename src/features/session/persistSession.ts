@@ -1,9 +1,7 @@
-// @ts-nocheck
-import { Sentry } from '@/lib/errors/sentry-compat';
+import * as Sentry from '@sentry/react';
 import { supabase } from '@/integrations/supabase/client';
 import { createSession } from '@/services/sessions/sessionsApi';
 import type { BreathProfile, Mode, Next } from '@/features/orchestration/useBreathworkOrchestration';
-import { logger } from '@/lib/logger';
 
 // Music session types and function
 interface MusicSessionMetadata {
@@ -23,7 +21,7 @@ interface PersistMusicSessionInput {
 export async function persistMusicSession(input: PersistMusicSessionInput): Promise<void> {
   const { module, metadata, durationSec = 0 } = input;
   try {
-    logger.info('session:persist:music', { module }, 'SESSION');
+    Sentry.addBreadcrumb({ category: 'session', message: 'session:persist:music', level: 'info', data: { module } });
     await createSession({
       type: module,
       duration_sec: Math.max(0, Math.round(durationSec)),
@@ -68,12 +66,17 @@ const sanitizeFlashGlowPayload = (payload: FlashGlowSessionMetadata) => ({
 export async function persistFlashGlowSession(module: 'flash_glow', payload: FlashGlowSessionMetadata): Promise<PersistSessionResult> {
   const sanitized = sanitizeFlashGlowPayload(payload);
 
-  logger.info('session:persist:flash_glow', {
-    module,
-    exit: sanitized.exit,
-    post_cta: sanitized.post_cta,
-    variant: sanitized.variant,
-  }, 'SESSION');
+  Sentry.addBreadcrumb({
+    category: 'session',
+    message: 'session:persist:flash_glow',
+    level: 'info',
+    data: {
+      module,
+      exit: sanitized.exit,
+      post_cta: sanitized.post_cta,
+      variant: sanitized.variant,
+    },
+  });
 
   try {
     const timestamp = new Date().toISOString();
@@ -120,7 +123,12 @@ export const persistBreathSession = async (module: 'breath', payload: PersistBre
     summary: payload.summary ?? 'respiration apaisante',
   } as const;
 
-  logger.info('breath:session:persist', meta, 'SESSION');
+  Sentry.addBreadcrumb({
+    category: 'session',
+    message: 'breath:session:persist',
+    level: 'info',
+    data: meta,
+  });
 
   try {
     await createSession({
@@ -130,7 +138,7 @@ export const persistBreathSession = async (module: 'breath', payload: PersistBre
       meta,
     });
   } catch (error) {
-    logger.error('[Breath] persist session failed', error as Error, 'SYSTEM');
+    console.error('[Breath] persist session failed', error);
     Sentry.captureException(error);
   }
 };

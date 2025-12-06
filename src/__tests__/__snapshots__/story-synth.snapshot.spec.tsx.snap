@@ -1,0 +1,364 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`StorySynthPage > rend la page et le CTA Générer 1`] = `
+<div>
+  <main
+    aria-label="Story Synth"
+  >
+    <div
+      class="relative overflow-hidden rounded-2xl p-6 mb-8 bg-gradient-to-r from-primary/10 via-primary/5 to-background"
+      style="opacity: 0; transform: translateY(-20px);"
+    >
+      <div
+        class="absolute inset-0 bg-gradient-to-r from-blue-50/50 via-purple-50/30 to-pink-50/20 dark:from-blue-900/10 dark:via-purple-900/5 dark:to-pink-900/5"
+      />
+      <div
+        class="relative z-10"
+      >
+        <div
+          class="flex items-center justify-between mb-4"
+        >
+          <div
+            class="flex items-center gap-4"
+          >
+            <button
+              class="inline-flex items-center justify-center whitespace-nowrap font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed focus-enhanced border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground hover:shadow-md active:scale-95 h-8 px-3 text-xs rounded-full"
+              type="button"
+            >
+              <svg
+                class="lucide lucide-arrow-left h-4 w-4"
+                fill="none"
+                height="24"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                width="24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="m12 19-7-7 7-7"
+                />
+                <path
+                  d="M19 12H5"
+                />
+              </svg>
+            </button>
+            <div
+              class="flex items-center gap-3"
+            >
+              <div>
+                <div
+                  class="flex items-center gap-3 mb-1"
+                >
+                  <h1
+                    class="text-2xl font-bold bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text"
+                  >
+                    Story Synth
+                  </h1>
+                </div>
+                <p
+                  class="text-muted-foreground"
+                >
+                  Génère une courte histoire à partir d’un brief
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          class="flex items-center gap-2"
+        >
+          <button
+            class="inline-flex items-center justify-center whitespace-nowrap font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed focus-enhanced hover:bg-accent hover:text-accent-foreground active:scale-95 h-8 rounded-md px-3 text-xs"
+            type="button"
+          >
+            <svg
+              class="lucide lucide-heart h-3 w-3 mr-1"
+              fill="none"
+              height="24"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              width="24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"
+              />
+            </svg>
+            Favoris
+          </button>
+          <button
+            class="inline-flex items-center justify-center whitespace-nowrap font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed focus-enhanced hover:bg-accent hover:text-accent-foreground active:scale-95 h-8 rounded-md px-3 text-xs"
+            type="button"
+          >
+            <svg
+              class="lucide lucide-share2 h-3 w-3 mr-1"
+              fill="none"
+              height="24"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              width="24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <circle
+                cx="18"
+                cy="5"
+                r="3"
+              />
+              <circle
+                cx="6"
+                cy="12"
+                r="3"
+              />
+              <circle
+                cx="18"
+                cy="19"
+                r="3"
+              />
+              <line
+                x1="8.59"
+                x2="15.42"
+                y1="13.51"
+                y2="17.49"
+              />
+              <line
+                x1="15.41"
+                x2="8.59"
+                y1="6.51"
+                y2="10.49"
+              />
+            </svg>
+            Partager
+          </button>
+          <button
+            class="inline-flex items-center justify-center whitespace-nowrap font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed focus-enhanced hover:bg-accent hover:text-accent-foreground active:scale-95 h-8 rounded-md px-3 text-xs"
+            type="button"
+          >
+            <svg
+              class="lucide lucide-star h-3 w-3 mr-1"
+              fill="none"
+              height="24"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              width="24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <polygon
+                points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+              />
+            </svg>
+            Noter
+          </button>
+        </div>
+      </div>
+    </div>
+    <div
+      class="rounded-xl border bg-card text-card-foreground shadow"
+    >
+      <section
+        style="display: grid; gap: 10px;"
+      >
+        <div
+          style="display: grid; gap: 8px;"
+        >
+          <label>
+            Genre
+            <select>
+              <option
+                value="calme"
+              >
+                Calme
+              </option>
+              <option
+                value="aventure"
+              >
+                Aventure
+              </option>
+              <option
+                value="poetique"
+              >
+                Poétique
+              </option>
+              <option
+                value="mysterieux"
+              >
+                Mystérieux
+              </option>
+              <option
+                value="romance"
+              >
+                Romance
+              </option>
+            </select>
+          </label>
+          <label>
+            Point de vue
+            <select>
+              <option
+                value="je"
+              >
+                Je
+              </option>
+              <option
+                value="il"
+              >
+                Il
+              </option>
+              <option
+                value="elle"
+              >
+                Elle
+              </option>
+              <option
+                value="nous"
+              >
+                Nous
+              </option>
+            </select>
+          </label>
+          <label>
+            Protagoniste
+            <input
+              type="text"
+              value="Alex"
+            />
+          </label>
+          <label>
+            Lieu
+            <input
+              type="text"
+              value="la ville"
+            />
+          </label>
+          <label>
+            Longueur : 
+            4
+             §
+            <input
+              max="7"
+              min="3"
+              type="range"
+              value="4"
+            />
+          </label>
+          <label>
+            Style
+            <select>
+              <option
+                value="sobre"
+              >
+                Sobre
+              </option>
+              <option
+                value="lyrique"
+              >
+                Lyrique
+              </option>
+              <option
+                value="journal"
+              >
+                Journal
+              </option>
+              <option
+                value="dialogue"
+              >
+                Dialogue
+              </option>
+            </select>
+          </label>
+          <label>
+            Seed (optionnel)
+            <input
+              placeholder="Reproductible si renseigné"
+              type="text"
+              value=""
+            />
+          </label>
+          <label>
+            Ambiance sonore
+            <select>
+              <option
+                value="aucun"
+              >
+                Aucun
+              </option>
+              <option
+                value="doux"
+              >
+                Lofi doux
+              </option>
+              <option
+                value="pluie"
+              >
+                Pluie
+              </option>
+            </select>
+          </label>
+        </div>
+        <div
+          style="display: flex; gap: 8px; flex-wrap: wrap;"
+        >
+          <button
+            class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed focus-enhanced bg-primary text-primary-foreground shadow hover:bg-primary/90 hover:shadow-md active:scale-95 h-9 px-4 py-2"
+            data-ui="primary-cta"
+            type="button"
+          >
+            Générer
+          </button>
+          <button
+            class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed focus-enhanced bg-primary text-primary-foreground shadow hover:bg-primary/90 hover:shadow-md active:scale-95 h-9 px-4 py-2"
+            type="button"
+          >
+            Continuer (+)
+          </button>
+          <button
+            class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed focus-enhanced bg-primary text-primary-foreground shadow hover:bg-primary/90 hover:shadow-md active:scale-95 h-9 px-4 py-2"
+            type="button"
+          >
+            Enregistrer
+          </button>
+          <button
+            class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed focus-enhanced bg-primary text-primary-foreground shadow hover:bg-primary/90 hover:shadow-md active:scale-95 h-9 px-4 py-2"
+            type="button"
+          >
+            Exporter .txt
+          </button>
+        </div>
+        <label>
+          Titre
+          <input
+            type="text"
+            value="Petite histoire"
+          />
+        </label>
+      </section>
+    </div>
+    <div
+      class="rounded-xl border bg-card text-card-foreground shadow"
+      style="margin-top: 12px;"
+    >
+      <h2>
+        Bibliothèque (local)
+      </h2>
+      <ul
+        style="list-style: none; padding: 0px; display: grid; gap: 8px;"
+      >
+        <em>
+          Aucune histoire enregistrée pour l’instant.
+        </em>
+      </ul>
+    </div>
+  </main>
+</div>
+`;

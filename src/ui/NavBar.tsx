@@ -1,14 +1,11 @@
-// @ts-nocheck
 "use client";
 import { ThemeToggle } from "@/theme/ThemeProvider";
 import { useI18n } from "@/lib/i18n";
 import { usePrefetchOnHover } from "@/hooks/usePrefetchOnHover";
 
 export function NavBar() {
-  const preMods = usePrefetchOnHover("/modules");
-  const i18n = useI18n();
-  const lang = i18n?.lang ?? "fr";
-  const setLang = i18n?.setLang ?? (() => {});
+  const preMods = usePrefetchOnHover?.("/modules") ?? {};
+  const { lang, setLang } = useI18n ? useI18n() : { lang: "fr", setLang: () => {} };
   return (
     <header style={{ display: "flex", gap: 12, alignItems: "center", padding: "12px 16px" }}>
       <a href="/" aria-label="Accueil">EmotionsCare</a>

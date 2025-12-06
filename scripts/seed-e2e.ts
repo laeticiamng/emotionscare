@@ -35,8 +35,8 @@ async function ensureOrganization() {
       },
       { onConflict: 'domain' }
     )
-    .eq('domain', ORG_DOMAIN)
     .select()
+    .eq('domain', ORG_DOMAIN)
     .single();
 
   if (error) {
@@ -47,10 +47,9 @@ async function ensureOrganization() {
 }
 
 async function ensureAuthUser(email: string): Promise<User> {
-  const { data: users } = await supabase.auth.admin.listUsers();
-  const existing = users?.users.find(u => u.email === email);
-  if (existing) {
-    return existing;
+  const existing = await supabase.auth.admin.getUserByEmail(email);
+  if (existing.data?.user) {
+    return existing.data.user;
   }
 
   const created = await supabase.auth.admin.createUser({

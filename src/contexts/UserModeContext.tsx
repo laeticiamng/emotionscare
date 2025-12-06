@@ -8,10 +8,11 @@ import React, {
   useMemo,
   useState,
 } from 'react';
-import { roleToMode as roleToModeUtil, modeToRole as modeToRoleUtil } from '@/lib/role-mappings';
-import type { Role, UserMode } from '@/lib/role-mappings';
 
 const STORAGE_KEY = 'userMode';
+
+type Role = 'user' | 'manager' | 'org' | 'admin';
+type UserMode = 'b2c' | 'b2b_user' | 'b2b_admin' | 'admin' | null;
 
 type UserModeContextValue = {
   role: Role | null;
@@ -23,9 +24,35 @@ type UserModeContextValue = {
   isLoading: boolean;
 };
 
-// Utilise les fonctions centralisées de lib/role-mappings.ts
-const roleToMode = roleToModeUtil;
-const modeToRole = modeToRoleUtil;
+const roleToMode = (role: Role | null): UserMode => {
+  switch (role) {
+    case 'user':
+      return 'b2c';
+    case 'manager':
+      return 'b2b_user';
+    case 'org':
+      return 'b2b_admin';
+    case 'admin':
+      return 'admin';
+    default:
+      return null;
+  }
+};
+
+const modeToRole = (mode: UserMode | null): Role | null => {
+  switch (mode) {
+    case 'b2c':
+      return 'user';
+    case 'b2b_user':
+      return 'manager';
+    case 'b2b_admin':
+      return 'org';
+    case 'admin':
+      return 'admin';
+    default:
+      return null;
+  }
+};
 
 const readStoredMode = (): UserMode => {
   if (typeof window === 'undefined') {

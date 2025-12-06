@@ -140,7 +140,7 @@ const MainNavigationMenu: React.FC<MainNavigationMenuProps> = ({ isOpen, onToggl
             </div>
             <h2 className="font-bold text-lg">EmotionsCare</h2>
           </div>
-          <Button variant="ghost" size="icon" onClick={onToggle} className="md:hidden" aria-label="Fermer le menu">
+          <Button variant="ghost" size="icon" onClick={onToggle} className="md:hidden">
             <X className="h-5 w-5" />
           </Button>
         </div>

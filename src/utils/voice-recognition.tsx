@@ -1,8 +1,6 @@
-// @ts-nocheck
 
 import React from 'react';
 import { SpeechRecognition } from '@/types/speech';
-import { logger } from '@/lib/logger';
 
 // Polyfill minimal pour remplacer react-speech-kit
 export const useSpeechRecognition = () => {
@@ -20,13 +18,13 @@ export const useSpeechRecognition = () => {
     
     setIsListening(true);
     // Logique réelle à implémenter
-    logger.debug("Speech recognition would start here", 'SYSTEM');
+    console.log("Speech recognition would start here");
   }, [browserSupported]);
 
   const stopListening = React.useCallback(() => {
     setIsListening(false);
     // Logique réelle à implémenter
-    logger.debug("Speech recognition would stop here", 'SYSTEM');
+    console.log("Speech recognition would stop here");
   }, []);
 
   return {

@@ -1,9 +1,6 @@
-// @ts-nocheck
 /**
  * Détection des compatibilités navigateur et iOS - Garde-fous techniques
  */
-
-import { logger } from '@/lib/logger';
 
 export interface DeviceCapabilities {
   webBluetooth: boolean;
@@ -175,7 +172,7 @@ export const useDeviceCapabilities = () => {
         const caps = await deviceCompatChecker.checkCapabilities();
         setCapabilities(caps);
       } catch (error) {
-        logger.error('Error checking device capabilities', error as Error, 'SYSTEM');
+        console.error('Error checking device capabilities:', error);
       } finally {
         setLoading(false);
       }

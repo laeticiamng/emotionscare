@@ -1,4 +1,3 @@
-// @ts-nocheck
 import type { InstrumentCode, ScoringResult } from './types';
 import { getCatalog } from './catalogs';
 

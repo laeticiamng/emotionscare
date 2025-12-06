@@ -6,7 +6,6 @@
  * Permet de configurer les clés API, tester les connexions, et gérer les paramètres.
  */
 import React, { useState } from 'react';
-import { logger } from '@/lib/logger';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -55,9 +54,10 @@ const ApiConfigPanel: React.FC<ApiConfigPanelProps> = ({ className = '', onUpdat
       // Simule un délai de sauvegarde
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      logger.info('API keys saved successfully', {}, 'SYSTEM');
+      // Afficherait normalement un toast de succès
+      console.log('API keys saved successfully');
     } catch (error) {
-      logger.error('Error saving API keys', error, 'SYSTEM');
+      console.error('Error saving API keys:', error);
     } finally {
       setIsLoading(false);
     }

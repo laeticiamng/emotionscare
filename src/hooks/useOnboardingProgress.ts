@@ -1,8 +1,7 @@
-// @ts-nocheck
+
 import { useState, useEffect } from 'react';
 import { OnboardingProgress, OnboardingLog } from '@/types/onboarding';
 import { useAuth } from '@/contexts/AuthContext';
-import { logger } from '@/lib/logger';
 
 export function useOnboardingProgress() {
   const { user } = useAuth();
@@ -26,7 +25,7 @@ export function useOnboardingProgress() {
       try {
         setProgress(JSON.parse(storedProgress));
       } catch (e) {
-        logger.error('Failed to parse onboarding progress', e as Error, 'SYSTEM');
+        console.error('Failed to parse onboarding progress:', e);
       }
     }
     
@@ -34,7 +33,7 @@ export function useOnboardingProgress() {
       try {
         setLogs(JSON.parse(storedLogs));
       } catch (e) {
-        logger.error('Failed to parse onboarding logs', e as Error, 'SYSTEM');
+        console.error('Failed to parse onboarding logs:', e);
       }
     }
   }, [userId]);
@@ -97,7 +96,7 @@ export function useOnboardingProgress() {
         });
       }
     } catch (e) {
-      logger.warn('Confetti effect unavailable', { error: e }, 'UI');
+      console.warn('Confetti effect unavailable:', e);
     }
     
     return {

@@ -1,6 +1,3 @@
-// @ts-nocheck
-
-import { logger } from '@/lib/logger';
 
 export interface CoachAction {
   id: string;
@@ -9,12 +6,12 @@ export interface CoachAction {
 }
 
 export const scheduleRoutine = async (userId: string, routine: any) => {
-  logger.info(`Scheduling routine for user`, { userId, routine }, 'API');
+  console.log(`Scheduling routine for user ${userId}`, routine);
   return { id: "routine-id", ...routine };
 };
 
 export const cancelRoutine = async (routineId: string) => {
-  logger.info(`Cancelling routine`, { routineId }, 'API');
+  console.log(`Cancelling routine ${routineId}`);
   return { success: true };
 };
 

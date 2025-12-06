@@ -1,6 +1,4 @@
-// @ts-nocheck
 
-// @ts-nocheck
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { routes } from '@/routerV2';

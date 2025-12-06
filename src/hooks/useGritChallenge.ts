@@ -1,7 +1,7 @@
+
 import { useState } from 'react';
 import useOpenAI from './api/useOpenAI';
 import { useMood } from './useMood';
-import { logger } from '@/lib/logger';
 
 interface GritChallenge {
   title: string;
@@ -15,7 +15,7 @@ interface GritChallenge {
 export const useGritChallenge = () => {
   const [currentChallenge, setCurrentChallenge] = useState<GritChallenge | null>(null);
   const { generateText, isLoading } = useOpenAI();
-  const mood = useMood();
+  const { mood } = useMood();
 
   const generateChallenge = async (objective?: string): Promise<GritChallenge | null> => {
     const moodContext = mood ? `Humeur actuelle: valence ${mood.valence}, énergie ${mood.arousal}` : '';
@@ -52,7 +52,7 @@ Le défi doit être réalisable immédiatement et adapté à l'humeur.
       setCurrentChallenge(challenge);
       return challenge;
     } catch (error) {
-      logger.error('Erreur parsing défi', error as Error, 'SYSTEM');
+      console.error('Erreur parsing défi:', error);
       return null;
     }
   };

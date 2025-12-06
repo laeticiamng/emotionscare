@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { logger } from '@/lib/logger';
 
 import { createImmutableStore } from './utils/createImmutableStore';
 import { createSelectors } from './utils/createSelectors';
@@ -17,8 +16,8 @@ interface HRState {
   source: HRSource;
   connected: boolean;
   connecting: boolean;
-  device: any | null; // BluetoothDevice
-  characteristic: any | null; // BluetoothRemoteGATTCharacteristic
+  device: BluetoothDevice | null;
+  characteristic: BluetoothRemoteGATTCharacteristic | null;
   readings: HRReading[];
   avgBpm: number | null;
   sessionStart: number | null;
@@ -32,8 +31,8 @@ interface HRActions {
   setSource: (source: HRSource) => void;
   setConnected: (connected: boolean) => void;
   setConnecting: (connecting: boolean) => void;
-  setDevice: (device: any | null) => void;
-  setCharacteristic: (characteristic: any | null) => void;
+  setDevice: (device: BluetoothDevice | null) => void;
+  setCharacteristic: (characteristic: BluetoothRemoteGATTCharacteristic | null) => void;
   addReading: (reading: HRReading) => void;
   updateAvgBpm: () => void;
   startSession: () => void;
@@ -68,7 +67,7 @@ const hrStoreBase = create<HRStore>()(
 
       setBpm: (bpm: number | null) => {
         if (bpm !== null && (bpm < 30 || bpm > 220)) {
-          logger.warn('Invalid BPM value', { bpm }, 'SYSTEM');
+          console.warn('Invalid BPM value:', bpm);
           return;
         }
         set({ bpm });
@@ -77,8 +76,8 @@ const hrStoreBase = create<HRStore>()(
       setSource: (source: HRSource) => set({ source }),
       setConnected: (connected: boolean) => set({ connected }),
       setConnecting: (connecting: boolean) => set({ connecting }),
-      setDevice: (device: any | null) => set({ device }),
-      setCharacteristic: (characteristic: any | null) => set({ characteristic }),
+      setDevice: (device: BluetoothDevice | null) => set({ device }),
+      setCharacteristic: (characteristic: BluetoothRemoteGATTCharacteristic | null) => set({ characteristic }),
 
       addReading: (reading: HRReading) => {
         const state = get();

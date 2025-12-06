@@ -1,7 +1,5 @@
-// @ts-nocheck
 import { supabase } from '@/integrations/supabase/client';
 import { Experiment } from '@/types/innovation';
-import { logger } from '@/lib/logger';
 
 /**
  * Service for managing innovation experiments
@@ -14,7 +12,7 @@ export const innovationService = {
       .order('created_at', { ascending: false });
 
     if (error) {
-      logger.error('Error fetching experiments', error as Error, 'API');
+      console.error('Error fetching experiments:', error);
       throw error;
     }
 
@@ -35,7 +33,7 @@ export const innovationService = {
       .single();
 
     if (error) {
-      logger.error('Error creating experiment', error as Error, 'API');
+      console.error('Error creating experiment:', error);
       throw error;
     }
 

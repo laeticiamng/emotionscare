@@ -1,7 +1,5 @@
-// @ts-nocheck
 
 import React from 'react';
-import { logger } from '@/lib/logger';
 
 // Optimisations spécifiques pour mobile avec protection d'erreurs renforcée
 export const mobileBreakpoints = {
@@ -45,7 +43,7 @@ export const useScreenSize = () => {
           setScreenSize('desktop');
         }
       } catch (error) {
-        logger.debug('⚠️ Screen size detection failed', error as Error, 'UI');
+        console.log('⚠️ Screen size detection failed:', error);
         // Fallback sécurisé
         setScreenSize('desktop');
       }
@@ -63,11 +61,11 @@ export const useScreenSize = () => {
         try {
           window.removeEventListener('resize', handleResize);
         } catch (error) {
-          logger.debug('⚠️ Event listener cleanup failed', error as Error, 'UI');
+          console.log('⚠️ Event listener cleanup failed:', error);
         }
       };
     } catch (error) {
-      logger.debug('⚠️ Resize listener setup failed', error as Error, 'UI');
+      console.log('⚠️ Resize listener setup failed:', error);
     }
   }, []);
   
@@ -77,7 +75,7 @@ export const useScreenSize = () => {
 // Optimisation des images pour mobile avec validation renforcée
 export const getOptimizedImageSrc = (src: string, screenSize: 'mobile' | 'tablet' | 'desktop') => {
   if (!src || typeof src !== 'string') {
-    logger.debug('⚠️ Invalid image src provided', { src }, 'UI');
+    console.log('⚠️ Invalid image src provided:', src);
     return '';
   }
   
@@ -94,7 +92,7 @@ export const getOptimizedImageSrc = (src: string, screenSize: 'mobile' | 'tablet
       ? `${src}?${sizeParam}`
       : src;
   } catch (error) {
-    logger.debug('⚠️ Image optimization failed', error as Error, 'UI');
+    console.log('⚠️ Image optimization failed:', error);
     return src;
   }
 };
@@ -107,7 +105,7 @@ export const combineClasses = (...classes: (string | undefined | null | false)[]
       .join(' ')
       .trim();
   } catch (error) {
-    logger.debug('⚠️ Class combination failed', error as Error, 'UI');
+    console.log('⚠️ Class combination failed:', error);
     return '';
   }
 };
@@ -115,7 +113,7 @@ export const combineClasses = (...classes: (string | undefined | null | false)[]
 // Fonction pour appliquer des classes de manière sécurisée à un élément DOM
 export const safeAddClass = (element: Element | null, className: string): void => {
   if (!element) {
-    logger.debug('⚠️ Element is null, cannot add class', { className }, 'UI');
+    console.log('⚠️ Element is null, cannot add class:', className);
     return;
   }
   
@@ -123,17 +121,17 @@ export const safeAddClass = (element: Element | null, className: string): void =
     if (element.classList && typeof element.classList.add === 'function') {
       element.classList.add(className);
     } else {
-      logger.debug('⚠️ classList not available on element', undefined, 'UI');
+      console.log('⚠️ classList not available on element');
     }
   } catch (error) {
-    logger.debug('⚠️ Failed to add class', { className, error: error as Error }, 'UI');
+    console.log('⚠️ Failed to add class:', className, error);
   }
 };
 
 // Fonction pour retirer des classes de manière sécurisée d'un élément DOM
 export const safeRemoveClass = (element: Element | null, className: string): void => {
   if (!element) {
-    logger.debug('⚠️ Element is null, cannot remove class', { className }, 'UI');
+    console.log('⚠️ Element is null, cannot remove class:', className);
     return;
   }
   
@@ -141,9 +139,9 @@ export const safeRemoveClass = (element: Element | null, className: string): voi
     if (element.classList && typeof element.classList.remove === 'function') {
       element.classList.remove(className);
     } else {
-      logger.debug('⚠️ classList not available on element', undefined, 'UI');
+      console.log('⚠️ classList not available on element');
     }
   } catch (error) {
-    logger.debug('⚠️ Failed to remove class', { className, error: error as Error }, 'UI');
+    console.log('⚠️ Failed to remove class:', className, error);
   }
 };

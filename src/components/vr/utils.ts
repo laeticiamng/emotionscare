@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 export const formatDuration = (duration: number | string): string => {
   const numDuration = typeof duration === 'string' ? parseInt(duration) : duration;

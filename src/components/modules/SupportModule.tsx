@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState, useRef, useEffect } from 'react';
 import { useSupport } from '@/providers/SupportProvider';
 import { Button } from '@/components/ui/button';
@@ -9,7 +8,6 @@ import { Badge } from '@/components/ui/badge';
 import { Send, MessageCircle, HelpCircle, Bot, User } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
-import { logger } from '@/lib/logger';
 
 export const SupportModule: React.FC = () => {
   const { messages, sendMessage, clearHistory } = useSupport();
@@ -37,7 +35,7 @@ export const SupportModule: React.FC = () => {
       }
     } catch (error) {
       toast.error('Erreur lors de l\'envoi du message');
-      logger.error('Erreur envoi message', error as Error, 'UI');
+      console.error('Erreur envoi message:', error);
     } finally {
       setIsLoading(false);
     }

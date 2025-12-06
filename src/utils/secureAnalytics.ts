@@ -1,7 +1,5 @@
-// @ts-nocheck
 
 import { GlobalInterceptor } from './globalInterceptor';
-import { logger } from '@/lib/logger';
 
 /**
  * Analytics sécurisées avec fallbacks robustes
@@ -22,7 +20,7 @@ export class SecureAnalytics {
   }): Promise<void> {
     // Si offline détecté, ne pas essayer
     if (this.isOffline) {
-      logger.warn('[Analytics] Service offline - skipping event', {}, 'ANALYTICS');
+      console.warn('[Analytics] Service offline - skipping event');
       return;
     }
 
@@ -55,9 +53,9 @@ export class SecureAnalytics {
 
     } catch (error: any) {
       if (error.name === 'AbortError') {
-        logger.warn('[Analytics] Request timeout - marking as offline', {}, 'ANALYTICS');
+        console.warn('[Analytics] Request timeout - marking as offline');
       } else {
-        logger.warn('[Analytics] Error sending event', { message: error.message }, 'ANALYTICS');
+        console.warn('[Analytics] Error sending event:', error.message);
       }
       
       this.markAsOffline();
@@ -73,7 +71,7 @@ export class SecureAnalytics {
     // Réessayer dans 30 secondes
     setTimeout(() => {
       this.isOffline = false;
-      logger.info('[Analytics] Service back online - resuming tracking', {}, 'ANALYTICS');
+      console.info('[Analytics] Service back online - resuming tracking');
     }, 30000);
   }
 

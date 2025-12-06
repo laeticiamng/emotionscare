@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
@@ -61,7 +60,7 @@ const LiveVoiceScanner: React.FC<LiveVoiceScannerProps> = ({
         setTranscript(text);
       }
     } catch (error) {
-      // Recording error
+      console.error('Error recording:', error);
       toast.error('Erreur lors de l\'enregistrement');
     } finally {
       setIsRecording(false);
@@ -91,7 +90,7 @@ const LiveVoiceScanner: React.FC<LiveVoiceScannerProps> = ({
         toast.error('Erreur lors de l\'analyse du texte');
       }
     } catch (error) {
-      // Text analysis error
+      console.error('Error analyzing text:', error);
       toast.error('Erreur lors de l\'analyse du texte');
     } finally {
       setIsProcessing(false);

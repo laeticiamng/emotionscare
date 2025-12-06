@@ -21,12 +21,6 @@
       "@types/*": [
         "./types/*"
       ],
-      "@emotionscare/contracts": [
-        "./packages/contracts/index.ts"
-      ],
-      "@emotionscare/contracts/*": [
-        "./packages/contracts/*"
-      ],
       "cross-fetch": [
         "./tests/polyfills/cross-fetch.ts"
       ]

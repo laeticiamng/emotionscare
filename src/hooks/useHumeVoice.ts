@@ -1,6 +1,4 @@
-// @ts-nocheck
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { logger } from '@/lib/logger';
 
 interface HumeVoiceConfig {
   enabled: boolean;
@@ -22,7 +20,7 @@ export const useHumeVoice = (config: HumeVoiceConfig) => {
 
   const startCapture = useCallback(async () => {
     if (!config.enabled) {
-      logger.info('Hume voice disabled by config', undefined, 'SYSTEM');
+      console.log('Hume voice disabled by config');
       return;
     }
 
@@ -52,7 +50,7 @@ export const useHumeVoice = (config: HumeVoiceConfig) => {
       wsRef.current = new WebSocket(wsUrl);
       
       wsRef.current.onopen = () => {
-        logger.info('Hume Voice WebSocket connected', undefined, 'SYSTEM');
+        console.log('Hume Voice WebSocket connected');
         setIsActive(true);
         startAudioAnalysis();
       };
@@ -74,7 +72,7 @@ export const useHumeVoice = (config: HumeVoiceConfig) => {
             }
           }
         } catch (error) {
-          logger.error('Error parsing Hume Voice response', error as Error, 'SYSTEM');
+          console.error('Error parsing Hume Voice response:', error);
         }
       };
 
@@ -84,7 +82,7 @@ export const useHumeVoice = (config: HumeVoiceConfig) => {
       };
 
     } catch (error) {
-      logger.error('Error starting Hume voice capture', error as Error, 'SYSTEM');
+      console.error('Error starting Hume voice capture:', error);
       setError('Impossible d\'accéder au microphone');
     }
   }, [config]);

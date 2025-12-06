@@ -1,7 +1,8 @@
+
 import React, { useEffect, useState } from 'react';
 import { useLocation, Navigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuthStore } from '@/store/useAuthStore';
+import { useAuthStore } from '@/stores/useAuthStore';
 import LoadingAnimation from '@/components/ui/loading-animation';
 import { logger } from '@/lib/logger';
 

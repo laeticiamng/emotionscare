@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
@@ -30,11 +29,11 @@ const AchievementBadge: React.FC<AchievementBadgeProps> = ({
 }) => {
   const getRarityColor = (rarity: string) => {
     switch (rarity) {
-      case 'common': return 'border-gray-400 bg-gray-50 dark:bg-gray-900/50';
-      case 'rare': return 'border-blue-400 bg-blue-50 dark:bg-blue-900/50';
-      case 'epic': return 'border-purple-400 bg-purple-50 dark:bg-purple-900/50';
-      case 'legendary': return 'border-yellow-400 bg-yellow-50 dark:bg-yellow-900/50';
-      default: return 'border-gray-400 bg-gray-50 dark:bg-gray-900/50';
+      case 'common': return 'border-gray-400 bg-gray-50';
+      case 'rare': return 'border-blue-400 bg-blue-50';
+      case 'epic': return 'border-purple-400 bg-purple-50';
+      case 'legendary': return 'border-yellow-400 bg-yellow-50';
+      default: return 'border-gray-400 bg-gray-50';
     }
   };
 

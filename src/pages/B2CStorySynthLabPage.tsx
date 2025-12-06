@@ -137,7 +137,7 @@ const B2CStorySynthLabPage: React.FC = () => {
   const canGenerate = validIntentions.length > 0 && !isGenerating;
 
   return (
-    <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-background via-background/95 to-muted/20 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-muted/20 p-4">
       {/* Header */}
       <div className="flex items-center gap-4 mb-8">
         <Button 
@@ -234,7 +234,7 @@ const B2CStorySynthLabPage: React.FC = () => {
 
             {/* Texte de l'histoire */}
             <div className="bg-background/30 rounded-lg p-4 mb-4 max-h-40 overflow-y-auto">
-              <p className="text-sm text-foreground leading-relaxed">
+              <p className="text-sm text-foreground/90 leading-relaxed">
                 {currentStory.content}
               </p>
             </div>

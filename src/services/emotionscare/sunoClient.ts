@@ -1,4 +1,3 @@
-// @ts-nocheck
 // Service client Suno pour EmotionsCare - Optimisé pour sunoapi.org
 export type SunoModel = "V3_5" | "V4" | "V4_5";
 
@@ -63,7 +62,7 @@ export class SunoApiClient {
 
       return await response.json();
     } catch (error) {
-      // Silent: Suno lyrics generation error logged internally
+      console.error('❌ EmotionsCare Suno Lyrics Error:', error);
       throw error;
     }
   }
@@ -94,7 +93,7 @@ export class SunoApiClient {
 
       return await response.json();
     } catch (error) {
-      // Silent: Suno music generation error logged internally
+      console.error('❌ EmotionsCare Suno Music Error:', error);
       throw error;
     }
   }
@@ -124,7 +123,7 @@ export class SunoApiClient {
       
       return result;
     } catch (error) {
-      // Silent: Suno task status check error logged internally
+      console.error('❌ EmotionsCare Suno Task Status Error:', error);
       throw error;
     }
   }

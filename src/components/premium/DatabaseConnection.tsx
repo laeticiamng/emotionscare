@@ -1,8 +1,6 @@
-// @ts-nocheck
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { logger } from '@/lib/logger';
 
 interface DatabaseContextType {
   isConnected: boolean;
@@ -49,11 +47,11 @@ export const DatabaseProvider: React.FC<DatabaseProviderProps> = ({ children }) 
       }
 
       setIsConnected(true);
-      logger.info('Base de données connectée', {}, 'SYSTEM');
+      console.log('✅ Base de données connectée');
     } catch (err: any) {
       setError(err.message);
       setIsConnected(false);
-      logger.error('Erreur de connexion base de données', err as Error, 'SYSTEM');
+      console.error('❌ Erreur de connexion base de données:', err);
     } finally {
       setIsLoading(false);
     }
@@ -66,10 +64,10 @@ export const DatabaseProvider: React.FC<DatabaseProviderProps> = ({ children }) 
   const executeQuery = async (query: string, params: any[] = []) => {
     try {
       // Cette fonction peut être étendue pour des requêtes plus complexes
-      logger.debug('Executing query', { query, params }, 'SYSTEM');
+      console.log('Executing query:', query, params);
       return { success: true, data: null };
     } catch (error) {
-      logger.error('Query execution error', error as Error, 'SYSTEM');
+      console.error('Query execution error:', error);
       throw error;
     }
   };
@@ -142,7 +140,7 @@ export const useDatabase = () => {
       if (error) throw error;
       return data;
     } catch (error) {
-      logger.error('Error creating profile', error as Error, 'SYSTEM');
+      console.error('Error creating profile:', error);
       throw error;
     }
   };
@@ -158,7 +156,7 @@ export const useDatabase = () => {
       if (error && error.code !== 'PGRST116') throw error;
       return data;
     } catch (error) {
-      logger.error('Error fetching profile', error as Error, 'SYSTEM');
+      console.error('Error fetching profile:', error);
       throw error;
     }
   };
@@ -174,7 +172,7 @@ export const useDatabase = () => {
       if (error) throw error;
       return data;
     } catch (error) {
-      logger.error('Error updating profile', error as Error, 'SYSTEM');
+      console.error('Error updating profile:', error);
       throw error;
     }
   };
@@ -200,7 +198,7 @@ export const useDatabase = () => {
       if (error) throw error;
       return data;
     } catch (error) {
-      logger.error('Error saving activity', error as Error, 'ANALYTICS');
+      console.error('Error saving activity:', error);
       throw error;
     }
   };
@@ -217,7 +215,7 @@ export const useDatabase = () => {
       if (error) throw error;
       return data;
     } catch (error) {
-      logger.error('Error fetching activities', error as Error, 'ANALYTICS');
+      console.error('Error fetching activities:', error);
       throw error;
     }
   };
@@ -249,7 +247,7 @@ export const useDatabase = () => {
 
       return { newXP, newLevel, levelUp: newLevel > (profile?.level || 1) };
     } catch (error) {
-      logger.error('Error incrementing XP', error as Error, 'SYSTEM');
+      console.error('Error incrementing XP:', error);
       throw error;
     }
   };

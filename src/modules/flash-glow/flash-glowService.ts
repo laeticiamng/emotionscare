@@ -3,7 +3,6 @@
  */
 
 import { supabase } from '@/integrations/supabase/client';
-import { logger } from '@/lib/logger';
 
 export interface FlashGlowSession {
   duration_s: number;
@@ -39,7 +38,7 @@ class FlashGlowService {
     intensity: number;
     duration: number;
   }): Promise<{ sessionId: string }> {
-    logger.info('Flash Glow session started', config, 'MUSIC');
+    console.log('🌟 Flash Glow session started:', config);
     
     // Simuler une session avec ID unique
     const sessionId = `fg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
@@ -67,7 +66,7 @@ class FlashGlowService {
 
       return data as FlashGlowResponse;
     } catch (error) {
-      logger.error('Flash Glow Service Error', error as Error, 'MUSIC');
+      console.error('❌ Flash Glow Service Error:', error);
       throw error;
     }
   }
@@ -87,7 +86,7 @@ class FlashGlowService {
 
       return data;
     } catch (error) {
-      logger.error('Flash Glow Stats Error', error as Error, 'MUSIC');
+      console.error('❌ Flash Glow Stats Error:', error);
       // Retourner des stats par défaut en cas d'erreur
       return {
         total_sessions: 0,

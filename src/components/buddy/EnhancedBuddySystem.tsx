@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -161,7 +160,7 @@ export default function EnhancedBuddySystem() {
         setMatchedBuddies(profiles.filter(p => p.isMatched));
       }
     } catch (error) {
-      // Buddy profiles loading error
+      console.error('Error loading buddy profiles:', error);
     }
   };
 
@@ -208,7 +207,7 @@ export default function EnhancedBuddySystem() {
         description: `Vous êtes maintenant connecté avec ${buddy.name}`,
       });
     } catch (error) {
-      // Buddy matching error
+      console.error('Error matching buddy:', error);
     }
   };
 
@@ -294,7 +293,7 @@ export default function EnhancedBuddySystem() {
         description: `Vous avez commencé "${activity.title}" avec votre buddy`,
       });
     } catch (error) {
-      // Activity start error
+      console.error('Error starting activity:', error);
     }
   };
 

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { defineConfig } from 'vitest/config';
 import path from 'path';
 import { createRequire } from 'module';
@@ -20,7 +19,6 @@ export default defineConfig({
     globals: true,
     environment: 'node',
     include: ['services/api/tests/**/*.test.ts'],
-    setupFiles: ['./services/api/tests/setup.ts'],
     maxThreads: 1,
     minThreads: 1,
     sequence: { hooks: 'list', files: 'serial' },

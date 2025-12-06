@@ -1,11 +1,9 @@
-// @ts-nocheck
 import { useNavigate } from "react-router-dom";
 import { useCallback } from "react";
 import { NavAction, NavContext, ActionResult } from "@/types/nav";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
-import { logger } from '@/lib/logger';
 
 /**
  * Hook d'action unifiée - Gestion centralisée de toutes les actions nav
@@ -22,8 +20,8 @@ export function useNavAction() {
     featureFlags: {}, // Feature flags integration ready
     analytics: {
       // Intégrer prefetch intelligent basé sur l'usage
-      trackPageView: (path: string) => logger.debug('Page view', { path }, 'ANALYTICS'),
-      trackNavigation: (from: string, to: string) => logger.debug('Navigation', { from, to }, 'ANALYTICS')
+      trackPageView: (path: string) => console.log('Page view:', path),
+      trackNavigation: (from: string, to: string) => console.log('Navigation:', from, '→', to)
     },
   }), [isAuthenticated, user]);
 
@@ -36,7 +34,8 @@ export function useNavAction() {
           // Prefetch si demandé
           if (action.prefetch) {
             // Implémenter prefetch intelligent basé sur l'usage
-            logger.debug('Prefetching route', { route: action.to }, 'SYSTEM');
+            console.log('Prefetching route:', to);
+            console.log(`Prefetching route: ${action.to}`);
           }
           
           navigate(action.to);
@@ -75,7 +74,8 @@ export function useNavAction() {
 
         case "mutation": {
           // Intégrer mutations React Query pour optimistic updates
-          logger.debug('Executing mutation', { key: action.key, input: action.input }, 'SYSTEM');
+          console.log('Navigation completed:', pathname);
+          console.log(`Executing mutation: ${action.key}`, action.input);
           
           // Analytics
           window.gtag?.('event', 'mutation', {
@@ -135,7 +135,7 @@ export function useNavAction() {
           };
       }
     } catch (error) {
-      logger.error('Nav action failed', error as Error, 'SYSTEM');
+      console.error('Nav action failed:', error);
       
       return {
         success: false,
@@ -208,7 +208,7 @@ export function useNavActionMutation() {
   return useMutation({
     mutationFn: executeAction,
     onError: (error) => {
-      logger.error('Nav action mutation failed', error as Error, 'SYSTEM');
+      console.error('Nav action mutation failed:', error);
     },
   });
 }

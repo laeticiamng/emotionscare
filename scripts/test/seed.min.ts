@@ -1,26 +1,22 @@
 import 'dotenv/config';
 import { createClient } from '@supabase/supabase-js';
 
-const supa = createClient(
-  process.env.SUPABASE_URL || '', 
-  process.env.SUPABASE_SERVICE_ROLE || ''
-);
+const supa = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE);
 
-async function upsertUser(email: string) {
+async function upsertUser(email) {
   const { data, error } = await supa.from('profiles').upsert({ email }, { onConflict: 'email' }).select().single();
   if (error) throw error;
   return data;
 }
 
-async function ensureOrg(name: string) {
+async function ensureOrg(name) {
   const { data, error } = await supa.from('orgs').upsert({ name }, { onConflict: 'name' }).select().single();
   if (error) throw error;
   return data;
 }
 
-async function ensureMember(org_id: string, user_email: string, role: string) {
+async function ensureMember(org_id, user_email, role) {
   const { data: u } = await supa.from('profiles').select('id').eq('email', user_email).single();
-  if (!u) throw new Error('User not found');
   await supa.from('org_members').upsert({ org_id, user_id: u.id, role });
 }
 

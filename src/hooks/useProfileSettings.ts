@@ -1,10 +1,7 @@
-// @ts-nocheck
 import { useState, useEffect, useCallback } from 'react';
 import { useSettingsStore, type Profile } from '@/store/settings.store';
 import { toast } from '@/hooks/use-toast';
 import { useDebounce } from 'react-use';
-import { logger } from '@/lib/logger';
-import { supabase } from '@/integrations/supabase/client';
 
 export const useProfileSettings = () => {
   const {
@@ -44,37 +41,21 @@ export const useProfileSettings = () => {
     setError(null);
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const response = await fetch('/api/me/profile');
       
-      if (!user) {
-        // No user logged in, use default settings
-        applyTheme();
-        applyA11y();
-        setInitialized(true);
-        setLoading(false);
-        return;
+      if (!response.ok) {
+        throw new Error('Failed to load profile');
       }
 
-      const { data, error: profileError } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .single();
-
-      if (profileError && profileError.code !== 'PGRST116') {
-        throw profileError;
-      }
-
-      if (data) {
-        setProfile(data);
-      }
+      const data = await response.json();
+      setProfile(data);
       
       // Apply settings immediately
       applyTheme();
       applyA11y();
       
     } catch (error: any) {
-      logger.error('Load profile failed', error as Error, 'AUTH');
+      console.error('Load profile failed:', error);
       setError(error.message);
       
       // Use stored profile as fallback
@@ -97,21 +78,18 @@ export const useProfileSettings = () => {
     const originalProfile = { ...profile };
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('User not authenticated');
+      const response = await fetch('/api/me/profile', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(changes)
+      });
 
-      const { error } = await supabase
-        .from('profiles')
-        .upsert({
-          id: user.id,
-          ...changes,
-          updated_at: new Date().toISOString(),
-        });
+      if (!response.ok) {
+        throw new Error('Failed to save profile');
+      }
 
-      if (error) throw error;
-
-      // Update local state
-      setProfile({ ...profile, ...changes });
+      const updatedProfile = await response.json();
+      setProfile(updatedProfile);
 
       // Analytics
       if (typeof window !== 'undefined' && window.gtag) {
@@ -142,7 +120,7 @@ export const useProfileSettings = () => {
       applyTheme();
       applyA11y();
       
-      logger.error('Save profile failed', error as Error, 'AUTH');
+      console.error('Save profile failed:', error);
       setError(error.message);
       
       toast({

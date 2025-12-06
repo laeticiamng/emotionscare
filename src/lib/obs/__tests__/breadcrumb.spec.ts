@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { describe, expect, it, beforeEach, vi } from 'vitest';
 
 const addBreadcrumbMock = vi.fn();

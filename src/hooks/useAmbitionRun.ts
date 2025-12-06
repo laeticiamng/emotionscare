@@ -1,9 +1,7 @@
-// @ts-nocheck
 import { useState, useCallback, useEffect } from 'react';
 import { useAmbitionStore } from '@/store/ambition.store';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
-import { logger } from '@/lib/logger';
 
 interface StartRunResponse {
   run_id: string;
@@ -78,7 +76,7 @@ export const useAmbitionRun = () => {
       await loadQuests(response.run_id);
       
     } catch (error) {
-      logger.error('Error starting ambition run', error as Error, 'UI');
+      console.error('Error starting ambition run:', error);
       setError('Erreur lors du démarrage de la session');
       
       // Fallback offline mode
@@ -155,7 +153,7 @@ export const useAmbitionRun = () => {
       }
       
     } catch (error) {
-      logger.error('Error answering PNJ', error as Error, 'UI');
+      console.error('Error answering PNJ:', error);
       // Fallback: just close dialog
       ambitionStore.setActivePNJ(null);
       ambitionStore.setPhase('hub');
@@ -188,7 +186,7 @@ export const useAmbitionRun = () => {
         });
       }
     } catch (error) {
-      logger.error('Error loading quests', error as Error, 'UI');
+      console.error('Error loading quests:', error);
     }
   }, [ambitionStore]);
 
@@ -231,7 +229,7 @@ export const useAmbitionRun = () => {
       });
       
     } catch (error) {
-      logger.error('Error completing quest', error as Error, 'UI');
+      console.error('Error completing quest:', error);
       // Fallback: complete locally
       ambitionStore.completeQuest(questId, result === 'success');
     } finally {

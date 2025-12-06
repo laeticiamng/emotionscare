@@ -1,6 +1,4 @@
-// @ts-nocheck
 import { useRef, useCallback } from 'react';
-import { logger } from '@/lib/logger';
 
 interface UseSoundOptions {
   volume?: number;
@@ -43,7 +41,7 @@ export function useSound(src: string, options: UseSoundOptions = {}): SoundContr
     try {
       await audio.play();
     } catch (error) {
-      logger.warn('Failed to play audio', error, 'UI');
+      console.warn('Failed to play audio:', error);
     }
   }, [initAudio]);
 

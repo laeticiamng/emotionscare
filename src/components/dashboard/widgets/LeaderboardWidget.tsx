@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import React from 'react';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
@@ -35,11 +34,11 @@ const LeaderboardWidget: React.FC<LeaderboardWidgetProps> = ({
   const getPositionIcon = (position: number) => {
     switch (position) {
       case 1:
-        return <Trophy className="h-5 w-5 text-warning" />;
+        return <Trophy className="h-5 w-5 text-yellow-500" />;
       case 2:
-        return <Medal className="h-5 w-5 text-muted-foreground" />;
+        return <Medal className="h-5 w-5 text-gray-400" />;
       case 3:
-        return <Medal className="h-5 w-5 text-warning/70" />;
+        return <Medal className="h-5 w-5 text-amber-700" />;
       default:
         return <span className="text-sm font-medium">{position}</span>;
     }

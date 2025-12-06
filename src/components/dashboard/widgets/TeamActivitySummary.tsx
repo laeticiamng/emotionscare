@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import React from 'react';
 import { motion } from 'framer-motion';
@@ -54,9 +53,9 @@ const TeamActivitySummary: React.FC<TeamActivitySummaryProps> = ({ className = '
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-2">
               <div className={`w-2 h-2 rounded-full ${
-                team.mood === 'positive' ? 'bg-success' : 
-                team.mood === 'neutral' ? 'bg-warning' : 
-                'bg-destructive'
+                team.mood === 'positive' ? 'bg-green-500' : 
+                team.mood === 'neutral' ? 'bg-amber-500' : 
+                'bg-red-500'
               }`}></div>
               <span className="font-medium">{team.name}</span>
               <Badge variant="outline" className="ml-2">
@@ -74,9 +73,9 @@ const TeamActivitySummary: React.FC<TeamActivitySummaryProps> = ({ className = '
             <Progress 
               value={team.activity} 
               className={`h-2 ${
-                team.activity > 80 ? 'bg-success/10' : 
-                team.activity > 50 ? 'bg-warning/10' : 
-                'bg-destructive/10'
+                team.activity > 80 ? 'bg-emerald-100 dark:bg-emerald-950' : 
+                team.activity > 50 ? 'bg-amber-100 dark:bg-amber-950' : 
+                'bg-red-100 dark:bg-red-950'
               }`}
             />
           </motion.div>

@@ -1,5 +1,5 @@
+
 import React, { useState, useEffect } from 'react';
-import { logger } from '@/lib/logger';
 import { Link, useLocation, NavLink, useNavigate } from 'react-router-dom';
 import { routes } from '@/routerV2';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -18,7 +18,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useTheme } from '@/providers/theme';
+import { useTheme } from '@/components/theme-provider';
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
@@ -31,7 +31,7 @@ interface EnhancedHeaderProps {
 }
 
 const EnhancedHeader: React.FC<EnhancedHeaderProps> = ({ scrolled = false, className }) => {
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme, isDarkMode } = useTheme();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
@@ -43,7 +43,7 @@ const EnhancedHeader: React.FC<EnhancedHeaderProps> = ({ scrolled = false, class
       await signOut();
       navigate('/');
     } catch (error) {
-      logger.error('Erreur lors de la déconnexion', error as Error, 'AUTH');
+      console.error('Erreur lors de la déconnexion:', error);
     }
   };
 
@@ -59,7 +59,7 @@ const EnhancedHeader: React.FC<EnhancedHeaderProps> = ({ scrolled = false, class
   ];
 
   const toggleTheme = () => {
-    setTheme(theme === 'dark' ? 'light' : 'dark');
+    setTheme(isDarkMode ? 'light' : 'dark');
   };
 
   return (
@@ -95,7 +95,7 @@ const EnhancedHeader: React.FC<EnhancedHeaderProps> = ({ scrolled = false, class
         </div>
 
         {/* Desktop Navigation */}
-        <nav className="hidden lg:flex items-center space-x-1" aria-label="Navigation principale">
+        <nav className="hidden lg:flex items-center space-x-1">
             {navigationItems.map((item) => (
               <NavLink
                 key={item.to}
@@ -104,7 +104,7 @@ const EnhancedHeader: React.FC<EnhancedHeaderProps> = ({ scrolled = false, class
                   "relative px-3 py-2 rounded-md text-sm font-medium transition-all flex items-center",
                   isActive
                     ? "text-primary"
-                    : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                    : "text-foreground/70 hover:text-foreground hover:bg-accent/50"
                 )}
               >
                 {({ isActive }) => (
@@ -155,9 +155,9 @@ const EnhancedHeader: React.FC<EnhancedHeaderProps> = ({ scrolled = false, class
             variant="ghost" 
             size="icon" 
             onClick={toggleTheme}
-            aria-label={theme === 'dark' ? "Passer au thème clair" : "Passer au thème sombre"}
+            aria-label={isDarkMode ? "Passer au thème clair" : "Passer au thème sombre"}
           >
-            {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            {isDarkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
           </Button>
 
           {/* Notifications */}
@@ -184,9 +184,9 @@ const EnhancedHeader: React.FC<EnhancedHeaderProps> = ({ scrolled = false, class
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon" className="rounded-full">
                   <Avatar className="h-8 w-8">
-                    <AvatarImage src={user?.user_metadata?.avatar_url} alt={user?.user_metadata?.full_name || 'Utilisateur'} />
+                    <AvatarImage src={user?.avatar} alt={user?.name || 'Utilisateur'} />
                     <AvatarFallback>
-                      {user?.user_metadata?.full_name?.charAt(0) || user?.email?.charAt(0) || 'U'}
+                      {user?.name?.charAt(0) || 'U'}
                     </AvatarFallback>
                   </Avatar>
                 </Button>

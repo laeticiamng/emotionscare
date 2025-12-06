@@ -1,4 +1,3 @@
-// @ts-nocheck
 'use client';
 
 import React, { useMemo } from 'react';
@@ -10,15 +9,15 @@ import { useFlags } from '@/core/flags';
 export interface ConsentGateProps {
   children: React.ReactNode;
   fallback?: React.ReactNode;
-  scope?: 'coach';
+  scope?: 'clinical';
 }
 
-export function ConsentGate({ children, fallback = null, scope = 'coach' }: ConsentGateProps) {
+export function ConsentGate({ children, fallback = null, scope = 'clinical' }: ConsentGateProps) {
   const { flags } = useFlags();
   const requireOptIn = flags?.FF_REQUIRE_CLINICAL_OPTIN !== false;
   const consent = useConsent();
 
-  const bypassGate = !requireOptIn || scope !== 'coach';
+  const bypassGate = !requireOptIn || scope !== 'clinical';
 
   const dialogProps = useMemo(
     () => ({
@@ -30,7 +29,9 @@ export function ConsentGate({ children, fallback = null, scope = 'coach' }: Cons
         void consent.accept();
       },
       onDecline: () => {
-        void consent.revoke();
+        if (consent.wasRevoked) {
+          return;
+        }
       },
     }),
     [consent],
@@ -40,14 +41,12 @@ export function ConsentGate({ children, fallback = null, scope = 'coach' }: Cons
     return <>{children}</>;
   }
 
-  // Laisser passer si accepté, révoqué, ou si l'utilisateur a refusé
-  if (consent.status === 'accepted' || consent.status === 'revoked' || consent.wasRevoked) {
+  if (consent.status === 'accepted') {
     return <>{children}</>;
   }
 
-  // Ne pas bloquer l'affichage indéfiniment - afficher le contenu même si le statut est inconnu
   if (consent.status === 'unknown' || consent.loading) {
-    return <>{children}</>;
+    return null;
   }
 
   return (

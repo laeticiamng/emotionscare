@@ -1,6 +1,5 @@
-// @ts-nocheck
+
 import { Challenge, Badge } from '@/types/gamification';
-import { logger } from '@/lib/logger';
 
 // Update challenge progress
 export const updateChallenge = async (
@@ -9,10 +8,10 @@ export const updateChallenge = async (
 ): Promise<boolean> => {
   try {
     // Mock implementation for now
-    logger.info('Updating challenge', { challengeId, progress: data.progress }, 'API');
+    console.log(`Updating challenge ${challengeId} with progress ${data.progress}`);
     return true;
   } catch (error) {
-    logger.error('Error updating challenge', error as Error, 'API');
+    console.error("Error updating challenge:", error);
     return false;
   }
 };
@@ -23,7 +22,7 @@ export const completeChallenge = async (
 ): Promise<{ success: boolean; badge?: Badge }> => {
   try {
     // Mock implementation for now
-    logger.info('Completing challenge', { challengeId }, 'API');
+    console.log(`Completing challenge ${challengeId}`);
     
     // Return a mock badge as reward
     return {
@@ -39,7 +38,7 @@ export const completeChallenge = async (
       }
     };
   } catch (error) {
-    logger.error('Error completing challenge', error as Error, 'API');
+    console.error("Error completing challenge:", error);
     return { success: false };
   }
 };

@@ -1,6 +1,3 @@
-// @ts-nocheck
-
-import { logger } from '@/lib/logger';
 
 /**
  * Utilitaire pour retry automatique des imports lazy en cas d'échec réseau
@@ -20,7 +17,7 @@ export const retryLazyImport = async <T>(
       
       // Si c'est une erreur de chunk loading, on retry
       if (error instanceof Error && error.name === 'ChunkLoadError') {
-        logger.warn(`Chunk load failed, retrying... (attempt ${i + 1}/${maxRetries})`, {}, 'SYSTEM');
+        console.warn(`Chunk load failed, retrying... (attempt ${i + 1}/${maxRetries})`);
         
         if (i < maxRetries - 1) {
           await new Promise(resolve => setTimeout(resolve, delay * (i + 1)));

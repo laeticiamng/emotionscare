@@ -1,7 +1,5 @@
-// @ts-nocheck
 
 import { useState } from 'react';
-import { logger } from '@/lib/logger';
 
 export interface CommunityTrends {
   topTrends: string[];
@@ -42,7 +40,7 @@ export const useCommunityRecommendations = () => {
       
       return mockTrends;
     } catch (err) {
-      logger.error("Error analyzing community trends", err as Error, 'ANALYTICS');
+      console.error("Error analyzing community trends:", err);
       setError("Impossible d'analyser les tendances communautaires");
       throw err;
     } finally {

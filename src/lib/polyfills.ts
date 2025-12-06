@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 /**
  * This file contains polyfills for browser APIs that may be missing

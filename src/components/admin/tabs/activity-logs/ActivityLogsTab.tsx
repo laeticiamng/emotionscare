@@ -1,13 +1,11 @@
+
 import React, { useState } from 'react';
-import { useToast } from '@/hooks/use-toast';
-import { logger } from '@/lib/logger';
 import { Button } from "@/components/ui/button";
 import ActivityLogsList from "./ActivityLogsList";
 import { useActivityData } from './useActivityData';
 import { ActivityTabView } from './types';
 
 const ActivityLogsTab: React.FC = () => {
-  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<ActivityTabView>("daily");
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -43,11 +41,9 @@ const ActivityLogsTab: React.FC = () => {
   });
 
   const handleExportActivities = () => {
-    logger.info('Exporting activities', { activeTab, filters }, 'ADMIN');
-    toast({
-      title: "Export en cours",
-      description: "Cette fonctionnalité sera bientôt disponible"
-    });
+    // Cette fonction serait implémentée pour exporter les données
+    console.log('Exporting activities...');
+    alert('Export des données en cours de développement');
   };
 
   return (

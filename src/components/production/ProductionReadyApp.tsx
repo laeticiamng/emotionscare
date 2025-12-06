@@ -1,11 +1,9 @@
-// @ts-nocheck
 
 import React, { useEffect } from 'react';
 import { initProductionSecurity } from '@/lib/security/productionSecurity';
 import { initBuildOptimizations } from '@/utils/buildOptimization';
 import { useProductionMonitoring } from '@/hooks/useProductionMonitoring';
 import ProductionMonitor from './ProductionMonitor';
-import { logger } from '@/lib/logger';
 
 interface ProductionReadyAppProps {
   children: React.ReactNode;
@@ -23,9 +21,9 @@ const ProductionReadyApp: React.FC<ProductionReadyAppProps> = ({ children }) => 
         initProductionSecurity(),
         initBuildOptimizations()
       ]).then(() => {
-        logger.info('Production mode activated', {}, 'SYSTEM');
+        console.log('🚀 Production mode activated');
       }).catch((error) => {
-        logger.error('Production initialization failed', error as Error, 'SYSTEM');
+        console.error('❌ Production initialization failed:', error);
       });
     }
   }, []);

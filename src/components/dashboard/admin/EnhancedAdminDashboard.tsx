@@ -1,4 +1,4 @@
-// @ts-nocheck
+
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -172,7 +172,7 @@ const EnhancedAdminDashboard: React.FC = () => {
                             <span className="text-sm text-muted-foreground">82%</span>
                           </div>
                           <div className="h-2 bg-muted rounded-full overflow-hidden">
-                            <div className="h-full bg-success rounded-full" style={{ width: '82%' }}></div>
+                            <div className="h-full bg-green-500 rounded-full" style={{ width: '82%' }}></div>
                           </div>
                         </div>
                         
@@ -182,7 +182,7 @@ const EnhancedAdminDashboard: React.FC = () => {
                             <span className="text-sm text-muted-foreground">43%</span>
                           </div>
                           <div className="h-2 bg-muted rounded-full overflow-hidden">
-                            <div className="h-full bg-warning rounded-full" style={{ width: '43%' }}></div>
+                            <div className="h-full bg-orange-500 rounded-full" style={{ width: '43%' }}></div>
                           </div>
                         </div>
                       </div>

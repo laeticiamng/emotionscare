@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Composant d'état de production EmotionsCare
  * Affiche le statut des services et APIs

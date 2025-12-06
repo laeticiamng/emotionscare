@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * TYPES UNIFIÉS EMOTIONSCARE - PLATEFORME PREMIUM
  * Consolidation et optimisation de tous les types pour éviter la duplication
@@ -296,10 +295,3 @@ export interface LoadingState {
 export type { MusicTrack as Track };
 export type { MusicPlaylist as Playlist };
 export type { EmotionResult as Emotion };
-
-// Export des types de widgets et dashboard
-export * from './kpi';
-export * from './dashboard';
-export * from './segment';
-export * from './onboarding';
-export * from './widgets';

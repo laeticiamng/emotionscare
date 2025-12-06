@@ -116,33 +116,19 @@ export function I18nProvider({ children, defaultLang = DEFAULT_LANG }: { childre
 
     const syncLanguageFromProfile = async () => {
       try {
-        // Import dynamique pour éviter les dépendances circulaires
-        const { supabase } = await import('@/integrations/supabase/client');
-
-        const { data: { user } } = await supabase.auth.getUser();
-        if (cancelled || !user) return;
-
-        // Récupérer les préférences utilisateur depuis Supabase
-        const { data: preferences, error } = await supabase
-          .from('user_preferences')
-          .select('language')
-          .eq('user_id', user.id)
-          .maybeSingle();
-
-        if (cancelled) return;
-
-        if (error) {
-          logger.warn('Unable to fetch language preference from profile', error, 'i18n');
+        const response = await fetch('/api/me/profile', { credentials: 'include' });
+        if (!response.ok) {
           return;
         }
 
-        if (preferences?.language && preferences.language !== profileLanguage) {
-          const syncedLang = preferences.language === 'en' ? 'en' : 'fr';
-          setProfileLanguage(syncedLang);
+        const data = await response.json();
+        const remoteLanguage = data?.language as 'fr' | 'en' | 'auto' | undefined;
+
+        if (!cancelled && remoteLanguage && remoteLanguage !== profileLanguage) {
+          setProfileLanguage(remoteLanguage);
         }
       } catch (error) {
-        // Silently fail - localStorage fallback is already in place
-        logger.warn('Language sync failed, using localStorage fallback', error, 'i18n');
+        logger.warn('Failed to synchronise profile language from Supabase', error, 'i18n');
       }
     };
 

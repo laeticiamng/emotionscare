@@ -29,7 +29,7 @@ export const useEnhancedToast = () => {
       duration: type === 'error' ? 5000 : 3000,
       action: type === 'error' ? {
         label: 'Réessayer',
-        onClick: () => {} // Retry action should be provided by caller
+        onClick: () => console.log('Retry action')
       } : undefined
     });
   };

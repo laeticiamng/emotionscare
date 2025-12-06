@@ -1,18 +1,28 @@
-// @ts-nocheck
 import React from 'react';
-import { captureException } from '@/lib/ai-monitoring';
-import { logger } from '@/lib/logger';
+import * as Sentry from '@sentry/react';
 
 interface ErrorBoundaryProps {
   children: React.ReactNode;
 }
 
 const logErrorBreadcrumb = (error: Error) => {
-  logger.error('error:boundary', { name: error.name, message: error.message }, 'ERROR_BOUNDARY');
+  Sentry.addBreadcrumb({
+    category: 'error-boundary',
+    level: 'error',
+    message: 'error:boundary',
+    data: {
+      name: error.name,
+      message: error.message,
+    },
+  });
 };
 
 const handleReload = () => {
-  logger.info('user:reload', undefined, 'ERROR_BOUNDARY');
+  Sentry.addBreadcrumb({
+    category: 'error-boundary',
+    level: 'info',
+    message: 'user:reload',
+  });
 
   if (typeof window !== 'undefined') {
     window.location.reload();
@@ -27,7 +37,14 @@ interface ErrorFallbackProps {
 const GlobalErrorFallback: React.FC<ErrorFallbackProps> = ({ error, resetError }) => {
   React.useEffect(() => {
     if (error) {
-      logger.info('error:boundary:fallback-shown', { name: error.name }, 'ERROR_BOUNDARY');
+      Sentry.addBreadcrumb({
+        category: 'error-boundary',
+        level: 'info',
+        message: 'error:boundary:fallback-shown',
+        data: {
+          name: error.name,
+        },
+      });
     }
   }, [error]);
 
@@ -83,7 +100,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     logErrorBreadcrumb(error);
 
-    captureException(error, {
+    Sentry.captureException(error, {
       tags: {
         origin: 'app-error-boundary',
       },
@@ -94,7 +111,11 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
   }
 
   resetError = () => {
-    logger.info('user:reset', undefined, 'ERROR_BOUNDARY');
+    Sentry.addBreadcrumb({
+      category: 'error-boundary',
+      level: 'info',
+      message: 'user:reset',
+    });
     this.setState({ hasError: false, error: null });
   };
 

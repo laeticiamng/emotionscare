@@ -1,9 +1,6 @@
-// @ts-nocheck
 /**
  * Helpers sécurisés pour éviter l'erreur "Cannot read properties of undefined (reading 'add')"
  */
-
-import { logger } from '@/lib/logger';
 
 /**
  * Ensure qu'un Set existe toujours, même si undefined
@@ -29,14 +26,14 @@ export function safeClassAdd(
   ...classNames: string[]
 ): void {
   if (!element || !element.classList) {
-    logger.warn('[safeClassAdd] Element or classList is undefined/null', { element, classNames }, 'UI');
+    console.warn('[safeClassAdd] Element or classList is undefined/null', { element, classNames });
     return;
   }
   
   try {
     element.classList.add(...classNames.filter(Boolean));
   } catch (error) {
-    logger.error('[safeClassAdd] Failed to add classes', error as Error, 'UI');
+    console.error('[safeClassAdd] Failed to add classes', { error, element, classNames });
   }
 }
 
@@ -48,14 +45,14 @@ export function safeClassRemove(
   ...classNames: string[]
 ): void {
   if (!element || !element.classList) {
-    logger.warn('[safeClassRemove] Element or classList is undefined/null', { element, classNames }, 'UI');
+    console.warn('[safeClassRemove] Element or classList is undefined/null', { element, classNames });
     return;
   }
   
   try {
     element.classList.remove(...classNames.filter(Boolean));
   } catch (error) {
-    logger.error('[safeClassRemove] Failed to remove classes', error as Error, 'UI');
+    console.error('[safeClassRemove] Failed to remove classes', { error, element, classNames });
   }
 }
 
@@ -68,14 +65,14 @@ export function safeClassToggle(
   force?: boolean
 ): boolean {
   if (!element || !element.classList || !className) {
-    logger.warn('[safeClassToggle] Element, classList or className is invalid', { element, className }, 'UI');
+    console.warn('[safeClassToggle] Element, classList or className is invalid', { element, className });
     return false;
   }
   
   try {
     return element.classList.toggle(className, force);
   } catch (error) {
-    logger.error('[safeClassToggle] Failed to toggle class', error as Error, 'UI');
+    console.error('[safeClassToggle] Failed to toggle class', { error, element, className });
     return false;
   }
 }
@@ -89,7 +86,7 @@ export function must<T>(
 ): T {
   if (value === null || value === undefined) {
     const error = new Error(`[must] ${message}`);
-    logger.error('[must] Required value is missing', error, 'SYSTEM');
+    console.error(error);
     
     if (process.env.NODE_ENV === 'development') {
       throw error;
@@ -148,7 +145,7 @@ export function safeGetElement(
   try {
     return context.querySelector(selector);
   } catch (error) {
-    logger.error('[safeGetElement] Invalid selector', error as Error, 'UI');
+    console.error('[safeGetElement] Invalid selector', { selector, error });
     return null;
   }
 }
@@ -171,7 +168,7 @@ export function safeDOM<T>(
   try {
     return operation();
   } catch (error) {
-    logger.error(`[safeDOM] ${context} failed`, error as Error, 'UI');
+    console.error(`[safeDOM] ${context} failed`, error);
     return fallback;
   }
 }
@@ -179,20 +176,20 @@ export function safeDOM<T>(
 /**
  * Type guard pour vérifier qu'un objet a une méthode add
  */
-export function hasAddMethod<T>(obj: unknown): obj is { add: (item: T) => void } {
-  return Boolean(obj && typeof (obj as { add?: unknown }).add === 'function');
+export function hasAddMethod<T>(obj: any): obj is { add: (item: T) => any } {
+  return Boolean(obj && typeof obj.add === 'function');
 }
 
 /**
  * Ajoute un élément à n'importe quel objet avec une méthode add de manière sécurisée
  */
 export function safeAddToCollection<T>(
-  collection: unknown,
+  collection: any,
   item: T,
   context = 'collection'
 ): boolean {
   if (!hasAddMethod<T>(collection)) {
-    logger.warn(`[safeAddToCollection] Object doesn't have add method`, { collection, context }, 'SYSTEM');
+    console.warn(`[safeAddToCollection] Object doesn't have add method`, { collection, context });
     return false;
   }
   
@@ -200,7 +197,7 @@ export function safeAddToCollection<T>(
     collection.add(item);
     return true;
   } catch (error) {
-    logger.error(`[safeAddToCollection] Failed to add to ${context}`, error as Error, 'SYSTEM');
+    console.error(`[safeAddToCollection] Failed to add to ${context}`, { error, collection, item });
     return false;
   }
 }

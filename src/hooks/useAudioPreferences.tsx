@@ -1,7 +1,5 @@
-// @ts-nocheck
 
 import { useState, useEffect } from 'react';
-import { logger } from '@/lib/logger';
 
 interface AudioPreference {
   equalizerEnabled: boolean;
@@ -36,7 +34,7 @@ export function useAudioPreferences() {
         setPreferences(JSON.parse(savedPreferences));
       }
     } catch (error) {
-      logger.error('Error loading audio preferences', error as Error, 'SYSTEM');
+      console.error('Error loading audio preferences:', error);
     }
   }, []);
   
@@ -48,7 +46,7 @@ export function useAudioPreferences() {
       localStorage.setItem('audioPreferences', JSON.stringify(updatedPreferences));
       return updatedPreferences;
     } catch (error) {
-      logger.error('Error saving audio preferences', error as Error, 'SYSTEM');
+      console.error('Error saving audio preferences:', error);
       return preferences;
     }
   };

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { chatCompletion, analyzeEmotion } from '@/services/openai';
 import { ChatMessage } from '@/types/chat';
 
@@ -12,8 +11,8 @@ export async function sendMessageHandler(message: string, history: ChatMessage[]
   try {
     return await chatCompletion(messages, { model: 'gpt-4o-mini', temperature: 0.7 });
   } catch (error) {
-    // Silent: message send error logged internally
-    return "Désolé, je rencontre un problème pour répondre.";
+    console.error('sendMessageHandler error:', error);
+    return "D\u00E9sol\u00E9, je rencontre un probl\u00E8me pour r\u00E9pondre.";
   }
 }
 
@@ -22,7 +21,7 @@ export async function analyzeEmotionHandler(text: string): Promise<{ emotion: st
     const result = await analyzeEmotion(text);
     return { emotion: result.primaryEmotion, score: result.intensity };
   } catch (error) {
-    // Silent: emotion analysis error logged internally
+    console.error('analyzeEmotionHandler error:', error);
     return { emotion: 'neutral', score: 0 };
   }
 }
@@ -30,12 +29,12 @@ export async function analyzeEmotionHandler(text: string): Promise<{ emotion: st
 export function getRecommendationsHandler(_category: string): string[] {
   try {
     return [
-      'Prenez une pause et respirez profondément.',
-      'Notez vos pensées dans un journal.',
-      'Faites quelques pas pour vous détendre.'
+      'Prenez une pause et respirez profond\u00E9ment.',
+      'Notez vos pens\u00E9es dans un journal.',
+      'Faites quelques pas pour vous d\u00E9tendre.'
     ];
   } catch (error) {
-    // Silent: recommendations fetch error logged internally
+    console.error('getRecommendationsHandler error:', error);
     return [];
   }
 }

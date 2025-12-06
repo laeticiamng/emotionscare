@@ -1,23 +1,5 @@
-# EmotionsCare Platform - Robots.txt
 User-agent: *
 Allow: /
-Disallow: /app/
-Disallow: /api/
-Disallow: /admin/
 
-# Sitemap
-Sitemap: https://emotionscare.app/sitemap.xml
-
-# Crawl delay
-Crawl-delay: 1
-
-# Specific bots
-User-agent: Googlebot
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: GPTBot
-Disallow: /
+Sitemap: https://emotionscare.com/sitemap.xml
 

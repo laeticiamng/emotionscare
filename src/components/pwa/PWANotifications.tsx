@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,7 +7,6 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Bell, BellOff, Clock, Heart, MessageCircle, TrendingUp } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
-import { logger } from '@/lib/logger';
 
 interface NotificationSettings {
   enabled: boolean;
@@ -85,7 +83,7 @@ const PWANotifications: React.FC = () => {
         });
       }
     } catch (error) {
-      logger.error('Erreur permission notifications', error as Error, 'SYSTEM');
+      console.error('Erreur permission notifications:', error);
     }
   };
 
@@ -120,7 +118,7 @@ const PWANotifications: React.FC = () => {
           }, delay);
         }
       } catch (error) {
-        logger.error('Erreur programmation notifications', error as Error, 'SYSTEM');
+        console.error('Erreur programmation notifications:', error);
       }
     }
   };

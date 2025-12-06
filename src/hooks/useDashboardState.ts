@@ -1,7 +1,5 @@
-// @ts-nocheck
 
 import { useState, useCallback, useEffect } from 'react';
-import { logger } from '@/lib/logger';
 
 interface CollapsedSections {
   [key: string]: boolean;
@@ -43,7 +41,7 @@ export const useDashboardState = (): DashboardState => {
           ...parsedSections
         }));
       } catch (error) {
-        logger.error('Error parsing stored collapsed sections', error as Error, 'SYSTEM');
+        console.error('Error parsing stored collapsed sections:', error);
       }
     }
   }, []);

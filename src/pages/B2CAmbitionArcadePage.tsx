@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -64,11 +63,11 @@ const B2CAmbitionArcadePage: React.FC = () => {
 
   const getCategoryColor = (category: string) => {
     switch (category) {
-      case 'personnel': return 'bg-info/10 text-info';
-      case 'professionnel': return 'bg-success/10 text-success';
-      case 'bien-etre': return 'bg-accent/10 text-accent';
-      case 'apprentissage': return 'bg-warning/10 text-warning';
-      default: return 'bg-muted text-muted-foreground';
+      case 'personnel': return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
+      case 'professionnel': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+      case 'bien-etre': return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200';
+      case 'apprentissage': return 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200';
+      default: return 'bg-gray-100 text-gray-800';
     }
   };
 
@@ -82,7 +81,7 @@ const B2CAmbitionArcadePage: React.FC = () => {
           className="text-center mb-8"
         >
           <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-primary to-primary/60 rounded-full mb-6">
-            <Gamepad2 className="w-10 h-10 text-primary-foreground" />
+            <Gamepad2 className="w-10 h-10 text-white" />
           </div>
           <h1 className="text-4xl font-bold text-foreground mb-2">
             Ambition Arcade
@@ -95,7 +94,7 @@ const B2CAmbitionArcadePage: React.FC = () => {
           <div className="flex items-center justify-center gap-8 mb-6">
             <div className="text-center">
               <div className="flex items-center justify-center gap-2 mb-1">
-                <Trophy className="w-5 h-5 text-warning" />
+                <Trophy className="w-5 h-5 text-yellow-500" />
                 <span className="text-2xl font-bold">Niveau {playerLevel}</span>
               </div>
               <p className="text-sm text-muted-foreground">Niveau d'ambition</p>
@@ -103,7 +102,7 @@ const B2CAmbitionArcadePage: React.FC = () => {
             
             <div className="text-center">
               <div className="flex items-center justify-center gap-2 mb-1">
-                <Star className="w-5 h-5 text-info" />
+                <Star className="w-5 h-5 text-blue-500" />
                 <span className="text-2xl font-bold">{playerXP.toLocaleString()}</span>
               </div>
               <p className="text-sm text-muted-foreground">Points d'expérience</p>
@@ -111,7 +110,7 @@ const B2CAmbitionArcadePage: React.FC = () => {
 
             <div className="text-center">
               <div className="flex items-center justify-center gap-2 mb-1">
-                <CheckCircle className="w-5 h-5 text-success" />
+                <CheckCircle className="w-5 h-5 text-green-500" />
                 <span className="text-2xl font-bold">{goals.filter(g => g.status === 'completed').length}</span>
               </div>
               <p className="text-sm text-muted-foreground">Objectifs atteints</p>
@@ -136,7 +135,7 @@ const B2CAmbitionArcadePage: React.FC = () => {
                   transition={{ delay: index * 0.1 }}
                 >
                   <Card className={`h-full transition-all hover:shadow-lg cursor-pointer ${
-                    goal.status === 'completed' ? 'border-success bg-success/10' :
+                    goal.status === 'completed' ? 'border-green-500 bg-green-50 dark:bg-green-950' :
                     goal.status === 'paused' ? 'opacity-60' : ''
                   }`}>
                     <CardHeader>
@@ -146,7 +145,7 @@ const B2CAmbitionArcadePage: React.FC = () => {
                         </Badge>
                         <div className="flex items-center gap-1">
                           {Array.from({ length: goal.difficulty }).map((_, i) => (
-                            <Star key={i} className="w-3 h-3 fill-warning text-warning" />
+                            <Star key={i} className="w-3 h-3 fill-yellow-400 text-yellow-400" />
                           ))}
                         </div>
                       </div>
@@ -178,12 +177,12 @@ const B2CAmbitionArcadePage: React.FC = () => {
 
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-1 text-sm">
-                          <Star className="w-4 h-4 text-warning" />
+                          <Star className="w-4 h-4 text-yellow-500" />
                           <span>{goal.xp} XP</span>
                         </div>
                         
                         {goal.status === 'completed' ? (
-                          <Badge className="bg-success/10 text-success">
+                          <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
                             <CheckCircle className="w-3 h-3 mr-1" />
                             Terminé
                           </Badge>

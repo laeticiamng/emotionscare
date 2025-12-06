@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -42,7 +43,7 @@ const TeamManagement: React.FC<TeamManagementProps> = ({ teams, departments }) =
     lead: ''
   });
   
-  const filteredTeams = selectedDepartment && selectedDepartment !== 'all'
+  const filteredTeams = selectedDepartment 
     ? teams.filter(team => team.departmentId === selectedDepartment)
     : teams;
     
@@ -103,7 +104,7 @@ const TeamManagement: React.FC<TeamManagementProps> = ({ teams, departments }) =
               <SelectValue placeholder="Tous les départements" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Tous les départements</SelectItem>
+              <SelectItem value={undefined}>Tous les départements</SelectItem>
               {departments.map((dept) => (
                 <SelectItem key={dept.id} value={dept.id}>
                   {dept.name}
@@ -132,10 +133,10 @@ const TeamManagement: React.FC<TeamManagementProps> = ({ teams, departments }) =
                     </div>
                   </div>
                   <div className="space-x-1">
-                    <Button variant="ghost" size="icon" onClick={() => handleEditTeam(team)} aria-label={`Modifier l'équipe ${team.name}`}>
+                    <Button variant="ghost" size="icon" onClick={() => handleEditTeam(team)}>
                       <PenSquare className="h-4 w-4" />
                     </Button>
-                    <Button variant="ghost" size="icon" onClick={() => handleDeleteTeam(team)} aria-label={`Supprimer l'équipe ${team.name}`}>
+                    <Button variant="ghost" size="icon" onClick={() => handleDeleteTeam(team)}>
                       <Trash2 className="h-4 w-4 text-destructive" />
                     </Button>
                   </div>

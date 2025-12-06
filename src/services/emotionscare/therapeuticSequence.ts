@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 // Parcours thérapeutique progressif EmotionsCare
 import { EmotionInput, ANALGESIC_ROUTER } from './analgesic';
@@ -64,7 +63,7 @@ export async function generateTherapeuticSequence(
   callBackUrl?: string
 ): Promise<{ taskId: string; sequence: TherapeuticSequence }> {
   
-  // Silent: starting therapeutic sequence generation
+  console.log(`🎵 EmotionsCare Séquence: Génération parcours pour: "${text.slice(0, 50)}..."`);
   
   try {
     // 1. Détecter l'émotion de départ
@@ -78,11 +77,12 @@ export async function generateTherapeuticSequence(
     const emotions = await hume.detectEmotion(text);
     
     const startEmotion = emotions[0]?.name || "neutral";
-    // Silent: start emotion detected
+    console.log(`🎭 Émotion de départ: ${startEmotion}`);
     
     // 2. Créer la séquence thérapeutique
     const sequence = createTherapeuticSequence(startEmotion);
-    // Silent: sequence created
+    console.log(`📋 Séquence créée: ${sequence.steps.length} étapes (${sequence.totalDuration}s)`);
+    
     // 3. Générer le premier morceau avec extension programmée
     const sunoApiKey = process.env.SUNO_API_KEY;
     if (!sunoApiKey) {
@@ -100,7 +100,8 @@ export async function generateTherapeuticSequence(
     // Prompt pour séquence évolutive
     const sequencePrompt = `${language} | parcours thérapeutique évolutif | ${firstPreset.style} | mood progression ${sequence.startEmotion} vers ${sequence.targetEmotion} | tempo ${firstStep.tempo} BPM progressif | durée ${sequence.totalDuration}s`;
     
-    // Silent: sequence prompt generated
+    console.log(`📝 Prompt séquence: "${sequencePrompt}"`);
+    
     const musicResponse = await suno.generateMusic({
       prompt: sequencePrompt,
       style: firstPreset.style,
@@ -111,7 +112,8 @@ export async function generateTherapeuticSequence(
       callBackUrl: callBackUrl || ""
     });
     
-    // Silent: therapeutic sequence generated
+    console.log(`✅ Séquence thérapeutique générée - Task ID: ${musicResponse.taskId}`);
+    console.log(`📊 Parcours: ${sequence.steps.map(s => s.preset).join(' → ')}`);
     
     return {
       taskId: musicResponse.taskId,
@@ -119,7 +121,7 @@ export async function generateTherapeuticSequence(
     };
     
   } catch (error) {
-    // Silent: therapeutic sequence generation error logged internally
+    console.error('❌ EmotionsCare Séquence: Erreur de génération:', error);
     throw new Error(`Génération séquence échouée: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
   }
 }

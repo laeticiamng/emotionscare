@@ -1,6 +1,3 @@
-// @ts-nocheck
-
-import { logger } from '@/lib/logger';
 
 export class PushNotificationService {
   private static instance: PushNotificationService;
@@ -21,7 +18,7 @@ export class PushNotificationService {
 
   async requestPermission(): Promise<boolean> {
     if (!this.isSupported) {
-      logger.warn('Les notifications push ne sont pas supportées sur ce navigateur', undefined, 'SYSTEM');
+      console.warn('Les notifications push ne sont pas supportées sur ce navigateur');
       return false;
     }
 
@@ -31,7 +28,7 @@ export class PushNotificationService {
     }
 
     if (Notification.permission === 'denied') {
-      logger.warn('L\'utilisateur a refusé les notifications push', undefined, 'SYSTEM');
+      console.warn('L\'utilisateur a refusé les notifications push');
       return false;
     }
 
@@ -40,7 +37,7 @@ export class PushNotificationService {
       this.isPermissionGranted = permission === 'granted';
       return this.isPermissionGranted;
     } catch (error) {
-      logger.error('Erreur lors de la demande de permission', error as Error, 'SYSTEM');
+      console.error('Erreur lors de la demande de permission:', error);
       return false;
     }
   }
@@ -64,7 +61,7 @@ export class PushNotificationService {
       }, 5000);
 
     } catch (error) {
-      logger.error('Erreur lors de l\'affichage de la notification', error as Error, 'SYSTEM');
+      console.error('Erreur lors de l\'affichage de la notification:', error);
     }
   }
 

@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import { useState } from 'react';
 import { supabase } from '@/lib/supabase-client';
@@ -97,7 +96,7 @@ export function useTextToVoice(options: TextToVoiceOptions = {}) {
         throw new Error('No audio content returned');
       }
     } catch (err) {
-      // Speech generation error
+      console.error('Error generating speech:', err);
       setError(err instanceof Error ? err.message : 'Error generating speech');
       toast({
         title: "Erreur de synthèse vocale",

@@ -1,9 +1,7 @@
-// @ts-nocheck
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { Notification } from '@/types/notifications';
-import { logger } from '@/lib/logger';
 
 // Local filter type used by this hook
 
@@ -79,7 +77,7 @@ export function useNotifications() {
       const unreadNotifications = mockNotifications.filter(n => !n.isRead);
       setUnreadCount(unreadNotifications.length);
     } catch (error) {
-      logger.error('Error fetching notifications', error as Error, 'SYSTEM');
+      console.error('Error fetching notifications:', error);
       toast({
         title: 'Erreur',
         description: 'Impossible de charger les notifications',
@@ -106,7 +104,7 @@ export function useNotifications() {
       // Update unread count
       setUnreadCount(prev => Math.max(0, prev - 1));
     } catch (error) {
-      logger.error('Error marking notification as read', error as Error, 'SYSTEM');
+      console.error('Error marking notification as read:', error);
       toast({
         title: 'Erreur',
         description: 'Impossible de marquer la notification comme lue',
@@ -129,7 +127,7 @@ export function useNotifications() {
       // Update unread count
       setUnreadCount(0);
     } catch (error) {
-      logger.error('Error marking all notifications as read', error as Error, 'SYSTEM');
+      console.error('Error marking all notifications as read:', error);
       toast({
         title: 'Erreur',
         description: 'Impossible de marquer toutes les notifications comme lues',

@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 /**
  * Service MusicGen
@@ -8,7 +7,6 @@
  */
 import { API_URL } from '@/lib/env';
 import { AudioTrack } from '@/types/audio';
-import { logger } from '@/lib/logger';
 
 // Types pour les options de génération
 export interface MusicGenOptions {
@@ -54,7 +52,7 @@ export async function checkApiConnection(): Promise<boolean> {
     
     return response.ok;
   } catch (error) {
-    logger.error('MusicGen API connection check failed', error as Error, 'MUSIC');
+    console.error('MusicGen API connection check failed:', error);
     return false;
   }
 }
@@ -97,7 +95,7 @@ export async function generateMusic(options: MusicGenOptions): Promise<MusicGenR
     
     return await response.json();
   } catch (error) {
-    logger.error('Error generating music', error as Error, 'MUSIC');
+    console.error('Error generating music:', error);
     throw error;
   }
 }

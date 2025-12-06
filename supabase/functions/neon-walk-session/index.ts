@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { serve } from 'https://deno.land/std@0.208.0/http/server.ts';
 import { z } from 'https://deno.land/x/zod@v3.22.2/mod.ts';
 import { authorizeRole, validateJwtOrThrow, hashUser } from '../_shared/auth.ts';

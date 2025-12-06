@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -18,7 +17,7 @@ const MusicEmotionRecommendation: React.FC<MusicEmotionRecommendationProps> = ({
   
   const handleActivateMusic = async () => {
     try {
-      // Activating music for emotion
+      console.log('🎵 Activation de la musique pour:', emotionResult);
       
       const playlist = await activateMusicForEmotion({
         emotion: emotionResult.emotion.toLowerCase(),
@@ -26,11 +25,11 @@ const MusicEmotionRecommendation: React.FC<MusicEmotionRecommendationProps> = ({
       });
       
       if (playlist) {
-        // Playlist received, opening player
+        console.log('✅ Playlist reçue, ouverture du lecteur');
         setGeneratedPlaylist(playlist);
       }
     } catch (error) {
-      // Music activation error - silent
+      console.error('❌ Erreur lors de l\'activation musicale:', error);
     }
   };
   

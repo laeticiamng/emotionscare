@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { vi } from "vitest";
 export function fastForwardTimers() {
   vi.useFakeTimers();

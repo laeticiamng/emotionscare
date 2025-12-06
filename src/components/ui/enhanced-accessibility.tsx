@@ -8,7 +8,7 @@ import {
   Zap, Moon, Sun, Palette, Move, RotateCcw
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useTheme } from '@/providers/theme';
+import { useTheme } from '@/components/theme-provider';
 import {
   safeClassAdd,
   safeClassRemove,
@@ -79,7 +79,7 @@ export const AccessibilityPanel: React.FC = () => {
         const saved = window.localStorage.getItem('accessibility-settings');
         return saved ? JSON.parse(saved) : defaultSettings;
       } catch (error) {
-        // Settings read error - non-critical
+        console.warn('[AccessibilityPanel] Failed to read settings', error);
       }
     }
     return defaultSettings;
@@ -127,7 +127,7 @@ export const AccessibilityPanel: React.FC = () => {
         window.localStorage.setItem('accessibility-settings', JSON.stringify(settings));
       }
     } catch (error) {
-      // Settings persist error - non-critical
+      console.warn('[AccessibilityPanel] Failed to persist settings', error);
     }
   }, [settings]);
 

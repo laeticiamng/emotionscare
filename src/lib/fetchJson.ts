@@ -1,4 +1,3 @@
-// @ts-nocheck
 if (!globalThis.fetch) {
   Object.assign(globalThis, require('undici'));
 }

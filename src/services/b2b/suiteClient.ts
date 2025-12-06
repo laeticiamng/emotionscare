@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { SUPABASE_ANON_KEY, SUPABASE_URL } from '@/lib/env';
 import { supabase } from '@/integrations/supabase/client';
 

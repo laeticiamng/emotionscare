@@ -1,7 +1,5 @@
-// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { Download, X, Smartphone } from 'lucide-react';
-import { logger } from '@/lib/logger';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
@@ -56,7 +54,7 @@ export const PWAInstallPrompt: React.FC = () => {
       
       setShowPrompt(false);
     } catch (error) {
-      logger.error('Error during PWA installation', error as Error, 'SYSTEM');
+      console.error('Error during PWA installation:', error);
     }
   };
 

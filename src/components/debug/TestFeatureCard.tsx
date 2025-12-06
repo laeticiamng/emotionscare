@@ -1,11 +1,9 @@
-// @ts-nocheck
 import React from 'react';
 import FeatureCard from '@/components/common/FeatureCard';
 import { Target, Zap } from 'lucide-react';
-import { logger } from '@/lib/logger';
 
 const TestFeatureCard: React.FC = () => {
-  logger.debug('Testing FeatureCard with different icon types', undefined, 'UI');
+  console.log('Testing FeatureCard with different icon types');
 
   return (
     <div className="p-8 space-y-8">

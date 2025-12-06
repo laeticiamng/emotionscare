@@ -1,7 +1,5 @@
-// @ts-nocheck
 import { useState, useEffect } from 'react';
 import { MusicPlaylist } from '@/types/music';
-import { logger } from '@/lib/logger';
 
 interface MusicStats {
   totalListeningTime: number; // en secondes
@@ -49,7 +47,7 @@ export default function useMusicStats(userId?: string) {
           setHasData(false);
         }
       } catch (error) {
-        logger.error('Erreur lors de la récupération des statistiques musicales', error as Error, 'ANALYTICS');
+        console.error('Erreur lors de la récupération des statistiques musicales:', error);
         setHasData(false);
       } finally {
         setIsLoading(false);

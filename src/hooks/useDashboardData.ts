@@ -1,6 +1,6 @@
+
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { logger } from '@/lib/logger';
 
 export interface DashboardData {
   totalUsers: number;
@@ -36,7 +36,7 @@ export const useDashboardData = () => {
         setData(mockData);
       } catch (err) {
         setError('Erreur lors du chargement des données');
-        logger.error('Dashboard data fetch error', err as Error, 'UI');
+        console.error('Dashboard data fetch error:', err);
       } finally {
         setIsLoading(false);
       }

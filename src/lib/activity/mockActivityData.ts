@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import { ActivityType } from './activityTypes';
 import { AnonymizedActivityLog, ActivityStats } from './activityTypes';

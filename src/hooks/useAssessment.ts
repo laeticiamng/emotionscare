@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { z } from 'zod';
@@ -15,7 +14,6 @@ import {
   type InstrumentCode as ClinicalInstrumentCode,
   type LocaleCode as ClinicalLocaleCode,
 } from '@/services/clinicalScoringService';
-import { logger } from '@/lib/logger';
 
 export const instrumentCodes = [
   'WHO5',
@@ -318,7 +316,7 @@ export const useAssessment = (instrument: InstrumentCode): UseAssessmentResult =
 
         return catalog;
       } catch (error) {
-        logger.error('[useAssessment] unable to start', error as Error, 'UI');
+        console.error('[useAssessment] unable to start', error);
         toast({
           title: toastLabels.unavailable.title,
           description: toastLabels.unavailable.description,
@@ -424,7 +422,7 @@ export const useAssessment = (instrument: InstrumentCode): UseAssessmentResult =
 
         return true;
       } catch (error) {
-        logger.error('[useAssessment] submit error', error as Error, 'UI');
+        console.error('[useAssessment] submit error', error);
         toast({
           title: toastLabels.submitError.title,
           description: toastLabels.submitError.description,

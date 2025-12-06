@@ -1,4 +1,3 @@
-// @ts-nocheck
 // Index des composants premium
 export { default as EnhancedCard } from './EnhancedCard';
 export { default as PremiumBackground } from './PremiumBackground';

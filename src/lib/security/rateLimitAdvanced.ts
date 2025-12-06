@@ -1,9 +1,6 @@
-// @ts-nocheck
 /**
  * Rate limiting avancé avec cache et budget monitoring
  */
-
-import { logger } from '@/lib/logger';
 
 interface RateLimitConfig {
   maxRequests: number;
@@ -180,7 +177,7 @@ class AdvancedRateLimiter {
    */
   private resetBudgets(): void {
     this.budgetCurrentCosts.clear();
-    logger.info('Budget costs reset', {}, 'SYSTEM');
+    console.log('Budget costs reset');
   }
 
   /**

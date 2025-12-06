@@ -1,15 +1,12 @@
-// @ts-nocheck
-
-import { logger } from '@/lib/logger';
 
 export const initServiceWorker = async () => {
   if ('serviceWorker' in navigator) {
     try {
       const registration = await navigator.serviceWorker.register('/sw.js');
-      logger.info('Service Worker registered successfully', undefined, 'SYSTEM');
+      console.log('Service Worker registered successfully');
       return registration;
     } catch (error) {
-      logger.error('Service Worker registration failed', error as Error, 'SYSTEM');
+      console.error('Service Worker registration failed:', error);
       throw error;
     }
   }

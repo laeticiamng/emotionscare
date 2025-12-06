@@ -3,10 +3,9 @@
  * Système de nettoyage automatique et sécurisation
  */
 
-import React from 'react';
 import { logger } from '@/lib/logger';
 import { initProductionSecurity, validateEnvironment } from '@/lib/security/productionSecurity';
-import { routes } from '@/routerV2';
+import { route } from '@/routes';
 
 export interface CleanupStats {
   totalFiles: number;
@@ -87,8 +86,10 @@ const optimizePerformance = async (): Promise<boolean> => {
 
     // Préchargement des routes critiques
     const criticalRoutes = [
-      routes.public.home(),
-      routes.b2c.home(),
+      route('home'),
+      route('choose-mode'),
+      route('consumer-home'),
+      route('b2b-selection'),
     ];
     criticalRoutes.forEach(prefetchRoute => {
       const link = document.createElement('link');

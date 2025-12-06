@@ -1,8 +1,7 @@
-// @ts-nocheck
+
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useTheme } from '@/providers/theme';
+import { useTheme } from '@/components/theme-provider';
 import CommandMenu from '@/components/layout/CommandMenu';
 import NotificationToast from '@/components/layout/NotificationToast';
 import ScrollProgress from '@/components/ui/ScrollProgress';
@@ -25,17 +24,7 @@ const PremiumShell: React.FC<PremiumShellProps> = ({
 }) => {
   const [isCommandOpen, setIsCommandOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [reduceMotion, setReduceMotion] = useState(false);
-  const { resolvedTheme } = useTheme();
-  const location = useLocation();
-  const isDarkMode = resolvedTheme === 'dark';
-
-  // SSR-safe reduced motion detection
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setReduceMotion(window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-    }
-  }, []);
+  const { isDarkMode, reduceMotion } = useTheme();
   
   // Track command+K keyboard shortcut
   useEffect(() => {
@@ -121,7 +110,7 @@ const PremiumShell: React.FC<PremiumShellProps> = ({
         <div className="flex-1 w-full">
           <AnimatePresence mode="sync">{/* Fixed multiple children warning */}
             <motion.div
-              key={location.pathname}
+              key={window.location.pathname}
               initial={reduceMotion ? { opacity: 1 } : { opacity: 0, y: 10 }}
               animate={reduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
               exit={reduceMotion ? { opacity: 1 } : { opacity: 0, y: -10 }}

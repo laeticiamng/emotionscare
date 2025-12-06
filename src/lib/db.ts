@@ -1,6 +1,3 @@
-// @ts-nocheck
-
-import { logger } from '@/lib/logger';
 
 // Database module stub
 // In a real implementation, this would connect to a database
@@ -8,7 +5,7 @@ import { logger } from '@/lib/logger';
 
 export const db = {
   async query(sql: string, params: any[] = []): Promise<any> {
-    logger.debug('DB query', { sql, params }, 'SYSTEM');
+    console.log('DB query:', sql, params);
     return { rows: [] };
   },
   

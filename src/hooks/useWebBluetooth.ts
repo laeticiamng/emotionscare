@@ -1,11 +1,9 @@
-// @ts-nocheck
 /**
  * Hook Web Bluetooth API native - Architecture minimale
  * Pour Bubble-Beat et capteurs de rythme cardiaque
  */
 
 import { useState, useRef, useCallback, useEffect } from 'react';
-import { logger } from '@/lib/logger';
 
 export interface BluetoothDevice {
   id: string;
@@ -195,7 +193,7 @@ export const useWebBluetooth = () => {
         await characteristicRef.current.stopNotifications();
         characteristicRef.current.removeEventListener('characteristicvaluechanged', handleHeartRateData);
       } catch (error) {
-        logger.warn('Erreur lors de l\'arrêt des notifications', error as Error, 'SYSTEM');
+        console.warn('Erreur lors de l\'arrêt des notifications:', error);
       }
     }
 
@@ -206,7 +204,7 @@ export const useWebBluetooth = () => {
         });
         await bluetoothDevice.gatt?.disconnect();
       } catch (error) {
-        logger.warn('Erreur lors de la déconnexion', error as Error, 'SYSTEM');
+        console.warn('Erreur lors de la déconnexion:', error);
       }
     }
 
@@ -297,7 +295,7 @@ export const useBubbleBeat = () => {
       await connectDevice();
     } catch (error) {
       // Fallback vers simulation en cas d'échec
-      logger.warn('Connexion Bluetooth échouée, passage en simulation', error as Error, 'SYSTEM');
+      console.warn('Connexion Bluetooth échouée, passage en simulation:', error);
       return startSimulation();
     }
   }, [isSupported, connectDevice, startSimulation]);

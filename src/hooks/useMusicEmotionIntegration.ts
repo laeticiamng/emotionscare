@@ -1,15 +1,12 @@
 import { useCallback } from 'react';
-import { useMusicCompat } from '@/hooks/useMusicCompat';
+import { useMusic } from '@/hooks/useMusic';
 import { useSoundscape } from '@/providers/SoundscapeProvider';
 import { EmotionMusicParams, MusicPlaylist, MusicTrack } from '@/types/music';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { logger } from '@/lib/logger';
 
 export const useMusicEmotionIntegration = () => {
-  const music = useMusicCompat();
-  const { generateMusicForEmotion, setPlaylist, play, getEmotionMusicDescription } = music;
-  const { isGenerating, generationProgress, emotionTarget, therapeuticMode } = music.state;
+  const { state, generateMusicForEmotion, setPlaylist, play } = useMusic();
   const { updateSoundscapeForEmotion } = useSoundscape();
 
   // Activation de la musique basée sur l'émotion
@@ -70,7 +67,7 @@ export const useMusicEmotionIntegration = () => {
 
       return null;
     } catch (error) {
-      logger.error('Erreur activation musique émotion', error as Error, 'MUSIC');
+      console.error('Erreur activation musique émotion:', error);
       toast.error('Impossible d\'activer la musique pour cette émotion');
       return null;
     }
@@ -103,7 +100,7 @@ export const useMusicEmotionIntegration = () => {
         energy: track.energy
       }));
     } catch (error) {
-      logger.error('Erreur recherche tracks', error as Error, 'MUSIC');
+      console.error('Erreur recherche tracks:', error);
       return [];
     }
   }, []);
@@ -150,7 +147,7 @@ export const useMusicEmotionIntegration = () => {
         energy: track.energy
       }));
     } catch (error) {
-      logger.error('Erreur recommandations musique', error as Error, 'MUSIC');
+      console.error('Erreur recommandations musique:', error);
       return [];
     }
   }, []);
@@ -175,7 +172,7 @@ export const useMusicEmotionIntegration = () => {
       });
 
     } catch (error) {
-      logger.error('Erreur analyse impact', error as Error, 'ANALYTICS');
+      console.error('Erreur analyse impact:', error);
     }
   }, []);
 
@@ -184,10 +181,9 @@ export const useMusicEmotionIntegration = () => {
     searchExistingTracks,
     getMusicRecommendations,
     analyzeMusicImpact,
-    getEmotionMusicDescription,
-    isGenerating,
-    generationProgress,
-    currentEmotion: emotionTarget,
-    therapeuticMode
+    isGenerating: state.isGenerating,
+    generationProgress: state.generationProgress,
+    currentEmotion: state.emotionTarget,
+    therapeuticMode: state.therapeuticMode
   };
 };

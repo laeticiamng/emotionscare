@@ -1,9 +1,7 @@
-// @ts-nocheck
 import { supabase } from '@/integrations/supabase/client';
 import sunoService from './suno.service';
 import emotionAnalysisService from './emotionAnalysis.service';
 import type { ApiResponse, EmotionData, MusicRecommendation, TherapeuticSession } from './types';
-import { logger } from '@/lib/logger';
 
 interface TherapySession {
   id: string;
@@ -646,7 +644,7 @@ class MusicTherapyService {
         status: 'active'
       });
     } catch (error) {
-      logger.error('Error saving therapy session', error as Error, 'MUSIC');
+      console.error('Error saving therapy session:', error);
     }
   }
 
@@ -661,7 +659,7 @@ class MusicTherapyService {
         })
         .eq('id', sessionId);
     } catch (error) {
-      logger.error('Error updating therapy session', error as Error, 'MUSIC');
+      console.error('Error updating therapy session:', error);
     }
   }
 
@@ -676,7 +674,7 @@ class MusicTherapyService {
         created_at: new Date().toISOString()
       });
     } catch (error) {
-      logger.error('Error saving feedback', error as Error, 'MUSIC');
+      console.error('Error saving feedback:', error);
     }
   }
 }

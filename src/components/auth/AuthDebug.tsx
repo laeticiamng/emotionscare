@@ -1,5 +1,6 @@
+
 import React from 'react';
-import { useAuthStore } from '@/store/useAuthStore';
+import { useAuthStore } from '@/stores/useAuthStore';
 
 const AuthDebug: React.FC = () => {
   const { user, session, isAuthenticated, isLoading } = useAuthStore();

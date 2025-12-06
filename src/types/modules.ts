@@ -1,4 +1,3 @@
-// @ts-nocheck
 export type ModuleState = 'loading' | 'content' | 'empty' | 'verbal-feedback';
 
 export interface SessionResult {

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { hasConsent, onConsentChange } from '@/lib/consent';
 import { initializeSentry, monitorDOMErrors } from '@/lib/sentry-config';
 

@@ -1,6 +1,3 @@
-// @ts-nocheck
-
-import { logger } from '@/lib/logger';
 
 interface PerformanceConfig {
   enableOptimizations: boolean;
@@ -37,7 +34,7 @@ class PerformanceOptimizer {
         entryTypes: ['navigation', 'paint', 'largest-contentful-paint', 'layout-shift'] 
       });
     } catch (error) {
-      logger.warn('PerformanceObserver not supported', error as Error, 'SYSTEM');
+      console.warn('PerformanceObserver not supported:', error);
     }
   }
 
@@ -59,16 +56,16 @@ class PerformanceOptimizer {
     const domTime = entry.domContentLoadedEventEnd - entry.domContentLoadedEventStart;
     
     if (import.meta.env.DEV) {
-      logger.debug(`📊 Navigation Timing`, {
+      console.log(`📊 Navigation Timing:`, {
         loadTime: `${loadTime.toFixed(2)}ms`,
         domTime: `${domTime.toFixed(2)}ms`,
         ttfb: `${(entry.responseStart - entry.requestStart).toFixed(2)}ms`
-      }, 'ANALYTICS');
+      });
     }
 
     // Alertes de performance
     if (loadTime > 3000) {
-      logger.warn('⚠️ Slow page load detected', { loadTime: `${loadTime.toFixed(2)}ms` }, 'SYSTEM');
+      console.warn('⚠️ Slow page load detected:', `${loadTime.toFixed(2)}ms`);
     }
   }
 
@@ -76,11 +73,11 @@ class PerformanceOptimizer {
     if (entry.name === 'first-contentful-paint') {
       const fcp = entry.startTime;
       if (import.meta.env.DEV) {
-        logger.debug(`🎨 First Contentful Paint: ${fcp.toFixed(2)}ms`, {}, 'ANALYTICS');
+        console.log(`🎨 First Contentful Paint: ${fcp.toFixed(2)}ms`);
       }
       
       if (fcp > 1500) {
-        logger.warn('⚠️ Slow FCP detected', { fcp: `${fcp.toFixed(2)}ms` }, 'SYSTEM');
+        console.warn('⚠️ Slow FCP detected:', `${fcp.toFixed(2)}ms`);
       }
     }
   }
@@ -88,22 +85,22 @@ class PerformanceOptimizer {
   private analyzeLCP(entry: PerformanceEntry) {
     const lcp = entry.startTime;
     if (import.meta.env.DEV) {
-      logger.debug(`🖼️ Largest Contentful Paint: ${lcp.toFixed(2)}ms`, {}, 'ANALYTICS');
+      console.log(`🖼️ Largest Contentful Paint: ${lcp.toFixed(2)}ms`);
     }
     
     if (lcp > 2500) {
-      logger.warn('⚠️ Slow LCP detected', { lcp: `${lcp.toFixed(2)}ms` }, 'SYSTEM');
+      console.warn('⚠️ Slow LCP detected:', `${lcp.toFixed(2)}ms`);
     }
   }
 
   private analyzeCLS(entry: any) {
     const cls = entry.value;
     if (import.meta.env.DEV) {
-      logger.debug(`📐 Cumulative Layout Shift: ${cls.toFixed(4)}`, {}, 'ANALYTICS');
+      console.log(`📐 Cumulative Layout Shift: ${cls.toFixed(4)}`);
     }
     
     if (cls > 0.1) {
-      logger.warn('⚠️ High CLS detected', { cls: cls.toFixed(4) }, 'SYSTEM');
+      console.warn('⚠️ High CLS detected:', cls.toFixed(4));
     }
   }
 
@@ -161,7 +158,7 @@ class PerformanceOptimizer {
     this.optimizeImages();
     this.preloadCriticalResources();
     
-    logger.info('🚀 Performance optimizations started', {}, 'SYSTEM');
+    console.log('🚀 Performance optimizations started');
   }
 
   /**

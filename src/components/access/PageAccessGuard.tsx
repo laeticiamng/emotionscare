@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
@@ -37,7 +38,7 @@ const PageAccessGuard: React.FC<PageAccessGuardProps> = ({
   }
 
   if (requiredRoles.length > 0) {
-    const userRole = user?.role || userMode || '';
+    const userRole = user?.role || userMode;
     if (!requiredRoles.includes(userRole)) {
       return fallbackComponent || (
         <div className="flex h-screen items-center justify-center">

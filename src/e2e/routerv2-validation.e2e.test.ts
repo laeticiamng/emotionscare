@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { test, expect } from '@playwright/test';
 import { ROUTES_REGISTRY } from '@/routerV2/registry';
 

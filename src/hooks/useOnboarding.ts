@@ -1,125 +1,261 @@
-/**
- * Hook pour gérer l'onboarding utilisateur
- * Sauvegarde le profil initial dans user_profiles
- */
+import { useCallback } from 'react';
+import { useOnboardingStore, ProfileDraft, GoalsDraft, SensorsDraft, ModuleSuggestion } from '@/store/onboarding.store';
 
-import { useState } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
-import { logger } from '@/lib/logger';
+export const useOnboarding = () => {
+  const store = useOnboardingStore();
 
-export interface OnboardingProfile {
-  goals: string[];
-  experience: string;
-  preferences: string[];
-}
-
-export function useOnboarding() {
-  const { user } = useAuth();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const createUserProfile = async (profile: OnboardingProfile) => {
-    if (!user?.id) {
-      throw new Error('User not authenticated');
-    }
+  const start = useCallback(async () => {
+    store.setLoading(true);
+    store.setError(null);
 
     try {
-      setLoading(true);
-      setError(null);
+      const response = await fetch('/api/onboarding/start', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
 
-      // Vérifier si le profil existe déjà
-      const { data: existingProfile } = await supabase
-        .from('user_profiles')
-        .select('id')
-        .eq('user_id', user.id)
-        .maybeSingle();
+      if (!response.ok) {
+        throw new Error('Failed to start onboarding');
+      }
 
-      const profileData = {
-        user_id: user.id,
-        preferences: {
-          goals: profile.goals,
-          experience_level: profile.experience,
-          feature_preferences: profile.preferences,
-          onboarding_completed: true,
-          onboarding_completed_at: new Date().toISOString(),
-        }
-      };
+      const { flow_id } = await response.json();
+      store.setFlowId(flow_id);
+      store.setStep(1); // Move to first actual step
 
-      if (existingProfile) {
-        // Update existing profile
-        const { error: updateError } = await supabase
-          .from('user_profiles')
-          .update(profileData)
-          .eq('user_id', user.id);
-
-        if (updateError) {
-          throw updateError;
-        }
-
-        logger.info('User profile updated from onboarding', { userId: user.id }, 'HOOK');
-      } else {
-        // Insert new profile
-        const { error: insertError } = await supabase
-          .from('user_profiles')
-          .insert(profileData);
-
-        if (insertError) {
-          throw insertError;
-        }
-
-        logger.info('User profile created from onboarding', { userId: user.id }, 'HOOK');
+      // Analytics
+      if (typeof window !== 'undefined' && window.gtag) {
+        window.gtag('event', 'onboarding_start');
       }
 
       return true;
-    } catch (err) {
-      logger.error('Failed to save onboarding profile', err as Error, 'HOOK');
-      setError('Impossible de sauvegarder votre profil');
-      throw err;
+    } catch (error) {
+      store.setError(error instanceof Error ? error.message : 'Erreur de démarrage');
+      return false;
     } finally {
-      setLoading(false);
+      store.setLoading(false);
     }
-  };
+  }, [store]);
 
-  const skipOnboarding = async () => {
-    if (!user?.id) {
-      throw new Error('User not authenticated');
-    }
-
+  const saveProfile = useCallback(async (profile: ProfileDraft) => {
+    store.setProfileDraft(profile);
+    
     try {
-      setLoading(true);
-      setError(null);
+      const response = await fetch('/api/me/profile', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(profile),
+      });
 
-      const { error } = await supabase
-        .from('user_profiles')
-        .upsert({
-          user_id: user.id,
-          preferences: {
-            onboarding_completed: true,
-            onboarding_skipped: true,
-            onboarding_completed_at: new Date().toISOString(),
-          }
+      if (!response.ok) {
+        throw new Error('Failed to save profile');
+      }
+
+      // Analytics
+      if (typeof window !== 'undefined' && window.gtag) {
+        window.gtag('event', 'onboarding_profile_saved');
+      }
+
+      return true;
+    } catch (error) {
+      // Keep draft but show error
+      store.setError(error instanceof Error ? error.message : 'Erreur de sauvegarde');
+      return false;
+    }
+  }, [store]);
+
+  const saveGoals = useCallback(async (goals: GoalsDraft) => {
+    store.setGoalsDraft(goals);
+    
+    try {
+      const response = await fetch('/api/onboarding/goals', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(goals),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save goals');
+      }
+
+      const { recommendations } = await response.json();
+      store.setModuleSuggestions(recommendations || []);
+
+      // Analytics
+      if (typeof window !== 'undefined' && window.gtag) {
+        window.gtag('event', 'onboarding_goals_saved', {
+          custom_goals: goals.objectives.join(',')
         });
-
-      if (error) {
-        throw error;
       }
 
-      logger.info('Onboarding skipped', { userId: user.id }, 'HOOK');
       return true;
-    } catch (err) {
-      logger.error('Failed to skip onboarding', err as Error, 'HOOK');
-      setError('Impossible de sauvegarder vos préférences');
-      throw err;
-    } finally {
-      setLoading(false);
+    } catch (error) {
+      store.setError(error instanceof Error ? error.message : 'Erreur de sauvegarde');
+      return false;
     }
-  };
+  }, [store]);
+
+  const saveSensors = useCallback(async (sensors: SensorsDraft) => {
+    store.setSensorsDraft(sensors);
+    
+    try {
+      const response = await fetch('/api/me/privacy_prefs', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(sensors),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save sensors');
+      }
+
+      // Analytics
+      if (typeof window !== 'undefined' && window.gtag) {
+        window.gtag('event', 'onboarding_sensors_saved', {
+          custom_enabled_count: Object.values(sensors).filter(Boolean).length
+        });
+      }
+
+      return true;
+    } catch (error) {
+      store.setError(error instanceof Error ? error.message : 'Erreur de sauvegarde');
+      return false;
+    }
+  }, [store]);
+
+  const enableNotifications = useCallback(async () => {
+    if (!('Notification' in window)) {
+      store.setError('Notifications non supportées');
+      return false;
+    }
+
+    try {
+      const permission = await Notification.requestPermission();
+      
+      if (permission === 'granted') {
+        store.setNotificationsEnabled(true);
+        
+        // Register for push notifications if service worker available
+        if ('serviceWorker' in navigator) {
+          try {
+            const registration = await navigator.serviceWorker.ready;
+            const subscription = await registration.pushManager.subscribe({
+              userVisibleOnly: true,
+              applicationServerKey: null // Add your VAPID key here
+            });
+
+            // Send token to backend
+            await fetch('/api/me/notifications/register', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ subscription }),
+            });
+          } catch (pushError) {
+            console.warn('Push subscription failed:', pushError);
+          }
+        }
+
+        // Analytics
+        if (typeof window !== 'undefined' && window.gtag) {
+          window.gtag('event', 'onboarding_push_granted');
+        }
+
+        return true;
+      } else {
+        // Analytics
+        if (typeof window !== 'undefined' && window.gtag) {
+          window.gtag('event', 'onboarding_push_denied');
+        }
+
+        return false;
+      }
+    } catch (error) {
+      store.setError(error instanceof Error ? error.message : 'Erreur de notifications');
+      return false;
+    }
+  }, [store]);
+
+  const complete = useCallback(async () => {
+    try {
+      const response = await fetch('/api/onboarding/complete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to complete onboarding');
+      }
+
+      store.setCompleted(true);
+
+      // Analytics
+      if (typeof window !== 'undefined' && window.gtag) {
+        window.gtag('event', 'onboarding_complete');
+      }
+
+      return true;
+    } catch (error) {
+      store.setError(error instanceof Error ? error.message : 'Erreur de finalisation');
+      return false;
+    }
+  }, [store]);
+
+  const skip = useCallback(() => {
+    store.setCompleted(true);
+    
+    // Analytics
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('event', 'onboarding_skip', {
+        custom_step: store.currentStep
+      });
+    }
+  }, [store]);
+
+  const next = useCallback(() => {
+    store.nextStep();
+    
+    // Analytics
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('event', 'onboarding_step_view', {
+        custom_step: store.currentStep + 1
+      });
+    }
+  }, [store]);
+
+  const prev = useCallback(() => {
+    store.prevStep();
+    
+    // Analytics
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('event', 'onboarding_step_view', {
+        custom_step: store.currentStep - 1
+      });
+    }
+  }, [store]);
 
   return {
-    createUserProfile,
-    skipOnboarding,
-    loading,
-    error,
+    // State
+    step: store.currentStep,
+    completed: store.completed,
+    loading: store.loading,
+    error: store.error,
+    
+    // Draft data
+    profileDraft: store.profileDraft,
+    goalsDraft: store.goalsDraft,
+    sensorsDraft: store.sensorsDraft,
+    notificationsEnabled: store.notificationsEnabled,
+    moduleSuggestions: store.moduleSuggestions,
+    
+    // Actions
+    start,
+    saveProfile,
+    saveGoals,
+    saveSensors,
+    enableNotifications,
+    complete,
+    skip,
+    next,
+    prev,
+    reset: store.reset,
   };
-}
+};

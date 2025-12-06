@@ -1,16 +1,14 @@
-// @ts-nocheck
 'use client';
 
 import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { captureException } from '@/lib/ai-monitoring';
-import { Sentry } from '@/lib/errors/sentry-compat';
+import * as Sentry from '@sentry/react';
 
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useTranslation } from 'react-i18next';
 
-const CONSENT_SCOPE = 'coach';
+const CONSENT_SCOPE = 'clinical';
 const CONSENT_VERSION = 'v1';
 const CONSENT_QUERY_KEY = ['clinical-optin', 'status'] as const;
 
@@ -153,35 +151,24 @@ export const ConsentProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const acceptMutation = useMutation({
     mutationFn: async () => {
-      logger.info('optin.accept.click', { scope: CONSENT_SCOPE }, 'CONSENT');
+      Sentry.addBreadcrumb({
+        category: 'consent',
+        level: 'info',
+        message: 'optin.accept.click',
+        data: { scope: CONSENT_SCOPE },
+      });
 
-      // Récupérer l'utilisateur actuel
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        throw new Error('User not authenticated');
-      }
+      const response = await fetch('/functions/v1/optin-accept', {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ scope: CONSENT_SCOPE }),
+      });
 
-      // Vérifier s'il existe déjà un consentement actif
-      const { data: existing } = await supabase
-        .from('clinical_optins')
-        .select('id')
-        .is('revoked_at', null)
-        .maybeSingle();
-
-      if (existing) {
-        return; // Déjà accepté
-      }
-
-      // Insérer un nouveau consentement avec le user_id
-      const { error } = await supabase
-        .from('clinical_optins')
-        .insert({
-          user_id: user.id,
-          scope: CONSENT_SCOPE,
-        });
-
-      if (error) {
-        throw error;
+      if (!response.ok) {
+        throw new Error(`optin-accept failed: ${response.status}`);
       }
     },
     onMutate: async () => {
@@ -196,16 +183,24 @@ export const ConsentProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const revokeMutation = useMutation({
     mutationFn: async () => {
-      logger.info('optin.revoke.click', { scope: CONSENT_SCOPE }, 'CONSENT');
+      Sentry.addBreadcrumb({
+        category: 'consent',
+        level: 'info',
+        message: 'optin.revoke.click',
+        data: { scope: CONSENT_SCOPE },
+      });
 
-      // Marquer tous les consentements actifs comme révoqués
-      const { error } = await supabase
-        .from('clinical_optins')
-        .update({ revoked_at: new Date().toISOString() })
-        .is('revoked_at', null);
+      const response = await fetch('/functions/v1/optin-revoke', {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ scope: CONSENT_SCOPE }),
+      });
 
-      if (error) {
-        throw error;
+      if (!response.ok) {
+        throw new Error(`optin-revoke failed: ${response.status}`);
       }
     },
     onMutate: async () => {

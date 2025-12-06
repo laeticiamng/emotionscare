@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import React, { useEffect, useState } from 'react';
 import { useMusicEmotionIntegration } from '@/hooks/useMusicEmotionIntegration';
@@ -48,7 +47,7 @@ export const MusicEmotionSync: React.FC<MusicEmotionSyncProps> = ({
         });
       }
     } catch (error) {
-      // Music sync error
+      console.error('Error syncing music with emotion:', error);
       toast({
         title: "Erreur de synchronisation",
         description: "Impossible de charger la musique adaptée à votre humeur.",

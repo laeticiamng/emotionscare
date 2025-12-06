@@ -1,7 +1,5 @@
-// @ts-nocheck
 import { useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
-import { logger } from '@/lib/logger';
 
 /**
  * Composant de redirection vers /entreprise
@@ -9,7 +7,7 @@ import { logger } from '@/lib/logger';
  */
 const RedirectToEntreprise = () => {
   useEffect(() => {
-    logger.info('🔀 Redirection automatique vers /entreprise', {}, 'SYSTEM');
+    console.log('🔀 Redirection automatique vers /entreprise');
   }, []);
 
   return <Navigate to="/entreprise" replace />;

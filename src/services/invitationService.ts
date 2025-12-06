@@ -1,7 +1,5 @@
-// @ts-nocheck
 
 import { InvitationStats, InvitationFormData } from '@/types';
-import { logger } from '@/lib/logger';
 
 class InvitationService {
   // Générer les statistiques d'invitation
@@ -26,7 +24,7 @@ class InvitationService {
     // Simulation d'appel API
     return new Promise((resolve) => {
       setTimeout(() => {
-        logger.info('Sending invitation to', { email: data.email }, 'API');
+        console.log('Sending invitation to:', data.email);
         resolve(true);
       }, 1000);
     });

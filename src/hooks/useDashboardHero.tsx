@@ -1,9 +1,7 @@
-// @ts-nocheck
 
 import { useState, useEffect } from 'react';
 import { Activity, BarChart3, Heart, Calendar, Users } from 'lucide-react';
 import type { DashboardKpi, DashboardShortcut } from '@/components/dashboard/DashboardHero';
-import { logger } from '@/lib/logger';
 
 export function useDashboardHero(userId?: string) {
   const [kpis, setKpis] = useState<DashboardKpi[]>([]);
@@ -75,7 +73,7 @@ export function useDashboardHero(userId?: string) {
       ]);
       
     } catch (error) {
-      logger.error('Erreur lors du chargement des données du tableau de bord', error as Error, 'SYSTEM');
+      console.error('Erreur lors du chargement des données du tableau de bord:', error);
     } finally {
       setIsLoading(false);
     }

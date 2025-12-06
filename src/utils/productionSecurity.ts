@@ -1,13 +1,10 @@
-// @ts-nocheck
-
-import { logger } from '@/lib/logger';
 
 export const initializeProductionSecurity = () => {
   // Configuration de sécurité pour la production
   if (typeof window !== 'undefined') {
     // Désactiver les outils de développement en production
     if (process.env.NODE_ENV === 'production') {
-      logger.info('Production security initialized', {}, 'SYSTEM');
+      console.log('Production security initialized');
     }
   }
 };

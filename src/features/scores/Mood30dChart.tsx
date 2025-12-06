@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { forwardRef, useId, useMemo } from 'react';
 import type { ForwardedRef } from 'react';
 import { Area, ComposedChart, Line, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';

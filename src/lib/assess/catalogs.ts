@@ -1,4 +1,3 @@
-// @ts-nocheck
 import type { InstrumentCatalog, InstrumentCode, LocaleCode } from './types';
 
 const CATALOGS: Record<InstrumentCode, Record<LocaleCode, InstrumentCatalog>> = {
@@ -249,17 +248,6 @@ export function getCatalog(instrument: InstrumentCode, locale: LocaleCode = 'fr'
   }
 
   return catalogs[locale] ?? catalogs.fr ?? catalogs.en!;
-  const catalogByLocale = CATALOGS[instrument];
-  if (!catalogByLocale) {
-    throw new Error(`Unknown instrument: ${instrument}`);
-  }
-
-  const localized = catalogByLocale[locale] || catalogByLocale.fr || catalogByLocale.en;
-  if (!localized) {
-    throw new Error(`No catalog available for instrument ${instrument}`);
-  }
-
-  return localized;
 }
 
 export function listAvailableLocales(instrument: InstrumentCode): LocaleCode[] {

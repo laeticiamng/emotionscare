@@ -1,7 +1,7 @@
+
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
-import { logger } from '@/lib/logger';
 
 interface AnalyticsEvent {
   id: string;
@@ -116,6 +116,7 @@ export const useAnalytics = () => {
 
     setEvents(prev => [event, ...prev.slice(0, 999)]); // Garder les 1000 derniers événements
 
+    // Mettre à jour le parcours utilisateur
     if (currentJourney) {
       setCurrentJourney(prev => prev ? {
         ...prev,
@@ -125,7 +126,7 @@ export const useAnalytics = () => {
       } : null);
     }
 
-    logger.debug('Event tracked', { eventType, module, metadata }, 'ANALYTICS');
+    console.log('Événement tracké:', event);
   };
 
   const trackPageView = (pageName: string, metadata?: Record<string, any>) => {

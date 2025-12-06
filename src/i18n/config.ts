@@ -1,4 +1,3 @@
-// @ts-nocheck
 import i18next, { type i18n as I18nInstance } from 'i18next';
 import { initReactI18next, useTranslation } from 'react-i18next';
 

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -12,7 +11,6 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import { b2cDashboardService } from '@/services/b2cDashboardService';
-import { logger } from '@/lib/logger';
 
 interface JournalEntry {
   id: string;
@@ -100,7 +98,7 @@ export const JournalModule: React.FC = () => {
       toast.success('Entrée sauvegardée et analysée');
     } catch (error) {
       toast.error('Erreur lors de la sauvegarde');
-      logger.error('Erreur sauvegarde journal', error as Error, 'UI');
+      console.error(error);
     } finally {
       setIsAnalyzing(false);
     }

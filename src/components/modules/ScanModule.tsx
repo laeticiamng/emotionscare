@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState, useCallback, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -12,7 +11,6 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { EmotionService } from '@/services/emotionService';
 import { toast } from 'sonner';
-import { logger } from '@/lib/logger';
 
 interface EmotionResult {
   emotion: string;
@@ -48,7 +46,7 @@ export const ScanModule: React.FC = () => {
       toast.success('Analyse textuelle terminée');
     } catch (error) {
       toast.error('Erreur lors de l\'analyse textuelle');
-      logger.error('Erreur analyse textuelle', error as Error, 'UI');
+      console.error(error);
     } finally {
       setIsScanning(false);
     }
@@ -95,7 +93,7 @@ export const ScanModule: React.FC = () => {
       toast.success('Analyse vocale terminée');
     } catch (error) {
       toast.error('Erreur lors de l\'analyse vocale');
-      logger.error('Erreur analyse vocale', error as Error, 'UI');
+      console.error(error);
     } finally {
       setIsScanning(false);
     }
@@ -142,7 +140,7 @@ export const ScanModule: React.FC = () => {
       }
     } catch (error) {
       toast.error('Erreur lors de l\'analyse faciale');
-      logger.error('Erreur analyse faciale', error as Error, 'UI');
+      console.error(error);
     } finally {
       setIsScanning(false);
     }

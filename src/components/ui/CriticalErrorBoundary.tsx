@@ -1,7 +1,6 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { AlertTriangle, RefreshCw, Home, Bug } from 'lucide-react';
-import { captureException } from '@/lib/ai-monitoring';
-import { log } from '@/lib/obs/logger';
+import * as Sentry from '@sentry/react';
 
 interface Props {
   children: ReactNode;
@@ -48,12 +47,12 @@ export class CriticalErrorBoundary extends Component<Props, State> {
     const { onError, context = 'Unknown Component' } = this.props;
     
     // Log détaillé de l'erreur
-    log.error(`🚨 Critical Error in ${context}`, {
-      error,
-      errorInfo,
-      componentStack: errorInfo.componentStack,
-      errorStack: error.stack
-    });
+    console.group(`🚨 Critical Error in ${context}`);
+    console.error('Error:', error);
+    console.error('Error Info:', errorInfo);
+    console.error('Component Stack:', errorInfo.componentStack);
+    console.error('Error Stack:', error.stack);
+    console.groupEnd();
 
     // Détecter spécifiquement les erreurs "reading add"
     const isReadingAddError = error.message.includes("Cannot read properties of undefined (reading 'add')");
@@ -61,21 +60,17 @@ export class CriticalErrorBoundary extends Component<Props, State> {
     const isCollectionError = error.message.includes('add');
 
     if (isReadingAddError || isClassListError || isCollectionError) {
-      log.error('🎯 DETECTED: "Cannot read properties of undefined (reading \'add\')" error', {
-        context,
-        componentStack: errorInfo.componentStack
-      });
+      console.error('🎯 DETECTED: "Cannot read properties of undefined (reading \'add\')" error');
+      console.error('Context:', context);
+      console.error('Component Stack:', errorInfo.componentStack);
       
       // En développement, essayer de donner plus d'informations
       if (process.env.NODE_ENV === 'development') {
-        log.warn('💡 Suggestions de debug:', {
-          suggestions: [
-            'Vérifier que tous les Sets/Maps sont initialisés',
-            'Utiliser les helpers safe-helpers.ts',
-            'Vérifier que les éléments DOM existent avant d\'utiliser classList',
-            'Valider les props avec Zod avant utilisation'
-          ]
-        });
+        console.warn('💡 Suggestions de debug:');
+        console.warn('1. Vérifier que tous les Sets/Maps sont initialisés');
+        console.warn('2. Utiliser les helpers safe-helpers.ts');
+        console.warn('3. Vérifier que les éléments DOM existent avant d\'utiliser classList');
+        console.warn('4. Valider les props avec Zod avant utilisation');
       }
     }
 
@@ -95,16 +90,24 @@ export class CriticalErrorBoundary extends Component<Props, State> {
 
   private reportError(error: Error, errorInfo: ErrorInfo, context?: string) {
     try {
-      captureException(error, {
-        react: {
-          componentStack: errorInfo.componentStack
-        },
-        errorBoundary: context || 'CriticalErrorBoundary',
-        feature: 'error-boundary',
-        errorType: error.message.includes("reading 'add'") ? 'reading_add' : 'unknown',
-        errorInfo,
-        retryCount: this.retryCount
-      });
+      if (Sentry.getCurrentHub().getClient()) {
+        Sentry.captureException(error, {
+          contexts: {
+            react: {
+              componentStack: errorInfo.componentStack
+            }
+          },
+          tags: {
+            errorBoundary: context || 'CriticalErrorBoundary',
+            feature: 'error-boundary',
+            errorType: error.message.includes("reading 'add'") ? 'reading_add' : 'unknown'
+          },
+          extra: {
+            errorInfo,
+            retryCount: this.retryCount
+          }
+        });
+      }
 
       // Log local pour développement
       const errorReport = {
@@ -127,7 +130,7 @@ export class CriticalErrorBoundary extends Component<Props, State> {
       );
 
     } catch (reportingError) {
-      log.error('Failed to report error', { reportingError });
+      console.error('Failed to report error:', reportingError);
     }
   }
 
@@ -135,7 +138,7 @@ export class CriticalErrorBoundary extends Component<Props, State> {
     this.retryCount += 1;
     
     if (this.retryCount > this.maxRetries) {
-      log.warn(`Max retries (${this.maxRetries}) reached, redirecting to home`);
+      console.warn(`Max retries (${this.maxRetries}) reached, redirecting to home`);
       window.location.href = '/';
       return;
     }

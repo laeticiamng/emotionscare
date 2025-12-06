@@ -1,9 +1,7 @@
-// @ts-nocheck
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { logger } from '@/lib/logger';
 
 /**
  * Hook pour récupérer et gérer le contexte utilisateur pour les chats IA
@@ -59,7 +57,7 @@ export function useUserContext() {
           }));
         }
       } catch (error) {
-        logger.error('Erreur lors du chargement du contexte utilisateur', error as Error, 'UI');
+        console.error('Erreur lors du chargement du contexte utilisateur:', error);
       } finally {
         setIsLoading(false);
       }

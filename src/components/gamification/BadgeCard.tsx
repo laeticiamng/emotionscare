@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import React from 'react';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
@@ -44,7 +43,7 @@ const BadgeCard: React.FC<BadgeCardProps> = ({
           )}
 
           {!isEarned && (
-            <div className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-muted-foreground text-background dark:text-foreground">
+            <div className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-muted-foreground text-white">
               <Lock className="h-3 w-3" />
             </div>
           )}

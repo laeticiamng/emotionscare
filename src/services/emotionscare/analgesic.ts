@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 // Routeur et générateur de musique antalgique EmotionsCare
 import { HumeEmotionScore } from './humeClient';
@@ -67,7 +66,7 @@ export async function generateAnalgesicTrack(
   callBackUrl?: string
 ): Promise<{ taskId: string; preset: AnalgesicPreset; emotions: EmotionInput[] }> {
   
-  // Silent: starting analgesic generation
+  console.log(`🎵 EmotionsCare Antalgique: Génération pour texte: "${text.slice(0, 50)}..."`);
   
   try {
     // 1. Analyser les émotions avec Hume AI
@@ -88,11 +87,12 @@ export async function generateAnalgesicTrack(
       arousal: rawEmotions[0]?.score || 0.5
     };
     
-    // Silent: main emotion detected
+    console.log(`🎭 Émotion principale détectée: ${mainEmotion.name} (${mainEmotion.score.toFixed(2)})`);
     
     // 2. Router vers preset antalgique
     const analgesicPreset = ANALGESIC_ROUTER(mainEmotion);
-    // Silent: analgesic preset selected
+    console.log(`💊 Preset antalgique sélectionné: "${analgesicPreset.presetTag}"`);
+    
     // 3. Trouver le preset correspondant
     const preset = PRESETS.find(p => p.tag === analgesicPreset.presetTag);
     if (!preset) {
@@ -102,7 +102,8 @@ export async function generateAnalgesicTrack(
     // 4. Construire le prompt thérapeutique
     const therapeuticPrompt = `${language} | ${preset.style} | mood ${preset.tag} | ${analgesicPreset.extraPrompt} | tempo ${analgesicPreset.tempo} BPM`;
     
-    // Silent: therapeutic prompt generated
+    console.log(`📝 Prompt thérapeutique: "${therapeuticPrompt}"`);
+    
     // 5. Générer avec Suno
     const sunoApiKey = process.env.SUNO_API_KEY;
     if (!sunoApiKey) {
@@ -121,7 +122,7 @@ export async function generateAnalgesicTrack(
       callBackUrl: callBackUrl || ""
     });
     
-    // Silent: analgesic track generated
+    console.log(`✅ Track antalgique généré - Task ID: ${musicResponse.taskId}`);
     
     return {
       taskId: musicResponse.taskId,
@@ -130,7 +131,7 @@ export async function generateAnalgesicTrack(
     };
     
   } catch (error) {
-    // Silent: analgesic generation error logged internally
+    console.error('❌ EmotionsCare Antalgique: Erreur de génération:', error);
     throw new Error(`Génération antalgique échouée: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
   }
 }

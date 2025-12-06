@@ -1,10 +1,7 @@
-// @ts-nocheck
 /**
  * Vérificateur d'accessibilité automatisé
  * Valide la conformité WCAG 2.1 AA des pages
  */
-
-import { logger } from '@/lib/logger';
 
 export interface AccessibilityReport {
   score: number;
@@ -318,10 +315,12 @@ export function useAccessibilityAudit() {
     const report = auditPageAccessibility();
     
     if (import.meta.env.DEV && report.level === 'fail') {
-      logger.warn(`Audit Accessibilité - Score: ${report.score}/100 - Niveau: ${report.level}`, {}, 'SYSTEM');
+      console.group('🔍 Audit Accessibilité');
+      console.warn(`Score: ${report.score}/100 - Niveau: ${report.level}`);
       report.issues.forEach(issue => {
-        logger.warn(`${issue.type.toUpperCase()}: ${issue.description} (${issue.fix})`, {}, 'SYSTEM');
+        console.warn(`${issue.type.toUpperCase()}: ${issue.description} (${issue.fix})`);
       });
+      console.groupEnd();
     }
     
     return report;

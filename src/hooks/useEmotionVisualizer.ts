@@ -1,7 +1,6 @@
-// @ts-nocheck
+
 import { useState, useEffect } from 'react';
 import { EmotionResult } from '@/types/emotion';
-import { logger } from '@/lib/logger';
 
 interface EmotionChartData {
   name: string;
@@ -44,7 +43,7 @@ export function useEmotionVisualizer(emotions: EmotionResult[], timeframe: strin
         setChartData(data);
         setDominantEmotion(data[0]?.name || 'neutral');
       } catch (error) {
-        logger.error('Error processing emotion data', error as Error, 'UI');
+        console.error('Error processing emotion data:', error);
       } finally {
         setLoading(false);
       }

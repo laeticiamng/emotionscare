@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,28 +16,28 @@ const B2CARFiltersPage: React.FC = () => {
       name: 'Sérénité',
       description: 'Filtre apaisant aux tons bleus',
       icon: Heart,
-      color: 'bg-info'
+      color: 'bg-blue-500'
     },
     {
       id: 'joy',
       name: 'Joie',
       description: 'Filtre énergisant aux tons dorés',
       icon: Smile,
-      color: 'bg-warning'
+      color: 'bg-yellow-500'
     },
     {
       id: 'focus',
       name: 'Concentration',
       description: 'Filtre favorisant la focus',
       icon: Sparkles,
-      color: 'bg-accent'
+      color: 'bg-purple-500'
     },
     {
       id: 'energy',
       name: 'Énergie',
       description: 'Filtre dynamisant',
       icon: Palette,
-      color: 'bg-destructive'
+      color: 'bg-red-500'
     }
   ];
 
@@ -90,7 +89,7 @@ const B2CARFiltersPage: React.FC = () => {
               <CardContent>
                 <div className="relative bg-muted rounded-lg overflow-hidden aspect-video">
                   <div className="w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center">
-                    <div className="text-center text-primary-foreground">
+                    <div className="text-center text-white">
                       <Camera className="w-12 h-12 mx-auto mb-4 opacity-50" />
                       <p className="text-sm opacity-75">Caméra AR simulée</p>
                     </div>
@@ -171,7 +170,7 @@ const B2CARFiltersPage: React.FC = () => {
                           <div className={`w-3 h-3 rounded-full ${filter.color}`} />
                           <Icon className="w-4 h-4" />
                           <span className="font-medium">{filter.name}</span>
-                          {isActive && <Badge className="ml-auto text-xs">Actif</Badge>}
+                          {isActive && <Badge size="sm" className="ml-auto">Actif</Badge>}
                         </div>
                         <p className="text-xs text-muted-foreground text-left">
                           {filter.description}

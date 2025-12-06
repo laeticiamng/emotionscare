@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -7,7 +6,6 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Wifi, WifiOff, RefreshCw, Download, Cloud } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
-import { logger } from '@/lib/logger';
 
 interface OfflineData {
   messages: any[];
@@ -66,7 +64,7 @@ const OfflineStatus: React.FC = () => {
         setOfflineData(JSON.parse(data));
       }
     } catch (error) {
-      logger.error('Erreur chargement données hors-ligne', error as Error, 'SYSTEM');
+      console.error('Erreur chargement données hors-ligne:', error);
     }
   };
 
@@ -76,7 +74,7 @@ const OfflineStatus: React.FC = () => {
       setOfflineData(currentData);
       localStorage.setItem('offline-data', JSON.stringify(currentData));
     } catch (error) {
-      logger.error('Erreur sauvegarde données hors-ligne', error as Error, 'SYSTEM');
+      console.error('Erreur sauvegarde données hors-ligne:', error);
     }
   };
 
@@ -105,7 +103,7 @@ const OfflineStatus: React.FC = () => {
         description: "Toutes vos données sont à jour.",
       });
     } catch (error) {
-      logger.error('Erreur synchronisation', error as Error, 'SYSTEM');
+      console.error('Erreur synchronisation:', error);
       toast({
         title: "Erreur de synchronisation",
         description: "Certaines données n'ont pas pu être synchronisées.",
@@ -222,21 +220,21 @@ const OfflineStatus: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           className="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:max-w-sm z-40"
         >
-          <Card className="bg-blue-50 dark:bg-blue-900/30 border-blue-200 dark:border-blue-800">
+          <Card className="bg-blue-50 border-blue-200">
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
-                  <Cloud className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                  <span className="font-semibold text-blue-900 dark:text-blue-100">
+                  <Cloud className="h-5 w-5 text-blue-600" />
+                  <span className="font-semibold text-blue-900">
                     Synchronisation
                   </span>
                 </div>
-                <Badge variant="outline" className="text-blue-700 dark:text-blue-300">
+                <Badge variant="outline" className="text-blue-700">
                   {getPendingCount()} éléments
                 </Badge>
               </div>
-
-              <p className="text-sm text-blue-700 dark:text-blue-300 mb-3">
+              
+              <p className="text-sm text-blue-700 mb-3">
                 Dernière sync : {getLastSyncText()}
               </p>
               

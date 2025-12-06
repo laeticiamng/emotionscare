@@ -1,4 +1,4 @@
-// @ts-nocheck
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,7 +10,6 @@ import { Music, Trophy, ChartLine, Bell, BookOpen, Lightbulb } from 'lucide-reac
 import DashboardContainer from '@/components/dashboard/DashboardContainer';
 import { UserModeSelector } from '@/components/ui/user-mode-selector';
 import { toast } from 'sonner';
-import { logger } from '@/lib/logger';
 
 // Import types from unified auth types
 import type { Challenge } from '@/types/badge';
@@ -89,7 +88,7 @@ const B2BUserDashboard: React.FC = () => {
         
         setIsLoading(false);
       } catch (error) {
-        logger.error('Erreur lors du chargement du tableau de bord :', error);
+        console.error('Erreur lors du chargement du tableau de bord :', error);
         setHasError(true);
         setIsLoading(false);
         toast.error('Impossible de charger les données du tableau de bord', {
@@ -106,8 +105,8 @@ const B2BUserDashboard: React.FC = () => {
     return (
       <DashboardContainer>
         <div className="flex flex-col items-center justify-center p-8">
-          <div className="bg-destructive/10 p-4 rounded-full mb-4">
-            <ChartLine className="h-8 w-8 text-destructive" />
+          <div className="bg-red-100 dark:bg-red-900/20 p-4 rounded-full mb-4">
+            <ChartLine className="h-8 w-8 text-red-600 dark:text-red-400" />
           </div>
           <h2 className="text-2xl font-bold mb-2">Impossible de charger votre tableau de bord</h2>
           <p className="text-muted-foreground mb-6 text-center">

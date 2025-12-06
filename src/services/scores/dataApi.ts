@@ -1,6 +1,5 @@
-// @ts-nocheck
 import { addDays, addWeeks, differenceInCalendarDays, formatISO, getISOWeek, getISOWeekYear, startOfDay, startOfISOWeek, subDays, subWeeks } from 'date-fns';
-import { Sentry } from '@/lib/errors/sentry-compat';
+import * as Sentry from '@sentry/react';
 import { supabase } from '@/integrations/supabase/client';
 
 export type VibeIntensity = 'light' | 'medium' | 'deep';

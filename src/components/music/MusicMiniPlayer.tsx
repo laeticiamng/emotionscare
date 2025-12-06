@@ -1,5 +1,6 @@
+
 import React from 'react';
-import { useMusicCompat } from '@/hooks/useMusicCompat';
+import { useMusic } from '@/hooks/useMusic';
 import { Button } from '@/components/ui/button';
 import { Play, Pause, SkipBack, SkipForward, Volume2, VolumeX } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -9,20 +10,16 @@ interface MusicMiniPlayerProps {
 }
 
 const MusicMiniPlayer: React.FC<MusicMiniPlayerProps> = ({ className }) => {
-  const music = useMusicCompat();
-  const {
-    currentTrack,
-    isPlaying,
-    volume
-  } = music.state;
-
-  const {
-    pause,
+  const { 
+    currentTrack, 
+    isPlaying, 
+    pause, 
     play,
     next,
     previous,
-    setVolume
-  } = music;
+    volume,
+    setVolume 
+  } = useMusic();
 
   const handlePlayPause = () => {
     if (isPlaying) {

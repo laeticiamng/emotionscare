@@ -1,8 +1,6 @@
-// @ts-nocheck
 
 import { useState, useEffect, useCallback } from 'react';
 import { LucideIcon, Home, Clock, Calendar, User, TrendingUp, Activity, BarChart } from 'lucide-react';
-import { logger } from '@/lib/logger';
 
 // Define the return type for clarity
 export interface DashboardKpi {
@@ -106,7 +104,7 @@ export const useDashboardHero = (userId?: string) => {
         setIsLoading(false);
       }, 500);
     } catch (error) {
-      logger.error('Error fetching dashboard data', error as Error, 'SYSTEM');
+      console.error('Error fetching dashboard data:', error);
       setIsLoading(false);
     }
   }, [userId]);

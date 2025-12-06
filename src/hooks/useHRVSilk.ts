@@ -1,7 +1,5 @@
-// @ts-nocheck
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { usePrivacyPrefs } from './usePrivacyPrefs';
-import { logger } from '@/lib/logger';
 
 interface HRVReading {
   rr_intervals: number[]; // RR intervals in milliseconds
@@ -34,7 +32,7 @@ export const useHRVSilk = () => {
   // Connect to HR device
   const connect = useCallback(async () => {
     if (!isSupported) {
-      logger.info('HRV not supported or disabled', undefined, 'SYSTEM');
+      console.log('HRV not supported or disabled');
       return false;
     }
     
@@ -47,7 +45,7 @@ export const useHRVSilk = () => {
         optionalServices: ['heart_rate']
       });
       
-      logger.info('Connecting to HR device', { name: device.name }, 'SYSTEM');
+      console.log('Connecting to HR device:', device.name);
       
       // Connect to GATT server
       const server = await device.gatt!.connect();
@@ -62,11 +60,11 @@ export const useHRVSilk = () => {
       characteristicRef.current = characteristic;
       setIsConnected(true);
       
-      logger.info('HRV device connected', undefined, 'SYSTEM');
+      console.log('HRV device connected');
       return true;
       
     } catch (error: any) {
-      logger.error('Failed to connect to HR device', error as Error, 'SYSTEM');
+      console.error('Failed to connect to HR device:', error);
       setError(error.message);
       return false;
     }
@@ -112,18 +110,18 @@ export const useHRVSilk = () => {
         }
       }
     } catch (error) {
-      logger.warn('Failed to parse HR notification', error, 'SYSTEM');
+      console.warn('Failed to parse HR notification:', error);
     }
   }, []);
   
   // Start HRV recording session
   const startRecording = useCallback(() => {
     if (!isConnected) {
-      logger.warn('Cannot start HRV recording: device not connected', undefined, 'SYSTEM');
+      console.warn('Cannot start HRV recording: device not connected');
       return;
     }
     
-    logger.info('Starting HRV recording', undefined, 'SYSTEM');
+    console.log('Starting HRV recording');
     isRecordingRef.current = true;
     rrIntervalsRef.current = [];
     sessionDataRef.current = { rr_during_ms: [] };
@@ -134,7 +132,7 @@ export const useHRVSilk = () => {
   const stopRecording = useCallback(() => {
     if (!isRecordingRef.current) return;
     
-    logger.info('Stopping HRV recording', undefined, 'SYSTEM');
+    console.log('Stopping HRV recording');
     isRecordingRef.current = false;
     setIsActive(false);
     
@@ -151,9 +149,9 @@ export const useHRVSilk = () => {
         }
         
         deviceRef.current.gatt.disconnect();
-        logger.info('HRV device disconnected', undefined, 'SYSTEM');
+        console.log('HRV device disconnected');
       } catch (error) {
-        logger.error('Error disconnecting device', error as Error, 'SYSTEM');
+        console.error('Error disconnecting device:', error);
       }
     }
     

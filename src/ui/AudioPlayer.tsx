@@ -1,13 +1,11 @@
-// @ts-nocheck
 "use client";
 
 import React from "react";
-import { Sentry } from "@/lib/errors/sentry-compat";
+import * as Sentry from "@sentry/react";
 
 import { useMotionPrefs } from "@/hooks/useMotionPrefs";
 import { clamp01 } from "@/lib/audio/utils";
 import { useSound } from "@/ui/hooks/useSound";
-import { logger } from '@/lib/logger';
 
 export type FavoriteControls = {
   active: boolean;
@@ -161,7 +159,7 @@ export function AudioPlayer({
       try {
         navigator.vibrate?.(10);
       } catch (error) {
-        logger.warn("Haptics unavailable", error, 'UI');
+        console.warn("Haptics unavailable", error);
       }
     }
   }, []);
@@ -217,7 +215,7 @@ export function AudioPlayer({
         await stopPlayback();
       }
     } catch (error) {
-      logger.warn("Audio toggle error", error, 'UI');
+      console.warn("Audio toggle error", error);
       Sentry.captureException(error);
     }
   }, [playing, startPlayback, stopPlayback]);
@@ -339,7 +337,7 @@ export function AudioPlayer({
               try {
                 await favorite?.onToggle?.();
               } catch (error) {
-                logger.warn("Favorite toggle failed", error, 'UI');
+                console.warn("Favorite toggle failed", error);
               }
             }}
             aria-pressed={favoriteActive}

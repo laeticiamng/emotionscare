@@ -1,10 +1,8 @@
-// @ts-nocheck
 import { z } from 'zod';
-import { CONFIG } from './config';
 
 /**
  * Gestion centralisée des variables d'environnement avec validation stricte.
- * Utilise les valeurs hardcodées de CONFIG comme fallback.
+ * Toutes les valeurs sensibles doivent être définies dans les fichiers .env correspondants.
  */
 
 const rawEnv = {
@@ -20,13 +18,12 @@ const rawEnv = {
     import.meta.env.VITE_COMMIT_SHA,
   VITE_SUPABASE_URL:
     import.meta.env.VITE_SUPABASE_URL ??
-    import.meta.env.SUPABASE_URL ??
-    CONFIG.SUPABASE.URL,
+    'https://yaincoxihiqdksxgrsrk.supabase.co',
   VITE_SUPABASE_ANON_KEY:
     import.meta.env.VITE_SUPABASE_ANON_KEY ??
     import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ??
     import.meta.env.SUPABASE_ANON_KEY ??
-    CONFIG.SUPABASE.ANON_KEY,
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhaW5jb3hpaGlxZGtzeGdyc3JrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI4MTE4MjcsImV4cCI6MjA1ODM4NzgyN30.HBfwymB2F9VBvb3uyeTtHBMZFZYXzL0wQmS5fqd65yU',
   VITE_API_URL: import.meta.env.VITE_API_URL,
   VITE_WEB_URL: import.meta.env.VITE_WEB_URL,
   VITE_SENTRY_DSN: import.meta.env.VITE_SENTRY_DSN,
@@ -59,8 +56,12 @@ const envSchema = z.object({
   VITE_APP_VERSION: z.string().optional(),
   VITE_COMMIT_SHA: z.string().optional(),
   VITE_SENTRY_RELEASE: z.string().optional(),
-  VITE_SUPABASE_URL: z.string().url(),
-  VITE_SUPABASE_ANON_KEY: z.string().min(1),
+  VITE_SUPABASE_URL: z
+    .string()
+    .url({ message: 'VITE_SUPABASE_URL doit être définie et contenir une URL valide' }),
+  VITE_SUPABASE_ANON_KEY: z
+    .string()
+    .min(1, { message: 'VITE_SUPABASE_ANON_KEY (ou PUBLISHABLE_KEY) doit être définie et non vide' }),
   VITE_API_URL: z.string().url().optional(),
   VITE_WEB_URL: z.string().url().optional(),
   VITE_SENTRY_DSN: z.string().url().optional(),
@@ -87,7 +88,7 @@ const parsedEnv = envSchema.safeParse(rawEnv);
 
 // Debug info in development
 if (rawEnv.MODE === 'development') {
-  console.debug('[SYSTEM] Raw environment variables', {
+  console.log('🔍 Raw environment variables:', {
     VITE_SUPABASE_URL: rawEnv.VITE_SUPABASE_URL,
     VITE_SUPABASE_ANON_KEY: rawEnv.VITE_SUPABASE_ANON_KEY ? '[SET]' : '[EMPTY]',
     allViteVars: Object.keys(import.meta.env).filter(k => k.startsWith('VITE_'))
@@ -95,9 +96,19 @@ if (rawEnv.MODE === 'development') {
 }
 
 if (!parsedEnv.success) {
-  console.warn('[SYSTEM] ⚠️ Environment validation warnings:', JSON.stringify(parsedEnv.error.flatten().fieldErrors));
-  console.info('[SYSTEM] Using fallback values from CONFIG');
-  // Continue with fallback values from CONFIG instead of throwing
+  console.error('❌ Invalid environment configuration:', parsedEnv.error.flatten().fieldErrors);
+  
+  // In development, provide more helpful error handling
+  if (rawEnv.MODE === 'development') {
+    console.warn('⚠️ Development mode: attempting to continue with available variables...');
+    
+    // Check if we at least have the basic Supabase config
+    if (!rawEnv.VITE_SUPABASE_URL || !rawEnv.VITE_SUPABASE_ANON_KEY) {
+      console.error('❌ Missing critical Supabase configuration. Please check your .env file.');
+    }
+  }
+  
+  throw new Error('Environment validation failed. Vérifiez les variables manquantes ou invalides.');
 }
 
 const env = parsedEnv.data;
@@ -210,11 +221,11 @@ const missingOptionalKeys = Object.entries({
 
 if (missingOptionalKeys.length > 0) {
   const formatted = missingOptionalKeys.map(([key]) => key).join(', ');
-  console.info(`[SYSTEM] Variables d'environnement optionnelles manquantes: ${formatted}`);
+  console.info(`ℹ️ Variables d'environnement optionnelles manquantes: ${formatted}`);
 }
 
 if (IS_DEV) {
-  console.info('[SYSTEM] EmotionsCare Environment', {
+  console.log('🔧 EmotionsCare Environment:', {
     mode: NODE_ENV,
     apiUrl: API_URL,
     webUrl: WEB_URL,

@@ -1,6 +1,4 @@
-// @ts-nocheck
 import { useState, useEffect } from 'react';
-import { logger } from '@/lib/logger';
 
 export const useMicPermission = () => {
   const [permission, setPermission] = useState<'granted' | 'denied' | 'prompt' | 'unknown'>('unknown');
@@ -21,7 +19,7 @@ export const useMicPermission = () => {
       setPermission('granted');
       return true;
     } catch (error) {
-      logger.error('Microphone permission denied', error as Error, 'SYSTEM');
+      console.error('Microphone permission denied:', error);
       setPermission('denied');
       return false;
     }

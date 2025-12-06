@@ -3,8 +3,7 @@ import { useAssess } from '@/hooks/useAssess';
 import { AssessCard } from './AssessCard';
 import { AssessForm } from './AssessForm';
 import { VerbalBadge } from './VerbalBadge';
-import type { Instrument } from './types';
-import { logger } from '@/lib/logger';
+import type { Instrument } from '../../../../packages/contracts/assess';
 
 interface AssessmentWrapperProps {
   instrument: Instrument;
@@ -40,7 +39,7 @@ export function AssessmentWrapper({
       onComplete?.(hints);
     },
     onError: (error) => {
-      logger.error('Assessment error', error as Error, 'UI');
+      console.error('Assessment error:', error);
       // Rester sur le formulaire en cas d'erreur
       // Les toasts sont gérés par le hook
     }
@@ -51,7 +50,7 @@ export function AssessmentWrapper({
     setView('form');
   };
 
-  const handleSubmit = (answers: Array<{id: string, value: number}>, meta?: Record<string, unknown>) => {
+  const handleSubmit = (answers: Array<{id: string, value: number}>, meta?: any) => {
     if (assess.currentSession) {
       assess.submit(assess.currentSession.session_id, answers, meta);
     }

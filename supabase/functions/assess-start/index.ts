@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { serve } from '../_shared/serve.ts';
 import { z } from '../_shared/zod.ts';
 
@@ -45,8 +44,6 @@ function isInstrumentEnabled(instrument: InstrumentCode): boolean {
 }
 
 async function ensureClinicalOptIn(userId: string, instrument: InstrumentCode): Promise<ConsentResult> {
-  console.log('[assess-start] Checking consent for', { userId: userId.substring(0, 8), instrument });
-  
   const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
   const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
 
@@ -81,11 +78,9 @@ async function ensureClinicalOptIn(userId: string, instrument: InstrumentCode): 
   }
 
   if (!data) {
-    console.log('[assess-start] No consent found');
     return { status: 403, error: 'optin_required' };
   }
 
-  console.log('[assess-start] Consent verified');
   return { status: 200 };
 }
 
@@ -110,8 +105,6 @@ function etagMatches(request: Request, etag: string): boolean {
 }
 
 serve(async (req) => {
-  console.log('[assess-start] Request received:', req.method, req.url);
-  
   const startedAt = Date.now();
   const cors = resolveCors(req);
   let hashedUserId: string | null = null;
@@ -120,7 +113,6 @@ serve(async (req) => {
     response: Response,
     metadata: { outcome?: 'success' | 'error' | 'denied'; stage?: string | null; error?: string | null } = {},
   ) => {
-    console.log('[assess-start] Finalizing', metadata);
     await recordEdgeLatencyMetric({
       route: 'assess-start',
       durationMs: Date.now() - startedAt,
@@ -134,12 +126,10 @@ serve(async (req) => {
   };
 
   if (req.method === 'OPTIONS') {
-    console.log('[assess-start] OPTIONS request');
     return finalize(applySecurityHeaders(preflightResponse(cors), { cacheControl: 'no-store' }));
   }
 
   if (!cors.allowed) {
-    console.log('[assess-start] CORS rejected');
     return finalize(applySecurityHeaders(rejectCors(cors), { cacheControl: 'no-store' }), {
       outcome: 'denied',
       error: 'origin_not_allowed',
@@ -148,7 +138,6 @@ serve(async (req) => {
   }
 
   if (req.method !== 'POST') {
-    console.log('[assess-start] Method not allowed:', req.method);
     const response = appendCorsHeaders(json(405, { error: 'method_not_allowed' }), cors);
     return finalize(applySecurityHeaders(response, { cacheControl: 'no-store' }), {
       outcome: 'denied',
@@ -158,11 +147,8 @@ serve(async (req) => {
   }
 
   try {
-    console.log('[assess-start] Authenticating...');
     const auth = await authenticateRequest(req);
-    
     if (auth.status !== 200 || !auth.user) {
-      console.log('[assess-start] Auth failed:', auth.status, auth.error);
       if (auth.status === 401 || auth.status === 403) {
         await logUnauthorizedAccess(req, auth.error ?? 'unauthorized');
       }
@@ -174,10 +160,8 @@ serve(async (req) => {
       });
     }
 
-    console.log('[assess-start] User authenticated:', auth.user.id.substring(0, 8));
     hashedUserId = hash(auth.user.id);
 
-    console.log('[assess-start] Checking rate limit...');
     const rateDecision = await enforceEdgeRateLimit(req, {
       route: 'assess-start',
       userId: auth.user.id,
@@ -187,7 +171,6 @@ serve(async (req) => {
     });
 
     if (!rateDecision.allowed) {
-      console.log('[assess-start] Rate limited');
       addSentryBreadcrumb({
         category: 'assess',
         message: 'assess:start:rate_limited',
@@ -201,10 +184,8 @@ serve(async (req) => {
       });
     }
 
-    console.log('[assess-start] Parsing body...');
     const body = await req.json().catch(() => null);
     if (!body) {
-      console.log('[assess-start] Invalid body');
       const response = appendCorsHeaders(json(422, { error: 'invalid_body' }), cors);
       return finalize(applySecurityHeaders(response, { cacheControl: 'no-store' }), {
         outcome: 'denied',
@@ -215,7 +196,6 @@ serve(async (req) => {
 
     const parsed = requestSchema.safeParse(body);
     if (!parsed.success) {
-      console.log('[assess-start] Validation failed:', parsed.error);
       const response = appendCorsHeaders(json(422, { error: 'invalid_body' }), cors);
       return finalize(applySecurityHeaders(response, { cacheControl: 'no-store' }), {
         outcome: 'denied',
@@ -227,8 +207,6 @@ serve(async (req) => {
     const instrument = parsed.data.instrument as InstrumentCode;
     const locale = (parsed.data.locale ?? 'fr') as LocaleCode;
 
-    console.log('[assess-start] Request validated:', { instrument, locale });
-
     addSentryBreadcrumb({
       category: 'assess',
       message: 'assess:start.request',
@@ -236,7 +214,6 @@ serve(async (req) => {
     });
 
     if (!isInstrumentEnabled(instrument)) {
-      console.log('[assess-start] Instrument disabled:', instrument);
       const response = appendCorsHeaders(json(404, { error: 'instrument_disabled' }), cors);
       return finalize(applySecurityHeaders(response, { cacheControl: 'no-store' }), {
         outcome: 'denied',
@@ -245,10 +222,8 @@ serve(async (req) => {
       });
     }
 
-    console.log('[assess-start] Checking clinical opt-in...');
     const consent = await ensureClinicalOptIn(auth.user.id, instrument);
     if (consent.status !== 200) {
-      console.log('[assess-start] Consent check failed:', consent);
       const response = appendCorsHeaders(json(consent.status, { error: consent.error }), cors);
       return finalize(applySecurityHeaders(response, { cacheControl: 'no-store' }), {
         outcome: 'denied',
@@ -257,11 +232,9 @@ serve(async (req) => {
       });
     }
 
-    console.log('[assess-start] Getting catalog...');
-    let catalog: any;
+  let catalog: any;
     try {
       catalog = getCatalog(instrument, locale);
-      console.log('[assess-start] Catalog loaded');
     } catch (error) {
       console.error('[assess-start] failed to resolve catalog', { instrument, locale, error });
       const response = appendCorsHeaders(json(500, { error: 'internal_error' }), cors);
@@ -275,7 +248,6 @@ serve(async (req) => {
     const etag = await computeEtag(catalog);
 
     if (etagMatches(req, etag)) {
-      console.log('[assess-start] Etag matches, returning 304');
       const response = appendCorsHeaders(new Response(null, { status: 304 }), cors);
       const secured = applySecurityHeaders(response, {
         cacheControl: CACHE_CONTROL,
@@ -300,7 +272,6 @@ serve(async (req) => {
       details: `instrument=${instrument} locale=${locale}`,
     });
 
-    console.log('[assess-start] Returning catalog');
     const response = appendCorsHeaders(json(200, catalog), cors);
     const secured = applySecurityHeaders(response, {
       cacheControl: CACHE_CONTROL,
@@ -308,8 +279,8 @@ serve(async (req) => {
     });
     return finalize(secured, { outcome: 'success', stage: 'catalog_served' });
   } catch (error) {
-    console.error('[assess-start] unexpected error', { message: error instanceof Error ? error.message : 'unknown', stack: error instanceof Error ? error.stack : undefined });
     captureSentryException(error, { route: 'assess-start' });
+    console.error('[assess-start] unexpected error', { message: error instanceof Error ? error.message : 'unknown' });
     const response = appendCorsHeaders(json(500, { error: 'internal_error' }), cors);
     return finalize(applySecurityHeaders(response, { cacheControl: 'no-store' }), {
       outcome: 'error',

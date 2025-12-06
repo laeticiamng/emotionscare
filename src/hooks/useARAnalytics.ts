@@ -1,8 +1,6 @@
-// @ts-nocheck
 import { useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { usePrivacyPrefs } from './usePrivacyPrefs';
-import { logger } from '@/lib/logger';
 
 interface AnalyticsEvent {
   event_type: string;
@@ -15,7 +13,7 @@ export const useARAnalytics = () => {
   const track = useCallback(async (eventType: string, eventData?: Record<string, any>) => {
     // Respect privacy preferences
     if (!prefs.analytics) {
-      logger.info('Analytics disabled by user preference', {}, 'ANALYTICS');
+      console.log('Analytics disabled by user preference');
       return;
     }
 
@@ -29,7 +27,7 @@ export const useARAnalytics = () => {
       });
     } catch (error) {
       // Analytics errors should not affect UX
-      logger.warn('Analytics tracking failed', error, 'ANALYTICS');
+      console.warn('Analytics tracking failed:', error);
     }
   }, [prefs.analytics]);
 
@@ -49,7 +47,7 @@ export const useARAnalytics = () => {
         }
       });
     } catch (error) {
-      logger.warn('Face filter tracking failed', error, 'ANALYTICS');
+      console.warn('Face filter tracking failed:', error);
     }
   }, []);
 
@@ -67,7 +65,7 @@ export const useARAnalytics = () => {
         }
       });
     } catch (error) {
-      logger.warn('HR tracking failed', error, 'ANALYTICS');
+      console.warn('HR tracking failed:', error);
     }
   }, []);
 

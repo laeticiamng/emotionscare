@@ -1,55 +1,14 @@
-import React, { useState, useEffect } from 'react';
+
+import React from 'react';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
-import { useTheme, Theme } from '@/providers/theme';
+import { useTheme } from '@/components/theme-provider';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Moon, Sun, Monitor, PenTool } from 'lucide-react';
-
-type FontSize = 'sm' | 'md' | 'lg' | 'xl';
-type FontFamily = 'sans' | 'serif' | 'mono' | 'rounded';
-
-const FONT_SIZE_KEY = 'emotionscare-font-size';
-const FONT_FAMILY_KEY = 'emotionscare-font-family';
+import { FontSize, FontFamily, ThemeName } from '@/types/theme';
 
 const ThemeSettingsForm = () => {
-  const { theme, setTheme } = useTheme();
-
-  // Local state for font size and family (not part of ThemeProvider)
-  const [fontSize, setFontSizeState] = useState<FontSize>(() => {
-    if (typeof window === 'undefined') return 'md';
-    return (localStorage.getItem(FONT_SIZE_KEY) as FontSize) || 'md';
-  });
-
-  const [fontFamily, setFontFamilyState] = useState<FontFamily>(() => {
-    if (typeof window === 'undefined') return 'sans';
-    return (localStorage.getItem(FONT_FAMILY_KEY) as FontFamily) || 'sans';
-  });
-
-  // Persist font size to localStorage and apply to document
-  const setFontSize = (size: FontSize) => {
-    setFontSizeState(size);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(FONT_SIZE_KEY, size);
-      document.documentElement.setAttribute('data-font-size', size);
-    }
-  };
-
-  // Persist font family to localStorage and apply to document
-  const setFontFamily = (family: FontFamily) => {
-    setFontFamilyState(family);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(FONT_FAMILY_KEY, family);
-      document.documentElement.setAttribute('data-font-family', family);
-    }
-  };
-
-  // Apply settings on mount
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      document.documentElement.setAttribute('data-font-size', fontSize);
-      document.documentElement.setAttribute('data-font-family', fontFamily);
-    }
-  }, [fontSize, fontFamily]);
+  const { theme, setTheme, fontSize, setFontSize, fontFamily, setFontFamily } = useTheme();
 
   return (
     <div className="space-y-6">
@@ -63,7 +22,7 @@ const ThemeSettingsForm = () => {
         <CardContent>
           <RadioGroup
             value={theme}
-            onValueChange={(value) => setTheme(value as Theme)}
+            onValueChange={(value) => setTheme(value as ThemeName)}
             className="grid grid-cols-2 sm:grid-cols-4 gap-2"
           >
             <div className="flex items-center space-x-2">

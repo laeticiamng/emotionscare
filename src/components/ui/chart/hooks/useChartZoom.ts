@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import { useState, useCallback, RefObject } from 'react';
 

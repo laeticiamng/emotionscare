@@ -1,7 +1,5 @@
-// @ts-nocheck
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { logger } from '@/lib/logger';
 
 interface UseAutoRefreshOptions {
   onRefresh: () => Promise<any>;
@@ -48,7 +46,7 @@ export function useAutoRefresh({
     try {
       await onRefresh();
     } catch (error) {
-      logger.error('Auto-refresh failed', error as Error, 'SYSTEM');
+      console.error('Auto-refresh failed:', error);
     } finally {
       setRefreshing(false);
     }

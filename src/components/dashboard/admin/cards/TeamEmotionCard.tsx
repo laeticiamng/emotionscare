@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -42,7 +41,7 @@ const TeamEmotionCard: React.FC<TeamEmotionCardProps> = ({
                   styles={buildStyles({
                     pathColor: dominantEmotion.color,
                     textColor: dominantEmotion.color,
-                    trailColor: 'hsl(var(--muted))'
+                    trailColor: '#e2e8f0'
                   })}
                 />
               </div>

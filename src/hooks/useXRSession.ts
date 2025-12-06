@@ -1,7 +1,5 @@
-// @ts-nocheck
 import { useState, useEffect } from 'react';
 import { useVRBreathStore } from '@/store/vrbreath.store';
-import { logger } from '@/lib/logger';
 
 export const useXRSession = () => {
   const { xrSupported, inXR, setXRSupported, setInXR } = useVRBreathStore();
@@ -19,7 +17,7 @@ export const useXRSession = () => {
             setXrSystem(navigator.xr);
           }
         } catch (error) {
-          logger.warn('XR support check failed', error as Error, 'VR');
+          console.warn('XR support check failed:', error);
           setXRSupported(false);
         }
       } else {
@@ -32,7 +30,7 @@ export const useXRSession = () => {
 
   const enterXR = async () => {
     if (!xrSystem || !xrSupported) {
-      logger.warn('XR not supported or system not available', {}, 'VR');
+      console.warn('XR not supported or system not available');
       return;
     }
 
@@ -45,7 +43,7 @@ export const useXRSession = () => {
         window.gtag('event', 'vrbreath_enter');
       }
     } catch (error) {
-      logger.error('Failed to enter XR', error as Error, 'VR');
+      console.error('Failed to enter XR:', error);
       setInXR(false);
     }
   };

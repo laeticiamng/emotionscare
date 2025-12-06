@@ -24,16 +24,20 @@ export function toastError(error: AppError) {
   toast(title, {
     description,
     duration: 4000,
+    ariaProps: {
+      role: 'status',
+      'aria-live': 'polite',
+    },
   });
 }
 
 function resolveDescription(error: AppError): string | undefined {
   if (error.code === 'RATE_LIMIT') {
-    return i18n.t('tryAgain', { ns: 'errors' });
+    return i18n.t('errors.tryAgain');
   }
 
   if (error.code === 'SERVER' || error.code === 'NETWORK' || error.code === 'TIMEOUT') {
-    return i18n.t('tryAgain', { ns: 'errors' });
+    return i18n.t('errors.tryAgain');
   }
 
   return undefined;

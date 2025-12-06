@@ -1,6 +1,5 @@
-// @ts-nocheck
 import { supabase } from '@/integrations/supabase/client'
-import { Sentry } from '@/lib/errors/sentry-compat'
+import * as Sentry from '@sentry/react'
 import sanitizeHtml from 'sanitize-html'
 import {
   FeedQuerySchema,
@@ -25,6 +24,7 @@ type JournalRow = {
   created_at?: string | null
   updated_at?: string | null
   mode?: string | null
+  is_voice?: boolean | null
 }
 
 const sanitizePlainText = (value: string) =>
@@ -69,7 +69,7 @@ const mapRowToNote = (row: JournalRow): SanitizedNote => {
     row.content ?? row.text_content ?? row.transcript ?? ''
   const text = sanitizePlainText(typeof rawText === 'string' ? rawText : String(rawText))
   const tags = sanitizeTags(row.tags)
-  const mode = row.mode ?? 'text'
+  const mode = row.mode ?? (row.is_voice ? 'voice' : 'text')
   return SanitizedNoteSchema.parse({
     id: row.id,
     text,
@@ -205,7 +205,7 @@ export async function listFeed(query: Partial<FeedQuery> = {}): Promise<Sanitize
 
   let request = supabase
     .from('journal_entries')
-    .select('id, content, text_content, transcript, summary, tags, created_at, mode')
+    .select('id, content, text_content, transcript, summary, tags, created_at, mode, is_voice')
     .order('created_at', { ascending: false })
 
   if (q.q) {

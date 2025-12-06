@@ -1,9 +1,7 @@
-// @ts-nocheck
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { captureException } from '@/lib/ai-monitoring';
+import * as Sentry from '@sentry/react';
 
 import { addBreadcrumb } from '@/lib/obs/breadcrumb';
-import { logger } from '@/lib/logger';
 
 import { startAssessment, submitAssessment, type AssessmentStartResponse } from './api';
 
@@ -200,7 +198,7 @@ export function useAssessment(instrument: string): UseAssessmentResult {
               window.localStorage.setItem(LEVEL_STORAGE_KEY(instrument), String(inferred));
             }
           } catch (storageError) {
-            logger.warn('[useAssessment] unable to persist AAQ summary', storageError as Error, 'SYSTEM');
+            console.warn('[useAssessment] unable to persist AAQ summary', storageError);
           }
         }
 

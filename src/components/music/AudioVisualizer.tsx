@@ -1,5 +1,5 @@
+
 import React, { useEffect, useRef, useState } from 'react';
-import { logger } from '@/lib/logger';
 import { Play, Pause, Volume2, VolumeX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
@@ -34,7 +34,7 @@ const AudioVisualizer: React.FC<AudioVisualizerProps> = ({
   const animationRef = useRef<number>();
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
-  const dataArrayRef = useRef<Uint8Array<ArrayBuffer> | null>(null);
+  const dataArrayRef = useRef<Uint8Array | null>(null);
   
   // Initialize audio on mount
   useEffect(() => {
@@ -52,7 +52,7 @@ const AudioVisualizer: React.FC<AudioVisualizerProps> = ({
     // Clean up on unmount
     return () => {
       if (audioContextRef.current) {
-        audioContextRef.current.close().catch((err) => logger.error('Error closing audio context', err as Error, 'MUSIC'));
+        audioContextRef.current.close().catch(console.error);
       }
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
@@ -98,13 +98,13 @@ const AudioVisualizer: React.FC<AudioVisualizerProps> = ({
         try {
           await audioRef.current.play();
         } catch (err) {
-          logger.error('Autoplay prevented', err as Error, 'MUSIC');
+          console.error('Autoplay prevented:', err);
           setLocalIsPlaying(false);
         }
       }
     };
     
-    setupAudio().catch((err) => logger.error('Error setting up audio', err as Error, 'MUSIC'));
+    setupAudio().catch(console.error);
   }, [audioUrl]);
   
   // Sync with isPlaying prop
@@ -130,7 +130,7 @@ const AudioVisualizer: React.FC<AudioVisualizerProps> = ({
     
     if (localIsPlaying) {
       audioRef.current.play().catch(err => {
-        logger.error('Play error', err as Error, 'MUSIC');
+        console.error('Play error:', err);
         setLocalIsPlaying(false);
       });
       visualize();

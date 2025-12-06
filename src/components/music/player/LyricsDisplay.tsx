@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Type, Download, Share2, Heart } from 'lucide-react';
-import { useMusicCompat } from '@/hooks/useMusicCompat';
+import { useMusic } from '@/hooks/useMusic';
 import { cn } from '@/lib/utils';
 
 interface LyricLine {
@@ -35,7 +35,7 @@ const mockLyrics: LyricLine[] = [
 ];
 
 const LyricsDisplay: React.FC<LyricsDisplayProps> = ({ className }) => {
-  const { currentTrack, isPlaying } = useMusicCompat().state;
+  const { currentTrack, isPlaying } = useMusic();
   const [currentTime, setCurrentTime] = useState(0);
   const [showTranslation, setShowTranslation] = useState(false);
   const [fontSize, setFontSize] = useState('md');

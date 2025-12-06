@@ -3,12 +3,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Maximize2, Minimize2, Settings, Palette, Sparkles, Waves } from 'lucide-react';
-import { useMusicCompat } from '@/hooks/useMusicCompat';
+import { useMusic } from '@/hooks/useMusic';
 import { cn } from '@/lib/utils';
 import ThreeDVisualizer from './ThreeDVisualizer';
 import AmbientBackground from './AmbientBackground';
 import PremiumMusicPlayer from './PremiumMusicPlayer';
-import { logger } from '@/lib/logger';
 
 interface ImmersiveFullscreenPlayerProps {
   className?: string;
@@ -20,7 +19,7 @@ const ImmersiveFullscreenPlayer: React.FC<ImmersiveFullscreenPlayerProps> = ({ c
   const [showControls, setShowControls] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
   const hideControlsTimeoutRef = useRef<NodeJS.Timeout>();
-  const { currentTrack, isPlaying } = useMusicCompat().state;
+  const { currentTrack, isPlaying } = useMusic();
 
   // Gestion du mode plein écran
   const enterFullscreen = async () => {
@@ -29,7 +28,7 @@ const ImmersiveFullscreenPlayer: React.FC<ImmersiveFullscreenPlayerProps> = ({ c
         await containerRef.current.requestFullscreen();
         setIsFullscreen(true);
       } catch (error) {
-        logger.info('Fullscreen not supported');
+        console.log('Fullscreen not supported');
       }
     }
   };
@@ -39,7 +38,7 @@ const ImmersiveFullscreenPlayer: React.FC<ImmersiveFullscreenPlayerProps> = ({ c
       await document.exitFullscreen();
       setIsFullscreen(false);
     } catch (error) {
-      logger.info('Exit fullscreen error');
+      console.log('Exit fullscreen error');
     }
   };
 

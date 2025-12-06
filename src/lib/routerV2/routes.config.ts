@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { ROUTES_REGISTRY } from '../../routerV2/registry';
 import type { RouteMeta } from '../../routerV2/schema';
 import type { Guard, Role, RouteDef, Segment } from './types';

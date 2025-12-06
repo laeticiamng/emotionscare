@@ -1,4 +1,3 @@
-// @ts-nocheck
 import type { Who5Tone } from '@/features/orchestration/useWho5Orchestration';
 
 export type DashboardCardId =

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -12,7 +11,6 @@ import {
 } from 'lucide-react';
 import { useRouter } from '@/hooks/router';
 import { useUserMode } from '@/contexts/UserModeContext';
-import { logger } from '@/lib/logger';
 
 const QUICK_ACTIONS = [
   {
@@ -21,7 +19,7 @@ const QUICK_ACTIONS = [
     title: 'Flash Glow',
     subtitle: '60 secondes d\'énergie',
     path: 'flash-glow',
-    color: 'bg-warning/10 text-warning hover:bg-warning/20'
+    color: 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200'
   },
   {
     key: 'screen_silk',
@@ -29,7 +27,7 @@ const QUICK_ACTIONS = [
     title: 'Screen-Silk',
     subtitle: 'Micro-pause 90s',
     path: 'screen-silk',
-    color: 'bg-primary/10 text-primary hover:bg-primary/20'
+    color: 'bg-blue-100 text-blue-700 hover:bg-blue-200'
   },
   {
     key: 'journal',
@@ -37,7 +35,7 @@ const QUICK_ACTIONS = [
     title: 'Journal',
     subtitle: 'Écrire une note',
     path: 'journal',
-    color: 'bg-accent/10 text-accent hover:bg-accent/20'
+    color: 'bg-purple-100 text-purple-700 hover:bg-purple-200'
   },
   {
     key: 'music',
@@ -45,7 +43,7 @@ const QUICK_ACTIONS = [
     title: 'Musicothérapie',
     subtitle: 'Session adaptée',
     path: 'music',
-    color: 'bg-accent/10 text-accent hover:bg-accent/20'
+    color: 'bg-pink-100 text-pink-700 hover:bg-pink-200'
   },
   {
     key: 'boss_grit',
@@ -53,7 +51,7 @@ const QUICK_ACTIONS = [
     title: 'Boss Grit',
     subtitle: 'Défi motivation',
     path: 'boss-grit',
-    color: 'bg-warning/10 text-warning hover:bg-warning/20'
+    color: 'bg-orange-100 text-orange-700 hover:bg-orange-200'
   },
   {
     key: 'vr_breath',
@@ -61,7 +59,7 @@ const QUICK_ACTIONS = [
     title: 'VR Respiration',
     subtitle: 'Immersion calme',
     path: 'vr-breath',
-    color: 'bg-success/10 text-success hover:bg-success/20'
+    color: 'bg-green-100 text-green-700 hover:bg-green-200'
   }
 ];
 
@@ -83,7 +81,7 @@ export const QuickActions: React.FC = () => {
     router.push(fullPath);
     
     // Analytics tracking would go here
-    logger.info('Quick action clicked:', { path });
+    console.log('Quick action clicked:', path);
   };
 
   return (

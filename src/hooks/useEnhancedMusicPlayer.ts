@@ -1,11 +1,11 @@
+
 import { useState, useCallback, useEffect } from 'react';
-import { useMusicCompat } from '@/hooks/useMusicCompat';
+import { useMusic } from '@/hooks/useMusic';
 import { MusicTrack } from '@/types/music';
 import { toast } from '@/hooks/use-toast';
 
 export const useEnhancedMusicPlayer = () => {
-  const music = useMusicCompat();
-  const { isPlaying } = music.state;
+  const music = useMusic();
   const [isExpanded, setIsExpanded] = useState(false);
   const [visualizerEnabled, setVisualizerEnabled] = useState(true);
   const [keyboardShortcutsEnabled, setKeyboardShortcutsEnabled] = useState(true);
@@ -41,7 +41,7 @@ export const useEnhancedMusicPlayer = () => {
   }, [keyboardShortcutsEnabled, isExpanded]);
 
   const togglePlayer = useCallback(() => {
-    if (isPlaying) {
+    if (music.isPlaying) {
       music.pause();
       toast({
         title: "Lecture mise en pause",
@@ -54,7 +54,7 @@ export const useEnhancedMusicPlayer = () => {
         duration: 1000
       });
     }
-  }, [isPlaying, music]);
+  }, [music]);
 
   const playTrackWithFeedback = useCallback((track: MusicTrack) => {
     music.play(track);
@@ -82,8 +82,7 @@ export const useEnhancedMusicPlayer = () => {
   }, [music]);
 
   return {
-    // État du lecteur (spread state and methods from useMusicCompat)
-    ...music.state,
+    // État du lecteur
     ...music,
     isExpanded,
     setIsExpanded,
@@ -91,7 +90,7 @@ export const useEnhancedMusicPlayer = () => {
     setVisualizerEnabled,
     keyboardShortcutsEnabled,
     setKeyboardShortcutsEnabled,
-
+    
     // Actions avec feedback
     togglePlayer,
     playTrackWithFeedback,

@@ -1,7 +1,6 @@
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import PageHeader from "@/components/ui/PageHeader";
-import { logger } from '@/lib/logger';
 import {
   Card,
   CardHeader,
@@ -19,7 +18,7 @@ import { Heart, Music2, Sparkles } from "lucide-react";
 import { useFlags } from "@/core/flags";
 import { useAssessment } from "@/hooks/useAssessment";
 import useCurrentMood from "@/hooks/useCurrentMood";
-import { useMusicFavorites } from "@/hooks/useMusicFavorites";
+import useMusicFavorites from "@/hooks/useMusicFavorites";
 import { useAdaptivePlayback } from "@/hooks/music/useAdaptivePlayback";
 import {
   requestMoodPlaylist,
@@ -123,11 +122,11 @@ const describeTrend = (summary: PomsTrendSummary | null): string => {
   return "Le ressenti reste stable, la sélection conserve cette caresse sonore.";
 };
 
-const TrackCard = React.memo<{
+const TrackCard: React.FC<{
   track: MoodPlaylistTrack;
   active: boolean;
   onSelect: () => void;
-}>(({ track, active, onSelect }) => {
+}> = ({ track, active, onSelect }) => {
   return (
     <li className="flex flex-col gap-3 rounded-lg border border-muted/60 bg-background/50 p-4 shadow-sm">
       <div className="flex items-center justify-between">
@@ -162,7 +161,7 @@ const TrackCard = React.memo<{
       </div>
     </li>
   );
-});
+};
 
 const AdaptiveMusicPage: React.FC = () => {
   const { has } = useFlags();
@@ -296,19 +295,16 @@ const AdaptiveMusicPage: React.FC = () => {
     if (!selectedTrack) return undefined;
     return {
       active: favorites.isFavorite(selectedTrack.id),
-      onToggle: () => favorites.toggleFavorite({
-        id: selectedTrack.id,
-        title: selectedTrack.title,
-        artist: selectedTrack.artist || 'Unknown',
-        url: selectedTrack.url,
-        audioUrl: selectedTrack.url,
-        duration: selectedTrack.duration || 0,
-      }),
-      busy: false,
+      onToggle: () =>
+        favorites.toggleFavorite(selectedTrack.id, recommendation.presetId, {
+          title: selectedTrack.title,
+          url: selectedTrack.url,
+        }),
+      busy: favorites.isToggling,
       addLabel: "Garder cette bulle",
       removeLabel: "Retirer de mes bulles",
     };
-  }, [favorites, selectedTrack]);
+  }, [favorites, recommendation.presetId, selectedTrack]);
 
   React.useEffect(() => {
     if (!pomsOptIn) return;
@@ -326,7 +322,7 @@ const AdaptiveMusicPage: React.FC = () => {
       try {
         await pomsAssessment.submit({ moment: "pre", tension: values.tension, fatigue: values.fatigue });
       } catch (error) {
-        logger.warn("[adaptive-music] unable to store pre POMS", error, 'MUSIC');
+        console.warn("[adaptive-music] unable to store pre POMS", error);
       }
     },
     [pomsAssessment],
@@ -342,10 +338,10 @@ const AdaptiveMusicPage: React.FC = () => {
       try {
         await pomsAssessment.submit({ moment: "post", tension: values.tension, fatigue: values.fatigue });
       } catch (error) {
-        logger.warn("[adaptive-music] unable to store post POMS", error, 'MUSIC');
+        console.warn("[adaptive-music] unable to store post POMS", error);
       }
     },
-    [pomsAssessment, prePoms, buildSummary],
+    [pomsAssessment, prePoms],
   );
 
   const presetDetail = PRESET_DETAILS[recommendation.presetId];
@@ -367,9 +363,7 @@ const AdaptiveMusicPage: React.FC = () => {
     );
   }
 
-  const favoriteEntries = playlist?.tracks
-    .filter(track => favorites.favorites.includes(track.id))
-    .slice(0, 3) ?? [];
+  const favoriteEntries = favorites.favorites.slice(0, 3);
   const resumeTrack = playback.snapshot && playlist?.tracks.find(track => track.id === playback.snapshot?.trackId);
 
   return (
@@ -493,7 +487,7 @@ const AdaptiveMusicPage: React.FC = () => {
                 <ul className="mt-2 space-y-2 text-sm">
                   {favoriteEntries.map(entry => (
                     <li
-                      key={entry.id}
+                      key={entry.trackId}
                       className="rounded-md border bg-background px-3 py-2 text-xs text-muted-foreground"
                     >
                       <span className="block font-medium text-foreground">

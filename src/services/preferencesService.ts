@@ -1,8 +1,6 @@
-// @ts-nocheck
 
 import { UserPreferences } from '@/types/preferences';
 import { supabase } from '@/integrations/supabase/client';
-import { logger } from '@/lib/logger';
 
 export class PreferencesService {
   /**
@@ -17,7 +15,7 @@ export class PreferencesService {
 
       if (error) throw error;
     } catch (error) {
-      logger.error('Error saving preferences', error as Error, 'SYSTEM');
+      console.error('Error saving preferences:', error);
       throw error;
     }
   }
@@ -36,7 +34,7 @@ export class PreferencesService {
       if (error) throw error;
       return data?.preferences || null;
     } catch (error) {
-      logger.error('Error loading preferences', error as Error, 'SYSTEM');
+      console.error('Error loading preferences:', error);
       return null;
     }
   }
@@ -60,7 +58,7 @@ export class PreferencesService {
 
       if (error) throw error;
     } catch (error) {
-      logger.error('Error deleting preferences', error as Error, 'SYSTEM');
+      console.error('Error deleting preferences:', error);
       throw error;
     }
   }

@@ -1,57 +1,20 @@
-// @ts-nocheck
-/**
- * metrics - Collecte de métriques anonymisées
- *
- * 🔒 SÉCURISÉ: Auth multi-rôle + Rate limit 60/min + CORS restrictif
- */
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { authorizeRole } from '../_shared/auth.ts';
-import { cors, preflightResponse, rejectCors } from '../_shared/cors.ts';
-import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.43.4';
 
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
 const supabaseServiceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+
 const supabase = createClient(supabaseUrl, supabaseServiceRoleKey);
 
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
 serve(async (req) => {
-  const corsResult = cors(req);
-  const corsHeaders = {
-    ...corsResult.headers,
-    'X-Content-Type-Options': 'nosniff',
-    'X-Frame-Options': 'DENY',
-  };
-
   if (req.method === 'OPTIONS') {
-    return preflightResponse(corsResult);
-  }
-
-  if (!corsResult.allowed) {
-    return rejectCors(corsResult);
-  }
-
-  const { user, status } = await authorizeRole(req, ['b2c', 'b2b_user', 'b2b_admin', 'admin']);
-  if (!user) {
-    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-      status,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
-  }
-
-  const rateLimit = await enforceEdgeRateLimit(req, {
-    route: 'metrics',
-    userId: user.id,
-    limit: 60,
-    windowMs: 60_000,
-    description: 'Metrics collection',
-  });
-
-  if (!rateLimit.allowed) {
-    return buildRateLimitResponse(rateLimit, corsHeaders, {
-      errorCode: 'rate_limit_exceeded',
-      message: `Trop de requêtes. Réessayez dans ${rateLimit.retryAfterSeconds}s.`,
-    });
+    return new Response(null, { headers: corsHeaders });
   }
 
   try {
@@ -146,11 +109,10 @@ serve(async (req) => {
         );
     }
 
-  } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
-    console.error('Error in metrics function:', error)
+  } catch (error) {
+    console.error('Error in metrics function:', error);
     return new Response(
-      JSON.stringify({ error: errorMessage }),
+      JSON.stringify({ error: error.message }),
       {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

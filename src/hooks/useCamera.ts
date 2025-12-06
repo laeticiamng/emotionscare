@@ -1,7 +1,5 @@
-// @ts-nocheck
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useARStore } from '@/store/ar.store';
-import { logger } from '@/lib/logger';
 
 interface CameraConstraints {
   video: {
@@ -21,18 +19,13 @@ export const useCamera = () => {
 
   // Get available camera devices
   const getDevices = useCallback(async () => {
-    // Vérification SSR
-    if (typeof navigator === 'undefined' || !navigator.mediaDevices) {
-      return [];
-    }
-
     try {
       const mediaDevices = await navigator.mediaDevices.enumerateDevices();
       const videoDevices = mediaDevices.filter(device => device.kind === 'videoinput');
       setDevices(videoDevices);
       return videoDevices;
     } catch (error) {
-      logger.error('Error enumerating devices', error as Error, 'UI');
+      console.error('Error enumerating devices:', error);
       store.setError('Failed to enumerate camera devices');
       return [];
     }
@@ -70,11 +63,11 @@ export const useCamera = () => {
         videoRef.current.srcObject = mediaStream;
       }
 
-      logger.info('Camera started successfully', {}, 'UI');
+      console.log('Camera started successfully');
       return mediaStream;
 
     } catch (error: any) {
-      logger.error('Error starting camera', error as Error, 'UI');
+      console.error('Error starting camera:', error);
       
       if (error.name === 'NotAllowedError') {
         store.setCameraPermission('denied');
@@ -110,7 +103,7 @@ export const useCamera = () => {
     store.setHasCamera(false);
     store.setActive(false);
     
-    logger.info('Camera stopped', {}, 'UI');
+    console.log('Camera stopped');
   }, [stream, store]);
 
   // Switch camera (front/back)
@@ -128,8 +121,6 @@ export const useCamera = () => {
 
   // Capture frame from video
   const captureFrame = useCallback((): string | null => {
-    // Vérification SSR
-    if (typeof document === 'undefined') return null;
     if (!videoRef.current || !stream) return null;
 
     try {
@@ -143,23 +134,17 @@ export const useCamera = () => {
       if (!ctx) return null;
 
       ctx.drawImage(video, 0, 0);
-
+      
       // Convert to JPEG with 60% quality for efficiency
       return canvas.toDataURL('image/jpeg', 0.6);
     } catch (error) {
-      logger.error('Error capturing frame', error as Error, 'UI');
+      console.error('Error capturing frame:', error);
       return null;
     }
   }, [stream]);
 
   // Check camera permission status
   const checkPermission = useCallback(async () => {
-    // Vérification SSR
-    if (typeof navigator === 'undefined') {
-      store.setCameraPermission('prompt');
-      return 'prompt';
-    }
-
     try {
       if (!navigator.permissions) {
         store.setCameraPermission('prompt');
@@ -170,7 +155,7 @@ export const useCamera = () => {
       store.setCameraPermission(permission.state as any);
       return permission.state;
     } catch (error) {
-      logger.error('Error checking camera permission', error as Error, 'UI');
+      console.error('Error checking camera permission:', error);
       store.setCameraPermission('prompt');
       return 'prompt';
     }

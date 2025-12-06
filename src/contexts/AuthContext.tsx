@@ -5,8 +5,7 @@
 
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { User, Session } from '@supabase/supabase-js';
-import { logger } from '@/lib/logger';
+import { User, Session, AuthError } from '@supabase/supabase-js';
 
 interface AuthContextType {
   user: User | null;
@@ -16,7 +15,6 @@ interface AuthContextType {
   signUp: (email: string, password: string, metadata?: any) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
-  logout: () => Promise<void>; // Alias pour compatibilité
   resetPassword: (email: string) => Promise<void>;
   register: (email: string, password: string, metadata?: any) => Promise<void>;
 }
@@ -43,13 +41,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
         if (!mounted) return;
         
         if (error) {
-          logger.error('Erreur lors de la récupération de la session', error, 'AUTH');
+          console.error('Erreur lors de la récupération de la session:', error);
         } else {
           setSession(session);
           setUser(session?.user ?? null);
         }
       } catch (error) {
-        logger.error('Erreur inattendue lors de la récupération de la session', error as Error, 'AUTH');
+        console.error('Erreur inattendue lors de la récupération de la session:', error);
       } finally {
         if (mounted) {
           setIsLoading(false);
@@ -64,7 +62,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       async (event, session) => {
         if (!mounted) return;
 
-        logger.info(`Auth state changed: ${event}`, { email: session?.user?.email }, 'AUTH');
+        console.log('Auth state changed:', event, session?.user?.email);
         
         setSession(session);
         setUser(session?.user ?? null);
@@ -73,16 +71,17 @@ export function AuthProvider({ children }: AuthProviderProps) {
         // Gestion des événements spécifiques
         switch (event) {
           case 'SIGNED_IN':
-            logger.info('Utilisateur connecté', undefined, 'AUTH');
+            console.log('Utilisateur connecté');
             break;
           case 'SIGNED_OUT':
-            logger.info('Utilisateur déconnecté', undefined, 'AUTH');
+            console.log('Utilisateur déconnecté');
+            // Ne pas rediriger automatiquement, laisser le routeur gérer
             break;
           case 'TOKEN_REFRESHED':
-            logger.debug('Token rafraîchi', undefined, 'AUTH');
+            console.log('Token rafraîchi');
             break;
           case 'USER_UPDATED':
-            logger.info('Utilisateur mis à jour', undefined, 'AUTH');
+            console.log('Utilisateur mis à jour');
             break;
         }
       }
@@ -106,16 +105,17 @@ export function AuthProvider({ children }: AuthProviderProps) {
       });
 
       if (error) {
-        logger.error('Erreur lors de l\'inscription', error as Error, 'AUTH');
-        throw error; // Lancer l'erreur pour que le composant puisse la gérer
+        throw error;
       }
 
       if (data.user && !data.user.email_confirmed_at) {
-        logger.info('Email de confirmation envoyé', undefined, 'AUTH');
+        console.log('Email de confirmation envoyé');
       }
+
+      return data;
     } catch (error) {
-      logger.error('Erreur lors de l\'inscription', error as Error, 'AUTH');
-      throw error; // Relancer pour compatibilité avec les composants existants
+      console.error('Erreur lors de l\'inscription:', error);
+      throw error;
     } finally {
       setIsLoading(false);
     }
@@ -130,14 +130,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
       });
 
       if (error) {
-        logger.error('Erreur lors de la connexion', error as Error, 'AUTH');
-        throw error; // Lancer l'erreur pour que le composant puisse la gérer
+        throw error;
       }
 
-      logger.info('Connexion réussie', { email }, 'AUTH');
+      console.log('Connexion réussie pour:', email);
+      return data;
     } catch (error) {
-      logger.error('Erreur lors de la connexion', error as Error, 'AUTH');
-      throw error; // Relancer pour compatibilité avec les composants existants
+      console.error('Erreur lors de la connexion:', error);
+      throw error;
     } finally {
       setIsLoading(false);
     }
@@ -152,9 +152,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
         throw error;
       }
 
-      logger.info('Déconnexion réussie', undefined, 'AUTH');
+      console.log('Déconnexion réussie');
     } catch (error) {
-      logger.error('Erreur lors de la déconnexion', error as Error, 'AUTH');
+      console.error('Erreur lors de la déconnexion:', error);
       throw error;
     } finally {
       setIsLoading(false);
@@ -171,9 +171,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
         throw error;
       }
 
-      logger.info('Email de réinitialisation envoyé', { email }, 'AUTH');
+      console.log('Email de réinitialisation envoyé à:', email);
     } catch (error) {
-      logger.error('Erreur lors de la réinitialisation', error as Error, 'AUTH');
+      console.error('Erreur lors de la réinitialisation:', error);
       throw error;
     }
   };
@@ -189,7 +189,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
     signUp,
     signIn,
     signOut,
-    logout: signOut, // Alias pour compatibilité
     resetPassword,
     register,
   };

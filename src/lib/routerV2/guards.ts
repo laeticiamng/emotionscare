@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useMemo } from 'react';
 import type { Guard, Role } from './types';
 import { useAuth } from '@/contexts/AuthContext';
@@ -78,7 +77,7 @@ export function useRouteAllowed(guards?: Guard[]) {
   } catch {
     consentContext = {
       status: 'accepted',
-      scope: 'coach',
+      scope: 'clinical',
       wasRevoked: false,
       loading: false,
       accept: async () => {},
@@ -135,7 +134,7 @@ export function useRouteAllowed(guards?: Guard[]) {
     }
 
     if (guard.type === 'consent') {
-      if (guard.scope === 'coach' && !hasClinicalConsent) {
+      if (guard.scope === 'clinical' && !hasClinicalConsent) {
         return { allowed: false, reason: 'consent' as GuardFailureReason };
       }
     }

@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -25,7 +24,7 @@ import {
   ZoomOut 
 } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { useTheme } from '@/providers/theme';
+import { useTheme } from '@/components/theme-provider';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const getMoodColor = (mood: string) => {
@@ -54,8 +53,7 @@ const TimelineView: React.FC = () => {
   const { events, addEvent } = useOrchestration();
   const [isLoading, setIsLoading] = useState(true);
   const [zoomLevel, setZoomLevel] = useState(1);
-  const { resolvedTheme } = useTheme();
-  const isDarkMode = resolvedTheme === 'dark';
+  const { isDarkMode } = useTheme();
 
   // Simulate loading state
   useEffect(() => {

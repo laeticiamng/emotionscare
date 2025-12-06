@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -5,9 +6,8 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { MessageSquare, Send, Bot, User, Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { coachSessionsApi, type CoachSessionRecord, type CoachMessageRecord } from '@/services/api/coachSessionsApi';
+import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { logger } from '@/lib/logger';
 
 interface Message {
   id: string;
@@ -36,47 +36,67 @@ const AICoach: React.FC = () => {
     if (!user) return;
 
     try {
-      // Récupérer les sessions existantes via API
-      const sessions = await coachSessionsApi.listSessions({ limit: 1 });
+      // Créer une nouvelle conversation ou récupérer la dernière
+      const { data: conversations, error } = await supabase
+        .from('chat_conversations')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('updated_at', { ascending: false })
+        .limit(1);
 
-      let sessionId: string;
+      if (error) throw error;
 
-      if (sessions && sessions.length > 0) {
-        sessionId = sessions[0].id;
-        setConversationId(sessionId);
+      let convId: string;
 
-        // Charger les messages existants via API
-        const existingMessages = await coachSessionsApi.getMessages(sessionId);
+      if (conversations && conversations.length > 0) {
+        convId = conversations[0].id;
+        setConversationId(convId);
+        
+        // Charger les messages existants
+        const { data: existingMessages, error: messagesError } = await supabase
+          .from('chat_messages')
+          .select('*')
+          .eq('conversation_id', convId)
+          .order('timestamp', { ascending: true });
 
-        const formattedMessages: Message[] = existingMessages.map((msg: CoachMessageRecord) => ({
+        if (messagesError) throw messagesError;
+
+        const formattedMessages: Message[] = existingMessages?.map(msg => ({
           id: msg.id,
-          sender: msg.sender === 'user' ? 'user' : 'ai' as const,
-          content: msg.content,
-          timestamp: new Date(msg.created_at)
-        }));
+          sender: msg.sender as 'user' | 'ai',
+          content: msg.text,
+          timestamp: new Date(msg.timestamp)
+        })) || [];
 
         setMessages(formattedMessages);
       } else {
-        // Créer une nouvelle session via API
-        const newSession = await coachSessionsApi.createSession({
-          title: 'Session avec Coach IA'
-        });
+        // Créer une nouvelle conversation
+        const { data: newConv, error: convError } = await supabase
+          .from('chat_conversations')
+          .insert({
+            user_id: user.id,
+            title: 'Session avec Coach IA'
+          })
+          .select()
+          .single();
 
-        sessionId = newSession.id;
-        setConversationId(sessionId);
-
+        if (convError) throw convError;
+        
+        convId = newConv.id;
+        setConversationId(convId);
+        
         // Message de bienvenue
         const welcomeMessage: Message = {
           id: 'welcome',
           sender: 'ai',
-          content: `Bonjour ! Je suis votre coach IA personnel. Comment puis-je vous aider avec votre bien-être émotionnel aujourd'hui ?`,
+          content: `Bonjour ${user.name} ! Je suis votre coach IA personnel. Comment puis-je vous aider avec votre bien-être émotionnel aujourd'hui ?`,
           timestamp: new Date()
         };
-
+        
         setMessages([welcomeMessage]);
       }
     } catch (error) {
-      logger.error('Conversation initialization error:', error);
+      console.error('Conversation initialization error:', error);
       toast.error('Erreur lors de l\'initialisation de la conversation');
     }
   };
@@ -102,12 +122,14 @@ const AICoach: React.FC = () => {
     setIsLoading(true);
 
     try {
-      // Sauvegarder le message utilisateur via API
-      await coachSessionsApi.sendMessage({
-        session_id: conversationId,
-        sender: 'user',
-        content: inputMessage
-      });
+      // Sauvegarder le message utilisateur
+      await supabase
+        .from('chat_messages')
+        .insert({
+          conversation_id: conversationId,
+          sender: 'user',
+          text: inputMessage
+        });
 
       // Simuler la réponse de l'IA (remplacer par l'appel OpenAI réel)
       const aiResponse = await generateAIResponse(inputMessage);
@@ -119,17 +141,28 @@ const AICoach: React.FC = () => {
         timestamp: new Date()
       };
 
-      // Sauvegarder la réponse IA via API
-      await coachSessionsApi.sendMessage({
-        session_id: conversationId,
-        sender: 'coach',
-        content: aiResponse
-      });
+      // Sauvegarder la réponse IA
+      await supabase
+        .from('chat_messages')
+        .insert({
+          conversation_id: conversationId,
+          sender: 'ai',
+          text: aiResponse
+        });
 
       setMessages(prev => [...prev, aiMessage]);
 
+      // Mettre à jour la conversation
+      await supabase
+        .from('chat_conversations')
+        .update({
+          last_message: aiResponse,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', conversationId);
+
     } catch (error) {
-      logger.error('Send message error:', error);
+      console.error('Send message error:', error);
       toast.error('Erreur lors de l\'envoi du message');
     } finally {
       setIsLoading(false);

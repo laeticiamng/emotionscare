@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUserMode } from '@/contexts/UserModeContext';
@@ -12,7 +13,7 @@ const LoginRedirect: React.FC<LoginRedirectProps> = ({ redirectPath }) => {
   const { userMode } = useUserMode();
   
   useEffect(() => {
-    const loginPath = getModeLoginPath(userMode as any);
+    const loginPath = getModeLoginPath(userMode);
     navigate(redirectPath || loginPath, { replace: true });
   }, [navigate, userMode, redirectPath]);
   

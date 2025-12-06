@@ -1,7 +1,7 @@
+
 import OpenAI from 'openai';
 import { ChatCompletion, ChatCompletionChunk } from 'openai/resources/chat/completions';
 import { Stream } from 'openai/streaming';
-import { logger } from '@/lib/logger';
 
 const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
 
@@ -44,10 +44,9 @@ export async function generateChatResponse(
     temperature?: number;
     maxTokens?: number;
   } = {}
-): Promise<ChatResponse | null> {
+): Promise<ChatResponse> {
   if (!isApiKeyAvailable()) {
-    logger.error('OpenAI API key not available', new Error('API key missing'), 'API');
-    return null;
+    throw new Error('OpenAI API key not available. Please add it to your .env file.');
   }
 
   try {
@@ -77,8 +76,8 @@ export async function generateChatResponse(
       } : undefined
     };
   } catch (error) {
-    logger.error('Error generating chat response', error as Error, 'API');
-    return null;
+    console.error('Error generating chat response:', error);
+    throw error;
   }
 }
 
@@ -96,10 +95,9 @@ export async function generateStreamingChatResponse(
     temperature?: number;
     maxTokens?: number;
   } = {}
-): Promise<boolean> {
+): Promise<void> {
   if (!isApiKeyAvailable()) {
-    logger.error('OpenAI API key not available', new Error('API key missing'), 'API');
-    return false;
+    throw new Error('OpenAI API key not available. Please add it to your .env file.');
   }
 
   try {
@@ -126,10 +124,10 @@ export async function generateStreamingChatResponse(
       }
     }
 
-    return true;
+    return;
   } catch (error) {
-    logger.error('Error generating streaming chat response', error as Error, 'API');
-    return false;
+    console.error('Error generating streaming chat response:', error);
+    throw error;
   }
 }
 

@@ -5,7 +5,7 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -25,7 +25,6 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
-import { logger } from '@/lib/logger';
 
 // Types pour la sécurité
 interface SecurityCheck {
@@ -144,7 +143,7 @@ const useSecurityAnalysis = () => {
       setSecurityScore(Math.round(totalScore));
 
     } catch (error) {
-      logger.error('Erreur d\'analyse de sécurité', { error }, 'AUTH');
+      console.error('Erreur d\'analyse de sécurité:', error);
       toast({
         title: "Erreur de sécurité",
         description: "Impossible d'analyser le contexte de sécurité",
@@ -290,11 +289,6 @@ const AdvancedSecurityGuard: React.FC<AdvancedSecurityGuardProps> = ({
     }
 
     // Vérifier les permissions requises
-    const checkPermission = (permission: string): boolean => {
-      // Implémentation simple - à adapter selon votre système de permissions
-      return true; // Pour l'instant, on considère que toutes les permissions sont accordées
-    };
-
     const hasAllPermissions = requiredPermissions.every(permission => 
       checkPermission(permission)
     );
@@ -312,7 +306,7 @@ const AdvancedSecurityGuard: React.FC<AdvancedSecurityGuardProps> = ({
     } else {
       setSecurityState('granted');
     }
-  }, [isAuthenticated, user, securityScore, requiredPermissions, securityLevel, config.requireMFA, showMFA, navigate, location.pathname]);
+  }, [isAuthenticated, user, securityScore, requiredPermissions, checkPermission, securityLevel, config.requireMFA, showMFA, navigate, location.pathname]);
 
   // Gestionnaires
   const handleMFASuccess = () => {

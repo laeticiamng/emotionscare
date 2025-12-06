@@ -1,7 +1,5 @@
-// @ts-nocheck
 import { supabase } from '@/integrations/supabase/client';
 import type { ApiResponse, EmotionData } from './types';
-import { logger } from '@/lib/logger';
 
 class HumeService {
   private wsConnection: WebSocket | null = null;
@@ -14,7 +12,7 @@ class HumeService {
       });
 
       if (error) {
-        logger.error(`Hume ${functionName} error`, error as Error, 'API');
+        console.error(`Hume ${functionName} error:`, error);
         return {
           success: false,
           error: error.message,
@@ -28,7 +26,7 @@ class HumeService {
         timestamp: new Date()
       };
     } catch (error: any) {
-      logger.error(`Hume ${functionName} error`, error as Error, 'API');
+      console.error(`Hume ${functionName} error:`, error);
       return {
         success: false,
         error: error.message,
@@ -144,16 +142,16 @@ class HumeService {
           this.listeners.forEach(listener => listener(emotions));
         }
       } catch (error) {
-        logger.error('Error parsing WebSocket message', error as Error, 'API');
+        console.error('Error parsing WebSocket message:', error);
       }
     };
 
     this.wsConnection.onerror = (error) => {
-      logger.error('WebSocket error', error as Error, 'API');
+      console.error('WebSocket error:', error);
     };
 
     this.wsConnection.onclose = () => {
-      logger.info('WebSocket connection closed', undefined, 'API');
+      console.log('WebSocket connection closed');
     };
   }
 

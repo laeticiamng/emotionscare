@@ -1,29 +1,16 @@
-// @ts-nocheck
-/**
- * story-synth-lab - Laboratoire de création d'histoires IA
- *
- * 🔒 SÉCURISÉ: Auth multi-rôle + Rate limit 10/min + CORS restrictif
- */
+
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { authorizeRole } from '../_shared/auth.ts';
-import { cors, preflightResponse, rejectCors } from '../_shared/cors.ts';
-import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
 
 serve(async (req) => {
-  const corsResult = cors(req);
-  const corsHeaders = {
-    ...corsResult.headers,
-    'X-Content-Type-Options': 'nosniff',
-    'X-Frame-Options': 'DENY',
-  };
-
   if (req.method === 'OPTIONS') {
-    return preflightResponse(corsResult);
-  }
-
-  if (!corsResult.allowed) {
-    return rejectCors(corsResult);
+    return new Response(null, { headers: corsHeaders });
   }
 
   try {
@@ -32,21 +19,6 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
-
-    const rateLimit = await enforceEdgeRateLimit(req, {
-      route: 'story-synth-lab',
-      userId: user.id,
-      limit: 10,
-      windowMs: 60_000,
-      description: 'Story synthesis lab - OpenAI',
-    });
-
-    if (!rateLimit.allowed) {
-      return buildRateLimitResponse(rateLimit, corsHeaders, {
-        errorCode: 'rate_limit_exceeded',
-        message: `Trop de requêtes. Réessayez dans ${rateLimit.retryAfterSeconds}s.`,
       });
     }
 

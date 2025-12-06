@@ -1,4 +1,4 @@
-// @ts-nocheck
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -41,7 +41,7 @@ const GamificationWidget: React.FC = () => {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Trophy className="h-5 w-5 text-warning" />
+          <Trophy className="h-5 w-5 text-yellow-500" />
           Niveau {currentLevel}
         </CardTitle>
       </CardHeader>
@@ -60,11 +60,11 @@ const GamificationWidget: React.FC = () => {
             <div className="text-xs text-muted-foreground">Points</div>
           </div>
           <div>
-            <div className="text-lg font-bold text-success">{currentLevel}</div>
+            <div className="text-lg font-bold text-green-500">{currentLevel}</div>
             <div className="text-xs text-muted-foreground">Niveau</div>
           </div>
           <div>
-            <div className="text-lg font-bold text-accent">{userBadges.length}</div>
+            <div className="text-lg font-bold text-purple-500">{userBadges.length}</div>
             <div className="text-xs text-muted-foreground">Badges</div>
           </div>
         </div>
@@ -72,14 +72,14 @@ const GamificationWidget: React.FC = () => {
         {userBadges.length > 0 && (
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <Award className="h-4 w-4 text-accent" />
+              <Award className="h-4 w-4 text-purple-500" />
               <span className="text-sm font-medium">Derniers badges</span>
             </div>
             <div className="flex gap-2">
               {userBadges.slice(0, 3).map((badge) => (
                 <div
                   key={badge.id}
-                  className="w-8 h-8 rounded-full bg-gradient-to-br from-warning to-warning/70 flex items-center justify-center"
+                  className="w-8 h-8 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center"
                   title={badge.badge.name}
                 >
                   <Star className="h-4 w-4 text-white" />

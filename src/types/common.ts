@@ -1,8 +1,6 @@
-// @ts-nocheck
 // Type fixes pour éviter les erreurs lucide-react et TypeScript
 import { LucideProps, LucideIcon } from 'lucide-react';
 import { ComponentType, ForwardRefExoticComponent, RefAttributes, createElement } from 'react';
-import { logger } from '@/lib/logger';
 
 // Type correct pour les icônes lucide-react
 export type LucideIconType = ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>;
@@ -76,7 +74,7 @@ export const isLucideIcon = (component: any): component is LucideIconType => {
 // Helper pour rendre une icône de manière sécurisée
 export const renderIcon = (Icon: LucideIconType, props: Partial<LucideProps> = {}) => {
   if (!isLucideIcon(Icon)) {
-    logger.warn('Invalid icon component passed to renderIcon', undefined, 'UI');
+    console.warn('Invalid icon component passed to renderIcon');
     return null;
   }
   const iconComponent = Icon as ComponentType<LucideProps>;

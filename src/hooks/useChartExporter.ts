@@ -1,8 +1,6 @@
-// @ts-nocheck
 import { useCallback, useState } from 'react';
 import type { RefObject } from 'react';
 import { exportElementToPng, type DomExportOptions } from '@/lib/export/domExport';
-import { logger } from '@/lib/logger';
 
 export interface ChartExportOptions extends DomExportOptions {}
 
@@ -23,7 +21,7 @@ export function useChartExporter(defaultOptions?: ChartExportOptions) {
         setError(null);
         await exportElementToPng(element, { ...defaultOptions, ...options });
       } catch (exportError) {
-        logger.error('Chart export failed', exportError as Error, 'UI');
+        console.error('Chart export failed', exportError);
         setError(exportError instanceof Error ? exportError.message : 'Export impossible.');
       } finally {
         setIsExporting(false);

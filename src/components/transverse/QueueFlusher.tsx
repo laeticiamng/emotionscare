@@ -1,6 +1,4 @@
-// @ts-nocheck
 import React, { useEffect } from 'react';
-import { logger } from '@/lib/logger';
 
 interface QueueFlusherProps {
   interval?: number;
@@ -27,7 +25,7 @@ export const QueueFlusher: React.FC<QueueFlusherProps> = ({
       // Nettoyer les timeouts et intervals orphelins
       // Note: Cette approche est limitée mais sûre
       if (process.env.NODE_ENV === 'development') {
-        logger.debug('🧹 Queue flushed', {}, 'SYSTEM');
+        console.debug('🧹 Queue flushed');
       }
     };
 

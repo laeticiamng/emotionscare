@@ -1,7 +1,6 @@
-// @ts-nocheck
+
 import { User } from '@/types';
 import { mockUsers } from '@/data/mockUsers';
-import { logger } from '@/lib/logger';
 
 // Simuler une base de données de tokens de réinitialisation
 interface PasswordResetToken {
@@ -49,9 +48,9 @@ export const requestPasswordReset = async (email: string): Promise<{ success: bo
     });
     
     // Dans une vraie implémentation, nous enverrions un email ici
-    logger.info(`Token de réinitialisation créé pour ${email}`, { token }, 'AUTH');
+    console.log(`Token de réinitialisation créé pour ${email}: ${token}`);
   } else {
-    logger.info(`Tentative de réinitialisation pour un email non existant: ${email}`, undefined, 'AUTH');
+    console.log(`Tentative de réinitialisation pour un email non existant: ${email}`);
   }
 
   // Toujours retourner success pour ne pas révéler si l'email existe
@@ -109,7 +108,7 @@ export const resetPassword = async (token: string, newPassword: string): Promise
   // mockUsers[userIndex].password = hashPassword(newPassword);
   
   // Simuler la mise à jour du mot de passe
-  logger.info(`Mot de passe réinitialisé pour ${email}`, undefined, 'AUTH');
+  console.log(`Mot de passe réinitialisé pour ${email}`);
   
   // Marquer le token comme utilisé
   const tokenIndex = resetTokens.findIndex(t => t.token === token);

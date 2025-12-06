@@ -1,9 +1,9 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Mic, MicOff } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { SpeechRecognition } from '@/types/speech';
-import { logger } from '@/lib/logger';
 
 interface VoiceCommandButtonProps {
   onTranscript?: (transcript: string) => void;
@@ -62,17 +62,17 @@ export const VoiceCommandButton: React.FC<VoiceCommandButtonProps> = ({
           setIsListening(false);
         };
         
-        recognitionInstance.onerror = (event: any) => {
-          logger.error('Speech recognition error', new Error(event.error || 'Unknown error'), 'UI');
+        recognitionInstance.onerror = (event) => {
+          console.error('Speech recognition error', event.error);
           setIsListening(false);
           toast({
             title: "Erreur de reconnaissance vocale",
-            description: event.error || 'Erreur inconnue',
+            description: event.error,
             variant: "destructive",
           });
         };
         
-        setRecognition(recognitionInstance as any);
+        setRecognition(recognitionInstance);
       }
     }
     
@@ -104,7 +104,7 @@ export const VoiceCommandButton: React.FC<VoiceCommandButtonProps> = ({
           description: "Je suis à votre écoute...",
         });
       } catch (error) {
-        logger.error('Error starting recognition', error as Error, 'UI');
+        console.error('Error starting recognition:', error);
         toast({
           title: "Erreur",
           description: "Impossible de démarrer la reconnaissance vocale",

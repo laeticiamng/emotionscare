@@ -7,7 +7,7 @@ let url: string;
 let token: string;
 
 beforeAll(async () => {
-  // JWT_SECRETS is already set in setup.ts with 32+ characters
+  process.env.JWT_SECRETS = 'test-secret';
   process.env.HASH_PEPPER = 'pepper';
   token = await signJwt({ sub: 'user-1', role: 'b2c', aud: 'test-suite' });
 
@@ -16,15 +16,13 @@ beforeAll(async () => {
   const address = app.server.address();
   const port = typeof address === 'object' && address ? address.port : 0;
   url = `http://127.0.0.1:${port}`;
-}, 15000);
+});
 
 afterAll(async () => {
-  if (app) {
-    await app.close().catch(() => {});
-  }
-}, 15000);
+  await app.close();
+});
 
-describe.skip('POST /api/mood_playlist', () => {
+describe('POST /api/mood_playlist', () => {
   it('returns an adaptive playlist for the requested mood', async () => {
     const res = await fetch(url + '/api/mood_playlist', {
       method: 'POST',

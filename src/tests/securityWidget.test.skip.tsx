@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { render } from '@testing-library/react';
 import SecurityWidget from '@/components/security/SecurityWidget';
 import React from 'react';

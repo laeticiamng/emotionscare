@@ -1,7 +1,5 @@
-// @ts-nocheck
 
 import { useState, useEffect, useCallback } from 'react';
-import { logger } from '@/lib/logger';
 
 export interface UseSessionSecurityOptions {
   warningTimeBeforeExpire?: number;
@@ -50,7 +48,7 @@ export function useSessionSecurity({
       // If session expired, handle it
       if (remainingTime <= 0) {
         // Session expired, you can add logic here to log out the user
-        logger.info('Session expired', {}, 'AUTH');
+        console.log('Session expired');
         // Clear the warning
         setShowWarning(false);
       }

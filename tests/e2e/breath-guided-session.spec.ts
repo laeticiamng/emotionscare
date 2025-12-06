@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { test, expect } from '@playwright/test';
 
 test.describe('Breath guided module', () => {

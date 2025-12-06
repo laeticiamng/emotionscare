@@ -1,8 +1,6 @@
-// @ts-nocheck
 
 import { useState } from 'react';
 import { useToast } from './use-toast';
-import { logger } from '@/lib/logger';
 
 interface CommunityRecommendation {
   id: string;
@@ -61,7 +59,7 @@ export function useCommunityRecommendations() {
       setRecommendations(mockRecommendations);
       return mockRecommendations;
     } catch (error) {
-      logger.error('Erreur lors de la récupération des recommandations', error as Error, 'ANALYTICS');
+      console.error('Erreur lors de la récupération des recommandations:', error);
       toast({
         title: 'Erreur',
         description: 'Impossible de charger les recommandations pour le moment.',
@@ -88,7 +86,7 @@ export function useCommunityRecommendations() {
         ]
       };
     } catch (error) {
-      logger.error('Erreur lors de l\'analyse des tendances', error as Error, 'ANALYTICS');
+      console.error('Erreur lors de l\'analyse des tendances:', error);
       return null;
     }
   };

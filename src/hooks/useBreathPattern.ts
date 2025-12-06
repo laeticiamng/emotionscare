@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useCallback, useEffect, useRef } from 'react';
 import { useVRStore, VR_PATTERN_TIMINGS, type VRPattern, type VRBreathPhase } from '@/store/vr.store';
 import { useHRVSilk, type HRVData } from './useHRVSilk';
@@ -114,7 +113,7 @@ export const useBreathPattern = () => {
 
   // Start VR breathing session
   const start = useCallback(async () => {
-    logger.info('Starting VR Galaxy breathing session', {}, 'VR');
+    console.log('Starting VR Galaxy breathing session');
 
     // Start HRV recording if enabled
     if (store.hrvEnabled && hrv.isConnected) {
@@ -135,7 +134,7 @@ export const useBreathPattern = () => {
 
   // Pause session
   const pause = useCallback(() => {
-    logger.info('Pausing VR breathing session', {}, 'VR');
+    console.log('Pausing VR breathing session');
     store.pause();
 
     if (animationFrameRef.current) {
@@ -146,7 +145,7 @@ export const useBreathPattern = () => {
 
   // Resume session
   const resume = useCallback(() => {
-    logger.info('Resuming VR breathing session', {}, 'VR');
+    console.log('Resuming VR breathing session');
     store.resume();
 
     // Adjust timing references for pause duration
@@ -159,7 +158,7 @@ export const useBreathPattern = () => {
 
   // Stop session and prepare metrics
   const stop = useCallback(() => {
-    logger.info('Stopping VR breathing session', {}, 'VR');
+    console.log('Stopping VR breathing session');
 
     if (animationFrameRef.current) {
       cancelAnimationFrame(animationFrameRef.current);
@@ -194,23 +193,23 @@ export const useBreathPattern = () => {
         metrics.adherence = dodatoyData.adherence;
       }
 
-      logger.info('Submitting VR Galaxy metrics', metrics, 'VR');
+      console.log('Submitting VR Galaxy metrics:', metrics);
 
       const { data, error } = await supabase.functions.invoke('vr-galaxy-metrics', {
         body: metrics
       });
 
       if (error) {
-        logger.error('Failed to submit VR metrics', error as Error, 'VR');
+        console.error('Failed to submit VR metrics:', error);
         // Queue for offline retry - functionality ready for backend integration
-        logger.info('Queuing breath pattern data for offline retry', {}, 'VR');
+        console.log('Queuing breath pattern data for offline retry');
       } else {
-        logger.info('VR metrics submitted successfully', data, 'VR');
+        console.log('VR metrics submitted successfully:', data);
       }
     } catch (error) {
-      logger.error('Error submitting VR metrics', error as Error, 'VR');
+      console.error('Error submitting VR metrics:', error);
       // Queue for offline retry - functionality ready for backend integration
-      logger.info('Queuing breath pattern data for offline retry', {}, 'VR');
+      console.log('Queuing breath pattern data for offline retry');
     }
   }, [store]);
 

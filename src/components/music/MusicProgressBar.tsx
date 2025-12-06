@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Slider } from '@/components/ui/slider';
 
@@ -44,10 +45,6 @@ export const MusicProgressBar: React.FC<ProgressBarProps> = ({
         onValueChange={handleChange}
         className="cursor-pointer"
         aria-label="Progression du morceau"
-        aria-valuemin={0}
-        aria-valuemax={duration || 100}
-        aria-valuenow={currentTime || 0}
-        aria-valuetext={`${formatTime(currentTime || 0)} sur ${formatTime(duration || 0)}`}
       />
     </div>
   );

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * COACH CONTEXT UNIFIÉ - EmotionsCare
  * Fusion optimisée de toutes les versions de CoachContext
@@ -8,7 +7,6 @@ import React, { createContext, useContext, useState, useCallback, useEffect } fr
 import { useQuery } from '@tanstack/react-query';
 import { ChatMessage, ChatConversation } from '@/types/chat';
 import { Suggestion } from '@/types/coach';
-import { logger } from '@/lib/logger';
 
 // Types unifiés
 export interface EmotionAnalysis {
@@ -188,7 +186,7 @@ export const UnifiedCoachProvider: React.FC<{ children: React.ReactNode }> = ({ 
           }
         }
       } catch (err) {
-        logger.error('Erreur chargement conversations', err as Error, 'UI');
+        console.error('Erreur chargement conversations:', err);
         setError('Impossible de charger l\'historique');
       }
     };
@@ -250,7 +248,7 @@ export const UnifiedCoachProvider: React.FC<{ children: React.ReactNode }> = ({ 
           setEmotionConfidence(analysis.confidence);
           setRecommendations(analysis.recommendations);
         } catch (err) {
-          logger.warn('Erreur analyse émotion', err as Error, 'UI');
+          console.warn('Erreur analyse émotion:', err);
         }
       }
 
@@ -284,7 +282,7 @@ export const UnifiedCoachProvider: React.FC<{ children: React.ReactNode }> = ({ 
     } catch (err) {
       const errorMsg = 'Erreur lors de l\'envoi du message';
       setError(errorMsg);
-      logger.error('Erreur sendMessage', err as Error, 'UI');
+      console.error('Erreur sendMessage:', err);
       return 'Désolé, une erreur s\'est produite.';
     } finally {
       setIsProcessing(false);

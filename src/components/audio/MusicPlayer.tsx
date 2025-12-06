@@ -1,9 +1,9 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
 import { Play, Pause, SkipForward, Volume2, Music } from 'lucide-react';
-import { logger } from '@/lib/logger';
 
 interface MusicPlayerProps {
   autoPlay?: boolean;
@@ -30,9 +30,9 @@ export const MusicPlayer: React.FC<MusicPlayerProps> = ({
   // In a production environment, this would integrate with an actual music API
   useEffect(() => {
     if (isPlaying) {
-      logger.debug('Music playback started', undefined, 'UI');
+      console.log('Music would start playing here');
     } else {
-      logger.debug('Music playback stopped', undefined, 'UI');
+      console.log('Music would stop playing here');
     }
   }, [isPlaying]);
 

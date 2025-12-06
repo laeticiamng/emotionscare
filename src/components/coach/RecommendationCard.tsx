@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import React from 'react';
 import { motion } from 'framer-motion';
@@ -33,21 +32,21 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
 }) => {
   const getTypeColor = () => {
     switch (recommendation.type) {
-      case 'music': return 'bg-accent/10 text-accent';
-      case 'breathing': return 'bg-primary/10 text-primary';
-      case 'meditation': return 'bg-success/10 text-success';
-      case 'exercise': return 'bg-warning/10 text-warning';
-      case 'social': return 'bg-destructive/10 text-destructive';
-      default: return 'bg-muted text-muted-foreground';
+      case 'music': return 'bg-purple-100 text-purple-700';
+      case 'breathing': return 'bg-blue-100 text-blue-700';
+      case 'meditation': return 'bg-green-100 text-green-700';
+      case 'exercise': return 'bg-orange-100 text-orange-700';
+      case 'social': return 'bg-pink-100 text-pink-700';
+      default: return 'bg-gray-100 text-gray-700';
     }
   };
 
   const getDifficultyColor = () => {
     switch (recommendation.difficulty) {
-      case 'easy': return 'bg-success/10 text-success';
-      case 'medium': return 'bg-warning/10 text-warning';
-      case 'hard': return 'bg-destructive/10 text-destructive';
-      default: return 'bg-muted text-muted-foreground';
+      case 'easy': return 'bg-green-100 text-green-700';
+      case 'medium': return 'bg-yellow-100 text-yellow-700';
+      case 'hard': return 'bg-red-100 text-red-700';
+      default: return 'bg-gray-100 text-gray-700';
     }
   };
 
@@ -126,7 +125,7 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
             </div>
             {recommendation.rating && (
               <div className="flex items-center gap-1">
-                <Star className="h-4 w-4 fill-warning text-warning" />
+                <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                 <span className="text-sm font-medium">{recommendation.rating}</span>
               </div>
             )}

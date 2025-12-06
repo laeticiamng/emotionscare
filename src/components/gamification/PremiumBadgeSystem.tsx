@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -252,7 +251,7 @@ export const PremiumBadgeSystem: React.FC = () => {
 
       setBadges(userBadges);
     } catch (error) {
-      // Badge loading error
+      console.error('Error loading badges:', error);
     } finally {
       setLoading(false);
     }

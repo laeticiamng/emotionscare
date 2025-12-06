@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { expect, test } from '@playwright/test';
 
 test.describe('Dashboard WHO-5 opt-in prompt', () => {

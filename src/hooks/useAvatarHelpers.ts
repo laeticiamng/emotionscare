@@ -1,9 +1,7 @@
-// @ts-nocheck
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
-import { logger } from '@/lib/logger';
 
 export function useAvatarHelpers() {
   const { user, updateUser } = useAuth();
@@ -54,7 +52,7 @@ export function useAvatarHelpers() {
       toast.success("Avatar mis à jour avec succès");
 
     } catch (error: any) {
-      logger.error('Error uploading avatar', error as Error, 'UI');
+      console.error('Error uploading avatar:', error);
       toast.error(error.message || "Erreur lors du téléchargement de l'avatar");
     } finally {
       setUploading(false);
@@ -90,7 +88,7 @@ export function useAvatarHelpers() {
       toast.success("Avatar supprimé avec succès");
 
     } catch (error: any) {
-      logger.error('Error removing avatar', error as Error, 'UI');
+      console.error('Error removing avatar:', error);
       toast.error(error.message || "Erreur lors de la suppression de l'avatar");
     } finally {
       setUploading(false);

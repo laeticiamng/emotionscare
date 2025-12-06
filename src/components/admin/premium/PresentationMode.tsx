@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { X, ChevronRight, ChevronLeft, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -60,7 +61,7 @@ const PresentationMode: React.FC<PresentationProps> = ({ onExit, data }) => {
     
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentSlide, onExit]);
+  }, [currentSlide]);
   
   const renderSlideContent = () => {
     const currentSlideData = slides[currentSlide];

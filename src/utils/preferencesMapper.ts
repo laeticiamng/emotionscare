@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 /**
  * Utilitaire pour mapper les propriétés de préférences utilisateur

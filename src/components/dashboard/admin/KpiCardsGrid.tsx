@@ -1,7 +1,7 @@
-// @ts-nocheck
+
 import React from 'react';
 import KpiCard from './KpiCard';
-import { KpiCardsGridProps } from '@/types/widgets';
+import { KpiCardsGridProps } from '@/types';
 
 const KpiCardsGrid: React.FC<KpiCardsGridProps> = ({ cards = [] }) => {
   return (

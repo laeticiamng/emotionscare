@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -139,7 +138,7 @@ export const EnhancedGamificationDashboard: React.FC = () => {
       }
 
     } catch (error) {
-      // Gamification data loading error
+      console.error('Error loading gamification data:', error);
       toast({
         title: "Erreur",
         description: "Impossible de charger les données de gamification",
@@ -174,7 +173,7 @@ export const EnhancedGamificationDashboard: React.FC = () => {
         });
       }
     } catch (error) {
-      // Challenge generation error
+      console.error('Error generating challenges:', error);
       toast({
         title: "Erreur",
         description: "Impossible de générer de nouveaux défis",
@@ -234,7 +233,7 @@ export const EnhancedGamificationDashboard: React.FC = () => {
         }
       }
     } catch (error) {
-      // Challenge progress update error
+      console.error('Error updating challenge progress:', error);
       toast({
         title: "Erreur",
         description: "Impossible de mettre à jour le défi",

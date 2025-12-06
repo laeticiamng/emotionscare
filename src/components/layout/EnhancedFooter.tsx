@@ -1,11 +1,9 @@
-// @ts-nocheck
 
-// @ts-nocheck
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { routes } from '@/routerV2';
 import { motion } from 'framer-motion';
-import { useTheme } from '@/providers/theme';
+import { useTheme } from '@/components/theme-provider';
 import { cn } from '@/lib/utils';
 import { 
   Heart, 
@@ -22,8 +20,7 @@ import {
 } from 'lucide-react';
 
 const EnhancedFooter: React.FC = () => {
-  const { theme, resolvedTheme } = useTheme();
-  const isDarkMode = resolvedTheme === 'dark' || (theme === 'system' && typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  const { isDarkMode } = useTheme();
   const currentYear = new Date().getFullYear();
   
   // Obtenir l'heure locale au format hh:mm
@@ -44,15 +41,12 @@ const EnhancedFooter: React.FC = () => {
   };
   
   return (
-    <footer 
-      className={cn(
-        "border-t transition-colors duration-300 mt-auto",
-        isDarkMode 
-          ? "bg-background/90 text-foreground" 
-          : "bg-background/80 text-foreground"
-      )}
-      role="contentinfo"
-    >
+    <footer className={cn(
+      "border-t transition-colors duration-300 mt-auto",
+      isDarkMode 
+        ? "bg-background/90 text-foreground" 
+        : "bg-background/80 text-foreground"
+    )}>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8">
           {/* Logo & About Column */}
@@ -86,8 +80,8 @@ const EnhancedFooter: React.FC = () => {
           </div>
           
           {/* Links Column */}
-          <nav aria-labelledby="footer-links-heading">
-            <h3 id="footer-links-heading" className="text-sm font-medium mb-4">Liens rapides</h3>
+          <div>
+            <h3 className="text-sm font-medium mb-4">Liens rapides</h3>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li>
                 <Link to={routes.public.about()} className="hover:text-foreground transition-colors">
@@ -115,7 +109,7 @@ const EnhancedFooter: React.FC = () => {
                 </Link>
               </li>
             </ul>
-          </nav>
+          </div>
           
           {/* Legal Column */}
           <div>

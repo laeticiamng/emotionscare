@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import { ROUTER_V2_MANIFEST } from '@/routerV2/manifest';
 

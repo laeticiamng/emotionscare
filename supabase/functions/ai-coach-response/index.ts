@@ -1,9 +1,10 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import "https://deno.land/x/xhr@0.1.0/mod.ts"
-import { authenticateRequest } from '../_shared/auth-middleware.ts';
-import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
-import { validateRequest, createErrorResponse, AICoachRequestSchema } from '../_shared/validation.ts';
-import { cors, preflightResponse, rejectCors } from '../_shared/cors.ts';
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
 
 interface CoachRequest {
   message: string;
@@ -22,68 +23,22 @@ interface CoachResponse {
 }
 
 serve(async (req) => {
-  // 1. CORS check - Strict domain validation
-  const corsResult = cors(req);
-  const corsHeaders = {
-    ...corsResult.headers,
-    'X-Content-Type-Options': 'nosniff',
-    'X-Frame-Options': 'DENY',
-  };
-
   if (req.method === 'OPTIONS') {
-    return preflightResponse(corsResult);
-  }
-
-  // Vérification CORS stricte
-  if (!corsResult.allowed) {
-    console.warn('[ai-coach-response] CORS rejected - origin not allowed');
-    return rejectCors(corsResult);
+    return new Response(null, { headers: corsHeaders })
   }
 
   try {
-    // 2. 🔒 SÉCURITÉ: Authentification obligatoire
-    const authResult = await authenticateRequest(req);
-    if (authResult.status !== 200 || !authResult.user) {
-      console.warn('[ai-coach-response] Unauthorized access attempt');
-      return createErrorResponse(authResult.error || 'Authentication required', authResult.status, corsHeaders);
-    }
-
-    // 🛡️ SÉCURITÉ: Rate limiting strict (5 req/min - coaching est plus coûteux)
-    const rateLimit = await enforceEdgeRateLimit(req, {
-      route: 'ai-coach-response',
-      userId: authResult.user.id,
-      limit: 5,
-      windowMs: 60_000,
-      description: 'AI Coach responses - GPT-4 API calls'
-    });
-
-    if (!rateLimit.allowed) {
-      console.warn('[ai-coach-response] Rate limit exceeded', { userId: authResult.user.id });
-      return buildRateLimitResponse(rateLimit, corsHeaders, {
-        errorCode: 'rate_limit_exceeded',
-        message: `Trop de requêtes coach. Réessayez dans ${rateLimit.retryAfterSeconds}s.`
-      });
-    }
-
-    // ✅ VALIDATION: Validation Zod des entrées
-    const validation = await validateRequest(req, AICoachRequestSchema);
-    if (!validation.success) {
-      return createErrorResponse(validation.error, validation.status, corsHeaders);
-    }
-
     const { 
       message, 
       conversationHistory = [], 
       userEmotion = 'neutral',
       coachPersonality = 'empathetic',
       context = ''
-    } = validation.data as {
-      message: string;
-      conversationHistory?: Array<{role: string, content: string}>;
-      userEmotion?: string;
-      coachPersonality?: string;
-      context?: string;
-    };
+    }: CoachRequest = await req.json()
+    
+    if (!message?.trim()) {
+      throw new Error('Message requis')
+    }
 
     console.log('🧠 Coach IA - Génération de réponse:', { 
       userEmotion, 
@@ -120,7 +75,7 @@ serve(async (req) => {
 
     // Construction de l'historique de conversation
     const historyContext = conversationHistory.length > 0 
-      ? `Historique récent:\n${conversationHistory.slice(-6).map((msg: any) => `${msg.role}: ${msg.content}`).join('\n')}\n\n`
+      ? `Historique récent:\n${conversationHistory.slice(-6).map(msg => `${msg.role}: ${msg.content}`).join('\n')}\n\n`
       : ''
 
     const coachPrompt = `

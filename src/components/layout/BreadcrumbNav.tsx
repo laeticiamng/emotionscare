@@ -1,5 +1,5 @@
+
 import React from 'react';
-import { logger } from '@/lib/logger';
 import { useLocation, Link } from 'react-router-dom';
 import { ChevronRight, Home } from 'lucide-react';
 import { combineClasses } from '@/utils/mobileOptimizations';
@@ -65,7 +65,7 @@ const BreadcrumbNav: React.FC<BreadcrumbNavProps> = ({ className = '' }) => {
       
       return breadcrumbs;
     } catch (error) {
-      logger.error('Error in getBreadcrumbs', error as Error, 'UI');
+      console.error('Error in getBreadcrumbs:', error);
       return [{ label: 'Accueil', path: '/', current: true }];
     }
   };

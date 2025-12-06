@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -6,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle, XCircle, ExternalLink } from 'lucide-react';
 import { routes } from '@/routerV2';
-import { logger } from '@/lib/logger';
 
 const NavigationValidator: React.FC = () => {
   const navigate = useNavigate();
@@ -65,9 +63,9 @@ const NavigationValidator: React.FC = () => {
   const testNavigation = (path: string, name: string) => {
     try {
       navigate(path);
-      logger.info(`✅ Navigation vers ${name} (${path}) réussie`, { path, name }, 'UI');
+      console.log(`✅ Navigation vers ${name} (${path}) réussie`);
     } catch (error) {
-      logger.error(`❌ Erreur navigation vers ${name} (${path}):`, error as Error, 'UI');
+      console.error(`❌ Erreur navigation vers ${name} (${path}):`, error);
     }
   };
 

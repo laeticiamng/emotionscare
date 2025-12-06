@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * GAMIFICATION PAGE - EMOTIONSCARE
  * Page de gamification accessible WCAG 2.1 AA
@@ -6,7 +5,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Trophy, Star, Flame, Gift, Zap, Crown, Medal, Sparkles } from 'lucide-react';
+import { ArrowLeft, Trophy, Star, Flame, Gift, Zap, Crown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface Achievement {
@@ -76,74 +75,27 @@ const B2CGamificationPage: React.FC = () => {
     }
   ];
 
-  const rewards = [
-    {
-      id: 'reward-1',
-      title: 'Pack Sérénité 7 jours',
-      description: 'Débloque un boost sonore premium et un check-in personnalisé.',
-      requirement: 'Maintiens 7 jours de série',
-      status: 'disponible',
-      xp: 250
-    },
-    {
-      id: 'reward-2',
-      title: 'Coffre Focus',
-      description: 'Accès anticipé aux playlists de concentration et à un rapport détaillé.',
-      requirement: 'Atteins le niveau 15',
-      status: 'en cours',
-      xp: 400
-    },
-    {
-      id: 'reward-3',
-      title: 'Cadeau Communauté',
-      description: 'Badge communautaire, fonds d’écran animé et filtres IA additionnels.',
-      requirement: 'Participe à 3 défis collectifs',
-      status: 'verrouillé',
-      xp: 600
-    }
-  ];
-
-  const leaderboard = [
-    { rank: 1, name: 'Léa K.', score: 4820, streak: 22, completion: 96, trend: '+12', badge: 'Top 1%' },
-    { rank: 2, name: 'Yanis T.', score: 4450, streak: 18, completion: 91, trend: '+6', badge: 'Top 5%' },
-    { rank: 3, name: 'Vous', score: 4210, streak: 14, completion: 89, trend: '+4', badge: 'En progression', isCurrentUser: true },
-    { rank: 4, name: 'Sofia R.', score: 3890, streak: 10, completion: 82, trend: '+2', badge: 'Régulier' },
-    { rank: 5, name: 'Nils G.', score: 3600, streak: 8, completion: 78, trend: '+1', badge: 'Régulier' }
-  ];
-
   const getRarityColor = (rarity: string) => {
     switch (rarity) {
-      case 'common': return 'from-muted to-muted-foreground';
-      case 'rare': return 'from-info to-info';
-      case 'epic': return 'from-accent to-accent';
-      case 'legendary': return 'from-warning to-warning/80';
-      default: return 'from-muted to-muted-foreground';
+      case 'common': return 'from-gray-400 to-gray-500';
+      case 'rare': return 'from-blue-400 to-blue-600';
+      case 'epic': return 'from-purple-400 to-purple-600';
+      case 'legendary': return 'from-yellow-400 to-orange-500';
+      default: return 'from-gray-400 to-gray-500';
     }
   };
 
   const getRarityBorder = (rarity: string) => {
     switch (rarity) {
-      case 'common': return 'border-muted';
-      case 'rare': return 'border-info';
-      case 'epic': return 'border-accent';
-      case 'legendary': return 'border-warning';
-      default: return 'border-muted';
+      case 'common': return 'border-gray-300';
+      case 'rare': return 'border-blue-300';
+      case 'epic': return 'border-purple-300';
+      case 'legendary': return 'border-yellow-300';
+      default: return 'border-gray-300';
     }
   };
 
   const progressPercentage = (experience / nextLevelXp) * 100;
-
-  const getRewardStatusClasses = (status: string) => {
-    switch (status) {
-      case 'disponible':
-        return 'bg-emerald-50 text-emerald-700 border-emerald-200';
-      case 'en cours':
-        return 'bg-amber-50 text-amber-700 border-amber-200';
-      case 'verrouillé':
-      default:
-        return 'bg-slate-50 text-slate-600 border-slate-200';
-    }
-  };
 
   const handleTabChange = (tab: 'achievements' | 'rewards' | 'leaderboard') => {
     setSelectedTab(tab);
@@ -194,11 +146,11 @@ const B2CGamificationPage: React.FC = () => {
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ type: "spring", delay: 0.2 }}
-                className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-accent to-accent/60 rounded-full flex items-center justify-center shadow-lg"
+                className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center shadow-lg"
                 role="img"
                 aria-label={`Niveau ${level}`}
               >
-                <Crown className="w-10 h-10 text-primary-foreground" aria-hidden="true" />
+                <Crown className="w-10 h-10 text-white" aria-hidden="true" />
               </motion.div>
               <h3 className="text-2xl font-bold">Niveau {level}</h3>
               <div 
@@ -213,7 +165,7 @@ const B2CGamificationPage: React.FC = () => {
                   initial={{ width: 0 }}
                   animate={{ width: `${progressPercentage}%` }}
                   transition={{ duration: 1, delay: 0.5 }}
-                  className="bg-gradient-to-r from-accent to-accent/60 h-3 rounded-full"
+                  className="bg-gradient-to-r from-purple-500 to-pink-500 h-3 rounded-full"
                 />
               </div>
               <p className="text-sm text-gray-600">{experience} / {nextLevelXp} XP</p>
@@ -223,21 +175,21 @@ const B2CGamificationPage: React.FC = () => {
             <div className="grid grid-cols-3 gap-4" role="group" aria-label="Statistiques rapides">
               <div className="text-center">
                 <div className="flex items-center justify-center mb-2" role="img" aria-label="Série de jours">
-                  <Flame className="w-6 h-6 text-warning" aria-hidden="true" />
+                  <Flame className="w-6 h-6 text-orange-500" aria-hidden="true" />
                 </div>
                 <div className="text-xl font-bold">{streak}</div>
                 <div className="text-xs text-gray-600">jours de série</div>
               </div>
               <div className="text-center">
                 <div className="flex items-center justify-center mb-2" role="img" aria-label="Succès obtenus">
-                  <Trophy className="w-6 h-6 text-warning" aria-hidden="true" />
+                  <Trophy className="w-6 h-6 text-yellow-500" aria-hidden="true" />
                 </div>
                 <div className="text-xl font-bold">{achievements.filter(a => a.unlocked).length}</div>
                 <div className="text-xs text-gray-600">succès obtenus</div>
               </div>
               <div className="text-center">
                 <div className="flex items-center justify-center mb-2" role="img" aria-label="Points d'expérience">
-                  <Zap className="w-6 h-6 text-info" aria-hidden="true" />
+                  <Zap className="w-6 h-6 text-blue-500" aria-hidden="true" />
                 </div>
                 <div className="text-xl font-bold">{experience}</div>
                 <div className="text-xs text-gray-600">points XP</div>
@@ -360,51 +312,11 @@ const B2CGamificationPage: React.FC = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                className="space-y-4"
+                className="text-center py-12"
               >
-                <div className="flex items-center gap-2 text-purple-700 bg-purple-50 border border-purple-100 rounded-2xl p-4">
-                  <Gift className="w-5 h-5" aria-hidden="true" />
-                  <div>
-                    <h3 className="font-semibold">Récompenses actives</h3>
-                    <p className="text-sm text-purple-600">Gagne des bonus en consolidant tes habitudes déjà suivies.</p>
-                  </div>
-                </div>
-
-                <div className="grid md:grid-cols-3 gap-4">
-                  {rewards.map((reward, index) => (
-                    <motion.article
-                      key={reward.id}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.05 }}
-                      className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 border border-white/40 shadow-sm h-full flex flex-col gap-3"
-                      aria-label={`Récompense ${reward.title}`}
-                    >
-                      <div className="flex items-start justify-between gap-3">
-                        <div>
-                          <p className="text-xs uppercase tracking-widest text-gray-500">{reward.requirement}</p>
-                          <h4 className="font-semibold text-lg leading-tight mt-1">{reward.title}</h4>
-                        </div>
-                        <span
-                          className={`text-xs px-3 py-1 rounded-full border font-medium ${getRewardStatusClasses(reward.status)}`}
-                        >
-                          {reward.status}
-                        </span>
-                      </div>
-                      <p className="text-sm text-gray-600 flex-1">{reward.description}</p>
-                      <div className="flex items-center justify-between text-sm bg-slate-50 rounded-xl px-3 py-2">
-                        <div className="flex items-center gap-2">
-                          <Zap className="w-4 h-4 text-amber-500" aria-hidden="true" />
-                          <span className="font-semibold">{reward.xp} XP</span>
-                        </div>
-                        <div className="flex items-center gap-1 text-gray-600">
-                          <Sparkles className="w-4 h-4" aria-hidden="true" />
-                          <span>Bonus bien-être</span>
-                        </div>
-                      </div>
-                    </motion.article>
-                  ))}
-                </div>
+                <Gift className="w-16 h-16 text-purple-400 mx-auto mb-4" aria-hidden="true" />
+                <h3 className="text-lg font-semibold mb-2">Récompenses à venir</h3>
+                <p className="text-gray-600">Bientôt disponible !</p>
               </motion.div>
             )}
 
@@ -417,69 +329,11 @@ const B2CGamificationPage: React.FC = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                className="space-y-4"
+                className="text-center py-12"
               >
-                <div className="flex items-center gap-2 text-amber-700 bg-amber-50 border border-amber-100 rounded-2xl p-4">
-                  <Trophy className="w-5 h-5" aria-hidden="true" />
-                  <div>
-                    <h3 className="font-semibold">Classement hebdomadaire</h3>
-                    <p className="text-sm text-amber-600">Visualise tes progrès face aux membres actifs de la communauté.</p>
-                  </div>
-                </div>
-
-                <div className="space-y-3" role="list" aria-label="Classement actuel">
-                  {leaderboard.map((entry, index) => (
-                    <motion.div
-                      key={entry.rank}
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.05 }}
-                      className={`flex items-center gap-3 rounded-2xl border p-3 bg-white/85 backdrop-blur-sm shadow-sm ${
-                        entry.isCurrentUser ? 'border-primary/40 ring-2 ring-primary/20' : 'border-white/60'
-                      }`}
-                      role="listitem"
-                    >
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center text-white font-semibold shadow-md">
-                        {entry.rank === 1 ? <Crown className="w-5 h-5" aria-hidden="true" /> : <Medal className="w-5 h-5" aria-hidden="true" />}
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between gap-2">
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm font-semibold">#{entry.rank}</span>
-                            <span className="font-medium">{entry.name}</span>
-                            {entry.isCurrentUser && <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">Toi</span>}
-                          </div>
-                          <div className="flex items-center gap-1 text-xs text-emerald-700 bg-emerald-50 px-2 py-1 rounded-full">
-                            <span aria-label="Progression hebdomadaire">{entry.trend}</span>
-                          </div>
-                        </div>
-                        <div className="grid grid-cols-3 gap-2 mt-2 text-xs text-gray-600">
-                          <div className="flex items-center gap-1">
-                            <Zap className="w-4 h-4 text-amber-500" aria-hidden="true" />
-                            <span>{entry.score} pts</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Flame className="w-4 h-4 text-orange-500" aria-hidden="true" />
-                            <span>{entry.streak} jours</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Star className="w-4 h-4 text-yellow-500" aria-hidden="true" />
-                            <span>{entry.badge}</span>
-                          </div>
-                        </div>
-                        <div className="mt-2">
-                          <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
-                            <span>Objectifs complétés</span>
-                            <span>{entry.completion}%</span>
-                          </div>
-                          <div className="w-full bg-gray-200 rounded-full h-2" role="progressbar" aria-valuenow={entry.completion} aria-valuemin={0} aria-valuemax={100} aria-label={`Objectifs complétés pour ${entry.name}`}>
-                            <div className="h-2 rounded-full bg-gradient-to-r from-primary to-primary/60" style={{ width: `${entry.completion}%` }} />
-                          </div>
-                        </div>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
+                <Trophy className="w-16 h-16 text-yellow-400 mx-auto mb-4" aria-hidden="true" />
+                <h3 className="text-lg font-semibold mb-2">Classement</h3>
+                <p className="text-gray-600">Bientôt disponible !</p>
               </motion.div>
             )}
           </AnimatePresence>

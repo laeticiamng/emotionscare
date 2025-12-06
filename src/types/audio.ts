@@ -1,3 +1,4 @@
+
 // Réexporter les types depuis music.ts pour compatibilité
 export type {
   MusicTrack as AudioTrack,

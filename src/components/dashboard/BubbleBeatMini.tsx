@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -38,14 +37,14 @@ export const BubbleBeatMini: React.FC = () => {
     <Card className="overflow-hidden">
       <CardHeader>
         <CardTitle className="text-lg flex items-center gap-2">
-          <Heart className="w-5 h-5 text-destructive" />
+          <Heart className="w-5 h-5 text-red-500" />
           Bubble Beat
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Zone d'animation */}
         <div 
-          className="relative h-32 bg-gradient-to-br from-primary/10 to-accent/10 rounded-lg overflow-hidden cursor-pointer group"
+          className="relative h-32 bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg overflow-hidden cursor-pointer group"
           onClick={handleClick}
           role="img"
           aria-label="Animation de rythme cardiaque"
@@ -54,7 +53,7 @@ export const BubbleBeatMini: React.FC = () => {
           {bubbles.map(bubble => (
             <div
               key={bubble.id}
-              className="absolute rounded-full bg-primary/30 animate-pulse"
+              className="absolute rounded-full bg-blue-400/30 animate-pulse"
               style={{
                 left: `${bubble.x}%`,
                 top: `${bubble.y}%`,
@@ -67,15 +66,15 @@ export const BubbleBeatMini: React.FC = () => {
           ))}
 
           {/* Overlay au hover */}
-          <div className="absolute inset-0 bg-background/5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-            <div className="text-sm font-medium text-foreground">
+          <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+            <div className="text-sm font-medium text-gray-700">
               Cliquer pour voir plus
             </div>
           </div>
 
           {/* Indicateur de démonstration */}
           <div className="absolute top-2 left-2">
-            <span className="text-xs bg-background/80 px-2 py-1 rounded-full">
+            <span className="text-xs bg-white/80 px-2 py-1 rounded-full">
               Mode démo
             </span>
           </div>

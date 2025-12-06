@@ -1,8 +1,6 @@
-// @ts-nocheck
 
 import { useState, useEffect, useCallback } from 'react';
 import emotionRecommendationService, { EmotionRecommendation } from '@/services/coach/emotion-recommendation-service';
-import { logger } from '@/lib/logger';
 
 interface UseEmotionRecommendationsOptions {
   initialEmotion?: string;
@@ -52,7 +50,7 @@ export function useEmotionRecommendations({
       
       setRecommendations(results);
     } catch (err) {
-      logger.error('Error fetching emotion recommendations', err as Error, 'SYSTEM');
+      console.error('Error fetching emotion recommendations:', err);
       setError('Impossible de charger les recommandations');
     } finally {
       setIsLoading(false);

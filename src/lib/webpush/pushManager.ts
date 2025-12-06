@@ -1,10 +1,8 @@
-// @ts-nocheck
 /**
  * Gestionnaire Web Push avec VAPID et heures calmes
  */
 
 import { supabase } from '@/integrations/supabase/client';
-import { logger } from '@/lib/logger';
 
 interface PushSubscriptionData {
   endpoint: string;
@@ -30,16 +28,16 @@ class WebPushManager {
    */
   async initialize(): Promise<boolean> {
     if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-      logger.warn('Push notifications not supported', {}, 'SYSTEM');
+      console.warn('Push notifications not supported');
       return false;
     }
 
     try {
       this.registration = await navigator.serviceWorker.register('/sw.js');
-      logger.info('Service Worker registered', {}, 'SYSTEM');
+      console.log('Service Worker registered');
       return true;
     } catch (error) {
-      logger.error('Service Worker registration failed', error as Error, 'SYSTEM');
+      console.error('Service Worker registration failed:', error);
       return false;
     }
   }
@@ -82,7 +80,7 @@ class WebPushManager {
 
       return { success: true, subscription: subscriptionData };
     } catch (error) {
-      logger.error('Push subscription failed', error as Error, 'SYSTEM');
+      console.error('Push subscription failed:', error);
       return { success: false, error: (error as Error).message };
     }
   }
@@ -131,13 +129,13 @@ class WebPushManager {
       });
 
       if (error) {
-        logger.error('Test notification failed', error as Error, 'SYSTEM');
+        console.error('Test notification failed:', error);
         return false;
       }
 
       return true;
     } catch (error) {
-      logger.error('Test notification error', error as Error, 'SYSTEM');
+      console.error('Test notification error:', error);
       return false;
     }
   }
@@ -168,7 +166,7 @@ class WebPushManager {
 
       return true;
     } catch (error) {
-      logger.error('Failed to update push preferences', error as Error, 'SYSTEM');
+      console.error('Failed to update push preferences:', error);
       return false;
     }
   }
@@ -213,7 +211,7 @@ class WebPushManager {
 
       return true;
     } catch (error) {
-      logger.error('Unsubscribe failed', error as Error, 'SYSTEM');
+      console.error('Unsubscribe failed:', error);
       return false;
     }
   }

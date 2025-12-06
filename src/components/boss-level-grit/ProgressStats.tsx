@@ -14,22 +14,6 @@ import {
   Sparkles
 } from 'lucide-react';
 
-interface GritAchievement {
-  id: string;
-  title: string;
-  description: string;
-  icon: string;
-  type: 'streak' | 'completion' | 'score' | 'time' | 'category';
-  requirement: number;
-  progress: number;
-  unlocked: boolean;
-  unlockedAt?: Date;
-  reward: {
-    xp: number;
-    features?: string[];
-  };
-}
-
 interface GritStats {
   totalXp: number;
   currentLevel: {
@@ -57,7 +41,7 @@ interface GritStats {
     emotional: number;
     spiritual: number;
   };
-  achievements: GritAchievement[];
+  achievements: any[];
 }
 
 interface ProgressStatsProps {

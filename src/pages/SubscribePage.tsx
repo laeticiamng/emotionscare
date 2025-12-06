@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { logger } from '@/lib/logger';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -100,7 +99,7 @@ const SubscribePage: React.FC = () => {
     }
 
     // For premium plan - would redirect to Stripe Checkout
-    logger.info('Redirecting to checkout for plan', { planId, billingPeriod }, 'SYSTEM');
+    console.log('Redirecting to checkout for plan:', planId);
     // Here you would integrate with Stripe via your Render backend
     // window.location.href = `/api/billing/checkout?plan=${planId}&period=${billingPeriod}`;
   };

@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 /**
  * OpenAI API Client
@@ -30,7 +29,7 @@ export async function callOpenAI<T>(
   const key = apiKey || import.meta.env.VITE_OPENAI_API_KEY;
   
   if (!key) {
-    // Silent: OpenAI API key missing
+    console.error("La clé API OpenAI est manquante");
     throw new Error("Une clé API est requise pour utiliser cette fonctionnalité");
   }
   
@@ -42,7 +41,7 @@ export async function callOpenAI<T>(
     
     if (cachedResponse && 
         (Date.now() - cachedResponse.timestamp) < (cacheOptions.ttl * 1000)) {
-      // Silent: using cached response
+      console.log("Utilisation de la réponse en cache pour:", endpoint);
       return cachedResponse.data as T;
     }
   }
@@ -62,7 +61,7 @@ export async function callOpenAI<T>(
     
     if (!response.ok) {
       const errorData = await response.json();
-      // Silent: OpenAI API error
+      console.error("Erreur API OpenAI:", errorData);
       
       if (response.status === 429) {
         toast({
@@ -93,7 +92,7 @@ export async function callOpenAI<T>(
     
     return data as T;
   } catch (error) {
-    // Silent: OpenAI call failed
+    console.error("Échec de l'appel à OpenAI:", error);
     throw error;
   }
 }
@@ -114,7 +113,7 @@ async function fetchWithRetry(
       return await fetch(url, options);
     } catch (error) {
       lastError = error as Error;
-      // Silent: retry attempt failed
+      console.warn(`Tentative de retry ${attempt + 1}/${maxRetries} échouée:`, error);
       
       // Attendre avant la prochaine tentative avec backoff exponentiel
       await new Promise(resolve => setTimeout(resolve, retryDelay * Math.pow(2, attempt)));
@@ -192,7 +191,7 @@ export async function checkApiConnection(apiKey?: string): Promise<boolean> {
     
     return !!response.choices.length;
   } catch (error) {
-    // Silent: API connection check failed
+    console.error("La vérification de connexion API a échoué:", error);
     return false;
   }
 }

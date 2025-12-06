@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import { rateLimiter } from './rateLimiter';
 import { toast } from '@/hooks/use-toast';
@@ -11,11 +10,7 @@ class SecureApiClient {
   private defaultHeaders: HeadersInit;
 
   constructor() {
-    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-    if (!supabaseUrl) {
-      throw new Error('VITE_SUPABASE_URL must be defined in environment variables');
-    }
-    this.baseUrl = `${supabaseUrl}/functions/v1`;
+    this.baseUrl = 'https://yaincoxihiqdksxgrsrk.supabase.co/functions/v1';
     this.defaultHeaders = {
       'Content-Type': 'application/json',
     };

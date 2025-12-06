@@ -1,6 +1,3 @@
-// @ts-nocheck
-
-import { logger } from '@/lib/logger';
 
 /**
  * Validateur de préparation à la production
@@ -27,7 +24,7 @@ export class ProductionValidator {
     overallScore: number;
     readyForProduction: boolean;
   }> {
-    logger.info('🔍 Démarrage de l\'audit de production...', {}, 'SYSTEM');
+    console.log('🔍 Démarrage de l\'audit de production...');
 
     // Test de l'authentification
     await this.checkAuthentication();

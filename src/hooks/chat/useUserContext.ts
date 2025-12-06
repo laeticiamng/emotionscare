@@ -1,8 +1,6 @@
-// @ts-nocheck
 
 import { useState, useEffect } from 'react';
 import { UserContext } from '@/types/user-context';
-import { logger } from '@/lib/logger';
 
 export function useUserContext(userId?: string) {
   const [userContext, setUserContext] = useState<UserContext>({});
@@ -33,7 +31,7 @@ export function useUserContext(userId?: string) {
         
         setUserContext(mockUserContext);
       } catch (error) {
-        logger.error('Error loading user context', error as Error, 'UI');
+        console.error('Error loading user context:', error);
       } finally {
         setIsLoading(false);
       }

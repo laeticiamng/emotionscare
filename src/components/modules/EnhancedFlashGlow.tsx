@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,7 +9,6 @@ import { useWebBluetooth } from '@/hooks/useWebBluetooth';
 import { supabase } from '@/integrations/supabase/client';
 import { triggerConfetti } from '@/lib/confetti';
 import { toast } from '@/hooks/use-toast';
-import { logger } from '@/lib/logger';
 
 interface BreathingPattern {
   id: string;
@@ -319,7 +317,7 @@ export default function EnhancedFlashGlow() {
         }
       });
     } catch (error) {
-      logger.error('Erreur sauvegarde', error as Error, 'UI');
+      console.error('Erreur sauvegarde:', error);
     }
 
     triggerConfetti();

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -184,20 +184,20 @@ const B2BAuditPage: React.FC = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'pass': return 'text-success bg-success/10';
-      case 'warning': return 'text-warning bg-warning/10';
-      case 'fail': return 'text-destructive bg-destructive/10';
-      default: return 'text-muted-foreground bg-muted';
+      case 'pass': return 'text-green-600 bg-green-100';
+      case 'warning': return 'text-yellow-600 bg-yellow-100';
+      case 'fail': return 'text-red-600 bg-red-100';
+      default: return 'text-gray-600 bg-gray-100';
     }
   };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'critical': return 'bg-destructive/10 text-destructive';
-      case 'high': return 'bg-warning/10 text-warning';
-      case 'medium': return 'bg-warning/20 text-warning';
-      case 'low': return 'bg-success/10 text-success';
-      default: return 'bg-muted text-muted-foreground';
+      case 'critical': return 'bg-red-100 text-red-800';
+      case 'high': return 'bg-orange-100 text-orange-800';
+      case 'medium': return 'bg-yellow-100 text-yellow-800';
+      case 'low': return 'bg-green-100 text-green-800';
+      default: return 'bg-gray-100 text-gray-800';
     }
   };
 
@@ -234,8 +234,8 @@ const B2BAuditPage: React.FC = () => {
           className="text-center mb-8"
         >
           <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="p-3 bg-info/10 rounded-full">
-              <Shield className="h-8 w-8 text-info" />
+            <div className="p-3 bg-blue-100 rounded-full">
+              <Shield className="h-8 w-8 text-blue-600" />
             </div>
             <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
               Audit Enterprise B2B
@@ -248,12 +248,12 @@ const B2BAuditPage: React.FC = () => {
 
         <div className="max-w-7xl mx-auto">
           {/* Control Panel */}
-          <Card className="shadow-lg border-0 bg-card/80 backdrop-blur-sm mb-8">
+          <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm mb-8">
             <CardContent className="p-6">
               <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div className="flex items-center gap-6">
                   <div className="text-center">
-                    <p className="text-sm text-muted-foreground">Dernier audit</p>
+                    <p className="text-sm text-gray-600">Dernier audit</p>
                     <p className="font-medium">
                       {auditResults.length > 0 ? 'Maintenant' : 'Jamais'}
                     </p>
@@ -261,14 +261,14 @@ const B2BAuditPage: React.FC = () => {
                   {auditResults.length > 0 && (
                     <>
                       <div className="text-center">
-                        <p className="text-sm text-muted-foreground">Score Enterprise</p>
-                        <Badge className={auditStats.score >= 90 ? 'bg-success/10 text-success' : 
-                                        auditStats.score >= 75 ? 'bg-warning/10 text-warning' : 'bg-destructive/10 text-destructive'}>
+                        <p className="text-sm text-gray-600">Score Enterprise</p>
+                        <Badge className={auditStats.score >= 90 ? 'bg-green-100 text-green-800' : 
+                                        auditStats.score >= 75 ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}>
                           {auditStats.score}%
                         </Badge>
                       </div>
                       <div className="text-center">
-                        <p className="text-sm text-muted-foreground">Conformité</p>
+                        <p className="text-sm text-gray-600">Conformité</p>
                         <Badge variant="outline">
                           {Math.round(complianceFrameworks.reduce((acc, fw) => acc + fw.score, 0) / complianceFrameworks.length)}%
                         </Badge>
@@ -284,7 +284,7 @@ const B2BAuditPage: React.FC = () => {
                       Exporter Rapport Enterprise
                     </Button>
                   )}
-                  <Button onClick={runEnterpriseAudit} disabled={isRunningAudit} className="bg-info hover:bg-info/90">
+                  <Button onClick={runEnterpriseAudit} disabled={isRunningAudit} className="bg-blue-600 hover:bg-blue-700">
                     <BarChart3 className="h-4 w-4 mr-2" />
                     {isRunningAudit ? 'Audit Enterprise en cours...' : 'Lancer Audit Enterprise'}
                   </Button>
@@ -294,11 +294,11 @@ const B2BAuditPage: React.FC = () => {
               {isRunningAudit && (
                 <div className="mt-6">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm text-muted-foreground">Progression de l'audit Enterprise</span>
+                    <span className="text-sm text-gray-600">Progression de l'audit Enterprise</span>
                     <span className="text-sm font-medium">{Math.round(auditProgress)}%</span>
                   </div>
                   <Progress value={auditProgress} className="h-3" />
-                  <p className="text-xs text-muted-foreground mt-2">
+                  <p className="text-xs text-gray-500 mt-2">
                     Analyse approfondie: sécurité, conformité, performance, gouvernance...
                   </p>
                 </div>
@@ -310,32 +310,32 @@ const B2BAuditPage: React.FC = () => {
             <>
               {/* Statistics Overview */}
               <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                <Card className="shadow-lg border-0 bg-card/80 backdrop-blur-sm">
+                <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
                   <CardContent className="p-6 text-center">
-                    <CheckCircle className="h-8 w-8 text-success mx-auto mb-2" />
-                    <div className="text-2xl font-bold text-success">{auditStats.passed}</div>
-                    <p className="text-sm text-muted-foreground">Contrôles Réussis</p>
+                    <CheckCircle className="h-8 w-8 text-green-600 mx-auto mb-2" />
+                    <div className="text-2xl font-bold text-green-600">{auditStats.passed}</div>
+                    <p className="text-sm text-gray-600">Contrôles Réussis</p>
                   </CardContent>
                 </Card>
-                <Card className="shadow-lg border-0 bg-card/80 backdrop-blur-sm">
+                <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
                   <CardContent className="p-6 text-center">
-                    <AlertTriangle className="h-8 w-8 text-warning mx-auto mb-2" />
-                    <div className="text-2xl font-bold text-warning">{auditStats.warnings}</div>
-                    <p className="text-sm text-muted-foreground">À Améliorer</p>
+                    <AlertTriangle className="h-8 w-8 text-yellow-600 mx-auto mb-2" />
+                    <div className="text-2xl font-bold text-yellow-600">{auditStats.warnings}</div>
+                    <p className="text-sm text-gray-600">À Améliorer</p>
                   </CardContent>
                 </Card>
-                <Card className="shadow-lg border-0 bg-card/80 backdrop-blur-sm">
+                <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
                   <CardContent className="p-6 text-center">
-                    <AlertTriangle className="h-8 w-8 text-destructive mx-auto mb-2" />
-                    <div className="text-2xl font-bold text-destructive">{auditStats.failed}</div>
-                    <p className="text-sm text-muted-foreground">Non Conformes</p>
+                    <AlertTriangle className="h-8 w-8 text-red-600 mx-auto mb-2" />
+                    <div className="text-2xl font-bold text-red-600">{auditStats.failed}</div>
+                    <p className="text-sm text-gray-600">Non Conformes</p>
                   </CardContent>
                 </Card>
-                <Card className="shadow-lg border-0 bg-card/80 backdrop-blur-sm">
+                <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
                   <CardContent className="p-6 text-center">
-                    <TrendingUp className="h-8 w-8 text-info mx-auto mb-2" />
-                    <div className="text-2xl font-bold text-info">{auditStats.score}%</div>
-                    <p className="text-sm text-muted-foreground">Score Global</p>
+                    <TrendingUp className="h-8 w-8 text-blue-600 mx-auto mb-2" />
+                    <div className="text-2xl font-bold text-blue-600">{auditStats.score}%</div>
+                    <p className="text-sm text-gray-600">Score Global</p>
                   </CardContent>
                 </Card>
               </div>
@@ -344,7 +344,7 @@ const B2BAuditPage: React.FC = () => {
               <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm mb-8">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <FileText className="h-5 w-5 text-accent" />
+                    <FileText className="h-5 w-5 text-purple-600" />
                     Frameworks de Conformité Enterprise
                   </CardTitle>
                 </CardHeader>
@@ -410,16 +410,16 @@ const B2BAuditPage: React.FC = () => {
                                     </Badge>
                                   </div>
                                   <p className="text-gray-600 mb-3">{item.description}</p>
-                                   {item.recommendation && (
-                                    <div className="p-3 bg-info/10 rounded-lg mb-3">
-                                      <p className="text-sm text-info">
+                                  {item.recommendation && (
+                                    <div className="p-3 bg-blue-50 rounded-lg mb-3">
+                                      <p className="text-sm text-blue-800">
                                         <strong>Recommandation:</strong> {item.recommendation}
                                       </p>
                                     </div>
                                   )}
                                   {item.businessImpact && (
-                                    <div className="p-3 bg-accent/10 rounded-lg">
-                                      <p className="text-sm text-accent">
+                                    <div className="p-3 bg-purple-50 rounded-lg">
+                                      <p className="text-sm text-purple-800">
                                         <strong>Impact Business:</strong> {item.businessImpact}
                                       </p>
                                     </div>

@@ -1,9 +1,7 @@
-// @ts-nocheck
 
 import { useState, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { logger } from '@/lib/logger';
 
 interface MusicTrack {
   id: string;
@@ -73,7 +71,7 @@ export const useMusicGen = () => {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erreur lors de la génération musicale';
       setError(errorMessage);
-      logger.error('Error generating music', err as Error, 'MUSIC');
+      console.error('Error generating music:', err);
       
       // Fallback mock track for development
       const mockTrack: MusicTrack = {
@@ -120,7 +118,7 @@ export const useMusicGen = () => {
       }
 
     } catch (err) {
-      logger.error('Error starting music session', err as Error, 'MUSIC');
+      console.error('Error starting music session:', err);
       setError('Erreur lors du démarrage de la session');
     } finally {
       setIsLoading(false);
@@ -135,7 +133,7 @@ export const useMusicGen = () => {
     if (audioRef.current) {
       audioRef.current.src = track.url;
       audioRef.current.play().catch(err => {
-        logger.error('Error playing track', err as Error, 'MUSIC');
+        console.error('Error playing track:', err);
         toast.error('Erreur de lecture audio');
       });
     }

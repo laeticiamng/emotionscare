@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 export type UserRole = 'b2c' | 'b2b_user' | 'b2b_admin' | 'admin';
 

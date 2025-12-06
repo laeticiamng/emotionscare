@@ -1,8 +1,6 @@
-// @ts-nocheck
 // ❌ EXEMPLES DE VIOLATIONS - Ces patterns déclencheront des erreurs ESLint
 
 import React from 'react';
-import { logger } from '@/lib/logger';
 
 // Dummy function for the example
 const fetchData = async () => {
@@ -26,7 +24,7 @@ export const BadComponent2 = () => {
     // ❌ Hook dans un try - INTERDIT  
     // const [data] = useState(null); // Uncomment to test ESLint error
   } catch (error) {
-    logger.error('Error in component', error as Error, 'UI');
+    console.error(error);
   }
   return null;
 };

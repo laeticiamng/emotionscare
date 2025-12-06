@@ -1,6 +1,4 @@
-// @ts-nocheck
 import { useState, useEffect, useRef } from 'react';
-import { logger } from '@/lib/logger';
 
 interface PerformanceMetrics {
   fcp: number | null;
@@ -52,7 +50,7 @@ export const usePerformanceMonitor = () => {
       try {
         observer.observe({ entryTypes: ['paint'] });
       } catch (e) {
-        logger.warn('Paint observer not supported', {}, 'SYSTEM');
+        console.warn('Paint observer not supported');
       }
 
       // Observer pour LCP
@@ -65,7 +63,7 @@ export const usePerformanceMonitor = () => {
       try {
         lcpObserver.observe({ entryTypes: ['largest-contentful-paint'] });
       } catch (e) {
-        logger.warn('LCP observer not supported', {}, 'SYSTEM');
+        console.warn('LCP observer not supported');
       }
 
       // Observer pour CLS
@@ -82,7 +80,7 @@ export const usePerformanceMonitor = () => {
       try {
         clsObserver.observe({ entryTypes: ['layout-shift'] });
       } catch (e) {
-        logger.warn('CLS observer not supported', {}, 'SYSTEM');
+        console.warn('CLS observer not supported');
       }
     }
 

@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
@@ -9,7 +8,7 @@ import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Palette, Eye, Save, RotateCcw } from 'lucide-react';
-import { useTheme } from '@/providers/theme';
+import { useTheme } from '@/components/theme-provider';
 
 interface ThemeCustomizerProps {
   onClose?: () => void;

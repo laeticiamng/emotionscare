@@ -1,4 +1,4 @@
-import { logger } from '@/lib/logger';
+
 import { ApiErrorHandler } from '@/utils/errorHandlers';
 
 /**
@@ -6,15 +6,6 @@ import { ApiErrorHandler } from '@/utils/errorHandlers';
  */
 export class VoiceUtils {
   
-  /**
-   * Crée une promesse de timeout
-   */
-  private static createTimeout(ms: number): Promise<Response> {
-    return new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Voice request timeout')), ms)
-    );
-  }
-
   /**
    * Appel sécurisé pour la transcription vocale
    */
@@ -28,7 +19,7 @@ export class VoiceUtils {
           },
           body: JSON.stringify({ audio: audioData }),
         }),
-        VoiceUtils.createTimeout(15000)
+        ApiErrorHandler.createVoiceTimeout(15000)
       ]);
 
       if (!response.ok) {
@@ -37,9 +28,8 @@ export class VoiceUtils {
 
       const result = await response.json();
       return result.text || null;
-    } catch (error) {
-      logger.error('Voice transcription failed', error as Error, 'API');
-      ApiErrorHandler.handleApiError(error, 'transcribeAudio');
+    } catch (error: any) {
+      ApiErrorHandler.handleVoiceError(error, 'transcribeAudio');
       return null;
     }
   }
@@ -57,7 +47,7 @@ export class VoiceUtils {
           },
           body: JSON.stringify({ text, voice }),
         }),
-        VoiceUtils.createTimeout(15000)
+        ApiErrorHandler.createVoiceTimeout(15000)
       ]);
 
       if (!response.ok) {
@@ -66,9 +56,8 @@ export class VoiceUtils {
 
       const result = await response.json();
       return result.audioContent || null;
-    } catch (error) {
-      logger.error('Voice synthesis failed', error as Error, 'API');
-      ApiErrorHandler.handleApiError(error, 'synthesizeText');
+    } catch (error: any) {
+      ApiErrorHandler.handleVoiceError(error, 'synthesizeText');
       return null;
     }
   }

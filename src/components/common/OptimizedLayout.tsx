@@ -1,11 +1,12 @@
 import React, { memo, Suspense, lazy } from 'react';
 import { EnhancedErrorBoundary } from '@/components/ui/enhanced-error-boundary';
 import { AccessibilityProvider } from '@/components/common/AccessibilityProvider';
-import { CoachProvider } from '@/contexts/coach/UnifiedCoachContext';
+import { CoachProvider } from '@/contexts/coach/CoachContextUnified';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import { logProductionEvent } from '@/utils/consoleCleanup';
 
 // Lazy load heavy components
+const AccessibilityEnhancer = lazy(() => import('@/components/ui/AccessibilityEnhancer'));
 const PerformanceMonitor = lazy(() => import('@/components/monitoring/PerformanceMonitor'));
 
 interface OptimizedLayoutProps {
@@ -75,7 +76,11 @@ const OptimizedLayout: React.FC<OptimizedLayoutProps> = memo(({
             </main>
             
             {/* Enhanced Features - Lazy Loaded */}
-            {/* AccessibilityEnhancer disabled for now - no default export */}
+            {enableAccessibility && (
+              <Suspense fallback={null}>
+                <AccessibilityEnhancer />
+              </Suspense>
+            )}
             
             {enableMonitoring && process.env.NODE_ENV === 'development' && (
               <Suspense fallback={null}>

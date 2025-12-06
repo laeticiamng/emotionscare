@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -130,7 +129,7 @@ const MainNavigationHub: React.FC = () => {
               onClick={(e) => e.stopPropagation()}
             >
               {/* Header */}
-              <div className="p-6 border-b bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-950/50 dark:to-pink-950/50">
+              <div className="p-6 border-b bg-gradient-to-r from-purple-50 to-pink-50">
                 <div className="flex items-center justify-between mb-4">
                   <div>
                     <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
@@ -195,7 +194,7 @@ const MainNavigationHub: React.FC = () => {
                           className={cn(
                             "cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-105",
                             "bg-gradient-to-br from-background to-accent/5",
-                            item.isPremium && "border-amber-200 dark:border-amber-700 bg-gradient-to-br from-amber-50 dark:from-amber-950/50 to-background"
+                            item.isPremium && "border-amber-200 bg-gradient-to-br from-amber-50 to-background"
                           )}
                           onClick={() => handleNavigate(item.path)}
                         >
@@ -203,8 +202,8 @@ const MainNavigationHub: React.FC = () => {
                             <div className="flex items-start gap-3">
                               <div className={cn(
                                 "p-2 rounded-lg shrink-0",
-                                item.isPremium
-                                  ? "bg-amber-100 dark:bg-amber-900/50 text-amber-600 dark:text-amber-400"
+                                item.isPremium 
+                                  ? "bg-amber-100 text-amber-600" 
                                   : "bg-primary/10 text-primary"
                               )}>
                                 <Icon className="h-5 w-5" />

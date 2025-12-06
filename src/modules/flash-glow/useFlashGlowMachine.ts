@@ -4,8 +4,7 @@
  */
 
 import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
-import { captureException } from '@/lib/ai-monitoring';
-import { Sentry } from '@/lib/errors/sentry-compat';
+import * as Sentry from '@sentry/react';
 import { useAsyncMachine } from '@/hooks/useAsyncMachine';
 import { flashGlowService, FlashGlowSession } from './flash-glowService';
 import { toast } from '@/hooks/use-toast';
@@ -14,7 +13,6 @@ import type { JournalEntry } from '@/modules/journal/journalService';
 import { useSessionClock } from '@/modules/sessions/hooks/useSessionClock';
 import { logAndJournal } from '@/services/sessions/sessionsApi';
 import { computeMoodDelta } from '@/services/sessions/moodDelta';
-import { logger } from '@/lib/logger';
 
 interface FlashGlowConfig {
   glowType: string;
@@ -161,11 +159,11 @@ export const useFlashGlowMachine = (): FlashGlowMachineReturn => {
       };
     },
     onSuccess: (result) => {
-      logger.info('Flash Glow session completed', result, 'MUSIC');
+      console.log('✅ Flash Glow session completed:', result);
     },
     onError: (error) => {
       clock.reset();
-      logger.error('Flash Glow session error', error as Error, 'MUSIC');
+      console.error('❌ Flash Glow session error:', error);
       toast({
         title: "Session interrompue",
         description: "La session Flash Glow a été interrompue",
@@ -235,7 +233,7 @@ export const useFlashGlowMachine = (): FlashGlowMachineReturn => {
         avgDuration: statsData.avg_duration
       });
     } catch (error) {
-      logger.error('Error loading stats', error as Error, 'MUSIC');
+      console.error('Error loading stats:', error);
     }
   }, []);
 
@@ -377,7 +375,7 @@ export const useFlashGlowMachine = (): FlashGlowMachineReturn => {
       await loadStats();
 
     } catch (error) {
-      logger.error('Error completing session', error as Error, 'MUSIC');
+      console.error('Error completing session:', error);
       Sentry.captureException(error);
       toast({
         title: "Erreur",

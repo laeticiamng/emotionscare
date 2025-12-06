@@ -1,5 +1,6 @@
+
 import { useState, useEffect, useCallback } from 'react';
-import { useMusicCompat } from '@/hooks/useMusicCompat';
+import { useMusic } from '@/hooks/useMusic';
 import { useBranding } from '@/contexts/BrandingContext';
 import { useStorytelling } from '@/providers/StorytellingProvider';
 import { useSoundscape } from '@/providers/SoundscapeProvider';
@@ -20,11 +21,11 @@ export function usePredictiveIntelligence(userMode: 'b2c' | 'b2b' | 'b2b-admin' 
   const { isEnabled: predictionEnabled, setEnabled: setPredictionEnabled, currentPredictions } = usePredictiveAnalytics();
   const { toast } = useToast();
   const logger = useLogger('PredictiveIntelligence');
-
+  
   const { updateSoundscapeForEmotion } = useSoundscape();
   const { applyEmotionalBranding } = useBranding();
   const { addStory } = useStorytelling();
-  const { loadPlaylistForEmotion } = useMusicCompat();
+  const { loadPlaylistForEmotion } = useMusic();
   
   // Define available predictive features
   useEffect(() => {

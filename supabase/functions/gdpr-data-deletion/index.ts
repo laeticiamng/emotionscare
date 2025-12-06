@@ -1,33 +1,21 @@
-/**
- * gdpr-data-deletion - Suppression complète des données RGPD (Art. 17)
- *
- * 🔒 SÉCURISÉ: Auth + Rate limit 1/jour + CORS restrictif
- */
 
-// @ts-nocheck
+import { serve } from 'https://deno.land/std@0.208.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { authenticateRequest, logUnauthorizedAccess } from '../_shared/auth-middleware.ts';
 import { buildRateLimitResponse, enforceEdgeRateLimit } from '../_shared/rate-limit.ts';
-import { cors, preflightResponse, rejectCors } from '../_shared/cors.ts';
 
-Deno.serve(async (req) => {
-  // 1. CORS check
-  const corsResult = cors(req);
+serve(async (req) => {
   const corsHeaders = {
-    ...corsResult.headers,
+    'Access-Control-Allow-Origin': req.headers.get('Origin') || '*',
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
     'Content-Security-Policy': "default-src 'self'",
     'X-Content-Type-Options': 'nosniff',
-    'X-Frame-Options': 'DENY',
+    'X-Frame-Options': 'DENY'
   };
 
   if (req.method === 'OPTIONS') {
-    return preflightResponse(corsResult);
-  }
-
-  // Vérification CORS stricte
-  if (!corsResult.allowed) {
-    console.warn('[gdpr-data-deletion] CORS rejected - origin not allowed');
-    return rejectCors(corsResult);
+    return new Response('ok', { headers: corsHeaders });
   }
 
   try {
@@ -80,19 +68,13 @@ Deno.serve(async (req) => {
         ip_address: req.headers.get('x-forwarded-for') || 'unknown'
       });
 
-    // ✅ Supprimer TOUTES les données utilisateur (RGPD Art. 17 - Droit à l'oubli)
-    // Ordre respectant les contraintes FK
+    // Supprimer les données utilisateur dans l'ordre correct (contraintes FK)
     const deletionSteps = [
       { table: 'user_activity_logs', condition: 'user_id' },
-      { table: 'health_data_consents', condition: 'user_id' },
-      { table: 'coach_logs', condition: 'user_id' },
-      { table: 'journal_entries', condition: 'user_id' },
-      { table: 'assessment_results', condition: 'user_id' },
-      { table: 'emotion_scans', condition: 'user_id' },
       { table: 'user_preferences', condition: 'user_id' },
+      { table: 'coach_conversations', condition: 'user_id' },
+      { table: 'emotion_entries', condition: 'user_id' },
       { table: 'data_export_requests', condition: 'user_id' },
-      { table: 'audit_logs', condition: 'user_id' },
-      { table: 'user_roles', condition: 'user_id' },
       { table: 'profiles', condition: 'id' }
     ];
 

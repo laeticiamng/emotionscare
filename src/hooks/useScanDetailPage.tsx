@@ -1,11 +1,7 @@
+
 import { useState, useEffect } from 'react';
 import type { User } from '@/types/user';
-
-interface Emotion {
-  id: string;
-  name: string;
-  color: string;
-}
+import type { Emotion } from '@/types/emotion';
 
 export interface ScanDetail {
   id: string;
@@ -81,8 +77,8 @@ export function useScanDetailPage(scanId: string): UseScanDetailPageReturn {
           id: 'usr-123',
           name: 'Jean Dupont',
           email: 'jean.dupont@example.com',
-          role: 'b2c' as const,
-          createdAt: new Date().toISOString()
+          role: 'user',
+          created_at: new Date().toISOString()
         },
         emotions: ['calme', 'concentré', 'léger stress'],
         insights: [
@@ -115,9 +111,8 @@ export function useScanDetailPage(scanId: string): UseScanDetailPageReturn {
 
   useEffect(() => {
     if (scanId) {
-      void fetchUserAndLatestEmotion();
+      fetchUserAndLatestEmotion();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scanId]);
 
   return { 

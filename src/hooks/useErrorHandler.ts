@@ -1,6 +1,6 @@
+
 import { useCallback } from 'react';
 import { useError } from '@/contexts';
-import { logger } from '@/lib/logger';
 
 interface ErrorHandlerOptions {
   showToast?: boolean;
@@ -26,7 +26,7 @@ export const useErrorHandler = () => {
     const fullContext = context ? `[${context}] ${errorMessage}` : errorMessage;
 
     if (logToConsole) {
-      logger.error(fullContext, error as Error, 'SYSTEM');
+      console.error(fullContext, error);
     }
 
     notify(
@@ -44,7 +44,7 @@ export const useErrorHandler = () => {
 
     if (reportToService && process.env.NODE_ENV === 'production') {
       // Ici on pourrait intégrer Sentry ou un autre service de monitoring
-      logger.warn('Error reporting service not configured', undefined, 'SYSTEM');
+      console.warn('Error reporting service not configured');
     }
 
     return {

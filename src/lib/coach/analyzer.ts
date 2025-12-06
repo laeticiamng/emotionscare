@@ -1,11 +1,9 @@
-// @ts-nocheck
 
-import { logger } from '@/lib/logger';
 import { EmotionResult } from '@/types/emotion';
 
 export const analyzeEmotionalState = async (userId: string, emotionalData: EmotionResult[]): Promise<any> => {
   // Mock implementation
-  logger.info(`Analyzing emotional state for user ${userId}`, {}, 'API');
+  console.log(`Analyzing emotional state for user ${userId}`);
   return {
     dominantEmotion: emotionalData[0]?.emotion || 'neutral',
     intensity: emotionalData[0]?.intensity || 50,

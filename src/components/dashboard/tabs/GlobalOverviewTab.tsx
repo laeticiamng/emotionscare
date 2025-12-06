@@ -1,13 +1,8 @@
-// @ts-nocheck
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Heart, Brain, Activity, TrendingUp } from 'lucide-react';
 import { UserRole } from '@/types/user';
-import { logger } from '@/lib/logger';
-import { useDashboard } from '@/hooks/useDashboard';
-import { useDashboardWeekly } from '@/hooks/useDashboardWeekly';
-import { useAuth } from '@/contexts/AuthContext';
 
 interface GlobalOverviewTabProps {
   className?: string;
@@ -17,46 +12,34 @@ interface GlobalOverviewTabProps {
 const SLEEP_REMINDER_STORAGE_KEY = 'breath:isi:status';
 
 const GlobalOverviewTab: React.FC<GlobalOverviewTabProps> = ({ className, userRole }) => {
-  const { user } = useAuth();
-  const { stats: dashboardStats, weeklySummary } = useDashboard(user?.id || '');
-  const { data: weeklyData } = useDashboardWeekly();
-
-  // Calculate stats from real API data
-  const wellnessScore = dashboardStats?.wellnessScore || 0;
-  const stressLevel = wellnessScore > 70 ? 'Faible' : wellnessScore > 40 ? 'Modéré' : 'Élevé';
-  const dailyActivity = weeklyData?.today?.glow_score
-    ? `${Math.round(weeklyData.today.glow_score / 10)}/10`
-    : '0/10';
-  const progression = wellnessScore;
-
   const stats = [
     {
       title: 'Bien-être général',
-      value: `${wellnessScore}%`,
+      value: '85%',
       icon: Heart,
       trend: '+5%',
-      color: 'text-success'
+      color: 'text-green-500'
     },
     {
       title: 'Niveau de stress',
-      value: stressLevel,
+      value: 'Faible',
       icon: Brain,
-      trend: wellnessScore > 60 ? '-12%' : '+3%',
-      color: 'text-primary'
+      trend: '-12%',
+      color: 'text-blue-500'
     },
     {
       title: 'Activité quotidienne',
-      value: dailyActivity,
+      value: '7/10',
       icon: Activity,
       trend: '+2%',
-      color: 'text-accent'
+      color: 'text-purple-500'
     },
     {
       title: 'Progression',
-      value: `${progression}%`,
+      value: '92%',
       icon: TrendingUp,
       trend: '+8%',
-      color: 'text-warning'
+      color: 'text-orange-500'
     }
   ];
 
@@ -79,7 +62,7 @@ const GlobalOverviewTab: React.FC<GlobalOverviewTabProps> = ({ className, userRo
         setShowSoothingReminder(true);
       }
     } catch (error) {
-      logger.warn('Soothing reminder flag parse failed', error, 'UI');
+      console.warn('Soothing reminder flag parse failed', error);
     }
   }, []);
 
@@ -95,7 +78,7 @@ const GlobalOverviewTab: React.FC<GlobalOverviewTabProps> = ({ className, userRo
             <CardContent>
               <div className="text-2xl font-bold">{stat.value}</div>
               <p className="text-xs text-muted-foreground">
-                <span className="text-success">{stat.trend}</span> par rapport à la semaine dernière
+                <span className="text-green-500">{stat.trend}</span> par rapport à la semaine dernière
               </p>
             </CardContent>
           </Card>
@@ -110,22 +93,16 @@ const GlobalOverviewTab: React.FC<GlobalOverviewTabProps> = ({ className, userRo
           <CardContent>
             <div className="space-y-4">
               <div className="flex justify-between items-center">
-                <span>Sessions totales</span>
-                <span className="font-medium">{weeklySummary?.totalSessions || 0}</span>
+                <span>Analyses émotionnelles</span>
+                <span className="font-medium">12</span>
               </div>
               <div className="flex justify-between items-center">
-                <span>Temps total</span>
-                <span className="font-medium">
-                  {weeklySummary?.totalMinutes
-                    ? `${Math.floor(weeklySummary.totalMinutes / 60)}h ${weeklySummary.totalMinutes % 60}min`
-                    : '0min'}
-                </span>
+                <span>Sessions VR</span>
+                <span className="font-medium">5</span>
               </div>
               <div className="flex justify-between items-center">
-                <span>Modules favoris</span>
-                <span className="font-medium">
-                  {weeklySummary?.topModules?.[0] || 'Aucun'}
-                </span>
+                <span>Écoute musicale</span>
+                <span className="font-medium">8h 30min</span>
               </div>
             </div>
           </CardContent>
@@ -137,24 +114,15 @@ const GlobalOverviewTab: React.FC<GlobalOverviewTabProps> = ({ className, userRo
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {wellnessScore >= 70 && (
-                <div className="p-3 bg-success/10 rounded-lg">
-                  <p className="text-sm">Excellent ! Votre bien-être est optimal. Continuez vos bonnes habitudes !</p>
-                </div>
-              )}
-              {wellnessScore < 70 && wellnessScore >= 40 && (
-                <div className="p-3 bg-primary/10 rounded-lg">
-                  <p className="text-sm">Prenez une pause de 10 minutes pour améliorer votre bien-être</p>
-                </div>
-              )}
-              {wellnessScore < 40 && (
-                <div className="p-3 bg-warning/10 rounded-lg">
-                  <p className="text-sm">Votre niveau de stress semble élevé. Essayez une session de respiration ou de méditation.</p>
-                </div>
-              )}
+              <div className="p-3 bg-blue-50 dark:bg-blue-950 rounded-lg">
+                <p className="text-sm">Prenez une pause VR de 10 minutes pour réduire le stress</p>
+              </div>
+              <div className="p-3 bg-green-50 dark:bg-green-950 rounded-lg">
+                <p className="text-sm">Votre bien-être s'améliore ! Continuez vos bonnes habitudes</p>
+              </div>
               {showSoothingReminder && (
-                <div className="rounded-lg border border-warning/20 bg-warning/10 p-3">
-                  <p className="text-sm text-warning-foreground">
+                <div className="rounded-lg border border-amber-200/80 bg-amber-50/80 p-3 dark:border-amber-900/60 dark:bg-amber-950/40">
+                  <p className="text-sm text-amber-900 dark:text-amber-100">
                     Rappel hebdo : programme une respiration apaisante 4-7-8 pour protéger ton sommeil.
                   </p>
                 </div>

@@ -1,5 +1,5 @@
+
 import React, { useState, useEffect } from 'react';
-import { logger } from '@/lib/logger';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
@@ -48,7 +48,7 @@ const UserActivityTimeline: React.FC<UserActivityTimelineProps> = ({ userId }) =
         
         setActivities(mockActivities);
       } catch (error) {
-        logger.error('Error fetching activity data', { error, userId }, 'ADMIN');
+        console.error('Error fetching activity data:', error);
       } finally {
         setLoading(false);
       }

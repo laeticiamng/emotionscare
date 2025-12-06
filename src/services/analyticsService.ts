@@ -3,8 +3,6 @@
  * Collecte uniquement des métriques techniques anonymisées
  */
 
-import { logger } from '@/lib/logger';
-
 interface AnalyticsEvent {
   event: string;
   category: 'routing' | 'module' | 'rh' | 'settings' | 'rgpd' | 'feedback';
@@ -152,7 +150,7 @@ class AnalyticsService {
 
     // Simulation d'envoi - dans la vraie implémentation, utiliser fetch
     try {
-      logger.debug('[Analytics] Events sent', { count: this.queue.length }, 'ANALYTICS');
+      console.log('[Analytics] Events sent:', this.queue.length);
       // Replace with real API call
       const mockAnalytics = {
         pageViews: Math.floor(Math.random() * 10000),
@@ -161,11 +159,12 @@ class AnalyticsService {
         bounceRate: (Math.random() * 50).toFixed(2) + '%'
       };
       
-      logger.debug('Analytics data loaded', mockAnalytics, 'ANALYTICS');
+      console.log('Analytics data loaded:', mockAnalytics);
+      return mockAnalytics;
       // await fetch('/api/analytics/batch', { method: 'POST', body: JSON.stringify(this.queue) });
       this.queue = [];
     } catch (error) {
-      logger.warn('[Analytics] Failed to send events', error as Error, 'ANALYTICS');
+      console.warn('[Analytics] Failed to send events:', error);
       // Garder les événements en queue pour retry
     }
   }

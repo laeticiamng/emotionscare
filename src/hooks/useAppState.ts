@@ -1,4 +1,4 @@
-// @ts-nocheck
+
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
 import { useLayout } from '@/contexts/LayoutContext';

@@ -1,6 +1,4 @@
-// @ts-nocheck
 
-import { logger } from '@/lib/logger';
 import { NotificationService } from '@/lib/notifications';
 import { CoachNotification } from '../types';
 
@@ -21,7 +19,7 @@ export async function wellnessNotification(
     });
     return true;
   } catch (error) {
-    logger.error('Error creating wellness notification', error as Error, 'API');
+    console.error('Error creating wellness notification:', error);
     return false;
   }
 }
@@ -43,7 +41,7 @@ export async function wellnessReminder(
     });
     return true;
   } catch (error) {
-    logger.error('Error creating wellness reminder', error as Error, 'API');
+    console.error('Error creating wellness reminder:', error);
     return false;
   }
 }
@@ -65,7 +63,7 @@ export async function wellnessTip(
     });
     return true;
   } catch (error) {
-    logger.error('Error creating wellness tip notification', error as Error, 'API');
+    console.error('Error creating wellness tip notification:', error);
     return false;
   }
 }

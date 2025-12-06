@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 // Sélecteur de preset EmotionsCare basé sur l'analyse émotionnelle Hume
 import { HumeEmotionScore } from './humeClient';
@@ -80,7 +79,7 @@ export function choosePreset(emotions: HumeEmotionScore[]): EmotionsCarePreset {
       for (const tag of mappedTags) {
         const preset = TAG_TO_PRESET.get(tag);
         if (preset) {
-          // Silent: preset selected for emotion
+          console.log(`🎵 EmotionsCare: Selected preset "${tag}" for emotion "${emotionName}" (score: ${emotion.score})`);
           return preset;
         }
       }
@@ -100,7 +99,7 @@ export function choosePreset(emotions: HumeEmotionScore[]): EmotionsCarePreset {
     }
   }
 
-  // Silent: fallback preset selected
+  console.log(`🎵 EmotionsCare: Fallback preset "${bestMatch.tag}" for emotion "${topEmotion.name}" (similarity: ${bestScore})`);
   return bestMatch;
 }
 

@@ -1,11 +1,9 @@
-// @ts-nocheck
 
 /**
  * Optimisations de cache spécialisées
  */
 
 import { apiCache, userCache, staticCache } from './cacheStrategies';
-import { logger } from '@/lib/logger';
 
 /**
  * Gestionnaire de cache intelligent
@@ -62,7 +60,7 @@ export class CacheManager {
         this.cacheUserData(userId, 'preferences', preferences);
       }
     } catch (error) {
-      logger.warn('Preload failed', error as Error, 'SYSTEM');
+      console.warn('Preload failed:', error);
     }
   }
 
@@ -71,7 +69,7 @@ export class CacheManager {
    */
   cleanupExpiredEntries(): void {
     // Les caches LRU se nettoient automatiquement
-    logger.info('Cache cleanup completed', undefined, 'SYSTEM');
+    console.log('Cache cleanup completed');
   }
 
   /**

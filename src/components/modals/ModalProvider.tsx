@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { Suspense } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { X } from 'lucide-react';
@@ -6,7 +5,6 @@ import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { useModalStore } from '@/state/modalStore';
 import { cn } from '@/lib/utils';
-import { logger } from '@/lib/logger';
 
 // Lazy load des composants de modals
 const AuthModal = React.lazy(() => import('./AuthModal'));
@@ -59,7 +57,7 @@ function ModalWrapper({ modal, onClose }: ModalWrapperProps) {
     : null;
 
   if (!ModalComponent) {
-    logger.warn('Modal component not found', { component: modal.component }, 'UI');
+    console.warn(`Modal component "${modal.component}" not found`);
     return null;
   }
 

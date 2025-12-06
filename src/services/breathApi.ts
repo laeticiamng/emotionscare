@@ -1,4 +1,3 @@
-// @ts-nocheck
 import dayjs from 'dayjs';
 import { GlobalInterceptor } from '@/utils/globalInterceptor';
 

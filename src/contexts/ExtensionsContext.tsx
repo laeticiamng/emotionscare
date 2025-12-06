@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { createContext, useContext } from 'react';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { ExtensionMeta } from '@/types/extensions';

@@ -1,6 +1,3 @@
-// @ts-nocheck
-import { logger } from '@/lib/logger';
-
 const STORAGE_KEY = "es_metrics_queue";
 const MAX_BYTES = 2_000_000; // 2MB
 const TTL_HOURS = 72;
@@ -46,7 +43,7 @@ function writeQueue(items: QueueItem[]): void {
     
     localStorage.setItem(STORAGE_KEY, serialized);
   } catch (error) {
-    logger.warn('Failed to write metrics queue', error as Error, 'ANALYTICS');
+    console.warn('Failed to write metrics queue:', error);
   }
 }
 
@@ -97,7 +94,7 @@ export async function postMetric(endpoint: string, body: any): Promise<void> {
     writeQueue(updatedQueue);
   } catch (error) {
     // Failed to send - item remains in queue for later retry
-    logger.warn('Metric queued for later retry', error as Error, 'ANALYTICS');
+    console.warn('Metric queued for later retry:', error);
   }
 }
 

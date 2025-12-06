@@ -1,6 +1,4 @@
-// @ts-nocheck
-import { captureException } from '@/lib/ai-monitoring';
-import { logger } from '@/lib/logger';
+import * as Sentry from '@sentry/react';
 
 import { sanitizeUserText } from '../guards/antiPromptInjection';
 import { mustBlock, moderateOutput } from '../guards/contentFilter';
@@ -46,6 +44,7 @@ async function callLLM(payload: CallLlmPayload): Promise<string> {
 
     return message;
   } catch (error) {
+    Sentry.captureException(error, { tags: { scope: 'coachLLM' } });
     throw error instanceof Error ? error : new Error('coach_llm_failed');
   }
 }
@@ -73,7 +72,7 @@ export async function generateCoachReply(
   const clean = sanitizeUserText(userText);
 
   if (mustBlock(clean)) {
-    logger.warn('guard:block', undefined, 'COACH');
+    Sentry.addBreadcrumb({ category: 'coach', message: 'guard:block', level: 'warning' });
     return 'Je ne peux pas aider sur ce point. Parlons sécurité.';
   }
 

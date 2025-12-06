@@ -1,10 +1,8 @@
-// @ts-nocheck
 
 import { useState, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useActivity } from '@/hooks/useActivity';
-import { logger } from '@/lib/logger';
 
 /**
  * Hook to handle coach recommendations generation and management
@@ -79,7 +77,7 @@ export function useRecommendations() {
         });
       }
     } catch (error) {
-      logger.error('Error generating recommendation', error as Error, 'UI');
+      console.error('Error generating recommendation:', error);
       
       // Provide fallback recommendations
       const fallbackRecommendations = [

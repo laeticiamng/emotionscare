@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import { ChatMessage, ChatConversation } from '@/types/chat';
 import { EmotionResult } from '@/types/emotion';

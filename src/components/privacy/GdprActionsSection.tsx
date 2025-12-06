@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,7 +9,6 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Download, Trash2, Shield, AlertTriangle } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { logger } from '@/lib/logger';
 
 const GdprActionsSection: React.FC = () => {
   const [isExporting, setIsExporting] = useState(false);
@@ -43,7 +41,7 @@ const GdprActionsSection: React.FC = () => {
         description: "Vos données ont été exportées avec succès.",
       });
     } catch (error) {
-      logger.error('Erreur export', error as Error, 'SYSTEM');
+      console.error('Erreur export:', error);
       toast({
         title: "Erreur d'export",
         description: "Impossible d'exporter vos données. Réessayez plus tard.",
@@ -82,7 +80,7 @@ const GdprActionsSection: React.FC = () => {
         window.location.href = '/';
       }, 2000);
     } catch (error) {
-      logger.error('Erreur suppression', error as Error, 'SYSTEM');
+      console.error('Erreur suppression:', error);
       toast({
         title: "Erreur de suppression",
         description: "Impossible de supprimer vos données. Contactez le support.",

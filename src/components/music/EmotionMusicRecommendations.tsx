@@ -1,5 +1,5 @@
+
 import React, { useState, useEffect } from 'react';
-import { logger } from '@/lib/logger';
 import { useMusicEmotionIntegration } from '@/hooks/useMusicEmotionIntegration';
 import { MusicTrack, MusicPlaylist, EmotionMusicParams } from '@/types/music';
 import { getTrackCover } from '@/utils/musicCompatibility';
@@ -23,8 +23,7 @@ export const EmotionMusicRecommendations: React.FC<EmotionMusicRecommendationsPr
   className = ''
 }) => {
   const [playlist, setPlaylist] = useState<MusicPlaylist | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const { activateMusicForEmotion, getEmotionMusicDescription } = useMusicEmotionIntegration();
+  const { activateMusicForEmotion, getEmotionMusicDescription, isLoading } = useMusicEmotionIntegration();
 
   useEffect(() => {
     if (autoActivate && emotion) {
@@ -33,7 +32,6 @@ export const EmotionMusicRecommendations: React.FC<EmotionMusicRecommendationsPr
   }, [emotion, autoActivate]);
 
   const loadMusicForEmotion = async () => {
-    setIsLoading(true);
     try {
       const params: EmotionMusicParams = {
         emotion,
@@ -49,9 +47,7 @@ export const EmotionMusicRecommendations: React.FC<EmotionMusicRecommendationsPr
         }
       }
     } catch (error) {
-      logger.error('Error loading music for emotion', error as Error, 'MUSIC');
-    } finally {
-      setIsLoading(false);
+      console.error('Error loading music for emotion:', error);
     }
   };
 

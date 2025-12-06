@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useTheme } from '@/providers/theme';
+import { useTheme } from '@/components/theme-provider';
 import EnhancedHeader from './EnhancedHeader';
 import EnhancedFooter from './EnhancedFooter';
 import CommandMenu from './CommandMenu';
 import NotificationToast from './NotificationToast';
 import MainNavigationHub from '@/components/navigation/MainNavigationHub';
-import SkipLinks from './SkipLinks';
-import { InAppNotificationCenter } from '@/components/InAppNotificationCenter';
 import { cn } from '@/lib/utils';
 
 interface EnhancedShellProps {
@@ -26,22 +24,11 @@ const EnhancedShell: React.FC<EnhancedShellProps> = ({
   immersive = false,
   className = '',
 }) => {
-  const { resolvedTheme } = useTheme();
+  const { theme, isDarkMode, reduceMotion } = useTheme();
   const [scrolled, setScrolled] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
   const location = useLocation();
   const [commandMenuOpen, setCommandMenuOpen] = useState(false);
-  const [reduceMotion, setReduceMotion] = useState(false);
-
-  // Compute derived theme properties (SSR-safe)
-  const isDarkMode = resolvedTheme === 'dark';
-
-  // SSR-safe reduced motion detection
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setReduceMotion(window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-    }
-  }, []);
   
   // Handling scroll effects
   useEffect(() => {
@@ -80,19 +67,11 @@ const EnhancedShell: React.FC<EnhancedShellProps> = ({
     <div className={cn(
       "flex flex-col min-h-screen bg-background transition-colors duration-300",
       className
-    )} data-testid="page-root">
-      {/* Skip Links pour accessibilité */}
-      <SkipLinks />
-      
+    )}>
       {/* Scroll Progress Indicator */}
       <div 
         className="fixed top-0 left-0 h-1 bg-primary z-50 transition-transform duration-200 ease-in-out origin-left"
         style={{ transform: `scaleX(${scrollProgress})` }}
-        role="progressbar"
-        aria-label="Progression de la page"
-        aria-valuenow={Math.round(scrollProgress * 100)}
-        aria-valuemin={0}
-        aria-valuemax={100}
       />
 
       {/* Background Gradient Effects */}
@@ -136,14 +115,10 @@ const EnhancedShell: React.FC<EnhancedShellProps> = ({
       )}
 
       {/* Header */}
-      {!hideNav && (
-        <header id="main-navigation" role="banner">
-          <EnhancedHeader scrolled={scrolled} />
-        </header>
-      )}
+      {!hideNav && <EnhancedHeader scrolled={scrolled} />}
 
       {/* Main Content */}
-      <main id="main-content" role="main" className="flex-1 w-full mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 relative mt-16">
+      <main className="flex-1 w-full mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 relative mt-16">
         <AnimatePresence mode="sync">{/* Fixed multiple children warning */}
           <motion.div
             key={location.pathname}
@@ -169,9 +144,6 @@ const EnhancedShell: React.FC<EnhancedShellProps> = ({
       
       {/* Navigation Hub */}
       <MainNavigationHub />
-      
-      {/* In-App Notification Center */}
-      <InAppNotificationCenter />
     </div>
   );
 };

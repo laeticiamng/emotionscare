@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,7 +7,6 @@ import { Shield, Eye, Download, Trash2, Calendar } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { logger } from '@/lib/logger';
 
 interface AuditLog {
   id: string;
@@ -37,7 +35,7 @@ const AuditLogViewer: React.FC = () => {
       if (error) throw error;
       setLogs(data || []);
     } catch (error) {
-      logger.error('Erreur chargement logs', error as Error, 'SYSTEM');
+      console.error('Erreur chargement logs:', error);
     } finally {
       setLoading(false);
     }

@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -36,7 +34,7 @@ export const ExportPanel: React.FC = () => {
           window.open(status.download_url, '_blank');
         }
       } catch (error) {
-        // Download failed - silent
+        console.error('Download failed:', error);
       }
     }
   };

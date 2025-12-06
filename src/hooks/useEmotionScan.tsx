@@ -1,11 +1,9 @@
-// @ts-nocheck
 
 import { useState, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { EmotionResult } from '@/types/emotion';
 import { emotionService, EmotionAnalysisRequest } from '@/services/emotion';
 import { v4 as uuid } from 'uuid';
-import { logger } from '@/lib/logger';
 
 export function useEmotionScan() {
   const { user } = useAuth() || { user: null };
@@ -43,7 +41,7 @@ export function useEmotionScan() {
       setLatestEmotion(emotionResult);
       return emotionResult;
     } catch (err) {
-      logger.error('Error scanning emotion', err as Error, 'SCAN');
+      console.error('Error scanning emotion:', err);
       setError('Échec de l\'analyse émotionnelle');
       return null;
     } finally {
@@ -80,7 +78,7 @@ export function useEmotionScan() {
       setLatestEmotion(latestEmotion);
       return latestEmotion;
     } catch (err) {
-      logger.error('Error fetching latest emotion', err as Error, 'SCAN');
+      console.error('Error fetching latest emotion:', err);
       setError('Impossible de charger votre dernière analyse');
       return null;
     } finally {
@@ -95,7 +93,7 @@ export function useEmotionScan() {
     try {
       return await emotionService.getUserEmotions(user.id, limit);
     } catch (err) {
-      logger.error('Error fetching emotion history', err as Error, 'SCAN');
+      console.error('Error fetching emotion history:', err);
       return [];
     }
   }, [user?.id]);
@@ -107,7 +105,7 @@ export function useEmotionScan() {
     try {
       return await emotionService.getEmotionTrends(user.id, days);
     } catch (err) {
-      logger.error('Error fetching emotion trends', err as Error, 'SCAN');
+      console.error('Error fetching emotion trends:', err);
       return null;
     }
   }, [user?.id]);
@@ -117,7 +115,7 @@ export function useEmotionScan() {
     try {
       return await emotionService.getEmotionRecommendations(emotion, intensity);
     } catch (err) {
-      logger.error('Error fetching recommendations', err as Error, 'SCAN');
+      console.error('Error fetching recommendations:', err);
       return {
         activities: [],
         music_style: 'calm',
@@ -165,7 +163,7 @@ export function useEmotionScan() {
       
       return newEmotion;
     } catch (err) {
-      logger.error('Error creating emotion', err as Error, 'SCAN');
+      console.error('Error creating emotion:', err);
       setError('Impossible de sauvegarder l\'émotion');
       return null;
     } finally {

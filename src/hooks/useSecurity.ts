@@ -1,6 +1,6 @@
+
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { logger } from '@/lib/logger';
 
 interface SecurityMetrics {
   securityScore: number;
@@ -83,7 +83,7 @@ export const useSecurity = () => {
     setLoading(true);
     try {
       // Simulation de mise à jour
-      logger.info('Security preferences updated', { preferences }, 'SYSTEM');
+      console.log('Security preferences updated:', preferences);
     } finally {
       setLoading(false);
     }

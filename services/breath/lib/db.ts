@@ -1,12 +1,5 @@
-import { createClient } from '@supabase/supabase-js';
-
-const supabaseUrl = process.env.VITE_SUPABASE_URL || 'https://yaincoxihiqdksxgrsrk.supabase.co';
-const supabaseKey = process.env.VITE_SUPABASE_PUBLISHABLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhaW5jb3hpaGlxZGtzeGdyc3JrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI4MTE4MjcsImV4cCI6MjA1ODM4NzgyN30.HBfwymB2F9VBvb3uyeTtHBMZFZYXzL0wQmS5fqd65yU';
-const supabase = createClient(supabaseUrl, supabaseKey);
-
 export type BreathWeeklyRow = {
-  user_id_hash?: string;
-  user_id?: string;
+  user_id_hash: string;
   week_start: string;
   hrv_stress_idx: number | null;
   coherence_avg: number | null;
@@ -28,65 +21,30 @@ export type BreathWeeklyOrgRow = {
   org_mood: number | null;
 };
 
-export async function insertWeekly(row: BreathWeeklyRow): Promise<void> {
-  const { error } = await supabase
-    .from('breath_weekly_metrics')
-    .upsert({
-      user_id: row.user_id,
-      week_start: row.week_start,
-      hrv_stress_idx: row.hrv_stress_idx,
-      coherence_avg: row.coherence_avg,
-      mvpa_week: row.mvpa_week,
-      relax_idx: row.relax_idx,
-      mindfulness_avg: row.mindfulness_avg,
-      mood_score: row.mood_score
-    }, {
-      onConflict: 'user_id,week_start'
-    });
-  
-  if (error) throw error;
+const weekly: BreathWeeklyRow[] = [];
+const weeklyOrg: BreathWeeklyOrgRow[] = [];
+
+export function insertWeekly(row: BreathWeeklyRow) {
+  weekly.push(row);
 }
 
-export async function insertWeeklyOrg(row: BreathWeeklyOrgRow): Promise<void> {
-  const { error } = await supabase
-    .from('breath_weekly_org_metrics')
-    .upsert({
-      org_id: row.org_id,
-      week_start: row.week_start,
-      members: row.members,
-      org_hrv_idx: row.org_hrv_idx,
-      org_coherence: row.org_coherence,
-      org_mvpa: row.org_mvpa,
-      org_relax: row.org_relax,
-      org_mindfulness: row.org_mindfulness,
-      org_mood: row.org_mood
-    }, {
-      onConflict: 'org_id,week_start'
-    });
-  
-  if (error) throw error;
+export function insertWeeklyOrg(row: BreathWeeklyOrgRow) {
+  weeklyOrg.push(row);
 }
 
-export async function listWeekly(userId: string, since: Date): Promise<BreathWeeklyRow[]> {
-  const { data, error } = await supabase
-    .from('breath_weekly_metrics')
-    .select('*')
-    .eq('user_id', userId)
-    .gte('week_start', since.toISOString().split('T')[0])
-    .order('week_start', { ascending: false });
-  
-  if (error) throw error;
-  return data || [];
+export function listWeekly(userHash: string, since: Date): BreathWeeklyRow[] {
+  return weekly
+    .filter(r => r.user_id_hash === userHash && new Date(r.week_start) >= since)
+    .sort((a, b) => b.week_start.localeCompare(a.week_start));
 }
 
-export async function listWeeklyOrg(orgId: string, since: Date): Promise<BreathWeeklyOrgRow[]> {
-  const { data, error } = await supabase
-    .from('breath_weekly_org_metrics')
-    .select('*')
-    .eq('org_id', orgId)
-    .gte('week_start', since.toISOString().split('T')[0])
-    .order('week_start', { ascending: false });
-  
-  if (error) throw error;
-  return data || [];
+export function listWeeklyOrg(orgId: string, since: Date): BreathWeeklyOrgRow[] {
+  return weeklyOrg
+    .filter(r => r.org_id === orgId && new Date(r.week_start) >= since)
+    .sort((a, b) => b.week_start.localeCompare(a.week_start));
+}
+
+export function clear() {
+  weekly.length = 0;
+  weeklyOrg.length = 0;
 }

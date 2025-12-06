@@ -1,12 +1,10 @@
-// @ts-nocheck
 import React, { useRef, useEffect, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Play, Pause, SkipForward, Square, Heart, Volume2, Loader2 } from '@/components/music/icons';
-import { LazyMotionWrapper, m } from '@/utils/lazy-motion';
-import { logger } from '@/lib/logger';
+import { Play, Pause, SkipForward, Square, Heart, Volume2, Loader2 } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 interface SunoPlayerProps {
   src: string | null;
@@ -63,7 +61,7 @@ export const SunoPlayer: React.FC<SunoPlayerProps> = ({
     if (!audio || !src) return;
 
     if (playing) {
-      audio.play().catch(error => logger.error('Audio play error:', error));
+      audio.play().catch(console.error);
     } else {
       audio.pause();
     }
@@ -131,9 +129,8 @@ export const SunoPlayer: React.FC<SunoPlayerProps> = ({
   };
 
   return (
-    <LazyMotionWrapper>
-      <Card className="overflow-hidden">
-        <CardContent className="p-6">
+    <Card className="overflow-hidden">
+      <CardContent className="p-6">
         {src && (
           <audio
             ref={audioRef}
@@ -242,13 +239,13 @@ export const SunoPlayer: React.FC<SunoPlayerProps> = ({
 
           {/* Visualisation audio simple */}
           {playing && (
-            <m.div
+            <motion.div 
               className="flex justify-center gap-1"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
             >
               {[1, 2, 3, 4, 5].map((i) => (
-                <m.div
+                <motion.div
                   key={i}
                   className="w-1 bg-primary rounded-full"
                   animate={{
@@ -261,7 +258,7 @@ export const SunoPlayer: React.FC<SunoPlayerProps> = ({
                   }}
                 />
               ))}
-            </m.div>
+            </motion.div>
           )}
 
           {/* Raccourcis */}
@@ -273,6 +270,5 @@ export const SunoPlayer: React.FC<SunoPlayerProps> = ({
         </div>
       </CardContent>
     </Card>
-    </LazyMotionWrapper>
   );
 };

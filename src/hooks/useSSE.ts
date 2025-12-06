@@ -1,6 +1,4 @@
-// @ts-nocheck
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { logger } from '@/lib/logger';
 
 interface UseSSEOptions {
   onMessage?: (event: MessageEvent) => void;
@@ -41,12 +39,12 @@ export const useSSE = (url: string | null, options: UseSSEOptions = {}): UseSSER
     if (!url || eventSourceRef.current) return;
 
     try {
-      logger.debug('SSE: Connecting to', { url }, 'SYSTEM');
+      console.log('SSE: Connecting to', url);
       const eventSource = new EventSource(url);
       eventSourceRef.current = eventSource;
 
       eventSource.onopen = () => {
-        logger.debug('SSE: Connected', {}, 'SYSTEM');
+        console.log('SSE: Connected');
         setIsConnected(true);
         setError(null);
         retryCountRef.current = 0;
@@ -54,12 +52,12 @@ export const useSSE = (url: string | null, options: UseSSEOptions = {}): UseSSER
       };
 
       eventSource.onmessage = (event) => {
-        logger.debug('SSE: Message received', { data: event.data }, 'SYSTEM');
+        console.log('SSE: Message received', event.data);
         onMessage?.(event);
       };
 
       eventSource.onerror = (event) => {
-        logger.error('SSE: Error', event as any, 'SYSTEM');
+        console.error('SSE: Error', event);
         setIsConnected(false);
         
         if (eventSource.readyState === EventSource.CLOSED) {
@@ -69,11 +67,7 @@ export const useSSE = (url: string | null, options: UseSSEOptions = {}): UseSSER
           // Auto-reconnect avec backoff exponentiel
           if (autoReconnect && shouldReconnectRef.current && retryCountRef.current < maxRetries) {
             const delay = Math.min(retryInterval * Math.pow(2, retryCountRef.current), 8000);
-            logger.debug('SSE: Reconnecting', { 
-              delay, 
-              attempt: retryCountRef.current + 1, 
-              maxRetries 
-            }, 'SYSTEM');
+            console.log(`SSE: Reconnecting in ${delay}ms (attempt ${retryCountRef.current + 1}/${maxRetries})`);
             
             retryTimeoutRef.current = setTimeout(() => {
               retryCountRef.current++;
@@ -94,13 +88,13 @@ export const useSSE = (url: string | null, options: UseSSEOptions = {}): UseSSER
       eventSource.addEventListener('prompt', onMessage || (() => {}));
 
     } catch (err) {
-      logger.error('SSE: Failed to create EventSource', err as Error, 'SYSTEM');
+      console.error('SSE: Failed to create EventSource', err);
       setError('Échec de la connexion');
     }
   }, [url, onMessage, onError, onOpen, autoReconnect, maxRetries, retryInterval]);
 
   const disconnect = useCallback(() => {
-    logger.debug('SSE: Disconnecting', {}, 'SYSTEM');
+    console.log('SSE: Disconnecting');
     shouldReconnectRef.current = false;
     
     if (retryTimeoutRef.current) {
@@ -118,7 +112,7 @@ export const useSSE = (url: string | null, options: UseSSEOptions = {}): UseSSER
   }, [onClose]);
 
   const reconnect = useCallback(() => {
-    logger.debug('SSE: Manual reconnect', {}, 'SYSTEM');
+    console.log('SSE: Manual reconnect');
     shouldReconnectRef.current = true;
     retryCountRef.current = 0;
     disconnect();

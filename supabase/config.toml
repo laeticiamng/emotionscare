@@ -1,94 +1,59 @@
+
 project_id = "yaincoxihiqdksxgrsrk"
 
-[functions.ai-monitoring]
-verify_jwt = false
-
-[functions.send-weekly-email]
+[functions.org-dashboard-weekly]
 verify_jwt = true
 
-[functions.send-notification-email]
+[functions.org-dashboard-export]
 verify_jwt = true
 
-[functions.track-email-open]
-verify_jwt = false
-
-[functions.emotion-music-ai]
+[functions.journal-voice]
 verify_jwt = true
 
-[functions.gamification]
+[functions.journal-text]
 verify_jwt = true
 
-[functions.automix-context]
+[functions.journal-entry]
 verify_jwt = true
 
-[functions.health-edge]
-verify_jwt = false
-
-[functions.silk-wallpaper]
+[functions.journal-weekly]
 verify_jwt = true
 
-[functions.bubble-sessions]
+[functions.face-filter-start]
 verify_jwt = true
 
-[functions.suno-status-check]
-verify_jwt = false
-
-[functions.music-queue-worker]
-verify_jwt = false
-
-[functions.send-weekly-report]
-verify_jwt = false
-
-[functions.send-error-alert]
-verify_jwt = false
-
-[functions.send-slack-alert]
-verify_jwt = false
-
-[functions.send-discord-alert]
-verify_jwt = false
-
-[functions.generate-analytics-report]
-verify_jwt = false
-
-[functions.check-scheduled-reports]
-verify_jwt = false
-
-[functions.check-alert-escalation]
-verify_jwt = false
-
-[functions.analyze-error-patterns]
-verify_jwt = false
-
-[functions.ml-alert-predictor]
-verify_jwt = false
-
-[functions.optimize-escalation-rules]
-verify_jwt = false
-
-[functions.monitoring-chatbot]
+[functions.face-filter-comment]
 verify_jwt = true
 
-[functions.create-ticket]
+[functions.hume-ws-proxy]
 verify_jwt = true
 
-[functions.ab-test-manager]
+[functions.metrics]
 verify_jwt = true
 
-[functions.send-notification]
-verify_jwt = false
+[functions.micro-breaks]
+verify_jwt = true
 
-[functions.send-weekly-monitoring-report]
-verify_jwt = false
+[functions.vr-galaxy-metrics]
+verify_jwt = true
 
-[functions.generate-incident-report]
-verify_jwt = false
+[functions.dashboard-weekly]
+verify_jwt = true
 
-[functions.proactive-incident-detector]
-verify_jwt = false
+[functions.openai-realtime]
+verify_jwt = true
 
-[functions.collect-system-metrics]
-verify_jwt = false
+[functions.contact-form]
+verify_jwt = true
+
+[functions.emotion-analytics]
+verify_jwt = true
+
+[functions.emotion-analysis]
+verify_jwt = true
+
+[functions.journal-analysis]
+verify_jwt = true
 
 [api]
 enabled = true
@@ -140,7 +105,41 @@ enable_signup = true
 double_confirm_changes = true
 enable_confirmations = false
 
-# Cron jobs
-# Vérification des activités suspectes toutes les heures
-[pg_cron]
-enabled = true
+[functions.generate-music]
+verify_jwt = true
+
+[functions.emotionscare-music-generator]
+verify_jwt = true
+
+[functions.ai-coach]
+verify_jwt = true
+
+[functions.analyze-emotion-text]
+verify_jwt = true
+
+[functions.assistant-api]
+verify_jwt = true
+
+[functions.biotune-session]
+verify_jwt = true
+
+[functions.enhanced-emotion-analyze]
+verify_jwt = true
+
+[functions.generate-grit-challenge]
+verify_jwt = true
+
+[functions.hume-analysis]
+verify_jwt = true
+
+[functions.mood-mixer]
+verify_jwt = true
+
+[functions.music-generation]
+verify_jwt = true
+
+[functions.music-weekly-org]
+verify_jwt = true
+
+[functions.music-weekly-user]
+verify_jwt = true

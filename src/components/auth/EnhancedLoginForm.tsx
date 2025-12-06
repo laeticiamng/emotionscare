@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
@@ -11,7 +12,6 @@ import { EyeIcon, EyeOffIcon, Mail, Lock, ArrowRight } from 'lucide-react';
 import { useTheme } from '@/hooks/use-theme';
 import { usePreferredAccess } from '@/hooks/use-preferred-access';
 import LoadingAnimation from '@/components/ui/LoadingAnimation';
-import { logger } from '@/lib/logger';
 
 const EnhancedLoginForm: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -23,7 +23,7 @@ const EnhancedLoginForm: React.FC = () => {
   const [emailValid, setEmailValid] = useState<boolean | null>(null);
   
   const navigate = useNavigate();
-  const { signIn } = useAuth();
+  const { login, error: authError, clearError } = useAuth();
   const { toast } = useToast();
   const { theme } = useTheme();
   
@@ -31,8 +31,11 @@ const EnhancedLoginForm: React.FC = () => {
   usePreferredAccess();
   
   useEffect(() => {
-    // Clean up on unmount
-  }, []);
+    // Clean up error on unmount
+    return () => {
+      if (clearError) clearError();
+    };
+  }, [clearError]);
   
   // Validate email with regex
   useEffect(() => {
@@ -53,13 +56,25 @@ const EnhancedLoginForm: React.FC = () => {
       navigator.vibrate(50);
     }
     
+    if (clearError) clearError();
+    
     try {
-      await signIn(email, password);
+      const user = await login(email, password);
+      
+      if (user && user.role !== 'b2c') {
+        toast({
+          title: "Accès refusé",
+          description: "Ce compte n'a pas les permissions nécessaires pour accéder à l'espace particulier.",
+          variant: "destructive"
+        });
+        setIsLoading(false);
+        return;
+      }
       
       // Success toast notification
       toast({
         title: "Connexion réussie",
-        description: "Bienvenue dans votre espace personnel.",
+        description: `Bienvenue ${user?.name || ''} dans votre espace personnel.`,
         variant: "success"
       });
       
@@ -69,7 +84,7 @@ const EnhancedLoginForm: React.FC = () => {
       }, 500);
       
     } catch (error: any) {
-      logger.error('Erreur de connexion', { error }, 'AUTH');
+      console.error('Erreur de connexion:', error);
       
       toast({
         title: "Connexion impossible",
@@ -255,7 +270,16 @@ const EnhancedLoginForm: React.FC = () => {
                 </div>
               </motion.div>
               
-              {/* No auth error display needed - using toast */}
+              {authError && (
+                <motion.div 
+                  className="p-3 rounded-md bg-destructive/10 text-destructive text-sm border border-destructive/20"
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  {authError}
+                </motion.div>
+              )}
               
               <motion.div variants={itemVariants}>
                 <Button

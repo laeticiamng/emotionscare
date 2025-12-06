@@ -1,9 +1,7 @@
-// @ts-nocheck
 import { useEffect } from 'react';
 import { shallow } from 'zustand/shallow';
 import { useDashboardStore, type Nudge } from '@/store/dashboard.store';
 import { NUDGE_TONE_LABELS } from '@/features/dashboard/orchestration/weeklyPlanMapper';
-import { logger } from '@/lib/logger';
 
 type NudgeTone = keyof typeof NUDGE_TONE_LABELS;
 
@@ -86,7 +84,7 @@ export const useNudges = () => {
           setNudge(suggestion);
         }
       } catch (error) {
-        logger.error('Failed to fetch nudge', error as Error, 'SYSTEM');
+        console.error('Failed to fetch nudge:', error);
         if (!cancelled) {
           setNudge(null);
         }

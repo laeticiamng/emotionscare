@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import { render, screen, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';

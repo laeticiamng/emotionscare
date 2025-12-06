@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import React, { createContext, useContext, useState } from 'react';
 
@@ -32,7 +31,7 @@ export const SoundscapeProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   };
 
   const playFunctionalSound = (soundType: string) => {
-    // Play functional sound - silent logging
+    console.log(`Playing functional sound: ${soundType}`);
     // Logic to play different UI sounds would go here
   };
 

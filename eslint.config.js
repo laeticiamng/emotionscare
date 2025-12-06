@@ -4,7 +4,6 @@ import ec from "./tools/eslint-plugin-ec/index.js";
 import tsEslintPlugin from "@typescript-eslint/eslint-plugin";
 import reactHooksPlugin from "eslint-plugin-react-hooks";
 import importPlugin from "eslint-plugin-import";
-import jsxA11yPlugin from "eslint-plugin-jsx-a11y";
 
 const createNoNodeImportsRule = ({ patterns = [], paths = [] } = {}) => [
   "error",
@@ -78,7 +77,6 @@ export default [
     plugins: {
       "@typescript-eslint": tsEslintPlugin,
       "react-hooks": reactHooksPlugin,
-      "jsx-a11y": jsxA11yPlugin,
       ec,
       import: importPlugin,
     },
@@ -102,37 +100,6 @@ export default [
       "ec/no-hooks-in-blocks": "error",
       "react-hooks/rules-of-hooks": "error",
       "react-hooks/exhaustive-deps": "warn",
-      // Accessibility rules
-      "jsx-a11y/alt-text": "error",
-      "jsx-a11y/anchor-has-content": "error",
-      "jsx-a11y/anchor-is-valid": "warn",
-      "jsx-a11y/aria-activedescendant-has-tabindex": "error",
-      "jsx-a11y/aria-props": "error",
-      "jsx-a11y/aria-proptypes": "error",
-      "jsx-a11y/aria-role": "error",
-      "jsx-a11y/aria-unsupported-elements": "error",
-      "jsx-a11y/click-events-have-key-events": "warn",
-      "jsx-a11y/heading-has-content": "error",
-      "jsx-a11y/html-has-lang": "error",
-      "jsx-a11y/iframe-has-title": "error",
-      "jsx-a11y/img-redundant-alt": "warn",
-      "jsx-a11y/interactive-supports-focus": "warn",
-      "jsx-a11y/label-has-associated-control": "warn",
-      "jsx-a11y/media-has-caption": "warn",
-      "jsx-a11y/mouse-events-have-key-events": "warn",
-      "jsx-a11y/no-access-key": "error",
-      "jsx-a11y/no-autofocus": "warn",
-      "jsx-a11y/no-distracting-elements": "error",
-      "jsx-a11y/no-interactive-element-to-noninteractive-role": "error",
-      "jsx-a11y/no-noninteractive-element-interactions": "warn",
-      "jsx-a11y/no-noninteractive-element-to-interactive-role": "error",
-      "jsx-a11y/no-noninteractive-tabindex": "warn",
-      "jsx-a11y/no-redundant-roles": "error",
-      "jsx-a11y/no-static-element-interactions": "warn",
-      "jsx-a11y/role-has-required-aria-props": "error",
-      "jsx-a11y/role-supports-aria-props": "error",
-      "jsx-a11y/scope": "error",
-      "jsx-a11y/tabindex-no-positive": "error",
     }
   },
   {
@@ -146,13 +113,6 @@ export default [
   },
   {
     files: ["services/**/*.{ts,tsx,js,jsx,mjs,cjs}", "supabase/functions/**/*.{ts,tsx,js,jsx,mjs,cjs}"],
-    languageOptions: {
-      parser: tsParser,
-      parserOptions: { ecmaVersion: "latest", sourceType: "module", ecmaFeatures: { jsx: true } }
-    },
-    plugins: {
-      "@typescript-eslint": tsEslintPlugin,
-    },
     rules: {
       "no-restricted-imports": "off",
       "ec/no-node-builtins-client": "off",

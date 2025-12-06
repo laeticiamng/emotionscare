@@ -1,6 +1,4 @@
-// @ts-nocheck
 import React from 'react';
-import { logger } from '@/lib/logger';
 
 // Mesure des Web Vitals
 export const measureWebVitals = async (): Promise<Record<string, number>> => {
@@ -27,7 +25,7 @@ export const measureWebVitals = async (): Promise<Record<string, number>> => {
         observer.observe({ entryTypes: ['largest-contentful-paint'] });
         setTimeout(() => observer.disconnect(), 3000);
       } catch (e) {
-        logger.warn('LCP observation not supported', e as Error, 'SYSTEM');
+        console.warn('LCP observation not supported');
       }
     }
 
@@ -47,7 +45,7 @@ export const measureWebVitals = async (): Promise<Record<string, number>> => {
         observer.observe({ entryTypes: ['layout-shift'] });
         setTimeout(() => observer.disconnect(), 3000);
       } catch (e) {
-        logger.warn('CLS observation not supported', e as Error, 'SYSTEM');
+        console.warn('CLS observation not supported');
       }
     }
 

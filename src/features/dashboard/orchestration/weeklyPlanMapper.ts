@@ -1,4 +1,3 @@
-// @ts-nocheck
 import type { DashboardWellbeingSignal, WellbeingTone } from '@/store/dashboard.store';
 
 const HEADLINES: Record<WellbeingTone, string> = {

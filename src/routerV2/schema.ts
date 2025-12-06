@@ -1,12 +1,11 @@
-// @ts-nocheck
 /**
  * RouterV2 Schema - Source de vérité unique pour le routing
  * TICKET: FE/BE-Router-Cleanup-01
  */
 
 export type Segment = 'public' | 'consumer' | 'employee' | 'manager';
-export type Role = 'consumer' | 'employee' | 'manager' | 'admin';
-export type LayoutType = 'marketing' | 'app' | 'simple' | 'app-sidebar';
+export type Role = 'consumer' | 'employee' | 'manager';
+export type LayoutType = 'marketing' | 'app' | 'simple';
 
 export interface RouteMeta {
   name: string;              // ex: 'home', 'music'

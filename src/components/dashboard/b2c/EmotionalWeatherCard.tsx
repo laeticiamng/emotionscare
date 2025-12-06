@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -21,14 +20,14 @@ const EmotionalWeatherCard: React.FC<EmotionalWeatherCardProps> = ({ className =
   const renderIcon = () => {
     switch (currentMood.icon) {
       case 'sun':
-        return <Sun className="h-16 w-16 text-warning" />;
+        return <Sun className="h-16 w-16 text-yellow-500" />;
       case 'cloud':
-        return <Cloud className="h-16 w-16 text-muted-foreground" />;
+        return <Cloud className="h-16 w-16 text-gray-500" />;
       case 'cloud-rain':
-        return <CloudRain className="h-16 w-16 text-primary" />;
+        return <CloudRain className="h-16 w-16 text-blue-700" />;
       case 'cloud-sun':
       default:
-        return <CloudSun className="h-16 w-16 text-primary" />;
+        return <CloudSun className="h-16 w-16 text-blue-500" />;
     }
   };
 
@@ -55,10 +54,10 @@ const EmotionalWeatherCard: React.FC<EmotionalWeatherCardProps> = ({ className =
               <div key={index} className="flex flex-col items-center">
                 <span className="text-sm text-muted-foreground mb-1">{day}</span>
                 <div className="bg-muted p-2 rounded-full">
-                  {index === 0 && <Cloud className="h-5 w-5 text-muted-foreground" />}
-                  {index === 1 && <CloudSun className="h-5 w-5 text-primary" />}
-                  {index === 2 && <Sun className="h-5 w-5 text-warning" />}
-                  {index === 3 && <Sun className="h-5 w-5 text-warning" />}
+                  {index === 0 && <Cloud className="h-5 w-5 text-gray-500" />}
+                  {index === 1 && <CloudSun className="h-5 w-5 text-blue-500" />}
+                  {index === 2 && <Sun className="h-5 w-5 text-yellow-500" />}
+                  {index === 3 && <Sun className="h-5 w-5 text-yellow-500" />}
                 </div>
               </div>
             ))}

@@ -1,7 +1,6 @@
-// @ts-nocheck
 import { useCallback, useState } from 'react';
 import type { RefObject } from 'react';
-import { captureException } from '@/lib/ai-monitoring';
+import * as Sentry from '@sentry/react';
 import { Download } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -29,7 +28,12 @@ export function ExportButton({ targetRef, fileName, label, className, onError, o
     try {
       setIsExporting(true);
       onStart?.();
-      logger.info('scores:export:png', { fileName }, 'SCORES');
+      Sentry.addBreadcrumb({
+        category: 'scores',
+        message: 'scores:export:png',
+        data: { fileName },
+        level: 'info',
+      });
       await exportElementToPng(container, {
         fileName,
         backgroundColor: '#ffffff',

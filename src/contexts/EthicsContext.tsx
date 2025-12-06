@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useAuth } from './AuthContext';
@@ -62,9 +61,9 @@ export const EthicsProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     
     // Simuler l'envoi au serveur
     try {
-      // Audit log saved silently
+      console.log('Audit log saved:', log);
     } catch (error) {
-      // Failed to save audit log - silent
+      console.error('Failed to save audit log:', error);
     }
   };
 

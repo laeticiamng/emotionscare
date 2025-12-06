@@ -1,5 +1,4 @@
 /* @vitest-environment node */
-// @ts-nocheck
 
 import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
 

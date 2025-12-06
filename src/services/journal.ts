@@ -1,6 +1,4 @@
-// @ts-nocheck
 import { supabase } from '@/integrations/supabase/client';
-import { logger } from '@/lib/logger';
 
 export interface JournalEntry {
   id: string;
@@ -29,13 +27,13 @@ export class JournalService {
         .order('created_at', { ascending: false });
 
       if (error) {
-        logger.error('Erreur lors de la récupération des entrées', error, 'JournalService.getEntries');
+        console.error('Erreur lors de la récupération des entrées:', error);
         throw new Error('Impossible de récupérer les entrées du journal');
       }
 
       return data || [];
     } catch (error) {
-      logger.error('Erreur service journal', error, 'JournalService.getEntries');
+      console.error('Erreur service journal:', error);
       throw error;
     }
   }
@@ -57,13 +55,13 @@ export class JournalService {
         .single();
 
       if (error) {
-        logger.error('Erreur lors de la création de l\'entrée', error, 'JournalService.createEntry');
+        console.error('Erreur lors de la création de l\'entrée:', error);
         throw new Error('Impossible de créer l\'entrée du journal');
       }
 
       return data;
     } catch (error) {
-      logger.error('Erreur création entrée', error, 'JournalService.createEntry');
+      console.error('Erreur création entrée:', error);
       throw error;
     }
   }
@@ -80,7 +78,7 @@ export class JournalService {
         .upload(fileName, audioBlob);
 
       if (uploadError) {
-        logger.error('Erreur upload audio', uploadError, 'JournalService.createVoiceEntry');
+        console.error('Erreur upload audio:', uploadError);
         throw new Error('Impossible d\'uploader l\'enregistrement audio');
       }
 
@@ -101,13 +99,13 @@ export class JournalService {
         .single();
 
       if (error) {
-        logger.error('Erreur création entrée vocale', error, 'JournalService.createVoiceEntry');
+        console.error('Erreur création entrée vocale:', error);
         throw new Error('Impossible de créer l\'entrée vocale');
       }
 
       return data;
     } catch (error) {
-      logger.error('Erreur création entrée vocale', error, 'JournalService.createVoiceEntry');
+      console.error('Erreur création entrée vocale:', error);
       throw error;
     }
   }
@@ -125,13 +123,13 @@ export class JournalService {
         .single();
 
       if (error) {
-        logger.error('Erreur mise à jour entrée', error, 'JournalService.updateEntry');
+        console.error('Erreur mise à jour entrée:', error);
         throw new Error('Impossible de mettre à jour l\'entrée');
       }
 
       return data;
     } catch (error) {
-      logger.error('Erreur mise à jour', error, 'JournalService.updateEntry');
+      console.error('Erreur mise à jour:', error);
       throw error;
     }
   }
@@ -144,11 +142,11 @@ export class JournalService {
         .eq('id', id);
 
       if (error) {
-        logger.error('Erreur suppression entrée', error, 'JournalService.deleteEntry');
+        console.error('Erreur suppression entrée:', error);
         throw new Error('Impossible de supprimer l\'entrée');
       }
     } catch (error) {
-      logger.error('Erreur suppression', error, 'JournalService.deleteEntry');
+      console.error('Erreur suppression:', error);
       throw error;
     }
   }

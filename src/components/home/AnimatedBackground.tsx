@@ -47,8 +47,8 @@ const AnimatedBackground: React.FC<AnimatedBackgroundProps> = ({ mood, timeOfDay
       opacity: number;
       
       constructor() {
-        this.x = Math.random() * (canvas?.width || 800);
-        this.y = Math.random() * (canvas?.height || 600);
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
         this.radius = Math.random() * 60 + 20;
         this.vx = (Math.random() - 0.5) * 0.5;
         this.vy = (Math.random() - 0.5) * 0.5;
@@ -60,14 +60,13 @@ const AnimatedBackground: React.FC<AnimatedBackgroundProps> = ({ mood, timeOfDay
         this.x += this.vx;
         this.y += this.vy;
         
-        if (this.x < -this.radius) this.x = (canvas?.width || 800) + this.radius;
-        if (this.x > (canvas?.width || 800) + this.radius) this.x = -this.radius;
-        if (this.y < -this.radius) this.y = (canvas?.height || 600) + this.radius;
-        if (this.y > (canvas?.height || 600) + this.radius) this.y = -this.radius;
+        if (this.x < -this.radius) this.x = canvas.width + this.radius;
+        if (this.x > canvas.width + this.radius) this.x = -this.radius;
+        if (this.y < -this.radius) this.y = canvas.height + this.radius;
+        if (this.y > canvas.height + this.radius) this.y = -this.radius;
       }
       
       draw() {
-        if (!ctx) return;
         const gradient = ctx.createRadialGradient(
           this.x, this.y, 0,
           this.x, this.y, this.radius

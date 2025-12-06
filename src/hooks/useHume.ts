@@ -1,7 +1,6 @@
-// @ts-nocheck
+
 import { useState, useCallback } from 'react';
 import { EmotionResult } from '@/types/emotion';
-import { logger } from '@/lib/logger';
 
 export const useHume = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -29,7 +28,7 @@ export const useHume = () => {
       setLastEmotionResult(result);
       return result;
     } catch (error) {
-      logger.error('Erreur lors du scan émotionnel', error as Error, 'SCAN');
+      console.error('Erreur lors du scan émotionnel:', error);
       throw error;
     } finally {
       setIsAnalyzing(false);

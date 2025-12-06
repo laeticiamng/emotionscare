@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
@@ -62,7 +63,7 @@ const PageLoader: React.FC<PageLoaderProps> = ({
               transition={{ delay: 0.3 }}
             >
               <h3 className="text-xl font-semibold mb-2">
-                {user ? `Bienvenue, ${user.user_metadata?.name || user.email?.split('@')[0] || 'utilisateur'}` : 'Bienvenue'}
+                {user ? `Bienvenue, ${user.name}` : 'Bienvenue'}
               </h3>
               <p className="text-muted-foreground">{message}</p>
             </motion.div>

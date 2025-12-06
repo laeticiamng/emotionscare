@@ -1,8 +1,6 @@
-// @ts-nocheck
 
 // Notification Service implementation
 import { supabase } from '@/integrations/supabase/client';
-import { logger } from '@/lib/logger';
 
 export interface Notification {
   id: string;
@@ -37,7 +35,7 @@ export class NotificationService {
       if (error) throw error;
       return data.id;
     } catch (error) {
-      logger.error('Error adding notification', error as Error, 'SYSTEM');
+      console.error('Error adding notification:', error);
       throw error;
     }
   }
@@ -55,7 +53,7 @@ export class NotificationService {
       if (error) throw error;
       return data || [];
     } catch (error) {
-      logger.error('Error getting notifications', error as Error, 'SYSTEM');
+      console.error('Error getting notifications:', error);
       return [];
     }
   }
@@ -73,7 +71,7 @@ export class NotificationService {
       if (error) throw error;
       return data?.count || 0;
     } catch (error) {
-      logger.error('Error getting unread count', error as Error, 'SYSTEM');
+      console.error('Error getting unread count:', error);
       return 0;
     }
   }
@@ -90,7 +88,7 @@ export class NotificationService {
       
       if (error) throw error;
     } catch (error) {
-      logger.error('Error marking notification as read', error as Error, 'SYSTEM');
+      console.error('Error marking notification as read:', error);
       throw error;
     }
   }
@@ -107,7 +105,7 @@ export class NotificationService {
       
       if (error) throw error;
     } catch (error) {
-      logger.error('Error marking all notifications as read', error as Error, 'SYSTEM');
+      console.error('Error marking all notifications as read:', error);
       throw error;
     }
   }

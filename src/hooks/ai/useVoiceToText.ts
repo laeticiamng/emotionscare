@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import { useState, useCallback } from 'react';
 import { supabase } from '@/lib/supabase-client';
@@ -79,7 +78,7 @@ export function useVoiceToText(options: VoiceToTextOptions = {}) {
             throw new Error('No transcription returned');
           }
         } catch (error) {
-          // Audio processing error
+          console.error('Error processing audio:', error);
           setError(error instanceof Error ? error.message : 'Error processing audio');
           toast({
             title: "Erreur de transcription",
@@ -117,7 +116,7 @@ export function useVoiceToText(options: VoiceToTextOptions = {}) {
         }
       };
     } catch (error) {
-      // Recording start error
+      console.error('Error starting recording:', error);
       setError(error instanceof Error ? error.message : 'Error starting recording');
       setIsRecording(false);
       toast({

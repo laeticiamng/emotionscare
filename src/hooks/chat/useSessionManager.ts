@@ -1,9 +1,7 @@
-// @ts-nocheck
 
 import { useState, useEffect, useCallback } from 'react';
 import { ChatMessage } from '@/types/chat';
 import { faker } from '@faker-js/faker';
-import { logger } from '@/lib/logger';
 
 export const useSessionManager = () => {
   const [sessionId, setSessionId] = useState<string>('');
@@ -24,7 +22,7 @@ export const useSessionManager = () => {
 
   // Load message history
   const loadMessageHistory = useCallback(async (messages: ChatMessage[]) => {
-    logger.debug('Loading message history for session', { sessionId }, 'UI');
+    console.log('Loading message history for session:', sessionId);
     return messages;
   }, [sessionId]);
 

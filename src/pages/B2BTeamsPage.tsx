@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * B2BTeamsPage - Gestion d'équipes B2B
  * TICKET: FE/BE-Router-Cleanup-01
@@ -233,14 +232,14 @@ const B2BTeamsPage: React.FC = () => {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Link to={routes.adminReports?.() || '/admin/reports'}>
+                <Link to={Routes.adminReports()}>
                   <Button variant="outline" className="w-full justify-start">
                     <BarChart3 className="h-4 w-4 mr-2" />
                     Voir les rapports
                   </Button>
                 </Link>
-
-                <Link to={routes.adminEvents?.() || '/admin/events'}>
+                
+                <Link to={Routes.adminEvents()}>
                   <Button variant="outline" className="w-full justify-start">
                     <Calendar className="h-4 w-4 mr-2" />
                     Organiser un événement

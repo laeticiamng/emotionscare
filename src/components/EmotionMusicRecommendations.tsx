@@ -1,10 +1,9 @@
 
 import React, { useEffect, useState } from 'react';
-import { logger } from '@/lib/logger';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Play, Music } from 'lucide-react';
-import { useMusicCompat } from '@/hooks/useMusicCompat';
+import { useMusic } from '@/hooks/useMusic';
 import { useMusicEmotionIntegration } from '@/hooks/useMusicEmotionIntegration';
 
 interface EmotionMusicRecommendationsProps {
@@ -16,7 +15,7 @@ const EmotionMusicRecommendations: React.FC<EmotionMusicRecommendationsProps> = 
   emotion = "calm",
   className = ""
 }) => {
-  const music = useMusicCompat();
+  const music = useMusic();
   const { activateMusicForEmotion, getEmotionMusicDescription } = useMusicEmotionIntegration();
   
   const [recommendedEmotion, setRecommendedEmotion] = useState(emotion);
@@ -58,7 +57,7 @@ const EmotionMusicRecommendations: React.FC<EmotionMusicRecommendationsProps> = 
     try {
       await activateMusicForEmotion({ emotion: recommendedEmotion });
     } catch (error) {
-      logger.error('Error activating music', error, 'MUSIC');
+      console.error("Error activating music:", error);
     }
   };
 

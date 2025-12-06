@@ -1,10 +1,7 @@
-// @ts-nocheck
 
 /**
  * Optimisations de build pour la production
  */
-
-import { logger } from '@/lib/logger';
 
 // Configuration des chunks optimisés
 export const CHUNK_OPTIMIZATION = {
@@ -157,6 +154,6 @@ export function initBuildOptimizations(): void {
     preloadCriticalResources();
     optimizeNetworkPerformance();
     
-    logger.info('⚡ Build optimizations initialized', undefined, 'SYSTEM');
+    console.log('⚡ Build optimizations initialized');
   }
 }

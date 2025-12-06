@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -66,7 +65,7 @@ const PersonalDataTab: React.FC<PersonalDataTabProps> = ({ className }) => {
             <CardTitle>Contrôle de confidentialité</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="p-4 bg-primary/10 rounded-lg">
+            <div className="p-4 bg-blue-50 dark:bg-blue-950 rounded-lg">
               <h3 className="font-medium mb-2">Protection des données</h3>
               <p className="text-sm text-muted-foreground">
                 Vos données sont chiffrées et stockées de manière sécurisée. 

@@ -1,10 +1,8 @@
-// @ts-nocheck
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
-import { logger } from '@/lib/logger';
 
 interface QuickSuggestionsProps {
   suggestions: string[];
@@ -59,7 +57,7 @@ const QuickSuggestions: React.FC<QuickSuggestionsProps> = ({ suggestions }) => {
         setActiveQuestion(null);
       }
     } catch (error) {
-      logger.error('Erreur lors du traitement de la suggestion', error as Error, 'UI');
+      console.error('Erreur lors du traitement de la suggestion:', error);
       // S'assurer que nous réinitialisons l'état de traitement même en cas d'erreur
       toast({
         title: "Erreur",

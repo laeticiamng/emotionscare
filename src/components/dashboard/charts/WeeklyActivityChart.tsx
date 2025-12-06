@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import React from 'react';
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
@@ -75,7 +74,7 @@ const WeeklyActivityChart: React.FC<WeeklyActivityChartProps> = ({
           <Bar 
             dataKey="journal" 
             name="Journal" 
-            fill="hsl(var(--success))"
+            fill="#4CAF50"
             radius={[4, 4, 0, 0]}
             stackId="activity"
             maxBarSize={40}
@@ -85,7 +84,7 @@ const WeeklyActivityChart: React.FC<WeeklyActivityChartProps> = ({
           <Bar 
             dataKey="music" 
             name="Musique" 
-            fill="hsl(var(--primary))"
+            fill="#2196F3"
             radius={[0, 0, 0, 0]}
             stackId="activity"
             maxBarSize={40}
@@ -95,7 +94,7 @@ const WeeklyActivityChart: React.FC<WeeklyActivityChartProps> = ({
           <Bar 
             dataKey="scan" 
             name="Scan" 
-            fill="hsl(var(--warning))"
+            fill="#FF9800"
             radius={[0, 0, 0, 0]}
             stackId="activity"
             maxBarSize={40}
@@ -105,7 +104,7 @@ const WeeklyActivityChart: React.FC<WeeklyActivityChartProps> = ({
           <Bar 
             dataKey="coach" 
             name="Coach" 
-            fill="hsl(var(--accent))"
+            fill="#9C27B0"
             radius={[0, 0, 4, 4]}
             stackId="activity"
             maxBarSize={40}

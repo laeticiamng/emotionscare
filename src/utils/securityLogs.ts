@@ -1,6 +1,4 @@
-// @ts-nocheck
 import { trackEvent } from './analytics';
-import { logger } from '@/lib/logger';
 
 /**
  * Log an unauthorized dashboard access attempt.
@@ -18,7 +16,7 @@ export function logDashboardAccessDenied(userId: string | null, path: string) {
     anonymous: !userId,
   });
   if (process.env.NODE_ENV !== 'production') {
-    logger.warn(`[SECURITY] Access denied for ${userId || 'anonymous'} on ${path} at ${timestamp}`, {}, 'SYSTEM');
+    console.warn(`[SECURITY] Access denied for ${userId || 'anonymous'} on ${path} at ${timestamp}`);
   }
 }
 
@@ -44,8 +42,8 @@ export function logSessionRedirect(
     anonymous: !userId,
   });
   if (process.env.NODE_ENV !== 'production') {
-    logger.warn(
-      `[SECURITY] Session redirect for ${userId || 'anonymous'} on ${path} reason ${reason} at ${timestamp}`, {}, 'SYSTEM'
+    console.warn(
+      `[SECURITY] Session redirect for ${userId || 'anonymous'} on ${path} reason ${reason} at ${timestamp}`
     );
   }
 }

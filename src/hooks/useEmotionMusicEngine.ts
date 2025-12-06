@@ -1,9 +1,8 @@
-// @ts-nocheck
+
 import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { EmotionResult } from '@/types/emotion';
 import { MusicTrack } from '@/types/music';
-import { logger } from '@/lib/logger';
 
 interface EmotionMusicParams {
   emotion: string;
@@ -21,7 +20,7 @@ export const useEmotionMusicEngine = () => {
     setIsGenerating(true);
     
     try {
-      logger.info('Génération musicale pour émotion', params, 'MUSIC');
+      console.log('Génération musicale pour émotion:', params);
       
       const { data, error } = await supabase.functions.invoke('generate-music', {
         body: {
@@ -34,7 +33,7 @@ export const useEmotionMusicEngine = () => {
       });
 
       if (error) {
-        logger.error('Erreur génération musicale', error as Error, 'MUSIC');
+        console.error('Erreur génération musicale:', error);
         throw error;
       }
 
@@ -51,13 +50,13 @@ export const useEmotionMusicEngine = () => {
         };
         
         setCurrentTrack(track);
-        logger.info('Musique générée avec succès', track, 'MUSIC');
+        console.log('Musique générée avec succès:', track);
         return track;
       }
 
       return null;
     } catch (error) {
-      logger.error('Erreur lors de la génération musicale', error as Error, 'MUSIC');
+      console.error('Erreur lors de la génération musicale:', error);
       throw error;
     } finally {
       setIsGenerating(false);

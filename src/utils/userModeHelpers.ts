@@ -1,10 +1,5 @@
-// @ts-nocheck
-import { normalizeUserMode as normalizeUserModeBase } from './normalizeUserMode';
 
 export type UserMode = 'b2c' | 'b2b_user' | 'b2b_admin';
-
-// Re-export normalizeUserMode for convenience
-export const normalizeUserMode = normalizeUserModeBase;
 
 export const getUserModeDisplayName = (mode: UserMode | null): string => {
   switch (mode) {

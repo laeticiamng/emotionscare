@@ -1,7 +1,5 @@
-// @ts-nocheck
 
 import { supabase } from '@/integrations/supabase/client';
-import { logger } from '@/lib/logger';
 
 export interface RouteMetadata {
   id?: string;
@@ -23,7 +21,7 @@ export const routeMetadataService = {
       .order('route_path');
     
     if (error) {
-      logger.error('Error fetching route metadata', error as Error, 'SYSTEM');
+      console.error('Error fetching route metadata:', error);
       return [];
     }
     
@@ -38,7 +36,7 @@ export const routeMetadataService = {
       .single();
     
     if (error) {
-      logger.error('Error fetching route', error as Error, 'SYSTEM');
+      console.error('Error fetching route:', error);
       return null;
     }
     
@@ -56,7 +54,7 @@ export const routeMetadataService = {
       .eq('route_path', path);
     
     if (error) {
-      logger.error('Error updating route completion', error as Error, 'SYSTEM');
+      console.error('Error updating route completion:', error);
       return false;
     }
     
@@ -74,7 +72,7 @@ export const routeMetadataService = {
       });
     
     if (error) {
-      logger.error('Error tracking page analytics', error as Error, 'ANALYTICS');
+      console.error('Error tracking page analytics:', error);
     }
   },
 

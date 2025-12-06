@@ -1,6 +1,4 @@
-// @ts-nocheck
 import { useCallback, useRef } from 'react';
-import { logger } from '@/lib/logger';
 
 interface CrossfadeControls {
   crossfade: (fromSrc: string, toSrc: string, duration?: number) => Promise<void>;
@@ -54,7 +52,7 @@ export function useCrossfade(): CrossfadeControls {
       toAudio.volume = 1;
 
     } catch (error) {
-      logger.warn('Crossfade failed', error, 'UI');
+      console.warn('Crossfade failed:', error);
     } finally {
       isTransitioningRef.current = false;
     }

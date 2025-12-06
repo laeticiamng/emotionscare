@@ -10,9 +10,22 @@ import { buildRateLimitResponse, enforceEdgeRateLimit } from '../_shared/rate-li
 import { createClient } from '../_shared/supabase.ts';
 import { recordEdgeLatencyMetric } from '../_shared/metrics.ts';
 
+type ConsentRow = {
+  id: string;
+  version: string;
+  scope: Record<string, boolean>;
+  accepted_at: string | null;
+};
+
 const requestSchema = z.object({
-  scope: z.string().min(1).default('coach'),
+  version: z.string().min(1),
+  scope: z.record(z.boolean()).default({}),
 });
+
+function isSameScope(a: Record<string, boolean>, b: Record<string, boolean>): boolean {
+  const keys = new Set([...Object.keys(a), ...Object.keys(b)]);
+  return Array.from(keys).every((key) => Boolean(a[key]) === Boolean(b[key]));
+}
 
 function getSupabaseClient(req: Request) {
   const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
@@ -94,41 +107,57 @@ serve(async (req) => {
   const now = new Date().toISOString();
 
   const { data: activeConsent, error: selectError } = await client
-    .from('clinical_optins')
-    .select('id, scope, created_at')
+    .from('consents')
+    .select('id, version, scope, accepted_at')
     .eq('user_id', auth.user.id)
-    .eq('scope', parsed.data.scope)
     .is('revoked_at', null)
-    .maybeSingle();
+    .maybeSingle<ConsentRow>();
 
   if (selectError) {
     console.error('[optin-accept] failed to fetch active consent', { message: selectError.message });
     return finalize(json(500, { error: 'consent_lookup_failed' }));
   }
 
-  if (activeConsent) {
+  if (activeConsent && activeConsent.version === parsed.data.version && isSameScope(activeConsent.scope ?? {}, parsed.data.scope)) {
     await logAccess({
       user_id: hashedUserId,
       route: 'optin-accept',
       action: 'accept',
       result: 'success',
       user_agent: 'redacted',
-      details: `scope:${parsed.data.scope}`,
+      details: `version:${parsed.data.version}`,
     });
     return finalize(json(200, {
       status: 'accepted',
-      scope: activeConsent.scope,
-      created_at: activeConsent.created_at,
+      accepted_at: activeConsent.accepted_at,
+      version: activeConsent.version,
     }));
   }
 
+  if (activeConsent) {
+    const { error: revokeError } = await client
+      .from('consents')
+      .update({ revoked_at: now })
+      .eq('user_id', auth.user.id)
+      .is('revoked_at', null)
+      .select('id')
+      .maybeSingle();
+
+    if (revokeError) {
+      console.error('[optin-accept] failed to revoke previous consent', { message: revokeError.message });
+      return finalize(json(500, { error: 'revoke_failed' }));
+    }
+  }
+
   const { data: inserted, error: insertError } = await client
-    .from('clinical_optins')
+    .from('consents')
     .insert({
       user_id: auth.user.id,
+      version: parsed.data.version,
       scope: parsed.data.scope,
+      accepted_at: now,
     })
-    .select('scope, created_at')
+    .select('accepted_at, version')
     .single();
 
   if (insertError || !inserted) {
@@ -142,12 +171,12 @@ serve(async (req) => {
     action: 'accept',
     result: 'success',
     user_agent: 'redacted',
-    details: `scope:${inserted.scope}`,
+    details: `version:${inserted.version}`,
   });
 
   return finalize(json(200, {
     status: 'accepted',
-    scope: inserted.scope,
-    created_at: inserted.created_at,
+    accepted_at: inserted.accepted_at,
+    version: inserted.version,
   }));
 });

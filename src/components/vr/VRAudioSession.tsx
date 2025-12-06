@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import React, { useEffect, useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
@@ -47,8 +46,8 @@ const VRAudioSession: React.FC<VRAudioSessionProps> = ({
     
     // Autoplay if enabled
     if (autoplay && audioUrl) {
-      audio.play().catch(() => {
-        // Autoplay failed - silent
+      audio.play().catch(err => {
+        console.error('Autoplay failed:', err);
       });
       setIsPlaying(true);
     }
@@ -77,9 +76,7 @@ const VRAudioSession: React.FC<VRAudioSessionProps> = ({
     if (isPlaying) {
       audioRef.current.pause();
     } else {
-      audioRef.current.play().catch(() => {
-        // Play failed - silent
-      });
+      audioRef.current.play().catch(console.error);
     }
     
     setIsPlaying(!isPlaying);

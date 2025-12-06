@@ -4,58 +4,43 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from 'framer-motion';
 import { Mail, Phone, MapPin, Send, MessageCircle, CheckCircle, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
-import { logger } from '@/lib/logger';
-import { contactFormSchema, type ContactFormInput } from '@/lib/validation/schemas';
-import { sanitizeInput } from '@/lib/validation/validator';
-
-interface SubmissionResult {
-  success: boolean;
-  message: string;
-  error?: string;
-  data?: {
-    ticketId: string;
-    estimatedResponse: string;
-  };
-}
 
 const ContactPage: React.FC = () => {
+  const [isLoading, setIsLoading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [submissionResult, setSubmissionResult] = useState<SubmissionResult | null>(null);
-
-  const form = useForm<ContactFormInput>({
-    resolver: zodResolver(contactFormSchema),
-    defaultValues: {
-      name: '',
-      email: '',
-      subject: '',
-      message: ''
-    }
-  });
+  const [submissionResult, setSubmissionResult] = useState<any>(null);
 
   // Focus management pour l'accessibilité
   useEffect(() => {
     document.title = "Contact | EmotionsCare - Nous contacter";
   }, []);
 
-  const handleSubmit = async (values: ContactFormInput) => {
+  const handleKeyDown = (event: React.KeyboardEvent, action: () => void) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      action();
+    }
+  };
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+
     try {
-      // Sanitize all inputs
+      const formData = new FormData(e.target as HTMLFormElement);
+      
       const contactData = {
-        name: sanitizeInput(values.name),
-        email: sanitizeInput(values.email),
-        subject: sanitizeInput(values.subject),
-        message: sanitizeInput(values.message),
+        name: formData.get('name') as string,
+        email: formData.get('email') as string,
+        subject: formData.get('subject') as string,
+        message: formData.get('message') as string,
         type: 'general' as const,
         priority: 'medium' as const
       };
@@ -69,15 +54,18 @@ const ContactPage: React.FC = () => {
       setIsSubmitted(true);
       setSubmissionResult(data);
       
-      form.reset();
+      // Reset form
+      (e.target as HTMLFormElement).reset();
       
     } catch (error) {
-      logger.error('Erreur lors de l\'envoi du formulaire', error as Error, 'SYSTEM');
+      console.error('Erreur lors de l\'envoi:', error);
       setSubmissionResult({
         success: false,
         message: 'Erreur lors de l\'envoi de votre message. Veuillez réessayer.',
         error: error instanceof Error ? error.message : 'Erreur inconnue'
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -92,7 +80,7 @@ const ContactPage: React.FC = () => {
         Aller au contenu principal
       </a>
 
-      <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-background/90" data-testid="page-root">
+      <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5" data-testid="page-root">
         <div className="container mx-auto px-4 py-16">
           <main id="main-content" role="main">
             <motion.header
@@ -101,7 +89,7 @@ const ContactPage: React.FC = () => {
               transition={{ duration: 0.6 }}
               className="text-center mb-12"
             >
-              <h1 className="text-4xl md:text-5xl font-bold mb-4 text-foreground">
+              <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
                 Contactez-nous
               </h1>
               <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -128,165 +116,130 @@ const ContactPage: React.FC = () => {
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
-                      <Form {...form}>
-                        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6" noValidate>
-                          {isSubmitted && submissionResult?.success ? (
-                            <div 
-                              className="bg-success/10 border border-success/30 rounded-lg p-4 mb-6"
-                              role="alert"
-                              aria-live="polite"
-                            >
-                              <div className="flex items-center gap-2 mb-2">
-                                <CheckCircle className="w-5 h-5 text-success" aria-hidden="true" />
-                                <h3 className="font-medium text-success">Message envoyé avec succès !</h3>
-                              </div>
-                              <p className="text-sm text-success/80 mb-3">{submissionResult.message}</p>
-                              {submissionResult.data && (
-                                <div className="space-y-2">
-                                  <div className="flex items-center gap-2">
-                                    <Badge variant="outline">Ticket: {submissionResult.data.ticketId}</Badge>
-                                    <Badge variant="secondary">Réponse: {submissionResult.data.estimatedResponse}</Badge>
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                          ) : null}
-                          
-                          {submissionResult && !submissionResult.success ? (
-                            <div 
-                              className="bg-destructive/10 border border-destructive/30 rounded-lg p-4 mb-6"
-                              role="alert"
-                              aria-live="polite"
-                            >
-                              <div className="flex items-center gap-2 mb-2">
-                                <AlertTriangle className="w-5 h-5 text-destructive" aria-hidden="true" />
-                                <h3 className="font-medium text-destructive">Erreur d'envoi</h3>
-                              </div>
-                              <p className="text-sm text-destructive/80">{submissionResult.message}</p>
-                            </div>
-                          ) : null}
-                          
-                          <fieldset className="grid sm:grid-cols-2 gap-4">
-                            <legend className="sr-only">Informations personnelles</legend>
-                            <FormField
-                              control={form.control}
-                              name="name"
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormLabel htmlFor="contact-name">
-                                    Nom complet <span className="text-destructive" aria-label="requis">*</span>
-                                  </FormLabel>
-                                  <FormControl>
-                                    <Input 
-                                      {...field}
-                                      id="contact-name"
-                                      placeholder="Votre nom complet"
-                                      aria-required="true"
-                                      aria-invalid={!!form.formState.errors.name}
-                                      aria-describedby={form.formState.errors.name ? "contact-name-error" : undefined}
-                                    />
-                                  </FormControl>
-                                  <FormMessage id="contact-name-error" />
-                                </FormItem>
-                              )}
-                            />
-                            
-                            <FormField
-                              control={form.control}
-                              name="email"
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormLabel htmlFor="contact-email">
-                                    Email <span className="text-destructive" aria-label="requis">*</span>
-                                  </FormLabel>
-                                  <FormControl>
-                                    <Input 
-                                      {...field}
-                                      id="contact-email"
-                                      type="email"
-                                      placeholder="votre@email.com"
-                                      aria-required="true"
-                                      aria-invalid={!!form.formState.errors.email}
-                                      aria-describedby={form.formState.errors.email ? "contact-email-error" : undefined}
-                                    />
-                                  </FormControl>
-                                  <FormMessage id="contact-email-error" />
-                                </FormItem>
-                              )}
-                            />
-                          </fieldset>
-
-                          <FormField
-                            control={form.control}
-                            name="subject"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel htmlFor="contact-subject">
-                                  Sujet <span className="text-destructive" aria-label="requis">*</span>
-                                </FormLabel>
-                                <FormControl>
-                                  <Input 
-                                    {...field}
-                                    id="contact-subject"
-                                    placeholder="Résumé de votre demande"
-                                    aria-required="true"
-                                    aria-invalid={!!form.formState.errors.subject}
-                                    aria-describedby={form.formState.errors.subject ? "contact-subject-error" : undefined}
-                                  />
-                                </FormControl>
-                                <FormMessage id="contact-subject-error" />
-                              </FormItem>
-                            )}
-                          />
-
-                          <FormField
-                            control={form.control}
-                            name="message"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel htmlFor="contact-message">
-                                  Message <span className="text-destructive" aria-label="requis">*</span>
-                                </FormLabel>
-                                <FormControl>
-                                  <Textarea 
-                                    {...field}
-                                    id="contact-message"
-                                    rows={5}
-                                    placeholder="Décrivez votre demande en détail..."
-                                    aria-required="true"
-                                    aria-invalid={!!form.formState.errors.message}
-                                    aria-describedby={form.formState.errors.message ? "contact-message-error" : undefined}
-                                  />
-                                </FormControl>
-                                <FormMessage id="contact-message-error" />
-                              </FormItem>
-                            )}
-                          />
-
-                          <Button 
-                            type="submit" 
-                            className="w-full h-12 text-base focus:ring-2 focus:ring-primary focus:ring-offset-2" 
-                            disabled={form.formState.isSubmitting}
-                            aria-busy={form.formState.isSubmitting}
+                      <form onSubmit={handleSubmit} className="space-y-6" noValidate>
+                        {isSubmitted && submissionResult?.success ? (
+                          <div 
+                            className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6"
+                            role="alert"
+                            aria-live="polite"
                           >
-                            {form.formState.isSubmitting ? (
-                              <div className="flex items-center gap-2">
-                                <div 
-                                  className="w-4 h-4 animate-spin rounded-full border-2 border-current border-t-transparent"
-                                  role="progressbar"
-                                  aria-label="Envoi en cours"
-                                />
-                                <span>Envoi en cours...</span>
+                            <div className="flex items-center gap-2 mb-2">
+                              <CheckCircle className="w-5 h-5 text-green-600" aria-hidden="true" />
+                              <h3 className="font-medium text-green-800">Message envoyé avec succès !</h3>
+                            </div>
+                            <p className="text-sm text-green-700 mb-3">{submissionResult.message}</p>
+                            {submissionResult.data && (
+                              <div className="space-y-2">
+                                <div className="flex items-center gap-2">
+                                  <Badge variant="outline">Ticket: {submissionResult.data.ticketId}</Badge>
+                                  <Badge variant="secondary">Réponse: {submissionResult.data.estimatedResponse}</Badge>
+                                </div>
                               </div>
-                            ) : (
-                              <>
-                                <Send className="w-4 h-4 mr-2" aria-hidden="true" />
-                                Envoyer le message
-                              </>
                             )}
-                          </Button>
-                        </form>
-                      </Form>
+                          </div>
+                        ) : null}
+                        
+                        {submissionResult && !submissionResult.success ? (
+                          <div 
+                            className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6"
+                            role="alert"
+                            aria-live="polite"
+                          >
+                            <div className="flex items-center gap-2 mb-2">
+                              <AlertTriangle className="w-5 h-5 text-red-600" aria-hidden="true" />
+                              <h3 className="font-medium text-red-800">Erreur d'envoi</h3>
+                            </div>
+                            <p className="text-sm text-red-700">{submissionResult.message}</p>
+                          </div>
+                        ) : null}
+                        
+                        <fieldset className="grid sm:grid-cols-2 gap-4">
+                          <legend className="sr-only">Informations personnelles</legend>
+                          <div>
+                            <label htmlFor="name" className="block text-sm font-medium mb-2">
+                              Nom complet <span className="text-red-500" aria-label="requis">*</span>
+                            </label>
+                            <Input 
+                              id="name" 
+                              name="name" 
+                              placeholder="Votre nom complet"
+                              required 
+                              disabled={isLoading}
+                              className="focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                              aria-describedby="name-error"
+                            />
+                          </div>
+                          <div>
+                            <label htmlFor="email" className="block text-sm font-medium mb-2">
+                              Email <span className="text-red-500" aria-label="requis">*</span>
+                            </label>
+                            <Input 
+                              id="email" 
+                              name="email" 
+                              type="email" 
+                              placeholder="votre@email.com"
+                              required 
+                              disabled={isLoading}
+                              className="focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                              aria-describedby="email-error"
+                            />
+                          </div>
+                        </fieldset>
+
+                        <div>
+                          <label htmlFor="subject" className="block text-sm font-medium mb-2">
+                            Sujet <span className="text-red-500" aria-label="requis">*</span>
+                          </label>
+                          <Input 
+                            id="subject" 
+                            name="subject" 
+                            placeholder="Résumé de votre demande"
+                            required 
+                            disabled={isLoading}
+                            className="focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                            aria-describedby="subject-error"
+                          />
+                        </div>
+
+                        <div>
+                          <label htmlFor="message" className="block text-sm font-medium mb-2">
+                            Message <span className="text-red-500" aria-label="requis">*</span>
+                          </label>
+                          <Textarea 
+                            id="message" 
+                            name="message" 
+                            rows={5}
+                            placeholder="Décrivez votre demande en détail..."
+                            required 
+                            disabled={isLoading}
+                            className="focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                            aria-describedby="message-error"
+                          />
+                        </div>
+
+                        <Button 
+                          type="submit" 
+                          className="w-full h-12 text-base focus:ring-2 focus:ring-primary focus:ring-offset-2" 
+                          disabled={isLoading}
+                          aria-describedby={isLoading ? "submit-status" : undefined}
+                        >
+                          {isLoading ? (
+                            <div className="flex items-center gap-2">
+                              <div 
+                                className="w-4 h-4 animate-spin rounded-full border-2 border-current border-t-transparent"
+                                role="progressbar"
+                                aria-label="Envoi en cours"
+                              />
+                              <span id="submit-status">Envoi en cours...</span>
+                            </div>
+                          ) : (
+                            <>
+                              <Send className="w-4 h-4 mr-2" aria-hidden="true" />
+                              Envoyer le message
+                            </>
+                          )}
+                        </Button>
+                      </form>
                     </CardContent>
                   </Card>
                 </motion.div>

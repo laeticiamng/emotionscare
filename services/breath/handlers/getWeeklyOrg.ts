@@ -17,8 +17,7 @@ export async function getWeeklyOrg(req: FastifyRequest, reply: FastifyReply) {
     reply.code(403).send({ ok: false, error: { code: 'forbidden', message: 'Forbidden' } });
     return;
   }
-  const rows = await listWeeklyOrg(orgId, since);
-  const mapped = rows.map(r => ({
+  const rows = listWeeklyOrg(orgId, since).map(r => ({
     week_start: r.week_start,
     members: r.members,
     org_glow: r.org_hrv_idx,
@@ -28,5 +27,5 @@ export async function getWeeklyOrg(req: FastifyRequest, reply: FastifyReply) {
     org_mindful: r.org_mindfulness,
     org_mood: r.org_mood
   }));
-  reply.code(200).send(mapped);
+  reply.code(200).send(rows);
 }

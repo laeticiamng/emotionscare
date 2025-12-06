@@ -1,9 +1,8 @@
-// @ts-nocheck
 import React from 'react';
 import { motion } from 'framer-motion';
-import {
-  TrendingUp, TrendingDown, Activity, Heart,
-  Brain, Zap, Target, Award, Clock, Star, Sparkles
+import { 
+  TrendingUp, TrendingDown, Activity, Heart, 
+  Brain, Zap, Target, Award, Clock, Star 
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -32,7 +31,7 @@ const QuickStatsGrid: React.FC<QuickStatsGridProps> = ({ userRole = 'consumer' }
       change: 12,
       trend: 'up',
       icon: <Heart className="w-5 h-5" />,
-      color: 'bg-accent',
+      color: 'bg-pink-500',
       description: 'Sur 10, cette semaine'
     },
     {
@@ -42,7 +41,7 @@ const QuickStatsGrid: React.FC<QuickStatsGridProps> = ({ userRole = 'consumer' }
       change: 5,
       trend: 'up',
       icon: <Activity className="w-5 h-5" />,
-      color: 'bg-primary',
+      color: 'bg-blue-500',
       description: 'Toutes activités confondues'
     },
     {
@@ -52,7 +51,7 @@ const QuickStatsGrid: React.FC<QuickStatsGridProps> = ({ userRole = 'consumer' }
       change: 0,
       trend: 'stable',
       icon: <Target className="w-5 h-5" />,
-      color: 'bg-success',
+      color: 'bg-green-500',
       description: 'Record personnel : 23 jours'
     },
     {
@@ -62,7 +61,7 @@ const QuickStatsGrid: React.FC<QuickStatsGridProps> = ({ userRole = 'consumer' }
       change: 23,
       trend: 'up',
       icon: <Star className="w-5 h-5" />,
-      color: 'bg-warning',
+      color: 'bg-yellow-500',
       description: 'Niveau 15 - Explorateur'
     }
   ];
@@ -75,7 +74,7 @@ const QuickStatsGrid: React.FC<QuickStatsGridProps> = ({ userRole = 'consumer' }
       change: 8,
       trend: 'up',
       icon: <Heart className="w-5 h-5" />,
-      color: 'bg-accent',
+      color: 'bg-purple-500',
       description: 'Score moyen équipe'
     },
     {
@@ -85,7 +84,7 @@ const QuickStatsGrid: React.FC<QuickStatsGridProps> = ({ userRole = 'consumer' }
       change: 15,
       trend: 'up',
       icon: <Activity className="w-5 h-5" />,
-      color: 'bg-primary',
+      color: 'bg-blue-500',
       description: 'Activités d\'équipe'
     },
     {
@@ -95,7 +94,7 @@ const QuickStatsGrid: React.FC<QuickStatsGridProps> = ({ userRole = 'consumer' }
       change: 7,
       trend: 'up',
       icon: <TrendingUp className="w-5 h-5" />,
-      color: 'bg-success',
+      color: 'bg-green-500',
       description: 'Basé sur le bien-être'
     },
     {
@@ -105,7 +104,7 @@ const QuickStatsGrid: React.FC<QuickStatsGridProps> = ({ userRole = 'consumer' }
       change: 12,
       trend: 'up',
       icon: <Target className="w-5 h-5" />,
-      color: 'bg-warning',
+      color: 'bg-orange-500',
       description: 'Messages d\'encouragement'
     }
   ];
@@ -118,7 +117,7 @@ const QuickStatsGrid: React.FC<QuickStatsGridProps> = ({ userRole = 'consumer' }
       change: 5,
       trend: 'up',
       icon: <TrendingUp className="w-5 h-5" />,
-      color: 'bg-success',
+      color: 'bg-green-600',
       description: 'Toutes équipes confondues'
     },
     {
@@ -128,7 +127,7 @@ const QuickStatsGrid: React.FC<QuickStatsGridProps> = ({ userRole = 'consumer' }
       change: 9,
       trend: 'up',
       icon: <Brain className="w-5 h-5" />,
-      color: 'bg-primary',
+      color: 'bg-blue-600',
       description: 'Participation aux programmes'
     },
     {
@@ -138,7 +137,7 @@ const QuickStatsGrid: React.FC<QuickStatsGridProps> = ({ userRole = 'consumer' }
       change: 2,
       trend: 'up',
       icon: <Award className="w-5 h-5" />,
-      color: 'bg-accent',
+      color: 'bg-purple-600',
       description: 'Taux de fidélisation'
     },
     {
@@ -148,7 +147,7 @@ const QuickStatsGrid: React.FC<QuickStatsGridProps> = ({ userRole = 'consumer' }
       change: 18,
       trend: 'up',
       icon: <Sparkles className="w-5 h-5" />,
-      color: 'bg-success',
+      color: 'bg-emerald-600',
       description: 'Retour sur investissement'
     }
   ];
@@ -169,11 +168,11 @@ const QuickStatsGrid: React.FC<QuickStatsGridProps> = ({ userRole = 'consumer' }
   const renderTrendIcon = (trend: 'up' | 'down' | 'stable') => {
     switch (trend) {
       case 'up':
-        return <TrendingUp className="w-4 h-4 text-success" />;
+        return <TrendingUp className="w-4 h-4 text-green-500" />;
       case 'down':
-        return <TrendingDown className="w-4 h-4 text-destructive" />;
+        return <TrendingDown className="w-4 h-4 text-red-500" />;
       default:
-        return <Activity className="w-4 h-4 text-muted-foreground" />;
+        return <Activity className="w-4 h-4 text-gray-500" />;
     }
   };
 
@@ -191,7 +190,7 @@ const QuickStatsGrid: React.FC<QuickStatsGridProps> = ({ userRole = 'consumer' }
             <CardContent className="p-6">
               {/* Header avec icône et titre */}
               <div className="flex items-center justify-between mb-4">
-                <div className={`p-3 rounded-xl ${stat.color} bg-opacity-20`}>
+                <div className={`p-3 rounded-xl ${stat.color} bg-opacity-20 text-white`}>
                   <div className={stat.color}>
                     {stat.icon}
                   </div>

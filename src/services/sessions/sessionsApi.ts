@@ -1,5 +1,4 @@
-// @ts-nocheck
-import { Sentry } from '@/lib/errors/sentry-compat'
+import * as Sentry from '@sentry/react'
 
 import { supabase } from '@/integrations/supabase/client'
 

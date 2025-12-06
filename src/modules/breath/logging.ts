@@ -1,5 +1,4 @@
-import { captureException } from '@/lib/ai-monitoring';
-import { logger } from '@/lib/logger';
+import * as Sentry from '@sentry/react';
 import { supabase } from '@/integrations/supabase/client';
 import { journalService } from '@/modules/journal/journalService';
 import type { JournalEntry } from '@/modules/journal/journalService';
@@ -32,7 +31,12 @@ export async function logAndJournal(payload: LogAndJournalPayload): Promise<LogA
   const result: LogAndJournalResult = { errors: {} };
   const durationSec = clampDuration(payload.durationSec);
 
-  logger.info('session:log:start', { type: payload.type, durationSec }, 'SESSION');
+  Sentry.addBreadcrumb({
+    category: 'session',
+    level: 'info',
+    message: 'session:log:start',
+    data: { type: payload.type, durationSec },
+  });
 
   try {
     const insertPayload = {
@@ -54,22 +58,31 @@ export async function logAndJournal(payload: LogAndJournalPayload): Promise<LogA
 
     result.sessionId = data?.id ?? null;
 
-    logger.info('session:log:complete', { type: payload.type, sessionId: result.sessionId ?? undefined }, 'SESSION');
+    Sentry.addBreadcrumb({
+      category: 'session',
+      level: 'info',
+      message: 'session:log:complete',
+      data: { type: payload.type, sessionId: result.sessionId ?? undefined },
+    });
   } catch (error) {
     const normalizedError = error instanceof Error ? error : new Error('Unknown session logging error');
     result.errors.session = normalizedError;
-    captureException(normalizedError, {
-      feature: 'breath',
-      session: { type: payload.type, durationSec },
+    Sentry.captureException(normalizedError, {
+      tags: { feature: 'breath' },
+      contexts: { session: { type: payload.type, durationSec } },
     });
   }
 
   if (payload.journalText && typeof window !== 'undefined') {
-    logger.info('journal:auto:start', { type: payload.type }, 'JOURNAL');
+    Sentry.addBreadcrumb({
+      category: 'journal',
+      level: 'info',
+      message: 'journal:auto:start',
+      data: { type: payload.type },
+    });
 
     try {
       const entry = await journalService.saveEntry({
-        type: 'text',
         content: payload.journalText,
         summary: 'Session de respiration guidée',
         tone: payload.moodDelta !== undefined && payload.moodDelta !== null && payload.moodDelta < 0 ? 'negative' : 'positive',
@@ -84,13 +97,21 @@ export async function logAndJournal(payload: LogAndJournalPayload): Promise<LogA
 
       result.journalEntry = entry;
 
-      if (entry) {
-        logger.info('journal:auto:success', { entryId: entry.id }, 'JOURNAL');
-      }
+      Sentry.addBreadcrumb({
+        category: 'journal',
+        level: 'info',
+        message: 'journal:auto:success',
+        data: { entryId: entry.id },
+      });
     } catch (error) {
       const normalizedError = error instanceof Error ? error : new Error('Unknown journal error');
       result.errors.journal = normalizedError;
-      logger.error('journal:auto:error', normalizedError, 'JOURNAL');
+      Sentry.addBreadcrumb({
+        category: 'journal',
+        level: 'error',
+        message: 'journal:auto:error',
+        data: { reason: normalizedError.message },
+      });
     }
   }
 

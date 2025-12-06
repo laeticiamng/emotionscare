@@ -1,26 +1,17 @@
+
 import { supabase } from '@/integrations/supabase/client';
-import { logger } from '@/lib/logger';
 
 // TopMedia AI API configuration
-const API_KEY = import.meta.env.VITE_TOPMEDIA_API_KEY;
+const API_KEY = '1e4228c100304c658ab1eab4333f54be';
 const API_BASE_URL = 'https://api.topmusicai.com/v1';
 const API_BASE_URL_V2 = 'https://api.topmusicai.com/v2';
-
-// Validate API key is configured
-if (!API_KEY) {
-  logger.error(
-    'TopMedia API key not configured',
-    new Error('VITE_TOPMEDIA_API_KEY environment variable is missing'),
-    'MUSIC'
-  );
-}
 
 /**
  * Generate lyrics based on a theme or mood
  */
 export async function generateLyrics(prompt: string): Promise<string> {
   try {
-    logger.debug(`Generating lyrics with prompt: ${prompt}`, undefined, 'MUSIC');
+    console.log(`Generating lyrics with prompt: ${prompt}`);
     
     // Direct API call to generate lyrics based on prompt
     const response = await fetch(`${API_BASE_URL}/lyrics`, {
@@ -39,7 +30,7 @@ export async function generateLyrics(prompt: string): Promise<string> {
     const data = await response.json();
     return data.lyrics || '';
   } catch (error) {
-    logger.error('Error generating lyrics', error as Error, 'MUSIC');
+    console.error('Error generating lyrics:', error);
     throw error;
   }
 }
@@ -56,7 +47,7 @@ export async function generateMusic(params: {
   instrumental: number;
 }): Promise<{ song_id: string }> {
   try {
-    logger.debug(`Generating music with parameters`, params, 'MUSIC');
+    console.log(`Generating music with parameters:`, params);
     
     const response = await fetch(`${API_BASE_URL}/music`, {
       method: 'POST',
@@ -74,7 +65,7 @@ export async function generateMusic(params: {
     const data = await response.json();
     return { song_id: data.song_id || '' };
   } catch (error) {
-    logger.error('Error generating music', error as Error, 'MUSIC');
+    console.error('Error generating music:', error);
     throw error;
   }
 }
@@ -94,7 +85,7 @@ export async function submitMusicGenerationTask(params: {
   mood?: string;
 }): Promise<{ song_id: string; task_id: string }> {
   try {
-    logger.debug(`Submitting advanced music generation task`, params, 'MUSIC');
+    console.log(`Submitting advanced music generation task:`, params);
     
     // Add mood to description if available
     const enhancedPrompt = params.mood 
@@ -125,7 +116,7 @@ export async function submitMusicGenerationTask(params: {
       task_id: data.task_id || ''
     };
   } catch (error) {
-    logger.error('Error submitting music generation task', error as Error, 'MUSIC');
+    console.error('Error submitting music generation task:', error);
     throw error;
   }
 }
@@ -140,7 +131,7 @@ export async function checkGenerationStatus(songId: string): Promise<{
   progress?: number;
 }> {
   try {
-    logger.debug(`Checking status for song_id: ${songId}`, undefined, 'MUSIC');
+    console.log(`Checking status for song_id: ${songId}`);
     
     const response = await fetch(`${API_BASE_URL_V2}/query?song_id=${songId}`, {
       method: 'GET',
@@ -162,7 +153,7 @@ export async function checkGenerationStatus(songId: string): Promise<{
       progress: data.progress
     };
   } catch (error) {
-    logger.error('Error checking generation status', error as Error, 'MUSIC');
+    console.error('Error checking generation status:', error);
     throw error;
   }
 }
@@ -175,7 +166,7 @@ export async function concatenateSongs(songIds: string[]): Promise<{
   status: string;
 }> {
   try {
-    logger.debug(`Combining songs`, { songIds: songIds.join(', ') }, 'MUSIC');
+    console.log(`Combining songs: ${songIds.join(', ')}`);
     
     const response = await fetch(`${API_BASE_URL_V2}/concat`, {
       method: 'POST',
@@ -196,7 +187,7 @@ export async function concatenateSongs(songIds: string[]): Promise<{
       status: data.status || 'pending'
     };
   } catch (error) {
-    logger.error('Error concatenating songs', error as Error, 'MUSIC');
+    console.error('Error concatenating songs:', error);
     throw error;
   }
 }
@@ -280,10 +271,10 @@ export async function saveUserMusicCreation(creation: Omit<MusicCreation, 'creat
       createdAt: new Date().toISOString()
     };
     
-    logger.info('Saved user music creation', { id: newCreation.id }, 'MUSIC');
+    console.log('Saved user music creation:', newCreation);
     return newCreation;
   } catch (error) {
-    logger.error('Error saving user music creation', error as Error, 'MUSIC');
+    console.error('Error saving user music creation:', error);
     throw error;
   }
 }
@@ -334,7 +325,7 @@ export async function getUserMusicCreations(userId: string): Promise<MusicCreati
       }
     ];
   } catch (error) {
-    logger.error('Error fetching user music creations', error as Error, 'MUSIC');
+    console.error('Error fetching user music creations:', error);
     throw error;
   }
 }

@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -73,7 +72,7 @@ const WelcomeMessage: React.FC<WelcomeMessageProps> = ({
             </motion.h2>
             
             <motion.p
-              className="text-xl text-foreground"
+              className="text-xl text-foreground/80"
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.6, duration: 0.5 }}

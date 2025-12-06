@@ -1,11 +1,9 @@
-// @ts-nocheck
 /**
  * Hook getUserMedia API native - Architecture minimale
  * Remplace les libs externes pour cam/mic (face AR, journal voix, scan)
  */
 
 import { useState, useRef, useCallback, useEffect } from 'react';
-import { logger } from '@/lib/logger';
 
 export interface MediaConstraints {
   video?: boolean | MediaTrackConstraints;
@@ -57,7 +55,7 @@ export const useUserMedia = () => {
         }
       }));
     } catch (error) {
-      logger.warn('Impossible de vérifier les permissions média', error as Error, 'SYSTEM');
+      console.warn('Impossible de vérifier les permissions média');
     }
   }, []);
 

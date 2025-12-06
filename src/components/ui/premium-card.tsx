@@ -1,5 +1,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
+import { motion } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface PremiumCardProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -26,11 +27,13 @@ const PremiumCard = React.forwardRef<HTMLDivElement, PremiumCardProps>(({
   ...props
 }, ref) => {
   return (
-    <Card
+    <motion.div
+      whileHover={hover ? { y: -2, scale: 1.02 } : undefined}
+      transition={{ duration: 0.2 }}
       className={cn(
         'rounded-xl border transition-all duration-300',
         premiumVariants[variant],
-        hover && 'hover:shadow-premium-lg hover:-translate-y-0.5',
+        hover && 'hover:shadow-premium-lg',
         glow && 'hover:shadow-glow',
         className
       )}
@@ -38,7 +41,7 @@ const PremiumCard = React.forwardRef<HTMLDivElement, PremiumCardProps>(({
       {...props}
     >
       {children}
-    </Card>
+    </motion.div>
   );
 });
 

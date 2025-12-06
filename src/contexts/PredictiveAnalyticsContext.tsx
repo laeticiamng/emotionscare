@@ -1,10 +1,8 @@
-// @ts-nocheck
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase-client';
 import { useAuth } from './AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { logger } from '@/lib/logger';
 
 // Types for predictions
 export interface PredictiveFeature {
@@ -54,8 +52,14 @@ export const PredictiveAnalyticsProvider: React.FC<{ children: React.ReactNode }
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [currentPredictions, setCurrentPredictions] = useState<Prediction | null>(null);
-  const [isEnabled, setIsEnabled] = useState<boolean>(true);
-  const [predictionEnabled, setPredictionEnabled] = useState<boolean>(true);
+  const [isEnabled, setIsEnabled] = useState(() => {
+    const stored = localStorage.getItem('predictiveAnalyticsEnabled');
+    return stored ? JSON.parse(stored) : true;
+  });
+  const [predictionEnabled, setPredictionEnabled] = useState(() => {
+    const stored = localStorage.getItem('predictionEnabled');
+    return stored ? JSON.parse(stored) : true;
+  });
   const [recommendations, setRecommendations] = useState<PredictionRecommendation[]>([]);
   const { user } = useAuth();
   const { toast } = useToast();
@@ -99,48 +103,13 @@ export const PredictiveAnalyticsProvider: React.FC<{ children: React.ReactNode }
     }
   ]);
 
-  useEffect(() => {
-    if (typeof window === 'undefined') {
-      return;
-    }
-
-    const storedIsEnabled = window.localStorage.getItem('predictiveAnalyticsEnabled');
-    if (storedIsEnabled !== null) {
-      try {
-        setIsEnabled(JSON.parse(storedIsEnabled));
-      } catch (e) {
-        // If parsing fails, fallback to default and clear corrupted value
-        setIsEnabled(true);
-        window.localStorage.removeItem('predictiveAnalyticsEnabled');
-      }
-    }
-
-    const storedPredictionEnabled = window.localStorage.getItem('predictionEnabled');
-    if (storedPredictionEnabled !== null) {
-      try {
-        setPredictionEnabled(JSON.parse(storedPredictionEnabled));
-      } catch (e) {
-        setPredictionEnabled(true);
-        window.localStorage.removeItem('predictionEnabled');
-      }
-    }
-  }, []);
-
   // Store settings in localStorage
   useEffect(() => {
-    if (typeof window === 'undefined') {
-      return;
-    }
-
-    window.localStorage.setItem('predictiveAnalyticsEnabled', JSON.stringify(isEnabled));
+    localStorage.setItem('predictiveAnalyticsEnabled', JSON.stringify(isEnabled));
   }, [isEnabled]);
 
   useEffect(() => {
-    if (typeof window === 'undefined') {
-      return;
-    }
-
-    window.localStorage.setItem('predictionEnabled', JSON.stringify(predictionEnabled));
+    localStorage.setItem('predictionEnabled', JSON.stringify(predictionEnabled));
   }, [predictionEnabled]);
   
   // Update feature enabled status when predictionEnabled changes
@@ -190,7 +159,7 @@ export const PredictiveAnalyticsProvider: React.FC<{ children: React.ReactNode }
       });
       
     } catch (err) {
-      logger.error('Error generating prediction', err as Error, 'ANALYTICS');
+      console.error('Error generating prediction:', err);
       setError('Erreur lors de la génération des prédictions');
       toast({
         title: "Erreur",

@@ -1,6 +1,3 @@
-// @ts-nocheck
-
-// @ts-nocheck
 
 import React from 'react';
 import { UserPreferences } from '@/types/preferences';

@@ -1,8 +1,6 @@
-// @ts-nocheck
 import React from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { HelmetProvider } from 'react-helmet-async';
-import { logger } from '@/lib/logger';
 
 import { AccessibilityProvider } from '@/components/common/AccessibilityProvider';
 import { NotificationProvider } from '@/components/ui/notification-system';
@@ -11,14 +9,14 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import { AuthProvider } from '@/contexts/AuthContext';
 import RootErrorBoundary from '@/components/error/RootErrorBoundary';
 import { ErrorProvider } from '@/contexts';
+import { MoodProvider } from '@/contexts/MoodContext';
+import { SimpleAuthProvider } from '@/contexts/SimpleAuth';
 import { UserModeProvider } from '@/contexts/UserModeContext';
-import { ConsentProvider } from '@/features/clinical-optin/ConsentProvider';
 import { I18nProvider } from '@/lib/i18n/i18n';
 import i18n from '@/lib/i18n';
 import { UnifiedProvider } from '@/core/UnifiedStateManager';
-import { ThemeProvider } from '@/providers/theme';
-import { PolicyAcceptanceModal } from '@/components/gdpr/PolicyAcceptanceModal';
-import AccessibilitySkipLinks from '@/components/AccessibilitySkipLinks';
+import { MusicProvider } from '@/contexts/MusicContext';
+import { ThemeProvider } from '@/providers/ThemeProvider';
 
 const createQueryClient = () =>
   new QueryClient({
@@ -47,7 +45,7 @@ const useI18nReady = () => {
 
     // Set a timeout to prevent infinite waiting
     const timeout = setTimeout(() => {
-      logger.warn('[i18n] Initialization timeout, proceeding anyway', undefined, 'SYSTEM');
+      console.warn('[i18n] Initialization timeout, proceeding anyway');
       setReady(true);
     }, 3000); // 3 seconds timeout
 
@@ -80,47 +78,73 @@ const useI18nReady = () => {
 };
 
 const I18nBootstrap: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // ✅ FIX: Render immediately instead of waiting for i18n
-  // i18n will load in background without blocking app render
+  const ready = useI18nReady();
+
+  // Temporairement, on force le rendu même si i18n n'est pas prêt
+  // pour éviter l'écran blanc 
+  if (!ready) {
+    return (
+      <div style={{ 
+        minHeight: '100vh', 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center',
+        background: '#1a1a1a',
+        color: '#fff'
+      }}>
+        <div>Chargement de l'application...</div>
+      </div>
+    );
+  }
+
   return <I18nProvider>{children}</I18nProvider>;
 };
 
 export function RootProvider({ children }: RootProviderProps) {
   const [queryClient] = React.useState(createQueryClient);
-  const resolvedDefaultTheme = 'system';
 
   return (
     <HelmetProvider>
       <RootErrorBoundary>
         <QueryClientProvider client={queryClient}>
           <ErrorProvider>
-            <AuthProvider>
-              <UserModeProvider>
-                <I18nBootstrap>
-                  <UnifiedProvider>
-                    <ConsentProvider>
+            <SimpleAuthProvider>
+              <AuthProvider>
+                <UserModeProvider>
+                  <I18nBootstrap>
+                    <ThemeProvider defaultTheme="light" storageKey="emotions-care-theme">
                       <AccessibilityProvider>
-                        <ThemeProvider
-                          attribute="class"
-                          defaultTheme={resolvedDefaultTheme}
-                          enableSystem
-                          storageKey="emotionscare-theme"
-                        >
-                          <TooltipProvider>
-                            <NotificationProvider>
-                              <AccessibilitySkipLinks />
-                              {children}
-                              <Toaster />
-                              <PolicyAcceptanceModal />
-                            </NotificationProvider>
+                        <NotificationProvider>
+                          <TooltipProvider delayDuration={200} skipDelayDuration={100}>
+                            <UnifiedProvider>
+                              <MoodProvider>
+                                <MusicProvider>
+                                  {children}
+                                  <Toaster
+                                    position="top-right"
+                                    className="toaster group"
+                                    closeButton
+                                    toastOptions={{
+                                      classNames: {
+                                        toast:
+                                          'group-[.toaster]:bg-card group-[.toaster]:text-card-foreground group-[.toaster]:border-border group-[.toaster]:shadow-premium',
+                                        description: 'group-[.toast]:text-muted-foreground',
+                                        actionButton: 'group-[.toast]:bg-primary group-[.toast]:text-primary-foreground',
+                                        cancelButton: 'group-[.toast]:bg-muted group-[.toast]:text-muted-foreground',
+                                      },
+                                    }}
+                                  />
+                                </MusicProvider>
+                              </MoodProvider>
+                            </UnifiedProvider>
                           </TooltipProvider>
-                        </ThemeProvider>
+                        </NotificationProvider>
                       </AccessibilityProvider>
-                    </ConsentProvider>
-                  </UnifiedProvider>
-                </I18nBootstrap>
-              </UserModeProvider>
-            </AuthProvider>
+                    </ThemeProvider>
+                  </I18nBootstrap>
+                </UserModeProvider>
+              </AuthProvider>
+            </SimpleAuthProvider>
           </ErrorProvider>
         </QueryClientProvider>
       </RootErrorBoundary>

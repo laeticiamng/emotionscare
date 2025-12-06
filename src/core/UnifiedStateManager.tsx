@@ -1,11 +1,9 @@
-// @ts-nocheck
 /**
  * UNIFIED STATE MANAGER - Version simplifiée
  * Remplace tous les contexts/stores éparpillés par un système unifié
  */
 
 import React, { createContext, useContext, ReactNode } from 'react';
-import { logger } from '@/lib/logger';
 
 // ==================== TYPES SIMPLIFIÉS ====================
 
@@ -64,7 +62,7 @@ export const UnifiedProvider: React.FC<UnifiedProviderProps> = ({ children }) =>
   // Performance Monitoring
   const recordPerformanceMetric = (name: string, value: number) => {
     if (import.meta.env.DEV) {
-      logger.debug(`Performance: ${name} = ${value.toFixed(2)}ms`, {}, 'SYSTEM');
+      console.log(`📊 Performance: ${name} = ${value.toFixed(2)}ms`);
     }
   };
   
@@ -79,7 +77,7 @@ export const UnifiedProvider: React.FC<UnifiedProviderProps> = ({ children }) =>
       document.body.appendChild(announcement);
       setTimeout(() => document.body.removeChild(announcement), 1000);
     } catch (error) {
-      logger.warn('Screen reader announcement failed', error as Error, 'UI');
+      console.warn('Screen reader announcement failed:', error);
     }
   };
   
@@ -90,7 +88,7 @@ export const UnifiedProvider: React.FC<UnifiedProviderProps> = ({ children }) =>
   // Security
   const logSecurityEvent = (event: string, details?: any) => {
     if (import.meta.env.DEV) {
-      logger.warn(`Security Event: ${event}`, details, 'SYSTEM');
+      console.warn(`🚨 Security Event: ${event}`, details);
     }
   };
   
@@ -101,13 +99,13 @@ export const UnifiedProvider: React.FC<UnifiedProviderProps> = ({ children }) =>
   // Analytics (Privacy-compliant)
   const trackEvent = (event: string, properties?: Record<string, any>) => {
     if (import.meta.env.DEV) {
-      logger.info(`Event: ${event}`, properties, 'ANALYTICS');
+      console.log(`📊 Event: ${event}`, properties);
     }
   };
   
   // Error Handling
   const reportError = (error: Error, context?: string) => {
-    logger.error(`Error${context ? ` in ${context}` : ''}`, error, 'SYSTEM');
+    console.error(`❌ Error${context ? ` in ${context}` : ''}:`, error);
   };
   
   const contextValue: UnifiedContextType = {
@@ -135,10 +133,10 @@ export const useAuth = () => {
     user: null,
     isAuthenticated: false,
     login: async (email: string, password: string) => {
-      logger.info('Login attempt', { email }, 'AUTH');
+      console.log('Login attempt:', { email });
     },
     logout: () => {
-      logger.info('Logout', {}, 'AUTH');
+      console.log('Logout');
     },
     loading: false,
     error: null

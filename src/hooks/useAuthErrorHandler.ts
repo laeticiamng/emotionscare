@@ -1,9 +1,9 @@
+
 import { useNavigate } from 'react-router-dom';
 import { useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
 import { routes } from '@/routerV2';
-import { logger } from '@/lib/logger';
 
 /**
  * Hook pour gérer les erreurs d'authentification
@@ -12,16 +12,14 @@ export const useAuthErrorHandler = () => {
   const navigate = useNavigate();
   const { signOut } = useAuth();
 
-  const handleAuthError = useCallback(async (error: unknown) => {
-    const err = error as { status?: number };
-    
-    if (err?.status === 401) {
-      logger.warn('Token expired or invalid, logging out user', undefined, 'AUTH');
+  const handleAuthError = useCallback(async (error: any) => {
+    if (error?.status === 401) {
+      console.warn('[Auth] Token expired or invalid, logging out user');
       
       try {
         await signOut();
       } catch (signOutError) {
-        logger.error('Error during signout', signOutError as Error, 'AUTH');
+        console.error('[Auth] Error during signout:', signOutError);
       }
 
       toast({
@@ -30,6 +28,7 @@ export const useAuthErrorHandler = () => {
         variant: "destructive",
       });
 
+      // Rediriger vers la page de choix de mode
       navigate(routes.b2c.home());
     }
   }, [navigate, signOut]);

@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import React, { useEffect, useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
@@ -82,7 +81,7 @@ export const AudioProcessor: React.FC<AudioProcessorProps> = ({
         });
       }, 1000);
     } catch (err) {
-      // Microphone access error
+      console.error('Error accessing microphone:', err);
       setError('Could not access microphone. Please check permissions.');
       toast({
         title: 'Erreur de microphone',
@@ -105,7 +104,7 @@ export const AudioProcessor: React.FC<AudioProcessorProps> = ({
 
   const processAudio = async () => {
     if (audioChunksRef.current.length === 0) {
-      // No audio recorded
+      console.log('No audio recorded');
       return;
     }
 
@@ -166,7 +165,7 @@ export const AudioProcessor: React.FC<AudioProcessorProps> = ({
       }, 2000);
       
     } catch (error) {
-      // Audio processing error
+      console.error('Error processing audio:', error);
       setError('Failed to process audio');
       setIsProcessing(false);
       if (onProcessingChange) {

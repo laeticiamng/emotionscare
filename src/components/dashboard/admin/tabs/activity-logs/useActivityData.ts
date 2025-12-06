@@ -1,8 +1,7 @@
-// @ts-nocheck
+
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase-client';
 import { ActivityFiltersState, AnonymousActivity, ActivityStats, ActivityTabView } from './types';
-import { logger } from '@/lib/logger';
 
 interface UseActivityDataProps {
   activeTab: ActivityTabView;
@@ -69,7 +68,7 @@ export const useActivityData = ({
       setTotalActivities(count || 0);
       setTotalPages(Math.ceil((count || 0) / pageSize));
     } catch (err) {
-      logger.error('Error fetching anonymous activities:', err as Error, 'UI');
+      console.error('Error fetching anonymous activities:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch activity data');
     } finally {
       setIsLoading(false);
@@ -89,10 +88,10 @@ export const useActivityData = ({
         });
         
       if (statsError) throw new Error(statsError.message);
-        
+      
       setActivityStats(data || []);
     } catch (err) {
-      logger.error('Error fetching activity stats:', err as Error, 'UI');
+      console.error('Error fetching activity stats:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch activity statistics');
     } finally {
       setIsLoading(false);

@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import React, { useState, useEffect } from 'react';
 import { Badge } from '@/components/ui/badge';
@@ -35,7 +34,7 @@ const TagSelector: React.FC<TagSelectorProps> = ({
           const tags = await getRecommendedTags();
           setRecommendations(tags || []);
         } catch (error) {
-          // Tag recommendations loading failed
+          console.error('Failed to load tag recommendations', error);
           setRecommendations([]);
         }
       };

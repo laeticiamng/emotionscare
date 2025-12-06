@@ -1,10 +1,11 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Play, Headphones } from '@/components/music/icons';
+import { Play, Headphones } from 'lucide-react';
 import { useMusicEmotionIntegration } from '@/hooks/useMusicEmotionIntegration';
 import { EmotionMusicParams } from '@/types/music';
-import { LazyMotionWrapper, m } from '@/utils/lazy-motion';
+import { motion } from 'framer-motion';
 
 interface MusicRecommendationCardProps {
   emotion: string;
@@ -34,25 +35,24 @@ export const MusicRecommendationCard: React.FC<MusicRecommendationCardProps> = (
   };
 
   return (
-    <LazyMotionWrapper>
-      <m.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, ease: "easeOut" }}
-        className="h-full"
-      >
-        <Card className="h-full bg-card overflow-hidden relative group hover:shadow-lg transition-all duration-300">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-primary/5 opacity-90 group-hover:opacity-100 transition-opacity duration-300" />
+    <motion.div 
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+      className="h-full"
+    >
+      <Card className="h-full bg-white dark:bg-gray-800 overflow-hidden relative group hover:shadow-lg transition-shadow duration-300">
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-100/30 via-transparent to-indigo-100/20 dark:from-blue-900/20 dark:via-transparent dark:to-indigo-900/10 opacity-90 group-hover:opacity-100 transition-opacity" />
         
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-lg">
-            <Headphones className="h-5 w-5 text-primary" />
+            <Headphones className="h-5 w-5 text-blue-600 dark:text-blue-400" />
             {title}
           </CardTitle>
         </CardHeader>
         
         <CardContent className="relative z-10">
-          <p className="text-sm mb-4 text-muted-foreground">
+          <p className="text-sm mb-4 text-gray-600 dark:text-gray-300">
             {description || getEmotionMusicDescription(emotion)}
           </p>
           
@@ -60,7 +60,7 @@ export const MusicRecommendationCard: React.FC<MusicRecommendationCardProps> = (
             <Button 
               onClick={handlePlay} 
               disabled={isLoading}
-              className="w-full transition-all duration-200"
+              className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white border-none shadow transition-all"
               size="sm"
             >
               {isLoading ? (
@@ -78,8 +78,7 @@ export const MusicRecommendationCard: React.FC<MusicRecommendationCardProps> = (
           </div>
         </CardContent>
       </Card>
-    </m.div>
-    </LazyMotionWrapper>
+    </motion.div>
   );
 };
 

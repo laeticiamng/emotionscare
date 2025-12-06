@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { SendHorizontal, Mic, Paperclip, Smile } from 'lucide-react';
@@ -60,7 +61,7 @@ const CoachChatInput: React.FC<CoachChatInputProps> = ({
           <div className="flex gap-2">
             <Popover>
               <PopoverTrigger asChild>
-                <Button variant="ghost" size="icon" type="button" aria-label="Réponses rapides">
+                <Button variant="ghost" size="icon" type="button">
                   <Smile className="h-4 w-4" />
                 </Button>
               </PopoverTrigger>
@@ -88,7 +89,6 @@ const CoachChatInput: React.FC<CoachChatInputProps> = ({
               size="icon" 
               type="button"
               disabled={isProcessing}
-              aria-label="Enregistrement vocal"
             >
               <Mic className="h-4 w-4" />
             </Button>
@@ -98,7 +98,6 @@ const CoachChatInput: React.FC<CoachChatInputProps> = ({
               size="icon" 
               type="button"
               disabled={isProcessing}
-              aria-label="Joindre un fichier"
             >
               <Paperclip className="h-4 w-4" />
             </Button>

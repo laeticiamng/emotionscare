@@ -1,7 +1,6 @@
-// @ts-nocheck
+
 import { supabase } from '@/integrations/supabase/client';
 import { BUDGET_THRESHOLDS, BUDGET_FALLBACKS } from './openai-config';
-import { logger } from '@/lib/logger';
 
 /**
  * Budget monitoring service for OpenAI API usage
@@ -78,7 +77,7 @@ class BudgetMonitor {
       });
       
       if (error || !data) {
-        logger.error('Error fetching API usage data', error as Error, 'API');
+        console.error('Error fetching API usage data:', error);
         return;
       }
       
@@ -90,7 +89,7 @@ class BudgetMonitor {
       }
       
     } catch (error) {
-      logger.error('Failed to fetch API usage data', error as Error, 'API');
+      console.error('Failed to fetch API usage data:', error);
     }
   }
 }

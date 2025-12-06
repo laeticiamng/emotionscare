@@ -1,6 +1,3 @@
-// @ts-nocheck
-import { logger } from '@/lib/logger';
-
 interface PerformanceMetrics {
   route: string;
   loadTime: number;
@@ -32,7 +29,7 @@ class PagePerformanceMonitor {
       this.metrics.set(route, [metric]);
     }
 
-    logger.info(`⏱️  Performance recorded for ${route}`, { loadTime }, 'SYSTEM');
+    console.log(`⏱️  Performance recorded for ${route}: ${loadTime}ms`);
   }
 
   getPageMetrics(route: string): PerformanceMetrics[] {

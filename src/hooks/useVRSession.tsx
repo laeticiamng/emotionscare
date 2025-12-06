@@ -1,10 +1,8 @@
-// @ts-nocheck
 
 import { useState, useEffect } from 'react';
 import VRService from '@/lib/vrService';
 import { VRSession, VRSessionTemplate, VRSessionFeedback } from '@/types/vr';
 import { useToast } from '@/hooks/use-toast';
-import { logger } from '@/lib/logger';
 
 interface UseVRSessionOptions {
   autoStart?: boolean;
@@ -59,7 +57,7 @@ export const useVRSession = (templateId?: string, options: UseVRSessionOptions =
         setTemplate(found);
       }
     } catch (error) {
-      logger.error('Error loading VR template', error as Error, 'VR');
+      console.error('Error loading VR template:', error);
       toast({
         title: "Erreur",
         description: "Impossible de charger le template VR",
@@ -86,7 +84,7 @@ export const useVRSession = (templateId?: string, options: UseVRSessionOptions =
         description: "Votre expérience VR a commencé"
       });
     } catch (error) {
-      logger.error('Error starting VR session', error as Error, 'VR');
+      console.error('Error starting VR session:', error);
       toast({
         title: "Erreur",
         description: "Impossible de démarrer la session VR",
@@ -119,7 +117,7 @@ export const useVRSession = (templateId?: string, options: UseVRSessionOptions =
       
       return endedSession;
     } catch (error) {
-      logger.error('Error ending VR session', error as Error, 'VR');
+      console.error('Error ending VR session:', error);
       toast({
         title: "Erreur",
         description: "Impossible de terminer la session VR",

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { supabase } from '@/integrations/supabase/client';
 import humeService from './hume.service';
 import openaiService from './openai.service';
@@ -34,7 +33,7 @@ class EmotionAnalysisService {
         status: 'active'
       });
     } catch (error) {
-      // Silent: session save error logged internally
+      console.error('Error saving session to database:', error);
     }
 
     return sessionId;
@@ -450,7 +449,7 @@ class EmotionAnalysisService {
         })
         .eq('id', sessionId);
     } catch (error) {
-      // Silent: session update error logged internally
+      console.error('Error updating session:', error);
     }
   }
 

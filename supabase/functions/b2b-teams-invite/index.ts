@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { serve } from 'https://deno.land/std@0.208.0/http/server.ts';
 import { Resend } from 'https://esm.sh/resend@3.4.0';
 import {

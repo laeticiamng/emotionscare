@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { z } from 'zod';
 import { supabase } from '@/integrations/supabase/client';
 import type { Database } from '@/integrations/supabase/types';
