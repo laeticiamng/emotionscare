@@ -212,7 +212,7 @@ export default function B2BReportsHeatmapPage() {
               <Button 
                 type="button" 
                 variant="outline" 
-                onClick={() => navigate('/app/admin/system-health')}
+                onClick={() => navigate('/admin/system-health')}
                 className="gap-2"
               >
                 <Activity className="h-4 w-4" aria-hidden="true" />

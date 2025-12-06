@@ -31,7 +31,7 @@ const GuestMenu: React.FC = () => {
   };
 
   const handleHelp = () => {
-    navigate('/support');
+    navigate('/help');
   };
 
   return (

@@ -326,7 +326,7 @@ const B2BSecurityPage: React.FC = () => {
             <TabsContent value="monitoring" className="space-y-6">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-2xl font-bold">Monitoring de Sécurité en Temps Réel</h2>
-                <Link to="/app/admin/compliance">
+                <Link to="/admin/gdpr">
                   <Button>
                     <Shield className="h-4 w-4 mr-2" />
                     Monitoring RGPD

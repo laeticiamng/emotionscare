@@ -337,13 +337,13 @@ const AlertTesterPage: React.FC = () => {
           </ol>
 
           <div className="mt-4 flex gap-2">
-            <Button variant="outline" onClick={() => navigate('/app/admin/unified')}>
+            <Button variant="outline" onClick={() => navigate('/admin/unified')}>
               Dashboard Unifié
             </Button>
-            <Button variant="outline" onClick={() => navigate('/app/admin/incidents')}>
+            <Button variant="outline" onClick={() => navigate('/admin/incidents')}>
               Tous les Incidents
             </Button>
-            <Button variant="outline" onClick={() => navigate('/app/admin/tickets')}>
+            <Button variant="outline" onClick={() => navigate('/admin/tickets/integrations')}>
               Configuration Tickets
             </Button>
           </div>

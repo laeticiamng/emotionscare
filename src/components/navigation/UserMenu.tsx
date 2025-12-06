@@ -119,7 +119,7 @@ const UserMenu: React.FC = () => {
           <>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem onClick={() => navigate('/app/admin')}>
+              <DropdownMenuItem onClick={() => navigate('/admin/unified')}>
                 <Shield className="mr-2 h-4 w-4" />
                 <span>Administration</span>
               </DropdownMenuItem>
@@ -129,9 +129,9 @@ const UserMenu: React.FC = () => {
         
         <DropdownMenuSeparator />
         
-        <DropdownMenuItem onClick={() => navigate('/support')}>
+        <DropdownMenuItem onClick={() => navigate('/help')}>
           <HelpCircle className="mr-2 h-4 w-4" />
-          <span>Support</span>
+          <span>Aide</span>
         </DropdownMenuItem>
         
         <DropdownMenuItem onClick={handleLogout}>
