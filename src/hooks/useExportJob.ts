@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useEffect, useRef } from 'react';
 import { useRGPDStore } from '@/store/rgpd.store';
 

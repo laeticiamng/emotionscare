@@ -1,5 +1,5 @@
-
 import React, { useEffect, useRef, useState } from 'react';
+import { logger } from '@/lib/logger';
 import { Play, Pause, Volume2, VolumeX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
@@ -52,7 +52,7 @@ const AudioVisualizer: React.FC<AudioVisualizerProps> = ({
     // Clean up on unmount
     return () => {
       if (audioContextRef.current) {
-        audioContextRef.current.close().catch(console.error);
+        audioContextRef.current.close().catch((err) => logger.error('Error closing audio context', err as Error, 'MUSIC'));
       }
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
@@ -85,7 +85,7 @@ const AudioVisualizer: React.FC<AudioVisualizerProps> = ({
         analyserRef.current = audioContextRef.current.createAnalyser();
         analyserRef.current.fftSize = 256;
         const bufferLength = analyserRef.current.frequencyBinCount;
-        dataArrayRef.current = new Uint8Array(bufferLength);
+        dataArrayRef.current = new Uint8Array(new ArrayBuffer(bufferLength));
         
         // Create source node from audio element
         const source = audioContextRef.current.createMediaElementSource(audioRef.current);
@@ -98,13 +98,13 @@ const AudioVisualizer: React.FC<AudioVisualizerProps> = ({
         try {
           await audioRef.current.play();
         } catch (err) {
-          console.error('Autoplay prevented:', err);
+          logger.error('Autoplay prevented', err as Error, 'MUSIC');
           setLocalIsPlaying(false);
         }
       }
     };
     
-    setupAudio().catch(console.error);
+    setupAudio().catch((err) => logger.error('Error setting up audio', err as Error, 'MUSIC'));
   }, [audioUrl]);
   
   // Sync with isPlaying prop
@@ -130,7 +130,7 @@ const AudioVisualizer: React.FC<AudioVisualizerProps> = ({
     
     if (localIsPlaying) {
       audioRef.current.play().catch(err => {
-        console.error('Play error:', err);
+        logger.error('Play error', err as Error, 'MUSIC');
         setLocalIsPlaying(false);
       });
       visualize();
@@ -168,7 +168,7 @@ const AudioVisualizer: React.FC<AudioVisualizerProps> = ({
     ctx.fillRect(0, 0, WIDTH, HEIGHT);
     
     // Get data
-    analyserRef.current.getByteFrequencyData(dataArrayRef.current);
+    analyserRef.current.getByteFrequencyData(dataArrayRef.current as Uint8Array<ArrayBuffer>);
     
     // Choose visualization variant
     switch (variant) {

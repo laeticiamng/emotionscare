@@ -6,6 +6,8 @@
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import * as Sentry from '@sentry/react';
+import { captureException } from '@/lib/ai-monitoring';
+import { logger } from '@/lib/logger';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Star, Play, Pause, RotateCcw, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -150,7 +152,7 @@ export default function B2CVRGalaxyPage() {
       mood_delta: null,
       meta,
     }).catch((error) => {
-      console.error('[VRGalaxy] unable to persist session', error);
+      logger.error('VRGalaxy: unable to persist session', error as Error, 'VR');
     });
   }, [activeMode, lastPOMSSummary, lastSSQSummary]);
 
@@ -317,13 +319,13 @@ export default function B2CVRGalaxyPage() {
 
   return (
     <ConsentGate>
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900/30 to-slate-900 p-4 relative overflow-hidden">
+      <div data-testid="page-root" className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900/30 to-slate-900 p-4 relative overflow-hidden">
       {/* Background Stars */}
       <div className="absolute inset-0 pointer-events-none">
         {backgroundStars.map((star) => (
           <motion.div
             key={star.id}
-            className="absolute w-1 h-1 bg-white rounded-full"
+            className="absolute w-1 h-1 bg-foreground rounded-full"
             style={{
               left: `${star.x}%`,
               top: `${star.y}%`,
@@ -363,19 +365,19 @@ export default function B2CVRGalaxyPage() {
           animate={allowMotion ? { opacity: 1, y: 0 } : { opacity: 1 }}
           className="mb-8 text-center"
         >
-          <div className="flex flex-col items-center gap-3 text-white">
+          <div className="flex flex-col items-center gap-3 text-foreground">
             <div className="flex items-center gap-2">
               <Star className="h-6 w-6" />
               <h1 className="text-2xl font-semibold">VR Galaxy</h1>
-              <Badge variant="secondary" className="bg-white/10 text-white/80 border-white/20">
+              <Badge variant="secondary" className="bg-background/10 text-foreground/80 border-border/20">
                 {modeBadgeLabel}
               </Badge>
             </div>
-            <p className="text-blue-200 text-sm">
+            <p className="text-info text-sm">
               Cathédrale cosmique sous les étoiles
             </p>
             {(lastSSQSummary || lastPOMSSummary) && (
-              <div className="space-y-1 text-xs text-white/60">
+              <div className="space-y-1 text-xs text-muted-foreground">
                 {lastSSQSummary && <p>{lastSSQSummary}</p>}
                 {lastPOMSSummary && <p>{lastPOMSSummary}</p>}
               </div>
@@ -391,17 +393,17 @@ export default function B2CVRGalaxyPage() {
             animate={{ opacity: 1, scale: 1 }}
             className="space-y-6"
           >
-            <Card className="p-6 bg-slate-800/50 border-slate-600">
+            <Card className="p-6 bg-card/50 border-border">
               <div className="text-center space-y-4">
-                <Sparkles className="w-12 h-12 mx-auto text-blue-400" />
-                <h3 className="text-lg font-semibold text-white">
+                <Sparkles className="w-12 h-12 mx-auto text-info" />
+                <h3 className="text-lg font-semibold text-foreground">
                   Voyage dans les étoiles
                 </h3>
-                <p className="text-slate-300 text-sm">
+                <p className="text-muted-foreground text-sm">
                   Respire calmement et regarde les constellations naître
                 </p>
 
-                <Button onClick={() => handleStart()} className="w-full h-12 mt-6 bg-blue-600 hover:bg-blue-700">
+                <Button onClick={() => handleStart()} className="w-full h-12 mt-6 bg-info hover:bg-info/90">
                   <Play className="w-5 h-5 mr-2" />
                   Commencer le voyage
                 </Button>
@@ -411,7 +413,7 @@ export default function B2CVRGalaxyPage() {
               <div className="flex justify-center">
                 <Button
                   variant="outline"
-                  className="bg-white/10 text-white border-white/30 hover:bg-white/20"
+                  className="bg-background/10 text-foreground border-border/30 hover:bg-background/20"
                   onClick={() => handleStart('extension')}
                 >
                   Encore 1 min
@@ -439,7 +441,7 @@ export default function B2CVRGalaxyPage() {
                       <motion.div
                         key={index}
                         className={`absolute w-3 h-3 rounded-full ${
-                          constellation.unlocked ? 'bg-blue-400' : 'bg-slate-500'
+                          constellation.unlocked ? 'bg-info' : 'bg-muted'
                         }`}
                         style={{
                           left: `${star.x}%`,
@@ -522,7 +524,7 @@ export default function B2CVRGalaxyPage() {
                 {/* Central Breathing Anchor */}
                 <div className="absolute inset-0 flex items-center justify-center">
                   <motion.div
-                    className="w-8 h-8 bg-white/80 rounded-full"
+                    className="w-8 h-8 bg-foreground/80 rounded-full"
                     animate={allowMotion
                       ? {
                           scale: [1, 1.3, 1],
@@ -553,12 +555,12 @@ export default function B2CVRGalaxyPage() {
 
               {/* Session Info */}
               <div className="text-center space-y-3">
-                <div className="text-white">
+                <div className="text-foreground">
                   <span className="text-2xl font-bold">{currentBreaths}</span>
-                  <span className="text-slate-300 ml-2">souffles cosmiques</span>
+                  <span className="text-muted-foreground ml-2">souffles cosmiques</span>
                 </div>
                 
-                <div className="text-slate-400 text-sm">
+                <div className="text-muted-foreground text-sm">
                   {Math.floor(sessionTime / 60)}:{(sessionTime % 60).toString().padStart(2, '0')}
                 </div>
                 
@@ -568,8 +570,8 @@ export default function B2CVRGalaxyPage() {
                       key={constellation.id}
                       className={`text-xs px-3 py-1 rounded-full ${
                         constellation.unlocked
-                          ? 'bg-blue-500/20 text-blue-200 border border-blue-500/30'
-                          : 'bg-slate-600/20 text-slate-400 border border-slate-600/30'
+                          ? 'bg-info/20 text-info border border-info/30'
+                          : 'bg-muted/20 text-muted-foreground border border-muted/30'
                       }`}
                       initial={allowGentleMotion ? { opacity: 0, scale: 0.8 } : undefined}
                       animate={allowGentleMotion ? { opacity: 1, scale: 1 } : { opacity: 1 }}
@@ -586,15 +588,15 @@ export default function B2CVRGalaxyPage() {
                 <Button
                   onClick={handlePause}
                   size="lg"
-                  className="w-16 h-16 rounded-full bg-slate-700 hover:bg-slate-600"
+                  className="w-16 h-16 rounded-full bg-muted hover:bg-muted/80"
                 >
-                  <Pause className="w-6 h-6 text-white" />
+                  <Pause className="w-6 h-6 text-foreground" />
                 </Button>
                 
                 <Button
                   onClick={handleComplete}
                   size="lg"
-                  className="w-16 h-16 rounded-full bg-blue-600 hover:bg-blue-700"
+                  className="w-16 h-16 rounded-full bg-info hover:bg-info/90"
                 >
                   <Star className="w-6 h-6" />
                 </Button>
@@ -603,7 +605,7 @@ export default function B2CVRGalaxyPage() {
                   onClick={handleReset}
                   variant="outline"
                   size="lg"
-                  className="w-16 h-16 rounded-full border-slate-600 text-slate-300"
+                  className="w-16 h-16 rounded-full border-border text-muted-foreground"
                 >
                   <RotateCcw className="w-6 h-6" />
                 </Button>
@@ -620,13 +622,13 @@ export default function B2CVRGalaxyPage() {
               animate={allowMotion ? { opacity: 1, y: 0 } : { opacity: 1 }}
               className="space-y-6"
             >
-              <Card className="p-6 bg-slate-800/50 border-slate-600 text-center">
-                <Sparkles className="w-16 h-16 mx-auto text-blue-400 mb-4" />
-                <h3 className="text-xl font-semibold text-white mb-4">
+              <Card className="p-6 bg-card/50 border-border text-center">
+                <Sparkles className="w-16 h-16 mx-auto text-info mb-4" />
+                <h3 className="text-xl font-semibold text-foreground mb-4">
                   Voyage terminé
                 </h3>
                 
-                <div className="text-slate-300 space-y-2 mb-6">
+                <div className="text-muted-foreground space-y-2 mb-6">
                   <p>{currentBreaths} souffles • {constellations.filter(c => c.unlocked).length} constellations</p>
                   <p className="text-sm">{Math.floor(sessionTime / 60)} minutes dans les étoiles</p>
                 </div>
@@ -635,14 +637,14 @@ export default function B2CVRGalaxyPage() {
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="bg-blue-900/30 rounded-lg p-4 mb-6"
+                    className="bg-info/10 rounded-lg p-4 mb-6"
                   >
-                    <p className="text-blue-200 italic">"{mantra}"</p>
+                    <p className="text-info italic">"{mantra}"</p>
                   </motion.div>
                 )}
                 
                 <div className="space-y-3">
-                  <Button onClick={handleReset} className="w-full bg-blue-600 hover:bg-blue-700">
+                  <Button onClick={handleReset} className="w-full bg-info hover:bg-info/90">
                     Nouveau voyage
                   </Button>
                   {allowExtensionCTA && (

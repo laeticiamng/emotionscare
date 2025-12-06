@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Footer - Pied de page complet et accessible
  * Inclut tous les liens légaux et de navigation

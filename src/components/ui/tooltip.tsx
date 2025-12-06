@@ -1,8 +1,8 @@
-
 import * as React from "react"
 import * as TooltipPrimitive from "@radix-ui/react-tooltip"
 
 import { cn } from "@/lib/utils"
+import { log } from '@/lib/obs/logger';
 
 const TooltipProvider = TooltipPrimitive.Provider
 
@@ -36,7 +36,7 @@ const SafeTooltip = ({ children, ...props }: React.ComponentProps<typeof Tooltip
     )
   } catch (error) {
     // Fallback to rendering children without tooltip if provider fails
-    console.warn('Tooltip provider error, rendering without tooltip:', error);
+    log.warn('Tooltip provider error, rendering without tooltip:', error);
     return <>{children}</>;
   }
 }

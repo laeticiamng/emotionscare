@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { motion } from 'framer-motion';
 import {
@@ -12,7 +11,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import EmptyState from './empty-state';
-import LoadingSpinner from './loading-spinner';
+import { LoadingSpinner } from './loading-spinner';
 import { Database } from 'lucide-react';
 
 interface Column<T> {

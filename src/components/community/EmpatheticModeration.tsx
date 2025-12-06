@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useOpenAI } from '@/hooks/ai/useOpenAI';
 import { Button } from '@/components/ui/button';
@@ -52,7 +51,7 @@ export const EmpatheticModeration: React.FC<EmpatheticModerationProps> = ({
     
     try {
       // Vérifier le contenu avec le service de modération OpenAI
-      const moderationResult = await moderation.checkContent(content);
+      const moderationResult = await moderation?.checkContent(content);
       
       if (moderationResult.flagged) {
         // Simuler une suggestion améliorée (dans une vraie implémentation, ceci viendrait d'OpenAI)
@@ -74,7 +73,7 @@ export const EmpatheticModeration: React.FC<EmpatheticModerationProps> = ({
         onContentCheck(true);
       }
     } catch (error) {
-      console.error("Erreur lors de la vérification du contenu:", error);
+      // Content verification error
       toast({
         title: "Erreur de modération",
         description: "Impossible de vérifier le contenu. Veuillez réessayer.",

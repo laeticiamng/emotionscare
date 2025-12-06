@@ -16,6 +16,16 @@ import {
 const GlobalNav: React.FC = () => {
   const { user, isAuthenticated, logout } = useAuth();
 
+  const getUserName = () => {
+    if (!user) return 'Utilisateur';
+    return user.user_metadata?.name || user.email?.split('@')[0] || 'Utilisateur';
+  };
+
+  const getUserAvatar = () => {
+    if (!user) return undefined;
+    return user.user_metadata?.avatar_url || user.user_metadata?.avatar;
+  };
+
   const getInitials = (displayName: string) => {
     return displayName
       .split(' ')
@@ -45,16 +55,16 @@ const GlobalNav: React.FC = () => {
                   <Button 
                     variant="ghost" 
                     className="relative h-8 w-8 rounded-full focus-enhanced"
-                    aria-label={`Menu utilisateur pour ${user?.name || 'utilisateur'}`}
+                    aria-label={`Menu utilisateur pour ${getUserName()}`}
                     aria-expanded={false}
                   >
                     <Avatar className="h-8 w-8">
                       <AvatarImage 
-                        src={user?.avatar} 
-                        alt={`Photo de profil de ${user?.name || 'utilisateur'}`} 
+                        src={getUserAvatar()} 
+                        alt={`Photo de profil de ${getUserName()}`} 
                       />
-                      <AvatarFallback aria-label={`Initiales: ${getInitials(user?.name || 'User')}`}>
-                        {getInitials(user?.name || 'User')}
+                      <AvatarFallback aria-label={`Initiales: ${getInitials(getUserName())}`}>
+                        {getInitials(getUserName())}
                       </AvatarFallback>
                     </Avatar>
                   </Button>
@@ -62,7 +72,7 @@ const GlobalNav: React.FC = () => {
                 <DropdownMenuContent className="w-56" align="end" forceMount>
                   <DropdownMenuLabel className="font-normal">
                     <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium leading-none">{user?.name || 'User'}</p>
+                      <p className="text-sm font-medium leading-none">{getUserName()}</p>
                       <p className="text-xs leading-none text-muted-foreground">
                         {user?.email || ''}
                       </p>
@@ -74,6 +84,15 @@ const GlobalNav: React.FC = () => {
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link to={routes.b2b.admin.dashboard()}>Admin Dashboard</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to={routes.b2b.admin.gdprDashboard()}>Dashboard RGPD Unifié</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to={routes.b2b.admin.cronMonitoring()}>Monitoring Cron</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to={routes.b2b.admin.blockchainBackups()}>Backups Blockchain</Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={logout}>

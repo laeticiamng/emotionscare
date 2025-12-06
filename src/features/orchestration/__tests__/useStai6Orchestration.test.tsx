@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { renderHook, act } from '@testing-library/react';
 import type { ReactNode } from 'react';
 

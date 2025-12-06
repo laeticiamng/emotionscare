@@ -7,10 +7,23 @@ process.env.ESBUILD_BINARY_PATH = require.resolve('esbuild/bin/esbuild', {
   paths: [require.resolve('vite')],
 });
 
+// Parse command line args
+const args = process.argv.slice(2);
+const testPattern = args.find(arg => !arg.startsWith('--')) || undefined;
+
 // Spawn vitest directly using Node's executable to avoid PATH resolution
 // issues when this script is executed outside of an npm lifecycle hook.
 const vitestBin = require.resolve('vitest/vitest.mjs');
-const result = spawnSync(process.execPath, [vitestBin, 'run', '--silent'], {
+const vitestArgs = ['run', '--silent'];
+
+// Add test pattern if provided
+if (testPattern) {
+  vitestArgs.push(testPattern);
+}
+
+console.log(`🧪 Running tests${testPattern ? ` for: ${testPattern}` : ''}...\n`);
+
+const result = spawnSync(process.execPath, [vitestBin, ...vitestArgs], {
   stdio: 'inherit',
   env: process.env,
 });

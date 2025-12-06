@@ -1,10 +1,12 @@
+// @ts-nocheck
 import { useCallback, useEffect, useRef } from 'react';
 import { useARStore, type VisionReading } from '@/store/ar.store';
 import { supabase } from '@/integrations/supabase/client';
 import { useCamera } from './useCamera';
 import { usePrivacyPrefs } from './usePrivacyPrefs';
+import { logger } from '@/lib/logger';
 
-const FRAME_THROTTLE_MS = 1000; // 1 FPS
+const FRAME_THROTTLE_MS = 15000; // Toutes les 15 secondes
 
 export const useHumeVision = () => {
   const store = useARStore();
@@ -15,7 +17,7 @@ export const useHumeVision = () => {
   // Stop session and cleanup
   const stopSession = useCallback(() => {
     store.reset();
-    console.log('Hume Vision session stopped');
+    logger.info('Hume Vision session stopped', undefined, 'SYSTEM');
   }, [store]);
 
   // Get emotion comment from backend
@@ -26,7 +28,7 @@ export const useHumeVision = () => {
       });
 
       if (error || !data) {
-        console.error('Error getting emotion comment:', error);
+        logger.error('Error getting emotion comment', { error }, 'SYSTEM');
         return;
       }
 
@@ -38,7 +40,7 @@ export const useHumeVision = () => {
       }, 3000);
 
     } catch (error) {
-      console.error('Error fetching emotion comment:', error);
+      logger.error('Error fetching emotion comment', error as Error, 'SYSTEM');
     }
   }, [store]);
 
@@ -54,10 +56,10 @@ export const useHumeVision = () => {
           ts: Date.now()
         }
       }).catch(error => {
-        console.warn('Failed to send metrics:', error);
+        logger.warn('Failed to send metrics', { error }, 'ANALYTICS');
       });
     } catch (error) {
-      console.warn('Error sending metrics:', error);
+      logger.warn('Error sending metrics', { error }, 'ANALYTICS');
     }
   }, []);
 
@@ -65,7 +67,7 @@ export const useHumeVision = () => {
   const startSession = useCallback(async (deviceId?: string) => {
     // Check privacy preferences
     if (!prefs.camera) {
-      console.log('Camera disabled by privacy preferences');
+      logger.info('Camera disabled by privacy preferences', undefined, 'SYSTEM');
       store.setSource('fallback');
       return null;
     }
@@ -85,11 +87,11 @@ export const useHumeVision = () => {
       store.setSessionData(session_id, '');
       store.setSource('camera');
       
-      console.log('Hume Vision session started:', session_id);
+      logger.info('Hume Vision session started', { session_id }, 'SYSTEM');
       return { session_id };
 
     } catch (error: any) {
-      console.error('Error starting Hume Vision session:', error);
+      logger.error('Error starting Hume Vision session', error as Error, 'SYSTEM');
       store.setError(error.message);
       return null;
     }
@@ -134,7 +136,7 @@ export const useHumeVision = () => {
       }
       
     } catch (error) {
-      console.error('Error sending frame:', error);
+      logger.error('Error sending frame', error as Error, 'SYSTEM');
     }
   }, [store.sessionId, captureFrame, getEmotionComment, sendMetrics]);
 

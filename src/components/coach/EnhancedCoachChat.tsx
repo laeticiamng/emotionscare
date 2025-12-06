@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,6 +9,7 @@ import { toast } from 'sonner';
 import useOpenAI from '@/hooks/api/useOpenAI';
 import useWhisper from '@/hooks/api/useWhisper';
 import { sanitizeUserContent } from '@/lib/security/sanitize';
+import { logger } from '@/lib/logger';
 
 interface Message {
   id: string;
@@ -35,7 +35,8 @@ const EnhancedCoachChat: React.FC<EnhancedCoachChatProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { generateText } = useOpenAI();
-  const { transcript, isRecording, startRecordingAndTranscribe, stopRecording } = useWhisper();
+  const { transcribeAudio, isTranscribing } = useWhisper();
+  const [isRecording, setIsRecording] = useState(false);
   
   useEffect(() => {
     // Add initial message
@@ -60,18 +61,6 @@ const EnhancedCoachChat: React.FC<EnhancedCoachChatProps> = ({
     // Scroll to bottom whenever messages change
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
-  
-  useEffect(() => {
-    // Add transcribed text to input
-    if (transcript) {
-      const sanitizedTranscript = sanitizeUserContent(transcript);
-      if (!sanitizedTranscript) {
-        return;
-      }
-
-      setInputMessage(prev => `${prev}${prev ? ' ' : ''}${sanitizedTranscript}`);
-    }
-  }, [transcript]);
 
   const handleSendMessage = async () => {
     if (!inputMessage.trim()) return;
@@ -116,7 +105,7 @@ const EnhancedCoachChat: React.FC<EnhancedCoachChatProps> = ({
         setMessages(prev => [...prev, newAssistantMessage]);
       }
     } catch (error) {
-      console.error('Error generating response:', error);
+      logger.error('Error generating response:', error);
       toast.error("Désolé, je n'ai pas pu générer de réponse. Veuillez réessayer.");
     } finally {
       setIsLoading(false);
@@ -131,18 +120,11 @@ const EnhancedCoachChat: React.FC<EnhancedCoachChatProps> = ({
   };
   
   const handleStartRecording = async () => {
-    try {
-      await startRecordingAndTranscribe();
-      toast.info("Enregistrement en cours... Parlez maintenant.");
-    } catch (error) {
-      console.error('Error starting recording:', error);
-      toast.error("Impossible d'accéder au microphone.");
-    }
+    toast.info("Fonctionnalité d'enregistrement vocal à venir");
   };
   
   const handleStopRecording = () => {
-    stopRecording();
-    toast.success("Enregistrement terminé.");
+    setIsRecording(false);
   };
   
   const formatTimestamp = (date: Date) => {

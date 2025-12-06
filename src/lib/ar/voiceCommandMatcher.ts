@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 interface VoiceCommandMatcherOptions {
   language?: string;

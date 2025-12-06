@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -13,18 +12,18 @@ const AccessibilityAudit: React.FC = () => {
 
   const getComplianceColor = (compliance: string) => {
     switch (compliance) {
-      case 'AA': return 'bg-green-500';
-      case 'A': return 'bg-yellow-500';
-      default: return 'bg-red-500';
+      case 'AA': return 'bg-success';
+      case 'A': return 'bg-warning';
+      default: return 'bg-error';
     }
   };
 
   const getImpactIcon = (impact: string) => {
     switch (impact) {
-      case 'critical': return <XCircle className="h-4 w-4 text-red-500" />;
-      case 'serious': return <AlertTriangle className="h-4 w-4 text-orange-500" />;
-      case 'moderate': return <AlertTriangle className="h-4 w-4 text-yellow-500" />;
-      default: return <CheckCircle className="h-4 w-4 text-blue-500" />;
+      case 'critical': return <XCircle className="h-4 w-4 text-error" />;
+      case 'serious': return <AlertTriangle className="h-4 w-4 text-destructive" />;
+      case 'moderate': return <AlertTriangle className="h-4 w-4 text-warning" />;
+      default: return <CheckCircle className="h-4 w-4 text-primary" />;
     }
   };
 
@@ -64,10 +63,10 @@ const AccessibilityAudit: React.FC = () => {
                   <Progress value={report.score} className="h-3" />
                 </div>
                 <Badge 
-                  className={`${getComplianceColor(report.compliance)} text-white`}
+                  className={`${getComplianceColor(String(report.compliance))} text-primary-foreground`}
                 >
-                  {report.compliance === 'AA' ? 'WCAG 2.1 AA' : 
-                   report.compliance === 'A' ? 'WCAG 2.1 A' : 
+                  {String(report.compliance) === 'AA' ? 'WCAG 2.1 AA' : 
+                   String(report.compliance) === 'A' ? 'WCAG 2.1 A' : 
                    'Non conforme'}
                 </Badge>
               </div>
@@ -76,9 +75,9 @@ const AccessibilityAudit: React.FC = () => {
               <div className="grid grid-cols-4 gap-4">
                 <Card className="p-4">
                   <div className="flex items-center space-x-2">
-                    <XCircle className="h-5 w-5 text-red-500" />
+                    <XCircle className="h-5 w-5 text-error" />
                     <div>
-                      <div className="font-semibold text-red-500">
+                      <div className="font-semibold text-error">
                         {report.issues.filter(i => i.impact === 'critical').length}
                       </div>
                       <div className="text-xs text-muted-foreground">Critiques</div>
@@ -87,9 +86,9 @@ const AccessibilityAudit: React.FC = () => {
                 </Card>
                 <Card className="p-4">
                   <div className="flex items-center space-x-2">
-                    <AlertTriangle className="h-5 w-5 text-orange-500" />
+                    <AlertTriangle className="h-5 w-5 text-destructive" />
                     <div>
-                      <div className="font-semibold text-orange-500">
+                      <div className="font-semibold text-destructive">
                         {report.issues.filter(i => i.impact === 'serious').length}
                       </div>
                       <div className="text-xs text-muted-foreground">Graves</div>
@@ -98,7 +97,7 @@ const AccessibilityAudit: React.FC = () => {
                 </Card>
                 <Card className="p-4">
                   <div className="flex items-center space-x-2">
-                    <AlertTriangle className="h-5 w-5 text-yellow-500" />
+                    <AlertTriangle className="h-5 w-5 text-warning" />
                     <div>
                       <div className="font-semibold text-yellow-500">
                         {report.issues.filter(i => i.impact === 'moderate').length}

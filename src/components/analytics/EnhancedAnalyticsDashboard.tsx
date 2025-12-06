@@ -46,6 +46,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { logger } from '@/lib/logger';
 
 // Services et hooks
 import { generateAnalyticsInsights } from '@/lib/ai/analytics-service';
@@ -240,7 +241,7 @@ const EnhancedAnalyticsDashboard: React.FC = () => {
 
       setInsights(insightCards);
     } catch (error) {
-      console.error('Erreur génération insights:', error);
+      logger.error('Erreur génération insights', { error }, 'ANALYTICS');
     }
   };
 

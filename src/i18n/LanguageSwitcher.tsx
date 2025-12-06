@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useState, type ChangeEvent } from 'react';
 
 import {

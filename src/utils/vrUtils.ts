@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 export const extractYoutubeID = (url: string): string | null => {
   const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;

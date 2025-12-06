@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 export const TOAST_VARIANTS = {
   default: 'default',

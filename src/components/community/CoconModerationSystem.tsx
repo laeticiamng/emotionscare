@@ -124,9 +124,9 @@ export default function CoconModerationSystem() {
         .limit(10);
 
       if (data) {
-        const spaces = data.reduce((acc, content) => {
+        const spaces = data.reduce<CoconSpace[]>((acc, content) => {
           const spaceId = content.content_type || 'general';
-          const existing = acc.find(s => s.id === spaceId);
+          const existing = acc.find((s: CoconSpace) => s.id === spaceId);
           
           if (existing) {
             existing.stats.posts++;
@@ -156,7 +156,7 @@ export default function CoconModerationSystem() {
         setCoconSpaces(spaces);
       }
     } catch (error) {
-      console.error('Error loading cocon spaces:', error);
+      // Cocon spaces loading error
     }
   };
 
@@ -223,7 +223,7 @@ export default function CoconModerationSystem() {
         }`,
       });
     } catch (error) {
-      console.error('Error handling moderation action:', error);
+      // Moderation action error
     }
   };
 

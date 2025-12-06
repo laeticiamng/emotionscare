@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -76,7 +75,7 @@ const GroupForm: React.FC<GroupFormProps> = ({ onSuccess, onCancel }) => {
       setTopic('');
       setSelectedTags([]);
     } catch (error) {
-      console.error('Error creating group:', error);
+      // Group creation error
       toast({
         title: 'Erreur',
         description: 'Un problème est survenu lors de la création du groupe',

@@ -1,5 +1,7 @@
+// @ts-nocheck
 
 import { useState, useEffect, useCallback } from 'react';
+import { logger } from '@/lib/logger';
 
 export function useAudioPlayer() {
   const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(null);
@@ -42,7 +44,7 @@ export function useAudioPlayer() {
     audioElement.src = src;
     audioElement.play()
       .then(() => setIsPlaying(true))
-      .catch(err => console.error('Error playing audio:', err));
+      .catch(err => logger.error('Error playing audio', err as Error, 'UI'));
   }, [audioElement]);
 
   const pause = useCallback(() => {
@@ -61,7 +63,7 @@ export function useAudioPlayer() {
     } else if (audioElement.src) {
       audioElement.play()
         .then(() => setIsPlaying(true))
-        .catch(err => console.error('Error playing audio:', err));
+        .catch(err => logger.error('Error playing audio', err as Error, 'UI'));
     }
   }, [audioElement, isPlaying]);
 

@@ -170,7 +170,7 @@ const StatCard: React.FC<StatCardProps> = ({
             </div>
             
             {status && (
-              <Badge variant={status.variant || 'outline'} className="text-xs">
+              <Badge variant={status.variant as any || 'outline'} className="text-xs">
                 {status.text}
               </Badge>
             )}

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { logger } from '@/lib/logger';
 import {
   Accessibility,
   Eye,
@@ -48,7 +49,7 @@ export const AccessibilityToolbar: React.FC = () => {
     try {
       saved = window.localStorage.getItem('accessibility-settings');
     } catch (error) {
-      console.warn('[AccessibilityToolbar] Failed to read settings', error);
+      logger.warn('Failed to read accessibility settings', error, 'UI');
     }
 
     if (saved) {
@@ -57,7 +58,7 @@ export const AccessibilityToolbar: React.FC = () => {
         setSettings(parsedSettings);
         applySettings(parsedSettings);
       } catch (error) {
-        console.error('Erreur lors du chargement des paramètres d\'accessibilité:', error);
+        logger.error('Error loading accessibility settings', error, 'UI');
       }
     }
   }, []);
@@ -74,7 +75,7 @@ export const AccessibilityToolbar: React.FC = () => {
         window.localStorage.setItem('accessibility-settings', JSON.stringify(newSettings));
       }
     } catch (error) {
-      console.warn('[AccessibilityToolbar] Failed to persist settings', error);
+      logger.warn('Failed to persist accessibility settings', error, 'UI');
     }
     applySettings(newSettings);
   };
@@ -155,7 +156,7 @@ export const AccessibilityToolbar: React.FC = () => {
         window.localStorage.removeItem('accessibility-settings');
       }
     } catch (error) {
-      console.warn('[AccessibilityToolbar] Failed to clear settings', error);
+      logger.warn('Failed to clear accessibility settings', error, 'UI');
     }
     applySettings(defaultSettings);
     announceToScreenReader('Paramètres d\'accessibilité réinitialisés');
@@ -175,7 +176,7 @@ export const AccessibilityToolbar: React.FC = () => {
 
       {/* Panel des paramètres */}
       {isOpen && (
-        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-background border rounded-lg shadow-xl max-w-md w-full max-h-[80vh] overflow-y-auto">
             <div className="flex items-center justify-between p-4 border-b">
               <h2 className="text-lg font-semibold text-foreground">

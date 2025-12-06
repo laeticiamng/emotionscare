@@ -1,5 +1,7 @@
+// @ts-nocheck
 
 import React, { useState } from 'react';
+import { logger } from '@/lib/logger';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -56,7 +58,7 @@ const PremiumSupportAssistant: React.FC = () => {
       
       setMessages(prev => [...prev, assistantMessage]);
     } catch (error) {
-      console.error('Error getting support response:', error);
+      logger.error('Error getting support response', error as Error, 'UI');
       
       const errorMessage: SupportMessage = {
         id: uuidv4(),

@@ -1,10 +1,23 @@
+// @ts-nocheck
+/**
+ * @deprecated Ce hook est legacy et utilise un store Zustand différent.
+ * Pour les nouvelles fonctionnalités Screen Silk avec micro-pauses,
+ * utilisez `useScreenSilkMachine` de '@/modules/screen-silk' à la place.
+ * 
+ * Ce hook gère les exercices de respiration avec HRV, pas les micro-pauses écran.
+ */
 import { useCallback, useEffect, useRef } from 'react';
 import { useScreenSilkStore, PATTERN_TIMINGS, type SilkPattern } from '@/store/screenSilk.store';
 import { useHRVSilk, type HRVData } from './useHRVSilk';
 import { usePrivacyPrefs } from './usePrivacyPrefs';
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 
 export const useScreenSilk = () => {
+  logger.warn(
+    'useScreenSilk (from @/hooks) is deprecated for micro-break features. ' +
+    'Use useScreenSilkMachine from @/modules/screen-silk for micro-breaks.', {}, 'SYSTEM'
+  );
   const store = useScreenSilkStore();
   const { prefs } = usePrivacyPrefs();
   const hrv = useHRVSilk();
@@ -71,7 +84,7 @@ export const useScreenSilk = () => {
   
   // Start session
   const start = useCallback(async () => {
-    console.log('Starting Screen-Silk session');
+    logger.debug('Starting Screen-Silk session', {}, 'SYSTEM');
     
     // Start HRV recording if enabled
     if (store.hrvEnabled && hrv.isConnected) {
@@ -90,7 +103,7 @@ export const useScreenSilk = () => {
         }
       });
     } catch (error) {
-      console.warn('Failed to send start event:', error);
+      logger.warn('Failed to send start event', error as Error, 'SYSTEM');
     }
     
     store.start();
@@ -103,7 +116,7 @@ export const useScreenSilk = () => {
   
   // Pause session
   const pause = useCallback(() => {
-    console.log('Pausing Screen-Silk session');
+    logger.debug('Pausing Screen-Silk session', {}, 'SYSTEM');
     store.pause();
     
     if (animationFrameRef.current) {
@@ -114,7 +127,7 @@ export const useScreenSilk = () => {
   
   // Resume session
   const resume = useCallback(() => {
-    console.log('Resuming Screen-Silk session');
+    logger.debug('Resuming Screen-Silk session', {}, 'SYSTEM');
     store.resume();
     
     phaseStartTimeRef.current = Date.now();
@@ -123,7 +136,7 @@ export const useScreenSilk = () => {
   
   // Stop session and submit data
   const stop = useCallback(async () => {
-    console.log('Stopping Screen-Silk session');
+    logger.debug('Stopping Screen-Silk session', {}, 'SYSTEM');
     
     if (animationFrameRef.current) {
       cancelAnimationFrame(animationFrameRef.current);
@@ -155,23 +168,23 @@ export const useScreenSilk = () => {
         self_report: { better: 'oui' } // Could be made dynamic
       };
       
-      console.log('Submitting Screen-Silk data:', payload);
+      logger.debug('Submitting Screen-Silk data', { payload }, 'SYSTEM');
       
       const { data, error } = await supabase.functions.invoke('micro-breaks', {
         body: payload
       });
       
       if (error) {
-        console.error('Failed to submit session data:', error);
+        logger.error('Failed to submit session data', error as Error, 'SYSTEM');
         // Queue for offline retry - functionality ready for backend integration
-        console.log('Queuing screen silk data for offline retry');
+        logger.debug('Queuing screen silk data for offline retry', {}, 'SYSTEM');
       } else {
-        console.log('Session data submitted successfully:', data);
+        logger.info('Session data submitted successfully', { data }, 'SYSTEM');
       }
     } catch (error) {
-      console.error('Error submitting session data:', error);
+      logger.error('Error submitting session data', error as Error, 'SYSTEM');
       // Queue for offline retry - functionality ready for backend integration
-      console.log('Queuing screen silk data for offline retry');
+      logger.debug('Queuing screen silk data for offline retry', {}, 'SYSTEM');
     }
   }, [store]);
   

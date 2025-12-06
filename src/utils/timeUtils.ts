@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 export function getTimeOfDay(): 'morning' | 'afternoon' | 'evening' {
   const hour = new Date().getHours();

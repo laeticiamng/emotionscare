@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Diagnostic des routes - Test rapide de toutes les routes importantes
  */

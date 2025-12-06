@@ -17,6 +17,7 @@ import { useMusic } from '@/contexts/MusicContext';
 import { cn } from '@/lib/utils';
 import PageRoot from '@/components/common/PageRoot';
 import { ConsentGate } from '@/features/clinical-optin/ConsentGate';
+import { SoundForestVisualizer } from '@/components/music/SoundForestVisualizer';
 
 interface PremiumTrack {
   id: string;
@@ -72,27 +73,58 @@ const B2CMusicTherapyPremiumPage: React.FC = () => {
             <div className="container mx-auto px-4 py-16">
               <div className="mb-12 text-center">
                 <div className="mb-4 flex items-center justify-center gap-3">
-                  <Crown className="h-8 w-8 text-yellow-400" />
-                  <h1 className="text-4xl font-bold text-transparent md:text-6xl bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text">
+                  <Crown className="h-8 w-8 text-warning" />
+                  <h1 className="text-4xl font-bold text-transparent md:text-6xl bg-gradient-to-r from-warning to-warning-foreground bg-clip-text">
                     Music Therapy Premium
                   </h1>
-                  <Crown className="h-8 w-8 text-yellow-400" />
+                  <Crown className="h-8 w-8 text-warning" />
                 </div>
-                <p className="mx-auto mb-8 max-w-3xl text-xl text-gray-300">
+                <p className="mx-auto mb-8 max-w-3xl text-xl text-muted-foreground">
                   Thérapie musicale avancée avec fréquences binaurales et compositions exclusives
                 </p>
               </div>
 
+              {/* Sound Forest 3D Visualizer */}
+              {selectedTrack && (
+                <div className="mb-8 rounded-2xl overflow-hidden border border-emerald-500/20">
+                  <div className="h-[400px]">
+                    <SoundForestVisualizer isPlaying={isPlaying} />
+                  </div>
+                  <div className="bg-slate-900/90 backdrop-blur-sm p-4 border-t border-emerald-500/20">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-emerald-300">{selectedTrack.title}</p>
+                        <p className="text-xs text-emerald-300/60">{selectedTrack.artist}</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handlePlayPause(selectedTrack)}
+                          className="h-8 w-8 rounded-full p-0"
+                        >
+                          {isPlaying ? (
+                            <Pause className="h-4 w-4" />
+                          ) : (
+                            <Play className="h-4 w-4 ml-0.5" />
+                          )}
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <div className="grid gap-6">
                 {PREMIUM_TRACKS.map(track => (
-                  <div key={track.id} className="rounded-xl border border-white/10 bg-black/20 p-6 backdrop-blur-sm">
+                  <div key={track.id} className="rounded-xl border border-border/10 bg-card/20 p-6 backdrop-blur-sm">
                     <div className="flex items-center gap-4">
                       <button
                         onClick={() => handlePlayPause(track)}
                         className={`flex h-12 w-12 items-center justify-center rounded-full transition-all ${
                           selectedTrack?.id === track.id && isPlaying
-                            ? 'bg-yellow-400 text-black'
-                            : 'bg-white/20 text-white hover:bg-white/30'
+                            ? 'bg-warning text-foreground'
+                            : 'bg-background/20 text-foreground hover:bg-background/30'
                         }`}
                       >
                         {selectedTrack?.id === track.id && isPlaying ? (
@@ -104,16 +136,16 @@ const B2CMusicTherapyPremiumPage: React.FC = () => {
 
                       <div className="flex-1">
                         <div className="mb-2 flex items-center gap-3">
-                          <h3 className="text-lg font-semibold text-white">{track.title}</h3>
-                          <Crown className="h-4 w-4 text-yellow-400" />
+                          <h3 className="text-lg font-semibold text-foreground">{track.title}</h3>
+                          <Crown className="h-4 w-4 text-warning" />
                         </div>
-                        <p className="mb-1 text-gray-400">{track.artist}</p>
-                        <p className="text-sm text-gray-500">{track.description}</p>
+                        <p className="mb-1 text-muted-foreground">{track.artist}</p>
+                        <p className="text-sm text-muted-foreground/80">{track.description}</p>
                       </div>
 
                       <div className="text-right">
-                        <div className="font-bold text-yellow-400">{track.frequency}</div>
-                        <div className="text-sm text-gray-400">{track.duration}</div>
+                        <div className="font-bold text-warning">{track.frequency}</div>
+                        <div className="text-sm text-muted-foreground">{track.duration}</div>
                       </div>
                     </div>
                   </div>

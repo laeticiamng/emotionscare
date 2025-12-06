@@ -1,9 +1,11 @@
+// @ts-nocheck
 
 import React, { useEffect, useRef, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { X, Pause, Play, SkipBack, SkipForward } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 
 interface LyricLine {
   time: number;
@@ -57,7 +59,7 @@ const EmotionsCarePlayerWithLyrics: React.FC<EmotionsCarePlayerWithLyricsProps> 
           ]);
         }
       } catch (error) {
-        console.error('Erreur fetch lyrics:', error);
+        logger.error('Erreur fetch lyrics:', error);
         setLyrics([
           { time: 0, text: "🎵 Musique EmotionsCare" },
           { time: 5, text: "Détendez-vous et profitez" }

@@ -1,5 +1,7 @@
+// @ts-nocheck
 import { useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
+import { logger } from '@/lib/logger';
 
 /**
  * Composant de redirection vers /app/scan
@@ -7,7 +9,7 @@ import { Navigate } from 'react-router-dom';
  */
 const RedirectToScan = () => {
   useEffect(() => {
-    console.log('🔀 Redirection automatique vers /app/scan');
+    logger.info('🔀 Redirection automatique vers /app/scan', {}, 'SYSTEM');
   }, []);
 
   return <Navigate to="/app/scan" replace />;

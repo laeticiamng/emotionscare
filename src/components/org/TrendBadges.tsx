@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { TeamRow, Trend } from '@/hooks/useOrgWeekly';

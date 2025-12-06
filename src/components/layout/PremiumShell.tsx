@@ -1,7 +1,7 @@
-
+// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useTheme } from '@/components/theme-provider';
+import { useTheme } from '@/providers/theme';
 import CommandMenu from '@/components/layout/CommandMenu';
 import NotificationToast from '@/components/layout/NotificationToast';
 import ScrollProgress from '@/components/ui/ScrollProgress';

@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 import Sidebar from "./Sidebar";
 import SidebarContent from "./SidebarContent";

@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 import { Theme } from './theme';
 

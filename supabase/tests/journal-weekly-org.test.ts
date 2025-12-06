@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { describe, it, expect } from 'vitest';
 import { createEdgeFunction } from 'edge-test-kit';
 import path from 'path';

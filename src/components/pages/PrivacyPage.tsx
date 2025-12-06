@@ -57,7 +57,7 @@ export const PrivacyPage: React.FC<{ 'data-testid'?: string }> = ({ 'data-testid
           </section>
 
           <section className="mb-8">
-            <h2 className="text-2xl font-semibent mb-4">5. Partage des données</h2>
+            <h2 className="text-2xl font-semibold mb-4">5. Partage des données</h2>
             <p className="mb-4">
               Nous ne vendons jamais vos données personnelles. Nous ne les partageons qu'avec :
             </p>

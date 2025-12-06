@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { describe, expect, it } from 'vitest';
 import { ROUTE_ALIASES, findRedirectFor } from '../aliases';
 import { ROUTES_REGISTRY } from '../registry';

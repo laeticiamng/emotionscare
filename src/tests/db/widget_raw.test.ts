@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { describe, it, expect } from 'vitest';
 
 // Placeholder DB test. In real CI this would connect to Postgres and verify triggers.

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -15,7 +14,7 @@ interface LoginFormProps {
 }
 
 const LoginForm: React.FC<LoginFormProps> = ({ onToggleMode }) => {
-  const { login } = useAuth();
+  const { signIn } = useAuth();
   const [rememberMe, setRememberMe] = useState(false);
   
   const form = useForm<LoginFormData>({
@@ -28,7 +27,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onToggleMode }) => {
 
   const onSubmit = async (data: LoginFormData) => {
     try {
-      await login(data.email, data.password);
+      await signIn(data.email, data.password);
     } catch (error: any) {
       toast({
         title: "Erreur de connexion",

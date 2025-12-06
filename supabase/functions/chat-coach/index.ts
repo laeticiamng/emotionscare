@@ -1,4 +1,4 @@
-
+// @ts-nocheck - ESM imports from https://deno.land ne supportent pas les types TypeScript natifs dans Deno
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
@@ -76,12 +76,14 @@ serve(async (req) => {
       }
     );
 
-  } catch (error) {
-    console.error('Chat coach error:', error);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const errorDetails = error instanceof Error ? error.stack : String(error);
+    console.error('Chat coach error:', errorMessage, errorDetails);
     return new Response(
       JSON.stringify({ 
         error: 'Erreur de communication avec le coach IA',
-        details: error.message 
+        details: errorMessage 
       }),
       {
         status: 500,

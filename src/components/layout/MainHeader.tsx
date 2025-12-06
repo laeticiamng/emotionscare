@@ -1,5 +1,5 @@
-
 import React from 'react';
+import { logger } from '@/lib/logger';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Heart, Building2, Loader2 } from 'lucide-react';
@@ -20,26 +20,29 @@ const MainHeader: React.FC = () => {
       });
       navigate('/');
     } catch (error) {
-      console.error('Error signing out:', error);
+      logger.error('Error signing out', error as Error, 'AUTH');
     }
   };
 
   const getIcon = () => {
-    if (user?.role === 'b2c') {
+    const role = user?.user_metadata?.role;
+    if (role === 'b2c') {
       return <Heart className="h-6 w-6 text-pink-500" />;
     }
     return <Building2 className="h-6 w-6 text-blue-600" />;
   };
 
   const getTitle = () => {
-    if (user?.role === 'b2c') {
+    const role = user?.user_metadata?.role;
+    if (role === 'b2c') {
       return 'EmotionsCare';
     }
     return 'EmotionsCare B2B';
   };
 
   const getDashboardLink = () => {
-    switch (user?.role) {
+    const role = user?.user_metadata?.role;
+    switch (role) {
       case 'b2c':
         return '/b2c/dashboard';
       case 'b2b_user':
@@ -64,7 +67,7 @@ const MainHeader: React.FC = () => {
             {user && (
               <>
                 <span className="text-sm text-muted-foreground">
-                  Bonjour, {user.firstName || user.email}
+                  Bonjour, {user?.user_metadata?.full_name || user.email}
                 </span>
                 <Button variant="outline" size="sm" onClick={handleSignOut}>
                   Déconnexion

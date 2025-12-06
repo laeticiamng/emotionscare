@@ -12,8 +12,10 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import { useAppStore } from '@/store/unified.store';
-import { toast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 import { User, Mail, Phone, MapPin, Calendar, Shield } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
 interface ProfileSettingsPageProps {
   'data-testid'?: string;
@@ -22,8 +24,9 @@ interface ProfileSettingsPageProps {
 export const ProfileSettingsPage: React.FC<ProfileSettingsPageProps> = ({ 'data-testid': testId }) => {
   const user = useAppStore.use.user();
   const setUser = useAppStore.use.setUser();
+  const { toast } = useToast();
   const [isLoading, setIsLoading] = React.useState(false);
-  
+
   const [formData, setFormData] = React.useState({
     displayName: user?.user_metadata?.full_name || '',
     email: user?.email || '',
@@ -38,17 +41,53 @@ export const ProfileSettingsPage: React.FC<ProfileSettingsPageProps> = ({ 'data-
   });
 
   const handleSave = async () => {
+    if (!user) return;
+
     setIsLoading(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      // Update user metadata in Supabase
+      const { error: authError } = await supabase.auth.updateUser({
+        data: {
+          full_name: formData.displayName,
+          phone: formData.phone,
+          bio: formData.bio,
+          location: formData.location,
+          website: formData.website,
+          birthday: formData.birthday,
+          is_public: formData.isPublic,
+          allow_notifications: formData.allowNotifications,
+          allow_analytics: formData.allowAnalytics,
+        }
+      });
+
+      if (authError) throw authError;
+
+      // Update profile in profiles table
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .upsert({
+          id: user.id,
+          full_name: formData.displayName,
+          updated_at: new Date().toISOString(),
+        });
+
+      if (profileError) throw profileError;
+
       // Update user in store
       setUser({
         ...user,
+        email: formData.email,
         user_metadata: {
           ...user?.user_metadata,
-          ...formData,
+          full_name: formData.displayName,
+          phone: formData.phone,
+          bio: formData.bio,
+          location: formData.location,
+          website: formData.website,
+          birthday: formData.birthday,
+          is_public: formData.isPublic,
+          allow_notifications: formData.allowNotifications,
+          allow_analytics: formData.allowAnalytics,
         }
       });
 
@@ -57,6 +96,7 @@ export const ProfileSettingsPage: React.FC<ProfileSettingsPageProps> = ({ 'data-
         description: "Vos modifications ont été sauvegardées avec succès.",
       });
     } catch (error) {
+      logger.error('Error saving profile', error as Error, 'COMPONENT');
       toast({
         title: "Erreur",
         description: "Impossible de sauvegarder les modifications.",
@@ -67,9 +107,9 @@ export const ProfileSettingsPage: React.FC<ProfileSettingsPageProps> = ({ 'data-
     }
   };
 
-  const handleInputChange = (field: string, value: any) => {
+  const handleInputChange = React.useCallback((field: string, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-  };
+  }, []);
 
   return (
     <div className="container max-w-4xl mx-auto py-8 space-y-6" data-testid={testId}>
@@ -97,7 +137,7 @@ export const ProfileSettingsPage: React.FC<ProfileSettingsPageProps> = ({ 'data-
               <Avatar className="h-20 w-20">
                 <AvatarImage src={user?.user_metadata?.avatar_url} />
                 <AvatarFallback className="text-lg">
-                  {formData.displayName.split(' ').map(n => n[0]).join('').toUpperCase() || user?.email?.[0]?.toUpperCase()}
+                  {formData.displayName.split(' ').map((n: string) => n[0]).join('').toUpperCase() || user?.email?.[0]?.toUpperCase()}
                 </AvatarFallback>
               </Avatar>
               <div className="space-y-2">

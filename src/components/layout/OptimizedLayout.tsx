@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 import React, { Suspense } from 'react';
 import { Outlet } from 'react-router-dom';

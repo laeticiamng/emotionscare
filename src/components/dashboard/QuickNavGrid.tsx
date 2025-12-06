@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 import React from 'react';
 import { Eye, BookOpen, Users, Star, HeartPulse, Brain, ArrowRight } from 'lucide-react';

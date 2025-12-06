@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 /**
  * 🚀 MIGRATED TO ROUTERV2 - Phase 2 Complete

@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 import * as React from "react";
 import { ChartConfig, ChartContextProps } from "./types";

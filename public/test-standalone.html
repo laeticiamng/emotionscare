@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Standalone - EmotionsCare</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      padding: 40px;
+      max-width: 800px;
+      margin: 0 auto;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      min-height: 100vh;
+    }
+    .card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 30px;
+      margin: 20px 0;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    h1 { margin-top: 0; font-size: 2.5em; }
+    .status { font-size: 1.2em; margin: 15px 0; }
+    .success { color: #10b981; }
+    .error { color: #ef4444; }
+    button {
+      background: white;
+      color: #667eea;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      margin: 10px 5px;
+    }
+    button:hover { transform: scale(1.05); }
+    pre {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 15px;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>🔍 Diagnostic EmotionsCare</h1>
+    <p style="font-size: 18px; opacity: 0.9;">
+      Ce test HTML standalone vérifie si le problème vient de Vite ou du code React.
+    </p>
+  </div>
+
+  <div class="card">
+    <h2>✅ Tests de base</h2>
+    <div class="status">
+      ✅ <strong>HTML se charge</strong> - Vous voyez cette page
+    </div>
+    <div class="status" id="js-test">
+      ⏳ <strong>JavaScript</strong> - Test en cours...
+    </div>
+    <div class="status" id="dom-test">
+      ⏳ <strong>DOM Manipulation</strong> - Test en cours...
+    </div>
+    <div class="status" id="fetch-test">
+      ⏳ <strong>Fetch API</strong> - Test en cours...
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>🎮 Tests interactifs</h2>
+    <button onclick="testClick()">Tester le clic</button>
+    <button onclick="testLocalStorage()">Tester localStorage</button>
+    <button onclick="testConsole()">Tester console.log</button>
+    <div id="interaction-result" style="margin-top: 15px;"></div>
+  </div>
+
+  <div class="card">
+    <h2>📊 Informations système</h2>
+    <pre id="system-info">Chargement...</pre>
+  </div>
+
+  <div class="card">
+    <h2>🔗 Navigation</h2>
+    <button onclick="window.location.href='/'">Retour à l'app principale</button>
+    <button onclick="window.location.reload()">Recharger cette page</button>
+  </div>
+
+  <script>
+    console.log('=== TEST STANDALONE CHARGÉ ===');
+    
+    // Test 1: JavaScript fonctionne
+    document.getElementById('js-test').innerHTML = 
+      '<span class="success">✅ <strong>JavaScript</strong> - Fonctionne correctement</span>';
+    console.log('✅ JavaScript works');
+
+    // Test 2: DOM Manipulation
+    try {
+      const testDiv = document.createElement('div');
+      testDiv.textContent = 'test';
+      document.body.appendChild(testDiv);
+      document.body.removeChild(testDiv);
+      document.getElementById('dom-test').innerHTML = 
+        '<span class="success">✅ <strong>DOM Manipulation</strong> - Fonctionne</span>';
+      console.log('✅ DOM manipulation works');
+    } catch (e) {
+      document.getElementById('dom-test').innerHTML = 
+        '<span class="error">❌ <strong>DOM Manipulation</strong> - Erreur: ' + e.message + '</span>';
+      console.error('❌ DOM manipulation error:', e);
+    }
+
+    // Test 3: Fetch API
+    fetch('/manifest.json')
+      .then(res => {
+        document.getElementById('fetch-test').innerHTML = 
+          '<span class="success">✅ <strong>Fetch API</strong> - Fonctionne (status: ' + res.status + ')</span>';
+        console.log('✅ Fetch API works');
+      })
+      .catch(e => {
+        document.getElementById('fetch-test').innerHTML = 
+          '<span class="error">❌ <strong>Fetch API</strong> - Erreur: ' + e.message + '</span>';
+        console.error('❌ Fetch error:', e);
+      });
+
+    // Afficher les infos système
+    document.getElementById('system-info').textContent = JSON.stringify({
+      timestamp: new Date().toISOString(),
+      url: window.location.href,
+      userAgent: navigator.userAgent,
+      screen: window.screen.width + 'x' + window.screen.height,
+      viewport: window.innerWidth + 'x' + window.innerHeight,
+      language: navigator.language,
+      cookiesEnabled: navigator.cookieEnabled,
+      onLine: navigator.onLine
+    }, null, 2);
+
+    // Fonctions de test interactif
+    function testClick() {
+      const result = document.getElementById('interaction-result');
+      result.innerHTML = '<div class="success">✅ Clic détecté à ' + new Date().toLocaleTimeString() + '</div>';
+      console.log('✅ Click event works');
+    }
+
+    function testLocalStorage() {
+      const result = document.getElementById('interaction-result');
+      try {
+        localStorage.setItem('test', 'value');
+        const value = localStorage.getItem('test');
+        localStorage.removeItem('test');
+        result.innerHTML = '<div class="success">✅ localStorage fonctionne (valeur test: "' + value + '")</div>';
+        console.log('✅ localStorage works');
+      } catch (e) {
+        result.innerHTML = '<div class="error">❌ localStorage erreur: ' + e.message + '</div>';
+        console.error('❌ localStorage error:', e);
+      }
+    }
+
+    function testConsole() {
+      const result = document.getElementById('interaction-result');
+      console.log('🔍 Test console.log');
+      console.warn('⚠️ Test console.warn');
+      console.error('❌ Test console.error (intentionnel)');
+      console.table({ test: 'value', number: 42 });
+      result.innerHTML = '<div class="success">✅ Messages envoyés dans la console (F12 pour voir)</div>';
+    }
+
+    console.log('=== FIN DES TESTS AUTOMATIQUES ===');
+    console.log('Utilisez les boutons pour tester les interactions');
+  </script>
+</body>
+</html>

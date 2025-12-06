@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { ChatMessage } from '@/types/chat';
 import { cn } from '@/lib/utils';
@@ -23,7 +22,7 @@ const ChatMessageItem: React.FC<ChatMessageItemProps> = ({ message, className })
       >
         <p className="text-sm">{message.content}</p>
         <span className="text-xs opacity-70 mt-1 block">
-          {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
         </span>
       </div>
     </div>

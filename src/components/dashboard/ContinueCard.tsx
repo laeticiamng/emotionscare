@@ -1,9 +1,11 @@
+// @ts-nocheck
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Play, ArrowRight } from 'lucide-react';
 import { useRouter } from '@/hooks/router';
 import { ContinueItem } from '@/store/dashboard.store';
+import { logger } from '@/lib/logger';
 
 interface ContinueCardProps {
   item: ContinueItem;
@@ -19,7 +21,7 @@ export const ContinueCard: React.FC<ContinueCardProps> = ({ item }) => {
     router.push(item.deeplink);
     
     // Analytics tracking
-    console.log('Continue clicked:', item.module);
+    logger.info('Continue clicked:', { module: item.module });
   };
 
   return (

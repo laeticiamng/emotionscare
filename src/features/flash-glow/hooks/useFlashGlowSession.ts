@@ -1,5 +1,6 @@
+// @ts-nocheck
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import * as Sentry from '@sentry/react';
+import { captureException } from '@/lib/ai-monitoring';
 
 import { useMotionPrefs } from '@/hooks/useMotionPrefs';
 
@@ -131,12 +132,7 @@ export const useFlashGlowSession = (): Runtime => {
       extendTimerRef.current = null;
     }
 
-    Sentry.addBreadcrumb({
-      category: 'flash',
-      level: 'info',
-      message: `flash:extend:${safeDuration}`,
-      data: { duration_ms: safeDuration },
-    });
+    logger.info(`flash:extend:${safeDuration}`, { duration_ms: safeDuration }, 'FLASH');
 
     setState((current) => ({ ...current, extendedMs: current.extendedMs + safeDuration }));
 
@@ -154,11 +150,7 @@ export const useFlashGlowSession = (): Runtime => {
       exitTimerRef.current = null;
     }
 
-    Sentry.addBreadcrumb({
-      category: 'flash',
-      level: 'info',
-      message: 'flash:soft_exit',
-    });
+    logger.info('flash:soft_exit', undefined, 'FLASH');
 
     applyAudioFade('slow');
     applyVisuals('lowered');

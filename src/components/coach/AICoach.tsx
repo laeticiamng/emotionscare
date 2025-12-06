@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,6 +7,7 @@ import { MessageSquare, Send, Bot, User, Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 interface Message {
   id: string;
@@ -89,14 +89,14 @@ const AICoach: React.FC = () => {
         const welcomeMessage: Message = {
           id: 'welcome',
           sender: 'ai',
-          content: `Bonjour ${user.name} ! Je suis votre coach IA personnel. Comment puis-je vous aider avec votre bien-être émotionnel aujourd'hui ?`,
+          content: `Bonjour ! Je suis votre coach IA personnel. Comment puis-je vous aider avec votre bien-être émotionnel aujourd'hui ?`,
           timestamp: new Date()
         };
         
         setMessages([welcomeMessage]);
       }
     } catch (error) {
-      console.error('Conversation initialization error:', error);
+      logger.error('Conversation initialization error:', error);
       toast.error('Erreur lors de l\'initialisation de la conversation');
     }
   };
@@ -162,7 +162,7 @@ const AICoach: React.FC = () => {
         .eq('id', conversationId);
 
     } catch (error) {
-      console.error('Send message error:', error);
+      logger.error('Send message error:', error);
       toast.error('Erreur lors de l\'envoi du message');
     } finally {
       setIsLoading(false);

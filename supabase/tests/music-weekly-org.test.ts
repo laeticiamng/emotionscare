@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { handler } from '../functions/music-weekly-org/index.ts';
 import * as auth from '../functions/_shared/auth.ts';

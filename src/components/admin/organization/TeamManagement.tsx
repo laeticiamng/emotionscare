@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -43,7 +42,7 @@ const TeamManagement: React.FC<TeamManagementProps> = ({ teams, departments }) =
     lead: ''
   });
   
-  const filteredTeams = selectedDepartment 
+  const filteredTeams = selectedDepartment && selectedDepartment !== 'all'
     ? teams.filter(team => team.departmentId === selectedDepartment)
     : teams;
     
@@ -104,7 +103,7 @@ const TeamManagement: React.FC<TeamManagementProps> = ({ teams, departments }) =
               <SelectValue placeholder="Tous les départements" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value={undefined}>Tous les départements</SelectItem>
+              <SelectItem value="all">Tous les départements</SelectItem>
               {departments.map((dept) => (
                 <SelectItem key={dept.id} value={dept.id}>
                   {dept.name}

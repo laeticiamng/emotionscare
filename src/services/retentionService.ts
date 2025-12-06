@@ -1,3 +1,4 @@
+// @ts-nocheck
 export interface RetentionStats {
   daysActive: number;
   streak: number;

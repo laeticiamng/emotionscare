@@ -11,6 +11,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { logger } from '@/lib/logger';
 
 interface ExportOption {
   id: string;
@@ -123,11 +124,7 @@ const ExportPage: React.FC = () => {
       return;
     }
 
-    console.log('Démarrage de l\'export:', {
-      options: selectedOptions,
-      format: selectedFormat,
-      period: selectedPeriod,
-    });
+    logger.info('Démarrage de l\'export', { options: selectedOptions, format: selectedFormat, period: selectedPeriod }, 'SYSTEM');
 
     // Ici, déclencher l'export
   };
@@ -163,9 +160,9 @@ const ExportPage: React.FC = () => {
     }, 0);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-800">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="bg-white/80 backdrop-blur-sm border-b sticky top-0 z-10">
+      <div className="bg-card/80 backdrop-blur-sm border-b border-border sticky top-0 z-10">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Button 
@@ -240,7 +237,7 @@ const ExportPage: React.FC = () => {
                   {exportOptions.map((option) => {
                     const IconComponent = option.icon;
                     return (
-                      <div key={option.id} className="flex items-start gap-3 p-3 rounded-lg border hover:bg-gray-50">
+                      <div key={option.id} className="flex items-start gap-3 p-3 rounded-lg border hover:bg-muted/50">
                         <Checkbox
                           checked={option.selected}
                           onCheckedChange={() => handleToggleOption(option.id)}
@@ -353,9 +350,9 @@ const ExportPage: React.FC = () => {
             </Card>
 
             {/* Informations */}
-            <Card className="p-6 bg-blue-50 border-blue-200">
-              <h3 className="font-semibold text-blue-900 mb-2">📋 Informations</h3>
-              <ul className="text-sm text-blue-700 space-y-2">
+            <Card className="p-6 bg-accent/20 border-accent">
+              <h3 className="font-semibold mb-2">📋 Informations</h3>
+              <ul className="text-sm text-muted-foreground space-y-2">
                 <li>• L'export peut prendre plusieurs minutes</li>
                 <li>• Vous recevrez un email une fois terminé</li>
                 <li>• Les fichiers sont disponibles 30 jours</li>
@@ -364,12 +361,12 @@ const ExportPage: React.FC = () => {
             </Card>
 
             {/* RGPD */}
-            <Card className="p-6 bg-green-50 border-green-200">
-              <h3 className="font-semibold text-green-900 mb-2">🔒 Confidentialité</h3>
-              <p className="text-sm text-green-700">
+            <Card className="p-6 bg-accent/20 border-accent">
+              <h3 className="font-semibold mb-2">🔒 Confidentialité</h3>
+              <p className="text-sm text-muted-foreground">
                 Conformément au RGPD, vous avez le droit d'accéder, modifier ou supprimer vos données personnelles.
               </p>
-              <Button variant="outline" size="sm" className="mt-3 text-green-700 border-green-300">
+              <Button variant="outline" size="sm" className="mt-3">
                 En savoir plus
               </Button>
             </Card>

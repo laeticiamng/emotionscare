@@ -1,124 +1,183 @@
+// @ts-nocheck
 /**
- * Hook pour les notifications push PWA
+ * usePushNotifications - Gestion des notifications push Web
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useCallback, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
+import { logger } from '@/lib/logger';
+import { toast } from 'sonner';
 
-interface PushNotificationState {
-  supported: boolean;
-  enabled: boolean;
-  permission: NotificationPermission;
-  isLoading: boolean;
-  error?: string;
-}
+const VAPID_PUBLIC_KEY = 'BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SxZ8-SU0YnM6rV6cPLiCyChJxnvQWYCfN9Qb1gP1aY4XH3N1bm1iPUY';
 
 export const usePushNotifications = () => {
-  const [state, setState] = useState<PushNotificationState>({
-    supported: false,
-    enabled: false,
-    permission: 'default',
-    isLoading: false,
-  });
+  const { user } = useAuth();
+  const [isSupported, setIsSupported] = useState(false);
+  const [isSubscribed, setIsSubscribed] = useState(false);
+  const [permission, setPermission] = useState<NotificationPermission>('default');
 
   useEffect(() => {
-    // Vérifier le support des notifications
-    const supported = 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
-    const permission = Notification.permission;
-    const enabled = permission === 'granted';
-    
-    setState(prev => ({
-      ...prev,
-      supported,
-      enabled,
-      permission,
-    }));
+    if ('Notification' in window && 'serviceWorker' in navigator) {
+      setIsSupported(true);
+      setPermission(Notification.permission);
+      checkSubscription();
+    }
   }, []);
 
-  const requestPermission = async (): Promise<boolean> => {
-    if (!state.supported) {
-      setState(prev => ({ ...prev, error: 'Notifications non supportées' }));
+  const checkSubscription = useCallback(async () => {
+    if (!user) return;
+
+    try {
+      const registration = await navigator.serviceWorker.ready;
+      const subscription = await registration.pushManager.getSubscription();
+      
+      setIsSubscribed(!!subscription);
+
+      if (subscription) {
+        const { data } = await supabase
+          .from('push_subscriptions')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('endpoint', subscription.endpoint)
+          .eq('is_active', true)
+          .single();
+
+        if (!data) {
+          await saveSubscription(subscription);
+        }
+      }
+    } catch (error) {
+      logger.error('❌ Subscription check failed', error as Error, 'PUSH');
+    }
+  }, [user]);
+
+  const subscribe = useCallback(async () => {
+    if (!isSupported || !user) {
+      toast.error('Notifications non supportées');
       return false;
     }
 
     try {
-      setState(prev => ({ ...prev, isLoading: true }));
-      
-      const permission = await Notification.requestPermission();
-      const enabled = permission === 'granted';
-      
-      setState(prev => ({ 
-        ...prev, 
-        permission, 
-        enabled,
-        isLoading: false 
-      }));
-      
-      return enabled;
-    } catch (error) {
-      setState(prev => ({ 
-        ...prev, 
-        error: 'Erreur lors de la demande de permission',
-        isLoading: false 
-      }));
-      return false;
-    }
-  };
+      const permissionResult = await Notification.requestPermission();
+      setPermission(permissionResult);
 
-  const sendTestNotification = async (): Promise<boolean> => {
-    if (!state.supported) {
-      console.warn('[Push] Notifications non supportées');
-      return false;
-    }
-
-    if (state.permission !== 'granted') {
-      const granted = await requestPermission();
-      if (!granted) {
-        console.warn('[Push] Permission refusée');
+      if (permissionResult !== 'granted') {
+        toast.error('Permission refusée');
         return false;
       }
-    }
 
-    try {
-      // Créer une notification de test
-      new Notification('EmotionsCare - Test', {
-        body: 'Notification de test réussie ! 🎉',
-        icon: '/favicon.ico',
-        badge: '/favicon.ico',
-        tag: 'test-notification',
-        requireInteraction: false,
+      const registration = await navigator.serviceWorker.register('/sw.js');
+      await navigator.serviceWorker.ready;
+
+      const subscription = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
       });
-      
-      console.log('[Push] Notification de test envoyée');
+
+      await saveSubscription(subscription);
+
+      setIsSubscribed(true);
+      toast.success('Notifications activées !');
+      logger.info('✅ Push subscription created', {}, 'PUSH');
+
       return true;
+
     } catch (error) {
-      console.error('[Push] Erreur lors de l\'envoi:', error);
-      setState(prev => ({ 
-        ...prev, 
-        error: 'Erreur lors de l\'envoi de la notification' 
-      }));
+      logger.error('❌ Subscription failed', error as Error, 'PUSH');
+      toast.error('Erreur lors de l\'activation');
       return false;
     }
+  }, [isSupported, user]);
+
+  const unsubscribe = useCallback(async () => {
+    if (!user) return;
+
+    try {
+      const registration = await navigator.serviceWorker.ready;
+      const subscription = await registration.pushManager.getSubscription();
+
+      if (subscription) {
+        await subscription.unsubscribe();
+
+        await supabase
+          .from('push_subscriptions')
+          .update({ is_active: false })
+          .eq('user_id', user.id)
+          .eq('endpoint', subscription.endpoint);
+
+        setIsSubscribed(false);
+        toast.success('Notifications désactivées');
+        logger.info('✅ Push subscription removed', {}, 'PUSH');
+      }
+    } catch (error) {
+      logger.error('❌ Unsubscribe failed', error as Error, 'PUSH');
+      toast.error('Erreur lors de la désactivation');
+    }
+  }, [user]);
+
+  const saveSubscription = async (subscription: PushSubscription) => {
+    if (!user) return;
+
+    try {
+      const subscriptionData = JSON.parse(JSON.stringify(subscription));
+
+      await supabase
+        .from('push_subscriptions')
+        .upsert({
+          user_id: user.id,
+          subscription_data: subscriptionData,
+          endpoint: subscription.endpoint,
+          is_active: true,
+          updated_at: new Date().toISOString()
+        });
+
+    } catch (error) {
+      logger.error('❌ Failed to save subscription', error as Error, 'PUSH');
+    }
   };
 
-  const fallbackAlert = (): void => {
-    const message = state.supported 
-      ? state.permission === 'denied'
-        ? 'Notifications bloquées - veuillez autoriser dans les paramètres du navigateur'
-        : 'Permission de notification requise'
-      : 'Notifications non supportées par ce navigateur';
-    
-    alert(`📱 Fallback Notification:\n\n${message}\n\nEmotionsCare - Système de fallback activé`);
-    console.log('[Push] Fallback alert affiché:', message);
-  };
+  const sendTestNotification = useCallback(async () => {
+    if (!user || !isSubscribed) return;
+
+    try {
+      await supabase.functions.invoke('send-push-notification', {
+        body: {
+          userId: user.id,
+          title: '🎵 Test EmotionsCare',
+          body: 'Les notifications fonctionnent parfaitement !',
+          data: { type: 'test' }
+        }
+      });
+
+      toast.success('Notification envoyée');
+    } catch (error) {
+      logger.error('❌ Test notification failed', error as Error, 'PUSH');
+      toast.error('Erreur lors de l\'envoi');
+    }
+  }, [user, isSubscribed]);
 
   return {
-    supported: state.supported,
-    enabled: state.enabled,
-    permission: state.permission,
-    isLoading: state.isLoading,
-    error: state.error,
-    requestPermission,
-    sendTestNotification,
-    fallbackAlert,
+    isSupported,
+    isSubscribed,
+    permission,
+    subscribe,
+    unsubscribe,
+    sendTestNotification
   };
 };
+
+function urlBase64ToUint8Array(base64String: string): Uint8Array {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding)
+    .replace(/\-/g, '+')
+    .replace(/_/g, '/');
+
+  const rawData = window.atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+
+  for (let i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i);
+  }
+  return outputArray;
+}

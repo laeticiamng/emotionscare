@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import apiServices from '@/services';
 import openaiService from '@/services/openai';

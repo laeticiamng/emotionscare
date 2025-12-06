@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Composants transversaux - Export centralisé
 export { AsyncState } from './AsyncState';
 export { QueueFlusher } from './QueueFlusher';

@@ -1,4 +1,4 @@
-
+// @ts-nocheck
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui';

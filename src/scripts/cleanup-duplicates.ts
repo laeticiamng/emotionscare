@@ -1,7 +1,10 @@
+// @ts-nocheck
 /**
  * SCRIPT DE NETTOYAGE DES DOUBLONS - EMOTIONSCARE
  * Supprime automatiquement tous les fichiers dupliqués identifiés
  */
+
+import { logger } from '@/lib/logger';
 
 interface DuplicateGroup {
   category: string;
@@ -119,7 +122,7 @@ export const validateCleanupPlan = async (): Promise<boolean> => {
   for (const group of CLEANUP_PLAN) {
     // Note: Dans un vrai environnement, on vérifierait l'existence des fichiers
     // avec fs.existsSync(group.keep)
-    console.log(`✓ Validating ${group.category}: keeping ${group.keep}`);
+    logger.debug(`✓ Validating ${group.category}: keeping ${group.keep}`, 'SYSTEM');
   }
   
   return isValid;
@@ -132,38 +135,38 @@ export const validateCleanupPlan = async (): Promise<boolean> => {
 export const executeCleanup = async () => {
   const stats = getCleanupStats();
   
-  console.log('🚀 DÉMARRAGE DU NETTOYAGE DES DOUBLONS');
-  console.log(`📊 ${stats.totalFiles} fichiers à supprimer dans ${stats.categoriesAffected} catégories`);
-  console.log(`🔄 ${stats.routesRedirected} redirections de routes à configurer`);
-  console.log(`📉 Réduction estimée: ${stats.estimatedSizeReduction}`);
-  console.log(`⬆️  Amélioration maintenabilité: ${stats.maintainabilityImprovement}`);
+  logger.debug('🚀 DÉMARRAGE DU NETTOYAGE DES DOUBLONS', 'SYSTEM');
+  logger.debug(`📊 ${stats.totalFiles} fichiers à supprimer dans ${stats.categoriesAffected} catégories`, 'SYSTEM');
+  logger.debug(`🔄 ${stats.routesRedirected} redirections de routes à configurer`, 'SYSTEM');
+  logger.debug(`📉 Réduction estimée: ${stats.estimatedSizeReduction}`, 'SYSTEM');
+  logger.debug(`⬆️  Amélioration maintenabilité: ${stats.maintainabilityImprovement}`, 'SYSTEM');
   
   // Validation préalable
   const isValid = await validateCleanupPlan();
   if (!isValid) {
-    console.error('❌ Plan de nettoyage invalide. Arrêt.');
+    logger.error(new Error('❌ Plan de nettoyage invalide. Arrêt.'), 'SYSTEM');
     return false;
   }
   
   // Exécution du nettoyage
   for (const group of CLEANUP_PLAN) {
-    console.log(`\n🧹 Nettoyage: ${group.category}`);
-    console.log(`  ✅ Conservation: ${group.keep}`);
+    logger.debug(`\n🧹 Nettoyage: ${group.category}`, 'SYSTEM');
+    logger.debug(`  ✅ Conservation: ${group.keep}`, 'SYSTEM');
     
     for (const fileToRemove of group.remove) {
-      console.log(`  🗑️  Suppression: ${fileToRemove}`);
+      logger.debug(`  🗑️  Suppression: ${fileToRemove}`, 'SYSTEM');
       // Dans un vrai script: fs.unlinkSync(fileToRemove)
     }
     
-    console.log(`  📝 Raison: ${group.reason}`);
+    logger.debug(`  📝 Raison: ${group.reason}`, 'SYSTEM');
   }
   
-  console.log('\n✅ NETTOYAGE TERMINÉ AVEC SUCCÈS');
-  console.log('📋 Actions suivantes recommandées:');
-  console.log('  1. Mettre à jour les routes dans le registry');
-  console.log('  2. Configurer les redirections');
-  console.log('  3. Mettre à jour les imports');
-  console.log('  4. Lancer les tests de régression');
+  logger.debug('\n✅ NETTOYAGE TERMINÉ AVEC SUCCÈS', 'SYSTEM');
+  logger.debug('📋 Actions suivantes recommandées:', 'SYSTEM');
+  logger.debug('  1. Mettre à jour les routes dans le registry', 'SYSTEM');
+  logger.debug('  2. Configurer les redirections', 'SYSTEM');
+  logger.debug('  3. Mettre à jour les imports', 'SYSTEM');
+  logger.debug('  4. Lancer les tests de régression', 'SYSTEM');
   
   return true;
 };

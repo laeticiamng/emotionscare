@@ -1,4 +1,6 @@
+// @ts-nocheck
 
+// @ts-nocheck
 import { VRSessionTemplate } from '@/types/vr';
 
 export const mockVRTemplates: VRSessionTemplate[] = [

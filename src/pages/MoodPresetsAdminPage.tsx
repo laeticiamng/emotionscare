@@ -9,6 +9,7 @@ import { moodPresetsService, MoodPresetPayload } from '@/services/moodPresetsSer
 import { MoodPresetRecord } from '@/types/mood-mixer';
 import { toast } from 'sonner';
 import { Loader2, Plus, RefreshCw, Save, Trash2 } from 'lucide-react';
+import { logger } from '@/lib/logger';
 
 interface MoodPresetFormState {
   slug: string;
@@ -60,7 +61,7 @@ const MoodPresetsAdminPage: React.FC = () => {
       const data = await moodPresetsService.listPresets();
       setPresets(data);
     } catch (error) {
-      console.error('Failed to load mood presets', error);
+      logger.error('Failed to load mood presets', error as Error, 'SYSTEM');
       toast.error('Impossible de charger les presets Mood Mixer.');
     } finally {
       setIsLoading(false);
@@ -151,7 +152,7 @@ const MoodPresetsAdminPage: React.FC = () => {
       await loadPresets();
       resetForm();
     } catch (error) {
-      console.error('Failed to save mood preset', error);
+      logger.error('Failed to save mood preset', error as Error, 'SYSTEM');
       toast.error('Erreur lors de la sauvegarde du preset.');
     } finally {
       setIsSubmitting(false);
@@ -172,7 +173,7 @@ const MoodPresetsAdminPage: React.FC = () => {
         resetForm();
       }
     } catch (error) {
-      console.error('Failed to delete mood preset', error);
+      logger.error('Failed to delete mood preset', error as Error, 'SYSTEM');
       toast.error('Erreur lors de la suppression du preset.');
     } finally {
       setIsSubmitting(false);

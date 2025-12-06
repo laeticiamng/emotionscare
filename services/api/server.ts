@@ -9,6 +9,11 @@ import type { FastifyBaseLogger } from 'fastify';
 
 import { createServer } from '../lib/server';
 import { moodPlaylistRequestSchema, buildMoodPlaylistResponse } from './music';
+import { registerAssessmentRoutes } from './routes/assessments';
+import { registerScanRoutes } from './routes/scans';
+import { registerCoachRoutes } from './routes/coach';
+import { registerGoalRoutes } from './routes/goals';
+import { v1Routes } from './routes/v1';
 
 type MaybePromise<T> = T | Promise<T>;
 
@@ -417,7 +422,16 @@ export function createApp(options: CreateAppOptions = {}) {
   };
 
   return createServer({
-    registerRoutes(app) {
+    async registerRoutes(app) {
+      // Register v1 API routes (journal, music, health)
+      await app.register(v1Routes, { prefix: '/api/v1' });
+
+      // Register modular API routes
+      registerAssessmentRoutes(app);
+      registerScanRoutes(app);
+      registerCoachRoutes(app);
+      registerGoalRoutes(app);
+
       const sendHealth = async (request: any, reply: any) => {
         applyHealthCors(request, reply);
         reply.header('cache-control', 'no-store');
@@ -490,6 +504,16 @@ export function createApp(options: CreateAppOptions = {}) {
       });
 
       app.post('/api/mood_playlist', async (req, reply) => {
+        // Vérifier l'authentification
+        const user = (req as any).user;
+        if (!user) {
+          reply.code(401).send({
+            ok: false,
+            error: { code: 'unauthorized', message: 'Authentication required' },
+          });
+          return;
+        }
+
         const parsed = moodPlaylistRequestSchema.safeParse(req.body);
 
         if (!parsed.success) {

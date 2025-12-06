@@ -161,13 +161,6 @@ const useSettingsStoreBase = create<SettingsState>()(
     }),
     {
       name: 'settings-storage',
-      onRehydrateStorage: () => (state) => {
-        // Apply settings on page load
-        if (state) {
-          applyThemeToDocument(state.profile.theme);
-          applyA11yToDocument(state.profile.a11y);
-        }
-      }
     }
   )
 );

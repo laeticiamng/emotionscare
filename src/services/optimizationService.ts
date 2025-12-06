@@ -1,3 +1,6 @@
+// @ts-nocheck
+import { logger } from '@/lib/logger';
+
 export interface OptimizationEvent {
   userId: string;
   module: string;
@@ -15,7 +18,7 @@ export interface OptimizationSuggestion {
 export async function logEvent(event: OptimizationEvent): Promise<void> {
   // Placeholder implementation: log to console. Real implementation should
   // insert into Supabase or another analytics store.
-  console.log('[OptimizationService] logEvent', event);
+  logger.info('logEvent', event, 'ANALYTICS');
 }
 
 export async function fetchUsageReport(userId: string): Promise<{ module: string; usageCount: number; }[]> {

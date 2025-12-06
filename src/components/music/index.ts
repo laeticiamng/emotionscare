@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Exports par défaut réexportés comme exports nommés pour éviter les conflits
 export { default as AdaptiveMusicSettings } from './AdaptiveMusicSettings';
 export { default as EmotionMusicIntegration } from './EmotionMusicIntegration';

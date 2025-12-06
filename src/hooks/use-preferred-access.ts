@@ -1,9 +1,11 @@
+// @ts-nocheck
 
 import { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { getModeDashboardPath, normalizeUserMode } from '@/utils/userModeHelpers';
+import { logger } from '@/lib/logger';
 
 /**
  * Hook qui gère la redirection automatique des utilisateurs
@@ -37,7 +39,7 @@ const usePreferredAccess = () => {
         });
       }, 300);
       
-      console.log('[usePreferredAccess] Redirected user to dashboard:', dashboardPath);
+      logger.info('[usePreferredAccess] Redirected user to dashboard', { dashboardPath }, 'AUTH');
     }
     
     // Si l'utilisateur tente d'accéder à un dashboard qui ne correspond pas à son rôle,

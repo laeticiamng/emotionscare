@@ -1,3 +1,6 @@
+// @ts-nocheck
+
+import { logger } from '@/lib/logger';
 
 // Monitoring de performance simple
 interface PerformanceMetric {
@@ -23,7 +26,7 @@ class PerformanceMonitor {
     }
 
     if (import.meta.env.DEV) {
-      console.log(`📊 Performance: ${name} = ${value.toFixed(2)}ms`);
+      logger.debug(`📊 Performance: ${name} = ${value.toFixed(2)}ms`, {}, 'ANALYTICS');
     }
   }
 

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { logger } from '@/lib/logger';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -318,7 +319,7 @@ const AdaptivePlaylistEngine: React.FC = () => {
       });
 
     } catch (error) {
-      console.error('Error generating playlist:', error);
+      logger.error('Error generating playlist', error as Error, 'MUSIC');
       toast({
         title: "Erreur de génération",
         description: "Impossible de générer la playlist adaptative",
@@ -352,16 +353,16 @@ const AdaptivePlaylistEngine: React.FC = () => {
         arousal: Math.max(0, Math.min(1, prev.arousal + (Math.random() - 0.5) * 0.1))
       }));
 
-      // Potentially modify remaining playlist based on new emotional state
-      const remainingTracks = currentPlaylist.tracks.slice(currentPlaylist.current_index + 1);
-      if (remainingTracks.length > 2) {
-        // Re-evaluate and potentially replace some tracks
-        const sessionProgress = (currentPlaylist.current_index + 1) / currentPlaylist.tracks.length;
-        
-        // This would implement real-time playlist adaptation logic
-        console.log('Adapting playlist based on current state:', currentEmotionalState);
+        // Potentially modify remaining playlist based on new emotional state
+        const remainingTracks = currentPlaylist.tracks.slice(currentPlaylist.current_index + 1);
+        if (remainingTracks.length > 2) {
+          // Re-evaluate and potentially replace some tracks
+          const sessionProgress = (currentPlaylist.current_index + 1) / currentPlaylist.tracks.length;
+          
+          // This would implement real-time playlist adaptation logic
+          logger.info('Adapting playlist based on current state', { currentEmotionalState }, 'MUSIC');
+        }
       }
-    }
 
     // Move to next track
     const nextIndex = currentPlaylist.current_index + 1;

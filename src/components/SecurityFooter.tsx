@@ -1,4 +1,3 @@
-
 import React from 'react';
 import SecurityCertifications from './SecurityCertifications';
 

@@ -8,6 +8,7 @@ import React, { createContext, useContext, useReducer, useRef, useCallback, useE
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { musicOrchestrationService, type MusicOrchestrationPreset } from '@/services/music/orchestration';
+import { logger } from '@/lib/logger';
 
 // ==================== TYPES ====================
 export interface MusicTrack {
@@ -199,6 +200,7 @@ interface MusicContextType {
   // Generation Suno
   generateMusicForEmotion: (emotion: string, prompt?: string) => Promise<MusicTrack | null>;
   checkGenerationStatus: (taskId: string) => Promise<MusicTrack | null>;
+  getEmotionMusicDescription: (emotion: string) => string;
   
   // Therapeutic features
   enableTherapeuticMode: (emotion: string) => void;
@@ -295,7 +297,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         adaptVolumeToEmotion(track.emotion, 0.7);
       }
     } catch (error) {
-      console.error('Erreur lecture audio:', error);
+      logger.error('Audio playback error', error as Error, 'MUSIC');
       toast.error('Impossible de lire ce fichier audio');
       dispatch({ type: 'SET_PLAYING', payload: false });
     }
@@ -441,7 +443,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     };
 
     bootstrap().catch(error => {
-      console.error('Failed to initialize music orchestration preset:', error);
+      logger.error('Failed to initialize music orchestration preset', error as Error, 'MUSIC');
     });
 
     const handleMoodUpdate = (event: Event) => {
@@ -517,7 +519,12 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         }
       });
 
-      if (error) throw error;
+      if (error) {
+        logger.error('Suno music generation invoke error', error as Error, 'MUSIC');
+        dispatch({ type: 'SET_GENERATION_ERROR', payload: 'Erreur lors de la génération de musique' });
+        toast.error('Erreur lors de la génération de musique');
+        return null;
+      }
 
       dispatch({ type: 'SET_GENERATION_PROGRESS', payload: 50 });
 
@@ -527,23 +534,34 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         const maxAttempts = 30; // 5 minutes max
 
         while (attempts < maxAttempts) {
-          const statusData = await checkGenerationStatus(taskId);
-          
-          if (statusData) {
-            dispatch({ type: 'SET_GENERATION_PROGRESS', payload: 100 });
-            return statusData;
+          try {
+            const statusData = await checkGenerationStatus(taskId);
+
+            if (statusData) {
+              dispatch({ type: 'SET_GENERATION_PROGRESS', payload: 100 });
+              return statusData;
+            }
+
+            dispatch({
+              type: 'SET_GENERATION_PROGRESS',
+              payload: 50 + (attempts / maxAttempts) * 45
+            });
+
+            await new Promise(resolve => setTimeout(resolve, 10000)); // Attendre 10s
+            attempts++;
+          } catch (error) {
+            logger.error('Error checking generation status', error as Error, 'MUSIC');
+            // Continue polling même en cas d'erreur temporaire
+            await new Promise(resolve => setTimeout(resolve, 10000));
+            attempts++;
           }
-          
-          dispatch({ 
-            type: 'SET_GENERATION_PROGRESS', 
-            payload: 50 + (attempts / maxAttempts) * 45 
-          });
-          
-          await new Promise(resolve => setTimeout(resolve, 10000)); // Attendre 10s
-          attempts++;
         }
-        
-        throw new Error('Timeout - Génération trop longue');
+
+        // Timeout - retourner null au lieu de throw
+        logger.error('Music generation timeout', new Error('Timeout - Génération trop longue'), 'MUSIC');
+        dispatch({ type: 'SET_GENERATION_ERROR', payload: 'Timeout - Génération trop longue' });
+        toast.error('La génération prend trop de temps, veuillez réessayer');
+        return null;
       };
 
       const generatedTrack = await checkStatus(data.taskId);
@@ -574,7 +592,10 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         }
       });
 
-      if (error) throw error;
+      if (error) {
+        logger.error('Error checking generation status', error as Error, 'MUSIC');
+        return null;
+      }
 
       if (data.status === 'completed' && data.audioUrl) {
         const track: MusicTrack = {
@@ -598,7 +619,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
       return null;
     } catch (error) {
-      console.error('Erreur vérification statut:', error);
+      logger.error('Generation status check error', error as Error, 'MUSIC');
       return null;
     }
   }, []);
@@ -663,9 +684,24 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       
       return data.tracks || [];
     } catch (error) {
-      console.error('Erreur recommandations:', error);
+      logger.error('Music recommendations error', error as Error, 'MUSIC');
       return [];
     }
+  }, []);
+
+  const getEmotionMusicDescription = useCallback((emotion: string): string => {
+    const descriptions: Record<string, string> = {
+      calm: 'Musique douce et apaisante pour retrouver la sérénité',
+      energetic: 'Sons dynamiques et motivants pour booster votre énergie',
+      happy: 'Mélodies joyeuses pour célébrer votre bonne humeur',
+      sad: 'Compositions réconfortantes pour traverser les moments difficiles',
+      focused: 'Ambiances propices à la concentration et la productivité',
+      relaxed: 'Atmosphères relaxantes pour décompresser en douceur',
+      anxious: 'Harmonies apaisantes pour calmer l\'anxiété',
+      melancholy: 'Pièces contemplatives pour accompagner la mélancolie',
+    };
+    
+    return descriptions[emotion.toLowerCase()] || 'Musique thérapeutique adaptée à votre état émotionnel';
   }, []);
 
   // ==================== CONTEXT VALUE ====================
@@ -690,6 +726,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     // Generation
     generateMusicForEmotion,
     checkGenerationStatus,
+    getEmotionMusicDescription,
     
     // Therapeutic
     enableTherapeuticMode,
@@ -718,4 +755,4 @@ export const useMusic = () => {
 };
 
 // Assurer que tous les exports sont disponibles
-export type { MusicContextType, MusicState, MusicTrack, MusicPlaylist };
+export type { MusicContextType, MusicState };

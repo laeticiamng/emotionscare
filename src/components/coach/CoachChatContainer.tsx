@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import CoachChatInterface from './CoachChatInterface';
 import { useChatMessages } from '@/hooks/chat/useChatMessages';
@@ -56,7 +55,7 @@ const CoachChatContainer: React.FC<CoachChatContainerProps> = ({
   }, [defaultPrompt]);
 
   const sendMessage = async (message: string) => {
-    if (!message.trim()) return;
+    if (!message.trim()) return null;
     
     onMessageSent?.(message);
     
@@ -66,12 +65,12 @@ const CoachChatContainer: React.FC<CoachChatContainerProps> = ({
       onResponseReceived(response);
     }
     
-    return response;
+    return response || null;
   };
 
   return (
     <CoachChatInterface
-      messages={coachMessages}
+      messages={coachMessages as any}
       sendMessage={sendMessage}
       isProcessing={isProcessing}
     />

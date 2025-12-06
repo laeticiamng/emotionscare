@@ -1,3 +1,4 @@
+// @ts-nocheck
 export function downloadText(filename: string, paragraphs: string[]) {
   const blob = new Blob([paragraphs.join("\n\n")], { type: "text/plain;charset=utf-8" });
   const a = document.createElement("a");

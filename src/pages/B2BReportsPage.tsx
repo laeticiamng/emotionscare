@@ -1,5 +1,6 @@
 import React from 'react';
-import * as Sentry from '@sentry/react';
+import { captureException } from '@/lib/ai-monitoring';
+import { Sentry } from '@/lib/errors/sentry-compat';
 import dayjs from 'dayjs';
 import 'dayjs/locale/fr';
 import { FileText, ArrowRight, AlertCircle } from 'lucide-react';
@@ -153,5 +154,5 @@ const B2BReportsPage: React.FC = () => {
 
 export default withGuard(B2BReportsPage, [
   { type: 'auth', required: true },
-  { type: 'role', roles: ['manager', 'org', 'admin'] },
+  { type: 'role', role: 'manager', required: true },
 ]);

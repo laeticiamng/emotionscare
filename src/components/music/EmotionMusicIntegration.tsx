@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAdaptiveMusic } from '@/hooks/useAdaptiveMusic';
@@ -62,7 +61,7 @@ const EmotionMusicIntegration: React.FC<EmotionMusicIntegrationProps> = ({
               <div>
                 <p className="font-medium capitalize">{emotionResult.emotion}</p>
                 <p className="text-sm text-muted-foreground">
-                  Confiance: {Math.round(emotionResult.confidence * 100)}%
+                  Confiance: {Math.round((typeof emotionResult.confidence === 'number' ? emotionResult.confidence : emotionResult.confidence.overall) * 100)}%
                 </p>
               </div>
               <div className="text-right">

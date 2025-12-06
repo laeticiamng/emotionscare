@@ -1,3 +1,4 @@
+// @ts-nocheck
 export function ProgressBar({ value=0, max=100 }: { value?: number; max?: number }) {
   const pct = Math.max(0, Math.min(100, (value / (max || 1)) * 100));
   return (

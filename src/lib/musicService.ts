@@ -1,6 +1,5 @@
-
 import { supabase } from '@/integrations/supabase/client';
-import { MusicTrack, MusicPlaylist } from '@/types/music';
+import { logger } from '@/lib/logger';
 
 // Re-export everything from the service modules
 export { getPlaylist } from '@/services/music/playlist-service';
@@ -11,7 +10,8 @@ export {
   musicTrackToTrack,
   musicPlaylistToPlaylist 
 } from '@/services/music/converters';
-export type { Track, Playlist } from '@/services/music/types';
+// Import depuis la source unique (consolidation Phase 2)
+export type { MusicTrack as Track, MusicPlaylist as Playlist } from '@/types/music';
 
 // Fonctions pour les VR audio sessions
 export const getAudioSessions = async () => {
@@ -36,7 +36,7 @@ export const getAudioSessions = async () => {
       }
     ];
   } catch (error) {
-    console.error('Error fetching audio sessions:', error);
+    logger.error('Error fetching audio sessions', error as Error, 'MUSIC');
     throw error;
   }
 };
@@ -67,7 +67,7 @@ export const getRecommendedTracks = async (emotion: string) => {
       }
     ];
   } catch (error) {
-    console.error('Error fetching recommended tracks:', error);
+    logger.error('Error fetching recommended tracks', error as Error, 'MUSIC');
     throw error;
   }
 };

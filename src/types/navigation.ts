@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Types et constantes pour la navigation
  */

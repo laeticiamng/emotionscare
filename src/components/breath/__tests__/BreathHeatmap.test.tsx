@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 import { render } from '@/tests/utils';

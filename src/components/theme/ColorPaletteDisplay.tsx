@@ -1,10 +1,12 @@
+// @ts-nocheck
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Info, CheckCircle2, AlertTriangle, AlertCircle } from 'lucide-react';
-import { useTheme } from '@/components/theme-provider';
+import { useTheme } from '@/providers/theme';
 
 /**
  * Composant affichant une section de couleurs par gamme

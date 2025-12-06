@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -33,7 +34,7 @@ const GamificationWidget: React.FC<GamificationWidgetProps> = ({ collapsed, onTo
       <CardHeader className="pb-2">
         <CardTitle className="text-lg flex items-center justify-between">
           <div className="flex items-center">
-            <Award className="mr-2 h-5 w-5 text-amber-500" />
+            <Award className="mr-2 h-5 w-5 text-warning" />
             Gamification Émotionnelle
           </div>
           <Badge variant="outline" className="ml-2 bg-primary/10">

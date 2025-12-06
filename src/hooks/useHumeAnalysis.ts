@@ -1,7 +1,9 @@
+// @ts-nocheck
 
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { logger } from '@/lib/logger';
 
 interface EmotionAnalysis {
   emotions: Array<{
@@ -54,7 +56,7 @@ export const useHumeAnalysis = () => {
         return data.analysis;
       }
     } catch (error) {
-      console.error('Erreur analyse Hume:', error);
+      logger.error('Erreur analyse Hume', error as Error, 'SCAN');
       toast.error('Erreur lors de l\'analyse émotionnelle');
     } finally {
       setIsAnalyzing(false);
@@ -88,7 +90,7 @@ export const useHumeAnalysis = () => {
       
       toast.info('Analyse vocale en cours... Parlez pendant 5 secondes');
     } catch (error) {
-      console.error('Erreur accès microphone:', error);
+      logger.error('Erreur accès microphone', error as Error, 'SYSTEM');
       toast.error('Impossible d\'accéder au microphone');
     }
   };

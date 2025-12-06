@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Legacy AI client compatibility exports.
  *

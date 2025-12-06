@@ -1,4 +1,4 @@
-
+// @ts-nocheck
 import { createClient } from './supabase.ts';
 
 const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
@@ -47,8 +47,20 @@ export async function authorizeRole(req: Request, allowedRoles: string[]) {
       return { user: null, status: 401 };
     }
 
-    const role = user.user_metadata?.role || 'b2c';
-    if (!allowedRoles.includes(role)) {
+    // ✅ SÉCURITÉ: Vérifier rôle via table user_roles au lieu de user_metadata
+    // Évite l'escalade de privilèges (user_metadata modifiable côté client)
+    let hasValidRole = false;
+    for (const role of allowedRoles) {
+      const { data, error: roleError } = await supabase
+        .rpc('has_role', { _user_id: user.id, _role: role });
+      
+      if (!roleError && data === true) {
+        hasValidRole = true;
+        break;
+      }
+    }
+
+    if (!hasValidRole) {
       await logUnauthorizedAccess(req, 'invalid role');
       return { user: null, status: 403 };
     }

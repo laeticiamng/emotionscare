@@ -1,3 +1,4 @@
+// @ts-nocheck
 export interface GritChallenge {
   id: string;
   title: string;

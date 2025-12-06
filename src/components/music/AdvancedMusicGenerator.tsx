@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
+import { logger } from '@/lib/logger';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
@@ -36,7 +37,7 @@ interface EmotionalContext {
 
 const AdvancedMusicGenerator: React.FC = () => {
   const { toast } = useToast();
-  const { generateMusic, isGenerating, generatedTracks } = useSunoMusic();
+  const { generateMusic, isGenerating } = useSunoMusic();
   
   const [settings, setSettings] = useState<GenerationSettings>({
     emotion: 'calm',
@@ -125,23 +126,17 @@ const AdvancedMusicGenerator: React.FC = () => {
       
       const track = await generateMusic({
         prompt: enhancedPrompt,
-        emotion: settings.emotion,
-        mood: settings.mood,
-        genre: settings.genre,
-        instrumental: settings.instrumental,
-        duration: settings.duration,
-        intensity: settings.intensity
       });
 
       setCurrentTrack(track);
       
       toast({
         title: "Musique générée avec succès",
-        description: `"${track.title}" est prête à être écoutée`,
+        description: "La musique est prête à être écoutée",
       });
 
     } catch (error) {
-      console.error('Generation error:', error);
+      logger.error('Generation error', error as Error, 'MUSIC');
       toast({
         title: "Erreur de génération",
         description: "Impossible de générer la musique. Veuillez réessayer.",
@@ -190,7 +185,7 @@ const AdvancedMusicGenerator: React.FC = () => {
         description: "La musique est en cours de téléchargement",
       });
     } catch (error) {
-      console.error('Download error:', error);
+      logger.error('Download error', error as Error, 'MUSIC');
       toast({
         title: "Erreur de téléchargement",
         description: "Impossible de télécharger la musique",

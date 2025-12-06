@@ -101,13 +101,30 @@ const config: Config = {
           "4": "hsl(var(--chart-4))",
           "5": "hsl(var(--chart-5))",
         },
-        success: "hsl(142 76% 36%)",
-        warning: "hsl(38 92% 50%)",
-        info: "hsl(199 89% 48%)",
+        success: {
+          DEFAULT: "hsl(var(--success))",
+          foreground: "hsl(var(--success-foreground))",
+        },
+        warning: {
+          DEFAULT: "hsl(var(--warning))",
+          foreground: "hsl(var(--warning-foreground))",
+        },
+        error: {
+          DEFAULT: "hsl(var(--error))",
+          foreground: "hsl(var(--error-foreground))",
+        },
+        info: {
+          DEFAULT: "hsl(var(--info))",
+          foreground: "hsl(var(--info-foreground))",
+        },
         glow: {
           low: "hsl(var(--glow-low))",
           medium: "hsl(var(--glow-medium))",
           high: "hsl(var(--glow-high))"
+        },
+        glass: {
+          bg: "hsl(var(--glass-bg))",
+          border: "hsl(var(--glass-border))",
         },
       },
       borderRadius: {
@@ -299,13 +316,22 @@ const config: Config = {
       const newUtilities = {
         // Premium Glass Effects
         '.glass-effect': {
-          '@apply backdrop-blur-xl bg-white/10 border border-white/20': {},
+          'backdrop-filter': 'blur(24px)',
+          'background-color': 'hsl(var(--glass-bg) / var(--glass-bg-opacity))',
+          'border-width': '1px',
+          'border-color': 'hsl(var(--glass-border) / var(--glass-border-opacity))',
         },
         '.glass-effect-strong': {
-          '@apply backdrop-blur-2xl bg-white/20 border border-white/30': {},
+          'backdrop-filter': 'blur(40px)',
+          'background-color': 'hsl(var(--glass-bg) / var(--glass-strong-bg-opacity))',
+          'border-width': '1px',
+          'border-color': 'hsl(var(--glass-border) / var(--glass-strong-border-opacity))',
         },
         '.glass-effect-dark': {
-          '@apply backdrop-blur-xl bg-black/10 border border-white/10': {},
+          'backdrop-filter': 'blur(24px)',
+          'background-color': 'hsl(var(--glass-bg) / var(--glass-bg-opacity))',
+          'border-width': '1px',
+          'border-color': 'hsl(var(--glass-border) / var(--glass-border-opacity))',
         },
         
         // Interactive Elements

@@ -1,0 +1,38 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Configuration de détection des dépendances circulaires",
+  "description": "Modules critiques à surveiller pour les cycles de dépendances",
+  "criticalModules": [
+    "src/lib/env.ts",
+    "src/lib/logger/index.ts",
+    "src/integrations/supabase/client.ts",
+    "src/lib/ai-monitoring/index.ts",
+    "src/lib/errors/sentry-compat.ts",
+    "src/contexts/ErrorBoundary.tsx",
+    "src/providers/index.tsx",
+    "src/main.tsx"
+  ],
+  "ignorePatterns": [
+    "node_modules/**",
+    "dist/**",
+    "build/**",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/*.spec.ts",
+    "**/*.spec.tsx"
+  ],
+  "rules": {
+    "noLoggerInInit": {
+      "enabled": true,
+      "level": "error",
+      "files": [
+        "src/lib/env.ts",
+        "src/integrations/supabase/client.ts"
+      ]
+    },
+    "noCircularDeps": {
+      "enabled": true,
+      "level": "warning"
+    }
+  }
+}

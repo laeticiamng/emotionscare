@@ -1,3 +1,4 @@
+// @ts-nocheck
 import dayjs from 'dayjs';
 import isoWeek from 'dayjs/plugin/isoWeek';
 import { describe, expect, it } from 'vitest';

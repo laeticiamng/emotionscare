@@ -175,6 +175,7 @@ class PerformanceOptimizer {
   private settings: PerformanceSettings;
   private preloadQueue = new Set<string>();
   private networkQuality: 'slow' | 'fast' = 'fast';
+  private visibilityChangeHandler: (() => void) | null = null;
 
   constructor() {
     this.settings = {
@@ -194,17 +195,17 @@ class PerformanceOptimizer {
     // @ts-ignore - experimental API
     if ('connection' in navigator) {
       // @ts-ignore
-      const connection = navigator.connection;
-      
-      if (connection.effectiveType === '4g' && connection.downlink > 10) {
+      const connection = navigator.connection as any;
+
+      if (connection?.effectiveType === '4g' && connection?.downlink > 10) {
         this.networkQuality = 'fast';
       } else {
         this.networkQuality = 'slow';
       }
-      
+
       logger.info('performance', 'Network quality detected', {
-        effectiveType: connection.effectiveType,
-        downlink: connection.downlink,
+        effectiveType: connection?.effectiveType,
+        downlink: connection?.downlink,
         quality: this.networkQuality,
       });
     }
@@ -212,14 +213,30 @@ class PerformanceOptimizer {
 
   private setupPerformanceMonitoring() {
     // Monitor page visibility for cache optimization
-    document.addEventListener('visibilitychange', () => {
+    this.visibilityChangeHandler = () => {
       if (document.hidden) {
         logger.debug('performance', 'Page hidden - pausing preloading');
         this.preloadQueue.clear();
       } else {
         logger.debug('performance', 'Page visible - resuming optimization');
       }
-    });
+    };
+
+    document.addEventListener('visibilitychange', this.visibilityChangeHandler);
+  }
+
+  /**
+   * Cleanup method to remove event listeners and prevent memory leaks
+   * Should be called when the optimizer is no longer needed
+   */
+  cleanup() {
+    if (this.visibilityChangeHandler) {
+      document.removeEventListener('visibilitychange', this.visibilityChangeHandler);
+      this.visibilityChangeHandler = null;
+    }
+    this.clearCache();
+    this.preloadQueue.clear();
+    logger.info('performance', 'Performance optimizer cleaned up');
   }
 
   // ============= Cache public API =============
@@ -355,7 +372,7 @@ class PerformanceOptimizer {
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting && !loaded && !loading) {
-          this.load();
+          load();
         }
       });
     }, { rootMargin: '50px', ...options });

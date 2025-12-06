@@ -1,0 +1,71 @@
+title: "Fatigue mentale/Burnout → Repos actif"
+emotion: "burnout"
+duration_min: 22
+duration_max: 24
+
+music:
+  bpm: "60–65"
+  mode: "dorian"
+  style: "piano pianosphere"
+  instruments: ["piano", "pads analogiques"]
+  prompt: "Ambient piano 62 BPM, soft analog pads, FR rest/permission lines."
+
+segments:
+  - title: "Permission de repos"
+    start: 0
+    end: 180
+    type: "permission"
+    voiceover: |
+      Tu as le droit de te reposer.
+      Sans culpabiliser. Sans te justifier.
+      Le repos n'est pas une faiblesse.
+    
+  - title: "Engagement valeurs - Moins mais mieux"
+    start: 180
+    end: 420
+    type: "values"
+    voiceover: |
+      Qu'est-ce qui compte vraiment ?
+      Moins mais mieux. Tu choisis tes priorités.
+      Tu poses des limites claires.
+    
+  - title: "Scan corporel profond"
+    start: 420
+    end: 840
+    type: "body_scan"
+    voiceover: |
+      Détends ton front... tes épaules... ton dos.
+      Chaque muscle se relâche.
+      Tu lâches les tensions accumulées.
+    
+  - title: "Déconnexion des to-do"
+    start: 840
+    end: 1080
+    type: "mental_release"
+    voiceover: |
+      Les listes, les tâches, dépose-les.
+      Pas maintenant. Pas ici.
+      Tu te reposes sans culpabiliser.
+    
+  - title: "Cocon et stabilisation"
+    start: 1080
+    end: 1380
+    type: "consolidation"
+    voiceover: |
+      Couverture lourde. Lumière éteinte.
+      Je me repose sans culpabiliser.
+      Mon corps récupère. Mon esprit se répare.
+
+tcm:
+  points: ["SP6", "Yintang"]
+  warnings: ["SP6 contre-indiqué grossesse"]
+  aromatherapy: "Lavande, camomille"
+
+immersion:
+  light: "blackout"
+  sounds: ["silence ou nature très basse"]
+  props: ["couverture lourde"]
+
+affirmations:
+  - "Je me repose sans culpabiliser."
+  - "Le repos nourrit ma force."

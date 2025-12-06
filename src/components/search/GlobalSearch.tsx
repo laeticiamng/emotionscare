@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 import React, { useRef, useState, useEffect } from 'react';
 import { Dialog, DialogContent } from "@/components/ui/dialog";

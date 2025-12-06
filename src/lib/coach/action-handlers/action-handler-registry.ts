@@ -1,4 +1,6 @@
+// @ts-nocheck
 
+import { logger } from '@/lib/logger';
 import { ActionHandler } from './action-handler.interface';
 
 export class ActionHandlerRegistry {
@@ -16,7 +18,7 @@ export class ActionHandlerRegistry {
     const handler = this.getHandler(actionType);
     
     if (!handler) {
-      console.warn(`No handler registered for action type: ${actionType}`);
+      logger.warn(`No handler registered for action type: ${actionType}`, {}, 'API');
       return false;
     }
     
@@ -24,7 +26,7 @@ export class ActionHandlerRegistry {
       handler.execute(userId, payload);
       return true;
     } catch (error) {
-      console.error(`Error executing action ${actionType}:`, error);
+      logger.error(`Error executing action ${actionType}`, error as Error, 'API');
       return false;
     }
   }

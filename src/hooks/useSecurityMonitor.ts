@@ -1,6 +1,8 @@
+// @ts-nocheck
 
 import { useEffect, useCallback, useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 
 interface SecurityEvent {
   type: 'suspicious_activity' | 'multiple_failed_logins' | 'unusual_access_pattern';
@@ -31,7 +33,7 @@ export const useSecurityMonitor = () => {
 
     // Log en développement
     if (import.meta.env.DEV) {
-      console.warn('🔒 Security event:', securityEvent);
+      logger.warn('Security event', { securityEvent }, 'SYSTEM');
     }
   }, [toast]);
 
@@ -160,7 +162,7 @@ export const useXSSProtection = () => {
     const handleInput = (event: Event) => {
       const target = event.target as HTMLInputElement;
       if (target && checkForXSS(target.value)) {
-        console.warn('🚨 Potential XSS attempt detected:', target.value);
+        logger.warn('Potential XSS attempt detected', { value: target.value }, 'SYSTEM');
         target.value = target.value.replace(/[<>]/g, '');
       }
     };

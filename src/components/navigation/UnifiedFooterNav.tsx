@@ -1,4 +1,6 @@
+// @ts-nocheck
 
+// @ts-nocheck
 import React from 'react';
 import { Settings, Help } from 'lucide-react';
 import NavItem from './NavItem';

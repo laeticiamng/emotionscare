@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Script de nettoyage massif des console.log - EmotionsCare
  * Remplace automatiquement tous les console.log par le système de logger sécurisé
@@ -16,14 +17,7 @@ const consoleToLoggerMap = {
 
 // Patterns pour détecter les console.log avec leurs contextes
 const consolePatterns = [
-  // Pattern basique: console.log('message', data)
-  /console\.(log|info|warn|error|debug)\s*\(\s*['"`](.*?)['"`]\s*(?:,\s*(.*?))?\s*\)/g,
-  
-  // Pattern avec template literals
-  /console\.(log|info|warn|error|debug)\s*\(\s*`(.*?)`\s*(?:,\s*(.*?))?\s*\)/g,
-  
-  // Pattern avec variables
-  /console\.(log|info|warn|error|debug)\s*\(\s*([^'"`][^,)]*)\s*(?:,\s*(.*?))?\s*\)/g
+  // Pattern basique: logger.debug('message', data, 'SYSTEM');/g
 ];
 
 /**

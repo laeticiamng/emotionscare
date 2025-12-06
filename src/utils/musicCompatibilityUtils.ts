@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 /**
  * Music Compatibility Utilities

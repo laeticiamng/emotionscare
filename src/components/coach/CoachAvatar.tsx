@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent } from '@/components/ui/card';
@@ -27,10 +26,10 @@ const CoachAvatar: React.FC<CoachAvatarProps> = ({
 
   const getMoodColor = () => {
     switch (mood) {
-      case 'happy': return 'from-green-400 to-blue-500';
-      case 'concerned': return 'from-orange-400 to-red-500';
-      case 'encouraging': return 'from-purple-400 to-pink-500';
-      default: return 'from-blue-400 to-purple-500';
+      case 'happy': return 'from-success to-primary';
+      case 'concerned': return 'from-warning to-destructive';
+      case 'encouraging': return 'from-accent to-destructive';
+      default: return 'from-primary to-accent';
     }
   };
 
@@ -66,18 +65,18 @@ const CoachAvatar: React.FC<CoachAvatarProps> = ({
         >
           {/* Avatar background avec animation */}
           <motion.div
-            className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent"
+            className="absolute inset-0 bg-gradient-to-br from-foreground/20 to-transparent"
             animate={isActive ? { scale: [1, 1.1, 1] } : {}}
             transition={{ duration: 2, repeat: Infinity }}
           />
           
           {/* Icône principale */}
-          <Icon className="h-8 w-8 text-white z-10" />
+          <Icon className="h-8 w-8 text-primary-foreground z-10" />
           
           {/* Indicateur d'activité */}
           {isActive && (
             <motion.div
-              className="absolute -top-1 -right-1 h-4 w-4 bg-green-500 rounded-full border-2 border-white"
+              className="absolute -top-1 -right-1 h-4 w-4 bg-success rounded-full border-2 border-border"
               animate={{ scale: [1, 1.2, 1] }}
               transition={{ duration: 1, repeat: Infinity }}
             />
@@ -95,7 +94,7 @@ const CoachAvatar: React.FC<CoachAvatarProps> = ({
                 {[...Array(3)].map((_, i) => (
                   <motion.div
                     key={i}
-                    className="absolute h-1 w-1 bg-white rounded-full"
+                    className="absolute h-1 w-1 bg-primary-foreground rounded-full"
                     initial={{ 
                       x: Math.random() * 60, 
                       y: Math.random() * 60,

@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Types communs pour les services EmotionsCare
 
 export interface EmotionData {

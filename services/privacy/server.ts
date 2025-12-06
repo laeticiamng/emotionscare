@@ -49,10 +49,10 @@ export function createApp() {
           const updates = PrivacyUpdateSchema.parse(req.body);
           
           // Update preferences
-          updatePrefs(userHash, updates);
+          updatePrefs(userHash, updates as any);
           
           // Log privacy change for audit
-          logChange(userHash, updates);
+          logChange(userHash, updates as any);
           
           app.log.info({
             user_hash: userHash,

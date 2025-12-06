@@ -32,13 +32,15 @@ import {
   Clock,
   Target,
   Smile,
-  Activity
+  Activity,
+  LucideIcon
 } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
 import { Suspense, lazy, useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { withLandingUtm } from "@/lib/utm";
 import { useLazyRender } from "@/hooks/useLazyRender";
+import { logger } from '@/lib/logger';
 
 const Footer = lazy(() => import("@/components/layout/Footer"));
 
@@ -46,8 +48,40 @@ interface UnifiedHomePageProps {
   variant?: 'full' | 'b2c-simple';
 }
 
+interface Feature {
+  icon: LucideIcon;
+  title: string;
+  description: string;
+  color: string;
+  gradient: string;
+  benefits: string[];
+  demo: string;
+}
+
+interface Testimonial {
+  name: string;
+  role: string;
+  company?: string;
+  content: string;
+  rating: number;
+  image?: string;
+}
+
+interface Stat {
+  value: string;
+  label: string;
+  icon: LucideIcon;
+}
+
+interface UseCase {
+  icon: LucideIcon;
+  title: string;
+  description: string;
+  color: string;
+}
+
 export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePageProps) {
-  console.log('[UnifiedHomePage] Starting render with variant:', variant);
+  logger.debug('[UnifiedHomePage] Starting render', { variant }, 'UI');
   
   // Initialiser les hooks et variables en dehors du try-catch
   const [searchParams] = useSearchParams();
@@ -59,11 +93,11 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
   const testimonialsSection = useLazyRender<HTMLElement>({ rootMargin: '200px' });
   const finalCtaSection = useLazyRender<HTMLElement>({ rootMargin: '200px' });
   
-  console.log('[UnifiedHomePage] Hooks initialized successfully');
+  logger.debug('[UnifiedHomePage] Hooks initialized successfully', undefined, 'UI');
   
   // Détection automatique du variant depuis les params
   const detectedVariant = searchParams.get('variant') === 'simple' ? 'b2c-simple' : variant;
-  console.log('[UnifiedHomePage] Detected variant:', detectedVariant);
+  logger.debug('[UnifiedHomePage] Detected variant', { detectedVariant }, 'UI');
 
   const heroHeadingId = detectedVariant === 'b2c-simple' ? 'b2c-home-hero-title' : 'homepage-hero-title';
 
@@ -137,6 +171,7 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
       name: "Sarah M.",
       role: "Cadre supérieure",
       avatar: "/images/avatar-sarah.jpg",
+      avatarAlt: "Photo de profil de Sarah M., cadre supérieure",
       rating: 5,
       text: "EmotionsCare a transformé ma gestion du stress. Le coach IA Nyvée m'aide quotidiennement à maintenir mon équilibre émotionnel.",
       highlight: "Transformation complète",
@@ -145,7 +180,8 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
     {
       name: "Marc D.",
       role: "Entrepreneur",
-      avatar: "/images/avatar-marc.jpg", 
+      avatar: "/images/avatar-marc.jpg",
+      avatarAlt: "Photo de profil de Marc D., entrepreneur",
       rating: 5,
       text: "L'analyse faciale en temps réel me permet d'adapter mes présentations. Un avantage concurrentiel incroyable.",
       highlight: "Avantage concurrentiel",
@@ -155,6 +191,7 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
       name: "Lisa K.",
       role: "Psychologue",
       avatar: "/images/avatar-lisa.jpg",
+      avatarAlt: "Photo de profil de Lisa K., psychologue",
       rating: 5,
       text: "J'utilise EmotionsCare avec mes patients. Les insights IA complètent parfaitement mes analyses cliniques.",
       highlight: "Outil professionnel",
@@ -205,7 +242,7 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
 
   // Version B2C Simple (comme HomeB2CPage)
   if (detectedVariant === 'b2c-simple') {
-    console.log('[UnifiedHomePage] Rendering B2C simple variant');
+    logger.debug('[UnifiedHomePage] Rendering B2C simple variant', undefined, 'UI');
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50" data-testid="page-root">
         {/* Header */}
@@ -372,7 +409,7 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
   }
 
   // Version Full Marketing (comme HomePage original)
-  console.log('[UnifiedHomePage] Rendering full marketing variant');
+  logger.debug('[UnifiedHomePage] Rendering full marketing variant', undefined, 'UI');
   return (
     <div className="min-h-screen bg-background" data-testid="page-root">
       <Header />
@@ -756,9 +793,25 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
                   className="bg-gradient-to-br from-primary/5 to-primary/10 rounded-3xl p-8 lg:p-12"
                 >
                   <div className="text-center space-y-6">
-                    <div className="flex justify-center space-x-1 mb-6">
+                    {/* Avatar */}
+                    <div className="flex justify-center mb-4">
+                      <img
+                        src={testimonials[currentTestimonial].avatar}
+                        alt={testimonials[currentTestimonial].avatarAlt}
+                        className="w-20 h-20 rounded-full object-cover border-4 border-primary/20"
+                        loading="lazy"
+                        onError={(e) => {
+                          // Fallback avec placeholder
+                          const target = e.currentTarget;
+                          target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="80" height="80"%3E%3Crect fill="%23ddd" width="80" height="80"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-size="32"%3E👤%3C/text%3E%3C/svg%3E';
+                          target.onerror = null;
+                        }}
+                      />
+                    </div>
+
+                    <div className="flex justify-center space-x-1 mb-6" aria-label={`Note: ${testimonials[currentTestimonial].rating} étoiles sur 5`}>
                       {Array.from({ length: testimonials[currentTestimonial].rating }).map((_, i) => (
-                        <Star key={i} className="h-6 w-6 fill-yellow-400 text-yellow-400" />
+                        <Star key={i} className="h-6 w-6 fill-yellow-400 text-yellow-400" aria-hidden="true" />
                       ))}
                     </div>
 

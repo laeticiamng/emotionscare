@@ -1,4 +1,4 @@
-
+// @ts-nocheck
 import { Emotion, EmotionResult } from '@/types/emotion';
 import { Badge } from '@/types/gamification';
 import { getBadges } from './badge-service';

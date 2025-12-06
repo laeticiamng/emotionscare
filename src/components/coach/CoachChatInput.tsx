@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { SendHorizontal, Mic, Paperclip, Smile } from 'lucide-react';

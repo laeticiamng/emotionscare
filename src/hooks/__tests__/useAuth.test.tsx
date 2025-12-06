@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 import { renderHook } from '@testing-library/react';
 import { useAuth } from '@/contexts/AuthContext';

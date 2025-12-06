@@ -9,6 +9,7 @@ import { Heart, Brain, Lightbulb, Users, Zap, MessageCircle, Send, Sparkles } fr
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { logger } from '@/lib/logger';
 
 interface Message {
   id: string;
@@ -124,7 +125,7 @@ const EmpathicAICoach: React.FC = () => {
         context: data.emotional_keywords || []
       };
     } catch (error) {
-      console.error('Error detecting emotion:', error);
+      logger.error('Error detecting emotion:', error);
       return { emotion: 'neutral', intensity: 0.5, context: [] };
     }
   }, []);
@@ -165,7 +166,7 @@ const EmpathicAICoach: React.FC = () => {
         nextQuestions: data.next_questions || []
       };
     } catch (error) {
-      console.error('Error generating response:', error);
+      logger.error('Error generating response:', error);
       throw error;
     }
   }, [messages]);
@@ -223,7 +224,7 @@ const EmpathicAICoach: React.FC = () => {
       });
 
     } catch (error) {
-      console.error('Error sending message:', error);
+      logger.error('Error sending message:', error);
       toast({
         title: "Erreur",
         description: "Impossible d'envoyer le message",
@@ -273,7 +274,7 @@ const EmpathicAICoach: React.FC = () => {
 
       setMessages([openingMessage]);
     } catch (error) {
-      console.error('Error starting conversation:', error);
+      logger.error('Error starting conversation:', error);
     }
   }, [selectedPersonality, personalities, conversationContext]);
 

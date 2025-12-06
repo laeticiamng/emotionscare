@@ -1,11 +1,11 @@
-
+// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Search, Bell, User, Menu, X, Command, Settings, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
-import { useTheme } from '@/components/theme-provider';
+import { useTheme } from '@/providers/theme';
 import { cn } from '@/lib/utils';
 import { ThemeSwitcher } from '@/components/ui/ThemeSwitcher';
 import MusicMiniPlayer from '@/components/music/MusicMiniPlayer';

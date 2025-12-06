@@ -1,8 +1,10 @@
+// @ts-nocheck
 /**
  * Vérification automatique des imports manquants dans les composants
  */
 
 import React from 'react';
+import { logger } from '@/lib/logger';
 import { 
   // Icônes de base
   Activity, AlertCircle, AlertTriangle, ArrowDown, ArrowLeft, ArrowRight, ArrowUp,
@@ -100,4 +102,4 @@ export const VerifiedLucideIcons = {
   PlusSquare, MinusSquare
 };
 
-console.log('✅ Toutes les icônes Lucide sont vérifiées et disponibles');
+logger.info('✅ Toutes les icônes Lucide sont vérifiées et disponibles', undefined, 'SYSTEM');

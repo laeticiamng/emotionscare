@@ -1,5 +1,5 @@
-
 import React, { useState } from 'react';
+import { logger } from '@/lib/logger';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Mic, Music, Loader2 } from 'lucide-react';
@@ -42,7 +42,7 @@ const EmotionBasedMusicSelector: React.FC = () => {
           await handleGenerateMusic(randomEmotion);
           
         } catch (error) {
-          console.error('Error analyzing emotion:', error);
+          logger.error('Error analyzing emotion', error as Error, 'MUSIC');
           toast.error('Failed to analyze emotion');
         }
         
@@ -50,7 +50,7 @@ const EmotionBasedMusicSelector: React.FC = () => {
       }, 5000);
       
     } catch (error) {
-      console.error('Error accessing microphone:', error);
+      logger.error('Error accessing microphone', error as Error, 'MUSIC');
       toast.error('Unable to access microphone');
       setIsAnalyzing(false);
     }
@@ -65,7 +65,7 @@ const EmotionBasedMusicSelector: React.FC = () => {
         await playTrack(track);
       }
     } catch (error) {
-      console.error('Error generating music:', error);
+      logger.error('Error generating music', error as Error, 'MUSIC');
       toast.error('Failed to generate music');
     }
   };

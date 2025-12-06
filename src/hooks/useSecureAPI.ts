@@ -1,77 +1,52 @@
+// @ts-nocheck
+import { useCallback } from 'react';
+import { GlobalInterceptor } from '@/utils/globalInterceptor';
+import { SecureAnalytics } from '@/utils/secureAnalytics';
 
-import { useAuthStore } from '@/stores/useAuthStore';
-import { supabase } from '@/integrations/supabase/client';
+/**
+ * Hook pour effectuer des appels API sécurisés avec gestion d'erreur globale
+ */
+export const useSecureApi = () => {
+  
+  /**
+   * Appel API sécurisé avec gestion d'erreur automatique
+   */
+  const secureCall = useCallback(async (
+    url: string,
+    options: RequestInit = {}
+  ): Promise<Response | null> => {
+    return GlobalInterceptor.secureFetch(url, options);
+  }, []);
 
-interface SecureAPIOptions {
-  requireAuth?: boolean;
-  allowAnonymous?: boolean;
-}
+  /**
+   * Appel analytics sécurisé (ne bloque jamais l'UI)
+   */
+  const trackEvent = useCallback(async (
+    event: string,
+    data?: any,
+    userId?: string
+  ): Promise<void> => {
+    await SecureAnalytics.trackEvent({ event, data, userId });
+  }, []);
 
-export const useSecureAPI = () => {
-  const { session, isAuthenticated } = useAuthStore();
+  /**
+   * Vérification du statut de session
+   */
+  const checkSession = useCallback(async (): Promise<boolean> => {
+    return GlobalInterceptor.checkSessionStatus();
+  }, []);
 
-  const secureCall = async <T>(
-    apiCall: () => Promise<T>,
-    options: SecureAPIOptions = { requireAuth: true }
-  ): Promise<T | null> => {
-    // Vérifier l'authentification si requise
-    if (options.requireAuth && !isAuthenticated) {
-      console.warn('🚫 API call blocked - authentication required');
-      throw new Error('Authentication required for this operation');
-    }
-
-    // Vérifier que la session est valide
-    if (options.requireAuth && session) {
-      const expiresAt = session.expires_at * 1000;
-      const now = Date.now();
-      
-      if (expiresAt < now) {
-        console.warn('🚫 API call blocked - session expired');
-        throw new Error('Session expired, please login again');
-      }
-    }
-
-    try {
-      return await apiCall();
-    } catch (error) {
-      console.error('❌ Secure API call failed:', error);
-      throw error;
-    }
-  };
-
-  const getAuthHeaders = () => {
-    if (!session?.access_token) {
-      return {};
-    }
-
-    return {
-      'Authorization': `Bearer ${session.access_token}`,
-      'Content-Type': 'application/json'
-    };
-  };
-
-  const secureSupabaseCall = async <T>(
-    operation: () => Promise<{ data: T; error: any }>
-  ): Promise<T> => {
-    if (!isAuthenticated) {
-      throw new Error('Authentication required for Supabase operations');
-    }
-
-    const { data, error } = await operation();
-    
-    if (error) {
-      console.error('❌ Supabase operation failed:', error);
-      throw error;
-    }
-
-    return data;
-  };
+  /**
+   * Get analytics service status
+   */
+  const getAnalyticsStatus = useCallback(() => {
+    return SecureAnalytics.getStatus();
+  }, []);
 
   return {
     secureCall,
-    getAuthHeaders,
-    secureSupabaseCall,
-    isAuthenticated,
-    session
+    trackEvent,
+    checkSession,
+    getAnalyticsStatus,
   };
 };

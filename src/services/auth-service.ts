@@ -1,10 +1,10 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { User, UserRole } from '@/types/user';
 import { UserPreferences } from '@/types/preferences';
 import { normalizeUserMode } from '@/utils/userModeHelpers';
 import { isLoginLocked, recordLoginAttempt } from '@/utils/security';
 import { AuthError, AuthErrorCode } from '@/utils/authErrors';
+import { logger } from '@/lib/logger';
 
 // Helper to persist the user role in a secure cookie
 const setRoleCookie = (role: UserRole) => {
@@ -69,24 +69,26 @@ export const authService = {
       }
       
       // Transformer la réponse Supabase en User
+      const validRole = (normalizedRole === 'b2b' || normalizedRole === 'b2c') ? normalizedRole : 'b2c';
+      const validLanguage = (preferences.language === 'en' || preferences.language === 'fr') ? preferences.language : 'fr';
+      
       const user: User = {
         id: data.user.id,
         email: data.user.email || email,
         name: name || email.split('@')[0],
-        role: normalizedRole,
-        created_at: data.user.created_at,
+        role: validRole,
+        createdAt: data.user.created_at,
         preferences: {
           theme: 'system',
-          language: 'fr',
-          ...preferences,
+          language: validLanguage,
         }
       };
       setRoleCookie(user.role);
 
       return { user, error: null };
-    } catch (error: any) {
-      console.error('Error signing up:', error);
-      return { user: null, error };
+    } catch (error: unknown) {
+      logger.error('Error signing up', error as Error, 'AUTH');
+      return { user: null, error: error as Error };
     }
   },
   
@@ -132,12 +134,15 @@ export const authService = {
         .single();
       
       // Transformer la réponse Supabase en User
+      const rawRole = profileData?.role || data.user.user_metadata?.role || 'b2c';
+      const validRole = (rawRole === 'b2b' || rawRole === 'b2c') ? rawRole : 'b2c';
+      
       const user: User = {
         id: data.user.id,
         email: data.user.email || email,
         name: profileData?.name || data.user.user_metadata?.name || email.split('@')[0],
-        role: (profileData?.role || data.user.user_metadata?.role || 'b2c') as UserRole,
-        created_at: data.user.created_at,
+        role: validRole,
+        createdAt: data.user.created_at,
         preferences: {
           theme: 'system',
           language: 'fr',
@@ -148,9 +153,9 @@ export const authService = {
       recordLoginAttempt(email, true);
       setRoleCookie(user.role);
       return { user, error: null };
-    } catch (error: any) {
-      console.error('Error signing in:', error);
-      return { user: null, error };
+    } catch (error: unknown) {
+      logger.error('Error signing in', error as Error, 'AUTH');
+      return { user: null, error: error as Error };
     }
   },
   
@@ -163,9 +168,9 @@ export const authService = {
       if (error) throw error;
       clearRoleCookie();
       return { error: null };
-    } catch (error: any) {
-      console.error('Error signing out:', error);
-      return { error };
+    } catch (error: unknown) {
+      logger.error('Error signing out', error as Error, 'AUTH');
+      return { error: error as Error };
     }
   },
   
@@ -188,12 +193,15 @@ export const authService = {
         .eq('id', data.session.user.id)
         .single();
       
+      const rawRole = profileData?.role || data.session.user.user_metadata?.role || 'b2c';
+      const validRole = (rawRole === 'b2b' || rawRole === 'b2c') ? rawRole : 'b2c';
+      
       const user: User = {
         id: data.session.user.id,
         email: data.session.user.email || '',
         name: profileData?.name || data.session.user.user_metadata?.name || '',
-        role: (profileData?.role || data.session.user.user_metadata?.role || 'b2c') as UserRole,
-        created_at: data.session.user.created_at,
+        role: validRole,
+        createdAt: data.session.user.created_at,
         preferences: {
           theme: 'system',
           language: 'fr',
@@ -202,9 +210,9 @@ export const authService = {
       };
       
       return { user, error: null };
-    } catch (error: any) {
-      console.error('Error getting current user:', error);
-      return { user: null, error };
+    } catch (error: unknown) {
+      logger.error('Error getting current user', error as Error, 'AUTH');
+      return { user: null, error: error as Error };
     }
   },
   
@@ -238,9 +246,9 @@ export const authService = {
       if (profileUpdateError) throw profileUpdateError;
       
       return { success: true, error: null };
-    } catch (error: any) {
-      console.error('Error updating user profile:', error);
-      return { success: false, error };
+    } catch (error: unknown) {
+      logger.error('Error updating user profile', error as Error, 'AUTH');
+      return { success: false, error: error as Error };
     }
   },
   
@@ -285,9 +293,9 @@ export const authService = {
       if (profileUpdateError) throw profileUpdateError;
       
       return { success: true, error: null };
-    } catch (error: any) {
-      console.error('Error updating user preferences:', error);
-      return { success: false, error };
+    } catch (error: unknown) {
+      logger.error('Error updating user preferences', error as Error, 'AUTH');
+      return { success: false, error: error as Error };
     }
   },
   
@@ -302,9 +310,9 @@ export const authService = {
 
       if (error) throw error;
       return { success: true, error: null };
-    } catch (error: any) {
-      console.error('Error resetting password:', error);
-      return { success: false, error };
+    } catch (error: unknown) {
+      logger.error('Error resetting password', error as Error, 'AUTH');
+      return { success: false, error: error as Error };
     }
   },
 
@@ -322,9 +330,65 @@ export const authService = {
 
       if (error) throw error;
       return { success: true, error: null };
-    } catch (error: any) {
-      console.error('Error sending magic link:', error);
-      return { success: false, error };
+    } catch (error: unknown) {
+      logger.error('Error sending magic link', error as Error, 'AUTH');
+      return { success: false, error: error as Error };
+    }
+  },
+
+  /**
+   * Connexion SSO via tokens (access_token + refresh_token)
+   * Utilisé pour le SSO depuis Med MNG
+   */
+  async signInWithTokens(accessToken: string, refreshToken?: string): Promise<AuthResponse> {
+    try {
+      // Établir la session avec les tokens fournis
+      const { data, error } = await supabase.auth.setSession({
+        access_token: accessToken,
+        refresh_token: refreshToken || '',
+      });
+
+      if (error) {
+        logger.error('Error setting session with tokens', error, 'AUTH_SSO');
+        throw new AuthError(AuthErrorCode.INVALID_CREDENTIALS, 'Session invalide ou expirée');
+      }
+
+      if (!data.session?.user) {
+        return {
+          user: null,
+          error: new AuthError(AuthErrorCode.UNKNOWN, 'No session data returned')
+        };
+      }
+
+      // Récupérer le profil complet depuis la table profiles
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', data.session.user.id)
+        .single();
+
+      const rawRole = profileData?.role || data.session.user.user_metadata?.role || 'b2c';
+      const validRole = (rawRole === 'b2b' || rawRole === 'b2c') ? rawRole : 'b2c';
+
+      const user: User = {
+        id: data.session.user.id,
+        email: data.session.user.email || '',
+        name: profileData?.name || data.session.user.user_metadata?.name || '',
+        role: validRole,
+        createdAt: data.session.user.created_at,
+        preferences: {
+          theme: 'system',
+          language: 'fr',
+          ...(profileData?.preferences || data.session.user.user_metadata?.preferences || {}),
+        }
+      };
+
+      setRoleCookie(user.role);
+      logger.info('SSO login successful', 'AUTH_SSO');
+      return { user, error: null };
+    } catch (error: unknown) {
+      logger.error('Error signing in with tokens', error as Error, 'AUTH_SSO');
+      return { user: null, error: error as Error };
     }
   },
 };

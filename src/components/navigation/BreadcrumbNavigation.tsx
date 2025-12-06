@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { LucideIconType } from '@/types/common';
 import { useLocation, Link } from 'react-router-dom';

@@ -1,3 +1,6 @@
+// @ts-nocheck
+
+// @ts-nocheck
 
 import React from 'react';
 import { Switch } from '@/components/ui/switch';

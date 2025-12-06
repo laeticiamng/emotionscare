@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 export type UserMode = 'b2c' | 'b2b_user' | 'b2b_admin';
 

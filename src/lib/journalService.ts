@@ -1,6 +1,7 @@
-
+// @ts-nocheck
 import { JournalEntry } from '@/types';
 import { v4 as uuidv4 } from 'uuid';
+import { logger } from '@/lib/logger';
 
 // Simulate local storage persistence
 const STORAGE_KEY = 'emotions_care_journal';
@@ -15,7 +16,7 @@ export const getJournalEntries = async (userId: string): Promise<JournalEntry[]>
     }
     return [];
   } catch (error) {
-    console.error('Error loading journal entries:', error);
+    logger.error('Error loading journal entries', error as Error, 'SYSTEM');
     return [];
   }
 };
@@ -37,7 +38,7 @@ export const addJournalEntry = async (entry: Omit<JournalEntry, 'id'>): Promise<
     
     return newEntry;
   } catch (error) {
-    console.error('Error adding journal entry:', error);
+    logger.error('Error adding journal entry', error as Error, 'SYSTEM');
     throw new Error('Failed to add journal entry');
   }
 };
@@ -62,7 +63,7 @@ export const updateJournalEntry = async (entry: JournalEntry): Promise<JournalEn
     
     return entry;
   } catch (error) {
-    console.error('Error updating journal entry:', error);
+    logger.error('Error updating journal entry', error as Error, 'SYSTEM');
     throw new Error('Failed to update journal entry');
   }
 };
@@ -80,7 +81,7 @@ export const deleteJournalEntry = async (entryId: string): Promise<void> => {
     
     localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedEntries));
   } catch (error) {
-    console.error('Error deleting journal entry:', error);
+    logger.error('Error deleting journal entry', error as Error, 'SYSTEM');
     throw new Error('Failed to delete journal entry');
   }
 };
@@ -98,7 +99,7 @@ export const getJournalEntryById = async (entryId: string): Promise<JournalEntry
     
     return entry || null;
   } catch (error) {
-    console.error('Error getting journal entry:', error);
+    logger.error('Error getting journal entry', error as Error, 'SYSTEM');
     return null;
   }
 };

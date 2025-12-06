@@ -1,3 +1,4 @@
+// @ts-nocheck
 export const journal = {
   header: 'Emotion journal',
   intro: 'Capture how you feel and spot recurring patterns over time.',

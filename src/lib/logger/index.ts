@@ -3,8 +3,8 @@
  * Système de logging unifié avec niveaux et contexte
  */
 
-export type LogLevel = 'debug' | 'info' | 'warn' | 'error' | 'critical'
-export type LogContext = 'AUTH' | 'API' | 'UI' | 'SCAN' | 'VR' | 'MUSIC' | 'ANALYTICS' | 'SYSTEM'
+export type LogLevel = 'debug' | 'info' | 'warn' | 'error' | 'critical';
+export type LogContext = 'AUTH' | 'API' | 'UI' | 'SCAN' | 'VR' | 'MUSIC' | 'ANALYTICS' | 'SYSTEM' | 'ERROR_BOUNDARY' | 'SESSION' | 'CONSENT' | 'SOCIAL' | 'NYVEE' | 'WHO5' | 'STAI6' | 'BREATH' | 'FLASH' | 'MIXER' | 'SCORES' | 'COACH';
 
 export interface LogEntry {
   timestamp: string
@@ -46,47 +46,26 @@ class Logger {
 
   error(message: string, error?: Error | any, context: LogContext = 'SYSTEM'): void {
     console.error(`[${context}] ${message}`, error || '')
+    
+    // En production, on pourrait envoyer à un service de monitoring
+    if (!this.isDevelopment && error instanceof Error) {
+      // TODO: Envoyer à Sentry, LogRocket, etc.
+    }
   }
 
   critical(message: string, error?: Error | any, context: LogContext = 'SYSTEM'): void {
-    console.error(`[CRITICAL] [${context}] ${message}`, error || '')
+    console.error(`[${context}] CRITICAL: ${message}`, error || '')
+    
+    // En production, alert immédiate
+    if (!this.isDevelopment) {
+      // TODO: Alert système critique
+    }
+  }
+
+  getSessionId(): string {
+    return this.sessionId
   }
 }
 
-// Instance singleton
 export const logger = new Logger()
-
-// Hook React pour utiliser le logger
-import { useCallback } from 'react'
-
-export function useLogger() {
-  const logDebug = useCallback((message: string, data?: any, context: LogContext = 'UI') => {
-    logger.debug(message, data, context)
-  }, [])
-
-  const logInfo = useCallback((message: string, data?: any, context: LogContext = 'UI') => {
-    logger.info(message, data, context)
-  }, [])
-
-  const logWarn = useCallback((message: string, data?: any, context: LogContext = 'UI') => {
-    logger.warn(message, data, context)
-  }, [])
-
-  const logError = useCallback((message: string, error?: Error | any, context: LogContext = 'UI') => {
-    logger.error(message, error, context)
-  }, [])
-
-  const logCritical = useCallback((message: string, error?: Error | any, context: LogContext = 'UI') => {
-    logger.critical(message, error, context)
-  }, [])
-
-  return {
-    debug: logDebug,
-    info: logInfo,
-    warn: logWarn,
-    error: logError,
-    critical: logCritical
-  }
-}
-
 export default logger

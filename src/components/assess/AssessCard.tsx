@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { AlertCircle, Clock, CheckCircle2 } from 'lucide-react';
-import type { Instrument } from '../../../../packages/contracts/assess';
+import type { Instrument } from './types';
 
 interface AssessCardProps {
   instrument: Instrument;
@@ -64,6 +64,8 @@ export function AssessCard({
 
   const handleOptIn = () => {
     setHasOptedIn(true);
+    // Démarrer immédiatement l'évaluation après l'opt-in
+    onStart();
   };
 
   const handleStart = () => {

@@ -66,6 +66,25 @@ Stockage du contenu complet d'une situation d'enseignement numérique.
 ### emotions
 Journal des émotions d'un utilisateur (texte, score, audio, etc.).
 
+### clinical_signals
+Stockage des signaux cliniques émotionnels capturés par différents instruments.
+- **id** : identifiant primaire
+- **user_id** : utilisateur concerné
+- **source_instrument** : source du signal (scan_camera, SAM, scan_sliders)
+- **domain** : domaine du signal (emotional)
+- **level** : niveau d'intensité (0-4)
+- **window_type** : type de fenêtre temporelle (instant, session)
+- **module_context** : contexte du module (scan, assess)
+- **metadata** : données JSON (valence, arousal, emotion, confidence, summary)
+- **created_at** : date de création
+- **expires_at** : date d'expiration
+
+Utilisé pour :
+- Historique émotionnel personnel de chaque utilisateur
+- Génération de micro-gestes personnalisés via IA
+- Génération musicale basée sur l'historique émotionnel
+- Analyse des tendances émotionnelles
+
 ### groups
 - **id** : identifiant du groupe
 - **name** : nom du groupe

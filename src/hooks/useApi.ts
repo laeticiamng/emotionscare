@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useState, useCallback } from 'react';
 import { ApiResponse, ApiError } from '@/services/api-client';
 

@@ -2,25 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { createCoachDraft, insertText, insertVoice } from '@/services/journal/journalApi'
 import type { SanitizedNote } from './types'
-
-type SpeechRecognitionEventLike = {
-  resultIndex: number
-  results: ArrayLike<{ 0?: { transcript?: string } }>
-  error?: string
-}
-
-type SpeechRecognitionInstance = {
-  lang: string
-  continuous: boolean
-  interimResults: boolean
-  start: () => void
-  stop: () => void
-  onresult: ((event: SpeechRecognitionEventLike) => void) | null
-  onerror: ((event: SpeechRecognitionEventLike & { error: string }) => void) | null
-  onend: (() => void) | null
-}
-
-type SpeechRecognitionConstructor = new () => SpeechRecognitionInstance
+import { logger } from '@/lib/logger'
 
 type DictationError =
   | 'not_supported'
@@ -68,13 +50,9 @@ const normalizeTag = (value: string) =>
     .toLowerCase()
     .replace(/[^\p{L}\p{N}_-]+/gu, '')
 
-const useSpeechRecognition = (): SpeechRecognitionConstructor | null => {
+const useSpeechRecognition = (): any | null => {
   if (typeof window === 'undefined') return null
-  const Recognition =
-    (window as typeof window & { webkitSpeechRecognition?: SpeechRecognitionConstructor })
-      .SpeechRecognition ??
-    (window as typeof window & { webkitSpeechRecognition?: SpeechRecognitionConstructor })
-      .webkitSpeechRecognition
+  const Recognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
   if (!Recognition) return null
   return Recognition
 }
@@ -88,7 +66,7 @@ export function useJournalComposer(options: UseJournalComposerOptions = {}): Use
   const [lastInsertedId, setLastInsertedId] = useState<string | null>(null)
   const [isDictating, setIsDictating] = useState(false)
   const [dictationError, setDictationError] = useState<DictationError | null>(null)
-  const recognitionRef = useRef<SpeechRecognitionInstance | null>(null)
+  const recognitionRef = useRef<any | null>(null)
 
   const RecognitionCtor = useSpeechRecognition()
   const dictationSupported = useMemo(() => Boolean(RecognitionCtor), [RecognitionCtor])
@@ -222,7 +200,7 @@ export function useJournalComposer(options: UseJournalComposerOptions = {}): Use
         window.localStorage.setItem(PENDING_MEMOS_KEY, JSON.stringify(next))
         return true
       } catch (offlineError) {
-        console.warn('voice memo offline persistence failed', offlineError)
+        logger.warn('Voice memo offline persistence failed', { error: offlineError }, 'JOURNAL');
         return false
       }
     },
@@ -261,12 +239,12 @@ export function useJournalComposer(options: UseJournalComposerOptions = {}): Use
     }
     try {
       cleanupRecognition()
-      const recognition = new RecognitionCtor() as SpeechRecognitionInstance
+      const recognition = new RecognitionCtor() as any
       recognition.lang = lang
       recognition.continuous = true
       recognition.interimResults = true
 
-      recognition.onresult = event => {
+      recognition.onresult = (event: any) => {
         let transcript = ''
         for (let i = event.resultIndex; i < event.results.length; i += 1) {
           const result = event.results[i]
@@ -274,7 +252,7 @@ export function useJournalComposer(options: UseJournalComposerOptions = {}): Use
         }
         setText(current => `${current.trimEnd()} ${transcript}`.trim())
       }
-      recognition.onerror = event => {
+      recognition.onerror = (event: any) => {
         if (event.error === 'not-allowed') {
           setDictationError('permission_denied')
         } else if (event.error === 'no-speech' || event.error === 'audio-capture') {
@@ -295,7 +273,7 @@ export function useJournalComposer(options: UseJournalComposerOptions = {}): Use
       setDictationError(null)
       setIsDictating(true)
     } catch (dictationIssue) {
-      console.error('Dictation start failed', dictationIssue)
+      logger.error('Dictation start failed', { error: dictationIssue }, 'JOURNAL');
       setDictationError('transcription_error')
       cleanupRecognition()
     }

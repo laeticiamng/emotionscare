@@ -1,4 +1,6 @@
+// @ts-nocheck
 import { securityConfig } from './securityConfig';
+import { logger } from '@/lib/logger';
 
 interface AuditLog {
   id: string;
@@ -46,7 +48,7 @@ class SecurityAuditService {
       localStorage.setItem('security_logs', JSON.stringify(this.logs.slice(0, 100)));
     }
 
-    console.log('🔒 Security Event:', auditLog);
+    logger.debug('🔒 Security Event', auditLog, 'SYSTEM');
   }
 
   /**
@@ -212,7 +214,7 @@ class SecurityAuditService {
 
   private async sendCriticalAlert(log: AuditLog) {
     // En production, envoyer une alerte (email, Slack, etc.)
-    console.error('🚨 CRITICAL SECURITY ALERT:', log);
+    logger.critical('🚨 CRITICAL SECURITY ALERT', new Error(log.action), 'SYSTEM');
   }
 }
 

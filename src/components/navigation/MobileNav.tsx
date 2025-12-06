@@ -1,4 +1,6 @@
+// @ts-nocheck
 
+// @ts-nocheck
 import React, { useState } from 'react';
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';

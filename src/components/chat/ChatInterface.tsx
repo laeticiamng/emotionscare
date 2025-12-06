@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef } from 'react';
 import useChat from '@/hooks/useChat';
 import { ChatMessage } from '@/types/chat';
@@ -82,7 +81,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     <Card className={`flex flex-col h-[600px] ${className}`}>
       <ScrollArea className="flex-1 p-4" ref={scrollAreaRef}>
         <div className="space-y-4">
-          {messages.map((message) => (
+          {messages.map((message: ChatMessage) => (
             <ChatMessageItem key={message.id} message={message} />
           ))}
           {messages.length === 0 && (

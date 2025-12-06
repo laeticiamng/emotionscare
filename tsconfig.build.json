@@ -1,0 +1,43 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "composite": false,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "strict": false,
+    "noImplicitAny": false,
+    "strictNullChecks": false
+  },
+  "include": [
+    "./src/features/nyvee/**/*.ts",
+    "./src/features/nyvee/**/*.tsx",
+    "./src/pages/B2CNyveeCoconPage.tsx"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "scripts/**/*",
+    "services/**/*",
+    "src/components/admin/**/*",
+    "src/components/ambition/**/*",
+    "src/components/ambition-arcade/**/*",
+    "src/components/ar/**/*",
+    "src/components/assess/**/*",
+    "src/components/audio/**/*",
+    "src/components/audit/**/*",
+    "src/components/access/**/*",
+    "src/components/accessibility/**/*",
+    "src/components/account/**/*",
+    "src/components/activity/**/*",
+    "src/components/ApiStatus.tsx",
+    "src/components/AppSidebar.tsx",
+    "src/components/ConsentBanner.tsx",
+    "src/components/SessionTimeoutAlert.tsx",
+    "src/hooks/**/*",
+    "src/lib/**/*",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/*.spec.ts",
+    "**/*.spec.tsx"
+  ]
+}

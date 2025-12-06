@@ -1,24 +1,48 @@
 import { useEffect } from 'react';
-import * as Sentry from '@sentry/react';
+import { captureException } from '@/lib/ai-monitoring';
+import { Sentry } from '@/lib/errors/sentry-compat';
 import { CoachView } from '@/modules/coach/CoachView';
 import { ConsentGate } from '@/features/clinical-optin/ConsentGate';
+import { MedicalDisclaimerDialog, useMedicalDisclaimer } from '@/components/medical/MedicalDisclaimerDialog';
+import { usePageSEO } from '@/hooks/usePageSEO';
 
 const B2CAICoachPage = () => {
+  usePageSEO({
+    title: 'Coach IA Émotionnel - Conseils personnalisés',
+    description: 'Discutez avec votre coach émotionnel IA 24/7. Conseils bien-être, gestion du stress, développement personnel avec intelligence artificielle.',
+    keywords: 'coach IA, intelligence émotionnelle, conseils bien-être, développement personnel'
+  });
+
+  const {
+    showDisclaimer,
+    isAccepted,
+    handleAccept,
+    handleDecline,
+  } = useMedicalDisclaimer('ai_coach');
+
   useEffect(() => {
     const client = Sentry.getCurrentHub().getClient();
     if (client) {
-      Sentry.configureScope(scope => {
+      Sentry.configureScope((scope: any) => {
         scope.setTag('coach_entry', 'b2c');
       });
     }
   }, []);
 
   return (
-    <ConsentGate>
-      <div className="min-h-screen bg-slate-100 dark:bg-slate-950">
-        <CoachView initialMode="b2c" />
-      </div>
-    </ConsentGate>
+    <div className="min-h-screen bg-slate-100 dark:bg-slate-950" data-testid="page-root">
+      <MedicalDisclaimerDialog
+        open={showDisclaimer}
+        onAccept={handleAccept}
+        onDecline={handleDecline}
+        feature="ai_coach"
+      />
+      {isAccepted && (
+        <ConsentGate>
+          <CoachView initialMode="b2c" />
+        </ConsentGate>
+      )}
+    </div>
   );
 };
 

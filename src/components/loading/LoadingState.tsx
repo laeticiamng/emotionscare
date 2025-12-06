@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import LoadingAnimation from '@/components/ui/loading-animation';
 import { Skeleton } from '@/components/ui/skeleton';

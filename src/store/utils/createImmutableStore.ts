@@ -1,4 +1,5 @@
 import type { StateCreator, StoreApi } from 'zustand';
+import { logger } from '@/lib/logger';
 
 type ImmutableSet<T extends object> = (
   partial: Partial<T> | ((state: T) => Partial<T>),
@@ -59,9 +60,9 @@ const parsePersistedState = <T extends object>(
       state: parsed as Partial<T>,
       version: 0,
     };
-  } catch {
+  } catch (error) {
     if (process.env.NODE_ENV !== 'production') {
-      console.warn('[zustand:persist] unable to parse stored value');
+      logger.warn('Unable to parse stored value', error, 'SYSTEM');
     }
 
     return undefined;
@@ -103,7 +104,7 @@ export const createImmutableStore = <T extends object>(
         storage.setItem(persistOptions.name, JSON.stringify(payload));
       } catch (error) {
         if (process.env.NODE_ENV !== 'production') {
-          console.warn(`[zustand:persist] unable to store state for ${persistOptions.name}`, error);
+          logger.warn('Unable to store state', { name: persistOptions.name, error }, 'SYSTEM');
         }
       }
     };

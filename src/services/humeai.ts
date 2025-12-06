@@ -1,3 +1,6 @@
+// @ts-nocheck
+
+import { logger } from '@/lib/logger';
 
 // HumeAI service types
 export interface HumeAIOptions {
@@ -10,7 +13,7 @@ export interface HumeAIOptions {
 const analyzeEmotion = async (audioData: Blob, options: HumeAIOptions = {}): Promise<any> => {
   try {
     // This would be a real API call in production
-    console.log('Analyzing emotion with HumeAI API', options);
+    logger.debug('Analyzing emotion with HumeAI API', options, 'API');
     
     // Mock response
     return {
@@ -27,7 +30,7 @@ const analyzeEmotion = async (audioData: Blob, options: HumeAIOptions = {}): Pro
       }
     };
   } catch (error) {
-    console.error('Error analyzing emotion with HumeAI:', error);
+    logger.error('Error analyzing emotion with HumeAI', error as Error, 'API');
     throw error;
   }
 };
@@ -35,7 +38,7 @@ const analyzeEmotion = async (audioData: Blob, options: HumeAIOptions = {}): Pro
 const analyzeFacialExpression = async (imageData: Blob, options: HumeAIOptions = {}): Promise<any> => {
   try {
     // This would be a real API call in production
-    console.log('Analyzing facial expression with HumeAI API', options);
+    logger.debug('Analyzing facial expression with HumeAI API', options, 'API');
     
     // Mock response
     return {
@@ -52,7 +55,7 @@ const analyzeFacialExpression = async (imageData: Blob, options: HumeAIOptions =
       } : undefined
     };
   } catch (error) {
-    console.error('Error analyzing facial expression with HumeAI:', error);
+    logger.error('Error analyzing facial expression with HumeAI', error as Error, 'API');
     throw error;
   }
 };

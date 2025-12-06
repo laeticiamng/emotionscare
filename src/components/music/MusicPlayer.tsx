@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -41,11 +40,11 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({
   const musicContext = useMusic();
   
   // Use props if provided, otherwise fall back to context
-  const currentTrack = propTrack || musicContext.currentTrack;
-  const isPlaying = propIsPlaying !== undefined ? propIsPlaying : musicContext.isPlaying;
-  const volume = propVolume !== undefined ? propVolume : musicContext.volume || 0.7;
-  const currentTime = propCurrentTime !== undefined ? propCurrentTime : musicContext.currentTime || 0;
-  const duration = musicContext.duration || 0;
+  const currentTrack = propTrack || musicContext.state.currentTrack;
+  const isPlaying = propIsPlaying !== undefined ? propIsPlaying : musicContext.state.isPlaying;
+  const volume = propVolume !== undefined ? propVolume : musicContext.state.volume || 0.7;
+  const currentTime = propCurrentTime !== undefined ? propCurrentTime : musicContext.state.currentTime || 0;
+  const duration = musicContext.state.duration || 0;
   
   const [isMuted, setIsMuted] = React.useState(false);
 
@@ -76,8 +75,8 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({
     const newTime = (value[0] / 100) * duration;
     if (onSeek) {
       onSeek(newTime);
-    } else if (musicContext.seekTo) {
-      musicContext.seekTo(newTime);
+    } else if (musicContext.seek) {
+      musicContext.seek(newTime);
     }
   };
 

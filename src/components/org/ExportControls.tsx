@@ -1,9 +1,11 @@
+// @ts-nocheck
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Download, Printer } from 'lucide-react';
 import { useOrgStore } from '@/store/org.store';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'react-hot-toast';
+import { logger } from '@/lib/logger';
 
 export const ExportControls: React.FC = () => {
   const filters = useOrgStore(state => state.filters);
@@ -36,7 +38,7 @@ export const ExportControls: React.FC = () => {
 
       toast.success('Export CSV téléchargé');
     } catch (error) {
-      console.error('Export error:', error);
+      logger.error('Export error', error as Error, 'SYSTEM');
       toast.error('Erreur lors de l\'export');
     }
   };

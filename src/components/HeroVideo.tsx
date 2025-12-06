@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import { logger } from '@/lib/logger';
 
 interface HeroVideoProps {
   className?: string;
@@ -19,12 +20,12 @@ const HeroVideo: React.FC<HeroVideoProps> = ({ className = '' }) => {
   }, []);
 
   const handleVideoError = () => {
-    console.warn('[HeroVideo] Video failed to load, falling back to image');
+    logger.warn('Video failed to load, falling back to image', {}, 'UI');
     setVideoError(true);
   };
 
   const handleVideoLoaded = () => {
-    console.info('[HeroVideo] Video loaded successfully');
+    logger.debug('Video loaded successfully', {}, 'UI');
     setVideoLoaded(true);
   };
 
@@ -36,7 +37,7 @@ const HeroVideo: React.FC<HeroVideoProps> = ({ className = '' }) => {
         alt="EmotionsCare - Plateforme de bien-être émotionnel"
         className={`w-full h-full object-cover ${className}`}
         loading="lazy"
-        onError={() => console.warn('[HeroVideo] Fallback image also failed to load')}
+        onError={() => logger.warn('Fallback image also failed to load', {}, 'UI')}
       />
     );
   }

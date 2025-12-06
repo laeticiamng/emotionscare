@@ -118,7 +118,7 @@ export const ActivityItemCard: React.FC<ActivityItemCardProps> = ({ item }) => {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => handleAction(item.actions.resume_deeplink!)}
+                  onClick={() => item.actions?.resume_deeplink && handleAction(item.actions.resume_deeplink)}
                   className="text-xs h-7"
                 >
                   <Play className="w-3 h-3 mr-1" />
@@ -130,7 +130,7 @@ export const ActivityItemCard: React.FC<ActivityItemCardProps> = ({ item }) => {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => handleAction(item.actions.replay_deeplink!)}
+                  onClick={() => item.actions?.replay_deeplink && handleAction(item.actions.replay_deeplink)}
                   className="text-xs h-7"
                 >
                   <RotateCcw className="w-3 h-3 mr-1" />

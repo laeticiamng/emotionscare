@@ -4,9 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
-import { 
-  BarChart, 
-  TrendingUp, 
+import {
+  BarChart,
+  TrendingUp,
   Calendar,
   Target,
   Heart,
@@ -17,17 +17,39 @@ import {
 } from 'lucide-react';
 import { Header } from '@/components/layout';
 
-export default function AnalyticsPage() {
-  const [timeRange, setTimeRange] = useState('7d');
+interface MoodData {
+  average: number;
+  trend: string;
+  sessions: number;
+  streakDays: number;
+}
 
-  const moodData = {
+interface ModuleStat {
+  name: string;
+  usage: number;
+  sessions: number;
+  avgDuration: string;
+}
+
+interface WeeklyMood {
+  day: string;
+  mood: number;
+  energy: number;
+}
+
+export default function AnalyticsPage() {
+  // TODO: Connect to real API and use timeRange
+  const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d'>('7d');
+
+  // TODO: Replace with real data from API
+  const moodData: MoodData = {
     average: 7.2,
     trend: '+5%',
     sessions: 28,
     streakDays: 12
   };
 
-  const moduleStats = [
+  const moduleStats: ModuleStat[] = [
     { name: 'Scan Émotionnel', usage: 85, sessions: 15, avgDuration: '3m' },
     { name: 'Musique Thérapeutique', usage: 72, sessions: 12, avgDuration: '15m' },
     { name: 'Coach IA', usage: 68, sessions: 8, avgDuration: '8m' },
@@ -35,7 +57,7 @@ export default function AnalyticsPage() {
     { name: 'Journal', usage: 45, sessions: 10, avgDuration: '5m' }
   ];
 
-  const weeklyMoods = [
+  const weeklyMoods: WeeklyMood[] = [
     { day: 'Lun', mood: 6.5, energy: 7.0 },
     { day: 'Mar', mood: 7.2, energy: 6.8 },
     { day: 'Mer', mood: 8.1, energy: 8.2 },
@@ -78,7 +100,7 @@ export default function AnalyticsPage() {
               <CardContent>
                 <div className="text-2xl font-bold">{moodData.average}/10</div>
                 <p className="text-xs text-muted-foreground">
-                  <span className="text-green-600">{moodData.trend}</span> cette semaine
+                  <span className="text-success">{moodData.trend}</span> cette semaine
                 </p>
               </CardContent>
             </Card>
@@ -229,12 +251,12 @@ export default function AnalyticsPage() {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
-                      <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-200">
+                      <div className="flex items-center justify-between p-3 bg-success/10 rounded-lg border border-success/20">
                         <div className="flex items-center gap-2">
-                          <TrendingUp className="h-4 w-4 text-green-600" />
+                          <TrendingUp className="h-4 w-4 text-success" />
                           <span className="font-medium">Amélioration générale</span>
                         </div>
-                        <span className="text-green-600 font-semibold">+18%</span>
+                        <span className="text-success font-semibold">+18%</span>
                       </div>
                       
                       <div className="grid grid-cols-2 gap-4">
@@ -264,23 +286,23 @@ export default function AnalyticsPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-                      <h4 className="font-medium text-blue-900">📈 Progression détectée</h4>
-                      <p className="text-sm text-blue-700 mt-1">
+                    <div className="p-4 bg-info/10 rounded-lg border border-info/20">
+                      <h4 className="font-medium text-info-foreground">📈 Progression détectée</h4>
+                      <p className="text-sm text-info mt-1">
                         Votre humeur s'améliore de 12% les jours où vous utilisez la musique thérapeutique.
                       </p>
                     </div>
                     
-                    <div className="p-4 bg-yellow-50 rounded-lg border border-yellow-200">
-                      <h4 className="font-medium text-yellow-900">💡 Suggestion</h4>
-                      <p className="text-sm text-yellow-700 mt-1">
+                    <div className="p-4 bg-warning/10 rounded-lg border border-warning/20">
+                      <h4 className="font-medium text-warning-foreground">💡 Suggestion</h4>
+                      <p className="text-sm text-warning mt-1">
                         Essayez la méditation VR le matin - elle semble plus efficace pour vous à ce moment.
                       </p>
                     </div>
                     
-                    <div className="p-4 bg-green-50 rounded-lg border border-green-200">
-                      <h4 className="font-medium text-green-900">🎯 Objectif recommandé</h4>
-                      <p className="text-sm text-green-700 mt-1">
+                    <div className="p-4 bg-success/10 rounded-lg border border-success/20">
+                      <h4 className="font-medium text-success-foreground">🎯 Objectif recommandé</h4>
+                      <p className="text-sm text-success mt-1">
                         Maintenez votre série actuelle - vous êtes sur la bonne voie pour un nouveau record !
                       </p>
                     </div>

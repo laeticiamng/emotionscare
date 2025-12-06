@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState } from 'react';
 import { SidebarContextType } from '@/types/sidebar';
 

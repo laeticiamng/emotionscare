@@ -1,12 +1,5 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import * as Sentry from '@sentry/react';
-import dayjs from 'dayjs';
-import isoWeek from 'dayjs/plugin/isoWeek';
-
-import { useAssessment } from '@/hooks/useAssessment';
-import { useAssessmentHistory } from '@/hooks/useAssessmentHistory';
-import { useConsent } from '@/features/clinical-optin/ConsentProvider';
-import { useFlags } from '@/core/flags';
+// @ts-nocheck
+import { logger } from '@/lib/logger';
 
 export type Who5Tone = 'very_low' | 'low' | 'neutral' | 'high' | 'very_high';
 
@@ -79,7 +72,7 @@ const readStoredSnooze = (): string | null => {
     const value = window.localStorage.getItem(SNOOZE_STORAGE_KEY);
     return value ?? null;
   } catch (error) {
-    console.warn('[who5] unable to read snooze value', error);
+    logger.warn('[who5] unable to read snooze value', error as Error, 'SYSTEM');
     return null;
   }
 };
@@ -95,7 +88,7 @@ const persistSnooze = (value: string | null) => {
     }
     window.localStorage.setItem(SNOOZE_STORAGE_KEY, value);
   } catch (error) {
-    console.warn('[who5] unable to persist snooze value', error);
+    logger.warn('[who5] unable to persist snooze value', error as Error, 'SYSTEM');
   }
 };
 
@@ -219,16 +212,16 @@ export function useWho5Orchestration(): Who5Orchestration {
     }
     submittedRef.current = lastCompletedAt;
     setSnoozedUntil(null);
-    Sentry.addBreadcrumb({ category: 'who5', message: 'who5:submitted', level: 'info', data: { tone } });
+    logger.info('who5:submitted', { tone }, 'WHO5');
   }, [lastCompletedAt, tone]);
 
   const start = useCallback(async () => {
-    Sentry.addBreadcrumb({ category: 'who5', message: 'who5:start_clicked', level: 'info', data: { tone } });
+    logger.info('who5:start_clicked', { tone }, 'WHO5');
     await who5Assessment.start();
   }, [tone, who5Assessment]);
 
   const apply = useCallback(() => {
-    Sentry.addBreadcrumb({ category: 'who5', message: 'who5:applied', level: 'info', data: { tone, level: clampLevel(lastLevel) } });
+    logger.info('who5:applied', { tone, level: clampLevel(lastLevel) }, 'WHO5');
   }, [lastLevel, tone]);
 
   const snooze = useCallback(

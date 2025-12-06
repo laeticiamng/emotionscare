@@ -1,5 +1,6 @@
 import type { FC, ReactNode } from 'react';
 import { useEffect, useRef } from 'react';
+import { logger } from '@/lib/logger';
 
 interface ZeroNumberBoundaryProps {
   children: ReactNode;
@@ -38,7 +39,7 @@ export const ZeroNumberBoundary: FC<ZeroNumberBoundaryProps> = ({
       if (DIGIT_PATTERN.test(textContent)) {
         warningIssuedRef.current = true;
         if (process.env.NODE_ENV !== 'production') {
-          console.warn('[ZeroNumberBoundary] Numeric characters detected within zero-number zone.');
+          logger.warn('ZeroNumberBoundary: Numeric characters detected within zero-number zone', {}, 'UI');
         }
       }
     };

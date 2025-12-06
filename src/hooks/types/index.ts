@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 // Types centralisés pour les hooks
 

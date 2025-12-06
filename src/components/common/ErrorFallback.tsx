@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { AlertTriangle, RefreshCw, Home, Bug } from 'lucide-react';
 import { EnhancedButton } from '@/components/ui/enhanced-button';
 import { PremiumCard, PremiumCardContent, PremiumCardHeader, PremiumCardTitle } from '@/components/ui/premium-card';
+import { logger } from '@/lib/logger';
 
 interface ErrorFallbackProps {
   error: Error;
@@ -17,7 +18,7 @@ const ErrorFallback: React.FC<ErrorFallbackProps> = ({
 }) => {
   const handleReportError = () => {
     // In production, send error to monitoring service
-    console.error('Error reported:', { error, errorInfo });
+    logger.error('Error reported', { error, errorInfo });
     
     // Example: Send to Sentry, LogRocket, etc.
     // errorReportingService.report({ error, errorInfo });

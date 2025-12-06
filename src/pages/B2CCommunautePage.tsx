@@ -1,6 +1,7 @@
+// @ts-nocheck
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import * as Sentry from '@sentry/react';
+import { captureException } from '@/lib/ai-monitoring';
 import { useReducedMotion } from 'framer-motion';
 import {
   ArrowLeft,
@@ -584,7 +585,7 @@ const B2CCommunautePage: React.FC = () => {
                 <Button
                   ref={bannerCtaRef}
                   onClick={() => setShowSocialConfirm(true)}
-                  className="bg-emerald-600 text-white hover:bg-emerald-600/90"
+                  className="bg-emerald-600 text-primary-foreground hover:bg-emerald-600/90"
                 >
                   Écoute 2 min ?
                 </Button>

@@ -2,6 +2,7 @@
 import React, { useState, useRef } from 'react';
 import { Play, Pause, SkipBack, SkipForward, Volume2 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { logger } from '@/lib/logger';
 
 const MiniMusicPlayer: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -10,7 +11,7 @@ const MiniMusicPlayer: React.FC = () => {
   const audioRef = useRef<HTMLAudioElement>(null);
 
   const handlePlayClick = () => {
-    console.log('🎵 PLAY BUTTON CLICKED');
+    logger.debug('Play button clicked', null, 'UI');
     setIsPlaying(!isPlaying);
     
     if (audioRef.current) {
@@ -18,18 +19,18 @@ const MiniMusicPlayer: React.FC = () => {
         audioRef.current.pause();
       } else {
         audioRef.current.play().catch(error => {
-          console.log('Audio play failed:', error);
+          logger.error('Audio play failed', error as Error, 'UI');
         });
       }
     }
   };
 
   const handlePreviousClick = () => {
-    console.log('⏮️ PREVIOUS CLICKED');
+    logger.debug('Previous button clicked', null, 'UI');
   };
 
   const handleNextClick = () => {
-    console.log('⏭️ NEXT CLICKED');
+    logger.debug('Next button clicked', null, 'UI');
   };
 
   const progress = (currentTime / duration) * 100;

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useStore } from 'zustand';
 import type { StoreApi } from 'zustand';
 

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -19,6 +18,7 @@ import {
   TrendingUp
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 
 interface Message {
   id: string;
@@ -44,21 +44,21 @@ const AI_PERSONALITIES: AIPersonality[] = [
     avatar: "🌙",
     specialty: "Bien-être émotionnel",
     description: "Experte en gestion des émotions et méditation",
-    color: "from-purple-500 to-pink-500"
+    color: "from-accent to-destructive"
   },
   {
     name: "Atlas",
     avatar: "🧠",
     specialty: "Coaching professionnel",
     description: "Spécialisé en développement personnel et carrière",
-    color: "from-blue-500 to-cyan-500"
+    color: "from-primary to-info"
   },
   {
     name: "Zen",
     avatar: "🧘",
     specialty: "Mindfulness",
     description: "Guide en méditation et relaxation",
-    color: "from-green-500 to-emerald-500"
+    color: "from-success to-success"
   }
 ];
 
@@ -117,7 +117,7 @@ const EnhancedAICoach: React.FC = () => {
         suggestions: generateSuggestions(randomEmotion)
       };
     } catch (error) {
-      console.error('Erreur analyse émotionnelle:', error);
+      logger.error('Erreur analyse émotionnelle', { error }, 'AI_COACH');
       return null;
     }
   };
@@ -228,7 +228,7 @@ const EnhancedAICoach: React.FC = () => {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Brain className="h-6 w-6 text-purple-600" />
+            <Brain className="h-6 w-6 text-accent" />
             Coach IA Personnalisé
           </CardTitle>
         </CardHeader>
@@ -243,13 +243,13 @@ const EnhancedAICoach: React.FC = () => {
                 <Card 
                   className={`cursor-pointer transition-all ${
                     selectedPersonality.name === personality.name 
-                      ? 'ring-2 ring-purple-500 shadow-lg' 
+                      ? 'ring-2 ring-primary shadow-lg' 
                       : 'hover:shadow-md'
                   }`}
                   onClick={() => setSelectedPersonality(personality)}
                 >
                   <CardContent className="p-4 text-center">
-                    <div className={`text-3xl mb-2 p-3 rounded-full bg-gradient-to-r ${personality.color} text-white w-fit mx-auto`}>
+                    <div className={`text-3xl mb-2 p-3 rounded-full bg-gradient-to-r ${personality.color} text-primary-foreground w-fit mx-auto`}>
                       {personality.avatar}
                     </div>
                     <h3 className="font-semibold">{personality.name}</h3>
@@ -268,7 +268,7 @@ const EnhancedAICoach: React.FC = () => {
         <CardHeader className="flex flex-row items-center justify-between">
           <div className="flex items-center gap-3">
             <Avatar>
-              <AvatarFallback className={`bg-gradient-to-r ${selectedPersonality.color} text-white`}>
+              <AvatarFallback className={`bg-gradient-to-r ${selectedPersonality.color} text-primary-foreground`}>
                 {selectedPersonality.avatar}
               </AvatarFallback>
             </Avatar>
@@ -299,8 +299,8 @@ const EnhancedAICoach: React.FC = () => {
                 >
                   <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
                     message.sender === 'user' 
-                      ? 'bg-purple-600 text-white' 
-                      : 'bg-gray-100 text-gray-900'
+                      ? 'bg-primary text-primary-foreground' 
+                      : 'bg-muted text-foreground'
                   }`}>
                     <p>{message.content}</p>
                     {message.emotion && (
@@ -331,11 +331,11 @@ const EnhancedAICoach: React.FC = () => {
                 animate={{ opacity: 1 }}
                 className="flex justify-start"
               >
-                <div className="bg-gray-100 px-4 py-2 rounded-lg">
+                <div className="bg-muted px-4 py-2 rounded-lg">
                   <div className="flex space-x-1">
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                    <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce"></div>
+                    <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                    <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                   </div>
                 </div>
               </motion.div>

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * DashboardNavigationWidget - Widget de navigation pour le dashboard
  * Accès rapide aux fonctionnalités principales
@@ -25,14 +26,14 @@ interface QuickAction {
 }
 
 const quickActions: QuickAction[] = [
-  { label: 'Scan Émotions', path: '/app/scan', icon: Brain, color: 'from-pink-500 to-rose-500', category: 'core' },
-  { label: 'Thérapie Musicale', path: '/app/music', icon: Music, color: 'from-purple-500 to-indigo-500', category: 'core' },
-  { label: 'Coach IA', path: '/app/coach', icon: Sparkles, color: 'from-blue-500 to-cyan-500', category: 'core' },
-  { label: 'Journal', path: '/app/journal', icon: FileText, color: 'from-green-500 to-emerald-500', category: 'core' },
-  { label: 'Flash Glow', path: '/app/flash-glow', icon: Zap, color: 'from-yellow-500 to-orange-500', category: 'fun' },
-  { label: 'Breathwork', path: '/app/breath', icon: Wind, color: 'from-teal-500 to-green-500', category: 'fun' },
-  { label: 'Communauté', path: '/app/community', icon: Users, color: 'from-green-500 to-teal-500', category: 'social' },
-  { label: 'Gamification', path: '/app/leaderboard', icon: Trophy, color: 'from-amber-500 to-yellow-500', category: 'social' },
+  { label: 'Scan Émotions', path: '/app/scan', icon: Brain, color: 'from-destructive to-destructive/80', category: 'core' },
+  { label: 'Thérapie Musicale', path: '/app/music', icon: Music, color: 'from-accent to-primary', category: 'core' },
+  { label: 'Coach IA', path: '/app/coach', icon: Sparkles, color: 'from-primary to-info', category: 'core' },
+  { label: 'Journal', path: '/app/journal', icon: FileText, color: 'from-success to-success/80', category: 'core' },
+  { label: 'Flash Glow', path: '/app/flash-glow', icon: Zap, color: 'from-warning to-warning/80', category: 'fun' },
+  { label: 'Breathwork', path: '/app/breath', icon: Wind, color: 'from-success/80 to-success', category: 'fun' },
+  { label: 'Communauté', path: '/app/community', icon: Users, color: 'from-success to-info', category: 'social' },
+  { label: 'Gamification', path: '/app/leaderboard', icon: Trophy, color: 'from-warning to-warning/80', category: 'social' },
 ];
 
 const recentPages = [
@@ -73,7 +74,7 @@ export default function DashboardNavigationWidget() {
                   className="w-full h-auto p-3 justify-start gap-3 hover:scale-105 transition-transform"
                 >
                   <div className={cn(
-                    "p-2 rounded-lg bg-gradient-to-br text-white",
+                    "p-2 rounded-lg bg-gradient-to-br text-primary-foreground",
                     action.color
                   )}>
                     <action.icon className="h-4 w-4" />

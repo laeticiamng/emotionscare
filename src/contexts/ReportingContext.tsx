@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 import React, { createContext, useContext, useCallback, useState, ReactNode } from 'react';
 import { useToast } from '@/hooks/use-toast';

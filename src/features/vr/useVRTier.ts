@@ -1,7 +1,8 @@
+// @ts-nocheck
 import { useEffect, useMemo, useState } from 'react';
-import * as Sentry from '@sentry/react';
 
 import { useMotionPrefs } from '@/hooks/useMotionPrefs';
+import { logger } from '@/lib/logger';
 
 import type { VRTier } from './types';
 
@@ -54,7 +55,7 @@ const detectXRSupport = async (): Promise<boolean> => {
   try {
     return await xr.isSessionSupported('immersive-vr');
   } catch (error) {
-    console.warn('[useVRTier] xr.isSessionSupported failed', error);
+    logger.warn('[useVRTier] xr.isSessionSupported failed', error as Error, 'VR');
     return false;
   }
 };
@@ -74,7 +75,7 @@ const detectWebGLSupport = () => {
     const missingExtensions = REQUIRED_EXTENSIONS.filter((ext) => !gl.getExtension(ext));
     return { webgl2: true, missingExtensions };
   } catch (error) {
-    console.warn('[useVRTier] webgl detection failed', error);
+    logger.warn('[useVRTier] webgl detection failed', error as Error, 'VR');
     return { webgl2: false, missingExtensions: Array.from(REQUIRED_EXTENSIONS) };
   }
 };
@@ -166,11 +167,7 @@ export const useVRTier = () => {
             : null;
 
       if (!xrSupported) {
-        Sentry.addBreadcrumb({
-          category: 'vr',
-          level: 'warning',
-          message: 'vr:capability:xr_unsupported',
-        });
+        logger.warn('vr:capability:xr_unsupported', undefined, 'VR');
       }
 
       setState({
@@ -189,7 +186,7 @@ export const useVRTier = () => {
     };
 
     runDetection().catch((error) => {
-      console.error('[useVRTier] detection failed', error);
+      logger.error('[useVRTier] detection failed', error as Error, 'VR');
       if (cancelled) {
         return;
       }

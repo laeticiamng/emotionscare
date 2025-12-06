@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { logger } from '@/lib/logger';
 
 type ClockState = 'idle' | 'running' | 'paused' | 'completed'
 
@@ -116,7 +117,7 @@ export function useSessionClock(options: Options = {}): Return {
         cb(ms)
       } catch (error) {
         if (typeof process !== 'undefined' && process.env?.NODE_ENV !== 'production') {
-          console.error('useSessionClock tick callback error', error)
+          logger.error('useSessionClock tick callback error', error as Error, 'SYSTEM');
         }
       }
     })

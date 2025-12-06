@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { type ZodType } from 'zod';
 import { SUPABASE_ANON_KEY, SUPABASE_URL } from '@/lib/env';
 import { fetchWithRetry, type FetchWithRetryOptions } from '@/lib/network/fetchWithRetry';

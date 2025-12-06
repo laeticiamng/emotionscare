@@ -152,7 +152,7 @@ const QuickActionButton: React.FC<QuickActionButtonProps> = ({
         {/* Badge */}
         {badge && (
           <Badge 
-            variant={badge.variant || 'outline'} 
+            variant={badge.variant as any || 'outline'} 
             className={cn(
               'absolute -top-1 -right-1 text-xs z-10',
               badge.pulse && 'animate-pulse'

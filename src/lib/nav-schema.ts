@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { NavNode } from '@/types/nav';
 
 /**

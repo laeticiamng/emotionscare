@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
@@ -19,6 +18,7 @@ import { useNavigate } from 'react-router-dom';
 import { useOpenAI } from '@/hooks/ai/useOpenAI';
 import { useToast } from '@/hooks/use-toast';
 import { useCommunityRecommendations } from '@/hooks/useCommunityRecommendations';
+import { logger } from '@/lib/logger';
 
 interface CommunityDashboardProps {
   isActive: boolean;
@@ -99,7 +99,7 @@ export const CommunityDashboard: React.FC<CommunityDashboardProps> = ({
         description: "L'analyse communautaire a été mise à jour avec succès",
       });
     } catch (error) {
-      console.error("Erreur lors de la génération des insights:", error);
+      logger.error("Erreur lors de la génération des insights", { error }, 'ADMIN');
       toast({
         title: "Erreur d'analyse",
         description: "Impossible de générer l'analyse communautaire",

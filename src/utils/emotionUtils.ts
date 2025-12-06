@@ -1,52 +1,56 @@
+import { EmotionResult } from '@/types/emotion';
 
-import { EmotionResult, Emotion } from '@/types/emotion';
+// Type pour les émotions brutes (compatibilité legacy)
+interface LegacyEmotion {
+  id?: string;
+  emotion?: string;
+  name?: string;
+  emoji?: string;
+  confidence?: number;
+  intensity?: number;
+  date?: string;
+  source?: string;
+  text?: string;
+  transcript?: string;
+  audioUrl?: string;
+  feedback?: string;
+  score?: number;
+  userId?: string;
+  user_id?: string;
+}
 
 // Normalise les résultats d'émotions pour assurer la compatibilité entre les différentes structures
 export function normalizeEmotionResult(result: any): EmotionResult {
   const normalized: EmotionResult = {
-    id: result.id || `emotion-${Date.now()}`,
     emotion: result.emotion || result.name || 'neutral',
     confidence: result.confidence || 0.5,
+    valence: result.valence || 0,
+    arousal: result.arousal || 0,
+    timestamp: result.timestamp ? new Date(result.timestamp) : new Date(),
     intensity: result.intensity || 0.5,
-    emojis: result.emojis || ['😐'],
-    timestamp: result.timestamp || result.date || new Date().toISOString()
   };
 
   // Copier les champs supplémentaires s'ils sont présents
   if (result.source) normalized.source = result.source;
-  if (result.text) normalized.text = result.text;
-  if (result.transcript) normalized.transcript = result.transcript;
-  if (result.audioUrl) normalized.audioUrl = result.audioUrl;
-  if (result.audio_url) normalized.audio_url = result.audio_url;
-  if (result.facialExpression) normalized.facialExpression = result.facialExpression;
-  if (result.feedback) normalized.feedback = result.feedback;
-  if (result.ai_feedback) normalized.ai_feedback = result.ai_feedback;
-  if (result.score) normalized.score = result.score;
-  if (result.userId) normalized.userId = result.userId;
-  if (result.user_id) normalized.user_id = result.user_id;
-  if (result.date) normalized.date = result.date;
-  if (result.recommendations) normalized.recommendations = result.recommendations;
-  if (result.textInput) normalized.textInput = result.textInput;
+  if (result.transcription) normalized.transcription = result.transcription;
+  if (result.sentiment) normalized.sentiment = result.sentiment;
+  if (result.details) normalized.details = result.details;
+  if (result.insight) normalized.insight = result.insight;
+  if (result.suggestions) normalized.suggestions = result.suggestions;
 
   return normalized;
 }
 
-// Convertit un objet Emotion en EmotionResult
-export function emotionToEmotionResult(emotion: Emotion): EmotionResult {
+// Convertit un objet legacy Emotion en EmotionResult
+export function emotionToEmotionResult(emotion: LegacyEmotion): EmotionResult {
   return {
-    id: emotion.id || `emotion-${Date.now()}`,
     emotion: emotion.emotion || emotion.name || 'neutral',
     confidence: emotion.confidence || 0.5,
+    valence: 0,
+    arousal: emotion.intensity || 0.5,
+    timestamp: emotion.date ? new Date(emotion.date) : new Date(),
     intensity: emotion.intensity || 0.5,
-    emojis: [emotion.emoji || '😐'],
-    timestamp: emotion.date || new Date().toISOString(),
-    source: emotion.source as any || 'manual',
-    text: emotion.text,
-    transcript: emotion.transcript,
-    audioUrl: emotion.audioUrl,
-    feedback: emotion.feedback,
-    score: emotion.score,
-    userId: emotion.userId || emotion.user_id,
+    source: (emotion.source as any) || 'manual',
   };
 }
 

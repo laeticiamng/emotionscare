@@ -1,4 +1,3 @@
-
 import { AnonymousActivity, ActivityStats, ActivityFiltersState, ActivityTabView } from "./types";
 
 export const getActivityLabel = (activityType: string): string => {
@@ -18,10 +17,10 @@ export const getActivityLabel = (activityType: string): string => {
   return labels[activityType] || activityType;
 };
 
-export const applyFilters = (
-  data: AnonymousActivity[] | ActivityStats[], 
+export const applyFilters = <T extends AnonymousActivity | ActivityStats>(
+  data: T[], 
   filters: ActivityFiltersState
-): AnonymousActivity[] | ActivityStats[] => {
+): T[] => {
   return data.filter((item) => {
     // Apply search term filter
     if (filters.searchTerm && !JSON.stringify(item).toLowerCase().includes(filters.searchTerm.toLowerCase())) {
@@ -58,7 +57,7 @@ export const applyFilters = (
     }
     
     return true;
-  }) as any;
+  });
 };
 
 export const formatCsvData = (
@@ -89,7 +88,7 @@ export const getDefaultCsvFileName = (tabView: ActivityTabView): string => {
 };
 
 // Added function for compatibility with ActivityLogsTab.tsx
-export const exportActivityData = (data: any[], filename: string): void => {
+export const exportActivityData = (data: Record<string, unknown>[], filename: string): void => {
   const csv = [
     Object.keys(data[0]).join(','),
     ...data.map(item => Object.values(item).join(','))

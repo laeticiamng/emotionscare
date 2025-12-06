@@ -1,6 +1,5 @@
-
-import { AxiosError } from 'axios';
 import { toast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 
 export interface ApiError {
   message: string;
@@ -10,26 +9,20 @@ export interface ApiError {
 }
 
 export class ApiErrorHandler {
-  static handle(error: AxiosError | Error): ApiError {
-    if (error instanceof AxiosError) {
+  static handle(error: any): ApiError {
+    if (error.response) {
       return this.handleAxiosError(error);
     }
     return this.handleGenericError(error);
   }
 
-  private static handleAxiosError(error: AxiosError): ApiError {
+  private static handleAxiosError(error: any): ApiError {
     const status = error.response?.status;
     const data = error.response?.data;
     const message = data?.message || error.message;
 
     // Log détaillé pour le debug
-    console.error('API Error:', {
-      status,
-      message,
-      url: error.config?.url,
-      method: error.config?.method,
-      data: data
-    });
+    logger.error('API Error', error, 'API');
 
     // Gestion spécifique par code d'erreur
     switch (status) {
@@ -69,7 +62,7 @@ export class ApiErrorHandler {
   }
 
   private static handleGenericError(error: Error): ApiError {
-    console.error('Generic Error:', error);
+    logger.error('Generic Error', error, 'API');
     
     this.showToast('Erreur', 'Une erreur inattendue est survenue', 'destructive');
     

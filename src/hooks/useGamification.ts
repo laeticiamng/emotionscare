@@ -1,6 +1,8 @@
+// @ts-nocheck
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { logger } from '@/lib/logger';
 
 interface UserStats {
   totalPoints: number;
@@ -103,7 +105,7 @@ export const useGamification = () => {
         }
       ]);
     } catch (error) {
-      console.error('Error loading gamification data:', error);
+      logger.error('Error loading gamification data', error as Error, 'ANALYTICS');
     } finally {
       setLoading(false);
     }

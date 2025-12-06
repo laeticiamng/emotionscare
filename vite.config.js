@@ -3,13 +3,14 @@ import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
 import { componentTagger } from "lovable-tagger";
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [
     react({
       jsxRuntime: 'automatic',
+      typescript: false, // Disable TS type checking in Vite - use esbuild only for transformation
     }),
-    componentTagger(),
-  ],
+    mode === 'development' && componentTagger(),
+  ].filter(Boolean),
   
   server: {
     host: "::",
@@ -40,6 +41,7 @@ export default defineConfig({
   },
   
   esbuild: {
+    target: 'esnext', // esbuild transforms TypeScript without type checking
     logOverride: { 
       'this-is-undefined-in-esm': 'silent',
       'direct-eval': 'silent'
@@ -49,4 +51,4 @@ export default defineConfig({
   define: {
     'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development')
   }
-});
+}));

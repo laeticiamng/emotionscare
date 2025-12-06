@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 import { ReactElement, ReactNode } from 'react';
 import { useToast } from '@/hooks/use-toast';

@@ -1,369 +1,362 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Trophy, Star, Target, Gift, Zap, Medal, Crown } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
-import { useUserMode } from '@/contexts/UserModeContext';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
+import { 
+  Trophy, Star, Zap, Target, CheckCircle, Clock, 
+  TrendingUp, Award, Sparkles, Flame, Loader2 
+} from 'lucide-react';
 
 interface Challenge {
   id: string;
   title: string;
   description: string;
-  points: number;
-  progress: number;
-  maxProgress: number;
-  category: 'daily' | 'weekly' | 'special';
-  difficulty: 'facile' | 'moyen' | 'difficile';
-  completed: boolean;
-  deadline?: string;
+  category: string;
+  difficulty: string;
+  duration_minutes: number;
+  xp_reward: number;
+  status: string;
+  challenge_config: any;
+  created_at: string;
+  completed_at?: string;
 }
 
-interface Achievement {
-  id: string;
-  title: string;
-  description: string;
-  icon: React.ReactNode;
-  points: number;
-  unlocked: boolean;
-  unlockedAt?: string;
-  rarity: 'common' | 'rare' | 'epic' | 'legendary';
-}
-
-interface UserStats {
-  totalPoints: number;
-  level: number;
-  rank: string;
-  streak: number;
+interface Stats {
+  totalChallenges: number;
   completedChallenges: number;
-  achievements: number;
+  totalAchievements: number;
+  totalXP: number;
+  currentLevel: number;
+  currentStreak: number;
 }
 
 const GamificationDashboard: React.FC = () => {
-  const { user } = useAuth();
-  const { userMode } = useUserMode();
-  const [userStats, setUserStats] = useState<UserStats>({
-    totalPoints: 1250,
-    level: 8,
-    rank: 'Explorateur Émotionnel',
-    streak: 5,
-    completedChallenges: 23,
-    achievements: 12
-  });
+  const { toast } = useToast();
+  const [challenges, setChallenges] = useState<Challenge[]>([]);
+  const [stats, setStats] = useState<Stats | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [completingId, setCompletingId] = useState<string | null>(null);
 
-  const [challenges, setChallenges] = useState<Challenge[]>([
-    {
-      id: '1',
-      title: 'Scanner quotidien',
-      description: 'Effectuez un scan émotionnel aujourd\'hui',
-      points: 50,
-      progress: 0,
-      maxProgress: 1,
-      category: 'daily',
-      difficulty: 'facile',
-      completed: false
-    },
-    {
-      id: '2',
-      title: 'Méditation guidée',
-      description: 'Complétez 3 sessions de méditation cette semaine',
-      points: 150,
-      progress: 1,
-      maxProgress: 3,
-      category: 'weekly',
-      difficulty: 'moyen',
-      completed: false,
-      deadline: '2025-06-29'
-    },
-    {
-      id: '3',
-      title: 'Journal intime',
-      description: 'Écrivez dans votre journal 7 jours consécutifs',
-      points: 200,
-      progress: 5,
-      maxProgress: 7,
-      category: 'special',
-      difficulty: 'difficile',
-      completed: false
-    }
-  ]);
+  useEffect(() => {
+    loadData();
+  }, []);
 
-  const [achievements, setAchievements] = useState<Achievement[]>([
-    {
-      id: '1',
-      title: 'Premier Pas',
-      description: 'Première connexion à l\'application',
-      icon: <Star className="h-6 w-6" />,
-      points: 50,
-      unlocked: true,
-      unlockedAt: '2025-06-20',
-      rarity: 'common'
-    },
-    {
-      id: '2',
-      title: 'Régularité',
-      description: '7 jours de connexion consécutifs',
-      icon: <Zap className="h-6 w-6" />,
-      points: 100,
-      unlocked: true,
-      unlockedAt: '2025-06-21',
-      rarity: 'rare'
-    },
-    {
-      id: '3',
-      title: 'Maître Zen',
-      description: '50 sessions de méditation complétées',
-      icon: <Crown className="h-6 w-6" />,
-      points: 500,
-      unlocked: false,
-      rarity: 'legendary'
+  const loadData = async () => {
+    try {
+      const { data: challengeData } = await supabase.functions.invoke('gamification-engine', {
+        body: { action: 'list' }
+      });
+
+      if (challengeData?.challenges) {
+        setChallenges(challengeData.challenges);
+      }
+
+      const { data: statsData } = await supabase.functions.invoke('gamification-engine', {
+        body: { action: 'stats' }
+      });
+
+      if (statsData?.stats) {
+        setStats(statsData.stats);
+      }
+    } catch (error) {
+      logger.error('Error loading data', error as Error, 'UI');
     }
-  ]);
+  };
+
+  const generateChallenges = async () => {
+    setIsGenerating(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('gamification-engine', {
+        body: { action: 'generate' }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: 'Défis générés',
+        description: `${data.challenges.length} nouveaux défis personnalisés`,
+      });
+
+      await loadData();
+    } catch (error: any) {
+      toast({
+        title: 'Erreur',
+        description: error.message,
+        variant: 'destructive',
+      });
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const completeChallenge = async (challengeId: string) => {
+    setCompletingId(challengeId);
+    try {
+      const { data, error } = await supabase.functions.invoke('gamification-engine', {
+        body: {
+          action: 'complete',
+          challengeId
+        }
+      });
+
+      if (error) throw error;
+
+      let description = `+${data.challenge.xp_reward} XP`;
+      if (data.newLevel > (stats?.currentLevel || 1)) {
+        description += ` | Niveau ${data.newLevel} atteint !`;
+      }
+      if (data.achievements.length > 0) {
+        description += ` | ${data.achievements.length} nouveau(x) badge(s)`;
+      }
+
+      toast({
+        title: 'Défi complété !',
+        description,
+      });
+
+      await loadData();
+    } catch (error: any) {
+      toast({
+        title: 'Erreur',
+        description: error.message,
+        variant: 'destructive',
+      });
+    } finally {
+      setCompletingId(null);
+    }
+  };
+
+  const getCategoryIcon = (category: string) => {
+    const icons: Record<string, any> = {
+      breathing: '🫁',
+      meditation: '🧘',
+      journal: '📔',
+      social: '👥',
+      physical: '💪',
+    };
+    return icons[category] || '⭐';
+  };
 
   const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty) {
-      case 'facile': return 'bg-green-500';
-      case 'moyen': return 'bg-yellow-500';
-      case 'difficile': return 'bg-red-500';
-      default: return 'bg-gray-500';
-    }
+    const colors: Record<string, string> = {
+      easy: 'bg-green-500',
+      medium: 'bg-yellow-500',
+      hard: 'bg-red-500',
+    };
+    return colors[difficulty] || 'bg-gray-500';
   };
 
-  const getRarityColor = (rarity: string) => {
-    switch (rarity) {
-      case 'common': return 'border-gray-400';
-      case 'rare': return 'border-blue-400';
-      case 'epic': return 'border-purple-400';
-      case 'legendary': return 'border-yellow-400';
-      default: return 'border-gray-400';
-    }
-  };
-
-  const calculateLevelProgress = () => {
-    const currentLevelPoints = userStats.level * 200;
-    const nextLevelPoints = (userStats.level + 1) * 200;
-    const progress = ((userStats.totalPoints - currentLevelPoints) / (nextLevelPoints - currentLevelPoints)) * 100;
-    return Math.min(Math.max(progress, 0), 100);
-  };
+  const xpToNextLevel = stats ? (stats.currentLevel * 1000) - stats.totalXP : 1000;
+  const progressToNextLevel = stats ? ((stats.totalXP % 1000) / 1000) * 100 : 0;
 
   return (
-    <div className="space-y-6">
-      {/* Stats Overview */}
+    <div className="space-y-6 p-6">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <Trophy className="h-8 w-8 text-yellow-500" />
+        <Card className="bg-gradient-to-br from-purple-500 to-pink-500 text-white">
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
               <div>
-                <p className="text-2xl font-bold">{userStats.totalPoints}</p>
-                <p className="text-sm text-muted-foreground">Points totaux</p>
+                <p className="text-sm opacity-90">Niveau</p>
+                <p className="text-3xl font-bold">{stats?.currentLevel || 1}</p>
               </div>
+              <Trophy className="h-10 w-10 opacity-80" />
+            </div>
+            <div className="mt-4 space-y-2">
+              <Progress value={progressToNextLevel} className="h-2 bg-white/20" />
+              <p className="text-xs opacity-90">{xpToNextLevel} XP pour le niveau suivant</p>
             </div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <Star className="h-8 w-8 text-blue-500" />
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
               <div>
-                <p className="text-2xl font-bold">Niveau {userStats.level}</p>
-                <p className="text-sm text-muted-foreground">{userStats.rank}</p>
+                <p className="text-sm text-muted-foreground">XP Total</p>
+                <p className="text-2xl font-bold">{stats?.totalXP || 0}</p>
               </div>
+              <Star className="h-8 w-8 text-yellow-500" />
             </div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <Zap className="h-8 w-8 text-orange-500" />
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
               <div>
-                <p className="text-2xl font-bold">{userStats.streak}</p>
-                <p className="text-sm text-muted-foreground">Jours consécutifs</p>
+                <p className="text-sm text-muted-foreground">Série actuelle</p>
+                <p className="text-2xl font-bold">{stats?.currentStreak || 0}</p>
               </div>
+              <Flame className="h-8 w-8 text-orange-500" />
             </div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <Medal className="h-8 w-8 text-purple-500" />
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
               <div>
-                <p className="text-2xl font-bold">{userStats.achievements}</p>
-                <p className="text-sm text-muted-foreground">Succès débloqués</p>
+                <p className="text-sm text-muted-foreground">Badges</p>
+                <p className="text-2xl font-bold">{stats?.totalAchievements || 0}</p>
               </div>
+              <Award className="h-8 w-8 text-blue-500" />
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Level Progress */}
       <Card>
-        <CardContent className="p-4">
-          <div className="space-y-2">
-            <div className="flex justify-between items-center">
-              <h3 className="font-semibold">Progression du niveau</h3>
-              <span className="text-sm text-muted-foreground">
-                Niveau {userStats.level} → {userStats.level + 1}
-              </span>
-            </div>
-            <Progress value={calculateLevelProgress()} className="h-3" />
-            <p className="text-sm text-muted-foreground">
-              {((userStats.level + 1) * 200) - userStats.totalPoints} points pour le prochain niveau
-            </p>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2">
+              <TrendingUp className="h-5 w-5" />
+              Progression
+            </CardTitle>
+            <Badge variant="secondary">
+              {stats?.completedChallenges || 0}/{stats?.totalChallenges || 0} défis
+            </Badge>
           </div>
+        </CardHeader>
+        <CardContent>
+          <Progress 
+            value={stats ? (stats.completedChallenges / Math.max(stats.totalChallenges, 1)) * 100 : 0} 
+            className="h-3"
+          />
         </CardContent>
       </Card>
 
-      <Tabs defaultValue="challenges" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="challenges">Défis</TabsTrigger>
-          <TabsTrigger value="achievements">Succès</TabsTrigger>
-          <TabsTrigger value="leaderboard">Classement</TabsTrigger>
-        </TabsList>
+      <div className="flex justify-center">
+        <Button
+          onClick={generateChallenges}
+          disabled={isGenerating}
+          size="lg"
+          className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+        >
+          {isGenerating ? (
+            <>
+              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+              Génération en cours...
+            </>
+          ) : (
+            <>
+              <Sparkles className="mr-2 h-5 w-5" />
+              Générer de nouveaux défis
+            </>
+          )}
+        </Button>
+      </div>
 
-        <TabsContent value="challenges" className="space-y-4">
-          <div className="grid gap-4">
-            {challenges.map((challenge) => (
-              <Card key={challenge.id}>
-                <CardContent className="p-4">
-                  <div className="flex items-start justify-between">
-                    <div className="space-y-2 flex-1">
+      {challenges.filter(c => c.status === 'active').length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Target className="h-5 w-5" />
+              Défis actifs
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {challenges.filter(c => c.status === 'active').map((challenge) => (
+                <Card key={challenge.id} className="hover:border-primary transition-colors">
+                  <CardContent className="pt-6 space-y-4">
+                    <div className="flex items-start justify-between">
                       <div className="flex items-center gap-2">
-                        <h3 className="font-semibold">{challenge.title}</h3>
-                        <Badge className={getDifficultyColor(challenge.difficulty)}>
-                          {challenge.difficulty}
-                        </Badge>
-                        <Badge variant="outline">
-                          {challenge.category}
-                        </Badge>
-                      </div>
-                      <p className="text-sm text-muted-foreground">
-                        {challenge.description}
-                      </p>
-                      <div className="space-y-1">
-                        <div className="flex justify-between text-sm">
-                          <span>Progression</span>
-                          <span>{challenge.progress}/{challenge.maxProgress}</span>
+                        <span className="text-2xl">{getCategoryIcon(challenge.category)}</span>
+                        <div>
+                          <h3 className="font-semibold">{challenge.title}</h3>
+                          <p className="text-sm text-muted-foreground line-clamp-2">
+                            {challenge.description}
+                          </p>
                         </div>
-                        <Progress 
-                          value={(challenge.progress / challenge.maxProgress) * 100} 
-                          className="h-2" 
-                        />
                       </div>
-                      {challenge.deadline && (
-                        <p className="text-xs text-muted-foreground">
-                          Échéance: {new Date(challenge.deadline).toLocaleDateString('fr-FR')}
-                        </p>
-                      )}
                     </div>
-                    <div className="text-right">
-                      <div className="flex items-center gap-1 text-yellow-600">
-                        <Trophy className="h-4 w-4" />
-                        <span className="font-semibold">{challenge.points}</span>
+
+                    <div className="flex gap-2 flex-wrap">
+                      <Badge className={getDifficultyColor(challenge.difficulty)}>
+                        {challenge.difficulty}
+                      </Badge>
+                      <Badge variant="outline" className="flex items-center gap-1">
+                        <Clock className="h-3 w-3" />
+                        {challenge.duration_minutes}min
+                      </Badge>
+                      <Badge variant="outline" className="flex items-center gap-1">
+                        <Zap className="h-3 w-3" />
+                        +{challenge.xp_reward} XP
+                      </Badge>
+                    </div>
+
+                    {challenge.challenge_config?.instructions && (
+                      <div className="space-y-1">
+                        <p className="text-xs font-medium">Instructions:</p>
+                        <ul className="text-xs text-muted-foreground space-y-1">
+                          {challenge.challenge_config.instructions.slice(0, 3).map((inst: string, i: number) => (
+                            <li key={i}>• {inst}</li>
+                          ))}
+                        </ul>
                       </div>
-                      {challenge.completed ? (
-                        <Badge className="bg-green-500 mt-2">Terminé</Badge>
+                    )}
+
+                    <Button
+                      onClick={() => completeChallenge(challenge.id)}
+                      disabled={completingId === challenge.id}
+                      className="w-full"
+                      size="sm"
+                    >
+                      {completingId === challenge.id ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Validation...
+                        </>
                       ) : (
-                        <Button size="sm" className="mt-2">
-                          Continuer
-                        </Button>
+                        <>
+                          <CheckCircle className="mr-2 h-4 w-4" />
+                          Marquer comme complété
+                        </>
                       )}
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {challenges.filter(c => c.status === 'completed').slice(0, 3).length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <CheckCircle className="h-5 w-5 text-green-500" />
+              Défis récemment complétés
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {challenges.filter(c => c.status === 'completed').slice(0, 3).map((challenge) => (
+                <div key={challenge.id} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <span className="text-xl">{getCategoryIcon(challenge.category)}</span>
+                    <div>
+                      <p className="font-medium">{challenge.title}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {new Date(challenge.completed_at!).toLocaleDateString('fr-FR')}
+                      </p>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </TabsContent>
-
-        <TabsContent value="achievements" className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {achievements.map((achievement) => (
-              <Card 
-                key={achievement.id} 
-                className={`${getRarityColor(achievement.rarity)} border-2 ${
-                  achievement.unlocked ? 'opacity-100' : 'opacity-50'
-                }`}
-              >
-                <CardContent className="p-4 text-center">
-                  <div className={`mx-auto mb-3 ${achievement.unlocked ? 'text-primary' : 'text-gray-400'}`}>
-                    {achievement.icon}
-                  </div>
-                  <h3 className="font-semibold mb-1">{achievement.title}</h3>
-                  <p className="text-sm text-muted-foreground mb-2">
-                    {achievement.description}
-                  </p>
-                  <div className="flex items-center justify-center gap-1 text-yellow-600 mb-2">
-                    <Trophy className="h-4 w-4" />
-                    <span className="font-semibold">{achievement.points}</span>
-                  </div>
-                  <Badge variant="outline" className={`capitalize ${getRarityColor(achievement.rarity)}`}>
-                    {achievement.rarity}
+                  <Badge variant="secondary" className="flex items-center gap-1">
+                    <Zap className="h-3 w-3" />
+                    +{challenge.xp_reward} XP
                   </Badge>
-                  {achievement.unlocked && achievement.unlockedAt && (
-                    <p className="text-xs text-muted-foreground mt-2">
-                      Débloqué le {new Date(achievement.unlockedAt).toLocaleDateString('fr-FR')}
-                    </p>
-                  )}
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </TabsContent>
-
-        <TabsContent value="leaderboard" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Classement {userMode === 'b2b_admin' || userMode === 'b2b_user' ? 'Équipe' : 'Global'}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {[
-                  { rank: 1, name: user?.email || 'Vous', points: userStats.totalPoints, isCurrentUser: true },
-                  { rank: 2, name: 'Sophie M.', points: 1180, isCurrentUser: false },
-                  { rank: 3, name: 'Thomas L.', points: 1050, isCurrentUser: false },
-                  { rank: 4, name: 'Marie D.', points: 980, isCurrentUser: false },
-                  { rank: 5, name: 'Pierre K.', points: 920, isCurrentUser: false }
-                ].map((entry) => (
-                  <div 
-                    key={entry.rank} 
-                    className={`flex items-center justify-between p-3 rounded-lg ${
-                      entry.isCurrentUser ? 'bg-primary/10 border border-primary/20' : 'bg-muted/50'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${
-                        entry.rank === 1 ? 'bg-yellow-500 text-white' :
-                        entry.rank === 2 ? 'bg-gray-400 text-white' :
-                        entry.rank === 3 ? 'bg-orange-600 text-white' :
-                        'bg-muted text-muted-foreground'
-                      }`}>
-                        {entry.rank}
-                      </div>
-                      <span className={entry.isCurrentUser ? 'font-semibold' : ''}>
-                        {entry.name}
-                      </span>
-                      {entry.isCurrentUser && (
-                        <Badge variant="outline">Vous</Badge>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-1 text-yellow-600">
-                      <Trophy className="h-4 w-4" />
-                      <span className="font-semibold">{entry.points}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };

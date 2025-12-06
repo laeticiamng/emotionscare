@@ -35,7 +35,7 @@ export function createApp() {
         const since = parseSince(req.query.since);
         
         try {
-          const weeklyData = listWeekly(userHash);
+          const weeklyData = listWeekly(userHash, since);
           reply.send({ 
             ok: true, 
             data: weeklyData,
@@ -56,7 +56,7 @@ export function createApp() {
         const since = parseSince(req.query.since);
         
         try {
-          const orgData = listWeeklyOrg(orgId);
+          const orgData = listWeeklyOrg(orgId, since);
           reply.send({ 
             ok: true, 
             data: orgData,

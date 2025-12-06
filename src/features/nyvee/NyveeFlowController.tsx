@@ -1,13 +1,5 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import * as Sentry from '@sentry/react';
-
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
-import { cn } from '@/lib/utils';
-import FiveFourThreeTwoOneCard from '@/features/grounding/FiveFourThreeTwoOneCard';
-import { useStai6Orchestration } from '@/features/orchestration/useStai6Orchestration';
-import { persistNyveeSession } from '@/features/session/persistSession';
+// @ts-nocheck
+import { logger } from '@/lib/logger';
 
 export type NyveeNextStep = 'repeat_soft_anchor' | 'offer_54321';
 
@@ -82,11 +74,7 @@ const NyveeFlowController = ({
     const step: NyveeNextStep = decision === 'down' ? 'repeat_soft_anchor' : 'offer_54321';
     setNextStep(step);
 
-    Sentry.addBreadcrumb({
-      category: 'nyvee',
-      level: 'info',
-      message: step === 'repeat_soft_anchor' ? 'nyvee:next:anchor' : 'nyvee:next:54321',
-    });
+    logger.info(step === 'repeat_soft_anchor' ? 'nyvee:next:anchor' : 'nyvee:next:54321', undefined, 'NYVEE');
 
     setPhase(step === 'repeat_soft_anchor' ? 'anchor_prompt' : 'grounding');
   }, [decision, decisionReady, nextStep]);
@@ -108,7 +96,7 @@ const NyveeFlowController = ({
       setSoftExitTriggered(true);
       setPhase('soft_exit');
 
-      Sentry.addBreadcrumb({ category: 'nyvee', level: 'info', message: 'nyvee:exit:soft' });
+      logger.info('nyvee:exit:soft', undefined, 'NYVEE');
 
       toast({
         title: softExitCopy.title,

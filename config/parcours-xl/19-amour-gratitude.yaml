@@ -1,0 +1,80 @@
+title: "Amour/Connexion/Gratitude → Expansion"
+emotion: "gratitude"
+duration_min: 20
+duration_max: 22
+
+music:
+  bpm: "76–82"
+  mode: "lydian/ionian"
+  style: "warm choir-piano"
+  instruments: ["chœurs légers", "piano chaleureux"]
+  prompt: "Warm choir-piano 78 BPM, FR gratitude/heart lines, no heavy drums."
+
+segments:
+  - title: "Validation de la gratitude"
+    start: 0
+    end: 120
+    type: "validation"
+    voiceover: |
+      La gratitude est un choix.
+      Elle élargit ton cœur, elle te connecte.
+      Tu peux la cultiver.
+    
+  - title: "Journal de gratitude"
+    start: 120
+    end: 360
+    type: "cognitive"
+    voiceover: |
+      Trois choses pour lesquelles tu es reconnaissant.
+      Petites ou grandes. Nomme-les.
+      Ressens la chaleur dans ta poitrine.
+    
+  - title: "Cœur-rayonnement"
+    start: 360
+    end: 720
+    type: "imagery"
+    voiceover: |
+      Imagine une lumière dans ton cœur.
+      Elle grandit, elle rayonne.
+      Vers toi, vers les autres, vers le monde.
+    
+  - title: "Acte de gentillesse planifié"
+    start: 720
+    end: 960
+    type: "behavioral"
+    voiceover: |
+      Un geste que tu peux faire demain.
+      Pour toi, pour quelqu'un.
+      La gratitude en action.
+    
+  - title: "Main sur cœur et sourire"
+    start: 960
+    end: 1200
+    type: "anchoring"
+    voiceover: |
+      Main sur ton cœur. Souris doucement.
+      Ressens l'expansion, la connexion.
+      J'ouvre, je remercie, je rayonne.
+    
+  - title: "Consolidation"
+    start: 1200
+    end: 1320
+    type: "consolidation"
+    voiceover: |
+      Chœurs légers. Piano chaleureux.
+      J'ouvre, je remercie, je rayonne.
+      La gratitude élargit mon monde.
+
+tcm:
+  points: ["CV17"]
+  warnings: []
+  aromatherapy: "Rose"
+
+immersion:
+  light: "chaude, dorée"
+  sounds: ["chœurs"]
+  props: ["main sur cœur"]
+
+affirmations:
+  - "J'ouvre, je remercie, je rayonne."
+  - "La gratitude élargit mon monde."

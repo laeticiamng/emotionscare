@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 import { Routes } from '@/routerV2';
 

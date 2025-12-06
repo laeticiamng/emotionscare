@@ -18,6 +18,7 @@ import {
   LineChart
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 
 interface AnalyticsData {
   activeUsers: number;
@@ -139,12 +140,12 @@ export const RealTimeAnalytics: React.FC = () => {
       };
 
       wsRef.current.onerror = (error) => {
-        console.error('WebSocket error:', error);
+        logger.error('WebSocket error', { error }, 'ANALYTICS');
         setIsConnected(false);
       };
 
     } catch (error) {
-      console.error('Failed to connect WebSocket:', error);
+      logger.error('Failed to connect WebSocket', { error }, 'ANALYTICS');
       // Fallback sur des données simulées
       startMockData();
     }

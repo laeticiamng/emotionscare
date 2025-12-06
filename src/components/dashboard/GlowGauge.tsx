@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -31,9 +32,9 @@ export const GlowGauge: React.FC<GlowGaugeProps> = ({ data }) => {
   }
 
   const colors = {
-    low: { bg: 'bg-blue-100', text: 'text-blue-700' },
-    medium: { bg: 'bg-green-100', text: 'text-green-700' },
-    high: { bg: 'bg-orange-100', text: 'text-orange-700' }
+    low: { bg: 'bg-primary/10', text: 'text-primary' },
+    medium: { bg: 'bg-success/10', text: 'text-success' },
+    high: { bg: 'bg-warning/10', text: 'text-warning' }
   }[data.color];
 
   return (

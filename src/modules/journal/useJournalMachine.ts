@@ -5,6 +5,7 @@
 import { useCallback, useState, useEffect } from 'react';
 import { useAsyncMachine } from '@/hooks/useAsyncMachine';
 import { journalService, JournalEntry, JournalVoiceEntry, JournalTextEntry } from './journalService';
+import { logger } from '@/lib/logger';
 
 export type JournalState = 'idle' | 'loading' | 'recording' | 'processing' | 'success' | 'error';
 
@@ -45,19 +46,24 @@ export const useJournalMachine = (config: JournalConfig = {}) => {
           const result = await journalService.processVoiceEntry(event.data);
           
           const entry = await journalService.saveEntry({
+            type: 'voice',
             content: result.content,
             summary: result.summary,
             tone: result.tone,
-            ephemeral: false, // Par défaut, pas éphémère
+            ephemeral: false,
             voice_url: URL.createObjectURL(event.data),
             duration: recordingDuration
           });
 
-          config.onEntryCreated?.(entry);
+          if (entry) {
+            config.onEntryCreated?.(entry);
+          }
+
+          const entries = await journalService.getEntries();
 
           resolve({
-            entries: journalService.getEntries(),
-            currentEntry: entry,
+            entries,
+            currentEntry: entry || undefined,
             isRecording: false,
             recordingDuration: 0
           });
@@ -80,17 +86,22 @@ export const useJournalMachine = (config: JournalConfig = {}) => {
     const result = await journalService.processTextEntry(text);
     
     const entry = await journalService.saveEntry({
+      type: 'text',
       content: result.content,
       summary: result.summary,
       tone: result.tone,
       ephemeral: false
     });
 
-    config.onEntryCreated?.(entry);
+    if (entry) {
+      config.onEntryCreated?.(entry);
+    }
+
+    const entries = await journalService.getEntries();
 
     return {
-      entries: journalService.getEntries(),
-      currentEntry: entry,
+      entries,
+      currentEntry: entry || undefined,
       isRecording: false,
       recordingDuration: 0
     };
@@ -98,10 +109,11 @@ export const useJournalMachine = (config: JournalConfig = {}) => {
 
   const {
     state,
-    data,
+    result: machineData,
     error,
-    run,
-    reset
+    start: startProcessing,
+    reset,
+    isLoading: machineIsLoading
   } = useAsyncMachine<JournalData>({
     run: processVoiceEntry,
     onSuccess: (data) => {
@@ -113,7 +125,7 @@ export const useJournalMachine = (config: JournalConfig = {}) => {
       }
     },
     onError: (error) => {
-      console.error('Erreur journal:', error);
+      logger.error('Journal processing failed', { error }, 'JOURNAL');
       setIsRecording(false);
       setRecordingDuration(0);
       if (recordingTimer) {
@@ -150,7 +162,7 @@ export const useJournalMachine = (config: JournalConfig = {}) => {
         });
       }
     } catch (error) {
-      console.error('Erreur démarrage enregistrement:', error);
+      logger.error('Recording start failed', { error }, 'JOURNAL');
       config.onError?.(error as Error);
     }
   }, [config]);
@@ -158,9 +170,9 @@ export const useJournalMachine = (config: JournalConfig = {}) => {
   // Arrêter l'enregistrement et traiter
   const stopRecording = useCallback(() => {
     if (mediaRecorder && isRecording) {
-      run(); // Déclenche le traitement
+      startProcessing(); // Déclenche le traitement
     }
-  }, [mediaRecorder, isRecording, run]);
+  }, [mediaRecorder, isRecording, startProcessing]);
 
   // Traiter une entrée texte
   const submitTextEntry = useCallback(async (text: string) => {
@@ -176,10 +188,6 @@ export const useJournalMachine = (config: JournalConfig = {}) => {
   // Marquer une entrée comme éphémère
   const burnEntry = useCallback(async (entryId: string) => {
     await journalService.burnEntry(entryId);
-    
-    // Mettre à jour les données
-    const updatedEntries = journalService.getEntries();
-    // Note: Dans une vraie app, on devrait updater le state de l'async machine
   }, []);
 
   // Charger les entrées au montage
@@ -199,10 +207,20 @@ export const useJournalMachine = (config: JournalConfig = {}) => {
     };
   }, [recordingTimer, mediaRecorder]);
 
+  /**
+   * Determines if the journal is in a "processing" state.
+   * This includes when the async machine is loading, or when the journal state
+   * is 'active' or 'ending', which represent ongoing processing activities.
+   */
+  function isJournalProcessing(machineIsLoading: boolean, state: string): boolean {
+    return machineIsLoading || state === 'active' || state === 'ending';
+  }
+
+  const isProcessing = isJournalProcessing(machineIsLoading, state);
   return {
     state: state as JournalState,
-    data: data || {
-      entries: journalService.getEntries(),
+    data: machineData || {
+      entries: [],
       isRecording,
       recordingDuration
     },
@@ -214,6 +232,7 @@ export const useJournalMachine = (config: JournalConfig = {}) => {
     submitTextEntry,
     burnEntry,
     reset,
+    isLoading: isProcessing,
     canRecord: !!navigator.mediaDevices?.getUserMedia
   };
 };

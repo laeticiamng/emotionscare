@@ -70,8 +70,10 @@ serve(async (req) => {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
 
-  } catch (error) {
-    console.error('Error in ai-moderate function:', error);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Moderation service error';
+    const errorDetails = error instanceof Error ? error.stack : String(error);
+    console.error('Error in ai-moderate function:', errorMessage, errorDetails);
     return new Response(JSON.stringify({ 
       error: 'Moderation service error',
       safe: false,

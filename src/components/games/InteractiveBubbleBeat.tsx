@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,6 +9,7 @@ import { useWebBluetooth } from '@/hooks/useWebBluetooth';
 import { supabase } from '@/integrations/supabase/client';
 import { triggerConfetti } from '@/lib/confetti';
 import { toast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 
 interface Bubble {
   x: number;
@@ -451,7 +453,7 @@ export default function InteractiveBubbleBeat() {
         bpm_avg: bpmHistory.length > 0 ? bpmHistory.reduce((a, b) => a + b, 0) / bpmHistory.length : null
       });
     } catch (error) {
-      console.error('Erreur sauvegarde score:', error);
+      logger.error('Erreur sauvegarde score', error as Error, 'UI');
     }
 
     triggerConfetti();

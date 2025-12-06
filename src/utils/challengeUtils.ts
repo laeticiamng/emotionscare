@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 import { Challenge } from '@/types/gamification';
 

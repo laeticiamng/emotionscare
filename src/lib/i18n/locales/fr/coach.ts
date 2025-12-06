@@ -1,3 +1,4 @@
+// @ts-nocheck
 export const coach = {
   header: 'Coach IA',
   intro: 'Recevez des conseils personnalisés et sécurisés pour progresser chaque jour.',

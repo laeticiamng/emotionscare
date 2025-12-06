@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 import { useState, useEffect } from 'react';
 import { FeedbackEntry, ImprovementSuggestion, QualityMetrics, AuditLog } from '@/types/feedback';

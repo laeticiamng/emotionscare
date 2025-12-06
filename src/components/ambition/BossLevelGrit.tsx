@@ -22,8 +22,8 @@ import {
   Mountain,
   Flag,
   Gem,
-  Fire,
-  Lightning,
+  Flame,
+  Bolt,
   Users
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -78,19 +78,19 @@ interface PlayerProfile {
 }
 
 const questCategories = [
-  { id: 'professional', name: 'Professionnel', icon: Target, color: 'text-blue-600', bg: 'from-blue-50 to-blue-100' },
-  { id: 'personal', name: 'Personnel', icon: Star, color: 'text-purple-600', bg: 'from-purple-50 to-purple-100' },
-  { id: 'health', name: 'Santé', icon: Shield, color: 'text-green-600', bg: 'from-green-50 to-green-100' },
-  { id: 'learning', name: 'Apprentissage', icon: Map, color: 'text-orange-600', bg: 'from-orange-50 to-orange-100' },
-  { id: 'social', name: 'Social', icon: Users, color: 'text-pink-600', bg: 'from-pink-50 to-pink-100' }
+  { id: 'professional', name: 'Professionnel', icon: Target, color: 'text-primary', bg: 'from-primary/5 to-primary/10' },
+  { id: 'personal', name: 'Personnel', icon: Star, color: 'text-accent', bg: 'from-accent/5 to-accent/10' },
+  { id: 'health', name: 'Santé', icon: Shield, color: 'text-success', bg: 'from-success/5 to-success/10' },
+  { id: 'learning', name: 'Apprentissage', icon: Map, color: 'text-warning', bg: 'from-warning/5 to-warning/10' },
+  { id: 'social', name: 'Social', icon: Users, color: 'text-info', bg: 'from-info/5 to-info/10' }
 ];
 
 const difficultyConfig = {
-  novice: { name: 'Novice', icon: Flag, color: 'text-gray-600', multiplier: 1 },
-  warrior: { name: 'Guerrier', icon: Sword, color: 'text-green-600', multiplier: 1.5 },
-  champion: { name: 'Champion', icon: Crown, color: 'text-blue-600', multiplier: 2 },
-  legend: { name: 'Légende', icon: Lightning, color: 'text-purple-600', multiplier: 3 },
-  mythic: { name: 'Mythique', icon: Fire, color: 'text-red-600', multiplier: 5 }
+  novice: { name: 'Novice', icon: Flag, color: 'text-muted-foreground', multiplier: 1 },
+  warrior: { name: 'Guerrier', icon: Sword, color: 'text-success', multiplier: 1.5 },
+  champion: { name: 'Champion', icon: Crown, color: 'text-primary', multiplier: 2 },
+  legend: { name: 'Légende', icon: Bolt, color: 'text-accent', multiplier: 3 },
+  mythic: { name: 'Mythique', icon: Flame, color: 'text-destructive', multiplier: 5 }
 };
 
 const questDatabase: Quest[] = [
@@ -164,7 +164,7 @@ const questDatabase: Quest[] = [
     unlockLevel: 25,
     rewards: { xp: 800, coins: 300, title: 'Tueur de Dragons' },
     flavor: 'Le courage n\'est pas l\'absence de peur, mais l\'action malgré la peur.',
-    icon: Fire
+    icon: Flame
   },
 
   // Quêtes Santé
@@ -406,7 +406,7 @@ export const BossLevelGrit: React.FC = () => {
         
         <Card>
           <CardContent className="p-4 text-center">
-            <Fire className="h-8 w-8 mx-auto mb-2 text-orange-600" />
+            <Flame className="h-8 w-8 mx-auto mb-2 text-orange-600" />
             <p className="text-2xl font-bold">{playerProfile.currentStreak}</p>
             <p className="text-sm text-muted-foreground">Série Jours</p>
           </CardContent>
@@ -556,7 +556,7 @@ export const BossLevelGrit: React.FC = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm"
             onClick={() => setShowQuestModal(false)}
           >
             <motion.div

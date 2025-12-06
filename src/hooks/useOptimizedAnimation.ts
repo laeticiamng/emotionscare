@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useCallback, useMemo, useRef } from 'react';
 import { Variants } from 'framer-motion';
 

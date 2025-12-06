@@ -1,0 +1,73 @@
+title: "Rumination/Culpabilité → Clarté"
+emotion: "rumination"
+duration_min: 19
+duration_max: 21
+
+music:
+  bpm: 62
+  mode: "aeolian"
+  progression: "i–VI–III–VII"
+  time_signature: "6/8"
+  style: "minimal harp"
+  instruments: ["harpe", "kalimba", "pad low-pass"]
+  prompt: "Minimal 6/8 62 BPM, harp + kalimba, low-pass pad, spoken FR defusion cues."
+
+segments:
+  - title: "ATT - Entraînement Attentionnel"
+    start: 0
+    end: 180
+    type: "attention"
+    voiceover: |
+      Écoute le son à ta gauche... puis à ta droite.
+      Devant toi... derrière toi. Tu diriges ton attention.
+      Les pensées passent, tu restes ici.
+    
+  - title: "Défusion cognitive"
+    start: 180
+    end: 420
+    type: "defusion"
+    voiceover: |
+      Quand une pensée arrive, dis : "J'ai la pensée que..."
+      "Je suis nul" devient "J'ai la pensée que je suis nul".
+      C'est une pensée, pas un fait. Tu la regardes passer.
+    
+  - title: "Créneau souci"
+    start: 420
+    end: 660
+    type: "worry_time"
+    voiceover: |
+      Ces pensées qui tournent, donne-leur 5 minutes par jour.
+      Un moment précis. En dehors, tu dis : "Plus tard".
+      Tu reprends le contrôle.
+    
+  - title: "Proprioception et tapping"
+    start: 660
+    end: 900
+    type: "grounding"
+    voiceover: |
+      Porte ton attention sur tes mains. Elles sont lourdes.
+      Tapote doucement gauche, droite, gauche, droite.
+      Tu reviens dans ton corps, hors des pensées.
+    
+  - title: "Consolidation"
+    start: 900
+    end: 1140
+    type: "consolidation"
+    voiceover: |
+      Les pensées coulent, toi tu restes.
+      Tu es l'observateur, pas le contenu.
+      Respire. Tu es libre.
+
+tcm:
+  points: ["Yintang"]
+  warnings: []
+  aromatherapy: "Verveine, tilleul (tisane)"
+
+immersion:
+  light: "douce"
+  sounds: ["tapping bilatéral"]
+  props: ["gants lourds (proprioception)"]
+
+affirmations:
+  - "Les pensées coulent, moi je reste."
+  - "Je suis l'observateur, pas le contenu."

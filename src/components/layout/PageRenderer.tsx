@@ -1,5 +1,5 @@
-
 import React, { Suspense } from 'react';
+import { logger } from '@/lib/logger';
 import { useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
@@ -54,7 +54,7 @@ const PageRenderer: React.FC<PageRendererProps> = ({ children }) => {
         </Suspense>
       );
     } catch (error) {
-      console.error('Erreur de rendu de page:', error);
+      logger.error('Erreur de rendu de page', error as Error, 'UI');
       return <ErrorFallback error={error as Error} />;
     }
   };

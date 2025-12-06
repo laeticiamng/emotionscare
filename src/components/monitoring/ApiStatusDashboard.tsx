@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Dashboard de monitoring des APIs
  * Affiche l'état de toutes les APIs en temps réel

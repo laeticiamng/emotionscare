@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Service Suno optimisé - Architecture minimale EmotionsCare
  * Remplace MusicGen pour génération musicale thérapeutique

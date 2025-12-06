@@ -1,5 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import type { ClinicalSignal } from '@/services/clinicalOrchestration';
+import { logger } from '@/lib/logger';
 
 export type MusicOrchestrationPresetId = 'ambient_soft' | 'focus' | 'bright';
 
@@ -155,13 +156,13 @@ class MusicOrchestrationService {
         .limit(8);
 
       if (error) {
-        console.error('Failed to fetch clinical signals for music orchestration:', error);
+        logger.error('Failed to fetch clinical signals for music orchestration', error as Error, 'MUSIC');
         return { preset: this.getActivePreset(), changed: false };
       }
 
       this.cachedSignals = (data ?? []) as ClinicalSignal[];
     } catch (err) {
-      console.error('Unexpected error while fetching clinical signals:', err);
+      logger.error('Unexpected error while fetching clinical signals', err as Error, 'MUSIC');
       this.cachedSignals = [];
     }
 
@@ -289,7 +290,7 @@ class MusicOrchestrationService {
     try {
       window.localStorage.setItem(STORAGE_KEY, presetId);
     } catch (error) {
-      console.warn('Unable to persist music preset:', error);
+      logger.warn('Unable to persist music preset', error, 'MUSIC');
     }
   }
 }

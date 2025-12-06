@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { useImageOptimization } from '@/hooks/useImageOptimization';
 import { cn } from '@/lib/utils';
@@ -7,7 +6,7 @@ interface OptimizedImageProps extends React.ImgHTMLAttributes<HTMLImageElement> 
   src: string;
   alt: string;
   quality?: number;
-  format?: 'webp' | 'avif' | 'original';
+  format?: 'webp' | 'avif' | 'auto';
   lazy?: boolean;
   placeholder?: string;
   fallback?: string;
@@ -30,10 +29,9 @@ const OptimizedImage = React.memo<OptimizedImageProps>(({
   const [isInView, setIsInView] = useState(!lazy);
   const imgRef = useRef<HTMLImageElement>(null);
   
-  const { src: optimizedSrc, isLoading, error } = useImageOptimization(
-    isInView ? src : '', 
-    { quality, format, lazy, placeholder }
-  );
+  const { optimizeImageUrl } = useImageOptimization();
+  const optimizedSrc = isInView ? optimizeImageUrl(src, { quality, format }) : '';
+  const isLoading = !optimizedSrc && isInView;
 
   // Intersection Observer pour lazy loading
   useEffect(() => {

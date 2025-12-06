@@ -1,5 +1,5 @@
-
 import React, { useState, useRef } from 'react';
+import { logger } from '@/lib/logger';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
@@ -95,7 +95,7 @@ const MusicTherapy: React.FC = () => {
       toast.success('Musique personnalisée générée avec succès !');
       
     } catch (error) {
-      console.error('Music generation error:', error);
+      logger.error('Music generation error', error as Error, 'MUSIC');
       toast.error('Erreur lors de la génération de musique');
     } finally {
       setIsGenerating(false);

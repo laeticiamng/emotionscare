@@ -44,7 +44,7 @@ interface AccessibilityIssue {
 
 export function AccessibilityEnhancer() {
   const [isOpen, setIsOpen] = useState(false);
-  const [settings, setSettings] = useState<AccessibilitySettings>({
+  const [localSettings, setLocalSettings] = useState<AccessibilitySettings>({
     highContrast: false,
     reducedMotion: false,
     largeText: false,
@@ -56,10 +56,17 @@ export function AccessibilityEnhancer() {
     announcements: true
   });
   const [issues, setIssues] = useState<AccessibilityIssue[]>([]);
-  const { announceToScreenReader } = useAccessibility();
   
-  // Functions pour la compatibilité
-  const announce = announceToScreenReader;
+  // Function to announce to screen readers
+  const announce = (message: string) => {
+    const announcer = document.getElementById('announcements');
+    if (announcer) {
+      announcer.textContent = message;
+      setTimeout(() => {
+        announcer.textContent = '';
+      }, 1000);
+    }
+  };
   const handleSkipLink = (id: string) => {
     if (typeof document === 'undefined') return;
     const element = document.getElementById(id);
@@ -71,16 +78,16 @@ export function AccessibilityEnhancer() {
   const generateId = () => `accessibility-${Math.random().toString(36).substr(2, 9)}`;
 
   useEffect(() => {
-    // Load settings from localStorage
+    // Load localSettings from localStorage
     if (typeof window === 'undefined') return;
 
     try {
       const savedSettings = window.localStorage.getItem('accessibility-settings');
       if (savedSettings) {
-        setSettings(JSON.parse(savedSettings));
+        setLocalSettings(JSON.parse(savedSettings));
       }
     } catch (error) {
-      console.warn('[AccessibilityEnhancer UI] Failed to read settings', error);
+      // Settings read error - non-critical
     }
 
     // Check for accessibility issues
@@ -88,17 +95,17 @@ export function AccessibilityEnhancer() {
   }, []);
 
   useEffect(() => {
-    // Apply settings to document
-    applyAccessibilitySettings(settings);
-    // Save settings to localStorage
+    // Apply localSettings to document
+    applyAccessibilitySettings(localSettings);
+    // Save localSettings to localStorage
     try {
       if (typeof window !== 'undefined') {
-        window.localStorage.setItem('accessibility-settings', JSON.stringify(settings));
+        window.localStorage.setItem('accessibility-settings', JSON.stringify(localSettings));
       }
     } catch (error) {
-      console.warn('[AccessibilityEnhancer UI] Failed to persist settings', error);
+      // Settings persist error - non-critical
     }
-  }, [settings]);
+  }, [localSettings]);
 
   const applyAccessibilitySettings = (newSettings: AccessibilitySettings) => {
     const root = safeGetDocumentRoot();
@@ -216,7 +223,7 @@ export function AccessibilityEnhancer() {
   };
 
   const toggleSetting = (key: keyof AccessibilitySettings) => {
-    setSettings(prev => {
+    setLocalSettings((prev: AccessibilitySettings) => {
       const newSettings = { ...prev, [key]: !prev[key] };
       
       // Announce the change
@@ -460,13 +467,13 @@ export function AccessibilityEnhancer() {
                             </div>
                             <Button
                               id={setting.key}
-                              variant={settings[setting.key] ? "default" : "outline"}
+                              variant={localSettings[setting.key] ? "default" : "outline"}
                               size="sm"
                               onClick={() => toggleSetting(setting.key)}
-                              aria-pressed={settings[setting.key]}
+                              aria-pressed={localSettings[setting.key]}
                               className="shrink-0"
                             >
-                              {settings[setting.key] ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}
+                              {localSettings[setting.key] ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}
                             </Button>
                           </div>
                         ))}

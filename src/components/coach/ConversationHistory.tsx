@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -68,12 +67,12 @@ const ConversationHistory: React.FC<ConversationHistoryProps> = ({
 
   const getTopicColor = (topic: string) => {
     const colors: Record<string, string> = {
-      'stress': 'bg-red-100 text-red-800',
-      'relaxation': 'bg-blue-100 text-blue-800',
-      'sommeil': 'bg-purple-100 text-purple-800',
-      'confiance': 'bg-green-100 text-green-800'
+      'stress': 'bg-destructive/10 text-destructive',
+      'relaxation': 'bg-primary/10 text-primary',
+      'sommeil': 'bg-accent/10 text-accent',
+      'confiance': 'bg-success/10 text-success'
     };
-    return colors[topic] || 'bg-gray-100 text-gray-800';
+    return colors[topic] || 'bg-muted text-muted-foreground';
   };
 
   const renderStars = (rating?: number) => {

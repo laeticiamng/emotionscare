@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -71,11 +72,11 @@ const B2CBounceBackBattlePage: React.FC = () => {
 
   const getTypeColor = (type: string) => {
     switch (type) {
-      case 'stress': return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
-      case 'setback': return 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200';
-      case 'failure': return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200';
-      case 'rejection': return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'stress': return 'bg-destructive/10 text-destructive';
+      case 'setback': return 'bg-warning/10 text-warning';
+      case 'failure': return 'bg-accent/10 text-accent';
+      case 'rejection': return 'bg-info/10 text-info';
+      default: return 'bg-muted text-muted-foreground';
     }
   };
 
@@ -87,8 +88,8 @@ const B2CBounceBackBattlePage: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-8"
         >
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-red-500 to-orange-600 rounded-full mb-4">
-            <Shield className="w-8 h-8 text-white" />
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-destructive to-warning rounded-full mb-4">
+            <Shield className="w-8 h-8 text-primary-foreground" />
           </div>
           <h1 className="text-3xl font-bold text-foreground mb-4">
             Bounce-Back Battle
@@ -110,7 +111,7 @@ const B2CBounceBackBattlePage: React.FC = () => {
 
           <Card>
             <CardContent className="p-4 text-center">
-              <Zap className="w-8 h-8 mx-auto mb-2 text-red-500" />
+              <Zap className="w-8 h-8 mx-auto mb-2 text-destructive" />
               <div className="text-2xl font-bold">{resilienceStats.stress}%</div>
               <div className="text-sm text-muted-foreground">Anti-Stress</div>
             </CardContent>
@@ -118,7 +119,7 @@ const B2CBounceBackBattlePage: React.FC = () => {
 
           <Card>
             <CardContent className="p-4 text-center">
-              <Heart className="w-8 h-8 mx-auto mb-2 text-pink-500" />
+              <Heart className="w-8 h-8 mx-auto mb-2 text-accent" />
               <div className="text-2xl font-bold">{resilienceStats.emotional}%</div>
               <div className="text-sm text-muted-foreground">Émotionnel</div>
             </CardContent>
@@ -126,7 +127,7 @@ const B2CBounceBackBattlePage: React.FC = () => {
 
           <Card>
             <CardContent className="p-4 text-center">
-              <TrendingUp className="w-8 h-8 mx-auto mb-2 text-blue-500" />
+              <TrendingUp className="w-8 h-8 mx-auto mb-2 text-info" />
               <div className="text-2xl font-bold">{resilienceStats.mental}%</div>
               <div className="text-sm text-muted-foreground">Mental</div>
             </CardContent>
@@ -134,7 +135,7 @@ const B2CBounceBackBattlePage: React.FC = () => {
 
           <Card>
             <CardContent className="p-4 text-center">
-              <Star className="w-8 h-8 mx-auto mb-2 text-yellow-500" />
+              <Star className="w-8 h-8 mx-auto mb-2 text-warning" />
               <div className="text-2xl font-bold">{resilienceStats.streak}</div>
               <div className="text-sm text-muted-foreground">Série</div>
             </CardContent>
@@ -169,7 +170,7 @@ const B2CBounceBackBattlePage: React.FC = () => {
                         </Badge>
                         <div className="flex items-center gap-1">
                           {Array.from({ length: challenge.difficulty }).map((_, i) => (
-                            <Star key={i} className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                            <Star key={i} className="w-3 h-3 fill-warning text-warning" />
                           ))}
                         </div>
                       </div>

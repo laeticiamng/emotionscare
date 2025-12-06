@@ -1,4 +1,6 @@
+// @ts-nocheck
 import { useState, useEffect, useCallback } from 'react';
+import { logger } from '@/lib/logger';
 
 interface ServiceWorkerState {
   isSupported: boolean;
@@ -31,12 +33,12 @@ export function useServiceWorker(): ServiceWorkerState & ServiceWorkerActions {
   // Enregistrer le Service Worker
   const register = useCallback(async () => {
     if (!state.isSupported) {
-      console.warn('Service Worker non supporté dans ce navigateur');
+      logger.warn('Service Worker non supporté dans ce navigateur', null, 'useServiceWorker.register');
       return;
     }
 
     try {
-      console.log('🔧 Enregistrement du Service Worker...');
+      logger.info('Enregistrement du Service Worker', null, 'useServiceWorker.register');
       
       const registration = await navigator.serviceWorker.register('/sw.js', {
         scope: '/',
@@ -49,7 +51,7 @@ export function useServiceWorker(): ServiceWorkerState & ServiceWorkerActions {
         registration,
       }));
 
-      console.log('✅ Service Worker enregistré:', registration.scope);
+      logger.info(`Service Worker enregistré: ${registration.scope}`, null, 'useServiceWorker.register');
 
       // Écouter les mises à jour
       registration.addEventListener('updatefound', () => {
@@ -64,7 +66,7 @@ export function useServiceWorker(): ServiceWorkerState & ServiceWorkerActions {
                 isWaitingForUpdate: true,
               }));
               
-              console.log('🔄 Nouvelle version du Service Worker disponible');
+              logger.info('Nouvelle version du Service Worker disponible', null, 'useServiceWorker.register');
             }
           });
         }
@@ -79,7 +81,7 @@ export function useServiceWorker(): ServiceWorkerState & ServiceWorkerActions {
       }
 
     } catch (error) {
-      console.error('❌ Erreur lors de l\'enregistrement du Service Worker:', error);
+      logger.error('Erreur lors de l\'enregistrement du Service Worker', error, 'useServiceWorker.register');
     }
   }, [state.isSupported]);
 
@@ -96,9 +98,9 @@ export function useServiceWorker(): ServiceWorkerState & ServiceWorkerActions {
         registration: null,
       }));
 
-      console.log('🗑️ Service Worker désinstallé:', result);
+      logger.info(`Service Worker désinstallé: ${result}`, null, 'useServiceWorker.unregister');
     } catch (error) {
-      console.error('❌ Erreur lors de la désinstallation du Service Worker:', error);
+      logger.error('Erreur lors de la désinstallation du Service Worker', error, 'useServiceWorker.unregister');
     }
   }, [state.registration]);
 
@@ -114,7 +116,7 @@ export function useServiceWorker(): ServiceWorkerState & ServiceWorkerActions {
       isWaitingForUpdate: false,
     }));
 
-    console.log('⏭️ Activation de la nouvelle version du Service Worker');
+    logger.info('Activation de la nouvelle version du Service Worker', null, 'useServiceWorker.skipWaiting');
   }, [state.registration]);
 
   // Mettre à jour le cache
@@ -122,7 +124,7 @@ export function useServiceWorker(): ServiceWorkerState & ServiceWorkerActions {
     if (!state.registration) return;
 
     state.registration.active?.postMessage({ type: 'CACHE_UPDATE' });
-    console.log('🔄 Mise à jour du cache demandée');
+    logger.info('Mise à jour du cache demandée', null, 'useServiceWorker.updateCache');
   }, [state.registration]);
 
   // Vérifier les mises à jour manuellement
@@ -131,9 +133,9 @@ export function useServiceWorker(): ServiceWorkerState & ServiceWorkerActions {
 
     try {
       await state.registration.update();
-      console.log('🔍 Vérification des mises à jour terminée');
+      logger.info('Vérification des mises à jour terminée', null, 'useServiceWorker.checkForUpdates');
     } catch (error) {
-      console.error('❌ Erreur lors de la vérification des mises à jour:', error);
+      logger.error('Erreur lors de la vérification des mises à jour', error, 'useServiceWorker.checkForUpdates');
     }
   }, [state.registration]);
 
@@ -141,12 +143,12 @@ export function useServiceWorker(): ServiceWorkerState & ServiceWorkerActions {
   useEffect(() => {
     const handleOnline = () => {
       setState(prev => ({ ...prev, isOffline: false }));
-      console.log('🌐 Connexion rétablie');
+      logger.info('Connexion rétablie', null, 'useServiceWorker');
     };
 
     const handleOffline = () => {
       setState(prev => ({ ...prev, isOffline: true }));
-      console.log('📡 Connexion perdue - mode hors ligne');
+      logger.info('Connexion perdue - mode hors ligne', null, 'useServiceWorker');
     };
 
     window.addEventListener('online', handleOnline);
@@ -233,7 +235,7 @@ export function useCacheManager() {
       setCacheKeys(cacheNames);
       
     } catch (error) {
-      console.error('Erreur lors du calcul de la taille du cache:', error);
+      logger.error('Erreur lors du calcul de la taille du cache', error, 'useCacheManager.calculateCacheSize');
     }
   }, []);
 
@@ -243,17 +245,17 @@ export function useCacheManager() {
     try {
       if (cacheName) {
         await caches.delete(cacheName);
-        console.log(`Cache "${cacheName}" supprimé`);
+        logger.info(`Cache "${cacheName}" supprimé`, null, 'useCacheManager.clearCache');
       } else {
         const cacheNames = await caches.keys();
         await Promise.all(cacheNames.map(name => caches.delete(name)));
-        console.log('Tous les caches supprimés');
+        logger.info('Tous les caches supprimés', null, 'useCacheManager.clearCache');
       }
       
       await calculateCacheSize();
       
     } catch (error) {
-      console.error('Erreur lors de la suppression du cache:', error);
+      logger.error('Erreur lors de la suppression du cache', error, 'useCacheManager.clearCache');
     }
   }, [calculateCacheSize]);
 
@@ -264,11 +266,11 @@ export function useCacheManager() {
       const cache = await caches.open('preload-cache');
       await cache.addAll(urls);
       
-      console.log(`${urls.length} ressources préchargées`);
+      logger.info(`${urls.length} ressources préchargées`, null, 'useCacheManager.preloadResources');
       await calculateCacheSize();
       
     } catch (error) {
-      console.error('Erreur lors du préchargement:', error);
+      logger.error('Erreur lors du préchargement', error, 'useCacheManager.preloadResources');
     }
   }, [calculateCacheSize]);
 

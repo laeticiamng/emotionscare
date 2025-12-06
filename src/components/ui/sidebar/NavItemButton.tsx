@@ -1,12 +1,12 @@
-
 import React, { useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { log } from '@/lib/obs/logger';
 
 interface NavItemButtonProps {
   path: string;
-  icon: React.ElementType;
+  icon: React.ComponentType<{ className?: string }>;
   label: string;
   collapsed: boolean;
 }
@@ -20,14 +20,14 @@ const NavItemButton: React.FC<NavItemButtonProps> = ({ path, icon, label, collap
   }, [location.pathname]);
 
   const handleNavigation = useCallback(() => {
-    console.log(`Navigation to: ${path}`);
+    log.info(`Navigation to: ${path}`);
     navigate(path);
   }, [path, navigate]);
 
   const Icon = icon;
   
   // Debug pour vérifier si le bouton reçoit correctement les props
-  console.log(`Rendering NavItemButton: ${label}, Path: ${path}, Active: ${isActive(path)}, Collapsed: ${collapsed}`);
+  log.info(`Rendering NavItemButton: ${label}, Path: ${path}, Active: ${isActive(path)}, Collapsed: ${collapsed}`);
 
   // Version avec tooltip lorsque la barre latérale est réduite
   if (collapsed) {

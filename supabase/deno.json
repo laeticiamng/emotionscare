@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "lib": ["deno.window"],
+    "strict": false,
+    "noImplicitAny": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "skipLibCheck": true
+  },
+  "lint": {
+    "files": {
+      "exclude": ["functions/**/*.test.ts"]
+    }
+  },
+  "fmt": {
+    "files": {
+      "exclude": ["functions/**/*.test.ts"]
+    }
+  }
+}

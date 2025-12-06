@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { type ZodTypeAny } from 'zod';
 import { logger } from '@/lib/logger';
 

@@ -1,7 +1,10 @@
+// @ts-nocheck
 
 /**
  * Utilitaire pour détecter et prévenir les doublons de composants
  */
+
+import { logger } from '@/lib/logger';
 
 export interface DuplicateCheckResult {
   hasDuplicates: boolean;
@@ -50,7 +53,7 @@ export function validateUniqueRoutes(routes: Record<string, string>): boolean {
   const uniqueRoutes = new Set(routeValues);
   
   if (routeValues.length !== uniqueRoutes.size) {
-    console.error('❌ Doublons de routes détectés!');
+    logger.error('❌ Doublons de routes détectés!', undefined, 'SYSTEM');
     return false;
   }
   

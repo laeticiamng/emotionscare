@@ -48,7 +48,6 @@ import {
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { useAccessibility } from '@/components/common/AccessibilityProvider';
 import { logProductionEvent } from '@/utils/consoleCleanup';
 
 interface NavigationItem {
@@ -154,10 +153,20 @@ const UnifiedSidebar: React.FC<UnifiedSidebarProps> = memo(({
   className,
   enabledFeatures = []
 }) => {
-  const { collapsed } = useSidebar();
+  const { open } = useSidebar();
   const location = useLocation();
-  const { announceToScreenReader } = useAccessibility();
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set(['Principal']));
+
+  // Announce to screen reader
+  const announceToScreenReader = (message: string) => {
+    const announcement = document.createElement('div');
+    announcement.setAttribute('role', 'status');
+    announcement.setAttribute('aria-live', 'polite');
+    announcement.className = 'sr-only';
+    announcement.textContent = message;
+    document.body.appendChild(announcement);
+    setTimeout(() => document.body.removeChild(announcement), 1000);
+  };
 
   // Filter navigation based on user role and feature flags
   const filteredGroups = navigationGroups.filter(group => {
@@ -232,7 +241,7 @@ const UnifiedSidebar: React.FC<UnifiedSidebarProps> = memo(({
   }, [isActive]);
 
   return (
-    <Sidebar className={cn('border-r bg-card', className)} collapsible>
+    <Sidebar className={cn('border-r bg-card', className)} collapsible="icon">
       {/* Mobile trigger - always visible */}
       <div className="p-2 border-b lg:hidden">
         <SidebarTrigger 
@@ -246,11 +255,9 @@ const UnifiedSidebar: React.FC<UnifiedSidebarProps> = memo(({
           const isExpanded = expandedGroups.has(group.label);
           
           return (
-            <SidebarGroup 
-              key={group.label}
-              open={isExpanded}
-              onOpenChange={() => toggleGroup(group.label)}
-            >
+          <SidebarGroup 
+            key={group.label}
+          >
               <SidebarGroupLabel 
                 className="flex items-center justify-between text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 cursor-pointer hover:text-foreground transition-colors"
                 onClick={() => toggleGroup(group.label)}
@@ -304,7 +311,7 @@ const UnifiedSidebar: React.FC<UnifiedSidebarProps> = memo(({
                             aria-hidden="true"
                           />
                           
-                          {!collapsed && (
+                          {open && (
                             <>
                               <span className="flex-1 text-sm font-medium">
                                 {item.title}
@@ -332,7 +339,7 @@ const UnifiedSidebar: React.FC<UnifiedSidebarProps> = memo(({
         })}
 
         {/* Sidebar footer */}
-        {!collapsed && (
+        {open && (
           <div className="mt-auto pt-4 border-t">
             <div className="text-xs text-muted-foreground text-center">
               <p>EmotionsCare v2.0</p>
@@ -357,7 +364,6 @@ export const UnifiedSidebarProvider: React.FC<{
   return (
     <SidebarProvider 
       defaultOpen={!defaultCollapsed}
-      collapsedWidth={56}
     >
       <div className="min-h-screen flex w-full">
         {children}

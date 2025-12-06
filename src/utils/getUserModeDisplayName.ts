@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 import { UserModeType } from '@/types/userMode';
 

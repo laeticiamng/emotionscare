@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { CoachChatProps } from '@/types/coach';
 import { useCoach } from '@/contexts/coach';
@@ -7,6 +6,7 @@ import CoachChatInput from './CoachChatInput';
 import CoachCharacter from './CoachCharacter';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
+import { logger } from '@/lib/logger';
 
 const CoachChat: React.FC<CoachChatProps> = ({
   initialMessage,
@@ -33,7 +33,7 @@ const CoachChat: React.FC<CoachChatProps> = ({
     // Send initial message from coach if provided
     if (initialMessage && messages.length === 0) {
       // Add initial message from coach to the chat
-      sendMessage(initialMessage, 'coach');
+      sendMessage(initialMessage, 'assistant');
     }
   }, [initialMessage, messages.length, sendMessage]);
   
@@ -44,7 +44,7 @@ const CoachChat: React.FC<CoachChatProps> = ({
       // Send user message
       sendMessage(text, 'user');
     } catch (error) {
-      console.error('Failed to send message:', error);
+      logger.error('Failed to send message:', error);
       toast({
         title: "Erreur",
         description: "Impossible d'envoyer votre message. Veuillez réessayer.",

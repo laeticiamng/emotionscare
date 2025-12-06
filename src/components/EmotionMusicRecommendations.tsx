@@ -1,5 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
+import { logger } from '@/lib/logger';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Play, Music } from 'lucide-react';
@@ -57,7 +58,7 @@ const EmotionMusicRecommendations: React.FC<EmotionMusicRecommendationsProps> = 
     try {
       await activateMusicForEmotion({ emotion: recommendedEmotion });
     } catch (error) {
-      console.error("Error activating music:", error);
+      logger.error('Error activating music', error, 'MUSIC');
     }
   };
 

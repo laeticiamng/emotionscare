@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useUserModeHelpers } from '@/hooks/useUserModeHelpers';
 import { motion, AnimatePresence } from 'framer-motion';

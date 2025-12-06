@@ -1,27 +1,31 @@
-
-import { useState } from 'react';
-
-interface FeatureFlags {
-  musicModule: boolean;
-  vrSessions: boolean;
-  emotionAnalysis: boolean;
-  coachChat: boolean;
-}
+import { useMemo } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { 
+  FeatureFlags, 
+  FeatureFlagKey, 
+  getFeatureFlagsForRole, 
+  isFeatureEnabled,
+  DEFAULT_FLAGS,
+} from '@/core/flags';
 
 export const useFeatureFlags = () => {
-  const [flags] = useState<FeatureFlags>({
-    musicModule: true,
-    vrSessions: true,
-    emotionAnalysis: true,
-    coachChat: true
-  });
+  const { user } = useAuth();
+  const role = user?.user_metadata?.role || user?.app_metadata?.role;
 
-  const isEnabled = (feature: keyof FeatureFlags) => {
-    return flags[feature];
+  const flags = useMemo<FeatureFlags>(() => {
+    if (!user || !role) {
+      return DEFAULT_FLAGS;
+    }
+
+    return getFeatureFlagsForRole(role);
+  }, [user, role]);
+
+  const isEnabled = (feature: FeatureFlagKey): boolean => {
+    return isFeatureEnabled(flags, feature);
   };
 
   return {
     flags,
-    isEnabled
+    isEnabled,
   };
 };

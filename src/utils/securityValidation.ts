@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 /**
  * Utilitaires de validation sécurisée

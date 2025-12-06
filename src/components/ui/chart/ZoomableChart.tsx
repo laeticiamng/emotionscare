@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 import React, { useState, useRef, useCallback } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';

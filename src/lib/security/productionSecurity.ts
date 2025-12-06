@@ -1,5 +1,5 @@
-
 import { APP_BASE_CSP } from './headers';
+import { logger } from '@/lib/logger';
 
 /**
  * Sécurité renforcée pour la production
@@ -10,16 +10,13 @@ export const initProductionSecurity = async (): Promise<void> => {
     // Désactiver les DevTools en production
     disableDevTools();
     
-    // Appliquer les en-têtes de sécurité
-    applySecurityHeaders();
-    
     // Nettoyer les variables sensibles
     cleanSensitiveData();
     
     // Initialiser le monitoring de sécurité
     initSecurityMonitoring();
     
-    console.log('🛡️ Production security initialized');
+    logger.info('Production security initialized', undefined, 'SYSTEM');
   }
 };
 
@@ -34,14 +31,20 @@ const disableDevTools = (): void => {
       onCommitFiberUnmount: () => {},
     };
 
-    // Remplacer console par le logger sécurisé
+    // EN PRODUCTION SEULEMENT : Remplacer console par le logger sécurisé
+    // MAIS garder console.error pour le débogage critique
     if (import.meta.env.PROD) {
       const noop = () => {};
+      const originalError = console.error;
       console.log = noop;
       console.warn = noop;
-      console.error = noop;
       console.info = noop;
       console.debug = noop;
+      // Garder console.error pour voir les erreurs critiques
+      console.error = (...args) => {
+        logger.error('Production error', args[0], 'SYSTEM');
+        originalError(...args);
+      };
     }
   }
 };
@@ -106,7 +109,7 @@ const initSecurityMonitoring = (): void => {
     if (event.error && event.error.stack) {
       const stack = event.error.stack.toLowerCase();
       if (stack.includes('script') || stack.includes('eval') || stack.includes('function')) {
-        console.warn('🚨 Potential XSS attempt detected');
+        logger.warn('Potential XSS attempt detected', undefined, 'SYSTEM');
         // En production, envoyer à un service de monitoring
       }
     }
@@ -120,7 +123,7 @@ const initSecurityMonitoring = (): void => {
           if (node.nodeType === Node.ELEMENT_NODE) {
             const element = node as Element;
             if (element.tagName === 'SCRIPT' && !element.hasAttribute('data-allowed')) {
-              console.warn('🚨 Unauthorized script injection detected');
+              logger.warn('Unauthorized script injection detected', undefined, 'SYSTEM');
               element.remove();
             }
           }
@@ -150,12 +153,12 @@ export const validateEnvironment = (): boolean => {
   });
 
   if (missing.length > 0) {
-    console.error('❌ Missing required environment variables:', missing);
+    logger.error('Missing required environment variables', { missing }, 'SYSTEM');
     return false;
   }
 
   if (exposedForbidden.length > 0) {
-    console.error('❌ Forbidden environment variables exposed in client build:', exposedForbidden);
+    logger.error('Forbidden environment variables exposed in client build', { exposedForbidden }, 'SYSTEM');
     return false;
   }
 

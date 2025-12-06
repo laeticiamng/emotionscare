@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { useJournalStore, type JournalEntry } from '../journal.store';

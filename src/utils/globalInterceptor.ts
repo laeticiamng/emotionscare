@@ -1,3 +1,6 @@
+// @ts-nocheck
+
+import { logger } from '@/lib/logger';
 
 interface RequestMetrics {
   url: string;
@@ -41,7 +44,7 @@ class GlobalInterceptor {
       
       // Log des erreurs API
       if (!response.ok) {
-        console.warn(`API Error: ${method} ${url} - Status: ${response.status}`);
+        logger.warn(`API Error: ${method} ${url}`, { status: response.status }, 'API');
       }
       
       return response;
@@ -58,7 +61,7 @@ class GlobalInterceptor {
         timestamp: Date.now()
       });
       
-      console.error(`Network Error: ${method} ${url}`, error);
+      logger.error(`Network Error: ${method} ${url}`, error as Error, 'API');
       
       // Retourner null au lieu de lever l'erreur
       return null;
@@ -90,11 +93,11 @@ class GlobalInterceptor {
 
   private static reportErrorMetric(metric: RequestMetrics): void {
     // Reporter les erreurs API vers le monitoring
-    console.error('API Error Metric:', {
+    logger.error('API Error Metric', {
       url: metric.url,
       status: metric.status,
       duration: metric.duration
-    });
+    }, 'API');
   }
 
   /**

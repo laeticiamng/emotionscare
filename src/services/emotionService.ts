@@ -1,6 +1,6 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { EmotionResult } from '@/types/emotion';
+import { logger } from '@/lib/logger';
 
 export class EmotionService {
   static async analyzeText(text: string): Promise<EmotionResult> {
@@ -14,6 +14,8 @@ export class EmotionService {
       return {
         emotion: data.emotion,
         confidence: data.confidence,
+        valence: data.valence || 0,
+        arousal: data.arousal || 0,
         source: 'text',
         timestamp: new Date(),
         transcription: text,
@@ -21,7 +23,7 @@ export class EmotionService {
         details: data.details
       };
     } catch (error) {
-      console.error('Erreur analyse texte:', error);
+      logger.error('Erreur analyse texte', error as Error, 'SCAN');
       throw new Error('Erreur lors de l\'analyse du texte');
     }
   }
@@ -39,6 +41,8 @@ export class EmotionService {
       return {
         emotion: data.emotion,
         confidence: data.confidence,
+        valence: data.valence || 0,
+        arousal: data.arousal || 0,
         source: 'voice',
         timestamp: new Date(),
         transcription: data.transcription,
@@ -46,7 +50,7 @@ export class EmotionService {
         details: data.details
       };
     } catch (error) {
-      console.error('Erreur analyse audio:', error);
+      logger.error('Erreur analyse audio', error as Error, 'SCAN');
       throw new Error('Erreur lors de l\'analyse audio');
     }
   }
@@ -62,12 +66,14 @@ export class EmotionService {
       return {
         emotion: data.emotion,
         confidence: data.confidence,
+        valence: data.valence || 0,
+        arousal: data.arousal || 0,
         source: 'facial',
         timestamp: new Date(),
         details: data.details
       };
     } catch (error) {
-      console.error('Erreur analyse faciale:', error);
+      logger.error('Erreur analyse faciale', error as Error, 'SCAN');
       throw new Error('Erreur lors de l\'analyse faciale');
     }
   }
@@ -88,7 +94,7 @@ export class EmotionService {
 
       if (error) throw error;
     } catch (error) {
-      console.error('Erreur sauvegarde:', error);
+      logger.error('Erreur sauvegarde', error as Error, 'SCAN');
       throw new Error('Erreur lors de la sauvegarde');
     }
   }

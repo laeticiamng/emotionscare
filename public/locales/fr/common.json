@@ -1,0 +1,17 @@
+{
+  "retry": "Réessayer",
+  "back": "Retour",
+  "home": "Accueil",
+  "help": "Aide",
+  "cancel": "Annuler",
+  "confirm": "Confirmer",
+  "save": "Enregistrer",
+  "delete": "Supprimer",
+  "edit": "Modifier",
+  "close": "Fermer",
+  "loading": "Chargement...",
+  "error": "Erreur",
+  "success": "Succès",
+  "warning": "Avertissement",
+  "info": "Information"
+}

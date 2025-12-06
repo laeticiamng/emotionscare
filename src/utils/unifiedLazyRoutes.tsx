@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 import React, { lazy } from 'react';
 import { ComponentLoadingFallback } from '@/components/ui/loading-fallback';

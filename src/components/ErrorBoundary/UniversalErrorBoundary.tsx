@@ -1,5 +1,6 @@
 
 import React, { Component, ErrorInfo, ReactNode, startTransition } from 'react';
+import { logger } from '@/lib/logger';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
@@ -27,7 +28,7 @@ export class UniversalErrorBoundary extends Component<Props, State> {
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
-    console.error('UniversalErrorBoundary caught an error:', error, errorInfo);
+    logger.error('Error caught by ErrorBoundary', { error, errorInfo }, 'UI');
     this.setState({
       hasError: true,
       error,

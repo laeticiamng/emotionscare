@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserMode } from '@/contexts/UserModeContext';
@@ -176,7 +175,7 @@ const AccessVerifier: React.FC = () => {
                     </div>
                     
                     <div className="flex items-center gap-2">
-                      <Badge variant={isAccessible ? "success" : "destructive"}>
+                      <Badge variant={isAccessible ? "default" : "destructive"}>
                         {isAccessible ? "Accessible" : "Restreint"}
                       </Badge>
                       {isAccessible && (

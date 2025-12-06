@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnostic EmotionsCare</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 { font-size: 2.5rem; margin-bottom: 30px; text-align: center; }
+        .status { 
+            padding: 15px; 
+            margin: 10px 0; 
+            border-radius: 10px; 
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .ok { background: rgba(76, 175, 80, 0.3); }
+        .error { background: rgba(244, 67, 54, 0.3); }
+        .info { background: rgba(33, 150, 243, 0.3); }
+        .icon { font-size: 1.5rem; }
+        button {
+            background: white;
+            color: #667eea;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 20px auto;
+            display: block;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+        button:hover { transform: scale(1.05); }
+        #logs { 
+            background: rgba(0,0,0,0.3); 
+            padding: 20px; 
+            border-radius: 10px; 
+            margin-top: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .log-entry { margin: 5px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Diagnostic EmotionsCare</h1>
+        
+        <div class="status ok">
+            <span class="icon">✅</span>
+            <span>HTML chargé correctement</span>
+        </div>
+        
+        <div class="status" id="jsStatus">
+            <span class="icon">⏳</span>
+            <span>Test JavaScript en cours...</span>
+        </div>
+        
+        <div class="status" id="domStatus">
+            <span class="icon">⏳</span>
+            <span>Test manipulation DOM...</span>
+        </div>
+        
+        <div class="status" id="fetchStatus">
+            <span class="icon">⏳</span>
+            <span>Test requêtes réseau...</span>
+        </div>
+        
+        <button onclick="goToApp()">🚀 Lancer l'application</button>
+        
+        <div id="logs">
+            <div class="log-entry">[INFO] Diagnostic démarré</div>
+        </div>
+    </div>
+
+    <script>
+        const log = (msg, type = 'INFO') => {
+            const logs = document.getElementById('logs');
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.textContent = `[${type}] ${new Date().toLocaleTimeString()} - ${msg}`;
+            logs.appendChild(entry);
+            logs.scrollTop = logs.scrollHeight;
+            console.log(`[${type}] ${msg}`);
+        };
+
+        const updateStatus = (id, success, message) => {
+            const el = document.getElementById(id);
+            el.className = `status ${success ? 'ok' : 'error'}`;
+            el.innerHTML = `<span class="icon">${success ? '✅' : '❌'}</span><span>${message}</span>`;
+        };
+
+        // Test 1: JavaScript
+        setTimeout(() => {
+            log('JavaScript fonctionne!', 'SUCCESS');
+            updateStatus('jsStatus', true, 'JavaScript fonctionne correctement');
+        }, 100);
+
+        // Test 2: DOM
+        setTimeout(() => {
+            try {
+                const test = document.createElement('div');
+                document.body.appendChild(test);
+                document.body.removeChild(test);
+                log('Manipulation DOM OK', 'SUCCESS');
+                updateStatus('domStatus', true, 'Manipulation DOM OK');
+            } catch (error) {
+                log(`Erreur DOM: ${error.message}`, 'ERROR');
+                updateStatus('domStatus', false, 'Erreur manipulation DOM');
+            }
+        }, 200);
+
+        // Test 3: Fetch
+        setTimeout(async () => {
+            try {
+                const response = await fetch('/manifest.json');
+                if (response.ok) {
+                    log('Fetch API fonctionne', 'SUCCESS');
+                    updateStatus('fetchStatus', true, 'Requêtes réseau OK');
+                } else {
+                    log(`Fetch retourne ${response.status}`, 'WARN');
+                    updateStatus('fetchStatus', false, `HTTP ${response.status}`);
+                }
+            } catch (error) {
+                log(`Erreur Fetch: ${error.message}`, 'ERROR');
+                updateStatus('fetchStatus', false, 'Erreur requêtes réseau');
+            }
+        }, 300);
+
+        // Test module ES6
+        setTimeout(() => {
+            if (typeof import === 'function') {
+                log('Modules ES6 supportés', 'SUCCESS');
+            } else {
+                log('Modules ES6 NON supportés', 'ERROR');
+            }
+        }, 400);
+
+        function goToApp() {
+            log('Redirection vers l\'application...', 'INFO');
+            window.location.href = '/';
+        }
+
+        log('Tests de diagnostic en cours...');
+    </script>
+</body>
+</html>

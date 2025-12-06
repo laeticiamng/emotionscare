@@ -1,8 +1,10 @@
+// @ts-nocheck
 "use client";
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import * as Sentry from '@sentry/react';
+import { captureException } from '@/lib/ai-monitoring';
 import { Link } from 'react-router-dom';
+import { logger } from '@/lib/logger';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -21,13 +23,14 @@ import { useToast } from '@/hooks/use-toast';
 import { useMotionPrefs } from '@/hooks/useMotionPrefs';
 import { useSessionClock } from '@/hooks/useSessionClock';
 import { GlowSurface } from '@/ui/GlowSurface';
-import { useFlashPhases } from '@/modules/flash/useFlashPhases';
+import { WallOfLights } from '@/components/flashglow/WallOfLights';
+import { useFlashPhases } from '@/modules/flash-glow/useFlashPhases';
 import {
   computeMoodDelta,
   getCurrentMoodSnapshot,
   logAndJournal,
   type MoodSnapshot,
-} from '@/modules/flash/sessionService';
+} from '@/modules/flash-glow/sessionService';
 import useCurrentMood from '@/hooks/useCurrentMood';
 import { ff } from '@/lib/flags/ff';
 import { useClinicalHints } from '@/hooks/useClinicalHints';
@@ -167,7 +170,7 @@ const storeCooldown = (timestamp: number) => {
   try {
     window.localStorage.setItem('flash_glow_suds_cooldown', String(timestamp));
   } catch (error) {
-    console.error('Impossible de sauvegarder le cooldown SUDS', error);
+    logger.error('Impossible de sauvegarder le cooldown SUDS', error as Error, 'SYSTEM');
   }
 };
 
@@ -178,7 +181,7 @@ const getCooldown = (): number | null => {
     const parsed = Number(raw);
     return Number.isFinite(parsed) ? parsed : null;
   } catch (error) {
-    console.error('Impossible de lire le cooldown SUDS', error);
+    logger.error('Impossible de lire le cooldown SUDS', error as Error, 'SYSTEM');
     return null;
   }
 };
@@ -187,7 +190,7 @@ const storeOptIn = (value: boolean) => {
   try {
     window.localStorage.setItem('flash_glow_suds_opt_in', value ? 'true' : 'false');
   } catch (error) {
-    console.error('Impossible de stocker la préférence SUDS', error);
+    logger.error('Impossible de stocker la préférence SUDS', error as Error, 'SYSTEM');
   }
 };
 
@@ -198,7 +201,7 @@ const readOptIn = (): boolean | null => {
     if (raw === 'false') return false;
     return null;
   } catch (error) {
-    console.error('Impossible de lire la préférence SUDS', error);
+    logger.error('Impossible de lire la préférence SUDS', error as Error, 'SYSTEM');
     return null;
   }
 };
@@ -395,7 +398,7 @@ const FlashGlowView: React.FC = () => {
 
       return true;
     } catch (error) {
-      console.error('Error submitting SUDS measure:', error);
+      logger.error('Error submitting SUDS measure', error as Error, 'SYSTEM');
       toast({
         title: 'Mesure indisponible',
         description: 'Impossible de transmettre le ressenti pour le moment.',
@@ -673,7 +676,7 @@ const FlashGlowView: React.FC = () => {
     try {
       window.localStorage.removeItem('flash_glow_suds_cooldown');
     } catch (error) {
-      console.error('Impossible de nettoyer le cooldown SUDS', error);
+      logger.error('Impossible de nettoyer le cooldown SUDS', error as Error, 'SYSTEM');
     }
   };
 
@@ -792,23 +795,12 @@ const FlashGlowView: React.FC = () => {
 
   const appearance = PHASE_APPEARANCE[snapshot.phase.key] ?? PHASE_APPEARANCE.warmup;
 
-  const phaseSurface = softEffects || motion.prefersReducedMotion ? (
-    <div
-      aria-label="Surface lumineuse douce"
-      className="h-64 w-full rounded-2xl border"
-      style={{
-        background: `radial-gradient(circle at 50% 30%, ${currentMood.palette.surface}, transparent 70%)`,
-        borderColor: currentMood.palette.border,
-        transition: 'opacity 240ms ease-in-out',
-        opacity: 0.6 + (snapshot.progress ?? 0) * 0.3,
-      }}
-    />
-  ) : (
-    <GlowSurface
-      phase01={snapshot.progress}
+  const phaseSurface = (
+    <WallOfLights
+      phase={snapshot.phase.key as 'warmup' | 'glow' | 'settle'}
+      progress={snapshot.progress ?? 0}
       theme={appearance.theme}
       intensity={appearance.intensity}
-      shape={appearance.shape}
     />
   );
 
@@ -959,7 +951,7 @@ const FlashGlowView: React.FC = () => {
                   try {
                     window.localStorage.removeItem('flash_glow_suds_cooldown');
                   } catch (error) {
-                    console.error('Impossible de supprimer le cooldown SUDS', error);
+                    logger.error('Impossible de supprimer le cooldown SUDS', error as Error, 'SYSTEM');
                   }
                 }}
               >

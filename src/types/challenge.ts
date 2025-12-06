@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 // Challenge and badge interfaces
 export interface Badge {

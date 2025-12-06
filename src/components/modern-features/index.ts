@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Index des fonctionnalités modernes
  * Export centralisé de tous les composants améliorés

@@ -1,4 +1,5 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
+import { logger } from '@/lib/logger';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -106,17 +107,21 @@ const EmotionScannerPremium: React.FC<EmotionScannerPremiumProps> = ({
       setScanProgress(100);
 
       // Create emotion result
+      const sourceMap: Record<ScanMode, 'facial' | 'voice' | 'text' | 'manual'> = {
+        'face': 'facial',
+        'voice': 'voice',
+        'mood_cards': 'manual'
+      };
+      
       const emotionResult: EmotionResult = {
-        id: `scan-${Date.now()}`,
-        timestamp: new Date().toISOString(),
+        timestamp: new Date(),
         emotion: scanResult.currentMood?.emotion || 'neutral',
         intensity: scanResult.currentMood?.intensity || 0.5,
         confidence: scanResult.confidence || 0.8,
-        source: scanMode,
+        source: sourceMap[scanMode],
         valence: scanResult.mood?.valence || 0.5,
         arousal: scanResult.mood?.arousal || 0.5,
         insight: scanResult.insight,
-        recommendations: scanResult.recommendations || [],
       };
 
       // Store in database
@@ -137,7 +142,7 @@ const EmotionScannerPremium: React.FC<EmotionScannerPremiumProps> = ({
       });
 
     } catch (error) {
-      console.error('Scan error:', error);
+      logger.error('Scan error', error as Error, 'EMOTION');
       toast({
         title: "Erreur d'analyse",
         description: "Une erreur est survenue lors de l'analyse. Veuillez réessayer.",
@@ -172,7 +177,7 @@ const EmotionScannerPremium: React.FC<EmotionScannerPremiumProps> = ({
       }, 10000);
       
     } catch (error) {
-      console.error('Voice recording error:', error);
+      logger.error('Voice recording error', error as Error, 'EMOTION');
       toast({
         title: "Erreur microphone",
         description: "Impossible d'accéder au microphone.",
@@ -191,7 +196,7 @@ const EmotionScannerPremium: React.FC<EmotionScannerPremiumProps> = ({
         videoRef.current.play();
       }
     } catch (error) {
-      console.error('Camera error:', error);
+      logger.error('Camera error', error as Error, 'EMOTION');
       toast({
         title: "Erreur caméra",
         description: "Impossible d'accéder à la caméra.",

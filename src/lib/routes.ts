@@ -3,6 +3,7 @@
  */
 
 import { ROUTES, ROUTE_NAME_BY_PATH, ROUTES_BY_NAME } from './routerV2/routes.config';
+import { logger } from '@/lib/logger';
 
 export type RouteName = (typeof ROUTES)[number]['name'];
 
@@ -38,9 +39,7 @@ function resolveRoutePath(name: string, fallback?: string): string {
     if (fallback) {
       return fallback;
     }
-    if (typeof console !== 'undefined') {
-      console.error(`[routerV2] Route inconnue: "${name}"`, error);
-    }
+    logger.error(`Route inconnue: "${name}"`, error as Error, 'SYSTEM');
     return '/';
   }
 }
@@ -110,11 +109,16 @@ export const b2cRoutes = {
   notifications: () => resolveRoutePath('settings-notifications'),
   preferences: () => resolveRoutePath('settings-privacy'),
   activity: () => resolveRoutePath('activity'),
+  analytics: () => resolveRoutePath('analytics'),
   heatmap: () => resolveRoutePath('heatmap'),
   leaderboard: () => resolveRoutePath('leaderboard'),
   gamification: () => resolveRoutePath('gamification'),
   emotions: () => resolveRoutePath('scan'),
-  meditation: () => resolveRoutePath('breath'),
+  meditation: () => resolveRoutePath('meditation'),
+  weeklyBars: () => resolveRoutePath('weekly-bars'),
+  screenSilk: () => resolveRoutePath('screen-silk'),
+  nyvee: () => resolveRoutePath('nyvee-cocon'),
+  ambitionArcade: () => resolveRoutePath('ambition-arcade'),
   feedback: () => resolveRoutePath('help'),
   accountDelete: () => resolveRoutePath('settings-privacy'),
 } as const;
@@ -138,11 +142,18 @@ export const consumerRoutes = {
   bounceBack: () => resolveRoutePath('bounce-back'),
   storySynth: () => resolveRoutePath('story-synth'),
   activity: () => resolveRoutePath('activity'),
+  analytics: () => resolveRoutePath('analytics'),
   heatmap: () => resolveRoutePath('heatmap'),
   leaderboard: () => resolveRoutePath('leaderboard'),
   gamification: () => resolveRoutePath('gamification'),
   socialCocon: () => resolveRoutePath('social-cocon-b2c'),
   community: () => resolveRoutePath('community'),
+  weeklyBars: () => resolveRoutePath('weekly-bars'),
+  screenSilk: () => resolveRoutePath('screen-silk'),
+  nyvee: () => resolveRoutePath('nyvee-cocon'),
+  ambitionArcade: () => resolveRoutePath('ambition-arcade'),
+  breath: () => resolveRoutePath('breath'),
+  meditation: () => resolveRoutePath('meditation'),
   preferences: () => resolveRoutePath('settings-privacy'),
   notifications: () => resolveRoutePath('settings-notifications'),
   settings: () => resolveRoutePath('settings-general'),
@@ -160,6 +171,10 @@ export const b2bRoutes = {
   security: () => resolveRoutePath('admin-security'),
   audit: () => resolveRoutePath('admin-audit'),
   accessibility: () => resolveRoutePath('admin-accessibility'),
+  gdprMonitoring: () => resolveRoutePath('admin-gdpr'),
+  gdprDashboard: () => resolveRoutePath('admin-gdpr'),
+  cronMonitoring: () => resolveRoutePath('gdpr-cron-monitoring'),
+  blockchainBackups: () => resolveRoutePath('gdpr-blockchain-backups'),
   user: {
     dashboard: () => resolveRoutePath('employee-home'),
   },
@@ -167,6 +182,13 @@ export const b2bRoutes = {
     dashboard: () => resolveRoutePath('manager-home'),
     analytics: () => resolveRoutePath('admin-optimization'),
     settings: () => resolveRoutePath('admin-security'),
+    gdprMonitoring: () => resolveRoutePath('admin-gdpr'),
+    gdprDashboard: () => resolveRoutePath('admin-gdpr'),
+    cronMonitoring: () => resolveRoutePath('gdpr-cron-monitoring'),
+    blockchainBackups: () => resolveRoutePath('gdpr-blockchain-backups'),
+    musicQueue: () => resolveRoutePath('admin-music-queue'),
+    musicMetrics: () => resolveRoutePath('admin-music-metrics'),
+    userRoles: () => '/admin/user-roles',
   },
 } as const;
 

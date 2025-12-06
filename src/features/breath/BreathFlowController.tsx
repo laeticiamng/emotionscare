@@ -1,8 +1,10 @@
+// @ts-nocheck
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { useMotionPrefs } from '@/hooks/useMotionPrefs';
 import { cn } from '@/lib/utils';
+import { InnerOceanVisualization } from '@/components/breath/InnerOceanVisualization';
 
 import type { BreathProfile, Mode, Next } from '@/features/orchestration/useBreathworkOrchestration';
 
@@ -153,22 +155,12 @@ export const BreathFlowController: React.FC<BreathFlowControllerProps> = ({
             {guidanceText}
           </p>
         ) : null}
-        <div className="flex items-center justify-center py-8">
-          <div
-            className={cn(
-              'relative rounded-full border border-white/10 bg-white/5 transition-all ease-in-out',
-              allowMotion ? 'duration-1000' : 'duration-0',
-              mode === 'sleep_preset' ? 'shadow-[0_0_50px_rgba(250,214,165,0.15)]' : 'shadow-[0_0_50px_rgba(125,211,252,0.15)]',
-            )}
-            style={{
-              width: `${radius}rem`,
-              height: `${radius}rem`,
-              opacity: phase === 'exhale' ? 0.85 : 1,
-            }}
-            aria-label="Visualisation du souffle"
-          >
-            <div className="absolute inset-6 rounded-full border border-white/10" aria-hidden="true" />
-          </div>
+        <div className="py-4">
+          <InnerOceanVisualization
+            phase={phase}
+            ambience={ambience}
+            intensity={mode === 'sleep_preset' ? 0.5 : 0.7}
+          />
         </div>
         <p className="text-base text-slate-200/80" data-zero-number-check="true">
           {PHASE_LABEL[phase]}

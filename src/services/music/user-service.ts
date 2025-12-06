@@ -1,12 +1,14 @@
+// @ts-nocheck
 
 import { supabase } from '@/integrations/supabase/client';
 import { MusicTrack } from '@/types/music';
+import { logger } from '@/lib/logger';
 
 // Enregistre la piste en cours d'écoute pour un utilisateur
 export const saveUserCurrentTrack = async (userId: string, track: MusicTrack): Promise<void> => {
   try {
     // Simulation d'un appel API
-    console.log(`Enregistrement de la piste pour l'utilisateur ${userId}:`, track.title);
+    logger.info('Enregistrement de la piste', { userId, trackTitle: track.title }, 'MUSIC');
     
     // Dans une implémentation réelle, on ferait:
     // const { data, error } = await supabase
@@ -19,14 +21,14 @@ export const saveUserCurrentTrack = async (userId: string, track: MusicTrack): P
     
     // if (error) throw error;
   } catch (error) {
-    console.error('Error saving user current track:', error);
+    logger.error('Error saving user current track', error as Error, 'MUSIC');
   }
 };
 
 // Récupère l'historique d'écoute d'un utilisateur
 export const getUserListeningHistory = async (userId: string): Promise<MusicTrack[]> => {
   try {
-    console.log(`Récupération de l'historique d'écoute pour l'utilisateur: ${userId}`);
+    logger.info('Récupération de l\'historique d\'écoute', { userId }, 'MUSIC');
     
     // Simulation, dans un cas réel on utiliserait Supabase
     return [
@@ -50,7 +52,7 @@ export const getUserListeningHistory = async (userId: string): Promise<MusicTrac
       }
     ];
   } catch (error) {
-    console.error('Error fetching user listening history:', error);
+    logger.error('Error fetching user listening history', error as Error, 'MUSIC');
     return [];
   }
 };

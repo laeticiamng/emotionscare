@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useUserMode } from '@/contexts/UserModeContext';
 import { getUserModeDisplayName } from '@/utils/userModeHelpers';
@@ -18,7 +17,7 @@ const UserModeIndicator: React.FC<UserModeIndicatorProps> = ({
   className = '' 
 }) => {
   const { userMode } = useUserMode();
-  const displayName = getUserModeDisplayName(userMode);
+  const displayName = getUserModeDisplayName(userMode as any);
   
   // Déterminer la couleur et l'icône en fonction du mode
   let variant = 'default';

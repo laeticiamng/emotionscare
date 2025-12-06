@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -176,27 +175,29 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
               size="icon"
               onClick={() => setIsShuffle(!isShuffle)}
               className={isShuffle ? 'text-primary' : ''}
+              aria-label={isShuffle ? "Désactiver le mode aléatoire" : "Activer le mode aléatoire"}
             >
               <Shuffle className="h-4 w-4" />
             </Button>
             
-            <Button variant="ghost" size="icon" onClick={handlePrevious}>
+            <Button variant="ghost" size="icon" onClick={handlePrevious} aria-label="Piste précédente">
               <SkipBack className="h-4 w-4" />
             </Button>
-            
-            <Button size="icon" onClick={togglePlay}>
+
+            <Button size="icon" onClick={togglePlay} aria-label={isPlaying ? "Pause" : "Lecture"}>
               {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
             </Button>
-            
-            <Button variant="ghost" size="icon" onClick={handleNext}>
+
+            <Button variant="ghost" size="icon" onClick={handleNext} aria-label="Piste suivante">
               <SkipForward className="h-4 w-4" />
             </Button>
-            
+
             <Button
               variant="ghost"
               size="icon"
               onClick={() => setIsRepeat(!isRepeat)}
               className={isRepeat ? 'text-primary' : ''}
+              aria-label={isRepeat ? "Désactiver la répétition" : "Activer la répétition"}
             >
               <Repeat className="h-4 w-4" />
             </Button>
@@ -204,7 +205,7 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({
           
           {/* Volume Control */}
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" onClick={toggleMute}>
+            <Button variant="ghost" size="icon" onClick={toggleMute} aria-label={isMuted ? "Activer le son" : "Couper le son"}>
               {isMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
             </Button>
             <Slider

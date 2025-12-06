@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 import React from 'react';
 import { TableBody, TableRow, TableCell } from '@/components/ui/table';

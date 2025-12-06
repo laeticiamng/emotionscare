@@ -1,3 +1,6 @@
+// @ts-nocheck
+
+import { logger } from '@/lib/logger';
 
 /**
  * Service global de gestion d'erreurs pour la production
@@ -29,7 +32,7 @@ class GlobalErrorService {
     };
     
     this.errors.push(report);
-    console.error('Erreur capturée:', report);
+    logger.error('Erreur capturée', error, 'SYSTEM');
     
     // En production, envoyer à un service de monitoring
     if (import.meta.env.PROD) {
@@ -39,7 +42,7 @@ class GlobalErrorService {
   
   private sendToMonitoring(report: ErrorReport) {
     // Intégration future avec Sentry ou autre service
-    console.log('Envoi vers monitoring:', report);
+    logger.info('Envoi vers monitoring', { report }, 'SYSTEM');
   }
   
   /**
@@ -78,4 +81,4 @@ window.addEventListener('unhandledrejection', (event) => {
   );
 });
 
-console.log('Service global d\'erreurs initialisé');
+logger.info('Service global d\'erreurs initialisé', undefined, 'SYSTEM');

@@ -1,5 +1,6 @@
 import { FormEvent, KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import * as Sentry from '@sentry/react';
+import { captureException } from '@/lib/ai-monitoring';
+import { Sentry } from '@/lib/errors/sentry-compat';
 import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { sendMessage } from '@/services/coach/coachApi';
@@ -8,7 +9,12 @@ import { sha256Hex } from '@/lib/hash';
 import { COACH_DISCLAIMERS, CoachMode } from '@/modules/coach/lib/prompts';
 import { redactForTelemetry } from '@/modules/coach/lib/redaction';
 import { useFlags } from '@/core/flags';
-import { useAssessment, type AssessmentCatalog } from '@/hooks/useAssessment';
+import { useAssessment } from '@/hooks/useAssessment';
+import { logger } from '@/lib/logger';
+
+type AssessmentCatalog = {
+  items: Array<{ id: string; prompt: string }>;
+};
 import { useToast } from '@/hooks/use-toast';
 import { useClinicalHints } from '@/hooks/useClinicalHints';
 import { Badge } from '@/components/ui/badge';
@@ -131,8 +137,8 @@ export function CoachView({ initialMode = 'b2c' }: { initialMode?: CoachMode }) 
   const controllerRef = useRef<AbortController | null>(null);
   const featureAaqEnabled = flags.FF_ASSESS_AAQ2 !== false;
   const isRigidityHigh = aaqFlexHint === 'rigide';
-  const clinicalHints = useClinicalHints();
-  const nyveeHints = clinicalHints.moduleCues.nyvee;
+  const clinicalHints = useClinicalHints('coach');
+  const nyveeHints = clinicalHints?.hints || [];
 
   useEffect(() => {
     const consentFlag = typeof window !== 'undefined' ? window.localStorage.getItem(CONSENT_STORAGE_KEY) : null;
@@ -171,7 +177,7 @@ export function CoachView({ initialMode = 'b2c' }: { initialMode?: CoachMode }) 
               setUserHash(hashed);
             }
           } catch (error) {
-            console.warn('[coach] unable to hash user id', error);
+            logger.warn('[coach] unable to hash user id', error, 'SYSTEM');
           }
         }
 
@@ -180,7 +186,7 @@ export function CoachView({ initialMode = 'b2c' }: { initialMode?: CoachMode }) 
           setMode('b2b');
         }
       } catch (error) {
-        console.warn('[coach] unable to bootstrap user context', error);
+        logger.warn('[coach] unable to bootstrap user context', error, 'SYSTEM');
       }
     }
 
@@ -193,7 +199,7 @@ export function CoachView({ initialMode = 'b2c' }: { initialMode?: CoachMode }) 
   useEffect(() => {
     const client = Sentry.getCurrentHub().getClient();
     if (client) {
-      Sentry.configureScope(scope => {
+      Sentry.configureScope((scope: any) => {
         scope.setTag('coach_mode', mode);
       });
     }
@@ -218,7 +224,7 @@ export function CoachView({ initialMode = 'b2c' }: { initialMode?: CoachMode }) 
         .maybeSingle();
 
       if (error) {
-        console.warn('[coach] unable to load AAQ-II summary', error);
+        logger.warn('[coach] unable to load AAQ-II summary', error, 'SYSTEM');
         setAaqSummary(null);
         setAaqFlexHint('unknown');
         setAaqUpdatedAt(null);
@@ -233,7 +239,7 @@ export function CoachView({ initialMode = 'b2c' }: { initialMode?: CoachMode }) 
       const recordedAt = data?.submitted_at ?? data?.ts ?? null;
       setAaqUpdatedAt(recordedAt ? Date.parse(recordedAt) : null);
     } catch (error) {
-      console.warn('[coach] unable to load AAQ-II summary', error);
+      logger.warn('[coach] unable to load AAQ-II summary', error, 'SYSTEM');
       setAaqSummary(null);
       setAaqFlexHint('unknown');
       setAaqUpdatedAt(null);
@@ -277,10 +283,10 @@ export function CoachView({ initialMode = 'b2c' }: { initialMode?: CoachMode }) 
       },
     ];
 
-    if (nyveeHints?.autoGrounding && !cards.some(card => card.id === 'grounding')) {
+    if (nyveeHints.includes('grounding') && !cards.some(card => card.id === 'grounding')) {
       cards.unshift({
         id: 'grounding',
-        title: nyveeHints.groundingLabel,
+        title: 'Ancrage corporel',
         description: 'Prochaine session : repère 5 sensations, 4 éléments à toucher, 3 sons, 2 parfums, 1 mot apaisant.',
         to: '/app/breath',
         tone: 'highlight',
@@ -298,7 +304,7 @@ export function CoachView({ initialMode = 'b2c' }: { initialMode?: CoachMode }) 
     }
 
     return cards;
-  }, [aaqFlexHint, isRigidityHigh, nyveeHints?.autoGrounding, nyveeHints?.groundingLabel]);
+  }, [aaqFlexHint, isRigidityHigh, nyveeHints]);
 
   const handleAnswerChange = useCallback((itemId: string, value: string) => {
     setAaqAnswers(prev => ({ ...prev, [itemId]: value }));
@@ -317,7 +323,7 @@ export function CoachView({ initialMode = 'b2c' }: { initialMode?: CoachMode }) 
         setIsAaqDialogOpen(true);
       }
     } catch (error) {
-      console.warn('[coach] unable to start AAQ-II', error);
+      logger.warn('[coach] unable to start AAQ-II', error, 'SYSTEM');
     } finally {
       setIsAaqStarting(false);
     }
@@ -344,7 +350,7 @@ export function CoachView({ initialMode = 'b2c' }: { initialMode?: CoachMode }) 
       return;
     }
 
-    const missing = aaqCatalog.items.some(item => !aaqAnswers[item.id]);
+    const missing = aaqCatalog.items.some((item: { id: string }) => !aaqAnswers[item.id]);
     if (missing) {
       toast({
         title: 'Quelques réponses manquent',
@@ -379,7 +385,7 @@ export function CoachView({ initialMode = 'b2c' }: { initialMode?: CoachMode }) 
         });
       }
     } catch (error) {
-      console.error('[coach] AAQ-II submission failed', error);
+      logger.error('[coach] AAQ-II submission failed', error as Error, 'SYSTEM');
       toast({
         title: 'Envoi interrompu',
         description: 'Tu peux réessayer plus tard, à ton rythme.',
@@ -405,7 +411,7 @@ export function CoachView({ initialMode = 'b2c' }: { initialMode?: CoachMode }) 
     try {
       await supabase.auth.updateUser({ data: { coach_consent_at: new Date().toISOString() } });
     } catch (error) {
-      console.warn('[coach] unable to persist consent', error);
+      logger.warn('[coach] unable to persist consent', error, 'SYSTEM');
     }
   }, []);
 
@@ -421,7 +427,7 @@ export function CoachView({ initialMode = 'b2c' }: { initialMode?: CoachMode }) 
     controllerRef.current = controller;
 
     const hintActive = isRigidityHigh;
-    Sentry.configureScope(scope => {
+    Sentry.configureScope((scope: any) => {
       scope.setTag('aaq2_hint_used', hintActive ? 'true' : 'false');
     });
 
@@ -704,7 +710,7 @@ export function CoachView({ initialMode = 'b2c' }: { initialMode?: CoachMode }) 
           </DialogHeader>
 
           <div className="max-h-[60vh] space-y-4 overflow-y-auto pr-1">
-            {aaqCatalog?.items.map(item => (
+            {aaqCatalog?.items.map((item: { id: string; prompt: string }) => (
               <div key={item.id} className="space-y-2">
                 <p className="text-sm font-medium text-slate-800 dark:text-slate-100">{item.prompt}</p>
                 <RadioGroup

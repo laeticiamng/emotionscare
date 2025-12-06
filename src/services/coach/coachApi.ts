@@ -81,7 +81,7 @@ export async function sendMessage(options: SendCoachMessageOptions): Promise<Coa
                 options.onThread?.(threadId);
               }
               if (Array.isArray(parsed.disclaimers)) {
-                disclaimers = parsed.disclaimers.filter(item => typeof item === 'string');
+                disclaimers = parsed.disclaimers.filter((item: any) => typeof item === 'string');
                 if (disclaimers.length) {
                   options.onDisclaimers?.(disclaimers);
                 }
@@ -108,7 +108,7 @@ export async function sendMessage(options: SendCoachMessageOptions): Promise<Coa
         };
       });
     } catch (error) {
-      console.warn('[coachApi] SSE failed, falling back to fetch', error);
+      // Silent: SSE failed, proceeding without logging
     }
   }
 

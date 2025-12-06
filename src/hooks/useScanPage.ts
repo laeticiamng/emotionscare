@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useState, useCallback, useEffect } from 'react';
 import { EmotionResult, EmotionRecommendation, ScanSession, EmotionGoal } from '@/types/emotion';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';

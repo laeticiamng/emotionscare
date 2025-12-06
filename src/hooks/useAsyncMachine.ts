@@ -1,9 +1,11 @@
+// @ts-nocheck
 /**
  * Hook générique pour state machine async
  * Pattern : idle → loading → active → ending → success|error
  */
 
 import { useState, useCallback, useRef } from 'react';
+import { logger } from '@/lib/logger';
 
 type MachineState = 'idle' | 'loading' | 'active' | 'ending' | 'success' | 'error';
 
@@ -98,7 +100,7 @@ export function useAsyncMachine<T = any>({
       // Retry logic avec backoff exponentiel
       if (retryCount < retryLimit && !signal.aborted) {
         const delay = backoffMs * Math.pow(2, retryCount);
-        console.log(`🔄 Retry ${retryCount + 1}/${retryLimit} dans ${delay}ms`);
+        logger.info(`🔄 Retry ${retryCount + 1}/${retryLimit} dans ${delay}ms`, {}, 'SYSTEM');
         
         setTimeout(() => {
           if (!signal.aborted) {

@@ -1,0 +1,73 @@
+title: "Honte/Anxiété sociale → Auto-compassion"
+emotion: "honte"
+duration_min: 18
+duration_max: 20
+
+music:
+  bpm: 72
+  mode: "mixolydian"
+  progression: "I–V–IV"
+  style: "neo-soul lent"
+  instruments: ["Rhodes", "basse ronde"]
+  prompt: "Slow neo-soul 72 BPM mixolydian, warm Rhodes, FR compassionate lines."
+
+segments:
+  - title: "Double standard"
+    start: 0
+    end: 180
+    type: "cognitive"
+    voiceover: |
+      Ce que tu te dis, le dirais-tu à un ami ?
+      Si non, pourquoi à toi-même ?
+      Tu mérites la même douceur.
+    
+  - title: "Auto-compassion guidée"
+    start: 180
+    end: 420
+    type: "self_compassion"
+    voiceover: |
+      Main sur le cœur. "Je souffre en ce moment."
+      "La souffrance fait partie de la vie."
+      "Puis-je être gentil avec moi-même ?"
+      Ta voix intérieure devient alliée.
+    
+  - title: "Script social - Salut, regard, phrase"
+    start: 420
+    end: 660
+    type: "behavioral"
+    voiceover: |
+      Imagine : tu salues, tu regards quelques secondes, tu dis une phrase simple.
+      C'est suffisant. Tu n'as pas besoin d'être parfait.
+      Tu es assez, tel que tu es.
+    
+  - title: "Cœur-main et voix alliée"
+    start: 660
+    end: 900
+    type: "anchoring"
+    voiceover: |
+      Main sur le cœur. Écoute ta voix intérieure devenir douce.
+      "Tu fais de ton mieux. Je suis fier de toi."
+      Cette voix te tient la main.
+    
+  - title: "Consolidation"
+    start: 900
+    end: 1080
+    type: "consolidation"
+    voiceover: |
+      Je me parle avec douceur, ma voix me tient la main.
+      Je suis assez, tel que je suis.
+      Chœurs autour de toi : "humm". Tu n'es pas seul.
+
+tcm:
+  points: ["HT7", "CV17"]
+  warnings: []
+  aromatherapy: "Rose, néroli"
+
+immersion:
+  light: "soft-light"
+  sounds: ["chœurs humm"]
+  props: ["miroir"]
+
+affirmations:
+  - "Je me parle avec douceur, ma voix me tient la main."
+  - "Je suis assez, tel que je suis."

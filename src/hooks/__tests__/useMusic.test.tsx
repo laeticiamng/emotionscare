@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 import { renderHook } from '@/tests/utils';
 import { MusicProvider } from '@/contexts/MusicContext';

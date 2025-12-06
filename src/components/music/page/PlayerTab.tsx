@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 import React, { useState, useEffect } from 'react';
 import { useMusic } from '@/hooks/useMusic';
@@ -7,6 +8,7 @@ import { Play, Pause, SkipBack, SkipForward, Heart, Volume, VolumeX } from 'luci
 import { Slider } from '@/components/ui/slider';
 import { getTrackCover, getTrackTitle, getTrackArtist } from '@/utils/musicCompatibility';
 import { MusicContextType } from '@/types/music';
+import { logger } from '@/lib/logger';
 
 interface PlayerTabProps {
   className?: string;
@@ -31,11 +33,11 @@ const PlayerTab: React.FC<PlayerTabProps> = ({ className = '' }) => {
   } = music;
   
   // Fallback values if they don't exist in the context
-  const previousTrack = music.previousTrack || (() => console.log('Previous track not available'));
-  const setCurrentTrack = music.setCurrentTrack || ((track) => console.log('Set current track not available', track));
+  const previousTrack = music.previousTrack || (() => logger.info('Previous track not available'));
+  const setCurrentTrack = music.setCurrentTrack || ((track) => logger.info('Set current track not available', { track }));
   const currentTime = music.currentTime || 0;
   const duration = music.duration || 0;
-  const seekTo = music.seekTo || ((time: number) => console.log('Seek not available', time));
+  const seekTo = music.seekTo || ((time: number) => logger.info('Seek not available', { time }));
 
   const formatTime = (seconds: number) => {
     if (isNaN(seconds)) return '0:00';

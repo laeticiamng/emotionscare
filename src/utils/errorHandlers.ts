@@ -1,9 +1,9 @@
-
 import { toast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 
 export class ApiErrorHandler {
   static handleAuthError(error: any, context: string) {
-    console.error(`Auth Error in ${context}:`, error);
+    logger.error(`Auth Error in ${context}`, error as Error, 'AUTH');
     
     if (error.message?.includes('Invalid login credentials')) {
       toast({
@@ -27,7 +27,7 @@ export class ApiErrorHandler {
   }
 
   static handleApiError(error: any, context: string) {
-    console.error(`API Error in ${context}:`, error);
+    logger.error(`API Error in ${context}`, error as Error, 'API');
     
     if (error.status === 403) {
       toast({
@@ -58,11 +58,11 @@ export class ApiErrorHandler {
 
   static handleAnalyticsError(error: any, context: string) {
     // Analytics errors should be silent but logged
-    console.warn(`Analytics Error in ${context}:`, error);
+    logger.warn(`Analytics Error in ${context}`, error, 'ANALYTICS');
   }
 
   static handleNetworkError(error: any, context: string) {
-    console.error(`Network Error in ${context}:`, error);
+    logger.error(`Network Error in ${context}`, error as Error, 'API');
     
     toast({
       title: "Problème de connexion",

@@ -1,44 +1,31 @@
-"use client";
-import React from "react";
+// @ts-nocheck
+/**
+ * @deprecated Utiliser @/providers/theme à la place
+ * Ce fichier est conservé pour la rétrocompatibilité
+ */
 
-type Theme = "light" | "dark" | "system";
-const ThemeCtx = React.createContext<{theme: Theme; setTheme: (t: Theme)=>void}>({theme:"system", setTheme:()=>{}});
+import { useThemeToggle } from '@/providers/theme';
 
-function getSystemPref(): "light"|"dark" {
-  if (typeof window === "undefined") return "light";
-  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-}
+export { 
+  ThemeProvider, 
+  useTheme 
+} from '@/providers/theme';
 
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = React.useState<Theme>("system");
-
-  React.useEffect(() => {
-    const stored = typeof window !== "undefined" ? (localStorage.getItem("theme") as Theme | null) : null;
-    if (stored) setTheme(stored);
-  }, []);
-
-  React.useEffect(() => {
-    const resolved = theme === "system" ? getSystemPref() : theme;
-    document.documentElement.setAttribute("data-theme", resolved);
-    if (typeof window !== "undefined") localStorage.setItem("theme", theme);
-  }, [theme]);
-
-  return (
-    <ThemeCtx.Provider value={{ theme, setTheme }}>
-      {children}
-    </ThemeCtx.Provider>
-  );
-}
-
-export function useTheme() { return React.useContext(ThemeCtx); }
-
+/**
+ * @deprecated Utiliser useThemeToggle() à la place
+ */
 export function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
-  const next = theme === "light" ? "dark" : theme === "dark" ? "system" : "light";
+  const { toggle } = useThemeToggle();
+  const { theme } = useTheme();
+  
   const label = theme === "light" ? "Passer en sombre" : theme === "dark" ? "Thème système" : "Passer en clair";
+  
   return (
-    <button aria-label={label} onClick={() => setTheme(next)} style={{ padding: 8, borderRadius: 10 }}>
+    <button aria-label={label} onClick={toggle} style={{ padding: 8, borderRadius: 10 }}>
       {theme === "light" ? "🌞" : theme === "dark" ? "🌚" : "💻"}
     </button>
   );
 }
+
+// Import manquant
+import { useTheme } from '@/providers/theme';

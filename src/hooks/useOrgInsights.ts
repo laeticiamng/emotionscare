@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useMemo } from 'react';
 import { OrgWeekly, VibeBucket, Trend } from '@/store/org.store';
 

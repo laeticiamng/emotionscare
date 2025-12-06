@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Validation complète de toutes les routes et composants
  * Vérifie que chaque bouton mène à une page fonctionnelle

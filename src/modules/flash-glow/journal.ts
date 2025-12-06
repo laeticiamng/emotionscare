@@ -1,6 +1,7 @@
 import type { FlashGlowSession } from './flash-glowService';
 import { journalService } from '@/modules/journal/journalService';
 import type { JournalEntry } from '@/modules/journal/journalService';
+import { logger } from '@/lib/logger';
 
 export type FlashGlowJournalLabel = FlashGlowSession['label'];
 
@@ -125,6 +126,7 @@ export async function createFlashGlowJournalEntry({
 
   try {
     const entry = await journalService.saveEntry({
+      type: 'text',
       content: contentLines.join('\n'),
       summary,
       tone: labelInfo.tone,
@@ -139,7 +141,7 @@ export async function createFlashGlowJournalEntry({
 
     return entry;
   } catch (error) {
-    console.error('Flash Glow auto journalisation échouée:', error);
+    logger.error('Flash Glow auto journalisation échouée', error as Error, 'MUSIC');
     return null;
   }
 }

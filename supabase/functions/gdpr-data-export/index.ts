@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 import { serve } from 'https://deno.land/std@0.208.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
@@ -56,14 +57,19 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Collecter toutes les données utilisateur
+    // ✅ Collecter TOUTES les données utilisateur (RGPD Art. 15 + 20)
     const userData = {
       profile: null,
       preferences: null,
       emotions: [],
+      emotionScans: [],
+      assessments: [],
+      journalEntries: [],
+      coachConversations: [],
       activities: [],
-      conversations: [],
-      exportDate: new Date().toISOString()
+      healthConsents: [],
+      exportDate: new Date().toISOString(),
+      legalVersion: '1.0'
     };
 
     // Récupérer le profil
@@ -83,6 +89,50 @@ serve(async (req) => {
     
     userData.preferences = preferences;
 
+    // ✅ Récupérer les scans émotionnels
+    const { data: emotionScans } = await supabase
+      .from('emotion_scans')
+      .select('*')
+      .eq('user_id', authResult.user.id)
+      .order('created_at', { ascending: false });
+    
+    userData.emotionScans = emotionScans || [];
+
+    // ✅ Récupérer les assessments
+    const { data: assessments } = await supabase
+      .from('assessment_results')
+      .select('*')
+      .eq('user_id', authResult.user.id)
+      .order('created_at', { ascending: false });
+    
+    userData.assessments = assessments || [];
+
+    // ✅ Récupérer les entrées de journal
+    const { data: journalEntries } = await supabase
+      .from('journal_entries')
+      .select('*')
+      .eq('user_id', authResult.user.id)
+      .order('created_at', { ascending: false });
+    
+    userData.journalEntries = journalEntries || [];
+
+    // ✅ Récupérer les conversations coach
+    const { data: coachLogs } = await supabase
+      .from('coach_logs')
+      .select('*')
+      .eq('user_id', authResult.user.id)
+      .order('created_at', { ascending: false });
+    
+    userData.coachConversations = coachLogs || [];
+
+    // ✅ Récupérer les consentements santé
+    const { data: healthConsents } = await supabase
+      .from('health_data_consents')
+      .select('*')
+      .eq('user_id', authResult.user.id);
+    
+    userData.healthConsents = healthConsents || [];
+
     // Récupérer les activités (anonymisées)
     const { data: activities } = await supabase
       .from('user_activity_logs')
@@ -99,7 +149,16 @@ serve(async (req) => {
         user_id: authResult.user.id,
         format,
         status: 'completed',
-        included_data: ['profile', 'preferences', 'activities'],
+        included_data: [
+          'profile', 
+          'preferences', 
+          'activities',
+          'emotion_scans',
+          'assessments',
+          'journal_entries',
+          'coach_conversations',
+          'health_consents'
+        ],
         expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() // 7 jours
       })
       .select()

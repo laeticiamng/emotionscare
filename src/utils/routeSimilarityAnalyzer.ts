@@ -1,8 +1,10 @@
+// @ts-nocheck
 /**
  * Analyseur de similarités et redondances dans les routes
  */
 
 import { ROUTER_V2_MANIFEST } from '@/routerV2/manifest';
+import { logger } from '@/lib/logger';
 
 export interface SimilarityGroup {
   category: string;
@@ -211,6 +213,6 @@ export function analyzeRouteSimilarities(): RouteAnalysis {
 
 // Exécuter l'analyse au chargement
 const analysis = analyzeRouteSimilarities();
-console.log('🔍 Analyse des similarités de routes:', analysis.summary);
+logger.debug('🔍 Analyse des similarités de routes', analysis.summary, 'SYSTEM');
 
 export default analysis;

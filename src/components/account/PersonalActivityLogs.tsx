@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -15,6 +14,14 @@ import { AnonymousActivity, ActivityStats } from '@/types/activity';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase-client';
 import Pagination from '@/components/ui/data-table/Pagination';
+import { logger } from '@/lib/logger';
+
+interface ActivityFiltersState {
+  searchTerm: string;
+  activityType: string;
+  startDate: Date | undefined;
+  endDate: Date | undefined;
+}
 
 // Since we don't have the actual activityUtils, we'll implement the functions directly here
 const getActivityLabel = (activityType: string): string => {
@@ -40,7 +47,7 @@ const applyFilters = (
 ): AnonymousActivity[] => {
   return data.filter((item) => {
     // Apply search term filter
-    if (filters.searchTerm && !item.activity_type.toLowerCase().includes(filters.searchTerm.toLowerCase())) {
+    if (filters.searchTerm && item.activity_type && !item.activity_type.toLowerCase().includes(filters.searchTerm.toLowerCase())) {
       return false;
     }
     
@@ -50,14 +57,14 @@ const applyFilters = (
     }
     
     // Apply date filters
-    if (filters.startDate) {
+    if (filters.startDate && item.timestamp_day) {
       const itemDate = new Date(item.timestamp_day);
       if (itemDate < filters.startDate) {
         return false;
       }
     }
     
-    if (filters.endDate) {
+    if (filters.endDate && item.timestamp_day) {
       const itemDate = new Date(item.timestamp_day);
       // Add one day to include the end date fully
       const endDatePlusOne = new Date(filters.endDate);
@@ -102,7 +109,7 @@ const PersonalActivityLogs: React.FC = () => {
           .order('timestamp_day', { ascending: false });
         
         if (error) {
-          console.error("Error fetching activities:", error);
+          logger.error("Error fetching activities", error, 'UI');
           toast({
             title: "Erreur",
             description: "Impossible de charger l'historique des activités",
@@ -251,14 +258,14 @@ const PersonalActivityLogs: React.FC = () => {
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-card divide-y divide-border">
                 {paginatedActivities.map((activity) => (
                   <tr key={activity.id}>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      {getActivityLabel(activity.activity_type)}
+                      {activity.activity_type ? getActivityLabel(activity.activity_type) : '-'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      {format(new Date(activity.timestamp_day), 'PPP', { locale: enUS })}
+                      {activity.timestamp_day ? format(new Date(activity.timestamp_day), 'PPP', { locale: enUS }) : '-'}
                     </td>
                   </tr>
                 ))}

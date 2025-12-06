@@ -1,5 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
+import { logger } from '@/lib/logger';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Eye, Keyboard, Volume2, Type, Contrast } from 'lucide-react';
@@ -89,7 +90,7 @@ const AccessibilityEnhancer: React.FC = () => {
         window.localStorage.setItem('accessibility-settings', JSON.stringify(newSettings));
       }
     } catch (error) {
-      console.warn('[AccessibilityEnhancer] Failed to persist settings', error);
+      logger.warn('Failed to persist accessibility settings', error, 'UI');
     }
   };
 

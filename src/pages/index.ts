@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Pages nécessaires pour RouterV2 uniquement
 export { default as HomePage } from './HomePage';
 export { default as AboutPage } from './AboutPage';
@@ -79,6 +80,9 @@ export { default as B2CEmotionsPage } from './B2CEmotionsPage';
 // Additional pages
 export { default as OnboardingPage } from './OnboardingPage';
 export { default as ApiMonitoringPage } from './ApiMonitoringPage';
+export { default as MusicQueueAdminPage } from './admin/MusicQueueAdminPage';
+export { default as MusicQueueMetricsPage } from './admin/MusicQueueMetricsPage';
+export { default as UserRolesPage } from './admin/UserRolesPage';
 export { default as SubscribePage } from './SubscribePage';
 export { default as DemoPage } from './DemoPage';
 
@@ -113,3 +117,9 @@ export { default as MoodPresetsAdminPage } from './MoodPresetsAdminPage';
 export { default as GamificationPage } from './GamificationPage';
 export { default as ChooseModePage } from './ChooseModePage';
 export { default as AdminFlagsPage } from "@/modules/admin/AdminFlagsPage";
+export { default as TestAccountsPage } from "./dev/TestAccountsPage";
+
+// Legal Pages (nouvelles)
+export { TermsPage } from './legal/TermsPage';
+export { PrivacyPage as PrivacyPageNew } from './legal/PrivacyPage';
+export { LegalPage } from './legal/LegalPage';

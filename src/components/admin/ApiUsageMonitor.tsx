@@ -7,6 +7,7 @@ import { Progress } from '@/components/ui/progress';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { RefreshCw, TrendingUp, AlertCircle, DollarSign, Clock, Zap } from 'lucide-react';
 import { adminService, ApiUsageStats, ApiUseActivity } from '@/services/admin';
+import { logger } from '@/lib/logger';
 
 interface ApiUsageMonitorProps {
   onRefresh?: () => void;
@@ -27,7 +28,7 @@ export default function ApiUsageMonitor({ onRefresh }: ApiUsageMonitorProps) {
         setUsageData(activities);
         setStats(stats);
       } catch (error) {
-        console.error('Error fetching API usage data:', error);
+        logger.error('Error fetching API usage data', error, 'Admin');
       } finally {
         setIsLoading(false);
       }
@@ -47,7 +48,7 @@ export default function ApiUsageMonitor({ onRefresh }: ApiUsageMonitorProps) {
       setUsageData(activities);
       setStats(stats);
     } catch (error) {
-      console.error('Error refreshing data:', error);
+      logger.error('Error refreshing data', error, 'Admin');
     } finally {
       setIsLoading(false);
     }

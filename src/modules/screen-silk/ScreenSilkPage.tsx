@@ -3,7 +3,8 @@
  */
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import * as Sentry from '@sentry/react';
+import { captureException } from '@/lib/ai-monitoring';
+import { Sentry } from '@/lib/errors/sentry-compat';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -372,11 +373,11 @@ export const ScreenSilkPage: React.FC = () => {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Clignements:</span>
-                      <span>{data.session.blinkCount}</span>
+                      <span>{data.session.blink_count}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Durée prévue:</span>
-                      <span>{formatTime(data.session.duration)}</span>
+                      <span>{formatTime(data.session.duration_seconds)}</span>
                     </div>
                   </div>
                 )}

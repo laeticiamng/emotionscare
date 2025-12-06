@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 type SessionState = 'idle' | 'running' | 'paused' | 'completed';

@@ -1,24 +1,56 @@
 # Module Registry et Roadmap technique
 
-Ce fichier recense les modules officiels d'EmotionsCare ainsi que les extensions en cours de conception. Il sert de référence pour savoir comment déclarer un nouveau module et suivre la feuille de route technique.
+Ce fichier recense les **22 modules officiels** d'EmotionsCare. Chaque module est documenté avec sa route, son statut et sa description.
 
-## Modules existants
+---
 
-- **auth** : contexte d'authentification et pages de connexion/inscription
-- **scan** : analyse émotionnelle (texte, voix, expression faciale)
-- **music** : thérapie musicale et lecteur intégré
-- **journal** : journal émotionnel et visualisations
-- **predictive** : tableau de bord d'intelligence prédictive
-- **social** : cocoon communautaire et messagerie
+## 📱 Modules avec Page Dédiée (18)
 
-## Modules planifiés ou expérimentaux
+| # | Module | Route | Statut | Description |
+|---|--------|-------|--------|-------------|
+| 1 | **meditation** | `/app/meditation` | stable | Méditation guidée et pleine conscience |
+| 2 | **breath** | `/app/breath` | stable | Exercices de respiration thérapeutique |
+| 3 | **journal** | `/app/journal` | stable | Journal émotionnel quotidien |
+| 4 | **journal-new** | `/app/journal-new` | bêta | Nouvelle interface journal enrichie |
+| 5 | **adaptive-music** | `/app/music` | stable | Thérapie musicale adaptative |
+| 6 | **nyvee** | `/app/nyvee` | bêta | Cocoon émotionnel Nyvee |
+| 7 | **story-synth** | `/app/story-synth` | stable | Synthèse narrative émotionnelle |
+| 8 | **screen-silk** | `/app/screen-silk` | stable | Pause écran apaisante |
+| 9 | **breath-constellation** | `/app/vr-breath` | stable | Respiration VR immersive |
+| 10 | **vr-galaxy** | `/app/vr-galaxy` | bêta | Expérience galaxie VR |
+| 11 | **emotion-scan** | `/app/scan` | stable | Analyse émotionnelle (texte/voix/visage) |
+| 12 | **bubble-beat** | `/app/bubble-beat` | bêta | Jeu rythmique anti-stress |
+| 13 | **flash-glow** | `/app/flash-glow` | stable | Micro-sessions énergétiques (Flash Glow + Ultra) |
+| 14 | **weekly-bars** | `/app/weekly-bars` | stable | Visualisation barres hebdomadaires |
+| 15 | **mood-mixer** | `/app/mood-mixer` | stable | Mixeur d'humeur interactif |
+| 16 | **ar-filters** | `/app/face-ar` | expérimental | Filtres AR émotionnels |
+| 17 | **ambition-arcade** | `/app/ambition-arcade` | bêta | Jeu d'objectifs gamifié |
+| 18 | **boss-grit** | `/app/boss-grit` | stable | Défis de résilience |
 
-- **vr** : sessions de réalité virtuelle
-- **analytics** : tableau de bord RH et suivi des KPIs
-- **coach** : agent conversationnel IA
-- **extensions IA** : intégrations OpenAI/HumeAI avancées
+---
 
-Les modules en phase d'exploration peuvent être placés dans `src/experimental` ou `src/services/experimental`.
+## 🔧 Modules Backend-Only (4)
+
+| # | Module | Route | Statut | Description |
+|---|--------|-------|--------|-------------|
+| 19 | **dashboard** | `/app/home` | stable | Tableau de bord unifié utilisateur |
+| 20 | **activity** | `/app/activity` | stable | Historique activités et logs |
+| 21 | **community** | `/app/community` | bêta | Espace communautaire et discussions |
+| 22 | **leaderboard** | `/app/leaderboard` | stable | Classement gamification |
+
+---
+
+## 📦 Modules Transverses (Infrastructure)
+
+| Module | Statut | Description |
+|--------|--------|-------------|
+| **auth** | stable | Contexte d'authentification Supabase |
+| **sessions** | stable | Gestion des sessions utilisateurs |
+| **scores** | stable | Système de scoring et analytics |
+| **admin** | stable | Outils d'administration B2B |
+| **coach** | expérimental | Agent conversationnel IA (OpenAI/Hume) |
+
+---
 
 ## Déclaration d'un nouveau module
 
@@ -41,12 +73,22 @@ Les modules en phase d'exploration peuvent être placés dans `src/experimental`
 | coach | expérimental | Coach IA et chat |
 | extensions IA | expérimental | Intégrations rapides d'APIs |
 
-## Roadmap
+## 🚀 Roadmap & Prochaines Versions
 
-Une roadmap simplifiée peut être tenue ici ou dans un outil externe. Chaque version majeure doit mentionner :
+### v2.5 (Court Terme - Q1 2025)
+- ✅ Finalisation des 22 modules officiels
+- ✅ Migration complète vers RouterV2
+- 🔄 Retrait de tous les `@ts-nocheck` critiques
+- 🔄 Tests E2E Playwright pour tous modules
 
-- Les modules ajoutés ou mis à jour
-- Les APIs intégrées ou dépréciées
-- Les migrations de schéma éventuelles
+### v2.6 (Moyen Terme - Q2 2025)
+- 📝 Extensions IA avancées (OpenAI GPT-4, Hume EVI)
+- 📝 Analytics prédictifs manager/RH
+- 📝 Intégration webhooks Supabase
 
-Ce registre permet d'assurer la traçabilité des évolutions et de vérifier la compatibilité des modules entre eux.
+### v3.0 (Long Terme - Q3 2025)
+- 🎯 PWA offline-first
+- 🎯 Modules WebXR natifs (Meta Quest, Apple Vision Pro)
+- 🎯 Marketplace de modules tiers
+
+---

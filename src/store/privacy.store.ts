@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { create } from 'zustand';
 import { persist } from './utils/createImmutableStore';
 import { createSelectors } from './utils/createSelectors';

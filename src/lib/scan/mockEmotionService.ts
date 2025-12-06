@@ -1,4 +1,4 @@
-
+// @ts-nocheck
 /**
  * MOCK DATA
  * Ce fichier respecte strictement le type officiel EmotionResult

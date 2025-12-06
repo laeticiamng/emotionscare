@@ -10,11 +10,15 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Progress } from '@/components/ui/progress';
-import { Heart, Brain, Users, Sparkles, ArrowRight, Check } from 'lucide-react';
+import { Heart, Brain, Users, Sparkles, ArrowRight, Check, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useOnboarding } from '@/hooks/useOnboarding';
+import { useToast } from '@/hooks/use-toast';
 
 const OnboardingPage: React.FC = () => {
   const navigate = useNavigate();
+  const { createUserProfile, loading } = useOnboarding();
+  const { toast } = useToast();
   const [currentStep, setCurrentStep] = useState(0);
   const [userProfile, setUserProfile] = useState({
     goals: [] as string[],
@@ -106,12 +110,31 @@ const OnboardingPage: React.FC = () => {
     }));
   };
 
-  const nextStep = () => {
+  const nextStep = async () => {
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
-      // Terminer l'onboarding
-      navigate('/app/home');
+      // Terminer l'onboarding en sauvegardant le profil
+      try {
+        await createUserProfile({
+          goals: userProfile.goals,
+          experience: userProfile.experience,
+          preferences: userProfile.preferences,
+        });
+
+        toast({
+          title: "Bienvenue sur EmotionsCare !",
+          description: "Votre profil a été créé avec succès",
+        });
+
+        navigate('/app/home');
+      } catch (error) {
+        toast({
+          title: "Erreur",
+          description: "Impossible de sauvegarder votre profil. Veuillez réessayer.",
+          variant: "destructive",
+        });
+      }
     }
   };
 
@@ -146,15 +169,15 @@ const OnboardingPage: React.FC = () => {
       </a>
 
       <div 
-        className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-100 flex items-center justify-center p-6" 
+        className="min-h-screen bg-gradient-to-br from-info/10 to-accent/20 flex items-center justify-center p-6" 
         data-testid="page-root"
       >
         <main id="main-content" role="main" className="w-full max-w-2xl">
           {/* En-tête avec progression */}
           <header className="text-center mb-8">
             <div className="flex items-center justify-center gap-2 mb-4">
-              <Heart className="w-8 h-8 text-purple-600" aria-hidden="true" />
-              <h1 className="text-3xl font-bold text-gray-900">EmotionsCare</h1>
+              <Heart className="w-8 h-8 text-accent" aria-hidden="true" />
+              <h1 className="text-3xl font-bold text-foreground">EmotionsCare</h1>
             </div>
             <div 
               role="progressbar"
@@ -165,7 +188,7 @@ const OnboardingPage: React.FC = () => {
             >
               <Progress value={progress} className="w-full mb-4" />
             </div>
-            <p className="text-gray-600">
+            <p className="text-muted-foreground">
               Étape {currentStep + 1} sur {steps.length}
             </p>
           </header>
@@ -180,14 +203,14 @@ const OnboardingPage: React.FC = () => {
             <Card className="shadow-xl">
               <CardHeader className="text-center">
                 <div 
-                  className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4"
+                  className="w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-4"
                   role="img"
                   aria-label={`Icône étape ${steps[currentStep].title}`}
                 >
-                  {React.createElement(steps[currentStep].icon, { className: "w-8 h-8 text-purple-600", "aria-hidden": "true" })}
+                  {React.createElement(steps[currentStep].icon, { className: "w-8 h-8 text-accent", "aria-hidden": "true" })}
                 </div>
                 <CardTitle className="text-2xl">{steps[currentStep].title}</CardTitle>
-                <p className="text-gray-600">{steps[currentStep].description}</p>
+                <p className="text-muted-foreground">{steps[currentStep].description}</p>
               </CardHeader>
               <CardContent className="space-y-6">
               
@@ -195,10 +218,10 @@ const OnboardingPage: React.FC = () => {
               {steps[currentStep].id === 'welcome' && (
                 <div className="text-center space-y-6">
                   <div className="space-y-4">
-                    <h3 className="text-xl font-semibold text-gray-900">
+                    <h3 className="text-xl font-semibold text-foreground">
                       Prenez soin de votre bien-être émotionnel
                     </h3>
-                    <p className="text-gray-600 leading-relaxed">
+                    <p className="text-muted-foreground leading-relaxed">
                       EmotionsCare vous accompagne dans votre développement personnel avec des outils 
                       innovants : scan émotionnel IA, réalité virtuelle thérapeutique, musicothérapie 
                       personnalisée et coach virtuel.
@@ -206,20 +229,20 @@ const OnboardingPage: React.FC = () => {
                   </div>
                   
                   <div className="grid md:grid-cols-3 gap-4">
-                    <div className="text-center p-4 bg-blue-50 rounded-lg">
+                    <div className="text-center p-4 bg-info/10 rounded-lg">
                       <div className="text-3xl mb-2">🧠</div>
                       <h4 className="font-semibold">IA Avancée</h4>
-                      <p className="text-sm text-gray-600">Analyse émotionnelle intelligente</p>
+                      <p className="text-sm text-muted-foreground">Analyse émotionnelle intelligente</p>
                     </div>
-                    <div className="text-center p-4 bg-purple-50 rounded-lg">
+                    <div className="text-center p-4 bg-accent/10 rounded-lg">
                       <div className="text-3xl mb-2">🥽</div>
                       <h4 className="font-semibold">VR Immersive</h4>
-                      <p className="text-sm text-gray-600">Environnements thérapeutiques</p>
+                      <p className="text-sm text-muted-foreground">Environnements thérapeutiques</p>
                     </div>
-                    <div className="text-center p-4 bg-green-50 rounded-lg">
+                    <div className="text-center p-4 bg-success/10 rounded-lg">
                       <div className="text-3xl mb-2">👥</div>
                       <h4 className="font-semibold">Communauté</h4>
-                      <p className="text-sm text-gray-600">Soutien et partage</p>
+                      <p className="text-sm text-muted-foreground">Soutien et partage</p>
                     </div>
                   </div>
                 </div>
@@ -230,7 +253,7 @@ const OnboardingPage: React.FC = () => {
                 <section aria-labelledby="goals-title">
                   <h2 id="goals-title" className="sr-only">Sélection des objectifs de bien-être</h2>
                   <div className="space-y-4">
-                    <p className="text-center text-gray-600 mb-6">
+                    <p className="text-center text-muted-foreground mb-6">
                       Sélectionnez les domaines que vous souhaitez améliorer (plusieurs choix possibles)
                     </p>
                     <fieldset>
@@ -241,10 +264,10 @@ const OnboardingPage: React.FC = () => {
                             key={goal.id}
                             onClick={() => handleGoalToggle(goal.id)}
                             onKeyDown={(e) => handleKeyDown(e, () => handleGoalToggle(goal.id))}
-                            className={`p-4 border-2 rounded-lg cursor-pointer transition-all hover:shadow-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 ${
+                            className={`p-4 border-2 rounded-lg cursor-pointer transition-all hover:shadow-md focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 ${
                               userProfile.goals.includes(goal.id)
-                                ? 'border-purple-500 bg-purple-50'
-                                : 'border-gray-200 hover:border-purple-300'
+                                ? 'border-accent bg-accent/10'
+                                : 'border-border hover:border-accent/50'
                             }`}
                             role="checkbox"
                             aria-checked={userProfile.goals.includes(goal.id)}
@@ -255,10 +278,10 @@ const OnboardingPage: React.FC = () => {
                               <span className="text-2xl" role="img" aria-label={`Icône ${goal.label}`}>{goal.icon}</span>
                               <h3 className="font-semibold">{goal.label}</h3>
                               {userProfile.goals.includes(goal.id) && (
-                                <Check className="w-5 h-5 text-purple-600 ml-auto" aria-label="Sélectionné" />
+                                <Check className="w-5 h-5 text-accent ml-auto" aria-label="Sélectionné" />
                               )}
                             </div>
-                            <p id={`goal-${goal.id}-desc`} className="text-sm text-gray-600">{goal.description}</p>
+                            <p id={`goal-${goal.id}-desc`} className="text-sm text-muted-foreground">{goal.description}</p>
                           </div>
                         ))}
                       </div>
@@ -272,7 +295,7 @@ const OnboardingPage: React.FC = () => {
                 <section aria-labelledby="experience-title">
                   <h2 id="experience-title" className="sr-only">Sélection du niveau d'expérience</h2>
                   <div className="space-y-4">
-                    <p className="text-center text-gray-600 mb-6">
+                    <p className="text-center text-muted-foreground mb-6">
                       Quel est votre niveau d'expérience avec les pratiques de bien-être mental ?
                     </p>
                     <fieldset>
@@ -283,10 +306,10 @@ const OnboardingPage: React.FC = () => {
                             key={level.id}
                             onClick={() => setUserProfile(prev => ({ ...prev, experience: level.id }))}
                             onKeyDown={(e) => handleKeyDown(e, () => setUserProfile(prev => ({ ...prev, experience: level.id })))}
-                            className={`p-4 border-2 rounded-lg cursor-pointer transition-all hover:shadow-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 ${
+                            className={`p-4 border-2 rounded-lg cursor-pointer transition-all hover:shadow-md focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 ${
                               userProfile.experience === level.id
-                                ? 'border-purple-500 bg-purple-50'
-                                : 'border-gray-200 hover:border-purple-300'
+                                ? 'border-accent bg-accent/10'
+                                : 'border-border hover:border-accent/50'
                             }`}
                             role="radio"
                             aria-checked={userProfile.experience === level.id}
@@ -296,10 +319,10 @@ const OnboardingPage: React.FC = () => {
                             <div className="flex items-center justify-between">
                               <div>
                                 <h3 className="font-semibold">{level.label}</h3>
-                                <p id={`level-${level.id}-desc`} className="text-sm text-gray-600">{level.description}</p>
+                                <p id={`level-${level.id}-desc`} className="text-sm text-muted-foreground">{level.description}</p>
                               </div>
                               {userProfile.experience === level.id && (
-                                <Check className="w-5 h-5 text-purple-600" aria-label="Sélectionné" />
+                                <Check className="w-5 h-5 text-accent" aria-label="Sélectionné" />
                               )}
                             </div>
                           </div>
@@ -313,7 +336,7 @@ const OnboardingPage: React.FC = () => {
               {/* Étape Préférences */}
               {steps[currentStep].id === 'preferences' && (
                 <div className="space-y-4">
-                  <p className="text-center text-gray-600 mb-6">
+                  <p className="text-center text-muted-foreground mb-6">
                     Choisissez vos préférences pour personnaliser votre expérience
                   </p>
                   <div className="grid md:grid-cols-2 gap-3">
@@ -323,8 +346,8 @@ const OnboardingPage: React.FC = () => {
                         onClick={() => handlePreferenceToggle(pref.id)}
                         className={`p-3 border rounded-lg cursor-pointer transition-all hover:shadow-sm ${
                           userProfile.preferences.includes(pref.id)
-                            ? 'border-purple-500 bg-purple-50'
-                            : 'border-gray-200 hover:border-purple-300'
+                            ? 'border-accent bg-accent/10'
+                            : 'border-border hover:border-accent/50'
                         }`}
                       >
                         <div className="flex items-center justify-between">
@@ -333,7 +356,7 @@ const OnboardingPage: React.FC = () => {
                             <span className="font-medium">{pref.label}</span>
                           </div>
                           {userProfile.preferences.includes(pref.id) && (
-                            <Check className="w-4 h-4 text-purple-600" />
+                            <Check className="w-4 h-4 text-accent" />
                           )}
                         </div>
                       </div>
@@ -372,13 +395,22 @@ const OnboardingPage: React.FC = () => {
                 <Button
                   onClick={nextStep}
                   onKeyDown={(e) => handleKeyDown(e, nextStep)}
-                  disabled={!isStepValid()}
-                  className="bg-purple-600 hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+                  disabled={!isStepValid() || loading}
+                  className="bg-accent hover:bg-accent/90 focus:ring-2 focus:ring-accent focus:ring-offset-2"
                   aria-label={currentStep === steps.length - 1 ? 'Terminer l\'onboarding' : 'Étape suivante'}
                   tabIndex={0}
                 >
-                  {currentStep === steps.length - 1 ? 'Terminer' : 'Suivant'}
-                  <ArrowRight className="w-4 h-4 ml-2" aria-hidden="true" />
+                  {loading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Sauvegarde...
+                    </>
+                  ) : (
+                    <>
+                      {currentStep === steps.length - 1 ? 'Terminer' : 'Suivant'}
+                      <ArrowRight className="w-4 h-4 ml-2" aria-hidden="true" />
+                    </>
+                  )}
                 </Button>
               </nav>
             </CardContent>
@@ -396,10 +428,10 @@ const OnboardingPage: React.FC = () => {
               key={index}
               className={`w-3 h-3 rounded-full transition-colors ${
                 index === currentStep
-                  ? 'bg-purple-600'
+                  ? 'bg-accent'
                   : index < currentStep
-                  ? 'bg-purple-400'
-                  : 'bg-gray-300'
+                  ? 'bg-accent/50'
+                  : 'bg-muted'
               }`}
               role="tab"
               aria-selected={index === currentStep}

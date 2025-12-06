@@ -1,0 +1,95 @@
+preset_key: "panique-anxiete"
+title: "Panique/Anxiété → Calme & Contrôle"
+emotion_category: "anxiété"
+duration_target: 20
+
+music:
+  bpm: 64
+  mode: "dorien"
+  progression: "vi–IV–I–V"
+  meter: "6/8"
+  instruments: "handpan + piano feutré + pad doux"
+  model: "V4_5"
+  style_weight: 0.8
+  weirdness: 0.1
+
+segments:
+  - title: "Respiration 4/6"
+    start_s: 0
+    end_s: 120
+    technique: "Respiration carrée 4/6"
+    voiceover: |
+      Inspirez par le nez pendant 4 temps.
+      Expirez par la bouche pendant 6 temps.
+      L'expiration longue apaise immédiatement votre système nerveux.
+      Continuez ce rythme... Vous êtes en sécurité.
+
+  - title: "Ancrage 5-4-3-2-1"
+    start_s: 120
+    end_s: 240
+    technique: "Grounding sensoriel"
+    voiceover: |
+      Nommez 5 choses que vous voyez autour de vous.
+      4 choses que vous touchez.
+      3 sons que vous entendez.
+      2 odeurs.
+      1 goût dans votre bouche.
+      Vous êtes ici, maintenant, en sécurité.
+
+  - title: "Exposition interoceptive"
+    start_s: 240
+    end_s: 480
+    technique: "Exposition graduée aux sensations"
+    voiceover: |
+      Respirez rapidement pendant 20 secondes... maintenant arrêtez.
+      Observez les sensations sans jugement.
+      Elles ne sont pas dangereuses. Elles passeront.
+      Reprenez votre respiration 4/6.
+      [Répéter 3 cycles]
+
+  - title: "Restructuration"
+    start_s: 480
+    end_s: 720
+    technique: "TCC - Pensées alternatives"
+    voiceover: |
+      La panique ne peut pas vous faire de mal.
+      C'est une alarme incendie qui se déclenche sans feu.
+      Vous avez déjà survécu à 100% de vos crises précédentes.
+      Ancrez votre pouce et index ensemble. C'est votre signal de sécurité.
+
+  - title: "Consolidation"
+    start_s: 720
+    end_s: 960
+    technique: "Ancrage + Safe place"
+    voiceover: |
+      Imaginez un lieu où vous vous sentez totalement en sécurité.
+      Respirez dans cet endroit. Il est toujours accessible.
+      Pouce et index ensemble. Respirez.
+
+  - title: "Sortie douce"
+    start_s: 960
+    end_s: 1200
+    technique: "Scan + Gratitude"
+    voiceover: |
+      Votre corps s'est calmé. Votre esprit revient au présent.
+      Vous avez traversé cette vague. Bravo.
+
+lyrics:
+  refrain: "C'est une vague, je flotte, elle passe."
+  verses:
+    - "Mon cœur bat fort, je respire lent"
+    - "Je reste debout, l'alarme s'éteint"
+    - "Pouce et index, mon ancre est là"
+
+tcm:
+  points: ["P6-Neiguan", "HT7-Shenmen"]
+  contraindications: []
+  aromatherapy: "lavande/bergamote"
+
+immersion:
+  tapping: true
+  light_color: "bleu-doux"
+  breathwork_pattern: "4/6"
+  props: "glaçon nuque (DBT-TIPP), couverture lourde"
+
+prompt_suno: "A dorian 64 BPM, handpan lull, felt piano, FR grounding whispers, no risers, low dynamics, therapeutic calm"

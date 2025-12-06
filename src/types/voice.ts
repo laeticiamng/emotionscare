@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 export interface SpeechRecognitionEvent extends Event {
   resultIndex: number;

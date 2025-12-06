@@ -1,5 +1,6 @@
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
+import { logger } from '@/lib/logger'
 
 /**
  * Utility function to merge Tailwind CSS classes with proper precedence
@@ -67,7 +68,7 @@ export async function copyToClipboard(text: string): Promise<boolean> {
     }
     return false
   } catch (error) {
-    console.error('Failed to copy to clipboard:', error)
+    logger.error('Failed to copy to clipboard', error as Error, 'UI')
     return false
   }
 }

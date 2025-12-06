@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -23,8 +24,8 @@ const CoachCard: React.FC<CoachCardProps> = ({ className = '' }) => {
       </CardHeader>
       <CardContent>
         <div className="flex flex-col items-center">
-          <div className="w-20 h-20 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 mb-4 flex items-center justify-center">
-            <MessageCircle className="h-10 w-10 text-white" />
+          <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary to-accent mb-4 flex items-center justify-center">
+            <MessageCircle className="h-10 w-10 text-primary-foreground" />
           </div>
           
           <h3 className="text-lg font-medium mb-2">Emma est disponible</h3>

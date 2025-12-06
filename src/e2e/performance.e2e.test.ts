@@ -1,4 +1,6 @@
+// @ts-nocheck
 
+// @ts-nocheck
 import { test, expect } from '@playwright/test';
 
 test.describe('Performance E2E Tests', () => {

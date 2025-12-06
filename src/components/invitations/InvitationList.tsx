@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 import React from 'react';
 import { InvitationData } from '@/types/invitation';

@@ -3,6 +3,7 @@
  */
 
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 
 export interface ScreenSilkMetrics {
   duration_s: number;
@@ -71,10 +72,10 @@ class ScreenSilkService {
       });
 
       if (response.error) {
-        console.error('Erreur envoi métriques Screen Silk:', response.error);
+        logger.error('Erreur envoi métriques Screen Silk', response.error, 'SYSTEM');
       }
     } catch (error) {
-      console.error('Erreur service Screen Silk:', error);
+      logger.error('Erreur service Screen Silk', error as Error, 'SYSTEM');
     }
 
     // Analytics

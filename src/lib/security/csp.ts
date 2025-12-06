@@ -1,21 +1,24 @@
-
 /**
  * Content Security Policy configuration
  */
+
+const isDevelopment = import.meta.env.MODE === 'development';
 
 export const CSP_DIRECTIVES = {
   'default-src': ["'self'"],
   'script-src': [
     "'self'",
-    "'unsafe-inline'", // Needed for Vite in development
-    "'unsafe-eval'", // Needed for development
+    // ⚠️ SECURITY: unsafe-inline and unsafe-eval are ONLY allowed in development
+    // In production, these directives are removed to prevent XSS attacks
+    ...(isDevelopment ? ["'unsafe-inline'", "'unsafe-eval'"] : []),
     "https://cdn.gpteng.co", // Lovable badge
     "https://www.googletagmanager.com",
     "https://unpkg.com" // For external libraries
   ],
   'style-src': [
     "'self'",
-    "'unsafe-inline'", // Needed for CSS-in-JS and Tailwind
+    "'unsafe-inline'", // Required for Tailwind CSS and CSS-in-JS libraries (Radix UI, Framer Motion)
+    // TODO: Consider using nonces or hashes for inline styles in production
     "https://fonts.googleapis.com"
   ],
   'font-src': [

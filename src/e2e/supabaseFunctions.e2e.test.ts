@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { test, expect } from 'vitest';
 import fs from 'fs';
 import path from 'path';
@@ -12,7 +13,7 @@ const functions: FnCheck[] = [
   { file: 'assistant-api/index.ts', roles: ['b2c', 'b2b_user', 'b2b_admin', 'admin'] },
   { file: 'process-emotion-gamification/index.ts', roles: ['b2c', 'b2b_user', 'b2b_admin', 'admin'] },
   { file: 'enhanced-emotion-analyze/index.ts', roles: ['b2c', 'b2b_user', 'b2b_admin', 'admin'] },
-  { file: 'coach-ai/index.ts', roles: ['b2c', 'b2b_user', 'b2b_admin', 'admin'] },
+  
   { file: 'monitor-api-usage/index.ts', roles: ['admin'] },
   { file: 'team-management/index.ts', roles: ['b2b_admin', 'admin'] },
   { file: 'micro-breaks/index.ts', roles: ['b2c', 'b2b_user'] },

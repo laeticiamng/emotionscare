@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 import { ChatConversation, ChatMessage } from '@/types/chat';
 

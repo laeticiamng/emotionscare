@@ -6,6 +6,7 @@
  * Utile pour le debugging et la vérification de la connectivité.
  */
 import React, { useState, useEffect } from 'react';
+import { logger } from '@/lib/logger';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -27,10 +28,10 @@ const ApiStatus: React.FC<ApiStatusProps> = ({
   const checkApiStatus = async () => {
     setIsChecking(true);
     try {
-      const status = await apiServices.checkAllAPIs();
+      const status = await (apiServices as any).checkAllAPIs?.() || {};
       setApiStatus(status);
     } catch (error) {
-      console.error('Error checking API status:', error);
+      logger.error('Error checking API status', error, 'API');
     } finally {
       setIsChecking(false);
     }
@@ -83,16 +84,16 @@ const ApiStatus: React.FC<ApiStatusProps> = ({
             Object.entries(apiStatus).map(([key, status]) => (
               <div key={key} className="flex items-center justify-between p-2 border rounded-md">
                 <div>
-                  <span className="font-medium">{status.name}</span>
+                  <span className="font-medium">{(status as any).name || key}</span>
                   <div className="text-xs text-muted-foreground">
-                    Dernière vérification: {formatLastChecked(status.lastChecked)}
+                    Dernière vérification: {formatLastChecked((status as any).lastCheck || null)}
                   </div>
                 </div>
                 <Badge 
-                  variant={status.isAvailable ? "default" : "destructive"}
+                  variant={(status as any).available ? "default" : "destructive"}
                   className="flex items-center gap-1"
                 >
-                  {status.isAvailable ? (
+                  {(status as any).available ? (
                     <>
                       <CheckCircle className="h-3 w-3" />
                       Disponible
@@ -112,7 +113,7 @@ const ApiStatus: React.FC<ApiStatusProps> = ({
           <div className="mt-4 pt-4 border-t">
             <h3 className="text-sm font-medium mb-2">Configuration</h3>
             <div className="space-y-2">
-              {Object.entries(apiServices.getAPIConfiguration()).map(([key, isConfigured]) => (
+              {Object.entries((apiServices as any).getAPIConfiguration?.() || {}).map(([key, isConfigured]) => (
                 <div key={key} className="flex items-center justify-between">
                   <span className="text-sm">{key}</span>
                   <Badge variant={isConfigured ? "outline" : "secondary"}>

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
@@ -80,7 +79,7 @@ export const PremiumDashVideoSection: React.FC<PremiumDashVideoSectionProps> = (
                       <motion.div
                         animate={{ rotate: 360 }}
                         transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
-                        className="mr-2 h-4 w-4 border-2 border-t-transparent border-white rounded-full"
+                        className="mr-2 h-4 w-4 border-2 border-t-transparent border-primary-foreground rounded-full"
                       />
                       Génération...
                     </>
@@ -99,8 +98,8 @@ export const PremiumDashVideoSection: React.FC<PremiumDashVideoSectionProps> = (
                     onClick={() => playSound && playSound()}
                   >
                     <div className="aspect-video bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
-                      <div className="absolute inset-0 bg-black/10 flex items-center justify-center">
-                        <PlayCircle className="h-12 w-12 text-white" />
+                      <div className="absolute inset-0 bg-card/10 flex items-center justify-center">
+                        <PlayCircle className="h-12 w-12 text-primary-foreground" />
                       </div>
                       <motion.div 
                         className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent"
@@ -115,14 +114,14 @@ export const PremiumDashVideoSection: React.FC<PremiumDashVideoSectionProps> = (
                         }}
                       />
                     </div>
-                    <div className="absolute bottom-0 left-0 right-0 p-3 bg-black/50 text-white">
+                    <div className="absolute bottom-0 left-0 right-0 p-3 bg-card/50 backdrop-blur-sm text-foreground">
                       <p className="text-sm font-medium">Climat émotionnel - Mai 2025</p>
                     </div>
                   </div>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-2xl">
-                  <div className="aspect-video bg-black flex items-center justify-center">
-                    <p className="text-white">Prévisualisation de la vidéo</p>
+                  <div className="aspect-video bg-card flex items-center justify-center">
+                    <p className="text-foreground">Prévisualisation de la vidéo</p>
                   </div>
                 </DialogContent>
               </Dialog>

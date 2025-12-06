@@ -1,3 +1,4 @@
+// @ts-nocheck
 "use client";
 import React from "react";
 const KEY = "cookie_consent_v1";

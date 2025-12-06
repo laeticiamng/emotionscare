@@ -5,6 +5,7 @@ import EmotionalModule from './EmotionalModule';
 import MindfulnessModule from './MindfulnessModule';
 import ModuleCard from './ModuleCard';
 import { Brain, Heart, Waves } from 'lucide-react';
+import { routes } from '@/routerV2';
 
 interface ModulesSectionProps {
   className?: string;

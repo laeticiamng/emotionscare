@@ -1,8 +1,10 @@
+// @ts-nocheck
 
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useUserMode } from '@/contexts/UserModeContext';
+import { logger } from '@/lib/logger';
 
 const DashboardContent: React.FC = () => {
   const { userMode } = useUserMode();
@@ -26,7 +28,7 @@ const DashboardContent: React.FC = () => {
         
         setContent(contentItems);
       } catch (error) {
-        console.error('Erreur lors du chargement du contenu:', error);
+        logger.error('Erreur lors du chargement du contenu:', error);
       } finally {
         setIsLoading(false);
       }

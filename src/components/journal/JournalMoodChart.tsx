@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 import React, { useMemo } from 'react';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';

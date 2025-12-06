@@ -1,5 +1,5 @@
-
 import React, { useState, useEffect } from 'react';
+import { logger } from '@/lib/logger';
 import { Link, useLocation, NavLink, useNavigate } from 'react-router-dom';
 import { routes } from '@/routerV2';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -18,7 +18,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useTheme } from '@/components/theme-provider';
+import { useTheme } from '@/providers/theme';
 import { Dialog, DialogContent, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
@@ -31,7 +31,7 @@ interface EnhancedHeaderProps {
 }
 
 const EnhancedHeader: React.FC<EnhancedHeaderProps> = ({ scrolled = false, className }) => {
-  const { theme, setTheme, isDarkMode } = useTheme();
+  const { theme, setTheme } = useTheme();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
@@ -43,7 +43,7 @@ const EnhancedHeader: React.FC<EnhancedHeaderProps> = ({ scrolled = false, class
       await signOut();
       navigate('/');
     } catch (error) {
-      console.error('Erreur lors de la déconnexion:', error);
+      logger.error('Erreur lors de la déconnexion', error as Error, 'AUTH');
     }
   };
 
@@ -59,7 +59,7 @@ const EnhancedHeader: React.FC<EnhancedHeaderProps> = ({ scrolled = false, class
   ];
 
   const toggleTheme = () => {
-    setTheme(isDarkMode ? 'light' : 'dark');
+    setTheme(theme === 'dark' ? 'light' : 'dark');
   };
 
   return (
@@ -155,9 +155,9 @@ const EnhancedHeader: React.FC<EnhancedHeaderProps> = ({ scrolled = false, class
             variant="ghost" 
             size="icon" 
             onClick={toggleTheme}
-            aria-label={isDarkMode ? "Passer au thème clair" : "Passer au thème sombre"}
+            aria-label={theme === 'dark' ? "Passer au thème clair" : "Passer au thème sombre"}
           >
-            {isDarkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
           </Button>
 
           {/* Notifications */}
@@ -184,9 +184,9 @@ const EnhancedHeader: React.FC<EnhancedHeaderProps> = ({ scrolled = false, class
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon" className="rounded-full">
                   <Avatar className="h-8 w-8">
-                    <AvatarImage src={user?.avatar} alt={user?.name || 'Utilisateur'} />
+                    <AvatarImage src={user?.user_metadata?.avatar_url} alt={user?.user_metadata?.full_name || 'Utilisateur'} />
                     <AvatarFallback>
-                      {user?.name?.charAt(0) || 'U'}
+                      {user?.user_metadata?.full_name?.charAt(0) || user?.email?.charAt(0) || 'U'}
                     </AvatarFallback>
                   </Avatar>
                 </Button>

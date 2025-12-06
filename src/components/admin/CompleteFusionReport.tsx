@@ -60,7 +60,7 @@ export default function CompleteFusionReport() {
     <div className="space-y-6 p-6" data-testid="page-root">
       {/* Header */}
       <div className="text-center space-y-4">
-        <div className="inline-flex items-center gap-2 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 px-6 py-3 rounded-full">
+        <div className="inline-flex items-center gap-2 bg-success/10 dark:bg-success/20 text-success px-6 py-3 rounded-full">
           <CheckCircle className="w-6 h-6" />
           <span className="font-semibold text-lg">FUSION COMPLÉTÉE À 100%</span>
         </div>
@@ -76,21 +76,21 @@ export default function CompleteFusionReport() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <CardContent className="p-6 text-center">
-            <div className="text-3xl font-bold text-green-600">{totalComponentsAfter}</div>
+            <div className="text-3xl font-bold text-success">{totalComponentsAfter}</div>
             <div className="text-sm text-muted-foreground">Composants Finaux</div>
           </CardContent>
         </Card>
         
         <Card>
           <CardContent className="p-6 text-center">
-            <div className="text-3xl font-bold text-red-600">{duplicatesRemoved}</div>
+            <div className="text-3xl font-bold text-destructive">{duplicatesRemoved}</div>
             <div className="text-sm text-muted-foreground">Doublons Supprimés</div>
           </CardContent>
         </Card>
         
         <Card>
           <CardContent className="p-6 text-center">
-            <div className="text-3xl font-bold text-blue-600">{fusedComponents.length}</div>
+            <div className="text-3xl font-bold text-primary">{fusedComponents.length}</div>
             <div className="text-sm text-muted-foreground">Composants Fusionnés</div>
           </CardContent>
         </Card>
@@ -137,9 +137,9 @@ export default function CompleteFusionReport() {
         <CardContent>
           <div className="space-y-4">
             {fusedComponents.map((component, index) => (
-              <div key={index} className="flex items-center justify-between p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+              <div key={index} className="flex items-center justify-between p-4 bg-success/5 dark:bg-success/10 rounded-lg border border-success/20">
                 <div className="space-y-1">
-                  <div className="font-semibold text-green-800 dark:text-green-300">
+                  <div className="font-semibold text-success">
                     {component.name}
                   </div>
                   <div className="text-sm text-muted-foreground">
@@ -181,17 +181,17 @@ export default function CompleteFusionReport() {
       </Card>
 
       {/* Final Status */}
-      <Card className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200 dark:border-green-800">
+      <Card className="bg-gradient-to-r from-success/5 to-success/10 dark:from-success/20 dark:to-success/30 border-success/20">
         <CardContent className="p-6 text-center">
           <div className="space-y-4">
-            <div className="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto">
-              <CheckCircle className="w-8 h-8 text-white" />
+            <div className="w-16 h-16 bg-success rounded-full flex items-center justify-center mx-auto">
+              <CheckCircle className="w-8 h-8 text-success-foreground" />
             </div>
             <div>
-              <h3 className="text-xl font-bold text-green-800 dark:text-green-300">
+              <h3 className="text-xl font-bold text-success">
                 🎉 FUSION 100% COMPLÉTÉE !
               </h3>
-              <p className="text-green-700 dark:text-green-400 mt-2">
+              <p className="text-success/80 mt-2">
                 Tous les doublons ont été supprimés. L'architecture est maintenant parfaitement unifiée et maintenable.
               </p>
             </div>

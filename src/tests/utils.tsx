@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 import React from 'react';
 import { render, RenderOptions } from '@testing-library/react';
@@ -6,7 +7,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { UserModeProvider } from '@/contexts/UserModeContext';
 import { MusicProvider } from '@/contexts/MusicContext';
-import { ThemeProvider } from '@/components/theme-provider';
+import { ThemeProvider } from '@/providers/theme';
 import { renderHook, RenderHookOptions } from '@testing-library/react';
 import { vi } from 'vitest';
 

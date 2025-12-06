@@ -5,15 +5,22 @@ import type { Download } from '@playwright/test';
 async function downloadToString(download: Download): Promise<string> {
   const stream = await download.createReadStream();
   if (stream) {
-    const chunks: Buffer[] = [];
+    const chunks: Uint8Array[] = [];
     for await (const chunk of stream as AsyncIterable<Uint8Array | string>) {
       if (typeof chunk === 'string') {
-        chunks.push(Buffer.from(chunk));
+        chunks.push(new TextEncoder().encode(chunk));
       } else {
-        chunks.push(Buffer.from(chunk));
+        chunks.push(new Uint8Array(chunk));
       }
     }
-    return Buffer.concat(chunks).toString('utf-8');
+    const totalLength = chunks.reduce((acc, chunk) => acc + chunk.length, 0);
+    const result = new Uint8Array(totalLength);
+    let offset = 0;
+    for (const chunk of chunks) {
+      result.set(chunk, offset);
+      offset += chunk.length;
+    }
+    return new TextDecoder('utf-8').decode(result);
   }
 
   const path = await download.path();

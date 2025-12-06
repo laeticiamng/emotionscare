@@ -130,7 +130,7 @@ interface HelpPageProps {
 export const HelpPage: React.FC<HelpPageProps> = ({ 'data-testid': testId }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('Tous');
-  const [expandedFAQ, setExpandedFAQ] = useState<number | null>(null);
+  const [expandedFAQ, setExpandedFAQ] = useState<string | null>(null);
 
   const categories = ['Tous', 'IA', 'Analyse', 'Premium', 'Sécurité', 'Technique', 'Paramètres'];
 
@@ -286,7 +286,7 @@ export const HelpPage: React.FC<HelpPageProps> = ({ 'data-testid': testId }) => 
               <div className="space-y-4">
                 {filteredFAQs.map((faq, index) => (
                   <motion.div
-                    key={index}
+                    key={`faq-${faq.question}`}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: index * 0.05 }}
@@ -294,7 +294,7 @@ export const HelpPage: React.FC<HelpPageProps> = ({ 'data-testid': testId }) => 
                     <Card>
                       <CardHeader
                         className="cursor-pointer hover:bg-muted/50 transition-colors"
-                        onClick={() => setExpandedFAQ(expandedFAQ === index ? null : index)}
+                        onClick={() => setExpandedFAQ(expandedFAQ === faq.question ? null : faq.question)}
                       >
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-3">
@@ -307,7 +307,7 @@ export const HelpPage: React.FC<HelpPageProps> = ({ 'data-testid': testId }) => 
                             )}
                           </div>
                           <motion.div
-                            animate={{ rotate: expandedFAQ === index ? 180 : 0 }}
+                            animate={{ rotate: expandedFAQ === faq.question ? 180 : 0 }}
                             transition={{ duration: 0.2 }}
                           >
                             <ChevronDown className="w-5 h-5 text-muted-foreground" />
@@ -315,7 +315,7 @@ export const HelpPage: React.FC<HelpPageProps> = ({ 'data-testid': testId }) => 
                         </div>
                       </CardHeader>
                       <AnimatePresence>
-                        {expandedFAQ === index && (
+                        {expandedFAQ === faq.question && (
                           <motion.div
                             initial={{ height: 0, opacity: 0 }}
                             animate={{ height: "auto", opacity: 1 }}

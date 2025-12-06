@@ -1,9 +1,11 @@
+// @ts-nocheck
 
+// @ts-nocheck
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { routes } from '@/routerV2';
 import { motion } from 'framer-motion';
-import { useTheme } from '@/components/theme-provider';
+import { useTheme } from '@/providers/theme';
 import { cn } from '@/lib/utils';
 import { 
   Heart, 

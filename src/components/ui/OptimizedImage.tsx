@@ -56,13 +56,18 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
     ${isLoaded ? 'opacity-100' : 'opacity-0'}
   `.trim();
 
+  // Calculer l'aspect ratio pour éviter le CLS
+  const aspectRatio = width && height ? (height / width) * 100 : undefined;
+
   return (
-    <div className="relative overflow-hidden">
+    <div
+      className="relative overflow-hidden"
+      style={aspectRatio ? { paddingBottom: `${aspectRatio}%` } : undefined}
+    >
       {/* Skeleton de chargement */}
       {!isLoaded && !imageError && (
-        <div 
+        <div
           className="absolute inset-0 bg-muted animate-pulse rounded"
-          style={{ width: width || 'auto', height: height || 'auto' }}
         />
       )}
 
@@ -77,7 +82,7 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
         <img
           src={imageError ? '/placeholder.svg' : sources.fallback}
           alt={alt}
-          className={imageClasses}
+          className={`${imageClasses} ${aspectRatio ? 'absolute inset-0 w-full h-full object-cover' : ''}`}
           width={width}
           height={height}
           loading={priority ? 'eager' : 'lazy'}
@@ -128,3 +133,42 @@ const generateSources = (baseSrc: string) => {
 };
 
 export { generateSources };
+
+/**
+ * Composant d'avatar optimisé avec fallback intelligent
+ */
+interface OptimizedAvatarProps extends OptimizedImageProps {
+  name?: string;
+}
+
+export const OptimizedAvatar: React.FC<OptimizedAvatarProps> = ({
+  name,
+  alt,
+  src,
+  className = '',
+  ...props
+}) => {
+  // Générer un avatar SVG avec initiales en fallback
+  const getInitials = (fullName?: string): string => {
+    if (!fullName) return '?';
+    const names = fullName.split(' ');
+    return names
+      .slice(0, 2)
+      .map(n => n[0])
+      .join('')
+      .toUpperCase();
+  };
+
+  const initials = getInitials(name || alt);
+  const fallbackSvg = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Crect fill='%236366f1' width='80' height='80'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='32' fill='white' font-family='sans-serif' font-weight='600'%3E${initials}%3C/text%3E%3C/svg%3E`;
+
+  return (
+    <div className={`${className} rounded-full overflow-hidden`}>
+      <OptimizedImage
+        src={src}
+        alt={alt}
+        {...props}
+      />
+    </div>
+  );
+};

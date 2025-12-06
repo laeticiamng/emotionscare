@@ -11,6 +11,7 @@ import { createClient } from '../_shared/supabase.ts';
 import { recordEdgeLatencyMetric } from '../_shared/metrics.ts';
 
 const requestSchema = z.object({
+  scope: z.string().min(1).default('coach'),
   reason: z.string().min(1).max(500).optional(),
 });
 
@@ -87,37 +88,20 @@ serve(async (req) => {
   const now = new Date().toISOString();
 
   const { data: revoked, error: revokeError } = await client
-    .from('consents')
+    .from('clinical_optins')
     .update({ revoked_at: now })
     .eq('user_id', auth.user.id)
+    .eq('scope', parsed.data.scope)
     .is('revoked_at', null)
     .select('revoked_at')
-    .maybeSingle<{ revoked_at: string | null }>();
+    .maybeSingle();
 
   if (revokeError) {
     console.error('[optin-revoke] failed to revoke consent', { message: revokeError.message });
     return finalize(json(500, { error: 'revoke_failed' }));
   }
 
-  let revokedAt = revoked?.revoked_at ?? null;
-
-  if (!revokedAt) {
-    const { data: last, error: lookupError } = await client
-      .from('consents')
-      .select('revoked_at')
-      .eq('user_id', auth.user.id)
-      .not('revoked_at', 'is', null)
-      .order('revoked_at', { ascending: false })
-      .limit(1)
-      .maybeSingle<{ revoked_at: string | null }>();
-
-    if (lookupError) {
-      console.error('[optin-revoke] failed to lookup last revocation', { message: lookupError.message });
-      return finalize(json(500, { error: 'consent_lookup_failed' }));
-    }
-
-    revokedAt = last?.revoked_at ?? null;
-  }
+  const revokedAt = revoked?.revoked_at ?? now;
 
   await logAccess({
     user_id: hashedUserId,
@@ -125,7 +109,7 @@ serve(async (req) => {
     action: 'revoke',
     result: 'success',
     user_agent: 'redacted',
-    details: parsed.data.reason ? 'reason:provided' : null,
+    details: parsed.data.reason ? 'reason:provided' : `scope:${parsed.data.scope}`,
   });
 
   return finalize(json(200, {

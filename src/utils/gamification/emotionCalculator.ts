@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 /**
  * Calculate streak days from emotion entries

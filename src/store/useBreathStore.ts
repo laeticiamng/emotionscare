@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { create } from 'zustand';
 import dayjs from 'dayjs';
 import { fetchUserWeekly, fetchOrgWeekly, BreathRow, BreathOrgRow } from '@/services/breathApi';

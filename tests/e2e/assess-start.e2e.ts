@@ -166,7 +166,7 @@ async function setupEdgeRoute(page: import('@playwright/test').Page, handler: Ha
     const edgeRequest = new Request(request.url(), {
       method: request.method(),
       headers,
-      body: bodyBuffer ?? undefined,
+      body: bodyBuffer ? new Uint8Array(bodyBuffer) : undefined,
     });
     const edgeResponse = await handler(edgeRequest);
     const responseBody = await edgeResponse.text();

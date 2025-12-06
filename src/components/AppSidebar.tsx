@@ -67,7 +67,7 @@ export function AppSidebar() {
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
             <Heart className="h-4 w-4" />
           </div>
-          {state === "expanded" && (
+          {state === "open" && (
             <div className="flex flex-col flex-1">
               <span className="text-sm font-semibold">EmotionsCare</span>
               <span className="text-xs text-muted-foreground">Bien-être digital</span>
@@ -87,7 +87,7 @@ export function AppSidebar() {
                   <SidebarMenuButton 
                     asChild 
                     isActive={isActive(item.url)}
-                    tooltip={state === "collapsed" ? item.title : undefined}
+                    tooltip={state === "closed" ? item.title : undefined}
                   >
                     <NavLink to={item.url} className={getNavCls(isActive(item.url))}>
                       <item.icon className="h-4 w-4" />
@@ -109,7 +109,7 @@ export function AppSidebar() {
                   <SidebarMenuButton 
                     asChild 
                     isActive={isActive(item.url)}
-                    tooltip={state === "collapsed" ? item.title : undefined}
+                    tooltip={state === "closed" ? item.title : undefined}
                   >
                     <NavLink to={item.url} className={getNavCls(isActive(item.url))}>
                       <item.icon className="h-4 w-4" />
@@ -131,7 +131,7 @@ export function AppSidebar() {
                   <SidebarMenuButton 
                     asChild 
                     isActive={isActive(item.url)}
-                    tooltip={state === "collapsed" ? item.title : undefined}
+                    tooltip={state === "closed" ? item.title : undefined}
                   >
                     <NavLink to={item.url} className={getNavCls(isActive(item.url))}>
                       <item.icon className="h-4 w-4" />
@@ -157,7 +157,7 @@ export function AppSidebar() {
                   U
                 </AvatarFallback>
               </Avatar>
-              {state === "expanded" && (
+              {state === "open" && (
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-semibold">Utilisateur</span>
                   <span className="truncate text-xs">user@emotionscare.com</span>

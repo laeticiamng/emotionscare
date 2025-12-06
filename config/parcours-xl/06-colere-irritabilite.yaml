@@ -1,0 +1,82 @@
+title: "Colère/Irritabilité → Assertivité"
+emotion: "colere"
+duration_min: 20
+duration_max: 22
+
+music:
+  bpm: "88→72"
+  mode: "minor-blues → aeolian"
+  progression: "12/8 → 4/4"
+  style: "blues transition"
+  instruments: ["toms soft", "pads aériens", "guitare nylon"]
+  prompt: "12/8 minor-blues 88 BPM → 72 BPM airy pads, FR anger→assertive arc."
+
+segments:
+  - title: "STOP - Pause immédiate"
+    start: 0
+    end: 120
+    type: "stop"
+    voiceover: |
+      Stop. Pose tout. Respire.
+      La colère est là, tu la sens. Tu ne l'es pas.
+      Tu prends une pause.
+    
+  - title: "Décharge dirigée"
+    start: 120
+    end: 300
+    type: "discharge"
+    voiceover: |
+      Serre les poings fort... puis relâche.
+      Contracte tout ton corps... puis lâche.
+      L'énergie sort, tu restes maître.
+    
+  - title: "DESC - Communication assertive"
+    start: 300
+    end: 600
+    type: "communication"
+    voiceover: |
+      Décrire : "Quand tu fais X..."
+      Exprimer : "Je ressens Y..."
+      Spécifier : "J'aimerais que..."
+      Conséquences : "Ainsi on pourra Z."
+      Tu dis ce qui blesse, sans casser demain.
+    
+  - title: "Disque rayé"
+    start: 600
+    end: 840
+    type: "technique"
+    voiceover: |
+      Si on insiste, tu répètes calmement.
+      "Non, ce n'est pas possible pour moi."
+      Encore et encore. Tu tiens ta ligne.
+    
+  - title: "Relaxation progressive"
+    start: 840
+    end: 1080
+    type: "relaxation"
+    voiceover: |
+      Relâche tes épaules... ton front... ta mâchoire.
+      Main fraîche sur ton visage. La tension fond.
+      
+  - title: "Stabilisation"
+    start: 1080
+    end: 1320
+    type: "stabilization"
+    voiceover: |
+      Tu dis ce qui blesse, sans casser demain.
+      Tu poses tes limites avec fermeté et douceur.
+      Respire. Tu es assertif, pas agressif.
+
+tcm:
+  points: ["LV3", "LI4"]
+  warnings: ["LI4 contre-indiqué grossesse"]
+  aromatherapy: "Orange douce"
+
+immersion:
+  light: "chaude progressive"
+  sounds: []
+  props: ["ballon anti-stress", "étirements mains/épaules"]
+
+affirmations:
+  - "Je dis ce qui blesse, sans casser demain."
+  - "Ma colère m'informe, elle ne me dirige pas."

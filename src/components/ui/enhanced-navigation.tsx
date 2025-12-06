@@ -9,7 +9,7 @@ import {
   ChevronDown, Search, Bell, Moon, Sun, Palette
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useTheme } from '@/components/theme-provider';
+import { useTheme } from '@/providers/theme';
 import { routes } from '@/routerV2';
 
 interface NavItem {

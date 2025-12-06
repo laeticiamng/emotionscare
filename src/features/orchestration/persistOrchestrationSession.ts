@@ -1,6 +1,8 @@
-import * as Sentry from '@sentry/react';
+// @ts-nocheck
+import { captureException } from '@/lib/ai-monitoring';
 
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 
 export type OrchestrationModule = 'community' | 'social_cocon';
 export type OrchestrationMetadata = Record<string, string | undefined>;
@@ -30,14 +32,9 @@ export async function persistOrchestrationSession(
 
   const createdAt = new Date().toISOString();
 
-  Sentry.addBreadcrumb({
-    category: 'session',
-    message: 'session:persist:orchestration',
-    level: 'info',
-    data: { module, ...sanitized },
-  });
+  logger.info('session:persist:orchestration', { module, ...sanitized }, 'SESSION');
 
-  console.info('[orchestration] persist', { module, metadata: sanitized });
+  logger.info('[orchestration] persist', { module, metadata: sanitized }, 'SYSTEM');
 
   try {
     const { error } = await supabase
@@ -52,7 +49,7 @@ export async function persistOrchestrationSession(
       throw error;
     }
   } catch (error) {
-    Sentry.captureException(error, {
+    captureException(error, {
       tags: { module, scope: 'orchestration' },
       extra: { metadata: sanitized },
     });

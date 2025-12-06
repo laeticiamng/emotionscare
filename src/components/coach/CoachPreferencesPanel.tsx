@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
@@ -137,7 +136,7 @@ const CoachPreferencesPanel: React.FC<CoachPreferencesPanelProps> = ({
                 aria-label={`Couleur ${color.label}`}
               >
                 {preferences.themeColor === color.value && (
-                  <Check className="h-4 w-4 text-white" />
+                  <Check className="h-4 w-4 text-primary-foreground" />
                 )}
               </button>
             ))}
@@ -168,7 +167,7 @@ const CoachPreferencesPanel: React.FC<CoachPreferencesPanelProps> = ({
               id="enable-animations"
               checked={preferences.animationsEnabled}
               onChange={(e) => setPreferences({...preferences, animationsEnabled: e.target.checked})}
-              className="rounded border-gray-300 focus:ring-primary"
+              className="rounded border-input focus:ring-primary"
             />
             <Label htmlFor="enable-animations">Animations</Label>
           </div>
@@ -179,7 +178,7 @@ const CoachPreferencesPanel: React.FC<CoachPreferencesPanelProps> = ({
               id="enable-sound"
               checked={preferences.soundEnabled}
               onChange={(e) => setPreferences({...preferences, soundEnabled: e.target.checked})}
-              className="rounded border-gray-300 focus:ring-primary"
+              className="rounded border-input focus:ring-primary"
             />
             <Label htmlFor="enable-sound">Sons</Label>
           </div>

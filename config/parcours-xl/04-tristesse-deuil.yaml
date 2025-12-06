@@ -1,0 +1,90 @@
+preset_key: "tristesse-deuil"
+title: "Tristesse/Deuil doux → Lumière"
+emotion_category: "tristesse"
+duration_target: 22
+
+music:
+  bpm: 68
+  mode: "lydien"
+  progression: "I–II–V–I"
+  meter: "4/4"
+  instruments: "piano + cordes + flûte douce"
+  model: "V4_5"
+  style_weight: 0.75
+  weirdness: 0.25
+
+segments:
+  - title: "Accueil de la tristesse"
+    start_s: 0
+    end_s: 120
+    technique: "Validation émotionnelle"
+    voiceover: |
+      Cette tristesse que vous ressentez est légitime.
+      Elle a le droit d'être là. Vous n'avez pas à la chasser.
+      Respirez avec elle, doucement, comme une vague.
+
+  - title: "Scan corporel"
+    start_s: 120
+    end_s: 300
+    technique: "Body scan + Chaleur"
+    voiceover: |
+      Parcourez votre corps de la tête aux pieds.
+      Où la tristesse se loge-t-elle ? Épaules ? Poitrine ? Gorge ?
+      Posez une main sur votre cœur. Sentez la chaleur.
+      Respirez dans cette zone, avec douceur.
+
+  - title: "Activation comportementale"
+    start_s: 300
+    end_s: 600
+    technique: "TCC - Micro-acte"
+    voiceover: |
+      Même dans la tristesse, vous pouvez faire un tout petit geste.
+      Quel serait ce geste aujourd'hui ? Boire de l'eau ? Ouvrir une fenêtre ?
+      Un pas suffit. La lumière revient par petites touches.
+
+  - title: "Recadrage socratique"
+    start_s: 600
+    end_s: 900
+    technique: "Questionnement socratique doux"
+    voiceover: |
+      Et si cette tristesse portait aussi un message de soin ?
+      Qu'essaie-t-elle de vous dire sur ce qui compte pour vous ?
+      Écoutez sans jugement. Elle veut peut-être vous protéger.
+
+  - title: "Lumière progressive"
+    start_s: 900
+    end_s: 1200
+    technique: "Imagerie + Gratitude"
+    voiceover: |
+      Imaginez une petite lumière douce dans votre poitrine.
+      À chaque inspiration, elle grandit légèrement.
+      Vous portez votre peine, ET la lumière vous tient.
+
+  - title: "Sortie douce"
+    start_s: 1200
+    end_s: 1320
+    technique: "Ancrage + Ressources"
+    voiceover: |
+      Vous avez été courageux aujourd'hui.
+      Gardez votre main sur votre cœur encore un instant.
+      Cette chaleur, vous pouvez la retrouver quand vous voulez.
+
+lyrics:
+  refrain: "Je porte ma peine, la lumière me tient."
+  verses:
+    - "Un pas dans le noir, puis la lumière revient"
+    - "Je me parle avec douceur, je me tiens la main"
+    - "Les larmes lavent, le cœur se pose"
+
+tcm:
+  points: ["PC6-Neiguan", "SP6-Sanyinjiao"]
+  contraindications: ["SP6: ⚠️ Contre-indiqué grossesse"]
+  aromatherapy: "encens doux"
+  props: "auto-hug, plaid chaud"
+
+immersion:
+  tapping: true
+  light_color: "chaud-doré"
+  breathwork_pattern: "3/5"
+
+prompt_suno: "Cinematic piano & strings 68 BPM, lydian shimmer, gentle FR lyrics on grief/light, no heavy drums, therapeutic emotional arc"

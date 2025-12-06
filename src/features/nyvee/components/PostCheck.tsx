@@ -1,11 +1,13 @@
+// @ts-nocheck
 import type { FC } from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import * as Sentry from '@sentry/react';
+import { captureException } from '@/lib/ai-monitoring';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { FocusTrap } from '@/components/ui/AccessibilityOptimized';
 import { cn } from '@/lib/utils';
+import { logger } from '@/lib/logger';
 
 interface PostCheckProps {
   visible: boolean;
@@ -26,7 +28,7 @@ export const PostCheck: FC<PostCheckProps> = ({
 
   useEffect(() => {
     if (visible && !dismissed) {
-      Sentry.addBreadcrumb({ category: 'stai6', level: 'info', message: 'stai6:post:shown' });
+      logger.info('stai6:post:shown', undefined, 'STAI6');
       setAnnouncement('Préparer un retour doux sur le ressenti après Nyvée.');
     }
   }, [visible, dismissed]);
@@ -44,7 +46,7 @@ export const PostCheck: FC<PostCheckProps> = ({
       await onStart();
       setDismissed(true);
     } catch (error) {
-      console.error('[PostCheck] unable to launch STAI-6 post-check', error);
+      logger.error('[PostCheck] unable to launch STAI-6 post-check', error as Error, 'SYSTEM');
     } finally {
       setIsStarting(false);
     }

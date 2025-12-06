@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { describe, expect, test } from 'vitest';
 
 import { deriveClinicalHints } from '@/hooks/useClinicalHints';

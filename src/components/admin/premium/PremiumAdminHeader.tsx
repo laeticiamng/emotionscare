@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Bell, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -37,7 +36,7 @@ const PremiumAdminHeader: React.FC<PremiumAdminHeaderProps> = ({
           </div>
           
           <Avatar>
-            <AvatarImage src={user?.avatar_url || user?.avatar} />
+            <AvatarImage src={user?.avatar} />
             <AvatarFallback>{user?.name?.charAt(0) || 'A'}</AvatarFallback>
           </Avatar>
         </div>

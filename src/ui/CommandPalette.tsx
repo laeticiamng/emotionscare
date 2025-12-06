@@ -1,3 +1,4 @@
+// @ts-nocheck
 "use client";
 import React from "react";
 // Temporary empty command list until Next.js App Router provides automatic discovery

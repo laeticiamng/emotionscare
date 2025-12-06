@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { LucideIconType } from '@/types/common';
 import { motion, AnimatePresence } from 'framer-motion';

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { X } from 'lucide-react';
@@ -32,7 +31,7 @@ const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
 >(({ className, children, onOpenAutoFocus, onCloseAutoFocus, ...props }, forwardedRef) => {
-  const contentRef = React.useRef<React.ElementRef<typeof DialogPrimitive.Content>>(null);
+  const contentRef = React.useRef<React.ElementRef<typeof DialogPrimitive.Content> | null>(null);
 
   React.useEffect(() => {
     const previouslyFocused = document.activeElement as HTMLElement | null;
@@ -43,10 +42,12 @@ const DialogContent = React.forwardRef<
 
   const setRefs = React.useCallback(
     (node: React.ElementRef<typeof DialogPrimitive.Content> | null) => {
-      contentRef.current = node;
+      if (contentRef) {
+        contentRef.current = node;
+      }
       if (typeof forwardedRef === 'function') {
         forwardedRef(node);
-      } else if (forwardedRef) {
+      } else if (forwardedRef && 'current' in forwardedRef) {
         (forwardedRef as React.MutableRefObject<React.ElementRef<typeof DialogPrimitive.Content> | null>).current = node;
       }
     },

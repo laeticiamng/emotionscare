@@ -1,3 +1,6 @@
+// @ts-nocheck
+
+import { logger } from '@/lib/logger';
 
 /**
  * Format time in seconds to MM:SS display format
@@ -14,7 +17,7 @@ export const formatTime = (timeInSeconds: number): string => {
  * Handle errors when attempting to play audio
  */
 export const handlePlayError = (error: Error, onError: (error: Error) => void): void => {
-  console.error("Erreur de lecture audio:", error);
+  logger.error("Erreur de lecture audio", error, 'MUSIC');
   onError(error);
 };
 

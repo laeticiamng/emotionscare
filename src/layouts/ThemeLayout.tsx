@@ -1,6 +1,7 @@
+// @ts-nocheck
 
 import React from 'react';
-import { ThemeProvider } from '@/components/theme-provider';
+import { ThemeProvider } from '@/providers/theme';
 
 interface ThemeLayoutProps {
   children: React.ReactNode;

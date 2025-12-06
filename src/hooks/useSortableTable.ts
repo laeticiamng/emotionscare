@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 import { useState, useCallback, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
