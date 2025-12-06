@@ -537,8 +537,8 @@ const PremiumNavigation: React.FC = () => {
       <div className="lg:hidden">
         <Sheet open={isMobileOpen} onOpenChange={setIsMobileOpen}>
           <SheetTrigger asChild>
-            <Button variant="outline" size="icon" className="fixed top-4 left-4 z-50">
-              <Menu className="w-5 h-5" />
+            <Button variant="outline" size="icon" className="fixed top-4 left-4 z-50" aria-label="Ouvrir le menu de navigation">
+              <Menu className="w-5 h-5" aria-hidden="true" />
             </Button>
           </SheetTrigger>
           <SheetContent side="left" className="w-full p-0 overflow-y-auto">

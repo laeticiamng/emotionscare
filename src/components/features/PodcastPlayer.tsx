@@ -108,8 +108,9 @@ const PodcastPlayer: React.FC = () => {
                     variant="outline" 
                     size="icon" 
                     className="h-8 w-8 rounded-full"
+                    aria-label="Épisode précédent"
                   >
-                    <SkipBack className="h-4 w-4" />
+                    <SkipBack className="h-4 w-4" aria-hidden="true" />
                   </Button>
                   
                   <Button 
@@ -117,11 +118,12 @@ const PodcastPlayer: React.FC = () => {
                     size="icon" 
                     className="h-10 w-10 rounded-full"
                     onClick={() => setIsPlaying(!isPlaying)}
+                    aria-label={isPlaying ? "Mettre en pause" : "Lire"}
                   >
                     {isPlaying ? (
-                      <Pause className="h-5 w-5" />
+                      <Pause className="h-5 w-5" aria-hidden="true" />
                     ) : (
-                      <Play className="h-5 w-5 ml-0.5" />
+                      <Play className="h-5 w-5 ml-0.5" aria-hidden="true" />
                     )}
                   </Button>
                   
@@ -129,8 +131,9 @@ const PodcastPlayer: React.FC = () => {
                     variant="outline" 
                     size="icon" 
                     className="h-8 w-8 rounded-full"
+                    aria-label="Épisode suivant"
                   >
-                    <SkipForward className="h-4 w-4" />
+                    <SkipForward className="h-4 w-4" aria-hidden="true" />
                   </Button>
                   
                   <div className="flex-1 flex items-center gap-2">
