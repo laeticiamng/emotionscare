@@ -312,28 +312,29 @@ export default function TherapeuticMusicEnhanced() {
 
                 {/* Controls */}
                 <div className="flex items-center justify-center gap-4">
-                  <Button variant="outline" size="icon">
+                  <Button variant="outline" size="icon" aria-label="Piste précédente">
                     <SkipBack className="h-5 w-5" />
                   </Button>
-                  <Button size="lg" onClick={togglePlay} className="h-16 w-16 rounded-full">
+                  <Button size="lg" onClick={togglePlay} className="h-16 w-16 rounded-full" aria-label={isPlaying ? "Pause" : "Lecture"}>
                     {isPlaying ? <Pause className="h-8 w-8" /> : <Play className="h-8 w-8" />}
                   </Button>
-                  <Button variant="outline" size="icon">
+                  <Button variant="outline" size="icon" aria-label="Piste suivante">
                     <SkipForward className="h-5 w-5" />
                   </Button>
                 </div>
 
                 {/* Volume */}
                 <div className="flex items-center gap-4">
-                  <Volume2 className="h-5 w-5 text-muted-foreground" />
+                  <Volume2 className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
                   <Slider
                     value={volume}
                     onValueChange={setVolume}
                     max={100}
                     step={1}
                     className="flex-1"
+                    aria-label={`Volume: ${volume[0]}%`}
                   />
-                  <span className="text-sm text-muted-foreground w-12">{volume[0]}%</span>
+                  <span className="text-sm text-muted-foreground w-12" aria-hidden="true">{volume[0]}%</span>
                 </div>
 
                 {/* Therapeutic Properties */}

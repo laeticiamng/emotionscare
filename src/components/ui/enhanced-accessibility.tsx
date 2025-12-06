@@ -164,7 +164,7 @@ export const AccessibilityPanel: React.FC = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setIsOpen(false)} />
+            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setIsOpen(false)} aria-label="Fermer le panneau d'accessibilité" role="button" tabIndex={0} onKeyDown={(e) => e.key === 'Escape' && setIsOpen(false)} />
             
             <motion.div
               className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto"
