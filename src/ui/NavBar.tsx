@@ -5,13 +5,13 @@ import { useI18n } from "@/lib/i18n";
 import { usePrefetchOnHover } from "@/hooks/usePrefetchOnHover";
 
 export function NavBar() {
-  const preMods = usePrefetchOnHover?.("/modules") ?? {};
+  const preMods = usePrefetchOnHover?.("/app/modules") ?? {};
   const { lang, setLang } = useI18n ? useI18n() : { lang: "fr", setLang: () => {} };
   return (
     <header style={{ display: "flex", gap: 12, alignItems: "center", padding: "12px 16px" }}>
       <a href="/" aria-label="Accueil">EmotionsCare</a>
       <nav style={{ display: "flex", gap: 8, marginLeft: "auto" }}>
-        <a {...preMods} href="/modules">Modules</a>
+        <a {...preMods} href="/app/modules">Modules</a>
         <a href="/legal/mentions">Mentions légales</a>
         <a href="/legal/terms">Conditions d'utilisation</a>
         <a href="/legal/sales">CGV</a>

@@ -562,7 +562,7 @@ const Header: React.FC<HeaderProps> = ({
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
-                      <Link to="/app/settings" className="flex items-center gap-2">
+                      <Link to="/settings" className="flex items-center gap-2">
                         <Settings className="mr-2 h-4 w-4" />
                         <span>Paramètres</span>
                       </Link>
@@ -737,7 +737,7 @@ const Header: React.FC<HeaderProps> = ({
                   </Link>
                   
                   <Link
-                    to="/app/settings"
+                    to="/settings"
                     onClick={() => setIsMenuOpen(false)}
                     className="flex items-center space-x-2 px-3 py-2 text-sm hover:bg-muted/50 rounded-md focus-enhanced"
                   >
