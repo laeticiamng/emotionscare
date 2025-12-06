@@ -126,7 +126,7 @@ const QuickStartModules: React.FC = () => {
           {/* Header */}
           <motion.div variants={itemVariants} className="text-center space-y-4">
             <Badge variant="secondary" className="justify-center">
-              <Zap className="h-3 w-3 mr-2" />
+              <Zap className="h-3 w-3 mr-2" aria-hidden="true" />
               Démarrage rapide
             </Badge>
             <h2 className="text-4xl lg:text-5xl font-bold">
@@ -160,7 +160,7 @@ const QuickStartModules: React.FC = () => {
 
                   <CardHeader className="relative pb-3">
                     <div className="flex items-start justify-between">
-                      <div className="text-5xl">{module.icon}</div>
+                      <div className="text-5xl" aria-hidden="true">{module.icon}</div>
                       {module.badge && (
                         <Badge className="text-xs">{module.badge}</Badge>
                       )}
@@ -201,9 +201,9 @@ const QuickStartModules: React.FC = () => {
 
                     {/* CTA Button */}
                     <Button className="w-full group/btn" size="sm" asChild>
-                      <Link to={module.link}>
+                      <Link to={module.link} aria-label={`Essayer ${module.title}`}>
                         <span>Essayer maintenant</span>
-                        <ArrowRight className="h-3.5 w-3.5 ml-2 group-hover/btn:translate-x-0.5 transition-transform" />
+                        <ArrowRight className="h-3.5 w-3.5 ml-2 group-hover/btn:translate-x-0.5 transition-transform" aria-hidden="true" />
                       </Link>
                     </Button>
                   </CardContent>
@@ -231,7 +231,7 @@ const QuickStartModules: React.FC = () => {
             <Button size="lg" asChild>
               <Link to="/signup">
                 Créer mon compte gratuit
-                <ArrowRight className="h-4 w-4 ml-2" />
+                <ArrowRight className="h-4 w-4 ml-2" aria-hidden="true" />
               </Link>
             </Button>
           </motion.div>

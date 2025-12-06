@@ -43,7 +43,7 @@ const ModuleCard: React.FC<ModuleCardProps> = ({
           {/* Statistique en haut si présente */}
           {statIcon && statText && (
             <div className="flex items-center gap-3 mb-6 text-white/90">
-              <span className="text-white">{statIcon}</span>
+              <span className="text-white" aria-hidden="true">{statIcon}</span>
               <span className="text-sm font-medium">
                 {statText}: <strong className="text-white">{statValue}</strong>
               </span>
@@ -52,7 +52,7 @@ const ModuleCard: React.FC<ModuleCardProps> = ({
           
           {/* Icône et titre */}
           <div className="flex items-center gap-4 mb-6">
-            <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm text-white group-hover:bg-white/30 group-hover:scale-110 transition-all duration-300">
+            <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm text-white group-hover:bg-white/30 group-hover:scale-110 transition-all duration-300" aria-hidden="true">
               {icon}
             </div>
             <h3 className="text-2xl font-bold">{title}</h3>
@@ -62,13 +62,13 @@ const ModuleCard: React.FC<ModuleCardProps> = ({
           <p className="text-white/90 mb-8 flex-grow leading-relaxed text-lg">{description}</p>
           
           {/* Bouton d'action */}
-          <Link to={to} className="mt-auto">
+          <Link to={to} className="mt-auto" aria-label={`Accéder au module ${title}`}>
             <PremiumButton 
               variant="ghost" 
               className="w-full justify-between group-hover:bg-white/10 border-white/20 text-white hover:text-white"
             >
               <span>Accéder</span>
-              <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+              <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" aria-hidden="true" />
             </PremiumButton>
           </Link>
         </div>
