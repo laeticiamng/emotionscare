@@ -44,7 +44,7 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({ onMenuToggle, onMenuClick
             variant="ghost" 
             size="icon" 
             className="relative"
-            onClick={() => navigate('/search')}
+            onClick={() => navigate('/app/scan')}
             aria-label="Rechercher"
           >
             <Search className="h-5 w-5" />
@@ -54,7 +54,7 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({ onMenuToggle, onMenuClick
             variant="ghost" 
             size="icon" 
             className="relative"
-            onClick={() => navigate('/notifications')}
+            onClick={() => navigate('/app/settings/notifications')}
             aria-label="Notifications"
           >
             <Bell className="h-5 w-5" />
@@ -67,7 +67,7 @@ const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({ onMenuToggle, onMenuClick
             variant="outline" 
             size="sm" 
             className="gap-2"
-            onClick={() => navigate('/profile')}
+            onClick={() => navigate('/app/settings/profile')}
           >
             <User className="h-4 w-4" />
             <span className="hidden sm:inline">Profil</span>

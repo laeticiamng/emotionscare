@@ -22,7 +22,7 @@ const B2BAdminLayout: React.FC = () => {
         description: "Vous n'avez pas les droits d'accès pour cette section",
         variant: "destructive",
       });
-      navigate('/dashboard');
+      navigate('/app/consumer/home');
     }
   }, [user, isLoading, navigate, toast]);
 

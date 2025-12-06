@@ -85,25 +85,25 @@ const CommandMenu: React.FC<CommandMenuProps> = ({
         
         <CommandGroup heading="Compte">
           <CommandItem
-            onSelect={() => runCommand(() => navigate('/profile'))}
+            onSelect={() => runCommand(() => navigate('/app/settings/profile'))}
           >
             <User className="mr-2 h-4 w-4" />
             <span>Mon profil</span>
           </CommandItem>
           <CommandItem
-            onSelect={() => runCommand(() => navigate('/settings'))}
+            onSelect={() => runCommand(() => navigate('/app/settings'))}
           >
             <Settings className="mr-2 h-4 w-4" />
             <span>Paramètres</span>
           </CommandItem>
           <CommandItem
-            onSelect={() => runCommand(() => navigate('/emotions/history'))}
+            onSelect={() => runCommand(() => navigate('/app/scan'))}
           >
             <Heart className="mr-2 h-4 w-4" />
             <span>Historique émotionnel</span>
           </CommandItem>
           <CommandItem
-            onSelect={() => runCommand(() => navigate('/calendar'))}
+            onSelect={() => runCommand(() => navigate('/app/activity'))}
           >
             <Calendar className="mr-2 h-4 w-4" />
             <span>Mon calendrier</span>
@@ -120,7 +120,7 @@ const CommandMenu: React.FC<CommandMenuProps> = ({
             <span>Centre d'aide</span>
           </CommandItem>
           <CommandItem
-            onSelect={() => runCommand(() => navigate('/search'))}
+            onSelect={() => runCommand(() => navigate('/app/scan'))}
           >
             <Search className="mr-2 h-4 w-4" />
             <span>Recherche</span>

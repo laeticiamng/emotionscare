@@ -47,7 +47,7 @@ export const StepSummary: React.FC<StepSummaryProps> = ({ onFinish, onBack }) =>
 
   const handleFinish = () => {
     onFinish();
-    navigate('/dashboard');
+    navigate('/app/consumer/home');
   };
 
   return (

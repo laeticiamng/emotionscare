@@ -80,7 +80,7 @@ const UserMenu: React.FC = () => {
             <span>Profil</span>
           </DropdownMenuItem>
           
-          <DropdownMenuItem onClick={() => navigate('/dashboard')}>
+          <DropdownMenuItem onClick={() => navigate('/app/consumer/home')}>
             <BarChart2 className="mr-2 h-4 w-4" />
             <span>Tableau de bord</span>
           </DropdownMenuItem>
@@ -109,7 +109,7 @@ const UserMenu: React.FC = () => {
             <span>Musicothérapie</span>
           </DropdownMenuItem>
           
-          <DropdownMenuItem onClick={() => navigate('/emotions')}>
+          <DropdownMenuItem onClick={() => navigate('/app/scan')}>
             <Heart className="mr-2 h-4 w-4" />
             <span>Scan émotionnel</span>
           </DropdownMenuItem>
@@ -119,7 +119,7 @@ const UserMenu: React.FC = () => {
           <>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem onClick={() => navigate('/community-admin')}>
+              <DropdownMenuItem onClick={() => navigate('/app/admin')}>
                 <Shield className="mr-2 h-4 w-4" />
                 <span>Administration</span>
               </DropdownMenuItem>

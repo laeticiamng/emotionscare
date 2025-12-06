@@ -85,7 +85,7 @@ const CoachRecommendations: React.FC<CoachRecommendationsProps> = ({
             <Button
               variant="outline"
               className="flex items-center gap-2"
-              onClick={() => navigate('/coach-chat')}
+              onClick={() => navigate('/app/coach')}
             >
               <MessageCircle className="h-4 w-4" />
               Parler au coach

@@ -193,7 +193,7 @@ export function NotificationBell() {
                 variant="ghost"
                 size="sm"
                 className="w-full"
-                onClick={() => navigate('/notifications')}
+                onClick={() => navigate('/app/settings/notifications')}
               >
                 Voir toutes les notifications
               </Button>

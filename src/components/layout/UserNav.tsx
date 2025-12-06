@@ -60,20 +60,20 @@ const UserNav: React.FC = () => {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => navigate('/profile')}>
+        <DropdownMenuItem onClick={() => navigate('/app/settings/profile')}>
           <User className="mr-2 h-4 w-4" />
           <span>Profil</span>
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => navigate('/notifications')}>
+        <DropdownMenuItem onClick={() => navigate('/app/settings/notifications')}>
           <Bell className="mr-2 h-4 w-4" />
           <span>Notifications</span>
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => navigate('/settings')}>
+        <DropdownMenuItem onClick={() => navigate('/app/settings')}>
           <Settings className="mr-2 h-4 w-4" />
           <span>Paramètres</span>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => navigate('/help')}>
+        <DropdownMenuItem onClick={() => navigate('/aide')}>
           <HelpCircle className="mr-2 h-4 w-4" />
           <span>Aide</span>
         </DropdownMenuItem>
