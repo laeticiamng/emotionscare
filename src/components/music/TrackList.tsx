@@ -45,6 +45,7 @@ const TrackList: React.FC<TrackListProps> = ({
                 variant="ghost"
                 size="icon"
                 className="h-8 w-8"
+                aria-label={isCurrent && isPlaying ? "Mettre en pause" : "Lire"}
                 onClick={(e) => {
                   e.stopPropagation();
                   onTrackSelect?.(track);

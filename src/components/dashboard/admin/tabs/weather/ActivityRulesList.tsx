@@ -329,13 +329,14 @@ const ActivityRulesList: React.FC = () => {
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end space-x-2">
-                      <Button size="icon" variant="ghost">
+                      <Button size="icon" variant="ghost" aria-label="Modifier la règle">
                         <Edit className="h-4 w-4" />
                       </Button>
                       <Button 
                         size="icon" 
                         variant="ghost" 
                         onClick={() => deleteRule(rule.id)}
+                        aria-label="Supprimer la règle"
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>

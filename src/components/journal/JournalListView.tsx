@@ -71,7 +71,7 @@ const JournalListView: React.FC<JournalListViewProps> = ({ entries, onDeleteEntr
             </CardContent>
             <CardFooter className="flex justify-end pt-0 opacity-0 group-hover:opacity-100 transition-opacity">
               <Link to={routes.consumer.journal() + '/' + entry.id}>
-                <Button variant="ghost" size="icon">
+                <Button variant="ghost" size="icon" aria-label="Modifier l'entrée">
                   <Edit size={18} />
                 </Button>
               </Link>
@@ -80,6 +80,7 @@ const JournalListView: React.FC<JournalListViewProps> = ({ entries, onDeleteEntr
                 size="icon" 
                 onClick={(e) => onDeleteEntry(entry.id, e)}
                 className="text-destructive hover:bg-destructive/10"
+                aria-label="Supprimer l'entrée"
               >
                 <Trash2 size={18} />
               </Button>

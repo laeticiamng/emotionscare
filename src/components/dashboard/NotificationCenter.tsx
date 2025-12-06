@@ -250,6 +250,7 @@ const NotificationCenter: React.FC = () => {
                               size="icon"
                               className="h-6 w-6"
                               onClick={() => deleteNotification(notification.id)}
+                              aria-label="Supprimer la notification"
                             >
                               <X className="h-3 w-3" />
                             </Button>

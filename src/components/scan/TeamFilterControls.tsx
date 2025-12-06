@@ -84,6 +84,7 @@ const TeamFilterControls: React.FC<TeamFilterControlsProps> = ({
           size="icon" 
           className="rounded-full"
           disabled={isLoading}
+          aria-label="Filtrer les résultats"
         >
           <Filter className="h-4 w-4" />
           {isLoading && <span className="sr-only">Chargement en cours</span>}

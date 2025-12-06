@@ -152,7 +152,7 @@ const ObjectiveCreator: React.FC<ObjectiveCreatorProps> = ({
               onKeyPress={(e) => e.key === 'Enter' && addTag()}
               className="flex-1"
             />
-            <Button onClick={addTag} size="icon" variant="outline">
+            <Button onClick={addTag} size="icon" variant="outline" aria-label="Ajouter le tag">
               <Plus className="h-4 w-4" />
             </Button>
           </div>

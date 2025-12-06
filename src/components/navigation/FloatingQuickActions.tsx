@@ -134,7 +134,7 @@ const FloatingQuickActions: React.FC = () => {
               {/* Header */}
               <div className="flex items-center justify-between pb-2 border-b">
                 <h3 className="font-semibold text-sm">Actions Rapides</h3>
-                <Button variant="ghost" size="icon" onClick={toggleMenu} className="h-6 w-6">
+                <Button variant="ghost" size="icon" onClick={toggleMenu} className="h-6 w-6" aria-label="Fermer le menu">
                   <X className="h-3 w-3" />
                 </Button>
               </div>

@@ -161,6 +161,7 @@ const EmotionsCareSongCard: React.FC<EmotionsCareSongCardProps> = ({
               size="icon"
               className="absolute inset-0 bg-black/50 text-white opacity-0 group-hover:opacity-100 transition-opacity"
               onClick={handlePlay}
+              aria-label="Lire le morceau"
             >
               <Play className="w-6 h-6" />
             </Button>
@@ -174,6 +175,7 @@ const EmotionsCareSongCard: React.FC<EmotionsCareSongCardProps> = ({
               onClick={toggleLike}
               disabled={loading}
               className="hover:bg-pink-100"
+              aria-label={liked ? "Retirer des favoris" : "Ajouter aux favoris"}
             >
               <Heart 
                 className={`w-5 h-5 ${liked ? 'fill-pink-500 text-pink-500' : 'text-gray-400'}`} 
@@ -186,6 +188,7 @@ const EmotionsCareSongCard: React.FC<EmotionsCareSongCardProps> = ({
               onClick={toggleLibrary}
               disabled={loading}
               className="hover:bg-green-100"
+              aria-label={inLibrary ? "Retirer de la bibliothèque" : "Ajouter à la bibliothèque"}
             >
               {inLibrary ? (
                 <Check className="w-5 h-5 text-green-500" />

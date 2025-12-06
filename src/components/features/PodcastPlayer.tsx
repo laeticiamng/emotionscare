@@ -93,10 +93,10 @@ const PodcastPlayer: React.FC = () => {
                   <p className="text-sm text-muted-foreground">{activePodcastData?.host}</p>
                 </div>
                 <div className="flex gap-1">
-                  <Button variant="ghost" size="icon" className="h-8 w-8">
+                  <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Ajouter aux favoris">
                     <Heart className="h-4 w-4" />
                   </Button>
-                  <Button variant="ghost" size="icon" className="h-8 w-8">
+                  <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Partager le podcast">
                     <Share2 className="h-4 w-4" />
                   </Button>
                 </div>

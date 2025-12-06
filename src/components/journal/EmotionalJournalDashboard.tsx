@@ -354,6 +354,7 @@ export const EmotionalJournalDashboard: React.FC = () => {
                     variant="ghost"
                     size="icon"
                     onClick={() => deleteEntry(entry.id)}
+                    aria-label="Supprimer l'entrée"
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
