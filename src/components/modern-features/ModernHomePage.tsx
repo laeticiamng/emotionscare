@@ -93,28 +93,28 @@ const ModernHomePage: React.FC = () => {
       title: 'Musique émotionnelle', 
       desc: 'Génération musicale par IA',
       icon: <Activity className="h-5 w-5" />,
-      href: '/app/emotion-music',
+      href: '/app/music',
       color: 'bg-pink-500'
     },
     { 
       title: 'Démarrer une session', 
       desc: 'Commencer votre parcours bien-être',
       icon: <Zap className="h-5 w-5" />,
-      href: '/app/sessions/new',
+      href: '/app/scan',
       color: 'bg-blue-500'
     },
     { 
       title: 'Voir mes statistiques', 
       desc: 'Analyser vos progrès',
       icon: <TrendingUp className="h-5 w-5" />,
-      href: '/app/analytics',
+      href: '/app/activity',
       color: 'bg-green-500'
     },
     { 
       title: 'Gérer mon profil', 
       desc: 'Personnaliser votre expérience',
       icon: <User className="h-5 w-5" />,
-      href: '/app/profile',
+      href: '/settings/profile',
       color: 'bg-purple-500'
     }
   ];
