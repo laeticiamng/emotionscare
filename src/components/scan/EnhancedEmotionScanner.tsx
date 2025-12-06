@@ -281,6 +281,7 @@ const EnhancedEmotionScanner: React.FC<EnhancedEmotionScannerProps> = ({
                 whileTap={{ scale: 0.98 }}
                 onClick={() => setScanMode(mode.id)}
                 disabled={!mode.permission || isScanning}
+                aria-label={`Mode de scan: ${mode.name} - ${mode.description}`}
                 className={cn(
                   "p-3 rounded-xl border-2 transition-all duration-300 text-left",
                   scanMode === mode.id

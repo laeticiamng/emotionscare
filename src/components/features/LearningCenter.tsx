@@ -110,6 +110,7 @@ const LearningCenter: React.FC = () => {
                 variant="ghost" 
                 className="h-16 w-16 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white border border-white/20"
                 onClick={() => setIsPlaying(!isPlaying)}
+                aria-label={isPlaying ? "Mettre en pause" : "Lire la vidéo"}
               >
                 {isPlaying ? (
                   <PauseCircle className="h-8 w-8" />
@@ -151,6 +152,7 @@ const LearningCenter: React.FC = () => {
                   size="icon" 
                   variant="ghost" 
                   className="h-12 w-12 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white border border-white/20"
+                  aria-label={`Lire ${tutorial.title}`}
                 >
                   <Play className="h-6 w-6" />
                 </Button>
