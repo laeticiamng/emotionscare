@@ -102,7 +102,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
               placeholder="Écrivez votre message..."
               className="min-h-[60px]"
             />
-            <Button size="icon" onClick={handleSendMessage} disabled={!currentInput.trim()}>
+            <Button size="icon" onClick={handleSendMessage} disabled={!currentInput.trim()} aria-label="Envoyer le message">
               <Send className="h-4 w-4" />
             </Button>
           </div>

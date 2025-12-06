@@ -429,6 +429,7 @@ const ImmersiveBreathingEnhanced: React.FC = () => {
                     variant="ghost"
                     size="icon"
                     onClick={() => setIsMuted(!isMuted)}
+                    aria-label={isMuted ? "Réactiver le son" : "Couper le son"}
                   >
                     {isMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
                   </Button>

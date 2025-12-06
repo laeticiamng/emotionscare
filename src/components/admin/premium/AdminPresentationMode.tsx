@@ -57,6 +57,7 @@ export const AdminPresentationMode: React.FC<AdminPresentationModeProps> = ({
             if (playSound) playSound();
             onExit();
           }}
+          aria-label="Retour"
         >
           <ArrowLeft />
         </Button>
@@ -81,6 +82,7 @@ export const AdminPresentationMode: React.FC<AdminPresentationModeProps> = ({
                 size="icon" 
                 onClick={prevSlide}
                 disabled={currentSlide === 0}
+                aria-label="Diapositive précédente"
               >
                 <ChevronLeft />
               </Button>
@@ -101,6 +103,7 @@ export const AdminPresentationMode: React.FC<AdminPresentationModeProps> = ({
                 size="icon" 
                 onClick={nextSlide}
                 disabled={currentSlide === slides.length - 1}
+                aria-label="Diapositive suivante"
               >
                 <ChevronRight />
               </Button>

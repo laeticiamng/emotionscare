@@ -112,7 +112,7 @@ export function CoachNotifications() {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative">
+        <Button variant="ghost" size="icon" className="relative" aria-label="Notifications">
           <Bell className="h-5 w-5" />
           {unreadCount > 0 && (
             <Badge
@@ -144,6 +144,7 @@ export function CoachNotifications() {
               size="icon"
               onClick={() => setOpen(false)}
               className="h-8 w-8"
+              aria-label="Fermer les notifications"
             >
               <X className="h-4 w-4" />
             </Button>
@@ -208,6 +209,7 @@ export function CoachNotifications() {
                           handleMarkAsRead(notification.id);
                         }}
                         className="h-8 w-8"
+                        aria-label="Marquer comme lu"
                       >
                         <Check className="h-4 w-4" />
                       </Button>
@@ -219,6 +221,7 @@ export function CoachNotifications() {
                           handleDelete(notification.id);
                         }}
                         className="h-8 w-8 text-destructive hover:text-destructive"
+                        aria-label="Supprimer la notification"
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>

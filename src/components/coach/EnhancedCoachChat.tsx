@@ -267,6 +267,7 @@ const EnhancedCoachChat: React.FC<EnhancedCoachChatProps> = ({
                 size="icon"
                 type="button"
                 onClick={() => toast.info("Fonctionnalité à venir")}
+                aria-label="Ajouter une image"
               >
                 <ImageIcon className="h-4 w-4" />
               </Button>
@@ -275,6 +276,7 @@ const EnhancedCoachChat: React.FC<EnhancedCoachChatProps> = ({
                 size="icon"
                 type="button"
                 onClick={isRecording ? handleStopRecording : handleStartRecording}
+                aria-label={isRecording ? "Arrêter l'enregistrement" : "Enregistrer un message vocal"}
               >
                 {isRecording ? (
                   <StopCircle className="h-4 w-4 text-red-500" />

@@ -212,6 +212,7 @@ const CoachChatInterface: React.FC<CoachChatInterfaceProps> = ({
               onClick={handleSendMessage}
               disabled={!inputMessage.trim() || isProcessing}
               size="icon"
+              aria-label="Envoyer le message"
             >
               <Send className="h-4 w-4" />
             </Button>

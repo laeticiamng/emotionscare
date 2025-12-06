@@ -436,6 +436,7 @@ const EmpathicAICoach: React.FC = () => {
                   onClick={sendMessage} 
                   disabled={!currentMessage.trim() || isTyping}
                   size="icon"
+                  aria-label="Envoyer le message"
                 >
                   <Send className="h-4 w-4" />
                 </Button>

@@ -120,6 +120,7 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
                       size="icon"
                       onClick={onCollapseToggle}
                       className="hidden md:flex"
+                      aria-label={collapsed ? "Développer le menu" : "Réduire le menu"}
                     >
                       <ChevronLeft className={cn(
                         'h-4 w-4 transition-transform',
@@ -132,6 +133,7 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
                     size="icon"
                     onClick={onToggle}
                     className="md:hidden"
+                    aria-label="Fermer le menu"
                   >
                     <X className="h-4 w-4" />
                   </Button>

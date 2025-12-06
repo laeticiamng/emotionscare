@@ -84,6 +84,7 @@ export const IncidentCard: React.FC<IncidentCardProps> = ({ incident, onExport, 
           size="icon"
           onClick={(e) => handleExport(e, 'excel')}
           disabled={isExporting === 'excel'}
+          aria-label="Exporter en Excel"
         >
           {isExporting === 'excel' ? (
             <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full" />
@@ -96,6 +97,7 @@ export const IncidentCard: React.FC<IncidentCardProps> = ({ incident, onExport, 
           size="icon"
           onClick={(e) => handleExport(e, 'pdf')}
           disabled={isExporting === 'pdf'}
+          aria-label="Exporter en PDF"
         >
           {isExporting === 'pdf' ? (
             <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full" />

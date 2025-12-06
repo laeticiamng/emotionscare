@@ -73,6 +73,7 @@ const PremiumHeader: React.FC<PremiumHeaderProps> = ({
             size="icon"
             className="mr-2 lg:hidden"
             onClick={toggleMenu}
+            aria-label={isMenuOpen ? "Fermer le menu" : "Ouvrir le menu"}
           >
             {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
           </Button>
@@ -108,7 +109,7 @@ const PremiumHeader: React.FC<PremiumHeaderProps> = ({
           {/* Search */}
           <Dialog open={searchOpen} onOpenChange={setSearchOpen}>
             <DialogTrigger asChild>
-              <Button variant="ghost" size="icon">
+              <Button variant="ghost" size="icon" aria-label="Rechercher">
                 <Search size={20} />
               </Button>
             </DialogTrigger>
@@ -129,12 +130,12 @@ const PremiumHeader: React.FC<PremiumHeaderProps> = ({
           </Dialog>
           
           {/* Quick Command Menu */}
-          <Button variant="ghost" size="icon">
+          <Button variant="ghost" size="icon" aria-label="Menu de commandes">
             <Command size={20} />
           </Button>
           
           {/* Notifications */}
-          <Button variant="ghost" size="icon">
+          <Button variant="ghost" size="icon" aria-label="Notifications">
             <Bell size={20} />
           </Button>
           
@@ -147,7 +148,7 @@ const PremiumHeader: React.FC<PremiumHeaderProps> = ({
           </div>
           
           {/* User Profile */}
-          <Button variant="ghost" size="icon" className="ml-2">
+          <Button variant="ghost" size="icon" className="ml-2" aria-label="Profil utilisateur">
             <User size={20} />
           </Button>
         </div>

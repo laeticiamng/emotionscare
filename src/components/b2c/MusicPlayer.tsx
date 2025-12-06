@@ -113,7 +113,7 @@ export const MusicPlayer: React.FC<MusicPlayerProps> = ({
 
         {/* Controls */}
         <div className="flex items-center justify-center gap-4">
-          <Button variant="ghost" size="icon" disabled>
+          <Button variant="ghost" size="icon" disabled aria-label="Morceau précédent">
             <SkipBack className="h-5 w-5" />
           </Button>
           
@@ -121,6 +121,7 @@ export const MusicPlayer: React.FC<MusicPlayerProps> = ({
             size="icon"
             onClick={togglePlay}
             className="h-12 w-12 rounded-full"
+            aria-label={isPlaying ? "Mettre en pause" : "Lecture"}
           >
             {isPlaying ? (
               <Pause className="h-6 w-6" />
@@ -129,14 +130,14 @@ export const MusicPlayer: React.FC<MusicPlayerProps> = ({
             )}
           </Button>
           
-          <Button variant="ghost" size="icon" disabled>
+          <Button variant="ghost" size="icon" disabled aria-label="Morceau suivant">
             <SkipForward className="h-5 w-5" />
           </Button>
         </div>
 
         {/* Volume Control */}
         <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={toggleMute}>
+          <Button variant="ghost" size="icon" onClick={toggleMute} aria-label={isMuted || volume === 0 ? "Réactiver le son" : "Couper le son"}>
             {isMuted || volume === 0 ? (
               <VolumeX className="h-4 w-4" />
             ) : (
