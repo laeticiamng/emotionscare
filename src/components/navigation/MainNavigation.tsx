@@ -82,19 +82,19 @@ const b2cFeatures: NavItem[] = [
 const enterpriseFeatures: NavItem[] = [
   {
     title: 'Dashboard Équipe',
-    href: '/enterprise/dashboard',
+    href: '/app/rh',
     description: 'Vue d\'ensemble du bien-être',
     icon: Building2
   },
   {
     title: 'Analytics RH',
-    href: '/enterprise/reports',
+    href: '/app/reports',
     description: 'Métriques et insights avancés',
     icon: Settings
   },
   {
     title: 'Gestion Équipes',
-    href: '/enterprise/teams',
+    href: '/app/teams',
     description: 'Organisation et collaboration',
     icon: User
   },

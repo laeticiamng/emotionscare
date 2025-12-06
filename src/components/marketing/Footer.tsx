@@ -13,22 +13,22 @@ import {
 
 const FOOTER_LINKS = {
   product: [
-    { label: 'Fonctionnalités', href: '/features' },
+    { label: 'Fonctionnalités', href: '/app/modules' },
     { label: 'Tarifs', href: '/pricing' },
-    { label: 'Sécurité', href: '/security' },
-    { label: 'API', href: '/api' }
+    { label: 'Entreprise', href: '/entreprise' },
+    { label: 'Démo', href: '/demo' }
   ],
   support: [
     { label: 'Centre d\'aide', href: '/help' },
-    { label: 'Documentation', href: '/docs' },
+    { label: 'FAQ', href: '/faq' },
     { label: 'Contact', href: '/contact' },
-    { label: 'Statut', href: '/status' }
+    { label: 'Tickets', href: '/support/tickets' }
   ],
   company: [
     { label: 'À propos', href: '/about' },
-    { label: 'Blog', href: '/blog' },
-    { label: 'Carrières', href: '/careers' },
-    { label: 'Presse', href: '/press' }
+    { label: 'Aide', href: '/help' },
+    { label: 'FAQ', href: '/faq' },
+    { label: 'Contact', href: '/contact' }
   ],
   legal: [
     { label: 'Mentions légales', href: '/legal/mentions' },

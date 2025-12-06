@@ -27,67 +27,67 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ currentPath }) => {
   const navigationItems = [
     {
       title: 'Vue d\'ensemble',
-      href: '/entreprise',
+      href: '/app/rh',
       icon: BarChart3,
       description: 'Dashboard principal'
     },
     {
       title: 'Gestion des équipes',
-      href: '/entreprise/teams',
+      href: '/app/teams',
       icon: Users,
       description: 'Équipes et collaborateurs'
     },
     {
       title: 'Analyses émotionnelles',
-      href: '/entreprise/emotional-analysis',
+      href: '/app/analytics',
       icon: Heart,
       description: 'Bien-être des équipes'
     },
     {
       title: 'Rapports avancés',
-      href: '/entreprise/reports',
+      href: '/app/reports',
       icon: FileText,
       description: 'Rapports et exports'
     },
     {
       title: 'Journal d\'activité',
-      href: '/entreprise/activity-logs',
+      href: '/app/activity',
       icon: Activity,
       description: 'Logs et audit'
     },
     {
       title: 'Événements',
-      href: '/entreprise/events',
+      href: '/app/events',
       icon: Calendar,
       description: 'Événements d\'entreprise'
     },
     {
       title: 'Social Cocon',
-      href: '/entreprise/social-cocon',
+      href: '/app/social-cocon',
       icon: Globe,
       description: 'Groupes sociaux'
     },
     {
       title: 'Utilisateurs',
-      href: '/entreprise/users',
+      href: '/admin/user-roles',
       icon: UserCog,
       description: 'Gestion utilisateurs'
     },
     {
       title: 'Gamification',
-      href: '/entreprise/gamification',
+      href: '/gamification',
       icon: Zap,
       description: 'Achievements et défis'
     },
     {
       title: 'Statistiques d\'usage',
-      href: '/entreprise/usage-stats',
+      href: '/app/analytics',
       icon: Database,
       description: 'Analytics d\'utilisation'
     },
     {
       title: 'Conformité RGPD',
-      href: '/entreprise/compliance',
+      href: '/admin/gdpr',
       icon: Shield,
       description: 'Sécurité et conformité'
     },
@@ -99,14 +99,14 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ currentPath }) => {
     },
     {
       title: 'Paramètres',
-      href: '/entreprise/settings',
+      href: '/settings/general',
       icon: Settings,
       description: 'Configuration'
     }
   ];
 
   const isActivePath = (href: string) => {
-    if (href === '/entreprise') {
+    if (href === '/app/rh') {
       return location.pathname === href;
     }
     return location.pathname.startsWith(href);

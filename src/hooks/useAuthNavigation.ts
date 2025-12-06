@@ -55,9 +55,9 @@ export function useAuthNavigation() {
     } else {
       // Pas de redirection spécifique, utiliser la logique par défaut
       if (segment === 'b2b') {
-        destination = '/enterprise/dashboard';
+        destination = '/app/rh';
       } else if (segment === 'b2c') {
-        destination = '/app/home';
+        destination = '/app/consumer/home';
       } else {
         // Automatically determine based on user profile
         // Will be implemented based on user metadata when available
@@ -127,9 +127,9 @@ export function useAuthNavigation() {
    */
   const navigateToDashboard = useCallback((segment?: 'b2c' | 'b2b') => {
     if (segment === 'b2b') {
-      navigate('/enterprise/dashboard');
+      navigate('/app/rh');
     } else {
-      navigate('/app/home');
+      navigate('/app/consumer/home');
     }
   }, [navigate]);
 
