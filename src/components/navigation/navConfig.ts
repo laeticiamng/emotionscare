@@ -121,7 +121,7 @@ export const b2cNavItems: NavItem[] = [
 // Navigation pour collaborateurs B2B
 export const b2bUserNavItems: NavItem[] = [
   {
-    href: '/app/employee/home',
+    href: '/app/collab',
     title: 'Tableau de bord',
     icon: Home,
     description: 'Vue d\'ensemble personnelle et équipe',

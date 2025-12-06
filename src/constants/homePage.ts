@@ -220,14 +220,14 @@ export const QUICK_ACTIONS: QuickAction[] = [
     title: 'Musique émotionnelle',
     desc: 'Génération musicale par IA',
     icon: Music,
-    href: '/app/emotion-music',
+    href: '/app/music',
     color: 'bg-pink-500'
   },
   {
     title: 'Démarrer une session',
     desc: 'Commencer votre parcours bien-être',
     icon: Sparkles,
-    href: '/app/sessions/new',
+    href: '/app/sessions',
     color: 'bg-blue-500'
   },
   {

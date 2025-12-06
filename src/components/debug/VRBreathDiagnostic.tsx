@@ -10,7 +10,7 @@ const VRBreathDiagnostic: React.FC = () => {
 
   const tests = [
     {
-      name: 'Route /app/vr-breath',
+      name: 'Route /app/vr-breath-guide',
       status: 'success',
       description: 'Route configurée dans le registry'
     },

@@ -41,7 +41,7 @@ const SystemAudit: React.FC = () => {
     
     // Dashboards
     { path: '/app/consumer/home', name: 'Dashboard B2C', category: 'Dashboard', expectedContent: 'Tableau de bord personnel B2C' },
-    { path: '/app/employee/home', name: 'Dashboard B2B User', category: 'Dashboard', expectedContent: 'Tableau de bord collaborateur' },
+    { path: '/app/collab', name: 'Dashboard B2B User', category: 'Dashboard', expectedContent: 'Tableau de bord collaborateur' },
     { path: '/entreprise', name: 'Dashboard B2B Admin', category: 'Dashboard', expectedContent: 'Tableau de bord administrateur' },
     
     // Fonctionnalités principales

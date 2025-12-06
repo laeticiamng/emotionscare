@@ -42,7 +42,7 @@ const AppHeader: React.FC<AppHeaderProps> = ({ onNotificationsToggle, notificati
   const quickActions = [
     { label: 'Scan rapide', action: () => window.location.href = '/app/scan' },
     { label: 'Flash Glow', action: () => window.location.href = '/app/flash-glow' },
-    { label: 'Respiration', action: () => window.location.href = '/app/breathing' },
+    { label: 'Respiration', action: () => window.location.href = '/app/breath' },
     { label: 'Journal', action: () => window.location.href = '/app/journal' }
   ];
 
