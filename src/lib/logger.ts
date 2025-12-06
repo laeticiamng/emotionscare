@@ -1,9 +1,9 @@
 /**
  * Production-safe logger utility with PII scrubbing
  * Replaces console.log calls with a structured logging system
+ * 
+ * NOTE: This module is imported by ai-monitoring.ts - avoid circular dependencies
  */
-
-import { aiMonitoring, captureMessage } from '@/lib/ai-monitoring';
 
 type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 
@@ -109,8 +109,10 @@ class Logger {
     }
   }
 
-  private reportToMonitoring(entry: LogEntry) {
+  private async reportToMonitoring(entry: LogEntry) {
+    // Lazy import to avoid circular dependency
     try {
+      const { aiMonitoring } = await import('@/lib/ai-monitoring');
       const levelMap: Record<LogLevel, 'critical' | 'high' | 'medium' | 'low'> = {
         debug: 'low',
         info: 'low',

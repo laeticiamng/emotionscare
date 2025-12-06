@@ -144,20 +144,13 @@ export const LivingPagesAnimation: React.FC<LivingPagesAnimationProps> = ({
                     <div className="flex items-center gap-1 mb-2 text-xs opacity-60">
                       <Calendar className="w-3 h-3" />
                       <span>
-                        {format(parseISO(page.createdAt), 'dd MMM', { locale: fr })}
+                        {page.created_at ? format(parseISO(page.created_at), 'dd MMM', { locale: fr }) : 'Récent'}
                       </span>
                     </div>
 
-                    {/* Title */}
-                    {page.title && (
-                      <h4 className="font-semibold text-sm mb-2 line-clamp-1">
-                        {page.title}
-                      </h4>
-                    )}
-
-                    {/* Content preview */}
-                    <p className="text-xs opacity-75 line-clamp-3">
-                      {page.content}
+                    {/* Text preview */}
+                    <p className="text-xs opacity-75 line-clamp-4">
+                      {page.text}
                     </p>
 
                     {/* Tags */}
