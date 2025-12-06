@@ -9,48 +9,47 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ExternalLink, CheckCircle, XCircle } from 'lucide-react';
-import { routes } from '@/routerV2';
 
 const RoutesDiagnostic: React.FC = () => {
   const [testedRoutes, setTestedRoutes] = useState<Record<string, boolean>>({});
 
   const routesToTest = [
     // Routes publiques
-    { name: 'Accueil', path: routes.public.home(), type: 'public' },
-    { name: 'À propos', path: routes.public.about(), type: 'public' },
-    { name: 'Contact', path: routes.public.contact(), type: 'public' },
-    { name: 'Aide', path: routes.public.help(), type: 'public' },
+    { name: 'Accueil', path: '/', type: 'public' },
+    { name: 'À propos', path: '/about', type: 'public' },
+    { name: 'Contact', path: '/contact', type: 'public' },
+    { name: 'Aide', path: '/help', type: 'public' },
     
     // Auth
-    { name: 'Login', path: routes.auth.login(), type: 'auth' },
-    { name: 'Inscription', path: routes.auth.signup(), type: 'auth' },
+    { name: 'Login', path: '/login', type: 'auth' },
+    { name: 'Inscription', path: '/signup', type: 'auth' },
     
     // B2C
-    { name: 'B2C Accueil', path: routes.b2c.home(), type: 'public' },
-    { name: 'Dashboard B2C', path: routes.b2c.dashboard(), type: 'protected' },
-    { name: 'Scan', path: routes.b2c.scan(), type: 'protected' },
-    { name: 'Musique', path: routes.b2c.music(), type: 'protected' },
-    { name: 'Coach', path: routes.b2c.coach(), type: 'protected' },
-    { name: 'Journal', path: routes.b2c.journal(), type: 'protected' },
-    { name: 'VR', path: routes.b2c.vr(), type: 'protected' },
+    { name: 'B2C Accueil', path: '/b2c', type: 'public' },
+    { name: 'Dashboard B2C', path: '/app/consumer/home', type: 'protected' },
+    { name: 'Scan', path: '/app/scan', type: 'protected' },
+    { name: 'Musique', path: '/app/music', type: 'protected' },
+    { name: 'Coach', path: '/app/coach', type: 'protected' },
+    { name: 'Journal', path: '/app/journal', type: 'protected' },
+    { name: 'VR', path: '/app/vr', type: 'protected' },
     
     // B2B
-    { name: 'B2B Accueil', path: routes.b2b.home(), type: 'public' },
-    { name: 'Dashboard Collaborateur', path: routes.b2b.user.dashboard(), type: 'protected' },
-    { name: 'Dashboard Admin', path: routes.b2b.admin.dashboard(), type: 'protected' },
+    { name: 'B2B Accueil', path: '/entreprise', type: 'public' },
+    { name: 'Dashboard Collaborateur', path: '/app/collab', type: 'protected' },
+    { name: 'Dashboard Admin', path: '/app/rh', type: 'protected' },
     
     // Modules Fun-First
-    { name: 'Flash Glow', path: routes.b2c.flashGlow(), type: 'protected' },
-    { name: 'Breathwork', path: routes.b2c.breathwork(), type: 'protected' },
-    { name: 'AR Filters', path: routes.b2c.arFilters(), type: 'protected' },
-    { name: 'Bubble Beat', path: routes.b2c.bubbleBeat(), type: 'protected' },
-    { name: 'Mood Mixer', path: routes.b2c.moodMixer(), type: 'protected' },
-    { name: 'Boss Level', path: routes.b2c.bossLevel(), type: 'protected' },
+    { name: 'Flash Glow', path: '/app/flash-glow', type: 'protected' },
+    { name: 'Breathwork', path: '/app/breath', type: 'protected' },
+    { name: 'AR Filters', path: '/app/face-ar', type: 'protected' },
+    { name: 'Bubble Beat', path: '/app/bubble-beat', type: 'protected' },
+    { name: 'Mood Mixer', path: '/app/mood-mixer', type: 'protected' },
+    { name: 'Boss Level', path: '/app/boss-grit', type: 'protected' },
     
     // Pages spéciales
-    { name: 'Choisir mode', path: routes.special.chooseMode(), type: 'public' },
-    { name: 'Non autorisé', path: routes.special.unauthorized(), type: 'error' },
-    { name: '404', path: routes.special.notFound(), type: 'error' },
+    { name: 'Choisir mode', path: '/mode-selection', type: 'public' },
+    { name: 'Non autorisé', path: '/401', type: 'error' },
+    { name: '404', path: '/404', type: 'error' },
   ];
 
   const markRouteAsTested = (path: string) => {

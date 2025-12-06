@@ -78,7 +78,7 @@ const ChallengesDashboard: React.FC = () => {
           <h1 className="text-3xl font-bold">Gestion des Défis</h1>
           <p className="text-muted-foreground">Gérez tous vos défis personnalisés</p>
         </div>
-        <Button onClick={() => navigate('/app/admin/challenges/create')}>
+        <Button onClick={() => navigate('/admin/challenges/create')}>
           Créer un Défi
         </Button>
       </div>
