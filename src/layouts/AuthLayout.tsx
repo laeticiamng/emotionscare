@@ -27,12 +27,12 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({ children }) => {
           <span className="font-bold text-xl">EmotionsCare</span>
         </Link>
         <div className="flex space-x-2">
-          <Button variant="ghost" size="icon" onClick={toggleTheme}>
-            {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+          <Button variant="ghost" size="icon" onClick={toggleTheme} aria-label={theme === 'dark' ? 'Passer au mode clair' : 'Passer au mode sombre'}>
+            {theme === 'dark' ? <Sun className="h-5 w-5" aria-hidden="true" /> : <Moon className="h-5 w-5" aria-hidden="true" />}
           </Button>
-          <Button variant="ghost" size="icon" asChild>
+          <Button variant="ghost" size="icon" asChild aria-label="Retour à l'accueil">
             <Link to={routes.public.home()}>
-              <Home className="h-5 w-5" />
+              <Home className="h-5 w-5" aria-hidden="true" />
             </Link>
           </Button>
         </div>

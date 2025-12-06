@@ -418,7 +418,16 @@ export const SMARTGoalBuilder: React.FC<SMARTGoalBuilderProps> = ({
               {goal.resources && goal.resources.length > 0 && (
                 <div className="flex gap-2 flex-wrap mt-2">
                   {goal.resources.map((resource, i) => (
-                    <Badge key={i} variant="secondary" className="cursor-pointer" onClick={() => removeResource(i)}>
+                    <Badge 
+                      key={i} 
+                      variant="secondary" 
+                      className="cursor-pointer" 
+                      onClick={() => removeResource(i)}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => e.key === 'Enter' && removeResource(i)}
+                      aria-label={`Supprimer la ressource ${resource}`}
+                    >
                       {resource} ×
                     </Badge>
                   ))}
@@ -473,7 +482,16 @@ export const SMARTGoalBuilder: React.FC<SMARTGoalBuilderProps> = ({
               {goal.obstacles && goal.obstacles.length > 0 && (
                 <div className="flex gap-2 flex-wrap mt-2">
                   {goal.obstacles.map((obstacle, i) => (
-                    <Badge key={i} variant="outline" className="cursor-pointer" onClick={() => removeObstacle(i)}>
+                    <Badge 
+                      key={i} 
+                      variant="outline" 
+                      className="cursor-pointer" 
+                      onClick={() => removeObstacle(i)}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => e.key === 'Enter' && removeObstacle(i)}
+                      aria-label={`Supprimer l'obstacle ${obstacle}`}
+                    >
                       {obstacle} ×
                     </Badge>
                   ))}

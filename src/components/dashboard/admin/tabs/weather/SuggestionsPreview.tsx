@@ -218,7 +218,7 @@ const SuggestionsPreview: React.FC = () => {
               <div className="pt-4 border-t border-border">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="user-location">Utiliser la localisation de l'utilisateur</Label>
-                  <Switch id="user-location" />
+                  <Switch id="user-location" aria-label="Utiliser la localisation de l'utilisateur" />
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">
                   Si activé, les suggestions seront basées sur la météo à la localisation réelle de l'utilisateur plutôt que celle par défaut.

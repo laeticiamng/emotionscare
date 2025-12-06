@@ -281,7 +281,7 @@ export function HealthIntegrationsManager() {
                   Vos données seront synchronisées toutes les heures
                 </div>
               </div>
-              <Switch />
+              <Switch aria-label="Activer la synchronisation automatique" />
             </div>
           </CardContent>
         </Card>

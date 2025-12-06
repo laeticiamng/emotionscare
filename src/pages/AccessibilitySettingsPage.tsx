@@ -20,16 +20,16 @@ export default function AccessibilitySettingsPage() {
             <h3 className="font-semibold mb-4">Vision</h3>
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <Label>Contraste élevé</Label>
-                <Switch />
+                <Label htmlFor="high-contrast">Contraste élevé</Label>
+                <Switch id="high-contrast" aria-label="Contraste élevé" />
               </div>
               <div className="flex items-center justify-between">
-                <Label>Mode daltonien</Label>
-                <Switch />
+                <Label htmlFor="colorblind-mode">Mode daltonien</Label>
+                <Switch id="colorblind-mode" aria-label="Mode daltonien" />
               </div>
               <div className="space-y-2">
                 <Label>Taille du texte</Label>
-                <Slider defaultValue={[100]} min={75} max={150} step={5} />
+                <Slider defaultValue={[100]} min={75} max={150} step={5} aria-label="Taille du texte" />
               </div>
               <div className="space-y-2">
                 <Label>Espacement des lignes</Label>
@@ -53,20 +53,20 @@ export default function AccessibilitySettingsPage() {
             <h3 className="font-semibold mb-4">Navigation</h3>
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <Label>Navigation au clavier</Label>
-                <Switch defaultChecked />
+                <Label htmlFor="keyboard-nav">Navigation au clavier</Label>
+                <Switch id="keyboard-nav" defaultChecked aria-label="Navigation au clavier" />
               </div>
               <div className="flex items-center justify-between">
-                <Label>Lecteur d'écran</Label>
-                <Switch defaultChecked />
+                <Label htmlFor="screen-reader">Lecteur d'écran</Label>
+                <Switch id="screen-reader" defaultChecked aria-label="Lecteur d'écran" />
               </div>
               <div className="flex items-center justify-between">
-                <Label>Descriptions audio</Label>
-                <Switch />
+                <Label htmlFor="audio-desc">Descriptions audio</Label>
+                <Switch id="audio-desc" aria-label="Descriptions audio" />
               </div>
               <div className="flex items-center justify-between">
-                <Label>Réduire les animations</Label>
-                <Switch />
+                <Label htmlFor="reduce-motion">Réduire les animations</Label>
+                <Switch id="reduce-motion" aria-label="Réduire les animations" />
               </div>
             </div>
           </div>

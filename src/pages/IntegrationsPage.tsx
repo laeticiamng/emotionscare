@@ -42,7 +42,7 @@ export default function IntegrationsPage() {
                   </p>
                 </div>
               </div>
-              <Switch defaultChecked={integration.connected} />
+              <Switch defaultChecked={integration.connected} aria-label={`${integration.connected ? 'Déconnecter' : 'Connecter'} ${integration.name}`} />
             </div>
           </Card>
         ))}

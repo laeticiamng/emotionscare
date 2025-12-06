@@ -457,8 +457,9 @@ export default function TherapeuticMusicEnhanced() {
                             setCurrentTrack(track);
                             setIsPlaying(true);
                           }}
+                          aria-label={`Lire ${track.title}`}
                         >
-                          <Play className="h-4 w-4" />
+                          <Play className="h-4 w-4" aria-hidden="true" />
                         </Button>
                         <div className="flex-1">
                           <p className="font-medium">{track.title}</p>
@@ -474,11 +475,12 @@ export default function TherapeuticMusicEnhanced() {
                           size="icon"
                           variant="ghost"
                           onClick={() => toggleFavorite(track.id)}
+                          aria-label={track.is_favorite ? `Retirer ${track.title} des favoris` : `Ajouter ${track.title} aux favoris`}
                         >
-                          <Heart className={`h-5 w-5 ${track.is_favorite ? 'fill-current text-red-500' : ''}`} />
+                          <Heart className={`h-5 w-5 ${track.is_favorite ? 'fill-current text-red-500' : ''}`} aria-hidden="true" />
                         </Button>
-                        <Button size="icon" variant="ghost">
-                          <Download className="h-5 w-5" />
+                        <Button size="icon" variant="ghost" aria-label={`Télécharger ${track.title}`}>
+                          <Download className="h-5 w-5" aria-hidden="true" />
                         </Button>
                       </div>
                     </CardContent>
