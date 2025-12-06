@@ -53,6 +53,14 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: false,
   },
   {
+    name: 'faq',
+    path: '/faq',
+    segment: 'public',
+    layout: 'marketing',
+    component: 'FAQPage',
+    guard: false,
+  },
+  {
     name: 'store',
     path: '/store',
     segment: 'public',
