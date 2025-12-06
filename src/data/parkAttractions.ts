@@ -184,7 +184,7 @@ export const parkAttractions: Attraction[] = [
     subtitle: 'Scan facial avancé',
     description: 'IA de reconnaissance faciale qui lit tes émotions en temps réel.',
     icon: Scan,
-    route: '/app/emotion-scan',
+    route: '/app/scan',
     gradient: 'from-blue-500/20 to-purple-500/20',
     collection: 'Historique de scans',
     zone: 'creative'

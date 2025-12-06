@@ -1243,6 +1243,33 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     component: 'JournalSettingsPage',
     guard: true,
   },
+  {
+    name: 'settings-accessibility',
+    path: '/settings/accessibility',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app-sidebar',
+    component: 'AccessibilitySettingsPage',
+    guard: true,
+  },
+  {
+    name: 'settings-language',
+    path: '/settings/language',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app-sidebar',
+    component: 'LanguageSettingsPage',
+    guard: true,
+  },
+  {
+    name: 'settings-security',
+    path: '/settings/security',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app-sidebar',
+    component: 'SecuritySettingsPage',
+    guard: true,
+  },
 
   // ═══════════════════════════════════════════════════════════
   // B2B FEATURES (EMPLOYEE)

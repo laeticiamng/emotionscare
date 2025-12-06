@@ -198,7 +198,7 @@ const B2CNyveeCoconPage: FC = () => {
                     Refaire une session
                   </Button>
                   <Button
-                    onClick={() => window.location.href = '/app/grounding'}
+                    onClick={() => window.location.href = '/app/meditation'}
                     className="bg-gradient-to-r from-emerald-500 to-cyan-500"
                   >
                     {badgeType === 'calm' ? 'Silence & Ancrage' : 'Carte 5-4-3-2-1'}

@@ -85,13 +85,13 @@ const CommandMenu: React.FC<CommandMenuProps> = ({
         
         <CommandGroup heading="Compte">
           <CommandItem
-            onSelect={() => runCommand(() => navigate('/app/settings/profile'))}
+            onSelect={() => runCommand(() => navigate('/settings/profile'))}
           >
             <User className="mr-2 h-4 w-4" />
             <span>Mon profil</span>
           </CommandItem>
           <CommandItem
-            onSelect={() => runCommand(() => navigate('/app/settings'))}
+            onSelect={() => runCommand(() => navigate('/settings/general'))}
           >
             <Settings className="mr-2 h-4 w-4" />
             <span>Paramètres</span>
