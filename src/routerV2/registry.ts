@@ -696,6 +696,20 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: true,
     aliases: ['/community'],
   },
+  // ═══════════════════════════════════════════════════════════
+  // EXCHANGE HUB V2.0 - 4 Marchés
+  // ═══════════════════════════════════════════════════════════
+  {
+    name: 'exchange-hub',
+    path: '/app/exchange',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app-sidebar',
+    component: 'ExchangeHubPage',
+    guard: true,
+    requireAuth: true,
+    aliases: ['/exchange'],
+  },
   {
     name: 'screen-silk',
     path: '/app/screen-silk',

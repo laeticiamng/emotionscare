@@ -91,6 +91,14 @@ const QUICK_ACTIONS: QuickAction[] = [
     icon: BookOpen,
     accent: 'bg-success/10 text-success',
   },
+  {
+    id: 'exchange',
+    title: 'Exchange Hub',
+    description: 'Marchés émotions, temps et confiance',
+    to: '/app/exchange',
+    icon: TrendingUp,
+    accent: 'bg-emerald-500/10 text-emerald-600',
+  },
 ];
 
 const WeeklyPlanSkeleton: React.FC = () => (

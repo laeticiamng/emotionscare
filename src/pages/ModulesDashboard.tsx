@@ -196,6 +196,18 @@ const modules: Module[] = [
     color: 'from-warning to-warning/70',
   },
 
+  // Exchange Hub V2.0
+  {
+    title: 'Exchange Hub',
+    description: 'Marchés d\'émotions, temps, confiance et progression',
+    url: '/app/exchange',
+    icon: TrendingUp,
+    category: 'Exchange',
+    status: 'active',
+    color: 'from-emerald-500 to-teal-600',
+    featured: true,
+  },
+
   // Analytics
   {
     title: 'Analytics',
