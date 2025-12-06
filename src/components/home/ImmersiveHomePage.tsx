@@ -126,7 +126,7 @@ const ImmersiveHomePage: React.FC = () => {
 
         // Simulate redirection based on command
         if (command.toLowerCase().includes('b2c')) {
-          navigate('/b2c/dashboard');
+          navigate('/app/consumer/home');
         }
 
         setListening(false);
@@ -189,10 +189,10 @@ const ImmersiveHomePage: React.FC = () => {
 
   // Voice commands with navigation
   const voiceCommands: Record<string, () => void> = {
-    "mode personnel": () => navigate('/b2c/dashboard'),
-    "mode entreprise": () => navigate('/b2b/selection'),
-    "je suis un particulier": () => navigate('/b2c/login'),
-    "je suis une entreprise": () => navigate('/b2b/selection')
+    "mode personnel": () => navigate('/app/consumer/home'),
+    "mode entreprise": () => navigate('/entreprise'),
+    "je suis un particulier": () => navigate('/login?segment=b2c'),
+    "je suis une entreprise": () => navigate('/entreprise')
   };
 
   return (
@@ -223,7 +223,7 @@ const ImmersiveHomePage: React.FC = () => {
         >
           <motion.button
             className="premium-button primary"
-            onClick={() => navigate('/b2c/dashboard')}
+            onClick={() => navigate('/app/consumer/home')}
             variants={buttonVariants}
             whileHover="hover"
             whileTap="tap"
@@ -234,7 +234,7 @@ const ImmersiveHomePage: React.FC = () => {
 
           <motion.button
             className="premium-button secondary"
-            onClick={() => navigate('/b2b/selection')}
+            onClick={() => navigate('/entreprise')}
             variants={buttonVariants}
             whileHover="hover"
             whileTap="tap"

@@ -317,7 +317,7 @@ export const PrivacyPolicyPage: React.FC = () => {
                 <ul>
                   <li><strong>Email :</strong> <a href="mailto:dpo@emotionscare.com" className="text-primary hover:underline">dpo@emotionscare.com</a></li>
                   <li><strong>Courrier :</strong> EmotionsCare SAS – DPO, 123 Avenue de l'Innovation, 75001 Paris</li>
-                  <li><strong>Formulaire en ligne :</strong> <a href="/b2c/settings" className="text-primary hover:underline">Paramètres compte → RGPD</a></li>
+                  <li><strong>Formulaire en ligne :</strong> <a href="/settings/privacy" className="text-primary hover:underline">Paramètres compte → RGPD</a></li>
                 </ul>
                 <p className="text-sm mt-3">
                   <strong>Délai de réponse :</strong> 1 mois maximum (prorogeable de 2 mois si complexité, avec justification).

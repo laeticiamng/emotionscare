@@ -144,7 +144,7 @@ const B2BLandingPageComplete: React.FC = () => {
             </Link>
           </Button>
           <Button variant="outline" asChild>
-            <Link to="/b2b/selection">
+            <Link to="/entreprise">
               Accès équipe existante
             </Link>
           </Button>

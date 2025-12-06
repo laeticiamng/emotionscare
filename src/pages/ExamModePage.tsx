@@ -175,16 +175,16 @@ export default function ExamModePage() {
     // TODO: Adapter selon les vraies routes de l'app
     switch (experience.type) {
       case 'pre-exam':
-        navigate('/b2c/music-enhanced'); // Page musique existante
+        navigate('/app/music');
         break;
       case 'post-exam':
-        navigate('/b2c/music-enhanced'); // Page musique existante
+        navigate('/app/music');
         break;
       case 'stress-relief':
-        navigate('/breath'); // Page respiration existante
+        navigate('/app/breath');
         break;
       default:
-        navigate('/b2c/dashboard');
+        navigate('/app/consumer/home');
     }
   };
 

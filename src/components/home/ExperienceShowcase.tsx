@@ -50,7 +50,7 @@ const ExperienceShowcase: React.FC = () => {
       ],
       cta: {
         text: "Commencer gratuitement",
-        action: () => navigate('/b2c/register'),
+        action: () => navigate('/signup'),
         variant: "default" as const
       }
     },
@@ -80,7 +80,7 @@ const ExperienceShowcase: React.FC = () => {
       ],
       cta: {
         text: "Découvrir l'offre entreprise",
-        action: () => navigate('/b2b/selection'),
+        action: () => navigate('/entreprise'),
         variant: "outline" as const
       }
     }
@@ -237,7 +237,7 @@ const ExperienceShowcase: React.FC = () => {
                 Découvrir gratuitement
               </Button>
               <Button 
-                onClick={() => navigate('/b2b/selection')}
+                onClick={() => navigate('/entreprise')}
                 variant="outline"
                 className="border-slate-300 hover:border-slate-400 dark:border-slate-600 dark:hover:border-slate-500"
               >

@@ -56,7 +56,7 @@ const EMPTY_STATE = (
     </CardHeader>
     <CardContent>
       <Button asChild variant="outline">
-        <Link to="/b2b/reports">Accéder à la heatmap</Link>
+        <Link to="/app/reports">Accéder à la heatmap</Link>
       </Button>
     </CardContent>
   </Card>

@@ -44,7 +44,7 @@ const FooterLinks: React.FC = () => {
               </li>
               <li>
                 <button 
-                  onClick={() => navigate('/b2b/selection')}
+                  onClick={() => navigate('/entreprise')}
                   className="text-muted-foreground hover:text-foreground transition-colors"
                 >
                   Solutions Entreprise

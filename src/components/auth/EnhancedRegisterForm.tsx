@@ -76,7 +76,7 @@ const EnhancedRegisterForm: React.FC = () => {
       
       // Add a short delay for animation purposes
       setTimeout(() => {
-        navigate('/b2c/dashboard');
+        navigate('/app/consumer/home');
       }, 500);
       
     } catch (error: any) {
@@ -310,7 +310,7 @@ const EnhancedRegisterForm: React.FC = () => {
               <Button
                 variant="link"
                 className="p-0 h-auto text-primary"
-                onClick={() => navigate('/b2c/login')}
+                onClick={() => navigate('/login')}
               >
                 Se connecter
               </Button>

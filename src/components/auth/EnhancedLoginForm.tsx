@@ -65,7 +65,7 @@ const EnhancedLoginForm: React.FC = () => {
       
       // Add a short delay for animation purposes
       setTimeout(() => {
-        navigate('/b2c/dashboard');
+        navigate('/app/consumer/home');
       }, 500);
       
     } catch (error: any) {
@@ -286,7 +286,7 @@ const EnhancedLoginForm: React.FC = () => {
               <Button
                 variant="link"
                 className="p-0 h-auto text-primary"
-                onClick={() => navigate('/b2c/register')}
+                onClick={() => navigate('/signup')}
               >
                 S'inscrire
               </Button>
