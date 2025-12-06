@@ -268,7 +268,7 @@ export const EmotionalMusicGenerator: React.FC = () => {
                     {track.image_url ? (
                       <img
                         src={track.image_url}
-                        alt=""
+                        alt={`Cover de ${track.title}`}
                         className="w-10 h-10 rounded object-cover"
                       />
                     ) : (

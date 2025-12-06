@@ -149,11 +149,11 @@ const EmotionsCareSongCard: React.FC<EmotionsCareSongCardProps> = ({
           {/* Miniature */}
           <div className="relative group">
             <img 
-              src={song.meta.image_url || '/sounds/ambient-calm.mp3'} 
+              src={song.meta.image_url || '/placeholder.svg'} 
               alt={song.title}
               className="w-16 h-16 rounded-lg object-cover"
               onError={(e) => {
-                e.currentTarget.src = '/sounds/ambient-calm.mp3';
+                e.currentTarget.src = '/placeholder.svg';
               }}
             />
             <Button
