@@ -104,6 +104,15 @@ export const ROUTE_ALIASES = {
   '/settings': '/settings/general',
   '/preferences': '/settings/general',
   '/notifications': '/settings/notifications',
+  '/app/settings': '/settings/general',
+  '/app/settings/general': '/settings/general',
+  '/app/settings/profile': '/settings/profile',
+  '/app/settings/privacy': '/settings/privacy',
+  '/app/settings/notifications': '/settings/notifications',
+  '/app/resources': '/app/modules',
+  '/app/gamification': '/gamification',
+  '/app/aura': '/app/activity',
+  '/aura': '/app/activity',
 } as const;
 
 export type LegacyPath = keyof typeof ROUTE_ALIASES;
