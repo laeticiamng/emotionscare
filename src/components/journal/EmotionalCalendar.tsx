@@ -105,14 +105,14 @@ const EmotionalCalendar: React.FC<EmotionalCalendarProps> = ({
             Calendrier Émotionnel
           </span>
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" onClick={() => navigateMonth('prev')}>
-              <ChevronLeft className="h-4 w-4" />
+            <Button variant="ghost" size="icon" onClick={() => navigateMonth('prev')} aria-label="Mois précédent">
+              <ChevronLeft className="h-4 w-4" aria-hidden="true" />
             </Button>
             <span className="text-sm font-medium min-w-[140px] text-center">
               {monthName}
             </span>
-            <Button variant="ghost" size="icon" onClick={() => navigateMonth('next')}>
-              <ChevronRight className="h-4 w-4" />
+            <Button variant="ghost" size="icon" onClick={() => navigateMonth('next')} aria-label="Mois suivant">
+              <ChevronRight className="h-4 w-4" aria-hidden="true" />
             </Button>
           </div>
         </CardTitle>

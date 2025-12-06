@@ -374,14 +374,14 @@ export default function GuidedMeditationEnhanced() {
 
                 {/* Controls */}
                 <div className="flex items-center justify-center gap-4">
-                  <Button variant="outline" size="icon" onClick={resetMeditation}>
-                    <RotateCcw className="h-5 w-5" />
+                  <Button variant="outline" size="icon" onClick={resetMeditation} aria-label="Réinitialiser la méditation">
+                    <RotateCcw className="h-5 w-5" aria-hidden="true" />
                   </Button>
-                  <Button size="lg" onClick={togglePlay} className="h-16 w-16 rounded-full">
-                    {isPlaying ? <Pause className="h-8 w-8" /> : <Play className="h-8 w-8 ml-1" />}
+                  <Button size="lg" onClick={togglePlay} className="h-16 w-16 rounded-full" aria-label={isPlaying ? "Mettre en pause" : "Démarrer"}>
+                    {isPlaying ? <Pause className="h-8 w-8" aria-hidden="true" /> : <Play className="h-8 w-8 ml-1" aria-hidden="true" />}
                   </Button>
-                  <Button variant="outline" size="icon" onClick={() => setIsMuted(!isMuted)}>
-                    {isMuted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
+                  <Button variant="outline" size="icon" onClick={() => setIsMuted(!isMuted)} aria-label={isMuted ? "Activer le son" : "Couper le son"}>
+                    {isMuted ? <VolumeX className="h-5 w-5" aria-hidden="true" /> : <Volume2 className="h-5 w-5" aria-hidden="true" />}
                   </Button>
                 </div>
 

@@ -202,8 +202,9 @@ export const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({
           size="lg"
           className="rounded-full w-14 h-14 shadow-lg"
           style={{ backgroundColor: primaryColor }}
+          aria-label="Ouvrir le chat d'assistance"
         >
-          <MessageSquare className="h-6 w-6" />
+          <MessageSquare className="h-6 w-6" aria-hidden="true" />
         </Button>
       )}
 
@@ -250,16 +251,18 @@ export const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({
                 size="sm"
                 onClick={() => setIsMinimized(!isMinimized)}
                 className="text-white hover:bg-white/20"
+                aria-label={isMinimized ? "Agrandir le chat" : "Réduire le chat"}
               >
-                {isMinimized ? <Maximize2 className="h-4 w-4" /> : <Minimize2 className="h-4 w-4" />}
+                {isMinimized ? <Maximize2 className="h-4 w-4" aria-hidden="true" /> : <Minimize2 className="h-4 w-4" aria-hidden="true" />}
               </Button>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setIsOpen(false)}
                 className="text-white hover:bg-white/20"
+                aria-label="Fermer le chat"
               >
-                <X className="h-4 w-4" />
+                <X className="h-4 w-4" aria-hidden="true" />
               </Button>
             </div>
           </div>
@@ -375,8 +378,9 @@ export const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({
                     variant="outline"
                     size="sm"
                     onClick={() => fileInputRef.current?.click()}
+                    aria-label="Joindre un fichier"
                   >
-                    <Paperclip className="h-4 w-4" />
+                    <Paperclip className="h-4 w-4" aria-hidden="true" />
                   </Button>
                   <Input
                     placeholder="Tapez votre message..."
@@ -385,8 +389,8 @@ export const LiveChatWidget: React.FC<LiveChatWidgetProps> = ({
                     onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                     className="flex-1"
                   />
-                  <Button onClick={handleSendMessage} disabled={!message.trim()}>
-                    <Send className="h-4 w-4" />
+                  <Button onClick={handleSendMessage} disabled={!message.trim()} aria-label="Envoyer le message">
+                    <Send className="h-4 w-4" aria-hidden="true" />
                   </Button>
                 </div>
               </div>

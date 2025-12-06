@@ -30,6 +30,7 @@ export function ARDebugPanel({ className }: ARDebugPanelProps) {
           'fixed bottom-4 right-4 px-3 py-2 bg-gray-900 text-white rounded-lg text-xs font-mono hover:bg-gray-800 z-50',
           className
         )}
+        aria-label="Ouvrir le panneau de débogage AR"
       >
         Debug Panel
       </button>
@@ -54,14 +55,16 @@ export function ARDebugPanel({ className }: ARDebugPanelProps) {
           <button
             onClick={() => setIsExpanded(!isExpanded)}
             className="p-1 hover:bg-gray-700 rounded"
+            aria-label={isExpanded ? "Réduire le panneau" : "Agrandir le panneau"}
           >
-            {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            {isExpanded ? <ChevronUp className="w-4 h-4" aria-hidden="true" /> : <ChevronDown className="w-4 h-4" aria-hidden="true" />}
           </button>
           <button
             onClick={() => setShowDebugPanel(false)}
             className="p-1 hover:bg-gray-700 rounded"
+            aria-label="Fermer le panneau de débogage"
           >
-            <X className="w-4 h-4" />
+            <X className="w-4 h-4" aria-hidden="true" />
           </button>
         </div>
       </div>

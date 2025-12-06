@@ -30,8 +30,9 @@ const SupportDrawer: React.FC = () => {
             variant="ghost"
             size="sm"
             onClick={() => setIsOpen(false)}
+            aria-label="Fermer le support"
           >
-            ×
+            <span aria-hidden="true">×</span>
           </Button>
         </CardTitle>
       </CardHeader>

@@ -87,8 +87,8 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
                   )}
                 </div>
               </div>
-              <Button size="sm" variant="ghost" onClick={recommendation.action}>
-                <ArrowRight className="h-4 w-4" />
+              <Button size="sm" variant="ghost" onClick={recommendation.action} aria-label="Voir la recommandation">
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Button>
             </div>
           </CardContent>

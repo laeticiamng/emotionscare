@@ -74,6 +74,7 @@ export function ARModeToggle({ className }: ARModeToggleProps) {
         <button
           onClick={() => setARMode(arMode === 'immersive' ? 'fallback' : 'immersive')}
           className="ml-2 px-3 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm font-semibold"
+          aria-label={arMode === 'immersive' ? 'Passer en mode 3D' : 'Passer en mode AR'}
         >
           Basculer
         </button>
