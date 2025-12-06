@@ -71,7 +71,7 @@ const B2BCollabDashboard: React.FC = () => {
                 asChild
                 aria-label="Accéder aux paramètres"
               >
-                <Link to="/settings">
+                <Link to="/settings/general">
                   <Settings className="h-4 w-4" aria-hidden="true" />
                   <span className="sr-only">Paramètres</span>
                 </Link>

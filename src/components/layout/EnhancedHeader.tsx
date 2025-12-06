@@ -201,7 +201,7 @@ const EnhancedHeader: React.FC<EnhancedHeaderProps> = ({ scrolled = false, class
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link to="/settings" className="cursor-pointer">
+                  <Link to="/settings/general" className="cursor-pointer">
                     <Settings className="mr-2 h-4 w-4" />
                     <span>Paramètres</span>
                   </Link>

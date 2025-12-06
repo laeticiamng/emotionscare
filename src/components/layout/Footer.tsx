@@ -60,11 +60,9 @@ const footerSections: FooterSection[] = [
   {
     title: 'Support',
     links: [
-      { name: 'Centre d\'aide', href: '/help', icon: HelpCircle },
+      { name: 'Centre d\'aide', href: '/faq', icon: HelpCircle },
       { name: 'Documentation', href: '/faq' },
-      { name: 'API Reference', href: '/api' },
       { name: 'Nous contacter', href: '/contact', icon: Mail },
-      { name: 'Tickets', href: '/support/tickets' },
     ]
   },
   {

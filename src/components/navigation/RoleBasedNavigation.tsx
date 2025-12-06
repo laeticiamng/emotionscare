@@ -76,9 +76,9 @@ const RoleBasedNavigation: React.FC = () => {
     {
       title: "Compte",
       items: [
-        { label: "Profil", path: "/profile", icon: User },
-        { label: "Paramètres", path: "/settings", icon: Settings },
-        { label: "Aide", path: "/help", icon: HelpCircle },
+        { label: "Profil", path: "/settings/profile", icon: User },
+        { label: "Paramètres", path: "/settings/general", icon: Settings },
+        { label: "Aide", path: "/faq", icon: HelpCircle },
       ]
     }
   ];
@@ -103,16 +103,16 @@ const RoleBasedNavigation: React.FC = () => {
     {
       title: "Collaboratif",
       items: [
-        { label: "Social Cocon", path: "/social-cocon", icon: MessageSquare, description: "Entreprise uniquement" },
-        { label: "Équipes", path: "/teams", icon: Building, description: "Mes équipes" },
+        { label: "Social Cocon", path: "/app/social-cocon", icon: MessageSquare, description: "Entreprise uniquement" },
+        { label: "Équipes", path: "/app/teams", icon: Building, description: "Mes équipes" },
       ]
     },
     {
       title: "Compte",
       items: [
-        { label: "Profil", path: "/profile", icon: User },
-        { label: "Paramètres", path: "/settings", icon: Settings },
-        { label: "Aide", path: "/help", icon: HelpCircle },
+        { label: "Profil", path: "/settings/profile", icon: User },
+        { label: "Paramètres", path: "/settings/general", icon: Settings },
+        { label: "Aide", path: "/faq", icon: HelpCircle },
       ]
     }
   ];
@@ -137,14 +137,14 @@ const RoleBasedNavigation: React.FC = () => {
     {
       title: "Collaboratif",
       items: [
-        { label: "Social Cocon", path: "/social-cocon", icon: MessageSquare, description: "Modération" },
-        { label: "Équipes", path: "/teams", icon: Building, description: "Gestion équipes" },
+        { label: "Social Cocon", path: "/app/social-cocon", icon: MessageSquare, description: "Modération" },
+        { label: "Équipes", path: "/app/teams", icon: Building, description: "Gestion équipes" },
       ]
     },
     {
       title: "Outils RH",
       items: [
-        { label: "Gestion des Rôles", path: routes.b2b.admin.userRoles(), icon: Shield, description: "Attribution rôles" },
+        { label: "Gestion des Rôles", path: "/b2b/admin/user-roles", icon: Shield, description: "Attribution rôles" },
         { label: "Rapports", path: "/app/reports", icon: BarChart3, description: "Données anonymisées" },
         { label: "Événements", path: "/app/events", icon: Calendar, description: "Organisation" },
         { label: "Optimisation", path: "/app/optimization", icon: TrendingUp, description: "Amélioration continue" },
@@ -154,9 +154,9 @@ const RoleBasedNavigation: React.FC = () => {
     {
       title: "Compte",
       items: [
-        { label: "Profil", path: "/profile", icon: User },
-        { label: "Paramètres", path: "/settings", icon: Settings },
-        { label: "Aide", path: "/help", icon: HelpCircle },
+        { label: "Profil", path: "/settings/profile", icon: User },
+        { label: "Paramètres", path: "/settings/general", icon: Settings },
+        { label: "Aide", path: "/faq", icon: HelpCircle },
       ]
     }
   ];
