@@ -15,67 +15,47 @@ const Breadcrumbs: React.FC = () => {
   const { user } = useAuth();
   
   const pathToLabel = {
-    // Routes B2C
-    '/b2c/dashboard': 'Tableau de bord',
-    '/b2c/scan': 'Scan Émotions',
-    '/b2c/music': 'Musique Thérapeutique',
-    '/b2c/coach': 'Coach IA',
-    '/b2c/journal': 'Journal',
-    '/b2c/vr': 'Réalité Virtuelle',
-    '/b2c/preferences': 'Préférences',
-    '/b2c/settings': 'Paramètres',
-    '/b2c/gamification': 'Gamification',
-    '/b2c/social-cocon': 'Cocon Social',
+    // Routes canoniques App
+    '/app/consumer/home': 'Tableau de bord',
+    '/app/scan': 'Scan Émotions',
+    '/app/music': 'Musique Thérapeutique',
+    '/app/coach': 'Coach IA',
+    '/app/journal': 'Journal',
+    '/app/vr': 'Réalité Virtuelle',
+    '/settings/general': 'Paramètres',
+    '/gamification': 'Gamification',
+    '/app/social-cocon': 'Cocon Social',
     
-    // Fun-First B2C
-    '/b2c/bubble-beat': 'Bubble Beat',
-    '/b2c/flash-glow': 'Flash Glow',
-    '/b2c/boss-level-grit': 'Boss Level Grit',
-    '/b2c/mood-mixer': 'Mood Mixer',
-    '/b2c/bounce-back-battle': 'Bounce Back Battle',
-    '/b2c/breathwork': 'Respiration',
-    '/b2c/instant-glow': 'Instant Glow',
-    '/b2c/vr-galactique': 'VR Galactique',
-    '/b2c/screen-silk-break': 'Screen Silk Break',
-    '/b2c/story-synth-lab': 'Story Synth Lab',
-    '/b2c/ar-filters': 'Filtres AR',
-    '/b2c/ambition-arcade': 'Ambition Arcade',
-    '/b2c/weekly-bars': 'Barres Hebdo',
-    '/b2c/heatmap-vibes': 'Scores & vibes',
+    // Fun-First modules
+    '/app/bubble-beat': 'Bubble Beat',
+    '/app/flash-glow': 'Flash Glow',
+    '/app/boss-grit': 'Boss Level Grit',
+    '/app/mood-mixer': 'Mood Mixer',
+    '/app/bounce-back': 'Bounce Back Battle',
+    '/app/breath': 'Respiration',
+    '/app/vr-galaxy': 'VR Galactique',
+    '/app/screen-silk': 'Screen Silk Break',
+    '/app/story-synth': 'Story Synth Lab',
+    '/app/face-ar': 'Filtres AR',
+    '/app/ambition-arcade': 'Ambition Arcade',
+    '/app/activity': 'Activité',
+    '/app/scores': 'Scores & vibes',
     
-    // Paramètres B2C
-    '/b2c/profile-settings': 'Profil',
-    '/b2c/activity-history': 'Historique',
-    '/b2c/notifications': 'Notifications',
-    '/b2c/feedback': 'Feedback',
-    '/b2c/settings-rgpd': 'RGPD',
-    '/b2c/account-delete': 'Suppression Compte',
-    '/b2c/export-csv': 'Export CSV',
-    '/b2c/privacy-toggles': 'Confidentialité',
-    '/b2c/health-check-badge': 'Badge Santé',
+    // Paramètres
+    '/settings/profile': 'Profil',
+    '/settings/notifications': 'Notifications',
+    '/settings/privacy': 'RGPD',
     
-    // Routes B2B User
-    '/b2b/user/dashboard': 'Dashboard RH',
-    '/b2b/user/scan': 'Scan Équipe',
-    '/b2b/user/music': 'Musique RH',
-    '/b2b/user/coach': 'Coach Équipe',
-    '/b2b/user/journal': 'Journal RH',
-    '/b2b/user/vr': 'VR Entreprise',
-    '/b2b/user/preferences': 'Préférences RH',
-    '/b2b/user/settings': 'Paramètres RH',
-    '/b2b/user/gamification': 'Gamification RH',
-    '/b2b/user/social-cocon': 'Cocon Équipe',
-    
-    // Routes B2B Admin
-    '/b2b/admin/dashboard': 'Administration',
-    '/b2b/admin/teams': 'Gestion Équipes',
-    '/b2b/admin/reports': 'Rapports',
-    '/b2b/admin/events': 'Événements',
-    '/b2b/admin/optimisation': 'Optimisation',
-    '/b2b/admin/settings': 'Paramètres Admin',
-    '/b2b/admin/security': 'Sécurité',
-    '/b2b/admin/audit': 'Audit',
-    '/b2b/admin/accessibility': 'Accessibilité'
+    // Routes B2B
+    '/app/collab': 'Dashboard Collaborateur',
+    '/app/rh': 'Dashboard RH',
+    '/app/teams': 'Gestion Équipes',
+    '/app/reports': 'Rapports',
+    '/app/events': 'Événements',
+    '/app/optimization': 'Optimisation',
+    '/app/security': 'Sécurité',
+    '/app/audit': 'Audit',
+    '/app/accessibility': 'Accessibilité'
   };
 
   const generateBreadcrumbs = (): BreadcrumbItem[] => {
@@ -83,12 +63,12 @@ const Breadcrumbs: React.FC = () => {
     const breadcrumbs: BreadcrumbItem[] = [];
     
     // Home breadcrumb basé sur le rôle utilisateur
-    if (user?.role === 'b2c') {
-      breadcrumbs.push({ label: 'Accueil', path: '/b2c/dashboard', icon: <Home className="h-4 w-4" /> });
-    } else if (user?.role === 'b2b_user') {
-      breadcrumbs.push({ label: 'RH', path: '/b2b/user/dashboard', icon: <Home className="h-4 w-4" /> });
-    } else if (user?.role === 'b2b_admin') {
-      breadcrumbs.push({ label: 'Admin', path: '/b2b/admin/dashboard', icon: <Home className="h-4 w-4" /> });
+    if (user?.role === 'b2c' || user?.role === 'consumer') {
+      breadcrumbs.push({ label: 'Accueil', path: '/app/consumer/home', icon: <Home className="h-4 w-4" /> });
+    } else if (user?.role === 'b2b_user' || user?.role === 'employee') {
+      breadcrumbs.push({ label: 'Espace Collab', path: '/app/collab', icon: <Home className="h-4 w-4" /> });
+    } else if (user?.role === 'b2b_admin' || user?.role === 'manager') {
+      breadcrumbs.push({ label: 'Admin RH', path: '/app/rh', icon: <Home className="h-4 w-4" /> });
     }
     
     // Construction des breadcrumbs pour le chemin actuel

@@ -24,7 +24,7 @@ const B2BModeGuard: React.FC<B2BModeGuardProps> = ({ children, requiredMode }) =
         userMode,
         expected
       });
-      navigate('/b2b/selection', { replace: true });
+      navigate('/entreprise', { replace: true });
     }
   }, [userMode, requiredMode, navigate, location.pathname]);
 

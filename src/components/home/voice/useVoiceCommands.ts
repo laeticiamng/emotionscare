@@ -27,10 +27,10 @@ export function useVoiceCommands(options: VoiceCommandOptions = {}) {
   } = options;
 
   const defaultCommands = {
-    'je suis un particulier': () => navigate('/b2c/login'),
-    'je suis une entreprise': () => navigate('/b2b/selection'),
-    'je suis rh': () => navigate('/b2b/admin/login'),
-    'je suis collaborateur': () => navigate('/b2b/user/login'),
+    'je suis un particulier': () => navigate('/login?segment=b2c'),
+    'je suis une entreprise': () => navigate('/entreprise'),
+    'je suis rh': () => navigate('/login?segment=b2b'),
+    'je suis collaborateur': () => navigate('/login?segment=b2b'),
     'connexion à mon espace': () => {
       toast({
         title: "Commande vocale reconnue",

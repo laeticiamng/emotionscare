@@ -75,13 +75,13 @@ const ModeSwitcher: React.FC<ModeSwitcherProps> = ({
       // Redirect to the appropriate page
       switch (normalizedMode) {
         case 'b2c':
-          navigate('/b2c/dashboard');
+          navigate('/app/consumer/home');
           break;
         case 'b2b_user':
-          navigate('/b2b/user/dashboard');
+          navigate('/app/collab');
           break;
         case 'b2b_admin':
-          navigate('/b2b/admin/dashboard');
+          navigate('/app/rh');
           break;
         default:
           navigate('/choose-mode');

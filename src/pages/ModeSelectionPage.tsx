@@ -119,7 +119,7 @@ const ModeSelectionPage: React.FC = () => {
             <Button
               variant="link"
               className="p-0 h-auto font-normal"
-              onClick={() => navigate('/auth/signup')}
+              onClick={() => navigate('/signup')}
             >
               Créer un compte
             </Button>

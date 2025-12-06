@@ -22,7 +22,7 @@ export function withGuard<P extends object>(
     // Check auth guard
     const authGuard = guards.find(g => g.type === 'auth');
     if (authGuard?.required && !isAuthenticated) {
-      return <Navigate to="/auth/login" replace />;
+      return <Navigate to="/login" replace />;
     }
 
     // Check role guard

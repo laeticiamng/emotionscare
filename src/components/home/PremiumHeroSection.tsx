@@ -139,7 +139,7 @@ const PremiumHeroSection: React.FC = () => {
             </Button>
             
             <Button 
-              onClick={() => navigate('/b2b/selection')}
+              onClick={() => navigate('/entreprise')}
               variant="outline" 
               size="lg"
               className="border-2 border-slate-300 hover:border-slate-400 dark:border-slate-600 dark:hover:border-slate-500 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white px-8 py-6 text-lg rounded-2xl group"

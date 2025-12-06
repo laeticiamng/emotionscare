@@ -25,7 +25,7 @@ const B2BEntreprisePage: React.FC = () => {
               </Link>
             </Button>
             <Button variant="outline" size="lg" asChild>
-              <Link to="/b2b/selection">Accès équipe</Link>
+              <Link to="/entreprise">Accès équipe</Link>
             </Button>
           </div>
         </div>
