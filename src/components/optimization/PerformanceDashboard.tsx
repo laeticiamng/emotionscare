@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -55,7 +54,7 @@ const PerformanceDashboard: React.FC = () => {
   });
   const [isLoading, setIsLoading] = useState(false);
 
-  const performanceData = usePerformanceMonitor('dashboard');
+  const performanceData = usePerformanceMonitor();
   const serviceWorker = useServiceWorker();
   const cacheManager = useCacheManager();
 
@@ -251,6 +250,12 @@ const PerformanceDashboard: React.FC = () => {
     return 'critical';
   };
 
+  const getScoreIndicatorColor = (score: number) => {
+    if (score >= 90) return 'bg-green-600';
+    if (score >= 70) return 'bg-yellow-600';
+    return 'bg-red-600';
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -289,8 +294,7 @@ const PerformanceDashboard: React.FC = () => {
               <Progress 
                 value={score.overall} 
                 className="mt-2"
-                // @ts-ignore
-                variant={getScoreStatus(score.overall)}
+                indicatorClassName={getScoreIndicatorColor(score.overall)}
               />
             </div>
             
@@ -302,8 +306,7 @@ const PerformanceDashboard: React.FC = () => {
               <Progress 
                 value={score.performance} 
                 className="mt-2"
-                // @ts-ignore
-                variant={getScoreStatus(score.performance)}
+                indicatorClassName={getScoreIndicatorColor(score.performance)}
               />
             </div>
             
@@ -315,8 +318,7 @@ const PerformanceDashboard: React.FC = () => {
               <Progress 
                 value={score.accessibility} 
                 className="mt-2"
-                // @ts-ignore
-                variant={getScoreStatus(score.accessibility)}
+                indicatorClassName={getScoreIndicatorColor(score.accessibility)}
               />
             </div>
             
@@ -328,8 +330,7 @@ const PerformanceDashboard: React.FC = () => {
               <Progress 
                 value={score.bestPractices} 
                 className="mt-2"
-                // @ts-ignore
-                variant={getScoreStatus(score.bestPractices)}
+                indicatorClassName={getScoreIndicatorColor(score.bestPractices)}
               />
             </div>
             
@@ -341,8 +342,7 @@ const PerformanceDashboard: React.FC = () => {
               <Progress 
                 value={score.seo} 
                 className="mt-2"
-                // @ts-ignore
-                variant={getScoreStatus(score.seo)}
+                indicatorClassName={getScoreIndicatorColor(score.seo)}
               />
             </div>
           </div>
