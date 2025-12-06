@@ -217,6 +217,12 @@ const ComprehensiveSystemAuditPage = lazy(() => import('@/pages/ComprehensiveSys
 const ErrorBoundaryTestPage = lazy(() => import('@/pages/dev/ErrorBoundaryTestPage'));
 const TestAccountsPage = lazy(() => import('@/pages/TestAccountsPage'));
 
+// Pages supplémentaires existantes
+const PublicAPIPage = lazy(() => import('@/pages/PublicAPIPage'));
+const SupportChatbotPage = lazy(() => import('@/pages/SupportChatbotPage'));
+const RecommendationEngineAdminPage = lazy(() => import('@/pages/RecommendationEngineAdminPage'));
+const ActivityLogsPage = lazy(() => import('@/pages/ActivityLogsPage'));
+
 // Analytics & Weekly Bars
 const B2CWeeklyBarsPage = lazy(() => import('@/pages/B2CWeeklyBarsPage'));
 const AnalyticsPage = lazy(() => import('@/pages/AnalyticsPage'));
@@ -478,15 +484,20 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   
   // Composants de redirection
   RedirectToScan,
+  RedirectToScanPage: RedirectToScan, // Alias pour registry
   RedirectToJournal, 
+  RedirectToJournalPage: RedirectToJournal, // Alias pour registry
   RedirectToSocialCocon,
   RedirectToEntreprise,
+  RedirectToEntreprisePage: RedirectToEntreprise, // Alias pour registry
   RedirectToMusic,
   
   // Pages Dashboard modules
   ModulesDashboard,
-  // UnifiedModulesDashboard supprimé - wrapper inutile
-  // FacialScanPage supprimé
+  ModulesDashboardPage: ModulesDashboard, // Alias pour registry
+  // FacialScanPage - redirigé vers B2CScanPage
+  FacialScanPage: B2CScanPage,
+  EmojiScanPage: B2CScanPage, // Alias pour registry
   VoiceScanPage,
   TextScanPage,
   // MusicGeneratePage supprimé
@@ -495,11 +506,25 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   PricingPageWorkingPage: PricingPageWorking, // Alias pour registry
   ModeSelectionPage,
   B2CDashboardPage,
-  // B2CMoodPage supprimé - fonctionnalité intégrée dans B2CScanPage
-  // B2CMusicPage supprimé
+  // B2CMusicEnhancedPage - alias pour registry
+  B2CMusicEnhancedPage: B2CMusicEnhanced,
+  // B2BCollabDashboardPage et B2BRHDashboardPage - alias pour registry
+  B2BCollabDashboardPage: B2BCollabDashboard,
+  B2BRHDashboardPage: B2BRHDashboard,
   EmotionalPark,
+  EmotionalParkPage: EmotionalPark, // Alias pour registry
   ParkJourney,
+  ParkJourneyPage: ParkJourney, // Alias pour registry
   ParcoursXL,
+  ParcoursXLPage: ParcoursXL, // Alias pour registry
+  // Journal sub-pages - redirigent vers la page principale
+  JournalActivityPage: B2CJournalPage,
+  JournalAnalyticsPage: B2CJournalPage,
+  JournalArchivePage: B2CJournalPage,
+  JournalFavoritesPage: B2CJournalPage,
+  JournalGoalsPage: B2CJournalPage,
+  JournalNotesPage: B2CJournalPage,
+  JournalSearchPage: B2CJournalPage,
   CoachProgramsPage,
   CoachProgramDetailPage,
   CoachSessionsPage,
@@ -548,38 +573,80 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   
   // Exchange Hub V2.0
   ExchangeHubPage,
-  // GDPR & Compliance
+  // GDPR & Compliance - avec alias pour registry
   UnifiedGDPRDashboard,
+  UnifiedGDPRDashboardPage: UnifiedGDPRDashboard,
   APIMonitoringDashboard,
+  APIMonitoringDashboardPage: APIMonitoringDashboard,
   AIMonitoringDashboard,
+  AIMonitoringDashboardPage: AIMonitoringDashboard,
   AlertConfigurationPage,
   AlertAnalyticsDashboard,
+  AlertAnalyticsDashboardPage: AlertAnalyticsDashboard,
   AlertTemplatesPage,
   AlertTemplatePlayground,
+  AlertTemplatePlaygroundPage: AlertTemplatePlayground,
   ScheduledReportsPage,
   AlertEscalationConfig,
+  AlertEscalationConfigPage: AlertEscalationConfig,
   AITemplateSuggestions,
+  AITemplateSuggestionsPage: AITemplateSuggestions,
   EscalationMonitoringDashboard,
+  EscalationMonitoringDashboardPage: EscalationMonitoringDashboard,
   TicketIntegrationConfig,
   ABTestManager,
   GamificationCronMonitoring,
+  GamificationCronMonitoringPage: GamificationCronMonitoring,
   MusicQueueAdminPage,
   MusicQueueMetricsPage,
   UserRolesPage,
   ChallengesHistory,
+  ChallengesHistoryPage: ChallengesHistory,
   CreateCustomChallenge,
+  CreateCustomChallengePage: CreateCustomChallenge,
   EditCustomChallenge,
+  EditCustomChallengePage: EditCustomChallenge,
   ChallengesDashboard,
+  ChallengesDashboardPage: ChallengesDashboard,
   MusicAnalyticsDashboard,
+  MusicAnalyticsDashboardPage: MusicAnalyticsDashboard,
   Achievements,
   CronMonitoring,
+  CronMonitoringPage: CronMonitoring,
   BlockchainBackups,
+  BlockchainBackupsPage: BlockchainBackups,
   MonitoringDashboard,
+  MonitoringDashboardPage: MonitoringDashboard,
   
   // System Health & Analytics
   SystemHealthPage,
   AdminSystemHealthPage,
   K6AnalyticsDashboard,
+  K6AnalyticsDashboardPage: K6AnalyticsDashboard, // Alias pour registry
+  
+  // Admin - alias supplémentaires pour registry
+  TicketIntegrationConfigPage: TicketIntegrationConfig,
+  ABTestManagerPage: ABTestManager,
+  NotificationWebhooksConfigPage: NotificationWebhooksConfig,
+  SystemHealthDashboardPage: SystemHealthDashboard,
+  ExecutiveDashboardPage: ExecutiveDashboard,
+  UnifiedAdminDashboardPage: UnifiedAdminDashboard,
+  
+  // Pages réelles - corrigées
+  RecommendationEngineAdminPage,
+  SupportChatbotPage,
+  PublicAPIPage,
+  ActivityLogsPage,
+  
+  // Alias fallback pour pages non créées
+  B2BAnalyticsPage: B2BReportsPage,
+  B2BUserCoachPage: B2CAICoachPage,
+  UnifiedDashboardPage: B2CDashboardPage,
+  UnifiedHomePage: HomePage,
+  B2CImmersivePage: B2CVRGalaxyPage,
+  
+  // Alias pour chooseMode
+  ChooseModePage: ModeSelectionPage,
 };
 
 // ═══════════════════════════════════════════════════════════
