@@ -23,7 +23,20 @@ const VRRecommendations: React.FC<VRRecommendationsProps> = ({
     <div>
       {showHeading && <h2>VR Recommendations</h2>}
       {safeTemplates.map(template => (
-        <div key={template.id} onClick={() => onSelect(template)}>
+        <div 
+          key={template.id} 
+          onClick={() => onSelect(template)}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              onSelect(template);
+            }
+          }}
+          aria-label={`Sélectionner ${template.title || template.name}`}
+          className="cursor-pointer hover:bg-accent/50 p-2 rounded transition-colors"
+        >
           {template.title || template.name}
         </div>
       ))}

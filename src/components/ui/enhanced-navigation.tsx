@@ -234,7 +234,7 @@ const EnhancedNavigation: React.FC = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-            <div className="fixed inset-0 bg-black/20 backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)} />
+            <div className="fixed inset-0 bg-black/20 backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)} aria-label="Fermer le menu" role="button" tabIndex={-1} />
             <motion.div
               className="fixed top-16 left-0 right-0 bg-background/98 backdrop-blur-xl border-b border-border/50 max-h-[calc(100vh-4rem)] overflow-y-auto"
               initial={{ y: -400, opacity: 0 }}
@@ -341,7 +341,7 @@ const EnhancedNavigation: React.FC = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setSearchOpen(false)} />
+            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setSearchOpen(false)} aria-label="Fermer la recherche" role="button" tabIndex={-1} />
             <motion.div
               className="relative w-full max-w-lg mx-4 bg-background/95 backdrop-blur-xl border border-border rounded-2xl shadow-2xl"
               initial={{ scale: 0.9, y: -50 }}
