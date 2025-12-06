@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { useState, useEffect, ReactNode, FC } from 'react';
+import React, { useState, useEffect, ReactNode, FC } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { HelmetProvider } from 'react-helmet-async';
 import { logger } from '@/lib/logger';
