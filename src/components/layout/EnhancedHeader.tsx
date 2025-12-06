@@ -54,7 +54,7 @@ const EnhancedHeader: React.FC<EnhancedHeaderProps> = ({ scrolled = false, class
     { to: routes.b2c.music(), icon: <Music className="h-4 w-4 mr-2" />, label: "Musicothérapie" },
     { to: routes.b2c.coach(), icon: <MessageCircle className="h-4 w-4 mr-2" />, label: "Coach IA" },
     { to: routes.b2c.community(), icon: <Users className="h-4 w-4 mr-2" />, label: "Communauté" },
-    { to: '/navigation', icon: <Compass className="h-4 w-4 mr-2" />, label: "Tous les Modules" },
+    { to: '/app/modules', icon: <Compass className="h-4 w-4 mr-2" />, label: "Tous les Modules" },
     { to: routes.b2c.settings(), icon: <Settings className="h-4 w-4 mr-2" />, label: "Paramètres" }
   ];
 
