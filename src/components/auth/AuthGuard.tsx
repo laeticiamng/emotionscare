@@ -117,7 +117,7 @@ const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
     
     if (location.pathname.startsWith('/app/consumer')) {
       loginPath = '/login?segment=b2c';
-    } else if (location.pathname.startsWith('/app/employee')) {
+    } else if (location.pathname.startsWith('/app/collab') || location.pathname.startsWith('/app/rh')) {
       loginPath = '/login?segment=b2b';
     } else if (location.pathname.startsWith('/entreprise')) {
       loginPath = '/login?segment=b2b';

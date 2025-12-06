@@ -22,11 +22,11 @@ export const getUserModeDisplayName = (mode: UserMode | null): string => {
 export const getModeLoginPath = (mode: UserMode | null): string => {
   switch (mode) {
     case 'b2c':
-      return '/b2c/login';
+      return '/login?segment=b2c';
     case 'b2b_user':
-      return '/b2b/user/login';
+      return '/login?segment=b2b';
     case 'b2b_admin':
-      return '/b2b/admin/login';
+      return '/login?segment=b2b&mode=admin';
     default:
       return '/choose-mode';
   }
@@ -35,11 +35,11 @@ export const getModeLoginPath = (mode: UserMode | null): string => {
 export const getModeDashboardPath = (mode: UserMode | null): string => {
   switch (mode) {
     case 'b2c':
-      return '/b2c/dashboard';
+      return '/app/consumer/home';
     case 'b2b_user':
-      return '/b2b/user/dashboard';
+      return '/app/collab';
     case 'b2b_admin':
-      return '/b2b/admin/dashboard';
+      return '/app/rh';
     default:
       return '/';
   }

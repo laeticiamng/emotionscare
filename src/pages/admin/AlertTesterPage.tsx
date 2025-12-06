@@ -242,7 +242,7 @@ const AlertTesterPage: React.FC = () => {
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={() => navigate('/app/admin/incidents')}
+                      onClick={() => navigate('/admin/incidents')}
                     >
                       <ExternalLink className="h-3 w-3" />
                     </Button>

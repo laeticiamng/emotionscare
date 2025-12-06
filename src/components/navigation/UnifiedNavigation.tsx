@@ -18,8 +18,8 @@ const UnifiedNavigation: React.FC = () => {
   // Déterminer le rôle de l'utilisateur basé sur l'URL actuelle
   const getCurrentUserRole = () => {
     if (location.pathname.startsWith('/app/consumer')) return 'b2c';
-    if (location.pathname.startsWith('/app/employee')) return 'b2b_user';
-    if (location.pathname.startsWith('/entreprise')) return 'b2b_admin';
+    if (location.pathname.startsWith('/app/collab')) return 'b2b_user';
+    if (location.pathname.startsWith('/app/rh') || location.pathname.startsWith('/entreprise')) return 'b2b_admin';
     return 'b2c'; // par défaut
   };
 
