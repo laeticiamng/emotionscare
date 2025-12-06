@@ -179,6 +179,7 @@ export function PostEditor({ post, open, onOpenChange, onSave }: PostEditorProps
                   size="icon"
                   onClick={handleAddTag}
                   disabled={!newTag.trim()}
+                  aria-label="Ajouter le tag"
                 >
                   <Plus className="h-4 w-4" />
                 </Button>

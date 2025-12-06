@@ -78,7 +78,7 @@ const AudioPlayerSection: React.FC<AudioPlayerSectionProps> = ({ audioUrl, title
           </div>
           
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" onClick={handleToggleMute}>
+            <Button variant="ghost" size="icon" onClick={handleToggleMute} aria-label={isMuted || volume === 0 ? 'Activer le son' : 'Couper le son'}>
               {isMuted || volume === 0 ? <VolumeX size={18} /> : <Volume size={18} />}
             </Button>
             <Slider
@@ -108,15 +108,15 @@ const AudioPlayerSection: React.FC<AudioPlayerSectionProps> = ({ audioUrl, title
         </div>
         
         <div className="flex justify-center">
-          <Button variant="ghost" size="icon" className="h-8 w-8">
+          <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Piste précédente">
             <SkipBack size={16} />
           </Button>
           
-          <Button onClick={togglePlay} className="mx-2">
+          <Button onClick={togglePlay} className="mx-2" aria-label={isPlaying ? 'Mettre en pause' : 'Lire'}>
             {isPlaying ? <Pause size={18} /> : <Play size={18} />}
           </Button>
           
-          <Button variant="ghost" size="icon" className="h-8 w-8">
+          <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Piste suivante">
             <SkipForward size={16} />
           </Button>
         </div>

@@ -46,11 +46,11 @@ const AudioController: React.FC = () => {
   return (
     <div className="flex flex-col space-y-4 w-full max-w-md mx-auto p-4 bg-card rounded-lg shadow-lg">
       <div className="flex items-center justify-between">
-        <Button variant="ghost" size="icon" onClick={togglePlayback}>
+        <Button variant="ghost" size="icon" onClick={togglePlayback} aria-label={isPlaying ? 'Mettre en pause' : 'Lire'}>
           {isPlaying ? <Pause className="h-6 w-6" /> : <Play className="h-6 w-6" />}
         </Button>
         <div className="flex items-center gap-2 flex-1 ml-4">
-          <Button variant="ghost" size="icon" onClick={toggleMute} className="p-1">
+          <Button variant="ghost" size="icon" onClick={toggleMute} className="p-1" aria-label={isMuted ? 'Activer le son' : 'Désactiver le son'}>
             <VolumeIcon />
           </Button>
           <Slider

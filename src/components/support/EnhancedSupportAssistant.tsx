@@ -233,7 +233,7 @@ const EnhancedSupportAssistant: React.FC = () => {
                 disabled={isTyping}
                 className="flex-grow"
               />
-              <Button type="submit" disabled={isTyping || !input.trim()} size="icon">
+              <Button type="submit" disabled={isTyping || !input.trim()} size="icon" aria-label="Envoyer le message">
                 <Send className="h-4 w-4" />
               </Button>
             </form>

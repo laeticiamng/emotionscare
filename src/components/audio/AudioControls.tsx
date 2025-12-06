@@ -69,6 +69,7 @@ const AudioControls: React.FC<AudioControlsProps> = ({
               size="icon"
               className="h-8 w-8"
               onClick={toggleMute}
+              aria-label={isMuted ? 'Activer le son' : 'Couper le son'}
             >
               {isMuted ? (
                 <VolumeX className="h-4 w-4" />
