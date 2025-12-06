@@ -197,7 +197,7 @@ const EnhancedNavigation: React.FC = () => {
               <Button
                 variant="outline"
                 className="border-border/50 hover:bg-muted/80 backdrop-blur-sm"
-                onClick={() => window.location.href = '/auth'}
+                onClick={() => window.location.href = '/login'}
               >
                 <User className="h-4 w-4 mr-2" />
                 Connexion
@@ -306,7 +306,7 @@ const EnhancedNavigation: React.FC = () => {
                 <div className="border-t border-border/50 pt-4 space-y-3">
                   <Button
                     onClick={() => {
-                      window.location.href = '/auth';
+                      window.location.href = '/login';
                       setMobileMenuOpen(false);
                     }}
                     variant="outline"
