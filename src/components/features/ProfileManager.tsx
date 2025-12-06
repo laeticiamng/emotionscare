@@ -201,8 +201,8 @@ const ProfileManager: React.FC = () => {
                   {profile.name.split(' ').map(n => n[0]).join('')}
                 </AvatarFallback>
               </Avatar>
-              <Button size="icon" variant="secondary" className="absolute -bottom-2 -right-2 h-8 w-8">
-                <Camera className="h-4 w-4" />
+              <Button size="icon" variant="secondary" className="absolute -bottom-2 -right-2 h-8 w-8" aria-label="Modifier l'avatar">
+                <Camera className="h-4 w-4" aria-hidden="true" />
               </Button>
             </div>
             
