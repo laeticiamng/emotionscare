@@ -737,7 +737,7 @@ const Header: React.FC<HeaderProps> = ({
                   </Link>
                   
                   <Link
-                    to="/settings"
+                    to="/settings/general"
                     onClick={() => setIsMenuOpen(false)}
                     className="flex items-center space-x-2 px-3 py-2 text-sm hover:bg-muted/50 rounded-md focus-enhanced"
                   >

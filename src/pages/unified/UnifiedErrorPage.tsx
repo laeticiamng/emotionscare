@@ -251,7 +251,7 @@ export default function UnifiedErrorPage({
                   <p className="text-xs text-muted-foreground mt-4">
                     Si le problème persiste, contactez notre{' '}
                     <a 
-                      href="/support" 
+                      href="/contact" 
                       className="text-primary hover:underline focus:underline focus:outline-none"
                       aria-label="Contacter le support technique d'EmotionsCare"
                     >
