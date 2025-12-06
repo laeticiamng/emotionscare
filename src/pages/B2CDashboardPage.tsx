@@ -19,6 +19,7 @@ import {
   HelpCircle,
   ChevronRight,
   Wind,
+  TreePalm,
 } from 'lucide-react';
 import { useAccessibilityAudit } from '@/lib/accessibility-checker';
 import { motion, useReducedMotion } from 'framer-motion';
@@ -99,6 +100,14 @@ const QUICK_ACTIONS: QuickAction[] = [
     to: routes.b2c.exchange(),
     icon: TrendingUp,
     accent: 'bg-emerald-500/10 text-emerald-600',
+  },
+  {
+    id: 'emotional-park',
+    title: 'Parc Émotionnel',
+    description: 'Voyage immersif dans vos émotions',
+    to: '/app/emotional-park',
+    icon: TreePalm,
+    accent: 'bg-violet-500/10 text-violet-600',
   },
 ];
 
