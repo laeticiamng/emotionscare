@@ -304,6 +304,10 @@ const WeeklyReportPage = lazy(() => import('@/pages/WeeklyReportPage'));
 const MonthlyReportPage = lazy(() => import('@/pages/MonthlyReportPage'));
 const NavigationPage = lazy(() => import('@/pages/NavigationPage'));
 
+// Settings pages
+const LanguageSettingsPage = lazy(() => import('@/pages/settings/LanguageSettingsPage'));
+const SecuritySettingsPage = lazy(() => import('@/pages/settings/SecuritySettingsPage'));
+
 // Exchange Hub V2.0
 const ExchangeHubPage = lazy(() => import('@/pages/ExchangeHubPage'));
 
@@ -570,6 +574,10 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   WeeklyReportPage,
   MonthlyReportPage,
   NavigationPage,
+  
+  // Settings pages
+  LanguageSettingsPage,
+  SecuritySettingsPage,
   
   // Exchange Hub V2.0
   ExchangeHubPage,

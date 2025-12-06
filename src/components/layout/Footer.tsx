@@ -51,8 +51,8 @@ const footerSections: FooterSection[] = [
     title: 'Entreprises',
     links: [
       { name: 'Solutions B2B', href: '/entreprise', icon: Building2 },
-      { name: 'Dashboard Équipe', href: '/app/rh' },
-      { name: 'Analytics RH', href: '/app/reports' },
+      { name: 'Dashboard RH', href: '/app/rh' },
+      { name: 'Rapports & Analytics', href: '/b2b/reports' },
       { name: 'Gestion Équipes', href: '/app/teams' },
       { name: 'Tarifs Entreprise', href: '/pricing' },
     ]

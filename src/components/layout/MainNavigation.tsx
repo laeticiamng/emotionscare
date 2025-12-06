@@ -39,7 +39,7 @@ export const MainNavigation: React.FC = () => {
       title: 'Accueil',
       description: 'Tableau de bord principal',
       icon: Home,
-      route: '/',
+      route: '/app/consumer/home',
       category: 'Accueil'
     },
     
@@ -49,16 +49,14 @@ export const MainNavigation: React.FC = () => {
       title: 'Scan Émotionnel',
       description: 'Analyse IA de votre état émotionnel',
       icon: Brain,
-      route: '/scan',
+      route: '/app/scan',
       category: 'Thérapies',
       premium: true,
       hot: true,
       subItems: [
-        { title: 'Nouveau Scan', route: '/scan/new', description: 'Démarrer une analyse' },
-        { title: 'Historique', route: '/scan/history', description: 'Vos analyses passées' },
-        { title: 'Tendances', route: '/scan/trends', description: 'Évolution émotionnelle' },
-        { title: 'Rapports', route: '/scan/reports', description: 'Analyses détaillées' },
-        { title: 'Paramètres', route: '/scan/settings', description: 'Configuration du scan' }
+        { title: 'Scan Facial', route: '/app/scan/facial', description: 'Analyse faciale' },
+        { title: 'Scan Vocal', route: '/app/scan/voice', description: 'Analyse vocale' },
+        { title: 'Scan Texte', route: '/app/scan/text', description: 'Analyse textuelle' },
       ]
     },
     {
@@ -66,15 +64,13 @@ export const MainNavigation: React.FC = () => {
       title: 'Musicothérapie',
       description: 'Thérapie musicale personnalisée',
       icon: Music,
-      route: '/music',
+      route: '/app/music',
       category: 'Thérapies',
       premium: true,
       subItems: [
-        { title: 'Générateur IA', route: '/music/generator', description: 'Créer votre musique' },
-        { title: 'Bibliothèque', route: '/music/library', description: 'Vos compositions' },
-        { title: 'Playlists', route: '/music/playlists', description: 'Collections thématiques' },
-        { title: 'Sessions Live', route: '/music/live', description: 'Écoute en temps réel' },
-        { title: 'Préférences', route: '/music/preferences', description: 'Styles et humeurs' }
+        { title: 'Analytics Musique', route: '/app/music/analytics', description: 'Vos statistiques' },
+        { title: 'Profil Musical', route: '/app/music/profile', description: 'Vos préférences' },
+        { title: 'Premium', route: '/app/music-premium', description: 'Fonctionnalités avancées' },
       ]
     },
     {
@@ -82,14 +78,8 @@ export const MainNavigation: React.FC = () => {
       title: 'Respiration',
       description: 'Exercices de respiration guidés',
       icon: Wind,
-      route: '/breathwork',
+      route: '/app/breath',
       category: 'Thérapies',
-      subItems: [
-        { title: 'Exercices', route: '/breathwork/exercises', description: 'Techniques guidées' },
-        { title: 'Programmes', route: '/breathwork/programs', description: 'Plans personnalisés' },
-        { title: 'Sessions', route: '/breathwork/sessions', description: 'Historique des séances' },
-        { title: 'Défis', route: '/breathwork/challenges', description: 'Objectifs respiratoires' }
-      ]
     },
 
     // Expériences Immersives
@@ -98,16 +88,13 @@ export const MainNavigation: React.FC = () => {
       title: 'VR Galactique',
       description: 'Expériences de réalité virtuelle',
       icon: Headset,
-      route: '/vr',
+      route: '/app/vr',
       category: 'Immersif',
       premium: true,
       new: true,
       subItems: [
-        { title: 'Hub VR', route: '/vr/hub', description: 'Centre des expériences' },
-        { title: 'Galaxie Zen', route: '/vr/zen-galaxy', description: 'Méditation spatiale' },
-        { title: 'Forêt Mystique', route: '/vr/forest', description: 'Nature immersive' },
-        { title: 'Océan Profond', route: '/vr/ocean', description: 'Plongée relaxante' },
-        { title: 'Mes Sessions', route: '/vr/sessions', description: 'Historique VR' }
+        { title: 'VR Galaxie', route: '/app/vr-galaxy', description: 'Voyage spatial' },
+        { title: 'VR Respiration', route: '/app/vr-breath-guide', description: 'Respiration guidée' },
       ]
     },
     {
@@ -115,15 +102,9 @@ export const MainNavigation: React.FC = () => {
       title: 'Filtres AR',
       description: 'Réalité augmentée émotionnelle',
       icon: Camera,
-      route: '/ar-filters',
+      route: '/app/face-ar',
       category: 'Immersif',
       new: true,
-      subItems: [
-        { title: 'Studio AR', route: '/ar/studio', description: 'Créer vos filtres' },
-        { title: 'Collection', route: '/ar/collection', description: 'Vos créations' },
-        { title: 'Communauté', route: '/ar/community', description: 'Partage et découverte' },
-        { title: 'Défis', route: '/ar/challenges', description: 'Concours créatifs' }
-      ]
     },
     {
       id: 'gamification',
@@ -134,10 +115,10 @@ export const MainNavigation: React.FC = () => {
       category: 'Immersif',
       hot: true,
       subItems: [
-        { title: 'Mes Quêtes', route: '/gamification/quests', description: 'Défis personnels' },
-        { title: 'Achievements', route: '/gamification/achievements', description: 'Succès débloqués' },
-        { title: 'Classements', route: '/gamification/leaderboard', description: 'Compétition amicale' },
-        { title: 'Récompenses', route: '/gamification/rewards', description: 'Badges et prix' }
+        { title: 'Classement', route: '/app/leaderboard', description: 'Compétition amicale' },
+        { title: 'Défis', route: '/app/daily-challenges', description: 'Défis quotidiens' },
+        { title: 'Récompenses', route: '/app/rewards', description: 'Badges et prix' },
+        { title: 'Badges', route: '/app/badges', description: 'Vos succès' }
       ]
     },
 
@@ -147,15 +128,13 @@ export const MainNavigation: React.FC = () => {
       title: 'Coach IA',
       description: 'Assistant personnel intelligent',
       icon: MessageCircle,
-      route: '/coach',
+      route: '/app/coach',
       category: 'Social',
       premium: true,
       subItems: [
-        { title: 'Chat IA', route: '/coach/chat', description: 'Conversation en temps réel' },
-        { title: 'Plans Personnalisés', route: '/coach/plans', description: 'Programmes adaptés' },
-        { title: 'Objectifs', route: '/coach/goals', description: 'Suivi des progrès' },
-        { title: 'Ressources', route: '/coach/resources', description: 'Guides et conseils' },
-        { title: 'Historique', route: '/coach/history', description: 'Conversations passées' }
+        { title: 'Micro-Coach', route: '/app/coach-micro', description: 'Coaching rapide' },
+        { title: 'Programmes', route: '/app/coach/programs', description: 'Plans personnalisés' },
+        { title: 'Sessions', route: '/app/coach/sessions', description: 'Historique' },
       ]
     },
     {
@@ -163,14 +142,11 @@ export const MainNavigation: React.FC = () => {
       title: 'Communauté',
       description: 'Espace de partage et entraide',
       icon: Users,
-      route: '/community',
+      route: '/app/community',
       category: 'Social',
       subItems: [
-        { title: 'Feed', route: '/community/feed', description: 'Actualités communautaires' },
-        { title: 'Groupes', route: '/community/groups', description: 'Communautés thématiques' },
-        { title: 'Événements', route: '/community/events', description: 'Rencontres et ateliers' },
-        { title: 'Messages', route: '/community/messages', description: 'Conversations privées' },
-        { title: 'Buddy System', route: '/community/buddies', description: 'Partenaires de bien-être' }
+        { title: 'Social Cocon', route: '/app/social-cocon', description: 'Espace bienveillant' },
+        { title: 'Exchange Hub', route: '/app/exchange', description: 'Marchés émotionnels' },
       ]
     },
 
@@ -180,14 +156,10 @@ export const MainNavigation: React.FC = () => {
       title: 'Journal',
       description: 'Carnet de bord émotionnel',
       icon: BookOpen,
-      route: '/journal',
+      route: '/app/journal',
       category: 'Suivi',
       subItems: [
-        { title: 'Nouvelle Entrée', route: '/journal/new', description: 'Écrire aujourd\'hui' },
-        { title: 'Mes Entrées', route: '/journal/entries', description: 'Historique complet' },
-        { title: 'Insights IA', route: '/journal/insights', description: 'Analyses automatiques' },
-        { title: 'Modèles', route: '/journal/templates', description: 'Structures guidées' },
-        { title: 'Export', route: '/journal/export', description: 'Sauvegarder vos données' }
+        { title: 'Nouvelle Entrée', route: '/app/journal-new', description: 'Écrire aujourd\'hui' },
       ]
     },
     {
@@ -195,15 +167,13 @@ export const MainNavigation: React.FC = () => {
       title: 'Analytics',
       description: 'Tableaux de bord et métriques',
       icon: BarChart3,
-      route: '/analytics',
+      route: '/app/analytics',
       category: 'Suivi',
       premium: true,
       subItems: [
-        { title: 'Dashboard', route: '/analytics/dashboard', description: 'Vue d\'ensemble' },
-        { title: 'Tendances', route: '/analytics/trends', description: 'Évolution temporelle' },
-        { title: 'Rapports', route: '/analytics/reports', description: 'Analyses détaillées' },
-        { title: 'Corrélations', route: '/analytics/correlations', description: 'Liens entre données' },
-        { title: 'Prédictions', route: '/analytics/predictions', description: 'IA prédictive' }
+        { title: 'Weekly Bars', route: '/app/weekly-bars', description: 'Progression hebdo' },
+        { title: 'Insights', route: '/app/insights', description: 'Analyses IA' },
+        { title: 'Tendances', route: '/app/trends', description: 'Évolution temporelle' },
       ]
     },
     {
@@ -211,13 +181,12 @@ export const MainNavigation: React.FC = () => {
       title: 'Progrès',
       description: 'Suivi de votre évolution',
       icon: TrendingUp,
-      route: '/progress',
+      route: '/app/activity',
       category: 'Suivi',
       subItems: [
-        { title: 'Objectifs', route: '/progress/goals', description: 'Définir vos cibles' },
-        { title: 'Milestones', route: '/progress/milestones', description: 'Étapes importantes' },
-        { title: 'Streaks', route: '/progress/streaks', description: 'Séries consécutives' },
-        { title: 'Achievements', route: '/progress/achievements', description: 'Succès débloqués' }
+        { title: 'Objectifs', route: '/app/goals', description: 'Définir vos cibles' },
+        { title: 'Sessions', route: '/app/sessions', description: 'Historique sessions' },
+        { title: 'Achievements', route: '/app/achievements', description: 'Succès débloqués' }
       ]
     },
 
@@ -227,14 +196,14 @@ export const MainNavigation: React.FC = () => {
       title: 'Paramètres',
       description: 'Configuration personnelle',
       icon: Settings,
-      route: '/settings',
+      route: '/settings/general',
       category: 'Configuration',
       subItems: [
         { title: 'Profil', route: '/settings/profile', description: 'Informations personnelles' },
         { title: 'Notifications', route: '/settings/notifications', description: 'Alertes et rappels' },
         { title: 'Confidentialité', route: '/settings/privacy', description: 'Protection des données' },
         { title: 'Accessibilité', route: '/settings/accessibility', description: 'Options d\'accessibilité' },
-        { title: 'Intégrations', route: '/settings/integrations', description: 'Apps tierces' },
+        { title: 'Langue', route: '/settings/language', description: 'Langue de l\'application' },
         { title: 'Sécurité', route: '/settings/security', description: 'Authentification et sécurité' }
       ]
     }
