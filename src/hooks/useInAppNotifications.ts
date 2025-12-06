@@ -34,13 +34,24 @@ export const useInAppNotifications = () => {
           .order('created_at', { ascending: false })
           .limit(10);
 
-        if (error) throw error;
+        // Ignore error if table doesn't exist (42P01)
+        if (error) {
+          if (error.code === '42P01') {
+            // Table doesn't exist yet, silently ignore
+            setLoading(false);
+            return;
+          }
+          throw error;
+        }
         
         const notifs = data || [];
         setNotifications(notifs);
         setUnreadCount(notifs.filter(n => !n.read).length);
-      } catch (error) {
-        logger.error('Error fetching notifications:', error, 'HOOK');
+      } catch (error: any) {
+        // Only log if it's not a "table doesn't exist" error
+        if (error?.code !== '42P01') {
+          logger.warn('Error fetching notifications:', error, 'HOOK');
+        }
       } finally {
         setLoading(false);
       }
