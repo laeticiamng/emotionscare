@@ -72,7 +72,7 @@ const CoachSuggestions: React.FC = () => {
                 variant="outline" 
                 size="sm" 
                 className="mt-2" 
-                onClick={() => navigate('/coach')}
+                onClick={() => navigate('/app/coach')}
               >
                 Consulter le coach
               </Button>
