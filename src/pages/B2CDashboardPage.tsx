@@ -1,5 +1,6 @@
 import React, { Suspense, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { routes } from '@/lib/routes';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -95,7 +96,7 @@ const QUICK_ACTIONS: QuickAction[] = [
     id: 'exchange',
     title: 'Exchange Hub',
     description: 'Marchés émotions, temps et confiance',
-    to: '/app/exchange',
+    to: routes.b2c.exchange(),
     icon: TrendingUp,
     accent: 'bg-emerald-500/10 text-emerald-600',
   },

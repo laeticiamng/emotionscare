@@ -92,6 +92,7 @@ export const Routes = {
   bounceBack: () => b2cRoutes.bounceBack(),
   storySynth: () => b2cRoutes.storySynth(),
   community: () => b2cRoutes.community(),
+  exchange: () => b2cRoutes.exchange(),
   socialCocon: () => b2cRoutes.socialCocon(),
   activity: () => b2cRoutes.activity(),
   heatmap: () => b2cRoutes.heatmap(),

@@ -200,7 +200,7 @@ const modules: Module[] = [
   {
     title: 'Exchange Hub',
     description: 'Marchés d\'émotions, temps, confiance et progression',
-    url: '/app/exchange',
+    url: routes.b2c.exchange(),
     icon: TrendingUp,
     category: 'Exchange',
     status: 'active',

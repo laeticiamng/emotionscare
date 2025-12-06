@@ -121,6 +121,7 @@ export const b2cRoutes = {
   ambitionArcade: () => resolveRoutePath('ambition-arcade'),
   feedback: () => resolveRoutePath('help'),
   accountDelete: () => resolveRoutePath('settings-privacy'),
+  exchange: () => resolveRoutePath('exchange-hub'),
 } as const;
 
 export const consumerRoutes = {
@@ -158,6 +159,7 @@ export const consumerRoutes = {
   notifications: () => resolveRoutePath('settings-notifications'),
   settings: () => resolveRoutePath('settings-general'),
   profile: () => resolveRoutePath('settings-profile'),
+  exchange: () => resolveRoutePath('exchange-hub'),
 } as const;
 
 export const b2bRoutes = {
