@@ -55,8 +55,8 @@ export const JournalWordCloud: React.FC<JournalWordCloudProps> = ({
     const wordMap = new Map<string, number>();
 
     notes.forEach((note) => {
-      // Combine title and content
-      const text = `${note.title || ''} ${note.content}`.toLowerCase();
+      // Use text field from SanitizedNote
+      const text = (note.text || '').toLowerCase();
 
       // Split into words, remove punctuation
       const words = text
