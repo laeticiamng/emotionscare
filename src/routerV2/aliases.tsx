@@ -30,6 +30,7 @@ export const ROUTE_ALIASES = {
   '/b2b/selection': '/entreprise',
   '/help-center': '/help',
   '/tarifs': '/pricing',
+  '/terms': '/legal/terms',
   '/legal/accessibility': '/app/accessibility',
   '/modules': '/app/modules',
 
@@ -124,9 +125,9 @@ export const ROUTE_ALIASES = {
   '/app/gamification': '/gamification',
   '/app/aura': '/app/activity',
   '/aura': '/app/activity',
-  '/store': '/about',
-  '/boutique': '/about',
-  '/contact': '/support',
+  '/store': '/store',
+  '/boutique': '/store',
+  '/contact': '/contact',
 } as const;
 
 export type LegacyPath = keyof typeof ROUTE_ALIASES;

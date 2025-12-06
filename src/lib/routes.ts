@@ -195,7 +195,7 @@ export const b2bRoutes = {
 } as const;
 
 export const specialRoutes = {
-  chooseMode: () => resolveRoutePath('choose-mode'),
+  chooseMode: () => resolveRoutePath('mode-selection'),
   appGate: () => resolveRoutePath('app-gate'),
   unauthorized: () => resolveRoutePath('unauthorized'),
   forbidden: () => resolveRoutePath('forbidden'),
