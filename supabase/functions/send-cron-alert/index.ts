@@ -6,13 +6,9 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-interface CronFailure {
-  jobname: string;
-  runid: bigint;
-  job_pid: number;
-  database: string;
-  username: string;
-  command: string;
+interface CronHistoryEntry {
+  jobid: number;
+  job_name: string;
   status: string;
   return_message: string;
   start_time: string;
@@ -42,24 +38,22 @@ Deno.serve(async (req: Request) => {
     // Check for consecutive failures in the last 30 minutes
     const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000).toISOString();
 
-    const { data: recentFailures, error: queryError } = await supabaseClient
-      .rpc('get_gamification_cron_history', {
-        p_limit: 100
-      });
+    const { data: recentHistory, error: queryError } = await supabaseClient
+      .rpc('get_gamification_cron_history');
 
     if (queryError) {
       throw queryError;
     }
 
     // Group failures by job name
-    const failuresByJob: Record<string, CronFailure[]> = {};
+    const failuresByJob: Record<string, CronHistoryEntry[]> = {};
     
-    for (const failure of recentFailures || []) {
-      if (failure.status === 'failed' && new Date(failure.end_time) >= new Date(thirtyMinutesAgo)) {
-        if (!failuresByJob[failure.jobname]) {
-          failuresByJob[failure.jobname] = [];
+    for (const entry of recentHistory || []) {
+      if (entry.status === 'failed' && new Date(entry.end_time) >= new Date(thirtyMinutesAgo)) {
+        if (!failuresByJob[entry.job_name]) {
+          failuresByJob[entry.job_name] = [];
         }
-        failuresByJob[failure.jobname].push(failure);
+        failuresByJob[entry.job_name].push(entry);
       }
     }
 
@@ -68,12 +62,14 @@ Deno.serve(async (req: Request) => {
     for (const [jobName, failures] of Object.entries(failuresByJob)) {
       if (failures.length >= 3) {
         // Verify they are consecutive (no success in between)
-        const allRecentRuns = (recentFailures || [])
-          .filter((r: any) => r.jobname === jobName)
-          .sort((a: any, b: any) => new Date(b.end_time).getTime() - new Date(a.end_time).getTime())
+        const allRecentRuns = (recentHistory || [])
+          .filter((r: CronHistoryEntry) => r.job_name === jobName)
+          .sort((a: CronHistoryEntry, b: CronHistoryEntry) => 
+            new Date(b.end_time).getTime() - new Date(a.end_time).getTime()
+          )
           .slice(0, 3);
 
-        const allFailed = allRecentRuns.every((r: any) => r.status === 'failed');
+        const allFailed = allRecentRuns.every((r: CronHistoryEntry) => r.status === 'failed');
         
         if (allFailed) {
           alertsToSend.push({
@@ -97,11 +93,11 @@ Deno.serve(async (req: Request) => {
     for (const alert of alertsToSend) {
       const { jobName, failures } = alert;
       
-      const errorDetails = failures.map((f: CronFailure) => `
+      const errorDetails = failures.map((f: CronHistoryEntry) => `
         <li>
-          <strong>Run ID:</strong> ${f.runid}<br>
+          <strong>Job ID:</strong> ${f.jobid}<br>
           <strong>Time:</strong> ${new Date(f.end_time).toLocaleString('fr-FR')}<br>
-          <strong>Error:</strong> ${f.return_message}
+          <strong>Error:</strong> ${f.return_message || 'No error message'}
         </li>
       `).join('');
 
