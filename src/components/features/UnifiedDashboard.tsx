@@ -86,10 +86,10 @@ const UnifiedDashboard: React.FC = () => {
         { label: "Rétention", value: "96%", trend: "+3%", icon: Award, color: "text-orange-500" }
       ],
       quickActions: [
-        { label: "Analytics Équipe", icon: BarChart3, path: "/entreprise/analytics" },
-        { label: "Reports", icon: Activity, path: "/entreprise/reports" },
-        { label: "Interventions", icon: Target, path: "/entreprise/interventions" },
-        { label: "Paramètres", icon: Brain, path: "/entreprise/settings" }
+        { label: "Analytics Équipe", icon: BarChart3, path: "/app/analytics" },
+        { label: "Reports", icon: Activity, path: "/app/reports" },
+        { label: "Interventions", icon: Target, path: "/app/optimization" },
+        { label: "Paramètres", icon: Brain, path: "/settings/general" }
       ]
     }
   };

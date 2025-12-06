@@ -130,6 +130,9 @@ export const ROUTE_ALIASES = {
   '/store': '/store',
   '/boutique': '/store',
   '/contact': '/contact',
+  '/app/park': '/app/emotional-park',
+  '/park': '/app/emotional-park',
+  '/app/social-b2c': '/app/social-cocon',
 } as const;
 
 export type LegacyPath = keyof typeof ROUTE_ALIASES;

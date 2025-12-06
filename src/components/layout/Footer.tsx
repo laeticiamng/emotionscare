@@ -51,9 +51,9 @@ const footerSections: FooterSection[] = [
     title: 'Entreprises',
     links: [
       { name: 'Solutions B2B', href: '/entreprise', icon: Building2 },
-      { name: 'Dashboard Équipe', href: '/enterprise/dashboard' },
-      { name: 'Analytics RH', href: '/enterprise/reports' },
-      { name: 'Gestion Équipes', href: '/enterprise/teams' },
+      { name: 'Dashboard Équipe', href: '/app/rh' },
+      { name: 'Analytics RH', href: '/app/reports' },
+      { name: 'Gestion Équipes', href: '/app/teams' },
       { name: 'Tarifs Entreprise', href: '/pricing' },
     ]
   },
@@ -61,10 +61,10 @@ const footerSections: FooterSection[] = [
     title: 'Support',
     links: [
       { name: 'Centre d\'aide', href: '/help', icon: HelpCircle },
-      { name: 'Documentation', href: '/docs' },
-      { name: 'API Reference', href: '/api-docs' },
+      { name: 'Documentation', href: '/faq' },
+      { name: 'API Reference', href: '/api' },
       { name: 'Nous contacter', href: '/contact', icon: Mail },
-      { name: 'Status', href: '/status', external: true },
+      { name: 'Tickets', href: '/support/tickets' },
     ]
   },
   {
