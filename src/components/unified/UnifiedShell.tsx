@@ -73,6 +73,7 @@ const UnifiedShell: React.FC<UnifiedShellProps> = ({ children }) => {
           variant="secondary"
           size="icon"
           className="fixed bottom-6 right-6 rounded-full shadow-lg z-50 h-12 w-12"
+          aria-label={sidebarOpen ? "Fermer le menu" : "Ouvrir le menu"}
         >
           <Menu className="h-6 w-6" />
         </Button>

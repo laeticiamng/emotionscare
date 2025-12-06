@@ -130,6 +130,7 @@ const QuickActions = () => {
               ? 'bg-red-500 hover:bg-red-600 rotate-45' 
               : 'bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary'
           }`}
+          aria-label={isOpen ? "Fermer les actions rapides" : "Ouvrir les actions rapides"}
         >
           {isOpen ? (
             <X className="h-6 w-6 text-white" />

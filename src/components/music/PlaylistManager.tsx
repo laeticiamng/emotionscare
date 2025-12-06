@@ -155,6 +155,7 @@ export const PlaylistManager: React.FC<PlaylistManagerProps> = ({
                       onClick={() => setEditingPlaylist(
                         editingPlaylist === playlist.id ? null : playlist.id
                       )}
+                      aria-label={`Modifier la playlist ${playlist.name}`}
                     >
                       <Edit2 className="w-4 h-4" />
                     </Button>
@@ -162,6 +163,7 @@ export const PlaylistManager: React.FC<PlaylistManagerProps> = ({
                       variant="ghost"
                       size="icon"
                       onClick={() => handleDeletePlaylist(playlist.id, playlist.name)}
+                      aria-label={`Supprimer la playlist ${playlist.name}`}
                     >
                       <Trash2 className="w-4 h-4 text-destructive" />
                     </Button>
@@ -201,6 +203,7 @@ export const PlaylistManager: React.FC<PlaylistManagerProps> = ({
                             variant="ghost"
                             size="icon"
                             onClick={() => onRemoveTrackFromPlaylist(playlist.id, track.id)}
+                            aria-label={`Retirer ${track.title} de la playlist`}
                           >
                             <Trash2 className="w-3 h-3" />
                           </Button>
