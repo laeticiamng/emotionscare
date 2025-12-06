@@ -63,6 +63,7 @@ export const MusicPlayer: React.FC<MusicPlayerProps> = ({
         size="icon"
         className="rounded-full bg-white/10 backdrop-blur-sm"
         onClick={() => setExpanded(true)}
+        aria-label="Agrandir le lecteur de musique"
       >
         <Music size={18} />
       </Button>
@@ -84,8 +85,9 @@ export const MusicPlayer: React.FC<MusicPlayerProps> = ({
               size="icon" 
               className="h-8 w-8" 
               onClick={() => setExpanded(false)}
+              aria-label="Réduire le lecteur"
             >
-              <span className="sr-only">Minimize</span>
+              <span className="sr-only">Réduire</span>
               <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M11 4H4V11H11V4Z" fill="currentColor" />
               </svg>
@@ -99,6 +101,7 @@ export const MusicPlayer: React.FC<MusicPlayerProps> = ({
             size="icon" 
             className="h-9 w-9" 
             onClick={skipTrack}
+            aria-label="Piste précédente"
           >
             <SkipForward size={16} />
           </Button>
@@ -108,6 +111,7 @@ export const MusicPlayer: React.FC<MusicPlayerProps> = ({
             size="icon" 
             className="h-10 w-10 rounded-full" 
             onClick={togglePlay}
+            aria-label={isPlaying ? 'Mettre en pause' : 'Lire'}
           >
             {isPlaying ? <Pause size={18} /> : <Play size={18} className="ml-1" />}
           </Button>
@@ -117,6 +121,7 @@ export const MusicPlayer: React.FC<MusicPlayerProps> = ({
             size="icon" 
             className="h-9 w-9" 
             onClick={skipTrack}
+            aria-label="Piste suivante"
           >
             <SkipForward size={16} />
           </Button>

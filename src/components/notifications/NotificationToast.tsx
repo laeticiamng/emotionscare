@@ -74,6 +74,7 @@ const NotificationToast: React.FC<NotificationToastProps> = ({
             size="icon"
             className="h-6 w-6"
             onClick={onClose}
+            aria-label="Fermer la notification"
           >
             <X className="h-4 w-4" />
           </Button>

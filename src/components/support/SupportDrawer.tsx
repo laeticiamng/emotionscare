@@ -14,6 +14,7 @@ const SupportDrawer: React.FC = () => {
         onClick={() => setIsOpen(true)}
         size="icon"
         className="rounded-full shadow-lg"
+        aria-label="Ouvrir l'aide et le support"
       >
         <HelpCircle className="h-5 w-5" />
       </Button>

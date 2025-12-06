@@ -464,6 +464,7 @@ export const VRSafetyCheck: React.FC<VRSafetyCheckProps> = ({
                 size="icon"
                 className="text-white/60 hover:text-white"
                 onClick={closeReview}
+                aria-label="Fermer le panneau de sécurité"
               >
                 <XCircle className="h-4 w-4" />
               </Button>

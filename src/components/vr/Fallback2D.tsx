@@ -190,7 +190,7 @@ export const Fallback2D: React.FC<Fallback2DProps> = ({
             size="icon"
             onClick={running ? onPause : onStart}
             className="h-12 w-12"
-            aria-label={running ? 'Pause' : 'Démarrer'}
+            aria-label={running ? 'Mettre en pause' : 'Démarrer la respiration'}
           >
             {running ? <Pause className="h-6 w-6" /> : <Play className="h-6 w-6" />}
           </Button>
@@ -200,7 +200,7 @@ export const Fallback2D: React.FC<Fallback2DProps> = ({
             size="icon"
             onClick={onFinish}
             className="h-12 w-12"
-            aria-label="Arrêter"
+            aria-label="Arrêter la session"
           >
             <Square className="h-6 w-6" />
           </Button>

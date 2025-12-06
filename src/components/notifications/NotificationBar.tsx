@@ -73,6 +73,8 @@ const NotificationBar: React.FC<NotificationBarProps> = ({
         size="icon"
         onClick={toggleNotifications}
         className="relative"
+        aria-label="Afficher les notifications"
+        aria-expanded={showNotifications}
       >
         <Bell className="h-5 w-5" />
         {unreadCount > 0 && (

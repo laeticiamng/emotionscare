@@ -25,7 +25,7 @@ const NotificationBell: React.FC = () => {
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative">
+        <Button variant="ghost" size="icon" className="relative" aria-label="Afficher les notifications">
           <Bell className="h-5 w-5" />
           <AnimatePresence>
             {unreadCount > 0 && (
@@ -54,7 +54,7 @@ const NotificationBell: React.FC = () => {
                   {unreadCount} non lue{unreadCount > 1 ? 's' : ''}
                 </Badge>
               )}
-              <Button variant="ghost" size="icon" className="h-8 w-8">
+              <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Paramètres des notifications">
                 <Settings className="h-4 w-4" />
               </Button>
             </div>
