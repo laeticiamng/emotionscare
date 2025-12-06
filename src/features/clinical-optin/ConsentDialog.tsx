@@ -42,7 +42,7 @@ export function ConsentDialog({ open, status, loading = false, wasRevoked = fals
             <p>{t('body')}</p>
             <p>
               <a
-                href="/privacy"
+                href="/legal/privacy"
                 target="_blank"
                 rel="noreferrer"
                 className="text-primary underline underline-offset-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"

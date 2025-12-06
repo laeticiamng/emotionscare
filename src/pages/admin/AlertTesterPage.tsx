@@ -242,7 +242,7 @@ const AlertTesterPage: React.FC = () => {
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={() => navigate('/admin/incidents')}
+                      onClick={() => navigate('/app/admin/incidents')}
                     >
                       <ExternalLink className="h-3 w-3" />
                     </Button>
@@ -337,13 +337,13 @@ const AlertTesterPage: React.FC = () => {
           </ol>
 
           <div className="mt-4 flex gap-2">
-            <Button variant="outline" onClick={() => navigate('/admin/unified')}>
+            <Button variant="outline" onClick={() => navigate('/app/admin/unified')}>
               Dashboard Unifié
             </Button>
-            <Button variant="outline" onClick={() => navigate('/admin/incidents')}>
+            <Button variant="outline" onClick={() => navigate('/app/admin/incidents')}>
               Tous les Incidents
             </Button>
-            <Button variant="outline" onClick={() => navigate('/admin/tickets/integrations')}>
+            <Button variant="outline" onClick={() => navigate('/app/admin/tickets')}>
               Configuration Tickets
             </Button>
           </div>

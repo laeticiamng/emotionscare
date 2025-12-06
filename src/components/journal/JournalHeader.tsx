@@ -43,7 +43,7 @@ const JournalHeader: React.FC<JournalHeaderProps> = ({ selectedPeriod, setSelect
           </DropdownMenuContent>
         </DropdownMenu>
         
-        <Button onClick={() => navigate('/journal/new')} className="flex items-center gap-2">
+        <Button onClick={() => navigate('/app/journal/new')} className="flex items-center gap-2">
           <Plus size={18} /> Nouvelle entrée
         </Button>
       </div>

@@ -528,7 +528,7 @@ export default function EmotionalPark() {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => navigate('/app/leaderboard')}
+            onClick={() => navigate('/gamification')}
             className="flex items-center gap-2"
           >
             <Trophy className="h-4 w-4" />
@@ -537,7 +537,7 @@ export default function EmotionalPark() {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => navigate('/app/daily-challenges')}
+            onClick={() => navigate('/gamification')}
             className="flex items-center gap-2"
           >
             <Target className="h-4 w-4" />
@@ -546,7 +546,7 @@ export default function EmotionalPark() {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => navigate('/app/achievements')}
+            onClick={() => navigate('/gamification')}
             className="flex items-center gap-2"
           >
             <Award className="h-4 w-4" />
