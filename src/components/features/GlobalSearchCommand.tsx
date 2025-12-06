@@ -118,7 +118,7 @@ const GlobalSearchCommand: React.FC<GlobalSearchCommandProps> = ({
       title: 'Méditation VR',
       description: 'Respiration guidée en réalité virtuelle',
       category: 'VR',
-      path: '/app/vr-breath',
+      path: '/app/vr-breath-guide',
       icon: Eye,
       keywords: ['vr', 'meditation', 'breathing', 'virtual', 'reality'],
       priority: 6,

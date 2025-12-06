@@ -147,7 +147,7 @@ export const FEATURES: Feature[] = [
       'Respiration guidée',
       'Réalité mixte'
     ],
-    demo: '/app/vr-breath'
+    demo: '/app/vr-breath-guide'
   }
 ];
 

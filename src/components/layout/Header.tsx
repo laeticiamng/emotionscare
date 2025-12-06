@@ -246,11 +246,11 @@ const Header: React.FC<HeaderProps> = ({
     { label: 'Journal', href: '/app/journal', icon: Sparkles },
     { 
       label: 'Bien-être', 
-      href: '/app/wellbeing', 
+      href: '/app/breath', 
       icon: Zap,
       children: [
         { label: 'Respiration', href: '/app/breath' },
-        { label: 'VR Thérapie', href: '/app/vr-breath' },
+        { label: 'VR Thérapie', href: '/app/vr-breath-guide' },
         { label: 'Méditation', href: '/app/meditation' },
       ]
     },
@@ -290,7 +290,7 @@ const Header: React.FC<HeaderProps> = ({
     { icon: Camera, label: 'Scan Rapide', action: () => navigate('/app/scan') },
     { icon: Music, label: 'Musique', action: () => navigate('/app/music') },
     { icon: Brain, label: 'Coach', action: () => navigate('/app/coach') },
-    { icon: Headphones, label: 'VR', action: () => navigate('/app/vr-breath') },
+    { icon: Headphones, label: 'VR', action: () => navigate('/app/vr-breath-guide') },
   ];
 
   return (

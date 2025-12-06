@@ -65,8 +65,8 @@ const AppSidebar = () => {
     { title: 'Flash Glow', url: '/app/flash-glow', icon: Zap, shortDesc: 'Boost express' },
     { title: 'Journal', url: '/app/journal', icon: BookOpen, shortDesc: 'Exutoire privé' },
     { title: 'Mood Mixer', url: '/app/mood-mixer', icon: Sparkles, shortDesc: 'Vibe sur mesure' },
-    { title: 'Respiration', url: '/app/breathing', icon: Wind, shortDesc: 'Calme profond' },
-    { title: 'VR Galaxy', url: '/app/vr-breathing', icon: Star, shortDesc: 'Immersion totale' },
+    { title: 'Respiration', url: '/app/breath', icon: Wind, shortDesc: 'Calme profond' },
+    { title: 'VR Galaxy', url: '/app/vr-galaxy', icon: Star, shortDesc: 'Immersion totale' },
     { title: 'Bubble Beat', url: '/app/bubble-beat', icon: Gamepad2, shortDesc: 'Jeu anti-stress' },
     { title: 'Coach 1-min', url: '/app/coach', icon: Target, shortDesc: 'Conseil express' },
     { title: 'Boss Grit', url: '/app/boss-grit', icon: Award, shortDesc: 'Défis bienveillants' },
@@ -77,7 +77,7 @@ const AppSidebar = () => {
   // Suivi & analyse
   const trackingItems = [
     { title: 'Mon Activité', url: '/app/activity', icon: Activity, shortDesc: 'Historique privé' },
-    { title: 'Weekly Recap', url: '/app/weekly-recap', icon: Calendar, shortDesc: 'Synthèse hebdo' },
+    { title: 'Weekly Recap', url: '/app/reports/weekly', icon: Calendar, shortDesc: 'Synthèse hebdo' },
     { title: 'Screen Silk', url: '/app/screen-silk', icon: TrendingUp, shortDesc: 'Pause visuelle' },
     { title: 'Leaderboard', url: '/app/leaderboard', icon: Crown, shortDesc: 'Communauté' }
   ];

@@ -146,7 +146,7 @@ export default function UnifiedHomePage({ variant = 'full' }: UnifiedHomePagePro
       color: "text-indigo-500",
       gradient: "from-indigo-500 to-purple-500",
       benefits: ["Environnements 3D", "Respiration guidée", "Réalité mixte"],
-      demo: "/app/vr-breath"
+      demo: "/app/vr-breath-guide"
     },
     {
       icon: Activity,

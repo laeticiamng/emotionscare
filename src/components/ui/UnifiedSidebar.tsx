@@ -85,7 +85,7 @@ const navigationGroups: NavigationGroup[] = [
     items: [
       { title: 'Respiration', url: '/app/breath', icon: Wind, description: 'Exercices de respiration' },
       { title: 'Musique', url: '/app/music', icon: Music, badge: 'Premium', description: 'Musique thérapeutique' },
-      { title: 'Méditation VR', url: '/app/vr-breath', icon: Eye, featureFlag: 'FF_VR', description: 'Réalité virtuelle' },
+      { title: 'Méditation VR', url: '/app/vr-breath-guide', icon: Eye, featureFlag: 'FF_VR', description: 'Réalité virtuelle' },
       { title: 'Activités', url: '/app/activity', icon: Activity, description: 'Activités bien-être' }
     ]
   },
