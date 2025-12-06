@@ -73,6 +73,7 @@ const MusicControls: React.FC<MusicControlsProps> = ({
         onClick={onPrevious}
         disabled={!onPrevious}
         className={size === 'sm' ? 'h-8 w-8' : 'h-10 w-10'}
+        aria-label="Piste précédente"
       >
         <SkipBack className={size === 'sm' ? 'h-4 w-4' : 'h-5 w-5'} />
       </Button>
@@ -82,6 +83,7 @@ const MusicControls: React.FC<MusicControlsProps> = ({
         size="icon"
         onClick={handleTogglePlay}
         className={`rounded-full ${size === 'sm' ? 'h-8 w-8' : size === 'lg' ? 'h-12 w-12' : 'h-10 w-10'}`}
+        aria-label={isPlaying ? "Pause" : "Lecture"}
       >
         {isPlaying ? (
           <Pause className={size === 'sm' ? 'h-4 w-4' : size === 'lg' ? 'h-6 w-6' : 'h-5 w-5'} />
@@ -96,6 +98,7 @@ const MusicControls: React.FC<MusicControlsProps> = ({
         onClick={onNext}
         disabled={!onNext}
         className={size === 'sm' ? 'h-8 w-8' : 'h-10 w-10'}
+        aria-label="Piste suivante"
       >
         <SkipForward className={size === 'sm' ? 'h-4 w-4' : 'h-5 w-5'} />
       </Button>
