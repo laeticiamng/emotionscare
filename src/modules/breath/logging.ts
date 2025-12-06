@@ -35,15 +35,27 @@ export async function logAndJournal(payload: LogAndJournalPayload): Promise<LogA
   logger.info('session:log:start', { type: payload.type, durationSec }, 'SESSION');
 
   try {
+    // Récupérer l'utilisateur courant
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      throw new Error('User not authenticated');
+    }
+
+    // Utiliser breathing_vr_sessions au lieu de sessions
     const insertPayload = {
-      type: payload.type,
-      duration_sec: durationSec,
-      mood_delta: typeof payload.moodDelta === 'number' ? payload.moodDelta : null,
-      meta: payload.metadata ?? null,
-    } as const;
+      user_id: user.id,
+      pattern: (payload.metadata?.profile as string) || 'default',
+      duration_seconds: durationSec,
+      mood_before: typeof payload.metadata?.mood_before === 'number' ? payload.metadata.mood_before : null,
+      mood_after: typeof payload.moodDelta === 'number' ? (payload.metadata?.mood_before as number ?? 5) + payload.moodDelta : null,
+      notes: payload.metadata?.notes as string ?? null,
+      vr_mode: payload.metadata?.mode === 'vr',
+      started_at: new Date().toISOString()
+    };
 
     const { data, error } = await supabase
-      .from('sessions')
+      .from('breathing_vr_sessions')
       .insert(insertPayload)
       .select('id')
       .single();
@@ -62,6 +74,7 @@ export async function logAndJournal(payload: LogAndJournalPayload): Promise<LogA
       feature: 'breath',
       session: { type: payload.type, durationSec },
     });
+    logger.error('session:log:error', normalizedError, 'SESSION');
   }
 
   if (payload.journalText && typeof window !== 'undefined') {
