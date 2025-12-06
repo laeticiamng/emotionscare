@@ -27,7 +27,7 @@ const B2BSelectionPage: React.FC = () => {
               </p>
               <Button 
                 className="w-full" 
-                onClick={() => navigate('/b2b/user/login')}
+                onClick={() => navigate('/login?segment=b2b')}
               >
                 Se connecter
               </Button>
@@ -44,7 +44,7 @@ const B2BSelectionPage: React.FC = () => {
               </p>
               <Button 
                 className="w-full" 
-                onClick={() => navigate('/b2b/admin/login')}
+                onClick={() => navigate('/login?segment=b2b')}
               >
                 Accès Admin
               </Button>

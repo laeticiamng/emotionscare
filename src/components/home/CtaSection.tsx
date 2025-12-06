@@ -125,7 +125,7 @@ const CtaSection: React.FC = () => {
               </div>
               
               <Button
-                onClick={() => navigate('/b2c/login')}
+                onClick={() => navigate('/login?segment=b2c')}
                 size="lg"
                 className="group w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-semibold py-3 sm:py-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 touch-manipulation min-h-[52px]"
               >

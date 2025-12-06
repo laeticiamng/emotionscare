@@ -62,7 +62,7 @@ const ModeSelectionPage: React.FC = () => {
               <Button 
                 className="w-full" 
                 size="lg"
-                onClick={() => navigate('/auth/login?mode=b2b')}
+                onClick={() => navigate('/login?segment=b2b')}
               >
                 Accéder à l'espace Entreprise
               </Button>
@@ -104,7 +104,7 @@ const ModeSelectionPage: React.FC = () => {
                 className="w-full" 
                 size="lg"
                 variant="secondary"
-                onClick={() => navigate('/auth/login?mode=b2c')}
+                onClick={() => navigate('/login?segment=b2c')}
               >
                 Accéder à l'espace Particulier
               </Button>

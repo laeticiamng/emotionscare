@@ -110,7 +110,7 @@ const HeroSection: React.FC = () => {
             className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-12 sm:mb-16 px-4"
           >
             <Button
-              onClick={() => navigate('/b2c/login')}
+              onClick={() => navigate('/login?segment=b2c')}
               size="lg"
               className="group bg-primary hover:bg-primary/90 text-primary-foreground px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover-lift min-h-[52px] touch-manipulation"
             >
