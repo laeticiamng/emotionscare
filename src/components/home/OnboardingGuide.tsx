@@ -254,10 +254,12 @@ const OnboardingGuide: React.FC = () => {
             variants={itemVariants}
             className="flex justify-center gap-3 mt-8"
           >
-            {steps.map((step, index) => (
+          {steps.map((step, index) => (
               <motion.button
                 key={step.id}
                 onClick={() => setActiveStep(index)}
+                aria-label={`Étape ${index + 1}: ${step.title}${index === activeStep ? ' (active)' : ''}`}
+                aria-current={index === activeStep ? 'step' : undefined}
                 className={`h-3 rounded-full transition-all ${
                   index === activeStep
                     ? 'w-8 bg-primary'
