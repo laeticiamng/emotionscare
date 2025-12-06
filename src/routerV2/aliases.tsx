@@ -99,6 +99,8 @@ export const ROUTE_ALIASES = {
   // B2B FEATURES
   // ═══════════════════════════════════════════════════════════
   '/teams': '/app/teams',
+  '/b2b-teams': '/app/teams',
+  '/b2b/teams': '/app/teams',
   '/social-cocon': '/app/social',
   '/reports': '/app/reports',
   '/events': '/app/events',
