@@ -108,6 +108,7 @@ const MainNavbar: React.FC = () => {
               size="icon"
               onClick={toggleMobileMenu}
               aria-expanded={mobileMenuOpen}
+              aria-label={mobileMenuOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
             >
               {mobileMenuOpen ? (
                 <X className="h-6 w-6" />

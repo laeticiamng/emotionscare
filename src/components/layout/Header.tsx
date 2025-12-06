@@ -427,6 +427,7 @@ const Header: React.FC<HeaderProps> = ({
                     onClick={action.action}
                     className="w-9 h-9 p-0 hover:bg-primary/10"
                     title={action.label}
+                    aria-label={action.label}
                   >
                     <action.icon className="h-4 w-4" />
                   </Button>
@@ -496,7 +497,7 @@ const Header: React.FC<HeaderProps> = ({
                 {/* Notifications Premium */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="sm" className="relative w-9 h-9 p-0">
+                    <Button variant="ghost" size="sm" className="relative w-9 h-9 p-0" aria-label={`Notifications${notifications > 0 ? ` (${notifications} nouvelles)` : ''}`}>
                       <Bell className="h-4 w-4" />
                       {notifications > 0 && (
                         <Badge 

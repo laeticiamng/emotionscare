@@ -187,13 +187,14 @@ export const AutoMixPlayer: React.FC = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center justify-center gap-4">
-              <Button size="icon" variant="outline">
+              <Button size="icon" variant="outline" aria-label="Piste précédente">
                 <SkipBack className="h-5 w-5" />
               </Button>
               <Button
                 size="lg"
                 className="w-16 h-16 rounded-full"
                 onClick={() => setIsPlaying(!isPlaying)}
+                aria-label={isPlaying ? 'Mettre en pause' : 'Lire'}
               >
                 {isPlaying ? (
                   <Pause className="h-6 w-6" />
@@ -201,7 +202,7 @@ export const AutoMixPlayer: React.FC = () => {
                   <Play className="h-6 w-6" />
                 )}
               </Button>
-              <Button size="icon" variant="outline">
+              <Button size="icon" variant="outline" aria-label="Piste suivante">
                 <SkipForward className="h-5 w-5" />
               </Button>
               <Button 
@@ -209,6 +210,7 @@ export const AutoMixPlayer: React.FC = () => {
                 variant="outline"
                 onClick={() => setShowShareModal(true)}
                 className="ml-2"
+                aria-label="Partager la playlist"
               >
                 <Share2 className="h-5 w-5" />
               </Button>
