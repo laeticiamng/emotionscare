@@ -131,6 +131,7 @@ const MixLibrary: React.FC<MixLibraryProps> = ({
             variant="outline"
             size="icon"
             onClick={() => {/* Ouvrir modal de filtres */}}
+            aria-label="Ouvrir les filtres"
           >
             <Filter className="h-4 w-4" />
           </Button>

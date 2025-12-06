@@ -317,6 +317,7 @@ const MusicTherapy: React.FC = () => {
                     variant="ghost"
                     size="icon"
                     onClick={() => playTrack(track)}
+                    aria-label={`Lire ${track.title}`}
                   >
                     <Play className="h-4 w-4" />
                   </Button>
