@@ -5066,6 +5066,60 @@ export type Database = {
         }
         Relationships: []
       }
+      emotion_assets: {
+        Row: {
+          ambient_config: Json | null
+          base_price: number | null
+          created_at: string | null
+          creator_id: string | null
+          current_price: number | null
+          demand_score: number | null
+          description: string | null
+          emotion_type: string
+          id: string
+          intensity: number | null
+          is_premium: boolean | null
+          music_config: Json | null
+          name: string
+          total_purchases: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          ambient_config?: Json | null
+          base_price?: number | null
+          created_at?: string | null
+          creator_id?: string | null
+          current_price?: number | null
+          demand_score?: number | null
+          description?: string | null
+          emotion_type: string
+          id?: string
+          intensity?: number | null
+          is_premium?: boolean | null
+          music_config?: Json | null
+          name: string
+          total_purchases?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          ambient_config?: Json | null
+          base_price?: number | null
+          created_at?: string | null
+          creator_id?: string | null
+          current_price?: number | null
+          demand_score?: number | null
+          description?: string | null
+          emotion_type?: string
+          id?: string
+          intensity?: number | null
+          is_premium?: boolean | null
+          music_config?: Json | null
+          name?: string
+          total_purchases?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       emotion_cards: {
         Row: {
           animation_config: Json | null
@@ -5150,6 +5204,38 @@ export type Database = {
         }
         Relationships: []
       }
+      emotion_market_history: {
+        Row: {
+          asset_id: string | null
+          id: string
+          price: number
+          recorded_at: string | null
+          volume: number | null
+        }
+        Insert: {
+          asset_id?: string | null
+          id?: string
+          price: number
+          recorded_at?: string | null
+          volume?: number | null
+        }
+        Update: {
+          asset_id?: string | null
+          id?: string
+          price?: number
+          recorded_at?: string | null
+          volume?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "emotion_market_history_asset_id_fkey"
+            columns: ["asset_id"]
+            isOneToOne: false
+            referencedRelation: "emotion_assets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       emotion_metrics: {
         Row: {
           confidence_score: number | null
@@ -5212,6 +5298,44 @@ export type Database = {
           week_start?: string
         }
         Relationships: []
+      }
+      emotion_portfolio: {
+        Row: {
+          acquired_at: string | null
+          acquired_price: number | null
+          asset_id: string | null
+          id: string
+          last_used_at: string | null
+          quantity: number | null
+          user_id: string
+        }
+        Insert: {
+          acquired_at?: string | null
+          acquired_price?: number | null
+          asset_id?: string | null
+          id?: string
+          last_used_at?: string | null
+          quantity?: number | null
+          user_id: string
+        }
+        Update: {
+          acquired_at?: string | null
+          acquired_price?: number | null
+          asset_id?: string | null
+          id?: string
+          last_used_at?: string | null
+          quantity?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "emotion_portfolio_asset_id_fkey"
+            columns: ["asset_id"]
+            isOneToOne: false
+            referencedRelation: "emotion_assets"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       emotion_scans: {
         Row: {
@@ -5287,6 +5411,47 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      emotion_transactions: {
+        Row: {
+          asset_id: string | null
+          created_at: string | null
+          id: string
+          price_per_unit: number | null
+          quantity: number | null
+          total_price: number | null
+          transaction_type: string
+          user_id: string
+        }
+        Insert: {
+          asset_id?: string | null
+          created_at?: string | null
+          id?: string
+          price_per_unit?: number | null
+          quantity?: number | null
+          total_price?: number | null
+          transaction_type: string
+          user_id: string
+        }
+        Update: {
+          asset_id?: string | null
+          created_at?: string | null
+          id?: string
+          price_per_unit?: number | null
+          quantity?: number | null
+          total_price?: number | null
+          transaction_type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "emotion_transactions_asset_id_fkey"
+            columns: ["asset_id"]
+            isOneToOne: false
+            referencedRelation: "emotion_assets"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       emotional_boosts: {
         Row: {
@@ -6091,6 +6256,90 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      exchange_leaderboards: {
+        Row: {
+          id: string
+          market_type: string
+          period: string | null
+          rank: number | null
+          recorded_at: string | null
+          score: number
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          market_type: string
+          period?: string | null
+          rank?: number | null
+          recorded_at?: string | null
+          score: number
+          user_id: string
+        }
+        Update: {
+          id?: string
+          market_type?: string
+          period?: string | null
+          rank?: number | null
+          recorded_at?: string | null
+          score?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      exchange_profiles: {
+        Row: {
+          achievements: Json | null
+          avatar_url: string | null
+          badges: Json | null
+          created_at: string | null
+          display_name: string | null
+          emotion_rank: number | null
+          id: string
+          improvement_rank: number | null
+          level: number | null
+          stats: Json | null
+          time_rank: number | null
+          total_xp: number | null
+          trust_rank: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          achievements?: Json | null
+          avatar_url?: string | null
+          badges?: Json | null
+          created_at?: string | null
+          display_name?: string | null
+          emotion_rank?: number | null
+          id?: string
+          improvement_rank?: number | null
+          level?: number | null
+          stats?: Json | null
+          time_rank?: number | null
+          total_xp?: number | null
+          trust_rank?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          achievements?: Json | null
+          avatar_url?: string | null
+          badges?: Json | null
+          created_at?: string | null
+          display_name?: string | null
+          emotion_rank?: number | null
+          id?: string
+          improvement_rank?: number | null
+          level?: number | null
+          stats?: Json | null
+          time_rank?: number | null
+          total_xp?: number | null
+          trust_rank?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
       }
       executive_business_metrics: {
         Row: {
@@ -7488,6 +7737,125 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      improvement_goals: {
+        Row: {
+          ai_analysis: Json | null
+          completed_at: string | null
+          created_at: string | null
+          current_value: number | null
+          description: string | null
+          goal_type: string
+          id: string
+          improvement_score: number | null
+          started_at: string | null
+          status: string | null
+          target_date: string | null
+          target_value: number | null
+          title: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          ai_analysis?: Json | null
+          completed_at?: string | null
+          created_at?: string | null
+          current_value?: number | null
+          description?: string | null
+          goal_type: string
+          id?: string
+          improvement_score?: number | null
+          started_at?: string | null
+          status?: string | null
+          target_date?: string | null
+          target_value?: number | null
+          title: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          ai_analysis?: Json | null
+          completed_at?: string | null
+          created_at?: string | null
+          current_value?: number | null
+          description?: string | null
+          goal_type?: string
+          id?: string
+          improvement_score?: number | null
+          started_at?: string | null
+          status?: string | null
+          target_date?: string | null
+          target_value?: number | null
+          title?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      improvement_logs: {
+        Row: {
+          ai_feedback: string | null
+          created_at: string | null
+          goal_id: string | null
+          id: string
+          metadata: Json | null
+          new_value: number
+          user_id: string
+          value_change: number
+        }
+        Insert: {
+          ai_feedback?: string | null
+          created_at?: string | null
+          goal_id?: string | null
+          id?: string
+          metadata?: Json | null
+          new_value: number
+          user_id: string
+          value_change: number
+        }
+        Update: {
+          ai_feedback?: string | null
+          created_at?: string | null
+          goal_id?: string | null
+          id?: string
+          metadata?: Json | null
+          new_value?: number
+          user_id?: string
+          value_change?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "improvement_logs_goal_id_fkey"
+            columns: ["goal_id"]
+            isOneToOne: false
+            referencedRelation: "improvement_goals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      improvement_market_history: {
+        Row: {
+          avg_score: number
+          goal_type: string
+          id: string
+          participants_count: number | null
+          recorded_at: string | null
+        }
+        Insert: {
+          avg_score: number
+          goal_type: string
+          id?: string
+          participants_count?: number | null
+          recorded_at?: string | null
+        }
+        Update: {
+          avg_score?: number
+          goal_type?: string
+          id?: string
+          participants_count?: number | null
+          recorded_at?: string | null
+        }
+        Relationships: []
       }
       incident_reports: {
         Row: {
@@ -16085,6 +16453,144 @@ export type Database = {
         }
         Relationships: []
       }
+      time_exchanges: {
+        Row: {
+          completed_at: string | null
+          created_at: string | null
+          exchange_for_offer_id: string | null
+          feedback: string | null
+          hours_exchanged: number
+          id: string
+          offer_id: string | null
+          provider_id: string
+          rating_given: number | null
+          rating_received: number | null
+          requester_id: string
+          scheduled_at: string | null
+          status: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string | null
+          exchange_for_offer_id?: string | null
+          feedback?: string | null
+          hours_exchanged: number
+          id?: string
+          offer_id?: string | null
+          provider_id: string
+          rating_given?: number | null
+          rating_received?: number | null
+          requester_id: string
+          scheduled_at?: string | null
+          status?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string | null
+          exchange_for_offer_id?: string | null
+          feedback?: string | null
+          hours_exchanged?: number
+          id?: string
+          offer_id?: string | null
+          provider_id?: string
+          rating_given?: number | null
+          rating_received?: number | null
+          requester_id?: string
+          scheduled_at?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "time_exchanges_exchange_for_offer_id_fkey"
+            columns: ["exchange_for_offer_id"]
+            isOneToOne: false
+            referencedRelation: "time_offers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "time_exchanges_offer_id_fkey"
+            columns: ["offer_id"]
+            isOneToOne: false
+            referencedRelation: "time_offers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      time_market_rates: {
+        Row: {
+          category: string
+          current_rate: number | null
+          demand_index: number | null
+          id: string
+          supply_count: number | null
+          trend: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          category: string
+          current_rate?: number | null
+          demand_index?: number | null
+          id?: string
+          supply_count?: number | null
+          trend?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string
+          current_rate?: number | null
+          demand_index?: number | null
+          id?: string
+          supply_count?: number | null
+          trend?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      time_offers: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          hours_available: number
+          id: string
+          rating: number | null
+          reviews_count: number | null
+          skill_category: string
+          skill_name: string
+          status: string | null
+          time_value: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          hours_available?: number
+          id?: string
+          rating?: number | null
+          reviews_count?: number | null
+          skill_category: string
+          skill_name: string
+          status?: string | null
+          time_value?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          hours_available?: number
+          id?: string
+          rating?: number | null
+          reviews_count?: number | null
+          skill_category?: string
+          skill_name?: string
+          status?: string | null
+          time_value?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       tournament_matches: {
         Row: {
           completed_at: string | null
@@ -16272,6 +16778,123 @@ export type Database = {
           status?: string
           tournament_type?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      trust_profiles: {
+        Row: {
+          badges: Json | null
+          created_at: string | null
+          id: string
+          level: string | null
+          total_given: number | null
+          total_received: number | null
+          trust_score: number | null
+          updated_at: string | null
+          user_id: string
+          verified_actions: number | null
+        }
+        Insert: {
+          badges?: Json | null
+          created_at?: string | null
+          id?: string
+          level?: string | null
+          total_given?: number | null
+          total_received?: number | null
+          trust_score?: number | null
+          updated_at?: string | null
+          user_id: string
+          verified_actions?: number | null
+        }
+        Update: {
+          badges?: Json | null
+          created_at?: string | null
+          id?: string
+          level?: string | null
+          total_given?: number | null
+          total_received?: number | null
+          trust_score?: number | null
+          updated_at?: string | null
+          user_id?: string
+          verified_actions?: number | null
+        }
+        Relationships: []
+      }
+      trust_projects: {
+        Row: {
+          backers_count: number | null
+          category: string
+          created_at: string | null
+          creator_id: string
+          description: string | null
+          id: string
+          status: string | null
+          title: string
+          trust_pool: number | null
+          updated_at: string | null
+          verified: boolean | null
+        }
+        Insert: {
+          backers_count?: number | null
+          category: string
+          created_at?: string | null
+          creator_id: string
+          description?: string | null
+          id?: string
+          status?: string | null
+          title: string
+          trust_pool?: number | null
+          updated_at?: string | null
+          verified?: boolean | null
+        }
+        Update: {
+          backers_count?: number | null
+          category?: string
+          created_at?: string | null
+          creator_id?: string
+          description?: string | null
+          id?: string
+          status?: string | null
+          title?: string
+          trust_pool?: number | null
+          updated_at?: string | null
+          verified?: boolean | null
+        }
+        Relationships: []
+      }
+      trust_transactions: {
+        Row: {
+          amount: number
+          created_at: string | null
+          from_user_id: string
+          id: string
+          reason: string | null
+          to_project_id: string | null
+          to_user_id: string | null
+          transaction_type: string
+          verified: boolean | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          from_user_id: string
+          id?: string
+          reason?: string | null
+          to_project_id?: string | null
+          to_user_id?: string | null
+          transaction_type: string
+          verified?: boolean | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          from_user_id?: string
+          id?: string
+          reason?: string | null
+          to_project_id?: string | null
+          to_user_id?: string | null
+          transaction_type?: string
+          verified?: boolean | null
         }
         Relationships: []
       }

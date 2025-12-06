@@ -90,6 +90,9 @@ verify_jwt = false
 [functions.collect-system-metrics]
 verify_jwt = false
 
+[functions.exchange-ai]
+verify_jwt = true
+
 [api]
 enabled = true
 port = 54321
@@ -140,7 +143,5 @@ enable_signup = true
 double_confirm_changes = true
 enable_confirmations = false
 
-# Cron jobs
-# Vérification des activités suspectes toutes les heures
 [pg_cron]
 enabled = true
