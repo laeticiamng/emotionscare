@@ -25,7 +25,7 @@ export function JournalSettingsLink({
       asChild
       {...props}
     >
-      <Link to="/app/journal/settings" aria-label="Paramètres du journal">
+      <Link to="/settings/journal" aria-label="Paramètres du journal">
         <Settings className="h-4 w-4" aria-hidden="true" />
         <span className="hidden sm:inline">Paramètres</span>
       </Link>

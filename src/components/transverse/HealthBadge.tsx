@@ -65,7 +65,7 @@ export function HealthBadge() {
     <Badge
       variant={getVariant()}
       className="cursor-pointer hover:opacity-80 transition-opacity"
-      onClick={() => navigate("/b2b/admin/api-monitoring")}
+      onClick={() => navigate("/admin/api-monitoring")}
       aria-label={`Santé du système: ${getLabel()}`}
     >
       {getIcon()}

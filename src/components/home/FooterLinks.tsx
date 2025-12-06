@@ -36,10 +36,10 @@ const FooterLinks: React.FC = () => {
               </li>
               <li>
                 <button 
-                  onClick={() => navigate('/features')}
+                  onClick={() => navigate('/demo')}
                   className="text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  Fonctionnalités
+                  Démo
                 </button>
               </li>
               <li>
@@ -52,10 +52,10 @@ const FooterLinks: React.FC = () => {
               </li>
               <li>
                 <button 
-                  onClick={() => navigate('/integrations')}
+                  onClick={() => navigate('/store')}
                   className="text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  Intégrations
+                  Boutique
                 </button>
               </li>
             </ul>
@@ -67,10 +67,10 @@ const FooterLinks: React.FC = () => {
             <ul className="space-y-2 text-sm">
               <li>
                 <button 
-                  onClick={() => navigate('/support')}
+                  onClick={() => navigate('/help')}
                   className="text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  Support
+                  Aide
                 </button>
               </li>
               <li>
@@ -83,18 +83,10 @@ const FooterLinks: React.FC = () => {
               </li>
               <li>
                 <button 
-                  onClick={() => navigate('/documentation')}
+                  onClick={() => navigate('/contact')}
                   className="text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  Documentation
-                </button>
-              </li>
-              <li>
-                <button 
-                  onClick={() => navigate('/blog')}
-                  className="text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  Blog
+                  Contact
                 </button>
               </li>
             </ul>
