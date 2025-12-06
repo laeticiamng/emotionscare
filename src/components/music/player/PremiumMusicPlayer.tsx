@@ -125,6 +125,7 @@ const PremiumMusicPlayer: React.FC<PremiumMusicPlayerProps> = ({
                 variant="ghost"
                 size="icon"
                 onClick={() => setShowFullscreen(true)}
+                aria-label="Plein écran"
               >
                 <Maximize2 className="h-4 w-4" />
               </Button>
@@ -213,6 +214,7 @@ const PremiumMusicPlayer: React.FC<PremiumMusicPlayerProps> = ({
                   size="icon"
                   onClick={() => setShowFullscreen(true)}
                   className="hover:bg-primary/10"
+                  aria-label="Plein écran"
                 >
                   <Maximize2 className="h-4 w-4" />
                 </Button>

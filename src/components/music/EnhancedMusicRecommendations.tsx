@@ -96,6 +96,7 @@ const EnhancedMusicRecommendations: React.FC<EnhancedMusicRecommendationsProps> 
               size="icon"
               variant="ghost"
               className="h-10 w-10 rounded-full bg-primary/10 hover:bg-primary/20"
+              aria-label={`Lire ${track.title}`}
             >
               <Play className="h-4 w-4" />
             </Button>
@@ -120,6 +121,7 @@ const EnhancedMusicRecommendations: React.FC<EnhancedMusicRecommendationsProps> 
               size="icon"
               onClick={() => toggleFavorite(track.id)}
               className={favorites.has(track.id) ? 'text-red-500 hover:text-red-600' : 'text-muted-foreground'}
+              aria-label={favorites.has(track.id) ? "Retirer des favoris" : "Ajouter aux favoris"}
             >
               <Heart className={`h-4 w-4 ${favorites.has(track.id) ? 'fill-current' : ''}`} />
             </Button>

@@ -192,7 +192,7 @@ const CreationsList: React.FC = () => {
                   </div>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon">
+                      <Button variant="ghost" size="icon" aria-label="Options">
                         <MoreHorizontal className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
@@ -267,6 +267,7 @@ const CreationsList: React.FC = () => {
                   size="icon" 
                   className="mr-4"
                   onClick={() => handlePlay(creation.id)}
+                  aria-label={currentlyPlaying === creation.id ? "Mettre en pause" : "Lire"}
                 >
                   {currentlyPlaying === creation.id ? (
                     <Pause className="h-5 w-5" />
@@ -289,13 +290,13 @@ const CreationsList: React.FC = () => {
                 </div>
                 
                 <div className="flex items-center space-x-2 ml-4">
-                  <Button variant="ghost" size="icon" onClick={() => handleDownload(creation.id)}>
+                  <Button variant="ghost" size="icon" onClick={() => handleDownload(creation.id)} aria-label="Télécharger">
                     <Download className="h-4 w-4" />
                   </Button>
                   
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon">
+                      <Button variant="ghost" size="icon" aria-label="Options">
                         <MoreHorizontal className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
