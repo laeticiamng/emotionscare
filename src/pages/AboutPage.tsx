@@ -161,8 +161,8 @@ const AboutPage: React.FC = () => {
                 <nav aria-label="Actions principales" className="flex flex-wrap justify-center gap-4">
                   <Button 
                     size="lg" 
-                    onClick={() => navigate('/auth')}
-                    onKeyDown={(e) => handleKeyDown(e, () => navigate('/auth'))}
+                    onClick={() => navigate('/register')}
+                    onKeyDown={(e) => handleKeyDown(e, () => navigate('/register'))}
                     className="bg-gradient-to-r from-primary to-accent focus:ring-2 focus:ring-primary focus:ring-offset-2"
                     aria-label="Commencer gratuitement avec EmotionsCare"
                     tabIndex={0}
@@ -428,8 +428,8 @@ const AboutPage: React.FC = () => {
                     <nav aria-label="Actions finales" className="flex flex-wrap justify-center gap-4">
                       <Button 
                         size="lg"
-                        onClick={() => navigate('/auth')}
-                        onKeyDown={(e) => handleKeyDown(e, () => navigate('/auth'))}
+                        onClick={() => navigate('/register')}
+                        onKeyDown={(e) => handleKeyDown(e, () => navigate('/register'))}
                         className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 focus:ring-2 focus:ring-primary focus:ring-offset-2"
                         aria-label="Commencer maintenant avec EmotionsCare"
                         tabIndex={0}

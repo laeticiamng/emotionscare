@@ -20,14 +20,14 @@ export const SuggestionChip: React.FC<SuggestionChipProps> = ({
   const handleClick = () => {
     // Parse suggestion to route to appropriate module
     if (suggestion.toLowerCase().includes('silk')) {
-      navigate('/screen-silk');
+      navigate('/app/screen-silk');
     } else if (suggestion.toLowerCase().includes('glow')) {
-      navigate('/flash-glow'); 
+      navigate('/app/flash-glow'); 
     } else if (suggestion.toLowerCase().includes('vr')) {
-      navigate('/vr-galaxy');
+      navigate('/app/vr-galaxy');
     } else {
       // Default to dashboard
-      navigate('/dashboard');
+      navigate('/app/consumer/home');
     }
   };
 

@@ -203,7 +203,7 @@ export function useVoiceAssistant(options: VoiceAssistantOptions = {}) {
         break;
       
       case 'start_meditation':
-        navigate('/meditation');
+        navigate('/app/meditation');
         break;
       
       case 'play_music':
@@ -217,21 +217,21 @@ export function useVoiceAssistant(options: VoiceAssistantOptions = {}) {
         break;
       
       case 'coach_chat':
-        navigate('/coach-chat');
+        navigate('/app/coach');
         break;
       
       case 'show_dashboard':
-        navigate('/dashboard');
+        navigate('/app/consumer/home');
         break;
       
       case 'search_content':
         // Search with params - silent
         return `🔍 Recherche effectuée avec les paramètres: ${JSON.stringify(params)}`;
-        navigate('/search');
+        navigate('/app/scan');
         break;
       
       case 'help':
-        navigate('/help');
+        navigate('/aide');
         break;
       
       case 'none':

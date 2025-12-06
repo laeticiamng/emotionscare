@@ -64,7 +64,7 @@ export const GlobalHeader: React.FC = () => {
         <div className="flex items-center space-x-2">
           <CartDrawer />
           <Button variant="ghost" size="icon" asChild>
-            <Link to="/profile">
+            <Link to="/settings/profile">
               <User className="h-5 w-5" />
               <span className="sr-only">Profil</span>
             </Link>

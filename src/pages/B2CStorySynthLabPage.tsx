@@ -143,7 +143,7 @@ const B2CStorySynthLabPage: React.FC = () => {
         <Button 
           variant="ghost" 
           size="icon"
-          onClick={() => navigate('/dashboard')}
+          onClick={() => navigate('/app/consumer/home')}
           className="hover:bg-white/10 transition-colors"
           aria-label="Retour au tableau de bord"
         >

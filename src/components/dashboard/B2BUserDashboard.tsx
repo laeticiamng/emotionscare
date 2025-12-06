@@ -135,7 +135,7 @@ const B2BUserDashboard: React.FC = () => {
   };
 
   const handleViewNotifications = () => {
-    navigate('/notifications');
+    navigate('/app/settings/notifications');
   };
 
   return (

@@ -27,7 +27,7 @@ const GuestMenu: React.FC = () => {
 
   const handleDemoMode = () => {
     toast.info('Mode démo activé. Vous pouvez explorer l\'application avec des données de démonstration');
-    navigate('/dashboard');
+    navigate('/app/consumer/home');
   };
 
   const handleHelp = () => {

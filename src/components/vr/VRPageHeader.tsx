@@ -16,7 +16,7 @@ const VRPageHeader: React.FC<VRPageHeaderProps> = ({ onNavigateBack }) => {
     if (onNavigateBack) {
       onNavigateBack();
     } else {
-      navigate('/dashboard');
+      navigate('/app/consumer/home');
     }
   };
   
