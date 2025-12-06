@@ -73,6 +73,7 @@ const MusicDrawer: React.FC<MusicDrawerProps> = ({
               size="icon" 
               onClick={() => handleOpenChange(false)}
               className="rounded-full"
+              aria-label="Fermer le lecteur musical"
             >
               <X className="h-4 w-4" />
             </Button>

@@ -159,6 +159,7 @@ export const UnifiedMusicPlayer: React.FC<UnifiedMusicPlayerProps> = ({
           variant="ghost"
           onClick={handlePlayPause}
           className="h-10 w-10"
+          aria-label={isPlaying ? 'Mettre en pause' : 'Lire'}
         >
           {isPlaying ? (
             <Pause className="h-5 w-5" />
