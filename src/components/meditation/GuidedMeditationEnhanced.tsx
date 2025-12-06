@@ -518,8 +518,9 @@ export default function GuidedMeditationEnhanced() {
                             setCurrentMeditation(meditation);
                             resetMeditation();
                           }}
+                          aria-label={`Lancer la méditation ${meditation.title}`}
                         >
-                          <Play className="h-4 w-4" />
+                          <Play className="h-4 w-4" aria-hidden="true" />
                         </Button>
                         <div className="flex-1">
                           <p className="font-medium">{meditation.title}</p>
@@ -530,8 +531,8 @@ export default function GuidedMeditationEnhanced() {
                           </div>
                         </div>
                       </div>
-                      <Button size="icon" variant="ghost">
-                        <Download className="h-5 w-5" />
+                      <Button size="icon" variant="ghost" aria-label={`Télécharger ${meditation.title}`}>
+                        <Download className="h-5 w-5" aria-hidden="true" />
                       </Button>
                     </CardContent>
                   </Card>
