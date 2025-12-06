@@ -2186,19 +2186,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     },
   },
 
-  // ═══════════════════════════════════════════════════════════
-  // 404 FALLBACK ROUTE (must be last)
-  // ═══════════════════════════════════════════════════════════
-  {
-    name: 'catch-all',
-    path: '/:path*',
-    segment: 'public',
-    layout: 'simple',
-    component: 'UnifiedErrorPage',
-    guard: false,
-    meta: {
-      title: 'Page introuvable - EmotionsCare',
-      description: 'Cette page n\'existe pas',
-    },
-  },
+  // 404 FALLBACK ROUTE - Le fallback '*' est géré directement dans router.tsx
+  // Cette entrée est gardée pour documentation mais n'est pas utilisée
+  // car router.tsx a déjà un catch-all '*' à la fin
 ];
