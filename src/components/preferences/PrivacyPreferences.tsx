@@ -1,8 +1,6 @@
 // @ts-nocheck
-
-// @ts-nocheck
-
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -151,7 +149,7 @@ const PrivacyPreferencesComponent: React.FC<PrivacyPreferencesProps> = ({
       <div className="mt-6 pt-4 border-t">
         <p className="text-sm text-muted-foreground">
           Vous pouvez modifier vos préférences de confidentialité à tout moment.
-          Consultez notre <a href="#" className="text-primary underline">politique de confidentialité</a> pour plus d'informations.
+          Consultez notre <Link to="/legal/privacy" className="text-primary underline">politique de confidentialité</Link> pour plus d'informations.
         </p>
       </div>
     </div>
