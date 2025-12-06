@@ -236,7 +236,7 @@ export const JournalVoiceRecorder: React.FC<JournalVoiceRecorderProps> = ({
             </Button>
           ) : (
             <>
-              <Button onClick={pauseRecording} variant="outline">
+              <Button onClick={pauseRecording} variant="outline" aria-label={isPaused ? "Reprendre l'enregistrement" : "Mettre en pause"}>
                 {isPaused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
               </Button>
               <Button onClick={stopRecording} variant="destructive" className="flex-1">
@@ -252,14 +252,14 @@ export const JournalVoiceRecorder: React.FC<JournalVoiceRecorderProps> = ({
       {audioBlob && !transcription && (
         <div className="space-y-3">
           <div className="flex items-center gap-2 p-3 bg-muted rounded-lg">
-            <Button onClick={playPauseAudio} variant="outline" size="sm">
+            <Button onClick={playPauseAudio} variant="outline" size="sm" aria-label={isPlaying ? "Mettre en pause" : "Écouter l'enregistrement"}>
               {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
             </Button>
             <div className="flex-1">
               <div className="text-sm font-medium">Enregistrement audio</div>
               <div className="text-xs text-muted-foreground">{formatDuration(duration)}</div>
             </div>
-            <Button onClick={deleteRecording} variant="ghost" size="sm">
+            <Button onClick={deleteRecording} variant="ghost" size="sm" aria-label="Supprimer l'enregistrement">
               <Trash2 className="h-4 w-4 text-red-600" />
             </Button>
           </div>

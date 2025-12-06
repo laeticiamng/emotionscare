@@ -205,6 +205,7 @@ export const JournalPhotoUpload: React.FC<JournalPhotoUploadProps> = ({
                 variant="destructive"
                 size="sm"
                 className="absolute top-2 right-2"
+                aria-label="Supprimer la photo"
               >
                 <X className="h-4 w-4" />
               </Button>

@@ -16,6 +16,7 @@ const ThemeSwitcher: React.FC = () => {
       size="icon"
       onClick={toggleTheme}
       className="h-9 w-9"
+      aria-label={theme === 'dark' ? 'Passer au thème clair' : 'Passer au thème sombre'}
     >
       {theme === 'dark' ? (
         <Sun className="h-4 w-4" />
