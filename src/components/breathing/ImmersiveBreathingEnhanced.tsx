@@ -412,7 +412,7 @@ const ImmersiveBreathingEnhanced: React.FC = () => {
                     </Button>
                   ) : (
                     <>
-                      <Button onClick={togglePause} variant="outline" size="lg">
+                      <Button onClick={togglePause} variant="outline" size="lg" aria-label={isPaused ? "Reprendre" : "Mettre en pause"}>
                         {isPaused ? <Play className="h-5 w-5" /> : <Pause className="h-5 w-5" />}
                       </Button>
                       <Button onClick={stopSession} variant="destructive" size="lg">

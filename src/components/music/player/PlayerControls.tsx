@@ -29,6 +29,7 @@ const PlayerControls: React.FC<PlayerControlsProps> = ({
         onClick={onPrevious}
         disabled={loadingTrack}
         className="h-8 w-8"
+        aria-label="Piste précédente"
       >
         <SkipBack className="h-4 w-4" />
       </Button>
@@ -40,6 +41,7 @@ const PlayerControls: React.FC<PlayerControlsProps> = ({
           onClick={onPause}
           disabled={loadingTrack}
           className="h-10 w-10"
+          aria-label="Mettre en pause"
         >
           <Pause className="h-5 w-5" />
         </Button>
@@ -50,6 +52,7 @@ const PlayerControls: React.FC<PlayerControlsProps> = ({
           onClick={onPlay}
           disabled={loadingTrack}
           className="h-10 w-10"
+          aria-label="Lire"
         >
           <Play className="h-5 w-5" />
         </Button>
@@ -61,6 +64,7 @@ const PlayerControls: React.FC<PlayerControlsProps> = ({
         onClick={onNext}
         disabled={loadingTrack}
         className="h-8 w-8"
+        aria-label="Piste suivante"
       >
         <SkipForward className="h-4 w-4" />
       </Button>
