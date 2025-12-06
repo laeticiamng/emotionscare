@@ -73,9 +73,8 @@ export const QuickActions: React.FC = () => {
   const { userMode } = useUserMode();
 
   const getFormattedPath = (path: string) => {
-    if (userMode === 'b2b_user') return `/b2b/user/${path}`;
-    if (userMode === 'b2b_admin') return `/b2b/admin/${path}`;
-    return `/b2c/${path}`;
+    // Utiliser les routes canoniques
+    return `/app/${path}`;
   };
 
   const handleAction = (path: string) => {

@@ -30,19 +30,19 @@ const SystemAudit: React.FC = () => {
     // Routes publiques
     { path: '/', name: 'Accueil', category: 'Public', expectedContent: 'Page d\'accueil avec navigation' },
     { path: '/choose-mode', name: 'Choix du mode', category: 'Public', expectedContent: 'Sélection B2C/B2B' },
-    { path: '/b2b/selection', name: 'Sélection B2B', category: 'Public', expectedContent: 'Choix User/Admin' },
+    { path: '/entreprise', name: 'Sélection B2B', category: 'Public', expectedContent: 'Choix User/Admin' },
     
     // Authentification
-    { path: '/b2c/login', name: 'Connexion B2C', category: 'Auth', expectedContent: 'Formulaire de connexion B2C' },
-    { path: '/b2c/register', name: 'Inscription B2C', category: 'Auth', expectedContent: 'Formulaire d\'inscription B2C' },
-    { path: '/b2b/user/login', name: 'Connexion B2B User', category: 'Auth', expectedContent: 'Formulaire de connexion B2B User' },
-    { path: '/b2b/user/register', name: 'Inscription B2B User', category: 'Auth', expectedContent: 'Formulaire d\'inscription B2B User' },
-    { path: '/b2b/admin/login', name: 'Connexion B2B Admin', category: 'Auth', expectedContent: 'Formulaire de connexion B2B Admin' },
+    { path: '/login?segment=b2c', name: 'Connexion B2C', category: 'Auth', expectedContent: 'Formulaire de connexion B2C' },
+    { path: '/signup?segment=b2c', name: 'Inscription B2C', category: 'Auth', expectedContent: 'Formulaire d\'inscription B2C' },
+    { path: '/login?segment=b2b', name: 'Connexion B2B User', category: 'Auth', expectedContent: 'Formulaire de connexion B2B User' },
+    { path: '/signup?segment=b2b', name: 'Inscription B2B User', category: 'Auth', expectedContent: 'Formulaire d\'inscription B2B User' },
+    { path: '/login?segment=b2b', name: 'Connexion B2B Admin', category: 'Auth', expectedContent: 'Formulaire de connexion B2B Admin' },
     
     // Dashboards
-    { path: '/b2c/dashboard', name: 'Dashboard B2C', category: 'Dashboard', expectedContent: 'Tableau de bord personnel B2C' },
-    { path: '/b2b/user/dashboard', name: 'Dashboard B2B User', category: 'Dashboard', expectedContent: 'Tableau de bord collaborateur' },
-    { path: '/b2b/admin/dashboard', name: 'Dashboard B2B Admin', category: 'Dashboard', expectedContent: 'Tableau de bord administrateur' },
+    { path: '/app/consumer/home', name: 'Dashboard B2C', category: 'Dashboard', expectedContent: 'Tableau de bord personnel B2C' },
+    { path: '/app/employee/home', name: 'Dashboard B2B User', category: 'Dashboard', expectedContent: 'Tableau de bord collaborateur' },
+    { path: '/entreprise', name: 'Dashboard B2B Admin', category: 'Dashboard', expectedContent: 'Tableau de bord administrateur' },
     
     // Fonctionnalités principales
     { path: '/scan', name: 'Scanner Émotions', category: 'Features', expectedContent: 'Interface de scan émotionnel' },

@@ -44,11 +44,11 @@ const MainHeader: React.FC = () => {
     const role = user?.user_metadata?.role;
     switch (role) {
       case 'b2c':
-        return '/b2c/dashboard';
+        return '/app/consumer/home';
       case 'b2b_user':
-        return '/b2b/user/dashboard';
+        return '/app/employee/home';
       case 'b2b_admin':
-        return '/b2b/admin/dashboard';
+        return '/entreprise';
       default:
         return '/';
     }

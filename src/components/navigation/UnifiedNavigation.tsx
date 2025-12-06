@@ -17,9 +17,9 @@ const UnifiedNavigation: React.FC = () => {
   
   // Déterminer le rôle de l'utilisateur basé sur l'URL actuelle
   const getCurrentUserRole = () => {
-    if (location.pathname.startsWith('/b2c')) return 'b2c';
-    if (location.pathname.startsWith('/b2b/user')) return 'b2b_user';
-    if (location.pathname.startsWith('/b2b/admin')) return 'b2b_admin';
+    if (location.pathname.startsWith('/app/consumer')) return 'b2c';
+    if (location.pathname.startsWith('/app/employee')) return 'b2b_user';
+    if (location.pathname.startsWith('/entreprise')) return 'b2b_admin';
     return 'b2c'; // par défaut
   };
 
@@ -30,58 +30,44 @@ const UnifiedNavigation: React.FC = () => {
     const baseItems = [
       { 
         name: 'Dashboard', 
-        href: userRole === 'b2c' ? '/b2c/dashboard' : 
-              userRole === 'b2b_user' ? '/b2b/user/dashboard' : 
-              '/b2b/admin/dashboard',
+        href: userRole === 'b2c' ? '/app/consumer/home' : 
+              userRole === 'b2b_user' ? '/app/employee/home' : 
+              '/entreprise',
         icon: Home 
       },
       { 
         name: 'Scanner', 
-        href: userRole === 'b2c' ? '/b2c/scan' : 
-              userRole === 'b2b_user' ? '/b2b/user/scan' : 
-              '/b2b/admin/scan',
+        href: '/app/scan',
         icon: Scan 
       },
       { 
         name: 'Musique', 
-        href: userRole === 'b2c' ? '/b2c/music' : 
-              userRole === 'b2b_user' ? '/b2b/user/music' : 
-              '/b2b/admin/music',
+        href: '/app/music',
         icon: Music 
       },
       { 
         name: 'Coach IA', 
-        href: userRole === 'b2c' ? '/b2c/coach' : 
-              userRole === 'b2b_user' ? '/b2b/user/coach' : 
-              '/b2b/admin/coach',
+        href: '/app/coach',
         icon: MessageCircle 
       },
       { 
         name: 'Journal', 
-        href: userRole === 'b2c' ? '/b2c/journal' : 
-              userRole === 'b2b_user' ? '/b2b/user/journal' : 
-              '/b2b/admin/journal',
+        href: '/app/journal',
         icon: BookOpen 
       },
       { 
         name: 'VR', 
-        href: userRole === 'b2c' ? '/b2c/vr' : 
-              userRole === 'b2b_user' ? '/b2b/user/vr' : 
-              '/b2b/admin/vr',
+        href: '/app/vr',
         icon: Headphones 
       },
       { 
         name: 'Gamification', 
-        href: userRole === 'b2c' ? '/b2c/gamification' : 
-              userRole === 'b2b_user' ? '/b2b/user/gamification' : 
-              '/b2b/admin/gamification',
+        href: '/app/gamification',
         icon: Gamepad2 
       },
       { 
         name: 'Cocon Social', 
-        href: userRole === 'b2c' ? '/b2c/social-cocon' : 
-              userRole === 'b2b_user' ? '/b2b/user/social-cocon' : 
-              '/b2b/admin/social-cocon',
+        href: '/app/social-cocon',
         icon: Users 
       },
     ];
@@ -89,19 +75,19 @@ const UnifiedNavigation: React.FC = () => {
     // Ajouter les éléments spécifiques aux admins B2B
     if (userRole === 'b2b_admin') {
       baseItems.push(
-        { name: 'Équipes', href: '/b2b/admin/teams', icon: Users },
-        { name: 'Rapports', href: '/b2b/admin/reports', icon: BarChart3 },
-        { name: 'Événements', href: '/b2b/admin/events', icon: Calendar },
-        { name: 'Optimisation', href: '/b2b/admin/optimisation', icon: TrendingUp },
+        { name: 'Équipes', href: '/entreprise/teams', icon: Users },
+        { name: 'Rapports', href: '/entreprise/reports', icon: BarChart3 },
+        { name: 'Événements', href: '/entreprise/events', icon: Calendar },
+        { name: 'Optimisation', href: '/entreprise/optimisation', icon: TrendingUp },
       );
     }
 
     // Ajouter les préférences pour tous
     baseItems.push({ 
       name: 'Préférences', 
-      href: userRole === 'b2c' ? '/b2c/preferences' : 
-            userRole === 'b2b_user' ? '/b2b/user/preferences' : 
-            '/b2b/admin/settings',
+      href: userRole === 'b2c' ? '/settings/preferences' : 
+            userRole === 'b2b_user' ? '/settings/preferences' : 
+            '/entreprise/settings',
       icon: Settings 
     });
 

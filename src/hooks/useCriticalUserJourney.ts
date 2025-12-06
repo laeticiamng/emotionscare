@@ -74,7 +74,7 @@ const CRITICAL_JOURNEYS: Record<string, Journey> = {
       {
         id: 'dashboard_first_visit',
         name: 'Premier accès au dashboard',
-        path: '/b2c/dashboard',
+        path: '/app/consumer/home',
         isRequired: true,
       },
     ],
@@ -95,7 +95,7 @@ const CRITICAL_JOURNEYS: Record<string, Journey> = {
       {
         id: 'dashboard_access',
         name: 'Accès au dashboard',
-        path: '/b2c/dashboard',
+        path: '/app/consumer/home',
         isRequired: true,
       },
     ],
@@ -109,20 +109,20 @@ const CRITICAL_JOURNEYS: Record<string, Journey> = {
       {
         id: 'scan_start',
         name: 'Démarrage du scan',
-        path: '/b2c/scan',
+        path: '/app/scan',
         isRequired: true,
       },
       {
         id: 'scan_process',
         name: 'Processus de scan',
-        path: '/b2c/scan/process',
+        path: '/app/scan/process',
         isRequired: true,
         maxDurationMs: 5 * 60 * 1000,
       },
       {
         id: 'scan_results',
         name: 'Résultats du scan',
-        path: '/b2c/scan/results',
+        path: '/app/scan/results',
         isRequired: true,
       },
     ],

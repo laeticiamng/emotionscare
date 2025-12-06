@@ -17,7 +17,7 @@ const CallToAction: React.FC<CallToActionProps> = ({ type }) => {
       title: 'Espace Particulier',
       description: 'Accédez à votre espace personnel pour analyser vos émotions et améliorer votre bien-être.',
       icon: Heart,
-      path: '/b2c/login',
+      path: '/login?segment=b2c',
       gradient: 'from-pink-500 to-purple-600',
       features: ['Analyse émotionnelle personnelle', 'Musique thérapeutique', 'Coach IA personnel', 'Journal intime']
     },
@@ -25,7 +25,7 @@ const CallToAction: React.FC<CallToActionProps> = ({ type }) => {
       title: 'Espace Entreprise',
       description: 'Solutions complètes pour le bien-être émotionnel de vos équipes et collaborateurs.',
       icon: Building2,
-      path: '/b2b/selection',
+      path: '/entreprise',
       gradient: 'from-blue-500 to-cyan-600',
       features: ['Gestion des équipes', 'Analytics RH', 'Rapports détaillés', 'Suivi collaborateurs']
     }
