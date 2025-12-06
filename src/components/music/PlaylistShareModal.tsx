@@ -119,7 +119,7 @@ export const PlaylistShareModal: React.FC<PlaylistShareModalProps> = ({
                   readOnly
                   className="flex-1 px-3 py-2 bg-muted rounded-md text-sm"
                 />
-                <Button onClick={copyToClipboard} size="icon" variant="outline">
+                <Button onClick={copyToClipboard} size="icon" variant="outline" aria-label="Copier le lien">
                   <Copy className="h-4 w-4" />
                 </Button>
               </div>

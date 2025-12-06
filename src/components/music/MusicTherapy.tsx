@@ -158,11 +158,11 @@ const MusicTherapy: React.FC = () => {
                 
                 {/* Contrôles de lecture */}
                 <div className="flex items-center space-x-4 mt-3">
-                  <Button variant="ghost" size="icon">
+                  <Button variant="ghost" size="icon" aria-label="Piste précédente">
                     <SkipBack className="h-4 w-4" />
                   </Button>
                   
-                  <Button onClick={togglePlayPause} size="icon">
+                  <Button onClick={togglePlayPause} size="icon" aria-label={isPlaying ? "Mettre en pause" : "Lire"}>
                     {isPlaying ? (
                       <Pause className="h-4 w-4" />
                     ) : (
@@ -170,7 +170,7 @@ const MusicTherapy: React.FC = () => {
                     )}
                   </Button>
                   
-                  <Button variant="ghost" size="icon">
+                  <Button variant="ghost" size="icon" aria-label="Piste suivante">
                     <SkipForward className="h-4 w-4" />
                   </Button>
                   

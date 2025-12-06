@@ -152,6 +152,7 @@ export const PersonalizedPlaylistRecommendations: React.FC<PersonalizedPlaylistR
                   variant={playlist.isFavorite ? 'default' : 'outline'}
                   size="icon"
                   onClick={() => handleToggleFavorite(playlist)}
+                  aria-label={playlist.isFavorite ? "Retirer des favoris" : "Ajouter aux favoris"}
                 >
                   <Heart
                     className={`h-4 w-4 ${playlist.isFavorite ? 'fill-current' : ''}`}

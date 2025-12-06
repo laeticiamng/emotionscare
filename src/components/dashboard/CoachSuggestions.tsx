@@ -58,7 +58,7 @@ const CoachSuggestions: React.FC = () => {
                   <p className="text-xs text-muted-foreground">{suggestion.description}</p>
                 </div>
                 
-                <Button variant="ghost" size="icon" className="rounded-full h-6 w-6">
+                <Button variant="ghost" size="icon" className="rounded-full h-6 w-6" aria-label={`Voir ${suggestion.title}`}>
                   <ArrowRight className="h-3 w-3" />
                 </Button>
               </div>

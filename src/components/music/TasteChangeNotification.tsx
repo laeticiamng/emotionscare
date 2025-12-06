@@ -83,6 +83,7 @@ export const TasteChangeNotification: React.FC<TasteChangeNotificationProps> = (
                       size="icon"
                       className="h-6 w-6 -mt-1 -mr-1"
                       onClick={handleDismiss}
+                      aria-label="Fermer la notification"
                     >
                       <X className="h-4 w-4" />
                     </Button>

@@ -229,6 +229,7 @@ const VirtualCoach: React.FC = () => {
                 size="icon"
                 onClick={() => setVoiceEnabled(!voiceEnabled)}
                 className={voiceEnabled ? 'text-blue-500' : 'text-muted-foreground'}
+                aria-label={voiceEnabled ? "Désactiver la voix" : "Activer la voix"}
               >
                 {voiceEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
               </Button>
@@ -382,6 +383,7 @@ const VirtualCoach: React.FC = () => {
                 variant={isListening ? 'destructive' : 'outline'}
                 size="icon"
                 disabled={isLoading}
+                aria-label={isListening ? "Arrêter l'enregistrement" : "Enregistrer un message vocal"}
               >
                 {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
               </Button>
@@ -389,6 +391,7 @@ const VirtualCoach: React.FC = () => {
                 onClick={handleSendMessage}
                 disabled={!currentMessage.trim() || isLoading}
                 size="icon"
+                aria-label="Envoyer le message"
               >
                 <Send className="h-4 w-4" />
               </Button>

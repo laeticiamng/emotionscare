@@ -127,6 +127,7 @@ export const CriticalAlertsNotification: React.FC<CriticalAlertsNotificationProp
                   variant="ghost"
                   onClick={() => setDismissed(true)}
                   className="h-8 w-8 hover:bg-destructive-foreground/10"
+                  aria-label="Fermer la notification"
                 >
                   <X className="h-4 w-4" />
                 </Button>
