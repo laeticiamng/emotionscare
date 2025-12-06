@@ -347,7 +347,7 @@ export default function ModulesDashboard() {
       {selectedCategory === 'all' && selectedStatus === 'all' && !searchQuery && (
         <div className="space-y-4">
           <h2 className="text-2xl font-bold flex items-center gap-2">
-            <Star className="h-6 w-6 text-warning fill-warning" />
+            <Star className="h-6 w-6 text-warning fill-warning" aria-hidden="true" />
             Modules mis en avant
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -360,7 +360,7 @@ export default function ModulesDashboard() {
                 >
                   <CardHeader>
                     <div className="flex items-start justify-between">
-                      <div className={`p-3 rounded-lg bg-gradient-to-br ${module.color} text-white group-hover:scale-110 transition-transform shadow-lg`}>
+                      <div className={`p-3 rounded-lg bg-gradient-to-br ${module.color} text-white group-hover:scale-110 transition-transform shadow-lg`} aria-hidden="true">
                         <Icon className="h-7 w-7" />
                       </div>
                       {getStatusBadge(module.status)}
@@ -369,7 +369,7 @@ export default function ModulesDashboard() {
                     <CardDescription>{module.description}</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <Link to={module.url}>
+                    <Link to={module.url} aria-label={`Accéder au module ${module.title}`}>
                       <Button 
                         className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors"
                         variant="outline"
@@ -397,7 +397,7 @@ export default function ModulesDashboard() {
             >
               <Card className="border-2 hover:border-primary/50 transition-colors cursor-pointer h-full">
                 <CardHeader className="pb-3">
-                  <div className={`w-3 h-3 rounded-full ${cat.color} mb-2`} />
+                  <div className={`w-3 h-3 rounded-full ${cat.color} mb-2`} aria-hidden="true" />
                   <CardTitle className="text-sm">{cat.name}</CardTitle>
                   <CardDescription className="text-xs">{cat.description}</CardDescription>
                 </CardHeader>

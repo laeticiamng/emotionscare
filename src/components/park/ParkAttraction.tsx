@@ -44,13 +44,17 @@ export const ParkAttraction: React.FC<ParkAttractionProps> = ({
     >
       <Card
         onClick={() => navigate(route)}
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigate(route); }}}
+        role="button"
+        tabIndex={0}
+        aria-label={`${title} - ${subtitle}. ${description}`}
         className={`
           relative overflow-hidden cursor-pointer h-full
           bg-gradient-to-br ${gradient}
           backdrop-blur-sm border-2 border-border/50
           hover:border-primary/60 hover:shadow-2xl
           transition-all duration-300
-          group
+          group focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2
         `}
       >
         {/* Animated background particles */}
@@ -96,13 +100,13 @@ export const ParkAttraction: React.FC<ParkAttractionProps> = ({
             ease: "easeInOut"
           }}
         >
-          <Sparkles className="h-5 w-5" />
+          <Sparkles className="h-5 w-5" aria-hidden="true" />
         </motion.div>
 
         <CardHeader className="relative z-10 pb-3">
           <div className="flex items-start gap-3 mb-2">
             <div className="p-3 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/20 backdrop-blur-sm">
-              <Icon className="h-6 w-6 text-primary" />
+              <Icon className="h-6 w-6 text-primary" aria-hidden="true" />
             </div>
             <div className="flex-1">
               <CardTitle className="text-lg mb-1 group-hover:text-primary transition-colors">
@@ -139,7 +143,7 @@ export const ParkAttraction: React.FC<ParkAttractionProps> = ({
                   ease: "easeInOut"
                 }}
               >
-                <Sparkles className="h-3 w-3 text-primary" />
+                <Sparkles className="h-3 w-3 text-primary" aria-hidden="true" />
               </motion.div>
               <span className="font-medium text-muted-foreground group-hover:text-foreground transition-colors">
                 {collection}

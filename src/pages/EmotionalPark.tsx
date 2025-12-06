@@ -311,8 +311,9 @@ export default function EmotionalPark() {
                     setShowSuggestions(false);
                   }}
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  aria-label="Effacer la recherche"
                 >
-                  <X className="h-4 w-4" />
+                  <X className="h-4 w-4" aria-hidden="true" />
                 </button>
               )}
               
@@ -433,8 +434,10 @@ export default function EmotionalPark() {
               size="sm"
               onClick={() => setShowStatistics(!showStatistics)}
               className="gap-1"
+              aria-label={showStatistics ? "Masquer les statistiques" : "Afficher les statistiques"}
+              aria-expanded={showStatistics}
             >
-              <ChevronDown className={`h-4 w-4 transition-transform ${showStatistics ? 'rotate-180' : ''}`} />
+              <ChevronDown className={`h-4 w-4 transition-transform ${showStatistics ? 'rotate-180' : ''}`} aria-hidden="true" />
             </Button>
           </div>
 
@@ -619,7 +622,11 @@ export default function EmotionalPark() {
                           key={attraction.id}
                           id={`attraction-${attraction.id}`}
                           onClick={() => handleAttractionClick(attraction)}
-                          className={`relative ${tourActive && currentStep?.attractionId === attraction.id ? 'ring-4 ring-primary rounded-xl animate-pulse' : ''}`}
+                          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleAttractionClick(attraction); }}}
+                          role="button"
+                          tabIndex={0}
+                          aria-label={`Accéder à ${attraction.title} - ${attraction.subtitle}`}
+                          className={`relative cursor-pointer ${tourActive && currentStep?.attractionId === attraction.id ? 'ring-4 ring-primary rounded-xl animate-pulse' : ''}`}
                         >
                           <ParkAttraction
                             {...attraction}
@@ -630,8 +637,9 @@ export default function EmotionalPark() {
                               initial={{ scale: 0 }}
                               animate={{ scale: 1 }}
                               className="absolute top-3 right-3 bg-primary text-primary-foreground rounded-full p-1.5 shadow-lg z-10"
+                              aria-label="Attraction visitée"
                             >
-                              <Star className="h-3 w-3 fill-current" />
+                              <Star className="h-3 w-3 fill-current" aria-hidden="true" />
                             </motion.div>
                           )}
                         </div>
@@ -668,7 +676,11 @@ export default function EmotionalPark() {
                     <div
                       key={attraction.id}
                       onClick={() => handleAttractionClick(attraction)}
-                      className="relative"
+                      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleAttractionClick(attraction); }}}
+                      role="button"
+                      tabIndex={0}
+                      aria-label={`Accéder à ${attraction.title} - ${attraction.subtitle}`}
+                      className="relative cursor-pointer"
                     >
                       <ParkAttraction
                         {...attraction}
@@ -679,8 +691,9 @@ export default function EmotionalPark() {
                           initial={{ scale: 0 }}
                           animate={{ scale: 1 }}
                           className="absolute top-3 right-3 bg-primary text-primary-foreground rounded-full p-1.5 shadow-lg z-10"
+                          aria-label="Attraction visitée"
                         >
-                          <Star className="h-3 w-3 fill-current" />
+                          <Star className="h-3 w-3 fill-current" aria-hidden="true" />
                         </motion.div>
                       )}
                     </div>
