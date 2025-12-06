@@ -164,6 +164,18 @@ const CameraSampler: React.FC<CameraSamplerProps> = ({ onPermissionChange, onUna
         return;
       }
 
+      // Vérifier que data contient une émotion valide
+      if (!data || !data.label) {
+        logger.warn('[CameraSampler] No valid emotion data received, using neutral', 'FEATURE');
+        // Continuer avec émotion neutre plutôt que de planter
+        const neutralData = { label: 'neutre', confidence: 0.5 };
+        Object.assign(data || {}, neutralData);
+        if (!data) {
+          setEdgeReady(true);
+          return;
+        }
+      }
+
       // Mapper les émotions vers valence/arousal (panel élargi 40+ émotions comme Hume)
       const emotionToValenceArousal = (label: string) => {
         const map: Record<string, { valence: number; arousal: number }> = {
