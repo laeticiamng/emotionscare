@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React from 'react';
+import { useState, useEffect, ReactNode, FC } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { HelmetProvider } from 'react-helmet-async';
 import { logger } from '@/lib/logger';
@@ -33,16 +33,16 @@ const createQueryClient = () =>
   });
 
 interface RootProviderProps {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 const useI18nReady = () => {
-  const [ready, setReady] = React.useState(() => {
+  const [ready, setReady] = useState(() => {
     // Try to determine if i18n is ready immediately
     return i18n.isInitialized || i18n.language !== undefined;
   });
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (ready) {
       return;
     }
@@ -81,14 +81,14 @@ const useI18nReady = () => {
   return ready;
 };
 
-const I18nBootstrap: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+const I18nBootstrap: FC<{ children: ReactNode }> = ({ children }) => {
   // ✅ FIX: Render immediately instead of waiting for i18n
   // i18n will load in background without blocking app render
   return <I18nProvider>{children}</I18nProvider>;
 };
 
 export function RootProvider({ children }: RootProviderProps) {
-  const [queryClient] = React.useState(createQueryClient);
+  const [queryClient] = useState(createQueryClient);
   const resolvedDefaultTheme = 'system';
 
   return (
