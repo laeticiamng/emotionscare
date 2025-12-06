@@ -225,6 +225,7 @@ const ChallengesDashboard: React.FC = () => {
                       variant="ghost"
                       size="icon"
                       onClick={() => navigate(`/admin/challenges/edit/${challenge.id}`)}
+                      aria-label="Modifier le défi"
                     >
                       <Edit className="w-4 h-4" />
                     </Button>
@@ -236,6 +237,7 @@ const ChallengesDashboard: React.FC = () => {
                           deleteChallenge(challenge.id);
                         }
                       }}
+                      aria-label="Supprimer le défi"
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>

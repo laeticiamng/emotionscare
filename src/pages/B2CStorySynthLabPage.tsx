@@ -145,6 +145,7 @@ const B2CStorySynthLabPage: React.FC = () => {
           size="icon"
           onClick={() => navigate('/dashboard')}
           className="hover:bg-white/10 transition-colors"
+          aria-label="Retour au tableau de bord"
         >
           <ArrowLeft className="h-5 w-5" />
         </Button>
@@ -206,6 +207,7 @@ const B2CStorySynthLabPage: React.FC = () => {
                 size="icon"
                 onClick={togglePlay}
                 className="hover:bg-white/10"
+                aria-label={isPlaying ? "Mettre en pause" : "Lecture"}
               >
                 {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
               </Button>
@@ -227,6 +229,7 @@ const B2CStorySynthLabPage: React.FC = () => {
                 size="icon"
                 onClick={() => setIsMuted(!isMuted)}
                 className="hover:bg-white/10"
+                aria-label={isMuted ? "Réactiver le son" : "Couper le son"}
               >
                 {isMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
               </Button>

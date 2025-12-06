@@ -339,13 +339,14 @@ export const ScheduledAuditsManager = () => {
                       <Badge variant={schedule.is_active ? 'default' : 'secondary'}>
                         {schedule.is_active ? 'Actif' : 'Inactif'}
                       </Badge>
-                      <Button variant="ghost" size="icon" onClick={() => handleEdit(schedule)}>
+                      <Button variant="ghost" size="icon" onClick={() => handleEdit(schedule)} aria-label="Modifier l'audit planifié">
                         <Edit className="h-4 w-4" />
                       </Button>
                       <Button 
                         variant="ghost" 
                         size="icon" 
                         onClick={() => deleteSchedule(schedule.id)}
+                        aria-label="Supprimer l'audit planifié"
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>

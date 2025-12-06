@@ -332,7 +332,7 @@ const TicketIntegrationConfig: React.FC = () => {
                     </p>
                   </div>
                   {ticket.ticket_url && (
-                    <Button variant="ghost" size="icon" asChild>
+                    <Button variant="ghost" size="icon" asChild aria-label="Ouvrir le ticket">
                       <a href={ticket.ticket_url} target="_blank" rel="noopener noreferrer">
                         <ExternalLink className="h-4 w-4" />
                       </a>

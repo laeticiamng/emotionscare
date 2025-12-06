@@ -240,6 +240,7 @@ export const PDFReportScheduler: React.FC = () => {
                                   variant="ghost"
                                   size="icon"
                                   onClick={() => removeEmailField(index)}
+                                  aria-label="Supprimer l'email"
                                 >
                                   <Trash2 className="h-4 w-4 text-destructive" />
                                 </Button>
@@ -383,6 +384,7 @@ export const PDFReportScheduler: React.FC = () => {
                           variant="ghost"
                           size="icon"
                           onClick={() => deleteSchedule(schedule.id)}
+                          aria-label="Supprimer la planification"
                         >
                           <Trash2 className="h-4 w-4 text-destructive" />
                         </Button>

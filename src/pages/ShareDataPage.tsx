@@ -62,7 +62,7 @@ export default function ShareDataPage() {
                 <p className="font-medium">Partage Coach #{i}</p>
                 <p className="text-muted-foreground">Expire dans 5 jours</p>
               </div>
-              <Button variant="ghost" size="icon">
+              <Button variant="ghost" size="icon" aria-label="Copier le lien de partage">
                 <Copy className="h-4 w-4" />
               </Button>
             </div>

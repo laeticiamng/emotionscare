@@ -241,6 +241,7 @@ export default function WebhooksPage() {
                       variant="ghost"
                       size="icon"
                       onClick={() => handleOpenDialog(webhook)}
+                      aria-label="Modifier le webhook"
                     >
                       <Edit className="h-4 w-4" />
                     </Button>
@@ -248,6 +249,7 @@ export default function WebhooksPage() {
                       variant="ghost"
                       size="icon"
                       onClick={() => handleDeleteWebhook(webhook.id)}
+                      aria-label="Supprimer le webhook"
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>

@@ -15,6 +15,7 @@ export default function HowItAdaptsPage() {
             size="icon"
             onClick={() => navigate(-1)}
             className="rounded-full"
+            aria-label="Retour"
           >
             <ArrowLeft className="h-5 w-5" />
           </Button>

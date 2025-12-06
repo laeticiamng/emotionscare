@@ -100,6 +100,7 @@ const MusicAnalyticsPage: React.FC = () => {
                 variant="ghost"
                 size="icon"
                 onClick={() => navigate('/app/music')}
+                aria-label="Retour à la musique"
               >
                 <ArrowLeft className="h-5 w-5" />
               </Button>
