@@ -8,7 +8,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { routes } from '@/routerV2';
+import { Routes } from '@/routerV2';
 import { Link } from 'react-router-dom';
 import { 
   Users, 
@@ -233,14 +233,14 @@ const B2BTeamsPage: React.FC = () => {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Link to={routes.adminReports?.() || '/admin/reports'}>
+                <Link to={Routes.adminReports()}>
                   <Button variant="outline" className="w-full justify-start">
                     <BarChart3 className="h-4 w-4 mr-2" />
                     Voir les rapports
                   </Button>
                 </Link>
 
-                <Link to={routes.adminEvents?.() || '/admin/events'}>
+                <Link to={Routes.adminEvents()}>
                   <Button variant="outline" className="w-full justify-start">
                     <Calendar className="h-4 w-4 mr-2" />
                     Organiser un événement
