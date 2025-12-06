@@ -215,8 +215,10 @@ const FlashGlowView: React.FC = () => {
   const { toast } = useToast();
   const motion = useMotionPrefs();
   const currentMood = useCurrentMood();
-  const clinicalHints = useClinicalHints();
-  const flashHints = clinicalHints.moduleCues.flashGlow;
+  const clinicalHints = useClinicalHints('flash_glow');
+  const flashHints = {
+    extendDuration: clinicalHints.hints.includes('extend_duration'),
+  };
   const consent = useConsent();
   const { start: startSudsStage, submit: submitSudsStage } = useAssessment('SUDS');
   const [softEffects, setSoftEffects] = useState(motion.prefersReducedMotion);
