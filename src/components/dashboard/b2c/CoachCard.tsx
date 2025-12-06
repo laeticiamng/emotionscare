@@ -14,7 +14,7 @@ const CoachCard: React.FC<CoachCardProps> = ({ className = '' }) => {
   const navigate = useNavigate();
 
   const handleChatWithCoach = () => {
-    navigate('/coach');
+    navigate('/app/coach');
   };
 
   return (

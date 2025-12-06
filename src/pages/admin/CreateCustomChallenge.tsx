@@ -68,7 +68,7 @@ const CreateCustomChallenge = () => {
 
       if (result) {
         toast.success('Défi créé avec succès !');
-        navigate('/app/admin/challenges');
+        navigate('/admin/challenges');
       }
     } catch (error) {
       logger.error('Error creating challenge:', error, 'PAGE');
