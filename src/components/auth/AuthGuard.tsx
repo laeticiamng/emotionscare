@@ -9,12 +9,11 @@ import { logger } from '@/lib/logger';
 const PUBLIC_ROUTES = [
   '/',
   '/choose-mode',
-  '/b2c/login',
-  '/b2c/register',
-  '/b2b/user/login',
-  '/b2b/user/register',
-  '/b2b/admin/login',
-  '/help-center'
+  '/login',
+  '/signup',
+  '/b2c',
+  '/entreprise',
+  '/help'
 ];
 
 interface AuthGuardProps {
@@ -114,18 +113,18 @@ const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
     logger.warn('Access denied - not authenticated, redirecting', { pathname: location.pathname }, 'AUTH');
     
     // Déterminer la page de connexion appropriée selon la route
-    let loginPath = '/choose-mode';
+    let loginPath = '/login';
     
-    if (location.pathname.startsWith('/b2c')) {
-      loginPath = '/b2c/login';
-    } else if (location.pathname.startsWith('/b2b/user')) {
-      loginPath = '/b2b/user/login';
-    } else if (location.pathname.startsWith('/b2b/admin')) {
-      loginPath = '/b2b/admin/login';
+    if (location.pathname.startsWith('/app/consumer')) {
+      loginPath = '/login?segment=b2c';
+    } else if (location.pathname.startsWith('/app/employee')) {
+      loginPath = '/login?segment=b2b';
+    } else if (location.pathname.startsWith('/entreprise')) {
+      loginPath = '/login?segment=b2b';
     }
     
     // Sauvegarder la route de destination pour redirection après connexion
-    const redirectTo = `${loginPath}?redirect=${encodeURIComponent(location.pathname + location.search)}`;
+    const redirectTo = `${loginPath}&redirect=${encodeURIComponent(location.pathname + location.search)}`;
     return <Navigate to={redirectTo} replace />;
   }
 

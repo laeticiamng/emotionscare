@@ -33,7 +33,7 @@ export interface NavItem {
 // Navigation pour utilisateurs B2C (Particuliers)
 export const b2cNavItems: NavItem[] = [
   {
-    href: '/b2c/dashboard',
+    href: '/app/consumer/home',
     title: 'Tableau de bord',
     icon: Home,
     description: 'Vue d\'ensemble de votre bien-être',
@@ -121,7 +121,7 @@ export const b2cNavItems: NavItem[] = [
 // Navigation pour collaborateurs B2B
 export const b2bUserNavItems: NavItem[] = [
   {
-    href: '/b2b/user/dashboard',
+    href: '/app/employee/home',
     title: 'Tableau de bord',
     icon: Home,
     description: 'Vue d\'ensemble personnelle et équipe',
@@ -209,7 +209,7 @@ export const b2bUserNavItems: NavItem[] = [
 // Navigation pour administrateurs B2B
 export const b2bAdminNavItems: NavItem[] = [
   {
-    href: '/b2b/admin/dashboard',
+    href: '/entreprise',
     title: 'Dashboard Admin',
     icon: Home,
     description: 'Vue d\'ensemble de l\'organisation',

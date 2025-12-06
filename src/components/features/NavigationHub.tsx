@@ -291,7 +291,7 @@ const NavigationHub: React.FC = () => {
       title: 'Dashboard Entreprise',
       description: 'Vue d\'ensemble des équipes et KPIs',
       icon: Users,
-      path: '/b2b/admin/dashboard',
+      path: '/entreprise',
       category: 'b2b',
       tags: ['b2b', 'team', 'admin', 'enterprise'],
       requiredRole: ['manager', 'b2b_admin']

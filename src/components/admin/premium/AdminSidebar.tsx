@@ -27,67 +27,67 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ currentPath }) => {
   const navigationItems = [
     {
       title: 'Vue d\'ensemble',
-      href: '/b2b/admin',
+      href: '/entreprise',
       icon: BarChart3,
       description: 'Dashboard principal'
     },
     {
       title: 'Gestion des équipes',
-      href: '/b2b/admin/teams',
+      href: '/entreprise/teams',
       icon: Users,
       description: 'Équipes et collaborateurs'
     },
     {
       title: 'Analyses émotionnelles',
-      href: '/b2b/admin/emotional-analysis',
+      href: '/entreprise/emotional-analysis',
       icon: Heart,
       description: 'Bien-être des équipes'
     },
     {
       title: 'Rapports avancés',
-      href: '/b2b/admin/reports',
+      href: '/entreprise/reports',
       icon: FileText,
       description: 'Rapports et exports'
     },
     {
       title: 'Journal d\'activité',
-      href: '/b2b/admin/activity-logs',
+      href: '/entreprise/activity-logs',
       icon: Activity,
       description: 'Logs et audit'
     },
     {
       title: 'Événements',
-      href: '/b2b/admin/events',
+      href: '/entreprise/events',
       icon: Calendar,
       description: 'Événements d\'entreprise'
     },
     {
       title: 'Social Cocon',
-      href: '/b2b/admin/social-cocon',
+      href: '/entreprise/social-cocon',
       icon: Globe,
       description: 'Groupes sociaux'
     },
     {
       title: 'Utilisateurs',
-      href: '/b2b/admin/users',
+      href: '/entreprise/users',
       icon: UserCog,
       description: 'Gestion utilisateurs'
     },
     {
       title: 'Gamification',
-      href: '/b2b/admin/gamification',
+      href: '/entreprise/gamification',
       icon: Zap,
       description: 'Achievements et défis'
     },
     {
       title: 'Statistiques d\'usage',
-      href: '/b2b/admin/usage-stats',
+      href: '/entreprise/usage-stats',
       icon: Database,
       description: 'Analytics d\'utilisation'
     },
     {
       title: 'Conformité RGPD',
-      href: '/b2b/admin/compliance',
+      href: '/entreprise/compliance',
       icon: Shield,
       description: 'Sécurité et conformité'
     },
@@ -99,14 +99,14 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ currentPath }) => {
     },
     {
       title: 'Paramètres',
-      href: '/b2b/admin/settings',
+      href: '/entreprise/settings',
       icon: Settings,
       description: 'Configuration'
     }
   ];
 
   const isActivePath = (href: string) => {
-    if (href === '/b2b/admin') {
+    if (href === '/entreprise') {
       return location.pathname === href;
     }
     return location.pathname.startsWith(href);

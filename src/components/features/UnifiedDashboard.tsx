@@ -70,10 +70,10 @@ const UnifiedDashboard: React.FC = () => {
         { label: "Équilibre", value: "Good", trend: "Stable", icon: Activity, color: "text-purple-500" }
       ],
       quickActions: [
-        { label: "Check Stress", icon: Heart, path: "/b2b/user/stress-check" },
-        { label: "Pause Active", icon: Zap, path: "/b2b/user/active-break" },
-        { label: "Équipe", icon: Users, path: "/b2b/user/team" },
-        { label: "Objectifs", icon: Target, path: "/b2b/user/goals" }
+        { label: "Check Stress", icon: Heart, path: "/app/stress-check" },
+        { label: "Pause Active", icon: Zap, path: "/app/active-break" },
+        { label: "Équipe", icon: Users, path: "/app/teams" },
+        { label: "Objectifs", icon: Target, path: "/app/goals" }
       ]
     },
     manager: {
@@ -86,10 +86,10 @@ const UnifiedDashboard: React.FC = () => {
         { label: "Rétention", value: "96%", trend: "+3%", icon: Award, color: "text-orange-500" }
       ],
       quickActions: [
-        { label: "Analytics Équipe", icon: BarChart3, path: "/b2b/admin/analytics" },
-        { label: "Reports", icon: Activity, path: "/b2b/admin/reports" },
-        { label: "Interventions", icon: Target, path: "/b2b/admin/interventions" },
-        { label: "Paramètres", icon: Brain, path: "/b2b/admin/settings" }
+        { label: "Analytics Équipe", icon: BarChart3, path: "/entreprise/analytics" },
+        { label: "Reports", icon: Activity, path: "/entreprise/reports" },
+        { label: "Interventions", icon: Target, path: "/entreprise/interventions" },
+        { label: "Paramètres", icon: Brain, path: "/entreprise/settings" }
       ]
     }
   };
