@@ -40,7 +40,7 @@ const StrictRoleGuard: React.FC<StrictRoleGuardProps> = ({
 
   // Non authentifié -> Redirection vers login
   if (!isAuthenticated) {
-    return <Navigate to="/choose-mode" replace />;
+    return <Navigate to="/mode-selection" replace />;
   }
 
   // Déterminer le rôle actuel

@@ -62,7 +62,7 @@ const UnifiedNavigation: React.FC = () => {
       },
       { 
         name: 'Gamification', 
-        href: '/app/gamification',
+        href: '/gamification',
         icon: Gamepad2 
       },
       { 
@@ -75,19 +75,17 @@ const UnifiedNavigation: React.FC = () => {
     // Ajouter les éléments spécifiques aux admins B2B
     if (userRole === 'b2b_admin') {
       baseItems.push(
-        { name: 'Équipes', href: '/entreprise/teams', icon: Users },
-        { name: 'Rapports', href: '/entreprise/reports', icon: BarChart3 },
-        { name: 'Événements', href: '/entreprise/events', icon: Calendar },
-        { name: 'Optimisation', href: '/entreprise/optimisation', icon: TrendingUp },
+        { name: 'Équipes', href: '/app/teams', icon: Users },
+        { name: 'Rapports', href: '/app/reports', icon: BarChart3 },
+        { name: 'Événements', href: '/app/events', icon: Calendar },
+        { name: 'Optimisation', href: '/app/optimization', icon: TrendingUp },
       );
     }
 
     // Ajouter les préférences pour tous
     baseItems.push({ 
       name: 'Préférences', 
-      href: userRole === 'b2c' ? '/settings/preferences' : 
-            userRole === 'b2b_user' ? '/settings/preferences' : 
-            '/entreprise/settings',
+      href: '/settings/general',
       icon: Settings 
     });
 

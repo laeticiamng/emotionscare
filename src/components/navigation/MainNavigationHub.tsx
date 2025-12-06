@@ -35,7 +35,7 @@ const MainNavigationHub: React.FC = () => {
 
   const navigationItems: NavigationItem[] = [
     // Core Features
-    { title: 'Dashboard', description: 'Tableau de bord principal', path: '/app/home', icon: Home, category: 'core' },
+    { title: 'Dashboard', description: 'Tableau de bord principal', path: '/app/consumer/home', icon: Home, category: 'core' },
     { title: 'Scan Émotionnel', description: 'Analyse IA en temps réel', path: '/app/scan', icon: Scan, category: 'core', badge: 'IA' },
     { title: 'Musicothérapie', description: 'Thérapie musicale adaptative', path: '/app/music', icon: Music, category: 'core' },
     { title: 'Coach IA', description: 'Assistant personnel intelligent', path: '/app/coach', icon: Brain, category: 'core', badge: 'IA' },
@@ -45,8 +45,8 @@ const MainNavigationHub: React.FC = () => {
     { title: 'Flash Glow', description: 'Boost énergétique instantané', path: '/app/flash-glow', icon: Zap, category: 'wellness', isNew: true },
     { title: 'Respiration', description: 'Exercices de breathwork', path: '/app/breath', icon: Wind, category: 'wellness' },
     { title: 'Réalité Virtuelle', description: 'Immersion thérapeutique', path: '/app/vr', icon: Monitor, category: 'wellness', isPremium: true },
-    { title: 'Scan Émotions', description: 'Analyse faciale avancée', path: '/app/emotion-scan', icon: Heart, category: 'wellness', badge: 'IA' },
-    { title: 'Journal Vocal', description: 'Expression vocale libre', path: '/app/voice-journal', icon: MessageSquare, category: 'wellness' },
+    { title: 'Analyse Faciale', description: 'Scan émotionnel avancé', path: '/app/scan', icon: Heart, category: 'wellness', badge: 'IA' },
+    { title: 'Journal Vocal', description: 'Expression vocale libre', path: '/app/journal', icon: MessageSquare, category: 'wellness' },
     
     // Fun & Interactive
     { title: 'Filtres AR', description: 'Réalité augmentée émotionnelle', path: '/app/face-ar', icon: Camera, category: 'fun', badge: 'AR' },
