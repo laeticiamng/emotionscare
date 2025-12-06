@@ -1,7 +1,7 @@
 // @ts-nocheck
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -9,19 +9,19 @@ import {
   Home, Scan, Music, MessageSquare, Calendar, Settings,
   Brain, Heart, Zap, Sparkles, Star, Target, Crown,
   Gamepad2, Camera, Wind, Palette, Trophy, BarChart3,
-  Users, Shield, Monitor, Headphones, Globe, Search,
-  Grid3X3, ArrowRight, Play, Filter, Menu, X
+  Users, Shield, Monitor, Headphones, Search,
+  Grid3X3, ArrowRight, Play, Menu, X
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { routes } from '@/routerV2';
 import { cn } from '@/lib/utils';
 
 interface NavigationItem {
+  id: string; // Clé unique pour chaque item
   title: string;
   description: string;
   path: string;
   icon: React.ElementType;
-  category: 'core' | 'wellness' | 'fun' | 'analytics' | 'settings' | 'b2b';
+  category: 'core' | 'wellness' | 'fun' | 'analytics' | 'settings';
   badge?: string;
   isNew?: boolean;
   isPremium?: boolean;
@@ -35,41 +35,41 @@ const MainNavigationHub: React.FC = () => {
 
   const navigationItems: NavigationItem[] = [
     // Core Features
-    { title: 'Dashboard', description: 'Tableau de bord principal', path: '/app/consumer/home', icon: Home, category: 'core' },
-    { title: 'Scan Émotionnel', description: 'Analyse IA en temps réel', path: '/app/scan', icon: Scan, category: 'core', badge: 'IA' },
-    { title: 'Musicothérapie', description: 'Thérapie musicale adaptative', path: '/app/music', icon: Music, category: 'core' },
-    { title: 'Coach IA', description: 'Assistant personnel intelligent', path: '/app/coach', icon: Brain, category: 'core', badge: 'IA' },
-    { title: 'Journal', description: 'Journal émotionnel intelligent', path: '/app/journal', icon: Calendar, category: 'core' },
+    { id: 'dashboard', title: 'Dashboard', description: 'Tableau de bord principal', path: '/app/consumer/home', icon: Home, category: 'core' },
+    { id: 'scan-main', title: 'Scan Émotionnel', description: 'Analyse IA en temps réel', path: '/app/scan', icon: Scan, category: 'core', badge: 'IA' },
+    { id: 'music', title: 'Musicothérapie', description: 'Thérapie musicale adaptative', path: '/app/music', icon: Music, category: 'core' },
+    { id: 'coach', title: 'Coach IA', description: 'Assistant personnel intelligent', path: '/app/coach', icon: Brain, category: 'core', badge: 'IA' },
+    { id: 'journal', title: 'Journal', description: 'Journal émotionnel intelligent', path: '/app/journal', icon: Calendar, category: 'core' },
     
     // Wellness & Mindfulness
-    { title: 'Flash Glow', description: 'Boost énergétique instantané', path: '/app/flash-glow', icon: Zap, category: 'wellness', isNew: true },
-    { title: 'Respiration', description: 'Exercices de breathwork', path: '/app/breath', icon: Wind, category: 'wellness' },
-    { title: 'Réalité Virtuelle', description: 'Immersion thérapeutique', path: '/app/vr', icon: Monitor, category: 'wellness', isPremium: true },
-    { title: 'Analyse Faciale', description: 'Scan émotionnel avancé', path: '/app/scan', icon: Heart, category: 'wellness', badge: 'IA' },
-    { title: 'Journal Vocal', description: 'Expression vocale libre', path: '/app/journal', icon: MessageSquare, category: 'wellness' },
+    { id: 'flash-glow', title: 'Flash Glow', description: 'Boost énergétique instantané', path: '/app/flash-glow', icon: Zap, category: 'wellness', isNew: true },
+    { id: 'breath', title: 'Respiration', description: 'Exercices de breathwork', path: '/app/breath', icon: Wind, category: 'wellness' },
+    { id: 'vr', title: 'Réalité Virtuelle', description: 'Immersion thérapeutique', path: '/app/vr', icon: Monitor, category: 'wellness', isPremium: true },
+    { id: 'scan-facial', title: 'Scan Facial', description: 'Scan émotionnel par caméra', path: '/app/scan/facial', icon: Heart, category: 'wellness', badge: 'IA' },
+    { id: 'scan-voice', title: 'Scan Vocal', description: 'Analyse vocale émotionnelle', path: '/app/scan/voice', icon: Headphones, category: 'wellness', badge: 'IA' },
     
     // Fun & Interactive
-    { title: 'Filtres AR', description: 'Réalité augmentée émotionnelle', path: '/app/face-ar', icon: Camera, category: 'fun', badge: 'AR' },
-    { title: 'Bubble Beat', description: 'Jeu rythmique relaxant', path: '/app/bubble-beat', icon: Gamepad2, category: 'fun' },
-    { title: 'Screen Silk', description: 'Pause écran intelligente', path: '/app/screen-silk', icon: Shield, category: 'fun' },
-    { title: 'VR Galaxy', description: 'Voyage galactique immersif', path: '/app/vr-galaxy', icon: Star, category: 'fun', isPremium: true },
-    { title: 'Boss Level Grit', description: 'Défi de résilience', path: '/app/boss-grit', icon: Crown, category: 'fun' },
-    { title: 'Mood Mixer', description: 'Création d\'ambiances', path: '/app/mood-mixer', icon: Palette, category: 'fun' },
-    { title: 'Ambition Arcade', description: 'Jeux d\'ambition', path: '/app/ambition-arcade', icon: Target, category: 'fun' },
-    { title: 'Bounce Back', description: 'Combat contre l\'adversité', path: '/app/bounce-back', icon: Sparkles, category: 'fun' },
-    { title: 'Story Synth', description: 'Laboratoire d\'histoires', path: '/app/story-synth', icon: Play, category: 'fun' },
+    { id: 'face-ar', title: 'Filtres AR', description: 'Réalité augmentée émotionnelle', path: '/app/face-ar', icon: Camera, category: 'fun', badge: 'AR' },
+    { id: 'bubble-beat', title: 'Bubble Beat', description: 'Jeu rythmique relaxant', path: '/app/bubble-beat', icon: Gamepad2, category: 'fun' },
+    { id: 'screen-silk', title: 'Screen Silk', description: 'Pause écran intelligente', path: '/app/screen-silk', icon: Shield, category: 'fun' },
+    { id: 'vr-galaxy', title: 'VR Galaxy', description: 'Voyage galactique immersif', path: '/app/vr-galaxy', icon: Star, category: 'fun', isPremium: true },
+    { id: 'boss-grit', title: 'Boss Level Grit', description: 'Défi de résilience', path: '/app/boss-grit', icon: Crown, category: 'fun' },
+    { id: 'mood-mixer', title: 'Mood Mixer', description: 'Création d\'ambiances', path: '/app/mood-mixer', icon: Palette, category: 'fun' },
+    { id: 'ambition-arcade', title: 'Ambition Arcade', description: 'Jeux d\'ambition', path: '/app/ambition-arcade', icon: Target, category: 'fun' },
+    { id: 'bounce-back', title: 'Bounce Back', description: 'Combat contre l\'adversité', path: '/app/bounce-back', icon: Sparkles, category: 'fun' },
+    { id: 'story-synth', title: 'Story Synth', description: 'Laboratoire d\'histoires', path: '/app/story-synth', icon: Play, category: 'fun' },
     
     // Analytics & Progress
-    { title: 'Gamification', description: 'Système de récompenses', path: '/app/leaderboard', icon: Trophy, category: 'analytics' },
-    { title: 'Activité', description: 'Historique et tendances', path: '/app/activity', icon: BarChart3, category: 'analytics' },
-    { title: 'Scores & vibes', description: 'Courbes d’humeur et heatmap quotidienne', path: '/app/scores', icon: Grid3X3, category: 'analytics' },
-    { title: 'Communauté', description: 'Réseau social thérapeutique', path: '/app/community', icon: Users, category: 'analytics' },
+    { id: 'leaderboard', title: 'Gamification', description: 'Système de récompenses', path: '/app/leaderboard', icon: Trophy, category: 'analytics' },
+    { id: 'activity', title: 'Activité', description: 'Historique et tendances', path: '/app/activity', icon: BarChart3, category: 'analytics' },
+    { id: 'scores', title: 'Scores & vibes', description: 'Courbes d\'humeur et heatmap quotidienne', path: '/app/scores', icon: Grid3X3, category: 'analytics' },
+    { id: 'community', title: 'Communauté', description: 'Réseau social thérapeutique', path: '/app/community', icon: Users, category: 'analytics' },
     
     // Settings
-    { title: 'Paramètres', description: 'Configuration générale', path: '/settings/general', icon: Settings, category: 'settings' },
-    { title: 'Profil', description: 'Informations personnelles', path: '/settings/profile', icon: Users, category: 'settings' },
-    { title: 'Confidentialité', description: 'Gestion des données', path: '/settings/privacy', icon: Shield, category: 'settings' },
-    { title: 'Notifications', description: 'Alertes et rappels', path: '/settings/notifications', icon: MessageSquare, category: 'settings' },
+    { id: 'settings-general', title: 'Paramètres', description: 'Configuration générale', path: '/settings/general', icon: Settings, category: 'settings' },
+    { id: 'settings-profile', title: 'Profil', description: 'Informations personnelles', path: '/settings/profile', icon: Users, category: 'settings' },
+    { id: 'settings-privacy', title: 'Confidentialité', description: 'Gestion des données', path: '/settings/privacy', icon: Shield, category: 'settings' },
+    { id: 'settings-notifications', title: 'Notifications', description: 'Alertes et rappels', path: '/settings/notifications', icon: MessageSquare, category: 'settings' },
   ];
 
   const categories = [
@@ -105,9 +105,10 @@ const MainNavigationHub: React.FC = () => {
         <Button
           onClick={() => setIsExpanded(true)}
           size="lg"
-          className="rounded-full h-14 w-14 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 shadow-lg hover:shadow-xl transition-all duration-300"
+          className="rounded-full h-14 w-14 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 shadow-lg hover:shadow-xl transition-all duration-300"
+          aria-label="Ouvrir la navigation"
         >
-          <Menu className="h-6 w-6" />
+          <Menu className="h-6 w-6" aria-hidden="true" />
         </Button>
       </motion.div>
 
@@ -120,6 +121,9 @@ const MainNavigationHub: React.FC = () => {
             exit={{ opacity: 0 }}
             className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
             onClick={() => setIsExpanded(false)}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Navigation EmotionsCare"
           >
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
@@ -130,10 +134,10 @@ const MainNavigationHub: React.FC = () => {
               onClick={(e) => e.stopPropagation()}
             >
               {/* Header */}
-              <div className="p-6 border-b bg-gradient-to-r from-purple-50 to-pink-50">
+              <div className="p-6 border-b bg-gradient-to-r from-primary/5 to-accent/5">
                 <div className="flex items-center justify-between mb-4">
                   <div>
-                    <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                    <h2 className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
                       Navigation EmotionsCare
                     </h2>
                     <p className="text-muted-foreground">Explorez toutes nos fonctionnalités</p>
@@ -143,24 +147,26 @@ const MainNavigationHub: React.FC = () => {
                     size="sm"
                     onClick={() => setIsExpanded(false)}
                     className="rounded-full"
+                    aria-label="Fermer la navigation"
                   >
-                    <X className="h-5 w-5" />
+                    <X className="h-5 w-5" aria-hidden="true" />
                   </Button>
                 </div>
 
                 {/* Recherche */}
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" aria-hidden="true" />
                   <Input
                     placeholder="Rechercher une fonctionnalité..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="pl-10"
+                    aria-label="Rechercher une fonctionnalité"
                   />
                 </div>
 
                 {/* Filtres de catégorie */}
-                <div className="flex gap-2 mt-4 flex-wrap">
+                <div className="flex gap-2 mt-4 flex-wrap" role="group" aria-label="Filtrer par catégorie">
                   {categories.map((category) => {
                     const Icon = category.icon;
                     return (
@@ -170,8 +176,9 @@ const MainNavigationHub: React.FC = () => {
                         size="sm"
                         onClick={() => setSelectedCategory(category.key)}
                         className="text-xs"
+                        aria-pressed={selectedCategory === category.key}
                       >
-                        <Icon className="h-3 w-3 mr-1" />
+                        <Icon className="h-3 w-3 mr-1" aria-hidden="true" />
                         {category.label}
                       </Button>
                     );
@@ -186,7 +193,7 @@ const MainNavigationHub: React.FC = () => {
                     const Icon = item.icon;
                     return (
                       <motion.div
-                        key={item.path}
+                        key={item.id}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: index * 0.05 }}
@@ -195,19 +202,28 @@ const MainNavigationHub: React.FC = () => {
                           className={cn(
                             "cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-105",
                             "bg-gradient-to-br from-background to-accent/5",
-                            item.isPremium && "border-amber-200 bg-gradient-to-br from-amber-50 to-background"
+                            item.isPremium && "border-amber-200 bg-gradient-to-br from-amber-50 to-background dark:from-amber-950/20 dark:to-background"
                           )}
                           onClick={() => handleNavigate(item.path)}
+                          tabIndex={0}
+                          role="button"
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault();
+                              handleNavigate(item.path);
+                            }
+                          }}
+                          aria-label={`${item.title} - ${item.description}`}
                         >
                           <CardContent className="p-4">
                             <div className="flex items-start gap-3">
                               <div className={cn(
                                 "p-2 rounded-lg shrink-0",
                                 item.isPremium 
-                                  ? "bg-amber-100 text-amber-600" 
+                                  ? "bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400" 
                                   : "bg-primary/10 text-primary"
                               )}>
-                                <Icon className="h-5 w-5" />
+                                <Icon className="h-5 w-5" aria-hidden="true" />
                               </div>
                               
                               <div className="min-w-0 flex-1">
@@ -234,7 +250,7 @@ const MainNavigationHub: React.FC = () => {
                                 </p>
                               </div>
                               
-                              <ArrowRight className="h-4 w-4 text-muted-foreground shrink-0" />
+                              <ArrowRight className="h-4 w-4 text-muted-foreground shrink-0" aria-hidden="true" />
                             </div>
                           </CardContent>
                         </Card>
@@ -245,7 +261,7 @@ const MainNavigationHub: React.FC = () => {
 
                 {filteredItems.length === 0 && (
                   <div className="text-center py-12">
-                    <Search className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <Search className="h-12 w-12 text-muted-foreground mx-auto mb-4" aria-hidden="true" />
                     <h3 className="text-lg font-semibold mb-2">Aucune fonctionnalité trouvée</h3>
                     <p className="text-muted-foreground">
                       Essayez de modifier votre recherche ou de changer de catégorie
