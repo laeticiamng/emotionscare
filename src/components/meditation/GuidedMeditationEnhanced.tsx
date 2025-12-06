@@ -394,6 +394,7 @@ export default function GuidedMeditationEnhanced() {
                     max={100}
                     step={1}
                     className="flex-1"
+                    aria-label="Contrôle du volume de méditation"
                   />
                   <span className="text-sm text-muted-foreground w-12">{volume[0]}%</span>
                 </div>

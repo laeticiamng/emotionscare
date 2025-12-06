@@ -241,6 +241,7 @@ const AmbientSoundSelector: React.FC = () => {
                               max={100}
                               step={5}
                               onValueChange={(value) => setVolume(sound.id, value[0])}
+                              aria-label={`Contrôle du volume pour ${sound.name}`}
                             />
                           </div>
                         )}

@@ -95,6 +95,7 @@ const VoiceEmotionAnalyzer: React.FC<VoiceEmotionAnalyzerProps> = ({ onResult, o
             max={100}
             step={1}
             onValueChange={(value) => setConfidence(value[0] / 100)}
+            aria-label="Niveau de confiance"
           />
           <p className="text-sm text-muted-foreground">
             Niveau de confiance: {Math.round(confidence * 100)}%
@@ -109,6 +110,7 @@ const VoiceEmotionAnalyzer: React.FC<VoiceEmotionAnalyzerProps> = ({ onResult, o
             max={100}
             step={1}
             onValueChange={(value) => setIntensity(value[0] / 100)}
+            aria-label="Intensité de l'émotion"
           />
           <p className="text-sm text-muted-foreground">
             Intensité de l'émotion: {Math.round(intensity * 100)}%

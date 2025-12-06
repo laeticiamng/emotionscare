@@ -189,6 +189,7 @@ const EnhancedEmotionScanner: React.FC<EnhancedEmotionScannerProps> = ({
                     max={60}
                     step={5}
                     className="w-full"
+                    aria-label="Durée d'analyse en secondes"
                   />
                   <p className="text-xs text-muted-foreground">{config.duration}s</p>
                 </div>
@@ -202,6 +203,7 @@ const EnhancedEmotionScanner: React.FC<EnhancedEmotionScannerProps> = ({
                     max={100}
                     step={5}
                     className="w-full"
+                    aria-label="Sensibilité en pourcentage"
                   />
                   <p className="text-xs text-muted-foreground">{config.sensitivity}%</p>
                 </div>
@@ -215,6 +217,7 @@ const EnhancedEmotionScanner: React.FC<EnhancedEmotionScannerProps> = ({
                     max={95}
                     step={5}
                     className="w-full"
+                    aria-label="Seuil de confiance en pourcentage"
                   />
                   <p className="text-xs text-muted-foreground">{config.confidenceThreshold}%</p>
                 </div>
@@ -228,6 +231,7 @@ const EnhancedEmotionScanner: React.FC<EnhancedEmotionScannerProps> = ({
                     max={80}
                     step={5}
                     className="w-full"
+                    aria-label="Lissage temporel"
                   />
                   <p className="text-xs text-muted-foreground">{Math.round((config.smoothingFactor || 0.3) * 100)}%</p>
                 </div>

@@ -33,6 +33,10 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
         max={duration || 100}
         onValueChange={handleSeek}
         className="w-full"
+        aria-label="Progression du morceau"
+        aria-valuemin={0}
+        aria-valuemax={duration || 100}
+        aria-valuenow={currentTime}
       />
       <div className="flex justify-between text-xs text-muted-foreground">
         <span>{formatTime(currentTime)}</span>

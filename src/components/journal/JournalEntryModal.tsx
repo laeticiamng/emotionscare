@@ -148,6 +148,7 @@ const JournalEntryModal: React.FC<JournalEntryModalProps> = ({
               step={1}
               className="w-full"
               disabled={isLoading}
+              aria-label="Intensité émotionnelle"
             />
           </div>
         </div>

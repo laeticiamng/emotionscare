@@ -182,6 +182,7 @@ const MusicTherapy: React.FC = () => {
                       max={100}
                       step={1}
                       className="w-20"
+                      aria-label="Contrôle du volume"
                     />
                   </div>
                 </div>

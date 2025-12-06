@@ -305,6 +305,7 @@ const VRTherapyEnhanced: React.FC = () => {
                 min={1}
                 max={10}
                 step={1}
+                aria-label="Intensité de la thérapie VR"
               />
             </div>
 
@@ -316,6 +317,7 @@ const VRTherapyEnhanced: React.FC = () => {
                 min={5}
                 max={30}
                 step={5}
+                aria-label="Durée de la session en minutes"
               />
             </div>
 

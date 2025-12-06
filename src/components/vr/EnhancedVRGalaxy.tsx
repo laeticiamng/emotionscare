@@ -626,6 +626,7 @@ export default function EnhancedVRGalaxy() {
                     min={1}
                     step={1}
                     className="mt-2"
+                    aria-label="Niveau d'immersion VR"
                   />
                   <div className="text-xs text-gray-400 mt-1">
                     Niveau {immersionLevel[0]}/10

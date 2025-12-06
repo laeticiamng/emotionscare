@@ -711,6 +711,7 @@ export const MoodMixer: React.FC = () => {
                           step={0.01}
                           className="w-full"
                           onClick={(e) => e.stopPropagation()}
+                          aria-label={`Intensité de ${emotion.name}`}
                         />
                       </div>
                     )}
