@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { logger } from '@/lib/logger';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -45,7 +46,7 @@ export default function WebhooksPage() {
       try {
         setWebhooks(JSON.parse(saved));
       } catch (error) {
-        console.error('Error loading webhooks:', error);
+        logger.warn('Error loading webhooks', { error }, 'STORAGE');
       }
     }
   }, []);
