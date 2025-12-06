@@ -31,7 +31,7 @@ const UnifiedNavigation: React.FC = () => {
       { 
         name: 'Dashboard', 
         href: userRole === 'b2c' ? '/app/consumer/home' : 
-              userRole === 'b2b_user' ? '/app/employee/home' : 
+              userRole === 'b2b_user' ? '/app/collab' : 
               '/entreprise',
         icon: Home 
       },

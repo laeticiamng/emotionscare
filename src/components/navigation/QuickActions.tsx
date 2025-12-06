@@ -35,7 +35,7 @@ const QuickActions = () => {
       label: 'Respiration',
       description: 'Calme immédiat',
       action: () => {
-        window.location.href = '/app/breathing';
+        window.location.href = '/app/breath';
         toast.success('Session respiration démarrée');
       },
       color: 'from-green-500 to-emerald-500'

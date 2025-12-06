@@ -46,7 +46,7 @@ const MainHeader: React.FC = () => {
       case 'b2c':
         return '/app/consumer/home';
       case 'b2b_user':
-        return '/app/employee/home';
+        return '/app/collab';
       case 'b2b_admin':
         return '/entreprise';
       default:
