@@ -232,7 +232,7 @@ export const CollaborativeSessionLobby: React.FC = () => {
                     onChange={(e) => setChatInput(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                   />
-                  <Button onClick={handleSendMessage} size="icon">
+                  <Button onClick={handleSendMessage} size="icon" aria-label="Envoyer le message">
                     <Send className="h-4 w-4" />
                   </Button>
                 </div>

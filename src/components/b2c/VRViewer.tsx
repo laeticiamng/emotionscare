@@ -138,6 +138,7 @@ export const VRViewer: React.FC<VRViewerProps> = ({
               variant="outline"
               size="icon"
               onClick={() => setIsFullscreen(!isFullscreen)}
+              aria-label={isFullscreen ? "Quitter le plein écran" : "Plein écran"}
             >
               {isFullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
             </Button>
@@ -145,6 +146,7 @@ export const VRViewer: React.FC<VRViewerProps> = ({
               variant="outline"
               size="icon"
               onClick={() => setShowSettings(!showSettings)}
+              aria-label="Paramètres"
             >
               <Settings className="h-4 w-4" />
             </Button>

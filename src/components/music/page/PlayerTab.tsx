@@ -127,6 +127,7 @@ const PlayerTab: React.FC<PlayerTabProps> = ({ className = '' }) => {
           size="icon"
           onClick={previousTrack}
           className="h-12 w-12 rounded-full hover:bg-blue-100 dark:hover:bg-blue-900/30"
+          aria-label="Piste précédente"
         >
           <SkipBack className="h-6 w-6" />
         </Button>
@@ -136,6 +137,7 @@ const PlayerTab: React.FC<PlayerTabProps> = ({ className = '' }) => {
           size="icon"
           onClick={togglePlay}
           className="h-16 w-16 rounded-full bg-primary hover:bg-primary/90"
+          aria-label={isPlaying ? "Mettre en pause" : "Lire"}
         >
           {isPlaying ? (
             <Pause className="h-8 w-8 text-primary-foreground" />
@@ -149,6 +151,7 @@ const PlayerTab: React.FC<PlayerTabProps> = ({ className = '' }) => {
           size="icon"
           onClick={nextTrack}
           className="h-12 w-12 rounded-full hover:bg-blue-100 dark:hover:bg-blue-900/30"
+          aria-label="Piste suivante"
         >
           <SkipForward className="h-6 w-6" />
         </Button>
@@ -159,6 +162,7 @@ const PlayerTab: React.FC<PlayerTabProps> = ({ className = '' }) => {
           variant="ghost"
           size="icon"
           className="text-muted-foreground hover:text-primary"
+          aria-label="Ajouter aux favoris"
         >
           <Heart className="h-6 w-6" />
         </Button>
@@ -170,6 +174,7 @@ const PlayerTab: React.FC<PlayerTabProps> = ({ className = '' }) => {
             onClick={() => setShowVolume(!showVolume)}
             onMouseEnter={() => setShowVolume(true)}
             className="text-muted-foreground hover:text-primary"
+            aria-label={localMute ? "Réactiver le son" : "Régler le volume"}
           >
             {localMute ? <VolumeX className="h-6 w-6" /> : <Volume className="h-6 w-6" />}
           </Button>

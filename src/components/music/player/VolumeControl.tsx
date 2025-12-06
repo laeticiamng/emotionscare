@@ -31,6 +31,7 @@ const VolumeControl: React.FC<VolumeControlProps> = ({
         size="icon"
         onClick={onMuteToggle}
         className="h-8 w-8"
+        aria-label={isMuted || volume === 0 ? "Réactiver le son" : "Couper le son"}
       >
         {isMuted || volume === 0 ? (
           <VolumeX className="h-4 w-4" />

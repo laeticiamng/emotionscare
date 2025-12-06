@@ -218,13 +218,14 @@ const ActivitiesCatalog: React.FC = () => {
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end space-x-2">
-                      <Button size="icon" variant="ghost">
+                      <Button size="icon" variant="ghost" aria-label="Modifier l'activité">
                         <Edit className="h-4 w-4" />
                       </Button>
                       <Button 
                         size="icon" 
                         variant="ghost" 
                         onClick={() => handleDeleteActivity(activity.id)}
+                        aria-label="Supprimer l'activité"
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
