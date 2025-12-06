@@ -50,10 +50,10 @@ export default function APIKeysPage() {
                     </p>
                   </div>
                   <div className="flex gap-2">
-                    <Button variant="ghost" size="icon">
+                    <Button variant="ghost" size="icon" aria-label="Copier la clé API">
                       <Copy className="h-4 w-4" />
                     </Button>
-                    <Button variant="ghost" size="icon">
+                    <Button variant="ghost" size="icon" aria-label="Supprimer la clé API">
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>

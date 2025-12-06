@@ -248,6 +248,7 @@ export function ScheduledExportsManager() {
                     variant="ghost"
                     size="icon"
                     onClick={() => deleteScheduledExport(schedule.id)}
+                    aria-label="Supprimer l'export planifié"
                   >
                     <Trash2 className="w-4 h-4" />
                   </Button>

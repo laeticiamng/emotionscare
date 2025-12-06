@@ -143,7 +143,7 @@ const GuildPage: React.FC = () => {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" onClick={() => navigate('/app/guilds')}>
+            <Button variant="ghost" size="icon" onClick={() => navigate('/app/guilds')} aria-label="Retour aux guildes">
               <ArrowLeft className="w-5 h-5" />
             </Button>
             <div>
@@ -253,7 +253,7 @@ const GuildPage: React.FC = () => {
                         onChange={(e) => setMessage(e.target.value)}
                         onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                       />
-                      <Button onClick={handleSendMessage} size="icon">
+                      <Button onClick={handleSendMessage} size="icon" aria-label="Envoyer le message">
                         <Send className="w-4 h-4" />
                       </Button>
                     </div>

@@ -30,7 +30,7 @@ const VoiceCommandListener: React.FC<VoiceCommandListenerProps> = ({ isActive, o
       size="icon"
       onClick={toggleListening}
       className={`rounded-full ${isListening ? 'bg-primary/20' : ''}`}
-      title="Commandes vocales"
+      aria-label={isListening ? "Arrêter les commandes vocales" : "Activer les commandes vocales"}
     >
       {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
     </Button>

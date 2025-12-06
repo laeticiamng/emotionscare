@@ -186,6 +186,7 @@ export default function AchievementsPage() {
                 variant="ghost"
                 size="icon"
                 onClick={() => navigate('/app/emotional-park')}
+                aria-label="Retour au parc émotionnel"
               >
                 <ArrowLeft className="h-5 w-5" />
               </Button>

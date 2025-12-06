@@ -288,13 +288,14 @@ export const WebhookManager = () => {
                       <Badge variant={webhook.is_active ? 'default' : 'secondary'}>
                         {webhook.is_active ? 'Actif' : 'Inactif'}
                       </Badge>
-                      <Button variant="ghost" size="icon" onClick={() => handleEdit(webhook)}>
+                      <Button variant="ghost" size="icon" onClick={() => handleEdit(webhook)} aria-label="Modifier le webhook">
                         <Edit className="h-4 w-4" />
                       </Button>
                       <Button 
                         variant="ghost" 
                         size="icon" 
                         onClick={() => deleteWebhook(webhook.id)}
+                        aria-label="Supprimer le webhook"
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
