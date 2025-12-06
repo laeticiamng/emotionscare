@@ -236,7 +236,7 @@ export default function EmotionalPark() {
       subtitle: 'Scan facial avancé',
       description: 'IA de reconnaissance faciale qui lit tes émotions en temps réel.',
       icon: Scan,
-      route: '/app/emotion-scan',
+      route: '/app/scan',
       gradient: 'from-blue-500/20 to-purple-500/20',
       collection: 'Historique de scans',
       zone: 'creative'
@@ -379,7 +379,7 @@ export default function EmotionalPark() {
       subtitle: 'Paramètres',
       description: 'Personnalise ton expérience dans le parc émotionnel.',
       icon: Settings,
-      route: '/app/settings/general',
+      route: '/settings/general',
       gradient: 'from-gray-500/20 to-slate-500/20',
       collection: 'Préférences personnelles',
       zone: 'hub'
@@ -401,7 +401,7 @@ export default function EmotionalPark() {
       subtitle: 'Confidentialité',
       description: 'Contrôle total sur tes données personnelles et ta vie privée.',
       icon: Shield,
-      route: '/app/settings/privacy',
+      route: '/settings/privacy',
       gradient: 'from-emerald-500/20 to-teal-500/20',
       collection: 'Paramètres de confidentialité',
       zone: 'hub'

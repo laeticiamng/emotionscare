@@ -113,12 +113,12 @@ const PAGE_METADATA: Record<string, Omit<PageMetadata, 'loadingState'>> = {
     allowedRoles: ['b2c', 'b2b_user', 'b2b_admin'],
     hasQuickActions: false
   },
-  '/app/emotion-scan': {
+  '/app/scan': {
     title: 'Scan Émotionnel',
     description: 'Analyse avancée de vos émotions',
     breadcrumbs: [
-      { label: 'Accueil', path: '/app/home' },
-      { label: 'Emotion Scan', path: '/app/emotion-scan' }
+      { label: 'Accueil', path: '/app/consumer/home' },
+      { label: 'Emotion Scan', path: '/app/scan' }
     ],
     requiresAuth: true,
     allowedRoles: ['b2c', 'b2b_user', 'b2b_admin'],

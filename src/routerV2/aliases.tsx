@@ -115,6 +115,8 @@ export const ROUTE_ALIASES = {
   '/aide': '/help',
   '/support': '/help',
   '/meditation': '/app/meditation',
+  '/app/grounding': '/app/meditation',
+  '/grounding': '/app/meditation',
   '/settings': '/settings/general',
   '/preferences': '/settings/general',
   '/notifications': '/settings/notifications',

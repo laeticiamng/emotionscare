@@ -29,7 +29,7 @@ export function buildAdvice(ctx: CoachContext, mode: CoachMode = "soft"): Advice
       key: "breath-then-journal",
       title: "2 min pour apaiser puis poser les mots",
       body: "Fais 6 cycles de cohérence (5-5), puis écris 3 lignes sur ce que tu ressens.",
-      cta: { label: "Démarrer Bubble Beat", href: "/modules/bubble-beat" },
+      cta: { label: "Démarrer Bubble Beat", href: "/app/bubble-beat" },
       weight: 85,
       tag: "respire"
     });
@@ -37,7 +37,7 @@ export function buildAdvice(ctx: CoachContext, mode: CoachMode = "soft"): Advice
       key: "journal-3-lines",
       title: "Écrire 3 lignes, sans filtre",
       body: "Note ce qui te pèse et une petite chose positive de ta journée.",
-      cta: { label: "Ouvrir Journal", href: "/modules/journal" },
+      cta: { label: "Ouvrir Journal", href: "/app/journal" },
       weight: 70,
       tag: "ecris"
     });
@@ -49,7 +49,7 @@ export function buildAdvice(ctx: CoachContext, mode: CoachMode = "soft"): Advice
       key: "micro-session",
       title: "Micro-séance pour relancer la série",
       body: "Lance une session de 3 minutes. L’important c’est d’y être.",
-      cta: { label: "Respiration 3 min", href: "/modules/bubble-beat" },
+      cta: { label: "Respiration 3 min", href: "/app/bubble-beat" },
       weight: 65,
       tag: "routine"
     });
@@ -61,7 +61,7 @@ export function buildAdvice(ctx: CoachContext, mode: CoachMode = "soft"): Advice
       key: "morning-focus",
       title: "2 min de musique pour cadrer la matinée",
       body: "Un preset ‘Focus’ léger pour te mettre en route.",
-      cta: { label: "Lancer Mood Mixer", href: "/modules/mood-mixer" },
+      cta: { label: "Lancer Mood Mixer", href: "/app/mood-mixer" },
       weight: 60,
       tag: "musique"
     });
@@ -71,7 +71,7 @@ export function buildAdvice(ctx: CoachContext, mode: CoachMode = "soft"): Advice
       key: "evening-lofi",
       title: "Débranche en douceur",
       body: "Un lofi tranquille (boucle courte) avant d’éteindre les écrans.",
-      cta: { label: "Lancer Mood Mixer", href: "/modules/mood-mixer" },
+      cta: { label: "Lancer Mood Mixer", href: "/app/mood-mixer" },
       weight: 55,
       tag: "musique"
     });
@@ -94,7 +94,7 @@ export function buildAdvice(ctx: CoachContext, mode: CoachMode = "soft"): Advice
     key: "routine-3",
     title: "Routine rapide : 3 respirations profondes",
     body: "Inspire 4s, expire 6s, trois fois. C’est déjà un pas.",
-    cta: { label: "Démarrer Bubble Beat", href: "/modules/bubble-beat" },
+    cta: { label: "Démarrer Bubble Beat", href: "/app/bubble-beat" },
     weight: 40,
     tag: "respire"
   });
