@@ -213,7 +213,7 @@ const AccessVerifier: React.FC = () => {
               }
             </p>
             {currentRole === 'b2c' && (
-              <Button variant="outline" onClick={() => navigate('/choose-mode')}>
+              <Button variant="outline" onClick={() => navigate('/mode-selection')}>
                 Changer de Mode
               </Button>
             )}

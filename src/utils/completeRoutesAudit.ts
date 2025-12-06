@@ -13,7 +13,7 @@ export interface RouteAuditData {
 export const COMPLETE_ROUTES_AUDIT: RouteAuditData[] = [
   // Routes publiques
   { route: '/', name: 'home', requiresAuth: false, category: 'Public', description: 'Page d\'accueil principale' },
-  { route: '/choose-mode', name: 'chooseMode', requiresAuth: false, category: 'Public', description: 'Sélection du mode utilisateur' },
+  { route: '/mode-selection', name: 'modeSelection', requiresAuth: false, category: 'Public', description: 'Sélection du mode utilisateur' },
   { route: '/auth', name: 'auth', requiresAuth: false, category: 'Public', description: 'Page d\'authentification' },
   
   // Routes B2C

@@ -89,7 +89,7 @@ export class EmotionsCareAudit {
     // Vérification des routes principales
     const routes = [
       '/',
-      '/choose-mode',
+      '/mode-selection',
       '/b2c/login',
       '/b2c/dashboard',
       '/b2b/selection',

@@ -28,7 +28,7 @@ const UserNav: React.FC = () => {
 
   if (!isAuthenticated || !user) {
     return (
-      <Button variant="outline" onClick={() => navigate('/choose-mode')}>
+      <Button variant="outline" onClick={() => navigate('/mode-selection')}>
         Se connecter
       </Button>
     );

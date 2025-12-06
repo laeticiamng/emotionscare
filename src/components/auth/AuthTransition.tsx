@@ -16,7 +16,7 @@ const AuthTransition: React.FC<AuthTransitionProps> = ({ children }) => {
     if (!isLoading) {
       setHasChecked(true);
       if (!isAuthenticated) {
-        navigate('/choose-mode');
+        navigate('/mode-selection');
       }
     }
   }, [isAuthenticated, isLoading, navigate]);

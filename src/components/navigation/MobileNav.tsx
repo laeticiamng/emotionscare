@@ -109,7 +109,7 @@ const MobileNav: React.FC<MobileNavProps> = ({ className }) => {
                   <Button 
                     variant="outline" 
                     onClick={() => {
-                      navigate('/choose-mode');
+                      navigate('/mode-selection');
                       setOpen(false);
                     }}
                     className="w-full"

@@ -24,7 +24,7 @@ const BreadcrumbNavigation: React.FC = () => {
   
   const routeLabels: Record<string, string> = {
     '/': 'Accueil',
-    '/choose-mode': 'Choisir Mode',
+    '/mode-selection': 'Choisir Mode',
     '/onboarding': 'Intégration',
     '/b2c': 'Particulier',
     '/b2c/login': 'Connexion',

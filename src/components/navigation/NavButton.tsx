@@ -165,7 +165,7 @@ function checkGuard(node: NavNode, context: NavContext): boolean {
 function handleGuardedAction(node: NavNode, context: NavContext) {
   if (node.guard?.requiresAuth && !context.isAuthenticated) {
     // Rediriger vers l'authentification
-    window.location.href = '/choose-mode';
+    window.location.href = '/mode-selection';
     return;
   }
 

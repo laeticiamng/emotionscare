@@ -205,7 +205,7 @@ const EnhancedNavigation: React.FC = () => {
               
               <Button
                 className="bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90 text-primary-foreground shadow-xl hover:shadow-2xl"
-                onClick={() => window.location.href = '/choose-mode'}
+                onClick={() => window.location.href = '/mode-selection'}
               >
                 Commencer
               </Button>
@@ -318,7 +318,7 @@ const EnhancedNavigation: React.FC = () => {
                   
                   <Button
                     onClick={() => {
-                      window.location.href = '/choose-mode';
+                      window.location.href = '/mode-selection';
                       setMobileMenuOpen(false);
                     }}
                     className="w-full bg-gradient-to-r from-primary to-purple-600"

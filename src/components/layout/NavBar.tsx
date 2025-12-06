@@ -117,7 +117,7 @@ const NavBar: React.FC = () => {
             </Button>
             
             <Button
-              onClick={() => window.location.href = '/choose-mode'}
+              onClick={() => window.location.href = '/mode-selection'}
               className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-xl hover:shadow-blue-500/25"
             >
               Commencer
@@ -181,7 +181,7 @@ const NavBar: React.FC = () => {
                 
                 <Button
                   onClick={() => {
-                    window.location.href = '/choose-mode';
+                    window.location.href = '/mode-selection';
                     setMobileMenuOpen(false);
                   }}
                   className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
