@@ -58,7 +58,7 @@ const VRBreathDiagnostic: React.FC = () => {
         
         <div className="pt-4 space-y-2">
           <Button 
-            onClick={() => navigate('/app/vr-breath')}
+            onClick={() => navigate('/app/vr-breath-guide')}
             className="w-full"
           >
             <RefreshCw className="h-4 w-4 mr-2" />

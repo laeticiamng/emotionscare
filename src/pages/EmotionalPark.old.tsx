@@ -159,7 +159,7 @@ export default function EmotionalPark() {
       subtitle: 'VR Breath',
       description: 'Temple suspendu dans les nuages. Ton souffle peint une fresque murale unique.',
       icon: Cloud,
-      route: '/app/vr-breath',
+      route: '/app/vr-breath-guide',
       gradient: 'from-sky-500/20 to-blue-500/20',
       collection: 'Fresques de souffle personnelles',
       zone: 'calm'

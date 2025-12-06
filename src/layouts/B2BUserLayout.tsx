@@ -64,12 +64,12 @@ const B2BUserLayout: React.FC = () => {
   const { toast } = useToast();
 
   const navItems = [
-    { to: "/b2b/user/dashboard", icon: <Home className="h-5 w-5" />, label: "Tableau de bord" },
-    { to: "/b2b/user/journal", icon: <BookOpen className="h-5 w-5" />, label: "Journal émotionnel", notification: 2 },
-    { to: "/b2b/user/music", icon: <Music className="h-5 w-5" />, label: "Musicothérapie" },
-    { to: "/b2b/user/coach", icon: <MessageCircle className="h-5 w-5" />, label: "Coach IA" },
-    { to: "/b2b/user/statistics", icon: <BarChart3 className="h-5 w-5" />, label: "Statistiques" },
-    { to: "/b2b/user/settings", icon: <Settings className="h-5 w-5" />, label: "Paramètres" }
+    { to: "/app/collab", icon: <Home className="h-5 w-5" />, label: "Tableau de bord" },
+    { to: "/app/journal", icon: <BookOpen className="h-5 w-5" />, label: "Journal émotionnel", notification: 2 },
+    { to: "/app/music", icon: <Music className="h-5 w-5" />, label: "Musicothérapie" },
+    { to: "/app/coach", icon: <MessageCircle className="h-5 w-5" />, label: "Coach IA" },
+    { to: "/app/analytics", icon: <BarChart3 className="h-5 w-5" />, label: "Statistiques" },
+    { to: "/settings/general", icon: <Settings className="h-5 w-5" />, label: "Paramètres" }
   ];
 
   const handleLogout = async () => {

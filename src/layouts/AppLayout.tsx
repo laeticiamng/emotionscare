@@ -97,7 +97,7 @@ const AppLayout: React.FC = () => {
     },
     { 
       label: 'VR Thérapie', 
-      href: '/app/vr-breath', 
+      href: '/app/vr-breath-guide', 
       icon: Headphones,
       description: 'Immersion thérapeutique',
       badge: 'VR'

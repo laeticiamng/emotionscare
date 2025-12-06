@@ -76,7 +76,7 @@ const modules: Module[] = [
     color: 'text-indigo-500',
     gradient: 'from-indigo-500 to-purple-500',
     features: ['Environnements 3D', 'Respiration guidée', 'Réalité mixte'],
-    link: '/app/vr-breath',
+    link: '/app/vr-breath-guide',
   },
   {
     id: 'analytics',

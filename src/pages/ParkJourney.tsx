@@ -200,10 +200,10 @@ export default function ParkJourney() {
       number: 7,
       icon: Cloud,
       title: "Le Temple de l'Air",
-      subtitle: "VR Breath /app/vr-breath",
+      subtitle: "VR Breath /app/vr-breath-guide",
       narrative: "Un immense temple suspendu dans le ciel t'attend.\nÀ chaque respiration, une onde lumineuse traverse les colonnes et peint les murs.\nQuand tu termines, la fresque finale est ton souffle devenu œuvre d'art.\nTu ressors avec une fresque unique gravée dans ton temple.",
       gradient: "from-sky-500/20 to-blue-500/20",
-      route: "/app/vr-breath"
+      route: "/app/vr-breath-guide"
     },
     {
       number: 8,

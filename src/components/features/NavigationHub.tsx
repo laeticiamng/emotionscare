@@ -131,7 +131,7 @@ const NavigationHub: React.FC = () => {
       title: 'Respiration VR',
       description: 'Méditation guidée en réalité virtuelle',
       icon: Eye,
-      path: '/app/vr-breath',
+      path: '/app/vr-breath-guide',
       category: 'vr',
       tags: ['vr', 'meditation', 'breathing'],
       badge: { type: 'new' }
