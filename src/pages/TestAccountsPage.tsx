@@ -90,6 +90,7 @@ export default function TestAccountsPage() {
                       size="icon"
                       variant="ghost"
                       onClick={() => copyToClipboard(account.email)}
+                      aria-label="Copier l'email"
                     >
                       <Copy className="h-4 w-4" />
                     </Button>
@@ -106,6 +107,7 @@ export default function TestAccountsPage() {
                       size="icon"
                       variant="ghost"
                       onClick={() => copyToClipboard(account.password)}
+                      aria-label="Copier le mot de passe"
                     >
                       <Copy className="h-4 w-4" />
                     </Button>

@@ -130,6 +130,7 @@ const NotificationBar: React.FC<NotificationBarProps> = ({
                         size="sm" 
                         className="h-6 w-6 p-0" 
                         onClick={() => removeNotification(notification.id)}
+                        aria-label="Supprimer la notification"
                       >
                         &times;
                       </Button>
