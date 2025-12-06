@@ -157,8 +157,9 @@ export function NotificationBell() {
                                   e.stopPropagation();
                                   markAsRead(notification.id);
                                 }}
+                                aria-label="Marquer comme lu"
                               >
-                                <Check className="h-3 w-3" />
+                                <Check className="h-3 w-3" aria-hidden="true" />
                               </Button>
                             )}
                             <Button
@@ -169,8 +170,9 @@ export function NotificationBell() {
                                 e.stopPropagation();
                                 deleteNotification(notification.id);
                               }}
+                              aria-label="Supprimer la notification"
                             >
-                              <Trash2 className="h-3 w-3" />
+                              <Trash2 className="h-3 w-3" aria-hidden="true" />
                             </Button>
                           </div>
                         </div>

@@ -215,8 +215,8 @@ const ImmersiveVisualization: React.FC<VisualizationProps> = ({
             Visualisation Immersive
           </CardTitle>
           {onToggleFullscreen && (
-            <Button variant="ghost" size="sm" onClick={onToggleFullscreen}>
-              {fullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+            <Button variant="ghost" size="sm" onClick={onToggleFullscreen} aria-label={fullscreen ? "Quitter le plein écran" : "Plein écran"}>
+              {fullscreen ? <Minimize2 className="h-4 w-4" aria-hidden="true" /> : <Maximize2 className="h-4 w-4" aria-hidden="true" />}
             </Button>
           )}
         </div>

@@ -109,6 +109,7 @@ export const EnhancedPostComposer: React.FC<EnhancedPostComposerProps> = ({
             variant={formats.bold ? 'default' : 'outline'}
             onClick={handleBold}
             title="Gras (Ctrl+B)"
+            aria-label="Mettre en gras"
             aria-pressed={formats.bold}
             className="h-8 w-8 p-0"
           >
@@ -120,6 +121,7 @@ export const EnhancedPostComposer: React.FC<EnhancedPostComposerProps> = ({
             variant={formats.italic ? 'default' : 'outline'}
             onClick={handleItalic}
             title="Italique (Ctrl+I)"
+            aria-label="Mettre en italique"
             aria-pressed={formats.italic}
             className="h-8 w-8 p-0"
           >
@@ -131,6 +133,7 @@ export const EnhancedPostComposer: React.FC<EnhancedPostComposerProps> = ({
             variant="outline"
             onClick={handleList}
             title="Liste à puces"
+            aria-label="Insérer une liste à puces"
             className="h-8 w-8 p-0"
           >
             <List className="h-4 w-4" aria-hidden="true" />
@@ -142,6 +145,7 @@ export const EnhancedPostComposer: React.FC<EnhancedPostComposerProps> = ({
             variant="outline"
             onClick={() => setContent(content + ' 💚')}
             title="Ajouter un cœur"
+            aria-label="Ajouter un cœur"
             className="h-8 w-8 p-0"
           >
             <Heart className="h-4 w-4" aria-hidden="true" />
