@@ -27,7 +27,7 @@ export const PostLoginTransition: React.FC<PostLoginTransitionProps> = ({ onComp
           clearInterval(timer);
           setTimeout(() => {
             onComplete?.();
-            navigate('/home');
+            navigate('/app/consumer/home');
           }, 500);
           return 100;
         }

@@ -29,7 +29,7 @@ export const useApiErrorHandler = () => {
           description: "Veuillez vous reconnecter",
           variant: "destructive",
         });
-        navigate('/choose-mode');
+        navigate('/mode-selection');
         break;
 
       case 403:

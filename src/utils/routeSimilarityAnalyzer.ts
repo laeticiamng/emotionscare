@@ -112,7 +112,7 @@ function findFunctionalDuplicates(): SimilarityGroup[] {
     if (routes.length > 1) {
       // Exclure les routes publiques des doublons
       const protectedRoutes = routes.filter(route => 
-        !['/', '/choose-mode', '/b2b/selection'].includes(route)
+        !['/', '/mode-selection', '/b2b/selection'].includes(route)
       );
       
       if (protectedRoutes.length > 1) {

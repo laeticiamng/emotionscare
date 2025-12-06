@@ -129,7 +129,7 @@ const PremiumHeroSection: React.FC = () => {
             className="flex flex-col sm:flex-row gap-4 justify-center items-center"
           >
             <Button 
-              onClick={() => navigate('/choose-mode')}
+              onClick={() => navigate('/mode-selection')}
               size="lg" 
               className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-6 text-lg rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 group"
             >

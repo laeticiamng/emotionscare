@@ -18,7 +18,7 @@ const SecureRouteGuard: React.FC<SecureRouteGuardProps> = ({
   children,
   allowedRoles = [],
   requireAuth = true,
-  fallbackPath = '/choose-mode'
+  fallbackPath = '/mode-selection'
 }) => {
   const { isAuthenticated, user, isLoading } = useAuth();
   const location = useLocation();

@@ -29,7 +29,7 @@ const SystemAudit: React.FC = () => {
   const allRoutes = [
     // Routes publiques
     { path: '/', name: 'Accueil', category: 'Public', expectedContent: 'Page d\'accueil avec navigation' },
-    { path: '/choose-mode', name: 'Choix du mode', category: 'Public', expectedContent: 'Sélection B2C/B2B' },
+    { path: '/mode-selection', name: 'Choix du mode', category: 'Public', expectedContent: 'Sélection B2C/B2B' },
     { path: '/entreprise', name: 'Sélection B2B', category: 'Public', expectedContent: 'Choix User/Admin' },
     
     // Authentification

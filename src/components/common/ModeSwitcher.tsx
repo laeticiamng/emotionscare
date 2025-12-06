@@ -84,7 +84,7 @@ const ModeSwitcher: React.FC<ModeSwitcherProps> = ({
           navigate('/app/rh');
           break;
         default:
-          navigate('/choose-mode');
+          navigate('/mode-selection');
       }
       
       // Reset transitioning state after navigation

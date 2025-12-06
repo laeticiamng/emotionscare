@@ -106,7 +106,7 @@ export class ProductionValidator {
 
     const criticalRoutes = [
       '/',
-      '/choose-mode',
+      '/mode-selection',
       '/b2c/dashboard',
       '/b2b/user/dashboard',
       '/b2b/admin/dashboard',

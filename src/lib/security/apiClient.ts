@@ -69,7 +69,7 @@ class SecureApiClient {
             variant: "destructive",
           });
           // Rediriger vers la page de connexion
-          window.location.href = '/choose-mode';
+          window.location.href = '/mode-selection';
           break;
         case 403:
           toast({
