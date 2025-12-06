@@ -75,7 +75,6 @@ export { default as B2CMusicTherapyPremiumPage } from './B2CMusicTherapyPremiumP
 
 // Additional B2C Pages
 export { default as B2CAICoachMicroPage } from './B2CAICoachMicroPage';
-export { default as B2CEmotionsPage } from './B2CEmotionsPage';
 
 // Additional pages
 export { default as OnboardingPage } from './OnboardingPage';
@@ -102,11 +101,7 @@ export { default as ServerErrorPage } from './errors/500/page';
 // Development pages
 export { default as ValidationPage } from './ValidationPage';
 export { default as B2CNyveeCoconPage } from './B2CNyveeCoconPage';
-
-// Pages manquantes créées
-export { default as CoachChatPage } from './CoachChatPage';
-export { default as VRBreathPage } from './VRBreathPage';
-export { default as VRSessionsPage } from './VRSessionsPage';
+// Pages supplémentaires
 export { default as JournalNewPage } from './JournalNewPage';
 export { default as ReportingPage } from './ReportingPage';
 export { default as ExportPage } from './ExportPage';
@@ -114,12 +109,10 @@ export { default as NavigationPage } from './NavigationPage';
 export { default as LeaderboardPage } from './LeaderboardPage';
 export { default as ScoresPage } from './ScoresPage';
 export { default as MoodPresetsAdminPage } from './MoodPresetsAdminPage';
-export { default as GamificationPage } from './GamificationPage';
-export { default as ChooseModePage } from './ChooseModePage';
 export { default as AdminFlagsPage } from "@/modules/admin/AdminFlagsPage";
-export { default as TestAccountsPage } from "./dev/TestAccountsPage";
+export { default as TestAccountsPage } from "./TestAccountsPage";
+export { default as ModeSelectionPage } from './ModeSelectionPage';
 
 // Legal Pages (nouvelles)
 export { TermsPage } from './legal/TermsPage';
-export { PrivacyPage as PrivacyPageNew } from './legal/PrivacyPage';
 export { LegalPage } from './legal/LegalPage';
