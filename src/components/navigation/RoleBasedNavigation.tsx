@@ -144,7 +144,7 @@ const RoleBasedNavigation: React.FC = () => {
     {
       title: "Outils RH",
       items: [
-        { label: "Gestion des Rôles", path: "/b2b/admin/user-roles", icon: Shield, description: "Attribution rôles" },
+        { label: "Gestion des Rôles", path: "/admin/user-roles", icon: Shield, description: "Attribution rôles" },
         { label: "Rapports", path: "/app/reports", icon: BarChart3, description: "Données anonymisées" },
         { label: "Événements", path: "/app/events", icon: Calendar, description: "Organisation" },
         { label: "Optimisation", path: "/app/optimization", icon: TrendingUp, description: "Amélioration continue" },

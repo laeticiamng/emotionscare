@@ -70,8 +70,8 @@ const UnifiedDashboard: React.FC = () => {
         { label: "Équilibre", value: "Good", trend: "Stable", icon: Activity, color: "text-purple-500" }
       ],
       quickActions: [
-        { label: "Check Stress", icon: Heart, path: "/app/stress-check" },
-        { label: "Pause Active", icon: Zap, path: "/app/active-break" },
+        { label: "Check Stress", icon: Heart, path: "/app/scan" },
+        { label: "Pause Active", icon: Zap, path: "/app/screen-silk" },
         { label: "Équipe", icon: Users, path: "/app/teams" },
         { label: "Objectifs", icon: Target, path: "/app/goals" }
       ]

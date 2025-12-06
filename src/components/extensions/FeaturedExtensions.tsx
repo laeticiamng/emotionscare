@@ -62,10 +62,7 @@ const FeaturedExtensions: React.FC = () => {
                   </>
                 )}
               </Button>
-              <Button variant="outline" onClick={() => navigate(`/extensions/${featuredExtension.id}`)}>
-                En savoir plus
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
+              {/* Route /extensions/:id non implémentée - bouton masqué */}
             </div>
           </div>
         </div>
