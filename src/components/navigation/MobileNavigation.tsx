@@ -32,7 +32,7 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({ items }) => {
         <SheetHeader className="px-6 py-4 border-b">
           <SheetTitle className="flex items-center justify-between">
             <span>Menu</span>
-            <Button variant="ghost" size="icon" onClick={() => setOpen(false)}>
+            <Button variant="ghost" size="icon" onClick={() => setOpen(false)} aria-label="Fermer le menu">
               <X className="h-4 w-4" />
             </Button>
           </SheetTitle>

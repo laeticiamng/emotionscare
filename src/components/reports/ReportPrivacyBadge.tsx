@@ -74,6 +74,7 @@ export const ReportPrivacyBadge: React.FC = () => {
                   size="icon" 
                   onClick={handleClose}
                   className="h-6 w-6"
+                  aria-label="Fermer"
                 >
                   <X className="h-3 w-3" />
                 </Button>

@@ -357,10 +357,11 @@ const EnhancedAICoach: React.FC = () => {
                 size="icon"
                 onClick={isListening ? stopListening : startListening}
                 disabled={isProcessing}
+                aria-label={isListening ? "Arrêter l'écoute" : "Activer le microphone"}
               >
                 {isListening ? <MicOff className="h-4 w-4 text-red-500" /> : <Mic className="h-4 w-4" />}
               </Button>
-              <Button onClick={sendMessage} disabled={isProcessing || !inputMessage.trim()}>
+              <Button onClick={sendMessage} disabled={isProcessing || !inputMessage.trim()} aria-label="Envoyer le message">
                 <Send className="h-4 w-4" />
               </Button>
             </div>

@@ -20,12 +20,12 @@ const PremiumAdminHeader: React.FC<PremiumAdminHeaderProps> = ({
       <h1 className="text-xl font-semibold">{pageTitle}</h1>
       
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" className="relative">
+        <Button variant="ghost" size="icon" className="relative" aria-label="Notifications">
           <Bell size={20} />
           <span className="absolute top-1 right-1 bg-red-500 rounded-full w-2 h-2"></span>
         </Button>
         
-        <Button variant="ghost" size="icon" onClick={onSettingsClick}>
+        <Button variant="ghost" size="icon" onClick={onSettingsClick} aria-label="Paramètres">
           <Settings size={20} />
         </Button>
         

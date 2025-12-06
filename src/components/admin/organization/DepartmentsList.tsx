@@ -101,6 +101,7 @@ const DepartmentsList: React.FC<DepartmentsListProps> = ({ departments }) => {
                     variant="ghost" 
                     size="icon"
                     onClick={() => handleEditDepartment(dept)}
+                    aria-label={`Modifier ${dept.name}`}
                   >
                     <PenSquare className="h-4 w-4" />
                   </Button>
@@ -108,6 +109,7 @@ const DepartmentsList: React.FC<DepartmentsListProps> = ({ departments }) => {
                     variant="ghost" 
                     size="icon"
                     onClick={() => handleDeleteDepartment(dept)}
+                    aria-label={`Supprimer ${dept.name}`}
                   >
                     <Trash2 className="h-4 w-4 text-destructive" />
                   </Button>

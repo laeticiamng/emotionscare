@@ -113,6 +113,7 @@ const MiniCoach: React.FC<MiniCoachProps> = ({ className, quickQuestions = [] })
             size="icon" 
             onClick={handleSend} 
             disabled={inputText.trim() === '' || isProcessing}
+            aria-label="Envoyer le message"
           >
             <Send className="h-4 w-4" />
           </Button>

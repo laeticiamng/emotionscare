@@ -264,6 +264,7 @@ const PresentationMode: React.FC<PresentationProps> = ({ onExit, data }) => {
           variant="outline" 
           size="icon"
           onClick={onExit}
+          aria-label="Fermer la présentation"
         >
           <X className="h-4 w-4" />
         </Button>
@@ -283,6 +284,7 @@ const PresentationMode: React.FC<PresentationProps> = ({ onExit, data }) => {
           size="icon"
           onClick={handlePrevSlide}
           disabled={currentSlide === 0}
+          aria-label="Diapositive précédente"
         >
           <ChevronLeft className="h-4 w-4" />
         </Button>
@@ -296,6 +298,7 @@ const PresentationMode: React.FC<PresentationProps> = ({ onExit, data }) => {
           size="icon"
           onClick={handleNextSlide}
           disabled={currentSlide === slides.length - 1}
+          aria-label="Diapositive suivante"
         >
           <ChevronRight className="h-4 w-4" />
         </Button>
