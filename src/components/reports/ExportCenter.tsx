@@ -296,17 +296,17 @@ const ExportCenter: React.FC<ExportCenterProps> = ({ filters, userRole }) => {
               <div className="space-y-3">
                 <div className="flex items-center justify-between p-3 border rounded">
                   <div>
-                    <p className="font-medium text-sm">Export automatique mensuel</p>
+                    <p className="font-medium text-sm" id="monthly-export-label">Export automatique mensuel</p>
                     <p className="text-xs text-muted-foreground">Rapport bien-être complet</p>
                   </div>
-                  <Checkbox />
+                  <Checkbox aria-labelledby="monthly-export-label" aria-label="Activer l'export automatique mensuel" />
                 </div>
                 <div className="flex items-center justify-between p-3 border rounded">
                   <div>
-                    <p className="font-medium text-sm">Notification par email</p>
+                    <p className="font-medium text-sm" id="email-notif-label">Notification par email</p>
                     <p className="text-xs text-muted-foreground">Recevoir les exports par email</p>
                   </div>
-                  <Checkbox />
+                  <Checkbox aria-labelledby="email-notif-label" aria-label="Activer les notifications par email" />
                 </div>
               </div>
             </div>

@@ -56,20 +56,20 @@ const HRActionsTab: React.FC<HRActionsTabProps> = ({ rhSuggestions, isLoading = 
         <CardContent>
           <form className="space-y-4">
             <div>
-              <label className="block text-sm font-medium mb-1">Titre</label>
-              <input type="text" className="w-full p-2 rounded border" placeholder="Nom de l'activité" />
+              <label htmlFor="activity-title" className="block text-sm font-medium mb-1">Titre</label>
+              <input id="activity-title" type="text" className="w-full p-2 rounded border" placeholder="Nom de l'activité" aria-label="Titre de l'activité" />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Date</label>
-              <input type="date" className="w-full p-2 rounded border" />
+              <label htmlFor="activity-date" className="block text-sm font-medium mb-1">Date</label>
+              <input id="activity-date" type="date" className="w-full p-2 rounded border" aria-label="Date de l'activité" />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Description</label>
-              <textarea className="w-full p-2 rounded border h-24" placeholder="Décrivez l'activité..."></textarea>
+              <label htmlFor="activity-description" className="block text-sm font-medium mb-1">Description</label>
+              <textarea id="activity-description" className="w-full p-2 rounded border h-24" placeholder="Décrivez l'activité..." aria-label="Description de l'activité"></textarea>
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Budget max</label>
-              <input type="number" className="w-full p-2 rounded border" placeholder="€" />
+              <label htmlFor="activity-budget" className="block text-sm font-medium mb-1">Budget max</label>
+              <input id="activity-budget" type="number" className="w-full p-2 rounded border" placeholder="€" aria-label="Budget maximum" />
             </div>
             <Button className="w-full bg-[#FF6F61] hover:bg-[#FF6F61]/90 text-white">
               Proposer l'atelier

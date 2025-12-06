@@ -37,13 +37,13 @@ const AdminSettingsTab: React.FC<AdminSettingsTabProps> = ({ isLoading = false }
           <TabsContent value="general">
             <div className="grid gap-6">
               <div>
-                <h3 className="text-lg font-medium mb-2">Nom de l'entreprise</h3>
-                <input type="text" className="w-full p-2 border rounded" defaultValue="EmotionsCare SAS" />
+                <label htmlFor="company-name" className="text-lg font-medium mb-2 block">Nom de l'entreprise</label>
+                <input id="company-name" type="text" className="w-full p-2 border rounded" defaultValue="EmotionsCare SAS" aria-label="Nom de l'entreprise" />
               </div>
               
               <div>
-                <h3 className="text-lg font-medium mb-2">Langue par défaut</h3>
-                <select className="w-full p-2 border rounded">
+                <label htmlFor="default-language" className="text-lg font-medium mb-2 block">Langue par défaut</label>
+                <select id="default-language" className="w-full p-2 border rounded" aria-label="Langue par défaut">
                   <option value="fr">Français</option>
                   <option value="en">English</option>
                   <option value="es">Español</option>
@@ -51,8 +51,8 @@ const AdminSettingsTab: React.FC<AdminSettingsTabProps> = ({ isLoading = false }
               </div>
               
               <div>
-                <h3 className="text-lg font-medium mb-2">Fuseau horaire</h3>
-                <select className="w-full p-2 border rounded">
+                <label htmlFor="timezone" className="text-lg font-medium mb-2 block">Fuseau horaire</label>
+                <select id="timezone" className="w-full p-2 border rounded" aria-label="Fuseau horaire">
                   <option value="europe-paris">Europe/Paris (UTC+1)</option>
                   <option value="europe-london">Europe/London (UTC+0)</option>
                   <option value="america-new_york">America/New_York (UTC-5)</option>
@@ -71,16 +71,16 @@ const AdminSettingsTab: React.FC<AdminSettingsTabProps> = ({ isLoading = false }
                 <h3 className="text-lg font-medium mb-2">Notifications par défaut</h3>
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <label className="text-sm">Notifications quotidiennes</label>
-                    <input type="checkbox" defaultChecked />
+                    <label htmlFor="daily-notifs" className="text-sm">Notifications quotidiennes</label>
+                    <input id="daily-notifs" type="checkbox" defaultChecked aria-label="Notifications quotidiennes" />
                   </div>
                   <div className="flex items-center justify-between">
-                    <label className="text-sm">Alertes de bien-être</label>
-                    <input type="checkbox" defaultChecked />
+                    <label htmlFor="wellness-alerts" className="text-sm">Alertes de bien-être</label>
+                    <input id="wellness-alerts" type="checkbox" defaultChecked aria-label="Alertes de bien-être" />
                   </div>
                   <div className="flex items-center justify-between">
-                    <label className="text-sm">Annonces système</label>
-                    <input type="checkbox" defaultChecked />
+                    <label htmlFor="system-announcements" className="text-sm">Annonces système</label>
+                    <input id="system-announcements" type="checkbox" defaultChecked aria-label="Annonces système" />
                   </div>
                 </div>
               </div>
@@ -97,12 +97,12 @@ const AdminSettingsTab: React.FC<AdminSettingsTabProps> = ({ isLoading = false }
                 <h3 className="text-lg font-medium mb-2">Sécurité du compte</h3>
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <label className="text-sm">Authentification à deux facteurs</label>
-                    <input type="checkbox" />
+                    <label htmlFor="two-factor" className="text-sm">Authentification à deux facteurs</label>
+                    <input id="two-factor" type="checkbox" aria-label="Authentification à deux facteurs" />
                   </div>
                   <div className="flex items-center justify-between">
-                    <label className="text-sm">Expiration du mot de passe (90 jours)</label>
-                    <input type="checkbox" defaultChecked />
+                    <label htmlFor="password-expiry" className="text-sm">Expiration du mot de passe (90 jours)</label>
+                    <input id="password-expiry" type="checkbox" defaultChecked aria-label="Expiration du mot de passe" />
                   </div>
                 </div>
               </div>
@@ -111,12 +111,12 @@ const AdminSettingsTab: React.FC<AdminSettingsTabProps> = ({ isLoading = false }
                 <h3 className="text-lg font-medium mb-2">Politique de mot de passe</h3>
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <label className="text-sm">Longueur minimale (8 caractères)</label>
-                    <input type="checkbox" defaultChecked />
+                    <label htmlFor="min-length" className="text-sm">Longueur minimale (8 caractères)</label>
+                    <input id="min-length" type="checkbox" defaultChecked aria-label="Longueur minimale" />
                   </div>
                   <div className="flex items-center justify-between">
-                    <label className="text-sm">Exiger des caractères spéciaux</label>
-                    <input type="checkbox" defaultChecked />
+                    <label htmlFor="special-chars" className="text-sm">Exiger des caractères spéciaux</label>
+                    <input id="special-chars" type="checkbox" defaultChecked aria-label="Exiger des caractères spéciaux" />
                   </div>
                 </div>
               </div>
