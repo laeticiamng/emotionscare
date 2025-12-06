@@ -4,6 +4,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { captureException } from '@/lib/ai-monitoring';
 import { Link } from 'react-router-dom';
+import * as Sentry from '@/lib/errors/sentry-compat';
 import { logger } from '@/lib/logger';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
