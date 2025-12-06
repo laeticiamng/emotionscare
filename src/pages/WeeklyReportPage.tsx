@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { logger } from '@/lib/logger';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
@@ -182,7 +183,7 @@ export default function WeeklyReportPage() {
         variant: 'success',
       });
     } catch (error) {
-      console.error('Error exporting CSV:', error);
+      logger.error('Error exporting CSV', error instanceof Error ? error : new Error(String(error)), 'EXPORT');
       toast({
         title: 'Erreur',
         description: "Impossible d'exporter le rapport",
@@ -252,7 +253,7 @@ export default function WeeklyReportPage() {
         variant: 'success',
       });
     } catch (error) {
-      console.error('Error exporting PDF:', error);
+      logger.error('Error exporting PDF', error instanceof Error ? error : new Error(String(error)), 'EXPORT');
       toast({
         title: 'Erreur',
         description: "Impossible d'exporter le rapport",

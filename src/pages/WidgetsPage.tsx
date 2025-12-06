@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { logger } from '@/lib/logger';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
@@ -69,7 +70,7 @@ export default function WidgetsPage() {
         setWidgets(parsed);
         setSavedWidgets(parsed);
       } catch (error) {
-        console.error('Error loading widgets:', error);
+        logger.warn('Error loading widgets', { error }, 'STORAGE');
         setWidgets(defaultWidgets);
         setSavedWidgets(defaultWidgets);
       }
@@ -104,7 +105,7 @@ export default function WidgetsPage() {
         variant: 'success',
       });
     } catch (error) {
-      console.error('Error saving widgets:', error);
+      logger.warn('Error saving widgets', { error }, 'STORAGE');
       toast({
         title: 'Erreur',
         description: 'Impossible de sauvegarder la configuration',

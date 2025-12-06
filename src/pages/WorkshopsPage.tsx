@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { logger } from '@/lib/logger';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -91,7 +92,7 @@ export default function WorkshopsPage() {
       try {
         setWorkshops(JSON.parse(storedWorkshops));
       } catch (error) {
-        console.error('Error loading workshops:', error);
+        logger.warn('Error loading workshops', { error }, 'STORAGE');
         setWorkshops(initialWorkshops);
       }
     } else {
@@ -102,7 +103,7 @@ export default function WorkshopsPage() {
       try {
         setRegistrations(new Set(JSON.parse(storedRegistrations)));
       } catch (error) {
-        console.error('Error loading registrations:', error);
+        logger.warn('Error loading registrations', { error }, 'STORAGE');
         setRegistrations(new Set());
       }
     }

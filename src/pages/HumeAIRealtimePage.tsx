@@ -4,6 +4,7 @@
  */
 
 import React, { useState } from 'react';
+import { logger } from '@/lib/logger';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -31,11 +32,11 @@ export default function HumeAIRealtimePage() {
 
     // Save the emotion scan to database
     try {
-      console.log('Emotion detected:', result.topEmotion.name, result.topEmotion.score);
+      logger.debug('Emotion detected', { emotion: result.topEmotion.name, score: result.topEmotion.score }, 'SCAN');
       // TODO: Implement save to database
       setScanCount((prev) => prev + 1);
     } catch (error) {
-      console.error('Failed to save emotion scan', error);
+      logger.error('Failed to save emotion scan', error instanceof Error ? error : new Error(String(error)), 'SCAN');
     }
   };
 
