@@ -99,7 +99,7 @@ const MobileNav: React.FC<MobileNavProps> = ({ className }) => {
                 <div className="space-y-2">
                   <Button 
                     onClick={() => {
-                      navigate('/b2c/login');
+                      navigate('/login?segment=b2c');
                       setOpen(false);
                     }}
                     className="w-full"

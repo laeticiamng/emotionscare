@@ -27,7 +27,7 @@ const AuthButton: React.FC<AuthButtonProps> = ({
       await logout();
       navigate('/');
     } else {
-      navigate('/b2c/login');
+      navigate('/login?segment=b2c');
     }
   };
   

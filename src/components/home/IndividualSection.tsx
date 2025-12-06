@@ -138,7 +138,7 @@ const IndividualSection: React.FC = () => {
               transition={{ duration: 0.8, delay: 1.2 }}
             >
               <Button
-                onClick={() => navigate('/b2c/login')}
+                onClick={() => navigate('/login?segment=b2c')}
                 size="lg"
                 className="group px-8 py-6 text-lg bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 shadow-xl hover:shadow-2xl transition-all duration-300"
               >
