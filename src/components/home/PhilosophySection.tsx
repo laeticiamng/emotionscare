@@ -56,7 +56,7 @@ const PhilosophySection: React.FC = () => {
           </p>
           
           <Button 
-            onClick={() => navigate('/philosophy')}
+            onClick={() => navigate('/about')}
             className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold px-8 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
           >
             Découvrir le parcours interactif

@@ -366,12 +366,12 @@ ORDER BY jobname;`;
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid md:grid-cols-2 gap-4">
-            <Button variant="outline" onClick={() => navigate('/admin/unified')}>
+            <Button variant="outline" onClick={() => navigate('/app/admin/unified')}>
               <Play className="h-4 w-4 mr-2" />
               Voir Dashboard Unifié
             </Button>
 
-            <Button variant="outline" onClick={() => navigate('/admin/alert-tester')}>
+            <Button variant="outline" onClick={() => navigate('/app/admin/alert-tester')}>
               <AlertTriangle className="h-4 w-4 mr-2" />
               Tester avec Alerte Critique
             </Button>

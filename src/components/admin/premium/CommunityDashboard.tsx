@@ -188,7 +188,7 @@ export const CommunityDashboard: React.FC<CommunityDashboardProps> = ({
             
             <div className="mb-3">
               <Button 
-                onClick={() => navigate('/admin/community')}
+                onClick={() => navigate('/app/admin/community')}
                 variant="outline"
                 className="w-full"
               >
@@ -299,7 +299,7 @@ export const CommunityDashboard: React.FC<CommunityDashboardProps> = ({
               )}
               
               <Button 
-                onClick={() => navigate('/admin/community/moderation')}
+                onClick={() => navigate('/app/admin/community/moderation')}
                 variant="outline"
                 className="w-full"
               >

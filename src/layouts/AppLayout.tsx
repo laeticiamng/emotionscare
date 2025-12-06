@@ -245,13 +245,13 @@ const AppLayout: React.FC = () => {
                 <DropdownMenuLabel>Mon compte</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
-                  <Link to="/app/profile">
+                  <Link to="/settings/profile">
                     <User className="mr-2 h-4 w-4" />
                     Profil
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link to="/app/settings">
+                  <Link to="/settings/general">
                     <Settings className="mr-2 h-4 w-4" />
                     Paramètres
                   </Link>
@@ -311,10 +311,10 @@ const AppLayout: React.FC = () => {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem asChild>
-                    <Link to="/app/profile">Profil</Link>
+                    <Link to="/settings/profile">Profil</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link to="/app/settings">Paramètres</Link>
+                    <Link to="/settings/general">Paramètres</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={handleSignOut}>
                     Déconnexion

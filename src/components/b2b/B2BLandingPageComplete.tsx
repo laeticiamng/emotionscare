@@ -138,7 +138,7 @@ const B2BLandingPageComplete: React.FC = () => {
         <h3 className="text-xl font-semibold">Prêt à transformer votre organisation ?</h3>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Button asChild>
-            <Link to="/signup?segment=b2b">
+            <Link to="/register?segment=b2b">
               Demander une démo
               <ArrowRight className="ml-2 h-4 w-4" />
             </Link>

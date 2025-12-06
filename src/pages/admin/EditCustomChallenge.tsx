@@ -221,7 +221,7 @@ const EditCustomChallenge = () => {
       });
 
       if (success) {
-        navigate('/admin/challenges');
+        navigate('/app/admin/challenges');
       }
     } finally {
       setSaving(false);
@@ -245,7 +245,7 @@ const EditCustomChallenge = () => {
             <CardDescription>Le défi que vous tentez de modifier n'existe plus.</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button onClick={() => navigate('/admin/challenges')}>Revenir à la liste des défis</Button>
+            <Button onClick={() => navigate('/app/admin/challenges')}>Revenir à la liste des défis</Button>
           </CardContent>
         </Card>
       </div>

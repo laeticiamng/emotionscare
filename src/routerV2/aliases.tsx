@@ -124,6 +124,9 @@ export const ROUTE_ALIASES = {
   '/app/gamification': '/gamification',
   '/app/aura': '/app/activity',
   '/aura': '/app/activity',
+  '/store': '/about',
+  '/boutique': '/about',
+  '/contact': '/support',
 } as const;
 
 export type LegacyPath = keyof typeof ROUTE_ALIASES;
