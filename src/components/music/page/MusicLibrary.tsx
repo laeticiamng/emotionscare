@@ -29,7 +29,14 @@ const MusicLibrary: React.FC<MusicLibraryProps> = ({
       {safePlaylists.map((playlist) => (
         <Card key={playlist.id} className="shadow-md">
           <CardHeader>
-            <CardTitle className="text-lg font-semibold cursor-pointer hover:underline" onClick={() => onSelectPlaylist?.(playlist)}>
+            <CardTitle 
+              className="text-lg font-semibold cursor-pointer hover:underline" 
+              onClick={() => onSelectPlaylist?.(playlist)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => e.key === 'Enter' && onSelectPlaylist?.(playlist)}
+              aria-label={`Ouvrir la playlist ${playlist.name}`}
+            >
               {playlist.name}
             </CardTitle>
           </CardHeader>

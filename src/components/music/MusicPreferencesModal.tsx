@@ -137,7 +137,7 @@ export const MusicPreferencesModal: React.FC<MusicPreferencesModalProps> = ({
                 <div className="space-y-4">
                   <div className="flex items-center gap-2"><Volume2 className="h-5 w-5" /><Label>Quel tempo préférez-vous ?</Label></div>
                   <p className="text-sm text-muted-foreground">De {tempoRange[0]} à {tempoRange[1]} BPM</p>
-                  <Slider value={tempoRange} onValueChange={(value) => setTempoRange(value as [number, number])} min={60} max={180} step={10} minStepsBetweenThumbs={2} />
+                  <Slider value={tempoRange} onValueChange={(value) => setTempoRange(value as [number, number])} min={60} max={180} step={10} minStepsBetweenThumbs={2} aria-label="Plage de tempo préférée" />
                 </div>
               )}
               {step === 3 && (
@@ -164,7 +164,7 @@ export const MusicPreferencesModal: React.FC<MusicPreferencesModalProps> = ({
                 <div className="space-y-6">
                   <div className="space-y-4">
                     <Label>Niveau d'énergie préféré: {energyLevel}%</Label>
-                    <Slider value={[energyLevel]} onValueChange={(v) => setEnergyLevel(v[0])} min={0} max={100} step={5} />
+                    <Slider value={[energyLevel]} onValueChange={(v) => setEnergyLevel(v[0])} min={0} max={100} step={5} aria-label="Niveau d'énergie préféré" />
                   </div>
                   <div className="space-y-4">
                     <Label>Préférence vocale</Label>

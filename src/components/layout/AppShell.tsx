@@ -96,7 +96,7 @@ const AppShell: React.FC = () => {
 
         {/* Mobile Sidebar Overlay */}
         {sidebarOpen && (
-          <div className="xl:hidden fixed inset-0 z-40 bg-black/40" onClick={() => setSidebarOpen(false)}>
+          <div className="xl:hidden fixed inset-0 z-40 bg-black/40" onClick={() => setSidebarOpen(false)} role="button" tabIndex={0} onKeyDown={(e) => e.key === 'Escape' && setSidebarOpen(false)} aria-label="Fermer le menu latéral">
             <aside className="absolute left-0 top-16 h-[calc(100vh-4rem)] w-72 bg-white shadow-xl border-r">
               <Sidebar collapsed={false} />
             </aside>

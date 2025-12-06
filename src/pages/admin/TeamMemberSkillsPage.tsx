@@ -304,7 +304,16 @@ const TeamMemberSkillsPage: React.FC = () => {
                 </div>
                 <div className="flex flex-wrap gap-2 mt-2">
                   {formData.skills.map(skill => (
-                    <Badge key={skill} variant="secondary" className="cursor-pointer" onClick={() => removeSkill(skill)}>
+                    <Badge 
+                      key={skill} 
+                      variant="secondary" 
+                      className="cursor-pointer" 
+                      onClick={() => removeSkill(skill)}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => e.key === 'Enter' && removeSkill(skill)}
+                      aria-label={`Supprimer la compétence ${skill}`}
+                    >
                       {skill} ×
                     </Badge>
                   ))}
@@ -324,7 +333,16 @@ const TeamMemberSkillsPage: React.FC = () => {
                 </div>
                 <div className="flex flex-wrap gap-2 mt-2">
                   {formData.specializations.map(spec => (
-                    <Badge key={spec} variant="outline" className="cursor-pointer" onClick={() => removeSpecialization(spec)}>
+                    <Badge 
+                      key={spec} 
+                      variant="outline" 
+                      className="cursor-pointer" 
+                      onClick={() => removeSpecialization(spec)}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => e.key === 'Enter' && removeSpecialization(spec)}
+                      aria-label={`Supprimer la spécialisation ${spec}`}
+                    >
                       {spec} ×
                     </Badge>
                   ))}

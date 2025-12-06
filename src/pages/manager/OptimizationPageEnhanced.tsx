@@ -523,7 +523,7 @@ const OptimizationPageEnhanced = () => {
                             </div>
                             <p className="text-sm text-gray-600">💰 Économies: {rule.savings}</p>
                           </div>
-                          <Switch checked={rule.status === 'active'} />
+                          <Switch checked={rule.status === 'active'} aria-label={`${rule.status === 'active' ? 'Désactiver' : 'Activer'} la règle ${rule.name}`} />
                         </motion.div>
                       ))}
                     </CardContent>

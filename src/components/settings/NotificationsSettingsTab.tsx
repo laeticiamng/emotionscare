@@ -304,7 +304,7 @@ const NotificationsSettingsTab: React.FC = () => {
                 Notifications pour les messages privés
               </p>
             </div>
-            <Switch defaultChecked />
+            <Switch defaultChecked aria-label="Messages directs" />
           </div>
 
           <div className="flex items-center justify-between">
@@ -314,7 +314,7 @@ const NotificationsSettingsTab: React.FC = () => {
                 Quand quelqu'un vous mentionne dans un groupe
               </p>
             </div>
-            <Switch defaultChecked />
+            <Switch defaultChecked aria-label="Mentions dans les groupes" />
           </div>
 
           <div className="flex items-center justify-between">
@@ -324,7 +324,7 @@ const NotificationsSettingsTab: React.FC = () => {
                 Afficher le contenu du message dans la notification
               </p>
             </div>
-            <Switch defaultChecked={false} />
+            <Switch defaultChecked={false} aria-label="Aperçu des messages" />
           </div>
         </CardContent>
       </Card>

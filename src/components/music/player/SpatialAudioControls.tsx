@@ -50,7 +50,7 @@ const SpatialAudioControls: React.FC<SpatialAudioControlsProps> = ({ className }
             <Badge variant={enabled ? "default" : "secondary"}>
               {enabled ? "Activé" : "Désactivé"}
             </Badge>
-            <Switch checked={enabled} onCheckedChange={setEnabled} />
+            <Switch checked={enabled} onCheckedChange={setEnabled} aria-label="Activer l'audio spatial" />
           </div>
         </div>
       </CardHeader>
