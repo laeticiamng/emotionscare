@@ -108,7 +108,7 @@ const NavBar: React.FC = () => {
             </div>
 
             <Button
-              onClick={() => window.location.href = '/auth'}
+              onClick={() => window.location.href = '/login'}
               variant="outline"
               className="border-white/30 text-white hover:bg-white/10 backdrop-blur-sm"
             >
@@ -169,7 +169,7 @@ const NavBar: React.FC = () => {
               <div className="border-t border-white/10 pt-4 space-y-3">
                 <Button
                   onClick={() => {
-                    window.location.href = '/auth';
+                    window.location.href = '/login';
                     setMobileMenuOpen(false);
                   }}
                   variant="outline"

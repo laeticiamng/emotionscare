@@ -40,7 +40,7 @@ class HttpClient {
       if (error.status === 401) {
         logger.warn('Unauthorized access - signing out', { status: 401 }, 'API');
         supabase.auth.signOut();
-        window.location.href = '/auth';
+        window.location.href = '/login';
       }
       
       // Gestion des erreurs de permissions
