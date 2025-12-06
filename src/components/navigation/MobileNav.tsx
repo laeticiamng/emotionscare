@@ -129,7 +129,7 @@ const MobileNav: React.FC<MobileNavProps> = ({ className }) => {
                 <Button
                   variant="ghost"
                   onClick={() => {
-                    navigate('/settings');
+                    navigate('/settings/general');
                     setOpen(false);
                   }}
                   className="w-full justify-start"

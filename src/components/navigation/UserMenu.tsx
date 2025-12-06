@@ -75,7 +75,7 @@ const UserMenu: React.FC = () => {
         <DropdownMenuSeparator />
         
         <DropdownMenuGroup>
-          <DropdownMenuItem onClick={() => navigate('/profile')}>
+          <DropdownMenuItem onClick={() => navigate('/settings/profile')}>
             <User className="mr-2 h-4 w-4" />
             <span>Profil</span>
           </DropdownMenuItem>
@@ -85,12 +85,12 @@ const UserMenu: React.FC = () => {
             <span>Tableau de bord</span>
           </DropdownMenuItem>
           
-          <DropdownMenuItem onClick={() => navigate('/settings')}>
+          <DropdownMenuItem onClick={() => navigate('/settings/general')}>
             <Settings className="mr-2 h-4 w-4" />
             <span>Paramètres</span>
           </DropdownMenuItem>
           
-          <DropdownMenuItem onClick={() => navigate('/notifications')}>
+          <DropdownMenuItem onClick={() => navigate('/settings/notifications')}>
             <Bell className="mr-2 h-4 w-4" />
             <span>Notifications</span>
           </DropdownMenuItem>
