@@ -26,25 +26,25 @@ interface AccessRule {
 
 const accessRules: AccessRule[] = [
   // Core functionality
-  { path: '/scan', name: 'Scan Émotionnel', requiredRoles: ['b2c', 'b2b_user', 'b2b_admin'], description: 'Analyse émotionnelle instantanée', category: 'core' },
-  { path: '/journal', name: 'Journal Personnel', requiredRoles: ['b2c', 'b2b_user', 'b2b_admin'], description: 'Espace de réflexion quotidien', category: 'core' },
-  { path: '/coach', name: 'Coach IA', requiredRoles: ['b2c', 'b2b_user', 'b2b_admin'], description: 'Accompagnement par intelligence artificielle', category: 'core' },
-  { path: '/preferences', name: 'Préférences', requiredRoles: ['b2c', 'b2b_user', 'b2b_admin'], description: 'Configuration personnelle', category: 'core' },
+  { path: '/app/scan', name: 'Scan Émotionnel', requiredRoles: ['b2c', 'b2b_user', 'b2b_admin'], description: 'Analyse émotionnelle instantanée', category: 'core' },
+  { path: '/app/journal', name: 'Journal Personnel', requiredRoles: ['b2c', 'b2b_user', 'b2b_admin'], description: 'Espace de réflexion quotidien', category: 'core' },
+  { path: '/app/coach', name: 'Coach IA', requiredRoles: ['b2c', 'b2b_user', 'b2b_admin'], description: 'Accompagnement par intelligence artificielle', category: 'core' },
+  { path: '/settings/privacy', name: 'Préférences', requiredRoles: ['b2c', 'b2b_user', 'b2b_admin'], description: 'Configuration personnelle', category: 'core' },
   
   // Therapeutic tools
-  { path: '/music', name: 'Musicothérapie', requiredRoles: ['b2c', 'b2b_user', 'b2b_admin'], description: 'Sons et musiques thérapeutiques', category: 'tools' },
-  { path: '/vr', name: 'Réalité Virtuelle', requiredRoles: ['b2c', 'b2b_user', 'b2b_admin'], description: 'Expériences immersives relaxantes', category: 'tools' },
+  { path: '/app/music', name: 'Musicothérapie', requiredRoles: ['b2c', 'b2b_user', 'b2b_admin'], description: 'Sons et musiques thérapeutiques', category: 'tools' },
+  { path: '/app/vr', name: 'Réalité Virtuelle', requiredRoles: ['b2c', 'b2b_user', 'b2b_admin'], description: 'Expériences immersives relaxantes', category: 'tools' },
   { path: '/gamification', name: 'Gamification', requiredRoles: ['b2c', 'b2b_user', 'b2b_admin'], description: 'Défis et récompenses motivantes', category: 'tools' },
   
   // Social features
-  { path: '/social-cocon', name: 'Cocon Social', requiredRoles: ['b2c', 'b2b_user', 'b2b_admin'], description: 'Communauté bienveillante', category: 'social' },
+  { path: '/app/social-cocon', name: 'Cocon Social', requiredRoles: ['b2c', 'b2b_user', 'b2b_admin'], description: 'Communauté bienveillante', category: 'social' },
   
   // Admin features
-  { path: '/teams', name: 'Gestion Équipes', requiredRoles: ['b2b_admin'], description: 'Management des collaborateurs', category: 'admin' },
-  { path: '/reports', name: 'Rapports Analytics', requiredRoles: ['b2b_admin'], description: 'Analyses et métriques détaillées', category: 'admin' },
-  { path: '/events', name: 'Événements RH', requiredRoles: ['b2b_admin'], description: 'Planification et suivi événements', category: 'admin' },
-  { path: '/optimisation', name: 'Optimisation', requiredRoles: ['b2b_admin'], description: 'Outils d\'optimisation avancés', category: 'admin' },
-  { path: '/settings', name: 'Paramètres Admin', requiredRoles: ['b2b_admin'], description: 'Configuration système', category: 'admin' }
+  { path: '/app/teams', name: 'Gestion Équipes', requiredRoles: ['b2b_admin'], description: 'Management des collaborateurs', category: 'admin' },
+  { path: '/app/reports', name: 'Rapports Analytics', requiredRoles: ['b2b_admin'], description: 'Analyses et métriques détaillées', category: 'admin' },
+  { path: '/app/events', name: 'Événements RH', requiredRoles: ['b2b_admin'], description: 'Planification et suivi événements', category: 'admin' },
+  { path: '/app/optimization', name: 'Optimisation', requiredRoles: ['b2b_admin'], description: 'Outils d\'optimisation avancés', category: 'admin' },
+  { path: '/settings/general', name: 'Paramètres Admin', requiredRoles: ['b2b_admin'], description: 'Configuration système', category: 'admin' }
 ];
 
 const AccessVerifier: React.FC = () => {

@@ -26,17 +26,17 @@ const NavBar: React.FC = () => {
 
   const navItems = [
     { name: 'Accueil', path: '/', icon: Home },
-    { name: 'Scanner', path: '/scan', icon: Brain, premium: true },
-    { name: 'Musique', path: '/music', icon: Music, premium: true },
-    { name: 'Journal', path: '/journal', icon: BookOpen },
-    { name: 'Coach', path: '/coach', icon: MessageCircle, premium: true },
-    { name: 'VR', path: '/vr', icon: Headphones, premium: true },
+    { name: 'Scanner', path: '/app/scan', icon: Brain, premium: true },
+    { name: 'Musique', path: '/app/music', icon: Music, premium: true },
+    { name: 'Journal', path: '/app/journal', icon: BookOpen },
+    { name: 'Coach', path: '/app/coach', icon: MessageCircle, premium: true },
+    { name: 'VR', path: '/app/vr', icon: Headphones, premium: true },
     { name: 'Gamification', path: '/gamification', icon: Trophy },
   ];
 
   const quickAccess = [
-    { name: 'Flash Glow', path: '/flash-glow', icon: Zap },
-    { name: 'Breathwork', path: '/breathwork', icon: Sparkles },
+    { name: 'Flash Glow', path: '/app/flash-glow', icon: Zap },
+    { name: 'Breathwork', path: '/app/breath', icon: Sparkles },
   ];
 
   return (

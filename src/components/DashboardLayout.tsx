@@ -48,11 +48,11 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
 
   const menuItems = [
     { icon: <Home className="w-5 h-5" />, label: 'Accueil', path: '/' },
-    { icon: <Heart className="w-5 h-5" />, label: 'Scan Émotionnel', path: '/scan' },
-    { icon: <FileText className="w-5 h-5" />, label: 'Journal', path: '/journal' },
-    { icon: <Music className="w-5 h-5" />, label: 'Musicothérapie', path: '/music' },
-    { icon: <User className="w-5 h-5" />, label: 'Profil', path: '/profile' },
-    { icon: <Settings className="w-5 h-5" />, label: 'Paramètres', path: '/settings' },
+    { icon: <Heart className="w-5 h-5" />, label: 'Scan Émotionnel', path: '/app/scan' },
+    { icon: <FileText className="w-5 h-5" />, label: 'Journal', path: '/app/journal' },
+    { icon: <Music className="w-5 h-5" />, label: 'Musicothérapie', path: '/app/music' },
+    { icon: <User className="w-5 h-5" />, label: 'Profil', path: '/settings/profile' },
+    { icon: <Settings className="w-5 h-5" />, label: 'Paramètres', path: '/settings/general' },
   ];
 
   return (

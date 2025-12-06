@@ -78,10 +78,10 @@ const navigationItems: NavigationItem[] = [
   { id: 'gamification', label: 'Gamification', icon: Target, href: '/gamification', category: 'Social', description: 'Défis et récompenses' },
   
   // Paramètres & Outils
-  { id: 'preferences', label: 'Préférences', icon: Settings, href: '/preferences', category: 'Paramètres', description: 'Configuration' },
-  { id: 'notifications', label: 'Notifications', icon: Bell, href: '/notifications', category: 'Paramètres', description: 'Alertes personnalisées' },
-  { id: 'export-csv', label: 'Export Données', icon: FileDown, href: '/export-csv', category: 'Outils', description: 'Sauvegarde CSV' },
-  { id: 'help-center', label: 'Centre d\'Aide', icon: HelpCircle, href: '/help-center', category: 'Support', description: 'Documentation' },
+  { id: 'preferences', label: 'Préférences', icon: Settings, href: '/settings/privacy', category: 'Paramètres', description: 'Configuration' },
+  { id: 'notifications', label: 'Notifications', icon: Bell, href: '/settings/notifications', category: 'Paramètres', description: 'Alertes personnalisées' },
+  { id: 'export-csv', label: 'Export Données', icon: FileDown, href: '/settings/general', category: 'Outils', description: 'Sauvegarde CSV' },
+  { id: 'help-center', label: 'Centre d\'Aide', icon: HelpCircle, href: '/help', category: 'Support', description: 'Documentation' },
 ];
 
 const categories = [

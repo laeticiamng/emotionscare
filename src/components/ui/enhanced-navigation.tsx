@@ -31,20 +31,20 @@ const EnhancedNavigation: React.FC = () => {
 
   const navItems: NavItem[] = [
     { name: 'Accueil', path: '/', icon: Home, category: 'main' },
-    { name: 'Scanner', path: '/scan', icon: Brain, premium: true, category: 'features', description: 'Analyse émotionnelle en temps réel' },
-    { name: 'Musique', path: '/music', icon: Music, premium: true, category: 'features', description: 'Thérapie musicale personnalisée' },
-    { name: 'Journal', path: '/journal', icon: BookOpen, category: 'features', description: 'Suivi de votre bien-être' },
-    { name: 'Coach IA', path: '/coach', icon: MessageCircle, premium: true, category: 'features', description: 'Accompagnement personnalisé' },
-    { name: 'VR', path: '/vr', icon: Headphones, premium: true, badge: 'Nouveau', category: 'features' },
+    { name: 'Scanner', path: '/app/scan', icon: Brain, premium: true, category: 'features', description: 'Analyse émotionnelle en temps réel' },
+    { name: 'Musique', path: '/app/music', icon: Music, premium: true, category: 'features', description: 'Thérapie musicale personnalisée' },
+    { name: 'Journal', path: '/app/journal', icon: BookOpen, category: 'features', description: 'Suivi de votre bien-être' },
+    { name: 'Coach IA', path: '/app/coach', icon: MessageCircle, premium: true, category: 'features', description: 'Accompagnement personnalisé' },
+    { name: 'VR', path: '/app/vr', icon: Headphones, premium: true, badge: 'Nouveau', category: 'features' },
     { name: 'Gamification', path: '/gamification', icon: Trophy, category: 'features' },
-    { name: 'Flash Glow', path: '/flash-glow', icon: Zap, category: 'tools' },
-    { name: 'Breathwork', path: '/breathwork', icon: Sparkles, category: 'tools' },
-    { name: 'Préférences', path: '/preferences', icon: Settings, category: 'settings' },
+    { name: 'Flash Glow', path: '/app/flash-glow', icon: Zap, category: 'tools' },
+    { name: 'Breathwork', path: '/app/breath', icon: Sparkles, category: 'tools' },
+    { name: 'Préférences', path: '/settings/privacy', icon: Settings, category: 'settings' },
   ];
 
   const quickAccess = [
-    { name: 'Instant Glow', path: '/instant-glow', icon: Zap },
-    { name: 'Mood Mixer', path: '/mood-mixer', icon: Palette },
+    { name: 'Instant Glow', path: '/app/flash-glow', icon: Zap },
+    { name: 'Mood Mixer', path: '/app/mood-mixer', icon: Palette },
   ];
 
   const filteredItems = navItems.filter(item =>

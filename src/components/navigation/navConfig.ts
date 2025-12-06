@@ -42,7 +42,7 @@ export const b2cNavItems: NavItem[] = [
     priority: 1
   },
   {
-    href: '/scan',
+    href: '/app/scan',
     title: 'Scan Émotionnel',
     icon: Scan,
     description: 'Analysez votre état émotionnel',
@@ -52,7 +52,7 @@ export const b2cNavItems: NavItem[] = [
     priority: 2
   },
   {
-    href: '/journal',
+    href: '/app/journal',
     title: 'Journal Personnel',
     icon: FileText,
     description: 'Espace de réflexion quotidien',
@@ -61,7 +61,7 @@ export const b2cNavItems: NavItem[] = [
     priority: 3
   },
   {
-    href: '/coach',
+    href: '/app/coach',
     title: 'Coach IA',
     icon: Brain,
     description: 'Accompagnement personnalisé',
@@ -71,7 +71,7 @@ export const b2cNavItems: NavItem[] = [
     priority: 4
   },
   {
-    href: '/music',
+    href: '/app/music',
     title: 'Musicothérapie',
     icon: Music,
     description: 'Sons et musiques thérapeutiques',
@@ -80,7 +80,7 @@ export const b2cNavItems: NavItem[] = [
     priority: 5
   },
   {
-    href: '/vr',
+    href: '/app/vr',
     title: 'Réalité Virtuelle',
     icon: Glasses,
     description: 'Expériences immersives',
@@ -99,7 +99,7 @@ export const b2cNavItems: NavItem[] = [
     priority: 7
   },
   {
-    href: '/social-cocon',
+    href: '/app/social-cocon',
     title: 'Cocon Social',
     icon: Heart,
     description: 'Communauté bienveillante',
@@ -108,7 +108,7 @@ export const b2cNavItems: NavItem[] = [
     priority: 8
   },
   {
-    href: '/preferences',
+    href: '/settings/privacy',
     title: 'Préférences',
     icon: Settings,
     description: 'Configuration personnelle',
@@ -130,7 +130,7 @@ export const b2bUserNavItems: NavItem[] = [
     priority: 1
   },
   {
-    href: '/scan',
+    href: '/app/scan',
     title: 'Scan Émotionnel',
     icon: Scan,
     description: 'Analysez votre état émotionnel',
@@ -140,7 +140,7 @@ export const b2bUserNavItems: NavItem[] = [
     priority: 2
   },
   {
-    href: '/journal',
+    href: '/app/journal',
     title: 'Journal Personnel',
     icon: FileText,
     description: 'Espace de réflexion quotidien',
@@ -149,7 +149,7 @@ export const b2bUserNavItems: NavItem[] = [
     priority: 3
   },
   {
-    href: '/coach',
+    href: '/app/coach',
     title: 'Coach IA',
     icon: Brain,
     description: 'Accompagnement personnalisé',
@@ -159,7 +159,7 @@ export const b2bUserNavItems: NavItem[] = [
     priority: 4
   },
   {
-    href: '/music',
+    href: '/app/music',
     title: 'Musicothérapie',
     icon: Music,
     description: 'Sons et musiques thérapeutiques',
@@ -168,7 +168,7 @@ export const b2bUserNavItems: NavItem[] = [
     priority: 5
   },
   {
-    href: '/vr',
+    href: '/app/vr',
     title: 'Réalité Virtuelle',
     icon: Glasses,
     description: 'Expériences immersives',
@@ -187,7 +187,7 @@ export const b2bUserNavItems: NavItem[] = [
     priority: 7
   },
   {
-    href: '/social-cocon',
+    href: '/app/social-cocon',
     title: 'Cocon Social',
     icon: Heart,
     description: 'Communauté d\'entreprise',
@@ -196,7 +196,7 @@ export const b2bUserNavItems: NavItem[] = [
     priority: 8
   },
   {
-    href: '/preferences',
+    href: '/settings/privacy',
     title: 'Préférences',
     icon: Settings,
     description: 'Configuration personnelle',
@@ -209,7 +209,7 @@ export const b2bUserNavItems: NavItem[] = [
 // Navigation pour administrateurs B2B
 export const b2bAdminNavItems: NavItem[] = [
   {
-    href: '/entreprise',
+    href: '/app/rh',
     title: 'Dashboard Admin',
     icon: Home,
     description: 'Vue d\'ensemble de l\'organisation',
@@ -218,7 +218,7 @@ export const b2bAdminNavItems: NavItem[] = [
     priority: 1
   },
   {
-    href: '/teams',
+    href: '/app/teams',
     title: 'Gestion d\'Équipes',
     icon: Users,
     description: 'Gérez vos collaborateurs',
@@ -227,7 +227,7 @@ export const b2bAdminNavItems: NavItem[] = [
     priority: 2
   },
   {
-    href: '/reports',
+    href: '/app/reports',
     title: 'Rapports Analytics',
     icon: BarChart3,
     description: 'Analyses et métriques détaillées',
@@ -237,7 +237,7 @@ export const b2bAdminNavItems: NavItem[] = [
     priority: 3
   },
   {
-    href: '/events',
+    href: '/app/events',
     title: 'Événements RH',
     icon: Calendar,
     description: 'Planification et suivi',
@@ -246,7 +246,7 @@ export const b2bAdminNavItems: NavItem[] = [
     priority: 4
   },
   {
-    href: '/optimisation',
+    href: '/app/optimization',
     title: 'Optimisation',
     icon: Sparkles,
     description: 'Outils d\'optimisation avancés',
@@ -256,7 +256,7 @@ export const b2bAdminNavItems: NavItem[] = [
     priority: 5
   },
   {
-    href: '/scan',
+    href: '/app/scan',
     title: 'Scan Émotionnel',
     icon: Scan,
     description: 'Outil d\'analyse personnelle',
@@ -265,7 +265,7 @@ export const b2bAdminNavItems: NavItem[] = [
     priority: 6
   },
   {
-    href: '/journal',
+    href: '/app/journal',
     title: 'Journal Personnel',
     icon: FileText,
     description: 'Espace de réflexion',
@@ -274,7 +274,7 @@ export const b2bAdminNavItems: NavItem[] = [
     priority: 7
   },
   {
-    href: '/coach',
+    href: '/app/coach',
     title: 'Coach IA',
     icon: Brain,
     description: 'Accompagnement personnalisé',
@@ -283,7 +283,7 @@ export const b2bAdminNavItems: NavItem[] = [
     priority: 8
   },
   {
-    href: '/music',
+    href: '/app/music',
     title: 'Musicothérapie',
     icon: Music,
     description: 'Sons thérapeutiques',
@@ -292,7 +292,7 @@ export const b2bAdminNavItems: NavItem[] = [
     priority: 9
   },
   {
-    href: '/vr',
+    href: '/app/vr',
     title: 'Réalité Virtuelle',
     icon: Glasses,
     description: 'Expériences immersives',
@@ -301,7 +301,7 @@ export const b2bAdminNavItems: NavItem[] = [
     priority: 10
   },
   {
-    href: '/social-cocon',
+    href: '/app/social-cocon',
     title: 'Cocon Social',
     icon: Heart,
     description: 'Communauté d\'entreprise',
@@ -310,7 +310,7 @@ export const b2bAdminNavItems: NavItem[] = [
     priority: 11
   },
   {
-    href: '/settings',
+    href: '/settings/general',
     title: 'Paramètres Système',
     icon: Settings,
     description: 'Configuration globale',

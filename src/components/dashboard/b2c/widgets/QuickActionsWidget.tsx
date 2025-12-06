@@ -10,12 +10,12 @@ export const QuickActionsWidget: React.FC = () => {
   const navigate = useNavigate();
 
   const actions = [
-    { title: 'Scan Émotionnel', icon: Activity, path: '/scan', color: 'bg-blue-500' },
-    { title: 'Musique', icon: Music, path: '/music', color: 'bg-purple-500' },
-    { title: 'Coach IA', icon: MessageCircle, path: '/coach', color: 'bg-green-500' },
-    { title: 'Journal', icon: Book, path: '/journal', color: 'bg-orange-500' },
-    { title: 'Réalité Virtuelle', icon: Camera, path: '/vr', color: 'bg-indigo-500' },
-    { title: 'Événements', icon: Calendar, path: '/events', color: 'bg-red-500' },
+    { title: 'Scan Émotionnel', icon: Activity, path: '/app/scan', color: 'bg-blue-500' },
+    { title: 'Musique', icon: Music, path: '/app/music', color: 'bg-purple-500' },
+    { title: 'Coach IA', icon: MessageCircle, path: '/app/coach', color: 'bg-green-500' },
+    { title: 'Journal', icon: Book, path: '/app/journal', color: 'bg-orange-500' },
+    { title: 'Réalité Virtuelle', icon: Camera, path: '/app/vr', color: 'bg-indigo-500' },
+    { title: 'Événements', icon: Calendar, path: '/app/events', color: 'bg-red-500' },
   ];
 
   return (
