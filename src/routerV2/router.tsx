@@ -298,6 +298,9 @@ const WeeklyReportPage = lazy(() => import('@/pages/WeeklyReportPage'));
 const MonthlyReportPage = lazy(() => import('@/pages/MonthlyReportPage'));
 const NavigationPage = lazy(() => import('@/pages/NavigationPage'));
 
+// Exchange Hub V2.0
+const ExchangeHubPage = lazy(() => import('@/pages/ExchangeHubPage'));
+
 // ═══════════════════════════════════════════════════════════
 // MAPPING DES COMPOSANTS
 // ═══════════════════════════════════════════════════════════
@@ -543,6 +546,8 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   MonthlyReportPage,
   NavigationPage,
   
+  // Exchange Hub V2.0
+  ExchangeHubPage,
   // GDPR & Compliance
   UnifiedGDPRDashboard,
   APIMonitoringDashboard,
