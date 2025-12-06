@@ -64,7 +64,7 @@ const RecentJournalEntries: React.FC = () => {
                 variant="outline" 
                 size="sm" 
                 className="mt-2" 
-                onClick={() => navigate('/app/journal/new')}
+                onClick={() => navigate('/app/journal-new')}
               >
                 Créer une entrée
               </Button>
