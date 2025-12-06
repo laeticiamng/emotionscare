@@ -65,7 +65,7 @@ const FloatingActionMenu: React.FC = () => {
       id: 'exchange',
       icon: <TrendingUp className="w-5 h-5" aria-hidden="true" />,
       label: 'Exchange Hub',
-      path: '/app/exchange',
+      path: routes.b2c.exchange(),
       color: 'bg-emerald-500',
       gradient: 'from-emerald-400 to-teal-600'
     }
