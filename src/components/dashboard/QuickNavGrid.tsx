@@ -14,7 +14,7 @@ const QuickNavGrid: React.FC = () => {
       title: 'Journal',
       description: 'Exprimez vos pensées',
       icon: BookOpen,
-      path: '/journal',
+      path: '/app/journal',
       bgClass: 'card-journal',
       indicator: 'Dernière entrée: hier'
     },
@@ -22,7 +22,7 @@ const QuickNavGrid: React.FC = () => {
       title: 'Micro-pauses VR',
       description: 'Sessions immersives',
       icon: HeartPulse,
-      path: '/vr-session',
+      path: '/app/vr',
       bgClass: 'card-vr',
       indicator: 'Sessions cette semaine: 3'
     },
@@ -30,7 +30,7 @@ const QuickNavGrid: React.FC = () => {
       title: 'Social Cocoon',
       description: 'Échangez anonymement',
       icon: Users,
-      path: '/community',
+      path: '/app/community',
       bgClass: 'card-social',
       indicator: 'Nouveaux messages: 2'
     },
@@ -38,7 +38,7 @@ const QuickNavGrid: React.FC = () => {
       title: 'Coach IA',
       description: 'Conseils personnalisés',
       icon: Brain,
-      path: '/scan',
+      path: '/app/scan',
       bgClass: 'card-coach',
       indicator: 'Recommandations: 4'
     },
@@ -46,7 +46,7 @@ const QuickNavGrid: React.FC = () => {
       title: 'Scan émotionnel',
       description: 'Analysez votre état',
       icon: Eye,
-      path: '/scan',
+      path: '/app/scan',
       bgClass: 'card-coach',
       indicator: 'Dernier scan: aujourd\'hui'
     },

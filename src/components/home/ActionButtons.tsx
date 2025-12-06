@@ -13,14 +13,14 @@ const ActionButtons: React.FC = () => {
       icon: <Brain className="h-6 w-6" />,
       title: "Scanner Émotionnel",
       description: "Analysez vos émotions",
-      path: "/scan",
+      path: "/app/scan",
       gradient: "from-blue-500 via-blue-600 to-indigo-700"
     },
     {
       icon: <Music className="h-6 w-6" />,
       title: "Musicothérapie",
       description: "Musique adaptative",
-      path: "/music",
+      path: "/app/music",
       gradient: "from-purple-500 via-purple-600 to-pink-700",
       isMusic: true
     },
@@ -28,28 +28,28 @@ const ActionButtons: React.FC = () => {
       icon: <BookOpen className="h-6 w-6" />,
       title: "Journal",
       description: "Suivez votre progression",
-      path: "/journal",
+      path: "/app/journal",
       gradient: "from-green-500 via-emerald-600 to-teal-700"
     },
     {
       icon: <Heart className="h-6 w-6" />,
       title: "Coach IA",
       description: "Accompagnement personnalisé",
-      path: "/coach",
+      path: "/app/coach",
       gradient: "from-red-500 via-pink-600 to-rose-700"
     },
     {
       icon: <Headphones className="h-6 w-6" />,
       title: "Réalité Virtuelle",
       description: "Expériences immersives",
-      path: "/vr",
+      path: "/app/vr",
       gradient: "from-indigo-500 via-purple-600 to-violet-700"
     },
     {
       icon: <Users className="h-6 w-6" />,
       title: "Communauté",
       description: "Partagez avec d'autres",
-      path: "/community",
+      path: "/app/community",
       gradient: "from-orange-500 via-amber-600 to-yellow-700"
     },
     {
@@ -63,14 +63,14 @@ const ActionButtons: React.FC = () => {
       icon: <Bell className="h-6 w-6" />,
       title: "Notifications",
       description: "Système de notifications",
-      path: "/notifications",
+      path: "/settings/notifications",
       gradient: "from-cyan-500 via-sky-600 to-blue-700"
     },
     {
       icon: <Settings className="h-6 w-6" />,
       title: "Paramètres",
       description: "Personnalisez votre expérience",
-      path: "/settings",
+      path: "/settings/general",
       gradient: "from-gray-500 via-slate-600 to-gray-700"
     },
   ];

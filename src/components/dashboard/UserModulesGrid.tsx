@@ -13,7 +13,7 @@ const UserModulesGrid: React.FC = () => {
       title: 'Scan émotionnel',
       description: 'Analysez votre état',
       icon: Eye,
-      path: '/scan',
+      path: '/app/scan',
       bgClass: 'bg-pastel-blue/30',
       indicator: 'Dernier scan: aujourd\'hui'
     },
@@ -21,7 +21,7 @@ const UserModulesGrid: React.FC = () => {
       title: 'Social Cocoon',
       description: 'Échangez anonymement',
       icon: Users,
-      path: '/social-cocoon',
+      path: '/app/social-cocon',
       bgClass: 'bg-pastel-purple/30',
       indicator: 'Nouveaux messages: 2'
     },
@@ -29,7 +29,7 @@ const UserModulesGrid: React.FC = () => {
       title: 'Buddy',
       description: 'Connexions de confiance',
       icon: User,
-      path: '/buddy',
+      path: '/app/community',
       bgClass: 'bg-pastel-orange/30', 
       indicator: 'Connexions: 3'
     },
@@ -37,7 +37,7 @@ const UserModulesGrid: React.FC = () => {
       title: 'Coach IA',
       description: 'Conseils personnalisés',
       icon: Brain,
-      path: '/coach',
+      path: '/app/coach',
       bgClass: 'bg-pastel-green/30',
       indicator: 'Recommandations: 4'
     },
