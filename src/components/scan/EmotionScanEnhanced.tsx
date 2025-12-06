@@ -509,7 +509,6 @@ export default function EmotionScanEnhanced() {
                           <Progress 
                             value={result.mood.arousal * 100} 
                             className="h-2"
-                            // @ts-ignore
                             indicatorClassName="bg-blue-600"
                           />
                         </div>
@@ -524,7 +523,6 @@ export default function EmotionScanEnhanced() {
                           <Progress 
                             value={result.confidence * 100} 
                             className="h-2"
-                            // @ts-ignore
                             indicatorClassName="bg-purple-600"
                           />
                         </div>
