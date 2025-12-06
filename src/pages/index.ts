@@ -1,18 +1,17 @@
 // @ts-nocheck
 // Pages nécessaires pour RouterV2 uniquement
-export { default as HomePage } from './HomePage';
+
+// Re-export HomePage from components (where it's located)
+export { default as HomePage } from '@/components/HomePage';
 export { default as AboutPage } from './AboutPage';
 export { default as ContactPage } from './ContactPage';
 export { default as HelpPage } from './HelpPage';
 export { default as LoginPage } from './LoginPage';
 export { default as SignupPage } from './SignupPage';
-export { default as PrivacyPage } from './PrivacyPage';
 
 // App & Dashboards
 export { default as AppGatePage } from './AppGatePage';
 export { default as B2CDashboardPage } from './B2CDashboardPage';
-export { default as B2BUserDashboardPage } from './B2BUserDashboardPage';
-export { default as B2BAdminDashboardPage } from './B2BAdminDashboardPage';
 export { default as B2BCollabDashboard } from './B2BCollabDashboard';
 export { default as B2BRHDashboard } from './B2BRHDashboard';
 
@@ -85,12 +84,14 @@ export { default as UserRolesPage } from './admin/UserRolesPage';
 export { default as SubscribePage } from './SubscribePage';
 export { default as DemoPage } from './DemoPage';
 
-// Legal pages
-export { default as LegalTermsPage } from './LegalTermsPage';
-export { default as LegalPrivacyPage } from './LegalPrivacyPage';
-export { default as LegalMentionsPage } from './LegalMentionsPage';
-export { default as LegalSalesPage } from './LegalSalesPage';
-export { default as LegalCookiesPage } from './LegalCookiesPage';
+// Legal pages - point to correct files in legal/ folder
+export { default as PrivacyPage } from './legal/PrivacyPage';
+export { default as MentionsLegalesPage } from './legal/MentionsLegalesPage';
+export { default as TermsPage } from './legal/TermsPage';
+export { default as SalesTermsPage } from './legal/SalesTermsPage';
+export { default as CookiesPage } from './legal/CookiesPage';
+export { default as LicensesPage } from './legal/LicensesPage';
+export { default as PrivacyPolicyPage } from './legal/PrivacyPolicyPage';
 
 // System & Error pages
 export { default as UnauthorizedPage } from './errors/401/page';
@@ -101,6 +102,7 @@ export { default as ServerErrorPage } from './errors/500/page';
 // Development pages
 export { default as ValidationPage } from './ValidationPage';
 export { default as B2CNyveeCoconPage } from './B2CNyveeCoconPage';
+
 // Pages supplémentaires
 export { default as JournalNewPage } from './JournalNewPage';
 export { default as ReportingPage } from './ReportingPage';
@@ -113,6 +115,5 @@ export { default as AdminFlagsPage } from "@/modules/admin/AdminFlagsPage";
 export { default as TestAccountsPage } from "./TestAccountsPage";
 export { default as ModeSelectionPage } from './ModeSelectionPage';
 
-// Legal Pages (nouvelles)
-export { TermsPage } from './legal/TermsPage';
+// Legal re-exports for compatibility
 export { LegalPage } from './legal/LegalPage';
