@@ -122,11 +122,12 @@ export const VRHUD: React.FC<VRHUDProps> = ({
                     variant="outline"
                     size="sm"
                     className="border-white/20 text-white hover:bg-white/10"
+                    aria-label={paused ? "Reprendre la session" : "Mettre en pause"}
                   >
                     {paused ? (
-                      <Play className="h-4 w-4" />
+                      <Play className="h-4 w-4" aria-hidden="true" />
                     ) : (
-                      <Pause className="h-4 w-4" />
+                      <Pause className="h-4 w-4" aria-hidden="true" />
                     )}
                   </Button>
                   
@@ -146,11 +147,12 @@ export const VRHUD: React.FC<VRHUDProps> = ({
                 variant="ghost"
                 size="sm"
                 className={`text-white hover:bg-white/10 ${musicEnabled ? 'bg-white/10' : ''}`}
+                aria-label={musicEnabled ? "Désactiver la musique" : "Activer la musique"}
               >
                 {musicEnabled ? (
-                  <Music className="h-4 w-4" />
+                  <Music className="h-4 w-4" aria-hidden="true" />
                 ) : (
-                  <MusicOff className="h-4 w-4" />
+                  <MusicOff className="h-4 w-4" aria-hidden="true" />
                 )}
               </Button>
               
