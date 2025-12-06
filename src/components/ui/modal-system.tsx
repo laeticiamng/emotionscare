@@ -91,8 +91,9 @@ export const ModalProvider: React.FC<{ children: ReactNode }> = ({ children }) =
                 size="icon"
                 className="absolute right-4 top-4 rounded-sm opacity-70 hover:opacity-100"
                 onClick={() => closeModal(modal.id)}
+                aria-label="Fermer la fenêtre"
               >
-                <X className="h-4 w-4" />
+                <X className="h-4 w-4" aria-hidden="true" />
               </Button>
             )}
             

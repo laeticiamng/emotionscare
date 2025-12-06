@@ -130,8 +130,8 @@ const AudioPlayerAdvanced: React.FC<AudioPlayerAdvancedProps> = ({
               <p className="font-medium text-sm truncate">{activeTrack?.title}</p>
               <p className="text-xs text-muted-foreground truncate">{activeTrack?.artist}</p>
             </div>
-            <Button size="sm" variant="ghost" onClick={togglePlay}>
-              {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+            <Button size="sm" variant="ghost" onClick={togglePlay} aria-label={isPlaying ? "Mettre en pause" : "Lire"}>
+              {isPlaying ? <Pause className="h-4 w-4" aria-hidden="true" /> : <Play className="h-4 w-4" aria-hidden="true" />}
             </Button>
           </div>
           <Slider
@@ -194,24 +194,26 @@ const AudioPlayerAdvanced: React.FC<AudioPlayerAdvancedProps> = ({
             size="sm"
             onClick={() => setIsShuffled(!isShuffled)}
             className={isShuffled ? 'text-primary' : ''}
+            aria-label={isShuffled ? "Désactiver la lecture aléatoire" : "Activer la lecture aléatoire"}
           >
-            <Shuffle className="h-4 w-4" />
+            <Shuffle className="h-4 w-4" aria-hidden="true" />
           </Button>
           
-          <Button variant="ghost" size="sm">
-            <SkipBack className="h-4 w-4" />
+          <Button variant="ghost" size="sm" aria-label="Piste précédente">
+            <SkipBack className="h-4 w-4" aria-hidden="true" />
           </Button>
           
           <Button
             size="lg"
             onClick={togglePlay}
             className="rounded-full w-12 h-12"
+            aria-label={isPlaying ? "Mettre en pause" : "Lire"}
           >
-            {isPlaying ? <Pause className="h-6 w-6" /> : <Play className="h-6 w-6" />}
+            {isPlaying ? <Pause className="h-6 w-6" aria-hidden="true" /> : <Play className="h-6 w-6" aria-hidden="true" />}
           </Button>
           
-          <Button variant="ghost" size="sm">
-            <SkipForward className="h-4 w-4" />
+          <Button variant="ghost" size="sm" aria-label="Piste suivante">
+            <SkipForward className="h-4 w-4" aria-hidden="true" />
           </Button>
           
           <Button
@@ -219,8 +221,9 @@ const AudioPlayerAdvanced: React.FC<AudioPlayerAdvancedProps> = ({
             size="sm"
             onClick={() => setIsRepeating(!isRepeating)}
             className={isRepeating ? 'text-primary' : ''}
+            aria-label={isRepeating ? "Désactiver la répétition" : "Activer la répétition"}
           >
-            <Repeat className="h-4 w-4" />
+            <Repeat className="h-4 w-4" aria-hidden="true" />
           </Button>
         </div>
 
@@ -231,13 +234,14 @@ const AudioPlayerAdvanced: React.FC<AudioPlayerAdvancedProps> = ({
             size="sm"
             onClick={() => setIsLiked(!isLiked)}
             className={isLiked ? 'text-red-500' : ''}
+            aria-label={isLiked ? "Retirer des favoris" : "Ajouter aux favoris"}
           >
-            <Heart className={cn("h-4 w-4", isLiked && "fill-current")} />
+            <Heart className={cn("h-4 w-4", isLiked && "fill-current")} aria-hidden="true" />
           </Button>
           
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" onClick={toggleMute}>
-              {isMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+            <Button variant="ghost" size="sm" onClick={toggleMute} aria-label={isMuted ? "Réactiver le son" : "Couper le son"}>
+              {isMuted ? <VolumeX className="h-4 w-4" aria-hidden="true" /> : <Volume2 className="h-4 w-4" aria-hidden="true" />}
             </Button>
             <Slider
               value={[isMuted ? 0 : volume]}
@@ -249,11 +253,11 @@ const AudioPlayerAdvanced: React.FC<AudioPlayerAdvancedProps> = ({
           </div>
           
           <div className="flex gap-1">
-            <Button variant="ghost" size="sm">
-              <Share2 className="h-4 w-4" />
+            <Button variant="ghost" size="sm" aria-label="Partager">
+              <Share2 className="h-4 w-4" aria-hidden="true" />
             </Button>
-            <Button variant="ghost" size="sm">
-              <MoreHorizontal className="h-4 w-4" />
+            <Button variant="ghost" size="sm" aria-label="Plus d'options">
+              <MoreHorizontal className="h-4 w-4" aria-hidden="true" />
             </Button>
           </div>
         </div>

@@ -182,19 +182,21 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({
                 size="icon"
                 onClick={handlePrevious}
                 className="h-10 w-10"
+                aria-label="Piste précédente"
               >
-                <SkipBack className="h-5 w-5" />
+                <SkipBack className="h-5 w-5" aria-hidden="true" />
               </Button>
 
               <Button
                 size="icon"
                 onClick={handlePlayPause}
                 className="h-12 w-12 rounded-full"
+                aria-label={isPlaying ? "Mettre en pause" : "Lire"}
               >
                 {isPlaying ? (
-                  <Pause className="h-6 w-6" />
+                  <Pause className="h-6 w-6" aria-hidden="true" />
                 ) : (
-                  <Play className="h-6 w-6 ml-1" />
+                  <Play className="h-6 w-6 ml-1" aria-hidden="true" />
                 )}
               </Button>
 
@@ -203,8 +205,9 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({
                 size="icon"
                 onClick={handleNext}
                 className="h-10 w-10"
+                aria-label="Piste suivante"
               >
-                <SkipForward className="h-5 w-5" />
+                <SkipForward className="h-5 w-5" aria-hidden="true" />
               </Button>
             </div>
           )}
@@ -216,11 +219,12 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({
               size="icon"
               onClick={toggleMute}
               className="h-8 w-8"
+              aria-label={isMuted || volume === 0 ? "Réactiver le son" : "Couper le son"}
             >
               {isMuted || volume === 0 ? (
-                <VolumeX className="h-4 w-4" />
+                <VolumeX className="h-4 w-4" aria-hidden="true" />
               ) : (
-                <Volume2 className="h-4 w-4" />
+                <Volume2 className="h-4 w-4" aria-hidden="true" />
               )}
             </Button>
             <Slider
