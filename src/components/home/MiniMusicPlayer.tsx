@@ -108,6 +108,7 @@ const MiniMusicPlayer: React.FC = () => {
             whileTap={{ scale: 0.9 }}
             onClick={handlePreviousClick}
             className="p-4 rounded-2xl bg-white/15 backdrop-blur-md hover:bg-white/25 transition-all duration-300 shadow-xl border border-white/20"
+            aria-label="Piste précédente"
           >
             <SkipBack className="h-6 w-6 text-white" />
           </motion.button>
@@ -117,6 +118,7 @@ const MiniMusicPlayer: React.FC = () => {
             whileTap={{ scale: 0.95 }}
             onClick={handlePlayClick}
             className="p-6 rounded-2xl bg-white/20 backdrop-blur-md hover:bg-white/30 shadow-2xl border border-white/30 transition-all duration-300"
+            aria-label={isPlaying ? "Pause" : "Lecture"}
           >
             {isPlaying ? (
               <Pause className="h-8 w-8 text-white" />
@@ -130,6 +132,7 @@ const MiniMusicPlayer: React.FC = () => {
             whileTap={{ scale: 0.9 }}
             onClick={handleNextClick}
             className="p-4 rounded-2xl bg-white/15 backdrop-blur-md hover:bg-white/25 transition-all duration-300 shadow-xl border border-white/20"
+            aria-label="Piste suivante"
           >
             <SkipForward className="h-6 w-6 text-white" />
           </motion.button>

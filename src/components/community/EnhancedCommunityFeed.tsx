@@ -591,7 +591,7 @@ export default function EnhancedCommunityFeed() {
                           if (e.key === 'Enter') handleAddComment(post.id);
                         }}
                       />
-                      <Button size="sm" onClick={() => handleAddComment(post.id)}>
+                      <Button size="sm" onClick={() => handleAddComment(post.id)} aria-label="Envoyer le commentaire">
                         <Send className="h-4 w-4" />
                       </Button>
                     </div>

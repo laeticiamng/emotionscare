@@ -39,7 +39,7 @@ const MoodPicker: React.FC<MoodPickerProps> = ({ onSelect, onClose }) => {
       >
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-xl font-semibold">Comment vous sentez-vous aujourd'hui ?</h3>
-          <Button variant="ghost" size="sm" onClick={onClose} className="rounded-full h-8 w-8 p-0">
+          <Button variant="ghost" size="sm" onClick={onClose} className="rounded-full h-8 w-8 p-0" aria-label="Fermer">
             <XCircle className="h-5 w-5" />
           </Button>
         </div>

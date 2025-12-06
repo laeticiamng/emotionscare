@@ -241,6 +241,7 @@ const RealtimeChatInterface: React.FC<RealtimeChatInterfaceProps> = ({ className
                 size="sm"
                 onClick={() => setIsAudioEnabled(!isAudioEnabled)}
                 className="flex items-center gap-2"
+                aria-label={isAudioEnabled ? "Désactiver le son" : "Activer le son"}
               >
                 {isAudioEnabled ? (
                   <Volume2 className="h-4 w-4" />
@@ -266,6 +267,7 @@ const RealtimeChatInterface: React.FC<RealtimeChatInterfaceProps> = ({ className
                 onClick={handleSendText}
                 disabled={!textMessage.trim() || !isConnected}
                 size="icon"
+                aria-label="Envoyer le message"
               >
                 <Send className="h-4 w-4" />
               </Button>

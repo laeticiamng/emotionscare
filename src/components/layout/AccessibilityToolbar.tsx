@@ -81,6 +81,7 @@ const AccessibilityToolbar: React.FC = () => {
                       size="sm"
                       onClick={() => setIsOpen(false)}
                       className="h-8 w-8 p-0"
+                      aria-label="Fermer le panneau d'accessibilité"
                     >
                       <X className="w-4 h-4" />
                     </Button>

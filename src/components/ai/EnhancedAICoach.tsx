@@ -282,6 +282,7 @@ const EnhancedAICoach: React.FC = () => {
               variant="outline"
               size="sm"
               onClick={() => setVoiceEnabled(!voiceEnabled)}
+              aria-label={voiceEnabled ? "Désactiver la synthèse vocale" : "Activer la synthèse vocale"}
             >
               {voiceEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
             </Button>

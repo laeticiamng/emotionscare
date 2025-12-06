@@ -87,7 +87,7 @@ const ReportsFilters: React.FC<ReportsFiltersProps> = ({ onFiltersChange }) => {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="font-medium">Filtres des Rapports</h3>
-            <Button variant="ghost" size="sm" onClick={clearFilters}>
+            <Button variant="ghost" size="sm" onClick={clearFilters} aria-label="Effacer les filtres">
               <X className="h-4 w-4" />
             </Button>
           </div>

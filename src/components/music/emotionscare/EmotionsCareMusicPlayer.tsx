@@ -221,11 +221,12 @@ const EmotionsCareMusicPlayer: React.FC<EmotionsCareMusicPlayerProps> = ({
               size="sm"
               onClick={toggleShuffle}
               className={cn(state.shuffle && "text-primary")}
+              aria-label={state.shuffle ? "Désactiver la lecture aléatoire" : "Activer la lecture aléatoire"}
             >
               <Shuffle className="w-4 h-4" />
             </Button>
             
-            <Button variant="ghost" size="sm" onClick={() => selectTrack('prev')}>
+            <Button variant="ghost" size="sm" onClick={() => selectTrack('prev')} aria-label="Piste précédente">
               <SkipBack className="w-5 h-5" />
             </Button>
             
@@ -234,11 +235,12 @@ const EmotionsCareMusicPlayer: React.FC<EmotionsCareMusicPlayerProps> = ({
               onClick={handlePlayPause}
               disabled={state.isLoading}
               className="w-14 h-14 rounded-full"
+              aria-label={state.isPlaying ? "Pause" : "Lecture"}
             >
               {state.isPlaying ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6" />}
             </Button>
             
-            <Button variant="ghost" size="sm" onClick={() => selectTrack('next')}>
+            <Button variant="ghost" size="sm" onClick={() => selectTrack('next')} aria-label="Piste suivante">
               <SkipForward className="w-5 h-5" />
             </Button>
             
@@ -247,6 +249,7 @@ const EmotionsCareMusicPlayer: React.FC<EmotionsCareMusicPlayerProps> = ({
               size="sm"
               onClick={() => setRepeat(state.repeat === 'none' ? 'all' : state.repeat === 'all' ? 'one' : 'none')}
               className={cn(state.repeat !== 'none' && "text-primary")}
+              aria-label={state.repeat === 'none' ? "Activer la répétition" : state.repeat === 'all' ? "Répéter une piste" : "Désactiver la répétition"}
             >
               <Repeat className="w-4 h-4" />
             </Button>
@@ -254,7 +257,7 @@ const EmotionsCareMusicPlayer: React.FC<EmotionsCareMusicPlayerProps> = ({
 
           {/* Volume Control */}
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="sm" onClick={toggleMute}>
+            <Button variant="ghost" size="sm" onClick={toggleMute} aria-label={state.isMuted ? "Réactiver le son" : "Couper le son"}>
               {state.isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
             </Button>
             <Slider
