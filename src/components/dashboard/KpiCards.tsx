@@ -30,8 +30,8 @@ const KpiCards: React.FC<KpiCardsProps> = ({
   const navigate = useNavigate();
   
   // Define drill-down routes for each KPI
-  const navigateToEmotionDetails = () => navigate('/journal');
-  const navigateToVRSessions = () => navigate('/vr-sessions');
+  const navigateToEmotionDetails = () => navigate('/app/journal');
+  const navigateToVRSessions = () => navigate('/app/breath');
   const navigateToBadges = () => navigate('/gamification');
   
   return (
