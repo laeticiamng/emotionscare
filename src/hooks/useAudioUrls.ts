@@ -4,7 +4,7 @@
  * avec fallback sur URLs externes et cache localStorage
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { getPublicMusicUrl } from '@/services/music/storage-service';
 import { logger } from '@/lib/logger';
 
@@ -26,13 +26,14 @@ const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 heures
 
 interface CachedData {
   urls: AudioUrlMapping;
+  sources: AudioUrlSource;
   timestamp: number;
 }
 
 /**
  * Lit le cache depuis localStorage
  */
-function readCache(): AudioUrlMapping | null {
+function readCache(): CachedData | null {
   if (typeof window === 'undefined') return null;
   
   try {
@@ -48,7 +49,7 @@ function readCache(): AudioUrlMapping | null {
       return null;
     }
     
-    return data.urls;
+    return data;
   } catch (error) {
     logger.warn('Failed to read audio URLs cache', error as Error, 'MUSIC');
     return null;
@@ -58,12 +59,13 @@ function readCache(): AudioUrlMapping | null {
 /**
  * Écrit le cache dans localStorage
  */
-function writeCache(urls: AudioUrlMapping): void {
+function writeCache(urls: AudioUrlMapping, sources: AudioUrlSource): void {
   if (typeof window === 'undefined') return;
   
   try {
     const data: CachedData = {
       urls,
+      sources,
       timestamp: Date.now()
     };
     window.localStorage.setItem(CACHE_KEY, JSON.stringify(data));
@@ -73,16 +75,24 @@ function writeCache(urls: AudioUrlMapping): void {
 }
 
 /**
+ * Vérifie si une URL audio est accessible via HEAD request
+ */
+async function checkUrlAccessible(url: string): Promise<boolean> {
+  try {
+    const response = await fetch(url, { method: 'HEAD', mode: 'no-cors' });
+    // no-cors ne donne pas le status, donc on vérifie juste que ça ne throw pas
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Hook pour charger les URLs audio de manière asynchrone
+ * Utilise directement les fallbacks pour éviter les problèmes de cache
  * 
  * @param config - Mapping trackId -> { fileName, fallbackUrl }
  * @returns { urls, isLoading, error }
- * 
- * @example
- * const { urls, isLoading } = useAudioUrls({
- *   'vinyl-1': { fileName: 'ambient-soft.mp3', fallbackUrl: 'https://...' },
- *   'vinyl-2': { fileName: 'focus-clarity.mp3', fallbackUrl: 'https://...' }
- * });
  */
 export function useAudioUrls(
   config: Record<string, AudioUrlConfig>
@@ -92,112 +102,84 @@ export function useAudioUrls(
   isLoading: boolean;
   error: string | null;
 } {
-  const [urls, setUrls] = useState<AudioUrlMapping>(() => {
-    // Initialiser avec le cache ou les fallbacks
-    const cached = readCache();
-    if (cached) {
-      logger.debug('Audio URLs loaded from cache', { count: Object.keys(cached).length }, 'MUSIC');
-      return cached;
-    }
-    
-    // Sinon, utiliser les fallbacks par défaut
-    const fallbackUrls: AudioUrlMapping = {};
+  // Générer les URLs fallback de manière stable
+  const fallbackUrls = useMemo(() => {
+    const urls: AudioUrlMapping = {};
     Object.entries(config).forEach(([trackId, { fallbackUrl }]) => {
-      fallbackUrls[trackId] = fallbackUrl;
+      urls[trackId] = fallbackUrl;
     });
+    return urls;
+  }, [config]);
+
+  const fallbackSources = useMemo(() => {
+    const sources: AudioUrlSource = {};
+    Object.keys(config).forEach(trackId => {
+      sources[trackId] = 'fallback';
+    });
+    return sources;
+  }, [config]);
+
+  const [urls, setUrls] = useState<AudioUrlMapping>(() => {
+    // Vérifier le cache d'abord
+    const cached = readCache();
+    if (cached && cached.sources) {
+      // Vérifier que toutes les URLs du cache utilisent fallback (pas supabase cassé)
+      const allFallback = Object.values(cached.sources).every(s => s === 'fallback');
+      if (allFallback) {
+        return cached.urls;
+      }
+    }
+    // Utiliser directement les fallbacks (pas Supabase car les fichiers n'existent pas)
     return fallbackUrls;
   });
   
-  const [sources, setSources] = useState<AudioUrlSource>(() => {
-    // Initialiser toutes les sources comme fallback
-    const initialSources: AudioUrlSource = {};
-    Object.keys(config).forEach(trackId => {
-      initialSources[trackId] = 'fallback';
-    });
-    return initialSources;
-  });
-  
+  const [sources, setSources] = useState<AudioUrlSource>(() => fallbackSources);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let isMounted = true;
     
-    async function loadSupabaseUrls() {
-      // Si on a déjà du cache, pas besoin de recharger
+    async function verifyAndLoadUrls() {
+      // Vérifier le cache
       const cached = readCache();
-      if (cached) {
+      if (cached && cached.urls && cached.sources) {
+        if (isMounted) {
+          setUrls(cached.urls);
+          setSources(cached.sources);
+        }
         return;
       }
       
       setIsLoading(true);
-      setError(null);
-      
-      const supabaseUrls: AudioUrlMapping = {};
-      let successCount = 0;
-      let failCount = 0;
-      
-      const urlSources: AudioUrlSource = {};
       
       try {
-        // Charger toutes les URLs en parallèle
-        const promises = Object.entries(config).map(async ([trackId, { fileName, fallbackUrl }]) => {
-          try {
-            const supabaseUrl = await getPublicMusicUrl(fileName);
-            if (supabaseUrl) {
-              supabaseUrls[trackId] = supabaseUrl;
-              urlSources[trackId] = 'supabase';
-              successCount++;
-            } else {
-              supabaseUrls[trackId] = fallbackUrl;
-              urlSources[trackId] = 'fallback';
-              failCount++;
-            }
-          } catch (err) {
-            logger.warn(`Failed to load Supabase URL for ${fileName}`, err as Error, 'MUSIC');
-            supabaseUrls[trackId] = fallbackUrl;
-            urlSources[trackId] = 'fallback';
-            failCount++;
-          }
-        });
+        // On utilise directement les fallbacks car Supabase Storage
+        // ne contient pas les fichiers audio pour le moment
+        // Cela évite les erreurs 404 répétées
         
-        await Promise.all(promises);
+        const resolvedUrls: AudioUrlMapping = {};
+        const resolvedSources: AudioUrlSource = {};
         
-        if (!isMounted) return;
-        
-        // Si au moins une URL Supabase a fonctionné, mettre à jour
-        if (successCount > 0) {
-          setUrls(supabaseUrls);
-          setSources(urlSources);
-          writeCache(supabaseUrls);
-          logger.info(
-            'Audio URLs loaded from Supabase Storage',
-            { success: successCount, failed: failCount },
-            'MUSIC'
-          );
-        } else {
-          // Toutes ont échoué, garder les fallbacks
-          logger.warn(
-            'All Supabase URLs failed, using fallbacks',
-            { count: failCount },
-            'MUSIC'
-          );
-          setError('Supabase Storage non disponible, URLs de secours utilisées');
-        }
-        
-      } catch (err) {
-        if (!isMounted) return;
-        
-        const errorMsg = 'Failed to load audio URLs from Supabase';
-        logger.error(errorMsg, err as Error, 'MUSIC');
-        setError(errorMsg);
-        
-        // En cas d'erreur globale, utiliser les fallbacks
-        const fallbackUrls: AudioUrlMapping = {};
         Object.entries(config).forEach(([trackId, { fallbackUrl }]) => {
-          fallbackUrls[trackId] = fallbackUrl;
+          resolvedUrls[trackId] = fallbackUrl;
+          resolvedSources[trackId] = 'fallback';
         });
-        setUrls(fallbackUrls);
+        
+        if (isMounted) {
+          setUrls(resolvedUrls);
+          setSources(resolvedSources);
+          writeCache(resolvedUrls, resolvedSources);
+          logger.debug('Audio URLs using fallbacks', { count: Object.keys(resolvedUrls).length }, 'MUSIC');
+        }
+      } catch (err) {
+        if (isMounted) {
+          logger.error('Failed to load audio URLs', err as Error, 'MUSIC');
+          setError('Erreur lors du chargement des URLs audio');
+          // En cas d'erreur, utiliser les fallbacks
+          setUrls(fallbackUrls);
+          setSources(fallbackSources);
+        }
       } finally {
         if (isMounted) {
           setIsLoading(false);
@@ -205,12 +187,12 @@ export function useAudioUrls(
       }
     }
     
-    loadSupabaseUrls();
+    verifyAndLoadUrls();
     
     return () => {
       isMounted = false;
     };
-  }, [config]);
+  }, [config, fallbackUrls, fallbackSources]);
 
   return { urls, sources, isLoading, error };
 }

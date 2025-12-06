@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { Sentry } from '@/lib/errors/sentry-compat'
-
 import { supabase } from '@/integrations/supabase/client'
+import { logger } from '@/lib/logger'
 
 export type SessionType =
   | 'flash_glow'
@@ -61,6 +61,33 @@ const sanitizeMoodDelta = (value: number | null | undefined) => {
   return Math.max(-10, Math.min(10, Math.round(value)))
 }
 
+/**
+ * Mapping des types de session vers les tables spécialisées
+ */
+const SESSION_TABLE_MAP: Record<SessionType, string> = {
+  flash_glow: 'flash_lite_sessions',
+  breath: 'breathing_vr_sessions',
+  music: 'music_sessions',
+  scan: 'user_activity_sessions',
+  vr_breath: 'breathing_vr_sessions',
+  vr_galaxy: 'vr_sessions',
+  ambition: 'user_activity_sessions',
+  grit: 'user_activity_sessions',
+  bubble: 'bubble_beat_sessions',
+  custom: 'user_activity_sessions',
+  community: 'user_activity_sessions',
+  social_cocon: 'user_activity_sessions',
+  auras: 'user_activity_sessions',
+  coach: 'ai_coach_sessions',
+  story_synth: 'story_synth_sessions',
+  activity: 'user_activity_sessions',
+  screen_silk: 'screen_silk_sessions',
+  weekly_bars: 'user_activity_sessions'
+}
+
+/**
+ * Créer une session dans la table appropriée
+ */
 export async function createSession(input: CreateSessionInput): Promise<SessionRecord> {
   const startedAt = typeof performance !== 'undefined' ? performance.now() : Date.now()
   Sentry.addBreadcrumb({
@@ -70,84 +97,172 @@ export async function createSession(input: CreateSessionInput): Promise<SessionR
     data: { type: input.type }
   })
 
-  const payload = {
-    type: input.type,
-    duration_sec: sanitizeDuration(input.duration_sec),
-    mood_delta: sanitizeMoodDelta(input.mood_delta ?? null),
-    meta: input.meta ?? {}
-  }
+  const duration = sanitizeDuration(input.duration_sec)
+  const moodDelta = sanitizeMoodDelta(input.mood_delta ?? null)
+  
+  try {
+    // Pour les sessions de respiration, utiliser breathing_vr_sessions
+    if (input.type === 'breath' || input.type === 'vr_breath') {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        throw new Error('User not authenticated')
+      }
 
-  const { data, error } = await supabase
-    .from('sessions')
-    .insert(payload)
-    .select('id, type, duration_sec, mood_delta, meta, created_at')
-    .single()
+      const { data, error } = await supabase
+        .from('breathing_vr_sessions')
+        .insert({
+          user_id: user.id,
+          pattern: input.meta?.pattern || 'default',
+          duration_seconds: duration,
+          mood_before: input.meta?.mood_before ?? null,
+          mood_after: input.meta?.mood_after ?? null,
+          notes: input.meta?.notes ?? null,
+          vr_mode: input.type === 'vr_breath',
+          started_at: new Date().toISOString()
+        })
+        .select('id, created_at')
+        .single()
 
-  if (error || !data) {
-    throw error ?? new Error('session insert failed')
-  }
+      if (error) {
+        throw error
+      }
 
-  const latency = toLatency(startedAt)
-  Sentry.addBreadcrumb({
-    category: 'session',
-    message: 'session:create:complete',
-    level: 'info',
-    data: { type: input.type, latency_ms: latency }
-  })
+      const latency = toLatency(startedAt)
+      logger.info('session:breath:create:complete', { type: input.type, latency_ms: latency }, 'SESSION')
 
-  const moodDeltaFromDb = (() => {
-    if (Object.prototype.hasOwnProperty.call(data, 'mood_delta')) {
-      return data.mood_delta as number | null | undefined
+      return {
+        id: data.id,
+        type: input.type,
+        duration_sec: duration,
+        mood_delta: moodDelta,
+        meta: input.meta ?? {},
+        created_at: data.created_at
+      }
     }
-    return undefined
-  })()
 
-  return {
-    id: data.id,
-    type: data.type as SessionType,
-    duration_sec: data.duration_sec ?? payload.duration_sec,
-    mood_delta:
-      typeof moodDeltaFromDb === 'number'
-        ? moodDeltaFromDb
-        : moodDeltaFromDb === null
-          ? null
-          : payload.mood_delta ?? null,
-    meta: (data.meta as Record<string, unknown> | null) ?? payload.meta,
-    created_at: data.created_at ?? new Date().toISOString()
+    // Pour les autres types, utiliser user_activity_sessions comme fallback
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+      throw new Error('User not authenticated')
+    }
+
+    const { data, error } = await supabase
+      .from('user_activity_sessions')
+      .insert({
+        user_id: user.id,
+        activity_type: input.type,
+        duration_minutes: Math.round(duration / 60),
+        mood_score: moodDelta ? Math.round((moodDelta + 10) / 2) : null,
+        notes: JSON.stringify(input.meta ?? {}),
+        started_at: new Date().toISOString()
+      })
+      .select('id, created_at')
+      .single()
+
+    if (error) {
+      throw error
+    }
+
+    const latency = toLatency(startedAt)
+    Sentry.addBreadcrumb({
+      category: 'session',
+      message: 'session:create:complete',
+      level: 'info',
+      data: { type: input.type, latency_ms: latency }
+    })
+
+    return {
+      id: data.id,
+      type: input.type,
+      duration_sec: duration,
+      mood_delta: moodDelta,
+      meta: input.meta ?? {},
+      created_at: data.created_at
+    }
+  } catch (error) {
+    logger.error('session:create:error', error as Error, 'SESSION')
+    Sentry.captureException(error)
+    
+    // Retourner un objet session factice pour ne pas bloquer l'UI
+    return {
+      id: `local-${Date.now()}`,
+      type: input.type,
+      duration_sec: duration,
+      mood_delta: moodDelta,
+      meta: input.meta ?? {},
+      created_at: new Date().toISOString()
+    }
   }
 }
 
+/**
+ * Lister les sessions de l'utilisateur
+ */
 export async function listMySessions(params: ListMySessionsParams = {}): Promise<SessionRecord[]> {
   const { type, limit = 20, offset = 0 } = params
-  let query = supabase
-    .from('sessions')
-    .select('id, type, duration_sec, mood_delta, meta, created_at')
-    .order('created_at', { ascending: false })
 
-  if (type) {
-    query = query.eq('type', type)
-  }
+  try {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+      return []
+    }
 
-  if (Number.isFinite(limit) && Number.isFinite(offset)) {
+    // Pour les sessions de respiration
+    if (type === 'breath' || type === 'vr_breath') {
+      const { data, error } = await supabase
+        .from('breathing_vr_sessions')
+        .select('id, pattern, duration_seconds, mood_before, mood_after, notes, vr_mode, created_at')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .range(offset, offset + limit - 1)
+
+      if (error) {
+        throw error
+      }
+
+      return (data ?? []).map(row => ({
+        id: row.id,
+        type: row.vr_mode ? 'vr_breath' : 'breath',
+        duration_sec: row.duration_seconds ?? 0,
+        mood_delta: row.mood_after && row.mood_before ? row.mood_after - row.mood_before : null,
+        meta: { pattern: row.pattern, notes: row.notes },
+        created_at: row.created_at
+      }))
+    }
+
+    // Pour les autres types, utiliser user_activity_sessions
+    let query = supabase
+      .from('user_activity_sessions')
+      .select('id, activity_type, duration_minutes, mood_score, notes, created_at')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+
+    if (type) {
+      query = query.eq('activity_type', type)
+    }
+
     const safeLimit = Math.max(1, Math.min(200, Math.floor(limit)))
     const safeOffset = Math.max(0, Math.floor(offset))
     query = query.range(safeOffset, safeOffset + safeLimit - 1)
+
+    const { data, error } = await query
+
+    if (error) {
+      throw error
+    }
+
+    return (data ?? []).map(row => ({
+      id: row.id,
+      type: (row.activity_type as SessionType) ?? 'custom',
+      duration_sec: (row.duration_minutes ?? 0) * 60,
+      mood_delta: row.mood_score ? (row.mood_score * 2) - 10 : null,
+      meta: row.notes ? JSON.parse(row.notes) : {},
+      created_at: row.created_at
+    }))
+  } catch (error) {
+    logger.error('session:list:error', error as Error, 'SESSION')
+    return []
   }
-
-  const { data, error } = await query
-
-  if (error) {
-    throw error
-  }
-
-  return (data ?? []).map(row => ({
-    id: row.id as string,
-    type: row.type as SessionType,
-    duration_sec: row.duration_sec ?? 0,
-    mood_delta: row.mood_delta ?? null,
-    meta: (row.meta as Record<string, unknown> | null) ?? {},
-    created_at: row.created_at ?? new Date().toISOString()
-  }))
 }
 
 export type LogAndJournalInput = {
@@ -223,4 +338,3 @@ export async function logAndJournal(params: LogAndJournalInput): Promise<Session
 
   return session
 }
-

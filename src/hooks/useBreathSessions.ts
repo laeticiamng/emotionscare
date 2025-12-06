@@ -6,14 +6,14 @@ import { logger } from '@/lib/logger';
 export interface BreathSession {
   id: string;
   created_at: string;
-  duration_sec: number;
-  type: string;
-  meta?: {
-    module: string;
-    profile: string;
-    mode: string;
-    summary?: string;
-  };
+  duration_seconds: number;
+  pattern: string;
+  cycles_completed?: number;
+  average_pace?: number;
+  mood_before?: number;
+  mood_after?: number;
+  notes?: string;
+  vr_mode?: boolean;
 }
 
 export interface BreathStats {
@@ -50,9 +50,9 @@ export const useBreathSessions = () => {
         }
 
         const { data, error: queryError } = await supabase
-          .from('sessions')
+          .from('breathing_vr_sessions')
           .select('*')
-          .eq('type', 'breath')
+          .eq('user_id', authSession.user.id)
           .order('created_at', { ascending: false })
           .limit(100);
 
@@ -87,7 +87,7 @@ export const useBreathSessions = () => {
       return;
     }
 
-    const totalMinutes = Math.round(sessions.reduce((acc, s) => acc + (s.duration_sec || 0), 0) / 60);
+    const totalMinutes = Math.round(sessions.reduce((acc, s) => acc + (s.duration_seconds || 0), 0) / 60);
 
     // Calculate weekly minutes (last 7 days)
     const oneWeekAgo = new Date();
@@ -95,7 +95,7 @@ export const useBreathSessions = () => {
     const weeklyMinutes = Math.round(
       sessions
         .filter(s => new Date(s.created_at) >= oneWeekAgo)
-        .reduce((acc, s) => acc + (s.duration_sec || 0), 0) / 60
+        .reduce((acc, s) => acc + (s.duration_seconds || 0), 0) / 60
     );
 
     // Calculate streak
@@ -116,7 +116,7 @@ export const useBreathSessions = () => {
       }
     }
 
-    const averageSessionDuration = Math.round(sessions.reduce((acc, s) => acc + (s.duration_sec || 0), 0) / sessions.length);
+    const averageSessionDuration = Math.round(sessions.reduce((acc, s) => acc + (s.duration_seconds || 0), 0) / sessions.length);
 
     setStats({
       totalSessions: sessions.length,
