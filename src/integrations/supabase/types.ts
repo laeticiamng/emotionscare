@@ -21300,6 +21300,22 @@ export type Database = {
       }
       is_admin: { Args: never; Returns: boolean }
       is_manager_of_org: { Args: { p_org_id: string }; Returns: boolean }
+      is_org_admin_or_manager: {
+        Args: { _org_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_org_member: {
+        Args: { _org_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_org_membership_admin: {
+        Args: { _org_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_org_membership_member: {
+        Args: { _org_id: string; _user_id: string }
+        Returns: boolean
+      }
       log_admin_change: {
         Args: {
           p_action_type?: string
