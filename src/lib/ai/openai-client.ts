@@ -1,15 +1,15 @@
 // @ts-nocheck
 
 /**
- * OpenAI API Client
+ * OpenAI API Client - VERSION SÉCURISÉE
  * 
- * Client sécurisé pour interagir avec les API OpenAI avec gestion d'erreur
- * intégrée, logique de retry, et validation des réponses.
+ * Client qui route toutes les requêtes via Supabase Edge Functions
+ * pour éviter d'exposer la clé API côté client.
  */
 import { toast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 import { AI_MODEL_CONFIG, AIModule, OpenAIModelParams } from "./openai-config";
-
-const OPENAI_API_BASE_URL = "https://api.openai.com/v1";
+import { logger } from "@/lib/logger";
 
 // Implémentation de cache pour les réponses API
 const responseCache = new Map<string, {
@@ -18,22 +18,14 @@ const responseCache = new Map<string, {
 }>();
 
 /**
- * Effectuer une requête à l'API OpenAI avec retry automatique et gestion des erreurs
+ * Effectuer une requête à l'API OpenAI via Edge Function sécurisée
  */
 export async function callOpenAI<T>(
   endpoint: string,
   body: any,
-  apiKey?: string,
+  _apiKey?: string, // Paramètre ignoré - clé gérée côté serveur
   cacheOptions?: { enabled: boolean, ttl: number }
 ): Promise<T> {
-  // Utiliser la clé API de l'environnement ou du paramètre
-  const key = apiKey || import.meta.env.VITE_OPENAI_API_KEY;
-  
-  if (!key) {
-    // Silent: OpenAI API key missing
-    throw new Error("Une clé API est requise pour utiliser cette fonctionnalité");
-  }
-  
   // Générer une clé de cache à partir de la requête si le cache est activé
   let cacheKey = "";
   if (cacheOptions?.enabled) {
@@ -42,29 +34,34 @@ export async function callOpenAI<T>(
     
     if (cachedResponse && 
         (Date.now() - cachedResponse.timestamp) < (cacheOptions.ttl * 1000)) {
-      // Silent: using cached response
       return cachedResponse.data as T;
     }
   }
 
-  // Configuration de requête API
-  const config = {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${key}`
-    },
-    body: JSON.stringify(body)
-  };
-
   try {
-    const response = await fetchWithRetry(`${OPENAI_API_BASE_URL}${endpoint}`, config);
-    
-    if (!response.ok) {
-      const errorData = await response.json();
-      // Silent: OpenAI API error
+    // Route vers l'Edge Function appropriée selon l'endpoint
+    let functionName = 'openai-chat';
+    let functionBody = body;
+
+    if (endpoint === '/moderations') {
+      functionName = 'openai-moderate';
+      functionBody = { input: body.input };
+    } else if (endpoint === '/chat/completions') {
+      functionName = 'openai-chat';
+      functionBody = { messages: body.messages };
+    } else if (endpoint === '/embeddings') {
+      functionName = 'openai-embeddings';
+      functionBody = body;
+    }
+
+    const { data, error } = await supabase.functions.invoke(functionName, {
+      body: functionBody
+    });
+
+    if (error) {
+      logger.error(`Edge Function ${functionName} error`, error, 'API');
       
-      if (response.status === 429) {
+      if (error.message?.includes('Rate limit') || error.message?.includes('429')) {
         toast({
           title: "Limite d'utilisation atteinte",
           description: "Veuillez réessayer dans quelques instants",
@@ -78,59 +75,53 @@ export async function callOpenAI<T>(
         });
       }
       
-      throw new Error(errorData.error?.message || "Erreur lors de l'appel à l'API OpenAI");
+      throw new Error(error.message || "Erreur lors de l'appel à l'API");
     }
 
-    const data = await response.json();
+    // Transformer la réponse pour correspondre au format attendu
+    let transformedData: any;
+    
+    if (endpoint === '/chat/completions') {
+      // L'Edge Function retourne { response: string }
+      // On le transforme en format OpenAI standard
+      transformedData = {
+        choices: [{
+          message: {
+            role: 'assistant',
+            content: data.response || data.content || ''
+          }
+        }]
+      };
+    } else if (endpoint === '/moderations') {
+      transformedData = {
+        results: [data]
+      };
+    } else {
+      transformedData = data;
+    }
     
     // Stocker en cache si activé
     if (cacheOptions?.enabled && cacheKey) {
       responseCache.set(cacheKey, {
-        data,
+        data: transformedData,
         timestamp: Date.now()
       });
     }
     
-    return data as T;
+    return transformedData as T;
   } catch (error) {
-    // Silent: OpenAI call failed
+    logger.error('OpenAI call via Edge Function failed', error, 'API');
     throw error;
   }
 }
 
 /**
- * Fetch avec retry automatique pour les erreurs transitoires
- */
-async function fetchWithRetry(
-  url: string, 
-  options: RequestInit, 
-  maxRetries = 3,
-  retryDelay = 1000
-): Promise<Response> {
-  let lastError: Error | null = null;
-  
-  for (let attempt = 0; attempt < maxRetries; attempt++) {
-    try {
-      return await fetch(url, options);
-    } catch (error) {
-      lastError = error as Error;
-      // Silent: retry attempt failed
-      
-      // Attendre avant la prochaine tentative avec backoff exponentiel
-      await new Promise(resolve => setTimeout(resolve, retryDelay * Math.pow(2, attempt)));
-    }
-  }
-  
-  throw lastError || new Error(`Échec après ${maxRetries} tentatives`);
-}
-
-/**
- * Envoyer une requête de chat à OpenAI
+ * Envoyer une requête de chat à OpenAI via Edge Function
  */
 export async function chatCompletion(
   messages: Array<{role: string, content: string}>,
   module: AIModule = 'chat',
-  apiKey?: string
+  _apiKey?: string // Paramètre ignoré - clé gérée côté serveur
 ) {
   const modelConfig = AI_MODEL_CONFIG[module];
   
@@ -146,7 +137,7 @@ export async function chatCompletion(
       top_p: modelConfig.top_p,
       stream: modelConfig.stream
     },
-    apiKey,
+    undefined,
     modelConfig.cacheEnabled ? 
       { enabled: true, ttl: modelConfig.cacheTTL || 3600 } : 
       undefined
@@ -154,11 +145,11 @@ export async function chatCompletion(
 }
 
 /**
- * Modérer du contenu via l'endpoint de modération d'OpenAI
+ * Modérer du contenu via l'Edge Function de modération
  */
 export async function moderateContent(
   content: string,
-  apiKey?: string
+  _apiKey?: string // Paramètre ignoré
 ) {
   return callOpenAI<{
     results: Array<{
@@ -171,28 +162,27 @@ export async function moderateContent(
     {
       input: content
     },
-    apiKey,
-    { enabled: true, ttl: 60 } // Mettre en cache les résultats de modération pendant une minute
+    undefined,
+    { enabled: true, ttl: 60 }
   );
 }
 
 /**
- * Vérifier si l'API OpenAI est accessible
+ * Vérifier si l'API OpenAI est accessible via Edge Function
  */
-export async function checkApiConnection(apiKey?: string): Promise<boolean> {
+export async function checkApiConnection(_apiKey?: string): Promise<boolean> {
   try {
     const response = await chatCompletion(
       [
         { role: "system", content: "You are a test assistant." },
         { role: "user", content: "Test connection" }
       ],
-      'chat',
-      apiKey
+      'chat'
     );
     
     return !!response.choices.length;
   } catch (error) {
-    // Silent: API connection check failed
+    logger.error('API connection check failed', error, 'API');
     return false;
   }
 }
