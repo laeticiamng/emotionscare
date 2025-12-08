@@ -1,12 +1,12 @@
 // @ts-nocheck
 
 /**
- * Service OpenAI
+ * Service OpenAI - VERSION SÉCURISÉE
  * 
  * Ce service centralise toutes les interactions avec l'API OpenAI (GPT, DALL-E, etc.)
- * pour assurer une mise en œuvre cohérente, sécurisée et maintenable.
+ * via Supabase Edge Functions pour éviter d'exposer les clés API côté client.
  */
-import { API_URL } from '@/lib/env';
+import { supabase } from '@/integrations/supabase/client';
 import { ChatMessage } from '@/types/chat';
 import { logger } from '@/lib/logger';
 
@@ -30,69 +30,32 @@ export interface OpenAIImageGenerationOptions {
   format?: 'url' | 'b64_json';
 }
 
-const API_BASE_URL = 'https://api.openai.com/v1';
 const DEFAULT_MODEL = 'gpt-4o-mini';
-const DEFAULT_IMAGE_MODEL = 'dall-e-3';
 
 /**
- * Récupère la clé API OpenAI depuis les variables d'environnement
- * NOTE: En production, les clés API sont gérées côté serveur via Supabase Edge Functions
- * @returns La clé API ou lance une erreur
+ * Appelle l'Edge Function openai-chat de manière sécurisée
  */
-function getApiKey(): string {
-  // En développement local, lire depuis les variables d'env
-  // En production, cette fonction ne sera pas utilisée (appels via Edge Functions)
-  const key = import.meta.env.VITE_OPENAI_API_KEY;
-  if (!key) {
-    throw new Error('OpenAI API key is not set. Use Supabase Edge Functions in production.');
+async function callOpenAIChat(messages: Array<{role: string, content: string}>): Promise<string> {
+  const { data, error } = await supabase.functions.invoke('openai-chat', {
+    body: { messages }
+  });
+
+  if (error) {
+    logger.error('OpenAI Edge Function Error', error, 'API');
+    throw new Error(error.message || 'Erreur lors de la communication avec le service IA');
   }
-  return key;
+
+  return data?.response || data?.content || '';
 }
 
 /**
- * Envoie une requête à l'API OpenAI avec gestion des erreurs
- * @param endpoint L'endpoint API à appeler
- * @param body Le corps de la requête
- * @returns La réponse de l'API
- */
-async function callOpenAI<T>(endpoint: string, body: any): Promise<T> {
-  try {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${getApiKey()}`
-      },
-      body: JSON.stringify(body)
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      logger.error('OpenAI API Error', error as Error, 'API');
-      throw new Error(error?.error?.message || 'Unknown error from OpenAI API');
-    }
-
-    return await response.json() as T;
-  } catch (error) {
-    logger.error('Error calling OpenAI API', error as Error, 'API');
-    throw error;
-  }
-}
-
-/**
- * Génère du texte via l'API OpenAI (ChatGPT)
+ * Génère du texte via l'Edge Function OpenAI
  * @param prompt Le prompt utilisateur
  * @param options Options de génération
  * @returns Le texte généré
  */
 export async function generateText(prompt: string, options: OpenAITextGenerationOptions = {}): Promise<string> {
   const {
-    model = DEFAULT_MODEL,
-    temperature = 0.7,
-    maxTokens = 500,
-    topP = 1,
-    frequencyPenalty = 0,
-    presencePenalty = 0,
     systemPrompt = 'You are a helpful assistant.'
   } = options;
 
@@ -101,28 +64,11 @@ export async function generateText(prompt: string, options: OpenAITextGeneration
     { role: 'user', content: prompt }
   ];
 
-  const response = await callOpenAI<{
-    choices: Array<{
-      message: {
-        role: string;
-        content: string;
-      };
-    }>;
-  }>('/chat/completions', {
-    model,
-    messages,
-    temperature,
-    max_tokens: maxTokens,
-    top_p: topP,
-    frequency_penalty: frequencyPenalty,
-    presence_penalty: presencePenalty
-  });
-
-  return response.choices[0]?.message.content || '';
+  return callOpenAIChat(messages);
 }
 
 /**
- * Traite une conversation complète via l'API OpenAI
+ * Traite une conversation complète via l'Edge Function OpenAI
  * @param messages Les messages de la conversation
  * @param options Options de génération
  * @returns La réponse générée
@@ -131,43 +77,17 @@ export async function chatCompletion(
   messages: ChatMessage[],
   options: OpenAITextGenerationOptions = {}
 ): Promise<string> {
-  const {
-    model = DEFAULT_MODEL,
-    temperature = 0.7,
-    maxTokens = 800,
-    topP = 1,
-    frequencyPenalty = 0,
-    presencePenalty = 0
-  } = options;
-
-  // Conversion des messages au format attendu par OpenAI
+  // Conversion des messages au format attendu
   const formattedMessages = messages.map(msg => ({
     role: msg.role as 'system' | 'user' | 'assistant',
     content: msg.content || msg.text || ''
   }));
 
-  const response = await callOpenAI<{
-    choices: Array<{
-      message: {
-        role: string;
-        content: string;
-      };
-    }>;
-  }>('/chat/completions', {
-    model,
-    messages: formattedMessages,
-    temperature,
-    max_tokens: maxTokens,
-    top_p: topP,
-    frequency_penalty: frequencyPenalty,
-    presence_penalty: presencePenalty
-  });
-
-  return response.choices[0]?.message.content || '';
+  return callOpenAIChat(formattedMessages);
 }
 
 /**
- * Génère une image via DALL-E
+ * Génère une image via Edge Function (à implémenter si nécessaire)
  * @param prompt Description de l'image à générer
  * @param options Options de génération
  * @returns URL ou données base64 de l'image générée
@@ -176,39 +96,14 @@ export async function generateImage(
   prompt: string, 
   options: OpenAIImageGenerationOptions = {}
 ): Promise<string> {
-  const {
-    size = '1024x1024',
-    quality = 'standard',
-    n = 1,
-    style = 'vivid',
-    format = 'url'
-  } = options;
-
-  const response = await callOpenAI<{
-    data: Array<{
-      url?: string;
-      b64_json?: string;
-    }>;
-  }>('/images/generations', {
-    model: DEFAULT_IMAGE_MODEL,
-    prompt,
-    n,
-    size,
-    quality,
-    response_format: format,
-    style
-  });
-
-  // Renvoie l'URL ou les données base64 selon l'option choisie
-  if (format === 'url') {
-    return response.data[0]?.url || '';
-  } else {
-    return response.data[0]?.b64_json || '';
-  }
+  // Pour la génération d'images, on peut utiliser une Edge Function dédiée
+  // ou utiliser openai-chat avec un modèle vision si disponible
+  logger.warn('generateImage: Cette fonctionnalité nécessite une Edge Function dédiée', {}, 'API');
+  throw new Error('Génération d\'images non disponible. Utilisez une Edge Function dédiée.');
 }
 
 /**
- * Modère un contenu via l'API OpenAI
+ * Modère un contenu via l'Edge Function de modération
  * @param content Le contenu à modérer
  * @returns Résultat de la modération
  */
@@ -217,27 +112,24 @@ export async function moderateContent(content: string): Promise<{
   categories: Record<string, boolean>;
   categoryScores: Record<string, number>;
 }> {
-  const response = await callOpenAI<{
-    results: Array<{
-      flagged: boolean;
-      categories: Record<string, boolean>;
-      category_scores: Record<string, number>;
-    }>;
-  }>('/moderations', {
-    input: content
+  const { data, error } = await supabase.functions.invoke('openai-moderate', {
+    body: { input: content }
   });
 
-  const result = response.results[0];
-  
+  if (error) {
+    logger.error('OpenAI Moderation Error', error, 'API');
+    throw new Error(error.message || 'Erreur lors de la modération');
+  }
+
   return {
-    flagged: result.flagged,
-    categories: result.categories,
-    categoryScores: result.category_scores
+    flagged: data?.flagged || false,
+    categories: data?.categories || {},
+    categoryScores: data?.category_scores || data?.categoryScores || {}
   };
 }
 
 /**
- * Analyse émotionnelle d'un texte via GPT
+ * Analyse émotionnelle d'un texte via Edge Function
  * @param text Le texte à analyser
  * @returns L'analyse émotionnelle
  */
@@ -256,14 +148,15 @@ export async function analyzeEmotion(text: string): Promise<{
   `;
   
   try {
-    const response = await generateText(text, {
-      systemPrompt,
-      temperature: 0.3,
-      model: "gpt-4o-mini",
-    });
+    const response = await generateText(text, { systemPrompt });
     
     // Tentative d'extraction JSON de la réponse
     try {
+      // Nettoyer la réponse pour extraire le JSON
+      const jsonMatch = response.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        return JSON.parse(jsonMatch[0]);
+      }
       return JSON.parse(response);
     } catch (e) {
       logger.error("Failed to parse OpenAI emotion analysis as JSON", e as Error, 'API');
@@ -282,13 +175,13 @@ export async function analyzeEmotion(text: string): Promise<{
 }
 
 /**
- * Vérifie la connectivité avec l'API OpenAI
+ * Vérifie la connectivité avec l'API OpenAI via Edge Function
  * @returns true si la connexion est établie, false sinon
  */
 export async function checkApiConnection(): Promise<boolean> {
   try {
-    await generateText("Connection test", {
-      maxTokens: 5,
+    await generateText("Test de connexion", {
+      systemPrompt: "Réponds simplement 'OK'."
     });
     return true;
   } catch (error) {
