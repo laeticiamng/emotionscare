@@ -5,14 +5,17 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Trophy, Clock, Target, Zap } from 'lucide-react';
+import { Trophy, Clock, Target, Zap, Filter, Link2, ChevronRight, Flame } from 'lucide-react';
 import { questService, Quest, UserQuestProgress } from '@/services/questService';
 import { useToast } from '@/hooks/use-toast';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export const QuestsPanel: React.FC = () => {
   const [quests, setQuests] = useState<Quest[]>([]);
   const [userProgress, setUserProgress] = useState<UserQuestProgress[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeFilter, setActiveFilter] = useState<'all' | 'daily' | 'weekly' | 'special'>('all');
   const { toast } = useToast();
 
   useEffect(() => {
@@ -34,12 +37,12 @@ export const QuestsPanel: React.FC = () => {
     return userProgress.find(p => p.quest_id === questId);
   };
 
-  const claimReward = async (questId: string) => {
+  const claimReward = async (questId: string, points: number) => {
     const success = await questService.claimQuestReward(questId);
     if (success) {
       toast({
         title: '🎉 Récompense réclamée !',
-        description: 'Vos points ont été ajoutés à votre total.',
+        description: `+${points} points ajoutés à votre total.`,
       });
       loadQuests();
     } else {
@@ -53,10 +56,10 @@ export const QuestsPanel: React.FC = () => {
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
-      case 'easy': return 'bg-green-500/20 text-green-400';
-      case 'medium': return 'bg-yellow-500/20 text-yellow-400';
-      case 'hard': return 'bg-red-500/20 text-red-400';
-      default: return 'bg-gray-500/20 text-gray-400';
+      case 'easy': return 'bg-green-500/20 text-green-500 border-green-500/30';
+      case 'medium': return 'bg-yellow-500/20 text-yellow-500 border-yellow-500/30';
+      case 'hard': return 'bg-red-500/20 text-red-500 border-red-500/30';
+      default: return 'bg-gray-500/20 text-gray-500 border-gray-500/30';
     }
   };
 
@@ -69,14 +72,23 @@ export const QuestsPanel: React.FC = () => {
     }
   };
 
-  const getQuestTypeLabel = (type: string) => {
-    switch (type) {
-      case 'daily': return 'Quotidienne';
-      case 'weekly': return 'Hebdomadaire';
-      case 'special': return 'Spéciale';
-      default: return type;
-    }
-  };
+  const filteredQuests = activeFilter === 'all' 
+    ? quests 
+    : quests.filter(q => q.quest_type === activeFilter);
+
+  // Quest chains (grouped quests)
+  const questChains = quests.filter(q => q.chain_id).reduce((acc, quest) => {
+    if (!acc[quest.chain_id!]) acc[quest.chain_id!] = [];
+    acc[quest.chain_id!].push(quest);
+    return acc;
+  }, {} as Record<string, Quest[]>);
+
+  // Stats
+  const completedToday = quests.filter(q => {
+    const progress = getProgressForQuest(q.id);
+    return progress?.completed && q.quest_type === 'daily';
+  }).length;
+  const totalDaily = quests.filter(q => q.quest_type === 'daily').length;
 
   if (loading) {
     return (
@@ -90,120 +102,131 @@ export const QuestsPanel: React.FC = () => {
     );
   }
 
-  const dailyQuests = quests.filter(q => q.quest_type === 'daily');
-  const weeklyQuests = quests.filter(q => q.quest_type === 'weekly');
+  const renderQuest = (quest: Quest, index: number) => {
+    const progress = getProgressForQuest(quest.id);
+    const progressPercentage = progress 
+      ? (progress.current_progress / quest.max_progress) * 100 
+      : 0;
+    const isCompleted = progress?.completed;
+    const isChained = quest.chain_id && quest.chain_order;
+
+    return (
+      <motion.div 
+        key={quest.id}
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: index * 0.05 }}
+        className={`p-4 rounded-lg border transition-all ${
+          isCompleted 
+            ? 'bg-green-500/5 border-green-500/20' 
+            : 'bg-secondary/20 border-border hover:border-primary/30'
+        }`}
+      >
+        <div className="flex items-start justify-between mb-2">
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-1">
+              {getQuestTypeIcon(quest.quest_type)}
+              <h4 className="font-semibold text-foreground">{quest.title}</h4>
+              <Badge className={getDifficultyColor(quest.difficulty)} variant="outline">
+                {quest.difficulty}
+              </Badge>
+              {isChained && (
+                <Badge variant="outline" className="text-xs flex items-center gap-1">
+                  <Link2 className="w-3 h-3" />
+                  Chaîne {quest.chain_order}
+                </Badge>
+              )}
+            </div>
+            <p className="text-sm text-muted-foreground">{quest.description}</p>
+          </div>
+          <div className="flex items-center gap-2 ml-4">
+            <Trophy className="w-4 h-4 text-yellow-500" />
+            <span className="font-bold text-yellow-500">{quest.points_reward}</span>
+          </div>
+        </div>
+        
+        <div className="space-y-2">
+          <Progress value={progressPercentage} className="h-2" />
+          <div className="flex items-center justify-between text-xs text-muted-foreground">
+            <span>{progress?.current_progress || 0} / {quest.max_progress}</span>
+            {isCompleted ? (
+              <Button 
+                size="sm" 
+                onClick={() => claimReward(quest.id, quest.points_reward)}
+                className="bg-gradient-to-r from-green-500 to-emerald-500 text-white"
+              >
+                <Trophy className="w-3 h-3 mr-1" />
+                Réclamer
+              </Button>
+            ) : (
+              <span>{Math.round(progressPercentage)}%</span>
+            )}
+          </div>
+        </div>
+      </motion.div>
+    );
+  };
 
   return (
     <div className="space-y-4">
-      <Card className="bg-card border-border">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-foreground">
-            <Clock className="w-5 h-5 text-primary" />
-            Quêtes Quotidiennes
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {dailyQuests.map(quest => {
-            const progress = getProgressForQuest(quest.id);
-            const progressPercentage = progress 
-              ? (progress.current_progress / quest.max_progress) * 100 
-              : 0;
-
-            return (
-              <div key={quest.id} className="p-4 bg-secondary/20 rounded-lg border border-border">
-                <div className="flex items-start justify-between mb-2">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      {getQuestTypeIcon(quest.quest_type)}
-                      <h4 className="font-semibold text-foreground">{quest.title}</h4>
-                      <Badge className={getDifficultyColor(quest.difficulty)}>
-                        {quest.difficulty}
-                      </Badge>
-                    </div>
-                    <p className="text-sm text-muted-foreground">{quest.description}</p>
-                  </div>
-                  <div className="flex items-center gap-2 ml-4">
-                    <Trophy className="w-4 h-4 text-yellow-500" />
-                    <span className="font-bold text-yellow-500">{quest.points_reward}</span>
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Progress value={progressPercentage} className="h-2" />
-                  <div className="flex items-center justify-between text-xs text-muted-foreground">
-                    <span>
-                      {progress?.current_progress || 0} / {quest.max_progress}
-                    </span>
-                    {progress?.completed && (
-                      <Button 
-                        size="sm" 
-                        onClick={() => claimReward(quest.id)}
-                        className="bg-primary text-primary-foreground"
-                      >
-                        Réclamer
-                      </Button>
-                    )}
-                  </div>
-                </div>
+      {/* Stats Header */}
+      <Card className="bg-gradient-to-r from-primary/5 to-secondary/5 border-primary/20">
+        <CardContent className="p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                <Flame className="w-6 h-6 text-primary" />
               </div>
-            );
-          })}
+              <div>
+                <p className="text-2xl font-bold">{completedToday}/{totalDaily}</p>
+                <p className="text-sm text-muted-foreground">Quêtes du jour</p>
+              </div>
+            </div>
+            <Badge variant="secondary" className="text-lg px-3 py-1">
+              {quests.reduce((sum, q) => {
+                const p = getProgressForQuest(q.id);
+                return sum + (p?.completed ? q.points_reward : 0);
+              }, 0)} pts gagnés
+            </Badge>
+          </div>
         </CardContent>
       </Card>
 
+      {/* Filters */}
+      <div className="flex gap-2">
+        {(['all', 'daily', 'weekly', 'special'] as const).map((filter) => (
+          <Button
+            key={filter}
+            variant={activeFilter === filter ? 'secondary' : 'ghost'}
+            size="sm"
+            onClick={() => setActiveFilter(filter)}
+            className="capitalize"
+          >
+            {filter === 'all' ? 'Toutes' : filter === 'daily' ? 'Quotidiennes' : filter === 'weekly' ? 'Hebdo' : 'Spéciales'}
+          </Button>
+        ))}
+      </div>
+
+      {/* Quests List */}
       <Card className="bg-card border-border">
-        <CardHeader>
+        <CardHeader className="pb-2">
           <CardTitle className="flex items-center gap-2 text-foreground">
             <Target className="w-5 h-5 text-primary" />
-            Quêtes Hebdomadaires
+            Quêtes actives
+            <Badge variant="outline" className="ml-auto">{filteredQuests.length}</Badge>
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          {weeklyQuests.map(quest => {
-            const progress = getProgressForQuest(quest.id);
-            const progressPercentage = progress 
-              ? (progress.current_progress / quest.max_progress) * 100 
-              : 0;
-
-            return (
-              <div key={quest.id} className="p-4 bg-secondary/20 rounded-lg border border-border">
-                <div className="flex items-start justify-between mb-2">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      {getQuestTypeIcon(quest.quest_type)}
-                      <h4 className="font-semibold text-foreground">{quest.title}</h4>
-                      <Badge className={getDifficultyColor(quest.difficulty)}>
-                        {quest.difficulty}
-                      </Badge>
-                    </div>
-                    <p className="text-sm text-muted-foreground">{quest.description}</p>
-                  </div>
-                  <div className="flex items-center gap-2 ml-4">
-                    <Trophy className="w-4 h-4 text-yellow-500" />
-                    <span className="font-bold text-yellow-500">{quest.points_reward}</span>
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Progress value={progressPercentage} className="h-2" />
-                  <div className="flex items-center justify-between text-xs text-muted-foreground">
-                    <span>
-                      {progress?.current_progress || 0} / {quest.max_progress}
-                    </span>
-                    {progress?.completed && (
-                      <Button 
-                        size="sm" 
-                        onClick={() => claimReward(quest.id)}
-                        className="bg-primary text-primary-foreground"
-                      >
-                        Réclamer
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+        <CardContent className="space-y-3">
+          <AnimatePresence>
+            {filteredQuests.map((quest, index) => renderQuest(quest, index))}
+          </AnimatePresence>
+          
+          {filteredQuests.length === 0 && (
+            <div className="text-center py-8 text-muted-foreground">
+              <Target className="w-12 h-12 mx-auto mb-2 opacity-30" />
+              <p>Aucune quête dans cette catégorie</p>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
