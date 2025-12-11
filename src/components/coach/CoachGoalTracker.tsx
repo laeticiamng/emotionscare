@@ -255,15 +255,84 @@ export const CoachGoalTracker: React.FC = () => {
                   Réservez un moment avec votre coach IA
                 </DialogDescription>
               </DialogHeader>
-              {/* Form session - simplifié pour l'exemple */}
-              <div className="py-4 text-center text-muted-foreground">
-                Sélectionnez une date et un créneau pour votre prochaine session.
+              <div className="space-y-4 py-4">
+                <div className="space-y-2">
+                  <Label>Date de la session</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="outline" className="w-full justify-start text-left font-normal">
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {selectedDate 
+                          ? format(selectedDate, 'EEEE d MMMM yyyy', { locale: fr })
+                          : 'Sélectionner une date'}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0">
+                      <Calendar
+                        mode="single"
+                        selected={selectedDate}
+                        onSelect={setSelectedDate}
+                        disabled={(date) => date < new Date()}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="session-time">Heure</Label>
+                  <Select defaultValue="10:00">
+                    <SelectTrigger id="session-time">
+                      <SelectValue placeholder="Choisir une heure" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {['09:00', '10:00', '11:00', '14:00', '15:00', '16:00', '17:00', '18:00'].map(time => (
+                        <SelectItem key={time} value={time}>{time}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="session-topic">Sujet de la session</Label>
+                  <Input id="session-topic" placeholder="Ex: Bilan de la semaine, Gestion du stress..." />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label>Type de session</Label>
+                  <Select defaultValue="check-in">
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="check-in">Check-in rapide (15 min)</SelectItem>
+                      <SelectItem value="deep-dive">Session approfondie (30 min)</SelectItem>
+                      <SelectItem value="review">Revue des objectifs (45 min)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
               <DialogFooter>
                 <Button variant="outline" onClick={() => setShowNewSession(false)}>
                   Annuler
                 </Button>
-                <Button onClick={() => setShowNewSession(false)}>
+                <Button onClick={() => {
+                  if (selectedDate) {
+                    const newSession: ScheduledSession = {
+                      id: Date.now().toString(),
+                      date: selectedDate,
+                      time: '10:00',
+                      topic: 'Nouvelle session',
+                      type: 'check-in',
+                      confirmed: false
+                    };
+                    setSessions(prev => [...prev, newSession]);
+                    setShowNewSession(false);
+                    toast({
+                      title: 'Session planifiée',
+                      description: `Votre session est prévue le ${format(selectedDate, 'EEEE d MMMM', { locale: fr })}`
+                    });
+                  }
+                }}>
                   Confirmer
                 </Button>
               </DialogFooter>

@@ -369,11 +369,70 @@ export const WeeklyEmotionReport: React.FC = () => {
                 </div>
               </div>
               <div className="flex gap-2">
-                <Button variant="outline" size="sm">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => {
+                    const reportContent = document.getElementById('weekly-report-content');
+                    if (reportContent) {
+                      const printWindow = window.open('', '_blank');
+                      if (printWindow) {
+                        printWindow.document.write(`
+                          <html>
+                            <head>
+                              <title>Rapport Émotionnel - ${format(weekStart, 'd MMM', { locale: fr })} au ${format(weekEnd, 'd MMM yyyy', { locale: fr })}</title>
+                              <style>
+                                body { font-family: system-ui, sans-serif; padding: 2rem; }
+                                h1 { color: #333; }
+                                .stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin: 1rem 0; }
+                                .stat { padding: 1rem; background: #f5f5f5; border-radius: 8px; }
+                              </style>
+                            </head>
+                            <body>
+                              <h1>Rapport Émotionnel Hebdomadaire</h1>
+                              <p>Période: ${format(weekStart, 'd MMM', { locale: fr })} - ${format(weekEnd, 'd MMM yyyy', { locale: fr })}</p>
+                              <div class="stats">
+                                <div class="stat"><strong>Bien-être moyen:</strong> ${stats?.averageValence}%</div>
+                                <div class="stat"><strong>Énergie moyenne:</strong> ${stats?.averageArousal}%</div>
+                                <div class="stat"><strong>Scans effectués:</strong> ${stats?.totalScans}</div>
+                                <div class="stat"><strong>Série:</strong> ${stats?.streakDays} jours</div>
+                              </div>
+                              <h2>Émotions dominantes</h2>
+                              <ul>
+                                ${stats?.topEmotions.map(e => `<li>${e.name}: ${e.percentage}%</li>`).join('')}
+                              </ul>
+                              <h2>Insights</h2>
+                              <ul>
+                                ${stats?.insights.map(i => `<li>${i}</li>`).join('')}
+                              </ul>
+                            </body>
+                          </html>
+                        `);
+                        printWindow.document.close();
+                        printWindow.print();
+                      }
+                    }
+                  }}
+                >
                   <Download className="h-4 w-4 mr-2" />
-                  Exporter
+                  Exporter PDF
                 </Button>
-                <Button variant="outline" size="sm">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={async () => {
+                    const shareData = {
+                      title: 'Mon rapport émotionnel',
+                      text: `Semaine du ${format(weekStart, 'd MMM', { locale: fr })} - Bien-être: ${stats?.averageValence}%, Énergie: ${stats?.averageArousal}%`
+                    };
+                    if (navigator.share) {
+                      await navigator.share(shareData);
+                    } else {
+                      await navigator.clipboard.writeText(shareData.text);
+                      alert('Rapport copié dans le presse-papier !');
+                    }
+                  }}
+                >
                   <Share2 className="h-4 w-4 mr-2" />
                   Partager
                 </Button>

@@ -20,7 +20,8 @@ import {
   Music,
   BarChart3,
   MessageCircle,
-  Award
+  Award,
+  Trees
 } from 'lucide-react';
 import { routes } from '@/routerV2';
 import { usePageSEO } from '@/hooks/usePageSEO';
@@ -298,6 +299,46 @@ const HomeB2CPage: React.FC = () => {
                       <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                     </Button>
                   </div>
+                </div>
+              </div>
+            </Link>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Parc Émotionnel Section */}
+      <section className="py-8">
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+          >
+            <Link to="/app/emotional-park" className="block">
+              <div className="group relative rounded-3xl p-6 bg-gradient-to-br from-green-400 via-emerald-500 to-green-600 text-white shadow-xl backdrop-blur-xl overflow-hidden hover:scale-[1.02] transition-all duration-300">
+                <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-3xl" />
+                
+                <div className="relative z-10 flex flex-col md:flex-row items-center gap-4">
+                  <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center flex-shrink-0">
+                    <Trees className="w-7 h-7 text-white" />
+                  </div>
+                  
+                  <div className="flex-1 text-center md:text-left">
+                    <h3 className="text-xl font-bold mb-1">Parc Émotionnel</h3>
+                    <p className="text-sm opacity-90">
+                      Explorez votre monde intérieur dans un espace interactif et apaisant
+                    </p>
+                  </div>
+                  
+                  <Button 
+                    size="sm"
+                    className="bg-white/20 hover:bg-white/30 text-white border border-white/30 backdrop-blur-sm rounded-xl group-hover:bg-white group-hover:text-green-600 transition-all duration-300"
+                  >
+                    Explorer
+                    <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </Button>
                 </div>
               </div>
             </Link>

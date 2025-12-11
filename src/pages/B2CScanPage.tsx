@@ -23,12 +23,13 @@ import { MultiSourceChart } from '@/components/scan/MultiSourceChart';
 import { ScanOnboarding, shouldShowOnboarding } from '@/components/scan/ScanOnboarding';
 import { useToast } from '@/hooks/use-toast';
 import { scanAnalytics } from '@/lib/analytics/scanEvents';
-import { Camera, Mic, FileText, Sliders, BarChart3, Lightbulb, Download, Settings } from 'lucide-react';
+import { Camera, Mic, FileText, Sliders, BarChart3, Lightbulb, Download, Settings, Calendar } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import EnhancedScanDashboard from '@/components/scan/EnhancedScanDashboard';
 import EmotionComparisonView from '@/components/scan/EmotionComparisonView';
 import SmartRecommendations from '@/components/scan/SmartRecommendations';
 import ScanExportPanel from '@/components/scan/ScanExportPanel';
+import { WeeklyEmotionReport } from '@/components/scan/WeeklyEmotionReport';
 
 const mapToSamScale = (value: number) => {
   const normalized = Math.max(0, Math.min(100, value));
@@ -52,7 +53,7 @@ const B2CScanPage: React.FC = () => {
   const [edgeUnavailable, setEdgeUnavailable] = useState(false);
   const [cameraDenied, setCameraDenied] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(shouldShowOnboarding());
-  const [mainViewTab, setMainViewTab] = useState<'scanner' | 'dashboard' | 'comparison' | 'insights' | 'export'>('scanner');
+  const [mainViewTab, setMainViewTab] = useState<'scanner' | 'dashboard' | 'comparison' | 'insights' | 'weekly' | 'export'>('scanner');
   const lastSubmittedRef = useRef<string | null>(null);
 
   const {
@@ -366,7 +367,7 @@ const B2CScanPage: React.FC = () => {
           <main className="space-y-8">
             {/* Onglets pour les différentes vues */}
             <Tabs value={mainViewTab} onValueChange={(v) => setMainViewTab(v as any)} className="w-full">
-              <TabsList className="grid w-full grid-cols-5 lg:grid-cols-5">
+              <TabsList className="grid w-full grid-cols-6 lg:grid-cols-6">
                 <TabsTrigger value="scanner" className="gap-1.5">
                   <Sliders className="w-4 h-4" />
                   <span className="hidden sm:inline">Scanner</span>
@@ -382,6 +383,10 @@ const B2CScanPage: React.FC = () => {
                 <TabsTrigger value="insights" className="gap-1.5">
                   <Lightbulb className="w-4 h-4" />
                   <span className="hidden sm:inline">Insights</span>
+                </TabsTrigger>
+                <TabsTrigger value="weekly" className="gap-1.5">
+                  <Calendar className="w-4 h-4" />
+                  <span className="hidden sm:inline">Hebdo</span>
                 </TabsTrigger>
                 <TabsTrigger value="export" className="gap-1.5">
                   <Download className="w-4 h-4" />
@@ -428,6 +433,11 @@ const B2CScanPage: React.FC = () => {
               {/* Onglet Insights */}
               <TabsContent value="insights" className="mt-6">
                 <SmartRecommendations />
+              </TabsContent>
+
+              {/* Onglet Rapport Hebdomadaire */}
+              <TabsContent value="weekly" className="mt-6">
+                <WeeklyEmotionReport />
               </TabsContent>
 
               {/* Onglet Export */}

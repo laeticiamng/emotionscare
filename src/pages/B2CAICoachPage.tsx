@@ -1,10 +1,13 @@
 import { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { captureException } from '@/lib/ai-monitoring';
 import { Sentry } from '@/lib/errors/sentry-compat';
 import { CoachView } from '@/modules/coach/CoachView';
 import { ConsentGate } from '@/features/clinical-optin/ConsentGate';
 import { MedicalDisclaimerDialog, useMedicalDisclaimer } from '@/components/medical/MedicalDisclaimerDialog';
 import { usePageSEO } from '@/hooks/usePageSEO';
+import { Button } from '@/components/ui/button';
+import { Target, Calendar, BarChart3 } from 'lucide-react';
 
 const B2CAICoachPage = () => {
   usePageSEO({
@@ -39,6 +42,34 @@ const B2CAICoachPage = () => {
       />
       {isAccepted && (
         <ConsentGate>
+          {/* Quick Actions Bar */}
+          <div className="bg-background/80 backdrop-blur-sm border-b sticky top-0 z-10">
+            <div className="container mx-auto px-4 py-2">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-muted-foreground">Coach IA</span>
+                <div className="flex items-center gap-2">
+                  <Button variant="ghost" size="sm" asChild>
+                    <Link to="/app/goals">
+                      <Target className="h-4 w-4 mr-1" />
+                      Mes Objectifs
+                    </Link>
+                  </Button>
+                  <Button variant="ghost" size="sm" asChild>
+                    <Link to="/app/coach/sessions">
+                      <Calendar className="h-4 w-4 mr-1" />
+                      Sessions
+                    </Link>
+                  </Button>
+                  <Button variant="ghost" size="sm" asChild>
+                    <Link to="/app/coach/analytics">
+                      <BarChart3 className="h-4 w-4 mr-1" />
+                      Analytics
+                    </Link>
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
           <CoachView initialMode="b2c" />
         </ConsentGate>
       )}
