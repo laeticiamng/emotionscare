@@ -15,6 +15,17 @@ export default function MeditationPage() {
   const [currentTime, setCurrentTime] = useState(0);
   const [selectedProgram, setSelectedProgram] = useState<string | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  
+  // Statistiques de méditation
+  const [stats, setStats] = useState(() => {
+    const saved = localStorage.getItem('meditation_stats');
+    return saved ? JSON.parse(saved) : { 
+      totalSessions: 0, 
+      totalMinutes: 0,
+      longestSession: 0,
+      lastSession: null
+    };
+  });
 
   const programs = [
     {
@@ -74,9 +85,20 @@ export default function MeditationPage() {
           // Auto-complete when time is up
           if (newTime >= selectedDuration * 60) {
             setIsPlaying(false);
+            
+            // Sauvegarder la session
+            const newStats = {
+              totalSessions: stats.totalSessions + 1,
+              totalMinutes: stats.totalMinutes + selectedDuration,
+              longestSession: Math.max(stats.longestSession, selectedDuration),
+              lastSession: new Date().toISOString()
+            };
+            setStats(newStats);
+            localStorage.setItem('meditation_stats', JSON.stringify(newStats));
+            
             toast({
               title: 'Méditation terminée! 🧘',
-              description: `Vous avez complété votre session de ${selectedDuration} minutes.`,
+              description: `Vous avez complété votre session de ${selectedDuration} minutes. Total: ${newStats.totalSessions} sessions.`,
             });
           }
           return newTime;
@@ -261,6 +283,42 @@ export default function MeditationPage() {
             </ul>
           </CardContent>
         </Card>
+
+        {/* Statistiques personnelles */}
+        {stats.totalSessions > 0 && (
+          <Card className="bg-gradient-to-r from-primary/5 to-purple-500/5 border-primary/20">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Clock className="h-5 w-5 text-primary" />
+                Vos statistiques
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                <div>
+                  <p className="text-3xl font-bold text-primary">{stats.totalSessions}</p>
+                  <p className="text-xs text-muted-foreground">Sessions</p>
+                </div>
+                <div>
+                  <p className="text-3xl font-bold text-primary">{stats.totalMinutes}</p>
+                  <p className="text-xs text-muted-foreground">Minutes totales</p>
+                </div>
+                <div>
+                  <p className="text-3xl font-bold text-primary">{stats.longestSession}</p>
+                  <p className="text-xs text-muted-foreground">Plus longue (min)</p>
+                </div>
+                <div>
+                  <p className="text-3xl font-bold text-primary">
+                    {stats.lastSession 
+                      ? new Date(stats.lastSession).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
+                      : '—'}
+                  </p>
+                  <p className="text-xs text-muted-foreground">Dernière session</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </main>
   );

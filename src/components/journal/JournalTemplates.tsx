@@ -167,7 +167,19 @@ Ce que je célèbre :
  * Permet d'utiliser des modèles pré-remplis pour démarrer rapidement
  */
 export const JournalTemplates = memo<JournalTemplatesProps>(({ onUseTemplate, className = '' }) => {
-  const [templates, setTemplates] = useState<JournalTemplate[]>(DEFAULT_TEMPLATES);
+  // Charger les templates personnalisés depuis localStorage
+  const [templates, setTemplates] = useState<JournalTemplate[]>(() => {
+    const saved = localStorage.getItem('journal_custom_templates');
+    if (saved) {
+      try {
+        const customTemplates = JSON.parse(saved) as JournalTemplate[];
+        return [...DEFAULT_TEMPLATES, ...customTemplates.map(t => ({ ...t, icon: Plus }))];
+      } catch {
+        return DEFAULT_TEMPLATES;
+      }
+    }
+    return DEFAULT_TEMPLATES;
+  });
   const [selectedTemplate, setSelectedTemplate] = useState<JournalTemplate | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -200,9 +212,24 @@ export const JournalTemplates = memo<JournalTemplatesProps>(({ onUseTemplate, cl
       tags: newTemplate.tags.split(',').map(t => t.trim()).filter(Boolean),
     };
 
-    setTemplates([...templates, customTemplate]);
+    setTemplates(prev => {
+      const updated = [...prev, customTemplate];
+      // Sauvegarder les templates personnalisés
+      const customOnly = updated.filter(t => t.category === 'custom');
+      localStorage.setItem('journal_custom_templates', JSON.stringify(customOnly));
+      return updated;
+    });
     setNewTemplate({ name: '', description: '', content: '', tags: '' });
     setIsCreateOpen(false);
+  };
+  
+  const handleDeleteTemplate = (templateId: string) => {
+    setTemplates(prev => {
+      const updated = prev.filter(t => t.id !== templateId);
+      const customOnly = updated.filter(t => t.category === 'custom');
+      localStorage.setItem('journal_custom_templates', JSON.stringify(customOnly));
+      return updated;
+    });
   };
 
   const getCategoryLabel = (category: JournalTemplate['category']): string => {

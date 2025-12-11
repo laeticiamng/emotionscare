@@ -62,11 +62,25 @@ export const JournalStreak = memo<JournalStreakProps>(({ notes }) => {
     return notes.some(n => new Date(n.created_at).toDateString() === today);
   }, [notes]);
 
+  // Messages de motivation contextuels
+  const motivationMessage = useMemo(() => {
+    if (streakData.currentStreak === 0) return null;
+    if (streakData.currentStreak >= 30) return "🏆 Vous êtes un maître de l'écriture!";
+    if (streakData.currentStreak >= 14) return "🌟 Deux semaines d'excellence!";
+    if (streakData.currentStreak >= 7) return "🔥 Une semaine complète! Bravo!";
+    if (streakData.currentStreak >= 3) return "💪 Belle constance, continuez!";
+    return "🌱 Bon début, gardez le rythme!";
+  }, [streakData.currentStreak]);
+
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Flame className={`h-5 w-5 ${streakData.currentStreak > 0 ? 'text-orange-500' : 'text-muted-foreground'}`} />
+          <Flame className={`h-5 w-5 transition-all duration-300 ${
+            streakData.currentStreak > 0 
+              ? 'text-orange-500 animate-pulse' 
+              : 'text-muted-foreground'
+          }`} />
           Streak d'écriture
         </CardTitle>
         <CardDescription>
@@ -77,12 +91,19 @@ export const JournalStreak = memo<JournalStreakProps>(({ notes }) => {
       <CardContent className="space-y-6">
         <div className="flex items-center justify-center">
           <div className="text-center">
-            <div className="text-6xl font-bold text-primary mb-2">
+            <div className={`text-6xl font-bold mb-2 transition-all duration-500 ${
+              streakData.currentStreak > 0 ? 'text-primary scale-100' : 'text-muted-foreground scale-95'
+            }`}>
               {streakData.currentStreak}
             </div>
             <div className="text-sm text-muted-foreground">
               jour{streakData.currentStreak > 1 ? 's' : ''} consécutif{streakData.currentStreak > 1 ? 's' : ''}
             </div>
+            {motivationMessage && (
+              <p className="mt-2 text-sm font-medium text-primary animate-fade-in">
+                {motivationMessage}
+              </p>
+            )}
           </div>
         </div>
 

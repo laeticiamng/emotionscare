@@ -173,10 +173,27 @@ export default function StreakTracker() {
   };
 
   const claimMilestoneReward = (milestone: StreakMilestone) => {
+    // Vérifier si déjà réclamé
+    const claimed = localStorage.getItem(`milestone_claimed_${milestone.days}`);
+    if (claimed) {
+      toast({
+        title: 'Déjà réclamé',
+        description: `Vous avez déjà réclamé la récompense des ${milestone.days} jours`,
+      });
+      return;
+    }
+    
+    // Marquer comme réclamé
+    localStorage.setItem(`milestone_claimed_${milestone.days}`, 'true');
+    
     toast({
       title: `${milestone.icon} Félicitations!`,
       description: `Vous avez débloqué: ${milestone.reward}`,
     });
+  };
+  
+  const isMilestoneClaimed = (days: number) => {
+    return localStorage.getItem(`milestone_claimed_${days}`) === 'true';
   };
 
   if (loading) {
@@ -259,21 +276,29 @@ export default function StreakTracker() {
             Récompenses
           </h4>
           <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
-            {milestones.map((milestone, idx) => (
-              <button
-                key={idx}
-                onClick={() => milestone.achieved && claimMilestoneReward(milestone)}
-                className={`p-2 rounded-lg text-center transition-all ${
-                  milestone.achieved 
-                    ? 'bg-amber-100 dark:bg-amber-900/30 cursor-pointer hover:scale-105' 
-                    : 'bg-muted/50 opacity-50'
-                }`}
-                disabled={!milestone.achieved}
-              >
-                <span className="text-2xl">{milestone.icon}</span>
-                <p className="text-xs font-medium mt-1">{milestone.days}j</p>
-              </button>
-            ))}
+            {milestones.map((milestone, idx) => {
+              const claimed = isMilestoneClaimed(milestone.days);
+              return (
+                <button
+                  key={idx}
+                  onClick={() => milestone.achieved && !claimed && claimMilestoneReward(milestone)}
+                  className={`p-2 rounded-lg text-center transition-all relative ${
+                    milestone.achieved 
+                      ? claimed
+                        ? 'bg-green-100 dark:bg-green-900/30'
+                        : 'bg-amber-100 dark:bg-amber-900/30 cursor-pointer hover:scale-105 animate-pulse' 
+                      : 'bg-muted/50 opacity-50'
+                  }`}
+                  disabled={!milestone.achieved || claimed}
+                >
+                  <span className="text-2xl">{milestone.icon}</span>
+                  <p className="text-xs font-medium mt-1">{milestone.days}j</p>
+                  {claimed && (
+                    <span className="absolute -top-1 -right-1 text-xs">✓</span>
+                  )}
+                </button>
+              );
+            })}
           </div>
         </div>
       </CardContent>
