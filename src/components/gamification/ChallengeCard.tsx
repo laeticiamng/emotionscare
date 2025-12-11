@@ -5,7 +5,10 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { Trophy, Clock, Target, Share2, Zap, Flame, Star } from 'lucide-react';
+import { 
+  Trophy, Clock, Target, Share2, Zap, Flame, Star, 
+  Bell, BellOff, Users, Medal, Info, Bookmark, MoreVertical, Heart
+} from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Tooltip,
@@ -13,7 +16,23 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { useToast } from '@/hooks/use-toast';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 interface Challenge {
   id: string;
@@ -36,6 +55,13 @@ interface ChallengeCardProps {
   onClaim?: (challengeId: string) => void;
 }
 
+// Mock data pour les amis qui font le même défi
+const mockFriendsOnChallenge = [
+  { id: '1', name: 'Marie', avatar: '', progress: 75 },
+  { id: '2', name: 'Pierre', avatar: '', progress: 50 },
+  { id: '3', name: 'Sophie', avatar: '', progress: 100 },
+];
+
 const ChallengeCard: React.FC<ChallengeCardProps> = ({ 
   challenge, 
   onStart, 
@@ -44,6 +70,16 @@ const ChallengeCard: React.FC<ChallengeCardProps> = ({
   const { toast } = useToast();
   const [timeRemaining, setTimeRemaining] = useState<string>('');
   const [isUrgent, setIsUrgent] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(() => {
+    const saved = localStorage.getItem('challengeFavorites');
+    return saved ? JSON.parse(saved).includes(challenge.id) : false;
+  });
+  const [hasReminder, setHasReminder] = useState(() => {
+    const saved = localStorage.getItem('challengeReminders');
+    return saved ? JSON.parse(saved).includes(challenge.id) : false;
+  });
+  const [showDetails, setShowDetails] = useState(false);
+  const [showFriends, setShowFriends] = useState(false);
 
   // Countdown timer
   useEffect(() => {
@@ -78,8 +114,7 @@ const ChallengeCard: React.FC<ChallengeCardProps> = ({
     };
 
     updateTimer();
-    const interval = setInterval(updateTimer, 60000); // Update every minute
-
+    const interval = setInterval(updateTimer, 60000);
     return () => clearInterval(interval);
   }, [challenge.deadline]);
 
@@ -116,26 +151,58 @@ const ChallengeCard: React.FC<ChallengeCardProps> = ({
     ? Math.round(challenge.points * challenge.bonusMultiplier) 
     : challenge.points;
 
+  const toggleFavorite = () => {
+    const saved = localStorage.getItem('challengeFavorites');
+    const favorites: string[] = saved ? JSON.parse(saved) : [];
+    
+    if (isFavorite) {
+      const newFavorites = favorites.filter(id => id !== challenge.id);
+      localStorage.setItem('challengeFavorites', JSON.stringify(newFavorites));
+      setIsFavorite(false);
+      toast({ title: 'Retiré des favoris' });
+    } else {
+      favorites.push(challenge.id);
+      localStorage.setItem('challengeFavorites', JSON.stringify(favorites));
+      setIsFavorite(true);
+      toast({ title: 'Ajouté aux favoris', description: 'Retrouvez ce défi facilement' });
+    }
+  };
+
+  const toggleReminder = () => {
+    const saved = localStorage.getItem('challengeReminders');
+    const reminders: string[] = saved ? JSON.parse(saved) : [];
+    
+    if (hasReminder) {
+      const newReminders = reminders.filter(id => id !== challenge.id);
+      localStorage.setItem('challengeReminders', JSON.stringify(newReminders));
+      setHasReminder(false);
+      toast({ title: 'Rappel désactivé' });
+    } else {
+      reminders.push(challenge.id);
+      localStorage.setItem('challengeReminders', JSON.stringify(reminders));
+      setHasReminder(true);
+      toast({ title: 'Rappel activé', description: 'Vous serez notifié avant l\'expiration' });
+    }
+  };
+
   const handleShare = async () => {
     const shareText = `🏆 Je relève le défi "${challenge.title}" sur EmotionsCare ! ${challenge.completed ? '✅ Terminé !' : `${Math.round(progressPercentage)}% complété`}`;
     
     if (navigator.share) {
       try {
-        await navigator.share({
-          title: 'Mon défi EmotionsCare',
-          text: shareText,
-        });
-      } catch (err) {
-        // User cancelled or error
+        await navigator.share({ title: 'Mon défi EmotionsCare', text: shareText });
+      } catch {
+        // cancelled
       }
     } else {
       await navigator.clipboard.writeText(shareText);
-      toast({
-        title: 'Copié !',
-        description: 'Le texte a été copié dans le presse-papier.',
-      });
+      toast({ title: 'Copié !', description: 'Le texte a été copié dans le presse-papier.' });
     }
   };
+
+  // Amis sur le même défi
+  const friendsOnChallenge = mockFriendsOnChallenge;
+  const friendsCompleted = friendsOnChallenge.filter(f => f.progress >= 100).length;
 
   return (
     <TooltipProvider>
@@ -145,7 +212,7 @@ const ChallengeCard: React.FC<ChallengeCardProps> = ({
       >
         <Card className={`hover:shadow-lg transition-all duration-200 overflow-hidden ${
           isCompleted && !challenge.completed ? 'ring-2 ring-green-500/50' : ''
-        }`}>
+        } ${isFavorite ? 'ring-2 ring-amber-400/30' : ''}`}>
           {/* Bonus Multiplier Banner */}
           {challenge.bonusMultiplier && challenge.bonusMultiplier > 1 && (
             <div className="bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs py-1 px-3 flex items-center justify-center gap-1">
@@ -161,6 +228,9 @@ const ChallengeCard: React.FC<ChallengeCardProps> = ({
                 <div className="space-y-1 flex-1">
                   <div className="flex items-center gap-2">
                     <h3 className="font-semibold text-lg">{challenge.title}</h3>
+                    {isFavorite && (
+                      <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
+                    )}
                     {challenge.streak && challenge.streak > 1 && (
                       <Tooltip>
                         <TooltipTrigger>
@@ -180,17 +250,46 @@ const ChallengeCard: React.FC<ChallengeCardProps> = ({
                   </p>
                 </div>
                 
-                {/* Points with bonus */}
-                <div className="flex flex-col items-end gap-1">
-                  <div className="flex items-center gap-1 text-yellow-600 bg-yellow-50 dark:bg-yellow-500/10 px-2 py-1 rounded-full">
-                    <Trophy className="h-4 w-4" />
-                    <span className="font-semibold text-sm">{totalPoints}</span>
+                {/* Points & Menu */}
+                <div className="flex items-start gap-2">
+                  <div className="flex flex-col items-end gap-1">
+                    <div className="flex items-center gap-1 text-yellow-600 bg-yellow-50 dark:bg-yellow-500/10 px-2 py-1 rounded-full">
+                      <Trophy className="h-4 w-4" />
+                      <span className="font-semibold text-sm">{totalPoints}</span>
+                    </div>
+                    {challenge.bonusMultiplier && challenge.bonusMultiplier > 1 && (
+                      <span className="text-xs text-muted-foreground line-through">
+                        {challenge.points}
+                      </span>
+                    )}
                   </div>
-                  {challenge.bonusMultiplier && challenge.bonusMultiplier > 1 && (
-                    <span className="text-xs text-muted-foreground line-through">
-                      {challenge.points}
-                    </span>
-                  )}
+                  
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-8 w-8">
+                        <MoreVertical className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={toggleFavorite}>
+                        <Star className={`h-4 w-4 mr-2 ${isFavorite ? 'fill-amber-400 text-amber-400' : ''}`} />
+                        {isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={toggleReminder}>
+                        {hasReminder ? <BellOff className="h-4 w-4 mr-2" /> : <Bell className="h-4 w-4 mr-2" />}
+                        {hasReminder ? 'Désactiver rappel' : 'Activer rappel'}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setShowDetails(true)}>
+                        <Info className="h-4 w-4 mr-2" />
+                        Détails
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={handleShare}>
+                        <Share2 className="h-4 w-4 mr-2" />
+                        Partager
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               </div>
 
@@ -208,7 +307,33 @@ const ChallengeCard: React.FC<ChallengeCardProps> = ({
                     ✓ Terminé
                   </Badge>
                 )}
+                {hasReminder && (
+                  <Badge variant="outline" className="bg-blue-500/10 text-blue-600">
+                    <Bell className="h-3 w-3 mr-1" />
+                    Rappel
+                  </Badge>
+                )}
               </div>
+
+              {/* Amis sur le même défi */}
+              {friendsOnChallenge.length > 0 && (
+                <div 
+                  className="flex items-center gap-2 p-2 rounded-lg bg-muted/50 cursor-pointer hover:bg-muted transition-colors"
+                  onClick={() => setShowFriends(true)}
+                >
+                  <Users className="h-4 w-4 text-muted-foreground" />
+                  <div className="flex -space-x-2">
+                    {friendsOnChallenge.slice(0, 3).map((friend) => (
+                      <Avatar key={friend.id} className="h-6 w-6 border-2 border-background">
+                        <AvatarFallback className="text-xs">{friend.name[0]}</AvatarFallback>
+                      </Avatar>
+                    ))}
+                  </div>
+                  <span className="text-xs text-muted-foreground">
+                    {friendsCompleted}/{friendsOnChallenge.length} amis ont terminé
+                  </span>
+                </div>
+              )}
 
               {/* Progress */}
               <div className="space-y-2">
@@ -220,7 +345,6 @@ const ChallengeCard: React.FC<ChallengeCardProps> = ({
                 </div>
                 <div className="relative">
                   <Progress value={progressPercentage} className="h-2" />
-                  {/* Progress milestones */}
                   <div className="absolute inset-0 flex justify-between items-center px-1">
                     {[25, 50, 75].map((milestone) => (
                       <div
@@ -289,14 +413,9 @@ const ChallengeCard: React.FC<ChallengeCardProps> = ({
                   )}
                 </div>
                 
-                {/* Share Button */}
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button 
-                      variant="outline" 
-                      size="icon"
-                      onClick={handleShare}
-                    >
+                    <Button variant="outline" size="icon" onClick={handleShare}>
                       <Share2 className="h-4 w-4" />
                     </Button>
                   </TooltipTrigger>
@@ -309,6 +428,93 @@ const ChallengeCard: React.FC<ChallengeCardProps> = ({
           </CardContent>
         </Card>
       </motion.div>
+
+      {/* Dialog détails */}
+      <Dialog open={showDetails} onOpenChange={setShowDetails}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Trophy className="h-5 w-5 text-primary" />
+              {challenge.title}
+            </DialogTitle>
+            <DialogDescription>{challenge.description}</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="p-3 rounded-lg bg-muted/50 text-center">
+                <p className="text-2xl font-bold text-primary">{totalPoints}</p>
+                <p className="text-xs text-muted-foreground">Points</p>
+              </div>
+              <div className="p-3 rounded-lg bg-muted/50 text-center">
+                <p className="text-2xl font-bold">{Math.round(progressPercentage)}%</p>
+                <p className="text-xs text-muted-foreground">Progression</p>
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Catégorie</span>
+                <span className="font-medium">{getCategoryLabel(challenge.category)}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Difficulté</span>
+                <Badge className={getDifficultyColor(challenge.difficulty)} variant="outline">
+                  {challenge.difficulty}
+                </Badge>
+              </div>
+              {challenge.deadline && (
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Échéance</span>
+                  <span className="font-medium">{timeRemaining}</span>
+                </div>
+              )}
+              {challenge.streak && (
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Série actuelle</span>
+                  <span className="font-medium flex items-center gap-1">
+                    <Flame className="h-4 w-4 text-orange-500" />
+                    {challenge.streak}
+                  </span>
+                </div>
+              )}
+            </div>
+
+            <Progress value={progressPercentage} className="h-3" />
+            <p className="text-center text-sm text-muted-foreground">
+              {challenge.progress} / {challenge.maxProgress} accompli
+            </p>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog amis */}
+      <Dialog open={showFriends} onOpenChange={setShowFriends}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Users className="h-5 w-5 text-primary" />
+              Amis sur ce défi
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            {friendsOnChallenge.map((friend) => (
+              <div key={friend.id} className="flex items-center gap-3 p-2 rounded-lg bg-muted/50">
+                <Avatar>
+                  <AvatarFallback>{friend.name[0]}</AvatarFallback>
+                </Avatar>
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium text-sm">{friend.name}</p>
+                  <Progress value={friend.progress} className="h-1.5 mt-1" />
+                </div>
+                <span className="text-sm text-muted-foreground">{friend.progress}%</span>
+                {friend.progress >= 100 && (
+                  <Medal className="h-4 w-4 text-amber-500" />
+                )}
+              </div>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
     </TooltipProvider>
   );
 };
