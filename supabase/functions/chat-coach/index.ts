@@ -1,10 +1,54 @@
-// @ts-nocheck - ESM imports from https://deno.land ne supportent pas les types TypeScript natifs dans Deno
+// @ts-nocheck
+/**
+ * Chat Coach - Coach IA sécurisé via Lovable AI Gateway
+ * Utilise google/gemini-2.5-flash pour des réponses rapides et empathiques
+ */
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.43.4";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+// Système de détection de crise
+const CRISIS_KEYWORDS = [
+  'suicide', 'suicidaire', 'me tuer', 'en finir', 'mourir', 
+  'plus envie de vivre', 'automutilation', 'me faire du mal',
+  'désespéré', 'sans espoir', 'plus rien à perdre'
+];
+
+const CRISIS_RESOURCES = {
+  france: {
+    name: 'Numéro national de prévention du suicide',
+    number: '3114',
+    available: '24h/24, 7j/7'
+  },
+  sos_amitie: {
+    name: 'SOS Amitié',
+    number: '09 72 39 40 50',
+    available: '24h/24'
+  }
+};
+
+function detectCrisis(message: string): boolean {
+  const lowerMessage = message.toLowerCase();
+  return CRISIS_KEYWORDS.some(keyword => lowerMessage.includes(keyword));
+}
+
+function getCrisisResponse(): string {
+  return `⚠️ **Je perçois que vous traversez un moment très difficile.**
+
+Votre bien-être est ma priorité absolue. Ce que vous ressentez est important et mérite une aide professionnelle immédiate.
+
+📞 **Ressources d'aide immédiate :**
+- **${CRISIS_RESOURCES.france.number}** - ${CRISIS_RESOURCES.france.name} (${CRISIS_RESOURCES.france.available})
+- **${CRISIS_RESOURCES.sos_amitie.number}** - ${CRISIS_RESOURCES.sos_amitie.name} (${CRISIS_RESOURCES.sos_amitie.available})
+
+Ces professionnels sont formés pour vous écouter et vous accompagner. N'hésitez pas à les appeler.
+
+Je reste là pour vous, mais un professionnel pourra mieux vous aider dans ce moment. 💙`;
+}
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -12,33 +56,79 @@ serve(async (req) => {
   }
 
   try {
-    const openaiApiKey = Deno.env.get('OPENAI_API_KEY');
-    if (!openaiApiKey) {
-      throw new Error('OpenAI API key not configured');
+    // Authentification
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      { global: { headers: { Authorization: req.headers.get('Authorization')! } } }
+    );
+
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    if (!user) {
+      return new Response(JSON.stringify({ error: 'Non autorisé' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
-    const { message, history } = await req.json();
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    if (!LOVABLE_API_KEY) {
+      throw new Error('LOVABLE_API_KEY non configurée');
+    }
 
-    // Build conversation context
+    const { message, history, context } = await req.json();
+
+    // Détection de crise
+    if (detectCrisis(message)) {
+      // Log l'alerte de crise
+      await supabaseClient.from('crisis_alerts').insert({
+        user_id: user.id,
+        message_snippet: message.substring(0, 100),
+        detected_at: new Date().toISOString(),
+        status: 'detected'
+      }).catch(() => {}); // Silent fail si table n'existe pas
+
+      return new Response(
+        JSON.stringify({ 
+          response: getCrisisResponse(),
+          crisis_detected: true
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Construction du contexte
+    const systemPrompt = `Tu es EmoCare, un coach en bien-être émotionnel bienveillant et professionnel pour la plateforme EmotionsCare.
+
+PERSONNALITÉ:
+- Empathique, chaleureux et encourageant
+- Pratique et orienté solutions
+- Respectueux des limites (tu n'es pas un thérapeute)
+- Tu parles français naturellement
+
+CAPACITÉS:
+- Aide à comprendre et gérer les émotions
+- Propose des exercices de respiration, méditation, gratitude
+- Donne des conseils concrets et réalisables
+- Encourage les bonnes habitudes de bien-être
+
+LIMITES:
+- Si situation grave → recommande un professionnel (psychologue, médecin)
+- Ne donne jamais de diagnostic médical
+- Ne prescris jamais de médicaments
+
+CONTEXTE UTILISATEUR:
+${context ? JSON.stringify(context) : 'Aucun contexte spécifique'}
+
+Réponds de manière naturelle, bienveillante et concise (max 200 mots).`;
+
     const messages = [
-      {
-        role: 'system',
-        content: `Tu es un coach en bien-être émotionnel bienveillant et professionnel. Tu aides les utilisateurs à:
-        - Comprendre et gérer leurs émotions
-        - Développer des stratégies de bien-être
-        - Réduire le stress et l'anxiété
-        - Améliorer leur humeur et leur confiance
-        
-        Sois empathique, pratique et encourage toujours. Donne des conseils concrets et réalisables.
-        Propose parfois des exercices simples (respiration, méditation, etc.).
-        Si la situation semble grave, encourage à consulter un professionnel.
-        Réponds en français de manière naturelle et bienveillante.`
-      }
+      { role: 'system', content: systemPrompt }
     ];
 
-    // Add conversation history
+    // Ajouter l'historique
     if (history && history.length > 0) {
-      history.forEach((msg: any) => {
+      history.slice(-10).forEach((msg: { sender: string; content: string }) => {
         messages.push({
           role: msg.sender === 'user' ? 'user' : 'assistant',
           content: msg.content
@@ -46,45 +136,62 @@ serve(async (req) => {
       });
     }
 
-    // Add current message
-    messages.push({
-      role: 'user',
-      content: message
-    });
+    messages.push({ role: 'user', content: message });
 
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    // Appel à Lovable AI Gateway
+    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${openaiApiKey}`,
+        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4.1-2025-04-14',
+        model: 'google/gemini-2.5-flash',
         messages: messages,
-        temperature: 0.8,
-        max_tokens: 1000,
+        max_tokens: 800,
       }),
     });
 
+    if (!response.ok) {
+      if (response.status === 429) {
+        return new Response(JSON.stringify({ 
+          error: 'Limite de requêtes atteinte. Réessayez dans quelques instants.' 
+        }), {
+          status: 429,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      if (response.status === 402) {
+        return new Response(JSON.stringify({ 
+          error: 'Service IA temporairement indisponible.' 
+        }), {
+          status: 402,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      throw new Error(`AI Gateway error: ${response.status}`);
+    }
+
     const data = await response.json();
-    const aiResponse = data.choices[0].message.content;
+    const aiResponse = data.choices?.[0]?.message?.content || 'Je suis désolé, je n\'ai pas pu générer une réponse.';
+
+    // Sauvegarder la session
+    await supabaseClient.from('ai_coach_sessions').upsert({
+      user_id: user.id,
+      updated_at: new Date().toISOString(),
+      messages_count: (history?.length || 0) + 2
+    }, { onConflict: 'user_id' }).catch(() => {});
 
     return new Response(
-      JSON.stringify({ response: aiResponse }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
+      JSON.stringify({ response: aiResponse, crisis_detected: false }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    const errorDetails = error instanceof Error ? error.stack : String(error);
-    console.error('Chat coach error:', errorMessage, errorDetails);
+    const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue';
+    console.error('[chat-coach] Error:', errorMessage);
     return new Response(
-      JSON.stringify({ 
-        error: 'Erreur de communication avec le coach IA',
-        details: errorMessage 
-      }),
+      JSON.stringify({ error: 'Erreur de communication avec le coach IA' }),
       {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

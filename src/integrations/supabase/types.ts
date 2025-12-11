@@ -3796,6 +3796,42 @@ export type Database = {
         }
         Relationships: []
       }
+      crisis_alerts: {
+        Row: {
+          acknowledged_at: string | null
+          created_at: string
+          crisis_score: number | null
+          detected_at: string
+          id: string
+          indicators: Json | null
+          message_snippet: string | null
+          status: string | null
+          user_id: string
+        }
+        Insert: {
+          acknowledged_at?: string | null
+          created_at?: string
+          crisis_score?: number | null
+          detected_at?: string
+          id?: string
+          indicators?: Json | null
+          message_snippet?: string | null
+          status?: string | null
+          user_id: string
+        }
+        Update: {
+          acknowledged_at?: string | null
+          created_at?: string
+          crisis_score?: number | null
+          detected_at?: string
+          id?: string
+          indicators?: Json | null
+          message_snippet?: string | null
+          status?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       custom_challenges: {
         Row: {
           created_at: string | null
@@ -4017,6 +4053,30 @@ export type Database = {
           id?: string
           original_data?: Json
           reason?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      data_export_logs: {
+        Row: {
+          export_type: string | null
+          exported_at: string
+          id: string
+          sections_exported: string[] | null
+          user_id: string
+        }
+        Insert: {
+          export_type?: string | null
+          exported_at?: string
+          id?: string
+          sections_exported?: string[] | null
+          user_id: string
+        }
+        Update: {
+          export_type?: string | null
+          exported_at?: string
+          id?: string
+          sections_exported?: string[] | null
           user_id?: string
         }
         Relationships: []
@@ -7497,6 +7557,45 @@ export type Database = {
           },
         ]
       }
+      health_data: {
+        Row: {
+          heart_rate: number | null
+          hrv: number | null
+          id: string
+          provider: string | null
+          recorded_at: string
+          sleep_minutes: number | null
+          steps: number | null
+          stress_level: number | null
+          synced_at: string | null
+          user_id: string
+        }
+        Insert: {
+          heart_rate?: number | null
+          hrv?: number | null
+          id?: string
+          provider?: string | null
+          recorded_at: string
+          sleep_minutes?: number | null
+          steps?: number | null
+          stress_level?: number | null
+          synced_at?: string | null
+          user_id: string
+        }
+        Update: {
+          heart_rate?: number | null
+          hrv?: number | null
+          id?: string
+          provider?: string | null
+          recorded_at?: string
+          sleep_minutes?: number | null
+          steps?: number | null
+          stress_level?: number | null
+          synced_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       honorary_titles: {
         Row: {
           awarded_at: string | null
@@ -8011,6 +8110,59 @@ export type Database = {
           token?: string
         }
         Relationships: []
+      }
+      item_reviews: {
+        Row: {
+          created_at: string
+          ease_factor_after: number | null
+          ease_factor_before: number | null
+          id: string
+          interval_after: number | null
+          interval_before: number | null
+          item_code: string
+          next_review_date: string | null
+          quality: number
+          response_time_ms: number | null
+          session_id: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          ease_factor_after?: number | null
+          ease_factor_before?: number | null
+          id?: string
+          interval_after?: number | null
+          interval_before?: number | null
+          item_code: string
+          next_review_date?: string | null
+          quality: number
+          response_time_ms?: number | null
+          session_id?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          ease_factor_after?: number | null
+          ease_factor_before?: number | null
+          id?: string
+          interval_after?: number | null
+          interval_before?: number | null
+          item_code?: string
+          next_review_date?: string | null
+          quality?: number
+          response_time_ms?: number | null
+          session_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "item_reviews_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "review_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       item_situation_relations: {
         Row: {
@@ -14272,6 +14424,45 @@ export type Database = {
         }
         Relationships: []
       }
+      review_sessions: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          id: string
+          items_again: number
+          items_correct: number
+          items_reviewed: number
+          session_type: string
+          started_at: string
+          total_time_seconds: number | null
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          items_again?: number
+          items_correct?: number
+          items_reviewed?: number
+          session_type?: string
+          started_at?: string
+          total_time_seconds?: number | null
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          items_again?: number
+          items_correct?: number
+          items_reviewed?: number
+          session_type?: string
+          started_at?: string
+          total_time_seconds?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       rituals: {
         Row: {
           description: string
@@ -17999,6 +18190,54 @@ export type Database = {
         }
         Relationships: []
       }
+      user_item_progress: {
+        Row: {
+          correct_reviews: number
+          created_at: string
+          ease_factor: number
+          id: string
+          interval_days: number
+          item_code: string
+          last_review_date: string | null
+          learning_state: string
+          next_review_date: string
+          repetitions: number
+          total_reviews: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          correct_reviews?: number
+          created_at?: string
+          ease_factor?: number
+          id?: string
+          interval_days?: number
+          item_code: string
+          last_review_date?: string | null
+          learning_state?: string
+          next_review_date?: string
+          repetitions?: number
+          total_reviews?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          correct_reviews?: number
+          created_at?: string
+          ease_factor?: number
+          id?: string
+          interval_days?: number
+          item_code?: string
+          last_review_date?: string | null
+          learning_state?: string
+          next_review_date?: string
+          repetitions?: number
+          total_reviews?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_leaderboard: {
         Row: {
           created_at: string | null
@@ -19626,6 +19865,36 @@ export type Database = {
           experience_title?: string
           id?: string
           rating?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      wearable_connections: {
+        Row: {
+          connected_at: string | null
+          id: string
+          is_active: boolean | null
+          last_sync: string | null
+          metadata: Json | null
+          provider: string
+          user_id: string
+        }
+        Insert: {
+          connected_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_sync?: string | null
+          metadata?: Json | null
+          provider: string
+          user_id: string
+        }
+        Update: {
+          connected_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_sync?: string | null
+          metadata?: Json | null
+          provider?: string
           user_id?: string
         }
         Relationships: []
