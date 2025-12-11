@@ -20493,11 +20493,11 @@ export type Database = {
         Returns: string
       }
       create_user_session:
-        | { Args: { session_data: Json }; Returns: string }
         | {
             Args: { p_ip_address?: unknown; p_user_agent?: string }
             Returns: string
           }
+        | { Args: { session_data: Json }; Returns: string }
       decrement_participant_count: {
         Args: { session_id: string }
         Returns: undefined
@@ -20652,8 +20652,8 @@ export type Database = {
       generate_master_content: { Args: { p_item_id: string }; Returns: Json }
       generate_security_audit_report: { Args: never; Returns: Json }
       generate_slug:
-        | { Args: { item_code: string; title: string }; Returns: string }
         | { Args: { input_text: string }; Returns: string }
+        | { Args: { item_code: string; title: string }; Returns: string }
       generate_specific_content_all_items: {
         Args: never
         Returns: {
@@ -21360,9 +21360,10 @@ export type Database = {
               p_operation_type: string
               p_request_details?: Json
               p_response_status?: string
+              p_response_time_ms?: number
               p_service_type: string
             }
-            Returns: string
+            Returns: undefined
           }
         | {
             Args: {
@@ -21371,10 +21372,9 @@ export type Database = {
               p_operation_type: string
               p_request_details?: Json
               p_response_status?: string
-              p_response_time_ms?: number
               p_service_type: string
             }
-            Returns: undefined
+            Returns: string
           }
       log_lyrics_access: {
         Args: {
@@ -21396,6 +21396,10 @@ export type Database = {
         Returns: string
       }
       log_security_event:
+        | {
+            Args: { event_details?: Json; event_type: string }
+            Returns: undefined
+          }
         | {
             Args: {
               p_action: string
@@ -21421,7 +21425,6 @@ export type Database = {
               p_event_details?: Json
               p_event_type: string
               p_ip_address?: unknown
-              p_severity?: string
               p_user_agent?: string
               p_user_id?: string
             }
@@ -21432,13 +21435,10 @@ export type Database = {
               p_event_details?: Json
               p_event_type: string
               p_ip_address?: unknown
+              p_severity?: string
               p_user_agent?: string
               p_user_id?: string
             }
-            Returns: undefined
-          }
-        | {
-            Args: { event_details?: Json; event_type: string }
             Returns: undefined
           }
       log_security_finding: {
