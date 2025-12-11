@@ -20360,6 +20360,8 @@ export type Database = {
       }
       calculate_risk_score: { Args: never; Returns: number }
       calculate_sla_metrics: { Args: never; Returns: undefined }
+      calculate_streak_bonus: { Args: { streak_days: number }; Returns: number }
+      calculate_trust_score: { Args: { profile_uuid: string }; Returns: number }
       calculate_user_learning_path: {
         Args: { p_user_id: string }
         Returns: Json
@@ -20418,6 +20420,7 @@ export type Database = {
       cleanup_old_monitoring_errors: { Args: never; Returns: undefined }
       cleanup_old_monitoring_events: { Args: never; Returns: undefined }
       cleanup_old_music_generations: { Args: never; Returns: undefined }
+      cleanup_old_notifications: { Args: never; Returns: number }
       cleanup_old_operation_logs: { Args: never; Returns: undefined }
       cleanup_old_performance_metrics: { Args: never; Returns: undefined }
       cleanup_old_streaming_logs: { Args: never; Returns: undefined }
@@ -21193,6 +21196,7 @@ export type Database = {
           role: string
         }[]
       }
+      get_user_statistics: { Args: { user_uuid: string }; Returns: Json }
       get_user_subscription: {
         Args: { user_uuid: string }
         Returns: {
@@ -21237,6 +21241,7 @@ export type Database = {
           webhook_url: string
         }[]
       }
+      get_weekly_summary: { Args: { user_uuid: string }; Returns: Json }
       has_org_role: {
         Args: { _org_id: string; _role: string; _user_id: string }
         Returns: boolean
@@ -21279,6 +21284,7 @@ export type Database = {
         }
         Returns: Json
       }
+      increment_view_count: { Args: { content_id: string }; Returns: undefined }
       integrate_all_oic_competences_into_edn_items: {
         Args: never
         Returns: {
