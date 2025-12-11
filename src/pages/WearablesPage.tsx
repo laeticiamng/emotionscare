@@ -208,6 +208,61 @@ export default function WearablesPage() {
         <TabsContent value="overview" className="space-y-6">
           {summary && summary.dataPoints > 0 ? (
             <>
+              {/* Corrélation Humeur-Santé */}
+              <Card className="bg-gradient-to-r from-primary/5 to-accent/5 border-primary/20">
+                <CardContent className="pt-6">
+                  <div className="flex items-center gap-3 mb-3">
+                    <Heart className="h-5 w-5 text-primary" />
+                    <h3 className="font-semibold">Corrélation humeur & santé</h3>
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Basé sur vos données des 7 derniers jours, voici les liens détectés :
+                  </p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {summary.avgSleepHours && summary.avgSleepHours < 6.5 && (
+                      <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
+                        <p className="text-sm font-medium text-amber-700 dark:text-amber-400">
+                          💤 Sommeil insuffisant détecté
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Un sommeil &lt; 7h peut affecter votre humeur. Essayez notre module Breath.
+                        </p>
+                      </div>
+                    )}
+                    {summary.avgHeartRate && summary.avgHeartRate > 75 && (
+                      <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/20">
+                        <p className="text-sm font-medium text-blue-700 dark:text-blue-400">
+                          💓 Fréquence cardiaque élevée
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Indique possiblement du stress. Une séance de respiration pourrait aider.
+                        </p>
+                      </div>
+                    )}
+                    {summary.totalSteps > 8000 && (
+                      <div className="p-3 rounded-lg bg-green-500/10 border border-green-500/20">
+                        <p className="text-sm font-medium text-green-700 dark:text-green-400">
+                          🎉 Bonne activité physique
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          L'exercice améliore l'humeur. Continuez ainsi !
+                        </p>
+                      </div>
+                    )}
+                    {summary.avgHrv && summary.avgHrv > 50 && (
+                      <div className="p-3 rounded-lg bg-purple-500/10 border border-purple-500/20">
+                        <p className="text-sm font-medium text-purple-700 dark:text-purple-400">
+                          🧘 Bonne récupération
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Votre HRV indique une bonne gestion du stress.
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {summary.avgHeartRate && (
                   <Card>

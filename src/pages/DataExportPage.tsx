@@ -13,6 +13,89 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { Navigate } from 'react-router-dom';
 
+// Génère le contenu HTML pour l'export PDF
+function generatePDFContent(data: any): string {
+  const date = new Date().toLocaleDateString('fr-FR', { 
+    day: 'numeric', month: 'long', year: 'numeric' 
+  });
+  
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Export EmotionsCare - ${date}</title>
+      <style>
+        body { font-family: Arial, sans-serif; padding: 40px; max-width: 800px; margin: 0 auto; }
+        h1 { color: #7c3aed; border-bottom: 2px solid #7c3aed; padding-bottom: 10px; }
+        h2 { color: #4c1d95; margin-top: 30px; }
+        .meta { color: #666; font-size: 12px; margin-bottom: 30px; }
+        .section { background: #f9fafb; padding: 15px; border-radius: 8px; margin: 15px 0; }
+        .item { padding: 10px; border-bottom: 1px solid #e5e7eb; }
+        .item:last-child { border-bottom: none; }
+        .label { font-weight: bold; color: #374151; }
+        .value { color: #6b7280; }
+        @media print { body { padding: 20px; } }
+      </style>
+    </head>
+    <body>
+      <h1>📊 Rapport EmotionsCare</h1>
+      <p class="meta">Exporté le ${date} • ID: ${data.user?.id?.slice(0, 8) || 'N/A'}</p>
+      
+      ${data.profile ? `
+        <h2>👤 Profil</h2>
+        <div class="section">
+          <div class="item"><span class="label">Email:</span> <span class="value">${data.user?.email || 'N/A'}</span></div>
+          <div class="item"><span class="label">Nom:</span> <span class="value">${data.profile.display_name || 'Non renseigné'}</span></div>
+        </div>
+      ` : ''}
+      
+      ${data.moods?.length ? `
+        <h2>😊 Historique des humeurs (${data.moods.length} entrées)</h2>
+        <div class="section">
+          ${data.moods.slice(0, 20).map((m: any) => `
+            <div class="item">
+              <span class="label">${new Date(m.created_at).toLocaleDateString('fr-FR')}:</span>
+              <span class="value">Score ${m.score}/10 ${m.notes ? `- ${m.notes.slice(0, 50)}...` : ''}</span>
+            </div>
+          `).join('')}
+          ${data.moods.length > 20 ? `<p class="value">... et ${data.moods.length - 20} autres entrées</p>` : ''}
+        </div>
+      ` : ''}
+      
+      ${data.journalEntries?.length ? `
+        <h2>📔 Journal (${data.journalEntries.length} entrées)</h2>
+        <div class="section">
+          ${data.journalEntries.slice(0, 10).map((j: any) => `
+            <div class="item">
+              <span class="label">${new Date(j.created_at).toLocaleDateString('fr-FR')}:</span>
+              <span class="value">${j.content?.slice(0, 100) || 'Contenu chiffré'}...</span>
+            </div>
+          `).join('')}
+          ${data.journalEntries.length > 10 ? `<p class="value">... et ${data.journalEntries.length - 10} autres entrées</p>` : ''}
+        </div>
+      ` : ''}
+      
+      ${data.achievements?.length ? `
+        <h2>🏆 Succès débloqués (${data.achievements.length})</h2>
+        <div class="section">
+          ${data.achievements.map((a: any) => `
+            <div class="item">
+              <span class="label">${a.achievements?.name || 'Badge'}:</span>
+              <span class="value">${a.achievements?.description || ''}</span>
+            </div>
+          `).join('')}
+        </div>
+      ` : ''}
+      
+      <p class="meta" style="margin-top: 40px;">
+        🔒 Document généré conformément à l'article 20 du RGPD (droit à la portabilité).
+        <br>EmotionsCare - Vos données vous appartiennent.
+      </p>
+    </body>
+    </html>
+  `;
+}
+
 const EXPORT_SECTIONS = [
   { id: 'profile', label: 'Profil utilisateur', description: 'Informations de compte', icon: '👤', estimatedSize: '~1 KB' },
   { id: 'moods', label: 'Historique des humeurs', description: 'Tous vos enregistrements d\'humeur', icon: '😊', estimatedSize: '~50 KB' },
@@ -111,17 +194,36 @@ export default function DataExportPage() {
       // Create and download file
       let blob: Blob;
       let filename: string;
+      const dateStr = new Date().toISOString().split('T')[0];
       
       if (format === 'json') {
         blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-        filename = `emotionscare-export-${new Date().toISOString().split('T')[0]}.json`;
+        filename = `emotionscare-export-${dateStr}.json`;
       } else if (format === 'csv') {
         blob = new Blob([data], { type: 'text/csv' });
-        filename = `emotionscare-export-${new Date().toISOString().split('T')[0]}.csv`;
+        filename = `emotionscare-export-${dateStr}.csv`;
+      } else if (format === 'pdf') {
+        // Générer un PDF simple via HTML
+        const pdfContent = generatePDFContent(data);
+        const printWindow = window.open('', '_blank');
+        if (printWindow) {
+          printWindow.document.write(pdfContent);
+          printWindow.document.close();
+          printWindow.focus();
+          setTimeout(() => {
+            printWindow.print();
+          }, 500);
+        }
+        toast({
+          title: 'Export PDF prêt',
+          description: 'Utilisez la boîte de dialogue pour sauvegarder en PDF.',
+        });
+        setIsExporting(false);
+        setExportProgress(0);
+        return;
       } else {
-        // PDF would require additional processing
         blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-        filename = `emotionscare-export-${new Date().toISOString().split('T')[0]}.json`;
+        filename = `emotionscare-export-${dateStr}.json`;
       }
 
       const url = URL.createObjectURL(blob);
@@ -277,11 +379,10 @@ export default function DataExportPage() {
                   variant={format === 'pdf' ? 'default' : 'outline'}
                   onClick={() => setFormat('pdf')}
                   className="h-auto py-4 flex-col gap-2"
-                  disabled
                 >
                   <FileText className="h-6 w-6" />
                   <span>PDF</span>
-                  <Badge variant="outline" className="text-xs">Bientôt</Badge>
+                  {format === 'pdf' && <Check className="h-4 w-4" />}
                 </Button>
               </div>
               <p className="text-xs text-muted-foreground mt-3">

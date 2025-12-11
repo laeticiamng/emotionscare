@@ -1,18 +1,23 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import PageRoot from '@/components/common/PageRoot'
 import JournalView from './journal/JournalView'
-import { Sparkles } from 'lucide-react'
+import { Sparkles, Mic, PenLine } from 'lucide-react'
 import { useFlags } from '@/core/flags'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { JournalSettingsLink } from '@/components/journal/JournalSettingsLink'
 import { JournalOnboarding } from '@/components/journal/JournalOnboarding'
 import { JournalQuickTips } from '@/components/journal/JournalQuickTips'
 import { MedicalDisclaimerDialog, useMedicalDisclaimer } from '@/components/medical/MedicalDisclaimerDialog'
 import { usePageSEO } from '@/hooks/usePageSEO';
 
+// Lazy load le composant vocal pour performance
+const VoiceJournalEntry = lazy(() => import('@/components/journal/VoiceJournalEntry'));
+
 const ONBOARDING_KEY = 'journal-onboarding-completed';
 
 export default function B2CJournalPage() {
+  const [activeTab, setActiveTab] = useState<'write' | 'voice'>('write');
   usePageSEO({
     title: 'Journal Émotionnel - Suivi quotidien',
     description: 'Tenez votre journal émotionnel quotidien avec analyse IA. Texte, vocal ou image. Suivez votre évolution et insights personnalisés.',
@@ -67,7 +72,33 @@ export default function B2CJournalPage() {
         {journalEnabled ? (
           <>
             {showTips && <JournalQuickTips className="mb-6" />}
-            <JournalView />
+            
+            <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'write' | 'voice')} className="w-full">
+              <TabsList className="mb-6">
+                <TabsTrigger value="write" className="gap-2">
+                  <PenLine className="h-4 w-4" />
+                  Écrire
+                </TabsTrigger>
+                <TabsTrigger value="voice" className="gap-2">
+                  <Mic className="h-4 w-4" />
+                  Dictée vocale
+                </TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="write">
+                <JournalView />
+              </TabsContent>
+              
+              <TabsContent value="voice">
+                <Suspense fallback={
+                  <div className="flex items-center justify-center py-12">
+                    <div className="animate-spin h-8 w-8 border-2 border-primary border-t-transparent rounded-full" />
+                  </div>
+                }>
+                  <VoiceJournalEntry />
+                </Suspense>
+              </TabsContent>
+            </Tabs>
           </>
         ) : (
           <Alert role="status" variant="default" className="border-primary/40 bg-primary/5">
