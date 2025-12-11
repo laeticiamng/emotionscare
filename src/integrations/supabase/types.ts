@@ -7044,32 +7044,50 @@ export type Database = {
       flashcards: {
         Row: {
           back_content: string
+          correct_count: number | null
           created_at: string
           deck_id: string
           difficulty: string | null
+          ease_factor: number | null
           front_content: string
           id: string
+          interval_days: number | null
           item_code: string | null
+          last_reviewed: string | null
+          next_review: string | null
+          review_count: number | null
           tags: string[] | null
         }
         Insert: {
           back_content: string
+          correct_count?: number | null
           created_at?: string
           deck_id: string
           difficulty?: string | null
+          ease_factor?: number | null
           front_content: string
           id?: string
+          interval_days?: number | null
           item_code?: string | null
+          last_reviewed?: string | null
+          next_review?: string | null
+          review_count?: number | null
           tags?: string[] | null
         }
         Update: {
           back_content?: string
+          correct_count?: number | null
           created_at?: string
           deck_id?: string
           difficulty?: string | null
+          ease_factor?: number | null
           front_content?: string
           id?: string
+          interval_days?: number | null
           item_code?: string | null
+          last_reviewed?: string | null
+          next_review?: string | null
+          review_count?: number | null
           tags?: string[] | null
         }
         Relationships: [
