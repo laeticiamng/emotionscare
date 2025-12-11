@@ -1,8 +1,25 @@
 // @ts-nocheck
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
-import { Play, Pause, SkipBack, SkipForward } from 'lucide-react';
+import { Badge } from "@/components/ui/badge";
+import { 
+  Play, Pause, SkipBack, SkipForward, Shuffle, Repeat, Repeat1, 
+  Heart, ListMusic, MoreVertical, Share2, Download, Clock, Star
+} from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { useToast } from '@/hooks/use-toast';
+
+const FAVORITES_KEY = 'music_favorites';
+const PLAYBACK_STATS_KEY = 'music_playback_stats';
 
 export interface PlayerControlsProps {
   isPlaying: boolean;
@@ -11,6 +28,13 @@ export interface PlayerControlsProps {
   onPause: () => void;
   onPrevious: () => void;
   onNext: () => void;
+  currentTrackId?: string;
+  currentTrackTitle?: string;
+  onShuffle?: () => void;
+  onRepeat?: () => void;
+  onAddToQueue?: () => void;
+  onAddToPlaylist?: () => void;
+  showExtendedControls?: boolean;
 }
 
 const PlayerControls: React.FC<PlayerControlsProps> = ({
@@ -19,56 +43,337 @@ const PlayerControls: React.FC<PlayerControlsProps> = ({
   onPlay,
   onPause,
   onPrevious,
-  onNext
+  onNext,
+  currentTrackId,
+  currentTrackTitle,
+  onShuffle,
+  onRepeat,
+  onAddToQueue,
+  onAddToPlaylist,
+  showExtendedControls = true
 }) => {
+  const { toast } = useToast();
+  const [shuffleEnabled, setShuffleEnabled] = useState(false);
+  const [repeatMode, setRepeatMode] = useState<'off' | 'all' | 'one'>('off');
+  const [favorites, setFavorites] = useState<string[]>([]);
+  const [stats, setStats] = useState({ totalPlays: 0, totalTime: 0, favoriteGenre: '' });
+  const [showAnimation, setShowAnimation] = useState(false);
+
+  // Load saved data
+  useEffect(() => {
+    const savedFavorites = localStorage.getItem(FAVORITES_KEY);
+    const savedStats = localStorage.getItem(PLAYBACK_STATS_KEY);
+    
+    if (savedFavorites) setFavorites(JSON.parse(savedFavorites));
+    if (savedStats) setStats(JSON.parse(savedStats));
+  }, []);
+
+  // Track play events
+  useEffect(() => {
+    if (isPlaying && currentTrackId) {
+      const newStats = { ...stats, totalPlays: stats.totalPlays + 1 };
+      setStats(newStats);
+      localStorage.setItem(PLAYBACK_STATS_KEY, JSON.stringify(newStats));
+    }
+  }, [isPlaying, currentTrackId]);
+
+  const isFavorite = currentTrackId ? favorites.includes(currentTrackId) : false;
+
+  const toggleFavorite = () => {
+    if (!currentTrackId) return;
+    
+    const newFavorites = isFavorite
+      ? favorites.filter(f => f !== currentTrackId)
+      : [...favorites, currentTrackId];
+    
+    setFavorites(newFavorites);
+    localStorage.setItem(FAVORITES_KEY, JSON.stringify(newFavorites));
+    
+    setShowAnimation(true);
+    setTimeout(() => setShowAnimation(false), 1000);
+    
+    toast({
+      title: isFavorite ? 'Retiré des favoris' : 'Ajouté aux favoris',
+      duration: 2000
+    });
+  };
+
+  const handleShuffle = () => {
+    setShuffleEnabled(!shuffleEnabled);
+    onShuffle?.();
+    toast({
+      title: shuffleEnabled ? 'Lecture aléatoire désactivée' : 'Lecture aléatoire activée',
+      duration: 2000
+    });
+  };
+
+  const handleRepeat = () => {
+    const modes: Array<'off' | 'all' | 'one'> = ['off', 'all', 'one'];
+    const currentIndex = modes.indexOf(repeatMode);
+    const nextMode = modes[(currentIndex + 1) % modes.length];
+    setRepeatMode(nextMode);
+    onRepeat?.();
+    
+    const labels = { off: 'Répétition désactivée', all: 'Répéter tout', one: 'Répéter ce titre' };
+    toast({ title: labels[nextMode], duration: 2000 });
+  };
+
+  const handleShare = async () => {
+    const text = currentTrackTitle 
+      ? `🎵 J'écoute "${currentTrackTitle}" sur EmotionsCare`
+      : '🎵 Découvrez la musique thérapeutique sur EmotionsCare';
+    
+    if (navigator.share) {
+      try {
+        await navigator.share({ text });
+      } catch {}
+    } else {
+      await navigator.clipboard.writeText(text);
+      toast({ title: 'Copié !', description: 'Lien copié dans le presse-papier' });
+    }
+  };
+
+  const getRepeatIcon = () => {
+    switch (repeatMode) {
+      case 'one': return <Repeat1 className="h-4 w-4" />;
+      default: return <Repeat className="h-4 w-4" />;
+    }
+  };
+
   return (
-    <div className="flex items-center justify-center gap-2">
-      <Button 
-        variant="ghost" 
-        size="icon"
-        onClick={onPrevious}
-        disabled={loadingTrack}
-        className="h-8 w-8"
-        aria-label="Piste précédente"
-      >
-        <SkipBack className="h-4 w-4" />
-      </Button>
-      
-      {isPlaying ? (
-        <Button 
-          variant="default" 
-          size="icon"
-          onClick={onPause}
-          disabled={loadingTrack}
-          className="h-10 w-10"
-          aria-label="Mettre en pause"
-        >
-          <Pause className="h-5 w-5" />
-        </Button>
-      ) : (
-        <Button 
-          variant="default" 
-          size="icon"
-          onClick={onPlay}
-          disabled={loadingTrack}
-          className="h-10 w-10"
-          aria-label="Lire"
-        >
-          <Play className="h-5 w-5" />
-        </Button>
-      )}
-      
-      <Button 
-        variant="ghost" 
-        size="icon"
-        onClick={onNext}
-        disabled={loadingTrack}
-        className="h-8 w-8"
-        aria-label="Piste suivante"
-      >
-        <SkipForward className="h-4 w-4" />
-      </Button>
-    </div>
+    <TooltipProvider>
+      <div className="space-y-2">
+        {/* Main controls */}
+        <div className="flex items-center justify-center gap-2">
+          {/* Shuffle */}
+          {showExtendedControls && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  size="icon"
+                  onClick={handleShuffle}
+                  disabled={loadingTrack}
+                  className={`h-8 w-8 ${shuffleEnabled ? 'text-primary' : ''}`}
+                  aria-label="Lecture aléatoire"
+                >
+                  <Shuffle className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Lecture aléatoire {shuffleEnabled ? '(activé)' : ''}</TooltipContent>
+            </Tooltip>
+          )}
+
+          {/* Previous */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button 
+                variant="ghost" 
+                size="icon"
+                onClick={onPrevious}
+                disabled={loadingTrack}
+                className="h-9 w-9"
+                aria-label="Piste précédente"
+              >
+                <SkipBack className="h-5 w-5" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Précédent</TooltipContent>
+          </Tooltip>
+          
+          {/* Play/Pause */}
+          <motion.div
+            whileTap={{ scale: 0.9 }}
+          >
+            {isPlaying ? (
+              <Button 
+                variant="default" 
+                size="icon"
+                onClick={onPause}
+                disabled={loadingTrack}
+                className="h-12 w-12 rounded-full"
+                aria-label="Mettre en pause"
+              >
+                <Pause className="h-6 w-6" />
+              </Button>
+            ) : (
+              <Button 
+                variant="default" 
+                size="icon"
+                onClick={onPlay}
+                disabled={loadingTrack}
+                className="h-12 w-12 rounded-full"
+                aria-label="Lire"
+              >
+                <Play className="h-6 w-6 ml-0.5" />
+              </Button>
+            )}
+          </motion.div>
+          
+          {/* Next */}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button 
+                variant="ghost" 
+                size="icon"
+                onClick={onNext}
+                disabled={loadingTrack}
+                className="h-9 w-9"
+                aria-label="Piste suivante"
+              >
+                <SkipForward className="h-5 w-5" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Suivant</TooltipContent>
+          </Tooltip>
+
+          {/* Repeat */}
+          {showExtendedControls && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  size="icon"
+                  onClick={handleRepeat}
+                  disabled={loadingTrack}
+                  className={`h-8 w-8 ${repeatMode !== 'off' ? 'text-primary' : ''}`}
+                  aria-label="Répéter"
+                >
+                  {getRepeatIcon()}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                {repeatMode === 'off' ? 'Répéter' : repeatMode === 'all' ? 'Répéter tout' : 'Répéter ce titre'}
+              </TooltipContent>
+            </Tooltip>
+          )}
+        </div>
+
+        {/* Extended controls row */}
+        {showExtendedControls && (
+          <div className="flex items-center justify-center gap-1">
+            {/* Favorite */}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  size="icon"
+                  onClick={toggleFavorite}
+                  disabled={!currentTrackId}
+                  className="h-8 w-8 relative"
+                  aria-label={isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'}
+                >
+                  <AnimatePresence>
+                    {showAnimation && (
+                      <motion.div
+                        initial={{ scale: 1 }}
+                        animate={{ scale: [1, 1.5, 1] }}
+                        exit={{ opacity: 0 }}
+                        className="absolute inset-0 flex items-center justify-center"
+                      >
+                        <Heart className="h-4 w-4 fill-red-500 text-red-500" />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                  <Heart className={`h-4 w-4 ${isFavorite ? 'fill-red-500 text-red-500' : ''}`} />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>{isFavorite ? 'Retirer' : 'Favoris'}</TooltipContent>
+            </Tooltip>
+
+            {/* Queue */}
+            {onAddToQueue && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button 
+                    variant="ghost" 
+                    size="icon"
+                    onClick={onAddToQueue}
+                    className="h-8 w-8"
+                    aria-label="Ajouter à la file d'attente"
+                  >
+                    <ListMusic className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>File d'attente</TooltipContent>
+              </Tooltip>
+            )}
+
+            {/* Share */}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  size="icon"
+                  onClick={handleShare}
+                  className="h-8 w-8"
+                  aria-label="Partager"
+                >
+                  <Share2 className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Partager</TooltipContent>
+            </Tooltip>
+
+            {/* More options */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  size="icon"
+                  className="h-8 w-8"
+                  aria-label="Plus d'options"
+                >
+                  <MoreVertical className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="center">
+                {onAddToPlaylist && (
+                  <DropdownMenuItem onClick={onAddToPlaylist}>
+                    <ListMusic className="h-4 w-4 mr-2" />
+                    Ajouter à une playlist
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuItem onClick={handleShare}>
+                  <Share2 className="h-4 w-4 mr-2" />
+                  Partager
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem disabled>
+                  <Clock className="h-4 w-4 mr-2" />
+                  {stats.totalPlays} lectures
+                </DropdownMenuItem>
+                <DropdownMenuItem disabled>
+                  <Star className="h-4 w-4 mr-2" />
+                  {favorites.length} favoris
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        )}
+
+        {/* Status badges */}
+        <div className="flex items-center justify-center gap-2">
+          {shuffleEnabled && (
+            <Badge variant="secondary" className="text-xs">
+              <Shuffle className="h-3 w-3 mr-1" />
+              Aléatoire
+            </Badge>
+          )}
+          {repeatMode !== 'off' && (
+            <Badge variant="secondary" className="text-xs">
+              {repeatMode === 'all' ? <Repeat className="h-3 w-3 mr-1" /> : <Repeat1 className="h-3 w-3 mr-1" />}
+              {repeatMode === 'all' ? 'Tout' : '1'}
+            </Badge>
+          )}
+          {loadingTrack && (
+            <Badge variant="outline" className="text-xs animate-pulse">
+              Chargement...
+            </Badge>
+          )}
+        </div>
+      </div>
+    </TooltipProvider>
   );
 };
 
