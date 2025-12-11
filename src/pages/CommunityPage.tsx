@@ -156,6 +156,7 @@ export default function CommunityPage() {
   };
 
   const handleReaction = async (messageId: string, emoji: string) => {
+    // Mise à jour optimiste de l'UI
     setMessages(prev => prev.map(msg => {
       if (msg.id !== messageId) return msg;
       
@@ -167,7 +168,7 @@ export default function CommunityPage() {
             r.emoji === emoji 
               ? { ...r, count: r.user_reacted ? r.count - 1 : r.count + 1, user_reacted: !r.user_reacted }
               : r
-          )
+          ).filter(r => r.count > 0)
         };
       } else {
         return {
@@ -176,6 +177,21 @@ export default function CommunityPage() {
         };
       }
     }));
+
+    // Persister sur le serveur
+    try {
+      await supabase.functions.invoke('community-groups', {
+        body: { action: 'react', messageId, emoji }
+      });
+    } catch (err) {
+      // Rollback si erreur
+      console.error('Reaction failed:', err);
+      toast({ 
+        title: 'Erreur', 
+        description: 'Impossible d\'enregistrer la réaction.', 
+        variant: 'destructive' 
+      });
+    }
   };
 
   if (!user) return <Navigate to="/login" replace />;

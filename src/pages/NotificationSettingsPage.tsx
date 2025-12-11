@@ -70,13 +70,32 @@ export default function NotificationSettingsPage() {
   const handleSave = async () => {
     setSaving(true);
     try {
+      // Sauvegarder localement
       localStorage.setItem('notification_preferences', JSON.stringify(preferences));
+      
+      // Sauvegarder dans Supabase pour synchronisation cross-device
+      if (user?.id) {
+        const { supabase } = await import('@/integrations/supabase/client');
+        const { error } = await supabase.from('user_preferences').upsert({
+          user_id: user.id,
+          notification_settings: preferences,
+          updated_at: new Date().toISOString()
+        }, { onConflict: 'user_id' });
+        // Ignorer les erreurs silencieusement (table peut ne pas exister)
+        if (error) console.warn('Notification prefs sync failed:', error.message);
+      }
+      
+      // Programmer le rappel quotidien si activé
+      if (preferences.dailyReminder && preferences.pushEnabled && permissionStatus === 'granted') {
+        scheduleLocalReminder(preferences.dailyReminderTime);
+      }
       
       // Test notification if push is enabled
       if (preferences.pushEnabled && permissionStatus === 'granted') {
-        await pushNotificationService.showNotification('Préférences sauvegardées', {
+        await pushNotificationService.showNotification('Préférences sauvegardées ✓', {
           body: 'Vos paramètres de notifications ont été mis à jour.',
-          icon: '/favicon.ico'
+          icon: '/favicon.ico',
+          tag: 'settings-saved'
         });
       }
       
@@ -86,6 +105,37 @@ export default function NotificationSettingsPage() {
     } finally {
       setSaving(false);
     }
+  };
+
+  // Planifier un rappel local (simplifié - en prod utiliser Service Worker)
+  const scheduleLocalReminder = (time: string) => {
+    const [hours, minutes] = time.split(':').map(Number);
+    const now = new Date();
+    const reminderTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes);
+    
+    if (reminderTime <= now) {
+      reminderTime.setDate(reminderTime.getDate() + 1);
+    }
+    
+    const delay = reminderTime.getTime() - now.getTime();
+    
+    // Stocker le timeout ID pour pouvoir l'annuler si nécessaire
+    const existingTimeout = localStorage.getItem('reminder_timeout_id');
+    if (existingTimeout) {
+      clearTimeout(parseInt(existingTimeout));
+    }
+    
+    const timeoutId = setTimeout(() => {
+      pushNotificationService.showNotification('🌟 C\'est l\'heure de votre check-in !', {
+        body: 'Prenez un moment pour noter comment vous vous sentez aujourd\'hui.',
+        icon: '/favicon.ico',
+        tag: 'daily-reminder'
+      });
+      // Reprogrammer pour demain
+      scheduleLocalReminder(time);
+    }, Math.min(delay, 24 * 60 * 60 * 1000)); // Max 24h
+    
+    localStorage.setItem('reminder_timeout_id', timeoutId.toString());
   };
 
   const updatePreference = (key: keyof NotificationPreferences, value: boolean | string) => {
