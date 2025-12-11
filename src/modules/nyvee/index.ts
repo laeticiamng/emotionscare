@@ -1,19 +1,38 @@
 /**
- * Nyvee Module - Respiration guidée avec bulle interactive
+ * Nyvee Module - Respiration guidée avec bulle interactive et personnalisation
  */
 
-export { useNyveeMachine } from './useNyveeMachine';
-export { nyveeService } from './nyveeService';
+// ============================================================================
+// SERVICE UNIFIÉ
+// ============================================================================
 
-// Re-export des composants existants de features
+export { nyveeService, NyveeServiceEnriched } from './nyveeServiceUnified';
+
+// ============================================================================
+// HOOKS
+// ============================================================================
+
+export { useNyveeMachine } from './useNyveeMachine';
+
+// ============================================================================
+// COMPONENTS (re-export depuis features)
+// ============================================================================
+
 export { BreathingBubble } from '@/features/nyvee/components/BreathingBubble';
 export { BadgeReveal } from '@/features/nyvee/components/BadgeReveal';
 export { CocoonGallery } from '@/features/nyvee/components/CocoonGallery';
 export { PreCheck } from '@/features/nyvee/components/PreCheck';
 export { PostCheck } from '@/features/nyvee/components/PostCheck';
 
-// Store
+// ============================================================================
+// STORE
+// ============================================================================
+
 export { useCocoonStore } from '@/features/nyvee/stores/cocoonStore';
+
+// ============================================================================
+// TYPES
+// ============================================================================
 
 export type {
   BreathingIntensity,
@@ -27,3 +46,11 @@ export type {
   CompleteNyveeSession,
   NyveeStats,
 } from './types';
+
+export type {
+  EnrichedNyveeSession,
+  NarrativeElement,
+  CozyEnvironment,
+  PersonalizedRecommendation,
+  NyveeProgressionStats,
+} from './nyveeServiceUnified';

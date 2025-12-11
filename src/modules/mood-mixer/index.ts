@@ -12,11 +12,10 @@
 export { MoodMixerView } from './MoodMixerView';
 
 // ============================================================================
-// SERVICES
+// SERVICE UNIFIÉ
 // ============================================================================
 
-export { MoodMixerService } from './moodMixerService';
-export { MoodMixerServiceEnriched } from './moodMixerServiceEnriched';
+export { MoodMixerService, moodMixerService } from './moodMixerServiceUnified';
 
 // ============================================================================
 // HOOKS
@@ -30,4 +29,17 @@ export { useMoodMixer } from './useMoodMixer';
 
 export type {
   MoodMixerSession,
-} from './moodMixerService';
+  EmotionComponent,
+  MixingStrategy,
+  BlendingStep,
+  EmotionBlend,
+  PersonalizedMix,
+  MoodMixerStats,
+} from './moodMixerServiceUnified';
+
+// ============================================================================
+// LEGACY EXPORTS (deprecated - utiliser MoodMixerService à la place)
+// ============================================================================
+
+/** @deprecated Utiliser MoodMixerService à la place */
+export { MoodMixerService as MoodMixerServiceEnriched } from './moodMixerServiceUnified';

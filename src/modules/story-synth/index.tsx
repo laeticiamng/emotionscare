@@ -1,11 +1,39 @@
 /**
- * Story Synth Module - Narration thérapeutique immersive
+ * Story Synth Module - Narration thérapeutique immersive et adaptative
  */
 
-export * from './types';
-export * as storySynthService from './storySynthService';
+// ============================================================================
+// SERVICE UNIFIÉ
+// ============================================================================
+
+export * as storySynthService from './storySynthServiceUnified';
+export { StorySynthServiceEnriched } from './storySynthServiceUnified';
+
+// ============================================================================
+// HOOKS
+// ============================================================================
+
 export { useStorySynthMachine } from './useStorySynthMachine';
+
+// ============================================================================
+// TYPES
+// ============================================================================
+
+export * from './types';
 export type { StorySynthState, StorySynthPhase } from './types';
+export type {
+  EnrichedStorySynthSession,
+  NarrativeArc,
+  StorySegment,
+  Choice,
+  UserChoice,
+  EmotionalImpactPoint,
+  PersonalizedStory,
+} from './storySynthServiceUnified';
+
+// ============================================================================
+// PAGE
+// ============================================================================
 
 import { lazyDefault } from '@/lib/lazyDefault';
 

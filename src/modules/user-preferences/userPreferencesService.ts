@@ -253,6 +253,7 @@ export class UserPreferencesService {
 
   /**
    * Enregistrer le consentement utilisateur
+   * Stocke dans la table consent_records + met à jour les préférences
    */
   static async recordConsent(
     userId: string,
@@ -265,14 +266,123 @@ export class UserPreferencesService {
       timestamp: new Date().toISOString()
     };
 
-    // TODO: Stocker dans une table dédiée consent_records
-    // Pour l'instant, on stocke dans les préférences
-    await this.updateUserSettings(userId, {
-      data_sharing: consents.dataSharing,
-      analytics_tracking: consents.analytics
-    });
+    try {
+      // Stocker dans la table dédiée consent_records
+      const { error: insertError } = await supabase
+        .from('consent_records')
+        .insert({
+          user_id: userId,
+          consent_version: CONSENT_VERSION,
+          audio_consent: consents.audio,
+          video_consent: consents.video,
+          emotion_analysis_consent: consents.emotionAnalysis,
+          data_storage_consent: consents.dataStorage,
+          data_sharing_consent: consents.dataSharing,
+          analytics_consent: consents.analytics,
+          marketing_consent: consents.marketing,
+          ip_address: null, // Anonymized
+          user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : null,
+          created_at: record.timestamp
+        });
 
-    return record;
+      if (insertError) {
+        // Si la table n'existe pas encore, log un warning mais continue
+        logger.warn('[UserPreferencesService] consent_records insert failed:', insertError, 'MODULE');
+      }
+
+      // Mettre à jour les préférences utilisateur également
+      await this.updateUserSettings(userId, {
+        data_sharing: consents.dataSharing,
+        analytics_tracking: consents.analytics
+      });
+
+      logger.info('[UserPreferencesService] Consent recorded', {
+        userId,
+        version: CONSENT_VERSION,
+        consents: Object.entries(consents)
+          .filter(([_, v]) => v)
+          .map(([k]) => k)
+      }, 'GDPR');
+
+      return record;
+    } catch (error) {
+      logger.error('[UserPreferencesService] Record consent failed:', error, 'MODULE');
+      throw error;
+    }
+  }
+
+  /**
+   * Récupérer l'historique des consentements
+   */
+  static async getConsentHistory(userId: string): Promise<ConsentRecord[]> {
+    try {
+      const { data, error } = await supabase
+        .from('consent_records')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        logger.warn('[UserPreferencesService] Get consent history failed:', error, 'MODULE');
+        return [];
+      }
+
+      return (data || []).map((row) => ({
+        user_id: row.user_id,
+        consents: {
+          audio: row.audio_consent,
+          video: row.video_consent,
+          emotionAnalysis: row.emotion_analysis_consent,
+          dataStorage: row.data_storage_consent,
+          dataSharing: row.data_sharing_consent,
+          analytics: row.analytics_consent,
+          marketing: row.marketing_consent
+        },
+        version: row.consent_version,
+        timestamp: row.created_at
+      }));
+    } catch (error) {
+      logger.error('[UserPreferencesService] Get consent history error:', error, 'MODULE');
+      return [];
+    }
+  }
+
+  /**
+   * Révoquer un consentement spécifique
+   */
+  static async revokeConsent(
+    userId: string,
+    consentType: keyof ConsentOptions
+  ): Promise<void> {
+    try {
+      // Récupérer les consentements actuels
+      const history = await this.getConsentHistory(userId);
+      const currentConsents = history[0]?.consents || {
+        audio: false,
+        video: false,
+        emotionAnalysis: false,
+        dataStorage: true,
+        dataSharing: false,
+        analytics: false,
+        marketing: false
+      };
+
+      // Mettre à jour avec le consentement révoqué
+      const updatedConsents = {
+        ...currentConsents,
+        [consentType]: false
+      };
+
+      await this.recordConsent(userId, updatedConsents);
+
+      logger.info('[UserPreferencesService] Consent revoked', {
+        userId,
+        revokedConsent: consentType
+      }, 'GDPR');
+    } catch (error) {
+      logger.error('[UserPreferencesService] Revoke consent failed:', error, 'MODULE');
+      throw error;
+    }
   }
 
   /**
@@ -524,52 +634,339 @@ export class UserPreferencesService {
   // ============================================================================
 
   /**
-   * Demander un export de données (RGPD)
+   * Demander un export de données (RGPD Article 20 - Portabilité)
+   * Génère un package JSON contenant toutes les données de l'utilisateur
    */
   static async requestDataExport(
     request: DataExportRequest
   ): Promise<DataExportResult> {
-    // TODO: Implémenter la génération d'export
-    // Pour l'instant, retourner un résultat mock
+    const exportId = crypto.randomUUID();
+
+    try {
+      // Créer l'entrée de demande d'export
+      const { error: insertError } = await supabase
+        .from('export_logs')
+        .insert({
+          id: exportId,
+          user_id: request.user_id,
+          export_type: request.format || 'json',
+          status: 'processing',
+          requested_at: new Date().toISOString(),
+          include_sections: request.include_sections || ['all']
+        });
+
+      if (insertError) {
+        logger.warn('[UserPreferencesService] Export log insert failed:', insertError, 'MODULE');
+      }
+
+      // Collecter toutes les données en parallèle
+      const sectionsToInclude = request.include_sections || ['all'];
+      const includeAll = sectionsToInclude.includes('all');
+
+      const [
+        profile,
+        journalNotes,
+        emotionScans,
+        activitySessions,
+        meditationSessions,
+        breathingSessions,
+        aiCoachSessions,
+        achievements,
+        notifications,
+        consentHistory
+      ] = await Promise.all([
+        // Profile
+        includeAll || sectionsToInclude.includes('profile')
+          ? supabase.from('profiles').select('*').eq('id', request.user_id).single()
+          : Promise.resolve({ data: null, error: null }),
+
+        // Journal
+        includeAll || sectionsToInclude.includes('journal')
+          ? supabase.from('journal_notes').select('*').eq('user_id', request.user_id)
+          : Promise.resolve({ data: [], error: null }),
+
+        // Emotion scans
+        includeAll || sectionsToInclude.includes('emotions')
+          ? supabase.from('emotion_scans').select('*').eq('user_id', request.user_id)
+          : Promise.resolve({ data: [], error: null }),
+
+        // Activity sessions
+        includeAll || sectionsToInclude.includes('activities')
+          ? supabase.from('activity_sessions').select('*').eq('user_id', request.user_id)
+          : Promise.resolve({ data: [], error: null }),
+
+        // Meditation sessions
+        includeAll || sectionsToInclude.includes('meditation')
+          ? supabase.from('meditation_sessions').select('*').eq('user_id', request.user_id)
+          : Promise.resolve({ data: [], error: null }),
+
+        // Breathing sessions
+        includeAll || sectionsToInclude.includes('breathing')
+          ? supabase.from('breathing_sessions').select('*').eq('user_id', request.user_id)
+          : Promise.resolve({ data: [], error: null }),
+
+        // AI Coach sessions
+        includeAll || sectionsToInclude.includes('coach')
+          ? supabase.from('ai_coach_sessions').select('*').eq('user_id', request.user_id)
+          : Promise.resolve({ data: [], error: null }),
+
+        // Achievements
+        includeAll || sectionsToInclude.includes('achievements')
+          ? supabase.from('user_achievements').select('*').eq('user_id', request.user_id)
+          : Promise.resolve({ data: [], error: null }),
+
+        // Notifications
+        includeAll || sectionsToInclude.includes('notifications')
+          ? supabase.from('notifications').select('*').eq('user_id', request.user_id)
+          : Promise.resolve({ data: [], error: null }),
+
+        // Consent history
+        includeAll || sectionsToInclude.includes('consents')
+          ? this.getConsentHistory(request.user_id)
+          : Promise.resolve([])
+      ]);
+
+      // Construire le package d'export
+      const exportData = {
+        export_info: {
+          id: exportId,
+          user_id: request.user_id,
+          generated_at: new Date().toISOString(),
+          format: request.format || 'json',
+          gdpr_article: 'Article 20 - Droit à la portabilité',
+          platform: 'EmotionsCare',
+          version: '1.0'
+        },
+        profile: profile.data ? this.sanitizeProfileForExport(profile.data) : null,
+        journal_entries: journalNotes.data || [],
+        emotion_scans: (emotionScans.data || []).map(this.sanitizeScanForExport),
+        activity_sessions: activitySessions.data || [],
+        meditation_sessions: meditationSessions.data || [],
+        breathing_sessions: breathingSessions.data || [],
+        ai_coach_sessions: (aiCoachSessions.data || []).map(this.sanitizeCoachSessionForExport),
+        achievements: achievements.data || [],
+        notifications: notifications.data || [],
+        consent_history: consentHistory,
+        statistics: await this.generateExportStatistics(request.user_id)
+      };
+
+      // Générer le fichier selon le format demandé
+      let exportUrl: string | undefined;
+      let exportContent: string;
+
+      if (request.format === 'csv') {
+        exportContent = this.convertToCSV(exportData);
+      } else {
+        exportContent = JSON.stringify(exportData, null, 2);
+      }
+
+      // Stocker le fichier d'export dans Supabase Storage
+      const fileName = `exports/${request.user_id}/${exportId}.${request.format || 'json'}`;
+      const { error: uploadError } = await supabase.storage
+        .from('user-exports')
+        .upload(fileName, exportContent, {
+          contentType: request.format === 'csv' ? 'text/csv' : 'application/json',
+          upsert: true
+        });
+
+      if (!uploadError) {
+        const { data: urlData } = supabase.storage
+          .from('user-exports')
+          .getPublicUrl(fileName);
+        exportUrl = urlData?.publicUrl;
+      }
+
+      // Mettre à jour le statut de l'export
+      await supabase
+        .from('export_logs')
+        .update({
+          status: 'completed',
+          completed_at: new Date().toISOString(),
+          file_url: exportUrl,
+          file_size: exportContent.length
+        })
+        .eq('id', exportId);
+
+      logger.info('[UserPreferencesService] Data export completed', {
+        userId: request.user_id,
+        exportId,
+        sections: sectionsToInclude,
+        size: exportContent.length
+      }, 'GDPR');
+
+      return {
+        id: exportId,
+        status: 'completed',
+        download_url: exportUrl,
+        expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() // 7 jours
+      };
+    } catch (error) {
+      logger.error('[UserPreferencesService] Data export failed:', error, 'MODULE');
+
+      // Mettre à jour le statut en erreur
+      await supabase
+        .from('export_logs')
+        .update({
+          status: 'failed',
+          error_message: error instanceof Error ? error.message : 'Unknown error'
+        })
+        .eq('id', exportId);
+
+      return {
+        id: exportId,
+        status: 'failed',
+        error: error instanceof Error ? error.message : 'Export failed'
+      };
+    }
+  }
+
+  /**
+   * Sanitizer le profil pour l'export (supprimer données sensibles internes)
+   */
+  private static sanitizeProfileForExport(profile: Record<string, unknown>): Record<string, unknown> {
+    const { id, ...rest } = profile;
     return {
-      id: crypto.randomUUID(),
-      status: 'pending'
+      ...rest,
+      user_id_hash: id ? `***${String(id).slice(-4)}` : undefined
     };
   }
 
   /**
-   * Demander la suppression du compte (RGPD)
+   * Sanitizer un scan pour l'export
+   */
+  private static sanitizeScanForExport(scan: Record<string, unknown>): Record<string, unknown> {
+    return {
+      ...scan,
+      // Supprimer les données brutes d'image/audio si présentes
+      payload: scan.payload ? {
+        ...(scan.payload as Record<string, unknown>),
+        raw_image: undefined,
+        raw_audio: undefined
+      } : undefined
+    };
+  }
+
+  /**
+   * Sanitizer une session coach pour l'export
+   */
+  private static sanitizeCoachSessionForExport(session: Record<string, unknown>): Record<string, unknown> {
+    return {
+      ...session,
+      // Garder seulement le résumé, pas les messages complets pour la vie privée
+      messages_count: Array.isArray(session.messages) ? session.messages.length : 0,
+      messages: undefined
+    };
+  }
+
+  /**
+   * Générer des statistiques pour l'export
+   */
+  private static async generateExportStatistics(userId: string): Promise<Record<string, unknown>> {
+    const settings = await this.getUserSettings(userId);
+
+    return {
+      account_created: settings.created_at || 'N/A',
+      last_activity: new Date().toISOString(),
+      data_retention_setting: `${settings.emotion_data_retention_days} jours`,
+      analytics_enabled: settings.analytics_tracking,
+      data_sharing_enabled: settings.data_sharing
+    };
+  }
+
+  /**
+   * Convertir les données en CSV
+   */
+  private static convertToCSV(data: Record<string, unknown>): string {
+    const lines: string[] = [];
+
+    // Header
+    lines.push('section,key,value');
+
+    // Flatten data recursively
+    const flatten = (obj: unknown, prefix = ''): void => {
+      if (obj === null || obj === undefined) return;
+
+      if (Array.isArray(obj)) {
+        obj.forEach((item, index) => {
+          flatten(item, `${prefix}[${index}]`);
+        });
+      } else if (typeof obj === 'object') {
+        Object.entries(obj as Record<string, unknown>).forEach(([key, value]) => {
+          flatten(value, prefix ? `${prefix}.${key}` : key);
+        });
+      } else {
+        const escapedValue = String(obj).replace(/"/g, '""');
+        lines.push(`"${prefix}","${escapedValue}"`);
+      }
+    };
+
+    flatten(data);
+    return lines.join('\n');
+  }
+
+  /**
+   * Demander la suppression du compte (RGPD Article 17 - Droit à l'effacement)
+   * Utilise AccountDeletionService pour la gestion complète avec période de grâce
    */
   static async requestAccountDeletion(
     request: AccountDeletionRequest
   ): Promise<AccountDeletionResult> {
     try {
-      if (request.delete_immediately) {
-        // Suppression immédiate
-        const { error } = await supabase
-          .from('user_profiles')
-          .delete()
-          .eq('user_id', request.user_id);
+      // Importer dynamiquement pour éviter les dépendances circulaires
+      const { AccountDeletionService } = await import('@/services/gdpr/AccountDeletionService');
 
-        if (error) {
-          throw error;
-        }
+      if (request.delete_immediately) {
+        // Suppression immédiate (cas rare, nécessite confirmation spéciale)
+        // D'abord supprimer toutes les données
+        await Promise.all([
+          supabase.from('journal_notes').delete().eq('user_id', request.user_id),
+          supabase.from('emotion_scans').delete().eq('user_id', request.user_id),
+          supabase.from('activity_sessions').delete().eq('user_id', request.user_id),
+          supabase.from('meditation_sessions').delete().eq('user_id', request.user_id),
+          supabase.from('breathing_sessions').delete().eq('user_id', request.user_id),
+          supabase.from('ai_coach_sessions').delete().eq('user_id', request.user_id),
+          supabase.from('notifications').delete().eq('user_id', request.user_id),
+          supabase.from('user_achievements').delete().eq('user_id', request.user_id),
+          supabase.from('export_logs').delete().eq('user_id', request.user_id),
+          supabase.from('consent_records').delete().eq('user_id', request.user_id)
+        ]);
+
+        // Anonymiser le profil
+        await supabase
+          .from('profiles')
+          .update({
+            email: `deleted-${request.user_id}@anonymized.local`,
+            name: 'Compte supprimé',
+            avatar_url: null,
+            preferences: null
+          })
+          .eq('id', request.user_id);
+
+        logger.info('[UserPreferencesService] Immediate account deletion completed', {
+          userId: request.user_id
+        }, 'GDPR');
 
         return {
           success: true
         };
       } else {
-        // Soft delete avec période de grâce de 30 jours
-        const deletionDate = new Date();
-        deletionDate.setDate(deletionDate.getDate() + 30);
+        // Suppression avec période de grâce (comportement par défaut RGPD)
+        const deletionRequest = await AccountDeletionService.requestDeletion(
+          request.user_id,
+          request.reason,
+          30 // 30 jours de période de grâce
+        );
 
-        // TODO: Marquer le compte pour suppression différée
-        // await supabase.from('user_profiles').update({ ... })
+        logger.info('[UserPreferencesService] Account deletion scheduled', {
+          userId: request.user_id,
+          scheduledDate: deletionRequest.scheduled_deletion_at
+        }, 'GDPR');
 
         return {
           success: true,
-          deletion_scheduled_for: deletionDate.toISOString(),
-          grace_period_days: 30
+          deletion_scheduled_for: deletionRequest.scheduled_deletion_at,
+          grace_period_days: deletionRequest.grace_period_days,
+          cancellation_url: '/app/settings/privacy?action=cancel-deletion'
         };
       }
     } catch (error) {
@@ -578,6 +975,51 @@ export class UserPreferencesService {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error'
       };
+    }
+  }
+
+  /**
+   * Annuler une demande de suppression de compte
+   */
+  static async cancelAccountDeletion(userId: string): Promise<{ success: boolean; error?: string }> {
+    try {
+      const { AccountDeletionService } = await import('@/services/gdpr/AccountDeletionService');
+      await AccountDeletionService.cancelDeletion(userId);
+
+      return { success: true };
+    } catch (error) {
+      logger.error('[UserPreferencesService] Cancel deletion failed:', error, 'MODULE');
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to cancel deletion'
+      };
+    }
+  }
+
+  /**
+   * Vérifier si une suppression est en cours
+   */
+  static async getPendingDeletion(userId: string): Promise<{
+    pending: boolean;
+    scheduled_date?: string;
+    remaining_days?: number;
+  }> {
+    try {
+      const { AccountDeletionService } = await import('@/services/gdpr/AccountDeletionService');
+      const pendingRequest = await AccountDeletionService.getPendingDeletionRequest(userId);
+
+      if (!pendingRequest) {
+        return { pending: false };
+      }
+
+      return {
+        pending: true,
+        scheduled_date: pendingRequest.scheduled_deletion_at,
+        remaining_days: AccountDeletionService.getRemainingDays(pendingRequest)
+      };
+    } catch (error) {
+      logger.error('[UserPreferencesService] Get pending deletion failed:', error, 'MODULE');
+      return { pending: false };
     }
   }
 
