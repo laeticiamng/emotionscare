@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '@/providers/theme';
@@ -10,6 +10,9 @@ import MainNavigationHub from '@/components/navigation/MainNavigationHub';
 import SkipLinks from './SkipLinks';
 import { InAppNotificationCenter } from '@/components/InAppNotificationCenter';
 import { cn } from '@/lib/utils';
+
+// Lazy load crisis detection banner
+const CrisisDetectionBanner = lazy(() => import('@/components/crisis/CrisisDetectionBanner'));
 
 interface EnhancedShellProps {
   children?: React.ReactNode;
@@ -132,6 +135,11 @@ const EnhancedShell: React.FC<EnhancedShellProps> = ({
 
       {/* Main Content */}
       <main id="main-content" className="flex-1 w-full mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 relative mt-16">
+        {/* Crisis Detection Banner */}
+        <Suspense fallback={null}>
+          <CrisisDetectionBanner />
+        </Suspense>
+        
         <AnimatePresence mode="sync">{/* Fixed multiple children warning */}
           <motion.div
             key={location.pathname}

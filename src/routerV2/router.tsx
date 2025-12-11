@@ -311,6 +311,11 @@ const SecuritySettingsPage = lazy(() => import('@/pages/settings/SecuritySetting
 // Exchange Hub V2.0
 const ExchangeHubPage = lazy(() => import('@/pages/ExchangeHubPage'));
 
+// Nouvelles fonctionnalités V2.1 - Community, Wearables, Export
+const DataExportPage = lazy(() => import('@/pages/DataExportPage'));
+const CommunityPage = lazy(() => import('@/pages/CommunityPage'));
+const WearablesPage = lazy(() => import('@/pages/WearablesPage'));
+
 // ═══════════════════════════════════════════════════════════
 // MAPPING DES COMPOSANTS
 // ═══════════════════════════════════════════════════════════
@@ -581,6 +586,12 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   
   // Exchange Hub V2.0
   ExchangeHubPage,
+  
+  // Nouvelles fonctionnalités V2.1
+  DataExportPage,
+  CommunityPage,
+  WearablesPage,
+  
   // GDPR & Compliance - avec alias pour registry
   UnifiedGDPRDashboard,
   UnifiedGDPRDashboardPage: UnifiedGDPRDashboard,
