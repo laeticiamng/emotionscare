@@ -1062,6 +1062,16 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: true,
   },
   {
+    name: 'notification-settings',
+    path: '/settings/notifications',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app-sidebar',
+    component: 'NotificationSettingsPage',
+    guard: true,
+    requireAuth: true,
+  },
+  {
     name: 'premium',
     path: '/app/premium',
     segment: 'consumer',

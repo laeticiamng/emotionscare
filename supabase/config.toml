@@ -93,6 +93,24 @@ verify_jwt = false
 [functions.exchange-ai]
 verify_jwt = true
 
+[functions.ai-analysis]
+verify_jwt = true
+
+[functions.chat-coach]
+verify_jwt = true
+
+[functions.crisis-detection]
+verify_jwt = true
+
+[functions.data-export]
+verify_jwt = true
+
+[functions.community-groups]
+verify_jwt = true
+
+[functions.wearables-sync]
+verify_jwt = true
+
 [api]
 enabled = true
 port = 54321
