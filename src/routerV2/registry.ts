@@ -718,6 +718,42 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     requireAuth: true,
     aliases: ['/exchange'],
   },
+  // ═══════════════════════════════════════════════════════════
+  // NOUVELLES FONCTIONNALITÉS V2.1
+  // ═══════════════════════════════════════════════════════════
+  {
+    name: 'community',
+    path: '/app/community',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app-sidebar',
+    component: 'CommunityPage',
+    guard: true,
+    requireAuth: true,
+    aliases: ['/community-groups', '/groups'],
+  },
+  {
+    name: 'wearables',
+    path: '/app/wearables',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app-sidebar',
+    component: 'WearablesPage',
+    guard: true,
+    requireAuth: true,
+    aliases: ['/health-sync', '/devices'],
+  },
+  {
+    name: 'data-export',
+    path: '/app/data-export',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app-sidebar',
+    component: 'DataExportPage',
+    guard: true,
+    requireAuth: true,
+    aliases: ['/export-data', '/rgpd-export'],
+  },
   {
     name: 'screen-silk',
     path: '/app/screen-silk',

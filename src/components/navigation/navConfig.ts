@@ -13,6 +13,7 @@ import {
   BarChart3,
   Calendar,
   Sparkles,
+  Watch,
   Heart,
   Target,
   Shield,
@@ -99,13 +100,32 @@ export const b2cNavItems: NavItem[] = [
     priority: 7
   },
   {
+    href: '/app/community',
+    title: 'Communauté',
+    icon: Users,
+    description: 'Groupes de soutien',
+    badge: 'Nouveau',
+    roles: ['b2c'],
+    category: 'social',
+    priority: 8
+  },
+  {
+    href: '/app/wearables',
+    title: 'Appareils',
+    icon: Watch,
+    description: 'Sync santé connectée',
+    roles: ['b2c'],
+    category: 'tools',
+    priority: 9
+  },
+  {
     href: '/app/social-cocon',
     title: 'Cocon Social',
     icon: Heart,
     description: 'Communauté bienveillante',
     roles: ['b2c'],
     category: 'social',
-    priority: 8
+    priority: 10
   },
   {
     href: '/settings/privacy',
