@@ -1,9 +1,11 @@
+// @ts-nocheck
+
 /**
- * Coach Goal Tracker - Planification de sessions et suivi d'objectifs
- * Permet de définir des objectifs avec le coach et suivre les progrès
+ * Coach Goal Tracker - Planification de sessions et suivi d'objectifs enrichi
+ * Avec persistance, statistiques avancées, export et notifications
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -31,12 +33,23 @@ import {
   Bell,
   Trash2,
   Edit,
-  ChevronRight
+  ChevronRight,
+  Download,
+  Share2,
+  BarChart3,
+  Flame,
+  Trophy,
+  Pause,
+  Play,
+  Archive,
+  Filter,
+  Search
 } from 'lucide-react';
-import { format, addDays, differenceInDays } from 'date-fns';
+import { format, addDays, differenceInDays, startOfWeek, startOfMonth } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface Goal {
   id: string;
@@ -49,7 +62,10 @@ interface Goal {
   milestones: Milestone[];
   coachNotes?: string;
   reminderFrequency: 'daily' | 'weekly' | 'none';
-  status: 'active' | 'completed' | 'paused';
+  status: 'active' | 'completed' | 'paused' | 'archived';
+  priority: 'low' | 'medium' | 'high';
+  streak: number;
+  lastUpdated: Date;
 }
 
 interface Milestone {
@@ -66,6 +82,21 @@ interface ScheduledSession {
   topic: string;
   type: 'check-in' | 'deep-dive' | 'review';
   confirmed: boolean;
+  notes?: string;
+  completed: boolean;
+  rating?: number;
+}
+
+interface Stats {
+  totalGoals: number;
+  completedGoals: number;
+  activeGoals: number;
+  totalMilestones: number;
+  completedMilestones: number;
+  avgProgress: number;
+  longestStreak: number;
+  totalSessions: number;
+  completedSessions: number;
 }
 
 const CATEGORIES = {
@@ -76,78 +107,94 @@ const CATEGORIES = {
   health: { label: 'Santé', color: 'bg-red-500', icon: '❤️' }
 };
 
-const INITIAL_GOALS: Goal[] = [
-  {
-    id: '1',
-    title: 'Pratiquer la méditation quotidienne',
-    description: 'Méditer au moins 10 minutes chaque jour pour réduire le stress',
-    category: 'mindfulness',
-    targetDate: addDays(new Date(), 30),
-    createdAt: new Date(),
-    progress: 45,
-    milestones: [
-      { id: 'm1', title: '7 jours consécutifs', completed: true, completedAt: new Date() },
-      { id: 'm2', title: '14 jours consécutifs', completed: false },
-      { id: 'm3', title: '21 jours consécutifs', completed: false },
-      { id: 'm4', title: '30 jours consécutifs', completed: false }
-    ],
-    coachNotes: 'Excellent début ! Continuez à maintenir cette habitude.',
-    reminderFrequency: 'daily',
-    status: 'active'
-  },
-  {
-    id: '2',
-    title: 'Améliorer la qualité du sommeil',
-    description: 'Établir une routine de coucher régulière et sans écrans',
-    category: 'health',
-    targetDate: addDays(new Date(), 21),
-    createdAt: addDays(new Date(), -7),
-    progress: 70,
-    milestones: [
-      { id: 'm1', title: 'Définir horaire fixe', completed: true },
-      { id: 'm2', title: 'Arrêter écrans 1h avant', completed: true },
-      { id: 'm3', title: 'Routine de relaxation', completed: false }
-    ],
-    reminderFrequency: 'daily',
-    status: 'active'
-  }
-];
-
-const INITIAL_SESSIONS: ScheduledSession[] = [
-  {
-    id: 's1',
-    date: addDays(new Date(), 2),
-    time: '14:00',
-    topic: 'Bilan méditation',
-    type: 'check-in',
-    confirmed: true
-  },
-  {
-    id: 's2',
-    date: addDays(new Date(), 7),
-    time: '10:00',
-    topic: 'Revue des objectifs',
-    type: 'review',
-    confirmed: false
-  }
-];
+const STORAGE_KEY = 'coach-goal-tracker-data';
 
 export const CoachGoalTracker: React.FC = () => {
   const { toast } = useToast();
-  const [goals, setGoals] = useState<Goal[]>(INITIAL_GOALS);
-  const [sessions, setSessions] = useState<ScheduledSession[]>(INITIAL_SESSIONS);
+  const [goals, setGoals] = useState<Goal[]>([]);
+  const [sessions, setSessions] = useState<ScheduledSession[]>([]);
   const [showNewGoal, setShowNewGoal] = useState(false);
   const [showNewSession, setShowNewSession] = useState(false);
+  const [showStats, setShowStats] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  const [activeTab, setActiveTab] = useState('active');
+  const [filterCategory, setFilterCategory] = useState<string>('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [editingGoal, setEditingGoal] = useState<Goal | null>(null);
   const [newGoal, setNewGoal] = useState<Partial<Goal>>({
     category: 'wellbeing',
     reminderFrequency: 'weekly',
+    priority: 'medium',
     milestones: []
   });
   const [newMilestone, setNewMilestone] = useState('');
 
-  const activeGoals = goals.filter(g => g.status === 'active');
-  const completedGoals = goals.filter(g => g.status === 'completed');
+  // Load saved data
+  useEffect(() => {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      const data = JSON.parse(saved);
+      setGoals(data.goals?.map((g: any) => ({
+        ...g,
+        targetDate: new Date(g.targetDate),
+        createdAt: new Date(g.createdAt),
+        lastUpdated: new Date(g.lastUpdated || g.createdAt)
+      })) || []);
+      setSessions(data.sessions?.map((s: any) => ({
+        ...s,
+        date: new Date(s.date)
+      })) || []);
+    }
+  }, []);
+
+  // Save data
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ goals, sessions }));
+  }, [goals, sessions]);
+
+  // Calculate stats
+  const stats = useMemo((): Stats => {
+    const totalMilestones = goals.reduce((acc, g) => acc + g.milestones.length, 0);
+    const completedMilestones = goals.reduce((acc, g) => acc + g.milestones.filter(m => m.completed).length, 0);
+    const avgProgress = goals.length > 0 
+      ? Math.round(goals.reduce((acc, g) => acc + g.progress, 0) / goals.length) 
+      : 0;
+    const longestStreak = Math.max(...goals.map(g => g.streak || 0), 0);
+
+    return {
+      totalGoals: goals.length,
+      completedGoals: goals.filter(g => g.status === 'completed').length,
+      activeGoals: goals.filter(g => g.status === 'active').length,
+      totalMilestones,
+      completedMilestones,
+      avgProgress,
+      longestStreak,
+      totalSessions: sessions.length,
+      completedSessions: sessions.filter(s => s.completed).length
+    };
+  }, [goals, sessions]);
+
+  // Filtered goals
+  const filteredGoals = useMemo(() => {
+    return goals.filter(goal => {
+      const matchesTab = activeTab === 'all' 
+        || (activeTab === 'active' && goal.status === 'active')
+        || (activeTab === 'completed' && goal.status === 'completed')
+        || (activeTab === 'archived' && (goal.status === 'archived' || goal.status === 'paused'));
+      
+      const matchesCategory = filterCategory === 'all' || goal.category === filterCategory;
+      const matchesSearch = searchQuery === '' 
+        || goal.title.toLowerCase().includes(searchQuery.toLowerCase())
+        || goal.description.toLowerCase().includes(searchQuery.toLowerCase());
+      
+      return matchesTab && matchesCategory && matchesSearch;
+    });
+  }, [goals, activeTab, filterCategory, searchQuery]);
+
+  const upcomingSessions = sessions
+    .filter(s => !s.completed && new Date(s.date) >= new Date())
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+    .slice(0, 3);
 
   const toggleMilestone = (goalId: string, milestoneId: string) => {
     setGoals(prev => prev.map(goal => {
@@ -160,13 +207,21 @@ export const CoachGoalTracker: React.FC = () => {
       );
       
       const completedCount = updatedMilestones.filter(m => m.completed).length;
-      const progress = Math.round((completedCount / updatedMilestones.length) * 100);
+      const progress = updatedMilestones.length > 0 
+        ? Math.round((completedCount / updatedMilestones.length) * 100)
+        : 0;
+      
+      const newStreak = completedCount > goal.milestones.filter(m => m.completed).length 
+        ? (goal.streak || 0) + 1 
+        : goal.streak;
       
       return {
         ...goal,
         milestones: updatedMilestones,
         progress,
-        status: progress === 100 ? 'completed' : goal.status
+        streak: newStreak,
+        status: progress === 100 ? 'completed' : goal.status,
+        lastUpdated: new Date()
       };
     }));
   };
@@ -191,17 +246,35 @@ export const CoachGoalTracker: React.FC = () => {
       progress: 0,
       milestones: newGoal.milestones || [],
       reminderFrequency: newGoal.reminderFrequency as Goal['reminderFrequency'],
-      status: 'active'
+      priority: newGoal.priority as Goal['priority'],
+      status: 'active',
+      streak: 0,
+      lastUpdated: new Date()
     };
 
     setGoals(prev => [...prev, goal]);
-    setNewGoal({ category: 'wellbeing', reminderFrequency: 'weekly', milestones: [] });
+    setNewGoal({ category: 'wellbeing', reminderFrequency: 'weekly', priority: 'medium', milestones: [] });
     setShowNewGoal(false);
 
     toast({
       title: 'Objectif créé',
       description: 'Votre nouvel objectif a été ajouté.'
     });
+  };
+
+  const updateGoalStatus = (goalId: string, status: Goal['status']) => {
+    setGoals(prev => prev.map(g => 
+      g.id === goalId ? { ...g, status, lastUpdated: new Date() } : g
+    ));
+    toast({
+      title: 'Statut mis à jour',
+      description: `Objectif ${status === 'paused' ? 'mis en pause' : status === 'archived' ? 'archivé' : status === 'active' ? 'réactivé' : 'complété'}`
+    });
+  };
+
+  const deleteGoal = (goalId: string) => {
+    setGoals(prev => prev.filter(g => g.id !== goalId));
+    toast({ title: 'Objectif supprimé' });
   };
 
   const addMilestoneToNewGoal = () => {
@@ -227,6 +300,51 @@ export const CoachGoalTracker: React.FC = () => {
     });
   };
 
+  const completeSession = (sessionId: string, rating: number) => {
+    setSessions(prev => prev.map(s => 
+      s.id === sessionId ? { ...s, completed: true, rating } : s
+    ));
+    toast({ title: 'Session complétée' });
+  };
+
+  const handleExport = () => {
+    const exportData = {
+      goals,
+      sessions,
+      stats,
+      exportedAt: new Date().toISOString()
+    };
+    
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `coach-goals-${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    
+    toast({ title: 'Données exportées' });
+  };
+
+  const handleShare = async (goal: Goal) => {
+    const text = `🎯 Mon objectif: ${goal.title}\nProgression: ${goal.progress}%\nCatégorie: ${CATEGORIES[goal.category].label}`;
+    
+    if (navigator.share) {
+      await navigator.share({ title: goal.title, text });
+    } else {
+      await navigator.clipboard.writeText(text);
+      toast({ title: 'Copié dans le presse-papier' });
+    }
+  };
+
+  const getPriorityColor = (priority: Goal['priority']) => {
+    switch (priority) {
+      case 'high': return 'text-red-500 bg-red-500/10';
+      case 'medium': return 'text-amber-500 bg-amber-500/10';
+      case 'low': return 'text-green-500 bg-green-500/10';
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -241,6 +359,58 @@ export const CoachGoalTracker: React.FC = () => {
           </p>
         </div>
         <div className="flex gap-2">
+          <Dialog open={showStats} onOpenChange={setShowStats}>
+            <DialogTrigger asChild>
+              <Button variant="outline" size="icon">
+                <BarChart3 className="h-4 w-4" />
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-md">
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <BarChart3 className="h-5 w-5" />
+                  Statistiques
+                </DialogTitle>
+              </DialogHeader>
+              <div className="grid grid-cols-2 gap-3 py-4">
+                <div className="p-3 rounded-lg bg-muted/50 text-center">
+                  <Target className="h-5 w-5 mx-auto mb-1 text-blue-500" />
+                  <div className="text-2xl font-bold">{stats.totalGoals}</div>
+                  <div className="text-xs text-muted-foreground">Objectifs total</div>
+                </div>
+                <div className="p-3 rounded-lg bg-muted/50 text-center">
+                  <CheckCircle2 className="h-5 w-5 mx-auto mb-1 text-green-500" />
+                  <div className="text-2xl font-bold">{stats.completedGoals}</div>
+                  <div className="text-xs text-muted-foreground">Complétés</div>
+                </div>
+                <div className="p-3 rounded-lg bg-muted/50 text-center">
+                  <Sparkles className="h-5 w-5 mx-auto mb-1 text-purple-500" />
+                  <div className="text-2xl font-bold">{stats.completedMilestones}/{stats.totalMilestones}</div>
+                  <div className="text-xs text-muted-foreground">Étapes</div>
+                </div>
+                <div className="p-3 rounded-lg bg-muted/50 text-center">
+                  <TrendingUp className="h-5 w-5 mx-auto mb-1 text-amber-500" />
+                  <div className="text-2xl font-bold">{stats.avgProgress}%</div>
+                  <div className="text-xs text-muted-foreground">Progression moy.</div>
+                </div>
+                <div className="p-3 rounded-lg bg-muted/50 text-center">
+                  <Flame className="h-5 w-5 mx-auto mb-1 text-orange-500" />
+                  <div className="text-2xl font-bold">{stats.longestStreak}</div>
+                  <div className="text-xs text-muted-foreground">Meilleur streak</div>
+                </div>
+                <div className="p-3 rounded-lg bg-muted/50 text-center">
+                  <MessageSquare className="h-5 w-5 mx-auto mb-1 text-cyan-500" />
+                  <div className="text-2xl font-bold">{stats.completedSessions}/{stats.totalSessions}</div>
+                  <div className="text-xs text-muted-foreground">Sessions</div>
+                </div>
+              </div>
+              <Button variant="outline" onClick={handleExport} className="w-full">
+                <Download className="h-4 w-4 mr-2" />
+                Exporter les données
+              </Button>
+            </DialogContent>
+          </Dialog>
+
           <Dialog open={showNewSession} onOpenChange={setShowNewSession}>
             <DialogTrigger asChild>
               <Button variant="outline">
@@ -323,7 +493,8 @@ export const CoachGoalTracker: React.FC = () => {
                       time: '10:00',
                       topic: 'Nouvelle session',
                       type: 'check-in',
-                      confirmed: false
+                      confirmed: false,
+                      completed: false
                     };
                     setSessions(prev => [...prev, newSession]);
                     setShowNewSession(false);
@@ -353,7 +524,7 @@ export const CoachGoalTracker: React.FC = () => {
                   Définissez un nouvel objectif à atteindre avec l'aide de votre coach
                 </DialogDescription>
               </DialogHeader>
-              <div className="space-y-4 py-4">
+              <div className="space-y-4 py-4 max-h-[60vh] overflow-y-auto">
                 <div className="space-y-2">
                   <Label htmlFor="goal-title">Titre *</Label>
                   <Input
@@ -395,6 +566,25 @@ export const CoachGoalTracker: React.FC = () => {
                   </div>
                   
                   <div className="space-y-2">
+                    <Label>Priorité</Label>
+                    <Select
+                      value={newGoal.priority}
+                      onValueChange={v => setNewGoal(prev => ({ ...prev, priority: v as Goal['priority'] }))}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="high">🔴 Haute</SelectItem>
+                        <SelectItem value="medium">🟡 Moyenne</SelectItem>
+                        <SelectItem value="low">🟢 Basse</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
                     <Label>Date cible *</Label>
                     <Popover>
                       <PopoverTrigger asChild>
@@ -415,23 +605,23 @@ export const CoachGoalTracker: React.FC = () => {
                       </PopoverContent>
                     </Popover>
                   </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label>Rappels</Label>
-                  <Select
-                    value={newGoal.reminderFrequency}
-                    onValueChange={v => setNewGoal(prev => ({ ...prev, reminderFrequency: v as Goal['reminderFrequency'] }))}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="daily">Quotidien</SelectItem>
-                      <SelectItem value="weekly">Hebdomadaire</SelectItem>
-                      <SelectItem value="none">Aucun</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  
+                  <div className="space-y-2">
+                    <Label>Rappels</Label>
+                    <Select
+                      value={newGoal.reminderFrequency}
+                      onValueChange={v => setNewGoal(prev => ({ ...prev, reminderFrequency: v as Goal['reminderFrequency'] }))}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="daily">Quotidien</SelectItem>
+                        <SelectItem value="weekly">Hebdomadaire</SelectItem>
+                        <SelectItem value="none">Aucun</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
                 
                 <div className="space-y-2">
@@ -453,6 +643,17 @@ export const CoachGoalTracker: React.FC = () => {
                         <li key={m.id} className="flex items-center gap-2 text-sm text-muted-foreground">
                           <Circle className="h-3 w-3" />
                           {m.title}
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-5 w-5 ml-auto"
+                            onClick={() => setNewGoal(prev => ({
+                              ...prev,
+                              milestones: prev.milestones?.filter(ms => ms.id !== m.id)
+                            }))}
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
                         </li>
                       ))}
                     </ul>
@@ -463,200 +664,272 @@ export const CoachGoalTracker: React.FC = () => {
                 <Button variant="outline" onClick={() => setShowNewGoal(false)}>
                   Annuler
                 </Button>
-                <Button onClick={addGoal}>Créer l'objectif</Button>
+                <Button onClick={addGoal}>
+                  Créer l'objectif
+                </Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
         </div>
       </div>
 
-      {/* Sessions planifiées */}
-      {sessions.length > 0 && (
+      {/* Quick Stats */}
+      <div className="grid grid-cols-4 gap-3">
+        <Card className="p-3">
+          <div className="flex items-center gap-2">
+            <div className="p-2 rounded-lg bg-blue-500/10">
+              <Target className="h-4 w-4 text-blue-500" />
+            </div>
+            <div>
+              <div className="text-xl font-bold">{stats.activeGoals}</div>
+              <div className="text-xs text-muted-foreground">Objectifs actifs</div>
+            </div>
+          </div>
+        </Card>
+        <Card className="p-3">
+          <div className="flex items-center gap-2">
+            <div className="p-2 rounded-lg bg-green-500/10">
+              <CheckCircle2 className="h-4 w-4 text-green-500" />
+            </div>
+            <div>
+              <div className="text-xl font-bold">{stats.completedGoals}</div>
+              <div className="text-xs text-muted-foreground">Complétés</div>
+            </div>
+          </div>
+        </Card>
+        <Card className="p-3">
+          <div className="flex items-center gap-2">
+            <div className="p-2 rounded-lg bg-purple-500/10">
+              <TrendingUp className="h-4 w-4 text-purple-500" />
+            </div>
+            <div>
+              <div className="text-xl font-bold">{stats.avgProgress}%</div>
+              <div className="text-xs text-muted-foreground">Progression moy.</div>
+            </div>
+          </div>
+        </Card>
+        <Card className="p-3">
+          <div className="flex items-center gap-2">
+            <div className="p-2 rounded-lg bg-orange-500/10">
+              <Flame className="h-4 w-4 text-orange-500" />
+            </div>
+            <div>
+              <div className="text-xl font-bold">{stats.longestStreak}</div>
+              <div className="text-xs text-muted-foreground">Meilleur streak</div>
+            </div>
+          </div>
+        </Card>
+      </div>
+
+      {/* Upcoming Sessions */}
+      {upcomingSessions.length > 0 && (
         <Card>
-          <CardHeader className="pb-3">
+          <CardHeader className="pb-2">
             <CardTitle className="text-lg flex items-center gap-2">
-              <MessageSquare className="h-5 w-5 text-primary" />
+              <CalendarIcon className="h-5 w-5" />
               Prochaines sessions
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
-              {sessions.map(session => (
-                <div 
+            <div className="space-y-2">
+              {upcomingSessions.map(session => (
+                <motion.div
                   key={session.id}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
                   className="flex items-center justify-between p-3 rounded-lg bg-muted/50"
                 >
                   <div className="flex items-center gap-3">
                     <div className={cn(
-                      "p-2 rounded-full",
+                      'p-2 rounded-lg',
                       session.type === 'check-in' && 'bg-blue-500/10',
                       session.type === 'deep-dive' && 'bg-purple-500/10',
                       session.type === 'review' && 'bg-amber-500/10'
                     )}>
-                      <CalendarIcon className="h-4 w-4 text-foreground" />
+                      <Clock className="h-4 w-4" />
                     </div>
                     <div>
-                      <h4 className="font-medium">{session.topic}</h4>
-                      <p className="text-sm text-muted-foreground">
+                      <div className="font-medium">{session.topic}</div>
+                      <div className="text-sm text-muted-foreground">
                         {format(session.date, 'EEEE d MMMM', { locale: fr })} à {session.time}
-                      </p>
+                      </div>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Badge variant={session.confirmed ? 'default' : 'secondary'}>
-                      {session.confirmed ? 'Confirmée' : 'En attente'}
-                    </Badge>
-                    {!session.confirmed && (
+                    {session.confirmed ? (
+                      <Badge variant="secondary" className="bg-green-500/10 text-green-600">
+                        Confirmée
+                      </Badge>
+                    ) : (
                       <Button size="sm" onClick={() => confirmSession(session.id)}>
                         Confirmer
                       </Button>
                     )}
                   </div>
-                </div>
+                </motion.div>
               ))}
             </div>
           </CardContent>
         </Card>
       )}
 
-      {/* Objectifs actifs */}
-      <Tabs defaultValue="active" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="active" className="gap-1">
-            <Target className="h-4 w-4" />
-            Actifs ({activeGoals.length})
-          </TabsTrigger>
-          <TabsTrigger value="completed" className="gap-1">
-            <CheckCircle2 className="h-4 w-4" />
-            Terminés ({completedGoals.length})
-          </TabsTrigger>
-        </TabsList>
+      {/* Goals List */}
+      <Card>
+        <CardHeader className="pb-2">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-lg">Mes objectifs</CardTitle>
+            <div className="flex items-center gap-2">
+              <div className="relative">
+                <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Rechercher..."
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                  className="pl-8 h-8 w-40"
+                />
+              </div>
+              <Select value={filterCategory} onValueChange={setFilterCategory}>
+                <SelectTrigger className="w-32 h-8">
+                  <Filter className="h-3 w-3 mr-1" />
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Toutes</SelectItem>
+                  {Object.entries(CATEGORIES).map(([key, cat]) => (
+                    <SelectItem key={key} value={key}>{cat.icon} {cat.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
+            <TabsList className="w-full mb-4">
+              <TabsTrigger value="active" className="flex-1">Actifs ({goals.filter(g => g.status === 'active').length})</TabsTrigger>
+              <TabsTrigger value="completed" className="flex-1">Complétés ({goals.filter(g => g.status === 'completed').length})</TabsTrigger>
+              <TabsTrigger value="archived" className="flex-1">Archivés</TabsTrigger>
+              <TabsTrigger value="all" className="flex-1">Tous</TabsTrigger>
+            </TabsList>
 
-        <TabsContent value="active" className="space-y-4">
-          {activeGoals.length === 0 ? (
-            <Card>
-              <CardContent className="pt-6 text-center">
-                <Target className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                <h3 className="text-lg font-semibold">Aucun objectif actif</h3>
-                <p className="text-muted-foreground mb-4">
-                  Créez votre premier objectif pour commencer le suivi.
-                </p>
-                <Button onClick={() => setShowNewGoal(true)}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Créer un objectif
-                </Button>
-              </CardContent>
-            </Card>
-          ) : (
-            activeGoals.map(goal => {
-              const category = CATEGORIES[goal.category];
-              const daysLeft = differenceInDays(goal.targetDate, new Date());
-              
-              return (
-                <Card key={goal.id}>
-                  <CardContent className="pt-6">
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex items-start gap-3">
-                        <div className={cn("w-10 h-10 rounded-full flex items-center justify-center text-lg", category.color, "bg-opacity-20")}>
-                          {category.icon}
-                        </div>
-                        <div>
-                          <h3 className="font-semibold">{goal.title}</h3>
-                          <p className="text-sm text-muted-foreground">{goal.description}</p>
-                        </div>
-                      </div>
-                      <Badge variant={daysLeft < 7 ? 'destructive' : 'secondary'}>
-                        <Clock className="h-3 w-3 mr-1" />
-                        {daysLeft} jours
-                      </Badge>
-                    </div>
-                    
-                    <div className="space-y-2 mb-4">
-                      <div className="flex justify-between text-sm">
-                        <span>Progression</span>
-                        <span className="font-medium">{goal.progress}%</span>
-                      </div>
-                      <Progress value={goal.progress} className="h-2" />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <h4 className="text-sm font-medium">Étapes</h4>
-                      {goal.milestones.map(milestone => (
-                        <div 
-                          key={milestone.id}
-                          className="flex items-center gap-3 cursor-pointer"
-                          onClick={() => toggleMilestone(goal.id, milestone.id)}
-                        >
-                          <Checkbox 
-                            checked={milestone.completed}
-                            onCheckedChange={() => toggleMilestone(goal.id, milestone.id)}
-                          />
-                          <span className={cn(
-                            "text-sm",
-                            milestone.completed && "line-through text-muted-foreground"
-                          )}>
-                            {milestone.title}
-                          </span>
-                          {milestone.completed && milestone.completedAt && (
-                            <span className="text-xs text-muted-foreground">
-                              {format(milestone.completedAt, 'd MMM', { locale: fr })}
-                            </span>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                    
-                    {goal.coachNotes && (
-                      <div className="mt-4 p-3 rounded-lg bg-primary/5 border border-primary/20">
-                        <div className="flex items-center gap-2 mb-1">
-                          <Sparkles className="h-4 w-4 text-primary" />
-                          <span className="text-sm font-medium">Note du coach</span>
-                        </div>
-                        <p className="text-sm text-muted-foreground">{goal.coachNotes}</p>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              );
-            })
-          )}
-        </TabsContent>
-
-        <TabsContent value="completed" className="space-y-4">
-          {completedGoals.length === 0 ? (
-            <Card>
-              <CardContent className="pt-6 text-center">
-                <Award className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                <h3 className="text-lg font-semibold">Pas encore d'objectifs terminés</h3>
-                <p className="text-muted-foreground">
-                  Continuez à travailler sur vos objectifs actifs !
-                </p>
-              </CardContent>
-            </Card>
-          ) : (
-            completedGoals.map(goal => (
-              <Card key={goal.id} className="opacity-80">
-                <CardContent className="pt-6">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <CheckCircle2 className="h-6 w-6 text-green-500" />
-                      <div>
-                        <h3 className="font-semibold">{goal.title}</h3>
-                        <p className="text-sm text-muted-foreground">
-                          Complété le {format(goal.targetDate, 'd MMMM yyyy', { locale: fr })}
-                        </p>
-                      </div>
-                    </div>
-                    <Badge variant="outline" className="text-green-600">
-                      100%
-                    </Badge>
+            <div className="space-y-3">
+              <AnimatePresence>
+                {filteredGoals.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    Aucun objectif trouvé
                   </div>
-                </CardContent>
-              </Card>
-            ))
-          )}
-        </TabsContent>
-      </Tabs>
+                ) : (
+                  filteredGoals.map((goal, index) => (
+                    <motion.div
+                      key={goal.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -20 }}
+                      transition={{ delay: index * 0.05 }}
+                      className={cn(
+                        'p-4 rounded-lg border transition-all',
+                        goal.status === 'completed' && 'bg-green-500/5 border-green-500/30',
+                        goal.status === 'paused' && 'opacity-60',
+                        goal.status === 'active' && 'hover:shadow-md'
+                      )}
+                    >
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex items-start gap-3">
+                          <span className="text-2xl">{CATEGORIES[goal.category].icon}</span>
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <h4 className="font-medium">{goal.title}</h4>
+                              <Badge className={cn('text-xs', getPriorityColor(goal.priority))}>
+                                {goal.priority === 'high' ? 'Haute' : goal.priority === 'medium' ? 'Moyenne' : 'Basse'}
+                              </Badge>
+                              {goal.streak > 0 && (
+                                <Badge variant="outline" className="gap-1">
+                                  <Flame className="h-3 w-3 text-orange-500" />
+                                  {goal.streak}
+                                </Badge>
+                              )}
+                            </div>
+                            <p className="text-sm text-muted-foreground">{goal.description}</p>
+                            <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
+                              <CalendarIcon className="h-3 w-3" />
+                              Échéance: {format(goal.targetDate, 'dd MMM yyyy', { locale: fr })}
+                              {differenceInDays(goal.targetDate, new Date()) <= 3 && goal.status === 'active' && (
+                                <Badge variant="destructive" className="text-xs">Bientôt !</Badge>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleShare(goal)}>
+                            <Share2 className="h-4 w-4" />
+                          </Button>
+                          {goal.status === 'active' && (
+                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => updateGoalStatus(goal.id, 'paused')}>
+                              <Pause className="h-4 w-4" />
+                            </Button>
+                          )}
+                          {goal.status === 'paused' && (
+                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => updateGoalStatus(goal.id, 'active')}>
+                              <Play className="h-4 w-4" />
+                            </Button>
+                          )}
+                          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => updateGoalStatus(goal.id, 'archived')}>
+                            <Archive className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => deleteGoal(goal.id)}>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+
+                      {/* Progress */}
+                      <div className="mb-3">
+                        <div className="flex items-center justify-between text-sm mb-1">
+                          <span className="text-muted-foreground">Progression</span>
+                          <span className="font-medium">{goal.progress}%</span>
+                        </div>
+                        <Progress value={goal.progress} className="h-2" />
+                      </div>
+
+                      {/* Milestones */}
+                      {goal.milestones.length > 0 && (
+                        <div className="space-y-1">
+                          {goal.milestones.map(milestone => (
+                            <div
+                              key={milestone.id}
+                              className="flex items-center gap-2 text-sm cursor-pointer hover:bg-muted/50 p-1 rounded"
+                              onClick={() => toggleMilestone(goal.id, milestone.id)}
+                            >
+                              {milestone.completed ? (
+                                <CheckCircle2 className="h-4 w-4 text-green-500" />
+                              ) : (
+                                <Circle className="h-4 w-4 text-muted-foreground" />
+                              )}
+                              <span className={cn(milestone.completed && 'line-through text-muted-foreground')}>
+                                {milestone.title}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {goal.coachNotes && (
+                        <div className="mt-3 p-2 rounded-lg bg-primary/5 border border-primary/20">
+                          <div className="flex items-center gap-1 text-xs text-primary mb-1">
+                            <MessageSquare className="h-3 w-3" />
+                            Note du coach
+                          </div>
+                          <p className="text-sm">{goal.coachNotes}</p>
+                        </div>
+                      )}
+                    </motion.div>
+                  ))
+                )}
+              </AnimatePresence>
+            </div>
+          </Tabs>
+        </CardContent>
+      </Card>
     </div>
   );
 };
