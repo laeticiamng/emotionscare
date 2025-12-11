@@ -22,8 +22,18 @@ interface PushPreferences {
 }
 
 class WebPushManager {
-  private vapidPublicKey = 'BMJ5Q5J5Q5J5Q5J5Q5J5Q5J5Q5J5Q5J5Q5J5Q5J5Q5J5Q5J5Q5J5Q5J5Q5J5Q5J5Q5J5Q5J5Q5J5Q5J5Q5J5Q5J5Q5J5Q5J5Q5J5Q5J5Q5J5Q5J5Q5J5Q5J5Q5J5Q5J5Q5J5Q5J5Q5J5Q5J5Q5J5'; // À remplacer par la vraie clé
+  private vapidPublicKey: string;
   private registration: ServiceWorkerRegistration | null = null;
+
+  constructor() {
+    // Utiliser la variable d'environnement ou la clé par défaut (pour dev)
+    this.vapidPublicKey = import.meta.env.VITE_VAPID_PUBLIC_KEY ||
+      'BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SxZ8-SU0YnM6rV6cPLiCyChJxnvQWYCfN9Qb1gP1aY4XH3N1bm1iPUY';
+
+    if (!import.meta.env.VITE_VAPID_PUBLIC_KEY) {
+      logger.warn('VAPID public key not configured in environment', {}, 'PUSH');
+    }
+  }
 
   /**
    * Initialiser le service worker et vérifier les permissions
