@@ -23,7 +23,8 @@ import {
   Target,
   TrendingUp,
   Calendar,
-  CheckCircle
+  CheckCircle,
+  LucideIcon
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -31,7 +32,7 @@ interface ReminderPattern {
   id: string;
   name: string;
   description: string;
-  icon: React.ElementType;
+  icon: LucideIcon;
   enabled: boolean;
   frequency: 'daily' | 'weekly' | 'smart';
   bestTime?: string;
