@@ -1,18 +1,35 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Plus, Target, TrendingUp, Calendar, Loader2 } from 'lucide-react';
+import { Plus, Target, TrendingUp, Calendar, Loader2, Filter, SortAsc, SortDesc } from 'lucide-react';
 import { useGoals } from '@/hooks/useGoals';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 export default function GoalsPage() {
   const navigate = useNavigate();
   const { goals, stats, isLoading, error } = useGoals();
+  const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const [sortBy, setSortBy] = useState<'deadline' | 'progress'>('deadline');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
-  // Filter active goals only
-  const activeGoals = goals.filter((g) => g.status === 'active');
+  // Filter and sort goals
+  const filteredGoals = goals
+    .filter((g) => g.status === 'active')
+    .filter((g) => categoryFilter === 'all' || g.category === categoryFilter)
+    .sort((a, b) => {
+      if (sortBy === 'deadline') {
+        const dateA = new Date(a.deadline).getTime();
+        const dateB = new Date(b.deadline).getTime();
+        return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
+      }
+      return sortOrder === 'asc' ? a.progress - b.progress : b.progress - a.progress;
+    });
+  
+  const categories = [...new Set(goals.map(g => g.category))].filter(Boolean);
 
   // Loading state
   if (isLoading) {
@@ -93,11 +110,41 @@ export default function GoalsPage() {
 
         {/* Goals List */}
         <Card>
-          <CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle>Objectifs en Cours</CardTitle>
+            <div className="flex items-center gap-2">
+              <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                <SelectTrigger className="w-[140px]">
+                  <Filter className="h-4 w-4 mr-2" />
+                  <SelectValue placeholder="Catégorie" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Toutes</SelectItem>
+                  {categories.map(cat => (
+                    <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select value={sortBy} onValueChange={(v) => setSortBy(v as 'deadline' | 'progress')}>
+                <SelectTrigger className="w-[130px]">
+                  <SelectValue placeholder="Trier par" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="deadline">Échéance</SelectItem>
+                  <SelectItem value="progress">Progression</SelectItem>
+                </SelectContent>
+              </Select>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc')}
+              >
+                {sortOrder === 'asc' ? <SortAsc className="h-4 w-4" /> : <SortDesc className="h-4 w-4" />}
+              </Button>
+            </div>
           </CardHeader>
           <CardContent>
-            {activeGoals.length === 0 ? (
+            {filteredGoals.length === 0 ? (
               <div className="text-center py-12">
                 <Target className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                 <h3 className="text-lg font-semibold mb-2">Aucun objectif actif</h3>
@@ -111,7 +158,7 @@ export default function GoalsPage() {
               </div>
             ) : (
               <div className="space-y-6">
-                {activeGoals.map((goal) => (
+                {filteredGoals.map((goal) => (
                   <div
                     key={goal.id}
                     className="space-y-3 p-4 border rounded-lg hover:bg-accent/50 cursor-pointer transition-colors"
