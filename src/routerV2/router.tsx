@@ -315,6 +315,7 @@ const ExchangeHubPage = lazy(() => import('@/pages/ExchangeHubPage'));
 const DataExportPage = lazy(() => import('@/pages/DataExportPage'));
 const CommunityPage = lazy(() => import('@/pages/CommunityPage'));
 const WearablesPage = lazy(() => import('@/pages/WearablesPage'));
+const NotificationSettingsPage = lazy(() => import('@/pages/NotificationSettingsPage'));
 
 // ═══════════════════════════════════════════════════════════
 // MAPPING DES COMPOSANTS
@@ -591,6 +592,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   DataExportPage,
   CommunityPage,
   WearablesPage,
+  NotificationSettingsPage,
   
   // GDPR & Compliance - avec alias pour registry
   UnifiedGDPRDashboard,
