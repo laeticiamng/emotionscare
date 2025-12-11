@@ -1,16 +1,19 @@
 // @ts-nocheck
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Textarea } from '@/components/ui/textarea';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   Clock, Star, ArrowRight, Heart, Share2, Calendar, 
   CheckCircle, ThumbsUp, ThumbsDown, Bookmark, Play,
-  History, TrendingUp, Bell, BellOff, MessageSquare
+  History, TrendingUp, Bell, BellOff, MessageSquare,
+  BarChart3, Download, Filter, Sparkles, Trophy, Flame
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
@@ -43,6 +46,20 @@ interface SavedRecommendation {
   rating?: number;
   scheduledFor?: Date;
   reminder?: boolean;
+  completionCount: number;
+  streak: number;
+}
+
+interface GlobalStats {
+  totalCompleted: number;
+  totalSaved: number;
+  helpfulCount: number;
+  notHelpfulCount: number;
+  avgRating: number;
+  totalRatings: number;
+  longestStreak: number;
+  byType: Record<string, { completed: number; saved: number }>;
+  weeklyProgress: number[];
 }
 
 const STORAGE_KEY = 'recommendation-card-data';
@@ -55,16 +72,24 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
   const [isSaved, setIsSaved] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
-  const [showSchedule, setShowSchedule] = useState(false);
+  const [showStats, setShowStats] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
   const [feedback, setFeedback] = useState<'helpful' | 'not_helpful' | null>(null);
   const [notes, setNotes] = useState('');
   const [userRating, setUserRating] = useState(0);
   const [hasReminder, setHasReminder] = useState(false);
   const [savedRecommendations, setSavedRecommendations] = useState<SavedRecommendation[]>([]);
-  const [stats, setStats] = useState({
+  const [currentStreak, setCurrentStreak] = useState(0);
+  const [stats, setStats] = useState<GlobalStats>({
     totalCompleted: 0,
     totalSaved: 0,
     helpfulCount: 0,
+    notHelpfulCount: 0,
+    avgRating: 0,
+    totalRatings: 0,
+    longestStreak: 0,
+    byType: {},
+    weeklyProgress: [0, 0, 0, 0, 0, 0, 0]
   });
 
   // Load saved data
@@ -85,6 +110,7 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
         setUserRating(savedEntry.rating || 0);
         setHasReminder(savedEntry.reminder || false);
         setNotes(savedEntry.notes || '');
+        setCurrentStreak(savedEntry.streak || 0);
       }
     }
   }, [recommendation.id]);
@@ -97,22 +123,42 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
     }));
   }, [savedRecommendations, stats]);
 
+  // Calculate weekly progress
+  const weeklyStats = useMemo(() => {
+    const weekDays = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+    const today = new Date();
+    const dayOfWeek = today.getDay();
+    
+    const completedThisWeek = savedRecommendations.filter(s => {
+      if (!s.completedAt) return false;
+      const completedDate = new Date(s.completedAt);
+      const diffDays = Math.floor((today.getTime() - completedDate.getTime()) / (1000 * 60 * 60 * 24));
+      return diffDays < 7;
+    });
+
+    return {
+      total: completedThisWeek.length,
+      goal: 7,
+      progress: Math.min(100, (completedThisWeek.length / 7) * 100)
+    };
+  }, [savedRecommendations]);
+
   const getTypeColor = () => {
     switch (recommendation.type) {
       case 'music': return 'bg-accent/10 text-accent';
       case 'breathing': return 'bg-primary/10 text-primary';
-      case 'meditation': return 'bg-success/10 text-success';
-      case 'exercise': return 'bg-warning/10 text-warning';
-      case 'social': return 'bg-destructive/10 text-destructive';
+      case 'meditation': return 'bg-green-500/10 text-green-600';
+      case 'exercise': return 'bg-amber-500/10 text-amber-600';
+      case 'social': return 'bg-pink-500/10 text-pink-600';
       default: return 'bg-muted text-muted-foreground';
     }
   };
 
   const getDifficultyColor = () => {
     switch (recommendation.difficulty) {
-      case 'easy': return 'bg-success/10 text-success';
-      case 'medium': return 'bg-warning/10 text-warning';
-      case 'hard': return 'bg-destructive/10 text-destructive';
+      case 'easy': return 'bg-green-500/10 text-green-600';
+      case 'medium': return 'bg-amber-500/10 text-amber-600';
+      case 'hard': return 'bg-red-500/10 text-red-600';
       default: return 'bg-muted text-muted-foreground';
     }
   };
@@ -160,26 +206,58 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
         recommendation,
         savedAt: new Date(),
         completed: false,
+        completionCount: 0,
+        streak: 0
       };
       setSavedRecommendations(prev => [newEntry, ...prev]);
       setIsSaved(true);
-      setStats(prev => ({ ...prev, totalSaved: prev.totalSaved + 1 }));
+      setStats(prev => ({
+        ...prev,
+        totalSaved: prev.totalSaved + 1,
+        byType: {
+          ...prev.byType,
+          [recommendation.type]: {
+            ...prev.byType[recommendation.type],
+            saved: (prev.byType[recommendation.type]?.saved || 0) + 1
+          }
+        }
+      }));
       toast.success('Ajouté aux favoris');
     }
   };
 
   const handleComplete = () => {
+    const newStreak = currentStreak + 1;
     setIsCompleted(true);
     setShowFeedback(true);
+    setCurrentStreak(newStreak);
     
     setSavedRecommendations(prev => 
       prev.map(s => s.recommendation.id === recommendation.id 
-        ? { ...s, completed: true, completedAt: new Date() }
+        ? { 
+            ...s, 
+            completed: true, 
+            completedAt: new Date(),
+            completionCount: (s.completionCount || 0) + 1,
+            streak: newStreak
+          }
         : s
       )
     );
     
-    setStats(prev => ({ ...prev, totalCompleted: prev.totalCompleted + 1 }));
+    setStats(prev => ({
+      ...prev,
+      totalCompleted: prev.totalCompleted + 1,
+      longestStreak: Math.max(prev.longestStreak, newStreak),
+      byType: {
+        ...prev.byType,
+        [recommendation.type]: {
+          ...prev.byType[recommendation.type],
+          completed: (prev.byType[recommendation.type]?.completed || 0) + 1
+        }
+      }
+    }));
+    
     toast.success('Bravo ! Activité complétée 🎉');
   };
 
@@ -193,9 +271,11 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
       )
     );
     
-    if (type === 'helpful') {
-      setStats(prev => ({ ...prev, helpfulCount: prev.helpfulCount + 1 }));
-    }
+    setStats(prev => ({
+      ...prev,
+      helpfulCount: type === 'helpful' ? prev.helpfulCount + 1 : prev.helpfulCount,
+      notHelpfulCount: type === 'not_helpful' ? prev.notHelpfulCount + 1 : prev.notHelpfulCount
+    }));
     
     setShowFeedback(false);
     toast.success('Merci pour votre retour !');
@@ -210,6 +290,15 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
         : s
       )
     );
+
+    const newTotalRatings = stats.totalRatings + 1;
+    const newAvgRating = ((stats.avgRating * stats.totalRatings) + rating) / newTotalRatings;
+    
+    setStats(prev => ({
+      ...prev,
+      avgRating: Math.round(newAvgRating * 10) / 10,
+      totalRatings: newTotalRatings
+    }));
   };
 
   const toggleReminder = () => {
@@ -236,12 +325,39 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
     }
   };
 
+  const handleExport = () => {
+    const exportData = {
+      recommendation,
+      stats: {
+        completed: isCompleted,
+        rating: userRating,
+        feedback,
+        streak: currentStreak,
+        notes
+      },
+      exportedAt: new Date().toISOString()
+    };
+    
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `recommendation-${recommendation.id}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    
+    toast.success('Exporté !');
+  };
+
   const handleStart = () => {
     recommendation.action?.();
     if (!isSaved) {
       handleSave();
     }
   };
+
+  const completedRecommendations = savedRecommendations.filter(s => s.completed);
+  const recentHistory = completedRecommendations.slice(0, 5);
 
   if (variant === 'compact') {
     return (
@@ -262,6 +378,12 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
                   <h4 className="font-medium text-sm">{recommendation.title}</h4>
                   {isCompleted && (
                     <CheckCircle className="h-4 w-4 text-green-500" />
+                  )}
+                  {currentStreak > 0 && (
+                    <Badge variant="outline" className="text-xs gap-1">
+                      <Flame className="h-3 w-3 text-orange-500" />
+                      {currentStreak}
+                    </Badge>
                   )}
                 </div>
                 <p className="text-xs text-muted-foreground mb-2">{recommendation.description}</p>
@@ -325,6 +447,12 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
                     Complété
                   </Badge>
                 )}
+                {currentStreak > 0 && (
+                  <Badge variant="outline" className="gap-1">
+                    <Flame className="h-3 w-3 text-orange-500" />
+                    {currentStreak} streak
+                  </Badge>
+                )}
               </div>
               <div className="flex flex-wrap gap-2 mb-2">
                 <Badge className={cn("text-xs", getTypeColor())}>
@@ -344,7 +472,7 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
             <div className="flex flex-col items-end gap-1">
               {recommendation.rating && (
                 <div className="flex items-center gap-1">
-                  <Star className="h-4 w-4 fill-warning text-warning" />
+                  <Star className="h-4 w-4 fill-yellow-500 text-yellow-500" />
                   <span className="text-sm font-medium">{recommendation.rating}</span>
                 </div>
               )}
@@ -369,6 +497,128 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
                     <BellOff className="h-4 w-4" />
                   )}
                 </Button>
+                <Dialog open={showStats} onOpenChange={setShowStats}>
+                  <DialogTrigger asChild>
+                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                      <BarChart3 className="h-4 w-4" />
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-md">
+                    <DialogHeader>
+                      <DialogTitle className="flex items-center gap-2">
+                        <BarChart3 className="h-5 w-5" />
+                        Statistiques globales
+                      </DialogTitle>
+                    </DialogHeader>
+                    <Tabs defaultValue="overview">
+                      <TabsList className="w-full">
+                        <TabsTrigger value="overview" className="flex-1">Aperçu</TabsTrigger>
+                        <TabsTrigger value="history" className="flex-1">Historique</TabsTrigger>
+                        <TabsTrigger value="types" className="flex-1">Par type</TabsTrigger>
+                      </TabsList>
+                      
+                      <TabsContent value="overview" className="space-y-4 mt-4">
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="p-3 rounded-lg bg-muted/50 text-center">
+                            <CheckCircle className="h-5 w-5 mx-auto mb-1 text-green-500" />
+                            <div className="text-2xl font-bold">{stats.totalCompleted}</div>
+                            <div className="text-xs text-muted-foreground">Complétées</div>
+                          </div>
+                          <div className="p-3 rounded-lg bg-muted/50 text-center">
+                            <Heart className="h-5 w-5 mx-auto mb-1 text-red-500" />
+                            <div className="text-2xl font-bold">{stats.totalSaved}</div>
+                            <div className="text-xs text-muted-foreground">Favoris</div>
+                          </div>
+                          <div className="p-3 rounded-lg bg-muted/50 text-center">
+                            <Star className="h-5 w-5 mx-auto mb-1 text-yellow-500" />
+                            <div className="text-2xl font-bold">{stats.avgRating || '-'}</div>
+                            <div className="text-xs text-muted-foreground">Note moyenne</div>
+                          </div>
+                          <div className="p-3 rounded-lg bg-muted/50 text-center">
+                            <Flame className="h-5 w-5 mx-auto mb-1 text-orange-500" />
+                            <div className="text-2xl font-bold">{stats.longestStreak}</div>
+                            <div className="text-xs text-muted-foreground">Meilleur streak</div>
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="flex items-center gap-1">
+                              <TrendingUp className="h-4 w-4" />
+                              Progression semaine
+                            </span>
+                            <span className="font-medium">{weeklyStats.total}/7</span>
+                          </div>
+                          <Progress value={weeklyStats.progress} className="h-2" />
+                        </div>
+
+                        <div className="flex items-center justify-between text-sm p-3 rounded-lg bg-muted/50">
+                          <span className="flex items-center gap-2">
+                            <ThumbsUp className="h-4 w-4 text-green-500" />
+                            Utiles
+                          </span>
+                          <span className="font-medium">{stats.helpfulCount}</span>
+                        </div>
+                      </TabsContent>
+
+                      <TabsContent value="history" className="mt-4">
+                        <div className="space-y-2">
+                          {recentHistory.length > 0 ? (
+                            recentHistory.map((item, index) => (
+                              <div key={index} className="flex items-center justify-between p-2 rounded-lg bg-muted/50">
+                                <div className="flex items-center gap-2">
+                                  <span>{getTypeIcon()}</span>
+                                  <div>
+                                    <div className="text-sm font-medium">{item.recommendation.title}</div>
+                                    <div className="text-xs text-muted-foreground">
+                                      {item.completedAt && new Date(item.completedAt).toLocaleDateString('fr-FR')}
+                                    </div>
+                                  </div>
+                                </div>
+                                {item.rating && (
+                                  <div className="flex items-center gap-1">
+                                    <Star className="h-3 w-3 fill-yellow-500 text-yellow-500" />
+                                    <span className="text-sm">{item.rating}</span>
+                                  </div>
+                                )}
+                              </div>
+                            ))
+                          ) : (
+                            <div className="text-center py-4 text-muted-foreground">
+                              Aucun historique
+                            </div>
+                          )}
+                        </div>
+                      </TabsContent>
+
+                      <TabsContent value="types" className="mt-4">
+                        <div className="space-y-2">
+                          {['music', 'breathing', 'meditation', 'exercise', 'social'].map(type => (
+                            <div key={type} className="flex items-center justify-between p-2 rounded-lg bg-muted/50">
+                              <div className="flex items-center gap-2">
+                                <span>{
+                                  type === 'music' ? '🎵' :
+                                  type === 'breathing' ? '🌬️' :
+                                  type === 'meditation' ? '🧘' :
+                                  type === 'exercise' ? '💪' : '👥'
+                                }</span>
+                                <span className="text-sm capitalize">{type}</span>
+                              </div>
+                              <div className="text-sm text-muted-foreground">
+                                {stats.byType[type]?.completed || 0} complétées
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </TabsContent>
+                    </Tabs>
+                    
+                    <Button variant="outline" onClick={handleExport} className="w-full mt-4">
+                      <Download className="h-4 w-4 mr-2" />
+                      Exporter
+                    </Button>
+                  </DialogContent>
+                </Dialog>
                 <Button 
                   variant="ghost" 
                   size="icon" 
@@ -485,7 +735,10 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
               <Button 
                 className="w-full" 
                 variant="outline"
-                onClick={handleStart}
+                onClick={() => {
+                  setIsCompleted(false);
+                  handleStart();
+                }}
               >
                 <History className="mr-2 h-4 w-4" />
                 Refaire
@@ -498,20 +751,31 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({
             <div className="flex justify-center">
               <Badge variant="outline" className={cn(
                 'gap-1',
-                feedback === 'helpful' ? 'text-green-500' : 'text-red-500'
+                feedback === 'helpful' ? 'text-green-600 border-green-500/30' : 'text-red-600 border-red-500/30'
               )}>
                 {feedback === 'helpful' ? (
                   <>
                     <ThumbsUp className="h-3 w-3" />
-                    Marqué comme utile
+                    Utile
                   </>
                 ) : (
                   <>
                     <ThumbsDown className="h-3 w-3" />
-                    Marqué comme pas utile
+                    Pas utile
                   </>
                 )}
               </Badge>
+            </div>
+          )}
+
+          {/* Notes preview */}
+          {notes && (
+            <div className="p-2 rounded-lg bg-muted/50">
+              <div className="flex items-center gap-1 text-xs text-muted-foreground mb-1">
+                <MessageSquare className="h-3 w-3" />
+                Votre note
+              </div>
+              <p className="text-sm line-clamp-2">{notes}</p>
             </div>
           )}
         </CardContent>
