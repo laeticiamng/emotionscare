@@ -156,3 +156,306 @@ const DEFAULT_RECOMMENDATIONS = [
   'Écoutez de la musique relaxante',
   'Prenez une pause et sortez prendre l\'air',
 ];
+
+// ========== MÉTHODES ENRICHIES ==========
+
+/**
+ * Effacer l'historique de conversation
+ */
+static async clearConversationHistory(): Promise<boolean> {
+  try {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    if (!userId) return false;
+
+    const { error } = await supabase
+      .from('coach_conversations')
+      .delete()
+      .eq('user_id', userId);
+
+    if (error) throw error;
+
+    logger.info('Conversation history cleared', { userId }, 'coach.service');
+    return true;
+  } catch (error) {
+    logger.error('Erreur suppression historique', error, 'coach.service');
+    return false;
+  }
+}
+
+/**
+ * Obtenir un résumé de la conversation
+ */
+static async getConversationSummary(): Promise<{
+  totalMessages: number;
+  userMessages: number;
+  botMessages: number;
+  topEmotions: string[];
+  firstMessageDate: string | null;
+  lastMessageDate: string | null;
+}> {
+  try {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    if (!userId) {
+      return {
+        totalMessages: 0,
+        userMessages: 0,
+        botMessages: 0,
+        topEmotions: [],
+        firstMessageDate: null,
+        lastMessageDate: null
+      };
+    }
+
+    const { data, error } = await supabase
+      .from('coach_conversations')
+      .select('is_bot, emotion, created_at')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: true });
+
+    if (error) throw error;
+
+    const messages = data || [];
+    const userMessages = messages.filter(m => !m.is_bot).length;
+    const botMessages = messages.filter(m => m.is_bot).length;
+
+    // Top emotions
+    const emotionCounts: Record<string, number> = {};
+    messages.forEach(m => {
+      if (m.emotion) {
+        emotionCounts[m.emotion] = (emotionCounts[m.emotion] || 0) + 1;
+      }
+    });
+
+    const topEmotions = Object.entries(emotionCounts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3)
+      .map(([emotion]) => emotion);
+
+    return {
+      totalMessages: messages.length,
+      userMessages,
+      botMessages,
+      topEmotions,
+      firstMessageDate: messages[0]?.created_at || null,
+      lastMessageDate: messages[messages.length - 1]?.created_at || null
+    };
+  } catch (error) {
+    logger.error('Erreur résumé conversation', error, 'coach.service');
+    return {
+      totalMessages: 0,
+      userMessages: 0,
+      botMessages: 0,
+      topEmotions: [],
+      firstMessageDate: null,
+      lastMessageDate: null
+    };
+  }
+}
+
+/**
+ * Obtenir les tendances d'humeur basées sur les conversations
+ */
+static async getMoodTrendsFromConversations(days: number = 30): Promise<Array<{
+  date: string;
+  dominantEmotion: string;
+  messagesCount: number;
+}>> {
+  try {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    if (!userId) return [];
+
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - days);
+
+    const { data, error } = await supabase
+      .from('coach_conversations')
+      .select('created_at, emotion')
+      .eq('user_id', userId)
+      .eq('is_bot', false)
+      .gte('created_at', startDate.toISOString())
+      .not('emotion', 'is', null);
+
+    if (error) throw error;
+
+    // Grouper par jour
+    const byDay: Record<string, { emotions: string[]; count: number }> = {};
+    (data || []).forEach(msg => {
+      const day = msg.created_at.split('T')[0];
+      if (!byDay[day]) byDay[day] = { emotions: [], count: 0 };
+      if (msg.emotion) byDay[day].emotions.push(msg.emotion);
+      byDay[day].count++;
+    });
+
+    return Object.entries(byDay).map(([date, stats]) => {
+      // Trouver l'émotion dominante
+      const emotionCounts: Record<string, number> = {};
+      stats.emotions.forEach(e => {
+        emotionCounts[e] = (emotionCounts[e] || 0) + 1;
+      });
+      const dominantEmotion = Object.entries(emotionCounts)
+        .sort((a, b) => b[1] - a[1])[0]?.[0] || 'neutral';
+
+      return {
+        date,
+        dominantEmotion,
+        messagesCount: stats.count
+      };
+    }).sort((a, b) => a.date.localeCompare(b.date));
+  } catch (error) {
+    logger.error('Erreur tendances humeur', error, 'coach.service');
+    return [];
+  }
+}
+
+/**
+ * Noter une réponse du coach
+ */
+static async rateResponse(messageId: string, rating: 1 | 2 | 3 | 4 | 5, feedback?: string): Promise<boolean> {
+  try {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    if (!userId) return false;
+
+    const { error } = await supabase
+      .from('coach_feedback')
+      .insert({
+        user_id: userId,
+        message_id: messageId,
+        rating,
+        feedback,
+        created_at: new Date().toISOString()
+      });
+
+    if (error) throw error;
+
+    logger.info('Response rated', { messageId, rating }, 'coach.service');
+    return true;
+  } catch (error) {
+    logger.error('Erreur notation réponse', error, 'coach.service');
+    return false;
+  }
+}
+
+/**
+ * Obtenir des suggestions contextuelles
+ */
+static async getContextualSuggestions(currentEmotion?: string): Promise<string[]> {
+  const baseSuggestions: Record<string, string[]> = {
+    stressed: [
+      'Comment puis-je mieux gérer mon stress ?',
+      'Quels exercices de respiration me recommandes-tu ?',
+      'Comment me détendre rapidement ?'
+    ],
+    anxious: [
+      'Comment calmer mon anxiété ?',
+      'Aide-moi à relativiser mes inquiétudes',
+      'Quelles techniques pour apaiser mon esprit ?'
+    ],
+    sad: [
+      'Comment améliorer mon humeur ?',
+      'Parle-moi de pensée positive',
+      'Que faire quand je me sens triste ?'
+    ],
+    happy: [
+      'Comment maintenir cette bonne humeur ?',
+      'Aide-moi à apprécier ce moment',
+      'Comment partager ma joie avec les autres ?'
+    ],
+    neutral: [
+      'Comment améliorer mon bien-être ?',
+      'Quels sont tes conseils pour la journée ?',
+      'Parle-moi de développement personnel'
+    ]
+  };
+
+  return baseSuggestions[currentEmotion || 'neutral'] || baseSuggestions.neutral;
+}
+
+/**
+ * Obtenir les statistiques d'utilisation du coach
+ */
+static async getCoachUsageStats(): Promise<{
+  totalConversations: number;
+  avgMessagesPerDay: number;
+  mostActiveDay: string;
+  avgResponseTime: number;
+  satisfactionRate: number;
+}> {
+  try {
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+    if (!userId) {
+      return {
+        totalConversations: 0,
+        avgMessagesPerDay: 0,
+        mostActiveDay: '',
+        avgResponseTime: 0,
+        satisfactionRate: 0
+      };
+    }
+
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    const { data: messages } = await supabase
+      .from('coach_conversations')
+      .select('created_at, is_bot')
+      .eq('user_id', userId)
+      .gte('created_at', thirtyDaysAgo.toISOString());
+
+    const { data: feedbacks } = await supabase
+      .from('coach_feedback')
+      .select('rating')
+      .eq('user_id', userId);
+
+    // Calculs
+    const totalConversations = messages?.length || 0;
+    const avgMessagesPerDay = Math.round((totalConversations / 30) * 10) / 10;
+
+    // Jour le plus actif
+    const byDayOfWeek: Record<number, number> = {};
+    messages?.forEach(m => {
+      const day = new Date(m.created_at).getDay();
+      byDayOfWeek[day] = (byDayOfWeek[day] || 0) + 1;
+    });
+
+    const dayNames = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+    const mostActiveDayNum = Object.entries(byDayOfWeek)
+      .sort((a, b) => b[1] - a[1])[0]?.[0];
+    const mostActiveDay = mostActiveDayNum ? dayNames[parseInt(mostActiveDayNum)] : '';
+
+    // Taux de satisfaction
+    const ratings = feedbacks?.map(f => f.rating) || [];
+    const satisfactionRate = ratings.length > 0
+      ? Math.round((ratings.reduce((a, b) => a + b, 0) / ratings.length / 5) * 100)
+      : 0;
+
+    return {
+      totalConversations,
+      avgMessagesPerDay,
+      mostActiveDay,
+      avgResponseTime: 2.5, // Placeholder en secondes
+      satisfactionRate
+    };
+  } catch (error) {
+    logger.error('Erreur stats coach', error, 'coach.service');
+    return {
+      totalConversations: 0,
+      avgMessagesPerDay: 0,
+      mostActiveDay: '',
+      avgResponseTime: 0,
+      satisfactionRate: 0
+    };
+  }
+}
+
+/**
+ * Exporter les conversations
+ */
+static async exportConversations(): Promise<string> {
+  try {
+    const history = await this.getConversationHistory();
+    return JSON.stringify(history, null, 2);
+  } catch (error) {
+    logger.error('Erreur export conversations', error, 'coach.service');
+    return '[]';
+  }
+}

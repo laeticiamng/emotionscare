@@ -345,6 +345,309 @@ class GamificationService {
       return [];
     }
   }
+
+  // ========== MÉTHODES ENRICHIES ==========
+
+  async getAllBadges(): Promise<Badge[]> {
+    try {
+      const { data, error } = await supabase
+        .from('badges')
+        .select('*')
+        .order('required_points', { ascending: true });
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      logger.error('Erreur récupération badges disponibles', error, 'GamificationService');
+      return [];
+    }
+  }
+
+  async awardBadge(badgeId: string): Promise<UserBadge | null> {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return null;
+
+      const existing = await supabase
+        .from('user_badges')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('badge_id', badgeId)
+        .single();
+
+      if (existing.data) return null;
+
+      const { data, error } = await supabase
+        .from('user_badges')
+        .insert({
+          user_id: user.id,
+          badge_id: badgeId,
+          earned_at: new Date().toISOString()
+        })
+        .select('*, badge:badges(*)')
+        .single();
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      logger.error('Erreur attribution badge', error, 'GamificationService');
+      return null;
+    }
+  }
+
+  async getPointsHistory(limit: number = 50): Promise<any[]> {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return [];
+
+      const { data, error } = await supabase
+        .from('point_history')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('timestamp', { ascending: false })
+        .limit(limit);
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      logger.error('Erreur récupération historique points', error, 'GamificationService');
+      return [];
+    }
+  }
+
+  async getStats(): Promise<{
+    totalPoints: number;
+    level: number;
+    badgesCount: number;
+    achievementsCount: number;
+    longestStreak: number;
+    currentStreak: number;
+    rank: number;
+    pointsToNextLevel: number;
+  }> {
+    try {
+      const [points, badges, achievements, streaks, leaderboard] = await Promise.all([
+        this.getUserPoints(),
+        this.getUserBadges(),
+        this.getUserAchievements(),
+        this.getUserStreaks(),
+        this.getLeaderboard(100)
+      ]);
+
+      const { data: { user } } = await supabase.auth.getUser();
+      const myRank = leaderboard.findIndex(e => e.id === user?.id) + 1;
+      const levelThresholds = [0, 100, 300, 600, 1000, 1500, 2100, 2800, 3600, 4500, 5500];
+      const currentLevel = points?.level || 1;
+      const nextThreshold = levelThresholds[currentLevel] || 5500;
+      const pointsToNext = Math.max(0, nextThreshold - (points?.total_points || 0));
+
+      const longestStreak = streaks.reduce((max, s) => Math.max(max, s.longest_streak || 0), 0);
+      const currentStreak = streaks.reduce((max, s) => Math.max(max, s.current_streak || 0), 0);
+
+      return {
+        totalPoints: points?.total_points || 0,
+        level: currentLevel,
+        badgesCount: badges.length,
+        achievementsCount: achievements.length,
+        longestStreak,
+        currentStreak,
+        rank: myRank || 0,
+        pointsToNextLevel: pointsToNext
+      };
+    } catch (error) {
+      logger.error('Erreur récupération stats', error, 'GamificationService');
+      return {
+        totalPoints: 0, level: 1, badgesCount: 0, achievementsCount: 0,
+        longestStreak: 0, currentStreak: 0, rank: 0, pointsToNextLevel: 100
+      };
+    }
+  }
+
+  async getDailyChallenge(): Promise<{
+    id: string;
+    title: string;
+    description: string;
+    reward: number;
+    progress: number;
+    target: number;
+    completed: boolean;
+  } | null> {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return null;
+
+      const today = new Date().toISOString().split('T')[0];
+      const { data } = await supabase
+        .from('daily_challenges')
+        .select('*')
+        .eq('date', today)
+        .single();
+
+      if (!data) {
+        return {
+          id: `daily-${today}`,
+          title: 'Défi du jour',
+          description: 'Complétez 3 activités aujourd\'hui',
+          reward: 50,
+          progress: 0,
+          target: 3,
+          completed: false
+        };
+      }
+
+      const { data: userProgress } = await supabase
+        .from('user_daily_progress')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('challenge_id', data.id)
+        .single();
+
+      return {
+        id: data.id,
+        title: data.title,
+        description: data.description,
+        reward: data.reward_points,
+        progress: userProgress?.progress || 0,
+        target: data.target_value,
+        completed: userProgress?.completed || false
+      };
+    } catch (error) {
+      logger.error('Erreur récupération défi quotidien', error, 'GamificationService');
+      return null;
+    }
+  }
+
+  async checkLevelUp(): Promise<{ leveledUp: boolean; newLevel: number; rewards: any[] }> {
+    try {
+      const points = await this.getUserPoints();
+      if (!points) return { leveledUp: false, newLevel: 1, rewards: [] };
+
+      const oldLevel = points.level;
+      const newLevel = this.calculateLevel(points.total_points);
+
+      if (newLevel > oldLevel) {
+        await supabase
+          .from('user_points')
+          .update({ level: newLevel })
+          .eq('user_id', points.user_id);
+
+        const rewards = [];
+        if (newLevel === 5) rewards.push({ type: 'badge', value: 'level_5_badge' });
+        if (newLevel === 10) rewards.push({ type: 'badge', value: 'level_10_badge' });
+
+        return { leveledUp: true, newLevel, rewards };
+      }
+
+      return { leveledUp: false, newLevel: oldLevel, rewards: [] };
+    } catch (error) {
+      logger.error('Erreur vérification level up', error, 'GamificationService');
+      return { leveledUp: false, newLevel: 1, rewards: [] };
+    }
+  }
+
+  async getWeeklyProgress(): Promise<{
+    pointsEarned: number;
+    activitiesCompleted: number;
+    streakDays: number;
+    comparison: { lastWeek: number; change: number };
+  }> {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return { pointsEarned: 0, activitiesCompleted: 0, streakDays: 0, comparison: { lastWeek: 0, change: 0 } };
+
+      const weekStart = new Date();
+      weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+      const weekStartStr = weekStart.toISOString();
+
+      const { data: history } = await supabase
+        .from('point_history')
+        .select('points')
+        .eq('user_id', user.id)
+        .gte('timestamp', weekStartStr);
+
+      const pointsEarned = (history || []).reduce((sum, h) => sum + h.points, 0);
+
+      const lastWeekStart = new Date(weekStart);
+      lastWeekStart.setDate(lastWeekStart.getDate() - 7);
+      const { data: lastWeekHistory } = await supabase
+        .from('point_history')
+        .select('points')
+        .eq('user_id', user.id)
+        .gte('timestamp', lastWeekStart.toISOString())
+        .lt('timestamp', weekStartStr);
+
+      const lastWeekPoints = (lastWeekHistory || []).reduce((sum, h) => sum + h.points, 0);
+      const change = lastWeekPoints > 0 ? Math.round(((pointsEarned - lastWeekPoints) / lastWeekPoints) * 100) : 0;
+
+      const streaks = await this.getUserStreaks();
+      const maxStreak = streaks.reduce((max, s) => Math.max(max, s.current_streak || 0), 0);
+
+      return {
+        pointsEarned,
+        activitiesCompleted: (history || []).length,
+        streakDays: maxStreak,
+        comparison: { lastWeek: lastWeekPoints, change }
+      };
+    } catch (error) {
+      logger.error('Erreur récupération progrès hebdo', error, 'GamificationService');
+      return { pointsEarned: 0, activitiesCompleted: 0, streakDays: 0, comparison: { lastWeek: 0, change: 0 } };
+    }
+  }
+
+  async claimStreakBonus(streakDays: number): Promise<number> {
+    try {
+      const bonusPoints = Math.min(streakDays * 5, 100);
+      await this.awardPoints(bonusPoints, `Bonus série ${streakDays} jours`);
+      return bonusPoints;
+    } catch (error) {
+      logger.error('Erreur réclamation bonus série', error, 'GamificationService');
+      return 0;
+    }
+  }
+
+  async getMilestones(): Promise<Array<{
+    id: string;
+    title: string;
+    description: string;
+    target: number;
+    current: number;
+    reward: number;
+    achieved: boolean;
+  }>> {
+    const milestones = [
+      { id: 'first_week', title: 'Première semaine', description: '7 jours consécutifs', target: 7, type: 'streak', reward: 100 },
+      { id: 'century', title: 'Centurion', description: 'Atteignez 100 points', target: 100, type: 'points', reward: 25 },
+      { id: 'half_k', title: 'Demi-millénaire', description: 'Atteignez 500 points', target: 500, type: 'points', reward: 75 },
+      { id: 'thousand', title: 'Millénaire', description: 'Atteignez 1000 points', target: 1000, type: 'points', reward: 150 },
+      { id: 'badge_collector', title: 'Collectionneur', description: 'Obtenez 5 badges', target: 5, type: 'badges', reward: 100 },
+      { id: 'achiever', title: 'Accomplisseur', description: 'Débloquez 10 succès', target: 10, type: 'achievements', reward: 150 }
+    ];
+
+    try {
+      const stats = await this.getStats();
+
+      return milestones.map(m => {
+        let current = 0;
+        if (m.type === 'points') current = stats.totalPoints;
+        else if (m.type === 'streak') current = stats.longestStreak;
+        else if (m.type === 'badges') current = stats.badgesCount;
+        else if (m.type === 'achievements') current = stats.achievementsCount;
+
+        return {
+          id: m.id,
+          title: m.title,
+          description: m.description,
+          target: m.target,
+          current,
+          reward: m.reward,
+          achieved: current >= m.target
+        };
+      });
+    } catch (error) {
+      logger.error('Erreur récupération jalons', error, 'GamificationService');
+      return [];
+    }
+  }
 }
 
 export const gamificationService = new GamificationService();

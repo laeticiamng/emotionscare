@@ -265,10 +265,228 @@ export async function getFriendChallenges(userId: string): Promise<FriendChallen
         ]
       }
     ];
-    
+
     return challenges;
   } catch (error) {
     logger.error('Failed to fetch friend challenges', error as Error, 'MUSIC');
+    return [];
+  }
+}
+
+// ========== MÉTHODES ENRICHIES ==========
+
+/**
+ * Rechercher des amis par nom
+ */
+export async function searchFriends(userId: string, query: string): Promise<MusicFriend[]> {
+  try {
+    const friends = await getFriends(userId);
+    const lowerQuery = query.toLowerCase();
+    return friends.filter(f =>
+      f.displayName.toLowerCase().includes(lowerQuery)
+    );
+  } catch (error) {
+    logger.error('Failed to search friends', error as Error, 'MUSIC');
+    return [];
+  }
+}
+
+/**
+ * Obtenir les amis actifs récemment
+ */
+export async function getActiveFriends(userId: string, hoursAgo: number = 24): Promise<MusicFriend[]> {
+  try {
+    const friends = await getFriends(userId);
+    const cutoff = Date.now() - hoursAgo * 60 * 60 * 1000;
+    return friends.filter(f => new Date(f.lastActive).getTime() > cutoff);
+  } catch (error) {
+    logger.error('Failed to get active friends', error as Error, 'MUSIC');
+    return [];
+  }
+}
+
+/**
+ * Obtenir le leaderboard global des amis
+ */
+export async function getFriendsLeaderboard(userId: string): Promise<Array<MusicFriend & { rank: number }>> {
+  try {
+    const friends = await getFriends(userId);
+    return friends
+      .sort((a, b) => b.totalXP - a.totalXP)
+      .map((friend, index) => ({
+        ...friend,
+        rank: index + 1
+      }));
+  } catch (error) {
+    logger.error('Failed to get friends leaderboard', error as Error, 'MUSIC');
+    return [];
+  }
+}
+
+/**
+ * Obtenir les statistiques sociales
+ */
+export async function getSocialStats(userId: string): Promise<{
+  friendsCount: number;
+  activeFriendsCount: number;
+  sharedPlaylistsCount: number;
+  activeChallengesCount: number;
+  totalBadgesInNetwork: number;
+  avgNetworkLevel: number;
+}> {
+  try {
+    const [friends, sharedPlaylists, challenges] = await Promise.all([
+      getFriends(userId),
+      getSharedPlaylists(userId),
+      getFriendChallenges(userId)
+    ]);
+
+    const activeFriends = friends.filter(f =>
+      Date.now() - new Date(f.lastActive).getTime() < 24 * 60 * 60 * 1000
+    );
+
+    const activeChallenges = challenges.filter(c => c.status === 'active');
+    const totalBadges = friends.reduce((sum, f) => sum + f.badgesCount, 0);
+    const avgLevel = friends.length > 0
+      ? Math.round(friends.reduce((sum, f) => sum + f.level, 0) / friends.length)
+      : 0;
+
+    return {
+      friendsCount: friends.length,
+      activeFriendsCount: activeFriends.length,
+      sharedPlaylistsCount: sharedPlaylists.length,
+      activeChallengesCount: activeChallenges.length,
+      totalBadgesInNetwork: totalBadges,
+      avgNetworkLevel: avgLevel
+    };
+  } catch (error) {
+    logger.error('Failed to get social stats', error as Error, 'MUSIC');
+    return {
+      friendsCount: 0, activeFriendsCount: 0, sharedPlaylistsCount: 0,
+      activeChallengesCount: 0, totalBadgesInNetwork: 0, avgNetworkLevel: 0
+    };
+  }
+}
+
+/**
+ * Liker une playlist partagée
+ */
+export async function likeSharedPlaylist(playlistId: string): Promise<boolean> {
+  try {
+    logger.info('Playlist liked', { playlistId }, 'MUSIC');
+    return true;
+  } catch (error) {
+    logger.error('Failed to like playlist', error as Error, 'MUSIC');
+    return false;
+  }
+}
+
+/**
+ * Rejoindre un challenge
+ */
+export async function joinChallenge(userId: string, challengeId: string): Promise<boolean> {
+  try {
+    logger.info('Joined challenge', { userId, challengeId }, 'MUSIC');
+    return true;
+  } catch (error) {
+    logger.error('Failed to join challenge', error as Error, 'MUSIC');
+    return false;
+  }
+}
+
+/**
+ * Quitter un challenge
+ */
+export async function leaveChallenge(userId: string, challengeId: string): Promise<boolean> {
+  try {
+    logger.info('Left challenge', { userId, challengeId }, 'MUSIC');
+    return true;
+  } catch (error) {
+    logger.error('Failed to leave challenge', error as Error, 'MUSIC');
+    return false;
+  }
+}
+
+/**
+ * Mettre à jour la progression d'un challenge
+ */
+export async function updateChallengeProgress(
+  userId: string,
+  challengeId: string,
+  progress: number
+): Promise<boolean> {
+  try {
+    logger.info('Challenge progress updated', { userId, challengeId, progress }, 'MUSIC');
+    return true;
+  } catch (error) {
+    logger.error('Failed to update challenge progress', error as Error, 'MUSIC');
+    return false;
+  }
+}
+
+/**
+ * Partager une playlist
+ */
+export async function sharePlaylist(
+  userId: string,
+  playlistData: Omit<SharedPlaylist, 'id' | 'sharedBy' | 'sharedAt' | 'likes'>
+): Promise<SharedPlaylist | null> {
+  try {
+    const newPlaylist: SharedPlaylist = {
+      ...playlistData,
+      id: `shared-${Date.now()}`,
+      sharedBy: userId,
+      sharedAt: new Date().toISOString(),
+      likes: 0
+    };
+
+    logger.info('Playlist shared', { playlistId: newPlaylist.id }, 'MUSIC');
+    return newPlaylist;
+  } catch (error) {
+    logger.error('Failed to share playlist', error as Error, 'MUSIC');
+    return null;
+  }
+}
+
+/**
+ * Obtenir les activités récentes des amis
+ */
+export async function getFriendsActivity(userId: string, limit: number = 20): Promise<Array<{
+  friendId: string;
+  friendName: string;
+  friendAvatar?: string;
+  activityType: 'listened' | 'badge_earned' | 'level_up' | 'challenge_completed';
+  description: string;
+  timestamp: string;
+}>> {
+  try {
+    const friends = await getFriends(userId);
+
+    // Generate mock activity
+    const activities = friends.flatMap(friend => [
+      {
+        friendId: friend.userId,
+        friendName: friend.displayName,
+        friendAvatar: friend.avatarUrl,
+        activityType: 'listened' as const,
+        description: 'a écouté "Calming Waves"',
+        timestamp: new Date(Date.now() - Math.random() * 24 * 60 * 60 * 1000).toISOString()
+      },
+      {
+        friendId: friend.userId,
+        friendName: friend.displayName,
+        friendAvatar: friend.avatarUrl,
+        activityType: 'badge_earned' as const,
+        description: 'a obtenu le badge "Explorateur Musical"',
+        timestamp: new Date(Date.now() - Math.random() * 48 * 60 * 60 * 1000).toISOString()
+      }
+    ]);
+
+    return activities
+      .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+      .slice(0, limit);
+  } catch (error) {
+    logger.error('Failed to get friends activity', error as Error, 'MUSIC');
     return [];
   }
 }

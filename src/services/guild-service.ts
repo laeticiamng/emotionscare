@@ -315,6 +315,379 @@ class GuildService {
       supabase.removeChannel(channel);
     };
   }
+
+  // ========== MÉTHODES ENRICHIES ==========
+
+  async getUserGuild(): Promise<Guild | null> {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return null;
+
+      const { data: membership } = await supabase
+        .from('guild_members')
+        .select('guild_id')
+        .eq('user_id', user.id)
+        .single();
+
+      if (!membership) return null;
+
+      return this.getGuildById(membership.guild_id);
+    } catch (error) {
+      logger.error('Error fetching user guild', error as Error, 'GuildService');
+      return null;
+    }
+  }
+
+  async getUserMembership(guildId: string): Promise<GuildMember | null> {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return null;
+
+      const { data, error } = await supabase
+        .from('guild_members')
+        .select(`*, user:user_id(display_name, avatar_url)`)
+        .eq('guild_id', guildId)
+        .eq('user_id', user.id)
+        .single();
+
+      if (error && error.code !== 'PGRST116') throw error;
+      return data;
+    } catch (error) {
+      logger.error('Error fetching membership', error as Error, 'GuildService');
+      return null;
+    }
+  }
+
+  async updateGuild(guildId: string, updates: Partial<Guild>): Promise<Guild | null> {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('User not authenticated');
+
+      const guild = await this.getGuildById(guildId);
+      if (!guild || guild.owner_id !== user.id) throw new Error('Not authorized');
+
+      const { data, error } = await supabase
+        .from('music_guilds')
+        .update({
+          ...updates,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', guildId)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      logger.error('Error updating guild', error as Error, 'GuildService');
+      return null;
+    }
+  }
+
+  async deleteGuild(guildId: string): Promise<boolean> {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('User not authenticated');
+
+      const guild = await this.getGuildById(guildId);
+      if (!guild || guild.owner_id !== user.id) throw new Error('Not authorized');
+
+      const { error } = await supabase
+        .from('music_guilds')
+        .delete()
+        .eq('id', guildId);
+
+      if (error) throw error;
+      return true;
+    } catch (error) {
+      logger.error('Error deleting guild', error as Error, 'GuildService');
+      return false;
+    }
+  }
+
+  async promoteToAdmin(guildId: string, userId: string): Promise<boolean> {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('User not authenticated');
+
+      const guild = await this.getGuildById(guildId);
+      if (!guild || guild.owner_id !== user.id) throw new Error('Not authorized');
+
+      const { error } = await supabase
+        .from('guild_members')
+        .update({ role: 'admin' })
+        .eq('guild_id', guildId)
+        .eq('user_id', userId);
+
+      if (error) throw error;
+      return true;
+    } catch (error) {
+      logger.error('Error promoting member', error as Error, 'GuildService');
+      return false;
+    }
+  }
+
+  async demoteFromAdmin(guildId: string, userId: string): Promise<boolean> {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('User not authenticated');
+
+      const guild = await this.getGuildById(guildId);
+      if (!guild || guild.owner_id !== user.id) throw new Error('Not authorized');
+
+      const { error } = await supabase
+        .from('guild_members')
+        .update({ role: 'member' })
+        .eq('guild_id', guildId)
+        .eq('user_id', userId);
+
+      if (error) throw error;
+      return true;
+    } catch (error) {
+      logger.error('Error demoting member', error as Error, 'GuildService');
+      return false;
+    }
+  }
+
+  async kickMember(guildId: string, userId: string): Promise<boolean> {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('User not authenticated');
+
+      const membership = await this.getUserMembership(guildId);
+      if (!membership || (membership.role !== 'owner' && membership.role !== 'admin')) {
+        throw new Error('Not authorized');
+      }
+
+      const { error } = await supabase
+        .from('guild_members')
+        .delete()
+        .eq('guild_id', guildId)
+        .eq('user_id', userId)
+        .neq('role', 'owner');
+
+      if (error) throw error;
+      return true;
+    } catch (error) {
+      logger.error('Error kicking member', error as Error, 'GuildService');
+      return false;
+    }
+  }
+
+  async contributeXP(guildId: string, xp: number): Promise<boolean> {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('User not authenticated');
+
+      const guild = await this.getGuildById(guildId);
+      if (!guild) throw new Error('Guild not found');
+
+      await supabase.rpc('increment_guild_xp', {
+        p_guild_id: guildId,
+        p_user_id: user.id,
+        p_xp: xp
+      });
+
+      return true;
+    } catch (error) {
+      // Fallback to manual update if RPC not available
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return false;
+
+        const { data: membership } = await supabase
+          .from('guild_members')
+          .select('contribution_xp')
+          .eq('guild_id', guildId)
+          .eq('user_id', user.id)
+          .single();
+
+        if (membership) {
+          await supabase
+            .from('guild_members')
+            .update({ contribution_xp: (membership.contribution_xp || 0) + xp })
+            .eq('guild_id', guildId)
+            .eq('user_id', user.id);
+        }
+
+        const { data: guild } = await supabase
+          .from('music_guilds')
+          .select('total_xp')
+          .eq('id', guildId)
+          .single();
+
+        if (guild) {
+          await supabase
+            .from('music_guilds')
+            .update({ total_xp: (guild.total_xp || 0) + xp })
+            .eq('id', guildId);
+        }
+
+        return true;
+      } catch {
+        return false;
+      }
+    }
+  }
+
+  async createChallenge(
+    guildId: string,
+    challenge: Omit<GuildChallenge, 'id' | 'guild_id' | 'current_value' | 'status' | 'created_at' | 'completed_at'>
+  ): Promise<GuildChallenge | null> {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('User not authenticated');
+
+      const membership = await this.getUserMembership(guildId);
+      if (!membership || (membership.role !== 'owner' && membership.role !== 'admin')) {
+        throw new Error('Not authorized');
+      }
+
+      const { data, error } = await supabase
+        .from('guild_challenges')
+        .insert({
+          ...challenge,
+          guild_id: guildId,
+          current_value: 0,
+          status: 'active'
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      logger.error('Error creating challenge', error as Error, 'GuildService');
+      return null;
+    }
+  }
+
+  async getGuildLeaderboard(limit: number = 20): Promise<Array<Guild & { rank: number }>> {
+    try {
+      const { data, error } = await supabase
+        .from('music_guilds')
+        .select('*')
+        .order('total_xp', { ascending: false })
+        .limit(limit);
+
+      if (error) throw error;
+
+      return (data || []).map((guild, index) => ({
+        ...guild,
+        rank: index + 1
+      }));
+    } catch (error) {
+      logger.error('Error fetching guild leaderboard', error as Error, 'GuildService');
+      return [];
+    }
+  }
+
+  async getMemberLeaderboard(guildId: string): Promise<Array<GuildMember & { rank: number }>> {
+    try {
+      const members = await this.getGuildMembers(guildId);
+      return members.map((member, index) => ({
+        ...member,
+        rank: index + 1
+      }));
+    } catch (error) {
+      logger.error('Error fetching member leaderboard', error as Error, 'GuildService');
+      return [];
+    }
+  }
+
+  async getGuildStats(guildId: string): Promise<{
+    totalXP: number;
+    memberCount: number;
+    activeMembers: number;
+    completedChallenges: number;
+    activeChallenges: number;
+    avgContribution: number;
+    topContributor: GuildMember | null;
+  }> {
+    try {
+      const [guild, members, challenges] = await Promise.all([
+        this.getGuildById(guildId),
+        this.getGuildMembers(guildId),
+        this.getGuildChallenges(guildId)
+      ]);
+
+      const completedChallenges = challenges.filter(c => c.status === 'completed').length;
+      const activeChallenges = challenges.filter(c => c.status === 'active').length;
+      const totalContribution = members.reduce((sum, m) => sum + (m.contribution_xp || 0), 0);
+      const avgContribution = members.length > 0 ? Math.round(totalContribution / members.length) : 0;
+      const topContributor = members.length > 0 ? members[0] : null;
+
+      // Active members (contributed in last 7 days would need timestamp tracking)
+      const activeMembers = members.filter(m => (m.contribution_xp || 0) > 0).length;
+
+      return {
+        totalXP: guild?.total_xp || 0,
+        memberCount: members.length,
+        activeMembers,
+        completedChallenges,
+        activeChallenges,
+        avgContribution,
+        topContributor
+      };
+    } catch (error) {
+      logger.error('Error fetching guild stats', error as Error, 'GuildService');
+      return {
+        totalXP: 0, memberCount: 0, activeMembers: 0, completedChallenges: 0,
+        activeChallenges: 0, avgContribution: 0, topContributor: null
+      };
+    }
+  }
+
+  async searchGuilds(query: string, filters?: {
+    genre?: string;
+    minMembers?: number;
+    maxMembers?: number;
+  }): Promise<Guild[]> {
+    try {
+      let queryBuilder = supabase
+        .from('music_guilds')
+        .select('*')
+        .eq('is_public', true)
+        .or(`name.ilike.%${query}%,description.ilike.%${query}%`);
+
+      if (filters?.genre) {
+        queryBuilder = queryBuilder.eq('music_genre', filters.genre);
+      }
+      if (filters?.minMembers) {
+        queryBuilder = queryBuilder.gte('member_count', filters.minMembers);
+      }
+      if (filters?.maxMembers) {
+        queryBuilder = queryBuilder.lte('member_count', filters.maxMembers);
+      }
+
+      const { data, error } = await queryBuilder
+        .order('total_xp', { ascending: false })
+        .limit(20);
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      logger.error('Error searching guilds', error as Error, 'GuildService');
+      return [];
+    }
+  }
+
+  async getActiveChallenges(guildId: string): Promise<GuildChallenge[]> {
+    try {
+      const { data, error } = await supabase
+        .from('guild_challenges')
+        .select('*')
+        .eq('guild_id', guildId)
+        .eq('status', 'active')
+        .order('expires_at', { ascending: true });
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      logger.error('Error fetching active challenges', error as Error, 'GuildService');
+      return [];
+    }
+  }
 }
 
 export const guildService = new GuildService();
