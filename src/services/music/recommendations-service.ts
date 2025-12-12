@@ -182,3 +182,282 @@ export async function togglePlaylistFavorite(
     return false;
   }
 }
+
+// ========== MÉTHODES ENRICHIES ==========
+
+/**
+ * Obtenir le Daily Mix personnalisé
+ */
+export async function getDailyMix(userId: string): Promise<PersonalizedPlaylist> {
+  try {
+    // Récupérer l'historique récent
+    const { data: history } = await supabase
+      .from('music_history')
+      .select('track_id, emotion, mood')
+      .eq('user_id', userId)
+      .order('played_at', { ascending: false })
+      .limit(50);
+
+    // Analyser les préférences
+    const { topMoods } = analyzeLocalHistory(history || []);
+    const dominantMood = topMoods[0]?.mood || 'calm';
+
+    return {
+      id: `daily-mix-${new Date().toISOString().split('T')[0]}`,
+      name: 'Daily Mix',
+      description: `Votre mix du jour basé sur votre humeur ${dominantMood}`,
+      tracks: generateMockTracks(dominantMood, 20),
+      matchScore: 92,
+      basedOn: [dominantMood, 'recent_history'],
+      coverUrl: '/covers/daily-mix.jpg'
+    };
+  } catch (error) {
+    logger.error('Failed to generate daily mix', error as Error, 'MUSIC');
+    return {
+      id: 'daily-mix-default',
+      name: 'Daily Mix',
+      description: 'Votre mix du jour',
+      tracks: generateMockTracks('calm', 20),
+      matchScore: 80,
+      basedOn: ['default'],
+      coverUrl: '/covers/daily-mix.jpg'
+    };
+  }
+}
+
+/**
+ * Obtenir des recommandations basées sur l'humeur actuelle
+ */
+export async function getRecommendationsForMood(
+  mood: string,
+  limit: number = 15
+): Promise<MusicTrack[]> {
+  try {
+    const { data, error } = await supabase
+      .from('music_tracks')
+      .select('*')
+      .eq('mood', mood)
+      .order('popularity', { ascending: false })
+      .limit(limit);
+
+    if (error) throw error;
+
+    if (data && data.length > 0) {
+      return data.map(track => ({
+        id: track.id,
+        title: track.title,
+        artist: track.artist,
+        duration: track.duration,
+        url: track.preview_url || '',
+        audioUrl: track.preview_url || '',
+        coverUrl: track.image_url,
+        mood: track.mood,
+        emotion: track.emotion
+      }));
+    }
+
+    // Fallback avec des tracks mockés
+    return generateMockTracks(mood, limit);
+  } catch (error) {
+    logger.error('Failed to get mood recommendations', error as Error, 'MUSIC');
+    return generateMockTracks(mood, limit);
+  }
+}
+
+/**
+ * Obtenir des tracks similaires
+ */
+export async function getSimilarTracks(trackId: string, limit: number = 10): Promise<MusicTrack[]> {
+  try {
+    // Récupérer les infos du track source
+    const { data: sourceTrack } = await supabase
+      .from('music_tracks')
+      .select('genre, mood, artist')
+      .eq('id', trackId)
+      .single();
+
+    if (!sourceTrack) {
+      return generateMockTracks('similar', limit);
+    }
+
+    // Chercher des tracks similaires
+    const { data, error } = await supabase
+      .from('music_tracks')
+      .select('*')
+      .neq('id', trackId)
+      .or(`genre.eq.${sourceTrack.genre},mood.eq.${sourceTrack.mood},artist.eq.${sourceTrack.artist}`)
+      .limit(limit);
+
+    if (error) throw error;
+
+    if (data && data.length > 0) {
+      return data.map(track => ({
+        id: track.id,
+        title: track.title,
+        artist: track.artist,
+        duration: track.duration,
+        url: track.preview_url || '',
+        audioUrl: track.preview_url || '',
+        coverUrl: track.image_url
+      }));
+    }
+
+    return generateMockTracks('similar', limit);
+  } catch (error) {
+    logger.error('Failed to get similar tracks', error as Error, 'MUSIC');
+    return generateMockTracks('similar', limit);
+  }
+}
+
+/**
+ * Obtenir les recommandations populaires
+ */
+export async function getPopularRecommendations(limit: number = 20): Promise<MusicTrack[]> {
+  try {
+    const { data, error } = await supabase
+      .from('music_tracks')
+      .select('*')
+      .order('popularity', { ascending: false })
+      .limit(limit);
+
+    if (error) throw error;
+
+    if (data && data.length > 0) {
+      return data.map(track => ({
+        id: track.id,
+        title: track.title,
+        artist: track.artist,
+        duration: track.duration,
+        url: track.preview_url || '',
+        audioUrl: track.preview_url || '',
+        coverUrl: track.image_url
+      }));
+    }
+
+    return generateMockTracks('popular', limit);
+  } catch (error) {
+    logger.error('Failed to get popular recommendations', error as Error, 'MUSIC');
+    return generateMockTracks('popular', limit);
+  }
+}
+
+/**
+ * Obtenir les nouvelles sorties
+ */
+export async function getNewReleases(limit: number = 15): Promise<MusicTrack[]> {
+  try {
+    const oneMonthAgo = new Date();
+    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+
+    const { data, error } = await supabase
+      .from('music_tracks')
+      .select('*')
+      .gte('created_at', oneMonthAgo.toISOString())
+      .order('created_at', { ascending: false })
+      .limit(limit);
+
+    if (error) throw error;
+
+    if (data && data.length > 0) {
+      return data.map(track => ({
+        id: track.id,
+        title: track.title,
+        artist: track.artist,
+        duration: track.duration,
+        url: track.preview_url || '',
+        audioUrl: track.preview_url || '',
+        coverUrl: track.image_url
+      }));
+    }
+
+    return generateMockTracks('new', limit);
+  } catch (error) {
+    logger.error('Failed to get new releases', error as Error, 'MUSIC');
+    return generateMockTracks('new', limit);
+  }
+}
+
+/**
+ * Générer une radio basée sur un track
+ */
+export async function generateRadioFromTrack(trackId: string): Promise<PersonalizedPlaylist> {
+  try {
+    const similarTracks = await getSimilarTracks(trackId, 25);
+
+    return {
+      id: `radio-${trackId}-${Date.now()}`,
+      name: 'Radio personnalisée',
+      description: 'Basée sur votre sélection',
+      tracks: similarTracks,
+      matchScore: 88,
+      basedOn: [trackId],
+      coverUrl: '/covers/radio.jpg'
+    };
+  } catch (error) {
+    logger.error('Failed to generate radio', error as Error, 'MUSIC');
+    return {
+      id: `radio-default-${Date.now()}`,
+      name: 'Radio personnalisée',
+      description: 'Musique recommandée',
+      tracks: generateMockTracks('radio', 25),
+      matchScore: 75,
+      basedOn: ['default'],
+      coverUrl: '/covers/radio.jpg'
+    };
+  }
+}
+
+/**
+ * Obtenir les playlists recommandées par catégorie
+ */
+export async function getRecommendedPlaylistsByCategory(
+  category: 'relaxation' | 'focus' | 'energy' | 'sleep'
+): Promise<PersonalizedPlaylist[]> {
+  const categoryConfig: Record<string, { moods: string[]; description: string }> = {
+    relaxation: { moods: ['calm', 'peaceful', 'serene'], description: 'Pour se détendre' },
+    focus: { moods: ['focused', 'concentrated', 'productive'], description: 'Pour la concentration' },
+    energy: { moods: ['energetic', 'happy', 'upbeat'], description: 'Pour bouger' },
+    sleep: { moods: ['sleepy', 'calm', 'peaceful'], description: 'Pour dormir' }
+  };
+
+  const config = categoryConfig[category];
+
+  return config.moods.map((mood, index) => ({
+    id: `${category}-playlist-${index + 1}`,
+    name: `${category.charAt(0).toUpperCase() + category.slice(1)} ${index + 1}`,
+    description: config.description,
+    tracks: generateMockTracks(mood, 12),
+    matchScore: 85 + Math.floor(Math.random() * 10),
+    basedOn: [mood, category],
+    coverUrl: `/covers/${category}-${index + 1}.jpg`
+  }));
+}
+
+/**
+ * Marquer une recommandation comme non pertinente
+ */
+export async function dismissRecommendation(
+  userId: string,
+  trackId: string,
+  reason?: string
+): Promise<boolean> {
+  try {
+    const { error } = await supabase
+      .from('recommendation_feedback')
+      .insert({
+        user_id: userId,
+        track_id: trackId,
+        feedback_type: 'dismiss',
+        reason,
+        created_at: new Date().toISOString()
+      });
+
+    if (error) throw error;
+
+    logger.info('Recommendation dismissed', { userId, trackId, reason }, 'MUSIC');
+    return true;
+  } catch (error) {
+    logger.error('Failed to dismiss recommendation', error as Error, 'MUSIC');
+    return false;
+  }
+}

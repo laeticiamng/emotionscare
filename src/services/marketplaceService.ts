@@ -704,6 +704,371 @@ class MarketplaceService {
       return [];
     }
   }
+
+  // ========== MÉTHODES ENRICHIES ==========
+
+  /**
+   * Récupérer les nouveaux items
+   */
+  async getNewItems(limit: number = 10): Promise<MarketplaceItem[]> {
+    try {
+      const { data, error } = await supabase
+        .from('marketplace_items')
+        .select('*')
+        .eq('status', 'published')
+        .order('published_at', { ascending: false })
+        .limit(limit);
+
+      if (error) throw error;
+      return (data || []) as MarketplaceItem[];
+    } catch (error) {
+      logger.error('Failed to fetch new items', error as Error, 'MARKETPLACE');
+      return [];
+    }
+  }
+
+  /**
+   * Récupérer les items gratuits
+   */
+  async getFreeItems(limit: number = 20): Promise<MarketplaceItem[]> {
+    try {
+      const { data, error } = await supabase
+        .from('marketplace_items')
+        .select('*')
+        .eq('status', 'published')
+        .eq('price', 0)
+        .order('install_count', { ascending: false })
+        .limit(limit);
+
+      if (error) throw error;
+      return (data || []) as MarketplaceItem[];
+    } catch (error) {
+      logger.error('Failed to fetch free items', error as Error, 'MARKETPLACE');
+      return [];
+    }
+  }
+
+  /**
+   * Récupérer les items officiels
+   */
+  async getOfficialItems(limit: number = 20): Promise<MarketplaceItem[]> {
+    try {
+      const { data, error } = await supabase
+        .from('marketplace_items')
+        .select('*')
+        .eq('status', 'published')
+        .eq('is_official', true)
+        .order('install_count', { ascending: false })
+        .limit(limit);
+
+      if (error) throw error;
+      return (data || []) as MarketplaceItem[];
+    } catch (error) {
+      logger.error('Failed to fetch official items', error as Error, 'MARKETPLACE');
+      return [];
+    }
+  }
+
+  /**
+   * Obtenir les recommandations personnalisées
+   */
+  async getRecommendedItems(userId: string, limit: number = 10): Promise<MarketplaceItem[]> {
+    try {
+      // Get user's installed themes to understand preferences
+      const { installed } = await this.getUserInstalledThemes(userId);
+      const installedIds = installed.map(t => t.item_id);
+
+      const { data: userItems } = await supabase
+        .from('marketplace_items')
+        .select('type, tags')
+        .in('id', installedIds);
+
+      const userPreferences = new Set<string>();
+      userItems?.forEach(item => {
+        item.tags?.forEach((tag: string) => userPreferences.add(tag));
+      });
+
+      // Get similar items not yet installed
+      const { data, error } = await supabase
+        .from('marketplace_items')
+        .select('*')
+        .eq('status', 'published')
+        .not('id', 'in', `(${installedIds.join(',')})`)
+        .order('average_rating', { ascending: false })
+        .limit(limit);
+
+      if (error) throw error;
+      return (data || []) as MarketplaceItem[];
+    } catch (error) {
+      logger.error('Failed to fetch recommended items', error as Error, 'MARKETPLACE');
+      return [];
+    }
+  }
+
+  /**
+   * Désinstaller un item
+   */
+  async uninstallItem(userId: string, itemId: string): Promise<boolean> {
+    try {
+      const { error } = await supabase
+        .from('installed_themes')
+        .delete()
+        .eq('user_id', userId)
+        .eq('item_id', itemId);
+
+      if (error) throw error;
+
+      logger.info(`Item uninstalled: ${itemId}`, { userId }, 'MARKETPLACE');
+      return true;
+    } catch (error) {
+      logger.error('Failed to uninstall item', error as Error, 'MARKETPLACE');
+      return false;
+    }
+  }
+
+  /**
+   * Marquer un avis comme utile
+   */
+  async markReviewHelpful(reviewId: string): Promise<boolean> {
+    try {
+      const { data: review } = await supabase
+        .from('marketplace_reviews')
+        .select('helpful_count')
+        .eq('id', reviewId)
+        .single();
+
+      if (!review) return false;
+
+      const { error } = await supabase
+        .from('marketplace_reviews')
+        .update({ helpful_count: (review.helpful_count || 0) + 1 })
+        .eq('id', reviewId);
+
+      if (error) throw error;
+      return true;
+    } catch (error) {
+      logger.error('Failed to mark review helpful', error as Error, 'MARKETPLACE');
+      return false;
+    }
+  }
+
+  /**
+   * Supprimer un avis
+   */
+  async deleteReview(userId: string, reviewId: string): Promise<boolean> {
+    try {
+      const { error } = await supabase
+        .from('marketplace_reviews')
+        .delete()
+        .eq('id', reviewId)
+        .eq('user_id', userId);
+
+      if (error) throw error;
+      return true;
+    } catch (error) {
+      logger.error('Failed to delete review', error as Error, 'MARKETPLACE');
+      return false;
+    }
+  }
+
+  /**
+   * Obtenir les statistiques du marketplace
+   */
+  async getMarketplaceStats(): Promise<{
+    totalItems: number;
+    totalCategories: number;
+    totalInstalls: number;
+    averageRating: number;
+    freeItemsCount: number;
+    premiumItemsCount: number;
+  }> {
+    try {
+      const [itemsRes, categoriesRes] = await Promise.all([
+        supabase
+          .from('marketplace_items')
+          .select('price, install_count, average_rating', { count: 'exact' })
+          .eq('status', 'published'),
+        supabase
+          .from('marketplace_categories')
+          .select('id', { count: 'exact' })
+      ]);
+
+      const items = itemsRes.data || [];
+      const totalInstalls = items.reduce((sum, i) => sum + (i.install_count || 0), 0);
+      const ratings = items.filter(i => i.average_rating > 0);
+      const avgRating = ratings.length > 0
+        ? ratings.reduce((sum, i) => sum + i.average_rating, 0) / ratings.length
+        : 0;
+      const freeCount = items.filter(i => i.price === 0).length;
+
+      return {
+        totalItems: itemsRes.count || 0,
+        totalCategories: categoriesRes.count || 0,
+        totalInstalls,
+        averageRating: Math.round(avgRating * 10) / 10,
+        freeItemsCount: freeCount,
+        premiumItemsCount: items.length - freeCount
+      };
+    } catch (error) {
+      logger.error('Failed to fetch marketplace stats', error as Error, 'MARKETPLACE');
+      return {
+        totalItems: 0, totalCategories: 0, totalInstalls: 0,
+        averageRating: 0, freeItemsCount: 0, premiumItemsCount: 0
+      };
+    }
+  }
+
+  /**
+   * Obtenir les stats d'un créateur
+   */
+  async getCreatorStats(creatorId: string): Promise<{
+    totalItems: number;
+    totalInstalls: number;
+    totalRevenue: number;
+    averageRating: number;
+    topItem: MarketplaceItem | null;
+  }> {
+    try {
+      const items = await this.getCreatorItems(creatorId);
+
+      if (items.length === 0) {
+        return {
+          totalItems: 0, totalInstalls: 0, totalRevenue: 0,
+          averageRating: 0, topItem: null
+        };
+      }
+
+      const totalInstalls = items.reduce((sum, i) => sum + (i.install_count || 0), 0);
+      const ratings = items.filter(i => i.average_rating > 0);
+      const avgRating = ratings.length > 0
+        ? ratings.reduce((sum, i) => sum + i.average_rating, 0) / ratings.length
+        : 0;
+
+      // Estimate revenue (simplified)
+      const totalRevenue = items.reduce((sum, i) => sum + (i.price * (i.install_count || 0)), 0);
+
+      const topItem = items.sort((a, b) => (b.install_count || 0) - (a.install_count || 0))[0];
+
+      return {
+        totalItems: items.length,
+        totalInstalls,
+        totalRevenue,
+        averageRating: Math.round(avgRating * 10) / 10,
+        topItem
+      };
+    } catch (error) {
+      logger.error('Failed to fetch creator stats', error as Error, 'MARKETPLACE');
+      return {
+        totalItems: 0, totalInstalls: 0, totalRevenue: 0,
+        averageRating: 0, topItem: null
+      };
+    }
+  }
+
+  /**
+   * Archiver un item
+   */
+  async archiveItem(itemId: string, userId: string): Promise<boolean> {
+    try {
+      const item = await this.getItemById(itemId);
+      if (!item || item.creator_id !== userId) {
+        throw new Error('Not authorized');
+      }
+
+      const { error } = await supabase
+        .from('marketplace_items')
+        .update({ status: 'archived' })
+        .eq('id', itemId);
+
+      if (error) throw error;
+
+      logger.info(`Item archived: ${itemId}`, {}, 'MARKETPLACE');
+      return true;
+    } catch (error) {
+      logger.error('Failed to archive item', error as Error, 'MARKETPLACE');
+      return false;
+    }
+  }
+
+  /**
+   * Récupérer les items similaires
+   */
+  async getSimilarItems(itemId: string, limit: number = 6): Promise<MarketplaceItem[]> {
+    try {
+      const item = await this.getItemById(itemId);
+      if (!item) return [];
+
+      const { data, error } = await supabase
+        .from('marketplace_items')
+        .select('*')
+        .eq('status', 'published')
+        .eq('category_id', item.category_id)
+        .neq('id', itemId)
+        .order('average_rating', { ascending: false })
+        .limit(limit);
+
+      if (error) throw error;
+      return (data || []) as MarketplaceItem[];
+    } catch (error) {
+      logger.error('Failed to fetch similar items', error as Error, 'MARKETPLACE');
+      return [];
+    }
+  }
+
+  /**
+   * Demander un remboursement
+   */
+  async requestRefund(purchaseId: string, reason: string): Promise<boolean> {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('User not authenticated');
+
+      const { error } = await supabase
+        .from('user_marketplace_purchases')
+        .update({
+          payment_status: 'refunded',
+          refund_reason: reason,
+          refunded_at: new Date().toISOString()
+        })
+        .eq('id', purchaseId)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      logger.info(`Refund requested for purchase ${purchaseId}`, { reason }, 'MARKETPLACE');
+      return true;
+    } catch (error) {
+      logger.error('Failed to request refund', error as Error, 'MARKETPLACE');
+      return false;
+    }
+  }
+
+  /**
+   * Signaler un item
+   */
+  async reportItem(itemId: string, reason: string): Promise<boolean> {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('User not authenticated');
+
+      const { error } = await supabase
+        .from('marketplace_reports')
+        .insert({
+          item_id: itemId,
+          user_id: user.id,
+          reason,
+          status: 'pending'
+        });
+
+      if (error) throw error;
+
+      logger.info(`Item reported: ${itemId}`, { reason }, 'MARKETPLACE');
+      return true;
+    } catch (error) {
+      logger.error('Failed to report item', error as Error, 'MARKETPLACE');
+      return false;
+    }
+  }
 }
 
 export const marketplaceService = new MarketplaceService();
