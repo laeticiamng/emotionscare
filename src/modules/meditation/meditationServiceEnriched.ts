@@ -378,8 +378,6 @@ export async function getRecommendations(options?: {
         basedOn: 'mood',
       });
     }
-  }
-  }
   
   // History-based - favorite technique
   if (stats.favoriteTechnique) {
@@ -694,3 +692,5 @@ export const meditationServiceEnriched = {
   exportUserData,
   downloadExport,
 };
+
+export default meditationServiceEnriched;
