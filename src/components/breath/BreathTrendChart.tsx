@@ -31,15 +31,15 @@ interface Props {
   title?: string;
 }
 
-type MetricKey = 'hrv_stress_idx' | 'coherence_avg' | 'mindfulness_avg' | 'relax_idx' | 'mood_score';
+type MetricKey = 'hrv_stress_idx' | 'coherence_avg' | 'mindfulness_pct' | 'relax_pct' | 'mood_avg';
 type TimeRange = '1w' | '1m' | '3m' | '6m' | 'all';
 
 const metricConfig: Record<MetricKey, { label: string; color: string; icon: React.ReactNode }> = {
   hrv_stress_idx: { label: 'HRV Stress', color: '#ef4444', icon: <Activity className="h-4 w-4" /> },
   coherence_avg: { label: 'Cohérence', color: '#22c55e', icon: <Heart className="h-4 w-4" /> },
-  mindfulness_avg: { label: 'Pleine conscience', color: '#3b82f6', icon: <Brain className="h-4 w-4" /> },
-  relax_idx: { label: 'Relaxation', color: '#8b5cf6', icon: <Zap className="h-4 w-4" /> },
-  mood_score: { label: 'Humeur', color: '#f59e0b', icon: <Heart className="h-4 w-4" /> }
+  mindfulness_pct: { label: 'Pleine conscience', color: '#3b82f6', icon: <Brain className="h-4 w-4" /> },
+  relax_pct: { label: 'Relaxation', color: '#8b5cf6', icon: <Zap className="h-4 w-4" /> },
+  mood_avg: { label: 'Humeur', color: '#f59e0b', icon: <Heart className="h-4 w-4" /> }
 };
 
 const BreathTrendChart: React.FC<Props> = ({ 
@@ -49,7 +49,7 @@ const BreathTrendChart: React.FC<Props> = ({
   title = 'Tendances Respiration'
 }) => {
   const { toast } = useToast();
-  const [selectedMetrics, setSelectedMetrics] = useState<MetricKey[]>(['hrv_stress_idx', 'coherence_avg']);
+  const [selectedMetrics, setSelectedMetrics] = useState<MetricKey[]>(['hrv_stress_idx', 'coherence_avg'] as MetricKey[]);
   const [timeRange, setTimeRange] = useState<TimeRange>('1m');
   const [chartType, setChartType] = useState<'line' | 'area'>('line');
 
@@ -78,7 +78,7 @@ const BreathTrendChart: React.FC<Props> = ({
     }
 
     return data.filter(item => {
-      const itemDate = new Date(item.week || item.week_start || '');
+      const itemDate = new Date(item.week || '');
       return itemDate >= cutoffDate;
     });
   }, [data, timeRange]);
@@ -90,7 +90,7 @@ const BreathTrendChart: React.FC<Props> = ({
     const result: Record<MetricKey, { current: number; previous: number; trend: 'up' | 'down' | 'stable'; avg: number }> = {} as any;
     
     selectedMetrics.forEach(metric => {
-      const values = filteredData.map(d => d[metric] as number).filter(v => v != null);
+      const values = filteredData.map(d => (d as unknown as Record<string, unknown>)[metric] as number).filter(v => v != null);
       if (values.length === 0) return;
       
       const current = values[values.length - 1];
@@ -117,17 +117,23 @@ const BreathTrendChart: React.FC<Props> = ({
   };
 
   const handleExport = () => {
-    const exportData = filteredData.map(row => ({
-      date: row.week || row.week_start,
-      ...Object.fromEntries(selectedMetrics.map(m => [metricConfig[m].label, row[m]]))
-    }));
+    const exportData = filteredData.map(row => {
+      const rowRecord = row as unknown as Record<string, unknown>;
+      return {
+        date: row.week,
+        ...Object.fromEntries(selectedMetrics.map(m => [metricConfig[m].label, rowRecord[m]]))
+      };
+    });
     
     const csv = [
       ['Date', ...selectedMetrics.map(m => metricConfig[m].label)].join(','),
-      ...exportData.map(row => [
-        row.date,
-        ...selectedMetrics.map(m => row[metricConfig[m].label] ?? '')
-      ].join(','))
+      ...exportData.map(row => {
+        const rowData = row as Record<string, unknown>;
+        return [
+          row.date,
+          ...selectedMetrics.map(m => rowData[metricConfig[m].label] ?? '')
+        ].join(',');
+      })
     ].join('\n');
 
     const blob = new Blob([csv], { type: 'text/csv' });
