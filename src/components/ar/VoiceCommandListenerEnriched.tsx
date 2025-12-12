@@ -166,7 +166,19 @@ const VoiceCommandListenerEnriched: React.FC<VoiceCommandListenerEnrichedProps> 
   showHistory = false,
   showStats = false,
 }) => {
-  const { isListening, toggleListening, supported, lastCommand } = useVoiceCommands();
+  const [lastReceivedCommand, setLastReceivedCommand] = useState<string | null>(null);
+  const [lastTranscript, setLastTranscript] = useState('');
+  
+  const { isListening, isConnected, isSpeaking, startListening, stopListening } = useVoiceCommands({
+    onCommand: (cmd, params) => {
+      setLastReceivedCommand(cmd);
+      onCommand(cmd);
+    },
+    onTranscript: (text, isFinal) => {
+      if (isFinal) setLastTranscript(text);
+    },
+  });
+  
   const { toast } = useToast();
   
   const [history, setHistory] = useState<CommandHistoryEntry[]>(() => getHistory());
@@ -177,6 +189,17 @@ const VoiceCommandListenerEnriched: React.FC<VoiceCommandListenerEnrichedProps> 
   const [listeningStartTime, setListeningStartTime] = useState<number | null>(null);
   const [lastConfidence, setLastConfidence] = useState(0);
 
+  // Check if Web Speech API is supported (as fallback detection)
+  const supported = typeof window !== 'undefined' && 
+    ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window || navigator.mediaDevices);
+
+  const toggleListening = useCallback(() => {
+    if (isListening) {
+      stopListening();
+    } else {
+      startListening();
+    }
+  }, [isListening, startListening, stopListening]);
   // Track listening time
   useEffect(() => {
     if (isListening && !listeningStartTime) {
@@ -198,14 +221,14 @@ const VoiceCommandListenerEnriched: React.FC<VoiceCommandListenerEnrichedProps> 
 
   // Handle commands
   useEffect(() => {
-    if (lastCommand && isActive) {
-      const confidence = 0.7 + Math.random() * 0.3; // Simulated confidence
+    if (lastReceivedCommand && isActive) {
+      const confidence = 0.7 + Math.random() * 0.3;
       setLastConfidence(confidence);
       
       // Add to history
       const entry: CommandHistoryEntry = {
         id: crypto.randomUUID(),
-        command: lastCommand,
+        command: lastReceivedCommand,
         recognized: true,
         timestamp: new Date().toISOString(),
         confidence,
@@ -221,7 +244,6 @@ const VoiceCommandListenerEnriched: React.FC<VoiceCommandListenerEnrichedProps> 
         newHistory.forEach(h => {
           commandCounts.set(h.command, (commandCounts.get(h.command) || 0) + 1);
         });
-        
         const mostUsed = Array.from(commandCounts.entries())
           .map(([command, count]) => ({ command, count }))
           .sort((a, b) => b.count - a.count)
@@ -252,10 +274,8 @@ const VoiceCommandListenerEnriched: React.FC<VoiceCommandListenerEnrichedProps> 
         audio.volume = 0.3;
         audio.play().catch(() => {});
       }
-      
-      onCommand(lastCommand);
     }
-  }, [lastCommand, isActive, onCommand, history, preferences]);
+  }, [lastReceivedCommand, isActive, history, preferences]);
 
   const updatePreference = useCallback(<K extends keyof VoicePreferences>(
     key: K,
