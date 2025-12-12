@@ -46,22 +46,10 @@ const MusicProgressBar: React.FC<ProgressBarProps> = ({
           max={max}
           value={value}
           onChange={handleInputChange}
-          className="
-            w-full h-1 bg-input rounded-full appearance-none
-            cursor-pointer
-            focus:outline-none focus:ring-2 focus:ring-primary
-            [&::-webkit-slider-thumb]:(
-              appearance-none w-4 h-4 bg-primary rounded-full border-none
-              cursor-pointer
-              transition-transform duration-200
-              transform translate-y-[-1.5px]
-            )
-            [&::-moz-range-thumb]:(
-              appearance-none w-4 h-4 bg-primary rounded-full border-none
-              cursor-pointer
-              transition-transform duration-200
-            )
-          "
+          className="w-full h-1 bg-input rounded-full appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary"
+          style={{
+            WebkitAppearance: 'none',
+          }}
         />
         <div
           className="absolute top-0 left-0 h-1 bg-primary rounded-full pointer-events-none"
