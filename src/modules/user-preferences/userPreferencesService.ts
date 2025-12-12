@@ -865,7 +865,7 @@ export class UserPreferencesService {
     const settings = await this.getUserSettings(userId);
 
     return {
-      account_created: settings.created_at || 'N/A',
+      account_created: (settings as Record<string, unknown>).created_at || 'N/A',
       last_activity: new Date().toISOString(),
       data_retention_setting: `${settings.emotion_data_retention_days} jours`,
       analytics_enabled: settings.analytics_tracking,

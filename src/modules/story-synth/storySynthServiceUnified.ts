@@ -33,9 +33,10 @@ export interface EnrichedStorySynthSession {
   emotional_impact?: EmotionalImpactPoint[];
   therapeutic_goals?: string[];
   personalization_level?: number;
-  duration_seconds: number;
+  duration_seconds?: number; // Made optional to support DB records without this field
   reading_duration_seconds?: number;
   created_at: string;
+  updated_at?: string;
   completed_at?: string;
   achievements_unlocked?: string[];
   story_content?: StoryContent;

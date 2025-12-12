@@ -34,6 +34,7 @@ interface UserSegment {
   users: number;
   averageScore: number;
   engagement: number;
+  color?: string;
 }
 
 class AnalyticsService {

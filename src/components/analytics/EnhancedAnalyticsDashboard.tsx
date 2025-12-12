@@ -81,7 +81,7 @@ interface TimeSeriesData {
   focus: number;
 }
 
-interface UserSegment {
+interface LocalUserSegment {
   segment: string;
   users: number;
   averageScore: number;
@@ -109,7 +109,7 @@ const EnhancedAnalyticsDashboard: React.FC = () => {
   const [metrics, setMetrics] = useState<AnalyticsMetrics | null>(null);
   const [emotionData, setEmotionData] = useState<(EmotionStats & { color: string })[]>([]);
   const [timeSeriesData, setTimeSeriesData] = useState<any[]>([]);
-  const [userSegments, setUserSegments] = useState<UserSegment[]>([]);
+  const [userSegments, setUserSegments] = useState<LocalUserSegment[]>([]);
   const [dataLoading, setDataLoading] = useState(true);
 
   // Chargement des données réelles depuis le service
@@ -129,7 +129,11 @@ const EnhancedAnalyticsDashboard: React.FC = () => {
         color: getEmotionColor(e.emotion)
       })));
       setTimeSeriesData(timeData);
-      setUserSegments(segmentsData);
+      // Map UserSegment from service to LocalUserSegment with color
+      setUserSegments(segmentsData.map((s, idx) => ({
+        ...s,
+        color: s.color || ['#10B981', '#3B82F6', '#F59E0B', '#EF4444'][idx % 4]
+      })));
     } catch (error) {
       logger.error('Erreur chargement données analytics', { error }, 'ANALYTICS');
     } finally {

@@ -232,6 +232,7 @@ export interface DataExportRequest {
   scope: DataExportScope[];
   date_from?: string;
   date_to?: string;
+  include_sections?: string[];
 }
 
 export interface DataExportResult {
@@ -240,6 +241,7 @@ export interface DataExportResult {
   download_url?: string;
   expires_at?: string;
   error_message?: string;
+  error?: string;
 }
 
 // ============================================================================
@@ -260,6 +262,7 @@ export interface AccountDeletionResult {
   success: boolean;
   deletion_scheduled_for?: string;
   grace_period_days?: number;
+  cancellation_url?: string;
   error?: string;
 }
 

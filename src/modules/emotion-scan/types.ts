@@ -36,7 +36,21 @@ export const EmotionType = z.enum([
   'joyful',
   'frustrated',
   'confident',
-  'overwhelmed'
+  'overwhelmed',
+  // Extended emotions for richer analysis
+  'contempt',
+  'confused',
+  'curious',
+  'amused',
+  'focused',
+  'determined',
+  'enlightened',
+  'reflective',
+  'disappointed',
+  'empathetic',
+  'proud',
+  'relieved',
+  'satisfied'
 ]);
 export type EmotionType = z.infer<typeof EmotionType>;
 
@@ -108,6 +122,12 @@ export const FacialAnalysisResult = z.object({
     brightness: z.number().optional(),
     sharpness: z.number().optional(),
     face_size: z.number().optional()
+  }).optional(),
+  boundingBox: z.object({
+    x: z.number(),
+    y: z.number(),
+    width: z.number(),
+    height: z.number()
   }).optional()
 });
 export type FacialAnalysisResult = z.infer<typeof FacialAnalysisResult>;
