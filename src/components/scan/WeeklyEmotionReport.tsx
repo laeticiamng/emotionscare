@@ -3,12 +3,14 @@
  * Génère un résumé des patterns émotionnels de la semaine
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
   Calendar,
   TrendingUp,
@@ -25,11 +27,17 @@ import {
   Heart,
   Zap,
   Brain,
-  Target
+  Target,
+  BarChart3,
+  History,
+  Star,
+  Award
 } from 'lucide-react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, BarChart, Bar } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
 import { format, startOfWeek, endOfWeek, subWeeks, addWeeks } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useToast } from '@/hooks/use-toast';
 
 interface DailyEmotion {
   day: string;
@@ -49,6 +57,7 @@ interface WeeklyStats {
   peakDay: string;
   lowDay: string;
   insights: string[];
+  weeklyGoalProgress: number;
 }
 
 interface EmotionDimension {
@@ -56,6 +65,14 @@ interface EmotionDimension {
   score: number;
   fullMark: 100;
 }
+
+interface WeekSnapshot {
+  weekStart: string;
+  stats: WeeklyStats;
+}
+
+const STORAGE_KEY = 'weekly_emotion_reports';
+const GOALS_KEY = 'weekly_emotion_goals';
 
 const MOCK_WEEKLY_DATA: DailyEmotion[] = [
   { day: 'Lun', valence: 65, arousal: 55, dominantEmotion: 'Calme', scansCount: 3 },
@@ -76,27 +93,43 @@ const EMOTION_DIMENSIONS: EmotionDimension[] = [
   { dimension: 'Gratitude', score: 82, fullMark: 100 },
 ];
 
+const PIE_COLORS = ['#10b981', '#3b82f6', '#8b5cf6', '#f59e0b', '#ef4444', '#6366f1'];
+
 export const WeeklyEmotionReport: React.FC = () => {
+  const { toast } = useToast();
   const [currentWeek, setCurrentWeek] = useState(new Date());
   const [weeklyData, setWeeklyData] = useState<DailyEmotion[]>(MOCK_WEEKLY_DATA);
   const [stats, setStats] = useState<WeeklyStats | null>(null);
-  const [isGenerating, setIsGenerating] = useState(false);
+  const [activeTab, setActiveTab] = useState('overview');
+  const [weeklyGoal, setWeeklyGoal] = useState(() => {
+    try {
+      return parseInt(localStorage.getItem(GOALS_KEY) || '14', 10);
+    } catch {
+      return 14;
+    }
+  });
+  const [reportHistory, setReportHistory] = useState<WeekSnapshot[]>(() => {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
+    }
+  });
 
   useEffect(() => {
     generateStats();
-  }, [weeklyData]);
+  }, [weeklyData, weeklyGoal]);
 
   const generateStats = () => {
     const avgValence = weeklyData.reduce((acc, d) => acc + d.valence, 0) / weeklyData.length;
     const avgArousal = weeklyData.reduce((acc, d) => acc + d.arousal, 0) / weeklyData.length;
     const totalScans = weeklyData.reduce((acc, d) => acc + d.scansCount, 0);
     
-    // Calculer la tendance
     const firstHalf = weeklyData.slice(0, 3).reduce((acc, d) => acc + d.valence, 0) / 3;
     const secondHalf = weeklyData.slice(4).reduce((acc, d) => acc + d.valence, 0) / 3;
     const trend = secondHalf > firstHalf + 5 ? 'up' : secondHalf < firstHalf - 5 ? 'down' : 'stable';
     
-    // Top émotions
     const emotionCounts: Record<string, number> = {};
     weeklyData.forEach(d => {
       emotionCounts[d.dominantEmotion] = (emotionCounts[d.dominantEmotion] || 0) + d.scansCount;
@@ -106,10 +139,9 @@ export const WeeklyEmotionReport: React.FC = () => {
       .sort((a, b) => b.count - a.count)
       .slice(0, 4);
     
-    // Jours remarquables
     const sortedByValence = [...weeklyData].sort((a, b) => b.valence - a.valence);
     
-    setStats({
+    const newStats: WeeklyStats = {
       averageValence: Math.round(avgValence),
       averageArousal: Math.round(avgArousal),
       trend,
@@ -118,17 +150,46 @@ export const WeeklyEmotionReport: React.FC = () => {
       topEmotions,
       peakDay: sortedByValence[0].day,
       lowDay: sortedByValence[sortedByValence.length - 1].day,
+      weeklyGoalProgress: Math.min(100, (totalScans / weeklyGoal) * 100),
       insights: [
-        'Votre humeur est généralement meilleure en fin de semaine.',
-        'Les jours avec plus de scans montrent une meilleure conscience émotionnelle.',
-        'Continuez à pratiquer la régulation émotionnelle, vos progrès sont visibles !'
+        avgValence > 70 ? 'Votre bien-être émotionnel est excellent cette semaine !' : 'Votre humeur montre des opportunités d\'amélioration.',
+        totalScans >= weeklyGoal ? '🎯 Objectif hebdomadaire atteint !' : `Encore ${weeklyGoal - totalScans} scans pour atteindre votre objectif.`,
+        trend === 'up' ? 'Tendance positive : votre humeur s\'améliore au fil de la semaine.' : 
+        trend === 'down' ? 'Prenez soin de vous - votre énergie semble diminuer.' : 
+        'Votre humeur est stable cette semaine.',
+        topEmotions[0]?.name === 'Joie' || topEmotions[0]?.name === 'Sérénité' 
+          ? 'Les émotions positives dominent votre semaine.' 
+          : 'Essayez des activités qui vous apportent de la joie.'
       ]
+    };
+    
+    setStats(newStats);
+  };
+
+  const saveReport = useCallback(() => {
+    if (!stats) return;
+    
+    const weekStart = startOfWeek(currentWeek, { weekStartsOn: 1 }).toISOString();
+    const snapshot: WeekSnapshot = { weekStart, stats };
+    
+    setReportHistory(prev => {
+      const filtered = prev.filter(r => r.weekStart !== weekStart);
+      const updated = [snapshot, ...filtered].slice(0, 12);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+      return updated;
     });
+    
+    toast({ title: 'Rapport sauvegardé', description: 'Consultez l\'historique.' });
+  }, [stats, currentWeek, toast]);
+
+  const updateWeeklyGoal = (goal: string) => {
+    const newGoal = parseInt(goal, 10);
+    setWeeklyGoal(newGoal);
+    localStorage.setItem(GOALS_KEY, goal);
   };
 
   const navigateWeek = (direction: 'prev' | 'next') => {
     setCurrentWeek(prev => direction === 'prev' ? subWeeks(prev, 1) : addWeeks(prev, 1));
-    // En prod, charger les données de la nouvelle semaine
   };
 
   const weekStart = startOfWeek(currentWeek, { weekStartsOn: 1 });
@@ -137,10 +198,51 @@ export const WeeklyEmotionReport: React.FC = () => {
   const TrendIcon = stats?.trend === 'up' ? TrendingUp : stats?.trend === 'down' ? TrendingDown : Minus;
   const trendColor = stats?.trend === 'up' ? 'text-green-500' : stats?.trend === 'down' ? 'text-red-500' : 'text-muted-foreground';
 
+  const handleExportJSON = () => {
+    const data = {
+      weekStart: weekStart.toISOString(),
+      weekEnd: weekEnd.toISOString(),
+      dailyData: weeklyData,
+      stats,
+      dimensions: EMOTION_DIMENSIONS,
+      exportDate: new Date().toISOString()
+    };
+    
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `emotion-report-${format(weekStart, 'yyyy-MM-dd')}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    
+    toast({ title: 'Export réussi' });
+  };
+
+  const handleShare = async () => {
+    const text = `📊 Mon rapport émotionnel (${format(weekStart, 'd MMM', { locale: fr })} - ${format(weekEnd, 'd MMM', { locale: fr })}):\n` +
+      `• Bien-être: ${stats?.averageValence}%\n` +
+      `• Énergie: ${stats?.averageArousal}%\n` +
+      `• Scans: ${stats?.totalScans}\n` +
+      `• Tendance: ${stats?.trend === 'up' ? '📈 En hausse' : stats?.trend === 'down' ? '📉 En baisse' : '→ Stable'}`;
+    
+    if (navigator.share) {
+      await navigator.share({ title: 'Mon rapport émotionnel', text });
+    } else {
+      await navigator.clipboard.writeText(text);
+      toast({ title: 'Copié !' });
+    }
+  };
+
+  const emotionPieData = stats?.topEmotions.map(e => ({
+    name: e.name,
+    value: e.percentage
+  })) || [];
+
   return (
     <div className="space-y-6">
       {/* Header avec navigation */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold text-foreground flex items-center gap-2">
             <Calendar className="h-6 w-6 text-primary" />
@@ -150,7 +252,7 @@ export const WeeklyEmotionReport: React.FC = () => {
             Analyse de vos émotions cette semaine
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <Button variant="outline" size="icon" onClick={() => navigateWeek('prev')}>
             <ChevronLeft className="h-4 w-4" />
           </Button>
@@ -165,282 +267,430 @@ export const WeeklyEmotionReport: React.FC = () => {
           >
             <ChevronRight className="h-4 w-4" />
           </Button>
+          <Button variant="outline" size="icon" onClick={handleExportJSON}>
+            <Download className="h-4 w-4" />
+          </Button>
+          <Button variant="outline" size="icon" onClick={handleShare}>
+            <Share2 className="h-4 w-4" />
+          </Button>
+          <Button variant="default" size="sm" onClick={saveReport}>
+            <Star className="h-4 w-4 mr-1" />
+            Sauvegarder
+          </Button>
         </div>
       </div>
 
-      {/* Stats principales */}
-      {stats && (
-        <div className="grid gap-4 md:grid-cols-4">
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="overview" className="gap-2">
+            <BarChart3 className="h-4 w-4" />
+            Aperçu
+          </TabsTrigger>
+          <TabsTrigger value="charts" className="gap-2">
+            <TrendingUp className="h-4 w-4" />
+            Graphiques
+          </TabsTrigger>
+          <TabsTrigger value="insights" className="gap-2">
+            <Sparkles className="h-4 w-4" />
+            Insights
+          </TabsTrigger>
+          <TabsTrigger value="history" className="gap-2">
+            <History className="h-4 w-4" />
+            Historique
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="overview" className="mt-4 space-y-4">
+          {/* Weekly Goal */}
           <Card>
             <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">Bien-être moyen</p>
-                  <p className="text-2xl font-bold text-foreground">{stats.averageValence}%</p>
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <Target className="h-5 w-5 text-primary" />
+                  <span className="font-medium">Objectif hebdomadaire</span>
                 </div>
-                <div className={`p-3 rounded-full ${stats.averageValence > 60 ? 'bg-green-500/10' : 'bg-amber-500/10'}`}>
-                  <Heart className={`h-5 w-5 ${stats.averageValence > 60 ? 'text-green-500' : 'text-amber-500'}`} />
-                </div>
+                <Select value={weeklyGoal.toString()} onValueChange={updateWeeklyGoal}>
+                  <SelectTrigger className="w-24">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {[7, 14, 21, 28].map(g => (
+                      <SelectItem key={g} value={g.toString()}>{g} scans</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
-              <div className="flex items-center gap-1 mt-2">
-                <TrendIcon className={`h-4 w-4 ${trendColor}`} />
-                <span className={`text-xs ${trendColor}`}>
-                  {stats.trend === 'up' ? 'En hausse' : stats.trend === 'down' ? 'En baisse' : 'Stable'}
+              <div className="flex items-center gap-4">
+                <Progress value={stats?.weeklyGoalProgress || 0} className="flex-1" />
+                <span className="text-sm font-medium">
+                  {stats?.totalScans || 0}/{weeklyGoal}
                 </span>
               </div>
+              {stats?.weeklyGoalProgress === 100 && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mt-2 flex items-center gap-2 text-green-600"
+                >
+                  <Award className="h-4 w-4" />
+                  <span className="text-sm font-medium">Objectif atteint !</span>
+                </motion.div>
+              )}
             </CardContent>
           </Card>
 
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">Énergie moyenne</p>
-                  <p className="text-2xl font-bold text-foreground">{stats.averageArousal}%</p>
-                </div>
-                <div className="p-3 rounded-full bg-primary/10">
-                  <Zap className="h-5 w-5 text-primary" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">Scans effectués</p>
-                  <p className="text-2xl font-bold text-foreground">{stats.totalScans}</p>
-                </div>
-                <div className="p-3 rounded-full bg-accent/10">
-                  <Brain className="h-5 w-5 text-accent" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">Série actuelle</p>
-                  <p className="text-2xl font-bold text-foreground">{stats.streakDays} jours</p>
-                </div>
-                <div className="p-3 rounded-full bg-orange-500/10">
-                  <Target className="h-5 w-5 text-orange-500" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
-
-      {/* Graphiques */}
-      <div className="grid gap-6 lg:grid-cols-2">
-        {/* Évolution journalière */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Évolution quotidienne</CardTitle>
-            <CardDescription>Valence et arousal jour par jour</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="h-[250px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={weeklyData}>
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                  <XAxis dataKey="day" className="text-xs" />
-                  <YAxis domain={[0, 100]} className="text-xs" />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: 'hsl(var(--background))', 
-                      border: '1px solid hsl(var(--border))',
-                      borderRadius: '8px'
-                    }}
-                  />
-                  <Line 
-                    type="monotone" 
-                    dataKey="valence" 
-                    stroke="hsl(var(--primary))" 
-                    strokeWidth={2}
-                    dot={{ fill: 'hsl(var(--primary))' }}
-                    name="Bien-être"
-                  />
-                  <Line 
-                    type="monotone" 
-                    dataKey="arousal" 
-                    stroke="hsl(var(--accent))" 
-                    strokeWidth={2}
-                    dot={{ fill: 'hsl(var(--accent))' }}
-                    name="Énergie"
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Radar émotionnel */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Profil émotionnel</CardTitle>
-            <CardDescription>Dimensions émotionnelles de la semaine</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="h-[250px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <RadarChart data={EMOTION_DIMENSIONS}>
-                  <PolarGrid className="stroke-muted" />
-                  <PolarAngleAxis dataKey="dimension" className="text-xs" />
-                  <PolarRadiusAxis angle={30} domain={[0, 100]} className="text-xs" />
-                  <Radar
-                    name="Score"
-                    dataKey="score"
-                    stroke="hsl(var(--primary))"
-                    fill="hsl(var(--primary))"
-                    fillOpacity={0.3}
-                  />
-                </RadarChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Émotions dominantes */}
-      {stats && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Émotions dominantes</CardTitle>
-            <CardDescription>Les émotions les plus fréquentes cette semaine</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {stats.topEmotions.map((emotion, index) => (
-                <div key={emotion.name} className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Badge variant={index === 0 ? 'default' : 'secondary'}>
-                        #{index + 1}
-                      </Badge>
-                      <span className="font-medium">{emotion.name}</span>
+          {/* Stats principales */}
+          {stats && (
+            <div className="grid gap-4 md:grid-cols-4">
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm text-muted-foreground">Bien-être moyen</p>
+                        <p className="text-2xl font-bold text-foreground">{stats.averageValence}%</p>
+                      </div>
+                      <div className={`p-3 rounded-full ${stats.averageValence > 60 ? 'bg-green-500/10' : 'bg-amber-500/10'}`}>
+                        <Heart className={`h-5 w-5 ${stats.averageValence > 60 ? 'text-green-500' : 'text-amber-500'}`} />
+                      </div>
                     </div>
-                    <span className="text-sm text-muted-foreground">
-                      {emotion.count} fois ({emotion.percentage}%)
-                    </span>
-                  </div>
-                  <Progress value={emotion.percentage} className="h-2" />
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
+                    <div className="flex items-center gap-1 mt-2">
+                      <TrendIcon className={`h-4 w-4 ${trendColor}`} />
+                      <span className={`text-xs ${trendColor}`}>
+                        {stats.trend === 'up' ? 'En hausse' : stats.trend === 'down' ? 'En baisse' : 'Stable'}
+                      </span>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
 
-      {/* Insights IA */}
-      {stats && (
-        <Card className="bg-gradient-to-r from-primary/5 to-accent/5 border-primary/20">
-          <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-primary" />
-              Insights de la semaine
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ul className="space-y-3">
-              {stats.insights.map((insight, index) => (
-                <li key={index} className="flex items-start gap-3">
-                  <div className="mt-1 w-2 h-2 rounded-full bg-primary shrink-0" />
-                  <p className="text-muted-foreground">{insight}</p>
-                </li>
-              ))}
-            </ul>
-            
-            <Separator className="my-4" />
-            
-            <div className="flex items-center justify-between text-sm">
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-1">
-                  <Sun className="h-4 w-4 text-amber-500" />
-                  <span>Meilleur jour: <strong>{stats.peakDay}</strong></span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <Cloud className="h-4 w-4 text-slate-400" />
-                  <span>À améliorer: <strong>{stats.lowDay}</strong></span>
-                </div>
-              </div>
-              <div className="flex gap-2">
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => {
-                    const reportContent = document.getElementById('weekly-report-content');
-                    if (reportContent) {
-                      const printWindow = window.open('', '_blank');
-                      if (printWindow) {
-                        printWindow.document.write(`
-                          <html>
-                            <head>
-                              <title>Rapport Émotionnel - ${format(weekStart, 'd MMM', { locale: fr })} au ${format(weekEnd, 'd MMM yyyy', { locale: fr })}</title>
-                              <style>
-                                body { font-family: system-ui, sans-serif; padding: 2rem; }
-                                h1 { color: #333; }
-                                .stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin: 1rem 0; }
-                                .stat { padding: 1rem; background: #f5f5f5; border-radius: 8px; }
-                              </style>
-                            </head>
-                            <body>
-                              <h1>Rapport Émotionnel Hebdomadaire</h1>
-                              <p>Période: ${format(weekStart, 'd MMM', { locale: fr })} - ${format(weekEnd, 'd MMM yyyy', { locale: fr })}</p>
-                              <div class="stats">
-                                <div class="stat"><strong>Bien-être moyen:</strong> ${stats?.averageValence}%</div>
-                                <div class="stat"><strong>Énergie moyenne:</strong> ${stats?.averageArousal}%</div>
-                                <div class="stat"><strong>Scans effectués:</strong> ${stats?.totalScans}</div>
-                                <div class="stat"><strong>Série:</strong> ${stats?.streakDays} jours</div>
-                              </div>
-                              <h2>Émotions dominantes</h2>
-                              <ul>
-                                ${stats?.topEmotions.map(e => `<li>${e.name}: ${e.percentage}%</li>`).join('')}
-                              </ul>
-                              <h2>Insights</h2>
-                              <ul>
-                                ${stats?.insights.map(i => `<li>${i}</li>`).join('')}
-                              </ul>
-                            </body>
-                          </html>
-                        `);
-                        printWindow.document.close();
-                        printWindow.print();
-                      }
-                    }
-                  }}
-                >
-                  <Download className="h-4 w-4 mr-2" />
-                  Exporter PDF
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={async () => {
-                    const shareData = {
-                      title: 'Mon rapport émotionnel',
-                      text: `Semaine du ${format(weekStart, 'd MMM', { locale: fr })} - Bien-être: ${stats?.averageValence}%, Énergie: ${stats?.averageArousal}%`
-                    };
-                    if (navigator.share) {
-                      await navigator.share(shareData);
-                    } else {
-                      await navigator.clipboard.writeText(shareData.text);
-                      alert('Rapport copié dans le presse-papier !');
-                    }
-                  }}
-                >
-                  <Share2 className="h-4 w-4 mr-2" />
-                  Partager
-                </Button>
-              </div>
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm text-muted-foreground">Énergie moyenne</p>
+                        <p className="text-2xl font-bold text-foreground">{stats.averageArousal}%</p>
+                      </div>
+                      <div className="p-3 rounded-full bg-primary/10">
+                        <Zap className="h-5 w-5 text-primary" />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm text-muted-foreground">Scans effectués</p>
+                        <p className="text-2xl font-bold text-foreground">{stats.totalScans}</p>
+                      </div>
+                      <div className="p-3 rounded-full bg-blue-500/10">
+                        <Brain className="h-5 w-5 text-blue-500" />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm text-muted-foreground">Série actuelle</p>
+                        <p className="text-2xl font-bold text-foreground">{stats.streakDays} jours</p>
+                      </div>
+                      <div className="p-3 rounded-full bg-orange-500/10">
+                        <Target className="h-5 w-5 text-orange-500" />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
             </div>
-          </CardContent>
-        </Card>
-      )}
+          )}
+
+          {/* Émotions dominantes */}
+          {stats && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Émotions dominantes</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    {stats.topEmotions.map((emotion, index) => (
+                      <motion.div 
+                        key={emotion.name}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                        className="space-y-2"
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <Badge variant={index === 0 ? 'default' : 'secondary'}>
+                              #{index + 1}
+                            </Badge>
+                            <span className="font-medium">{emotion.name}</span>
+                          </div>
+                          <span className="text-sm text-muted-foreground">
+                            {emotion.count} fois ({emotion.percentage}%)
+                          </span>
+                        </div>
+                        <Progress value={emotion.percentage} className="h-2" />
+                      </motion.div>
+                    ))}
+                  </div>
+                  
+                  <div className="h-[200px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={emotionPieData}
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={40}
+                          outerRadius={80}
+                          dataKey="value"
+                          label={({ name, value }) => `${name}: ${value}%`}
+                        >
+                          {emotionPieData.map((_, index) => (
+                            <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
+                          ))}
+                        </Pie>
+                        <Tooltip />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </TabsContent>
+
+        <TabsContent value="charts" className="mt-4 space-y-6">
+          {/* Évolution journalière */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Évolution quotidienne</CardTitle>
+              <CardDescription>Valence et arousal jour par jour</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[250px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={weeklyData}>
+                    <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                    <XAxis dataKey="day" className="text-xs" />
+                    <YAxis domain={[0, 100]} className="text-xs" />
+                    <Tooltip 
+                      contentStyle={{ 
+                        backgroundColor: 'hsl(var(--background))', 
+                        border: '1px solid hsl(var(--border))',
+                        borderRadius: '8px'
+                      }}
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="valence" 
+                      stroke="hsl(var(--primary))" 
+                      strokeWidth={2}
+                      dot={{ fill: 'hsl(var(--primary))' }}
+                      name="Bien-être"
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="arousal" 
+                      stroke="hsl(142 76% 36%)" 
+                      strokeWidth={2}
+                      dot={{ fill: 'hsl(142 76% 36%)' }}
+                      name="Énergie"
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Radar émotionnel */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Profil émotionnel</CardTitle>
+              <CardDescription>Dimensions émotionnelles de la semaine</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[300px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <RadarChart data={EMOTION_DIMENSIONS}>
+                    <PolarGrid className="stroke-muted" />
+                    <PolarAngleAxis dataKey="dimension" className="text-xs" />
+                    <PolarRadiusAxis angle={30} domain={[0, 100]} className="text-xs" />
+                    <Radar
+                      name="Score"
+                      dataKey="score"
+                      stroke="hsl(var(--primary))"
+                      fill="hsl(var(--primary))"
+                      fillOpacity={0.3}
+                    />
+                  </RadarChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Nombre de scans par jour */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Activité quotidienne</CardTitle>
+              <CardDescription>Nombre de scans par jour</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="h-[200px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={weeklyData}>
+                    <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                    <XAxis dataKey="day" className="text-xs" />
+                    <YAxis className="text-xs" />
+                    <Tooltip />
+                    <Bar dataKey="scansCount" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} name="Scans" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="insights" className="mt-4">
+          {stats && (
+            <Card className="bg-gradient-to-r from-primary/5 to-primary/10 border-primary/20">
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Sparkles className="h-5 w-5 text-primary" />
+                  Insights de la semaine
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <ul className="space-y-3">
+                  {stats.insights.map((insight, index) => (
+                    <motion.li 
+                      key={index} 
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                      className="flex items-start gap-3"
+                    >
+                      <div className="mt-1 w-2 h-2 rounded-full bg-primary shrink-0" />
+                      <p className="text-muted-foreground">{insight}</p>
+                    </motion.li>
+                  ))}
+                </ul>
+                
+                <Separator />
+                
+                <div className="flex items-center justify-between text-sm">
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-1">
+                      <Sun className="h-4 w-4 text-amber-500" />
+                      <span>Meilleur jour: <strong>{stats.peakDay}</strong></span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Cloud className="h-4 w-4 text-slate-400" />
+                      <span>À améliorer: <strong>{stats.lowDay}</strong></span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Recommendations */}
+                <div className="mt-6 p-4 rounded-lg bg-background/50 border">
+                  <h4 className="font-medium mb-3 flex items-center gap-2">
+                    <Brain className="h-4 w-4 text-primary" />
+                    Recommandations personnalisées
+                  </h4>
+                  <div className="grid md:grid-cols-2 gap-3">
+                    {stats.averageValence < 60 && (
+                      <div className="p-3 rounded bg-amber-50 dark:bg-amber-900/20 text-sm">
+                        💡 Essayez une séance de méditation guidée pour améliorer votre bien-être.
+                      </div>
+                    )}
+                    {stats.averageArousal < 50 && (
+                      <div className="p-3 rounded bg-blue-50 dark:bg-blue-900/20 text-sm">
+                        ⚡ Une activité physique modérée peut booster votre énergie.
+                      </div>
+                    )}
+                    {stats.totalScans < weeklyGoal && (
+                      <div className="p-3 rounded bg-purple-50 dark:bg-purple-900/20 text-sm">
+                        📊 Augmentez la fréquence de vos scans pour mieux suivre vos émotions.
+                      </div>
+                    )}
+                    <div className="p-3 rounded bg-green-50 dark:bg-green-900/20 text-sm">
+                      🌟 Continuez à pratiquer la conscience émotionnelle quotidienne !
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </TabsContent>
+
+        <TabsContent value="history" className="mt-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <History className="h-5 w-5" />
+                Historique des rapports
+              </CardTitle>
+              <CardDescription>
+                Vos 12 dernières semaines sauvegardées
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {reportHistory.length > 0 ? (
+                <div className="space-y-3">
+                  {reportHistory.map((report, idx) => (
+                    <motion.div
+                      key={report.weekStart}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: idx * 0.05 }}
+                      className="flex items-center justify-between p-4 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
+                    >
+                      <div>
+                        <p className="font-medium">
+                          Semaine du {format(new Date(report.weekStart), 'd MMMM yyyy', { locale: fr })}
+                        </p>
+                        <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
+                          <span>Bien-être: {report.stats.averageValence}%</span>
+                          <span>Énergie: {report.stats.averageArousal}%</span>
+                          <span>{report.stats.totalScans} scans</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Badge variant={
+                          report.stats.trend === 'up' ? 'default' : 
+                          report.stats.trend === 'down' ? 'destructive' : 
+                          'secondary'
+                        }>
+                          {report.stats.trend === 'up' ? '↑' : report.stats.trend === 'down' ? '↓' : '→'}
+                        </Badge>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8 text-muted-foreground">
+                  <History className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                  <p>Aucun rapport sauvegardé</p>
+                  <p className="text-sm">Cliquez sur "Sauvegarder" pour conserver vos rapports.</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
