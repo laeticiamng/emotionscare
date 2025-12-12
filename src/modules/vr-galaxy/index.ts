@@ -1,5 +1,27 @@
+/**
+ * VR Galaxy Module - Exploration spatiale thérapeutique
+ */
+
+// ============================================================================
+// SERVICE UNIFIÉ
+// ============================================================================
+
+export { VRGalaxyService, VRGalaxyServiceEnriched, vrGalaxyService } from './vrGalaxyServiceUnified';
+
+// ============================================================================
+// COMPONENTS
+// ============================================================================
+
 export { VRGalaxyMain } from './components/VRGalaxyMain';
+
+// ============================================================================
+// HOOKS
+// ============================================================================
+
 export { useVRGalaxy } from './hooks/useVRGalaxy';
-export { VRGalaxyService } from './vrGalaxyService';
-export { VRGalaxyServiceEnriched } from './vrGalaxyServiceEnriched';
+
+// ============================================================================
+// TYPES
+// ============================================================================
+
 export * from './types';

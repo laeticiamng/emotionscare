@@ -9,7 +9,9 @@ import { useAuth } from '@/contexts/AuthContext';
 import { logger } from '@/lib/logger';
 import { toast } from 'sonner';
 
-const VAPID_PUBLIC_KEY = 'BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SxZ8-SU0YnM6rV6cPLiCyChJxnvQWYCfN9Qb1gP1aY4XH3N1bm1iPUY';
+// Clé VAPID depuis l'environnement, avec fallback pour dev
+const VAPID_PUBLIC_KEY = import.meta.env.VITE_VAPID_PUBLIC_KEY ||
+  'BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SxZ8-SU0YnM6rV6cPLiCyChJxnvQWYCfN9Qb1gP1aY4XH3N1bm1iPUY';
 
 export const usePushNotifications = () => {
   const { user } = useAuth();

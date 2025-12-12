@@ -6,20 +6,30 @@
  */
 
 // ============================================================================
-// SERVICE
+// SERVICE UNIFIÉ
 // ============================================================================
 
-export { MusicTherapyService } from './musicTherapyService';
-export { MusicTherapyService as musicTherapyService } from './musicTherapyService';
-
-// Export du service enrichi (version avancée)
-export { MusicTherapyServiceEnriched } from './musicTherapyServiceEnriched';
-export { MusicTherapyServiceEnriched as musicTherapyServiceEnriched } from './musicTherapyServiceEnriched';
+export { MusicTherapyService, musicTherapyService } from './musicTherapyServiceUnified';
 
 // ============================================================================
 // TYPES
 // ============================================================================
 
-// Export des types
 export * from './types';
-export type { MusicSession } from './musicTherapyService';
+export type {
+  MusicSession,
+  EmotionalPoint,
+  TherapeuticPlaylist,
+  Track,
+  MusicTherapyRecommendation,
+  MusicTherapyStats,
+} from './musicTherapyServiceUnified';
+
+// ============================================================================
+// LEGACY EXPORTS (deprecated - utiliser MusicTherapyService à la place)
+// ============================================================================
+
+/** @deprecated Utiliser MusicTherapyService à la place */
+export { MusicTherapyService as MusicTherapyServiceEnriched } from './musicTherapyServiceUnified';
+/** @deprecated Utiliser musicTherapyService à la place */
+export { musicTherapyService as musicTherapyServiceEnriched } from './musicTherapyServiceUnified';
