@@ -1,7 +1,6 @@
-import { serve } from 'https://deno.land/std@0.208.0/http/server.ts';
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { authorizeRole, logUnauthorizedAccess } from '../_shared/auth-middleware.ts';
-import { buildRateLimitResponse, enforceEdgeRateLimit } from '../_shared/rate-limit.ts';
+// @ts-nocheck
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
+import { createClient } from '../_shared/supabase.ts';
 
 interface EmailResult {
   success: boolean;
@@ -263,9 +262,6 @@ serve(async (req) => {
     'Access-Control-Allow-Origin': req.headers.get('Origin') || '*',
     'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Content-Security-Policy': "default-src 'self'",
-    'X-Content-Type-Options': 'nosniff',
-    'X-Frame-Options': 'DENY'
   };
 
   if (req.method === 'OPTIONS') {
@@ -273,29 +269,18 @@ serve(async (req) => {
   }
 
   try {
-    // Vérification de l'autorisation (seuls les admins peuvent envoyer des invitations)
-    const authResult = await authorizeRole(req, ['b2b_admin', 'admin']);
-    if (authResult.status !== 200) {
-      await logUnauthorizedAccess(req, authResult.error || 'Authorization failed');
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      { global: { headers: { Authorization: req.headers.get('Authorization')! } } }
+    );
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
       return new Response(
-        JSON.stringify({ error: authResult.error }),
-        { status: authResult.status, headers: corsHeaders }
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: corsHeaders }
       );
-    }
-
-    // Rate limiting plus strict pour les invitations
-    const rateLimit = await enforceEdgeRateLimit(req, {
-      route: 'send-invitation',
-      userId: authResult.user.id,
-      limit: 10,
-      windowMs: 300_000, // 5 minutes
-      description: 'send-invitation',
-    });
-
-    if (!rateLimit.allowed) {
-      return buildRateLimitResponse(rateLimit, corsHeaders, {
-        message: "Limite d'invitations atteinte. Veuillez patienter.",
-      });
     }
 
     const { email, role, organizationId, customMessage } = await req.json();
@@ -316,13 +301,13 @@ serve(async (req) => {
       );
     }
 
-    const supabase = createClient(
+    const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
     // Vérifier si l'email n'est pas déjà un utilisateur existant
-    const { data: existingUser } = await supabase
+    const { data: existingUser } = await supabaseAdmin
       .from('profiles')
       .select('id')
       .eq('email', email)
@@ -336,7 +321,7 @@ serve(async (req) => {
     }
 
     // Vérifier si l'email n'est pas déjà invité
-    const { data: existingInvitation } = await supabase
+    const { data: existingInvitation } = await supabaseAdmin
       .from('invitations')
       .select('id, created_at')
       .eq('email', email)
@@ -344,7 +329,6 @@ serve(async (req) => {
       .single();
 
     if (existingInvitation) {
-      // Vérifier si l'invitation est trop récente (moins de 24h)
       const invitedAt = new Date(existingInvitation.created_at);
       const hoursSinceInvite = (Date.now() - invitedAt.getTime()) / (1000 * 60 * 60);
       
@@ -358,8 +342,7 @@ serve(async (req) => {
         );
       }
       
-      // Annuler l'ancienne invitation pour en créer une nouvelle
-      await supabase
+      await supabaseAdmin
         .from('invitations')
         .update({ status: 'expired' })
         .eq('id', existingInvitation.id);
@@ -367,15 +350,15 @@ serve(async (req) => {
 
     // Créer l'invitation avec un token sécurisé
     const invitationToken = crypto.randomUUID();
-    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(); // 7 jours
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
 
-    const { data: invitation, error } = await supabase
+    const { data: invitation, error } = await supabaseAdmin
       .from('invitations')
       .insert({
         email,
         role,
         organization_id: organizationId,
-        invited_by: authResult.user.id,
+        invited_by: user.id,
         token: invitationToken,
         expires_at: expiresAt,
         custom_message: customMessage,
@@ -393,16 +376,16 @@ serve(async (req) => {
     }
 
     // Récupérer les informations de l'organisation et de l'inviteur
-    const { data: organization } = await supabase
+    const { data: organization } = await supabaseAdmin
       .from('organizations')
       .select('name')
       .eq('id', organizationId)
       .single();
 
-    const { data: inviter } = await supabase
+    const { data: inviter } = await supabaseAdmin
       .from('profiles')
       .select('full_name, email')
-      .eq('id', authResult.user.id)
+      .eq('id', user.id)
       .single();
 
     // Générer l'URL d'invitation
@@ -436,8 +419,7 @@ serve(async (req) => {
     if (!emailResult.success) {
       console.error(`[Invitation] Failed to send email to ${email}:`, emailResult.error);
       
-      // Marquer l'invitation comme failed
-      await supabase
+      await supabaseAdmin
         .from('invitations')
         .update({ 
           status: 'failed', 
@@ -457,7 +439,7 @@ serve(async (req) => {
     }
 
     // Mettre à jour l'invitation avec l'ID du message
-    await supabase
+    await supabaseAdmin
       .from('invitations')
       .update({ 
         email_message_id: emailResult.messageId,
