@@ -282,7 +282,6 @@ export class ScoresService {
         emotional_score,
         wellbeing_score,
         engagement_score,
-        overall_score,
         vibe: vibeData.current_vibe,
         vibe_intensity: vibeData.vibe_intensity,
         total_sessions: sessionData.length,
@@ -292,7 +291,7 @@ export class ScoresService {
         insights: await this.generateWeeklyInsights(userId, emotional_score, wellbeing_score, engagement_score),
         start_date: startDate.toISOString(),
         end_date: endDate.toISOString(),
-      };
+      } as WeeklyMetrics;
     } catch (error) {
       logger.error('[ScoresService] Get weekly metrics error:', error, 'MODULE');
       return null;

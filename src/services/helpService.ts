@@ -302,244 +302,244 @@ class HelpService {
   clearCache(): void {
     this.cache.clear();
   }
-}
 
-// ========== MÉTHODES ENRICHIES ==========
+  // ========== MÉTHODES ENRICHIES ==========
 
-async getPopularArticles(limit: number = 10): Promise<HelpArticle[]> {
-  try {
-    const { data, error } = await supabase
-      .from('help_articles')
-      .select('*')
-      .order('views', { ascending: false })
-      .limit(limit);
+  async getPopularArticles(limit: number = 10): Promise<HelpArticle[]> {
+    try {
+      const { data, error } = await supabase
+        .from('help_articles')
+        .select('*')
+        .order('views', { ascending: false })
+        .limit(limit);
 
-    if (error) throw error;
+      if (error) throw error;
 
-    return (data || []).map(row => ({
-      id: row.id,
-      sectionId: row.section_id,
-      title: row.title,
-      slug: row.slug,
-      content: row.content,
-      summary: row.summary,
-      tags: row.tags,
-      views: row.views,
-      helpful: row.helpful,
-      notHelpful: row.not_helpful,
-      createdAt: row.created_at,
-      updatedAt: row.updated_at
-    }));
-  } catch (err) {
-    logger.warn('Failed to fetch popular articles', { error: err }, 'HELP');
-    return [];
+      return ((data as any[]) || []).map(row => ({
+        id: row.id,
+        sectionId: row.section_id,
+        title: row.title,
+        slug: row.slug,
+        content: row.content,
+        summary: row.summary,
+        tags: row.tags,
+        views: row.views,
+        helpful: row.helpful,
+        notHelpful: row.not_helpful,
+        createdAt: row.created_at,
+        updatedAt: row.updated_at
+      }));
+    } catch (err) {
+      logger.warn('Failed to fetch popular articles', { error: err }, 'HELP');
+      return [];
+    }
   }
-}
 
-getFAQsByCategory(category: string): FAQ[] {
-  return DEFAULT_FAQS.filter(faq => faq.category === category);
-}
+  getFAQsByCategory(category: string): FAQ[] {
+    return DEFAULT_FAQS.filter(faq => faq.category === category);
+  }
 
-async submitSupportTicket(ticket: {
-  subject: string;
-  description: string;
-  category: string;
-  priority?: 'low' | 'medium' | 'high';
-}): Promise<{ success: boolean; ticketId?: string; error?: string }> {
-  try {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return { success: false, error: 'Non authentifié' };
+  async submitSupportTicket(ticket: {
+    subject: string;
+    description: string;
+    category: string;
+    priority?: 'low' | 'medium' | 'high';
+  }): Promise<{ success: boolean; ticketId?: string; error?: string }> {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return { success: false, error: 'Non authentifié' };
 
-    const { data, error } = await supabase
-      .from('support_tickets')
-      .insert({
-        user_id: user.id,
+      const { data, error } = await supabase
+        .from('support_tickets')
+        .insert({
+          user_id: user.id,
+          subject: ticket.subject,
+          description: ticket.description,
+          category: ticket.category,
+          priority: ticket.priority || 'medium',
+          status: 'open',
+          created_at: new Date().toISOString()
+        })
+        .select('id')
+        .single();
+
+      if (error) throw error;
+
+      logger.info('Support ticket created', { ticketId: (data as any).id }, 'HELP');
+      return { success: true, ticketId: (data as any).id };
+    } catch (err) {
+      logger.error('Failed to submit support ticket', err, 'HELP');
+      return { success: false, error: 'Erreur lors de la création du ticket' };
+    }
+  }
+
+  async getRelatedArticles(articleId: string, limit: number = 5): Promise<HelpArticle[]> {
+    try {
+      const { data: currentArticle } = await supabase
+        .from('help_articles')
+        .select('tags, section_id')
+        .eq('id', articleId)
+        .single();
+
+      if (!currentArticle) return [];
+
+      const { data, error } = await supabase
+        .from('help_articles')
+        .select('*')
+        .neq('id', articleId)
+        .eq('section_id', (currentArticle as any).section_id)
+        .limit(limit);
+
+      if (error) throw error;
+
+      return ((data as any[]) || []).map(row => ({
+        id: row.id,
+        sectionId: row.section_id,
+        title: row.title,
+        slug: row.slug,
+        content: row.content,
+        summary: row.summary,
+        tags: row.tags,
+        views: row.views,
+        helpful: row.helpful,
+        notHelpful: row.not_helpful,
+        createdAt: row.created_at,
+        updatedAt: row.updated_at
+      }));
+    } catch (err) {
+      logger.warn('Failed to fetch related articles', { error: err, articleId }, 'HELP');
+      return [];
+    }
+  }
+
+  async getUserTickets(): Promise<Array<{
+    id: string;
+    subject: string;
+    status: string;
+    priority: string;
+    createdAt: string;
+    updatedAt: string;
+  }>> {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return [];
+
+      const { data, error } = await supabase
+        .from('support_tickets')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      return ((data as any[]) || []).map(ticket => ({
+        id: ticket.id,
         subject: ticket.subject,
-        description: ticket.description,
-        category: ticket.category,
-        priority: ticket.priority || 'medium',
-        status: 'open',
-        created_at: new Date().toISOString()
-      })
-      .select('id')
-      .single();
-
-    if (error) throw error;
-
-    logger.info('Support ticket created', { ticketId: data.id }, 'HELP');
-    return { success: true, ticketId: data.id };
-  } catch (err) {
-    logger.error('Failed to submit support ticket', err, 'HELP');
-    return { success: false, error: 'Erreur lors de la création du ticket' };
+        status: ticket.status,
+        priority: ticket.priority,
+        createdAt: ticket.created_at,
+        updatedAt: ticket.updated_at
+      }));
+    } catch (err) {
+      logger.warn('Failed to fetch user tickets', { error: err }, 'HELP');
+      return [];
+    }
   }
-}
 
-async getRelatedArticles(articleId: string, limit: number = 5): Promise<HelpArticle[]> {
-  try {
-    const { data: currentArticle } = await supabase
-      .from('help_articles')
-      .select('tags, section_id')
-      .eq('id', articleId)
-      .single();
+  async getHelpStats(): Promise<{
+    totalArticles: number;
+    totalSections: number;
+    totalViews: number;
+    avgHelpfulRate: number;
+  }> {
+    try {
+      const { data: articles } = await supabase
+        .from('help_articles')
+        .select('views, helpful, not_helpful');
 
-    if (!currentArticle) return [];
+      const { count: sectionsCount } = await supabase
+        .from('help_sections')
+        .select('id', { count: 'exact', head: true });
 
-    const { data, error } = await supabase
-      .from('help_articles')
-      .select('*')
-      .neq('id', articleId)
-      .eq('section_id', currentArticle.section_id)
-      .limit(limit);
+      if (!articles) {
+        return {
+          totalArticles: 0,
+          totalSections: sectionsCount || DEFAULT_SECTIONS.length,
+          totalViews: 0,
+          avgHelpfulRate: 0
+        };
+      }
 
-    if (error) throw error;
+      const articlesTyped = articles as any[];
+      const totalViews = articlesTyped.reduce((sum, a) => sum + (a.views || 0), 0);
+      const totalHelpful = articlesTyped.reduce((sum, a) => sum + (a.helpful || 0), 0);
+      const totalNotHelpful = articlesTyped.reduce((sum, a) => sum + (a.not_helpful || 0), 0);
+      const avgHelpfulRate = totalHelpful + totalNotHelpful > 0
+        ? Math.round((totalHelpful / (totalHelpful + totalNotHelpful)) * 100)
+        : 0;
 
-    return (data || []).map(row => ({
-      id: row.id,
-      sectionId: row.section_id,
-      title: row.title,
-      slug: row.slug,
-      content: row.content,
-      summary: row.summary,
-      tags: row.tags,
-      views: row.views,
-      helpful: row.helpful,
-      notHelpful: row.not_helpful,
-      createdAt: row.created_at,
-      updatedAt: row.updated_at
-    }));
-  } catch (err) {
-    logger.warn('Failed to fetch related articles', { error: err, articleId }, 'HELP');
-    return [];
-  }
-}
-
-async getUserTickets(): Promise<Array<{
-  id: string;
-  subject: string;
-  status: string;
-  priority: string;
-  createdAt: string;
-  updatedAt: string;
-}>> {
-  try {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return [];
-
-    const { data, error } = await supabase
-      .from('support_tickets')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false });
-
-    if (error) throw error;
-
-    return (data || []).map(ticket => ({
-      id: ticket.id,
-      subject: ticket.subject,
-      status: ticket.status,
-      priority: ticket.priority,
-      createdAt: ticket.created_at,
-      updatedAt: ticket.updated_at
-    }));
-  } catch (err) {
-    logger.warn('Failed to fetch user tickets', { error: err }, 'HELP');
-    return [];
-  }
-}
-
-async getHelpStats(): Promise<{
-  totalArticles: number;
-  totalSections: number;
-  totalViews: number;
-  avgHelpfulRate: number;
-}> {
-  try {
-    const { data: articles } = await supabase
-      .from('help_articles')
-      .select('views, helpful, not_helpful');
-
-    const { count: sectionsCount } = await supabase
-      .from('help_sections')
-      .select('id', { count: 'exact', head: true });
-
-    if (!articles) {
+      return {
+        totalArticles: articlesTyped.length,
+        totalSections: sectionsCount || DEFAULT_SECTIONS.length,
+        totalViews,
+        avgHelpfulRate
+      };
+    } catch (err) {
+      logger.warn('Failed to get help stats', { error: err }, 'HELP');
       return {
         totalArticles: 0,
-        totalSections: sectionsCount || DEFAULT_SECTIONS.length,
+        totalSections: DEFAULT_SECTIONS.length,
         totalViews: 0,
         avgHelpfulRate: 0
       };
     }
-
-    const totalViews = articles.reduce((sum, a) => sum + (a.views || 0), 0);
-    const totalHelpful = articles.reduce((sum, a) => sum + (a.helpful || 0), 0);
-    const totalNotHelpful = articles.reduce((sum, a) => sum + (a.not_helpful || 0), 0);
-    const avgHelpfulRate = totalHelpful + totalNotHelpful > 0
-      ? Math.round((totalHelpful / (totalHelpful + totalNotHelpful)) * 100)
-      : 0;
-
-    return {
-      totalArticles: articles.length,
-      totalSections: sectionsCount || DEFAULT_SECTIONS.length,
-      totalViews,
-      avgHelpfulRate
-    };
-  } catch (err) {
-    logger.warn('Failed to get help stats', { error: err }, 'HELP');
-    return {
-      totalArticles: 0,
-      totalSections: DEFAULT_SECTIONS.length,
-      totalViews: 0,
-      avgHelpfulRate: 0
-    };
   }
-}
 
-searchFAQs(query: string): FAQ[] {
-  const lowerQuery = query.toLowerCase();
-  return DEFAULT_FAQS.filter(faq =>
-    faq.question.toLowerCase().includes(lowerQuery) ||
-    faq.answer.toLowerCase().includes(lowerQuery)
-  );
-}
-
-async getRecentArticles(limit: number = 5): Promise<HelpArticle[]> {
-  try {
-    const { data, error } = await supabase
-      .from('help_articles')
-      .select('*')
-      .order('updated_at', { ascending: false })
-      .limit(limit);
-
-    if (error) throw error;
-
-    return (data || []).map(row => ({
-      id: row.id,
-      sectionId: row.section_id,
-      title: row.title,
-      slug: row.slug,
-      content: row.content,
-      summary: row.summary,
-      tags: row.tags,
-      views: row.views,
-      helpful: row.helpful,
-      notHelpful: row.not_helpful,
-      createdAt: row.created_at,
-      updatedAt: row.updated_at
-    }));
-  } catch (err) {
-    logger.warn('Failed to fetch recent articles', { error: err }, 'HELP');
-    return [];
+  searchFAQs(query: string): FAQ[] {
+    const lowerQuery = query.toLowerCase();
+    return DEFAULT_FAQS.filter(faq =>
+      faq.question.toLowerCase().includes(lowerQuery) ||
+      faq.answer.toLowerCase().includes(lowerQuery)
+    );
   }
-}
 
-getAllFAQCategories(): string[] {
-  const categories = new Set<string>();
-  DEFAULT_FAQS.forEach(faq => {
-    if (faq.category) categories.add(faq.category);
-  });
-  return Array.from(categories);
-}
+  async getRecentArticles(limit: number = 5): Promise<HelpArticle[]> {
+    try {
+      const { data, error } = await supabase
+        .from('help_articles')
+        .select('*')
+        .order('updated_at', { ascending: false })
+        .limit(limit);
+
+      if (error) throw error;
+
+      return ((data as any[]) || []).map(row => ({
+        id: row.id,
+        sectionId: row.section_id,
+        title: row.title,
+        slug: row.slug,
+        content: row.content,
+        summary: row.summary,
+        tags: row.tags,
+        views: row.views,
+        helpful: row.helpful,
+        notHelpful: row.not_helpful,
+        createdAt: row.created_at,
+        updatedAt: row.updated_at
+      }));
+    } catch (err) {
+      logger.warn('Failed to fetch recent articles', { error: err }, 'HELP');
+      return [];
+    }
+  }
+
+  getAllFAQCategories(): string[] {
+    const categories = new Set<string>();
+    DEFAULT_FAQS.forEach(faq => {
+      if (faq.category) categories.add(faq.category);
+    });
+    return Array.from(categories);
+  }
 }
 
 export const helpService = new HelpService();

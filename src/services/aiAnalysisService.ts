@@ -295,7 +295,7 @@ class AIAnalysisService {
       const emotionData = predictions[0]?.results?.predictions?.[0]?.models?.language?.grouped_predictions?.[0]?.predictions?.[0]?.emotions;
       
       if (!emotionData || !Array.isArray(emotionData)) {
-        return this.advancedEmotionAnalysis('');
+        return { tone: 'neutral', emotions: {}, dominantEmotion: undefined };
       }
 
       const emotions: Record<string, number> = {};
@@ -308,7 +308,6 @@ class AIAnalysisService {
         }
       }
 
-      // Déterminer le tone global
       const positiveEmotions = ['joy', 'amusement', 'love', 'admiration', 'excitement', 'gratitude', 'pride', 'relief'];
       const negativeEmotions = ['sadness', 'anger', 'fear', 'disgust', 'contempt', 'disappointment', 'embarrassment', 'shame'];
       
@@ -331,7 +330,7 @@ class AIAnalysisService {
         dominantEmotion: topEmotion.name,
       };
     } catch {
-      return this.advancedEmotionAnalysis('');
+      return { tone: 'neutral', emotions: {}, dominantEmotion: undefined };
     }
   }
 
