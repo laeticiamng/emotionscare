@@ -122,6 +122,34 @@ const AMBIENT_SOUNDS: AmbientSound[] = [
   }
 ];
 
+// Guidances audio générées
+const GUIDANCE_TRACKS: GuidanceTrack[] = [
+  {
+    id: 'breathing-4-7-8',
+    name: 'Respiration 4-7-8',
+    technique: '4-7-8',
+    duration: 300,
+    language: 'fr',
+    url: 'https://cdn.pixabay.com/audio/2022/03/10/audio_c8c8e92a82.mp3'
+  },
+  {
+    id: 'body-scan',
+    name: 'Scan corporel',
+    technique: 'body-scan',
+    duration: 600,
+    language: 'fr',
+    url: 'https://cdn.pixabay.com/audio/2022/05/16/audio_460b6c7c2b.mp3'
+  },
+  {
+    id: 'loving-kindness',
+    name: 'Méditation bienveillance',
+    technique: 'metta',
+    duration: 480,
+    language: 'fr',
+    url: 'https://cdn.pixabay.com/audio/2022/10/30/audio_3b3f66f0af.mp3'
+  }
+];
+
 class MeditationAudioServiceClass {
   private ambientAudio: HTMLAudioElement | null = null;
   private guidanceAudio: HTMLAudioElement | null = null;
@@ -129,6 +157,8 @@ class MeditationAudioServiceClass {
   private fadeInterval: NodeJS.Timeout | null = null;
   private currentVolume: number = 0.5;
   private isPlaying: boolean = false;
+  private currentAmbientId: AmbientSoundType | null = null;
+  private mixedSounds: Map<string, HTMLAudioElement> = new Map();
 
   /**
    * Récupère la liste des sons ambiants disponibles
@@ -145,6 +175,99 @@ class MeditationAudioServiceClass {
   }
 
   /**
+   * Récupère les guidances disponibles
+   */
+  getGuidanceTracks(): GuidanceTrack[] {
+    return GUIDANCE_TRACKS;
+  }
+
+  /**
+   * Récupère une guidance par technique
+   */
+  getGuidanceByTechnique(technique: string): GuidanceTrack | undefined {
+    return GUIDANCE_TRACKS.find(g => g.technique === technique);
+  }
+
+  /**
+   * Mixe plusieurs sons ambiants ensemble
+   */
+  async playMixedAmbient(
+    sounds: Array<{ id: AmbientSoundType; volume: number }>
+  ): Promise<void> {
+    try {
+      // Arrêter les sons existants
+      this.stopAllMixed();
+
+      for (const { id, volume } of sounds) {
+        const sound = AMBIENT_SOUNDS.find(s => s.id === id);
+        if (!sound) continue;
+
+        const audio = new Audio(sound.url);
+        audio.loop = true;
+        audio.volume = 0;
+
+        await audio.play();
+        this.mixedSounds.set(id, audio);
+
+        // Fade in
+        await this.fadeIn(audio, volume, 1500);
+      }
+
+      this.isPlaying = true;
+      logger.info('Mixed ambient started', { count: sounds.length }, 'MEDITATION_AUDIO');
+    } catch (error) {
+      logger.error('Error playing mixed ambient', error as Error, 'MEDITATION_AUDIO');
+    }
+  }
+
+  /**
+   * Ajuste le volume d'un son dans le mix
+   */
+  setMixedVolume(soundId: AmbientSoundType, volume: number): void {
+    const audio = this.mixedSounds.get(soundId);
+    if (audio) {
+      audio.volume = Math.max(0, Math.min(1, volume));
+    }
+  }
+
+  /**
+   * Arrête tous les sons mixés
+   */
+  async stopAllMixed(): Promise<void> {
+    const promises = Array.from(this.mixedSounds.values()).map(audio => 
+      this.fadeOut(audio, 1000).then(() => {
+        audio.pause();
+      })
+    );
+    await Promise.all(promises);
+    this.mixedSounds.clear();
+  }
+
+  /**
+   * Précharge un son pour lecture instantanée
+   */
+  async preload(soundId: AmbientSoundType): Promise<void> {
+    const sound = AMBIENT_SOUNDS.find(s => s.id === soundId);
+    if (!sound) return;
+
+    const audio = new Audio();
+    audio.preload = 'auto';
+    audio.src = sound.url;
+    
+    return new Promise((resolve) => {
+      audio.oncanplaythrough = () => resolve();
+      audio.onerror = () => resolve();
+    });
+  }
+
+  /**
+   * Récupère le son ambiant actuellement en lecture
+   */
+  getCurrentAmbientId(): AmbientSoundType | null {
+    return this.currentAmbientId;
+  }
+
+  /**
    * Joue un son ambiant
    */
   async playAmbient(soundId: AmbientSoundType, volume: number = 0.5): Promise<void> {
@@ -156,12 +279,13 @@ class MeditationAudioServiceClass {
       }
 
       // Stop existing ambient
-      this.stopAmbient();
+      await this.stopAmbient();
 
       this.ambientAudio = new Audio(sound.url);
       this.ambientAudio.loop = true;
       this.ambientAudio.volume = 0;
       this.currentVolume = volume;
+      this.currentAmbientId = soundId;
 
       await this.ambientAudio.play();
       this.isPlaying = true;
@@ -173,6 +297,7 @@ class MeditationAudioServiceClass {
     } catch (error) {
       logger.error('Error playing ambient sound', error as Error, 'MEDITATION_AUDIO');
       this.isPlaying = false;
+      this.currentAmbientId = null;
     }
   }
 
