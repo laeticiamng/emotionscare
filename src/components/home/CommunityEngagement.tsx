@@ -1,5 +1,6 @@
 /**
- * CommunityEngagement - Engagement communautaire avec défis et leaderboards
+ * CommunityEngagement - Engagement communautaire avec framing interventionnel
+ * Vision: Pas de défis "wellness", mais des rituels de régulation collective
  */
 
 import React, { useState } from 'react';
@@ -13,74 +14,72 @@ import {
   Flame,
   Users,
   Target,
-  Medal,
   Heart,
-  Sparkles,
   ArrowRight,
-  CheckCircle2,
+  StopCircle,
+  Moon,
+  Zap,
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 
 interface Challenge {
   id: string;
   title: string;
-  description: string;
+  situation: string; // Moment vécu, pas description technique
   participants: number;
   progress: number;
   icon: React.ReactNode;
   color: string;
-  reward: string;
+  effect: string;
 }
 
 interface LeaderboardEntry {
   rank: number;
   name: string;
-  points: number;
+  sessions: number;
   streak: number;
-  avatar: string;
   badge?: string;
 }
 
 const challenges: Challenge[] = [
   {
     id: '1',
-    title: 'Semaine de bien-être',
-    description: '7 sessions de scan émotionnel consécutives',
+    title: 'Protocole matin',
+    situation: '7 jours de reset au réveil',
     participants: 3421,
     progress: 65,
-    icon: <Flame className="h-5 w-5" />,
-    color: 'bg-orange-500',
-    reward: '+100 points',
+    icon: <Zap className="h-5 w-5" />,
+    color: 'bg-amber-500',
+    effect: 'Démarrer sans brouillard mental',
   },
   {
     id: '2',
-    title: 'Mélomane IA',
-    description: 'Écoutez 10 compositions musicales différentes',
+    title: 'Arrêt nocturne',
+    situation: '5 sessions avant de dormir',
     participants: 2156,
     progress: 42,
-    icon: <Heart className="h-5 w-5" />,
-    color: 'bg-pink-500',
-    reward: '+80 points',
+    icon: <Moon className="h-5 w-5" />,
+    color: 'bg-indigo-500',
+    effect: 'Couper le cerveau le soir',
   },
   {
     id: '3',
-    title: 'Conversation avec Nyvée',
-    description: 'Ayez 5 conversations avec votre coach IA',
+    title: 'Stop crise',
+    situation: '3 interventions en urgence',
     participants: 1847,
     progress: 78,
-    icon: <Sparkles className="h-5 w-5" />,
-    color: 'bg-purple-500',
-    reward: '+90 points',
+    icon: <StopCircle className="h-5 w-5" />,
+    color: 'bg-red-500',
+    effect: 'Savoir se stopper quand ça monte',
   },
 ];
 
 const leaderboard: LeaderboardEntry[] = [
-  { rank: 1, name: 'Alex C.', points: 4850, streak: 45, avatar: '/avatars/avatar-1.jpg', badge: '👑' },
-  { rank: 2, name: 'Jordan M.', points: 4620, streak: 38, avatar: '/avatars/avatar-2.jpg' },
-  { rank: 3, name: 'Sam L.', points: 4390, streak: 32, avatar: '/avatars/avatar-3.jpg' },
-  { rank: 4, name: 'Casey R.', points: 4120, streak: 28, avatar: '/avatars/avatar-4.jpg' },
-  { rank: 5, name: 'Taylor P.', points: 3950, streak: 24, avatar: '/avatars/avatar-5.jpg' },
+  { rank: 1, name: 'Alex C.', sessions: 45, streak: 45, badge: '👑' },
+  { rank: 2, name: 'Jordan M.', sessions: 38, streak: 38 },
+  { rank: 3, name: 'Sam L.', sessions: 32, streak: 32 },
+  { rank: 4, name: 'Casey R.', sessions: 28, streak: 28 },
+  { rank: 5, name: 'Taylor P.', sessions: 24, streak: 24 },
 ];
 
 const CommunityEngagement: React.FC = () => {
@@ -116,17 +115,18 @@ const CommunityEngagement: React.FC = () => {
           viewport={{ once: true }}
           className="space-y-12"
         >
-          {/* Header */}
+          {/* Header - Framing interventionnel */}
           <motion.div variants={itemVariants} className="text-center space-y-4">
             <Badge variant="outline" className="justify-center">
               <Users className="h-3 w-3 mr-2" />
-              Communauté
+              Rituels collectifs
             </Badge>
-            <h2 className="text-4xl lg:text-5xl font-bold">
-              Relevez des défis ensemble
+            <h2 className="text-3xl lg:text-4xl font-bold">
+              Tu n'es pas seul à lutter
             </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Motivez-vous mutuellement, participez à des défis collectifs et gagnez des récompenses
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Des milliers de personnes utilisent les mêmes protocoles que toi.
+              <span className="text-foreground font-medium"> Ensemble, on crée des rituels qui tiennent.</span>
             </p>
           </motion.div>
 
@@ -135,11 +135,11 @@ const CommunityEngagement: React.FC = () => {
             variants={containerVariants}
             className="grid grid-cols-1 lg:grid-cols-2 gap-8"
           >
-            {/* Challenges */}
+            {/* Challenges/Rituels */}
             <motion.div variants={itemVariants} className="space-y-4">
-              <h3 className="text-2xl font-bold flex items-center gap-2">
-                <Target className="h-6 w-6 text-primary" />
-                Défis actifs
+              <h3 className="text-xl font-bold flex items-center gap-2">
+                <Target className="h-5 w-5 text-primary" />
+                Protocoles en cours
               </h3>
 
               <div className="space-y-3">
@@ -169,25 +169,24 @@ const CommunityEngagement: React.FC = () => {
                             <div className="flex-1 min-w-0">
                               <h4 className="font-semibold text-sm">{challenge.title}</h4>
                               <p className="text-xs text-muted-foreground mt-1">
-                                {challenge.description}
+                                {challenge.situation}
                               </p>
                             </div>
                           </div>
                           <Badge variant="secondary" className="text-xs flex-shrink-0">
-                            {challenge.reward}
+                            {challenge.participants.toLocaleString()} actifs
                           </Badge>
                         </div>
 
                         {/* Progress Bar */}
                         <div className="space-y-2">
                           <div className="flex justify-between text-xs">
-                            <span className="text-muted-foreground">{challenge.progress}% complété</span>
-                            <span className="text-muted-foreground">{challenge.participants} participants</span>
+                            <span className="text-muted-foreground">{challenge.progress}% de ton objectif</span>
                           </div>
                           <Progress value={challenge.progress} className="h-2" />
                         </div>
 
-                        {/* Join Button */}
+                        {/* Effect + Join Button */}
                         <motion.div
                           initial={{ opacity: 0, height: 0 }}
                           animate={{
@@ -197,8 +196,11 @@ const CommunityEngagement: React.FC = () => {
                           transition={{ duration: 0.3 }}
                           className="overflow-hidden"
                         >
-                          <Button className="w-full mt-2" size="sm" variant="outline">
-                            Rejoindre le défi
+                          <p className="text-sm text-foreground/80 py-2 border-t border-border/50 mb-2">
+                            <span className="text-primary font-medium">Effet :</span> {challenge.effect}
+                          </p>
+                          <Button className="w-full" size="sm" variant="outline">
+                            Rejoindre le protocole
                             <ArrowRight className="h-3 w-3 ml-2" />
                           </Button>
                         </motion.div>
@@ -209,19 +211,19 @@ const CommunityEngagement: React.FC = () => {
               </div>
             </motion.div>
 
-            {/* Leaderboard */}
+            {/* Leaderboard - Sessions pas points */}
             <motion.div variants={itemVariants} className="space-y-4">
-              <h3 className="text-2xl font-bold flex items-center gap-2">
-                <Trophy className="h-6 w-6 text-yellow-500" />
-                Classement
+              <h3 className="text-xl font-bold flex items-center gap-2">
+                <Trophy className="h-5 w-5 text-yellow-500" />
+                Régularité
               </h3>
 
               <Card>
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
-                    <CardTitle>Top 5 cette semaine</CardTitle>
+                    <CardTitle className="text-base">Qui tient le plus longtemps</CardTitle>
                     <Badge variant="secondary" className="text-xs">
-                      En direct
+                      Cette semaine
                     </Badge>
                   </div>
                 </CardHeader>
@@ -260,45 +262,44 @@ const CommunityEngagement: React.FC = () => {
                         </div>
                         <div className="flex items-center gap-2 text-xs text-muted-foreground">
                           <Flame className="h-3 w-3" />
-                          <span>{entry.streak} jours</span>
+                          <span>{entry.streak} jours sans casser</span>
                         </div>
                       </div>
 
-                      {/* Points */}
+                      {/* Sessions */}
                       <div className="text-right flex-shrink-0">
-                        <div className="font-bold text-sm">{entry.points}</div>
-                        <div className="text-xs text-muted-foreground">points</div>
+                        <div className="font-bold text-sm">{entry.sessions}</div>
+                        <div className="text-xs text-muted-foreground">sessions</div>
                       </div>
                     </motion.div>
                   ))}
                 </CardContent>
               </Card>
 
-              {/* CTA */}
-              <Button className="w-full" size="sm" variant="outline">
-                Voir le classement complet
-                <ArrowRight className="h-3 w-3 ml-2" />
-              </Button>
+              {/* Micro-copy rétention */}
+              <p className="text-center text-sm text-muted-foreground italic">
+                "Reviens avant que ton corps n'explose."
+              </p>
             </motion.div>
           </motion.div>
 
-          {/* Community Stats */}
+          {/* Community Stats - Reframés */}
           <motion.div
             variants={itemVariants}
             className="grid grid-cols-2 md:grid-cols-4 gap-4"
           >
             {[
-              { icon: '👥', label: 'Membres actifs', value: '25K+' },
-              { icon: '🎯', label: 'Défis complétés', value: '150K+' },
-              { icon: '🏆', label: 'Récompenses distribuées', value: '5M+' },
-              { icon: '🌟', label: 'Groupes communautaires', value: '500+' },
+              { icon: <Heart className="h-6 w-6 text-pink-500" />, label: 'Personnes qui luttent ensemble', value: '25K+' },
+              { icon: <StopCircle className="h-6 w-6 text-red-500" />, label: 'Crises interrompues', value: '150K+' },
+              { icon: <Zap className="h-6 w-6 text-amber-500" />, label: 'Resets réussis', value: '5M+' },
+              { icon: <Moon className="h-6 w-6 text-indigo-500" />, label: 'Nuits récupérées', value: '500K+' },
             ].map((stat, i) => (
               <motion.div
                 key={i}
                 className="text-center p-4 rounded-lg bg-muted/30 border border-border/50"
-                whileHover={{ scale: 1.05 }}
+                whileHover={{ scale: 1.02 }}
               >
-                <div className="text-3xl mb-2">{stat.icon}</div>
+                <div className="mx-auto w-fit mb-2">{stat.icon}</div>
                 <div className="text-2xl font-bold text-primary mb-1">{stat.value}</div>
                 <div className="text-xs text-muted-foreground">{stat.label}</div>
               </motion.div>

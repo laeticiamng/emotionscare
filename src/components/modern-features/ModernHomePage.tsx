@@ -1,13 +1,12 @@
 /**
- * ModernHomePage - Version améliorée de la page d'accueil
- * Conserve l'apparence existante tout en ajoutant des fonctionnalités modernes
+ * ModernHomePage - Version interventionnelle de la page d'accueil
+ * Vision: EmotionsCare n'est pas une plateforme, c'est un réflexe émotionnel
  */
 
 import React, { useState, lazy, Suspense } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import UnifiedHomePage from '@/pages/unified/UnifiedHomePage';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Link } from 'react-router-dom';
 import { useUserStatsQuery, useUserStatsRealtime } from '@/hooks/useUserStatsQuery';
@@ -18,25 +17,19 @@ import {
   ArrowRight,
   User,
   Bell,
-  TrendingUp,
   Zap,
-  Activity,
   Target,
   Flame,
-  Trophy,
-  ShoppingBag,
-  Sparkles,
-  Shield,
-  Star
+  StopCircle,
+  Moon,
 } from 'lucide-react';
-import { Progress } from '@/components/ui/progress';
 import EnrichedHeroSection from '@/components/home/EnrichedHeroSection';
 import OnboardingGuide from '@/components/home/OnboardingGuide';
 import QuickStartModules from '@/components/home/QuickStartModules';
 import CommunityEngagement from '@/components/home/CommunityEngagement';
+import AcademySection from '@/components/home/AcademySection';
 
 // Code splitting : lazy load des sections non critiques
-const ActivityFeed = lazy(() => import('@/components/home/ActivityFeed'));
 const FAQSection = lazy(() => import('@/components/home/FAQSection'));
 
 // Skeleton de chargement pour sections lazy
@@ -55,12 +48,6 @@ const SectionSkeleton = () => (
     </div>
   </div>
 );
-
-interface Achievement {
-  name: string;
-  icon: string;
-  date: string;
-}
 
 interface QuickAction {
   title: string;
@@ -82,46 +69,34 @@ const ModernHomePage: React.FC = () => {
   // Activer les notifications automatiques pour les changements de stats
   useStatsNotifications(userStats, statsLoading);
 
-  const recentAchievements: Achievement[] = [
-    { name: 'Semaine productive', icon: '🎯', date: 'Aujourd\'hui' },
-    { name: 'Premier badge', icon: '🏆', date: 'Hier' },
-    { name: 'Connexion quotidienne', icon: '🔥', date: 'Il y a 2 jours' }
-  ];
-
+  // Actions rapides reframées - interventions, pas fonctionnalités
   const quickActions: QuickAction[] = [
     { 
-      title: 'Musique émotionnelle', 
-      desc: 'Génération musicale par IA',
-      icon: <Activity className="h-5 w-5" />,
-      href: '/app/music',
-      color: 'bg-pink-500'
+      title: 'Stop urgence', 
+      desc: 'Interrompre une montée anxieuse',
+      icon: <StopCircle className="h-5 w-5" />,
+      href: '/app/scan?mode=stop',
+      color: 'bg-red-500'
     },
     { 
-      title: 'Démarrer une session', 
-      desc: 'Commencer votre parcours bien-être',
+      title: 'Reset rapide', 
+      desc: 'Récupérer en 3 minutes',
       icon: <Zap className="h-5 w-5" />,
-      href: '/app/scan',
-      color: 'bg-blue-500'
+      href: '/app/scan?mode=reset',
+      color: 'bg-amber-500'
     },
     { 
-      title: 'Voir mes statistiques', 
-      desc: 'Analyser vos progrès',
-      icon: <TrendingUp className="h-5 w-5" />,
-      href: '/app/activity',
-      color: 'bg-green-500'
+      title: 'Arrêt nocturne', 
+      desc: 'Forcer le cerveau à couper',
+      icon: <Moon className="h-5 w-5" />,
+      href: '/app/scan?mode=mental-stop',
+      color: 'bg-indigo-500'
     },
-    { 
-      title: 'Gérer mon profil', 
-      desc: 'Personnaliser votre expérience',
-      icon: <User className="h-5 w-5" />,
-      href: '/settings/profile',
-      color: 'bg-purple-500'
-    }
   ];
 
   return (
     <div className="relative">
-      {/* Bannière utilisateur connecté améliorée */}
+      {/* Bannière utilisateur connecté - version interventionnelle */}
       {isAuthenticated && user && (
         <div className="bg-gradient-to-r from-primary/10 to-blue-500/10 border-b border-primary/20 py-4">
           <div className="container mx-auto px-4">
@@ -138,10 +113,9 @@ const ModernHomePage: React.FC = () => {
                 <div>
                   <div className="flex items-center gap-2 text-sm font-medium">
                     <span>Bonjour <strong>{user.email?.split('@')[0] || 'Utilisateur'}</strong></span>
-                    <Badge variant="secondary" className="text-xs">Pro</Badge>
                   </div>
                   <div className="text-xs text-muted-foreground">
-                    Dernière connexion: Aujourd'hui • {onlineCount > 0 ? `${onlineCount} utilisateur${onlineCount > 1 ? 's' : ''} en ligne` : 'Chargement...'}
+                    {onlineCount > 0 ? `${onlineCount} personnes en ligne en ce moment` : 'Chargement...'}
                   </div>
                 </div>
               </div>
@@ -159,7 +133,6 @@ const ModernHomePage: React.FC = () => {
                     <Badge
                       variant="destructive"
                       className="absolute -top-1 -right-1 h-5 w-5 text-xs p-0 flex items-center justify-center"
-                      aria-label={`${notifications} notification${notifications > 1 ? 's' : ''}`}
                     >
                       {notifications}
                     </Badge>
@@ -170,18 +143,18 @@ const ModernHomePage: React.FC = () => {
                 <Link to="/app/home">
                   <Button variant="default" size="sm" className="gap-2">
                     <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                    Accéder à votre espace
+                    Mon espace
                   </Button>
                 </Link>
               </div>
             </div>
 
-            {/* Stats rapides avec composants réutilisables */}
+            {/* Stats rapides - reframées */}
             <StatsGrid columns={4}>
               <StatsCard
-                label="Objectifs"
+                label="Sessions"
                 subtitle="Cette semaine"
-                value={userStats.weeklyGoals}
+                value={userStats.completedSessions}
                 icon={Target}
                 iconColor="text-blue-500"
                 valueColor="text-blue-600"
@@ -189,32 +162,6 @@ const ModernHomePage: React.FC = () => {
                 variant="gradient"
                 size="sm"
                 delay={0}
-              />
-
-              <StatsCard
-                label="Sessions"
-                subtitle="Complétées"
-                value={userStats.completedSessions}
-                icon={Activity}
-                iconColor="text-green-500"
-                valueColor="text-green-600"
-                loading={statsLoading}
-                variant="gradient"
-                size="sm"
-                delay={1}
-              />
-
-              <StatsCard
-                label="Points"
-                subtitle={`Niveau ${userStats.level}`}
-                value={userStats.totalPoints}
-                icon={Trophy}
-                iconColor="text-yellow-500"
-                valueColor="text-yellow-600"
-                loading={statsLoading}
-                variant="gradient"
-                size="sm"
-                delay={2}
               />
 
               <StatsCard
@@ -227,13 +174,39 @@ const ModernHomePage: React.FC = () => {
                 loading={statsLoading}
                 variant="gradient"
                 size="sm"
+                delay={1}
+              />
+
+              <StatsCard
+                label="Stop"
+                subtitle="Crises interrompues"
+                value={userStats.weeklyGoals}
+                icon={StopCircle}
+                iconColor="text-red-500"
+                valueColor="text-red-600"
+                loading={statsLoading}
+                variant="gradient"
+                size="sm"
+                delay={2}
+              />
+
+              <StatsCard
+                label="Resets"
+                subtitle="Ce mois"
+                value={userStats.totalPoints}
+                icon={Zap}
+                iconColor="text-amber-500"
+                valueColor="text-amber-600"
+                loading={statsLoading}
+                variant="gradient"
+                size="sm"
                 delay={3}
               />
             </StatsGrid>
 
-            {/* Actions rapides */}
+            {/* Actions rapides - interventions */}
             <div className="mt-4">
-              <div className="text-sm font-medium mb-2">Actions rapides</div>
+              <div className="text-sm font-medium mb-2">Besoin d'intervenir maintenant ?</div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                 {quickActions.map((action, index) => (
                   <Link key={index} to={action.href}>
@@ -254,164 +227,49 @@ const ModernHomePage: React.FC = () => {
                 ))}
               </div>
             </div>
-
-            {/* Derniers succès */}
-            <div className="mt-4">
-              <div className="text-sm font-medium mb-2">Derniers succès</div>
-              <div className="flex gap-2">
-                {recentAchievements.map((achievement, index) => (
-                  <Badge key={index} variant="secondary" className="flex items-center gap-1">
-                    <span>{achievement.icon}</span>
-                    <span className="text-xs">{achievement.name}</span>
-                    <span className="text-xs text-muted-foreground">• {achievement.date}</span>
-                  </Badge>
-                ))}
-              </div>
-            </div>
           </div>
         </div>
       )}
 
-      {/* SECTION 1: Section héro enrichie */}
+      {/* SECTION 1: Hero interventionnel */}
       <EnrichedHeroSection />
 
-      {/* SECTION 2: Guide de démarrage */}
+      {/* SECTION 2: Onboarding ultra-court */}
       <OnboardingGuide />
 
-      {/* SECTION 3: Modules rapides */}
+      {/* SECTION 3: Protocoles d'activation */}
       <QuickStartModules />
 
-      {/* SECTION 4: Flux d'activité en direct (lazy loaded) */}
-      <Suspense fallback={<SectionSkeleton />}>
-        <ActivityFeed />
-      </Suspense>
+      {/* SECTION 4: Academy - Comprendre pour reprendre la main */}
+      <AcademySection />
 
       {/* SECTION 5: Engagement communautaire */}
       <CommunityEngagement />
 
-      {/* SECTION 6: Page d'accueil unifiée originale */}
-      <UnifiedHomePage variant="full" />
-
-      {/* SECTION 7: Section fonctionnalités modernes (pour tous les utilisateurs) */}
-      <div className="bg-gradient-to-b from-muted/20 to-background py-16">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Découvrez nos fonctionnalités</h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Une expérience complète pour votre bien-être émotionnel avec des outils modernes et intuitifs
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            {/* Fonctionnalité Store - Mise en avant */}
-            <Card className="text-center hover:shadow-xl transition-all border-2 border-primary/20 hover:border-primary/40 bg-gradient-to-br from-primary/5 to-primary/10">
-              <CardHeader>
-                <div className="h-14 w-14 bg-primary rounded-lg flex items-center justify-center mx-auto mb-4 shadow-lg" aria-hidden="true">
-                  <ShoppingBag className="h-7 w-7 text-primary-foreground" />
-                </div>
-                <CardTitle className="text-xl">EmotionsCare Store</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground mb-4 text-sm">
-                  Collection premium de produits bien-être : luminothérapie, relaxation, objets sensoriels. Chaque achat débloque l'accès aux modules digitaux correspondants.
-                </p>
-                <Link to="/store">
-                  <Button className="w-full shadow-md hover:shadow-lg">
-                    <Sparkles className="h-4 w-4 mr-2" />
-                    Découvrir la boutique
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
-
-            {/* Fonctionnalité 1 */}
-            <Card className="text-center">
-              <CardHeader>
-                <div className="h-12 w-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4" aria-hidden="true">
-                  <Activity className="h-6 w-6 text-blue-600" />
-                </div>
-                <CardTitle>Suivi en temps réel</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  Moniteur vos émotions et votre bien-être avec des analyses en temps réel et des insights personnalisés.
-                </p>
-                <div className="mt-4">
-                  <Progress value={85} className="h-2" />
-                  <div className="text-sm text-muted-foreground mt-1">85% de satisfaction utilisateur</div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Fonctionnalité 2 */}
-            <Card className="text-center">
-              <CardHeader>
-                <div className="h-12 w-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-4" aria-hidden="true">
-                  <Shield className="h-6 w-6 text-green-600" />
-                </div>
-                <CardTitle>Données sécurisées</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  Vos données sont protégées par un chiffrement de niveau bancaire et une conformité RGPD totale.
-                </p>
-                <div className="flex items-center justify-center gap-2 mt-4">
-                  <Badge variant="outline" className="text-green-600 border-green-600">
-                    <Shield className="h-3 w-3 mr-1" />
-                    Certifié
-                  </Badge>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Fonctionnalité 3 */}
-            <Card className="text-center">
-              <CardHeader>
-                <div className="h-12 w-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-4" aria-hidden="true">
-                  <Star className="h-6 w-6 text-purple-600" />
-                </div>
-                <CardTitle>Expérience premium</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  Interface moderne, responsive et accessible, conçue pour une expérience utilisateur exceptionnelle.
-                </p>
-                <div className="flex items-center justify-center gap-1 mt-4">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <Star key={star} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                  ))}
-                  <span className="text-sm text-muted-foreground ml-2">(4.9/5)</span>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </div>
-
-      {/* SECTION 8: FAQ (lazy loaded) */}
+      {/* SECTION 6: FAQ (lazy loaded) */}
       <Suspense fallback={<SectionSkeleton />}>
         <FAQSection />
       </Suspense>
 
-      {/* Statistiques globales */}
+      {/* Stats globales - reframées */}
       <div className="bg-primary/5 py-8">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             <div>
               <div className="text-3xl font-bold text-primary">{onlineCount > 0 ? onlineCount.toLocaleString() : '...'}</div>
-              <div className="text-sm text-muted-foreground">Utilisateurs actifs</div>
+              <div className="text-sm text-muted-foreground">En ligne maintenant</div>
             </div>
             <div>
-              <div className="text-3xl font-bold text-green-600">98.7%</div>
-              <div className="text-sm text-muted-foreground">Satisfaction</div>
+              <div className="text-3xl font-bold text-red-500">150K+</div>
+              <div className="text-sm text-muted-foreground">Crises interrompues</div>
             </div>
             <div>
-              <div className="text-3xl font-bold text-purple-600">24/7</div>
-              <div className="text-sm text-muted-foreground">Support disponible</div>
+              <div className="text-3xl font-bold text-indigo-500">500K+</div>
+              <div className="text-sm text-muted-foreground">Nuits récupérées</div>
             </div>
             <div>
-              <div className="text-3xl font-bold text-orange-600">150k+</div>
-              <div className="text-sm text-muted-foreground">Sessions complétées</div>
+              <div className="text-3xl font-bold text-amber-500">5M+</div>
+              <div className="text-sm text-muted-foreground">Resets réussis</div>
             </div>
           </div>
         </div>
