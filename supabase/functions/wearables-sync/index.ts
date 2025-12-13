@@ -267,25 +267,93 @@ function analyzeHealthData(data: HealthData[]): string[] {
   
   if (data.length === 0) return insights;
 
-  const avgHr = data.filter(d => d.heartRate).reduce((sum, d) => sum + (d.heartRate || 0), 0) / data.filter(d => d.heartRate).length;
-  const avgHrv = data.filter(d => d.hrv).reduce((sum, d) => sum + (d.hrv || 0), 0) / data.filter(d => d.hrv).length;
+  // Calculs moyennes avec protection contre division par zéro
+  const hrData = data.filter(d => d.heartRate && d.heartRate > 0);
+  const hrvData = data.filter(d => d.hrv && d.hrv > 0);
+  const sleepData = data.filter(d => d.sleepMinutes && d.sleepMinutes > 0);
+  const stressData = data.filter(d => d.stressLevel !== undefined);
+  
+  const avgHr = hrData.length > 0 
+    ? hrData.reduce((sum, d) => sum + (d.heartRate || 0), 0) / hrData.length 
+    : 0;
+  const avgHrv = hrvData.length > 0 
+    ? hrvData.reduce((sum, d) => sum + (d.hrv || 0), 0) / hrvData.length 
+    : 0;
   const totalSteps = data.reduce((sum, d) => sum + (d.steps || 0), 0);
+  const avgSleep = sleepData.length > 0
+    ? sleepData.reduce((sum, d) => sum + (d.sleepMinutes || 0), 0) / sleepData.length / 60
+    : 0;
+  const avgStress = stressData.length > 0
+    ? stressData.reduce((sum, d) => sum + (d.stressLevel || 0), 0) / stressData.length
+    : 0;
 
-  if (avgHr > 80) {
-    insights.push('💓 Votre fréquence cardiaque moyenne est élevée. Pensez à pratiquer des exercices de respiration.');
+  // Insights fréquence cardiaque
+  if (avgHr > 0) {
+    if (avgHr > 85) {
+      insights.push('💓 Fréquence cardiaque élevée. Pratiquez des exercices de respiration pour la réguler.');
+    } else if (avgHr < 55 && avgHr > 0) {
+      insights.push('💗 Excellent! Votre fréquence cardiaque au repos est optimale.');
+    } else if (avgHr >= 60 && avgHr <= 75) {
+      insights.push('💚 Bonne fréquence cardiaque, continuez ainsi!');
+    }
   }
   
-  if (avgHrv && avgHrv < 30) {
-    insights.push('📊 Votre variabilité cardiaque suggère un stress élevé. Une séance de méditation pourrait aider.');
+  // Insights HRV
+  if (avgHrv > 0) {
+    if (avgHrv < 25) {
+      insights.push('📊 Variabilité cardiaque faible = stress élevé. Une méditation de 10min peut aider.');
+    } else if (avgHrv > 50) {
+      insights.push('🧘 Excellente variabilité cardiaque! Votre récupération est optimale.');
+    } else if (avgHrv >= 30 && avgHrv <= 50) {
+      insights.push('📈 Bonne variabilité cardiaque, votre système nerveux est équilibré.');
+    }
   }
 
-  if (totalSteps < 5000) {
-    insights.push('🚶 Votre activité physique est faible. Essayez de faire une courte marche.');
-  } else if (totalSteps > 10000) {
-    insights.push('🎉 Excellent! Vous avez atteint plus de 10 000 pas.');
+  // Insights activité
+  if (totalSteps > 0) {
+    if (totalSteps < 3000) {
+      insights.push('🚶 Activité très faible. Essayez une marche de 15 minutes.');
+    } else if (totalSteps < 5000) {
+      insights.push('🚶 Activité modérée. Ajoutez 2000 pas pour atteindre votre objectif.');
+    } else if (totalSteps >= 10000) {
+      insights.push('🎉 Excellent! Objectif de 10 000 pas atteint!');
+    } else if (totalSteps >= 7500) {
+      insights.push('👍 Très bonne activité! Continuez ainsi.');
+    }
   }
 
-  return insights;
+  // Insights sommeil
+  if (avgSleep > 0) {
+    if (avgSleep < 6) {
+      insights.push('😴 Sommeil insuffisant. Visez 7-8h pour une récupération optimale.');
+    } else if (avgSleep >= 7 && avgSleep <= 9) {
+      insights.push('🌙 Excellent sommeil! Durée optimale pour la récupération.');
+    } else if (avgSleep > 9) {
+      insights.push('💤 Sommeil long. Vérifiez la qualité si fatigue persistante.');
+    }
+  }
+
+  // Insights stress
+  if (avgStress > 0) {
+    if (avgStress > 70) {
+      insights.push('⚠️ Niveau de stress élevé détecté. Prenez une pause respiration.');
+    } else if (avgStress < 30) {
+      insights.push('😊 Niveau de stress bas. Excellente gestion émotionnelle!');
+    }
+  }
+
+  // Corrélations
+  if (avgHrv > 0 && avgSleep > 0) {
+    if (avgHrv < 30 && avgSleep < 6) {
+      insights.push('🔗 Lien détecté: manque de sommeil impacte votre récupération cardiaque.');
+    }
+  }
+
+  if (totalSteps > 8000 && avgHrv > 40) {
+    insights.push('🏆 Super combo! Activité physique + bonne récupération = santé optimale.');
+  }
+
+  return insights.slice(0, 5); // Max 5 insights
 }
 
 function calculateHealthSummary(data: Array<{
