@@ -4,6 +4,7 @@ import { Sentry } from '@/lib/errors/sentry-compat';
 import { supabase } from '@/integrations/supabase/client';
 import { Link, useLocation } from 'react-router-dom';
 import { usePageSEO } from '@/hooks/usePageSEO';
+import { useOptimizedPage } from '@/hooks/useOptimizedPage';
 
 import PageRoot from '@/components/common/PageRoot';
 import { Button } from '@/components/ui/button';
@@ -38,6 +39,7 @@ const mapToSamScale = (value: number) => {
 };
 
 const B2CScanPage: React.FC = () => {
+  useOptimizedPage('B2CScanPage');
   usePageSEO({
     title: 'Scan Émotionnel - Analyse IA',
     description: 'Analysez vos émotions en temps réel avec notre IA : scan facial, vocal, image ou texte. Obtenez des insights personnalisés et recommandations musicales.',

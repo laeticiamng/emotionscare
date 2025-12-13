@@ -6,10 +6,12 @@ import { CoachView } from '@/modules/coach/CoachView';
 import { ConsentGate } from '@/features/clinical-optin/ConsentGate';
 import { MedicalDisclaimerDialog, useMedicalDisclaimer } from '@/components/medical/MedicalDisclaimerDialog';
 import { usePageSEO } from '@/hooks/usePageSEO';
+import { useOptimizedPage } from '@/hooks/useOptimizedPage';
 import { Button } from '@/components/ui/button';
 import { Target, Calendar, BarChart3 } from 'lucide-react';
 
 const B2CAICoachPage = () => {
+  useOptimizedPage('B2CAICoachPage');
   usePageSEO({
     title: 'Coach IA Émotionnel - Conseils personnalisés',
     description: 'Discutez avec votre coach émotionnel IA 24/7. Conseils bien-être, gestion du stress, développement personnel avec intelligence artificielle.',

@@ -1,6 +1,7 @@
 import React, { Suspense, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { routes } from '@/lib/routes';
+import { useOptimizedPage } from '@/hooks/useOptimizedPage';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -145,6 +146,7 @@ const DashboardWidgetSkeleton: React.FC<{ lines?: number }> = ({ lines = 4 }) =>
 );
 
 export default function B2CDashboardPage() {
+  useOptimizedPage('B2CDashboardPage');
   const { runAudit } = useAccessibilityAudit();
   const { has } = useFlags();
   const playback = useAdaptivePlayback();

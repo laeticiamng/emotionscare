@@ -7,6 +7,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePageSEO } from '@/hooks/usePageSEO';
+import { useOptimizedPage } from '@/hooks/useOptimizedPage';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -154,6 +155,7 @@ const categoryIcons = {
 };
 
 const B2CMusicEnhanced: React.FC = () => {
+  useOptimizedPage('B2CMusicEnhanced');
   usePageSEO({
     title: 'Musicothérapie IA - Musique personnalisée',
     description: 'Écoutez des musiques générées par IA adaptées à vos émotions. Bibliothèque personnalisée, playlists bien-être, recommandations intelligentes.',

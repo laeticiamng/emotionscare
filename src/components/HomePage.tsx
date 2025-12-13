@@ -6,8 +6,10 @@ import React from 'react';
 import ModernHomePage from './modern-features/ModernHomePage';
 import { usePageSEO } from '@/hooks/usePageSEO';
 import HomePageErrorBoundary from './error/HomePageErrorBoundary';
+import { useOptimizedPage } from '@/hooks/useOptimizedPage';
 
 const HomePage: React.FC = () => {
+  useOptimizedPage('HomePage');
   usePageSEO({
     title: 'Accueil - Intelligence émotionnelle et bien-être',
     description: 'EmotionsCare : plateforme d\'intelligence émotionnelle pour particuliers et entreprises. Scan émotions, musicothérapie IA, coach virtuel, VR bien-être.',

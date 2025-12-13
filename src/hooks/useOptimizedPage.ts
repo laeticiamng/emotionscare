@@ -3,7 +3,7 @@
  * Combine prefetch, preload, et mesure de performance
  */
 
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { preloadCriticalResources, prefetchRoutes, measureComponentRender, observeWebVitals } from '@/lib/performance/preloadCritical';
 import { logger } from '@/lib/logger';
@@ -136,8 +136,5 @@ export function useDataPrefetch<T>(
 
   return { data, isLoading, error };
 }
-
-// Import manquant
-import { useState } from 'react';
 
 export default useOptimizedPage;
