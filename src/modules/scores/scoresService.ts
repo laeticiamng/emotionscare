@@ -241,8 +241,124 @@ export class ScoresService {
     week: number,
     year: number
   ): Promise<WeeklyMetrics | null> {
-    // TODO: Implémenter la récupération depuis la DB ou calculer
-    return null;
+    try {
+      // Calculer les dates de début et fin de semaine
+      const startDate = this.getWeekStartDate(week, year);
+      const endDate = new Date(startDate);
+      endDate.setDate(endDate.getDate() + 7);
+
+      // Récupérer les données de la semaine
+      const [emotionalData, activityData, sessionData] = await Promise.all([
+        this.getEmotionalData(userId, startDate, endDate),
+        this.getActivityData(userId, startDate, endDate),
+        this.getSessionData(userId, startDate, endDate)
+      ]);
+
+      // Calculer les métriques
+      const emotional_score = this.calculateEmotionalScore(emotionalData);
+      const wellbeing_score = this.calculateWellbeingScore(emotionalData, activityData);
+      const engagement_score = this.calculateEngagementScore(sessionData, activityData);
+      const overall_score = Math.round(
+        emotional_score * 0.4 + wellbeing_score * 0.3 + engagement_score * 0.3
+      );
+
+      // Calculer les activités par jour
+      const dailyActivity: Record<string, number> = {};
+      for (let i = 0; i < 7; i++) {
+        const date = new Date(startDate);
+        date.setDate(date.getDate() + i);
+        const dayStr = date.toISOString().split('T')[0];
+        dailyActivity[dayStr] = activityData.filter(a => 
+          (a.created_at as string)?.startsWith(dayStr)
+        ).length;
+      }
+
+      // Vibe de la semaine
+      const vibeData = await this.getCurrentVibe(userId);
+
+      return {
+        week_number: week,
+        year,
+        emotional_score,
+        wellbeing_score,
+        engagement_score,
+        overall_score,
+        vibe: vibeData.current_vibe,
+        vibe_intensity: vibeData.vibe_intensity,
+        total_sessions: sessionData.length,
+        total_activities: activityData.length,
+        daily_activity: dailyActivity,
+        top_modules: this.getTopModules(activityData),
+        insights: await this.generateWeeklyInsights(userId, emotional_score, wellbeing_score, engagement_score),
+        start_date: startDate.toISOString(),
+        end_date: endDate.toISOString(),
+      };
+    } catch (error) {
+      logger.error('[ScoresService] Get weekly metrics error:', error, 'MODULE');
+      return null;
+    }
+  }
+
+  /**
+   * Obtenir la date de début d'une semaine ISO
+   */
+  private static getWeekStartDate(week: number, year: number): Date {
+    const simple = new Date(year, 0, 1 + (week - 1) * 7);
+    const dayOfWeek = simple.getDay();
+    const ISOweekStart = simple;
+    if (dayOfWeek <= 4) {
+      ISOweekStart.setDate(simple.getDate() - simple.getDay() + 1);
+    } else {
+      ISOweekStart.setDate(simple.getDate() + 8 - simple.getDay());
+    }
+    return ISOweekStart;
+  }
+
+  /**
+   * Obtenir les modules les plus utilisés
+   */
+  private static getTopModules(activityData: Record<string, unknown>[]): string[] {
+    const moduleCounts: Record<string, number> = {};
+    for (const activity of activityData) {
+      const module = activity.module_name as string;
+      if (module) {
+        moduleCounts[module] = (moduleCounts[module] || 0) + 1;
+      }
+    }
+    return Object.entries(moduleCounts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5)
+      .map(([name]) => name);
+  }
+
+  /**
+   * Générer les insights hebdomadaires
+   */
+  private static async generateWeeklyInsights(
+    userId: string,
+    emotional: number,
+    wellbeing: number,
+    engagement: number
+  ): Promise<string[]> {
+    const insights: string[] = [];
+
+    if (emotional >= 75) {
+      insights.push('🌟 Excellent équilibre émotionnel cette semaine !');
+    } else if (emotional < 50) {
+      insights.push('💡 Essayez plus de sessions de respiration pour améliorer votre score émotionnel.');
+    }
+
+    if (wellbeing >= 70) {
+      insights.push('✨ Votre bien-être est stable, continuez ainsi !');
+    }
+
+    if (engagement >= 80) {
+      insights.push('🎯 Engagement exceptionnel avec la plateforme !');
+    } else if (engagement < 40) {
+      insights.push('📱 Utilisez plus régulièrement les modules pour de meilleurs résultats.');
+    }
+
+    return insights;
   }
 
   /**
