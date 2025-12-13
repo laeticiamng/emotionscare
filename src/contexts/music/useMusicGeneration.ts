@@ -104,7 +104,7 @@ export const useMusicGeneration = (dispatch: Dispatch<MusicAction>) => {
         const track: MusicTrack = {
           ...randomTrack,
           id: `fallback-${Date.now()}`,
-          status: 'ready',
+          status: 'completed',
         };
 
         logger.info('Fallback track selected', { trackId: track.id, title: track.title }, 'MUSIC');
@@ -120,7 +120,7 @@ export const useMusicGeneration = (dispatch: Dispatch<MusicAction>) => {
         url: '/audio/default-ambient.mp3',
         audioUrl: '/audio/default-ambient.mp3',
         duration: 180,
-        status: 'ready',
+        status: 'completed',
       };
 
       return genericTrack;
