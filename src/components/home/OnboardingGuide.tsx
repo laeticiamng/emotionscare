@@ -1,79 +1,78 @@
 /**
- * OnboardingGuide - Guide de démarrage interactif pour nouveaux utilisateurs
+ * OnboardingGuide - Onboarding ultra court, orienté action immédiate
+ * Vision: L'utilisateur lance une session AVANT toute explication
  */
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { CheckCircle2, ArrowRight, Sparkles } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Card, CardContent } from '@/components/ui/card';
+import { useNavigate } from 'react-router-dom';
+import { Sun, Moon, Zap, AlertTriangle, ArrowRight, Play } from 'lucide-react';
 
-interface Step {
-  id: number;
-  title: string;
+interface Situation {
+  id: string;
+  label: string;
   description: string;
-  icon: string;
-  features: string[];
-  action: {
-    label: string;
-    href: string;
-  };
+  icon: React.ReactNode;
   color: string;
   gradient: string;
+  sessionPath: string;
 }
 
-const steps: Step[] = [
+const situations: Situation[] = [
   {
-    id: 1,
-    title: 'Découvrez votre profil émotionnel',
-    description: 'Commencez par un scan émotionnel rapide pour comprendre votre état actuel',
-    icon: '👁️',
-    features: ['Analyse en 30 secondes', 'Résultats détaillés', 'Recommandations personnalisées'],
-    action: { label: 'Faire mon scan', href: '/app/scan' },
-    color: 'text-green-500',
-    gradient: 'from-green-500 to-emerald-500',
+    id: 'morning',
+    label: 'Matin',
+    description: 'Difficile de démarrer, pensées lourdes dès le réveil',
+    icon: <Sun className="h-6 w-6" />,
+    color: 'text-amber-500',
+    gradient: 'from-amber-500/20 to-orange-500/10',
+    sessionPath: '/app/scan?context=morning',
   },
   {
-    id: 2,
-    title: 'Écoutez votre musique émotionnelle',
-    description: 'Recevez une composition musicale générée par IA adaptée à votre état',
-    icon: '🎵',
-    features: ['Musique en temps réel', 'Binaural beats', 'Sessions guidées'],
-    action: { label: 'Explorer la musique', href: '/app/music' },
-    color: 'text-purple-500',
-    gradient: 'from-purple-500 to-pink-500',
-  },
-  {
-    id: 3,
-    title: 'Parlez avec Nyvée',
-    description: 'Votre coach IA personnel qui comprend vos émotions et vos besoins',
-    icon: '🧠',
-    features: ['Conversation 24/7', 'Conseils personnalisés', 'Suivi émotionnel'],
-    action: { label: 'Rencontrer Nyvée', href: '/app/coach' },
+    id: 'day',
+    label: 'Journée',
+    description: 'Surcharge mentale, besoin de reset rapide',
+    icon: <Zap className="h-6 w-6" />,
     color: 'text-blue-500',
-    gradient: 'from-blue-500 to-cyan-500',
+    gradient: 'from-blue-500/20 to-cyan-500/10',
+    sessionPath: '/app/scan?context=day',
   },
   {
-    id: 4,
-    title: 'Suivez vos progrès',
-    description: 'Visualisez votre évolution émotionnelle avec des graphiques détaillés',
-    icon: '📊',
-    features: ['Tableaux de bord', 'Tendances long-terme', 'Rapports hebdomadaires'],
-    action: { label: 'Voir mon dashboard', href: '/app/analytics' },
-    color: 'text-orange-500',
-    gradient: 'from-orange-500 to-red-500',
+    id: 'night',
+    label: 'Nuit',
+    description: 'Impossible de couper, le cerveau continue de tourner',
+    icon: <Moon className="h-6 w-6" />,
+    color: 'text-indigo-500',
+    gradient: 'from-indigo-500/20 to-purple-500/10',
+    sessionPath: '/app/scan?context=night',
+  },
+  {
+    id: 'crisis',
+    label: 'Crise',
+    description: "Besoin d'arrêter maintenant, tout de suite",
+    icon: <AlertTriangle className="h-6 w-6" />,
+    color: 'text-red-500',
+    gradient: 'from-red-500/20 to-rose-500/10',
+    sessionPath: '/app/scan?context=crisis',
   },
 ];
 
 const OnboardingGuide: React.FC = () => {
-  const [activeStep, setActiveStep] = useState(0);
-  const [completedSteps, setCompletedSteps] = useState<number[]>([]);
+  const navigate = useNavigate();
+  const [selectedSituation, setSelectedSituation] = useState<string | null>(null);
+  const [step, setStep] = useState<'situation' | 'action'>('situation');
 
-  const handleStepComplete = (stepId: number) => {
-    if (!completedSteps.includes(stepId)) {
-      setCompletedSteps([...completedSteps, stepId]);
+  const handleSituationSelect = (situation: Situation) => {
+    setSelectedSituation(situation.id);
+    setStep('action');
+  };
+
+  const handleStartSession = () => {
+    const situation = situations.find(s => s.id === selectedSituation);
+    if (situation) {
+      navigate(situation.sessionPath);
     }
   };
 
@@ -82,196 +81,168 @@ const OnboardingGuide: React.FC = () => {
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.2,
+        staggerChildren: 0.08,
+        delayChildren: 0.1,
       },
     },
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
+    hidden: { opacity: 0, y: 15 },
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.6 },
+      transition: { duration: 0.5 },
     },
   };
 
-  const currentStep = steps[activeStep];
-  const progress = ((activeStep + 1) / steps.length) * 100;
-
   return (
-    <section className="py-20 bg-gradient-to-b from-muted/20 to-background">
-      <div className="container">
+    <section className="py-20 bg-gradient-to-b from-muted/10 to-background">
+      <div className="container max-w-4xl">
         <motion.div
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
-          className="space-y-12"
+          className="space-y-10"
         >
-          {/* Header */}
-          <motion.div variants={itemVariants} className="text-center space-y-4 mb-16">
-            <Badge variant="outline" className="mb-2">
-              <Sparkles className="h-3 w-3 mr-2" />
-              Bien démarrer
-            </Badge>
-            <h2 className="text-4xl lg:text-5xl font-bold">
-              Votre parcours en 4 étapes simples
-            </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Découvrez progressivement toutes les fonctionnalités d'EmotionsCare
-            </p>
-          </motion.div>
-
-          {/* Progress Bar */}
-          <motion.div variants={itemVariants} className="space-y-4">
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-sm font-medium">Étape {activeStep + 1} sur {steps.length}</span>
-              <span className="text-sm text-muted-foreground">{Math.round(progress)}% complété</span>
-            </div>
-            <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
+          <AnimatePresence mode="wait">
+            {step === 'situation' && (
               <motion.div
-                className="h-full bg-gradient-to-r from-primary to-blue-500"
-                initial={{ width: 0 }}
-                animate={{ width: `${progress}%` }}
-                transition={{ duration: 0.5 }}
-              />
-            </div>
-          </motion.div>
+                key="situation"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0, x: -50 }}
+                className="space-y-8"
+              >
+                {/* Étape 1 - Question directe */}
+                <motion.div variants={itemVariants} className="text-center space-y-4">
+                  <p className="text-sm font-medium text-primary uppercase tracking-wider">
+                    Étape 1
+                  </p>
+                  <h2 className="text-3xl lg:text-4xl font-bold text-foreground">
+                    À quel moment c'est le plus difficile pour toi ?
+                  </h2>
+                  <p className="text-muted-foreground text-lg max-w-xl mx-auto">
+                    On adapte la session à ton moment. Pas de formulaire, pas d'explication.
+                  </p>
+                </motion.div>
 
-          {/* Main Content */}
-          <motion.div
-            variants={itemVariants}
-            className="grid grid-cols-1 lg:grid-cols-3 gap-8"
-          >
-            {/* Steps Navigation */}
-            <div className="space-y-3">
-              {steps.map((step, index) => (
-                <motion.button
-                  key={step.id}
-                  onClick={() => setActiveStep(index)}
-                  className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
-                    activeStep === index
-                      ? 'border-primary bg-primary/5'
-                      : 'border-muted hover:border-primary/50 bg-card'
-                  }`}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <div className="flex items-start gap-3">
-                    <div className="text-2xl flex-shrink-0">{step.icon}</div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h3 className="font-semibold text-sm line-clamp-1">{step.title}</h3>
-                        {completedSteps.includes(step.id) && (
-                          <CheckCircle2 className="h-4 w-4 text-green-500 flex-shrink-0" />
-                        )}
-                      </div>
-                      <p className="text-xs text-muted-foreground line-clamp-2">
-                        {step.description}
-                      </p>
-                    </div>
-                  </div>
-                </motion.button>
-              ))}
-            </div>
-
-            {/* Step Details */}
-            <div className="lg:col-span-2">
-              <AnimatePresence mode="wait">
+                {/* Choix des situations */}
                 <motion.div
-                  key={activeStep}
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  transition={{ duration: 0.3 }}
+                  variants={containerVariants}
+                  className="grid grid-cols-2 lg:grid-cols-4 gap-4"
                 >
-                  <Card className={`border-2 bg-gradient-to-br ${currentStep.gradient} bg-opacity-[0.03] border-${currentStep.color}`}>
-                    <CardHeader>
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <div className="text-5xl mb-4">{currentStep.icon}</div>
-                          <CardTitle className="text-3xl">{currentStep.title}</CardTitle>
-                        </div>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="space-y-6">
-                      <p className="text-lg text-muted-foreground">
-                        {currentStep.description}
-                      </p>
-
-                      {/* Features List */}
-                      <div className="space-y-3">
-                        <h4 className="font-semibold text-sm">Ce que vous découvrirez :</h4>
-                        {currentStep.features.map((feature, i) => (
-                          <motion.div
-                            key={i}
-                            initial={{ opacity: 0, x: -10 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: i * 0.1 }}
-                            className="flex items-center gap-3 p-2 bg-white/5 rounded-lg"
+                  {situations.map((situation) => (
+                    <motion.div key={situation.id} variants={itemVariants}>
+                      <Card
+                        onClick={() => handleSituationSelect(situation)}
+                        className={`cursor-pointer transition-all duration-300 border-2 hover:shadow-lg group ${
+                          selectedSituation === situation.id
+                            ? 'border-primary shadow-lg'
+                            : 'border-border/50 hover:border-primary/50'
+                        }`}
+                      >
+                        <CardContent className="p-6 text-center space-y-3">
+                          <div
+                            className={`mx-auto h-14 w-14 rounded-2xl bg-gradient-to-br ${situation.gradient} flex items-center justify-center ${situation.color} group-hover:scale-110 transition-transform`}
                           >
-                            <CheckCircle2 className="h-4 w-4 text-green-500 flex-shrink-0" />
-                            <span className="text-sm">{feature}</span>
-                          </motion.div>
-                        ))}
+                            {situation.icon}
+                          </div>
+                          <div>
+                            <p className="font-semibold text-foreground">{situation.label}</p>
+                            <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                              {situation.description}
+                            </p>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+                  ))}
+                </motion.div>
+              </motion.div>
+            )}
+
+            {step === 'action' && (
+              <motion.div
+                key="action"
+                initial={{ opacity: 0, x: 50 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0 }}
+                className="space-y-8"
+              >
+                {/* Étape 2 - Action immédiate */}
+                <motion.div variants={itemVariants} className="text-center space-y-4">
+                  <p className="text-sm font-medium text-primary uppercase tracking-wider">
+                    Étape 2
+                  </p>
+                  <h2 className="text-3xl lg:text-4xl font-bold text-foreground">
+                    On te propose une session adaptée
+                  </h2>
+                  <p className="text-muted-foreground text-lg max-w-xl mx-auto">
+                    Tu n'as rien à réussir. Laisse faire.<br />
+                    <span className="text-sm">Tu peux arrêter quand tu veux.</span>
+                  </p>
+                </motion.div>
+
+                {/* Session préparée */}
+                <motion.div variants={itemVariants}>
+                  <Card className="max-w-md mx-auto border-2 border-primary/30 bg-gradient-to-br from-primary/5 to-transparent">
+                    <CardContent className="p-8 text-center space-y-6">
+                      <div className="mx-auto h-20 w-20 rounded-3xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
+                        <Play className="h-10 w-10 text-primary" />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <p className="text-xl font-semibold text-foreground">
+                          Session personnalisée
+                        </p>
+                        <p className="text-muted-foreground">
+                          Basée sur ton contexte : <span className="text-primary font-medium">
+                            {situations.find(s => s.id === selectedSituation)?.label}
+                          </span>
+                        </p>
+                        <p className="text-sm text-muted-foreground/70">
+                          Durée estimée : 2-5 minutes
+                        </p>
                       </div>
 
-                      {/* Actions */}
-                      <div className="flex gap-3 pt-6">
-                        <Button size="lg" className="flex-1" asChild>
-                          <Link to={currentStep.action.href}>
-                            {currentStep.action.label}
-                            <ArrowRight className="h-4 w-4 ml-2" />
-                          </Link>
+                      <div className="flex flex-col gap-3">
+                        <Button
+                          size="lg"
+                          onClick={handleStartSession}
+                          className="w-full py-6 text-lg font-semibold"
+                        >
+                          Lancer la session
+                          <ArrowRight className="h-5 w-5 ml-2" />
                         </Button>
-
-                        {activeStep < steps.length - 1 && (
-                          <Button
-                            size="lg"
-                            variant="outline"
-                            onClick={() => {
-                              handleStepComplete(currentStep.id);
-                              setActiveStep(activeStep + 1);
-                            }}
-                            className="flex-1"
-                          >
-                            Étape suivante
-                            <ArrowRight className="h-4 w-4 ml-2" />
-                          </Button>
-                        )}
+                        
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setStep('situation');
+                            setSelectedSituation(null);
+                          }}
+                          className="text-muted-foreground"
+                        >
+                          Changer de contexte
+                        </Button>
                       </div>
                     </CardContent>
                   </Card>
                 </motion.div>
-              </AnimatePresence>
-            </div>
-          </motion.div>
 
-          {/* Step Indicators */}
-          <motion.div
-            variants={itemVariants}
-            className="flex justify-center gap-3 mt-8"
-          >
-          {steps.map((step, index) => (
-              <motion.button
-                key={step.id}
-                onClick={() => setActiveStep(index)}
-                aria-label={`Étape ${index + 1}: ${step.title}${index === activeStep ? ' (active)' : ''}`}
-                aria-current={index === activeStep ? 'step' : undefined}
-                className={`h-3 rounded-full transition-all ${
-                  index === activeStep
-                    ? 'w-8 bg-primary'
-                    : index < activeStep
-                    ? 'w-3 bg-green-500'
-                    : 'w-3 bg-muted'
-                }`}
-                whileHover={{ scale: 1.2 }}
-                whileTap={{ scale: 0.9 }}
-              />
-            ))}
-          </motion.div>
+                {/* Note de réassurance */}
+                <motion.p
+                  variants={itemVariants}
+                  className="text-center text-sm text-muted-foreground/70 italic"
+                >
+                  "Note ce qui a changé. Même légèrement."
+                </motion.p>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </motion.div>
       </div>
     </section>

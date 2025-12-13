@@ -1,92 +1,107 @@
 /**
- * QuickStartModules - Cartes de démarrage rapide avec aperçu interactif
+ * QuickStartModules - Sessions et Protocoles (pas playlists ni musiques)
+ * Vision: Chaque session correspond à un moment vécu réel
+ * Repositionnement sémantique: Musique → Session, Playlist → Protocole, Écoute → Activation
  */
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowRight, Zap } from 'lucide-react';
+import { ArrowRight, StopCircle, Moon, Zap, Brain, Heart, Wind, Target, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 
-interface Module {
+interface Protocol {
   id: string;
   title: string;
-  description: string;
-  icon: string;
+  situation: string; // Le moment vécu réel
+  effect: string; // L'effet visible, pas la technique
+  icon: React.ReactNode;
   color: string;
   gradient: string;
-  features: string[];
+  duration: string;
   link: string;
   badge?: string;
-  demo?: boolean;
+  urgency?: 'low' | 'medium' | 'high';
 }
 
-const modules: Module[] = [
+const protocols: Protocol[] = [
   {
-    id: 'scan',
-    title: 'Scan émotionnel IA',
-    description: 'Analysez vos émotions en 30 secondes avec notre IA de reconnaissance faciale',
-    icon: '👁️',
-    color: 'text-green-500',
-    gradient: 'from-green-500 to-emerald-500',
-    features: ['99% de précision', 'Analyse instantanée', 'Rapports détaillés'],
-    link: '/app/scan',
-    badge: 'Populaire',
-    demo: true,
+    id: 'stop-anxiety',
+    title: 'Stop',
+    situation: 'Montée anxieuse en cours',
+    effect: 'Interrompre le cycle de pensées',
+    icon: <StopCircle className="h-6 w-6" />,
+    color: 'text-red-500',
+    gradient: 'from-red-500/15 to-rose-500/5',
+    duration: '2 min',
+    link: '/app/scan?mode=stop',
+    badge: 'Urgence',
+    urgency: 'high',
   },
   {
-    id: 'music',
-    title: 'Musique thérapeutique',
-    description: 'Écoutez des compositions musicales générées par IA adaptées à votre état',
-    icon: '🎵',
-    color: 'text-purple-500',
-    gradient: 'from-purple-500 to-pink-500',
-    features: ['Génération en temps réel', 'Binaural beats', 'Sessions guidées'],
-    link: '/app/music',
-    badge: 'Nouveau',
-  },
-  {
-    id: 'coach',
-    title: 'Coach personnel Nyvée',
-    description: 'Discutez avec votre assistant IA pour un soutien émotionnel 24/7',
-    icon: '🧠',
-    color: 'text-blue-500',
-    gradient: 'from-blue-500 to-cyan-500',
-    features: ['Disponibilité 24/7', 'Conseils personnalisés', 'Suivi émotionnel'],
-    link: '/app/coach',
-  },
-  {
-    id: 'journal',
-    title: 'Journal intelligent',
-    description: 'Écrivez vos pensées et laissez l\'IA analyser vos tendances émotionnelles',
-    icon: '📔',
-    color: 'text-orange-500',
-    gradient: 'from-orange-500 to-red-500',
-    features: ['Chiffrement e2e', 'Analyse de sentiments', 'Historique complet'],
-    link: '/app/journal',
-  },
-  {
-    id: 'vr',
-    title: 'Expériences VR',
-    description: 'Immergez-vous dans des environnements thérapeutiques en réalité virtuelle',
-    icon: '🥽',
+    id: 'mental-stop',
+    title: 'Arrêt mental',
+    situation: 'Corps épuisé, cerveau qui tourne',
+    effect: 'Forcer la déconnexion mentale',
+    icon: <Moon className="h-6 w-6" />,
     color: 'text-indigo-500',
-    gradient: 'from-indigo-500 to-purple-500',
-    features: ['Environnements 3D', 'Respiration guidée', 'Réalité mixte'],
-    link: '/app/vr-breath-guide',
+    gradient: 'from-indigo-500/15 to-purple-500/5',
+    duration: '5 min',
+    link: '/app/scan?mode=mental-stop',
+    badge: 'Nuit',
+    urgency: 'medium',
   },
   {
-    id: 'analytics',
-    title: 'Analytics wellness',
-    description: 'Visualisez votre progression émotionnelle avec des graphiques détaillés',
-    icon: '📊',
-    color: 'text-teal-500',
-    gradient: 'from-teal-500 to-blue-500',
-    features: ['Métriques détaillées', 'Tendances long-terme', 'Rapports exportables'],
-    link: '/app/analytics',
+    id: 'reset',
+    title: 'Reset',
+    situation: 'Besoin de continuer sans craquer',
+    effect: "Récupérer sans s'arrêter longtemps",
+    icon: <Zap className="h-6 w-6" />,
+    color: 'text-amber-500',
+    gradient: 'from-amber-500/15 to-orange-500/5',
+    duration: '3 min',
+    link: '/app/scan?mode=reset',
+    badge: 'Journée',
+    urgency: 'medium',
+  },
+  {
+    id: 'regulation',
+    title: 'Régulation',
+    situation: 'Émotions trop intenses',
+    effect: 'Ramener à un niveau gérable',
+    icon: <Heart className="h-6 w-6" />,
+    color: 'text-pink-500',
+    gradient: 'from-pink-500/15 to-rose-500/5',
+    duration: '4 min',
+    link: '/app/coach',
+    urgency: 'medium',
+  },
+  {
+    id: 'breath',
+    title: 'Respiration',
+    situation: 'Souffle court, tension physique',
+    effect: "Relâcher le corps automatiquement",
+    icon: <Wind className="h-6 w-6" />,
+    color: 'text-cyan-500',
+    gradient: 'from-cyan-500/15 to-blue-500/5',
+    duration: '3 min',
+    link: '/app/vr-breath-guide',
+    urgency: 'low',
+  },
+  {
+    id: 'focus',
+    title: 'Concentration',
+    situation: 'Impossible de se concentrer',
+    effect: 'Retrouver la clarté mentale',
+    icon: <Target className="h-6 w-6" />,
+    color: 'text-emerald-500',
+    gradient: 'from-emerald-500/15 to-green-500/5',
+    duration: '5 min',
+    link: '/app/music?mode=focus',
+    urgency: 'low',
   },
 ];
 
@@ -98,8 +113,8 @@ const QuickStartModules: React.FC = () => {
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.2,
+        staggerChildren: 0.08,
+        delayChildren: 0.15,
       },
     },
   };
@@ -109,8 +124,16 @@ const QuickStartModules: React.FC = () => {
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.6 },
+      transition: { duration: 0.5 },
     },
+  };
+
+  const getUrgencyColor = (urgency?: string) => {
+    switch (urgency) {
+      case 'high': return 'border-l-red-500';
+      case 'medium': return 'border-l-amber-500';
+      default: return 'border-l-emerald-500';
+    }
   };
 
   return (
@@ -123,114 +146,126 @@ const QuickStartModules: React.FC = () => {
           viewport={{ once: true }}
           className="space-y-12"
         >
-          {/* Header */}
-          <motion.div variants={itemVariants} className="text-center space-y-4">
+          {/* Header - Pas de jargon technique */}
+          <motion.div variants={itemVariants} className="text-center space-y-4 max-w-3xl mx-auto">
             <Badge variant="secondary" className="justify-center">
-              <Zap className="h-3 w-3 mr-2" aria-hidden="true" />
-              Démarrage rapide
+              <Sparkles className="h-3 w-3 mr-2" aria-hidden="true" />
+              Protocoles d'activation
             </Badge>
-            <h2 className="text-4xl lg:text-5xl font-bold">
-              Explorez nos modules
+            <h2 className="text-3xl lg:text-4xl font-bold">
+              Chaque session correspond à un moment précis
             </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Découvrez chaque fonctionnalité et commencez immédiatement votre voyage vers le bien-être émotionnel
+            <p className="text-lg text-muted-foreground">
+              Pas besoin de comprendre comment ça marche. 
+              <span className="text-foreground font-medium"> Choisis ton moment, lance la session.</span>
             </p>
           </motion.div>
 
-          {/* Modules Grid */}
+          {/* Protocols Grid */}
           <motion.div
             variants={containerVariants}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"
           >
-            {modules.map((module) => (
+            {protocols.map((protocol) => (
               <motion.div
-                key={module.id}
+                key={protocol.id}
                 variants={itemVariants}
-                onHoverStart={() => setHoveredId(module.id)}
+                onHoverStart={() => setHoveredId(protocol.id)}
                 onHoverEnd={() => setHoveredId(null)}
               >
-                <Card className="h-full hover:shadow-xl transition-all duration-300 border-0 overflow-hidden group">
-                  {/* Background Gradient */}
+                <Card 
+                  className={cn(
+                    "h-full hover:shadow-xl transition-all duration-300 border-l-4 overflow-hidden group cursor-pointer",
+                    getUrgencyColor(protocol.urgency)
+                  )}
+                >
+                  {/* Background Gradient on hover */}
                   <div
                     className={cn(
-                      'absolute inset-0 opacity-0 group-hover:opacity-5 transition-opacity duration-300',
-                      `bg-gradient-to-br ${module.gradient}`
+                      'absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300',
+                      `bg-gradient-to-br ${protocol.gradient}`
                     )}
                   />
 
-                  <CardHeader className="relative pb-3">
+                  <CardHeader className="relative pb-2">
                     <div className="flex items-start justify-between">
-                      <div className="text-5xl" aria-hidden="true">{module.icon}</div>
-                      {module.badge && (
-                        <Badge className="text-xs">{module.badge}</Badge>
-                      )}
+                      <div className={cn(
+                        "h-12 w-12 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110",
+                        `bg-gradient-to-br ${protocol.gradient}`,
+                        protocol.color
+                      )}>
+                        {protocol.icon}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {protocol.badge && (
+                          <Badge 
+                            variant="outline" 
+                            className={cn(
+                              "text-xs",
+                              protocol.urgency === 'high' && 'border-red-500/50 text-red-500',
+                              protocol.urgency === 'medium' && 'border-amber-500/50 text-amber-500',
+                              protocol.urgency === 'low' && 'border-emerald-500/50 text-emerald-500'
+                            )}
+                          >
+                            {protocol.badge}
+                          </Badge>
+                        )}
+                        <Badge variant="secondary" className="text-xs">
+                          {protocol.duration}
+                        </Badge>
+                      </div>
                     </div>
-                    <CardTitle className="text-xl mt-4 group-hover:text-primary transition-colors">
-                      {module.title}
-                    </CardTitle>
                   </CardHeader>
 
-                  <CardContent className="relative space-y-4">
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      {module.description}
-                    </p>
+                  <CardContent className="relative space-y-4 pt-2">
+                    <div>
+                      <h3 className="text-xl font-bold text-foreground group-hover:text-primary transition-colors">
+                        {protocol.title}
+                      </h3>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        {protocol.situation}
+                      </p>
+                    </div>
 
-                    {/* Features List */}
+                    {/* Effect - visible sur hover */}
                     <motion.div
                       initial={{ opacity: 0, height: 0 }}
                       animate={{
-                        opacity: hoveredId === module.id ? 1 : 0,
-                        height: hoveredId === module.id ? 'auto' : 0,
+                        opacity: hoveredId === protocol.id ? 1 : 0,
+                        height: hoveredId === protocol.id ? 'auto' : 0,
                       }}
-                      transition={{ duration: 0.3 }}
-                      className="space-y-2 overflow-hidden"
+                      transition={{ duration: 0.2 }}
+                      className="overflow-hidden"
                     >
-                      {module.features.map((feature, i) => (
-                        <motion.div
-                          key={i}
-                          initial={{ opacity: 0, x: -10 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: i * 0.1 }}
-                          className="flex items-center gap-2 text-xs"
-                        >
-                          <div className="h-1.5 w-1.5 rounded-full bg-primary flex-shrink-0" />
-                          <span>{feature}</span>
-                        </motion.div>
-                      ))}
+                      <p className="text-sm text-foreground/80 py-2 border-t border-border/50">
+                        <span className="text-primary font-medium">Effet :</span> {protocol.effect}
+                      </p>
                     </motion.div>
 
-                    {/* CTA Button */}
+                    {/* CTA */}
                     <Button className="w-full group/btn" size="sm" asChild>
-                      <Link to={module.link} aria-label={`Essayer ${module.title}`}>
-                        <span>Essayer maintenant</span>
+                      <Link to={protocol.link}>
+                        <span>Lancer</span>
                         <ArrowRight className="h-3.5 w-3.5 ml-2 group-hover/btn:translate-x-0.5 transition-transform" aria-hidden="true" />
                       </Link>
                     </Button>
                   </CardContent>
-
-                  {/* Hover indicator */}
-                  <motion.div
-                    className={`absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r ${module.gradient}`}
-                    initial={{ scaleX: 0 }}
-                    animate={{ scaleX: hoveredId === module.id ? 1 : 0 }}
-                    transition={{ duration: 0.3 }}
-                  />
                 </Card>
               </motion.div>
             ))}
           </motion.div>
 
-          {/* Bottom CTA */}
+          {/* Bottom message - Rétention */}
           <motion.div
             variants={itemVariants}
-            className="text-center pt-8"
+            className="text-center pt-8 space-y-4"
           >
-            <p className="text-muted-foreground mb-4">
-              Prêt à commencer ? Chacun de nos modules peut être exploré gratuitement pendant 30 jours.
+            <p className="text-muted-foreground italic">
+              "Reviens avant que ton corps n'explose."
             </p>
-            <Button size="lg" asChild>
+            <Button size="lg" variant="outline" asChild>
               <Link to="/signup">
-                Créer mon compte gratuit
+                Créer mon accès gratuit
                 <ArrowRight className="h-4 w-4 ml-2" aria-hidden="true" />
               </Link>
             </Button>
