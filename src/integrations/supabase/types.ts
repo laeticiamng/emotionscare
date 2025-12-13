@@ -18615,6 +18615,30 @@ export type Database = {
         }
         Relationships: []
       }
+      user_cart: {
+        Row: {
+          checkout_url: string | null
+          id: string
+          items: Json
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          checkout_url?: string | null
+          id?: string
+          items?: Json
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          checkout_url?: string | null
+          id?: string
+          items?: Json
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       user_challenges_progress: {
         Row: {
           challenge_id: string
@@ -19073,6 +19097,30 @@ export type Database = {
         }
         Relationships: []
       }
+      user_global_state: {
+        Row: {
+          created_at: string | null
+          id: string
+          state: Json
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          state?: Json
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          state?: Json
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       user_goals: {
         Row: {
           category: string
@@ -19241,6 +19289,33 @@ export type Database = {
           priority?: string
           title?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      user_integration_tokens: {
+        Row: {
+          created_at: string | null
+          encrypted_token: string
+          id: string
+          integration_name: string
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          encrypted_token: string
+          id?: string
+          integration_name: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          encrypted_token?: string
+          id?: string
+          integration_name?: string
+          updated_at?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
