@@ -13557,6 +13557,56 @@ export type Database = {
         }
         Relationships: []
       }
+      plan_sessions: {
+        Row: {
+          completed: boolean
+          completed_date: string | null
+          created_at: string
+          duration_minutes: number
+          id: string
+          item_code: string | null
+          notes: string | null
+          plan_id: string
+          scheduled_date: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          completed?: boolean
+          completed_date?: string | null
+          created_at?: string
+          duration_minutes?: number
+          id?: string
+          item_code?: string | null
+          notes?: string | null
+          plan_id: string
+          scheduled_date: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          completed?: boolean
+          completed_date?: string | null
+          created_at?: string
+          duration_minutes?: number
+          id?: string
+          item_code?: string | null
+          notes?: string | null
+          plan_id?: string
+          scheduled_date?: string
+          title?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "plan_sessions_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "study_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       playlist_listen_stats: {
         Row: {
           completed: boolean | null
@@ -16182,6 +16232,51 @@ export type Database = {
           session_token?: string
           song_id?: string
           user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      study_plans: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          priority: string
+          progress: number
+          sessions_completed: number
+          status: string
+          target_date: string
+          title: string
+          total_sessions: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          priority?: string
+          progress?: number
+          sessions_completed?: number
+          status?: string
+          target_date: string
+          title: string
+          total_sessions?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          priority?: string
+          progress?: number
+          sessions_completed?: number
+          status?: string
+          target_date?: string
+          title?: string
+          total_sessions?: number
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
