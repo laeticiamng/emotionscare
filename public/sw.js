@@ -1,45 +1,252 @@
-// Service Worker pour les Push Notifications
-self.addEventListener('push', (event) => {
-  const data = event.data ? event.data.json() : {};
+// Service Worker pour EmotionsCare PWA
+// Gère les notifications push en arrière-plan et le cache offline
+
+const CACHE_NAME = 'emotionscare-v2';
+const OFFLINE_URL = '/offline.html';
+
+// Assets à mettre en cache
+const STATIC_ASSETS = [
+  '/',
+  '/index.html',
+  '/manifest.json',
+  '/favicon.ico'
+];
+
+// Installation du Service Worker
+self.addEventListener('install', (event) => {
+  console.log('[SW] Installing Service Worker v2...');
   
-  const options = {
-    body: data.body || 'Nouvelle notification EmotionsCare',
-    icon: data.icon || '/icon-192x192.png',
-    badge: data.badge || '/badge-96x96.png',
-    data: data.data || {},
-    vibrate: [200, 100, 200],
-    tag: data.tag || 'default',
-    requireInteraction: false,
-    actions: data.actions || []
-  };
-
   event.waitUntil(
-    self.registration.showNotification(data.title || 'EmotionsCare', options)
-  );
-});
-
-self.addEventListener('notificationclick', (event) => {
-  event.notification.close();
-
-  event.waitUntil(
-    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
-      for (const client of clientList) {
-        if (client.url === '/' && 'focus' in client) {
-          return client.focus();
-        }
-      }
-      if (clients.openWindow) {
-        return clients.openWindow('/');
-      }
+    caches.open(CACHE_NAME).then((cache) => {
+      console.log('[SW] Caching static assets');
+      return cache.addAll(STATIC_ASSETS).catch((err) => {
+        console.warn('[SW] Cache addAll failed (non-blocking):', err);
+      });
     })
   );
+  
+  self.skipWaiting();
 });
 
-self.addEventListener('pushsubscriptionchange', (event) => {
+// Activation du Service Worker
+self.addEventListener('activate', (event) => {
+  console.log('[SW] Activating Service Worker...');
+  
   event.waitUntil(
-    self.registration.pushManager.subscribe(event.oldSubscription.options)
-      .then((subscription) => {
-        console.log('Subscription renewed:', subscription);
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames
+          .filter((name) => name !== CACHE_NAME)
+          .map((name) => {
+            console.log('[SW] Deleting old cache:', name);
+            return caches.delete(name);
+          })
+      );
+    })
+  );
+  
+  self.clients.claim();
+});
+
+// Interception des requêtes (stratégie Network First avec fallback cache)
+self.addEventListener('fetch', (event) => {
+  // Ignorer les requêtes non-GET
+  if (event.request.method !== 'GET') return;
+  
+  // Ignorer les requêtes API/Supabase/externes
+  const url = new URL(event.request.url);
+  if (url.pathname.startsWith('/functions/') || 
+      url.hostname.includes('supabase') ||
+      url.hostname.includes('api.') ||
+      url.protocol !== 'https:' && url.protocol !== 'http:') {
+    return;
+  }
+
+  event.respondWith(
+    fetch(event.request)
+      .then((response) => {
+        // Mettre en cache les réponses valides
+        if (response.status === 200) {
+          const responseClone = response.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, responseClone);
+          });
+        }
+        return response;
+      })
+      .catch(() => {
+        // Fallback au cache si offline
+        return caches.match(event.request).then((cachedResponse) => {
+          if (cachedResponse) {
+            return cachedResponse;
+          }
+          // Page offline par défaut
+          if (event.request.mode === 'navigate') {
+            return caches.match(OFFLINE_URL).then((offline) => {
+              return offline || new Response('Offline', { status: 503, statusText: 'Service Unavailable' });
+            });
+          }
+          return new Response('Offline', { status: 503 });
+        });
       })
   );
 });
+
+// Gestion des notifications push
+self.addEventListener('push', (event) => {
+  console.log('[SW] Push notification received');
+  
+  let notificationData = {
+    title: 'EmotionsCare',
+    body: 'Nouvelle notification',
+    icon: '/icons/icon-192x192.png',
+    badge: '/icons/icon-72x72.png',
+    vibrate: [200, 100, 200],
+    tag: 'emotionscare-notification',
+    requireInteraction: false,
+    data: {}
+  };
+
+  if (event.data) {
+    try {
+      const payload = event.data.json();
+      notificationData = {
+        ...notificationData,
+        ...payload
+      };
+    } catch (e) {
+      notificationData.body = event.data.text();
+    }
+  }
+
+  const options = {
+    body: notificationData.body,
+    icon: notificationData.icon || '/icons/icon-192x192.png',
+    badge: notificationData.badge || '/icons/icon-72x72.png',
+    vibrate: notificationData.vibrate || [200, 100, 200],
+    tag: notificationData.tag || 'default',
+    requireInteraction: notificationData.requireInteraction || false,
+    data: notificationData.data || {},
+    actions: notificationData.actions || [
+      { action: 'open', title: 'Ouvrir' },
+      { action: 'dismiss', title: 'Fermer' }
+    ]
+  };
+
+  event.waitUntil(
+    self.registration.showNotification(notificationData.title, options)
+  );
+});
+
+// Gestion des clics sur les notifications
+self.addEventListener('notificationclick', (event) => {
+  console.log('[SW] Notification clicked:', event.action);
+  
+  event.notification.close();
+
+  if (event.action === 'dismiss') {
+    return;
+  }
+
+  // Ouvrir ou focus sur l'app
+  const urlToOpen = event.notification.data?.url || '/';
+  
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true })
+      .then((clientList) => {
+        // Chercher une fenêtre existante
+        for (const client of clientList) {
+          if (client.url.includes(self.location.origin) && 'focus' in client) {
+            client.focus();
+            if (event.notification.data?.url) {
+              client.navigate(urlToOpen);
+            }
+            return;
+          }
+        }
+        // Ouvrir une nouvelle fenêtre
+        if (self.clients.openWindow) {
+          return self.clients.openWindow(urlToOpen);
+        }
+      })
+  );
+});
+
+// Gestion de la fermeture des notifications
+self.addEventListener('notificationclose', (event) => {
+  console.log('[SW] Notification closed');
+});
+
+// Renouvellement automatique de l'abonnement push
+self.addEventListener('pushsubscriptionchange', (event) => {
+  console.log('[SW] Push subscription changed');
+  
+  event.waitUntil(
+    self.registration.pushManager.subscribe(event.oldSubscription?.options || { userVisibleOnly: true })
+      .then((subscription) => {
+        console.log('[SW] Subscription renewed:', subscription.endpoint);
+        // Envoyer la nouvelle subscription au serveur
+        return fetch('/functions/v1/push-notification', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'renew',
+            subscription: subscription.toJSON()
+          })
+        });
+      })
+      .catch((err) => {
+        console.error('[SW] Subscription renewal failed:', err);
+      })
+  );
+});
+
+// Background sync pour données offline
+self.addEventListener('sync', (event) => {
+  console.log('[SW] Background sync:', event.tag);
+  
+  if (event.tag === 'sync-offline-data') {
+    event.waitUntil(syncOfflineData());
+  }
+});
+
+async function syncOfflineData() {
+  try {
+    const cache = await caches.open('offline-data');
+    const requests = await cache.keys();
+    
+    for (const request of requests) {
+      const response = await cache.match(request);
+      if (response) {
+        const data = await response.json();
+        await fetch(request.url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        await cache.delete(request);
+      }
+    }
+    console.log('[SW] Offline data synced successfully');
+  } catch (error) {
+    console.error('[SW] Sync failed:', error);
+    throw error; // Retry later
+  }
+}
+
+// Message handler pour communication avec l'app
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+  
+  if (event.data && event.data.type === 'CACHE_URLS') {
+    event.waitUntil(
+      caches.open(CACHE_NAME).then((cache) => {
+        return cache.addAll(event.data.urls);
+      })
+    );
+  }
+});
+
+console.log('[SW] Service Worker loaded v2');
