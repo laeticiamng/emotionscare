@@ -118,12 +118,16 @@ class PushNotificationsService {
       }
 
       // Créer l'abonnement push
-      const vapidKey = this.vapidPublicKey ? this.urlBase64ToUint8Array(this.vapidPublicKey) : undefined;
-      
-      this.subscription = await this.registration.pushManager.subscribe({
+      const subscribeOptions: PushSubscriptionOptionsInit = {
         userVisibleOnly: true,
-        ...(vapidKey && { applicationServerKey: vapidKey })
-      });
+      };
+      
+      if (this.vapidPublicKey) {
+        const vapidKey = this.urlBase64ToUint8Array(this.vapidPublicKey);
+        subscribeOptions.applicationServerKey = vapidKey.buffer as ArrayBuffer;
+      }
+      
+      this.subscription = await this.registration.pushManager.subscribe(subscribeOptions);
 
       const subscriptionData = this.subscription.toJSON();
       
