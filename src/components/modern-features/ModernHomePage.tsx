@@ -96,6 +96,38 @@ const ModernHomePage: React.FC = () => {
 
   return (
     <div className="relative">
+      {/* Header avec nom de la plateforme */}
+      <header className="bg-background/95 backdrop-blur-sm border-b border-border/50 sticky top-0 z-50">
+        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+          <Link 
+            to="/" 
+            className="font-bold text-xl text-primary hover:text-primary/80 transition-colors focus-enhanced"
+            aria-label="EmotionsCare - Accueil"
+          >
+            EmotionsCare
+          </Link>
+          
+          <nav className="flex items-center gap-4">
+            {isAuthenticated ? (
+              <Link to="/app/home">
+                <Button variant="ghost" size="sm" className="gap-2">
+                  Mon espace
+                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                </Button>
+              </Link>
+            ) : (
+              <>
+                <Link to="/login">
+                  <Button variant="ghost" size="sm">Se connecter</Button>
+                </Link>
+                <Link to="/signup">
+                  <Button size="sm">Commencer</Button>
+                </Link>
+              </>
+            )}
+          </nav>
+        </div>
+      </header>
       {/* Bannière utilisateur connecté - version interventionnelle */}
       {isAuthenticated && user && (
         <div className="bg-gradient-to-r from-primary/10 to-blue-500/10 border-b border-primary/20 py-4">
