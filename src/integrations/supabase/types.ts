@@ -18953,6 +18953,36 @@ export type Database = {
         }
         Relationships: []
       }
+      user_feature_tracking: {
+        Row: {
+          feature_key: string
+          first_visited_at: string | null
+          id: string
+          is_dismissed: boolean | null
+          last_visited_at: string | null
+          user_id: string | null
+          visit_count: number | null
+        }
+        Insert: {
+          feature_key: string
+          first_visited_at?: string | null
+          id?: string
+          is_dismissed?: boolean | null
+          last_visited_at?: string | null
+          user_id?: string | null
+          visit_count?: number | null
+        }
+        Update: {
+          feature_key?: string
+          first_visited_at?: string | null
+          id?: string
+          is_dismissed?: boolean | null
+          last_visited_at?: string | null
+          user_id?: string | null
+          visit_count?: number | null
+        }
+        Relationships: []
+      }
       user_feature_usage: {
         Row: {
           feature_name: string
@@ -19709,6 +19739,30 @@ export type Database = {
         }
         Relationships: []
       }
+      user_personalization_settings: {
+        Row: {
+          created_at: string | null
+          id: string
+          settings: Json
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          settings?: Json
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          settings?: Json
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       user_playlists: {
         Row: {
           cover_image_url: string | null
@@ -20223,6 +20277,51 @@ export type Database = {
           notes?: string | null
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
+        }
+        Relationships: []
+      }
+      user_saved_searches: {
+        Row: {
+          id: string
+          name: string | null
+          query: string
+          saved_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          id?: string
+          name?: string | null
+          query: string
+          saved_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          id?: string
+          name?: string | null
+          query?: string
+          saved_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      user_search_history: {
+        Row: {
+          id: string
+          query: string
+          searched_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          id?: string
+          query: string
+          searched_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          id?: string
+          query?: string
+          searched_at?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }

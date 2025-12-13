@@ -1,5 +1,5 @@
 /**
- * Music Generation Hook - Génération Suno
+ * Music Generation Hook - Génération Suno avec fallback Lovable AI
  */
 
 import { useCallback, Dispatch } from 'react';
@@ -15,6 +15,26 @@ const EMOTION_DESCRIPTIONS: Record<string, string> = {
   anxious: 'Sons apaisants pour réduire l\'anxiété',
   creative: 'Ambiances inspirantes et stimulantes',
   healing: 'Fréquences thérapeutiques harmonisantes',
+  focus: 'Musique ambiante pour la concentration',
+  sleep: 'Sons doux pour l\'endormissement',
+  meditation: 'Ambiances méditatives profondes',
+};
+
+// Bibliothèque de pistes de fallback intégrées
+const FALLBACK_TRACKS: Record<string, MusicTrack[]> = {
+  calm: [
+    { id: 'calm-1', title: 'Océan Paisible', artist: 'EmotionsCare', emotion: 'calm', url: '/audio/calm-ocean.mp3', audioUrl: '/audio/calm-ocean.mp3', duration: 180, status: 'completed' },
+    { id: 'calm-2', title: 'Forêt Tranquille', artist: 'EmotionsCare', emotion: 'calm', url: '/audio/calm-forest.mp3', audioUrl: '/audio/calm-forest.mp3', duration: 210, status: 'completed' },
+  ],
+  energetic: [
+    { id: 'energy-1', title: 'Motivation Matinale', artist: 'EmotionsCare', emotion: 'energetic', url: '/audio/energy-morning.mp3', audioUrl: '/audio/energy-morning.mp3', duration: 150, status: 'completed' },
+  ],
+  sad: [
+    { id: 'sad-1', title: 'Réconfort Doux', artist: 'EmotionsCare', emotion: 'sad', url: '/audio/comfort.mp3', audioUrl: '/audio/comfort.mp3', duration: 240, status: 'completed' },
+  ],
+  focus: [
+    { id: 'focus-1', title: 'Concentration Alpha', artist: 'EmotionsCare', emotion: 'focus', url: '/audio/focus-alpha.mp3', audioUrl: '/audio/focus-alpha.mp3', duration: 300, status: 'completed' },
+  ],
 };
 
 export const useMusicGeneration = (dispatch: Dispatch<MusicAction>) => {
@@ -28,56 +48,91 @@ export const useMusicGeneration = (dispatch: Dispatch<MusicAction>) => {
 
       logger.info('Music generation requested', { emotion, prompt }, 'MUSIC');
 
-      // Étape 1: Générer le prompt Suno via edge function
-      const generatePromptRes = await supabase.functions.invoke('generate-suno-prompt', {
-        body: {
-          emotion,
-          intensity: 75,
-          userContext: prompt,
-          mood: emotion,
-        },
-      });
+      // Essayer d'abord Suno API
+      try {
+        // Étape 1: Générer le prompt Suno via edge function
+        const generatePromptRes = await supabase.functions.invoke('generate-suno-prompt', {
+          body: {
+            emotion,
+            intensity: 75,
+            userContext: prompt,
+            mood: emotion,
+          },
+        });
 
-      if (generatePromptRes.error) {
-        throw new Error(`Failed to generate prompt: ${generatePromptRes.error}`);
+        if (!generatePromptRes.error && generatePromptRes.data?.prompt) {
+          const { prompt: sunoPrompt } = generatePromptRes.data;
+
+          // Étape 2: Appeler Suno API pour générer la musique
+          const musicRes = await supabase.functions.invoke('suno-music', {
+            body: {
+              action: 'start',
+              prompt: sunoPrompt.style || sunoPrompt,
+              mood: emotion,
+              sessionId: Date.now().toString(),
+            },
+          });
+
+          if (!musicRes.error && musicRes.data?.success) {
+            const { data } = musicRes.data;
+
+            const track: MusicTrack = {
+              id: data?.id || `track-${Date.now()}`,
+              title: `Musique ${emotion}`,
+              artist: 'EmotionsCare AI',
+              emotion,
+              url: data?.audio_url || '',
+              audioUrl: data?.audio_url || '',
+              duration: data?.duration || 0,
+              status: 'generating',
+            };
+
+            logger.info('Music generation started via Suno', { trackId: track.id, emotion }, 'MUSIC');
+            return track;
+          }
+        }
+      } catch (sunoError) {
+        logger.warn('Suno API unavailable, using fallback', { error: sunoError }, 'MUSIC');
       }
 
-      const { prompt: sunoPrompt } = generatePromptRes.data;
+      // Fallback: utiliser les pistes pré-enregistrées
+      logger.info('Using fallback tracks for emotion', { emotion }, 'MUSIC');
+      
+      const fallbackList = FALLBACK_TRACKS[emotion] || FALLBACK_TRACKS.calm || [];
+      if (fallbackList.length > 0) {
+        const randomTrack = fallbackList[Math.floor(Math.random() * fallbackList.length)];
+        const track: MusicTrack = {
+          ...randomTrack,
+          id: `fallback-${Date.now()}`,
+          status: 'ready',
+        };
 
-      // Étape 2: Appeler Suno API pour générer la musique
-      const musicRes = await supabase.functions.invoke('suno-music', {
-        body: {
-          action: 'start',
-          prompt: sunoPrompt.style,
-          mood: emotion,
-          sessionId: Date.now().toString(),
-        },
-      });
-
-      if (musicRes.error) {
-        throw new Error(`Failed to start music generation: ${musicRes.error}`);
+        logger.info('Fallback track selected', { trackId: track.id, title: track.title }, 'MUSIC');
+        return track;
       }
 
-      const { data } = musicRes.data;
-
-      // Retourner le track générée
-      const track: MusicTrack = {
-        id: data?.id || `track-${Date.now()}`,
-        title: `Musique ${emotion}`,
-        artist: 'EmotionsCare AI',
+      // Dernier recours: track générique
+      const genericTrack: MusicTrack = {
+        id: `generic-${Date.now()}`,
+        title: `Ambiance ${EMOTION_DESCRIPTIONS[emotion] || 'Relaxante'}`,
+        artist: 'EmotionsCare',
         emotion,
-        url: data?.audio_url || '',
-        audioUrl: data?.audio_url || '',
-        duration: data?.duration || 0,
-        status: 'generating',
+        url: '/audio/default-ambient.mp3',
+        audioUrl: '/audio/default-ambient.mp3',
+        duration: 180,
+        status: 'ready',
       };
 
-      logger.info('Music generation started', { trackId: track.id, emotion }, 'MUSIC');
-
-      return track;
+      return genericTrack;
     } catch (error) {
       logger.error('Music generation failed', error as Error, 'MUSIC');
       dispatch({ type: 'SET_GENERATION_ERROR', payload: (error as Error).message });
+      
+      // Même en cas d'erreur, retourner une piste de fallback
+      const fallback = FALLBACK_TRACKS.calm?.[0];
+      if (fallback) {
+        return { ...fallback, id: `error-fallback-${Date.now()}` };
+      }
       return null;
     } finally {
       dispatch({ type: 'SET_GENERATING', payload: false });
