@@ -18953,6 +18953,57 @@ export type Database = {
         }
         Relationships: []
       }
+      user_feature_usage: {
+        Row: {
+          feature_name: string
+          first_used_at: string
+          id: string
+          last_used_at: string
+          usage_count: number | null
+          user_id: string
+        }
+        Insert: {
+          feature_name: string
+          first_used_at?: string
+          id?: string
+          last_used_at?: string
+          usage_count?: number | null
+          user_id: string
+        }
+        Update: {
+          feature_name?: string
+          first_used_at?: string
+          id?: string
+          last_used_at?: string
+          usage_count?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_gamification_stats: {
+        Row: {
+          created_at: string
+          id: string
+          longest_streak: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          longest_streak?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          longest_streak?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_generated_music: {
         Row: {
           audio_url: string
@@ -19099,6 +19150,27 @@ export type Database = {
           id?: string
           last_refill_time?: string
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_help_dismissals: {
+        Row: {
+          dismissed_at: string
+          help_key: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          dismissed_at?: string
+          help_key: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          dismissed_at?: string
+          help_key?: string
+          id?: string
           user_id?: string
         }
         Relationships: []
