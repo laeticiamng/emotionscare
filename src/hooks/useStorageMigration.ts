@@ -14,19 +14,29 @@ const MIGRATION_KEYS = [
   'theme',
   'i18nextLng',
   'userMode',
+  'lang',
+  'branding',
   
   // Accessibility
   'accessibility-settings',
+  'music-accessibility-prefs',
   
   // Coach & Sessions
   'coachMessages',
   'coach-conversation-history',
   'unified_coach_conversations',
+  'coach:userId:v1',
+  'coachConversationFavorites',
+  'emotionscare_assistant',
+  'emotion_scan_history_v1',
   
   // Journal
   'pending_memos',
   'journal_prompt_timestamp',
   'journal_drafts',
+  'journal-last-backup',
+  'journal_favorites',
+  'journal_sentiment_history',
   
   // Music & Audio
   'music:cachedTracks',
@@ -40,6 +50,11 @@ const MIGRATION_KEYS = [
   'adaptive-music:persisted-session',
   'adaptive-music:favorites-sync',
   'sleep_preset',
+  'music-generation-history',
+  'music-generation-favorites',
+  'music-generation-stats',
+  'music-quota-data',
+  'music-favorites',
   
   // Orchestration & WHO-5
   'orchestration:snooze',
@@ -49,6 +64,9 @@ const MIGRATION_KEYS = [
   // Gamification & Tips
   'dismissed-tips',
   'glow-tip-favorites',
+  'feature_flags',
+  'boss_grit_tasks_v1',
+  'rank_history_v1',
   
   // Tours & Onboarding
   'emotional-park-tour-completed',
@@ -63,6 +81,9 @@ const MIGRATION_KEYS = [
   'emotionscare.consent.preferences',
   'predictiveAnalyticsEnabled',
   'predictionEnabled',
+  'privacy_consents',
+  'privacy_audit_logs',
+  'crisis_settings',
   
   // Session & Mood data
   'session-events',
@@ -85,6 +106,18 @@ const MIGRATION_KEYS = [
   
   // Dashboard
   'sleep_reminder',
+  
+  // Modules & Immersive
+  'breathingVR_stats',
+  'meditation_stats',
+  'wearables_cache',
+  
+  // Social & Community
+  'ec_social_posts',
+  'exchangeFollowing',
+  
+  // System & Metrics
+  'es_metrics_queue',
   
   // Sort preferences (dynamic keys handled separately)
   'sort-preferences',
