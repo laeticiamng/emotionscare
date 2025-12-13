@@ -1,8 +1,12 @@
 // @ts-nocheck
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { OnboardingProgress, OnboardingLog } from '@/types/onboarding';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';
+
+const SETTINGS_KEY_PROGRESS = 'onboarding_progress';
+const SETTINGS_KEY_LOGS = 'onboarding_logs';
 
 export function useOnboardingProgress() {
   const { user } = useAuth();
@@ -16,41 +20,129 @@ export function useOnboardingProgress() {
     timeSpent: 0
   });
   const [logs, setLogs] = useState<OnboardingLog[]>([]);
+  const [isLoaded, setIsLoaded] = useState(false);
 
-  // Load progress from localStorage on mount
-  useEffect(() => {
-    const storedProgress = localStorage.getItem(`onboarding-progress-${userId}`);
-    const storedLogs = localStorage.getItem(`onboarding-logs-${userId}`);
+  // Sauvegarder vers Supabase
+  const saveToSupabase = useCallback(async (key: string, value: unknown) => {
+    if (!user) return;
     
-    if (storedProgress) {
+    try {
+      await supabase
+        .from('user_settings')
+        .upsert({
+          user_id: user.id,
+          key,
+          value: JSON.stringify(value),
+          updated_at: new Date().toISOString()
+        }, {
+          onConflict: 'user_id,key'
+        });
+    } catch (error) {
+      logger.error(`Error saving ${key} to Supabase:`, error, 'ONBOARDING');
+    }
+  }, [user]);
+
+  // Charger depuis Supabase ou localStorage
+  useEffect(() => {
+    const loadData = async () => {
       try {
-        setProgress(JSON.parse(storedProgress));
-      } catch (e) {
-        logger.error('Failed to parse onboarding progress', e as Error, 'SYSTEM');
+        if (user) {
+          // Charger depuis Supabase
+          const { data: settings } = await supabase
+            .from('user_settings')
+            .select('key, value')
+            .eq('user_id', user.id)
+            .in('key', [SETTINGS_KEY_PROGRESS, SETTINGS_KEY_LOGS]);
+
+          if (settings) {
+            const progressData = settings.find(s => s.key === SETTINGS_KEY_PROGRESS);
+            const logsData = settings.find(s => s.key === SETTINGS_KEY_LOGS);
+
+            if (progressData?.value) {
+              const parsed = typeof progressData.value === 'string'
+                ? JSON.parse(progressData.value)
+                : progressData.value;
+              setProgress(parsed);
+            }
+
+            if (logsData?.value) {
+              const parsed = typeof logsData.value === 'string'
+                ? JSON.parse(logsData.value)
+                : logsData.value;
+              setLogs(Array.isArray(parsed) ? parsed : []);
+            }
+          }
+
+          // Migrer depuis localStorage
+          const localProgress = localStorage.getItem(`onboarding-progress-${userId}`);
+          const localLogs = localStorage.getItem(`onboarding-logs-${userId}`);
+
+          if (localProgress) {
+            const parsed = JSON.parse(localProgress);
+            setProgress(prev => {
+              const merged = { ...parsed, ...prev };
+              saveToSupabase(SETTINGS_KEY_PROGRESS, merged);
+              return merged;
+            });
+            localStorage.removeItem(`onboarding-progress-${userId}`);
+          }
+
+          if (localLogs) {
+            const parsed = JSON.parse(localLogs);
+            if (Array.isArray(parsed)) {
+              setLogs(prev => {
+                const merged = [...prev, ...parsed];
+                saveToSupabase(SETTINGS_KEY_LOGS, merged);
+                return merged;
+              });
+              localStorage.removeItem(`onboarding-logs-${userId}`);
+            }
+          }
+        } else {
+          // Fallback localStorage
+          const localProgress = localStorage.getItem(`onboarding-progress-${userId}`);
+          const localLogs = localStorage.getItem(`onboarding-logs-${userId}`);
+
+          if (localProgress) {
+            setProgress(JSON.parse(localProgress));
+          }
+
+          if (localLogs) {
+            setLogs(JSON.parse(localLogs));
+          }
+        }
+      } catch (error) {
+        logger.error('Failed to load onboarding data', error as Error, 'ONBOARDING');
+      } finally {
+        setIsLoaded(true);
+      }
+    };
+
+    loadData();
+  }, [user?.id, userId, saveToSupabase]);
+
+  // Sauvegarder automatiquement les changements
+  useEffect(() => {
+    if (!isLoaded) return;
+    
+    if (user) {
+      if (progress.totalSteps > 0) {
+        saveToSupabase(SETTINGS_KEY_PROGRESS, progress);
+      }
+      if (logs.length > 0) {
+        saveToSupabase(SETTINGS_KEY_LOGS, logs);
+      }
+    } else {
+      // Fallback localStorage
+      if (progress.totalSteps > 0) {
+        localStorage.setItem(`onboarding-progress-${userId}`, JSON.stringify(progress));
+      }
+      if (logs.length > 0) {
+        localStorage.setItem(`onboarding-logs-${userId}`, JSON.stringify(logs));
       }
     }
-    
-    if (storedLogs) {
-      try {
-        setLogs(JSON.parse(storedLogs));
-      } catch (e) {
-        logger.error('Failed to parse onboarding logs', e as Error, 'SYSTEM');
-      }
-    }
-  }, [userId]);
+  }, [progress, logs, user, userId, isLoaded, saveToSupabase]);
 
-  // Save progress to localStorage whenever it changes
-  useEffect(() => {
-    if (progress.totalSteps > 0) {
-      localStorage.setItem(`onboarding-progress-${userId}`, JSON.stringify(progress));
-    }
-    
-    if (logs.length > 0) {
-      localStorage.setItem(`onboarding-logs-${userId}`, JSON.stringify(logs));
-    }
-  }, [progress, logs, userId]);
-
-  // Log a step view or completion
   const logStep = (stepId: string, action: 'view' | 'complete' | 'skip' | 'back', timeSpent?: number, responses?: any) => {
     const log: OnboardingLog = {
       userId,
@@ -62,16 +154,13 @@ export function useOnboardingProgress() {
     };
     
     setLogs(prevLogs => [...prevLogs, log]);
-    
     return log;
   };
   
-  // Update progress
   const updateProgress = (updates: Partial<OnboardingProgress>) => {
     setProgress(prev => ({ ...prev, ...updates }));
   };
   
-  // Complete onboarding
   const completeOnboarding = () => {
     const completedAt = new Date().toISOString();
     const startTime = progress.startedAt ? new Date(progress.startedAt).getTime() : 0;
@@ -84,10 +173,8 @@ export function useOnboardingProgress() {
       timeSpent: totalTimeSpent
     });
     
-    // Log completion
     logStep('completion', 'complete', totalTimeSpent);
     
-    // Show confetti celebration
     try {
       if (window.confetti) {
         window.confetti({
@@ -107,8 +194,19 @@ export function useOnboardingProgress() {
     };
   };
   
-  // Reset onboarding progress
-  const resetProgress = () => {
+  const resetProgress = useCallback(async () => {
+    if (user) {
+      try {
+        await supabase
+          .from('user_settings')
+          .delete()
+          .eq('user_id', user.id)
+          .in('key', [SETTINGS_KEY_PROGRESS, SETTINGS_KEY_LOGS]);
+      } catch (error) {
+        logger.error('Failed to reset onboarding in Supabase', error as Error, 'ONBOARDING');
+      }
+    }
+    
     localStorage.removeItem(`onboarding-progress-${userId}`);
     localStorage.removeItem(`onboarding-logs-${userId}`);
     
@@ -122,9 +220,8 @@ export function useOnboardingProgress() {
     });
     
     setLogs([]);
-  };
+  }, [user, userId]);
   
-  // Initialize onboarding
   const initOnboarding = (totalSteps: number) => {
     if (!progress.startedAt) {
       updateProgress({
@@ -134,7 +231,6 @@ export function useOnboardingProgress() {
         startedAt: new Date().toISOString()
       });
     } else if (totalSteps !== progress.totalSteps) {
-      // If steps count changed, update it
       updateProgress({ totalSteps });
     }
   };
@@ -146,6 +242,7 @@ export function useOnboardingProgress() {
     updateProgress,
     completeOnboarding,
     resetProgress,
-    initOnboarding
+    initOnboarding,
+    isLoaded
   };
 }
