@@ -13,6 +13,7 @@ const MIGRATION_KEYS = [
   // Theme & UI
   'theme',
   'i18nextLng',
+  'userMode',
   
   // Accessibility
   'accessibility-settings',
@@ -26,16 +27,21 @@ const MIGRATION_KEYS = [
   'journal_prompt_timestamp',
   'journal_drafts',
   
-  // Music
+  // Music & Audio
   'music:cachedTracks',
   'music:integrations',
   'music:preset',
   'music:favorites',
   'music:history',
+  'music:lastPlayed',
+  'music:email',
+  'adaptive-music:persisted-session',
+  'sleep_preset',
   
   // Orchestration & WHO-5
   'orchestration:snooze',
   'who5:lastPrompt',
+  'who5.invite.snooze_until',
   
   // Gamification & Tips
   'dismissed-tips',
@@ -47,15 +53,24 @@ const MIGRATION_KEYS = [
   'onboarding-completed',
   'tour-completed',
   
-  // Preferences
+  // Preferences & Consent
   'user-preferences',
   'notification-preferences',
   'privacy-preferences',
+  'emotionscare.consent.preferences',
+  'predictiveAnalyticsEnabled',
+  'predictionEnabled',
   
-  // Session data
+  // Session & Mood data
   'session-events',
   'community-bookmarks',
   'community-reactions',
+  'current_mood',
+  'hume-emotion-history',
+  
+  // Flash Glow
+  'flash_glow_suds_cooldown',
+  'flash_glow_suds_opt_in',
 ] as const;
 
 export type MigrationStatus = 'idle' | 'migrating' | 'completed' | 'error';
