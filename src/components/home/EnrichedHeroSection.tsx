@@ -1,25 +1,28 @@
 /**
- * EnrichedHeroSection - Section héro améliorée avec animations et contenu dynamique
+ * EnrichedHeroSection - Section héro interventionnelle
+ * Vision: EmotionsCare n'est pas une plateforme, c'est un réflexe émotionnel
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Link } from 'react-router-dom';
-import { Play, ArrowRight, Sparkles, Zap, Heart } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { StopCircle, Clock, Zap, Heart, Shield, Brain } from 'lucide-react';
 import { useReducedMotion, getAnimationVariants } from '@/hooks/useReducedMotion';
 
 const EnrichedHeroSection: React.FC = () => {
   const prefersReducedMotion = useReducedMotion();
   const animations = getAnimationVariants(prefersReducedMotion);
+  const navigate = useNavigate();
+  const [isHovered, setIsHovered] = useState(false);
 
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: prefersReducedMotion ? 0.05 : 0.2,
+        staggerChildren: prefersReducedMotion ? 0.05 : 0.15,
         delayChildren: prefersReducedMotion ? 0 : 0.1,
       },
     },
@@ -28,53 +31,59 @@ const EnrichedHeroSection: React.FC = () => {
   const itemVariants = prefersReducedMotion
     ? animations.fadeIn
     : {
-        hidden: { opacity: 0, y: 20 },
+        hidden: { opacity: 0, y: 30 },
         visible: {
           opacity: 1,
           y: 0,
-          transition: { duration: 0.8, ease: 'easeOut' },
+          transition: { duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] },
         },
       };
 
-  const floatingVariants = prefersReducedMotion
+  const pulseVariants = prefersReducedMotion
     ? { animate: {} }
     : {
         animate: {
-          y: [0, -20, 0],
+          scale: [1, 1.05, 1],
           transition: {
-            duration: 4,
+            duration: 2,
             repeat: Infinity,
             ease: 'easeInOut',
           },
         },
       };
 
+  // Action immédiate - lancer une session
+  const handleImmediateAction = () => {
+    navigate('/app/scan');
+  };
+
   return (
-    <section className="relative overflow-hidden py-20 lg:py-32 bg-gradient-to-br from-background via-background/80 to-primary/5">
-      {/* Animated background elements - optimized with will-change and conditional animations */}
+    <section className="relative overflow-hidden min-h-[90vh] flex items-center py-12 lg:py-20 bg-gradient-to-br from-background via-background to-primary/5">
+      {/* Animated background - ambiance apaisante */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
         {!prefersReducedMotion ? (
           <>
             <motion.div
-              className="absolute top-20 left-10 w-72 h-72 bg-primary/20 rounded-full mix-blend-multiply filter blur-3xl"
+              className="absolute top-1/4 left-1/4 w-[40rem] h-[40rem] bg-gradient-to-br from-primary/15 to-transparent rounded-full mix-blend-multiply filter blur-3xl"
               style={{ willChange: 'transform' }}
               animate={{
-                y: [0, 100, 0],
-                x: [0, 50, 0],
+                y: [0, 50, 0],
+                x: [0, 30, 0],
+                scale: [1, 1.1, 1],
               }}
               transition={{
-                duration: 8,
+                duration: 12,
                 repeat: Infinity,
                 ease: 'easeInOut',
                 repeatType: 'mirror'
               }}
             />
             <motion.div
-              className="absolute -bottom-8 right-20 w-72 h-72 bg-blue-500/20 rounded-full mix-blend-multiply filter blur-3xl"
+              className="absolute bottom-1/4 right-1/4 w-[35rem] h-[35rem] bg-gradient-to-br from-blue-500/10 to-cyan-500/5 rounded-full mix-blend-multiply filter blur-3xl"
               style={{ willChange: 'transform' }}
               animate={{
-                y: [0, -100, 0],
-                x: [0, -50, 0],
+                y: [0, -40, 0],
+                x: [0, -20, 0],
               }}
               transition={{
                 duration: 10,
@@ -83,27 +92,11 @@ const EnrichedHeroSection: React.FC = () => {
                 repeatType: 'mirror'
               }}
             />
-            <motion.div
-              className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-purple-500/10 rounded-full mix-blend-multiply filter blur-3xl"
-              style={{ willChange: 'transform, opacity' }}
-              animate={{
-                scale: [1, 1.2, 1],
-                opacity: [0.3, 0.5, 0.3],
-              }}
-              transition={{
-                duration: 6,
-                repeat: Infinity,
-                ease: 'easeInOut',
-                repeatType: 'mirror'
-              }}
-            />
           </>
         ) : (
-          /* Static background elements for reduced motion preference */
           <>
-            <div className="absolute top-20 left-10 w-72 h-72 bg-primary/20 rounded-full mix-blend-multiply filter blur-3xl" />
-            <div className="absolute -bottom-8 right-20 w-72 h-72 bg-blue-500/20 rounded-full mix-blend-multiply filter blur-3xl" />
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-purple-500/10 rounded-full mix-blend-multiply filter blur-3xl opacity-40" />
+            <div className="absolute top-1/4 left-1/4 w-[40rem] h-[40rem] bg-gradient-to-br from-primary/15 to-transparent rounded-full mix-blend-multiply filter blur-3xl" />
+            <div className="absolute bottom-1/4 right-1/4 w-[35rem] h-[35rem] bg-gradient-to-br from-blue-500/10 to-cyan-500/5 rounded-full mix-blend-multiply filter blur-3xl" />
           </>
         )}
       </div>
@@ -113,132 +106,173 @@ const EnrichedHeroSection: React.FC = () => {
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="text-center space-y-8 max-w-5xl mx-auto"
+          className="text-center space-y-10 max-w-5xl mx-auto"
         >
-          {/* Badge */}
+          {/* Badge contextuel - pas de jargon tech */}
           <motion.div variants={itemVariants}>
             <Badge
               variant="secondary"
-              className="mb-4 px-4 py-2 text-sm font-medium bg-gradient-to-r from-primary/10 to-blue-500/10 border-primary/20 backdrop-blur-sm"
+              className="px-5 py-2.5 text-sm font-medium bg-gradient-to-r from-primary/10 to-blue-500/10 border-primary/20 backdrop-blur-sm"
             >
-              <Sparkles className="h-3 w-3 mr-2" />
-              Nouveau : Expériences immersives débloquées
+              <Heart className="h-3.5 w-3.5 mr-2 text-primary" />
+              Si tu es ici, ce n'est probablement pas par curiosité.
             </Badge>
           </motion.div>
 
-          {/* Main Heading */}
-          <motion.div variants={itemVariants} className="space-y-4">
-            <h1 className="text-5xl lg:text-7xl font-bold leading-tight">
-              <span className="bg-gradient-to-r from-primary via-primary/80 to-blue-500 bg-clip-text text-transparent">
-                Transformez votre bien-être
+          {/* Headline interventionnelle - situation avant produit */}
+          <motion.div variants={itemVariants} className="space-y-6">
+            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold leading-[1.1] tracking-tight">
+              <span className="text-foreground">
+                Ton cerveau est encore
               </span>
               <br />
-              <span className="text-3xl lg:text-5xl text-foreground/90 font-medium">
-                Avec intelligence émotionnelle
+              <span className="bg-gradient-to-r from-primary via-primary/90 to-blue-500 bg-clip-text text-transparent">
+                en train de tourner ?
               </span>
             </h1>
           </motion.div>
 
-          {/* Subheading */}
+          {/* Sous-titre - urgence avant explication */}
           <motion.p
             variants={itemVariants}
-            className="text-xl lg:text-2xl text-muted-foreground max-w-4xl mx-auto leading-relaxed"
+            className="text-xl lg:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed font-light"
           >
-            Découvrez la première plateforme d'IA qui comprend vos émotions.
-            <strong className="text-foreground"> Musicothérapie, scan émotionnel, coaching personnalisé</strong> et expériences immersives.
+            On ne t'explique rien.{' '}
+            <strong className="text-foreground font-medium">On t'aide à t'arrêter.</strong>
           </motion.p>
 
-          {/* CTA Buttons */}
+          {/* CTAs émotionnels - action avant compréhension */}
           <motion.div
             variants={itemVariants}
-            className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-6"
+            className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4"
           >
-            <Button
-              size="lg"
-              className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary shadow-xl hover:shadow-2xl transition-all duration-300 px-8 py-4 text-lg group"
-              asChild
+            <motion.div
+              variants={pulseVariants}
+              animate="animate"
+              onHoverStart={() => setIsHovered(true)}
+              onHoverEnd={() => setIsHovered(false)}
             >
-              <Link to="/signup">
-                <Play className="h-5 w-5 mr-2 group-hover:scale-110 transition-transform" />
-                <span>Essai gratuit 30 jours</span>
-                <ArrowRight className="h-5 w-5 ml-2 group-hover:translate-x-1 transition-transform" />
-              </Link>
-            </Button>
+              <Button
+                size="lg"
+                onClick={handleImmediateAction}
+                className="relative overflow-hidden bg-gradient-to-r from-primary to-primary/90 hover:from-primary/95 hover:to-primary shadow-2xl hover:shadow-primary/25 transition-all duration-500 px-10 py-7 text-lg font-semibold group"
+              >
+                <StopCircle className="h-5 w-5 mr-3" />
+                <span>Je veux que ça s'arrête maintenant</span>
+                
+                {/* Effet de brillance au hover */}
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                  initial={{ x: '-100%' }}
+                  animate={isHovered ? { x: '100%' } : { x: '-100%' }}
+                  transition={{ duration: 0.6 }}
+                />
+              </Button>
+            </motion.div>
 
             <Button
               size="lg"
-              variant="outline"
-              className="border-2 hover:bg-muted/50 px-8 py-4 text-lg backdrop-blur-sm"
-              asChild
+              variant="ghost"
+              onClick={handleImmediateAction}
+              className="text-muted-foreground hover:text-foreground px-8 py-7 text-lg group"
             >
-              <Link to="/demo">
-                <Zap className="h-5 w-5 mr-2" />
-                <span>Voir la démo interactive</span>
-              </Link>
+              <Clock className="h-4 w-4 mr-2 group-hover:text-primary transition-colors" />
+              <span>2 minutes suffisent</span>
             </Button>
           </motion.div>
 
-          {/* Trust Indicators */}
+          {/* Indicateurs de confiance - réassurance sans jargon */}
           <motion.div
             variants={itemVariants}
-            className="flex flex-col sm:flex-row gap-6 justify-center items-center text-sm text-muted-foreground pt-8 border-t border-border/50"
+            className="flex flex-col sm:flex-row gap-8 justify-center items-center text-sm text-muted-foreground pt-10"
           >
             <div className="flex items-center space-x-2">
-              <div className="h-8 w-8 bg-green-500/20 rounded-full flex items-center justify-center">
-                <Heart className="h-4 w-4 text-green-500" aria-hidden="true" />
+              <div className="h-9 w-9 bg-green-500/15 rounded-full flex items-center justify-center">
+                <Shield className="h-4 w-4 text-green-500" aria-hidden="true" />
               </div>
-              <span>Confiance de 25K+ utilisateurs</span>
+              <span>Tes données restent privées</span>
             </div>
             <div className="flex items-center space-x-2">
-              <div className="h-8 w-8 bg-blue-500/20 rounded-full flex items-center justify-center">
-                <Sparkles className="h-4 w-4 text-blue-500" aria-hidden="true" />
+              <div className="h-9 w-9 bg-blue-500/15 rounded-full flex items-center justify-center">
+                <Zap className="h-4 w-4 text-blue-500" aria-hidden="true" />
               </div>
-              <span>100% sécurisé RGPD</span>
+              <span>Effet en moins de 2 minutes</span>
             </div>
             <div className="flex items-center space-x-2">
-              <div className="h-8 w-8 bg-purple-500/20 rounded-full flex items-center justify-center">
-                <Zap className="h-4 w-4 text-purple-500" aria-hidden="true" />
+              <div className="h-9 w-9 bg-purple-500/15 rounded-full flex items-center justify-center">
+                <Brain className="h-4 w-4 text-purple-500" aria-hidden="true" />
               </div>
-              <span>Installation instantanée</span>
+              <span>Aucune explication nécessaire</span>
             </div>
           </motion.div>
 
-          {/* Floating Cards Preview */}
+          {/* Cartes de sessions - protocoles, pas playlists */}
           <motion.div
             variants={itemVariants}
-            className="pt-12 grid grid-cols-1 md:grid-cols-3 gap-4 max-w-3xl mx-auto"
+            className="pt-14 grid grid-cols-1 md:grid-cols-3 gap-5 max-w-4xl mx-auto"
           >
-            <motion.div
-              variants={floatingVariants}
-              animate="animate"
-              className="bg-gradient-to-br from-blue-500/10 to-blue-500/5 backdrop-blur-sm rounded-xl p-4 border border-blue-500/20"
+            {/* Session STOP */}
+            <motion.button
+              onClick={() => navigate('/app/scan?mode=stop')}
+              whileHover={{ scale: 1.03, y: -5 }}
+              whileTap={{ scale: 0.98 }}
+              className="text-left bg-gradient-to-br from-red-500/10 to-red-500/5 backdrop-blur-sm rounded-2xl p-6 border border-red-500/20 hover:border-red-500/40 transition-all group cursor-pointer"
             >
-              <div className="text-2xl mb-2">🎵</div>
-              <p className="text-sm font-medium">Musique Thérapeutique</p>
-              <p className="text-xs text-muted-foreground">Générée par IA en temps réel</p>
-            </motion.div>
+              <div className="flex items-center gap-3 mb-3">
+                <div className="h-10 w-10 rounded-full bg-red-500/20 flex items-center justify-center">
+                  <StopCircle className="h-5 w-5 text-red-500" />
+                </div>
+                <Badge variant="outline" className="text-xs border-red-500/30 text-red-500">
+                  Urgence
+                </Badge>
+              </div>
+              <p className="text-base font-semibold text-foreground mb-1">Stop</p>
+              <p className="text-sm text-muted-foreground">
+                Interrompre une montée anxieuse en cours
+              </p>
+            </motion.button>
 
-            <motion.div
-              variants={floatingVariants}
-              animate="animate"
-              transition={{ delay: 0.2 }}
-              className="bg-gradient-to-br from-green-500/10 to-green-500/5 backdrop-blur-sm rounded-xl p-4 border border-green-500/20"
+            {/* Session Arrêt mental */}
+            <motion.button
+              onClick={() => navigate('/app/scan?mode=mental-stop')}
+              whileHover={{ scale: 1.03, y: -5 }}
+              whileTap={{ scale: 0.98 }}
+              className="text-left bg-gradient-to-br from-indigo-500/10 to-indigo-500/5 backdrop-blur-sm rounded-2xl p-6 border border-indigo-500/20 hover:border-indigo-500/40 transition-all group cursor-pointer"
             >
-              <div className="text-2xl mb-2">👁️</div>
-              <p className="text-sm font-medium">Analyse Émotions</p>
-              <p className="text-xs text-muted-foreground">99% de précision avec IA</p>
-            </motion.div>
+              <div className="flex items-center gap-3 mb-3">
+                <div className="h-10 w-10 rounded-full bg-indigo-500/20 flex items-center justify-center">
+                  <Brain className="h-5 w-5 text-indigo-500" />
+                </div>
+                <Badge variant="outline" className="text-xs border-indigo-500/30 text-indigo-500">
+                  Nuit
+                </Badge>
+              </div>
+              <p className="text-base font-semibold text-foreground mb-1">Arrêt mental</p>
+              <p className="text-sm text-muted-foreground">
+                Quand le corps est épuisé mais que le cerveau refuse
+              </p>
+            </motion.button>
 
-            <motion.div
-              variants={floatingVariants}
-              animate="animate"
-              transition={{ delay: 0.4 }}
-              className="bg-gradient-to-br from-purple-500/10 to-purple-500/5 backdrop-blur-sm rounded-xl p-4 border border-purple-500/20"
+            {/* Session Reset */}
+            <motion.button
+              onClick={() => navigate('/app/scan?mode=reset')}
+              whileHover={{ scale: 1.03, y: -5 }}
+              whileTap={{ scale: 0.98 }}
+              className="text-left bg-gradient-to-br from-amber-500/10 to-amber-500/5 backdrop-blur-sm rounded-2xl p-6 border border-amber-500/20 hover:border-amber-500/40 transition-all group cursor-pointer"
             >
-              <div className="text-2xl mb-2">🧠</div>
-              <p className="text-sm font-medium">Coach Personnel</p>
-              <p className="text-xs text-muted-foreground">Support 24/7 personnalisé</p>
-            </motion.div>
+              <div className="flex items-center gap-3 mb-3">
+                <div className="h-10 w-10 rounded-full bg-amber-500/20 flex items-center justify-center">
+                  <Zap className="h-5 w-5 text-amber-500" />
+                </div>
+                <Badge variant="outline" className="text-xs border-amber-500/30 text-amber-500">
+                  Journée
+                </Badge>
+              </div>
+              <p className="text-base font-semibold text-foreground mb-1">Reset</p>
+              <p className="text-sm text-muted-foreground">
+                Quand tu dois continuer sans t'effondrer
+              </p>
+            </motion.button>
           </motion.div>
         </motion.div>
       </div>
