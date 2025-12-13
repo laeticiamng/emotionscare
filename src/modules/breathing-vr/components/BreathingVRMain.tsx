@@ -75,7 +75,7 @@ export const BreathingVRMain = memo(function BreathingVRMain() {
   // Haptic feedback synchronisé avec la respiration
   useEffect(() => {
     if (status === 'active') {
-      haptics.trigger('breathe');
+      haptics.trigger('breathing');
     }
   }, [currentPhase, status, haptics]);
 
