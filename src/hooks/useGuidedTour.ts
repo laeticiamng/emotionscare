@@ -1,5 +1,6 @@
 // @ts-nocheck
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { useUserPreference } from '@/hooks/useSupabaseStorage';
 
 export interface TourStep {
   attractionId: string;
@@ -13,25 +14,14 @@ export interface EmotionalProfile {
   preferences: string[];
 }
 
-const TOUR_STORAGE_KEY = 'emotional-park-tour-completed';
-const PROFILE_STORAGE_KEY = 'emotional-profile';
-
 export const useGuidedTour = () => {
   const [tourActive, setTourActive] = useState(false);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
-  const [tourCompleted, setTourCompleted] = useState(false);
-  const [emotionalProfile, setEmotionalProfile] = useState<EmotionalProfile | null>(null);
   const [recommendedSteps, setRecommendedSteps] = useState<TourStep[]>([]);
 
-  useEffect(() => {
-    const completed = localStorage.getItem(TOUR_STORAGE_KEY);
-    const profile = localStorage.getItem(PROFILE_STORAGE_KEY);
-    
-    setTourCompleted(completed === 'true');
-    if (profile) {
-      setEmotionalProfile(JSON.parse(profile));
-    }
-  }, []);
+  // Utiliser Supabase pour persister l'état du tour
+  const [tourCompleted, setTourCompleted] = useUserPreference<boolean>('emotional-park-tour-completed', false);
+  const [emotionalProfile, setEmotionalProfile] = useUserPreference<EmotionalProfile | null>('emotional-profile', null);
 
   const generateRecommendedPath = (profile: EmotionalProfile): TourStep[] => {
     const pathMap: Record<string, TourStep[]> = {
@@ -170,12 +160,11 @@ export const useGuidedTour = () => {
     return pathMap[profile.primary] || pathMap.stress;
   };
 
-  const startTour = (profile: EmotionalProfile) => {
-    setEmotionalProfile(profile);
+  const startTour = async (profile: EmotionalProfile) => {
+    await setEmotionalProfile(profile);
     setRecommendedSteps(generateRecommendedPath(profile));
     setTourActive(true);
     setCurrentStepIndex(0);
-    localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(profile));
   };
 
   const nextStep = () => {
@@ -192,23 +181,20 @@ export const useGuidedTour = () => {
     }
   };
 
-  const skipTour = () => {
+  const skipTour = async () => {
     setTourActive(false);
-    setTourCompleted(true);
-    localStorage.setItem(TOUR_STORAGE_KEY, 'true');
+    await setTourCompleted(true);
   };
 
-  const completeTour = () => {
+  const completeTour = async () => {
     setTourActive(false);
-    setTourCompleted(true);
-    localStorage.setItem(TOUR_STORAGE_KEY, 'true');
+    await setTourCompleted(true);
   };
 
-  const resetTour = () => {
+  const resetTour = async () => {
     setTourActive(false);
     setCurrentStepIndex(0);
-    setTourCompleted(false);
-    localStorage.removeItem(TOUR_STORAGE_KEY);
+    await setTourCompleted(false);
   };
 
   const currentStep = recommendedSteps[currentStepIndex];

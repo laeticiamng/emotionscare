@@ -9,44 +9,32 @@ import {
   safeGetDocumentRoot
 } from '@/lib/safe-helpers';
 import { logger } from '@/lib/logger';
+import { useUserPreference } from '@/hooks/useSupabaseStorage';
 
 const ThemeButton: React.FC = () => {
-  const [theme, setTheme] = useState<'light' | 'dark' | 'system'>('system');
+  const [theme, setThemeState, isLoading] = useUserPreference<'light' | 'dark' | 'system'>('theme', 'system');
   const { toast } = useToast();
   
+  // Appliquer le thème au chargement et aux changements
   useEffect(() => {
-    // Check if theme is set in localStorage
-    let savedTheme: 'light' | 'dark' | 'system' | null = null;
-
-    if (typeof window !== 'undefined') {
-      try {
-        savedTheme = window.localStorage.getItem('theme') as 'light' | 'dark' | 'system' | null;
-      } catch (error) {
-        logger.warn('Failed to read theme from localStorage', error as Error, 'UI');
-      }
+    if (!isLoading) {
+      applyTheme(theme);
     }
+  }, [theme, isLoading]);
+  
+  // Écouter les changements de préférence système
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     
-    if (savedTheme) {
-      setTheme(savedTheme);
-      applyTheme(savedTheme);
-    } else {
-      // Check system preference
-      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        setTheme('dark');
-        applyTheme('dark');
-      } else {
-        setTheme('light');
-        applyTheme('light');
-      }
-    }
-    
-    // Listen for system preference changes
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+    const handleChange = (e: MediaQueryListEvent) => {
       if (theme === 'system') {
         applyTheme(e.matches ? 'dark' : 'light');
       }
-    });
-  }, []);
+    };
+    
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, [theme]);
   
   const applyTheme = (newTheme: 'light' | 'dark' | 'system') => {
     if (typeof window === 'undefined') return;
@@ -64,7 +52,7 @@ const ThemeButton: React.FC = () => {
     }
   };
   
-  const toggleTheme = () => {
+  const toggleTheme = async () => {
     let newTheme: 'light' | 'dark' | 'system';
     
     if (theme === 'light') {
@@ -75,14 +63,8 @@ const ThemeButton: React.FC = () => {
       newTheme = 'light';
     }
     
-    setTheme(newTheme);
-    try {
-      if (typeof window !== 'undefined') {
-        window.localStorage.setItem('theme', newTheme);
-      }
-    } catch (error) {
-      logger.warn('Failed to persist theme', error as Error, 'UI');
-    }
+    // Sauvegarde dans Supabase via le hook (avec fallback localStorage)
+    await setThemeState(newTheme);
     applyTheme(newTheme);
     
     toast({
