@@ -1,5 +1,6 @@
 /**
- * FAQSection - Questions fréquemment posées avec animations
+ * FAQSection - FAQ avec framing interventionnel
+ * Vision: Répondre aux vraies questions sur le moment où utiliser EmotionsCare
  */
 
 import React, { useState } from 'react';
@@ -7,8 +8,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ChevronDown, Search, Sparkles } from 'lucide-react';
+import { ChevronDown, Search, HelpCircle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { Link } from 'react-router-dom';
 
 interface FAQItem {
   id: number;
@@ -21,67 +23,67 @@ interface FAQItem {
 const faqs: FAQItem[] = [
   {
     id: 1,
-    category: 'Général',
-    question: 'Qu\'est-ce qu\'EmotionsCare ?',
+    category: 'Quand utiliser',
+    question: "C'est pour quel genre de moment ?",
     answer:
-      'EmotionsCare est une plateforme d\'intelligence émotionnelle pilotée par l\'IA. Elle combine l\'analyse émotionnelle, la musicothérapie, le coaching personnalisé et des expériences immersives pour améliorer votre bien-être émotionnel et votre qualité de vie.',
-    icon: '💭',
+      "Quand ton cerveau ne veut pas s'arrêter. Quand tu sens une montée d'anxiété. Quand tu es épuisé mais que tu n'arrives pas à dormir. Quand tu dois continuer ta journée mais que tu es au bord de l'effondrement. Ce ne sont pas des exercices de relaxation. Ce sont des interventions pour des moments précis.",
+    icon: '🎯',
   },
   {
     id: 2,
-    category: 'Général',
-    question: 'Comment fonctionne l\'analyse émotionnelle ?',
+    category: 'Quand utiliser',
+    question: 'Combien de temps ça prend ?',
     answer:
-      'Notre système utilise la technologie de reconnaissance faciale avancée avec 99% de précision. En 30 secondes, il analyse vos micro-expressions pour identifier vos émotions actuelles et vous proposer des recommandations adaptées.',
-    icon: '👁️',
+      "Entre 2 et 5 minutes. On ne te demande pas de méditer 30 minutes. Une session Stop prend 2 minutes. Un Reset en prend 3. L'objectif n'est pas de t'occuper, c'est de produire un effet. Rapidement.",
+    icon: '⏱️',
   },
   {
     id: 3,
-    category: 'Sécurité',
-    question: 'Mes données sont-elles sécurisées ?',
+    category: 'Quand utiliser',
+    question: 'Est-ce que ça marche vraiment ?',
     answer:
-      'Absolument. Toutes vos données sont chiffrées avec un protocole de niveau bancaire (AES-256). Nous respectons intégralement le RGPD et somos certifiés ISO 27001 pour la sécurité de l\'information.',
-    icon: '🔒',
+      "Tu le sentiras. Pas besoin de croire à quoi que ce soit. Le protocole agit sur ton système nerveux, pas sur tes croyances. Si après 2 minutes tu ne sens rien de différent, c'est que ce n'était pas le bon protocole pour ce moment-là. On t'en proposera un autre.",
+    icon: '✨',
   },
   {
     id: 4,
-    category: 'Sécurité',
-    question: 'Que faites-vous avec mes données personnelles ?',
+    category: 'Comment ça marche',
+    question: "C'est quoi exactement ?",
     answer:
-      'Vos données vous appartiennent. Nous ne les vendons jamais à des tiers. Elles sont utilisées uniquement pour vous proposer une expérience personnalisée et améliorer nos algorithmes avec votre consentement.',
-    icon: '📋',
+      "Des protocoles audio-visuels qui agissent sur ton système nerveux. On n'explique pas comment pendant que tu les utilises. Tu lances, tu laisses faire, tu observes ce qui change. L'explication viendra après si tu la veux.",
+    icon: '🧠',
   },
   {
     id: 5,
-    category: 'Compte',
-    question: 'Comment puis-je annuler mon abonnement ?',
+    category: 'Comment ça marche',
+    question: 'Et la musique là-dedans ?',
     answer:
-      'Vous pouvez annuler votre abonnement à tout moment en accédant à vos paramètres de compte. Aucun frais caché, aucun engagement à long terme. Vous aurez accès à vos données personnelles même après annulation.',
-    icon: '⚙️',
+      "La musique n'est pas le produit. C'est le véhicule. Tu n'écoutes pas de la musique pour te détendre. Tu reçois un signal qui recalibre ton état. La différence : une playlist te distrait, un protocole te transforme.",
+    icon: '🎵',
   },
   {
     id: 6,
-    category: 'Compte',
-    question: 'Y a-t-il une période d\'essai gratuit ?',
+    category: 'Sécurité',
+    question: 'Mes données sont protégées ?',
     answer:
-      'Oui ! Vous disposez de 30 jours d\'essai gratuit sans avoir besoin de renseigner une carte bancaire. Accès complet à toutes les fonctionnalités premium pendant cette période.',
-    icon: '🎁',
+      "Oui. Chiffrement niveau bancaire, conformité RGPD totale. Mais surtout : on ne stocke rien d'inutile. Ton historique t'appartient. Tu peux tout supprimer à tout moment. On n'a pas besoin de tes données pour que ça fonctionne.",
+    icon: '🔒',
   },
   {
     id: 7,
-    category: 'Fonctionnalités',
-    question: 'Puis-je utiliser EmotionsCare sur mobile ?',
+    category: 'Accès',
+    question: "C'est gratuit ?",
     answer:
-      'Oui, EmotionsCare fonctionne sur tous les appareils : smartphones, tablettes et ordinateurs. Notre application web est progressive (PWA) et fonctionne même hors ligne.',
-    icon: '📱',
+      "30 jours d'essai sans carte bancaire. Ensuite c'est un abonnement. Mais réfléchis : combien te coûtent tes nuits blanches ? Tes crises d'anxiété ? Tes journées où tu n'arrives pas à fonctionner ? Le vrai coût, c'est de ne rien faire.",
+    icon: '💳',
   },
   {
     id: 8,
-    category: 'Fonctionnalités',
-    question: 'Comment fonctionne le coach Nyvée ?',
+    category: 'Accès',
+    question: 'Je peux annuler quand je veux ?',
     answer:
-      'Nyvée est notre coach IA personnel. Elle apprend de vos interactions pour vous proposer un soutien émotionnel adapté. Elle combine les techniques de psychologie positive avec les dernières avancées en IA.',
-    icon: '🧠',
+      "Oui. Sans justification. Sans frais cachés. On préfère que tu reviennes parce que ça te manque, pas parce que tu es coincé.",
+    icon: '🚪',
   },
 ];
 
@@ -131,14 +133,14 @@ const FAQSection: React.FC = () => {
           {/* Header */}
           <div className="text-center space-y-4">
             <Badge variant="outline" className="mb-2">
-              <Sparkles className="h-3 w-3 mr-2" />
-              Questions fréquentes
+              <HelpCircle className="h-3 w-3 mr-2" />
+              Questions légitimes
             </Badge>
-            <h2 className="text-4xl lg:text-5xl font-bold">
-              Tout ce que vous devez savoir
+            <h2 className="text-3xl lg:text-4xl font-bold">
+              Ce que tu te demandes probablement
             </h2>
             <p className="text-lg text-muted-foreground">
-              Trouvez des réponses à vos questions les plus courantes
+              Pas de jargon. Des réponses directes.
             </p>
           </div>
 
@@ -153,7 +155,7 @@ const FAQSection: React.FC = () => {
             <div className="relative">
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground pointer-events-none" />
               <Input
-                placeholder="Rechercher une question..."
+                placeholder="Chercher une question..."
                 className="pl-12 py-3 text-base"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -167,7 +169,7 @@ const FAQSection: React.FC = () => {
                 size="sm"
                 onClick={() => setSelectedCategory(null)}
               >
-                Tous
+                Tout
               </Button>
               {categories.map((category) => (
                 <Button
@@ -245,7 +247,7 @@ const FAQSection: React.FC = () => {
                 className="text-center py-12"
               >
                 <p className="text-muted-foreground text-lg">
-                  Aucune question trouvée. Essayez une autre recherche.
+                  Aucune question trouvée. Essaie autre chose.
                 </p>
               </motion.div>
             )}
@@ -259,10 +261,12 @@ const FAQSection: React.FC = () => {
             className="text-center p-8 bg-muted/50 rounded-xl border border-border/50"
           >
             <p className="text-muted-foreground mb-4">
-              Vous n\'avez pas trouvé votre réponse ?
+              La meilleure façon de comprendre, c'est d'essayer.
             </p>
-            <Button variant="outline">
-              Nous contacter
+            <Button asChild>
+              <Link to="/app/scan">
+                Lancer une session maintenant
+              </Link>
             </Button>
           </motion.div>
         </motion.div>
