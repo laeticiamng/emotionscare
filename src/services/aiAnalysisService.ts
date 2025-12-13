@@ -214,23 +214,225 @@ class AIAnalysisService {
    */
   async analyzeEmotions(text: string): Promise<EmotionAnalysisResult> {
     try {
-      // Si pas de clé Hume AI, utiliser l'analyse de sentiment comme fallback
+      // Si pas de clé Hume AI, utiliser l'analyse avancée multi-modèle
       if (!this.humeApiKey || this.humeApiKey === '') {
-        logger.warn('Hume AI API key not configured, using sentiment analysis fallback', undefined, 'AI_ANALYSIS');
-        const sentiment = await this.analyzeSentiment(text);
-        return this.sentimentToEmotion(sentiment);
+        logger.warn('Hume AI API key not configured, using advanced fallback analysis', undefined, 'AI_ANALYSIS');
+        return this.advancedEmotionAnalysis(text);
       }
 
-      // TODO: Implémenter l'intégration Hume AI ici
-      // Pour l'instant, utiliser le fallback
-      logger.info('Hume AI integration not yet implemented, using fallback', undefined, 'AI_ANALYSIS');
-      const sentiment = await this.analyzeSentiment(text);
-      return this.sentimentToEmotion(sentiment);
+      // Appel à Hume AI Batch API pour analyse de texte
+      const response = await fetch('https://api.hume.ai/v0/batch/jobs', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Hume-Api-Key': this.humeApiKey,
+        },
+        body: JSON.stringify({
+          models: {
+            language: {
+              granularity: 'sentence',
+              identify_speakers: false,
+            },
+          },
+          text: [text],
+        }),
+      });
+
+      if (!response.ok) {
+        logger.warn('Hume AI API error, using fallback', { status: response.status }, 'AI_ANALYSIS');
+        return this.advancedEmotionAnalysis(text);
+      }
+
+      const jobData = await response.json();
+      const jobId = jobData.job_id;
+
+      // Polling pour le résultat (max 30 secondes)
+      let attempts = 0;
+      const maxAttempts = 15;
+      
+      while (attempts < maxAttempts) {
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        const statusResponse = await fetch(`https://api.hume.ai/v0/batch/jobs/${jobId}`, {
+          headers: { 'X-Hume-Api-Key': this.humeApiKey },
+        });
+
+        if (!statusResponse.ok) break;
+
+        const statusData = await statusResponse.json();
+        
+        if (statusData.state?.status === 'COMPLETED') {
+          // Récupérer les prédictions
+          const predictionsResponse = await fetch(`https://api.hume.ai/v0/batch/jobs/${jobId}/predictions`, {
+            headers: { 'X-Hume-Api-Key': this.humeApiKey },
+          });
+
+          if (predictionsResponse.ok) {
+            const predictions = await predictionsResponse.json();
+            return this.parseHumeEmotions(predictions);
+          }
+          break;
+        } else if (statusData.state?.status === 'FAILED') {
+          break;
+        }
+        
+        attempts++;
+      }
+
+      // Fallback si le polling échoue
+      return this.advancedEmotionAnalysis(text);
     } catch (error) {
       logger.error('Error analyzing emotions', error as Error, 'AI_ANALYSIS');
-      const sentiment = await this.analyzeSentiment(text);
-      return this.sentimentToEmotion(sentiment);
+      return this.advancedEmotionAnalysis(text);
     }
+  }
+
+  /**
+   * Parse les résultats Hume AI en EmotionAnalysisResult
+   */
+  private parseHumeEmotions(predictions: any): EmotionAnalysisResult {
+    try {
+      const emotionData = predictions[0]?.results?.predictions?.[0]?.models?.language?.grouped_predictions?.[0]?.predictions?.[0]?.emotions;
+      
+      if (!emotionData || !Array.isArray(emotionData)) {
+        return this.advancedEmotionAnalysis('');
+      }
+
+      const emotions: Record<string, number> = {};
+      let topEmotion = { name: 'neutral', score: 0 };
+
+      for (const emotion of emotionData) {
+        emotions[emotion.name.toLowerCase()] = emotion.score;
+        if (emotion.score > topEmotion.score) {
+          topEmotion = { name: emotion.name.toLowerCase(), score: emotion.score };
+        }
+      }
+
+      // Déterminer le tone global
+      const positiveEmotions = ['joy', 'amusement', 'love', 'admiration', 'excitement', 'gratitude', 'pride', 'relief'];
+      const negativeEmotions = ['sadness', 'anger', 'fear', 'disgust', 'contempt', 'disappointment', 'embarrassment', 'shame'];
+      
+      let positiveScore = 0;
+      let negativeScore = 0;
+      
+      for (const [emotion, score] of Object.entries(emotions)) {
+        if (positiveEmotions.includes(emotion)) positiveScore += score;
+        if (negativeEmotions.includes(emotion)) negativeScore += score;
+      }
+
+      let tone: 'positive' | 'neutral' | 'negative';
+      if (positiveScore > negativeScore + 0.1) tone = 'positive';
+      else if (negativeScore > positiveScore + 0.1) tone = 'negative';
+      else tone = 'neutral';
+
+      return {
+        tone,
+        emotions,
+        dominantEmotion: topEmotion.name,
+      };
+    } catch {
+      return this.advancedEmotionAnalysis('');
+    }
+  }
+
+  /**
+   * Analyse émotionnelle avancée multi-modèle (fallback)
+   */
+  private async advancedEmotionAnalysis(text: string): Promise<EmotionAnalysisResult> {
+    // Analyse heuristique avancée avec patterns émotionnels français
+    const emotionPatterns: Record<string, { keywords: string[]; weight: number }> = {
+      joy: {
+        keywords: ['heureux', 'heureuse', 'content', 'contente', 'joie', 'ravi', 'ravie', 'super', 'génial', 'fantastique', 'merveilleux', 'excité', 'enthousiaste', 'sourire', 'rire', '😊', '😄', '🎉'],
+        weight: 1.0
+      },
+      sadness: {
+        keywords: ['triste', 'tristesse', 'malheureux', 'malheureuse', 'déprimé', 'déprimée', 'mélancolie', 'pleurer', 'pleurs', 'larmes', 'désespoir', 'chagrin', '😢', '😭'],
+        weight: 1.0
+      },
+      anger: {
+        keywords: ['colère', 'en colère', 'fâché', 'fâchée', 'énervé', 'énervée', 'furieux', 'furieuse', 'agacé', 'agacée', 'irrité', 'irritée', 'frustré', 'frustrée', '😠', '😡'],
+        weight: 1.0
+      },
+      fear: {
+        keywords: ['peur', 'effrayé', 'effrayée', 'anxieux', 'anxieuse', 'inquiet', 'inquiète', 'terrifié', 'terrifiée', 'paniqué', 'paniquée', 'nerveux', 'nerveuse', 'stress', 'stressé', '😰', '😨'],
+        weight: 1.0
+      },
+      surprise: {
+        keywords: ['surpris', 'surprise', 'étonné', 'étonnée', 'choqué', 'choquée', 'stupéfait', 'stupéfaite', 'incroyable', 'wow', 'oh', '😮', '😲'],
+        weight: 0.8
+      },
+      disgust: {
+        keywords: ['dégoût', 'dégoûté', 'dégoûtée', 'écœuré', 'écœurée', 'répugnant', 'horrible', 'déplaisant', '🤢', '🤮'],
+        weight: 0.9
+      },
+      love: {
+        keywords: ['amour', 'aimer', 'adore', 'adoré', 'adorée', 'affection', 'tendresse', 'chéri', 'chérie', 'passion', '❤️', '💕', '🥰'],
+        weight: 1.0
+      },
+      gratitude: {
+        keywords: ['merci', 'reconnaissant', 'reconnaissante', 'gratitude', 'chanceux', 'chanceuse', 'béni', 'bénie', 'apprécier', '🙏'],
+        weight: 0.9
+      }
+    };
+
+    const lowerText = text.toLowerCase();
+    const emotions: Record<string, number> = {};
+    let totalMatches = 0;
+
+    for (const [emotion, { keywords, weight }] of Object.entries(emotionPatterns)) {
+      let matchCount = 0;
+      for (const keyword of keywords) {
+        if (lowerText.includes(keyword)) {
+          matchCount++;
+        }
+      }
+      if (matchCount > 0) {
+        emotions[emotion] = Math.min(1, (matchCount / keywords.length) * weight * 2);
+        totalMatches += matchCount;
+      }
+    }
+
+    // Trouver l'émotion dominante
+    let dominantEmotion: string | undefined;
+    let maxScore = 0;
+    for (const [emotion, score] of Object.entries(emotions)) {
+      if (score > maxScore) {
+        maxScore = score;
+        dominantEmotion = emotion;
+      }
+    }
+
+    // Déterminer le tone
+    const positiveEmotions = ['joy', 'love', 'gratitude', 'surprise'];
+    const negativeEmotions = ['sadness', 'anger', 'fear', 'disgust'];
+    
+    let positiveScore = 0;
+    let negativeScore = 0;
+    
+    for (const [emotion, score] of Object.entries(emotions)) {
+      if (positiveEmotions.includes(emotion)) positiveScore += score;
+      if (negativeEmotions.includes(emotion)) negativeScore += score;
+    }
+
+    let tone: 'positive' | 'neutral' | 'negative';
+    if (positiveScore > negativeScore + 0.1) tone = 'positive';
+    else if (negativeScore > positiveScore + 0.1) tone = 'negative';
+    else tone = 'neutral';
+
+    // Si aucune émotion détectée, retourner neutre
+    if (totalMatches === 0) {
+      return {
+        tone: 'neutral',
+        emotions: {},
+        dominantEmotion: undefined,
+      };
+    }
+
+    return {
+      tone,
+      emotions,
+      dominantEmotion,
+    };
   }
 
   /**
