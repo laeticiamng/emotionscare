@@ -55,18 +55,101 @@ Deno.serve(async (req) => {
 
     // Send notifications for critical alerts
     if (alert.severity === 'critical' || alert.severity === 'error') {
-      // In production, send to Slack, email, etc.
       console.error('CRITICAL ALERT:', {
         message: alert.message,
         context: alert.context,
         timestamp: alert.timestamp,
       });
 
-      // Could integrate with:
-      // - Slack webhook
-      // - Email service
-      // - PagerDuty
-      // - Discord webhook
+      // Send Slack notification
+      const slackWebhook = Deno.env.get('SLACK_WEBHOOK_URL');
+      if (slackWebhook) {
+        try {
+          await fetch(slackWebhook, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              text: `🚨 *${alert.severity.toUpperCase()} ALERT*`,
+              blocks: [
+                {
+                  type: 'header',
+                  text: { type: 'plain_text', text: `🚨 ${alert.severity.toUpperCase()} Alert` }
+                },
+                {
+                  type: 'section',
+                  text: { type: 'mrkdwn', text: `*Message:* ${alert.message}` }
+                },
+                {
+                  type: 'section',
+                  fields: [
+                    { type: 'mrkdwn', text: `*Timestamp:*\n${alert.timestamp}` },
+                    { type: 'mrkdwn', text: `*Severity:*\n${alert.severity}` }
+                  ]
+                },
+                ...(alert.context ? [{
+                  type: 'section',
+                  text: { type: 'mrkdwn', text: `*Context:*\n\`\`\`${JSON.stringify(alert.context, null, 2)}\`\`\`` }
+                }] : [])
+              ]
+            })
+          });
+          console.log('Slack notification sent');
+        } catch (slackError) {
+          console.error('Slack notification failed:', slackError);
+        }
+      }
+
+      // Send Discord notification
+      const discordWebhook = Deno.env.get('DISCORD_WEBHOOK_URL');
+      if (discordWebhook) {
+        try {
+          await fetch(discordWebhook, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              embeds: [{
+                title: `🚨 ${alert.severity.toUpperCase()} Alert`,
+                description: alert.message,
+                color: alert.severity === 'critical' ? 0xFF0000 : 0xFFA500,
+                fields: [
+                  { name: 'Severity', value: alert.severity, inline: true },
+                  { name: 'Timestamp', value: alert.timestamp, inline: true },
+                  ...(alert.context ? [{ name: 'Context', value: `\`\`\`json\n${JSON.stringify(alert.context, null, 2)}\`\`\`` }] : [])
+                ],
+                timestamp: new Date().toISOString()
+              }]
+            })
+          });
+          console.log('Discord notification sent');
+        } catch (discordError) {
+          console.error('Discord notification failed:', discordError);
+        }
+      }
+
+      // Send email notification for critical alerts
+      if (alert.severity === 'critical') {
+        const adminEmail = Deno.env.get('ADMIN_ALERT_EMAIL');
+        if (adminEmail) {
+          try {
+            await supabase.functions.invoke('send-notification-email', {
+              body: {
+                to: adminEmail,
+                subject: `[CRITICAL] ${alert.message.slice(0, 50)}...`,
+                html: `
+                  <h2>🚨 Critical Alert</h2>
+                  <p><strong>Message:</strong> ${alert.message}</p>
+                  <p><strong>Timestamp:</strong> ${alert.timestamp}</p>
+                  ${alert.context ? `<pre>${JSON.stringify(alert.context, null, 2)}</pre>` : ''}
+                `,
+                text: `Critical Alert\n\nMessage: ${alert.message}\nTimestamp: ${alert.timestamp}\n${alert.context ? JSON.stringify(alert.context, null, 2) : ''}`
+              }
+            });
+            console.log('Email notification sent');
+          } catch (emailError) {
+            console.error('Email notification failed:', emailError);
+          }
+        }
+      }
     }
 
     // Check for alert patterns (e.g., too many errors)

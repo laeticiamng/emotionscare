@@ -54,9 +54,23 @@ export function sendAlert(alert: Alert): void {
     }
   }
 
-  // Edge function désactivée temporairement (fonction inexistante)
-  // TODO: Créer l'edge function monitoring-alerts si nécessaire
-  // Pour l'instant, les alertes sont loggées localement et envoyées à Sentry uniquement
+  // Send to monitoring-alerts edge function for production alerting
+  if (alert.severity === 'error' || alert.severity === 'critical') {
+    try {
+      const { supabase } = await import('@/integrations/supabase/client');
+      await supabase.functions.invoke('monitoring-alerts', {
+        body: {
+          severity: alert.severity,
+          message: alert.message,
+          context: alert.context,
+          timestamp: new Date().toISOString()
+        }
+      });
+    } catch (edgeFnError) {
+      // Fail silently - don't break the app if monitoring fails
+      console.error('[Monitoring] Edge function call failed:', edgeFnError);
+    }
+  }
 }
 
 /**
