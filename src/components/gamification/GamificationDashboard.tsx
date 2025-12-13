@@ -1,15 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { logger } from '@/lib/logger';
 import { 
   Trophy, Star, Zap, Target, CheckCircle, Clock, 
-  TrendingUp, Award, Sparkles, Flame, Loader2 
+  TrendingUp, Award, Sparkles, Flame, Loader2,
+  Filter, RefreshCw, Share2, Medal, Crown
 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface Challenge {
   id: string;
@@ -32,17 +35,61 @@ interface Stats {
   totalXP: number;
   currentLevel: number;
   currentStreak: number;
+  weeklyXP?: number;
+  rank?: number;
 }
+
+interface LeaderboardEntry {
+  userId: string;
+  displayName: string;
+  xp: number;
+  level: number;
+  rank: number;
+}
+
+const LEVEL_TITLES: Record<number, string> = {
+  1: 'Débutant',
+  2: 'Apprenti',
+  3: 'Pratiquant',
+  4: 'Confirmé',
+  5: 'Expert',
+  6: 'Maître',
+  7: 'Grand Maître',
+  8: 'Légende',
+  9: 'Mythique',
+  10: 'Transcendant'
+};
 
 const GamificationDashboard: React.FC = () => {
   const { toast } = useToast();
   const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [stats, setStats] = useState<Stats | null>(null);
+  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [completingId, setCompletingId] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState('challenges');
+  const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
+  // Charger données avec realtime subscription
   useEffect(() => {
     loadData();
+
+    // Subscription realtime pour les mises à jour
+    const channel = supabase
+      .channel('gamification-updates')
+      .on('postgres_changes', { 
+        event: '*', 
+        schema: 'public', 
+        table: 'user_challenges' 
+      }, () => {
+        loadData();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const loadData = async () => {
