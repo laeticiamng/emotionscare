@@ -206,7 +206,35 @@ const handler = withMonitoring('purge_deleted_users', async (req) => {
     // Send notification to admins if there were errors
     if (results.failed > 0) {
       console.error(`Purge completed with errors. Purged: ${results.purged}, Failed: ${results.failed}`);
-      // TODO: Send email notification to GDPR admin
+      
+      // Send email notification to GDPR admin
+      const gdprAdminEmail = Deno.env.get('GDPR_ADMIN_EMAIL');
+      if (gdprAdminEmail) {
+        try {
+          await supabase.functions.invoke('send-notification-email', {
+            body: {
+              to: gdprAdminEmail,
+              subject: `[GDPR ALERT] User Purge Completed with Errors`,
+              html: `
+                <h2>GDPR User Purge Report</h2>
+                <p><strong>Status:</strong> Completed with errors</p>
+                <p><strong>Successfully Purged:</strong> ${results.purged} users</p>
+                <p><strong>Failed:</strong> ${results.failed} users</p>
+                <h3>Errors:</h3>
+                <ul>
+                  ${results.errors.map(e => `<li>${e}</li>`).join('')}
+                </ul>
+                <p><em>Please review and manually address the failed deletions to ensure GDPR compliance.</em></p>
+                <p>Timestamp: ${now}</p>
+              `,
+              text: `GDPR User Purge Report\n\nStatus: Completed with errors\nSuccessfully Purged: ${results.purged} users\nFailed: ${results.failed} users\n\nErrors:\n${results.errors.join('\n')}\n\nPlease review and manually address the failed deletions.`
+            }
+          });
+          console.log('Admin notification sent successfully');
+        } catch (emailError) {
+          console.error('Failed to send admin notification:', emailError);
+        }
+      }
     }
 
     return new Response(JSON.stringify({

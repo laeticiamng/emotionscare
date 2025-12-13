@@ -276,22 +276,84 @@ export class ScoresService {
       // Vibe de la semaine
       const vibeData = await this.getCurrentVibe(userId);
 
+      // Calculer les minutes totales
+      const totalMinutes = sessionData.reduce((sum, s) => sum + ((s as any).duration_minutes || 0), 0);
+      
+      // Modules utilisés
+      const modulesUsed = [...new Set(activityData.map(a => (a as any).module_type || 'unknown').filter(Boolean))];
+      
+      // Achievements débloqués cette semaine
+      const { count: achievementsCount } = await supabase
+        .from('user_achievements')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', userId)
+        .gte('unlocked_at', startDate.toISOString())
+        .lte('unlocked_at', endDate.toISOString());
+      
+      // Mood range
+      const moodScores = sessionData
+        .map(s => (s as any).mood_score || (s as any).emotional_score || 0)
+        .filter(s => s > 0);
+      const moodRange = {
+        min: moodScores.length > 0 ? Math.min(...moodScores) : 0,
+        max: moodScores.length > 0 ? Math.max(...moodScores) : 0,
+        average: moodScores.length > 0 ? Math.round(moodScores.reduce((a, b) => a + b, 0) / moodScores.length) : 0
+      };
+      
+      // Dominant emotions
+      const emotionCounts: Record<string, number> = {};
+      activityData.forEach(a => {
+        const emotion = (a as any).dominant_emotion || (a as any).emotion;
+        if (emotion) {
+          emotionCounts[emotion] = (emotionCounts[emotion] || 0) + 1;
+        }
+      });
+      const totalEmotions = Object.values(emotionCounts).reduce((a, b) => a + b, 0);
+      const dominantEmotions = Object.entries(emotionCounts)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5)
+        .map(([emotion, count]) => ({
+          emotion,
+          percentage: totalEmotions > 0 ? Math.round((count / totalEmotions) * 100) : 0
+        }));
+      
+      // Best day
+      const dailyScores: Record<string, number[]> = {};
+      sessionData.forEach(s => {
+        const day = (s.created_at as string)?.split('T')[0];
+        if (day) {
+          if (!dailyScores[day]) dailyScores[day] = [];
+          dailyScores[day].push((s as any).mood_score || (s as any).emotional_score || 50);
+        }
+      });
+      let bestDay = { date: startDate.toISOString().split('T')[0], score: 0 };
+      Object.entries(dailyScores).forEach(([date, scores]) => {
+        const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
+        if (avg > bestDay.score) {
+          bestDay = { date, score: Math.round(avg) };
+        }
+      });
+      
+      // Challenges faced (based on low mood or stress indicators)
+      const challengesFaced = sessionData.filter(s => 
+        ((s as any).mood_score || 50) < 40 || (s as any).stress_level === 'high'
+      ).length;
+
       return {
         week_number: week,
         year,
         emotional_score,
         wellbeing_score,
         engagement_score,
-        vibe: vibeData.current_vibe,
-        vibe_intensity: vibeData.vibe_intensity,
         total_sessions: sessionData.length,
-        total_activities: activityData.length,
-        daily_activity: dailyActivity,
-        top_modules: this.getTopModules(activityData),
-        insights: await this.generateWeeklyInsights(userId, emotional_score, wellbeing_score, engagement_score),
-        start_date: startDate.toISOString(),
-        end_date: endDate.toISOString(),
-      } as WeeklyMetrics;
+        total_minutes: totalMinutes,
+        modules_used: modulesUsed,
+        achievements_unlocked: achievementsCount || 0,
+        mood_range: moodRange,
+        dominant_emotions: dominantEmotions,
+        best_day: bestDay,
+        challenges_faced: challengesFaced
+      };
     } catch (error) {
       logger.error('[ScoresService] Get weekly metrics error:', error, 'MODULE');
       return null;

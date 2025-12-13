@@ -896,12 +896,13 @@ class AnalyticsService {
         .lt('created_at', oneWeekAgo.toISOString());
 
       const scansCount = thisWeekScans?.length || 0;
+      const safeThisWeekScans = thisWeekScans || [];
       const avgMood = scansCount > 0
-        ? Math.round((thisWeekScans.reduce((sum, s) => sum + ((s as any).mood_score || 0), 0) / scansCount) * 10) / 10
+        ? Math.round((safeThisWeekScans.reduce((sum, s) => sum + ((s as any).mood_score || 0), 0) / scansCount) * 10) / 10
         : 0;
 
       const emotionCounts: Record<string, number> = {};
-      thisWeekScans?.forEach(s => {
+      safeThisWeekScans.forEach(s => {
         const emotion = (s as any).dominant_emotion;
         if (emotion) {
           emotionCounts[emotion] = (emotionCounts[emotion] || 0) + 1;
