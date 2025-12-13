@@ -255,6 +255,24 @@ const B2CScanPage: React.FC = () => {
         onDecline={handleDecline}
         feature="emotional_scan"
       />
+      {!isAccepted && !showDisclaimer && (
+        <PageRoot>
+          <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-primary/10">
+            <div className="container mx-auto flex flex-col items-center justify-center gap-6 px-4 py-20 text-center">
+              <h1 className="text-3xl font-semibold text-foreground">Scanner émotionnel</h1>
+              <p className="max-w-md text-muted-foreground">
+                Pour utiliser le scanner émotionnel, veuillez accepter les conditions d'utilisation.
+              </p>
+              <Button onClick={handleAccept} size="lg">
+                Accepter et continuer
+              </Button>
+              <Link to="/app/home" className="text-sm text-muted-foreground hover:text-foreground">
+                ← Retour à l'accueil
+              </Link>
+            </div>
+          </div>
+        </PageRoot>
+      )}
       {isAccepted && (
         <PageRoot>
         {showOnboarding && (
