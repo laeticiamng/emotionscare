@@ -1,6 +1,6 @@
 /**
- * useStorageMigration - Hook centralisé pour migrer tous les localStorage restants vers Supabase
- * Gère la migration automatique au login + préserve le fallback offline
+ * useStorageMigration - Hook centralisé pour migrer tous les localStorage vers Supabase
+ * Migration automatique au login + fallback offline
  */
 
 import { useEffect, useCallback, useState } from 'react';
@@ -8,7 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { logger } from '@/lib/logger';
 
-// Liste exhaustive des clés localStorage à migrer
+// Liste exhaustive de TOUTES les clés localStorage à migrer
 const MIGRATION_KEYS = [
   // Theme & UI
   'theme',
@@ -21,6 +21,7 @@ const MIGRATION_KEYS = [
   // Coach & Sessions
   'coachMessages',
   'coach-conversation-history',
+  'unified_coach_conversations',
   
   // Journal
   'pending_memos',
@@ -35,7 +36,9 @@ const MIGRATION_KEYS = [
   'music:history',
   'music:lastPlayed',
   'music:email',
+  'music:audio-urls-cache',
   'adaptive-music:persisted-session',
+  'adaptive-music:favorites-sync',
   'sleep_preset',
   
   // Orchestration & WHO-5
@@ -71,6 +74,20 @@ const MIGRATION_KEYS = [
   // Flash Glow
   'flash_glow_suds_cooldown',
   'flash_glow_suds_opt_in',
+  
+  // Community banners
+  'community_nudge_ucla3_last_seen',
+  'community_nudge_mspss_last_seen',
+  
+  // Voice & Help
+  'voice_command_history',
+  'help_search_history',
+  
+  // Dashboard
+  'sleep_reminder',
+  
+  // Sort preferences (dynamic keys handled separately)
+  'sort-preferences',
 ] as const;
 
 export type MigrationStatus = 'idle' | 'migrating' | 'completed' | 'error';
@@ -88,7 +105,7 @@ export function useStorageMigration() {
 
   const migrateAll = useCallback(async (): Promise<MigrationResult> => {
     if (!user) {
-      return { migrated: [], failed: [], skipped: MIGRATION_KEYS.slice() };
+      return { migrated: [], failed: [], skipped: [...MIGRATION_KEYS] };
     }
 
     const migrated: string[] = [];
@@ -97,7 +114,21 @@ export function useStorageMigration() {
 
     setStatus('migrating');
 
-    for (const key of MIGRATION_KEYS) {
+    // Collecter toutes les clés à migrer (incluant clés dynamiques)
+    const allKeys = new Set<string>(MIGRATION_KEYS);
+    
+    // Ajouter les clés dynamiques de sort-preferences
+    if (typeof window !== 'undefined') {
+      Object.keys(localStorage).forEach(key => {
+        if (key.startsWith('sort-preferences:') || 
+            key.startsWith('banner-cooldown:') ||
+            key.startsWith('_sec_')) {
+          allKeys.add(key);
+        }
+      });
+    }
+
+    for (const key of allKeys) {
       try {
         const localData = localStorage.getItem(key);
         
@@ -106,7 +137,13 @@ export function useStorageMigration() {
           continue;
         }
 
-        // Vérifier si déjà migré dans Supabase
+        // Ignorer les clés sensibles qui ne doivent pas être migrées
+        if (key.startsWith('_sec_') || key === 'auth_session' || key === 'auth_token') {
+          skipped.push(key);
+          continue;
+        }
+
+        // Vérifier si déjà migré
         const { data: existing } = await supabase
           .from('user_settings')
           .select('id')
@@ -137,9 +174,7 @@ export function useStorageMigration() {
             updated_at: new Date().toISOString()
           });
 
-        if (error) {
-          throw error;
-        }
+        if (error) throw error;
 
         // Migration réussie - supprimer du localStorage
         localStorage.removeItem(key);
@@ -151,8 +186,8 @@ export function useStorageMigration() {
       }
     }
 
-    const result = { migrated, failed, skipped };
-    setResult(result);
+    const finalResult = { migrated, failed, skipped };
+    setResult(finalResult);
     setStatus(migrated.length > 0 || failed.length === 0 ? 'completed' : 'error');
 
     logger.info('[StorageMigration] Migration complete', { 
@@ -161,7 +196,7 @@ export function useStorageMigration() {
       skipped: skipped.length 
     }, 'STORAGE');
 
-    return result;
+    return finalResult;
   }, [user]);
 
   // Auto-migration au login
