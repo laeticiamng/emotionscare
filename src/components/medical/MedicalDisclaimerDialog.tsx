@@ -247,6 +247,7 @@ export const MedicalDisclaimerDialog: React.FC<MedicalDisclaimerDialogProps> = (
 export const useMedicalDisclaimer = (feature: 'scan' | 'assessment' | 'coach' | 'journal' | 'ai_coach' | 'emotional_scan' | 'psychological_assessment') => {
   const [showDisclaimer, setShowDisclaimer] = useState(false);
   const [isAccepted, setIsAccepted] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     // Vérifier si l'utilisateur a déjà accepté pour cette fonctionnalité
@@ -261,6 +262,7 @@ export const useMedicalDisclaimer = (feature: 'scan' | 'assessment' | 'coach' | 
         
         if (consentDate > sixMonthsAgo && consent.accepted) {
           setIsAccepted(true);
+          setIsLoading(false);
           return;
         }
       } catch (e) {
@@ -270,9 +272,19 @@ export const useMedicalDisclaimer = (feature: 'scan' | 'assessment' | 'coach' | 
     
     // Pas de consentement valide, afficher le disclaimer
     setShowDisclaimer(true);
+    setIsLoading(false);
   }, [feature]);
 
   const handleAccept = () => {
+    // Sauvegarder le consentement
+    const consent = {
+      accepted: true,
+      feature,
+      timestamp: new Date().toISOString(),
+      version: '1.0',
+    };
+    localStorage.setItem(`${STORAGE_KEY}_${feature}`, JSON.stringify(consent));
+    
     setShowDisclaimer(false);
     setIsAccepted(true);
   };
@@ -285,6 +297,7 @@ export const useMedicalDisclaimer = (feature: 'scan' | 'assessment' | 'coach' | 
   return {
     showDisclaimer,
     isAccepted,
+    isLoading,
     setShowDisclaimer,
     handleAccept,
     handleDecline,
