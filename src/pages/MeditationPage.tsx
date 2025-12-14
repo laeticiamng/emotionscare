@@ -6,26 +6,79 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
+
+interface MeditationStats {
+  totalSessions: number;
+  totalMinutes: number;
+  longestSession: number;
+  lastSession: string | null;
+}
 
 export default function MeditationPage() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user } = useAuth();
   const [isPlaying, setIsPlaying] = useState(false);
   const [selectedDuration, setSelectedDuration] = useState(5);
   const [currentTime, setCurrentTime] = useState(0);
   const [selectedProgram, setSelectedProgram] = useState<string | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   
-  // Statistiques de méditation
-  const [stats, setStats] = useState(() => {
-    const saved = localStorage.getItem('meditation_stats');
-    return saved ? JSON.parse(saved) : { 
-      totalSessions: 0, 
-      totalMinutes: 0,
-      longestSession: 0,
-      lastSession: null
-    };
+  // Statistiques de méditation - persistées en Supabase
+  const [stats, setStats] = useState<MeditationStats>({ 
+    totalSessions: 0, 
+    totalMinutes: 0,
+    longestSession: 0,
+    lastSession: null
   });
+
+  // Charger les stats depuis Supabase
+  useEffect(() => {
+    const loadStats = async () => {
+      if (!user) {
+        // Fallback localStorage pour utilisateurs non connectés
+        const saved = localStorage.getItem('meditation_stats');
+        if (saved) setStats(JSON.parse(saved));
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from('user_preferences')
+        .select('meditation_stats')
+        .eq('user_id', user.id)
+        .single();
+
+      if (data?.meditation_stats) {
+        setStats(data.meditation_stats as MeditationStats);
+      } else if (error?.code === 'PGRST116') {
+        // Pas de préférences, créer une entrée
+        await supabase.from('user_preferences').insert({
+          user_id: user.id,
+          meditation_stats: stats
+        });
+      }
+    };
+    loadStats();
+  }, [user]);
+
+  // Sauvegarder les stats
+  const saveStats = async (newStats: MeditationStats) => {
+    setStats(newStats);
+    
+    if (user) {
+      await supabase
+        .from('user_preferences')
+        .upsert({
+          user_id: user.id,
+          meditation_stats: newStats,
+          updated_at: new Date().toISOString()
+        }, { onConflict: 'user_id' });
+    } else {
+      localStorage.setItem('meditation_stats', JSON.stringify(newStats));
+    }
+  };
 
   const programs = [
     {
@@ -86,15 +139,14 @@ export default function MeditationPage() {
           if (newTime >= selectedDuration * 60) {
             setIsPlaying(false);
             
-            // Sauvegarder la session
-            const newStats = {
+            // Sauvegarder la session via Supabase
+            const newStats: MeditationStats = {
               totalSessions: stats.totalSessions + 1,
               totalMinutes: stats.totalMinutes + selectedDuration,
               longestSession: Math.max(stats.longestSession, selectedDuration),
               lastSession: new Date().toISOString()
             };
-            setStats(newStats);
-            localStorage.setItem('meditation_stats', JSON.stringify(newStats));
+            saveStats(newStats);
             
             toast({
               title: 'Méditation terminée! 🧘',

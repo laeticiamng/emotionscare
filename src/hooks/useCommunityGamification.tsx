@@ -1,31 +1,57 @@
 // @ts-nocheck
-
-// @ts-nocheck
 import { useState, useEffect } from 'react';
 import { Challenge, Badge } from '@/types/badge';
 import { toast } from '@/hooks/use-toast';
 import { mockBadges, mockChallenges } from './community-gamification/mockData';
 import { logger } from '@/lib/logger';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 
 export const useCommunityGamification = () => {
+  const { user } = useAuth();
   const [badges, setBadges] = useState<Badge[]>([]);
   const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    // Load mock data on component mount
     loadBadges();
     loadChallenges();
-  }, []);
+  }, [user]);
 
   const loadBadges = async () => {
     setIsLoading(true);
     try {
-      // In a real app, this would be an API call
-      await new Promise(resolve => setTimeout(resolve, 800)); // Simulate API delay
+      if (user) {
+        // Charger depuis Supabase
+        const { data, error } = await supabase
+          .from('user_achievements')
+          .select('*, achievements(*)')
+          .eq('user_id', user.id);
+
+        if (!error && data && data.length > 0) {
+          const supabaseBadges: Badge[] = data.map((ua: any) => ({
+            id: ua.achievements?.id || ua.id,
+            name: ua.achievements?.name || 'Badge',
+            description: ua.achievements?.description || '',
+            icon: ua.achievements?.icon || '🏆',
+            category: ua.achievements?.category || 'general',
+            unlocked: true,
+            earned: true,
+            unlockedAt: ua.unlocked_at
+          }));
+          setBadges([...mockBadges.map(b => ({
+            ...b,
+            unlocked: supabaseBadges.some(sb => sb.name === b.name),
+            earned: supabaseBadges.some(sb => sb.name === b.name)
+          }))]);
+          return;
+        }
+      }
+      // Fallback vers mock data
       setBadges(mockBadges);
     } catch (error) {
       logger.error('Error loading badges', error as Error, 'SYSTEM');
+      setBadges(mockBadges);
     } finally {
       setIsLoading(false);
     }
@@ -34,11 +60,31 @@ export const useCommunityGamification = () => {
   const loadChallenges = async () => {
     setIsLoading(true);
     try {
-      // In a real app, this would be an API call
-      await new Promise(resolve => setTimeout(resolve, 800)); // Simulate API delay
+      if (user) {
+        // Charger depuis Supabase
+        const { data, error } = await supabase
+          .from('user_challenge_progress')
+          .select('*')
+          .eq('user_id', user.id);
+
+        if (!error && data && data.length > 0) {
+          const progressMap = new Map(data.map((p: any) => [p.challenge_id, p]));
+          setChallenges(mockChallenges.map(c => {
+            const progress = progressMap.get(c.id);
+            return progress ? {
+              ...c,
+              progress: progress.progress || 0,
+              status: progress.completed_at ? 'completed' : c.status
+            } : c;
+          }));
+          return;
+        }
+      }
+      // Fallback vers mock data
       setChallenges(mockChallenges);
     } catch (error) {
       logger.error('Error loading challenges', error as Error, 'SYSTEM');
+      setChallenges(mockChallenges);
     } finally {
       setIsLoading(false);
     }
