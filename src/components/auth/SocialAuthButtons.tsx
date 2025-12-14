@@ -1,8 +1,9 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
-import { Apple, Facebook, Github, Mail } from 'lucide-react';
+import { Apple, Facebook, Mail, Loader2 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 // Google icon SVG (inline to avoid external dependency)
 const GoogleIcon = () => (
@@ -23,11 +24,40 @@ const SocialAuthButtons: React.FC<SocialAuthButtonsProps> = ({
   mode, 
   onMagicLinkClick 
 }) => {
-  const handleSocialLogin = (provider: string) => {
-    toast({
-      title: "Authentification sociale",
-      description: `La connexion via ${provider} sera bientôt disponible!`,
-    });
+  const [isLoading, setIsLoading] = React.useState<string | null>(null);
+
+  const handleSocialLogin = async (provider: 'google' | 'apple' | 'facebook') => {
+    setIsLoading(provider);
+    try {
+      const redirectTo = `${window.location.origin}/`;
+      
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo,
+          queryParams: provider === 'google' ? {
+            access_type: 'offline',
+            prompt: 'consent',
+          } : undefined,
+        },
+      });
+
+      if (error) {
+        toast({
+          title: "Erreur de connexion",
+          description: error.message,
+          variant: "destructive",
+        });
+      }
+    } catch (err) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de se connecter. Veuillez réessayer.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(null);
+    }
   };
 
   const buttonVariants = {
@@ -53,9 +83,14 @@ const SocialAuthButtons: React.FC<SocialAuthButtonsProps> = ({
           <Button
             variant="outline"
             className="w-full bg-white dark:bg-slate-800"
-            onClick={() => handleSocialLogin('Google')}
+            onClick={() => handleSocialLogin('google')}
+            disabled={isLoading !== null}
           >
-            <GoogleIcon />
+            {isLoading === 'google' ? (
+              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+            ) : (
+              <GoogleIcon />
+            )}
             Google
           </Button>
         </motion.div>
@@ -64,9 +99,14 @@ const SocialAuthButtons: React.FC<SocialAuthButtonsProps> = ({
           <Button 
             variant="outline" 
             className="w-full bg-white dark:bg-slate-800" 
-            onClick={() => handleSocialLogin('Apple')}
+            onClick={() => handleSocialLogin('apple')}
+            disabled={isLoading !== null}
           >
-            <Apple className="mr-2 h-5 w-5" />
+            {isLoading === 'apple' ? (
+              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+            ) : (
+              <Apple className="mr-2 h-5 w-5" />
+            )}
             Apple
           </Button>
         </motion.div>
@@ -77,9 +117,14 @@ const SocialAuthButtons: React.FC<SocialAuthButtonsProps> = ({
           <Button 
             variant="outline" 
             className="w-full bg-white dark:bg-slate-800" 
-            onClick={() => handleSocialLogin('Facebook')}
+            onClick={() => handleSocialLogin('facebook')}
+            disabled={isLoading !== null}
           >
-            <Facebook className="mr-2 h-5 w-5 text-blue-600" />
+            {isLoading === 'facebook' ? (
+              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+            ) : (
+              <Facebook className="mr-2 h-5 w-5 text-blue-600" />
+            )}
             Facebook
           </Button>
         </motion.div>
