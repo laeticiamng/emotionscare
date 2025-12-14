@@ -61,6 +61,7 @@ const B2CScanPage: React.FC = () => {
   const {
     showDisclaimer,
     isAccepted,
+    isLoading: disclaimerLoading,
     handleAccept,
     handleDecline,
   } = useMedicalDisclaimer('emotional_scan');
@@ -241,7 +242,21 @@ const B2CScanPage: React.FC = () => {
             <p className="text-sm text-muted-foreground">
               Cette expérience en temps réel est temporairement désactivée pour votre espace. Aucun signal n'est enregistré.
             </p>
+            <Link to="/app/home" className="text-sm text-primary hover:underline">
+              ← Retour à l'accueil
+            </Link>
           </div>
+        </div>
+      </PageRoot>
+    );
+  }
+
+  // État de chargement pendant la vérification du consentement
+  if (disclaimerLoading) {
+    return (
+      <PageRoot>
+        <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-primary/10 flex items-center justify-center">
+          <div className="animate-pulse text-muted-foreground">Chargement...</div>
         </div>
       </PageRoot>
     );
@@ -263,8 +278,11 @@ const B2CScanPage: React.FC = () => {
               <p className="max-w-md text-muted-foreground">
                 Pour utiliser le scanner émotionnel, veuillez accepter les conditions d'utilisation.
               </p>
-              <Button onClick={handleAccept} size="lg">
-                Accepter et continuer
+              <Button onClick={() => {
+                // Forcer l'affichage du disclaimer
+                handleAccept();
+              }} size="lg">
+                Continuer
               </Button>
               <Link to="/app/home" className="text-sm text-muted-foreground hover:text-foreground">
                 ← Retour à l'accueil
