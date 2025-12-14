@@ -170,28 +170,66 @@ const AICoach: React.FC = () => {
   };
 
   const generateAIResponse = async (userInput: string): Promise<string> => {
-    // Simulation de réponse IA contextuelle
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    try {
+      // Appeler l'edge function openai-chat pour une vraie réponse IA
+      const { data, error } = await supabase.functions.invoke('openai-chat', {
+        body: {
+          messages: [
+            {
+              role: 'system',
+              content: `Tu es un coach émotionnel bienveillant et professionnel pour EmotionsCare. 
+              Tu aides les utilisateurs à gérer leurs émotions, leur stress et leur bien-être.
+              Réponds en français de manière empathique, concise et actionnable.
+              Suggère des exercices pratiques (respiration, méditation, journaling) quand c'est pertinent.
+              N'oublie jamais de valider les émotions de l'utilisateur avant de proposer des solutions.
+              Limite tes réponses à 3-4 phrases maximum.`
+            },
+            ...messages.slice(-6).map(m => ({
+              role: m.sender === 'user' ? 'user' : 'assistant',
+              content: m.content
+            })),
+            { role: 'user', content: userInput }
+          ]
+        }
+      });
 
-    const input = userInput.toLowerCase();
-    
-    if (input.includes('stress') || input.includes('anxieux')) {
-      return "Je comprends que vous ressentez du stress. Avez-vous essayé la technique de respiration 4-7-8 ? Inspirez pendant 4 secondes, retenez pendant 7, puis expirez pendant 8. Cette technique peut vous aider à vous détendre immédiatement.";
+      if (error) {
+        logger.error('AI Coach error:', error);
+        throw error;
+      }
+
+      // Extraire la réponse du format de l'edge function
+      const aiMessage = data?.choices?.[0]?.message?.content || data?.response || data?.content;
+      
+      if (!aiMessage) {
+        throw new Error('No response from AI');
+      }
+
+      return aiMessage;
+    } catch (error) {
+      logger.warn('Falling back to local responses:', error);
+      
+      // Fallback vers les réponses locales si l'IA n'est pas disponible
+      const input = userInput.toLowerCase();
+      
+      if (input.includes('stress') || input.includes('anxieux')) {
+        return "Je comprends que vous ressentez du stress. Avez-vous essayé la technique de respiration 4-7-8 ? Inspirez pendant 4 secondes, retenez pendant 7, puis expirez pendant 8. Cette technique peut vous aider à vous détendre immédiatement.";
+      }
+      
+      if (input.includes('triste') || input.includes('déprim')) {
+        return "Il est normal de se sentir triste parfois. Ces émotions font partie de l'expérience humaine. Puis-je vous suggérer de vous concentrer sur une petite activité qui vous procure habituellement de la joie ?";
+      }
+      
+      if (input.includes('fatigue') || input.includes('épuis')) {
+        return "La fatigue peut affecter notre bien-être émotionnel. Assurez-vous de prendre des pauses régulières et d'avoir un sommeil de qualité. Avez-vous pensé à essayer une courte méditation ?";
+      }
+      
+      if (input.includes('heureux') || input.includes('bien') || input.includes('content')) {
+        return "C'est merveilleux d'entendre que vous vous sentez bien ! Profitez de ce moment positif. Que pouvez-vous faire aujourd'hui pour maintenir cette sensation ?";
+      }
+      
+      return "Merci de partager cela avec moi. Votre bien-être émotionnel est important. Pouvez-vous me dire ce qui vous préoccupe le plus en ce moment ?";
     }
-    
-    if (input.includes('triste') || input.includes('déprim')) {
-      return "Il est normal de se sentir triste parfois. Ces émotions font partie de l'expérience humaine. Puis-je vous suggérer de vous concentrer sur une petite activité qui vous procure habituellement de la joie ? Même quelque chose de simple comme écouter votre musique préférée.";
-    }
-    
-    if (input.includes('fatigue') || input.includes('épuis')) {
-      return "La fatigue peut affecter notre bien-être émotionnel. Assurez-vous de prendre des pauses régulières et d'avoir un sommeil de qualité. Avez-vous pensé à essayer une courte méditation ou une session de musicothérapie ?";
-    }
-    
-    if (input.includes('heureux') || input.includes('bien') || input.includes('content')) {
-      return "C'est merveilleux d'entendre que vous vous sentez bien ! Profitez de ce moment positif. Que pouvez-vous faire aujourd'hui pour maintenir ou renforcer cette sensation de bien-être ?";
-    }
-    
-    return "Merci de partager cela avec moi. Votre bien-être émotionnel est important. Pouvez-vous me dire ce qui vous préoccupe le plus en ce moment ou ce sur quoi vous aimeriez travailler ensemble ?";
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {

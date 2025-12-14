@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { toast } from 'sonner';
 import { logger } from '@/lib/logger';
 import { Link, useLocation, NavLink, useNavigate } from 'react-router-dom';
 import { routes } from '@/routerV2';
@@ -167,9 +168,7 @@ const EnhancedHeader: React.FC<EnhancedHeaderProps> = ({ scrolled = false, class
             aria-label="Notifications"
             onClick={() => {
               if (isAuthenticated) {
-                // Créer une notification toast pour indiquer que c'est fonctionnel
-                alert('Notifications : Fonctionnalité prochainement disponible !');
-                // navigate('/notifications'); // Décommenter quand la page existe
+                toast.info("Vous n'avez aucune nouvelle notification pour le moment.");
               } else {
                 navigate('/login');
               }
