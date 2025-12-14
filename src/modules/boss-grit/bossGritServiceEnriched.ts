@@ -1,9 +1,10 @@
 /**
  * BossGritService ENRICHED - Service Boss Grit complet
- * Version enrichie avec stats avancées, leaderboard, achievements, export
+ * Version enrichie avec Supabase persistence
  */
 
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 import type { BounceBattle, CopingResponse, BattleMode, BounceEventType, BounceEventData } from './types';
 
 const ACHIEVEMENTS_KEY = 'boss-grit-achievements';
@@ -37,6 +38,60 @@ const defaultAchievements: BossGritAchievement[] = [
   { id: 'master', name: 'Maître Grit', description: 'Atteignez un score de coping de 90%', icon: '👑', progress: 0, target: 90 },
 ];
 
+async function getAchievementsFromSupabase(userId: string): Promise<BossGritAchievement[]> {
+  try {
+    const { data } = await supabase
+      .from('user_settings')
+      .select('value')
+      .eq('user_id', userId)
+      .eq('key', 'boss_grit_achievements')
+      .maybeSingle();
+    
+    if (data?.value) {
+      const saved = typeof data.value === 'string' ? JSON.parse(data.value) : data.value;
+      return defaultAchievements.map(def => {
+        const found = saved.find((s: BossGritAchievement) => s.id === def.id);
+        return found ? { ...def, ...found } : def;
+      });
+    }
+  } catch (error) {
+    logger.error('Failed to load boss grit achievements', error as Error, 'BOSSGRIT');
+  }
+  
+  // Fallback localStorage
+  try {
+    const saved = JSON.parse(localStorage.getItem(ACHIEVEMENTS_KEY) || '[]');
+    return defaultAchievements.map(def => {
+      const found = saved.find((s: BossGritAchievement) => s.id === def.id);
+      return found ? { ...def, ...found } : def;
+    });
+  } catch { return defaultAchievements; }
+}
+
+async function getStatsFromSupabase(userId: string): Promise<BossGritStats> {
+  const defaultStats = { totalBattles: 0, totalWins: 0, winStreak: 0, longestStreak: 0, totalDuration: 0, averageDuration: 0, favoriteMode: '', copingScoreAvg: 0 };
+  
+  try {
+    const { data } = await supabase
+      .from('user_settings')
+      .select('value')
+      .eq('user_id', userId)
+      .eq('key', 'boss_grit_stats')
+      .maybeSingle();
+    
+    if (data?.value) {
+      return typeof data.value === 'string' ? JSON.parse(data.value) : data.value;
+    }
+  } catch (error) {
+    logger.error('Failed to load boss grit stats', error as Error, 'BOSSGRIT');
+  }
+  
+  // Fallback localStorage
+  try {
+    return JSON.parse(localStorage.getItem(STATS_KEY) || '{}') || defaultStats;
+  } catch { return defaultStats; }
+}
+
 function getAchievements(): BossGritAchievement[] {
   try {
     const saved = JSON.parse(localStorage.getItem(ACHIEVEMENTS_KEY) || '[]');
@@ -67,7 +122,7 @@ export class BossGritServiceEnriched {
     if (error) throw error;
   }
 
-  static async completeBattle(battleId: string, durationSeconds: number, won: boolean = true): Promise<void> {
+  static async completeBattle(battleId: string, durationSeconds: number, won: boolean = true, userId?: string): Promise<void> {
     const { error } = await supabase.from('bounce_battles').update({ status: 'completed', duration_seconds: durationSeconds, ended_at: new Date().toISOString() }).eq('id', battleId);
     if (error) throw error;
 
@@ -84,6 +139,16 @@ export class BossGritServiceEnriched {
     }
     localStorage.setItem(STATS_KEY, JSON.stringify(stats));
     this.updateAchievements(stats);
+
+    // Sync to Supabase if userId provided
+    if (userId) {
+      await supabase.from('user_settings').upsert({
+        user_id: userId,
+        key: 'boss_grit_stats',
+        value: JSON.stringify(stats),
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'user_id,key' });
+    }
   }
 
   static async fetchHistory(userId: string, limit: number = 20): Promise<BounceBattle[]> {
@@ -101,8 +166,10 @@ export class BossGritServiceEnriched {
 
   static getAchievements(): BossGritAchievement[] { return getAchievements(); }
   static getStats(): BossGritStats { return getStats(); }
+  static async getAchievementsAsync(userId: string): Promise<BossGritAchievement[]> { return getAchievementsFromSupabase(userId); }
+  static async getStatsAsync(userId: string): Promise<BossGritStats> { return getStatsFromSupabase(userId); }
 
-  private static updateAchievements(stats: BossGritStats): void {
+  private static async updateAchievements(stats: BossGritStats, userId?: string): Promise<void> {
     const achievements = getAchievements().map(a => {
       if (a.id === 'first_battle') a.progress = Math.min(stats.totalBattles, 1);
       if (a.id === 'streak_5') a.progress = stats.winStreak;
@@ -111,6 +178,15 @@ export class BossGritServiceEnriched {
       return a;
     });
     localStorage.setItem(ACHIEVEMENTS_KEY, JSON.stringify(achievements));
+
+    if (userId) {
+      await supabase.from('user_settings').upsert({
+        user_id: userId,
+        key: 'boss_grit_achievements',
+        value: JSON.stringify(achievements),
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'user_id,key' });
+    }
   }
 
   static exportData(): { stats: BossGritStats; achievements: BossGritAchievement[]; exportedAt: string } {

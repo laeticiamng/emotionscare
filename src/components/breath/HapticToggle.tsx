@@ -33,8 +33,8 @@ import {
 import { useBreathStore } from '@/store/breath.store';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
-
-type HapticPattern = 'soft' | 'medium' | 'strong' | 'pulse' | 'heartbeat';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface PatternConfig {
   label: string;
@@ -94,7 +94,10 @@ const STORAGE_KEY = 'haptic-settings';
 const PRESETS_KEY = 'haptic-presets';
 const STATS_KEY = 'haptic-stats';
 
+type HapticPattern = 'soft' | 'medium' | 'strong' | 'pulse' | 'heartbeat';
+
 export const HapticToggle: React.FC = () => {
+  const { user } = useAuth();
   const { hapticEnabled, setHapticEnabled } = useBreathStore();
   const { toast } = useToast();
   
@@ -113,30 +116,62 @@ export const HapticToggle: React.FC = () => {
   // Check if device supports vibration
   const supportsHaptic = typeof navigator !== 'undefined' && 'vibrate' in navigator;
 
-  // Load settings from localStorage
+  // Load settings from Supabase or localStorage
   useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      const settings = JSON.parse(stored);
-      setIntensity(settings.intensity || 50);
-      setSelectedPattern(settings.pattern || 'soft');
-    }
-
-    const storedPresets = localStorage.getItem(PRESETS_KEY);
-    if (storedPresets) {
-      setPresets(JSON.parse(storedPresets));
-    }
-
-    const storedStats = localStorage.getItem(STATS_KEY);
-    if (storedStats) {
-      setStats(JSON.parse(storedStats));
-    }
-  }, []);
+    const loadSettings = async () => {
+      if (user) {
+        const { data } = await supabase
+          .from('user_settings')
+          .select('value')
+          .eq('user_id', user.id)
+          .eq('key', 'haptic_settings')
+          .maybeSingle();
+        
+        if (data?.value) {
+          const settings = typeof data.value === 'string' ? JSON.parse(data.value) : data.value;
+          setIntensity(settings.intensity || 50);
+          setSelectedPattern(settings.pattern || 'soft');
+          setPresets(settings.presets || []);
+          setStats(settings.stats || { totalUses: 0, favoritePattern: null, avgIntensity: 50, lastUsed: null });
+          return;
+        }
+      }
+      // Fallback localStorage
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        const settings = JSON.parse(stored);
+        setIntensity(settings.intensity || 50);
+        setSelectedPattern(settings.pattern || 'soft');
+      }
+      const storedPresets = localStorage.getItem(PRESETS_KEY);
+      if (storedPresets) setPresets(JSON.parse(storedPresets));
+      const storedStats = localStorage.getItem(STATS_KEY);
+      if (storedStats) setStats(JSON.parse(storedStats));
+    };
+    loadSettings();
+  }, [user]);
 
   // Save settings when they change
+  const saveSettings = async () => {
+    const settings = { intensity, pattern: selectedPattern, presets, stats };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ intensity, pattern: selectedPattern }));
+    localStorage.setItem(PRESETS_KEY, JSON.stringify(presets));
+    localStorage.setItem(STATS_KEY, JSON.stringify(stats));
+    
+    if (user) {
+      await supabase.from('user_settings').upsert({
+        user_id: user.id,
+        key: 'haptic_settings',
+        value: JSON.stringify(settings),
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'user_id,key' });
+    }
+  };
+
   useEffect(() => {
-    const settings = { intensity, pattern: selectedPattern };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+    if (intensity !== 50 || selectedPattern !== 'soft') {
+      saveSettings();
+    }
   }, [intensity, selectedPattern]);
 
   // Update stats

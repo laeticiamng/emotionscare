@@ -1,55 +1,114 @@
 // @ts-nocheck
 
 import { EmotionalData } from '@/types/emotional-data';
+import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 
 class EmotionalDataService {
-  private mockDatabase: EmotionalData[] = [];
-
-  // Get emotional data for a specific user
+  // Get emotional data for a specific user from Supabase
   async getEmotionalData(userId: string): Promise<EmotionalData[]> {
-    // In a real implementation, this would fetch from an API or database
-    return this.mockDatabase.filter(entry => entry.user_id === userId);
+    try {
+      const { data, error } = await supabase
+        .from('emotion_scans')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+        .limit(100);
+
+      if (error) throw error;
+
+      return (data || []).map(entry => ({
+        id: entry.id,
+        user_id: entry.user_id,
+        valence: entry.valence,
+        arousal: entry.arousal,
+        summary: entry.summary,
+        source: entry.source,
+        timestamp: entry.created_at,
+        metadata: entry.metadata
+      }));
+    } catch (error) {
+      logger.error('Failed to fetch emotional data', error as Error, 'SERVICE');
+      return [];
+    }
   }
 
-  // Save new emotional data
+  // Save new emotional data to Supabase
   async saveEmotionalData(data: EmotionalData): Promise<EmotionalData> {
-    // Ensure it has an ID
-    const entryWithId = {
-      ...data,
-      id: data.id || `emotion-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
-      timestamp: data.timestamp || new Date().toISOString()
-    };
-    
-    // In a real implementation, this would call an API or save to a database
-    this.mockDatabase.push(entryWithId);
-    return entryWithId;
+    try {
+      const { data: inserted, error } = await supabase
+        .from('emotion_scans')
+        .insert({
+          user_id: data.user_id,
+          valence: data.valence || 50,
+          arousal: data.arousal || 50,
+          summary: data.summary,
+          source: data.source || 'manual',
+          metadata: data.metadata || {}
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      return {
+        ...data,
+        id: inserted.id,
+        timestamp: inserted.created_at
+      };
+    } catch (error) {
+      logger.error('Failed to save emotional data', error as Error, 'SERVICE');
+      throw error;
+    }
   }
 
   // Update existing emotional data
-  async updateEmotionalData(
-    id: string, 
-    updates: Partial<EmotionalData>
-  ): Promise<EmotionalData> {
-    const index = this.mockDatabase.findIndex(entry => entry.id === id);
-    
-    if (index === -1) {
-      throw new Error(`Emotional data entry with ID ${id} not found`);
+  async updateEmotionalData(id: string, updates: Partial<EmotionalData>): Promise<EmotionalData> {
+    try {
+      const { data, error } = await supabase
+        .from('emotion_scans')
+        .update({
+          valence: updates.valence,
+          arousal: updates.arousal,
+          summary: updates.summary,
+          metadata: updates.metadata
+        })
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      return {
+        id: data.id,
+        user_id: data.user_id,
+        valence: data.valence,
+        arousal: data.arousal,
+        summary: data.summary,
+        source: data.source,
+        timestamp: data.created_at,
+        metadata: data.metadata
+      };
+    } catch (error) {
+      logger.error('Failed to update emotional data', error as Error, 'SERVICE');
+      throw error;
     }
-    
-    // Update the entry
-    this.mockDatabase[index] = {
-      ...this.mockDatabase[index],
-      ...updates
-    };
-    
-    return this.mockDatabase[index];
   }
 
   // Delete emotional data entry
   async deleteEmotionalData(id: string): Promise<boolean> {
-    const initialLength = this.mockDatabase.length;
-    this.mockDatabase = this.mockDatabase.filter(entry => entry.id !== id);
-    return this.mockDatabase.length < initialLength;
+    try {
+      const { error } = await supabase
+        .from('emotion_scans')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      return true;
+    } catch (error) {
+      logger.error('Failed to delete emotional data', error as Error, 'SERVICE');
+      return false;
+    }
   }
 }
 
