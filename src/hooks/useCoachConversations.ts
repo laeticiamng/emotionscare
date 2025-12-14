@@ -1,4 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 import { logger } from '@/lib/logger';
 
 export interface ConversationMessage {
@@ -36,38 +38,72 @@ export interface UseCoachConversationsReturn {
 const STORAGE_KEY = 'coach:conversations:v1';
 
 /**
- * Hook pour gérer les conversations du coach
+ * Hook pour gérer les conversations du coach - Persisté en Supabase
  */
 export const useCoachConversations = (): UseCoachConversationsReturn => {
+  const { user } = useAuth();
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [currentConversation, setCurrentConversation] = useState<Conversation | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
-  // Load conversations from localStorage on mount
+  // Load conversations from Supabase on mount
   useEffect(() => {
-    const loadFromStorage = () => {
+    const loadFromStorage = async () => {
       try {
+        if (user) {
+          // Charger depuis Supabase via user_settings
+          const { data, error: fetchError } = await supabase
+            .from('user_settings')
+            .select('value')
+            .eq('user_id', user.id)
+            .eq('key', 'coach_conversations')
+            .maybeSingle();
+
+          if (data?.value) {
+            const parsed = typeof data.value === 'string' ? JSON.parse(data.value) : data.value;
+            setConversations(parsed);
+            return;
+          }
+        }
+        // Fallback localStorage
         const stored = localStorage.getItem(STORAGE_KEY);
         if (stored) {
           setConversations(JSON.parse(stored));
         }
       } catch (err) {
-        logger.error('Failed to load conversations from storage:', err, 'HOOK');
+        logger.error('Failed to load conversations:', err, 'HOOK');
       }
     };
 
     loadFromStorage();
-  }, []);
+  }, [user]);
 
-  // Save conversations to localStorage whenever they change
+  // Save conversations to Supabase whenever they change
   useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(conversations));
-    } catch (err) {
-      logger.error('Failed to save conversations to storage:', err, 'HOOK');
+    const saveToStorage = async () => {
+      try {
+        if (user && conversations.length > 0) {
+          await supabase
+            .from('user_settings')
+            .upsert({
+              user_id: user.id,
+              key: 'coach_conversations',
+              value: JSON.stringify(conversations),
+              updated_at: new Date().toISOString()
+            }, { onConflict: 'user_id,key' });
+        }
+        // Toujours sauvegarder en localStorage comme backup
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(conversations));
+      } catch (err) {
+        logger.error('Failed to save conversations:', err, 'HOOK');
+      }
+    };
+
+    if (conversations.length > 0) {
+      saveToStorage();
     }
-  }, [conversations]);
+  }, [conversations, user]);
 
   const createConversation = useCallback(
     async (title: string): Promise<string> => {
@@ -208,22 +244,32 @@ export const useCoachConversations = (): UseCoachConversationsReturn => {
   );
 
   const loadConversations = useCallback(async (): Promise<void> => {
-    // Conversations are already loaded from localStorage on mount
-    // This is a placeholder for future API integration
     setIsLoading(true);
     setError(null);
 
     try {
-      // TODO: Fetch conversations from API
-      // const response = await fetchConversations();
-      // setConversations(response);
+      if (user) {
+        const { data, error: fetchError } = await supabase
+          .from('user_settings')
+          .select('value')
+          .eq('user_id', user.id)
+          .eq('key', 'coach_conversations')
+          .maybeSingle();
+
+        if (fetchError) throw fetchError;
+        
+        if (data?.value) {
+          const parsed = typeof data.value === 'string' ? JSON.parse(data.value) : data.value;
+          setConversations(parsed);
+        }
+      }
     } catch (err) {
       const error = err instanceof Error ? err : new Error('Failed to load conversations');
       setError(error);
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [user]);
 
   const clearCurrentConversation = useCallback(() => {
     setCurrentConversation(null);

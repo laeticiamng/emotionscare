@@ -194,6 +194,114 @@ export function useMusicCorrelations() {
     return insights;
   }, []);
 
+  // Analyser les corrélations de tempo
+  const analyzeTempoCorrelations = useCallback(async (): Promise<TempoMoodCorrelation[]> => {
+    if (!user) return [];
+
+    try {
+      const { data: listens } = await supabase
+        .from('music_listen_events')
+        .select('track_id, tempo, played_at')
+        .eq('user_id', user.id)
+        .not('tempo', 'is', null)
+        .gte('played_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString());
+
+      const { data: moods } = await supabase
+        .from('mood_entries')
+        .select('score, created_at')
+        .eq('user_id', user.id)
+        .gte('created_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString());
+
+      if (!listens?.length || !moods?.length) return [];
+
+      const tempoRanges = [
+        { range: '60-90 BPM', min: 60, max: 90 },
+        { range: '90-120 BPM', min: 90, max: 120 },
+        { range: '120-150 BPM', min: 120, max: 150 },
+        { range: '150+ BPM', min: 150, max: 300 },
+      ];
+
+      return tempoRanges.map(({ range, min, max }) => {
+        const rangeListens = listens.filter((l: any) => l.tempo >= min && l.tempo < max);
+        let totalChange = 0;
+        let count = 0;
+
+        for (const listen of rangeListens) {
+          const listenTime = new Date(listen.played_at).getTime();
+          const moodBefore = moods.find((m: any) => {
+            const t = new Date(m.created_at).getTime();
+            return t < listenTime && listenTime - t < 30 * 60 * 1000;
+          });
+          const moodAfter = moods.find((m: any) => {
+            const t = new Date(m.created_at).getTime();
+            return t > listenTime && t - listenTime < 60 * 60 * 1000;
+          });
+          if (moodBefore && moodAfter) {
+            totalChange += moodAfter.score - moodBefore.score;
+            count++;
+          }
+        }
+
+        return {
+          tempoRange: range,
+          avgMoodChange: count > 0 ? Math.round((totalChange / count) * 10) / 10 : 0,
+          bestForMood: min < 100 ? 'low' : min < 130 ? 'medium' : 'high',
+        };
+      });
+    } catch (error) {
+      logger.error('[MusicCorrelations] Tempo analysis error', error as Error, 'MUSIC');
+      return [];
+    }
+  }, [user]);
+
+  // Analyser les patterns horaires
+  const analyzeTimePatterns = useCallback(async (): Promise<TimeOfDayPattern[]> => {
+    if (!user) return [];
+
+    try {
+      const { data: listens } = await supabase
+        .from('music_listen_events')
+        .select('genre, played_at, duration_ms')
+        .eq('user_id', user.id)
+        .gte('played_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString());
+
+      if (!listens?.length) return [];
+
+      const hourStats: Record<number, { genres: string[]; durations: number[] }> = {};
+
+      for (const listen of listens) {
+        const hour = new Date(listen.played_at).getHours();
+        if (!hourStats[hour]) hourStats[hour] = { genres: [], durations: [] };
+        if (listen.genre) hourStats[hour].genres.push(listen.genre);
+        if (listen.duration_ms) hourStats[hour].durations.push(listen.duration_ms);
+      }
+
+      return Object.entries(hourStats)
+        .filter(([_, stats]) => stats.genres.length >= 3)
+        .map(([hour, stats]) => {
+          const genreCounts: Record<string, number> = {};
+          stats.genres.forEach(g => { genreCounts[g] = (genreCounts[g] || 0) + 1; });
+          const sortedGenres = Object.entries(genreCounts)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 3)
+            .map(([g]) => g);
+
+          return {
+            hour: parseInt(hour),
+            preferredGenres: sortedGenres,
+            avgListenDuration: stats.durations.length > 0
+              ? Math.round(stats.durations.reduce((a, b) => a + b, 0) / stats.durations.length / 1000)
+              : 0,
+            moodTrend: 'stable' as const,
+          };
+        })
+        .sort((a, b) => a.hour - b.hour);
+    } catch (error) {
+      logger.error('[MusicCorrelations] Time pattern analysis error', error as Error, 'MUSIC');
+      return [];
+    }
+  }, [user]);
+
   // Analyse complète
   const runAnalysis = useCallback(async () => {
     if (!user) return;
@@ -201,27 +309,33 @@ export function useMusicCorrelations() {
     setState(s => ({ ...s, isLoading: true }));
 
     try {
-      const genreCorrelations = await analyzeGenreCorrelations();
+      const [genreCorrelations, tempoCorrelations, timePatterns] = await Promise.all([
+        analyzeGenreCorrelations(),
+        analyzeTempoCorrelations(),
+        analyzeTimePatterns(),
+      ]);
       const insights = generateInsights(genreCorrelations);
 
       setState({
         genreCorrelations,
-        tempoCorrelations: [], // TODO: implémenter
-        timePatterns: [], // TODO: implémenter
+        tempoCorrelations,
+        timePatterns,
         insights,
         isLoading: false,
         lastAnalysis: new Date().toISOString(),
       });
 
       logger.info('[MusicCorrelations] Analysis complete', { 
-        genres: genreCorrelations.length, 
+        genres: genreCorrelations.length,
+        tempos: tempoCorrelations.length,
+        patterns: timePatterns.length,
         insights: insights.length 
       }, 'MUSIC');
     } catch (error) {
       logger.error('[MusicCorrelations] Analysis error', error as Error, 'MUSIC');
       setState(s => ({ ...s, isLoading: false }));
     }
-  }, [user, analyzeGenreCorrelations, generateInsights]);
+  }, [user, analyzeGenreCorrelations, analyzeTempoCorrelations, analyzeTimePatterns, generateInsights]);
 
   // Obtenir recommandation pour humeur actuelle
   const getRecommendationForMood = useCallback((currentMood: number): string | null => {

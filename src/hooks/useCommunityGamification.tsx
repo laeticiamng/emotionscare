@@ -93,32 +93,48 @@ export const useCommunityGamification = () => {
   const updateChallengeProgress = async (challengeId: string, progress: number) => {
     setIsLoading(true);
     try {
-      // In a real app, this would be an API call
-      await new Promise(resolve => setTimeout(resolve, 500)); // Simulate API delay
+      const challenge = challenges.find(c => c.id === challengeId);
+      if (!challenge) return false;
+
+      const newProgress = Math.min(progress, challenge.goal || challenge.totalSteps || 1);
+      const completed = newProgress >= (challenge.goal || challenge.totalSteps || 1);
+
+      // Sauvegarder dans Supabase si connecté
+      if (user) {
+        const { error } = await supabase
+          .from('user_challenge_progress')
+          .upsert({
+            user_id: user.id,
+            challenge_id: challengeId,
+            progress: newProgress,
+            completed_at: completed ? new Date().toISOString() : null,
+            updated_at: new Date().toISOString()
+          }, { onConflict: 'user_id,challenge_id' });
+
+        if (error) {
+          logger.error('Error saving challenge progress to Supabase', error, 'SYSTEM');
+        }
+      }
       
       setChallenges(prev => 
-        prev.map(challenge => {
-          if (challenge.id === challengeId) {
-            const newProgress = Math.min(progress, challenge.goal || challenge.totalSteps || 1);
-            const completed = newProgress >= (challenge.goal || challenge.totalSteps || 1);
-            
-            if (completed && challenge.status !== 'completed') {
-              // Show toast when challenge is completed
+        prev.map(c => {
+          if (c.id === challengeId) {
+            if (completed && c.status !== 'completed') {
               toast({
                 title: 'Challenge terminé !',
-                description: `Vous avez complété le challenge "${challenge.title || challenge.name}"`,
+                description: `Vous avez complété le challenge "${c.title || c.name}"`,
                 variant: 'success',
                 duration: 5000,
               });
             }
             
             return {
-              ...challenge,
+              ...c,
               progress: newProgress,
-              status: completed ? 'completed' : challenge.status
+              status: completed ? 'completed' : c.status
             };
           }
-          return challenge;
+          return c;
         })
       );
       
@@ -134,37 +150,49 @@ export const useCommunityGamification = () => {
   const unlockBadge = async (badgeId: string) => {
     setIsLoading(true);
     try {
-      // In a real app, this would be an API call
-      await new Promise(resolve => setTimeout(resolve, 500)); // Simulate API delay
-      
-      let badgeName = '';
+      const badge = badges.find(b => b.id === badgeId);
+      if (!badge || badge.unlocked) return false;
+
+      // Sauvegarder dans Supabase si connecté
+      if (user) {
+        // Chercher l'achievement correspondant
+        const { data: achievement } = await supabase
+          .from('achievements')
+          .select('id')
+          .eq('name', badge.name)
+          .maybeSingle();
+
+        if (achievement) {
+          const { error } = await supabase
+            .from('user_achievements')
+            .insert({
+              user_id: user.id,
+              achievement_id: achievement.id,
+              unlocked_at: new Date().toISOString()
+            });
+
+          if (error && error.code !== '23505') { // Ignore duplicate
+            logger.error('Error saving badge to Supabase', error, 'SYSTEM');
+          }
+        }
+      }
       
       setBadges(prev => 
-        prev.map(badge => {
-          if (badge.id === badgeId && !badge.unlocked) {
-            badgeName = badge.name;
-            return {
-              ...badge,
-              unlocked: true,
-              earned: true
-            };
+        prev.map(b => {
+          if (b.id === badgeId && !b.unlocked) {
+            return { ...b, unlocked: true, earned: true };
           }
-          return badge;
+          return b;
         })
       );
       
-      if (badgeName) {
-        // Show toast when badge is unlocked
-        toast({
-          title: 'Badge débloqué !',
-          description: `Vous avez débloqué le badge "${badgeName}"`,
-          variant: 'success',
-          duration: 5000,
-        });
-        return true;
-      }
-      
-      return false;
+      toast({
+        title: 'Badge débloqué !',
+        description: `Vous avez débloqué le badge "${badge.name}"`,
+        variant: 'success',
+        duration: 5000,
+      });
+      return true;
     } catch (error) {
       logger.error('Error unlocking badge', error as Error, 'SYSTEM');
       return false;
