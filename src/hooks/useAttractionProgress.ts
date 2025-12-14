@@ -1,5 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Attraction } from '@/types/park';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
+import { logger } from '@/lib/logger';
 
 export interface AttractionVisit {
   id: string;
@@ -24,31 +27,70 @@ const STORAGE_KEY = 'emotional-park-progress';
 const SEARCH_HISTORY_KEY = 'emotional-park-search-history';
 
 export const useAttractionProgress = () => {
+  const { user } = useAuth();
   const [visitedAttractions, setVisitedAttractions] = useState<Record<string, AttractionVisit>>({});
   const [unlockedBadges, setUnlockedBadges] = useState<ZoneBadge[]>([]);
   const [searchHistory, setSearchHistory] = useState<SearchHistory[]>([]);
   const [newlyUnlockedZone, setNewlyUnlockedZone] = useState<string | null>(null);
 
-  // Load progress from localStorage
+  // Load progress from Supabase first, then localStorage fallback
   useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    const storedSearch = localStorage.getItem(SEARCH_HISTORY_KEY);
-    
-    if (stored) {
-      const data = JSON.parse(stored);
-      setVisitedAttractions(data.visits || {});
-      setUnlockedBadges(data.badges || []);
-    }
-    
-    if (storedSearch) {
-      setSearchHistory(JSON.parse(storedSearch));
-    }
-  }, []);
+    const loadProgress = async () => {
+      try {
+        if (user) {
+          const { data } = await supabase
+            .from('user_settings')
+            .select('value')
+            .eq('user_id', user.id)
+            .eq('key', 'emotional_park_progress')
+            .maybeSingle();
 
-  // Save progress to localStorage
-  const saveProgress = (visits: Record<string, AttractionVisit>, badges: ZoneBadge[]) => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ visits, badges }));
-  };
+          if (data?.value) {
+            const parsed = typeof data.value === 'string' ? JSON.parse(data.value) : data.value;
+            setVisitedAttractions(parsed.visits || {});
+            setUnlockedBadges(parsed.badges || []);
+            setSearchHistory(parsed.searchHistory || []);
+            return;
+          }
+        }
+        // Fallback localStorage
+        const stored = localStorage.getItem(STORAGE_KEY);
+        const storedSearch = localStorage.getItem(SEARCH_HISTORY_KEY);
+        if (stored) {
+          const data = JSON.parse(stored);
+          setVisitedAttractions(data.visits || {});
+          setUnlockedBadges(data.badges || []);
+        }
+        if (storedSearch) {
+          setSearchHistory(JSON.parse(storedSearch));
+        }
+      } catch (error) {
+        logger.error('Failed to load attraction progress', error as Error, 'PARK');
+      }
+    };
+    loadProgress();
+  }, [user]);
+
+  // Save progress to Supabase
+  const saveProgress = useCallback(async (visits: Record<string, AttractionVisit>, badges: ZoneBadge[], history?: SearchHistory[]) => {
+    const data = { visits, badges, searchHistory: history || searchHistory };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    
+    if (user) {
+      try {
+        await supabase
+          .from('user_settings')
+          .upsert({
+            user_id: user.id,
+            key: 'emotional_park_progress',
+            value: JSON.stringify(data),
+            updated_at: new Date().toISOString()
+          }, { onConflict: 'user_id,key' });
+      } catch (error) {
+        logger.error('Failed to save progress to Supabase', error as Error, 'PARK');
+      }
+    }
+  }, [user, searchHistory]);
 
   // Mark attraction as visited
   const markVisited = (attractionId: string) => {

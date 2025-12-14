@@ -1,12 +1,15 @@
 /**
  * usePedometer ENRICHED - Hook de podomètre complet
- * Version enrichie avec historique, objectifs, statistiques, export
+ * Version enrichie avec Supabase persistence
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
+import { logger } from '@/lib/logger';
 
 // ─────────────────────────────────────────────────────────────
-// LOCAL STORAGE KEYS
+// LOCAL STORAGE KEYS (fallback)
 // ─────────────────────────────────────────────────────────────
 
 const HISTORY_KEY = 'pedometer-history';
@@ -137,15 +140,66 @@ function savePreferences(prefs: PedometerPreferences): void {
 // ─────────────────────────────────────────────────────────────
 
 export const usePedometerEnriched = () => {
+  const { user } = useAuth();
   const [cadence, setCadence] = useState(0);
   const [steps, setSteps] = useState(0);
   const [isTracking, setIsTracking] = useState(false);
-  const [history, setHistory] = useState<StepEntry[]>(() => getHistory());
-  const [goals, setGoals] = useState<StepGoal[]>(() => getGoals());
-  const [stats, setStats] = useState<PedometerStats>(() => getStats());
-  const [preferences, setPreferences] = useState<PedometerPreferences>(() => getPreferences());
+  const [history, setHistory] = useState<StepEntry[]>([]);
+  const [goals, setGoals] = useState<StepGoal[]>([]);
+  const [stats, setStats] = useState<PedometerStats>(getStats());
+  const [preferences, setPreferences] = useState<PedometerPreferences>(getPreferences());
   const [sessionStart, setSessionStart] = useState<Date | null>(null);
   const [hourlySteps, setHourlySteps] = useState<Record<number, number>>({});
+
+  // Load from Supabase on mount
+  useEffect(() => {
+    const loadData = async () => {
+      if (user) {
+        try {
+          const { data } = await supabase
+            .from('user_settings')
+            .select('value')
+            .eq('user_id', user.id)
+            .eq('key', 'pedometer_data')
+            .maybeSingle();
+          
+          if (data?.value) {
+            const parsed = typeof data.value === 'string' ? JSON.parse(data.value) : data.value;
+            if (parsed.history) setHistory(parsed.history);
+            if (parsed.goals) setGoals(parsed.goals);
+            if (parsed.stats) setStats(parsed.stats);
+            if (parsed.preferences) setPreferences(parsed.preferences);
+            return;
+          }
+        } catch (error) {
+          logger.error('Failed to load pedometer data', error as Error, 'PEDOMETER');
+        }
+      }
+      // Fallback localStorage
+      setHistory(getHistory());
+      setGoals(getGoals());
+    };
+    loadData();
+  }, [user]);
+
+  // Save to Supabase
+  const saveToSupabase = useCallback(async (newHistory?: StepEntry[], newGoals?: StepGoal[], newStats?: PedometerStats) => {
+    if (!user) return;
+    
+    const data = {
+      history: newHistory || history,
+      goals: newGoals || goals,
+      stats: newStats || stats,
+      preferences
+    };
+    
+    await supabase.from('user_settings').upsert({
+      user_id: user.id,
+      key: 'pedometer_data',
+      value: JSON.stringify(data),
+      updated_at: new Date().toISOString()
+    }, { onConflict: 'user_id,key' });
+  }, [user, history, goals, stats, preferences]);
 
   // Calculate distance and calories
   const distance = useMemo(() => 
@@ -228,13 +282,16 @@ export const usePedometerEnriched = () => {
 
     setHistory(newHistory);
     saveHistory(newHistory);
-    updateStats(newHistory);
+    const updatedStats = updateStatsInternal(newHistory);
     checkGoals(steps);
     setSessionStart(null);
-  }, [sessionStart, todayEntry, steps, distance, calories, cadence, hourlySteps, history]);
+    
+    // Sync to Supabase
+    saveToSupabase(newHistory, undefined, updatedStats);
+  }, [sessionStart, todayEntry, steps, distance, calories, cadence, hourlySteps, history, saveToSupabase]);
 
-  // Update stats
-  const updateStats = useCallback((historyData: StepEntry[]) => {
+  // Update stats and return new stats
+  const updateStatsInternal = useCallback((historyData: StepEntry[]): PedometerStats => {
     const totalSteps = historyData.reduce((sum, h) => sum + h.steps, 0);
     const totalDistance = historyData.reduce((sum, h) => sum + h.distance, 0);
     const totalCalories = historyData.reduce((sum, h) => sum + h.calories, 0);
@@ -246,7 +303,6 @@ export const usePedometerEnriched = () => {
       { date: '', steps: 0 }
     );
 
-    // Calculate streak
     let currentStreak = 0;
     const sortedHistory = [...historyData].sort((a, b) => 
       new Date(b.date).getTime() - new Date(a.date).getTime()
@@ -274,6 +330,7 @@ export const usePedometerEnriched = () => {
 
     setStats(newStats);
     saveStats(newStats);
+    return newStats;
   }, [preferences.dailyGoal, stats.longestStreak, goals]);
 
   // Check and update goals

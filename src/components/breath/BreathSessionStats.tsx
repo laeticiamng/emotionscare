@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
@@ -8,6 +8,8 @@ import { Activity, Flame, Target, Clock, TrendingUp, TrendingDown, Minus, Share2
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface StatCardProps {
   icon: React.ReactNode;
@@ -62,13 +64,32 @@ const StatCard: React.FC<StatCardProps> = ({ icon, label, value, unit = '', tren
 const WEEKLY_GOAL_OPTIONS = [30, 60, 90, 120, 150];
 
 export const BreathSessionStats: React.FC = () => {
+  const { user } = useAuth();
   const { stats, loading } = useBreathSessions();
   const [showDetails, setShowDetails] = useState(false);
   const [showGoalSetting, setShowGoalSetting] = useState(false);
-  const [weeklyGoal, setWeeklyGoal] = useState(() => {
-    const saved = localStorage.getItem('breath-weekly-goal');
-    return saved ? parseInt(saved) : 60;
-  });
+  const [weeklyGoal, setWeeklyGoal] = useState(60);
+
+  // Load weekly goal from Supabase
+  useEffect(() => {
+    const loadGoal = async () => {
+      if (user) {
+        const { data } = await supabase
+          .from('user_settings')
+          .select('value')
+          .eq('user_id', user.id)
+          .eq('key', 'breath_weekly_goal')
+          .maybeSingle();
+        if (data?.value) {
+          setWeeklyGoal(parseInt(data.value) || 60);
+          return;
+        }
+      }
+      const saved = localStorage.getItem('breath-weekly-goal');
+      if (saved) setWeeklyGoal(parseInt(saved) || 60);
+    };
+    loadGoal();
+  }, [user]);
 
   // Calculate trends (simulated - would come from historical data)
   const trends = useMemo(() => ({
@@ -96,9 +117,21 @@ export const BreathSessionStats: React.FC = () => {
     }
   };
 
-  const handleSetGoal = (minutes: number) => {
+  const handleSetGoal = async (minutes: number) => {
     setWeeklyGoal(minutes);
     localStorage.setItem('breath-weekly-goal', String(minutes));
+    
+    if (user) {
+      await supabase
+        .from('user_settings')
+        .upsert({
+          user_id: user.id,
+          key: 'breath_weekly_goal',
+          value: String(minutes),
+          updated_at: new Date().toISOString()
+        }, { onConflict: 'user_id,key' });
+    }
+    
     setShowGoalSetting(false);
     toast.success(`Objectif fixé à ${minutes} min/semaine`);
   };
