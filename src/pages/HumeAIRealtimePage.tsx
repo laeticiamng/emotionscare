@@ -5,6 +5,7 @@
 
 import React, { useState } from 'react';
 import { logger } from '@/lib/logger';
+import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -30,10 +31,35 @@ export default function HumeAIRealtimePage() {
   const handleEmotionDetected = async (result: HumeEmotionResult) => {
     if (!user?.id) return;
 
-    // Save the emotion scan to database
+    // Save the emotion scan to Supabase
     try {
       logger.debug('Emotion detected', { emotion: result.topEmotion.name, score: result.topEmotion.score }, 'SCAN');
-      // TODO: Implement save to database
+      
+      // Sauvegarder le scan en base de données
+      const { error: insertError } = await supabase
+        .from('emotion_scans')
+        .insert({
+          user_id: user.id,
+          valence: result.topEmotion.score * 100,
+          arousal: 50, // Valeur par défaut
+          summary: result.topEmotion.name,
+          source: 'hume_realtime',
+          metadata: {
+            allEmotions: result.emotions?.slice(0, 5) || [],
+            mode: selectedMode,
+            timestamp: new Date().toISOString()
+          }
+        });
+
+      if (insertError) {
+        logger.error('Failed to save to DB', insertError, 'SCAN');
+      } else {
+        toast({
+          title: 'Scan enregistré',
+          description: `Émotion détectée: ${result.topEmotion.name}`,
+        });
+      }
+      
       setScanCount((prev) => prev + 1);
     } catch (error) {
       logger.error('Failed to save emotion scan', error instanceof Error ? error : new Error(String(error)), 'SCAN');
