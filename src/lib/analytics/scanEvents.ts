@@ -54,11 +54,26 @@ export function trackScanEvent(
     logger.debug('[Analytics]', eventName, properties, 'LIB');
   }
 
-  // TODO: Add integration with analytics platform (Google Analytics, Mixpanel, etc.)
-  // Example:
-  // if (window.gtag) {
-  //   window.gtag('event', eventName, properties);
-  // }
+  // Send to Google Analytics if available
+  if (typeof window !== 'undefined' && (window as any).gtag) {
+    (window as any).gtag('event', eventName, {
+      event_category: 'scan',
+      ...properties
+    });
+  }
+
+  // Send to Mixpanel if available
+  if (typeof window !== 'undefined' && (window as any).mixpanel) {
+    (window as any).mixpanel.track(eventName, properties);
+  }
+
+  // Send to Sentry as breadcrumb for error context
+  Sentry.addBreadcrumb({
+    category: 'analytics',
+    message: eventName,
+    data: properties,
+    level: 'info'
+  });
 }
 
 /**

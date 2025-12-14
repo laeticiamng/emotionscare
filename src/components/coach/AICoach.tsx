@@ -16,13 +16,19 @@ interface Message {
   timestamp: Date;
 }
 
+const RATE_LIMIT_MAX = 10; // Max messages par minute
+const RATE_LIMIT_WINDOW = 60000; // 1 minute en ms
+
 const AICoach: React.FC = () => {
   const { user } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [conversationId, setConversationId] = useState<string | null>(null);
+  const [rateLimitCount, setRateLimitCount] = useState(0);
+  const [isRateLimited, setIsRateLimited] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const rateLimitResetRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     initializeConversation();
@@ -109,6 +115,30 @@ const AICoach: React.FC = () => {
 
   const sendMessage = async () => {
     if (!inputMessage.trim() || !conversationId || !user) return;
+
+    // Rate limiting check
+    if (isRateLimited) {
+      toast.error('Trop de messages envoyés. Veuillez patienter une minute.');
+      return;
+    }
+
+    // Incrémenter le compteur de rate limit
+    setRateLimitCount(prev => {
+      const newCount = prev + 1;
+      if (newCount >= RATE_LIMIT_MAX) {
+        setIsRateLimited(true);
+        toast.warning(`Limite atteinte (${RATE_LIMIT_MAX} messages/min). Pause de 1 minute.`);
+        
+        // Reset après 1 minute
+        if (rateLimitResetRef.current) clearTimeout(rateLimitResetRef.current);
+        rateLimitResetRef.current = setTimeout(() => {
+          setRateLimitCount(0);
+          setIsRateLimited(false);
+          toast.success('Vous pouvez à nouveau envoyer des messages.');
+        }, RATE_LIMIT_WINDOW);
+      }
+      return newCount;
+    });
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -323,13 +353,22 @@ const AICoach: React.FC = () => {
           />
           <Button 
             onClick={sendMessage}
-            disabled={!inputMessage.trim() || isLoading}
+            disabled={!inputMessage.trim() || isLoading || isRateLimited}
             size="icon"
             aria-label="Envoyer le message"
           >
             <Send className="h-4 w-4" />
           </Button>
         </div>
+
+        {/* Rate limit indicator */}
+        {isRateLimited && (
+          <div className="bg-amber-50 dark:bg-amber-950/20 p-2 rounded-lg text-center">
+            <p className="text-amber-700 dark:text-amber-400 text-xs">
+              ⏳ Limite de messages atteinte. Réessayez dans 1 minute.
+            </p>
+          </div>
+        )}
 
         {/* Info */}
         <div className="bg-blue-50 p-3 rounded-lg">

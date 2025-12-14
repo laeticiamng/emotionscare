@@ -12,6 +12,8 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { AlertTriangle, Phone } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface MedicalDisclaimerDialogProps {
   open: boolean;
@@ -54,7 +56,7 @@ export const MedicalDisclaimerDialog: React.FC<MedicalDisclaimerDialogProps> = (
     journal: 'le journal émotionnel',
   };
 
-  const handleAccept = () => {
+  const handleAccept = async () => {
     if (!hasReadAll || !hasUnderstood) return;
     
     // Sauvegarder consentement avec date
@@ -64,7 +66,21 @@ export const MedicalDisclaimerDialog: React.FC<MedicalDisclaimerDialogProps> = (
       timestamp: new Date().toISOString(),
       version: '1.0',
     };
+    
+    // Sauvegarder localement d'abord (pour le fallback)
     localStorage.setItem(`${STORAGE_KEY}_${feature}`, JSON.stringify(consent));
+    
+    // Puis synchroniser avec Supabase si connecté
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      await supabase
+        .from('user_preferences')
+        .upsert({
+          user_id: user.id,
+          medical_consents: { [feature]: consent },
+          updated_at: new Date().toISOString()
+        }, { onConflict: 'user_id' });
+    }
     
     onAccept();
   };
@@ -245,35 +261,52 @@ export const MedicalDisclaimerDialog: React.FC<MedicalDisclaimerDialogProps> = (
  * Hook pour gérer l'affichage du disclaimer
  */
 export const useMedicalDisclaimer = (feature: 'scan' | 'assessment' | 'coach' | 'journal' | 'ai_coach' | 'emotional_scan' | 'psychological_assessment') => {
+  const { user } = useAuth();
   const [showDisclaimer, setShowDisclaimer] = useState(false);
   const [isAccepted, setIsAccepted] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Vérifier si l'utilisateur a déjà accepté pour cette fonctionnalité
-    const stored = localStorage.getItem(`${STORAGE_KEY}_${feature}`);
-    if (stored) {
-      try {
-        const consent = JSON.parse(stored);
-        // Vérifier que le consentement date de moins de 6 mois
-        const consentDate = new Date(consent.timestamp);
-        const sixMonthsAgo = new Date();
-        sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
-        
-        if (consentDate > sixMonthsAgo && consent.accepted) {
+    const checkConsent = async () => {
+      const sixMonthsAgo = new Date();
+      sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+
+      // Vérifier d'abord en Supabase si connecté
+      if (user) {
+        const { data } = await supabase
+          .from('user_preferences')
+          .select('medical_consents')
+          .eq('user_id', user.id)
+          .single();
+
+        const consent = data?.medical_consents?.[feature];
+        if (consent?.accepted && new Date(consent.timestamp) > sixMonthsAgo) {
           setIsAccepted(true);
           setIsLoading(false);
           return;
         }
-      } catch (e) {
-        // Consentement invalide, redemander
       }
-    }
-    
-    // Pas de consentement valide, afficher le disclaimer
-    setShowDisclaimer(true);
-    setIsLoading(false);
-  }, [feature]);
+
+      // Fallback localStorage
+      const stored = localStorage.getItem(`${STORAGE_KEY}_${feature}`);
+      if (stored) {
+        try {
+          const consent = JSON.parse(stored);
+          if (new Date(consent.timestamp) > sixMonthsAgo && consent.accepted) {
+            setIsAccepted(true);
+            setIsLoading(false);
+            return;
+          }
+        } catch (e) {}
+      }
+      
+      // Pas de consentement valide
+      setShowDisclaimer(true);
+      setIsLoading(false);
+    };
+
+    checkConsent();
+  }, [feature, user]);
 
   const handleAccept = () => {
     // Sauvegarder le consentement
