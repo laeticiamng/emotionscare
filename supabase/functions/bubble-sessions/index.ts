@@ -38,9 +38,18 @@ serve(async (req) => {
   }
 
   try {
-    const { user, status } = await authorizeRole(req, ['b2c', 'b2b_user']);
-    if (!user) {
-      return json(status, { error: 'Unauthorized' });
+    // Autoriser tous les utilisateurs authentifiés (jeu accessible à tous)
+    const authHeader = req.headers.get('authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
+      return json(401, { error: 'Unauthorized' });
+    }
+    
+    const { data: { user }, error: authError } = await supabase.auth.getUser(
+      authHeader.replace('Bearer ', '')
+    );
+    
+    if (authError || !user) {
+      return json(401, { error: 'Unauthorized' });
     }
 
     const body = await req.json();
