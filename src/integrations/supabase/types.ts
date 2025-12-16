@@ -20489,6 +20489,7 @@ export type Database = {
           high_contrast: boolean | null
           id: string
           journal_reminders: boolean | null
+          key: string | null
           low_stim_mode: boolean | null
           nyvee_reminders: boolean | null
           onboarding_completed: boolean | null
@@ -20499,6 +20500,7 @@ export type Database = {
           tts_enabled: boolean | null
           updated_at: string | null
           user_id: string
+          value: string | null
         }
         Insert: {
           consent_anonymous_aggregation?: boolean | null
@@ -20513,6 +20515,7 @@ export type Database = {
           high_contrast?: boolean | null
           id?: string
           journal_reminders?: boolean | null
+          key?: string | null
           low_stim_mode?: boolean | null
           nyvee_reminders?: boolean | null
           onboarding_completed?: boolean | null
@@ -20523,6 +20526,7 @@ export type Database = {
           tts_enabled?: boolean | null
           updated_at?: string | null
           user_id: string
+          value?: string | null
         }
         Update: {
           consent_anonymous_aggregation?: boolean | null
@@ -20537,6 +20541,7 @@ export type Database = {
           high_contrast?: boolean | null
           id?: string
           journal_reminders?: boolean | null
+          key?: string | null
           low_stim_mode?: boolean | null
           nyvee_reminders?: boolean | null
           onboarding_completed?: boolean | null
@@ -20547,6 +20552,7 @@ export type Database = {
           tts_enabled?: boolean | null
           updated_at?: string | null
           user_id?: string
+          value?: string | null
         }
         Relationships: []
       }
