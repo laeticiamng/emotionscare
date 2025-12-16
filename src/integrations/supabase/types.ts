@@ -4101,6 +4101,30 @@ export type Database = {
         }
         Relationships: []
       }
+      csrf_tokens: {
+        Row: {
+          created_at: string | null
+          expires_at: string
+          id: string
+          token: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          expires_at: string
+          id?: string
+          token: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          expires_at?: string
+          id?: string
+          token?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       custom_challenges: {
         Row: {
           created_at: string | null
@@ -6436,6 +6460,51 @@ export type Database = {
           resolved?: boolean | null
           severity?: string
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      error_patterns: {
+        Row: {
+          created_at: string | null
+          error_category: string | null
+          error_message: string | null
+          first_seen: string | null
+          id: string
+          last_seen: string | null
+          occurrence_count: number | null
+          pattern_key: string
+          severity: string | null
+          unique_urls: number | null
+          unique_users: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          error_category?: string | null
+          error_message?: string | null
+          first_seen?: string | null
+          id?: string
+          last_seen?: string | null
+          occurrence_count?: number | null
+          pattern_key: string
+          severity?: string | null
+          unique_urls?: number | null
+          unique_users?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          error_category?: string | null
+          error_message?: string | null
+          first_seen?: string | null
+          id?: string
+          last_seen?: string | null
+          occurrence_count?: number | null
+          pattern_key?: string
+          severity?: string | null
+          unique_urls?: number | null
+          unique_users?: number | null
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -10138,6 +10207,39 @@ export type Database = {
         }
         Relationships: []
       }
+      med_mng_listening_modes: {
+        Row: {
+          created_at: string | null
+          duration_minutes: number | null
+          id: string
+          is_active: boolean | null
+          mode_config: Json | null
+          mode_id: string
+          started_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          duration_minutes?: number | null
+          id?: string
+          is_active?: boolean | null
+          mode_config?: Json | null
+          mode_id: string
+          started_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          duration_minutes?: number | null
+          id?: string
+          is_active?: boolean | null
+          mode_config?: Json | null
+          mode_id?: string
+          started_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       med_mng_listening_sessions: {
         Row: {
           browser_info: Json | null
@@ -10508,6 +10610,39 @@ export type Database = {
         }
         Relationships: []
       }
+      med_mng_recommendations: {
+        Row: {
+          content_id: string | null
+          created_at: string | null
+          expires_at: string | null
+          id: string
+          priority: number | null
+          reason: string | null
+          recommendation_type: string | null
+          user_id: string | null
+        }
+        Insert: {
+          content_id?: string | null
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          priority?: number | null
+          reason?: string | null
+          recommendation_type?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          content_id?: string | null
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          priority?: number | null
+          reason?: string | null
+          recommendation_type?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       med_mng_song_likes: {
         Row: {
           created_at: string
@@ -10708,6 +10843,42 @@ export type Database = {
           created_at?: string
           id?: string
           song_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      med_mng_user_preferences: {
+        Row: {
+          created_at: string | null
+          id: string
+          learning_style: string | null
+          medical_specialties: string[] | null
+          preferred_genres: string[] | null
+          preferred_moods: string[] | null
+          study_schedule: Json | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          learning_style?: string | null
+          medical_specialties?: string[] | null
+          preferred_genres?: string[] | null
+          preferred_moods?: string[] | null
+          study_schedule?: Json | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          learning_style?: string | null
+          medical_specialties?: string[] | null
+          preferred_genres?: string[] | null
+          preferred_moods?: string[] | null
+          study_schedule?: Json | null
+          updated_at?: string | null
           user_id?: string
         }
         Relationships: []
@@ -14729,6 +14900,51 @@ export type Database = {
           endpoint?: string
           id?: string
           p256dh?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      pwa_metrics: {
+        Row: {
+          cls: number | null
+          connection_type: string | null
+          created_at: string | null
+          device_type: string | null
+          fcp: number | null
+          id: string
+          inp: number | null
+          is_pwa: boolean | null
+          lcp: number | null
+          session_id: string
+          ttfb: number | null
+          user_id: string | null
+        }
+        Insert: {
+          cls?: number | null
+          connection_type?: string | null
+          created_at?: string | null
+          device_type?: string | null
+          fcp?: number | null
+          id?: string
+          inp?: number | null
+          is_pwa?: boolean | null
+          lcp?: number | null
+          session_id: string
+          ttfb?: number | null
+          user_id?: string | null
+        }
+        Update: {
+          cls?: number | null
+          connection_type?: string | null
+          created_at?: string | null
+          device_type?: string | null
+          fcp?: number | null
+          id?: string
+          inp?: number | null
+          is_pwa?: boolean | null
+          lcp?: number | null
+          session_id?: string
+          ttfb?: number | null
           user_id?: string | null
         }
         Relationships: []
