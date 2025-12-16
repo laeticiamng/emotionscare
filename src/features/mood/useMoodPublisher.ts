@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { useCallback } from 'react';
 import { captureException } from '@/lib/ai-monitoring';
+import { logger } from '@/lib/logger';
 
 import { MOOD_UPDATED, publishMoodUpdated, type MoodEventDetail } from './mood-bus';
 
