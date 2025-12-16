@@ -284,28 +284,46 @@ const CameraSampler: React.FC<CameraSamplerProps> = ({ onPermissionChange, onUna
           });
 
           if (insertError) {
-            logger.error('[CameraSampler] Error saving to clinical_signals:', insertError, 'FEATURE');
+            logger.warn('[CameraSampler] Error saving to clinical_signals:', insertError.message || insertError, 'FEATURE');
           } else {
             logger.debug('[CameraSampler] Successfully saved to clinical_signals', 'FEATURE');
-            // Invalider le cache pour rafraîchir l'historique
-            queryClient.invalidateQueries({ queryKey: ['scan-history'] });
-            window.dispatchEvent(new CustomEvent('scan-saved'));
+            // Invalider le cache pour rafraîchir l'historique (non-blocking)
+            try {
+              queryClient.invalidateQueries({ queryKey: ['scan-history'] });
+              window.dispatchEvent(new CustomEvent('scan-saved'));
+            } catch (cacheError) {
+              // Non-critical, log and continue
+              logger.warn('[CameraSampler] Cache invalidation failed:', cacheError, 'FEATURE');
+            }
           }
         }
       } catch (saveError) {
-        logger.error('[CameraSampler] Exception saving to DB:', saveError, 'FEATURE');
+        // Non-critical: don't break the scan if save fails
+        logger.warn('[CameraSampler] Exception saving to DB:', saveError instanceof Error ? saveError.message : saveError, 'FEATURE');
       }
       
       const duration = Date.now() - startTime;
       logger.debug('[CameraSampler] Analysis completed in', duration, 'ms', 'FEATURE');
-      scanAnalytics.cameraAnalysisCompleted(duration);
+      
+      try {
+        scanAnalytics.cameraAnalysisCompleted(duration);
+      } catch (analyticsError) {
+        // Analytics failure shouldn't break the scan
+        logger.warn('[CameraSampler] Analytics error:', analyticsError, 'FEATURE');
+      }
     } catch (error) {
-      logger.error('[CameraSampler] Error during analysis:', error, 'FEATURE');
-      setEdgeReady(false);
+      // Only set edgeReady to false for actual edge function errors
+      const errorMessage = error instanceof Error ? error.message : JSON.stringify(error);
+      logger.error('[CameraSampler] Error during analysis:', errorMessage, 'FEATURE');
+      
+      // Check if it's a real edge function error (not a secondary error)
+      if (errorMessage.includes('Edge') || errorMessage.includes('fetch') || errorMessage.includes('network')) {
+        setEdgeReady(false);
+      }
     } finally {
       setIsAnalyzing(false);
     }
-  }, [publishMood]);
+  }, [publishMood, queryClient]);
 
   // Auto-recovery when edgeReady is false
   useEffect(() => {
