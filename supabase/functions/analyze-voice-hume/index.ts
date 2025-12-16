@@ -74,14 +74,30 @@ serve(async (req) => {
     const startTime = Date.now();
 
     // Étape 1: Transcrire l'audio avec OpenAI Whisper
-    const audioData = audioBase64.replace(/^data:audio\/\w+;base64,/, '');
-    const binaryAudio = Uint8Array.from(atob(audioData), c => c.charCodeAt(0));
+    // Supprimer le préfixe data URL si présent
+    let audioData = audioBase64;
+    if (audioData.includes(',')) {
+      audioData = audioData.split(',')[1];
+    }
     
+    // Convertir base64 en binaire de manière plus robuste
+    const binaryString = atob(audioData);
+    const len = binaryString.length;
+    const bytes = new Uint8Array(len);
+    for (let i = 0; i < len; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+    
+    console.log('[analyze-voice-hume] Audio size:', bytes.length, 'bytes');
+    
+    // Créer le FormData avec le bon type MIME
     const formData = new FormData();
-    const blob = new Blob([binaryAudio], { type: 'audio/webm' });
-    formData.append('file', blob, 'audio.webm');
+    const blob = new Blob([bytes], { type: 'audio/webm;codecs=opus' });
+    formData.append('file', blob, 'recording.webm');
     formData.append('model', 'whisper-1');
     formData.append('language', 'fr');
+    // Ajouter un prompt pour aider Whisper à comprendre le contexte
+    formData.append('prompt', 'Ceci est un enregistrement vocal d\'une personne qui exprime ses émotions et son état émotionnel. Elle peut parler de stress, d\'anxiété, de bonheur, de tristesse ou d\'autres émotions.');
 
     const transcriptionResponse = await fetch('https://api.openai.com/v1/audio/transcriptions', {
       method: 'POST',
@@ -98,11 +114,47 @@ serve(async (req) => {
     }
 
     const transcriptionData = await transcriptionResponse.json();
-    const transcript = transcriptionData.text;
+    let transcript = transcriptionData.text?.trim() || '';
 
-    console.log('[analyze-voice-hume] Transcription:', transcript);
+    // Détecter les transcriptions placeholder de Whisper
+    const placeholderPhrases = [
+      'sous-titres réalisés',
+      'amara.org',
+      'merci d\'avoir regardé',
+      'sous-titrage',
+      'community d\'amara'
+    ];
+    
+    const isPlaceholder = placeholderPhrases.some(phrase => 
+      transcript.toLowerCase().includes(phrase.toLowerCase())
+    );
+    
+    if (isPlaceholder || transcript.length < 3) {
+      console.warn('[analyze-voice-hume] Whisper returned placeholder or empty text:', transcript);
+      transcript = ''; // Force empty to trigger fallback analysis
+    }
+
+    console.log('[analyze-voice-hume] Transcription:', transcript || '(aucune parole détectée)');
 
     // Étape 2: Analyser l'émotion du texte avec Lovable AI
+    // Si pas de transcription, retourner un état par défaut
+    if (!transcript) {
+      console.log('[analyze-voice-hume] No valid transcript, returning neutral state');
+      return new Response(
+        JSON.stringify({
+          emotion: 'neutre',
+          valence: 0.5,
+          arousal: 0.5,
+          confidence: 0.3,
+          emotions: { 'neutre': 0.3 },
+          transcript: '',
+          latency_ms: Date.now() - startTime,
+          note: 'Transcription audio non détectée. Veuillez parler plus clairement ou plus longtemps.'
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    
     const analysisResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -114,11 +166,19 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: `Tu es un expert en analyse émotionnelle vocale. Analyse le texte transcrit d'un enregistrement vocal et identifie les émotions. Prends en compte que ce texte provient d'une parole naturelle.`
+            content: `Tu es un expert en psychologie et en analyse émotionnelle. Ton rôle est d'analyser le contenu émotionnel d'un texte transcrit à partir d'un enregistrement vocal.
+
+IMPORTANT: Analyse attentivement le CONTENU SÉMANTIQUE du texte, pas seulement les mots.
+- Si la personne dit qu'elle est stressée, anxieuse, ou exprime du stress → détecte "anxiété" ou "stress" avec une valence BASSE (0.2-0.35) et arousal ÉLEVÉ (0.65-0.85)
+- Si la personne exprime de la tristesse, du mal-être → détecte "tristesse" avec valence TRÈS BASSE (0.1-0.25)
+- Si la personne exprime de la joie, du bonheur → détecte "joie" avec valence HAUTE (0.75-0.95)
+- Le stress et l'anxiété sont des émotions NÉGATIVES à haute énergie
+
+Ne réponds JAMAIS "neutre" si la personne exprime clairement une émotion. Écoute le sens de ses mots.`
           },
           {
             role: 'user',
-            content: transcript || 'Aucune parole détectée'
+            content: `Voici la transcription de ce que la personne a dit: "${transcript}"\n\nAnalyse l'émotion dominante exprimée.`
           }
         ],
         tools: [
@@ -133,7 +193,7 @@ serve(async (req) => {
                   emotion: {
                     type: 'string',
                     description: 'Émotion principale détectée',
-                    enum: ['joie', 'tristesse', 'colère', 'peur', 'surprise', 'dégoût', 'anxiété', 'calme', 'excitation', 'confiance', 'neutre', 'frustration', 'sérénité', 'espoir', 'mélancolie', 'satisfaction', 'inquiétude', 'fatigue', 'ennui']
+                    enum: ['joie', 'tristesse', 'colère', 'peur', 'surprise', 'dégoût', 'anxiété', 'stress', 'calme', 'excitation', 'confiance', 'neutre', 'frustration', 'sérénité', 'espoir', 'mélancolie', 'satisfaction', 'inquiétude', 'fatigue', 'ennui', 'nervosité', 'tension']
                   },
                   valence: {
                     type: 'number',
