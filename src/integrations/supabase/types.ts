@@ -7488,6 +7488,33 @@ export type Database = {
           },
         ]
       }
+      free_trial_usage: {
+        Row: {
+          created_at: string | null
+          generations_used: number | null
+          id: string
+          last_generation_at: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          generations_used?: number | null
+          id?: string
+          last_generation_at?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          generations_used?: number | null
+          id?: string
+          last_generation_at?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       gamification_activities: {
         Row: {
           achievements_unlocked: string[] | null
@@ -8519,6 +8546,39 @@ export type Database = {
           id?: string
           participants_count?: number | null
           recorded_at?: string | null
+        }
+        Relationships: []
+      }
+      in_app_notifications: {
+        Row: {
+          created_at: string | null
+          data: Json | null
+          id: string
+          message: string | null
+          read: boolean | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          data?: Json | null
+          id?: string
+          message?: string | null
+          read?: boolean | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          data?: Json | null
+          id?: string
+          message?: string | null
+          read?: boolean | null
+          title?: string
+          type?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -11452,6 +11512,45 @@ export type Database = {
         }
         Relationships: []
       }
+      moods: {
+        Row: {
+          arousal: number
+          context: Json | null
+          created_at: string | null
+          id: string
+          note: string | null
+          score: number | null
+          tags: string[] | null
+          ts: string | null
+          user_id: string
+          valence: number
+        }
+        Insert: {
+          arousal: number
+          context?: Json | null
+          created_at?: string | null
+          id?: string
+          note?: string | null
+          score?: number | null
+          tags?: string[] | null
+          ts?: string | null
+          user_id: string
+          valence: number
+        }
+        Update: {
+          arousal?: number
+          context?: Json | null
+          created_at?: string | null
+          id?: string
+          note?: string | null
+          score?: number | null
+          tags?: string[] | null
+          ts?: string | null
+          user_id?: string
+          valence?: number
+        }
+        Relationships: []
+      }
       music_achievements: {
         Row: {
           category: string
@@ -11541,6 +11640,36 @@ export type Database = {
           id?: string
           meta?: Json
           track_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      music_feedback: {
+        Row: {
+          audio_url: string | null
+          created_at: string | null
+          id: string
+          item_code: string
+          rating: number | null
+          style: string | null
+          user_id: string
+        }
+        Insert: {
+          audio_url?: string | null
+          created_at?: string | null
+          id?: string
+          item_code: string
+          rating?: number | null
+          style?: string | null
+          user_id: string
+        }
+        Update: {
+          audio_url?: string | null
+          created_at?: string | null
+          id?: string
+          item_code?: string
+          rating?: number | null
+          style?: string | null
           user_id?: string
         }
         Relationships: []
@@ -19742,6 +19871,30 @@ export type Database = {
         }
         Relationships: []
       }
+      user_notification_settings: {
+        Row: {
+          created_at: string | null
+          id: string
+          preferences: Json | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          preferences?: Json | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          preferences?: Json | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_notifications: {
         Row: {
           action_label: string | null
@@ -19786,6 +19939,54 @@ export type Database = {
           title?: string
           type?: string
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_onboarding: {
+        Row: {
+          completed_at: string | null
+          completed_steps: Json | null
+          created_at: string | null
+          current_step: number | null
+          id: string
+          is_active: boolean | null
+          is_seen: boolean | null
+          last_state: string | null
+          onboarding_completed: boolean | null
+          preferred_deadline: string | null
+          seen_tooltips: Json | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          completed_steps?: Json | null
+          created_at?: string | null
+          current_step?: number | null
+          id?: string
+          is_active?: boolean | null
+          is_seen?: boolean | null
+          last_state?: string | null
+          onboarding_completed?: boolean | null
+          preferred_deadline?: string | null
+          seen_tooltips?: Json | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          completed_steps?: Json | null
+          created_at?: string | null
+          current_step?: number | null
+          id?: string
+          is_active?: boolean | null
+          is_seen?: boolean | null
+          last_state?: string | null
+          onboarding_completed?: boolean | null
+          preferred_deadline?: string | null
+          seen_tooltips?: Json | null
+          updated_at?: string | null
           user_id?: string
         }
         Relationships: []
