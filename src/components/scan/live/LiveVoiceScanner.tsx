@@ -168,42 +168,66 @@ const LiveVoiceScanner: React.FC<LiveVoiceScannerProps> = ({
     audioChunksRef.current = [];
     
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        audio: {
+          sampleRate: 16000,
+          channelCount: 1,
+          echoCancellation: true,
+          noiseSuppression: true
+        } 
+      });
+      
+      // Déterminer le meilleur format supporté
+      const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus') 
+        ? 'audio/webm;codecs=opus'
+        : MediaRecorder.isTypeSupported('audio/webm')
+          ? 'audio/webm'
+          : 'audio/mp4';
+      
+      logger.debug('[LiveVoiceScanner] Using mimeType:', mimeType, 'COMPONENT');
       
       // Créer le MediaRecorder avec format approprié
       const mediaRecorder = new MediaRecorder(stream, {
-        mimeType: 'audio/webm;codecs=opus'
+        mimeType,
+        audioBitsPerSecond: 128000
       });
       
       mediaRecorder.ondataavailable = (event) => {
+        logger.debug('[LiveVoiceScanner] Data available, size:', event.data.size, 'COMPONENT');
         if (event.data.size > 0) {
           audioChunksRef.current.push(event.data);
         }
       };
       
       mediaRecorder.onstop = async () => {
-        // Créer le blob audio
-        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-        logger.debug('[LiveVoiceScanner] Recording stopped, blob size:', audioBlob.size, 'COMPONENT');
+        // Créer le blob audio avec tous les chunks collectés
+        const audioBlob = new Blob(audioChunksRef.current, { type: mimeType });
+        const totalChunks = audioChunksRef.current.length;
+        logger.debug('[LiveVoiceScanner] Recording stopped, blob size:', audioBlob.size, 'chunks:', totalChunks, 'COMPONENT');
         
         // Arrêter tous les tracks
         stream.getTracks().forEach(track => track.stop());
         
-        // Traiter l'audio
-        if (audioBlob.size > 0) {
-          await processAudioData(audioBlob);
-        } else {
-          setError('Aucun audio enregistré');
+        // Vérifier la taille minimale (au moins 5KB pour une analyse correcte)
+        if (audioBlob.size < 5000) {
+          setError('Enregistrement trop court. Parlez pendant au moins 3 secondes.');
+          logger.warn('[LiveVoiceScanner] Audio too small:', audioBlob.size, 'bytes', 'COMPONENT');
+          return;
         }
+        
+        // Traiter l'audio
+        await processAudioData(audioBlob);
       };
       
       mediaRecorderRef.current = mediaRecorder;
-      mediaRecorder.start();
+      
+      // IMPORTANT: Collecter les données toutes les 500ms pour éviter la perte de données
+      mediaRecorder.start(500);
       
       setIsRecording(true);
       setProgress(0);
       
-      logger.debug('[LiveVoiceScanner] Recording started', 'COMPONENT');
+      logger.debug('[LiveVoiceScanner] Recording started with timeslice 500ms', 'COMPONENT');
       
     } catch (err) {
       logger.error('[LiveVoiceScanner] Failed to start recording:', err, 'COMPONENT');

@@ -137,7 +137,8 @@ export const VoiceAnalysisSchema = z.object({
   audioBase64: z.string()
     .min(100, 'Audio data too short')
     .max(10 * 1024 * 1024, 'Audio data too large (max ~10MB base64)')
-    .regex(/^data:audio\/\w+;base64,/, 'Invalid audio base64 format')
+    // Accepte tous les formats audio avec data URL (webm, mp4, ogg, etc.)
+    .regex(/^data:audio\/[^;,]+/, 'Invalid audio base64 format')
 });
 
 export const HumeAnalysisSchema = z.object({
