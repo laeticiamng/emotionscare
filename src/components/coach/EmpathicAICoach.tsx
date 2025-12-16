@@ -218,10 +218,10 @@ const EmpathicAICoach: React.FC = () => {
       // Save conversation to database
       await supabase.from('coach_conversations').upsert({
         user_id: user?.id,
-        personality: selectedPersonality,
+        coach_mode: selectedPersonality,
         message_count: messages.length + 2,
         last_message_at: new Date().toISOString()
-      });
+      }, { onConflict: 'user_id,coach_mode' });
 
     } catch (error) {
       logger.error('Error sending message:', error);

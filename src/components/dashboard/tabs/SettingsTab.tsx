@@ -89,11 +89,11 @@ const SettingsTab: React.FC<SettingsTabProps> = ({ className }) => {
         .from('user_settings')
         .upsert({
           user_id: user.id,
-          setting_key: 'dashboard_preferences',
-          settings: settings,
+          key: 'dashboard_preferences',
+          value: JSON.stringify(settings),
           updated_at: new Date().toISOString()
         }, {
-          onConflict: 'user_id,setting_key'
+          onConflict: 'user_id,key'
         });
 
       if (error) throw error;
