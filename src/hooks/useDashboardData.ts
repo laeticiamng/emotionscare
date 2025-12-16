@@ -59,31 +59,23 @@ export const useDashboardData = () => {
           }
         }
 
-        // Fallback si pas de données
-        if (totalUsers === 0) {
-          setData({
-            totalUsers: 256,
-            activeUsers: 178,
-            averageScore: 78,
-            criticalAlerts: 5
-          });
-        } else {
-          setData({
-            totalUsers,
-            activeUsers,
-            averageScore: averageScore || 75,
-            criticalAlerts
-          });
-        }
-      } catch (err) {
-        setError('Erreur lors du chargement des données');
-        logger.error('Dashboard data fetch error', err as Error, 'UI');
-        // Fallback data
         setData({
-          totalUsers: 256,
-          activeUsers: 178,
-          averageScore: 78,
-          criticalAlerts: 5
+          totalUsers,
+          activeUsers,
+          averageScore: averageScore || 0,
+          criticalAlerts
+        });
+        setError(null);
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'Erreur inconnue';
+        setError(`Erreur lors du chargement: ${errorMessage}`);
+        logger.error('Dashboard data fetch error', err as Error, 'UI');
+        // Keep previous data or set to zeros (not fake data)
+        setData(prev => prev.totalUsers > 0 ? prev : {
+          totalUsers: 0,
+          activeUsers: 0,
+          averageScore: 0,
+          criticalAlerts: 0
         });
       } finally {
         setIsLoading(false);
