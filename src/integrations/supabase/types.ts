@@ -20299,6 +20299,7 @@ export type Database = {
           created_at: string
           id: string
           language: string | null
+          medical_consents: Json | null
           nyvee_tutorial_seen: boolean | null
           preferences: Json
           updated_at: string
@@ -20308,6 +20309,7 @@ export type Database = {
           created_at?: string
           id?: string
           language?: string | null
+          medical_consents?: Json | null
           nyvee_tutorial_seen?: boolean | null
           preferences?: Json
           updated_at?: string
@@ -20317,6 +20319,7 @@ export type Database = {
           created_at?: string
           id?: string
           language?: string | null
+          medical_consents?: Json | null
           nyvee_tutorial_seen?: boolean | null
           preferences?: Json
           updated_at?: string

@@ -307,6 +307,18 @@ const CameraSampler: React.FC<CameraSamplerProps> = ({ onPermissionChange, onUna
     }
   }, [publishMood]);
 
+  // Auto-recovery when edgeReady is false
+  useEffect(() => {
+    if (edgeReady || status !== 'streaming') return;
+    
+    const retryTimer = setTimeout(() => {
+      logger.info('[CameraSampler] Auto-recovering edge connection...', 'FEATURE');
+      setEdgeReady(true);
+    }, 3000);
+    
+    return () => clearTimeout(retryTimer);
+  }, [edgeReady, status]);
+
   useEffect(() => {
     if (status !== 'streaming') {
       return;
@@ -314,12 +326,29 @@ const CameraSampler: React.FC<CameraSamplerProps> = ({ onPermissionChange, onUna
 
     let cancelled = false;
     let timeout: ReturnType<typeof setTimeout> | null = null;
+    let consecutiveErrors = 0;
+    const MAX_CONSECUTIVE_ERRORS = 3;
 
     const loop = async () => {
+      if (!edgeReady) {
+        // Skip analysis if edge not ready, but continue loop
+        if (!cancelled) {
+          timeout = setTimeout(loop, 5000);
+        }
+        return;
+      }
+      
       try {
         await sampleFromEdge();
+        consecutiveErrors = 0; // Reset on success
       } catch (error) {
+        consecutiveErrors++;
         logger.error('[CameraSampler] Loop error:', error, 'FEATURE');
+        
+        if (consecutiveErrors >= MAX_CONSECUTIVE_ERRORS) {
+          setEdgeReady(false);
+          consecutiveErrors = 0;
+        }
       }
 
       if (cancelled) {
@@ -337,7 +366,7 @@ const CameraSampler: React.FC<CameraSamplerProps> = ({ onPermissionChange, onUna
         clearTimeout(timeout);
       }
     };
-  }, [sampleFromEdge, status]);
+  }, [sampleFromEdge, status, edgeReady]);
 
   const statusLabel = useMemo(() => {
     if (status === 'error') {
