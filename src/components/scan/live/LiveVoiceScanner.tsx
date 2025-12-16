@@ -168,48 +168,55 @@ const LiveVoiceScanner: React.FC<LiveVoiceScannerProps> = ({
     audioChunksRef.current = [];
     
     try {
+      // Contraintes audio simples pour maximiser la compatibilité
       const stream = await navigator.mediaDevices.getUserMedia({ 
-        audio: {
-          sampleRate: 16000,
-          channelCount: 1,
-          echoCancellation: true,
-          noiseSuppression: true
-        } 
+        audio: true
       });
       
       // Déterminer le meilleur format supporté
-      const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus') 
-        ? 'audio/webm;codecs=opus'
-        : MediaRecorder.isTypeSupported('audio/webm')
-          ? 'audio/webm'
-          : 'audio/mp4';
+      let mimeType = 'audio/webm';
+      if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+        mimeType = 'audio/webm;codecs=opus';
+      } else if (MediaRecorder.isTypeSupported('audio/webm')) {
+        mimeType = 'audio/webm';
+      } else if (MediaRecorder.isTypeSupported('audio/mp4')) {
+        mimeType = 'audio/mp4';
+      } else if (MediaRecorder.isTypeSupported('audio/ogg')) {
+        mimeType = 'audio/ogg';
+      }
       
       logger.debug('[LiveVoiceScanner] Using mimeType:', mimeType, 'COMPONENT');
       
-      // Créer le MediaRecorder avec format approprié
-      const mediaRecorder = new MediaRecorder(stream, {
-        mimeType,
-        audioBitsPerSecond: 128000
-      });
+      // Créer le MediaRecorder
+      const mediaRecorder = new MediaRecorder(stream, { mimeType });
       
       mediaRecorder.ondataavailable = (event) => {
-        logger.debug('[LiveVoiceScanner] Data available, size:', event.data.size, 'COMPONENT');
-        if (event.data.size > 0) {
+        logger.debug('[LiveVoiceScanner] ondataavailable fired, size:', event.data.size, 'COMPONENT');
+        if (event.data && event.data.size > 0) {
           audioChunksRef.current.push(event.data);
+          logger.debug('[LiveVoiceScanner] Total chunks:', audioChunksRef.current.length, 'COMPONENT');
         }
       };
       
       mediaRecorder.onstop = async () => {
-        // Créer le blob audio avec tous les chunks collectés
-        const audioBlob = new Blob(audioChunksRef.current, { type: mimeType });
-        const totalChunks = audioChunksRef.current.length;
-        logger.debug('[LiveVoiceScanner] Recording stopped, blob size:', audioBlob.size, 'chunks:', totalChunks, 'COMPONENT');
+        logger.debug('[LiveVoiceScanner] onstop fired, chunks count:', audioChunksRef.current.length, 'COMPONENT');
         
         // Arrêter tous les tracks
         stream.getTracks().forEach(track => track.stop());
         
-        // Vérifier la taille minimale (au moins 5KB pour une analyse correcte)
-        if (audioBlob.size < 5000) {
+        // Vérifier qu'on a des chunks
+        if (audioChunksRef.current.length === 0) {
+          setError('Aucune donnée audio capturée. Vérifiez les permissions du microphone.');
+          logger.error('[LiveVoiceScanner] No audio chunks collected', 'COMPONENT');
+          return;
+        }
+        
+        // Créer le blob audio avec tous les chunks collectés
+        const audioBlob = new Blob(audioChunksRef.current, { type: mimeType });
+        logger.debug('[LiveVoiceScanner] Recording stopped, blob size:', audioBlob.size, 'bytes, chunks:', audioChunksRef.current.length, 'COMPONENT');
+        
+        // Seuil de taille réduit car WebM compressé peut être petit
+        if (audioBlob.size < 1000) {
           setError('Enregistrement trop court. Parlez pendant au moins 3 secondes.');
           logger.warn('[LiveVoiceScanner] Audio too small:', audioBlob.size, 'bytes', 'COMPONENT');
           return;
@@ -221,13 +228,13 @@ const LiveVoiceScanner: React.FC<LiveVoiceScannerProps> = ({
       
       mediaRecorderRef.current = mediaRecorder;
       
-      // IMPORTANT: Collecter les données toutes les 500ms pour éviter la perte de données
-      mediaRecorder.start(500);
+      // Démarrer avec timeslice pour collecter les données périodiquement
+      mediaRecorder.start(1000); // Collecter toutes les secondes
       
       setIsRecording(true);
       setProgress(0);
       
-      logger.debug('[LiveVoiceScanner] Recording started with timeslice 500ms', 'COMPONENT');
+      logger.debug('[LiveVoiceScanner] Recording started with timeslice 1000ms', 'COMPONENT');
       
     } catch (err) {
       logger.error('[LiveVoiceScanner] Failed to start recording:', err, 'COMPONENT');
