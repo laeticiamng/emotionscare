@@ -168,10 +168,17 @@ const LiveVoiceScanner: React.FC<LiveVoiceScannerProps> = ({
     audioChunksRef.current = [];
     
     try {
-      // Contraintes audio simples pour maximiser la compatibilité
+      // Contraintes audio optimisées pour la capture vocale
       const stream = await navigator.mediaDevices.getUserMedia({ 
-        audio: true
+        audio: {
+          echoCancellation: false,
+          noiseSuppression: false,
+          autoGainControl: true
+        }
       });
+      
+      // Garder une référence au stream
+      const streamRef = stream;
       
       // Déterminer le meilleur format supporté
       let mimeType = 'audio/webm';
@@ -187,38 +194,39 @@ const LiveVoiceScanner: React.FC<LiveVoiceScannerProps> = ({
       
       logger.debug('[LiveVoiceScanner] Using mimeType:', mimeType, 'COMPONENT');
       
-      // Créer le MediaRecorder
-      const mediaRecorder = new MediaRecorder(stream, { mimeType });
+      // Créer le MediaRecorder avec bitrate élevé
+      const mediaRecorder = new MediaRecorder(stream, { 
+        mimeType,
+        audioBitsPerSecond: 128000
+      });
       
       mediaRecorder.ondataavailable = (event) => {
-        logger.debug('[LiveVoiceScanner] ondataavailable fired, size:', event.data.size, 'COMPONENT');
+        logger.debug('[LiveVoiceScanner] ondataavailable, size:', event.data.size, 'COMPONENT');
         if (event.data && event.data.size > 0) {
           audioChunksRef.current.push(event.data);
-          logger.debug('[LiveVoiceScanner] Total chunks:', audioChunksRef.current.length, 'COMPONENT');
         }
       };
       
       mediaRecorder.onstop = async () => {
-        logger.debug('[LiveVoiceScanner] onstop fired, chunks count:', audioChunksRef.current.length, 'COMPONENT');
+        const chunks = [...audioChunksRef.current];
+        logger.debug('[LiveVoiceScanner] onstop, chunks:', chunks.length, 'total size:', chunks.reduce((acc, c) => acc + c.size, 0), 'COMPONENT');
         
         // Arrêter tous les tracks
-        stream.getTracks().forEach(track => track.stop());
+        streamRef.getTracks().forEach(track => track.stop());
         
         // Vérifier qu'on a des chunks
-        if (audioChunksRef.current.length === 0) {
+        if (chunks.length === 0) {
           setError('Aucune donnée audio capturée. Vérifiez les permissions du microphone.');
-          logger.error('[LiveVoiceScanner] No audio chunks collected', 'COMPONENT');
           return;
         }
         
-        // Créer le blob audio avec tous les chunks collectés
-        const audioBlob = new Blob(audioChunksRef.current, { type: mimeType });
-        logger.debug('[LiveVoiceScanner] Recording stopped, blob size:', audioBlob.size, 'bytes, chunks:', audioChunksRef.current.length, 'COMPONENT');
+        // Créer le blob audio
+        const audioBlob = new Blob(chunks, { type: mimeType });
+        logger.debug('[LiveVoiceScanner] Final blob size:', audioBlob.size, 'bytes', 'COMPONENT');
         
-        // Seuil de taille réduit car WebM compressé peut être petit
+        // Vérifier la taille minimale
         if (audioBlob.size < 1000) {
           setError('Enregistrement trop court. Parlez pendant au moins 3 secondes.');
-          logger.warn('[LiveVoiceScanner] Audio too small:', audioBlob.size, 'bytes', 'COMPONENT');
           return;
         }
         
@@ -228,13 +236,14 @@ const LiveVoiceScanner: React.FC<LiveVoiceScannerProps> = ({
       
       mediaRecorderRef.current = mediaRecorder;
       
-      // Démarrer avec timeslice pour collecter les données périodiquement
-      mediaRecorder.start(1000); // Collecter toutes les secondes
+      // IMPORTANT: Démarrer SANS timeslice pour collecter tout à la fin
+      // Le timeslice peut causer des problèmes sur certains navigateurs
+      mediaRecorder.start();
       
       setIsRecording(true);
       setProgress(0);
       
-      logger.debug('[LiveVoiceScanner] Recording started with timeslice 1000ms', 'COMPONENT');
+      logger.debug('[LiveVoiceScanner] Recording started (continuous mode)', 'COMPONENT');
       
     } catch (err) {
       logger.error('[LiveVoiceScanner] Failed to start recording:', err, 'COMPONENT');
@@ -253,7 +262,11 @@ const LiveVoiceScanner: React.FC<LiveVoiceScannerProps> = ({
    */
   const stopRecording = useCallback(() => {
     if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
-      logger.debug('[LiveVoiceScanner] Stopping recording', 'COMPONENT');
+      logger.debug('[LiveVoiceScanner] Stopping recording, state:', mediaRecorderRef.current.state, 'COMPONENT');
+      // Forcer la collecte des dernières données avant d'arrêter
+      if (mediaRecorderRef.current.state === 'recording') {
+        mediaRecorderRef.current.requestData();
+      }
       mediaRecorderRef.current.stop();
       setIsRecording(false);
     }
