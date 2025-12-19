@@ -5,8 +5,15 @@ export const APP_CONFIG = {
   name: 'EmotionsCare',
   version: '1.0.0',
   author: 'EmotionsCare Team',
-  description: 'Plateforme premium de bien-être émotionnel',
-  url: 'https://emotionscare.app'
+  description: 'Plateforme de régulation émotionnelle dédiée aux étudiants en santé et aux professionnels du soin',
+  tagline: 'Prendre soin de celles et ceux qui prennent soin.',
+  subtitle: 'Une plateforme de régulation émotionnelle dédiée aux étudiants en santé et aux professionnels du soin.',
+  url: 'https://emotionscare.app',
+  target: {
+    primary: 'Étudiants en santé et professionnels du soin',
+    b2c: ['Étudiants en santé', 'Infirmiers', 'Médecins', 'Aides-soignants', 'Psychologues'],
+    b2b: ['Facultés de médecine', 'Hôpitaux', 'Cliniques', 'EHPAD', 'Centres de santé']
+  }
 } as const;
 
 export const ROUTES = {
