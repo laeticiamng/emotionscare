@@ -22,40 +22,40 @@ interface Situation {
 
 const situations: Situation[] = [
   {
-    id: 'morning',
-    label: 'Matin',
-    description: 'Difficile de démarrer, pensées lourdes dès le réveil',
-    icon: <Sun className="h-6 w-6" />,
+    id: 'pressure',
+    label: '😰 Sous pression',
+    description: 'Examens, gardes, responsabilités qui s\'accumulent',
+    icon: <Zap className="h-6 w-6" />,
     color: 'text-amber-500',
     gradient: 'from-amber-500/20 to-orange-500/10',
-    sessionPath: '/app/scan?context=morning',
+    sessionPath: '/app/scan?context=pressure',
   },
   {
-    id: 'day',
-    label: 'Journée',
-    description: 'Surcharge mentale, besoin de reset rapide',
-    icon: <Zap className="h-6 w-6" />,
-    color: 'text-blue-500',
-    gradient: 'from-blue-500/20 to-cyan-500/10',
-    sessionPath: '/app/scan?context=day',
-  },
-  {
-    id: 'night',
-    label: 'Nuit',
-    description: 'Impossible de couper, le cerveau continue de tourner',
+    id: 'exhausted',
+    label: '💤 Épuisé',
+    description: 'Fatigue physique et émotionnelle après des jours intenses',
     icon: <Moon className="h-6 w-6" />,
     color: 'text-indigo-500',
     gradient: 'from-indigo-500/20 to-purple-500/10',
-    sessionPath: '/app/scan?context=night',
+    sessionPath: '/app/scan?context=exhausted',
   },
   {
-    id: 'crisis',
-    label: 'Crise',
-    description: "Besoin d'arrêter maintenant, tout de suite",
+    id: 'overloaded',
+    label: '🧠 Surchargé',
+    description: 'Trop d\'informations, de patients, de décisions à prendre',
     icon: <AlertTriangle className="h-6 w-6" />,
-    color: 'text-red-500',
-    gradient: 'from-red-500/20 to-rose-500/10',
-    sessionPath: '/app/scan?context=crisis',
+    color: 'text-blue-500',
+    gradient: 'from-blue-500/20 to-cyan-500/10',
+    sessionPath: '/app/scan?context=overloaded',
+  },
+  {
+    id: 'fragile',
+    label: '🙂 Stable mais fragile',
+    description: 'Ça va, mais tu sens que ça pourrait basculer',
+    icon: <Sun className="h-6 w-6" />,
+    color: 'text-emerald-500',
+    gradient: 'from-emerald-500/20 to-teal-500/10',
+    sessionPath: '/app/scan?context=fragile',
   },
 ];
 
@@ -118,13 +118,13 @@ const OnboardingGuide: React.FC = () => {
                 {/* Étape 1 - Question directe */}
                 <motion.div variants={itemVariants} className="text-center space-y-4">
                   <p className="text-sm font-medium text-primary uppercase tracking-wider">
-                    Étape 1
+                    Comment tu te sens ?
                   </p>
                   <h2 className="text-3xl lg:text-4xl font-bold text-foreground">
-                    À quel moment c'est le plus difficile pour toi ?
+                    Comment tu te sens en ce moment dans ton rôle de soignant ?
                   </h2>
                   <p className="text-muted-foreground text-lg max-w-xl mx-auto">
-                    On adapte la session à ton moment. Pas de formulaire, pas d'explication.
+                    On adapte la session à ton état. Pas de formulaire, pas d'explication.
                   </p>
                 </motion.div>
 

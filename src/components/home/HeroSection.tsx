@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
-import { Heart, Building2, Sparkles, Users, Brain, Music, ArrowRight, Star, Play } from 'lucide-react';
+import { Heart, Stethoscope, GraduationCap, Shield, Brain, Sparkles, ArrowRight, Star, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
@@ -11,36 +11,36 @@ const HeroSection: React.FC = () => {
 
   const features = [
     { 
-      icon: Brain, 
-      title: "IA Coach", 
-      description: "Assistant intelligent",
+      icon: GraduationCap, 
+      title: "Étudiants santé", 
+      description: "Gérer stress et examens",
       gradient: "from-primary to-blue-600"
     },
     { 
-      icon: Music, 
-      title: "Musicothérapie", 
-      description: "Thérapie personnalisée",
+      icon: Stethoscope, 
+      title: "Soignants", 
+      description: "Prévenir l'épuisement",
+      gradient: "from-emerald-500 to-teal-500"
+    },
+    { 
+      icon: Brain, 
+      title: "Régulation", 
+      description: "Retrouver l'équilibre",
       gradient: "from-purple-500 to-pink-500"
     },
     { 
-      icon: Users, 
-      title: "Communauté", 
-      description: "Soutien bienveillant",
-      gradient: "from-green-500 to-emerald-500"
-    },
-    { 
-      icon: Sparkles, 
-      title: "Expérience VR", 
-      description: "Innovation immersive",
-      gradient: "from-orange-500 to-red-500"
+      icon: Shield, 
+      title: "Confidentialité", 
+      description: "Vos données protégées",
+      gradient: "from-orange-500 to-amber-500"
     }
   ];
 
   const stats = [
-    { value: "10K+", label: "Utilisateurs actifs" },
-    { value: "95%", label: "Satisfaction client" },
-    { value: "24/7", label: "Support disponible" },
-    { value: "50+", label: "Outils thérapeutiques" }
+    { value: "10K+", label: "Étudiants & soignants" },
+    { value: "95%", label: "Recommandent" },
+    { value: "2 min", label: "Pour se recentrer" },
+    { value: "100%", label: "Confidentiel" }
   ];
 
   return (
@@ -65,9 +65,9 @@ const HeroSection: React.FC = () => {
               variant="outline" 
               className="glass-effect px-3 sm:px-6 py-2 sm:py-3 text-xs sm:text-sm font-medium border-primary/20 hover:border-primary/40 transition-colors duration-300"
             >
-              <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 text-primary" />
-              <span className="hidden xs:inline">Plateforme d'intelligence émotionnelle nouvelle génération</span>
-              <span className="xs:hidden">Intelligence émotionnelle IA</span>
+              <Heart className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2 text-primary" />
+              <span className="hidden xs:inline">Si tu es ici, ce n'est probablement pas par curiosité.</span>
+              <span className="xs:hidden">Pour ceux qui prennent soin</span>
             </Badge>
           </motion.div>
 
@@ -76,9 +76,11 @@ const HeroSection: React.FC = () => {
             initial={shouldReduceMotion ? {} : { opacity: 0, y: 30 }}
             animate={shouldReduceMotion ? {} : { opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-fluid-4xl sm:text-6xl lg:text-8xl font-bold mb-6 sm:mb-8 text-gradient leading-tight"
+            className="text-fluid-4xl sm:text-5xl lg:text-7xl font-bold mb-6 sm:mb-8 leading-tight"
           >
-            EmotionsCare
+            <span className="text-foreground">Prendre soin de celles et ceux</span>
+            <br />
+            <span className="text-gradient">qui prennent soin.</span>
           </motion.h1>
 
           {/* Subtitle - Responsive typography */}
@@ -86,9 +88,9 @@ const HeroSection: React.FC = () => {
             initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
             animate={shouldReduceMotion ? {} : { opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
-            className="text-fluid-lg sm:text-2xl lg:text-3xl text-muted-foreground mb-4 sm:mb-6 font-light max-w-4xl mx-auto px-2"
+            className="text-fluid-lg sm:text-xl lg:text-2xl text-muted-foreground mb-4 sm:mb-6 font-light max-w-4xl mx-auto px-2"
           >
-            Transformez votre bien-être émotionnel avec l'IA
+            Une plateforme de régulation émotionnelle dédiée aux étudiants en santé et aux professionnels du soin.
           </motion.p>
 
           {/* Description - Mobile optimized */}
@@ -98,8 +100,8 @@ const HeroSection: React.FC = () => {
             transition={{ duration: 0.6, delay: 0.5 }}
             className="text-fluid-base sm:text-lg text-muted-foreground mb-8 sm:mb-12 max-w-2xl mx-auto leading-relaxed px-4"
           >
-            Analysez, comprenez et améliorez votre santé mentale avec nos outils innovants basés sur l'IA, 
-            la musicothérapie et les technologies immersives.
+            Gérer le stress, la surcharge, la fatigue émotionnelle. 
+            Tenir dans la durée, apprendre, soigner, sans s'épuiser.
           </motion.p>
 
           {/* Action Buttons - Mobile optimized */}
