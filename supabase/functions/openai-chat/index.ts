@@ -22,13 +22,13 @@ serve(async (req) => {
       return createErrorResponse(authResult.error || 'Authentication required', authResult.status, corsHeaders);
     }
 
-    // 🛡️ SÉCURITÉ: Rate limiting strict (10 req/min - GPT-5 est très coûteux)
+    // 🛡️ SÉCURITÉ: Rate limiting strict (10 req/min)
     const rateLimit = await enforceEdgeRateLimit(req, {
       route: 'openai-chat',
       userId: authResult.user.id,
       limit: 10,
       windowMs: 60_000,
-      description: 'OpenAI GPT-5 chat completions'
+      description: 'OpenAI chat completions'
     });
 
     if (!rateLimit.allowed) {
@@ -60,10 +60,10 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-5-2025-08-07', // Modèle GPT-5 flagship
+        model: 'gpt-4o-mini', // Modèle rapide et économique
         messages: messages,
-        max_completion_tokens: 1000,
-        // Note: GPT-5 ne supporte pas le paramètre temperature
+        max_tokens: 1000,
+        temperature: 0.7,
       }),
     })
 

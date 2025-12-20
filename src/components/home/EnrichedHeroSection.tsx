@@ -8,7 +8,7 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Link, useNavigate } from 'react-router-dom';
-import { StopCircle, Clock, Zap, Heart, Shield, Brain } from 'lucide-react';
+import { StopCircle, Clock, Zap, Heart, Shield, Brain, GraduationCap, Stethoscope } from 'lucide-react';
 import { useReducedMotion, getAnimationVariants } from '@/hooks/useReducedMotion';
 
 const EnrichedHeroSection: React.FC = () => {
@@ -119,15 +119,15 @@ const EnrichedHeroSection: React.FC = () => {
             </Badge>
           </motion.div>
 
-          {/* Headline interventionnelle - situation avant produit */}
+          {/* Headline interventionnelle - positionnement santé */}
           <motion.div variants={itemVariants} className="space-y-6">
             <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold leading-[1.1] tracking-tight">
               <span className="text-foreground">
-                Ton cerveau est encore
+                Prendre soin de celles et ceux
               </span>
               <br />
               <span className="bg-gradient-to-r from-primary via-primary/90 to-blue-500 bg-clip-text text-transparent">
-                en train de tourner ?
+                qui prennent soin.
               </span>
             </h1>
           </motion.div>
@@ -137,8 +137,8 @@ const EnrichedHeroSection: React.FC = () => {
             variants={itemVariants}
             className="text-xl lg:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed font-light"
           >
-            On ne t'explique rien.{' '}
-            <strong className="text-foreground font-medium">On t'aide à t'arrêter.</strong>
+            Une plateforme de régulation émotionnelle dédiée{' '}
+            <strong className="text-foreground font-medium">aux étudiants en santé et aux soignants.</strong>
           </motion.p>
 
           {/* CTAs émotionnels - action avant compréhension */}
@@ -157,8 +157,8 @@ const EnrichedHeroSection: React.FC = () => {
                 onClick={handleImmediateAction}
                 className="relative overflow-hidden bg-gradient-to-r from-primary to-primary/90 hover:from-primary/95 hover:to-primary shadow-2xl hover:shadow-primary/25 transition-all duration-500 px-10 py-7 text-lg font-semibold group"
               >
-                <StopCircle className="h-5 w-5 mr-3" />
-                <span>Je veux que ça s'arrête maintenant</span>
+                <Heart className="h-5 w-5 mr-3" />
+                <span>Commencer maintenant</span>
                 
                 {/* Effet de brillance au hover */}
                 <motion.div
@@ -181,28 +181,28 @@ const EnrichedHeroSection: React.FC = () => {
             </Button>
           </motion.div>
 
-          {/* Indicateurs de confiance - réassurance sans jargon */}
+          {/* Indicateurs de confiance - réassurance santé */}
           <motion.div
             variants={itemVariants}
             className="flex flex-col sm:flex-row gap-8 justify-center items-center text-sm text-muted-foreground pt-10"
           >
             <div className="flex items-center space-x-2">
+              <div className="h-9 w-9 bg-primary/15 rounded-full flex items-center justify-center">
+                <GraduationCap className="h-4 w-4 text-primary" aria-hidden="true" />
+              </div>
+              <span>Étudiants en santé</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <div className="h-9 w-9 bg-emerald-500/15 rounded-full flex items-center justify-center">
+                <Stethoscope className="h-4 w-4 text-emerald-500" aria-hidden="true" />
+              </div>
+              <span>Soignants & internes</span>
+            </div>
+            <div className="flex items-center space-x-2">
               <div className="h-9 w-9 bg-green-500/15 rounded-full flex items-center justify-center">
                 <Shield className="h-4 w-4 text-green-500" aria-hidden="true" />
               </div>
-              <span>Tes données restent privées</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <div className="h-9 w-9 bg-blue-500/15 rounded-full flex items-center justify-center">
-                <Zap className="h-4 w-4 text-blue-500" aria-hidden="true" />
-              </div>
-              <span>Effet en moins de 2 minutes</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <div className="h-9 w-9 bg-purple-500/15 rounded-full flex items-center justify-center">
-                <Brain className="h-4 w-4 text-purple-500" aria-hidden="true" />
-              </div>
-              <span>Aucune explication nécessaire</span>
+              <span>100% confidentiel</span>
             </div>
           </motion.div>
 
