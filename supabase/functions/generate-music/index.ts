@@ -11,6 +11,7 @@ const GenerateMusicSchema = z.object({
   duration_seconds: z.number().int().min(30).max(180).default(60),
   style_preferences: z.array(z.string()).optional().default([]),
   session_id: z.string().uuid().optional(),
+  intensity: z.number().min(0).max(1).optional(),
 });
 
 serve(async (req) => {
@@ -40,14 +41,14 @@ serve(async (req) => {
       );
     }
 
-    const { emotion, target_energy, duration_seconds, style_preferences, session_id } = parsed.data;
+    const { emotion, target_energy, duration_seconds, style_preferences, session_id, intensity } = parsed.data;
 
     const { data, error } = await supabase
       .from('music_generation_queue')
       .insert({
         user_id: auth.user.id,
         emotion,
-        intensity: 0.5,
+        intensity: intensity ?? 0.5,
         user_context: `target_energy:${target_energy}`,
         mood: target_energy,
         status: 'pending',
