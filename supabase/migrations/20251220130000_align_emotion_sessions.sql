@@ -43,9 +43,10 @@ begin
   end loop;
 end $$;
 
+-- intensity is normalized from frontend 1–10 scale to 0.1–1.0
 alter table public.emotion_sessions
   add constraint emotion_sessions_intensity_check
-  check (intensity is null or (intensity between 0 and 1));
+  check (intensity is null or (intensity between 0.1 and 1));
 
 create index if not exists idx_emotion_sessions_user_date
   on public.emotion_sessions(user_id, created_at desc);
