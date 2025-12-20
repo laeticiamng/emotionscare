@@ -13,6 +13,17 @@ const AnalyzeEmotionSchema = z.object({
   selected_emotion: z.string().optional().nullable(),
   intensity: z.number().min(1).max(10),
   context_tags: z.array(z.string()).optional().default([]),
+}).superRefine((data, ctx) => {
+  if (data.input_type === 'text') {
+    const value = (data.raw_input ?? '').trim();
+    if (!value) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['raw_input'],
+        message: 'raw_input is required when input_type is "text".',
+      });
+    }
+  }
 });
 
 serve(async (req) => {
