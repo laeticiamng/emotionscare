@@ -85,7 +85,7 @@ export default function EmotionSessionHistoryPage() {
     if (filteredSessions.length > 0 && !filteredSessions.find(s => s.id === selectedId)) {
       setSelectedId(filteredSessions[0].id);
     }
-  }, [filteredSessions, selectedId]);
+  }, [filteredSessions]);
 
   const sessionPlan = useMemo(
     () => plans.find(plan => plan.session_id === selectedSession?.id) ?? null,
