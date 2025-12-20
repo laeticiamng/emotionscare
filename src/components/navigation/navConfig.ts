@@ -62,6 +62,16 @@ export const b2cNavItems: NavItem[] = [
     priority: 3
   },
   {
+    href: '/app/emotion-sessions',
+    title: 'Sessions Émotionnelles',
+    icon: Sparkles,
+    description: 'Résumé IA et actions immédiates',
+    badge: 'Nouveau',
+    roles: ['b2c'],
+    category: 'core',
+    priority: 4
+  },
+  {
     href: '/app/coach',
     title: 'Coach IA',
     icon: Brain,
@@ -69,7 +79,7 @@ export const b2cNavItems: NavItem[] = [
     badge: 'Premium',
     roles: ['b2c'],
     category: 'core',
-    priority: 4
+    priority: 5
   },
   {
     href: '/app/music',
@@ -169,6 +179,16 @@ export const b2bUserNavItems: NavItem[] = [
     priority: 3
   },
   {
+    href: '/app/emotion-sessions',
+    title: 'Sessions Émotionnelles',
+    icon: Sparkles,
+    description: 'Résumé IA et actions immédiates',
+    badge: 'Nouveau',
+    roles: ['b2b_user'],
+    category: 'core',
+    priority: 4
+  },
+  {
     href: '/app/coach',
     title: 'Coach IA',
     icon: Brain,
@@ -176,7 +196,7 @@ export const b2bUserNavItems: NavItem[] = [
     badge: 'Premium',
     roles: ['b2b_user'],
     category: 'core',
-    priority: 4
+    priority: 5
   },
   {
     href: '/app/music',
