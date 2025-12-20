@@ -96,6 +96,7 @@ export const requestMusicGeneration = async (params: {
   duration_seconds: number;
   style_preferences?: string[];
   session_id?: string;
+  intensity?: number;
 }) => {
   const { data, error } = await supabase.functions.invoke('generate-music', {
     body: params,

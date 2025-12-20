@@ -170,12 +170,16 @@ export default function EmotionSessionNewPage() {
   const handleMusicLaunch = async () => {
     if (!analysis) return;
     const emotionKey = analysis.primaryEmotion;
+    const userIntensity = form.getValues('intensity');
+    // Convert intensity from 1-10 scale to 0-1 scale for music generation
+    const normalizedIntensity = (userIntensity - 1) / 9;
     try {
       await requestMusicGeneration({
         emotion: emotionKey,
         target_energy: ENERGY_MAP[emotionKey] ?? 'calming',
         duration_seconds: 60,
         session_id: analysis.sessionId,
+        intensity: normalizedIntensity,
       });
       toast({
         title: 'Musique lancée',
