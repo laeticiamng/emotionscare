@@ -129,6 +129,12 @@ Retourne exactement ${baseRecommendations.length} descriptions, une pour chaque 
         });
         const content = response.choices[0]?.message?.content ?? '';
         const parsed = JSON.parse(content);
+        
+        // Validate that we have the expected structure
+        if (!parsed.descriptions || !Array.isArray(parsed.descriptions)) {
+          throw new Error('Invalid response structure from OpenAI');
+        }
+        
         recommendations = baseRecommendations.map((rec, index) => ({
           ...rec,
           description: parsed.descriptions[index] || `Action ${rec.title}`,
