@@ -81,6 +81,8 @@ create policy "emotion_plans_all_own"
   with check (auth.uid() = user_id);
 
 -- Optional compatibility: expose music_queue view for spec naming
+-- NOTE: After applying this migration, regenerate Supabase TypeScript types to include `suno_request_id`:
+--   supabase gen types typescript --project-id <project-id> > src/integrations/supabase/types.ts
 alter table public.music_generation_queue
   add column if not exists suno_request_id text;
 
