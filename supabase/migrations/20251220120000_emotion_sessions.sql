@@ -4,12 +4,12 @@ create table if not exists public.emotion_sessions (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users(id) on delete cascade,
   input_text text not null,
-  emotion text not null,
+  emotion text,
   intensity smallint not null check (intensity >= 1 and intensity <= 10),
-  ai_summary text not null,
-  ai_actions text[] not null,
-  music_prompt text not null,
-  light_recommendation text not null,
+  ai_summary text,
+  ai_actions text[],
+  music_prompt text,
+  light_recommendation text,
   created_at timestamptz not null default now()
 );
 
