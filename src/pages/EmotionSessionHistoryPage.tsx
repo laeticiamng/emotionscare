@@ -48,7 +48,8 @@ export default function EmotionSessionHistoryPage() {
         if (!isMounted) return;
         setSessions(data.sessions);
         setPlans(data.plans);
-        setSelectedId(data.sessions[0]?.id ?? null);
+        const firstSessionId = data.sessions.length > 0 ? data.sessions[0].id : null;
+        setSelectedId(firstSessionId);
       } catch (error) {
         if (!isMounted) return;
         setErrorMessage(
