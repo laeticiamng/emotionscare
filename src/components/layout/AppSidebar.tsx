@@ -41,6 +41,7 @@ const coreModules = [
   { title: 'Musique Adaptative', url: routes.b2c.music(), icon: Music },
   { title: 'AI Coach', url: routes.b2c.coach(), icon: MessageSquare },
   { title: 'Journal', url: routes.b2c.journal(), icon: BookOpen },
+  { title: 'Sessions Émotionnelles', url: routes.b2c.emotionSessions(), icon: Sparkles },
 ];
 
 const wellnessModules = [

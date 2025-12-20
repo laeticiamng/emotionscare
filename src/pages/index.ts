@@ -19,6 +19,8 @@ export { default as B2BRHDashboard } from './B2BRHDashboard';
 export { default as B2CScanPage } from './B2CScanPage';
 export { default as B2CAICoachPage } from './B2CAICoachPage';
 export { default as B2CJournalPage } from './B2CJournalPage';
+export { default as EmotionSessionNewPage } from './EmotionSessionNewPage';
+export { default as EmotionSessionHistoryPage } from './EmotionSessionHistoryPage';
 export { default as B2CVRBreathGuidePage } from './B2CVRBreathGuidePage';
 export { default as B2CVRGalaxyPage } from './B2CVRGalaxyPage';
 
