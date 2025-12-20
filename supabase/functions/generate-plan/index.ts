@@ -81,10 +81,7 @@ serve(async (req) => {
     const { session_id, emotion_analysis } = parsed.data;
     const baseRecommendations = getRecommendations(emotion_analysis.primary_emotion);
 
-    let recommendations = baseRecommendations.map(rec => ({
-      ...rec,
-      description: '',
-    }));
+    let recommendations;
 
     const openaiApiKey = Deno.env.get('OPENAI_API_KEY');
     if (openaiApiKey) {
