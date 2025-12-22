@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { logger } from '@/lib/logger';
 

@@ -1,7 +1,5 @@
-// @ts-nocheck
-
 import { useState, useRef, useEffect } from 'react';
-import { MusicTrack } from '@/types/music';
+import type { MusicTrack } from '@/types/music';
 import { logger } from '@/lib/logger';
 
 export const useMusicPlayer = () => {

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Gestionnaire Web Push avec VAPID et heures calmes
  */
@@ -74,9 +73,10 @@ class WebPushManager {
       }
 
       // S'abonner aux push
+      const appServerKey = this.urlBase64ToUint8Array(this.vapidPublicKey);
       const subscription = await this.registration.pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey: this.urlBase64ToUint8Array(this.vapidPublicKey)
+        applicationServerKey: appServerKey.buffer as ArrayBuffer
       });
 
       const subscriptionData: PushSubscriptionData = {
@@ -328,5 +328,7 @@ export const useWebPush = () => {
   };
 };
 
-// Nécessaire pour le hook
+// Imports React pour le hook (déplacés ici pour éviter des problèmes de hoisting)
 import { useState, useEffect } from 'react';
+
+export type { PushPreferences };

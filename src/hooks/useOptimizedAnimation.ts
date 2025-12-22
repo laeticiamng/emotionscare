@@ -1,6 +1,5 @@
-// @ts-nocheck
 import { useCallback, useMemo, useRef } from 'react';
-import { Variants } from 'framer-motion';
+import type { Variants } from 'framer-motion';
 
 export interface OptimizedAnimationConfig {
   enableComplexAnimations?: boolean;

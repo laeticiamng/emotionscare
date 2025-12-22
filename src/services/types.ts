@@ -1,4 +1,3 @@
-// @ts-nocheck
 // Types communs pour les services EmotionsCare
 
 export interface EmotionData {
@@ -6,7 +5,7 @@ export interface EmotionData {
   confidence: number;
   intensity: number;
   timestamp: Date;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface MusicRecommendation {
