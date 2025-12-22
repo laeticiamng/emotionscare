@@ -1,6 +1,5 @@
-// @ts-nocheck
 import { create } from 'zustand';
-import { persist } from './utils/createImmutableStore';
+import { persist } from 'zustand/middleware';
 import { createSelectors } from './utils/createSelectors';
 
 export interface StimulusSpec {

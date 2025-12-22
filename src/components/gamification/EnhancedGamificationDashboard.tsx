@@ -1,5 +1,4 @@
-// @ts-nocheck
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -420,7 +419,7 @@ export const EnhancedGamificationDashboard: React.FC = () => {
 
                     <div className="flex items-center justify-between text-xs text-muted-foreground">
                       <span>Expire le {new Date(challenge.expires_at).toLocaleDateString()}</span>
-                      <Badge variant="outline" size="sm">
+                      <Badge variant="outline" className="text-xs">
                         {challenge.difficulty}
                       </Badge>
                     </div>
@@ -460,7 +459,7 @@ export const EnhancedGamificationDashboard: React.FC = () => {
                     </div>
                     <div className="flex-1">
                       <h3 className="font-semibold">{achievement.name}</h3>
-                      <Badge variant="outline" size="sm">
+                      <Badge variant="outline" className="text-xs">
                         {achievement.rarity}
                       </Badge>
                     </div>
