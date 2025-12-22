@@ -81,15 +81,17 @@ const PremiumHome: React.FC = () => {
           </motion.div>
         )}
 
-        {/* Question principale */}
+        {/* Question principale - Accroche émotionnelle incarnée */}
         <motion.div variants={itemVariants} className="mb-10">
-          <h1 className="font-premium text-[clamp(1.75rem,5vw,2.5rem)] font-semibold leading-[1.15] tracking-tight text-foreground mb-3">
+          <h1 className="font-premium text-[clamp(1.75rem,5vw,2.5rem)] font-semibold leading-[1.15] tracking-tight text-foreground mb-4">
             Comment tu te sens,
             <br />
-            <span className="text-primary">maintenant ?</span>
+            <span className="text-primary">là, maintenant ?</span>
           </h1>
           <p className="text-base text-muted-foreground leading-relaxed max-w-sm">
-            Prends un instant. Ici, tu peux déposer ce qui te traverse, sans jugement.
+            Tu peux prendre ce moment pour toi.
+            <br />
+            <span className="text-muted-foreground/70">Rien n'est enregistré sans ton accord.</span>
           </p>
         </motion.div>
 
