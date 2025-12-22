@@ -23,12 +23,20 @@ export interface EmotionSessionRecord {
   created_at: string;
 }
 
+export interface EmotionRecommendation {
+  type: string;
+  title?: string;
+  description?: string;
+  priority?: number;
+  [key: string]: unknown;
+}
+
 export interface EmotionPlanRecord {
   id: string;
   session_id: string;
   user_id: string;
   plan_type: string;
-  recommendations: Array<Record<string, unknown>>;
+  recommendations: EmotionRecommendation[];
   status: string;
   created_at: string;
 }

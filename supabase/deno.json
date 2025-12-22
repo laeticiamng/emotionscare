@@ -8,6 +8,7 @@
     "noUnusedParameters": false,
     "skipLibCheck": true
   },
+  "nodeModulesDir": "auto",
   "lint": {
     "files": {
       "exclude": ["functions/**/*.test.ts"]
