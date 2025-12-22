@@ -166,16 +166,27 @@ const EmotionalInput: React.FC<EmotionalInputProps> = ({ onSubmit, isLoading = f
                   aria-label="Intensité de l'émotion"
                 />
                 
-                {/* Repères visuels */}
-                <div className="flex justify-between mt-3 text-xs text-muted-foreground">
-                  <span>Léger</span>
-                  <span>Modéré</span>
-                  <span>Intense</span>
+                {/* Repères visuels - plus visibles */}
+                <div className="flex justify-between mt-4 text-sm font-medium text-muted-foreground">
+                  <span className="flex flex-col items-start">
+                    <span className="text-primary/40 text-lg leading-none mb-1">•</span>
+                    <span>Léger</span>
+                  </span>
+                  <span className="flex flex-col items-center">
+                    <span className="text-primary/60 text-lg leading-none mb-1">••</span>
+                    <span>Modéré</span>
+                  </span>
+                  <span className="flex flex-col items-end">
+                    <span className="text-primary/80 text-lg leading-none mb-1">•••</span>
+                    <span>Intense</span>
+                  </span>
                 </div>
                 
-                {/* Micro-texte discret */}
-                <p className="mt-4 text-xs text-muted-foreground/70 text-center italic">
-                  Fais confiance à ton ressenti du moment.
+                {/* Micro-texte empathique - NOUVEAU */}
+                <p className="mt-5 text-sm text-muted-foreground text-center leading-relaxed">
+                  C'est normal de ressentir comme ça.
+                  <br />
+                  <span className="text-muted-foreground/70">Choisis ce qui te parle.</span>
                 </p>
               </div>
             </motion.div>
