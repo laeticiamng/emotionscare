@@ -1,5 +1,4 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import "https://deno.land/x/xhr@0.1.0/mod.ts"
 import { authenticateRequest } from '../_shared/auth-middleware.ts';
 import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
 import { validateRequest, createErrorResponse, OpenAIChatRequestSchema } from '../_shared/validation.ts';
@@ -28,7 +27,7 @@ serve(async (req) => {
       userId: authResult.user.id,
       limit: 10,
       windowMs: 60_000,
-      description: 'OpenAI chat completions'
+      description: 'Lovable AI chat completions'
     });
 
     if (!rateLimit.allowed) {
@@ -47,25 +46,42 @@ serve(async (req) => {
 
     const { messages } = validation.data as { messages: Array<{role: string, content: string}> };
 
-    const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY')
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY')
 
-    if (!OPENAI_API_KEY) {
-      throw new Error('OpenAI API key not configured')
+    if (!LOVABLE_API_KEY) {
+      throw new Error('LOVABLE_API_KEY not configured')
     }
 
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${OPENAI_API_KEY}`,
+        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini', // Modèle rapide et économique
+        model: 'google/gemini-2.5-flash',
         messages: messages,
         max_tokens: 1000,
-        temperature: 0.7,
       }),
     })
+
+    if (!response.ok) {
+      if (response.status === 429) {
+        return new Response(
+          JSON.stringify({ error: 'Limite de requêtes atteinte. Réessayez plus tard.' }),
+          { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      if (response.status === 402) {
+        return new Response(
+          JSON.stringify({ error: 'Crédits insuffisants. Veuillez recharger.' }),
+          { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      const errorText = await response.text();
+      console.error('[openai-chat] AI gateway error:', response.status, errorText);
+      throw new Error(`AI gateway error: ${response.status}`);
+    }
 
     const data = await response.json()
     
@@ -75,7 +91,7 @@ serve(async (req) => {
     )
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error'
-    console.error('OpenAI chat error:', errorMessage)
+    console.error('[openai-chat] Error:', errorMessage)
     return new Response(
       JSON.stringify({ error: errorMessage }),
       { 

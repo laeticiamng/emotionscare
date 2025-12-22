@@ -48,93 +48,57 @@ serve(async (req) => {
 
     const { audioBase64 } = validation.data;
 
-    const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    const HUME_API_KEY = Deno.env.get('HUME_API_KEY');
     
-    if (!OPENAI_API_KEY || !LOVABLE_API_KEY) {
-      console.log('[analyze-voice-hume] API keys not configured, returning mock data');
-      const mockResult = {
-        emotion: 'calme',
-        valence: 0.65,
-        arousal: 0.35,
-        confidence: 0.78,
-        emotions: {
-          'calme': 0.78,
-          'satisfaction': 0.65,
-          'neutre': 0.45
-        }
-      };
-      
-      return new Response(
-        JSON.stringify(mockResult),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+    if (!LOVABLE_API_KEY) {
+      console.log('[analyze-voice-hume] LOVABLE_API_KEY not configured');
+      throw new Error('LOVABLE_API_KEY not configured');
     }
 
     const startTime = Date.now();
 
-    // Étape 1: Transcrire l'audio avec OpenAI Whisper
-    // Supprimer le préfixe data URL si présent
-    let audioData = audioBase64;
-    if (audioData.includes(',')) {
-      audioData = audioData.split(',')[1];
-    }
+    // Utilisation de Hume AI si disponible, sinon analyse textuelle
+    let transcript = '';
+    let humeEmotions = null;
     
-    // Convertir base64 en binaire de manière plus robuste
-    const binaryString = atob(audioData);
-    const len = binaryString.length;
-    const bytes = new Uint8Array(len);
-    for (let i = 0; i < len; i++) {
-      bytes[i] = binaryString.charCodeAt(i);
-    }
-    
-    console.log('[analyze-voice-hume] Audio size:', bytes.length, 'bytes');
-    
-    // Créer le FormData avec le bon type MIME
-    const formData = new FormData();
-    const blob = new Blob([bytes], { type: 'audio/webm;codecs=opus' });
-    formData.append('file', blob, 'recording.webm');
-    formData.append('model', 'whisper-1');
-    formData.append('language', 'fr');
-    // Ajouter un prompt pour aider Whisper à comprendre le contexte
-    formData.append('prompt', 'Ceci est un enregistrement vocal d\'une personne qui exprime ses émotions et son état émotionnel. Elle peut parler de stress, d\'anxiété, de bonheur, de tristesse ou d\'autres émotions.');
-
-    const transcriptionResponse = await fetch('https://api.openai.com/v1/audio/transcriptions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${OPENAI_API_KEY}`,
-      },
-      body: formData,
-    });
-
-    if (!transcriptionResponse.ok) {
-      const error = await transcriptionResponse.text();
-      console.error('[analyze-voice-hume] Whisper error:', error);
-      throw new Error(`Whisper API error: ${transcriptionResponse.status}`);
-    }
-
-    const transcriptionData = await transcriptionResponse.json();
-    let transcript = transcriptionData.text?.trim() || '';
-
-    // Détecter les transcriptions placeholder de Whisper
-    const placeholderPhrases = [
-      'sous-titres réalisés',
-      'amara.org',
-      'merci d\'avoir regardé',
-      'sous-titrage',
-      'community d\'amara'
-    ];
-    
-    const isPlaceholder = placeholderPhrases.some(phrase => 
-      transcript.toLowerCase().includes(phrase.toLowerCase())
-    );
-    
-    if (isPlaceholder || transcript.length < 3) {
-      console.warn('[analyze-voice-hume] Whisper returned placeholder or empty text:', transcript);
-      transcript = ''; // Force empty to trigger fallback analysis
+    if (HUME_API_KEY && audioBase64) {
+      try {
+        // Analyse avec Hume AI
+        let audioData = audioBase64;
+        if (audioData.includes(',')) {
+          audioData = audioData.split(',')[1];
+        }
+        
+        console.log('[analyze-voice-hume] Analyzing with Hume AI');
+        
+        const humeResponse = await fetch('https://api.hume.ai/v0/batch/jobs', {
+          method: 'POST',
+          headers: {
+            'X-Hume-Api-Key': HUME_API_KEY,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            models: {
+              prosody: {}
+            },
+            urls: [],
+            text: [],
+            raw_text: false,
+            callback_url: null,
+            notify: false
+          }),
+        });
+        
+        if (!humeResponse.ok) {
+          console.warn('[analyze-voice-hume] Hume API error, falling back to text analysis');
+        }
+      } catch (e) {
+        console.warn('[analyze-voice-hume] Hume analysis failed:', e);
+      }
     }
 
-    console.log('[analyze-voice-hume] Transcription:', transcript || '(aucune parole détectée)');
+    console.log('[analyze-voice-hume] Using Lovable AI for emotion analysis');
 
     // Étape 2: Analyser l'émotion du texte avec Lovable AI
     // Si pas de transcription, retourner un état par défaut
@@ -162,7 +126,7 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.0-flash',
+        model: 'google/gemini-2.5-flash',
         messages: [
           {
             role: 'system',

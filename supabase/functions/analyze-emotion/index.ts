@@ -1,6 +1,6 @@
 // @ts-nocheck
+// Migrated to Lovable AI Gateway
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
-import OpenAI from 'https://deno.land/x/openai@v4.28.0/mod.ts';
 import { authenticateRequest } from '../_shared/auth-middleware.ts';
 import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
 import { supabase } from '../_shared/supa_client.ts';
@@ -71,22 +71,12 @@ serve(async (req) => {
     const start = Date.now();
     const { input_type, raw_input, selected_emotion, intensity, context_tags } = parsed.data;
 
-    const openaiApiKey = Deno.env.get('OPENAI_API_KEY');
-    if (!openaiApiKey) {
-      throw new Error('OPENAI_API_KEY not configured');
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    if (!LOVABLE_API_KEY) {
+      throw new Error('LOVABLE_API_KEY not configured');
     }
 
-    const openai = new OpenAI({ apiKey: openaiApiKey });
-    const systemPrompt = `Tu es un analyste émotionnel EmotionsCare. Analyse un input utilisateur et réponds STRICTEMENT en JSON :
-{
-  "detected_emotions": [
-    {"label": "anxiété", "intensity": 0.7, "confidence": 0.9, "valence": -0.4}
-  ],
-  "primary_emotion": "anxiété",
-  "valence": -0.4,
-  "arousal": 0.7,
-  "summary": "Je détecte principalement..."
-}
+    const systemPrompt = `Tu es un analyste émotionnel EmotionsCare. Analyse un input utilisateur.
 Contraintes: pas de diagnostic médical, langage "je détecte". Intensité 0..1. Valence -1..1. Arousal 0..1.`;
 
     const userPrompt = `Input type: ${input_type}
@@ -95,22 +85,85 @@ Texte: ${raw_input}
 Intensité déclarée (1-10): ${intensity}
 Contexte: ${context_tags.join(', ')}`;
 
-    const response = await openai.chat.completions.create({
-      model: 'gpt-4.1',
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userPrompt },
-      ],
-      temperature: 0.2,
-      max_tokens: 500,
+    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'google/gemini-2.5-flash',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt },
+        ],
+        tools: [
+          {
+            type: 'function',
+            function: {
+              name: 'analyze_emotion_result',
+              description: 'Retourne l\'analyse émotionnelle',
+              parameters: {
+                type: 'object',
+                properties: {
+                  detected_emotions: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      properties: {
+                        label: { type: 'string' },
+                        intensity: { type: 'number', minimum: 0, maximum: 1 },
+                        confidence: { type: 'number', minimum: 0, maximum: 1 },
+                        valence: { type: 'number', minimum: -1, maximum: 1 }
+                      },
+                      required: ['label', 'intensity', 'confidence', 'valence']
+                    }
+                  },
+                  primary_emotion: { type: 'string' },
+                  valence: { type: 'number', minimum: -1, maximum: 1 },
+                  arousal: { type: 'number', minimum: 0, maximum: 1 },
+                  summary: { type: 'string' }
+                },
+                required: ['detected_emotions', 'primary_emotion', 'valence', 'arousal', 'summary'],
+                additionalProperties: false
+              }
+            }
+          }
+        ],
+        tool_choice: { type: 'function', function: { name: 'analyze_emotion_result' } }
+      }),
     });
 
-    const content = response.choices[0]?.message?.content ?? '{}';
+    if (!response.ok) {
+      if (response.status === 429) {
+        return new Response(JSON.stringify({ error: 'Rate limit exceeded' }), {
+          status: 429,
+          headers: { 'Content-Type': 'application/json', ...cors.headers }
+        });
+      }
+      if (response.status === 402) {
+        return new Response(JSON.stringify({ error: 'Payment required' }), {
+          status: 402,
+          headers: { 'Content-Type': 'application/json', ...cors.headers }
+        });
+      }
+      const errorText = await response.text();
+      console.error('[analyze-emotion] AI gateway error:', response.status, errorText);
+      throw new Error(`AI gateway error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
+    
     let analysis;
-    try {
-      analysis = JSON.parse(content);
-    } catch {
-      analysis = { detected_emotions: [], primary_emotion: selected_emotion ?? 'neutral', valence: 0, arousal: 0.3, summary: content };
+    if (toolCall) {
+      try {
+        analysis = JSON.parse(toolCall.function.arguments);
+      } catch {
+        analysis = { detected_emotions: [], primary_emotion: selected_emotion ?? 'neutral', valence: 0, arousal: 0.3, summary: 'Analyse non disponible' };
+      }
+    } else {
+      analysis = { detected_emotions: [], primary_emotion: selected_emotion ?? 'neutral', valence: 0, arousal: 0.3, summary: 'Analyse non disponible' };
     }
 
     const detected = Array.isArray(analysis.detected_emotions) ? analysis.detected_emotions : [];
@@ -130,7 +183,7 @@ Contexte: ${context_tags.join(', ')}`;
         valence: analysis.valence ?? 0,
         arousal: analysis.arousal ?? 0.3,
         context_tags,
-        ai_model_version: response.model ?? 'gpt-4.1',
+        ai_model_version: 'google/gemini-2.5-flash',
         processing_time_ms: processingTime,
       })
       .select()
@@ -148,7 +201,7 @@ Contexte: ${context_tags.join(', ')}`;
         valence: analysis.valence ?? 0,
         arousal: analysis.arousal ?? 0.3,
         summary: analysis.summary ?? 'Analyse disponible.',
-        modelVersion: response.model ?? 'gpt-4.1',
+        modelVersion: 'google/gemini-2.5-flash',
       }),
       { headers: { 'Content-Type': 'application/json', ...cors.headers } },
     );
