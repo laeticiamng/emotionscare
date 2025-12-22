@@ -1,8 +1,7 @@
-// @ts-nocheck
 import { create } from 'zustand';
 import { persist } from './utils/createImmutableStore';
 import { createSelectors } from './utils/createSelectors';
-import { UserCollection, Reward, RewardType } from '@/types/rewards';
+import type { UserCollection, Reward, RewardType } from '@/types/rewards';
 
 interface CollectionState {
   collection: UserCollection;

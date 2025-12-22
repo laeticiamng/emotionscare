@@ -1,7 +1,5 @@
-// @ts-nocheck
-
 import { create } from 'zustand';
-import { GlowWeek, GlowBreathState } from '@/types/glow';
+import type { GlowBreathState } from '@/types/glow';
 
 const CACHE_DURATION = 600_000; // 10 minutes
 

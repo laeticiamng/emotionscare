@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { create } from 'zustand';
 import { persist } from './utils/createImmutableStore';
 import { createSelectors } from './utils/createSelectors';
@@ -96,6 +95,8 @@ const useVRBreathStoreBase = create<VRBreathState>()(
   )
 );
 
+export const useVRBreathStore = createSelectors(useVRBreathStoreBase);
+
 // Detect reduced motion preference
 if (typeof window !== 'undefined') {
   const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -108,5 +109,3 @@ if (typeof window !== 'undefined') {
     useVRBreathStore.getState().setReduceMotion(e.matches);
   });
 }
-
-export const useVRBreathStore = createSelectors(useVRBreathStoreBase);
