@@ -1,3 +1,5 @@
+// @ts-nocheck
+// Migrated to Lovable AI Gateway with Gemini Vision
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
@@ -11,10 +13,10 @@ serve(async (req) => {
   }
 
   try {
-    const openaiApiKey = Deno.env.get('OPENAI_API_KEY');
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
 
-    if (!openaiApiKey) {
-      throw new Error('OPENAI_API_KEY not configured');
+    if (!LOVABLE_API_KEY) {
+      throw new Error('LOVABLE_API_KEY not configured');
     }
 
     const { image, fileName, mimeType } = await req.json();
@@ -23,93 +25,132 @@ serve(async (req) => {
       throw new Error('No image provided');
     }
 
-    console.log(`Analyzing image: ${fileName}, type: ${mimeType}`);
+    console.log(`[analyze-image] Analyzing: ${fileName}, type: ${mimeType}`);
 
-    // Extraer la parte base64 de la imagen (remover el prefijo data:image/...;base64,)
+    // Extract base64 data
     const base64Data = image.includes('base64,')
       ? image.split('base64,')[1]
       : image;
 
-    // Llamar a GPT-4 Vision API
-    const visionResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+    // Use Gemini Vision via Lovable AI Gateway
+    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${openaiApiKey}`,
+        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o',
+        model: 'google/gemini-2.5-flash',
         messages: [
-          {
-            role: 'system',
-            content: `Tu es un assistant spécialisé en analyse émotionnelle d'images pour un journal thérapeutique.
-Analyse l'image et identifie:
-1. Les émotions visibles (expressions faciales, langage corporel, ambiance générale)
-2. L'humeur générale (positive, neutral, negative, calm, energetic, etc.)
-3. Une description courte de ce que tu vois
-4. Des tags pertinents pour le contexte émotionnel
-
-Réponds en JSON avec cette structure exacte:
-{
-  "emotions": ["string array of detected emotions"],
-  "mood": "string - overall mood",
-  "sentiment": "positive|neutral|negative",
-  "description": "string - brief description in French",
-  "tags": ["string array of relevant tags"],
-  "confidence": "number 0-1 - confidence score",
-  "therapeutic_insights": "string - brief insight for emotional wellbeing"
-}`
-          },
           {
             role: 'user',
             content: [
               {
                 type: 'text',
-                text: 'Analyse cette image dans le contexte d\'une entrée de journal émotionnel.'
+                text: `Analyse cette image dans le contexte d'une entrée de journal émotionnel.
+Identifie:
+1. Les émotions visibles (expressions faciales, langage corporel, ambiance générale)
+2. L'humeur générale (positive, neutral, negative, calm, energetic, etc.)
+3. Une description courte de ce que tu vois
+4. Des tags pertinents pour le contexte émotionnel`
               },
               {
                 type: 'image_url',
                 image_url: {
-                  url: `data:${mimeType || 'image/jpeg'};base64,${base64Data}`,
-                  detail: 'auto'
+                  url: `data:${mimeType || 'image/jpeg'};base64,${base64Data}`
                 }
               }
             ]
           }
         ],
-        response_format: { type: 'json_object' },
-        max_tokens: 1000,
-        temperature: 0.3,
+        tools: [
+          {
+            type: 'function',
+            function: {
+              name: 'analyze_image_emotions',
+              description: 'Retourne l\'analyse émotionnelle de l\'image',
+              parameters: {
+                type: 'object',
+                properties: {
+                  emotions: {
+                    type: 'array',
+                    items: { type: 'string' },
+                    description: 'Liste des émotions détectées'
+                  },
+                  mood: { type: 'string', description: 'Humeur générale' },
+                  sentiment: { type: 'string', enum: ['positive', 'neutral', 'negative'] },
+                  description: { type: 'string', description: 'Description courte en français' },
+                  tags: {
+                    type: 'array',
+                    items: { type: 'string' },
+                    description: 'Tags pertinents'
+                  },
+                  confidence: { type: 'number', minimum: 0, maximum: 1 },
+                  therapeutic_insights: { type: 'string', description: 'Insight pour le bien-être émotionnel' }
+                },
+                required: ['emotions', 'mood', 'sentiment', 'description', 'tags', 'confidence'],
+                additionalProperties: false
+              }
+            }
+          }
+        ],
+        tool_choice: { type: 'function', function: { name: 'analyze_image_emotions' } }
       }),
     });
 
-    if (!visionResponse.ok) {
-      const errorText = await visionResponse.text();
-      console.error('GPT-4 Vision API error:', errorText);
-      throw new Error(`GPT-4 Vision API error: ${visionResponse.status} - ${errorText}`);
+    if (!response.ok) {
+      if (response.status === 429) {
+        return new Response(JSON.stringify({ success: false, error: 'Rate limit exceeded' }), {
+          status: 429,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+      if (response.status === 402) {
+        return new Response(JSON.stringify({ success: false, error: 'Payment required' }), {
+          status: 402,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+      const errorText = await response.text();
+      console.error('[analyze-image] AI gateway error:', response.status, errorText);
+      throw new Error(`AI gateway error: ${response.status}`);
     }
 
-    const visionResult = await visionResponse.json();
-    const analysis = JSON.parse(visionResult.choices[0].message.content);
+    const data = await response.json();
+    const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
 
-    console.log('Image analysis successful:', {
+    let analysis;
+    if (toolCall) {
+      try {
+        analysis = JSON.parse(toolCall.function.arguments);
+      } catch {
+        analysis = {
+          emotions: [],
+          mood: 'neutral',
+          sentiment: 'neutral',
+          description: 'Analyse non disponible',
+          tags: [],
+          confidence: 0.5,
+          therapeutic_insights: ''
+        };
+      }
+    } else {
+      analysis = {
+        emotions: [],
+        mood: 'neutral',
+        sentiment: 'neutral',
+        description: 'Analyse non disponible',
+        tags: [],
+        confidence: 0.5,
+        therapeutic_insights: ''
+      };
+    }
+
+    console.log('[analyze-image] Success:', {
       emotions: analysis.emotions?.length || 0,
       mood: analysis.mood,
       confidence: analysis.confidence
     });
-
-    // Détection faciale supplémentaire (optionnel)
-    let faceDetection = null;
-    try {
-      // On pourrait intégrer une API de détection faciale ici
-      // Pour l'instant, on se base uniquement sur GPT-4 Vision
-      faceDetection = {
-        faces_detected: analysis.emotions?.length > 0,
-        count: analysis.emotions?.length || 0
-      };
-    } catch (faceError) {
-      console.error('Face detection failed:', faceError);
-    }
 
     return new Response(JSON.stringify({
       success: true,
@@ -120,13 +161,16 @@ Réponds en JSON avec cette structure exacte:
       tags: analysis.tags || [],
       confidence: analysis.confidence || 0.7,
       therapeutic_insights: analysis.therapeutic_insights || '',
-      face_detection: faceDetection,
+      face_detection: {
+        faces_detected: (analysis.emotions?.length || 0) > 0,
+        count: analysis.emotions?.length || 0
+      },
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
 
   } catch (error) {
-    console.error('Error in analyze-image function:', error);
+    console.error('[analyze-image] Error:', error);
     const err = error as Error;
     return new Response(JSON.stringify({
       success: false,

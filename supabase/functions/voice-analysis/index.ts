@@ -1,11 +1,8 @@
 // @ts-nocheck  
 // Note: ESM imports don't provide TypeScript types in Deno
-// Types améliorés avec gestion d'erreurs appropriée
+// Migrated to Lovable AI Gateway
 
-import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-
-const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -18,61 +15,111 @@ serve(async (req) => {
   }
 
   try {
-    const { audio } = await req.json();
+    const { audio, text } = await req.json();
     
-    if (!audio) {
-      throw new Error('No audio data provided');
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+
+    if (!LOVABLE_API_KEY) {
+      throw new Error('LOVABLE_API_KEY not configured');
     }
 
-    if (!openAIApiKey) {
-      // Fallback when no API key is available
+    // Si on a du texte, on analyse directement
+    if (text) {
+      const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'google/gemini-2.5-flash',
+          messages: [
+            {
+              role: 'system',
+              content: 'Tu es un assistant qui analyse la voix et retourne le texte transcrit avec le niveau de confiance.'
+            },
+            {
+              role: 'user',
+              content: `Analyse ce texte vocal et identifie les émotions: "${text}"`
+            }
+          ],
+          tools: [
+            {
+              type: 'function',
+              function: {
+                name: 'voice_analysis_result',
+                description: 'Retourne le résultat de l\'analyse vocale',
+                parameters: {
+                  type: 'object',
+                  properties: {
+                    text: { type: 'string', description: 'Texte transcrit ou analysé' },
+                    confidence: { type: 'number', minimum: 0, maximum: 1, description: 'Niveau de confiance' },
+                    emotions: {
+                      type: 'object',
+                      description: 'Émotions détectées avec leurs scores',
+                      additionalProperties: { type: 'number' }
+                    }
+                  },
+                  required: ['text', 'confidence'],
+                  additionalProperties: false
+                }
+              }
+            }
+          ],
+          tool_choice: { type: 'function', function: { name: 'voice_analysis_result' } }
+        }),
+      });
+
+      if (!response.ok) {
+        if (response.status === 429) {
+          return new Response(JSON.stringify({ error: 'Rate limit exceeded' }), {
+            status: 429,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          });
+        }
+        if (response.status === 402) {
+          return new Response(JSON.stringify({ error: 'Payment required' }), {
+            status: 402,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          });
+        }
+        throw new Error(`AI gateway error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
+      
+      if (toolCall) {
+        const result = JSON.parse(toolCall.function.arguments);
+        return new Response(
+          JSON.stringify(result),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      return new Response(
+        JSON.stringify({ text, confidence: 0.85 }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Pour l'audio sans texte, retourner un placeholder
+    if (audio) {
       return new Response(
         JSON.stringify({ 
-          text: "Transcription simulée : L'utilisateur a exprimé ses émotions via un enregistrement vocal.",
-          confidence: 0.95 
+          text: "Enregistrement vocal reçu. L'analyse audio nécessite un service de transcription.",
+          confidence: 0.5,
+          note: "Transcription audio non disponible sans OpenAI Whisper"
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // Convert base64 to binary
-    const binaryAudio = Uint8Array.from(atob(audio), c => c.charCodeAt(0));
-    
-    // Prepare form data for OpenAI Whisper
-    const formData = new FormData();
-    const blob = new Blob([binaryAudio], { type: 'audio/webm' });
-    formData.append('file', blob, 'audio.webm');
-    formData.append('model', 'whisper-1');
-    formData.append('language', 'fr');
-
-    // Send to OpenAI Whisper
-    const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${openAIApiKey}`,
-      },
-      body: formData,
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('OpenAI API error:', errorText);
-      throw new Error(`OpenAI API error: ${response.status}`);
-    }
-
-    const result = await response.json();
-
-    return new Response(
-      JSON.stringify({ 
-        text: result.text,
-        confidence: 0.95 
-      }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+    throw new Error('No audio or text data provided');
 
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error'
-    console.error('Error in voice-analysis:', error)
+    console.error('[voice-analysis] Error:', errorMessage)
     return new Response(
       JSON.stringify({ error: errorMessage }),
       {
