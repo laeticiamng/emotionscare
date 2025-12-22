@@ -12,11 +12,11 @@ interface AnalysisTransitionProps {
   duration?: number;
 }
 
+// Messages uniques, calmes et humains - pas techniques
 const SOOTHING_MESSAGES = [
-  "Je prends le temps de comprendre...",
-  "J'analyse ton état émotionnel...",
-  "Je prépare des recommandations adaptées...",
-  "Ton bien-être est ma priorité...",
+  "Merci de m'avoir partagé ça.",
+  "Je prends un instant pour comprendre ce que tu ressens…",
+  "J'écoute, tranquillement.",
 ];
 
 const AnalysisTransition: React.FC<AnalysisTransitionProps> = ({

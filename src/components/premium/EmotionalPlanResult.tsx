@@ -102,8 +102,18 @@ const EmotionalPlanResult: React.FC<EmotionalPlanResultProps> = ({
       animate="visible"
     >
       <div className="container-mobile pt-8">
-        {/* Section 1: Résumé émotionnel */}
+        {/* Transition d'accueil vers le plan */}
+        <motion.div variants={itemVariants} className="mb-6">
+          <p className="text-sm text-primary/80 font-medium">
+            Voilà ce que je te propose, tranquillement.
+          </p>
+        </motion.div>
+
+        {/* Section 1: Résumé émotionnel - Validation */}
         <motion.section variants={itemVariants} className="mb-8">
+          <p className="text-xs uppercase tracking-wider text-muted-foreground/70 mb-3">
+            Ce que je comprends de ce que tu ressens
+          </p>
           <div className="p-6 bg-gradient-to-br from-primary/5 to-primary/10 rounded-3xl border border-primary/10">
             <div className="flex items-start gap-4">
               <div className="w-12 h-12 rounded-2xl bg-primary/20 flex items-center justify-center flex-shrink-0">
@@ -126,6 +136,9 @@ const EmotionalPlanResult: React.FC<EmotionalPlanResultProps> = ({
 
         {/* Section 2: Actions immédiates */}
         <motion.section variants={itemVariants} className="mb-8">
+          <p className="text-xs uppercase tracking-wider text-muted-foreground/70 mb-2">
+            Tu peux essayer maintenant
+          </p>
           <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
             <Clock className="h-4 w-4 text-muted-foreground" />
             Actions immédiates
@@ -154,38 +167,46 @@ const EmotionalPlanResult: React.FC<EmotionalPlanResultProps> = ({
           </div>
         </motion.section>
 
-        {/* Section 3: Recommandation musique - "Moment à soi" */}
+        {/* Section 3: Musique - Présentée comme un cadeau, un espace refuge */}
         {recommendations.music && (
           <motion.section variants={itemVariants} className="mb-8">
+            <p className="text-xs uppercase tracking-wider text-muted-foreground/70 mb-2">
+              Pour prolonger ce moment
+            </p>
             <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
               <Headphones className="h-4 w-4 text-muted-foreground" />
-              Un moment rien que pour toi
+              Un espace rien que pour toi
             </h3>
             
-            <div className="p-5 bg-gradient-to-r from-indigo-50 to-violet-50 dark:from-indigo-950/30 dark:to-violet-950/30 rounded-2xl border border-indigo-100 dark:border-indigo-900/50">
+            {/* Carte musique mise en valeur comme un cadeau */}
+            <div className="p-6 bg-gradient-to-br from-indigo-50 via-violet-50 to-purple-50 dark:from-indigo-950/40 dark:via-violet-950/30 dark:to-purple-950/20 rounded-3xl border border-indigo-100/80 dark:border-indigo-900/50 shadow-lg shadow-indigo-500/5">
               <div className="flex items-center gap-4">
-                {/* Cover placeholder */}
-                <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-indigo-400 to-violet-500 flex items-center justify-center shadow-lg">
-                  <Music className="h-7 w-7 text-white" />
+                {/* Cover avec effet premium */}
+                <div className="relative">
+                  <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-indigo-400 via-violet-500 to-purple-600 flex items-center justify-center shadow-xl shadow-violet-500/30">
+                    <Music className="h-8 w-8 text-white" />
+                  </div>
+                  {/* Halo subtil */}
+                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/20 to-transparent pointer-events-none" />
                 </div>
                 
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium text-foreground truncate">{recommendations.music.title}</p>
+                  <p className="font-semibold text-foreground truncate text-base">{recommendations.music.title}</p>
                   <p className="text-sm text-muted-foreground truncate">{recommendations.music.artist}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">{recommendations.music.duration}</p>
+                  <p className="text-xs text-muted-foreground/70 mt-1">{recommendations.music.duration}</p>
                 </div>
-                
-                {/* Play button */}
-                <Button 
-                  size="icon" 
-                  className="h-12 w-12 rounded-full shadow-lg shadow-primary/20"
-                >
-                  <Play className="h-5 w-5 ml-0.5" />
-                </Button>
               </div>
               
-              <p className="text-xs text-muted-foreground mt-4 italic">
-                Cette musique a été sélectionnée pour t'accompagner vers le calme.
+              {/* CTA principal pour la musique */}
+              <Button 
+                className="w-full mt-5 h-12 rounded-xl shadow-md shadow-primary/15 gap-2"
+              >
+                <Play className="h-4 w-4" />
+                Prendre quelques minutes pour moi
+              </Button>
+              
+              <p className="text-xs text-center text-muted-foreground/60 mt-4 italic">
+                Sélectionnée pour t'accompagner vers le calme.
               </p>
             </div>
           </motion.section>

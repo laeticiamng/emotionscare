@@ -30,7 +30,7 @@ const EMOTIONS = [
   { id: 'neutral', label: 'Neutre', emoji: '😐', color: 'bg-gray-100 dark:bg-gray-900/30 border-gray-200 dark:border-gray-800' },
 ];
 
-const INTENSITY_LABELS = ['Légère', 'Modérée', 'Forte', 'Intense'];
+const INTENSITY_LABELS = ['Léger', 'Modéré', 'Intense'];
 
 const EmotionalInput: React.FC<EmotionalInputProps> = ({ onSubmit, isLoading = false }) => {
   const [text, setText] = useState('');
@@ -66,17 +66,20 @@ const EmotionalInput: React.FC<EmotionalInputProps> = ({ onSubmit, isLoading = f
       animate="visible"
     >
       <div className="container-mobile pt-8">
-        {/* Header */}
+        {/* Header - Transition d'accueil */}
         <motion.header variants={itemVariants} className="mb-8">
+          <p className="text-sm text-primary/80 font-medium mb-2">
+            Merci d'être là.
+          </p>
           <h1 className="font-premium text-2xl font-semibold text-foreground mb-2">
             Qu'est-ce qui te traverse ?
           </h1>
           <p className="text-muted-foreground text-sm leading-relaxed">
-            Exprime-toi librement. Cet espace t'appartient.
+            Cet espace est à toi. Rien ne presse.
           </p>
         </motion.header>
 
-        {/* Zone de texte - Espace de dépose */}
+        {/* Zone de texte - Espace de dépose émotionnelle */}
         <motion.div variants={itemVariants} className="mb-8">
           <label className="block text-sm font-medium text-foreground mb-3">
             Dépose tes mots ici
@@ -85,7 +88,7 @@ const EmotionalInput: React.FC<EmotionalInputProps> = ({ onSubmit, isLoading = f
             <textarea
               value={text}
               onChange={(e) => setText(e.target.value)}
-              placeholder="Ce que tu ressens, ce qui te pèse, ce qui tourne dans ta tête..."
+              placeholder="Dis-moi ce qui te traverse, avec tes mots…"
               className="textarea-emotional w-full min-h-[160px] resize-none"
               maxLength={1000}
             />
@@ -94,10 +97,13 @@ const EmotionalInput: React.FC<EmotionalInputProps> = ({ onSubmit, isLoading = f
             </div>
           </div>
           
-          {/* Microcopy rassurant */}
-          <div className="flex items-center gap-1.5 mt-3 text-xs text-muted-foreground/70">
+          {/* Microcopy rassurant - Plus humain */}
+          <p className="mt-3 text-xs text-muted-foreground/70 italic">
+            Tu n'as rien à prouver. Écris comme tu veux.
+          </p>
+          <div className="flex items-center gap-1.5 mt-2 text-xs text-muted-foreground/60">
             <Lock className="h-3 w-3" />
-            <span>Ces mots restent confidentiels et ne sont jamais partagés.</span>
+            <span>Confidentiel — jamais partagé.</span>
           </div>
         </motion.div>
 
@@ -173,9 +179,20 @@ const EmotionalInput: React.FC<EmotionalInputProps> = ({ onSubmit, isLoading = f
                   aria-label="Intensité de l'émotion"
                 />
                 
-                <div className="flex justify-between mt-2 text-xs text-muted-foreground">
-                  <span>Légère</span>
-                  <span>Intense</span>
+                {/* Repères visuels émotionnels */}
+                <div className="flex justify-between mt-3 text-xs text-muted-foreground">
+                  <span className="flex flex-col items-start">
+                    <span className="text-lg mb-0.5">·</span>
+                    <span>Léger</span>
+                  </span>
+                  <span className="flex flex-col items-center">
+                    <span className="text-lg mb-0.5">··</span>
+                    <span>Modéré</span>
+                  </span>
+                  <span className="flex flex-col items-end">
+                    <span className="text-lg mb-0.5">···</span>
+                    <span>Intense</span>
+                  </span>
                 </div>
               </div>
             </motion.div>
