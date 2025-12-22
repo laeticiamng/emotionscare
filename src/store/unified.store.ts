@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Unified Store - Centralizes all application state
  * Replaces redundant contexts with a single Zustand store
@@ -10,10 +9,46 @@ import { persist } from './utils/createImmutableStore';
 import { createSelectors } from './utils/createSelectors';
 import { logger } from '@/lib/logger';
 
+// Generic types for store entities
+interface UserData {
+  id?: string;
+  email?: string;
+  [key: string]: unknown;
+}
+
+interface SessionData {
+  access_token?: string;
+  [key: string]: unknown;
+}
+
+interface TrackData {
+  id: string;
+  title?: string;
+  [key: string]: unknown;
+}
+
+interface ConversationData {
+  id: string;
+  [key: string]: unknown;
+}
+
+interface NotificationData {
+  id?: string;
+  type?: string;
+  createdAt?: string;
+  read?: boolean;
+  [key: string]: unknown;
+}
+
+interface WidgetData {
+  id: string;
+  [key: string]: unknown;
+}
+
 // Auth State
 interface AuthState {
-  user: any | null;
-  session: any | null;
+  user: UserData | null;
+  session: SessionData | null;
   isLoading: boolean;
   error: string | null;
 }
@@ -111,7 +146,7 @@ interface AppStore extends AuthState, ThemeState, MusicState, CoachState, Notifi
   setDashboardPreferences: (prefs: Record<string, any>) => void;
 }
 
-const initialState = {
+const initialState: Pick<AppStore, 'user' | 'session' | 'isLoading' | 'error' | 'theme' | 'fontSize' | 'highContrast' | 'reducedMotion' | 'currentTrack' | 'isPlaying' | 'volume' | 'playlist' | 'repeat' | 'shuffle' | 'conversations' | 'currentConversation' | 'coachPreferences' | 'notifications' | 'notificationPreferences' | 'widgets' | 'layout' | 'dashboardPreferences'> = {
   // Initial Auth State
   user: null,
   session: null,
@@ -119,8 +154,8 @@ const initialState = {
   error: null,
 
   // Initial Theme State
-  theme: 'system',
-  fontSize: 'medium',
+  theme: 'system' as const,
+  fontSize: 'medium' as const,
   highContrast: false,
   reducedMotion: false,
 
@@ -129,16 +164,16 @@ const initialState = {
   isPlaying: false,
   volume: 0.7,
   playlist: [],
-  repeat: 'none',
+  repeat: 'none' as const,
   shuffle: false,
 
   // Initial Coach State
   conversations: [],
   currentConversation: null,
   coachPreferences: {
-    personality: 'empathetic',
+    personality: 'empathetic' as const,
     language: 'fr',
-    responseLength: 'medium',
+    responseLength: 'medium' as const,
   },
 
   // Initial Notifications State
@@ -147,7 +182,7 @@ const initialState = {
     push: true,
     email: true,
     sound: true,
-    emailFrequency: 'daily',
+    emailFrequency: 'daily' as const,
   },
 
   // Initial Dashboard State
