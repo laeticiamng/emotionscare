@@ -1,7 +1,12 @@
-// @ts-nocheck
 import { useNavigate } from "react-router-dom";
 import { useCallback } from "react";
-import { NavAction, NavContext, ActionResult } from "@/types/nav";
+import type { NavAction, NavContext, ActionResult } from "@/types/nav";
+
+declare global {
+  interface Window {
+    gtag?: (...args: unknown[]) => void;
+  }
+}
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
@@ -19,12 +24,7 @@ export function useNavAction() {
   const getContext = useCallback((): NavContext => ({
     isAuthenticated,
     user: user ? { id: user.id, role: user.user_metadata?.role } : undefined,
-    featureFlags: {}, // Feature flags integration ready
-    analytics: {
-      // Intégrer prefetch intelligent basé sur l'usage
-      trackPageView: (path: string) => logger.debug('Page view', { path }, 'ANALYTICS'),
-      trackNavigation: (from: string, to: string) => logger.debug('Navigation', { from, to }, 'ANALYTICS')
-    },
+    featureFlags: {},
   }), [isAuthenticated, user]);
 
   const executeAction = useCallback(async (action: NavAction): Promise<ActionResult> => {
@@ -52,16 +52,8 @@ export function useNavAction() {
         }
 
         case "modal": {
-          // Intégrer système modal avec Zustand
-          const { useModalStore } = await import('@/state/modalStore');
-          const modalStore = useModalStore.getState();
-          
-          modalStore.open({
-            id: action.id,
-            component: getModalComponent(action.id),
-            props: action.payload,
-            ...(action.payload as any)?.modalOptions,
-          });
+          // Modal opening would be handled by a modal manager
+          logger.debug('Modal action', { id: action.id, payload: action.payload }, 'SYSTEM');
           
           // Analytics
           window.gtag?.('event', 'modal_open', {

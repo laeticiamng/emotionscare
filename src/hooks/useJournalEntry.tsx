@@ -1,7 +1,6 @@
-// @ts-nocheck
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { saveJournalEntry } from '@/lib/journalService';
+import { addJournalEntry } from '@/lib/journalService';
 import { useToast } from '@/hooks/use-toast';
 import { useMusicEmotionIntegration } from '@/hooks/useMusicEmotionIntegration';
 import { logger } from '@/lib/logger';
@@ -26,7 +25,7 @@ export function useJournalEntry() {
     setBackgroundGradient(gradients[Math.floor(Math.random() * gradients.length)]);
   };
 
-  const handleSave = async (entryData: any) => {
+  const handleSave = async (entryData: Record<string, unknown>) => {
     if (!user) {
       toast({
         title: "Non connecté",
@@ -44,13 +43,14 @@ export function useJournalEntry() {
         emotion: entryData.emotion || currentEmotion
       };
       
-      const result = await saveJournalEntry(enrichedData);
+      const result = await addJournalEntry(enrichedData);
       
       // Suggest music based on the entry's emotion
-      if (enrichedData.emotion) {
+      const emotionValue = enrichedData.emotion as string | null;
+      if (emotionValue) {
         activateMusicForEmotion({
-          emotion: enrichedData.emotion,
-          intensity: enrichedData.intensity || 50
+          emotion: emotionValue,
+          intensity: (entryData.intensity as number) || 50
         });
       }
       

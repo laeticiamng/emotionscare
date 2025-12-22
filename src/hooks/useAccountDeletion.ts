@@ -1,6 +1,11 @@
-// @ts-nocheck
 import { useEffect } from 'react';
 import { useAccountStore } from '@/store/account.store';
+
+declare global {
+  interface Window {
+    gtag?: (...args: unknown[]) => void;
+  }
+}
 
 export const useAccountDeletion = () => {
   const store = useAccountStore();

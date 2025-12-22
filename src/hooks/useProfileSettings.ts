@@ -5,13 +5,13 @@ import { useDebounce } from 'react-use';
 import { logger } from '@/lib/logger';
 import { supabase } from '@/integrations/supabase/client';
 
-interface WindowWithGtag extends Window {
-  gtag?: (command: string, action: string, params?: Record<string, unknown>) => void;
+declare global {
+  interface Window {
+    gtag?: (...args: unknown[]) => void;
+    i18n?: { changeLanguage: (lang: string) => void };
+  }
 }
 
-interface WindowWithI18n extends Window {
-  i18n?: { changeLanguage: (lang: string) => void };
-}
 
 export const useProfileSettings = () => {
   const {
@@ -122,21 +122,20 @@ export const useProfileSettings = () => {
 
       // Analytics
       if (typeof window !== 'undefined') {
-        const win = window as WindowWithGtag;
-        if (typeof win.gtag === 'function') {
+        if (typeof window.gtag === 'function') {
           if (changes.theme) {
-            win.gtag('event', 'settings.profile.theme.changed', {
+            window.gtag('event', 'settings.profile.theme.changed', {
               theme: changes.theme
             });
           }
           if (changes.language) {
-            win.gtag('event', 'settings.profile.language.changed', {
+            window.gtag('event', 'settings.profile.language.changed', {
               lang: changes.language
             });
           }
           if (changes.a11y) {
             Object.keys(changes.a11y).forEach(key => {
-              win.gtag!('event', 'settings.profile.a11y.changed', {
+              window.gtag?.('event', 'settings.profile.a11y.changed', {
                 key: key
               });
             });
@@ -186,9 +185,8 @@ export const useProfileSettings = () => {
     setLanguage(language);
     
     // Apply language change immediately if available
-    const win = window as WindowWithI18n;
-    if (typeof window !== 'undefined' && win.i18n) {
-      win.i18n.changeLanguage(language === 'auto' ? navigator.language.slice(0, 2) : language);
+    if (typeof window !== 'undefined' && window.i18n) {
+      window.i18n.changeLanguage(language === 'auto' ? navigator.language.slice(0, 2) : language);
     }
     
     setPendingChanges(prev => ({ ...prev, language }));

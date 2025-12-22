@@ -1,4 +1,4 @@
-// @ts-nocheck
+// @ts-nocheck - Complex caching service with flexible typing
 /**
  * Advanced Music Cache Service
  *
@@ -14,7 +14,7 @@
  */
 
 import { logger } from '@/lib/logger';
-import { musicErrorHandler, MusicErrorType } from './error-handler';
+import { musicErrorHandler } from './error-handler';
 import type { MusicTrack } from '@/types/music';
 
 // ============================================

@@ -1,4 +1,4 @@
-import { Badge, Challenge, LeaderboardEntry } from '@/types/badge';
+import type { Badge, Challenge, LeaderboardEntry } from '@/types/badge';
 
 export const mockBadges: Badge[] = [
   {

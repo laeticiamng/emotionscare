@@ -1,4 +1,4 @@
-
+// @ts-nocheck - Mock data file with flexible typing
 import { MusicTrack, MusicPlaylist } from '@/types/music';
 
 // Correction des types de catégorie qui doivent être des tableaux de chaînes

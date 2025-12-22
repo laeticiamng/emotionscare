@@ -1,11 +1,11 @@
-import { MusicTrack, MusicPlaylist } from '@/types/music';
+import type { MusicTrack, MusicPlaylist } from '@/types/music';
 
 // Mock emotion music playlists
 export const emotionPlaylists: MusicPlaylist[] = [
   {
     id: "calm-playlist",
     title: "Calming Melodies",
-    name: "Calming Melodies", // Adding name property to match the type
+    name: "Calming Melodies",
     description: "Relaxing melodies to help you calm down and destress",
     coverUrl: "/images/music/calm-cover.jpg",
     tracks: [
@@ -14,6 +14,7 @@ export const emotionPlaylists: MusicPlaylist[] = [
         title: "Gentle Waves",
         artist: "Ocean Sounds",
         url: "/audio/gentle-waves.mp3",
+        audioUrl: "/audio/gentle-waves.mp3",
         duration: 240,
         emotion: "calm",
         mood: "peaceful"
@@ -23,6 +24,7 @@ export const emotionPlaylists: MusicPlaylist[] = [
         title: "Soft Rain",
         artist: "Nature Collective",
         url: "/audio/soft-rain.mp3",
+        audioUrl: "/audio/soft-rain.mp3",
         duration: 300,
         emotion: "calm",
         mood: "relaxed"
@@ -32,6 +34,7 @@ export const emotionPlaylists: MusicPlaylist[] = [
         title: "Piano Lullaby",
         artist: "Sleepy Keys",
         url: "/audio/piano-lullaby.mp3",
+        audioUrl: "/audio/piano-lullaby.mp3",
         duration: 280,
         emotion: "calm",
         mood: "soothing"
@@ -52,6 +55,7 @@ export const emotionPlaylists: MusicPlaylist[] = [
         title: "Sunshine Days",
         artist: "Mood Lifters",
         url: "/audio/sunshine-days.mp3",
+        audioUrl: "/audio/sunshine-days.mp3",
         duration: 198,
         emotion: "happy",
         mood: "energetic"
@@ -61,6 +65,7 @@ export const emotionPlaylists: MusicPlaylist[] = [
         title: "Walking on Air",
         artist: "Joyful Beats",
         url: "/audio/walking-on-air.mp3",
+        audioUrl: "/audio/walking-on-air.mp3",
         duration: 210,
         emotion: "happy",
         mood: "cheerful"
@@ -70,6 +75,7 @@ export const emotionPlaylists: MusicPlaylist[] = [
         title: "Good Vibes",
         artist: "Positive Flow",
         url: "/audio/good-vibes.mp3",
+        audioUrl: "/audio/good-vibes.mp3",
         duration: 225,
         emotion: "happy",
         mood: "optimistic"
@@ -90,6 +96,7 @@ export const emotionPlaylists: MusicPlaylist[] = [
         title: "Clear Mind",
         artist: "Concentration",
         url: "/audio/clear-mind.mp3",
+        audioUrl: "/audio/clear-mind.mp3",
         duration: 320,
         emotion: "focus",
         mood: "determined"
@@ -99,6 +106,7 @@ export const emotionPlaylists: MusicPlaylist[] = [
         title: "Study Session",
         artist: "Brain Boost",
         url: "/audio/study-session.mp3",
+        audioUrl: "/audio/study-session.mp3",
         duration: 360,
         emotion: "focus",
         mood: "attentive"
@@ -108,6 +116,7 @@ export const emotionPlaylists: MusicPlaylist[] = [
         title: "Work Mode",
         artist: "Productivity",
         url: "/audio/work-mode.mp3",
+        audioUrl: "/audio/work-mode.mp3",
         duration: 340,
         emotion: "focus",
         mood: "efficient"
@@ -128,6 +137,7 @@ export const emotionPlaylists: MusicPlaylist[] = [
         title: "Night Dreams",
         artist: "Sleep Well",
         url: "/audio/night-dreams.mp3",
+        audioUrl: "/audio/night-dreams.mp3",
         duration: 450,
         emotion: "sleep",
         mood: "relaxed"
@@ -137,6 +147,7 @@ export const emotionPlaylists: MusicPlaylist[] = [
         title: "Gentle Breeze",
         artist: "Dream Weaver",
         url: "/audio/gentle-breeze.mp3",
+        audioUrl: "/audio/gentle-breeze.mp3",
         duration: 480,
         emotion: "sleep",
         mood: "peaceful"
@@ -146,6 +157,7 @@ export const emotionPlaylists: MusicPlaylist[] = [
         title: "Starry Night",
         artist: "Slumber Party",
         url: "/audio/starry-night.mp3",
+        audioUrl: "/audio/starry-night.mp3",
         duration: 420,
         emotion: "sleep",
         mood: "calming"

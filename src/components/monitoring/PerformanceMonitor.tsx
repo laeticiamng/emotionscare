@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useEffect, useState } from 'react';
 import { Activity } from 'lucide-react';
 import { logger } from '@/lib/logger';
