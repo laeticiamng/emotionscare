@@ -31,11 +31,13 @@ export interface MusicTrack {
   vinylColor?: string;
   description?: string;
   category?: string;
+  genre?: string;
 }
 
 export interface MusicPlaylist {
   id: string;
   name: string;
+  title?: string;
   tracks: MusicTrack[];
   description?: string;
   tags?: string[];

@@ -1,5 +1,4 @@
-// @ts-nocheck
-
+import { type ComponentType } from 'react';
 import { 
   Home, 
   Brain, 
@@ -23,7 +22,7 @@ import {
 export interface NavItem {
   href: string;
   title: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: ComponentType<{ className?: string }>;
   description?: string;
   badge?: string;
   roles: ('b2c' | 'b2b_user' | 'b2b_admin')[];

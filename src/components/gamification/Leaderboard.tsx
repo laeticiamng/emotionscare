@@ -1,5 +1,4 @@
-// @ts-nocheck
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, type CSSProperties } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -416,8 +415,7 @@ export const Leaderboard: React.FC<LeaderboardProps> = ({
                     itemCount={filteredEntries.length}
                     itemSize={80}
                     itemData={{ entries: filteredEntries, currentUserId }}
-                    role="table"
-                    aria-label="Classement des utilisateurs"
+                    width="100%"
                   >
                     {LeaderboardRow}
                   </List>
