@@ -66,24 +66,15 @@ const EmotionalInput: React.FC<EmotionalInputProps> = ({ onSubmit, isLoading = f
       animate="visible"
     >
       <div className="container-mobile pt-8">
-        {/* Header - Transition d'accueil */}
+        {/* Header */}
         <motion.header variants={itemVariants} className="mb-8">
-          <p className="text-sm text-primary/80 font-medium mb-2">
-            Merci d'être là.
-          </p>
           <h1 className="font-premium text-2xl font-semibold text-foreground mb-2">
             Qu'est-ce qui te traverse ?
           </h1>
-          <p className="text-muted-foreground text-sm leading-relaxed">
-            Cet espace est à toi. Rien ne presse.
-          </p>
         </motion.header>
 
-        {/* Zone de texte - Espace de dépose émotionnelle */}
+        {/* Zone de texte */}
         <motion.div variants={itemVariants} className="mb-8">
-          <label className="block text-sm font-medium text-foreground mb-3">
-            Dépose tes mots ici
-          </label>
           <div className="relative">
             <textarea
               value={text}
@@ -97,20 +88,16 @@ const EmotionalInput: React.FC<EmotionalInputProps> = ({ onSubmit, isLoading = f
             </div>
           </div>
           
-          {/* Microcopy rassurant - Plus humain */}
-          <p className="mt-3 text-xs text-muted-foreground/70 italic">
-            Tu n'as rien à prouver. Écris comme tu veux.
+          {/* Microcopy rassurant */}
+          <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
+            Tu peux être vague ou précis. Il n'y a pas de bonne façon de faire.
           </p>
-          <div className="flex items-center gap-1.5 mt-2 text-xs text-muted-foreground/60">
-            <Lock className="h-3 w-3" />
-            <span>Confidentiel — jamais partagé.</span>
-          </div>
         </motion.div>
 
         {/* Sélection d'émotion */}
         <motion.div variants={itemVariants} className="mb-8">
           <label className="block text-sm font-medium text-foreground mb-3">
-            Comment te sens-tu ?
+            Ce qui se rapproche le plus de ce que tu ressens
           </label>
           <div className="grid grid-cols-3 gap-2">
             {EMOTIONS.map((emotion) => (
@@ -163,7 +150,7 @@ const EmotionalInput: React.FC<EmotionalInputProps> = ({ onSubmit, isLoading = f
               <div className="p-5 bg-card rounded-2xl border border-border/50">
                 <div className="flex items-center justify-between mb-4">
                   <label className="text-sm font-medium text-foreground">
-                    Intensité du ressenti
+                    À quel point est-ce présent pour toi ?
                   </label>
                   <span className="text-sm font-semibold text-primary px-3 py-1 bg-primary/10 rounded-full">
                     {intensityLabel}
@@ -179,21 +166,17 @@ const EmotionalInput: React.FC<EmotionalInputProps> = ({ onSubmit, isLoading = f
                   aria-label="Intensité de l'émotion"
                 />
                 
-                {/* Repères visuels émotionnels */}
+                {/* Repères visuels */}
                 <div className="flex justify-between mt-3 text-xs text-muted-foreground">
-                  <span className="flex flex-col items-start">
-                    <span className="text-lg mb-0.5">·</span>
-                    <span>Léger</span>
-                  </span>
-                  <span className="flex flex-col items-center">
-                    <span className="text-lg mb-0.5">··</span>
-                    <span>Modéré</span>
-                  </span>
-                  <span className="flex flex-col items-end">
-                    <span className="text-lg mb-0.5">···</span>
-                    <span>Intense</span>
-                  </span>
+                  <span>Léger</span>
+                  <span>Modéré</span>
+                  <span>Intense</span>
                 </div>
+                
+                {/* Micro-texte discret */}
+                <p className="mt-4 text-xs text-muted-foreground/70 text-center italic">
+                  Fais confiance à ton ressenti du moment.
+                </p>
               </div>
             </motion.div>
           )}
@@ -215,17 +198,12 @@ const EmotionalInput: React.FC<EmotionalInputProps> = ({ onSubmit, isLoading = f
                 animate={{ rotate: 360 }}
                 transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
               />
-              Analyse en cours...
+              Un instant…
             </span>
           ) : (
-            'Analyser mon état'
+            'Continuer'
           )}
         </Button>
-        
-        <div className="flex items-center justify-center gap-1.5 mt-3 text-xs text-muted-foreground/60">
-          <Shield className="h-3 w-3" />
-          <span>Analyse bienveillante, sans jugement</span>
-        </div>
       </div>
     </motion.div>
   );

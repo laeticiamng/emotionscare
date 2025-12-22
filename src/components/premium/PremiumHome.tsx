@@ -81,7 +81,7 @@ const PremiumHome: React.FC = () => {
           </motion.div>
         )}
 
-        {/* Question principale - Accroche émotionnelle incarnée */}
+        {/* Question principale */}
         <motion.div variants={itemVariants} className="mb-10">
           <h1 className="font-premium text-[clamp(1.75rem,5vw,2.5rem)] font-semibold leading-[1.15] tracking-tight text-foreground mb-4">
             Comment tu te sens,
@@ -96,7 +96,7 @@ const PremiumHome: React.FC = () => {
         </motion.div>
 
         {/* CTA Principal */}
-        <motion.div variants={itemVariants} className="space-y-4">
+        <motion.div variants={itemVariants} className="space-y-3">
           <Link to="/app/scan" className="block">
             <Button 
               size="lg" 
@@ -107,17 +107,10 @@ const PremiumHome: React.FC = () => {
             </Button>
           </Link>
           
-          {/* Microcopy rassurant */}
-          <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground">
-            <span className="flex items-center gap-1.5">
-              <Lock className="h-3.5 w-3.5" />
-              Confidentiel
-            </span>
-            <span className="flex items-center gap-1.5">
-              <Shield className="h-3.5 w-3.5" />
-              Sans jugement
-            </span>
-          </div>
+          {/* Texte secondaire discret */}
+          <p className="text-center text-sm text-muted-foreground/70">
+            Quelques minutes suffisent.
+          </p>
         </motion.div>
 
         {/* Cards actions rapides */}
