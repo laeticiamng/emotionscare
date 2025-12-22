@@ -1,6 +1,4 @@
-// @ts-nocheck
-
-import { VRSessionTemplate } from '@/types/vr';
+import type { VRSessionTemplate } from '@/types/vr';
 import { normalizeDifficulty } from '@/components/vr/utils';
 
 export const vrTemplates: VRSessionTemplate[] = [

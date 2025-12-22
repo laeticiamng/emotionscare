@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 export interface VRSessionTemplate {
   id: string;
   name: string;
@@ -7,15 +5,18 @@ export interface VRSessionTemplate {
   description: string;
   duration: number; // en secondes
   thumbnailUrl?: string;
+  imageUrl?: string;
+  audioUrl?: string;
   environmentId?: string;
-  category: 'relaxation' | 'meditation' | 'adventure' | 'exploration' | 'contemplation';
-  intensity: number; // 1-5
-  difficulty: 'easy' | 'medium' | 'hard';
-  immersionLevel: 'low' | 'medium' | 'high' | 'extreme';
-  goalType: 'relaxation' | 'mindfulness' | 'stimulation' | 'inspiration';
-  interactive: boolean;
+  category: 'relaxation' | 'meditation' | 'adventure' | 'exploration' | 'contemplation' | 'breathing';
+  intensity?: number; // 1-5
+  difficulty: 'easy' | 'medium' | 'hard' | 'beginner' | 'intermediate' | 'advanced';
+  immersionLevel?: 'low' | 'medium' | 'high' | 'extreme';
+  goalType?: 'relaxation' | 'mindfulness' | 'stimulation' | 'inspiration';
+  interactive?: boolean;
   tags: string[];
   recommendedMood?: string;
+  isFeatured?: boolean;
 }
 
 export interface VRSession {

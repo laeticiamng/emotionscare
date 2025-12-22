@@ -1,6 +1,7 @@
-// @ts-nocheck
-import flags from "./flags.json" assert { type: "json" };
+import flags from "./flags.json";
 
-export function ff(name: keyof typeof flags): boolean {
+type FlagName = keyof typeof flags;
+
+export function ff(name: FlagName): boolean {
   return Boolean((flags as Record<string, boolean>)[name]);
 }
