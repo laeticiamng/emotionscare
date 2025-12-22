@@ -1,10 +1,9 @@
-// @ts-nocheck
 import React from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { useAppStore } from '@/store/appStore';
 import { useError } from '@/contexts';
-import { useStoreActions, useGlobalStateSlice } from '@/store/hooks';
-import { useErrorHandler } from '@/contexts/ErrorContext';
-import { useCache } from '@/contexts/CacheContext';
+import { useGlobalStateSlice } from '@/store/hooks';
+import { useCache } from '@/contexts/UnifiedCacheContext';
 import { logger } from '@/lib/logger';
 
 /**
@@ -15,7 +14,7 @@ export const useGlobalState = () => {
   const stateSlice = useGlobalStateSlice();
 
   const actions = useAppStore(
-    (state) => ({
+    useShallow((state) => ({
       setUser: state.setUser,
       setTheme: state.setTheme,
       setAuthenticated: state.setAuthenticated,
@@ -32,8 +31,7 @@ export const useGlobalState = () => {
       clearCache: state.clearCache,
       isCacheValid: state.isCacheValid,
       reset: state.reset,
-    }),
-    shallow
+    }))
   );
   const errorApi = useError();
   const { notify } = errorApi;
