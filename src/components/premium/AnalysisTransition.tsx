@@ -14,8 +14,8 @@ interface AnalysisTransitionProps {
 
 // Voix produit officielle - calme, adulte, empathique
 const SOOTHING_MESSAGES = [
-  "Merci d'avoir partagé.",
-  "Je regarde ce que tu m'as confié…",
+  "Merci.",
+  "Je prends un moment pour comprendre ce que tu m'as partagé…",
 ];
 
 const AnalysisTransition: React.FC<AnalysisTransitionProps> = ({
