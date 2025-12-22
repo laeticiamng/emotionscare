@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Defusion Haikus - Grimoire Collection
  * Poetic wisdom for cognitive defusion (ACT therapy)

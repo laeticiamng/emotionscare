@@ -1,4 +1,3 @@
-// @ts-nocheck
 
 export const primaryEmotions = [
   // Positives haute énergie

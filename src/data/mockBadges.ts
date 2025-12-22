@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { Badge, Challenge, LeaderboardEntry } from '@/types/badge';
 
 export const mockBadges: Badge[] = [
