@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { create } from 'zustand';
 import { persist } from './utils/createImmutableStore';
 import { createSelectors } from './utils/createSelectors';
@@ -301,6 +300,8 @@ const useVRSafetyStoreBase = create<VRSafetyState>()(
   )
 );
 
+export const useVRSafetyStore = createSelectors(useVRSafetyStoreBase);
+
 if (typeof window !== 'undefined') {
   const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
 
@@ -310,5 +311,3 @@ if (typeof window !== 'undefined') {
     useVRSafetyStore.getState().setPrefersReducedMotion(event.matches);
   });
 }
-
-export const useVRSafetyStore = createSelectors(useVRSafetyStoreBase);
