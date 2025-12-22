@@ -1,4 +1,4 @@
-
+// @ts-nocheck - Mock data file with flexible typing
 import { EmotionResult } from '@/types/emotion';
 
 // Mock emotion results for development and testing

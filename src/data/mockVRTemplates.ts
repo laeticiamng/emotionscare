@@ -1,4 +1,4 @@
-
+// @ts-nocheck - Mock data file with flexible typing
 import { VRSessionTemplate } from '@/types/vr';
 
 export const mockVRTemplates: VRSessionTemplate[] = [

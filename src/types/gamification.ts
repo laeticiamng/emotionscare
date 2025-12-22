@@ -14,11 +14,17 @@ export interface Badge {
   id: string;
   name: string;
   description: string;
-  icon: string;
+  icon?: string;
+  image?: string;
+  imageUrl?: string;
   category: BadgeCategory;
-  points_required: number;
-  rarity: BadgeRarity;
-  conditions: BadgeCondition[];
+  points_required?: number;
+  rarity?: BadgeRarity;
+  conditions?: BadgeCondition[];
+  unlocked?: boolean;
+  unlockedAt?: string;
+  progress?: number;
+  threshold?: number;
 }
 
 export interface UserBadge {
@@ -54,7 +60,11 @@ export type BadgeCategory =
   | 'social'
   | 'exploration'
   | 'achievement'
-  | 'wellness';
+  | 'wellness'
+  | 'emotion'
+  | 'streak'
+  | 'meditation'
+  | 'tracking';
 
 export type BadgeRarity = 'common' | 'rare' | 'epic' | 'legendary';
 

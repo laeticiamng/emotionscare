@@ -1,7 +1,18 @@
-// @ts-nocheck
-
 import React, { createContext, useContext, useState } from 'react';
-import { Story } from '@/types';
+
+
+export interface Story {
+  id: string;
+  title: string;
+  content: string;
+  type: string;
+  seen: boolean;
+  image?: string;
+  cta?: {
+    label: string;
+    route: string;
+  };
+}
 
 interface StorytellingContextType {
   activeStory: Story | null;

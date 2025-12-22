@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 export type Theme = 'light' | 'dark' | 'system';
 export type FontSize = 'small' | 'medium' | 'large';
 export type FontFamily = 'sans' | 'serif' | 'mono';
@@ -43,6 +41,17 @@ export interface UserPreferences {
   vibration?: boolean;
   soundEffects?: boolean;
   darkMode?: boolean;
+  soundEnabled?: boolean;
+  ambientSound?: string;
+  autoPlay?: boolean;
+  journalReminders?: boolean;
+  audioQuality?: string;
+  notifications_enabled?: boolean;
+  email_notifications?: boolean;
+  push_notifications?: boolean;
+  emotionalCamouflage?: boolean;
+  aiSuggestions?: boolean;
+  fullAnonymity?: boolean;
 }
 
 export interface UserPreferencesContextType {

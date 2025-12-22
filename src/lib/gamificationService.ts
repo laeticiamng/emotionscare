@@ -1,5 +1,5 @@
-// @ts-nocheck
-import { Badge, Challenge, GamificationStats } from '@/types/gamification';
+// @ts-nocheck - Mock service with flexible typing
+import type { Badge } from '@/types/gamification';
 
 // Mock service for gamification features
 const GamificationService = {
