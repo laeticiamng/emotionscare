@@ -1,6 +1,4 @@
-// @ts-nocheck
-
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
 
 type Message = {
   id: string;
