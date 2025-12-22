@@ -90,7 +90,7 @@ const EmotionalInput: React.FC<EmotionalInputProps> = ({ onSubmit, isLoading = f
           
           {/* Microcopy rassurant */}
           <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
-            Exprime-toi comme tu veux — sans pression.
+            Aucune bonne ou mauvaise façon de décrire ce que tu ressens.
           </p>
         </motion.div>
 

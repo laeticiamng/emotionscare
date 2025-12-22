@@ -111,12 +111,9 @@ const EmotionalPlanResult: React.FC<EmotionalPlanResultProps> = ({
 
         {/* Section 1: Résumé émotionnel */}
         <motion.section variants={itemVariants} className="mb-8">
-          <h3 className="text-sm font-semibold text-foreground mb-2">
-            Voici ce que je comprends de ce que tu traverses
+          <h3 className="text-sm font-semibold text-foreground mb-3">
+            Ce que je comprends de ce que tu ressens
           </h3>
-          <p className="text-xs text-muted-foreground/70 mb-3">
-            Dis-moi si ça te parle.
-          </p>
           <div className="p-6 bg-gradient-to-br from-primary/5 to-primary/10 rounded-3xl border border-primary/10">
             <div className="flex items-start gap-4">
               <div className="w-12 h-12 rounded-2xl bg-primary/20 flex items-center justify-center flex-shrink-0">
@@ -139,13 +136,10 @@ const EmotionalPlanResult: React.FC<EmotionalPlanResultProps> = ({
 
         {/* Section 2: Actions immédiates */}
         <motion.section variants={itemVariants} className="mb-8">
-          <h3 className="text-sm font-semibold text-foreground mb-2 flex items-center gap-2">
+          <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
             <Clock className="h-4 w-4 text-muted-foreground" />
-            Par où commencer maintenant ?
+            Ce que tu peux essayer maintenant
           </h3>
-          <p className="text-xs text-muted-foreground/70 mb-3">
-            À ton rythme, tu peux essayer…
-          </p>
           
           <div className="space-y-2">
             {actions.map((action, index) => (
@@ -173,7 +167,7 @@ const EmotionalPlanResult: React.FC<EmotionalPlanResultProps> = ({
         {/* Section 3: Pour prolonger ce moment */}
         <motion.section variants={itemVariants} className="mb-8">
           <h3 className="text-sm font-semibold text-foreground mb-2">
-            Un espace sonore / visuel pour t'accompagner
+            Pour prolonger ce moment
           </h3>
           <p className="text-xs text-muted-foreground/70 mb-4">
             Tu peux t'arrêter ici, ou prendre encore quelques minutes pour toi.

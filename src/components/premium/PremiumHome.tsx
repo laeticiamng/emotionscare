@@ -93,7 +93,7 @@ const PremiumHome: React.FC = () => {
             <span className="text-primary">là, maintenant ?</span>
           </h1>
           <p className="text-base text-muted-foreground leading-relaxed max-w-sm">
-            Un espace pour déposer ce que tu vis.
+            Un espace pour poser ce que tu vis.
             <br />
             <span className="text-muted-foreground/70">Prends ce moment pour toi.</span>
           </p>
