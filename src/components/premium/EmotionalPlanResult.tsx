@@ -112,7 +112,7 @@ const EmotionalPlanResult: React.FC<EmotionalPlanResultProps> = ({
         {/* Section 1: Résumé émotionnel */}
         <motion.section variants={itemVariants} className="mb-8">
           <h3 className="text-sm font-semibold text-foreground mb-2">
-            Ce que je comprends de ce que tu ressens
+            Voici ce que je comprends de ce que tu traverses
           </h3>
           <p className="text-xs text-muted-foreground/70 mb-3">
             Dis-moi si ça te parle.
@@ -141,7 +141,7 @@ const EmotionalPlanResult: React.FC<EmotionalPlanResultProps> = ({
         <motion.section variants={itemVariants} className="mb-8">
           <h3 className="text-sm font-semibold text-foreground mb-2 flex items-center gap-2">
             <Clock className="h-4 w-4 text-muted-foreground" />
-            Ce que tu peux essayer maintenant
+            Par où commencer maintenant ?
           </h3>
           <p className="text-xs text-muted-foreground/70 mb-3">
             Des actions simples, à ton rythme.
@@ -173,7 +173,7 @@ const EmotionalPlanResult: React.FC<EmotionalPlanResultProps> = ({
         {/* Section 3: Pour prolonger ce moment */}
         <motion.section variants={itemVariants} className="mb-8">
           <h3 className="text-sm font-semibold text-foreground mb-2">
-            Pour prolonger ce moment
+            Un espace sonore / visuel pour t'accompagner
           </h3>
           <p className="text-xs text-muted-foreground/70 mb-4">
             Tu peux t'arrêter ici, ou prendre encore quelques minutes pour toi.
