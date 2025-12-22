@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React, { useRef } from 'react';
 import { motion } from 'framer-motion';
 import WelcomeSection from '@/components/onboarding/WelcomeSection';
@@ -12,10 +10,10 @@ interface OnboardingContentProps {
   step: number;
   loading: boolean;
   emotion: string;
-  userResponses: Record<string, any>;
+  userResponses: Record<string, unknown>;
   nextStep: () => void;
   prevStep: () => void;
-  handleResponse: (key: string, value: any) => void;
+  handleResponse: (key: string, value: unknown) => void;
   completeOnboarding: () => Promise<void>;
 }
 
@@ -29,7 +27,6 @@ const OnboardingContent: React.FC<OnboardingContentProps> = ({
   handleResponse,
   completeOnboarding
 }) => {
-  // Create a video reference to pass to WelcomeSection
   const videoRef = useRef<HTMLVideoElement>(null);
   
   const renderStep = () => {

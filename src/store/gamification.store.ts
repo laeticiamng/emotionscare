@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { create } from 'zustand';
 import { persist } from './utils/createImmutableStore';
 import { createSelectors } from './utils/createSelectors';
@@ -13,6 +12,10 @@ export interface LeaderboardEntry {
   tier_label?: string;
   badges?: string[];
   me?: boolean;
+  user_id?: string;
+  rankChange?: number;
+  streak?: number;
+  points?: number;
 }
 
 export interface Badge {
