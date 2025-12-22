@@ -1,10 +1,33 @@
-// @ts-nocheck
-
-import { InvitationStats, InvitationFormData } from '@/types';
 import { logger } from '@/lib/logger';
 
+interface InvitationStats {
+  total: number;
+  sent: number;
+  pending: number;
+  accepted: number;
+  expired: number;
+  rejected: number;
+  completed: number;
+  conversionRate: number;
+  averageTimeToAccept: number;
+  recent_invites: unknown[];
+  teams: Record<string, unknown>;
+}
+
+interface InvitationFormData {
+  email: string;
+  role?: string;
+  message?: string;
+}
+
+interface PendingInvitation {
+  id: string;
+  email: string;
+  role: string;
+  sent: Date;
+}
+
 class InvitationService {
-  // Générer les statistiques d'invitation
   getInvitationStats(): InvitationStats {
     return {
       total: 50,
@@ -21,9 +44,7 @@ class InvitationService {
     };
   }
 
-  // Envoi d'invitation
   async sendInvitation(data: InvitationFormData): Promise<boolean> {
-    // Simulation d'appel API
     return new Promise((resolve) => {
       setTimeout(() => {
         logger.info('Sending invitation to', { email: data.email }, 'API');
@@ -32,20 +53,18 @@ class InvitationService {
     });
   }
 
-  // Récupérer la liste des invitations en attente
-  async getPendingInvitations(): Promise<any[]> {
+  async getPendingInvitations(): Promise<PendingInvitation[]> {
     return [
       { id: '1', email: 'john@example.com', role: 'user', sent: new Date() },
       { id: '2', email: 'jane@example.com', role: 'admin', sent: new Date() }
     ];
   }
   
-  // Pour la compatibilité avec InvitationsTab
   async fetchInvitationStats(): Promise<InvitationStats> {
     return this.getInvitationStats();
   }
 }
 
 export default new InvitationService();
-// Exporter également la méthode fetchInvitationStats pour la compatibilité
 export const fetchInvitationStats = () => new InvitationService().getInvitationStats();
+export type { InvitationStats, InvitationFormData };

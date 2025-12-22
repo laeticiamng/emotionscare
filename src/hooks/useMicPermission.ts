@@ -1,12 +1,13 @@
-// @ts-nocheck
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { logger } from '@/lib/logger';
 
+type PermissionState = 'granted' | 'denied' | 'prompt' | 'unknown';
+
 export const useMicPermission = () => {
-  const [permission, setPermission] = useState<'granted' | 'denied' | 'prompt' | 'unknown'>('unknown');
+  const [permission, setPermission] = useState<PermissionState>('unknown');
   const [stream, setStream] = useState<MediaStream | null>(null);
 
-  const requestPermission = async (): Promise<boolean> => {
+  const requestPermission = useCallback(async (): Promise<boolean> => {
     try {
       const mediaStream = await navigator.mediaDevices.getUserMedia({ 
         audio: {
@@ -25,23 +26,23 @@ export const useMicPermission = () => {
       setPermission('denied');
       return false;
     }
-  };
+  }, []);
 
-  const stopStream = () => {
+  const stopStream = useCallback(() => {
     if (stream) {
       stream.getTracks().forEach(track => track.stop());
       setStream(null);
     }
-  };
+  }, [stream]);
 
   useEffect(() => {
     // Check existing permission on mount
     if (navigator.permissions) {
       navigator.permissions.query({ name: 'microphone' as PermissionName })
         .then(result => {
-          setPermission(result.state as any);
+          setPermission(result.state as PermissionState);
           result.addEventListener('change', () => {
-            setPermission(result.state as any);
+            setPermission(result.state as PermissionState);
           });
         })
         .catch(() => {
@@ -49,7 +50,11 @@ export const useMicPermission = () => {
         });
     }
 
-    return () => stopStream();
+    return () => {
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+      }
+    };
   }, []);
 
   return {

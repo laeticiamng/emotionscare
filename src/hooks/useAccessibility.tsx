@@ -1,11 +1,9 @@
-// @ts-nocheck
-
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, type RefObject } from 'react';
 import { announceToScreenReader } from '@/utils/accessibility';
 
 export const useAccessibility = () => {
   // Gestion du focus pour les modales
-  const trapFocus = useCallback((containerRef: React.RefObject<HTMLElement>) => {
+  const trapFocus = useCallback((containerRef: RefObject<HTMLElement>) => {
     if (!containerRef.current) return;
 
     const focusableElements = containerRef.current.querySelectorAll(

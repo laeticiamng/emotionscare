@@ -1,6 +1,4 @@
-// @ts-nocheck
-
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, type ReactNode } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { logger } from '@/lib/logger';
 
@@ -30,7 +28,7 @@ interface Achievement {
   id: string;
   title: string;
   description: string;
-  icon: React.ReactNode;
+  icon: ReactNode;
   points: number;
   unlocked: boolean;
   unlockedAt?: string;
@@ -44,13 +42,7 @@ export const useGamification = () => {
   const [achievements, setAchievements] = useState<Achievement[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (user) {
-      loadGamificationData();
-    }
-  }, [user]);
-
-  const loadGamificationData = async () => {
+  const loadGamificationData = useCallback(async () => {
     setLoading(true);
     try {
       // Simuler le chargement des données
@@ -109,9 +101,15 @@ export const useGamification = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const updateChallengeProgress = async (challengeId: string, progress: number) => {
+  useEffect(() => {
+    if (user) {
+      loadGamificationData();
+    }
+  }, [user, loadGamificationData]);
+
+  const updateChallengeProgress = useCallback(async (challengeId: string, progress: number) => {
     setChallenges(prev => 
       prev.map(challenge => 
         challenge.id === challengeId 
@@ -119,9 +117,9 @@ export const useGamification = () => {
           : challenge
       )
     );
-  };
+  }, []);
 
-  const claimReward = async (challengeId: string) => {
+  const claimReward = useCallback(async (challengeId: string) => {
     const challenge = challenges.find(c => c.id === challengeId);
     if (challenge && challenge.progress >= challenge.maxProgress) {
       setChallenges(prev => 
@@ -141,9 +139,9 @@ export const useGamification = () => {
         } : null);
       }
     }
-  };
+  }, [challenges, userStats]);
 
-  const unlockAchievement = async (achievementId: string) => {
+  const unlockAchievement = useCallback(async (achievementId: string) => {
     setAchievements(prev => 
       prev.map(achievement => 
         achievement.id === achievementId 
@@ -155,7 +153,7 @@ export const useGamification = () => {
           : achievement
       )
     );
-  };
+  }, []);
 
   return {
     userStats,

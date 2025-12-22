@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { useState, useCallback } from 'react';
 
 export const useSelectedUsers = (userIds: string[]) => {

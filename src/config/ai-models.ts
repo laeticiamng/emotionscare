@@ -1,7 +1,16 @@
-// @ts-nocheck
-
 // Configuration for AI models used in different parts of the application
-export const AI_MODEL_CONFIG = {
+
+export interface AIModelConfig {
+  model: string;
+  temperature: number;
+  max_tokens: number;
+  top_p: number;
+  stream: boolean;
+  cacheEnabled: boolean;
+  cacheTTL: number;
+}
+
+export const AI_MODEL_CONFIG: Record<string, AIModelConfig> = {
   chat: {
     model: 'gpt-4o-mini',
     temperature: 0.7,
