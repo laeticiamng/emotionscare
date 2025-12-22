@@ -102,17 +102,20 @@ const EmotionalPlanResult: React.FC<EmotionalPlanResultProps> = ({
       animate="visible"
     >
       <div className="container-mobile pt-8">
-        {/* Transition d'accueil vers le plan */}
-        <motion.div variants={itemVariants} className="mb-6">
-          <p className="text-sm text-primary/80 font-medium">
-            Voilà ce que je te propose, tranquillement.
+        {/* Transition */}
+        <motion.div variants={itemVariants} className="mb-8">
+          <p className="text-base text-muted-foreground">
+            Voilà ce que je te propose.
           </p>
         </motion.div>
 
-        {/* Section 1: Résumé émotionnel - Validation */}
+        {/* Section 1: Résumé émotionnel */}
         <motion.section variants={itemVariants} className="mb-8">
-          <p className="text-xs uppercase tracking-wider text-muted-foreground/70 mb-3">
+          <h3 className="text-sm font-semibold text-foreground mb-2">
             Ce que je comprends de ce que tu ressens
+          </h3>
+          <p className="text-xs text-muted-foreground/70 mb-3">
+            Dis-moi si ça te parle.
           </p>
           <div className="p-6 bg-gradient-to-br from-primary/5 to-primary/10 rounded-3xl border border-primary/10">
             <div className="flex items-start gap-4">
@@ -136,13 +139,13 @@ const EmotionalPlanResult: React.FC<EmotionalPlanResultProps> = ({
 
         {/* Section 2: Actions immédiates */}
         <motion.section variants={itemVariants} className="mb-8">
-          <p className="text-xs uppercase tracking-wider text-muted-foreground/70 mb-2">
-            Tu peux essayer maintenant
-          </p>
-          <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
+          <h3 className="text-sm font-semibold text-foreground mb-2 flex items-center gap-2">
             <Clock className="h-4 w-4 text-muted-foreground" />
-            Actions immédiates
+            Ce que tu peux essayer maintenant
           </h3>
+          <p className="text-xs text-muted-foreground/70 mb-3">
+            Des actions simples, à ton rythme.
+          </p>
           
           <div className="space-y-2">
             {actions.map((action, index) => (
@@ -167,92 +170,92 @@ const EmotionalPlanResult: React.FC<EmotionalPlanResultProps> = ({
           </div>
         </motion.section>
 
-        {/* Section 3: Musique - Présentée comme un cadeau, un espace refuge */}
-        {recommendations.music && (
-          <motion.section variants={itemVariants} className="mb-8">
-            <p className="text-xs uppercase tracking-wider text-muted-foreground/70 mb-2">
-              Pour prolonger ce moment
-            </p>
-            <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
-              <Headphones className="h-4 w-4 text-muted-foreground" />
-              Un espace rien que pour toi
-            </h3>
-            
-            {/* Carte musique mise en valeur comme un cadeau */}
-            <div className="p-6 bg-gradient-to-br from-indigo-50 via-violet-50 to-purple-50 dark:from-indigo-950/40 dark:via-violet-950/30 dark:to-purple-950/20 rounded-3xl border border-indigo-100/80 dark:border-indigo-900/50 shadow-lg shadow-indigo-500/5">
+        {/* Section 3: Pour prolonger ce moment */}
+        <motion.section variants={itemVariants} className="mb-8">
+          <h3 className="text-sm font-semibold text-foreground mb-2">
+            Pour prolonger ce moment
+          </h3>
+          <p className="text-xs text-muted-foreground/70 mb-4">
+            Tu peux t'arrêter ici, ou prendre encore quelques minutes pour toi.
+          </p>
+          
+          {/* Carte musique */}
+          {recommendations.music && (
+            <div className="p-6 bg-gradient-to-br from-indigo-50 via-violet-50 to-purple-50 dark:from-indigo-950/40 dark:via-violet-950/30 dark:to-purple-950/20 rounded-3xl border border-indigo-100/80 dark:border-indigo-900/50 shadow-lg shadow-indigo-500/5 mb-4">
+              <p className="text-sm text-foreground mb-4">
+                Un moment de musique pour t'accompagner
+              </p>
               <div className="flex items-center gap-4">
-                {/* Cover avec effet premium */}
                 <div className="relative">
-                  <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-indigo-400 via-violet-500 to-purple-600 flex items-center justify-center shadow-xl shadow-violet-500/30">
-                    <Music className="h-8 w-8 text-white" />
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-400 via-violet-500 to-purple-600 flex items-center justify-center shadow-xl shadow-violet-500/30">
+                    <Music className="h-6 w-6 text-white" />
                   </div>
-                  {/* Halo subtil */}
-                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/20 to-transparent pointer-events-none" />
                 </div>
                 
                 <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-foreground truncate text-base">{recommendations.music.title}</p>
+                  <p className="font-medium text-foreground truncate">{recommendations.music.title}</p>
                   <p className="text-sm text-muted-foreground truncate">{recommendations.music.artist}</p>
-                  <p className="text-xs text-muted-foreground/70 mt-1">{recommendations.music.duration}</p>
+                  <p className="text-xs text-muted-foreground/70 mt-0.5">{recommendations.music.duration}</p>
                 </div>
               </div>
               
-              {/* CTA principal pour la musique */}
-              <Button 
-                className="w-full mt-5 h-12 rounded-xl shadow-md shadow-primary/15 gap-2"
-              >
+              <Button className="w-full mt-4 h-12 rounded-xl shadow-md shadow-primary/15 gap-2">
                 <Play className="h-4 w-4" />
-                Prendre quelques minutes pour moi
+                Écouter la musique
               </Button>
-              
-              <p className="text-xs text-center text-muted-foreground/60 mt-4 italic">
-                Sélectionnée pour t'accompagner vers le calme.
-              </p>
             </div>
-          </motion.section>
-        )}
-
-        {/* Section 4: Lumière */}
-        {recommendations.light && (
-          <motion.section variants={itemVariants} className="mb-8">
+          )}
+          
+          {/* Carte lumière */}
+          {recommendations.light && (
             <div className="flex items-center gap-4 p-4 bg-amber-50 dark:bg-amber-950/20 rounded-2xl border border-amber-100 dark:border-amber-900/50">
               <div className="w-10 h-10 rounded-xl bg-amber-200 dark:bg-amber-800 flex items-center justify-center">
                 <Sun className="h-5 w-5 text-amber-600 dark:text-amber-300" />
               </div>
               <div className="flex-1">
-                <p className="font-medium text-foreground text-sm">{recommendations.light.mode}</p>
-                <p className="text-xs text-muted-foreground">{recommendations.light.description}</p>
+                <p className="font-medium text-foreground text-sm">Une ambiance lumineuse apaisante</p>
+                <p className="text-xs text-muted-foreground">Si tu peux ajuster la lumière autour de toi.</p>
               </div>
             </div>
-          </motion.section>
-        )}
+          )}
+        </motion.section>
+
       </div>
 
       {/* Bottom actions */}
       <div className="bottom-bar-mobile px-4 pt-4 pb-2">
-        <div className="flex gap-3">
+        <div className="flex flex-col gap-2">
           <Button
             variant="outline"
             size="lg"
-            className="flex-1 h-12 rounded-xl"
+            className="w-full h-12 rounded-xl"
             onClick={onSave}
           >
             <Bookmark className="h-4 w-4 mr-2" />
-            Sauvegarder
+            Enregistrer cette session
           </Button>
-          <Button
-            variant="ghost"
-            size="lg"
-            className="h-12 rounded-xl text-muted-foreground"
-            onClick={onRestart}
-          >
-            <RotateCcw className="h-4 w-4 mr-2" />
-            Refaire
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="flex-1 h-10 rounded-xl text-muted-foreground text-sm"
+            >
+              Revenir plus tard
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="flex-1 h-10 rounded-xl text-muted-foreground text-sm"
+              onClick={onRestart}
+            >
+              <RotateCcw className="h-3.5 w-3.5 mr-1.5" />
+              Nouvelle session
+            </Button>
+          </div>
         </div>
         
         <p className="text-center text-xs text-muted-foreground/60 mt-3">
-          Tu peux revenir à ce plan quand tu veux.
+          Tu peux revenir sur ce plan quand tu le souhaites.
         </p>
       </div>
     </motion.div>

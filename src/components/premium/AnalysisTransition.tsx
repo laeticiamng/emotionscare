@@ -12,11 +12,10 @@ interface AnalysisTransitionProps {
   duration?: number;
 }
 
-// Messages uniques, calmes et humains - pas techniques
+// Voix produit officielle - calme, adulte, empathique
 const SOOTHING_MESSAGES = [
-  "Merci de m'avoir partagé ça.",
-  "Je prends un instant pour comprendre ce que tu ressens…",
-  "J'écoute, tranquillement.",
+  "Merci.",
+  "Je prends un instant pour comprendre ce que tu ressens.",
 ];
 
 const AnalysisTransition: React.FC<AnalysisTransitionProps> = ({
