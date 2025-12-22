@@ -144,7 +144,7 @@ const EmotionalPlanResult: React.FC<EmotionalPlanResultProps> = ({
             Par où commencer maintenant ?
           </h3>
           <p className="text-xs text-muted-foreground/70 mb-3">
-            Des actions simples, à ton rythme.
+            À ton rythme, tu peux essayer…
           </p>
           
           <div className="space-y-2">
@@ -181,8 +181,11 @@ const EmotionalPlanResult: React.FC<EmotionalPlanResultProps> = ({
           
           {/* Carte musique */}
           {recommendations.music && (
-            <div className="p-6 bg-gradient-to-br from-indigo-50 via-violet-50 to-purple-50 dark:from-indigo-950/40 dark:via-violet-950/30 dark:to-purple-950/20 rounded-3xl border border-indigo-100/80 dark:border-indigo-900/50 shadow-lg shadow-indigo-500/5 mb-4">
-              <p className="text-sm text-foreground mb-4">
+            <div className="p-6 bg-gradient-to-br from-indigo-50 via-violet-50 to-purple-50 dark:from-indigo-950/40 dark:via-violet-950/30 dark:to-purple-950/20 rounded-3xl border border-indigo-100/80 dark:border-indigo-900/50 shadow-lg shadow-indigo-500/5 mb-4 relative overflow-hidden">
+              {/* Onde subtile en arrière-plan */}
+              <div className="absolute -top-8 -right-8 w-32 h-32 rounded-full bg-gradient-to-br from-violet-300/20 to-purple-400/10 blur-2xl pointer-events-none" />
+              
+              <p className="text-sm text-foreground mb-4 relative z-10">
                 Un moment de musique pour t'accompagner
               </p>
               <div className="flex items-center gap-4">

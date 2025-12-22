@@ -37,9 +37,13 @@ const PremiumHome: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background via-[hsl(var(--calm-mist))] to-[hsl(var(--warmth-cream))] dark:from-background dark:via-background dark:to-background">
+    <div className="min-h-screen bg-gradient-to-b from-background via-[hsl(var(--calm-mist))] to-[hsl(var(--warmth-cream))] dark:from-background dark:via-background dark:to-background relative overflow-hidden">
+      {/* Élément visuel subtil - cercle doux en arrière-plan */}
+      <div className="absolute top-1/4 -right-32 w-96 h-96 rounded-full bg-gradient-to-br from-primary/5 to-primary/10 blur-3xl pointer-events-none" />
+      <div className="absolute bottom-1/3 -left-32 w-80 h-80 rounded-full bg-gradient-to-tr from-accent/5 to-accent/10 blur-3xl pointer-events-none" />
+      
       {/* Header minimal */}
-      <header className="header-mobile">
+      <header className="header-mobile relative z-10">
         <div className="container-mobile flex h-14 items-center justify-between">
           <Link 
             to="/" 
@@ -67,7 +71,7 @@ const PremiumHome: React.FC = () => {
 
       {/* Hero Section - Question émotionnelle */}
       <motion.main 
-        className="container-mobile pt-16 pb-20"
+        className="container-mobile pt-16 pb-20 relative z-10"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
@@ -89,10 +93,17 @@ const PremiumHome: React.FC = () => {
             <span className="text-primary">là, maintenant ?</span>
           </h1>
           <p className="text-base text-muted-foreground leading-relaxed max-w-sm">
-            Tu peux prendre ce moment pour toi.
+            Un espace pour déposer ce que tu vis.
             <br />
-            <span className="text-muted-foreground/70">Rien n'est enregistré sans ton accord.</span>
+            <span className="text-muted-foreground/70">Prends ce moment pour toi.</span>
           </p>
+          
+          {/* Ligne décorative subtile */}
+          <div className="mt-6 flex items-center gap-3">
+            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-border to-transparent" />
+            <span className="text-xs text-muted-foreground/50">•</span>
+            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-border to-transparent" />
+          </div>
         </motion.div>
 
         {/* CTA Principal */}
