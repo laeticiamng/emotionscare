@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { createContext, useContext, ReactNode } from 'react';
 import { useMoodStore } from '@/hooks/useMood';
 import type { MoodPalette } from '@/utils/moodSignals';

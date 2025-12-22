@@ -1,6 +1,4 @@
-// @ts-nocheck
-
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import { useAuth } from './AuthContext';
 
 interface ExperimentFeature {

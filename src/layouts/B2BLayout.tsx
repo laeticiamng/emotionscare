@@ -1,13 +1,12 @@
-// @ts-nocheck
 import React from 'react';
 import { Outlet } from 'react-router-dom';
-import Shell from '@/Shell';
+import EnhancedShell from '@/components/layout/EnhancedShell';
 
 const B2BLayout: React.FC = () => {
   return (
-    <Shell>
+    <EnhancedShell>
       <Outlet />
-    </Shell>
+    </EnhancedShell>
   );
 };
 
