@@ -1,6 +1,4 @@
-// @ts-nocheck
-
-import { Notification, NotificationType, NotificationPriority } from '@/types/notifications';
+import { Notification } from '@/types/notifications';
 import { pushNotificationService } from '@/lib/notifications/pushNotifications';
 import { logger } from '@/lib/logger';
 

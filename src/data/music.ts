@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { MusicTrack, MusicPlaylist } from '@/types/music';
 
 export const musicTracks: MusicTrack[] = [
@@ -13,8 +12,8 @@ export const musicTracks: MusicTrack[] = [
     mood: 'relaxed',
     intensity: 0.3,
     coverUrl: '/images/covers/calm-waters.jpg',
-    tags: ['nature', 'meditation', 'sleep'],
-    category: ['relax']
+    tags: 'nature,meditation,sleep',
+    category: 'relax'
   },
   {
     id: 'track-2',
@@ -27,8 +26,8 @@ export const musicTracks: MusicTrack[] = [
     mood: 'concentrated',
     intensity: 0.5,
     coverUrl: '/images/covers/deep-focus.jpg',
-    tags: ['focus', 'work', 'study'],
-    category: ['focus']
+    tags: 'focus,work,study',
+    category: 'focus'
   },
   {
     id: 'track-3',
@@ -41,8 +40,8 @@ export const musicTracks: MusicTrack[] = [
     mood: 'motivated',
     intensity: 0.8,
     coverUrl: '/images/covers/energy-boost.jpg',
-    tags: ['workout', 'energy', 'motivation'],
-    category: ['energy']
+    tags: 'workout,energy,motivation',
+    category: 'energy'
   },
   {
     id: 'track-4',
@@ -55,8 +54,8 @@ export const musicTracks: MusicTrack[] = [
     mood: 'calm',
     intensity: 0.2,
     coverUrl: '/images/covers/peaceful-mind.jpg',
-    tags: ['meditation', 'relax', 'mindfulness'],
-    category: ['meditation']
+    tags: 'meditation,relax,mindfulness',
+    category: 'meditation'
   },
   {
     id: 'track-5',
@@ -69,8 +68,8 @@ export const musicTracks: MusicTrack[] = [
     mood: 'joyful',
     intensity: 0.7,
     coverUrl: '/images/covers/happy-vibes.jpg',
-    tags: ['happy', 'joyful', 'uplifting'],
-    category: ['mood']
+    tags: 'happy,joyful,uplifting',
+    category: 'mood'
   },
   {
     id: 'track-6',
@@ -83,8 +82,8 @@ export const musicTracks: MusicTrack[] = [
     mood: 'reflective',
     intensity: 0.4,
     coverUrl: '/images/covers/emotional-release.jpg',
-    tags: ['emotional', 'reflective', 'cathartic'],
-    category: ['mood']
+    tags: 'emotional,reflective,cathartic',
+    category: 'mood'
   }
 ];
 
@@ -96,13 +95,13 @@ export const musicPlaylists: MusicPlaylist[] = [
     description: 'Soothing sounds to help you relax and unwind',
     coverUrl: '/images/covers/relaxation.jpg',
     tracks: musicTracks.filter(track => 
-      (Array.isArray(track.category) && track.category.includes('relax')) || 
+      track.category === 'relax' || 
       track.emotion === 'calm' || 
       track.emotion === 'peaceful'
     ),
     emotion: 'calm',
     mood: 'relaxed',
-    category: ['relax']
+    category: 'relax'
   },
   {
     id: 'playlist-2',
@@ -111,12 +110,12 @@ export const musicPlaylists: MusicPlaylist[] = [
     description: 'Music designed to enhance concentration and productivity',
     coverUrl: '/images/covers/focus.jpg',
     tracks: musicTracks.filter(track => 
-      (Array.isArray(track.category) && track.category.includes('focus')) || 
+      track.category === 'focus' || 
       track.emotion === 'focused'
     ),
     emotion: 'focused',
     mood: 'concentrated',
-    category: ['focus']
+    category: 'focus'
   },
   {
     id: 'playlist-3',
@@ -125,12 +124,12 @@ export const musicPlaylists: MusicPlaylist[] = [
     description: 'Boost your energy and find motivation',
     coverUrl: '/images/covers/energy.jpg',
     tracks: musicTracks.filter(track => 
-      (Array.isArray(track.category) && track.category.includes('energy')) || 
+      track.category === 'energy' || 
       track.emotion === 'energetic'
     ),
     emotion: 'energetic',
     mood: 'motivated',
-    category: ['energy']
+    category: 'energy'
   },
   {
     id: 'playlist-4',
@@ -139,12 +138,12 @@ export const musicPlaylists: MusicPlaylist[] = [
     description: 'Gentle sounds to help you fall asleep',
     coverUrl: '/images/covers/sleep.jpg',
     tracks: musicTracks.filter(track => 
-      (Array.isArray(track.category) && track.category.includes('sleep')) || 
+      track.category === 'sleep' || 
       track.emotion === 'sleepy'
     ),
     emotion: 'sleepy',
     mood: 'drowsy',
-    category: ['sleep']
+    category: 'sleep'
   },
   {
     id: 'playlist-5',
@@ -155,7 +154,7 @@ export const musicPlaylists: MusicPlaylist[] = [
     tracks: musicTracks.filter(track => track.emotion === 'happy'),
     emotion: 'happy',
     mood: 'joyful',
-    category: ['mood']
+    category: 'mood'
   },
   {
     id: 'playlist-6',
@@ -166,7 +165,7 @@ export const musicPlaylists: MusicPlaylist[] = [
     tracks: musicTracks.filter(track => track.emotion === 'sad'),
     emotion: 'sad',
     mood: 'reflective',
-    category: ['mood']
+    category: 'mood'
   }
 ];
 
@@ -175,6 +174,6 @@ export const findPlaylistByMood = (mood: string): MusicPlaylist | undefined => {
   return musicPlaylists.find(playlist => 
     playlist.mood === mood || 
     playlist.emotion === mood || 
-    (Array.isArray(playlist.category) && playlist.category.includes(mood))
+    playlist.category === mood
   );
 };

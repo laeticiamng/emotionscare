@@ -1,5 +1,4 @@
-// @ts-nocheck
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { Notification } from '@/types/notifications';
@@ -141,8 +140,9 @@ export function useNotifications() {
   // Fetch notifications on mount and when filter changes
   useEffect(() => {
     if (user) {
-      fetchNotifications(filter);
+      void fetchNotifications(filter);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filter, user]);
   
   // Simulate real-time notification (in a real app, this would be a WebSocket connection)

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import i18next, { type i18n as I18nInstance } from 'i18next';
 import { initReactI18next, useTranslation } from 'react-i18next';
 
@@ -39,14 +38,14 @@ async function ensureResources(locale: AppLocale) {
   markLocaleAsLoaded(locale);
 }
 
-export async function initI18n(initialLocale: AppLocale = DEFAULT_LOCALE) {
+export async function initI18n(initialLocale: AppLocale = DEFAULT_LOCALE): Promise<I18nInstance> {
   if (!initPromise) {
     initPromise = i18next
       .use(initReactI18next)
       .init({
         lng: initialLocale,
         fallbackLng: DEFAULT_LOCALE,
-        supportedLngs: SUPPORTED_LOCALES,
+        supportedLngs: SUPPORTED_LOCALES as unknown as string[],
         defaultNS: DEFAULT_NAMESPACE,
         ns: namespaces,
         interpolation: {
@@ -59,19 +58,19 @@ export async function initI18n(initialLocale: AppLocale = DEFAULT_LOCALE) {
           fr,
         },
       })
-      .then((instance) => {
+      .then(() => {
         markLocaleAsLoaded('fr');
-        return instance;
+        return i18next;
       });
   }
 
   const instance = await initPromise;
 
-  if (instance.language !== initialLocale) {
+  if (instance && instance.language !== initialLocale) {
     await changeLanguage(initialLocale);
   }
 
-  return instance;
+  return i18next;
 }
 
 export function resolveLocale(locale?: string | null): AppLocale {

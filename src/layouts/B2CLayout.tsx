@@ -1,7 +1,6 @@
-// @ts-nocheck
 import React, { useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
-import Shell from '@/Shell';
+import EnhancedShell from '@/components/layout/EnhancedShell';
 import '@/styles/b2c-theme.css';
 
 const B2CLayout: React.FC = () => {
@@ -15,11 +14,11 @@ const B2CLayout: React.FC = () => {
 
   return (
     <div className="b2c-smooth-scroll">
-      <Shell>
+      <EnhancedShell>
         <div className="b2c-page-enter b2c-page-enter-active">
           <Outlet />
         </div>
-      </Shell>
+      </EnhancedShell>
     </div>
   );
 };

@@ -21,6 +21,7 @@ export interface MusicTrack {
   bpm?: number;
   key?: string;
   energy?: number;
+  intensity?: number;
   status?: 'pending' | 'generating' | 'completed' | 'failed';
   // Ajout pour compatibilité avec ancien système
   cover?: string;
@@ -46,6 +47,9 @@ export interface MusicPlaylist {
   targetEmotion?: string;
   duration?: number;
   coverUrl?: string;
+  emotion?: string;
+  mood?: string;
+  category?: string;
 }
 
 export interface EmotionMusicParams {

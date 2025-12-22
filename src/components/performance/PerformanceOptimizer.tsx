@@ -1,5 +1,4 @@
-// @ts-nocheck
-import React, { useEffect, useCallback, useRef } from 'react';
+import React, { useEffect, useCallback, useRef, useState } from 'react';
 
 interface PerformanceOptimizerProps {
   children: React.ReactNode;
