@@ -23090,6 +23090,15 @@ export type Database = {
           purpose_name: string
         }[]
       }
+      get_user_dashboard_stats: {
+        Args: { p_user_id: string }
+        Returns: {
+          chat_count: number
+          journal_count: number
+          last_activity_at: string
+          meditation_count: number
+        }[]
+      }
       get_user_edn_progress_summary: {
         Args: { target_user_id: string }
         Returns: {
