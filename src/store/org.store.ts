@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { create } from 'zustand';
 
 export type GroupBy = 'team' | 'tribe' | 'site';

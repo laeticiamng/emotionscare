@@ -1,7 +1,6 @@
-// @ts-nocheck
 import { create } from 'zustand';
 
-import { moodPresetsService, MoodPresetPayload } from '@/services/moodPresetsService';
+import { moodPresetsService, type MoodPresetPayload } from '@/services/moodPresetsService';
 import type { MoodPresetRecord } from '@/types/mood-mixer';
 
 interface MoodMixerState {

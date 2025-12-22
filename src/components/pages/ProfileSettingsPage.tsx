@@ -21,8 +21,30 @@ interface ProfileSettingsPageProps {
   'data-testid'?: string;
 }
 
+interface UserMetadata {
+  full_name?: string;
+  phone?: string;
+  bio?: string;
+  location?: string;
+  website?: string;
+  birthday?: string;
+  is_public?: boolean;
+  allow_notifications?: boolean;
+  allow_analytics?: boolean;
+  avatar_url?: string;
+  [key: string]: unknown;
+}
+
+interface ExtendedUser {
+  id?: string;
+  email?: string;
+  user_metadata?: UserMetadata;
+  [key: string]: unknown;
+}
+
 export const ProfileSettingsPage: React.FC<ProfileSettingsPageProps> = ({ 'data-testid': testId }) => {
-  const user = useAppStore.use.user();
+  const rawUser = useAppStore.use.user();
+  const user = rawUser as ExtendedUser | null;
   const setUser = useAppStore.use.setUser();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = React.useState(false);
@@ -74,11 +96,11 @@ export const ProfileSettingsPage: React.FC<ProfileSettingsPageProps> = ({ 'data-
       if (profileError) throw profileError;
 
       // Update user in store
-      setUser({
+      const updatedUser: ExtendedUser = {
         ...user,
         email: formData.email,
         user_metadata: {
-          ...user?.user_metadata,
+          ...(user?.user_metadata ?? {}),
           full_name: formData.displayName,
           phone: formData.phone,
           bio: formData.bio,
@@ -89,7 +111,8 @@ export const ProfileSettingsPage: React.FC<ProfileSettingsPageProps> = ({ 'data-
           allow_notifications: formData.allowNotifications,
           allow_analytics: formData.allowAnalytics,
         }
-      });
+      };
+      setUser(updatedUser);
 
       toast({
         title: "Profil mis à jour",
