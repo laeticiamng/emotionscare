@@ -1,10 +1,8 @@
-// @ts-nocheck
-
 import { hasConsent } from "@/ui/CookieConsent";
 import { logger } from '@/lib/logger';
 
 interface TrackEventOptions {
-  properties?: Record<string, any>;
+  properties?: Record<string, unknown>;
   anonymous?: boolean;
 }
 
