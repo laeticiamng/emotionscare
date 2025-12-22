@@ -1,10 +1,14 @@
-// @ts-nocheck
-import React, { useState, useEffect } from 'react';
+/**
+ * PremiumShell - Layout premium avec navigation et transitions
+ * Mobile-first, animations douces, accessibilité
+ */
+
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useLocation } from 'react-router-dom';
 import { useTheme } from '@/providers/theme';
 import CommandMenu from '@/components/layout/CommandMenu';
 import NotificationToast from '@/components/layout/NotificationToast';
-import ScrollProgress from '@/components/ui/ScrollProgress';
 import { cn } from '@/lib/utils';
 
 interface PremiumShellProps {
@@ -24,7 +28,14 @@ const PremiumShell: React.FC<PremiumShellProps> = ({
 }) => {
   const [isCommandOpen, setIsCommandOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const { isDarkMode, reduceMotion } = useTheme();
+  const { resolvedTheme } = useTheme();
+  const location = useLocation();
+  
+  // Check for reduced motion preference
+  const reduceMotion = useMemo(() => {
+    if (typeof window === 'undefined') return false;
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }, []);
   
   // Track command+K keyboard shortcut
   useEffect(() => {
@@ -47,15 +58,9 @@ const PremiumShell: React.FC<PremiumShellProps> = ({
   
   return (
     <div className={cn(
-      "min-h-screen flex flex-col w-full relative",
-      isDarkMode ? "bg-slate-950 text-white" : "bg-white text-slate-900",
+      "min-h-screen flex flex-col w-full relative bg-background text-foreground",
       className
     )}>
-      {/* Progress Indicator */}
-      <ScrollProgress
-        color={isDarkMode ? "primary" : "blue-500"}
-        height={3}
-      />
       
       {/* Header */}
       {header}
@@ -108,9 +113,9 @@ const PremiumShell: React.FC<PremiumShellProps> = ({
         
         {/* Main Content Area */}
         <div className="flex-1 w-full">
-          <AnimatePresence mode="sync">{/* Fixed multiple children warning */}
+          <AnimatePresence mode="sync">
             <motion.div
-              key={window.location.pathname}
+              key={location.pathname}
               initial={reduceMotion ? { opacity: 1 } : { opacity: 0, y: 10 }}
               animate={reduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
               exit={reduceMotion ? { opacity: 1 } : { opacity: 0, y: -10 }}
