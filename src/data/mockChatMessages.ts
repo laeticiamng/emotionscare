@@ -1,7 +1,5 @@
-// @ts-nocheck
 
 import { v4 as uuidv4 } from 'uuid';
-// @ts-nocheck
 import { ChatMessage, ChatConversation } from '@/types/chat';
 
 // Create conversation IDs
