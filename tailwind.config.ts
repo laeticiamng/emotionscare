@@ -126,6 +126,22 @@ const config: Config = {
           bg: "hsl(var(--glass-bg))",
           border: "hsl(var(--glass-border))",
         },
+        landing: {
+          cream: "hsl(var(--landing-cream))",
+          beige: "hsl(var(--landing-beige))",
+          sage: {
+            DEFAULT: "hsl(var(--landing-sage))",
+            dark: "hsl(var(--landing-sage-dark))",
+          },
+          sky: {
+            DEFAULT: "hsl(var(--landing-sky))",
+            dark: "hsl(var(--landing-sky-dark))",
+          },
+          text: {
+            DEFAULT: "hsl(var(--landing-text))",
+            muted: "hsl(var(--landing-text-muted))",
+          },
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
