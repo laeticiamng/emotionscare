@@ -83,6 +83,16 @@ body {
     --popover-foreground: 222.2 84% 4.9%;
     --primary: 221.2 83.2% 53.3%;
     --primary-foreground: 210 40% 98%;
+    
+    /* Landing page premium colors - palette apaisante */
+    --landing-cream: 40 40% 97%;
+    --landing-beige: 35 30% 90%;
+    --landing-sage: 150 25% 50%;
+    --landing-sage-dark: 150 30% 35%;
+    --landing-sky: 200 60% 70%;
+    --landing-sky-dark: 200 50% 45%;
+    --landing-text: 220 15% 20%;
+    --landing-text-muted: 220 10% 50%;
     --secondary: 210 40% 96%;
     --secondary-foreground: 222.2 84% 4.9%;
     --muted: 210 40% 96%;
