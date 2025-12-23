@@ -342,7 +342,7 @@ const benefits = [
   {
     title: 'Meilleur sommeil',
     stat: '65%',
-    description: 'retrouvent un sommeil réparateur après une semaine d'utilisation'
+    description: "retrouvent un sommeil réparateur après une semaine d'utilisation"
   },
   {
     title: 'Plus de sérénité',
