@@ -972,6 +972,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'SessionsPage',
     guard: true,
+    aliases: ['/session', '/sessions'],
   },
   {
     name: 'session-detail',
@@ -1100,6 +1101,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     component: 'PremiumPage',
     guard: true,
     requireAuth: true,
+    aliases: ['/premium'],
   },
   {
     name: 'billing',
