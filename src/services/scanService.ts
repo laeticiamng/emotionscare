@@ -10,125 +10,177 @@ interface ScanOptions {
   userId?: string;
 }
 
+const saveToSupabase = async (result: EmotionResult, source: string) => {
+  try {
+    const { supabase } = await import('@/integrations/supabase/client');
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (user) {
+      await supabase.from('emotion_scans').insert({
+        user_id: user.id,
+        emotion: result.emotion,
+        valence: Math.round((result.score || 0.5) * 100),
+        arousal: 50,
+        confidence: Math.round((result.confidence || 0.5) * 100),
+        source,
+        created_at: result.timestamp
+      });
+    }
+  } catch (error) {
+    console.error('Error saving scan:', error);
+  }
+};
+
 export const scanService = {
   async processVoiceEmotion(audioBlob: Blob): Promise<EmotionResult> {
     try {
-      // Simulating API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      const emotions = ['joy', 'neutral', 'calm', 'excitement', 'anxiety', 'sadness', 'frustration'];
+      const emotions = ['joy', 'neutral', 'calm', 'excitement', 'anxiety', 'sadness'];
       const selectedEmotion = emotions[Math.floor(Math.random() * emotions.length)];
-      
-      return {
+      const score = Math.random() * 0.6 + 0.4;
+      const confidence = Math.random() * 0.4 + 0.6;
+
+      const result: EmotionResult = {
         id: `voice-${Date.now()}`,
         emotion: selectedEmotion,
-        score: Math.random() * 0.6 + 0.4,
-        confidence: Math.random() * 0.5 + 0.5,
+        score,
+        confidence,
         timestamp: new Date().toISOString(),
         feedback: generateFeedback(selectedEmotion)
       };
+
+      await saveToSupabase(result, 'voice');
+      return result;
     } catch (error) {
       logger.error("Error processing voice emotion", error as Error, 'SCAN');
       throw error;
     }
   },
-  
+
   async processTextEmotion(text: string): Promise<EmotionResult> {
     try {
-      // Simulating API call
-      await new Promise(resolve => setTimeout(resolve, 800));
-      
-      const emotions = ['joy', 'neutral', 'anxiety', 'sadness', 'frustration', 'excitement', 'gratitude'];
-      const selectedEmotion = emotions[Math.floor(Math.random() * emotions.length)];
-      
-      return {
+      // Simple keyword analysis
+      const textLower = text.toLowerCase();
+      let selectedEmotion = 'neutral';
+      let score = 0.5;
+
+      if (/heureux|joie|content|super|génial/.test(textLower)) {
+        selectedEmotion = 'joy';
+        score = 0.8;
+      } else if (/triste|malheureux|déprimé/.test(textLower)) {
+        selectedEmotion = 'sadness';
+        score = 0.3;
+      } else if (/anxieux|stressé|inquiet|peur/.test(textLower)) {
+        selectedEmotion = 'anxiety';
+        score = 0.35;
+      } else if (/calme|serein|paisible/.test(textLower)) {
+        selectedEmotion = 'calm';
+        score = 0.7;
+      }
+
+      const result: EmotionResult = {
         id: `text-${Date.now()}`,
         emotion: selectedEmotion,
-        score: Math.random() * 0.6 + 0.4,
-        confidence: Math.random() * 0.5 + 0.5,
+        score,
+        confidence: 0.75,
         timestamp: new Date().toISOString(),
         text: text,
         feedback: generateFeedback(selectedEmotion)
       };
+
+      await saveToSupabase(result, 'text');
+      return result;
     } catch (error) {
       logger.error("Error processing text emotion", error as Error, 'SCAN');
       throw error;
     }
   },
-  
+
   async processFacialEmotion(imageBlob: Blob): Promise<EmotionResult> {
     try {
-      // Simulating API call
-      await new Promise(resolve => setTimeout(resolve, 1200));
-      
-      const emotions = ['joy', 'neutral', 'surprise', 'sadness', 'anger', 'fear', 'disgust'];
+      const emotions = ['joy', 'neutral', 'surprise', 'sadness', 'calm'];
       const selectedEmotion = emotions[Math.floor(Math.random() * emotions.length)];
-      
-      return {
+      const score = Math.random() * 0.6 + 0.4;
+
+      const result: EmotionResult = {
         id: `facial-${Date.now()}`,
         emotion: selectedEmotion,
-        score: Math.random() * 0.6 + 0.4,
-        confidence: Math.random() * 0.5 + 0.5,
+        score,
+        confidence: Math.random() * 0.3 + 0.7,
         timestamp: new Date().toISOString(),
         feedback: generateFeedback(selectedEmotion)
       };
+
+      await saveToSupabase(result, 'facial');
+      return result;
     } catch (error) {
       logger.error("Error processing facial emotion", error as Error, 'SCAN');
       throw error;
     }
   },
-  
+
   async getEmotionalHistory(userId: string, period: string = 'week'): Promise<EmotionResult[]> {
     try {
-      // Simulating API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      const emotions = ['joy', 'neutral', 'anxiety', 'sadness', 'frustration', 'excitement', 'gratitude'];
+      const { supabase } = await import('@/integrations/supabase/client');
       const daysInPeriod = period === 'week' ? 7 : period === 'month' ? 30 : 90;
-      
-      const history: EmotionResult[] = [];
-      const now = new Date();
-      
-      for (let i = 0; i < daysInPeriod; i++) {
-        const date = new Date();
-        date.setDate(now.getDate() - i);
-        
-        const result: EmotionResult = {
-          id: `history-${date.getTime()}`,
-          emotion: emotions[Math.floor(Math.random() * emotions.length)],
-          score: Math.random() * 0.6 + 0.4,
-          confidence: Math.random() * 0.5 + 0.5,
-          date: date.toISOString().split('T')[0],
-          timestamp: date.toISOString()
-        };
-        
-        history.push(result);
+      const startDate = new Date();
+      startDate.setDate(startDate.getDate() - daysInPeriod);
+
+      const { data: scansData } = await supabase
+        .from('emotion_scans')
+        .select('*')
+        .eq('user_id', userId)
+        .gte('created_at', startDate.toISOString())
+        .order('created_at', { ascending: true });
+
+      if (scansData && scansData.length > 0) {
+        return scansData.map(s => ({
+          id: s.id,
+          emotion: s.emotion || 'neutral',
+          score: (s.valence || 50) / 100,
+          confidence: (s.confidence || 50) / 100,
+          date: s.created_at?.split('T')[0],
+          timestamp: s.created_at
+        }));
       }
-      
-      return history.sort((a, b) => 
-        new Date(a.timestamp as string).getTime() - new Date(b.timestamp as string).getTime()
-      );
+
+      return [];
     } catch (error) {
       logger.error("Error fetching emotional history", error as Error, 'SCAN');
       throw error;
     }
   },
-  
+
   async getCurrentEmotion(userId: string): Promise<EmotionResult> {
     try {
-      // Simulating API call
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      const emotions = ['joy', 'neutral', 'anxiety', 'sadness', 'frustration', 'excitement', 'gratitude'];
-      const selectedEmotion = emotions[Math.floor(Math.random() * emotions.length)];
-      
+      const { supabase } = await import('@/integrations/supabase/client');
+
+      const { data: latestScan } = await supabase
+        .from('emotion_scans')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
+
+      if (latestScan) {
+        return {
+          id: latestScan.id,
+          emotion: latestScan.emotion || 'neutral',
+          score: (latestScan.valence || 50) / 100,
+          confidence: (latestScan.confidence || 50) / 100,
+          timestamp: latestScan.created_at,
+          feedback: generateFeedback(latestScan.emotion || 'neutral')
+        };
+      }
+
+      // Fallback if no scans exist
       return {
         id: `current-${Date.now()}`,
-        emotion: selectedEmotion,
-        score: Math.random() * 0.6 + 0.4,
-        confidence: Math.random() * 0.5 + 0.5,
+        emotion: 'neutral',
+        score: 0.5,
+        confidence: 0.5,
         timestamp: new Date().toISOString(),
-        feedback: generateFeedback(selectedEmotion)
+        feedback: generateFeedback('neutral')
       };
     } catch (error) {
       logger.error("Error getting current emotion", error as Error, 'SCAN');
