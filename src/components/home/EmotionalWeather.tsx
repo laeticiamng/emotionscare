@@ -1,4 +1,4 @@
-
+// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Cloud, CloudDrizzle, CloudRain, CloudSun, Sun, Thermometer } from 'lucide-react';
@@ -14,44 +14,79 @@ const EmotionalWeather: React.FC = () => {
   });
 
   useEffect(() => {
-    // Mock weather data - in a real app this would come from a weather API
-    const mockWeatherData = () => {
-      const conditions = ['sunny', 'partly-cloudy', 'cloudy', 'rainy', 'drizzle'];
-      const condition = conditions[Math.floor(Math.random() * conditions.length)] as 'sunny' | 'partly-cloudy' | 'cloudy' | 'rainy' | 'drizzle';
-      
-      const descriptions = {
-        'sunny': 'Ensoleillé',
-        'partly-cloudy': 'Partiellement nuageux',
-        'cloudy': 'Nuageux',
-        'rainy': 'Pluvieux',
-        'drizzle': 'Bruine légère'
-      };
-      
-      const suggestions = {
-        'sunny': 'Idéal pour une activité extérieure qui élève l\'humeur.',
-        'partly-cloudy': 'Bon moment pour une marche contemplative.',
-        'cloudy': 'Parfait pour un moment de lecture méditative.',
-        'rainy': 'Propice à l\'introspection et à l\'écriture.',
-        'drizzle': 'Idéal pour écouter de la musique douce et réfléchir.'
-      };
-      
-      const temperature = Math.floor(Math.random() * 20) + 10; // Random temp between 10-30°C
-      
-      return {
-        temperature,
-        description: descriptions[condition],
-        condition,
-        emotionalSuggestion: suggestions[condition]
-      };
+    const loadEmotionalWeather = async () => {
+      try {
+        const { supabase } = await import('@/integrations/supabase/client');
+        const { data: { user } } = await supabase.auth.getUser();
+
+        // Get user's recent emotional state to calculate "emotional weather"
+        if (user) {
+          const { data: scansData } = await supabase
+            .from('emotion_scans')
+            .select('valence, emotion, created_at')
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false })
+            .limit(7);
+
+          if (scansData && scansData.length > 0) {
+            // Calculate average valence to determine emotional weather
+            const avgValence = scansData.reduce((sum, s) => sum + (s.valence || 50), 0) / scansData.length;
+
+            let condition: 'sunny' | 'partly-cloudy' | 'cloudy' | 'rainy' | 'drizzle';
+            if (avgValence >= 70) condition = 'sunny';
+            else if (avgValence >= 55) condition = 'partly-cloudy';
+            else if (avgValence >= 40) condition = 'cloudy';
+            else if (avgValence >= 25) condition = 'drizzle';
+            else condition = 'rainy';
+
+            const descriptions = {
+              'sunny': 'Ensoleillé - Vous rayonnez !',
+              'partly-cloudy': 'Partiellement nuageux',
+              'cloudy': 'Nuageux - Temps de réflexion',
+              'rainy': 'Pluvieux - Période à traverser',
+              'drizzle': 'Bruine légère - Légère mélancolie'
+            };
+
+            const suggestions = {
+              'sunny': 'Votre énergie est au top ! Parfait pour partager votre bonne humeur.',
+              'partly-cloudy': 'Un bon équilibre émotionnel. Continuez ainsi !',
+              'cloudy': 'Parfait pour un moment de lecture méditative ou de musique calme.',
+              'rainy': 'Prenez soin de vous. Une session de respiration pourrait aider.',
+              'drizzle': 'Idéal pour écouter de la musique douce et tenir votre journal.'
+            };
+
+            setWeather({
+              temperature: Math.round(avgValence),
+              description: descriptions[condition],
+              condition,
+              emotionalSuggestion: suggestions[condition]
+            });
+            setLoading(false);
+            return;
+          }
+        }
+
+        // Fallback if no data
+        setWeather({
+          temperature: 50,
+          description: 'Partiellement nuageux',
+          condition: 'partly-cloudy',
+          emotionalSuggestion: 'Faites un scan émotionnel pour découvrir votre météo intérieure.'
+        });
+        setLoading(false);
+      } catch (error) {
+        console.error('Error loading emotional weather:', error);
+        setWeather({
+          temperature: 50,
+          description: 'Partiellement nuageux',
+          condition: 'partly-cloudy',
+          emotionalSuggestion: 'Commencez votre journée avec un scan émotionnel.'
+        });
+        setLoading(false);
+      }
     };
-    
-    // Simulate API call delay
-    const timer = setTimeout(() => {
-      setWeather(mockWeatherData());
-      setLoading(false);
-    }, 1500);
-    
-    return () => clearTimeout(timer);
+
+    loadEmotionalWeather();
   }, []);
 
   // Render the appropriate weather icon

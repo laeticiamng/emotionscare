@@ -51,16 +51,53 @@ const LeaderboardWidget: React.FC<LeaderboardWidgetProps> = ({
   const [selectedPeriod, setSelectedPeriod] = useState<Period>('week');
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  // Mock data with trends
-  const defaultEntries: LeaderboardEntry[] = [
-    { rank: 1, userId: '1', name: user?.email || 'Vous', points: 1250, level: 8, isCurrentUser: true, trend: 'up', trendValue: 2, streak: 7 },
-    { rank: 2, userId: '2', name: 'Sophie M.', points: 1180, level: 7, isCurrentUser: false, trend: 'same', trendValue: 0, streak: 12 },
-    { rank: 3, userId: '3', name: 'Thomas L.', points: 1050, level: 6, isCurrentUser: false, trend: 'down', trendValue: 1, streak: 3 },
-    { rank: 4, userId: '4', name: 'Marie D.', points: 980, level: 6, isCurrentUser: false, trend: 'up', trendValue: 3, streak: 5 },
-    { rank: 5, userId: '5', name: 'Pierre K.', points: 920, level: 5, isCurrentUser: false, trend: 'down', trendValue: 2, streak: 0 }
-  ];
+  const [leaderboardEntries, setLeaderboardEntries] = useState<LeaderboardEntry[]>([]);
 
-  const displayEntries = entries.length > 0 ? entries : defaultEntries;
+  // Load leaderboard from Supabase
+  useEffect(() => {
+    const loadLeaderboard = async () => {
+      try {
+        const { supabase } = await import('@/integrations/supabase/client');
+
+        const { data: leaderboardData } = await supabase
+          .from('user_leaderboard')
+          .select('*')
+          .order('rank', { ascending: true })
+          .limit(maxEntries);
+
+        if (leaderboardData && leaderboardData.length > 0) {
+          const formattedEntries: LeaderboardEntry[] = leaderboardData.map(entry => ({
+            rank: entry.rank || 0,
+            userId: entry.user_id,
+            name: entry.pseudo_anonyme || 'Utilisateur',
+            points: entry.total_badges * 100 || 0,
+            level: Math.floor((entry.total_badges || 0) / 5) + 1,
+            isCurrentUser: entry.user_id === user?.id,
+            trend: 'same' as const,
+            trendValue: 0,
+            streak: (entry.zones_completed || []).length
+          }));
+          setLeaderboardEntries(formattedEntries);
+          return;
+        }
+
+        // Fallback to mock data
+        setLeaderboardEntries([
+          { rank: 1, userId: '1', name: user?.email || 'Vous', points: 1250, level: 8, isCurrentUser: true, trend: 'up', trendValue: 2, streak: 7 },
+          { rank: 2, userId: '2', name: 'Sophie M.', points: 1180, level: 7, isCurrentUser: false, trend: 'same', trendValue: 0, streak: 12 },
+          { rank: 3, userId: '3', name: 'Thomas L.', points: 1050, level: 6, isCurrentUser: false, trend: 'down', trendValue: 1, streak: 3 },
+        ]);
+      } catch (error) {
+        console.error('Error loading leaderboard:', error);
+      }
+    };
+
+    loadLeaderboard();
+  }, [user, maxEntries, selectedPeriod]);
+
+  const displayEntries = entries.length > 0 ? entries : leaderboardEntries.length > 0 ? leaderboardEntries : [
+    { rank: 1, userId: '1', name: user?.email || 'Vous', points: 1250, level: 8, isCurrentUser: true, trend: 'up' as const, trendValue: 2, streak: 7 }
+  ];
   const limitedEntries = displayEntries.slice(0, maxEntries);
 
   const handleRefresh = async () => {
