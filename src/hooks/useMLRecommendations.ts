@@ -27,62 +27,62 @@ export const useMLRecommendations = (userId?: string) => {
 
   const loadUserHistory = useCallback(async () => {
     try {
-      // Mock history - in production, fetch from Supabase
-      const mockHistory: UserHistoryEntry[] = [
-        {
-          timestamp: new Date(Date.now() - 86400000 * 7).toISOString(),
-          emotion: 'anxious',
-          intensity: 0.8,
-          musicGenerated: true,
-          sunoParams: { bpm: 70, style: 'ambient', mood: 'calme', tags: ['relax'] },
-          sessionDuration: 15,
-          userFeedback: 'positive',
-          timeOfDay: '18:30',
-        },
-        {
-          timestamp: new Date(Date.now() - 86400000 * 6).toISOString(),
-          emotion: 'calm',
-          intensity: 0.6,
-          musicGenerated: true,
-          sunoParams: { bpm: 80, style: 'piano', mood: 'serein', tags: ['peace'] },
-          sessionDuration: 20,
-          userFeedback: 'positive',
-          timeOfDay: '08:00',
-        },
-        {
-          timestamp: new Date(Date.now() - 86400000 * 5).toISOString(),
-          emotion: 'happy',
-          intensity: 0.7,
-          musicGenerated: true,
-          sunoParams: { bpm: 120, style: 'upbeat', mood: 'joyeux', tags: ['energy'] },
-          sessionDuration: 10,
-          userFeedback: 'neutral',
-          timeOfDay: '12:00',
-        },
-        {
-          timestamp: new Date(Date.now() - 86400000 * 3).toISOString(),
-          emotion: 'sad',
-          intensity: 0.6,
-          musicGenerated: true,
-          sunoParams: { bpm: 65, style: 'melancholic', mood: 'mélancolique', tags: ['healing'] },
-          sessionDuration: 25,
-          userFeedback: 'positive',
-          timeOfDay: '20:00',
-        },
-        {
-          timestamp: new Date(Date.now() - 86400000 * 1).toISOString(),
-          emotion: 'focused',
-          intensity: 0.75,
-          musicGenerated: true,
-          sunoParams: { bpm: 90, style: 'lofi', mood: 'concentré', tags: ['focus'] },
-          sessionDuration: 45,
-          userFeedback: 'positive',
-          timeOfDay: '10:00',
-        },
-      ];
-      
-      setUserHistory(mockHistory);
-      logger.info('📊 User history loaded', { entries: mockHistory.length }, 'ML');
+      const { supabase } = await import('@/integrations/supabase/client');
+      const { data: { user } } = await supabase.auth.getUser();
+      const targetUserId = userId || user?.id;
+
+      if (targetUserId) {
+        // Fetch from ml_history table
+        const { data: historyData } = await supabase
+          .from('ml_user_history')
+          .select('*')
+          .eq('user_id', targetUserId)
+          .order('created_at', { ascending: false })
+          .limit(50);
+
+        if (historyData && historyData.length > 0) {
+          const formattedHistory: UserHistoryEntry[] = historyData.map(h => ({
+            timestamp: h.created_at,
+            emotion: h.emotion,
+            intensity: h.intensity || 0.5,
+            musicGenerated: h.music_generated || false,
+            sunoParams: h.suno_params || {},
+            sessionDuration: h.session_duration || 0,
+            userFeedback: h.user_feedback || 'neutral',
+            timeOfDay: h.time_of_day || new Date(h.created_at).toTimeString().substring(0, 5),
+          }));
+
+          setUserHistory(formattedHistory);
+          logger.info('📊 User history loaded from DB', { entries: formattedHistory.length }, 'ML');
+          return;
+        }
+      }
+
+      // Fallback: also check emotion_scans for basic history
+      if (targetUserId) {
+        const { data: scansData } = await supabase
+          .from('emotion_scans')
+          .select('*')
+          .eq('user_id', targetUserId)
+          .order('created_at', { ascending: false })
+          .limit(20);
+
+        if (scansData && scansData.length > 0) {
+          const historyFromScans: UserHistoryEntry[] = scansData.map(s => ({
+            timestamp: s.created_at,
+            emotion: s.emotion || 'neutral',
+            intensity: (s.valence || 50) / 100,
+            musicGenerated: false,
+            sunoParams: {},
+            sessionDuration: 0,
+            userFeedback: 'neutral',
+            timeOfDay: new Date(s.created_at).toTimeString().substring(0, 5),
+          }));
+
+          setUserHistory(historyFromScans);
+          logger.info('📊 User history loaded from scans', { entries: historyFromScans.length }, 'ML');
+        }
+      }
     } catch (err) {
       logger.error('Error loading history', err as Error, 'ML');
     }

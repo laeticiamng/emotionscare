@@ -21,31 +21,63 @@ export default function useMusicStats(userId?: string) {
     favoriteEmotion: '',
     listenedTracksCount: 0
   });
-  
+
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [hasData, setHasData] = useState<boolean>(false);
-  
+
   useEffect(() => {
     const fetchStats = async () => {
       setIsLoading(true);
-      
+
       try {
-        // Simuler un appel d'API
-        await new Promise(resolve => setTimeout(resolve, 800));
-        
-        // Données simulées
-        if (userId) {
-          setStats({
-            totalListeningTime: 7823, // 2h10m23s
-            mostPlayedGenre: 'Ambient',
-            mostPlayedTrack: 'Ocean Waves at Sunset',
-            mostPlayedArtist: 'Nature Sounds',
-            favoriteEmotion: 'Calm',
-            listenedTracksCount: 42
-          });
-          setHasData(true);
+        const { supabase } = await import('@/integrations/supabase/client');
+        const { data: { user } } = await supabase.auth.getUser();
+        const targetUserId = userId || user?.id;
+
+        if (targetUserId) {
+          // Fetch listening history
+          const { data: historyData } = await supabase
+            .from('music_listening_history')
+            .select('*')
+            .eq('user_id', targetUserId);
+
+          if (historyData && historyData.length > 0) {
+            // Calculate total listening time
+            const totalTime = historyData.reduce((acc, h) => acc + (h.listen_duration || 0), 0);
+
+            // Count genres, tracks, artists
+            const genreCounts: Record<string, number> = {};
+            const trackCounts: Record<string, number> = {};
+            const artistCounts: Record<string, number> = {};
+            const emotionCounts: Record<string, number> = {};
+
+            historyData.forEach(h => {
+              if (h.genre) genreCounts[h.genre] = (genreCounts[h.genre] || 0) + 1;
+              if (h.track_title) trackCounts[h.track_title] = (trackCounts[h.track_title] || 0) + 1;
+              if (h.track_artist) artistCounts[h.track_artist] = (artistCounts[h.track_artist] || 0) + 1;
+              if (h.mood) emotionCounts[h.mood] = (emotionCounts[h.mood] || 0) + 1;
+            });
+
+            // Get most played
+            const getMostPlayed = (counts: Record<string, number>) => {
+              const entries = Object.entries(counts);
+              if (entries.length === 0) return '';
+              return entries.sort((a, b) => b[1] - a[1])[0][0];
+            };
+
+            setStats({
+              totalListeningTime: totalTime,
+              mostPlayedGenre: getMostPlayed(genreCounts) || 'Ambient',
+              mostPlayedTrack: getMostPlayed(trackCounts) || 'Inconnu',
+              mostPlayedArtist: getMostPlayed(artistCounts) || 'Artiste inconnu',
+              favoriteEmotion: getMostPlayed(emotionCounts) || 'Calm',
+              listenedTracksCount: historyData.length
+            });
+            setHasData(true);
+          } else {
+            setHasData(false);
+          }
         } else {
-          // Si pas d'utilisateur, pas de données
           setHasData(false);
         }
       } catch (error) {
@@ -55,7 +87,7 @@ export default function useMusicStats(userId?: string) {
         setIsLoading(false);
       }
     };
-    
+
     fetchStats();
   }, [userId]);
   

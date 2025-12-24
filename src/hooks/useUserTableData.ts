@@ -16,50 +16,45 @@ export const useUserTableData = () => {
     const fetchUsers = async () => {
       setLoading(true);
       setError(null);
-      
+
       try {
-        // In a real app, this would be a fetch call to an API
-        // We'll simulate a delay and return mock data
-        await new Promise(resolve => setTimeout(resolve, 600));
-        
-        // Mock data
-        const mockUsers: UserWithStatus[] = [
-          {
-            id: '1',
-            name: 'John Doe',
-            email: 'john@example.com',
-            firstName: 'John',
-            lastName: 'Doe',
-            role: 'user',
-            created_at: '2023-05-01T10:00:00Z',
-            avatar_url: 'https://ui-avatars.com/api/?name=John+Doe',
-            status: 'active'
-          },
-          {
-            id: '2',
-            name: 'Jane Smith',
-            email: 'jane@example.com',
-            firstName: 'Jane',
-            lastName: 'Smith',
-            role: 'admin',
-            created_at: '2023-05-02T09:30:00Z',
-            avatar_url: 'https://ui-avatars.com/api/?name=Jane+Smith',
-            status: 'active'
-          },
-          {
-            id: '3',
-            name: 'Alice Johnson',
-            email: 'alice@example.com',
-            firstName: 'Alice',
-            lastName: 'Johnson',
-            role: 'user',
-            created_at: '2023-05-03T14:15:00Z',
-            avatar_url: 'https://ui-avatars.com/api/?name=Alice+Johnson',
-            status: 'inactive'
+        const { supabase } = await import('@/integrations/supabase/client');
+        const { data: { user } } = await supabase.auth.getUser();
+
+        // Check if current user is admin
+        if (user) {
+          const { data: currentProfile } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', user.id)
+            .single();
+
+          // Only admins can see user table
+          if (currentProfile?.role === 'admin' || currentProfile?.role === 'b2b_admin') {
+            const { data: profilesData, error: profilesError } = await supabase
+              .from('profiles')
+              .select('*')
+              .order('created_at', { ascending: false })
+              .limit(100);
+
+            if (profilesError) throw profilesError;
+
+            if (profilesData && profilesData.length > 0) {
+              const formattedUsers: UserWithStatus[] = profilesData.map(p => ({
+                id: p.id,
+                name: p.full_name || `${p.first_name || ''} ${p.last_name || ''}`.trim() || 'Utilisateur',
+                email: p.email || '',
+                firstName: p.first_name || '',
+                lastName: p.last_name || '',
+                role: p.role || 'user',
+                created_at: p.created_at,
+                avatar_url: p.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(p.full_name || 'U')}`,
+                status: p.is_active === false ? 'inactive' : p.email_confirmed ? 'active' : 'pending'
+              }));
+              setUsers(formattedUsers);
+            }
           }
-        ];
-        
-        setUsers(mockUsers);
+        }
       } catch (err) {
         setError('Failed to fetch users');
         logger.error('Failed to fetch users', err as Error, 'SYSTEM');
@@ -67,7 +62,7 @@ export const useUserTableData = () => {
         setLoading(false);
       }
     };
-    
+
     fetchUsers();
   }, []);
 
