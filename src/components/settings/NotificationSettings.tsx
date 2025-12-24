@@ -28,6 +28,77 @@ const NotificationSettings: React.FC = () => {
   const [quietStart, setQuietStart] = useState('22:00');
   const [quietEnd, setQuietEnd] = useState('08:00');
 
+  // Load settings from Supabase
+  React.useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        const { supabase } = await import('@/integrations/supabase/client');
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (user) {
+          const { data: settings } = await supabase
+            .from('user_settings')
+            .select('notification_preferences')
+            .eq('user_id', user.id)
+            .single();
+
+          if (settings?.notification_preferences) {
+            const prefs = settings.notification_preferences;
+            setEmailNotifications(prefs.email ?? true);
+            setPushNotifications(prefs.push ?? true);
+            setEmotionalAlerts(prefs.emotionalAlerts ?? true);
+            setTeamUpdates(prefs.teamUpdates ?? false);
+            setWeeklyReports(prefs.weeklyReports ?? true);
+            setCriticalAlerts(prefs.criticalAlerts ?? true);
+            setQuietHours(prefs.quietHours ?? true);
+            setQuietStart(prefs.quietStart ?? '22:00');
+            setQuietEnd(prefs.quietEnd ?? '08:00');
+          }
+        }
+      } catch (error) {
+        console.error('Error loading notification settings:', error);
+      }
+    };
+
+    loadSettings();
+  }, []);
+
+  // Save settings to Supabase
+  const saveSettings = async () => {
+    try {
+      const { supabase } = await import('@/integrations/supabase/client');
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (user) {
+        await supabase
+          .from('user_settings')
+          .upsert({
+            user_id: user.id,
+            notification_preferences: {
+              email: emailNotifications,
+              push: pushNotifications,
+              emotionalAlerts,
+              teamUpdates,
+              weeklyReports,
+              criticalAlerts,
+              quietHours,
+              quietStart,
+              quietEnd
+            },
+            updated_at: new Date().toISOString()
+          }, { onConflict: 'user_id' });
+      }
+    } catch (error) {
+      console.error('Error saving notification settings:', error);
+    }
+  };
+
+  // Save on any change
+  React.useEffect(() => {
+    const timer = setTimeout(saveSettings, 500);
+    return () => clearTimeout(timer);
+  }, [emailNotifications, pushNotifications, emotionalAlerts, teamUpdates, weeklyReports, criticalAlerts, quietHours, quietStart, quietEnd]);
+
   return (
     <div className="space-y-6">
       {/* Canaux de notification */}
