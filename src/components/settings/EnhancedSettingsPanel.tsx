@@ -53,37 +53,88 @@ const EnhancedSettingsPanel: React.FC = () => {
     darkMode: true,
     language: 'fr',
     timezone: 'Europe/Paris',
-    
+
     // Notifications
     pushNotifications: true,
     emailAlerts: false,
     soundNotifications: true,
     vibrations: true,
-    
+
     // Privacy & Security
     dataAnalytics: true,
     biometricAuth: true,
     encryptionLevel: 'high',
     shareUsageData: false,
-    
+
     // AI & Personalization
     emotionalAnalysis: true,
     predictiveInsights: true,
     adaptiveInterface: true,
     voiceCommands: true,
-    
+
     // Audio & Visual
     ambientSounds: true,
     visualEffects: true,
     hapticFeedback: true,
     audioQuality: 'high',
-    
+
     // Accessibility
     highContrast: false,
     largeText: false,
     reducedMotion: false,
     screenReader: false
   });
+
+  // Load settings from Supabase
+  useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        const { supabase } = await import('@/integrations/supabase/client');
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (user) {
+          const { data: userSettings } = await supabase
+            .from('user_settings')
+            .select('*')
+            .eq('user_id', user.id)
+            .single();
+
+          if (userSettings?.preferences) {
+            setSettings(prev => ({ ...prev, ...userSettings.preferences }));
+          }
+        }
+      } catch (error) {
+        console.error('Error loading settings:', error);
+      }
+    };
+
+    loadSettings();
+  }, []);
+
+  // Save settings to Supabase (debounced)
+  useEffect(() => {
+    const saveSettings = async () => {
+      try {
+        const { supabase } = await import('@/integrations/supabase/client');
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (user) {
+          await supabase
+            .from('user_settings')
+            .upsert({
+              user_id: user.id,
+              preferences: settings,
+              updated_at: new Date().toISOString()
+            }, { onConflict: 'user_id' });
+        }
+      } catch (error) {
+        console.error('Error saving settings:', error);
+      }
+    };
+
+    const timer = setTimeout(saveSettings, 1000);
+    return () => clearTimeout(timer);
+  }, [settings]);
 
   const settingsSections: SettingsSection[] = [
     {

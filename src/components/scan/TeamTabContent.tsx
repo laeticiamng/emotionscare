@@ -44,70 +44,72 @@ const TeamTabContent: React.FC<TeamTabContentProps> = ({ teamId }) => {
   const { user } = useAuth();
   
   useEffect(() => {
-    // Simuler le chargement des membres de l'équipe
     const loadTeamMembers = async () => {
       setIsLoading(true);
       try {
-        // Simuler une requête API
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        // Données simulées
-        const mockMembers: Member[] = [
-          {
-            id: '1',
-            name: 'Alice Dubois',
-            email: 'alice.dubois@example.com',
-            avatarUrl: 'https://i.pravatar.cc/150?img=1',
-            emotional_score: 75,
-            department: 'Marketing',
-            position: 'Chef de projet'
-          },
-          {
-            id: '2',
-            name: 'Bob Martin',
-            email: 'bob.martin@example.com',
-            avatarUrl: 'https://i.pravatar.cc/150?img=2',
-            emotional_score: 62,
-            department: 'Ventes',
-            position: 'Commercial'
-          },
-          {
-            id: '3',
-            name: 'Charlie Dupont',
-            email: 'charlie.dupont@example.com',
-            avatarUrl: 'https://i.pravatar.cc/150?img=3',
-            emotional_score: 88,
-            department: 'IT',
-            position: 'Développeur'
-          },
-          {
-            id: '4',
-            name: 'Diana Leclerc',
-            email: 'diana.leclerc@example.com',
-            avatarUrl: 'https://i.pravatar.cc/150?img=4',
-            emotional_score: 92,
-            department: 'RH',
-            position: 'Responsable RH'
-          },
-          {
-            id: '5',
-            name: 'Eva Garcia',
-            email: 'eva.garcia@example.com',
-            avatarUrl: 'https://i.pravatar.cc/150?img=5',
-            emotional_score: 55,
-            department: 'Finance',
-            position: 'Analyste financier'
-          },
-        ];
-        
-        setMembers(mockMembers);
+        const { supabase } = await import('@/integrations/supabase/client');
+
+        // Get team members from organization_users table
+        const { data: teamData } = await supabase
+          .from('organization_users')
+          .select(`
+            user_id,
+            role,
+            profiles:user_id (
+              id,
+              full_name,
+              first_name,
+              last_name,
+              email,
+              avatar_url,
+              department
+            )
+          `)
+          .eq('organization_id', teamId);
+
+        if (teamData && teamData.length > 0) {
+          // Get recent emotion scores for each member
+          const memberIds = teamData.map(t => t.user_id);
+          const { data: scoresData } = await supabase
+            .from('emotion_scans')
+            .select('user_id, valence')
+            .in('user_id', memberIds)
+            .order('created_at', { ascending: false });
+
+          // Calculate average scores per user
+          const userScores: Record<string, number[]> = {};
+          (scoresData || []).forEach(s => {
+            if (!userScores[s.user_id]) userScores[s.user_id] = [];
+            userScores[s.user_id].push(s.valence || 50);
+          });
+
+          const formattedMembers: Member[] = teamData.map(t => {
+            const profile = t.profiles as any;
+            const scores = userScores[t.user_id] || [];
+            const avgScore = scores.length > 0
+              ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length)
+              : 50;
+
+            return {
+              id: t.user_id,
+              name: profile?.full_name || `${profile?.first_name || ''} ${profile?.last_name || ''}`.trim() || 'Utilisateur',
+              email: profile?.email || '',
+              avatarUrl: profile?.avatar_url,
+              emotional_score: avgScore,
+              department: profile?.department || 'Non spécifié',
+              position: t.role || 'Membre'
+            };
+          });
+
+          setMembers(formattedMembers);
+        }
       } catch (error) {
-        // Team members loading error
+        console.error('Error loading team members:', error);
       } finally {
         setIsLoading(false);
       }
     };
-    
+
     loadTeamMembers();
   }, [teamId]);
   
