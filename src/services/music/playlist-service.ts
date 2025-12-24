@@ -5,89 +5,34 @@ import { playlistToMusicPlaylist } from './converters';
 import { MusicPlaylist } from '@/types/music';
 import { logger } from '@/lib/logger';
 
-// Données mockées de playlists pour le développement
-const mockPlaylists: Record<string, MusicPlaylist> = {
-  'meditation': {
-    id: 'meditation-playlist',
-    name: 'Méditation profonde',
-    description: 'Musique apaisante pour la méditation',
-    coverUrl: '/images/meditation.jpg',
-    emotion: 'calm',
-    tracks: [
-      {
-        id: 'meditation-1',
-        title: 'Inner Peace',
-        artist: 'Zen Garden',
-        duration: 360,
-        url: 'https://example.com/meditation1.mp3',
-        audioUrl: 'https://example.com/meditation1.mp3',
-        coverUrl: '/images/meditation1.jpg'
-      },
-      {
-        id: 'meditation-2',
-        title: 'Mindful Morning',
-        artist: 'Breath Collective',
-        duration: 480,
-        url: 'https://example.com/meditation2.mp3',
-        audioUrl: 'https://example.com/meditation2.mp3',
-        coverUrl: '/images/meditation2.jpg'
-      }
-    ]
-  },
-  'focus': {
-    id: 'focus-playlist',
-    name: 'Concentration maximale',
-    description: 'Musique pour améliorer la concentration',
-    coverUrl: '/images/focus.jpg',
-    emotion: 'focused',
-    tracks: [
-      {
-        id: 'focus-1',
-        title: 'Deep Work',
-        artist: 'Productivity Sound',
-        duration: 300,
-        url: 'https://example.com/focus1.mp3',
-        audioUrl: 'https://example.com/focus1.mp3',
-        coverUrl: '/images/focus1.jpg'
-      },
-      {
-        id: 'focus-2',
-        title: 'Flow State',
-        artist: 'Mind Waves',
-        duration: 320,
-        url: 'https://example.com/focus2.mp3',
-        audioUrl: 'https://example.com/focus2.mp3',
-        coverUrl: '/images/focus2.jpg'
-      }
-    ]
-  }
-};
-
 /**
- * Récupère une playlist par ID
+ * Récupère une playlist par ID depuis Supabase
  */
 export const getPlaylist = async (id: string): Promise<Playlist | null> => {
   try {
-    // Simuler une requête API
     logger.debug(`Récupération de la playlist: ${id}`, undefined, 'MUSIC');
-    await new Promise(resolve => setTimeout(resolve, 300));
-    
-    // Dans une implémentation réelle, on ferait un appel à l'API
-    const mockPlaylist = mockPlaylists[id];
-    
-    if (mockPlaylist) {
-      return {
-        id: mockPlaylist.id,
-        name: mockPlaylist.name,
-        title: mockPlaylist.title,
-        tracks: mockPlaylist.tracks.map(track => ({
-          ...track,
-          url: track.url || track.audioUrl || track.audio_url || ''
-        }))
-      };
+
+    const { supabase } = await import('@/integrations/supabase/client');
+    const { data: playlist, error } = await supabase
+      .from('music_playlists')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error || !playlist) {
+      logger.warn(`Playlist not found: ${id}`, undefined, 'MUSIC');
+      return null;
     }
-    
-    return null;
+
+    return {
+      id: playlist.id,
+      name: playlist.name,
+      title: playlist.name,
+      tracks: (playlist.tracks || []).map((track: any) => ({
+        ...track,
+        url: track.url || track.audioUrl || track.audio_url || ''
+      }))
+    };
   } catch (error) {
     logger.error('Error fetching playlist', error as Error, 'MUSIC');
     return null;
@@ -95,20 +40,33 @@ export const getPlaylist = async (id: string): Promise<Playlist | null> => {
 };
 
 /**
- * Récupère toutes les playlists disponibles
+ * Récupère toutes les playlists disponibles depuis Supabase
  */
 export const getAllPlaylists = async (): Promise<Playlist[]> => {
   try {
-    // Simuler une requête API
     logger.debug('Récupération de toutes les playlists', undefined, 'MUSIC');
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    // Dans une implémentation réelle, on ferait un appel à l'API
-    return Object.values(mockPlaylists).map(playlist => ({
+
+    const { supabase } = await import('@/integrations/supabase/client');
+    const { data: { user } } = await supabase.auth.getUser();
+
+    // Get user playlists and public playlists
+    let query = supabase.from('music_playlists').select('*');
+
+    if (user) {
+      query = query.or(`user_id.eq.${user.id},is_public.eq.true`);
+    } else {
+      query = query.eq('is_public', true);
+    }
+
+    const { data: playlists, error } = await query.order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    return (playlists || []).map(playlist => ({
       id: playlist.id,
       name: playlist.name,
-      title: playlist.title,
-      tracks: playlist.tracks.map(track => ({
+      title: playlist.name,
+      tracks: (playlist.tracks || []).map((track: any) => ({
         ...track,
         url: track.url || track.audioUrl || track.audio_url || ''
       }))
@@ -120,26 +78,32 @@ export const getAllPlaylists = async (): Promise<Playlist[]> => {
 };
 
 /**
- * Récupère les playlists recommandées basées sur l'émotion
+ * Récupère les playlists recommandées basées sur l'émotion depuis Supabase
  */
 export const getRecommendedPlaylists = async (emotion: string): Promise<Playlist[]> => {
   try {
-    // Simuler une requête API
     logger.debug(`Récupération des playlists recommandées pour l'émotion: ${emotion}`, undefined, 'MUSIC');
-    await new Promise(resolve => setTimeout(resolve, 400));
 
-    // Dans une implémentation réelle, on ferait un appel à l'API avec l'émotion comme paramètre
-    return Object.values(mockPlaylists)
-      .filter(playlist => playlist.emotion && playlist.emotion.includes(emotion.toLowerCase()))
-      .map(playlist => ({
-        id: playlist.id,
-        name: playlist.name,
-        title: playlist.title,
-        tracks: playlist.tracks.map(track => ({
-          ...track,
-          url: track.url || track.audioUrl || track.audio_url || ''
-        }))
-      }));
+    const { supabase } = await import('@/integrations/supabase/client');
+
+    const { data: playlists, error } = await supabase
+      .from('music_playlists')
+      .select('*')
+      .or(`emotion.ilike.%${emotion}%,is_public.eq.true`)
+      .order('created_at', { ascending: false })
+      .limit(10);
+
+    if (error) throw error;
+
+    return (playlists || []).map(playlist => ({
+      id: playlist.id,
+      name: playlist.name,
+      title: playlist.name,
+      tracks: (playlist.tracks || []).map((track: any) => ({
+        ...track,
+        url: track.url || track.audioUrl || track.audio_url || ''
+      }))
+    }));
   } catch (error) {
     logger.error('Error fetching recommended playlists', error as Error, 'MUSIC');
     return [];

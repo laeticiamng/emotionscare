@@ -77,16 +77,36 @@ const moodStoreBase = create<MoodStore>()(
         set({ isLoading: true, error: null });
 
         try {
-          await new Promise(resolve => setTimeout(resolve, 500));
+          const { supabase } = await import('@/integrations/supabase/client');
+          const { data: { user } } = await supabase.auth.getUser();
 
-          const mockValence = Math.floor(Math.random() * 201) - 100;
-          const mockArousal = Math.floor(Math.random() * 101);
-          const mockTimestamp = new Date().toISOString();
-          const signals = buildMoodSignals(mockValence, mockArousal);
-          const mockMood = {
-            valence: mockValence,
-            arousal: mockArousal,
-            timestamp: mockTimestamp,
+          let valence = 0;
+          let arousal = 50;
+          let timestamp = new Date().toISOString();
+
+          if (user) {
+            // Get the latest emotion scan
+            const { data: scanData } = await supabase
+              .from('emotion_scans')
+              .select('valence, arousal, created_at')
+              .eq('user_id', user.id)
+              .order('created_at', { ascending: false })
+              .limit(1)
+              .single();
+
+            if (scanData) {
+              // Convert valence from 0-100 to -100/+100
+              valence = (scanData.valence || 50) * 2 - 100;
+              arousal = scanData.arousal || 50;
+              timestamp = scanData.created_at || timestamp;
+            }
+          }
+
+          const signals = buildMoodSignals(valence, arousal);
+          const mood = {
+            valence,
+            arousal,
+            timestamp,
             vibe: signals.vibe,
             summary: signals.summary,
             microGesture: signals.microGesture,
@@ -94,7 +114,7 @@ const moodStoreBase = create<MoodStore>()(
           };
 
           set({
-            ...mockMood,
+            ...mood,
             isLoading: false,
             error: null,
           });

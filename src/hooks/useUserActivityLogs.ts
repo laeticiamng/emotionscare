@@ -3,41 +3,69 @@ import { useState, useEffect } from 'react';
 import { AnonymousActivity, ActivityStats } from '@/types/activity';
 import { logger } from '@/lib/logger';
 
-// Mock data functions since the imports were missing
+// Load activity data from Supabase
 const getActivityData = async (): Promise<AnonymousActivity[]> => {
-  // Mock implementation - in a real app, this would call an API
-  return Promise.resolve([
-    {
-      id: '1',
-      activity_type: 'login',
-      category: 'authentication',
-      count: 25,
-      timestamp_day: '2023-07-01'
-    },
-    {
-      id: '2',
-      activity_type: 'scan_emotion',
-      category: 'wellness',
-      count: 18,
-      timestamp_day: '2023-07-01'
+  try {
+    const { supabase } = await import('@/integrations/supabase/client');
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) return [];
+
+    const { data } = await supabase
+      .from('activity_logs')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+      .limit(100);
+
+    if (data && data.length > 0) {
+      return data.map(a => ({
+        id: a.id,
+        activity_type: a.activity_type || a.type || 'activity',
+        category: a.category || 'general',
+        count: a.count || 1,
+        timestamp_day: a.created_at?.split('T')[0] || new Date().toISOString().split('T')[0]
+      }));
     }
-  ]);
+  } catch (error) {
+    console.error('Error loading activity data:', error);
+  }
+
+  return [];
 };
 
 const getActivityStats = async (): Promise<ActivityStats[]> => {
-  // Mock implementation - in a real app, this would call an API
-  return Promise.resolve([
-    {
-      activity_type: 'login',
-      total_count: 125,
-      percentage: 40.5
-    },
-    {
-      activity_type: 'scan_emotion',
-      total_count: 82,
-      percentage: 26.5
+  try {
+    const { supabase } = await import('@/integrations/supabase/client');
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) return [];
+
+    // Get all activities and calculate stats
+    const { data } = await supabase
+      .from('activity_logs')
+      .select('activity_type')
+      .eq('user_id', user.id);
+
+    if (data && data.length > 0) {
+      const counts: Record<string, number> = {};
+      data.forEach(a => {
+        const type = a.activity_type || 'activity';
+        counts[type] = (counts[type] || 0) + 1;
+      });
+
+      const total = data.length;
+      return Object.entries(counts).map(([type, count]) => ({
+        activity_type: type,
+        total_count: count,
+        percentage: Math.round((count / total) * 1000) / 10
+      }));
     }
-  ]);
+  } catch (error) {
+    console.error('Error loading activity stats:', error);
+  }
+
+  return [];
 };
 
 export interface ActivityLogFilters {

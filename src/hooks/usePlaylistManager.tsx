@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { MusicTrack, MusicPlaylist } from '@/types/music';
-import { mockPlaylists } from '@/data/mockMusic';
 
 interface UsePlaylistManagerProps {
   autoLoad?: boolean;
@@ -21,13 +20,34 @@ export function usePlaylistManager({ autoLoad = true }: UsePlaylistManagerProps 
     }
   }, [autoLoad]);
 
-  // Fetch playlists from API (mocked)
+  // Fetch playlists from Supabase
   const fetchPlaylists = async () => {
     setLoading(true);
     try {
-      // Simulated API call delay
-      await new Promise((resolve) => setTimeout(resolve, 800));
-      setPlaylists(mockPlaylists);
+      const { supabase } = await import('@/integrations/supabase/client');
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (user) {
+        const { data: playlistsData } = await supabase
+          .from('music_playlists')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false });
+
+        if (playlistsData && playlistsData.length > 0) {
+          const formattedPlaylists: MusicPlaylist[] = playlistsData.map(p => ({
+            id: p.id,
+            title: p.name,
+            name: p.name,
+            description: p.description,
+            tracks: p.tracks || [],
+            category: p.category || 'user-created',
+            coverUrl: p.cover_url,
+            emotion: p.emotion
+          }));
+          setPlaylists(formattedPlaylists);
+        }
+      }
       setLoading(false);
     } catch (err) {
       setError(err instanceof Error ? err : new Error('Failed to fetch playlists'));
@@ -43,18 +63,37 @@ export function usePlaylistManager({ autoLoad = true }: UsePlaylistManagerProps 
   ) => {
     setLoading(true);
     try {
-      // Simulated API call delay
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      
+      const { supabase } = await import('@/integrations/supabase/client');
+      const { data: { user } } = await supabase.auth.getUser();
+
+      const playlistId = `playlist-${Date.now()}`;
       const newPlaylist: MusicPlaylist = {
-        id: `playlist-${Date.now()}`,
+        id: playlistId,
         title: name,
         name,
         description,
         tracks,
         category: 'user-created'
       };
-      
+
+      if (user) {
+        const { data, error: insertError } = await supabase
+          .from('music_playlists')
+          .insert({
+            id: playlistId,
+            user_id: user.id,
+            name,
+            description,
+            tracks,
+            created_at: new Date().toISOString()
+          })
+          .select()
+          .single();
+
+        if (insertError) throw insertError;
+        if (data) newPlaylist.id = data.id;
+      }
+
       setPlaylists((prevPlaylists) => [...prevPlaylists, newPlaylist]);
       setLoading(false);
       return newPlaylist;
