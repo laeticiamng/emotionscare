@@ -67,15 +67,62 @@ const WorldMapView: React.FC = () => {
     ? "bg-slate-900 bg-opacity-50 bg-[url('/images/world-map-dark.svg')]" 
     : "bg-slate-100 bg-opacity-30 bg-[url('/images/world-map-light.svg')]";
   
-  // Initialize clusters
+  // Initialize clusters from Supabase
   useEffect(() => {
-    // Simulate loading
-    const timer = setTimeout(() => {
-      setClusters(generateClusters(8));
-      setIsLoading(false);
-    }, 1500);
-    
-    return () => clearTimeout(timer);
+    const loadEmotionClusters = async () => {
+      try {
+        const { supabase } = await import('@/integrations/supabase/client');
+
+        // Get aggregated emotion data from scans
+        const { data: scansData } = await supabase
+          .from('emotion_scans')
+          .select('emotion, valence, created_at')
+          .gte('created_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString())
+          .order('created_at', { ascending: false });
+
+        if (scansData && scansData.length > 0) {
+          // Group by emotion
+          const emotionCounts: Record<string, number> = {};
+          const emotionValences: Record<string, number[]> = {};
+
+          scansData.forEach(s => {
+            const emotion = s.emotion || 'neutral';
+            emotionCounts[emotion] = (emotionCounts[emotion] || 0) + 1;
+            if (!emotionValences[emotion]) emotionValences[emotion] = [];
+            emotionValences[emotion].push(s.valence || 50);
+          });
+
+          // Create clusters from real data
+          const realClusters: EmotionCluster[] = Object.entries(emotionCounts).map(([emotion, count], index) => {
+            const valences = emotionValences[emotion];
+            const avgIntensity = valences.reduce((a, b) => a + b, 0) / valences.length / 100;
+
+            return {
+              id: `cluster-${emotion}`,
+              x: 15 + (index % 4) * 20 + Math.random() * 10,
+              y: 20 + Math.floor(index / 4) * 30 + Math.random() * 10,
+              radius: Math.min(count * 2, 25) + 5,
+              emotion,
+              intensity: Math.min(avgIntensity + 0.3, 1),
+              label: emotion.charAt(0).toUpperCase() + emotion.slice(1),
+              count
+            };
+          });
+
+          setClusters(realClusters);
+        } else {
+          // Fallback to generated clusters
+          setClusters(generateClusters(8));
+        }
+      } catch (error) {
+        console.error('Error loading emotion clusters:', error);
+        setClusters(generateClusters(8));
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadEmotionClusters();
   }, []);
 
   const handleZoom = (increment: boolean) => {

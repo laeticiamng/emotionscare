@@ -439,6 +439,8 @@ const RecordingStudio: React.FC = () => {
     }
 
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+
       const session: RecordingSession = {
         id: Date.now().toString(),
         name: `Session ${new Date().toLocaleDateString()}`,
@@ -448,7 +450,19 @@ const RecordingStudio: React.FC = () => {
         created_at: new Date().toISOString()
       };
 
-      // Save to local storage for now (could be extended to Supabase)
+      // Save to Supabase
+      if (user) {
+        await supabase.from('recording_sessions').insert({
+          user_id: user.id,
+          name: session.name,
+          tracks: session.tracks,
+          bpm: session.bpm,
+          time_signature: session.timeSignature,
+          created_at: session.created_at
+        });
+      }
+
+      // Also save to localStorage as backup
       const savedSessions = JSON.parse(localStorage.getItem('recording-sessions') || '[]');
       savedSessions.push(session);
       localStorage.setItem('recording-sessions', JSON.stringify(savedSessions));
