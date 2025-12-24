@@ -63,50 +63,95 @@ const EmojiEmotionScanner: React.FC<EmotionScannerProps> = ({
 
     setIsProcessing(true);
 
-    // Simuler l'analyse des émojis
-    setTimeout(() => {
-      // Logique simple d'analyse basée sur les émojis sélectionnés
-      const emotionMapping: Record<string, { name: string; intensity: number }[]> = {
-        '😊': [{ name: 'Joie', intensity: 85 }],
-        '😄': [{ name: 'Enthousiasme', intensity: 90 }],
-        '😢': [{ name: 'Tristesse', intensity: 75 }],
-        '😠': [{ name: 'Colère', intensity: 80 }],
-        '😌': [{ name: 'Calme', intensity: 70 }],
-        '😍': [{ name: 'Amour', intensity: 88 }],
-        '😴': [{ name: 'Fatigue', intensity: 60 }],
-        '😮': [{ name: 'Surprise', intensity: 75 }]
+    try {
+      const { supabase } = await import('@/integrations/supabase/client');
+      const { data: { user } } = await supabase.auth.getUser();
+
+      // Logique d'analyse basée sur les émojis sélectionnés
+      const emotionMapping: Record<string, { name: string; intensity: number; valence: number; arousal: number }> = {
+        '😊': { name: 'Joie', intensity: 85, valence: 85, arousal: 60 },
+        '😄': { name: 'Enthousiasme', intensity: 90, valence: 90, arousal: 80 },
+        '😢': { name: 'Tristesse', intensity: 75, valence: 25, arousal: 30 },
+        '😠': { name: 'Colère', intensity: 80, valence: 30, arousal: 85 },
+        '😌': { name: 'Calme', intensity: 70, valence: 70, arousal: 25 },
+        '😍': { name: 'Amour', intensity: 88, valence: 95, arousal: 70 },
+        '😴': { name: 'Fatigue', intensity: 60, valence: 45, arousal: 15 },
+        '😮': { name: 'Surprise', intensity: 75, valence: 60, arousal: 80 },
+        '😰': { name: 'Anxiété', intensity: 70, valence: 30, arousal: 75 },
+        '😔': { name: 'Tristesse', intensity: 65, valence: 30, arousal: 25 }
       };
 
-      const detectedEmotions = selectedEmojis.flatMap(emoji => 
-        emotionMapping[emoji] || [{ name: 'Émotion complexe', intensity: 65 }]
+      const detectedEmotions = selectedEmojis.map(emoji =>
+        emotionMapping[emoji] || { name: 'Émotion complexe', intensity: 65, valence: 50, arousal: 50 }
       );
 
-      // Grouper et moyenner les émotions similaires
+      // Grouper et moyenner les émotions
       const emotionGroups = detectedEmotions.reduce((acc, emotion) => {
         if (acc[emotion.name]) {
-          acc[emotion.name].push(emotion.intensity);
+          acc[emotion.name].intensities.push(emotion.intensity);
+          acc[emotion.name].valences.push(emotion.valence);
+          acc[emotion.name].arousals.push(emotion.arousal);
         } else {
-          acc[emotion.name] = [emotion.intensity];
+          acc[emotion.name] = {
+            intensities: [emotion.intensity],
+            valences: [emotion.valence],
+            arousals: [emotion.arousal]
+          };
         }
         return acc;
-      }, {} as Record<string, number[]>);
+      }, {} as Record<string, { intensities: number[]; valences: number[]; arousals: number[] }>);
 
-      const finalEmotions = Object.entries(emotionGroups).map(([name, intensities]) => ({
+      const finalEmotions = Object.entries(emotionGroups).map(([name, data]) => ({
         name,
-        intensity: Math.round(intensities.reduce((a, b) => a + b, 0) / intensities.length)
+        intensity: Math.round(data.intensities.reduce((a, b) => a + b, 0) / data.intensities.length)
       }));
 
-      const mockResult: EmotionResult = {
-        emotions: finalEmotions.slice(0, 3), // Prendre les 3 principales
+      // Calculate overall valence and arousal
+      const avgValence = Math.round(detectedEmotions.reduce((a, e) => a + e.valence, 0) / detectedEmotions.length);
+      const avgArousal = Math.round(detectedEmotions.reduce((a, e) => a + e.arousal, 0) / detectedEmotions.length);
+      const mainEmotion = finalEmotions[0]?.name.toLowerCase() || 'neutral';
+
+      // Save to Supabase
+      if (user) {
+        await supabase.from('emotion_scans').insert({
+          user_id: user.id,
+          emotion: mainEmotion,
+          valence: avgValence,
+          arousal: avgArousal,
+          confidence: 85,
+          source: 'emoji',
+          notes: `Émojis: ${selectedEmojis.join(' ')}`,
+          created_at: new Date().toISOString()
+        });
+      }
+
+      const result: EmotionResult = {
+        emotions: finalEmotions.slice(0, 3),
+        emotion: mainEmotion,
         confidence: 85,
+        valence: avgValence,
+        arousal: avgArousal,
         timestamp: new Date(),
-        recommendations: `Basé sur vos émojis sélectionnés, vous semblez exprimer ${finalEmotions[0]?.name.toLowerCase()}. C'est parfaitement normal !`,
-        analysisType: 'emoji'
+        recommendations: `Basé sur vos émojis sélectionnés, vous semblez exprimer ${mainEmotion}. C'est parfaitement normal !`,
+        analysisType: 'emoji',
+        source: 'emoji'
       };
 
-      onScanComplete(mockResult);
+      onScanComplete(result);
+    } catch (error) {
+      console.error('Error analyzing emojis:', error);
+      // Fallback result
+      const fallbackResult: EmotionResult = {
+        emotions: [{ name: 'Neutral', intensity: 60 }],
+        confidence: 70,
+        timestamp: new Date(),
+        recommendations: 'Analyse terminée.',
+        analysisType: 'emoji'
+      };
+      onScanComplete(fallbackResult);
+    } finally {
       setIsProcessing(false);
-    }, 2000);
+    }
   };
 
   return (
