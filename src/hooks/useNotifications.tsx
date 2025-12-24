@@ -16,67 +16,54 @@ export function useNotifications() {
   const { user } = useAuth();
   const { toast } = useToast();
   
-  // Fetch notifications based on filter
+  // Fetch notifications from Supabase
   const fetchNotifications = async (selectedFilter: NotificationFilter = filter) => {
     if (!user) return;
-    
+
     setIsLoading(true);
     try {
-      // In a real app, this would be an API call
-      // For now, we'll use mock data
-      await new Promise(resolve => setTimeout(resolve, 500)); // Simulate network delay
-      
-      // Mock notification data
-      const mockNotifications: Notification[] = [
-        {
-          id: '1',
-          type: 'info',
-          title: 'Nouveau rapport disponible',
-          message: 'Votre rapport hebdomadaire est prêt à être consulté.',
-          date: new Date(Date.now() - 1000 * 60 * 30).toISOString(), // 30 minutes ago
-          isRead: false,
-          linkTo: '/dashboard'
-        },
-        {
-          id: '2',
-          type: 'invitation',
-          title: 'Invitation à une session VR',
-          message: 'Jean Dupont vous invite à rejoindre une session VR relaxation.',
-          date: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(), // 2 hours ago
-          isRead: false,
-          linkTo: '/vr-sessions'
-        },
-        {
-          id: '3',
-          type: 'reminder',
-          title: 'Rappel: Scan émotionnel',
-          message: 'N\'oubliez pas d\'effectuer votre scan émotionnel quotidien.',
-          date: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString(), // 5 hours ago
-          isRead: true,
-          linkTo: '/scan'
-        },
-        {
-          id: '4',
-          type: 'system',
-          title: 'Maintenance système prévue',
-          message: 'Une maintenance est prévue demain à 22h00.',
-          date: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(), // 1 day ago
-          isRead: true,
-          linkTo: '/notifications'
-        }
-      ];
-      
-      // Filter notifications based on selected filter
-      let filteredNotifications = mockNotifications;
+      const { supabase } = await import('@/integrations/supabase/client');
+
+      let query = supabase
+        .from('notifications')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(50);
+
+      // Apply filter
       if (selectedFilter === 'unread') {
-        filteredNotifications = mockNotifications.filter(n => !n.isRead);
+        query = query.eq('is_read', false);
       } else if (selectedFilter !== 'all') {
-        filteredNotifications = mockNotifications.filter(n => n.type === selectedFilter);
+        query = query.eq('type', selectedFilter);
       }
-      
-      setNotifications(filteredNotifications);
-      const unreadNotifications = mockNotifications.filter(n => !n.isRead);
-      setUnreadCount(unreadNotifications.length);
+
+      const { data, error } = await query;
+
+      if (error) throw error;
+
+      // Transform to Notification format
+      const transformedNotifications: Notification[] = (data || []).map(n => ({
+        id: n.id,
+        type: n.type as Notification['type'],
+        title: n.title,
+        message: n.message,
+        date: n.created_at,
+        isRead: n.is_read,
+        linkTo: n.action_url || '/dashboard'
+      }));
+
+      setNotifications(transformedNotifications);
+
+      // Get unread count
+      const { count } = await supabase
+        .from('notifications')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+        .eq('is_read', false);
+
+      setUnreadCount(count || 0);
+
     } catch (error) {
       logger.error('Error fetching notifications', error as Error, 'SYSTEM');
       toast({
@@ -92,16 +79,25 @@ export function useNotifications() {
   // Mark a notification as read
   const markAsRead = async (id: string) => {
     if (!user) return;
-    
+
     try {
-      // In a real app, this would be an API call
-      // For now, we'll update the local state
-      setNotifications(prev => 
-        prev.map(notification => 
+      const { supabase } = await import('@/integrations/supabase/client');
+
+      const { error } = await supabase
+        .from('notifications')
+        .update({ is_read: true, read_at: new Date().toISOString() })
+        .eq('id', id)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      // Update local state
+      setNotifications(prev =>
+        prev.map(notification =>
           notification.id === id ? { ...notification, isRead: true } : notification
         )
       );
-      
+
       // Update unread count
       setUnreadCount(prev => Math.max(0, prev - 1));
     } catch (error) {
@@ -117,14 +113,23 @@ export function useNotifications() {
   // Mark all notifications as read
   const markAllAsRead = async () => {
     if (!user) return;
-    
+
     try {
-      // In a real app, this would be an API call
-      // For now, we'll update the local state
-      setNotifications(prev => 
+      const { supabase } = await import('@/integrations/supabase/client');
+
+      const { error } = await supabase
+        .from('notifications')
+        .update({ is_read: true, read_at: new Date().toISOString() })
+        .eq('user_id', user.id)
+        .eq('is_read', false);
+
+      if (error) throw error;
+
+      // Update local state
+      setNotifications(prev =>
         prev.map(notification => ({ ...notification, isRead: true }))
       );
-      
+
       // Update unread count
       setUnreadCount(0);
     } catch (error) {

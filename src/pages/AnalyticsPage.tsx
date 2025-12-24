@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -38,34 +38,148 @@ interface WeeklyMood {
 }
 
 export default function AnalyticsPage() {
-  // TODO: Connect to real API and use timeRange
   const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d'>('7d');
+  const [moodData, setMoodData] = useState<MoodData>({
+    average: 0,
+    trend: '0%',
+    sessions: 0,
+    streakDays: 0
+  });
+  const [moduleStats, setModuleStats] = useState<ModuleStat[]>([]);
+  const [weeklyMoods, setWeeklyMoods] = useState<WeeklyMood[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // TODO: Replace with real data from API
-  const moodData: MoodData = {
-    average: 7.2,
-    trend: '+5%',
-    sessions: 28,
-    streakDays: 12
-  };
+  useEffect(() => {
+    const loadAnalytics = async () => {
+      setIsLoading(true);
+      try {
+        const days = timeRange === '7d' ? 7 : timeRange === '30d' ? 30 : 90;
+        const startDate = new Date();
+        startDate.setDate(startDate.getDate() - days);
 
-  const moduleStats: ModuleStat[] = [
-    { name: 'Scan Émotionnel', usage: 85, sessions: 15, avgDuration: '3m' },
-    { name: 'Musique Thérapeutique', usage: 72, sessions: 12, avgDuration: '15m' },
-    { name: 'Coach IA', usage: 68, sessions: 8, avgDuration: '8m' },
-    { name: 'Respiration VR', usage: 54, sessions: 6, avgDuration: '12m' },
-    { name: 'Journal', usage: 45, sessions: 10, avgDuration: '5m' }
-  ];
+        // Charger les données depuis Supabase via l'API existante
+        const { supabase } = await import('@/integrations/supabase/client');
+        const { data: { user } } = await supabase.auth.getUser();
 
-  const weeklyMoods: WeeklyMood[] = [
-    { day: 'Lun', mood: 6.5, energy: 7.0 },
-    { day: 'Mar', mood: 7.2, energy: 6.8 },
-    { day: 'Mer', mood: 8.1, energy: 8.2 },
-    { day: 'Jeu', mood: 7.8, energy: 7.5 },
-    { day: 'Ven', mood: 6.9, energy: 6.2 },
-    { day: 'Sam', mood: 8.5, energy: 8.8 },
-    { day: 'Dim', mood: 7.6, energy: 7.9 }
-  ];
+        if (!user) {
+          setIsLoading(false);
+          return;
+        }
+
+        // Récupérer les sessions d'activité
+        const { data: sessions } = await supabase
+          .from('activity_sessions')
+          .select('*')
+          .eq('user_id', user.id)
+          .gte('created_at', startDate.toISOString())
+          .order('created_at', { ascending: false });
+
+        // Récupérer les scans émotionnels
+        const { data: scans } = await supabase
+          .from('emotion_scans')
+          .select('*')
+          .eq('user_id', user.id)
+          .gte('created_at', startDate.toISOString())
+          .order('created_at', { ascending: false });
+
+        // Calculer les statistiques
+        const totalSessions = sessions?.length || 0;
+        const avgMood = scans && scans.length > 0
+          ? scans.reduce((sum, s) => sum + (s.mood_score || 5), 0) / scans.length
+          : 5;
+
+        // Calculer le streak
+        let streak = 0;
+        if (sessions && sessions.length > 0) {
+          const uniqueDays = new Set(sessions.map(s => s.created_at.split('T')[0]));
+          const today = new Date().toISOString().split('T')[0];
+          let checkDate = new Date();
+          while (uniqueDays.has(checkDate.toISOString().split('T')[0])) {
+            streak++;
+            checkDate.setDate(checkDate.getDate() - 1);
+          }
+        }
+
+        // Calculer le trend
+        const midPoint = Math.floor((scans?.length || 0) / 2);
+        const recentAvg = scans && scans.length > midPoint
+          ? scans.slice(0, midPoint).reduce((sum, s) => sum + (s.mood_score || 5), 0) / midPoint
+          : avgMood;
+        const oldAvg = scans && scans.length > midPoint
+          ? scans.slice(midPoint).reduce((sum, s) => sum + (s.mood_score || 5), 0) / (scans.length - midPoint)
+          : avgMood;
+        const trendPercent = oldAvg > 0 ? Math.round(((recentAvg - oldAvg) / oldAvg) * 100) : 0;
+
+        setMoodData({
+          average: Math.round(avgMood * 10) / 10,
+          trend: `${trendPercent >= 0 ? '+' : ''}${trendPercent}%`,
+          sessions: totalSessions,
+          streakDays: streak
+        });
+
+        // Calculer les stats par module
+        const moduleMap = new Map<string, { sessions: number; totalDuration: number }>();
+        sessions?.forEach(s => {
+          const existing = moduleMap.get(s.module_name) || { sessions: 0, totalDuration: 0 };
+          moduleMap.set(s.module_name, {
+            sessions: existing.sessions + 1,
+            totalDuration: existing.totalDuration + (s.duration_seconds || 0)
+          });
+        });
+
+        const moduleNames: Record<string, string> = {
+          'scan': 'Scan Émotionnel',
+          'music': 'Musique Thérapeutique',
+          'coach': 'Coach IA',
+          'breathing-vr': 'Respiration VR',
+          'journal': 'Journal'
+        };
+
+        const stats = Array.from(moduleMap.entries())
+          .map(([name, data]) => ({
+            name: moduleNames[name] || name,
+            usage: Math.round((data.sessions / Math.max(totalSessions, 1)) * 100),
+            sessions: data.sessions,
+            avgDuration: `${Math.round(data.totalDuration / Math.max(data.sessions, 1) / 60)}m`
+          }))
+          .sort((a, b) => b.sessions - a.sessions)
+          .slice(0, 5);
+
+        setModuleStats(stats.length > 0 ? stats : [
+          { name: 'Scan Émotionnel', usage: 0, sessions: 0, avgDuration: '0m' }
+        ]);
+
+        // Calculer les humeurs hebdomadaires
+        const dayNames = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
+        const weekData: WeeklyMood[] = [];
+        for (let i = 6; i >= 0; i--) {
+          const date = new Date();
+          date.setDate(date.getDate() - i);
+          const dayStr = date.toISOString().split('T')[0];
+          const dayScans = scans?.filter(s => s.created_at.startsWith(dayStr)) || [];
+          const avgDayMood = dayScans.length > 0
+            ? dayScans.reduce((sum, s) => sum + (s.mood_score || 5), 0) / dayScans.length
+            : 5;
+          const avgDayEnergy = dayScans.length > 0
+            ? dayScans.reduce((sum, s) => sum + (s.energy_level || 5), 0) / dayScans.length
+            : 5;
+          weekData.push({
+            day: dayNames[date.getDay()],
+            mood: Math.round(avgDayMood * 10) / 10,
+            energy: Math.round(avgDayEnergy * 10) / 10
+          });
+        }
+        setWeeklyMoods(weekData);
+
+      } catch (error) {
+        console.error('Error loading analytics:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadAnalytics();
+  }, [timeRange]);
 
   return (
     <div className="min-h-screen bg-background">

@@ -30,82 +30,161 @@ interface MeditationStat {
 
 const MeditationStats: React.FC = () => {
   const { toast } = useToast();
-  const [selectedWeek, setSelectedWeek] = useState(3); // Current week
+  const [selectedWeek, setSelectedWeek] = useState(3);
+  const [stats, setStats] = useState<MeditationStat[]>([]);
+  const [weeklyGoal, setWeeklyGoal] = useState({ target: 7, completed: 0, percentage: 0 });
+  const [recentAchievements, setRecentAchievements] = useState<any[]>([]);
+  const [monthlyData, setMonthlyData] = useState<{ week: string; sessions: number; minutes: number }[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Mock data - En production, ces données viendraient d'une API
-  const stats: MeditationStat[] = [
-    {
-      label: 'Sessions cette semaine',
-      value: 5,
-      icon: <Calendar className="h-5 w-5" />,
-      trend: '+2 vs semaine dernière',
-      trendDirection: 'up',
-      color: 'text-blue-500',
-    },
-    {
-      label: 'Temps total médité',
-      value: '2h 45min',
-      icon: <Clock className="h-5 w-5" />,
-      trend: '+35min cette semaine',
-      trendDirection: 'up',
-      color: 'text-emerald-500',
-    },
-    {
-      label: 'Série actuelle',
-      value: 7,
-      icon: <Flame className="h-5 w-5" />,
-      trend: 'jours consécutifs',
-      trendDirection: 'neutral',
-      color: 'text-orange-500',
-    },
-    {
-      label: 'Objectif hebdomadaire',
-      value: '71%',
-      icon: <Target className="h-5 w-5" />,
-      progress: 71,
-      color: 'text-purple-500',
-    }
-  ];
+  // Load meditation stats from Supabase
+  React.useEffect(() => {
+    const loadStats = async () => {
+      try {
+        const { supabase } = await import('@/integrations/supabase/client');
+        const { data: { user } } = await supabase.auth.getUser();
 
-  const weeklyGoal = {
-    target: 7,
-    completed: 5,
-    percentage: Math.round((5 / 7) * 100)
+        if (!user) {
+          setIsLoading(false);
+          return;
+        }
+
+        // Get meditation sessions
+        const { data: sessions } = await supabase
+          .from('activity_sessions')
+          .select('*')
+          .eq('user_id', user.id)
+          .in('module_name', ['meditation', 'breathing', 'breathing-vr'])
+          .order('created_at', { ascending: false });
+
+        if (sessions && sessions.length > 0) {
+          // Calculate weekly sessions
+          const weekAgo = new Date();
+          weekAgo.setDate(weekAgo.getDate() - 7);
+          const twoWeeksAgo = new Date();
+          twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
+
+          const thisWeekSessions = sessions.filter(s => new Date(s.created_at) >= weekAgo);
+          const lastWeekSessions = sessions.filter(s => new Date(s.created_at) >= twoWeeksAgo && new Date(s.created_at) < weekAgo);
+
+          const thisWeekMinutes = Math.round(thisWeekSessions.reduce((sum, s) => sum + (s.duration_seconds || 0), 0) / 60);
+          const lastWeekMinutes = Math.round(lastWeekSessions.reduce((sum, s) => sum + (s.duration_seconds || 0), 0) / 60);
+
+          // Calculate streak
+          const uniqueDays = new Set(sessions.map(s => s.created_at.split('T')[0]));
+          let streak = 0;
+          let checkDate = new Date();
+          while (uniqueDays.has(checkDate.toISOString().split('T')[0])) {
+            streak++;
+            checkDate.setDate(checkDate.getDate() - 1);
+          }
+
+          const hours = Math.floor(thisWeekMinutes / 60);
+          const mins = thisWeekMinutes % 60;
+          const weekDiff = thisWeekSessions.length - lastWeekSessions.length;
+          const minDiff = thisWeekMinutes - lastWeekMinutes;
+
+          setStats([
+            {
+              label: 'Sessions cette semaine',
+              value: thisWeekSessions.length,
+              icon: <Calendar className="h-5 w-5" />,
+              trend: `${weekDiff >= 0 ? '+' : ''}${weekDiff} vs semaine dernière`,
+              trendDirection: weekDiff >= 0 ? 'up' : 'down',
+              color: 'text-blue-500',
+            },
+            {
+              label: 'Temps total médité',
+              value: `${hours}h ${mins}min`,
+              icon: <Clock className="h-5 w-5" />,
+              trend: `${minDiff >= 0 ? '+' : ''}${minDiff}min cette semaine`,
+              trendDirection: minDiff >= 0 ? 'up' : 'down',
+              color: 'text-emerald-500',
+            },
+            {
+              label: 'Série actuelle',
+              value: streak,
+              icon: <Flame className="h-5 w-5" />,
+              trend: 'jours consécutifs',
+              trendDirection: 'neutral',
+              color: 'text-orange-500',
+            },
+            {
+              label: 'Objectif hebdomadaire',
+              value: `${Math.round((thisWeekSessions.length / 7) * 100)}%`,
+              icon: <Target className="h-5 w-5" />,
+              progress: Math.round((thisWeekSessions.length / 7) * 100),
+              color: 'text-purple-500',
+            }
+          ]);
+
+          setWeeklyGoal({
+            target: 7,
+            completed: thisWeekSessions.length,
+            percentage: Math.round((thisWeekSessions.length / 7) * 100)
+          });
+
+          // Calculate monthly data
+          const monthData: { week: string; sessions: number; minutes: number }[] = [];
+          for (let i = 3; i >= 0; i--) {
+            const weekStart = new Date();
+            weekStart.setDate(weekStart.getDate() - (i * 7) - 7);
+            const weekEnd = new Date();
+            weekEnd.setDate(weekEnd.getDate() - (i * 7));
+
+            const weekSessions = sessions.filter(s => {
+              const d = new Date(s.created_at);
+              return d >= weekStart && d < weekEnd;
+            });
+
+            monthData.push({
+              week: `Sem. ${4 - i}`,
+              sessions: weekSessions.length,
+              minutes: Math.round(weekSessions.reduce((sum, s) => sum + (s.duration_seconds || 0), 0) / 60)
+            });
+          }
+          setMonthlyData(monthData);
+        }
+
+        // Load achievements
+        const { data: achievements } = await supabase
+          .from('user_achievements')
+          .select('*, achievements(*)')
+          .eq('user_id', user.id)
+          .order('earned_at', { ascending: false })
+          .limit(3);
+
+        if (achievements) {
+          setRecentAchievements(achievements.map(a => ({
+            id: a.id,
+            title: a.achievements?.name || 'Badge',
+            description: a.achievements?.description || '',
+            icon: a.achievements?.icon || '🏆',
+            date: formatRelativeDate(a.earned_at),
+            rarity: a.achievements?.tier || 'common'
+          })));
+        }
+
+      } catch (error) {
+        console.error('Error loading meditation stats:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadStats();
+  }, []);
+
+  const formatRelativeDate = (dateStr: string) => {
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diffDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
+    if (diffDays === 0) return "Aujourd'hui";
+    if (diffDays === 1) return 'Hier';
+    if (diffDays < 7) return `Il y a ${diffDays} jours`;
+    if (diffDays < 14) return 'Il y a 1 semaine';
+    return `Il y a ${Math.floor(diffDays / 7)} semaines`;
   };
-
-  const recentAchievements = [
-    {
-      id: '1',
-      title: 'Première semaine',
-      description: '7 jours de méditation consécutifs',
-      icon: '🏆',
-      date: 'Il y a 3 jours',
-      rarity: 'rare'
-    },
-    {
-      id: '2',
-      title: 'Respirateur zen',
-      description: '50 exercices de respiration complétés',
-      icon: '🧘',
-      date: 'Il y a 1 semaine',
-      rarity: 'epic'
-    },
-    {
-      id: '3',
-      title: 'Explorateur sonore',
-      description: 'Tous les types d\'ambiances testés',
-      icon: '🎵',
-      date: 'Il y a 2 semaines',
-      rarity: 'common'
-    }
-  ];
-
-  const monthlyData = [
-    { week: 'Sem. 1', sessions: 3, minutes: 45 },
-    { week: 'Sem. 2', sessions: 5, minutes: 75 },
-    { week: 'Sem. 3', sessions: 6, minutes: 90 },
-    { week: 'Sem. 4', sessions: 5, minutes: 85 }
-  ];
 
   // Calculate totals
   const totals = useMemo(() => ({

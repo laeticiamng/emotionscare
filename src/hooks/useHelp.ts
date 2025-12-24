@@ -24,14 +24,42 @@ export const useHelp = () => {
 
   const [initialized, setInitialized] = useState(false);
 
-  // Load sections
+  // Load sections from Supabase
   const loadSections = useCallback(async () => {
     setLoading(true);
     setError(null);
 
     try {
-      // TODO: Implement with Supabase edge function
-      // For now, use fallback data
+      const { supabase } = await import('@/integrations/supabase/client');
+
+      const { data, error: fetchError } = await supabase
+        .from('help_sections')
+        .select('*')
+        .eq('is_active', true)
+        .order('order_index', { ascending: true });
+
+      if (fetchError) throw fetchError;
+
+      if (data && data.length > 0) {
+        const formattedSections: Section[] = data.map(s => ({
+          id: s.id,
+          name: s.name,
+          slug: s.slug,
+          icon: s.icon || '📄'
+        }));
+        setSections(formattedSections);
+      } else {
+        // Fallback to default sections if none in database
+        setSections([
+          { id: '1', name: 'Modules', slug: 'modules', icon: '🧩' },
+          { id: '2', name: 'Compte', slug: 'account', icon: '👤' },
+          { id: '3', name: 'RGPD', slug: 'rgpd', icon: '🔒' },
+          { id: '4', name: 'Technique', slug: 'technical', icon: '⚙️' }
+        ]);
+      }
+    } catch (error: any) {
+      logger.error('Load sections failed', error, 'SYSTEM');
+      // Use fallback on error
       setSections([
         { id: '1', name: 'Modules', slug: 'modules', icon: '🧩' },
         { id: '2', name: 'Compte', slug: 'account', icon: '👤' },

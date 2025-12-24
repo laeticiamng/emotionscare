@@ -25,32 +25,36 @@ export const useChatHistory = () => {
     loadConversations();
   }, []);
 
-  // Load all conversations
+  // Load all conversations from Supabase
   const loadConversations = async () => {
     setIsLoading(true);
     setError(null);
-    
+
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      // Mock data
-      const mockConversations: Conversation[] = [
-        {
-          id: 'conv-1',
-          title: 'Gestion du stress',
-          lastMessage: 'Voici quelques techniques de respiration pour vous aider.',
-          lastMessageTimestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-        },
-        {
-          id: 'conv-2',
-          title: 'Amélioration du sommeil',
-          lastMessage: 'N\'hésitez pas à essayer cette méditation avant de dormir.',
-          lastMessageTimestamp: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-        }
-      ];
-      
-      setConversations(mockConversations);
+      const { supabase } = await import('@/integrations/supabase/client');
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (!user) {
+        setConversations([]);
+        return;
+      }
+
+      const { data, error: fetchError } = await supabase
+        .from('chat_conversations')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('updated_at', { ascending: false });
+
+      if (fetchError) throw fetchError;
+
+      const formattedConversations: Conversation[] = (data || []).map(c => ({
+        id: c.id,
+        title: c.title || 'Nouvelle conversation',
+        lastMessage: c.last_message,
+        lastMessageTimestamp: c.updated_at || c.created_at
+      }));
+
+      setConversations(formattedConversations);
     } catch (error) {
       logger.error('Error loading conversations', error as Error, 'UI');
       setError(error instanceof Error ? error : new Error('Failed to load conversations'));
@@ -59,50 +63,35 @@ export const useChatHistory = () => {
     }
   };
 
-  // Load messages for a specific conversation
+  // Load messages for a specific conversation from Supabase
   const loadMessages = async (conversationId: string) => {
     setIsLoading(true);
     setError(null);
-    
+
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 700));
-      
-      // Mock data
-      const mockMessages: ChatMessage[] = [
-        {
-          id: `${conversationId}-msg-1`,
-          text: 'Bonjour, comment puis-je vous aider aujourd\'hui ?',
-          content: 'Bonjour, comment puis-je vous aider aujourd\'hui ?',
-          sender: 'bot',
-          role: 'assistant',
-          timestamp: new Date(Date.now() - 10 * 60 * 1000).toISOString(),
-          conversation_id: conversationId
-        },
-        {
-          id: `${conversationId}-msg-2`,
-          text: 'J\'ai du mal à gérer mon stress au travail.',
-          content: 'J\'ai du mal à gérer mon stress au travail.',
-          sender: 'user',
-          role: 'user',
-          timestamp: new Date(Date.now() - 8 * 60 * 1000).toISOString(),
-          conversation_id: conversationId
-        },
-        {
-          id: `${conversationId}-msg-3`,
-          text: 'Je comprends. Le stress au travail est très courant. Pouvez-vous me décrire plus précisément ce qui génère ce stress ?',
-          content: 'Je comprends. Le stress au travail est très courant. Pouvez-vous me décrire plus précisément ce qui génère ce stress ?',
-          sender: 'bot',
-          role: 'assistant',
-          timestamp: new Date(Date.now() - 7 * 60 * 1000).toISOString(),
-          conversation_id: conversationId
-        }
-      ];
-      
-      // Update active conversation
+      const { supabase } = await import('@/integrations/supabase/client');
+
+      const { data, error: fetchError } = await supabase
+        .from('chat_messages')
+        .select('*')
+        .eq('conversation_id', conversationId)
+        .order('created_at', { ascending: true });
+
+      if (fetchError) throw fetchError;
+
+      const messages: ChatMessage[] = (data || []).map(m => ({
+        id: m.id,
+        text: m.content,
+        content: m.content,
+        sender: m.role === 'assistant' ? 'bot' : 'user',
+        role: m.role,
+        timestamp: m.created_at,
+        conversation_id: conversationId
+      }));
+
       setActiveConversationId(conversationId);
-      
-      return mockMessages;
+
+      return messages;
     } catch (error) {
       logger.error('Error loading messages', error as Error, 'UI');
       setError(error instanceof Error ? error : new Error('Failed to load messages'));
@@ -112,24 +101,37 @@ export const useChatHistory = () => {
     }
   };
 
-  // Create new conversation
+  // Create new conversation in Supabase
   const createConversation = async (title: string) => {
     setIsLoading(true);
     setError(null);
-    
+
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
+      const { supabase } = await import('@/integrations/supabase/client');
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (!user) throw new Error('User not authenticated');
+
+      const { data, error: insertError } = await supabase
+        .from('chat_conversations')
+        .insert({
+          user_id: user.id,
+          title: title || 'Nouvelle conversation'
+        })
+        .select()
+        .single();
+
+      if (insertError) throw insertError;
+
       const newConversation: Conversation = {
-        id: `conv-${Date.now()}`,
-        title,
-        lastMessageTimestamp: new Date().toISOString()
+        id: data.id,
+        title: data.title,
+        lastMessageTimestamp: data.created_at
       };
-      
+
       setConversations(prev => [newConversation, ...prev]);
       setActiveConversationId(newConversation.id);
-      
+
       return newConversation;
     } catch (error) {
       logger.error('Error creating conversation', error as Error, 'UI');
@@ -140,34 +142,46 @@ export const useChatHistory = () => {
     }
   };
 
-  // Delete conversation
+  // Delete conversation from Supabase
   const deleteConversation = async (conversationId: string) => {
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 300));
-      
+      const { supabase } = await import('@/integrations/supabase/client');
+
+      // Delete messages first (if no cascade delete)
+      await supabase
+        .from('chat_messages')
+        .delete()
+        .eq('conversation_id', conversationId);
+
+      // Delete conversation
+      const { error } = await supabase
+        .from('chat_conversations')
+        .delete()
+        .eq('id', conversationId);
+
+      if (error) throw error;
+
       setConversations(prev => prev.filter(conv => conv.id !== conversationId));
-      
-      // Reset active conversation if deleted
+
       if (activeConversationId === conversationId) {
         setActiveConversationId(null);
       }
-      
+
       toast({
         title: 'Conversation supprimée',
         description: 'La conversation a bien été supprimée.'
       });
-      
+
       return true;
     } catch (error) {
       logger.error('Error deleting conversation', error as Error, 'UI');
-      
+
       toast({
         title: 'Erreur',
         description: 'Impossible de supprimer la conversation.',
         variant: 'destructive'
       });
-      
+
       return false;
     }
   };

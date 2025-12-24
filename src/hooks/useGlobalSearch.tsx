@@ -47,53 +47,77 @@ export function useGlobalSearch() {
     }
 
     setIsLoading(true);
-    
+
     try {
-      // In a real app, this would be a call to your backend API
-      // For now, we'll simulate results with mock data
-      await new Promise(resolve => setTimeout(resolve, 300)); // Simulate network delay
-      
-      // Mock data for demonstration purposes
-      const mockResults: SearchResults = {
-        users: [
-          { id: 1, name: 'Sophie Martin', to: '/users/1', },
-          { id: 2, name: 'Thomas Dubois', to: '/users/2', },
-          { id: 3, name: 'Julie Bernard', to: '/users/3', },
-        ].filter(user => 
-          user.name.toLowerCase().includes(searchQuery.toLowerCase())
-        ),
-        
-        modules: [
-          { key: 'dashboard', label: 'Dashboard', to: '/dashboard' },
-          { key: 'scan', label: 'Scan émotionnel', to: '/scan' },
-          { key: 'journal', label: 'Journal', to: '/journal' },
-          { key: 'vr-sessions', label: 'VR Sessions', to: '/vr-sessions' },
-          { key: 'community', label: 'Communauté', to: '/community/feed' },
-          { key: 'music', label: 'Musique & Bien-être', to: '/music-wellbeing' },
-          { key: 'coach', label: 'Coach IA', to: '/coach' },
-        ].filter(module => 
-          module.label.toLowerCase().includes(searchQuery.toLowerCase())
-        ),
-        
-        kpis: [
-          { key: 'sessions_today', label: 'Sessions aujourd\'hui', to: '/dashboard#sessions' },
-          { key: 'emotional_score', label: 'Score émotionnel', to: '/dashboard#emotional' },
-          { key: 'wellbeing', label: 'Bien-être général', to: '/dashboard#wellbeing' },
-          { key: 'productivity', label: 'Productivité', to: '/dashboard#productivity' },
-        ].filter(kpi => 
-          kpi.label.toLowerCase().includes(searchQuery.toLowerCase())
-        ),
-        
-        notifications: [
-          { id: 1, title: 'Nouvelle analyse disponible', to: '/notifications/1' },
-          { id: 2, title: 'Rappel: Session VR planifiée', to: '/notifications/2' },
-          { id: 3, title: 'Alerte bien-être', to: '/notifications/3' },
-        ].filter(notification => 
-          notification.title.toLowerCase().includes(searchQuery.toLowerCase())
-        ),
-      };
-      
-      setResults(mockResults);
+      const { supabase } = await import('@/integrations/supabase/client');
+      const { data: { user } } = await supabase.auth.getUser();
+
+      // Static modules list (always available)
+      const modules = [
+        { key: 'dashboard', label: 'Dashboard', to: '/dashboard' },
+        { key: 'scan', label: 'Scan émotionnel', to: '/scan' },
+        { key: 'journal', label: 'Journal', to: '/journal' },
+        { key: 'vr-sessions', label: 'VR Sessions', to: '/vr-sessions' },
+        { key: 'community', label: 'Communauté', to: '/community/feed' },
+        { key: 'music', label: 'Musique & Bien-être', to: '/music-wellbeing' },
+        { key: 'coach', label: 'Coach IA', to: '/coach' },
+        { key: 'meditation', label: 'Méditation', to: '/meditation' },
+        { key: 'breathing', label: 'Respiration', to: '/breathing' },
+        { key: 'analytics', label: 'Analytiques', to: '/analytics' },
+        { key: 'settings', label: 'Paramètres', to: '/settings' },
+        { key: 'help', label: 'Aide', to: '/help' },
+      ].filter(module =>
+        module.label.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+
+      // Static KPIs
+      const kpis = [
+        { key: 'sessions_today', label: 'Sessions aujourd\'hui', to: '/dashboard#sessions' },
+        { key: 'emotional_score', label: 'Score émotionnel', to: '/dashboard#emotional' },
+        { key: 'wellbeing', label: 'Bien-être général', to: '/dashboard#wellbeing' },
+        { key: 'productivity', label: 'Productivité', to: '/dashboard#productivity' },
+      ].filter(kpi =>
+        kpi.label.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+
+      let users: SearchResult[] = [];
+      let notifications: SearchResult[] = [];
+
+      if (user) {
+        // Search users from profiles table
+        const { data: profilesData } = await supabase
+          .from('profiles')
+          .select('user_id, full_name, avatar_url')
+          .ilike('full_name', `%${searchQuery}%`)
+          .limit(5);
+
+        users = (profilesData || []).map(p => ({
+          id: p.user_id,
+          name: p.full_name || 'Utilisateur',
+          to: `/users/${p.user_id}`
+        }));
+
+        // Search notifications
+        const { data: notificationsData } = await supabase
+          .from('notifications')
+          .select('id, title')
+          .eq('user_id', user.id)
+          .ilike('title', `%${searchQuery}%`)
+          .limit(5);
+
+        notifications = (notificationsData || []).map(n => ({
+          id: n.id,
+          title: n.title,
+          to: `/notifications/${n.id}`
+        }));
+      }
+
+      setResults({
+        users,
+        modules,
+        kpis,
+        notifications
+      });
     } catch (error) {
       logger.error('Error fetching search results', error as Error, 'UI');
       toast({

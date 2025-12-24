@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -17,22 +17,98 @@ interface VRDashboardProps {
 
 const VRDashboard: React.FC<VRDashboardProps> = ({ templates, onStartSession }) => {
   const [activeTab, setActiveTab] = useState<'featured' | 'history' | 'progress'>('featured');
-
-  // Mock data for dashboard
-  const userStats = {
-    totalSessions: 47,
-    totalTime: '12h 34m',
-    weeklyGoal: 180, // minutes
-    weeklyProgress: 142, // minutes
-    currentStreak: 5,
+  const [userStats, setUserStats] = useState({
+    totalSessions: 0,
+    totalTime: '0h 0m',
+    weeklyGoal: 180,
+    weeklyProgress: 0,
+    currentStreak: 0,
     favoriteCategory: 'Méditation'
-  };
+  });
+  const [recentSessions, setRecentSessions] = useState<Array<{
+    id: string;
+    title: string;
+    date: string;
+    duration: number;
+    rating: number;
+  }>>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const recentSessions = [
-    { id: '1', title: 'Méditation pleine conscience', date: '2024-01-20', duration: 10, rating: 5 },
-    { id: '2', title: 'Respiration profonde', date: '2024-01-19', duration: 5, rating: 4 },
-    { id: '3', title: 'Relaxation guidée', date: '2024-01-18', duration: 15, rating: 5 }
-  ];
+  // Load real data from Supabase
+  React.useEffect(() => {
+    const loadVRStats = async () => {
+      try {
+        const { supabase } = await import('@/integrations/supabase/client');
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (!user) {
+          setIsLoading(false);
+          return;
+        }
+
+        // Fetch VR sessions
+        const { data: sessions } = await supabase
+          .from('activity_sessions')
+          .select('*')
+          .eq('user_id', user.id)
+          .in('module_name', ['breathing-vr', 'vr-galaxy', 'vr-nebula', 'meditation-vr'])
+          .order('created_at', { ascending: false });
+
+        if (sessions && sessions.length > 0) {
+          const totalMinutes = sessions.reduce((sum, s) => sum + (s.duration_seconds || 0), 0) / 60;
+          const hours = Math.floor(totalMinutes / 60);
+          const mins = Math.round(totalMinutes % 60);
+
+          // Calculate streak
+          const uniqueDays = new Set(sessions.map(s => s.created_at.split('T')[0]));
+          let streak = 0;
+          let checkDate = new Date();
+          while (uniqueDays.has(checkDate.toISOString().split('T')[0])) {
+            streak++;
+            checkDate.setDate(checkDate.getDate() - 1);
+          }
+
+          // Calculate weekly progress
+          const weekAgo = new Date();
+          weekAgo.setDate(weekAgo.getDate() - 7);
+          const weekSessions = sessions.filter(s => new Date(s.created_at) >= weekAgo);
+          const weeklyMinutes = weekSessions.reduce((sum, s) => sum + (s.duration_seconds || 0), 0) / 60;
+
+          // Find favorite category
+          const categoryCount = new Map<string, number>();
+          sessions.forEach(s => {
+            categoryCount.set(s.module_name, (categoryCount.get(s.module_name) || 0) + 1);
+          });
+          const topCategory = Array.from(categoryCount.entries()).sort((a, b) => b[1] - a[1])[0];
+
+          setUserStats({
+            totalSessions: sessions.length,
+            totalTime: `${hours}h ${mins}m`,
+            weeklyGoal: 180,
+            weeklyProgress: Math.round(weeklyMinutes),
+            currentStreak: streak,
+            favoriteCategory: topCategory?.[0] || 'Méditation'
+          });
+
+          // Format recent sessions
+          const recent = sessions.slice(0, 3).map(s => ({
+            id: s.id,
+            title: s.title || s.module_name || 'Session VR',
+            date: s.created_at.split('T')[0],
+            duration: Math.round((s.duration_seconds || 0) / 60),
+            rating: s.rating || 4
+          }));
+          setRecentSessions(recent);
+        }
+      } catch (error) {
+        console.error('Error loading VR stats:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadVRStats();
+  }, []);
 
   const featuredTemplates = templates.filter(t => t.isFeatured || templates.indexOf(t) < 3);
 

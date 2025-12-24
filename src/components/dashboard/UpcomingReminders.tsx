@@ -54,58 +54,92 @@ const UpcomingReminders: React.FC = () => {
   });
   const { toast } = useToast();
 
-  // Load from localStorage
+  // Load reminders from Supabase first, fallback to localStorage
   useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
+    const loadReminders = async () => {
       try {
-        const parsed = JSON.parse(stored);
-        // Filter out old completed non-recurring reminders
-        const filtered = parsed.filter((r: Reminder) => {
-          if (r.completed && r.recurring === 'none') {
-            const reminderDate = new Date(r.time);
-            const dayAgo = new Date();
-            dayAgo.setDate(dayAgo.getDate() - 1);
-            return reminderDate > dayAgo;
+        const { supabase } = await import('@/integrations/supabase/client');
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (user) {
+          const { data, error } = await supabase
+            .from('reminders')
+            .select('*')
+            .eq('user_id', user.id)
+            .eq('is_active', true)
+            .order('scheduled_time', { ascending: true });
+
+          if (!error && data && data.length > 0) {
+            const formattedReminders: Reminder[] = data.map(r => ({
+              id: r.id,
+              title: r.title || 'Rappel',
+              time: r.scheduled_time || new Date().toISOString(),
+              completed: r.completed || false,
+              category: (r.type as Reminder['category']) || 'custom',
+              recurring: (r.frequency as Reminder['recurring']) || 'none',
+              snoozedUntil: r.snoozed_until
+            }));
+            setReminders(formattedReminders);
+            return;
           }
-          return true;
-        });
-        setReminders(filtered);
-      } catch (e) {
-        // Invalid data
-      }
-    } else {
-      // Default reminders
-      const now = new Date();
-      const defaultReminders: Reminder[] = [
-        {
-          id: '1',
-          title: 'Session de méditation',
-          time: new Date(now.setHours(10, 0, 0, 0)).toISOString(),
-          completed: false,
-          category: 'meditation',
-          recurring: 'daily',
-        },
-        {
-          id: '2',
-          title: 'Scanner votre émotion',
-          time: new Date(now.setHours(14, 30, 0, 0)).toISOString(),
-          completed: false,
-          category: 'scan',
-          recurring: 'daily',
-        },
-        {
-          id: '3',
-          title: 'Écrire dans le journal',
-          time: new Date(now.setHours(19, 0, 0, 0)).toISOString(),
-          completed: true,
-          category: 'journal',
-          recurring: 'daily',
         }
-      ];
-      setReminders(defaultReminders);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultReminders));
-    }
+
+        // Fallback to localStorage
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+          try {
+            const parsed = JSON.parse(stored);
+            const filtered = parsed.filter((r: Reminder) => {
+              if (r.completed && r.recurring === 'none') {
+                const reminderDate = new Date(r.time);
+                const dayAgo = new Date();
+                dayAgo.setDate(dayAgo.getDate() - 1);
+                return reminderDate > dayAgo;
+              }
+              return true;
+            });
+            setReminders(filtered);
+          } catch (e) {
+            // Invalid data
+          }
+        } else {
+          // Default reminders
+          const now = new Date();
+          const defaultReminders: Reminder[] = [
+            {
+              id: '1',
+              title: 'Session de méditation',
+              time: new Date(now.setHours(10, 0, 0, 0)).toISOString(),
+              completed: false,
+              category: 'meditation',
+              recurring: 'daily',
+            },
+            {
+              id: '2',
+              title: 'Scanner votre émotion',
+              time: new Date(now.setHours(14, 30, 0, 0)).toISOString(),
+              completed: false,
+              category: 'scan',
+              recurring: 'daily',
+            },
+            {
+              id: '3',
+              title: 'Écrire dans le journal',
+              time: new Date(now.setHours(19, 0, 0, 0)).toISOString(),
+              completed: true,
+              category: 'journal',
+              recurring: 'daily',
+            }
+          ];
+          setReminders(defaultReminders);
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(defaultReminders));
+        }
+      } catch (error) {
+        console.error('Error loading reminders:', error);
+      }
+    };
+
+    loadReminders();
   }, []);
 
   // Save to localStorage

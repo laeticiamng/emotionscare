@@ -51,8 +51,16 @@ export const SecurityAlertsPanel: React.FC = () => {
 
   const handleAcknowledge = async (alertId: string) => {
     try {
-      // TODO: Get actual user ID from auth context
-      await acknowledgeAlert(alertId, 'current-user-id');
+      // Get actual user ID from Supabase auth
+      const { supabase } = await import('@/integrations/supabase/client');
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (!user) {
+        toast.error('Erreur', 'Vous devez être connecté pour traiter les alertes.');
+        return;
+      }
+
+      await acknowledgeAlert(alertId, user.id);
       setAlerts((prev) => prev.filter((a) => a.id !== alertId));
       toast.success('Alerte traitée', 'L\'alerte a été marquée comme traitée.');
     } catch (error) {

@@ -46,19 +46,63 @@ class Logger {
 
   error(message: string, error?: Error | any, context: LogContext = 'SYSTEM'): void {
     console.error(`[${context}] ${message}`, error || '')
-    
-    // En production, on pourrait envoyer à un service de monitoring
+
+    // En production, envoyer à un service de monitoring
     if (!this.isDevelopment && error instanceof Error) {
-      // TODO: Envoyer à Sentry, LogRocket, etc.
+      this.sendToMonitoring('error', message, error, context);
     }
   }
 
   critical(message: string, error?: Error | any, context: LogContext = 'SYSTEM'): void {
     console.error(`[${context}] CRITICAL: ${message}`, error || '')
-    
+
     // En production, alert immédiate
     if (!this.isDevelopment) {
-      // TODO: Alert système critique
+      this.sendToMonitoring('critical', message, error, context);
+      this.sendCriticalAlert(message, error, context);
+    }
+  }
+
+  private async sendToMonitoring(level: string, message: string, error?: Error | any, context?: LogContext): Promise<void> {
+    try {
+      // Envoyer les erreurs à Supabase pour monitoring
+      const { supabase } = await import('@/integrations/supabase/client');
+
+      await supabase.from('error_logs').insert({
+        level,
+        message,
+        context: context || 'SYSTEM',
+        error_message: error?.message || String(error),
+        error_stack: error?.stack || null,
+        session_id: this.sessionId,
+        timestamp: new Date().toISOString(),
+        user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : null,
+        url: typeof window !== 'undefined' ? window.location.href : null
+      });
+    } catch (monitoringError) {
+      // Fail silently to avoid infinite loops
+      console.error('[Logger] Failed to send to monitoring:', monitoringError);
+    }
+  }
+
+  private async sendCriticalAlert(message: string, error?: Error | any, context?: LogContext): Promise<void> {
+    try {
+      const { supabase } = await import('@/integrations/supabase/client');
+
+      // Créer une alerte de sécurité pour les erreurs critiques
+      await supabase.from('security_alerts').insert({
+        alert_type: 'critical_error',
+        severity: 'critical',
+        message: `[${context}] ${message}`,
+        metadata: {
+          error_message: error?.message || String(error),
+          error_stack: error?.stack,
+          session_id: this.sessionId,
+          timestamp: new Date().toISOString()
+        }
+      });
+    } catch (alertError) {
+      console.error('[Logger] Failed to send critical alert:', alertError);
     }
   }
 

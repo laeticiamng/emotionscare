@@ -30,48 +30,52 @@ const MOOD_CONFIG = {
   very_difficult: { emoji: '😢', color: 'text-red-500', bg: 'bg-red-500/10' },
 };
 
-const mockEntries: JournalEntry[] = [
-  {
-    id: '1',
-    title: 'Journée productive',
-    date: '2025-05-12',
-    snippet: 'Aujourd\'hui j\'ai pu accomplir beaucoup de choses importantes. Je me sens vraiment fier de mes progrès.',
-    mood: 'excellent',
-    tags: ['travail', 'accomplissement'],
-    wordCount: 145,
-  },
-  {
-    id: '2',
-    title: 'Réunion d\'équipe',
-    date: '2025-05-10',
-    snippet: 'La réunion s\'est bien passée, j\'ai pu partager mes idées et elles ont été bien reçues par l\'équipe.',
-    mood: 'good',
-    tags: ['travail', 'équipe'],
-    wordCount: 89,
-  },
-  {
-    id: '3',
-    title: 'Moment de détente',
-    date: '2025-05-08',
-    snippet: 'J\'ai pris du temps pour me relaxer et faire une pause bien méritée. La méditation m\'a beaucoup aidé.',
-    mood: 'neutral',
-    tags: ['détente', 'méditation'],
-    wordCount: 67,
-  },
-  {
-    id: '4',
-    title: 'Journée difficile',
-    date: '2025-05-06',
-    snippet: 'Une journée compliquée avec beaucoup de stress. J\'ai essayé de rester positif malgré tout.',
-    mood: 'difficult',
-    tags: ['stress', 'challenge'],
-    wordCount: 112,
-  }
-];
-
 const RecentJournalEntries: React.FC = () => {
   const navigate = useNavigate();
-  const [entries, setEntries] = useState<JournalEntry[]>(mockEntries);
+  const [entries, setEntries] = useState<JournalEntry[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Load journal entries from Supabase
+  useEffect(() => {
+    const loadEntries = async () => {
+      try {
+        const { supabase } = await import('@/integrations/supabase/client');
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (!user) {
+          setIsLoading(false);
+          return;
+        }
+
+        const { data, error } = await supabase
+          .from('journal_entries')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(10);
+
+        if (error) throw error;
+
+        const formattedEntries: JournalEntry[] = (data || []).map(e => ({
+          id: e.id,
+          title: e.title || 'Sans titre',
+          date: e.created_at?.split('T')[0] || new Date().toISOString().split('T')[0],
+          snippet: e.content?.substring(0, 150) || '',
+          mood: e.mood as JournalEntry['mood'],
+          tags: e.tags || [],
+          wordCount: e.content?.split(/\s+/).filter(Boolean).length || 0
+        }));
+
+        setEntries(formattedEntries);
+      } catch (error) {
+        console.error('Error loading journal entries:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadEntries();
+  }, []);
   const [favorites, setFavorites] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [filter, setFilter] = useState<'all' | 'favorites'>('all');

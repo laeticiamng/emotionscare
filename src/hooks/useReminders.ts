@@ -19,16 +19,43 @@ export const useReminders = () => {
 
   const [initialized, setInitialized] = useState(false);
 
-  // Load reminders from API
+  // Load reminders from Supabase
   const loadReminders = useCallback(async () => {
     setLoading(true);
     setError(null);
 
     try {
-      // TODO: Implement with Supabase edge function
-      // For now, return empty array (reminders stored locally)
-      setReminders([]);
-      
+      const { supabase } = await import('@/integrations/supabase/client');
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (!user) {
+        setReminders([]);
+        return;
+      }
+
+      const { data, error: fetchError } = await supabase
+        .from('reminders')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('is_active', true)
+        .order('scheduled_time', { ascending: true });
+
+      if (fetchError) throw fetchError;
+
+      // Transform to Reminder format
+      const formattedReminders: Reminder[] = (data || []).map(r => ({
+        id: r.id,
+        kind: r.type || r.kind || 'general',
+        time: r.scheduled_time || r.time,
+        frequency: r.frequency || 'daily',
+        enabled: r.is_active ?? true,
+        title: r.title,
+        message: r.message,
+        days: r.days_of_week || []
+      }));
+
+      setReminders(formattedReminders);
+
     } catch (error: any) {
       logger.error('Load reminders failed', error as Error, 'SYSTEM');
       setError(error.message);

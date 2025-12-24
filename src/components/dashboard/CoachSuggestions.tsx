@@ -91,22 +91,70 @@ const CoachSuggestions: React.FC = () => {
   const [suggestions, setSuggestions] = useState<Suggestion[]>(initialSuggestions);
   const [showSaved, setShowSaved] = useState(false);
 
-  // Load from localStorage
+  // Load suggestions from Supabase, fallback to localStorage
   useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
+    const loadSuggestions = async () => {
       try {
-        const parsed = JSON.parse(stored);
-        // Merge with initial suggestions to keep icons
-        const merged = initialSuggestions.map(initial => {
-          const saved = parsed.find((s: Suggestion) => s.id === initial.id);
-          return saved ? { ...initial, ...saved } : initial;
-        });
-        setSuggestions(merged);
-      } catch (e) {
-        // Invalid data
+        const { supabase } = await import('@/integrations/supabase/client');
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (user) {
+          // Try to load personalized suggestions from Supabase
+          const { data: coachData } = await supabase
+            .from('coach_suggestions')
+            .select('*')
+            .eq('user_id', user.id)
+            .eq('is_active', true)
+            .order('relevance_score', { ascending: false })
+            .limit(10);
+
+          if (coachData && coachData.length > 0) {
+            const iconMap: Record<string, React.ElementType> = {
+              respiration: Heart,
+              meditation: Brain,
+              music: Music,
+              journal: BookOpen,
+              exercise: Sparkles,
+            };
+
+            const formattedSuggestions: Suggestion[] = coachData.map(s => ({
+              id: s.id,
+              title: s.title,
+              description: s.description,
+              icon: iconMap[s.category] || Sparkles,
+              link: s.link || `/app/${s.category}`,
+              duration: s.duration || '5 min',
+              category: s.category as Suggestion['category'],
+              relevanceScore: s.relevance_score || 80,
+              completedCount: s.completed_count || 0,
+              lastCompleted: s.last_completed,
+              savedForLater: s.saved_for_later || false,
+            }));
+            setSuggestions(formattedSuggestions);
+            return;
+          }
+        }
+
+        // Fallback to localStorage
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+          try {
+            const parsed = JSON.parse(stored);
+            const merged = initialSuggestions.map(initial => {
+              const saved = parsed.find((s: Suggestion) => s.id === initial.id);
+              return saved ? { ...initial, ...saved } : initial;
+            });
+            setSuggestions(merged);
+          } catch (e) {
+            // Invalid data
+          }
+        }
+      } catch (error) {
+        console.error('Error loading suggestions:', error);
       }
-    }
+    };
+
+    loadSuggestions();
   }, []);
 
   // Save to localStorage

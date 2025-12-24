@@ -283,13 +283,26 @@ export class DashboardService {
       .slice(0, 3)
       .map(([name]) => name);
 
+    // Calculate wellness trend by comparing this week vs last week
+    const twoWeeksAgo = new Date(weekStart);
+    twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 7);
+
+    const lastWeekActivities = activities.filter(
+      a => new Date(a.created_at) >= twoWeeksAgo && new Date(a.created_at) < weekStart
+    );
+
+    const lastWeekSessions = lastWeekActivities.length;
+    const wellnessTrend = lastWeekSessions > 0
+      ? Math.round(((totalSessions - lastWeekSessions) / lastWeekSessions) * 100)
+      : totalSessions > 0 ? 100 : 0;
+
     return {
       weekStart: weekStart.toISOString(),
       weekEnd: today.toISOString(),
       totalSessions,
       totalMinutes,
       topModules,
-      wellnessTrend: 0 // À calculer avec l'historique
+      wellnessTrend
     };
   }
 }

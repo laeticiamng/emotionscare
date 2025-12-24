@@ -1,12 +1,13 @@
 // @ts-nocheck
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  TrendingUp, TrendingDown, Activity, Heart, 
-  Brain, Zap, Target, Award, Clock, Star 
+import {
+  TrendingUp, TrendingDown, Activity, Heart,
+  Brain, Zap, Target, Award, Clock, Star, Sparkles
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface QuickStat {
   id: string;
@@ -24,7 +25,197 @@ interface QuickStatsGridProps {
 }
 
 const QuickStatsGrid: React.FC<QuickStatsGridProps> = ({ userRole = 'consumer' }) => {
-  const consumerStats: QuickStat[] = [
+  const [stats, setStats] = useState<QuickStat[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const loadStats = async () => {
+      setIsLoading(true);
+      try {
+        const { supabase } = await import('@/integrations/supabase/client');
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (!user) {
+          setStats(getDefaultStats(userRole));
+          setIsLoading(false);
+          return;
+        }
+
+        const weekAgo = new Date();
+        weekAgo.setDate(weekAgo.getDate() - 7);
+        const twoWeeksAgo = new Date();
+        twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
+
+        // Fetch emotion scans
+        const { data: scans } = await supabase
+          .from('emotion_scans')
+          .select('*')
+          .eq('user_id', user.id)
+          .gte('created_at', twoWeeksAgo.toISOString())
+          .order('created_at', { ascending: false });
+
+        // Fetch activity sessions
+        const { data: sessions } = await supabase
+          .from('activity_sessions')
+          .select('*')
+          .eq('user_id', user.id)
+          .gte('created_at', twoWeeksAgo.toISOString())
+          .order('created_at', { ascending: false });
+
+        // Fetch gamification metrics
+        const { data: metrics } = await supabase
+          .from('gamification_metrics')
+          .select('*')
+          .eq('user_id', user.id)
+          .single();
+
+        // Calculate stats
+        const thisWeekScans = (scans || []).filter(s => new Date(s.created_at) >= weekAgo);
+        const lastWeekScans = (scans || []).filter(s => new Date(s.created_at) >= twoWeeksAgo && new Date(s.created_at) < weekAgo);
+
+        const thisWeekSessions = (sessions || []).filter(s => new Date(s.created_at) >= weekAgo);
+        const lastWeekSessions = (sessions || []).filter(s => new Date(s.created_at) >= twoWeeksAgo && new Date(s.created_at) < weekAgo);
+
+        const avgMood = thisWeekScans.length > 0
+          ? thisWeekScans.reduce((sum, s) => sum + (s.mood_score || 5), 0) / thisWeekScans.length
+          : 5;
+        const lastAvgMood = lastWeekScans.length > 0
+          ? lastWeekScans.reduce((sum, s) => sum + (s.mood_score || 5), 0) / lastWeekScans.length
+          : avgMood;
+        const moodChange = lastAvgMood > 0 ? Math.round(((avgMood - lastAvgMood) / lastAvgMood) * 100) : 0;
+
+        const sessionsChange = lastWeekSessions.length > 0
+          ? Math.round(((thisWeekSessions.length - lastWeekSessions.length) / lastWeekSessions.length) * 100)
+          : thisWeekSessions.length > 0 ? 100 : 0;
+
+        // Calculate streak
+        const uniqueDays = new Set((sessions || []).map(s => s.created_at.split('T')[0]));
+        let streak = 0;
+        let checkDate = new Date();
+        while (uniqueDays.has(checkDate.toISOString().split('T')[0])) {
+          streak++;
+          checkDate.setDate(checkDate.getDate() - 1);
+        }
+
+        const totalXP = metrics?.total_points || 0;
+        const level = Math.floor(totalXP / 100) + 1;
+        const levelNames = ['Débutant', 'Explorer', 'Aventurier', 'Expert', 'Maître', 'Légende'];
+        const levelName = levelNames[Math.min(level - 1, levelNames.length - 1)];
+
+        setStats([
+          {
+            id: 'mood',
+            title: 'Humeur Moyenne',
+            value: avgMood.toFixed(1),
+            change: Math.abs(moodChange),
+            trend: moodChange >= 0 ? 'up' : 'down',
+            icon: <Heart className="w-5 h-5" />,
+            color: 'bg-accent',
+            description: 'Sur 10, cette semaine'
+          },
+          {
+            id: 'sessions',
+            title: 'Sessions Cette Semaine',
+            value: thisWeekSessions.length,
+            change: Math.abs(sessionsChange),
+            trend: sessionsChange >= 0 ? 'up' : 'down',
+            icon: <Activity className="w-5 h-5" />,
+            color: 'bg-primary',
+            description: 'Toutes activités confondues'
+          },
+          {
+            id: 'streak',
+            title: 'Série Actuelle',
+            value: `${streak} jours`,
+            change: 0,
+            trend: 'stable',
+            icon: <Target className="w-5 h-5" />,
+            color: 'bg-success',
+            description: streak > 7 ? `Record en cours !` : 'Continuez ainsi !'
+          },
+          {
+            id: 'xp',
+            title: 'XP Total',
+            value: totalXP.toLocaleString(),
+            change: 0,
+            trend: 'up',
+            icon: <Star className="w-5 h-5" />,
+            color: 'bg-warning',
+            description: `Niveau ${level} - ${levelName}`
+          }
+        ]);
+      } catch (error) {
+        console.error('Error loading stats:', error);
+        setStats(getDefaultStats(userRole));
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadStats();
+  }, [userRole]);
+
+  const getDefaultStats = (role: string): QuickStat[] => [
+    {
+      id: 'mood',
+      title: 'Humeur Moyenne',
+      value: '5.0',
+      change: 0,
+      trend: 'stable',
+      icon: <Heart className="w-5 h-5" />,
+      color: 'bg-accent',
+      description: 'Sur 10, cette semaine'
+    },
+    {
+      id: 'sessions',
+      title: 'Sessions Cette Semaine',
+      value: 0,
+      change: 0,
+      trend: 'stable',
+      icon: <Activity className="w-5 h-5" />,
+      color: 'bg-primary',
+      description: 'Toutes activités confondues'
+    },
+    {
+      id: 'streak',
+      title: 'Série Actuelle',
+      value: '0 jours',
+      change: 0,
+      trend: 'stable',
+      icon: <Target className="w-5 h-5" />,
+      color: 'bg-success',
+      description: 'Commencez votre série !'
+    },
+    {
+      id: 'xp',
+      title: 'XP Total',
+      value: '0',
+      change: 0,
+      trend: 'stable',
+      icon: <Star className="w-5 h-5" />,
+      color: 'bg-warning',
+      description: 'Niveau 1 - Débutant'
+    }
+  ];
+
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {[1, 2, 3, 4].map((i) => (
+          <Card key={i}>
+            <CardContent className="p-6">
+              <Skeleton className="h-12 w-12 rounded-xl mb-4" />
+              <Skeleton className="h-8 w-16 mb-2" />
+              <Skeleton className="h-4 w-24 mb-1" />
+              <Skeleton className="h-3 w-32" />
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    );
+  }
+
+  const consumerStats: QuickStat[] = stats.length > 0 ? stats : [
     {
       id: 'mood',
       title: 'Humeur Moyenne',
@@ -153,18 +344,21 @@ const QuickStatsGrid: React.FC<QuickStatsGridProps> = ({ userRole = 'consumer' }
     }
   ];
 
-  const getStats = () => {
+  const getDisplayStats = () => {
+    if (stats.length > 0 && userRole === 'consumer') {
+      return stats;
+    }
     switch (userRole) {
       case 'employee':
         return employeeStats;
       case 'manager':
         return managerStats;
       default:
-        return consumerStats;
+        return stats.length > 0 ? stats : consumerStats;
     }
   };
 
-  const stats = getStats();
+  const displayStats = getDisplayStats();
 
   const renderTrendIcon = (trend: 'up' | 'down' | 'stable') => {
     switch (trend) {
@@ -179,7 +373,7 @@ const QuickStatsGrid: React.FC<QuickStatsGridProps> = ({ userRole = 'consumer' }
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      {stats.map((stat, index) => (
+      {displayStats.map((stat, index) => (
         <motion.div
           key={stat.id}
           initial={{ opacity: 0, y: 20 }}
