@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Slider } from "@/components/ui/slider";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,47 +18,111 @@ const VoiceEmotionAnalyzer: React.FC<VoiceEmotionAnalyzerProps> = ({ onResult, o
   const [intensity, setIntensity] = useState(0.6);
   const [showResults, setShowResults] = useState(false);
   const [processing, setProcessing] = useState(false);
-  
-  const mockRecommendations: EmotionRecommendation[] = [
-    {
-      id: "rec-voice-1",
-      emotion: "calm",
-      type: "activity",
-      title: "Exercice de respiration",
-      description: "3 minutes de respiration profonde",
-      content: "Inspirez lentement, retenez, expirez lentement",
-      category: "wellness"
-    },
-    {
-      id: "rec-voice-2",
-      emotion: "relaxed",
-      type: "music",
-      title: "Playlist recommandée",
-      description: "Musique relaxante pour vous aider à vous détendre",
-      content: "Écouter notre playlist zen",
-      category: "audio"
-    }
-  ];
+  const [recommendations, setRecommendations] = useState<EmotionRecommendation[]>([]);
 
-  // Update the handleCompleted function to include the required source field
-  const handleCompleted = () => {
+  useEffect(() => {
+    loadRecommendations();
+  }, []);
+
+  const loadRecommendations = async () => {
+    try {
+      const { supabase } = await import('@/integrations/supabase/client');
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (user) {
+        const { data: recsData } = await supabase
+          .from('ai_recommendations')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('is_active', true)
+          .limit(5);
+
+        if (recsData && recsData.length > 0) {
+          const formattedRecs: EmotionRecommendation[] = recsData.map(r => ({
+            id: r.id,
+            emotion: r.emotion || 'calm',
+            type: r.type || 'activity',
+            title: r.title,
+            description: r.description,
+            content: r.content || '',
+            category: r.category || 'wellness'
+          }));
+          setRecommendations(formattedRecs);
+          return;
+        }
+      }
+    } catch (error) {
+      console.error('Error loading recommendations:', error);
+    }
+
+    // Fallback recommendations
+    setRecommendations([
+      {
+        id: "rec-voice-1",
+        emotion: "calm",
+        type: "activity",
+        title: "Exercice de respiration",
+        description: "3 minutes de respiration profonde",
+        content: "Inspirez lentement, retenez, expirez lentement",
+        category: "wellness"
+      },
+      {
+        id: "rec-voice-2",
+        emotion: "relaxed",
+        type: "music",
+        title: "Playlist recommandée",
+        description: "Musique relaxante pour vous aider à vous détendre",
+        content: "Écouter notre playlist zen",
+        category: "audio"
+      }
+    ]);
+  };
+
+  const handleCompleted = async () => {
     setProcessing(false);
-    // Create mock emotion result
+
+    // Calculate valence and arousal based on emotion
+    const valenceMap: Record<string, number> = { happy: 80, excited: 85, calm: 70, neutral: 50, anxious: 35, sad: 25, angry: 30 };
+    const arousalMap: Record<string, number> = { excited: 85, angry: 80, anxious: 70, happy: 65, neutral: 50, calm: 30, sad: 25 };
+    const valence = valenceMap[emotion] || 50;
+    const arousal = arousalMap[emotion] || 50;
+
+    // Save to Supabase
+    try {
+      const { supabase } = await import('@/integrations/supabase/client');
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (user) {
+        await supabase.from('emotion_scans').insert({
+          user_id: user.id,
+          emotion: emotion,
+          valence,
+          arousal,
+          confidence: Math.round(confidence * 100),
+          source: 'voice',
+          created_at: new Date().toISOString()
+        });
+      }
+    } catch (error) {
+      console.error('Error saving voice analysis:', error);
+    }
+
     const result: EmotionResult = {
       id: `voice-${Date.now()}`,
       emotion: emotion,
       confidence: confidence,
       intensity: intensity,
-      recommendations: mockRecommendations,
+      valence,
+      arousal,
+      recommendations: recommendations,
       timestamp: new Date().toISOString(),
       emojis: ["😌", "🧘‍♀️"],
       emotions: {},
-      source: "voice-analyzer" // Added required source field
+      source: "voice"
     };
-    
+
     setShowResults(true);
-    
-    // Pass result to parent component
+
     if (onResult) {
       onResult(result);
     }

@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -22,47 +22,53 @@ interface AccessAuditLogProps {
   attempts?: AccessAttempt[];
 }
 
-const AccessAuditLog: React.FC<AccessAuditLogProps> = ({ attempts = [] }) => {
-  const mockAttempts: AccessAttempt[] = [
-    {
-      id: '1',
-      page: '/b2b/admin/dashboard',
-      timestamp: '2024-01-20T10:30:00Z',
-      success: true,
-      userRole: 'b2b_admin',
-      location: 'Paris, France'
-    },
-    {
-      id: '2',
-      page: '/teams',
-      timestamp: '2024-01-20T10:25:00Z',
-      success: false,
-      userRole: 'b2c',
-      requiredRole: 'b2b_admin',
-      reason: 'Rôle insuffisant',
-      location: 'Paris, France'
-    },
-    {
-      id: '3',
-      page: '/scan',
-      timestamp: '2024-01-20T10:20:00Z',
-      success: true,
-      userRole: 'b2c',
-      location: 'Paris, France'
-    },
-    {
-      id: '4',
-      page: '/reports',
-      timestamp: '2024-01-20T10:15:00Z',
-      success: false,
-      userRole: 'b2b_user',
-      requiredRole: 'b2b_admin',
-      reason: 'Accès administrateur requis',
-      location: 'Lyon, France'
-    }
-  ];
+const AccessAuditLog: React.FC<AccessAuditLogProps> = ({ attempts: propAttempts = [] }) => {
+  const [accessAttempts, setAccessAttempts] = useState<AccessAttempt[]>(propAttempts);
+  const [loading, setLoading] = useState(true);
 
-  const accessAttempts = attempts.length > 0 ? attempts : mockAttempts;
+  useEffect(() => {
+    const loadAccessLogs = async () => {
+      if (propAttempts.length > 0) {
+        setAccessAttempts(propAttempts);
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const { supabase } = await import('@/integrations/supabase/client');
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (user) {
+          const { data: logsData } = await supabase
+            .from('access_logs')
+            .select('*')
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false })
+            .limit(50);
+
+          if (logsData && logsData.length > 0) {
+            const formattedLogs: AccessAttempt[] = logsData.map(l => ({
+              id: l.id,
+              page: l.page || l.resource_path || '/',
+              timestamp: l.created_at,
+              success: l.success ?? l.authorized ?? true,
+              userRole: l.user_role || 'user',
+              requiredRole: l.required_role,
+              reason: l.reason || l.denial_reason,
+              location: l.location || l.ip_location || 'Inconnue'
+            }));
+            setAccessAttempts(formattedLogs);
+          }
+        }
+      } catch (error) {
+        console.error('Error loading access logs:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadAccessLogs();
+  }, [propAttempts]);
 
   const getStatusIcon = (success: boolean) => {
     return success ? (

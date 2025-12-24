@@ -4,7 +4,7 @@
  * Affiche l'historique des morceaux écoutés avec statistiques
  */
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Clock, TrendingUp, Heart } from 'lucide-react';
@@ -20,18 +20,70 @@ interface ListenEntry {
 }
 
 interface MusicHistoryProps {
-  history: ListenEntry[];
+  history?: ListenEntry[];
   onPlayTrack?: (track: MusicTrack) => void;
   onToggleFavorite?: (trackId: string) => void;
   favorites?: Set<string>;
 }
 
 export const MusicHistory: React.FC<MusicHistoryProps> = ({
-  history,
+  history: propHistory,
   onPlayTrack,
   onToggleFavorite,
   favorites = new Set()
 }) => {
+  const [loadedHistory, setLoadedHistory] = useState<ListenEntry[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadHistory = async () => {
+      if (propHistory && propHistory.length > 0) {
+        setLoadedHistory(propHistory);
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const { supabase } = await import('@/integrations/supabase/client');
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (user) {
+          const { data: historyData } = await supabase
+            .from('music_listening_history')
+            .select('*')
+            .eq('user_id', user.id)
+            .order('listened_at', { ascending: false })
+            .limit(100);
+
+          if (historyData && historyData.length > 0) {
+            const formattedHistory: ListenEntry[] = historyData.map(h => ({
+              track: {
+                id: h.track_id || h.id,
+                title: h.track_title || 'Titre inconnu',
+                artist: h.track_artist || 'Artiste inconnu',
+                url: h.track_url || '',
+                audioUrl: h.track_url || '',
+                duration: h.track_duration || 180,
+                emotion: h.mood || 'calm'
+              },
+              timestamp: new Date(h.listened_at),
+              duration: h.listen_duration || 0,
+              completed: h.completed || false
+            }));
+            setLoadedHistory(formattedHistory);
+          }
+        }
+      } catch (error) {
+        console.error('Error loading music history:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadHistory();
+  }, [propHistory]);
+
+  const history = propHistory && propHistory.length > 0 ? propHistory : loadedHistory;
   // Statistiques calculées
   const stats = useMemo(() => {
     const totalListens = history.length;
