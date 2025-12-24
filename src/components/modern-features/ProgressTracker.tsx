@@ -9,10 +9,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { 
-  TrendingUp, 
-  Target, 
-  Award, 
+import {
+  TrendingUp,
+  Target,
+  Award,
   Calendar,
   Zap,
   Clock,
@@ -49,98 +49,188 @@ interface Milestone {
 const ProgressTracker: React.FC = () => {
   const [selectedPeriod, setSelectedPeriod] = useState<'week' | 'month' | 'year'>('week');
   const [animatedProgress, setAnimatedProgress] = useState<Record<string, number>>({});
+  const [progressData, setProgressData] = useState<ProgressData[]>([]);
+  const [milestones, setMilestones] = useState<Milestone[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const progressData: ProgressData[] = [
-    {
-      category: 'Sessions complétées',
-      current: 12,
-      target: 20,
-      trend: 'up',
-      trendValue: 15,
-      unit: 'sessions',
-      icon: <Zap className="h-5 w-5" />,
-      color: 'text-blue-600'
-    },
-    {
-      category: 'Objectifs atteints',
-      current: 8,
-      target: 10,
-      trend: 'up',
-      trendValue: 25,
-      unit: 'objectifs',
-      icon: <Target className="h-5 w-5" />,
-      color: 'text-green-600'
-    },
-    {
-      category: 'Temps d\'activité',
-      current: 145,
-      target: 200,
-      trend: 'up',
-      trendValue: 8,
-      unit: 'minutes',
-      icon: <Clock className="h-5 w-5" />,
-      color: 'text-purple-600'
-    },
-    {
-      category: 'Série actuelle',
-      current: 7,
-      target: 14,
-      trend: 'stable',
-      trendValue: 0,
-      unit: 'jours',
-      icon: <Award className="h-5 w-5" />,
-      color: 'text-orange-600'
-    }
-  ];
+  // Load progress data from Supabase
+  useEffect(() => {
+    const loadProgressData = async () => {
+      try {
+        const { supabase } = await import('@/integrations/supabase/client');
+        const { data: { user } } = await supabase.auth.getUser();
 
-  const milestones: Milestone[] = [
-    {
-      id: '1',
-      title: 'Premier pas',
-      description: 'Complétez votre première session',
-      target: 1,
-      current: 1,
-      achieved: true,
-      achievedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
-      reward: 'Badge Débutant'
-    },
-    {
-      id: '2',
-      title: 'Habitué',
-      description: 'Complétez 10 sessions',
-      target: 10,
-      current: 12,
-      achieved: true,
-      achievedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-      reward: 'Badge Régulier'
-    },
-    {
-      id: '3',
-      title: 'Série hebdomadaire',
-      description: 'Maintenez une série de 7 jours',
-      target: 7,
-      current: 7,
-      achieved: true,
-      achievedAt: new Date(),
-      reward: 'Badge Persévérant'
-    },
-    {
-      id: '4',
-      title: 'Expert',
-      description: 'Complétez 50 sessions',
-      target: 50,
-      current: 12,
-      achieved: false
-    },
-    {
-      id: '5',
-      title: 'Maître',
-      description: 'Atteignez 100 heures d\'activité',
-      target: 6000, // en minutes
-      current: 145,
-      achieved: false
-    }
-  ];
+        if (user) {
+          // Get user's progress metrics
+          const { data: metricsData } = await supabase
+            .from('gamification_metrics')
+            .select('*')
+            .eq('user_id', user.id)
+            .single();
+
+          // Get user's milestones/achievements
+          const { data: achievementsData } = await supabase
+            .from('user_achievements')
+            .select('*')
+            .eq('user_id', user.id);
+
+          // Get activity count for sessions
+          const { count: sessionsCount } = await supabase
+            .from('activity_logs')
+            .select('*', { count: 'exact', head: true })
+            .eq('user_id', user.id);
+
+          // Get goals progress
+          const { data: goalsData } = await supabase
+            .from('user_goals')
+            .select('*')
+            .eq('user_id', user.id)
+            .eq('status', 'completed');
+
+          // Calculate streak
+          const { data: scansData } = await supabase
+            .from('emotion_scans')
+            .select('created_at')
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false })
+            .limit(30);
+
+          let streak = 0;
+          if (scansData && scansData.length > 0) {
+            const today = new Date();
+            const uniqueDays = new Set();
+            scansData.forEach(scan => {
+              const scanDate = new Date(scan.created_at).toDateString();
+              uniqueDays.add(scanDate);
+            });
+            const sortedDays = Array.from(uniqueDays).sort().reverse();
+            for (let i = 0; i < sortedDays.length; i++) {
+              const checkDate = new Date(today);
+              checkDate.setDate(today.getDate() - i);
+              if (sortedDays.includes(checkDate.toDateString())) {
+                streak++;
+              } else {
+                break;
+              }
+            }
+          }
+
+          // Build progress data
+          const loadedProgress: ProgressData[] = [
+            {
+              category: 'Sessions complétées',
+              current: sessionsCount || 0,
+              target: 20,
+              trend: (sessionsCount || 0) > 10 ? 'up' : 'stable',
+              trendValue: 15,
+              unit: 'sessions',
+              icon: <Zap className="h-5 w-5" />,
+              color: 'text-blue-600'
+            },
+            {
+              category: 'Objectifs atteints',
+              current: goalsData?.length || 0,
+              target: 10,
+              trend: 'up',
+              trendValue: 25,
+              unit: 'objectifs',
+              icon: <Target className="h-5 w-5" />,
+              color: 'text-green-600'
+            },
+            {
+              category: 'Temps d\'activité',
+              current: metricsData?.total_xp || 0,
+              target: 200,
+              trend: 'up',
+              trendValue: 8,
+              unit: 'minutes',
+              icon: <Clock className="h-5 w-5" />,
+              color: 'text-purple-600'
+            },
+            {
+              category: 'Série actuelle',
+              current: streak,
+              target: 14,
+              trend: streak >= 7 ? 'up' : 'stable',
+              trendValue: 0,
+              unit: 'jours',
+              icon: <Award className="h-5 w-5" />,
+              color: 'text-orange-600'
+            }
+          ];
+
+          setProgressData(loadedProgress);
+
+          // Build milestones from achievements
+          const loadedMilestones: Milestone[] = [
+            {
+              id: '1',
+              title: 'Premier pas',
+              description: 'Complétez votre première session',
+              target: 1,
+              current: Math.min(sessionsCount || 0, 1),
+              achieved: (sessionsCount || 0) >= 1,
+              achievedAt: achievementsData?.find(a => a.achievement_type === 'first_session')?.achieved_at ? new Date(achievementsData.find(a => a.achievement_type === 'first_session').achieved_at) : undefined,
+              reward: 'Badge Débutant'
+            },
+            {
+              id: '2',
+              title: 'Habitué',
+              description: 'Complétez 10 sessions',
+              target: 10,
+              current: Math.min(sessionsCount || 0, 10),
+              achieved: (sessionsCount || 0) >= 10,
+              reward: 'Badge Régulier'
+            },
+            {
+              id: '3',
+              title: 'Série hebdomadaire',
+              description: 'Maintenez une série de 7 jours',
+              target: 7,
+              current: Math.min(streak, 7),
+              achieved: streak >= 7,
+              reward: 'Badge Persévérant'
+            },
+            {
+              id: '4',
+              title: 'Expert',
+              description: 'Complétez 50 sessions',
+              target: 50,
+              current: sessionsCount || 0,
+              achieved: (sessionsCount || 0) >= 50
+            },
+            {
+              id: '5',
+              title: 'Maître',
+              description: 'Atteignez 100 heures d\'activité',
+              target: 6000,
+              current: metricsData?.total_xp || 0,
+              achieved: (metricsData?.total_xp || 0) >= 6000
+            }
+          ];
+
+          setMilestones(loadedMilestones);
+        }
+      } catch (error) {
+        console.error('Error loading progress data:', error);
+        // Use default fallback data
+        setProgressData([
+          { category: 'Sessions complétées', current: 0, target: 20, trend: 'stable', trendValue: 0, unit: 'sessions', icon: <Zap className="h-5 w-5" />, color: 'text-blue-600' },
+          { category: 'Objectifs atteints', current: 0, target: 10, trend: 'stable', trendValue: 0, unit: 'objectifs', icon: <Target className="h-5 w-5" />, color: 'text-green-600' },
+          { category: 'Temps d\'activité', current: 0, target: 200, trend: 'stable', trendValue: 0, unit: 'minutes', icon: <Clock className="h-5 w-5" />, color: 'text-purple-600' },
+          { category: 'Série actuelle', current: 0, target: 14, trend: 'stable', trendValue: 0, unit: 'jours', icon: <Award className="h-5 w-5" />, color: 'text-orange-600' }
+        ]);
+        setMilestones([
+          { id: '1', title: 'Premier pas', description: 'Complétez votre première session', target: 1, current: 0, achieved: false, reward: 'Badge Débutant' },
+          { id: '2', title: 'Habitué', description: 'Complétez 10 sessions', target: 10, current: 0, achieved: false, reward: 'Badge Régulier' }
+        ]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadProgressData();
+  }, [selectedPeriod]);
 
   const getTrendIcon = (trend: string) => {
     switch (trend) {

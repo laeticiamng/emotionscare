@@ -116,15 +116,15 @@ const patterns: BreathingPattern[] = [
 const BREATHING_HISTORY_KEY = 'breathing_session_history';
 const BREATHING_SETTINGS_KEY = 'breathing_settings';
 
-const communityStats = {
-  activeUsers: 1247,
-  avgMoodImprovement: 2.3,
+const defaultCommunityStats = {
+  activeUsers: 0,
+  avgMoodImprovement: 0,
   popularPattern: 'coherence',
-  totalMinutesToday: 18420
+  totalMinutesToday: 0
 };
 
-const achievements = [
-  { id: 'first', name: 'Premier souffle', description: 'Complétez votre première session', icon: '🌱', unlocked: true },
+const defaultAchievements = [
+  { id: 'first', name: 'Premier souffle', description: 'Complétez votre première session', icon: '🌱', unlocked: false },
   { id: 'week', name: 'Semaine zen', description: '7 jours consécutifs', icon: '🔥', unlocked: false },
   { id: 'master', name: 'Maître respirateur', description: '100 sessions complétées', icon: '🏆', unlocked: false },
   { id: 'explorer', name: 'Explorateur', description: 'Essayez tous les patterns', icon: '🧭', unlocked: false },
@@ -147,12 +147,52 @@ export const BreathingExerciseDashboard: React.FC = () => {
   const [showAchievements, setShowAchievements] = useState(false);
   const [sessionHistory, setSessionHistory] = useState<any[]>([]);
   const [guidedVoice, setGuidedVoice] = useState(false);
+  const [communityStats, setCommunityStats] = useState(defaultCommunityStats);
+  const [achievements, setAchievements] = useState(defaultAchievements);
 
   useEffect(() => {
     loadInsights();
     loadSettings();
     loadHistory();
+    loadCommunityStats();
+    loadAchievements();
   }, []);
+
+  const loadCommunityStats = async () => {
+    try {
+      const { data, error } = await supabase.functions.invoke('breathing-exercises', {
+        body: { action: 'get-community-stats' }
+      });
+
+      if (!error && data?.stats) {
+        setCommunityStats(data.stats);
+      }
+    } catch (error) {
+      logger.error('Error loading community stats', error as Error, 'UI');
+    }
+  };
+
+  const loadAchievements = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data: userAchievements } = await supabase
+        .from('user_achievements')
+        .select('achievement_type, achieved_at')
+        .eq('user_id', user.id);
+
+      if (userAchievements) {
+        const achievementMap = new Map(userAchievements.map(a => [a.achievement_type, a]));
+        setAchievements(defaultAchievements.map(a => ({
+          ...a,
+          unlocked: achievementMap.has(a.id)
+        })));
+      }
+    } catch (error) {
+      logger.error('Error loading achievements', error as Error, 'UI');
+    }
+  };
 
   useEffect(() => {
     if (!isActive) return;
