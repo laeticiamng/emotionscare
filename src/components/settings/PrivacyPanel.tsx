@@ -66,8 +66,7 @@ const PRIVACY_TOGGLES = [
  */
 export const PrivacyPanel: React.FC = () => {
   const router = useRouter();
-  
-  // Mock state - in reality this would come from usePrivacyPrefs hook
+
   const [preferences, setPreferences] = React.useState({
     cam: false,
     mic: false,
@@ -81,24 +80,62 @@ export const PrivacyPanel: React.FC = () => {
     cam: false,
     mic: false,
     hr: false,
-    gps: true, // Example: GPS locked by organization
+    gps: false,
     social: false,
     nft: false
   });
 
+  // Load preferences from Supabase
+  React.useEffect(() => {
+    const loadPreferences = async () => {
+      try {
+        const { supabase } = await import('@/integrations/supabase/client');
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (user) {
+          const { data: prefsData } = await supabase
+            .from('user_settings')
+            .select('privacy_preferences, organization_locks')
+            .eq('user_id', user.id)
+            .single();
+
+          if (prefsData) {
+            if (prefsData.privacy_preferences) {
+              setPreferences(prev => ({ ...prev, ...prefsData.privacy_preferences }));
+            }
+            if (prefsData.organization_locks) {
+              setLockedByOrg(prev => ({ ...prev, ...prefsData.organization_locks }));
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error loading privacy preferences:', error);
+      }
+    };
+
+    loadPreferences();
+  }, []);
+
   const handleToggle = async (key: string, value: boolean) => {
     // Optimistic update
     setPreferences(prev => ({ ...prev, [key]: value }));
-    
+
     try {
-      // Mock API call - PATCH /me/privacy_prefs
-      await new Promise(resolve => setTimeout(resolve, 300));
-      
-      // Privacy setting changed - silent tracking
+      const { supabase } = await import('@/integrations/supabase/client');
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (user) {
+        const newPreferences = { ...preferences, [key]: value };
+        await supabase.from('user_settings').upsert({
+          user_id: user.id,
+          privacy_preferences: newPreferences,
+          updated_at: new Date().toISOString()
+        }, { onConflict: 'user_id' });
+      }
     } catch (error) {
       // Rollback on error
       setPreferences(prev => ({ ...prev, [key]: !value }));
-      // Update failed - silent
+      console.error('Error updating privacy preferences:', error);
     }
   };
 

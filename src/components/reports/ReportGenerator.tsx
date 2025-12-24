@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -33,32 +33,49 @@ const ReportGenerator: React.FC<ReportGeneratorProps> = ({ filters }) => {
 
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationProgress, setGenerationProgress] = useState(0);
-  const [recentReports, setRecentReports] = useState([
-    {
-      id: '1',
-      name: 'Rapport Bien-être Mensuel',
-      type: 'wellbeing',
-      created: '2024-06-20',
-      status: 'completed',
-      size: '2.4 MB'
-    },
-    {
-      id: '2',
-      name: 'Analyse Productivité Équipe',
-      type: 'productivity',
-      created: '2024-06-18',
-      status: 'completed',
-      size: '1.8 MB'
-    },
-    {
-      id: '3',
-      name: 'Rapport Engagement Q2',
-      type: 'engagement',
-      created: '2024-06-15',
-      status: 'processing',
-      size: '...'
-    }
-  ]);
+  const [recentReports, setRecentReports] = useState<{
+    id: string;
+    name: string;
+    type: string;
+    created: string;
+    status: 'completed' | 'processing';
+    size: string;
+  }[]>([]);
+
+  // Load reports from Supabase
+  useEffect(() => {
+    const loadReports = async () => {
+      try {
+        const { supabase } = await import('@/integrations/supabase/client');
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (user) {
+          const { data: reportsData } = await supabase
+            .from('reports')
+            .select('*')
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false })
+            .limit(10);
+
+          if (reportsData && reportsData.length > 0) {
+            const formattedReports = reportsData.map(r => ({
+              id: r.id,
+              name: r.name || r.title || 'Rapport',
+              type: r.type || 'wellbeing',
+              created: r.created_at?.split('T')[0] || new Date().toISOString().split('T')[0],
+              status: r.status === 'processing' ? 'processing' as const : 'completed' as const,
+              size: r.size || '2.0 MB'
+            }));
+            setRecentReports(formattedReports);
+          }
+        }
+      } catch (error) {
+        console.error('Error loading reports:', error);
+      }
+    };
+
+    loadReports();
+  }, []);
 
   const reportTypes = [
     { value: 'wellbeing', label: 'Bien-être Général', icon: '❤️' },
@@ -96,26 +113,48 @@ const ReportGenerator: React.FC<ReportGeneratorProps> = ({ filters }) => {
     setIsGenerating(true);
     setGenerationProgress(0);
 
-    // Simulation de génération
-    const intervals = [10, 25, 45, 70, 85, 100];
-    for (const progress of intervals) {
-      await new Promise(resolve => setTimeout(resolve, 500));
-      setGenerationProgress(progress);
+    try {
+      const { supabase } = await import('@/integrations/supabase/client');
+      const { data: { user } } = await supabase.auth.getUser();
+
+      // Progress simulation
+      const intervals = [10, 25, 45, 70, 85, 100];
+      for (const progress of intervals) {
+        await new Promise(resolve => setTimeout(resolve, 400));
+        setGenerationProgress(progress);
+      }
+
+      const reportId = Date.now().toString();
+      const newReport = {
+        id: reportId,
+        name: reportConfig.name || 'Nouveau Rapport',
+        type: reportConfig.type,
+        created: new Date().toISOString().split('T')[0],
+        status: 'completed' as const,
+        size: '2.1 MB'
+      };
+
+      // Save report to Supabase
+      if (user) {
+        await supabase.from('reports').insert({
+          id: reportId,
+          user_id: user.id,
+          name: newReport.name,
+          type: newReport.type,
+          status: 'completed',
+          size: newReport.size,
+          config: reportConfig,
+          created_at: new Date().toISOString()
+        });
+      }
+
+      setRecentReports(prev => [newReport, ...prev]);
+    } catch (error) {
+      console.error('Error generating report:', error);
+    } finally {
+      setIsGenerating(false);
+      setGenerationProgress(0);
     }
-
-    // Ajouter le nouveau rapport
-    const newReport = {
-      id: Date.now().toString(),
-      name: reportConfig.name || 'Nouveau Rapport',
-      type: reportConfig.type,
-      created: new Date().toISOString().split('T')[0],
-      status: 'completed' as const,
-      size: '2.1 MB'
-    };
-
-    setRecentReports(prev => [newReport, ...prev]);
-    setIsGenerating(false);
-    setGenerationProgress(0);
   };
 
   const getStatusBadge = (status: string) => {
