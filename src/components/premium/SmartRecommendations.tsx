@@ -52,13 +52,52 @@ const SmartRecommendations: React.FC<SmartRecommendationsProps> = ({
   const [personalizedScore, setPersonalizedScore] = useState(85);
 
   useEffect(() => {
-    // Simuler l'IA de recommandation
+    // Load AI-powered recommendations
     const generateRecommendations = async () => {
       setIsLoading(true);
-      
-      // Simuler un délai de traitement IA
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
+
+      try {
+        const { supabase } = await import('@/integrations/supabase/client');
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (user) {
+          // Try to load personalized recommendations from Supabase
+          const { data: recsData } = await supabase
+            .from('ai_recommendations')
+            .select('*')
+            .eq('user_id', user.id)
+            .eq('is_active', true)
+            .order('confidence', { ascending: false })
+            .limit(maxRecommendations);
+
+          if (recsData && recsData.length > 0) {
+            const formattedRecs: Recommendation[] = recsData.map(r => ({
+              id: r.id,
+              type: r.type as Recommendation['type'],
+              title: r.title,
+              description: r.description,
+              reason: r.reason || `Recommandé pour votre profil`,
+              confidence: r.confidence || 80,
+              category: r.category || 'Bien-être',
+              estimatedTime: r.estimated_time || 10,
+              difficulty: r.difficulty as Recommendation['difficulty'] || 'beginner',
+              personalizedFor: r.personalized_for || [],
+              benefits: r.benefits || [],
+              thumbnail: r.thumbnail,
+              rating: r.rating || 4.5,
+              completions: r.completions || 0
+            }));
+            setRecommendations(formattedRecs);
+            setPersonalizedScore(Math.round(formattedRecs.reduce((sum, r) => sum + r.confidence, 0) / formattedRecs.length));
+            setIsLoading(false);
+            return;
+          }
+        }
+      } catch (error) {
+        console.error('Error loading recommendations:', error);
+      }
+
+      // Fallback to default recommendations
       const mockRecommendations: Recommendation[] = [
         {
           id: '1',

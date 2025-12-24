@@ -74,15 +74,17 @@ interface WeekSnapshot {
 const STORAGE_KEY = 'weekly_emotion_reports';
 const GOALS_KEY = 'weekly_emotion_goals';
 
-const MOCK_WEEKLY_DATA: DailyEmotion[] = [
-  { day: 'Lun', valence: 65, arousal: 55, dominantEmotion: 'Calme', scansCount: 3 },
-  { day: 'Mar', valence: 72, arousal: 68, dominantEmotion: 'Joie', scansCount: 4 },
-  { day: 'Mer', valence: 58, arousal: 45, dominantEmotion: 'Fatigue', scansCount: 2 },
-  { day: 'Jeu', valence: 80, arousal: 75, dominantEmotion: 'Enthousiasme', scansCount: 5 },
-  { day: 'Ven', valence: 70, arousal: 60, dominantEmotion: 'Satisfaction', scansCount: 3 },
-  { day: 'Sam', valence: 85, arousal: 70, dominantEmotion: 'Joie', scansCount: 2 },
-  { day: 'Dim', valence: 75, arousal: 50, dominantEmotion: 'Sérénité', scansCount: 2 },
-];
+const DAYS_FR = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
+
+const getDefaultWeeklyData = (): DailyEmotion[] => {
+  return DAYS_FR.slice(1).concat([DAYS_FR[0]]).map(day => ({
+    day,
+    valence: 50,
+    arousal: 50,
+    dominantEmotion: '-',
+    scansCount: 0
+  }));
+};
 
 const EMOTION_DIMENSIONS: EmotionDimension[] = [
   { dimension: 'Joie', score: 78, fullMark: 100 },
@@ -98,7 +100,83 @@ const PIE_COLORS = ['#10b981', '#3b82f6', '#8b5cf6', '#f59e0b', '#ef4444', '#636
 export const WeeklyEmotionReport: React.FC = () => {
   const { toast } = useToast();
   const [currentWeek, setCurrentWeek] = useState(new Date());
-  const [weeklyData, setWeeklyData] = useState<DailyEmotion[]>(MOCK_WEEKLY_DATA);
+  const [weeklyData, setWeeklyData] = useState<DailyEmotion[]>(getDefaultWeeklyData());
+  const [isLoadingData, setIsLoadingData] = useState(true);
+
+  // Load real data from Supabase
+  useEffect(() => {
+    const loadWeeklyData = async () => {
+      setIsLoadingData(true);
+      try {
+        const { supabase } = await import('@/integrations/supabase/client');
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (!user) {
+          setIsLoadingData(false);
+          return;
+        }
+
+        const weekStart = startOfWeek(currentWeek, { weekStartsOn: 1 });
+        const weekEnd = endOfWeek(currentWeek, { weekStartsOn: 1 });
+
+        const { data: scans } = await supabase
+          .from('emotion_scans')
+          .select('*')
+          .eq('user_id', user.id)
+          .gte('created_at', weekStart.toISOString())
+          .lte('created_at', weekEnd.toISOString())
+          .order('created_at', { ascending: true });
+
+        if (scans && scans.length > 0) {
+          // Group by day
+          const dayMap = new Map<string, { valences: number[], arousals: number[], emotions: string[] }>();
+
+          scans.forEach(scan => {
+            const dayIndex = new Date(scan.created_at).getDay();
+            const dayName = DAYS_FR[dayIndex];
+            const existing = dayMap.get(dayName) || { valences: [], arousals: [], emotions: [] };
+
+            existing.valences.push(scan.mood_score || scan.overall_score || 50);
+            existing.arousals.push(scan.energy_level || 50);
+            existing.emotions.push(scan.primary_emotion || scan.mood || 'neutral');
+
+            dayMap.set(dayName, existing);
+          });
+
+          // Build weekly data
+          const newWeeklyData: DailyEmotion[] = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'].map(day => {
+            const data = dayMap.get(day);
+            if (data && data.valences.length > 0) {
+              const avgValence = Math.round(data.valences.reduce((a, b) => a + b, 0) / data.valences.length);
+              const avgArousal = Math.round(data.arousals.reduce((a, b) => a + b, 0) / data.arousals.length);
+
+              // Find dominant emotion
+              const emotionCount = new Map<string, number>();
+              data.emotions.forEach(e => emotionCount.set(e, (emotionCount.get(e) || 0) + 1));
+              const dominantEmotion = Array.from(emotionCount.entries()).sort((a, b) => b[1] - a[1])[0]?.[0] || 'neutral';
+
+              return {
+                day,
+                valence: avgValence,
+                arousal: avgArousal,
+                dominantEmotion: dominantEmotion.charAt(0).toUpperCase() + dominantEmotion.slice(1),
+                scansCount: data.valences.length
+              };
+            }
+            return { day, valence: 0, arousal: 0, dominantEmotion: '-', scansCount: 0 };
+          });
+
+          setWeeklyData(newWeeklyData);
+        }
+      } catch (error) {
+        console.error('Error loading weekly data:', error);
+      } finally {
+        setIsLoadingData(false);
+      }
+    };
+
+    loadWeeklyData();
+  }, [currentWeek]);
   const [stats, setStats] = useState<WeeklyStats | null>(null);
   const [activeTab, setActiveTab] = useState('overview');
   const [weeklyGoal, setWeeklyGoal] = useState(() => {

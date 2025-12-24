@@ -32,12 +32,68 @@ export const DailyQuestsPanel: React.FC = () => {
   const [weeklyQuests, setWeeklyQuests] = useState<Quest[]>([]);
 
   useEffect(() => {
-    if (user?.id) {
-      // Charger les quêtes (normalement depuis Supabase)
-      // Pour l'instant, on génère des quêtes mock
-      setDailyQuests(generateDailyQuests(user.id));
-      setWeeklyQuests(generateWeeklyQuests(user.id));
-    }
+    const loadQuests = async () => {
+      if (!user?.id) return;
+
+      try {
+        const { supabase } = await import('@/integrations/supabase/client');
+
+        // Try to load quests from Supabase
+        const { data: questsData } = await supabase
+          .from('quests')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('is_active', true);
+
+        if (questsData && questsData.length > 0) {
+          const daily = questsData
+            .filter(q => q.type === 'daily')
+            .map(q => ({
+              id: q.id,
+              title: q.title,
+              description: q.description,
+              icon: q.icon || '🎯',
+              xpReward: q.xp_reward || 50,
+              badgeReward: q.badge_reward,
+              currentValue: q.current_value || 0,
+              targetValue: q.target_value || 1,
+              completed: q.completed || false,
+              difficulty: q.difficulty || 'easy',
+              expiresAt: q.expires_at
+            }));
+
+          const weekly = questsData
+            .filter(q => q.type === 'weekly')
+            .map(q => ({
+              id: q.id,
+              title: q.title,
+              description: q.description,
+              icon: q.icon || '🏆',
+              xpReward: q.xp_reward || 100,
+              badgeReward: q.badge_reward,
+              currentValue: q.current_value || 0,
+              targetValue: q.target_value || 1,
+              completed: q.completed || false,
+              difficulty: q.difficulty || 'medium',
+              expiresAt: q.expires_at
+            }));
+
+          setDailyQuests(daily);
+          setWeeklyQuests(weekly);
+        } else {
+          // Fallback to generated quests
+          setDailyQuests(generateDailyQuests(user.id));
+          setWeeklyQuests(generateWeeklyQuests(user.id));
+        }
+      } catch (error) {
+        console.error('Error loading quests:', error);
+        // Fallback to generated quests
+        setDailyQuests(generateDailyQuests(user.id));
+        setWeeklyQuests(generateWeeklyQuests(user.id));
+      }
+    };
+
+    loadQuests();
   }, [user?.id]);
 
   const handleClaimReward = (quest: Quest) => {

@@ -43,9 +43,47 @@ export const MusicRecommendations: React.FC<MusicRecommendationsProps> = ({
 
   const generateRecommendations = async () => {
     setLoading(true);
-    
-    // Simulation de génération de recommandations
-    // Dans un environnement réel, cela ferait appel à une API
+
+    try {
+      const { supabase } = await import('@/integrations/supabase/client');
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (user) {
+        // Try to load recommendations from Supabase
+        const { data: recsData } = await supabase
+          .from('music_recommendations')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('is_active', true)
+          .order('score', { ascending: false })
+          .limit(10);
+
+        if (recsData && recsData.length > 0) {
+          const formattedRecs: Recommendation[] = recsData.map(r => ({
+            track: {
+              id: r.track_id || r.id,
+              title: r.title,
+              artist: r.artist,
+              url: r.audio_url || '',
+              audioUrl: r.audio_url || '',
+              duration: r.duration || 180,
+              emotion: r.emotion || currentMood,
+              mood: r.emotion || currentMood
+            },
+            score: r.score || 0.8,
+            reason: r.reason || 'Recommandé pour vous',
+            category: r.category as Recommendation['category'] || 'mood'
+          }));
+          setRecommendations(formattedRecs);
+          setLoading(false);
+          return;
+        }
+      }
+    } catch (error) {
+      console.error('Error loading recommendations:', error);
+    }
+
+    // Fallback to default recommendations
     const mockRecommendations: Recommendation[] = [
       {
         track: {
