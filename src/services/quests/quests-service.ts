@@ -134,60 +134,190 @@ const WEEKLY_QUESTS_TEMPLATES: Omit<Quest, 'id' | 'currentValue' | 'completed' |
 /**
  * Génère les quêtes du jour pour un utilisateur
  */
-export function generateDailyQuests(userId: string): Quest[] {
+export async function generateDailyQuests(userId: string): Promise<Quest[]> {
   const today = new Date();
   const tomorrow = new Date(today);
   tomorrow.setDate(tomorrow.getDate() + 1);
   tomorrow.setHours(0, 0, 0, 0);
 
-  // Sélectionner aléatoirement 3-4 quêtes quotidiennes
-  const shuffled = [...DAILY_QUESTS_TEMPLATES].sort(() => Math.random() - 0.5);
-  const selected = shuffled.slice(0, 3 + Math.floor(Math.random() * 2));
+  try {
+    const { supabase } = await import('@/integrations/supabase/client');
 
-  return selected.map((template, index) => ({
-    ...template,
-    id: `daily_${userId}_${today.toISOString().split('T')[0]}_${index}`,
-    currentValue: 0,
-    completed: false,
-    expiresAt: tomorrow.toISOString()
-  }));
+    // Check if quests already exist for today
+    const { data: existingQuests } = await supabase
+      .from('quests')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('type', 'daily')
+      .gte('expires_at', today.toISOString());
+
+    if (existingQuests && existingQuests.length > 0) {
+      return existingQuests.map(q => ({
+        id: q.id,
+        title: q.title,
+        description: q.description,
+        type: q.type,
+        category: q.category,
+        difficulty: q.difficulty,
+        targetValue: q.target_value,
+        currentValue: q.current_value || 0,
+        xpReward: q.xp_reward,
+        badgeReward: q.badge_reward,
+        completed: q.is_completed || false,
+        expiresAt: q.expires_at,
+        icon: q.icon
+      }));
+    }
+
+    // Generate new quests if none exist
+    const shuffled = [...DAILY_QUESTS_TEMPLATES].sort(() => Math.random() - 0.5);
+    const selected = shuffled.slice(0, 3 + Math.floor(Math.random() * 2));
+
+    const quests = selected.map((template, index) => ({
+      ...template,
+      id: `daily_${userId}_${today.toISOString().split('T')[0]}_${index}`,
+      currentValue: 0,
+      completed: false,
+      expiresAt: tomorrow.toISOString()
+    }));
+
+    // Save to Supabase
+    await supabase.from('quests').insert(
+      quests.map(q => ({
+        id: q.id,
+        user_id: userId,
+        title: q.title,
+        description: q.description,
+        type: q.type,
+        category: q.category,
+        difficulty: q.difficulty,
+        target_value: q.targetValue,
+        current_value: q.currentValue,
+        xp_reward: q.xpReward,
+        badge_reward: q.badgeReward,
+        is_completed: q.completed,
+        expires_at: q.expiresAt,
+        icon: q.icon,
+        created_at: new Date().toISOString()
+      }))
+    );
+
+    return quests;
+  } catch (error) {
+    // Fallback to local generation if Supabase fails
+    const shuffled = [...DAILY_QUESTS_TEMPLATES].sort(() => Math.random() - 0.5);
+    const selected = shuffled.slice(0, 3 + Math.floor(Math.random() * 2));
+
+    return selected.map((template, index) => ({
+      ...template,
+      id: `daily_${userId}_${today.toISOString().split('T')[0]}_${index}`,
+      currentValue: 0,
+      completed: false,
+      expiresAt: tomorrow.toISOString()
+    }));
+  }
 }
 
 /**
  * Génère les quêtes de la semaine pour un utilisateur
  */
-export function generateWeeklyQuests(userId: string): Quest[] {
+export async function generateWeeklyQuests(userId: string): Promise<Quest[]> {
   const today = new Date();
   const nextWeek = new Date(today);
   nextWeek.setDate(nextWeek.getDate() + 7);
   nextWeek.setHours(0, 0, 0, 0);
 
-  // Sélectionner 2-3 quêtes hebdomadaires
-  const shuffled = [...WEEKLY_QUESTS_TEMPLATES].sort(() => Math.random() - 0.5);
-  const selected = shuffled.slice(0, 2 + Math.floor(Math.random() * 2));
+  try {
+    const { supabase } = await import('@/integrations/supabase/client');
 
-  return selected.map((template, index) => ({
-    ...template,
-    id: `weekly_${userId}_${today.toISOString().split('T')[0]}_${index}`,
-    currentValue: 0,
-    completed: false,
-    expiresAt: nextWeek.toISOString()
-  }));
+    // Check if weekly quests already exist
+    const { data: existingQuests } = await supabase
+      .from('quests')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('type', 'weekly')
+      .gte('expires_at', today.toISOString());
+
+    if (existingQuests && existingQuests.length > 0) {
+      return existingQuests.map(q => ({
+        id: q.id,
+        title: q.title,
+        description: q.description,
+        type: q.type,
+        category: q.category,
+        difficulty: q.difficulty,
+        targetValue: q.target_value,
+        currentValue: q.current_value || 0,
+        xpReward: q.xp_reward,
+        badgeReward: q.badge_reward,
+        completed: q.is_completed || false,
+        expiresAt: q.expires_at,
+        icon: q.icon
+      }));
+    }
+
+    // Generate new quests
+    const shuffled = [...WEEKLY_QUESTS_TEMPLATES].sort(() => Math.random() - 0.5);
+    const selected = shuffled.slice(0, 2 + Math.floor(Math.random() * 2));
+
+    const quests = selected.map((template, index) => ({
+      ...template,
+      id: `weekly_${userId}_${today.toISOString().split('T')[0]}_${index}`,
+      currentValue: 0,
+      completed: false,
+      expiresAt: nextWeek.toISOString()
+    }));
+
+    // Save to Supabase
+    await supabase.from('quests').insert(
+      quests.map(q => ({
+        id: q.id,
+        user_id: userId,
+        title: q.title,
+        description: q.description,
+        type: q.type,
+        category: q.category,
+        difficulty: q.difficulty,
+        target_value: q.targetValue,
+        current_value: q.currentValue,
+        xp_reward: q.xpReward,
+        badge_reward: q.badgeReward,
+        is_completed: q.completed,
+        expires_at: q.expiresAt,
+        icon: q.icon,
+        created_at: new Date().toISOString()
+      }))
+    );
+
+    return quests;
+  } catch (error) {
+    // Fallback to local generation
+    const shuffled = [...WEEKLY_QUESTS_TEMPLATES].sort(() => Math.random() - 0.5);
+    const selected = shuffled.slice(0, 2 + Math.floor(Math.random() * 2));
+
+    return selected.map((template, index) => ({
+      ...template,
+      id: `weekly_${userId}_${today.toISOString().split('T')[0]}_${index}`,
+      currentValue: 0,
+      completed: false,
+      expiresAt: nextWeek.toISOString()
+    }));
+  }
 }
 
 /**
  * Met à jour la progression d'une quête
  */
-export function updateQuestProgress(
+export async function updateQuestProgress(
   quests: Quest[],
   questId: string,
   incrementBy: number = 1
-): Quest[] {
-  return quests.map(quest => {
+): Promise<Quest[]> {
+  const updatedQuests = quests.map(quest => {
     if (quest.id === questId && !quest.completed) {
       const newValue = Math.min(quest.currentValue + incrementBy, quest.targetValue);
       const isCompleted = newValue >= quest.targetValue;
-      
+
       return {
         ...quest,
         currentValue: newValue,
@@ -196,6 +326,27 @@ export function updateQuestProgress(
     }
     return quest;
   });
+
+  // Persist to Supabase
+  try {
+    const { supabase } = await import('@/integrations/supabase/client');
+    const updatedQuest = updatedQuests.find(q => q.id === questId);
+
+    if (updatedQuest) {
+      await supabase
+        .from('quests')
+        .update({
+          current_value: updatedQuest.currentValue,
+          is_completed: updatedQuest.completed,
+          completed_at: updatedQuest.completed ? new Date().toISOString() : null
+        })
+        .eq('id', questId);
+    }
+  } catch (error) {
+    // Continue with local state even if Supabase fails
+  }
+
+  return updatedQuests;
 }
 
 /**

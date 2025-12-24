@@ -76,19 +76,51 @@ export const useNudges = () => {
     const fetchNudge = async () => {
       try {
         setLoading('nudge', true);
-        await new Promise((resolve) => setTimeout(resolve, 200));
 
-        const toneKey: 'default' | NudgeTone = tone ?? 'default';
-        const pool = NUDGE_LIBRARY[toneKey];
-        const suggestion = pool[Math.floor(Math.random() * pool.length)];
+        // Try to fetch personalized nudge from Supabase
+        const { supabase } = await import('@/integrations/supabase/client');
+        const { data: { user } } = await supabase.auth.getUser();
+
+        let suggestion: Nudge | null = null;
+
+        if (user) {
+          const { data: nudgeData } = await supabase
+            .from('nudges')
+            .select('*')
+            .eq('user_id', user.id)
+            .eq('tone', tone || 'default')
+            .eq('is_active', true)
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .single();
+
+          if (nudgeData) {
+            suggestion = {
+              text: nudgeData.text,
+              deeplink: nudgeData.deeplink || '/app/dashboard',
+              emoji: nudgeData.emoji || '💡'
+            };
+          }
+        }
+
+        // Fallback to local library if no personalized nudge
+        if (!suggestion) {
+          const toneKey: 'default' | NudgeTone = tone ?? 'default';
+          const pool = NUDGE_LIBRARY[toneKey];
+          suggestion = pool[Math.floor(Math.random() * pool.length)];
+        }
 
         if (!cancelled) {
           setNudge(suggestion);
         }
       } catch (error) {
         logger.error('Failed to fetch nudge', error as Error, 'SYSTEM');
+        // Fallback to local library on error
         if (!cancelled) {
-          setNudge(null);
+          const toneKey: 'default' | NudgeTone = tone ?? 'default';
+          const pool = NUDGE_LIBRARY[toneKey];
+          const fallback = pool[Math.floor(Math.random() * pool.length)];
+          setNudge(fallback);
         }
       } finally {
         if (!cancelled) {

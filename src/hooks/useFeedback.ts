@@ -43,11 +43,30 @@ export const useFeedback = () => {
         diagnostics: payload.include_diagnostics ? collectDiagnostics() : undefined
       };
 
-      // Mock API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      const ticketId = `F2025-${Math.floor(Math.random() * 1000)}`;
-      
+      const { supabase } = await import('@/integrations/supabase/client');
+      const { data: { user } } = await supabase.auth.getUser();
+
+      // Save feedback to Supabase
+      const { data: ticketData, error } = await supabase
+        .from('feedback_tickets')
+        .insert({
+          user_id: user?.id,
+          type: finalPayload.type || 'feedback',
+          category: finalPayload.category,
+          message: finalPayload.message,
+          rating: finalPayload.rating,
+          diagnostics: finalPayload.diagnostics,
+          screenshot_url: finalPayload.screenshot_url,
+          status: 'open',
+          created_at: new Date().toISOString()
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      const ticketId = ticketData?.id?.substring(0, 8).toUpperCase() || `F${Date.now()}`;
+
       // Save last ticket
       setLastTicket({
         id: ticketId,
@@ -56,7 +75,7 @@ export const useFeedback = () => {
 
       // Clear draft
       clearDraft();
-      
+
       // Show success message
       toast.success(`Merci ! Ticket #${ticketId} créé`, {
         description: 'Nous reviendrons vers vous rapidement.',

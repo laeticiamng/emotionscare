@@ -55,6 +55,27 @@ class NotificationUiService {
     this.saveNotifications();
     this.notifyListeners();
 
+    // Save to Supabase for persistence across devices
+    try {
+      const { supabase } = await import('@/integrations/supabase/client');
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (user) {
+        await supabase.from('notifications').insert({
+          user_id: user.id,
+          type: notification.type,
+          title: notification.title,
+          message: notification.message,
+          action_url: notification.actionUrl,
+          priority: notification.priority,
+          is_read: false,
+          created_at: newNotification.timestamp
+        });
+      }
+    } catch (error) {
+      logger.error('Error saving notification to Supabase', error as Error, 'SYSTEM');
+    }
+
     // Send push notification if allowed
     if (notification.priority === 'high' || notification.priority === 'critical') {
       await this.sendPushNotification(newNotification);
