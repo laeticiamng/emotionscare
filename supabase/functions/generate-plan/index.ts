@@ -88,25 +88,56 @@ serve(async (req) => {
       const openai = new OpenAI({ apiKey: openaiApiKey });
       const systemPrompt = `Tu es un coach EmotionsCare. Reformule des recommandations en français, 1 phrase max, ton bienveillant.`;
       const userPrompt = `Émotion principale: ${emotion_analysis.primary_emotion}
-Recommandations: ${JSON.stringify(baseRecommendations)}`;
+Recommandations: ${JSON.stringify(baseRecommendations)}
+
+Retourne exactement ${baseRecommendations.length} descriptions, une pour chaque recommandation dans l'ordre.`;
 
       try {
         const response = await openai.chat.completions.create({
-          model: 'gpt-4.1',
+          model: 'gpt-4.1-mini-2025-04-14',
           messages: [
             { role: 'system', content: systemPrompt },
             { role: 'user', content: userPrompt },
           ],
+          response_format: {
+            type: 'json_schema',
+            json_schema: {
+              name: 'RecommendationDescriptions',
+              schema: {
+                type: 'object',
+                properties: {
+                  descriptions: {
+                    type: 'array',
+                    items: {
+                      type: 'string',
+                      description: 'Une phrase de description bienveillante pour la recommandation',
+                    },
+                    description: 'Liste des descriptions pour chaque recommandation',
+                  },
+                },
+                required: ['descriptions'],
+                additionalProperties: false,
+              },
+              strict: true,
+            },
+          },
           temperature: 0.4,
-          max_tokens: 300,
+          max_completion_tokens: 300,
         });
         const content = response.choices[0]?.message?.content ?? '';
-        const lines = content.split('\n').map((line) => line.replace(/^[-•]\s*/, '').trim()).filter(Boolean);
+        const parsed = JSON.parse(content);
+        
+        // Validate that we have the expected structure
+        if (!parsed.descriptions || !Array.isArray(parsed.descriptions)) {
+          throw new Error('Invalid response structure from OpenAI');
+        }
+        
         recommendations = baseRecommendations.map((rec, index) => ({
           ...rec,
-          description: lines[index] || `Action ${rec.title}`,
+          description: parsed.descriptions[index] || `Action ${rec.title}`,
         }));
       } catch (error) {
+        console.error('[generate-plan] OpenAI error:', error);
         recommendations = baseRecommendations.map((rec) => ({
           ...rec,
           description: `Action recommandée: ${rec.title}`,
