@@ -34,7 +34,7 @@ interface StatCard {
   label: string;
   value: string | number;
   change: number;
-  icon: React.ElementType;
+  icon: React.ComponentType<{ className?: string }>;
   color: string;
 }
 
@@ -136,7 +136,7 @@ export const AdvancedAnalyticsDashboard: React.FC = () => {
             <Card>
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
-                  {React.createElement(stat.icon, { className: `h-8 w-8 ${stat.color}` })}
+                  <stat.icon className={`h-8 w-8 ${stat.color}`} />
                   <Badge
                     variant={stat.change >= 0 ? 'default' : 'secondary'}
                     className="gap-1"
