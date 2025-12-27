@@ -1,15 +1,12 @@
-// @ts-nocheck
-
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Trophy, Clock, Target, Zap, Filter, Link2, ChevronRight, Flame } from 'lucide-react';
+import { Trophy, Clock, Target, Zap, Flame } from 'lucide-react';
 import { questService, Quest, UserQuestProgress } from '@/services/questService';
 import { useToast } from '@/hooks/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export const QuestsPanel: React.FC = () => {
   const [quests, setQuests] = useState<Quest[]>([]);
@@ -76,13 +73,6 @@ export const QuestsPanel: React.FC = () => {
     ? quests 
     : quests.filter(q => q.quest_type === activeFilter);
 
-  // Quest chains (grouped quests)
-  const questChains = quests.filter(q => q.chain_id).reduce((acc, quest) => {
-    if (!acc[quest.chain_id!]) acc[quest.chain_id!] = [];
-    acc[quest.chain_id!].push(quest);
-    return acc;
-  }, {} as Record<string, Quest[]>);
-
   // Stats
   const completedToday = quests.filter(q => {
     const progress = getProgressForQuest(q.id);
@@ -108,7 +98,6 @@ export const QuestsPanel: React.FC = () => {
       ? (progress.current_progress / quest.max_progress) * 100 
       : 0;
     const isCompleted = progress?.completed;
-    const isChained = quest.chain_id && quest.chain_order;
 
     return (
       <motion.div 
@@ -130,12 +119,6 @@ export const QuestsPanel: React.FC = () => {
               <Badge className={getDifficultyColor(quest.difficulty)} variant="outline">
                 {quest.difficulty}
               </Badge>
-              {isChained && (
-                <Badge variant="outline" className="text-xs flex items-center gap-1">
-                  <Link2 className="w-3 h-3" />
-                  Chaîne {quest.chain_order}
-                </Badge>
-              )}
             </div>
             <p className="text-sm text-muted-foreground">{quest.description}</p>
           </div>
