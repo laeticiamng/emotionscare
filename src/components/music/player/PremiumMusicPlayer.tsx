@@ -1,6 +1,3 @@
-// @ts-nocheck
-
-// @ts-nocheck
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -34,11 +31,7 @@ const PremiumMusicPlayer: React.FC<PremiumMusicPlayerProps> = ({
   const [showFullscreen, setShowFullscreen] = useState(false);
   
   const {
-    currentTrack,
-    isPlaying,
-    volume,
-    currentTime,
-    duration,
+    state,
     visualizerEnabled,
     setVisualizerEnabled,
     keyboardShortcutsEnabled,
@@ -47,8 +40,10 @@ const PremiumMusicPlayer: React.FC<PremiumMusicPlayerProps> = ({
     nextTrackWithFeedback,
     previousTrackWithFeedback,
     setVolume,
-    seekTo
+    seek
   } = useEnhancedMusicPlayer();
+
+  const { currentTrack, isPlaying, volume, currentTime, duration } = state;
 
   const [isMuted, setIsMuted] = useState(false);
 
@@ -66,12 +61,6 @@ const PremiumMusicPlayer: React.FC<PremiumMusicPlayerProps> = ({
     } else {
       setVolume(0.7);
     }
-  };
-
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
   };
 
   if (compact) {
@@ -93,7 +82,7 @@ const PremiumMusicPlayer: React.FC<PremiumMusicPlayerProps> = ({
                 <WaveformVisualizer
                   isPlaying={isPlaying}
                   progress={(currentTime / duration) * 100}
-                  onSeek={(values) => seekTo((values[0] / 100) * duration)}
+                  onSeek={(values: number[]) => seek((values[0] / 100) * duration)}
                 />
               </div>
             )}
@@ -101,8 +90,7 @@ const PremiumMusicPlayer: React.FC<PremiumMusicPlayerProps> = ({
             <ProgressBar
               currentTime={currentTime}
               duration={duration}
-              onSeek={seekTo}
-              formatTime={formatTime}
+              onSeek={seek}
             />
             
             <div className="flex items-center justify-between">
@@ -178,7 +166,7 @@ const PremiumMusicPlayer: React.FC<PremiumMusicPlayerProps> = ({
                 <WaveformVisualizer
                   isPlaying={isPlaying}
                   progress={(currentTime / duration) * 100}
-                  onSeek={(values) => seekTo((values[0] / 100) * duration)}
+                  onSeek={(values: number[]) => seek((values[0] / 100) * duration)}
                   className="h-full"
                 />
               </div>
@@ -188,8 +176,7 @@ const PremiumMusicPlayer: React.FC<PremiumMusicPlayerProps> = ({
               <ProgressBar
                 currentTime={currentTime}
                 duration={duration}
-                onSeek={seekTo}
-                formatTime={formatTime}
+                onSeek={seek}
                 className="text-center"
               />
               
