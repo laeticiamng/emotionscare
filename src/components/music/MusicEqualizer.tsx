@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React, { useEffect, useState, useRef } from 'react';
 import { useMusic } from '@/hooks/useMusic';
 import { cn } from '@/lib/utils';
@@ -19,7 +17,8 @@ const MusicEqualizer: React.FC<MusicEqualizerProps> = ({
   inactiveColor = 'bg-primary/30',
   size = 'md'
 }) => {
-  const { isPlaying } = useMusic();
+  const { state } = useMusic();
+  const isPlaying = state.isPlaying;
   const [active, setActive] = useState(false);
   const timeout = useRef<NodeJS.Timeout | null>(null);
   

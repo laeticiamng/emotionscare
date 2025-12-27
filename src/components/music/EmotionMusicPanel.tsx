@@ -1,10 +1,8 @@
-// @ts-nocheck
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Music, Sparkles, Loader2, AlertCircle, Play } from '@/components/music/icons';
-import { useHumeAI } from '@/hooks/useHumeAI';
 import { useEmotionMusic } from '@/hooks/useEmotionMusic';
 import { useSunoCallback } from '@/hooks/useSunoCallback';
 import { supabase } from '@/integrations/supabase/client';
@@ -14,9 +12,13 @@ import { logger } from '@/lib/logger';
 
 export const EmotionMusicPanel: React.FC = () => {
   const [analysisText, setAnalysisText] = useState('');
-  const { analyzeEmotion, isProcessing: isAnalyzing, emotionResult } = useHumeAI();
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const { generateFromEmotion, isGenerating, emotionBadge, currentTask, error, rateLimitStatus, reset } = useEmotionMusic();
-  const [manualPollResult, setManualPollResult] = useState<any>(null);
+  const [manualPollResult, setManualPollResult] = useState<{
+    stage?: string;
+    streamUrl?: string;
+    downloadUrl?: string;
+  } | null>(null);
   const [isManualPolling, setIsManualPolling] = useState(false);
   
   const { latestCallback, isWaiting, elapsedTime, signedUrl } = useSunoCallback({
@@ -24,8 +26,8 @@ export const EmotionMusicPanel: React.FC = () => {
     onComplete: (callback) => {
       logger.info('Musique complète', callback, 'UI');
     },
-    onError: (error) => {
-      logger.error('Erreur génération', error as Error, 'UI');
+    onError: (errorMsg) => {
+      logger.error('Erreur génération', new Error(errorMsg), 'UI');
     }
   });
 
@@ -84,22 +86,29 @@ export const EmotionMusicPanel: React.FC = () => {
     }
 
     try {
-      // 1. Analyser l'émotion via Hume (simulation pour l'instant)
-      const result = await analyzeEmotion(analysisText);
+      setIsAnalyzing(true);
       
-      if (!result) return;
+      // Simulation d'analyse d'émotion basée sur le texte
+      // Dans une implémentation complète, cela utiliserait un service d'analyse
+      const detectedEmotion = analysisText.toLowerCase().includes('triste') ? 'sadness' 
+        : analysisText.toLowerCase().includes('joyeux') || analysisText.toLowerCase().includes('heureux') ? 'joy'
+        : analysisText.toLowerCase().includes('calme') ? 'calm'
+        : analysisText.toLowerCase().includes('anxieux') || analysisText.toLowerCase().includes('stress') ? 'anxiety'
+        : 'neutral';
 
-      // 2. Générer la musique basée sur l'émotion
+      // Générer la musique basée sur l'émotion détectée
       const emotionState = {
-        valence: result.confidence || 0.7,
+        valence: 0.7,
         arousal: 0.5,
-        dominantEmotion: result.emotion,
-        labels: [result.emotion]
+        dominantEmotion: detectedEmotion,
+        labels: [detectedEmotion]
       };
 
       await generateFromEmotion(emotionState);
-    } catch (error) {
-      logger.error('Erreur', error as Error, 'UI');
+    } catch (err) {
+      logger.error('Erreur', err as Error, 'UI');
+    } finally {
+      setIsAnalyzing(false);
     }
   };
 
@@ -305,7 +314,7 @@ export const EmotionMusicPanel: React.FC = () => {
             )}
 
             {/* Fallback: afficher URLs Suno directes si pas encore en Storage */}
-            {!signedUrl && latestCallback?.data?.audio_url && (
+            {!signedUrl && latestCallback?.data?.audioUrl && (
               <div className="p-4 bg-yellow-500/5 rounded-md border border-yellow-500/20">
                 <div className="flex items-center gap-3 mb-2">
                   <Music className="h-5 w-5 text-yellow-600" />
