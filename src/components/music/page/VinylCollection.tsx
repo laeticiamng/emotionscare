@@ -60,7 +60,7 @@ export const VinylCollection: React.FC<VinylCollectionProps> = ({
                     role="button"
                     tabIndex={0}
                     aria-label={`Lancer le vinyle ${track.title} de ${track.artist}, catégorie ${track.category}`}
-                    className="h-full bg-card/90 backdrop-blur-md hover:shadow-lg transition-all duration-300 cursor-pointer group overflow-hidden focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2"
+                    className="h-full bg-card/90 backdrop-blur-md hover:shadow-xl transition-all duration-300 cursor-pointer group overflow-hidden focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2"
                     onClick={() => !isLoading && onStartTrack(track)}
                     onKeyDown={(e) => {
                       if (!isLoading && (e.key === 'Enter' || e.key === ' ')) {
@@ -70,30 +70,48 @@ export const VinylCollection: React.FC<VinylCollectionProps> = ({
                     }}
                   >
                     <CardContent className="p-6 space-y-4">
-                      {/* Vinyl Disc */}
-                      <div className="relative">
+                      {/* Vinyl Disc with enhanced 3D effect */}
+                      <div className="relative perspective-1000">
                         <motion.div
-                          animate={isLoading ? { rotate: 360 } : {}}
-                          transition={isLoading ? { duration: 2, repeat: Infinity, ease: "linear" } : {}}
-                          className="w-24 h-24 mx-auto rounded-full relative overflow-hidden"
-                          style={{ background: track.vinylColor }}
+                          animate={isLoading ? { rotate: 360 } : { rotateY: 0 }}
+                          whileHover={{ rotateY: 15, scale: 1.05 }}
+                          transition={isLoading ? { duration: 2, repeat: Infinity, ease: "linear" } : { duration: 0.3 }}
+                          className="w-28 h-28 mx-auto rounded-full relative overflow-hidden shadow-2xl"
+                          style={{ 
+                            background: `radial-gradient(circle at 30% 30%, ${track.vinylColor}, ${track.color}40)`,
+                            transformStyle: 'preserve-3d'
+                          }}
                         >
+                          {/* Vinyl grooves */}
                           <div className="absolute inset-2 rounded-full border-2 border-foreground/20" />
-                          <div className="absolute inset-4 rounded-full border border-foreground/20" />
-                          <div className="absolute inset-6 rounded-full border border-foreground/20" />
+                          <div className="absolute inset-4 rounded-full border border-foreground/15" />
+                          <div className="absolute inset-6 rounded-full border border-foreground/15" />
+                          <div className="absolute inset-8 rounded-full border border-foreground/10" />
                           
-                          <div className="absolute top-1/2 left-1/2 w-6 h-6 -mt-3 -ml-3 rounded-full bg-card border-2 border-foreground/30 flex items-center justify-center">
+                          {/* Vinyl shine effect */}
+                          <div 
+                            className="absolute inset-0 rounded-full opacity-40"
+                            style={{ 
+                              background: 'linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.3) 50%, transparent 60%)'
+                            }}
+                          />
+                          
+                          {/* Center label */}
+                          <div className="absolute top-1/2 left-1/2 w-8 h-8 -mt-4 -ml-4 rounded-full bg-card border-2 border-foreground/30 flex items-center justify-center shadow-inner">
                             {isLoading ? (
-                              <Loader2 className="w-3 h-3 animate-spin" style={{ color: track.color }} />
+                              <Loader2 className="w-4 h-4 animate-spin" style={{ color: track.color }} />
                             ) : Icon ? (
-                              <Icon className="w-3 h-3" style={{ color: track.color }} />
+                              <Icon className="w-4 h-4" style={{ color: track.color }} />
                             ) : null}
                           </div>
                         </motion.div>
                         
-                        <div 
-                          className="absolute -inset-2 rounded-full opacity-30 blur-md"
+                        {/* Glow effect */}
+                        <motion.div 
+                          className="absolute -inset-4 rounded-full opacity-20 blur-xl -z-10"
                           style={{ background: track.vinylColor }}
+                          animate={{ opacity: [0.2, 0.4, 0.2] }}
+                          transition={{ duration: 2, repeat: Infinity }}
                         />
                       </div>
                 
