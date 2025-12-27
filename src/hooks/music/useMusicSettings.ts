@@ -19,7 +19,15 @@ type SettingKey =
   | 'music:generation-favorites'
   | 'music:generation-stats'
   | 'music:accessibility-prefs'
-  | 'music:shortcuts-seen';
+  | 'music:shortcuts-seen'
+  | 'music:history'
+  | 'music:lastPlayed'
+  | 'music:cachedTracks'
+  | 'music:queue'
+  | 'music:favorites'
+  | 'music:player-stats'
+  | 'music:track-ratings'
+  | 'music:track-play-counts';
 
 interface UseMusicSettingsOptions<T> {
   key: SettingKey;
@@ -282,6 +290,85 @@ export function useQuotaIndicatorData() {
       history: [] as any[],
       notifications: { enabled: true, threshold: 20 }
     }
+  });
+}
+
+// Hook pour l'historique de lecture
+export function useMusicHistory() {
+  return useMusicSettings<string[]>({
+    key: 'music:history',
+    defaultValue: []
+  });
+}
+
+// Hook pour le dernier morceau joué
+export function useLastPlayedTrack() {
+  return useMusicSettings<string | null>({
+    key: 'music:lastPlayed',
+    defaultValue: null,
+    debounceMs: 100
+  });
+}
+
+// Hook pour les tracks en cache offline
+export function useCachedTracks() {
+  return useMusicSettings<any[]>({
+    key: 'music:cachedTracks',
+    defaultValue: [],
+    debounceMs: 1000
+  });
+}
+
+// Hook pour la queue du player
+export function useMusicQueue() {
+  return useMusicSettings<any[]>({
+    key: 'music:queue',
+    defaultValue: []
+  });
+}
+
+// Hook pour les favoris du player
+export function useMusicPlayerFavorites() {
+  return useMusicSettings<any[]>({
+    key: 'music:favorites',
+    defaultValue: []
+  });
+}
+
+// Hook pour les stats du player
+export function useMusicPlayerStats() {
+  return useMusicSettings({
+    key: 'music:player-stats',
+    defaultValue: {
+      totalPlayTime: 0,
+      tracksPlayed: 0,
+      favoriteGenre: 'Ambient',
+      lastSession: new Date().toISOString()
+    }
+  });
+}
+
+// Hook pour les notes des tracks
+export function useTrackRatings() {
+  return useMusicSettings<Record<string, number>>({
+    key: 'music:track-ratings',
+    defaultValue: {}
+  });
+}
+
+// Hook pour les compteurs de lecture
+export function useTrackPlayCounts() {
+  return useMusicSettings<Record<string, number>>({
+    key: 'music:track-play-counts',
+    defaultValue: {}
+  });
+}
+
+// Hook pour savoir si les raccourcis ont été vus
+export function useShortcutsSeen() {
+  return useMusicSettings<boolean>({
+    key: 'music:shortcuts-seen',
+    defaultValue: false
   });
 }
 

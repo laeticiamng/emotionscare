@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useMusic } from '@/hooks/useMusic';
 import { toast } from '@/hooks/use-toast';
+import { useShortcutsSeen } from '@/hooks/music/useMusicSettings';
 
 interface PlayerKeyboardShortcutsProps {
   enabled?: boolean;
@@ -13,6 +14,7 @@ const PlayerKeyboardShortcuts: React.FC<PlayerKeyboardShortcutsProps> = ({
 }) => {
   const { state, play, pause, next, previous, setVolume } = useMusic();
   const { isPlaying, volume } = state;
+  const { value: hasSeenShortcuts, setValue: setHasSeenShortcuts } = useShortcutsSeen();
 
   useEffect(() => {
     if (!enabled) return;
@@ -118,20 +120,17 @@ const PlayerKeyboardShortcuts: React.FC<PlayerKeyboardShortcutsProps> = ({
 
   // Show keyboard shortcuts help on first load
   useEffect(() => {
-    if (enabled && showTooltips) {
-      const hasSeenShortcuts = localStorage.getItem('music-shortcuts-seen');
-      if (!hasSeenShortcuts) {
-        setTimeout(() => {
-          toast({
-            title: "Raccourcis clavier disponibles",
-            description: "Espace: Pause/Lecture, ←→: Navigation, ↑↓: Volume, M: Muet",
-            duration: 5000
-          });
-          localStorage.setItem('music-shortcuts-seen', 'true');
-        }, 2000);
-      }
+    if (enabled && showTooltips && !hasSeenShortcuts) {
+      setTimeout(() => {
+        toast({
+          title: "Raccourcis clavier disponibles",
+          description: "Espace: Pause/Lecture, ←→: Navigation, ↑↓: Volume, M: Muet",
+          duration: 5000
+        });
+        setHasSeenShortcuts(true);
+      }, 2000);
     }
-  }, [enabled, showTooltips]);
+  }, [enabled, showTooltips, hasSeenShortcuts, setHasSeenShortcuts]);
 
   return null; // This component doesn't render anything
 };
