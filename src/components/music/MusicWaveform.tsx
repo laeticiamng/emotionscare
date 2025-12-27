@@ -1,7 +1,5 @@
-// @ts-nocheck
 import React, { useRef, useEffect } from 'react';
 import { useMusic } from '@/hooks/useMusic';
-import { getTrackUrl } from '@/utils/musicCompatibility';
 import { cn } from '@/lib/utils';
 
 interface MusicWaveformProps {
@@ -33,13 +31,8 @@ const MusicWaveform: React.FC<MusicWaveformProps> = ({
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const waveformRef = useRef<HTMLDivElement>(null);
-  const { 
-    currentTrack, 
-    isPlaying, 
-    currentTime, 
-    duration,
-    seekTo 
-  } = useMusic();
+  const { state, seek } = useMusic();
+  const { currentTrack, isPlaying, currentTime, duration } = state;
 
   // Generate random waveform data (in a real app, this would use the actual audio data)
   const generateWaveformData = (count: number) => {
@@ -71,7 +64,7 @@ const MusicWaveform: React.FC<MusicWaveformProps> = ({
 
   // Handle seeking when clicking on waveform
   const handleWaveformClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!interactive || !seekTo || !duration) return;
+    if (!interactive || !seek || !duration) return;
     
     const waveformElement = waveformRef.current;
     if (waveformElement) {
@@ -80,7 +73,7 @@ const MusicWaveform: React.FC<MusicWaveformProps> = ({
       const percentPosition = clickPositionX / rect.width;
       const newPosition = percentPosition * duration;
       
-      seekTo(newPosition);
+      seek(newPosition);
     }
   };
 

@@ -13,7 +13,6 @@
  * @module components/music/QuotaIndicator
  */
 
-// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { LazyMotionWrapper, m } from '@/utils/lazy-motion';
 import { useQuotaUI } from '@/hooks/music/useUserQuota';
@@ -26,9 +25,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { 
   Zap, TrendingUp, AlertCircle, Clock, Sparkles, 
-  History, Bell, BellOff, BarChart3, Calendar,
-  ChevronUp, ChevronDown, Target, Gift
+  History, BarChart3, Target
 } from '@/components/music/icons';
+import { Bell, BellOff, Calendar, ChevronUp, ChevronDown, Gift } from 'lucide-react';
 import { UserTier } from '@/services/music/quota-service';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
