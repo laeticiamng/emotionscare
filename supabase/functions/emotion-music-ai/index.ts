@@ -292,9 +292,9 @@ serve(async (req) => {
       }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
 
-    // Check status - Documentation: https://docs.sunoapi.org/suno-api/query-task
+    // Check status - Documentation: https://docs.sunoapi.org/suno-api/quickstart#step-2-check-task-status
     if (action === 'check-status') {
-      const statusRes = await fetch(`https://api.sunoapi.org/api/v1/query?taskId=${sunoTaskId}`, {
+      const statusRes = await fetch(`https://api.sunoapi.org/api/v1/generate/record-info?taskId=${sunoTaskId}`, {
         headers: { 'Authorization': `Bearer ${sunoKey}` }
       });
 
@@ -309,12 +309,15 @@ serve(async (req) => {
         throw new Error(`Erreur lors de la vérification du statut: ${statusRes.status}`);
       }
       const rawData = await statusRes.json();
-      // Adapter la réponse au format attendu
+      console.log(`[emotion-music-ai] Status response:`, JSON.stringify(rawData));
+      
+      // Adapter la réponse au format attendu selon la doc
+      // Format: { data: { taskId, status: "SUCCESS", response: { data: [{ audio_url, title, duration }] } } }
       const statusData = {
         status: rawData.data?.status === 'SUCCESS' ? 'complete' : rawData.data?.status?.toLowerCase() || 'pending',
-        audio_url: rawData.data?.sunoData?.[0]?.audioUrl,
-        image_url: rawData.data?.sunoData?.[0]?.imageUrl,
-        duration: rawData.data?.sunoData?.[0]?.duration
+        audio_url: rawData.data?.response?.data?.[0]?.audio_url,
+        image_url: rawData.data?.response?.data?.[0]?.image_url,
+        duration: rawData.data?.response?.data?.[0]?.duration
       };
 
       if (statusData.status === 'complete' && statusData.audio_url && trackId) {
