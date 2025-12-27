@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -32,7 +30,8 @@ const AIRecommendationEngine: React.FC<AIRecommendationEngineProps> = ({ classNa
     timeContext: 'evening'
   });
   
-  const { currentTrack, playlists } = useMusic();
+  const { state } = useMusic();
+  const currentTrack = state.currentTrack;
 
   // Simulation d'IA générant des recommandations
   const generateAIRecommendations = async () => {
@@ -54,6 +53,7 @@ const AIRecommendationEngine: React.FC<AIRecommendationEngineProps> = ({ classNa
             artist: 'AI Composer',
             duration: 240,
             url: '/sounds/ambient-calm.mp3',
+            audioUrl: '/sounds/ambient-calm.mp3',
             emotion: 'calm'
           },
           {
@@ -62,6 +62,7 @@ const AIRecommendationEngine: React.FC<AIRecommendationEngineProps> = ({ classNa
             artist: 'Neural Symphony',
             duration: 300,
             url: '/sounds/ambient-calm.mp3',
+            audioUrl: '/sounds/ambient-calm.mp3',
             emotion: 'peaceful'
           }
         ],
@@ -80,6 +81,7 @@ const AIRecommendationEngine: React.FC<AIRecommendationEngineProps> = ({ classNa
             artist: 'Productivity AI',
             duration: 180,
             url: '/sounds/ambient-calm.mp3',
+            audioUrl: '/sounds/ambient-calm.mp3',
             emotion: 'focused'
           }
         ],
@@ -98,6 +100,7 @@ const AIRecommendationEngine: React.FC<AIRecommendationEngineProps> = ({ classNa
             artist: 'Echo Chamber',
             duration: 270,
             url: '/sounds/ambient-calm.mp3',
+            audioUrl: '/sounds/ambient-calm.mp3',
             emotion: 'curious'
           }
         ],

@@ -1,12 +1,10 @@
-// @ts-nocheck
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Equalizer, RotateCcw } from 'lucide-react';
+import { SlidersHorizontal, RotateCcw } from 'lucide-react';
 
 interface EqualizerBand {
   frequency: string;
@@ -63,8 +61,8 @@ const AdvancedEqualizer: React.FC = () => {
     <Card className="w-full">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
-            <Equalizer className="h-5 w-5" />
+        <CardTitle className="flex items-center gap-2">
+            <SlidersHorizontal className="h-5 w-5" />
             Égaliseur Avancé
           </CardTitle>
           <div className="flex items-center gap-2">

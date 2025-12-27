@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * AutoMixPlayer - Lecteur intelligent avec contexte temps réel
  */
@@ -98,7 +97,7 @@ export const AutoMixPlayer: React.FC = () => {
               <div className="flex flex-col items-center gap-2 p-4 bg-card/50 rounded-lg">
                 <TimeIcon className="h-8 w-8 text-orange-500" />
                 <span className="text-sm font-medium capitalize">{context.timeContext}</span>
-                <span className="text-xs text-muted-foreground">{context.hour}h</span>
+                <span className="text-xs text-muted-foreground">{new Date().getHours()}h</span>
               </div>
               <div className="flex flex-col items-center gap-2 p-4 bg-card/50 rounded-lg">
                 <WeatherIcon className="h-8 w-8 text-blue-500" />

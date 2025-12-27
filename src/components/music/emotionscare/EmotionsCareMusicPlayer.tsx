@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState, useRef, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,9 +7,10 @@ import {
   Play, Pause, SkipBack, SkipForward, Volume2, VolumeX,
   Repeat, Shuffle, Heart, Download, Share2, Music
 } from 'lucide-react';
-import { useMusic } from '@/contexts/MusicContext';
+import { useMusic } from '@/hooks/useMusic';
 import { cn } from '@/lib/utils';
 import { logger } from '@/lib/logger';
+import { MusicTrack } from '@/types/music';
 
 interface EmotionsCareMusicPlayerProps {
   className?: string;
@@ -23,53 +23,46 @@ const EmotionsCareMusicPlayer: React.FC<EmotionsCareMusicPlayerProps> = ({
   compact = false,
   showPlaylist = true,
 }) => {
-  const {
-    state,
-    playTrack,
-    pause,
-    resume,
-    stop,
-    selectTrack,
-    setVolume,
-    toggleMute,
-    setRepeat,
-    toggleShuffle,
-    formatTime,
-    getProgressPercentage
-  } = useEmotionsCareMusicContext();
+  const { state, play, pause, next, previous, setVolume, setPlaylist } = useMusic();
+  const { currentTrack, isPlaying, volume, playlist } = state;
 
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isUserSeeking, setIsUserSeeking] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+  const [localCurrentTime, setLocalCurrentTime] = useState(0);
+  const [localDuration, setLocalDuration] = useState(0);
+  const [repeatMode, setRepeatMode] = useState<'none' | 'all' | 'one'>('none');
+  const [shuffleMode, setShuffleMode] = useState(false);
 
   // Audio control effects
   useEffect(() => {
-    if (audioRef.current && state.currentTrack) {
-      if (state.isPlaying) {
+    if (audioRef.current && currentTrack) {
+      if (isPlaying) {
         audioRef.current.play().catch(error => logger.error('Audio play error:', error));
       } else {
         audioRef.current.pause();
       }
     }
-  }, [state.isPlaying, state.currentTrack]);
+  }, [isPlaying, currentTrack]);
 
   useEffect(() => {
     if (audioRef.current) {
-      audioRef.current.volume = state.isMuted ? 0 : state.volume;
+      audioRef.current.volume = isMuted ? 0 : volume;
     }
-  }, [state.volume, state.isMuted]);
+  }, [volume, isMuted]);
 
   const handlePlayPause = () => {
-    if (state.isPlaying) {
+    if (isPlaying) {
       pause();
-    } else {
-      resume();
+    } else if (currentTrack) {
+      play(currentTrack);
     }
   };
 
   const handleProgressChange = (value: number[]) => {
-    if (audioRef.current && state.duration > 0) {
-      const newTime = (value[0] / 100) * state.duration;
+    if (audioRef.current && localDuration > 0) {
+      const newTime = (value[0] / 100) * localDuration;
       audioRef.current.currentTime = newTime;
     }
   };
@@ -78,7 +71,26 @@ const EmotionsCareMusicPlayer: React.FC<EmotionsCareMusicPlayerProps> = ({
     setVolume(value[0] / 100);
   };
 
-  if (!state.currentTrack && !state.currentPlaylist) {
+  const toggleMute = () => {
+    setIsMuted(!isMuted);
+  };
+
+  const toggleShuffle = () => {
+    setShuffleMode(!shuffleMode);
+  };
+
+  const formatTime = (seconds: number): string => {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const getProgressPercentage = (): number => {
+    if (localDuration === 0) return 0;
+    return (localCurrentTime / localDuration) * 100;
+  };
+
+  if (!currentTrack && playlist.length === 0) {
     return (
       <Card className={cn("border-2", className)}>
         <CardContent className="p-8 text-center">
@@ -94,23 +106,23 @@ const EmotionsCareMusicPlayer: React.FC<EmotionsCareMusicPlayerProps> = ({
 
   const CompactPlayer = () => (
     <div className={cn("flex items-center gap-4 p-4 bg-card rounded-lg border", className)}>
-      {state.currentTrack && (
+      {currentTrack && (
         <>
           <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
             <Music className="w-6 h-6 text-primary" />
           </div>
           <div className="flex-1 min-w-0">
-            <h4 className="font-medium truncate">{state.currentTrack.title}</h4>
-            <p className="text-sm text-muted-foreground truncate">{state.currentTrack.artist}</p>
+            <h4 className="font-medium truncate">{currentTrack.title}</h4>
+            <p className="text-sm text-muted-foreground truncate">{currentTrack.artist}</p>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" onClick={() => selectTrack('prev')}>
+            <Button variant="ghost" size="sm" onClick={previous}>
               <SkipBack className="w-4 h-4" />
             </Button>
             <Button variant="ghost" size="sm" onClick={handlePlayPause}>
-              {state.isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+              {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
             </Button>
-            <Button variant="ghost" size="sm" onClick={() => selectTrack('next')}>
+            <Button variant="ghost" size="sm" onClick={next}>
               <SkipForward className="w-4 h-4" />
             </Button>
           </div>
@@ -126,26 +138,25 @@ const EmotionsCareMusicPlayer: React.FC<EmotionsCareMusicPlayerProps> = ({
   return (
     <div className={cn("space-y-6", className)}>
       {/* Hidden Audio Element */}
-      {state.currentTrack && (
+      {currentTrack && (
         <audio
           ref={audioRef}
-          src={state.currentTrack.url}
+          src={currentTrack.audioUrl || currentTrack.url}
           onLoadedMetadata={() => {
             if (audioRef.current) {
-              // Update duration in state would go here
+              setLocalDuration(audioRef.current.duration);
             }
           }}
           onTimeUpdate={() => {
             if (audioRef.current && !isUserSeeking) {
-              // Update current time in state would go here
+              setLocalCurrentTime(audioRef.current.currentTime);
             }
           }}
           onEnded={() => {
-            // Handle track end based on repeat/shuffle settings
-            if (state.repeat === 'one') {
+            if (repeatMode === 'one') {
               audioRef.current?.play();
             } else {
-              selectTrack('next');
+              next();
             }
           }}
         />
@@ -161,16 +172,16 @@ const EmotionsCareMusicPlayer: React.FC<EmotionsCareMusicPlayerProps> = ({
               </div>
               <div>
                 <CardTitle className="text-xl">
-                  {state.currentTrack?.title || 'Aucun titre'}
+                  {currentTrack?.title || 'Aucun titre'}
                 </CardTitle>
                 <p className="text-muted-foreground">
-                  {state.currentTrack?.artist || 'Artiste inconnu'}
+                  {currentTrack?.artist || 'Artiste inconnu'}
                 </p>
                 <div className="flex items-center gap-2 mt-1">
                   <Badge variant="secondary" className="text-xs">
-                    {state.currentTrack?.emotion || 'Neutre'}
+                    {currentTrack?.emotion || 'Neutre'}
                   </Badge>
-                  {state.currentTrack?.isGenerated && (
+                  {currentTrack?.isGenerated && (
                     <Badge variant="outline" className="text-xs">
                       IA Générée
                     </Badge>
@@ -209,8 +220,8 @@ const EmotionsCareMusicPlayer: React.FC<EmotionsCareMusicPlayerProps> = ({
               onPointerDown={() => setIsUserSeeking(true)}
             />
             <div className="flex justify-between text-sm text-muted-foreground">
-              <span>{formatTime(state.currentTime)}</span>
-              <span>{formatTime(state.duration)}</span>
+              <span>{formatTime(localCurrentTime)}</span>
+              <span>{formatTime(localDuration)}</span>
             </div>
           </div>
 
@@ -220,36 +231,35 @@ const EmotionsCareMusicPlayer: React.FC<EmotionsCareMusicPlayerProps> = ({
               variant="ghost"
               size="sm"
               onClick={toggleShuffle}
-              className={cn(state.shuffle && "text-primary")}
-              aria-label={state.shuffle ? "Désactiver la lecture aléatoire" : "Activer la lecture aléatoire"}
+              className={cn(shuffleMode && "text-primary")}
+              aria-label={shuffleMode ? "Désactiver la lecture aléatoire" : "Activer la lecture aléatoire"}
             >
               <Shuffle className="w-4 h-4" />
             </Button>
             
-            <Button variant="ghost" size="sm" onClick={() => selectTrack('prev')} aria-label="Piste précédente">
+            <Button variant="ghost" size="sm" onClick={previous} aria-label="Piste précédente">
               <SkipBack className="w-5 h-5" />
             </Button>
             
             <Button
               size="lg"
               onClick={handlePlayPause}
-              disabled={state.isLoading}
               className="w-14 h-14 rounded-full"
-              aria-label={state.isPlaying ? "Pause" : "Lecture"}
+              aria-label={isPlaying ? "Pause" : "Lecture"}
             >
-              {state.isPlaying ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6" />}
+              {isPlaying ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6" />}
             </Button>
             
-            <Button variant="ghost" size="sm" onClick={() => selectTrack('next')} aria-label="Piste suivante">
+            <Button variant="ghost" size="sm" onClick={next} aria-label="Piste suivante">
               <SkipForward className="w-5 h-5" />
             </Button>
             
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => setRepeat(state.repeat === 'none' ? 'all' : state.repeat === 'all' ? 'one' : 'none')}
-              className={cn(state.repeat !== 'none' && "text-primary")}
-              aria-label={state.repeat === 'none' ? "Activer la répétition" : state.repeat === 'all' ? "Répéter une piste" : "Désactiver la répétition"}
+              onClick={() => setRepeatMode(repeatMode === 'none' ? 'all' : repeatMode === 'all' ? 'one' : 'none')}
+              className={cn(repeatMode !== 'none' && "text-primary")}
+              aria-label={repeatMode === 'none' ? "Activer la répétition" : repeatMode === 'all' ? "Répéter une piste" : "Désactiver la répétition"}
             >
               <Repeat className="w-4 h-4" />
             </Button>
@@ -257,11 +267,11 @@ const EmotionsCareMusicPlayer: React.FC<EmotionsCareMusicPlayerProps> = ({
 
           {/* Volume Control */}
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="sm" onClick={toggleMute} aria-label={state.isMuted ? "Réactiver le son" : "Couper le son"}>
-              {state.isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+            <Button variant="ghost" size="sm" onClick={toggleMute} aria-label={isMuted ? "Réactiver le son" : "Couper le son"}>
+              {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
             </Button>
             <Slider
-              value={[state.isMuted ? 0 : state.volume * 100]}
+              value={[isMuted ? 0 : volume * 100]}
               onValueChange={handleVolumeChange}
               max={100}
               step={1}
@@ -272,30 +282,30 @@ const EmotionsCareMusicPlayer: React.FC<EmotionsCareMusicPlayerProps> = ({
       </Card>
 
       {/* Playlist */}
-      {showPlaylist && state.currentPlaylist && (
+      {showPlaylist && playlist.length > 0 && (
         <Card className="border-2">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Music className="w-5 h-5" />
-              {state.currentPlaylist.name}
+              Playlist
               <Badge variant="outline" className="ml-auto">
-                {state.currentPlaylist.tracks.length} titres
+                {playlist.length} titres
               </Badge>
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-2 max-h-60 overflow-y-auto">
-              {state.currentPlaylist.tracks.map((track, index) => (
+              {playlist.map((track: MusicTrack, index: number) => (
                 <div
                   key={track.id}
-                  onClick={() => selectTrack(track.id)}
+                  onClick={() => play(track)}
                   className={cn(
                     "flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors hover:bg-muted/50",
-                    state.currentTrack?.id === track.id && "bg-primary/10 border border-primary/20"
+                    currentTrack?.id === track.id && "bg-primary/10 border border-primary/20"
                   )}
                 >
                   <div className="w-8 h-8 rounded bg-muted flex items-center justify-center text-sm font-medium">
-                    {state.currentTrack?.id === track.id && state.isPlaying ? (
+                    {currentTrack?.id === track.id && isPlaying ? (
                       <Pause className="w-3 h-3" />
                     ) : (
                       index + 1
