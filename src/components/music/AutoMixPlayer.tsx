@@ -59,12 +59,29 @@ export const AutoMixPlayer: React.FC = () => {
     submitFeedback
   } = useAutoMix();
 
+  // Connexion au contexte musique global
+  const musicContext = React.useMemo(() => {
+    try {
+      // eslint-disable-next-line react-hooks/rules-of-hooks
+      return require('@/hooks/useMusic').useMusic();
+    } catch {
+      return null;
+    }
+  }, []);
+
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [trackCount, setTrackCount] = useState(7);
   const [weatherSensitivity, setWeatherSensitivity] = useState(true);
   const [feedbackGiven, setFeedbackGiven] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
+
+  // Sync avec le player global
+  useEffect(() => {
+    if (musicContext?.state?.isPlaying !== undefined) {
+      setIsPlaying(musicContext.state.isPlaying);
+    }
+  }, [musicContext?.state?.isPlaying]);
 
   useEffect(() => {
     if (activePlaylist) {
@@ -186,13 +203,32 @@ export const AutoMixPlayer: React.FC = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center justify-center gap-4">
-              <Button size="icon" variant="outline" aria-label="Piste précédente">
+              <Button 
+                size="icon" 
+                variant="outline" 
+                aria-label="Piste précédente"
+                onClick={() => {
+                  if (currentIndex > 0) {
+                    setCurrentIndex(prev => prev - 1);
+                    musicContext?.previous?.();
+                  }
+                }}
+              >
                 <SkipBack className="h-5 w-5" />
               </Button>
               <Button
                 size="lg"
                 className="w-16 h-16 rounded-full"
-                onClick={() => setIsPlaying(!isPlaying)}
+                onClick={() => {
+                  setIsPlaying(!isPlaying);
+                  if (musicContext) {
+                    if (isPlaying) {
+                      musicContext.pause?.();
+                    } else {
+                      musicContext.play?.();
+                    }
+                  }
+                }}
                 aria-label={isPlaying ? 'Mettre en pause' : 'Lire'}
               >
                 {isPlaying ? (
@@ -201,7 +237,17 @@ export const AutoMixPlayer: React.FC = () => {
                   <Play className="h-6 w-6" />
                 )}
               </Button>
-              <Button size="icon" variant="outline" aria-label="Piste suivante">
+              <Button 
+                size="icon" 
+                variant="outline" 
+                aria-label="Piste suivante"
+                onClick={() => {
+                  if (activePlaylist?.generated_tracks && currentIndex < activePlaylist.generated_tracks.length - 1) {
+                    setCurrentIndex(prev => prev + 1);
+                    musicContext?.next?.();
+                  }
+                }}
+              >
                 <SkipForward className="h-5 w-5" />
               </Button>
               <Button 

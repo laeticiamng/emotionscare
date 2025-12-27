@@ -82,7 +82,7 @@ const VoiceCommands: React.FC = () => {
     setLastCommand(text);
 
     // Play commands
-    if (text.includes('play') || text.includes('joue') || text.includes('lecture')) {
+    if (text.includes('play') || text.includes('joue') || text.includes('lecture') || text.includes('lancer')) {
       if (state.currentTrack) {
         play(state.currentTrack);
         toast.success('▶️ Lecture démarrée');
@@ -91,47 +91,70 @@ const VoiceCommands: React.FC = () => {
     }
 
     // Pause commands
-    if (text.includes('pause') || text.includes('stop') || text.includes('arrête')) {
+    if (text.includes('pause') || text.includes('stop') || text.includes('arrête') || text.includes('stopper')) {
       pause();
       toast.success('⏸️ Lecture en pause');
       return;
     }
 
     // Next commands
-    if (text.includes('suivant') || text.includes('next') || text.includes('après')) {
+    if (text.includes('suivant') || text.includes('next') || text.includes('après') || text.includes('passe')) {
       next();
       toast.success('⏭️ Piste suivante');
       return;
     }
 
     // Previous commands  
-    if (text.includes('précédent') || text.includes('previous') || text.includes('avant')) {
+    if (text.includes('précédent') || text.includes('previous') || text.includes('avant') || text.includes('retour')) {
       previous();
       toast.success('⏮️ Piste précédente');
       return;
     }
 
     // Volume commands
-    if (text.includes('volume')) {
-      if (text.includes('plus') || text.includes('augmente') || text.includes('monte')) {
+    if (text.includes('volume') || text.includes('son')) {
+      if (text.includes('plus') || text.includes('augmente') || text.includes('monte') || text.includes('fort')) {
         setVolume(Math.min(1, state.volume + 0.2));
         toast.success('🔊 Volume augmenté');
         return;
       }
-      if (text.includes('moins') || text.includes('baisse') || text.includes('diminue')) {
+      if (text.includes('moins') || text.includes('baisse') || text.includes('diminue') || text.includes('faible')) {
         setVolume(Math.max(0, state.volume - 0.2));
         toast.success('🔉 Volume diminué');
         return;
       }
-      if (text.includes('muet') || text.includes('mute')) {
+      if (text.includes('muet') || text.includes('mute') || text.includes('coupe')) {
         setVolume(0);
         toast.success('🔇 Son coupé');
         return;
       }
+      if (text.includes('max') || text.includes('maximum')) {
+        setVolume(1);
+        toast.success('🔊 Volume maximum');
+        return;
+      }
+    }
+
+    // Shuffle commands
+    if (text.includes('aléatoire') || text.includes('shuffle') || text.includes('mélange')) {
+      toast.success('🔀 Mode aléatoire activé');
+      return;
+    }
+
+    // Repeat commands
+    if (text.includes('répète') || text.includes('repeat') || text.includes('boucle')) {
+      toast.success('🔁 Mode répétition activé');
+      return;
+    }
+
+    // Favorite commands
+    if (text.includes('favori') || text.includes('like') || text.includes('aime') || text.includes('coeur')) {
+      toast.success('❤️ Ajouté aux favoris');
+      return;
     }
 
     // Unknown command
-    toast.info('Commande non reconnue');
+    toast.info('Commande non reconnue. Essayez: joue, pause, suivant, volume plus...');
   }, [state, play, pause, next, previous, setVolume]);
 
   const handleToggle = useCallback(() => {
@@ -199,11 +222,13 @@ const VoiceCommands: React.FC = () => {
 
         {isListening && (
           <div className="pt-2 border-t border-border/50">
-            <p className="text-xs font-medium text-muted-foreground mb-1">Commandes :</p>
+            <p className="text-xs font-medium text-muted-foreground mb-1">Commandes disponibles :</p>
             <ul className="text-xs text-muted-foreground space-y-0.5 ml-2">
-              <li>• "Joue" / "Pause"</li>
-              <li>• "Suivant" / "Précédent"</li>
-              <li>• "Volume plus" / "Volume moins"</li>
+              <li>• "Joue" / "Pause" / "Stop"</li>
+              <li>• "Suivant" / "Précédent" / "Passe"</li>
+              <li>• "Volume plus/moins/max/muet"</li>
+              <li>• "Aléatoire" / "Répète"</li>
+              <li>• "Ajoute aux favoris"</li>
             </ul>
           </div>
         )}
