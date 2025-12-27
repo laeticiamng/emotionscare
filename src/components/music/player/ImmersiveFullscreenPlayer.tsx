@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -20,8 +18,10 @@ const ImmersiveFullscreenPlayer: React.FC<ImmersiveFullscreenPlayerProps> = ({ c
   const [visualMode, setVisualMode] = useState<'3d' | 'ambient' | 'particles' | 'wave'>('3d');
   const [showControls, setShowControls] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
-  const hideControlsTimeoutRef = useRef<NodeJS.Timeout>();
-  const { currentTrack, isPlaying } = useMusic();
+  const hideControlsTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>();
+  const { state } = useMusic();
+  const currentTrack = state.currentTrack;
+  const isPlaying = state.isPlaying;
 
   // Gestion du mode plein écran
   const enterFullscreen = async () => {
