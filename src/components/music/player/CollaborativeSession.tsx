@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -40,7 +38,8 @@ const CollaborativeSession: React.FC<CollaborativeSessionProps> = ({ className }
   const [newMessage, setNewMessage] = useState('');
   const [isConnected, setIsConnected] = useState(false);
   
-  const { currentTrack, isPlaying } = useMusic();
+  const { state } = useMusic();
+  const { currentTrack, isPlaying } = state;
 
   // Simulation d'une session collaborative
   useEffect(() => {

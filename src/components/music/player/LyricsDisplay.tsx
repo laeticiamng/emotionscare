@@ -1,6 +1,3 @@
-// @ts-nocheck
-
-// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -37,7 +34,8 @@ const mockLyrics: LyricLine[] = [
 ];
 
 const LyricsDisplay: React.FC<LyricsDisplayProps> = ({ className }) => {
-  const { currentTrack, isPlaying } = useMusic();
+  const { state } = useMusic();
+  const { currentTrack, isPlaying } = state;
   const [currentTime, setCurrentTime] = useState(0);
   const [showTranslation, setShowTranslation] = useState(false);
   const [fontSize, setFontSize] = useState('md');

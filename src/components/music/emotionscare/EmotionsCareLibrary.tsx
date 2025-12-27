@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -92,16 +90,26 @@ const EmotionsCareLibrary: React.FC = () => {
       const likedSongIds = new Set(likesData?.map(like => like.song_id) || []);
 
       // Formater les données
-      const formattedSongs: EmotionsCareSong[] = libraryData?.map(item => ({
-        id: item.emotionscare_songs.id,
-        title: item.emotionscare_songs.title,
-        suno_audio_id: item.emotionscare_songs.suno_audio_id,
-        meta: item.emotionscare_songs.meta,
-        lyrics: item.emotionscare_songs.lyrics,
-        created_at: item.emotionscare_songs.created_at,
-        isLiked: likedSongIds.has(item.emotionscare_songs.id),
-        inLibrary: true
-      })) || [];
+      const formattedSongs: EmotionsCareSong[] = libraryData?.map(item => {
+        const song = item.emotionscare_songs as unknown as {
+          id: string;
+          title: string;
+          suno_audio_id: string;
+          meta: unknown;
+          lyrics: unknown;
+          created_at: string;
+        };
+        return {
+          id: song.id,
+          title: song.title,
+          suno_audio_id: song.suno_audio_id,
+          meta: song.meta,
+          lyrics: song.lyrics,
+          created_at: song.created_at,
+          isLiked: likedSongIds.has(song.id),
+          inLibrary: true
+        };
+      }) || [];
 
       setSongs(formattedSongs);
     } catch (error) {

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * MusicVisualizer - Visualiseur audio temps réel
  * Affiche une représentation graphique de la musique en cours
@@ -22,13 +21,13 @@ export const MusicVisualizer: React.FC<MusicVisualizerProps> = ({
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number>();
-  const analyserRef = useRef<AnalyserNode>();
-  const dataArrayRef = useRef<Uint8Array>();
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const dataArrayRef = useRef<Uint8Array | null>(null);
 
   useEffect(() => {
     if (!audioElement || !enabled || !canvasRef.current) return;
 
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const audioContext = new AudioContext();
     const analyser = audioContext.createAnalyser();
     const source = audioContext.createMediaElementSource(audioElement);
     
@@ -55,12 +54,13 @@ export const MusicVisualizer: React.FC<MusicVisualizerProps> = ({
       ctx.fillStyle = 'hsl(var(--background))';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+      const currentData = dataArrayRef.current;
       if (type === 'bars') {
-        drawBars(ctx, canvas, dataArrayRef.current, bufferLength);
+        drawBars(ctx, canvas, currentData, bufferLength);
       } else if (type === 'wave') {
-        drawWave(ctx, canvas, dataArrayRef.current, bufferLength);
+        drawWave(ctx, canvas, currentData, bufferLength);
       } else if (type === 'circular') {
-        drawCircular(ctx, canvas, dataArrayRef.current, bufferLength);
+        drawCircular(ctx, canvas, currentData, bufferLength);
       }
     };
 
