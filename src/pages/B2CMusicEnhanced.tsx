@@ -36,15 +36,20 @@ import { useTasteChangeNotifications } from '@/hooks/useTasteChangeNotifications
 import { useMusicHistory, useLastPlayedTrack } from '@/hooks/music/useMusicSettings';
 
 // Lazy loading des sections lourdes pour optimiser le first paint
+// Priorité haute - chargé immédiatement après le first paint
 const VinylCollection = lazy(() => import('@/components/music/page/VinylCollection').then(m => ({ default: m.VinylCollection })));
+const MusicSearchAndFilter = lazy(() => import('@/components/music/MusicSearchAndFilter').then(m => ({ default: m.MusicSearchAndFilter })));
+
+// Priorité moyenne - chargé lors du scroll
 const MusicGeneratorSection = lazy(() => import('@/components/music/page/MusicGeneratorSection').then(m => ({ default: m.MusicGeneratorSection })));
 const MusicGamificationSection = lazy(() => import('@/components/music/page/MusicGamificationSection').then(m => ({ default: m.MusicGamificationSection })));
 const MusicJourneySection = lazy(() => import('@/components/music/page/MusicJourneySection').then(m => ({ default: m.MusicJourneySection })));
 const MusicFocusSection = lazy(() => import('@/components/music/page/MusicFocusSection').then(m => ({ default: m.MusicFocusSection })));
 const MusicStatsSection = lazy(() => import('@/components/music/page/MusicStatsSection').then(m => ({ default: m.MusicStatsSection })));
+
+// Priorité basse - chargé en arrière-plan
 const ImmersiveMode = lazy(() => import('@/components/music/ImmersiveMode').then(m => ({ default: m.ImmersiveMode })));
 const CollaborativePlaylistSection = lazy(() => import('@/components/music/page/CollaborativePlaylistSection').then(m => ({ default: m.CollaborativePlaylistSection })));
-const MusicSearchAndFilter = lazy(() => import('@/components/music/MusicSearchAndFilter').then(m => ({ default: m.MusicSearchAndFilter })));
 const ExternalIntegrationsPanel = lazy(() => import('@/components/music/ExternalIntegrationsPanel').then(m => ({ default: m.ExternalIntegrationsPanel })));
 
 // Composants statiques chargés immédiatement

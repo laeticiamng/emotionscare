@@ -132,11 +132,59 @@ export const CollaborativePlaylistSection: React.FC = () => {
     loadPlaylist();
   }, [user]);
 
-  // Sauvegarder les changements vers Supabase
+  // Supabase Realtime subscription for collaborative updates
+  useEffect(() => {
+    if (!user || !playlist) return;
+
+    const channel = supabase
+      .channel('collab-playlist-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'user_settings',
+          filter: `key=eq.collab_playlist`
+        },
+        (payload) => {
+          // Only process updates from other users (not our own)
+          if (payload.new && (payload.new as any).user_id !== user.id) {
+            const newValue = (payload.new as any).value;
+            if (newValue) {
+              const parsed = typeof newValue === 'string' ? JSON.parse(newValue) : newValue;
+              // Merge collaborative changes (tracks, chat) without overwriting local state
+              setPlaylist(prev => {
+                if (!prev) return parsed;
+                return {
+                  ...prev,
+                  tracks: [...new Map([...prev.tracks, ...parsed.tracks].map(t => [t.id, t])).values()],
+                  chat: [...new Map([...prev.chat, ...parsed.chat].map(m => [m.id, m])).values()].sort(
+                    (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+                  )
+                };
+              });
+            }
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user, playlist?.id]);
+
+  // Sauvegarder les changements vers Supabase (debounced)
+  const savePlaylistRef = React.useRef<NodeJS.Timeout>();
   useEffect(() => {
     if (!playlist || !user) return;
 
-    const saveToSupabase = async () => {
+    // Clear previous timeout
+    if (savePlaylistRef.current) {
+      clearTimeout(savePlaylistRef.current);
+    }
+
+    savePlaylistRef.current = setTimeout(async () => {
       try {
         const { error } = await supabase
           .from('user_settings')
@@ -151,10 +199,13 @@ export const CollaborativePlaylistSection: React.FC = () => {
       } catch (error) {
         console.error('Error saving playlist:', error);
       }
-    };
+    }, 500);
 
-    const debounce = setTimeout(saveToSupabase, 500);
-    return () => clearTimeout(debounce);
+    return () => {
+      if (savePlaylistRef.current) {
+        clearTimeout(savePlaylistRef.current);
+      }
+    };
   }, [playlist, user]);
 
   const handleVote = (trackId: string, vote: 'up' | 'down') => {
@@ -296,7 +347,35 @@ export const CollaborativePlaylistSection: React.FC = () => {
           <TabsContent value="tracks" className="space-y-3 mt-3">
             <div className="flex items-center justify-between">
               <p className="text-xs text-muted-foreground">Triés par votes</p>
-              <Button size="sm" variant="outline" className="h-7 gap-1 text-xs">
+              <Button 
+                size="sm" 
+                variant="outline" 
+                className="h-7 gap-1 text-xs"
+                onClick={() => {
+                  // Ajouter un track de démonstration
+                  const demoTrack: CollaborativeTrack = {
+                    id: crypto.randomUUID(),
+                    title: `Track ${(playlist?.tracks.length || 0) + 1}`,
+                    artist: 'Nouveau Titre',
+                    addedBy: user?.email?.split('@')[0] || 'Vous',
+                    votes: { up: 0, down: 0 },
+                    audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'
+                  };
+                  if (playlist) {
+                    setPlaylist({
+                      ...playlist,
+                      tracks: [...playlist.tracks, demoTrack],
+                      collaborators: playlist.collaborators.map(c => 
+                        c.id === user?.id ? { ...c, addedTracks: c.addedTracks + 1 } : c
+                      )
+                    });
+                    toast({
+                      title: '🎵 Track ajouté',
+                      description: 'Ajouté à la playlist collaborative'
+                    });
+                  }
+                }}
+              >
                 <Plus className="h-3 w-3" />
                 Ajouter
               </Button>

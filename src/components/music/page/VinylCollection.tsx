@@ -27,6 +27,8 @@ interface VinylCollectionProps {
   isLoadingFavorites: boolean;
   onStartTrack: (track: VinylTrack) => void;
   onToggleFavorite: (track: VinylTrack) => void;
+  filterCategory?: string;
+  sortBy?: 'title' | 'duration' | 'category';
 }
 
 export const VinylCollection: React.FC<VinylCollectionProps> = ({
@@ -37,11 +39,32 @@ export const VinylCollection: React.FC<VinylCollectionProps> = ({
   isFavorite,
   isLoadingFavorites,
   onStartTrack,
-  onToggleFavorite
+  onToggleFavorite,
+  filterCategory,
+  sortBy = 'title'
 }) => {
+  // Apply filtering and sorting
+  const displayTracks = React.useMemo(() => {
+    let result = [...tracks];
+    
+    // Filter by category
+    if (filterCategory && filterCategory !== 'all') {
+      result = result.filter(t => t.category === filterCategory);
+    }
+    
+    // Sort
+    result.sort((a, b) => {
+      if (sortBy === 'duration') return a.duration - b.duration;
+      if (sortBy === 'category') return a.category.localeCompare(b.category);
+      return a.title.localeCompare(b.title);
+    });
+    
+    return result;
+  }, [tracks, filterCategory, sortBy]);
+
   return (
     <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4 max-w-6xl mx-auto">
-      {tracks.map((track) => {
+      {displayTracks.map((track) => {
         const Icon = categoryIcons[track.category];
         const favorite = isFavorite(track.id);
         const isLoading = loadingTrackId === track.id;

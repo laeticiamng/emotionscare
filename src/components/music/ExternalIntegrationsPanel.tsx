@@ -328,11 +328,32 @@ export const ExternalIntegrationsPanel: React.FC = () => {
 
                   {/* Actions */}
                   <div className="flex gap-2">
-                    <Button size="sm" variant="outline" className="flex-1 gap-1 text-xs">
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      className="flex-1 gap-1 text-xs"
+                      onClick={() => {
+                        toast({
+                          title: '📥 Import en cours',
+                          description: `Import des playlists depuis ${integration.name}...`,
+                        });
+                        handleSync(integration.id);
+                      }}
+                    >
                       <Import className="h-3 w-3" />
                       Importer
                     </Button>
-                    <Button size="sm" variant="outline" className="flex-1 gap-1 text-xs">
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      className="flex-1 gap-1 text-xs"
+                      onClick={() => {
+                        toast({
+                          title: '📤 Export',
+                          description: `Export vers ${integration.name} disponible prochainement`,
+                        });
+                      }}
+                    >
                       <Download className="h-3 w-3" />
                       Exporter
                     </Button>

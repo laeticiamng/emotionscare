@@ -86,8 +86,14 @@ export const ImmersiveMode: React.FC<ImmersiveModeProps> = ({
   const [isLiked, setIsLiked] = useState(false);
   const [currentLyricIndex, setCurrentLyricIndex] = useState(0);
   const [visualizerBars, setVisualizerBars] = useState<number[]>(Array(32).fill(0));
+  const [localVolume, setLocalVolume] = useState(volume);
   const controlsTimeoutRef = useRef<NodeJS.Timeout>();
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Sync local volume with prop
+  useEffect(() => {
+    setLocalVolume(volume);
+  }, [volume]);
 
   // Auto-hide controls
   useEffect(() => {
@@ -304,9 +310,19 @@ export const ImmersiveMode: React.FC<ImmersiveModeProps> = ({
 
               {/* Bottom Controls */}
               <div className="absolute bottom-0 left-0 right-0 p-6 pointer-events-auto">
-                {/* Progress Bar */}
+                {/* Progress Bar - Seekable */}
                 <div className="mb-4 space-y-2">
-                  <Progress value={progress} className="h-1 bg-white/20" />
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value={progress}
+                    onChange={(e) => {
+                      const seekPos = Number(e.target.value);
+                      onSeek?.(seekPos);
+                    }}
+                    className="w-full h-1 bg-white/20 rounded-lg appearance-none cursor-pointer accent-white"
+                  />
                   <div className="flex justify-between text-xs text-white/60">
                     <span>{formatTime(currentTime)}</span>
                     <span>{formatTime(track.duration || 0)}</span>
@@ -315,14 +331,33 @@ export const ImmersiveMode: React.FC<ImmersiveModeProps> = ({
 
                 {/* Playback Controls */}
                 <div className="flex items-center justify-center gap-4">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setIsMuted(!isMuted)}
-                    className="text-white hover:bg-white/10"
-                  >
-                    {isMuted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => {
+                        const newMuted = !isMuted;
+                        setIsMuted(newMuted);
+                        onVolumeChange?.(newMuted ? 0 : localVolume);
+                      }}
+                      className="text-white hover:bg-white/10"
+                    >
+                      {isMuted || localVolume === 0 ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
+                    </Button>
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      value={isMuted ? 0 : localVolume}
+                      onChange={(e) => {
+                        const newVol = Number(e.target.value);
+                        setLocalVolume(newVol);
+                        setIsMuted(newVol === 0);
+                        onVolumeChange?.(newVol);
+                      }}
+                      className="w-20 h-1 bg-white/30 rounded-lg appearance-none cursor-pointer accent-white"
+                    />
+                  </div>
 
                   <Button
                     variant="ghost"
