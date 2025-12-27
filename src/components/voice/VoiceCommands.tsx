@@ -1,105 +1,181 @@
-// @ts-nocheck
-import React, { useState } from 'react';
+/**
+ * VoiceCommands - Commandes vocales pour le player musical
+ * Intégration complète avec MusicContext
+ */
+
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { Mic, MicOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { useVoiceCommands } from '@/hooks/useVoiceCommands';
 import { useMusic } from '@/hooks/useMusic';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { logger } from '@/lib/logger';
 
-const VoiceCommands = () => {
-  const { play, pause, next, previous, stop } = useMusic();
-  const [transcript, setTranscript] = useState<string>('');
-  const [assistantResponse, setAssistantResponse] = useState<string>('');
+// Type declarations for Web Speech API
+interface SpeechRecognitionEvent extends Event {
+  results: SpeechRecognitionResultList;
+}
 
-  const handleCommand = async (command: string, params?: any) => {
-    logger.debug('🎯 Executing command:', command, params, 'COMPONENT');
+interface SpeechRecognitionErrorEvent extends Event {
+  error: string;
+}
 
-    if (command === 'player') {
-      switch (params.action) {
-        case 'play':
-          play();
-          toast.success('Lecture démarrée');
-          break;
-        case 'pause':
-          pause();
-          toast.success('Lecture en pause');
-          break;
-        case 'next':
-          next();
-          toast.success('Piste suivante');
-          break;
-        case 'previous':
-          previous();
-          toast.success('Piste précédente');
-          break;
-        case 'stop':
-          stop();
-          toast.success('Lecture arrêtée');
-          break;
+// Simplified voice recognition hook
+const useSimpleVoiceRecognition = () => {
+  const [isListening, setIsListening] = useState(false);
+  const [isSupported, setIsSupported] = useState(false);
+  const [transcript, setTranscript] = useState('');
+  const recognitionRef = useRef<any>(null);
+
+  useEffect(() => {
+    const SpeechRecognitionAPI = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    setIsSupported(!!SpeechRecognitionAPI);
+    
+    if (SpeechRecognitionAPI) {
+      recognitionRef.current = new SpeechRecognitionAPI();
+      recognitionRef.current.continuous = false;
+      recognitionRef.current.interimResults = true;
+      recognitionRef.current.lang = 'fr-FR';
+    }
+
+    return () => {
+      recognitionRef.current?.stop();
+    };
+  }, []);
+
+  const start = useCallback((onResult: (text: string) => void) => {
+    if (!recognitionRef.current) return;
+
+    recognitionRef.current.onresult = (event: SpeechRecognitionEvent) => {
+      const result = event.results[event.results.length - 1];
+      if (result.isFinal) {
+        setTranscript(result[0].transcript);
+        onResult(result[0].transcript.toLowerCase());
       }
-    } else if (command === 'generate') {
-      logger.debug('🎵 Generating music for:', params.emotion, 'intensity:', params.intensity, 'COMPONENT');
-      toast.success(`Génération de musique ${params.emotion}...`);
-    }
-  };
+    };
 
-  const handleTranscript = (text: string, isFinal: boolean) => {
-    if (isFinal) {
-      setTranscript(text);
-      setAssistantResponse('');
+    recognitionRef.current.onend = () => setIsListening(false);
+    recognitionRef.current.onerror = () => setIsListening(false);
+
+    recognitionRef.current.start();
+    setIsListening(true);
+  }, []);
+
+  const stop = useCallback(() => {
+    recognitionRef.current?.stop();
+    setIsListening(false);
+  }, []);
+
+  return { isListening, isSupported, transcript, start, stop };
+};
+
+const VoiceCommands: React.FC = () => {
+  const musicContext = useMusic();
+  const { state, play, pause, next, previous, stop: stopPlayback, setVolume } = musicContext;
+  const [lastCommand, setLastCommand] = useState<string>('');
+  
+  const { isListening, isSupported, transcript, start, stop } = useSimpleVoiceRecognition();
+
+  const processCommand = useCallback((text: string) => {
+    logger.debug('Voice command received:', text, 'VOICE');
+    setLastCommand(text);
+
+    // Play commands
+    if (text.includes('play') || text.includes('joue') || text.includes('lecture')) {
+      if (state.currentTrack) {
+        play(state.currentTrack);
+        toast.success('▶️ Lecture démarrée');
+      }
+      return;
+    }
+
+    // Pause commands
+    if (text.includes('pause') || text.includes('stop') || text.includes('arrête')) {
+      pause();
+      toast.success('⏸️ Lecture en pause');
+      return;
+    }
+
+    // Next commands
+    if (text.includes('suivant') || text.includes('next') || text.includes('après')) {
+      next();
+      toast.success('⏭️ Piste suivante');
+      return;
+    }
+
+    // Previous commands  
+    if (text.includes('précédent') || text.includes('previous') || text.includes('avant')) {
+      previous();
+      toast.success('⏮️ Piste précédente');
+      return;
+    }
+
+    // Volume commands
+    if (text.includes('volume')) {
+      if (text.includes('plus') || text.includes('augmente') || text.includes('monte')) {
+        setVolume(Math.min(1, state.volume + 0.2));
+        toast.success('🔊 Volume augmenté');
+        return;
+      }
+      if (text.includes('moins') || text.includes('baisse') || text.includes('diminue')) {
+        setVolume(Math.max(0, state.volume - 0.2));
+        toast.success('🔉 Volume diminué');
+        return;
+      }
+      if (text.includes('muet') || text.includes('mute')) {
+        setVolume(0);
+        toast.success('🔇 Son coupé');
+        return;
+      }
+    }
+
+    // Unknown command
+    toast.info('Commande non reconnue');
+  }, [state, play, pause, next, previous, setVolume]);
+
+  const handleToggle = useCallback(() => {
+    if (isListening) {
+      stop();
     } else {
-      setAssistantResponse(prev => prev + text);
+      start(processCommand);
     }
-  };
+  }, [isListening, start, stop, processCommand]);
 
-  const {
-    isListening,
-    isConnected,
-    isSpeaking,
-    startListening,
-    stopListening
-  } = useVoiceCommands({
-    onCommand: handleCommand,
-    onTranscript: handleTranscript
-  });
+  if (!isSupported) {
+    return null;
+  }
 
   return (
     <Card className={cn(
-      "fixed bottom-24 left-8 p-4 shadow-lg border-border/50 backdrop-blur-sm z-50",
-      "bg-background/80 transition-all duration-300 min-w-[320px]",
-      (isListening || isSpeaking) && "ring-2 ring-primary"
+      "fixed bottom-24 left-4 p-4 shadow-lg border-border/50 backdrop-blur-sm z-50",
+      "bg-background/90 transition-all duration-300 min-w-[280px]",
+      isListening && "ring-2 ring-primary"
     )}>
-      <div className="space-y-4">
+      <div className="space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className={cn(
-              "relative w-12 h-12 rounded-full flex items-center justify-center",
+              "relative w-10 h-10 rounded-full flex items-center justify-center",
               "bg-gradient-to-br from-primary/20 to-primary/5",
               isListening && "animate-pulse"
             )}>
               {isListening ? (
-                <Mic className="w-6 h-6 text-primary" />
+                <Mic className="w-5 h-5 text-primary" />
               ) : (
-                <MicOff className="w-6 h-6 text-muted-foreground" />
+                <MicOff className="w-5 h-5 text-muted-foreground" />
               )}
-              
               {isListening && (
                 <span className="absolute inset-0 rounded-full bg-primary/20 animate-ping" />
               )}
             </div>
 
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col">
               <span className="text-sm font-medium text-foreground">
                 Commandes Vocales
               </span>
               <span className="text-xs text-muted-foreground">
-                {!isConnected && !isListening && 'Inactif'}
-                {isConnected && !isListening && 'Connexion...'}
-                {isListening && !isSpeaking && 'En écoute 🎤'}
-                {isSpeaking && 'Assistant parle 🔊'}
+                {isListening ? '🎤 En écoute...' : 'Inactif'}
               </span>
             </div>
           </div>
@@ -107,46 +183,27 @@ const VoiceCommands = () => {
           <Button
             size="sm"
             variant={isListening ? "destructive" : "default"}
-            onClick={isListening ? stopListening : startListening}
-            className="ml-2"
+            onClick={handleToggle}
           >
             {isListening ? 'Stop' : 'Start'}
           </Button>
         </div>
 
-        {transcript && (
-          <div className="pt-3 border-t border-border/50">
-            <div className="text-xs font-semibold text-muted-foreground mb-1">
-              Vous :
-            </div>
-            <div className="text-sm text-foreground bg-muted/50 p-2 rounded">
-              {transcript}
-            </div>
+        {lastCommand && (
+          <div className="pt-2 border-t border-border/50">
+            <p className="text-xs text-muted-foreground mb-1">Dernière commande :</p>
+            <p className="text-sm bg-muted/50 p-2 rounded">{lastCommand}</p>
           </div>
         )}
 
-        {assistantResponse && (
-          <div className="pt-3 border-t border-border/50">
-            <div className="text-xs font-semibold text-muted-foreground mb-1">
-              Assistant :
-            </div>
-            <div className="text-sm text-foreground bg-primary/10 p-2 rounded">
-              {assistantResponse}
-            </div>
-          </div>
-        )}
-
-        {isListening && !transcript && (
-          <div className="pt-3 border-t border-border/50">
-            <div className="text-xs text-muted-foreground space-y-1">
-              <p className="font-semibold">Essayez :</p>
-              <ul className="list-disc list-inside space-y-0.5 ml-2">
-                <li>"Joue la musique"</li>
-                <li>"Pause"</li>
-                <li>"Suivant"</li>
-                <li>"Génère musique calme"</li>
-              </ul>
-            </div>
+        {isListening && (
+          <div className="pt-2 border-t border-border/50">
+            <p className="text-xs font-medium text-muted-foreground mb-1">Commandes :</p>
+            <ul className="text-xs text-muted-foreground space-y-0.5 ml-2">
+              <li>• "Joue" / "Pause"</li>
+              <li>• "Suivant" / "Précédent"</li>
+              <li>• "Volume plus" / "Volume moins"</li>
+            </ul>
           </div>
         )}
       </div>

@@ -19073,6 +19073,42 @@ export type Database = {
         }
         Relationships: []
       }
+      user_competence_progress: {
+        Row: {
+          competence_id: string
+          created_at: string
+          id: string
+          item_code: string
+          mastered: boolean | null
+          mastered_at: string | null
+          rang: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          competence_id: string
+          created_at?: string
+          id?: string
+          item_code: string
+          mastered?: boolean | null
+          mastered_at?: string | null
+          rang: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          competence_id?: string
+          created_at?: string
+          id?: string
+          item_code?: string
+          mastered?: boolean | null
+          mastered_at?: string | null
+          rang?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_consent_preferences: {
         Row: {
           channel_id: string
