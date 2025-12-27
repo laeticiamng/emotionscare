@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -12,7 +10,7 @@ import TrackInfo from './TrackInfo';
 import ProgressBar from './ProgressBar';
 import VolumeControl from './VolumeControl';
 import { useMusicControls } from '@/hooks/useMusicControls';
-import { MusicTrack } from '@/types/music';
+import type { MusicTrack } from '@/types/music';
 import { 
   Loader2, 
   ListMusic, 
@@ -127,7 +125,7 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ track, className }) => {
   useEffect(() => {
     if (track && isPlaying) {
       const interval = setInterval(() => {
-        setStats(prev => ({
+        setStats((prev: typeof stats) => ({
           ...prev,
           totalPlayTime: prev.totalPlayTime + 1,
           lastSession: new Date().toISOString()
@@ -150,14 +148,14 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ track, className }) => {
   const handleNext = () => {
     if (queue.length > 0) {
       const nextItem = queue[0];
-      setQueue(prev => prev.slice(1));
-      setHistory(prev => [...prev, {
+      setQueue((prev: QueueItem[]) => prev.slice(1));
+      setHistory((prev: PlayHistory[]) => [...prev, {
         id: Date.now().toString(),
         track: track as MusicTrack,
         playedAt: new Date().toISOString(),
         duration: currentTime
       }]);
-      setStats(prev => ({ ...prev, tracksPlayed: prev.tracksPlayed + 1 }));
+      setStats((prev: typeof stats) => ({ ...prev, tracksPlayed: prev.tracksPlayed + 1 }));
       logger.info('Next track:', nextItem.track.title);
     } else {
       logger.info('Queue is empty');

@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React from 'react';
 import { useMusic } from '@/hooks/useMusic';
 import { Button } from '@/components/ui/button';
@@ -12,15 +10,15 @@ interface MusicMiniPlayerProps {
 
 const MusicMiniPlayer: React.FC<MusicMiniPlayerProps> = ({ className }) => {
   const { 
-    currentTrack, 
-    isPlaying, 
+    state, 
     pause, 
     play,
     next,
     previous,
-    volume,
     setVolume 
   } = useMusic();
+
+  const { currentTrack, isPlaying, volume } = state;
 
   const handlePlayPause = () => {
     if (isPlaying) {
