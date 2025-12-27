@@ -17,16 +17,7 @@ import {
   Maximize2,
   Volume2,
 } from 'lucide-react';
-
-interface MusicTrack {
-  id: string;
-  title: string;
-  artist: string;
-  duration: number;
-  mood: string;
-  color: string;
-  vinylColor: string;
-}
+import type { MusicTrack } from '@/types/music';
 
 interface FloatingMiniPlayerProps {
   currentTrack?: MusicTrack | null;
@@ -57,13 +48,17 @@ export const FloatingMiniPlayer: React.FC<FloatingMiniPlayerProps> = ({
     return null;
   }
 
+  // Fallback values for optional properties
+  const vinylColor = currentTrack.vinylColor || 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-foreground)))';
+  const trackColor = currentTrack.color || 'hsl(var(--primary)), hsl(var(--accent))';
+
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const currentTime = (progress / 100) * currentTrack.duration;
+  const currentTime = (progress / 100) * (currentTrack.duration || 180);
 
   return (
     <AnimatePresence>
@@ -88,7 +83,7 @@ export const FloatingMiniPlayer: React.FC<FloatingMiniPlayerProps> = ({
                 animate={{ rotate: isPlaying ? 360 : 0 }}
                 transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
                 className="w-10 h-10 rounded-full flex-shrink-0 relative"
-                style={{ background: currentTrack.vinylColor }}
+                style={{ background: vinylColor }}
               >
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="w-4 h-4 rounded-full bg-card" />
@@ -123,7 +118,7 @@ export const FloatingMiniPlayer: React.FC<FloatingMiniPlayerProps> = ({
               <div
                 className="h-24 relative overflow-hidden"
                 style={{
-                  background: `linear-gradient(135deg, ${currentTrack.color})`,
+                  background: `linear-gradient(135deg, ${trackColor})`,
                 }}
               >
                 {/* Vinyl Disc - Large */}
@@ -131,7 +126,7 @@ export const FloatingMiniPlayer: React.FC<FloatingMiniPlayerProps> = ({
                   animate={{ rotate: isPlaying ? 360 : 0 }}
                   transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
                   className="absolute -right-8 -top-8 w-32 h-32 rounded-full opacity-20 border-4 border-white"
-                  style={{ background: currentTrack.vinylColor }}
+                  style={{ background: vinylColor }}
                 />
               </div>
 

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * B2C MUSIC ENHANCED - EmotionsCare
  * Interface vinyles thérapeutiques avec player audio unifié
@@ -6,8 +5,10 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { usePageSEO } from '@/hooks/usePageSEO';
 import { useOptimizedPage } from '@/hooks/useOptimizedPage';
+import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -24,7 +25,8 @@ import {
   Loader2,
   Clock,
   Star,
-  TrendingUp
+  TrendingUp,
+  User
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useMusic } from '@/hooks/useMusic';
@@ -64,7 +66,6 @@ import { WeeklyInsightsDashboard } from '@/components/music/WeeklyInsightsDashbo
 import { MusicBadgesDisplay } from '@/components/music/MusicBadgesDisplay';
 import { getUserListeningHistory } from '@/services/music/user-service';
 import { Link } from 'react-router-dom';
-import { User } from 'lucide-react';
 import { FloatingMiniPlayer } from '@/components/music/FloatingMiniPlayer';
 
 interface VinylTrack extends MusicTrack {
@@ -163,6 +164,8 @@ const B2CMusicEnhanced: React.FC = () => {
   });
 
   const { toast } = useToast();
+  const navigate = useNavigate();
+  const { user } = useAuth();
   const musicFavorites = useMusicFavorites();
   
   // Charger les URLs audio de manière asynchrone avec fallback
@@ -413,7 +416,7 @@ const B2CMusicEnhanced: React.FC = () => {
           confidence={notification.confidence}
           onDismiss={() => dismissNotification(notification.id)}
           onViewAnalytics={() => {
-            window.location.href = '/app/music/analytics';
+            navigate('/app/music/analytics');
           }}
         />
       ))}
@@ -457,7 +460,7 @@ const B2CMusicEnhanced: React.FC = () => {
             <div className="max-w-4xl mx-auto mt-8">
               <MLRecommendationsPanel 
                 currentEmotion={state.currentTrack?.emotion || 'calm'}
-                userId="demo-user"
+                userId={user?.id || 'anonymous'}
                 onApplySunoParams={(params) => {
                   toast({
                     title: 'Paramètres Suno appliqués',
