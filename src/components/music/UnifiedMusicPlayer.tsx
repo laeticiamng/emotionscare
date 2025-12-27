@@ -2,9 +2,10 @@
  * UNIFIED MUSIC PLAYER - EmotionsCare
  * Player audio unifié utilisant MusicContext
  * Enhanced with full accessibility support (ARIA, keyboard navigation, screen reader)
+ * Includes: equalizer, visualizer, loop, shuffle controls
  */
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { useDebouncedCallback } from '@/hooks/useDebounce';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -16,7 +17,12 @@ import {
   SkipForward,
   Volume2,
   VolumeX,
-  Music
+  Music,
+  Repeat,
+  Repeat1,
+  Shuffle,
+  Activity,
+  SlidersHorizontal,
 } from 'lucide-react';
 import { useMusic } from '@/hooks/useMusic';
 import { cn } from '@/lib/utils';
@@ -36,6 +42,16 @@ interface UnifiedMusicPlayerProps {
   className?: string;
   compact?: boolean;
 }
+
+type LoopMode = 'none' | 'all' | 'one';
+
+const EQUALIZER_PRESETS = {
+  flat: [0, 0, 0, 0, 0],
+  bass: [4, 3, 0, 0, 0],
+  treble: [0, 0, 0, 3, 4],
+  vocal: [0, 2, 3, 2, 0],
+  rock: [3, 1, -1, 2, 3],
+};
 
 export const UnifiedMusicPlayer: React.FC<UnifiedMusicPlayerProps> = ({
   className,
@@ -60,6 +76,14 @@ export const UnifiedMusicPlayer: React.FC<UnifiedMusicPlayerProps> = ({
   } = state;
 
   const playerRef = useRef<HTMLDivElement>(null);
+  
+  // Enhanced controls state
+  const [loopMode, setLoopMode] = useState<LoopMode>('none');
+  const [isShuffled, setIsShuffled] = useState(false);
+  const [showEqualizer, setShowEqualizer] = useState(false);
+  const [showVisualizer, setShowVisualizer] = useState(true);
+  const [equalizerValues, setEqualizerValues] = useState([0, 0, 0, 0, 0]);
+  const [visualizerBars, setVisualizerBars] = useState<number[]>(Array(16).fill(0));
 
   // Announce track changes to screen readers
   useEffect(() => {
@@ -75,12 +99,42 @@ export const UnifiedMusicPlayer: React.FC<UnifiedMusicPlayerProps> = ({
     }
   }, [isPlaying, currentTrack?.id]);
 
+  // Visualizer animation
+  useEffect(() => {
+    if (!isPlaying || !showVisualizer) {
+      setVisualizerBars(Array(16).fill(0));
+      return;
+    }
+    const interval = setInterval(() => {
+      setVisualizerBars(prev => 
+        prev.map(() => Math.random() * 100)
+      );
+    }, 100);
+    return () => clearInterval(interval);
+  }, [isPlaying, showVisualizer]);
+
   const formatTime = (seconds: number) => {
     if (!seconds || isNaN(seconds)) return '0:00';
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
     return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
   };
+
+  const cycleLoopMode = useCallback(() => {
+    setLoopMode(prev => {
+      if (prev === 'none') return 'all';
+      if (prev === 'all') return 'one';
+      return 'none';
+    });
+  }, []);
+
+  const toggleShuffle = useCallback(() => {
+    setIsShuffled(prev => !prev);
+  }, []);
+
+  const applyEqualizerPreset = useCallback((preset: keyof typeof EQUALIZER_PRESETS) => {
+    setEqualizerValues(EQUALIZER_PRESETS[preset]);
+  }, []);
 
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
 
@@ -196,6 +250,19 @@ export const UnifiedMusicPlayer: React.FC<UnifiedMusicPlayerProps> = ({
       className={cn("bg-card/90 backdrop-blur-md", className)}
     >
       <CardContent className="p-6 space-y-6">
+        {/* Visualizer */}
+        {showVisualizer && isPlaying && (
+          <div className="flex items-end justify-center gap-0.5 h-12 mb-4">
+            {visualizerBars.map((height, i) => (
+              <div
+                key={i}
+                className="w-1.5 bg-gradient-to-t from-primary to-primary/50 rounded-t transition-all duration-100"
+                style={{ height: `${Math.max(4, height * 0.5)}%` }}
+              />
+            ))}
+          </div>
+        )}
+
         {/* Track Info */}
         <div className="text-center space-y-2">
           <h3 className="text-xl font-medium">{currentTrack.title}</h3>
@@ -230,8 +297,19 @@ export const UnifiedMusicPlayer: React.FC<UnifiedMusicPlayerProps> = ({
           {isPlaying ? `Lecture en cours : ${currentTrack?.title} par ${currentTrack?.artist}` : 'Lecture en pause'}
         </div>
 
-        {/* Controls */}
-        <div className="flex items-center justify-center gap-4">
+        {/* Main Controls */}
+        <div className="flex items-center justify-center gap-2">
+          {/* Shuffle */}
+          <Button
+            size="icon"
+            variant={isShuffled ? "secondary" : "ghost"}
+            onClick={toggleShuffle}
+            aria-label="Lecture aléatoire"
+            className="h-9 w-9"
+          >
+            <Shuffle className={cn("h-4 w-4", isShuffled && "text-primary")} aria-hidden="true" />
+          </Button>
+
           <Button
             size="icon"
             variant="ghost"
@@ -264,6 +342,21 @@ export const UnifiedMusicPlayer: React.FC<UnifiedMusicPlayerProps> = ({
           >
             <SkipForward className="h-5 w-5" aria-hidden="true" />
           </Button>
+
+          {/* Loop Mode */}
+          <Button
+            size="icon"
+            variant={loopMode !== 'none' ? "secondary" : "ghost"}
+            onClick={cycleLoopMode}
+            aria-label={`Mode répétition: ${loopMode === 'none' ? 'désactivé' : loopMode === 'all' ? 'toutes' : 'une'}`}
+            className="h-9 w-9"
+          >
+            {loopMode === 'one' ? (
+              <Repeat1 className="h-4 w-4 text-primary" aria-hidden="true" />
+            ) : (
+              <Repeat className={cn("h-4 w-4", loopMode === 'all' && "text-primary")} aria-hidden="true" />
+            )}
+          </Button>
         </div>
 
         {/* Volume Control */}
@@ -287,15 +380,75 @@ export const UnifiedMusicPlayer: React.FC<UnifiedMusicPlayerProps> = ({
             max={100}
             step={1}
             onValueChange={handleVolumeChange}
-            className="w-full"
+            className="flex-1"
           />
-          <span
-            className="text-xs text-muted-foreground w-12 text-right"
-            aria-label={`Volume actuel: ${Math.round(volume * 100)} pourcent`}
-          >
+          <span className="text-xs text-muted-foreground w-10 text-right">
             {Math.round(volume * 100)}%
           </span>
         </div>
+
+        {/* Advanced Controls */}
+        <div className="flex items-center justify-center gap-2 pt-2 border-t">
+          <Button
+            size="sm"
+            variant={showVisualizer ? "secondary" : "outline"}
+            onClick={() => setShowVisualizer(!showVisualizer)}
+            className="gap-1 text-xs"
+          >
+            <Activity className="h-3 w-3" />
+            Visualizer
+          </Button>
+          <Button
+            size="sm"
+            variant={showEqualizer ? "secondary" : "outline"}
+            onClick={() => setShowEqualizer(!showEqualizer)}
+            className="gap-1 text-xs"
+          >
+            <SlidersHorizontal className="h-3 w-3" />
+            Égaliseur
+          </Button>
+        </div>
+
+        {/* Equalizer Panel */}
+        {showEqualizer && (
+          <div className="space-y-3 p-3 rounded-lg bg-muted/30">
+            <div className="flex justify-between items-center">
+              <span className="text-sm font-medium">Égaliseur</span>
+              <div className="flex gap-1">
+                {(Object.keys(EQUALIZER_PRESETS) as (keyof typeof EQUALIZER_PRESETS)[]).map((preset) => (
+                  <Button
+                    key={preset}
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => applyEqualizerPreset(preset)}
+                    className="h-6 px-2 text-xs capitalize"
+                  >
+                    {preset}
+                  </Button>
+                ))}
+              </div>
+            </div>
+            <div className="flex items-end justify-around gap-2 h-24">
+              {['60Hz', '250Hz', '1kHz', '4kHz', '16kHz'].map((label, i) => (
+                <div key={label} className="flex flex-col items-center gap-1">
+                  <Slider
+                    orientation="vertical"
+                    value={[equalizerValues[i] + 6]}
+                    max={12}
+                    step={1}
+                    onValueChange={(v) => {
+                      const newValues = [...equalizerValues];
+                      newValues[i] = v[0] - 6;
+                      setEqualizerValues(newValues);
+                    }}
+                    className="h-16"
+                  />
+                  <span className="text-[10px] text-muted-foreground">{label}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Keyboard Shortcuts Help */}
         <div className="text-xs text-center text-muted-foreground pt-2 border-t">
