@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React from 'react';
 import { TabsContent } from '@/components/ui/tabs';
 import { MusicPlaylist, MusicCategory } from '@/types/music';

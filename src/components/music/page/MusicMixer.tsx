@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React, { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
@@ -17,6 +15,7 @@ import AudioEqualizer from '@/components/music/AudioEqualizer';
 import MusicMoodVisualization from './MusicMoodVisualization';
 import { useToast } from '@/hooks/use-toast';
 import { useMusic } from '@/hooks/useMusic';
+import type { MusicTrack } from '@/types/music';
 
 interface MixPreset {
   id: string;
@@ -33,7 +32,8 @@ interface MixPreset {
 
 const MusicMixer: React.FC = () => {
   const { toast } = useToast();
-  const { currentTrack, playTrack } = useMusic();
+  const { state, play } = useMusic();
+  const currentTrack = state.currentTrack;
   const [selectedMood, setSelectedMood] = useState<string>('calm');
   const [mixSettings, setMixSettings] = useState({
     bass: 50,
@@ -122,9 +122,9 @@ const MusicMixer: React.FC = () => {
   };
 
   // Apply the mix and start playing
-  const applyMix = () => {
+  const applyMix = async () => {
     if (currentTrack) {
-      playTrack(currentTrack);
+      await play(currentTrack);
     }
     
     toast({

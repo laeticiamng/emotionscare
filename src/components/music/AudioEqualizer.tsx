@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
@@ -15,7 +14,8 @@ interface AudioEqualizerProps {
  * Compatible avec l'API Web Audio
  */
 const AudioEqualizer: React.FC<AudioEqualizerProps> = ({ className }) => {
-  const { currentTrack } = useMusic();
+  const { state } = useMusic();
+  const currentTrack = state.currentTrack;
   const [equalizerEnabled, setEqualizerEnabled] = useState(false);
   const [bands, setBands] = useState([
     { name: 'Bass', freq: 60, gain: 0 },

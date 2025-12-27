@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -16,7 +14,7 @@ const RecommendedPresets: React.FC<RecommendedPresetsProps> = ({
   className = '',
   currentMood = 'calm'
 }) => {
-  const { loadPlaylistForEmotion } = useMusic();
+  const { getRecommendationsForEmotion, setPlaylist } = useMusic();
   const [loading, setLoading] = useState(false);
   
   // Presets based on different moods/activities
@@ -30,11 +28,12 @@ const RecommendedPresets: React.FC<RecommendedPresetsProps> = ({
   const handlePlayPreset = async (presetId: string) => {
     setLoading(true);
     try {
-      if (loadPlaylistForEmotion) {
-        await loadPlaylistForEmotion(presetId);
+      const tracks = await getRecommendationsForEmotion(presetId);
+      if (tracks && tracks.length > 0) {
+        setPlaylist(tracks);
       }
     } catch (error) {
-      logger.error('Error loading preset:', error);
+      logger.error('Error loading preset:', error instanceof Error ? error : new Error(String(error)), 'MUSIC');
     } finally {
       setLoading(false);
     }
