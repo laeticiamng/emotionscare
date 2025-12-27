@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * PlaylistShareModal - Modal de partage de playlist avec QR code et réseaux sociaux
  */

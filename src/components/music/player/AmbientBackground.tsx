@@ -1,7 +1,5 @@
-// @ts-nocheck
-
 import React, { useEffect, useState } from 'react';
-import { MusicTrack } from '@/types/music';
+import type { MusicTrack } from '@/types/music';
 import { cn } from '@/lib/utils';
 
 interface AmbientBackgroundProps {
@@ -158,34 +156,7 @@ const AmbientBackground: React.FC<AmbientBackgroundProps> = ({
         )}
       </div>
 
-      {/* CSS intégré pour les animations */}
-      <style jsx>{`
-        @keyframes ripple {
-          0% {
-            transform: scale(0.8);
-            opacity: 1;
-          }
-          100% {
-            transform: scale(2);
-            opacity: 0;
-          }
-        }
-        
-        @keyframes float-gentle {
-          0%, 100% {
-            transform: translateY(0px) translateX(0px);
-          }
-          25% {
-            transform: translateY(-10px) translateX(5px);
-          }
-          50% {
-            transform: translateY(-5px) translateX(-5px);
-          }
-          75% {
-            transform: translateY(-15px) translateX(3px);
-          }
-        }
-      `}</style>
+      {/* CSS animations are handled by Tailwind animate-float-gentle class in index.css */}
     </div>
   );
 };

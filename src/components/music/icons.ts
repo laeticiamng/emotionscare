@@ -51,8 +51,8 @@ export {
   Save,
   Search,
   Copy,
-
-  // Social media icons
+  ListMusic,
+  SlidersHorizontal as Sliders,
   Twitter,
   Facebook,
   Instagram,
