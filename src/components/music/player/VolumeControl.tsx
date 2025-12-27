@@ -16,6 +16,7 @@ import { Badge } from '@/components/ui/badge';
 import { Volume2, VolumeX, Volume1, Settings2, Save, RotateCcw, Keyboard } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
+import { useVolumeSettings, useVolumePresets } from '@/hooks/music/useMusicSettings';
 
 interface VolumePreset {
   name: string;
@@ -42,9 +43,6 @@ const DEFAULT_PRESETS: VolumePreset[] = [
   { name: 'Maximum', value: 1, icon: '🔥' },
 ];
 
-const STORAGE_KEY = 'volume-settings';
-const PRESETS_KEY = 'volume-presets';
-
 const VolumeControl: React.FC<VolumeControlProps> = ({
   volume,
   isMuted,
@@ -55,28 +53,22 @@ const VolumeControl: React.FC<VolumeControlProps> = ({
   orientation = 'horizontal',
 }) => {
   const { toast } = useToast();
+  const { value: volumeSettings, setValue: setVolumeSettings } = useVolumeSettings();
+  const { value: savedPresets, setValue: setSavedPresets } = useVolumePresets();
+  
   const [showSettings, setShowSettings] = useState(false);
-  const [presets, setPresets] = useState<VolumePreset[]>(DEFAULT_PRESETS);
-  const [previousVolume, setPreviousVolume] = useState(volume);
+  const [presets, setPresets] = useState<VolumePreset[]>(savedPresets.length ? savedPresets : DEFAULT_PRESETS);
+  const [previousVolume, setPreviousVolume] = useState(volumeSettings.previousVolume || volume);
   const [customPresetName, setCustomPresetName] = useState('');
   const [showKeyboardHints, setShowKeyboardHints] = useState(false);
   const [volumeHistory, setVolumeHistory] = useState<number[]>([]);
 
-  // Load settings from localStorage
+  // Sync presets from settings
   useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      const settings = JSON.parse(stored);
-      if (settings.previousVolume !== undefined) {
-        setPreviousVolume(settings.previousVolume);
-      }
+    if (savedPresets.length > 0) {
+      setPresets(savedPresets);
     }
-
-    const storedPresets = localStorage.getItem(PRESETS_KEY);
-    if (storedPresets) {
-      setPresets(JSON.parse(storedPresets));
-    }
-  }, []);
+  }, [savedPresets]);
 
   // Save volume to history
   useEffect(() => {
@@ -132,7 +124,7 @@ const VolumeControl: React.FC<VolumeControlProps> = ({
     const newVolume = values[0];
     if (!isMuted && volume > 0) {
       setPreviousVolume(volume);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ previousVolume: volume }));
+      setVolumeSettings({ previousVolume: volume });
     }
     onVolumeChange(newVolume);
   };
@@ -140,7 +132,7 @@ const VolumeControl: React.FC<VolumeControlProps> = ({
   const handleMuteToggle = () => {
     if (!isMuted) {
       setPreviousVolume(volume);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ previousVolume: volume }));
+      setVolumeSettings({ previousVolume: volume });
     }
     onMuteToggle();
   };
@@ -164,7 +156,7 @@ const VolumeControl: React.FC<VolumeControlProps> = ({
 
     const updated = [...presets, newPreset];
     setPresets(updated);
-    localStorage.setItem(PRESETS_KEY, JSON.stringify(updated));
+    setSavedPresets(updated);
     setCustomPresetName('');
 
     toast({
@@ -176,12 +168,12 @@ const VolumeControl: React.FC<VolumeControlProps> = ({
   const deletePreset = (index: number) => {
     const updated = presets.filter((_, i) => i !== index);
     setPresets(updated);
-    localStorage.setItem(PRESETS_KEY, JSON.stringify(updated));
+    setSavedPresets(updated);
   };
 
   const resetPresets = () => {
     setPresets(DEFAULT_PRESETS);
-    localStorage.removeItem(PRESETS_KEY);
+    setSavedPresets(DEFAULT_PRESETS);
     toast({
       title: 'Presets réinitialisés',
       description: 'Les presets par défaut ont été restaurés',
