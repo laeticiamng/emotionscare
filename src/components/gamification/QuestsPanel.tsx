@@ -94,8 +94,11 @@ export const QuestsPanel: React.FC = () => {
 
   const renderQuest = (quest: Quest, index: number) => {
     const progress = getProgressForQuest(quest.id);
+    const maxProgress = quest.max_progress || quest.target_value || 1;
+    const pointsReward = quest.points_reward || (quest.energy_reward || 0) + (quest.harmony_points_reward || 0);
+    const difficulty = quest.difficulty || 'medium';
     const progressPercentage = progress 
-      ? (progress.current_progress / quest.max_progress) * 100 
+      ? (progress.current_progress / maxProgress) * 100 
       : 0;
     const isCompleted = progress?.completed;
 
@@ -116,26 +119,26 @@ export const QuestsPanel: React.FC = () => {
             <div className="flex items-center gap-2 mb-1">
               {getQuestTypeIcon(quest.quest_type)}
               <h4 className="font-semibold text-foreground">{quest.title}</h4>
-              <Badge className={getDifficultyColor(quest.difficulty)} variant="outline">
-                {quest.difficulty}
+              <Badge className={getDifficultyColor(difficulty)} variant="outline">
+                {difficulty}
               </Badge>
             </div>
             <p className="text-sm text-muted-foreground">{quest.description}</p>
           </div>
           <div className="flex items-center gap-2 ml-4">
             <Trophy className="w-4 h-4 text-yellow-500" />
-            <span className="font-bold text-yellow-500">{quest.points_reward}</span>
+            <span className="font-bold text-yellow-500">{pointsReward}</span>
           </div>
         </div>
         
         <div className="space-y-2">
           <Progress value={progressPercentage} className="h-2" />
           <div className="flex items-center justify-between text-xs text-muted-foreground">
-            <span>{progress?.current_progress || 0} / {quest.max_progress}</span>
+            <span>{progress?.current_progress || 0} / {maxProgress}</span>
             {isCompleted ? (
               <Button 
                 size="sm" 
-                onClick={() => claimReward(quest.id, quest.points_reward)}
+                onClick={() => claimReward(quest.id, pointsReward)}
                 className="bg-gradient-to-r from-green-500 to-emerald-500 text-white"
               >
                 <Trophy className="w-3 h-3 mr-1" />
@@ -168,7 +171,7 @@ export const QuestsPanel: React.FC = () => {
             <Badge variant="secondary" className="text-lg px-3 py-1">
               {quests.reduce((sum, q) => {
                 const p = getProgressForQuest(q.id);
-                return sum + (p?.completed ? q.points_reward : 0);
+                return sum + (p?.completed ? (q.points_reward || (q.energy_reward || 0) + (q.harmony_points_reward || 0)) : 0);
               }, 0)} pts gagnés
             </Badge>
           </div>

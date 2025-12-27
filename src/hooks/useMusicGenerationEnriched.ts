@@ -46,54 +46,54 @@ const HISTORY_KEY = 'music-generation-history';
 const FAVORITES_KEY = 'music-generation-favorites';
 const STATS_KEY = 'music-generation-stats';
 
-// Fallback tracks pour quand Suno n'est pas disponible
+// Fallback tracks avec audio libre de droits (Pixabay)
 const FALLBACK_TRACKS: GeneratedTrack[] = [
   {
     id: 'fallback-calm-1',
     title: 'Océan Tranquille',
     artist: 'EmotionsCare Music',
-    url: '/audio/fallback-calm.mp3',
-    audioUrl: '/audio/fallback-calm.mp3',
+    url: 'https://cdn.pixabay.com/audio/2024/11/04/audio_87cdc7ccfe.mp3',
+    audioUrl: 'https://cdn.pixabay.com/audio/2024/11/04/audio_87cdc7ccfe.mp3',
     duration: 180,
     emotion: 'calm',
     mood: 'relaxed',
-    coverUrl: '/images/covers/calm-ocean.jpg',
+    coverUrl: '/placeholder.svg',
     tags: 'calm,peaceful,ambient'
   },
   {
     id: 'fallback-happy-1',
     title: 'Sunrise Energy',
     artist: 'EmotionsCare Music',
-    url: '/audio/fallback-energize.mp3',
-    audioUrl: '/audio/fallback-energize.mp3',
+    url: 'https://cdn.pixabay.com/audio/2022/10/25/audio_946499bb90.mp3',
+    audioUrl: 'https://cdn.pixabay.com/audio/2022/10/25/audio_946499bb90.mp3',
     duration: 200,
     emotion: 'happy',
     mood: 'energetic',
-    coverUrl: '/images/covers/happy-sunrise.jpg',
+    coverUrl: '/placeholder.svg',
     tags: 'happy,uplifting,energetic'
   },
   {
     id: 'fallback-focus-1',
     title: 'Deep Focus Flow',
     artist: 'EmotionsCare Music',
-    url: '/audio/fallback-focus.mp3',
-    audioUrl: '/audio/fallback-focus.mp3',
+    url: 'https://cdn.pixabay.com/audio/2022/08/02/audio_884fe92c21.mp3',
+    audioUrl: 'https://cdn.pixabay.com/audio/2022/08/02/audio_884fe92c21.mp3',
     duration: 240,
     emotion: 'focused',
     mood: 'concentrated',
-    coverUrl: '/images/covers/focus-flow.jpg',
+    coverUrl: '/placeholder.svg',
     tags: 'focus,concentration,ambient'
   },
   {
     id: 'fallback-sad-1',
     title: 'Healing Rain',
     artist: 'EmotionsCare Music',
-    url: '/audio/fallback-healing.mp3',
-    audioUrl: '/audio/fallback-healing.mp3',
+    url: 'https://cdn.pixabay.com/audio/2022/01/18/audio_d0a13f69d2.mp3',
+    audioUrl: 'https://cdn.pixabay.com/audio/2022/01/18/audio_d0a13f69d2.mp3',
     duration: 220,
     emotion: 'melancholic',
     mood: 'reflective',
-    coverUrl: '/images/covers/healing-rain.jpg',
+    coverUrl: '/placeholder.svg',
     tags: 'healing,gentle,melancholic'
   }
 ];

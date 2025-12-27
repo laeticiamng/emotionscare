@@ -7,12 +7,18 @@ export interface Quest {
   description: string;
   quest_type: 'daily' | 'weekly' | 'special';
   category: 'listening' | 'exploration' | 'wellness' | 'social';
-  difficulty: 'easy' | 'medium' | 'hard';
-  points_reward: number;
-  max_progress: number;
+  target_value: number; // DB column name
+  energy_reward: number;
+  harmony_points_reward: number;
+  special_reward?: string;
   start_date: string;
   end_date?: string;
-  is_active: boolean;
+  active: boolean; // DB column name
+  // Computed/mapped for UI compatibility
+  points_reward?: number;
+  max_progress?: number;
+  difficulty?: 'easy' | 'medium' | 'hard';
+  is_active?: boolean;
 }
 
 export interface UserQuestProgress {
@@ -26,18 +32,26 @@ export interface UserQuestProgress {
   quest?: Quest;
 }
 
+// Helper pour mapper les colonnes DB vers l'interface UI
+const mapQuestFromDB = (quest: any): Quest => ({
+  ...quest,
+  max_progress: quest.target_value || 1,
+  points_reward: (quest.energy_reward || 0) + (quest.harmony_points_reward || 0),
+  is_active: quest.active,
+  difficulty: quest.target_value <= 1 ? 'easy' : quest.target_value <= 5 ? 'medium' : 'hard'
+});
+
 class QuestService {
   async getActiveQuests(): Promise<Quest[]> {
     try {
       const { data, error } = await supabase
         .from('wellness_quests')
         .select('*')
-        .eq('is_active', true)
-        .order('quest_type', { ascending: true })
-        .order('difficulty', { ascending: true });
+        .eq('active', true)
+        .order('quest_type', { ascending: true });
 
       if (error) throw error;
-      return data || [];
+      return (data || []).map(mapQuestFromDB);
     } catch (error) {
       logger.error('Erreur lors de la récupération des quêtes', error as Error, 'QuestService');
       return [];
@@ -71,16 +85,17 @@ class QuestService {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Utilisateur non connecté');
 
-      // Récupérer la quête pour connaître max_progress
+      // Récupérer la quête pour connaître target_value
       const { data: quest } = await supabase
         .from('wellness_quests')
-        .select('max_progress, points_reward')
+        .select('target_value, energy_reward, harmony_points_reward')
         .eq('id', questId)
         .single();
 
       if (!quest) throw new Error('Quête non trouvée');
 
-      const completed = progress >= quest.max_progress;
+      const maxProgress = quest.target_value || 1;
+      const completed = progress >= maxProgress;
 
       // Upsert la progression
       const { error } = await supabase
@@ -88,7 +103,7 @@ class QuestService {
         .upsert({
           user_id: user.id,
           quest_id: questId,
-          current_progress: Math.min(progress, quest.max_progress),
+          current_progress: Math.min(progress, maxProgress),
           completed,
           completed_at: completed ? new Date().toISOString() : null,
           updated_at: new Date().toISOString()
@@ -109,10 +124,10 @@ class QuestService {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Utilisateur non connecté');
 
-      // Vérifier que la quête est complétée
+      // Vérifier que la quête est complétée et non réclamée
       const { data: progress } = await supabase
         .from('user_quest_progress')
-        .select('completed')
+        .select('completed, claimed')
         .eq('user_id', user.id)
         .eq('quest_id', questId)
         .single();
@@ -120,7 +135,39 @@ class QuestService {
       if (!progress?.completed) {
         throw new Error('Quête non complétée');
       }
+      
+      if (progress?.claimed) {
+        throw new Error('Récompense déjà réclamée');
+      }
 
+      // Récupérer les points de la quête
+      const { data: quest } = await supabase
+        .from('wellness_quests')
+        .select('energy_reward, harmony_points_reward')
+        .eq('id', questId)
+        .single();
+
+      if (!quest) throw new Error('Quête non trouvée');
+
+      const totalPoints = (quest.energy_reward || 0) + (quest.harmony_points_reward || 0);
+
+      // Marquer comme réclamé
+      const { error: updateError } = await supabase
+        .from('user_quest_progress')
+        .update({ 
+          claimed: true, 
+          claimed_at: new Date().toISOString() 
+        })
+        .eq('user_id', user.id)
+        .eq('quest_id', questId);
+
+      if (updateError) throw updateError;
+
+      // Ajouter les points au leaderboard
+      const { leaderboardService } = await import('./leaderboardService');
+      await leaderboardService.updateScore(totalPoints);
+
+      logger.info(`Quest reward claimed: +${totalPoints} points`, { questId }, 'QuestService');
       return true;
     } catch (error) {
       logger.error('Erreur lors de la réclamation de la récompense', error as Error, 'QuestService');
