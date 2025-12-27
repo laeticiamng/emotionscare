@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React, { useEffect, useRef, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -17,7 +15,7 @@ interface VisualizationProps {
 type VisualizationType = 'waveform' | 'spectrum' | 'circular' | 'particles' | 'galaxy';
 type ColorTheme = 'neon' | 'sunset' | 'ocean' | 'fire' | 'cosmic';
 
-const colorThemes = {
+const colorThemes: Record<ColorTheme, string[]> = {
   neon: ['#ff0080', '#00ff80', '#8000ff', '#ff8000'],
   sunset: ['#ff6b35', '#f7931e', '#ffd23f', '#fff75e'],
   ocean: ['#006b96', '#0087b5', '#00a3d4', '#00bef2'],
@@ -31,8 +29,9 @@ const ImmersiveVisualization: React.FC<VisualizationProps> = ({
   onToggleFullscreen
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const animationFrameRef = useRef<number>();
-  const { isPlaying, currentTrack } = useMusic();
+  const animationFrameRef = useRef<number | undefined>();
+  const { state } = useMusic();
+  const isPlaying = state.isPlaying;
   
   const [visualizationType, setVisualizationType] = useState<VisualizationType>('spectrum');
   const [colorTheme, setColorTheme] = useState<ColorTheme>('neon');
