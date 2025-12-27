@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -27,7 +25,8 @@ interface AudioAnalysisDisplayProps {
 const AudioAnalysisDisplay: React.FC<AudioAnalysisDisplayProps> = ({ className }) => {
   const [analysis, setAnalysis] = useState<AudioAnalysis | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const { currentTrack } = useMusic();
+  const { state } = useMusic();
+  const currentTrack = state.currentTrack;
 
   // Simulation d'analyse audio avancée
   useEffect(() => {

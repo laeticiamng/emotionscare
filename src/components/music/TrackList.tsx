@@ -1,7 +1,5 @@
-// @ts-nocheck
-
 import React, { useState, useCallback } from 'react';
-import { MusicTrack } from '@/types/music';
+import type { MusicTrack } from '@/types/music';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import { Play, Pause, Heart, MoreVertical, ListPlus, Share2, Clock, Shuffle } from 'lucide-react';

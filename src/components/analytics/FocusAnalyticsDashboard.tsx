@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * FocusAnalyticsDashboard - Tableau de bord analytics Focus Flow
  */
@@ -29,6 +28,7 @@ import {
   Tooltip,
   Legend,
   ArcElement,
+  Filler,
 } from 'chart.js';
 import { Line, Bar, Doughnut } from 'react-chartjs-2';
 import { useFocusAnalytics } from '@/hooks/useFocusAnalytics';
@@ -42,7 +42,8 @@ ChartJS.register(
   Title,
   Tooltip,
   Legend,
-  ArcElement
+  ArcElement,
+  Filler
 );
 
 export const FocusAnalyticsDashboard: React.FC = () => {
