@@ -15,6 +15,7 @@ import { LazyMotionWrapper, m } from '@/utils/lazy-motion';
 import { logger } from '@/lib/logger';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { useSunoPlayerSettings } from '@/hooks/music/useMusicSettings';
 
 interface SunoPlayerProps {
   src: string | null;
@@ -50,7 +51,7 @@ interface PlayHistory {
   rating?: number;
 }
 
-const STORAGE_KEY = 'suno-player-data';
+// Removed STORAGE_KEY - now using useMusicSettings hook
 
 export const SunoPlayer: React.FC<SunoPlayerProps> = ({
   src,
@@ -64,46 +65,48 @@ export const SunoPlayer: React.FC<SunoPlayerProps> = ({
   trackInfo
 }) => {
   const audioRef = useRef<HTMLAudioElement>(null);
+  const { value: playerData, setValue: setPlayerData, isLoading: settingsLoading } = useSunoPlayerSettings();
+  
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [volume, setVolume] = useState(0.7);
+  const [volume, setVolume] = useState(playerData.volume);
   const [isMuted, setIsMuted] = useState(false);
-  const [isRepeat, setIsRepeat] = useState(false);
-  const [isShuffle, setIsShuffle] = useState(false);
+  const [isRepeat, setIsRepeat] = useState(playerData.isRepeat);
+  const [isShuffle, setIsShuffle] = useState(playerData.isShuffle);
   const [activeTab, setActiveTab] = useState('player');
-  const [queue, setQueue] = useState<QueueItem[]>([]);
-  const [playHistory, setPlayHistory] = useState<PlayHistory[]>([]);
-  const [favorites, setFavorites] = useState<PlayHistory[]>([]);
+  const [queue, setQueue] = useState<QueueItem[]>(playerData.queue);
+  const [playHistory, setPlayHistory] = useState<PlayHistory[]>(playerData.history);
+  const [favorites, setFavorites] = useState<PlayHistory[]>(playerData.favorites);
   const [isFavorite, setIsFavorite] = useState(false);
   const [showEqualizer, setShowEqualizer] = useState(false);
   const [equalizerBands, setEqualizerBands] = useState([50, 50, 50, 50, 50]);
   const previousVolume = useRef(0.7);
 
-  // Load saved data
+  // Sync avec les settings chargés
   useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      const data = JSON.parse(saved);
-      setQueue(data.queue || []);
-      setPlayHistory(data.history || []);
-      setFavorites(data.favorites || []);
-      if (data.volume !== undefined) setVolume(data.volume);
-      if (data.isRepeat !== undefined) setIsRepeat(data.isRepeat);
-      if (data.isShuffle !== undefined) setIsShuffle(data.isShuffle);
+    if (!settingsLoading) {
+      setVolume(playerData.volume);
+      setIsRepeat(playerData.isRepeat);
+      setIsShuffle(playerData.isShuffle);
+      setQueue(playerData.queue);
+      setPlayHistory(playerData.history);
+      setFavorites(playerData.favorites);
     }
-  }, []);
+  }, [settingsLoading, playerData]);
 
-  // Save data
+  // Save data with debounce via hook
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({
-      queue,
-      history: playHistory,
-      favorites,
-      volume,
-      isRepeat,
-      isShuffle
-    }));
-  }, [queue, playHistory, favorites, volume, isRepeat, isShuffle]);
+    if (!settingsLoading) {
+      setPlayerData({
+        queue,
+        history: playHistory,
+        favorites,
+        volume,
+        isRepeat,
+        isShuffle
+      });
+    }
+  }, [queue, playHistory, favorites, volume, isRepeat, isShuffle, settingsLoading]);
 
   // Audio event handlers
   useEffect(() => {

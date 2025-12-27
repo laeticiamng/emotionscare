@@ -127,7 +127,7 @@ export const useMusicJourney = () => {
           *,
           tracks:music_journey_tracks(
             *,
-            track:generated_music_tracks(audio_url, prompt)
+            track:generated_music_tracks(id, audio_url, title)
           )
         `)
         .eq('id', journeyId)
