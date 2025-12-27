@@ -1,7 +1,5 @@
-// @ts-nocheck
-
 import React from 'react';
-import { MusicTrack } from '@/types/music';
+import type { MusicTrack } from '@/types/music';
 import { Badge } from '@/components/ui/badge';
 import { Music, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
