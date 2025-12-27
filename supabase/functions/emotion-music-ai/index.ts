@@ -259,8 +259,13 @@ serve(async (req) => {
       }
       
       const sunoData = await sunoRes.json();
-      const taskId = sunoData.data?.taskId || sunoData.id;
-      console.log(`[emotion-music-ai] Suno generation started:`, taskId);
+      console.log(`[emotion-music-ai] Suno raw response:`, JSON.stringify(sunoData));
+      const taskId = sunoData.data?.taskId || sunoData.taskId || sunoData.id;
+      if (!taskId) {
+        console.error(`[emotion-music-ai] No taskId found in response`);
+        throw new Error('Aucun taskId retourné par le service de génération');
+      }
+      console.log(`[emotion-music-ai] Suno generation started with taskId:`, taskId);
 
       const { data: track } = await supabaseClient
         .from('generated_music_tracks')
@@ -294,12 +299,27 @@ serve(async (req) => {
 
     // Check status - Documentation: https://docs.sunoapi.org/suno-api/quickstart#step-2-check-task-status
     if (action === 'check-status') {
-      const statusRes = await fetch(`https://api.sunoapi.org/api/v1/generate/record-info?taskId=${sunoTaskId}`, {
+      if (!sunoTaskId) {
+        return new Response(JSON.stringify({ 
+          error: 'MISSING_TASK_ID',
+          message: 'TaskId manquant pour vérifier le statut'
+        }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+      
+      console.log(`[emotion-music-ai] Checking status for taskId: ${sunoTaskId}`);
+      const statusUrl = `https://api.sunoapi.org/api/v1/generate/record-info?taskId=${encodeURIComponent(sunoTaskId)}`;
+      console.log(`[emotion-music-ai] Status URL: ${statusUrl}`);
+      
+      const statusRes = await fetch(statusUrl, {
         headers: { 'Authorization': `Bearer ${sunoKey}` }
       });
 
       if (!statusRes.ok) {
-        console.error(`[emotion-music-ai] Status check failed: ${statusRes.status}`);
+        const errorBody = await statusRes.text().catch(() => 'No error details');
+        console.error(`[emotion-music-ai] Status check failed: ${statusRes.status}, body: ${errorBody}`);
         
         // Erreurs temporaires
         if ([502, 503, 504, 429].includes(statusRes.status)) {
