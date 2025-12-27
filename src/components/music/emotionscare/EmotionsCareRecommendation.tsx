@@ -1,15 +1,14 @@
-// @ts-nocheck
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
 import { Play, Pause, RotateCcw, Heart, Sparkles } from 'lucide-react';
-import { useMusic } from '@/contexts/MusicContext';
+import { useMusic } from '@/hooks/useMusic';
 import { useMusicGeneration } from '@/hooks/useMusicGeneration';
 import { useToast } from '@/hooks/use-toast';
 import type { EmotionResult } from '@/types';
+import type { MusicTrack } from '@/types/music';
 import { logger } from '@/lib/logger';
 
 interface EmotionsCareRecommendationProps {
@@ -24,10 +23,10 @@ const EmotionsCareRecommendationContent: React.FC<EmotionsCareRecommendationProp
   className = ''
 }) => {
   const [intensity, setIntensity] = useState([0.5]);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTrack, setCurrentTrack] = useState(null);
+  const [isTrackPlaying, setIsTrackPlaying] = useState(false);
+  const [currentTrack, setCurrentTrack] = useState<MusicTrack | null>(null);
   
-  const { playTrack, isLoading: musicLoading } = useMusic();
+  const { play, pause, state } = useMusic();
   const { generateMusic, isGenerating, error } = useMusicGeneration();
   const { toast } = useToast();
 
@@ -38,13 +37,13 @@ const EmotionsCareRecommendationContent: React.FC<EmotionsCareRecommendationProp
   }, [emotionResult, autoGenerate]);
 
   const handleGenerateMusic = async () => {
-    if (!emotionResult?.dominantEmotion) return;
+    if (!emotionResult?.emotion) return;
 
     try {
       const track = await generateMusic(
-        emotionResult.dominantEmotion,
+        emotionResult.emotion,
         undefined, // customPrompt
-        emotionResult.overallMood,
+        emotionResult.emotion, // use emotion as mood fallback
         intensity[0]
       );
 
@@ -70,12 +69,12 @@ const EmotionsCareRecommendationContent: React.FC<EmotionsCareRecommendationProp
     if (!currentTrack) return;
 
     try {
-      if (isPlaying) {
-        // Pause logic would go here
-        setIsPlaying(false);
+      if (isTrackPlaying) {
+        pause();
+        setIsTrackPlaying(false);
       } else {
-        await playTrack(currentTrack);
-        setIsPlaying(true);
+        await play(currentTrack);
+        setIsTrackPlaying(true);
       }
     } catch (err) {
       logger.error('Error playing track:', err);
@@ -95,7 +94,7 @@ const EmotionsCareRecommendationContent: React.FC<EmotionsCareRecommendationProp
           Recommandation Musicale
         </CardTitle>
         <CardDescription>
-          Musique adaptée à votre état émotionnel: {emotionResult.dominantEmotion}
+          Musique adaptée à votre état émotionnel: {emotionResult.emotion}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -115,7 +114,7 @@ const EmotionsCareRecommendationContent: React.FC<EmotionsCareRecommendationProp
           <Button 
             onClick={handleGenerateMusic} 
             className="w-full"
-            disabled={isGenerating || musicLoading}
+            disabled={isGenerating || state.isPlaying}
           >
             {isGenerating ? (
               <>
@@ -142,7 +141,7 @@ const EmotionsCareRecommendationContent: React.FC<EmotionsCareRecommendationProp
                 variant="outline"
                 className="w-full"
               >
-                {isPlaying ? (
+                {isTrackPlaying ? (
                   <>
                     <Pause className="mr-2 h-4 w-4" />
                     Pause

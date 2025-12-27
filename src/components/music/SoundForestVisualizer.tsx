@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Sound Forest 3D Visualizer for Music Therapy
  * Audio-reactive 3D forest with trees that sway and glow to music
@@ -164,7 +163,7 @@ const ForestScene: React.FC<ForestSceneProps> = ({ audioLevel, isPlaying }) => {
       {/* Moon/sun */}
       <mesh position={[-8, 8, -8]}>
         <sphereGeometry args={[1, 32, 32]} />
-        <meshBasicMaterial color="#ffd700" emissive="#ffd700" emissiveIntensity={0.8} />
+        <meshStandardMaterial color="#ffd700" emissive="#ffd700" emissiveIntensity={0.8} />
       </mesh>
 
       {/* Fog atmosphere */}
