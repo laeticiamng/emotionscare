@@ -1,10 +1,8 @@
-// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -20,6 +18,7 @@ import { useMusicControls } from '@/hooks/useMusicControls';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import type { MusicTrack } from '@/types/music';
 
 interface GenerationHistory {
   id: string;
@@ -65,7 +64,7 @@ const EmotionMusicGenerator: React.FC = () => {
   });
   
   const { generateMusic, isGenerating, error } = useMusicGeneration();
-  const { playTrack } = useMusicControls();
+  const { loadTrack } = useMusicControls();
 
   const emotions = [
     { value: 'calm', label: 'Calme', icon: '🧘', color: 'bg-blue-500/20 text-blue-600' },
@@ -111,7 +110,7 @@ const EmotionMusicGenerator: React.FC = () => {
 
     const track = await generateMusic(selectedEmotion, fullPrompt);
     if (track) {
-      playTrack(track);
+      loadTrack(track);
       
       const newEntry: GenerationHistory = {
         id: Date.now().toString(),
