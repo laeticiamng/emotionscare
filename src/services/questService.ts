@@ -30,7 +30,7 @@ class QuestService {
   async getActiveQuests(): Promise<Quest[]> {
     try {
       const { data, error } = await supabase
-        .from('music_quests')
+        .from('wellness_quests')
         .select('*')
         .eq('is_active', true)
         .order('quest_type', { ascending: true })
@@ -53,7 +53,7 @@ class QuestService {
         .from('user_quest_progress')
         .select(`
           *,
-          quest:music_quests(*)
+          quest:wellness_quests(*)
         `)
         .eq('user_id', user.id)
         .order('started_at', { ascending: false });
@@ -73,7 +73,7 @@ class QuestService {
 
       // Récupérer la quête pour connaître max_progress
       const { data: quest } = await supabase
-        .from('music_quests')
+        .from('wellness_quests')
         .select('max_progress, points_reward')
         .eq('id', questId)
         .single();
@@ -133,7 +133,7 @@ class QuestService {
   async getQuestsByType(type: Quest['quest_type']): Promise<Quest[]> {
     try {
       const { data, error } = await supabase
-        .from('music_quests')
+        .from('wellness_quests')
         .select('*')
         .eq('is_active', true)
         .eq('quest_type', type)
@@ -150,7 +150,7 @@ class QuestService {
   async getQuestsByCategory(category: Quest['category']): Promise<Quest[]> {
     try {
       const { data, error } = await supabase
-        .from('music_quests')
+        .from('wellness_quests')
         .select('*')
         .eq('is_active', true)
         .eq('category', category)
@@ -198,7 +198,7 @@ class QuestService {
           current_progress: 0,
           completed: false
         })
-        .select('*, quest:music_quests(*)')
+        .select('*, quest:wellness_quests(*)')
         .single();
 
       if (error) throw error;
@@ -216,7 +216,7 @@ class QuestService {
 
       const { data: progress } = await supabase
         .from('user_quest_progress')
-        .select('*, quest:music_quests(*)')
+        .select('*, quest:wellness_quests(*)')
         .eq('user_id', user.id)
         .eq('quest_id', questId)
         .single();
@@ -241,7 +241,7 @@ class QuestService {
 
       const { data, error } = await supabase
         .from('user_quest_progress')
-        .select('*, quest:music_quests(*)')
+        .select('*, quest:wellness_quests(*)')
         .eq('user_id', user.id)
         .eq('completed', true)
         .order('completed_at', { ascending: false });
@@ -261,7 +261,7 @@ class QuestService {
 
       const { data, error } = await supabase
         .from('user_quest_progress')
-        .select('*, quest:music_quests(*)')
+        .select('*, quest:wellness_quests(*)')
         .eq('user_id', user.id)
         .eq('completed', false)
         .order('started_at', { ascending: false });
@@ -292,7 +292,7 @@ class QuestService {
 
       const { data: completed } = await supabase
         .from('user_quest_progress')
-        .select('*, quest:music_quests(*)')
+        .select('*, quest:wellness_quests(*)')
         .eq('user_id', user.id)
         .eq('completed', true);
 
@@ -338,7 +338,7 @@ class QuestService {
       const favoriteCategory = stats.favoriteCategory || 'listening';
 
       const { data, error } = await supabase
-        .from('music_quests')
+        .from('wellness_quests')
         .select('*')
         .eq('is_active', true)
         .eq('category', favoriteCategory)
@@ -360,7 +360,7 @@ class QuestService {
 
       const { data, error } = await supabase
         .from('user_quest_progress')
-        .select('*, quest:music_quests(*)')
+        .select('*, quest:wellness_quests(*)')
         .eq('user_id', user.id)
         .eq('quest_id', questId)
         .single();
@@ -415,7 +415,7 @@ class QuestService {
       cutoff.setHours(cutoff.getHours() + hoursUntilExpiry);
 
       const { data, error } = await supabase
-        .from('music_quests')
+        .from('wellness_quests')
         .select('*')
         .eq('is_active', true)
         .lt('end_date', cutoff.toISOString())
