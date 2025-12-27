@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState, useCallback, useEffect } from 'react';
 import { useMusic } from '@/hooks/useMusic';
 import { MusicTrack } from '@/types/music';
@@ -41,7 +40,7 @@ export const useEnhancedMusicPlayer = () => {
   }, [keyboardShortcutsEnabled, isExpanded]);
 
   const togglePlayer = useCallback(() => {
-    if (music.isPlaying) {
+    if (music.state.isPlaying) {
       music.pause();
       toast({
         title: "Lecture mise en pause",

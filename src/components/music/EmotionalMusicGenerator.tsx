@@ -224,7 +224,7 @@ export const EmotionalMusicGenerator: React.FC = () => {
                 {completedTrack.image_url && (
                   <img
                     src={completedTrack.image_url}
-                    alt="Cover"
+                    alt={`Pochette de la musique générée pour l'émotion ${emotionAnalysis?.dominantEmotion || 'détectée'}`}
                     className="w-full h-48 object-cover rounded-lg"
                   />
                 )}
