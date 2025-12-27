@@ -16,6 +16,7 @@
 
 import { useEffect, useCallback, useState, useRef } from 'react';
 import { logger } from '@/lib/logger';
+import { useMusicAccessibilitySettings } from '@/hooks/music/useMusicSettings';
 
 // ============================================
 // TYPES
@@ -376,8 +377,7 @@ export function useMusicAccessibility(
         document.body.classList.remove('large-controls');
       }
 
-      // Sauvegarder dans localStorage
-      localStorage.setItem('music-accessibility-prefs', JSON.stringify(updated));
+      // Note: Persistance gérée par useMusicAccessibilitySettings si intégré au niveau supérieur
 
       logger.info('Accessibility preferences updated', updated, 'MusicAccessibility');
 
@@ -385,18 +385,8 @@ export function useMusicAccessibility(
     });
   }, []);
 
-  // Charger les préférences sauvegardées
-  useEffect(() => {
-    const stored = localStorage.getItem('music-accessibility-prefs');
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored);
-        updatePreferences(parsed);
-      } catch (error) {
-        logger.error('Failed to parse saved preferences', error as Error, 'MusicAccessibility');
-      }
-    }
-  }, [updatePreferences]);
+  // Note: Les préférences sont maintenant gérées par useMusicAccessibilitySettings
+  // qui sync automatiquement avec Supabase
 
   // Détecter les préférences système
   useEffect(() => {

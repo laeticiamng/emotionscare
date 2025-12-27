@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useCallback } from 'react';
 import type { MusicTrack } from '@/types/music';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
@@ -7,6 +7,7 @@ import { formatDuration } from '@/utils/musicCompatibility';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useMusicPlayerFavorites } from '@/hooks/music/useMusicSettings';
 
 interface TrackListProps {
   tracks: MusicTrack[];
@@ -27,27 +28,21 @@ const TrackList: React.FC<TrackListProps> = ({
   onAddToPlaylist,
   showActions = true,
 }) => {
-  const [favorites, setFavorites] = useState<Set<string>>(() => {
-    const saved = localStorage.getItem('music-favorites');
-    return new Set(saved ? JSON.parse(saved) : []);
-  });
-  const [hoveredTrack, setHoveredTrack] = useState<string | null>(null);
+  const { value: favoritesArray, setValue: setFavoritesArray } = useMusicPlayerFavorites();
+  const favorites = new Set(favoritesArray.map((f: any) => f.id || f));
+  const [hoveredTrack, setHoveredTrack] = React.useState<string | null>(null);
 
   const toggleFavorite = useCallback((trackId: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    setFavorites(prev => {
-      const next = new Set(prev);
-      if (next.has(trackId)) {
-        next.delete(trackId);
-        toast.success('Retiré des favoris');
-      } else {
-        next.add(trackId);
-        toast.success('Ajouté aux favoris ❤️');
-      }
-      localStorage.setItem('music-favorites', JSON.stringify([...next]));
-      return next;
-    });
-  }, []);
+    const isFav = favorites.has(trackId);
+    if (isFav) {
+      setFavoritesArray((prev: any[]) => prev.filter((f: any) => (f.id || f) !== trackId));
+      toast.success('Retiré des favoris');
+    } else {
+      setFavoritesArray((prev: any[]) => [...prev, { id: trackId, addedAt: new Date().toISOString() }]);
+      toast.success('Ajouté aux favoris ❤️');
+    }
+  }, [favorites, setFavoritesArray]);
 
   const handleShare = async (track: MusicTrack, e: React.MouseEvent) => {
     e.stopPropagation();
