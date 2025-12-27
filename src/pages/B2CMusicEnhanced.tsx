@@ -41,6 +41,8 @@ const MusicGeneratorSection = lazy(() => import('@/components/music/page/MusicGe
 const MusicGamificationSection = lazy(() => import('@/components/music/page/MusicGamificationSection').then(m => ({ default: m.MusicGamificationSection })));
 const MusicJourneySection = lazy(() => import('@/components/music/page/MusicJourneySection').then(m => ({ default: m.MusicJourneySection })));
 const MusicFocusSection = lazy(() => import('@/components/music/page/MusicFocusSection').then(m => ({ default: m.MusicFocusSection })));
+const MusicStatsSection = lazy(() => import('@/components/music/page/MusicStatsSection').then(m => ({ default: m.MusicStatsSection })));
+const ImmersiveMode = lazy(() => import('@/components/music/ImmersiveMode').then(m => ({ default: m.ImmersiveMode })));
 
 // Composants statiques chargés immédiatement
 import {
@@ -143,6 +145,7 @@ const B2CMusicEnhanced: React.FC = () => {
   const { setValue: setLastPlayed } = useLastPlayedTrack();
   const [voiceCoachEnabled, setVoiceCoachEnabled] = useState(true);
   const [sessionState] = useState<'idle' | 'active' | 'break' | 'completed'>('idle');
+  const [showImmersive, setShowImmersive] = useState(false);
   
   // Préférences musicales
   const { hasPreferences, isLoading: prefsLoading, refreshPreferences } = useUserMusicPreferences();
@@ -267,6 +270,10 @@ const B2CMusicEnhanced: React.FC = () => {
 
               <Suspense fallback={<SectionSkeleton />}>
                 <MusicFocusSection />
+              </Suspense>
+
+              <Suspense fallback={<SectionSkeleton />}>
+                <MusicStatsSection />
               </Suspense>
 
               <MusicFavoritesSection
