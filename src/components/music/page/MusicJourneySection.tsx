@@ -17,10 +17,14 @@ export const MusicJourneySection: React.FC = () => {
   const [activeJourneyId, setActiveJourneyId] = useState<string | null>(null);
 
   const journeyOptions = [
-    { from: 'anxious', to: 'calm', emoji: '😰 → 😌', label: 'Anxiété → Calme' },
-    { from: 'sad', to: 'joy', emoji: '😢 → 😊', label: 'Tristesse → Joie' },
-    { from: 'anger', to: 'calm', emoji: '😠 → 😌', label: 'Colère → Calme' },
-    { from: 'stressed', to: 'energetic', emoji: '😓 → ⚡', label: 'Stress → Énergie' }
+    { from: 'anxious', to: 'calm', emoji: '😰 → 😌', label: 'Anxiété → Calme', duration: '15 min' },
+    { from: 'sad', to: 'joy', emoji: '😢 → 😊', label: 'Tristesse → Joie', duration: '20 min' },
+    { from: 'anger', to: 'calm', emoji: '😠 → 😌', label: 'Colère → Calme', duration: '12 min' },
+    { from: 'stressed', to: 'energetic', emoji: '😓 → ⚡', label: 'Stress → Énergie', duration: '18 min' },
+    { from: 'tired', to: 'focused', emoji: '😴 → 🎯', label: 'Fatigue → Focus', duration: '10 min' },
+    { from: 'lonely', to: 'connected', emoji: '😔 → 💕', label: 'Solitude → Connexion', duration: '25 min' },
+    { from: 'overwhelmed', to: 'peaceful', emoji: '😵 → 🕊️', label: 'Submergé → Paisible', duration: '22 min' },
+    { from: 'unmotivated', to: 'inspired', emoji: '😑 → 🚀', label: 'Démotivé → Inspiré', duration: '15 min' },
   ];
 
   const handleStartJourney = async (from: string, to: string) => {
@@ -50,16 +54,17 @@ export const MusicJourneySection: React.FC = () => {
                 <Button
                   key={`${option.from}-${option.to}`}
                   variant="outline"
-                  className="h-auto py-4 flex-col gap-2"
+                  className="h-auto py-4 flex-col gap-2 hover:bg-purple-500/10 transition-all"
                   onClick={() => handleStartJourney(option.from, option.to)}
                 >
                   <span className="text-2xl">{option.emoji}</span>
-                  <span className="text-xs">{option.label}</span>
+                  <span className="text-xs font-medium">{option.label}</span>
+                  <span className="text-xs text-muted-foreground">{option.duration}</span>
                 </Button>
               ))}
             </div>
             <p className="text-sm text-center text-muted-foreground">
-              Choisissez votre parcours pour commencer
+              Choisissez votre parcours pour commencer une transformation émotionnelle guidée
             </p>
           </div>
         ) : activeJourneyId ? (

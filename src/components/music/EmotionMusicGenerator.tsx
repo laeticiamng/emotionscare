@@ -116,7 +116,27 @@ const EmotionMusicGenerator: React.FC = () => {
     { value: 'motivated', label: 'Motivé', icon: '🚀', color: 'bg-orange-500/20 text-orange-600' },
     { value: 'melancholic', label: 'Mélancolique', icon: '🌧️', color: 'bg-slate-500/20 text-slate-600' },
     { value: 'romantic', label: 'Romantique', icon: '💕', color: 'bg-pink-500/20 text-pink-600' },
+    { value: 'creative', label: 'Créatif', icon: '🎨', color: 'bg-indigo-500/20 text-indigo-600' },
+    { value: 'peaceful', label: 'Paisible', icon: '🕊️', color: 'bg-emerald-500/20 text-emerald-600' },
+    { value: 'confident', label: 'Confiant', icon: '💪', color: 'bg-rose-500/20 text-rose-600' },
+    { value: 'nostalgic', label: 'Nostalgique', icon: '📻', color: 'bg-amber-500/20 text-amber-600' },
   ];
+
+  // Presets rapides pour génération en un clic
+  const quickPresets = [
+    { name: 'Méditation', emotion: 'calm', intensity: 30, duration: 120, genres: ['ambient', 'nature'] },
+    { name: 'Workout', emotion: 'energetic', intensity: 90, duration: 60, genres: ['electronic'] },
+    { name: 'Focus', emotion: 'focused', intensity: 50, duration: 90, genres: ['lofi', 'ambient'] },
+    { name: 'Sommeil', emotion: 'relaxed', intensity: 20, duration: 180, genres: ['ambient', 'nature'] },
+  ];
+
+  const applyPreset = (preset: typeof quickPresets[0]) => {
+    setSelectedEmotion(preset.emotion);
+    setIntensity([preset.intensity]);
+    setDuration([preset.duration]);
+    setGenres(prev => prev.map(g => ({ ...g, selected: preset.genres.includes(g.id) })));
+    toast.success(`Preset "${preset.name}" appliqué`);
+  };
 
   const handleGenerate = async () => {
     const selectedGenres = genres.filter(g => g.selected).map(g => g.label).join(', ');
@@ -235,6 +255,25 @@ const EmotionMusicGenerator: React.FC = () => {
           </TabsList>
 
           <TabsContent value="generate" className="space-y-6">
+            {/* Quick Presets */}
+            <div>
+              <Label className="mb-3 block">Presets rapides</Label>
+              <div className="flex flex-wrap gap-2">
+                {quickPresets.map((preset) => (
+                  <Button
+                    key={preset.name}
+                    variant="outline"
+                    size="sm"
+                    onClick={() => applyPreset(preset)}
+                    className="gap-1"
+                  >
+                    <Sparkles className="h-3 w-3" />
+                    {preset.name}
+                  </Button>
+                ))}
+              </div>
+            </div>
+
             {/* Emotion Grid */}
             <div>
               <Label className="mb-3 block">Émotion cible</Label>
