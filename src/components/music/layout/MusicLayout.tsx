@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React from 'react';
 import { useMusic } from '@/hooks/useMusic';
 import { Button } from '@/components/ui/button';
@@ -12,7 +10,8 @@ interface MusicLayoutProps {
 
 const MusicLayout: React.FC<MusicLayoutProps> = ({ children }) => {
   const music = useMusic();
-  const isInitialized = music.isInitialized !== false; // Par défaut true si non défini
+  // MusicContext is always initialized if we get here (provider exists)
+  const isInitialized = true;
 
   if (!isInitialized) {
     return (

@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React from 'react';
 import { MusicTrack, MusicPlaylist } from '@/types/music';
 

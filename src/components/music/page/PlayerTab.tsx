@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React, { useState, useEffect } from 'react';
 import { useMusic } from '@/hooks/useMusic';
 import { Button } from '@/components/ui/button';
@@ -7,8 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Play, Pause, SkipBack, SkipForward, Heart, Volume, VolumeX } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
 import { getTrackCover, getTrackTitle, getTrackArtist } from '@/utils/musicCompatibility';
-import { MusicContextType } from '@/types/music';
-import { logger } from '@/lib/logger';
+import type { MusicTrack } from '@/types/music';
 
 interface PlayerTabProps {
   className?: string;
@@ -20,24 +17,8 @@ const PlayerTab: React.FC<PlayerTabProps> = ({ className = '' }) => {
   const [localMute, setLocalMute] = useState(false);
   const [progress, setProgress] = useState(0);
   
-  const music = useMusic() as MusicContextType;
-  const { 
-    currentTrack, 
-    isPlaying,
-    togglePlay,
-    playTrack,
-    pauseTrack,
-    resumeTrack,
-    nextTrack,
-    playlist,
-  } = music;
-  
-  // Fallback values if they don't exist in the context
-  const previousTrack = music.previousTrack || (() => logger.info('Previous track not available'));
-  const setCurrentTrack = music.setCurrentTrack || ((track) => logger.info('Set current track not available', { track }));
-  const currentTime = music.currentTime || 0;
-  const duration = music.duration || 0;
-  const seekTo = music.seekTo || ((time: number) => logger.info('Seek not available', { time }));
+  const { state, play, pause, next, previous, seek, setVolume: setContextVolume } = useMusic();
+  const { currentTrack, isPlaying, currentTime, duration, playlist } = state;
 
   const formatTime = (seconds: number) => {
     if (isNaN(seconds)) return '0:00';
@@ -54,25 +35,42 @@ const PlayerTab: React.FC<PlayerTabProps> = ({ className = '' }) => {
   
   const handleVolumeChange = (values: number[]) => {
     setLocalVolume(values[0]);
-    music.setVolume && music.setVolume(values[0] / 100);
+    setContextVolume(values[0] / 100);
   };
   
   const handleToggleMute = () => {
     setLocalMute(!localMute);
-    music.toggleMute && music.toggleMute();
+    if (localMute) {
+      setContextVolume(localVolume / 100);
+    } else {
+      setContextVolume(0);
+    }
   };
   
   const handleProgressChange = (values: number[]) => {
     const newPosition = (values[0] / 100) * (duration || 0);
-    seekTo(newPosition);
+    seek(newPosition);
+  };
+
+  const handleTogglePlay = async () => {
+    if (isPlaying) {
+      pause();
+    } else if (currentTrack) {
+      await play(currentTrack);
+    }
+  };
+
+  const handleStartPlayback = async () => {
+    if (playlist && playlist.length > 0) {
+      await play(playlist[0]);
+    }
   };
   
   if (!currentTrack) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[300px]">
         <p className="text-muted-foreground">Aucune piste en cours de lecture</p>
-        <Button onClick={() => playlist && playlist.tracks.length > 0 ? 
-          playTrack(playlist.tracks[0]) : null} className="mt-4">
+        <Button onClick={handleStartPlayback} className="mt-4">
           Démarrer la lecture
         </Button>
       </div>
@@ -125,7 +123,7 @@ const PlayerTab: React.FC<PlayerTabProps> = ({ className = '' }) => {
         <Button
           variant="ghost"
           size="icon"
-          onClick={previousTrack}
+          onClick={previous}
           className="h-12 w-12 rounded-full hover:bg-blue-100 dark:hover:bg-blue-900/30"
           aria-label="Piste précédente"
         >
@@ -135,7 +133,7 @@ const PlayerTab: React.FC<PlayerTabProps> = ({ className = '' }) => {
         <Button
           variant="default"
           size="icon"
-          onClick={togglePlay}
+          onClick={handleTogglePlay}
           className="h-16 w-16 rounded-full bg-primary hover:bg-primary/90"
           aria-label={isPlaying ? "Mettre en pause" : "Lire"}
         >
@@ -149,7 +147,7 @@ const PlayerTab: React.FC<PlayerTabProps> = ({ className = '' }) => {
         <Button
           variant="ghost"
           size="icon"
-          onClick={nextTrack}
+          onClick={next}
           className="h-12 w-12 rounded-full hover:bg-blue-100 dark:hover:bg-blue-900/30"
           aria-label="Piste suivante"
         >
@@ -197,18 +195,18 @@ const PlayerTab: React.FC<PlayerTabProps> = ({ className = '' }) => {
         </div>
       </div>
       
-      {playlist && (
+      {playlist && playlist.length > 0 && (
         <div className="space-y-2 mt-8">
-          <h4 className="text-lg font-medium">Playlist: {playlist.title || playlist.name}</h4>
+          <h4 className="text-lg font-medium">Playlist</h4>
           <div className="space-y-1">
-            {playlist.tracks.map((track) => (
+            {playlist.map((track: MusicTrack) => (
               <Button
                 key={track.id}
                 variant="ghost"
                 className={`w-full justify-start ${
                   currentTrack.id === track.id ? 'bg-primary/10 text-primary' : ''
                 }`}
-                onClick={() => setCurrentTrack(track)}
+                onClick={() => play(track)}
               >
                 {getTrackTitle(track)}
               </Button>
