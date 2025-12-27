@@ -43,8 +43,8 @@ export const useMusicPlaylist = (
         return [];
       }
 
-      // Construct URL with query params
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      // Construct URL with query params - use direct URL instead of VITE env var
+      const supabaseUrl = 'https://yaincoxihiqdksxgrsrk.supabase.co';
       const url = new URL(`${supabaseUrl}/functions/v1/adaptive-music/recommendations`);
       url.searchParams.set('emotion', emotion);
       url.searchParams.set('intensity', intensity.toString());

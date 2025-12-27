@@ -36,18 +36,18 @@ import { useTasteChangeNotifications } from '@/hooks/useTasteChangeNotifications
 import { useMusicHistory, useLastPlayedTrack } from '@/hooks/music/useMusicSettings';
 
 // Lazy loading des sections lourdes pour optimiser le first paint
-// Priorité haute - chargé immédiatement après le first paint
+// Priorité haute - chargé immédiatement après le first paint (preload)
 const VinylCollection = lazy(() => import('@/components/music/page/VinylCollection').then(m => ({ default: m.VinylCollection })));
 const MusicSearchAndFilter = lazy(() => import('@/components/music/MusicSearchAndFilter').then(m => ({ default: m.MusicSearchAndFilter })));
 
-// Priorité moyenne - chargé lors du scroll
-const MusicGeneratorSection = lazy(() => import('@/components/music/page/MusicGeneratorSection').then(m => ({ default: m.MusicGeneratorSection })));
+// Priorité moyenne - chargé lors de l'interaction utilisateur
 const MusicGamificationSection = lazy(() => import('@/components/music/page/MusicGamificationSection').then(m => ({ default: m.MusicGamificationSection })));
 const MusicJourneySection = lazy(() => import('@/components/music/page/MusicJourneySection').then(m => ({ default: m.MusicJourneySection })));
-const MusicFocusSection = lazy(() => import('@/components/music/page/MusicFocusSection').then(m => ({ default: m.MusicFocusSection })));
 const MusicStatsSection = lazy(() => import('@/components/music/page/MusicStatsSection').then(m => ({ default: m.MusicStatsSection })));
 
-// Priorité basse - chargé en arrière-plan
+// Priorité basse - chargé en arrière-plan (idle)
+const MusicGeneratorSection = lazy(() => import('@/components/music/page/MusicGeneratorSection').then(m => ({ default: m.MusicGeneratorSection })));
+const MusicFocusSection = lazy(() => import('@/components/music/page/MusicFocusSection').then(m => ({ default: m.MusicFocusSection })));
 const ImmersiveMode = lazy(() => import('@/components/music/ImmersiveMode').then(m => ({ default: m.ImmersiveMode })));
 const CollaborativePlaylistSection = lazy(() => import('@/components/music/page/CollaborativePlaylistSection').then(m => ({ default: m.CollaborativePlaylistSection })));
 const ExternalIntegrationsPanel = lazy(() => import('@/components/music/ExternalIntegrationsPanel').then(m => ({ default: m.ExternalIntegrationsPanel })));
@@ -60,13 +60,13 @@ import {
   MusicHistorySection,
 } from '@/components/music/page';
 
-// Skeleton de chargement optimisé
+// Skeleton de chargement optimisé - plus léger
 const SectionSkeleton = memo(() => (
-  <Card className="p-6">
-    <Skeleton className="h-6 w-1/3 mb-4" />
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+  <Card className="p-4 animate-pulse">
+    <div className="h-5 w-1/4 bg-muted rounded mb-3" />
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
       {[1, 2, 3, 4].map(i => (
-        <Skeleton key={i} className="h-32 rounded-lg" />
+        <div key={i} className="h-24 bg-muted rounded-lg" />
       ))}
     </div>
   </Card>
@@ -258,47 +258,24 @@ const B2CMusicEnhanced: React.FC = () => {
       <TooltipProvider>
         <div>
           {!playerVisible ? (
-            <div className="space-y-12">
+            <div className="space-y-8">
               <VinylIntroduction />
 
+              {/* Vinyles - Priorité haute */}
               <Suspense fallback={<SectionSkeleton />}>
-                <MusicGeneratorSection 
-                  currentEmotion={state.currentTrack?.emotion || 'calm'} 
-                  userId={user?.id || 'anonymous'} 
-                />
-              </Suspense>
-
-              <Suspense fallback={<SectionSkeleton />}>
-                <MusicGamificationSection />
-              </Suspense>
-
-              <Suspense fallback={<SectionSkeleton />}>
-                <MusicJourneySection />
-              </Suspense>
-
-              <Suspense fallback={<SectionSkeleton />}>
-                <MusicFocusSection />
-              </Suspense>
-
-              <Suspense fallback={<SectionSkeleton />}>
-                <MusicStatsSection />
-              </Suspense>
-
-              <Suspense fallback={<SectionSkeleton />}>
-                <MusicSearchAndFilter
+                <VinylCollection
                   tracks={vinylTracks}
-                  onTrackSelect={(track) => startTrack(track as VinylTrack)}
+                  audioSources={audioSources}
+                  loadingTrackId={loadingTrackId}
+                  categoryIcons={categoryIcons}
+                  isFavorite={(id) => musicFavorites.isFavorite(id)}
+                  isLoadingFavorites={musicFavorites.isLoading}
+                  onStartTrack={startTrack}
+                  onToggleFavorite={(track) => musicFavorites.toggleFavorite(track)}
                 />
               </Suspense>
 
-              <Suspense fallback={<SectionSkeleton />}>
-                <CollaborativePlaylistSection />
-              </Suspense>
-
-              <Suspense fallback={<SectionSkeleton />}>
-                <ExternalIntegrationsPanel />
-              </Suspense>
-
+              {/* Favoris & Historique - Immédiat */}
               <MusicFavoritesSection
                 tracks={vinylTracks}
                 favoriteIds={musicFavorites.favorites}
@@ -313,17 +290,47 @@ const B2CMusicEnhanced: React.FC = () => {
                 onStartTrack={(track) => startTrack(track as VinylTrack)}
               />
 
+              {/* Stats - Priorité moyenne */}
               <Suspense fallback={<SectionSkeleton />}>
-                <VinylCollection
+                <MusicStatsSection />
+              </Suspense>
+
+              {/* Gamification - Priorité moyenne */}
+              <Suspense fallback={<SectionSkeleton />}>
+                <MusicGamificationSection />
+              </Suspense>
+
+              {/* Parcours - Priorité moyenne */}
+              <Suspense fallback={<SectionSkeleton />}>
+                <MusicJourneySection />
+              </Suspense>
+
+              {/* Recherche */}
+              <Suspense fallback={<SectionSkeleton />}>
+                <MusicSearchAndFilter
                   tracks={vinylTracks}
-                  audioSources={audioSources}
-                  loadingTrackId={loadingTrackId}
-                  categoryIcons={categoryIcons}
-                  isFavorite={(id) => musicFavorites.isFavorite(id)}
-                  isLoadingFavorites={musicFavorites.isLoading}
-                  onStartTrack={startTrack}
-                  onToggleFavorite={(track) => musicFavorites.toggleFavorite(track)}
+                  onTrackSelect={(track) => startTrack(track as VinylTrack)}
                 />
+              </Suspense>
+
+              {/* Sections basse priorité */}
+              <Suspense fallback={<SectionSkeleton />}>
+                <MusicGeneratorSection 
+                  currentEmotion={state.currentTrack?.emotion || 'calm'} 
+                  userId={user?.id || 'anonymous'} 
+                />
+              </Suspense>
+
+              <Suspense fallback={<SectionSkeleton />}>
+                <MusicFocusSection />
+              </Suspense>
+
+              <Suspense fallback={<SectionSkeleton />}>
+                <CollaborativePlaylistSection />
+              </Suspense>
+
+              <Suspense fallback={<SectionSkeleton />}>
+                <ExternalIntegrationsPanel />
               </Suspense>
             </div>
           ) : (
@@ -344,11 +351,13 @@ const B2CMusicEnhanced: React.FC = () => {
           currentTrack={state.currentTrack}
           isPlaying={state.isPlaying}
           progress={state.progress}
+          duration={state.currentTrack?.duration}
           onPlayPause={handlePlayPause}
           onNext={handleNext}
           onPrevious={handlePrevious}
           onExpand={() => setPlayerVisible(true)}
           onImmersive={() => setShowImmersive(true)}
+          onSeek={(pos) => musicContext?.seek?.(pos)}
           isDocked={playerVisible}
         />
 
@@ -365,6 +374,8 @@ const B2CMusicEnhanced: React.FC = () => {
             onPause={() => musicContext?.pause()}
             onNext={handleNext}
             onPrevious={handlePrevious}
+            onSeek={(pos) => musicContext?.seek?.(pos)}
+            onVolumeChange={(vol) => musicContext?.setVolume?.(vol / 100)}
           />
         </Suspense>
       </TooltipProvider>
