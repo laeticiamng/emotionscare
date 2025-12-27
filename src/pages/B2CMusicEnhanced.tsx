@@ -225,7 +225,7 @@ const B2CMusicEnhanced: React.FC = () => {
 
               <MusicFavoritesSection
                 tracks={vinylTracks}
-                favoriteIds={musicFavorites.favorites.map(f => typeof f === 'string' ? f : f.id)}
+                favoriteIds={musicFavorites.favorites}
                 loadingTrackId={loadingTrackId}
                 onStartTrack={(track) => startTrack(track as VinylTrack)}
               />
