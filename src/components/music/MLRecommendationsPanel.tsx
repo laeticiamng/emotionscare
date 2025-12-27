@@ -61,24 +61,36 @@ const CATEGORY_CONFIG = {
   similar: { label: 'Similaire', icon: Heart, color: 'text-pink-500' },
 };
 
-// Génère des recommandations basées sur l'émotion actuelle
+// Génère des recommandations basées sur l'émotion actuelle avec URLs audio valides
 const generateRecommendations = (emotion: string, historyCount: number): MLRecommendation[] => {
+  // Utiliser des URLs audio de démonstration valides
+  const DEMO_AUDIO_URLS = [
+    'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
+    'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
+    'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
+    'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3',
+    'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3',
+    'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3',
+    'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3',
+    'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3',
+  ];
+
   const emotionTracks: Record<string, MusicTrack[]> = {
     calm: [
-      { id: 'rec-1', title: 'Océan Paisible', artist: 'Ambient Collective', url: '', audioUrl: '/audio/calm.mp3', duration: 245, emotion: 'calm', mood: 'peaceful' },
-      { id: 'rec-2', title: 'Forêt Enchantée', artist: 'Nature Sounds', url: '', audioUrl: '/audio/forest.mp3', duration: 300, emotion: 'calm', mood: 'serene' },
+      { id: 'rec-1', title: 'Océan Paisible', artist: 'Ambient Collective', url: DEMO_AUDIO_URLS[0], audioUrl: DEMO_AUDIO_URLS[0], duration: 245, emotion: 'calm', mood: 'peaceful' },
+      { id: 'rec-2', title: 'Forêt Enchantée', artist: 'Nature Sounds', url: DEMO_AUDIO_URLS[1], audioUrl: DEMO_AUDIO_URLS[1], duration: 300, emotion: 'calm', mood: 'serene' },
     ],
     focus: [
-      { id: 'rec-3', title: 'Focus Flow', artist: 'Deep Work', url: '', audioUrl: '/audio/focus.mp3', duration: 320, emotion: 'focus', mood: 'concentrated' },
-      { id: 'rec-4', title: 'Alpha Waves', artist: 'Brain Boost', url: '', audioUrl: '/audio/alpha.mp3', duration: 280, emotion: 'focus', mood: 'alert' },
+      { id: 'rec-3', title: 'Focus Flow', artist: 'Deep Work', url: DEMO_AUDIO_URLS[2], audioUrl: DEMO_AUDIO_URLS[2], duration: 320, emotion: 'focus', mood: 'concentrated' },
+      { id: 'rec-4', title: 'Alpha Waves', artist: 'Brain Boost', url: DEMO_AUDIO_URLS[3], audioUrl: DEMO_AUDIO_URLS[3], duration: 280, emotion: 'focus', mood: 'alert' },
     ],
     energetic: [
-      { id: 'rec-5', title: 'Energy Boost', artist: 'Motivation Lab', url: '', audioUrl: '/audio/energy.mp3', duration: 198, emotion: 'energetic', mood: 'motivated' },
-      { id: 'rec-6', title: 'Power Up', artist: 'High Energy', url: '', audioUrl: '/audio/power.mp3', duration: 210, emotion: 'energetic', mood: 'pumped' },
+      { id: 'rec-5', title: 'Energy Boost', artist: 'Motivation Lab', url: DEMO_AUDIO_URLS[4], audioUrl: DEMO_AUDIO_URLS[4], duration: 198, emotion: 'energetic', mood: 'motivated' },
+      { id: 'rec-6', title: 'Power Up', artist: 'High Energy', url: DEMO_AUDIO_URLS[5], audioUrl: DEMO_AUDIO_URLS[5], duration: 210, emotion: 'energetic', mood: 'pumped' },
     ],
     relaxed: [
-      { id: 'rec-7', title: 'Sunset Dreams', artist: 'Chill Horizon', url: '', audioUrl: '/audio/sunset.mp3', duration: 275, emotion: 'relaxed', mood: 'dreamy' },
-      { id: 'rec-8', title: 'Evening Calm', artist: 'Peaceful Vibes', url: '', audioUrl: '/audio/evening.mp3', duration: 290, emotion: 'relaxed', mood: 'tranquil' },
+      { id: 'rec-7', title: 'Sunset Dreams', artist: 'Chill Horizon', url: DEMO_AUDIO_URLS[6], audioUrl: DEMO_AUDIO_URLS[6], duration: 275, emotion: 'relaxed', mood: 'dreamy' },
+      { id: 'rec-8', title: 'Evening Calm', artist: 'Peaceful Vibes', url: DEMO_AUDIO_URLS[7], audioUrl: DEMO_AUDIO_URLS[7], duration: 290, emotion: 'relaxed', mood: 'tranquil' },
     ],
   };
 
