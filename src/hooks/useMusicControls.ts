@@ -115,6 +115,14 @@ export const useMusicControls = () => {
     setIsMuted(!isMuted);
   };
 
+  const loadTrack = (track: MusicTrack) => {
+    setCurrentTrack(track);
+    if (audioRef.current && track.url) {
+      audioRef.current.src = track.url;
+      audioRef.current.load();
+    }
+  };
+
   return {
     isPlaying,
     currentTime,
@@ -129,5 +137,6 @@ export const useMusicControls = () => {
     seek,
     setVolume: setVolumeLevel,
     toggleMute,
+    loadTrack,
   };
 };

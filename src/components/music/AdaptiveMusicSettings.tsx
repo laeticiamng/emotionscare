@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -53,9 +51,9 @@ const AdaptiveMusicSettings: React.FC<AdaptiveMusicSettingsProps> = ({
           <>
             {/* Sensibilité */}
             <div className="space-y-2">
-              <Label>Sensibilité émotionnelle: {Math.round(config.emotionSensitivity * 100)}%</Label>
+              <Label>Sensibilité émotionnelle: {Math.round((config.emotionSensitivity ?? 0.7) * 100)}%</Label>
               <Slider
-                value={[config.emotionSensitivity * 100]}
+                value={[(config.emotionSensitivity ?? 0.7) * 100]}
                 onValueChange={handleSensitivityChange}
                 max={100}
                 step={5}
@@ -76,18 +74,18 @@ const AdaptiveMusicSettings: React.FC<AdaptiveMusicSettingsProps> = ({
               </div>
               <Switch
                 id="auto-transition"
-                checked={config.autoTransition}
+                checked={config.autoTransition ?? true}
                 onCheckedChange={(autoTransition) => updateConfig({ autoTransition })}
               />
             </div>
 
-            {config.autoTransition && (
+            {(config.autoTransition ?? true) && (
               <>
                 {/* Durée fade in */}
                 <div className="space-y-2">
-                  <Label>Durée d'apparition: {config.fadeInDuration}ms</Label>
+                  <Label>Durée d'apparition: {config.fadeInDuration ?? 2000}ms</Label>
                   <Slider
-                    value={[config.fadeInDuration / 100]}
+                    value={[(config.fadeInDuration ?? 2000) / 100]}
                     onValueChange={handleFadeInChange}
                     max={50}
                     min={5}
@@ -98,9 +96,9 @@ const AdaptiveMusicSettings: React.FC<AdaptiveMusicSettingsProps> = ({
 
                 {/* Durée fade out */}
                 <div className="space-y-2">
-                  <Label>Durée de disparition: {config.fadeOutDuration}ms</Label>
+                  <Label>Durée de disparition: {config.fadeOutDuration ?? 1500}ms</Label>
                   <Slider
-                    value={[config.fadeOutDuration / 100]}
+                    value={[(config.fadeOutDuration ?? 1500) / 100]}
                     onValueChange={handleFadeOutChange}
                     max={50}
                     min={5}
@@ -111,7 +109,6 @@ const AdaptiveMusicSettings: React.FC<AdaptiveMusicSettingsProps> = ({
               </>
             )}
 
-            {/* Ajustement de volume */}
             <div className="flex items-center justify-between">
               <div>
                 <Label htmlFor="volume-adjustment">Ajustement automatique du volume</Label>
@@ -121,7 +118,7 @@ const AdaptiveMusicSettings: React.FC<AdaptiveMusicSettingsProps> = ({
               </div>
               <Switch
                 id="volume-adjustment"
-                checked={config.volumeAdjustment}
+                checked={config.volumeAdjustment ?? true}
                 onCheckedChange={(volumeAdjustment) => updateConfig({ volumeAdjustment })}
               />
             </div>
