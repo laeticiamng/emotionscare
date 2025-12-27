@@ -49,7 +49,8 @@ export const MusicVisualizer: React.FC<MusicVisualizerProps> = ({
       if (!analyserRef.current || !dataArrayRef.current) return;
 
       animationRef.current = requestAnimationFrame(draw);
-      analyserRef.current.getByteFrequencyData(dataArrayRef.current);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      analyserRef.current.getByteFrequencyData(dataArrayRef.current as any);
 
       ctx.fillStyle = 'hsl(var(--background))';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
