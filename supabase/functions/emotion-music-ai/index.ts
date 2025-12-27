@@ -208,6 +208,10 @@ serve(async (req) => {
       
       // Utiliser fetchWithRetry pour gérer les erreurs temporaires
       // Documentation: https://docs.sunoapi.org/suno-api/generate-music
+      // Note: callBackUrl est requis par l'API Suno
+      const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
+      const callBackUrl = `${supabaseUrl}/functions/v1/suno-webhook`;
+      
       const sunoRes = await fetchWithRetry('https://api.sunoapi.org/api/v1/generate', {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${sunoKey}`, 'Content-Type': 'application/json' },
@@ -217,7 +221,8 @@ serve(async (req) => {
           model: 'V4_5',
           prompt,
           style: profile.desc,
-          title: `${emotion} - Therapeutic Music`
+          title: `${emotion} - Therapeutic Music`,
+          callBackUrl
         })
       }, 3);
 
