@@ -5,6 +5,11 @@ import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { 
+  useMusicPlayerFavorites, 
+  useTrackRatings, 
+  useTrackPlayCounts 
+} from '@/hooks/music/useMusicSettings';
+import { 
   Music, 
   Heart, 
   Share2, 
@@ -42,19 +47,14 @@ const TrackInfo: React.FC<TrackInfoProps> = ({
   showDetails = true
 }) => {
   const { toast } = useToast();
-  const [isFavorite, setIsFavorite] = useState(false);
-  const [favorites, setFavorites] = useState<FavoriteTrack[]>(() => {
-    const saved = localStorage.getItem('music_favorites');
-    return saved ? JSON.parse(saved) : [];
-  });
-  const [playCount, setPlayCount] = useState(() => {
-    const saved = localStorage.getItem('track_play_counts');
-    return saved ? JSON.parse(saved) : {};
-  });
   const [showShareMenu, setShowShareMenu] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [rating, setRating] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
+  
+  // Supabase-synced state
+  const { value: favorites, setValue: setFavorites } = useMusicPlayerFavorites();
+  const { value: ratings, setValue: setRatings } = useTrackRatings();
+  const { value: playCount } = useTrackPlayCounts();
 
   // Default track if none provided
   const defaultTrack = {
@@ -70,28 +70,14 @@ const TrackInfo: React.FC<TrackInfoProps> = ({
   };
 
   const currentTrack = track || defaultTrack;
-
+  
   // Check if current track is favorite
-  useEffect(() => {
-    const isFav = favorites.some(f => f.id === currentTrack.id);
-    setIsFavorite(isFav);
-    
-    // Load rating
-    const savedRatings = localStorage.getItem('track_ratings');
-    if (savedRatings) {
-      const ratings = JSON.parse(savedRatings);
-      setRating(ratings[currentTrack.id] || 0);
-    }
-  }, [currentTrack.id, favorites]);
-
-  // Persist favorites
-  useEffect(() => {
-    localStorage.setItem('music_favorites', JSON.stringify(favorites));
-  }, [favorites]);
+  const isFavorite = favorites.some((f: any) => f.id === currentTrack.id);
+  const rating = ratings[currentTrack.id || 'default'] || 0;
 
   const toggleFavorite = () => {
     if (isFavorite) {
-      setFavorites(prev => prev.filter(f => f.id !== currentTrack.id));
+      setFavorites((prev: any[]) => prev.filter((f: any) => f.id !== currentTrack.id));
       toast({
         title: "Retiré des favoris",
         description: `"${currentTrack.title}" a été retiré de vos favoris`
@@ -103,21 +89,19 @@ const TrackInfo: React.FC<TrackInfoProps> = ({
         artist: currentTrack.artist || 'Artiste inconnu',
         addedAt: new Date().toISOString()
       };
-      setFavorites(prev => [...prev, newFavorite]);
+      setFavorites((prev: any[]) => [...prev, newFavorite]);
       toast({
         title: "Ajouté aux favoris",
         description: `"${currentTrack.title}" a été ajouté à vos favoris`
       });
     }
-    setIsFavorite(!isFavorite);
   };
 
   const handleRating = (newRating: number) => {
-    setRating(newRating);
-    const savedRatings = localStorage.getItem('track_ratings');
-    const ratings = savedRatings ? JSON.parse(savedRatings) : {};
-    ratings[currentTrack.id || 'default'] = newRating;
-    localStorage.setItem('track_ratings', JSON.stringify(ratings));
+    setRatings((prev) => ({
+      ...prev,
+      [currentTrack.id || 'default']: newRating
+    }));
     toast({
       title: "Note enregistrée",
       description: `Vous avez donné ${newRating} étoile${newRating > 1 ? 's' : ''} à ce morceau`

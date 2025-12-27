@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -10,6 +10,11 @@ import TrackInfo from './TrackInfo';
 import ProgressBar from './ProgressBar';
 import VolumeControl from './VolumeControl';
 import { useMusicControls } from '@/hooks/useMusicControls';
+import { 
+  useMusicQueue, 
+  useMusicPlayerFavorites, 
+  useMusicPlayerStats 
+} from '@/hooks/music/useMusicSettings';
 import type { MusicTrack } from '@/types/music';
 import { 
   Loader2, 
@@ -74,58 +79,18 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ track, className }) => {
   const [isExpanded, setIsExpanded] = useState(true);
   const [shuffle, setShuffle] = useState(false);
   const [repeatMode, setRepeatMode] = useState<RepeatMode>('off');
+  const [history, setHistory] = useState<PlayHistory[]>([]);
   
-  // Queue management
-  const [queue, setQueue] = useState<QueueItem[]>(() => {
-    const saved = localStorage.getItem('music_queue');
-    return saved ? JSON.parse(saved) : [];
-  });
-  
-  // Play history
-  const [history, setHistory] = useState<PlayHistory[]>(() => {
-    const saved = localStorage.getItem('music_play_history');
-    return saved ? JSON.parse(saved) : [];
-  });
-
-  // Favorites
-  const [favorites, setFavorites] = useState<MusicTrack[]>(() => {
-    const saved = localStorage.getItem('music_favorites_tracks');
-    return saved ? JSON.parse(saved) : [];
-  });
-
-  // Stats
-  const [stats, setStats] = useState(() => {
-    const saved = localStorage.getItem('music_player_stats');
-    return saved ? JSON.parse(saved) : {
-      totalPlayTime: 0,
-      tracksPlayed: 0,
-      favoriteGenre: 'Ambient',
-      lastSession: new Date().toISOString()
-    };
-  });
-
-  // Persist data
-  useEffect(() => {
-    localStorage.setItem('music_queue', JSON.stringify(queue));
-  }, [queue]);
-
-  useEffect(() => {
-    localStorage.setItem('music_play_history', JSON.stringify(history.slice(-100)));
-  }, [history]);
-
-  useEffect(() => {
-    localStorage.setItem('music_favorites_tracks', JSON.stringify(favorites));
-  }, [favorites]);
-
-  useEffect(() => {
-    localStorage.setItem('music_player_stats', JSON.stringify(stats));
-  }, [stats]);
+  // Supabase-synced state via hooks
+  const { value: queue, setValue: setQueue } = useMusicQueue();
+  const { value: favorites, setValue: setFavorites } = useMusicPlayerFavorites();
+  const { value: stats, setValue: setStats } = useMusicPlayerStats();
 
   // Track play history
   useEffect(() => {
     if (track && isPlaying) {
       const interval = setInterval(() => {
-        setStats((prev: typeof stats) => ({
+        setStats((prev) => ({
           ...prev,
           totalPlayTime: prev.totalPlayTime + 1,
           lastSession: new Date().toISOString()
@@ -133,7 +98,7 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ track, className }) => {
       }, 1000);
       return () => clearInterval(interval);
     }
-  }, [track, isPlaying]);
+  }, [track, isPlaying, setStats]);
 
   const handlePrevious = () => {
     if (history.length > 0) {

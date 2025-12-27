@@ -31,6 +31,7 @@ import { useGamification } from '@/hooks/useGamification';
 import { useUserMusicPreferences } from '@/hooks/useUserMusicPreferences';
 import { useMusicPreferencesLearning } from '@/hooks/useMusicPreferencesLearning';
 import { useTasteChangeNotifications } from '@/hooks/useTasteChangeNotifications';
+import { useMusicHistory, useLastPlayedTrack } from '@/hooks/music/useMusicSettings';
 
 // Composants de page modulaires
 import {
@@ -122,9 +123,8 @@ const B2CMusicEnhanced: React.FC = () => {
   const [showReward, setShowReward] = useState(false);
   const [playerVisible, setPlayerVisible] = useState(false);
   const [loadingTrackId, setLoadingTrackId] = useState<string | null>(null);
-  const [playHistory, setPlayHistory] = useState<string[]>(() => {
-    try { return JSON.parse(window.localStorage.getItem('music:history') || '[]'); } catch { return []; }
-  });
+  const { value: playHistory } = useMusicHistory();
+  const { setValue: setLastPlayed } = useLastPlayedTrack();
   const [voiceCoachEnabled, setVoiceCoachEnabled] = useState(true);
   const [sessionState] = useState<'idle' | 'active' | 'break' | 'completed'>('idle');
   
@@ -167,7 +167,7 @@ const B2CMusicEnhanced: React.FC = () => {
     try {
       setPlayerVisible(true);
       await play(track);
-      window.localStorage.setItem('music:lastPlayed', track.id);
+      setLastPlayed(track.id);
       await updateChallengeProgress('1', 1);
       toast({ title: "Vinyle en rotation ♪", description: `${track.title} compose ton aura sonore` });
     } catch (error) {
