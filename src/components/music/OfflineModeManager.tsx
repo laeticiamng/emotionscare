@@ -22,6 +22,7 @@ import {
   Zap,
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useCachedTracks } from '@/hooks/music/useMusicSettings';
 
 interface CachedTrack {
   id: string;
@@ -66,6 +67,7 @@ export const OfflineModeManager: React.FC<OfflineModeManagerProps> = ({
 }) => {
   const { toast } = useToast();
   const [isOnline, setIsOnline] = useState(typeof navigator !== 'undefined' && navigator.onLine);
+  const { value: cachedTracksData, setValue: setCachedTracksData } = useCachedTracks();
   const [cachedTracks, setCachedTracks] = useState<CachedTrack[]>([]);
   const [downloadQueue, setDownloadQueue] = useState<string[]>([]);
   const [totalCacheSize, setTotalCacheSize] = useState(0);
@@ -103,24 +105,14 @@ export const OfflineModeManager: React.FC<OfflineModeManagerProps> = ({
     };
   }, [autoSync, toast]);
 
-  // Load cached tracks from localStorage
+  // Load cached tracks from Supabase-synced hook
   useEffect(() => {
-    const loadCachedTracks = async () => {
-      try {
-        const stored = localStorage.getItem('music:cachedTracks');
-        if (stored) {
-          const cached = JSON.parse(stored);
-          setCachedTracks(cached);
-          const size = cached.reduce((acc: number, t: CachedTrack) => acc + t.size, 0);
-          setTotalCacheSize(size);
-        }
-      } catch (error) {
-        logger.error('Error loading cached tracks:', error, 'COMPONENT');
-      }
-    };
-
-    loadCachedTracks();
-  }, []);
+    if (cachedTracksData && cachedTracksData.length > 0) {
+      setCachedTracks(cachedTracksData);
+      const size = cachedTracksData.reduce((acc: number, t: CachedTrack) => acc + (t.size || 0), 0);
+      setTotalCacheSize(size);
+    }
+  }, [cachedTracksData]);
 
   // Download track
   const downloadTrack = async (trackId: string) => {
@@ -175,11 +167,11 @@ export const OfflineModeManager: React.FC<OfflineModeManagerProps> = ({
         setDownloadQueue((prev) => prev.filter((id) => id !== trackId));
         setTotalCacheSize((prev) => prev + trackSize);
 
-        // Save to localStorage
+        // Save to Supabase via hook
         const updated = cachedTracks.map((t) =>
           t.id === trackId ? newCached : t
         );
-        localStorage.setItem('music:cachedTracks', JSON.stringify(updated));
+        setCachedTracksData(updated);
 
         toast({
           title: '✅ Téléchargement terminé',
@@ -208,9 +200,9 @@ export const OfflineModeManager: React.FC<OfflineModeManagerProps> = ({
       setCachedTracks((prev) => prev.filter((t) => t.id !== trackId));
       setTotalCacheSize((prev) => prev - track.size);
 
-      // Update localStorage
+      // Update via Supabase hook
       const updated = cachedTracks.filter((t) => t.id !== trackId);
-      localStorage.setItem('music:cachedTracks', JSON.stringify(updated));
+      setCachedTracksData(updated);
 
       toast({
         title: '🗑️ Supprimé du cache',
