@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -19,6 +19,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import type { MusicTrack } from '@/types/music';
+import { useMusicSettings } from '@/hooks/music/useMusicSettings';
 
 interface GenerationHistory {
   id: string;
@@ -37,31 +38,71 @@ interface GenrePreference {
   selected: boolean;
 }
 
-const STORAGE_KEY = 'emotion-music-generator-data';
+interface EmotionGeneratorData {
+  history: GenerationHistory[];
+  favorites: GenerationHistory[];
+  stats: { totalGenerations: number; totalDuration: number; favoriteEmotion: string; streak: number };
+  genres: GenrePreference[];
+}
 
 const EmotionMusicGenerator: React.FC = () => {
+  const { value: savedData, setValue: setSavedData } = useMusicSettings<EmotionGeneratorData>({
+    key: 'music:emotion-generator',
+    defaultValue: {
+      history: [],
+      favorites: [],
+      stats: { totalGenerations: 0, totalDuration: 0, favoriteEmotion: '', streak: 0 },
+      genres: [
+        { id: 'ambient', label: 'Ambient', selected: false },
+        { id: 'classical', label: 'Classique', selected: false },
+        { id: 'electronic', label: 'Électronique', selected: false },
+        { id: 'jazz', label: 'Jazz', selected: false },
+        { id: 'lofi', label: 'Lo-Fi', selected: false },
+        { id: 'nature', label: 'Sons naturels', selected: false },
+      ]
+    }
+  });
+
   const [selectedEmotion, setSelectedEmotion] = useState('calm');
   const [customPrompt, setCustomPrompt] = useState('');
   const [intensity, setIntensity] = useState([50]);
   const [duration, setDuration] = useState([60]);
   const [activeTab, setActiveTab] = useState('generate');
-  const [history, setHistory] = useState<GenerationHistory[]>([]);
-  const [favorites, setFavorites] = useState<GenerationHistory[]>([]);
   const [showAdvanced, setShowAdvanced] = useState(false);
-  const [genres, setGenres] = useState<GenrePreference[]>([
-    { id: 'ambient', label: 'Ambient', selected: false },
-    { id: 'classical', label: 'Classique', selected: false },
-    { id: 'electronic', label: 'Électronique', selected: false },
-    { id: 'jazz', label: 'Jazz', selected: false },
-    { id: 'lofi', label: 'Lo-Fi', selected: false },
-    { id: 'nature', label: 'Sons naturels', selected: false },
-  ]);
-  const [stats, setStats] = useState({
-    totalGenerations: 0,
-    totalDuration: 0,
-    favoriteEmotion: '',
-    streak: 0,
-  });
+  
+  // Utiliser les données persistées
+  const history = savedData.history;
+  const favorites = savedData.favorites;
+  const stats = savedData.stats;
+  const genres = savedData.genres;
+  
+  const setHistory = (newHistory: GenerationHistory[] | ((prev: GenerationHistory[]) => GenerationHistory[])) => {
+    setSavedData(prev => ({
+      ...prev,
+      history: typeof newHistory === 'function' ? newHistory(prev.history) : newHistory
+    }));
+  };
+  
+  const setFavorites = (newFavorites: GenerationHistory[] | ((prev: GenerationHistory[]) => GenerationHistory[])) => {
+    setSavedData(prev => ({
+      ...prev,
+      favorites: typeof newFavorites === 'function' ? newFavorites(prev.favorites) : newFavorites
+    }));
+  };
+  
+  const setStats = (newStats: typeof stats | ((prev: typeof stats) => typeof stats)) => {
+    setSavedData(prev => ({
+      ...prev,
+      stats: typeof newStats === 'function' ? newStats(prev.stats) : newStats
+    }));
+  };
+  
+  const setGenres = (newGenres: GenrePreference[] | ((prev: GenrePreference[]) => GenrePreference[])) => {
+    setSavedData(prev => ({
+      ...prev,
+      genres: typeof newGenres === 'function' ? newGenres(prev.genres) : newGenres
+    }));
+  };
   
   const { generateMusic, isGenerating, error } = useMusicGeneration();
   const { loadTrack } = useMusicControls();
@@ -76,28 +117,6 @@ const EmotionMusicGenerator: React.FC = () => {
     { value: 'melancholic', label: 'Mélancolique', icon: '🌧️', color: 'bg-slate-500/20 text-slate-600' },
     { value: 'romantic', label: 'Romantique', icon: '💕', color: 'bg-pink-500/20 text-pink-600' },
   ];
-
-  // Load from localStorage
-  useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      const data = JSON.parse(saved);
-      setHistory(data.history || []);
-      setFavorites(data.favorites || []);
-      setStats(data.stats || stats);
-      if (data.genres) setGenres(data.genres);
-    }
-  }, []);
-
-  // Save to localStorage
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({
-      history,
-      favorites,
-      stats,
-      genres
-    }));
-  }, [history, favorites, stats, genres]);
 
   const handleGenerate = async () => {
     const selectedGenres = genres.filter(g => g.selected).map(g => g.label).join(', ');

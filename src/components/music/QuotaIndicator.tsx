@@ -32,6 +32,7 @@ import { UserTier } from '@/services/music/quota-service';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { useQuotaIndicatorData } from '@/hooks/music/useMusicSettings';
 
 interface QuotaIndicatorProps {
   variant?: 'default' | 'compact' | 'minimal';
@@ -50,8 +51,6 @@ interface QuotaNotification {
   threshold: number; // Percentage
 }
 
-const STORAGE_KEY = 'quota-indicator-data';
-
 export function QuotaIndicator({
   variant = 'default',
   showUpgrade = true,
@@ -69,35 +68,31 @@ export function QuotaIndicator({
     canGenerate
   } = useQuotaUI();
 
+  const { value: savedQuotaData, setValue: setSavedQuotaData } = useQuotaIndicatorData();
+  
   const [activeTab, setActiveTab] = useState('overview');
-  const [usageHistory, setUsageHistory] = useState<UsageEntry[]>([]);
-  const [notifications, setNotifications] = useState<QuotaNotification>({
-    enabled: true,
-    threshold: 20
-  });
+  const usageHistory = savedQuotaData.history || [];
+  const notifications = savedQuotaData.notifications || { enabled: true, threshold: 20 };
+  
+  const setUsageHistory = (newHistory: UsageEntry[] | ((prev: UsageEntry[]) => UsageEntry[])) => {
+    setSavedQuotaData(prev => ({
+      ...prev,
+      history: typeof newHistory === 'function' ? newHistory(prev.history || []) : newHistory
+    }));
+  };
+  
+  const setNotifications = (newNotifs: QuotaNotification | ((prev: QuotaNotification) => QuotaNotification)) => {
+    setSavedQuotaData(prev => ({
+      ...prev,
+      notifications: typeof newNotifs === 'function' ? newNotifs(prev.notifications) : newNotifs
+    }));
+  };
+
   const [predictions, setPredictions] = useState({
     daysRemaining: 0,
     dailyAverage: 0,
     willExceed: false
   });
-
-  // Load saved data
-  useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      const data = JSON.parse(saved);
-      setUsageHistory(data.history || []);
-      setNotifications(data.notifications || notifications);
-    }
-  }, []);
-
-  // Save data
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({
-      history: usageHistory,
-      notifications
-    }));
-  }, [usageHistory, notifications]);
 
   // Calculate predictions
   useEffect(() => {
@@ -381,13 +376,13 @@ export function QuotaIndicator({
                   ) : (
                     <div className="space-y-2">
                       {/* Group by date */}
-                      {Object.entries(
+                      {(Object.entries(
                         usageHistory.reduce((acc, entry) => {
                           acc[entry.date] = acc[entry.date] || [];
                           acc[entry.date].push(entry);
                           return acc;
                         }, {} as Record<string, UsageEntry[]>)
-                      )
+                      ) as [string, UsageEntry[]][])
                         .slice(0, 7)
                         .map(([date, entries]) => {
                           const total = entries.reduce((sum, e) => sum + e.count, 0);

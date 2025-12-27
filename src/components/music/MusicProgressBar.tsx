@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef, useEffect } from 'react';
+import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -16,6 +16,7 @@ import {
 import { cn } from '@/lib/utils';
 import { Repeat, Bookmark, Star, Settings2, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useMusicSettings } from '@/hooks/music/useMusicSettings';
 
 interface LoopSection {
   start: number;
@@ -44,8 +45,6 @@ export interface ProgressBarProps {
   onLoopChange?: (loop: LoopSection | null) => void;
 }
 
-const POSITIONS_KEY = 'music-saved-positions';
-
 export const MusicProgressBar: React.FC<ProgressBarProps> = ({
   currentTime = 0,
   duration = 0,
@@ -65,25 +64,35 @@ export const MusicProgressBar: React.FC<ProgressBarProps> = ({
   onLoopChange,
 }) => {
   const { toast } = useToast();
+  const { value: allPositions, setValue: setAllPositions } = useMusicSettings<Record<string, SavedPosition[]>>({
+    key: 'music:saved-positions',
+    defaultValue: {}
+  });
+  
   const [isHovering, setIsHovering] = useState(false);
   const [hoverPosition, setHoverPosition] = useState(0);
   const [hoverTime, setHoverTime] = useState(0);
   const [loop, setLoop] = useState<LoopSection | null>(null);
   const [isSettingLoop, setIsSettingLoop] = useState<'start' | 'end' | null>(null);
-  const [savedPositions, setSavedPositions] = useState<SavedPosition[]>([]);
   const [showSettings, setShowSettings] = useState(false);
   const [positionName, setPositionName] = useState('');
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Load saved positions
-  useEffect(() => {
-    if (trackId) {
-      const stored = localStorage.getItem(`${POSITIONS_KEY}-${trackId}`);
-      if (stored) {
-        setSavedPositions(JSON.parse(stored));
-      }
-    }
-  }, [trackId]);
+  // Positions sauvegardées pour ce track
+  const savedPositions = useMemo(() => 
+    trackId ? (allPositions[trackId] || []) : [], 
+    [allPositions, trackId]
+  );
+  
+  const setSavedPositions = useCallback((positions: SavedPosition[] | ((prev: SavedPosition[]) => SavedPosition[])) => {
+    if (!trackId) return;
+    setAllPositions(prev => {
+      const newPositions = typeof positions === 'function' 
+        ? positions(prev[trackId] || []) 
+        : positions;
+      return { ...prev, [trackId]: newPositions };
+    });
+  }, [trackId, setAllPositions]);
 
   const handleChange = useCallback((value: number[]) => {
     if (onSeek) {
@@ -142,9 +151,7 @@ export const MusicProgressBar: React.FC<ProgressBarProps> = ({
       createdAt: new Date().toISOString(),
     };
 
-    const updated = [...savedPositions, newPosition];
-    setSavedPositions(updated);
-    localStorage.setItem(`${POSITIONS_KEY}-${trackId}`, JSON.stringify(updated));
+    setSavedPositions(prev => [...prev, newPosition]);
     setPositionName('');
 
     toast({
@@ -155,11 +162,7 @@ export const MusicProgressBar: React.FC<ProgressBarProps> = ({
 
   // Delete saved position
   const deletePosition = (index: number) => {
-    const updated = savedPositions.filter((_, i) => i !== index);
-    setSavedPositions(updated);
-    if (trackId) {
-      localStorage.setItem(`${POSITIONS_KEY}-${trackId}`, JSON.stringify(updated));
-    }
+    setSavedPositions(prev => prev.filter((_, i) => i !== index));
   };
 
   // Jump to saved position

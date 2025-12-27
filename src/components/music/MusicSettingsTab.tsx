@@ -137,9 +137,9 @@ export const MusicSettingsTab: React.FC<MusicSettingsTabProps> = ({
   };
 
   const handleClearCache = () => {
-    localStorage.removeItem('music:favorites');
-    localStorage.removeItem('music:history');
-    localStorage.removeItem('music:lastPlayed');
+    // Les données sont maintenant dans Supabase, on nettoie seulement le cache local restant
+    const musicKeys = Object.keys(localStorage).filter(key => key.startsWith('music:'));
+    musicKeys.forEach(key => localStorage.removeItem(key));
 
     toast({
       title: 'Cache nettoyé ✓',

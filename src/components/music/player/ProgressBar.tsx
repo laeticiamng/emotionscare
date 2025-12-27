@@ -15,6 +15,7 @@ import {
   ChevronDown
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useMusicSettings } from '@/hooks/music/useMusicSettings';
 
 interface Marker {
   id: string;
@@ -51,10 +52,11 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
   onSeek,
   className = ""
 }) => {
-  const [markers, setMarkers] = useState<Marker[]>(() => {
-    const saved = localStorage.getItem('progressbar_markers');
-    return saved ? JSON.parse(saved) : [];
+  const { value: markers, setValue: setMarkers } = useMusicSettings<Marker[]>({
+    key: 'music:progressbar-markers',
+    defaultValue: []
   });
+  
   const [loop, setLoop] = useState<LoopRegion | null>(null);
   const [isLoopActive, setIsLoopActive] = useState(false);
   const [playbackSpeed, setPlaybackSpeed] = useState(1);
@@ -63,11 +65,6 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
   const [seekHistory, setSeekHistory] = useState<number[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const sliderRef = useRef<HTMLDivElement>(null);
-
-  // Persist markers
-  useEffect(() => {
-    localStorage.setItem('progressbar_markers', JSON.stringify(markers));
-  }, [markers]);
 
   // Loop logic
   useEffect(() => {
