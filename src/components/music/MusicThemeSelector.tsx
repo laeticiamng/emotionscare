@@ -29,7 +29,7 @@ import { useToast } from '@/hooks/use-toast';
 interface MusicTheme {
   id: string;
   name: string;
-  icon: React.ElementType;
+  icon: React.ComponentType<{ className?: string; style?: React.CSSProperties }>;
   colors: {
     primary: string;
     secondary: string;
@@ -220,7 +220,7 @@ export const MusicThemeSelector: React.FC<MusicThemeSelectorProps> = ({
           {/* Theme Name */}
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="text-center">
-              {React.createElement(activeTheme.icon, { className: "h-8 w-8 mx-auto mb-1", style: { color: activeTheme.colors.accent } })}
+              <activeTheme.icon className="h-8 w-8 mx-auto mb-1" style={{ color: activeTheme.colors.accent }} />
               <p className="text-sm font-medium text-white">{activeTheme.name}</p>
             </div>
           </div>
@@ -241,7 +241,7 @@ export const MusicThemeSelector: React.FC<MusicThemeSelectorProps> = ({
               }`}
               style={{ background: theme.colors.background }}
             >
-              {React.createElement(theme.icon, { className: "h-5 w-5 mx-auto", style: { color: theme.colors.accent } })}
+              <theme.icon className="h-5 w-5 mx-auto" style={{ color: theme.colors.accent }} />
               <p className="text-[10px] text-white/80 mt-1 truncate">{theme.name}</p>
               {selectedTheme === theme.id && (
                 <motion.div
