@@ -1,7 +1,5 @@
-// @ts-nocheck
-
 import { useState } from 'react';
-import { MusicTrack } from '@/types/music';
+import type { MusicTrack } from '@/types/music';
 
 const useMusicGen = () => {
   const [isGenerating, setIsGenerating] = useState(false);
@@ -15,11 +13,13 @@ const useMusicGen = () => {
       // Simulation de génération musicale
       await new Promise(resolve => setTimeout(resolve, 3000));
       
+      const audioUrl = '/audio/generated.mp3';
       const generatedTrack: MusicTrack = {
         id: Date.now().toString(),
         title: `Musique générée: ${prompt}`,
         artist: 'IA Composer',
-        url: '/audio/generated.mp3',
+        url: audioUrl,
+        audioUrl,
         duration: 180,
         emotion: 'calm'
       };

@@ -1,8 +1,7 @@
-// @ts-nocheck
 import { useCallback } from 'react';
 import { useMusic } from '@/hooks/useMusic';
 import { useSoundscape } from '@/providers/SoundscapeProvider';
-import { EmotionMusicParams, MusicPlaylist, MusicTrack } from '@/types/music';
+import type { EmotionMusicParams, MusicPlaylist, MusicTrack } from '@/types/music';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { logger } from '@/lib/logger';
