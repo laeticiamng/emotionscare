@@ -43,6 +43,9 @@ const MusicJourneySection = lazy(() => import('@/components/music/page/MusicJour
 const MusicFocusSection = lazy(() => import('@/components/music/page/MusicFocusSection').then(m => ({ default: m.MusicFocusSection })));
 const MusicStatsSection = lazy(() => import('@/components/music/page/MusicStatsSection').then(m => ({ default: m.MusicStatsSection })));
 const ImmersiveMode = lazy(() => import('@/components/music/ImmersiveMode').then(m => ({ default: m.ImmersiveMode })));
+const CollaborativePlaylistSection = lazy(() => import('@/components/music/page/CollaborativePlaylistSection').then(m => ({ default: m.CollaborativePlaylistSection })));
+const MusicSearchAndFilter = lazy(() => import('@/components/music/MusicSearchAndFilter').then(m => ({ default: m.MusicSearchAndFilter })));
+const ExternalIntegrationsPanel = lazy(() => import('@/components/music/ExternalIntegrationsPanel').then(m => ({ default: m.ExternalIntegrationsPanel })));
 
 // Composants statiques chargés immédiatement
 import {
@@ -274,6 +277,21 @@ const B2CMusicEnhanced: React.FC = () => {
 
               <Suspense fallback={<SectionSkeleton />}>
                 <MusicStatsSection />
+              </Suspense>
+
+              <Suspense fallback={<SectionSkeleton />}>
+                <MusicSearchAndFilter
+                  tracks={vinylTracks}
+                  onTrackSelect={(track) => startTrack(track as VinylTrack)}
+                />
+              </Suspense>
+
+              <Suspense fallback={<SectionSkeleton />}>
+                <CollaborativePlaylistSection />
+              </Suspense>
+
+              <Suspense fallback={<SectionSkeleton />}>
+                <ExternalIntegrationsPanel />
               </Suspense>
 
               <MusicFavoritesSection

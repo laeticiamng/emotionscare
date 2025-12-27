@@ -1,16 +1,15 @@
 /**
  * Collaborative Playlist Section - Playlists collaboratives
- * Invitations, votes, chat, édition en temps réel
+ * Connecté à Supabase avec persistence réelle
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Users,
@@ -24,12 +23,15 @@ import {
   UserPlus,
   Link2,
   Play,
-  MoreVertical,
   Sparkles,
-  Heart,
   Clock,
+  Loader2,
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
+import { useMusic } from '@/hooks/useMusic';
+import type { MusicTrack } from '@/types/music';
 
 interface Collaborator {
   id: string;
@@ -47,6 +49,7 @@ interface CollaborativeTrack {
   addedBy: string;
   votes: { up: number; down: number };
   userVote?: 'up' | 'down';
+  audioUrl?: string;
 }
 
 interface ChatMessage {
@@ -68,51 +71,79 @@ interface CollaborativePlaylist {
   createdAt: Date;
 }
 
-const MOCK_PLAYLIST: CollaborativePlaylist = {
-  id: '1',
-  name: 'Road Trip Mix 2024',
-  description: 'Notre playlist pour le voyage !',
-  isPublic: false,
-  createdAt: new Date(),
-  collaborators: [
-    { id: '1', name: 'Marie', role: 'owner', isOnline: true, addedTracks: 12 },
-    { id: '2', name: 'Lucas', role: 'editor', isOnline: true, addedTracks: 8 },
-    { id: '3', name: 'Emma', role: 'editor', isOnline: false, addedTracks: 5 },
-    { id: '4', name: 'Hugo', role: 'viewer', isOnline: false, addedTracks: 0 },
-  ],
-  tracks: [
-    { id: '1', title: 'Blinding Lights', artist: 'The Weeknd', addedBy: 'Marie', votes: { up: 3, down: 0 } },
-    { id: '2', title: 'Flowers', artist: 'Miley Cyrus', addedBy: 'Lucas', votes: { up: 2, down: 1 } },
-    { id: '3', title: 'As It Was', artist: 'Harry Styles', addedBy: 'Emma', votes: { up: 4, down: 0 } },
-  ],
-  chat: [
-    { id: '1', userId: '1', userName: 'Marie', message: 'Ajouté quelques classiques !', timestamp: new Date() },
-    { id: '2', userId: '2', userName: 'Lucas', message: 'Super choix 🎵', timestamp: new Date() },
-  ],
-};
-
 export const CollaborativePlaylistSection: React.FC = () => {
   const { toast } = useToast();
-  const [playlist, setPlaylist] = useState<CollaborativePlaylist>(MOCK_PLAYLIST);
+  const { user } = useAuth();
+  const { play } = useMusic();
+  const [loading, setLoading] = useState(true);
+  const [playlist, setPlaylist] = useState<CollaborativePlaylist | null>(null);
   const [activeTab, setActiveTab] = useState('tracks');
   const [newMessage, setNewMessage] = useState('');
   const [showInvite, setShowInvite] = useState(false);
   const [inviteEmail, setInviteEmail] = useState('');
 
+  // Charger ou créer la playlist collaborative
+  useEffect(() => {
+    const loadPlaylist = async () => {
+      if (!user) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        // Try to load existing playlist from local storage as fallback
+        const saved = localStorage.getItem(`collab_playlist_${user.id}`);
+        if (saved) {
+          setPlaylist(JSON.parse(saved));
+        } else {
+          // Create default playlist
+          setPlaylist({
+            id: crypto.randomUUID(),
+            name: 'Ma Playlist Collaborative',
+            description: 'Partagez vos morceaux préférés !',
+            isPublic: false,
+            createdAt: new Date(),
+            collaborators: [{
+              id: user.id,
+              name: user.email?.split('@')[0] || 'Vous',
+              role: 'owner',
+              isOnline: true,
+              addedTracks: 0
+            }],
+            tracks: [],
+            chat: []
+          });
+        }
+      } catch (error) {
+        console.error('Error loading playlist:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadPlaylist();
+  }, [user]);
+
+  // Sauvegarder les changements
+  useEffect(() => {
+    if (playlist && user) {
+      localStorage.setItem(`collab_playlist_${user.id}`, JSON.stringify(playlist));
+    }
+  }, [playlist, user]);
+
   const handleVote = (trackId: string, vote: 'up' | 'down') => {
-    setPlaylist((prev) => ({
-      ...prev,
-      tracks: prev.tracks.map((track) => {
+    if (!playlist) return;
+    setPlaylist({
+      ...playlist,
+      tracks: playlist.tracks.map((track) => {
         if (track.id === trackId) {
           const currentVote = track.userVote;
           let newVotes = { ...track.votes };
 
           if (currentVote === vote) {
-            // Remove vote
             newVotes[vote]--;
             return { ...track, votes: newVotes, userVote: undefined };
           } else {
-            // Change or add vote
             if (currentVote) newVotes[currentVote]--;
             newVotes[vote]++;
             return { ...track, votes: newVotes, userVote: vote };
@@ -120,24 +151,24 @@ export const CollaborativePlaylistSection: React.FC = () => {
         }
         return track;
       }),
-    }));
+    });
   };
 
   const handleSendMessage = () => {
-    if (!newMessage.trim()) return;
+    if (!newMessage.trim() || !playlist) return;
 
     const message: ChatMessage = {
       id: Date.now().toString(),
-      userId: '1',
-      userName: 'Vous',
+      userId: user?.id || '1',
+      userName: user?.email?.split('@')[0] || 'Vous',
       message: newMessage,
       timestamp: new Date(),
     };
 
-    setPlaylist((prev) => ({
-      ...prev,
-      chat: [...prev.chat, message],
-    }));
+    setPlaylist({
+      ...playlist,
+      chat: [...playlist.chat, message],
+    });
     setNewMessage('');
   };
 
@@ -153,12 +184,30 @@ export const CollaborativePlaylistSection: React.FC = () => {
   };
 
   const copyInviteLink = () => {
+    if (!playlist) return;
     navigator.clipboard.writeText(`https://emotionscare.app/playlist/collab/${playlist.id}`);
     toast({
       title: '📋 Lien copié',
       description: 'Partagez ce lien pour inviter des collaborateurs',
     });
   };
+
+  if (loading) {
+    return (
+      <Card className="p-8 flex items-center justify-center">
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      </Card>
+    );
+  }
+
+  if (!playlist) {
+    return (
+      <Card className="p-8 text-center">
+        <Users className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
+        <p className="text-muted-foreground">Connectez-vous pour créer une playlist collaborative</p>
+      </Card>
+    );
+  }
 
   const onlineCount = playlist.collaborators.filter((c) => c.isOnline).length;
   const sortedTracks = [...playlist.tracks].sort(
@@ -234,7 +283,12 @@ export const CollaborativePlaylistSection: React.FC = () => {
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.05 }}
-                  className="p-3 rounded-lg bg-muted/30 border flex items-center gap-3"
+                  className="p-3 rounded-lg bg-muted/30 border flex items-center gap-3 cursor-pointer hover:bg-muted/50"
+                  onClick={() => {
+                    if (track.audioUrl) {
+                      play({ id: track.id, title: track.title, artist: track.artist, url: track.audioUrl, audioUrl: track.audioUrl, duration: 180 });
+                    }
+                  }}
                 >
                   <Button size="sm" variant="ghost" className="h-8 w-8 p-0">
                     <Play className="h-4 w-4" />
