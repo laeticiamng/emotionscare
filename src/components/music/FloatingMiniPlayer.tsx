@@ -24,12 +24,14 @@ interface FloatingMiniPlayerProps {
   currentTrack?: MusicTrack | null;
   isPlaying?: boolean;
   progress?: number;
+  duration?: number;
   onPlayPause?: () => void;
   onNext?: () => void;
   onPrevious?: () => void;
   onExpand?: () => void;
   onClose?: () => void;
   onImmersive?: () => void;
+  onSeek?: (position: number) => void;
   isDocked?: boolean;
 }
 
@@ -37,12 +39,14 @@ export const FloatingMiniPlayer: React.FC<FloatingMiniPlayerProps> = ({
   currentTrack,
   isPlaying = false,
   progress = 0,
+  duration,
   onPlayPause,
   onNext,
   onPrevious,
   onExpand,
   onClose,
   onImmersive,
+  onSeek,
   isDocked = false,
 }) => {
   const [isMinimized, setIsMinimized] = useState(false);
@@ -146,12 +150,20 @@ export const FloatingMiniPlayer: React.FC<FloatingMiniPlayerProps> = ({
                   </div>
                 </div>
 
-                {/* Progress Bar */}
+                {/* Progress Bar - Interactive Seekbar */}
                 <div className="space-y-1">
-                  <Progress value={progress} className="h-1" />
+                  <input
+                    type="range"
+                    min={0}
+                    max={100}
+                    value={progress}
+                    onChange={(e) => onSeek?.(Number(e.target.value))}
+                    className="w-full h-1 bg-muted rounded-lg appearance-none cursor-pointer accent-primary [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer"
+                    aria-label="Progression de lecture"
+                  />
                   <div className="flex justify-between text-xs text-muted-foreground">
                     <span>{formatTime(currentTime)}</span>
-                    <span>{formatTime(currentTrack.duration)}</span>
+                    <span>{formatTime(duration || currentTrack.duration)}</span>
                   </div>
                 </div>
 

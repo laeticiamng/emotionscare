@@ -142,6 +142,47 @@ export const ImmersiveMode: React.FC<ImmersiveModeProps> = ({
     }
   };
 
+  // Handle keyboard shortcuts in immersive mode
+  useEffect(() => {
+    if (!isOpen) return;
+    
+    const handleKeyDown = (e: KeyboardEvent) => {
+      switch (e.code) {
+        case 'Space':
+          e.preventDefault();
+          handlePlayPause();
+          break;
+        case 'Escape':
+          e.preventDefault();
+          onClose?.();
+          break;
+        case 'ArrowLeft':
+          e.preventDefault();
+          onPrevious?.();
+          break;
+        case 'ArrowRight':
+          e.preventDefault();
+          onNext?.();
+          break;
+        case 'ArrowUp':
+          e.preventDefault();
+          const newVolUp = Math.min(100, localVolume + 10);
+          setLocalVolume(newVolUp);
+          onVolumeChange?.(newVolUp);
+          break;
+        case 'ArrowDown':
+          e.preventDefault();
+          const newVolDown = Math.max(0, localVolume - 10);
+          setLocalVolume(newVolDown);
+          onVolumeChange?.(newVolDown);
+          break;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, handlePlayPause, onClose, onNext, onPrevious, localVolume, onVolumeChange]);
+
   if (!isOpen || !track) return null;
 
   const currentTime = (progress / 100) * (track.duration || 0);
