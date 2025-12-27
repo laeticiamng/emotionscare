@@ -336,14 +336,23 @@ serve(async (req) => {
       const rawData = await statusRes.json();
       console.log(`[emotion-music-ai] Status response:`, JSON.stringify(rawData));
       
-      // Adapter la réponse au format attendu selon la doc
-      // Format: { data: { taskId, status: "SUCCESS", response: { data: [{ audio_url, title, duration }] } } }
+      // Adapter la réponse au format Suno API
+      // Format observé: { data: { status: "TEXT_SUCCESS", response: { sunoData: [{ audioUrl, streamAudioUrl, imageUrl, duration }] } } }
+      const sunoTracks = rawData.data?.response?.sunoData || rawData.data?.response?.data || [];
+      const firstTrack = sunoTracks[0];
+      
+      // TEXT_SUCCESS = génération terminée avec succès
+      const isComplete = rawData.data?.status === 'SUCCESS' || rawData.data?.status === 'TEXT_SUCCESS';
+      
       const statusData = {
-        status: rawData.data?.status === 'SUCCESS' ? 'complete' : rawData.data?.status?.toLowerCase() || 'pending',
-        audio_url: rawData.data?.response?.data?.[0]?.audio_url,
-        image_url: rawData.data?.response?.data?.[0]?.image_url,
-        duration: rawData.data?.response?.data?.[0]?.duration
+        status: isComplete ? 'complete' : (rawData.data?.status?.toLowerCase() || 'pending'),
+        // Priorité: audioUrl (final) > streamAudioUrl (streaming) > sourceAudioUrl
+        audio_url: firstTrack?.audioUrl || firstTrack?.streamAudioUrl || firstTrack?.sourceAudioUrl || firstTrack?.audio_url,
+        image_url: firstTrack?.imageUrl || firstTrack?.sourceImageUrl || firstTrack?.image_url,
+        duration: firstTrack?.duration
       };
+      
+      console.log(`[emotion-music-ai] Parsed status:`, JSON.stringify(statusData));
 
       if (statusData.status === 'complete' && statusData.audio_url && trackId) {
         await supabaseClient
