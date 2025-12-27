@@ -207,10 +207,18 @@ serve(async (req) => {
       console.log(`[emotion-music-ai] Generating music for emotion: ${emotion}`);
       
       // Utiliser fetchWithRetry pour gérer les erreurs temporaires
-      const sunoRes = await fetchWithRetry('https://api.suno.ai/v1/generate', {
+      // Documentation: https://docs.sunoapi.org/suno-api/generate-music
+      const sunoRes = await fetchWithRetry('https://api.sunoapi.org/api/v1/generate', {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${sunoKey}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt, make_instrumental: true, wait_audio: false })
+        body: JSON.stringify({
+          customMode: true,
+          instrumental: true,
+          model: 'V4_5',
+          prompt,
+          style: profile.desc,
+          title: `${emotion} - Therapeutic Music`
+        })
       }, 3);
 
       if (!sunoRes.ok) {
@@ -251,7 +259,8 @@ serve(async (req) => {
       }
       
       const sunoData = await sunoRes.json();
-      console.log(`[emotion-music-ai] Suno generation started:`, sunoData.id);
+      const taskId = sunoData.data?.taskId || sunoData.id;
+      console.log(`[emotion-music-ai] Suno generation started:`, taskId);
 
       const { data: track } = await supabaseClient
         .from('generated_music_tracks')
@@ -259,7 +268,7 @@ serve(async (req) => {
           user_id: user.id,
           emotion,
           prompt,
-          original_task_id: sunoData.id,
+          original_task_id: taskId,
           generation_status: 'pending',
           metadata: { profile }
         })
@@ -274,7 +283,7 @@ serve(async (req) => {
 
       return new Response(JSON.stringify({
         success: true,
-        taskId: sunoData.id,
+        taskId,
         trackId: track?.id,
         sessionId: session?.id,
         emotion,
@@ -283,9 +292,9 @@ serve(async (req) => {
       }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
 
-    // Check status
+    // Check status - Documentation: https://docs.sunoapi.org/suno-api/query-task
     if (action === 'check-status') {
-      const statusRes = await fetch(`https://api.suno.ai/v1/generate/${sunoTaskId}`, {
+      const statusRes = await fetch(`https://api.sunoapi.org/api/v1/query?taskId=${sunoTaskId}`, {
         headers: { 'Authorization': `Bearer ${sunoKey}` }
       });
 
@@ -299,7 +308,14 @@ serve(async (req) => {
         
         throw new Error(`Erreur lors de la vérification du statut: ${statusRes.status}`);
       }
-      const statusData = await statusRes.json();
+      const rawData = await statusRes.json();
+      // Adapter la réponse au format attendu
+      const statusData = {
+        status: rawData.data?.status === 'SUCCESS' ? 'complete' : rawData.data?.status?.toLowerCase() || 'pending',
+        audio_url: rawData.data?.sunoData?.[0]?.audioUrl,
+        image_url: rawData.data?.sunoData?.[0]?.imageUrl,
+        duration: rawData.data?.sunoData?.[0]?.duration
+      };
 
       if (statusData.status === 'complete' && statusData.audio_url && trackId) {
         await supabaseClient
