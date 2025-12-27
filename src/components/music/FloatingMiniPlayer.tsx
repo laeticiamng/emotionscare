@@ -16,6 +16,7 @@ import {
   X,
   Maximize2,
   Volume2,
+  Sparkles,
 } from 'lucide-react';
 import type { MusicTrack } from '@/types/music';
 
@@ -28,6 +29,7 @@ interface FloatingMiniPlayerProps {
   onPrevious?: () => void;
   onExpand?: () => void;
   onClose?: () => void;
+  onImmersive?: () => void;
   isDocked?: boolean;
 }
 
@@ -40,6 +42,7 @@ export const FloatingMiniPlayer: React.FC<FloatingMiniPlayerProps> = ({
   onPrevious,
   onExpand,
   onClose,
+  onImmersive,
   isDocked = false,
 }) => {
   const [isMinimized, setIsMinimized] = useState(false);
@@ -201,6 +204,16 @@ export const FloatingMiniPlayer: React.FC<FloatingMiniPlayerProps> = ({
                   >
                     <Maximize2 className="h-4 w-4" />
                     Agrandir
+                  </Button>
+
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    className="gap-1"
+                    onClick={onImmersive}
+                    title="Mode immersif"
+                  >
+                    <Sparkles className="h-4 w-4" />
                   </Button>
 
                   <Button

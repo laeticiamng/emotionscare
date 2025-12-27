@@ -148,8 +148,9 @@ const VoiceCommands: React.FC = () => {
 
   return (
     <Card className={cn(
-      "fixed bottom-24 left-4 p-4 shadow-lg border-border/50 backdrop-blur-sm z-50",
-      "bg-background/90 transition-all duration-300 min-w-[280px]",
+      "fixed bottom-24 left-4 p-3 shadow-lg border-border/50 backdrop-blur-sm z-50",
+      "bg-background/90 transition-all duration-300",
+      "w-auto min-w-[200px] md:min-w-[280px]",
       isListening && "ring-2 ring-primary"
     )}>
       <div className="space-y-3">

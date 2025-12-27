@@ -82,7 +82,7 @@ export const CollaborativePlaylistSection: React.FC = () => {
   const [showInvite, setShowInvite] = useState(false);
   const [inviteEmail, setInviteEmail] = useState('');
 
-  // Charger ou créer la playlist collaborative
+  // Charger ou créer la playlist collaborative depuis Supabase
   useEffect(() => {
     const loadPlaylist = async () => {
       if (!user) {
@@ -91,13 +91,20 @@ export const CollaborativePlaylistSection: React.FC = () => {
       }
 
       try {
-        // Try to load existing playlist from local storage as fallback
-        const saved = localStorage.getItem(`collab_playlist_${user.id}`);
-        if (saved) {
-          setPlaylist(JSON.parse(saved));
+        // Charger depuis Supabase user_settings
+        const { data, error } = await supabase
+          .from('user_settings')
+          .select('value')
+          .eq('user_id', user.id)
+          .eq('key', 'collab_playlist')
+          .maybeSingle();
+
+        if (data?.value) {
+          const parsed = typeof data.value === 'string' ? JSON.parse(data.value) : data.value;
+          setPlaylist(parsed as CollaborativePlaylist);
         } else {
           // Create default playlist
-          setPlaylist({
+          const newPlaylist: CollaborativePlaylist = {
             id: crypto.randomUUID(),
             name: 'Ma Playlist Collaborative',
             description: 'Partagez vos morceaux préférés !',
@@ -112,7 +119,8 @@ export const CollaborativePlaylistSection: React.FC = () => {
             }],
             tracks: [],
             chat: []
-          });
+          };
+          setPlaylist(newPlaylist);
         }
       } catch (error) {
         console.error('Error loading playlist:', error);
@@ -124,11 +132,29 @@ export const CollaborativePlaylistSection: React.FC = () => {
     loadPlaylist();
   }, [user]);
 
-  // Sauvegarder les changements
+  // Sauvegarder les changements vers Supabase
   useEffect(() => {
-    if (playlist && user) {
-      localStorage.setItem(`collab_playlist_${user.id}`, JSON.stringify(playlist));
-    }
+    if (!playlist || !user) return;
+
+    const saveToSupabase = async () => {
+      try {
+        const { error } = await supabase
+          .from('user_settings')
+          .upsert({
+            user_id: user.id,
+            key: 'collab_playlist',
+            value: JSON.stringify(playlist),
+            updated_at: new Date().toISOString()
+          }, { onConflict: 'user_id,key' });
+
+        if (error) throw error;
+      } catch (error) {
+        console.error('Error saving playlist:', error);
+      }
+    };
+
+    const debounce = setTimeout(saveToSupabase, 500);
+    return () => clearTimeout(debounce);
   }, [playlist, user]);
 
   const handleVote = (trackId: string, vote: 'up' | 'down') => {

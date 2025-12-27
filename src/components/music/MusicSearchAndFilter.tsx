@@ -55,7 +55,7 @@ export const MusicSearchAndFilter: React.FC<MusicSearchAndFilterProps> = ({
   const [filters, setFilters] = useState<FilterOptions>({
     mood: [],
     category: [],
-    durationRange: [0, 600], // 0 to 10 minutes
+    durationRange: [0, 10], // 0 to 10 minutes (en minutes maintenant)
   });
 
   // Filtered results
@@ -79,11 +79,11 @@ export const MusicSearchAndFilter: React.FC<MusicSearchAndFilterProps> = ({
         filters.category.length === 0 ||
         (track.category && filters.category.includes(track.category));
 
-      // Duration filter
-      const trackDuration = Math.floor(track.duration / 60);
+      // Duration filter (en minutes)
+      const trackDurationMin = Math.floor(track.duration / 60);
       const matchesDuration =
-        trackDuration >= filters.durationRange[0] &&
-        trackDuration <= filters.durationRange[1];
+        trackDurationMin >= filters.durationRange[0] &&
+        trackDurationMin <= filters.durationRange[1];
 
       return matchesSearch && matchesMood && matchesCategory && matchesDuration;
     });
@@ -110,13 +110,13 @@ export const MusicSearchAndFilter: React.FC<MusicSearchAndFilterProps> = ({
     setFilters({
       mood: [],
       category: [],
-      durationRange: [0, 600],
+      durationRange: [0, 10],
     });
   };
 
   const activeFilterCount =
     filters.mood.length + filters.category.length +
-    (filters.durationRange[0] > 0 || filters.durationRange[1] < 600 ? 1 : 0);
+    (filters.durationRange[0] > 0 || filters.durationRange[1] < 10 ? 1 : 0);
 
   return (
     <Card>
@@ -250,7 +250,7 @@ export const MusicSearchAndFilter: React.FC<MusicSearchAndFilterProps> = ({
                   <input
                     type="range"
                     min="0"
-                    max="600"
+                    max="10"
                     value={filters.durationRange[0]}
                     onChange={(e) =>
                       setFilters((prev) => ({
@@ -266,7 +266,7 @@ export const MusicSearchAndFilter: React.FC<MusicSearchAndFilterProps> = ({
                   <input
                     type="range"
                     min="0"
-                    max="600"
+                    max="10"
                     value={filters.durationRange[1]}
                     onChange={(e) =>
                       setFilters((prev) => ({
@@ -281,7 +281,7 @@ export const MusicSearchAndFilter: React.FC<MusicSearchAndFilterProps> = ({
                   />
                 </div>
                 <div className="flex gap-2 text-xs">
-                  {['Court (0-3 min)', 'Moyen (3-5 min)', 'Long (5-10 min)'].map(
+                  {['Court (0-3)', 'Moyen (3-5)', 'Long (5-10)'].map(
                     (label, idx) => (
                       <Button
                         key={label}
@@ -289,14 +289,14 @@ export const MusicSearchAndFilter: React.FC<MusicSearchAndFilterProps> = ({
                         variant="outline"
                         className="text-xs h-7"
                         onClick={() => {
-                          const ranges = [
-                            [0, 180],
-                            [180, 300],
-                            [300, 600],
+                          const ranges: [number, number][] = [
+                            [0, 3],
+                            [3, 5],
+                            [5, 10],
                           ];
                           setFilters((prev) => ({
                             ...prev,
-                            durationRange: ranges[idx] as [number, number],
+                            durationRange: ranges[idx],
                           }));
                         }}
                       >
