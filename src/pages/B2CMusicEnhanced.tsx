@@ -1,10 +1,11 @@
 /**
  * B2C MUSIC ENHANCED - EmotionsCare
  * Interface vinyles thérapeutiques avec player audio unifié
- * Refactorisé avec lazy loading et composants modulaires
+ * Refactorisé avec lazy loading, memo et composants modulaires
+ * Optimisé pour performance maximale
  */
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, lazy, Suspense, useCallback, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePageSEO } from '@/hooks/usePageSEO';
 import { useOptimizedPage } from '@/hooks/useOptimizedPage';
@@ -12,6 +13,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { TooltipProvider } from '@/components/ui/tooltip';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Music, ArrowLeft, Loader2, Heart, Brain, Zap, Sparkles } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useMusic } from '@/hooks/useMusic';
@@ -33,18 +35,32 @@ import { useMusicPreferencesLearning } from '@/hooks/useMusicPreferencesLearning
 import { useTasteChangeNotifications } from '@/hooks/useTasteChangeNotifications';
 import { useMusicHistory, useLastPlayedTrack } from '@/hooks/music/useMusicSettings';
 
-// Composants de page modulaires
+// Lazy loading des sections lourdes pour optimiser le first paint
+const VinylCollection = lazy(() => import('@/components/music/page/VinylCollection').then(m => ({ default: m.VinylCollection })));
+const MusicGeneratorSection = lazy(() => import('@/components/music/page/MusicGeneratorSection').then(m => ({ default: m.MusicGeneratorSection })));
+const MusicGamificationSection = lazy(() => import('@/components/music/page/MusicGamificationSection').then(m => ({ default: m.MusicGamificationSection })));
+const MusicJourneySection = lazy(() => import('@/components/music/page/MusicJourneySection').then(m => ({ default: m.MusicJourneySection })));
+const MusicFocusSection = lazy(() => import('@/components/music/page/MusicFocusSection').then(m => ({ default: m.MusicFocusSection })));
+
+// Composants statiques chargés immédiatement
 import {
   MusicPageHeader,
   VinylIntroduction,
-  VinylCollection,
   MusicFavoritesSection,
   MusicHistorySection,
-  MusicJourneySection,
-  MusicGamificationSection,
-  MusicFocusSection,
-  MusicGeneratorSection
 } from '@/components/music/page';
+
+// Skeleton de chargement optimisé
+const SectionSkeleton = memo(() => (
+  <Card className="p-6">
+    <Skeleton className="h-6 w-1/3 mb-4" />
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      {[1, 2, 3, 4].map(i => (
+        <Skeleton key={i} className="h-32 rounded-lg" />
+      ))}
+    </div>
+  </Card>
+));
 
 // Types
 interface VinylTrack extends MusicTrack {
@@ -161,8 +177,8 @@ const B2CMusicEnhanced: React.FC = () => {
     }
   }, [insights, toast]);
 
-  // Handlers
-  const startTrack = async (track: VinylTrack) => {
+  // Handlers optimisés avec useCallback
+  const startTrack = useCallback(async (track: VinylTrack) => {
     setLoadingTrackId(track.id);
     try {
       setPlayerVisible(true);
@@ -176,7 +192,29 @@ const B2CMusicEnhanced: React.FC = () => {
     } finally {
       setLoadingTrackId(null);
     }
-  };
+  }, [play, setLastPlayed, updateChallengeProgress, toast]);
+
+  // Handler pour next/previous via contexte
+  const handleNext = useCallback(() => {
+    if (musicContext?.next) {
+      musicContext.next();
+    }
+  }, [musicContext]);
+
+  const handlePrevious = useCallback(() => {
+    if (musicContext?.previous) {
+      musicContext.previous();
+    }
+  }, [musicContext]);
+
+  const handlePlayPause = useCallback(() => {
+    if (!state.currentTrack) return;
+    if (state.isPlaying) {
+      musicContext?.pause();
+    } else {
+      play(state.currentTrack);
+    }
+  }, [state.currentTrack, state.isPlaying, musicContext, play]);
 
   return (
     <div className="min-h-full bg-background p-8">
@@ -212,16 +250,24 @@ const B2CMusicEnhanced: React.FC = () => {
             <div className="space-y-12">
               <VinylIntroduction />
 
-              <MusicGeneratorSection 
-                currentEmotion={state.currentTrack?.emotion || 'calm'} 
-                userId={user?.id || 'anonymous'} 
-              />
+              <Suspense fallback={<SectionSkeleton />}>
+                <MusicGeneratorSection 
+                  currentEmotion={state.currentTrack?.emotion || 'calm'} 
+                  userId={user?.id || 'anonymous'} 
+                />
+              </Suspense>
 
-              <MusicGamificationSection />
+              <Suspense fallback={<SectionSkeleton />}>
+                <MusicGamificationSection />
+              </Suspense>
 
-              <MusicJourneySection />
+              <Suspense fallback={<SectionSkeleton />}>
+                <MusicJourneySection />
+              </Suspense>
 
-              <MusicFocusSection />
+              <Suspense fallback={<SectionSkeleton />}>
+                <MusicFocusSection />
+              </Suspense>
 
               <MusicFavoritesSection
                 tracks={vinylTracks}
@@ -237,16 +283,18 @@ const B2CMusicEnhanced: React.FC = () => {
                 onStartTrack={(track) => startTrack(track as VinylTrack)}
               />
 
-              <VinylCollection
-                tracks={vinylTracks}
-                audioSources={audioSources}
-                loadingTrackId={loadingTrackId}
-                categoryIcons={categoryIcons}
-                isFavorite={(id) => musicFavorites.isFavorite(id)}
-                isLoadingFavorites={musicFavorites.isLoading}
-                onStartTrack={startTrack}
-                onToggleFavorite={(track) => musicFavorites.toggleFavorite(track)}
-              />
+              <Suspense fallback={<SectionSkeleton />}>
+                <VinylCollection
+                  tracks={vinylTracks}
+                  audioSources={audioSources}
+                  loadingTrackId={loadingTrackId}
+                  categoryIcons={categoryIcons}
+                  isFavorite={(id) => musicFavorites.isFavorite(id)}
+                  isLoadingFavorites={musicFavorites.isLoading}
+                  onStartTrack={startTrack}
+                  onToggleFavorite={(track) => musicFavorites.toggleFavorite(track)}
+                />
+              </Suspense>
             </div>
           ) : (
             <div className="max-w-2xl mx-auto space-y-6">
@@ -266,9 +314,9 @@ const B2CMusicEnhanced: React.FC = () => {
           currentTrack={state.currentTrack}
           isPlaying={state.isPlaying}
           progress={state.progress}
-          onPlayPause={() => state.currentTrack && !state.isPlaying && play(state.currentTrack)}
-          onNext={() => {}}
-          onPrevious={() => {}}
+          onPlayPause={handlePlayPause}
+          onNext={handleNext}
+          onPrevious={handlePrevious}
           onExpand={() => setPlayerVisible(true)}
           isDocked={playerVisible}
         />
