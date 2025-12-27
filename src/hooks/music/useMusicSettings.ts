@@ -31,7 +31,9 @@ type SettingKey =
   | 'music:saved-positions'
   | 'music:emotion-generator'
   | 'music:progressbar-markers'
-  | 'music:adaptive-playback';
+  | 'music:adaptive-playback'
+  | 'music:integrations'
+  | 'music:email';
 
 interface UseMusicSettingsOptions<T> {
   key: SettingKey;
