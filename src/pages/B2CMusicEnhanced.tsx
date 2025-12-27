@@ -343,8 +343,25 @@ const B2CMusicEnhanced: React.FC = () => {
           onNext={handleNext}
           onPrevious={handlePrevious}
           onExpand={() => setPlayerVisible(true)}
+          onImmersive={() => setShowImmersive(true)}
           isDocked={playerVisible}
         />
+
+        {/* Immersive Mode */}
+        <Suspense fallback={null}>
+          <ImmersiveMode
+            track={state.currentTrack || undefined}
+            isPlaying={state.isPlaying}
+            progress={state.progress}
+            volume={state.volume * 100}
+            isOpen={showImmersive}
+            onClose={() => setShowImmersive(false)}
+            onPlay={() => state.currentTrack && play(state.currentTrack)}
+            onPause={() => musicContext?.pause()}
+            onNext={handleNext}
+            onPrevious={handlePrevious}
+          />
+        </Suspense>
       </TooltipProvider>
     </div>
   );
