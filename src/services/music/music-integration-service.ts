@@ -1,9 +1,11 @@
 /**
  * Music Integration Service - Gestionnaire central des intégrations
  * Coordonne Streaming, Notifications, et Widget
+ * Migré vers Supabase user_settings
  */
 
 import { logger } from '@/lib/logger';
+import { supabase } from '@/integrations/supabase/client';
 
 interface StreamingServiceConfig {
   serviceId: 'spotify' | 'apple' | 'youtube' | 'tidal';
@@ -38,9 +40,10 @@ class MusicIntegrationService {
     detectDuplicates: true,
   };
   private syncIntervals: Map<string, NodeJS.Timeout> = new Map();
+  private userId: string | null = null;
 
   private constructor() {
-    this.loadFromLocalStorage();
+    this.loadFromSupabase();
     logger.info('Music Integration Service initialized', {}, 'INTEGRATION');
   }
 
@@ -68,7 +71,7 @@ class MusicIntegrationService {
     };
 
     this.streamingServices.set(serviceId, config);
-    this.saveToLocalStorage();
+    this.saveToSupabase();
 
     logger.info(`Connected to ${serviceId}`, { serviceId }, 'INTEGRATION');
   }
@@ -78,7 +81,7 @@ class MusicIntegrationService {
    */
   async disconnectStreamingService(serviceId: string): Promise<void> {
     this.streamingServices.delete(serviceId);
-    this.saveToLocalStorage();
+    this.saveToSupabase();
 
     // Stop auto-sync if enabled
     this.stopAutoSync(serviceId);
@@ -227,7 +230,7 @@ class MusicIntegrationService {
    */
   setNotificationPreferences(preferences: NotificationPreference[]): void {
     this.notificationPreferences = preferences;
-    this.saveToLocalStorage();
+    this.saveToSupabase();
 
     logger.info(`Updated notification preferences`,
       { count: preferences.length },
@@ -247,7 +250,7 @@ class MusicIntegrationService {
    */
   setSyncOptions(options: Partial<PlaylistSyncOptions>): void {
     this.syncOptions = { ...this.syncOptions, ...options };
-    this.saveToLocalStorage();
+    this.saveToSupabase();
 
     logger.info(`Updated sync options`, { options }, 'INTEGRATION');
   }
@@ -314,53 +317,76 @@ class MusicIntegrationService {
   }
 
   /**
-   * Save to localStorage
+   * Save to Supabase
    */
-  private saveToLocalStorage(): void {
+  private async saveToSupabase(): Promise<void> {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      
       const data = {
         streamingServices: Array.from(this.streamingServices.entries()),
         notificationPreferences: this.notificationPreferences,
         syncOptions: this.syncOptions,
       };
-      localStorage.setItem('music:integrations', JSON.stringify(data));
+      
+      await supabase
+        .from('user_settings')
+        .upsert({
+          user_id: user.id,
+          setting_key: 'music:integrations',
+          setting_value: data,
+          updated_at: new Date().toISOString()
+        }, { onConflict: 'user_id,setting_key' });
     } catch (error) {
-      logger.error('Failed to save integrations to localStorage',
-        error as Error,
-        'INTEGRATION'
-      );
+      logger.error('Failed to save integrations to Supabase', error as Error, 'INTEGRATION');
     }
   }
 
   /**
-   * Load from localStorage
+   * Load from Supabase
    */
-  private loadFromLocalStorage(): void {
+  private async loadFromSupabase(): Promise<void> {
     try {
-      const stored = localStorage.getItem('music:integrations');
-      if (stored) {
-        const data = JSON.parse(stored);
-        this.streamingServices = new Map(data.streamingServices || []);
-        this.notificationPreferences = data.notificationPreferences || [];
-        this.syncOptions = { ...this.syncOptions, ...data.syncOptions };
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      
+      this.userId = user.id;
+      
+      const { data } = await supabase
+        .from('user_settings')
+        .select('setting_value')
+        .eq('user_id', user.id)
+        .eq('setting_key', 'music:integrations')
+        .single();
+      
+      if (data?.setting_value) {
+        const stored = data.setting_value as Record<string, unknown>;
+        this.streamingServices = new Map(stored.streamingServices as [string, StreamingServiceConfig][] || []);
+        this.notificationPreferences = stored.notificationPreferences as NotificationPreference[] || [];
+        this.syncOptions = { ...this.syncOptions, ...stored.syncOptions as PlaylistSyncOptions };
       }
     } catch (error) {
-      logger.error('Failed to load integrations from localStorage',
-        error as Error,
-        'INTEGRATION'
-      );
+      logger.error('Failed to load integrations from Supabase', error as Error, 'INTEGRATION');
     }
   }
 
   /**
    * Clear all integrations
    */
-  clearAll(): void {
+  async clearAll(): Promise<void> {
     this.streamingServices.clear();
     this.notificationPreferences = [];
     this.syncIntervals.forEach((timeoutId) => clearInterval(timeoutId));
     this.syncIntervals.clear();
-    localStorage.removeItem('music:integrations');
+    
+    if (this.userId) {
+      await supabase
+        .from('user_settings')
+        .delete()
+        .eq('user_id', this.userId)
+        .eq('setting_key', 'music:integrations');
+    }
 
     logger.info('Cleared all integrations', {}, 'INTEGRATION');
   }

@@ -1,9 +1,11 @@
 /**
  * Email Integration Service - Gestion des digests hebdomadaires
  * Composition et envoi de rapports email personnalisés
+ * Migré vers Supabase user_settings
  */
 
 import { logger } from '@/lib/logger';
+import { supabase } from '@/integrations/supabase/client';
 
 interface EmailTemplate {
   type: 'weekly_digest' | 'monthly_report' | 'achievement_unlock' | 'personalized_recommendation';
@@ -67,9 +69,10 @@ class EmailIntegrationService {
   private scheduledEmails: ScheduledEmail[] = [];
   private emailQueue: ScheduledEmail[] = [];
   private sendInterval: NodeJS.Timeout | null = null;
+  private userId: string | null = null;
 
   private constructor() {
-    this.loadFromLocalStorage();
+    this.loadFromSupabase();
     logger.info('Email Integration Service initialized', {}, 'EMAIL_SERVICE');
   }
 
@@ -85,7 +88,7 @@ class EmailIntegrationService {
    */
   setEmailPreferences(userId: string, preferences: EmailPreference): void {
     this.emailPreferences.set(userId, preferences);
-    this.saveToLocalStorage();
+    this.saveToSupabase();
 
     logger.info(`Email preferences updated for user ${userId}`, { userId }, 'EMAIL_SERVICE');
   }
@@ -249,7 +252,7 @@ class EmailIntegrationService {
 
     this.scheduledEmails.push(scheduledEmail);
     this.emailQueue.push(scheduledEmail);
-    this.saveToLocalStorage();
+    this.saveToSupabase();
 
     logger.info(`Weekly digest scheduled for ${userId}`, { userId, recipient: recipientEmail }, 'EMAIL_SERVICE');
   }
@@ -282,7 +285,7 @@ class EmailIntegrationService {
 
     // Clear queue
     this.emailQueue = this.emailQueue.filter((e) => !e.sent);
-    this.saveToLocalStorage();
+    this.saveToSupabase();
 
     return { sent, failed };
   }
@@ -358,35 +361,57 @@ class EmailIntegrationService {
   }
 
   /**
-   * Save to localStorage
+   * Save to Supabase
    */
-  private saveToLocalStorage(): void {
+  private async saveToSupabase(): Promise<void> {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      
       const data = {
         preferences: Array.from(this.emailPreferences.entries()),
         scheduledEmails: this.scheduledEmails,
         emailQueue: this.emailQueue,
       };
-      localStorage.setItem('music:email', JSON.stringify(data));
+      
+      await supabase
+        .from('user_settings')
+        .upsert({
+          user_id: user.id,
+          setting_key: 'music:email',
+          setting_value: data,
+          updated_at: new Date().toISOString()
+        }, { onConflict: 'user_id,setting_key' });
     } catch (error) {
-      logger.error('Failed to save email data to localStorage', error as Error, 'EMAIL_SERVICE');
+      logger.error('Failed to save email data to Supabase', error as Error, 'EMAIL_SERVICE');
     }
   }
 
   /**
-   * Load from localStorage
+   * Load from Supabase
    */
-  private loadFromLocalStorage(): void {
+  private async loadFromSupabase(): Promise<void> {
     try {
-      const stored = localStorage.getItem('music:email');
-      if (stored) {
-        const data = JSON.parse(stored);
-        this.emailPreferences = new Map(data.preferences || []);
-        this.scheduledEmails = data.scheduledEmails || [];
-        this.emailQueue = data.emailQueue || [];
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      
+      this.userId = user.id;
+      
+      const { data } = await supabase
+        .from('user_settings')
+        .select('setting_value')
+        .eq('user_id', user.id)
+        .eq('setting_key', 'music:email')
+        .single();
+      
+      if (data?.setting_value) {
+        const stored = data.setting_value as Record<string, unknown>;
+        this.emailPreferences = new Map(stored.preferences as [string, EmailPreference][] || []);
+        this.scheduledEmails = stored.scheduledEmails as ScheduledEmail[] || [];
+        this.emailQueue = stored.emailQueue as ScheduledEmail[] || [];
       }
     } catch (error) {
-      logger.error('Failed to load email data from localStorage', error as Error, 'EMAIL_SERVICE');
+      logger.error('Failed to load email data from Supabase', error as Error, 'EMAIL_SERVICE');
     }
   }
 }

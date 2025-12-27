@@ -218,7 +218,7 @@ export const OfflineModeManager: React.FC<OfflineModeManagerProps> = ({
     if (confirm('Vider complètement le cache ?')) {
       setCachedTracks([]);
       setTotalCacheSize(0);
-      localStorage.removeItem('music:cachedTracks');
+      // Cleared via hook - no localStorage needed
 
       toast({
         title: '🗑️ Cache vidé',
