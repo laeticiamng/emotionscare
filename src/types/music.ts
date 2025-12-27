@@ -22,8 +22,9 @@ export interface MusicTrack {
   key?: string;
   energy?: number;
   intensity?: number;
+  valence?: number;
   status?: 'pending' | 'generating' | 'completed' | 'failed';
-  // Ajout pour compatibilité avec ancien système
+  // Compatibilité avec ancien système
   cover?: string;
   name?: string;
   audio_url?: string;
@@ -100,6 +101,12 @@ export interface AdaptiveMusicConfig {
   emotionTarget?: string;
   intensityThreshold?: number;
   adaptiveVolume?: boolean;
+  // Extended config for adaptive music service
+  emotionSensitivity?: number;
+  autoTransition?: boolean;
+  fadeInDuration?: number;
+  fadeOutDuration?: number;
+  volumeAdjustment?: boolean;
 }
 
 // Re-export MusicContextType from context (will be imported where needed)

@@ -1,7 +1,5 @@
-// @ts-nocheck
-
 import { useState, useEffect, useCallback } from 'react';
-import { MusicTrack, AdaptiveMusicConfig } from '@/types/music';
+import type { MusicTrack, AdaptiveMusicConfig } from '@/types/music';
 import { adaptiveMusicService } from '@/services/adaptiveMusicService';
 import { useMusicControls } from './useMusicControls';
 
@@ -24,7 +22,7 @@ export const useAdaptiveMusic = ({
     ...initialConfig
   }));
 
-  const musicControls = useMusicControls(recommendedTrack);
+  const musicControls = useMusicControls();
 
   // Mettre à jour la configuration du service
   useEffect(() => {
@@ -49,7 +47,8 @@ export const useAdaptiveMusic = ({
     if (musicControls.isPlaying) {
       const originalVolume = musicControls.volume;
       const fadeSteps = 20;
-      const fadeStepDuration = config.fadeOutDuration / fadeSteps;
+      const fadeOutDur = config.fadeOutDuration ?? 1500;
+      const fadeStepDuration = fadeOutDur / fadeSteps;
       const volumeStep = originalVolume / fadeSteps;
 
       for (let i = 0; i < fadeSteps; i++) {
@@ -71,7 +70,8 @@ export const useAdaptiveMusic = ({
       musicControls.setVolume(0);
 
       const fadeSteps = 20;
-      const fadeStepDuration = config.fadeInDuration / fadeSteps;
+      const fadeInDur = config.fadeInDuration ?? 2000;
+      const fadeStepDuration = fadeInDur / fadeSteps;
       const volumeStep = targetVolume / fadeSteps;
 
       for (let i = 0; i < fadeSteps; i++) {

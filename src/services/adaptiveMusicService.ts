@@ -1,6 +1,4 @@
-// @ts-nocheck
-
-import { MusicTrack, Playlist, AdaptiveMusicConfig } from '@/types/music';
+import type { MusicTrack, Playlist, AdaptiveMusicConfig } from '@/types/music';
 
 export class AdaptiveMusicService {
   private static instance: AdaptiveMusicService;
@@ -40,6 +38,7 @@ export class AdaptiveMusicService {
           artist: 'Nature Sounds',
           duration: 300,
           url: '/music/calm/forest-meditation.mp3',
+          audioUrl: '/music/calm/forest-meditation.mp3',
           emotion: 'calm',
           bpm: 60,
           energy: 0.2,
@@ -51,6 +50,7 @@ export class AdaptiveMusicService {
           artist: 'Ambient Nature',
           duration: 420,
           url: '/music/calm/ocean-waves.mp3',
+          audioUrl: '/music/calm/ocean-waves.mp3',
           emotion: 'calm',
           bpm: 55,
           energy: 0.1,
@@ -72,6 +72,7 @@ export class AdaptiveMusicService {
           artist: 'Upbeat Collective',
           duration: 240,
           url: '/music/happy/sunny-day.mp3',
+          audioUrl: '/music/happy/sunny-day.mp3',
           emotion: 'happy',
           bpm: 120,
           energy: 0.8,
@@ -83,6 +84,7 @@ export class AdaptiveMusicService {
           artist: 'Feel Good Band',
           duration: 180,
           url: '/music/happy/morning-energy.mp3',
+          audioUrl: '/music/happy/morning-energy.mp3',
           emotion: 'happy',
           bpm: 110,
           energy: 0.7,
@@ -104,6 +106,7 @@ export class AdaptiveMusicService {
           artist: 'Mindful Music',
           duration: 360,
           url: '/music/anxious/breathing-space.mp3',
+          audioUrl: '/music/anxious/breathing-space.mp3',
           emotion: 'calm',
           bpm: 65,
           energy: 0.3,

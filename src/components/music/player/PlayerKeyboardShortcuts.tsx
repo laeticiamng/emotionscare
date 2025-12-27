@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React, { useEffect } from 'react';
 import { useMusic } from '@/hooks/useMusic';
 import { toast } from '@/hooks/use-toast';
@@ -13,15 +11,8 @@ const PlayerKeyboardShortcuts: React.FC<PlayerKeyboardShortcutsProps> = ({
   enabled = true,
   showTooltips = false
 }) => {
-  const {
-    isPlaying,
-    volume,
-    play,
-    pause,
-    next,
-    previous,
-    setVolume
-  } = useMusic();
+  const { state, play, pause, next, previous, setVolume } = useMusic();
+  const { isPlaying, volume } = state;
 
   useEffect(() => {
     if (!enabled) return;
