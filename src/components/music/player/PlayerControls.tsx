@@ -15,9 +15,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useToast } from '@/hooks/use-toast';
-
-const FAVORITES_KEY = 'music_favorites';
-const PLAYBACK_STATS_KEY = 'music_playback_stats';
+import { useMusicPlayerFavorites, usePlaybackStats } from '@/hooks/music/useMusicSettings';
 
 export interface PlayerControlsProps {
   isPlaying: boolean;
@@ -51,41 +49,31 @@ const PlayerControls: React.FC<PlayerControlsProps> = ({
   showExtendedControls = true
 }) => {
   const { toast } = useToast();
+  const { value: favorites, setValue: setFavorites } = useMusicPlayerFavorites();
+  const { value: stats, setValue: setStats } = usePlaybackStats();
+  
   const [shuffleEnabled, setShuffleEnabled] = useState(false);
   const [repeatMode, setRepeatMode] = useState<'off' | 'all' | 'one'>('off');
-  const [favorites, setFavorites] = useState<string[]>([]);
-  const [stats, setStats] = useState({ totalPlays: 0, totalTime: 0, favoriteGenre: '' });
   const [showAnimation, setShowAnimation] = useState(false);
-
-  // Load saved data
-  useEffect(() => {
-    const savedFavorites = localStorage.getItem(FAVORITES_KEY);
-    const savedStats = localStorage.getItem(PLAYBACK_STATS_KEY);
-    
-    if (savedFavorites) setFavorites(JSON.parse(savedFavorites));
-    if (savedStats) setStats(JSON.parse(savedStats));
-  }, []);
 
   // Track play events
   useEffect(() => {
     if (isPlaying && currentTrackId) {
-      const newStats = { ...stats, totalPlays: stats.totalPlays + 1 };
-      setStats(newStats);
-      localStorage.setItem(PLAYBACK_STATS_KEY, JSON.stringify(newStats));
+      setStats(prev => ({ ...prev, totalPlays: prev.totalPlays + 1 }));
     }
-  }, [isPlaying, currentTrackId]);
+  }, [isPlaying, currentTrackId, setStats]);
 
-  const isFavorite = currentTrackId ? favorites.includes(currentTrackId) : false;
+  const isFavorite = currentTrackId ? (favorites as string[]).includes(currentTrackId) : false;
 
   const toggleFavorite = () => {
     if (!currentTrackId) return;
     
+    const currentFavorites = favorites as string[];
     const newFavorites = isFavorite
-      ? favorites.filter(f => f !== currentTrackId)
-      : [...favorites, currentTrackId];
+      ? currentFavorites.filter(f => f !== currentTrackId)
+      : [...currentFavorites, currentTrackId];
     
-    setFavorites(newFavorites);
-    localStorage.setItem(FAVORITES_KEY, JSON.stringify(newFavorites));
+    setFavorites(newFavorites as any);
     
     setShowAnimation(true);
     setTimeout(() => setShowAnimation(false), 1000);

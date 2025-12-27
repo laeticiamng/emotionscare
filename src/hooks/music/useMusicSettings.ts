@@ -27,7 +27,11 @@ type SettingKey =
   | 'music:favorites'
   | 'music:player-stats'
   | 'music:track-ratings'
-  | 'music:track-play-counts';
+  | 'music:track-play-counts'
+  | 'music:saved-positions'
+  | 'music:emotion-generator'
+  | 'music:progressbar-markers'
+  | 'music:adaptive-playback';
 
 interface UseMusicSettingsOptions<T> {
   key: SettingKey;
