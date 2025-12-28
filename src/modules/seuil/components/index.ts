@@ -4,3 +4,6 @@ export { SeuilScale } from './SeuilScale';
 export { SeuilMessage } from './SeuilMessage';
 export { SeuilActions } from './SeuilActions';
 export { SeuilExitMessage } from './SeuilExitMessage';
+export { SeuilStats } from './SeuilStats';
+export { SeuilTrendChart } from './SeuilTrendChart';
+export { SeuilMiniSession } from './SeuilMiniSession';
