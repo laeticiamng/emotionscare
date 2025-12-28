@@ -241,6 +241,18 @@ export const MusicHistory: React.FC<MusicHistoryProps> = ({
                             {entry.completed && (
                               <div className="w-2 h-2 rounded-full bg-green-500" title="Écouté en entier" />
                             )}
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onToggleFavorite?.(entry.track.id);
+                              }}
+                              className="p-1 hover:bg-accent rounded transition-colors"
+                              aria-label={favorites.has(entry.track.id) ? "Retirer des favoris" : "Ajouter aux favoris"}
+                            >
+                              <Heart 
+                                className={`w-4 h-4 ${favorites.has(entry.track.id) ? 'fill-red-500 text-red-500' : 'text-muted-foreground'}`} 
+                              />
+                            </button>
                           </div>
                         </div>
                       ))}

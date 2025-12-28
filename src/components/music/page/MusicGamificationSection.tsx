@@ -3,7 +3,9 @@
  */
 
 import React, { Suspense, lazy } from 'react';
-import { Loader2 } from 'lucide-react';
+import { Loader2, AlertTriangle } from 'lucide-react';
+import { ErrorBoundary } from 'react-error-boundary';
+import { Button } from '@/components/ui/button';
 
 const MusicGamificationPanel = lazy(() => import('@/components/gamification/MusicGamificationPanel'));
 const QuestsPanel = lazy(() => import('@/components/gamification/QuestsPanel').then(m => ({ default: m.QuestsPanel })));
@@ -15,20 +17,36 @@ const LoadingFallback = () => (
   </div>
 );
 
+const ErrorFallback = ({ error, resetErrorBoundary }: { error: Error; resetErrorBoundary: () => void }) => (
+  <div className="flex flex-col items-center justify-center p-8 text-center">
+    <AlertTriangle className="h-8 w-8 text-destructive mb-2" />
+    <p className="text-sm text-muted-foreground mb-3">Erreur de chargement</p>
+    <Button variant="outline" size="sm" onClick={resetErrorBoundary}>
+      Réessayer
+    </Button>
+  </div>
+);
+
 export const MusicGamificationSection: React.FC = () => {
   return (
     <div className="max-w-4xl mx-auto mt-8 space-y-6">
-      <Suspense fallback={<LoadingFallback />}>
-        <MusicGamificationPanel />
-      </Suspense>
+      <ErrorBoundary FallbackComponent={ErrorFallback}>
+        <Suspense fallback={<LoadingFallback />}>
+          <MusicGamificationPanel />
+        </Suspense>
+      </ErrorBoundary>
       
-      <Suspense fallback={<LoadingFallback />}>
-        <QuestsPanel />
-      </Suspense>
+      <ErrorBoundary FallbackComponent={ErrorFallback}>
+        <Suspense fallback={<LoadingFallback />}>
+          <QuestsPanel />
+        </Suspense>
+      </ErrorBoundary>
       
-      <Suspense fallback={<LoadingFallback />}>
-        <LeaderboardPanel />
-      </Suspense>
+      <ErrorBoundary FallbackComponent={ErrorFallback}>
+        <Suspense fallback={<LoadingFallback />}>
+          <LeaderboardPanel />
+        </Suspense>
+      </ErrorBoundary>
     </div>
   );
 };

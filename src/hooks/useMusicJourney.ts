@@ -1,4 +1,4 @@
-// @ts-nocheck
+// TODO: Add proper type definitions for Supabase tables music_journeys and music_journey_tracks
 /**
  * useMusicJourney - Gestion des parcours musicaux guidés
  * Transitions progressives d'émotions négatives vers positives

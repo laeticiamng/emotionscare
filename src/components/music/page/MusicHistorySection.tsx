@@ -27,9 +27,10 @@ export const MusicHistorySection: React.FC<MusicHistorySectionProps> = ({
 }) => {
   if (playHistory.length === 0) return null;
 
+  // Trier par ordre de lecture récent (le plus récent d'abord)
   const historyTracks = tracks
     .filter(t => playHistory.includes(t.id))
-    .sort((a, b) => playHistory.indexOf(a.id) - playHistory.indexOf(b.id))
+    .sort((a, b) => playHistory.indexOf(b.id) - playHistory.indexOf(a.id))
     .slice(0, 5);
 
   if (historyTracks.length === 0) return null;
