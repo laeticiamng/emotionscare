@@ -1,5 +1,4 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import "https://deno.land/x/xhr@0.1.0/mod.ts"
 import { authenticateRequest } from '../_shared/auth-middleware.ts';
 import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
 import { validateRequest, createErrorResponse, AICoachRequestSchema } from '../_shared/validation.ts';
@@ -9,14 +8,6 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-interface CoachRequest {
-  message: string;
-  conversationHistory?: Array<{role: string, content: string}>;
-  userEmotion?: string;
-  coachPersonality?: string;
-  context?: string;
-}
-
 interface CoachResponse {
   response: string;
   emotion: string;
@@ -24,6 +15,29 @@ interface CoachResponse {
   resources: Array<{type: string, title: string, description: string}>;
   followUpQuestions: string[];
 }
+
+const PERSONALITIES: Record<string, { style: string; approach: string }> = {
+  empathetic: {
+    style: "empathique et bienveillant",
+    approach: "écoute active, validation des émotions, soutien inconditionnel"
+  },
+  analytical: {
+    style: "analytique et structuré", 
+    approach: "analyse des problèmes, solutions logiques, approche méthodique"
+  },
+  motivational: {
+    style: "motivant et énergisant",
+    approach: "encouragement, défis positifs, focus sur les objectifs"
+  },
+  zen: {
+    style: "centré sur la pleine conscience",
+    approach: "présence à l'instant, respiration, acceptation"
+  },
+  energetic: {
+    style: "dynamique et enthousiaste",
+    approach: "énergie positive, action immédiate, motivation intense"
+  }
+};
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -44,7 +58,7 @@ serve(async (req) => {
       userId: authResult.user.id,
       limit: 5,
       windowMs: 60_000,
-      description: 'AI Coach responses - GPT-4 API calls'
+      description: 'AI Coach responses - Lovable AI calls'
     });
 
     if (!rateLimit.allowed) {
@@ -79,181 +93,189 @@ serve(async (req) => {
       userEmotion, 
       coachPersonality, 
       messageLength: message.length 
-    })
+    });
 
-    const openAIKey = Deno.env.get('OPENAI_API_KEY')
-    if (!openAIKey) {
-      throw new Error('Clé OpenAI manquante')
+    // Use Lovable AI Gateway
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    if (!LOVABLE_API_KEY) {
+      throw new Error('LOVABLE_API_KEY is not configured');
     }
 
-    // Personnalités de coach
-    const personalities = {
-      empathetic: {
-        style: "empathique et bienveillant",
-        approach: "écoute active, validation des émotions, soutien inconditionnel"
-      },
-      analytical: {
-        style: "analytique et structuré", 
-        approach: "analyse des problèmes, solutions logiques, approche méthodique"
-      },
-      motivational: {
-        style: "motivant et énergisant",
-        approach: "encouragement, défis positifs, focus sur les objectifs"
-      },
-      mindful: {
-        style: "centré sur la pleine conscience",
-        approach: "présence à l'instant, respiration, acceptation"
-      }
-    }
+    const personality = PERSONALITIES[coachPersonality] || PERSONALITIES.empathetic;
 
-    const personality = personalities[coachPersonality as keyof typeof personalities] || personalities.empathetic
-
-    // Construction de l'historique de conversation
+    // Build conversation history context
     const historyContext = conversationHistory.length > 0 
       ? `Historique récent:\n${conversationHistory.slice(-6).map((msg: any) => `${msg.role}: ${msg.content}`).join('\n')}\n\n`
-      : ''
+      : '';
 
-    const coachPrompt = `
-Tu es un coach en bien-être ${personality.style}. Ton approche: ${personality.approach}.
+    const systemPrompt = `Tu es un expert coach en bien-être mental EmotionsCare avec une formation en psychologie positive.
+Tu es ${personality.style}. Ton approche: ${personality.approach}.
 
-${historyContext}Message actuel de l'utilisateur: "${message}"
+RÈGLES IMPORTANTES:
+- Réponds avec empathie et pragmatisme
+- Pas de diagnostic ni de prescription
+- Oriente vers un professionnel si besoin
+- Garde tes réponses concises (2-3 phrases max)
+- Suggère des ressources de l'app: respiration (/app/breath), journal (/app/journal), musique (/app/music)
+
+Tu dois répondre en JSON valide avec cette structure exacte:
+{
+  "response": "Ta réponse empathique ici",
+  "emotion": "supportive|encouraging|calm|energizing",
+  "techniques": ["technique 1", "technique 2", "technique 3"],
+  "resources": [{"type": "méditation|exercice|musique|respiration", "title": "Titre", "description": "Description"}],
+  "followUpQuestions": ["Question 1?", "Question 2?"]
+}`;
+
+    const userPrompt = `${historyContext}Message de l'utilisateur: "${message}"
 Émotion détectée: ${userEmotion}
 ${context ? `Contexte: ${context}` : ''}
 
-Génère une réponse JSON avec:
-1. response: Réponse personnalisée et empathique (2-3 phrases)
-2. emotion: Ton émotion en réponse (supportive/encouraging/calm/energizing)
-3. techniques: 3 techniques pratiques de bien-être adaptées
-4. resources: 2 ressources (méditation/exercice/lecture/musique) avec type, titre, description
-5. followUpQuestions: 2 questions pour approfondir la conversation
+Génère ta réponse JSON:`;
 
-Sois authentique, évite le jargon, et adapte-toi à l'émotion de l'utilisateur.
-`
-
-    const openAIResponse = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
+    const aiResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
       headers: {
-        'Authorization': `Bearer ${openAIKey}`,
-        'Content-Type': 'application/json',
+        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: 'gpt-4',
+        model: "google/gemini-2.5-flash",
         messages: [
-          {
-            role: 'system',
-            content: `Tu es un expert coach en bien-être mental avec une formation en psychologie positive. Réponds uniquement en JSON valide français.`
-          },
-          {
-            role: 'user',
-            content: coachPrompt
-          }
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt }
         ],
         temperature: 0.7,
         max_tokens: 1200
       }),
-    })
+    });
 
-    if (!openAIResponse.ok) {
-      const error = await openAIResponse.text()
-      console.error('❌ Erreur OpenAI:', error)
-      throw new Error('Échec génération coach IA')
+    if (!aiResponse.ok) {
+      const errorText = await aiResponse.text();
+      console.error('❌ Lovable AI error:', aiResponse.status, errorText);
+      
+      if (aiResponse.status === 429) {
+        return new Response(JSON.stringify({ 
+          error: "Rate limits exceeded, please try again later." 
+        }), {
+          status: 429,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      if (aiResponse.status === 402) {
+        return new Response(JSON.stringify({ 
+          error: "Payment required, please add funds to your Lovable AI workspace." 
+        }), {
+          status: 402,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      throw new Error('AI gateway error');
     }
 
-    const openAIResult = await openAIResponse.json()
-    let coachResponse: CoachResponse
+    const aiResult = await aiResponse.json();
+    const rawContent = aiResult.choices?.[0]?.message?.content || '';
+    
+    let coachResponse: CoachResponse;
 
     try {
-      coachResponse = JSON.parse(openAIResult.choices[0].message.content)
+      // Try to parse JSON from response
+      const jsonMatch = rawContent.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        coachResponse = JSON.parse(jsonMatch[0]);
+      } else {
+        throw new Error('No JSON found in response');
+      }
     } catch (parseError) {
-      console.warn('⚠️ Erreur parsing JSON, utilisation fallback')
+      console.warn('⚠️ Erreur parsing JSON, utilisation fallback:', parseError);
       coachResponse = {
-        response: openAIResult.choices[0].message.content || "Je vous écoute et je suis là pour vous accompagner.",
+        response: rawContent.trim() || "Je suis là pour t'écouter et t'accompagner. Comment puis-je t'aider?",
         emotion: "supportive",
         techniques: [
-          "Prenez trois respirations profondes",
-          "Posez vos pieds au sol et ressentez l'ancrage",
-          "Nommez 3 choses que vous voyez autour de vous"
+          "Prends trois respirations profondes",
+          "Pose tes pieds au sol et ressens l'ancrage",
+          "Nomme 3 choses que tu vois autour de toi"
         ],
         resources: [
           {
-            type: "méditation",
-            title: "Méditation de 5 minutes",
-            description: "Une courte pratique pour retrouver le calme intérieur"
+            type: "respiration",
+            title: "Respiration guidée",
+            description: "Une courte pratique pour retrouver le calme"
           },
           {
-            type: "exercice",
-            title: "Étirements apaisants",
-            description: "Quelques mouvements doux pour détendre le corps"
+            type: "méditation",
+            title: "Moment de calme",
+            description: "5 minutes pour te reconnecter"
           }
         ],
         followUpQuestions: [
-          "Comment vous sentez-vous en ce moment?",
-          "Y a-t-il quelque chose de spécifique qui vous préoccupe?"
+          "Comment te sens-tu maintenant?",
+          "Y a-t-il quelque chose de spécifique qui te préoccupe?"
         ]
-      }
+      };
     }
 
     // Validation et enrichissement de la réponse
-    coachResponse.response = coachResponse.response || "Je suis là pour vous écouter et vous accompagner."
-    coachResponse.emotion = coachResponse.emotion || "supportive"
+    coachResponse.response = coachResponse.response || "Je suis là pour t'écouter et t'accompagner.";
+    coachResponse.emotion = coachResponse.emotion || "supportive";
     coachResponse.techniques = Array.isArray(coachResponse.techniques) 
       ? coachResponse.techniques.slice(0, 3)
-      : ["Prenez une pause", "Respirez profondément", "Soyez bienveillant avec vous-même"]
+      : ["Prends une pause", "Respire profondément", "Sois bienveillant avec toi-même"];
     
     coachResponse.resources = Array.isArray(coachResponse.resources)
       ? coachResponse.resources.slice(0, 2)
       : [{
-          type: "méditation",
+          type: "respiration",
           title: "Moment de calme", 
-          description: "Une pause pour vous reconnecter"
-        }]
+          description: "Une pause pour te reconnecter"
+        }];
 
     coachResponse.followUpQuestions = Array.isArray(coachResponse.followUpQuestions)
       ? coachResponse.followUpQuestions.slice(0, 2)
-      : ["Comment puis-je mieux vous accompagner?"]
+      : ["Comment puis-je mieux t'accompagner?"];
 
     console.log('✅ Réponse coach générée:', { 
       emotion: coachResponse.emotion,
       techniquesCount: coachResponse.techniques.length 
-    })
+    });
 
     return new Response(JSON.stringify(coachResponse), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    })
+    });
 
   } catch (error) {
-    console.error('❌ Erreur coach IA:', error)
+    console.error('❌ Erreur coach IA:', error);
     
     // Réponse de fallback empathique
     const fallbackResponse: CoachResponse = {
-      response: "Je rencontre un petit problème technique, mais je suis toujours là pour vous. Comment puis-je vous aider autrement?",
+      response: "Je rencontre un petit problème technique, mais je suis toujours là pour toi. Comment puis-je t'aider autrement?",
       emotion: "supportive",
       techniques: [
-        "Prenez un moment pour respirer calmement",
-        "Accordez-vous de la bienveillance",
-        "Rappelez-vous que vous n'êtes pas seul(e)"
+        "Prends un moment pour respirer calmement",
+        "Accorde-toi de la bienveillance",
+        "Rappelle-toi que tu n'es pas seul(e)"
       ],
       resources: [
         {
           type: "respiration",
           title: "Technique 4-7-8",
-          description: "Inspirez 4s, retenez 7s, expirez 8s pour vous apaiser"
+          description: "Inspire 4s, retiens 7s, expire 8s pour t'apaiser"
         },
         {
           type: "ancrage",
           title: "Exercice d'ancrage",
-          description: "Connectez-vous au moment présent par vos 5 sens"
+          description: "Connecte-toi au moment présent par tes 5 sens"
         }
       ],
       followUpQuestions: [
-        "Que ressentez-vous maintenant?",
-        "Y a-t-il quelque chose que je peux faire pour vous?"
+        "Que ressens-tu maintenant?",
+        "Y a-t-il quelque chose que je peux faire pour toi?"
       ]
-    }
+    };
     
     return new Response(JSON.stringify(fallbackResponse), {
-      status: 200, // On retourne 200 avec une réponse de fallback plutôt qu'une erreur
+      status: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    })
+    });
   }
-})
+});

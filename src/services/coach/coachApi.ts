@@ -1,3 +1,10 @@
+export interface CoachSuggestions {
+  techniques: string[];
+  resources: Array<{ type: string; title: string; description: string }>;
+  followUpQuestions: string[];
+  emotion?: string;
+}
+
 export interface SendCoachMessageOptions {
   threadId?: string;
   message: string;
@@ -5,16 +12,20 @@ export interface SendCoachMessageOptions {
   locale?: 'fr' | 'en';
   userHash?: string;
   flexHint?: 'souple' | 'transition' | 'rigide';
+  personality?: string;
+  conversationHistory?: Array<{ role: string; content: string }>;
   signal?: AbortSignal;
   onChunk?: (chunk: string) => void;
   onThread?: (threadId: string) => void;
   onDisclaimers?: (items: string[]) => void;
+  onSuggestions?: (suggestions: CoachSuggestions) => void;
 }
 
 export interface CoachApiResponse {
   threadId: string;
   text: string;
   disclaimers: string[];
+  suggestions?: CoachSuggestions;
 }
 
 const END_TOKEN = '[END]';
@@ -28,6 +39,8 @@ function buildPayload(options: SendCoachMessageOptions) {
     locale: options.locale ?? 'fr',
     user_hash: options.userHash,
     flex_hint: options.flexHint,
+    personality: options.personality ?? 'empathetic',
+    conversation_history: options.conversationHistory ?? [],
   };
 }
 
@@ -42,6 +55,7 @@ export async function sendMessage(options: SendCoachMessageOptions): Promise<Coa
         let resolved = false;
         let threadId = options.threadId ?? '';
         let disclaimers: string[] = [];
+        let suggestions: CoachSuggestions | undefined;
 
         const source = new EventSource(`${FUNCTION_URL}?body=${encodeURIComponent(body)}`);
 
@@ -69,6 +83,7 @@ export async function sendMessage(options: SendCoachMessageOptions): Promise<Coa
               threadId: threadId || options.threadId || 'new',
               text: accumulated,
               disclaimers,
+              suggestions,
             });
             return;
           }
@@ -86,11 +101,36 @@ export async function sendMessage(options: SendCoachMessageOptions): Promise<Coa
                   options.onDisclaimers?.(disclaimers);
                 }
               }
+              // Parse suggestions from meta
+              if (parsed.techniques || parsed.resources || parsed.followUpQuestions) {
+                suggestions = {
+                  techniques: Array.isArray(parsed.techniques) ? parsed.techniques : [],
+                  resources: Array.isArray(parsed.resources) ? parsed.resources : [],
+                  followUpQuestions: Array.isArray(parsed.followUpQuestions) ? parsed.followUpQuestions : [],
+                  emotion: parsed.emotion,
+                };
+                options.onSuggestions?.(suggestions);
+              }
               return;
             }
             if (parsed?.type === 'delta' && typeof parsed.content === 'string') {
               accumulated += parsed.content;
               options.onChunk?.(parsed.content);
+              return;
+            }
+            // Handle complete JSON response (non-streaming)
+            if (parsed?.response || parsed?.techniques || parsed?.resources) {
+              if (parsed.response) {
+                accumulated = parsed.response;
+                options.onChunk?.(parsed.response);
+              }
+              suggestions = {
+                techniques: Array.isArray(parsed.techniques) ? parsed.techniques : [],
+                resources: Array.isArray(parsed.resources) ? parsed.resources : [],
+                followUpQuestions: Array.isArray(parsed.followUpQuestions) ? parsed.followUpQuestions : [],
+                emotion: parsed.emotion,
+              };
+              options.onSuggestions?.(suggestions);
               return;
             }
           } catch {
@@ -108,7 +148,7 @@ export async function sendMessage(options: SendCoachMessageOptions): Promise<Coa
         };
       });
     } catch (error) {
-      // Silent: SSE failed, proceeding without logging
+      // Silent: SSE failed, proceeding to fetch fallback
     }
   }
 
@@ -127,10 +167,18 @@ export async function sendMessage(options: SendCoachMessageOptions): Promise<Coa
 
   const json = await response.json();
   const threadId = typeof json?.thread_id === 'string' ? json.thread_id : options.threadId ?? 'new';
-  const text = String(json?.messages?.[0]?.content ?? '');
+  const text = String(json?.response ?? json?.messages?.[0]?.content ?? '');
   const disclaimers = Array.isArray(json?.disclaimers)
     ? json.disclaimers.filter((item: unknown): item is string => typeof item === 'string')
     : [];
+
+  // Parse suggestions from response
+  const suggestions: CoachSuggestions = {
+    techniques: Array.isArray(json?.techniques) ? json.techniques : [],
+    resources: Array.isArray(json?.resources) ? json.resources : [],
+    followUpQuestions: Array.isArray(json?.followUpQuestions) ? json.followUpQuestions : [],
+    emotion: json?.emotion,
+  };
 
   if (text && options.onChunk) {
     options.onChunk(text);
@@ -141,6 +189,9 @@ export async function sendMessage(options: SendCoachMessageOptions): Promise<Coa
   if (disclaimers.length && options.onDisclaimers) {
     options.onDisclaimers(disclaimers);
   }
+  if (suggestions.techniques.length || suggestions.resources.length || suggestions.followUpQuestions.length) {
+    options.onSuggestions?.(suggestions);
+  }
 
-  return { threadId, text, disclaimers };
+  return { threadId, text, disclaimers, suggestions };
 }
