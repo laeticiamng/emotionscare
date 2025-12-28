@@ -9,6 +9,8 @@ export { ExportButton } from './components/ExportButton';
 export { RatingStars } from './components/RatingStars';
 export { ArtifactGallery } from './components/ArtifactGallery';
 export { QuestTimer } from './components/QuestTimer';
+export { QuestCard } from './components/QuestCard';
+export { QuestList } from './components/QuestList';
 export { ProgressChart } from './components/ProgressChart';
 export { ShareAchievement } from './components/ShareAchievement';
 export { DailyStreak } from './components/DailyStreak';
