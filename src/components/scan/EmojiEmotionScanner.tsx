@@ -3,7 +3,10 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { EmotionResult, EmotionScannerProps } from '@/types/emotion';
-import { Smile, Sparkles } from 'lucide-react';
+import { Smile, Sparkles, Loader2 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { normalizeEmotionResult } from '@/types/emotion-unified';
+import { logger } from '@/lib/logger';
 
 const EmojiEmotionScanner: React.FC<EmotionScannerProps> = ({
   onScanComplete,
@@ -12,6 +15,7 @@ const EmojiEmotionScanner: React.FC<EmotionScannerProps> = ({
   setIsProcessing
 }) => {
   const [selectedEmojis, setSelectedEmojis] = useState<string[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
   const emojiCategories = [
     {
@@ -62,51 +66,45 @@ const EmojiEmotionScanner: React.FC<EmotionScannerProps> = ({
     if (selectedEmojis.length === 0) return;
 
     setIsProcessing(true);
+    setError(null);
 
-    // Simuler l'analyse des émojis
-    setTimeout(() => {
-      // Logique simple d'analyse basée sur les émojis sélectionnés
-      const emotionMapping: Record<string, { name: string; intensity: number }[]> = {
-        '😊': [{ name: 'Joie', intensity: 85 }],
-        '😄': [{ name: 'Enthousiasme', intensity: 90 }],
-        '😢': [{ name: 'Tristesse', intensity: 75 }],
-        '😠': [{ name: 'Colère', intensity: 80 }],
-        '😌': [{ name: 'Calme', intensity: 70 }],
-        '😍': [{ name: 'Amour', intensity: 88 }],
-        '😴': [{ name: 'Fatigue', intensity: 60 }],
-        '😮': [{ name: 'Surprise', intensity: 75 }]
-      };
+    try {
+      // Construire une description textuelle des émojis sélectionnés
+      const emojiDescription = `L'utilisateur a sélectionné les émojis suivants pour décrire son état émotionnel : ${selectedEmojis.join(' ')}. Analyse les émotions exprimées par ces émojis.`;
 
-      const detectedEmotions = selectedEmojis.flatMap(emoji => 
-        emotionMapping[emoji] || [{ name: 'Émotion complexe', intensity: 65 }]
-      );
+      // Appel réel à l'edge function d'analyse textuelle
+      const { data, error: invokeError } = await supabase.functions.invoke('emotion-analysis', {
+        body: { text: emojiDescription, language: 'fr' }
+      });
 
-      // Grouper et moyenner les émotions similaires
-      const emotionGroups = detectedEmotions.reduce((acc, emotion) => {
-        if (acc[emotion.name]) {
-          acc[emotion.name].push(emotion.intensity);
-        } else {
-          acc[emotion.name] = [emotion.intensity];
-        }
-        return acc;
-      }, {} as Record<string, number[]>);
+      if (invokeError) {
+        throw new Error(invokeError.message || 'Erreur d\'analyse');
+      }
 
-      const finalEmotions = Object.entries(emotionGroups).map(([name, intensities]) => ({
-        name,
-        intensity: Math.round(intensities.reduce((a, b) => a + b, 0) / intensities.length)
-      }));
+      if (!data) {
+        throw new Error('Aucune réponse de l\'analyse');
+      }
 
-      const mockResult: EmotionResult = {
-        emotions: finalEmotions.slice(0, 3), // Prendre les 3 principales
-        confidence: 85,
-        timestamp: new Date(),
-        recommendations: `Basé sur vos émojis sélectionnés, vous semblez exprimer ${finalEmotions[0]?.name.toLowerCase()}. C'est parfaitement normal !`,
-        analysisType: 'emoji'
-      };
+      const result = normalizeEmotionResult({
+        id: `emoji-${Date.now()}`,
+        emotion: data.emotion || 'neutre',
+        valence: (data.valence ?? 0.5) * 100,
+        arousal: (data.arousal ?? 0.5) * 100,
+        confidence: (data.confidence ?? 0.7) * 100,
+        source: 'emoji',
+        timestamp: new Date().toISOString(),
+        summary: data.summary || `Émotion ${data.emotion} détectée via émojis`,
+        emotions: data.emotions || {},
+        recommendations: data.recommendations || []
+      });
 
-      onScanComplete(mockResult);
+      onScanComplete(result as any);
+    } catch (err) {
+      logger.error('[EmojiEmotionScanner] Error:', err, 'COMPONENT');
+      setError(err instanceof Error ? err.message : 'Erreur lors de l\'analyse');
+    } finally {
       setIsProcessing(false);
-    }, 2000);
+    }
   };
 
   return (
@@ -167,6 +165,12 @@ const EmojiEmotionScanner: React.FC<EmotionScannerProps> = ({
           ))}
         </div>
 
+        {error && (
+          <div className="text-sm text-destructive bg-destructive/10 px-3 py-2 rounded-lg text-center">
+            {error}
+          </div>
+        )}
+
         <div className="flex space-x-2">
           <Button 
             onClick={onCancel} 
@@ -183,7 +187,7 @@ const EmojiEmotionScanner: React.FC<EmotionScannerProps> = ({
           >
             {isProcessing ? (
               <>
-                <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Analyse en cours...
               </>
             ) : (
