@@ -115,21 +115,53 @@ export const SunoMusicGenerator: React.FC = () => {
 
     try {
       const moodData = MOOD_OPTIONS.find((m) => m.id === selectedMood);
-      const prompt = customPrompt || `therapeutic ${selectedMood} music, ${genre} style, ${isInstrumental ? 'instrumental' : 'with vocals'}`;
+      const tempoData = TEMPO_OPTIONS.find((t) => t.value === tempo);
+      const energyLevel = energy[0];
+      
+      // Construire un prompt enrichi avec toutes les données émotionnelles
+      const therapeuticContext = {
+        calm: 'relaxing, soothing, peaceful, stress-relief',
+        energizing: 'uplifting, motivating, dynamic, positive energy',
+        focused: 'concentration, clarity, productive, deep work',
+        happy: 'joyful, cheerful, optimistic, feel-good',
+        meditative: 'zen, mindfulness, deep relaxation, inner peace',
+        uplifting: 'inspiring, hopeful, empowering, emotional healing'
+      };
+      
+      const emotionTags = therapeuticContext[selectedMood as keyof typeof therapeuticContext] || 'therapeutic';
+      
+      // Prompt enrichi avec tempo, énergie et contexte thérapeutique
+      const enrichedPrompt = customPrompt || [
+        `Therapeutic ${moodData?.label || selectedMood} music`,
+        `${genre} style`,
+        `${tempoData?.label || 'moderate tempo'} (${tempoData?.bpm || 100} BPM)`,
+        `energy level ${Math.round(energyLevel * 100)}%`,
+        isInstrumental ? 'instrumental only, no vocals' : 'with gentle vocals',
+        `mood: ${emotionTags}`,
+        `for ${moodData?.description || 'emotional well-being'}`
+      ].join(', ');
 
-      logger.info('Generating Suno music', {
+      logger.info('Generating Suno music with enriched prompt', {
         mood: selectedMood,
         genre,
         tempo,
-        energy: energy[0],
+        bpm: tempoData?.bpm,
+        energy: energyLevel,
+        prompt: enrichedPrompt
       }, 'MUSIC');
 
-      // Call Suno edge function
+      // Call Suno edge function with enriched data
       const { data, error } = await supabase.functions.invoke('suno-music', {
         body: {
           action: 'start',
-          prompt,
+          prompt: enrichedPrompt,
           mood: selectedMood,
+          style: `${genre}, ${emotionTags}`,
+          title: `${moodData?.label || selectedMood} - Thérapie musicale`,
+          instrumental: isInstrumental,
+          tempo: tempo,
+          bpmMin: tempoData?.bpm ? tempoData.bpm - 10 : 90,
+          bpmMax: tempoData?.bpm ? tempoData.bpm + 10 : 110,
         },
       });
 
@@ -159,7 +191,7 @@ export const SunoMusicGenerator: React.FC = () => {
           title: `Musique ${moodData?.label || selectedMood} (Fallback)`,
           audioUrl: fallbackTrack.url,
           status: 'completed',
-          prompt,
+          prompt: customPrompt || `therapeutic ${selectedMood} music`,
           mood: selectedMood,
         });
 
@@ -203,23 +235,59 @@ export const SunoMusicGenerator: React.FC = () => {
         if (trackData.status === 'complete' || trackData.status === 'completed' || trackData.audio_url) {
           // Generation completed
           const moodData = MOOD_OPTIONS.find((m) => m.id === selectedMood);
+          const genreData = GENRE_OPTIONS.find((g) => g.value === genre);
+          const tempoData = TEMPO_OPTIONS.find((t) => t.value === tempo);
 
-          setCurrentTrack({
+          const newTrack: GeneratedTrack = {
             id: trackId,
             title: trackData.title || `Musique ${moodData?.label || selectedMood}`,
             audioUrl: trackData.audio_url,
             imageUrl: trackData.image_url,
             duration: trackData.duration,
             status: 'completed',
-            prompt: trackData.metadata?.prompt || '',
+            prompt: trackData.metadata?.prompt || customPrompt || '',
             mood: selectedMood,
-          });
+          };
 
+          setCurrentTrack(newTrack);
           setGenerationQueue((prev) => prev.filter((id) => id !== trackId));
+
+          // 🔥 SAUVEGARDE AUTOMATIQUE dans music_generation_sessions
+          if (user) {
+            try {
+              await supabase.from('music_generation_sessions').insert({
+                user_id: user.id,
+                task_id: trackId,
+                status: 'completed',
+                emotion_state: {
+                  mood: selectedMood,
+                  genre: genre,
+                  tempo: tempo,
+                  energy: energy[0],
+                  instrumental: isInstrumental,
+                },
+                suno_config: {
+                  prompt: newTrack.prompt,
+                  style: `${genreData?.label || genre}, therapeutic`,
+                  bpm: tempoData?.bpm || 100,
+                },
+                result: {
+                  audio_url: trackData.audio_url,
+                  image_url: trackData.image_url,
+                  duration: trackData.duration,
+                  title: newTrack.title,
+                },
+                completed_at: new Date().toISOString(),
+              });
+              logger.info('Track auto-saved to library', { trackId }, 'MUSIC');
+            } catch (saveError) {
+              logger.warn('Failed to auto-save track', saveError as Error, 'MUSIC');
+            }
+          }
 
           toast({
             title: 'Musique prête !',
-            description: 'Votre musique personnalisée est disponible',
+            description: 'Votre musique a été générée et sauvegardée automatiquement',
           });
 
           return;
