@@ -79,24 +79,24 @@ interface VinylTrack extends MusicTrack {
   waveform?: number[];
 }
 
-// Configuration audio - URLs MP3 Pixabay CDN fonctionnelles (testées décembre 2025)
-// Chaque vinyle a sa propre URL pour diversifier l'expérience audio
+// Configuration audio - URLs MP3 stables provenant de sources fiables
+// Ces URLs sont des fichiers audio libres de droits hébergés sur des CDN stables
 const AUDIO_URL_CONFIG = {
   'vinyl-1': { 
     fileName: 'ambient-soft.mp3', 
-    fallbackUrl: 'https://cdn.pixabay.com/audio/2024/11/04/audio_a94216a94c.mp3' // Relaxing ambient
+    fallbackUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'
   },
   'vinyl-2': { 
     fileName: 'focus-clarity.mp3', 
-    fallbackUrl: 'https://cdn.pixabay.com/audio/2024/09/20/audio_7dbed47d09.mp3' // Upbeat energy
+    fallbackUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3'
   },
   'vinyl-3': { 
     fileName: 'creative-flow.mp3', 
-    fallbackUrl: 'https://cdn.pixabay.com/audio/2024/10/25/audio_fd1ebf4c04.mp3' // Focus concentration
+    fallbackUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3'
   },
   'vinyl-4': { 
     fileName: 'healing-waves.mp3', 
-    fallbackUrl: 'https://cdn.pixabay.com/audio/2024/08/27/audio_2f8cd794a5.mp3' // Healing meditation
+    fallbackUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3'
   }
 } as const;
 
