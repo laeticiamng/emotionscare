@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState, useCallback } from 'react';
 import { EmotionResult } from '@/types/emotion';
 import { supabase } from '@/integrations/supabase/client';
@@ -43,15 +42,13 @@ export const useEmotionAnalysis = (): UseEmotionAnalysisReturn => {
 
       if (apiError) throw apiError;
 
-      // Parse Lovable AI response format
       const result: EmotionResult = {
         emotion: data.emotion || 'neutral',
         confidence: data.confidence || 0.75,
-        timestamp: new Date().toISOString(),
+        valence: data.valence || 0.5,
+        arousal: data.arousal || 0.5,
+        timestamp: new Date(),
         source: 'text',
-        emotions: data.emotions || {},
-        sentiment: data.valence > 0.6 ? 'positive' : data.valence < 0.4 ? 'negative' : 'neutral',
-        recommendations: []
       };
 
       setLastResult(result);
@@ -61,14 +58,13 @@ export const useEmotionAnalysis = (): UseEmotionAnalysisReturn => {
       setError(errorMessage);
       logger.error('Text analysis error', err as Error, 'SCAN');
 
-      // Fallback result
       const fallbackResult: EmotionResult = {
         emotion: 'neutral',
         confidence: 0.5,
-        timestamp: new Date().toISOString(),
+        valence: 0.5,
+        arousal: 0.5,
+        timestamp: new Date(),
         source: 'text',
-        emotions: { neutral: 0.5, calm: 0.3, content: 0.2 },
-        sentiment: 'neutral'
       };
 
       setLastResult(fallbackResult);
@@ -116,11 +112,10 @@ export const useEmotionAnalysis = (): UseEmotionAnalysisReturn => {
       const result: EmotionResult = {
         emotion: analysis.dominant_emotion || 'neutral',
         confidence: analysis.confidence_score || 0.7,
-        timestamp: new Date().toISOString(),
+        valence: analysis.valence || 0.5,
+        arousal: analysis.arousal || 0.5,
+        timestamp: new Date(),
         source: 'facial',
-        emotions: emotionsObj,
-        sentiment: analysis.overall_sentiment || 'neutral',
-        facialFeatures: analysis.face_details
       };
 
       setLastResult(result);
@@ -130,14 +125,13 @@ export const useEmotionAnalysis = (): UseEmotionAnalysisReturn => {
       setError(errorMessage);
       logger.error('Facial analysis error', err as Error, 'SCAN');
       
-      // Fallback result
       const fallbackResult: EmotionResult = {
         emotion: 'neutral',
         confidence: 0.6,
-        timestamp: new Date().toISOString(),
+        valence: 0.5,
+        arousal: 0.5,
+        timestamp: new Date(),
         source: 'facial',
-        emotions: { neutral: 0.6, calm: 0.4 },
-        sentiment: 'neutral'
       };
       
       setLastResult(fallbackResult);
@@ -193,12 +187,11 @@ export const useEmotionAnalysis = (): UseEmotionAnalysisReturn => {
       const result: EmotionResult = {
         emotion: analysis.dominant_emotion || 'neutral',
         confidence: analysis.confidence_score || 0.75,
-        timestamp: new Date().toISOString(),
+        valence: analysis.valence || 0.5,
+        arousal: analysis.arousal || 0.5,
+        timestamp: new Date(),
         source: 'voice',
-        emotions: emotionsObj,
-        sentiment: analysis.overall_sentiment || 'neutral',
         transcription: transcriptionData?.text || '',
-        prosody: analysis.prosody
       };
 
       setLastResult(result);
@@ -208,14 +201,13 @@ export const useEmotionAnalysis = (): UseEmotionAnalysisReturn => {
       setError(errorMessage);
       logger.error('Voice analysis error', err as Error, 'SCAN');
       
-      // Fallback result
       const fallbackResult: EmotionResult = {
         emotion: 'neutral',
         confidence: 0.65,
-        timestamp: new Date().toISOString(),
+        valence: 0.5,
+        arousal: 0.5,
+        timestamp: new Date(),
         source: 'voice',
-        emotions: { neutral: 0.65, calm: 0.35 },
-        sentiment: 'neutral'
       };
       
       setLastResult(fallbackResult);
