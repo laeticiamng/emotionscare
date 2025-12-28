@@ -12246,6 +12246,48 @@ export type Database = {
           },
         ]
       }
+      music_generation_sessions: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          emotion_badge: string
+          emotion_state: Json
+          error_message: string | null
+          id: string
+          result: Json | null
+          status: string
+          suno_config: Json
+          task_id: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          emotion_badge: string
+          emotion_state: Json
+          error_message?: string | null
+          id?: string
+          result?: Json | null
+          status?: string
+          suno_config: Json
+          task_id: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          emotion_badge?: string
+          emotion_state?: Json
+          error_message?: string | null
+          id?: string
+          result?: Json | null
+          status?: string
+          suno_config?: Json
+          task_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       music_generation_usage: {
         Row: {
           created_at: string
@@ -17567,6 +17609,60 @@ export type Database = {
           metadata?: Json | null
           status?: string | null
           task_id?: string
+        }
+        Relationships: []
+      }
+      suno_generated_tracks: {
+        Row: {
+          audio_url: string
+          category: string | null
+          completed_at: string | null
+          created_at: string
+          duration: number | null
+          expires_at: string | null
+          generated_at: string | null
+          id: string
+          is_fallback: boolean | null
+          model: string | null
+          status: string | null
+          task_id: string | null
+          title: string
+          user_id: string
+          vinyl_id: string
+        }
+        Insert: {
+          audio_url: string
+          category?: string | null
+          completed_at?: string | null
+          created_at?: string
+          duration?: number | null
+          expires_at?: string | null
+          generated_at?: string | null
+          id?: string
+          is_fallback?: boolean | null
+          model?: string | null
+          status?: string | null
+          task_id?: string | null
+          title: string
+          user_id: string
+          vinyl_id: string
+        }
+        Update: {
+          audio_url?: string
+          category?: string | null
+          completed_at?: string | null
+          created_at?: string
+          duration?: number | null
+          expires_at?: string | null
+          generated_at?: string | null
+          id?: string
+          is_fallback?: boolean | null
+          model?: string | null
+          status?: string | null
+          task_id?: string | null
+          title?: string
+          user_id?: string
+          vinyl_id?: string
         }
         Relationships: []
       }

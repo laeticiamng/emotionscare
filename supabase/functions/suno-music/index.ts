@@ -89,16 +89,17 @@ serve(async (req) => {
 
     let result;
     
-    // Action: check credits
+    // Action: check credits - https://docs.sunoapi.org/suno-api/get-remaining-credits
     if (action === 'credits') {
       try {
-        const creditsResponse = await fetch(`${SUNO_API_BASE}/api/v1/account/info`, {
+        const creditsResponse = await fetch(`${SUNO_API_BASE}/api/v1/generate/credit`, {
           headers: {
             'Authorization': `Bearer ${sunoApiKey}`,
           }
         });
         
         if (!creditsResponse.ok) {
+          console.error('[suno-music] Credits API error:', creditsResponse.status);
           return new Response(JSON.stringify({ 
             success: false,
             error: 'Unable to fetch credits info',
@@ -111,12 +112,15 @@ serve(async (req) => {
         const creditsData = await creditsResponse.json();
         console.log('[suno-music] Credits info:', JSON.stringify(creditsData));
         
+        // API returns { code: 200, msg: "success", data: 100 } where data is remaining credits
+        const remaining = typeof creditsData.data === 'number' ? creditsData.data : 0;
+        
         return new Response(JSON.stringify({ 
           success: true,
           credits: {
-            remaining: creditsData.data?.credits || creditsData.credits || 0,
-            total: creditsData.data?.totalCredits || creditsData.totalCredits || 0,
-            plan: creditsData.data?.plan || 'unknown'
+            remaining: remaining,
+            total: 100, // Suno doesn't provide total, using default
+            plan: 'standard'
           }
         }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
