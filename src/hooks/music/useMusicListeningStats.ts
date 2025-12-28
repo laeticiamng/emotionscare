@@ -66,22 +66,61 @@ export function useMusicListeningStats() {
   const [stats, setStats] = useState<ListeningStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Charger les sessions d'écoute depuis Supabase
+  // Charger les sessions d'écoute depuis Supabase - VRAIES DONNÉES
   const loadStats = useCallback(async () => {
     setIsLoading(true);
     
     try {
-      // Calculer les statistiques depuis les données locales
-      const totalTracks = historyIds?.length || 0;
-      const totalPlayCount = Object.values(playCounts || {}).reduce((a, b) => a + b, 0);
+      // Charger l'historique réel depuis music_history
+      let realHistory: any[] = [];
+      let totalMinutes = 0;
+      let topArtists: ArtistStat[] = [];
+      let uniqueArtists = 0;
       
-      // Estimer les minutes (moyenne 3 min par track)
-      const totalMinutes = totalTracks * 3;
-      
-      // Calculer les artistes uniques (simulé pour l'instant)
-      const uniqueArtists = Math.min(Math.floor(totalTracks / 3), 50);
+      if (user) {
+        // Récupérer l'historique complet
+        const { data: historyData, error: historyError } = await supabase
+          .from('music_history')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('played_at', { ascending: false })
+          .limit(500);
 
-      // Charger les données de sessions si disponibles
+        if (!historyError && historyData) {
+          realHistory = historyData;
+          
+          // Calculer le temps total réel
+          totalMinutes = Math.round(
+            realHistory.reduce((acc, h) => acc + (h.listen_duration || h.track_duration || 180), 0) / 60
+          );
+          
+          // Calculer les top artistes réels
+          const artistCounts: Record<string, number> = {};
+          realHistory.forEach(h => {
+            const artist = h.track_artist || 'Unknown';
+            artistCounts[artist] = (artistCounts[artist] || 0) + 1;
+          });
+          
+          topArtists = Object.entries(artistCounts)
+            .map(([artist, count]) => ({ artist, count }))
+            .sort((a, b) => b.count - a.count)
+            .slice(0, 5);
+          
+          uniqueArtists = Object.keys(artistCounts).length;
+        }
+      }
+
+      const totalTracks = realHistory.length || historyIds?.length || 0;
+      
+      // Fallback si pas de données DB
+      if (totalMinutes === 0 && totalTracks > 0) {
+        totalMinutes = totalTracks * 3;
+      }
+      if (uniqueArtists === 0) {
+        uniqueArtists = Math.min(Math.floor(totalTracks / 3), 50);
+      }
+
+      // Charger les données de sessions d'écoute
       let sessions: ListeningSession[] = [];
       if (user) {
         const { data: settingsData } = await supabase
@@ -102,32 +141,38 @@ export function useMusicListeningStats() {
         }
       }
 
-      // Calculer les stats par émotion
+      // Calculer les stats par émotion depuis l'historique réel
       const emotionCounts: Record<string, number> = {};
+      realHistory.forEach(h => {
+        if (h.emotion) {
+          emotionCounts[h.emotion] = (emotionCounts[h.emotion] || 0) + 1;
+        }
+      });
+      // Ajouter les sessions aussi
       sessions.forEach(s => {
         emotionCounts[s.mood] = (emotionCounts[s.mood] || 0) + 1;
       });
 
-      const totalSessions = sessions.length || 1;
+      const totalEmotions = Object.values(emotionCounts).reduce((a, b) => a + b, 1);
       const emotionStats: EmotionStat[] = Object.entries(emotionCounts)
         .map(([emotion, count]) => ({
           emotion: emotion.charAt(0).toUpperCase() + emotion.slice(1),
           count,
-          percentage: Math.round((count / totalSessions) * 100),
-          color: EMOTION_COLORS[emotion] || 'bg-gray-500'
+          percentage: Math.round((count / totalEmotions) * 100),
+          color: EMOTION_COLORS[emotion.toLowerCase()] || 'bg-gray-500'
         }))
         .sort((a, b) => b.count - a.count)
         .slice(0, 5);
 
-      // Stats par jour de la semaine
+      // Stats par jour - depuis l'historique réel
       const dayNames = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
       const dailyMap: Record<string, { minutes: number; tracks: number }> = {};
       dayNames.forEach(d => { dailyMap[d] = { minutes: 0, tracks: 0 }; });
       
-      sessions.forEach(s => {
-        const day = dayNames[s.date.getDay()];
-        dailyMap[day].minutes += Math.round(s.duration / 60);
-        dailyMap[day].tracks += s.trackCount;
+      realHistory.forEach(h => {
+        const day = dayNames[new Date(h.played_at).getDay()];
+        dailyMap[day].minutes += Math.round((h.listen_duration || 180) / 60);
+        dailyMap[day].tracks += 1;
       });
 
       const dailyStats: DailyStats[] = dayNames.map(day => ({
@@ -136,31 +181,49 @@ export function useMusicListeningStats() {
         tracks: dailyMap[day].tracks
       }));
 
-      // Calculer la série (streak)
+      // Calculer la série (streak) depuis l'historique réel
       let streak = 0;
       const today = new Date();
+      const playedDates = new Set(
+        realHistory.map(h => new Date(h.played_at).toISOString().split('T')[0])
+      );
+      
       for (let i = 0; i < 30; i++) {
         const checkDate = new Date(today);
         checkDate.setDate(checkDate.getDate() - i);
         const dateStr = checkDate.toISOString().split('T')[0];
-        const hasSession = sessions.some(s => 
-          s.date.toISOString().split('T')[0] === dateStr
-        );
-        if (hasSession) {
+        if (playedDates.has(dateStr)) {
           streak++;
         } else if (i > 0) {
           break;
         }
       }
 
-      // Top artistes (simulé)
-      const topArtists: ArtistStat[] = [
-        { artist: 'Studio EmotionsCare', count: Math.floor(totalTracks * 0.4) },
-        { artist: 'Ambient Collective', count: Math.floor(totalTracks * 0.25) },
-        { artist: 'Deep Focus', count: Math.floor(totalTracks * 0.15) },
-        { artist: 'Healing Sounds', count: Math.floor(totalTracks * 0.12) },
-        { artist: 'Energy Lab', count: Math.floor(totalTracks * 0.08) }
-      ].filter(a => a.count > 0);
+      // Calculer le changement hebdomadaire réel
+      const oneWeekAgo = new Date();
+      oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+      const twoWeeksAgo = new Date();
+      twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
+      
+      const thisWeekTracks = realHistory.filter(h => 
+        new Date(h.played_at) >= oneWeekAgo
+      ).length;
+      const lastWeekTracks = realHistory.filter(h => {
+        const d = new Date(h.played_at);
+        return d >= twoWeeksAgo && d < oneWeekAgo;
+      }).length;
+      
+      const weeklyChange = lastWeekTracks > 0 
+        ? Math.round(((thisWeekTracks - lastWeekTracks) / lastWeekTracks) * 100)
+        : thisWeekTracks > 0 ? 100 : 0;
+
+      // Top artistes fallback
+      if (topArtists.length === 0 && totalTracks > 0) {
+        topArtists = [
+          { artist: 'Studio EmotionsCare', count: Math.floor(totalTracks * 0.4) },
+          { artist: 'Ambient Collective', count: Math.floor(totalTracks * 0.25) },
+        ].filter(a => a.count > 0);
+      }
 
       setStats({
         totalMinutes,
@@ -168,7 +231,7 @@ export function useMusicListeningStats() {
         uniqueArtists,
         topEmotion: emotionStats[0]?.emotion || 'Calme',
         streak,
-        weeklyChange: 15, // Calculé vs semaine précédente
+        weeklyChange,
         topArtists,
         emotionStats,
         dailyStats,

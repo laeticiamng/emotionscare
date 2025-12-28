@@ -27,13 +27,14 @@ export const useMusicGeneration = () => {
     customPrompt?: string,
     mood?: string,
     intensity: number = 0.5,
-    userContext?: string
+    userContext?: string,
+    bpmPreferences?: { min?: number; max?: number; tempo?: string }
   ): Promise<GeneratedTrack | null> => {
     setIsGenerating(true);
     setError(null);
     
     try {
-      logger.info('🎵 Génération musique thérapeutique', { emotion, mood, intensity }, 'MUSIC');
+      logger.info('🎵 Génération musique thérapeutique', { emotion, mood, intensity, bpmPreferences }, 'MUSIC');
       
       // Utiliser emotion-music-ai qui gère tout le flow Suno
       const { data, error: functionError } = await supabase.functions.invoke('emotion-music-ai', {
@@ -43,7 +44,10 @@ export const useMusicGeneration = () => {
           customPrompt: customPrompt || undefined,
           mood: mood,
           intensity: intensity,
-          userContext: userContext
+          userContext: userContext,
+          bpmMin: bpmPreferences?.min,
+          bpmMax: bpmPreferences?.max,
+          tempo: bpmPreferences?.tempo
         }
       });
 
@@ -64,7 +68,7 @@ export const useMusicGeneration = () => {
       if (data.audio_url) {
         return {
           id: data.trackId || taskId,
-          title: `${emotion} - Therapeutic Music`,
+          title: data.title || `${emotion} - Therapeutic Music`,
           artist: 'AI Generated',
           url: data.audio_url,
           audioUrl: data.audio_url,
@@ -75,7 +79,7 @@ export const useMusicGeneration = () => {
         };
       }
 
-      // Polling pour attendre la génération
+      // Polling pour attendre la génération avec meilleure gestion
       const track = await pollForCompletion(taskId, data.trackId, emotion, mood);
       return track;
 
@@ -96,8 +100,10 @@ export const useMusicGeneration = () => {
     emotion: string,
     mood?: string
   ): Promise<GeneratedTrack | null> => {
-    const maxAttempts = 60; // 2 minutes max
+    const maxAttempts = 90; // 3 minutes max (2s intervals)
     let attempts = 0;
+    let consecutiveErrors = 0;
+    const maxConsecutiveErrors = 5;
 
     while (attempts < maxAttempts) {
       await new Promise(resolve => setTimeout(resolve, 2000));
@@ -113,11 +119,20 @@ export const useMusicGeneration = () => {
         });
 
         if (error) {
-          logger.warn('Status check error', { error }, 'MUSIC');
+          consecutiveErrors++;
+          logger.warn('Status check error', { error, consecutiveErrors }, 'MUSIC');
+          if (consecutiveErrors >= maxConsecutiveErrors) {
+            throw new Error('Trop d\'erreurs consécutives lors du polling');
+          }
           continue;
         }
 
-        if (data?.status === 'complete' || data?.status === 'completed') {
+        // Reset consecutive errors on success
+        consecutiveErrors = 0;
+
+        // Handle all completion statuses
+        const status = data?.status?.toLowerCase();
+        if (status === 'complete' || status === 'completed' || status === 'success') {
           return {
             id: trackId || taskId,
             title: data.title || `${emotion} - Therapeutic Music`,
@@ -132,17 +147,26 @@ export const useMusicGeneration = () => {
           };
         }
 
-        if (data?.status === 'failed' || data?.status === 'error') {
-          throw new Error('La génération a échoué');
+        // Handle failure statuses
+        if (status === 'failed' || status === 'error' || status === 'cancelled') {
+          throw new Error(data?.error || 'La génération a échoué');
         }
 
-        logger.info(`Génération en cours... (${attempts}/${maxAttempts})`, { status: data?.status }, 'MUSIC');
+        // Log progress for pending statuses
+        const progressStatuses = ['pending', 'processing', 'generating', 'queued', 'running'];
+        if (progressStatuses.includes(status)) {
+          logger.info(`Génération en cours... (${attempts}/${maxAttempts})`, { status }, 'MUSIC');
+        }
       } catch (err) {
-        logger.warn('Polling error', { err }, 'MUSIC');
+        consecutiveErrors++;
+        logger.warn('Polling error', { err, consecutiveErrors }, 'MUSIC');
+        if (consecutiveErrors >= maxConsecutiveErrors) {
+          throw err;
+        }
       }
     }
 
-    throw new Error('Timeout: la génération a pris trop de temps');
+    throw new Error('Timeout: la génération a pris trop de temps (3 min)');
   };
 
   const checkStatus = useCallback(async (taskId: string): Promise<string> => {
