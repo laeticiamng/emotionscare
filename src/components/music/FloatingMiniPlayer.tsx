@@ -18,6 +18,7 @@ import {
   Volume2,
   VolumeX,
   Sparkles,
+  Loader2,
 } from 'lucide-react';
 import type { MusicTrack } from '@/types/music';
 import { useMusic } from '@/hooks/useMusic';
@@ -25,6 +26,7 @@ import { useMusic } from '@/hooks/useMusic';
 interface FloatingMiniPlayerProps {
   currentTrack?: MusicTrack | null;
   isPlaying?: boolean;
+  isLoading?: boolean;
   progress?: number;
   duration?: number;
   volume?: number;
@@ -42,6 +44,7 @@ interface FloatingMiniPlayerProps {
 export const FloatingMiniPlayer: React.FC<FloatingMiniPlayerProps> = ({
   currentTrack: propTrack,
   isPlaying: propIsPlaying,
+  isLoading: propIsLoading = false,
   progress: propProgress = 0,
   duration: propDuration,
   volume: propVolume,
@@ -253,8 +256,14 @@ export const FloatingMiniPlayer: React.FC<FloatingMiniPlayerProps> = ({
                     size="sm"
                     onClick={handlePlayPause}
                     className="flex-1 gap-2"
+                    disabled={propIsLoading}
                   >
-                    {isPlaying ? (
+                    {propIsLoading ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Chargement...
+                      </>
+                    ) : isPlaying ? (
                       <>
                         <Pause className="h-4 w-4" />
                         Pause
