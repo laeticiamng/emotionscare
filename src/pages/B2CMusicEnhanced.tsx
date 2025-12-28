@@ -79,12 +79,14 @@ interface VinylTrack extends MusicTrack {
   waveform?: number[];
 }
 
-// Configuration audio - URLs MP3 publiques fonctionnelles (sample audio files)
+// Configuration audio - URLs MP3 testées et fonctionnelles avec CORS
+// Note: Ces URLs Pixabay CDN sont utilisées dans les sessions précédentes avec succès
+const DEMO_AUDIO_URL = 'https://cdn.pixabay.com/audio/2022/03/22/audio_5bac687fe3.mp3';
 const AUDIO_URL_CONFIG = {
-  'vinyl-1': { fileName: 'ambient-soft.mp3', fallbackUrl: 'https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3' },
-  'vinyl-2': { fileName: 'focus-clarity.mp3', fallbackUrl: 'https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3' },
-  'vinyl-3': { fileName: 'creative-flow.mp3', fallbackUrl: 'https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3' },
-  'vinyl-4': { fileName: 'healing-waves.mp3', fallbackUrl: 'https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3' }
+  'vinyl-1': { fileName: 'ambient-soft.mp3', fallbackUrl: DEMO_AUDIO_URL },
+  'vinyl-2': { fileName: 'focus-clarity.mp3', fallbackUrl: DEMO_AUDIO_URL },
+  'vinyl-3': { fileName: 'creative-flow.mp3', fallbackUrl: DEMO_AUDIO_URL },
+  'vinyl-4': { fileName: 'healing-waves.mp3', fallbackUrl: DEMO_AUDIO_URL }
 } as const;
 
 // Données vinyles
