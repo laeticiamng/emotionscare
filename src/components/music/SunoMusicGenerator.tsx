@@ -338,14 +338,14 @@ export const SunoMusicGenerator: React.FC = () => {
     if (!currentTrack || !user) return;
 
     try {
-      // Save to user's favorites
-      const { error } = await supabase.from('user_music_favorites').insert({
+      // Save to music_favorites table (unified)
+      const { error } = await supabase.from('music_favorites').insert({
         user_id: user.id,
         track_id: currentTrack.id,
-        title: currentTrack.title,
-        audio_url: currentTrack.audioUrl,
-        mood: currentTrack.mood,
-        metadata: {
+        meta: {
+          title: currentTrack.title,
+          audio_url: currentTrack.audioUrl,
+          mood: currentTrack.mood,
           prompt: currentTrack.prompt,
           genre,
           tempo,

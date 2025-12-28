@@ -12250,7 +12250,7 @@ export type Database = {
         Row: {
           completed_at: string | null
           created_at: string
-          emotion_badge: string
+          emotion_badge: string | null
           emotion_state: Json
           error_message: string | null
           id: string
@@ -12263,7 +12263,7 @@ export type Database = {
         Insert: {
           completed_at?: string | null
           created_at?: string
-          emotion_badge: string
+          emotion_badge?: string | null
           emotion_state: Json
           error_message?: string | null
           id?: string
@@ -12276,7 +12276,7 @@ export type Database = {
         Update: {
           completed_at?: string | null
           created_at?: string
-          emotion_badge?: string
+          emotion_badge?: string | null
           emotion_state?: Json
           error_message?: string | null
           id?: string

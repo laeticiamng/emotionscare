@@ -120,6 +120,9 @@ verify_jwt = true
 [functions.suno-callback]
 verify_jwt = false
 
+[functions.download-audio]
+verify_jwt = false
+
 [api]
 enabled = true
 port = 54321
