@@ -35,10 +35,23 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     };
     
     const handleEnded = () => {
-      dispatch({ type: 'SET_PLAYING', payload: false });
       if (state.repeatMode === 'one') {
+        // Repeat single track
         audio.currentTime = 0;
         audio.play().catch(err => logger.error('Auto-replay failed', err, 'MUSIC'));
+      } else if (state.repeatMode === 'all' && state.playlist.length > 0) {
+        // Repeat all - go to next track, loop to start if at end
+        const nextIndex = (state.currentPlaylistIndex + 1) % state.playlist.length;
+        dispatch({ type: 'SET_PLAYLIST_INDEX', payload: nextIndex });
+        const nextTrack = state.playlist[nextIndex];
+        if (nextTrack) {
+          dispatch({ type: 'SET_CURRENT_TRACK', payload: nextTrack });
+          audio.src = nextTrack.audioUrl || nextTrack.url;
+          audio.load();
+          audio.play().catch(err => logger.error('Auto-next failed', err, 'MUSIC'));
+        }
+      } else {
+        dispatch({ type: 'SET_PLAYING', payload: false });
       }
     };
     
@@ -88,7 +101,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       audio.removeEventListener('error', handleError);
       audio.pause();
     };
-  }, [state.repeatMode]);
+  }, [state.repeatMode, state.playlist, state.currentPlaylistIndex]);
 
   // Custom hooks pour modularité
   const playbackControls = useMusicPlayback(audioRef, state, dispatch);
