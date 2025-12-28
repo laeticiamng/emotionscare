@@ -55,8 +55,15 @@ export const useSunoMusic = () => {
     try {
       logger.info('🎵 Generating music with Suno', request, 'MUSIC');
 
-      const { data, error } = await supabase.functions.invoke('suno-music-generation', {
-        body: request
+      const { data, error } = await supabase.functions.invoke('suno-music', {
+        body: {
+          action: 'generate',
+          prompt: request.prompt,
+          mood: request.tags?.split(',')[0] || 'calm',
+          style: request.tags,
+          title: request.title,
+          instrumental: request.make_instrumental ?? true
+        }
       });
 
       if (error) {
