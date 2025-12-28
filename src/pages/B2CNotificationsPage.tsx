@@ -1,25 +1,38 @@
-// @ts-nocheck
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Bell, Settings, Clock, Mail, Smartphone, Volume2 } from 'lucide-react';
-import { LoadingState, ErrorState, useLoadingStates } from '@/components/ui/LoadingStates';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Skeleton } from '@/components/ui/skeleton';
+import { 
+  Bell, Settings, Clock, Mail, Smartphone, Volume2, 
+  Trash2, Check, Pin, Filter, RefreshCw, BellOff
+} from 'lucide-react';
 import Breadcrumbs from '@/components/navigation/Breadcrumbs';
-import { usePageMetadata } from '@/hooks/usePageMetadata';
+import { useNotifications } from '@/modules/notifications';
+import { formatDistanceToNow } from 'date-fns';
+import { fr } from 'date-fns/locale';
 import { toast } from 'sonner';
+import { motion, AnimatePresence } from 'framer-motion';
+import { cn } from '@/lib/utils';
 
 const B2CNotificationsPage: React.FC = () => {
-  const [notifications, setNotifications] = useState([
-    { id: 1, title: 'Session de méditation recommandée', time: '2h', type: 'recommendation', read: false },
-    { id: 2, title: 'Votre score de bien-être s\'améliore !', time: '4h', type: 'achievement', read: false },
-    { id: 3, title: 'Rappel: Scan émotionnel quotidien', time: '1j', type: 'reminder', read: true },
-    { id: 4, title: 'Nouvelle fonctionnalité disponible: Flash Glow', time: '2j', type: 'feature', read: true },
-    { id: 5, title: 'Résumé hebdomadaire de votre progression', time: '3j', type: 'summary', read: true }
-  ]);
+  const {
+    notifications,
+    unreadCount,
+    stats,
+    loading,
+    markAsRead,
+    markAllAsRead,
+    togglePin,
+    deleteNotification,
+    deleteAllRead,
+    refresh,
+  } = useNotifications();
 
+  const [activeTab, setActiveTab] = useState<'all' | 'unread' | 'pinned'>('all');
   const [settings, setSettings] = useState({
     pushNotifications: true,
     emailNotifications: true,
@@ -31,54 +44,54 @@ const B2CNotificationsPage: React.FC = () => {
     vibrationEnabled: true
   });
 
-  const { loadingState } = usePageMetadata();
-
-  if (loadingState === 'loading') return <LoadingState type="list" count={3} />;
-  if (loadingState === 'error') return <ErrorState error="Erreur de chargement" />;
-
   const handleSettingChange = (key: keyof typeof settings) => {
     setSettings(prev => ({ ...prev, [key]: !prev[key] }));
     toast.success('Paramètre mis à jour');
   };
 
-  const markAsRead = (id: number) => {
-    setNotifications(prev => 
-      prev.map(notif => 
-        notif.id === id ? { ...notif, read: true } : notif
-      )
-    );
+  const handleMarkAllAsRead = async () => {
+    await markAllAsRead();
+    toast.success('Toutes les notifications ont été marquées comme lues');
   };
 
-  const markAllAsRead = () => {
-    setNotifications(prev => 
-      prev.map(notif => ({ ...notif, read: true }))
-    );
-    toast.success('Toutes les notifications ont été marquées comme lues');
+  const handleDeleteAllRead = async () => {
+    await deleteAllRead();
+    toast.success('Notifications lues supprimées');
   };
 
   const getNotificationIcon = (type: string) => {
     switch (type) {
-      case 'recommendation': return '💡';
-      case 'achievement': return '🏆';
+      case 'achievement':
+      case 'badge_unlocked': return '🏆';
       case 'reminder': return '⏰';
-      case 'feature': return '✨';
-      case 'summary': return '📊';
+      case 'update': return '✨';
+      case 'social':
+      case 'community': return '👥';
+      case 'therapeutic': return '💚';
+      case 'challenge': return '🎯';
+      case 'goal': return '🎖️';
+      case 'badge_progress': return '📈';
       default: return '📬';
     }
   };
 
-  const getNotificationColor = (type: string) => {
-    switch (type) {
-      case 'recommendation': return 'bg-blue-500';
-      case 'achievement': return 'bg-yellow-500';
-      case 'reminder': return 'bg-green-500';
-      case 'feature': return 'bg-purple-500';
-      case 'summary': return 'bg-gray-500';
-      default: return 'bg-gray-500';
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case 'urgent': return 'border-l-destructive bg-destructive/5';
+      case 'high': return 'border-l-orange-500 bg-orange-500/5';
+      case 'medium': return 'border-l-primary bg-primary/5';
+      default: return 'border-l-muted';
     }
   };
 
-  const unreadCount = notifications.filter(n => !n.read).length;
+  const filteredNotifications = notifications.filter(n => {
+    if (activeTab === 'unread') return !n.read;
+    if (activeTab === 'pinned') return n.pinned;
+    return true;
+  });
+
+  const isSnoozed = (notif: typeof notifications[0]) => 
+    notif.snoozed_until && new Date(notif.snoozed_until) > new Date();
 
   return (
     <div data-testid="page-root" className="space-y-6">
@@ -86,7 +99,7 @@ const B2CNotificationsPage: React.FC = () => {
       
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Bell className="h-8 w-8 text-blue-500" />
+          <Bell className="h-8 w-8 text-primary" />
           <div>
             <h1 className="text-3xl font-bold">Notifications</h1>
             <p className="text-muted-foreground">
@@ -99,55 +112,189 @@ const B2CNotificationsPage: React.FC = () => {
             </p>
           </div>
         </div>
-        {unreadCount > 0 && (
-          <Button onClick={markAllAsRead} variant="outline">
-            Tout marquer comme lu
+        <div className="flex gap-2">
+          <Button onClick={refresh} variant="outline" size="sm">
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Actualiser
           </Button>
-        )}
+          {unreadCount > 0 && (
+            <Button onClick={handleMarkAllAsRead} variant="outline" size="sm">
+              <Check className="h-4 w-4 mr-2" />
+              Tout marquer comme lu
+            </Button>
+          )}
+        </div>
       </div>
+
+      {/* Statistiques */}
+      {stats && (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <Card>
+            <CardContent className="pt-6">
+              <div className="text-2xl font-bold">{stats.total}</div>
+              <p className="text-sm text-muted-foreground">Total</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="pt-6">
+              <div className="text-2xl font-bold text-primary">{stats.unread}</div>
+              <p className="text-sm text-muted-foreground">Non lues</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="pt-6">
+              <div className="text-2xl font-bold text-green-500">{stats.todayCount}</div>
+              <p className="text-sm text-muted-foreground">Aujourd'hui</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="pt-6">
+              <div className="text-2xl font-bold text-amber-500">
+                {notifications.filter(n => n.pinned).length}
+              </div>
+              <p className="text-sm text-muted-foreground">Épinglées</p>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Liste des notifications */}
         <Card className="lg:col-span-2">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Bell className="h-5 w-5" />
-              Notifications Récentes
-            </CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-2">
+                <Bell className="h-5 w-5" />
+                Notifications
+              </CardTitle>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={handleDeleteAllRead}
+                className="text-muted-foreground"
+              >
+                <Trash2 className="h-4 w-4 mr-1" />
+                Supprimer les lues
+              </Button>
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
-              {notifications.map((notification) => (
-                <div
-                  key={notification.id}
-                  className={`flex items-start gap-4 p-4 rounded-lg border cursor-pointer transition-colors hover:bg-muted/50 ${
-                    !notification.read ? 'bg-primary/5 border-primary/20' : ''
-                  }`}
-                  onClick={() => markAsRead(notification.id)}
-                >
-                  <div className="flex-shrink-0">
-                    <div className={`w-2 h-2 rounded-full ${getNotificationColor(notification.type)} ${!notification.read ? '' : 'opacity-50'}`}></div>
+            <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)}>
+              <TabsList className="mb-4">
+                <TabsTrigger value="all">
+                  Toutes ({notifications.length})
+                </TabsTrigger>
+                <TabsTrigger value="unread">
+                  Non lues ({unreadCount})
+                </TabsTrigger>
+                <TabsTrigger value="pinned">
+                  Épinglées ({notifications.filter(n => n.pinned).length})
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value={activeTab}>
+                {loading ? (
+                  <div className="space-y-3">
+                    {[1, 2, 3].map(i => (
+                      <Skeleton key={i} className="h-20 w-full" />
+                    ))}
                   </div>
-                  <div className="flex items-center gap-3 flex-1">
-                    <div className="text-xl">{getNotificationIcon(notification.type)}</div>
-                    <div className="flex-1">
-                      <div className={`font-medium ${!notification.read ? 'text-foreground' : 'text-muted-foreground'}`}>
-                        {notification.title}
-                      </div>
-                      <div className="text-sm text-muted-foreground flex items-center gap-1">
-                        <Clock className="h-3 w-3" />
-                        il y a {notification.time}
-                      </div>
+                ) : filteredNotifications.length === 0 ? (
+                  <div className="text-center py-12">
+                    <BellOff className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                    <p className="text-muted-foreground">Aucune notification</p>
+                  </div>
+                ) : (
+                  <AnimatePresence mode="popLayout">
+                    <div className="space-y-3">
+                      {filteredNotifications.map((notification) => (
+                        <motion.div
+                          key={notification.id}
+                          layout
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, x: 100 }}
+                          className={cn(
+                            "flex items-start gap-4 p-4 rounded-lg border-l-4 cursor-pointer transition-colors hover:bg-muted/50",
+                            !notification.read && "bg-accent/10 ring-1 ring-primary/20",
+                            notification.pinned && "border-l-amber-500",
+                            !notification.pinned && getPriorityColor(notification.priority),
+                            isSnoozed(notification) && "opacity-60"
+                          )}
+                          onClick={() => !notification.read && markAsRead(notification.id)}
+                        >
+                          <div className="flex-shrink-0 text-xl">
+                            {getNotificationIcon(notification.type)}
+                          </div>
+                          
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className={cn(
+                                "font-medium",
+                                notification.read && "text-muted-foreground"
+                              )}>
+                                {notification.title}
+                              </span>
+                              {!notification.read && (
+                                <span className="w-2 h-2 rounded-full bg-primary" />
+                              )}
+                              {notification.pinned && (
+                                <Pin className="h-3 w-3 text-amber-500" />
+                              )}
+                            </div>
+                            
+                            {notification.message && (
+                              <p className="text-sm text-muted-foreground line-clamp-2">
+                                {notification.message}
+                              </p>
+                            )}
+                            
+                            <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
+                              <Clock className="h-3 w-3" />
+                              {formatDistanceToNow(new Date(notification.created_at), {
+                                addSuffix: true,
+                                locale: fr,
+                              })}
+                              <Badge variant="outline" className="text-xs">
+                                {notification.type}
+                              </Badge>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-1">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                togglePin(notification.id, !notification.pinned);
+                              }}
+                            >
+                              <Pin className={cn(
+                                "h-4 w-4",
+                                notification.pinned && "fill-amber-500 text-amber-500"
+                              )} />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-destructive"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                deleteNotification(notification.id);
+                              }}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </motion.div>
+                      ))}
                     </div>
-                  </div>
-                  {!notification.read && (
-                    <Badge variant="default" className="text-xs">
-                      Nouveau
-                    </Badge>
-                  )}
-                </div>
-              ))}
-            </div>
+                  </AnimatePresence>
+                )}
+              </TabsContent>
+            </Tabs>
           </CardContent>
         </Card>
 
