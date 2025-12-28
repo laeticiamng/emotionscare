@@ -8,6 +8,7 @@ export { RecommendationsPanel } from './components/RecommendationsPanel';
 export { ExportButton } from './components/ExportButton';
 export { RatingStars } from './components/RatingStars';
 export { ArtifactGallery } from './components/ArtifactGallery';
+export { GlobalArtifactGallery } from './components/GlobalArtifactGallery';
 export { QuestTimer } from './components/QuestTimer';
 export { QuestCard } from './components/QuestCard';
 export { QuestList } from './components/QuestList';

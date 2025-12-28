@@ -74,6 +74,7 @@ export const GoalCard: React.FC<GoalCardProps> = ({ goal, onTagClick }) => {
 
   return (
     <motion.div
+      id={`goal-${goal.id}`}
       layout
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}

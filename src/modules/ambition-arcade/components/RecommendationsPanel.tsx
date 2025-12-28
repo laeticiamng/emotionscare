@@ -7,9 +7,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Lightbulb, ArrowRight, Sparkles, TrendingUp, RotateCcw } from 'lucide-react';
+import { Lightbulb, ArrowRight, Sparkles, TrendingUp, RotateCcw, RefreshCw } from 'lucide-react';
 import { useAmbitionRecommendations, type RunRecommendation } from '../hooks/useAmbitionExtras';
 import { useCreateGoal } from '../hooks';
+import { useToast } from '@/hooks/use-toast';
 
 const TYPE_ICONS: Record<string, React.ReactNode> = {
   continue: <RotateCcw className="w-4 h-4" />,
@@ -71,13 +72,24 @@ interface RecommendationsPanelProps {
 }
 
 export const RecommendationsPanel: React.FC<RecommendationsPanelProps> = ({ onSelectRecommendation }) => {
-  const { data: recommendations, isLoading } = useAmbitionRecommendations();
+  const { data: recommendations, isLoading, refetch } = useAmbitionRecommendations();
   const createGoal = useCreateGoal();
+  const { toast } = useToast();
 
   const handleSelect = async (rec: RunRecommendation) => {
     if (rec.type === 'continue' && rec.basedOn) {
-      // Navigate or show the existing run
+      // Scroll to or highlight the existing run
+      const runElement = document.getElementById(`goal-${rec.basedOn}`);
+      if (runElement) {
+        runElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        runElement.classList.add('ring-2', 'ring-primary');
+        setTimeout(() => runElement.classList.remove('ring-2', 'ring-primary'), 2000);
+      }
       onSelectRecommendation?.(rec.title.replace('Continuer: ', ''), rec.tags);
+      toast({
+        title: '📍 Objectif localisé',
+        description: 'Naviguez vers votre objectif actif',
+      });
     } else {
       // Create new goal from recommendation
       await createGoal.mutateAsync({

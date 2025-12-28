@@ -104,6 +104,7 @@ export const ShareAchievement: React.FC<ShareAchievementProps> = ({
           <motion.div
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
+            data-share-preview
             className="p-4 bg-gradient-to-br from-primary/10 via-background to-warning/10 rounded-lg border"
           >
             <div className="flex items-start gap-3">
@@ -170,6 +171,37 @@ export const ShareAchievement: React.FC<ShareAchievementProps> = ({
               </Button>
             )}
           </div>
+
+          {/* Download as Image */}
+          <Button 
+            variant="outline" 
+            className="w-full gap-2"
+            onClick={async () => {
+              try {
+                const html2canvas = (await import('html2canvas')).default;
+                const previewElement = document.querySelector('[data-share-preview]');
+                if (!previewElement) return;
+                
+                const canvas = await html2canvas(previewElement as HTMLElement, {
+                  backgroundColor: null,
+                  scale: 2,
+                });
+                
+                const link = document.createElement('a');
+                link.download = `achievement-${Date.now()}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                
+                toast({ title: 'Image téléchargée !', description: 'Partagez votre réussite' });
+              } catch (error) {
+                console.error('Error generating image:', error);
+                toast({ title: 'Erreur', description: 'Impossible de générer l\'image', variant: 'destructive' });
+              }
+            }}
+          >
+            <Download className="w-4 h-4" />
+            Télécharger l'image
+          </Button>
         </div>
       </DialogContent>
     </Dialog>
