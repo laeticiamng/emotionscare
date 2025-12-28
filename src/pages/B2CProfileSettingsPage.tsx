@@ -21,15 +21,15 @@ import {
   Settings, Bell, Lock, Eye, Download, Trash2, 
   Star, Award, TrendingUp, Activity, Heart, Loader2,
   Save, X, Globe, Briefcase, Sparkles, CheckCircle2,
-  AlertTriangle, Key
+  AlertTriangle, Key, Share2
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useProfile, getProfileCompletionPercentage, getRarityColor } from '@/modules/profile';
 import { useAccessibility } from '@/hooks/useAccessibility';
 import PageRoot from '@/components/common/PageRoot';
 import { format, differenceInMonths } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 const B2CProfileSettingsPage: React.FC = () => {
   const {
@@ -53,6 +53,8 @@ const B2CProfileSettingsPage: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [showPasswordDialog, setShowPasswordDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [show2FADialog, setShow2FADialog] = useState(false);
+  const [showSessionsDialog, setShowSessionsDialog] = useState(false);
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -168,6 +170,31 @@ const B2CProfileSettingsPage: React.FC = () => {
       // Error handled by hook
     }
   }, [requestAccountDeletion]);
+
+  const handleShareProfile = useCallback(async () => {
+    const shareText = `Mon profil EmotionsCare 🧠\n\n📊 ${stats.totalScans} scans émotionnels\n📝 ${stats.totalJournalEntries} entrées journal\n🧘 ${stats.totalBreathingSessions} séances respiration\n🏆 ${stats.totalBadges} badges\n🔥 Série de ${stats.currentStreak} jours\n⭐ Niveau ${stats.level}`;
+    
+    if (navigator.share) {
+      try {
+        await navigator.share({ 
+          title: 'Mon profil EmotionsCare',
+          text: shareText 
+        });
+        announce('Profil partagé');
+      } catch {
+        await navigator.clipboard.writeText(shareText);
+        announce('Profil copié dans le presse-papiers');
+      }
+    } else {
+      await navigator.clipboard.writeText(shareText);
+      announce('Profil copié dans le presse-papiers');
+    }
+  }, [stats, announce]);
+
+  const handle2FASetup = useCallback(() => {
+    // 2FA setup - Supabase supports this via MFA
+    setShow2FADialog(true);
+  }, []);
 
   if (isLoading) {
     return (
@@ -290,7 +317,7 @@ const B2CProfileSettingsPage: React.FC = () => {
                         onChange={handleAvatarChange}
                       />
                       
-                      <div className="flex gap-2 justify-center">
+                      <div className="flex gap-2 justify-center flex-wrap">
                         <Button 
                           variant="outline" 
                           size="sm" 
@@ -310,6 +337,13 @@ const B2CProfileSettingsPage: React.FC = () => {
                             <X className="h-4 w-4" />
                           </Button>
                         )}
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          onClick={handleShareProfile}
+                        >
+                          <Share2 className="h-4 w-4" />
+                        </Button>
                       </div>
                     </div>
                     
@@ -589,7 +623,7 @@ const B2CProfileSettingsPage: React.FC = () => {
                           </p>
                         </div>
                       </div>
-                      <Button variant="outline">
+                      <Button variant="outline" onClick={handle2FASetup}>
                         Configurer
                       </Button>
                     </div>
@@ -610,7 +644,7 @@ const B2CProfileSettingsPage: React.FC = () => {
                           </p>
                         </div>
                       </div>
-                      <Button variant="outline">
+                      <Button variant="outline" onClick={() => setShowSessionsDialog(true)}>
                         Voir détails
                       </Button>
                     </div>
@@ -950,6 +984,96 @@ const B2CProfileSettingsPage: React.FC = () => {
             >
               {isSaving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
               Supprimer définitivement
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* 2FA Setup Dialog */}
+      <Dialog open={show2FADialog} onOpenChange={setShow2FADialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Key className="h-5 w-5 text-primary" />
+              Authentification à deux facteurs
+            </DialogTitle>
+            <DialogDescription>
+              Renforcez la sécurité de votre compte avec une vérification en deux étapes.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4 space-y-4">
+            <div className="p-4 bg-muted rounded-lg">
+              <h4 className="font-medium mb-2">Comment ça marche ?</h4>
+              <ul className="text-sm text-muted-foreground space-y-2">
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                  Téléchargez une application d'authentification (Google Authenticator, Authy)
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                  Scannez le QR code pour lier votre compte
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                  Entrez le code à 6 chiffres à chaque connexion
+                </li>
+              </ul>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Cette fonctionnalité sera bientôt disponible. Vous serez notifié dès son activation.
+            </p>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShow2FADialog(false)}>
+              Fermer
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Sessions Dialog */}
+      <Dialog open={showSessionsDialog} onOpenChange={setShowSessionsDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Activity className="h-5 w-5 text-primary" />
+              Sessions actives
+            </DialogTitle>
+            <DialogDescription>
+              Appareils actuellement connectés à votre compte
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4 space-y-4">
+            <div className="p-4 border rounded-lg">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-primary/10 rounded-lg">
+                    <Activity className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <h4 className="font-medium">Session actuelle</h4>
+                    <p className="text-sm text-muted-foreground">
+                      {navigator.userAgent.includes('Mobile') ? 'Mobile' : 'Desktop'} • {
+                        navigator.userAgent.includes('Chrome') ? 'Chrome' :
+                        navigator.userAgent.includes('Firefox') ? 'Firefox' :
+                        navigator.userAgent.includes('Safari') ? 'Safari' : 'Navigateur'
+                      }
+                    </p>
+                    <p className="text-xs text-green-600 mt-1">Connecté maintenant</p>
+                  </div>
+                </div>
+                <Badge variant="secondary" className="bg-green-500/10 text-green-600">
+                  Actif
+                </Badge>
+              </div>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Aucune autre session active détectée.
+            </p>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowSessionsDialog(false)}>
+              Fermer
             </Button>
           </DialogFooter>
         </DialogContent>

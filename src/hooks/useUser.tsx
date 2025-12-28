@@ -1,65 +1,71 @@
-// @ts-nocheck
-import { useState, useEffect, useCallback } from 'react';
-import { User } from '@/types/user';
+/**
+ * useUser Hook - Wrapper autour du module profile
+ * Maintient la compatibilité avec le code existant
+ */
+
+import { useProfile } from '@/modules/profile';
 import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/hooks/use-toast';
+
+export interface UserData {
+  id: string;
+  email: string | null;
+  name: string | null;
+  role: string;
+  avatar_url: string | null;
+  bio: string | null;
+  phone: string | null;
+  location: string | null;
+}
 
 export const useUser = () => {
-  const { user: authUser, updateUser: authUpdateUser } = useAuth();
-  const { toast } = useToast();
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { user: authUser } = useAuth();
+  const { 
+    profile, 
+    isLoading, 
+    error, 
+    updateProfile,
+    uploadAvatar,
+    removeAvatar,
+  } = useProfile();
 
-  useEffect(() => {
-    if (authUser) {
-      setUser(authUser as User);
-    }
-    setIsLoading(false);
-  }, [authUser]);
+  // Map profile to user format for compatibility
+  const user: UserData | null = profile ? {
+    id: profile.id,
+    email: profile.email,
+    name: profile.name,
+    role: profile.role,
+    avatar_url: profile.avatar_url,
+    bio: profile.bio,
+    phone: profile.phone,
+    location: profile.location,
+  } : authUser ? {
+    id: authUser.id,
+    email: authUser.email || null,
+    name: authUser.user_metadata?.name || null,
+    role: 'b2c',
+    avatar_url: authUser.user_metadata?.avatar_url || null,
+    bio: null,
+    phone: null,
+    location: null,
+  } : null;
 
-  const updateUser = useCallback(async (userData: Partial<User>) => {
-    setIsLoading(true);
-    try {
-      // Call the auth context update function
-      const updatedUser = await authUpdateUser({
-        ...user,
-        ...userData
-      } as User);
-      
-      // Update local user state
-      setUser(prevUser => prevUser ? {
-        ...prevUser,
-        ...userData
-      } : null);
-      
-      toast({
-        title: "Profil mis à jour",
-        description: "Vos informations ont été enregistrées"
-      });
-      
-      return updatedUser;
-    } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : 'Une erreur est survenue';
-      setError(errorMsg);
-      
-      toast({
-        title: "Erreur",
-        description: errorMsg,
-        variant: "destructive"
-      });
-      
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [user, authUpdateUser, toast]);
+  const updateUser = async (userData: Partial<UserData>) => {
+    await updateProfile({
+      name: userData.name || undefined,
+      bio: userData.bio || undefined,
+      phone: userData.phone || undefined,
+      location: userData.location || undefined,
+    });
+    return user;
+  };
 
   return {
     user,
     isLoading,
     error,
-    updateUser
+    updateUser,
+    uploadAvatar,
+    removeAvatar,
   };
 };
 
