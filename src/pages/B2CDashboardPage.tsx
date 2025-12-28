@@ -547,15 +547,15 @@ export default function B2CDashboardPage() {
                   journal: BookOpen,
                   scan: Brain,
                   coach: MessageCircle
-                };
+                } as const;
                 const colorMap = {
                   breath: 'bg-sky-500/10 text-sky-500',
                   music: 'bg-info/10 text-info',
                   journal: 'bg-success/10 text-success',
                   scan: 'bg-primary/10 text-primary',
                   coach: 'bg-accent/10 text-accent'
-                };
-                const RecIcon = iconMap[rec.icon];
+                } as const;
+                const RecIcon = iconMap[rec.icon as keyof typeof iconMap] ?? Brain;
                 return (
                   <Card key={rec.id}>
                     <CardHeader>
