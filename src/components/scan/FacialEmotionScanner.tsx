@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React, { useState, useRef, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -52,13 +50,13 @@ const FacialEmotionScanner: React.FC<FacialEmotionScannerProps> = ({
   };
   
   // Arrêter la caméra
-  const stopCamera = () => {
+  const stopCamera = useCallback(() => {
     if (stream) {
       stream.getTracks().forEach(track => track.stop());
       setStream(null);
     }
     setIsCapturing(false);
-  };
+  }, [stream]);
   
   // Capturer une photo
   const capturePhoto = useCallback(() => {
@@ -84,7 +82,7 @@ const FacialEmotionScanner: React.FC<FacialEmotionScannerProps> = ({
     stopCamera();
     
     toast.success('Photo capturée avec succès');
-  }, [stream]);
+  }, [stopCamera]);
   
   // Gérer l'upload de fichier
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {

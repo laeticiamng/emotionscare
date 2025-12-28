@@ -1,13 +1,15 @@
-// @ts-nocheck
-
 import React, { useState, useRef, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Mic, StopCircle, Loader2, AlertCircle } from 'lucide-react';
-import { EmotionResult, VoiceEmotionScannerProps, normalizeEmotionResult } from '@/types/emotion-unified';
+import { EmotionResult } from '@/types/emotion';
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';
+
+interface VoiceEmotionScannerProps {
+  onEmotionDetected: (result: EmotionResult) => void;
+}
 
 const blobToBase64 = (blob: Blob): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -60,28 +62,17 @@ const VoiceEmotionScanner: React.FC<VoiceEmotionScannerProps> = ({ onEmotionDete
         setTranscript(data.transcript);
       }
 
-      const result: EmotionResult = normalizeEmotionResult({
+      const result: EmotionResult = {
         id: `voice-${Date.now()}`,
         emotion: data.emotion || 'neutre',
         valence: (data.valence || 0.5) * 100,
         arousal: (data.arousal || 0.5) * 100,
-        confidence: (data.confidence || 0.7) * 100,
+        confidence: data.confidence || 0.7,
         source: 'voice',
-        timestamp: new Date().toISOString(),
-        summary: `Émotion ${data.emotion} détectée`,
-        emotions: data.emotions || {},
-        recommendations: [
-          {
-            id: `rec-${Date.now()}-1`,
-            type: 'exercise',
-            title: 'Exercice de respiration',
-            description: 'Un exercice pour vous recentrer',
-            emotion: data.emotion,
-            content: 'Respirez 4s, retenez 4s, expirez 6s.',
-            category: 'wellness'
-          }
-        ]
-      });
+        timestamp: new Date(),
+        insight: `Émotion ${data.emotion} détectée`,
+        suggestions: ['Exercice de respiration: Respirez 4s, retenez 4s, expirez 6s.']
+      };
       
       onEmotionDetected(result);
     } catch (err) {
@@ -91,6 +82,19 @@ const VoiceEmotionScanner: React.FC<VoiceEmotionScannerProps> = ({ onEmotionDete
       setIsProcessing(false);
     }
   }, [onEmotionDetected]);
+
+  const stopRecording = useCallback(() => {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+      if (mediaRecorderRef.current.state === 'recording') {
+        mediaRecorderRef.current.requestData();
+      }
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+    }
+    if (progressIntervalRef.current) {
+      clearInterval(progressIntervalRef.current);
+    }
+  }, []);
 
   const startRecording = useCallback(async () => {
     setError(null);
@@ -147,20 +151,7 @@ const VoiceEmotionScanner: React.FC<VoiceEmotionScannerProps> = ({ onEmotionDete
     } catch (err) {
       setError('Impossible d\'accéder au microphone');
     }
-  }, [processAudio]);
-
-  const stopRecording = useCallback(() => {
-    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
-      if (mediaRecorderRef.current.state === 'recording') {
-        mediaRecorderRef.current.requestData();
-      }
-      mediaRecorderRef.current.stop();
-      setIsRecording(false);
-    }
-    if (progressIntervalRef.current) {
-      clearInterval(progressIntervalRef.current);
-    }
-  }, []);
+  }, [processAudio, stopRecording]);
 
   return (
     <Card>

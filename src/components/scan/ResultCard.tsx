@@ -1,4 +1,4 @@
-// @ts-nocheck
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -239,13 +239,15 @@ export const ResultCard: React.FC<ResultCardProps> = ({
                 <p className="text-xs mb-2">Vos derniers scans</p>
                 <div className="flex justify-center gap-2">
                   {history.slice(0, 5).map((entry, i) => {
-                    const entryConfig = bucketConfig[entry.bucket];
+                    const entryConfig = bucketConfig[entry.bucket as ScanBucket];
+                    if (!entryConfig) return null;
+                    const EntryIcon = entryConfig.icon;
                     return (
                       <div
                         key={i}
                         className={cn('w-8 h-8 rounded-full flex items-center justify-center', entryConfig.bgColor)}
                       >
-                        <entryConfig.icon className={cn('w-4 h-4', entryConfig.color)} />
+                        <EntryIcon className={cn('w-4 h-4', entryConfig.color)} />
                       </div>
                     );
                   })}
@@ -421,7 +423,9 @@ export const ResultCard: React.FC<ResultCardProps> = ({
                 ) : (
                   <div className="space-y-2">
                     {history.map((entry) => {
-                      const entryConfig = bucketConfig[entry.bucket];
+                      const entryConfig = bucketConfig[entry.bucket as ScanBucket];
+                      if (!entryConfig) return null;
+                      const EntryIcon = entryConfig.icon;
                       return (
                         <motion.div
                           key={entry.id}
@@ -430,7 +434,7 @@ export const ResultCard: React.FC<ResultCardProps> = ({
                           className="flex items-center gap-3 p-2 rounded-lg hover:bg-background/50 transition-colors"
                         >
                           <div className={cn('w-8 h-8 rounded-full flex items-center justify-center', entryConfig.bgColor)}>
-                            <entryConfig.icon className={cn('w-4 h-4', entryConfig.color)} />
+                            <EntryIcon className={cn('w-4 h-4', entryConfig.color)} />
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-medium truncate">{entry.label}</p>

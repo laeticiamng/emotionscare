@@ -1,11 +1,9 @@
-// @ts-nocheck
-
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Camera, Mic, Type, Play, Square, RotateCcw, Settings, 
-  Zap, Brain, Eye, Heart, Timer, TrendingUp, AlertTriangle,
-  CheckCircle, Loader2, Volume2, VolumeX
+  Zap, Brain, Timer, TrendingUp,
+  Loader2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -55,23 +53,31 @@ const EnhancedEmotionScanner: React.FC<EnhancedEmotionScannerProps> = ({
     scanProgress,
     currentResult,
     permissions,
-    scanHistory,
     startScan,
     stopScan,
     resetScan,
-    updateConfig,
-    getRealtimeEmotion
+    updateConfig
   } = useEnhancedEmotionScan(config);
 
   // Refs pour les médias
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const audioContextRef = useRef<AudioContext | null>(null);
+
+  // Type pour la configuration des modes de scan
+  interface ScanModeConfig {
+    id: ScanMode;
+    name: string;
+    description: string;
+    icon: React.ReactNode;
+    color: string;
+    permission: boolean;
+    accuracy: number;
+  }
 
   // Modes de scan disponibles
-  const scanModes = [
+  const scanModes: ScanModeConfig[] = [
     {
-      id: 'facial' as ScanMode,
+      id: 'facial',
       name: 'Analyse Faciale',
       description: 'Reconnaissance d\'émotions par caméra IA',
       icon: <Camera className="w-5 h-5" />,
@@ -80,7 +86,7 @@ const EnhancedEmotionScanner: React.FC<EnhancedEmotionScannerProps> = ({
       accuracy: 96
     },
     {
-      id: 'voice' as ScanMode,
+      id: 'voice',
       name: 'Analyse Vocale',
       description: 'Détection d\'émotions par tonalité vocale',
       icon: <Mic className="w-5 h-5" />,
@@ -89,7 +95,7 @@ const EnhancedEmotionScanner: React.FC<EnhancedEmotionScannerProps> = ({
       accuracy: 94
     },
     {
-      id: 'text' as ScanMode,
+      id: 'text',
       name: 'Analyse Textuelle',
       description: 'Sentiment analysis NLP avancée',
       icon: <Type className="w-5 h-5" />,
@@ -98,7 +104,7 @@ const EnhancedEmotionScanner: React.FC<EnhancedEmotionScannerProps> = ({
       accuracy: 91
     },
     {
-      id: 'combined' as ScanMode,
+      id: 'combined',
       name: 'Analyse Multimodale',
       description: 'Combinaison de toutes les sources IA',
       icon: <Brain className="w-5 h-5" />,
@@ -107,7 +113,7 @@ const EnhancedEmotionScanner: React.FC<EnhancedEmotionScannerProps> = ({
       accuracy: 98
     },
     {
-      id: 'realtime' as ScanMode,
+      id: 'realtime',
       name: 'Stream Temps Réel',
       description: 'Analyse continue et adaptative',
       icon: <Zap className="w-5 h-5" />,
@@ -127,7 +133,7 @@ const EnhancedEmotionScanner: React.FC<EnhancedEmotionScannerProps> = ({
   }, [startScan, scanMode, textInput]);
 
   // Mettre à jour la configuration
-  const handleConfigChange = useCallback((key: keyof EmotionAnalysisConfig, value: any) => {
+  const handleConfigChange = useCallback(<K extends keyof EmotionAnalysisConfig>(key: K, value: EmotionAnalysisConfig[K]) => {
     const newConfig = { ...config, [key]: value };
     setConfig(newConfig);
     updateConfig(newConfig);
@@ -431,8 +437,8 @@ const EnhancedEmotionScanner: React.FC<EnhancedEmotionScannerProps> = ({
             >
               <EmotionVisualization result={currentResult} />
               
-              {config.biometricTracking && currentResult.biometrics && (
-                <BiometricDisplay biometrics={currentResult.biometrics} />
+              {config.biometricTracking && currentResult.details?.biometrics && (
+                <BiometricDisplay biometrics={currentResult.details.biometrics} />
               )}
             </motion.div>
           )}
@@ -453,12 +459,12 @@ const EnhancedEmotionScanner: React.FC<EnhancedEmotionScannerProps> = ({
                 {currentResult && (
                   <Button variant="outline" onClick={resetScan}>
                     <RotateCcw className="w-4 h-4 mr-2" />
-                    Nouveau Scan
+                    Réinitialiser
                   </Button>
                 )}
               </>
             ) : (
-              <Button variant="destructive" onClick={stopScan} className="flex-1 max-w-xs">
+              <Button variant="destructive" onClick={stopScan}>
                 <Square className="w-4 h-4 mr-2" />
                 Arrêter
               </Button>

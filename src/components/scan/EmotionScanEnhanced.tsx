@@ -1,4 +1,4 @@
-// @ts-nocheck
+
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -61,8 +61,13 @@ export default function EmotionScanEnhanced() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
-  const { stream, startCamera, stopCamera, isStreaming, error: cameraError } = useUserMedia();
+  const { stream, startMedia, stopMedia, isActive, error: cameraError } = useUserMedia();
   const { toast } = useToast();
+  
+  // Aliases for compatibility
+  const startCamera = async () => startMedia({ video: true, audio: false });
+  const stopCamera = stopMedia;
+  const isStreaming = isActive;
   
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [result, setResult] = useState<EmotionResult | null>(null);
