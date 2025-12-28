@@ -105,8 +105,15 @@ export const requestMusicGeneration = async (params: {
   style_preferences?: string[];
   session_id?: string;
 }) => {
-  const { data, error } = await supabase.functions.invoke('generate-music', {
-    body: params,
+  // Utiliser suno-music qui existe
+  const { data, error } = await supabase.functions.invoke('suno-music', {
+    body: {
+      action: 'generate',
+      emotion: params.emotion,
+      style: params.target_energy,
+      duration: params.duration_seconds,
+      instrumental: true
+    },
   });
 
   if (error) {
@@ -114,7 +121,11 @@ export const requestMusicGeneration = async (params: {
     throw new Error(error.message || 'Erreur lors du lancement de la musique.');
   }
 
-  return data as { request_id: string; status: string };
+  const trackData = data?.data || data;
+  return { 
+    request_id: trackData?.taskId || trackData?.id || `request_${Date.now()}`, 
+    status: trackData?.status || 'pending' 
+  };
 };
 
 export const fetchEmotionSessions = async () => {

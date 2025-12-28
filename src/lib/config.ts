@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Configuration centralisée pour EmotionsCare Production
  */
@@ -10,16 +9,16 @@ export const CONFIG = {
     ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhaW5jb3hpaGlxZGtzeGdyc3JrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI4MTE4MjcsImV4cCI6MjA1ODM4NzgyN30.HBfwymB2F9VBvb3uyeTtHBMZFZYXzL0wQmS5fqd65yU'
   },
   
-  // Edge Functions
+  // Edge Functions - Utilisant les vraies edge functions existantes
   EDGE_FUNCTIONS: {
-    EMOTION_ANALYSIS: 'enhanced-emotion-analyze',
-    MUSIC_GENERATION: 'suno-music-generation',
-    MUSIC_RECOMMENDATIONS: 'get-music-recommendations',
-    MUSIC_THERAPY: 'music-therapy',
-    COACH_AI: 'coach-ai',
-    JOURNAL_ANALYSIS: 'journal-analysis',
-    EMOTIONSCARE_GENERATOR: 'emotionscare-music-generator',
-    ADMIN_ANALYTICS: 'admin-analytics',
+    EMOTION_ANALYSIS: 'analyze-emotion',
+    MUSIC_GENERATION: 'suno-music',
+    MUSIC_RECOMMENDATIONS: 'emotion-music-ai',
+    MUSIC_THERAPY: 'adaptive-music',
+    COACH_AI: 'chat-coach',
+    JOURNAL_ANALYSIS: 'journal-ai-process',
+    EMOTIONSCARE_GENERATOR: 'emotion-music-ai',
+    ADMIN_ANALYTICS: 'ai-analytics-insights',
     SECURITY_AUDIT: 'security-audit'
   },
 

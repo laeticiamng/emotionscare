@@ -230,11 +230,10 @@ class ApiMonitoringService {
     const startTime = performance.now();
     
     try {
-      const { data, error } = await supabase.functions.invoke('suno-music-generation', {
+      // Utiliser suno-music avec health-check
+      const { data, error } = await supabase.functions.invoke('suno-music', {
         body: { 
-          emotion: 'calm',
-          mood: 'peaceful',
-          intensity: 0.5
+          action: 'health-check'
         }
       });
       
@@ -247,7 +246,7 @@ class ApiMonitoringService {
       return { 
         success: true, 
         responseTime,
-        details: { testResult: 'SUNO music generation working' }
+        details: { testResult: 'SUNO music generation working', hasApiKey: data?.hasApiKey }
       };
     } catch (error) {
       const responseTime = performance.now() - startTime;
@@ -352,21 +351,19 @@ class ApiMonitoringService {
     const startTime = performance.now();
     
     try {
-      // Test direct de l'API SUNO via notre edge function
-      const { data, error } = await supabase.functions.invoke('suno-music-generation', {
+      // Test via suno-music health-check
+      const { data, error } = await supabase.functions.invoke('suno-music', {
         body: { 
-          emotion: 'test',
-          mood: 'test', 
-          intensity: 0.5 
+          action: 'health-check'
         }
       });
       
       const responseTime = performance.now() - startTime;
       
       return { 
-        success: !error, 
+        success: !error && data?.success, 
         responseTime,
-        details: { service: 'SUNO API via Edge Function' },
+        details: { service: 'SUNO API via Edge Function', hasApiKey: data?.hasApiKey },
         error: error?.message
       };
     } catch (error) {

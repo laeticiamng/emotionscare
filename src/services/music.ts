@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Service de musique thérapeutique EmotionsCare
  * Connexion Suno AI et recommandations personnalisées
@@ -31,34 +30,38 @@ class MusicService {
    */
   async generateMusic(request: MusicGenerationRequest): Promise<MusicTrack> {
     try {
-      const { data, error } = await supabase.functions.invoke('suno-music-generation', {
+      // Utiliser suno-music qui existe
+      const { data, error } = await supabase.functions.invoke('suno-music', {
         body: {
+          action: 'generate',
           emotion: request.emotion,
           mood: request.mood || request.emotion,
           intensity: request.intensity || 0.7,
           style: request.style || 'therapeutic ambient',
-          lyrics: request.lyrics,
+          prompt: request.lyrics,
           duration: request.duration || 120,
-          therapeutic: request.therapeutic !== false
+          therapeutic: request.therapeutic !== false,
+          instrumental: true
         }
       });
 
       if (error) throw error;
 
+      const trackData = data?.data || data;
       const track: MusicTrack = {
-        id: data.id || `generated_${Date.now()}`,
-        title: data.title || `Musique ${request.emotion}`,
-        artist: data.artist || 'Suno AI',
-        url: data.audioUrl || data.url,
-        audioUrl: data.audioUrl || data.url,
-        duration: data.duration || request.duration || 120,
+        id: trackData.id || trackData.taskId || `generated_${Date.now()}`,
+        title: trackData.title || `Musique ${request.emotion}`,
+        artist: trackData.artist || 'Suno AI',
+        url: trackData.audio_url || trackData.audioUrl || trackData.url,
+        audioUrl: trackData.audio_url || trackData.audioUrl || trackData.url,
+        duration: trackData.duration || request.duration || 120,
         emotion: request.emotion,
         mood: request.mood,
-        coverUrl: data.coverUrl || data.image_url,
-        tags: data.tags || request.style,
+        coverUrl: trackData.image_url || trackData.imageUrl || trackData.coverUrl,
+        tags: trackData.tags || request.style,
         isGenerated: true,
         generatedAt: new Date().toISOString(),
-        sunoTaskId: data.id
+        sunoTaskId: trackData.taskId || trackData.id
       };
 
       return track;
@@ -73,8 +76,10 @@ class MusicService {
    */
   async getRecommendationsForEmotion(emotion: string, count: number = 5): Promise<MusicRecommendation[]> {
     try {
-      const { data, error } = await supabase.functions.invoke('get-music-recommendations', {
+      // Utiliser emotion-music-ai avec action get-recommendations
+      const { data, error } = await supabase.functions.invoke('emotion-music-ai', {
         body: {
+          action: 'get-recommendations',
           emotion,
           count,
           therapeutic: true
@@ -83,26 +88,26 @@ class MusicService {
 
       if (error) throw error;
 
-      return data.recommendations.map((rec: any) => ({
+      const recommendations = data?.recommendations || data?.tracks || [];
+      return recommendations.map((rec: any) => ({
         track: {
           id: rec.id,
-          title: rec.title,
-          artist: rec.artist,
-          url: rec.url,
-          audioUrl: rec.audioUrl || rec.url,
-          duration: rec.duration,
+          title: rec.title || rec.prompt,
+          artist: rec.artist || 'Suno AI',
+          url: rec.audio_url || rec.audioUrl || rec.url,
+          audioUrl: rec.audio_url || rec.audioUrl || rec.url,
+          duration: rec.duration || 120,
           emotion: rec.emotion,
           mood: rec.mood,
-          coverUrl: rec.coverUrl,
+          coverUrl: rec.image_url || rec.imageUrl || rec.coverUrl,
           tags: rec.tags
         } as MusicTrack,
-        reason: rec.reason,
-        therapeutic_benefit: rec.therapeutic_benefit,
-        suggested_duration: rec.suggested_duration
+        reason: rec.reason || `Recommandé pour ${emotion}`,
+        therapeutic_benefit: rec.therapeutic_benefit || 'Bien-être émotionnel',
+        suggested_duration: rec.suggested_duration || 15
       }));
     } catch (error) {
       logger.error('Music recommendations error', error as Error, 'MUSIC');
-      // Fallback recommendations
       return this.getFallbackRecommendations(emotion);
     }
   }
@@ -121,8 +126,10 @@ class MusicService {
     total_duration: number;
   }> {
     try {
-      const { data, error } = await supabase.functions.invoke('music-therapy', {
+      // Utiliser adaptive-music pour créer une playlist thérapeutique
+      const { data, error } = await supabase.functions.invoke('adaptive-music', {
         body: {
+          action: 'create-playlist',
           emotions,
           duration,
           userId,
@@ -132,21 +139,22 @@ class MusicService {
 
       if (error) throw error;
 
+      const tracks = data?.tracks || data?.playlist || [];
       return {
-        playlist: data.tracks.map((track: any) => ({
+        playlist: tracks.map((track: any) => ({
           id: track.id,
           title: track.title,
-          artist: track.artist,
-          url: track.audioUrl || track.url,
-          audioUrl: track.audioUrl || track.url,
-          duration: track.duration,
+          artist: track.artist || 'Suno AI',
+          url: track.audio_url || track.audioUrl || track.url,
+          audioUrl: track.audio_url || track.audioUrl || track.url,
+          duration: track.duration || 120,
           emotion: track.emotion,
           mood: track.mood,
-          coverUrl: track.coverUrl
+          coverUrl: track.image_url || track.imageUrl || track.coverUrl
         } as MusicTrack)),
-        title: data.title,
-        description: data.description,
-        total_duration: data.total_duration
+        title: data?.title || `Playlist ${emotions.join(', ')}`,
+        description: data?.description || 'Playlist thérapeutique personnalisée',
+        total_duration: data?.total_duration || duration * 60
       };
     } catch (error) {
       logger.error('Therapeutic playlist error', error as Error, 'MUSIC');
@@ -242,8 +250,10 @@ class MusicService {
     steps: string[];
   }> {
     try {
-      const { data, error } = await supabase.functions.invoke('emotionscare-music-generator', {
+      // Utiliser adaptive-music edge function
+      const { data, error } = await supabase.functions.invoke('adaptive-music', {
         body: {
+          action: 'transition',
           current_emotion: currentEmotion,
           target_emotion: targetEmotion,
           intensity,
@@ -253,19 +263,20 @@ class MusicService {
 
       if (error) throw error;
 
+      const tracks = data?.tracks || data?.transition_tracks || [];
       return {
-        transition_tracks: data.tracks.map((track: any) => ({
+        transition_tracks: tracks.map((track: any) => ({
           id: track.id,
           title: track.title,
-          artist: track.artist,
-          url: track.audioUrl || track.url,
-          audioUrl: track.audioUrl || track.url,
-          duration: track.duration,
+          artist: track.artist || 'Suno AI',
+          url: track.audio_url || track.audioUrl || track.url,
+          audioUrl: track.audio_url || track.audioUrl || track.url,
+          duration: track.duration || 120,
           emotion: track.emotion,
           mood: track.mood
         } as MusicTrack)),
-        duration: data.total_duration,
-        steps: data.transition_steps
+        duration: data?.total_duration || 300,
+        steps: data?.transition_steps || [`De ${currentEmotion} vers ${targetEmotion}`]
       };
     } catch (error) {
       logger.error('Adaptive music error', error as Error, 'MUSIC');
