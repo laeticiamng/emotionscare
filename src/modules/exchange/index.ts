@@ -15,8 +15,13 @@ export { default as TimeExchangeMarket } from './components/TimeExchangeMarket';
 export { default as EmotionMarket } from './components/EmotionMarket';
 export { default as ExchangeLeaderboard } from './components/ExchangeLeaderboard';
 
+// Profile & Requests Components
+export { default as TimeExchangeRequests } from './components/TimeExchangeRequests';
+export { default as ExchangeProfileCard } from './components/ExchangeProfileCard';
+
 // Hooks
 export * from './hooks/useExchangeData';
+export * from './hooks/useExchangeMatching';
 
 // Types
 export * from './types';
