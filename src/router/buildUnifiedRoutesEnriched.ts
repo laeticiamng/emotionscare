@@ -175,6 +175,22 @@ export const ROUTES_MANIFEST: RouteManifestEntry[] = [
     auth: true,
     title: 'VR Galaxy'
   },
+  {
+    path: '/app/seuil',
+    component: 'SeuilPage',
+    module: 'seuil',
+    auth: true,
+    title: 'Seuil - Zone de transition',
+    description: 'Module de régulation émotionnelle proactive'
+  },
+  {
+    path: '/app/ambition-arcade',
+    component: 'AmbitionArcade',
+    module: 'ambition-arcade',
+    auth: true,
+    title: 'Ambition Arcade',
+    description: 'Gamification des objectifs personnels'
+  },
 
   // Settings routes
   {
