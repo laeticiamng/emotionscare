@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 
 interface WaveformVisualizerProps {
@@ -8,6 +8,7 @@ interface WaveformVisualizerProps {
   className?: string;
   color?: string;
   activeColor?: string;
+  audioData?: Uint8Array | number[];
 }
 
 const WaveformVisualizer: React.FC<WaveformVisualizerProps> = ({
@@ -16,29 +17,44 @@ const WaveformVisualizer: React.FC<WaveformVisualizerProps> = ({
   onSeek,
   className,
   color = 'hsl(var(--muted))',
-  activeColor = 'hsl(var(--primary))'
+  activeColor = 'hsl(var(--primary))',
+  audioData
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [waveformData, setWaveformData] = useState<number[]>([]);
   const animationFrameRef = useRef<number>();
+  const lastAudioDataRef = useRef<number[]>([]);
 
-  // Generate mock waveform data
+  // Generate initial waveform or use audio data
   useEffect(() => {
-    const generateWaveform = () => {
-      const samples = 100;
+    if (audioData && audioData.length > 0) {
+      // Use real audio data - normalize to 0-1 range
+      const normalized = Array.from(audioData).map(v => Math.min(1, Math.max(0.1, v / 255)));
+      // Smooth transition
+      if (lastAudioDataRef.current.length === normalized.length) {
+        const smoothed = normalized.map((v, i) => {
+          const prev = lastAudioDataRef.current[i] || v;
+          return prev * 0.3 + v * 0.7; // Exponential smoothing
+        });
+        lastAudioDataRef.current = smoothed;
+        setWaveformData(smoothed);
+      } else {
+        lastAudioDataRef.current = normalized;
+        setWaveformData(normalized);
+      }
+    } else if (waveformData.length === 0) {
+      // Generate mock waveform data only if no data exists
+      const samples = 64;
       const data = Array.from({ length: samples }, (_, i) => {
-        // Create a more realistic waveform pattern
         const baseHeight = Math.sin(i * 0.1) * 0.5 + 0.5;
         const variation = Math.random() * 0.3;
         const peak = Math.sin(i * 0.05) * 0.2;
         return Math.min(1, Math.max(0.1, baseHeight + variation + peak));
       });
       setWaveformData(data);
-    };
-
-    generateWaveform();
-  }, []);
+    }
+  }, [audioData]);
 
   // Animation loop for playing state
   useEffect(() => {
@@ -65,7 +81,7 @@ const WaveformVisualizer: React.FC<WaveformVisualizerProps> = ({
     };
   }, [isPlaying, progress, waveformData]);
 
-  const drawWaveform = () => {
+  const drawWaveform = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas || waveformData.length === 0) return;
 
@@ -75,25 +91,43 @@ const WaveformVisualizer: React.FC<WaveformVisualizerProps> = ({
     const { width, height } = canvas;
     ctx.clearRect(0, 0, width, height);
 
-    const barWidth = width / waveformData.length;
+    const barWidth = Math.max(2, width / waveformData.length);
+    const gap = Math.max(1, barWidth * 0.2);
     const progressPoint = (progress / 100) * waveformData.length;
 
     waveformData.forEach((amplitude, index) => {
-      const barHeight = amplitude * height * 0.8;
+      const barHeight = amplitude * height * 0.85;
       const x = index * barWidth;
       const y = (height - barHeight) / 2;
 
-      // Determine color based on progress
+      // Determine color based on progress with gradient effect
       const isActive = index < progressPoint;
+      const isNearProgress = Math.abs(index - progressPoint) < 2;
+      
+      if (isNearProgress && isPlaying) {
+        // Glow effect near playhead
+        ctx.shadowColor = activeColor;
+        ctx.shadowBlur = 8;
+      } else {
+        ctx.shadowBlur = 0;
+      }
+      
       ctx.fillStyle = isActive ? activeColor : color;
 
-      // Add some animation when playing
-      const animationOffset = isPlaying ? Math.sin(Date.now() * 0.01 + index * 0.1) * 2 : 0;
-      const finalHeight = barHeight + (isActive && isPlaying ? animationOffset : 0);
+      // Add subtle animation when playing
+      const animationOffset = isPlaying && isActive ? 
+        Math.sin(Date.now() * 0.008 + index * 0.15) * 3 : 0;
+      const finalHeight = Math.max(3, barHeight + animationOffset);
 
-      ctx.fillRect(x, y, Math.max(1, barWidth - 1), Math.max(2, finalHeight));
+      // Rounded bars
+      const radius = Math.min(2, (barWidth - gap) / 2);
+      ctx.beginPath();
+      ctx.roundRect(x, y, barWidth - gap, finalHeight, radius);
+      ctx.fill();
     });
-  };
+    
+    ctx.shadowBlur = 0;
+  }, [waveformData, progress, isPlaying, color, activeColor]);
 
   // Handle click to seek
   const handleClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
