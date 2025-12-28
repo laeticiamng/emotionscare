@@ -98,24 +98,31 @@ export const useParkRecommendations = () => {
 
   const getDailyChallenge = (attractions: Attraction[]): Attraction | null => {
     const today = new Date().toDateString();
-    const savedChallenge = localStorage.getItem(`daily-challenge-${today}`);
+    const storageKey = `daily-challenge-${today}`;
+    
+    // Use sessionStorage for daily challenge (cleared on browser close, no sensitive data)
+    const savedChallenge = sessionStorage.getItem(storageKey);
 
     if (savedChallenge) {
-      return JSON.parse(savedChallenge);
+      try {
+        return JSON.parse(savedChallenge);
+      } catch {
+        sessionStorage.removeItem(storageKey);
+      }
     }
 
-    // Sélectionner une attraction aléatoire non visitée aujourd'hui
-    const unvisitedToday = attractions.filter(
-      a => !visitedAttractions[`${a.id}-today`]
-    );
+    // Sélectionner une attraction aléatoire non visitée
+    const unvisited = attractions.filter(a => !visitedAttractions[a.id]);
 
-    if (unvisitedToday.length === 0) {
-      return null;
+    if (unvisited.length === 0) {
+      // Si tout est visité, choisir parmi toutes les attractions
+      const randomIndex = Math.floor(Math.random() * attractions.length);
+      return attractions[randomIndex] || null;
     }
 
-    const randomIndex = Math.floor(Math.random() * unvisitedToday.length);
-    const challenge = unvisitedToday[randomIndex];
-    localStorage.setItem(`daily-challenge-${today}`, JSON.stringify(challenge));
+    const randomIndex = Math.floor(Math.random() * unvisited.length);
+    const challenge = unvisited[randomIndex];
+    sessionStorage.setItem(storageKey, JSON.stringify(challenge));
     return challenge;
   };
 

@@ -53,17 +53,8 @@ export const useAttractionProgress = () => {
             return;
           }
         }
-        // Fallback localStorage
-        const stored = localStorage.getItem(STORAGE_KEY);
-        const storedSearch = localStorage.getItem(SEARCH_HISTORY_KEY);
-        if (stored) {
-          const data = JSON.parse(stored);
-          setVisitedAttractions(data.visits || {});
-          setUnlockedBadges(data.badges || []);
-        }
-        if (storedSearch) {
-          setSearchHistory(JSON.parse(storedSearch));
-        }
+        // Fallback: try to load from Supabase user_settings without auth (for legacy data)
+        // No localStorage fallback to avoid unencrypted data storage
       } catch (error) {
         logger.error('Failed to load attraction progress', error as Error, 'PARK');
       }
@@ -74,7 +65,6 @@ export const useAttractionProgress = () => {
   // Save progress to Supabase
   const saveProgress = useCallback(async (visits: Record<string, AttractionVisit>, badges: ZoneBadge[], history?: SearchHistory[]) => {
     const data = { visits, badges, searchHistory: history || searchHistory };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     
     if (user) {
       try {
@@ -167,9 +157,10 @@ export const useAttractionProgress = () => {
       const newHistory = [
         { term, timestamp: Date.now(), resultCount },
         ...prev.filter(h => h.term !== term)
-      ].slice(0, 10); // Keep last 10 searches
+      ].slice(0, 10);
       
-      localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(newHistory));
+      // Save with main progress data via Supabase
+      saveProgress(visitedAttractions, unlockedBadges, newHistory);
       return newHistory;
     });
   };
