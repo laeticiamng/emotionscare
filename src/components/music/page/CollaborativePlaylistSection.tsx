@@ -81,6 +81,7 @@ export const CollaborativePlaylistSection: React.FC = () => {
   const [newMessage, setNewMessage] = useState('');
   const [showInvite, setShowInvite] = useState(false);
   const [inviteEmail, setInviteEmail] = useState('');
+  const chatContainerRef = React.useRef<HTMLDivElement>(null);
 
   // Charger ou créer la playlist collaborative depuis Supabase
   useEffect(() => {
@@ -247,6 +248,13 @@ export const CollaborativePlaylistSection: React.FC = () => {
       chat: [...playlist.chat, message],
     });
     setNewMessage('');
+    
+    // Auto-scroll to bottom after sending message
+    setTimeout(() => {
+      if (chatContainerRef.current) {
+        chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+      }
+    }, 50);
   };
 
   const handleInvite = () => {
@@ -407,12 +415,15 @@ export const CollaborativePlaylistSection: React.FC = () => {
                   </div>
 
                   {/* Votes */}
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
                     <Button
                       size="sm"
                       variant={track.userVote === 'up' ? 'default' : 'ghost'}
                       className="h-7 w-7 p-0"
-                      onClick={() => handleVote(track.id, 'up')}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleVote(track.id, 'up');
+                      }}
                     >
                       <ThumbsUp className="h-3 w-3" />
                     </Button>
@@ -423,7 +434,10 @@ export const CollaborativePlaylistSection: React.FC = () => {
                       size="sm"
                       variant={track.userVote === 'down' ? 'destructive' : 'ghost'}
                       className="h-7 w-7 p-0"
-                      onClick={() => handleVote(track.id, 'down')}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleVote(track.id, 'down');
+                      }}
                     >
                       <ThumbsDown className="h-3 w-3" />
                     </Button>
@@ -516,7 +530,10 @@ export const CollaborativePlaylistSection: React.FC = () => {
 
           {/* Chat Tab */}
           <TabsContent value="chat" className="space-y-3 mt-3">
-            <div className="space-y-2 max-h-48 overflow-y-auto">
+            <div 
+              ref={chatContainerRef}
+              className="space-y-2 max-h-48 overflow-y-auto"
+            >
               {playlist.chat.map((msg) => (
                 <div key={msg.id} className="flex gap-2">
                   <Avatar className="h-6 w-6">

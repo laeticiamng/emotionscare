@@ -30,6 +30,7 @@ import {
   Share2
 } from '@/components/music/icons';
 import { useAutoMix } from '@/hooks/useAutoMix';
+import { useMusic } from '@/hooks/useMusic';
 import { PlaylistShareModal } from './PlaylistShareModal';
 
 const TimeIcons = {
@@ -60,14 +61,7 @@ export const AutoMixPlayer: React.FC = () => {
   } = useAutoMix();
 
   // Connexion au contexte musique global
-  const musicContext = React.useMemo(() => {
-    try {
-      // eslint-disable-next-line react-hooks/rules-of-hooks
-      return require('@/hooks/useMusic').useMusic();
-    } catch {
-      return null;
-    }
-  }, []);
+  const musicContext = useMusic();
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
