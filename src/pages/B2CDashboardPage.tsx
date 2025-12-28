@@ -33,6 +33,7 @@ import { PRESET_DETAILS } from '@/services/music/presetMetadata';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useClinicalHints } from '@/hooks/useClinicalHints';
 import { useUserStatsQuery, useUserStatsRealtime } from '@/hooks/useUserStatsQuery';
+import { useDynamicRecommendations } from '@/hooks/useDynamicRecommendations';
 
 const WeeklyPlanCard = React.lazy(() => import('@/components/dashboard/widgets/WeeklyPlanCard'));
 const RecentEmotionScansWidget = React.lazy(() => import('@/components/dashboard/widgets/RecentEmotionScansWidget'));
@@ -163,6 +164,9 @@ export default function B2CDashboardPage() {
   // Stats réelles depuis Supabase
   const { stats: userStats, loading: statsLoading } = useUserStatsQuery();
   useUserStatsRealtime();
+  
+  // Recommandations dynamiques
+  const { recommendations, loading: recsLoading } = useDynamicRecommendations();
 
   const musicSnapshot = playback.snapshot;
   const presetLabel = musicSnapshot?.presetId && musicSnapshot.presetId in PRESET_DETAILS
@@ -499,32 +503,51 @@ export default function B2CDashboardPage() {
           <h2 id="recommendations-title" className="text-xl font-semibold mb-4">
             Recommandé pour vous
           </h2>
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <div className="p-2 bg-orange-500/10 rounded">
-                  <Target className="h-4 w-4 text-orange-500" aria-hidden="true" />
-                </div>
-                <span>Session de respiration guidée</span>
-              </CardTitle>
-              <CardDescription>
-                Basé sur votre niveau de stress détecté ce matin
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground mb-4">
-                Une session de 10 minutes pour réduire le stress et améliorer votre concentration.
-              </p>
-              <Button asChild aria-describedby="breath-session-desc">
-                <Link to="/app/breath">
-                  Commencer la session
-                </Link>
-              </Button>
-              <p id="breath-session-desc" className="sr-only">
-                Démarre une session de respiration guidée de 10 minutes
-              </p>
-            </CardContent>
-          </Card>
+          <div className="grid gap-4 md:grid-cols-2">
+            {recsLoading ? (
+              <>
+                <Skeleton className="h-40 w-full" />
+                <Skeleton className="h-40 w-full" />
+              </>
+            ) : (
+              recommendations.map((rec) => {
+                const iconMap = {
+                  breath: Wind,
+                  music: Music,
+                  journal: BookOpen,
+                  scan: Brain,
+                  coach: MessageCircle
+                };
+                const colorMap = {
+                  breath: 'bg-sky-500/10 text-sky-500',
+                  music: 'bg-info/10 text-info',
+                  journal: 'bg-success/10 text-success',
+                  scan: 'bg-primary/10 text-primary',
+                  coach: 'bg-accent/10 text-accent'
+                };
+                const RecIcon = iconMap[rec.icon];
+                return (
+                  <Card key={rec.id}>
+                    <CardHeader>
+                      <CardTitle className="flex items-center space-x-2">
+                        <div className={`p-2 rounded ${colorMap[rec.icon]}`}>
+                          <RecIcon className="h-4 w-4" aria-hidden="true" />
+                        </div>
+                        <span>{rec.title}</span>
+                      </CardTitle>
+                      <CardDescription>{rec.reason}</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm text-muted-foreground mb-4">{rec.description}</p>
+                      <Button asChild size="sm">
+                        <Link to={rec.to}>Commencer</Link>
+                      </Button>
+                    </CardContent>
+                  </Card>
+                );
+              })
+            )}
+          </div>
         </section>
       </main>
 
@@ -535,13 +558,13 @@ export default function B2CDashboardPage() {
             <p>© 2025 EmotionsCare - Votre bien-être, notre priorité</p>
             <nav aria-label="Liens footer">
               <div className="flex space-x-4">
-                <Link to="/privacy" className="hover:text-foreground">
+                <Link to="/legal/privacy" className="hover:text-foreground">
                   Confidentialité
                 </Link>
-                <Link to="/terms" className="hover:text-foreground">
+                <Link to="/legal/terms" className="hover:text-foreground">
                   Conditions
                 </Link>
-                <Link to="/help" className="hover:text-foreground">
+                <Link to="/contact" className="hover:text-foreground">
                   Support
                 </Link>
               </div>
