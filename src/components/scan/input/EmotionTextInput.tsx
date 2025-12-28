@@ -128,14 +128,12 @@ const EmotionTextInput: React.FC<EmotionTextInputProps> = ({
     if (!value.trim()) return;
     
     const newDraft = {
-      id: Date.now().toString(),
       text: value,
       date: new Date().toISOString()
     };
     
-    const newDrafts = [newDraft, ...drafts.filter(d => d.text !== value)].slice(0, 10);
-    setDrafts(newDrafts);
-    localStorage.setItem(DRAFTS_KEY, JSON.stringify(newDrafts));
+    saveTextDraft(newDraft);
+    setDrafts(prev => [{ id: Date.now().toString(), ...newDraft }, ...prev.filter(d => d.text !== value)].slice(0, 10));
     
     if (!auto) {
       // Show feedback
@@ -156,9 +154,8 @@ const EmotionTextInput: React.FC<EmotionTextInputProps> = ({
       sentiment: sentiment || 'neutral'
     };
     
-    const newHistory = [entry, ...history].slice(0, 50);
-    setHistory(newHistory);
-    localStorage.setItem(HISTORY_KEY, JSON.stringify(newHistory));
+    addTextHistory(entry);
+    setHistory(prev => [entry, ...prev].slice(0, 50));
   };
 
   const toggleRecording = () => {
