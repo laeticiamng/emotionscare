@@ -201,7 +201,7 @@ export function MusicLyricsSynchronized({
 
   if (!lrcData) {
     return (
-      <div className={cn('flex items-center justify-center p-8 text-gray-500', className)}>
+      <div className={cn('flex items-center justify-center p-8 text-muted-foreground', className)}>
         <div className="text-center">
           <p>Aucune parole disponible</p>
         </div>
@@ -229,12 +229,12 @@ export function MusicLyricsSynchronized({
     >
       {/* Metadata */}
       {(lrcData.title || lrcData.artist) && (
-        <div className="sticky top-0 bg-white/95 backdrop-blur-sm p-4 border-b z-10">
+        <div className="sticky top-0 bg-background/95 backdrop-blur-sm p-4 border-b z-10">
           {lrcData.title && (
-            <h3 className="font-semibold text-lg">{lrcData.title}</h3>
+            <h3 className="font-semibold text-lg text-foreground">{lrcData.title}</h3>
           )}
           {lrcData.artist && (
-            <p className="text-sm text-gray-600">{lrcData.artist}</p>
+            <p className="text-sm text-muted-foreground">{lrcData.artist}</p>
           )}
         </div>
       )}

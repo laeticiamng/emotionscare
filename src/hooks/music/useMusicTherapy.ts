@@ -1,4 +1,4 @@
-// @ts-nocheck
+// TODO: Add proper types for musicTherapyService responses
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { musicTherapyService } from '@/services';
 import type { ApiResponse, EmotionData, MusicRecommendation } from '@/services/types';
@@ -145,8 +145,8 @@ export const useMusicTherapy = (): MusicTherapyHook => {
         setCurrentTrackIndex(0);
         
         // Charger la piste dans l'élément audio
-        if (audioRef.current && initialTrack.audioUrl) {
-          audioRef.current.src = initialTrack.audioUrl;
+        if (audioRef.current && initialTrack.url) {
+          audioRef.current.src = initialTrack.url;
           audioRef.current.load();
         }
 
@@ -221,7 +221,7 @@ export const useMusicTherapy = (): MusicTherapyHook => {
           // Charger la nouvelle piste
           if (audioRef.current) {
             const wasPlaying = isPlaying;
-            audioRef.current.src = newTrack.audioUrl || '';
+            audioRef.current.src = newTrack.url || '';
             audioRef.current.load();
             
             if (wasPlaying) {
@@ -354,9 +354,9 @@ export const useMusicTherapy = (): MusicTherapyHook => {
     setCurrentTrackIndex(nextIndex);
     setCurrentTrack(nextTrack);
     
-    if (audioRef.current && nextTrack.audioUrl) {
+    if (audioRef.current && nextTrack.url) {
       const wasPlaying = isPlaying;
-      audioRef.current.src = nextTrack.audioUrl;
+      audioRef.current.src = nextTrack.url;
       audioRef.current.load();
       
       if (wasPlaying) {
@@ -374,9 +374,9 @@ export const useMusicTherapy = (): MusicTherapyHook => {
     setCurrentTrackIndex(prevIndex);
     setCurrentTrack(prevTrack);
     
-    if (audioRef.current && prevTrack.audioUrl) {
+    if (audioRef.current && prevTrack.url) {
       const wasPlaying = isPlaying;
-      audioRef.current.src = prevTrack.audioUrl;
+      audioRef.current.src = prevTrack.url;
       audioRef.current.load();
       
       if (wasPlaying) {
@@ -410,7 +410,7 @@ export const useMusicTherapy = (): MusicTherapyHook => {
           setCurrentTrackIndex(0);
           
           if (audioRef.current) {
-            audioRef.current.src = response.data.playlist[0].audioUrl || '';
+            audioRef.current.src = response.data.playlist[0].url || '';
             audioRef.current.load();
           }
         }
