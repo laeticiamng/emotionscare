@@ -7,6 +7,7 @@
  */
 
 import React, { useState, useMemo, useEffect } from 'react';
+import { useUserStatsQuery } from '@/hooks/useUserStatsQuery';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Filter, Search, X, TrendingUp, Target, Award, ChevronDown, Star, Calendar, Sparkles, Trophy, Zap, BarChart3 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -61,6 +62,7 @@ export default function EmotionalPark() {
   } = useGuidedTour();
 
   const { getRecommendations, getDailyChallenge } = useParkRecommendations();
+  const { stats: userStats } = useUserStatsQuery();
 
   const [showTourModal, setShowTourModal] = useState(false);
 
@@ -147,14 +149,14 @@ export default function EmotionalPark() {
       },
       {
         label: 'Jours Actifs',
-        value: Math.floor(Math.random() * 30) + 1,
+        value: userStats.currentStreak,
         unit: 'jours',
         icon: Calendar,
         gradient: 'from-green-500/20 to-emerald-500/20',
         description: 'Continuité de ton engagement'
       }
     ];
-  }, [attractions, visitedAttractions, unlockedBadges, zones]);
+  }, [attractions, visitedAttractions, unlockedBadges, zones, userStats.currentStreak]);
 
   // Handle search
   const handleSearch = (value: string) => {
