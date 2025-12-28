@@ -200,7 +200,7 @@ export const SunoMusicGenerator: React.FC = () => {
 
         const trackData = data.data;
 
-        if (trackData.status === 'complete' || trackData.audio_url) {
+        if (trackData.status === 'complete' || trackData.status === 'completed' || trackData.audio_url) {
           // Generation completed
           const moodData = MOOD_OPTIONS.find((m) => m.id === selectedMood);
 
