@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React, { useState, useMemo } from 'react';
 import { Line, Bar, Area, ComposedChart } from 'recharts';
 import { LineChart, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, AreaChart, BarChart } from 'recharts';
@@ -106,7 +104,7 @@ const EmotionTrendChart: React.FC<EmotionTrendChartProps> = ({
       if (!grouped[date].scores[emotion]) {
         grouped[date].scores[emotion] = [];
       }
-      grouped[date].scores[emotion].push(item.score);
+      grouped[date].scores[emotion].push(item.confidence ?? 0.5);
       grouped[date].count++;
     });
 
