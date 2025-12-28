@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, lazy, Suspense } from 'react';
 import { captureException } from '@/lib/ai-monitoring';
 import { Sentry } from '@/lib/errors/sentry-compat';
 import { supabase } from '@/integrations/supabase/client';
@@ -11,26 +11,34 @@ import { Button } from '@/components/ui/button';
 import { ClinicalOptIn } from '@/components/consent/ClinicalOptIn';
 import { MedicalDisclaimerDialog, useMedicalDisclaimer } from '@/components/medical/MedicalDisclaimerDialog';
 import { useFlags } from '@/core/flags';
-import CameraSampler from '@/features/scan/CameraSampler';
-import SamSliders from '@/features/scan/SamSliders';
-import MicroGestes from '@/features/scan/MicroGestes';
 import { useSamOrchestration } from '@/features/mood/useSamOrchestration';
 import { ConsentGate } from '@/features/clinical-optin/ConsentGate';
 import { useAssessment } from '@/hooks/useAssessment';
-import { AssessmentWrapper } from '@/components/assess';
 import { logger } from '@/lib/logger';
-import { ScanHistory } from '@/components/scan/ScanHistory';
-import { MultiSourceChart } from '@/components/scan/MultiSourceChart';
 import { ScanOnboarding, shouldShowOnboarding } from '@/components/scan/ScanOnboarding';
 import { useToast } from '@/hooks/use-toast';
 import { scanAnalytics } from '@/lib/analytics/scanEvents';
-import { Camera, Mic, FileText, Sliders, BarChart3, Lightbulb, Download, Settings, Calendar } from 'lucide-react';
+import { Camera, Mic, FileText, Sliders, BarChart3, Lightbulb, Download, Calendar, Loader2 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import EnhancedScanDashboard from '@/components/scan/EnhancedScanDashboard';
-import EmotionComparisonView from '@/components/scan/EmotionComparisonView';
-import SmartRecommendations from '@/components/scan/SmartRecommendations';
-import ScanExportPanel from '@/components/scan/ScanExportPanel';
-import { WeeklyEmotionReport } from '@/components/scan/WeeklyEmotionReport';
+
+// Lazy load heavy components for faster initial render
+const CameraSampler = lazy(() => import('@/features/scan/CameraSampler'));
+const SamSliders = lazy(() => import('@/features/scan/SamSliders'));
+const MicroGestes = lazy(() => import('@/features/scan/MicroGestes'));
+const ScanHistory = lazy(() => import('@/components/scan/ScanHistory').then(m => ({ default: m.ScanHistory })));
+const MultiSourceChart = lazy(() => import('@/components/scan/MultiSourceChart').then(m => ({ default: m.MultiSourceChart })));
+const EnhancedScanDashboard = lazy(() => import('@/components/scan/EnhancedScanDashboard'));
+const EmotionComparisonView = lazy(() => import('@/components/scan/EmotionComparisonView'));
+const SmartRecommendations = lazy(() => import('@/components/scan/SmartRecommendations'));
+const ScanExportPanel = lazy(() => import('@/components/scan/ScanExportPanel'));
+const WeeklyEmotionReport = lazy(() => import('@/components/scan/WeeklyEmotionReport').then(m => ({ default: m.WeeklyEmotionReport })));
+
+// Loading fallback component
+const LoadingFallback = () => (
+  <div className="flex items-center justify-center p-8 min-h-[200px]">
+    <Loader2 className="h-6 w-6 animate-spin text-primary/50" />
+  </div>
+);
 
 const mapToSamScale = (value: number) => {
   const normalized = Math.max(0, Math.min(100, value));
@@ -436,25 +444,33 @@ const B2CScanPage: React.FC = () => {
               <TabsContent value="scanner" className="mt-6">
                 <div className="grid gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
                   <div className="space-y-8">
-                    {mode === 'camera' && !cameraDisabled ? (
-                      <CameraSampler
-                        summary={activeSummary}
-                        onPermissionChange={handleCameraPermission}
-                        onUnavailable={handleUnavailable}
-                      />
-                    ) : (
-                      <SamSliders detail={detail} summary={activeSummary} />
-                    )}
-                    <ScanHistory />
-                    <MultiSourceChart />
+                    <Suspense fallback={<LoadingFallback />}>
+                      {mode === 'camera' && !cameraDisabled ? (
+                        <CameraSampler
+                          summary={activeSummary}
+                          onPermissionChange={handleCameraPermission}
+                          onUnavailable={handleUnavailable}
+                        />
+                      ) : (
+                        <SamSliders detail={detail} summary={activeSummary} />
+                      )}
+                    </Suspense>
+                    <Suspense fallback={<LoadingFallback />}>
+                      <ScanHistory />
+                    </Suspense>
+                    <Suspense fallback={<LoadingFallback />}>
+                      <MultiSourceChart />
+                    </Suspense>
                   </div>
-                  <MicroGestes
-                    gestures={gestures}
-                    summary={activeSummary}
-                    emotion={displayEmotion}
-                    valence={detail?.valence}
-                    arousal={detail?.arousal}
-                  />
+                  <Suspense fallback={<LoadingFallback />}>
+                    <MicroGestes
+                      gestures={gestures}
+                      summary={activeSummary}
+                      emotion={displayEmotion}
+                      valence={detail?.valence}
+                      arousal={detail?.arousal}
+                    />
+                  </Suspense>
                 </div>
               </TabsContent>
 
