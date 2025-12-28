@@ -1,9 +1,10 @@
 /**
  * Suno Music Generator Component
  * Complete music generation interface with mood selection and customization
+ * Uses Supabase Realtime for live generation updates
  */
 
-import React, { useState } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -13,7 +14,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Music,
   Wand2,
@@ -25,13 +25,15 @@ import {
   AlertTriangle,
   Info,
   Sparkles,
-  Volume2,
+  Star,
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';
 import { cn } from '@/lib/utils';
+import { useSunoRealtimeUpdates } from '@/hooks/useSunoRealtimeUpdates';
+import { TrackFeedback } from './TrackFeedback';
 
 interface GeneratedTrack {
   id: string;
@@ -88,9 +90,63 @@ export const SunoMusicGenerator: React.FC = () => {
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [audioElement] = useState(() => new Audio());
+  const [showLyrics, setShowLyrics] = useState(false);
+
+  // 🔥 Realtime updates via Supabase instead of polling
+  const handleRealtimeComplete = useCallback((callback: { metadata?: { audioUrl?: string; imageUrl?: string; duration?: number; title?: string } }) => {
+    const moodData = MOOD_OPTIONS.find((m) => m.id === selectedMood);
+    
+    setCurrentTrack(prev => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        audioUrl: callback.metadata?.audioUrl || prev.audioUrl,
+        imageUrl: callback.metadata?.imageUrl || prev.imageUrl,
+        duration: callback.metadata?.duration,
+        title: callback.metadata?.title || prev.title,
+        status: 'completed',
+      };
+    });
+    
+    setIsGenerating(false);
+    
+    // Auto-save to library
+    if (user && callback.metadata?.audioUrl) {
+      supabase.from('music_generation_sessions').insert({
+        user_id: user.id,
+        task_id: generationQueue[0] || 'unknown',
+        status: 'completed',
+        emotion_state: { mood: selectedMood, genre, tempo, energy: energy[0], instrumental: isInstrumental },
+        suno_config: { style: `${genre}, therapeutic` },
+        result: {
+          audio_url: callback.metadata.audioUrl,
+          image_url: callback.metadata.imageUrl,
+          duration: callback.metadata.duration,
+          title: callback.metadata.title,
+        },
+        completed_at: new Date().toISOString(),
+      }).then(() => {
+        logger.info('Track auto-saved via realtime', {}, 'MUSIC');
+      });
+    }
+    
+    setGenerationQueue([]);
+  }, [selectedMood, genre, tempo, energy, isInstrumental, user, generationQueue]);
+
+  const handleRealtimeError = useCallback(() => {
+    setCurrentTrack(prev => prev ? { ...prev, status: 'failed' } : prev);
+    setIsGenerating(false);
+    setGenerationQueue([]);
+  }, []);
+
+  const { trackTask } = useSunoRealtimeUpdates({
+    onComplete: handleRealtimeComplete,
+    onError: handleRealtimeError,
+    enabled: generationQueue.length > 0,
+  });
 
   // Cleanup audio element on unmount
-  React.useEffect(() => {
+  useEffect(() => {
     const audio = audioElement;
     return () => {
       audio.pause();
@@ -171,25 +227,39 @@ export const SunoMusicGenerator: React.FC = () => {
 
       // Check if generation was successful
       if (data.success && data.data) {
-        const trackId = data.data.id || data.data[0]?.id;
+        const taskId = data.data.id || data.data.taskId || data.data[0]?.id;
 
-        if (trackId) {
-          setGenerationQueue((prev) => [...prev, trackId]);
-          pollGenerationStatus(trackId);
+        if (taskId) {
+          setGenerationQueue((prev) => [...prev, taskId]);
+          
+          // 🔥 Use realtime instead of polling - track the task
+          trackTask(taskId);
+          
+          // Set initial track state
+          const moodData = MOOD_OPTIONS.find((m) => m.id === selectedMood);
+          setCurrentTrack({
+            id: taskId,
+            title: `${moodData?.label || selectedMood} - Thérapie musicale`,
+            audioUrl: '',
+            status: 'generating',
+            prompt: enrichedPrompt,
+            mood: selectedMood,
+          });
 
           toast({
             title: 'Génération démarrée',
-            description: 'Votre musique est en cours de création...',
+            description: 'Vous recevrez une notification quand la musique sera prête',
           });
+          
+          // Fallback: also poll in case realtime doesn't work
+          pollGenerationStatus(taskId);
         }
-      } else if (data.fallback) {
+      } else if (data.isFallback && data.data) {
         // Use fallback tracks
-        const fallbackTrack = data.fallback.tracks.find((t: any) => t.mood === selectedMood) || data.fallback.tracks[0];
-
         setCurrentTrack({
-          id: fallbackTrack.id,
-          title: `Musique ${moodData?.label || selectedMood} (Fallback)`,
-          audioUrl: fallbackTrack.url,
+          id: data.data.id,
+          title: `Musique ${MOOD_OPTIONS.find((m) => m.id === selectedMood)?.label || selectedMood} (Fallback)`,
+          audioUrl: data.data.audio_url,
           status: 'completed',
           prompt: customPrompt || `therapeutic ${selectedMood} music`,
           mood: selectedMood,
@@ -587,13 +657,22 @@ export const SunoMusicGenerator: React.FC = () => {
                           className="flex-1"
                         >
                           <Heart className="h-4 w-4 mr-2" />
-                          Sauvegarder
+                          Favoris
                         </Button>
                         <Button variant="outline" className="flex-1">
                           <Download className="h-4 w-4 mr-2" />
                           Télécharger
                         </Button>
                       </div>
+
+                      {/* Feedback Component */}
+                      <TrackFeedback
+                        trackId={currentTrack.id}
+                        onFeedbackSubmit={(rating) => {
+                          logger.info('Feedback submitted', { rating, trackId: currentTrack.id }, 'MUSIC');
+                        }}
+                        compact
+                      />
                     </div>
                   )}
 
@@ -602,6 +681,9 @@ export const SunoMusicGenerator: React.FC = () => {
                       <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary mb-4" />
                       <p className="text-sm text-muted-foreground">
                         Génération en cours...
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-2">
+                        Notification automatique à la fin
                       </p>
                     </div>
                   )}

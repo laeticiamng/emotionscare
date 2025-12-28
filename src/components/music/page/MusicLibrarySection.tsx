@@ -8,7 +8,9 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Music, Play, Clock, Trash2, Library, Sparkles, Heart } from 'lucide-react';
+import { Music, Play, Clock, Trash2, Library, Sparkles, Search, Filter } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
@@ -52,6 +54,9 @@ export const MusicLibrarySection: React.FC<MusicLibrarySectionProps> = ({ onPlay
   const { toast } = useToast();
   const [tracks, setTracks] = useState<SavedTrack[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [filterMood, setFilterMood] = useState<string>('all');
+  const [sortBy, setSortBy] = useState<'date' | 'title'>('date');
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     if (user) {
@@ -179,6 +184,39 @@ export const MusicLibrarySection: React.FC<MusicLibrarySectionProps> = ({ onPlay
         </CardDescription>
       </CardHeader>
       <CardContent>
+        {/* Filters */}
+        {tracks.length > 0 && (
+          <div className="flex flex-wrap gap-2 mb-4">
+            <Input
+              placeholder="Rechercher..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-40 h-8 text-sm"
+            />
+            <Select value={filterMood} onValueChange={setFilterMood}>
+              <SelectTrigger className="w-32 h-8 text-sm">
+                <SelectValue placeholder="Humeur" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Toutes</SelectItem>
+                <SelectItem value="calm">Calme</SelectItem>
+                <SelectItem value="energizing">Énergique</SelectItem>
+                <SelectItem value="focused">Focus</SelectItem>
+                <SelectItem value="happy">Joyeux</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={sortBy} onValueChange={(v) => setSortBy(v as 'date' | 'title')}>
+              <SelectTrigger className="w-28 h-8 text-sm">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="date">Date</SelectItem>
+                <SelectItem value="title">Titre</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        )}
+        
         {isLoading ? (
           <div className="space-y-3">
             {[...Array(3)].map((_, i) => (
@@ -202,7 +240,13 @@ export const MusicLibrarySection: React.FC<MusicLibrarySectionProps> = ({ onPlay
         ) : (
           <ScrollArea className="h-[400px] pr-4">
             <div className="space-y-3">
-              {tracks.map((track) => (
+              {tracks
+                .filter(t => filterMood === 'all' || t.emotion_state?.mood === filterMood)
+                .filter(t => !searchQuery || t.result?.title?.toLowerCase().includes(searchQuery.toLowerCase()))
+                .sort((a, b) => sortBy === 'date' 
+                  ? new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+                  : (a.result?.title || '').localeCompare(b.result?.title || ''))
+                .map((track) => (
                 <div
                   key={track.id}
                   className="flex items-center gap-3 p-3 rounded-lg bg-muted/20 hover:bg-muted/30 transition-colors group"
