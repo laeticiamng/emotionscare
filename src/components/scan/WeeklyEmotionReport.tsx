@@ -349,17 +349,29 @@ export const WeeklyEmotionReport: React.FC = () => {
     );
   }
 
+  // Détecter si on utilise des données réelles ou démo
+  const isUsingRealData = weeklyData.some(d => d.scansCount > 0) && 
+    weeklyData !== MOCK_WEEKLY_DATA;
+
   return (
     <div className="space-y-6">
       {/* Header avec navigation */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-foreground flex items-center gap-2">
-            <Calendar className="h-6 w-6 text-primary" />
-            Rapport Hebdomadaire
-          </h2>
+          <div className="flex items-center gap-3">
+            <h2 className="text-2xl font-bold text-foreground flex items-center gap-2">
+              <Calendar className="h-6 w-6 text-primary" />
+              Rapport Hebdomadaire
+            </h2>
+            {/* Indicateur données réelles vs démo */}
+            <Badge variant={isUsingRealData ? "default" : "secondary"} className="text-xs">
+              {isUsingRealData ? "📊 Données réelles" : "🎭 Données démo"}
+            </Badge>
+          </div>
           <p className="text-muted-foreground">
-            Analyse de vos émotions cette semaine
+            {isUsingRealData 
+              ? "Analyse de vos émotions cette semaine" 
+              : "Aperçu avec données de démonstration"}
           </p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">

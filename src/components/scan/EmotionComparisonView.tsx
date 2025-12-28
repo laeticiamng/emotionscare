@@ -170,26 +170,59 @@ export const EmotionComparisonView: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Sélecteur de période */}
+      {/* Sélecteur de période et toggle comparaison */}
       <div className="flex items-center justify-between flex-wrap gap-4">
-        <div className="flex items-center gap-2">
-          <Filter className="h-4 w-4 text-muted-foreground" />
-          <Select value={period} onValueChange={(v: PeriodType) => setPeriod(v)}>
-            <SelectTrigger className="w-40">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="7d">7 jours</SelectItem>
-              <SelectItem value="14d">14 jours</SelectItem>
-              <SelectItem value="30d">30 jours</SelectItem>
-              <SelectItem value="90d">3 mois</SelectItem>
-            </SelectContent>
-          </Select>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <Filter className="h-4 w-4 text-muted-foreground" />
+            <Select value={period} onValueChange={(v: PeriodType) => setPeriod(v)}>
+              <SelectTrigger className="w-40">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="7d">7 jours</SelectItem>
+                <SelectItem value="14d">14 jours</SelectItem>
+                <SelectItem value="30d">30 jours</SelectItem>
+                <SelectItem value="90d">3 mois</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          {/* Toggle mode comparaison */}
+          <Button
+            variant={compareMode ? "default" : "outline"}
+            size="sm"
+            onClick={() => setCompareMode(!compareMode)}
+            className="gap-1.5"
+          >
+            <RefreshCw className="h-3.5 w-3.5" />
+            {compareMode ? "Comparaison active" : "Comparer périodes"}
+          </Button>
         </div>
+        
         <Badge variant="outline">
           {comparisonData.currentScans} scans sur cette période
         </Badge>
       </div>
+      
+      {/* Bandeau comparaison si activé */}
+      {compareMode && (
+        <motion.div 
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: 'auto' }}
+          className="p-4 rounded-lg bg-primary/5 border border-primary/20"
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <TrendingUp className="h-4 w-4 text-primary" />
+              <span className="text-sm font-medium">Mode comparaison activé</span>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Comparer {periodLabels[period]} actuels vs précédents
+            </p>
+          </div>
+        </motion.div>
+      )}
 
       {/* Comparaison rapide */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

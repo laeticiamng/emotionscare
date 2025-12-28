@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useMusicEmotionIntegration } from '@/hooks/useMusicEmotionIntegration';
+import { useMusic } from '@/hooks/useMusic';
 import { MusicPlaylist } from '@/types/music';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -19,9 +20,14 @@ export const MusicRecommendation: React.FC<MusicRecommendationProps> = ({
   autoPlay = false
 }) => {
   const [playlist, setPlaylist] = useState<MusicPlaylist | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
   const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
   const { playEmotion, isLoading, getEmotionMusicDescription } = useMusicEmotionIntegration();
+  
+  // Connexion au contexte audio réel
+  const musicContext = useMusic();
+  const isPlaying = musicContext?.state?.isPlaying ?? false;
+  const currentTime = musicContext?.state?.currentTime ?? 0;
+  const duration = musicContext?.state?.duration ?? 0;
   
   useEffect(() => {
     if (autoPlay && emotion) {
@@ -35,7 +41,6 @@ export const MusicRecommendation: React.FC<MusicRecommendationProps> = ({
         const result = await playEmotion(emotion);
         if (result) {
           setPlaylist(result);
-          setIsPlaying(true);
           setCurrentTrackIndex(0);
         }
       } catch (error) {
@@ -45,12 +50,26 @@ export const MusicRecommendation: React.FC<MusicRecommendationProps> = ({
   };
 
   const togglePlayPause = () => {
-    setIsPlaying(prev => !prev);
+    if (musicContext) {
+      if (isPlaying) {
+        musicContext.pause();
+      } else {
+        const currentTrack = playlist?.tracks[currentTrackIndex];
+        if (currentTrack) {
+          musicContext.play(currentTrack);
+        }
+      }
+    }
   };
 
   const nextTrack = () => {
     if (playlist && currentTrackIndex < playlist.tracks.length - 1) {
-      setCurrentTrackIndex(prev => prev + 1);
+      const nextIndex = currentTrackIndex + 1;
+      setCurrentTrackIndex(nextIndex);
+      const nextTrack = playlist.tracks[nextIndex];
+      if (nextTrack && musicContext) {
+        musicContext.play(nextTrack);
+      }
     }
   };
 
@@ -65,6 +84,17 @@ export const MusicRecommendation: React.FC<MusicRecommendationProps> = ({
     };
     return colors[emotion.toLowerCase()] || 'bg-primary';
   };
+
+  // Formatage du temps mm:ss
+  const formatTime = (seconds: number): string => {
+    if (!seconds || isNaN(seconds)) return '0:00';
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  // Progression en pourcentage
+  const progressPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
   
   return (
     <Card className="overflow-hidden">
@@ -124,12 +154,12 @@ export const MusicRecommendation: React.FC<MusicRecommendationProps> = ({
                 </div>
               </div>
               
-              {/* Progress bar */}
+              {/* Progress bar - connectée au contexte audio réel */}
               <div className="mt-3">
-                <Progress value={isPlaying ? 45 : 0} className="h-1" />
+                <Progress value={progressPercent} className="h-1" />
                 <div className="flex justify-between text-xs text-muted-foreground mt-1">
-                  <span>1:23</span>
-                  <span>3:45</span>
+                  <span>{formatTime(currentTime)}</span>
+                  <span>{formatTime(duration)}</span>
                 </div>
               </div>
             </div>
