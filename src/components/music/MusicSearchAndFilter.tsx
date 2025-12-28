@@ -247,38 +247,44 @@ export const MusicSearchAndFilter: React.FC<MusicSearchAndFilterProps> = ({
                   </span>
                 </div>
                 <div className="space-y-3">
-                  <input
-                    type="range"
-                    min="0"
-                    max="10"
-                    value={filters.durationRange[0]}
-                    onChange={(e) =>
-                      setFilters((prev) => ({
-                        ...prev,
-                        durationRange: [
-                          parseInt(e.target.value),
-                          prev.durationRange[1],
-                        ],
-                      }))
-                    }
-                    className="w-full"
-                  />
-                  <input
-                    type="range"
-                    min="0"
-                    max="10"
-                    value={filters.durationRange[1]}
-                    onChange={(e) =>
-                      setFilters((prev) => ({
-                        ...prev,
-                        durationRange: [
-                          prev.durationRange[0],
-                          parseInt(e.target.value),
-                        ],
-                      }))
-                    }
-                    className="w-full"
-                  />
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs w-8">{filters.durationRange[0]}m</span>
+                    <input
+                      type="range"
+                      min="0"
+                      max="10"
+                      value={filters.durationRange[0]}
+                      onChange={(e) =>
+                        setFilters((prev) => ({
+                          ...prev,
+                          durationRange: [
+                            Math.min(parseInt(e.target.value), prev.durationRange[1]),
+                            prev.durationRange[1],
+                          ],
+                        }))
+                      }
+                      className="flex-1 h-2 rounded-lg appearance-none cursor-pointer bg-muted accent-primary"
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs w-8">{filters.durationRange[1]}m</span>
+                    <input
+                      type="range"
+                      min="0"
+                      max="10"
+                      value={filters.durationRange[1]}
+                      onChange={(e) =>
+                        setFilters((prev) => ({
+                          ...prev,
+                          durationRange: [
+                            prev.durationRange[0],
+                            Math.max(parseInt(e.target.value), prev.durationRange[0]),
+                          ],
+                        }))
+                      }
+                      className="flex-1 h-2 rounded-lg appearance-none cursor-pointer bg-muted accent-primary"
+                    />
+                  </div>
                 </div>
                 <div className="flex gap-2 text-xs">
                   {['Court (0-3)', 'Moyen (3-5)', 'Long (5-10)'].map(

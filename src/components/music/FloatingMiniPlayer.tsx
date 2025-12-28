@@ -20,6 +20,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import type { MusicTrack } from '@/types/music';
+import { useMusic } from '@/hooks/useMusic';
 
 interface FloatingMiniPlayerProps {
   currentTrack?: MusicTrack | null;
@@ -39,11 +40,11 @@ interface FloatingMiniPlayerProps {
 }
 
 export const FloatingMiniPlayer: React.FC<FloatingMiniPlayerProps> = ({
-  currentTrack,
-  isPlaying = false,
-  progress = 0,
-  duration,
-  volume = 0.7,
+  currentTrack: propTrack,
+  isPlaying: propIsPlaying,
+  progress: propProgress = 0,
+  duration: propDuration,
+  volume: propVolume,
   onPlayPause,
   onNext,
   onPrevious,
@@ -54,8 +55,40 @@ export const FloatingMiniPlayer: React.FC<FloatingMiniPlayerProps> = ({
   onVolumeChange,
   isDocked = false,
 }) => {
+  const musicContext = useMusic();
   const [isMinimized, setIsMinimized] = useState(false);
   const [showVolume, setShowVolume] = useState(false);
+
+  // Use context values if props not provided
+  const currentTrack = propTrack ?? musicContext.state.currentTrack;
+  const isPlaying = propIsPlaying ?? musicContext.state.isPlaying;
+  const progress = propProgress || (musicContext.state.duration > 0 
+    ? (musicContext.state.currentTime / musicContext.state.duration) * 100 
+    : 0);
+  const volume = propVolume ?? musicContext.state.volume;
+
+  // Handlers that fallback to context
+  const handlePlayPause = () => {
+    if (onPlayPause) {
+      onPlayPause();
+    } else if (isPlaying) {
+      musicContext.pause();
+    } else {
+      musicContext.play();
+    }
+  };
+
+  const handleNext = () => {
+    onNext ? onNext() : musicContext.next();
+  };
+
+  const handlePrevious = () => {
+    onPrevious ? onPrevious() : musicContext.previous();
+  };
+
+  const handleVolumeChange = (vol: number) => {
+    onVolumeChange ? onVolumeChange(vol) : musicContext.setVolume(vol);
+  };
 
   if (!currentTrack) {
     return null;
@@ -64,7 +97,7 @@ export const FloatingMiniPlayer: React.FC<FloatingMiniPlayerProps> = ({
   // Fallback values for optional properties
   const vinylColor = currentTrack.vinylColor || 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-foreground)))';
   const trackColor = currentTrack.color || 'hsl(var(--primary)), hsl(var(--accent))';
-  const trackDuration = duration || currentTrack.duration || 180;
+  const trackDuration = propDuration || currentTrack.duration || 180;
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -199,7 +232,7 @@ export const FloatingMiniPlayer: React.FC<FloatingMiniPlayerProps> = ({
                       value={[volume * 100]}
                       max={100}
                       step={1}
-                      onValueChange={(v) => onVolumeChange?.(v[0] / 100)}
+                      onValueChange={(v) => handleVolumeChange(v[0] / 100)}
                       className="w-20"
                     />
                   )}
@@ -210,7 +243,7 @@ export const FloatingMiniPlayer: React.FC<FloatingMiniPlayerProps> = ({
                   <Button
                     size="sm"
                     variant="ghost"
-                    onClick={onPrevious}
+                    onClick={handlePrevious}
                     className="h-8 w-8 p-0"
                   >
                     <SkipBack className="h-4 w-4" />
@@ -218,7 +251,7 @@ export const FloatingMiniPlayer: React.FC<FloatingMiniPlayerProps> = ({
 
                   <Button
                     size="sm"
-                    onClick={onPlayPause}
+                    onClick={handlePlayPause}
                     className="flex-1 gap-2"
                   >
                     {isPlaying ? (
@@ -237,7 +270,7 @@ export const FloatingMiniPlayer: React.FC<FloatingMiniPlayerProps> = ({
                   <Button
                     size="sm"
                     variant="ghost"
-                    onClick={onNext}
+                    onClick={handleNext}
                     className="h-8 w-8 p-0"
                   >
                     <SkipForward className="h-4 w-4" />
