@@ -17,7 +17,7 @@ declare global {
 }
 
 import React, { lazy, Suspense } from 'react';
-import { createBrowserRouter, Navigate } from 'react-router-dom';
+import { createBrowserRouter, Navigate, Link } from 'react-router-dom';
 import { ROUTES_REGISTRY } from './registry';
 import { LegacyRedirect, ROUTE_ALIAS_ENTRIES } from './aliases';
 import { AuthGuard, ModeGuard, RoleGuard } from './guards';
@@ -813,8 +813,8 @@ export const router = createBrowserRouter([
           <p style={{ marginBottom: '1.5rem', color: '#666' }}>
             La route /test-nyvee est maintenant opérationnelle !
           </p>
-          <a 
-            href="/app/nyvee"
+          <Link 
+            to="/app/nyvee"
             style={{
               display: 'inline-block',
               padding: '1rem 2rem',
@@ -826,7 +826,7 @@ export const router = createBrowserRouter([
             }}
           >
             🌿 Aller vers Nyvée
-          </a>
+          </Link>
         </div>
       </div>
     ),
