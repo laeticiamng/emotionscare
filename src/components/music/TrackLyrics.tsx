@@ -3,7 +3,7 @@
  * Utilise suno-lyrics edge function
  */
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -36,11 +36,18 @@ export const TrackLyrics: React.FC<TrackLyricsProps> = ({
   const [isGenerating, setIsGenerating] = useState(false);
   const [taskId, setTaskId] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const cancelledRef = useRef(false);
 
   const generateLyrics = useCallback(async () => {
+    // Cancel any ongoing polling
+    cancelledRef.current = true;
+    
     setIsGenerating(true);
     setLyrics(null);
     setGeneratedTitle(null);
+    
+    // Reset cancel flag for new generation
+    cancelledRef.current = false;
 
     try {
       // Build prompt for lyrics
@@ -86,6 +93,12 @@ export const TrackLyrics: React.FC<TrackLyricsProps> = ({
     let attempts = 0;
 
     const checkStatus = async () => {
+      // Check if cancelled before proceeding
+      if (cancelledRef.current) {
+        logger.info('Lyrics polling cancelled', {}, 'MUSIC');
+        return;
+      }
+      
       try {
         const { data, error } = await supabase.functions.invoke('suno-lyrics', {
           body: {
@@ -93,6 +106,9 @@ export const TrackLyrics: React.FC<TrackLyricsProps> = ({
             taskId: lyricsTaskId,
           },
         });
+
+        // Check again after async operation
+        if (cancelledRef.current) return;
 
         if (error) throw error;
 
@@ -111,12 +127,14 @@ export const TrackLyrics: React.FC<TrackLyricsProps> = ({
         }
 
         attempts++;
-        if (attempts < maxAttempts) {
+        if (attempts < maxAttempts && !cancelledRef.current) {
           setTimeout(checkStatus, 2000);
-        } else {
+        } else if (attempts >= maxAttempts) {
           throw new Error('Lyrics generation timeout');
         }
       } catch (error) {
+        if (cancelledRef.current) return;
+        
         logger.error('Lyrics status check failed', error as Error, 'MUSIC');
         toast({
           title: 'Erreur',

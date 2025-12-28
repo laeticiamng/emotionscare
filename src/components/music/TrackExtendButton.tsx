@@ -47,14 +47,26 @@ const TrackExtendButton: React.FC<TrackExtendButtonProps> = ({
 
     setIsExtending(true);
     try {
-      // Extract audioId from Suno URL - format: https://cdn.sunoapi.org/audio/xxxxx-xxxx-xxxx-xxxx-xxxxxxxx.mp3
-      // Or use track.sunoId if available, or track.id as fallback
-      const audioIdMatch = audioUrl.match(/\/audio\/([a-f0-9-]{36})\./) || audioUrl.match(/\/([a-f0-9-]{36})\./);
-      const audioId = (track as { sunoId?: string }).sunoId || (audioIdMatch ? audioIdMatch[1] : null);
+      // Extract audioId from various Suno URL formats:
+      // - https://cdn.sunoapi.org/audio/xxxxx-xxxx-xxxx-xxxx-xxxxxxxx.mp3
+      // - https://cdn1.suno.ai/xxxxx-xxxx-xxxx-xxxx-xxxxxxxx.mp3
+      // - https://audiopipe.suno.ai/?item_id=xxxxx-xxxx-xxxx-xxxx-xxxxxxxx
+      // Or use track.sunoId/track.id as fallback
+      const uuidRegex = /[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/i;
+      const audioIdMatch = audioUrl.match(uuidRegex);
+      const audioId = (track as { sunoId?: string }).sunoId 
+        || (audioIdMatch ? audioIdMatch[0] : null)
+        || (track.id && uuidRegex.test(track.id) ? track.id : null);
       
-      if (!audioId || audioId.startsWith('fallback-')) {
+      // Check if it's a fallback track (Pixabay, etc.)
+      const isFallback = !audioId 
+        || audioId.startsWith('fallback-') 
+        || audioUrl.includes('pixabay.com')
+        || audioUrl.includes('freesound.org');
+      
+      if (isFallback) {
         toast.error('Extension impossible', {
-          description: 'Cette piste ne peut pas être étendue (piste de secours)',
+          description: 'Seules les pistes générées par Suno peuvent être étendues',
         });
         setIsExtending(false);
         return;

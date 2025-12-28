@@ -209,13 +209,18 @@ export const MLRecommendationsPanel: React.FC<MLRecommendationsPanelProps> = ({
   };
 
   const handleApplySunoParams = () => {
-    // Map emotion to optimal parameters
+    // Map emotion to optimal parameters - comprehensive mapping
     const emotionParams: Record<string, { style: string; mood: string; bpm: number; intensity: number; tags: string[] }> = {
       calm: { style: 'ambient', mood: 'peaceful', bpm: 70, intensity: 0.3, tags: ['relaxing', 'soothing', 'meditative'] },
       focus: { style: 'lo-fi', mood: 'concentrated', bpm: 85, intensity: 0.5, tags: ['focus', 'study', 'productivity'] },
       energetic: { style: 'electronic', mood: 'uplifting', bpm: 120, intensity: 0.8, tags: ['energetic', 'motivating', 'upbeat'] },
       relaxed: { style: 'classical', mood: 'serene', bpm: 65, intensity: 0.2, tags: ['calm', 'tranquil', 'dreamy'] },
       happy: { style: 'pop', mood: 'joyful', bpm: 110, intensity: 0.7, tags: ['happy', 'cheerful', 'bright'] },
+      joy: { style: 'pop', mood: 'joyful', bpm: 115, intensity: 0.75, tags: ['joyful', 'uplifting', 'celebratory'] },
+      sad: { style: 'piano', mood: 'melancholic', bpm: 60, intensity: 0.35, tags: ['emotional', 'reflective', 'tender'] },
+      anger: { style: 'rock', mood: 'intense', bpm: 130, intensity: 0.9, tags: ['powerful', 'releasing', 'cathartic'] },
+      anxious: { style: 'ambient', mood: 'calming', bpm: 65, intensity: 0.25, tags: ['grounding', 'breathing', 'gentle'] },
+      fear: { style: 'ambient', mood: 'reassuring', bpm: 70, intensity: 0.3, tags: ['safe', 'protective', 'warm'] },
       neutral: { style: 'ambient', mood: 'balanced', bpm: 80, intensity: 0.4, tags: ['neutral', 'atmospheric'] },
     };
     
