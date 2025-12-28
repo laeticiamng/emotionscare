@@ -527,29 +527,29 @@ export default function EmotionalPark() {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => navigate('/gamification')}
+            onClick={() => navigate('/app/achievements')}
             className="flex items-center gap-2"
           >
             <Trophy className="h-4 w-4" />
-            Classement
+            Mes Succès
           </Button>
           <Button
             variant="outline"
             size="sm"
-            onClick={() => navigate('/gamification')}
+            onClick={() => navigate('/app/daily-challenges')}
             className="flex items-center gap-2"
           >
             <Target className="h-4 w-4" />
-            Défis
+            Défis du jour
           </Button>
           <Button
             variant="outline"
             size="sm"
-            onClick={() => navigate('/gamification')}
+            onClick={() => navigate('/app/home')}
             className="flex items-center gap-2"
           >
             <Award className="h-4 w-4" />
-            Succès
+            Tableau de bord
           </Button>
         </div>
       </div>
@@ -727,6 +727,28 @@ export default function EmotionalPark() {
           </motion.div>
         )}
       </div>
+
+      {/* Footer */}
+      <footer role="contentinfo" className="bg-card border-t mt-12">
+        <div className="container mx-auto px-4 py-6">
+          <div className="flex items-center justify-between text-sm text-muted-foreground">
+            <p>© 2025 EmotionsCare - Le Parc Émotionnel</p>
+            <nav aria-label="Liens footer">
+              <div className="flex space-x-4">
+                <a href="/legal/privacy" className="hover:text-foreground transition-colors">
+                  Confidentialité
+                </a>
+                <a href="/legal/terms" className="hover:text-foreground transition-colors">
+                  Conditions
+                </a>
+                <a href="/contact" className="hover:text-foreground transition-colors">
+                  Support
+                </a>
+              </div>
+            </nav>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
