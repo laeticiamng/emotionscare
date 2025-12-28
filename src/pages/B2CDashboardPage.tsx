@@ -15,7 +15,6 @@ import {
   Sparkles,
   Target,
   TrendingUp,
-  Calendar,
   Settings,
   HelpCircle,
   ChevronRight,
@@ -158,7 +157,7 @@ export default function B2CDashboardPage() {
   const setEphemeralSignal = useDashboardStore((state) => state.setEphemeralSignal);
   const [activeTone, setActiveTone] = useState(summaryTone);
   const shouldReduceMotion = useReducedMotion();
-  const clinicalHints = useClinicalHints('dashboard');
+  const { hints: clinicalHintsList, isLoading: hintsLoading } = useClinicalHints('dashboard');
   const clinicalTone = summaryTone;
   
   // Stats réelles depuis Supabase
@@ -424,14 +423,45 @@ export default function B2CDashboardPage() {
                   <Sparkles className="h-4 w-4 text-purple-500" aria-hidden="true" />
                 </div>
                 {!statsLoading && (
-                  <Badge variant="outline" className="text-xs mt-2">
-                    {userStats.rank}
-                  </Badge>
+                  <>
+                    <Badge variant="outline" className="text-xs mt-2">
+                      {userStats.rank}
+                    </Badge>
+                    <div className="mt-3">
+                      <div className="flex justify-between text-xs text-muted-foreground mb-1">
+                        <span>{userStats.totalPoints} XP</span>
+                        <span>{(userStats.level) * (userStats.level) * 100} XP</span>
+                      </div>
+                      <Progress 
+                        value={Math.min(100, (userStats.totalPoints / ((userStats.level) * (userStats.level) * 100)) * 100)} 
+                        className="h-2"
+                        aria-label={`Progression vers le niveau ${userStats.level + 1}`}
+                      />
+                    </div>
+                  </>
                 )}
               </CardContent>
             </Card>
           </div>
         </section>
+
+        {/* Conseils cliniques personnalisés */}
+        {!hintsLoading && clinicalHintsList.length > 0 && (
+          <section aria-labelledby="clinical-hints-title" className="mb-8">
+            <h2 id="clinical-hints-title" className="text-xl font-semibold mb-4">
+              Conseils personnalisés
+            </h2>
+            <div className="grid gap-3">
+              {clinicalHintsList.slice(0, 3).map((hint: string, index: number) => (
+                <Card key={index} className="bg-muted/50">
+                  <CardContent className="py-3 px-4">
+                    <p className="text-sm">{hint}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* Actions rapides */}
         <section id="quick-actions" aria-labelledby="actions-title" className="mb-8">
