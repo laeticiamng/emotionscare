@@ -133,6 +133,19 @@ serve(async (req) => {
       }
     }
     
+    // Health check action
+    if (action === 'health-check' || action === 'health') {
+      console.log('[suno-music] Health check requested');
+      return new Response(JSON.stringify({ 
+        success: true,
+        status: 'ok',
+        hasApiKey: !!sunoApiKey,
+        timestamp: new Date().toISOString()
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     switch (action) {
       case 'start':
       case 'generate':
