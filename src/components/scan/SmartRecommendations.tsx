@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -7,11 +7,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Lightbulb, Brain, Heart, Zap, Music, Sparkles, Coffee,
   UtensilsCrossed, Dumbbell, Moon, BookOpen, Users, ChevronRight,
-  TrendingUp, Clock, Target, RefreshCw
+  TrendingUp, Clock, Target, RefreshCw, Play, Wind, Loader2
 } from 'lucide-react';
 import { useScanHistory } from '@/hooks/useScanHistory';
+import { useMusicEmotionIntegration } from '@/hooks/useMusicEmotionIntegration';
+import { useNavigate } from 'react-router-dom';
+import { useToast } from '@/hooks/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
-
 interface Recommendation {
   id: string;
   title: string;
@@ -151,23 +153,23 @@ const RECOMMENDATIONS: { [key: string]: Recommendation[] } = {
   ]
 };
 
-const RecommendationCard: React.FC<{ rec: Recommendation }> = ({ rec }) => {
+const RecommendationCard: React.FC<{ rec: Recommendation; onAction?: (rec: Recommendation) => void }> = ({ rec, onAction }) => {
   const categoryColors = {
-    wellness: 'bg-green-50 border-green-200',
-    social: 'bg-purple-50 border-purple-200',
-    activity: 'bg-blue-50 border-blue-200',
-    rest: 'bg-indigo-50 border-indigo-200',
-    creative: 'bg-orange-50 border-orange-200'
+    wellness: 'bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-800',
+    social: 'bg-purple-50 border-purple-200 dark:bg-purple-900/20 dark:border-purple-800',
+    activity: 'bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-800',
+    rest: 'bg-indigo-50 border-indigo-200 dark:bg-indigo-900/20 dark:border-indigo-800',
+    creative: 'bg-orange-50 border-orange-200 dark:bg-orange-900/20 dark:border-orange-800'
   };
 
   const priorityColors = {
-    high: 'bg-red-100 text-red-800',
-    medium: 'bg-yellow-100 text-yellow-800',
-    low: 'bg-green-100 text-green-800'
+    high: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
+    medium: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
+    low: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
   };
 
   return (
-    <div className={`rounded-lg border p-4 ${categoryColors[rec.category]}`}>
+    <div className={`rounded-lg border p-4 ${categoryColors[rec.category]} transition-all hover:shadow-sm`}>
       <div className="flex items-start gap-3">
         <div className="flex-shrink-0 mt-0.5 text-muted-foreground">
           {rec.icon}
@@ -180,9 +182,22 @@ const RecommendationCard: React.FC<{ rec: Recommendation }> = ({ rec }) => {
             </Badge>
           </div>
           <p className="text-xs text-muted-foreground mt-1">{rec.description}</p>
-          {rec.duration && (
-            <p className="text-xs text-muted-foreground mt-2 font-medium">⏱️ {rec.duration}</p>
-          )}
+          <div className="flex items-center justify-between mt-2">
+            {rec.duration && (
+              <p className="text-xs text-muted-foreground font-medium">⏱️ {rec.duration}</p>
+            )}
+            {onAction && (
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="h-7 text-xs gap-1"
+                onClick={() => onAction(rec)}
+              >
+                <Play className="h-3 w-3" />
+                Appliquer
+              </Button>
+            )}
+          </div>
         </div>
       </div>
     </div>
@@ -216,7 +231,59 @@ export const SmartRecommendations: React.FC = () => {
   const { data: history = [] } = useScanHistory(50);
   const [activeTab, setActiveTab] = useState('recommendations');
   const [refreshKey, setRefreshKey] = useState(0);
+  const [isActivating, setIsActivating] = useState(false);
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const { activateMusicForEmotion, isGenerating } = useMusicEmotionIntegration();
 
+  // Action handler pour les recommandations
+  const handleRecommendationAction = useCallback(async (rec: Recommendation) => {
+    setIsActivating(true);
+    try {
+      if (rec.id.includes('music') || rec.category === 'creative') {
+        // Activer la musique adaptée
+        const emotion = rec.emotionTrigger?.toLowerCase() || 'calm';
+        await activateMusicForEmotion({ emotion, intensity: 0.5, duration: 120 });
+        toast({
+          title: '🎵 Musique activée',
+          description: `Playlist adaptée à votre état: ${rec.emotionTrigger || 'relaxation'}`,
+        });
+        navigate('/app/music');
+      } else if (rec.id === 'breathing' || rec.id.includes('breath')) {
+        navigate('/app/breathwork');
+        toast({ title: '🌬️ Respiration guidée', description: 'Démarrage de l\'exercice...' });
+      } else if (rec.id === 'journaling') {
+        navigate('/app/journal');
+        toast({ title: '📔 Journal', description: 'Ouverture du journal...' });
+      } else if (rec.id === 'talk-friend' || rec.category === 'social') {
+        navigate('/app/community');
+        toast({ title: '👥 Communauté', description: 'Connectez-vous avec les autres' });
+      } else if (rec.id === 'quick-exercise' || rec.category === 'activity') {
+        toast({
+          title: '💪 Activité suggérée',
+          description: rec.description,
+          duration: 5000
+        });
+      } else if (rec.category === 'rest') {
+        navigate('/app/breathwork');
+        toast({ title: '😴 Détente', description: 'Préparez-vous à vous relaxer' });
+      } else {
+        toast({
+          title: `✅ ${rec.title}`,
+          description: rec.description,
+          duration: 5000
+        });
+      }
+    } catch (error) {
+      toast({
+        title: 'Erreur',
+        description: 'Impossible d\'appliquer cette recommandation',
+        variant: 'destructive'
+      });
+    } finally {
+      setIsActivating(false);
+    }
+  }, [activateMusicForEmotion, navigate, toast]);
   const { recommendations, patterns, insights, emotionScore } = useMemo(() => {
     if (history.length === 0) {
       return {
@@ -430,7 +497,7 @@ export const SmartRecommendations: React.FC = () => {
                         exit={{ opacity: 0, y: -10 }}
                         transition={{ delay: idx * 0.1 }}
                       >
-                        <RecommendationCard rec={rec} />
+                        <RecommendationCard rec={rec} onAction={handleRecommendationAction} />
                       </motion.div>
                     ))}
                   </>
