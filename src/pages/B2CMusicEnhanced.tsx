@@ -35,23 +35,24 @@ import { useMusicPreferencesLearning } from '@/hooks/useMusicPreferencesLearning
 import { useTasteChangeNotifications } from '@/hooks/useTasteChangeNotifications';
 import { useMusicHistory, useLastPlayedTrack } from '@/hooks/music/useMusicSettings';
 
-// Lazy loading des sections lourdes pour optimiser le first paint
-// Priorité haute - chargé immédiatement après le first paint (preload)
+// Lazy loading des sections - Optimisé pour first paint rapide
+// Critique: Vinyles chargés immédiatement (above the fold)
 const VinylCollection = lazy(() => import('@/components/music/page/VinylCollection').then(m => ({ default: m.VinylCollection })));
+
+// Haute priorité - Visible rapidement
+const MusicStatsSection = lazy(() => import('@/components/music/page/MusicStatsSection').then(m => ({ default: m.MusicStatsSection })));
 const MusicSearchAndFilter = lazy(() => import('@/components/music/MusicSearchAndFilter').then(m => ({ default: m.MusicSearchAndFilter })));
 
-// Priorité moyenne - chargé lors de l'interaction utilisateur
+// Moyenne priorité - Interaction utilisateur
 const MusicGamificationSection = lazy(() => import('@/components/music/page/MusicGamificationSection').then(m => ({ default: m.MusicGamificationSection })));
 const MusicJourneySection = lazy(() => import('@/components/music/page/MusicJourneySection').then(m => ({ default: m.MusicJourneySection })));
-const MusicStatsSection = lazy(() => import('@/components/music/page/MusicStatsSection').then(m => ({ default: m.MusicStatsSection })));
 
-// Priorité basse - chargé en arrière-plan (idle)
+// Basse priorité - Chargé en idle
 const MusicGeneratorSection = lazy(() => import('@/components/music/page/MusicGeneratorSection').then(m => ({ default: m.MusicGeneratorSection })));
 const MusicFocusSection = lazy(() => import('@/components/music/page/MusicFocusSection').then(m => ({ default: m.MusicFocusSection })));
-const ImmersiveMode = lazy(() => import('@/components/music/ImmersiveMode').then(m => ({ default: m.ImmersiveMode })));
 const CollaborativePlaylistSection = lazy(() => import('@/components/music/page/CollaborativePlaylistSection').then(m => ({ default: m.CollaborativePlaylistSection })));
 const ExternalIntegrationsPanel = lazy(() => import('@/components/music/ExternalIntegrationsPanel').then(m => ({ default: m.ExternalIntegrationsPanel })));
-
+const ImmersiveMode = lazy(() => import('@/components/music/ImmersiveMode').then(m => ({ default: m.ImmersiveMode })));
 // Composants statiques chargés immédiatement
 import {
   MusicPageHeader,
@@ -60,17 +61,14 @@ import {
   MusicHistorySection,
 } from '@/components/music/page';
 
-// Skeleton de chargement optimisé - plus léger
+// Skeleton de chargement ultra-léger
 const SectionSkeleton = memo(() => (
-  <Card className="p-4 animate-pulse">
-    <div className="h-5 w-1/4 bg-muted rounded mb-3" />
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-      {[1, 2, 3, 4].map(i => (
-        <div key={i} className="h-24 bg-muted rounded-lg" />
-      ))}
-    </div>
-  </Card>
+  <div className="p-4 rounded-lg border bg-card/50 animate-pulse">
+    <div className="h-4 w-32 bg-muted/50 rounded mb-3" />
+    <div className="h-20 bg-muted/30 rounded-lg" />
+  </div>
 ));
+SectionSkeleton.displayName = 'SectionSkeleton';
 
 // Types
 interface VinylTrack extends MusicTrack {
