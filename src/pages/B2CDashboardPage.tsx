@@ -21,6 +21,7 @@ import {
   ChevronRight,
   Wind,
   TreePalm,
+  Flame,
 } from 'lucide-react';
 import { useAccessibilityAudit } from '@/lib/accessibility-checker';
 import { motion, useReducedMotion } from 'framer-motion';
@@ -31,6 +32,7 @@ import { useAdaptivePlayback } from '@/hooks/music/useAdaptivePlayback';
 import { PRESET_DETAILS } from '@/services/music/presetMetadata';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useClinicalHints } from '@/hooks/useClinicalHints';
+import { useUserStatsQuery, useUserStatsRealtime } from '@/hooks/useUserStatsQuery';
 
 const WeeklyPlanCard = React.lazy(() => import('@/components/dashboard/widgets/WeeklyPlanCard'));
 const RecentEmotionScansWidget = React.lazy(() => import('@/components/dashboard/widgets/RecentEmotionScansWidget'));
@@ -157,7 +159,10 @@ export default function B2CDashboardPage() {
   const shouldReduceMotion = useReducedMotion();
   const clinicalHints = useClinicalHints('dashboard');
   const clinicalTone = summaryTone;
-  const dashboardCta = null;
+  
+  // Stats réelles depuis Supabase
+  const { stats: userStats, loading: statsLoading } = useUserStatsQuery();
+  useUserStatsRealtime();
 
   const musicSnapshot = playback.snapshot;
   const presetLabel = musicSnapshot?.presetId && musicSnapshot.presetId in PRESET_DETAILS
@@ -315,16 +320,16 @@ export default function B2CDashboardPage() {
         </section>
 
 
-        {/* Statistiques rapides */}
+        {/* Statistiques rapides - données réelles */}
         <section aria-labelledby="stats-title" className="mb-8">
           <h2 id="stats-title" className="text-xl font-semibold mb-4">
-            Votre progression aujourd'hui
+            Votre progression
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <Card className="relative">
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Sessions d'analyse
+                  Sessions
                 </CardTitle>
                 <CardDescription className="sr-only">
                   Nombre de sessions d'analyse émotionnelle effectuées
@@ -332,12 +337,15 @@ export default function B2CDashboardPage() {
               </CardHeader>
               <CardContent>
                 <div className="flex items-center justify-between">
-                  <div className="text-2xl font-bold">3</div>
-                  <TrendingUp className="h-4 w-4 text-success" aria-hidden="true" />
+                  {statsLoading ? (
+                    <Skeleton className="h-8 w-12" />
+                  ) : (
+                    <div className="text-2xl font-bold">{userStats.completedSessions}</div>
+                  )}
+                  <Brain className="h-4 w-4 text-primary" aria-hidden="true" />
                 </div>
-                <Progress value={60} className="mt-2" aria-label="Progression 60%" />
-                <p className="text-xs text-muted-foreground mt-1">
-                  +20% par rapport à hier
+                <p className="text-xs text-muted-foreground mt-2">
+                  Total de scans réalisés
                 </p>
               </CardContent>
             </Card>
@@ -345,20 +353,26 @@ export default function B2CDashboardPage() {
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Temps de méditation
+                  Série en cours
                 </CardTitle>
                 <CardDescription className="sr-only">
-                  Durée totale de méditation aujourd'hui
+                  Jours consécutifs d'utilisation
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="flex items-center justify-between">
-                  <div className="text-2xl font-bold">25min</div>
-                  <Calendar className="h-4 w-4 text-info" aria-hidden="true" />
+                  {statsLoading ? (
+                    <Skeleton className="h-8 w-12" />
+                  ) : (
+                    <div className="text-2xl font-bold flex items-center gap-1">
+                      {userStats.currentStreak}
+                      <span className="text-sm font-normal text-muted-foreground">jours</span>
+                    </div>
+                  )}
+                  <Flame className="h-4 w-4 text-orange-500" aria-hidden="true" />
                 </div>
-                <Progress value={83} className="mt-2" aria-label="Progression 83%" />
-                <p className="text-xs text-muted-foreground mt-1">
-                  Objectif: 30min
+                <p className="text-xs text-muted-foreground mt-2">
+                  Continue ta série !
                 </p>
               </CardContent>
             </Card>
@@ -366,25 +380,50 @@ export default function B2CDashboardPage() {
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
-                  Humeur générale
+                  Objectifs semaine
                 </CardTitle>
                 <CardDescription className="sr-only">
-                  Évaluation de votre humeur générale
+                  Objectifs complétés cette semaine
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="flex items-center justify-between">
-                  <div className="text-2xl font-bold">😊</div>
-                  <Target className="h-4 w-4 text-warning" aria-hidden="true" />
+                  {statsLoading ? (
+                    <Skeleton className="h-8 w-12" />
+                  ) : (
+                    <div className="text-2xl font-bold">{userStats.weeklyGoals}</div>
+                  )}
+                  <Target className="h-4 w-4 text-emerald-500" aria-hidden="true" />
                 </div>
-                <div className="mt-2">
-                  <Badge variant="outline" className="text-xs">
-                    Positive
+                <p className="text-xs text-muted-foreground mt-2">
+                  Complétés cette semaine
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
+                  Niveau & Rang
+                </CardTitle>
+                <CardDescription className="sr-only">
+                  Votre niveau et rang actuel
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between">
+                  {statsLoading ? (
+                    <Skeleton className="h-8 w-20" />
+                  ) : (
+                    <div className="text-xl font-bold">Niv. {userStats.level}</div>
+                  )}
+                  <Sparkles className="h-4 w-4 text-purple-500" aria-hidden="true" />
+                </div>
+                {!statsLoading && (
+                  <Badge variant="outline" className="text-xs mt-2">
+                    {userStats.rank}
                   </Badge>
-                </div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Tendance stable
-                </p>
+                )}
               </CardContent>
             </Card>
           </div>
