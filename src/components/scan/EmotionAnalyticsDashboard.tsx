@@ -1,12 +1,23 @@
-// @ts-nocheck
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { EmotionTrend, EmotionPattern } from '@/types/emotion';
-import { TrendingUp, Activity, Target, Brain } from 'lucide-react';
+import { TrendingUp, Brain } from 'lucide-react';
+
+interface EmotionTrend {
+  date: string;
+  averageMood: number;
+  peakEmotion: string;
+}
+
+interface EmotionPattern {
+  id: string;
+  name: string;
+  description: string;
+  confidence: number;
+}
 
 interface EmotionAnalyticsDashboardProps {
   trends: EmotionTrend[];
-  weeklyStats: any;
+  weeklyStats?: Record<string, unknown>;
   patterns: EmotionPattern[];
   isLoading: boolean;
 }

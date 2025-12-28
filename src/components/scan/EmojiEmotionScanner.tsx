@@ -1,20 +1,30 @@
-// @ts-nocheck
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { EmotionResult, EmotionScannerProps } from '@/types/emotion';
+import type { EmotionResult } from '@/types/emotion-unified';
 import { Smile, Sparkles, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { normalizeEmotionResult } from '@/types/emotion-unified';
 import { logger } from '@/lib/logger';
 
-const EmojiEmotionScanner: React.FC<EmotionScannerProps> = ({
+interface EmojiEmotionScannerProps {
+  onScanComplete: (result: EmotionResult) => void;
+  onCancel?: () => void;
+  isProcessing?: boolean;
+  setIsProcessing?: (processing: boolean) => void;
+}
+
+const EmojiEmotionScanner: React.FC<EmojiEmotionScannerProps> = ({
   onScanComplete,
   onCancel,
-  isProcessing,
-  setIsProcessing
+  isProcessing: externalProcessing,
+  setIsProcessing: externalSetProcessing
 }) => {
   const [selectedEmojis, setSelectedEmojis] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [internalProcessing, setInternalProcessing] = useState(false);
+
+  const isProcessing = externalProcessing ?? internalProcessing;
+  const setIsProcessing = externalSetProcessing ?? setInternalProcessing;
 
   const emojiCategories = [
     {
@@ -68,10 +78,8 @@ const EmojiEmotionScanner: React.FC<EmotionScannerProps> = ({
     setError(null);
 
     try {
-      // Construire une description textuelle des émojis sélectionnés
       const emojiDescription = `L'utilisateur a sélectionné les émojis suivants pour décrire son état émotionnel : ${selectedEmojis.join(' ')}. Analyse les émotions exprimées par ces émojis.`;
 
-      // Appel réel à l'edge function d'analyse textuelle
       const { data, error: invokeError } = await supabase.functions.invoke('emotion-analysis', {
         body: { text: emojiDescription, language: 'fr' }
       });
@@ -97,7 +105,7 @@ const EmojiEmotionScanner: React.FC<EmotionScannerProps> = ({
         recommendations: data.recommendations || []
       });
 
-      onScanComplete(result as any);
+      onScanComplete(result);
     } catch (err) {
       logger.error('[EmojiEmotionScanner] Error:', err, 'COMPONENT');
       setError(err instanceof Error ? err.message : 'Erreur lors de l\'analyse');
@@ -119,7 +127,6 @@ const EmojiEmotionScanner: React.FC<EmotionScannerProps> = ({
       </div>
 
       <div className="space-y-4">
-        {/* Émojis sélectionnés */}
         {selectedEmojis.length > 0 && (
           <div className="p-4 bg-muted/50 rounded-lg">
             <h4 className="text-sm font-medium mb-2">Émojis sélectionnés:</h4>
@@ -137,7 +144,6 @@ const EmojiEmotionScanner: React.FC<EmotionScannerProps> = ({
           </div>
         )}
 
-        {/* Grille d'émojis par catégorie */}
         <div className="space-y-4 max-h-80 overflow-y-auto">
           {emojiCategories.map((category, categoryIndex) => (
             <div key={categoryIndex}>
@@ -171,14 +177,16 @@ const EmojiEmotionScanner: React.FC<EmotionScannerProps> = ({
         )}
 
         <div className="flex space-x-2">
-          <Button 
-            onClick={onCancel} 
-            variant="outline" 
-            disabled={isProcessing}
-            className="flex-1"
-          >
-            Annuler
-          </Button>
+          {onCancel && (
+            <Button 
+              onClick={onCancel} 
+              variant="outline" 
+              disabled={isProcessing}
+              className="flex-1"
+            >
+              Annuler
+            </Button>
+          )}
           <Button 
             onClick={analyzeEmojis}
             disabled={selectedEmojis.length === 0 || isProcessing}

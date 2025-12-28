@@ -8,18 +8,15 @@ import { Progress } from '@/components/ui/progress';
 import { 
   Brain, 
   Music, 
-  TrendingUp, 
   Heart, 
   Activity, 
-  Zap,
   Clock,
   Target,
   BarChart3
 } from 'lucide-react';
-import { useEmotionAnalysisEngine } from '@/hooks/useEmotionAnalysisEngine';
 import EmotionScannerPremium from './EmotionScannerPremium';
 import { EmotionsCareRecommendation } from '@/components/music/emotionscare';
-import type { EmotionResult } from '@/types';
+import type { EmotionResult } from '@/types/emotion-unified';
 
 interface EmotionAnalysisDashboardProps {
   className?: string;
@@ -31,16 +28,14 @@ const EmotionAnalysisDashboard: React.FC<EmotionAnalysisDashboardProps> = ({
   const [currentEmotionResult, setCurrentEmotionResult] = useState<EmotionResult | null>(null);
   const [emotionHistory, setEmotionHistory] = useState<EmotionResult[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  
-  const { analyzeEmotion } = useEmotionAnalysisEngine();
 
   const handleEmotionAnalyzed = (result: EmotionResult) => {
     setCurrentEmotionResult(result);
-    setEmotionHistory(prev => [result, ...prev.slice(0, 9)]); // Keep last 10 results
+    setEmotionHistory(prev => [result, ...prev.slice(0, 9)]);
   };
 
   const getEmotionColor = (emotion: string) => {
-    const colors = {
+    const colors: Record<string, string> = {
       joy: 'text-yellow-600 bg-yellow-50 border-yellow-200',
       happiness: 'text-orange-600 bg-orange-50 border-orange-200',
       calm: 'text-blue-600 bg-blue-50 border-blue-200',
@@ -56,7 +51,8 @@ const EmotionAnalysisDashboard: React.FC<EmotionAnalysisDashboardProps> = ({
     if (emotionHistory.length === 0) return null;
     
     const moodCounts = emotionHistory.reduce((acc, result) => {
-      acc[result.overallMood] = (acc[result.overallMood] || 0) + 1;
+      const mood = result.emotion || 'neutral';
+      acc[mood] = (acc[mood] || 0) + 1;
       return acc;
     }, {} as Record<string, number>);
     
@@ -73,8 +69,8 @@ const EmotionAnalysisDashboard: React.FC<EmotionAnalysisDashboardProps> = ({
 
   const getAverageConfidence = () => {
     if (emotionHistory.length === 0) return 0;
-    const total = emotionHistory.reduce((sum, result) => sum + result.confidence, 0);
-    return Math.round((total / emotionHistory.length) * 100);
+    const total = emotionHistory.reduce((sum, result) => sum + (result.confidence || 0), 0);
+    return Math.round((total / emotionHistory.length));
   };
 
   const stats = getMoodStats();
@@ -135,8 +131,8 @@ const EmotionAnalysisDashboard: React.FC<EmotionAnalysisDashboardProps> = ({
             <Heart className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {currentEmotionResult?.dominantEmotion || 'Inconnue'}
+            <div className="text-2xl font-bold capitalize">
+              {currentEmotionResult?.emotion || 'Inconnue'}
             </div>
             <p className="text-xs text-muted-foreground">
               {currentEmotionResult ? 'Analysé' : 'En attente'}
@@ -155,16 +151,17 @@ const EmotionAnalysisDashboard: React.FC<EmotionAnalysisDashboardProps> = ({
 
         <TabsContent value="scanner" className="space-y-4">
           <EmotionScannerPremium
-            onEmotionAnalyzed={handleEmotionAnalyzed}
-            isAnalyzing={isAnalyzing}
-            setIsAnalyzing={setIsAnalyzing}
+            onScanComplete={handleEmotionAnalyzed}
           />
         </TabsContent>
 
         <TabsContent value="musicotherapy" className="space-y-4">
           {currentEmotionResult ? (
             <EmotionsCareRecommendation
-              emotionResult={currentEmotionResult}
+              emotionResult={{
+                ...currentEmotionResult,
+                intensity: currentEmotionResult.intensity ?? 50
+              }}
               autoGenerate={false}
             />
           ) : (
@@ -177,7 +174,10 @@ const EmotionAnalysisDashboard: React.FC<EmotionAnalysisDashboardProps> = ({
                   une musicothérapie personnalisée générée par IA
                 </p>
                 <Button 
-                  onClick={() => document.querySelector('[value="scanner"]')?.click()}
+                  onClick={() => {
+                    const el = document.querySelector('[value="scanner"]');
+                    if (el instanceof HTMLElement) el.click();
+                  }}
                   variant="outline"
                 >
                   Commencer l'analyse
@@ -203,7 +203,7 @@ const EmotionAnalysisDashboard: React.FC<EmotionAnalysisDashboardProps> = ({
                 <div className="space-y-4">
                   {emotionHistory.map((result, index) => (
                     <div 
-                      key={result.id}
+                      key={result.id || index}
                       className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
                     >
                       <div className="flex items-center space-x-4">
@@ -212,15 +212,15 @@ const EmotionAnalysisDashboard: React.FC<EmotionAnalysisDashboardProps> = ({
                         </div>
                         <div>
                           <div className="flex items-center space-x-2 mb-1">
-                            <Badge className={getEmotionColor(result.dominantEmotion)}>
-                              {result.dominantEmotion}
+                            <Badge className={getEmotionColor(result.emotion || 'neutral')}>
+                              {result.emotion || 'Neutre'}
                             </Badge>
                             <span className="text-sm text-muted-foreground">
-                              {result.confidence}% confiance
+                              {result.confidence || 0}% confiance
                             </span>
                           </div>
                           <p className="text-sm text-muted-foreground">
-                            {new Date(result.timestamp).toLocaleString('fr-FR')}
+                            {result.timestamp ? new Date(result.timestamp).toLocaleString('fr-FR') : 'Date inconnue'}
                           </p>
                         </div>
                       </div>
@@ -228,7 +228,7 @@ const EmotionAnalysisDashboard: React.FC<EmotionAnalysisDashboardProps> = ({
                       <div className="flex items-center space-x-2">
                         <Clock className="w-4 h-4 text-muted-foreground" />
                         <span className="text-sm text-muted-foreground">
-                          {result.source}
+                          {result.source || 'Scan'}
                         </span>
                       </div>
                     </div>
