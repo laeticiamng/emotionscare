@@ -101,7 +101,7 @@ const B2CAmbitionArcadePage: React.FC = () => {
 
             {/* Creator */}
             {showCreator && (
-              <GoalCreator onSuccess={() => setShowCreator(false)} />
+              <GoalCreator onSuccess={() => setShowCreator(false)} onCancel={() => setShowCreator(false)} />
             )}
 
             {/* Loading */}

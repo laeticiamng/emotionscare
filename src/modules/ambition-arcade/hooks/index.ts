@@ -11,3 +11,5 @@ export {
   useAmbitionArtifacts,
   type RunRecommendation 
 } from './useAmbitionExtras';
+export { useDeleteGoal } from './useDeleteGoal';
+export { useConfetti } from './useConfetti';

@@ -17,9 +17,11 @@ import {
   useCreateQuest, 
   useCompleteQuest, 
   useStartQuest,
+  useConfetti,
   type AmbitionGoal 
 } from '../hooks';
 import { useCompleteGoal, useAbandonGoal } from '../hooks/useAmbitionGoals';
+import { useDeleteGoal } from '../hooks/useDeleteGoal';
 import { useAmbitionFavorites, useAmbitionRatings } from '../hooks/useAmbitionExtras';
 import { RatingStars } from './RatingStars';
 import { ArtifactGallery } from './ArtifactGallery';
@@ -38,11 +40,18 @@ export const GoalCard: React.FC<GoalCardProps> = ({ goal }) => {
   const startQuest = useStartQuest();
   const completeGoal = useCompleteGoal();
   const abandonGoal = useAbandonGoal();
+  const deleteGoal = useDeleteGoal();
   const { isFavorite, toggleFavorite } = useAmbitionFavorites();
   const { getRating, rateRun } = useAmbitionRatings();
+  const { fireGoalCompleteConfetti } = useConfetti();
 
   const goalIsFavorite = isFavorite(goal.id);
   const goalRating = getRating(goal.id);
+
+  const handleCompleteGoal = async () => {
+    await completeGoal.mutateAsync(goal.id);
+    fireGoalCompleteConfetti();
+  };
 
   const progressPercent = goal.questsTotal > 0 
     ? (goal.questsCompleted / goal.questsTotal) * 100 
@@ -256,7 +265,7 @@ export const GoalCard: React.FC<GoalCardProps> = ({ goal }) => {
                   <div className="flex gap-2 pt-2">
                     <Button 
                       className="flex-1" 
-                      onClick={() => completeGoal.mutate(goal.id)}
+                      onClick={handleCompleteGoal}
                       disabled={completeGoal.isPending}
                     >
                       <CheckCircle className="w-4 h-4 mr-2" />
@@ -269,6 +278,26 @@ export const GoalCard: React.FC<GoalCardProps> = ({ goal }) => {
                       disabled={abandonGoal.isPending}
                     >
                       <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                )}
+
+                {/* Delete abandoned */}
+                {isAbandoned && (
+                  <div className="pt-2">
+                    <Button 
+                      variant="destructive" 
+                      size="sm"
+                      className="w-full"
+                      onClick={() => deleteGoal.mutate(goal.id)}
+                      disabled={deleteGoal.isPending}
+                    >
+                      {deleteGoal.isPending ? (
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      ) : (
+                        <Trash2 className="w-4 h-4 mr-2" />
+                      )}
+                      Supprimer définitivement
                     </Button>
                   </div>
                 )}

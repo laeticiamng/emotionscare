@@ -18,9 +18,10 @@ const SUGGESTED_TAGS = [
 
 interface GoalCreatorProps {
   onSuccess?: () => void;
+  onCancel?: () => void;
 }
 
-export const GoalCreator: React.FC<GoalCreatorProps> = ({ onSuccess }) => {
+export const GoalCreator: React.FC<GoalCreatorProps> = ({ onSuccess, onCancel }) => {
   const [objective, setObjective] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [customTag, setCustomTag] = useState('');
@@ -147,7 +148,7 @@ export const GoalCreator: React.FC<GoalCreatorProps> = ({ onSuccess }) => {
             <Button 
               type="button"
               variant="outline"
-              onClick={() => onSuccess?.()}
+              onClick={() => onCancel?.()}
               className="flex-1"
             >
               Annuler
