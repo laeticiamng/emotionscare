@@ -10,6 +10,36 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Process base64 in chunks to prevent memory issues
+function processBase64Chunks(base64String: string, chunkSize = 32768): Uint8Array {
+  const chunks: Uint8Array[] = [];
+  let position = 0;
+  
+  while (position < base64String.length) {
+    const chunk = base64String.slice(position, position + chunkSize);
+    const binaryChunk = atob(chunk);
+    const bytes = new Uint8Array(binaryChunk.length);
+    
+    for (let i = 0; i < binaryChunk.length; i++) {
+      bytes[i] = binaryChunk.charCodeAt(i);
+    }
+    
+    chunks.push(bytes);
+    position += chunkSize;
+  }
+
+  const totalLength = chunks.reduce((acc, chunk) => acc + chunk.length, 0);
+  const result = new Uint8Array(totalLength);
+  let offset = 0;
+
+  for (const chunk of chunks) {
+    result.set(chunk, offset);
+    offset += chunk.length;
+  }
+
+  return result;
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -23,13 +53,13 @@ serve(async (req) => {
       return createErrorResponse(authResult.error || 'Authentication required', authResult.status, corsHeaders);
     }
 
-    // 🛡️ SÉCURITÉ: Rate limiting strict (10 req/min - Whisper + Lovable AI)
+    // 🛡️ SÉCURITÉ: Rate limiting strict (10 req/min)
     const rateLimit = await enforceEdgeRateLimit(req, {
       route: 'analyze-voice-hume',
       userId: authResult.user.id,
       limit: 10,
       windowMs: 60_000,
-      description: 'Voice analysis - OpenAI Whisper + Lovable AI'
+      description: 'Voice analysis - Whisper + Lovable AI'
     });
 
     if (!rateLimit.allowed) {
@@ -49,7 +79,6 @@ serve(async (req) => {
     const { audioBase64 } = validation.data;
 
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
-    const HUME_API_KEY = Deno.env.get('HUME_API_KEY');
     
     if (!LOVABLE_API_KEY) {
       console.log('[analyze-voice-hume] LOVABLE_API_KEY not configured');
@@ -58,57 +87,44 @@ serve(async (req) => {
 
     const startTime = Date.now();
 
-    // Extraire les données audio base64
+    // Extraire les données audio base64 (enlever le préfixe data:audio/...)
     let audioData = audioBase64;
     if (audioData.includes(',')) {
       audioData = audioData.split(',')[1];
     }
 
-    // Étape 1: Transcription audio avec Lovable AI
+    // Étape 1: Transcription audio avec OpenAI Whisper via Lovable Gateway
     let transcript = '';
     
-    console.log('[analyze-voice-hume] Transcribing audio with Lovable AI');
+    console.log('[analyze-voice-hume] Transcribing audio with Whisper');
     
     try {
-      const transcriptionResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+      // Convert base64 to binary using chunked processing
+      const binaryAudio = processBase64Chunks(audioData);
+      
+      // Prepare form data for Whisper API
+      const formData = new FormData();
+      const blob = new Blob([binaryAudio], { type: 'audio/webm' });
+      formData.append('file', blob, 'audio.webm');
+      formData.append('model', 'whisper-1');
+      formData.append('language', 'fr');
+
+      // Call Whisper API via Lovable Gateway
+      const transcriptionResponse = await fetch('https://ai.gateway.lovable.dev/v1/audio/transcriptions', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${LOVABLE_API_KEY}`,
-          'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          model: 'google/gemini-2.5-flash',
-          messages: [
-            {
-              role: 'system',
-              content: 'Tu es un expert en transcription audio. Transcris fidèlement le contenu audio fourni en français. Retourne uniquement le texte transcrit, sans commentaires ni annotations.'
-            },
-            {
-              role: 'user',
-              content: [
-                {
-                  type: 'text',
-                  text: 'Transcris cet enregistrement audio en français :'
-                },
-                {
-                  type: 'input_audio',
-                  input_audio: {
-                    data: audioData,
-                    format: 'webm'
-                  }
-                }
-              ]
-            }
-          ]
-        })
+        body: formData
       });
 
       if (transcriptionResponse.ok) {
         const transcriptionData = await transcriptionResponse.json();
-        transcript = transcriptionData.choices?.[0]?.message?.content?.trim() || '';
-        console.log('[analyze-voice-hume] Transcription:', transcript.substring(0, 100));
+        transcript = transcriptionData.text?.trim() || '';
+        console.log('[analyze-voice-hume] Transcription success:', transcript.substring(0, 100));
       } else {
-        console.warn('[analyze-voice-hume] Transcription failed:', await transcriptionResponse.text());
+        const errorText = await transcriptionResponse.text();
+        console.warn('[analyze-voice-hume] Whisper transcription failed:', transcriptionResponse.status, errorText);
       }
     } catch (e) {
       console.warn('[analyze-voice-hume] Transcription error:', e);
@@ -132,8 +148,9 @@ serve(async (req) => {
       );
     }
 
-    console.log('[analyze-voice-hume] Using Lovable AI for emotion analysis');
+    console.log('[analyze-voice-hume] Analyzing emotion from transcript');
     
+    // Étape 2: Analyser l'émotion du texte transcrit avec Lovable AI
     const analysisResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {

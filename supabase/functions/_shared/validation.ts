@@ -137,13 +137,14 @@ export const VoiceAnalysisSchema = z.object({
   audioBase64: z.string()
     .min(100, 'Audio data too short')
     .max(10 * 1024 * 1024, 'Audio data too large (max ~10MB base64)')
-    // Accepte tous les formats audio avec data URL (webm, mp4, ogg, etc.)
-    .regex(/^data:audio\/[^;,]+/, 'Invalid audio base64 format')
 });
 
 export const HumeAnalysisSchema = z.object({
-  audioData: z.string().min(1, 'Audio data required'),
-  analysisType: z.enum(['emotion', 'multimodal']).optional().default('emotion')
+  audioData: z.string().optional(),
+  imageBase64: z.string().optional(),
+  analysisType: z.enum(['emotion', 'multimodal', 'facial', 'voice']).optional().default('facial')
+}).refine(data => data.audioData || data.imageBase64, {
+  message: 'Either audioData or imageBase64 is required'
 });
 
 // ============================================
