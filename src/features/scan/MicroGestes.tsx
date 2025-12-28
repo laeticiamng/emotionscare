@@ -59,22 +59,46 @@ const MicroGestes: React.FC<MicroGestesProps> = ({
 
   const displaySummary = suggestions?.summary || summary;
 
+  const handleRegenerate = () => {
+    if (emotion) {
+      reset();
+      setTimeout(() => {
+        generateSuggestions({ emotion, valence, arousal });
+      }, 100);
+    }
+  };
+
   return (
     <section className="rounded-3xl border border-transparent bg-white/5 p-6 shadow-lg backdrop-blur mood-surface dark:bg-slate-800/40">
       <header className="space-y-3">
-        <div className="flex items-center gap-2">
-          <h2 className="text-lg font-semibold text-foreground">Micro-gestes suggérés</h2>
-          {isLoading && (
-            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-              <Loader2 className="h-3 w-3 animate-spin" />
-              <span>Génération en cours...</span>
-            </div>
-          )}
-          {hasAISuggestions && !isLoading && (
-            <div className="flex items-center gap-1.5 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <h2 className="text-lg font-semibold text-foreground">Micro-gestes suggérés</h2>
+            {isLoading && (
+              <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                <Loader2 className="h-3 w-3 animate-spin" />
+                <span>Génération en cours...</span>
+              </div>
+            )}
+            {hasAISuggestions && !isLoading && (
+              <div className="flex items-center gap-1.5 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+                <Sparkles className="h-3 w-3" />
+                <span>IA</span>
+              </div>
+            )}
+          </div>
+          
+          {/* Bouton Régénérer */}
+          {emotion && !isLoading && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleRegenerate}
+              className="gap-1.5 text-xs"
+            >
               <Sparkles className="h-3 w-3" />
-              <span>IA</span>
-            </div>
+              Régénérer
+            </Button>
           )}
         </div>
         
