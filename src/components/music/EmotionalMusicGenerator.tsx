@@ -81,10 +81,11 @@ export const EmotionalMusicGenerator: React.FC = () => {
     return phase?.message || 'Génération en cours...';
   }, [generationProgress]);
 
-  // Analyser automatiquement au montage
+  // Analyser automatiquement au montage (une seule fois)
   useEffect(() => {
     analyzeEmotions();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Intentionally empty - only run on mount
 
   // Poll le statut si une génération est en cours
   useEffect(() => {
