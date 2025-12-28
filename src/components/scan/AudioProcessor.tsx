@@ -1,11 +1,20 @@
 // @ts-nocheck
-
 import React, { useEffect, useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Mic, StopCircle, AlertCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { EmotionResult, EmotionRecommendation } from '@/types/emotion';
-import { AudioProcessorProps } from '@/types/audio';
+
+interface AudioProcessorProps {
+  onResult?: (result: EmotionResult) => void;
+  onProcessingChange?: (processing: boolean) => void;
+  isRecording?: boolean;
+  duration?: number;
+  autoStart?: boolean;
+  className?: string;
+  mode?: string;
+  visualize?: boolean;
+}
 
 export const AudioProcessor: React.FC<AudioProcessorProps> = ({
   onResult,

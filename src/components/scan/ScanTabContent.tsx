@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -101,8 +99,8 @@ const ScanTabContent: React.FC<ScanTabContentProps> = ({
     addHistoryEntry({
       date: new Date().toISOString(),
       method: selectedMethod || 'text',
-      emotion: result.primaryEmotion || 'neutral',
-      score: result.intensity || 50
+      emotion: result.emotion || 'neutral',
+      score: result.intensity ?? result.confidence ?? 50
     });
 
     onScanComplete(result);
