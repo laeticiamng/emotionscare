@@ -89,6 +89,50 @@ serve(async (req) => {
 
     let result;
     
+    // Action: check credits
+    if (action === 'credits') {
+      try {
+        const creditsResponse = await fetch(`${SUNO_API_BASE}/api/v1/account/info`, {
+          headers: {
+            'Authorization': `Bearer ${sunoApiKey}`,
+          }
+        });
+        
+        if (!creditsResponse.ok) {
+          return new Response(JSON.stringify({ 
+            success: false,
+            error: 'Unable to fetch credits info',
+            credits: { remaining: -1, total: -1 }
+          }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+        
+        const creditsData = await creditsResponse.json();
+        console.log('[suno-music] Credits info:', JSON.stringify(creditsData));
+        
+        return new Response(JSON.stringify({ 
+          success: true,
+          credits: {
+            remaining: creditsData.data?.credits || creditsData.credits || 0,
+            total: creditsData.data?.totalCredits || creditsData.totalCredits || 0,
+            plan: creditsData.data?.plan || 'unknown'
+          }
+        }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      } catch (error) {
+        console.error('[suno-music] Credits check error:', error);
+        return new Response(JSON.stringify({ 
+          success: false,
+          error: 'Credits check failed',
+          credits: { remaining: -1, total: -1 }
+        }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+    }
+    
     switch (action) {
       case 'start':
       case 'generate':
