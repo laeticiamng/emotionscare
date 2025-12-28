@@ -277,7 +277,7 @@ export const useMedicalDisclaimer = (feature: 'scan' | 'assessment' | 'coach' | 
           .from('user_preferences')
           .select('medical_consents')
           .eq('user_id', user.id)
-          .single();
+          .maybeSingle();
 
         const consent = data?.medical_consents?.[feature];
         if (consent?.accepted && new Date(consent.timestamp) > sixMonthsAgo) {
