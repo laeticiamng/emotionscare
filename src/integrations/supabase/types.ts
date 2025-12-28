@@ -16793,6 +16793,45 @@ export type Database = {
         }
         Relationships: []
       }
+      seuil_events: {
+        Row: {
+          action_taken: string | null
+          action_type: string | null
+          created_at: string
+          id: string
+          notes: string | null
+          session_completed: boolean | null
+          threshold_level: number
+          updated_at: string
+          user_id: string
+          zone: string
+        }
+        Insert: {
+          action_taken?: string | null
+          action_type?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          session_completed?: boolean | null
+          threshold_level: number
+          updated_at?: string
+          user_id: string
+          zone: string
+        }
+        Update: {
+          action_taken?: string | null
+          action_type?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          session_completed?: boolean | null
+          threshold_level?: number
+          updated_at?: string
+          user_id?: string
+          zone?: string
+        }
+        Relationships: []
+      }
       share_audit_logs: {
         Row: {
           action: string
