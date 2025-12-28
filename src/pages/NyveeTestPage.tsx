@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 export default function NyveeTestPage() {
   return (
@@ -29,8 +30,8 @@ export default function NyveeTestPage() {
         <p style={{ marginBottom: '1.5rem', color: '#6b7280' }}>
           Si tu vois cette page, la route /test-nyvee fonctionne correctement !
         </p>
-        <a 
-          href="/app/nyvee"
+        <Link 
+          to="/app/nyvee"
           style={{
             display: 'inline-block',
             padding: '0.75rem 1.5rem',
@@ -42,7 +43,7 @@ export default function NyveeTestPage() {
           }}
         >
           🌿 Aller vers Nyvée
-        </a>
+        </Link>
       </div>
     </div>
   );
