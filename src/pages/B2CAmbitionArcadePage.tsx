@@ -1,7 +1,7 @@
 /**
  * Page Ambition Arcade - Gamification d'objectifs
  */
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -38,14 +38,14 @@ const B2CAmbitionArcadePage: React.FC = () => {
     return [...new Set(allTags)].sort();
   }, [goals]);
 
-  // Handle tag toggle
-  const handleTagToggle = (tag: string) => {
+  // Handle tag toggle - memoized for GoalCard
+  const handleTagToggle = useCallback((tag: string) => {
     setSelectedTags(prev => 
       prev.includes(tag) 
         ? prev.filter(t => t !== tag) 
         : [...prev, tag]
     );
-  };
+  }, []);
 
   // Filter and sort goals
   const filteredGoals = useMemo(() => {
@@ -215,7 +215,9 @@ const B2CAmbitionArcadePage: React.FC = () => {
                 {activeGoals.length > 0 && (
                   <div className="space-y-4">
                     <h3 className="text-sm font-medium text-muted-foreground uppercase">Actifs ({activeGoals.length})</h3>
-                    {activeGoals.map(goal => <GoalCard key={goal.id} goal={goal} />)}
+                    {activeGoals.map(goal => (
+                      <GoalCard key={goal.id} goal={goal} onTagClick={handleTagToggle} />
+                    ))}
                   </div>
                 )}
 
@@ -223,7 +225,9 @@ const B2CAmbitionArcadePage: React.FC = () => {
                 {completedGoals.length > 0 && (
                   <div className="space-y-4">
                     <h3 className="text-sm font-medium text-muted-foreground uppercase">Complétés ({completedGoals.length})</h3>
-                    {completedGoals.map(goal => <GoalCard key={goal.id} goal={goal} />)}
+                    {completedGoals.map(goal => (
+                      <GoalCard key={goal.id} goal={goal} onTagClick={handleTagToggle} />
+                    ))}
                   </div>
                 )}
 
@@ -231,14 +235,18 @@ const B2CAmbitionArcadePage: React.FC = () => {
                 {abandonedGoals.length > 0 && (
                   <div className="space-y-4">
                     <h3 className="text-sm font-medium text-muted-foreground uppercase">Abandonnés ({abandonedGoals.length})</h3>
-                    {abandonedGoals.map(goal => <GoalCard key={goal.id} goal={goal} />)}
+                    {abandonedGoals.map(goal => (
+                      <GoalCard key={goal.id} goal={goal} onTagClick={handleTagToggle} />
+                    ))}
                   </div>
                 )}
               </>
             ) : (
               /* Flat list when filtered */
               <div className="space-y-4">
-                {filteredGoals.map(goal => <GoalCard key={goal.id} goal={goal} />)}
+                {filteredGoals.map(goal => (
+                  <GoalCard key={goal.id} goal={goal} onTagClick={handleTagToggle} />
+                ))}
               </div>
             )}
 

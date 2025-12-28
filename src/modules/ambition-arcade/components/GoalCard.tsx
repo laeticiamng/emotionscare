@@ -30,9 +30,10 @@ import { QuestTimer } from './QuestTimer';
 
 interface GoalCardProps {
   goal: AmbitionGoal;
+  onTagClick?: (tag: string) => void;
 }
 
-export const GoalCard: React.FC<GoalCardProps> = ({ goal }) => {
+export const GoalCard: React.FC<GoalCardProps> = ({ goal, onTagClick }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [newQuestTitle, setNewQuestTitle] = useState('');
   
@@ -92,7 +93,17 @@ export const GoalCard: React.FC<GoalCardProps> = ({ goal }) => {
               </CardTitle>
               <div className="flex flex-wrap gap-1 mt-2">
                 {goal.tags.map(tag => (
-                  <Badge key={tag} variant="secondary" className="text-xs">
+                  <Badge 
+                    key={tag} 
+                    variant="secondary" 
+                    className={`text-xs ${onTagClick ? 'cursor-pointer hover:bg-primary/20 transition-colors' : ''}`}
+                    onClick={(e) => {
+                      if (onTagClick) {
+                        e.stopPropagation();
+                        onTagClick(tag);
+                      }
+                    }}
+                  >
                     {tag}
                   </Badge>
                 ))}
