@@ -137,33 +137,6 @@ export const SmartNotificationEngine: React.FC<SmartNotificationEngineProps> = (
       }, { onConflict: 'user_id,key' });
   }, [user?.id]);
 
-  const [scheduledNotifications, setScheduledNotifications] = useState<
-    ScheduledNotification[]
-  >([
-    {
-      id: '1',
-      title: '🎵 Nouvelle Playlist Recommandée',
-      message: 'Focus Créatif - Parfait pour votre après-midi',
-      type: 'recommendation',
-      icon: '💡',
-      scheduledTime: new Date(Date.now() + 3600000),
-      sent: false,
-      emoji: '🎵',
-    },
-    {
-      id: '2',
-      title: '🎯 Défi du Jour',
-      message: 'Écoutez 30 min de musique thérapeutique',
-      type: 'challenge',
-      icon: '🎯',
-      scheduledTime: new Date(Date.now() + 7200000),
-      sent: false,
-      emoji: '🎯',
-    },
-  ]);
-
-  const [showAdvanced, setShowAdvanced] = useState(false);
-
   // Simulate sending notifications
   useEffect(() => {
     const interval = setInterval(() => {
