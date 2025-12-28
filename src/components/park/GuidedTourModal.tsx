@@ -1,10 +1,9 @@
-// @ts-nocheck
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Heart, Zap, Palette, Wind, Users, Sparkles } from 'lucide-react';
+import { Heart, Zap, Palette, Wind, Users, Sparkles, LucideIcon } from 'lucide-react';
 import { EmotionalProfile } from '@/hooks/useGuidedTour';
 
 interface GuidedTourModalProps {
@@ -24,7 +23,7 @@ export const GuidedTourModal: React.FC<GuidedTourModalProps> = ({
     id: EmotionalProfile['primary'];
     name: string;
     description: string;
-    icon: any;
+    icon: LucideIcon;
     color: string;
   }> = [
     {

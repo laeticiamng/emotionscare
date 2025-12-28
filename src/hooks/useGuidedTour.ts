@@ -1,5 +1,4 @@
-// @ts-nocheck
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { useUserPreference } from '@/hooks/useSupabaseStorage';
 
 export interface TourStep {

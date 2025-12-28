@@ -1,13 +1,12 @@
-// @ts-nocheck
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Sparkles, Heart, Star, Zap, TrendingUp } from 'lucide-react';
+import { Sparkles, Heart, LucideIcon } from 'lucide-react';
 import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import type { Attraction } from '@/types/park';
 
 interface RecommendationProps {
-  attraction: any;
+  attraction: Attraction;
   score: number;
   reason: string;
   delay?: number;
@@ -112,8 +111,14 @@ export const AttractionRecommendation: React.FC<RecommendationProps> = ({
   );
 };
 
+interface RecommendationData {
+  attraction: Attraction;
+  score: number;
+  reason: string;
+}
+
 interface RecommendationsProps {
-  recommendations: any[];
+  recommendations: RecommendationData[];
   onSelectAttraction?: (id: string) => void;
   title?: string;
 }

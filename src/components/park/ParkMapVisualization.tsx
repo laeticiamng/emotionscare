@@ -1,11 +1,10 @@
-// @ts-nocheck
 /**
  * Visualisation Interactive de la Carte du Parc Émotionnel
  * Affiche une vue spatiale et interconnectée des zones du parc
  */
 
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Maximize2, Minimize2, Info } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
