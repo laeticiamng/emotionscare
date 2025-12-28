@@ -1,8 +1,22 @@
-// @ts-nocheck
-
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { MusicPlaylist, EmotionMusicParams } from '@/types/music';
+import { useState, useCallback, useRef } from 'react';
 import { logger } from '@/lib/logger';
+
+interface MusicPlaylist {
+  id: string;
+  name: string;
+  tracks: Array<{
+    id: string;
+    title: string;
+    artist: string;
+    url?: string;
+  }>;
+}
+
+interface EmotionMusicParams {
+  emotion: string;
+  intensity?: number;
+  genre?: string;
+}
 
 interface CacheEntry {
   playlist: MusicPlaylist;

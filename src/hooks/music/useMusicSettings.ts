@@ -69,15 +69,21 @@ export function useMusicSettings<T>({
             .maybeSingle();
 
           if (!error && data?.value) {
-            const parsed = typeof data.value === 'string' 
-              ? JSON.parse(data.value) 
-              : data.value;
-            setValue(parsed as T);
-            lastSavedRef.current = JSON.stringify(parsed);
-            setIsSynced(true);
-            
-            // Supprimer du localStorage après migration
-            localStorage.removeItem(key);
+            try {
+              const parsed = typeof data.value === 'string' 
+                ? JSON.parse(data.value) 
+                : data.value;
+              setValue(parsed as T);
+              lastSavedRef.current = JSON.stringify(parsed);
+              setIsSynced(true);
+              
+              // Supprimer du localStorage après migration
+              localStorage.removeItem(key);
+            } catch (parseError) {
+              logger.warn(`[useMusicSettings] JSON parse failed for ${key}, using default`, { value: data.value }, 'MUSIC');
+              // Use default value if parse fails
+              setValue(defaultValue);
+            }
           } else {
             // Migration: charger depuis localStorage si existe
             const localData = localStorage.getItem(key);

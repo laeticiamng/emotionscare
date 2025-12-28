@@ -3,7 +3,8 @@
  * Spotify, Apple Music, YouTube Music, SoundCloud
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useMusicSettings } from '@/hooks/music/useMusicSettings';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -81,10 +82,30 @@ const INTEGRATIONS: Integration[] = [
 
 export const ExternalIntegrationsPanel: React.FC = () => {
   const { toast } = useToast();
-  const [integrations, setIntegrations] = useState(INTEGRATIONS);
+  
+  // Persist integrations state with useMusicSettings
+  const { value: savedIntegrations, setValue: setSavedIntegrations } = useMusicSettings<Integration[]>({
+    key: 'music:integrations' as any,
+    defaultValue: INTEGRATIONS,
+  });
+  
+  const [integrations, setIntegrations] = useState<Integration[]>(savedIntegrations || INTEGRATIONS);
   const [importing, setImporting] = useState<string | null>(null);
   const [importProgress, setImportProgress] = useState(0);
   const [showSettings, setShowSettings] = useState<string | null>(null);
+
+  // Sync with saved state
+  useEffect(() => {
+    if (savedIntegrations) {
+      setIntegrations(savedIntegrations);
+    }
+  }, [savedIntegrations]);
+
+  // Save integrations when they change
+  const updateIntegrations = (newIntegrations: Integration[]) => {
+    setIntegrations(newIntegrations);
+    setSavedIntegrations(newIntegrations);
+  };
 
   const handleConnect = async (integrationId: string) => {
     const integration = integrations.find((i) => i.id === integrationId);
@@ -97,8 +118,8 @@ export const ExternalIntegrationsPanel: React.FC = () => {
 
     // Simulate OAuth flow
     setTimeout(() => {
-      setIntegrations((prev) =>
-        prev.map((i) =>
+      updateIntegrations(
+        integrations.map((i) =>
           i.id === integrationId
             ? {
                 ...i,
@@ -122,8 +143,8 @@ export const ExternalIntegrationsPanel: React.FC = () => {
     const integration = integrations.find((i) => i.id === integrationId);
     if (!integration) return;
 
-    setIntegrations((prev) =>
-      prev.map((i) =>
+    updateIntegrations(
+      integrations.map((i) =>
         i.id === integrationId
           ? { ...i, connected: false, username: undefined, syncEnabled: false }
           : i

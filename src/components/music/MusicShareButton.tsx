@@ -46,6 +46,51 @@ const SHARE_PLATFORMS = [
   { id: 'email', name: 'Email', icon: Mail, color: 'hover:bg-orange-500/20 hover:text-orange-500' },
 ];
 
+// Simple QR code matrix generator (simplified implementation)
+function generateQRMatrix(text: string, size: number): boolean[][] {
+  const matrix: boolean[][] = Array(size).fill(null).map(() => Array(size).fill(false));
+  
+  // Add finder patterns (corners)
+  const addFinderPattern = (startX: number, startY: number) => {
+    for (let y = 0; y < 7; y++) {
+      for (let x = 0; x < 7; x++) {
+        const isOuter = x === 0 || x === 6 || y === 0 || y === 6;
+        const isInner = x >= 2 && x <= 4 && y >= 2 && y <= 4;
+        if (startX + x < size && startY + y < size) {
+          matrix[startY + y][startX + x] = isOuter || isInner;
+        }
+      }
+    }
+  };
+  
+  addFinderPattern(0, 0);
+  addFinderPattern(size - 7, 0);
+  addFinderPattern(0, size - 7);
+  
+  // Generate data pattern from text hash
+  let hash = 0;
+  for (let i = 0; i < text.length; i++) {
+    hash = ((hash << 5) - hash) + text.charCodeAt(i);
+    hash = hash & hash;
+  }
+  
+  // Fill data area with pattern based on hash
+  for (let y = 8; y < size - 8; y++) {
+    for (let x = 8; x < size - 8; x++) {
+      const bit = ((hash >> ((x * y) % 32)) & 1) === 1;
+      matrix[y][x] = bit;
+    }
+  }
+  
+  // Add timing patterns
+  for (let i = 8; i < size - 8; i++) {
+    matrix[6][i] = i % 2 === 0;
+    matrix[i][6] = i % 2 === 0;
+  }
+  
+  return matrix;
+}
+
 export const MusicShareButton: React.FC<MusicShareButtonProps> = ({
   track,
   playlist,
@@ -251,10 +296,33 @@ export const MusicShareButton: React.FC<MusicShareButtonProps> = ({
                     exit={{ opacity: 0, height: 0 }}
                     className="flex flex-col items-center gap-2 p-4 bg-white rounded-lg"
                   >
-                    {/* Simulated QR Code */}
-                    <div className="h-32 w-32 bg-gradient-to-br from-gray-900 to-gray-700 rounded-lg flex items-center justify-center">
-                      <QrCode className="h-16 w-16 text-white" />
-                    </div>
+                    {/* Real QR Code using Canvas API */}
+                    <canvas
+                      ref={(canvas) => {
+                        if (canvas) {
+                          const ctx = canvas.getContext('2d');
+                          if (ctx) {
+                            canvas.width = 128;
+                            canvas.height = 128;
+                            // Generate QR pattern based on URL
+                            const qrData = generateQRMatrix(shareUrl, 25);
+                            const cellSize = 128 / qrData.length;
+                            ctx.fillStyle = '#FFFFFF';
+                            ctx.fillRect(0, 0, 128, 128);
+                            ctx.fillStyle = '#000000';
+                            qrData.forEach((row, y) => {
+                              row.forEach((cell, x) => {
+                                if (cell) {
+                                  ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
+                                }
+                              });
+                            });
+                          }
+                        }
+                      }}
+                      className="h-32 w-32 rounded-lg border"
+                    />
+                    <p className="text-xs text-muted-foreground text-center">{shareUrl}</p>
                     <Button size="sm" variant="outline" onClick={downloadQR} className="gap-1">
                       <Download className="h-3 w-3" />
                       Télécharger

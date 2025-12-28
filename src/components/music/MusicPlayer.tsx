@@ -46,7 +46,7 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({
   const currentTime = propCurrentTime !== undefined ? propCurrentTime : musicContext.state.currentTime || 0;
   const duration = musicContext.state.duration || 0;
   
-  const [isMuted, setIsMuted] = React.useState(false);
+  const [isMuted, setIsMuted] = React.useState(volume === 0);
 
   const formatTime = (time: number) => {
     if (!time || isNaN(time)) return '0:00';
@@ -106,16 +106,28 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({
     }
   };
 
+  const previousVolumeRef = React.useRef(volume);
+
+  // Sync mute state with volume from context
+  React.useEffect(() => {
+    if (volume === 0 && !isMuted) {
+      setIsMuted(true);
+    } else if (volume > 0 && isMuted) {
+      setIsMuted(false);
+    }
+  }, [volume, isMuted]);
+
   const toggleMute = () => {
     if (isMuted) {
-      const newVolume = 0.7;
+      const restoreVolume = previousVolumeRef.current > 0 ? previousVolumeRef.current : 0.7;
       if (onVolumeChange) {
-        onVolumeChange(newVolume);
+        onVolumeChange(restoreVolume);
       } else if (musicContext.setVolume) {
-        musicContext.setVolume(newVolume);
+        musicContext.setVolume(restoreVolume);
       }
       setIsMuted(false);
     } else {
+      previousVolumeRef.current = volume;
       if (onVolumeChange) {
         onVolumeChange(0);
       } else if (musicContext.setVolume) {
