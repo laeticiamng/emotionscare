@@ -3,12 +3,13 @@
  * avec timer Pomodoro et progression visualisée
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { useFocusFlow, type FocusMode } from '@/hooks/useFocusFlow';
+import { useMusic } from '@/hooks/useMusic';
 import { 
   Play, 
   Pause, 
@@ -44,6 +45,9 @@ export const FocusFlowPlayer: React.FC = () => {
   const [selectedMode, setSelectedMode] = useState<FocusMode>('work');
   const [duration, setDuration] = useState(120);
   
+  // Connect to global music context
+  const musicContext = useMusic();
+  
   const {
     currentSession,
     tracks,
@@ -63,6 +67,26 @@ export const FocusFlowPlayer: React.FC = () => {
     resumeFromBreak,
     FOCUS_MODE_CONFIG
   } = useFocusFlow();
+
+  // Sync with global music context when playing focus tracks
+  useEffect(() => {
+    if (currentTrack && isPlaying && !isPaused) {
+      // Sync playback state with global context
+      const trackUrl = (currentTrack as any).suno_audio_url || (currentTrack as any).audio_url || '';
+      if (trackUrl) {
+        musicContext.play({
+          id: currentTrack.id,
+          title: `Focus Track #${currentTrackIndex + 1}`,
+          artist: 'Focus Flow',
+          duration: 180,
+          url: trackUrl,
+          audioUrl: trackUrl,
+          emotion: 'focused',
+          mood: `${currentTrack.phase} - ${currentTrack.target_tempo} BPM`
+        });
+      }
+    }
+  }, [currentTrack?.id, isPlaying, isPaused]);
 
   const handleStart = () => {
     startFocusSession(selectedMode, duration);
