@@ -15,7 +15,7 @@ import { useSamOrchestration } from '@/features/mood/useSamOrchestration';
 import { ConsentGate } from '@/features/clinical-optin/ConsentGate';
 import { useAssessment } from '@/hooks/useAssessment';
 import { logger } from '@/lib/logger';
-import { ScanOnboarding, shouldShowOnboarding } from '@/components/scan/ScanOnboarding';
+import { ScanOnboarding, useShouldShowOnboarding } from '@/components/scan/ScanOnboarding';
 import { useToast } from '@/hooks/use-toast';
 import { scanAnalytics } from '@/lib/analytics/scanEvents';
 import { Camera, Mic, FileText, Sliders, BarChart3, Lightbulb, Download, Calendar, Loader2 } from 'lucide-react';
@@ -62,7 +62,15 @@ const B2CScanPage: React.FC = () => {
   const [mode, setMode] = useState<'sliders' | 'camera'>('sliders');
   const [edgeUnavailable, setEdgeUnavailable] = useState(false);
   const [cameraDenied, setCameraDenied] = useState(false);
-  const [showOnboarding, setShowOnboarding] = useState(shouldShowOnboarding());
+  const { shouldShow: shouldShowOnboardingCheck, isLoading: onboardingLoading } = useShouldShowOnboarding();
+  const [showOnboarding, setShowOnboarding] = useState(false);
+
+  // Sync onboarding state from Supabase
+  useEffect(() => {
+    if (!onboardingLoading) {
+      setShowOnboarding(shouldShowOnboardingCheck);
+    }
+  }, [shouldShowOnboardingCheck, onboardingLoading]);
   const [mainViewTab, setMainViewTab] = useState<'scanner' | 'dashboard' | 'comparison' | 'insights' | 'weekly' | 'export'>('scanner');
   const lastSubmittedRef = useRef<string | null>(null);
 
