@@ -63,16 +63,16 @@ const CATEGORY_CONFIG = {
 
 // Génère des recommandations basées sur l'émotion actuelle avec URLs audio valides
 const generateRecommendations = (emotion: string, historyCount: number): MLRecommendation[] => {
-  // Utiliser des URLs audio de démonstration valides
+  // URLs audio publiques sans CORS (Pixabay CDN)
   const DEMO_AUDIO_URLS = [
-    'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
-    'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
-    'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
-    'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3',
-    'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3',
-    'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3',
-    'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3',
-    'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3',
+    'https://cdn.pixabay.com/audio/2024/11/04/audio_0c2e9f0c18.mp3',
+    'https://cdn.pixabay.com/audio/2024/02/22/audio_4ffd0cda82.mp3',
+    'https://cdn.pixabay.com/audio/2024/05/17/audio_6951b6b024.mp3',
+    'https://cdn.pixabay.com/audio/2023/09/04/audio_4c0fc29c6e.mp3',
+    'https://cdn.pixabay.com/audio/2024/01/10/audio_bc70cb15ab.mp3',
+    'https://cdn.pixabay.com/audio/2023/12/07/audio_50c0d13e7b.mp3',
+    'https://cdn.pixabay.com/audio/2024/03/12/audio_1a2e8f7c9b.mp3',
+    'https://cdn.pixabay.com/audio/2024/06/28/audio_d3f5a7e2c1.mp3',
   ];
 
   const emotionTracks: Record<string, MusicTrack[]> = {

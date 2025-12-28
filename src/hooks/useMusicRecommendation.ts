@@ -46,8 +46,8 @@ export function useMusicRecommendation(options: MusicHookOptions = {}) {
           id: `rec-${emotion}-1`,
           title: `${mapped} Track 1`,
           artist: 'Emotion Music',
-          url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
-          audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
+          url: 'https://cdn.pixabay.com/audio/2024/11/04/audio_0c2e9f0c18.mp3',
+          audioUrl: 'https://cdn.pixabay.com/audio/2024/11/04/audio_0c2e9f0c18.mp3',
           duration: 180,
           emotion: mapped,
           mood: emotion
@@ -56,8 +56,8 @@ export function useMusicRecommendation(options: MusicHookOptions = {}) {
           id: `rec-${emotion}-2`,
           title: `${mapped} Track 2`,
           artist: 'Mood Sounds',
-          url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
-          audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
+          url: 'https://cdn.pixabay.com/audio/2024/02/22/audio_4ffd0cda82.mp3',
+          audioUrl: 'https://cdn.pixabay.com/audio/2024/02/22/audio_4ffd0cda82.mp3',
           duration: 200,
           emotion: mapped,
           mood: emotion

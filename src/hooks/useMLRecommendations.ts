@@ -9,6 +9,7 @@ import {
 } from '@/services/ml-recommendation-service';
 import { logger } from '@/lib/logger';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 export const useMLRecommendations = (userId?: string) => {
   const [isTraining, setIsTraining] = useState(false);
@@ -18,7 +19,7 @@ export const useMLRecommendations = (userId?: string) => {
   const [userHistory, setUserHistory] = useState<UserHistoryEntry[]>([]);
   const [error, setError] = useState<string | null>(null);
 
-  // Simulate loading user history (in production, fetch from DB)
+  // Charger l'historique depuis Supabase
   useEffect(() => {
     if (userId) {
       loadUserHistory();
@@ -27,64 +28,87 @@ export const useMLRecommendations = (userId?: string) => {
 
   const loadUserHistory = useCallback(async () => {
     try {
-      // Mock history - in production, fetch from Supabase
-      const mockHistory: UserHistoryEntry[] = [
-        {
-          timestamp: new Date(Date.now() - 86400000 * 7).toISOString(),
-          emotion: 'anxious',
-          intensity: 0.8,
-          musicGenerated: true,
-          sunoParams: { bpm: 70, style: 'ambient', mood: 'calme', tags: ['relax'] },
-          sessionDuration: 15,
-          userFeedback: 'positive',
-          timeOfDay: '18:30',
-        },
-        {
-          timestamp: new Date(Date.now() - 86400000 * 6).toISOString(),
-          emotion: 'calm',
-          intensity: 0.6,
-          musicGenerated: true,
-          sunoParams: { bpm: 80, style: 'piano', mood: 'serein', tags: ['peace'] },
-          sessionDuration: 20,
-          userFeedback: 'positive',
-          timeOfDay: '08:00',
-        },
-        {
-          timestamp: new Date(Date.now() - 86400000 * 5).toISOString(),
-          emotion: 'happy',
-          intensity: 0.7,
-          musicGenerated: true,
-          sunoParams: { bpm: 120, style: 'upbeat', mood: 'joyeux', tags: ['energy'] },
-          sessionDuration: 10,
-          userFeedback: 'neutral',
-          timeOfDay: '12:00',
-        },
+      if (!userId) return;
+
+      // Charger depuis music_listening_history ou session_emotions
+      const { data: sessionData, error: sessionError } = await supabase
+        .from('session_emotions')
+        .select('*')
+        .eq('user_id', userId)
+        .order('timestamp', { ascending: false })
+        .limit(50);
+
+      if (sessionError) {
+        logger.warn('Session emotions not available, using fallback', {}, 'ML');
+      }
+
+      if (sessionData && sessionData.length > 0) {
+        const history: UserHistoryEntry[] = sessionData.map((entry: any) => ({
+          timestamp: entry.timestamp || entry.created_at,
+          emotion: entry.primary_emotion || entry.emotion || 'neutral',
+          intensity: entry.intensity || 0.5,
+          musicGenerated: entry.music_generated ?? false,
+          sunoParams: entry.suno_params || {},
+          sessionDuration: entry.duration_seconds || 15,
+          userFeedback: entry.feedback || 'neutral',
+          timeOfDay: new Date(entry.timestamp || entry.created_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
+        }));
+
+        setUserHistory(history);
+        logger.info('📊 User history loaded from Supabase', { entries: history.length }, 'ML');
+        return;
+      }
+
+      // Fallback: charger depuis user_settings
+      const { data: settingsData } = await supabase
+        .from('user_settings')
+        .select('value')
+        .eq('user_id', userId)
+        .eq('key', 'ml_history')
+        .single();
+
+      if (settingsData?.value) {
+        try {
+          const history = typeof settingsData.value === 'string' 
+            ? JSON.parse(settingsData.value) 
+            : settingsData.value;
+          if (Array.isArray(history)) {
+            setUserHistory(history);
+            logger.info('📊 User history loaded from settings', { entries: history.length }, 'ML');
+            return;
+          }
+        } catch (e) {
+          logger.warn('Failed to parse ML history from settings', {}, 'ML');
+        }
+      }
+
+      // Si aucune donnée, utiliser des données de démo minimales
+      const demoHistory: UserHistoryEntry[] = [
         {
           timestamp: new Date(Date.now() - 86400000 * 3).toISOString(),
-          emotion: 'sad',
-          intensity: 0.6,
+          emotion: 'calm',
+          intensity: 0.7,
           musicGenerated: true,
-          sunoParams: { bpm: 65, style: 'melancholic', mood: 'mélancolique', tags: ['healing'] },
-          sessionDuration: 25,
+          sessionDuration: 15,
           userFeedback: 'positive',
-          timeOfDay: '20:00',
+          timeOfDay: '18:00',
         },
         {
-          timestamp: new Date(Date.now() - 86400000 * 1).toISOString(),
-          emotion: 'focused',
-          intensity: 0.75,
+          timestamp: new Date(Date.now() - 86400000).toISOString(),
+          emotion: 'focus',
+          intensity: 0.6,
           musicGenerated: true,
-          sunoParams: { bpm: 90, style: 'lofi', mood: 'concentré', tags: ['focus'] },
-          sessionDuration: 45,
+          sessionDuration: 20,
           userFeedback: 'positive',
           timeOfDay: '10:00',
         },
       ];
       
-      setUserHistory(mockHistory);
-      logger.info('📊 User history loaded', { entries: mockHistory.length }, 'ML');
+      setUserHistory(demoHistory);
+      logger.info('📊 Using demo history (no user data found)', { entries: demoHistory.length }, 'ML');
     } catch (err) {
       logger.error('Error loading history', err as Error, 'ML');
+      setUserHistory([]);
     }
   }, [userId]);
 

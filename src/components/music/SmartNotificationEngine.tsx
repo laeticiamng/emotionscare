@@ -1,9 +1,10 @@
 /**
  * Smart Notification Engine - Notifications intelligentes et personnalisées
  * Timing optimal, recommandations contextuelles, gamification
+ * Connecté à Supabase pour persistence
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -19,14 +20,17 @@ import {
   CheckCircle,
   Trash2,
   Send,
+  Loader2,
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
 interface NotificationPreference {
   type: 'recommendation' | 'challenge' | 'achievement' | 'social' | 'update';
   enabled: boolean;
   frequency: 'realtime' | 'hourly' | 'daily' | 'weekly';
-  optimalTime?: string; // HH:MM format
+  optimalTime?: string;
   icon: string;
   label: string;
 }
@@ -48,53 +52,90 @@ interface SmartNotificationEngineProps {
   onPreferenceChange?: (preferences: NotificationPreference[]) => void;
 }
 
+const DEFAULT_PREFERENCES: NotificationPreference[] = [
+  { type: 'recommendation', enabled: true, frequency: 'daily', optimalTime: '08:00', icon: '💡', label: 'Recommandations personnalisées' },
+  { type: 'challenge', enabled: true, frequency: 'daily', optimalTime: '12:00', icon: '🎯', label: 'Défis quotidiens' },
+  { type: 'achievement', enabled: true, frequency: 'realtime', icon: '🏆', label: 'Succès et badges' },
+  { type: 'social', enabled: false, frequency: 'daily', optimalTime: '18:00', icon: '👥', label: 'Activités sociales' },
+  { type: 'update', enabled: false, frequency: 'weekly', optimalTime: 'Monday 10:00', icon: '📰', label: 'Nouvelles fonctionnalités' },
+];
+
 export const SmartNotificationEngine: React.FC<SmartNotificationEngineProps> = ({
-  userId = 'user-123',
   onNotificationSent,
   onPreferenceChange,
 }) => {
   const { toast } = useToast();
-  const [preferences, setPreferences] = useState<NotificationPreference[]>([
-    {
-      type: 'recommendation',
-      enabled: true,
-      frequency: 'daily',
-      optimalTime: '08:00',
-      icon: '💡',
-      label: 'Recommandations personnalisées',
-    },
-    {
-      type: 'challenge',
-      enabled: true,
-      frequency: 'daily',
-      optimalTime: '12:00',
-      icon: '🎯',
-      label: 'Défis quotidiens',
-    },
-    {
-      type: 'achievement',
-      enabled: true,
-      frequency: 'realtime',
-      icon: '🏆',
-      label: 'Succès et badges',
-    },
-    {
-      type: 'social',
-      enabled: false,
-      frequency: 'daily',
-      optimalTime: '18:00',
-      icon: '👥',
-      label: 'Activités sociales',
-    },
-    {
-      type: 'update',
-      enabled: false,
-      frequency: 'weekly',
-      optimalTime: 'Monday 10:00',
-      icon: '📰',
-      label: 'Nouvelles fonctionnalités',
-    },
-  ]);
+  const { user } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const [preferences, setPreferences] = useState<NotificationPreference[]>(DEFAULT_PREFERENCES);
+  const [scheduledNotifications, setScheduledNotifications] = useState<ScheduledNotification[]>([]);
+  const [showAdvanced, setShowAdvanced] = useState(false);
+
+  // Charger préférences et notifications depuis Supabase
+  useEffect(() => {
+    const loadData = async () => {
+      if (!user?.id) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        // Charger préférences
+        const { data: prefData } = await supabase
+          .from('user_settings')
+          .select('value')
+          .eq('user_id', user.id)
+          .eq('key', 'notification_preferences')
+          .single();
+
+        if (prefData?.value) {
+          const parsed = typeof prefData.value === 'string' ? JSON.parse(prefData.value) : prefData.value;
+          if (Array.isArray(parsed)) setPreferences(parsed);
+        }
+
+        // Charger notifications depuis music_notifications
+        const { data: notifData } = await supabase
+          .from('music_notifications')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(10);
+
+        if (notifData) {
+          setScheduledNotifications(notifData.map((n: any) => ({
+            id: n.id,
+            title: n.title,
+            message: n.message || '',
+            type: n.type,
+            icon: n.data?.icon || '🔔',
+            scheduledTime: new Date(n.created_at),
+            sent: n.is_read,
+            emoji: n.data?.emoji || '🔔',
+          })));
+        }
+      } catch (err) {
+        console.warn('Error loading notifications:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, [user?.id]);
+
+  // Sauvegarder préférences
+  const savePreferences = useCallback(async (newPrefs: NotificationPreference[]) => {
+    if (!user?.id) return;
+    
+    await supabase
+      .from('user_settings')
+      .upsert({
+        user_id: user.id,
+        key: 'notification_preferences',
+        value: newPrefs,
+        updated_at: new Date().toISOString(),
+      }, { onConflict: 'user_id,key' });
+  }, [user?.id]);
 
   const [scheduledNotifications, setScheduledNotifications] = useState<
     ScheduledNotification[]
