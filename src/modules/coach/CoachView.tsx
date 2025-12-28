@@ -30,6 +30,14 @@ import {
 } from '@/components/ui/dialog';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
+import {
+  CoachSessionHistory,
+  CoachStatsPanel,
+  CoachPersonalitySelector,
+  CoachSatisfactionDialog,
+  CoachExportButton,
+  type CoachPersonality,
+} from '@/modules/coach/components';
 
 interface ChatMessage {
   id: string;
@@ -132,6 +140,9 @@ export function CoachView({ initialMode = 'b2c' }: { initialMode?: CoachMode }) 
   const [skipUntil, setSkipUntil] = useState<number>(() => readSkipUntil());
   const [isAaqStarting, setIsAaqStarting] = useState(false);
   const [isAaqSubmitting, setIsAaqSubmitting] = useState(false);
+  const [personality, setPersonality] = useState<CoachPersonality>('empathetic');
+  const [showSatisfaction, setShowSatisfaction] = useState(false);
+  const [sessionId, setSessionId] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const controllerRef = useRef<AbortController | null>(null);
@@ -536,49 +547,50 @@ export function CoachView({ initialMode = 'b2c' }: { initialMode?: CoachMode }) 
     <div className="relative mx-auto flex w-full max-w-3xl flex-1 flex-col gap-4 p-4">
       {showConsent && <CoachConsent onAccept={handleConsentAccepted} />}
 
-      <header className="flex flex-col gap-2">
+      <header className="flex flex-col gap-3">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-50">Coach IA sécurisé</h1>
-          {mode === 'b2b' && (
-            <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-800 dark:bg-blue-900 dark:text-blue-100">
-              Mode B2B
-            </span>
-          )}
+          <div className="flex items-center gap-2">
+            <CoachExportButton messages={messages} disabled={isSending} />
+            <CoachSessionHistory />
+            {mode === 'b2b' && (
+              <Badge variant="secondary">B2B</Badge>
+            )}
+          </div>
         </div>
         <p className="text-sm text-slate-600 dark:text-slate-300">
-          Conversations confidentielles, réponses courtes et bienveillantes. Aucun contenu sensible n’est conservé.
+          Conversations confidentielles, réponses courtes et bienveillantes.
         </p>
-        {featureAaqEnabled && aaqSummary && (
-          <Badge
-            variant="outline"
-            className="w-fit bg-blue-50/70 text-blue-800 dark:bg-blue-900/40 dark:text-blue-100"
-          >
-            Souplesse actuelle : {aaqSummary}
-          </Badge>
-        )}
+        <div className="flex flex-wrap items-center gap-3">
+          <CoachPersonalitySelector value={personality} onChange={setPersonality} disabled={isSending} />
+          {featureAaqEnabled && aaqSummary && (
+            <Badge variant="outline" className="bg-blue-50/70 text-blue-800 dark:bg-blue-900/40 dark:text-blue-100">
+              Souplesse : {aaqSummary}
+            </Badge>
+          )}
+        </div>
+        <CoachStatsPanel />
         <div className="flex items-center gap-2 text-sm">
           <label className="flex items-center gap-1 text-slate-600 dark:text-slate-300">
-            <input
-              type="radio"
-              name="coach-mode"
-              value="b2c"
-              checked={mode === 'b2c'}
-              onChange={() => handleModeChange('b2c')}
-            />
+            <input type="radio" name="coach-mode" value="b2c" checked={mode === 'b2c'} onChange={() => handleModeChange('b2c')} />
             <span>B2C</span>
           </label>
           <label className="flex items-center gap-1 text-slate-600 dark:text-slate-300">
-            <input
-              type="radio"
-              name="coach-mode"
-              value="b2b"
-              checked={mode === 'b2b'}
-              onChange={() => handleModeChange('b2b')}
-            />
+            <input type="radio" name="coach-mode" value="b2b" checked={mode === 'b2b'} onChange={() => handleModeChange('b2b')} />
             <span>B2B</span>
           </label>
         </div>
       </header>
+      
+      <CoachSatisfactionDialog 
+        open={showSatisfaction} 
+        onClose={() => setShowSatisfaction(false)}
+        onSubmit={async (satisfaction, notes) => {
+          if (sessionId) {
+            await supabase.from('ai_coach_sessions').update({ user_satisfaction: satisfaction, session_notes: notes }).eq('id', sessionId);
+          }
+        }}
+      />
 
       {featureAaqEnabled && shouldPromptAaq && (
         <Card className="border border-slate-200 bg-white/80 shadow-sm dark:border-slate-700 dark:bg-slate-900/70">
