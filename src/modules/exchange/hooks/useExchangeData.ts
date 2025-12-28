@@ -134,6 +134,52 @@ export const useTrustProjects = () => {
   });
 };
 
+export const useCreateTrustProject = () => {
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+
+  return useMutation({
+    mutationFn: async (project: { title: string; description?: string; category: string }) => {
+      const { data, error } = await supabase
+        .from('trust_projects')
+        .insert({
+          creator_id: user?.id,
+          title: project.title,
+          description: project.description,
+          category: project.category,
+          trust_pool: 0,
+          backers_count: 0,
+          status: 'active',
+          verified: false,
+        })
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['trust-projects'] });
+    },
+  });
+};
+
+export const useTrustLeaderboard = () => {
+  return useQuery({
+    queryKey: ['trust-leaderboard'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('trust_profiles')
+        .select('*')
+        .order('trust_score', { ascending: false })
+        .limit(5);
+      
+      if (error) throw error;
+      return data;
+    },
+  });
+};
+
 export const useGiveTrust = () => {
   const queryClient = useQueryClient();
   const { user } = useAuth();
@@ -210,7 +256,7 @@ export const useCreateTimeOffer = () => {
     mutationFn: async (offer: Partial<TimeOffer>) => {
       const { data, error } = await supabase
         .from('time_offers')
-        .insert({ ...offer, user_id: user?.id })
+        .insert({ ...offer, user_id: user?.id, status: 'available', rating: 5, reviews_count: 0, time_value: 1 })
         .select()
         .single();
       
@@ -219,6 +265,34 @@ export const useCreateTimeOffer = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['time-offers'] });
+    },
+  });
+};
+
+export const useRequestTimeExchange = () => {
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+
+  return useMutation({
+    mutationFn: async ({ offerId, providerId, hours }: { offerId: string; providerId: string; hours: number }) => {
+      const { data, error } = await supabase
+        .from('time_exchanges')
+        .insert({
+          offer_id: offerId,
+          requester_id: user?.id,
+          provider_id: providerId,
+          hours_exchanged: hours,
+          status: 'pending',
+        })
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['time-offers'] });
+      queryClient.invalidateQueries({ queryKey: ['time-exchanges'] });
     },
   });
 };
