@@ -138,10 +138,25 @@ serve(async (req) => {
       case 'generate':
         try {
           // Documentation: https://docs.sunoapi.org/suno-api/generate-music
-          console.log('[suno-music] Generating with prompt:', prompt);
+          const { bpmMin, bpmMax, tempo } = body;
+          console.log('[suno-music] Generating with prompt:', prompt, 'BPM:', bpmMin, '-', bpmMax);
           
           const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
           const callBackUrl = `${supabaseUrl}/functions/v1/emotion-music-callback`;
+          
+          // Construire le style avec BPM si fourni
+          let finalStyle = style || `therapeutic ${mood} ambient`;
+          if (bpmMin && bpmMax) {
+            finalStyle += `, tempo ${bpmMin}-${bpmMax} BPM`;
+          } else if (tempo) {
+            const tempoRanges: Record<string, string> = {
+              slow: '60-80 BPM',
+              medium: '80-100 BPM',
+              fast: '100-130 BPM',
+              veryfast: '130-160 BPM'
+            };
+            finalStyle += `, tempo ${tempoRanges[tempo] || '80-100 BPM'}`;
+          }
           
           const generateResponse = await fetch(`${SUNO_API_BASE}/api/v1/generate`, {
             method: 'POST',
@@ -154,7 +169,7 @@ serve(async (req) => {
               instrumental: instrumental,
               model: 'V4_5', // V4_5 - Smart Prompts, up to 8 minutes
               prompt: prompt || `therapeutic relaxing instrumental music for ${mood} mood`,
-              style: style || `therapeutic ${mood} ambient`,
+              style: finalStyle,
               title: title || `${mood} - Therapeutic Music`,
               callBackUrl
             })

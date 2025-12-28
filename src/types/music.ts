@@ -85,6 +85,22 @@ export type Playlist = MusicPlaylist;
 export type Track = MusicTrack; // Alias pour rétrocompatibilité avec services/music/types.ts
 export type MusicCategory = 'therapeutic' | 'ambient' | 'focus' | 'energy' | 'relax' | 'sleep';
 
+// Music session type for therapeutic sessions
+export interface MusicSession {
+  id: string;
+  userId?: string;
+  type?: string;
+  emotion?: string;
+  mood?: string;
+  duration: number;
+  completedAt?: string;
+  notes?: string;
+  tracks?: MusicTrack[];
+  intensity?: number;
+  createdAt: string;
+  updatedAt?: string;
+}
+
 // Music state type (re-export from context will be needed)
 export interface MusicPlayerState {
   currentTrack: MusicTrack | null;

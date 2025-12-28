@@ -71,13 +71,31 @@ export const useMusicPlayback = (
     }
   }, [audioRef, dispatch, state.therapeuticMode, state.volume]);
 
-  const pause = useCallback(() => {
+  const pause = useCallback(async () => {
     const audio = audioRef.current;
     if (audio) {
       audio.pause();
       dispatch({ type: 'SET_PAUSED', payload: true });
+      
+      // Calculer et sauvegarder la durée d'écoute réelle
+      if (playStartTime.current && currentTrackId.current && state.currentTrack) {
+        const listenDurationMs = Date.now() - playStartTime.current;
+        const listenDurationSec = Math.round(listenDurationMs / 1000);
+        const trackDuration = state.currentTrack.duration || audio.duration || 0;
+        const completionRate = calculateCompletionRate(listenDurationSec, trackDuration);
+        
+        // Sauvegarder dans l'historique avec durée réelle
+        await saveHistoryEntry({
+          track: state.currentTrack,
+          listenDuration: listenDurationSec,
+          completionRate,
+          source: 'player',
+        });
+        
+        playStartTime.current = null;
+      }
     }
-  }, [audioRef, dispatch]);
+  }, [audioRef, dispatch, state.currentTrack]);
 
   const stop = useCallback(() => {
     const audio = audioRef.current;
