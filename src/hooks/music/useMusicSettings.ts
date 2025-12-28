@@ -88,11 +88,16 @@ export function useMusicSettings<T>({
             // Migration: charger depuis localStorage si existe
             const localData = localStorage.getItem(key);
             if (localData) {
-              const parsed = JSON.parse(localData);
-              setValue(parsed as T);
-              // Sauvegarder immédiatement dans Supabase
-              await saveToSupabase(parsed);
-              localStorage.removeItem(key);
+              try {
+                const parsed = JSON.parse(localData);
+                setValue(parsed as T);
+                // Sauvegarder immédiatement dans Supabase
+                await saveToSupabase(parsed);
+                localStorage.removeItem(key);
+              } catch {
+                // Invalid JSON in localStorage, remove it
+                localStorage.removeItem(key);
+              }
             }
           }
         } else {
@@ -107,7 +112,11 @@ export function useMusicSettings<T>({
         // Fallback localStorage
         const localData = localStorage.getItem(key);
         if (localData) {
-          setValue(JSON.parse(localData) as T);
+          try {
+            setValue(JSON.parse(localData) as T);
+          } catch {
+            localStorage.removeItem(key);
+          }
         }
       } finally {
         setIsLoading(false);
