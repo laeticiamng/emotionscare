@@ -408,5 +408,16 @@ export const parkAttractions: Attraction[] = [
     gradient: 'from-yellow-500/20 to-orange-500/20',
     collection: 'Centre de notifications',
     zone: 'hub'
+  },
+  {
+    id: 'seuil',
+    title: 'La Zone Seuil',
+    subtitle: 'Régulation proactive',
+    description: 'Le moment fragile où tout peut encore être rattrapé. Un outil de lucidité émotionnelle.',
+    icon: Waves,
+    route: '/app/seuil',
+    gradient: 'from-amber-500/20 to-rose-500/20',
+    collection: 'Journal émotionnel discret',
+    zone: 'calm'
   }
 ];
