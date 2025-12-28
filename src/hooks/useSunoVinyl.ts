@@ -115,7 +115,6 @@ export function useSunoVinyl(): UseSunoVinylReturn {
         const { data } = await supabase
           .from('suno_generated_tracks')
           .select('vinyl_id, audio_url, is_fallback, expires_at')
-          .eq('user_id', user.id)
           .eq('status', 'completed')
           .gt('expires_at', new Date().toISOString());
         

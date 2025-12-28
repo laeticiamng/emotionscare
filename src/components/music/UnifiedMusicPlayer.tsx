@@ -2,10 +2,10 @@
  * UNIFIED MUSIC PLAYER - EmotionsCare
  * Player audio unifié utilisant MusicContext
  * Enhanced with full accessibility support (ARIA, keyboard navigation, screen reader)
- * Includes: equalizer, visualizer, loop, shuffle controls
+ * Includes: equalizer, visualizer, loop, shuffle controls, lyrics, extend, feedback
  */
 
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useRef, useState, useCallback, lazy, Suspense } from 'react';
 import { useDebouncedCallback } from '@/hooks/useDebounce';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -25,6 +25,9 @@ import {
   Activity,
   SlidersHorizontal,
   Coins,
+  FileText,
+  Maximize2,
+  ThumbsUp,
 } from 'lucide-react';
 import { useAudioEqualizer, EQUALIZER_PRESETS } from '@/hooks/useAudioEqualizer';
 import { useSunoVinyl } from '@/hooks/useSunoVinyl';
@@ -41,6 +44,11 @@ import {
   getProgressAriaAttributes,
   formatTimeForScreenReader
 } from '@/utils/music-a11y';
+
+// Lazy load additional components
+const TrackLyrics = lazy(() => import('@/components/music/TrackLyrics'));
+const TrackExtendButton = lazy(() => import('@/components/music/TrackExtendButton'));
+const TrackFeedback = lazy(() => import('@/components/music/TrackFeedback'));
 
 interface UnifiedMusicPlayerProps {
   className?: string;
@@ -94,6 +102,8 @@ export const UnifiedMusicPlayer: React.FC<UnifiedMusicPlayerProps> = ({
   // Enhanced controls state
   const [showEqualizer, setShowEqualizer] = useState(false);
   const [showVisualizer, setShowVisualizer] = useState(true);
+  const [showLyrics, setShowLyrics] = useState(false);
+  const [showFeedback, setShowFeedback] = useState(false);
   const [visualizerBars, setVisualizerBars] = useState<number[]>(Array(16).fill(0));
   
   // Map context repeatMode to local loopMode for UI
@@ -419,7 +429,7 @@ export const UnifiedMusicPlayer: React.FC<UnifiedMusicPlayerProps> = ({
         </div>
 
         {/* Advanced Controls */}
-        <div className="flex items-center justify-center gap-2 pt-2 border-t">
+        <div className="flex items-center justify-center gap-2 pt-2 border-t flex-wrap">
           <Button
             size="sm"
             variant={showVisualizer ? "secondary" : "outline"}
@@ -438,7 +448,48 @@ export const UnifiedMusicPlayer: React.FC<UnifiedMusicPlayerProps> = ({
             <SlidersHorizontal className="h-3 w-3" />
             Égaliseur
           </Button>
+          <Button
+            size="sm"
+            variant={showLyrics ? "secondary" : "outline"}
+            onClick={() => setShowLyrics(!showLyrics)}
+            className="gap-1 text-xs"
+          >
+            <FileText className="h-3 w-3" />
+            Paroles
+          </Button>
+          <Button
+            size="sm"
+            variant={showFeedback ? "secondary" : "outline"}
+            onClick={() => setShowFeedback(!showFeedback)}
+            className="gap-1 text-xs"
+          >
+            <ThumbsUp className="h-3 w-3" />
+            Avis
+          </Button>
+          {currentTrack && (
+            <Suspense fallback={null}>
+              <TrackExtendButton track={currentTrack} size="sm" variant="outline" />
+            </Suspense>
+          )}
         </div>
+
+        {/* Lyrics Panel */}
+        {showLyrics && currentTrack && (
+          <Suspense fallback={<div className="p-4 text-center text-muted-foreground">Chargement...</div>}>
+            <div className="p-3 rounded-lg bg-muted/30 mt-2">
+              <TrackLyrics trackTitle={currentTrack.title} mood={currentTrack.mood} />
+            </div>
+          </Suspense>
+        )}
+
+        {/* Feedback Panel */}
+        {showFeedback && currentTrack && (
+          <Suspense fallback={<div className="p-4 text-center text-muted-foreground">Chargement...</div>}>
+            <div className="mt-2">
+              <TrackFeedback trackId={currentTrack.id} compact={false} />
+            </div>
+          </Suspense>
+        )}
 
         {/* Equalizer Panel */}
         {showEqualizer && (
