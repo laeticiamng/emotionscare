@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,8 +6,15 @@ import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { Save, Share, Download, ArrowRight } from 'lucide-react';
 
+interface ExtendedEmotionResult extends EmotionResult {
+  primaryEmotion?: string;
+  score?: number;
+  date?: string | Date;
+  secondaryEmotions?: string[];
+}
+
 interface EmotionScanResultProps {
-  result: EmotionResult;
+  result: ExtendedEmotionResult;
   onSave?: () => void;
   onShare?: () => void;
   onDownload?: () => void;
@@ -18,16 +23,14 @@ interface EmotionScanResultProps {
 }
 
 // Fonction utilitaire pour formater la date
-const formatResultDate = (result: EmotionResult): string => {
+const formatResultDate = (result: ExtendedEmotionResult): string => {
   try {
-    // Utiliser date si disponible, sinon utiliser timestamp
-    const dateString = result.date || result.timestamp;
-    if (!dateString) return 'Date inconnue';
+    const dateValue = result.date || result.timestamp;
+    if (!dateValue) return 'Date inconnue';
 
-    const date = new Date(dateString);
+    const date = dateValue instanceof Date ? dateValue : new Date(dateValue);
     return formatDistanceToNow(date, { addSuffix: true, locale: fr });
-  } catch (error) {
-    // Date formatting error
+  } catch {
     return 'Date invalide';
   }
 };
@@ -120,7 +123,7 @@ const EmotionScanResult: React.FC<EmotionScanResultProps> = ({
           <p className="text-sm">{result.source === 'facial' ? 'Expression faciale' : 
               result.source === 'voice' ? 'Voix' : 
               result.source === 'text' ? 'Texte' : 
-              result.source === 'emoji' ? 'Emoji sélectionné' : 'Autre'}</p>
+              result.source === 'manual' ? 'Sélection manuelle' : 'Autre'}</p>
         </div>
 
         {/* Actions */}

@@ -6,7 +6,7 @@
 
 // === TYPES D'ÉMOTIONS UNIFIÉS ===
 export type EmotionCategory = 'positive' | 'negative' | 'neutral' | 'mixed' | 'intense';
-export type EmotionSource = 'facial_analysis' | 'voice_analysis' | 'text_analysis' | 'multimodal' | 'biometric';
+export type EmotionSource = 'facial' | 'voice' | 'text' | 'manual' | 'facial_analysis' | 'voice_analysis' | 'text_analysis' | 'multimodal' | 'biometric' | 'emoji';
 export type ScanMode = 'facial' | 'voice' | 'text' | 'combined' | 'realtime';
 
 export interface EmotionVector {
@@ -41,7 +41,7 @@ export interface EmotionConfidence {
 
 // === RÉSULTAT D'ANALYSE ÉMOTIONNELLE UNIFIÉ ===
 export interface EmotionResult {
-  id: string;
+  id?: string;
   userId?: string;
   user_id?: string; // Compatibilité DB
   timestamp: string | Date;
