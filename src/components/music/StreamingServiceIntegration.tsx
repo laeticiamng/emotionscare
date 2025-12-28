@@ -85,45 +85,49 @@ export const StreamingServiceIntegration: React.FC<
   const [importingService, setImportingService] = useState<string | null>(null);
   const [selectedService, setSelectedService] = useState<string | null>(null);
 
-  // Simulate OAuth connection
+  // Connect service - requires real OAuth implementation
   const connectService = async (serviceId: string) => {
-    try {
-      // Simulate OAuth flow
+    const service = services.find(s => s.id === serviceId);
+    if (!service) return;
+
+    // NOTE: Real OAuth integration requires:
+    // 1. Backend edge function to initiate OAuth flow
+    // 2. Provider app credentials (client_id, client_secret)
+    // 3. Callback URL handling
+    // 4. Secure token storage in database
+    
+    toast({
+      title: '⚠️ Configuration OAuth requise',
+      description: `L'intégration ${service.name} nécessite une configuration serveur.`,
+    });
+
+    // Demo mode for development
+    const userConfirmed = window.confirm(
+      `Simuler la connexion à ${service.name} ?\n\nEn production, cela nécessite:\n- Credentials ${service.name} API\n- Edge function pour OAuth\n- Stockage sécurisé des tokens`
+    );
+    
+    if (userConfirmed) {
+      setServices((prev) =>
+        prev.map((s) =>
+          s.id === serviceId
+            ? {
+                ...s,
+                isConnected: true,
+                username: `demo_${serviceId}`,
+                lastSync: new Date(),
+                playlistCount: Math.floor(Math.random() * 50) + 5,
+                followerCount: Math.floor(Math.random() * 5000) + 100,
+              }
+            : s
+        )
+      );
+
       toast({
-        title: '🔐 Redirection de connexion...',
-        description: `Connexion à ${services.find((s) => s.id === serviceId)?.name}`,
+        title: '✅ Connecté (mode démo)',
+        description: `${service.name} connecté en démonstration`,
       });
 
-      // Simulate OAuth callback
-      setTimeout(() => {
-        setServices((prev) =>
-          prev.map((s) =>
-            s.id === serviceId
-              ? {
-                  ...s,
-                  isConnected: true,
-                  username: `user_${serviceId}`,
-                  lastSync: new Date(),
-                  playlistCount: Math.floor(Math.random() * 50) + 5,
-                  followerCount: Math.floor(Math.random() * 5000) + 100,
-                }
-              : s
-          )
-        );
-
-        toast({
-          title: '✅ Connexion réussie!',
-          description: `${services.find((s) => s.id === serviceId)?.name} est maintenant connecté`,
-        });
-
-        onServiceConnect?.(serviceId, 'mock_access_token_' + serviceId);
-      }, 2000);
-    } catch (error) {
-      toast({
-        title: '❌ Erreur de connexion',
-        description: 'Impossible de connecter le service',
-        variant: 'destructive',
-      });
+      onServiceConnect?.(serviceId, 'demo_token_' + serviceId);
     }
   };
 

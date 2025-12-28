@@ -111,32 +111,42 @@ export const ExternalIntegrationsPanel: React.FC = () => {
     const integration = integrations.find((i) => i.id === integrationId);
     if (!integration) return;
 
+    // NOTE: Real OAuth would require backend edge functions with provider credentials
+    // This shows the intended flow - actual implementation needs:
+    // 1. Edge function to initiate OAuth (redirect to provider)
+    // 2. Callback handler to exchange code for tokens
+    // 3. Secure token storage
+    
     toast({
-      title: '🔗 Connexion en cours...',
-      description: `Redirection vers ${integration.name}`,
+      title: '⚠️ Configuration requise',
+      description: `L'intégration ${integration.name} nécessite une configuration OAuth côté serveur.`,
     });
 
-    // Simulate OAuth flow
-    setTimeout(() => {
+    // For demo/development, simulate connection after user sees the message
+    const userConfirmed = window.confirm(
+      `Simuler la connexion à ${integration.name} ? (En production, cela ouvrirait le flux OAuth réel)`
+    );
+    
+    if (userConfirmed) {
       updateIntegrations(
         integrations.map((i) =>
           i.id === integrationId
             ? {
                 ...i,
                 connected: true,
-                username: 'user@example.com',
+                username: 'demo_user@example.com',
                 lastSync: new Date(),
-                playlistCount: Math.floor(Math.random() * 30),
-                trackCount: Math.floor(Math.random() * 1000),
+                playlistCount: Math.floor(Math.random() * 30) + 5,
+                trackCount: Math.floor(Math.random() * 1000) + 100,
               }
             : i
         )
       );
       toast({
-        title: '✅ Connecté',
-        description: `${integration.name} lié avec succès`,
+        title: '✅ Connecté (démo)',
+        description: `${integration.name} connecté en mode démonstration`,
       });
-    }, 2000);
+    }
   };
 
   const handleDisconnect = (integrationId: string) => {
