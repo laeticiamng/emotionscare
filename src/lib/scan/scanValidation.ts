@@ -1,5 +1,4 @@
 // @ts-nocheck
-
 import { EmotionResult, EmotionAnalysisConfig, ScanMode } from '@/types/emotion';
 
 /**
