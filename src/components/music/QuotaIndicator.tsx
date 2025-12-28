@@ -13,7 +13,7 @@
  * @module components/music/QuotaIndicator
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { LazyMotionWrapper, m } from '@/utils/lazy-motion';
 import { useQuotaUI } from '@/hooks/music/useUserQuota';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -114,8 +114,8 @@ export function QuotaIndicator({
     }
   }, [percentage, remaining, notifications]);
 
-  // Track usage (would be called on actual generation)
-  const trackUsage = (type: 'generation' | 'save' | 'share' = 'generation') => {
+  // Track usage - exposed via window for global access
+  const trackUsage = useCallback((type: 'generation' | 'save' | 'share' = 'generation') => {
     const today = new Date().toISOString().split('T')[0];
     setUsageHistory(prev => {
       const todayEntry = prev.find(e => e.date === today && e.type === type);
@@ -128,7 +128,15 @@ export function QuotaIndicator({
       }
       return [{ date: today, count: 1, type }, ...prev.slice(0, 89)];
     });
-  };
+  }, [setUsageHistory]);
+
+  // Expose trackUsage globally for other components to use
+  useEffect(() => {
+    (window as unknown as { trackMusicQuotaUsage?: typeof trackUsage }).trackMusicQuotaUsage = trackUsage;
+    return () => {
+      delete (window as unknown as { trackMusicQuotaUsage?: typeof trackUsage }).trackMusicQuotaUsage;
+    };
+  }, [trackUsage]);
 
   if (isLoading) {
     return (

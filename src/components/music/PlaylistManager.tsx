@@ -32,7 +32,42 @@ export const PlaylistManager: React.FC<PlaylistManagerProps> = ({
   const [newPlaylistName, setNewPlaylistName] = useState('');
   const [newPlaylistDescription, setNewPlaylistDescription] = useState('');
   const [editingPlaylist, setEditingPlaylist] = useState<string | null>(null);
+  const [editName, setEditName] = useState('');
+  const [editDescription, setEditDescription] = useState('');
   const [showCreateForm, setShowCreateForm] = useState(false);
+
+  const startEditing = (playlist: MusicPlaylist) => {
+    setEditingPlaylist(playlist.id);
+    setEditName(playlist.name);
+    setEditDescription(playlist.description || '');
+  };
+
+  const saveEdit = (playlist: MusicPlaylist) => {
+    if (!editName.trim()) {
+      toast({
+        title: "Nom requis",
+        description: "Le nom de la playlist ne peut pas être vide",
+        variant: "destructive"
+      });
+      return;
+    }
+    onUpdatePlaylist({
+      ...playlist,
+      name: editName,
+      description: editDescription
+    });
+    setEditingPlaylist(null);
+    toast({
+      title: "Playlist modifiée",
+      description: `"${editName}" a été mise à jour`
+    });
+  };
+
+  const cancelEdit = () => {
+    setEditingPlaylist(null);
+    setEditName('');
+    setEditDescription('');
+  };
 
   const handleCreatePlaylist = () => {
     if (!newPlaylistName.trim()) {
@@ -138,35 +173,62 @@ export const PlaylistManager: React.FC<PlaylistManagerProps> = ({
                     <div className="p-2 rounded-lg bg-primary/10">
                       <Music className="w-5 h-5 text-primary" />
                     </div>
-                    <div>
-                      <CardTitle className="text-lg">{playlist.name}</CardTitle>
-                      {playlist.description && (
-                        <p className="text-sm text-muted-foreground mt-1">
-                          {playlist.description}
-                        </p>
-                      )}
+                    {editingPlaylist === playlist.id ? (
+                      <div className="space-y-2 flex-1">
+                        <Input
+                          value={editName}
+                          onChange={(e) => setEditName(e.target.value)}
+                          placeholder="Nom de la playlist"
+                          className="h-8"
+                          autoFocus
+                        />
+                        <Input
+                          value={editDescription}
+                          onChange={(e) => setEditDescription(e.target.value)}
+                          placeholder="Description (optionnel)"
+                          className="h-8"
+                        />
+                        <div className="flex gap-2">
+                          <Button size="sm" onClick={() => saveEdit(playlist)} className="gap-1">
+                            <Save className="w-3 h-3" />
+                            Sauvegarder
+                          </Button>
+                          <Button size="sm" variant="ghost" onClick={cancelEdit}>
+                            Annuler
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div>
+                        <CardTitle className="text-lg">{playlist.name}</CardTitle>
+                        {playlist.description && (
+                          <p className="text-sm text-muted-foreground mt-1">
+                            {playlist.description}
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                  {editingPlaylist !== playlist.id && (
+                    <div className="flex gap-2">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => startEditing(playlist)}
+                        aria-label={`Modifier la playlist ${playlist.name}`}
+                      >
+                        <Edit2 className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleDeletePlaylist(playlist.id, playlist.name)}
+                        aria-label={`Supprimer la playlist ${playlist.name}`}
+                      >
+                        <Trash2 className="w-4 h-4 text-destructive" />
+                      </Button>
                     </div>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => setEditingPlaylist(
-                        editingPlaylist === playlist.id ? null : playlist.id
-                      )}
-                      aria-label={`Modifier la playlist ${playlist.name}`}
-                    >
-                      <Edit2 className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleDeletePlaylist(playlist.id, playlist.name)}
-                      aria-label={`Supprimer la playlist ${playlist.name}`}
-                    >
-                      <Trash2 className="w-4 h-4 text-destructive" />
-                    </Button>
-                  </div>
+                  )}
                 </div>
               </CardHeader>
               <CardContent>
