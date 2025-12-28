@@ -6,7 +6,7 @@ import {
   ArrowLeft, Shield, Eye, Database, Lock, UserCheck, 
   Clock, FileText, AlertTriangle, Mail, Download, Trash2 
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { routes } from '@/lib/routes';
 
 /**
@@ -115,7 +115,7 @@ export const PrivacyPolicyPage: React.FC = () => {
                 <li><strong>Durée de conservation :</strong> 13 mois maximum</li>
               </ul>
               <p>
-                Pour plus d'informations, consultez notre <a href="/legal/cookies" className="text-primary hover:underline">Politique Cookies</a>.
+                Pour plus d'informations, consultez notre <Link to="/legal/cookies" className="text-primary hover:underline">Politique Cookies</Link>.
               </p>
 
               <h3>2.4. Données de paiement (offre Premium)</h3>
@@ -317,7 +317,7 @@ export const PrivacyPolicyPage: React.FC = () => {
                 <ul>
                   <li><strong>Email :</strong> <a href="mailto:dpo@emotionscare.com" className="text-primary hover:underline">dpo@emotionscare.com</a></li>
                   <li><strong>Courrier :</strong> EmotionsCare SAS – DPO, 123 Avenue de l'Innovation, 75001 Paris</li>
-                  <li><strong>Formulaire en ligne :</strong> <a href="/app/settings/privacy" className="text-primary hover:underline">Paramètres compte → RGPD</a></li>
+                  <li><strong>Formulaire en ligne :</strong> <Link to="/app/settings/privacy" className="text-primary hover:underline">Paramètres compte → RGPD</Link></li>
                 </ul>
                 <p className="text-sm mt-3">
                   <strong>Délai de réponse :</strong> 1 mois maximum (prorogeable de 2 mois si complexité, avec justification).

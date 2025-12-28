@@ -1,5 +1,6 @@
 // @ts-nocheck
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { 
   Shield, 
@@ -92,18 +93,18 @@ export const TrustStrip: React.FC = () => {
       {/* Legal links */}
       <div className="mt-8 text-center">
         <div className="flex flex-wrap justify-center gap-6 text-sm text-muted-foreground">
-          <a href="/legal/privacy" className="hover:text-primary transition-colors">
+          <Link to="/legal/privacy" className="hover:text-primary transition-colors">
             Politique de confidentialité
-          </a>
-          <a href="/legal/terms" className="hover:text-primary transition-colors">
+          </Link>
+          <Link to="/legal/terms" className="hover:text-primary transition-colors">
             Conditions d'utilisation
-          </a>
-          <a href="/legal/cookies" className="hover:text-primary transition-colors">
+          </Link>
+          <Link to="/legal/cookies" className="hover:text-primary transition-colors">
             Gestion des cookies
-          </a>
-          <a href="/legal/accessibility" className="hover:text-primary transition-colors">
+          </Link>
+          <Link to="/legal/accessibility" className="hover:text-primary transition-colors">
             Déclaration d'accessibilité
-          </a>
+          </Link>
         </div>
       </div>
     </div>
