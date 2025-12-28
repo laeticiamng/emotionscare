@@ -74,11 +74,21 @@ const MusicEmotionRecommendation: React.FC<MusicEmotionRecommendationProps> = ({
         </CardContent>
       </Card>
 
-      {/* Lecteur automatique */}
+      {/* Lecteur automatique avec bouton de fermeture fonctionnel */}
       {generatedPlaylist && (
-        <PremiumMusicPlayer 
-          className="mt-4"
-        />
+        <div className="relative mt-4">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="absolute top-2 right-2 z-10 h-8 w-8"
+            onClick={handleClosePlayer}
+            aria-label="Fermer le lecteur"
+          >
+            <span className="sr-only">Fermer</span>
+            ×
+          </Button>
+          <PremiumMusicPlayer className="pt-8" />
+        </div>
       )}
     </>
   );

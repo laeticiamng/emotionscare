@@ -79,13 +79,14 @@ const MOCK_WEEKLY_DATA: DailyEmotion[] = [
   { day: 'Dim', valence: 75, arousal: 50, dominantEmotion: 'Sérénité', scansCount: 2 },
 ];
 
-const EMOTION_DIMENSIONS: EmotionDimension[] = [
-  { dimension: 'Joie', score: 78, fullMark: 100 },
-  { dimension: 'Calme', score: 65, fullMark: 100 },
-  { dimension: 'Énergie', score: 72, fullMark: 100 },
-  { dimension: 'Focus', score: 58, fullMark: 100 },
-  { dimension: 'Confiance', score: 70, fullMark: 100 },
-  { dimension: 'Gratitude', score: 82, fullMark: 100 },
+// Dimensions par défaut (utilisées si aucune donnée réelle)
+const DEFAULT_EMOTION_DIMENSIONS: EmotionDimension[] = [
+  { dimension: 'Joie', score: 50, fullMark: 100 },
+  { dimension: 'Calme', score: 50, fullMark: 100 },
+  { dimension: 'Énergie', score: 50, fullMark: 100 },
+  { dimension: 'Focus', score: 50, fullMark: 100 },
+  { dimension: 'Confiance', score: 50, fullMark: 100 },
+  { dimension: 'Gratitude', score: 50, fullMark: 100 },
 ];
 
 const PIE_COLORS = ['#10b981', '#3b82f6', '#8b5cf6', '#f59e0b', '#ef4444', '#6366f1'];
@@ -266,6 +267,30 @@ export const WeeklyEmotionReport: React.FC = () => {
     setStats(newStats);
   };
 
+  // Calculer les dimensions dynamiquement à partir des données réelles
+  const emotionDimensions = useMemo((): EmotionDimension[] => {
+    if (!stats || weeklyData.length === 0) {
+      return DEFAULT_EMOTION_DIMENSIONS;
+    }
+
+    // Calculer les scores basés sur les données réelles
+    const joyScore = Math.min(100, Math.round(stats.averageValence * 1.1));
+    const calmScore = Math.min(100, Math.round(100 - stats.averageArousal * 0.5));
+    const energyScore = Math.min(100, Math.round(stats.averageArousal));
+    const focusScore = Math.min(100, Math.round((stats.totalScans / 7) * 15 + 40));
+    const confidenceScore = Math.min(100, Math.round(stats.averageValence * 0.9 + 10));
+    const gratitudeScore = Math.min(100, Math.round(stats.streakDays * 12 + 30));
+
+    return [
+      { dimension: 'Joie', score: joyScore, fullMark: 100 },
+      { dimension: 'Calme', score: calmScore, fullMark: 100 },
+      { dimension: 'Énergie', score: energyScore, fullMark: 100 },
+      { dimension: 'Focus', score: focusScore, fullMark: 100 },
+      { dimension: 'Confiance', score: confidenceScore, fullMark: 100 },
+      { dimension: 'Gratitude', score: gratitudeScore, fullMark: 100 },
+    ];
+  }, [stats, weeklyData]);
+
   const handleSaveReport = useCallback(() => {
     if (!stats) return;
     
@@ -302,7 +327,7 @@ export const WeeklyEmotionReport: React.FC = () => {
       weekEnd: weekEnd.toISOString(),
       dailyData: weeklyData,
       stats,
-      dimensions: EMOTION_DIMENSIONS,
+      dimensions: emotionDimensions,
       exportDate: new Date().toISOString()
     };
     
@@ -647,7 +672,7 @@ export const WeeklyEmotionReport: React.FC = () => {
             <CardContent>
               <div className="h-[300px]">
                 <ResponsiveContainer width="100%" height="100%">
-                  <RadarChart data={EMOTION_DIMENSIONS}>
+                  <RadarChart data={emotionDimensions}>
                     <PolarGrid className="stroke-muted" />
                     <PolarAngleAxis dataKey="dimension" className="text-xs" />
                     <PolarRadiusAxis angle={30} domain={[0, 100]} className="text-xs" />
