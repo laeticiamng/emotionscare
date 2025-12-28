@@ -21,6 +21,7 @@ import {
   Sparkles
 } from '@/components/music/icons';
 import { useMusicJourney, type MusicJourney } from '@/hooks/useMusicJourney';
+import { useMusic } from '@/hooks/useMusic';
 
 interface Props {
   journeyId: string;
@@ -56,6 +57,8 @@ export const MusicJourneyPlayer: React.FC<Props> = ({ journeyId, onComplete }) =
     completeJourney,
     isGeneratingTrack 
   } = useMusicJourney();
+  
+  const musicContext = useMusic();
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [rating, setRating] = useState(3);
@@ -65,8 +68,25 @@ export const MusicJourneyPlayer: React.FC<Props> = ({ journeyId, onComplete }) =
     loadJourney(journeyId);
   }, [journeyId, loadJourney]);
 
-  const handlePlayPause = () => {
-    setIsPlaying(!isPlaying);
+  const handlePlayPause = async () => {
+    const journeyTrack = activeJourney?.tracks?.[currentTrackIndex];
+    
+    if (isPlaying) {
+      musicContext.pause();
+      setIsPlaying(false);
+    } else if (journeyTrack?.audio_url) {
+      // Jouer le track via MusicContext
+      await musicContext.play({
+        id: journeyTrack.id,
+        title: journeyTrack.title || `Étape ${journeyTrack.step_number}`,
+        artist: 'Parcours Guidé',
+        audioUrl: journeyTrack.audio_url,
+        url: journeyTrack.audio_url,
+        duration: 180,
+        emotion: journeyTrack.emotion_level
+      });
+      setIsPlaying(true);
+    }
   };
 
   const handleNextStep = async () => {

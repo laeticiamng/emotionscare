@@ -12,7 +12,7 @@ import { useMusicJourney } from '@/hooks/useMusicJourney';
 
 export const MusicJourneySection: React.FC = () => {
   const { toast } = useToast();
-  const { createJourney } = useMusicJourney();
+  const { createJourney, isCreating } = useMusicJourney();
   const [showJourney, setShowJourney] = useState(false);
   const [activeJourneyId, setActiveJourneyId] = useState<string | null>(null);
 
@@ -56,6 +56,7 @@ export const MusicJourneySection: React.FC = () => {
                   variant="outline"
                   className="h-auto py-4 flex-col gap-2 hover:bg-purple-500/10 transition-all"
                   onClick={() => handleStartJourney(option.from, option.to)}
+                  disabled={isCreating}
                 >
                   <span className="text-2xl">{option.emoji}</span>
                   <span className="text-xs font-medium">{option.label}</span>

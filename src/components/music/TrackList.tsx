@@ -14,6 +14,7 @@ interface TrackListProps {
   currentTrack?: MusicTrack | null;
   isPlaying?: boolean;
   onTrackSelect?: (track: MusicTrack) => void;
+  onTrackPause?: () => void;
   onAddToQueue?: (track: MusicTrack) => void;
   onAddToPlaylist?: (track: MusicTrack) => void;
   showActions?: boolean;
@@ -24,6 +25,7 @@ const TrackList: React.FC<TrackListProps> = ({
   currentTrack,
   isPlaying = false,
   onTrackSelect,
+  onTrackPause,
   onAddToQueue,
   onAddToPlaylist,
   showActions = true,
@@ -146,7 +148,11 @@ const TrackList: React.FC<TrackListProps> = ({
                       aria-label={isCurrent && isPlaying ? "Mettre en pause" : "Lire"}
                       onClick={(e) => {
                         e.stopPropagation();
-                        onTrackSelect?.(track);
+                        if (isCurrent && isPlaying) {
+                          onTrackPause?.();
+                        } else {
+                          onTrackSelect?.(track);
+                        }
                       }}
                     >
                       {isCurrent && isPlaying ? (
