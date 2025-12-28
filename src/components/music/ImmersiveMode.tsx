@@ -3,7 +3,7 @@
  * Visualiseur, paroles synchronisées, contrôles gestuels
  */
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -25,6 +25,7 @@ import {
   Settings,
 } from 'lucide-react';
 import { MusicTrack } from '@/types/music';
+import { useMusicFavorites } from '@/hooks/useMusicFavorites';
 
 interface LyricLine {
   time: number;
@@ -121,10 +122,19 @@ export const ImmersiveMode: React.FC<ImmersiveModeProps> = ({
   // Generate lyrics based on track if none provided
   const lyrics = externalLyrics || generateImmersiveLyrics(track);
   
+  // Connect to favorites system
+  const { isFavorite, toggleFavorite, isLoading: favoritesLoading } = useMusicFavorites();
+  const isLiked = track ? isFavorite(track.id) : false;
+  
+  const handleToggleFavorite = useCallback(() => {
+    if (track) {
+      toggleFavorite(track);
+    }
+  }, [track, toggleFavorite]);
+  
   const [showControls, setShowControls] = useState(true);
   const [showLyrics, setShowLyrics] = useState(true);
   const [isMuted, setIsMuted] = useState(false);
-  const [isLiked, setIsLiked] = useState(false);
   const [currentLyricIndex, setCurrentLyricIndex] = useState(0);
   const [visualizerBars, setVisualizerBars] = useState<number[]>(Array(32).fill(0));
   const [localVolume, setLocalVolume] = useState(volume);
@@ -382,7 +392,8 @@ export const ImmersiveMode: React.FC<ImmersiveModeProps> = ({
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => setIsLiked(!isLiked)}
+                    onClick={handleToggleFavorite}
+                    disabled={favoritesLoading}
                     className={`hover:bg-white/10 ${isLiked ? 'text-pink-500' : 'text-white'}`}
                   >
                     <Heart className={`h-5 w-5 ${isLiked ? 'fill-current' : ''}`} />

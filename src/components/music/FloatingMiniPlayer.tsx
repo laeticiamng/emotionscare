@@ -7,7 +7,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
+import { Slider } from '@/components/ui/slider';
 import {
   Play,
   Pause,
@@ -16,6 +16,7 @@ import {
   X,
   Maximize2,
   Volume2,
+  VolumeX,
   Sparkles,
 } from 'lucide-react';
 import type { MusicTrack } from '@/types/music';
@@ -25,13 +26,15 @@ interface FloatingMiniPlayerProps {
   isPlaying?: boolean;
   progress?: number;
   duration?: number;
+  volume?: number;
   onPlayPause?: () => void;
   onNext?: () => void;
   onPrevious?: () => void;
   onExpand?: () => void;
   onClose?: () => void;
   onImmersive?: () => void;
-  onSeek?: (position: number) => void;
+  onSeek?: (timeInSeconds: number) => void;
+  onVolumeChange?: (volume: number) => void;
   isDocked?: boolean;
 }
 
@@ -40,6 +43,7 @@ export const FloatingMiniPlayer: React.FC<FloatingMiniPlayerProps> = ({
   isPlaying = false,
   progress = 0,
   duration,
+  volume = 0.7,
   onPlayPause,
   onNext,
   onPrevious,
@@ -47,9 +51,11 @@ export const FloatingMiniPlayer: React.FC<FloatingMiniPlayerProps> = ({
   onClose,
   onImmersive,
   onSeek,
+  onVolumeChange,
   isDocked = false,
 }) => {
   const [isMinimized, setIsMinimized] = useState(false);
+  const [showVolume, setShowVolume] = useState(false);
 
   if (!currentTrack) {
     return null;
@@ -58,6 +64,7 @@ export const FloatingMiniPlayer: React.FC<FloatingMiniPlayerProps> = ({
   // Fallback values for optional properties
   const vinylColor = currentTrack.vinylColor || 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-foreground)))';
   const trackColor = currentTrack.color || 'hsl(var(--primary)), hsl(var(--accent))';
+  const trackDuration = duration || currentTrack.duration || 180;
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -65,7 +72,13 @@ export const FloatingMiniPlayer: React.FC<FloatingMiniPlayerProps> = ({
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const currentTime = (progress / 100) * (currentTrack.duration || 180);
+  const currentTime = (progress / 100) * trackDuration;
+  
+  // Convert progress % to seconds for seek
+  const handleSeek = (progressPercent: number) => {
+    const timeInSeconds = (progressPercent / 100) * trackDuration;
+    onSeek?.(timeInSeconds);
+  };
 
   return (
     <AnimatePresence>
@@ -157,14 +170,39 @@ export const FloatingMiniPlayer: React.FC<FloatingMiniPlayerProps> = ({
                     min={0}
                     max={100}
                     value={progress}
-                    onChange={(e) => onSeek?.(Number(e.target.value))}
+                    onChange={(e) => handleSeek(Number(e.target.value))}
                     className="w-full h-1 bg-muted rounded-lg appearance-none cursor-pointer accent-primary [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:cursor-pointer"
                     aria-label="Progression de lecture"
                   />
                   <div className="flex justify-between text-xs text-muted-foreground">
                     <span>{formatTime(currentTime)}</span>
-                    <span>{formatTime(duration || currentTrack.duration)}</span>
+                    <span>{formatTime(trackDuration)}</span>
                   </div>
+                </div>
+                
+                {/* Volume Control */}
+                <div className="flex items-center gap-2">
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="h-7 w-7 p-0"
+                    onClick={() => setShowVolume(!showVolume)}
+                  >
+                    {volume === 0 ? (
+                      <VolumeX className="h-4 w-4" />
+                    ) : (
+                      <Volume2 className="h-4 w-4" />
+                    )}
+                  </Button>
+                  {showVolume && (
+                    <Slider
+                      value={[volume * 100]}
+                      max={100}
+                      step={1}
+                      onValueChange={(v) => onVolumeChange?.(v[0] / 100)}
+                      className="w-20"
+                    />
+                  )}
                 </div>
 
                 {/* Controls */}

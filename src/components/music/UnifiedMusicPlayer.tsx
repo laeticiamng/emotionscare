@@ -57,6 +57,7 @@ export const UnifiedMusicPlayer: React.FC<UnifiedMusicPlayerProps> = ({
   className,
   compact = false
 }) => {
+  const musicContext = useMusic();
   const {
     state,
     play,
@@ -64,8 +65,9 @@ export const UnifiedMusicPlayer: React.FC<UnifiedMusicPlayerProps> = ({
     next,
     previous,
     seek,
-    setVolume
-  } = useMusic();
+    setVolume,
+    shufflePlaylist,
+  } = musicContext;
 
   const {
     currentTrack,
@@ -73,17 +75,22 @@ export const UnifiedMusicPlayer: React.FC<UnifiedMusicPlayerProps> = ({
     volume,
     currentTime,
     duration,
+    repeatMode: contextRepeatMode,
+    shuffleMode: contextShuffleMode,
   } = state;
 
   const playerRef = useRef<HTMLDivElement>(null);
   
-  // Enhanced controls state
-  const [loopMode, setLoopMode] = useState<LoopMode>('none');
-  const [isShuffled, setIsShuffled] = useState(false);
+  // Enhanced controls state - sync with context
   const [showEqualizer, setShowEqualizer] = useState(false);
   const [showVisualizer, setShowVisualizer] = useState(true);
   const [equalizerValues, setEqualizerValues] = useState([0, 0, 0, 0, 0]);
   const [visualizerBars, setVisualizerBars] = useState<number[]>(Array(16).fill(0));
+  
+  // Map context repeatMode to local loopMode for UI
+  const loopMode: LoopMode = contextRepeatMode === 'one' ? 'one' 
+    : contextRepeatMode === 'all' ? 'all' : 'none';
+  const isShuffled = contextShuffleMode;
 
   // Announce track changes to screen readers
   useEffect(() => {
@@ -120,17 +127,19 @@ export const UnifiedMusicPlayer: React.FC<UnifiedMusicPlayerProps> = ({
     return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
   };
 
+  // Cycle loop mode via context dispatch
   const cycleLoopMode = useCallback(() => {
-    setLoopMode(prev => {
-      if (prev === 'none') return 'all';
-      if (prev === 'all') return 'one';
-      return 'none';
-    });
-  }, []);
+    const nextMode = loopMode === 'none' ? 'all' : loopMode === 'all' ? 'one' : 'none';
+    // Dispatch to context to update repeatMode
+    if ('dispatch' in musicContext && typeof (musicContext as any).dispatch === 'function') {
+      (musicContext as any).dispatch({ type: 'SET_REPEAT_MODE', payload: nextMode });
+    }
+  }, [loopMode, musicContext]);
 
+  // Toggle shuffle via context
   const toggleShuffle = useCallback(() => {
-    setIsShuffled(prev => !prev);
-  }, []);
+    shufflePlaylist?.();
+  }, [shufflePlaylist]);
 
   const applyEqualizerPreset = useCallback((preset: keyof typeof EQUALIZER_PRESETS) => {
     setEqualizerValues(EQUALIZER_PRESETS[preset]);

@@ -350,12 +350,14 @@ const B2CMusicEnhanced: React.FC = () => {
           isPlaying={state.isPlaying}
           progress={state.progress}
           duration={state.currentTrack?.duration}
+          volume={state.volume}
           onPlayPause={handlePlayPause}
           onNext={handleNext}
           onPrevious={handlePrevious}
           onExpand={() => setPlayerVisible(true)}
           onImmersive={() => setShowImmersive(true)}
-          onSeek={(pos) => musicContext?.seek?.(pos)}
+          onSeek={(timeInSeconds) => musicContext?.seek?.(timeInSeconds)}
+          onVolumeChange={(vol) => musicContext?.setVolume?.(vol)}
           isDocked={playerVisible}
         />
 
