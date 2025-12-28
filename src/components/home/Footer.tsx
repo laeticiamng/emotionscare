@@ -18,13 +18,13 @@ const Footer: React.FC = () => {
     ],
     resources: [
       { label: 'FAQ', href: '/#faq' },
-      { label: 'Academy', href: '/app/academy' },
+      { label: 'Modules', href: '/app/modules' },
       { label: 'Communauté', href: '/app/community' },
-      { label: 'Support', href: '/support' },
+      { label: 'Aide', href: '/help' },
     ],
     legal: [
       { label: 'Mentions légales', href: '/legal/mentions' },
-      { label: 'Politique de confidentialité', href: '/legal/privacy' },
+      { label: 'Confidentialité', href: '/legal/privacy' },
       { label: 'CGV', href: '/legal/sales' },
       { label: 'Cookies', href: '/legal/cookies' },
     ],
