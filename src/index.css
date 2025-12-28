@@ -14,8 +14,47 @@
 }
 
 .high-contrast {
-  --border: hsl(var(--foreground) / 0.3);
-  --ring: hsl(var(--foreground) / 0.8);
+  --border: hsl(var(--foreground) / 0.5);
+  --ring: hsl(var(--foreground) / 0.9);
+  --background: 0 0% 100%;
+  --foreground: 0 0% 0%;
+  --muted: 0 0% 90%;
+  --muted-foreground: 0 0% 20%;
+  --primary: 220 100% 40%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 0 0% 85%;
+  --secondary-foreground: 0 0% 0%;
+}
+
+.dark .high-contrast {
+  --background: 0 0% 0%;
+  --foreground: 0 0% 100%;
+  --muted: 0 0% 15%;
+  --muted-foreground: 0 0% 85%;
+  --primary: 220 100% 60%;
+  --primary-foreground: 0 0% 0%;
+  --secondary: 0 0% 20%;
+  --secondary-foreground: 0 0% 100%;
+}
+
+.large-text {
+  --font-scale: 1.25;
+}
+
+.large-text h1 { font-size: 2.5rem !important; }
+.large-text h2 { font-size: 2rem !important; }
+.large-text h3 { font-size: 1.5rem !important; }
+.large-text p, .large-text span, .large-text button { font-size: 1.125rem !important; }
+.large-text .text-xs { font-size: 0.875rem !important; }
+.large-text .text-sm { font-size: 1rem !important; }
+
+.reduce-motion *,
+.reduce-motion *::before,
+.reduce-motion *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
 }
 
 .dyslexic-font {
