@@ -6,4 +6,15 @@ export { AchievementsTab } from './components/AchievementsTab';
 export { useAmbitionMachine } from './useAmbitionMachine';
 export * as ambitionService from './ambitionArcadeService';
 export * from './types';
-export * from './hooks';
+export { 
+  useAmbitionStats, 
+  useAmbitionGoals, 
+  useCreateGoal, 
+  useCompleteGoal, 
+  useAbandonGoal,
+  useAmbitionQuests,
+  useCreateQuest,
+  useStartQuest,
+  useCompleteQuest,
+  useAmbitionAchievements
+} from './hooks';
