@@ -1,18 +1,22 @@
-// @ts-nocheck
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { EmotionResult, EmotionScannerProps } from '@/types/emotion';
+import { EmotionResult } from '@/types/emotion';
 import { FileText, Send, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { normalizeEmotionResult } from '@/types/emotion-unified';
 import { logger } from '@/lib/logger';
 
-const TextEmotionScanner: React.FC<EmotionScannerProps> = ({
+interface TextEmotionScannerProps {
+  onScanComplete: (result: EmotionResult) => void;
+  onCancel?: () => void;
+  isProcessing?: boolean;
+  setIsProcessing?: (processing: boolean) => void;
+}
+
+const TextEmotionScanner: React.FC<TextEmotionScannerProps> = ({
   onScanComplete,
   onCancel,
-  isProcessing,
+  isProcessing = false,
   setIsProcessing
 }) => {
   const [text, setText] = useState('');
@@ -20,6 +24,7 @@ const TextEmotionScanner: React.FC<EmotionScannerProps> = ({
 
   const analyzeText = async () => {
     if (!text.trim()) return;
+    if (!setIsProcessing) return;
 
     setIsProcessing(true);
     setError(null);
@@ -38,20 +43,19 @@ const TextEmotionScanner: React.FC<EmotionScannerProps> = ({
         throw new Error('Aucune réponse de l\'analyse');
       }
 
-      const result = normalizeEmotionResult({
+      const result: EmotionResult = {
         id: `text-${Date.now()}`,
         emotion: data.emotion || 'neutre',
         valence: (data.valence ?? 0.5) * 100,
         arousal: (data.arousal ?? 0.5) * 100,
-        confidence: (data.confidence ?? 0.7) * 100,
+        confidence: (data.confidence ?? 0.7),
         source: 'text',
-        timestamp: new Date().toISOString(),
-        summary: data.summary || `Émotion ${data.emotion} détectée`,
-        emotions: data.emotions || {},
-        recommendations: data.recommendations || []
-      });
+        timestamp: new Date(),
+        insight: data.summary || `Émotion ${data.emotion} détectée`,
+        suggestions: data.recommendations || []
+      };
 
-      onScanComplete(result as any);
+      onScanComplete(result);
     } catch (err) {
       logger.error('[TextEmotionScanner] Error:', err, 'COMPONENT');
       setError(err instanceof Error ? err.message : 'Erreur lors de l\'analyse');

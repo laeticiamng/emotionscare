@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -18,7 +16,7 @@ const EnhancedEmotionAnalysis: React.FC<EnhancedEmotionAnalysisProps> = ({
 }) => {
   // Generate complementary insights based on emotion
   const generateInsights = (emotion: EmotionResult) => {
-    const insights = {
+    const insights: Record<string, string[]> = {
       happy: [
         "Vous êtes dans un état positif, propice à la créativité",
         "Votre humeur actuelle favorise la collaboration"
@@ -45,12 +43,15 @@ const EnhancedEmotionAnalysis: React.FC<EnhancedEmotionAnalysisProps> = ({
       ]
     };
     
-    return insights[emotion.emotion as keyof typeof insights] || 
+    const emotionKey = emotion.emotion?.toLowerCase() || 'neutral';
+    return insights[emotionKey] || 
       ["Prenez conscience de votre état émotionnel", "Adaptez vos activités à votre humeur actuelle"];
   };
   
   const insights = generateInsights(emotion);
-  const emotionIntensity = emotion.score / 100;
+  const confidencePercent = typeof emotion.confidence === 'number' 
+    ? Math.round(emotion.confidence * (emotion.confidence > 1 ? 1 : 100)) 
+    : 50;
   
   return (
     <Card className={className}>
@@ -61,11 +62,11 @@ const EnhancedEmotionAnalysis: React.FC<EnhancedEmotionAnalysisProps> = ({
         <div>
           <div className="flex items-center justify-between mb-2">
             <span className="font-medium">Émotion principale : {emotion.emotion}</span>
-            <span className="text-sm">{emotion.score}%</span>
+            <span className="text-sm">{confidencePercent}%</span>
           </div>
-          <Progress value={emotion.score} className="h-2" />
+          <Progress value={confidencePercent} className="h-2" />
           <p className="text-xs text-muted-foreground mt-1">
-            Fiabilité: {Math.round(emotion.confidence * 100)}%
+            Fiabilité: {confidencePercent}%
           </p>
         </div>
         
