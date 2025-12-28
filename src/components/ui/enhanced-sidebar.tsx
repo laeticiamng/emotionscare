@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
@@ -160,7 +161,7 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
                       )}
                       asChild
                     >
-                      <a href={item.href}>
+                      <Link to={item.href}>
                         <item.icon className={cn(
                           'h-4 w-4',
                           collapsed ? 'mx-auto' : 'mr-2'
@@ -175,7 +176,7 @@ const EnhancedSidebar: React.FC<EnhancedSidebarProps> = ({
                             )}
                           </>
                         )}
-                      </a>
+                      </Link>
                     </Button>
                   </motion.li>
                 ))}

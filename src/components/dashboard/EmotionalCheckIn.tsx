@@ -1,6 +1,7 @@
 // @ts-nocheck
 import React, { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -635,9 +636,9 @@ const EmotionalCheckin: React.FC<EmotionalCheckinProps> = ({
                   </div>
                 </div>
                 <Button variant="ghost" size="sm" asChild>
-                  <a href={QUICK_EXERCISES[selectedMood].path}>
+                  <Link to={QUICK_EXERCISES[selectedMood].path}>
                     <ChevronRight className="h-4 w-4" />
-                  </a>
+                  </Link>
                 </Button>
               </div>
             </motion.div>

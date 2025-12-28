@@ -1,6 +1,7 @@
 // @ts-nocheck
 
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
@@ -138,7 +139,7 @@ const CoachRecommendations = () => {
                   <p className="text-sm text-muted-foreground mt-1">{rec.description}</p>
                   {rec.link && (
                     <Button variant="link" className="px-0 mt-2" asChild>
-                      <a href={rec.link}>Voir plus</a>
+                      <Link to={rec.link}>Voir plus</Link>
                     </Button>
                   )}
                 </CardContent>
