@@ -5208,6 +5208,7 @@ export type Database = {
       edn_items_immersive: {
         Row: {
           audio_ambiance: Json | null
+          bd_panels: Json | null
           competences_count_rang_a: number | null
           competences_count_rang_b: number | null
           competences_count_total: number | null
@@ -5225,6 +5226,7 @@ export type Database = {
           pitch_intro: string | null
           quiz_questions: Json | null
           reward_messages: Json | null
+          roman_story: Json | null
           scene_immersive: Json | null
           slug: string | null
           subtitle: string | null
@@ -5236,6 +5238,7 @@ export type Database = {
         }
         Insert: {
           audio_ambiance?: Json | null
+          bd_panels?: Json | null
           competences_count_rang_a?: number | null
           competences_count_rang_b?: number | null
           competences_count_total?: number | null
@@ -5253,6 +5256,7 @@ export type Database = {
           pitch_intro?: string | null
           quiz_questions?: Json | null
           reward_messages?: Json | null
+          roman_story?: Json | null
           scene_immersive?: Json | null
           slug?: string | null
           subtitle?: string | null
@@ -5264,6 +5268,7 @@ export type Database = {
         }
         Update: {
           audio_ambiance?: Json | null
+          bd_panels?: Json | null
           competences_count_rang_a?: number | null
           competences_count_rang_b?: number | null
           competences_count_total?: number | null
@@ -5281,6 +5286,7 @@ export type Database = {
           pitch_intro?: string | null
           quiz_questions?: Json | null
           reward_messages?: Json | null
+          roman_story?: Json | null
           scene_immersive?: Json | null
           slug?: string | null
           subtitle?: string | null
