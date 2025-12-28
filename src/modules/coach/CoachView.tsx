@@ -36,8 +36,18 @@ import {
   CoachPersonalitySelector,
   CoachSatisfactionDialog,
   CoachExportButton,
+  CoachTypingIndicator,
+  CoachSessionTimer,
+  CoachSuggestionsPanel,
+  CoachEndSessionButton,
   type CoachPersonality,
 } from '@/modules/coach/components';
+
+interface CoachResource {
+  type: string;
+  title: string;
+  description: string;
+}
 
 interface ChatMessage {
   id: string;
@@ -45,6 +55,9 @@ interface ChatMessage {
   content: string;
   createdAt: string;
   streaming?: boolean;
+  techniques?: string[];
+  resources?: CoachResource[];
+  followUpQuestions?: string[];
 }
 
 const CONSENT_STORAGE_KEY = 'coach:consent:v1';
@@ -143,6 +156,12 @@ export function CoachView({ initialMode = 'b2c' }: { initialMode?: CoachMode }) 
   const [personality, setPersonality] = useState<CoachPersonality>('empathetic');
   const [showSatisfaction, setShowSatisfaction] = useState(false);
   const [sessionId, setSessionId] = useState<string | null>(null);
+  const [sessionStartedAt, setSessionStartedAt] = useState<number | null>(null);
+  const [lastSuggestions, setLastSuggestions] = useState<{
+    techniques: string[];
+    resources: CoachResource[];
+    followUpQuestions: string[];
+  }>({ techniques: [], resources: [], followUpQuestions: [] });
   const containerRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const controllerRef = useRef<AbortController | null>(null);
@@ -433,6 +452,31 @@ export function CoachView({ initialMode = 'b2c' }: { initialMode?: CoachMode }) 
     const trimmed = input.trim();
     if (!trimmed) return;
 
+    // Initialize session on first message
+    if (!sessionStartedAt) {
+      setSessionStartedAt(Date.now());
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const { data: newSession } = await supabase
+            .from('ai_coach_sessions')
+            .insert({
+              user_id: user.id,
+              coach_personality: personality,
+              session_duration: 0,
+              messages_count: 0,
+            })
+            .select('id')
+            .single();
+          if (newSession?.id) {
+            setSessionId(newSession.id);
+          }
+        }
+      } catch (err) {
+        logger.warn('[coach] unable to create session', err, 'SYSTEM');
+      }
+    }
+
     controllerRef.current?.abort();
     const controller = new AbortController();
     controllerRef.current = controller;
@@ -524,7 +568,67 @@ export function CoachView({ initialMode = 'b2c' }: { initialMode?: CoachMode }) 
       controllerRef.current = null;
       textareaRef.current?.focus();
     }
-  }, [aaqFlexHint, disableSend, input, isRigidityHigh, locale, mode, threadId, userHash]);
+  }, [aaqFlexHint, disableSend, input, isRigidityHigh, locale, mode, threadId, userHash, sessionStartedAt, personality]);
+
+  const handleEndSession = useCallback(async () => {
+    if (!sessionId || !sessionStartedAt) {
+      // No session to end, just show satisfaction if there are messages
+      if (messages.length > 0) {
+        setShowSatisfaction(true);
+      }
+      return;
+    }
+
+    const duration = Math.floor((Date.now() - sessionStartedAt) / 1000);
+    const userMessagesCount = messages.filter(m => m.role === 'user').length;
+
+    try {
+      await supabase
+        .from('ai_coach_sessions')
+        .update({
+          session_duration: duration,
+          messages_count: userMessagesCount,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', sessionId);
+    } catch (err) {
+      logger.warn('[coach] unable to update session duration', err, 'SYSTEM');
+    }
+
+    setShowSatisfaction(true);
+  }, [sessionId, sessionStartedAt, messages]);
+
+  const handleSatisfactionSubmit = useCallback(async (satisfaction: number, notes?: string) => {
+    if (sessionId) {
+      try {
+        await supabase
+          .from('ai_coach_sessions')
+          .update({
+            user_satisfaction: satisfaction,
+            session_notes: notes || null,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', sessionId);
+        toast({
+          title: 'Merci pour ton retour !',
+          description: 'Ton avis nous aide à améliorer le coach.',
+        });
+      } catch (err) {
+        logger.warn('[coach] unable to save satisfaction', err, 'SYSTEM');
+      }
+    }
+    // Reset session
+    setSessionId(null);
+    setSessionStartedAt(null);
+    setMessages([]);
+    setThreadId(null);
+    setLastSuggestions({ techniques: [], resources: [], followUpQuestions: [] });
+  }, [sessionId, toast]);
+
+  const handleFollowUpQuestion = useCallback((question: string) => {
+    setInput(question);
+    textareaRef.current?.focus();
+  }, []);
 
   const handleKeyDown = useCallback((event: KeyboardEvent<HTMLTextAreaElement>) => {
     if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
@@ -549,8 +653,16 @@ export function CoachView({ initialMode = 'b2c' }: { initialMode?: CoachMode }) 
 
       <header className="flex flex-col gap-3">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-50">Coach IA sécurisé</h1>
+          <div className="flex items-center gap-3">
+            <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-50">Coach IA sécurisé</h1>
+            <CoachSessionTimer startedAt={sessionStartedAt} isActive={messages.length > 0} />
+          </div>
           <div className="flex items-center gap-2">
+            <CoachEndSessionButton 
+              hasMessages={messages.length > 0} 
+              disabled={isSending} 
+              onEnd={handleEndSession} 
+            />
             <CoachExportButton messages={messages} disabled={isSending} />
             <CoachSessionHistory />
             {mode === 'b2b' && (
@@ -562,7 +674,7 @@ export function CoachView({ initialMode = 'b2c' }: { initialMode?: CoachMode }) 
           Conversations confidentielles, réponses courtes et bienveillantes.
         </p>
         <div className="flex flex-wrap items-center gap-3">
-          <CoachPersonalitySelector value={personality} onChange={setPersonality} disabled={isSending} />
+          <CoachPersonalitySelector value={personality} onChange={setPersonality} disabled={isSending || messages.length > 0} />
           {featureAaqEnabled && aaqSummary && (
             <Badge variant="outline" className="bg-blue-50/70 text-blue-800 dark:bg-blue-900/40 dark:text-blue-100">
               Souplesse : {aaqSummary}
@@ -585,11 +697,7 @@ export function CoachView({ initialMode = 'b2c' }: { initialMode?: CoachMode }) 
       <CoachSatisfactionDialog 
         open={showSatisfaction} 
         onClose={() => setShowSatisfaction(false)}
-        onSubmit={async (satisfaction, notes) => {
-          if (sessionId) {
-            await supabase.from('ai_coach_sessions').update({ user_satisfaction: satisfaction, session_notes: notes }).eq('id', sessionId);
-          }
-        }}
+        onSubmit={handleSatisfactionSubmit}
       />
 
       {featureAaqEnabled && shouldPromptAaq && (
@@ -665,7 +773,16 @@ export function CoachView({ initialMode = 'b2c' }: { initialMode?: CoachMode }) 
             </li>
           ))}
         </ul>
+        <CoachTypingIndicator isTyping={isSending} />
       </section>
+
+      {/* Suggestions Panel */}
+      <CoachSuggestionsPanel
+        techniques={lastSuggestions.techniques}
+        resources={lastSuggestions.resources}
+        followUpQuestions={lastSuggestions.followUpQuestions}
+        onQuestionClick={handleFollowUpQuestion}
+      />
 
       <section aria-label="Actions rapides" className="flex flex-wrap gap-2">
         {quickActions.map(action => (
