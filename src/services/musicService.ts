@@ -15,19 +15,22 @@ export interface MusicTrack {
 }
 
 export class MusicService {
+  /**
+   * Génère de la musique via emotion-music-ai (Suno API)
+   */
   static async generateMusic(emotion: string, mood?: string): Promise<MusicTrack> {
     try {
-      const { data, error } = await supabase.functions.invoke('generate-music', {
-        body: { emotion, mood }
+      const { data, error } = await supabase.functions.invoke('emotion-music-ai', {
+        body: { action: 'generate-music', emotion, customPrompt: mood }
       });
 
       if (error) throw error;
 
       return {
-        id: data.id,
-        title: data.title,
+        id: data.trackId || data.id || crypto.randomUUID(),
+        title: data.title || `${emotion} - Therapeutic Music`,
         artist: 'EmotionsCare AI',
-        url: data.audioUrl,
+        url: data.audio_url || '',
         duration: data.duration || 120,
         emotion,
         mood
@@ -38,15 +41,27 @@ export class MusicService {
     }
   }
 
+  /**
+   * Récupère des recommandations via adaptive-music
+   */
   static async getRecommendedTracks(emotion: string): Promise<MusicTrack[]> {
     try {
-      const { data, error } = await supabase.functions.invoke('get-music-recommendations', {
-        body: { emotion }
+      const { data, error } = await supabase.functions.invoke('adaptive-music', {
+        body: { action: 'create-playlist', emotions: [emotion], duration: 30 }
       });
 
       if (error) throw error;
 
-      return data.tracks || [];
+      // Transformer les tracks adaptive-music en MusicTrack
+      return (data.tracks || []).map((track: any) => ({
+        id: track.id,
+        title: track.title,
+        artist: track.artist || 'EmotionsCare',
+        url: track.url,
+        duration: track.duration,
+        emotion: emotion,
+        genre: track.emotion_tags?.[0]
+      }));
     } catch (error) {
       logger.error('Erreur recommandations', error as Error, 'MUSIC');
       return [];
@@ -78,7 +93,6 @@ export class MusicService {
 
       if (error) throw error;
 
-      // En production, on récupérerait les détails des tracks
       return [];
     } catch (error) {
       logger.error('Erreur récupération favoris', error as Error, 'MUSIC');

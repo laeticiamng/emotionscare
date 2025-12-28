@@ -47,12 +47,22 @@ export const MusicTherapyDashboard: React.FC = () => {
 
   const loadTracks = async () => {
     try {
-      const { data, error } = await supabase.functions.invoke('music-therapy', {
-        body: { action: 'recommend', emotion: selectedEmotion },
+      // Utilise adaptive-music au lieu de music-therapy inexistant
+      const { data, error } = await supabase.functions.invoke('adaptive-music', {
+        body: { action: 'create-playlist', emotions: [selectedEmotion], duration: 30 },
       });
 
       if (error) throw error;
-      setTracks(data.tracks || []);
+      
+      // Transformer les données au format attendu
+      const formattedTracks = (data.tracks || []).map((track: any) => ({
+        id: track.id,
+        title: track.title,
+        frequency: `${track.bpm || 60} BPM`,
+        duration: track.duration,
+        description: track.emotion_tags?.join(', ') || 'Musique thérapeutique'
+      }));
+      setTracks(formattedTracks);
     } catch (error) {
       logger.error('Erreur chargement musiques', error as Error, 'UI');
     }
@@ -60,12 +70,20 @@ export const MusicTherapyDashboard: React.FC = () => {
 
   const loadInsights = async () => {
     try {
-      const { data, error } = await supabase.functions.invoke('music-therapy', {
-        body: { action: 'get_insights' },
+      // Utilise adaptive-music stats
+      const { data, error } = await supabase.functions.invoke('adaptive-music', {
+        body: { action: 'generate-report', sessionId: 'current' },
       });
 
       if (error) throw error;
-      setInsights(data.insights);
+      
+      setInsights({
+        totalSessions: data.report?.tracksPlayed || 0,
+        totalDuration: data.report?.duration || 0,
+        averageDuration: data.report?.duration || 0,
+        favoriteEmotion: selectedEmotion,
+        weeklyUsage: data.report?.tracksPlayed || 0
+      });
     } catch (error) {
       logger.error('Erreur chargement insights', error as Error, 'UI');
     }
@@ -73,14 +91,12 @@ export const MusicTherapyDashboard: React.FC = () => {
 
   const handlePlay = (trackId: string) => {
     if (playingTrack === trackId) {
-      // Pause
       if (sessionStartTime) {
         logSession(trackId, Date.now() - sessionStartTime);
       }
       setPlayingTrack(null);
       setSessionStartTime(null);
     } else {
-      // Play
       setPlayingTrack(trackId);
       setSessionStartTime(Date.now());
       toast({
@@ -92,13 +108,11 @@ export const MusicTherapyDashboard: React.FC = () => {
 
   const logSession = async (trackId: string, duration: number) => {
     try {
-      await supabase.functions.invoke('music-therapy', {
-        body: {
-          action: 'log_session',
-          trackId,
-          duration: Math.round(duration / 1000),
-          emotion: selectedEmotion,
-        },
+      // Log session dans Supabase directement
+      await supabase.from('music_listening_sessions').insert({
+        track_id: trackId,
+        duration_seconds: Math.round(duration / 1000),
+        emotion_before: selectedEmotion
       });
       loadInsights();
     } catch (error) {

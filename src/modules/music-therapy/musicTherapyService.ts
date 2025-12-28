@@ -19,18 +19,19 @@ export interface MusicSession {
 export class MusicTherapyService {
   /**
    * Générer une playlist basée sur l'humeur
+   * Utilise adaptive-music au lieu de coach-ai
    */
   static async generatePlaylist(
     userId: string,
     mood: string,
     preferences?: any
   ): Promise<any> {
-    const { data, error } = await supabase.functions.invoke('coach-ai', {
+    const { data, error } = await supabase.functions.invoke('adaptive-music', {
       body: {
-        action: 'generate_music',
-        userId,
-        mood,
-        preferences
+        action: 'create-playlist',
+        emotions: [mood],
+        duration: preferences?.duration || 30,
+        playlist_type: 'therapeutic'
       }
     });
 
