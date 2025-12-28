@@ -28,6 +28,9 @@ import TimeExchangeMarket from './TimeExchangeMarket';
 import EmotionMarket from './EmotionMarket';
 import ExchangeLeaderboard from './ExchangeLeaderboard';
 import ExchangeProfileCard from './ExchangeProfileCard';
+import MatchingPanel from './MatchingPanel';
+import ExchangeNotifications from './ExchangeNotifications';
+import EmotionPortfolioPanel from './EmotionPortfolioPanel';
 
 const getMarkets = (stats: { improvement: { avgScore: string }; trust: { totalPool: string }; time: { activeOffers: string }; emotion: { volume24h: string } } | undefined) => [
   {
@@ -72,14 +75,15 @@ const ExchangeHub: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
-      {/* Back Button */}
-      <div className="container mx-auto px-4 pt-4">
+      {/* Back Button & Notifications */}
+      <div className="container mx-auto px-4 pt-4 flex items-center justify-between">
         <Link to="/app/home">
           <Button variant="ghost" size="sm" className="gap-2">
             <ArrowLeft className="w-4 h-4" />
             Retour au menu
           </Button>
         </Link>
+        <ExchangeNotifications />
       </div>
 
       {/* Hero Section */}
@@ -263,15 +267,22 @@ const ExchangeHub: React.FC = () => {
         )}
       </AnimatePresence>
 
-      {/* Leaderboard & Profile Section */}
+      {/* Leaderboard, Profile & Matching Section */}
       {!activeMarket && (
-        <div className="container mx-auto px-4 pb-12">
+        <div className="container mx-auto px-4 pb-12 space-y-6">
+          {/* Portfolio Panel */}
+          <EmotionPortfolioPanel compact />
+          
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2">
+            <div className="lg:col-span-2 space-y-6">
               <ExchangeLeaderboard />
+              {/* Matching Panel */}
+              <MatchingPanel marketType="time" />
             </div>
-            <div>
+            <div className="space-y-6">
               <ExchangeProfileCard />
+              {/* Emotion Portfolio Full */}
+              <EmotionPortfolioPanel />
             </div>
           </div>
         </div>

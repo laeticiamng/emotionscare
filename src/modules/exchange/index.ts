@@ -20,6 +20,11 @@ export { default as TimeExchangeRequests } from './components/TimeExchangeReques
 export { default as ExchangeProfileCard } from './components/ExchangeProfileCard';
 export { default as MatchingPanel } from './components/MatchingPanel';
 
+// New Components
+export { default as ExchangeNotifications } from './components/ExchangeNotifications';
+export { default as MarketTrendChart } from './components/MarketTrendChart';
+export { default as EmotionPortfolioPanel } from './components/EmotionPortfolioPanel';
+
 // Hooks
 export * from './hooks/useExchangeData';
 export * from './hooks/useExchangeMatching';
