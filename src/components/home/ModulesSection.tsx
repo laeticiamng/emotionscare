@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import EmotionalModule from './EmotionalModule';
 import MindfulnessModule from './MindfulnessModule';
 import ModuleCard from './ModuleCard';
-import { Brain, Heart, Waves } from 'lucide-react';
+import { Brain, Waves } from 'lucide-react';
 import { routes } from '@/routerV2';
 
 interface ModulesSectionProps {
