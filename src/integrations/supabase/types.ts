@@ -7974,11 +7974,13 @@ export type Database = {
           audio_url: string | null
           created_at: string
           duration: number | null
+          emotion: string | null
           generation_status: string | null
           id: string
           image_url: string | null
           metadata: Json | null
           original_task_id: string | null
+          prompt: string | null
           stream_url: string | null
           suno_track_id: string | null
           task_id: string | null
@@ -7990,11 +7992,13 @@ export type Database = {
           audio_url?: string | null
           created_at?: string
           duration?: number | null
+          emotion?: string | null
           generation_status?: string | null
           id?: string
           image_url?: string | null
           metadata?: Json | null
           original_task_id?: string | null
+          prompt?: string | null
           stream_url?: string | null
           suno_track_id?: string | null
           task_id?: string | null
@@ -8006,11 +8010,13 @@ export type Database = {
           audio_url?: string | null
           created_at?: string
           duration?: number | null
+          emotion?: string | null
           generation_status?: string | null
           id?: string
           image_url?: string | null
           metadata?: Json | null
           original_task_id?: string | null
+          prompt?: string | null
           stream_url?: string | null
           suno_track_id?: string | null
           task_id?: string | null
