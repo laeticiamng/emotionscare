@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 import { MusicTrack } from '@/types/music';
 import { useMusicFavorites } from '@/hooks/useMusicFavorites';
+import { useWebAudioContext } from '@/hooks/useWebAudioContext';
 
 interface LyricLine {
   time: number;
@@ -140,6 +141,9 @@ export const ImmersiveMode: React.FC<ImmersiveModeProps> = ({
   const [localVolume, setLocalVolume] = useState(volume);
   const controlsTimeoutRef = useRef<NodeJS.Timeout>();
   const containerRef = useRef<HTMLDivElement>(null);
+  
+  // Web Audio API for real visualizer
+  const { getAnalyserData, isConnected: audioConnected } = useWebAudioContext();
 
   // Sync local volume with prop
   useEffect(() => {
@@ -160,16 +164,24 @@ export const ImmersiveMode: React.FC<ImmersiveModeProps> = ({
     };
   }, [showControls, isPlaying]);
 
-  // Simulate visualizer
+  // Real audio visualizer using Web Audio API
   useEffect(() => {
     if (!isPlaying) return;
     const interval = setInterval(() => {
-      setVisualizerBars((bars) =>
-        bars.map(() => Math.random() * 100)
-      );
-    }, 100);
+      if (audioConnected) {
+        // Use real audio data from Web Audio API
+        const analyserData = getAnalyserData();
+        const newBars = Array.from(analyserData).slice(0, 32).map(v => (v / 255) * 100);
+        setVisualizerBars(newBars);
+      } else {
+        // Fallback to simulated data when audio not connected
+        setVisualizerBars((bars) =>
+          bars.map(() => Math.random() * 100)
+        );
+      }
+    }, 50);
     return () => clearInterval(interval);
-  }, [isPlaying]);
+  }, [isPlaying, audioConnected, getAnalyserData]);
 
   // Update current lyric based on progress
   useEffect(() => {

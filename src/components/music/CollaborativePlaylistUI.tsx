@@ -1,9 +1,9 @@
 /**
  * Collaborative Playlist UI - Partage et édition temps réel
- * Invitations, permissions, synchronisation live
+ * Invitations, permissions, synchronisation live avec Supabase Realtime
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -24,8 +24,10 @@ import {
   UserPlus,
   Clock,
   Edit,
+  Wifi,
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 interface Collaborator {
   id: string;
@@ -77,6 +79,46 @@ export const CollaborativePlaylistUI: React.FC<CollaborativePlaylistUIProps> = (
   const [inviteRole, setInviteRole] = useState<'editor' | 'viewer'>('viewer');
   const [copiedLink, setCopiedLink] = useState(false);
   const [expandedCollaborator, setExpandedCollaborator] = useState<string | null>(null);
+  const [isRealtimeConnected, setIsRealtimeConnected] = useState(false);
+  const [realtimeActivity, setRealtimeActivity] = useState<string[]>([]);
+
+  // Subscribe to realtime updates for this playlist
+  useEffect(() => {
+    const channel = supabase
+      .channel(`playlist-${playlistId}`)
+      .on('presence', { event: 'sync' }, () => {
+        setIsRealtimeConnected(true);
+      })
+      .on('presence', { event: 'join' }, ({ key, newPresences }) => {
+        const activity = `${newPresences[0]?.user_name || 'Quelqu\'un'} a rejoint`;
+        setRealtimeActivity(prev => [...prev.slice(-4), activity]);
+        toast({ title: '👤 Nouveau collaborateur', description: activity, duration: 2000 });
+      })
+      .on('presence', { event: 'leave' }, ({ key, leftPresences }) => {
+        const activity = `${leftPresences[0]?.user_name || 'Quelqu\'un'} est parti`;
+        setRealtimeActivity(prev => [...prev.slice(-4), activity]);
+      })
+      .on('broadcast', { event: 'playlist_update' }, ({ payload }) => {
+        const activity = `${payload.user_name} a ${payload.action}`;
+        setRealtimeActivity(prev => [...prev.slice(-4), activity]);
+        toast({ title: '🎵 Mise à jour', description: activity, duration: 2000 });
+      })
+      .subscribe(async (status) => {
+        if (status === 'SUBSCRIBED') {
+          setIsRealtimeConnected(true);
+          await channel.track({
+            user_id: currentUserId,
+            user_name: collaborators.find(c => c.id === currentUserId)?.name || 'Anonyme',
+            online_at: new Date().toISOString(),
+          });
+        }
+      });
+
+    return () => {
+      supabase.removeChannel(channel);
+      setIsRealtimeConnected(false);
+    };
+  }, [playlistId, currentUserId, collaborators, toast]);
 
   const currentUser = collaborators.find((c) => c.id === currentUserId);
   const isOwner = currentUser?.role === 'owner';
@@ -148,6 +190,12 @@ export const CollaborativePlaylistUI: React.FC<CollaborativePlaylistUIProps> = (
               <CardTitle className="flex items-center gap-2">
                 <Users className="h-5 w-5" />
                 Collaboration
+                {isRealtimeConnected && (
+                  <Badge variant="secondary" className="text-xs gap-1">
+                    <Wifi className="h-3 w-3 text-green-500" />
+                    Live
+                  </Badge>
+                )}
               </CardTitle>
               <p className="text-sm text-muted-foreground mt-1">
                 {collaborators.length} collaborateur{collaborators.length !== 1 ? 's' : ''}

@@ -1,6 +1,7 @@
 /**
  * Audio 3D Visualizer - Visualisations audio 3D avancées
  * Particules, ondes, spectre, géométries
+ * Connecté au Web Audio API pour données réelles
  */
 
 import React, { useState, useEffect } from 'react';
@@ -16,6 +17,7 @@ import {
   Sparkles,
   Volume2,
 } from 'lucide-react';
+import { useWebAudioContext } from '@/hooks/useWebAudioContext';
 
 interface Audio3DVisualizerProps {
   isPlaying?: boolean;
@@ -44,23 +46,34 @@ export const Audio3DVisualizer: React.FC<Audio3DVisualizerProps> = ({
 }) => {
   const [vizType, setVizType] = useState<VisualizationType>('bars');
   const [animationData, setAnimationData] = useState(frequency);
+  
+  // Use Web Audio API for real audio data
+  const { getAnalyserData, isConnected: audioConnected } = useWebAudioContext();
 
-  // Simulate audio data updates
+  // Get real or simulated audio data updates
   useEffect(() => {
     if (!isPlaying) return;
 
     const interval = setInterval(() => {
-      setAnimationData((prev) =>
-        prev.map((val) => {
-          const change = (Math.random() - 0.5) * 50;
-          const newVal = Math.max(0, Math.min(100, val + change));
-          return newVal;
-        })
-      );
+      if (audioConnected) {
+        // Use real audio data
+        const realData = getAnalyserData();
+        const normalizedData = Array.from(realData).map(v => (v / 255) * 100);
+        setAnimationData(normalizedData.length >= 64 ? normalizedData : [...normalizedData, ...Array(64 - normalizedData.length).fill(0)]);
+      } else {
+        // Fallback to simulated data
+        setAnimationData((prev) =>
+          prev.map((val) => {
+            const change = (Math.random() - 0.5) * 50;
+            const newVal = Math.max(0, Math.min(100, val + change));
+            return newVal;
+          })
+        );
+      }
     }, 50);
 
     return () => clearInterval(interval);
-  }, [isPlaying]);
+  }, [isPlaying, audioConnected, getAnalyserData]);
 
   // Bar Chart Visualizer
   const renderBars = () => (
