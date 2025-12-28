@@ -79,13 +79,13 @@ interface VinylTrack extends MusicTrack {
   waveform?: number[];
 }
 
-// Configuration audio - URLs MP3 directes testées et fonctionnelles avec CORS
-// Utilisation de fichiers audio libre de droits hébergés sur des CDN fiables
+// Configuration audio - URLs MP3 hébergées sur Supabase Storage (CORS garanti)
+const SUPABASE_STORAGE_URL = 'https://yaincoxihiqdksxgrsrk.supabase.co/storage/v1/object/public/music-tracks/demo';
 const AUDIO_URL_CONFIG = {
-  'vinyl-1': { fileName: 'ambient-soft.mp3', fallbackUrl: 'https://files.freemusicarchive.org/storage-freemusicarchive-org/music/ccCommunity/Chad_Crouch/Arps/Chad_Crouch_-_Shipping_Lanes.mp3' },
-  'vinyl-2': { fileName: 'focus-clarity.mp3', fallbackUrl: 'https://files.freemusicarchive.org/storage-freemusicarchive-org/music/no_curator/Tours/Enthusiast/Tours_-_01_-_Enthusiast.mp3' },
-  'vinyl-3': { fileName: 'creative-flow.mp3', fallbackUrl: 'https://files.freemusicarchive.org/storage-freemusicarchive-org/music/ccCommunity/Kai_Engel/Satin/Kai_Engel_-_04_-_Interlude.mp3' },
-  'vinyl-4': { fileName: 'healing-waves.mp3', fallbackUrl: 'https://files.freemusicarchive.org/storage-freemusicarchive-org/music/ccCommunity/Ketsa/Raising_Frequency/Ketsa_-_08_-_Multiverse.mp3' }
+  'vinyl-1': { fileName: 'ambient-soft.mp3', fallbackUrl: `${SUPABASE_STORAGE_URL}/serenity.mp3` },
+  'vinyl-2': { fileName: 'focus-clarity.mp3', fallbackUrl: `${SUPABASE_STORAGE_URL}/energy.mp3` },
+  'vinyl-3': { fileName: 'creative-flow.mp3', fallbackUrl: `${SUPABASE_STORAGE_URL}/focus.mp3` },
+  'vinyl-4': { fileName: 'healing-waves.mp3', fallbackUrl: `${SUPABASE_STORAGE_URL}/healing.mp3` }
 } as const;
 
 // Données vinyles
