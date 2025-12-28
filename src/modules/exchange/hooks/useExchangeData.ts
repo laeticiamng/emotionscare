@@ -428,7 +428,141 @@ export const useUseEmotionAsset = () => {
       queryClient.invalidateQueries({ queryKey: ['emotion-transactions'] });
     },
   });
-}
+};
+
+// Sell Emotion Asset
+export const useSellEmotionAsset = () => {
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+
+  return useMutation({
+    mutationFn: async ({ portfolioId, assetId, quantity }: { portfolioId: string; assetId: string; quantity: number }) => {
+      // Get asset price
+      const { data: asset } = await supabase
+        .from('emotion_assets')
+        .select('current_price')
+        .eq('id', assetId)
+        .single();
+
+      if (!asset) throw new Error('Asset not found');
+
+      const totalPrice = asset.current_price * quantity * 0.9; // 10% fee
+
+      // Get portfolio item
+      const { data: portfolioItem } = await supabase
+        .from('emotion_portfolio')
+        .select('quantity')
+        .eq('id', portfolioId)
+        .single();
+
+      if (!portfolioItem || portfolioItem.quantity < quantity) {
+        throw new Error('Quantité insuffisante');
+      }
+
+      // Update or delete portfolio item
+      if (portfolioItem.quantity === quantity) {
+        await supabase
+          .from('emotion_portfolio')
+          .delete()
+          .eq('id', portfolioId);
+      } else {
+        await supabase
+          .from('emotion_portfolio')
+          .update({ quantity: portfolioItem.quantity - quantity })
+          .eq('id', portfolioId);
+      }
+
+      // Log transaction
+      await supabase
+        .from('emotion_transactions')
+        .insert({
+          user_id: user?.id,
+          asset_id: assetId,
+          transaction_type: 'sell',
+          quantity,
+          price_per_unit: asset.current_price * 0.9,
+          total_price: totalPrice,
+        });
+
+      return { assetId, quantity, totalPrice };
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['emotion-portfolio'] });
+      queryClient.invalidateQueries({ queryKey: ['emotion-assets'] });
+    },
+  });
+};
+
+// Abandon/Delete Improvement Goal
+export const useAbandonGoal = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ goalId, abandon }: { goalId: string; abandon: boolean }) => {
+      const { error } = await supabase
+        .from('improvement_goals')
+        .update({ 
+          status: abandon ? 'abandoned' : 'completed',
+          completed_at: new Date().toISOString()
+        })
+        .eq('id', goalId);
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['improvement-goals'] });
+    },
+  });
+};
+
+// Delete Improvement Goal permanently
+export const useDeleteGoal = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (goalId: string) => {
+      // Delete logs first
+      await supabase
+        .from('improvement_logs')
+        .delete()
+        .eq('goal_id', goalId);
+
+      // Delete goal
+      const { error } = await supabase
+        .from('improvement_goals')
+        .delete()
+        .eq('id', goalId);
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['improvement-goals'] });
+    },
+  });
+};
+
+// Complete Time Exchange manually
+export const useCompleteTimeExchange = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (exchangeId: string) => {
+      const { error } = await supabase
+        .from('time_exchanges')
+        .update({ 
+          status: 'completed',
+          completed_at: new Date().toISOString()
+        })
+        .eq('id', exchangeId);
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['time-exchange-requests'] });
+      queryClient.invalidateQueries({ queryKey: ['time-offers'] });
+    },
+  });
+};
 
 // Exchange Profile Hooks
 export const useExchangeProfile = () => {

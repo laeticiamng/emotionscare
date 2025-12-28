@@ -14,7 +14,10 @@ import {
   Activity,
   Sparkles,
   ArrowUpRight,
-  ArrowDownRight
+  ArrowDownRight,
+  Trash2,
+  XCircle,
+  MoreVertical
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -37,7 +40,23 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useImprovementGoals, useCreateGoal, useUpdateGoalProgress } from '../hooks/useExchangeData';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { useImprovementGoals, useCreateGoal, useUpdateGoalProgress, useAbandonGoal, useDeleteGoal } from '../hooks/useExchangeData';
 import type { GoalType } from '../types';
 import { toast } from 'sonner';
 
@@ -63,7 +82,10 @@ const ImprovementMarket: React.FC = () => {
   const { data: goals, isLoading } = useImprovementGoals();
   const createGoal = useCreateGoal();
   const updateProgress = useUpdateGoalProgress();
+  const abandonGoal = useAbandonGoal();
+  const deleteGoal = useDeleteGoal();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const [newGoal, setNewGoal] = useState({
     goal_type: '' as GoalType,
     title: '',
@@ -93,6 +115,25 @@ const ImprovementMarket: React.FC = () => {
       toast.success('Progression mise à jour !');
     } catch (error) {
       toast.error('Erreur lors de la mise à jour');
+    }
+  };
+
+  const handleAbandon = async (goalId: string) => {
+    try {
+      await abandonGoal.mutateAsync({ goalId, abandon: true });
+      toast.info('Objectif abandonné');
+    } catch (error) {
+      toast.error('Erreur');
+    }
+  };
+
+  const handleDelete = async (goalId: string) => {
+    try {
+      await deleteGoal.mutateAsync(goalId);
+      toast.success('Objectif supprimé définitivement');
+      setDeleteConfirm(null);
+    } catch (error) {
+      toast.error('Erreur lors de la suppression');
     }
   };
 
@@ -322,7 +363,6 @@ const ImprovementMarket: React.FC = () => {
                             className="flex-1"
                             onClick={() => handleUpdateProgress(goal.id, 5)}
                             disabled={updateProgress.isPending}
-                            aria-label="Ajouter 5 points de progression"
                           >
                             +5
                           </Button>
@@ -332,7 +372,6 @@ const ImprovementMarket: React.FC = () => {
                             className="flex-1"
                             onClick={() => handleUpdateProgress(goal.id, 10)}
                             disabled={updateProgress.isPending}
-                            aria-label="Ajouter 10 points de progression"
                           >
                             +10
                           </Button>
@@ -341,11 +380,42 @@ const ImprovementMarket: React.FC = () => {
                             className="flex-1 bg-gradient-to-r from-emerald-500 to-teal-600"
                             onClick={() => handleUpdateProgress(goal.id, 25)}
                             disabled={updateProgress.isPending}
-                            aria-label="Ajouter 25 points de progression"
                           >
                             +25
                           </Button>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button size="sm" variant="ghost">
+                                <MoreVertical className="w-4 h-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                              <DropdownMenuItem onClick={() => handleAbandon(goal.id)}>
+                                <XCircle className="w-4 h-4 mr-2" />
+                                Abandonner
+                              </DropdownMenuItem>
+                              <DropdownMenuItem 
+                                className="text-destructive"
+                                onClick={() => setDeleteConfirm(goal.id)}
+                              >
+                                <Trash2 className="w-4 h-4 mr-2" />
+                                Supprimer
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </div>
+                      )}
+                      
+                      {goal.status === 'abandoned' && (
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          className="w-full"
+                          onClick={() => setDeleteConfirm(goal.id)}
+                        >
+                          <Trash2 className="w-4 h-4 mr-2" />
+                          Supprimer définitivement
+                        </Button>
                       )}
                     </CardContent>
                   </Card>
@@ -367,6 +437,27 @@ const ImprovementMarket: React.FC = () => {
           </Card>
         )}
       </div>
+
+      {/* Delete Confirmation */}
+      <AlertDialog open={!!deleteConfirm} onOpenChange={(open) => !open && setDeleteConfirm(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Supprimer cet objectif ?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Cette action est irréversible. L'objectif et tout son historique seront supprimés.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground"
+              onClick={() => deleteConfirm && handleDelete(deleteConfirm)}
+            >
+              Supprimer
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
