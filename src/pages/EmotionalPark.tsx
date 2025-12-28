@@ -8,8 +8,9 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { useUserStatsQuery } from '@/hooks/useUserStatsQuery';
+import { useUserPreference } from '@/hooks/useSupabaseStorage';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Filter, Search, X, TrendingUp, Target, Award, ChevronDown, Star, Calendar, Sparkles, Trophy, Zap, BarChart3 } from 'lucide-react';
+import { Filter, Search, X, TrendingUp, Target, Award, ChevronDown, Star, Calendar, Sparkles, Trophy, Zap, BarChart3, Map } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { ParkAttraction } from '@/components/park/ParkAttraction';
 import type { Attraction } from '@/types/park';
@@ -35,7 +36,10 @@ export default function EmotionalPark() {
   const [searchTerm, setSearchTerm] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [showStatistics, setShowStatistics] = useState(true);
-  const [currentMood, setCurrentMood] = useState<string>('');
+  const [showMap, setShowMap] = useState(false);
+  
+  // Mood persisté via Supabase
+  const [currentMood, setCurrentMood] = useUserPreference<string>('emotional-park-mood', '');
 
   const {
     visitedAttractions,
@@ -482,11 +486,13 @@ export default function EmotionalPark() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
           className="rounded-lg bg-gradient-to-r from-primary/10 to-secondary/10 p-4 border border-border/50"
+          role="group"
+          aria-labelledby="mood-selector-label"
         >
-          <p className="text-sm font-medium mb-3 text-foreground">
+          <p id="mood-selector-label" className="text-sm font-medium mb-3 text-foreground">
             Comment te sens-tu en ce moment?
           </p>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Sélection de l'humeur">
             {([
               { value: 'happy', emoji: '😊', label: 'Heureux' },
               { value: 'calm', emoji: '😌', label: 'Calme' },
@@ -500,8 +506,10 @@ export default function EmotionalPark() {
                 size="sm"
                 onClick={() => setCurrentMood(currentMood === mood.value ? '' : mood.value)}
                 className="gap-1"
+                aria-pressed={currentMood === mood.value}
+                aria-label={`Humeur: ${mood.label}`}
               >
-                {mood.emoji} {mood.label}
+                <span aria-hidden="true">{mood.emoji}</span> {mood.label}
               </Button>
             ))}
           </div>

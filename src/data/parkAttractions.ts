@@ -124,6 +124,28 @@ export const parkAttractions: Attraction[] = [
     zone: 'explore'
   },
   {
+    id: 'discovery-path',
+    title: 'Le Sentier des Découvertes',
+    subtitle: 'Exploration guidée',
+    description: 'Parcours d\'exploration personnalisé pour découvrir de nouvelles facettes de tes émotions.',
+    icon: Leaf,
+    route: '/app/discovery',
+    gradient: 'from-teal-500/20 to-emerald-500/20',
+    collection: 'Carnets d\'exploration',
+    zone: 'explore'
+  },
+  {
+    id: 'emotion-atlas',
+    title: 'L\'Atlas des Émotions',
+    subtitle: 'Cartographie émotionnelle',
+    description: 'Cartographie interactive de ton univers émotionnel personnel.',
+    icon: Grid3X3,
+    route: '/app/emotion-atlas',
+    gradient: 'from-purple-500/20 to-indigo-500/20',
+    collection: 'Cartes personnalisées',
+    zone: 'explore'
+  },
+  {
     id: 'flash-glow',
     title: 'La Chambre des Lumières',
     subtitle: 'Flash Glow',
@@ -242,6 +264,28 @@ export const parkAttractions: Attraction[] = [
     route: '/app/community',
     gradient: 'from-emerald-500/20 to-green-500/20',
     collection: 'Badges de soutien',
+    zone: 'social'
+  },
+  {
+    id: 'buddy-system',
+    title: 'Le Cercle des Alliés',
+    subtitle: 'Système de binômes',
+    description: 'Trouve un partenaire de bien-être pour vous soutenir mutuellement.',
+    icon: Heart,
+    route: '/app/buddies',
+    gradient: 'from-pink-500/20 to-rose-500/20',
+    collection: 'Liens de confiance',
+    zone: 'social'
+  },
+  {
+    id: 'group-sessions',
+    title: 'L\'Agora du Partage',
+    subtitle: 'Sessions de groupe',
+    description: 'Participe à des sessions collectives animées pour partager et grandir ensemble.',
+    icon: Users,
+    route: '/app/group-sessions',
+    gradient: 'from-blue-500/20 to-indigo-500/20',
+    collection: 'Moments partagés',
     zone: 'social'
   },
   {

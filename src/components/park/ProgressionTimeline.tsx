@@ -1,11 +1,10 @@
-// @ts-nocheck
 /**
  * Timeline visuelle de la progression du joueur dans le parc émotionnel
  */
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { CheckCircle, Circle, Lock } from 'lucide-react';
+import { CheckCircle } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 

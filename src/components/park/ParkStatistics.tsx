@@ -1,17 +1,17 @@
-// @ts-nocheck
 import React from 'react';
 import { motion } from 'framer-motion';
-import { BarChart3, TrendingUp, Award, Zap, Clock, Target } from 'lucide-react';
+import { BarChart3, TrendingUp, Award, Zap, Clock, Target, LucideIcon } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
 interface StatItem {
   label: string;
   value: number | string;
-  icon: React.ElementType;
+  icon: LucideIcon;
   gradient: string;
   unit?: string;
   description?: string;
+  trend?: number; // pourcentage de changement
 }
 
 interface ParkStatisticsProps {
@@ -27,6 +27,7 @@ export const StatCard: React.FC<StatItem & { delay?: number }> = ({
   gradient,
   unit,
   description,
+  trend,
   delay = 0
 }) => {
   return (
@@ -52,9 +53,12 @@ export const StatCard: React.FC<StatItem & { delay?: number }> = ({
             >
               <Icon className="h-6 w-6 text-primary" />
             </motion.div>
-            {description && (
-              <Badge variant="secondary" className="text-xs">
-                +12%
+            {trend !== undefined && trend !== 0 && (
+              <Badge 
+                variant="secondary" 
+                className={`text-xs ${trend > 0 ? 'text-green-600' : 'text-red-600'}`}
+              >
+                {trend > 0 ? '+' : ''}{trend}%
               </Badge>
             )}
           </div>

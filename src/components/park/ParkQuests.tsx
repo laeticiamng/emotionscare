@@ -1,17 +1,29 @@
-// @ts-nocheck
 /**
  * Composant pour afficher et gérer les quêtes du parc émotionnel
  */
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Trophy, Lock, Zap, Target } from 'lucide-react';
+import { Trophy, Zap, Target } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 
+interface Quest {
+  id: string;
+  title: string;
+  description: string;
+  objective: string;
+  icon: string;
+  progress: number;
+  maxProgress: number;
+  difficulty: 'easy' | 'medium' | 'hard';
+  reward: number;
+  completed: boolean;
+}
+
 interface QuestItemProps {
-  quest: any;
+  quest: Quest;
   onStart?: () => void;
   delay?: number;
 }
@@ -113,10 +125,10 @@ const QuestItem: React.FC<QuestItemProps> = ({ quest, onStart, delay = 0 }) => {
             </div>
             {onStart && !quest.completed && (
               <Button
-                size="xs"
+                size="sm"
                 variant="ghost"
                 onClick={onStart}
-                className="text-xs h-6"
+                className="text-xs h-6 px-2"
               >
                 Commencer
               </Button>
@@ -135,7 +147,7 @@ const QuestItem: React.FC<QuestItemProps> = ({ quest, onStart, delay = 0 }) => {
 };
 
 interface ParkQuestsProps {
-  quests: any[];
+  quests: Quest[];
   completedCount: number;
   totalRewards: number;
   onQuestStart?: (questId: string) => void;
