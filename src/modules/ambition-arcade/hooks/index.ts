@@ -13,3 +13,4 @@ export {
 } from './useAmbitionExtras';
 export { useDeleteGoal } from './useDeleteGoal';
 export { useConfetti } from './useConfetti';
+export { useAutoArtifacts } from './useAutoArtifacts';

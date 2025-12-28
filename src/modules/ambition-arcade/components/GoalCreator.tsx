@@ -1,5 +1,5 @@
 /**
- * Composant de création d'objectifs Ambition Arcade
+ * Composant de création d'objectifs Ambition Arcade avec génération IA
  */
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
@@ -8,8 +8,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
-import { Loader2, Plus, Sparkles, Target, X } from 'lucide-react';
-import { useCreateGoal } from '../hooks';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Loader2, Plus, Sparkles, Target, X, Wand2 } from 'lucide-react';
+import { useCreateGoal, useCreateQuest } from '../hooks';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import { useConfetti } from '../hooks/useConfetti';
 
 const SUGGESTED_TAGS = [
   'bien-être', 'productivité', 'apprentissage', 'fitness', 
@@ -21,12 +25,32 @@ interface GoalCreatorProps {
   onCancel?: () => void;
 }
 
+interface GameLevel {
+  name: string;
+  description: string;
+  points: number;
+  tasks: string[];
+}
+
+interface GameStructure {
+  levels: GameLevel[];
+  totalPoints: number;
+  badges: string[];
+}
+
 export const GoalCreator: React.FC<GoalCreatorProps> = ({ onSuccess, onCancel }) => {
   const [objective, setObjective] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [customTag, setCustomTag] = useState('');
+  const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard'>('medium');
+  const [timeframe, setTimeframe] = useState('30');
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generatedStructure, setGeneratedStructure] = useState<GameStructure | null>(null);
   
   const createGoal = useCreateGoal();
+  const createQuest = useCreateQuest();
+  const { toast } = useToast();
+  const { fireAchievementConfetti } = useConfetti();
 
   const handleTagToggle = (tag: string) => {
     setSelectedTags(prev => 
@@ -43,18 +67,99 @@ export const GoalCreator: React.FC<GoalCreatorProps> = ({ onSuccess, onCancel })
     }
   };
 
+  const handleGenerateWithAI = async () => {
+    if (!objective.trim()) return;
+
+    setIsGenerating(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast({
+          title: 'Erreur',
+          description: 'Vous devez être connecté',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      const response = await fetch(
+        'https://yaincoxihiqdksxgrsrk.supabase.co/functions/v1/ambition-arcade',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({
+            goal: objective.trim(),
+            timeframe,
+            difficulty,
+          }),
+        }
+      );
+
+      const data = await response.json();
+      
+      if (data.gameStructure) {
+        setGeneratedStructure(data.gameStructure);
+        toast({
+          title: '✨ Structure générée !',
+          description: `${data.gameStructure.levels.length} niveaux créés par l'IA`,
+        });
+      } else {
+        throw new Error(data.error || 'Erreur de génération');
+      }
+    } catch (error) {
+      console.error('Error generating structure:', error);
+      toast({
+        title: 'Erreur',
+        description: 'Impossible de générer la structure',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!objective.trim()) return;
 
-    await createGoal.mutateAsync({
-      objective: objective.trim(),
-      tags: selectedTags
-    });
+    try {
+      // Créer l'objectif
+      const newGoal = await createGoal.mutateAsync({
+        objective: objective.trim(),
+        tags: selectedTags
+      });
 
-    setObjective('');
-    setSelectedTags([]);
-    onSuccess?.();
+      // Si une structure a été générée, créer les quêtes automatiquement
+      if (generatedStructure && newGoal) {
+        for (const level of generatedStructure.levels) {
+          for (const task of level.tasks) {
+            await createQuest.mutateAsync({
+              runId: newGoal.id,
+              title: task,
+              flavor: level.name,
+              xpReward: Math.round(level.points / level.tasks.length),
+              estMinutes: 15
+            });
+          }
+        }
+        
+        fireAchievementConfetti();
+        toast({
+          title: '🎮 Aventure lancée !',
+          description: `${generatedStructure.levels.reduce((sum, l) => sum + l.tasks.length, 0)} quêtes créées`,
+        });
+      }
+
+      setObjective('');
+      setSelectedTags([]);
+      setGeneratedStructure(null);
+      onSuccess?.();
+    } catch (error) {
+      console.error('Error creating goal:', error);
+    }
   };
 
   return (
@@ -80,11 +185,96 @@ export const GoalCreator: React.FC<GoalCreatorProps> = ({ onSuccess, onCancel })
                 value={objective}
                 onChange={(e) => setObjective(e.target.value)}
                 className="pr-10"
-                disabled={createGoal.isPending}
+                disabled={createGoal.isPending || isGenerating}
               />
               <Sparkles className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             </div>
           </div>
+
+          {/* AI Generation Options */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Difficulté</Label>
+              <Select value={difficulty} onValueChange={(v) => setDifficulty(v as 'easy' | 'medium' | 'hard')}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="easy">🌱 Facile</SelectItem>
+                  <SelectItem value="medium">⚡ Moyen</SelectItem>
+                  <SelectItem value="hard">🔥 Difficile</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>Délai (jours)</Label>
+              <Select value={timeframe} onValueChange={setTimeframe}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="7">7 jours</SelectItem>
+                  <SelectItem value="14">14 jours</SelectItem>
+                  <SelectItem value="30">30 jours</SelectItem>
+                  <SelectItem value="60">60 jours</SelectItem>
+                  <SelectItem value="90">90 jours</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          {/* Generate with AI Button */}
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full gap-2"
+            onClick={handleGenerateWithAI}
+            disabled={!objective.trim() || isGenerating}
+          >
+            {isGenerating ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Génération en cours...
+              </>
+            ) : (
+              <>
+                <Wand2 className="w-4 h-4" />
+                Générer une structure avec l'IA
+              </>
+            )}
+          </Button>
+
+          {/* Generated Structure Preview */}
+          {generatedStructure && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              className="p-4 bg-primary/5 rounded-lg border border-primary/20 space-y-3"
+            >
+              <div className="flex items-center justify-between">
+                <h4 className="font-medium text-sm">Structure générée</h4>
+                <Badge variant="secondary">
+                  {generatedStructure.totalPoints} XP total
+                </Badge>
+              </div>
+              <div className="space-y-2">
+                {generatedStructure.levels.map((level, idx) => (
+                  <div key={idx} className="flex items-center gap-2 text-sm">
+                    <Badge variant="outline" className="shrink-0">Niv. {idx + 1}</Badge>
+                    <span className="text-muted-foreground">{level.name}</span>
+                    <span className="text-xs text-muted-foreground">({level.tasks.length} tâches)</span>
+                  </div>
+                ))}
+              </div>
+              <div className="flex flex-wrap gap-1">
+                {generatedStructure.badges.slice(0, 3).map((badge, idx) => (
+                  <Badge key={idx} variant="secondary" className="text-xs">
+                    {badge}
+                  </Badge>
+                ))}
+              </div>
+            </motion.div>
+          )}
 
           {/* Tags */}
           <div className="space-y-2">
@@ -166,7 +356,7 @@ export const GoalCreator: React.FC<GoalCreatorProps> = ({ onSuccess, onCancel })
               ) : (
                 <>
                   <Target className="w-4 h-4 mr-2" />
-                  Lancer l'aventure
+                  {generatedStructure ? 'Lancer l\'aventure' : 'Créer l\'objectif'}
                 </>
               )}
             </Button>
