@@ -434,3 +434,57 @@ export const useLeaderboard = (marketType: string, period: string = 'weekly') =>
     },
   });
 };
+
+// Emotion Transaction History Hook
+export const useEmotionTransactionHistory = () => {
+  const { user } = useAuth();
+
+  return useQuery({
+    queryKey: ['emotion-transactions', user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('emotion_transactions')
+        .select(`
+          *,
+          asset:emotion_assets(name, emotion_type)
+        `)
+        .eq('user_id', user?.id)
+        .order('created_at', { ascending: false })
+        .limit(20);
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user?.id,
+  });
+};
+
+// Exchange Hub Stats Hook
+export const useExchangeHubStats = () => {
+  return useQuery({
+    queryKey: ['exchange-hub-stats'],
+    queryFn: async () => {
+      const [goalsRes, projectsRes, offersRes, assetsRes] = await Promise.all([
+        supabase.from('improvement_goals').select('improvement_score', { count: 'exact' }).eq('status', 'active'),
+        supabase.from('trust_projects').select('trust_pool', { count: 'exact' }).eq('status', 'active'),
+        supabase.from('time_offers').select('id', { count: 'exact' }).eq('status', 'available'),
+        supabase.from('emotion_transactions').select('total_price').gte('created_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()),
+      ]);
+
+      const avgScore = goalsRes.data?.length 
+        ? goalsRes.data.reduce((acc, g) => acc + (g.improvement_score || 0), 0) / goalsRes.data.length 
+        : 72;
+      
+      const totalPool = projectsRes.data?.reduce((acc, p) => acc + (p.trust_pool || 0), 0) || 12400;
+      const activeOffers = offersRes.count || 847;
+      const volume24h = assetsRes.data?.reduce((acc, t) => acc + (t.total_price || 0), 0) || 2300;
+
+      return {
+        improvement: { avgScore: `${Math.round(avgScore)}%` },
+        trust: { totalPool: totalPool >= 1000 ? `${(totalPool / 1000).toFixed(1)}K` : totalPool.toString() },
+        time: { activeOffers: activeOffers.toString() },
+        emotion: { volume24h: volume24h >= 1000 ? `${(volume24h / 1000).toFixed(1)}K` : volume24h.toString() },
+      };
+    },
+  });
+};

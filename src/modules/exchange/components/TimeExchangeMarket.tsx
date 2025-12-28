@@ -40,9 +40,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useTimeOffers, useTimeMarketRates, useCreateTimeOffer } from '../hooks/useExchangeData';
-import type { SkillCategory } from '../types';
+import { useTimeOffers, useTimeMarketRates, useCreateTimeOffer, useRequestTimeExchange } from '../hooks/useExchangeData';
+import type { SkillCategory, TimeOffer } from '../types';
 import { toast } from 'sonner';
+import { useAuth } from '@/contexts/AuthContext';
 
 const categoryIcons = {
   tech: Code,
@@ -75,17 +76,41 @@ const categoryColors: Record<SkillCategory, string> = {
 };
 
 const TimeExchangeMarket: React.FC = () => {
+  const { user } = useAuth();
   const [selectedCategory, setSelectedCategory] = useState<SkillCategory | null>(null);
   const { data: offers, isLoading: offersLoading } = useTimeOffers(selectedCategory || undefined);
   const { data: rates, isLoading: ratesLoading } = useTimeMarketRates();
   const createOffer = useCreateTimeOffer();
+  const requestExchange = useRequestTimeExchange();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [exchangeDialogOffer, setExchangeDialogOffer] = useState<TimeOffer | null>(null);
+  const [exchangeHours, setExchangeHours] = useState(1);
   const [newOffer, setNewOffer] = useState({
     skill_category: '' as SkillCategory,
     skill_name: '',
     description: '',
     hours_available: 1,
   });
+
+  const handleRequestExchange = async () => {
+    if (!exchangeDialogOffer || !user) {
+      toast.error('Vous devez être connecté pour proposer un échange');
+      return;
+    }
+
+    try {
+      await requestExchange.mutateAsync({
+        offerId: exchangeDialogOffer.id,
+        providerId: exchangeDialogOffer.user_id,
+        hours: exchangeHours,
+      });
+      toast.success('Demande d\'échange envoyée !');
+      setExchangeDialogOffer(null);
+      setExchangeHours(1);
+    } catch (error) {
+      toast.error('Erreur lors de la demande d\'échange');
+    }
+  };
 
   const handleCreateOffer = async () => {
     if (!newOffer.skill_category || !newOffer.skill_name) {
@@ -325,9 +350,14 @@ const TimeExchangeMarket: React.FC = () => {
                       <Button 
                         className={`w-full bg-gradient-to-r ${color}`}
                         aria-label={`Proposer un échange pour ${offer.skill_name}`}
+                        onClick={() => {
+                          setExchangeDialogOffer(offer);
+                          setExchangeHours(1);
+                        }}
+                        disabled={offer.user_id === user?.id}
                       >
                         <ArrowRightLeft className="w-4 h-4 mr-2" aria-hidden="true" />
-                        Proposer un échange
+                        {offer.user_id === user?.id ? 'Votre offre' : 'Proposer un échange'}
                       </Button>
                     </CardContent>
                   </Card>
@@ -351,6 +381,47 @@ const TimeExchangeMarket: React.FC = () => {
           </Card>
         )}
       </div>
+
+      {/* Exchange Request Dialog */}
+      <Dialog open={!!exchangeDialogOffer} onOpenChange={(open) => !open && setExchangeDialogOffer(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Proposer un échange</DialogTitle>
+          </DialogHeader>
+          {exchangeDialogOffer && (
+            <div className="space-y-4 pt-4">
+              <div className="p-4 bg-muted/50 rounded-lg">
+                <p className="font-medium">{exchangeDialogOffer.skill_name}</p>
+                <p className="text-sm text-muted-foreground">
+                  {categoryLabels[exchangeDialogOffer.skill_category as SkillCategory]}
+                </p>
+                <p className="text-sm mt-2">
+                  Disponible: {exchangeDialogOffer.hours_available}h
+                </p>
+              </div>
+              <div>
+                <Label htmlFor="exchange-hours">Heures demandées</Label>
+                <Input
+                  id="exchange-hours"
+                  type="number"
+                  value={exchangeHours}
+                  onChange={(e) => setExchangeHours(parseFloat(e.target.value) || 1)}
+                  min={0.5}
+                  max={exchangeDialogOffer.hours_available}
+                  step={0.5}
+                />
+              </div>
+              <Button 
+                onClick={handleRequestExchange}
+                className="w-full bg-gradient-to-r from-amber-500 to-orange-600"
+                disabled={requestExchange.isPending || exchangeHours > exchangeDialogOffer.hours_available}
+              >
+                {requestExchange.isPending ? 'Envoi...' : 'Envoyer la demande'}
+              </Button>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

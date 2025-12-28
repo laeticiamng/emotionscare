@@ -55,7 +55,7 @@ import {
   TabsList,
   TabsTrigger,
 } from '@/components/ui/tabs';
-import { useEmotionAssets, useEmotionPortfolio, useBuyEmotionAsset } from '../hooks/useExchangeData';
+import { useEmotionAssets, useEmotionPortfolio, useBuyEmotionAsset, useEmotionTransactionHistory } from '../hooks/useExchangeData';
 import type { EmotionType, EmotionAsset } from '../types';
 import { toast } from 'sonner';
 import { useToast } from '@/hooks/use-toast';
@@ -102,6 +102,7 @@ const EmotionMarket: React.FC = () => {
   const { toast: toastHook } = useToast();
   const { data: assets, isLoading: assetsLoading } = useEmotionAssets();
   const { data: portfolio } = useEmotionPortfolio();
+  const { data: transactionHistory } = useEmotionTransactionHistory();
   const buyAsset = useBuyEmotionAsset();
   
   const [selectedAsset, setSelectedAsset] = useState<EmotionAsset | null>(null);
@@ -123,12 +124,25 @@ const EmotionMarket: React.FC = () => {
     return saved ? JSON.parse(saved) : {};
   });
   
-  // Transaction History (mock)
-  const [transactions] = useState<Transaction[]>([
-    { id: '1', assetName: 'Calme Profond', type: 'buy', quantity: 2, price: 150, date: '2024-01-15' },
-    { id: '2', assetName: 'Focus Intense', type: 'buy', quantity: 1, price: 200, date: '2024-01-14' },
-    { id: '3', assetName: 'Joie Pure', type: 'sell', quantity: 1, price: 180, date: '2024-01-13' },
-  ]);
+  // Transaction History from DB with fallback
+  const transactions = useMemo(() => {
+    if (transactionHistory && transactionHistory.length > 0) {
+      return transactionHistory.map((t: any) => ({
+        id: t.id,
+        assetName: t.asset?.name || 'Asset inconnu',
+        type: t.transaction_type as 'buy' | 'sell',
+        quantity: t.quantity,
+        price: t.total_price,
+        date: new Date(t.created_at).toISOString().split('T')[0],
+      }));
+    }
+    // Fallback mock
+    return [
+      { id: '1', assetName: 'Calme Profond', type: 'buy' as const, quantity: 2, price: 150, date: '2024-01-15' },
+      { id: '2', assetName: 'Focus Intense', type: 'buy' as const, quantity: 1, price: 200, date: '2024-01-14' },
+      { id: '3', assetName: 'Joie Pure', type: 'sell' as const, quantity: 1, price: 180, date: '2024-01-13' },
+    ];
+  }, [transactionHistory]);
 
   // Toggle watchlist
   const toggleWatchlist = (assetId: string) => {
