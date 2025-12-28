@@ -297,6 +297,60 @@ serve(async (req) => {
         }
         break;
 
+      case 'extend':
+        // Documentation: https://docs.sunoapi.org/suno-api/extend-music
+        try {
+          const { audioId, continueAt = 120 } = body;
+          
+          if (!audioId) {
+            throw new Error('audioId is required for extend');
+          }
+          
+          console.log('[suno-music] Extending track:', audioId, 'from:', continueAt);
+          
+          const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
+          const callBackUrl = `${supabaseUrl}/functions/v1/suno-callback`;
+          
+          const extendResponse = await fetch(`${SUNO_API_BASE}/api/v1/extend`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${sunoApiKey}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              audioId,
+              continueAt,
+              model: 'V4_5',
+              callBackUrl
+            })
+          });
+          
+          if (!extendResponse.ok) {
+            const errorText = await extendResponse.text().catch(() => 'Unknown error');
+            console.error(`[suno-music] Extend API error ${extendResponse.status}:`, errorText);
+            throw new Error(`Extend failed: ${extendResponse.status}`);
+          }
+          
+          const extendData = await extendResponse.json();
+          console.log('[suno-music] Extend response:', JSON.stringify(extendData));
+          
+          const extendTaskId = extendData?.data?.taskId || extendData?.taskId;
+          
+          if (extendTaskId) {
+            result = {
+              taskId: extendTaskId,
+              status: 'pending',
+              isFallback: false,
+            };
+          } else {
+            throw new Error('No taskId returned from extend');
+          }
+        } catch (extendError) {
+          console.error('[suno-music] Extend failed:', extendError);
+          throw extendError;
+        }
+        break;
+
       case 'fallback':
         // Demande explicite de fallback
         const fallbackTrack = getFallbackTrack(mood);
