@@ -117,12 +117,29 @@ const EmotionTrendChart: React.FC<EmotionTrendChartProps> = ({
       });
       result.avgScore = Object.values(g.scores).flat().reduce((a, b) => a + b, 0) / 
         Object.values(g.scores).flat().length;
+      // Ajouter un timestamp pour le tri
+      result._sortKey = g.date;
       return result;
     }).sort((a, b) => {
-      // Sort by date
-      const dateA = new Date(a.date.split(' ').reverse().join(' '));
-      const dateB = new Date(b.date.split(' ').reverse().join(' '));
-      return dateA.getTime() - dateB.getTime();
+      // Tri robuste par date en parsant le format français (ex: "15 janv.")
+      const monthMap: Record<string, number> = {
+        'janv': 0, 'févr': 1, 'mars': 2, 'avr': 3, 'mai': 4, 'juin': 5,
+        'juil': 6, 'août': 7, 'sept': 8, 'oct': 9, 'nov': 10, 'déc': 11
+      };
+      
+      const parseDate = (dateStr: string): number => {
+        const parts = dateStr.trim().split(' ');
+        if (parts.length >= 2) {
+          const day = parseInt(parts[0], 10);
+          const monthKey = parts[1].replace('.', '').toLowerCase();
+          const month = monthMap[monthKey] ?? 0;
+          const year = new Date().getFullYear();
+          return new Date(year, month, day).getTime();
+        }
+        return 0;
+      };
+      
+      return parseDate(a.date) - parseDate(b.date);
     });
   }, [filteredData]);
 

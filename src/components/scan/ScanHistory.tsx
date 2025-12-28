@@ -132,19 +132,32 @@ export const ScanHistory: React.FC = () => {
   const handleExport = () => {
     if (!filteredHistory.length) return;
     
+    // Fonction pour échapper correctement les valeurs CSV
+    const escapeCSV = (value: string | number | undefined | null): string => {
+      if (value === undefined || value === null) return '';
+      const str = String(value);
+      // Si la valeur contient des guillemets, virgules ou retours à la ligne, l'entourer de guillemets
+      if (str.includes('"') || str.includes(',') || str.includes('\n') || str.includes('\r')) {
+        return `"${str.replace(/"/g, '""')}"`;
+      }
+      return str;
+    };
+    
     const csvContent = [
       ['Date', 'Valence', 'Arousal', 'Source', 'État', 'Résumé'].join(','),
       ...filteredHistory.map(scan => [
-        format(new Date(scan.created_at), 'dd/MM/yyyy HH:mm'),
+        escapeCSV(format(new Date(scan.created_at), 'dd/MM/yyyy HH:mm')),
         Math.round(scan.valence),
         Math.round(scan.arousal),
-        sourceConfig[scan.source]?.label || scan.source,
-        getEmotionLabel(scan.valence, scan.arousal),
-        `"${scan.summary || ''}"`,
+        escapeCSV(sourceConfig[scan.source]?.label || scan.source),
+        escapeCSV(getEmotionLabel(scan.valence, scan.arousal)),
+        escapeCSV(scan.summary || ''),
       ].join(','))
     ].join('\n');
     
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    // Ajouter BOM pour UTF-8 (support caractères spéciaux dans Excel)
+    const bom = '\uFEFF';
+    const blob = new Blob([bom + csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;

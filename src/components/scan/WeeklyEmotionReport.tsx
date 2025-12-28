@@ -31,7 +31,8 @@ import {
   BarChart3,
   History,
   Star,
-  Award
+  Award,
+  Loader2
 } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
 import { format, startOfWeek, endOfWeek, subWeeks, addWeeks } from 'date-fns';
@@ -39,6 +40,7 @@ import { fr } from 'date-fns/locale';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useToast } from '@/hooks/use-toast';
 import { useScanSettings, WeekSnapshot } from '@/hooks/useScanSettings';
+import { supabase } from '@/integrations/supabase/client';
 
 interface DailyEmotion {
   day: string;
@@ -93,18 +95,110 @@ export const WeeklyEmotionReport: React.FC = () => {
   const { weeklyReports, weeklyGoal, saveWeeklyReport, setWeeklyGoal } = useScanSettings();
   
   const [currentWeek, setCurrentWeek] = useState(new Date());
-  const [weeklyData, setWeeklyData] = useState<DailyEmotion[]>(MOCK_WEEKLY_DATA);
+  const [weeklyData, setWeeklyData] = useState<DailyEmotion[]>([]);
   const [stats, setStats] = useState<WeeklyStats | null>(null);
   const [activeTab, setActiveTab] = useState('overview');
   const [reportHistory, setReportHistory] = useState<WeekSnapshot[]>(weeklyReports);
+  const [isLoadingData, setIsLoadingData] = useState(true);
 
   // Sync from hook
   useEffect(() => {
     setReportHistory(weeklyReports);
   }, [weeklyReports]);
 
+  // Charger les vraies données depuis clinical_signals
   useEffect(() => {
-    generateStats();
+    const loadWeeklyData = async () => {
+      setIsLoadingData(true);
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          setWeeklyData(MOCK_WEEKLY_DATA);
+          setIsLoadingData(false);
+          return;
+        }
+
+        const weekStart = startOfWeek(currentWeek, { weekStartsOn: 1 });
+        const weekEnd = endOfWeek(currentWeek, { weekStartsOn: 1 });
+
+        const { data: signals, error } = await supabase
+          .from('clinical_signals')
+          .select('metadata, created_at, source_instrument')
+          .eq('user_id', user.id)
+          .gte('created_at', weekStart.toISOString())
+          .lte('created_at', weekEnd.toISOString())
+          .order('created_at', { ascending: true });
+
+        if (error || !signals || signals.length === 0) {
+          // Fallback aux données mock si pas de données
+          setWeeklyData(MOCK_WEEKLY_DATA);
+          setIsLoadingData(false);
+          return;
+        }
+
+        // Grouper par jour
+        const dayNames = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
+        const dailyGroups: Record<string, { valences: number[]; arousals: number[]; emotions: string[] }> = {};
+
+        signals.forEach((signal: any) => {
+          const date = new Date(signal.created_at);
+          const dayName = dayNames[date.getDay()];
+          const metadata = signal.metadata as any;
+
+          if (!dailyGroups[dayName]) {
+            dailyGroups[dayName] = { valences: [], arousals: [], emotions: [] };
+          }
+
+          const valence = metadata?.valence ?? 50;
+          const arousal = metadata?.arousal ?? 50;
+          const emotion = metadata?.summary || metadata?.emotion || 'Neutre';
+
+          dailyGroups[dayName].valences.push(valence);
+          dailyGroups[dayName].arousals.push(arousal);
+          dailyGroups[dayName].emotions.push(emotion);
+        });
+
+        // Convertir en format DailyEmotion
+        const weekDays = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+        const realData: DailyEmotion[] = weekDays.map(day => {
+          const group = dailyGroups[day];
+          if (!group || group.valences.length === 0) {
+            return { day, valence: 0, arousal: 0, dominantEmotion: '-', scansCount: 0 };
+          }
+
+          const avgValence = group.valences.reduce((a, b) => a + b, 0) / group.valences.length;
+          const avgArousal = group.arousals.reduce((a, b) => a + b, 0) / group.arousals.length;
+          
+          // Trouver l'émotion dominante
+          const emotionCounts: Record<string, number> = {};
+          group.emotions.forEach(e => { emotionCounts[e] = (emotionCounts[e] || 0) + 1; });
+          const dominantEmotion = Object.entries(emotionCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || 'Neutre';
+
+          return {
+            day,
+            valence: Math.round(avgValence),
+            arousal: Math.round(avgArousal),
+            dominantEmotion,
+            scansCount: group.valences.length
+          };
+        });
+
+        setWeeklyData(realData);
+      } catch (err) {
+        console.error('[WeeklyEmotionReport] Error loading data:', err);
+        setWeeklyData(MOCK_WEEKLY_DATA);
+      } finally {
+        setIsLoadingData(false);
+      }
+    };
+
+    loadWeeklyData();
+  }, [currentWeek]);
+
+  useEffect(() => {
+    if (weeklyData.length > 0) {
+      generateStats();
+    }
   }, [weeklyData, weeklyGoal]);
 
   const generateStats = () => {
