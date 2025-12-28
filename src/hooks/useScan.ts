@@ -1,8 +1,14 @@
-// @ts-nocheck
 import { useState, useCallback } from 'react';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';
+
+// Declare gtag on window for analytics
+declare global {
+  interface Window {
+    gtag?: (...args: unknown[]) => void;
+  }
+}
 
 export type ScanMode = 'photo' | 'camera';
 export type ScanBucket = 'positif' | 'calme' | 'neutre' | 'tendu';
@@ -30,7 +36,7 @@ const compressImage = (file: File, maxWidth = 1280, quality = 0.7): Promise<stri
 
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
-    const img = new Image();
+    const img = new window.Image();
 
     img.onload = () => {
       // Calculate new dimensions
@@ -136,11 +142,7 @@ export const useScan = () => {
       toast({
         title: "Analyse impossible",
         description: "Réessayez dans quelques instants",
-        variant: "destructive",
-        action: {
-          label: "Réessayer",
-          onClick: () => analyzeImage(imageBase64, mode)
-        }
+        variant: "destructive"
       });
     }
   }, []);
