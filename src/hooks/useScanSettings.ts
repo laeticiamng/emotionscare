@@ -22,6 +22,10 @@ const HISTORY_FAVORITES_KEY = 'scan:history_favorites';
 const RESULT_HISTORY_KEY = 'scan:result_history';
 const WEEKLY_REPORTS_KEY = 'scan:weekly_reports';
 const WEEKLY_GOAL_KEY = 'scan:weekly_goal';
+const EXPORT_HISTORY_KEY = 'scan:export_history';
+const EMOTION_BOOKMARKS_KEY = 'scan:emotion_bookmarks';
+const TEXT_DRAFTS_KEY = 'scan:text_drafts';
+const TEXT_HISTORY_KEY = 'scan:text_history';
 
 export interface ScanStats {
   totalScans: number;
@@ -55,6 +59,25 @@ export interface WeekSnapshot {
   stats: any;
 }
 
+export interface ExportRecord {
+  id: string;
+  format: string;
+  date: string;
+  itemCount: number;
+}
+
+export interface TextDraft {
+  id: string;
+  text: string;
+  date: string;
+}
+
+export interface TextHistoryEntry {
+  text: string;
+  date: string;
+  sentiment: string;
+}
+
 const defaultStats: ScanStats = {
   totalScans: 0,
   scansByMethod: {},
@@ -79,6 +102,10 @@ export function useScanSettings() {
   const [resultHistory, setResultHistory] = useState<ResultHistoryEntry[]>([]);
   const [weeklyReports, setWeeklyReports] = useState<WeekSnapshot[]>([]);
   const [weeklyGoal, setWeeklyGoalState] = useState(14);
+  const [exportHistory, setExportHistory] = useState<ExportRecord[]>([]);
+  const [emotionBookmarks, setEmotionBookmarks] = useState<string[]>([]);
+  const [textDrafts, setTextDrafts] = useState<TextDraft[]>([]);
+  const [textHistory, setTextHistory] = useState<TextHistoryEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -102,6 +129,14 @@ export function useScanSettings() {
         if (wReports) setWeeklyReports(JSON.parse(wReports));
         const wGoal = localStorage.getItem('weekly_emotion_goals');
         if (wGoal) setWeeklyGoalState(parseInt(wGoal, 10));
+        const expHist = localStorage.getItem('scan_export_history');
+        if (expHist) setExportHistory(JSON.parse(expHist));
+        const emBookmarks = localStorage.getItem('emotion-bookmarks');
+        if (emBookmarks) setEmotionBookmarks(JSON.parse(emBookmarks));
+        const tDrafts = localStorage.getItem('emotion_text_drafts');
+        if (tDrafts) setTextDrafts(JSON.parse(tDrafts));
+        const tHist = localStorage.getItem('emotion_text_history');
+        if (tHist) setTextHistory(JSON.parse(tHist));
       } catch (e) {
         logger.warn('Failed to load localStorage fallback', {}, 'SCAN');
       }
@@ -117,7 +152,8 @@ export function useScanSettings() {
         .in('key', [
           SCAN_STATS_KEY, SCAN_HISTORY_KEY, FAVORITE_METHODS_KEY, SCAN_DRAFT_KEY,
           ONBOARDING_KEY, EMOJI_FAVORITES_KEY, EMOJI_HISTORY_KEY, EMOJI_STATS_KEY,
-          HISTORY_FAVORITES_KEY, RESULT_HISTORY_KEY, WEEKLY_REPORTS_KEY, WEEKLY_GOAL_KEY
+          HISTORY_FAVORITES_KEY, RESULT_HISTORY_KEY, WEEKLY_REPORTS_KEY, WEEKLY_GOAL_KEY,
+          EXPORT_HISTORY_KEY, EMOTION_BOOKMARKS_KEY, TEXT_DRAFTS_KEY, TEXT_HISTORY_KEY
         ]);
 
       if (error) {
@@ -366,6 +402,48 @@ export function useScanSettings() {
     debouncedSave(WEEKLY_GOAL_KEY, goal);
   }, [debouncedSave]);
 
+  // Export history
+  const addExportRecord = useCallback((record: Omit<ExportRecord, 'id'>) => {
+    setExportHistory(prev => {
+      const newRecord = { ...record, id: Date.now().toString() };
+      const updated = [newRecord, ...prev].slice(0, 20);
+      debouncedSave(EXPORT_HISTORY_KEY, updated);
+      return updated;
+    });
+  }, [debouncedSave]);
+
+  // Emotion bookmarks
+  const toggleEmotionBookmark = useCallback((id: string) => {
+    setEmotionBookmarks(prev => {
+      const updated = prev.includes(id) ? prev.filter(b => b !== id) : [...prev, id];
+      debouncedSave(EMOTION_BOOKMARKS_KEY, updated);
+      return updated;
+    });
+  }, [debouncedSave]);
+
+  const isEmotionBookmarked = useCallback((id: string) => {
+    return emotionBookmarks.includes(id);
+  }, [emotionBookmarks]);
+
+  // Text drafts
+  const saveTextDraft = useCallback((draft: Omit<TextDraft, 'id'>) => {
+    setTextDrafts(prev => {
+      const newDraft = { ...draft, id: Date.now().toString() };
+      const updated = [newDraft, ...prev.filter(d => d.text !== draft.text)].slice(0, 10);
+      debouncedSave(TEXT_DRAFTS_KEY, updated);
+      return updated;
+    });
+  }, [debouncedSave]);
+
+  // Text history
+  const addTextHistory = useCallback((entry: TextHistoryEntry) => {
+    setTextHistory(prev => {
+      const updated = [entry, ...prev].slice(0, 50);
+      debouncedSave(TEXT_HISTORY_KEY, updated);
+      return updated;
+    });
+  }, [debouncedSave]);
+
   // Cleanup on unmount
   useEffect(() => {
     return () => {
@@ -388,6 +466,10 @@ export function useScanSettings() {
     resultHistory,
     weeklyReports,
     weeklyGoal,
+    exportHistory,
+    emotionBookmarks,
+    textDrafts,
+    textHistory,
     isLoading,
     updateStats,
     addHistoryEntry,
@@ -403,6 +485,11 @@ export function useScanSettings() {
     toggleResultFavorite,
     saveWeeklyReport,
     setWeeklyGoal,
+    addExportRecord,
+    toggleEmotionBookmark,
+    isEmotionBookmarked,
+    saveTextDraft,
+    addTextHistory,
     reload: loadSettings
   };
 }

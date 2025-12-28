@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -10,6 +10,7 @@ import {
   Calendar, TrendingUp, Clock
 } from 'lucide-react';
 import { useScanHistory } from '@/hooks/useScanHistory';
+import { useScanSettings, ExportRecord } from '@/hooks/useScanSettings';
 import {
   exportAsJSON,
   exportAsCSV,
@@ -22,15 +23,6 @@ import { useToast } from '@/hooks/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 
 type ExportFormat = 'json' | 'csv' | 'pdf' | 'all';
-
-interface ExportRecord {
-  id: string;
-  format: ExportFormat;
-  date: string;
-  itemCount: number;
-}
-
-const STORAGE_KEY = 'scan_export_history';
 
 const ExportOption: React.FC<{
   format: ExportFormat;
@@ -71,33 +63,24 @@ const ExportOption: React.FC<{
 export const ScanExportPanel: React.FC = () => {
   const { data: history = [] } = useScanHistory(100);
   const { toast } = useToast();
+  const { exportHistory, addExportRecord } = useScanSettings();
   const [loadingFormat, setLoadingFormat] = useState<ExportFormat | null>(null);
   const [lastExport, setLastExport] = useState<ExportFormat | null>(null);
   const [activeTab, setActiveTab] = useState('export');
+  const [localExportHistory, setLocalExportHistory] = useState<ExportRecord[]>(exportHistory);
 
-  // Export history persistence
-  const [exportHistory, setExportHistory] = useState<ExportRecord[]>(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      return stored ? JSON.parse(stored) : [];
-    } catch {
-      return [];
-    }
-  });
+  // Sync from hook
+  useEffect(() => {
+    setLocalExportHistory(exportHistory);
+  }, [exportHistory]);
 
   const saveExportRecord = useCallback((format: ExportFormat, itemCount: number) => {
-    const record: ExportRecord = {
-      id: Date.now().toString(),
+    addExportRecord({
       format,
       date: new Date().toISOString(),
       itemCount
-    };
-    setExportHistory(prev => {
-      const updated = [record, ...prev].slice(0, 20);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-      return updated;
     });
-  }, []);
+  }, [addExportRecord]);
 
   // Statistics
   const stats = useMemo(() => {
