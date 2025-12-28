@@ -1,8 +1,6 @@
-// @ts-nocheck
-
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { useMusicEmotionIntegration } from '@/hooks/useMusicEmotionIntegration';
-import { useMusic } from '@/hooks/useMusic';
+import { MusicContext } from '@/contexts/music/MusicContext';
 import { MusicPlaylist } from '@/types/music';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -23,8 +21,8 @@ export const MusicRecommendation: React.FC<MusicRecommendationProps> = ({
   const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
   const { playEmotion, isLoading, getEmotionMusicDescription } = useMusicEmotionIntegration();
   
-  // Connexion au contexte audio réel
-  const musicContext = useMusic();
+  // Connexion au contexte audio réel - utilise useContext directement pour éviter le throw
+  const musicContext = useContext(MusicContext);
   const isPlaying = musicContext?.state?.isPlaying ?? false;
   const currentTime = musicContext?.state?.currentTime ?? 0;
   const duration = musicContext?.state?.duration ?? 0;
