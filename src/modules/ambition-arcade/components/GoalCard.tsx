@@ -22,6 +22,7 @@ import {
 import { useCompleteGoal, useAbandonGoal } from '../hooks/useAmbitionGoals';
 import { useAmbitionFavorites, useAmbitionRatings } from '../hooks/useAmbitionExtras';
 import { RatingStars } from './RatingStars';
+import { ArtifactGallery } from './ArtifactGallery';
 
 interface GoalCardProps {
   goal: AmbitionGoal;
@@ -210,6 +211,11 @@ export const GoalCard: React.FC<GoalCardProps> = ({ goal }) => {
                   </div>
                 )}
 
+                {/* Artifacts */}
+                <div className="pt-2 border-t">
+                  <p className="text-xs text-muted-foreground mb-2">Artefacts</p>
+                  <ArtifactGallery runId={goal.id} compact />
+                </div>
                 {/* Add Quest */}
                 {!isCompleted && !isAbandoned && (
                   <div className="flex gap-2">

@@ -6,6 +6,7 @@ export { AchievementsTab } from './components/AchievementsTab';
 export { RecommendationsPanel } from './components/RecommendationsPanel';
 export { ExportButton } from './components/ExportButton';
 export { RatingStars } from './components/RatingStars';
+export { ArtifactGallery } from './components/ArtifactGallery';
 export { useAmbitionMachine } from './useAmbitionMachine';
 export * as ambitionService from './ambitionArcadeService';
 export * from './types';

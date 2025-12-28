@@ -101,7 +101,17 @@ export const RecommendationsPanel: React.FC<RecommendationsPanelProps> = ({ onSe
   }
 
   if (!recommendations || recommendations.length === 0) {
-    return null;
+    return (
+      <Card className="border-dashed">
+        <CardContent className="py-12 text-center">
+          <Lightbulb className="w-12 h-12 mx-auto mb-4 text-muted-foreground opacity-50" />
+          <h3 className="text-lg font-semibold mb-2">Pas de suggestions pour le moment</h3>
+          <p className="text-muted-foreground text-sm">
+            Créez des objectifs et marquez-les en favoris pour recevoir des suggestions personnalisées
+          </p>
+        </CardContent>
+      </Card>
+    );
   }
 
   return (

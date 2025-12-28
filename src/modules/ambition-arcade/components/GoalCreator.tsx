@@ -142,24 +142,34 @@ export const GoalCreator: React.FC<GoalCreatorProps> = ({ onSuccess }) => {
             </div>
           )}
 
-          {/* Submit */}
-          <Button 
-            type="submit" 
-            className="w-full" 
-            disabled={!objective.trim() || createGoal.isPending}
-          >
-            {createGoal.isPending ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Création...
-              </>
-            ) : (
-              <>
-                <Target className="w-4 h-4 mr-2" />
-                Lancer l'aventure
-              </>
-            )}
-          </Button>
+          {/* Actions */}
+          <div className="flex gap-2">
+            <Button 
+              type="button"
+              variant="outline"
+              onClick={() => onSuccess?.()}
+              className="flex-1"
+            >
+              Annuler
+            </Button>
+            <Button 
+              type="submit" 
+              className="flex-1" 
+              disabled={!objective.trim() || createGoal.isPending}
+            >
+              {createGoal.isPending ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Création...
+                </>
+              ) : (
+                <>
+                  <Target className="w-4 h-4 mr-2" />
+                  Lancer l'aventure
+                </>
+              )}
+            </Button>
+          </div>
         </form>
       </CardContent>
     </Card>
