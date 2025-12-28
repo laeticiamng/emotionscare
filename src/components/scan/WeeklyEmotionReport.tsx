@@ -152,26 +152,24 @@ export const WeeklyEmotionReport: React.FC = () => {
     setStats(newStats);
   };
 
-  const saveReport = useCallback(() => {
+  const handleSaveReport = useCallback(() => {
     if (!stats) return;
     
-    const weekStart = startOfWeek(currentWeek, { weekStartsOn: 1 }).toISOString();
-    const snapshot: WeekSnapshot = { weekStart, stats };
+    const weekStartDate = startOfWeek(currentWeek, { weekStartsOn: 1 }).toISOString();
+    const snapshot: WeekSnapshot = { weekStart: weekStartDate, stats };
     
+    saveWeeklyReport(snapshot);
     setReportHistory(prev => {
-      const filtered = prev.filter(r => r.weekStart !== weekStart);
-      const updated = [snapshot, ...filtered].slice(0, 12);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-      return updated;
+      const filtered = prev.filter(r => r.weekStart !== weekStartDate);
+      return [snapshot, ...filtered].slice(0, 12);
     });
     
     toast({ title: 'Rapport sauvegardé', description: 'Consultez l\'historique.' });
-  }, [stats, currentWeek, toast]);
+  }, [stats, currentWeek, toast, saveWeeklyReport]);
 
   const updateWeeklyGoal = (goal: string) => {
     const newGoal = parseInt(goal, 10);
     setWeeklyGoal(newGoal);
-    localStorage.setItem(GOALS_KEY, goal);
   };
 
   const navigateWeek = (direction: 'prev' | 'next') => {
@@ -259,7 +257,7 @@ export const WeeklyEmotionReport: React.FC = () => {
           <Button variant="outline" size="icon" onClick={handleShare}>
             <Share2 className="h-4 w-4" />
           </Button>
-          <Button variant="default" size="sm" onClick={saveReport}>
+          <Button variant="default" size="sm" onClick={handleSaveReport}>
             <Star className="h-4 w-4 mr-1" />
             Sauvegarder
           </Button>

@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -16,6 +16,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { useScanSettings } from '@/hooks/useScanSettings';
 
 interface EmotionResultCardProps {
   result: EmotionResult;
@@ -41,12 +42,15 @@ const EmotionResultCard: React.FC<EmotionResultCardProps> = ({
   showDetailed = true,
 }) => {
   const { user } = useAuth();
+  const { isEmotionBookmarked, toggleEmotionBookmark } = useScanSettings();
   const [showDetails, setShowDetails] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
-  const [isBookmarked, setIsBookmarked] = useState(() => {
-    const bookmarks = JSON.parse(localStorage.getItem('emotion-bookmarks') || '[]');
-    return bookmarks.includes(result.id);
-  });
+  const [isBookmarked, setIsBookmarked] = useState(isEmotionBookmarked(result.id));
+
+  // Sync bookmark state
+  useEffect(() => {
+    setIsBookmarked(isEmotionBookmarked(result.id));
+  }, [result.id, isEmotionBookmarked]);
 
   const date = new Date(result.date);
   const formattedDate = formatDistanceToNow(date, { addSuffix: true, locale: fr });
@@ -97,18 +101,9 @@ const EmotionResultCard: React.FC<EmotionResultCardProps> = ({
   };
 
   const handleBookmark = () => {
-    const bookmarks = JSON.parse(localStorage.getItem('emotion-bookmarks') || '[]');
-    if (isBookmarked) {
-      const filtered = bookmarks.filter((id: string) => id !== result.id);
-      localStorage.setItem('emotion-bookmarks', JSON.stringify(filtered));
-      setIsBookmarked(false);
-      toast.success('Retiré des favoris');
-    } else {
-      bookmarks.push(result.id);
-      localStorage.setItem('emotion-bookmarks', JSON.stringify(bookmarks));
-      setIsBookmarked(true);
-      toast.success('Ajouté aux favoris ⭐');
-    }
+    toggleEmotionBookmark(result.id);
+    setIsBookmarked(!isBookmarked);
+    toast.success(isBookmarked ? 'Retiré des favoris' : 'Ajouté aux favoris ⭐');
   };
 
   const handleShare = async () => {

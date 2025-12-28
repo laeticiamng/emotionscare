@@ -12,6 +12,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { useScanSettings, TextDraft, TextHistoryEntry } from '@/hooks/useScanSettings';
 
 const TEMPLATES = [
   { id: 'morning', label: '🌅 Matin', text: "Ce matin, je me sens..." },
@@ -28,9 +29,6 @@ const EMOTION_KEYWORDS = {
   neutral: ['normal', 'correct', 'moyen', 'ordinaire', 'habituel']
 };
 
-const DRAFTS_KEY = 'emotion_text_drafts';
-const HISTORY_KEY = 'emotion_text_history';
-
 interface EmotionTextInputProps {
   value: string;
   onChange: (text: string) => void;
@@ -46,24 +44,24 @@ const EmotionTextInput: React.FC<EmotionTextInputProps> = ({
   placeholder = "Décrivez ce que vous ressentez...",
   className = "" 
 }) => {
+  const { textDrafts, textHistory, saveTextDraft, addTextHistory } = useScanSettings();
+  
   const [isRecording, setIsRecording] = useState(false);
   const [showTemplates, setShowTemplates] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
-  const [drafts, setDrafts] = useState<{ id: string; text: string; date: string }[]>([]);
-  const [history, setHistory] = useState<{ text: string; date: string; sentiment: string }[]>([]);
+  const [drafts, setDrafts] = useState<TextDraft[]>(textDrafts);
+  const [history, setHistory] = useState<TextHistoryEntry[]>(textHistory);
   const [sentiment, setSentiment] = useState<'positive' | 'negative' | 'neutral' | null>(null);
   const [wordCount, setWordCount] = useState(0);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [autosaveTimer, setAutosaveTimer] = useState<NodeJS.Timeout | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Load saved data
+  // Sync from hook
   useEffect(() => {
-    const savedDrafts = localStorage.getItem(DRAFTS_KEY);
-    const savedHistory = localStorage.getItem(HISTORY_KEY);
-    if (savedDrafts) setDrafts(JSON.parse(savedDrafts));
-    if (savedHistory) setHistory(JSON.parse(savedHistory));
-  }, []);
+    setDrafts(textDrafts);
+    setHistory(textHistory);
+  }, [textDrafts, textHistory]);
 
   // Analyze sentiment in real-time
   useEffect(() => {
