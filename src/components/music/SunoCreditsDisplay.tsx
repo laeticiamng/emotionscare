@@ -1,8 +1,9 @@
 /**
  * SunoCreditsDisplay - Affichage des crédits Suno avec détails
+ * Inclut notification proactive quand les crédits sont bas
  */
 
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -10,6 +11,7 @@ import { Progress } from '@/components/ui/progress';
 import { Coins, RefreshCw, Sparkles, AlertTriangle, Loader2 } from 'lucide-react';
 import { useSunoVinyl } from '@/hooks/useSunoVinyl';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 interface SunoCreditsDisplayProps {
   compact?: boolean;
@@ -22,6 +24,7 @@ const SunoCreditsDisplay: React.FC<SunoCreditsDisplayProps> = ({
 }) => {
   const { credits, refreshCredits } = useSunoVinyl();
   const [isRefreshing, setIsRefreshing] = React.useState(false);
+  const hasShownWarning = useRef(false);
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
@@ -35,6 +38,26 @@ const SunoCreditsDisplay: React.FC<SunoCreditsDisplayProps> = ({
 
   const isLow = credits.remaining >= 0 && credits.remaining < 10;
   const isCritical = credits.remaining >= 0 && credits.remaining < 3;
+
+  // Toast proactif au chargement si crédits faibles
+  useEffect(() => {
+    if (credits.loading || hasShownWarning.current) return;
+    if (credits.remaining < 0) return; // Non configuré
+    
+    if (isCritical) {
+      hasShownWarning.current = true;
+      toast.warning('Crédits Suno critiques !', {
+        description: `Il vous reste ${credits.remaining} crédit(s). Pensez à recharger.`,
+        duration: 8000,
+      });
+    } else if (isLow) {
+      hasShownWarning.current = true;
+      toast.info('Crédits Suno limités', {
+        description: `${credits.remaining} crédit(s) restants sur ${credits.total}.`,
+        duration: 5000,
+      });
+    }
+  }, [credits.loading, credits.remaining, credits.total, isLow, isCritical]);
 
   if (credits.loading) {
     return (

@@ -34,6 +34,8 @@ import { logger } from '@/lib/logger';
 import { cn } from '@/lib/utils';
 import { useSunoRealtimeUpdates } from '@/hooks/useSunoRealtimeUpdates';
 import { TrackFeedback } from './TrackFeedback';
+import TrackDownloadButton from './TrackDownloadButton';
+import TrackExtendButton from './TrackExtendButton';
 
 interface GeneratedTrack {
   id: string;
@@ -659,11 +661,37 @@ export const SunoMusicGenerator: React.FC = () => {
                           <Heart className="h-4 w-4 mr-2" />
                           Favoris
                         </Button>
-                        <Button variant="outline" className="flex-1">
-                          <Download className="h-4 w-4 mr-2" />
-                          Télécharger
-                        </Button>
+                        <TrackDownloadButton
+                          track={{
+                            id: currentTrack.id,
+                            title: currentTrack.title,
+                            audioUrl: currentTrack.audioUrl,
+                            url: currentTrack.audioUrl,
+                            artist: 'EmotionsCare AI',
+                            duration: currentTrack.duration || 180,
+                          }}
+                          variant="outline"
+                          size="sm"
+                          showLabel
+                        />
                       </div>
+
+                      {/* Bouton Étendre */}
+                      <TrackExtendButton
+                        track={{
+                          id: currentTrack.id,
+                          title: currentTrack.title,
+                          audioUrl: currentTrack.audioUrl,
+                          url: currentTrack.audioUrl,
+                          artist: 'EmotionsCare AI',
+                          duration: currentTrack.duration || 180,
+                        }}
+                        onExtended={(newUrl) => {
+                          setCurrentTrack(prev => prev ? { ...prev, audioUrl: newUrl } : prev);
+                        }}
+                        variant="outline"
+                        size="sm"
+                      />
 
                       {/* Feedback Component */}
                       <TrackFeedback
