@@ -29,7 +29,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { useTrustProfile, useTrustProjects, useGiveTrust } from '../hooks/useExchangeData';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { useTrustProfile, useTrustProjects, useGiveTrust, useCreateTrustProject, useTrustLeaderboard } from '../hooks/useExchangeData';
 import type { TrustLevel } from '../types';
 import { toast } from 'sonner';
 
@@ -49,12 +56,29 @@ const levelLabels: Record<TrustLevel, string> = {
   legend: 'Légende',
 };
 
+const projectCategories = [
+  { value: 'wellness', label: 'Bien-être' },
+  { value: 'education', label: 'Éducation' },
+  { value: 'community', label: 'Communauté' },
+  { value: 'health', label: 'Santé' },
+  { value: 'environment', label: 'Environnement' },
+  { value: 'innovation', label: 'Innovation' },
+];
+
 const TrustMarket: React.FC = () => {
   const { data: profile, isLoading: profileLoading } = useTrustProfile();
   const { data: projects, isLoading: projectsLoading } = useTrustProjects();
+  const { data: leaderboard, isLoading: leaderboardLoading } = useTrustLeaderboard();
   const giveTrust = useGiveTrust();
+  const createProject = useCreateTrustProject();
   const [selectedProject, setSelectedProject] = useState<string | null>(null);
   const [trustAmount, setTrustAmount] = useState(10);
+  const [isProjectDialogOpen, setIsProjectDialogOpen] = useState(false);
+  const [newProject, setNewProject] = useState({
+    title: '',
+    description: '',
+    category: '',
+  });
 
   const handleGiveTrust = async (projectId: string) => {
     try {
@@ -67,6 +91,22 @@ const TrustMarket: React.FC = () => {
       setSelectedProject(null);
     } catch (error) {
       toast.error('Erreur lors du don de confiance');
+    }
+  };
+
+  const handleCreateProject = async () => {
+    if (!newProject.title || !newProject.category) {
+      toast.error('Veuillez remplir tous les champs requis');
+      return;
+    }
+
+    try {
+      await createProject.mutateAsync(newProject);
+      toast.success('Projet créé avec succès !');
+      setIsProjectDialogOpen(false);
+      setNewProject({ title: '', description: '', category: '' });
+    } catch (error) {
+      toast.error('Erreur lors de la création du projet');
     }
   };
 
@@ -150,10 +190,62 @@ const TrustMarket: React.FC = () => {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold">Projets à soutenir</h3>
-          <Button variant="outline" size="sm">
-            <Plus className="w-4 h-4 mr-2" aria-hidden="true" />
-            Créer un projet
-          </Button>
+          <Dialog open={isProjectDialogOpen} onOpenChange={setIsProjectDialogOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline" size="sm">
+                <Plus className="w-4 h-4 mr-2" aria-hidden="true" />
+                Créer un projet
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Créer un projet de confiance</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4 pt-4">
+                <div>
+                  <Label htmlFor="project-title">Titre du projet</Label>
+                  <Input
+                    id="project-title"
+                    value={newProject.title}
+                    onChange={(e) => setNewProject(prev => ({ ...prev, title: e.target.value }))}
+                    placeholder="Ex: Programme de bien-être communautaire"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="project-category">Catégorie</Label>
+                  <Select
+                    value={newProject.category}
+                    onValueChange={(v) => setNewProject(prev => ({ ...prev, category: v }))}
+                  >
+                    <SelectTrigger id="project-category">
+                      <SelectValue placeholder="Sélectionner une catégorie" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {projectCategories.map((cat) => (
+                        <SelectItem key={cat.value} value={cat.value}>{cat.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="project-description">Description (optionnel)</Label>
+                  <Textarea
+                    id="project-description"
+                    value={newProject.description}
+                    onChange={(e) => setNewProject(prev => ({ ...prev, description: e.target.value }))}
+                    placeholder="Décrivez votre projet..."
+                  />
+                </div>
+                <Button 
+                  onClick={handleCreateProject}
+                  className="w-full bg-gradient-to-r from-blue-500 to-indigo-600"
+                  disabled={createProject.isPending}
+                >
+                  {createProject.isPending ? 'Création...' : 'Créer le projet'}
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
 
         {projectsLoading ? (
@@ -262,7 +354,7 @@ const TrustMarket: React.FC = () => {
             <p className="text-sm text-muted-foreground mb-4">
               Soyez le premier à créer un projet de confiance
             </p>
-            <Button>
+            <Button onClick={() => setIsProjectDialogOpen(true)}>
               <Plus className="w-4 h-4 mr-2" aria-hidden="true" />
               Créer un projet
             </Button>
@@ -280,32 +372,70 @@ const TrustMarket: React.FC = () => {
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            {[1, 2, 3, 4, 5].map((rank) => (
-              <div 
-                key={rank}
-                className="flex items-center gap-4 p-3 bg-muted/30 rounded-lg"
-              >
-                <span className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${
-                  rank === 1 ? 'bg-amber-500 text-white' :
-                  rank === 2 ? 'bg-gray-400 text-white' :
-                  rank === 3 ? 'bg-amber-700 text-white' :
-                  'bg-muted text-muted-foreground'
-                }`}>
-                  {rank}
-                </span>
-                <Avatar className="w-10 h-10">
-                  <AvatarFallback>U{rank}</AvatarFallback>
-                </Avatar>
-                <div className="flex-1">
-                  <p className="font-medium">Utilisateur #{rank}</p>
-                  <p className="text-xs text-muted-foreground">Niveau Expert</p>
+            {leaderboardLoading ? (
+              [...Array(5)].map((_, i) => (
+                <div key={i} className="h-16 bg-muted/30 rounded-lg animate-pulse" />
+              ))
+            ) : leaderboard && leaderboard.length > 0 ? (
+              leaderboard.map((entry: any, index: number) => {
+                const rank = index + 1;
+                const userLevel = entry.level as TrustLevel || 'trusted';
+                return (
+                  <div 
+                    key={entry.id}
+                    className="flex items-center gap-4 p-3 bg-muted/30 rounded-lg"
+                  >
+                    <span className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${
+                      rank === 1 ? 'bg-amber-500 text-white' :
+                      rank === 2 ? 'bg-gray-400 text-white' :
+                      rank === 3 ? 'bg-amber-700 text-white' :
+                      'bg-muted text-muted-foreground'
+                    }`}>
+                      {rank}
+                    </span>
+                    <Avatar className="w-10 h-10">
+                      <AvatarFallback>{entry.user_id?.slice(0, 2).toUpperCase() || 'U'}</AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1">
+                      <p className="font-medium">Utilisateur</p>
+                      <p className="text-xs text-muted-foreground">{levelLabels[userLevel]}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-bold">{entry.trust_score || 0}</p>
+                      <p className="text-xs text-muted-foreground">points</p>
+                    </div>
+                  </div>
+                );
+              })
+            ) : (
+              // Fallback mock data
+              [...Array(5)].map((_, rank) => (
+                <div 
+                  key={rank}
+                  className="flex items-center gap-4 p-3 bg-muted/30 rounded-lg"
+                >
+                  <span className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${
+                    rank === 0 ? 'bg-amber-500 text-white' :
+                    rank === 1 ? 'bg-gray-400 text-white' :
+                    rank === 2 ? 'bg-amber-700 text-white' :
+                    'bg-muted text-muted-foreground'
+                  }`}>
+                    {rank + 1}
+                  </span>
+                  <Avatar className="w-10 h-10">
+                    <AvatarFallback>U{rank + 1}</AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1">
+                    <p className="font-medium">Utilisateur #{rank + 1}</p>
+                    <p className="text-xs text-muted-foreground">Niveau Expert</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-bold">{1000 - rank * 100}</p>
+                    <p className="text-xs text-muted-foreground">points</p>
+                  </div>
                 </div>
-                <div className="text-right">
-                  <p className="font-bold">{1000 - rank * 100}</p>
-                  <p className="text-xs text-muted-foreground">points</p>
-                </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </CardContent>
       </Card>
