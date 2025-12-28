@@ -89,6 +89,15 @@ export const SunoMusicGenerator: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [audioElement] = useState(() => new Audio());
 
+  // Cleanup audio element on unmount
+  React.useEffect(() => {
+    const audio = audioElement;
+    return () => {
+      audio.pause();
+      audio.src = '';
+    };
+  }, [audioElement]);
+
   const sunoApiKey = import.meta.env.VITE_SUNO_API_KEY;
 
   const handleGenerateMusic = async () => {

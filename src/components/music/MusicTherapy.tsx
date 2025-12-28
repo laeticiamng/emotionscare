@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { logger } from '@/lib/logger';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -18,7 +18,9 @@ import {
   Loader2
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useMusic } from '@/hooks/useMusic';
 import { toast } from 'sonner';
+import { MusicTrack as GlobalMusicTrack } from '@/types/music';
 
 interface MusicTrack {
   id: string;
@@ -32,12 +34,14 @@ interface MusicTrack {
 
 const MusicTherapy: React.FC = () => {
   const { user } = useAuth();
-  const [isPlaying, setIsPlaying] = useState(false);
+  const musicContext = useMusic();
   const [currentTrack, setCurrentTrack] = useState<MusicTrack | null>(null);
   const [volume, setVolume] = useState([75]);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const audioRef = useRef<HTMLAudioElement>(null);
+
+  // Sync with global music context
+  const isPlaying = musicContext.state.isPlaying;
+  const progress = musicContext.state.currentTime;
 
   const predefinedTracks: MusicTrack[] = [
     {
@@ -102,16 +106,43 @@ const MusicTherapy: React.FC = () => {
     }
   };
 
-  const playTrack = (track: MusicTrack) => {
+  const playTrack = async (track: MusicTrack) => {
     setCurrentTrack(track);
-    setIsPlaying(true);
-    // Note: En production, ici on chargerait le vrai fichier audio
-    toast.success(`Lecture de "${track.title}"`);
+    
+    // Convert to global MusicTrack format and play via context
+    const globalTrack: GlobalMusicTrack = {
+      id: track.id,
+      title: track.title,
+      artist: 'EmotionsCare Therapy',
+      duration: track.duration,
+      url: track.url || '',
+      audioUrl: track.url || '',
+      coverUrl: '',
+      mood: track.mood,
+      genre: 'therapeutic',
+    };
+    
+    try {
+      await musicContext.play(globalTrack);
+      toast.success(`Lecture de "${track.title}"`);
+    } catch (error) {
+      logger.error('Failed to play therapy track', error as Error, 'MUSIC');
+      toast.error('Erreur lors de la lecture');
+    }
   };
 
   const togglePlayPause = () => {
-    setIsPlaying(!isPlaying);
+    if (isPlaying) {
+      musicContext.pause();
+    } else if (currentTrack) {
+      playTrack(currentTrack);
+    }
   };
+  
+  // Sync volume with context
+  useEffect(() => {
+    musicContext.setVolume(volume[0] / 100);
+  }, [volume]);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
