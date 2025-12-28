@@ -403,7 +403,7 @@ export const ImmersiveMode: React.FC<ImmersiveModeProps> = ({
 
               {/* Bottom Controls */}
               <div className="absolute bottom-0 left-0 right-0 p-6 pointer-events-auto">
-                {/* Progress Bar - Seekable */}
+              {/* Progress Bar - Seekable */}
                 <div className="mb-4 space-y-2">
                   <input
                     type="range"
@@ -411,8 +411,10 @@ export const ImmersiveMode: React.FC<ImmersiveModeProps> = ({
                     max="100"
                     value={progress}
                     onChange={(e) => {
-                      const seekPos = Number(e.target.value);
-                      onSeek?.(seekPos);
+                      const progressPercent = Number(e.target.value);
+                      // Convert progress % to seconds
+                      const seekTimeSeconds = (progressPercent / 100) * (track?.duration || 0);
+                      onSeek?.(seekTimeSeconds);
                     }}
                     className="w-full h-1 bg-white/20 rounded-lg appearance-none cursor-pointer accent-white"
                   />

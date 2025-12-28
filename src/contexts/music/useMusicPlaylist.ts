@@ -30,6 +30,10 @@ export const useMusicPlaylist = (
     dispatch({ type: 'TOGGLE_SHUFFLE' });
   }, [dispatch]);
 
+  const setRepeatMode = useCallback((mode: 'none' | 'one' | 'all') => {
+    dispatch({ type: 'SET_REPEAT_MODE', payload: mode });
+  }, [dispatch]);
+
   const toggleFavorite = useCallback((trackId: string) => {
     dispatch({ type: 'TOGGLE_FAVORITE', payload: trackId });
   }, [dispatch]);
@@ -95,6 +99,7 @@ export const useMusicPlaylist = (
     addToPlaylist,
     removeFromPlaylist,
     shufflePlaylist,
+    setRepeatMode,
     toggleFavorite,
     getRecommendationsForEmotion,
   };

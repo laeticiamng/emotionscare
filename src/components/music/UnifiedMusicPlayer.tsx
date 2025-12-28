@@ -67,6 +67,7 @@ export const UnifiedMusicPlayer: React.FC<UnifiedMusicPlayerProps> = ({
     seek,
     setVolume,
     shufflePlaylist,
+    setRepeatMode,
   } = musicContext;
 
   const {
@@ -127,14 +128,11 @@ export const UnifiedMusicPlayer: React.FC<UnifiedMusicPlayerProps> = ({
     return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
   };
 
-  // Cycle loop mode via context dispatch
+  // Cycle loop mode via context
   const cycleLoopMode = useCallback(() => {
     const nextMode = loopMode === 'none' ? 'all' : loopMode === 'all' ? 'one' : 'none';
-    // Dispatch to context to update repeatMode
-    if ('dispatch' in musicContext && typeof (musicContext as any).dispatch === 'function') {
-      (musicContext as any).dispatch({ type: 'SET_REPEAT_MODE', payload: nextMode });
-    }
-  }, [loopMode, musicContext]);
+    setRepeatMode(nextMode);
+  }, [loopMode, setRepeatMode]);
 
   // Toggle shuffle via context
   const toggleShuffle = useCallback(() => {
