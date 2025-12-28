@@ -1,6 +1,9 @@
-// @ts-nocheck
-import { useState, useEffect } from 'react';
-import { logger } from '@/lib/logger';
+/**
+ * Hook de compatibilité pour les préférences de confidentialité
+ * Redirige vers le nouveau module privacy
+ */
+
+import { usePrivacy } from '@/modules/privacy';
 
 interface PrivacyPrefs {
   camera: boolean;
@@ -9,60 +12,31 @@ interface PrivacyPrefs {
   personalization: boolean;
 }
 
-const DEFAULT_PREFS: PrivacyPrefs = {
-  camera: true,
-  heartRate: true,
-  analytics: true,
-  personalization: true,
-};
-
-const STORAGE_KEY = 'emotionscare_privacy_prefs';
-
 export const usePrivacyPrefs = () => {
-  const [prefs, setPrefs] = useState<PrivacyPrefs>(DEFAULT_PREFS);
-  const [isLoaded, setIsLoaded] = useState(false);
+  const { preferences, isLoading, updatePreference, refresh } = usePrivacy();
 
-  // Load preferences from localStorage on mount
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        const parsedPrefs = JSON.parse(stored);
-        setPrefs({ ...DEFAULT_PREFS, ...parsedPrefs });
-      }
-    } catch (error) {
-      logger.warn('Failed to load privacy preferences', error as Error, 'SYSTEM');
-    } finally {
-      setIsLoaded(true);
-    }
-  }, []);
-
-  // Save preferences to localStorage
-  const updatePrefs = (newPrefs: Partial<PrivacyPrefs>) => {
-    const updatedPrefs = { ...prefs, ...newPrefs };
-    setPrefs(updatedPrefs);
-    
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedPrefs));
-    } catch (error) {
-      logger.warn('Failed to save privacy preferences', error as Error, 'SYSTEM');
-    }
+  const prefs: PrivacyPrefs = {
+    camera: preferences?.cam ?? false,
+    heartRate: preferences?.hr ?? false,
+    analytics: preferences?.analytics ?? true,
+    personalization: preferences?.personalization ?? true,
   };
 
-  // Reset to defaults
+  const updatePrefs = async (newPrefs: Partial<PrivacyPrefs>) => {
+    if (newPrefs.camera !== undefined) await updatePreference('cam', newPrefs.camera);
+    if (newPrefs.heartRate !== undefined) await updatePreference('hr', newPrefs.heartRate);
+    if (newPrefs.analytics !== undefined) await updatePreference('analytics', newPrefs.analytics);
+    if (newPrefs.personalization !== undefined) await updatePreference('personalization', newPrefs.personalization);
+  };
+
   const resetPrefs = () => {
-    setPrefs(DEFAULT_PREFS);
-    try {
-      localStorage.removeItem(STORAGE_KEY);
-    } catch (error) {
-      logger.warn('Failed to reset privacy preferences', error as Error, 'SYSTEM');
-    }
+    refresh();
   };
 
   return {
     prefs,
     updatePrefs,
     resetPrefs,
-    isLoaded,
+    isLoaded: !isLoading,
   };
 };
