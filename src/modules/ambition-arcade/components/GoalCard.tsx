@@ -10,7 +10,7 @@ import { Progress } from '@/components/ui/progress';
 import { Input } from '@/components/ui/input';
 import { 
   ChevronDown, ChevronUp, CheckCircle, Clock, 
-  Plus, Star, Target, Trash2, Play, Loader2 
+  Plus, Star, Target, Trash2, Play, Loader2, Heart 
 } from 'lucide-react';
 import { 
   useAmbitionQuests, 
@@ -20,6 +20,8 @@ import {
   type AmbitionGoal 
 } from '../hooks';
 import { useCompleteGoal, useAbandonGoal } from '../hooks/useAmbitionGoals';
+import { useAmbitionFavorites, useAmbitionRatings } from '../hooks/useAmbitionExtras';
+import { RatingStars } from './RatingStars';
 
 interface GoalCardProps {
   goal: AmbitionGoal;
@@ -35,6 +37,11 @@ export const GoalCard: React.FC<GoalCardProps> = ({ goal }) => {
   const startQuest = useStartQuest();
   const completeGoal = useCompleteGoal();
   const abandonGoal = useAbandonGoal();
+  const { isFavorite, toggleFavorite } = useAmbitionFavorites();
+  const { getRating, rateRun } = useAmbitionRatings();
+
+  const goalIsFavorite = isFavorite(goal.id);
+  const goalRating = getRating(goal.id);
 
   const progressPercent = goal.questsTotal > 0 
     ? (goal.questsCompleted / goal.questsTotal) * 100 
@@ -80,11 +87,23 @@ export const GoalCard: React.FC<GoalCardProps> = ({ goal }) => {
               </div>
             </div>
             
-            {isCompleted && (
-              <div className="w-10 h-10 rounded-full bg-success/20 flex items-center justify-center flex-shrink-0">
-                <CheckCircle className="w-5 h-5 text-success" />
-              </div>
-            )}
+            <div className="flex items-center gap-2 flex-shrink-0">
+              {/* Favorite Button */}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8"
+                onClick={(e) => { e.stopPropagation(); toggleFavorite(goal.id); }}
+              >
+                <Heart className={`w-4 h-4 ${goalIsFavorite ? 'fill-destructive text-destructive' : 'text-muted-foreground'}`} />
+              </Button>
+
+              {isCompleted && (
+                <div className="w-10 h-10 rounded-full bg-success/20 flex items-center justify-center">
+                  <CheckCircle className="w-5 h-5 text-success" />
+                </div>
+              )}
+            </div>
           </div>
         </CardHeader>
 
@@ -211,6 +230,18 @@ export const GoalCard: React.FC<GoalCardProps> = ({ goal }) => {
                         <Plus className="w-4 h-4" />
                       )}
                     </Button>
+                  </div>
+                )}
+
+                {/* Rating (for completed) */}
+                {isCompleted && (
+                  <div className="flex items-center justify-between pt-2 border-t">
+                    <span className="text-sm text-muted-foreground">Votre note :</span>
+                    <RatingStars 
+                      value={goalRating} 
+                      onChange={(rating) => rateRun(goal.id, rating)} 
+                      size="sm"
+                    />
                   </div>
                 )}
 
