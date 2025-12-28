@@ -3,6 +3,9 @@ export { GoalCard } from './components/GoalCard';
 export { GoalCreator } from './components/GoalCreator';
 export { StatsPanel } from './components/StatsPanel';
 export { AchievementsTab } from './components/AchievementsTab';
+export { RecommendationsPanel } from './components/RecommendationsPanel';
+export { ExportButton } from './components/ExportButton';
+export { RatingStars } from './components/RatingStars';
 export { useAmbitionMachine } from './useAmbitionMachine';
 export * as ambitionService from './ambitionArcadeService';
 export * from './types';
@@ -16,5 +19,11 @@ export {
   useCreateQuest,
   useStartQuest,
   useCompleteQuest,
-  useAmbitionAchievements
+  useAmbitionAchievements,
+  useAmbitionFavorites,
+  useAmbitionRatings,
+  useAmbitionExport,
+  useAmbitionRecommendations,
+  useAwardArtifact,
+  useAmbitionArtifacts
 } from './hooks';

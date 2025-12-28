@@ -7,13 +7,14 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ArrowLeft, Gamepad2, Target, TrendingUp, Trophy, Plus } from 'lucide-react';
-import { useAmbitionGoals } from '@/modules/ambition-arcade/hooks';
+import { ArrowLeft, Gamepad2, Target, TrendingUp, Trophy, Plus, Lightbulb } from 'lucide-react';
+import { useAmbitionGoals, useAmbitionStats } from '@/modules/ambition-arcade/hooks';
 import { GoalCard } from '@/modules/ambition-arcade/components/GoalCard';
 import { GoalCreator } from '@/modules/ambition-arcade/components/GoalCreator';
 import { StatsPanel } from '@/modules/ambition-arcade/components/StatsPanel';
 import { AchievementsTab } from '@/modules/ambition-arcade/components/AchievementsTab';
-import { useAmbitionStats } from '@/modules/ambition-arcade/hooks';
+import { RecommendationsPanel } from '@/modules/ambition-arcade/components/RecommendationsPanel';
+import { ExportButton } from '@/modules/ambition-arcade/components/ExportButton';
 
 const B2CAmbitionArcadePage: React.FC = () => {
   const [showCreator, setShowCreator] = useState(false);
@@ -25,14 +26,15 @@ const B2CAmbitionArcadePage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-muted/20 p-4 md:p-6" data-testid="page-root">
-      {/* Back Button */}
-      <div className="max-w-6xl mx-auto mb-4">
+      {/* Back Button & Export */}
+      <div className="max-w-6xl mx-auto mb-4 flex items-center justify-between">
         <Link to="/app/home">
           <Button variant="ghost" size="sm" className="gap-2">
             <ArrowLeft className="w-4 h-4" />
             Retour au menu
           </Button>
         </Link>
+        <ExportButton />
       </div>
 
       <div className="max-w-6xl mx-auto">
@@ -67,10 +69,14 @@ const B2CAmbitionArcadePage: React.FC = () => {
 
         {/* Tabs */}
         <Tabs defaultValue="goals" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="goals" className="gap-2">
               <Target className="w-4 h-4" />
               Objectifs
+            </TabsTrigger>
+            <TabsTrigger value="suggestions" className="gap-2">
+              <Lightbulb className="w-4 h-4" />
+              Suggestions
             </TabsTrigger>
             <TabsTrigger value="progress" className="gap-2">
               <TrendingUp className="w-4 h-4" />
@@ -129,6 +135,11 @@ const B2CAmbitionArcadePage: React.FC = () => {
                 <Button onClick={() => setShowCreator(true)}>Commencer</Button>
               </div>
             )}
+          </TabsContent>
+
+          {/* Suggestions Tab */}
+          <TabsContent value="suggestions">
+            <RecommendationsPanel />
           </TabsContent>
 
           {/* Progress Tab */}
