@@ -58,6 +58,16 @@ export const MusicGeneratorSection: React.FC<MusicGeneratorSectionProps> = ({
     logger.info('Suno params applied from ML', params, 'ML');
   }, [toast]);
 
+  // Cleanup sessionStorage on unmount
+  React.useEffect(() => {
+    return () => {
+      // Only cleanup if params were applied during this session
+      if (appliedParams) {
+        sessionStorage.removeItem('ml_suno_params');
+      }
+    };
+  }, [appliedParams]);
+
   return (
     <>
       {/* Suno Service Status */}
