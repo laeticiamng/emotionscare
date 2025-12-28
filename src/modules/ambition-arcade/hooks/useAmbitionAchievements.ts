@@ -45,6 +45,12 @@ const ACHIEVEMENT_DEFINITIONS = [
   // Level
   { id: 'level_5', name: 'Niveau 5', description: 'Atteindre le niveau 5', icon: '🎮', category: 'xp', rarity: 'rare', condition: (s: any) => s.level >= 5, max: 5 },
   { id: 'level_10', name: 'Niveau 10', description: 'Atteindre le niveau 10', icon: '🎯', category: 'xp', rarity: 'epic', condition: (s: any) => s.level >= 10, max: 10 },
+  
+  // Artifacts
+  { id: 'first_artifact', name: 'Collectionneur', description: 'Obtenir votre premier artefact', icon: '💎', category: 'artifacts', rarity: 'common', condition: (s: any) => s.artifacts >= 1, max: 1 },
+  { id: 'five_artifacts', name: 'Trésorier', description: 'Obtenir 5 artefacts', icon: '🏺', category: 'artifacts', rarity: 'rare', condition: (s: any) => s.artifacts >= 5, max: 5 },
+  { id: 'ten_artifacts', name: 'Archéologue', description: 'Obtenir 10 artefacts', icon: '🗿', category: 'artifacts', rarity: 'epic', condition: (s: any) => s.artifacts >= 10, max: 10 },
+  { id: 'legendary_hunter', name: 'Chasseur de Légendes', description: 'Obtenir 25 artefacts', icon: '👑', category: 'artifacts', rarity: 'legendary', condition: (s: any) => s.artifacts >= 25, max: 25 },
 ] as const;
 
 export function useAmbitionAchievements() {
@@ -70,6 +76,9 @@ export function useAmbitionAchievements() {
           break;
         case 'streak':
           progress = stats.currentStreak;
+          break;
+        case 'artifacts':
+          progress = stats.artifacts;
           break;
         default:
           progress = 0;
