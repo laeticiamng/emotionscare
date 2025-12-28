@@ -31,6 +31,8 @@ import AcademySection from '@/components/home/AcademySection';
 
 // Code splitting : lazy load des sections non critiques
 const FAQSection = lazy(() => import('@/components/home/FAQSection'));
+const TestimonialsSection = lazy(() => import('@/components/home/TestimonialsSection'));
+const Footer = lazy(() => import('@/components/home/Footer'));
 
 // Skeleton de chargement pour sections lazy
 const SectionSkeleton = () => (
@@ -278,7 +280,12 @@ const ModernHomePage: React.FC = () => {
       {/* SECTION 5: Engagement communautaire */}
       <CommunityEngagement />
 
-      {/* SECTION 6: FAQ (lazy loaded) */}
+      {/* SECTION 6: Témoignages (lazy loaded) */}
+      <Suspense fallback={<SectionSkeleton />}>
+        <TestimonialsSection />
+      </Suspense>
+
+      {/* SECTION 7: FAQ (lazy loaded) */}
       <Suspense fallback={<SectionSkeleton />}>
         <FAQSection />
       </Suspense>
@@ -306,6 +313,11 @@ const ModernHomePage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* SECTION 8: Footer (lazy loaded) */}
+      <Suspense fallback={<div className="h-48 bg-muted/30" />}>
+        <Footer />
+      </Suspense>
     </div>
   );
 };
