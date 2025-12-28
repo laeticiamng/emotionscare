@@ -2,16 +2,28 @@ export interface EmotionResult {
   id?: string;
   emotion: string;
   confidence: number;
-  valence: number;
-  arousal: number;
-  timestamp: Date;
+  valence?: number;
+  arousal?: number;
+  timestamp: Date | string;
   insight?: string;
   intensity?: number;
   suggestions?: string[];
-  source?: 'text' | 'voice' | 'facial' | 'manual';
+  source?: string;
   transcription?: string;
   sentiment?: string;
   details?: any;
+  // Extended fields used by various components
+  score?: number;
+  text?: string;
+  emojis?: string | string[];
+  ai_feedback?: string;
+  audio_url?: string;
+  date?: Date | string;
+  recommendations?: (string | EmotionRecommendation)[];
+  scanMode?: ScanMode;
+  duration?: number;
+  environment?: string;
+  emotions?: Record<string, number>;
 }
 
 export interface EmotionRecommendation {
@@ -22,6 +34,13 @@ export interface EmotionRecommendation {
   duration?: string;
   action?: string;
   category?: string;
+  emotion?: string;
+  content?: string;
+}
+
+export interface VoiceEmotionAnalyzerProps {
+  onResult?: (result: EmotionResult) => void;
+  onStartRecording?: () => void;
 }
 
 export interface EmotionScannerProps {

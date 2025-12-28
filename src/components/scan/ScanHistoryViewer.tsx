@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -11,6 +9,11 @@ interface ScanHistoryViewerProps {
 }
 
 const ScanHistoryViewer: React.FC<ScanHistoryViewerProps> = ({ history }) => {
+  const formatTimestamp = (ts: Date | string) => {
+    const date = typeof ts === 'string' ? new Date(ts) : ts;
+    return date.toLocaleTimeString();
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -21,8 +24,8 @@ const ScanHistoryViewer: React.FC<ScanHistoryViewerProps> = ({ history }) => {
       </CardHeader>
       <CardContent>
         <div className="space-y-3">
-          {history.slice(0, 10).map((result) => (
-            <div key={result.id} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+          {history.slice(0, 10).map((result, index) => (
+            <div key={result.id || index} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
               <div className="flex items-center gap-3">
                 <div className="text-2xl">
                   {result.emotion === 'happy' ? '😊' : 
@@ -33,15 +36,15 @@ const ScanHistoryViewer: React.FC<ScanHistoryViewerProps> = ({ history }) => {
                   <p className="font-semibold text-sm capitalize">{result.emotion}</p>
                   <p className="text-xs text-muted-foreground flex items-center gap-1">
                     <Clock className="w-3 h-3" />
-                    {result.timestamp.toLocaleTimeString()}
+                    {formatTimestamp(result.timestamp)}
                   </p>
                 </div>
               </div>
               <div className="text-right">
                 <Badge variant="outline" className="mb-1">
-                  {result.confidence.overall.toFixed(1)}%
+                  {typeof result.confidence === 'number' ? `${(result.confidence * 100).toFixed(1)}%` : 'N/A'}
                 </Badge>
-                <p className="text-xs text-muted-foreground capitalize">{result.source}</p>
+                <p className="text-xs text-muted-foreground capitalize">{result.source || 'manual'}</p>
               </div>
             </div>
           ))}

@@ -1,11 +1,10 @@
 // @ts-nocheck
-
 /**
  * EMOTION SCANNER PREMIUM - EMOTIONSCARE
  * Scanner d'émotions avancé avec IA, accessible et performant
  */
 
-import React, { useState, useRef, useCallback, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
