@@ -1,19 +1,20 @@
-// @ts-nocheck
+import { Link } from 'react-router-dom';
+
 export function Footer() {
   return (
     <footer style={{ padding: "16px", opacity: 0.8 }}>
       <small>
         © {new Date().getFullYear()} EmotionsCare —
         {' '}
-        <a href="/legal/mentions">Mentions légales</a>
+        <Link to="/legal/mentions">Mentions légales</Link>
         {' · '}
-        <a href="/legal/terms">Conditions d'utilisation</a>
+        <Link to="/legal/terms">Conditions d'utilisation</Link>
         {' · '}
-        <a href="/legal/sales">CGV</a>
+        <Link to="/legal/sales">CGV</Link>
         {' · '}
-        <a href="/legal/privacy">Confidentialité</a>
+        <Link to="/legal/privacy">Confidentialité</Link>
         {' · '}
-        <a href="/legal/cookies">Cookies</a>
+        <Link to="/legal/cookies">Cookies</Link>
       </small>
     </footer>
   );

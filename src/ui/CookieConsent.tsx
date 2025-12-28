@@ -1,6 +1,6 @@
-// @ts-nocheck
-"use client";
 import React from "react";
+import { Link } from 'react-router-dom';
+
 const KEY = "cookie_consent_v1";
 
 export function hasConsent(kind: "analytics" | "functional" | "marketing" = "functional") {
@@ -25,13 +25,13 @@ export function CookieConsent() {
       style={{ position: "fixed", insetInline: 16, bottom: 16, background: "var(--card)", padding: 12, borderRadius: 12 }}
     >
       <p>
-        Nous déposons uniquement des cookies essentiels par défaut. Les mesures d’audience anonymisées et la personnalisation
-        sont activées si vous l’acceptez, conformément à ECC-RGPD-01.
+        Nous déposons uniquement des cookies essentiels par défaut. Les mesures d'audience anonymisées et la personnalisation
+        sont activées si vous l'acceptez, conformément à ECC-RGPD-01.
       </p>
       <div className="flex gap-2 mt-2 flex-wrap">
         <button onClick={essentialsOnly}>Essentiels uniquement</button>
         <button onClick={acceptAll}>Tout accepter</button>
-        <a href="/legal/cookies">Configurer</a>
+        <Link to="/legal/cookies">Configurer</Link>
       </div>
     </div>
   );
