@@ -539,12 +539,39 @@ export function CoachView({ initialMode = 'b2c' }: { initialMode?: CoachMode }) 
             firstChunk = false;
           }
         },
-        onSuggestions: (suggestions) => {
+        onSuggestions: async (suggestions) => {
           setLastSuggestions({
             techniques: suggestions.techniques,
             resources: suggestions.resources,
             followUpQuestions: suggestions.followUpQuestions,
           });
+          
+          // Persist techniques, resources and detected emotion to session
+          if (sessionId && suggestions) {
+            try {
+              const updateData: Record<string, unknown> = {
+                updated_at: new Date().toISOString(),
+              };
+              
+              if (suggestions.techniques?.length) {
+                updateData.techniques_suggested = suggestions.techniques;
+              }
+              if (suggestions.resources?.length) {
+                updateData.resources_provided = suggestions.resources;
+              }
+              if (suggestions.emotion) {
+                // Accumulate emotions detected
+                updateData.emotions_detected = { lastEmotion: suggestions.emotion, timestamp: Date.now() };
+              }
+              
+              await supabase
+                .from('ai_coach_sessions')
+                .update(updateData)
+                .eq('id', sessionId);
+            } catch (err) {
+              logger.warn('[coach] unable to persist suggestions to session', err, 'SYSTEM');
+            }
+          }
         },
       });
 
@@ -612,16 +639,33 @@ export function CoachView({ initialMode = 'b2c' }: { initialMode?: CoachMode }) 
     setShowSatisfaction(true);
   }, [sessionId, sessionStartedAt, messages]);
 
-  const handleSatisfactionSubmit = useCallback(async (satisfaction: number, notes?: string) => {
+  const handleSatisfactionSubmit = useCallback(async (
+    satisfaction: number, 
+    notes?: string, 
+    feedback?: { helpfulness: string | null; wouldRecommend: boolean | null; improvementAreas: string[] }
+  ) => {
     if (sessionId) {
       try {
+        const updateData: Record<string, unknown> = {
+          user_satisfaction: satisfaction,
+          session_notes: notes || null,
+          updated_at: new Date().toISOString(),
+        };
+        
+        // Store extended feedback in session_notes as JSON if provided
+        if (feedback && (feedback.helpfulness || feedback.wouldRecommend !== null || feedback.improvementAreas.length > 0)) {
+          const extendedNotes = {
+            userComment: notes || '',
+            helpfulness: feedback.helpfulness,
+            wouldRecommend: feedback.wouldRecommend,
+            improvementAreas: feedback.improvementAreas,
+          };
+          updateData.session_notes = JSON.stringify(extendedNotes);
+        }
+        
         await supabase
           .from('ai_coach_sessions')
-          .update({
-            user_satisfaction: satisfaction,
-            session_notes: notes || null,
-            updated_at: new Date().toISOString(),
-          })
+          .update(updateData)
           .eq('id', sessionId);
         toast({
           title: 'Merci pour ton retour !',
