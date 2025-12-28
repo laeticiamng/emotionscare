@@ -1,6 +1,7 @@
 export { AmbitionArcadeMain } from './components/AmbitionArcadeMain';
 export { GoalCard } from './components/GoalCard';
 export { GoalCreator } from './components/GoalCreator';
+export { GoalFilters } from './components/GoalFilters';
 export { StatsPanel } from './components/StatsPanel';
 export { AchievementsTab } from './components/AchievementsTab';
 export { RecommendationsPanel } from './components/RecommendationsPanel';
@@ -32,5 +33,11 @@ export {
   useAwardArtifact,
   useAmbitionArtifacts,
   useDeleteGoal,
-  useConfetti
+  useConfetti,
+  useAutoArtifacts,
+  useAmbitionNotifications,
+  type Achievement,
+  type AmbitionQuest,
+  type AmbitionGoal,
+  type RunRecommendation
 } from './hooks';
