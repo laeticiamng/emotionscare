@@ -3,12 +3,14 @@
  */
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { 
   TrendingUp, 
   Shield, 
   Clock, 
   Heart,
   ArrowRight,
+  ArrowLeft,
   Sparkles,
   Users,
   Zap,
@@ -69,6 +71,16 @@ const ExchangeHub: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
+      {/* Back Button */}
+      <div className="container mx-auto px-4 pt-4">
+        <Link to="/app/home">
+          <Button variant="ghost" size="sm" className="gap-2">
+            <ArrowLeft className="w-4 h-4" />
+            Retour au menu
+          </Button>
+        </Link>
+      </div>
+
       {/* Hero Section */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-transparent to-secondary/10" />
