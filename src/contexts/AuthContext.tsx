@@ -19,6 +19,8 @@ interface AuthContextType {
   logout: () => Promise<void>; // Alias pour compatibilité
   resetPassword: (email: string) => Promise<void>;
   register: (email: string, password: string, metadata?: any) => Promise<void>;
+  updateUser: (data: { data?: Record<string, any>; password?: string }) => Promise<User | null>;
+  refreshSession: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -181,6 +183,45 @@ export function AuthProvider({ children }: AuthProviderProps) {
   // Alias pour la compatibilité
   const register = signUp;
 
+  // Update user data
+  const updateUser = async (updates: { data?: Record<string, any>; password?: string }): Promise<User | null> => {
+    try {
+      const { data, error } = await supabase.auth.updateUser(updates);
+      
+      if (error) {
+        logger.error('Erreur lors de la mise à jour utilisateur', error as Error, 'AUTH');
+        throw error;
+      }
+      
+      if (data.user) {
+        setUser(data.user);
+        logger.info('Utilisateur mis à jour', undefined, 'AUTH');
+      }
+      
+      return data.user;
+    } catch (error) {
+      logger.error('Erreur lors de la mise à jour utilisateur', error as Error, 'AUTH');
+      throw error;
+    }
+  };
+
+  // Refresh session
+  const refreshSession = async () => {
+    try {
+      const { data: { session }, error } = await supabase.auth.refreshSession();
+      
+      if (error) {
+        throw error;
+      }
+      
+      setSession(session);
+      setUser(session?.user ?? null);
+    } catch (error) {
+      logger.error('Erreur lors du rafraîchissement de la session', error as Error, 'AUTH');
+      throw error;
+    }
+  };
+
   const value: AuthContextType = {
     user,
     session,
@@ -192,6 +233,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
     logout: signOut, // Alias pour compatibilité
     resetPassword,
     register,
+    updateUser,
+    refreshSession,
   };
 
   return (
