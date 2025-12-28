@@ -71,6 +71,7 @@ export interface MusicContextType {
   addToPlaylist: (track: MusicTrack) => void;
   removeFromPlaylist: (trackId: string) => void;
   shufflePlaylist: () => void;
+  setRepeatMode: (mode: 'none' | 'one' | 'all') => void;
   generateMusicForEmotion: (emotion: string, prompt?: string) => Promise<MusicTrack | null>;
   checkGenerationStatus: (taskId: string) => Promise<MusicTrack | null>;
   getEmotionMusicDescription: (emotion: string) => string;

@@ -42,9 +42,11 @@ export const musicReducer = (state: MusicState, action: MusicAction): MusicState
     case 'SET_VOLUME':
       return { ...state, volume: Math.max(0, Math.min(1, action.payload)) };
     case 'SET_CURRENT_TIME':
-      return { ...state, currentTime: action.payload };
+      const newProgress = state.duration > 0 ? (action.payload / state.duration) * 100 : 0;
+      return { ...state, currentTime: action.payload, progress: newProgress };
     case 'SET_DURATION':
-      return { ...state, duration: action.payload };
+      const progressWithNewDuration = action.payload > 0 ? (state.currentTime / action.payload) * 100 : 0;
+      return { ...state, duration: action.payload, progress: progressWithNewDuration };
     case 'SET_ACTIVE_PRESET':
       return {
         ...state,

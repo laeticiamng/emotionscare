@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Type, Download, Share2, Heart } from 'lucide-react';
 import { useMusic } from '@/hooks/useMusic';
+import { useMusicFavorites } from '@/hooks/useMusicFavorites';
 import { cn } from '@/lib/utils';
 
 interface LyricLine {
@@ -72,13 +73,16 @@ const generateTherapeuticLyrics = (track: { title: string; mood?: string; artist
 
 const LyricsDisplay: React.FC<LyricsDisplayProps> = ({ className }) => {
   const { state } = useMusic();
+  const { isFavorite, toggleFavorite } = useMusicFavorites();
   const { currentTrack, isPlaying, currentTime: playerTime } = state;
   const [showTranslation, setShowTranslation] = useState(false);
   const [fontSize, setFontSize] = useState('md');
-  const [isLiked, setIsLiked] = useState(false);
 
   // Use real player time instead of simulated time
   const currentTime = playerTime || 0;
+  
+  // Check if current track is liked via favorites system
+  const isLiked = currentTrack ? isFavorite(currentTrack.id) : false;
 
   // Generate lyrics based on current track
   const lyrics = currentTrack ? generateTherapeuticLyrics(currentTrack) : mockLyrics;
@@ -124,7 +128,7 @@ const LyricsDisplay: React.FC<LyricsDisplayProps> = ({ className }) => {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => setIsLiked(!isLiked)}
+              onClick={() => currentTrack && toggleFavorite(currentTrack)}
             >
               <Heart className={cn("h-4 w-4", isLiked && "fill-red-500 text-red-500")} />
             </Button>
