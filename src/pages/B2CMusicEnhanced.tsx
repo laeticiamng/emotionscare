@@ -18,7 +18,7 @@ import { Music, ArrowLeft, Loader2, Heart, Brain, Zap, Sparkles } from 'lucide-r
 import { useToast } from '@/hooks/use-toast';
 import { useMusic } from '@/hooks/useMusic';
 import { useMusicFavorites } from '@/hooks/useMusicFavorites';
-import { useAudioUrls } from '@/hooks/useAudioUrls';
+import { useSunoVinyl } from '@/hooks/useSunoVinyl';
 import { RewardSystem } from '@/components/rewards/RewardSystem';
 import { useOptimizedAnimation } from '@/hooks/useOptimizedAnimation';
 import { UnifiedMusicPlayer } from '@/components/music/UnifiedMusicPlayer';
@@ -79,33 +79,12 @@ interface VinylTrack extends MusicTrack {
   waveform?: number[];
 }
 
-// Configuration audio - URL Pixabay qui fonctionne (même fichier pour tous en attendant génération Suno)
-// TODO: Remplacer par des pistes générées via Suno API
-const AUDIO_URL_CONFIG = {
-  'vinyl-1': { 
-    fileName: 'ambient-soft.mp3', 
-    fallbackUrl: 'https://cdn.pixabay.com/audio/2022/05/27/audio_1808fbf07a.mp3' // Sérénité Fluide - Ambient
-  },
-  'vinyl-2': { 
-    fileName: 'focus-clarity.mp3', 
-    fallbackUrl: 'https://cdn.pixabay.com/audio/2022/10/25/audio_946b0939c5.mp3' // Énergie Vibrante - Upbeat
-  },
-  'vinyl-3': { 
-    fileName: 'creative-flow.mp3', 
-    fallbackUrl: 'https://cdn.pixabay.com/audio/2022/08/02/audio_884fe92c21.mp3' // Flow Créatif - Lofi
-  },
-  'vinyl-4': { 
-    fileName: 'healing-waves.mp3', 
-    fallbackUrl: 'https://cdn.pixabay.com/audio/2022/02/22/audio_d1718ab41b.mp3' // Ondes Guérisseuses - Nature
-  }
-} as const;
-
-// Données vinyles
+// Données vinyles - URL sera générée dynamiquement via Suno API
 const vinylTracksBase: Omit<VinylTrack, 'url' | 'audioUrl'>[] = [
-  { id: 'vinyl-1', title: 'Sérénité Fluide', artist: 'Studio EmotionsCare', duration: 180, category: 'doux', mood: 'Calme océanique', color: 'from-blue-500 to-cyan-400', vinylColor: 'bg-gradient-to-br from-blue-400 via-cyan-300 to-blue-200', description: 'Ambiance douce et apaisante' },
-  { id: 'vinyl-2', title: 'Énergie Vibrante', artist: 'Studio EmotionsCare', duration: 210, category: 'énergique', mood: 'Dynamisme positif', color: 'from-orange-500 to-red-400', vinylColor: 'bg-gradient-to-br from-orange-400 via-red-300 to-orange-200', description: 'Boost d\'énergie et motivation' },
-  { id: 'vinyl-3', title: 'Focus Mental', artist: 'Studio EmotionsCare', duration: 240, category: 'créatif', mood: 'Concentration pure', color: 'from-purple-500 to-indigo-400', vinylColor: 'bg-gradient-to-br from-purple-400 via-indigo-300 to-purple-200', description: 'Concentration optimale pour créer' },
-  { id: 'vinyl-4', title: 'Réparation Émotionnelle', artist: 'Studio EmotionsCare', duration: 270, category: 'guérison', mood: 'Bien-être intérieur', color: 'from-green-500 to-emerald-400', vinylColor: 'bg-gradient-to-br from-green-400 via-emerald-300 to-green-200', description: 'Sons thérapeutiques pour guérir' },
+  { id: 'vinyl-1', title: 'Sérénité Fluide', artist: 'Suno AI', duration: 180, category: 'doux', mood: 'Calme océanique', color: 'from-blue-500 to-cyan-400', vinylColor: 'bg-gradient-to-br from-blue-400 via-cyan-300 to-blue-200', description: 'Ambiance douce et apaisante' },
+  { id: 'vinyl-2', title: 'Énergie Vibrante', artist: 'Suno AI', duration: 210, category: 'énergique', mood: 'Dynamisme positif', color: 'from-orange-500 to-red-400', vinylColor: 'bg-gradient-to-br from-orange-400 via-red-300 to-orange-200', description: 'Boost d\'énergie et motivation' },
+  { id: 'vinyl-3', title: 'Focus Mental', artist: 'Suno AI', duration: 240, category: 'créatif', mood: 'Concentration pure', color: 'from-purple-500 to-indigo-400', vinylColor: 'bg-gradient-to-br from-purple-400 via-indigo-300 to-purple-200', description: 'Concentration optimale pour créer' },
+  { id: 'vinyl-4', title: 'Réparation Émotionnelle', artist: 'Suno AI', duration: 270, category: 'guérison', mood: 'Bien-être intérieur', color: 'from-green-500 to-emerald-400', vinylColor: 'bg-gradient-to-br from-green-400 via-emerald-300 to-green-200', description: 'Sons thérapeutiques pour guérir' },
 ];
 
 const categoryIcons = { doux: Heart, créatif: Sparkles, énergique: Zap, guérison: Brain };
@@ -124,15 +103,27 @@ const B2CMusicEnhanced: React.FC = () => {
   const musicFavorites = useMusicFavorites();
   const { updateChallengeProgress } = useGamification();
   
-  const { urls: audioUrls, sources: audioSources } = useAudioUrls(AUDIO_URL_CONFIG);
+  // Hook Suno pour générer la musique à la demande
+  const { generateForVinyl, generationState } = useSunoVinyl();
   
+  // Les vinyles avec URL vide initialement - sera rempli après génération
   const vinylTracks: VinylTrack[] = useMemo(() => {
     return vinylTracksBase.map(track => ({
       ...track,
-      url: audioUrls[track.id] || AUDIO_URL_CONFIG[track.id as keyof typeof AUDIO_URL_CONFIG]?.fallbackUrl || '',
-      audioUrl: audioUrls[track.id] || AUDIO_URL_CONFIG[track.id as keyof typeof AUDIO_URL_CONFIG]?.fallbackUrl || ''
+      url: '', // Sera généré dynamiquement
+      audioUrl: ''
     }));
-  }, [audioUrls]);
+  }, []);
+  
+  // Mapper l'état de génération pour audioSources
+  const audioSources = useMemo(() => {
+    const sources: Record<string, 'supabase' | 'fallback'> = {};
+    vinylTracks.forEach(track => {
+      const state = generationState[track.id];
+      sources[track.id] = state?.isFallback ? 'fallback' : 'supabase';
+    });
+    return sources;
+  }, [vinylTracks, generationState]);
   
   // Protection contexte Music
   let musicContext;
@@ -199,22 +190,40 @@ const B2CMusicEnhanced: React.FC = () => {
     }
   }, [insights, toast]);
 
-  // Handlers optimisés avec useCallback
+  // Handler pour démarrer un vinyl - génère via Suno API puis joue
   const startTrack = useCallback(async (track: VinylTrack) => {
     setLoadingTrackId(track.id);
     try {
+      // Générer la musique via Suno API
+      const audioUrl = await generateForVinyl(track.id, track.category, track.title);
+      
+      if (!audioUrl) {
+        throw new Error('Failed to generate audio');
+      }
+      
+      // Créer une copie du track avec l'URL générée
+      const trackWithUrl: VinylTrack = {
+        ...track,
+        url: audioUrl,
+        audioUrl: audioUrl
+      };
+      
       setPlayerVisible(true);
-      await play(track);
+      await play(trackWithUrl);
       setLastPlayed(track.id);
       await updateChallengeProgress('1', 1);
-      toast({ title: "Vinyle en rotation ♪", description: `${track.title} compose ton aura sonore` });
+      
+      const isFallback = generationState[track.id]?.isFallback;
+      if (!isFallback) {
+        toast({ title: "🎵 Musique IA générée", description: `${track.title} - créée par Suno AI` });
+      }
     } catch (error) {
       logger.error('Failed to start track', error as Error, 'MUSIC');
       toast({ title: "Erreur de lecture", description: "Impossible de lire ce vinyle.", variant: "destructive" });
     } finally {
       setLoadingTrackId(null);
     }
-  }, [play, setLastPlayed, updateChallengeProgress, toast]);
+  }, [play, setLastPlayed, updateChallengeProgress, toast, generateForVinyl, generationState]);
 
   // Handler pour next/previous via contexte
   const handleNext = useCallback(() => {
