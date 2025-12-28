@@ -367,7 +367,7 @@ export const CollaborativePlaylistSection: React.FC = () => {
                     artist: 'Nouveau Titre',
                     addedBy: user?.email?.split('@')[0] || 'Vous',
                     votes: { up: 0, down: 0 },
-                    audioUrl: 'https://cdn.pixabay.com/audio/2024/11/04/audio_0c2e9f0c18.mp3'
+                    audioUrl: 'https://ia800905.us.archive.org/19/items/FREE_background_music_dridge/Kevin_MacLeod_-_Waltz_of_the_Flowers_-_Tchaikovsky.mp3'
                   };
                   if (playlist) {
                     setPlaylist({

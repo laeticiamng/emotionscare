@@ -40,14 +40,18 @@ export function useMusicRecommendation(options: MusicHookOptions = {}) {
     setError(null);
     try {
       const mapped = EMOTION_TO_MUSIC[emotion] || emotion;
-      // Use demo tracks based on emotion
+      // Use demo tracks based on emotion (archive.org - CORS OK)
+      const archiveUrls = [
+        'https://ia800905.us.archive.org/19/items/FREE_background_music_dridge/Kevin_MacLeod_-_Waltz_of_the_Flowers_-_Tchaikovsky.mp3',
+        'https://ia800905.us.archive.org/19/items/FREE_background_music_dridge/Kevin_MacLeod_-_Gymnopedie_No_1.mp3',
+      ];
       const demoTracks: MusicTrack[] = [
         {
           id: `rec-${emotion}-1`,
           title: `${mapped} Track 1`,
           artist: 'Emotion Music',
-          url: 'https://cdn.pixabay.com/audio/2024/11/04/audio_0c2e9f0c18.mp3',
-          audioUrl: 'https://cdn.pixabay.com/audio/2024/11/04/audio_0c2e9f0c18.mp3',
+          url: archiveUrls[0],
+          audioUrl: archiveUrls[0],
           duration: 180,
           emotion: mapped,
           mood: emotion
@@ -56,8 +60,8 @@ export function useMusicRecommendation(options: MusicHookOptions = {}) {
           id: `rec-${emotion}-2`,
           title: `${mapped} Track 2`,
           artist: 'Mood Sounds',
-          url: 'https://cdn.pixabay.com/audio/2024/02/22/audio_4ffd0cda82.mp3',
-          audioUrl: 'https://cdn.pixabay.com/audio/2024/02/22/audio_4ffd0cda82.mp3',
+          url: archiveUrls[1],
+          audioUrl: archiveUrls[1],
           duration: 200,
           emotion: mapped,
           mood: emotion

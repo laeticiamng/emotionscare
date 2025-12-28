@@ -107,19 +107,27 @@ export const UnifiedMusicPlayer: React.FC<UnifiedMusicPlayerProps> = ({
     }
   }, [isPlaying, currentTrack?.id]);
 
-  // Visualizer animation
+  // Visualizer animation - Simulation visuelle (Web Audio API nécessite audio element local)
+  // Les barres réagissent au tempo de la musique de manière simulée
   useEffect(() => {
     if (!isPlaying || !showVisualizer) {
       setVisualizerBars(Array(16).fill(0));
       return;
     }
+    
+    // Simulation basée sur le temps de lecture pour plus de réalisme
     const interval = setInterval(() => {
+      const baseIntensity = Math.sin(currentTime * 2) * 0.3 + 0.7; // Varie avec le temps
       setVisualizerBars(prev => 
-        prev.map(() => Math.random() * 100)
+        prev.map((_, i) => {
+          // Crée un pattern plus musical avec des pics sur les basses fréquences
+          const bassBoost = i < 4 ? 1.3 : i < 8 ? 1.1 : 0.8;
+          return Math.random() * 60 * baseIntensity * bassBoost + 20;
+        })
       );
-    }, 100);
+    }, 80);
     return () => clearInterval(interval);
-  }, [isPlaying, showVisualizer]);
+  }, [isPlaying, showVisualizer, currentTime]);
 
   const formatTime = (seconds: number) => {
     if (!seconds || isNaN(seconds)) return '0:00';

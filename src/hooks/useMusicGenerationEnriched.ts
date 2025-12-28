@@ -46,14 +46,21 @@ const HISTORY_KEY = 'music-generation-history';
 const FAVORITES_KEY = 'music-generation-favorites';
 const STATS_KEY = 'music-generation-stats';
 
-// Fallback tracks avec audio libre de droits (Pixabay)
+// Fallback tracks avec audio libre de droits (archive.org - CORS OK)
+const ARCHIVE_AUDIO_URLS = {
+  calm: 'https://ia800905.us.archive.org/19/items/FREE_background_music_dridge/Kevin_MacLeod_-_Gymnopedie_No_1.mp3',
+  happy: 'https://ia800905.us.archive.org/19/items/FREE_background_music_dridge/Kevin_MacLeod_-_Waltz_of_the_Flowers_-_Tchaikovsky.mp3',
+  focus: 'https://ia800905.us.archive.org/19/items/FREE_background_music_dridge/Kevin_MacLeod_-_Canon_in_D.mp3',
+  sad: 'https://ia800905.us.archive.org/19/items/FREE_background_music_dridge/Kevin_MacLeod_-_Moonlight_Sonata.mp3',
+};
+
 const FALLBACK_TRACKS: GeneratedTrack[] = [
   {
     id: 'fallback-calm-1',
     title: 'Océan Tranquille',
     artist: 'EmotionsCare Music',
-    url: 'https://cdn.pixabay.com/audio/2024/11/04/audio_87cdc7ccfe.mp3',
-    audioUrl: 'https://cdn.pixabay.com/audio/2024/11/04/audio_87cdc7ccfe.mp3',
+    url: ARCHIVE_AUDIO_URLS.calm,
+    audioUrl: ARCHIVE_AUDIO_URLS.calm,
     duration: 180,
     emotion: 'calm',
     mood: 'relaxed',
@@ -64,8 +71,8 @@ const FALLBACK_TRACKS: GeneratedTrack[] = [
     id: 'fallback-happy-1',
     title: 'Sunrise Energy',
     artist: 'EmotionsCare Music',
-    url: 'https://cdn.pixabay.com/audio/2022/10/25/audio_946499bb90.mp3',
-    audioUrl: 'https://cdn.pixabay.com/audio/2022/10/25/audio_946499bb90.mp3',
+    url: ARCHIVE_AUDIO_URLS.happy,
+    audioUrl: ARCHIVE_AUDIO_URLS.happy,
     duration: 200,
     emotion: 'happy',
     mood: 'energetic',
@@ -76,8 +83,8 @@ const FALLBACK_TRACKS: GeneratedTrack[] = [
     id: 'fallback-focus-1',
     title: 'Deep Focus Flow',
     artist: 'EmotionsCare Music',
-    url: 'https://cdn.pixabay.com/audio/2022/08/02/audio_884fe92c21.mp3',
-    audioUrl: 'https://cdn.pixabay.com/audio/2022/08/02/audio_884fe92c21.mp3',
+    url: ARCHIVE_AUDIO_URLS.focus,
+    audioUrl: ARCHIVE_AUDIO_URLS.focus,
     duration: 240,
     emotion: 'focused',
     mood: 'concentrated',
@@ -88,8 +95,8 @@ const FALLBACK_TRACKS: GeneratedTrack[] = [
     id: 'fallback-sad-1',
     title: 'Healing Rain',
     artist: 'EmotionsCare Music',
-    url: 'https://cdn.pixabay.com/audio/2022/01/18/audio_d0a13f69d2.mp3',
-    audioUrl: 'https://cdn.pixabay.com/audio/2022/01/18/audio_d0a13f69d2.mp3',
+    url: ARCHIVE_AUDIO_URLS.sad,
+    audioUrl: ARCHIVE_AUDIO_URLS.sad,
     duration: 220,
     emotion: 'melancholic',
     mood: 'reflective',
