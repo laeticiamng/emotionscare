@@ -79,13 +79,12 @@ interface VinylTrack extends MusicTrack {
   waveform?: number[];
 }
 
-// Configuration audio - URLs MP3 hébergées sur Supabase Storage (CORS garanti)
-const SUPABASE_STORAGE_URL = 'https://yaincoxihiqdksxgrsrk.supabase.co/storage/v1/object/public/music-tracks/demo';
+// Configuration audio - URLs MP3 publiques fonctionnelles (sample audio files)
 const AUDIO_URL_CONFIG = {
-  'vinyl-1': { fileName: 'ambient-soft.mp3', fallbackUrl: `${SUPABASE_STORAGE_URL}/serenity.mp3` },
-  'vinyl-2': { fileName: 'focus-clarity.mp3', fallbackUrl: `${SUPABASE_STORAGE_URL}/energy.mp3` },
-  'vinyl-3': { fileName: 'creative-flow.mp3', fallbackUrl: `${SUPABASE_STORAGE_URL}/focus.mp3` },
-  'vinyl-4': { fileName: 'healing-waves.mp3', fallbackUrl: `${SUPABASE_STORAGE_URL}/healing.mp3` }
+  'vinyl-1': { fileName: 'ambient-soft.mp3', fallbackUrl: 'https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3' },
+  'vinyl-2': { fileName: 'focus-clarity.mp3', fallbackUrl: 'https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3' },
+  'vinyl-3': { fileName: 'creative-flow.mp3', fallbackUrl: 'https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3' },
+  'vinyl-4': { fileName: 'healing-waves.mp3', fallbackUrl: 'https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3' }
 } as const;
 
 // Données vinyles
