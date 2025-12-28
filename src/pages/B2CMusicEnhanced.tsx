@@ -88,7 +88,7 @@ const AUDIO_URL_CONFIG = {
   },
   'vinyl-2': { 
     fileName: 'focus-clarity.mp3', 
-    fallbackUrl: 'https://cdn.pixabay.com/audio/2022/03/15/audio_7625e92871.mp3' // Focus Cristallin - Piano
+    fallbackUrl: 'https://cdn.pixabay.com/audio/2022/10/25/audio_946b0939c5.mp3' // Énergie Vibrante - Upbeat
   },
   'vinyl-3': { 
     fileName: 'creative-flow.mp3', 
