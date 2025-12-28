@@ -5,8 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { logger } from '@/lib/logger';
 import { scanAnalytics } from '@/lib/analytics/scanEvents';
-
-const ONBOARDING_STORAGE_KEY = 'scan-onboarding-completed';
+import { useScanSettings } from '@/hooks/useScanSettings';
 
 interface OnboardingStep {
   title: string;
@@ -38,6 +37,7 @@ interface ScanOnboardingProps {
 
 export const ScanOnboarding: React.FC<ScanOnboardingProps> = ({ onComplete }) => {
   const [currentStep, setCurrentStep] = useState(0);
+  const { completeOnboarding } = useScanSettings();
 
   useEffect(() => {
     logger.info('[Onboarding] Scan onboarding started', {}, 'UI');
@@ -59,14 +59,14 @@ export const ScanOnboarding: React.FC<ScanOnboardingProps> = ({ onComplete }) =>
   };
 
   const handleComplete = () => {
-    localStorage.setItem(ONBOARDING_STORAGE_KEY, 'true');
+    completeOnboarding();
     logger.info('[Onboarding] Scan onboarding completed', {}, 'UI');
     scanAnalytics.onboardingCompleted(STEPS.length);
     onComplete();
   };
 
   const handleSkip = () => {
-    localStorage.setItem(ONBOARDING_STORAGE_KEY, 'true');
+    completeOnboarding();
     logger.info('[Onboarding] Scan onboarding skipped', {}, 'UI');
     scanAnalytics.onboardingSkipped(currentStep + 1, STEPS.length);
     onComplete();
@@ -137,6 +137,13 @@ export const ScanOnboarding: React.FC<ScanOnboardingProps> = ({ onComplete }) =>
   );
 };
 
+// Hook-based check - used externally
+export const useShouldShowOnboarding = () => {
+  const { onboardingCompleted, isLoading } = useScanSettings();
+  return { shouldShow: !isLoading && !onboardingCompleted, isLoading };
+};
+
+// Fallback for non-hook contexts
 export const shouldShowOnboarding = (): boolean => {
-  return !localStorage.getItem(ONBOARDING_STORAGE_KEY);
+  return !localStorage.getItem('scan-onboarding-completed');
 };

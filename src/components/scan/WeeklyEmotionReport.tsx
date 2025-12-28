@@ -38,6 +38,7 @@ import { format, startOfWeek, endOfWeek, subWeeks, addWeeks } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useToast } from '@/hooks/use-toast';
+import { useScanSettings, WeekSnapshot } from '@/hooks/useScanSettings';
 
 interface DailyEmotion {
   day: string;
@@ -66,14 +67,6 @@ interface EmotionDimension {
   fullMark: 100;
 }
 
-interface WeekSnapshot {
-  weekStart: string;
-  stats: WeeklyStats;
-}
-
-const STORAGE_KEY = 'weekly_emotion_reports';
-const GOALS_KEY = 'weekly_emotion_goals';
-
 const MOCK_WEEKLY_DATA: DailyEmotion[] = [
   { day: 'Lun', valence: 65, arousal: 55, dominantEmotion: 'Calme', scansCount: 3 },
   { day: 'Mar', valence: 72, arousal: 68, dominantEmotion: 'Joie', scansCount: 4 },
@@ -97,25 +90,18 @@ const PIE_COLORS = ['#10b981', '#3b82f6', '#8b5cf6', '#f59e0b', '#ef4444', '#636
 
 export const WeeklyEmotionReport: React.FC = () => {
   const { toast } = useToast();
+  const { weeklyReports, weeklyGoal, saveWeeklyReport, setWeeklyGoal } = useScanSettings();
+  
   const [currentWeek, setCurrentWeek] = useState(new Date());
   const [weeklyData, setWeeklyData] = useState<DailyEmotion[]>(MOCK_WEEKLY_DATA);
   const [stats, setStats] = useState<WeeklyStats | null>(null);
   const [activeTab, setActiveTab] = useState('overview');
-  const [weeklyGoal, setWeeklyGoal] = useState(() => {
-    try {
-      return parseInt(localStorage.getItem(GOALS_KEY) || '14', 10);
-    } catch {
-      return 14;
-    }
-  });
-  const [reportHistory, setReportHistory] = useState<WeekSnapshot[]>(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      return stored ? JSON.parse(stored) : [];
-    } catch {
-      return [];
-    }
-  });
+  const [reportHistory, setReportHistory] = useState<WeekSnapshot[]>(weeklyReports);
+
+  // Sync from hook
+  useEffect(() => {
+    setReportHistory(weeklyReports);
+  }, [weeklyReports]);
 
   useEffect(() => {
     generateStats();

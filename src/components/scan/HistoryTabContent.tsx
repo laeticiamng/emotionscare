@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/collapsible";
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
+import { useScanSettings } from '@/hooks/useScanSettings';
 
 interface HistoryTabContentProps {
   emotionHistory: EmotionResult[];
@@ -39,26 +40,27 @@ type SortBy = 'date' | 'score' | 'emotion';
 type SortOrder = 'asc' | 'desc';
 type TimeFilter = 'all' | 'today' | 'week' | 'month';
 
-const FAVORITES_KEY = 'emotion-history-favorites';
-
 const HistoryTabContent: React.FC<HistoryTabContentProps> = ({ 
   emotionHistory,
   onDelete,
   onSelect
 }) => {
   const { toast } = useToast();
+  const { historyFavorites, toggleHistoryFavorite } = useScanSettings();
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<SortBy>('date');
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
   const [timeFilter, setTimeFilter] = useState<TimeFilter>('all');
   const [selectedEmotions, setSelectedEmotions] = useState<string[]>([]);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
-  const [favorites, setFavorites] = useState<string[]>(() => {
-    const stored = localStorage.getItem(FAVORITES_KEY);
-    return stored ? JSON.parse(stored) : [];
-  });
+  const [favorites, setFavorites] = useState<string[]>(historyFavorites);
   const [showStats, setShowStats] = useState(true);
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
+
+  // Sync favorites from hook
+  useEffect(() => {
+    setFavorites(historyFavorites);
+  }, [historyFavorites]);
 
   // Get unique emotions
   const uniqueEmotions = useMemo(() => {
@@ -156,12 +158,12 @@ const HistoryTabContent: React.FC<HistoryTabContentProps> = ({
   }, [filteredHistory]);
 
   // Toggle favorite
-  const toggleFavorite = (id: string) => {
+  const handleToggleFavorite = (id: string) => {
     const updated = favorites.includes(id)
       ? favorites.filter(f => f !== id)
       : [...favorites, id];
     setFavorites(updated);
-    localStorage.setItem(FAVORITES_KEY, JSON.stringify(updated));
+    toggleHistoryFavorite(id);
   };
 
   // Toggle item selection
