@@ -1,6 +1,8 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import type { MusicTrack } from '@/types/music';
 import { logger } from '@/lib/logger';
+
+export type RepeatMode = 'off' | 'all' | 'one';
 
 export const useMusicControls = () => {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -10,8 +12,13 @@ export const useMusicControls = () => {
   const [isMuted, setIsMuted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [currentTrack, setCurrentTrack] = useState<MusicTrack | null>(null);
+  const [shuffle, setShuffle] = useState(false);
+  const [repeatMode, setRepeatMode] = useState<RepeatMode>('off');
+  const [queue, setQueue] = useState<MusicTrack[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
   
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const previousVolumeRef = useRef(0.7);
 
   // Créer l'élément audio si nécessaire
   useEffect(() => {
@@ -28,10 +35,7 @@ export const useMusicControls = () => {
       audioRef.current.addEventListener('timeupdate', () => {
         setCurrentTime(audioRef.current?.currentTime || 0);
       });
-      audioRef.current.addEventListener('ended', () => {
-        setIsPlaying(false);
-        setCurrentTime(0);
-      });
+      audioRef.current.addEventListener('ended', handleTrackEnd);
       audioRef.current.addEventListener('error', (e) => {
         logger.error('Audio error', { error: e }, 'MUSIC');
         setIsLoading(false);
@@ -46,6 +50,54 @@ export const useMusicControls = () => {
       }
     };
   }, []);
+
+  // Gérer la fin de piste
+  const handleTrackEnd = useCallback(() => {
+    if (repeatMode === 'one') {
+      // Répéter la piste actuelle
+      if (audioRef.current) {
+        audioRef.current.currentTime = 0;
+        audioRef.current.play();
+      }
+    } else if (queue.length > 0) {
+      // Passer à la piste suivante
+      const nextIndex = getNextIndex();
+      if (nextIndex !== -1) {
+        setCurrentIndex(nextIndex);
+        const nextTrack = queue[nextIndex];
+        if (nextTrack) {
+          playTrack(nextTrack);
+        }
+      } else if (repeatMode === 'all') {
+        // Recommencer la queue
+        setCurrentIndex(0);
+        if (queue[0]) playTrack(queue[0]);
+      } else {
+        setIsPlaying(false);
+        setCurrentTime(0);
+      }
+    } else {
+      setIsPlaying(false);
+      setCurrentTime(0);
+    }
+  }, [repeatMode, queue]);
+
+  // Calculer l'index suivant (avec shuffle si activé)
+  const getNextIndex = useCallback((): number => {
+    if (queue.length === 0) return -1;
+    
+    if (shuffle) {
+      // Random index différent de l'actuel
+      const availableIndices = queue
+        .map((_, i) => i)
+        .filter(i => i !== currentIndex);
+      if (availableIndices.length === 0) return currentIndex;
+      return availableIndices[Math.floor(Math.random() * availableIndices.length)];
+    }
+    
+    const nextIdx = currentIndex + 1;
+    return nextIdx < queue.length ? nextIdx : -1;
+  }, [shuffle, currentIndex, queue]);
 
   // Mettre à jour le volume
   useEffect(() => {
@@ -109,9 +161,17 @@ export const useMusicControls = () => {
   const setVolumeLevel = (newVolume: number) => {
     const clampedVolume = Math.max(0, Math.min(1, newVolume));
     setVolume(clampedVolume);
+    if (clampedVolume > 0) {
+      previousVolumeRef.current = clampedVolume;
+    }
   };
 
   const toggleMute = () => {
+    if (isMuted) {
+      setVolume(previousVolumeRef.current);
+    } else {
+      previousVolumeRef.current = volume;
+    }
     setIsMuted(!isMuted);
   };
 
@@ -123,6 +183,46 @@ export const useMusicControls = () => {
     }
   };
 
+  const toggleShuffle = () => {
+    setShuffle(!shuffle);
+  };
+
+  const cycleRepeatMode = () => {
+    const modes: RepeatMode[] = ['off', 'all', 'one'];
+    const currentIdx = modes.indexOf(repeatMode);
+    setRepeatMode(modes[(currentIdx + 1) % modes.length]);
+  };
+
+  const next = () => {
+    const nextIdx = getNextIndex();
+    if (nextIdx !== -1 && queue[nextIdx]) {
+      setCurrentIndex(nextIdx);
+      playTrack(queue[nextIdx]);
+    }
+  };
+
+  const previous = () => {
+    // Si on est > 3 secondes, revenir au début de la piste
+    if (currentTime > 3) {
+      seek(0);
+      return;
+    }
+    
+    const prevIdx = currentIndex - 1;
+    if (prevIdx >= 0 && queue[prevIdx]) {
+      setCurrentIndex(prevIdx);
+      playTrack(queue[prevIdx]);
+    }
+  };
+
+  const setPlayQueue = (tracks: MusicTrack[], startIndex: number = 0) => {
+    setQueue(tracks);
+    setCurrentIndex(startIndex);
+    if (tracks[startIndex]) {
+      playTrack(tracks[startIndex]);
+    }
+  };
+
   return {
     isPlaying,
     currentTime,
@@ -131,6 +231,10 @@ export const useMusicControls = () => {
     isMuted,
     isLoading,
     currentTrack,
+    shuffle,
+    repeatMode,
+    queue,
+    currentIndex,
     playTrack,
     play,
     pause,
@@ -138,5 +242,10 @@ export const useMusicControls = () => {
     setVolume: setVolumeLevel,
     toggleMute,
     loadTrack,
+    toggleShuffle,
+    cycleRepeatMode,
+    next,
+    previous,
+    setPlayQueue,
   };
 };

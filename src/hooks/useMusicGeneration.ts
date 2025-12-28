@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';
 
@@ -13,13 +13,16 @@ export interface GeneratedTrack {
   mood?: string;
   coverUrl?: string;
   tags?: string;
+  taskId?: string;
+  status?: 'pending' | 'generating' | 'completed' | 'failed';
 }
 
 export const useMusicGeneration = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [currentTaskId, setCurrentTaskId] = useState<string | null>(null);
 
-  const generateMusic = async (
+  const generateMusic = useCallback(async (
     emotion: string, 
     customPrompt?: string,
     mood?: string,
@@ -30,51 +33,51 @@ export const useMusicGeneration = () => {
     setError(null);
     
     try {
-      logger.info('🎵 Génération musique 100% personnalisée style Nekfeu/Kendrick', { emotion, mood, intensity }, 'MUSIC');
+      logger.info('🎵 Génération musique thérapeutique', { emotion, mood, intensity }, 'MUSIC');
       
-      // Étape 1: Générer le prompt Suno optimal via IA
-      const { data: promptData, error: promptError } = await supabase.functions.invoke('generate-suno-prompt', {
+      // Utiliser emotion-music-ai qui gère tout le flow Suno
+      const { data, error: functionError } = await supabase.functions.invoke('emotion-music-ai', {
         body: {
-          emotion,
-          intensity: intensity * 100,
-          userContext,
-          mood
-        }
-      });
-
-      if (promptError || !promptData?.success) {
-        throw new Error('Erreur génération prompt IA');
-      }
-
-      const aiPrompt = promptData.prompt;
-      logger.info('✅ Prompt IA généré:', aiPrompt, 'MUSIC');
-
-      // Étape 2: Envoyer à Suno avec le prompt optimisé
-      const { data, error: functionError } = await supabase.functions.invoke('suno-music-generation', {
-        body: {
+          action: 'generate-music',
           emotion: emotion,
+          customPrompt: customPrompt || undefined,
           mood: mood,
           intensity: intensity,
-          style: aiPrompt.style,
-          lyrics: aiPrompt.prompt_lyrics,
-          customMode: true,
-          instrumental: false, // AVEC lyrics style rap
-          bpm: aiPrompt.bpm,
-          tags: aiPrompt.mood_tags
+          userContext: userContext
         }
       });
 
       if (functionError) {
-        logger.error('❌ Erreur Suno', functionError, 'MUSIC');
+        logger.error('❌ Erreur génération', functionError, 'MUSIC');
         throw new Error(functionError.message || 'Erreur lors de la génération');
       }
 
-      if (!data) {
-        throw new Error('Aucune donnée reçue de la génération musicale');
+      if (!data?.success) {
+        throw new Error(data?.error || data?.message || 'Échec de la génération');
       }
 
-      logger.info('✅ Track Suno générée avec succès', data, 'MUSIC');
-      return data as GeneratedTrack;
+      const taskId = data.taskId;
+      setCurrentTaskId(taskId);
+      logger.info('✅ Génération démarrée', { taskId }, 'MUSIC');
+
+      // Si la piste est déjà prête (fallback)
+      if (data.audio_url) {
+        return {
+          id: data.trackId || taskId,
+          title: `${emotion} - Therapeutic Music`,
+          artist: 'AI Generated',
+          url: data.audio_url,
+          audioUrl: data.audio_url,
+          duration: data.duration || 60,
+          emotion: emotion,
+          mood: mood,
+          status: 'completed'
+        };
+      }
+
+      // Polling pour attendre la génération
+      const track = await pollForCompletion(taskId, data.trackId, emotion, mood);
+      return track;
 
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erreur inconnue lors de la génération musicale';
@@ -83,12 +86,86 @@ export const useMusicGeneration = () => {
       return null;
     } finally {
       setIsGenerating(false);
+      setCurrentTaskId(null);
     }
+  }, []);
+
+  const pollForCompletion = async (
+    taskId: string, 
+    trackId: string | undefined,
+    emotion: string,
+    mood?: string
+  ): Promise<GeneratedTrack | null> => {
+    const maxAttempts = 60; // 2 minutes max
+    let attempts = 0;
+
+    while (attempts < maxAttempts) {
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      attempts++;
+
+      try {
+        const { data, error } = await supabase.functions.invoke('emotion-music-ai', {
+          body: {
+            action: 'check-status',
+            sunoTaskId: taskId,
+            trackId: trackId
+          }
+        });
+
+        if (error) {
+          logger.warn('Status check error', { error }, 'MUSIC');
+          continue;
+        }
+
+        if (data?.status === 'complete' || data?.status === 'completed') {
+          return {
+            id: trackId || taskId,
+            title: data.title || `${emotion} - Therapeutic Music`,
+            artist: 'AI Generated',
+            url: data.audio_url,
+            audioUrl: data.audio_url,
+            duration: data.duration || 60,
+            emotion: emotion,
+            mood: mood,
+            coverUrl: data.image_url,
+            status: 'completed'
+          };
+        }
+
+        if (data?.status === 'failed' || data?.status === 'error') {
+          throw new Error('La génération a échoué');
+        }
+
+        logger.info(`Génération en cours... (${attempts}/${maxAttempts})`, { status: data?.status }, 'MUSIC');
+      } catch (err) {
+        logger.warn('Polling error', { err }, 'MUSIC');
+      }
+    }
+
+    throw new Error('Timeout: la génération a pris trop de temps');
   };
+
+  const checkStatus = useCallback(async (taskId: string): Promise<string> => {
+    try {
+      const { data, error } = await supabase.functions.invoke('emotion-music-ai', {
+        body: {
+          action: 'check-status',
+          sunoTaskId: taskId
+        }
+      });
+
+      if (error) throw error;
+      return data?.status || 'unknown';
+    } catch {
+      return 'error';
+    }
+  }, []);
 
   return {
     generateMusic,
     isGenerating,
-    error
+    error,
+    currentTaskId,
+    checkStatus
   };
 };

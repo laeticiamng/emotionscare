@@ -98,13 +98,14 @@ export const SunoMusicGenerator: React.FC = () => {
     };
   }, [audioElement]);
 
-  const sunoApiKey = import.meta.env.VITE_SUNO_API_KEY;
+  // La clé API est gérée côté serveur, pas besoin de vérifier côté client
+  const isApiConfigured = true; // L'API Suno est configurée via secrets serveur
 
   const handleGenerateMusic = async () => {
-    if (!user || !sunoApiKey) {
+    if (!user) {
       toast({
-        title: 'Configuration manquante',
-        description: 'Veuillez vous connecter et configurer la clé API Suno',
+        title: 'Connexion requise',
+        description: 'Veuillez vous connecter pour générer de la musique',
         variant: 'destructive',
       });
       return;
@@ -318,14 +319,13 @@ export const SunoMusicGenerator: React.FC = () => {
         </CardHeader>
       </Card>
 
-      {!sunoApiKey && (
-        <Alert variant="destructive">
-          <AlertTriangle className="h-4 w-4" />
-          <AlertTitle>Configuration requise</AlertTitle>
+      {/* Info API - plus besoin de clé côté client */}
+      {!user && (
+        <Alert>
+          <Info className="h-4 w-4" />
+          <AlertTitle>Connexion requise</AlertTitle>
           <AlertDescription>
-            La clé API Suno n'est pas configurée. Ajoutez{' '}
-            <code className="bg-muted px-1 py-0.5 rounded">VITE_SUNO_API_KEY</code> dans votre
-            fichier .env
+            Connectez-vous pour accéder à la génération de musique IA
           </AlertDescription>
         </Alert>
       )}
@@ -445,7 +445,7 @@ export const SunoMusicGenerator: React.FC = () => {
               {/* Generate Button */}
               <Button
                 onClick={handleGenerateMusic}
-                disabled={isGenerating || !sunoApiKey}
+                disabled={isGenerating || !user}
                 className="w-full"
                 size="lg"
               >
