@@ -111,6 +111,15 @@ verify_jwt = true
 [functions.wearables-sync]
 verify_jwt = true
 
+[functions.suno-lyrics]
+verify_jwt = true
+
+[functions.suno-music]
+verify_jwt = true
+
+[functions.suno-callback]
+verify_jwt = false
+
 [api]
 enabled = true
 port = 54321

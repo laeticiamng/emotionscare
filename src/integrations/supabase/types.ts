@@ -12854,6 +12854,53 @@ export type Database = {
         }
         Relationships: []
       }
+      music_track_feedback: {
+        Row: {
+          context: Json | null
+          created_at: string
+          emotion_match: boolean | null
+          feedback_type: string | null
+          id: string
+          notes: string | null
+          rating: number | null
+          session_id: string | null
+          track_id: string
+          user_id: string
+        }
+        Insert: {
+          context?: Json | null
+          created_at?: string
+          emotion_match?: boolean | null
+          feedback_type?: string | null
+          id?: string
+          notes?: string | null
+          rating?: number | null
+          session_id?: string | null
+          track_id: string
+          user_id: string
+        }
+        Update: {
+          context?: Json | null
+          created_at?: string
+          emotion_match?: boolean | null
+          feedback_type?: string | null
+          id?: string
+          notes?: string | null
+          rating?: number | null
+          session_id?: string | null
+          track_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "music_track_feedback_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "music_generation_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       music_uploads: {
         Row: {
           bit_rate: number | null
