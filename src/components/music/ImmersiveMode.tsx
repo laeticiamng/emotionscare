@@ -47,17 +47,55 @@ interface ImmersiveModeProps {
   onVolumeChange?: (volume: number) => void;
 }
 
-const MOCK_LYRICS: LyricLine[] = [
-  { time: 0, text: '♪ Instrumental ♪' },
-  { time: 10, text: 'Sous les étoiles brillantes' },
-  { time: 15, text: 'Je marche dans la nuit' },
-  { time: 20, text: 'Le vent murmure doucement' },
-  { time: 25, text: 'Une mélodie infinie' },
-  { time: 30, text: 'Les rêves prennent leur envol' },
-  { time: 35, text: 'Vers un horizon lointain' },
-  { time: 40, text: 'La musique guide mes pas' },
-  { time: 45, text: 'Sur ce chemin incertain' },
-];
+// Generate therapeutic lyrics based on track mood
+const generateImmersiveLyrics = (track?: { mood?: string; title?: string }): LyricLine[] => {
+  if (!track) {
+    return [{ time: 0, text: '♪ Instrumental ♪' }];
+  }
+  
+  const mood = track.mood?.toLowerCase() || '';
+  
+  if (mood.includes('calm') || mood.includes('océan') || mood.includes('doux')) {
+    return [
+      { time: 0, text: '♪ Vagues apaisantes ♪' },
+      { time: 10, text: 'Le calme t\'envahit doucement' },
+      { time: 20, text: 'Respire... inspire... expire...' },
+      { time: 30, text: 'Tu es en paix avec toi-même' },
+      { time: 40, text: 'Laisse le stress s\'éloigner' },
+      { time: 50, text: '♪ Sérénité ♪' },
+    ];
+  }
+  
+  if (mood.includes('energ') || mood.includes('dynam')) {
+    return [
+      { time: 0, text: '♪ Énergie montante ♪' },
+      { time: 8, text: 'Sens la force en toi' },
+      { time: 16, text: 'Chaque battement te propulse' },
+      { time: 24, text: 'Tu es puissant, invincible' },
+      { time: 32, text: 'Rien ne peut t\'arrêter' },
+      { time: 40, text: '♪ Victoire ♪' },
+    ];
+  }
+  
+  if (mood.includes('focus') || mood.includes('concent') || mood.includes('créat')) {
+    return [
+      { time: 0, text: '♪ Clarté mentale ♪' },
+      { time: 12, text: 'Ton esprit est affûté' },
+      { time: 24, text: 'Les idées affluent naturellement' },
+      { time: 36, text: 'Concentration profonde' },
+      { time: 48, text: '♪ Excellence ♪' },
+    ];
+  }
+  
+  // Default healing/wellness
+  return [
+    { time: 0, text: '♪ Fréquences de guérison ♪' },
+    { time: 15, text: 'Ton corps se régénère' },
+    { time: 30, text: 'Harmonie corps et esprit' },
+    { time: 45, text: 'Tu te sens renouvelé' },
+    { time: 60, text: '♪ Bien-être profond ♪' },
+  ];
+};
 
 const formatTime = (seconds: number): string => {
   const mins = Math.floor(seconds / 60);
@@ -70,7 +108,7 @@ export const ImmersiveMode: React.FC<ImmersiveModeProps> = ({
   isPlaying = false,
   progress = 0,
   volume = 80,
-  lyrics = MOCK_LYRICS,
+  lyrics: externalLyrics,
   isOpen = false,
   onClose,
   onPlay,
@@ -80,6 +118,9 @@ export const ImmersiveMode: React.FC<ImmersiveModeProps> = ({
   onSeek,
   onVolumeChange,
 }) => {
+  // Generate lyrics based on track if none provided
+  const lyrics = externalLyrics || generateImmersiveLyrics(track);
+  
   const [showControls, setShowControls] = useState(true);
   const [showLyrics, setShowLyrics] = useState(true);
   const [isMuted, setIsMuted] = useState(false);

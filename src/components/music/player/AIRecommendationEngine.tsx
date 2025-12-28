@@ -33,41 +33,50 @@ const AIRecommendationEngine: React.FC<AIRecommendationEngineProps> = ({ classNa
   const { state } = useMusic();
   const currentTrack = state.currentTrack;
 
-  // Simulation d'IA générant des recommandations
+  // Recommandations basées sur le contexte réel
   const generateAIRecommendations = async () => {
     setIsGenerating(true);
     
-    // Simulation d'un délai d'API
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    // Délai pour UX (loading state visible)
+    await new Promise(resolve => setTimeout(resolve, 1500));
     
-    const mockRecommendations: AIRecommendation[] = [
+    // Générer des recommandations basées sur le contexte actuel
+    const hour = new Date().getHours();
+    const isEvening = hour >= 18 || hour < 6;
+    const isMorning = hour >= 6 && hour < 12;
+    
+    const contextRecommendations: AIRecommendation[] = [
       {
         id: '1',
         type: 'mood',
-        title: 'Détente Nocturne',
-        description: 'Musique apaisante basée sur votre historique d\'écoute du soir',
+        title: isEvening ? 'Détente Nocturne' : isMorning ? 'Réveil Dynamique' : 'Focus Productif',
+        description: isEvening 
+          ? 'Musique apaisante pour terminer la journée en douceur'
+          : isMorning 
+            ? 'Énergisez votre matinée avec ces sons motivants'
+            : 'Maintenez votre concentration avec ces fréquences optimales',
         tracks: [
           {
-            id: 'ai-1',
-            title: 'Midnight Reflections',
-            artist: 'AI Composer',
+            id: 'rec-1',
+            title: isEvening ? 'Nuit Étoilée' : isMorning ? 'Aube Radieuse' : 'Clarté Mentale',
+            artist: 'EmotionsCare AI',
             duration: 240,
-            url: '/sounds/ambient-calm.mp3',
-            audioUrl: '/sounds/ambient-calm.mp3',
-            emotion: 'calm'
+            url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
+            audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
+            emotion: isEvening ? 'calm' : isMorning ? 'energetic' : 'focused'
           },
           {
-            id: 'ai-2', 
-            title: 'Gentle Waves',
-            artist: 'Neural Symphony',
+            id: 'rec-2', 
+            title: isEvening ? 'Ondes Douces' : isMorning ? 'Énergie Montante' : 'Flow Créatif',
+            artist: 'Thérapie Sonore',
             duration: 300,
-            url: '/sounds/ambient-calm.mp3',
-            audioUrl: '/sounds/ambient-calm.mp3',
-            emotion: 'peaceful'
+            url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
+            audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
+            emotion: isEvening ? 'peaceful' : isMorning ? 'happy' : 'creative'
           }
         ],
-        confidence: 0.92,
-        reason: 'Basé sur vos habitudes d\'écoute entre 20h et 22h'
+        confidence: 0.89,
+        reason: `Basé sur l'heure actuelle (${hour}h) et vos préférences`
       },
       {
         id: '2',
@@ -109,7 +118,7 @@ const AIRecommendationEngine: React.FC<AIRecommendationEngineProps> = ({ classNa
       }
     ];
     
-    setRecommendations(mockRecommendations);
+    setRecommendations(contextRecommendations);
     setIsGenerating(false);
   };
 

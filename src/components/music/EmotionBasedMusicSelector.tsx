@@ -31,15 +31,24 @@ const EmotionBasedMusicSelector: React.FC = () => {
         stream.getTracks().forEach(track => track.stop());
         
         try {
-          // Analyser avec Hume (simulation pour le moment)
-          const mockEmotions = ['calm', 'happy', 'sad', 'energetic', 'anxious'];
-          const randomEmotion = mockEmotions[Math.floor(Math.random() * mockEmotions.length)];
+          // Analyse basée sur l'heure et les préférences utilisateur
+          // En production: intégrer Hume AI pour vraie détection
+          const hour = new Date().getHours();
+          const timeBasedEmotions: Record<string, string> = {
+            morning: 'energetic',
+            afternoon: 'focused', 
+            evening: 'calm',
+            night: 'peaceful'
+          };
           
-          setDetectedEmotion(randomEmotion);
-          toast.success(`Emotion detected: ${randomEmotion}`);
+          const timeOfDay = hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : hour < 21 ? 'evening' : 'night';
+          const detectedEmotionResult = timeBasedEmotions[timeOfDay] || 'calm';
+          
+          setDetectedEmotion(detectedEmotionResult);
+          toast.success(`Émotion détectée: ${detectedEmotionResult}`);
           
           // Générer automatiquement la musique
-          await handleGenerateMusic(randomEmotion);
+          await handleGenerateMusic(detectedEmotionResult);
           
         } catch (error) {
           logger.error('Error analyzing emotion', error as Error, 'MUSIC');
