@@ -23,6 +23,7 @@ const B2CAmbitionArcadePage: React.FC = () => {
 
   const activeGoals = goals?.filter(g => g.status === 'active') || [];
   const completedGoals = goals?.filter(g => g.status === 'completed') || [];
+  const abandonedGoals = goals?.filter(g => g.status === 'abandoned') || [];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-muted/20 p-4 md:p-6" data-testid="page-root">
@@ -121,8 +122,16 @@ const B2CAmbitionArcadePage: React.FC = () => {
             {/* Completed Goals */}
             {completedGoals.length > 0 && (
               <div className="space-y-4">
-                <h3 className="text-sm font-medium text-muted-foreground uppercase">Complétés</h3>
+                <h3 className="text-sm font-medium text-muted-foreground uppercase">Complétés ({completedGoals.length})</h3>
                 {completedGoals.map(goal => <GoalCard key={goal.id} goal={goal} />)}
+              </div>
+            )}
+
+            {/* Abandoned Goals */}
+            {abandonedGoals.length > 0 && (
+              <div className="space-y-4">
+                <h3 className="text-sm font-medium text-muted-foreground uppercase">Abandonnés ({abandonedGoals.length})</h3>
+                {abandonedGoals.map(goal => <GoalCard key={goal.id} goal={goal} />)}
               </div>
             )}
 
