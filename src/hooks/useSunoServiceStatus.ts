@@ -1,5 +1,5 @@
 /**
- * Hook pour gérer le statut du service Suno
+ * Hook pour gérer le statut du service Suno avec health check réel
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -15,7 +15,6 @@ export const useSunoServiceStatus = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [userId, setUserId] = useState<string | undefined>(undefined);
 
-  // Récupérer l'ID de l'utilisateur connecté
   useEffect(() => {
     const fetchUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -24,15 +23,43 @@ export const useSunoServiceStatus = () => {
     fetchUser();
   }, []);
 
-  // Activer les notifications en temps réel
   useMusicQueueNotifications(userId);
 
   const fetchStatus = useCallback(async () => {
     try {
-      const apiStatus = await getSunoApiStatus();
-      setStatus(apiStatus);
+      const startTime = Date.now();
+      
+      const { data, error } = await supabase.functions.invoke('suno-music', {
+        body: { action: 'health-check' }
+      });
+
+      const responseTime = Date.now() - startTime;
+
+      if (error) {
+        const apiStatus = await getSunoApiStatus();
+        setStatus(apiStatus);
+        return;
+      }
+
+      if (data?.status === 'ok' || data?.success) {
+        const apiStatus = await getSunoApiStatus();
+        setStatus({
+          ...apiStatus,
+          is_available: true,
+          consecutive_failures: 0
+        });
+      } else {
+        const apiStatus = await getSunoApiStatus();
+        setStatus(apiStatus);
+      }
     } catch (error) {
       logger.error('Failed to fetch service status', error as Error, 'MUSIC_STATUS');
+      try {
+        const apiStatus = await getSunoApiStatus();
+        setStatus(apiStatus);
+      } catch {
+        // Fallback silently
+      }
     }
   }, []);
 
@@ -53,12 +80,7 @@ export const useSunoServiceStatus = () => {
 
   useEffect(() => {
     refresh();
-
-    // Polling toutes les 30 secondes
-    const interval = setInterval(() => {
-      refresh();
-    }, 30000);
-
+    const interval = setInterval(refresh, 30000);
     return () => clearInterval(interval);
   }, [refresh]);
 
