@@ -59,6 +59,14 @@ const SunoCreditsDisplay: React.FC<SunoCreditsDisplayProps> = ({
     }
   }, [credits.loading, credits.remaining, credits.total, isLow, isCritical]);
 
+  // Auto-refresh des crédits toutes les 2 minutes
+  useEffect(() => {
+    const interval = setInterval(() => {
+      refreshCredits();
+    }, 2 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, [refreshCredits]);
+
   if (credits.loading) {
     return (
       <div className={cn("flex items-center gap-2 text-muted-foreground", className)}>
