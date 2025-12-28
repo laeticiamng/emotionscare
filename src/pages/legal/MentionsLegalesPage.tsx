@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Building, Mail, Phone, Shield } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { routes } from '@/lib/routes';
 
 /**
@@ -82,7 +82,7 @@ export const MentionsLegalesPage: React.FC = () => {
               </p>
               <p>
                 Pour plus d'informations sur le traitement de vos données personnelles, consultez notre{' '}
-                <a href="/legal/privacy" className="text-primary hover:underline">Politique de confidentialité</a>.
+                <Link to="/legal/privacy" className="text-primary hover:underline">Politique de confidentialité</Link>.
               </p>
               <p>
                 <strong>Réclamation CNIL :</strong> Vous pouvez introduire une réclamation auprès de la Commission Nationale de l'Informatique et des Libertés (CNIL) :<br />
@@ -111,7 +111,7 @@ export const MentionsLegalesPage: React.FC = () => {
               </ul>
               <p>
                 Pour consulter les licences des logiciels open source utilisés, voir notre page{' '}
-                <a href="/legal/licenses" className="text-primary hover:underline">Crédits & Licences</a>.
+                <Link to="/legal/licenses" className="text-primary hover:underline">Crédits & Licences</Link>.
               </p>
             </section>
 

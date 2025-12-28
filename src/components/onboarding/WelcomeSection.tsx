@@ -1,6 +1,7 @@
 // @ts-nocheck
 
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -326,9 +327,9 @@ const WelcomeSection: React.FC<WelcomeSectionProps> = ({ onContinue, videoRef, o
           </Button>
           <p className="text-xs text-muted-foreground text-center">
             En continuant, vous acceptez notre{' '}
-            <a href="/legal/privacy" className="underline hover:text-primary">
+            <Link to="/legal/privacy" className="underline hover:text-primary">
               politique de confidentialité
-            </a>
+            </Link>
           </p>
         </motion.div>
       </div>

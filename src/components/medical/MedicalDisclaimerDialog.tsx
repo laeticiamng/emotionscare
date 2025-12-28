@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import {
   Dialog,
   DialogContent,
@@ -170,7 +171,7 @@ export const MedicalDisclaimerDialog: React.FC<MedicalDisclaimerDialogProps> = (
           <div className="text-xs text-muted-foreground border-t pt-4">
             <p>
               <strong>Confidentialité :</strong> Vos données sont protégées conformément au RGPD. 
-              Consultez notre <a href="/legal/privacy" className="text-primary hover:underline" target="_blank">Politique de Confidentialité</a>.
+              Consultez notre <Link to="/legal/privacy" className="text-primary hover:underline">Politique de Confidentialité</Link>.
             </p>
             <p className="mt-2">
               <strong>Responsabilité :</strong> EmotionsCare décline toute responsabilité en cas d'utilisation 

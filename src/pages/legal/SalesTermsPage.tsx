@@ -6,7 +6,7 @@ import {
   ArrowLeft, ShoppingCart, CreditCard, RotateCcw, 
   FileText, AlertCircle, Euro, Calendar 
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { routes } from '@/lib/routes';
 
 /**
@@ -362,7 +362,7 @@ export const SalesTermsPage: React.FC = () => {
               <h2>9. Protection des données personnelles</h2>
               <p>
                 Les données personnelles collectées lors de la souscription et de l'utilisation du service sont traitées 
-                conformément au RGPD et à notre <a href="/legal/privacy" className="text-primary hover:underline">Politique de Confidentialité</a>.
+                conformément au RGPD et à notre <Link to="/legal/privacy" className="text-primary hover:underline">Politique de Confidentialité</Link>.
               </p>
               <p>
                 <strong>Responsable du traitement :</strong> EmotionsCare SAS<br />
