@@ -18,7 +18,7 @@ import { logger } from '@/lib/logger';
 import { ScanOnboarding, useShouldShowOnboarding } from '@/components/scan/ScanOnboarding';
 import { useToast } from '@/hooks/use-toast';
 import { scanAnalytics } from '@/lib/analytics/scanEvents';
-import { Camera, Mic, FileText, Sliders, BarChart3, Lightbulb, Download, Calendar, Loader2 } from 'lucide-react';
+import { Camera, Mic, FileText, Sliders, BarChart3, Lightbulb, Download, Calendar, Loader2, ArrowLeft } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 // Lazy load heavy components for faster initial render
@@ -314,6 +314,16 @@ const B2CScanPage: React.FC = () => {
         )}
         <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-primary/10">
           <div className="container mx-auto flex flex-col gap-10 px-4 py-10">
+          
+          {/* Bouton retour au menu */}
+          <div className="flex items-center gap-4">
+            <Link to="/app/home">
+              <Button variant="ghost" size="sm" className="gap-2 text-muted-foreground hover:text-foreground">
+                <ArrowLeft className="h-4 w-4" />
+                Retour au menu
+              </Button>
+            </Link>
+          </div>
           
           {/* Navigation des modalités de scan */}
           <nav className="flex gap-2 overflow-x-auto pb-2">
