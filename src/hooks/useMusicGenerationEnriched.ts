@@ -207,8 +207,12 @@ export const useMusicGenerationEnriched = () => {
         setProgress(50);
         setCurrentStep('Génération musicale en cours...');
 
-        const { data, error: functionError } = await supabase.functions.invoke('suno-music-generation', {
-          body: sunoBody
+        const { data, error: functionError } = await supabase.functions.invoke('suno-music', {
+          body: {
+            action: 'generate',
+            ...sunoBody,
+            mood: emotion
+          }
         });
 
         if (functionError) {

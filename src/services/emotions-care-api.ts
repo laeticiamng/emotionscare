@@ -50,13 +50,15 @@ export class EmotionsCareApi {
     try {
       logger.info('Generating Suno music', { params }, 'MUSIC');
 
-      const { data, error } = await supabase.functions.invoke('suno-music-generation', {
+      const { data, error } = await supabase.functions.invoke('suno-music', {
         body: {
+          action: 'generate',
           emotion: params.emotion,
+          mood: params.emotion,
           intensity: params.intensity,
-          duration_minutes: params.duration || 3,
-          style: params.style || 'ambient',
-          prompt: params.prompt || `Musique thérapeutique pour ${params.emotion}`
+          style: params.style || 'therapeutic ambient',
+          prompt: params.prompt || `Musique thérapeutique pour ${params.emotion}`,
+          instrumental: true
         }
       });
 

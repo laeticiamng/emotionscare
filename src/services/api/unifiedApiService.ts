@@ -119,9 +119,13 @@ class UnifiedApiService {
 
   // === GÉNÉRATION MUSICALE ===
   async generateMusic(request: MusicGenerationRequest): Promise<ApiResponse<{ trackId: string; url: string }>> {
-    return this.makeRequest<{ trackId: string; url: string }>('emotionscare-music-generator', {
+    return this.makeRequest<{ trackId: string; url: string }>('suno-music', {
       method: 'POST',
-      body: JSON.stringify(request),
+      body: JSON.stringify({
+        action: 'generate',
+        ...request,
+        mood: request.emotion || 'calm'
+      }),
     });
   }
 

@@ -85,13 +85,13 @@ export default function ApiHealthCheck() {
         }
       },
       {
-        name: 'Music Therapy',
+        name: 'Adaptive Music',
         test: async () => {
-          const { data, error } = await supabase.functions.invoke('music-therapy', {
-            body: { mood: 'relaxation', duration: 300, genre: 'ambient' }
+          const { data, error } = await supabase.functions.invoke('adaptive-music', {
+            body: { action: 'create-playlist', emotions: ['calm'], duration: 5 }
           });
           if (error) throw new Error(error.message);
-          return `✅ Session thérapie: ${data?.therapy?.tracks?.length || 3} pistes`;
+          return `✅ Musique adaptative: ${data?.tracks?.length || 3} pistes`;
         }
       },
       {

@@ -34,8 +34,15 @@ export interface SunoAddVocalsRequest {
 
 export async function generateMusic(request: SunoGenerateRequest) {
   try {
-    const { data, error } = await supabase.functions.invoke('suno-music-generation', {
-      body: request
+    const { data, error } = await supabase.functions.invoke('suno-music', {
+      body: {
+        action: 'generate',
+        prompt: request.prompt,
+        mood: request.style?.split(' ')[0] || 'calm',
+        style: request.style,
+        title: request.title,
+        instrumental: request.instrumental
+      }
     });
 
     if (error) throw error;
