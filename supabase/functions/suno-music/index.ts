@@ -12,33 +12,33 @@ const corsHeaders = {
 // API Base URL - https://docs.sunoapi.org/#api-base-url
 const SUNO_API_BASE = 'https://api.sunoapi.org';
 
-// URLs de fallback - Mixkit MP3 (CORS activé, fiables)
+// URLs de fallback - Pixabay CDN MP3 (CORS natif, vérifié)
 const FALLBACK_TRACKS: Record<string, { url: string; duration: number; bpm: number }[]> = {
   calm: [
-    { url: 'https://assets.mixkit.co/music/preview/mixkit-serene-view-443.mp3', duration: 180, bpm: 60 },
-    { url: 'https://assets.mixkit.co/music/preview/mixkit-valley-sunset-127.mp3', duration: 195, bpm: 55 },
+    { url: 'https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3', duration: 180, bpm: 60 },
+    { url: 'https://cdn.pixabay.com/download/audio/2021/04/06/audio_63aa86e805.mp3', duration: 195, bpm: 55 },
   ],
   energize: [
-    { url: 'https://assets.mixkit.co/music/preview/mixkit-tech-house-vibes-130.mp3', duration: 150, bpm: 120 },
-    { url: 'https://assets.mixkit.co/music/preview/mixkit-hip-hop-02-738.mp3', duration: 165, bpm: 110 },
+    { url: 'https://cdn.pixabay.com/download/audio/2022/10/25/audio_946b0939c8.mp3', duration: 150, bpm: 120 },
+    { url: 'https://cdn.pixabay.com/download/audio/2022/08/02/audio_884fe92c21.mp3', duration: 165, bpm: 110 },
   ],
   focus: [
-    { url: 'https://assets.mixkit.co/music/preview/mixkit-deep-urban-623.mp3', duration: 240, bpm: 80 },
-    { url: 'https://assets.mixkit.co/music/preview/mixkit-sleepy-cat-135.mp3', duration: 200, bpm: 75 },
+    { url: 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_8cb749d484.mp3', duration: 240, bpm: 80 },
+    { url: 'https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0c6ff1bab.mp3', duration: 200, bpm: 75 },
   ],
   sleep: [
-    { url: 'https://assets.mixkit.co/music/preview/mixkit-valley-sunset-127.mp3', duration: 300, bpm: 50 },
-    { url: 'https://assets.mixkit.co/music/preview/mixkit-serene-view-443.mp3', duration: 280, bpm: 45 },
+    { url: 'https://cdn.pixabay.com/download/audio/2021/04/06/audio_63aa86e805.mp3', duration: 300, bpm: 50 },
+    { url: 'https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3', duration: 280, bpm: 45 },
   ],
   meditation: [
-    { url: 'https://assets.mixkit.co/music/preview/mixkit-serene-view-443.mp3', duration: 120, bpm: 60 },
-    { url: 'https://assets.mixkit.co/music/preview/mixkit-valley-sunset-127.mp3', duration: 180, bpm: 55 },
+    { url: 'https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3', duration: 120, bpm: 60 },
+    { url: 'https://cdn.pixabay.com/download/audio/2021/04/06/audio_63aa86e805.mp3', duration: 180, bpm: 55 },
   ],
   anxiety: [
-    { url: 'https://assets.mixkit.co/music/preview/mixkit-serene-view-443.mp3', duration: 200, bpm: 65 },
+    { url: 'https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3', duration: 200, bpm: 65 },
   ],
   joy: [
-    { url: 'https://assets.mixkit.co/music/preview/mixkit-tech-house-vibes-130.mp3', duration: 150, bpm: 100 },
+    { url: 'https://cdn.pixabay.com/download/audio/2022/10/25/audio_946b0939c8.mp3', duration: 150, bpm: 100 },
   ],
 };
 

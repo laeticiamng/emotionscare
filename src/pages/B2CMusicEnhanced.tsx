@@ -79,23 +79,23 @@ interface VinylTrack extends MusicTrack {
   waveform?: number[];
 }
 
-// Configuration audio - URLs MP3 Mixkit (CORS activé, fiables)
+// Configuration audio - URLs Pixabay CDN (CORS natif, MP3 vérifié)
 const AUDIO_URL_CONFIG = {
   'vinyl-1': { 
     fileName: 'ambient-soft.mp3', 
-    fallbackUrl: 'https://assets.mixkit.co/music/preview/mixkit-serene-view-443.mp3'
+    fallbackUrl: 'https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3'
   },
   'vinyl-2': { 
     fileName: 'focus-clarity.mp3', 
-    fallbackUrl: 'https://assets.mixkit.co/music/preview/mixkit-tech-house-vibes-130.mp3'
+    fallbackUrl: 'https://cdn.pixabay.com/download/audio/2022/10/25/audio_946b0939c8.mp3'
   },
   'vinyl-3': { 
     fileName: 'creative-flow.mp3', 
-    fallbackUrl: 'https://assets.mixkit.co/music/preview/mixkit-deep-urban-623.mp3'
+    fallbackUrl: 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_8cb749d484.mp3'
   },
   'vinyl-4': { 
     fileName: 'healing-waves.mp3', 
-    fallbackUrl: 'https://assets.mixkit.co/music/preview/mixkit-valley-sunset-127.mp3'
+    fallbackUrl: 'https://cdn.pixabay.com/download/audio/2021/04/06/audio_63aa86e805.mp3'
   }
 } as const;
 
