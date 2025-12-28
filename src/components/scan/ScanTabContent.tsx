@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -12,7 +12,7 @@ import UnifiedEmotionCheckin from './UnifiedEmotionCheckin';
 import { 
   Camera, Mic, MessageSquare, Smile, TrendingUp, Clock, 
   Calendar, BarChart3, Share2, Download, Filter, Star, 
-  Sparkles, History, Target, Award
+  Sparkles, History, Target, Award, Loader2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -23,20 +23,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-
-const SCAN_STATS_KEY = 'scan_statistics';
-const SCAN_HISTORY_KEY = 'scan_history';
-const FAVORITE_METHODS_KEY = 'favorite_scan_methods';
-
-interface ScanStats {
-  totalScans: number;
-  scansByMethod: Record<string, number>;
-  lastScanDate: string | null;
-  averageEmotionScore: number;
-  streakDays: number;
-  weeklyGoal: number;
-  weeklyProgress: number;
-}
+import { useScanSettings, type ScanStats, type ScanHistoryEntry } from '@/hooks/useScanSettings';
 
 interface ScanTabContentProps {
   showScanForm: boolean;
@@ -59,34 +46,31 @@ const ScanTabContent: React.FC<ScanTabContentProps> = ({
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<'scan' | 'stats' | 'history'>('scan');
   const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
-  const [stats, setStats] = useState<ScanStats>({
-    totalScans: 0,
-    scansByMethod: {},
-    lastScanDate: null,
-    averageEmotionScore: 0,
-    streakDays: 0,
-    weeklyGoal: 7,
-    weeklyProgress: 0
-  });
-  const [history, setHistory] = useState<Array<{ id: string; date: string; method: string; emotion: string; score: number }>>([]);
-  const [favoriteMethods, setFavoriteMethods] = useState<string[]>([]);
   const [filterMethod, setFilterMethod] = useState<string | null>(null);
 
-  // Load saved data
-  useEffect(() => {
-    const savedStats = localStorage.getItem(SCAN_STATS_KEY);
-    const savedHistory = localStorage.getItem(SCAN_HISTORY_KEY);
-    const savedFavorites = localStorage.getItem(FAVORITE_METHODS_KEY);
-    
-    if (savedStats) setStats(JSON.parse(savedStats));
-    if (savedHistory) setHistory(JSON.parse(savedHistory));
-    if (savedFavorites) setFavoriteMethods(JSON.parse(savedFavorites));
-  }, []);
+  // Use Supabase-backed settings instead of localStorage
+  const {
+    stats,
+    history,
+    favoriteMethods,
+    isLoading,
+    updateStats,
+    addHistoryEntry,
+    toggleFavoriteMethod
+  } = useScanSettings();
+
+  // Show loading state while fetching from Supabase
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
 
   const handleScanComplete = (result: EmotionResult) => {
-    // Update stats
-    const newStats = {
-      ...stats,
+    // Calculate new stats
+    const newStats: Partial<ScanStats> = {
       totalScans: stats.totalScans + 1,
       scansByMethod: {
         ...stats.scansByMethod,
@@ -110,34 +94,24 @@ const ScanTabContent: React.FC<ScanTabContentProps> = ({
       newStats.streakDays = 1;
     }
 
-    setStats(newStats);
-    localStorage.setItem(SCAN_STATS_KEY, JSON.stringify(newStats));
+    // Update via hook (saves to Supabase)
+    updateStats(newStats);
 
-    // Add to history
-    const historyEntry = {
-      id: Date.now().toString(),
+    // Add to history via hook (saves to Supabase)
+    addHistoryEntry({
       date: new Date().toISOString(),
       method: selectedMethod || 'text',
       emotion: result.primaryEmotion || 'neutral',
       score: result.intensity || 50
-    };
-    const newHistory = [historyEntry, ...history].slice(0, 100);
-    setHistory(newHistory);
-    localStorage.setItem(SCAN_HISTORY_KEY, JSON.stringify(newHistory));
+    });
 
     onScanComplete(result);
     setShowScanForm(false);
     setSelectedMethod(null);
   };
 
-  const toggleFavoriteMethod = (methodId: string) => {
-    const newFavorites = favoriteMethods.includes(methodId)
-      ? favoriteMethods.filter(m => m !== methodId)
-      : [...favoriteMethods, methodId];
-    
-    setFavoriteMethods(newFavorites);
-    localStorage.setItem(FAVORITE_METHODS_KEY, JSON.stringify(newFavorites));
-    
+  const handleToggleFavorite = (methodId: string) => {
+    toggleFavoriteMethod(methodId);
     toast({
       title: favoriteMethods.includes(methodId) ? 'Retiré des favoris' : 'Ajouté aux favoris',
       duration: 2000

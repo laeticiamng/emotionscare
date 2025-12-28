@@ -3,8 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { EmotionResult } from '@/types';
 import { useToast } from '@/hooks/use-toast';
-
-const STORAGE_KEY = 'emotion-scan-draft';
+import { useScanSettings } from '@/hooks/useScanSettings';
 
 interface EmotionScanFormState {
   step: number;
@@ -48,17 +47,18 @@ const initialState: EmotionScanFormState = {
 export function useEmotionScanFormState(): UseEmotionScanFormStateReturn {
   const { toast } = useToast();
   const [state, setState] = useState<EmotionScanFormState>(initialState);
+  
+  // Use Supabase-backed draft storage
+  const { draft, saveDraft: saveToSupabase, clearDraft: clearFromSupabase, isLoading } = useScanSettings();
 
-  // Auto-load draft on mount
+  // Auto-load draft from Supabase on mount
   useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
+    if (!isLoading && draft) {
       try {
-        const parsed = JSON.parse(saved);
         setState(prev => ({
           ...prev,
-          ...parsed,
-          lastSaved: parsed.lastSaved ? new Date(parsed.lastSaved) : null,
+          ...draft,
+          lastSaved: draft.lastSaved ? new Date(draft.lastSaved) : null,
           isSubmitting: false,
           error: null
         }));
@@ -66,21 +66,21 @@ export function useEmotionScanFormState(): UseEmotionScanFormStateReturn {
         console.error('Failed to load draft:', e);
       }
     }
-  }, []);
+  }, [isLoading, draft]);
 
-  // Auto-save draft when state changes
+  // Auto-save draft to Supabase when state changes (debounced by hook)
   useEffect(() => {
     if (state.emotionResult || state.selectedTriggers.length > 0 || state.notes) {
-      const draft = {
+      const draftData = {
         step: state.step,
         emotionResult: state.emotionResult,
         selectedTriggers: state.selectedTriggers,
         notes: state.notes,
         lastSaved: new Date().toISOString()
       };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(draft));
+      saveToSupabase(draftData);
     }
-  }, [state.emotionResult, state.selectedTriggers, state.notes, state.step]);
+  }, [state.emotionResult, state.selectedTriggers, state.notes, state.step, saveToSupabase]);
 
   const setStep = useCallback((step: number) => {
     setState(prev => ({ ...prev, step }));
@@ -127,34 +127,33 @@ export function useEmotionScanFormState(): UseEmotionScanFormStateReturn {
 
   const resetForm = useCallback(() => {
     setState(initialState);
-    localStorage.removeItem(STORAGE_KEY);
-  }, []);
+    clearFromSupabase();
+  }, [clearFromSupabase]);
 
   const saveDraft = useCallback(() => {
-    const draft = {
+    const draftData = {
       step: state.step,
       emotionResult: state.emotionResult,
       selectedTriggers: state.selectedTriggers,
       notes: state.notes,
       lastSaved: new Date().toISOString()
     };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(draft));
+    saveToSupabase(draftData);
     setState(prev => ({ ...prev, lastSaved: new Date() }));
     toast({
       title: 'Brouillon sauvegardé',
       description: 'Votre scan a été sauvegardé. Vous pouvez le reprendre plus tard.'
     });
-  }, [state, toast]);
+  }, [state, toast, saveToSupabase]);
 
   const loadDraft = useCallback((): boolean => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
+    // Draft is auto-loaded from Supabase via useScanSettings hook
+    if (draft) {
       try {
-        const parsed = JSON.parse(saved);
         setState(prev => ({
           ...prev,
-          ...parsed,
-          lastSaved: parsed.lastSaved ? new Date(parsed.lastSaved) : null,
+          ...draft,
+          lastSaved: draft.lastSaved ? new Date(draft.lastSaved) : null,
           isSubmitting: false,
           error: null
         }));
@@ -164,12 +163,12 @@ export function useEmotionScanFormState(): UseEmotionScanFormStateReturn {
       }
     }
     return false;
-  }, []);
+  }, [draft]);
 
   const clearDraft = useCallback(() => {
-    localStorage.removeItem(STORAGE_KEY);
+    clearFromSupabase();
     setState(prev => ({ ...prev, lastSaved: null }));
-  }, []);
+  }, [clearFromSupabase]);
 
   const handleSave = useCallback(async () => {
     // Validation
@@ -187,8 +186,8 @@ export function useEmotionScanFormState(): UseEmotionScanFormStateReturn {
       // Mock API call with a delay
       await new Promise(resolve => setTimeout(resolve, 1000));
 
-      // Clear draft on success
-      localStorage.removeItem(STORAGE_KEY);
+      // Clear draft on success (Supabase)
+      clearFromSupabase();
 
       toast({
         title: 'Scan enregistré ! 🎉',
