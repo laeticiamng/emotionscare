@@ -27,51 +27,58 @@ export const MusicVisualizer: React.FC<MusicVisualizerProps> = ({
   useEffect(() => {
     if (!audioElement || !enabled || !canvasRef.current) return;
 
-    const audioContext = new AudioContext();
-    const analyser = audioContext.createAnalyser();
-    const source = audioContext.createMediaElementSource(audioElement);
+    let audioContext: AudioContext | null = null;
     
-    analyser.fftSize = 256;
-    const bufferLength = analyser.frequencyBinCount;
-    const dataArray = new Uint8Array(bufferLength);
+    try {
+      audioContext = new AudioContext();
+      const analyser = audioContext.createAnalyser();
+      const source = audioContext.createMediaElementSource(audioElement);
+      
+      analyser.fftSize = 256;
+      const bufferLength = analyser.frequencyBinCount;
+      const dataArray = new Uint8Array(bufferLength);
 
-    source.connect(analyser);
-    analyser.connect(audioContext.destination);
-    
-    analyserRef.current = analyser;
-    dataArrayRef.current = dataArray;
+      source.connect(analyser);
+      analyser.connect(audioContext.destination);
+      
+      analyserRef.current = analyser;
+      dataArrayRef.current = dataArray;
 
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+      const canvas = canvasRef.current;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
 
-    const draw = () => {
-      if (!analyserRef.current || !dataArrayRef.current) return;
+      const draw = () => {
+        if (!analyserRef.current || !dataArrayRef.current) return;
 
-      animationRef.current = requestAnimationFrame(draw);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      analyserRef.current.getByteFrequencyData(dataArrayRef.current as any);
+        animationRef.current = requestAnimationFrame(draw);
+        analyserRef.current.getByteFrequencyData(dataArrayRef.current as Uint8Array<ArrayBuffer>);
 
-      ctx.fillStyle = 'hsl(var(--background))';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = 'hsl(var(--background))';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      const currentData = dataArrayRef.current;
-      if (type === 'bars') {
-        drawBars(ctx, canvas, currentData, bufferLength);
-      } else if (type === 'wave') {
-        drawWave(ctx, canvas, currentData, bufferLength);
-      } else if (type === 'circular') {
-        drawCircular(ctx, canvas, currentData, bufferLength);
-      }
-    };
+        const currentData = dataArrayRef.current;
+        if (type === 'bars') {
+          drawBars(ctx, canvas, currentData, bufferLength);
+        } else if (type === 'wave') {
+          drawWave(ctx, canvas, currentData, bufferLength);
+        } else if (type === 'circular') {
+          drawCircular(ctx, canvas, currentData, bufferLength);
+        }
+      };
 
-    draw();
+      draw();
+    } catch (error) {
+      console.warn('MusicVisualizer: AudioContext initialization failed', error);
+    }
 
     return () => {
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
       }
-      audioContext.close();
+      if (audioContext) {
+        audioContext.close().catch(() => {});
+      }
     };
   }, [audioElement, enabled, type]);
 

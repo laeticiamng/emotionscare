@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
-import { Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, Repeat, Shuffle } from 'lucide-react';
+import { Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, Repeat, Repeat1, Shuffle } from 'lucide-react';
 
 interface MusicControlsProps {
   isPlaying: boolean;
@@ -16,6 +16,10 @@ interface MusicControlsProps {
   onProgressChange?: (value: number) => void;
   showShuffle?: boolean;
   showRepeat?: boolean;
+  isShuffleActive?: boolean;
+  repeatMode?: 'none' | 'one' | 'all';
+  onToggleShuffle?: () => void;
+  onToggleRepeat?: () => void;
   isMuted?: boolean;
   onToggleMute?: () => void;
   className?: string;
@@ -34,10 +38,18 @@ const MusicControls: React.FC<MusicControlsProps> = ({
   onProgressChange,
   showShuffle = false,
   showRepeat = false,
+  isShuffleActive = false,
+  repeatMode = 'none',
+  onToggleShuffle,
+  onToggleRepeat,
   isMuted = false,
   onToggleMute,
   className = ''
 }) => {
+  const getRepeatIcon = () => {
+    if (repeatMode === 'one') return <Repeat1 className="h-4 w-4" />;
+    return <Repeat className="h-4 w-4" />;
+  };
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
@@ -108,10 +120,12 @@ const MusicControls: React.FC<MusicControlsProps> = ({
         <div className="flex items-center gap-2">
           {showShuffle && (
             <Button 
-              variant="ghost" 
+              variant={isShuffleActive ? "secondary" : "ghost"}
               size="icon" 
-              className="h-8 w-8"
-              aria-label="Mode aléatoire"
+              className={`h-8 w-8 ${isShuffleActive ? 'text-primary' : ''}`}
+              onClick={onToggleShuffle}
+              aria-label={isShuffleActive ? "Désactiver le mode aléatoire" : "Activer le mode aléatoire"}
+              aria-pressed={isShuffleActive}
             >
               <Shuffle className="h-4 w-4" />
             </Button>
@@ -157,12 +171,18 @@ const MusicControls: React.FC<MusicControlsProps> = ({
 
           {showRepeat && (
             <Button 
-              variant="ghost" 
+              variant={repeatMode !== 'none' ? "secondary" : "ghost"}
               size="icon" 
-              className="h-8 w-8"
-              aria-label="Répéter"
+              className={`h-8 w-8 ${repeatMode !== 'none' ? 'text-primary' : ''}`}
+              onClick={onToggleRepeat}
+              aria-label={
+                repeatMode === 'none' ? "Activer la répétition" :
+                repeatMode === 'one' ? "Répéter toute la playlist" :
+                "Désactiver la répétition"
+              }
+              aria-pressed={repeatMode !== 'none'}
             >
-              <Repeat className="h-4 w-4" />
+              {getRepeatIcon()}
             </Button>
           )}
         </div>
