@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * useAutoMix - Génération intelligente de playlists contextuelles
  */
@@ -119,12 +118,12 @@ export const useAutoMix = () => {
         });
       }
 
-      // Mettre à jour la playlist avec les tracks
+      // Mettre à jour la playlist avec les tracks (sans last_generated_at car colonne absente)
       await supabase
         .from('automix_playlists')
         .update({
           generated_tracks: tracks,
-          last_generated_at: new Date().toISOString()
+          updated_at: new Date().toISOString()
         })
         .eq('id', playlist.id);
 

@@ -75,23 +75,51 @@ Structure : [Intro] [Couplet 1] [Refrain] [Couplet 2] [Refrain] [Outro]`;
     const data = await response.json();
     const generatedContent = data.choices[0].message.content;
 
-    // Parser le JSON généré
+    // Parser le JSON généré avec meilleure gestion d'erreurs
     let sunoPrompt;
     try {
-      const jsonMatch = generatedContent.match(/\{[\s\S]*\}/);
+      // Essayer d'extraire le JSON de la réponse
+      const jsonMatch = generatedContent.match(/\{[\s\S]*?\}/);
       if (jsonMatch) {
-        sunoPrompt = JSON.parse(jsonMatch[0]);
+        // Nettoyer le JSON avant parsing
+        const cleanedJson = jsonMatch[0]
+          .replace(/[\u0000-\u001F]+/g, ' ') // Supprimer caractères de contrôle
+          .replace(/,\s*}/g, '}') // Supprimer virgules trailing
+          .replace(/,\s*]/g, ']');
+        sunoPrompt = JSON.parse(cleanedJson);
       } else {
         throw new Error('No JSON found in response');
       }
+      
+      // Valider les champs obligatoires
+      if (!sunoPrompt.style) {
+        sunoPrompt.style = `${emotion} therapeutic instrumental music`;
+      }
+      if (!sunoPrompt.bpm || typeof sunoPrompt.bpm !== 'number') {
+        sunoPrompt.bpm = 90;
+      }
+      if (!sunoPrompt.mood_tags || !Array.isArray(sunoPrompt.mood_tags)) {
+        sunoPrompt.mood_tags = [emotion, 'therapeutic', 'ambient'];
+      }
     } catch (parseError) {
-      console.error('Failed to parse AI response:', generatedContent);
-      // Fallback
+      console.error('Failed to parse AI response:', parseError, 'Content:', generatedContent?.substring(0, 200));
+      // Fallback robuste basé sur l'émotion
+      const emotionProfiles: Record<string, { style: string; bpm: number }> = {
+        calm: { style: 'peaceful ambient piano, soft strings, gentle', bpm: 70 },
+        joy: { style: 'uplifting bright energetic, upbeat tempo', bpm: 110 },
+        sad: { style: 'melancholic comforting, gentle piano', bpm: 65 },
+        anger: { style: 'intense cathartic, dynamic drums', bpm: 100 },
+        anxious: { style: 'grounding calming reassuring, slow tempo', bpm: 60 },
+        energetic: { style: 'dynamic motivating powerful, high energy', bpm: 130 },
+        neutral: { style: 'balanced peaceful harmonious', bpm: 90 }
+      };
+      
+      const profile = emotionProfiles[emotion?.toLowerCase()] || emotionProfiles.neutral;
       sunoPrompt = {
-        style: `${emotion} rap français, boom bap, piano mélancolique`,
-        prompt_lyrics: generatedContent,
-        bpm: 90,
-        mood_tags: [emotion, 'rap', 'conscient']
+        style: profile.style,
+        prompt_lyrics: `Therapeutic ${emotion} music for emotional wellness`,
+        bpm: profile.bpm,
+        mood_tags: [emotion, 'therapeutic', 'wellness']
       };
     }
 

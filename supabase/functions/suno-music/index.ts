@@ -1,15 +1,16 @@
-// @ts-nocheck
 /**
- * Suno Music - Génération de musique thérapeutique avec fallback robuste
- * Intègre l'API Suno avec gestion d'erreurs et fallbacks gratuits
+ * Suno Music - Génération de musique thérapeutique avec API Suno officielle
+ * Documentation: https://docs.sunoapi.org/
  */
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import "https://deno.land/x/xhr@0.1.0/mod.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+// API Base URL - https://docs.sunoapi.org/#api-base-url
+const SUNO_API_BASE = 'https://api.sunoapi.org';
 
 // URLs de fallback - sons gratuits de haute qualité
 const FALLBACK_TRACKS: Record<string, { url: string; duration: number; bpm: number }[]> = {
@@ -61,7 +62,8 @@ serve(async (req) => {
   }
 
   try {
-    const { action, prompt, mood, sessionId, trackIds } = await req.json();
+    const body = await req.json();
+    const { action, prompt, mood, sessionId, trackIds, style, title, instrumental = true } = body;
     const sunoApiKey = Deno.env.get('SUNO_API_KEY');
     
     // Si pas de clé API, retourner directement un fallback
@@ -89,24 +91,35 @@ serve(async (req) => {
     
     switch (action) {
       case 'start':
+      case 'generate':
         try {
-          // Generate new music track avec Suno
-          const generateResponse = await fetch('https://api.suno.ai/v1/generate', {
+          // Documentation: https://docs.sunoapi.org/suno-api/generate-music
+          console.log('[suno-music] Generating with prompt:', prompt);
+          
+          const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
+          const callBackUrl = `${supabaseUrl}/functions/v1/emotion-music-callback`;
+          
+          const generateResponse = await fetch(`${SUNO_API_BASE}/api/v1/generate`, {
             method: 'POST',
             headers: {
               'Authorization': `Bearer ${sunoApiKey}`,
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              prompt: prompt || `therapeutic relaxing instrumental music for ${mood} mood, no vocals`,
-              make_instrumental: true,
-              model_version: 'v3.5',
-              wait_audio: false
+              customMode: true,
+              instrumental: instrumental,
+              model: 'V4_5', // V4_5 - Smart Prompts, up to 8 minutes
+              prompt: prompt || `therapeutic relaxing instrumental music for ${mood} mood`,
+              style: style || `therapeutic ${mood} ambient`,
+              title: title || `${mood} - Therapeutic Music`,
+              callBackUrl
             })
           });
           
           if (!generateResponse.ok) {
-            console.error(`[suno-music] Suno API error: ${generateResponse.status}`);
+            const errorText = await generateResponse.text().catch(() => 'Unknown error');
+            console.error(`[suno-music] Suno API error ${generateResponse.status}:`, errorText);
+            
             // Fallback en cas d'erreur API
             const fallbackTrack = getFallbackTrack(mood);
             result = {
@@ -116,7 +129,32 @@ serve(async (req) => {
               isFallback: true,
             };
           } else {
-            result = await generateResponse.json();
+            const sunoData = await generateResponse.json();
+            console.log('[suno-music] Suno response:', JSON.stringify(sunoData));
+            
+            // Extract taskId from various response formats
+            const taskId = sunoData?.data?.taskId 
+              || sunoData?.taskId 
+              || sunoData?.id 
+              || sunoData?.data?.id;
+            
+            if (taskId) {
+              result = {
+                id: taskId,
+                taskId: taskId,
+                status: 'pending',
+                isFallback: false,
+              };
+            } else {
+              console.error('[suno-music] No taskId in response');
+              const fallbackTrack = getFallbackTrack(mood);
+              result = {
+                id: fallbackTrack.id,
+                audio_url: fallbackTrack.url,
+                status: 'completed',
+                isFallback: true,
+              };
+            }
           }
         } catch (apiError) {
           console.error('[suno-music] API call failed:', apiError);
@@ -135,24 +173,50 @@ serve(async (req) => {
           throw new Error('No track IDs provided');
         }
         
+        const taskId = trackIds[0];
+        
         // Si c'est un fallback, retourner completed
-        if (trackIds[0]?.startsWith('fallback-')) {
+        if (taskId?.startsWith('fallback-')) {
           result = { status: 'completed', isFallback: true };
         } else {
           try {
-            const statusResponse = await fetch(`https://api.suno.ai/v1/generate/${trackIds[0]}`, {
-              headers: {
-                'Authorization': `Bearer ${sunoApiKey}`,
+            // Documentation: https://docs.sunoapi.org/suno-api/get-music-generation-details
+            const statusResponse = await fetch(
+              `${SUNO_API_BASE}/api/v1/generate/record-info?taskId=${encodeURIComponent(taskId)}`, 
+              {
+                headers: {
+                  'Authorization': `Bearer ${sunoApiKey}`,
+                }
               }
-            });
+            );
             
             if (!statusResponse.ok) {
-              result = { status: 'completed', isFallback: true };
+              console.error(`[suno-music] Status check failed: ${statusResponse.status}`);
+              result = { status: 'pending', isFallback: false };
             } else {
-              result = await statusResponse.json();
+              const statusData = await statusResponse.json();
+              console.log('[suno-music] Status response:', JSON.stringify(statusData));
+              
+              // Parse Suno status response
+              const sunoStatus = statusData.data?.status;
+              const sunoTracks = statusData.data?.response?.sunoData || [];
+              const firstTrack = sunoTracks[0];
+              
+              // Map Suno statuses: SUCCESS, TEXT_SUCCESS = complete
+              const isComplete = sunoStatus === 'SUCCESS' || sunoStatus === 'TEXT_SUCCESS';
+              
+              result = {
+                status: isComplete ? 'completed' : (sunoStatus?.toLowerCase() || 'pending'),
+                audio_url: firstTrack?.audioUrl || firstTrack?.streamAudioUrl,
+                image_url: firstTrack?.imageUrl,
+                duration: firstTrack?.duration,
+                title: firstTrack?.title,
+                isFallback: false,
+              };
             }
-          } catch {
-            result = { status: 'completed', isFallback: true };
+          } catch (error) {
+            console.error('[suno-music] Status check error:', error);
+            result = { status: 'pending', isFallback: false };
           }
         }
         break;
@@ -182,12 +246,12 @@ serve(async (req) => {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
 
-  } catch (error) {
-    console.error('[suno-music] Error:', error);
+  } catch (err) {
+    const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+    console.error('[suno-music] Error:', errorMessage);
     
     // Toujours retourner un fallback en cas d'erreur
-    const { mood = 'calm' } = await req.json().catch(() => ({}));
-    const fallbackTrack = getFallbackTrack(mood);
+    const fallbackTrack = getFallbackTrack('calm');
     
     return new Response(JSON.stringify({ 
       success: true,
@@ -199,7 +263,7 @@ serve(async (req) => {
         bpm: fallbackTrack.bpm,
       },
       isFallback: true,
-      error: error.message,
+      error: errorMessage,
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
