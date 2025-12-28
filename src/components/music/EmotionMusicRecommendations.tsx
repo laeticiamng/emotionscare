@@ -30,6 +30,7 @@ export const EmotionMusicRecommendations: React.FC<EmotionMusicRecommendationsPr
     if (autoActivate && emotion) {
       loadMusicForEmotion();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [emotion, autoActivate]);
 
   const loadMusicForEmotion = async () => {

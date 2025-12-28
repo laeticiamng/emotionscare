@@ -1,9 +1,9 @@
-// @ts-nocheck
 import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { EmotionResult } from '@/types/emotion';
 import { MusicTrack } from '@/types/music';
 import { logger } from '@/lib/logger';
+import { toast } from 'sonner';
 
 interface EmotionMusicParams {
   emotion: string;
@@ -16,49 +16,108 @@ interface EmotionMusicParams {
 export const useEmotionMusicEngine = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentTrack, setCurrentTrack] = useState<MusicTrack | null>(null);
+  const [generationProgress, setGenerationProgress] = useState(0);
 
   const generateMusicForEmotion = useCallback(async (params: EmotionMusicParams): Promise<MusicTrack | null> => {
     setIsGenerating(true);
+    setGenerationProgress(0);
     
     try {
-      logger.info('Génération musicale pour émotion', params, 'MUSIC');
+      logger.info('Génération musicale Suno pour émotion', params, 'MUSIC');
       
-      const { data, error } = await supabase.functions.invoke('generate-music', {
+      // Utiliser l'edge function suno-music qui existe
+      const { data, error } = await supabase.functions.invoke('suno-music', {
         body: {
+          action: 'generate',
           emotion: params.emotion,
           intensity: params.intensity,
-          style: params.style || 'ambient',
-          lyrics: params.lyrics || '',
-          duration: params.duration || 240
+          style: params.style || 'therapeutic ambient',
+          prompt: `Musique thérapeutique ${params.style || 'ambient'} pour émotion ${params.emotion}`,
+          instrumental: true,
+          duration: params.duration || 240,
+          model: 'V4_5'
         }
       });
 
       if (error) {
-        logger.error('Erreur génération musicale', error as Error, 'MUSIC');
-        throw error;
+        logger.error('Erreur génération Suno', error as Error, 'MUSIC');
+        toast.error('Erreur lors de la génération de musique');
+        return null;
       }
 
-      if (data?.music) {
+      setGenerationProgress(30);
+
+      // Si on a un taskId, on doit poller pour le statut
+      if (data?.data?.taskId) {
+        const taskId = data.data.taskId;
+        let attempts = 0;
+        const maxAttempts = 30;
+
+        while (attempts < maxAttempts) {
+          await new Promise(resolve => setTimeout(resolve, 10000));
+          attempts++;
+          setGenerationProgress(30 + (attempts / maxAttempts) * 60);
+
+          const { data: statusData, error: statusError } = await supabase.functions.invoke('suno-music', {
+            body: { action: 'status', taskId }
+          });
+
+          if (statusError) continue;
+
+          if (statusData?.data?.status === 'completed' || statusData?.data?.status === 'complete') {
+            const audioUrl = statusData.data.audio_url || statusData.data.audioUrl;
+            if (audioUrl) {
+              const track: MusicTrack = {
+                id: taskId,
+                title: statusData.data.title || `Musique ${params.emotion}`,
+                artist: 'Suno AI',
+                audioUrl,
+                url: audioUrl,
+                duration: statusData.data.duration || params.duration || 240,
+                emotion: params.emotion,
+                coverUrl: statusData.data.image_url || statusData.data.imageUrl,
+                isGenerated: true,
+                generatedAt: new Date().toISOString()
+              };
+              
+              setCurrentTrack(track);
+              setGenerationProgress(100);
+              toast.success('Musique générée avec succès !');
+              return track;
+            }
+          }
+        }
+
+        toast.error('Timeout - Génération trop longue');
+        return null;
+      }
+
+      // Réponse directe avec audio
+      if (data?.data?.audio_url || data?.data?.audioUrl) {
         const track: MusicTrack = {
-          id: data.music.id,
-          title: data.music.title,
-          artist: 'EmotionsCare AI',
-          audioUrl: data.music.audioUrl,
-          url: data.music.audioUrl,
-          duration: data.music.duration,
+          id: data.data.id || `generated-${Date.now()}`,
+          title: data.data.title || `Musique ${params.emotion}`,
+          artist: 'Suno AI',
+          audioUrl: data.data.audio_url || data.data.audioUrl,
+          url: data.data.audio_url || data.data.audioUrl,
+          duration: data.data.duration || params.duration || 240,
           emotion: params.emotion,
-          intensity: params.intensity
+          coverUrl: data.data.image_url || data.data.imageUrl,
+          isGenerated: true,
+          generatedAt: new Date().toISOString()
         };
         
         setCurrentTrack(track);
-        logger.info('Musique générée avec succès', track, 'MUSIC');
+        setGenerationProgress(100);
+        toast.success('Musique générée avec succès !');
         return track;
       }
 
       return null;
     } catch (error) {
       logger.error('Erreur lors de la génération musicale', error as Error, 'MUSIC');
-      throw error;
+      toast.error('Erreur lors de la génération');
+      return null;
     } finally {
       setIsGenerating(false);
     }
@@ -101,6 +160,7 @@ export const useEmotionMusicEngine = () => {
     generateMusicForEmotion,
     analyzeEmotionAndGenerateMusic,
     isGenerating,
-    currentTrack
+    currentTrack,
+    generationProgress
   };
 };
