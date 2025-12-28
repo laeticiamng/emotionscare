@@ -21,7 +21,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useExchangeProfile, useExchangeHubStats } from '../hooks/useExchangeData';
+import { useExchangeProfile, useExchangeHubStats, useImprovementGoals } from '../hooks/useExchangeData';
 import ImprovementMarket from './ImprovementMarket';
 import TrustMarket from './TrustMarket';
 import TimeExchangeMarket from './TimeExchangeMarket';
@@ -31,6 +31,8 @@ import ExchangeProfileCard from './ExchangeProfileCard';
 import MatchingPanel from './MatchingPanel';
 import ExchangeNotifications from './ExchangeNotifications';
 import EmotionPortfolioPanel from './EmotionPortfolioPanel';
+import ExchangeDataExport from './ExchangeDataExport';
+import ImprovementProgressChart from './ImprovementProgressChart';
 
 const getMarkets = (stats: { improvement: { avgScore: string }; trust: { totalPool: string }; time: { activeOffers: string }; emotion: { volume24h: string } } | undefined) => [
   {
@@ -71,6 +73,7 @@ const ExchangeHub: React.FC = () => {
   const [activeMarket, setActiveMarket] = useState<string | null>(null);
   const { data: profile } = useExchangeProfile();
   const { data: hubStats } = useExchangeHubStats();
+  const { data: goals } = useImprovementGoals();
   const markets = getMarkets(hubStats);
 
   return (
@@ -83,7 +86,10 @@ const ExchangeHub: React.FC = () => {
             Retour au menu
           </Button>
         </Link>
-        <ExchangeNotifications />
+        <div className="flex items-center gap-2">
+          <ExchangeDataExport />
+          <ExchangeNotifications />
+        </div>
       </div>
 
       {/* Hero Section */}
@@ -276,6 +282,10 @@ const ExchangeHub: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 space-y-6">
               <ExchangeLeaderboard />
+              {/* Improvement Progress Chart */}
+              {goals && goals.length > 0 && (
+                <ImprovementProgressChart goals={goals} />
+              )}
               {/* Matching Panel */}
               <MatchingPanel marketType="time" />
             </div>
