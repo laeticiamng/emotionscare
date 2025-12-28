@@ -4,7 +4,10 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { EmotionResult, EmotionScannerProps } from '@/types/emotion';
-import { FileText, Send } from 'lucide-react';
+import { FileText, Send, Loader2 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { normalizeEmotionResult } from '@/types/emotion-unified';
+import { logger } from '@/lib/logger';
 
 const TextEmotionScanner: React.FC<EmotionScannerProps> = ({
   onScanComplete,
@@ -13,30 +16,48 @@ const TextEmotionScanner: React.FC<EmotionScannerProps> = ({
   setIsProcessing
 }) => {
   const [text, setText] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
   const analyzeText = async () => {
     if (!text.trim()) return;
 
     setIsProcessing(true);
+    setError(null);
 
-    // Simulate API call delay
-    setTimeout(() => {
-      // Mock emotion analysis
-      const mockResult: EmotionResult = {
-        emotions: [
-          { name: 'Calme', intensity: 75 },
-          { name: 'Optimisme', intensity: 68 },
-          { name: 'Confiance', intensity: 82 }
-        ],
-        confidence: 87,
-        timestamp: new Date(),
-        recommendations: 'Votre état émotionnel semble positif. Continuez à cultiver cette sérénité !',
-        analysisType: 'text'
-      };
+    try {
+      // Appel réel à l'edge function d'analyse textuelle
+      const { data, error: invokeError } = await supabase.functions.invoke('emotion-analysis', {
+        body: { text: text.trim(), language: 'fr' }
+      });
 
-      onScanComplete(mockResult);
+      if (invokeError) {
+        throw new Error(invokeError.message || 'Erreur d\'analyse');
+      }
+
+      if (!data) {
+        throw new Error('Aucune réponse de l\'analyse');
+      }
+
+      const result = normalizeEmotionResult({
+        id: `text-${Date.now()}`,
+        emotion: data.emotion || 'neutre',
+        valence: (data.valence ?? 0.5) * 100,
+        arousal: (data.arousal ?? 0.5) * 100,
+        confidence: (data.confidence ?? 0.7) * 100,
+        source: 'text',
+        timestamp: new Date().toISOString(),
+        summary: data.summary || `Émotion ${data.emotion} détectée`,
+        emotions: data.emotions || {},
+        recommendations: data.recommendations || []
+      });
+
+      onScanComplete(result as any);
+    } catch (err) {
+      logger.error('[TextEmotionScanner] Error:', err, 'COMPONENT');
+      setError(err instanceof Error ? err.message : 'Erreur lors de l\'analyse');
+    } finally {
       setIsProcessing(false);
-    }, 2000);
+    }
   };
 
   return (
@@ -60,6 +81,12 @@ const TextEmotionScanner: React.FC<EmotionScannerProps> = ({
           disabled={isProcessing}
         />
 
+        {error && (
+          <div className="text-sm text-destructive bg-destructive/10 px-3 py-2 rounded-lg">
+            {error}
+          </div>
+        )}
+
         <div className="flex space-x-2">
           <Button 
             onClick={onCancel} 
@@ -76,7 +103,7 @@ const TextEmotionScanner: React.FC<EmotionScannerProps> = ({
           >
             {isProcessing ? (
               <>
-                <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Analyse en cours...
               </>
             ) : (
