@@ -9,13 +9,14 @@ import {
   XCircle, 
   ArrowRight,
   Star,
-  User
+  User,
+  CheckCheck
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { useTimeExchangeRequests, useRespondToExchange, useRateExchange } from '../hooks/useExchangeData';
+import { useTimeExchangeRequests, useRespondToExchange, useRateExchange, useCompleteTimeExchange } from '../hooks/useExchangeData';
 import { toast } from 'sonner';
 import {
   Dialog,
@@ -48,9 +49,19 @@ const TimeExchangeRequests: React.FC<TimeExchangeRequestsProps> = ({ type }) => 
   const { data: requests, isLoading } = useTimeExchangeRequests(type);
   const respondToExchange = useRespondToExchange();
   const rateExchange = useRateExchange();
+  const completeExchange = useCompleteTimeExchange();
   const [ratingDialog, setRatingDialog] = React.useState<{ exchangeId: string; isProvider: boolean } | null>(null);
   const [rating, setRating] = React.useState(5);
   const [feedback, setFeedback] = React.useState('');
+
+  const handleComplete = async (exchangeId: string) => {
+    try {
+      await completeExchange.mutateAsync(exchangeId);
+      toast.success('Échange marqué comme terminé !');
+    } catch (error) {
+      toast.error('Erreur lors de la complétion');
+    }
+  };
 
   const handleRespond = async (exchangeId: string, accept: boolean) => {
     try {
@@ -172,6 +183,20 @@ const TimeExchangeRequests: React.FC<TimeExchangeRequestsProps> = ({ type }) => 
                             <XCircle className="w-4 h-4" />
                           </Button>
                         </div>
+                      )}
+
+                      {/* Bouton Compléter pour les échanges acceptés */}
+                      {status === 'accepted' && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="text-blue-500 hover:bg-blue-500/10"
+                          onClick={() => handleComplete(exchange.id)}
+                          disabled={completeExchange.isPending}
+                        >
+                          <CheckCheck className="w-4 h-4 mr-1" />
+                          Terminer
+                        </Button>
                       )}
 
                       {canRate && (

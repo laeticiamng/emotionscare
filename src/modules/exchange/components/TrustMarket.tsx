@@ -37,8 +37,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useTrustProfile, useTrustProjects, useGiveTrust, useCreateTrustProject, useTrustLeaderboard } from '../hooks/useExchangeData';
+import TrustActivityFeed from './TrustActivityFeed';
 import type { TrustLevel } from '../types';
-import { toast } from 'sonner';
 
 const levelColors: Record<TrustLevel, string> = {
   newcomer: 'from-gray-400 to-gray-500',
