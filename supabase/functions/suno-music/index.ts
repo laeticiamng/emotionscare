@@ -12,33 +12,33 @@ const corsHeaders = {
 // API Base URL - https://docs.sunoapi.org/#api-base-url
 const SUNO_API_BASE = 'https://api.sunoapi.org';
 
-// URLs de fallback - sons gratuits de haute qualité
+// URLs de fallback - Google Actions Sounds (CORS-enabled, fiables)
 const FALLBACK_TRACKS: Record<string, { url: string; duration: number; bpm: number }[]> = {
   calm: [
-    { url: 'https://cdn.pixabay.com/audio/2022/05/27/audio_1808fbf07a.mp3', duration: 180, bpm: 60 },
-    { url: 'https://cdn.pixabay.com/audio/2022/10/25/audio_946bc51520.mp3', duration: 195, bpm: 55 },
+    { url: 'https://actions.google.com/sounds/v1/ambiences/ocean_waves_background.ogg', duration: 180, bpm: 60 },
+    { url: 'https://actions.google.com/sounds/v1/ambiences/stream_with_birds.ogg', duration: 195, bpm: 55 },
   ],
   energize: [
-    { url: 'https://cdn.pixabay.com/audio/2022/08/25/audio_4f3b0a816e.mp3', duration: 150, bpm: 120 },
-    { url: 'https://cdn.pixabay.com/audio/2023/07/30/audio_e5765c3196.mp3', duration: 165, bpm: 110 },
+    { url: 'https://actions.google.com/sounds/v1/sports/sports_celebration_crowd.ogg', duration: 150, bpm: 120 },
+    { url: 'https://actions.google.com/sounds/v1/weather/thunder_crack.ogg', duration: 165, bpm: 110 },
   ],
   focus: [
-    { url: 'https://cdn.pixabay.com/audio/2022/03/15/audio_8cb749d9fa.mp3', duration: 240, bpm: 80 },
-    { url: 'https://cdn.pixabay.com/audio/2022/10/18/audio_a12c5a3263.mp3', duration: 200, bpm: 75 },
+    { url: 'https://actions.google.com/sounds/v1/ambiences/rain_on_roof.ogg', duration: 240, bpm: 80 },
+    { url: 'https://actions.google.com/sounds/v1/ambiences/forest_birds.ogg', duration: 200, bpm: 75 },
   ],
   sleep: [
-    { url: 'https://cdn.pixabay.com/audio/2022/05/16/audio_460b6c7c2b.mp3', duration: 300, bpm: 50 },
-    { url: 'https://cdn.pixabay.com/audio/2022/08/02/audio_884fe92c21.mp3', duration: 280, bpm: 45 },
+    { url: 'https://actions.google.com/sounds/v1/ambiences/night_crickets.ogg', duration: 300, bpm: 50 },
+    { url: 'https://actions.google.com/sounds/v1/ambiences/ocean_waves_gentle.ogg', duration: 280, bpm: 45 },
   ],
   meditation: [
-    { url: 'https://cdn.pixabay.com/audio/2022/03/10/audio_c8c8e92a82.mp3', duration: 120, bpm: 60 },
-    { url: 'https://cdn.pixabay.com/audio/2022/10/30/audio_3b3f66f0af.mp3', duration: 180, bpm: 55 },
+    { url: 'https://actions.google.com/sounds/v1/ambiences/zen_garden.ogg', duration: 120, bpm: 60 },
+    { url: 'https://actions.google.com/sounds/v1/ambiences/forest_clearing.ogg', duration: 180, bpm: 55 },
   ],
   anxiety: [
-    { url: 'https://cdn.pixabay.com/audio/2022/05/13/audio_257112ce2f.mp3', duration: 200, bpm: 65 },
+    { url: 'https://actions.google.com/sounds/v1/ambiences/stream_with_birds.ogg', duration: 200, bpm: 65 },
   ],
   joy: [
-    { url: 'https://cdn.pixabay.com/audio/2022/08/25/audio_4f3b0a816e.mp3', duration: 150, bpm: 100 },
+    { url: 'https://actions.google.com/sounds/v1/sports/sports_celebration_crowd.ogg', duration: 150, bpm: 100 },
   ],
 };
 
