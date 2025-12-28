@@ -11,7 +11,7 @@ import { useUserStatsQuery } from '@/hooks/useUserStatsQuery';
 import { useUserPreference } from '@/hooks/useSupabaseStorage';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Filter, Search, X, TrendingUp, Target, Award, ChevronDown, Star, Calendar, Sparkles, Trophy, Zap, BarChart3, Map } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { ParkAttraction } from '@/components/park/ParkAttraction';
 import type { Attraction } from '@/types/park';
 import { Button } from '@/components/ui/button';
@@ -743,15 +743,15 @@ export default function EmotionalPark() {
             <p>© 2025 EmotionsCare - Le Parc Émotionnel</p>
             <nav aria-label="Liens footer">
               <div className="flex space-x-4">
-                <a href="/legal/privacy" className="hover:text-foreground transition-colors">
+                <Link to="/legal/privacy" className="hover:text-foreground transition-colors">
                   Confidentialité
-                </a>
-                <a href="/legal/terms" className="hover:text-foreground transition-colors">
+                </Link>
+                <Link to="/legal/terms" className="hover:text-foreground transition-colors">
                   Conditions
-                </a>
-                <a href="/contact" className="hover:text-foreground transition-colors">
+                </Link>
+                <Link to="/contact" className="hover:text-foreground transition-colors">
                   Support
-                </a>
+                </Link>
               </div>
             </nav>
           </div>

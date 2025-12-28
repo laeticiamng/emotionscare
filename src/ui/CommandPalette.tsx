@@ -1,8 +1,5 @@
-// @ts-nocheck
-"use client";
 import React from "react";
-// Temporary empty command list until Next.js App Router provides automatic discovery
-// of available routes.
+import { Link } from 'react-router-dom';
 
 type Cmd = { id: string; label: string; path: string };
 const Ctx = React.createContext<{ open: () => void } | null>(null);
@@ -32,7 +29,7 @@ export function CommandPalette({ children }: { children: React.ReactNode }) {
             <ul>
               {filtered.map(c => (
                 <li key={c.id} style={{ padding: 8 }}>
-                  <a href={c.path}>{c.label} — <small>{c.path}</small></a>
+                  <Link to={c.path} onClick={() => setVisible(false)}>{c.label} — <small>{c.path}</small></Link>
                 </li>
               ))}
             </ul>
