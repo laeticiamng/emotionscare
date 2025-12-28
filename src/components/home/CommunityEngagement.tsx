@@ -199,7 +199,15 @@ const CommunityEngagement: React.FC = () => {
                           <p className="text-sm text-foreground/80 py-2 border-t border-border/50 mb-2">
                             <span className="text-primary font-medium">Effet :</span> {challenge.effect}
                           </p>
-                          <Button className="w-full" size="sm" variant="outline">
+                          <Button 
+                            className="w-full" 
+                            size="sm" 
+                            variant="outline"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              window.location.href = '/signup?join=' + challenge.id;
+                            }}
+                          >
                             Rejoindre le protocole
                             <ArrowRight className="h-3 w-3 ml-2" />
                           </Button>

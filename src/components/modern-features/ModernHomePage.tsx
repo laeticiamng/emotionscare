@@ -290,27 +290,19 @@ const ModernHomePage: React.FC = () => {
         <FAQSection />
       </Suspense>
 
-      {/* Stats globales - reframées */}
-      <div className="bg-primary/5 py-8">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-            <div>
-              <div className="text-3xl font-bold text-primary">{onlineCount > 0 ? onlineCount.toLocaleString() : '...'}</div>
-              <div className="text-sm text-muted-foreground">En ligne maintenant</div>
-            </div>
-            <div>
-              <div className="text-3xl font-bold text-red-500">150K+</div>
-              <div className="text-sm text-muted-foreground">Crises interrompues</div>
-            </div>
-            <div>
-              <div className="text-3xl font-bold text-indigo-500">500K+</div>
-              <div className="text-sm text-muted-foreground">Nuits récupérées</div>
-            </div>
-            <div>
-              <div className="text-3xl font-bold text-amber-500">5M+</div>
-              <div className="text-sm text-muted-foreground">Resets réussis</div>
-            </div>
-          </div>
+      {/* CTA Final */}
+      <div className="bg-gradient-to-r from-primary/10 to-blue-500/10 py-12">
+        <div className="container mx-auto px-4 text-center">
+          <h3 className="text-2xl font-bold mb-4">Prêt à reprendre le contrôle ?</h3>
+          <p className="text-muted-foreground mb-6 max-w-xl mx-auto">
+            Rejoins les {onlineCount > 0 ? onlineCount.toLocaleString() : '...'} personnes en ligne qui prennent soin d'elles en ce moment.
+          </p>
+          <Button size="lg" asChild>
+            <Link to="/signup">
+              Commencer gratuitement
+              <ArrowRight className="h-4 w-4 ml-2" />
+            </Link>
+          </Button>
         </div>
       </div>
 
