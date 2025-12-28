@@ -47,7 +47,10 @@ serve(async (req) => {
       return createErrorResponse(validation.error, validation.status, corsHeaders);
     }
 
-    const { audioData, analysisType } = validation.data;
+    // Support both imageBase64 and audioData for compatibility
+    const rawData = validation.data;
+    const audioData = rawData.audioData || rawData.imageBase64;
+    const analysisType = rawData.analysisType || 'facial';
 
     const humeApiKey = Deno.env.get('HUME_API_KEY');
     if (!humeApiKey) {

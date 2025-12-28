@@ -76,23 +76,38 @@ const useHumeAI = () => {
     try {
       // Appeler l'edge function d'analyse faciale
       const { data, error: invokeError } = await supabase.functions.invoke('hume-analysis', {
-        body: { imageBase64 }
+        body: { imageBase64, analysisType: 'facial' }
       });
 
       if (invokeError) {
         throw new Error(invokeError.message || 'Erreur d\'analyse faciale');
       }
 
+      // Extraire les résultats de l'analyse Hume
+      const analysis = data?.analysis || data;
+      const dominantEmotion = analysis?.dominant_emotion || 'neutre';
+      const confidence = analysis?.confidence_score || 0.7;
+      
+      // Calculer valence/arousal basés sur l'émotion dominante
+      const positiveEmotions = ['joy', 'joie', 'excitement', 'happiness', 'contentment', 'amusement', 'love'];
+      const highArousalEmotions = ['excitement', 'anger', 'fear', 'surprise', 'anxiety'];
+      
+      const isPositive = positiveEmotions.includes(dominantEmotion.toLowerCase());
+      const isHighArousal = highArousalEmotions.includes(dominantEmotion.toLowerCase());
+
       return normalizeEmotionResult({
         id: Date.now().toString(),
-        emotion: data?.emotion || 'neutre',
-        valence: (data?.valence || 0.5) * 100,
-        arousal: (data?.arousal || 0.5) * 100,
-        confidence: (data?.confidence || 0.7) * 100,
+        emotion: dominantEmotion,
+        valence: isPositive ? 70 + confidence * 25 : 30 - confidence * 20,
+        arousal: isHighArousal ? 65 + confidence * 30 : 35 + confidence * 15,
+        confidence: confidence * 100,
         source: 'facial',
         timestamp: new Date().toISOString(),
-        summary: data?.summary || `Expression ${data?.emotion || 'neutre'} détectée`,
-        emotions: data?.emotions || {}
+        summary: `Expression ${dominantEmotion} détectée`,
+        emotions: analysis?.emotions?.reduce((acc: Record<string, number>, e: any) => {
+          acc[e.name] = e.confidence * 100;
+          return acc;
+        }, {}) || {}
       });
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Erreur d\'analyse faciale';

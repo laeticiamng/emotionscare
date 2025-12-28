@@ -58,51 +58,64 @@ serve(async (req) => {
 
     const startTime = Date.now();
 
-    // Utilisation de Hume AI si disponible, sinon analyse textuelle
-    let transcript = '';
-    let humeEmotions = null;
-    
-    if (HUME_API_KEY && audioBase64) {
-      try {
-        // Analyse avec Hume AI
-        let audioData = audioBase64;
-        if (audioData.includes(',')) {
-          audioData = audioData.split(',')[1];
-        }
-        
-        console.log('[analyze-voice-hume] Analyzing with Hume AI');
-        
-        const humeResponse = await fetch('https://api.hume.ai/v0/batch/jobs', {
-          method: 'POST',
-          headers: {
-            'X-Hume-Api-Key': HUME_API_KEY,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            models: {
-              prosody: {}
-            },
-            urls: [],
-            text: [],
-            raw_text: false,
-            callback_url: null,
-            notify: false
-          }),
-        });
-        
-        if (!humeResponse.ok) {
-          console.warn('[analyze-voice-hume] Hume API error, falling back to text analysis');
-        }
-      } catch (e) {
-        console.warn('[analyze-voice-hume] Hume analysis failed:', e);
-      }
+    // Extraire les données audio base64
+    let audioData = audioBase64;
+    if (audioData.includes(',')) {
+      audioData = audioData.split(',')[1];
     }
 
-    console.log('[analyze-voice-hume] Using Lovable AI for emotion analysis');
+    // Étape 1: Transcription audio avec Lovable AI
+    let transcript = '';
+    
+    console.log('[analyze-voice-hume] Transcribing audio with Lovable AI');
+    
+    try {
+      const transcriptionResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'google/gemini-2.5-flash',
+          messages: [
+            {
+              role: 'system',
+              content: 'Tu es un expert en transcription audio. Transcris fidèlement le contenu audio fourni en français. Retourne uniquement le texte transcrit, sans commentaires ni annotations.'
+            },
+            {
+              role: 'user',
+              content: [
+                {
+                  type: 'text',
+                  text: 'Transcris cet enregistrement audio en français :'
+                },
+                {
+                  type: 'input_audio',
+                  input_audio: {
+                    data: audioData,
+                    format: 'webm'
+                  }
+                }
+              ]
+            }
+          ]
+        })
+      });
 
-    // Étape 2: Analyser l'émotion du texte avec Lovable AI
+      if (transcriptionResponse.ok) {
+        const transcriptionData = await transcriptionResponse.json();
+        transcript = transcriptionData.choices?.[0]?.message?.content?.trim() || '';
+        console.log('[analyze-voice-hume] Transcription:', transcript.substring(0, 100));
+      } else {
+        console.warn('[analyze-voice-hume] Transcription failed:', await transcriptionResponse.text());
+      }
+    } catch (e) {
+      console.warn('[analyze-voice-hume] Transcription error:', e);
+    }
+
     // Si pas de transcription, retourner un état par défaut
-    if (!transcript) {
+    if (!transcript || transcript.length < 3) {
       console.log('[analyze-voice-hume] No valid transcript, returning neutral state');
       return new Response(
         JSON.stringify({
@@ -118,6 +131,8 @@ serve(async (req) => {
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+
+    console.log('[analyze-voice-hume] Using Lovable AI for emotion analysis');
     
     const analysisResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
