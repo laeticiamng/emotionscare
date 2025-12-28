@@ -15,11 +15,13 @@ export interface EmotionResult {
 }
 
 export interface EmotionRecommendation {
+  id?: string;
   type: string;
   title: string;
   description: string;
   duration?: string;
   action?: string;
+  category?: string;
 }
 
 export interface EmotionScannerProps {
