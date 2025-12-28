@@ -55,8 +55,8 @@ const BiometricDisplay: React.FC<BiometricDisplayProps> = ({ biometrics }) => {
           <div className="flex items-center gap-4">
             <motion.div
               className="flex items-center gap-2"
-              animate={{ scale: [1, 1.1, 1] }}
-              transition={{ duration: 60/heartRate, repeat: Infinity }}
+              animate={{ scale: heartRate > 0 ? [1, 1.1, 1] : 1 }}
+              transition={{ duration: heartRate > 0 ? 60/heartRate : 1, repeat: heartRate > 0 ? Infinity : 0 }}
             >
               <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse" />
               <span className="text-2xl font-bold">{Math.round(heartRate)}</span>
@@ -82,8 +82,8 @@ const BiometricDisplay: React.FC<BiometricDisplayProps> = ({ biometrics }) => {
           <div className="flex items-center gap-4">
             <motion.div
               className="flex items-center gap-2"
-              animate={{ scale: [1, 1.05, 1] }}
-              transition={{ duration: 60/breathingRate, repeat: Infinity }}
+              animate={{ scale: breathingRate > 0 ? [1, 1.05, 1] : 1 }}
+              transition={{ duration: breathingRate > 0 ? 60/breathingRate : 1, repeat: breathingRate > 0 ? Infinity : 0 }}
             >
               <Waves className="w-4 h-4 text-blue-500" />
               <span className="text-2xl font-bold">{Math.round(breathingRate)}</span>

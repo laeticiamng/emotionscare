@@ -1,5 +1,4 @@
-// @ts-nocheck
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import type { MicroGesture } from '@/features/mood/useSamOrchestration';
 import { useAIMicroGestures, type AIMicroGesture } from '@/hooks/useAIMicroGestures';
 import { Button } from '@/components/ui/button';
@@ -53,9 +52,7 @@ const MicroGestes: React.FC<MicroGestesProps> = ({
     }
   }, [emotion, valence, arousal, lastEmotion, generateSuggestions, reset]);
 
-  const displayGestures: AIMicroGesture[] | MicroGesture[] = hasAISuggestions 
-    ? suggestions.gestures 
-    : gestures;
+  // On n'utilise plus displayGestures - on utilise directement suggestions.gestures ou gestures
 
   const displaySummary = suggestions?.summary || summary;
 
@@ -117,9 +114,9 @@ const MicroGestes: React.FC<MicroGestesProps> = ({
       </header>
 
       <div className="mt-6 space-y-4">
-        {hasAISuggestions ? (
+        {hasAISuggestions && suggestions?.gestures ? (
           // Affichage enrichi des suggestions IA
-          displayGestures.map((gesture: AIMicroGesture, index: number) => (
+          suggestions.gestures.map((gesture, index) => (
             <div
               key={index}
               className="flex gap-4 rounded-2xl border border-primary/20 bg-background/60 p-4 shadow-sm transition-all hover:border-primary/40 hover:shadow-md"
@@ -141,7 +138,7 @@ const MicroGestes: React.FC<MicroGestesProps> = ({
         ) : hasGestures ? (
           // Affichage classique des gestes statiques
           <div className="grid gap-4 md:grid-cols-2">
-            {displayGestures.map((gesture: MicroGesture) => (
+            {gestures.map((gesture) => (
               <div
                 key={gesture.id}
                 className="flex items-center gap-4 rounded-2xl border border-primary/20 bg-background/60 p-4 shadow-sm transition-colors hover:border-primary/40"

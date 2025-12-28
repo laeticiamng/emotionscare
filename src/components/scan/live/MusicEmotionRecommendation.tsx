@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -14,7 +12,7 @@ interface MusicEmotionRecommendationProps {
 
 const MusicEmotionRecommendation: React.FC<MusicEmotionRecommendationProps> = ({ emotionResult }) => {
   const { activateMusicForEmotion, getEmotionMusicDescription, isLoading } = useMusicEmotionIntegration();
-  const [generatedPlaylist, setGeneratedPlaylist] = useState<any>(null);
+  const [generatedPlaylist, setGeneratedPlaylist] = useState<boolean>(false);
   
   const handleActivateMusic = async () => {
     try {
@@ -27,7 +25,7 @@ const MusicEmotionRecommendation: React.FC<MusicEmotionRecommendationProps> = ({
       
       if (playlist) {
         // Playlist received, opening player
-        setGeneratedPlaylist(playlist);
+        setGeneratedPlaylist(true);
       }
     } catch (error) {
       // Music activation error - silent
@@ -35,7 +33,7 @@ const MusicEmotionRecommendation: React.FC<MusicEmotionRecommendationProps> = ({
   };
   
   const handleClosePlayer = () => {
-    setGeneratedPlaylist(null);
+    setGeneratedPlaylist(false);
   };
   
   return (

@@ -1,6 +1,4 @@
-// @ts-nocheck
-
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useMusicEmotionIntegration } from '@/hooks/useMusicEmotionIntegration';
 import { MusicPlaylist, EmotionMusicParams } from '@/types/music';
 import { ensureArray } from '@/utils/musicCompatibility';
@@ -18,15 +16,8 @@ export const useMusicRecommendation = (options: UseMusicRecommendationOptions = 
   const [isLoading, setIsLoading] = useState(false);
   const { activateMusicForEmotion } = useMusicEmotionIntegration();
 
-  // Auto-activate music if emotion is set and autoActivate is true
-  useEffect(() => {
-    if (autoActivate && currentEmotion) {
-      loadMusicForEmotion(currentEmotion);
-    }
-  }, [currentEmotion, autoActivate]);
-
-  // Load music for emotion
-  const loadMusicForEmotion = async (emotion: string) => {
+  // Load music for emotion - memoized
+  const loadMusicForEmotion = useCallback(async (emotion: string) => {
     if (!emotion) return null;
     
     setIsLoading(true);
@@ -44,16 +35,23 @@ export const useMusicRecommendation = (options: UseMusicRecommendationOptions = 
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [activateMusicForEmotion, intensity]);
+
+  // Auto-activate music if emotion is set and autoActivate is true
+  useEffect(() => {
+    if (autoActivate && currentEmotion) {
+      loadMusicForEmotion(currentEmotion);
+    }
+  }, [currentEmotion, autoActivate, loadMusicForEmotion]);
 
   // Update emotion and optionally activate music
-  const updateEmotion = async (emotion: string, activate = false) => {
+  const updateEmotion = useCallback(async (emotion: string, activate = false) => {
     setCurrentEmotion(emotion);
     if (activate) {
       return await loadMusicForEmotion(emotion);
     }
     return null;
-  };
+  }, [loadMusicForEmotion]);
 
   return {
     currentEmotion,
