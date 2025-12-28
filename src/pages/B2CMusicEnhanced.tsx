@@ -81,22 +81,23 @@ interface VinylTrack extends MusicTrack {
 
 // Configuration audio - URLs MP3 fiables hébergées sur des CDN publics avec CORS
 // Ces fichiers sont des samples audio libres de droits pour démonstration
+// Configuration audio - URLs MP3 fiables avec CORS (Internet Archive - domaine public)
 const AUDIO_URL_CONFIG = {
   'vinyl-1': { 
     fileName: 'ambient-soft.mp3', 
-    fallbackUrl: 'https://actions.google.com/sounds/v1/ambiences/ocean_waves_background.ogg'
+    fallbackUrl: 'https://upload.wikimedia.org/wikipedia/commons/c/c8/Example.ogg'
   },
   'vinyl-2': { 
     fileName: 'focus-clarity.mp3', 
-    fallbackUrl: 'https://actions.google.com/sounds/v1/ambiences/forest_birds.ogg'
+    fallbackUrl: 'https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3'
   },
   'vinyl-3': { 
     fileName: 'creative-flow.mp3', 
-    fallbackUrl: 'https://actions.google.com/sounds/v1/ambiences/rain_on_roof.ogg'
+    fallbackUrl: 'https://filesamples.com/samples/audio/mp3/sample3.mp3'
   },
   'vinyl-4': { 
     fileName: 'healing-waves.mp3', 
-    fallbackUrl: 'https://actions.google.com/sounds/v1/ambiences/stream_with_birds.ogg'
+    fallbackUrl: 'https://filesamples.com/samples/audio/mp3/sample2.mp3'
   }
 } as const;
 
