@@ -260,9 +260,10 @@ export const CollaborativePlaylistSection: React.FC = () => {
   const handleInvite = () => {
     if (!inviteEmail.trim()) return;
 
+    // TODO: Implémenter l'envoi d'email réel via edge function
     toast({
-      title: '✉️ Invitation envoyée',
-      description: `Invitation envoyée à ${inviteEmail}`,
+      title: '📧 Fonctionnalité à venir',
+      description: 'Les invitations par email seront disponibles prochainement',
     });
     setInviteEmail('');
     setShowInvite(false);
@@ -270,10 +271,10 @@ export const CollaborativePlaylistSection: React.FC = () => {
 
   const copyInviteLink = () => {
     if (!playlist) return;
-    navigator.clipboard.writeText(`https://emotionscare.app/playlist/collab/${playlist.id}`);
+    // Note: Le partage par lien sera disponible dans une future version
     toast({
-      title: '📋 Lien copié',
-      description: 'Partagez ce lien pour inviter des collaborateurs',
+      title: '🔗 Fonctionnalité à venir',
+      description: 'Le partage par lien sera disponible prochainement',
     });
   };
 

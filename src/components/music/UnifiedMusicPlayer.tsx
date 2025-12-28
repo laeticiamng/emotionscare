@@ -10,6 +10,7 @@ import { useDebouncedCallback } from '@/hooks/useDebounce';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
+import { Badge } from '@/components/ui/badge';
 import {
   Play,
   Pause,
@@ -23,7 +24,10 @@ import {
   Shuffle,
   Activity,
   SlidersHorizontal,
+  Coins,
 } from 'lucide-react';
+import { useAudioEqualizer, EQUALIZER_PRESETS } from '@/hooks/useAudioEqualizer';
+import { useSunoVinyl } from '@/hooks/useSunoVinyl';
 import { useMusic } from '@/hooks/useMusic';
 import { cn } from '@/lib/utils';
 import {
@@ -45,13 +49,7 @@ interface UnifiedMusicPlayerProps {
 
 type LoopMode = 'none' | 'all' | 'one';
 
-const EQUALIZER_PRESETS = {
-  flat: [0, 0, 0, 0, 0],
-  bass: [4, 3, 0, 0, 0],
-  treble: [0, 0, 0, 3, 4],
-  vocal: [0, 2, 3, 2, 0],
-  rock: [3, 1, -1, 2, 3],
-};
+// Presets importés depuis useAudioEqualizer
 
 export const UnifiedMusicPlayer: React.FC<UnifiedMusicPlayerProps> = ({
   className,
@@ -80,12 +78,22 @@ export const UnifiedMusicPlayer: React.FC<UnifiedMusicPlayerProps> = ({
     shuffleMode: contextShuffleMode,
   } = state;
 
+  // Suno credits
+  const { credits } = useSunoVinyl();
+
+  // Real audio equalizer
+  const { 
+    bands, 
+    setBandGain, 
+    applyPreset: applyEqPreset, 
+    isConnected: eqConnected 
+  } = useAudioEqualizer();
+
   const playerRef = useRef<HTMLDivElement>(null);
   
-  // Enhanced controls state - sync with context
+  // Enhanced controls state
   const [showEqualizer, setShowEqualizer] = useState(false);
   const [showVisualizer, setShowVisualizer] = useState(true);
-  const [equalizerValues, setEqualizerValues] = useState([0, 0, 0, 0, 0]);
   const [visualizerBars, setVisualizerBars] = useState<number[]>(Array(16).fill(0));
   
   // Map context repeatMode to local loopMode for UI
@@ -148,8 +156,8 @@ export const UnifiedMusicPlayer: React.FC<UnifiedMusicPlayerProps> = ({
   }, [shufflePlaylist]);
 
   const applyEqualizerPreset = useCallback((preset: keyof typeof EQUALIZER_PRESETS) => {
-    setEqualizerValues(EQUALIZER_PRESETS[preset]);
-  }, []);
+    applyEqPreset(preset);
+  }, [applyEqPreset]);
 
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
 
@@ -278,13 +286,21 @@ export const UnifiedMusicPlayer: React.FC<UnifiedMusicPlayerProps> = ({
           </div>
         )}
 
-        {/* Track Info */}
+        {/* Track Info + Credits */}
         <div className="text-center space-y-2">
           <h3 className="text-xl font-medium">{currentTrack.title}</h3>
           <p className="text-sm text-muted-foreground">{currentTrack.artist}</p>
-          {currentTrack.mood && (
-            <p className="text-xs text-muted-foreground italic">{currentTrack.mood}</p>
-          )}
+          <div className="flex items-center justify-center gap-2">
+            {currentTrack.mood && (
+              <Badge variant="secondary" className="text-xs">{currentTrack.mood}</Badge>
+            )}
+            {credits.remaining >= 0 && (
+              <Badge variant="outline" className="text-xs gap-1">
+                <Coins className="h-3 w-3" />
+                {credits.remaining} crédits
+              </Badge>
+            )}
+          </div>
         </div>
 
         {/* Progress Bar */}
@@ -444,24 +460,25 @@ export const UnifiedMusicPlayer: React.FC<UnifiedMusicPlayerProps> = ({
               </div>
             </div>
             <div className="flex items-end justify-around gap-2 h-24">
-              {['60Hz', '250Hz', '1kHz', '4kHz', '16kHz'].map((label, i) => (
-                <div key={label} className="flex flex-col items-center gap-1">
+              {bands.map((band, i) => (
+                <div key={band.label} className="flex flex-col items-center gap-1">
                   <Slider
                     orientation="vertical"
-                    value={[equalizerValues[i] + 6]}
+                    value={[band.gain + 6]}
                     max={12}
                     step={1}
-                    onValueChange={(v) => {
-                      const newValues = [...equalizerValues];
-                      newValues[i] = v[0] - 6;
-                      setEqualizerValues(newValues);
-                    }}
+                    onValueChange={(v) => setBandGain(i, v[0] - 6)}
                     className="h-16"
                   />
-                  <span className="text-[10px] text-muted-foreground">{label}</span>
+                  <span className="text-[10px] text-muted-foreground">{band.label}</span>
                 </div>
               ))}
             </div>
+            {!eqConnected && (
+              <p className="text-xs text-muted-foreground text-center">
+                L'égaliseur sera activé lors de la lecture
+              </p>
+            )}
           </div>
         )}
 
