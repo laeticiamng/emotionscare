@@ -265,10 +265,32 @@ serve(async (req) => {
       
       const sunoData = await sunoRes.json();
       console.log(`[emotion-music-ai] Suno raw response:`, JSON.stringify(sunoData));
-      const taskId = sunoData.data?.taskId || sunoData.taskId || sunoData.id;
+      
+      // Handle various response formats from Suno API
+      // Format 1: { data: { taskId: "xxx" } }
+      // Format 2: { taskId: "xxx" }
+      // Format 3: { id: "xxx" }
+      // Format 4: { code: 200, data: { taskId: "xxx" } }
+      const taskId = sunoData?.data?.taskId 
+        || sunoData?.taskId 
+        || sunoData?.id 
+        || sunoData?.data?.id
+        || sunoData?.result?.taskId;
+      
       if (!taskId) {
-        console.error(`[emotion-music-ai] No taskId found in response`);
-        throw new Error('Aucun taskId retourné par le service de génération');
+        console.error(`[emotion-music-ai] No taskId found in response. Full response:`, JSON.stringify(sunoData));
+        
+        // Check if there's an error message in the response
+        const errorMsg = sunoData?.error || sunoData?.message || sunoData?.data?.errorMessage || 'Aucun taskId retourné';
+        
+        return new Response(JSON.stringify({ 
+          error: 'GENERATION_FAILED',
+          message: errorMsg,
+          details: sunoData
+        }), {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
       }
       console.log(`[emotion-music-ai] Suno generation started with taskId:`, taskId);
 
