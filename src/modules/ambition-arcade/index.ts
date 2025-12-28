@@ -26,5 +26,7 @@ export {
   useAmbitionExport,
   useAmbitionRecommendations,
   useAwardArtifact,
-  useAmbitionArtifacts
+  useAmbitionArtifacts,
+  useDeleteGoal,
+  useConfetti
 } from './hooks';

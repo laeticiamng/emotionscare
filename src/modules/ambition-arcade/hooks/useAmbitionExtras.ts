@@ -16,6 +16,7 @@ const STORAGE_KEYS = {
 // ===================== FAVORITES =====================
 
 export function useAmbitionFavorites() {
+  const { toast } = useToast();
   const [favorites, setFavorites] = useState<string[]>(() => {
     try {
       return JSON.parse(localStorage.getItem(STORAGE_KEYS.favorites) || '[]');
@@ -26,13 +27,22 @@ export function useAmbitionFavorites() {
 
   const toggleFavorite = useCallback((runId: string) => {
     setFavorites(prev => {
-      const newFavorites = prev.includes(runId)
+      const isCurrentlyFavorite = prev.includes(runId);
+      const newFavorites = isCurrentlyFavorite
         ? prev.filter(id => id !== runId)
         : [...prev, runId];
       localStorage.setItem(STORAGE_KEYS.favorites, JSON.stringify(newFavorites));
+      
+      toast({
+        title: isCurrentlyFavorite ? '💔 Retiré des favoris' : '❤️ Ajouté aux favoris',
+        description: isCurrentlyFavorite 
+          ? 'Objectif retiré de vos favoris' 
+          : 'Objectif ajouté à vos favoris',
+      });
+      
       return newFavorites;
     });
-  }, []);
+  }, [toast]);
 
   const isFavorite = useCallback((runId: string) => {
     return favorites.includes(runId);
