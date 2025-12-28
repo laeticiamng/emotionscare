@@ -299,8 +299,9 @@ serve(async (req) => {
 
       case 'extend':
         // Documentation: https://docs.sunoapi.org/suno-api/extend-music
+        // Correct endpoint: /api/v1/generate/extend
         try {
-          const { audioId, continueAt = 120 } = body;
+          const { audioId, continueAt = 120, prompt, style, title } = body;
           
           if (!audioId) {
             throw new Error('audioId is required for extend');
@@ -311,17 +312,21 @@ serve(async (req) => {
           const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
           const callBackUrl = `${supabaseUrl}/functions/v1/suno-callback`;
           
-          const extendResponse = await fetch(`${SUNO_API_BASE}/api/v1/extend`, {
+          const extendResponse = await fetch(`${SUNO_API_BASE}/api/v1/generate/extend`, {
             method: 'POST',
             headers: {
               'Authorization': `Bearer ${sunoApiKey}`,
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
+              defaultParamFlag: true,
               audioId,
               continueAt,
               model: 'V4_5',
-              callBackUrl
+              callBackUrl,
+              ...(prompt && { prompt }),
+              ...(style && { style }),
+              ...(title && { title }),
             })
           });
           

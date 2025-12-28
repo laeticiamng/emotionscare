@@ -47,9 +47,18 @@ const TrackExtendButton: React.FC<TrackExtendButtonProps> = ({
 
     setIsExtending(true);
     try {
-      // Extract audioId from Suno URL if possible
-      const audioIdMatch = audioUrl.match(/\/([a-f0-9-]{36})\./);
-      const audioId = audioIdMatch ? audioIdMatch[1] : track.id;
+      // Extract audioId from Suno URL - format: https://cdn.sunoapi.org/audio/xxxxx-xxxx-xxxx-xxxx-xxxxxxxx.mp3
+      // Or use track.sunoId if available, or track.id as fallback
+      const audioIdMatch = audioUrl.match(/\/audio\/([a-f0-9-]{36})\./) || audioUrl.match(/\/([a-f0-9-]{36})\./);
+      const audioId = (track as { sunoId?: string }).sunoId || (audioIdMatch ? audioIdMatch[1] : null);
+      
+      if (!audioId || audioId.startsWith('fallback-')) {
+        toast.error('Extension impossible', {
+          description: 'Cette piste ne peut pas être étendue (piste de secours)',
+        });
+        setIsExtending(false);
+        return;
+      }
 
       const { data, error } = await supabase.functions.invoke('suno-music', {
         body: {
