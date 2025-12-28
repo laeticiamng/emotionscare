@@ -72,5 +72,14 @@ export function useConfetti() {
     });
   }, []);
 
-  return { fireConfetti, fireAchievementConfetti, fireGoalCompleteConfetti };
+  const fireQuestCompleteConfetti = useCallback(() => {
+    confetti({
+      particleCount: 50,
+      spread: 60,
+      origin: { y: 0.7 },
+      colors: ['#3b82f6', '#60a5fa', '#93c5fd', '#6366f1'],
+    });
+  }, []);
+
+  return { fireConfetti, fireAchievementConfetti, fireGoalCompleteConfetti, fireQuestCompleteConfetti };
 }

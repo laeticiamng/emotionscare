@@ -1,26 +1,104 @@
 /**
- * Affichage du streak quotidien Ambition Arcade
+ * Affichage du streak quotidien Ambition Arcade avec données réelles
  */
-import React from 'react';
+import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Flame, Calendar, Zap, Trophy } from 'lucide-react';
-import { useAmbitionStats } from '../hooks';
+import { Flame, Trophy } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
+import { startOfWeek, eachDayOfInterval, isSameDay, format } from 'date-fns';
+import { fr } from 'date-fns/locale';
 
 interface DailyStreakProps {
   compact?: boolean;
 }
 
 const STREAK_MILESTONES = [3, 7, 14, 30, 60, 100];
+const DAYS_OF_WEEK = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
 
 export const DailyStreak: React.FC<DailyStreakProps> = ({ compact = false }) => {
-  const { data: stats } = useAmbitionStats();
+  const { user } = useAuth();
 
-  const currentStreak = stats?.currentStreak || 0;
-  const longestStreak = stats?.longestStreak || 0;
-  
-  // Find next milestone
+  // Fetch real activity data for current week
+  const { data: weekActivity } = useQuery({
+    queryKey: ['ambition-week-activity', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return [];
+
+      // Get runs for current user
+      const { data: runs } = await supabase
+        .from('ambition_runs')
+        .select('id')
+        .eq('user_id', user.id);
+
+      const runIds = runs?.map(r => r.id) || [];
+      if (runIds.length === 0) return [];
+
+      // Get start of week (Monday)
+      const weekStart = startOfWeek(new Date(), { weekStartsOn: 1 });
+      
+      // Get completed quests from this week
+      const { data: quests } = await supabase
+        .from('ambition_quests')
+        .select('completed_at')
+        .in('run_id', runIds)
+        .eq('status', 'completed')
+        .gte('completed_at', weekStart.toISOString());
+
+      return quests?.map(q => new Date(q.completed_at!)) || [];
+    },
+    enabled: !!user?.id,
+  });
+
+  // Calculate stats
+  const { currentStreak, longestStreak, activeDays } = useMemo(() => {
+    if (!weekActivity || weekActivity.length === 0) {
+      return { currentStreak: 0, longestStreak: 0, activeDays: new Set<number>() };
+    }
+
+    // Get unique days with activity this week
+    const weekStart = startOfWeek(new Date(), { weekStartsOn: 1 });
+    const weekDays = eachDayOfInterval({
+      start: weekStart,
+      end: new Date()
+    });
+
+    const activeDaysSet = new Set<number>();
+    weekDays.forEach((day, index) => {
+      if (weekActivity.some(actDate => isSameDay(actDate, day))) {
+        activeDaysSet.add(index);
+      }
+    });
+
+    // Calculate streak from today backwards
+    let streak = 0;
+    const today = new Date();
+    for (let i = 0; i < 365; i++) {
+      const checkDate = new Date(today);
+      checkDate.setDate(today.getDate() - i);
+      
+      const hasActivity = weekActivity.some(actDate => isSameDay(actDate, checkDate));
+      
+      if (hasActivity) {
+        streak++;
+      } else if (i === 0) {
+        // Today has no activity, but yesterday might
+        continue;
+      } else {
+        break;
+      }
+    }
+
+    return {
+      currentStreak: streak,
+      longestStreak: Math.max(streak, activeDaysSet.size),
+      activeDays: activeDaysSet
+    };
+  }, [weekActivity]);
+
   const nextMilestone = STREAK_MILESTONES.find(m => m > currentStreak) || 100;
   const progressToMilestone = (currentStreak / nextMilestone) * 100;
 
@@ -113,23 +191,32 @@ export const DailyStreak: React.FC<DailyStreakProps> = ({ compact = false }) => 
           </div>
         </div>
 
-        {/* Week visualization */}
+        {/* Week visualization with real data */}
         <div className="flex justify-between mt-4 gap-1">
-          {['L', 'M', 'M', 'J', 'V', 'S', 'D'].map((day, index) => {
-            const isActive = index < Math.min(currentStreak, 7);
+          {DAYS_OF_WEEK.map((day, index) => {
+            const isActive = activeDays.has(index);
+            const isToday = index === (new Date().getDay() + 6) % 7; // Adjust for Monday start
+            
             return (
               <motion.div
-                key={day}
+                key={`${day}-${index}`}
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: index * 0.05 }}
-                className={`flex-1 h-8 rounded flex items-center justify-center text-xs font-medium ${
+                className={`flex-1 h-8 rounded flex items-center justify-center text-xs font-medium relative ${
                   isActive 
                     ? 'bg-gradient-to-br from-amber-500 to-orange-600 text-white' 
                     : 'bg-muted text-muted-foreground'
-                }`}
+                } ${isToday ? 'ring-2 ring-primary ring-offset-1' : ''}`}
               >
                 {day}
+                {isActive && (
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="absolute -top-1 -right-1 w-2 h-2 bg-success rounded-full"
+                  />
+                )}
               </motion.div>
             );
           })}

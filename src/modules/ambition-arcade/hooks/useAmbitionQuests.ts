@@ -4,6 +4,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useConfetti } from './useConfetti';
 
 export interface AmbitionQuest {
   id: string;
@@ -102,6 +103,7 @@ export function useCreateQuest() {
 export function useCompleteQuest() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { fireQuestCompleteConfetti } = useConfetti();
 
   return useMutation({
     mutationFn: async ({ questId, result, notes }: { questId: string; result?: string; notes?: string }) => {
@@ -124,8 +126,12 @@ export function useCompleteQuest() {
       queryClient.invalidateQueries({ queryKey: ['ambition-quests'] });
       queryClient.invalidateQueries({ queryKey: ['ambition-goals'] });
       queryClient.invalidateQueries({ queryKey: ['ambition-stats'] });
+      queryClient.invalidateQueries({ queryKey: ['ambition-artifacts'] });
+      
+      fireQuestCompleteConfetti();
+      
       toast({
-        title: 'Quête complétée',
+        title: '✅ Quête complétée !',
         description: `+${data?.xp_reward || 0} XP gagnés`,
       });
     },
