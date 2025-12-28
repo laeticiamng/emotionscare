@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { motion, AnimatePresence } from "framer-motion";
 import { Trash, Search, Heart, Clock, Star, TrendingUp, Sparkles } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { useScanSettings } from '@/hooks/useScanSettings';
 
 // Extended emoji list with categories
 const EMOJI_CATEGORIES = {
@@ -43,10 +44,6 @@ const EMOJI_CATEGORIES = {
   }
 };
 
-const FAVORITES_KEY = 'emoji_favorites';
-const HISTORY_KEY = 'emoji_history';
-const STATS_KEY = 'emoji_stats';
-
 interface EmojiSelectorProps {
   emojis: string;
   onEmojiClick: (emoji: string) => void;
@@ -54,23 +51,24 @@ interface EmojiSelectorProps {
 }
 
 const EmojiSelector: React.FC<EmojiSelectorProps> = ({ emojis, onEmojiClick, onClear }) => {
+  const { 
+    emojiFavorites, emojiHistory, emojiStats,
+    updateEmojiFavorites, updateEmojiHistory, updateEmojiStats 
+  } = useScanSettings();
+  
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState<string>('all');
-  const [favorites, setFavorites] = useState<string[]>([]);
-  const [history, setHistory] = useState<string[]>([]);
-  const [stats, setStats] = useState<Record<string, number>>({});
+  const [favorites, setFavorites] = useState<string[]>(emojiFavorites);
+  const [history, setHistory] = useState<string[]>(emojiHistory);
+  const [stats, setStats] = useState<Record<string, number>>(emojiStats);
   const [showSuggestions, setShowSuggestions] = useState(true);
 
-  // Load saved data
+  // Sync from hook
   useEffect(() => {
-    const savedFavorites = localStorage.getItem(FAVORITES_KEY);
-    const savedHistory = localStorage.getItem(HISTORY_KEY);
-    const savedStats = localStorage.getItem(STATS_KEY);
-    
-    if (savedFavorites) setFavorites(JSON.parse(savedFavorites));
-    if (savedHistory) setHistory(JSON.parse(savedHistory));
-    if (savedStats) setStats(JSON.parse(savedStats));
-  }, []);
+    setFavorites(emojiFavorites);
+    setHistory(emojiHistory);
+    setStats(emojiStats);
+  }, [emojiFavorites, emojiHistory, emojiStats]);
 
   // Get all emojis flat
   const allEmojis = useMemo(() => {
@@ -122,12 +120,12 @@ const EmojiSelector: React.FC<EmojiSelectorProps> = ({ emojis, onEmojiClick, onC
     // Update history
     const newHistory = [emoji, ...history.filter(e => e !== emoji)].slice(0, 20);
     setHistory(newHistory);
-    localStorage.setItem(HISTORY_KEY, JSON.stringify(newHistory));
+    updateEmojiHistory(newHistory);
     
     // Update stats
     const newStats = { ...stats, [emoji]: (stats[emoji] || 0) + 1 };
     setStats(newStats);
-    localStorage.setItem(STATS_KEY, JSON.stringify(newStats));
+    updateEmojiStats(newStats);
   };
 
   const toggleFavorite = (emoji: string, e: React.MouseEvent) => {
@@ -136,7 +134,7 @@ const EmojiSelector: React.FC<EmojiSelectorProps> = ({ emojis, onEmojiClick, onC
       ? favorites.filter(f => f !== emoji)
       : [...favorites, emoji];
     setFavorites(newFavorites);
-    localStorage.setItem(FAVORITES_KEY, JSON.stringify(newFavorites));
+    updateEmojiFavorites(newFavorites);
   };
 
   const isFavorite = (emoji: string) => favorites.includes(emoji);

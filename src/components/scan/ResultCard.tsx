@@ -14,6 +14,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { useScanSettings, ResultHistoryEntry } from '@/hooks/useScanSettings';
 
 export type ScanBucket = 'positif' | 'calme' | 'neutre' | 'tendu';
 
@@ -97,34 +98,25 @@ export const ResultCard: React.FC<ResultCardProps> = ({
   result,
   onRecommendation
 }) => {
+  const { resultHistory, addResultHistory, toggleResultFavorite } = useScanSettings();
   const [activeTab, setActiveTab] = useState('result');
-  const [history, setHistory] = useState<ScanHistoryEntry[]>([]);
+  const [history, setHistory] = useState<ResultHistoryEntry[]>(resultHistory);
   const [showConfetti, setShowConfetti] = useState(false);
 
-  // Load history
+  // Sync from hook
   useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      setHistory(JSON.parse(saved));
-    }
-  }, []);
+    setHistory(resultHistory);
+  }, [resultHistory]);
 
   // Save result to history
   useEffect(() => {
     if (result) {
-      const newEntry: ScanHistoryEntry = {
-        id: Date.now().toString(),
+      addResultHistory({
         bucket: result.bucket,
         label: result.label,
         confidence: result.confidence || 0,
-        timestamp: new Date(),
+        timestamp: new Date().toISOString(),
         isFavorite: false,
-      };
-      
-      setHistory(prev => {
-        const updated = [newEntry, ...prev.slice(0, 49)];
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-        return updated;
       });
 
       // Show confetti for positive results
@@ -133,26 +125,20 @@ export const ResultCard: React.FC<ResultCardProps> = ({
         setTimeout(() => setShowConfetti(false), 3000);
       }
     }
-  }, [result]);
+  }, [result, addResultHistory]);
 
   // Calculate trend
   const getTrend = () => {
     if (history.length < 2) return 'stable';
     const current = bucketOrder.indexOf(result?.bucket || 'neutre');
-    const previous = bucketOrder.indexOf(history[1]?.bucket || 'neutre');
+    const previous = bucketOrder.indexOf(history[1]?.bucket as ScanBucket || 'neutre');
     if (current > previous) return 'up';
     if (current < previous) return 'down';
     return 'stable';
   };
 
-  const toggleFavorite = (id: string) => {
-    setHistory(prev => {
-      const updated = prev.map(h => 
-        h.id === id ? { ...h, isFavorite: !h.isFavorite } : h
-      );
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-      return updated;
-    });
+  const handleToggleFavorite = (id: string) => {
+    toggleResultFavorite(id);
   };
 
   const handleShare = async () => {
@@ -465,7 +451,7 @@ export const ResultCard: React.FC<ResultCardProps> = ({
                             variant="ghost"
                             size="icon"
                             className="h-8 w-8"
-                            onClick={() => toggleFavorite(entry.id)}
+                            onClick={() => handleToggleFavorite(entry.id)}
                           >
                             <Heart className={cn('h-4 w-4', entry.isFavorite && 'fill-red-500 text-red-500')} />
                           </Button>
