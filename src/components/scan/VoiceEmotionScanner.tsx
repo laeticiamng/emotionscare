@@ -29,6 +29,7 @@ const VoiceEmotionScanner: React.FC<VoiceEmotionScannerProps> = ({ onEmotionDete
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [progress, setProgress] = useState(0);
+  const [transcript, setTranscript] = useState<string | null>(null);
   
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
@@ -37,6 +38,7 @@ const VoiceEmotionScanner: React.FC<VoiceEmotionScannerProps> = ({ onEmotionDete
   const processAudio = useCallback(async (audioBlob: Blob) => {
     setIsProcessing(true);
     setError(null);
+    setTranscript(null);
 
     try {
       const audioBase64 = await blobToBase64(audioBlob);
@@ -51,6 +53,11 @@ const VoiceEmotionScanner: React.FC<VoiceEmotionScannerProps> = ({ onEmotionDete
 
       if (!data) {
         throw new Error('Aucune réponse de l\'analyse');
+      }
+
+      // Afficher la transcription si disponible
+      if (data.transcript) {
+        setTranscript(data.transcript);
       }
 
       const result: EmotionResult = normalizeEmotionResult({
@@ -180,6 +187,13 @@ const VoiceEmotionScanner: React.FC<VoiceEmotionScannerProps> = ({ onEmotionDete
           <div className="flex items-center gap-2 text-sm text-destructive bg-destructive/10 px-3 py-2 rounded-lg">
             <AlertCircle className="h-4 w-4" />
             <span>{error}</span>
+          </div>
+        )}
+
+        {transcript && (
+          <div className="w-full p-3 bg-muted/50 rounded-lg">
+            <p className="text-xs text-muted-foreground mb-1">Transcription :</p>
+            <p className="text-sm italic">"{transcript}"</p>
           </div>
         )}
         
