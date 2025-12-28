@@ -79,24 +79,24 @@ interface VinylTrack extends MusicTrack {
   waveform?: number[];
 }
 
-// Configuration audio - URLs MP3 stables provenant de sources fiables
-// Ces URLs sont des fichiers audio libres de droits hébergés sur des CDN stables
+// Configuration audio - URLs MP3 fiables hébergées sur des CDN publics avec CORS
+// Ces fichiers sont des samples audio libres de droits pour démonstration
 const AUDIO_URL_CONFIG = {
   'vinyl-1': { 
     fileName: 'ambient-soft.mp3', 
-    fallbackUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'
+    fallbackUrl: 'https://actions.google.com/sounds/v1/ambiences/ocean_waves_background.ogg'
   },
   'vinyl-2': { 
     fileName: 'focus-clarity.mp3', 
-    fallbackUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3'
+    fallbackUrl: 'https://actions.google.com/sounds/v1/ambiences/forest_birds.ogg'
   },
   'vinyl-3': { 
     fileName: 'creative-flow.mp3', 
-    fallbackUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3'
+    fallbackUrl: 'https://actions.google.com/sounds/v1/ambiences/rain_on_roof.ogg'
   },
   'vinyl-4': { 
     fileName: 'healing-waves.mp3', 
-    fallbackUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3'
+    fallbackUrl: 'https://actions.google.com/sounds/v1/ambiences/stream_with_birds.ogg'
   }
 } as const;
 
