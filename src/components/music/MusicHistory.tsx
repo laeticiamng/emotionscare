@@ -1,36 +1,47 @@
 /**
  * MusicHistory - Historique d'écoute musical
  * Affiche l'historique des morceaux écoutés avec statistiques
+ * Connecté à music_play_logs via useMusicPlayHistory
  */
 
 import React, { useMemo } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Clock, TrendingUp, Heart } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Clock, TrendingUp, Heart, RefreshCw } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { MusicTrack } from '@/types/music';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { useMusicPlayHistory } from '@/hooks/useMusicPlayHistory';
 
 interface ListenEntry {
   track: MusicTrack;
   timestamp: Date;
-  duration: number; // temps d'écoute en secondes
-  completed: boolean; // true si écouté jusqu'à la fin
+  duration: number;
+  completed: boolean;
 }
 
 interface MusicHistoryProps {
-  history: ListenEntry[];
+  history?: ListenEntry[];
   onPlayTrack?: (track: MusicTrack) => void;
   onToggleFavorite?: (trackId: string) => void;
   favorites?: Set<string>;
+  useDatabase?: boolean;
 }
 
 export const MusicHistory: React.FC<MusicHistoryProps> = ({
-  history,
+  history: externalHistory,
   onPlayTrack,
   onToggleFavorite,
-  favorites = new Set()
+  favorites = new Set(),
+  useDatabase = true,
 }) => {
+  // Use database hook if no external history provided
+  const { history: dbHistory, isLoading, refetch } = useMusicPlayHistory(50);
+  
+  // Use external history if provided, otherwise use database
+  const history = externalHistory || (useDatabase ? dbHistory : []);
   // Statistiques calculées
   const stats = useMemo(() => {
     const totalListens = history.length;
@@ -97,8 +108,28 @@ export const MusicHistory: React.FC<MusicHistoryProps> = ({
 
   const groupedHistory = groupHistoryByDate();
 
+  if (isLoading && useDatabase) {
+    return (
+      <div className="space-y-4">
+        <Skeleton className="h-24 w-full" />
+        <Skeleton className="h-24 w-full" />
+        <Skeleton className="h-24 w-full" />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
+      {/* Header with refresh */}
+      {useDatabase && (
+        <div className="flex justify-end">
+          <Button variant="ghost" size="sm" onClick={refetch} className="gap-1">
+            <RefreshCw className="h-4 w-4" />
+            Actualiser
+          </Button>
+        </div>
+      )}
+      
       {/* Statistiques */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
