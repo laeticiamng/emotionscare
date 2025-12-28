@@ -195,6 +195,40 @@ export const useParkQuests = () => {
     });
   }, [saveQuests, completedQuests]);
 
+  // Update quest progress based on visited zone
+  const updateQuestFromZoneVisit = useCallback((zoneKey: string) => {
+    setQuests(prev => {
+      let updated = [...prev];
+      let changed = false;
+      
+      updated = updated.map(quest => {
+        if (quest.zones.includes(zoneKey) && !quest.completed) {
+          const newProgress = Math.min(quest.progress + 1, quest.maxProgress);
+          if (newProgress !== quest.progress) {
+            changed = true;
+            const completed = newProgress >= quest.maxProgress;
+            
+            if (completed) {
+              setCompletedQuests(prevCompleted => {
+                const newCompleted = [...prevCompleted, quest.id];
+                return newCompleted;
+              });
+            }
+            
+            return { ...quest, progress: newProgress, completed };
+          }
+        }
+        return quest;
+      });
+      
+      if (changed) {
+        saveQuests(updated, completedQuests);
+      }
+      
+      return updated;
+    });
+  }, [saveQuests, completedQuests]);
+
   const getActiveQuests = useCallback((): Quest[] => {
     return quests.filter(q => !q.completed).slice(0, 3);
   }, [quests]);
@@ -215,6 +249,7 @@ export const useParkQuests = () => {
     completedQuests,
     isLoading,
     updateQuestProgress,
+    updateQuestFromZoneVisit,
     getActiveQuests,
     getCompletedQuestsCount,
     getTotalRewards,
