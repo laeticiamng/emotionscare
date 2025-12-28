@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState, useMemo } from 'react';
 import { Clock, TrendingUp, Activity, ChevronRight, Filter, Download, BarChart3, Camera, MessageSquare, Mic, SlidersHorizontal, Calendar, X } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';

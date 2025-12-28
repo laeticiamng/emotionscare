@@ -1,4 +1,4 @@
-// @ts-nocheck
+import React from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -122,7 +122,7 @@ const CameraSampler: React.FC<CameraSamplerProps> = ({ onPermissionChange, onUna
     
     try {
       if (!videoRef.current) {
-        logger.error(new Error('[CameraSampler] Video ref not ready'), 'FEATURE');
+        logger.error('[CameraSampler] Video ref not ready', 'FEATURE');
         return;
       }
 
@@ -142,7 +142,7 @@ const CameraSampler: React.FC<CameraSamplerProps> = ({ onPermissionChange, onUna
       canvas.height = videoRef.current.videoHeight;
       const ctx = canvas.getContext('2d');
       if (!ctx) {
-        logger.error(new Error('[CameraSampler] Canvas context not available'), 'FEATURE');
+        logger.error('[CameraSampler] Canvas context not available', 'FEATURE');
         return;
       }
       ctx.drawImage(videoRef.current, 0, 0);
@@ -303,7 +303,7 @@ const CameraSampler: React.FC<CameraSamplerProps> = ({ onPermissionChange, onUna
       }
       
       const duration = Date.now() - startTime;
-      logger.debug('[CameraSampler] Analysis completed in', duration, 'ms', 'FEATURE');
+      logger.debug(`[CameraSampler] Analysis completed in ${duration}ms`, 'FEATURE');
       
       try {
         scanAnalytics.cameraAnalysisCompleted(duration);
