@@ -183,25 +183,93 @@ export const EnhancedScanDashboard: React.FC = () => {
     ];
   }, [history]);
 
-  const insights = useMemo(() => {
-    const tips = [
-      {
-        title: 'Routine matinale',
-        description: 'Vos scans du matin montrent généralement une arousal plus faible. C\'est normal !',
-        type: 'tip' as const
-      },
-      {
+  const { insights, stability, reactivity } = useMemo(() => {
+    if (history.length < 2) {
+      return {
+        insights: [
+          { title: 'Bienvenue', description: 'Effectuez plus de scans pour obtenir des insights personnalisés.', type: 'tip' as const }
+        ],
+        stability: 50,
+        reactivity: 50
+      };
+    }
+
+    // Calculer la stabilité (écart-type de la valence)
+    const valences = history.map(s => s.valence);
+    const avgValence = valences.reduce((a, b) => a + b, 0) / valences.length;
+    const variance = valences.reduce((sum, v) => sum + Math.pow(v - avgValence, 2), 0) / valences.length;
+    const stdDev = Math.sqrt(variance);
+    const stabilityScore = Math.max(0, Math.min(100, 100 - stdDev * 2));
+
+    // Calculer la réactivité (différence moyenne entre scans consécutifs)
+    let totalDiff = 0;
+    for (let i = 1; i < Math.min(10, history.length); i++) {
+      totalDiff += Math.abs(history[i].valence - history[i - 1].valence);
+    }
+    const avgDiff = totalDiff / Math.min(9, history.length - 1);
+    const reactivityScore = Math.min(100, avgDiff * 2);
+
+    // Générer des insights dynamiques
+    const tips: { title: string; description: string; type: 'tip' | 'pattern' | 'trend' }[] = [];
+    
+    // Analyse des heures
+    const morningScans = history.filter(s => {
+      const h = new Date(s.created_at).getHours();
+      return h >= 6 && h < 12;
+    });
+    const eveningScans = history.filter(s => {
+      const h = new Date(s.created_at).getHours();
+      return h >= 18 && h < 24;
+    });
+
+    if (morningScans.length > 0 && eveningScans.length > 0) {
+      const morningAvg = morningScans.reduce((a, s) => a + s.arousal, 0) / morningScans.length;
+      const eveningAvg = eveningScans.reduce((a, s) => a + s.arousal, 0) / eveningScans.length;
+      
+      if (morningAvg < eveningAvg * 0.8) {
+        tips.push({
+          title: 'Routine matinale',
+          description: 'Vos scans du matin montrent une arousal plus faible. Une routine énergisante pourrait aider.',
+          type: 'pattern'
+        });
+      }
+    }
+
+    // Analyse de la tendance
+    const recentScans = history.slice(0, 5);
+    const olderScans = history.slice(5, 10);
+    if (recentScans.length > 0 && olderScans.length > 0) {
+      const recentAvg = recentScans.reduce((a, s) => a + s.valence, 0) / recentScans.length;
+      const olderAvg = olderScans.reduce((a, s) => a + s.valence, 0) / olderScans.length;
+      
+      if (recentAvg > olderAvg + 5) {
+        tips.push({
+          title: 'Tendance positive',
+          description: 'Votre bien-être s\'améliore ces derniers jours. Continuez !',
+          type: 'trend'
+        });
+      } else if (recentAvg < olderAvg - 5) {
+        tips.push({
+          title: 'Attention à vous',
+          description: 'Votre humeur semble diminuer. Prenez du temps pour vous ressourcer.',
+          type: 'trend'
+        });
+      }
+    }
+
+    if (stabilityScore > 70) {
+      tips.push({
         title: 'Stabilité émotionnelle',
         description: 'Votre valence reste stable. Excellent pour le bien-être général.',
-        type: 'trend' as const
-      },
-      {
-        title: 'Pattern détecté',
-        description: 'Vous tendez à être plus énergique l\'après-midi.',
-        type: 'pattern' as const
-      }
-    ];
-    return tips;
+        type: 'tip'
+      });
+    }
+
+    return {
+      insights: tips.length > 0 ? tips : [{ title: 'Analyse en cours', description: 'Continuez à scanner pour des insights plus précis.', type: 'tip' as const }],
+      stability: Math.round(stabilityScore),
+      reactivity: Math.round(reactivityScore)
+    };
   }, [history]);
 
   if (isLoading) {
@@ -319,19 +387,25 @@ export const EnhancedScanDashboard: React.FC = () => {
                     <div>
                       <div className="flex justify-between items-center text-xs mb-1">
                         <span>Stabilité</span>
-                        <span className="font-semibold">78%</span>
+                        <span className="font-semibold">{stability}%</span>
                       </div>
                       <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-                        <div className="h-full w-3/4 bg-green-500 rounded-full" />
+                        <div 
+                          className="h-full bg-green-500 rounded-full transition-all" 
+                          style={{ width: `${stability}%` }}
+                        />
                       </div>
                     </div>
                     <div>
                       <div className="flex justify-between items-center text-xs mb-1">
                         <span>Réactivité</span>
-                        <span className="font-semibold">42%</span>
+                        <span className="font-semibold">{reactivity}%</span>
                       </div>
                       <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-                        <div className="h-full w-5/12 bg-yellow-500 rounded-full" />
+                        <div 
+                          className="h-full bg-yellow-500 rounded-full transition-all" 
+                          style={{ width: `${reactivity}%` }}
+                        />
                       </div>
                     </div>
                   </div>

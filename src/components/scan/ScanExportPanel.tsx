@@ -82,7 +82,7 @@ export const ScanExportPanel: React.FC = () => {
     });
   }, [addExportRecord]);
 
-  // Statistics
+  // Statistics - calculées dynamiquement
   const stats = useMemo(() => {
     if (history.length === 0) return null;
     
@@ -90,10 +90,29 @@ export const ScanExportPanel: React.FC = () => {
     const lastDate = new Date(history[0].created_at);
     const daySpan = Math.ceil((lastDate.getTime() - firstDate.getTime()) / (1000 * 60 * 60 * 24)) || 1;
     
+    // Calculer les émotions uniques depuis les summaries
+    const uniqueEmotionsSet = new Set(
+      history
+        .map(s => s.summary?.toLowerCase().trim())
+        .filter(Boolean)
+    );
+    
+    // Calculer la confiance moyenne (si disponible dans metadata)
+    const confidenceValues = history
+      .map(s => {
+        const meta = s as any;
+        return meta?.confidence ?? meta?.metadata?.confidence;
+      })
+      .filter((c): c is number => typeof c === 'number' && c > 0);
+    
+    const avgConfidence = confidenceValues.length > 0
+      ? Math.round(confidenceValues.reduce((a, b) => a + b, 0) / confidenceValues.length)
+      : 0;
+    
     return {
       totalScans: history.length,
-      uniqueEmotions: 0,
-      avgConfidence: 0,
+      uniqueEmotions: uniqueEmotionsSet.size,
+      avgConfidence,
       daySpan,
       avgPerDay: (history.length / daySpan).toFixed(1),
       totalExports: exportHistory.length
