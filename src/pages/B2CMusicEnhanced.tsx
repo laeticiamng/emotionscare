@@ -79,7 +79,7 @@ interface VinylTrack extends MusicTrack {
   waveform?: number[];
 }
 
-// Configuration audio - URLs Pixabay audio directes (CORS natif)
+// Configuration audio - URLs Pixabay audio directes (CORS natif, vérifiées)
 const AUDIO_URL_CONFIG = {
   'vinyl-1': { 
     fileName: 'ambient-soft.mp3', 
@@ -87,11 +87,11 @@ const AUDIO_URL_CONFIG = {
   },
   'vinyl-2': { 
     fileName: 'focus-clarity.mp3', 
-    fallbackUrl: 'https://cdn.pixabay.com/audio/2022/08/02/audio_884fe92c21.mp3'
+    fallbackUrl: 'https://cdn.pixabay.com/audio/2024/11/04/audio_a94216a94c.mp3'
   },
   'vinyl-3': { 
     fileName: 'creative-flow.mp3', 
-    fallbackUrl: 'https://cdn.pixabay.com/audio/2022/03/15/audio_8cb749d484.mp3'
+    fallbackUrl: 'https://cdn.pixabay.com/audio/2022/01/18/audio_d0c6ff1bab.mp3'
   },
   'vinyl-4': { 
     fileName: 'healing-waves.mp3', 
