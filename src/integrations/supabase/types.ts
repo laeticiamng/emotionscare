@@ -19383,6 +19383,51 @@ export type Database = {
         }
         Relationships: []
       }
+      user_competence_mastery: {
+        Row: {
+          created_at: string
+          id: string
+          is_mastered: boolean | null
+          item_code: string
+          last_reviewed_at: string | null
+          mastery_level: number | null
+          notes: string | null
+          objectif_id: string
+          rang: string
+          review_count: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_mastered?: boolean | null
+          item_code: string
+          last_reviewed_at?: string | null
+          mastery_level?: number | null
+          notes?: string | null
+          objectif_id: string
+          rang: string
+          review_count?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_mastered?: boolean | null
+          item_code?: string
+          last_reviewed_at?: string | null
+          mastery_level?: number | null
+          notes?: string | null
+          objectif_id?: string
+          rang?: string
+          review_count?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_competence_progress: {
         Row: {
           competence_id: string

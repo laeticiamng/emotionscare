@@ -29,9 +29,9 @@ export const useMusicPlayback = (
       return null;
     }
     
-    // Corriger les URLs Pixabay /download/ -> /audio/
-    if (url.includes('pixabay.com/download/audio/')) {
-      return url.replace('/download/audio/', '/audio/');
+    // Corriger les URLs Pixabay /download/ vers /audio/ (download nécessite auth)
+    if (url.includes('cdn.pixabay.com/download/')) {
+      return url.replace('/download/', '/');
     }
     
     return url;
