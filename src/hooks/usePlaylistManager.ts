@@ -1,4 +1,4 @@
-// @ts-nocheck
+// TODO: Add proper type definitions for MusicPlaylist and MusicTrack integration
 
 import { useState, useCallback } from 'react';
 import { MusicPlaylist, MusicTrack } from '@/types/music';

@@ -1,7 +1,9 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Play, Pause, SkipBack, SkipForward } from 'lucide-react';
+import { Slider } from '@/components/ui/slider';
+import { Play, Pause, SkipBack, SkipForward, Shuffle, Repeat, Repeat1, Volume2, VolumeX } from 'lucide-react';
 import { MusicTrack } from '@/types/music';
+import { cn } from '@/lib/utils';
 
 export interface MusicControlsProps {
   isPlaying?: boolean;
@@ -11,7 +13,7 @@ export interface MusicControlsProps {
   onNext?: () => void;
   onPrevious?: () => void;
   shuffleMode?: boolean;
-  repeatMode?: boolean;
+  repeatMode?: 'none' | 'one' | 'all';
   onToggleShuffle?: () => void;
   onToggleRepeat?: () => void;
   currentTime?: number;
@@ -63,30 +65,46 @@ const MusicControls: React.FC<MusicControlsProps> = ({
     }
   };
 
+  const iconSize = size === 'sm' ? 'h-4 w-4' : size === 'lg' ? 'h-6 w-6' : 'h-5 w-5';
+  const buttonSize = size === 'sm' ? 'h-8 w-8' : size === 'lg' ? 'h-12 w-12' : 'h-10 w-10';
+
   return (
-    <div className={`flex items-center justify-center space-x-2 ${className}`}>
+    <div className={cn('flex items-center justify-center gap-2', className)}>
+      {/* Shuffle button */}
+      {onToggleShuffle && (
+        <Button
+          variant={shuffleMode ? 'default' : 'ghost'}
+          size="icon"
+          onClick={onToggleShuffle}
+          className={cn(size === 'sm' ? 'h-7 w-7' : 'h-8 w-8')}
+          aria-label={shuffleMode ? 'Désactiver lecture aléatoire' : 'Activer lecture aléatoire'}
+        >
+          <Shuffle className={cn(size === 'sm' ? 'h-3 w-3' : 'h-4 w-4', shuffleMode && 'text-primary-foreground')} />
+        </Button>
+      )}
+
       <Button
         variant="ghost"
         size="icon"
         onClick={onPrevious}
         disabled={!onPrevious}
-        className={size === 'sm' ? 'h-8 w-8' : 'h-10 w-10'}
+        className={buttonSize}
         aria-label="Piste précédente"
       >
-        <SkipBack className={size === 'sm' ? 'h-4 w-4' : 'h-5 w-5'} />
+        <SkipBack className={iconSize} />
       </Button>
       
       <Button
         variant="default"
         size="icon"
         onClick={handleTogglePlay}
-        className={`rounded-full ${size === 'sm' ? 'h-8 w-8' : size === 'lg' ? 'h-12 w-12' : 'h-10 w-10'}`}
+        className={cn('rounded-full', buttonSize)}
         aria-label={isPlaying ? "Pause" : "Lecture"}
       >
         {isPlaying ? (
-          <Pause className={size === 'sm' ? 'h-4 w-4' : size === 'lg' ? 'h-6 w-6' : 'h-5 w-5'} />
+          <Pause className={iconSize} />
         ) : (
-          <Play className={`${size === 'sm' ? 'h-4 w-4' : size === 'lg' ? 'h-6 w-6' : 'h-5 w-5'} ml-0.5`} />
+          <Play className={cn(iconSize, 'ml-0.5')} />
         )}
       </Button>
       
@@ -95,11 +113,55 @@ const MusicControls: React.FC<MusicControlsProps> = ({
         size="icon"
         onClick={onNext}
         disabled={!onNext}
-        className={size === 'sm' ? 'h-8 w-8' : 'h-10 w-10'}
+        className={buttonSize}
         aria-label="Piste suivante"
       >
-        <SkipForward className={size === 'sm' ? 'h-4 w-4' : 'h-5 w-5'} />
+        <SkipForward className={iconSize} />
       </Button>
+
+      {/* Repeat button */}
+      {onToggleRepeat && (
+        <Button
+          variant={repeatMode !== 'none' ? 'default' : 'ghost'}
+          size="icon"
+          onClick={onToggleRepeat}
+          className={cn(size === 'sm' ? 'h-7 w-7' : 'h-8 w-8')}
+          aria-label={`Mode répétition: ${repeatMode}`}
+        >
+          {repeatMode === 'one' ? (
+            <Repeat1 className={cn(size === 'sm' ? 'h-3 w-3' : 'h-4 w-4')} />
+          ) : (
+            <Repeat className={cn(size === 'sm' ? 'h-3 w-3' : 'h-4 w-4', repeatMode === 'all' && 'text-primary-foreground')} />
+          )}
+        </Button>
+      )}
+
+      {/* Volume control */}
+      {showVolume && onVolumeChange && (
+        <div className="flex items-center gap-2 ml-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onToggleMute}
+            className={cn(size === 'sm' ? 'h-7 w-7' : 'h-8 w-8')}
+            aria-label={isMuted ? 'Activer le son' : 'Couper le son'}
+          >
+            {isMuted || volume === 0 ? (
+              <VolumeX className={cn(size === 'sm' ? 'h-3 w-3' : 'h-4 w-4')} />
+            ) : (
+              <Volume2 className={cn(size === 'sm' ? 'h-3 w-3' : 'h-4 w-4')} />
+            )}
+          </Button>
+          <Slider
+            value={[isMuted ? 0 : (volume ?? 0.7)]}
+            onValueChange={(v) => onVolumeChange(v[0])}
+            max={1}
+            step={0.01}
+            className="w-20"
+            aria-label="Volume"
+          />
+        </div>
+      )}
     </div>
   );
 };
