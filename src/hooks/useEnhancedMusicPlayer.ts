@@ -37,18 +37,30 @@ export const useEnhancedMusicPlayer = () => {
       switch (e.code) {
         case 'Space':
           e.preventDefault();
-          togglePlayer();
+          if (music.state.isPlaying) {
+            music.pause();
+            toast({ title: "⏸️ Lecture mise en pause", duration: 1000 });
+          } else {
+            music.play();
+            toast({ title: "▶️ Lecture démarrée", duration: 1000 });
+          }
           break;
         case 'KeyP':
           if (e.ctrlKey || e.metaKey) {
             e.preventDefault();
-            togglePlayer();
+            if (music.state.isPlaying) {
+              music.pause();
+              toast({ title: "⏸️ Lecture mise en pause", duration: 1000 });
+            } else {
+              music.play();
+              toast({ title: "▶️ Lecture démarrée", duration: 1000 });
+            }
           }
           break;
         case 'KeyE':
           if (e.ctrlKey || e.metaKey) {
             e.preventDefault();
-            setIsExpanded(!isExpanded);
+            setIsExpanded(prev => !prev);
           }
           break;
         case 'KeyM':
@@ -70,13 +82,15 @@ export const useEnhancedMusicPlayer = () => {
         case 'ArrowRight':
           if (e.ctrlKey) {
             e.preventDefault();
-            nextTrackWithFeedback();
+            music.next();
+            toast({ title: "⏭️ Morceau suivant", duration: 1000 });
           }
           break;
         case 'ArrowLeft':
           if (e.ctrlKey) {
             e.preventDefault();
-            previousTrackWithFeedback();
+            music.previous();
+            toast({ title: "⏮️ Morceau précédent", duration: 1000 });
           }
           break;
       }
@@ -84,7 +98,7 @@ export const useEnhancedMusicPlayer = () => {
 
     document.addEventListener('keydown', handleGlobalKeypress);
     return () => document.removeEventListener('keydown', handleGlobalKeypress);
-  }, [keyboardShortcutsEnabled, isExpanded, music]);
+  }, [keyboardShortcutsEnabled, music.state.isPlaying, music.state.volume, music]);
 
   // Tracker l'historique et gamification
   useEffect(() => {
@@ -103,7 +117,7 @@ export const useEnhancedMusicPlayer = () => {
       
       logger.debug('Track played', { trackId: track.id }, 'MUSIC');
     }
-  }, [music.state.currentTrack?.id, music.state.isPlaying]);
+  }, [music.state.currentTrack?.id, music.state.isPlaying, history, setHistory, setLastPlayed, updateChallengeProgress, addPoints]);
 
   const togglePlayer = useCallback(() => {
     if (music.state.isPlaying) {

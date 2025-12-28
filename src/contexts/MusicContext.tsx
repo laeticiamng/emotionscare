@@ -509,8 +509,10 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     dispatch({ type: 'SET_GENERATION_PROGRESS', payload: 0 });
 
     try {
-      const { data, error } = await supabase.functions.invoke('suno-music-generation', {
+      // Utiliser suno-music (la vraie edge function)
+      const { data, error } = await supabase.functions.invoke('suno-music', {
         body: {
+          action: 'generate',
           emotion,
           prompt: prompt || `Musique thérapeutique apaisante pour émotion ${emotion}`,
           style: 'therapeutic ambient',
@@ -526,49 +528,56 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         return null;
       }
 
-      dispatch({ type: 'SET_GENERATION_PROGRESS', payload: 50 });
+      dispatch({ type: 'SET_GENERATION_PROGRESS', payload: 30 });
 
-      // Poll pour le statut de génération
-      const checkStatus = async (taskId: string): Promise<MusicTrack | null> => {
+      // Si on a un taskId, on doit poller pour le statut
+      if (data?.data?.taskId) {
+        const taskId = data.data.taskId;
         let attempts = 0;
         const maxAttempts = 30; // 5 minutes max
 
         while (attempts < maxAttempts) {
-          try {
-            const statusData = await checkGenerationStatus(taskId);
+          await new Promise(resolve => setTimeout(resolve, 10000));
+          attempts++;
+          dispatch({
+            type: 'SET_GENERATION_PROGRESS',
+            payload: 30 + (attempts / maxAttempts) * 60
+          });
 
-            if (statusData) {
-              dispatch({ type: 'SET_GENERATION_PROGRESS', payload: 100 });
-              return statusData;
-            }
+          const statusData = await checkGenerationStatus(taskId);
 
-            dispatch({
-              type: 'SET_GENERATION_PROGRESS',
-              payload: 50 + (attempts / maxAttempts) * 45
-            });
-
-            await new Promise(resolve => setTimeout(resolve, 10000)); // Attendre 10s
-            attempts++;
-          } catch (error) {
-            logger.error('Error checking generation status', error as Error, 'MUSIC');
-            // Continue polling même en cas d'erreur temporaire
-            await new Promise(resolve => setTimeout(resolve, 10000));
-            attempts++;
+          if (statusData) {
+            dispatch({ type: 'SET_GENERATION_PROGRESS', payload: 100 });
+            toast.success('Musique thérapeutique générée avec succès !');
+            return statusData;
           }
         }
 
-        // Timeout - retourner null au lieu de throw
-        logger.error('Music generation timeout', new Error('Timeout - Génération trop longue'), 'MUSIC');
+        // Timeout
         dispatch({ type: 'SET_GENERATION_ERROR', payload: 'Timeout - Génération trop longue' });
         toast.error('La génération prend trop de temps, veuillez réessayer');
         return null;
-      };
+      }
 
-      const generatedTrack = await checkStatus(data.taskId);
-      
-      if (generatedTrack) {
+      // Réponse directe avec audio (fallback Pixabay)
+      if (data?.data?.audio_url || data?.data?.audioUrl) {
+        const track: MusicTrack = {
+          id: data.data.id || `generated-${Date.now()}`,
+          title: data.data.title || `Musique ${emotion}`,
+          artist: data.data.artist || 'Suno AI',
+          url: data.data.audio_url || data.data.audioUrl,
+          audioUrl: data.data.audio_url || data.data.audioUrl,
+          duration: data.data.duration || 120,
+          coverUrl: data.data.image_url || data.data.imageUrl,
+          isGenerated: true,
+          generatedAt: new Date().toISOString(),
+          emotion,
+          mood: emotion
+        };
+
+        dispatch({ type: 'SET_GENERATION_PROGRESS', payload: 100 });
         toast.success('Musique thérapeutique générée avec succès !');
-        return generatedTrack;
+        return track;
       }
 
       return null;
@@ -585,7 +594,7 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const checkGenerationStatus = useCallback(async (taskId: string): Promise<MusicTrack | null> => {
     try {
-      const { data, error } = await supabase.functions.invoke('suno-music-generation', {
+      const { data, error } = await supabase.functions.invoke('suno-music', {
         body: {
           action: 'status',
           taskId
@@ -597,21 +606,22 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         return null;
       }
 
-      if (data.status === 'completed' && data.audioUrl) {
+      const status = data?.data?.status;
+      if ((status === 'completed' || status === 'complete') && (data.data.audio_url || data.data.audioUrl)) {
         const track: MusicTrack = {
           id: taskId,
-          title: data.title || 'Musique générée',
+          title: data.data.title || 'Musique générée',
           artist: 'Suno AI',
-          url: data.audioUrl,
-          audioUrl: data.audioUrl,
-          duration: data.duration || 120,
-          coverUrl: data.imageUrl,
+          url: data.data.audio_url || data.data.audioUrl,
+          audioUrl: data.data.audio_url || data.data.audioUrl,
+          duration: data.data.duration || 120,
+          coverUrl: data.data.image_url || data.data.imageUrl,
           isGenerated: true,
           generatedAt: new Date().toISOString(),
           sunoTaskId: taskId,
-          emotion: data.emotion,
-          mood: data.mood,
-          tags: data.tags
+          emotion: data.data.emotion,
+          mood: data.data.mood,
+          tags: data.data.tags
         };
 
         return track;
@@ -672,17 +682,31 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   const getRecommendationsForEmotion = useCallback(async (emotion: string): Promise<MusicTrack[]> => {
     try {
-      const { data, error } = await supabase.functions.invoke('emotionscare-music-generator', {
+      // Utiliser emotion-music-ai qui existe avec action get-recommendations
+      const { data, error } = await supabase.functions.invoke('emotion-music-ai', {
         body: {
+          action: 'get-recommendations',
           emotion,
-          type: 'recommendations',
           count: 10
         }
       });
 
       if (error) throw error;
       
-      return data.tracks || [];
+      // Mapper les tracks du format DB au format MusicTrack
+      const recommendations = data?.recommendations || data?.tracks || [];
+      return recommendations.map((track: any) => ({
+        id: track.id,
+        title: track.title || track.prompt || 'Musique générée',
+        artist: track.artist || 'Suno AI',
+        url: track.audio_url || track.audioUrl || '',
+        audioUrl: track.audio_url || track.audioUrl || '',
+        duration: track.duration || 120,
+        coverUrl: track.image_url || track.imageUrl,
+        emotion: track.emotion,
+        mood: track.mood,
+        tags: track.tags
+      }));
     } catch (error) {
       logger.error('Music recommendations error', error as Error, 'MUSIC');
       return [];
