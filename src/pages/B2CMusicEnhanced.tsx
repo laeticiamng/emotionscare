@@ -59,6 +59,7 @@ import {
   VinylIntroduction,
   MusicFavoritesSection,
   MusicHistorySection,
+  MusicLibrarySection,
 } from '@/components/music/page';
 
 // Skeleton de chargement ultra-léger
@@ -323,6 +324,20 @@ const B2CMusicEnhanced: React.FC = () => {
                 playHistory={playHistory}
                 loadingTrackId={loadingTrackId}
                 onStartTrack={(track) => startTrack(track as VinylTrack)}
+              />
+
+              {/* 🔥 BIBLIOTHÈQUE - Musiques générées sauvegardées */}
+              <MusicLibrarySection 
+                onPlayTrack={(track) => {
+                  const vinylTrack: VinylTrack = {
+                    ...track,
+                    category: 'doux',
+                    color: 'from-primary to-primary/50',
+                    vinylColor: 'bg-gradient-to-br from-primary/40 via-primary/20 to-primary/10',
+                    description: track.mood || 'Musique générée',
+                  };
+                  startTrack(vinylTrack);
+                }}
               />
 
               {/* Stats - Priorité moyenne */}
