@@ -79,25 +79,23 @@ interface VinylTrack extends MusicTrack {
   waveform?: number[];
 }
 
-// Configuration audio - URLs MP3 fiables hébergées sur des CDN publics avec CORS
-// Ces fichiers sont des samples audio libres de droits pour démonstration
 // Configuration audio - URLs MP3 fiables avec CORS (Internet Archive - domaine public)
 const AUDIO_URL_CONFIG = {
   'vinyl-1': { 
     fileName: 'ambient-soft.mp3', 
-    fallbackUrl: 'https://upload.wikimedia.org/wikipedia/commons/c/c8/Example.ogg'
+    fallbackUrl: 'https://ia800905.us.archive.org/19/items/FREE_background_music_dridge/relax.mp3'
   },
   'vinyl-2': { 
     fileName: 'focus-clarity.mp3', 
-    fallbackUrl: 'https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3'
+    fallbackUrl: 'https://ia800905.us.archive.org/19/items/FREE_background_music_dridge/upbeat.mp3'
   },
   'vinyl-3': { 
     fileName: 'creative-flow.mp3', 
-    fallbackUrl: 'https://filesamples.com/samples/audio/mp3/sample3.mp3'
+    fallbackUrl: 'https://ia600900.us.archive.org/16/items/relaxing-music-vol-1_202102/Relaxing%20Music%20Vol%201%20-%2001%20A%20Call%20To%20Relax.mp3'
   },
   'vinyl-4': { 
     fileName: 'healing-waves.mp3', 
-    fallbackUrl: 'https://filesamples.com/samples/audio/mp3/sample2.mp3'
+    fallbackUrl: 'https://ia800905.us.archive.org/19/items/FREE_background_music_dridge/calm.mp3'
   }
 } as const;
 
