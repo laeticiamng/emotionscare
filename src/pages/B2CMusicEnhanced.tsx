@@ -87,7 +87,7 @@ const AUDIO_URL_CONFIG = {
   },
   'vinyl-2': { 
     fileName: 'focus-clarity.mp3', 
-    fallbackUrl: 'https://cdn.pixabay.com/audio/2022/10/25/audio_946b0939c8.mp3'
+    fallbackUrl: 'https://cdn.pixabay.com/audio/2022/08/02/audio_884fe92c21.mp3'
   },
   'vinyl-3': { 
     fileName: 'creative-flow.mp3', 
