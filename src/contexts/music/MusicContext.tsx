@@ -19,6 +19,22 @@ export const MusicProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [state, dispatch] = useReducer(musicReducer, initialState);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
+  // Nettoyer tout cache potentiellement corrompu au démarrage
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        // Supprimer tous les caches music: qui peuvent contenir des URLs Supabase invalides
+        Object.keys(window.localStorage).forEach(key => {
+          if (key.startsWith('music:')) {
+            window.localStorage.removeItem(key);
+          }
+        });
+      } catch {
+        // Ignore
+      }
+    }
+  }, []);
+
   // Setup audio element
   useEffect(() => {
     audioRef.current = new Audio();
