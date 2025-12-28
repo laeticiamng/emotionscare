@@ -109,9 +109,9 @@ export const useTrustProfile = () => {
         .from('trust_profiles')
         .select('*')
         .eq('user_id', user?.id)
-        .single();
+        .maybeSingle();
       
-      if (error && error.code !== 'PGRST116') throw error;
+      if (error) throw error;
       return data as TrustProfile | null;
     },
     enabled: !!user?.id,
@@ -331,9 +331,9 @@ export const useExchangeProfile = () => {
         .from('exchange_profiles')
         .select('*')
         .eq('user_id', user?.id)
-        .single();
+        .maybeSingle();
       
-      if (error && error.code !== 'PGRST116') throw error;
+      if (error) throw error;
       return data as ExchangeProfile | null;
     },
     enabled: !!user?.id,
