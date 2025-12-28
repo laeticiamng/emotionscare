@@ -86,11 +86,13 @@ class SunoService {
       );
     }
 
-    return this.callEdgeFunction('emotionscare-music-generator', {
+    return this.callEdgeFunction('suno-music', {
+      action: 'generate',
       emotion: dominantEmotion,
-      targetMood: emotionalProfile.targetMood,
+      mood: emotionalProfile.targetMood,
       sessionType: emotionalProfile.sessionType,
-      musicParams,
+      style: musicParams.genre,
+      instrumental: true,
       preferences: emotionalProfile.preferences
     });
   }
