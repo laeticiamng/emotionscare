@@ -124,6 +124,9 @@ export function useAudioUrls(
     if (typeof window !== 'undefined') {
       try {
         window.localStorage.removeItem(CACHE_KEY);
+        // Vider aussi le cache d'historique potentiellement corrompu
+        window.localStorage.removeItem('music:audio-urls-cache');
+        window.localStorage.removeItem('music:history');
       } catch (e) {
         // Ignore
       }
