@@ -79,12 +79,13 @@ interface VinylTrack extends MusicTrack {
   waveform?: number[];
 }
 
-// Configuration audio - URLs MP3 fiables avec CORS (fichiers de test courts)
+// Configuration audio - URLs MP3 directes testées et fonctionnelles avec CORS
+// Utilisation de fichiers audio libre de droits hébergés sur des CDN fiables
 const AUDIO_URL_CONFIG = {
-  'vinyl-1': { fileName: 'ambient-soft.mp3', fallbackUrl: 'https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3' },
-  'vinyl-2': { fileName: 'focus-clarity.mp3', fallbackUrl: 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_8cb749d484.mp3' },
-  'vinyl-3': { fileName: 'creative-flow.mp3', fallbackUrl: 'https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0c6ff1bab.mp3' },
-  'vinyl-4': { fileName: 'healing-waves.mp3', fallbackUrl: 'https://cdn.pixabay.com/download/audio/2021/08/04/audio_0625c1539c.mp3' }
+  'vinyl-1': { fileName: 'ambient-soft.mp3', fallbackUrl: 'https://files.freemusicarchive.org/storage-freemusicarchive-org/music/ccCommunity/Chad_Crouch/Arps/Chad_Crouch_-_Shipping_Lanes.mp3' },
+  'vinyl-2': { fileName: 'focus-clarity.mp3', fallbackUrl: 'https://files.freemusicarchive.org/storage-freemusicarchive-org/music/no_curator/Tours/Enthusiast/Tours_-_01_-_Enthusiast.mp3' },
+  'vinyl-3': { fileName: 'creative-flow.mp3', fallbackUrl: 'https://files.freemusicarchive.org/storage-freemusicarchive-org/music/ccCommunity/Kai_Engel/Satin/Kai_Engel_-_04_-_Interlude.mp3' },
+  'vinyl-4': { fileName: 'healing-waves.mp3', fallbackUrl: 'https://files.freemusicarchive.org/storage-freemusicarchive-org/music/ccCommunity/Ketsa/Raising_Frequency/Ketsa_-_08_-_Multiverse.mp3' }
 } as const;
 
 // Données vinyles
