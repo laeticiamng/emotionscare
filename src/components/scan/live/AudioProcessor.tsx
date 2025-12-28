@@ -1,6 +1,5 @@
-// @ts-nocheck
 import React, { useEffect, useState, useRef } from 'react';
-import { EmotionResult, EmotionRecommendation } from '@/types/emotion';
+import type { EmotionResult, EmotionRecommendation } from '@/types/emotion';
 
 interface AudioProcessorProps {
   onResult?: (result: EmotionResult) => void;
@@ -144,16 +143,16 @@ export const AudioProcessor: React.FC<AudioProcessorProps> = ({
           const fakeResult: EmotionResult = {
             id: `scan-${Date.now()}`,
             emotion: 'calm',
-            confidence: 0.85,
+            confidence: 85,
             timestamp: new Date().toISOString(),
             recommendations: recommendations,
             text: "J'ai passé une journée tranquille aujourd'hui.",
-            audioUrl: URL.createObjectURL(audioBlob),
-            transcript: "J'ai passé une journée tranquille aujourd'hui.",
-            emotions: {},
+            audio_url: URL.createObjectURL(audioBlob),
+            transcription: "J'ai passé une journée tranquille aujourd'hui.",
+            emotions: { calm: 0.85, neutral: 0.1, happy: 0.05 },
             emojis: ['😌', '🧘‍♂️'],
-            intensity: 0.7,
-            source: 'audio-processor'
+            intensity: 70,
+            source: 'voice'
           };
           
           onResult(fakeResult);

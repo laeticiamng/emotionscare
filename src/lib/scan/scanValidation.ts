@@ -1,5 +1,4 @@
-// @ts-nocheck
-import { EmotionResult, EmotionAnalysisConfig, ScanMode } from '@/types/emotion';
+import type { EmotionResult, EmotionAnalysisConfig, ScanMode, EmotionResultExtended } from '@/types/emotion';
 
 /**
  * Service de validation pour les scans émotionnels
@@ -10,6 +9,19 @@ export interface ValidationResult {
   errors: string[];
   warnings: string[];
 }
+
+// Helper to extract confidence as number from various formats
+const getConfidenceValue = (result: EmotionResult): number => {
+  const confidence = result.confidence;
+  if (typeof confidence === 'number') {
+    return confidence;
+  }
+  // Handle object format with 'overall' property (from extended types)
+  if (confidence && typeof confidence === 'object' && 'overall' in (confidence as Record<string, unknown>)) {
+    return (confidence as { overall: number }).overall;
+  }
+  return 0;
+};
 
 /**
  * Valide une configuration de scan
@@ -73,11 +85,9 @@ export function validateEmotionResult(result: EmotionResult): ValidationResult {
   }
 
   // Validation de la confiance
-  const confidence = typeof result.confidence === 'number'
-    ? result.confidence
-    : result.confidence?.overall;
+  const confidence = getConfidenceValue(result);
 
-  if (confidence === undefined || confidence < 0 || confidence > 100) {
+  if (confidence < 0 || confidence > 100) {
     errors.push('La confiance doit être comprise entre 0 et 100');
   } else if (confidence < 50) {
     warnings.push('Confiance faible: les résultats peuvent ne pas être fiables');
@@ -100,8 +110,11 @@ export function validateEmotionResult(result: EmotionResult): ValidationResult {
   // Validation du timestamp
   if (!result.timestamp) {
     errors.push('Le timestamp est requis');
-  } else if (result.timestamp > new Date()) {
-    errors.push('Le timestamp ne peut pas être dans le futur');
+  } else {
+    const ts = result.timestamp instanceof Date ? result.timestamp : new Date(result.timestamp);
+    if (ts > new Date()) {
+      errors.push('Le timestamp ne peut pas être dans le futur');
+    }
   }
 
   return {
@@ -126,9 +139,7 @@ export function calculateScanQuality(result: EmotionResult, config: EmotionAnaly
   let quality = 0;
 
   // Facteur de confiance (40% du score)
-  const confidence = typeof result.confidence === 'number'
-    ? result.confidence
-    : result.confidence?.overall || 0;
+  const confidence = getConfidenceValue(result);
   quality += (confidence / 100) * 40;
 
   // Durée appropriée (20% du score)
@@ -139,13 +150,14 @@ export function calculateScanQuality(result: EmotionResult, config: EmotionAnaly
   const sourceCount = config.sources.length;
   quality += Math.min(sourceCount / 3, 1) * 20;
 
-  // Données biométriques (10% du score)
-  if (config.biometricTracking && result.biometrics) {
+  // Données biométriques (10% du score) - check for extended result
+  const extendedResult = result as EmotionResultExtended;
+  if (config.biometricTracking && extendedResult.biometrics) {
     quality += 10;
   }
 
-  // Mode prédictif (10% du score)
-  if (config.predictiveMode && result.predictions) {
+  // Mode prédictif (10% du score) - check for extended result
+  if (config.predictiveMode && extendedResult.predictions) {
     quality += 10;
   }
 
@@ -178,12 +190,8 @@ export function compareEmotionResults(
   arousalDelta: number;
   isSignificantChange: boolean;
 } {
-  const prevConfidence = typeof previous.confidence === 'number'
-    ? previous.confidence
-    : previous.confidence?.overall || 0;
-  const currConfidence = typeof current.confidence === 'number'
-    ? current.confidence
-    : current.confidence?.overall || 0;
+  const prevConfidence = getConfidenceValue(previous);
+  const currConfidence = getConfidenceValue(current);
 
   const confidenceDelta = currConfidence - prevConfidence;
   const valenceDelta = (current.valence || 0) - (previous.valence || 0);

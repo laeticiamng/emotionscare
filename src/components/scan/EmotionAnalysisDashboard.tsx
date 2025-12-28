@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -16,22 +15,42 @@ import {
 } from 'lucide-react';
 import EmotionScannerPremium from './EmotionScannerPremium';
 import { EmotionsCareRecommendation } from '@/components/music/emotionscare';
-import type { EmotionResult } from '@/types/emotion-unified';
+import type { EmotionResult as BaseEmotionResult } from '@/types/emotion';
+import type { EmotionResult as IndexEmotionResult, EmotionConfidence } from '@/types';
 
 interface EmotionAnalysisDashboardProps {
   className?: string;
 }
 
+// Helper to get confidence as number from various formats
+const getConfidenceNumber = (confidence: number | EmotionConfidence | undefined): number => {
+  if (typeof confidence === 'number') return confidence;
+  if (confidence && typeof confidence === 'object' && 'overall' in confidence) {
+    return confidence.overall;
+  }
+  return 0;
+};
+
+// Adapter to convert between emotion result types
+const toIndexEmotionResult = (result: BaseEmotionResult): IndexEmotionResult => ({
+  id: result.id ?? `scan-${Date.now()}`,
+  emotion: result.emotion,
+  confidence: result.confidence,
+  timestamp: result.timestamp,
+  source: (result.source as IndexEmotionResult['source']) ?? 'manual',
+  intensity: result.intensity ?? 50
+});
+
 const EmotionAnalysisDashboard: React.FC<EmotionAnalysisDashboardProps> = ({
   className = ''
 }) => {
-  const [currentEmotionResult, setCurrentEmotionResult] = useState<EmotionResult | null>(null);
-  const [emotionHistory, setEmotionHistory] = useState<EmotionResult[]>([]);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [currentEmotionResult, setCurrentEmotionResult] = useState<IndexEmotionResult | null>(null);
+  const [emotionHistory, setEmotionHistory] = useState<IndexEmotionResult[]>([]);
 
-  const handleEmotionAnalyzed = (result: EmotionResult) => {
-    setCurrentEmotionResult(result);
-    setEmotionHistory(prev => [result, ...prev.slice(0, 9)]);
+  const handleEmotionAnalyzed = (result: BaseEmotionResult) => {
+    const indexResult = toIndexEmotionResult(result);
+    setCurrentEmotionResult(indexResult);
+    setEmotionHistory(prev => [indexResult, ...prev.slice(0, 9)]);
   };
 
   const getEmotionColor = (emotion: string) => {
@@ -69,8 +88,10 @@ const EmotionAnalysisDashboard: React.FC<EmotionAnalysisDashboardProps> = ({
 
   const getAverageConfidence = () => {
     if (emotionHistory.length === 0) return 0;
-    const total = emotionHistory.reduce((sum, result) => sum + (result.confidence || 0), 0);
-    return Math.round((total / emotionHistory.length));
+    const total = emotionHistory.reduce((sum, result) => {
+      return sum + getConfidenceNumber(result.confidence);
+    }, 0);
+    return Math.round(total / emotionHistory.length);
   };
 
   const stats = getMoodStats();
@@ -151,17 +172,14 @@ const EmotionAnalysisDashboard: React.FC<EmotionAnalysisDashboardProps> = ({
 
         <TabsContent value="scanner" className="space-y-4">
           <EmotionScannerPremium
-            onScanComplete={handleEmotionAnalyzed}
+            onEmotionDetected={handleEmotionAnalyzed}
           />
         </TabsContent>
 
         <TabsContent value="musicotherapy" className="space-y-4">
           {currentEmotionResult ? (
             <EmotionsCareRecommendation
-              emotionResult={{
-                ...currentEmotionResult,
-                intensity: currentEmotionResult.intensity ?? 50
-              }}
+              emotionResult={currentEmotionResult}
               autoGenerate={false}
             />
           ) : (
@@ -216,7 +234,7 @@ const EmotionAnalysisDashboard: React.FC<EmotionAnalysisDashboardProps> = ({
                               {result.emotion || 'Neutre'}
                             </Badge>
                             <span className="text-sm text-muted-foreground">
-                              {result.confidence || 0}% confiance
+                              {getConfidenceNumber(result.confidence)}% confiance
                             </span>
                           </div>
                           <p className="text-sm text-muted-foreground">
