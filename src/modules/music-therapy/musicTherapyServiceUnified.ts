@@ -265,8 +265,9 @@ export class MusicTherapyService {
 
     if (!session) return null;
 
-    const { data, error } = await supabase.functions.invoke('adapt-music-therapy', {
+    const { data, error } = await supabase.functions.invoke('adaptive-music', {
       body: {
+        action: 'adapt-session',
         sessionId,
         userId: session.user_id,
         currentPlaylistId: session.playlist_id,
@@ -458,8 +459,8 @@ export class MusicTherapyService {
 
     if (error) throw error;
 
-    const { data } = await supabase.functions.invoke('music-therapy-report', {
-      body: { sessionId, feedback: completion.userFeedback }
+    const { data } = await supabase.functions.invoke('adaptive-music', {
+      body: { action: 'generate-report', sessionId, feedback: completion.userFeedback }
     });
 
     return {

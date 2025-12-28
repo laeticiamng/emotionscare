@@ -15363,6 +15363,51 @@ export type Database = {
         }
         Relationships: []
       }
+      quiz_results: {
+        Row: {
+          answers: Json | null
+          correct_answers: number
+          created_at: string
+          id: string
+          item_code: string
+          item_title: string
+          performance: Json | null
+          score: number
+          time_spent: number
+          total_questions: number
+          user_id: string | null
+          wrong_answers: number
+        }
+        Insert: {
+          answers?: Json | null
+          correct_answers: number
+          created_at?: string
+          id?: string
+          item_code: string
+          item_title: string
+          performance?: Json | null
+          score: number
+          time_spent?: number
+          total_questions: number
+          user_id?: string | null
+          wrong_answers: number
+        }
+        Update: {
+          answers?: Json | null
+          correct_answers?: number
+          created_at?: string
+          id?: string
+          item_code?: string
+          item_title?: string
+          performance?: Json | null
+          score?: number
+          time_spent?: number
+          total_questions?: number
+          user_id?: string | null
+          wrong_answers?: number
+        }
+        Relationships: []
+      }
       quiz_sessions: {
         Row: {
           completed: boolean
