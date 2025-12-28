@@ -84,16 +84,55 @@ export const TrackFeedback: React.FC<TrackFeedbackProps> = ({
     );
   }
 
+  // Handler pour compact mode avec rating correct
+  const handleCompactSubmit = async (starRating: number) => {
+    if (!user || isSubmitting) return;
+
+    setRating(starRating);
+    setIsSubmitting(true);
+    try {
+      const { error } = await supabase.from('music_track_feedback').insert({
+        user_id: user.id,
+        track_id: trackId,
+        session_id: sessionId || null,
+        rating: starRating,
+        feedback_type: starRating >= 4 ? 'positive' : starRating <= 2 ? 'negative' : 'neutral',
+        emotion_match: null,
+        notes: null,
+        context: {
+          submitted_at: new Date().toISOString(),
+          source: 'compact_rating',
+        },
+      });
+
+      if (error) throw error;
+
+      setHasSubmitted(true);
+      onFeedbackSubmit?.(starRating);
+      
+      toast({
+        title: 'Merci !',
+        description: `Note: ${starRating}/5`,
+      });
+    } catch (error) {
+      logger.error('Failed to submit compact feedback', error as Error, 'MUSIC');
+      toast({
+        title: 'Erreur',
+        description: 'Impossible d\'envoyer le feedback',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   if (compact) {
     return (
       <div className="flex items-center gap-1">
         {[1, 2, 3, 4, 5].map((star) => (
           <button
             key={star}
-            onClick={() => {
-              setRating(star);
-              handleSubmit();
-            }}
+            onClick={() => handleCompactSubmit(star)}
             onMouseEnter={() => setHoveredRating(star)}
             onMouseLeave={() => setHoveredRating(0)}
             className="p-1 hover:scale-110 transition-transform"

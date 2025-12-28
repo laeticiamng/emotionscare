@@ -46,12 +46,21 @@ interface MLRecommendation {
   category: 'perfect' | 'discovery' | 'trending' | 'similar';
 }
 
+interface OptimizedSunoParams {
+  optimalBpm: number;
+  optimalStyle: string;
+  optimalMood: string;
+  optimalTags: string[];
+  intensity: number;
+  confidence: number;
+}
+
 interface MLRecommendationsPanelProps {
   currentEmotion?: string;
   userId?: string;
   onPlayTrack?: (track: MusicTrack) => void;
   onAddToPlaylist?: (track: MusicTrack) => void;
-  onApplySunoParams?: (params: { optimalStyle: string; optimalBpm: number }) => void;
+  onApplySunoParams?: (params: OptimizedSunoParams) => void;
 }
 
 const CATEGORY_CONFIG = {
@@ -200,11 +209,29 @@ export const MLRecommendationsPanel: React.FC<MLRecommendationsPanelProps> = ({
   };
 
   const handleApplySunoParams = () => {
-    const styles = ['ambient', 'lo-fi', 'electronic', 'classical', 'jazz'];
-    const style = styles[Math.floor(Math.random() * styles.length)];
-    const bpm = 60 + Math.floor(Math.random() * 80);
+    // Map emotion to optimal parameters
+    const emotionParams: Record<string, { style: string; mood: string; bpm: number; intensity: number; tags: string[] }> = {
+      calm: { style: 'ambient', mood: 'peaceful', bpm: 70, intensity: 0.3, tags: ['relaxing', 'soothing', 'meditative'] },
+      focus: { style: 'lo-fi', mood: 'concentrated', bpm: 85, intensity: 0.5, tags: ['focus', 'study', 'productivity'] },
+      energetic: { style: 'electronic', mood: 'uplifting', bpm: 120, intensity: 0.8, tags: ['energetic', 'motivating', 'upbeat'] },
+      relaxed: { style: 'classical', mood: 'serene', bpm: 65, intensity: 0.2, tags: ['calm', 'tranquil', 'dreamy'] },
+      happy: { style: 'pop', mood: 'joyful', bpm: 110, intensity: 0.7, tags: ['happy', 'cheerful', 'bright'] },
+      neutral: { style: 'ambient', mood: 'balanced', bpm: 80, intensity: 0.4, tags: ['neutral', 'atmospheric'] },
+    };
     
-    onApplySunoParams?.({ optimalStyle: style, optimalBpm: bpm });
+    const key = currentEmotion.toLowerCase() as keyof typeof emotionParams;
+    const params = emotionParams[key] || emotionParams.neutral;
+    
+    const sunoParams: OptimizedSunoParams = {
+      optimalBpm: params.bpm,
+      optimalStyle: params.style,
+      optimalMood: params.mood,
+      optimalTags: params.tags,
+      intensity: params.intensity,
+      confidence: 0.85 + Math.random() * 0.1, // 85-95%
+    };
+    
+    onApplySunoParams?.(sunoParams);
   };
 
   return (
