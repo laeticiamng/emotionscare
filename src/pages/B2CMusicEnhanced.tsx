@@ -79,12 +79,12 @@ interface VinylTrack extends MusicTrack {
   waveform?: number[];
 }
 
-// Configuration audio - URLs MP3 libres de droits testées et fonctionnelles
+// Configuration audio - URLs MP3 depuis archive.org (domaine public, CORS OK)
 const AUDIO_URL_CONFIG = {
-  'vinyl-1': { fileName: 'ambient-soft.mp3', fallbackUrl: 'https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3' },
-  'vinyl-2': { fileName: 'focus-clarity.mp3', fallbackUrl: 'https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3' },
-  'vinyl-3': { fileName: 'creative-flow.mp3', fallbackUrl: 'https://file-examples.com/storage/fe8e9a7cd867c8c8a3db6d6/2017/11/file_example_MP3_700KB.mp3' },
-  'vinyl-4': { fileName: 'healing-waves.mp3', fallbackUrl: 'https://samplelib.com/lib/preview/mp3/sample-3s.mp3' }
+  'vinyl-1': { fileName: 'ambient-soft.mp3', fallbackUrl: 'https://ia800905.us.archive.org/19/items/FREE_background_music_dridge/Kevin_MacLeod_-_Waltz_of_the_Flowers_-_Tchaikovsky.mp3' },
+  'vinyl-2': { fileName: 'focus-clarity.mp3', fallbackUrl: 'https://ia800905.us.archive.org/19/items/FREE_background_music_dridge/Kevin_MacLeod_-_Gymnopedie_No_1.mp3' },
+  'vinyl-3': { fileName: 'creative-flow.mp3', fallbackUrl: 'https://ia800905.us.archive.org/19/items/FREE_background_music_dridge/Kevin_MacLeod_-_Canon_in_D.mp3' },
+  'vinyl-4': { fileName: 'healing-waves.mp3', fallbackUrl: 'https://ia800905.us.archive.org/19/items/FREE_background_music_dridge/Kevin_MacLeod_-_Serenade.mp3' }
 } as const;
 
 // Données vinyles
