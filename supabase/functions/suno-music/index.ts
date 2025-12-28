@@ -159,7 +159,7 @@ serve(async (req) => {
           console.log('[suno-music] Generating with prompt:', prompt, 'BPM:', bpmMin, '-', bpmMax);
           
           const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
-          const callBackUrl = `${supabaseUrl}/functions/v1/emotion-music-callback`;
+          const callBackUrl = `${supabaseUrl}/functions/v1/suno-callback`;
           
           // Construire le style avec BPM si fourni
           let finalStyle = style || `therapeutic ${mood} ambient`;

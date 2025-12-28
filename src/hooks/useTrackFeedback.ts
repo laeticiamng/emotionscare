@@ -83,14 +83,15 @@ export function useTrackFeedback(): UseTrackFeedbackReturn {
             track_id: track.id,
             feedback_type: type,
             rating: rating || null,
-            emotion: track.emotion || null,
-            mood: track.mood || null,
-            metadata: {
+            emotion_match: track.emotion ? true : null,
+            notes: null,
+            context: {
               title: track.title,
               artist: track.artist,
               isGenerated: track.isGenerated,
+              emotion: track.emotion || null,
+              mood: track.mood || null,
             },
-            created_at: feedback.createdAt,
           }, { onConflict: 'user_id,track_id' });
         } catch (dbError) {
           // Table might not exist yet, continue with local storage
