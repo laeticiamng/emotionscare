@@ -1,11 +1,9 @@
-// @ts-nocheck
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import type { EmotionResult } from '@/types/emotion-unified';
+import type { EmotionResult } from '@/types/emotion';
 import { Mic, StopCircle, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import { normalizeEmotionResult } from '@/types/emotion-unified';
 import { logger } from '@/lib/logger';
 
 interface LiveVoiceScannerProps {
@@ -123,17 +121,17 @@ const LiveVoiceScanner: React.FC<LiveVoiceScannerProps> = ({
       if (error) throw error;
       
       if (data) {
-        const result = normalizeEmotionResult({
+        const result: EmotionResult = {
           id: `voice-${Date.now()}`,
           emotion: data.emotion || 'neutre',
           valence: (data.valence ?? 0.5) * 100,
           arousal: (data.arousal ?? 0.5) * 100,
           confidence: (data.confidence ?? 0.7) * 100,
           source: 'voice',
-          timestamp: new Date().toISOString(),
-          summary: data.summary || `Émotion ${data.emotion} détectée dans votre voix`,
+          timestamp: new Date(),
+          insight: data.summary || `Émotion ${data.emotion} détectée dans votre voix`,
           text: transcript
-        });
+        };
         
         onScanComplete?.(result);
       } else {
