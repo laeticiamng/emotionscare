@@ -53,21 +53,21 @@ export default function ApiHealthCheck() {
       {
         name: 'Music Generation API', 
         test: async () => {
-          const { data, error } = await supabase.functions.invoke('suno-music-generation', {
-            body: { emotion: 'calm', mood: 'peaceful', intensity: 0.5, duration: 30 }
+          const { data, error } = await supabase.functions.invoke('suno-music', {
+            body: { action: 'health-check' }
           });
           if (error) throw new Error(error.message);
-          return `✅ Piste générée: ${data?.title || 'Musique Calme'}`;
+          return `✅ Suno API: ${data?.hasApiKey ? 'Configuré' : 'Non configuré'}`;
         }
       },
       {
         name: 'Music Recommendations',
         test: async () => {
-          const { data, error } = await supabase.functions.invoke('get-music-recommendations', {
-            body: { emotion: 'happy' }
+          const { data, error } = await supabase.functions.invoke('emotion-music-ai', {
+            body: { action: 'get-recommendations', emotion: 'happy' }
           });
           if (error) throw new Error(error.message);
-          return `✅ ${data?.tracks?.length || data?.count || 3} recommandations trouvées`;
+          return `✅ ${data?.recommendations?.length || data?.tracks?.length || 3} recommandations trouvées`;
         }
       },
       {
