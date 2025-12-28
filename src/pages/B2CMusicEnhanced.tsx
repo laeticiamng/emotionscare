@@ -84,19 +84,19 @@ interface VinylTrack extends MusicTrack {
 const AUDIO_URL_CONFIG = {
   'vinyl-1': { 
     fileName: 'ambient-soft.mp3', 
-    fallbackUrl: 'https://cdn.pixabay.com/audio/2022/05/27/audio_1808fbf07a.mp3'
+    fallbackUrl: 'https://cdn.pixabay.com/audio/2022/05/27/audio_1808fbf07a.mp3' // Sérénité Fluide - Ambient
   },
   'vinyl-2': { 
     fileName: 'focus-clarity.mp3', 
-    fallbackUrl: 'https://cdn.pixabay.com/audio/2022/05/27/audio_1808fbf07a.mp3'
+    fallbackUrl: 'https://cdn.pixabay.com/audio/2022/03/15/audio_7625e92871.mp3' // Focus Cristallin - Piano
   },
   'vinyl-3': { 
     fileName: 'creative-flow.mp3', 
-    fallbackUrl: 'https://cdn.pixabay.com/audio/2022/05/27/audio_1808fbf07a.mp3'
+    fallbackUrl: 'https://cdn.pixabay.com/audio/2022/08/02/audio_884fe92c21.mp3' // Flow Créatif - Lofi
   },
   'vinyl-4': { 
     fileName: 'healing-waves.mp3', 
-    fallbackUrl: 'https://cdn.pixabay.com/audio/2022/05/27/audio_1808fbf07a.mp3'
+    fallbackUrl: 'https://cdn.pixabay.com/audio/2022/02/22/audio_d1718ab41b.mp3' // Ondes Guérisseuses - Nature
   }
 } as const;
 

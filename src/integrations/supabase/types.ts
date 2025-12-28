@@ -19632,6 +19632,33 @@ export type Database = {
         }
         Relationships: []
       }
+      user_edn_notes: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          item_code: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          item_code: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          item_code?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_edn_progress: {
         Row: {
           completed_at: string | null
