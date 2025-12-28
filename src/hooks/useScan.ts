@@ -2,6 +2,7 @@
 import { useState, useCallback } from 'react';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 
 export type ScanMode = 'photo' | 'camera';
 export type ScanBucket = 'positif' | 'calme' | 'neutre' | 'tendu';

@@ -336,11 +336,40 @@ export const EnhancedScanDashboard: React.FC = () => {
               <CardDescription>Analyse approfondie de vos états émotionnels</CardDescription>
             </div>
             <div className="flex gap-2">
-              <Button variant="outline" size="sm" className="gap-1">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="gap-1"
+                onClick={() => {
+                  const newTab = activeTab === 'timeline' ? 'overview' : 'timeline';
+                  setActiveTab(newTab);
+                }}
+              >
                 <Filter className="w-4 h-4" />
-                Filtrer
+                {activeTab === 'overview' ? 'Timeline' : 'Aperçu'}
               </Button>
-              <Button variant="outline" size="sm" className="gap-1">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="gap-1"
+                onClick={() => {
+                  if (history.length === 0) return;
+                  const csv = [
+                    'Date,Valence,Arousal,État',
+                    ...history.map(s => 
+                      `${new Date(s.created_at).toLocaleDateString('fr-FR')},${s.valence},${s.arousal},${s.summary || 'Neutre'}`
+                    )
+                  ].join('\n');
+                  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = `dashboard-emotions-${new Date().toISOString().slice(0,10)}.csv`;
+                  a.click();
+                  URL.revokeObjectURL(url);
+                }}
+                disabled={history.length === 0}
+              >
                 <Download className="w-4 h-4" />
                 Exporter
               </Button>
