@@ -488,3 +488,127 @@ export const useExchangeHubStats = () => {
     },
   });
 };
+
+// Time Exchange Requests Hook
+export const useTimeExchangeRequests = (type: 'incoming' | 'outgoing') => {
+  const { user } = useAuth();
+
+  return useQuery({
+    queryKey: ['time-exchange-requests', user?.id, type],
+    queryFn: async () => {
+      const column = type === 'incoming' ? 'provider_id' : 'requester_id';
+      
+      const { data, error } = await supabase
+        .from('time_exchanges')
+        .select(`
+          *,
+          offer:time_offers(skill_name, skill_category)
+        `)
+        .eq(column, user?.id)
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user?.id,
+  });
+};
+
+// Respond to Time Exchange
+export const useRespondToExchange = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ exchangeId, accept }: { exchangeId: string; accept: boolean }) => {
+      const { error } = await supabase
+        .from('time_exchanges')
+        .update({ status: accept ? 'accepted' : 'cancelled' })
+        .eq('id', exchangeId);
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['time-exchange-requests'] });
+      queryClient.invalidateQueries({ queryKey: ['time-offers'] });
+    },
+  });
+};
+
+// Rate Time Exchange
+export const useRateExchange = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ 
+      exchangeId, 
+      rating, 
+      feedback, 
+      isProvider 
+    }: { 
+      exchangeId: string; 
+      rating: number; 
+      feedback?: string; 
+      isProvider: boolean;
+    }) => {
+      const updateData = isProvider 
+        ? { rating_given: rating, status: 'completed' }
+        : { rating_received: rating, feedback, status: 'completed' };
+
+      const { error } = await supabase
+        .from('time_exchanges')
+        .update(updateData)
+        .eq('id', exchangeId);
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['time-exchange-requests'] });
+    },
+  });
+};
+
+// Update Exchange Profile
+export const useUpdateExchangeProfile = () => {
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+
+  return useMutation({
+    mutationFn: async (data: { display_name?: string; avatar_url?: string }) => {
+      const { error } = await supabase
+        .from('exchange_profiles')
+        .upsert({
+          user_id: user?.id,
+          ...data,
+          updated_at: new Date().toISOString(),
+        });
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['exchange-profile'] });
+    },
+  });
+};
+
+// Exchange Stats Hook
+export const useExchangeStats = () => {
+  const { user } = useAuth();
+
+  return useQuery({
+    queryKey: ['exchange-stats', user?.id],
+    queryFn: async () => {
+      const [goalsRes, exchangesRes, trustRes] = await Promise.all([
+        supabase.from('improvement_goals').select('id', { count: 'exact' }).eq('user_id', user?.id),
+        supabase.from('time_exchanges').select('id', { count: 'exact' }).or(`requester_id.eq.${user?.id},provider_id.eq.${user?.id}`),
+        supabase.from('trust_transactions').select('amount').eq('from_user_id', user?.id),
+      ]);
+
+      return {
+        totalGoals: goalsRes.count || 0,
+        totalExchanges: exchangesRes.count || 0,
+        trustGiven: trustRes.data?.reduce((acc, t) => acc + (t.amount || 0), 0) || 0,
+      };
+    },
+    enabled: !!user?.id,
+  });
+};
