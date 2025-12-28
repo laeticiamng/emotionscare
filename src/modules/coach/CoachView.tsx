@@ -508,6 +508,11 @@ export function CoachView({ initialMode = 'b2c' }: { initialMode?: CoachMode }) 
 
     try {
       let firstChunk = true;
+      // Build conversation history for context
+      const conversationHistory = messages
+        .filter(m => !m.streaming && m.content)
+        .map(m => ({ role: m.role, content: m.content }));
+
       await sendMessage({
         threadId: threadId ?? undefined,
         message: trimmed,
@@ -515,6 +520,8 @@ export function CoachView({ initialMode = 'b2c' }: { initialMode?: CoachMode }) 
         locale,
         userHash: userHash ?? undefined,
         flexHint: aaqFlexHint === 'unknown' ? undefined : aaqFlexHint,
+        personality,
+        conversationHistory,
         signal: controller.signal,
         onThread: id => {
           setThreadId(id);
@@ -531,6 +538,13 @@ export function CoachView({ initialMode = 'b2c' }: { initialMode?: CoachMode }) 
             Sentry.addBreadcrumb({ category: 'coach', message: 'coach:reply', data: { mode, aaq2_hint_used: hintActive } });
             firstChunk = false;
           }
+        },
+        onSuggestions: (suggestions) => {
+          setLastSuggestions({
+            techniques: suggestions.techniques,
+            resources: suggestions.resources,
+            followUpQuestions: suggestions.followUpQuestions,
+          });
         },
       });
 
