@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useMemo, useState } from 'react';
 import { Line } from 'react-chartjs-2';
 import {
@@ -17,7 +16,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
-import { TrendingUp, Video, Mic, FileText, TrendingUp as TotalIcon } from 'lucide-react';
+import { TrendingUp, Video, Mic, FileText } from 'lucide-react';
 
 ChartJS.register(
   CategoryScale,
@@ -36,9 +35,12 @@ interface ScanData {
   arousal: number;
 }
 
-const fetchMultiSourceHistory = async (days = 30) => {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return [];
+type SourceKey = 'video' | 'text' | 'voice' | 'total';
+type SourceInstrument = 'scan_camera' | 'SAM' | 'voice' | 'scan_sliders';
+
+const fetchMultiSourceHistory = async (days = 30): Promise<ScanData[]> => {
+  const { data: userData } = await supabase.auth.getUser();
+  if (!userData?.user) return [];
 
   const since = new Date();
   since.setDate(since.getDate() - days);
@@ -46,7 +48,7 @@ const fetchMultiSourceHistory = async (days = 30) => {
   const { data, error } = await supabase
     .from('clinical_signals')
     .select('created_at, source_instrument, metadata')
-    .eq('user_id', user.id)
+    .eq('user_id', userData.user.id)
     .in('source_instrument', ['SAM', 'scan_camera', 'scan_sliders', 'voice'])
     .gte('created_at', since.toISOString())
     .order('created_at', { ascending: true });
@@ -54,18 +56,18 @@ const fetchMultiSourceHistory = async (days = 30) => {
   if (error) throw error;
 
   return (data || []).map((item): ScanData => {
-    const metadata = item.metadata as any;
+    const metadata = item.metadata as Record<string, unknown> | null;
     return {
       created_at: item.created_at,
       source_instrument: item.source_instrument,
-      valence: metadata?.valence ?? 50,
-      arousal: metadata?.arousal ?? 50,
+      valence: (metadata?.valence as number) ?? 50,
+      arousal: (metadata?.arousal as number) ?? 50,
     };
   });
 };
 
 export const MultiSourceChart: React.FC = () => {
-  const [visibleSources, setVisibleSources] = useState({
+  const [visibleSources, setVisibleSources] = useState<Record<SourceKey, boolean>>({
     video: true,
     text: true,
     voice: true,
@@ -78,7 +80,7 @@ export const MultiSourceChart: React.FC = () => {
     staleTime: 60_000,
   });
 
-  const toggleSource = (source: keyof typeof visibleSources) => {
+  const toggleSource = (source: SourceKey) => {
     setVisibleSources(prev => ({ ...prev, [source]: !prev[source] }));
   };
 
@@ -86,16 +88,17 @@ export const MultiSourceChart: React.FC = () => {
     if (!scans || scans.length === 0) return null;
 
     // Grouper par source
-    const bySource = {
-      scan_camera: [] as ScanData[],
-      SAM: [] as ScanData[],
-      voice: [] as ScanData[],
-      scan_sliders: [] as ScanData[],
+    const bySource: Record<SourceInstrument, ScanData[]> = {
+      scan_camera: [],
+      SAM: [],
+      voice: [],
+      scan_sliders: [],
     };
 
     scans.forEach(scan => {
-      if (bySource[scan.source_instrument]) {
-        bySource[scan.source_instrument].push(scan);
+      const instrument = scan.source_instrument as SourceInstrument;
+      if (bySource[instrument]) {
+        bySource[instrument].push(scan);
       }
     });
 
@@ -107,7 +110,16 @@ export const MultiSourceChart: React.FC = () => {
     const uniqueDates = Array.from(new Set(allDates));
 
     // Calculer moyenne valence par source et par date
-    const allDatasets = [
+    const allDatasets: Array<{
+      key: SourceKey;
+      label: string;
+      data: (number | null)[];
+      borderColor: string;
+      backgroundColor: string;
+      tension: number;
+      borderWidth: number;
+      borderDash?: number[];
+    }> = [
       {
         key: 'video',
         label: 'Vidéo',
@@ -118,7 +130,7 @@ export const MultiSourceChart: React.FC = () => {
           if (filtered.length === 0) return null;
           return filtered.reduce((sum, s) => sum + s.valence, 0) / filtered.length;
         }),
-        borderColor: 'hsl(221, 83%, 53%)', // primary
+        borderColor: 'hsl(221, 83%, 53%)',
         backgroundColor: 'hsla(221, 83%, 53%, 0.1)',
         tension: 0.4,
         borderWidth: 2,
@@ -133,7 +145,7 @@ export const MultiSourceChart: React.FC = () => {
           if (filtered.length === 0) return null;
           return filtered.reduce((sum, s) => sum + s.valence, 0) / filtered.length;
         }),
-        borderColor: 'hsl(142, 76%, 36%)', // green
+        borderColor: 'hsl(142, 76%, 36%)',
         backgroundColor: 'hsla(142, 76%, 36%, 0.1)',
         tension: 0.4,
         borderWidth: 2,
@@ -148,7 +160,7 @@ export const MultiSourceChart: React.FC = () => {
           if (filtered.length === 0) return null;
           return filtered.reduce((sum, s) => sum + s.valence, 0) / filtered.length;
         }),
-        borderColor: 'hsl(271, 81%, 56%)', // purple
+        borderColor: 'hsl(271, 81%, 56%)',
         backgroundColor: 'hsla(271, 81%, 56%, 0.1)',
         tension: 0.4,
         borderWidth: 2,
@@ -163,7 +175,7 @@ export const MultiSourceChart: React.FC = () => {
           if (filtered.length === 0) return null;
           return filtered.reduce((sum, s) => sum + s.valence, 0) / filtered.length;
         }),
-        borderColor: 'hsl(47, 96%, 53%)', // yellow
+        borderColor: 'hsl(47, 96%, 53%)',
         backgroundColor: 'hsla(47, 96%, 53%, 0.1)',
         tension: 0.4,
         borderWidth: 3,
@@ -322,7 +334,7 @@ export const MultiSourceChart: React.FC = () => {
             onClick={() => toggleSource('total')}
             style={visibleSources.total ? { backgroundColor: 'hsl(47, 96%, 53%)', borderColor: 'hsl(47, 96%, 53%)', color: 'hsl(222, 84%, 5%)' } : {}}
           >
-            <TotalIcon className="h-3.5 w-3.5" />
+            <TrendingUp className="h-3.5 w-3.5" />
             Total
           </Badge>
         </div>

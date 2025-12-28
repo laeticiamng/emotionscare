@@ -1,20 +1,26 @@
-// @ts-nocheck
 import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { EmotionResult, EmotionScannerProps } from '@/types/emotion';
-import { Mic, MicOff, Square, Play } from 'lucide-react';
+import { EmotionResult } from '@/types/emotion';
+import { Mic, Square, Play } from 'lucide-react';
 
-const AudioEmotionScanner: React.FC<EmotionScannerProps> = ({
+interface AudioEmotionScannerProps {
+  onScanComplete: (result: EmotionResult) => void;
+  onCancel?: () => void;
+  isProcessing?: boolean;
+  setIsProcessing?: (processing: boolean) => void;
+}
+
+const AudioEmotionScanner: React.FC<AudioEmotionScannerProps> = ({
   onScanComplete,
   onCancel,
-  isProcessing,
+  isProcessing = false,
   setIsProcessing
 }) => {
   const [isRecording, setIsRecording] = useState(false);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [recordingTime, setRecordingTime] = useState(0);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const startRecording = async () => {
     try {
@@ -61,24 +67,26 @@ const AudioEmotionScanner: React.FC<EmotionScannerProps> = ({
   const analyzeAudio = async () => {
     if (!audioBlob) return;
 
-    setIsProcessing(true);
+    setIsProcessing?.(true);
 
     // Simuler l'analyse audio
     setTimeout(() => {
       const mockResult: EmotionResult = {
-        emotions: [
-          { name: 'Assurance', intensity: 72 },
-          { name: 'Détermination', intensity: 65 },
-          { name: 'Calme', intensity: 58 }
-        ],
-        confidence: 78,
+        id: `audio-${Date.now()}`,
+        emotion: 'calm',
+        confidence: 0.78,
+        intensity: 0.65,
         timestamp: new Date(),
-        recommendations: 'Votre voix exprime de la confiance. Continuez à cultiver cette assurance !',
-        analysisType: 'audio'
+        source: 'voice',
+        insight: 'Votre voix exprime de la confiance. Continuez à cultiver cette assurance !',
+        suggestions: [
+          'Continuez à parler avec assurance',
+          'Pratiquez la respiration profonde avant les présentations'
+        ]
       };
 
       onScanComplete(mockResult);
-      setIsProcessing(false);
+      setIsProcessing?.(false);
     }, 3000);
   };
 
@@ -172,14 +180,16 @@ const AudioEmotionScanner: React.FC<EmotionScannerProps> = ({
           </div>
         )}
 
-        <Button 
-          onClick={onCancel} 
-          variant="ghost" 
-          disabled={isProcessing || isRecording}
-          className="w-full"
-        >
-          Annuler
-        </Button>
+        {onCancel && (
+          <Button 
+            onClick={onCancel} 
+            variant="ghost" 
+            disabled={isProcessing || isRecording}
+            className="w-full"
+          >
+            Annuler
+          </Button>
+        )}
       </div>
     </div>
   );

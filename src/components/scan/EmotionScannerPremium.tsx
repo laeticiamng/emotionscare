@@ -1,11 +1,10 @@
-// @ts-nocheck
 /**
  * EMOTION SCANNER PREMIUM - EMOTIONSCARE
  * Scanner d'émotions avancé avec IA, accessible et performant
  */
 
 import React, { useState, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -15,23 +14,14 @@ import {
   Mic, 
   Type, 
   Play, 
-  Square, 
   RefreshCw, 
-  Settings, 
-  Eye,
-  EyeOff,
-  Volume2,
-  VolumeX,
   Zap,
   Brain,
   Heart,
-  Sparkles,
-  AlertCircle,
-  CheckCircle,
   Loader2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { EmotionResult, ScanMode } from '@/types';
+import { EmotionResult, ScanMode } from '@/types/emotion';
 import { toast } from '@/hooks/use-toast';
 
 type ScanState = 'idle' | 'initializing' | 'scanning' | 'processing' | 'complete' | 'error';
@@ -44,22 +34,16 @@ interface EmotionScannerPremiumProps {
   className?: string;
 }
 
-interface ScanConfig {
-  mode: ScanMode;
-  duration: number;
-  sensitivity: number;
-  realTime: boolean;
-  saveResults: boolean;
-}
-
-const scanModes: Array<{
+interface ScanModeConfig {
   mode: ScanMode;
   label: string;
   icon: React.ComponentType<{ className?: string }>;
   description: string;
   accuracy: number;
   color: string;
-}> = [
+}
+
+const scanModes: ScanModeConfig[] = [
   {
     mode: 'facial',
     label: 'Analyse Faciale',
@@ -106,8 +90,6 @@ const emotions = [
 
 const EmotionScannerPremium: React.FC<EmotionScannerPremiumProps> = ({
   onEmotionDetected,
-  autoGenerateMusic = false,
-  showRecommendations = false,
   allowedModes = ['facial', 'voice', 'text', 'combined'],
   className
 }) => {
@@ -118,7 +100,7 @@ const EmotionScannerPremium: React.FC<EmotionScannerPremiumProps> = ({
   const [hasPermissions, setHasPermissions] = useState(false);
   
   const videoRef = useRef<HTMLVideoElement>(null);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const availableModes = scanModes.filter(mode => allowedModes.includes(mode.mode));
 
@@ -139,9 +121,8 @@ const EmotionScannerPremium: React.FC<EmotionScannerPremiumProps> = ({
       }
       
       setHasPermissions(true);
-    } catch (error) {
+    } catch {
       setHasPermissions(false);
-      // Missing permissions - silent warning
     }
   };
 
@@ -168,7 +149,7 @@ const EmotionScannerPremium: React.FC<EmotionScannerPremiumProps> = ({
       setScanState('scanning');
       startScanningProcess();
       
-    } catch (error) {
+    } catch {
       setScanState('error');
       toast({
         title: "Erreur d'initialisation",
@@ -179,27 +160,22 @@ const EmotionScannerPremium: React.FC<EmotionScannerPremiumProps> = ({
   };
 
   const initializeCamera = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { 
-          width: { ideal: 640 }, 
-          height: { ideal: 480 },
-          facingMode: 'user'
-        } 
-      });
-      
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-      }
-    } catch (error) {
-      // Camera error
-      throw error;
+    const stream = await navigator.mediaDevices.getUserMedia({ 
+      video: { 
+        width: { ideal: 640 }, 
+        height: { ideal: 480 },
+        facingMode: 'user'
+      } 
+    });
+    
+    if (videoRef.current) {
+      videoRef.current.srcObject = stream;
     }
   };
 
   const startScanningProcess = () => {
     let progressValue = 0;
-    const duration = 5000; // 5 secondes
+    const duration = 5000;
     const interval = 100;
     const increment = (interval / duration) * 100;
 
@@ -226,11 +202,11 @@ const EmotionScannerPremium: React.FC<EmotionScannerPremiumProps> = ({
     
     const finalResult: EmotionResult = {
       id: `final_${Date.now()}`,
-      timestamp: new Date().toISOString(),
+      timestamp: new Date(),
       emotion: finalEmotion.name,
       confidence: (selectedModeData?.accuracy || 90) / 100 + (Math.random() * 0.1 - 0.05),
       intensity: 0.5 + Math.random() * 0.5,
-      source: selectedMode === 'combined' ? 'multimodal' : `${selectedMode}_analysis`,
+      source: selectedMode === 'combined' ? 'facial' : selectedMode,
       scanMode: selectedMode,
       duration: 5,
       environment: 'home'

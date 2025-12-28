@@ -1,9 +1,7 @@
-// @ts-nocheck
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Camera, CameraOff, RotateCcw, Loader2, Zap } from 'lucide-react';
-import { useCamera } from '@/hooks/useCamera';
 import { motion } from 'framer-motion';
 
 interface LiveScannerProps {
@@ -16,21 +14,54 @@ export const LiveScanner: React.FC<LiveScannerProps> = ({
   loading = false
 }) => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isActive, setIsActive] = useState(false);
+  const [hasPermission, setHasPermission] = useState<boolean | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user');
   
-  const {
-    videoRef,
-    isActive,
-    hasPermission,
-    error,
-    startCamera,
-    stopCamera,
-    swapCamera,
-    captureFrame
-  } = useCamera({
-    onPermissionDenied: () => {
-      // Fallback to photo mode could be implemented here
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+
+  const startCamera = useCallback(async () => {
+    try {
+      setError(null);
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          width: { ideal: 640 },
+          height: { ideal: 480 },
+          facingMode
+        }
+      });
+      
+      streamRef.current = stream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+      }
+      setIsActive(true);
+      setHasPermission(true);
+    } catch (err) {
+      setHasPermission(false);
+      setError('Accès à la caméra refusé');
     }
-  });
+  }, [facingMode]);
+
+  const stopCamera = useCallback(() => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current = null;
+    }
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+    }
+    setIsActive(false);
+  }, []);
+
+  const swapCamera = useCallback(async () => {
+    stopCamera();
+    setFacingMode(prev => prev === 'user' ? 'environment' : 'user');
+    // Will restart with new facing mode on next startCamera call
+    setTimeout(() => startCamera(), 100);
+  }, [stopCamera, startCamera]);
 
   const handleAnalyze = () => {
     if (!videoRef.current || !isActive) return;

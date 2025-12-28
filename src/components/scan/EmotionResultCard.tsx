@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,11 +8,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { EmotionResult } from '@/types/emotion';
 import { formatDistanceToNow, format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { Check, Download, Music, Play, Share2, User, TrendingUp, TrendingDown, Minus, BarChart3, Heart, Brain, Zap, FileText, Copy, Bookmark, BookmarkCheck } from 'lucide-react';
+import { Check, Download, Music, Play, Share2, User, TrendingUp, TrendingDown, Minus, BarChart3, Heart, Brain, Zap, FileText, Bookmark, BookmarkCheck } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useScanSettings } from '@/hooks/useScanSettings';
 
@@ -30,7 +29,9 @@ const EMOTION_DIMENSIONS = [
   { key: 'joy', label: 'Joie', icon: Heart, color: 'text-pink-500' },
   { key: 'calm', label: 'Calme', icon: Brain, color: 'text-blue-500' },
   { key: 'energy', label: 'Énergie', icon: Zap, color: 'text-yellow-500' },
-];
+] as const;
+
+type DimensionKey = typeof EMOTION_DIMENSIONS[number]['key'];
 
 const EmotionResultCard: React.FC<EmotionResultCardProps> = ({
   result,
@@ -44,41 +45,62 @@ const EmotionResultCard: React.FC<EmotionResultCardProps> = ({
   const { isEmotionBookmarked, toggleEmotionBookmark } = useScanSettings();
   const [showDetails, setShowDetails] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
-  const [isBookmarked, setIsBookmarked] = useState(isEmotionBookmarked(result.id));
+  const [isBookmarked, setIsBookmarked] = useState(isEmotionBookmarked(result.id || ''));
+
+  // Get score from result - handle different formats
+  const resultScore = useMemo(() => {
+    if (typeof result.score === 'number') return result.score;
+    if (typeof result.confidence === 'number') return result.confidence * 100;
+    return 50;
+  }, [result.score, result.confidence]);
+
+  // Get date from result
+  const resultDate = useMemo(() => {
+    if (result.date) return new Date(result.date);
+    if (result.timestamp) return new Date(result.timestamp);
+    return new Date();
+  }, [result.date, result.timestamp]);
 
   // Sync bookmark state
   useEffect(() => {
-    setIsBookmarked(isEmotionBookmarked(result.id));
+    setIsBookmarked(isEmotionBookmarked(result.id || ''));
   }, [result.id, isEmotionBookmarked]);
 
-  const date = new Date(result.date);
-  const formattedDate = formatDistanceToNow(date, { addSuffix: true, locale: fr });
-  const fullDate = format(date, "EEEE d MMMM yyyy 'à' HH:mm", { locale: fr });
+  const formattedDate = formatDistanceToNow(resultDate, { addSuffix: true, locale: fr });
+  const fullDate = format(resultDate, "EEEE d MMMM yyyy 'à' HH:mm", { locale: fr });
 
   // Calculate score category
   const scoreCategory = useMemo(() => {
-    if (result.score >= 75) return { color: 'text-green-600', bg: 'bg-green-100', text: 'Positif', emoji: '😊' };
-    if (result.score >= 60) return { color: 'text-blue-600', bg: 'bg-blue-100', text: 'Plutôt positif', emoji: '🙂' };
-    if (result.score >= 40) return { color: 'text-amber-500', bg: 'bg-amber-100', text: 'Neutre', emoji: '😐' };
-    if (result.score >= 25) return { color: 'text-orange-600', bg: 'bg-orange-100', text: 'Plutôt négatif', emoji: '😕' };
+    if (resultScore >= 75) return { color: 'text-green-600', bg: 'bg-green-100', text: 'Positif', emoji: '😊' };
+    if (resultScore >= 60) return { color: 'text-blue-600', bg: 'bg-blue-100', text: 'Plutôt positif', emoji: '🙂' };
+    if (resultScore >= 40) return { color: 'text-amber-500', bg: 'bg-amber-100', text: 'Neutre', emoji: '😐' };
+    if (resultScore >= 25) return { color: 'text-orange-600', bg: 'bg-orange-100', text: 'Plutôt négatif', emoji: '😕' };
     return { color: 'text-red-600', bg: 'bg-red-100', text: 'Négatif', emoji: '😔' };
-  }, [result.score]);
+  }, [resultScore]);
+
+  // Get previous score
+  const previousScore = useMemo(() => {
+    if (!previousResult) return null;
+    if (typeof previousResult.score === 'number') return previousResult.score;
+    if (typeof previousResult.confidence === 'number') return previousResult.confidence * 100;
+    return null;
+  }, [previousResult]);
 
   // Calculate trend vs previous
   const trend = useMemo(() => {
-    if (!previousResult) return null;
-    const diff = result.score - previousResult.score;
+    if (previousScore === null) return null;
+    const diff = resultScore - previousScore;
     if (diff > 5) return { direction: 'up', diff, icon: TrendingUp, color: 'text-green-500' };
     if (diff < -5) return { direction: 'down', diff: Math.abs(diff), icon: TrendingDown, color: 'text-red-500' };
     return { direction: 'stable', diff: 0, icon: Minus, color: 'text-muted-foreground' };
-  }, [result.score, previousResult]);
+  }, [resultScore, previousScore]);
 
   // Simulated emotion dimensions
-  const dimensions = useMemo(() => ({
-    joy: Math.min(100, Math.max(0, result.score + Math.random() * 20 - 10)),
-    calm: Math.min(100, Math.max(0, 100 - (result.score > 50 ? 30 : 60) + Math.random() * 20)),
-    energy: Math.min(100, Math.max(0, result.score * 0.8 + Math.random() * 30)),
-  }), [result.score]);
+  const dimensions = useMemo((): Record<DimensionKey, number> => ({
+    joy: Math.min(100, Math.max(0, resultScore + Math.random() * 20 - 10)),
+    calm: Math.min(100, Math.max(0, 100 - (resultScore > 50 ? 30 : 60) + Math.random() * 20)),
+    energy: Math.min(100, Math.max(0, resultScore * 0.8 + Math.random() * 30)),
+  }), [resultScore]);
 
   const handleSave = async () => {
     if (!user) {
@@ -87,7 +109,15 @@ const EmotionResultCard: React.FC<EmotionResultCardProps> = ({
     }
 
     try {
-      const saveResult = { ...result, user_id: user.id };
+      const saveResult = { 
+        user_id: user.id,
+        emotion: result.emotion,
+        confidence: result.confidence,
+        score: resultScore,
+        text: result.text,
+        source: result.source,
+        timestamp: resultDate.toISOString()
+      };
       const { error } = await supabase.from('emotions').insert(saveResult);
       if (error) throw error;
       
@@ -100,13 +130,13 @@ const EmotionResultCard: React.FC<EmotionResultCardProps> = ({
   };
 
   const handleBookmark = () => {
-    toggleEmotionBookmark(result.id);
+    toggleEmotionBookmark(result.id || '');
     setIsBookmarked(!isBookmarked);
     toast.success(isBookmarked ? 'Retiré des favoris' : 'Ajouté aux favoris ⭐');
   };
 
   const handleShare = async () => {
-    const shareText = `Mon niveau de bien-être émotionnel : ${result.score}/100 ${scoreCategory.emoji} - ${scoreCategory.text}\n\n${result.ai_feedback || ''}`;
+    const shareText = `Mon niveau de bien-être émotionnel : ${Math.round(resultScore)}/100 ${scoreCategory.emoji} - ${scoreCategory.text}\n\n${result.ai_feedback || result.insight || ''}`;
     
     if (navigator.share) {
       try {
@@ -131,7 +161,7 @@ const EmotionResultCard: React.FC<EmotionResultCardProps> = ({
             <style>
               body { font-family: system-ui, sans-serif; padding: 2rem; max-width: 800px; margin: 0 auto; }
               .header { border-bottom: 2px solid #eee; padding-bottom: 1rem; margin-bottom: 1rem; }
-              .score { font-size: 3rem; font-weight: bold; color: ${result.score >= 60 ? '#16a34a' : result.score >= 40 ? '#f59e0b' : '#dc2626'}; }
+              .score { font-size: 3rem; font-weight: bold; color: ${resultScore >= 60 ? '#16a34a' : resultScore >= 40 ? '#f59e0b' : '#dc2626'}; }
               .section { margin: 1.5rem 0; padding: 1rem; background: #f9fafb; border-radius: 8px; }
               .dimensions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
               .dim { text-align: center; padding: 1rem; background: white; border-radius: 8px; }
@@ -144,11 +174,11 @@ const EmotionResultCard: React.FC<EmotionResultCardProps> = ({
               <h1>Analyse Émotionnelle</h1>
               <p>${fullDate}</p>
             </div>
-            <div class="score">${result.score}/100 ${scoreCategory.emoji}</div>
+            <div class="score">${Math.round(resultScore)}/100 ${scoreCategory.emoji}</div>
             <p style="font-size: 1.25rem; color: #666;">${scoreCategory.text}</p>
             
             ${result.text ? `<div class="section"><h3>Texte analysé</h3><p>${result.text}</p></div>` : ''}
-            ${result.emojis ? `<div class="section"><h3>Émojis</h3><p style="font-size: 2rem;">${result.emojis}</p></div>` : ''}
+            ${result.emojis ? `<div class="section"><h3>Émojis</h3><p style="font-size: 2rem;">${Array.isArray(result.emojis) ? result.emojis.join('') : result.emojis}</p></div>` : ''}
             
             <div class="section">
               <h3>Dimensions émotionnelles</h3>
@@ -173,7 +203,7 @@ const EmotionResultCard: React.FC<EmotionResultCardProps> = ({
             
             <div class="section">
               <h3>Analyse IA</h3>
-              <p>${result.ai_feedback}</p>
+              <p>${result.ai_feedback || result.insight || 'Aucune analyse disponible'}</p>
             </div>
             
             <footer style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #eee; color: #999; font-size: 0.875rem;">
@@ -188,7 +218,7 @@ const EmotionResultCard: React.FC<EmotionResultCardProps> = ({
   };
 
   const getEmotionIcon = () => {
-    if (result.emojis) return <div className="text-2xl">{result.emojis}</div>;
+    if (result.emojis) return <div className="text-2xl">{Array.isArray(result.emojis) ? result.emojis[0] : result.emojis}</div>;
     if (result.audio_url) return <Play className="h-6 w-6 text-blue-500" />;
     return <User className="h-6 w-6 text-purple-500" />;
   };
@@ -208,7 +238,7 @@ const EmotionResultCard: React.FC<EmotionResultCardProps> = ({
                 {trend && (
                   <Badge variant="outline" className={cn("gap-1", trend.color)}>
                     <trend.icon className="h-3 w-3" />
-                    {trend.direction === 'up' ? `+${trend.diff}` : trend.direction === 'down' ? `-${trend.diff}` : 'Stable'}
+                    {trend.direction === 'up' ? `+${Math.round(trend.diff)}` : trend.direction === 'down' ? `-${Math.round(trend.diff)}` : 'Stable'}
                   </Badge>
                 )}
               </CardDescription>
@@ -233,7 +263,7 @@ const EmotionResultCard: React.FC<EmotionResultCardProps> = ({
                 animate={{ scale: 1 }}
               >
                 <span className="text-lg">{scoreCategory.emoji}</span>
-                {result.score}/100
+                {Math.round(resultScore)}/100
               </motion.div>
             </div>
           </div>
@@ -247,8 +277,8 @@ const EmotionResultCard: React.FC<EmotionResultCardProps> = ({
                 <div key={key} className="text-center p-3 bg-muted/50 rounded-lg">
                   <Icon className={cn("h-5 w-5 mx-auto mb-1", color)} />
                   <div className="text-xs text-muted-foreground">{label}</div>
-                  <div className="text-sm font-semibold">{Math.round(dimensions[key as keyof typeof dimensions])}%</div>
-                  <Progress value={dimensions[key as keyof typeof dimensions]} className="h-1 mt-1" />
+                  <div className="text-sm font-semibold">{Math.round(dimensions[key])}%</div>
+                  <Progress value={dimensions[key]} className="h-1 mt-1" />
                 </div>
               ))}
             </div>
@@ -264,7 +294,7 @@ const EmotionResultCard: React.FC<EmotionResultCardProps> = ({
           {result.emojis && (
             <div className="bg-muted/50 p-3 rounded-md">
               <h4 className="text-sm font-medium text-muted-foreground mb-1">Émojis choisis</h4>
-              <p className="text-2xl">{result.emojis}</p>
+              <p className="text-2xl">{Array.isArray(result.emojis) ? result.emojis.join('') : result.emojis}</p>
             </div>
           )}
           
@@ -273,7 +303,7 @@ const EmotionResultCard: React.FC<EmotionResultCardProps> = ({
               <Brain className="h-4 w-4" />
               Analyse IA
             </h4>
-            <p className="text-foreground">{result.ai_feedback}</p>
+            <p className="text-foreground">{result.ai_feedback || result.insight || 'Aucune analyse disponible'}</p>
           </div>
           
           <div className="flex flex-wrap gap-2">
@@ -345,7 +375,7 @@ const EmotionResultCard: React.FC<EmotionResultCardProps> = ({
             
             <TabsContent value="dimensions" className="space-y-4 mt-4">
               <div className="text-center">
-                <div className={cn("text-5xl font-bold", scoreCategory.color)}>{result.score}</div>
+                <div className={cn("text-5xl font-bold", scoreCategory.color)}>{Math.round(resultScore)}</div>
                 <div className="text-muted-foreground">Score global</div>
               </div>
               
@@ -356,9 +386,9 @@ const EmotionResultCard: React.FC<EmotionResultCardProps> = ({
                     <div className="flex-1">
                       <div className="flex justify-between text-sm mb-1">
                         <span>{label}</span>
-                        <span className="font-medium">{Math.round(dimensions[key as keyof typeof dimensions])}%</span>
+                        <span className="font-medium">{Math.round(dimensions[key])}%</span>
                       </div>
-                      <Progress value={dimensions[key as keyof typeof dimensions]} />
+                      <Progress value={dimensions[key]} />
                     </div>
                   </div>
                 ))}
