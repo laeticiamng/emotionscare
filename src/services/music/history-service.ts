@@ -43,6 +43,28 @@ export interface ListeningStats {
 }
 
 /**
+ * Valide et corrige une URL audio
+ * - Remplace /download/ par /audio/ pour Pixabay
+ * - Refuse les URLs Supabase Storage (fichiers inexistants)
+ */
+function sanitizeAudioUrl(url: string | undefined): string | null {
+  if (!url) return null;
+  
+  // Refuser les URLs Supabase Storage (fichiers non uploadés)
+  if (url.includes('supabase.co/storage')) {
+    logger.warn('Rejecting Supabase storage URL (files not available)', { url }, 'MUSIC');
+    return null;
+  }
+  
+  // Corriger les URLs Pixabay /download/ -> /audio/
+  if (url.includes('pixabay.com/download/audio/')) {
+    return url.replace('/download/audio/', '/audio/');
+  }
+  
+  return url;
+}
+
+/**
  * Sauvegarder une entrée d'historique
  */
 export async function saveHistoryEntry(params: SaveHistoryParams): Promise<{ success: boolean; error?: string }> {
@@ -57,6 +79,9 @@ export async function saveHistoryEntry(params: SaveHistoryParams): Promise<{ suc
 
     // Détecter le device si non fourni
     const detectedDevice = device || detectDevice();
+    
+    // Valider et nettoyer l'URL audio avant sauvegarde
+    const sanitizedUrl = sanitizeAudioUrl(track.audioUrl || track.url);
 
     const { error } = await supabase
       .from('music_history')
@@ -65,7 +90,7 @@ export async function saveHistoryEntry(params: SaveHistoryParams): Promise<{ suc
         track_id: track.id,
         track_title: track.title,
         track_artist: track.artist,
-        track_url: track.audioUrl || track.url,
+        track_url: sanitizedUrl,
         track_duration: track.duration,
         listen_duration: listenDuration || null,
         completion_rate: completionRate || null,
@@ -81,7 +106,8 @@ export async function saveHistoryEntry(params: SaveHistoryParams): Promise<{ suc
     logger.info('History entry saved', { 
       trackId: track.id, 
       duration: listenDuration,
-      completion: completionRate 
+      completion: completionRate,
+      urlSanitized: sanitizedUrl !== (track.audioUrl || track.url)
     }, 'MUSIC');
     
     return { success: true };

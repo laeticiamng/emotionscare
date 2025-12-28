@@ -17,6 +17,26 @@ export const useMusicPlayback = (
   const playStartTime = useRef<number | null>(null);
   const currentTrackId = useRef<string | null>(null);
 
+  /**
+   * Valide et nettoie une URL audio avant utilisation
+   */
+  const sanitizeAudioUrl = useCallback((url: string | undefined): string | null => {
+    if (!url) return null;
+    
+    // Refuser les URLs Supabase Storage (fichiers non uploadés)
+    if (url.includes('supabase.co/storage')) {
+      logger.warn('Rejecting Supabase storage URL', { url }, 'MUSIC');
+      return null;
+    }
+    
+    // Corriger les URLs Pixabay /download/ -> /audio/
+    if (url.includes('pixabay.com/download/audio/')) {
+      return url.replace('/download/audio/', '/audio/');
+    }
+    
+    return url;
+  }, []);
+
   const play = useCallback(async (track?: MusicTrack) => {
     const audio = audioRef.current;
     if (!audio) {
@@ -26,8 +46,17 @@ export const useMusicPlayback = (
 
     try {
       if (track) {
+        // Valider l'URL audio avant de l'utiliser
+        const rawUrl = track.audioUrl || track.url;
+        const audioUrl = sanitizeAudioUrl(rawUrl);
+        
+        if (!audioUrl) {
+          toast.error('URL audio invalide ou inaccessible');
+          logger.error('Invalid audio URL rejected', new Error(`URL rejected: ${rawUrl}`), 'MUSIC');
+          return;
+        }
+        
         dispatch({ type: 'SET_CURRENT_TRACK', payload: track });
-        const audioUrl = track.audioUrl || track.url;
         logger.info(`Loading audio from: ${audioUrl}`, 'MUSIC');
         audio.src = audioUrl;
         audio.load();
@@ -39,7 +68,7 @@ export const useMusicPlayback = (
         
         // Save initial history entry (sera mis à jour à la fin)
         await saveHistoryEntry({
-          track,
+          track: { ...track, audioUrl, url: audioUrl },
           device: undefined, // Auto-détecté
           source: 'player',
         });
@@ -69,7 +98,7 @@ export const useMusicPlayback = (
       
       throw error; // Re-throw pour propagation
     }
-  }, [audioRef, dispatch, state.therapeuticMode, state.volume]);
+  }, [audioRef, dispatch, state.therapeuticMode, state.volume, sanitizeAudioUrl]);
 
   const pause = useCallback(async () => {
     const audio = audioRef.current;
