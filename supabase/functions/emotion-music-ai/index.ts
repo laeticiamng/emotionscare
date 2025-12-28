@@ -298,11 +298,12 @@ serve(async (req) => {
         .from('generated_music_tracks')
         .insert({
           user_id: user.id,
+          title: `${emotion} - Therapeutic Music`,
           emotion,
           prompt,
           original_task_id: taskId,
           generation_status: 'pending',
-          metadata: { profile }
+          metadata: { profile, emotion, prompt }
         })
         .select()
         .single();

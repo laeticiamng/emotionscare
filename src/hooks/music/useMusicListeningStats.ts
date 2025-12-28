@@ -66,19 +66,33 @@ export function useMusicListeningStats() {
   const [stats, setStats] = useState<ListeningStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Charger les sessions d'écoute depuis Supabase - VRAIES DONNÉES
+  // Charger les sessions d'écoute depuis Supabase - VRAIES DONNÉES via RPC
   const loadStats = useCallback(async () => {
     setIsLoading(true);
     
     try {
-      // Charger l'historique réel depuis music_history
-      let realHistory: any[] = [];
       let totalMinutes = 0;
-      let topArtists: ArtistStat[] = [];
+      let totalTracks = 0;
       let uniqueArtists = 0;
+      let topArtists: ArtistStat[] = [];
+      let topEmotion = 'Calme';
+      let realHistory: any[] = [];
       
       if (user) {
-        // Récupérer l'historique complet
+        // Utiliser la RPC optimisée pour les stats de base
+        const { data: rpcStats, error: rpcError } = await supabase
+          .rpc('get_user_listening_stats', { p_user_id: user.id });
+
+        if (!rpcError && rpcStats && rpcStats.length > 0) {
+          const stats = rpcStats[0];
+          totalTracks = Number(stats.total_listens) || 0;
+          totalMinutes = Math.round((Number(stats.total_duration_seconds) || 0) / 60);
+          topEmotion = stats.top_emotion ? 
+            stats.top_emotion.charAt(0).toUpperCase() + stats.top_emotion.slice(1) : 
+            'Calme';
+        }
+
+        // Récupérer l'historique pour les stats détaillées (artistes, daily, emotions)
         const { data: historyData, error: historyError } = await supabase
           .from('music_history')
           .select('*')
@@ -88,11 +102,6 @@ export function useMusicListeningStats() {
 
         if (!historyError && historyData) {
           realHistory = historyData;
-          
-          // Calculer le temps total réel
-          totalMinutes = Math.round(
-            realHistory.reduce((acc, h) => acc + (h.listen_duration || h.track_duration || 180), 0) / 60
-          );
           
           // Calculer les top artistes réels
           const artistCounts: Record<string, number> = {};
@@ -110,13 +119,13 @@ export function useMusicListeningStats() {
         }
       }
 
-      const totalTracks = realHistory.length || historyIds?.length || 0;
-      
       // Fallback si pas de données DB
-      if (totalMinutes === 0 && totalTracks > 0) {
-        totalMinutes = totalTracks * 3;
+      const historyCount = historyIds?.length || 0;
+      if (totalTracks === 0 && historyCount > 0) {
+        totalTracks = historyCount;
+        totalMinutes = historyCount * 3;
       }
-      if (uniqueArtists === 0) {
+      if (uniqueArtists === 0 && totalTracks > 0) {
         uniqueArtists = Math.min(Math.floor(totalTracks / 3), 50);
       }
 
@@ -229,7 +238,7 @@ export function useMusicListeningStats() {
         totalMinutes,
         totalTracks,
         uniqueArtists,
-        topEmotion: emotionStats[0]?.emotion || 'Calme',
+        topEmotion: emotionStats[0]?.emotion || topEmotion,
         streak,
         weeklyChange,
         topArtists,
