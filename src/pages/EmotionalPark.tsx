@@ -26,8 +26,10 @@ import { TourStepOverlay } from '@/components/park/TourStepOverlay';
 import { useParkRecommendations } from '@/hooks/useParkRecommendations';
 import { AttractionRecommendations } from '@/components/park/AttractionRecommendations';
 import { ParkStatistics, ProgressStage } from '@/components/park/ParkStatistics';
+import { ParkQuests } from '@/components/park/ParkQuests';
 import { parkAttractions } from '@/data/parkAttractions';
 import { parkZones } from '@/data/parkZones';
+import { useParkQuests } from '@/hooks/useParkQuests';
 import type { ZoneKey, ZoneProgressData, ParkStat, MoodOption } from '@/types/park';
 
 export default function EmotionalPark() {
@@ -67,6 +69,7 @@ export default function EmotionalPark() {
 
   const { getRecommendations, getDailyChallenge } = useParkRecommendations();
   const { stats: userStats } = useUserStatsQuery();
+  const { quests, getCompletedQuestsCount, getTotalRewards, updateQuestProgress } = useParkQuests();
 
   const [showTourModal, setShowTourModal] = useState(false);
 
@@ -527,6 +530,14 @@ export default function EmotionalPark() {
             }}
           />
         )}
+
+        {/* Park Quests Section */}
+        <ParkQuests
+          quests={quests}
+          completedCount={getCompletedQuestsCount()}
+          totalRewards={getTotalRewards()}
+          onQuestStart={(questId) => updateQuestProgress(questId, 1)}
+        />
       </div>
 
       {/* Navigation Buttons */}
