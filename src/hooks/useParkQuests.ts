@@ -1,9 +1,12 @@
-// @ts-nocheck
 /**
  * Hook pour la gestion des quêtes et missions du parc émotionnel
+ * Persistance via Supabase
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
+import { logger } from '@/lib/logger';
 
 export interface Quest {
   id: string;
@@ -17,8 +20,8 @@ export interface Quest {
   completed: boolean;
   difficulty: 'easy' | 'medium' | 'hard';
   zones: string[];
-  timeLimit?: number; // en heures
-  createdAt: Date;
+  timeLimit?: number;
+  createdAt: string;
 }
 
 const AVAILABLE_QUESTS: Omit<Quest, 'progress' | 'completed' | 'createdAt'>[] = [
@@ -91,46 +94,79 @@ const AVAILABLE_QUESTS: Omit<Quest, 'progress' | 'completed' | 'createdAt'>[] = 
 ];
 
 export const useParkQuests = () => {
+  const { user } = useAuth();
   const [quests, setQuests] = useState<Quest[]>([]);
   const [completedQuests, setCompletedQuests] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Initialize quests from localStorage
-  useEffect(() => {
-    const saved = localStorage.getItem('park-quests');
-    const savedCompleted = localStorage.getItem('park-quests-completed');
-
-    if (saved) {
-      try {
-        const parsedQuests = JSON.parse(saved);
-        setQuests(parsedQuests);
-      } catch {
-        initializeQuests();
-      }
-    } else {
-      initializeQuests();
+  // Save quests to Supabase
+  const saveQuests = useCallback(async (questsData: Quest[], completed: string[]) => {
+    if (!user) return;
+    
+    try {
+      await supabase
+        .from('user_settings')
+        .upsert({
+          user_id: user.id,
+          key: 'park_quests',
+          value: JSON.stringify({ quests: questsData, completed }),
+          updated_at: new Date().toISOString()
+        }, { onConflict: 'user_id,key' });
+    } catch (error) {
+      logger.error('Failed to save park quests', error as Error, 'PARK');
     }
+  }, [user]);
 
-    if (savedCompleted) {
-      try {
-        setCompletedQuests(JSON.parse(savedCompleted));
-      } catch {
-        setCompletedQuests([]);
-      }
-    }
-  }, []);
-
-  const initializeQuests = () => {
-    const newQuests: Quest[] = AVAILABLE_QUESTS.map(q => ({
+  // Initialize quests
+  const initializeQuests = useCallback((): Quest[] => {
+    return AVAILABLE_QUESTS.map(q => ({
       ...q,
       progress: 0,
       completed: false,
-      createdAt: new Date()
+      createdAt: new Date().toISOString()
     }));
-    setQuests(newQuests);
-    localStorage.setItem('park-quests', JSON.stringify(newQuests));
-  };
+  }, []);
 
-  const updateQuestProgress = (questId: string, progress: number) => {
+  // Load quests from Supabase
+  useEffect(() => {
+    const loadQuests = async () => {
+      setIsLoading(true);
+      
+      try {
+        if (user) {
+          const { data } = await supabase
+            .from('user_settings')
+            .select('value')
+            .eq('user_id', user.id)
+            .eq('key', 'park_quests')
+            .maybeSingle();
+
+          if (data?.value) {
+            const parsed = typeof data.value === 'string' ? JSON.parse(data.value) : data.value;
+            setQuests(parsed.quests || initializeQuests());
+            setCompletedQuests(parsed.completed || []);
+          } else {
+            const newQuests = initializeQuests();
+            setQuests(newQuests);
+            setCompletedQuests([]);
+          }
+        } else {
+          // No user - use default quests
+          setQuests(initializeQuests());
+          setCompletedQuests([]);
+        }
+      } catch (error) {
+        logger.error('Failed to load park quests', error as Error, 'PARK');
+        setQuests(initializeQuests());
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadQuests();
+  }, [user, initializeQuests]);
+
+  const updateQuestProgress = useCallback((questId: string, progress: number) => {
     setQuests(prev => {
       const updated = prev.map(q => {
         if (q.id === questId) {
@@ -138,10 +174,9 @@ export const useParkQuests = () => {
           const completed = newProgress >= q.maxProgress;
 
           if (completed && !q.completed) {
-            // Mark as completed and add to completed list
             setCompletedQuests(prevCompleted => {
               const newCompleted = [...prevCompleted, questId];
-              localStorage.setItem('park-quests-completed', JSON.stringify(newCompleted));
+              saveQuests(updated, newCompleted);
               return newCompleted;
             });
           }
@@ -155,29 +190,30 @@ export const useParkQuests = () => {
         return q;
       });
 
-      localStorage.setItem('park-quests', JSON.stringify(updated));
+      saveQuests(updated, completedQuests);
       return updated;
     });
-  };
+  }, [saveQuests, completedQuests]);
 
-  const getActiveQuests = (): Quest[] => {
+  const getActiveQuests = useCallback((): Quest[] => {
     return quests.filter(q => !q.completed).slice(0, 3);
-  };
+  }, [quests]);
 
-  const getCompletedQuestsCount = (): number => {
+  const getCompletedQuestsCount = useCallback((): number => {
     return completedQuests.length;
-  };
+  }, [completedQuests]);
 
-  const getTotalRewards = (): number => {
+  const getTotalRewards = useCallback((): number => {
     return completedQuests.reduce((total, questId) => {
       const quest = quests.find(q => q.id === questId);
       return total + (quest?.reward || 0);
     }, 0);
-  };
+  }, [completedQuests, quests]);
 
   return {
     quests,
     completedQuests,
+    isLoading,
     updateQuestProgress,
     getActiveQuests,
     getCompletedQuestsCount,
