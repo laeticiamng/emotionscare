@@ -24,6 +24,10 @@ export { default as MatchingPanel } from './components/MatchingPanel';
 export { default as ExchangeNotifications } from './components/ExchangeNotifications';
 export { default as MarketTrendChart } from './components/MarketTrendChart';
 export { default as EmotionPortfolioPanel } from './components/EmotionPortfolioPanel';
+export { default as EmotionTransactionHistory } from './components/EmotionTransactionHistory';
+export { default as ExchangeDataExport } from './components/ExchangeDataExport';
+export { default as ImprovementProgressChart } from './components/ImprovementProgressChart';
+export { default as TrustActivityFeed } from './components/TrustActivityFeed';
 
 // Hooks
 export * from './hooks/useExchangeData';

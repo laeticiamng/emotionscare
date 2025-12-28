@@ -13,7 +13,8 @@ import {
   Shield,
   Clock,
   Heart,
-  Save
+  Save,
+  Download
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -29,6 +30,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { useExchangeProfile, useUpdateExchangeProfile, useExchangeStats } from '../hooks/useExchangeData';
+import ExchangeDataExport from './ExchangeDataExport';
 import { toast } from 'sonner';
 
 const rankIcons = {
@@ -85,9 +87,12 @@ const ExchangeProfileCard: React.FC = () => {
               <User className="w-5 h-5" />
               Mon Profil Exchange
             </CardTitle>
-            <Button variant="ghost" size="sm" onClick={handleEdit}>
-              <Edit2 className="w-4 h-4" />
-            </Button>
+            <div className="flex gap-1">
+              <ExchangeDataExport />
+              <Button variant="ghost" size="sm" onClick={handleEdit}>
+                <Edit2 className="w-4 h-4" />
+              </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent className="space-y-6">
