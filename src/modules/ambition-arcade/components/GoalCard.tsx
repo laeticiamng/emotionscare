@@ -10,7 +10,7 @@ import { Progress } from '@/components/ui/progress';
 import { Input } from '@/components/ui/input';
 import { 
   ChevronDown, ChevronUp, CheckCircle, Clock, 
-  Plus, Star, Target, Trash2, Play, Loader2, Heart 
+  Plus, Star, Target, Trash2, Play, Loader2, Heart, Timer
 } from 'lucide-react';
 import { 
   useAmbitionQuests, 
@@ -25,6 +25,8 @@ import { useDeleteGoal } from '../hooks/useDeleteGoal';
 import { useAmbitionFavorites, useAmbitionRatings } from '../hooks/useAmbitionExtras';
 import { RatingStars } from './RatingStars';
 import { ArtifactGallery } from './ArtifactGallery';
+import { ShareAchievement } from './ShareAchievement';
+import { QuestTimer } from './QuestTimer';
 
 interface GoalCardProps {
   goal: AmbitionGoal;
@@ -107,6 +109,19 @@ export const GoalCard: React.FC<GoalCardProps> = ({ goal }) => {
               >
                 <Heart className={`w-4 h-4 ${goalIsFavorite ? 'fill-destructive text-destructive' : 'text-muted-foreground'}`} />
               </Button>
+
+              {/* Share Button (for completed) */}
+              {isCompleted && (
+                <ShareAchievement
+                  type="goal"
+                  title={goal.objective}
+                  description={`Objectif complété avec ${goal.questsCompleted} quêtes !`}
+                  stats={[
+                    { label: 'XP', value: goal.xpEarned },
+                    { label: 'Quêtes', value: goal.questsCompleted }
+                  ]}
+                />
+              )}
 
               {isCompleted && (
                 <div className="w-10 h-10 rounded-full bg-success/20 flex items-center justify-center">
@@ -191,13 +206,21 @@ export const GoalCard: React.FC<GoalCardProps> = ({ goal }) => {
                         {quest.status === 'completed' ? (
                           <CheckCircle className="w-5 h-5 text-success" />
                         ) : quest.status === 'in_progress' ? (
-                          <Button 
-                            size="sm" 
-                            onClick={() => completeQuest.mutate({ questId: quest.id })}
-                            disabled={completeQuest.isPending}
-                          >
-                            Terminer
-                          </Button>
+                          <div className="flex items-center gap-2">
+                            <QuestTimer
+                              questId={quest.id}
+                              questTitle={quest.title}
+                              estimatedMinutes={quest.estMinutes}
+                              compact
+                            />
+                            <Button 
+                              size="sm" 
+                              onClick={() => completeQuest.mutate({ questId: quest.id })}
+                              disabled={completeQuest.isPending}
+                            >
+                              Terminer
+                            </Button>
+                          </div>
                         ) : (
                           <Button 
                             size="sm" 

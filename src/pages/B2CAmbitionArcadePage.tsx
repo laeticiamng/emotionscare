@@ -7,7 +7,7 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ArrowLeft, Gamepad2, Target, TrendingUp, Trophy, Plus, Lightbulb } from 'lucide-react';
+import { ArrowLeft, Gamepad2, Target, TrendingUp, Trophy, Plus, Lightbulb, Flame } from 'lucide-react';
 import { useAmbitionGoals, useAmbitionStats } from '@/modules/ambition-arcade/hooks';
 import { GoalCard } from '@/modules/ambition-arcade/components/GoalCard';
 import { GoalCreator } from '@/modules/ambition-arcade/components/GoalCreator';
@@ -15,6 +15,8 @@ import { StatsPanel } from '@/modules/ambition-arcade/components/StatsPanel';
 import { AchievementsTab } from '@/modules/ambition-arcade/components/AchievementsTab';
 import { RecommendationsPanel } from '@/modules/ambition-arcade/components/RecommendationsPanel';
 import { ExportButton } from '@/modules/ambition-arcade/components/ExportButton';
+import { ProgressChart } from '@/modules/ambition-arcade/components/ProgressChart';
+import { DailyStreak } from '@/modules/ambition-arcade/components/DailyStreak';
 
 const B2CAmbitionArcadePage: React.FC = () => {
   const [showCreator, setShowCreator] = useState(false);
@@ -63,6 +65,10 @@ const B2CAmbitionArcadePage: React.FC = () => {
               <div className="flex items-center gap-1">
                 <Target className="w-4 h-4 text-primary" />
                 <span>{stats.totalXP} XP</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Flame className="w-4 h-4 text-orange-500" />
+                <span>{stats.currentStreak} jours</span>
               </div>
             </div>
           )}
@@ -152,7 +158,9 @@ const B2CAmbitionArcadePage: React.FC = () => {
           </TabsContent>
 
           {/* Progress Tab */}
-          <TabsContent value="progress">
+          <TabsContent value="progress" className="space-y-6">
+            <DailyStreak />
+            <ProgressChart />
             <StatsPanel />
           </TabsContent>
 
