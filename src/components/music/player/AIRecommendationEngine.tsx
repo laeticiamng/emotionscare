@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Sparkles, TrendingUp, Heart, Clock, Zap } from 'lucide-react';
+import { Sparkles, TrendingUp, Heart, Clock, Zap, Play } from 'lucide-react';
 import { useMusic } from '@/hooks/useMusic';
-import { MusicTrack, MusicPlaylist } from '@/types/music';
+import { MusicTrack } from '@/types/music';
+import { useToast } from '@/hooks/use-toast';
 
 interface AIRecommendation {
   id: string;
@@ -30,7 +31,8 @@ const AIRecommendationEngine: React.FC<AIRecommendationEngineProps> = ({ classNa
     timeContext: 'evening'
   });
   
-  const { state } = useMusic();
+  const { state, play, setPlaylist } = useMusic();
+  const { toast } = useToast();
   const currentTrack = state.currentTrack;
 
   // Recommandations basées sur le contexte réel
@@ -122,9 +124,27 @@ const AIRecommendationEngine: React.FC<AIRecommendationEngineProps> = ({ classNa
     setIsGenerating(false);
   };
 
+  // Effectuer un rafraichissement initial
   useEffect(() => {
     generateAIRecommendations();
-  }, [currentTrack]);
+  }, [currentTrack?.id]);
+
+  // Handler pour jouer un track recommandé
+  const handlePlayTrack = useCallback(async (track: MusicTrack) => {
+    try {
+      await play(track);
+      toast({
+        title: '▶️ Lecture',
+        description: `${track.title} - ${track.artist}`,
+      });
+    } catch (error) {
+      toast({
+        title: 'Erreur',
+        description: 'Impossible de lire ce morceau',
+        variant: 'destructive',
+      });
+    }
+  }, [play, toast]);
 
   const getTypeIcon = (type: AIRecommendation['type']) => {
     switch (type) {
@@ -208,7 +228,13 @@ const AIRecommendationEngine: React.FC<AIRecommendationEngineProps> = ({ classNa
                         <span className="font-medium">{track.title}</span>
                         <span className="text-muted-foreground ml-2">- {track.artist}</span>
                       </div>
-                      <Button size="sm" variant="ghost">
+                      <Button 
+                        size="sm" 
+                        variant="ghost"
+                        className="gap-1"
+                        onClick={() => handlePlayTrack(track)}
+                      >
+                        <Play className="h-3 w-3" />
                         Écouter
                       </Button>
                     </div>
