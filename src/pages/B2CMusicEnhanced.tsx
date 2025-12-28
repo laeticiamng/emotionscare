@@ -79,7 +79,8 @@ interface VinylTrack extends MusicTrack {
   waveform?: number[];
 }
 
-// Configuration audio - URLs audio publiques vérifiées (CORS OK)
+// Configuration audio - URL Pixabay qui fonctionne (même fichier pour tous en attendant génération Suno)
+// TODO: Remplacer par des pistes générées via Suno API
 const AUDIO_URL_CONFIG = {
   'vinyl-1': { 
     fileName: 'ambient-soft.mp3', 
@@ -87,15 +88,15 @@ const AUDIO_URL_CONFIG = {
   },
   'vinyl-2': { 
     fileName: 'focus-clarity.mp3', 
-    fallbackUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'
+    fallbackUrl: 'https://cdn.pixabay.com/audio/2022/05/27/audio_1808fbf07a.mp3'
   },
   'vinyl-3': { 
     fileName: 'creative-flow.mp3', 
-    fallbackUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3'
+    fallbackUrl: 'https://cdn.pixabay.com/audio/2022/05/27/audio_1808fbf07a.mp3'
   },
   'vinyl-4': { 
     fileName: 'healing-waves.mp3', 
-    fallbackUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3'
+    fallbackUrl: 'https://cdn.pixabay.com/audio/2022/05/27/audio_1808fbf07a.mp3'
   }
 } as const;
 
