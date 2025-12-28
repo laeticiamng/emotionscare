@@ -3,7 +3,7 @@
 import React, { useState, useRef, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { EmotionResult } from '@/types/emotion';
+import { EmotionResult } from '@/types/emotion-unified';
 import { Camera, Upload, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import useHumeAI from '@/hooks/api/useHumeAI';
