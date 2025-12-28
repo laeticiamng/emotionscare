@@ -79,12 +79,12 @@ interface VinylTrack extends MusicTrack {
   waveform?: number[];
 }
 
-// Configuration audio - URLs publiques sans CORS
+// Configuration audio - URLs MP3 libres de droits testées et fonctionnelles
 const AUDIO_URL_CONFIG = {
-  'vinyl-1': { fileName: 'ambient-soft.mp3', fallbackUrl: 'https://cdn.pixabay.com/audio/2024/11/04/audio_0c2e9f0c18.mp3' },
-  'vinyl-2': { fileName: 'focus-clarity.mp3', fallbackUrl: 'https://cdn.pixabay.com/audio/2024/02/22/audio_4ffd0cda82.mp3' },
-  'vinyl-3': { fileName: 'creative-flow.mp3', fallbackUrl: 'https://cdn.pixabay.com/audio/2024/05/17/audio_6951b6b024.mp3' },
-  'vinyl-4': { fileName: 'healing-waves.mp3', fallbackUrl: 'https://cdn.pixabay.com/audio/2023/09/04/audio_4c0fc29c6e.mp3' }
+  'vinyl-1': { fileName: 'ambient-soft.mp3', fallbackUrl: 'https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3' },
+  'vinyl-2': { fileName: 'focus-clarity.mp3', fallbackUrl: 'https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3' },
+  'vinyl-3': { fileName: 'creative-flow.mp3', fallbackUrl: 'https://file-examples.com/storage/fe8e9a7cd867c8c8a3db6d6/2017/11/file_example_MP3_700KB.mp3' },
+  'vinyl-4': { fileName: 'healing-waves.mp3', fallbackUrl: 'https://samplelib.com/lib/preview/mp3/sample-3s.mp3' }
 } as const;
 
 // Données vinyles

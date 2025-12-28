@@ -120,16 +120,15 @@ export function useAudioUrls(
   }, [config]);
 
   const [urls, setUrls] = useState<AudioUrlMapping>(() => {
-    // Vérifier le cache d'abord
-    const cached = readCache();
-    if (cached && cached.sources) {
-      // Vérifier que toutes les URLs du cache utilisent fallback (pas supabase cassé)
-      const allFallback = Object.values(cached.sources).every(s => s === 'fallback');
-      if (allFallback) {
-        return cached.urls;
+    // Toujours vider le cache au démarrage pour éviter les URLs cassées
+    if (typeof window !== 'undefined') {
+      try {
+        window.localStorage.removeItem(CACHE_KEY);
+      } catch (e) {
+        // Ignore
       }
     }
-    // Utiliser directement les fallbacks (pas Supabase car les fichiers n'existent pas)
+    // Utiliser directement les fallbacks (pas de cache potentiellement corrompu)
     return fallbackUrls;
   });
   
