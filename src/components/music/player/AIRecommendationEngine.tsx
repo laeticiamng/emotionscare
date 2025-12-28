@@ -63,8 +63,8 @@ const AIRecommendationEngine: React.FC<AIRecommendationEngineProps> = ({ classNa
             title: isEvening ? 'Nuit Étoilée' : isMorning ? 'Aube Radieuse' : 'Clarté Mentale',
             artist: 'EmotionsCare AI',
             duration: 240,
-            url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
-            audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
+            url: 'https://cdn.pixabay.com/audio/2024/11/04/audio_0c2e9f0c18.mp3',
+            audioUrl: 'https://cdn.pixabay.com/audio/2024/11/04/audio_0c2e9f0c18.mp3',
             emotion: isEvening ? 'calm' : isMorning ? 'energetic' : 'focused'
           },
           {
@@ -72,8 +72,8 @@ const AIRecommendationEngine: React.FC<AIRecommendationEngineProps> = ({ classNa
             title: isEvening ? 'Ondes Douces' : isMorning ? 'Énergie Montante' : 'Flow Créatif',
             artist: 'Thérapie Sonore',
             duration: 300,
-            url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
-            audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
+            url: 'https://cdn.pixabay.com/audio/2024/02/22/audio_4ffd0cda82.mp3',
+            audioUrl: 'https://cdn.pixabay.com/audio/2024/02/22/audio_4ffd0cda82.mp3',
             emotion: isEvening ? 'peaceful' : isMorning ? 'happy' : 'creative'
           }
         ],

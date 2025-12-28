@@ -3326,6 +3326,124 @@ export type Database = {
         }
         Relationships: []
       }
+      collaborative_playlist_members: {
+        Row: {
+          id: string
+          joined_at: string
+          playlist_id: string
+          role: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          joined_at?: string
+          playlist_id: string
+          role?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          joined_at?: string
+          playlist_id?: string
+          role?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collaborative_playlist_members_playlist_id_fkey"
+            columns: ["playlist_id"]
+            isOneToOne: false
+            referencedRelation: "collaborative_playlists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      collaborative_playlist_tracks: {
+        Row: {
+          added_by: string
+          artist: string | null
+          audio_url: string | null
+          created_at: string
+          duration: number | null
+          id: string
+          playlist_id: string
+          position: number | null
+          title: string
+          votes_down: number | null
+          votes_up: number | null
+        }
+        Insert: {
+          added_by: string
+          artist?: string | null
+          audio_url?: string | null
+          created_at?: string
+          duration?: number | null
+          id?: string
+          playlist_id: string
+          position?: number | null
+          title: string
+          votes_down?: number | null
+          votes_up?: number | null
+        }
+        Update: {
+          added_by?: string
+          artist?: string | null
+          audio_url?: string | null
+          created_at?: string
+          duration?: number | null
+          id?: string
+          playlist_id?: string
+          position?: number | null
+          title?: string
+          votes_down?: number | null
+          votes_up?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collaborative_playlist_tracks_playlist_id_fkey"
+            columns: ["playlist_id"]
+            isOneToOne: false
+            referencedRelation: "collaborative_playlists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      collaborative_playlists: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          invite_code: string | null
+          is_public: boolean
+          max_collaborators: number | null
+          name: string
+          owner_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          invite_code?: string | null
+          is_public?: boolean
+          max_collaborators?: number | null
+          name: string
+          owner_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          invite_code?: string | null
+          is_public?: boolean
+          max_collaborators?: number | null
+          name?: string
+          owner_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       comments: {
         Row: {
           content: string
@@ -11764,6 +11882,60 @@ export type Database = {
         }
         Relationships: []
       }
+      music_challenges: {
+        Row: {
+          challenge_type: string
+          created_at: string
+          creator_id: string
+          creator_progress: number | null
+          description: string | null
+          end_date: string | null
+          goal_value: number | null
+          id: string
+          participant_id: string | null
+          participant_progress: number | null
+          reward_points: number | null
+          start_date: string
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          challenge_type?: string
+          created_at?: string
+          creator_id: string
+          creator_progress?: number | null
+          description?: string | null
+          end_date?: string | null
+          goal_value?: number | null
+          id?: string
+          participant_id?: string | null
+          participant_progress?: number | null
+          reward_points?: number | null
+          start_date?: string
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          challenge_type?: string
+          created_at?: string
+          creator_id?: string
+          creator_progress?: number | null
+          description?: string | null
+          end_date?: string | null
+          goal_value?: number | null
+          id?: string
+          participant_id?: string | null
+          participant_progress?: number | null
+          reward_points?: number | null
+          start_date?: string
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       music_completion_logs: {
         Row: {
           completion_percentage: number | null
@@ -11879,6 +12051,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      music_friends: {
+        Row: {
+          created_at: string
+          friend_id: string
+          id: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          friend_id: string
+          id?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          friend_id?: string
+          id?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       music_generation_logs: {
         Row: {
@@ -12325,6 +12524,39 @@ export type Database = {
           user_id?: string
           weekly_rank?: number | null
           weekly_score?: number | null
+        }
+        Relationships: []
+      }
+      music_notifications: {
+        Row: {
+          created_at: string
+          data: Json | null
+          id: string
+          is_read: boolean
+          message: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          data?: Json | null
+          id?: string
+          is_read?: boolean
+          message?: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          data?: Json | null
+          id?: string
+          is_read?: boolean
+          message?: string | null
+          title?: string
+          type?: string
+          user_id?: string
         }
         Relationships: []
       }

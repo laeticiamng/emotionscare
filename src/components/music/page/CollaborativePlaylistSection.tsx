@@ -367,7 +367,7 @@ export const CollaborativePlaylistSection: React.FC = () => {
                     artist: 'Nouveau Titre',
                     addedBy: user?.email?.split('@')[0] || 'Vous',
                     votes: { up: 0, down: 0 },
-                    audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'
+                    audioUrl: 'https://cdn.pixabay.com/audio/2024/11/04/audio_0c2e9f0c18.mp3'
                   };
                   if (playlist) {
                     setPlaylist({
