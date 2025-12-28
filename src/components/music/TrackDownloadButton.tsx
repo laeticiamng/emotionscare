@@ -1,5 +1,6 @@
 /**
  * TrackDownloadButton - Bouton d'export/téléchargement de tracks
+ * Utilise proxy edge function pour éviter CORS
  */
 
 import React, { useState } from 'react';
@@ -14,6 +15,7 @@ import { Download, Loader2, FileAudio, Share2, Copy, Check } from 'lucide-react'
 import { toast } from 'sonner';
 import type { MusicTrack } from '@/types/music';
 import { logger } from '@/lib/logger';
+import { supabase } from '@/integrations/supabase/client';
 
 interface TrackDownloadButtonProps {
   track: MusicTrack;
@@ -41,21 +43,39 @@ const TrackDownloadButton: React.FC<TrackDownloadButtonProps> = ({
 
     setIsDownloading(true);
     try {
-      // Fetch the audio file
-      const response = await fetch(audioUrl);
-      if (!response.ok) throw new Error('Téléchargement échoué');
-
-      const blob = await response.blob();
+      const filename = `${track.title || 'track'}_${track.artist || 'emotionscare'}.mp3`;
       
-      // Create download link
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${track.title || 'track'}_${track.artist || 'emotionscare'}.mp3`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      // Use edge function proxy for CORS-safe download
+      const { data, error } = await supabase.functions.invoke('download-audio', {
+        body: { audioUrl, filename }
+      });
+
+      if (error) {
+        // Fallback to direct fetch for same-origin URLs
+        const response = await fetch(audioUrl);
+        if (!response.ok) throw new Error('Téléchargement échoué');
+        
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      } else {
+        // Edge function returns the file directly as blob
+        const blob = new Blob([data], { type: 'audio/mpeg' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
 
       toast.success('Téléchargement terminé', {
         description: `"${track.title}" enregistrée`,
