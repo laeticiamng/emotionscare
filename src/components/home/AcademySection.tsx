@@ -31,7 +31,7 @@ const modules: Module[] = [
     icon: <Brain className="h-6 w-6" />,
     duration: '8 min',
     color: 'text-purple-500',
-    link: '/app/academy/nervous-system',
+    link: '/app/scan?context=learn',
   },
   {
     id: 'triggers',
@@ -41,7 +41,7 @@ const modules: Module[] = [
     icon: <Target className="h-6 w-6" />,
     duration: '10 min',
     color: 'text-red-500',
-    link: '/app/academy/triggers',
+    link: '/app/journal',
   },
   {
     id: 'regulation',
@@ -51,7 +51,7 @@ const modules: Module[] = [
     icon: <Zap className="h-6 w-6" />,
     duration: '12 min',
     color: 'text-amber-500',
-    link: '/app/academy/regulation',
+    link: '/app/coach',
   },
   {
     id: 'prevention',
@@ -61,7 +61,7 @@ const modules: Module[] = [
     icon: <Shield className="h-6 w-6" />,
     duration: '15 min',
     color: 'text-emerald-500',
-    link: '/app/academy/prevention',
+    link: '/app/vr-breath-guide',
   },
 ];
 
@@ -168,7 +168,7 @@ const AcademySection: React.FC = () => {
               "Tu n'as pas besoin de tout comprendre pour que ça marche. Mais comprendre t'aide à tenir sur la durée."
             </p>
             <Button variant="ghost" asChild>
-              <Link to="/app/academy">
+              <Link to="/app/modules">
                 Voir tous les modules
                 <ArrowRight className="h-4 w-4 ml-2" />
               </Link>
