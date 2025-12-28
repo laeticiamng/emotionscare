@@ -1,32 +1,40 @@
 /**
  * Affichage du streak quotidien Ambition Arcade avec données réelles
+ * Inclut badges de milestone et récompenses visuelles
  */
 import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Flame, Trophy } from 'lucide-react';
+import { Flame, Trophy, Star, Zap, Target, Crown } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { startOfWeek, eachDayOfInterval, isSameDay, format } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { startOfWeek, eachDayOfInterval, isSameDay, subDays } from 'date-fns';
 
 interface DailyStreakProps {
   compact?: boolean;
 }
 
-const STREAK_MILESTONES = [3, 7, 14, 30, 60, 100];
+const STREAK_MILESTONES = [
+  { days: 3, name: 'Débutant', icon: '🌱', reward: 50 },
+  { days: 7, name: 'Régulier', icon: '🔥', reward: 100 },
+  { days: 14, name: 'Constant', icon: '⚡', reward: 200 },
+  { days: 30, name: 'Dévoué', icon: '🌟', reward: 500 },
+  { days: 60, name: 'Champion', icon: '💎', reward: 1000 },
+  { days: 100, name: 'Légende', icon: '👑', reward: 2500 },
+];
+
 const DAYS_OF_WEEK = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
 
 export const DailyStreak: React.FC<DailyStreakProps> = ({ compact = false }) => {
   const { user } = useAuth();
 
-  // Fetch real activity data for current week
-  const { data: weekActivity } = useQuery({
-    queryKey: ['ambition-week-activity', user?.id],
+  // Fetch real activity data for streak calculation
+  const { data: activityData, isLoading } = useQuery({
+    queryKey: ['ambition-streak-activity', user?.id],
     queryFn: async () => {
-      if (!user?.id) return [];
+      if (!user?.id) return { weekDates: [], allDates: [] };
 
       // Get runs for current user
       const { data: runs } = await supabase
@@ -35,79 +43,119 @@ export const DailyStreak: React.FC<DailyStreakProps> = ({ compact = false }) => 
         .eq('user_id', user.id);
 
       const runIds = runs?.map(r => r.id) || [];
-      if (runIds.length === 0) return [];
+      if (runIds.length === 0) return { weekDates: [], allDates: [] };
 
       // Get start of week (Monday)
       const weekStart = startOfWeek(new Date(), { weekStartsOn: 1 });
+      const threeMonthsAgo = subDays(new Date(), 90);
       
-      // Get completed quests from this week
+      // Get completed quests for streak calculation
       const { data: quests } = await supabase
         .from('ambition_quests')
         .select('completed_at')
         .in('run_id', runIds)
         .eq('status', 'completed')
-        .gte('completed_at', weekStart.toISOString());
+        .gte('completed_at', threeMonthsAgo.toISOString())
+        .order('completed_at', { ascending: false });
 
-      return quests?.map(q => new Date(q.completed_at!)) || [];
+      const allDates = quests?.filter(q => q.completed_at).map(q => new Date(q.completed_at!)) || [];
+      const weekDates = allDates.filter(d => d >= weekStart);
+
+      return { weekDates, allDates };
     },
     enabled: !!user?.id,
+    staleTime: 1000 * 60 * 2, // 2 min cache
   });
 
   // Calculate stats
-  const { currentStreak, longestStreak, activeDays } = useMemo(() => {
-    if (!weekActivity || weekActivity.length === 0) {
-      return { currentStreak: 0, longestStreak: 0, activeDays: new Set<number>() };
+  const { currentStreak, longestStreak, activeDays, unlockedMilestones } = useMemo(() => {
+    if (!activityData || activityData.allDates.length === 0) {
+      return { currentStreak: 0, longestStreak: 0, activeDays: new Set<number>(), unlockedMilestones: [] };
     }
 
-    // Get unique days with activity this week
-    const weekStart = startOfWeek(new Date(), { weekStartsOn: 1 });
-    const weekDays = eachDayOfInterval({
-      start: weekStart,
-      end: new Date()
-    });
+    // Get unique activity dates
+    const uniqueDates = Array.from(new Set(
+      activityData.allDates.map(d => d.toDateString())
+    )).map(str => new Date(str)).sort((a, b) => b.getTime() - a.getTime());
 
-    const activeDaysSet = new Set<number>();
-    weekDays.forEach((day, index) => {
-      if (weekActivity.some(actDate => isSameDay(actDate, day))) {
-        activeDaysSet.add(index);
-      }
-    });
-
-    // Calculate streak from today backwards
+    // Calculate current streak
     let streak = 0;
     const today = new Date();
-    for (let i = 0; i < 365; i++) {
+    today.setHours(0, 0, 0, 0);
+    
+    for (let i = 0; i <= 365; i++) {
       const checkDate = new Date(today);
       checkDate.setDate(today.getDate() - i);
+      checkDate.setHours(0, 0, 0, 0);
       
-      const hasActivity = weekActivity.some(actDate => isSameDay(actDate, checkDate));
+      const hasActivity = uniqueDates.some(d => {
+        const actDate = new Date(d);
+        actDate.setHours(0, 0, 0, 0);
+        return actDate.getTime() === checkDate.getTime();
+      });
       
       if (hasActivity) {
         streak++;
       } else if (i === 0) {
-        // Today has no activity, but yesterday might
+        // Today has no activity yet, check yesterday
         continue;
       } else {
         break;
       }
     }
 
+    // Calculate longest streak
+    let maxStreak = 0;
+    let tempStreak = 0;
+    let lastDate: Date | null = null;
+
+    uniqueDates.sort((a, b) => a.getTime() - b.getTime()).forEach(date => {
+      if (lastDate) {
+        const diffDays = Math.round((date.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24));
+        if (diffDays === 1) {
+          tempStreak++;
+        } else {
+          maxStreak = Math.max(maxStreak, tempStreak);
+          tempStreak = 1;
+        }
+      } else {
+        tempStreak = 1;
+      }
+      lastDate = date;
+    });
+    maxStreak = Math.max(maxStreak, tempStreak);
+
+    // Week visualization
+    const weekStart = startOfWeek(new Date(), { weekStartsOn: 1 });
+    const weekDays = eachDayOfInterval({ start: weekStart, end: new Date() });
+    const activeDaysSet = new Set<number>();
+    
+    weekDays.forEach((day, index) => {
+      if (activityData.weekDates.some(actDate => isSameDay(actDate, day))) {
+        activeDaysSet.add(index);
+      }
+    });
+
+    // Unlocked milestones
+    const unlocked = STREAK_MILESTONES.filter(m => maxStreak >= m.days);
+
     return {
       currentStreak: streak,
-      longestStreak: Math.max(streak, activeDaysSet.size),
-      activeDays: activeDaysSet
+      longestStreak: maxStreak,
+      activeDays: activeDaysSet,
+      unlockedMilestones: unlocked
     };
-  }, [weekActivity]);
+  }, [activityData]);
 
-  const nextMilestone = STREAK_MILESTONES.find(m => m > currentStreak) || 100;
-  const progressToMilestone = (currentStreak / nextMilestone) * 100;
+  const nextMilestone = STREAK_MILESTONES.find(m => m.days > currentStreak) || STREAK_MILESTONES[STREAK_MILESTONES.length - 1];
+  const progressToMilestone = Math.min((currentStreak / nextMilestone.days) * 100, 100);
 
   const getStreakMessage = () => {
     if (currentStreak === 0) return 'Commencez votre streak !';
     if (currentStreak === 1) return 'Premier jour !';
-    if (currentStreak < 7) return `${7 - currentStreak} jours avant une semaine !`;
-    if (currentStreak < 30) return `${30 - currentStreak} jours avant un mois !`;
-    return 'Incroyable régularité !';
+    const daysToNext = nextMilestone.days - currentStreak;
+    if (daysToNext <= 0) return 'Incroyable régularité !';
+    return `${daysToNext} jour${daysToNext > 1 ? 's' : ''} avant "${nextMilestone.name}"`;
   };
 
   const getFlameColor = () => {
@@ -117,13 +165,19 @@ export const DailyStreak: React.FC<DailyStreakProps> = ({ compact = false }) => 
     return 'text-muted-foreground';
   };
 
+  if (isLoading) {
+    return (
+      <Card className="animate-pulse">
+        <CardContent className="p-4 h-32" />
+      </Card>
+    );
+  }
+
   if (compact) {
     return (
       <div className="flex items-center gap-2">
         <motion.div
-          animate={currentStreak > 0 ? {
-            scale: [1, 1.1, 1],
-          } : {}}
+          animate={currentStreak > 0 ? { scale: [1, 1.1, 1] } : {}}
           transition={{ duration: 1, repeat: Infinity }}
         >
           <Flame className={`w-5 h-5 ${getFlameColor()}`} />
@@ -140,8 +194,9 @@ export const DailyStreak: React.FC<DailyStreakProps> = ({ compact = false }) => 
         ? 'border-amber-500/50 bg-gradient-to-br from-amber-500/10 to-orange-500/10' 
         : ''
     }`}>
-      <CardContent className="p-4">
-        <div className="flex items-center justify-between mb-4">
+      <CardContent className="p-4 space-y-4">
+        {/* Header */}
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <motion.div
               animate={currentStreak > 0 ? {
@@ -155,9 +210,7 @@ export const DailyStreak: React.FC<DailyStreakProps> = ({ compact = false }) => 
                   : 'bg-muted'
               }`}
             >
-              <Flame className={`w-6 h-6 ${
-                currentStreak >= 7 ? 'text-white' : getFlameColor()
-              }`} />
+              <Flame className={`w-6 h-6 ${currentStreak >= 7 ? 'text-white' : getFlameColor()}`} />
             </motion.div>
             <div>
               <div className="flex items-baseline gap-1">
@@ -179,8 +232,14 @@ export const DailyStreak: React.FC<DailyStreakProps> = ({ compact = false }) => 
         {/* Progress to next milestone */}
         <div className="space-y-1">
           <div className="flex justify-between text-xs text-muted-foreground">
-            <span>Prochain objectif: {nextMilestone} jours</span>
-            <span>{Math.round(progressToMilestone)}%</span>
+            <span className="flex items-center gap-1">
+              <span>{nextMilestone.icon}</span>
+              {nextMilestone.name}: {nextMilestone.days} jours
+            </span>
+            <span className="flex items-center gap-1">
+              <Zap className="w-3 h-3 text-warning" />
+              +{nextMilestone.reward} XP
+            </span>
           </div>
           <div className="relative h-2 bg-muted rounded-full overflow-hidden">
             <motion.div
@@ -191,11 +250,11 @@ export const DailyStreak: React.FC<DailyStreakProps> = ({ compact = false }) => 
           </div>
         </div>
 
-        {/* Week visualization with real data */}
-        <div className="flex justify-between mt-4 gap-1">
+        {/* Week visualization */}
+        <div className="flex justify-between gap-1">
           {DAYS_OF_WEEK.map((day, index) => {
             const isActive = activeDays.has(index);
-            const isToday = index === (new Date().getDay() + 6) % 7; // Adjust for Monday start
+            const isToday = index === (new Date().getDay() + 6) % 7;
             
             return (
               <motion.div
@@ -221,6 +280,28 @@ export const DailyStreak: React.FC<DailyStreakProps> = ({ compact = false }) => 
             );
           })}
         </div>
+
+        {/* Unlocked Milestones */}
+        {unlockedMilestones.length > 0 && (
+          <div className="pt-2 border-t">
+            <p className="text-xs text-muted-foreground mb-2">Badges débloqués</p>
+            <div className="flex flex-wrap gap-2">
+              {unlockedMilestones.map((milestone, idx) => (
+                <motion.div
+                  key={milestone.days}
+                  initial={{ scale: 0, rotate: -10 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  transition={{ delay: idx * 0.1 }}
+                >
+                  <Badge variant="secondary" className="gap-1">
+                    <span>{milestone.icon}</span>
+                    {milestone.name}
+                  </Badge>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

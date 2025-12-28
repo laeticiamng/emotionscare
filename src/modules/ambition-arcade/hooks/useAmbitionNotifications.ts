@@ -37,33 +37,35 @@ export function useAmbitionNotifications() {
   useEffect(() => {
     if (!user?.id) return;
 
-    // Subscribe to quests changes
+    // Subscribe to quests changes for current user
     const questsChannel = supabase
-      .channel('ambition-quests-changes')
+      .channel(`ambition-quests-${user.id}`)
       .on(
         'postgres_changes',
         {
           event: 'UPDATE',
           schema: 'public',
           table: 'ambition_quests',
-          filter: `status=eq.completed`,
         },
         (payload) => {
-          const quest = payload.new as { title?: string; xp_reward?: number };
-          showNotification({
-            type: 'quest_completed',
-            title: 'Quête complétée !',
-            message: `${quest.title || 'Quête'} (+${quest.xp_reward || 0} XP)`,
-          });
+          const quest = payload.new as { status?: string; title?: string; xp_reward?: number };
+          if (quest.status === 'completed') {
+            showNotification({
+              type: 'quest_completed',
+              title: 'Quête complétée !',
+              message: `${quest.title || 'Quête'} (+${quest.xp_reward || 0} XP)`,
+            });
+          }
           queryClient.invalidateQueries({ queryKey: ['ambition-quests'] });
           queryClient.invalidateQueries({ queryKey: ['ambition-stats'] });
+          queryClient.invalidateQueries({ queryKey: ['ambition-goals'] });
         }
       )
       .subscribe();
 
-    // Subscribe to artifacts
+    // Subscribe to artifacts for current user's runs
     const artifactsChannel = supabase
-      .channel('ambition-artifacts-changes')
+      .channel(`ambition-artifacts-${user.id}`)
       .on(
         'postgres_changes',
         {
@@ -86,7 +88,7 @@ export function useAmbitionNotifications() {
 
     // Subscribe to runs (goal) completions
     const runsChannel = supabase
-      .channel('ambition-runs-changes')
+      .channel(`ambition-runs-${user.id}`)
       .on(
         'postgres_changes',
         {

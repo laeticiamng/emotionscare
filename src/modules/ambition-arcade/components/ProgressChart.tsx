@@ -82,6 +82,27 @@ export const ProgressChart: React.FC = () => {
     );
   }
 
+  // Empty state
+  if (totalQuests === 0) {
+    return (
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <TrendingUp className="w-4 h-4 text-primary" />
+            Activité (14 jours)
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col items-center justify-center py-8 text-center">
+            <Calendar className="w-10 h-10 text-muted-foreground mb-3 opacity-50" />
+            <p className="text-sm text-muted-foreground">Aucune activité récente</p>
+            <p className="text-xs text-muted-foreground mt-1">Complétez des quêtes pour voir votre progression</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <CardHeader className="pb-2">

@@ -18,6 +18,7 @@ import { RecommendationsPanel } from '@/modules/ambition-arcade/components/Recom
 import { ExportButton } from '@/modules/ambition-arcade/components/ExportButton';
 import { ProgressChart } from '@/modules/ambition-arcade/components/ProgressChart';
 import { DailyStreak } from '@/modules/ambition-arcade/components/DailyStreak';
+import { GlobalArtifactGallery } from '@/modules/ambition-arcade/components/GlobalArtifactGallery';
 
 const B2CAmbitionArcadePage: React.FC = () => {
   const [showCreator, setShowCreator] = useState(false);
@@ -278,6 +279,7 @@ const B2CAmbitionArcadePage: React.FC = () => {
           <TabsContent value="progress" className="space-y-6">
             <DailyStreak />
             <ProgressChart />
+            <GlobalArtifactGallery />
             <StatsPanel />
           </TabsContent>
 
