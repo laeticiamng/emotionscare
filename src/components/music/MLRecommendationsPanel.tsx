@@ -61,20 +61,20 @@ const CATEGORY_CONFIG = {
   similar: { label: 'Similaire', icon: Heart, color: 'text-pink-500' },
 };
 
+// URLs audio publiques depuis archive.org (CORS OK)
+const DEMO_AUDIO_URLS = [
+  'https://ia800905.us.archive.org/19/items/FREE_background_music_dridge/Kevin_MacLeod_-_Waltz_of_the_Flowers_-_Tchaikovsky.mp3',
+  'https://ia800905.us.archive.org/19/items/FREE_background_music_dridge/Kevin_MacLeod_-_Gymnopedie_No_1.mp3',
+  'https://ia800905.us.archive.org/19/items/FREE_background_music_dridge/Kevin_MacLeod_-_Canon_in_D.mp3',
+  'https://ia800905.us.archive.org/19/items/FREE_background_music_dridge/Kevin_MacLeod_-_Serenade.mp3',
+  'https://ia800905.us.archive.org/19/items/FREE_background_music_dridge/Kevin_MacLeod_-_Scheming_Weasel.mp3',
+  'https://ia800905.us.archive.org/19/items/FREE_background_music_dridge/Kevin_MacLeod_-_Cipher.mp3',
+  'https://ia800905.us.archive.org/19/items/FREE_background_music_dridge/Kevin_MacLeod_-_Moonlight_Sonata.mp3',
+  'https://ia800905.us.archive.org/19/items/FREE_background_music_dridge/Kevin_MacLeod_-_Vivaldi_Spring.mp3',
+];
+
 // Génère des recommandations basées sur l'émotion actuelle avec URLs audio valides
 const generateRecommendations = (emotion: string, historyCount: number): MLRecommendation[] => {
-  // URLs audio publiques sans CORS (Pixabay CDN)
-  const DEMO_AUDIO_URLS = [
-    'https://cdn.pixabay.com/audio/2024/11/04/audio_0c2e9f0c18.mp3',
-    'https://cdn.pixabay.com/audio/2024/02/22/audio_4ffd0cda82.mp3',
-    'https://cdn.pixabay.com/audio/2024/05/17/audio_6951b6b024.mp3',
-    'https://cdn.pixabay.com/audio/2023/09/04/audio_4c0fc29c6e.mp3',
-    'https://cdn.pixabay.com/audio/2024/01/10/audio_bc70cb15ab.mp3',
-    'https://cdn.pixabay.com/audio/2023/12/07/audio_50c0d13e7b.mp3',
-    'https://cdn.pixabay.com/audio/2024/03/12/audio_1a2e8f7c9b.mp3',
-    'https://cdn.pixabay.com/audio/2024/06/28/audio_d3f5a7e2c1.mp3',
-  ];
-
   const emotionTracks: Record<string, MusicTrack[]> = {
     calm: [
       { id: 'rec-1', title: 'Océan Paisible', artist: 'Ambient Collective', url: DEMO_AUDIO_URLS[0], audioUrl: DEMO_AUDIO_URLS[0], duration: 245, emotion: 'calm', mood: 'peaceful' },

@@ -292,6 +292,13 @@ export async function saveUserMusicCreation(creation: Omit<MusicCreation, 'creat
  * Get all music creations for a user
  */
 export async function getUserMusicCreations(userId: string): Promise<MusicCreation[]> {
+  // URLs audio fiables (archive.org - CORS OK)
+  const archiveUrls = [
+    'https://ia800905.us.archive.org/19/items/FREE_background_music_dridge/Kevin_MacLeod_-_Gymnopedie_No_1.mp3',
+    'https://ia800905.us.archive.org/19/items/FREE_background_music_dridge/Kevin_MacLeod_-_Canon_in_D.mp3',
+    'https://ia800905.us.archive.org/19/items/FREE_background_music_dridge/Kevin_MacLeod_-_Waltz_of_the_Flowers_-_Tchaikovsky.mp3',
+  ];
+  
   try {
     // In a real implementation, this would fetch from Supabase
     // For now, we'll return a mock array
@@ -302,7 +309,7 @@ export async function getUserMusicCreations(userId: string): Promise<MusicCreati
         title: 'Mon premier morceau relaxant',
         prompt: 'musique relaxante avec sons de nature',
         lyrics: undefined,
-        audioUrl: 'https://cdn.pixabay.com/audio/2022/01/18/audio_d0c6435fe5.mp3',
+        audioUrl: archiveUrls[0],
         status: 'completed',
         createdAt: new Date(Date.now() - 86400000).toISOString(),
         instrumental: true,
@@ -314,7 +321,7 @@ export async function getUserMusicCreations(userId: string): Promise<MusicCreati
         title: 'Méditation guidée',
         prompt: 'musique ambient pour méditation profonde',
         lyrics: 'Respirez profondément...',
-        audioUrl: 'https://cdn.pixabay.com/audio/2021/08/09/audio_dc39bede44.mp3',
+        audioUrl: archiveUrls[1],
         status: 'completed',
         createdAt: new Date(Date.now() - 172800000).toISOString(),
         instrumental: false,
@@ -326,7 +333,7 @@ export async function getUserMusicCreations(userId: string): Promise<MusicCreati
         title: 'Énergie matinale',
         prompt: 'musique motivante pour commencer la journée',
         lyrics: undefined,
-        audioUrl: 'https://cdn.pixabay.com/audio/2022/05/27/audio_1808fbf07a.mp3',
+        audioUrl: archiveUrls[2],
         status: 'completed',
         createdAt: new Date(Date.now() - 259200000).toISOString(),
         instrumental: true,

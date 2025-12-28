@@ -143,12 +143,15 @@ export async function getFavoritesCount(): Promise<number> {
     
     if (!user) return 0;
 
-    const { data, error } = await supabase
-      .rpc('get_user_favorites_count', { p_user_id: user.id });
+    // Compter directement au lieu d'utiliser une RPC inexistante
+    const { data, error, count } = await supabase
+      .from('music_favorites')
+      .select('id', { count: 'exact', head: true })
+      .eq('user_id', user.id);
 
     if (error) throw error;
 
-    return data || 0;
+    return count || 0;
   } catch (error) {
     logger.error('Failed to get favorites count', error as Error, 'MUSIC');
     return 0;
