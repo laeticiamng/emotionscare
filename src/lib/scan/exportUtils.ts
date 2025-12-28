@@ -121,7 +121,7 @@ export const exportAsCSV = (
 };
 
 /**
- * Exporte les données en format PDF
+ * Exporte les données en format PDF (version simple sans dépendance jsPDF)
  */
 export const exportAsPDF = async (
   scans: ScanData[],
@@ -132,109 +132,117 @@ export const exportAsPDF = async (
   } = options;
 
   try {
-    // PDF export temporarily disabled - jsPDF package needs to be added
-    logger.warn('PDF export feature temporarily disabled', 'LIB');
-    throw new Error('PDF export not yet implemented - please use CSV or JSON export');
-    
-    /* 
-    // TODO: Enable once jsPDF is installed
-    const doc = new jsPDF();
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const pageHeight = doc.internal.pageSize.getHeight();
-    let yPosition = 20;
+    // Générer un HTML formaté pour impression PDF
+    const avgValence = scans.length > 0 
+      ? (scans.reduce((a, s) => a + s.valence, 0) / scans.length).toFixed(1)
+      : '0';
+    const avgArousal = scans.length > 0
+      ? (scans.reduce((a, s) => a + s.arousal, 0) / scans.length).toFixed(1)
+      : '0';
 
-    // En-tête
-    doc.setFontSize(20);
-    doc.text('Rapport d\'analyse émotionnelle', pageWidth / 2, yPosition, { align: 'center' });
+    const htmlContent = `
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Rapport d'analyse émotionnelle</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 40px; max-width: 800px; margin: 0 auto; }
+    h1 { color: #1a1a2e; border-bottom: 2px solid #4f46e5; padding-bottom: 10px; }
+    h2 { color: #4f46e5; margin-top: 30px; }
+    .stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin: 20px 0; }
+    .stat-card { background: #f8fafc; padding: 20px; border-radius: 8px; text-align: center; }
+    .stat-value { font-size: 2em; font-weight: bold; color: #4f46e5; }
+    .stat-label { color: #64748b; font-size: 0.9em; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+    th { background: #4f46e5; color: white; }
+    tr:nth-child(even) { background: #f8fafc; }
+    .footer { margin-top: 40px; text-align: center; color: #94a3b8; font-size: 0.8em; }
+    @media print { body { padding: 20px; } }
+  </style>
+</head>
+<body>
+  <h1>📊 Rapport d'analyse émotionnelle</h1>
+  <p>Généré le: ${new Date().toLocaleString('fr-FR')}</p>
+  
+  <div class="stats">
+    <div class="stat-card">
+      <div class="stat-value">${scans.length}</div>
+      <div class="stat-label">Scans totaux</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">${avgValence}</div>
+      <div class="stat-label">Valence moyenne</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">${avgArousal}</div>
+      <div class="stat-label">Arousal moyen</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value">${scans.length > 0 ? new Date(scans[scans.length - 1].created_at).toLocaleDateString('fr-FR') : '-'}</div>
+      <div class="stat-label">Premier scan</div>
+    </div>
+  </div>
 
-    yPosition += 15;
-    doc.setFontSize(10);
-    doc.setTextColor(100);
-    doc.text(`Généré le: ${new Date().toLocaleString('fr-FR')}`, pageWidth / 2, yPosition, { align: 'center' });
-
-    yPosition += 20;
-
-    // Statistiques générales
-    if (scans.length > 0) {
-      const avgValence = (scans.reduce((a, s) => a + s.valence, 0) / scans.length).toFixed(1);
-      const avgArousal = (scans.reduce((a, s) => a + s.arousal, 0) / scans.length).toFixed(1);
-
-      doc.setFontSize(14);
-      doc.setTextColor(0);
-      doc.text('Statistiques globales', 20, yPosition);
-
-      yPosition += 10;
-      doc.setFontSize(10);
-      doc.setTextColor(80);
-
-      const stats = [
-        `Total de scans: ${scans.length}`,
-        `Valence moyenne: ${avgValence}`,
-        `Arousal moyen: ${avgArousal}`,
-        `Période: ${new Date(scans[scans.length - 1].created_at).toLocaleDateString('fr-FR')} - ${new Date(scans[0].created_at).toLocaleDateString('fr-FR')}`
-      ];
-
-      stats.forEach(stat => {
-        doc.text(stat, 30, yPosition);
-        yPosition += 7;
-      });
-
-      yPosition += 10;
-
-      // Tableau des données
-      doc.setFontSize(12);
-      doc.setTextColor(0);
-      doc.text('Détail des scans', 20, yPosition);
-      yPosition += 8;
-
-      // Créer un tableau avec les données
-      const tableData = scans.slice(0, 30).map(scan => {
+  <h2>Détail des scans</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Heure</th>
+        <th>Valence</th>
+        <th>Arousal</th>
+        <th>Émotion</th>
+        <th>Source</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${scans.slice(0, 50).map(scan => {
         const date = new Date(scan.created_at);
-        return [
-          date.toLocaleDateString('fr-FR'),
-          date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
-          scan.valence.toFixed(1),
-          scan.arousal.toFixed(1),
-          scan.summary || 'Neutre',
-          scan.source || 'Manuel'
-        ];
-      });
+        return `
+          <tr>
+            <td>${date.toLocaleDateString('fr-FR')}</td>
+            <td>${date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</td>
+            <td>${scan.valence.toFixed(1)}</td>
+            <td>${scan.arousal.toFixed(1)}</td>
+            <td>${scan.summary || 'Neutre'}</td>
+            <td>${scan.source || 'Manuel'}</td>
+          </tr>
+        `;
+      }).join('')}
+    </tbody>
+  </table>
+  
+  ${scans.length > 50 ? `<p style="color: #94a3b8; font-style: italic;">Affichage limité aux 50 premiers scans sur ${scans.length} total.</p>` : ''}
+  
+  <div class="footer">
+    <p>Rapport généré par EmotionsCare</p>
+    <p>Les données sont confidentielles et personnelles.</p>
+  </div>
+</body>
+</html>
+    `;
 
-      // @ts-ignore - jsPDF-autoTable
-      doc.autoTable({
-        startY: yPosition,
-        head: [['Date', 'Heure', 'Valence', 'Arousal', 'Émotion', 'Source']],
-        body: tableData,
-        theme: 'grid',
-        styles: {
-          fontSize: 9,
-          cellPadding: 3
-        },
-        headStyles: {
-          fillColor: [59, 130, 246],
-          textColor: 255,
-          fontStyle: 'bold'
-        },
-        margin: { left: 20, right: 20 }
-      });
-
-      // Pied de page
-      const pageCount = (doc as any).internal.pages.length - 1;
-      for (let i = 1; i <= pageCount; i++) {
-        doc.setPage(i);
-        doc.setFontSize(8);
-        doc.setTextColor(150);
-        doc.text(
-          `Page ${i} / ${pageCount}`,
-          pageWidth / 2,
-          pageHeight - 10,
-          { align: 'center' }
-        );
-      }
+    // Ouvrir dans une nouvelle fenêtre pour impression
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(htmlContent);
+      printWindow.document.close();
+      
+      // Attendre le chargement puis lancer l'impression
+      printWindow.onload = () => {
+        printWindow.print();
+      };
+      
+      // Fallback si onload ne se déclenche pas
+      setTimeout(() => {
+        printWindow.print();
+      }, 500);
+    } else {
+      throw new Error('Impossible d\'ouvrir la fenêtre d\'impression. Vérifiez les bloqueurs de popup.');
     }
 
-      doc.save(filename);
-    */
   } catch (error) {
     logger.error('Erreur lors de la génération du PDF:', error, 'LIB');
     throw error;
