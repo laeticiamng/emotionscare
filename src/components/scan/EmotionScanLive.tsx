@@ -1,9 +1,7 @@
-// @ts-nocheck
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { EmotionResult } from '@/types';
+import { EmotionResult } from '@/types/emotion';
 import { Mic, StopCircle } from 'lucide-react';
 
 interface EmotionScanLiveProps {
