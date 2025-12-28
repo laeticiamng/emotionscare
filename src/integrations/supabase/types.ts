@@ -15559,6 +15559,33 @@ export type Database = {
         }
         Relationships: []
       }
+      revision_history: {
+        Row: {
+          created_at: string
+          id: string
+          item_code: string
+          score: number
+          session_date: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          item_code: string
+          score?: number
+          session_date?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          item_code?: string
+          score?: number
+          session_date?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       revision_plans: {
         Row: {
           completion_rate: number | null

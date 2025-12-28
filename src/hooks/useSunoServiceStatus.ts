@@ -43,11 +43,22 @@ export const useSunoServiceStatus = () => {
 
       if (data?.status === 'ok' || data?.success) {
         const apiStatus = await getSunoApiStatus();
-        setStatus({
-          ...apiStatus,
-          is_available: true,
-          consecutive_failures: 0
-        });
+        if (apiStatus) {
+          setStatus({
+            ...apiStatus,
+            is_available: true,
+            consecutive_failures: 0
+          });
+        } else {
+          setStatus({
+            id: 'health-check',
+            is_available: true,
+            consecutive_failures: 0,
+            last_check: new Date().toISOString(),
+            response_time_ms: Date.now() - startTime,
+            error_message: undefined
+          });
+        }
       } else {
         const apiStatus = await getSunoApiStatus();
         setStatus(apiStatus);
