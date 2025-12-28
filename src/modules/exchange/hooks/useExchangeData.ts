@@ -394,6 +394,42 @@ export const useBuyEmotionAsset = () => {
   });
 };
 
+// Use Emotion Asset (Activate)
+export const useUseEmotionAsset = () => {
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+
+  return useMutation({
+    mutationFn: async ({ portfolioId, assetId }: { portfolioId: string; assetId: string }) => {
+      // Update last used
+      const { error } = await supabase
+        .from('emotion_portfolio')
+        .update({ last_used_at: new Date().toISOString() })
+        .eq('id', portfolioId);
+
+      if (error) throw error;
+
+      // Log transaction
+      await supabase
+        .from('emotion_transactions')
+        .insert({
+          user_id: user?.id,
+          asset_id: assetId,
+          transaction_type: 'use',
+          quantity: 1,
+          price_per_unit: 0,
+          total_price: 0,
+        });
+
+      return { success: true };
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['emotion-portfolio'] });
+      queryClient.invalidateQueries({ queryKey: ['emotion-transactions'] });
+    },
+  });
+}
+
 // Exchange Profile Hooks
 export const useExchangeProfile = () => {
   const { user } = useAuth();

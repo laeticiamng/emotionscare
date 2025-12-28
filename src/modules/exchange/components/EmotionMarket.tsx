@@ -55,7 +55,7 @@ import {
   TabsList,
   TabsTrigger,
 } from '@/components/ui/tabs';
-import { useEmotionAssets, useEmotionPortfolio, useBuyEmotionAsset, useEmotionTransactionHistory } from '../hooks/useExchangeData';
+import { useEmotionAssets, useEmotionPortfolio, useBuyEmotionAsset, useEmotionTransactionHistory, useUseEmotionAsset } from '../hooks/useExchangeData';
 import type { EmotionType, EmotionAsset } from '../types';
 import { toast } from 'sonner';
 import { useToast } from '@/hooks/use-toast';
@@ -104,6 +104,7 @@ const EmotionMarket: React.FC = () => {
   const { data: portfolio } = useEmotionPortfolio();
   const { data: transactionHistory } = useEmotionTransactionHistory();
   const buyAsset = useBuyEmotionAsset();
+  const useAsset = useUseEmotionAsset();
   
   const [selectedAsset, setSelectedAsset] = useState<EmotionAsset | null>(null);
   const [quantity, setQuantity] = useState(1);

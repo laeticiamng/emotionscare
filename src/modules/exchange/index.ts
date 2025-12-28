@@ -18,6 +18,7 @@ export { default as ExchangeLeaderboard } from './components/ExchangeLeaderboard
 // Profile & Requests Components
 export { default as TimeExchangeRequests } from './components/TimeExchangeRequests';
 export { default as ExchangeProfileCard } from './components/ExchangeProfileCard';
+export { default as MatchingPanel } from './components/MatchingPanel';
 
 // Hooks
 export * from './hooks/useExchangeData';
