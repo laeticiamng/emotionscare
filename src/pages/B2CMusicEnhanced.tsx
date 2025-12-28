@@ -79,12 +79,12 @@ interface VinylTrack extends MusicTrack {
   waveform?: number[];
 }
 
-// Configuration audio - URLs MP3 depuis archive.org (domaine public, CORS OK)
+// Configuration audio - URLs MP3 fiables avec CORS (fichiers de test courts)
 const AUDIO_URL_CONFIG = {
-  'vinyl-1': { fileName: 'ambient-soft.mp3', fallbackUrl: 'https://ia800905.us.archive.org/19/items/FREE_background_music_dridge/Kevin_MacLeod_-_Waltz_of_the_Flowers_-_Tchaikovsky.mp3' },
-  'vinyl-2': { fileName: 'focus-clarity.mp3', fallbackUrl: 'https://ia800905.us.archive.org/19/items/FREE_background_music_dridge/Kevin_MacLeod_-_Gymnopedie_No_1.mp3' },
-  'vinyl-3': { fileName: 'creative-flow.mp3', fallbackUrl: 'https://ia800905.us.archive.org/19/items/FREE_background_music_dridge/Kevin_MacLeod_-_Canon_in_D.mp3' },
-  'vinyl-4': { fileName: 'healing-waves.mp3', fallbackUrl: 'https://ia800905.us.archive.org/19/items/FREE_background_music_dridge/Kevin_MacLeod_-_Serenade.mp3' }
+  'vinyl-1': { fileName: 'ambient-soft.mp3', fallbackUrl: 'https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3' },
+  'vinyl-2': { fileName: 'focus-clarity.mp3', fallbackUrl: 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_8cb749d484.mp3' },
+  'vinyl-3': { fileName: 'creative-flow.mp3', fallbackUrl: 'https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0c6ff1bab.mp3' },
+  'vinyl-4': { fileName: 'healing-waves.mp3', fallbackUrl: 'https://cdn.pixabay.com/download/audio/2021/08/04/audio_0625c1539c.mp3' }
 } as const;
 
 // Données vinyles
