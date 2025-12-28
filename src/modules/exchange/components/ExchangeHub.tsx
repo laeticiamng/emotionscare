@@ -21,7 +21,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useExchangeProfile, useExchangeHubStats, useImprovementGoals } from '../hooks/useExchangeData';
+import { useExchangeProfile, useExchangeHubStats, useImprovementGoals, useMarketTrends } from '../hooks/useExchangeData';
 import ImprovementMarket from './ImprovementMarket';
 import TrustMarket from './TrustMarket';
 import TimeExchangeMarket from './TimeExchangeMarket';
@@ -33,6 +33,8 @@ import ExchangeNotifications from './ExchangeNotifications';
 import EmotionPortfolioPanel from './EmotionPortfolioPanel';
 import ExchangeDataExport from './ExchangeDataExport';
 import ImprovementProgressChart from './ImprovementProgressChart';
+import { MarketStatsCard } from './MarketTrendChart';
+import TrustActivityFeed from './TrustActivityFeed';
 
 const getMarkets = (stats: { improvement: { avgScore: string }; trust: { totalPool: string }; time: { activeOffers: string }; emotion: { volume24h: string } } | undefined) => [
   {
@@ -74,6 +76,7 @@ const ExchangeHub: React.FC = () => {
   const { data: profile } = useExchangeProfile();
   const { data: hubStats } = useExchangeHubStats();
   const { data: goals } = useImprovementGoals();
+  const { data: trends } = useMarketTrends(7);
   const markets = getMarkets(hubStats);
 
   return (
@@ -278,6 +281,38 @@ const ExchangeHub: React.FC = () => {
         <div className="container mx-auto px-4 pb-12 space-y-6">
           {/* Portfolio Panel */}
           <EmotionPortfolioPanel compact />
+
+          {/* Market Trend Charts */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <MarketStatsCard
+              title="Improvement"
+              value={hubStats?.improvement.avgScore || '72%'}
+              data={trends?.improvement?.length ? trends.improvement : [65, 68, 72, 70, 75, 78, 72]}
+              icon={<TrendingUp className="w-4 h-4 text-emerald-500" />}
+              color="hsl(160, 84%, 39%)"
+            />
+            <MarketStatsCard
+              title="Trust Pool"
+              value={hubStats?.trust.totalPool || '12.4K'}
+              data={trends?.trust?.length ? trends.trust : [10, 11, 10.5, 12, 11.8, 12.2, 12.4]}
+              icon={<Shield className="w-4 h-4 text-blue-500" />}
+              color="hsl(217, 91%, 60%)"
+            />
+            <MarketStatsCard
+              title="Time Offers"
+              value={hubStats?.time.activeOffers || '847'}
+              data={trends?.time?.length ? trends.time : [750, 780, 800, 820, 810, 840, 847]}
+              icon={<Clock className="w-4 h-4 text-amber-500" />}
+              color="hsl(38, 92%, 50%)"
+            />
+            <MarketStatsCard
+              title="Emotion Volume"
+              value={hubStats?.emotion.volume24h || '2.3K'}
+              data={trends?.emotion?.length ? trends.emotion : [1800, 2000, 1900, 2200, 2100, 2400, 2300]}
+              icon={<Heart className="w-4 h-4 text-pink-500" />}
+              color="hsl(330, 81%, 60%)"
+            />
+          </div>
           
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 space-y-6">
@@ -286,6 +321,8 @@ const ExchangeHub: React.FC = () => {
               {goals && goals.length > 0 && (
                 <ImprovementProgressChart goals={goals} />
               )}
+              {/* Trust Activity Feed */}
+              <TrustActivityFeed />
               {/* Matching Panel */}
               <MatchingPanel marketType="time" />
             </div>

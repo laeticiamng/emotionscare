@@ -164,15 +164,15 @@ export const useCreateTrustProject = () => {
   });
 };
 
-export const useTrustLeaderboard = () => {
+export const useTrustLeaderboard = (limit: number = 10) => {
   return useQuery({
-    queryKey: ['trust-leaderboard'],
+    queryKey: ['trust-leaderboard', limit],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('trust_profiles')
         .select('*')
         .order('trust_score', { ascending: false })
-        .limit(5);
+        .limit(limit);
       
       if (error) throw error;
       return data;
@@ -584,9 +584,9 @@ export const useExchangeProfile = () => {
   });
 };
 
-export const useLeaderboard = (marketType: string, period: string = 'weekly') => {
+export const useLeaderboard = (marketType: string, period: string = 'weekly', limit: number = 50) => {
   return useQuery({
-    queryKey: ['leaderboard', marketType, period],
+    queryKey: ['leaderboard', marketType, period, limit],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('exchange_leaderboards')
@@ -597,7 +597,7 @@ export const useLeaderboard = (marketType: string, period: string = 'weekly') =>
         .eq('market_type', marketType)
         .eq('period', period)
         .order('score', { ascending: false })
-        .limit(50);
+        .limit(limit);
       
       if (error) throw error;
       return data;
@@ -780,5 +780,58 @@ export const useExchangeStats = () => {
       };
     },
     enabled: !!user?.id,
+  });
+};
+
+// Market Trends Hook - Get historical data for charts
+export const useMarketTrends = (days: number = 7) => {
+  return useQuery({
+    queryKey: ['market-trends', days],
+    queryFn: async () => {
+      const startDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
+      
+      // Fetch improvement scores over time
+      const [goalsRes, trustRes, offersRes, emotionRes] = await Promise.all([
+        supabase
+          .from('improvement_logs')
+          .select('created_at, new_value')
+          .gte('created_at', startDate)
+          .order('created_at', { ascending: true }),
+        supabase
+          .from('trust_transactions')
+          .select('created_at, amount')
+          .gte('created_at', startDate)
+          .order('created_at', { ascending: true }),
+        supabase
+          .from('time_offers')
+          .select('created_at')
+          .gte('created_at', startDate)
+          .order('created_at', { ascending: true }),
+        supabase
+          .from('emotion_transactions')
+          .select('created_at, total_price')
+          .gte('created_at', startDate)
+          .order('created_at', { ascending: true }),
+      ]);
+
+      // Group by day and compute metrics
+      const groupByDay = (data: any[], valueKey?: string) => {
+        const groups: Record<string, number[]> = {};
+        data?.forEach(item => {
+          const day = new Date(item.created_at).toISOString().split('T')[0];
+          if (!groups[day]) groups[day] = [];
+          groups[day].push(valueKey ? item[valueKey] : 1);
+        });
+        return Object.values(groups).map(vals => vals.reduce((a, b) => a + b, 0) / vals.length);
+      };
+
+      return {
+        improvement: groupByDay(goalsRes.data || [], 'new_value').slice(-7),
+        trust: groupByDay(trustRes.data || [], 'amount').slice(-7),
+        time: groupByDay(offersRes.data || []).slice(-7),
+        emotion: groupByDay(emotionRes.data || [], 'total_price').slice(-7),
+      };
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 };

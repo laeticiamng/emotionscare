@@ -87,7 +87,7 @@ export const ExchangeNotifications: React.FC = () => {
 
     // Subscribe to time exchange requests
     const timeChannel = supabase
-      .channel('time_exchanges_notifications')
+      .channel(`time_exchanges_notifications_${user.id}`)
       .on(
         'postgres_changes',
         {
@@ -114,7 +114,7 @@ export const ExchangeNotifications: React.FC = () => {
 
     // Subscribe to trust transactions
     const trustChannel = supabase
-      .channel('trust_transactions_notifications')
+      .channel(`trust_transactions_notifications_${user.id}`)
       .on(
         'postgres_changes',
         {
