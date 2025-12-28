@@ -1,5 +1,4 @@
 // @ts-nocheck
-
 import { EmotionResult, EmotionVector } from '@/types/emotion';
 import { BASE_EMOTIONS, EMOTION_CATEGORIES } from './constants';
 
