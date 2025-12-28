@@ -107,10 +107,10 @@ async function fetchUserContext(userId: string): Promise<UserContext> {
       .maybeSingle(),
     supabase
       .from('user_goals')
-      .select('module_type')
+      .select('id, completed')
       .eq('user_id', userId)
       .eq('completed', true)
-      .order('completed_at', { ascending: false })
+      .order('created_at', { ascending: false })
       .limit(5)
   ]);
 
@@ -119,7 +119,7 @@ async function fetchUserContext(userId: string): Promise<UserContext> {
     lastScanTime: lastScan.data?.created_at ? new Date(lastScan.data.created_at) : undefined,
     streakDays: userStats.data?.streak_days || 0,
     weeklyGoals: 0,
-    preferredModules: recentModules.data?.map(g => g.module_type).filter(Boolean) as string[] || []
+    preferredModules: [] // Simplified - module_type doesn't exist in user_goals
   };
 }
 
