@@ -61,16 +61,16 @@ const CATEGORY_CONFIG = {
   similar: { label: 'Similaire', icon: Heart, color: 'text-pink-500' },
 };
 
-// URLs audio publiques depuis archive.org (CORS OK)
+// URLs audio Pixabay (CORS OK)
 const DEMO_AUDIO_URLS = [
-  'https://ia800905.us.archive.org/19/items/FREE_background_music_dridge/Kevin_MacLeod_-_Waltz_of_the_Flowers_-_Tchaikovsky.mp3',
-  'https://ia800905.us.archive.org/19/items/FREE_background_music_dridge/Kevin_MacLeod_-_Gymnopedie_No_1.mp3',
-  'https://ia800905.us.archive.org/19/items/FREE_background_music_dridge/Kevin_MacLeod_-_Canon_in_D.mp3',
-  'https://ia800905.us.archive.org/19/items/FREE_background_music_dridge/Kevin_MacLeod_-_Serenade.mp3',
-  'https://ia800905.us.archive.org/19/items/FREE_background_music_dridge/Kevin_MacLeod_-_Scheming_Weasel.mp3',
-  'https://ia800905.us.archive.org/19/items/FREE_background_music_dridge/Kevin_MacLeod_-_Cipher.mp3',
-  'https://ia800905.us.archive.org/19/items/FREE_background_music_dridge/Kevin_MacLeod_-_Moonlight_Sonata.mp3',
-  'https://ia800905.us.archive.org/19/items/FREE_background_music_dridge/Kevin_MacLeod_-_Vivaldi_Spring.mp3',
+  'https://cdn.pixabay.com/audio/2022/05/27/audio_1808fbf07a.mp3',
+  'https://cdn.pixabay.com/audio/2021/04/06/audio_63aa86e805.mp3',
+  'https://cdn.pixabay.com/audio/2022/10/25/audio_946b0939c8.mp3',
+  'https://cdn.pixabay.com/audio/2022/03/15/audio_8cb749d484.mp3',
+  'https://cdn.pixabay.com/audio/2022/08/02/audio_884fe92c21.mp3',
+  'https://cdn.pixabay.com/audio/2022/01/18/audio_d0c6ff1bab.mp3',
+  'https://cdn.pixabay.com/audio/2022/05/16/audio_115b9c9d6d.mp3',
+  'https://cdn.pixabay.com/audio/2021/08/04/audio_0625c1539c.mp3',
 ];
 
 // Génère des recommandations basées sur l'émotion actuelle avec URLs audio valides
