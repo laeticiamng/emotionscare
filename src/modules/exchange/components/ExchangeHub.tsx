@@ -19,21 +19,21 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useExchangeProfile } from '../hooks/useExchangeData';
+import { useExchangeProfile, useExchangeHubStats } from '../hooks/useExchangeData';
 import ImprovementMarket from './ImprovementMarket';
 import TrustMarket from './TrustMarket';
 import TimeExchangeMarket from './TimeExchangeMarket';
 import EmotionMarket from './EmotionMarket';
 import ExchangeLeaderboard from './ExchangeLeaderboard';
 
-const markets = [
+const getMarkets = (stats: { improvement: { avgScore: string }; trust: { totalPool: string }; time: { activeOffers: string }; emotion: { volume24h: string } } | undefined) => [
   {
     id: 'improvement',
     name: 'Improvement Market',
     icon: TrendingUp,
     color: 'from-emerald-500 to-teal-600',
     description: 'Trackez et valorisez votre progression personnelle',
-    stats: { label: 'Score moyen', value: '72%' }
+    stats: { label: 'Score moyen', value: stats?.improvement.avgScore || '72%' }
   },
   {
     id: 'trust',
@@ -41,7 +41,7 @@ const markets = [
     icon: Shield,
     color: 'from-blue-500 to-indigo-600',
     description: 'Échangez et investissez votre confiance',
-    stats: { label: 'Pool total', value: '12.4K' }
+    stats: { label: 'Pool total', value: stats?.trust.totalPool || '12.4K' }
   },
   {
     id: 'time',
@@ -49,7 +49,7 @@ const markets = [
     icon: Clock,
     color: 'from-amber-500 to-orange-600',
     description: 'Échangez votre temps et vos compétences',
-    stats: { label: 'Offres actives', value: '847' }
+    stats: { label: 'Offres actives', value: stats?.time.activeOffers || '847' }
   },
   {
     id: 'emotion',
@@ -57,13 +57,15 @@ const markets = [
     icon: Heart,
     color: 'from-pink-500 to-rose-600',
     description: 'Achetez et vendez des expériences émotionnelles',
-    stats: { label: 'Volume 24h', value: '2.3K' }
+    stats: { label: 'Volume 24h', value: stats?.emotion.volume24h || '2.3K' }
   }
 ];
 
 const ExchangeHub: React.FC = () => {
   const [activeMarket, setActiveMarket] = useState<string | null>(null);
   const { data: profile } = useExchangeProfile();
+  const { data: hubStats } = useExchangeHubStats();
+  const markets = getMarkets(hubStats);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
