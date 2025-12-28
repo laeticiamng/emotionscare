@@ -1,18 +1,24 @@
-// @ts-nocheck
+/**
+ * Hook pour le badge de notifications
+ * Affiche le nombre de notifications non lues
+ */
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase';
+import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { logger } from '@/lib/logger';
+import { RealtimeChannel } from '@supabase/supabase-js';
 
-interface NotificationBadge {
+interface NotificationBadgeState {
   count: number;
-  badgesCount?: number;
-  notificationsCount?: number;
+  badgesCount: number;
+  notificationsCount: number;
   isLoading: boolean;
+  markAsRead: () => void;
+  markAllAsRead: () => void;
 }
 
-export const useNotificationBadge = (): NotificationBadge => {
+export const useNotificationBadge = (): NotificationBadgeState => {
   const [count, setCount] = useState(0);
   const [badgesCount, setBadgesCount] = useState(0);
   const [notificationsCount, setNotificationsCount] = useState(0);
@@ -20,53 +26,111 @@ export const useNotificationBadge = (): NotificationBadge => {
   const { user } = useAuth();
 
   useEffect(() => {
-    if (!user) {
+    if (!user?.id) {
       setIsLoading(false);
       return;
     }
 
-    const loadNotifications = async () => {
+    let channel: RealtimeChannel | null = null;
+
+    const loadCounts = async () => {
       try {
-        // This is a mock implementation
-        // In a real app, you'd fetch notifications and badges from the database
+        // Charger les notifications non lues
+        const { count: unreadCount, error } = await supabase
+          .from('in_app_notifications')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', user.id)
+          .eq('read', false);
+
+        if (error) {
+          if (error.code === '42P01') {
+            // Table doesn't exist, silent fail
+            setIsLoading(false);
+            return;
+          }
+          throw error;
+        }
+
+        const total = unreadCount || 0;
         
-        // Simulate API call delay
-        await new Promise(resolve => setTimeout(resolve, 500));
-        
-        // Mock data - random number of notifications between 0 and 5
-        const newBadgesCount = Math.floor(Math.random() * 3);
-        const newNotificationsCount = Math.floor(Math.random() * 3);
-        const totalCount = newBadgesCount + newNotificationsCount;
-        
-        setBadgesCount(newBadgesCount);
-        setNotificationsCount(newNotificationsCount);
-        setCount(totalCount);
+        // Charger les badges non lus (type badge_unlocked)
+        const { count: badges } = await supabase
+          .from('in_app_notifications')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', user.id)
+          .eq('read', false)
+          .eq('type', 'badge_unlocked');
+
+        setBadgesCount(badges || 0);
+        setNotificationsCount(total - (badges || 0));
+        setCount(total);
       } catch (error) {
-        logger.error('Error loading notifications', error as Error, 'SYSTEM');
+        logger.warn('Error loading notification counts', 'useNotificationBadge');
       } finally {
         setIsLoading(false);
       }
     };
 
-    loadNotifications();
-    
-    // Set up real-time subscription for new notifications
-    // This is a mock; in a real app you'd use Supabase real-time or WebSockets
-    const interval = setInterval(() => {
-      // Randomly decide if there's a new notification (10% chance)
-      if (Math.random() < 0.1) {
-        setCount(prevCount => prevCount + 1);
-        setNotificationsCount(prevCount => prevCount + 1);
+    // Subscription temps réel
+    const setupRealtime = () => {
+      channel = supabase
+        .channel(`notification_badge_${user.id}`)
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'in_app_notifications',
+            filter: `user_id=eq.${user.id}`,
+          },
+          () => {
+            // Recharger les compteurs à chaque changement
+            loadCounts();
+          }
+        )
+        .subscribe();
+    };
+
+    loadCounts();
+    setupRealtime();
+
+    return () => {
+      if (channel) {
+        supabase.removeChannel(channel);
       }
-    }, 30000); // Check every 30 seconds
+    };
+  }, [user?.id]);
+
+  const markAsRead = () => {
+    setCount(0);
+    setBadgesCount(0);
+    setNotificationsCount(0);
+  };
+
+  const markAllAsRead = async () => {
+    if (!user?.id) return;
     
-    return () => clearInterval(interval);
-  }, [user]);
+    try {
+      await supabase
+        .from('in_app_notifications')
+        .update({ read: true })
+        .eq('user_id', user.id)
+        .eq('read', false);
+
+      setCount(0);
+      setBadgesCount(0);
+      setNotificationsCount(0);
+    } catch (error) {
+      logger.error('Error marking all as read', error as Error, 'useNotificationBadge');
+    }
+  };
 
   return {
     count,
     badgesCount,
     notificationsCount,
-    isLoading
+    isLoading,
+    markAsRead,
+    markAllAsRead,
   };
 };
