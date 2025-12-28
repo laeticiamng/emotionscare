@@ -86,3 +86,47 @@ export type SunoGenerationResult = z.infer<typeof sunoGenerationResultSchema>;
 export type MusicGenerationSession = z.infer<typeof musicGenerationSessionSchema>;
 export type CreateMusicGenerationInput = z.infer<typeof createMusicGenerationSchema>;
 export type ListMusicSessionsInput = z.infer<typeof listMusicSessionsSchema>;
+
+// ============================================
+// Frontend-compatible type aliases
+// ============================================
+
+/**
+ * MusicTrack - Compatible avec src/types/music.ts
+ * Utilisé pour la lecture et l'affichage
+ */
+export const musicTrackSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  artist: z.string(),
+  url: z.string(),
+  audioUrl: z.string(),
+  duration: z.number(),
+  emotion: z.string().optional(),
+  mood: z.string().optional(),
+  coverUrl: z.string().optional(),
+  tags: z.string().optional(),
+  isGenerated: z.boolean().optional(),
+  generatedAt: z.string().optional(),
+  sunoTaskId: z.string().optional(),
+  bpm: z.number().optional(),
+  status: z.enum(['pending', 'generating', 'completed', 'failed']).optional(),
+});
+
+export type MusicTrack = z.infer<typeof musicTrackSchema>;
+
+/**
+ * GenerationResponse - Réponse standard de génération
+ */
+export const generationResponseSchema = z.object({
+  taskId: z.string(),
+  trackId: z.string().optional(),
+  status: z.enum(['pending', 'processing', 'completed', 'failed']),
+  audioUrl: z.string().optional(),
+  imageUrl: z.string().optional(),
+  title: z.string().optional(),
+  duration: z.number().optional(),
+  error: z.string().optional(),
+});
+
+export type GenerationResponse = z.infer<typeof generationResponseSchema>;

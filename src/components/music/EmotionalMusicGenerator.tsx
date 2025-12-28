@@ -3,16 +3,17 @@
  * Composant de génération de musique basée sur les émotions
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { LazyMotionWrapper, m, AnimatePresence } from '@/utils/lazy-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { Sparkles, Brain, Music2, Heart, Zap, Loader2, Play, Download } from '@/components/music/icons';
+import { Sparkles, Brain, Music2, Heart, Zap, Loader2, Play, Download, Settings } from '@/components/music/icons';
 import { useEmotionalMusicAI } from '@/hooks/useEmotionalMusicAI';
 import { useMusic } from '@/hooks/useMusic';
 import { cn } from '@/lib/utils';
+import { logger } from '@/lib/logger';
 
 const emotionIcons: Record<string, any> = {
   joy: Sparkles,
@@ -34,6 +35,16 @@ const emotionColors: Record<string, string> = {
   neutral: 'from-gray-500 to-slate-400',
 };
 
+// Status messages for generation phases
+const GENERATION_PHASES = [
+  { min: 0, max: 15, message: 'Analyse de votre profil émotionnel...' },
+  { min: 15, max: 30, message: 'Envoi à Suno AI...' },
+  { min: 30, max: 50, message: 'Composition musicale en cours...' },
+  { min: 50, max: 75, message: 'Harmonisation des fréquences...' },
+  { min: 75, max: 90, message: 'Finalisation de la piste...' },
+  { min: 90, max: 100, message: 'Préparation du rendu audio...' },
+];
+
 export const EmotionalMusicGenerator: React.FC = () => {
   const {
     isAnalyzing,
@@ -43,12 +54,32 @@ export const EmotionalMusicGenerator: React.FC = () => {
     currentGeneration,
     recommendations,
     analyzeEmotions,
-    generateFromCurrentEmotion,
+    generateMusicForEmotion,
     pollGenerationStatus,
   } = useEmotionalMusicAI();
 
   const { play } = useMusic();
   const [completedTrack, setCompletedTrack] = useState<any>(null);
+  const [mlParams, setMlParams] = useState<any>(null);
+
+  // Load ML params from sessionStorage
+  useEffect(() => {
+    const stored = sessionStorage.getItem('ml_suno_params');
+    if (stored) {
+      try {
+        setMlParams(JSON.parse(stored));
+        logger.info('ML params loaded for generation', JSON.parse(stored), 'MUSIC');
+      } catch {
+        setMlParams(null);
+      }
+    }
+  }, []);
+
+  // Get current phase message
+  const currentPhaseMessage = useMemo(() => {
+    const phase = GENERATION_PHASES.find(p => generationProgress >= p.min && generationProgress < p.max);
+    return phase?.message || 'Génération en cours...';
+  }, [generationProgress]);
 
   // Analyser automatiquement au montage
   useEffect(() => {
@@ -68,12 +99,20 @@ export const EmotionalMusicGenerator: React.FC = () => {
     }
   }, [currentGeneration, completedTrack, pollGenerationStatus]);
 
-  const handleGenerate = async () => {
-    const result = await generateFromCurrentEmotion();
+  const handleGenerate = useCallback(async () => {
+    // Use ML params if available, otherwise use emotion analysis
+    const emotion = emotionAnalysis?.dominantEmotion || 'neutral';
+    const customPrompt = mlParams ? 
+      `${mlParams.style} ${mlParams.mood} ${mlParams.bpm}BPM ${mlParams.tags?.join(' ') || ''}` : 
+      undefined;
+    
+    logger.info('Starting generation', { emotion, mlParams, customPrompt }, 'MUSIC');
+    
+    const result = await generateMusicForEmotion(emotion, customPrompt);
     if (result) {
       setCompletedTrack(null);
     }
-  };
+  }, [emotionAnalysis, mlParams, generateMusicForEmotion]);
 
   const handlePlay = () => {
     if (completedTrack?.audio_url) {
@@ -188,13 +227,20 @@ export const EmotionalMusicGenerator: React.FC = () => {
               <CardContent className="pt-6">
                 <div className="space-y-3">
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">Génération IA en cours...</span>
+                    <span className="text-muted-foreground">{currentPhaseMessage}</span>
                     <span className="font-medium">{generationProgress}%</span>
                   </div>
                   <Progress value={generationProgress} className="h-2" />
-                  <p className="text-xs text-muted-foreground text-center">
-                    Création de votre composition unique avec Suno AI
-                  </p>
+                  <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                    <span>Création de votre composition unique avec Suno AI</span>
+                  </div>
+                  {mlParams && (
+                    <div className="flex items-center justify-center gap-2 text-xs text-primary/80">
+                      <Settings className="h-3 w-3" />
+                      <span>Paramètres ML: {mlParams.style} • {mlParams.bpm} BPM</span>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
