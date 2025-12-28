@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React from 'react';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import LoadingAnimation from "@/components/ui/loading-animation";
@@ -18,8 +16,8 @@ const AnalysisDialog: React.FC<AnalysisDialogProps> = ({ open, onOpenChange }) =
         <div className="flex flex-col items-center justify-center py-8">
           <LoadingAnimation 
             text="Notre IA analyse votre état émotionnel..." 
-            className="mb-4"
-            iconClassName="h-12 w-12"
+            variant="premium"
+            size="lg"
           />
           <div className="text-center max-w-sm">
             <p className="text-sm text-muted-foreground mt-4">

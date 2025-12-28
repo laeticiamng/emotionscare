@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { useState, useEffect, useCallback } from 'react';
 import { EmotionResult } from '@/types';
 import { useToast } from '@/hooks/use-toast';

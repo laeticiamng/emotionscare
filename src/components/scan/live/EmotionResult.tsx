@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React from 'react';
 import { Progress } from '@/components/ui/progress';
 import { getEmotionIcon, getEmotionColor } from '@/lib/emotionUtils';

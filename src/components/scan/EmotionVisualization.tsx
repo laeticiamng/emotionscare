@@ -1,13 +1,11 @@
-// @ts-nocheck
-
 import React from 'react';
 import { motion } from 'framer-motion';
-import { EmotionResult } from '@/types/emotion';
+import { EmotionResultExtended } from '@/types/emotion';
 import { Badge } from '@/components/ui/badge';
-import { Star, Heart, Brain, Activity } from 'lucide-react';
+import { Star, Brain, Activity } from 'lucide-react';
 
 interface EmotionVisualizationProps {
-  result: EmotionResult;
+  result: EmotionResultExtended;
 }
 
 const EmotionVisualization: React.FC<EmotionVisualizationProps> = ({ result }) => {
@@ -51,19 +49,23 @@ const EmotionVisualization: React.FC<EmotionVisualizationProps> = ({ result }) =
         <div className="flex flex-wrap justify-center gap-2">
           <Badge variant="outline">
             <Star className="w-3 h-3 mr-1" />
-            Confiance: {result.confidence.overall.toFixed(1)}%
+            Confiance: {(result.confidence * 100).toFixed(1)}%
           </Badge>
-          <Badge variant="outline">
-            <Activity className="w-3 h-3 mr-1" />
-            Valence: {(result.vector.valence * 100).toFixed(0)}%
-          </Badge>
-          <Badge variant="outline">
-            <Brain className="w-3 h-3 mr-1" />
-            Arousal: {(result.vector.arousal * 100).toFixed(0)}%
-          </Badge>
+          {result.vector && (
+            <>
+              <Badge variant="outline">
+                <Activity className="w-3 h-3 mr-1" />
+                Valence: {(result.vector.valence * 100).toFixed(0)}%
+              </Badge>
+              <Badge variant="outline">
+                <Brain className="w-3 h-3 mr-1" />
+                Arousal: {(result.vector.arousal * 100).toFixed(0)}%
+              </Badge>
+            </>
+          )}
         </div>
         
-        {result.predictions && (
+        {result.predictions?.nextEmotionLikely && (
           <div className="text-sm text-muted-foreground">
             <p>Prochaine émotion probable: <strong>{result.predictions.nextEmotionLikely}</strong></p>
           </div>

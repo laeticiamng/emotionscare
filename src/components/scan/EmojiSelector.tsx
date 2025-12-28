@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Smile, Heart, User, Coffee, Sun, Moon, BadgeCheck, X, Search } from 'lucide-react';
