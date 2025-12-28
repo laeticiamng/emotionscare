@@ -1,12 +1,13 @@
 /**
  * useSunoVinyl - Hook pour générer la musique des vinyls via Suno API
- * Gère la génération, le polling du statut, et les fallbacks
+ * Avec cache DB pour éviter re-génération et affichage crédits
  */
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 
 // Mapping des catégories vinyl vers les prompts Suno
 const VINYL_PROMPTS: Record<string, { prompt: string; style: string; mood: string }> = {
@@ -47,16 +48,97 @@ interface GenerationState {
   isFallback: boolean;
 }
 
+interface SunoCredits {
+  remaining: number;
+  total: number;
+  plan?: string;
+  loading: boolean;
+}
+
+interface CachedTrack {
+  id: string;
+  audio_url: string;
+  is_fallback: boolean;
+  expires_at: string;
+}
+
 interface UseSunoVinylReturn {
   generateForVinyl: (vinylId: string, category: string, title: string) => Promise<string | null>;
   generationState: Record<string, GenerationState>;
   cancelGeneration: (vinylId: string) => void;
+  credits: SunoCredits;
+  refreshCredits: () => Promise<void>;
 }
 
 export function useSunoVinyl(): UseSunoVinylReturn {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [generationState, setGenerationState] = useState<Record<string, GenerationState>>({});
+  const [credits, setCredits] = useState<SunoCredits>({ remaining: -1, total: -1, loading: true });
   const abortControllers = useRef<Record<string, AbortController>>({});
+  const cacheRef = useRef<Record<string, CachedTrack>>({});
+
+  // Charger les crédits au montage
+  const refreshCredits = useCallback(async () => {
+    setCredits(prev => ({ ...prev, loading: true }));
+    try {
+      const { data, error } = await supabase.functions.invoke('suno-music', {
+        body: { action: 'credits' }
+      });
+      
+      if (!error && data?.success && data?.credits) {
+        setCredits({
+          remaining: data.credits.remaining,
+          total: data.credits.total,
+          plan: data.credits.plan,
+          loading: false
+        });
+      } else {
+        setCredits(prev => ({ ...prev, loading: false }));
+      }
+    } catch (err) {
+      logger.warn('Failed to fetch Suno credits', err as Error, 'MUSIC');
+      setCredits(prev => ({ ...prev, loading: false }));
+    }
+  }, []);
+
+  useEffect(() => {
+    refreshCredits();
+  }, [refreshCredits]);
+
+  // Charger le cache depuis la DB
+  useEffect(() => {
+    if (!user) return;
+    
+    const loadCache = async () => {
+      try {
+        const { data } = await supabase
+          .from('suno_generated_tracks')
+          .select('vinyl_id, audio_url, is_fallback, expires_at')
+          .eq('user_id', user.id)
+          .eq('status', 'completed')
+          .gt('expires_at', new Date().toISOString());
+        
+        if (data) {
+          const cache: Record<string, CachedTrack> = {};
+          data.forEach((track: any) => {
+            cache[track.vinyl_id] = {
+              id: track.vinyl_id,
+              audio_url: track.audio_url,
+              is_fallback: track.is_fallback,
+              expires_at: track.expires_at
+            };
+          });
+          cacheRef.current = cache;
+          logger.info(`Loaded ${data.length} cached Suno tracks`, {}, 'MUSIC');
+        }
+      } catch (err) {
+        logger.warn('Failed to load Suno cache', err as Error, 'MUSIC');
+      }
+    };
+    
+    loadCache();
+  }, [user]);
 
   const updateState = useCallback((vinylId: string, updates: Partial<GenerationState>) => {
     setGenerationState(prev => ({
@@ -70,6 +152,41 @@ export function useSunoVinyl(): UseSunoVinylReturn {
       }
     }));
   }, []);
+
+  const saveToCache = useCallback(async (
+    vinylId: string,
+    category: string,
+    title: string,
+    audioUrl: string,
+    isFallback: boolean,
+    taskId?: string
+  ) => {
+    if (!user) return;
+    
+    try {
+      await supabase.from('suno_generated_tracks').upsert({
+        user_id: user.id,
+        vinyl_id: vinylId,
+        category,
+        title,
+        audio_url: audioUrl,
+        is_fallback: isFallback,
+        task_id: taskId,
+        status: 'completed',
+        completed_at: new Date().toISOString(),
+        expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() // 7 days
+      }, { onConflict: 'user_id,vinyl_id' });
+      
+      cacheRef.current[vinylId] = {
+        id: vinylId,
+        audio_url: audioUrl,
+        is_fallback: isFallback,
+        expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
+      };
+    } catch (err) {
+      logger.warn('Failed to save to Suno cache', err as Error, 'MUSIC');
+    }
+  }, [user]);
 
   const pollForCompletion = useCallback(async (
     taskId: string,
@@ -127,6 +244,26 @@ export function useSunoVinyl(): UseSunoVinylReturn {
     category: string,
     title: string
   ): Promise<string | null> => {
+    // Check cache first
+    const cached = cacheRef.current[vinylId];
+    if (cached && new Date(cached.expires_at) > new Date()) {
+      logger.info(`Using cached track for ${vinylId}`, {}, 'MUSIC');
+      updateState(vinylId, {
+        isGenerating: false,
+        progress: 100,
+        isFallback: cached.is_fallback
+      });
+      
+      if (!cached.is_fallback) {
+        toast({
+          title: "🎵 Track en cache",
+          description: `"${title}" chargée instantanément`,
+        });
+      }
+      
+      return cached.audio_url;
+    }
+
     // Cancel any existing generation for this vinyl
     if (abortControllers.current[vinylId]) {
       abortControllers.current[vinylId].abort();
@@ -172,6 +309,12 @@ export function useSunoVinyl(): UseSunoVinylReturn {
           isFallback
         });
         
+        // Save to cache
+        await saveToCache(vinylId, category, title, audioUrl, isFallback, taskId);
+        
+        // Refresh credits after generation
+        refreshCredits();
+        
         if (!isFallback) {
           toast({
             title: "🎵 Musique générée !",
@@ -188,7 +331,7 @@ export function useSunoVinyl(): UseSunoVinylReturn {
         
         toast({
           title: "🎹 Génération en cours...",
-          description: `Création de "${title}" via IA`,
+          description: `Création de "${title}" via IA (~30s)`,
         });
 
         const generatedUrl = await pollForCompletion(taskId, vinylId);
@@ -199,6 +342,12 @@ export function useSunoVinyl(): UseSunoVinylReturn {
             progress: 100,
             isFallback: false
           });
+          
+          // Save to cache
+          await saveToCache(vinylId, category, title, generatedUrl, false, taskId);
+          
+          // Refresh credits after generation
+          refreshCredits();
           
           toast({
             title: "🎵 Musique générée !",
@@ -220,9 +369,12 @@ export function useSunoVinyl(): UseSunoVinylReturn {
       updateState(vinylId, {
         isGenerating: false,
         progress: 100,
-        error: null, // Don't show error, we have fallback
+        error: null,
         isFallback: true
       });
+
+      // Save fallback to cache too (shorter expiry)
+      await saveToCache(vinylId, category, title, fallbackUrl, true);
 
       toast({
         title: "Mode démo",
@@ -234,7 +386,7 @@ export function useSunoVinyl(): UseSunoVinylReturn {
     } finally {
       delete abortControllers.current[vinylId];
     }
-  }, [toast, updateState, pollForCompletion]);
+  }, [toast, updateState, pollForCompletion, saveToCache, refreshCredits]);
 
   const cancelGeneration = useCallback((vinylId: string) => {
     if (abortControllers.current[vinylId]) {
@@ -251,6 +403,8 @@ export function useSunoVinyl(): UseSunoVinylReturn {
   return {
     generateForVinyl,
     generationState,
-    cancelGeneration
+    cancelGeneration,
+    credits,
+    refreshCredits
   };
 }

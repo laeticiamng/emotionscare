@@ -47,12 +47,8 @@ const INTEGRATIONS: Integration[] = [
     name: 'Spotify',
     icon: '🎵',
     color: '#1DB954',
-    connected: true,
-    username: 'user@example.com',
-    syncEnabled: true,
-    lastSync: new Date(Date.now() - 3600000),
-    playlistCount: 24,
-    trackCount: 856,
+    connected: false,
+    syncEnabled: false,
   },
   {
     id: 'apple_music',
@@ -79,6 +75,8 @@ const INTEGRATIONS: Integration[] = [
     syncEnabled: false,
   },
 ];
+
+// Note: Ces intégrations sont prévues pour une version future
 
 export const ExternalIntegrationsPanel: React.FC = () => {
   const { toast } = useToast();
