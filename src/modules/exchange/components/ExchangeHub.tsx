@@ -27,6 +27,7 @@ import TrustMarket from './TrustMarket';
 import TimeExchangeMarket from './TimeExchangeMarket';
 import EmotionMarket from './EmotionMarket';
 import ExchangeLeaderboard from './ExchangeLeaderboard';
+import ExchangeProfileCard from './ExchangeProfileCard';
 
 const getMarkets = (stats: { improvement: { avgScore: string }; trust: { totalPool: string }; time: { activeOffers: string }; emotion: { volume24h: string } } | undefined) => [
   {
@@ -262,10 +263,17 @@ const ExchangeHub: React.FC = () => {
         )}
       </AnimatePresence>
 
-      {/* Leaderboard Section */}
+      {/* Leaderboard & Profile Section */}
       {!activeMarket && (
         <div className="container mx-auto px-4 pb-12">
-          <ExchangeLeaderboard />
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2">
+              <ExchangeLeaderboard />
+            </div>
+            <div>
+              <ExchangeProfileCard />
+            </div>
+          </div>
         </div>
       )}
     </div>
