@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -144,7 +142,7 @@ const EmotionScanForm: React.FC<EmotionScanFormProps> = ({ onComplete, onClose }
               <div className="text-4xl mb-2">{result.emotion === 'happy' ? '😊' : result.emotion === 'sad' ? '😢' : '😐'}</div>
               <h3 className="text-xl font-semibold">Émotion détectée : {result.emotion}</h3>
               <p className="text-muted-foreground">Intensité : {result.intensity}/10</p>
-              <p className="text-muted-foreground">Confiance : {Math.round((result.confidence || 0) * 100)}%</p>
+              <p className="text-muted-foreground">Confiance : {Math.round((typeof result.confidence === 'number' ? result.confidence : 0.5) * 100)}%</p>
             </div>
             
             {result.ai_feedback && (
