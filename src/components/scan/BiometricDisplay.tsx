@@ -168,11 +168,23 @@ const BiometricDisplay: React.FC<BiometricDisplayProps> = ({ biometrics }) => {
         <div className="pt-4 border-t">
           <div className="flex items-center justify-between mb-2">
             <span className="font-medium text-sm">Qualité des données</span>
-            <Badge variant="secondary">Excellente</Badge>
+            <Badge variant="secondary">
+              {heartRate > 0 && breathingRate > 0 ? 'Excellente' : 
+               heartRate > 0 || breathingRate > 0 ? 'Partielle' : 'En attente'}
+            </Badge>
           </div>
-          <Progress value={92} className="h-2" />
+          <Progress 
+            value={
+              (heartRate > 0 ? 33 : 0) + 
+              (breathingRate > 0 ? 33 : 0) + 
+              (skinConductance > 0 ? 34 : 0)
+            } 
+            className="h-2" 
+          />
           <p className="text-xs text-muted-foreground mt-1">
-            Toutes les métriques sont dans les plages normales
+            {heartRate > 0 && breathingRate > 0 && skinConductance > 0
+              ? 'Toutes les métriques sont disponibles'
+              : 'Connectez un appareil pour plus de données'}
           </p>
         </div>
       </CardContent>
