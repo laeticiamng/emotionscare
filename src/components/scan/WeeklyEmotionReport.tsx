@@ -202,38 +202,58 @@ export const WeeklyEmotionReport: React.FC = () => {
   }, [weeklyData, weeklyGoal]);
 
   const generateStats = () => {
-    const avgValence = weeklyData.reduce((acc, d) => acc + d.valence, 0) / weeklyData.length;
-    const avgArousal = weeklyData.reduce((acc, d) => acc + d.arousal, 0) / weeklyData.length;
+    // Protection contre les données vides
+    const validData = weeklyData.filter(d => d.scansCount > 0);
+    if (validData.length === 0) {
+      setStats(null);
+      return;
+    }
+
+    const dataLength = weeklyData.length || 1;
+    const avgValence = weeklyData.reduce((acc, d) => acc + d.valence, 0) / dataLength;
+    const avgArousal = weeklyData.reduce((acc, d) => acc + d.arousal, 0) / dataLength;
     const totalScans = weeklyData.reduce((acc, d) => acc + d.scansCount, 0);
     
-    const firstHalf = weeklyData.slice(0, 3).reduce((acc, d) => acc + d.valence, 0) / 3;
-    const secondHalf = weeklyData.slice(4).reduce((acc, d) => acc + d.valence, 0) / 3;
+    const firstHalfData = weeklyData.slice(0, 3);
+    const secondHalfData = weeklyData.slice(4);
+    const firstHalf = firstHalfData.length > 0 
+      ? firstHalfData.reduce((acc, d) => acc + d.valence, 0) / firstHalfData.length 
+      : 0;
+    const secondHalf = secondHalfData.length > 0 
+      ? secondHalfData.reduce((acc, d) => acc + d.valence, 0) / secondHalfData.length 
+      : 0;
     const trend = secondHalf > firstHalf + 5 ? 'up' : secondHalf < firstHalf - 5 ? 'down' : 'stable';
     
     const emotionCounts: Record<string, number> = {};
     weeklyData.forEach(d => {
-      emotionCounts[d.dominantEmotion] = (emotionCounts[d.dominantEmotion] || 0) + d.scansCount;
+      if (d.dominantEmotion && d.dominantEmotion !== '-') {
+        emotionCounts[d.dominantEmotion] = (emotionCounts[d.dominantEmotion] || 0) + d.scansCount;
+      }
     });
     const topEmotions = Object.entries(emotionCounts)
-      .map(([name, count]) => ({ name, count, percentage: Math.round((count / totalScans) * 100) }))
+      .map(([name, count]) => ({ 
+        name, 
+        count, 
+        percentage: totalScans > 0 ? Math.round((count / totalScans) * 100) : 0 
+      }))
       .sort((a, b) => b.count - a.count)
       .slice(0, 4);
     
-    const sortedByValence = [...weeklyData].sort((a, b) => b.valence - a.valence);
+    const sortedByValence = [...weeklyData].filter(d => d.valence > 0).sort((a, b) => b.valence - a.valence);
     
     const newStats: WeeklyStats = {
-      averageValence: Math.round(avgValence),
-      averageArousal: Math.round(avgArousal),
+      averageValence: Math.round(avgValence) || 0,
+      averageArousal: Math.round(avgArousal) || 0,
       trend,
       totalScans,
-      streakDays: 7,
+      streakDays: validData.length,
       topEmotions,
-      peakDay: sortedByValence[0].day,
-      lowDay: sortedByValence[sortedByValence.length - 1].day,
-      weeklyGoalProgress: Math.min(100, (totalScans / weeklyGoal) * 100),
+      peakDay: sortedByValence[0]?.day || '-',
+      lowDay: sortedByValence[sortedByValence.length - 1]?.day || '-',
+      weeklyGoalProgress: weeklyGoal > 0 ? Math.min(100, (totalScans / weeklyGoal) * 100) : 0,
       insights: [
         avgValence > 70 ? 'Votre bien-être émotionnel est excellent cette semaine !' : 'Votre humeur montre des opportunités d\'amélioration.',
-        totalScans >= weeklyGoal ? '🎯 Objectif hebdomadaire atteint !' : `Encore ${weeklyGoal - totalScans} scans pour atteindre votre objectif.`,
+        totalScans >= weeklyGoal ? '🎯 Objectif hebdomadaire atteint !' : `Encore ${Math.max(0, weeklyGoal - totalScans)} scans pour atteindre votre objectif.`,
         trend === 'up' ? 'Tendance positive : votre humeur s\'améliore au fil de la semaine.' : 
         trend === 'down' ? 'Prenez soin de vous - votre énergie semble diminuer.' : 
         'Votre humeur est stable cette semaine.',
@@ -316,6 +336,18 @@ export const WeeklyEmotionReport: React.FC = () => {
     name: e.name,
     value: e.percentage
   })) || [];
+
+  // Affichage de chargement
+  if (isLoadingData) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <span className="ml-3 text-muted-foreground">Chargement des données...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
