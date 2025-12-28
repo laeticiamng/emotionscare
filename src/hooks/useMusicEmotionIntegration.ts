@@ -177,12 +177,37 @@ export const useMusicEmotionIntegration = () => {
     }
   }, []);
 
+  // Alias for compatibility with MusicRecommendation component
+  const playEmotion = useCallback(async (emotion: string) => {
+    return activateMusicForEmotion({ emotion, intensity: 0.5, duration: 120 });
+  }, [activateMusicForEmotion]);
+
+  // Get description for emotion music
+  const getEmotionDescription = useCallback((emotion: string): string => {
+    const descriptions: Record<string, string> = {
+      joie: 'Musique joyeuse et entraînante pour célébrer votre bonne humeur',
+      calme: 'Sons apaisants et mélodies douces pour maintenir votre sérénité',
+      tristesse: 'Musique réconfortante pour accompagner et transformer votre émotion',
+      colère: 'Rythmes libérateurs pour canaliser votre énergie',
+      anxiété: 'Compositions relaxantes pour apaiser votre esprit',
+      sérénité: 'Ambiances zen et harmonieuses pour prolonger votre bien-être',
+      stress: 'Musique déstressante avec fréquences apaisantes',
+      fatigue: 'Mélodies énergisantes douces pour vous revitaliser',
+      focus: 'Sons de concentration pour améliorer votre productivité',
+      créatif: 'Musique inspirante pour stimuler votre créativité'
+    };
+    return descriptions[emotion.toLowerCase()] || `Musique adaptée à votre état : ${emotion}`;
+  }, []);
+
   return {
     activateMusicForEmotion,
     searchExistingTracks,
     getMusicRecommendations,
     analyzeMusicImpact,
-    getEmotionMusicDescription,
+    getEmotionMusicDescription: getEmotionDescription,
+    // Aliases for component compatibility
+    playEmotion,
+    isLoading: state.isGenerating,
     isGenerating: state.isGenerating,
     generationProgress: state.generationProgress,
     currentEmotion: state.emotionTarget,
