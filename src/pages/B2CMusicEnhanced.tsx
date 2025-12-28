@@ -81,10 +81,25 @@ interface VinylTrack extends MusicTrack {
 
 // Données vinyles - URL sera générée dynamiquement via Suno API
 const vinylTracksBase: Omit<VinylTrack, 'url' | 'audioUrl'>[] = [
+  // Catégorie Doux
   { id: 'vinyl-1', title: 'Sérénité Fluide', artist: 'Suno AI', duration: 180, category: 'doux', mood: 'Calme océanique', color: 'from-blue-500 to-cyan-400', vinylColor: 'bg-gradient-to-br from-blue-400 via-cyan-300 to-blue-200', description: 'Ambiance douce et apaisante' },
+  { id: 'vinyl-5', title: 'Murmures du Soir', artist: 'Suno AI', duration: 200, category: 'doux', mood: 'Nuit paisible', color: 'from-indigo-400 to-blue-500', vinylColor: 'bg-gradient-to-br from-indigo-300 via-blue-200 to-indigo-100', description: 'Berceuse douce pour le sommeil' },
+  { id: 'vinyl-9', title: 'Brume Matinale', artist: 'Suno AI', duration: 190, category: 'doux', mood: 'Éveil doux', color: 'from-slate-400 to-zinc-300', vinylColor: 'bg-gradient-to-br from-slate-300 via-zinc-200 to-slate-100', description: 'Réveil en douceur' },
+  
+  // Catégorie Énergique
   { id: 'vinyl-2', title: 'Énergie Vibrante', artist: 'Suno AI', duration: 210, category: 'énergique', mood: 'Dynamisme positif', color: 'from-orange-500 to-red-400', vinylColor: 'bg-gradient-to-br from-orange-400 via-red-300 to-orange-200', description: 'Boost d\'énergie et motivation' },
+  { id: 'vinyl-6', title: 'Pulse Solaire', artist: 'Suno AI', duration: 195, category: 'énergique', mood: 'Énergie radiante', color: 'from-yellow-400 to-orange-500', vinylColor: 'bg-gradient-to-br from-yellow-300 via-orange-200 to-yellow-100', description: 'Vitalité du lever de soleil' },
+  { id: 'vinyl-10', title: 'Feu Intérieur', artist: 'Suno AI', duration: 220, category: 'énergique', mood: 'Motivation intense', color: 'from-red-500 to-rose-400', vinylColor: 'bg-gradient-to-br from-red-400 via-rose-300 to-red-200', description: 'Puissance et détermination' },
+  
+  // Catégorie Créatif
   { id: 'vinyl-3', title: 'Focus Mental', artist: 'Suno AI', duration: 240, category: 'créatif', mood: 'Concentration pure', color: 'from-purple-500 to-indigo-400', vinylColor: 'bg-gradient-to-br from-purple-400 via-indigo-300 to-purple-200', description: 'Concentration optimale pour créer' },
+  { id: 'vinyl-7', title: 'Étoiles Pensantes', artist: 'Suno AI', duration: 230, category: 'créatif', mood: 'Inspiration cosmique', color: 'from-violet-500 to-purple-400', vinylColor: 'bg-gradient-to-br from-violet-400 via-purple-300 to-violet-200', description: 'Créativité sans limites' },
+  { id: 'vinyl-11', title: 'Flux Créatif', artist: 'Suno AI', duration: 215, category: 'créatif', mood: 'État de flow', color: 'from-fuchsia-500 to-pink-400', vinylColor: 'bg-gradient-to-br from-fuchsia-400 via-pink-300 to-fuchsia-200', description: 'Immersion créative totale' },
+  
+  // Catégorie Guérison
   { id: 'vinyl-4', title: 'Réparation Émotionnelle', artist: 'Suno AI', duration: 270, category: 'guérison', mood: 'Bien-être intérieur', color: 'from-green-500 to-emerald-400', vinylColor: 'bg-gradient-to-br from-green-400 via-emerald-300 to-green-200', description: 'Sons thérapeutiques pour guérir' },
+  { id: 'vinyl-8', title: 'Souffle de Vie', artist: 'Suno AI', duration: 250, category: 'guérison', mood: 'Régénération profonde', color: 'from-teal-500 to-cyan-400', vinylColor: 'bg-gradient-to-br from-teal-400 via-cyan-300 to-teal-200', description: 'Respiration et renouveau' },
+  { id: 'vinyl-12', title: 'Harmonie Cellulaire', artist: 'Suno AI', duration: 280, category: 'guérison', mood: 'Guérison holistique', color: 'from-lime-500 to-green-400', vinylColor: 'bg-gradient-to-br from-lime-400 via-green-300 to-lime-200', description: 'Fréquences de réparation' },
 ];
 
 const categoryIcons = { doux: Heart, créatif: Sparkles, énergique: Zap, guérison: Brain };
