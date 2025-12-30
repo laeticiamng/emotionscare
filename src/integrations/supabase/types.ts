@@ -11695,6 +11695,36 @@ export type Database = {
         }
         Relationships: []
       }
+      module_connections: {
+        Row: {
+          connection_type: string
+          created_at: string
+          id: string
+          metadata: Json | null
+          source_module: string
+          target_module: string
+          weight: number | null
+        }
+        Insert: {
+          connection_type: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          source_module: string
+          target_module: string
+          weight?: number | null
+        }
+        Update: {
+          connection_type?: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          source_module?: string
+          target_module?: string
+          weight?: number | null
+        }
+        Relationships: []
+      }
       module_progress: {
         Row: {
           created_at: string
@@ -16906,6 +16936,60 @@ export type Database = {
           severity?: string
           title?: string
           type?: string
+        }
+        Relationships: []
+      }
+      sessions: {
+        Row: {
+          achievements_unlocked: string[] | null
+          created_at: string
+          duration_seconds: number | null
+          ended_at: string | null
+          id: string
+          metadata: Json | null
+          mood_after: number | null
+          mood_before: number | null
+          mood_delta: number | null
+          session_type: string
+          source_id: string | null
+          started_at: string
+          updated_at: string
+          user_id: string
+          xp_earned: number | null
+        }
+        Insert: {
+          achievements_unlocked?: string[] | null
+          created_at?: string
+          duration_seconds?: number | null
+          ended_at?: string | null
+          id?: string
+          metadata?: Json | null
+          mood_after?: number | null
+          mood_before?: number | null
+          mood_delta?: number | null
+          session_type: string
+          source_id?: string | null
+          started_at?: string
+          updated_at?: string
+          user_id: string
+          xp_earned?: number | null
+        }
+        Update: {
+          achievements_unlocked?: string[] | null
+          created_at?: string
+          duration_seconds?: number | null
+          ended_at?: string | null
+          id?: string
+          metadata?: Json | null
+          mood_after?: number | null
+          mood_before?: number | null
+          mood_delta?: number | null
+          session_type?: string
+          source_id?: string | null
+          started_at?: string
+          updated_at?: string
+          user_id?: string
+          xp_earned?: number | null
         }
         Relationships: []
       }
@@ -23108,6 +23192,21 @@ export type Database = {
           metric_name: string | null
           status: string | null
           total_count: number | null
+        }
+        Relationships: []
+      }
+      user_session_stats: {
+        Row: {
+          avg_duration: number | null
+          avg_mood_impact: number | null
+          last_session_at: string | null
+          session_type: string | null
+          sessions_last_30_days: number | null
+          sessions_last_7_days: number | null
+          total_duration: number | null
+          total_sessions: number | null
+          total_xp: number | null
+          user_id: string | null
         }
         Relationships: []
       }

@@ -6,6 +6,10 @@ export { default as sunoService } from './suno.service';
 export { default as emotionAnalysisService } from './emotionAnalysis.service';
 export { default as musicTherapyService } from './musicTherapy.service';
 
+// Service d'interconnexion des modules
+export { moduleInterconnectService } from './moduleInterconnectService';
+export type * from './moduleInterconnectService';
+
 // Services d'audit et sécurité
 export * from './auditStatsService';
 export * from './advancedAuditStatsService';
