@@ -4,7 +4,7 @@
 
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -16,15 +16,22 @@ import {
   UserPlus,
   TrendingUp,
   Sparkles,
-  Filter
+  Filter,
+  Settings,
+  Send
 } from 'lucide-react';
 import PageRoot from '@/components/common/PageRoot';
 import { useAuth } from '@/contexts/AuthContext';
 import { useBuddies, useBuddyChat } from '@/modules/buddies/hooks/useBuddies';
-import { BuddyCard } from '@/modules/buddies/components/BuddyCard';
-import { BuddyChat } from '@/modules/buddies/components/BuddyChat';
-import { BuddyRequests } from '@/modules/buddies/components/BuddyRequests';
-import { BuddyStatsCard } from '@/modules/buddies/components/BuddyStats';
+import { 
+  BuddyCard, 
+  BuddyChat, 
+  BuddyRequests, 
+  BuddyStatsCard,
+  BuddyProfileEditor,
+  BuddyFiltersModal,
+  BuddySentRequests
+} from '@/modules/buddies/components';
 import type { BuddyMatch } from '@/modules/buddies/types';
 import { motion } from 'framer-motion';
 
@@ -42,12 +49,15 @@ const BuddiesPage: React.FC = () => {
     setFilters,
     sendBuddyRequest,
     respondToRequest,
-    discoverBuddies
+    discoverBuddies,
+    updateProfile
   } = useBuddies();
 
   const [activeTab, setActiveTab] = useState('matches');
   const [selectedMatch, setSelectedMatch] = useState<BuddyMatch | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [profileEditorOpen, setProfileEditorOpen] = useState(false);
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
   const buddyChat = useBuddyChat(
     selectedMatch?.id || '',
@@ -82,20 +92,43 @@ const BuddiesPage: React.FC = () => {
             </div>
 
             <div className="flex items-center gap-3">
+              <Button variant="outline" size="sm" onClick={() => setProfileEditorOpen(true)} className="gap-2">
+                <Settings className="h-4 w-4" />
+                Mon profil
+              </Button>
               {requests.length > 0 && (
                 <Badge variant="destructive" className="gap-1">
                   <UserPlus className="h-4 w-4" />
-                  {requests.length} demande{requests.length > 1 ? 's' : ''}
+                  {requests.length}
                 </Badge>
               )}
               {unreadCount > 0 && (
                 <Badge className="gap-1">
                   <MessageCircle className="h-4 w-4" />
-                  {unreadCount} message{unreadCount > 1 ? 's' : ''}
+                  {unreadCount}
                 </Badge>
               )}
             </div>
           </motion.div>
+
+          {/* Profile Editor Modal */}
+          <BuddyProfileEditor
+            open={profileEditorOpen}
+            onOpenChange={setProfileEditorOpen}
+            profile={myProfile}
+            onSave={updateProfile}
+          />
+
+          {/* Filters Modal */}
+          <BuddyFiltersModal
+            open={filtersOpen}
+            onOpenChange={setFiltersOpen}
+            filters={filters}
+            onApply={(newFilters) => {
+              setFilters(newFilters);
+              discoverBuddies(newFilters);
+            }}
+          />
 
           {/* Chat View */}
           {selectedMatch && (
@@ -200,7 +233,7 @@ const BuddiesPage: React.FC = () => {
                         />
                       </div>
                       <Button type="submit">Rechercher</Button>
-                      <Button type="button" variant="outline">
+                      <Button type="button" variant="outline" onClick={() => setFiltersOpen(true)}>
                         <Filter className="h-4 w-4" />
                       </Button>
                     </form>
@@ -230,13 +263,21 @@ const BuddiesPage: React.FC = () => {
                 )}
               </TabsContent>
 
-              {/* Demandes */}
-              <TabsContent value="requests">
+              {/* Demandes reçues */}
+              <TabsContent value="requests" className="space-y-6">
+                <h3 className="text-lg font-semibold flex items-center gap-2">
+                  <UserPlus className="h-5 w-5" /> Demandes reçues
+                </h3>
                 <BuddyRequests
                   requests={requests}
                   onAccept={id => respondToRequest(id, true)}
                   onDecline={id => respondToRequest(id, false)}
                 />
+                
+                <h3 className="text-lg font-semibold flex items-center gap-2 pt-4">
+                  <Send className="h-5 w-5" /> Demandes envoyées
+                </h3>
+                {user && <BuddySentRequests userId={user.id} />}
               </TabsContent>
 
               {/* Messages */}
