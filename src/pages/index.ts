@@ -35,6 +35,7 @@ export { default as B2CMoodMixerPage } from './B2CMoodMixerPage';
 export { default as B2CAmbitionArcadePage } from './B2CAmbitionArcadePage';
 export { default as B2CBounceBackBattlePage } from './B2CBounceBackBattlePage';
 export { default as B2CStorySynthLabPage } from './B2CStorySynthLabPage';
+export { default as B2CVoiceJournalPage } from './B2CVoiceJournalPage';
 
 // Social & Community
 export { default as B2CSocialCoconPage } from './B2CSocialCoconPage';

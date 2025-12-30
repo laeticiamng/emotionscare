@@ -701,17 +701,16 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     requireAuth: true,
     aliases: ['/seuil', '/threshold'],
   },
-  // Redirections obsolètes supprimées - utiliser /app/scan directement
+  // Voice Journal - Journal vocal avec transcription
   {
-    name: 'voice-journal-redirect',
+    name: 'voice-journal',
     path: '/app/voice-journal',
     segment: 'consumer',
     role: 'consumer',
-    layout: 'app',
-    component: 'RedirectToJournalPage',
+    layout: 'app-sidebar',
+    component: 'B2CVoiceJournalPage',
     guard: true,
-    aliases: ['/voice-journal'],
-    deprecated: true,
+    aliases: ['/voice-journal', '/vocal-journal'],
   },
   // emotions route obsolète - alias vers scan
   {
