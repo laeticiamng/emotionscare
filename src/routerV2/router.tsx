@@ -72,6 +72,7 @@ const AdvancedAnalyticsPage = lazy(() => import('@/pages/AdvancedAnalyticsPage')
 // EmotionMusicLibraryPage supprimé - utiliser B2CMusicEnhanced
 const B2CAICoachPage = lazy(() => import('@/pages/B2CAICoachPage'));
 const B2CJournalPage = lazy(() => import('@/pages/B2CJournalPage'));
+const B2CVoiceJournalPage = lazy(() => import('@/pages/B2CVoiceJournalPage'));
 const EmotionSessionNewPage = lazy(() => import('@/pages/EmotionSessionNewPage'));
 const EmotionSessionHistoryPage = lazy(() => import('@/pages/EmotionSessionHistoryPage'));
 const B2CVRBreathGuidePage = lazy(() => import('@/pages/B2CVRBreathGuidePage'));
@@ -369,6 +370,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   // EmotionMusicLibraryPage supprimé
   B2CAICoachPage,
   B2CJournalPage,
+  B2CVoiceJournalPage,
   EmotionSessionNewPage,
   EmotionSessionHistoryPage,
   B2CVRBreathGuidePage,
