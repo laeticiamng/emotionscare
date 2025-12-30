@@ -184,7 +184,7 @@ class ProfileService {
     if (!user) return DEFAULT_STATS;
 
     try {
-      // Parallel queries for stats
+      // Parallel queries for stats - using correct table names
       const [
         scansResult,
         journalResult,
@@ -193,7 +193,7 @@ class ProfileService {
         streakResult,
         profileResult,
       ] = await Promise.all([
-        supabase.from('scans').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
+        supabase.from('emotional_scans').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
         supabase.from('journal_entries').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
         supabase.from('breathing_vr_sessions').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
         supabase.from('user_achievements').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
@@ -325,7 +325,7 @@ class ProfileService {
     try {
       const [scansData, journalData, breathData] = await Promise.all([
         supabase
-          .from('scans')
+          .from('emotional_scans')
           .select('created_at')
           .eq('user_id', user.id)
           .gte('created_at', dateStr),
