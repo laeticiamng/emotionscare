@@ -8592,6 +8592,297 @@ export type Database = {
           },
         ]
       }
+      group_session_categories: {
+        Row: {
+          color: string | null
+          created_at: string | null
+          description: string | null
+          icon: string | null
+          id: string
+          is_active: boolean | null
+          label: string
+          name: string
+          order_index: number | null
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          label: string
+          name: string
+          order_index?: number | null
+        }
+        Update: {
+          color?: string | null
+          created_at?: string | null
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          label?: string
+          name?: string
+          order_index?: number | null
+        }
+        Relationships: []
+      }
+      group_session_messages: {
+        Row: {
+          content: string
+          created_at: string | null
+          id: string
+          is_hidden: boolean | null
+          is_pinned: boolean | null
+          message_type: string | null
+          metadata: Json | null
+          reply_to_id: string | null
+          session_id: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          id?: string
+          is_hidden?: boolean | null
+          is_pinned?: boolean | null
+          message_type?: string | null
+          metadata?: Json | null
+          reply_to_id?: string | null
+          session_id: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          id?: string
+          is_hidden?: boolean | null
+          is_pinned?: boolean | null
+          message_type?: string | null
+          metadata?: Json | null
+          reply_to_id?: string | null
+          session_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "group_session_messages_reply_to_id_fkey"
+            columns: ["reply_to_id"]
+            isOneToOne: false
+            referencedRelation: "group_session_messages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "group_session_messages_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "group_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      group_session_participants: {
+        Row: {
+          created_at: string | null
+          feedback: string | null
+          id: string
+          joined_at: string | null
+          left_at: string | null
+          mood_after: number | null
+          mood_before: number | null
+          rating: number | null
+          role: string | null
+          session_id: string
+          status: string | null
+          user_id: string
+          xp_earned: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          feedback?: string | null
+          id?: string
+          joined_at?: string | null
+          left_at?: string | null
+          mood_after?: number | null
+          mood_before?: number | null
+          rating?: number | null
+          role?: string | null
+          session_id: string
+          status?: string | null
+          user_id: string
+          xp_earned?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          feedback?: string | null
+          id?: string
+          joined_at?: string | null
+          left_at?: string | null
+          mood_after?: number | null
+          mood_before?: number | null
+          rating?: number | null
+          role?: string | null
+          session_id?: string
+          status?: string | null
+          user_id?: string
+          xp_earned?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "group_session_participants_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "group_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      group_session_reactions: {
+        Row: {
+          created_at: string | null
+          emoji: string
+          id: string
+          message_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          emoji: string
+          id?: string
+          message_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          emoji?: string
+          id?: string
+          message_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "group_session_reactions_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "group_session_messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      group_session_resources: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          download_count: number | null
+          id: string
+          resource_type: string
+          session_id: string
+          title: string
+          uploaded_by: string
+          url: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          download_count?: number | null
+          id?: string
+          resource_type: string
+          session_id: string
+          title: string
+          uploaded_by: string
+          url: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          download_count?: number | null
+          id?: string
+          resource_type?: string
+          session_id?: string
+          title?: string
+          uploaded_by?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "group_session_resources_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "group_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      group_sessions: {
+        Row: {
+          category: string
+          cover_image: string | null
+          created_at: string | null
+          description: string | null
+          duration_minutes: number | null
+          host_id: string
+          id: string
+          is_recurring: boolean | null
+          max_participants: number | null
+          meeting_url: string | null
+          metadata: Json | null
+          recording_url: string | null
+          recurrence_rule: string | null
+          scheduled_at: string
+          session_type: string
+          status: string | null
+          tags: string[] | null
+          title: string
+          updated_at: string | null
+          xp_reward: number | null
+        }
+        Insert: {
+          category?: string
+          cover_image?: string | null
+          created_at?: string | null
+          description?: string | null
+          duration_minutes?: number | null
+          host_id: string
+          id?: string
+          is_recurring?: boolean | null
+          max_participants?: number | null
+          meeting_url?: string | null
+          metadata?: Json | null
+          recording_url?: string | null
+          recurrence_rule?: string | null
+          scheduled_at: string
+          session_type?: string
+          status?: string | null
+          tags?: string[] | null
+          title: string
+          updated_at?: string | null
+          xp_reward?: number | null
+        }
+        Update: {
+          category?: string
+          cover_image?: string | null
+          created_at?: string | null
+          description?: string | null
+          duration_minutes?: number | null
+          host_id?: string
+          id?: string
+          is_recurring?: boolean | null
+          max_participants?: number | null
+          meeting_url?: string | null
+          metadata?: Json | null
+          recording_url?: string | null
+          recurrence_rule?: string | null
+          scheduled_at?: string
+          session_type?: string
+          status?: string | null
+          tags?: string[] | null
+          title?: string
+          updated_at?: string | null
+          xp_reward?: number | null
+        }
+        Relationships: []
+      }
       groups: {
         Row: {
           id: string
