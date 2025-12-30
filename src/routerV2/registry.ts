@@ -919,6 +919,16 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: true,
     aliases: ['/voyage', '/journey'],
   },
+  {
+    name: 'emotion-atlas',
+    path: '/app/emotion-atlas',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app-sidebar',
+    component: 'EmotionAtlasPage',
+    guard: true,
+    aliases: ['/atlas', '/emotion-map'],
+  },
 
   // ═══════════════════════════════════════════════════════════
   // ANALYTICS & DATA (CONSUMER)
