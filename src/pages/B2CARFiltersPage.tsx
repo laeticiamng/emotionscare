@@ -1,72 +1,65 @@
-// @ts-nocheck
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Camera, Sparkles, Heart, Smile, Palette, Play, Square, RotateCcw } from 'lucide-react';
+import { Camera, Sparkles, Image, History, BarChart3 } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useAuth } from '@/contexts/AuthContext';
+import { useARFilters } from '@/modules/ar-filters/hooks/useARFilters';
+import { ARCamera } from '@/modules/ar-filters/components/ARCamera';
+import { ARFilterSelector } from '@/modules/ar-filters/components/ARFilterSelector';
+import { ARPhotoGallery } from '@/modules/ar-filters/components/ARPhotoGallery';
+import { ARStats } from '@/modules/ar-filters/components/ARStats';
+import { ARSessionControls } from '@/modules/ar-filters/components/ARSessionControls';
+import { ARHistory } from '@/modules/ar-filters/components/ARHistory';
 
 const B2CARFiltersPage: React.FC = () => {
-  const [isRecording, setIsRecording] = useState(false);
-  const [activeFilter, setActiveFilter] = useState<string | null>(null);
+  const { user } = useAuth();
   const videoRef = useRef<HTMLVideoElement>(null);
+  
+  const {
+    filters,
+    currentFilter,
+    selectFilter,
+    isCameraActive,
+    startCamera,
+    stopCamera,
+    isSessionActive,
+    startSession,
+    endSession,
+    sessionDuration,
+    capturedPhotos,
+    capturePhoto,
+    clearPhotos,
+    stats,
+    history,
+    isLoadingStats,
+  } = useARFilters(user?.id);
 
-  const filters = [
-    {
-      id: 'calm',
-      name: 'Sérénité',
-      description: 'Filtre apaisant aux tons bleus',
-      icon: Heart,
-      color: 'bg-info'
-    },
-    {
-      id: 'joy',
-      name: 'Joie',
-      description: 'Filtre énergisant aux tons dorés',
-      icon: Smile,
-      color: 'bg-warning'
-    },
-    {
-      id: 'focus',
-      name: 'Concentration',
-      description: 'Filtre favorisant la focus',
-      icon: Sparkles,
-      color: 'bg-accent'
-    },
-    {
-      id: 'energy',
-      name: 'Énergie',
-      description: 'Filtre dynamisant',
-      icon: Palette,
-      color: 'bg-destructive'
+  // Sync video ref
+  useEffect(() => {
+    if (videoRef.current && isCameraActive) {
+      navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } })
+        .then(stream => {
+          if (videoRef.current) {
+            videoRef.current.srcObject = stream;
+          }
+        })
+        .catch(console.error);
     }
-  ];
-
-  const handleFilterSelect = (filterId: string) => {
-    setActiveFilter(filterId === activeFilter ? null : filterId);
-  };
-
-  const toggleRecording = () => {
-    setIsRecording(!isRecording);
-  };
-
-  const resetFilters = () => {
-    setActiveFilter(null);
-    setIsRecording(false);
-  };
+  }, [isCameraActive]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-muted/20 p-6" data-testid="page-root">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 p-4 md:p-6" data-testid="page-root">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-8"
         >
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-full mb-4">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-fuchsia-500/20 to-pink-500/20 rounded-full mb-4">
             <Camera className="w-8 h-8 text-primary" />
           </div>
-          <h1 className="text-3xl font-bold text-foreground mb-4">
+          <h1 className="text-3xl font-bold text-foreground mb-2">
             Filtres AR Émotionnels
           </h1>
           <p className="text-muted-foreground max-w-2xl mx-auto">
@@ -74,116 +67,76 @@ const B2CARFiltersPage: React.FC = () => {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Zone de prévisualisation */}
-          <div className="lg:col-span-2">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Camera className="w-5 h-5" />
-                  Prévisualisation AR
-                </CardTitle>
-                <CardDescription>
-                  {activeFilter ? `Filtre actif: ${filters.find(f => f.id === activeFilter)?.name}` : 'Aucun filtre sélectionné'}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="relative bg-muted rounded-lg overflow-hidden aspect-video">
-                  <div className="w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center">
-                    <div className="text-center text-primary-foreground">
-                      <Camera className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                      <p className="text-sm opacity-75">Caméra AR simulée</p>
-                    </div>
-                  </div>
-                  
-                  {/* Overlay de filtre simulé */}
-                  {activeFilter && (
-                    <div 
-                      className={`absolute inset-0 mix-blend-overlay opacity-30 ${
-                        filters.find(f => f.id === activeFilter)?.color
-                      }`}
-                    />
-                  )}
+        <Tabs defaultValue="camera" className="space-y-6">
+          <TabsList className="grid grid-cols-4 max-w-md mx-auto">
+            <TabsTrigger value="camera" className="gap-2">
+              <Camera className="w-4 h-4" />
+              <span className="hidden sm:inline">Caméra</span>
+            </TabsTrigger>
+            <TabsTrigger value="gallery" className="gap-2">
+              <Image className="w-4 h-4" />
+              <span className="hidden sm:inline">Galerie</span>
+            </TabsTrigger>
+            <TabsTrigger value="history" className="gap-2">
+              <History className="w-4 h-4" />
+              <span className="hidden sm:inline">Historique</span>
+            </TabsTrigger>
+            <TabsTrigger value="stats" className="gap-2">
+              <BarChart3 className="w-4 h-4" />
+              <span className="hidden sm:inline">Stats</span>
+            </TabsTrigger>
+          </TabsList>
 
-                  {/* Badge d'état */}
-                  {isRecording && (
-                    <div className="absolute top-4 right-4">
-                      <Badge variant="destructive" className="animate-pulse">
-                        ● Enregistrement
-                      </Badge>
-                    </div>
-                  )}
+          {/* Camera Tab */}
+          <TabsContent value="camera" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2 space-y-6">
+                <ARCamera
+                  currentFilter={currentFilter}
+                  isCameraActive={isCameraActive}
+                  isSessionActive={isSessionActive}
+                  sessionDuration={sessionDuration}
+                  onStartCamera={startCamera}
+                  onStopCamera={stopCamera}
+                  onCapturePhoto={capturePhoto}
+                  videoRef={videoRef}
+                />
+              </div>
+              
+              <div className="space-y-6">
+                <ARFilterSelector
+                  filters={filters}
+                  currentFilter={currentFilter}
+                  onSelectFilter={selectFilter}
+                  disabled={isSessionActive}
+                />
+                <ARSessionControls
+                  currentFilter={currentFilter}
+                  isSessionActive={isSessionActive}
+                  isCameraActive={isCameraActive}
+                  sessionDuration={sessionDuration}
+                  onStartSession={startSession}
+                  onEndSession={endSession}
+                />
+              </div>
+            </div>
+          </TabsContent>
 
-                  {/* Contrôles de capture */}
-                  <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
-                    <Button
-                      size="lg"
-                      variant={isRecording ? "destructive" : "default"}
-                      onClick={toggleRecording}
-                      className="rounded-full w-12 h-12 p-0"
-                    >
-                      {isRecording ? <Square className="w-6 h-6" /> : <Play className="w-6 h-6" />}
-                    </Button>
-                    
-                    <Button
-                      size="lg"
-                      variant="outline"
-                      onClick={resetFilters}
-                      className="rounded-full w-12 h-12 p-0"
-                    >
-                      <RotateCcw className="w-5 h-5" />
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+          {/* Gallery Tab */}
+          <TabsContent value="gallery">
+            <ARPhotoGallery photos={capturedPhotos} onClearPhotos={clearPhotos} />
+          </TabsContent>
 
-          {/* Panneau des filtres */}
-          <div>
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Sparkles className="w-5 h-5" />
-                  Filtres Émotionnels
-                </CardTitle>
-                <CardDescription>
-                  Sélectionnez un filtre pour améliorer votre bien-être
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {filters.map((filter) => {
-                  const Icon = filter.icon;
-                  const isActive = activeFilter === filter.id;
-                  
-                  return (
-                    <motion.div
-                      key={filter.id}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                    >
-                      <Button
-                        variant={isActive ? "default" : "outline"}
-                        className="w-full h-auto p-4 flex flex-col items-start gap-2"
-                        onClick={() => handleFilterSelect(filter.id)}
-                      >
-                        <div className="flex items-center gap-2 w-full">
-                          <div className={`w-3 h-3 rounded-full ${filter.color}`} />
-                          <Icon className="w-4 h-4" />
-                          <span className="font-medium">{filter.name}</span>
-                          {isActive && <Badge className="ml-auto text-xs">Actif</Badge>}
-                        </div>
-                        <p className="text-xs text-muted-foreground text-left">
-                          {filter.description}
-                        </p>
-                      </Button>
-                    </motion.div>
-                  );
-                })}
-              </CardContent>
-            </Card>
-          </div>
-        </div>
+          {/* History Tab */}
+          <TabsContent value="history">
+            <ARHistory sessions={history} />
+          </TabsContent>
+
+          {/* Stats Tab */}
+          <TabsContent value="stats">
+            <ARStats stats={stats} isLoading={isLoadingStats} />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
