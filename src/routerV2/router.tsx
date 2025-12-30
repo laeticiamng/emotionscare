@@ -259,6 +259,8 @@ const B2CDashboardPage = lazy(() => import('@/pages/B2CDashboardPage'));
 // B2CMusicPage supprimé - utiliser B2CMusicEnhanced
 const EmotionalPark = lazy(() => import('@/pages/EmotionalPark'));
 const ParkJourney = lazy(() => import('@/pages/ParkJourney'));
+const EmotionAtlasPage = lazy(() => import('@/modules/emotion-atlas/pages/EmotionAtlasPage'));
+const DiscoveryPage = lazy(() => import('@/modules/discovery/pages/DiscoveryPage'));
 const CoachProgramsPage = lazy(() => import('@/pages/CoachProgramsPage'));
 const CoachProgramDetailPage = lazy(() => import('@/pages/CoachProgramDetailPage'));
 const CoachSessionsPage = lazy(() => import('@/pages/CoachSessionsPage'));
@@ -488,6 +490,8 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   BossGritPage,
   BubbleBeatPage,
   StorySynthPage,
+  EmotionAtlasPage,
+  DiscoveryPage,
 
   // Dev-only pages
   ComprehensiveSystemAuditPage,
