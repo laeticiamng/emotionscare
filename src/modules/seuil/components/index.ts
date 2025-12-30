@@ -7,3 +7,7 @@ export { SeuilExitMessage } from './SeuilExitMessage';
 export { SeuilStats } from './SeuilStats';
 export { SeuilTrendChart } from './SeuilTrendChart';
 export { SeuilMiniSession } from './SeuilMiniSession';
+export { SeuilInsightsPanel } from './SeuilInsightsPanel';
+export { SeuilCalendar } from './SeuilCalendar';
+export { SeuilSettings } from './SeuilSettings';
+export type { SeuilUserSettings } from './SeuilSettings';

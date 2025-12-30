@@ -85,6 +85,7 @@ const B2CARFiltersPage = lazy(() => import('@/pages/B2CARFiltersPage'));
 const B2CBubbleBeatPage = lazy(() => import('@/pages/B2CBubbleBeatPage'));
 const B2CScreenSilkBreakPage = lazy(() => import('@/pages/B2CScreenSilkBreakPage'));
 const MeditationPage = lazy(() => import('@/pages/MeditationPage'));
+const SeuilPage = lazy(() => import('@/pages/SeuilPage'));
 
 // Analytics - nettoyage (pages non utilisées dans registry)
 
@@ -379,6 +380,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   B2CBubbleBeatPage,
   B2CScreenSilkBreakPage,
   MeditationPage,
+  SeuilPage,
   
   // Analytics & Gamification
   B2CGamificationPage,

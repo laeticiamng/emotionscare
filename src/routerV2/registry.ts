@@ -690,6 +690,17 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: false,
     aliases: ['/bubble-beat'],
   },
+  {
+    name: 'seuil',
+    path: '/app/seuil',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'simple',
+    component: 'SeuilPage',
+    guard: true,
+    requireAuth: true,
+    aliases: ['/seuil', '/threshold'],
+  },
   // Redirections obsolètes supprimées - utiliser /app/scan directement
   {
     name: 'voice-journal-redirect',
