@@ -929,6 +929,16 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: true,
     aliases: ['/atlas', '/emotion-map'],
   },
+  {
+    name: 'discovery',
+    path: '/app/discovery',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app-sidebar',
+    component: 'DiscoveryPage',
+    guard: true,
+    aliases: ['/discovery', '/exploration'],
+  },
 
   // ═══════════════════════════════════════════════════════════
   // ANALYTICS & DATA (CONSUMER)
