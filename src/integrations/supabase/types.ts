@@ -8913,6 +8913,71 @@ export type Database = {
         }
         Relationships: []
       }
+      insight_feedback: {
+        Row: {
+          action_taken: string | null
+          created_at: string | null
+          feedback_text: string | null
+          id: string
+          insight_id: string
+          rating: number
+          user_id: string
+          was_helpful: boolean | null
+        }
+        Insert: {
+          action_taken?: string | null
+          created_at?: string | null
+          feedback_text?: string | null
+          id?: string
+          insight_id: string
+          rating: number
+          user_id: string
+          was_helpful?: boolean | null
+        }
+        Update: {
+          action_taken?: string | null
+          created_at?: string | null
+          feedback_text?: string | null
+          id?: string
+          insight_id?: string
+          rating?: number
+          user_id?: string
+          was_helpful?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "insight_feedback_insight_id_fkey"
+            columns: ["insight_id"]
+            isOneToOne: false
+            referencedRelation: "user_insights"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      insight_stats_cache: {
+        Row: {
+          created_at: string | null
+          id: string
+          last_updated: string | null
+          stats_data: Json
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          last_updated?: string | null
+          stats_data: Json
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          last_updated?: string | null
+          stats_data?: Json
+          user_id?: string
+        }
+        Relationships: []
+      }
       integration_logs: {
         Row: {
           created_at: string
@@ -20297,37 +20362,64 @@ export type Database = {
       user_insights: {
         Row: {
           action_items: Json | null
+          applied_at: string | null
+          category: string | null
+          confidence: number | null
           created_at: string | null
           description: string
+          dismissed_at: string | null
           expires_at: string | null
+          feedback_rating: number | null
+          feedback_text: string | null
           id: string
+          impact_score: number | null
           insight_type: string
           is_read: boolean | null
           priority: string
+          reminded_at: string | null
+          source_data: Json | null
           title: string
           user_id: string
         }
         Insert: {
           action_items?: Json | null
+          applied_at?: string | null
+          category?: string | null
+          confidence?: number | null
           created_at?: string | null
           description: string
+          dismissed_at?: string | null
           expires_at?: string | null
+          feedback_rating?: number | null
+          feedback_text?: string | null
           id?: string
+          impact_score?: number | null
           insight_type: string
           is_read?: boolean | null
           priority?: string
+          reminded_at?: string | null
+          source_data?: Json | null
           title: string
           user_id: string
         }
         Update: {
           action_items?: Json | null
+          applied_at?: string | null
+          category?: string | null
+          confidence?: number | null
           created_at?: string | null
           description?: string
+          dismissed_at?: string | null
           expires_at?: string | null
+          feedback_rating?: number | null
+          feedback_text?: string | null
           id?: string
+          impact_score?: number | null
           insight_type?: string
           is_read?: boolean | null
           priority?: string
+          reminded_at?: string | null
+          source_data?: Json | null
           title?: string
           user_id?: string
         }
