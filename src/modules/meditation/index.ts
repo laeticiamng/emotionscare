@@ -12,6 +12,11 @@ export { TechniqueSelector } from './ui/TechniqueSelector';
 export { MeditationProgress } from './ui/MeditationProgress';
 export { MeditationStats as MeditationStatsCard } from './ui/MeditationStats';
 export { MeditationHistory } from './ui/MeditationHistory';
+export { GuidedSessionPlayer } from './ui/GuidedSessionPlayer';
+export { AmbientSoundMixer } from './ui/AmbientSoundMixer';
+export { MeditationSettingsPanel } from './ui/MeditationSettingsPanel';
+export { StreakWidget } from './ui/StreakWidget';
+export { MeditationCalendar } from './ui/MeditationCalendar';
 
 export type {
   MeditationTechnique,
