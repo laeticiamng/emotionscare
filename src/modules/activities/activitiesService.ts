@@ -18,16 +18,15 @@ export class ActivitiesService {
     activityType: string,
     moduleName: string,
     durationSeconds?: number,
-    metadata?: any
+    metadata?: Record<string, unknown>
   ): Promise<void> {
     const { error } = await supabase
       .from('user_activities')
       .insert({
         user_id: userId,
         activity_type: activityType,
-        module_name: moduleName,
         duration_seconds: durationSeconds,
-        metadata
+        activity_data: { module_name: moduleName, ...metadata }
       });
 
     if (error) throw error;
@@ -53,9 +52,10 @@ export class ActivitiesService {
     let totalDuration = 0;
 
     data?.forEach(activity => {
+      const moduleName = (activity.activity_data as Record<string, unknown>)?.module_name as string || 'unknown';
       moduleUsage.set(
-        activity.module_name,
-        (moduleUsage.get(activity.module_name) || 0) + 1
+        moduleName,
+        (moduleUsage.get(moduleName) || 0) + 1
       );
 
       const day = activity.created_at.split('T')[0];

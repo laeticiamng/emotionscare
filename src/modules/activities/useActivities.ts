@@ -2,7 +2,7 @@
  * Hook principal pour activities
  */
 
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useActivitiesMachine } from './useActivitiesMachine';
 import type { ActivityFilters } from './types';
@@ -17,10 +17,14 @@ export function useActivities(options: UseActivitiesOptions = {}) {
   const machine = useActivitiesMachine(user?.id || '');
 
   useEffect(() => {
-    if (options.autoLoad && user?.id) {
+    if (options.autoLoad) {
       machine.loadActivities(options.defaultFilters);
     }
-  }, [options.autoLoad, user?.id]);
+  }, [options.autoLoad]);
+
+  const loadActivities = useCallback((filters?: ActivityFilters) => {
+    machine.loadActivities(filters);
+  }, [machine.loadActivities]);
 
   return {
     activities: machine.state.activities,
@@ -29,7 +33,7 @@ export function useActivities(options: UseActivitiesOptions = {}) {
     filters: machine.state.filters,
     status: machine.state.status,
     error: machine.state.error,
-    loadActivities: machine.loadActivities,
+    loadActivities,
     toggleFavorite: machine.toggleFavorite,
     completeActivity: machine.completeActivity,
     setFilters: machine.setFilters
