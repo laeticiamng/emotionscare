@@ -2,7 +2,7 @@
 import { createRng, pick } from "./rng";
 
 export type Brief = {
-  genre?: "calme"|"aventure"|"poetique"|"mysterieux"|"romance";
+  genre?: "calme"|"aventure"|"poetique"|"mysterieux"|"romance"|"introspection"|"nature";
   pov?: "je"|"il"|"elle"|"nous";
   hero?: string;    // nom court
   place?: string;   // lieu
@@ -36,6 +36,16 @@ const OPENERS = {
     "{hero} n'avait rien prévu, sinon de sourire au hasard.",
     "À {place}, tout semblait soudain possible.",
     "Le ciel, ce soir-là, tenait juste assez pour deux."
+  ],
+  introspection: [
+    "{hero} s'arrêta un instant pour écouter le silence intérieur.",
+    "Une question flottait, sans réponse, et c'était bien ainsi.",
+    "Le regard tourné vers soi, {hero} découvrit un paysage inconnu."
+  ],
+  nature: [
+    "Les arbres de {place} murmuraient des secrets anciens.",
+    "Un ruisseau chantait quelque part, et {hero} suivit sa mélodie.",
+    "La forêt respirait, lente et profonde, autour de {hero}."
   ]
 };
 
