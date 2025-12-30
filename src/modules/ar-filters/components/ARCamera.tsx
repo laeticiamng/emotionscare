@@ -4,7 +4,7 @@
 
 import React, { useRef, useEffect, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Camera, CameraOff, Circle, Sparkles } from 'lucide-react';
+import { Camera, CameraOff, Circle, Sparkles, FlipHorizontal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import type { ARFilter } from '../hooks/useARFilters';
@@ -14,9 +14,11 @@ interface ARCameraProps {
   isCameraActive: boolean;
   isSessionActive: boolean;
   sessionDuration: number;
+  isMirrored?: boolean;
   onStartCamera: () => void;
   onStopCamera: () => void;
   onCapturePhoto: () => void;
+  onToggleMirror?: () => void;
   videoRef: React.RefObject<HTMLVideoElement>;
 }
 
@@ -31,25 +33,18 @@ export const ARCamera = memo<ARCameraProps>(({
   isCameraActive,
   isSessionActive,
   sessionDuration,
+  isMirrored = true,
   onStartCamera,
   onStopCamera,
   onCapturePhoto,
+  onToggleMirror,
   videoRef,
 }) => {
-  const localVideoRef = useRef<HTMLVideoElement>(null);
-  
-  // Sync video ref
-  useEffect(() => {
-    if (localVideoRef.current) {
-      (videoRef as React.MutableRefObject<HTMLVideoElement | null>).current = localVideoRef.current;
-    }
-  }, [videoRef]);
-
   return (
     <div className="relative bg-card rounded-2xl overflow-hidden aspect-video border border-border/50 shadow-lg">
       {/* Video Element */}
       <video
-        ref={localVideoRef}
+        ref={videoRef}
         autoPlay
         muted
         playsInline
@@ -57,6 +52,7 @@ export const ARCamera = memo<ARCameraProps>(({
         style={{
           filter: currentFilter?.cssFilter || 'none',
           display: isCameraActive ? 'block' : 'none',
+          transform: isMirrored ? 'scaleX(-1)' : 'none',
         }}
       />
 
@@ -106,12 +102,16 @@ export const ARCamera = memo<ARCameraProps>(({
 
       {/* Session Timer */}
       {isSessionActive && (
-        <div className="absolute top-4 right-4">
-          <Badge variant="destructive" className="animate-pulse gap-2">
+        <motion.div 
+          className="absolute top-4 right-4"
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+        >
+          <Badge variant="destructive" className="animate-pulse gap-2 text-sm font-mono">
             <Circle className="w-2 h-2 fill-current" />
             {formatDuration(sessionDuration)}
           </Badge>
-        </div>
+        </motion.div>
       )}
 
       {/* Active Filter Badge */}
@@ -140,14 +140,24 @@ export const ARCamera = memo<ARCameraProps>(({
             <Button
               size="lg"
               onClick={onCapturePhoto}
-              className="rounded-full w-16 h-16 p-0 bg-white text-primary shadow-lg"
+              className="rounded-full w-16 h-16 p-0 bg-white text-primary shadow-lg hover:bg-white/90"
               aria-label="Capturer une photo"
             >
               <div className="w-12 h-12 rounded-full border-4 border-primary" />
             </Button>
           </motion.div>
           
-          <div className="w-12" /> {/* Spacer for symmetry */}
+          {onToggleMirror && (
+            <Button
+              size="lg"
+              variant="outline"
+              onClick={onToggleMirror}
+              className={`rounded-full w-12 h-12 p-0 bg-background/80 backdrop-blur-sm ${isMirrored ? 'ring-2 ring-primary' : ''}`}
+              aria-label="Basculer le mode miroir"
+            >
+              <FlipHorizontal className="w-5 h-5" />
+            </Button>
+          )}
         </div>
       )}
     </div>

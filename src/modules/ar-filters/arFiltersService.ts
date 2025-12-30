@@ -3,10 +3,16 @@
  */
 
 import { supabase } from '@/integrations/supabase/client';
-import type { ARFilterSession, ARFilterStats } from './types';
+import type { ARFilterSession, ARFilterStats, FilterType } from './types';
 
 const STORAGE_KEY = 'ar-filters-local-history';
 const ACHIEVEMENTS_KEY = 'ar-filters-achievements';
+
+// Liste des filtres valides
+const VALID_FILTERS: FilterType[] = [
+  'joy', 'calm', 'energy', 'creativity', 
+  'confidence', 'serenity', 'playful', 'focused'
+];
 
 export interface ARFilterAchievement {
   id: string;
@@ -15,13 +21,38 @@ export interface ARFilterAchievement {
   unlockedAt?: string;
   progress: number;
   target: number;
+  icon: string;
 }
 
 export interface ARFilterRecommendation {
   filterId: string;
+  filterName: string;
+  filterEmoji: string;
   reason: string;
   score: number;
 }
+
+const FILTER_NAMES: Record<string, string> = {
+  joy: 'Joie',
+  calm: 'Calme',
+  energy: 'Énergie',
+  serenity: 'Sérénité',
+  creativity: 'Créativité',
+  confidence: 'Confiance',
+  playful: 'Ludique',
+  focused: 'Focus',
+};
+
+const FILTER_EMOJIS: Record<string, string> = {
+  joy: '😊',
+  calm: '😌',
+  energy: '⚡',
+  serenity: '🧘',
+  creativity: '🎨',
+  confidence: '💪',
+  playful: '🎉',
+  focused: '🎯',
+};
 
 export class ARFiltersService {
   /**
@@ -46,6 +77,18 @@ export class ARFiltersService {
     
     // Update local stats
     this.updateLocalStats(filterType, 'start');
+    
+    // Check first session achievement
+    const achievements = this.getAchievements();
+    const firstSession = achievements.find(a => a.id === 'first_session');
+    if (firstSession && !firstSession.unlockedAt) {
+      firstSession.progress = 1;
+      firstSession.unlockedAt = new Date().toISOString();
+      localStorage.setItem(ACHIEVEMENTS_KEY, JSON.stringify(achievements));
+    }
+    
+    // Check explorer achievement
+    this.checkExplorerAchievement(filterType);
     
     return data;
   }
@@ -96,6 +139,7 @@ export class ARFiltersService {
     // Update local stats and check achievements
     this.updateLocalStats('', 'complete', durationSeconds);
     this.checkDurationAchievements(durationSeconds);
+    this.checkRegularUserAchievement();
   }
 
   /**
@@ -151,8 +195,9 @@ export class ARFiltersService {
       weeklyTrend.push(count);
     }
 
-    // Get achievements
+    // Get achievements with updated progress
     const achievements = this.getAchievements();
+    this.updateAchievementsProgress(achievements, totalSessions, totalPhotosTaken, filterCount);
     
     // Generate recommendations
     const recommendations = this.generateRecommendations(sessions, filterCount);
@@ -169,21 +214,58 @@ export class ARFiltersService {
   }
 
   /**
-   * Get local achievements
+   * Get local achievements with icons
    */
   private static getAchievements(): ARFilterAchievement[] {
     const stored = localStorage.getItem(ACHIEVEMENTS_KEY);
     if (stored) return JSON.parse(stored);
     
     const defaultAchievements: ARFilterAchievement[] = [
-      { id: 'first_session', name: 'Première expérience', description: 'Complétez votre première session AR', progress: 0, target: 1 },
-      { id: 'photo_master', name: 'Photographe', description: 'Prenez 50 photos en AR', progress: 0, target: 50 },
-      { id: 'regular_user', name: 'Habitué', description: 'Complétez 10 sessions', progress: 0, target: 10 },
-      { id: 'marathon', name: 'Marathon AR', description: 'Cumulez 1 heure en AR', progress: 0, target: 3600 },
-      { id: 'explorer', name: 'Explorateur', description: 'Essayez tous les filtres', progress: 0, target: 4 },
+      { id: 'first_session', name: 'Première expérience', description: 'Complétez votre première session AR', progress: 0, target: 1, icon: '🌟' },
+      { id: 'photo_master', name: 'Photographe', description: 'Prenez 50 photos en AR', progress: 0, target: 50, icon: '📸' },
+      { id: 'regular_user', name: 'Habitué', description: 'Complétez 10 sessions', progress: 0, target: 10, icon: '🎖️' },
+      { id: 'marathon', name: 'Marathon AR', description: 'Cumulez 1 heure en AR', progress: 0, target: 3600, icon: '⏱️' },
+      { id: 'explorer', name: 'Explorateur', description: 'Essayez les 8 filtres différents', progress: 0, target: 8, icon: '🧭' },
     ];
     localStorage.setItem(ACHIEVEMENTS_KEY, JSON.stringify(defaultAchievements));
     return defaultAchievements;
+  }
+
+  /**
+   * Update achievements progress based on current data
+   */
+  private static updateAchievementsProgress(
+    achievements: ARFilterAchievement[], 
+    totalSessions: number, 
+    totalPhotos: number,
+    filterCount: Map<string, number>
+  ): void {
+    const regularUser = achievements.find(a => a.id === 'regular_user');
+    if (regularUser) {
+      regularUser.progress = Math.min(totalSessions, regularUser.target);
+      if (regularUser.progress >= regularUser.target && !regularUser.unlockedAt) {
+        regularUser.unlockedAt = new Date().toISOString();
+      }
+    }
+
+    const photoMaster = achievements.find(a => a.id === 'photo_master');
+    if (photoMaster) {
+      photoMaster.progress = Math.min(totalPhotos, photoMaster.target);
+      if (photoMaster.progress >= photoMaster.target && !photoMaster.unlockedAt) {
+        photoMaster.unlockedAt = new Date().toISOString();
+      }
+    }
+
+    const explorer = achievements.find(a => a.id === 'explorer');
+    if (explorer) {
+      const uniqueFilters = filterCount.size;
+      explorer.progress = Math.min(uniqueFilters, explorer.target);
+      if (explorer.progress >= explorer.target && !explorer.unlockedAt) {
+        explorer.unlockedAt = new Date().toISOString();
+      }
+    }
+
+    localStorage.setItem(ACHIEVEMENTS_KEY, JSON.stringify(achievements));
   }
 
   /**
@@ -202,6 +284,43 @@ export class ARFiltersService {
     }
     
     localStorage.setItem(STORAGE_KEY, JSON.stringify(stats));
+  }
+
+  /**
+   * Check explorer achievement
+   */
+  private static checkExplorerAchievement(filterType: string): void {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    const stats = stored ? JSON.parse(stored) : { filters: {} };
+    const uniqueFilters = Object.keys(stats.filters).filter(f => VALID_FILTERS.includes(f as FilterType)).length;
+    
+    const achievements = this.getAchievements();
+    const explorer = achievements.find(a => a.id === 'explorer');
+    if (explorer) {
+      explorer.progress = uniqueFilters;
+      if (explorer.progress >= explorer.target && !explorer.unlockedAt) {
+        explorer.unlockedAt = new Date().toISOString();
+      }
+      localStorage.setItem(ACHIEVEMENTS_KEY, JSON.stringify(achievements));
+    }
+  }
+
+  /**
+   * Check regular user achievement
+   */
+  private static checkRegularUserAchievement(): void {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    const stats = stored ? JSON.parse(stored) : { sessions: 0 };
+    
+    const achievements = this.getAchievements();
+    const regularUser = achievements.find(a => a.id === 'regular_user');
+    if (regularUser) {
+      regularUser.progress = Math.min(stats.sessions, regularUser.target);
+      if (regularUser.progress >= regularUser.target && !regularUser.unlockedAt) {
+        regularUser.unlockedAt = new Date().toISOString();
+      }
+      localStorage.setItem(ACHIEVEMENTS_KEY, JSON.stringify(achievements));
+    }
   }
 
   /**
@@ -235,20 +354,21 @@ export class ARFiltersService {
   }
 
   /**
-   * Generate personalized recommendations
+   * Generate personalized recommendations with correct filter names
    */
   private static generateRecommendations(
     sessions: ARFilterSession[], 
     filterCount: Map<string, number>
   ): ARFilterRecommendation[] {
-    const allFilters = ['aura', 'breathing', 'bubbles', 'music'];
     const recommendations: ARFilterRecommendation[] = [];
     
     // Recommend filters not tried yet
-    allFilters.forEach(filter => {
+    VALID_FILTERS.forEach(filter => {
       if (!filterCount.has(filter)) {
         recommendations.push({
           filterId: filter,
+          filterName: FILTER_NAMES[filter] || filter,
+          filterEmoji: FILTER_EMOJIS[filter] || '🎭',
           reason: 'Nouveau filtre à découvrir',
           score: 0.9
         });
@@ -265,12 +385,17 @@ export class ARFiltersService {
       if (!recommendations.find(r => r.filterId === filter)) {
         recommendations.push({
           filterId: filter,
+          filterName: FILTER_NAMES[filter] || filter,
+          filterEmoji: FILTER_EMOJIS[filter] || '🎭',
           reason: 'Impact positif sur votre humeur',
           score: 0.85
         });
       }
     });
 
-    return recommendations.slice(0, 3);
+    // Sort by score and limit
+    return recommendations
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 3);
   }
 }

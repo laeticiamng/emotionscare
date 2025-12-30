@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 import { Camera, Sparkles, Image, History, BarChart3 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -13,39 +13,31 @@ import { ARHistory } from '@/modules/ar-filters/components/ARHistory';
 
 const B2CARFiltersPage: React.FC = () => {
   const { user } = useAuth();
-  const videoRef = useRef<HTMLVideoElement>(null);
   
   const {
     filters,
     currentFilter,
     selectFilter,
     isCameraActive,
+    isMirrored,
+    toggleMirror,
     startCamera,
     stopCamera,
+    videoRef,
     isSessionActive,
     startSession,
     endSession,
     sessionDuration,
     capturedPhotos,
     capturePhoto,
+    deletePhoto,
     clearPhotos,
+    downloadPhoto,
+    sharePhoto,
     stats,
     history,
     isLoadingStats,
   } = useARFilters(user?.id);
-
-  // Sync video ref
-  useEffect(() => {
-    if (videoRef.current && isCameraActive) {
-      navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } })
-        .then(stream => {
-          if (videoRef.current) {
-            videoRef.current.srcObject = stream;
-          }
-        })
-        .catch(console.error);
-    }
-  }, [isCameraActive]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 p-4 md:p-6" data-testid="page-root">
@@ -96,9 +88,11 @@ const B2CARFiltersPage: React.FC = () => {
                   isCameraActive={isCameraActive}
                   isSessionActive={isSessionActive}
                   sessionDuration={sessionDuration}
+                  isMirrored={isMirrored}
                   onStartCamera={startCamera}
                   onStopCamera={stopCamera}
                   onCapturePhoto={capturePhoto}
+                  onToggleMirror={toggleMirror}
                   videoRef={videoRef}
                 />
               </div>
@@ -124,7 +118,13 @@ const B2CARFiltersPage: React.FC = () => {
 
           {/* Gallery Tab */}
           <TabsContent value="gallery">
-            <ARPhotoGallery photos={capturedPhotos} onClearPhotos={clearPhotos} />
+            <ARPhotoGallery 
+              photos={capturedPhotos} 
+              onClearPhotos={clearPhotos}
+              onDeletePhoto={deletePhoto}
+              onDownloadPhoto={downloadPhoto}
+              onSharePhoto={sharePhoto}
+            />
           </TabsContent>
 
           {/* History Tab */}
