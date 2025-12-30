@@ -21,6 +21,11 @@ type JournalFeedProps = {
   onLoadMore: () => void
   onSendToCoach: (note: SanitizedNote) => Promise<void>
   sendingId: string | null
+  // Enriched props
+  onDelete?: (noteId: string) => void
+  onToggleFavorite?: (noteId: string) => void
+  onEdit?: (note: SanitizedNote) => void
+  isFavorite?: (noteId: string) => boolean
 }
 
 export function JournalFeed({
@@ -37,6 +42,10 @@ export function JournalFeed({
   onLoadMore,
   onSendToCoach,
   sendingId,
+  onDelete,
+  onToggleFavorite,
+  onEdit,
+  isFavorite,
 }: JournalFeedProps) {
   return (
     <Card>
@@ -72,6 +81,10 @@ export function JournalFeed({
           onLoadMore={onLoadMore}
           onSendToCoach={onSendToCoach}
           sendingId={sendingId}
+          onDelete={onDelete}
+          onToggleFavorite={onToggleFavorite}
+          onEdit={onEdit}
+          isFavorite={isFavorite}
         />
       </CardContent>
     </Card>
