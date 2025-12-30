@@ -30,7 +30,6 @@ const weatherConfig: Record<WeatherType, {
     icon: Sun,
     label: 'Ensoleillé',
     gradient: 'from-yellow-400/20 via-orange-400/20 to-amber-400/20',
-    animation: { rotate: [0, 360], scale: [1, 1.1, 1] },
     emoji: '☀️',
     color: 'text-yellow-500'
   },
@@ -38,7 +37,6 @@ const weatherConfig: Record<WeatherType, {
     icon: CloudSun,
     label: 'Partiellement nuageux',
     gradient: 'from-blue-300/20 via-yellow-300/20 to-gray-300/20',
-    animation: { x: [-5, 5, -5] },
     emoji: '⛅',
     color: 'text-gray-400'
   },
@@ -46,7 +44,6 @@ const weatherConfig: Record<WeatherType, {
     icon: Cloud,
     label: 'Nuageux',
     gradient: 'from-gray-400/20 via-slate-400/20 to-gray-500/20',
-    animation: { x: [-10, 10, -10] },
     emoji: '☁️',
     color: 'text-gray-500'
   },
@@ -54,7 +51,6 @@ const weatherConfig: Record<WeatherType, {
     icon: CloudRain,
     label: 'Pluvieux',
     gradient: 'from-blue-500/20 via-indigo-400/20 to-slate-500/20',
-    animation: { y: [0, 5, 0] },
     emoji: '🌧️',
     color: 'text-blue-500'
   },
@@ -62,7 +58,6 @@ const weatherConfig: Record<WeatherType, {
     icon: CloudLightning,
     label: 'Orageux',
     gradient: 'from-purple-600/20 via-slate-600/20 to-gray-700/20',
-    animation: { scale: [1, 1.2, 1], opacity: [1, 0.7, 1] },
     emoji: '⛈️',
     color: 'text-purple-600'
   },
@@ -70,7 +65,6 @@ const weatherConfig: Record<WeatherType, {
     icon: Sparkles,
     label: 'Magique',
     gradient: 'from-pink-400/20 via-purple-400/20 to-indigo-400/20',
-    animation: { rotate: [0, 10, -10, 0], scale: [1, 1.15, 1] },
     emoji: '✨',
     color: 'text-pink-500'
   },
@@ -78,7 +72,6 @@ const weatherConfig: Record<WeatherType, {
     icon: Wind,
     label: 'Venteux',
     gradient: 'from-cyan-400/20 via-teal-400/20 to-emerald-400/20',
-    animation: { x: [-15, 15, -15], rotate: [0, 5, -5, 0] },
     emoji: '💨',
     color: 'text-cyan-500'
   }
