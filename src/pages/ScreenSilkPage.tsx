@@ -36,7 +36,7 @@ export default function ScreenSilkPage() {
     resumeSession,
     completeSession,
     interruptSession
-  } = useScreenSilk();
+  } = useScreenSilkMicroBreak();
 
   const [showCompletionDialog, setShowCompletionDialog] = useState(false);
   const [activeTab, setActiveTab] = useState<string>('session');
