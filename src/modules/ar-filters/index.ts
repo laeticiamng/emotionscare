@@ -1,4 +1,10 @@
 export { ARFiltersMain } from './components/ARFiltersMain';
+export { ARCamera } from './components/ARCamera';
+export { ARFilterSelector } from './components/ARFilterSelector';
+export { ARPhotoGallery } from './components/ARPhotoGallery';
+export { ARStats } from './components/ARStats';
+export { ARSessionControls } from './components/ARSessionControls';
+export { ARHistory } from './components/ARHistory';
 export { useARFilters } from './hooks/useARFilters';
 export { ARFiltersService } from './arFiltersService';
 export * from './types';
