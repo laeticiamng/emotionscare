@@ -67,10 +67,10 @@ const B2CActivitePage: React.FC = () => {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('overview');
   const [streak, setStreak] = useState<ActivityStreak | null>(null);
-  const [activities, setActivities] = useState<Activity[]>([]);
+  const [activities, setActivities] = useState<ActivityType[]>([]);
   const [favorites, setFavorites] = useState<string[]>([]);
   const [filters, setFilters] = useState<Filters>({});
-  const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
+  const [selectedActivity, setSelectedActivity] = useState<ActivityType | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -148,7 +148,7 @@ const B2CActivitePage: React.FC = () => {
     }
   };
 
-  const handleSelectActivity = (activity: Activity) => {
+  const handleSelectActivity = (activity: ActivityType) => {
     setSelectedActivity(activity);
     setIsModalOpen(true);
   };
@@ -188,7 +188,7 @@ const B2CActivitePage: React.FC = () => {
           >
             <div>
               <h1 className="text-3xl md:text-4xl font-bold flex items-center gap-3">
-                <Activity className="h-8 w-8 text-primary" />
+                <ActivityIcon className="h-8 w-8 text-primary" />
                 <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
                   Centre d'Activités
                 </span>
@@ -276,7 +276,7 @@ const B2CActivitePage: React.FC = () => {
                 
                 <Card className="bg-gradient-to-br from-green-500/10 to-emerald-500/10 border-green-500/20">
                   <CardContent className="p-6 text-center">
-                    <Activity className="h-8 w-8 text-green-500 mx-auto mb-2" />
+                    <ActivityIcon className="h-8 w-8 text-green-500 mx-auto mb-2" />
                     <div className="text-3xl font-bold">{detailedStats?.totalSessions || 0}</div>
                     <div className="text-sm text-muted-foreground">Sessions complétées</div>
                   </CardContent>
@@ -518,7 +518,7 @@ const B2CActivitePage: React.FC = () => {
               ) : activities.length === 0 ? (
                 <Card>
                   <CardContent className="py-12 text-center">
-                    <Activity className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                    <ActivityIcon className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                     <p className="text-muted-foreground">Aucune activité trouvée</p>
                   </CardContent>
                 </Card>
