@@ -4483,6 +4483,39 @@ export type Database = {
         }
         Relationships: []
       }
+      daily_mood_heatmap: {
+        Row: {
+          activity_count: number | null
+          created_at: string
+          date: string
+          dominant_emotion: string | null
+          hour: number | null
+          id: string
+          mood_score: number | null
+          user_id: string
+        }
+        Insert: {
+          activity_count?: number | null
+          created_at?: string
+          date: string
+          dominant_emotion?: string | null
+          hour?: number | null
+          id?: string
+          mood_score?: number | null
+          user_id: string
+        }
+        Update: {
+          activity_count?: number | null
+          created_at?: string
+          date?: string
+          dominant_emotion?: string | null
+          hour?: number | null
+          id?: string
+          mood_score?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       data_archives: {
         Row: {
           archived_at: string
@@ -21587,6 +21620,51 @@ export type Database = {
         }
         Relationships: []
       }
+      user_scores: {
+        Row: {
+          components: Json | null
+          created_at: string
+          emotional_score: number
+          engagement_score: number
+          id: string
+          insights: Json | null
+          resilience_score: number | null
+          updated_at: string
+          user_id: string
+          week_number: number
+          wellbeing_score: number
+          year: number
+        }
+        Insert: {
+          components?: Json | null
+          created_at?: string
+          emotional_score?: number
+          engagement_score?: number
+          id?: string
+          insights?: Json | null
+          resilience_score?: number | null
+          updated_at?: string
+          user_id: string
+          week_number: number
+          wellbeing_score?: number
+          year: number
+        }
+        Update: {
+          components?: Json | null
+          created_at?: string
+          emotional_score?: number
+          engagement_score?: number
+          id?: string
+          insights?: Json | null
+          resilience_score?: number | null
+          updated_at?: string
+          user_id?: string
+          week_number?: number
+          wellbeing_score?: number
+          year?: number
+        }
+        Relationships: []
+      }
       user_search_history: {
         Row: {
           id: string
@@ -21949,6 +22027,42 @@ export type Database = {
           shopify_order_id?: string
           unlocked_at?: string | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      user_vibes: {
+        Row: {
+          contributing_factors: Json | null
+          created_at: string
+          duration_hours: number | null
+          id: string
+          intensity: number
+          recent_activities: string[] | null
+          recommended_modules: string[] | null
+          user_id: string
+          vibe_type: string
+        }
+        Insert: {
+          contributing_factors?: Json | null
+          created_at?: string
+          duration_hours?: number | null
+          id?: string
+          intensity?: number
+          recent_activities?: string[] | null
+          recommended_modules?: string[] | null
+          user_id: string
+          vibe_type?: string
+        }
+        Update: {
+          contributing_factors?: Json | null
+          created_at?: string
+          duration_hours?: number | null
+          id?: string
+          intensity?: number
+          recent_activities?: string[] | null
+          recommended_modules?: string[] | null
+          user_id?: string
+          vibe_type?: string
         }
         Relationships: []
       }
