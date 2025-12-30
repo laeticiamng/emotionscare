@@ -16404,6 +16404,111 @@ export type Database = {
         }
         Relationships: []
       }
+      score_comparisons: {
+        Row: {
+          comparison_data: Json
+          created_at: string
+          id: string
+          period_a_end: string
+          period_a_start: string
+          period_b_end: string
+          period_b_start: string
+          user_id: string
+        }
+        Insert: {
+          comparison_data: Json
+          created_at?: string
+          id?: string
+          period_a_end: string
+          period_a_start: string
+          period_b_end: string
+          period_b_start: string
+          user_id: string
+        }
+        Update: {
+          comparison_data?: Json
+          created_at?: string
+          id?: string
+          period_a_end?: string
+          period_a_start?: string
+          period_b_end?: string
+          period_b_start?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      score_goals: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          current_value: number | null
+          deadline: string | null
+          goal_type: string
+          id: string
+          reward_claimed: boolean | null
+          status: string | null
+          target_value: number
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          current_value?: number | null
+          deadline?: string | null
+          goal_type: string
+          id?: string
+          reward_claimed?: boolean | null
+          status?: string | null
+          target_value: number
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          current_value?: number | null
+          deadline?: string | null
+          goal_type?: string
+          id?: string
+          reward_claimed?: boolean | null
+          status?: string | null
+          target_value?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      score_milestones: {
+        Row: {
+          id: string
+          metadata: Json | null
+          milestone_type: string
+          milestone_value: number
+          notified: boolean | null
+          reached_at: string
+          shared: boolean | null
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          metadata?: Json | null
+          milestone_type: string
+          milestone_value: number
+          notified?: boolean | null
+          reached_at?: string
+          shared?: boolean | null
+          user_id: string
+        }
+        Update: {
+          id?: string
+          metadata?: Json | null
+          milestone_type?: string
+          milestone_value?: number
+          notified?: boolean | null
+          reached_at?: string
+          shared?: boolean | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       screen_silk_sessions: {
         Row: {
           badge: string | null
@@ -17315,6 +17420,45 @@ export type Database = {
           status?: string
           target_value?: number
           updated_at?: string
+        }
+        Relationships: []
+      }
+      special_badges: {
+        Row: {
+          category: string
+          condition_type: string
+          condition_value: number
+          created_at: string
+          description: string | null
+          icon: string | null
+          id: string
+          name: string
+          rarity: string | null
+          xp_reward: number | null
+        }
+        Insert: {
+          category: string
+          condition_type: string
+          condition_value: number
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name: string
+          rarity?: string | null
+          xp_reward?: number | null
+        }
+        Update: {
+          category?: string
+          condition_type?: string
+          condition_value?: number
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name?: string
+          rarity?: string | null
+          xp_reward?: number | null
         }
         Relationships: []
       }
@@ -21964,6 +22108,38 @@ export type Database = {
           visit_stats?: Json | null
         }
         Relationships: []
+      }
+      user_special_badges: {
+        Row: {
+          badge_id: string | null
+          earned_at: string
+          id: string
+          shared: boolean | null
+          user_id: string
+        }
+        Insert: {
+          badge_id?: string | null
+          earned_at?: string
+          id?: string
+          shared?: boolean | null
+          user_id: string
+        }
+        Update: {
+          badge_id?: string | null
+          earned_at?: string
+          id?: string
+          shared?: boolean | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_special_badges_badge_id_fkey"
+            columns: ["badge_id"]
+            isOneToOne: false
+            referencedRelation: "special_badges"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_stats: {
         Row: {
