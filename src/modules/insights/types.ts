@@ -59,6 +59,8 @@ export const Insight = z.object({
   applied_at: z.string().datetime().nullable().optional(),
   dismissed_at: z.string().datetime().nullable().optional(),
   reminded_at: z.string().datetime().nullable().optional(),
+  feedback_rating: z.number().min(1).max(5).nullable().optional(),
+  feedback_text: z.string().nullable().optional(),
   created_at: z.string().datetime()
 });
 export type Insight = z.infer<typeof Insight>;
@@ -84,8 +86,10 @@ export interface InsightStats {
   dismissed: number;
   applicationRate: number;
   averageImpact: number;
+  averageFeedback?: number;
   byType: Record<InsightType, number>;
   byPriority: Record<InsightPriority, number>;
+  byCategory?: Record<InsightCategory, number>;
 }
 
 export interface InsightFilters {
@@ -97,6 +101,13 @@ export interface InsightFilters {
   dateTo?: string;
 }
 
+export interface InsightPaginationOptions {
+  page?: number;
+  limit?: number;
+  sortBy?: 'created_at' | 'priority' | 'impact_score';
+  sortOrder?: 'asc' | 'desc';
+}
+
 export interface InsightGenerationContext {
   userId: string;
   recentEmotions?: Array<{ emotion: string; score: number; date: string }>;
@@ -104,4 +115,19 @@ export interface InsightGenerationContext {
   sessionData?: { breathingMinutes: number; meditationMinutes: number; musicSessions: number };
   streakDays?: number;
   goals?: Array<{ id: string; title: string; progress: number }>;
+}
+
+export interface InsightFeedback {
+  user_id: string;
+  insight_id: string;
+  rating: number;
+  feedback_text?: string;
+  was_helpful?: boolean;
+  action_taken?: string;
+}
+
+export interface InsightExportOptions {
+  format: 'json' | 'csv';
+  filters?: InsightFilters;
+  includeArchived?: boolean;
 }

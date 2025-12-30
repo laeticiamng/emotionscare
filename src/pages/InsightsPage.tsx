@@ -13,10 +13,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Progress } from '@/components/ui/progress';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Textarea } from '@/components/ui/textarea';
 import { 
   Brain, TrendingUp, Lightbulb, Target, Check, Clock, X, 
   ChevronRight, Sparkles, RefreshCw, BarChart3, Award,
-  AlertTriangle, Bell, Loader2, Calendar, Filter, Zap
+  AlertTriangle, Bell, Loader2, Filter, Zap, Download,
+  Star, ChevronLeft, ArrowUpDown, ThumbsUp, MessageSquare
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useInsights } from '@/modules/insights';
@@ -61,16 +64,30 @@ export default function InsightsPage() {
   const [typeFilter, setTypeFilter] = useState<InsightType | 'all'>('all');
   const [priorityFilter, setPriorityFilter] = useState<InsightPriority | 'all'>('all');
   const [generating, setGenerating] = useState(false);
+  const [feedbackInsight, setFeedbackInsight] = useState<Insight | null>(null);
+  const [feedbackRating, setFeedbackRating] = useState(0);
+  const [feedbackText, setFeedbackText] = useState('');
 
   const {
     insights,
     stats,
     loading,
     error,
+    total,
+    page,
+    totalPages,
+    hasNextPage,
+    hasPrevPage,
+    setPage,
+    sortBy,
+    sortOrder,
+    updateSort,
     applyInsight,
     dismissInsight,
     scheduleReminder,
     markAsRead,
+    submitFeedback,
+    exportInsights,
     generateInsights,
     reload
   } = useInsights();

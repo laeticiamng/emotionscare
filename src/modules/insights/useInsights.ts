@@ -1,36 +1,105 @@
 /**
  * Module Insights - Hook
- * Hook React pour gérer les insights IA
+ * Hook React pour gérer les insights IA avec pagination et filtres persistés
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useSearchParams } from 'react-router-dom';
 import { InsightsService } from './insightsService';
-import type { Insight, InsightStats, InsightFilters, InsightGenerationContext } from './types';
+import type { 
+  Insight, 
+  InsightStats, 
+  InsightFilters, 
+  InsightGenerationContext,
+  InsightPaginationOptions,
+  InsightFeedback,
+  InsightType,
+  InsightPriority,
+  InsightCategory
+} from './types';
 import { logger } from '@/lib/logger';
 import { supabase } from '@/integrations/supabase/client';
 
-export function useInsights(filters?: InsightFilters) {
+const STORAGE_KEY = 'insights_filters';
+
+export function useInsights(initialFilters?: InsightFilters) {
   const { user } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
+  
   const [insights, setInsights] = useState<Insight[]>([]);
   const [stats, setStats] = useState<InsightStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [total, setTotal] = useState(0);
+  
+  // Pagination state
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(20);
+  const [sortBy, setSortBy] = useState<'created_at' | 'priority' | 'impact_score'>('created_at');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
-  // Load insights
-  const loadInsights = useCallback(async () => {
+  // Filters - restore from localStorage or URL
+  const [filters, setFilters] = useState<InsightFilters>(() => {
+    // Try URL params first
+    const typeParam = searchParams.get('type');
+    const priorityParam = searchParams.get('priority');
+    const categoryParam = searchParams.get('category');
+    
+    if (typeParam || priorityParam || categoryParam) {
+      return {
+        type: typeParam ? [typeParam as InsightType] : undefined,
+        priority: priorityParam ? [priorityParam as InsightPriority] : undefined,
+        category: categoryParam ? [categoryParam as InsightCategory] : undefined,
+        ...initialFilters
+      };
+    }
+
+    // Try localStorage
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        return { ...JSON.parse(stored), ...initialFilters };
+      }
+    } catch {
+      // Ignore parse errors
+    }
+
+    return initialFilters || {};
+  });
+
+  // Persist filters to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(filters));
+    } catch {
+      // Ignore storage errors
+    }
+  }, [filters]);
+
+  // Load insights with pagination
+  const loadInsights = useCallback(async (resetPage = false) => {
     if (!user?.id) return;
 
     try {
       setLoading(true);
       setError(null);
       
-      const [insightsData, statsData] = await Promise.all([
-        InsightsService.getUserInsights(user.id, filters),
+      const currentPage = resetPage ? 1 : page;
+      if (resetPage) setPage(1);
+
+      const [result, statsData] = await Promise.all([
+        InsightsService.getUserInsights(user.id, filters, {
+          page: currentPage,
+          limit,
+          sortBy,
+          sortOrder
+        }),
         InsightsService.getInsightStats(user.id)
       ]);
 
-      setInsights(insightsData);
+      setInsights(result.insights);
+      setTotal(result.total);
       setStats(statsData);
     } catch (err) {
       logger.error('[useInsights] Load failed:', err as Error, 'HOOK');
@@ -38,7 +107,7 @@ export function useInsights(filters?: InsightFilters) {
     } finally {
       setLoading(false);
     }
-  }, [user?.id, filters]);
+  }, [user?.id, filters, page, limit, sortBy, sortOrder]);
 
   // Initial load
   useEffect(() => {
@@ -70,6 +139,26 @@ export function useInsights(filters?: InsightFilters) {
     };
   }, [user?.id, loadInsights]);
 
+  // Update filters
+  const updateFilters = useCallback((newFilters: Partial<InsightFilters>) => {
+    setFilters(prev => ({ ...prev, ...newFilters }));
+    setPage(1); // Reset to first page on filter change
+  }, []);
+
+  // Clear filters
+  const clearFilters = useCallback(() => {
+    setFilters({});
+    setPage(1);
+    localStorage.removeItem(STORAGE_KEY);
+  }, []);
+
+  // Update sorting
+  const updateSort = useCallback((newSortBy: typeof sortBy, newSortOrder?: typeof sortOrder) => {
+    setSortBy(newSortBy);
+    if (newSortOrder) setSortOrder(newSortOrder);
+    setPage(1);
+  }, []);
+
   // Apply insight
   const applyInsight = useCallback(async (insightId: string) => {
     if (!user?.id) return;
@@ -78,9 +167,12 @@ export function useInsights(filters?: InsightFilters) {
       await InsightsService.applyInsight(insightId, user.id);
       setInsights(prev => prev.map(i => 
         i.id === insightId 
-          ? { ...i, status: 'applied', is_read: true } 
+          ? { ...i, status: 'applied', is_read: true, applied_at: new Date().toISOString() } 
           : i
       ));
+      // Refresh stats
+      const newStats = await InsightsService.getInsightStats(user.id, true);
+      setStats(newStats);
     } catch (err) {
       logger.error('[useInsights] Apply failed:', err as Error, 'HOOK');
       throw err;
@@ -94,6 +186,10 @@ export function useInsights(filters?: InsightFilters) {
     try {
       await InsightsService.dismissInsight(insightId, user.id);
       setInsights(prev => prev.filter(i => i.id !== insightId));
+      setTotal(prev => prev - 1);
+      // Refresh stats
+      const newStats = await InsightsService.getInsightStats(user.id, true);
+      setStats(newStats);
     } catch (err) {
       logger.error('[useInsights] Dismiss failed:', err as Error, 'HOOK');
       throw err;
@@ -104,7 +200,7 @@ export function useInsights(filters?: InsightFilters) {
   const scheduleReminder = useCallback(async (insightId: string, remindAt?: Date) => {
     if (!user?.id) return;
 
-    const reminderDate = remindAt || new Date(Date.now() + 24 * 60 * 60 * 1000); // Default: tomorrow
+    const reminderDate = remindAt || new Date(Date.now() + 24 * 60 * 60 * 1000);
 
     try {
       await InsightsService.scheduleReminder(insightId, user.id, reminderDate);
@@ -125,13 +221,54 @@ export function useInsights(filters?: InsightFilters) {
       await InsightsService.markAsRead(insightId);
       setInsights(prev => prev.map(i => 
         i.id === insightId 
-          ? { ...i, is_read: true, status: 'read' } 
+          ? { ...i, is_read: true, status: i.status === 'new' ? 'read' : i.status } 
           : i
       ));
     } catch (err) {
       logger.error('[useInsights] Mark as read failed:', err as Error, 'HOOK');
     }
   }, []);
+
+  // Submit feedback
+  const submitFeedback = useCallback(async (feedback: Omit<InsightFeedback, 'user_id'>) => {
+    if (!user?.id) return;
+
+    try {
+      await InsightsService.submitFeedback({ ...feedback, user_id: user.id });
+      setInsights(prev => prev.map(i => 
+        i.id === feedback.insight_id 
+          ? { ...i, feedback_rating: feedback.rating, feedback_text: feedback.feedback_text } 
+          : i
+      ));
+    } catch (err) {
+      logger.error('[useInsights] Submit feedback failed:', err as Error, 'HOOK');
+      throw err;
+    }
+  }, [user?.id]);
+
+  // Export insights
+  const exportInsights = useCallback(async (format: 'json' | 'csv') => {
+    if (!user?.id) return;
+
+    try {
+      const data = await InsightsService.exportInsights(user.id, format);
+      
+      const blob = new Blob([data], { 
+        type: format === 'csv' ? 'text/csv' : 'application/json' 
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `insights_${new Date().toISOString().split('T')[0]}.${format}`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      logger.error('[useInsights] Export failed:', err as Error, 'HOOK');
+      throw err;
+    }
+  }, [user?.id]);
 
   // Generate new insights
   const generateInsights = useCallback(async (context?: Partial<InsightGenerationContext>) => {
@@ -140,7 +277,6 @@ export function useInsights(filters?: InsightFilters) {
     try {
       setLoading(true);
       
-      // Build context from user data
       const fullContext: InsightGenerationContext = {
         userId: user.id,
         ...context
@@ -201,11 +337,26 @@ export function useInsights(filters?: InsightFilters) {
         themes: []
       };
 
+      // Get goals progress
+      const { data: goals } = await supabase
+        .from('user_goals')
+        .select('id, title, progress')
+        .eq('user_id', user.id)
+        .eq('status', 'active');
+
+      if (goals?.length) {
+        fullContext.goals = goals.map(g => ({
+          id: g.id,
+          title: g.title,
+          progress: g.progress || 0
+        }));
+      }
+
       // Generate insights
       const newInsights = await InsightsService.generateInsights(fullContext);
       
       // Reload all insights
-      await loadInsights();
+      await loadInsights(true);
 
       return newInsights;
     } catch (err) {
@@ -216,16 +367,53 @@ export function useInsights(filters?: InsightFilters) {
     }
   }, [user?.id, loadInsights]);
 
+  // Computed values
+  const hasFilters = useMemo(() => {
+    return !!(filters.type?.length || filters.priority?.length || filters.category?.length || filters.dateFrom || filters.dateTo);
+  }, [filters]);
+
+  const totalPages = useMemo(() => Math.ceil(total / limit), [total, limit]);
+
+  const hasNextPage = page < totalPages;
+  const hasPrevPage = page > 1;
+
   return {
+    // Data
     insights,
     stats,
     loading,
     error,
+    total,
+    
+    // Pagination
+    page,
+    limit,
+    totalPages,
+    hasNextPage,
+    hasPrevPage,
+    setPage,
+    setLimit,
+    
+    // Sorting
+    sortBy,
+    sortOrder,
+    updateSort,
+    
+    // Filters
+    filters,
+    hasFilters,
+    updateFilters,
+    clearFilters,
+    
+    // Actions
     applyInsight,
     dismissInsight,
     scheduleReminder,
     markAsRead,
+    submitFeedback,
+    exportInsights,
     generateInsights,
-    reload: loadInsights
+    reload: () => loadInsights(false),
+    refresh: () => loadInsights(true)
   };
 }
