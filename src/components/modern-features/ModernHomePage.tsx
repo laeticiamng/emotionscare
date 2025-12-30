@@ -22,12 +22,14 @@ import {
   Flame,
   StopCircle,
   Moon,
+  Map,
 } from 'lucide-react';
 import EnrichedHeroSection from '@/components/home/EnrichedHeroSection';
 import OnboardingGuide from '@/components/home/OnboardingGuide';
 import QuickStartModules from '@/components/home/QuickStartModules';
 import CommunityEngagement from '@/components/home/CommunityEngagement';
 import AcademySection from '@/components/home/AcademySection';
+import ParkPreviewCard from '@/components/home/ParkPreviewCard';
 
 // Code splitting : lazy load des sections non critiques
 const FAQSection = lazy(() => import('@/components/home/FAQSection'));
@@ -268,16 +270,19 @@ const ModernHomePage: React.FC = () => {
       {/* SECTION 1: Hero interventionnel */}
       <EnrichedHeroSection />
 
-      {/* SECTION 2: Onboarding ultra-court */}
+      {/* SECTION 2: Carte du Parc - Accès direct */}
+      <ParkPreviewCard />
+
+      {/* SECTION 3: Onboarding ultra-court */}
       <OnboardingGuide />
 
-      {/* SECTION 3: Protocoles d'activation */}
+      {/* SECTION 4: Protocoles d'activation */}
       <QuickStartModules />
 
-      {/* SECTION 4: Academy - Comprendre pour reprendre la main */}
+      {/* SECTION 5: Academy - Comprendre pour reprendre la main */}
       <AcademySection />
 
-      {/* SECTION 5: Engagement communautaire */}
+      {/* SECTION 6: Engagement communautaire */}
       <CommunityEngagement />
 
       {/* SECTION 6: Témoignages (lazy loaded) */}
