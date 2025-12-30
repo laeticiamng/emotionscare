@@ -23,6 +23,7 @@ import {
   StopCircle,
   Moon,
   Map,
+  Building2,
 } from 'lucide-react';
 import EnrichedHeroSection from '@/components/home/EnrichedHeroSection';
 import OnboardingGuide from '@/components/home/OnboardingGuide';
@@ -111,7 +112,15 @@ const ModernHomePage: React.FC = () => {
             EmotionsCare
           </Link>
           
-          <nav className="flex items-center gap-4">
+          <nav className="flex items-center gap-2 sm:gap-4">
+            {/* Bouton Entreprise B2B - toujours visible */}
+            <Link to="/b2b">
+              <Button variant="outline" size="sm" className="gap-2 border-blue-500/50 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950">
+                <Building2 className="h-4 w-4" />
+                <span className="hidden sm:inline">Entreprise</span>
+              </Button>
+            </Link>
+            
             {isAuthenticated ? (
               <Link to="/app/home">
                 <Button variant="ghost" size="sm" className="gap-2">
