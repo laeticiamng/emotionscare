@@ -2,12 +2,13 @@
  * B2C Boss Level Grit Page - Module de résilience gamifié
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { Crown, BarChart2, Sword, RefreshCw } from 'lucide-react';
+import { Crown, BarChart2, Sword, RefreshCw, History } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useGritQuest } from '@/hooks/useGritQuest';
+import { toast } from '@/hooks/use-toast';
 import {
   ChallengeCard,
   QuestPanel,
@@ -17,7 +18,7 @@ import {
   type Quest
 } from '@/components/boss-grit';
 
-type ViewMode = 'challenges' | 'stats';
+type ViewMode = 'challenges' | 'stats' | 'history';
 
 // Défis prédéfinis
 const PRESET_CHALLENGES: Challenge[] = [
@@ -82,8 +83,18 @@ const B2CBossLevelGritPage: React.FC = () => {
     pauseQuest,
     resumeQuest,
     abortQuest,
-    resetQuest
+    resetQuest,
+    updateElapsedTime
   } = useGritQuest();
+
+  // History state
+  const [questHistory, setQuestHistory] = useState<Array<{
+    id: string;
+    title: string;
+    completedAt: string;
+    xp: number;
+    success: boolean;
+  }>>([]);
 
   // Player stats from localStorage
   const [playerStats, setPlayerStats] = useState({
@@ -96,6 +107,11 @@ const B2CBossLevelGritPage: React.FC = () => {
     bestStreak: 0
   });
 
+  // Timer ref for elapsed time
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const startTimeRef = useRef<number | null>(null);
+
+  // Load stats and history from localStorage
   useEffect(() => {
     const saved = localStorage.getItem('boss-grit-stats');
     if (saved) {
@@ -105,11 +121,51 @@ const B2CBossLevelGritPage: React.FC = () => {
         // Ignore
       }
     }
+
+    const savedHistory = localStorage.getItem('boss-grit-history');
+    if (savedHistory) {
+      try {
+        setQuestHistory(JSON.parse(savedHistory));
+      } catch {
+        // Ignore
+      }
+    }
   }, []);
+
+  // Timer effect: increment elapsed time every second when active
+  useEffect(() => {
+    if (status === 'active' && !timerRef.current) {
+      startTimeRef.current = Date.now() - elapsedTime * 1000;
+      timerRef.current = setInterval(() => {
+        if (startTimeRef.current) {
+          const newElapsed = Math.floor((Date.now() - startTimeRef.current) / 1000);
+          updateElapsedTime(newElapsed);
+        }
+      }, 1000);
+    } else if (status === 'paused' && timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    } else if (status !== 'active' && status !== 'paused' && timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    };
+  }, [status, elapsedTime, updateElapsedTime]);
 
   const saveStats = (stats: typeof playerStats) => {
     localStorage.setItem('boss-grit-stats', JSON.stringify(stats));
     setPlayerStats(stats);
+  };
+
+  const saveHistory = (history: typeof questHistory) => {
+    localStorage.setItem('boss-grit-history', JSON.stringify(history));
+    setQuestHistory(history);
   };
 
   // Convert quest from hook to Quest format
@@ -130,8 +186,13 @@ const B2CBossLevelGritPage: React.FC = () => {
         theme: 'balance'
       };
       setActiveQuest(convertedQuest);
+
+      // Auto-start quest
+      if (quest.quest_id && status === 'idle') {
+        startQuest(quest.quest_id);
+      }
     }
-  }, [quest]);
+  }, [quest, status, startQuest]);
 
   const handleStartChallenge = async (challengeId: string) => {
     // Update challenge status
@@ -186,6 +247,7 @@ const B2CBossLevelGritPage: React.FC = () => {
     };
 
     // Level up check
+    let leveledUp = false;
     while (newStats.currentXP >= newStats.maxXP) {
       newStats = {
         ...newStats,
@@ -193,14 +255,46 @@ const B2CBossLevelGritPage: React.FC = () => {
         currentXP: newStats.currentXP - newStats.maxXP,
         maxXP: Math.floor(newStats.maxXP * 1.5)
       };
+      leveledUp = true;
     }
 
     saveStats(newStats);
+
+    // Save to history
+    const historyEntry = {
+      id: activeQuest.id || `quest-${Date.now()}`,
+      title: activeQuest.title,
+      completedAt: new Date().toISOString(),
+      xp,
+      success: true
+    };
+    saveHistory([historyEntry, ...questHistory].slice(0, 50));
+
     await completeQuest(true);
+
+    if (leveledUp) {
+      toast({
+        title: `🎉 Niveau ${newStats.level} atteint !`,
+        description: 'Félicitations pour votre progression !'
+      });
+    }
+
     setShowCompletion(true);
   };
 
   const handleAbandonQuest = () => {
+    if (activeQuest) {
+      // Save abandoned quest to history
+      const historyEntry = {
+        id: activeQuest.id || `quest-${Date.now()}`,
+        title: activeQuest.title,
+        completedAt: new Date().toISOString(),
+        xp: 0,
+        success: false
+      };
+      saveHistory([historyEntry, ...questHistory].slice(0, 50));
+    }
+
     abortQuest('User abandoned');
     setActiveQuest(null);
     setChallenges(prev =>
