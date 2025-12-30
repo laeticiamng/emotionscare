@@ -1,179 +1,267 @@
-"use client";
-import React from "react";
-import PageHeader from "@/components/ui/PageHeader";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { AudioPlayer } from "@/ui/AudioPlayer";
-import { synthParagraphs } from "@/lib/story-synth/templates";
-import { downloadText } from "@/lib/story-synth/export";
-import { ff } from "@/lib/flags/ff";
-import { useStorySynth } from '@/hooks/useStorySynth';
+/**
+ * Page Story Synth enrichie avec design moderne
+ * @module story-synth
+ */
+
+import React, { useState, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  BookOpen, 
+  PenTool, 
+  Library, 
+  BarChart3, 
+  Sparkles,
+  Settings
+} from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
+
 import { useAuth } from '@/contexts/AuthContext';
+import { useStorySynth } from '@/hooks/useStorySynth';
+import { synthParagraphs } from '@/lib/story-synth/templates';
+import { downloadText } from '@/lib/story-synth/export';
 
-type Genre = "calme"|"aventure"|"poetique"|"mysterieux"|"romance";
-type Pov = "je"|"il"|"elle"|"nous";
-type Style = "sobre"|"lyrique"|"journal"|"dialogue";
-
-const AMBIENTS: Record<string, string> = {
-  doux: "/audio/lofi-120.mp3",
-  pluie: "/audio/rain-soft.mp3"
-};
+import { StoryGeneratorForm, type StoryGenerationFormData } from './components/StoryGeneratorForm';
+import { StoryReader } from './components/StoryReader';
+import { StoryLibrary } from './components/StoryLibrary';
+import { StoryStats } from './components/StoryStats';
+import type { StoryContent, StorySynthStats } from './types';
 
 export default function StorySynthPage() {
   const { user } = useAuth();
-  const { history, createStory, isLoading } = useStorySynth(user?.id || '');
+  const { history, createStory, isLoading, isSavingStory } = useStorySynth(user?.id || '');
   
-  const [genre, setGenre] = React.useState<Genre>("calme");
-  const [pov, setPov] = React.useState<Pov>("je");
-  const [hero, setHero] = React.useState("Alex");
-  const [place, setPlace] = React.useState("la ville");
-  const [length, setLength] = React.useState(4);
-  const [style, setStyle] = React.useState<Style>("sobre");
-  const [seed, setSeed] = React.useState("");
-  const [ambient, setAmbient] = React.useState<keyof typeof AMBIENTS | "aucun">("aucun");
+  const [activeTab, setActiveTab] = useState('create');
+  const [currentStory, setCurrentStory] = useState<StoryContent | null>(null);
+  const [currentConfig, setCurrentConfig] = useState<StoryGenerationFormData | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [isReading, setIsReading] = useState(false);
 
-  const [title, setTitle] = React.useState("Petite histoire");
-  const [story, setStory] = React.useState<string[]>([]);
+  // Mock stats (would come from service)
+  const stats: StorySynthStats = {
+    total_stories_read: history?.length || 0,
+    total_reading_time_minutes: history?.reduce((sum: number, s: any) => 
+      sum + Math.round((s.reading_duration_seconds || 0) / 60), 0) || 0,
+    favorite_theme: 'calme',
+    favorite_tone: 'apaisant',
+    completion_rate: history?.length ? 
+      history.filter((s: any) => s.completed_at).length / history.length : 0,
+  };
 
-  const newAudio = ff?.("new-audio-engine") ?? false;
+  const handleGenerate = useCallback((config: StoryGenerationFormData) => {
+    setIsGenerating(true);
+    setCurrentConfig(config);
 
-  function onGenerate() {
-    const paragraphs = synthParagraphs({ genre, pov, hero, place, length, style, seed });
-    setStory(paragraphs);
-  }
+    try {
+      // Generate story using templates
+      const paragraphs = synthParagraphs({
+        genre: config.theme,
+        pov: config.pov,
+        hero: config.protagonist,
+        place: config.location,
+        length: config.length,
+        style: config.style,
+        seed: config.seed,
+      });
 
-  function onContinue() {
-    const more = synthParagraphs({ genre, pov, hero, place, length: Math.min(2, 2), style, seed: seed || String(Date.now()) });
-    setStory(s => [...s, ...more.slice(0, 2)]);
-  }
+      const story: StoryContent = {
+        title: `${config.protagonist} et ${config.location}`,
+        paragraphs: paragraphs.map((text, i) => ({
+          id: `p-${i}`,
+          text,
+          emphasis: i === 0 ? 'strong' : i === paragraphs.length - 1 ? 'soft' : 'normal',
+        })),
+        estimated_duration_seconds: paragraphs.length * 8,
+        ambient_music: config.ambient !== 'aucun' ? config.ambient : undefined,
+      };
 
-  function onSave() {
-    if (!story.length || !user?.id) return;
+      setCurrentStory(story);
+      setIsReading(true);
+      toast.success('Histoire générée !');
+    } catch (error) {
+      toast.error('Erreur lors de la génération');
+    } finally {
+      setIsGenerating(false);
+    }
+  }, []);
+
+  const handleCompleteReading = useCallback((duration: number) => {
+    setIsReading(false);
     
-    const content = story.join('\n\n');
-    const metadata = { genre, pov, style, hero, place };
+    if (currentStory && user?.id) {
+      const content = currentStory.paragraphs.map(p => p.text).join('\n\n');
+      
+      createStory({
+        title: currentStory.title,
+        content,
+        genre: currentConfig?.theme || 'calme',
+        style: currentConfig?.style || 'sobre',
+        metadata: { ...currentConfig, reading_duration: duration },
+      });
+    }
+
+    toast.success(`Lecture terminée ! ${Math.round(duration / 60)} min de lecture.`);
+  }, [currentStory, currentConfig, user?.id, createStory]);
+
+  const handleSaveStory = useCallback(() => {
+    if (!currentStory || !user?.id) return;
     
-    createStory({ 
-      title: title.trim() || "Histoire", 
+    const content = currentStory.paragraphs.map(p => p.text).join('\n\n');
+    
+    createStory({
+      title: currentStory.title,
       content,
-      genre,
-      style,
-      metadata 
+      genre: currentConfig?.theme || 'calme',
+      style: currentConfig?.style || 'sobre',
+      metadata: currentConfig,
     });
-  }
+  }, [currentStory, currentConfig, user?.id, createStory]);
 
-  function onExport() {
-    if (!story.length) return;
-    downloadText(`${(title || "histoire").replace(/\s+/g,"-").toLowerCase()}.txt`, story);
-  }
+  const handleExportStory = useCallback(() => {
+    if (!currentStory) return;
+    
+    const filename = `${currentStory.title.replace(/\s+/g, '-').toLowerCase()}.txt`;
+    const content = currentStory.paragraphs.map(p => p.text);
+    downloadText(filename, content);
+    toast.success('Histoire exportée !');
+  }, [currentStory]);
+
+  const handleReadStory = useCallback((storyId: string) => {
+    // In a real app, this would fetch the story from the backend
+    const story = history?.find((s: any) => s.id === storyId);
+    if (story) {
+      // Convert stored story to StoryContent format
+      setCurrentStory({
+        title: story.theme || 'Histoire',
+        paragraphs: [{
+          id: 'p-0',
+          text: 'Cette histoire sera chargée depuis votre bibliothèque...',
+          emphasis: 'normal',
+        }],
+      });
+      setIsReading(true);
+    }
+  }, [history]);
+
+  const handleDeleteStory = useCallback((storyId: string) => {
+    toast.info('Suppression non implémentée dans cette démo');
+  }, []);
 
   return (
-    <main aria-label="Story Synth">
-      <PageHeader title="Story Synth" subtitle="Génère une courte histoire à partir d'un brief" />
-      <Card>
-        <section style={{ display:"grid", gap: 10 }}>
-          <div style={{ display:"grid", gap: 8 }}>
-            <label>Genre
-              <select value={genre} onChange={(e)=>setGenre(e.target.value as Genre)}>
-                <option value="calme">Calme</option>
-                <option value="aventure">Aventure</option>
-                <option value="poetique">Poétique</option>
-                <option value="mysterieux">Mystérieux</option>
-                <option value="romance">Romance</option>
-              </select>
-            </label>
+    <div className="min-h-screen bg-gradient-to-b from-background via-background to-muted/20">
+      {/* Header */}
+      <header className="sticky top-0 z-40 bg-background/80 backdrop-blur-lg border-b border-border/50">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-purple-500/20">
+                <BookOpen className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-foreground">Story Synth Lab</h1>
+                <p className="text-sm text-muted-foreground">
+                  Créez des histoires thérapeutiques personnalisées
+                </p>
+              </div>
+            </div>
 
-            <label>Point de vue
-              <select value={pov} onChange={(e)=>setPov(e.target.value as Pov)}>
-                <option value="je">Je</option>
-                <option value="il">Il</option>
-                <option value="elle">Elle</option>
-                <option value="nous">Nous</option>
-              </select>
-            </label>
+            <Button variant="outline" size="icon">
+              <Settings className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+      </header>
 
-            <label>Protagoniste
-              <input type="text" value={hero} onChange={(e)=>setHero(e.target.value)} />
-            </label>
+      {/* Main Content */}
+      <main className="container mx-auto px-4 py-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <TabsList className="grid w-full grid-cols-3 lg:w-auto lg:inline-grid">
+            <TabsTrigger value="create" className="gap-2">
+              <PenTool className="w-4 h-4" />
+              <span className="hidden sm:inline">Créer</span>
+            </TabsTrigger>
+            <TabsTrigger value="library" className="gap-2">
+              <Library className="w-4 h-4" />
+              <span className="hidden sm:inline">Bibliothèque</span>
+            </TabsTrigger>
+            <TabsTrigger value="stats" className="gap-2">
+              <BarChart3 className="w-4 h-4" />
+              <span className="hidden sm:inline">Stats</span>
+            </TabsTrigger>
+          </TabsList>
 
-            <label>Lieu
-              <input type="text" value={place} onChange={(e)=>setPlace(e.target.value)} />
-            </label>
-
-            <label>Longueur : {length} §
-              <input type="range" min={3} max={7} value={length} onChange={(e)=>setLength(parseInt(e.target.value,10))} />
-            </label>
-
-            <label>Style
-              <select value={style} onChange={(e)=>setStyle(e.target.value as Style)}>
-                <option value="sobre">Sobre</option>
-                <option value="lyrique">Lyrique</option>
-                <option value="journal">Journal</option>
-                <option value="dialogue">Dialogue</option>
-              </select>
-            </label>
-
-            <label>Seed (optionnel)
-              <input type="text" value={seed} onChange={(e)=>setSeed(e.target.value)} placeholder="Reproductible si renseigné"/>
-            </label>
-
-            <label>Ambiance sonore
-              <select value={ambient} onChange={(e)=>setAmbient(e.target.value as any)}>
-                <option value="aucun">Aucun</option>
-                <option value="doux">Lofi doux</option>
-                <option value="pluie">Pluie</option>
-              </select>
-            </label>
-
-            {newAudio && ambient !== "aucun" && (
-              <AudioPlayer
-                src={AMBIENTS[ambient]}
-                trackId={`story-ambient-${ambient}`}
-                title={`Ambiance ${ambient}`}
-                loop
-                defaultVolume={0.5}
+          {/* Create Tab */}
+          <TabsContent value="create" className="space-y-6">
+            <div className="grid lg:grid-cols-[1fr_320px] gap-6">
+              {/* Generator Form */}
+              <StoryGeneratorForm
+                onGenerate={handleGenerate}
+                isGenerating={isGenerating}
               />
-            )}
-          </div>
 
-          <div style={{ display:"flex", gap: 8, flexWrap:"wrap" }}>
-            <Button onClick={onGenerate} data-ui="primary-cta">Générer</Button>
-            <Button onClick={onContinue}>Continuer (+)</Button>
-            <Button onClick={onSave}>Enregistrer</Button>
-            <Button onClick={onExport}>Exporter .txt</Button>
-          </div>
-
-          <label>Titre
-            <input type="text" value={title} onChange={(e)=>setTitle(e.target.value)} />
-          </label>
-
-          {!!story.length && (
-            <article style={{ display:"grid", gap: 10 }}>
-              {story.map((p, i) => <p key={i} style={{ whiteSpace: "pre-wrap" }}>{p}</p>)}
-            </article>
-          )}
-        </section>
-      </Card>
-
-      <Card style={{ marginTop: 12 }}>
-        <h2>Bibliothèque</h2>
-        {isLoading ? (
-          <p>Chargement...</p>
-        ) : (
-          <ul style={{ listStyle:"none", padding:0, display:"grid", gap:8 }}>
-            {history?.map((s: any) => (
-              <li key={s.id} style={{ border:"1px solid var(--card)", borderRadius:12, padding:10 }}>
-                <div style={{ display:"flex", justifyContent:"space-between", gap:8 }}>
-                  <strong>{s.theme || 'Histoire'}</strong>
-                  <small>{new Date(s.created_at).toLocaleString()}</small>
+              {/* Stats Sidebar */}
+              <aside className="hidden lg:block">
+                <div className="sticky top-24">
+                  <StoryStats 
+                    stats={stats}
+                    weeklyGoal={3}
+                    weeklyProgress={history?.filter((s: any) => {
+                      const date = new Date(s.created_at);
+                      const now = new Date();
+                      const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+                      return date >= weekAgo;
+                    }).length || 0}
+                  />
                 </div>
-                <p style={{ marginTop:6, opacity:.85 }}>Session du {new Date(s.created_at).toLocaleDateString()}</p>
-              </li>
-            ))}
-            {!history?.length && <em>Aucune histoire enregistrée pour l'instant.</em>}
-          </ul>
+              </aside>
+            </div>
+          </TabsContent>
+
+          {/* Library Tab */}
+          <TabsContent value="library">
+            <StoryLibrary
+              stories={history || []}
+              isLoading={isLoading}
+              onReadStory={handleReadStory}
+              onDeleteStory={handleDeleteStory}
+              onExportStory={(id) => toast.info('Export depuis bibliothèque à implémenter')}
+              onToggleFavorite={(id) => toast.info('Favoris à implémenter')}
+            />
+          </TabsContent>
+
+          {/* Stats Tab */}
+          <TabsContent value="stats" className="lg:hidden">
+            <StoryStats 
+              stats={stats}
+              weeklyGoal={3}
+              weeklyProgress={history?.filter((s: any) => {
+                const date = new Date(s.created_at);
+                const now = new Date();
+                const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+                return date >= weekAgo;
+              }).length || 0}
+            />
+          </TabsContent>
+        </Tabs>
+      </main>
+
+      {/* Story Reader Overlay */}
+      <AnimatePresence>
+        {isReading && currentStory && (
+          <StoryReader
+            story={currentStory}
+            title={currentStory.title}
+            theme={currentConfig?.theme}
+            onClose={() => setIsReading(false)}
+            onComplete={handleCompleteReading}
+            onSave={handleSaveStory}
+            onExport={handleExportStory}
+            ambient={currentConfig?.ambient}
+          />
         )}
-      </Card>
-    </main>
+      </AnimatePresence>
+    </div>
   );
 }

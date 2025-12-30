@@ -16,6 +16,16 @@ export { StorySynthServiceEnriched } from './storySynthServiceUnified';
 export { useStorySynthMachine } from './useStorySynthMachine';
 
 // ============================================================================
+// COMPOSANTS
+// ============================================================================
+
+export { StoryCard } from './components/StoryCard';
+export { StoryStats } from './components/StoryStats';
+export { StoryGeneratorForm } from './components/StoryGeneratorForm';
+export { StoryReader } from './components/StoryReader';
+export { StoryLibrary } from './components/StoryLibrary';
+
+// ============================================================================
 // TYPES
 // ============================================================================
 
