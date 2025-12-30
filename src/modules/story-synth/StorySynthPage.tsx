@@ -1,153 +1,85 @@
 /**
- * Page Story Synth enrichie avec design moderne
+ * Page Story Synth enrichie avec toutes les fonctionnalités
  * @module story-synth
  */
 
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   BookOpen, 
   PenTool, 
   Library, 
   BarChart3, 
-  Sparkles,
   Settings
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
 import { useAuth } from '@/contexts/AuthContext';
-import { useStorySynth } from '@/hooks/useStorySynth';
-import { synthParagraphs } from '@/lib/story-synth/templates';
-import { downloadText } from '@/lib/story-synth/export';
+import { useStorySynthEnriched } from './useStorySynthEnriched';
 
 import { StoryGeneratorForm, type StoryGenerationFormData } from './components/StoryGeneratorForm';
 import { StoryReader } from './components/StoryReader';
 import { StoryLibrary } from './components/StoryLibrary';
 import { StoryStats } from './components/StoryStats';
-import type { StoryContent, StorySynthStats } from './types';
 
 export default function StorySynthPage() {
   const { user } = useAuth();
-  const { history, createStory, isLoading, isSavingStory } = useStorySynth(user?.id || '');
-  
-  const [activeTab, setActiveTab] = useState('create');
-  const [currentStory, setCurrentStory] = useState<StoryContent | null>(null);
-  const [currentConfig, setCurrentConfig] = useState<StoryGenerationFormData | null>(null);
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [isReading, setIsReading] = useState(false);
+  const {
+    sessions,
+    stats,
+    achievements,
+    weeklyProgress,
+    streak,
+    currentStory,
+    currentConfig,
+    isReading,
+    isGenerating,
+    isLoadingHistory,
+    readingStartTime,
+    generateStory,
+    completeReading,
+    saveCurrentStory,
+    exportStory,
+    readFromLibrary,
+    closeReader,
+    deleteSession,
+    toggleFavorite,
+  } = useStorySynthEnriched(user?.id);
 
-  // Mock stats (would come from service)
-  const stats: StorySynthStats = {
-    total_stories_read: history?.length || 0,
-    total_reading_time_minutes: history?.reduce((sum: number, s: any) => 
-      sum + Math.round((s.reading_duration_seconds || 0) / 60), 0) || 0,
-    favorite_theme: 'calme',
-    favorite_tone: 'apaisant',
-    completion_rate: history?.length ? 
-      history.filter((s: any) => s.completed_at).length / history.length : 0,
+  const [activeTab, setActiveTab] = useState('create');
+
+  // Transform sessions for StoryLibrary component
+  const libraryStories = sessions.map(s => ({
+    id: s.id,
+    title: s.story_theme || s.theme || 'Histoire',
+    theme: s.theme || undefined,
+    tone: s.tone || undefined,
+    reading_duration_seconds: s.reading_duration_seconds || s.duration_seconds || 0,
+    created_at: s.created_at,
+    completed_at: s.completed_at || undefined,
+    is_favorite: s.is_favorite,
+  }));
+
+  const handleGenerate = (config: StoryGenerationFormData) => {
+    generateStory({
+      theme: config.theme,
+      tone: config.tone,
+      pov: config.pov,
+      style: config.style,
+      protagonist: config.protagonist,
+      location: config.location,
+      length: config.length,
+      seed: config.seed,
+      userContext: config.userContext,
+      ambient: config.ambient,
+    });
   };
 
-  const handleGenerate = useCallback((config: StoryGenerationFormData) => {
-    setIsGenerating(true);
-    setCurrentConfig(config);
-
-    try {
-      // Generate story using templates
-      const paragraphs = synthParagraphs({
-        genre: config.theme,
-        pov: config.pov,
-        hero: config.protagonist,
-        place: config.location,
-        length: config.length,
-        style: config.style,
-        seed: config.seed,
-      });
-
-      const story: StoryContent = {
-        title: `${config.protagonist} et ${config.location}`,
-        paragraphs: paragraphs.map((text, i) => ({
-          id: `p-${i}`,
-          text,
-          emphasis: i === 0 ? 'strong' : i === paragraphs.length - 1 ? 'soft' : 'normal',
-        })),
-        estimated_duration_seconds: paragraphs.length * 8,
-        ambient_music: config.ambient !== 'aucun' ? config.ambient : undefined,
-      };
-
-      setCurrentStory(story);
-      setIsReading(true);
-      toast.success('Histoire générée !');
-    } catch (error) {
-      toast.error('Erreur lors de la génération');
-    } finally {
-      setIsGenerating(false);
-    }
-  }, []);
-
-  const handleCompleteReading = useCallback((duration: number) => {
-    setIsReading(false);
-    
-    if (currentStory && user?.id) {
-      const content = currentStory.paragraphs.map(p => p.text).join('\n\n');
-      
-      createStory({
-        title: currentStory.title,
-        content,
-        genre: currentConfig?.theme || 'calme',
-        style: currentConfig?.style || 'sobre',
-        metadata: { ...currentConfig, reading_duration: duration },
-      });
-    }
-
-    toast.success(`Lecture terminée ! ${Math.round(duration / 60)} min de lecture.`);
-  }, [currentStory, currentConfig, user?.id, createStory]);
-
-  const handleSaveStory = useCallback(() => {
-    if (!currentStory || !user?.id) return;
-    
-    const content = currentStory.paragraphs.map(p => p.text).join('\n\n');
-    
-    createStory({
-      title: currentStory.title,
-      content,
-      genre: currentConfig?.theme || 'calme',
-      style: currentConfig?.style || 'sobre',
-      metadata: currentConfig,
-    });
-  }, [currentStory, currentConfig, user?.id, createStory]);
-
-  const handleExportStory = useCallback(() => {
-    if (!currentStory) return;
-    
-    const filename = `${currentStory.title.replace(/\s+/g, '-').toLowerCase()}.txt`;
-    const content = currentStory.paragraphs.map(p => p.text);
-    downloadText(filename, content);
-    toast.success('Histoire exportée !');
-  }, [currentStory]);
-
-  const handleReadStory = useCallback((storyId: string) => {
-    // In a real app, this would fetch the story from the backend
-    const story = history?.find((s: any) => s.id === storyId);
-    if (story) {
-      // Convert stored story to StoryContent format
-      setCurrentStory({
-        title: story.theme || 'Histoire',
-        paragraphs: [{
-          id: 'p-0',
-          text: 'Cette histoire sera chargée depuis votre bibliothèque...',
-          emphasis: 'normal',
-        }],
-      });
-      setIsReading(true);
-    }
-  }, [history]);
-
-  const handleDeleteStory = useCallback((storyId: string) => {
-    toast.info('Suppression non implémentée dans cette démo');
-  }, []);
+  const handleCompleteReading = (duration: number) => {
+    completeReading(duration);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-background to-muted/20">
@@ -167,15 +99,22 @@ export default function StorySynthPage() {
               </div>
             </div>
 
-            <Button variant="outline" size="icon">
-              <Settings className="w-4 h-4" />
-            </Button>
+            <div className="flex items-center gap-2">
+              {streak > 0 && (
+                <div className="hidden sm:flex items-center gap-1 px-3 py-1 rounded-full bg-orange-500/10 text-orange-500 text-sm font-medium">
+                  🔥 {streak} jour{streak > 1 ? 's' : ''}
+                </div>
+              )}
+              <Button variant="outline" size="icon">
+                <Settings className="w-4 h-4" />
+              </Button>
+            </div>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-6">
+      <main id="main-content" className="container mx-auto px-4 py-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="grid w-full grid-cols-3 lg:w-auto lg:inline-grid">
             <TabsTrigger value="create" className="gap-2">
@@ -207,12 +146,7 @@ export default function StorySynthPage() {
                   <StoryStats 
                     stats={stats}
                     weeklyGoal={3}
-                    weeklyProgress={history?.filter((s: any) => {
-                      const date = new Date(s.created_at);
-                      const now = new Date();
-                      const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-                      return date >= weekAgo;
-                    }).length || 0}
+                    weeklyProgress={weeklyProgress}
                   />
                 </div>
               </aside>
@@ -222,27 +156,54 @@ export default function StorySynthPage() {
           {/* Library Tab */}
           <TabsContent value="library">
             <StoryLibrary
-              stories={history || []}
-              isLoading={isLoading}
-              onReadStory={handleReadStory}
-              onDeleteStory={handleDeleteStory}
-              onExportStory={(id) => toast.info('Export depuis bibliothèque à implémenter')}
-              onToggleFavorite={(id) => toast.info('Favoris à implémenter')}
+              stories={libraryStories}
+              isLoading={isLoadingHistory}
+              onReadStory={readFromLibrary}
+              onDeleteStory={deleteSession}
+              onExportStory={exportStory}
+              onToggleFavorite={toggleFavorite}
             />
           </TabsContent>
 
           {/* Stats Tab */}
-          <TabsContent value="stats" className="lg:hidden">
-            <StoryStats 
-              stats={stats}
-              weeklyGoal={3}
-              weeklyProgress={history?.filter((s: any) => {
-                const date = new Date(s.created_at);
-                const now = new Date();
-                const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-                return date >= weekAgo;
-              }).length || 0}
-            />
+          <TabsContent value="stats">
+            <div className="max-w-md mx-auto lg:max-w-none lg:grid lg:grid-cols-2 gap-6">
+              <StoryStats 
+                stats={stats}
+                weeklyGoal={3}
+                weeklyProgress={weeklyProgress}
+              />
+              
+              {/* Extended achievements panel */}
+              <div className="mt-6 lg:mt-0">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="bg-card rounded-xl border border-border p-6"
+                >
+                  <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+                    🏆 Tous les succès
+                  </h3>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    {achievements.map(achievement => (
+                      <div
+                        key={achievement.id}
+                        className={cn(
+                          'p-4 rounded-lg border text-center transition-all',
+                          achievement.unlocked
+                            ? 'bg-amber-500/10 border-amber-500/30'
+                            : 'bg-muted/50 border-border opacity-50 grayscale'
+                        )}
+                      >
+                        <span className="text-2xl block mb-2">{achievement.icon}</span>
+                        <p className="text-sm font-medium text-foreground">{achievement.name}</p>
+                        <p className="text-xs text-muted-foreground mt-1">{achievement.description}</p>
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+              </div>
+            </div>
           </TabsContent>
         </Tabs>
       </main>
@@ -254,10 +215,10 @@ export default function StorySynthPage() {
             story={currentStory}
             title={currentStory.title}
             theme={currentConfig?.theme}
-            onClose={() => setIsReading(false)}
+            onClose={closeReader}
             onComplete={handleCompleteReading}
-            onSave={handleSaveStory}
-            onExport={handleExportStory}
+            onSave={saveCurrentStory}
+            onExport={() => exportStory()}
             ambient={currentConfig?.ambient}
           />
         )}

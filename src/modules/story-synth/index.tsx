@@ -14,6 +14,13 @@ export { StorySynthServiceEnriched } from './storySynthServiceUnified';
 // ============================================================================
 
 export { useStorySynthMachine } from './useStorySynthMachine';
+export { useStorySynthEnriched } from './useStorySynthEnriched';
+export type { 
+  UseStorySynthEnrichedReturn,
+  StorySynthSessionEnriched,
+  StoryGenerationConfig,
+  StorySynthAchievement,
+} from './useStorySynthEnriched';
 
 // ============================================================================
 // COMPOSANTS
