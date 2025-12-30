@@ -4,7 +4,7 @@
  * Avec persistance Supabase via useUserSettings
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -16,16 +16,21 @@ import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Slider } from "@/components/ui/slider";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { 
   Settings, Bell, Palette, Heart, Shield, Loader2, AlertCircle,
-  Globe, Clock, Monitor, Moon, Sun, Volume2, VolumeX,
-  Accessibility, Eye, Download, Trash2, RefreshCw, Save,
-  Smartphone, Database, CheckCircle2, Info, HardDrive, Zap
+  Globe, Clock, Monitor, Moon, Sun, Volume2, VolumeX, Upload,
+  Accessibility, Eye, Download, Trash2, RefreshCw, Save, History,
+  Smartphone, Database, CheckCircle2, Info, HardDrive, Zap, TestTube2,
+  Lock, Sparkles, User, BellRing
 } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useUserSettings } from "@/hooks/useUserSettings";
 import { useToast } from "@/hooks/use-toast";
 import { useAccessibility } from "@/hooks/useAccessibility";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import PageRoot from "@/components/common/PageRoot";
 
 // Timezones communes
@@ -53,20 +58,55 @@ const FONT_SIZES = [
   { value: 'large', label: 'Grand' },
 ];
 
+const COLOR_SCHEMES = [
+  { value: 'default', label: 'Par défaut', colors: ['#8B5CF6', '#3B82F6'] },
+  { value: 'ocean', label: 'Océan', colors: ['#06B6D4', '#0EA5E9'] },
+  { value: 'forest', label: 'Forêt', colors: ['#10B981', '#22C55E'] },
+  { value: 'sunset', label: 'Coucher de soleil', colors: ['#F59E0B', '#EF4444'] },
+  { value: 'lavender', label: 'Lavande', colors: ['#A855F7', '#EC4899'] },
+];
+
+const REMINDER_TIMES = [
+  { value: '07:00', label: '07:00 - Matin tôt' },
+  { value: '09:00', label: '09:00 - Matin' },
+  { value: '12:00', label: '12:00 - Midi' },
+  { value: '18:00', label: '18:00 - Soir' },
+  { value: '21:00', label: '21:00 - Nuit' },
+];
+
+const PREFERRED_MODULES = [
+  { value: 'scan', label: 'Scan émotionnel' },
+  { value: 'breathwork', label: 'Respiration' },
+  { value: 'journal', label: 'Journal' },
+  { value: 'meditation', label: 'Méditation' },
+  { value: 'music', label: 'Musicothérapie' },
+  { value: 'coach', label: 'Coach IA' },
+];
+
 const B2CSettingsPage = () => {
   const { settings, loading, saving, updateSettings, resetSettings, error: settingsError, reload } = useUserSettings();
   const { toast } = useToast();
   const { announce } = useAccessibility();
+  const { user } = useAuth();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [activeTab, setActiveTab] = useState('general');
   const [showResetDialog, setShowResetDialog] = useState(false);
   const [showExportDialog, setShowExportDialog] = useState(false);
+  const [showImportDialog, setShowImportDialog] = useState(false);
+  const [showHistoryDialog, setShowHistoryDialog] = useState(false);
+  const [importFile, setImportFile] = useState<File | null>(null);
+  const [storageInfo, setStorageInfo] = useState({ used: 0, max: 100, breakdown: { scans: 0, journal: 0, sessions: 0, other: 0 } });
+  const [loadingStorage, setLoadingStorage] = useState(false);
+  const [testingNotification, setTestingNotification] = useState(false);
 
   // Local state pour les modifications
   const [localSettings, setLocalSettings] = useState({
     // General
     language: 'fr',
     timezone: 'Europe/Paris',
+    dailyReminderTime: null as string | null,
+    preferredModules: [] as string[],
     // Appearance
     theme: 'auto' as 'light' | 'dark' | 'auto',
     colorScheme: 'default',
@@ -99,6 +139,8 @@ const B2CSettingsPage = () => {
       setLocalSettings({
         language: settings.language ?? 'fr',
         timezone: settings.timezone ?? 'Europe/Paris',
+        dailyReminderTime: settings.daily_reminder_time ?? null,
+        preferredModules: settings.preferred_modules ?? [],
         theme: settings.theme ?? 'auto',
         colorScheme: settings.color_scheme ?? 'default',
         fontSize: settings.font_size ?? 'medium',
@@ -121,6 +163,53 @@ const B2CSettingsPage = () => {
       });
     }
   }, [settings]);
+
+  // Load real storage info
+  useEffect(() => {
+    if (user?.id) {
+      loadStorageInfo();
+    }
+  }, [user?.id]);
+
+  const loadStorageInfo = async () => {
+    if (!user?.id) return;
+    setLoadingStorage(true);
+    try {
+      // Get counts from different tables to estimate storage
+      const [scansResult, journalResult, sessionsResult] = await Promise.all([
+        supabase.from('emotional_scans').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
+        supabase.from('journal_entries').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
+        supabase.from('session_tracking').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
+      ]);
+
+      // Estimate storage based on record counts (rough estimate)
+      const scansCount = scansResult.count || 0;
+      const journalCount = journalResult.count || 0;
+      const sessionsCount = sessionsResult.count || 0;
+
+      const scansSize = scansCount * 0.5; // ~0.5 KB per scan
+      const journalSize = journalCount * 2; // ~2 KB per journal entry
+      const sessionsSize = sessionsCount * 0.3; // ~0.3 KB per session
+      const otherSize = 3; // Base metadata
+
+      const totalUsed = Math.round(scansSize + journalSize + sessionsSize + otherSize);
+
+      setStorageInfo({
+        used: Math.min(totalUsed, 100),
+        max: 100,
+        breakdown: {
+          scans: Math.round(scansSize),
+          journal: Math.round(journalSize),
+          sessions: Math.round(sessionsSize),
+          other: otherSize,
+        }
+      });
+    } catch (err) {
+      console.error('Failed to load storage info:', err);
+    } finally {
+      setLoadingStorage(false);
+    }
+  };
 
   // Check for unsaved changes
   const hasChanges = settings ? (
@@ -151,6 +240,7 @@ const B2CSettingsPage = () => {
         language: localSettings.language,
         timezone: localSettings.timezone,
         theme: localSettings.theme,
+        color_scheme: localSettings.colorScheme,
         font_size: localSettings.fontSize as 'small' | 'medium' | 'large',
         email_notifications: localSettings.emailNotifications,
         push_notifications: localSettings.pushNotifications,
@@ -167,6 +257,8 @@ const B2CSettingsPage = () => {
         screen_reader_mode: localSettings.screenReaderMode,
         auto_suggestions: localSettings.autoSuggestions,
         emotion_tracking_frequency: localSettings.emotionTrackingFrequency as 'low' | 'medium' | 'high',
+        daily_reminder_time: localSettings.dailyReminderTime,
+        preferred_modules: localSettings.preferredModules,
       });
 
       toast({
@@ -224,9 +316,83 @@ const B2CSettingsPage = () => {
     announce('Paramètres exportés');
   }, [localSettings, toast, announce]);
 
-  // Calculate storage estimate
-  const storageUsed = 45; // Mock value - would come from actual data
-  const storageMax = 100;
+  const handleImportSettings = useCallback(async () => {
+    if (!importFile) return;
+
+    try {
+      const text = await importFile.text();
+      const data = JSON.parse(text);
+      
+      if (!data.settings || !data.version) {
+        throw new Error('Format de fichier invalide');
+      }
+
+      // Validate and apply imported settings
+      setLocalSettings(prev => ({
+        ...prev,
+        ...data.settings,
+      }));
+
+      setShowImportDialog(false);
+      setImportFile(null);
+      toast({
+        title: "Import réussi",
+        description: "Vos paramètres ont été importés. N'oubliez pas de sauvegarder.",
+      });
+      announce('Paramètres importés');
+    } catch (err) {
+      toast({
+        title: "Erreur d'import",
+        description: err instanceof Error ? err.message : "Fichier invalide",
+        variant: "destructive",
+      });
+    }
+  }, [importFile, toast, announce]);
+
+  const handleTestNotification = useCallback(async () => {
+    setTestingNotification(true);
+    try {
+      // Request notification permission if not granted
+      if ('Notification' in window) {
+        const permission = await Notification.requestPermission();
+        if (permission === 'granted') {
+          new Notification('EmotionsCare - Test', {
+            body: 'Vos notifications fonctionnent correctement !',
+            icon: '/favicon.ico',
+          });
+          toast({
+            title: "Notification envoyée",
+            description: "Vérifiez votre système de notifications",
+          });
+        } else {
+          toast({
+            title: "Permission refusée",
+            description: "Veuillez autoriser les notifications dans votre navigateur",
+            variant: "destructive",
+          });
+        }
+      } else {
+        toast({
+          title: "Non supporté",
+          description: "Les notifications ne sont pas supportées par votre navigateur",
+          variant: "destructive",
+        });
+      }
+    } finally {
+      setTestingNotification(false);
+    }
+  }, [toast]);
+
+  const togglePreferredModule = useCallback((moduleValue: string) => {
+    setLocalSettings(prev => {
+      const current = prev.preferredModules || [];
+      if (current.includes(moduleValue)) {
+        return { ...prev, preferredModules: current.filter(m => m !== moduleValue) };
+      } else {
+        return { ...prev, preferredModules: [...current, moduleValue] };
+      }
+    });
+  }, []);
 
   if (loading) {
     return (
@@ -430,6 +596,56 @@ const B2CSettingsPage = () => {
 
                     <Separator />
 
+                    {/* Daily reminder time */}
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-1">
+                        <label className="font-medium">Heure du rappel quotidien</label>
+                        <p className="text-sm text-muted-foreground">Quand souhaitez-vous être rappelé</p>
+                      </div>
+                      <Select
+                        value={localSettings.dailyReminderTime || '09:00'}
+                        onValueChange={(value) => setLocalSettings(prev => ({ ...prev, dailyReminderTime: value }))}
+                      >
+                        <SelectTrigger className="w-48">
+                          <SelectValue placeholder="Choisir une heure" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {REMINDER_TIMES.map(time => (
+                            <SelectItem key={time.value} value={time.value}>
+                              {time.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <Separator />
+
+                    {/* Preferred modules */}
+                    <div className="space-y-3">
+                      <div className="space-y-1">
+                        <label className="font-medium">Modules préférés</label>
+                        <p className="text-sm text-muted-foreground">Les modules qui vous seront suggérés en priorité</p>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {PREFERRED_MODULES.map(module => (
+                          <Badge
+                            key={module.value}
+                            variant={localSettings.preferredModules?.includes(module.value) ? 'default' : 'outline'}
+                            className="cursor-pointer hover:opacity-80 transition-opacity"
+                            onClick={() => togglePreferredModule(module.value)}
+                          >
+                            {localSettings.preferredModules?.includes(module.value) && (
+                              <CheckCircle2 className="h-3 w-3 mr-1" />
+                            )}
+                            {module.label}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+
+                    <Separator />
+
                     <SettingToggle
                       id="sound-enabled"
                       label="Sons activés"
@@ -517,6 +733,41 @@ const B2CSettingsPage = () => {
                         ))}
                       </div>
                     </div>
+
+                    <Separator />
+
+                    {/* Color Scheme */}
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <label className="font-medium">Palette de couleurs</label>
+                        <Badge variant="secondary">{COLOR_SCHEMES.find(c => c.value === localSettings.colorScheme)?.label}</Badge>
+                      </div>
+                      <div className="grid grid-cols-5 gap-3">
+                        {COLOR_SCHEMES.map(scheme => (
+                          <button
+                            key={scheme.value}
+                            onClick={() => setLocalSettings(prev => ({ ...prev, colorScheme: scheme.value }))}
+                            className={`p-3 rounded-lg border-2 transition-all flex flex-col items-center gap-2 ${
+                              localSettings.colorScheme === scheme.value 
+                                ? 'border-primary bg-primary/10' 
+                                : 'border-border hover:border-primary/50'
+                            }`}
+                            title={scheme.label}
+                          >
+                            <div className="flex gap-1">
+                              {scheme.colors.map((color, idx) => (
+                                <div 
+                                  key={idx} 
+                                  className="w-4 h-4 rounded-full" 
+                                  style={{ backgroundColor: color }}
+                                />
+                              ))}
+                            </div>
+                            <span className="text-xs truncate w-full text-center">{scheme.label}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
                   </CardContent>
                 </Card>
               </motion.div>
@@ -586,6 +837,34 @@ const B2CSettingsPage = () => {
                       checked={localSettings.achievementNotifications}
                       onCheckedChange={(value) => setLocalSettings(prev => ({ ...prev, achievementNotifications: value }))}
                     />
+                  </CardContent>
+                </Card>
+
+                {/* Test notification */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <TestTube2 className="h-5 w-5 text-primary" />
+                      Tester les notifications
+                    </CardTitle>
+                    <CardDescription>
+                      Vérifiez que vos notifications fonctionnent
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Button 
+                      variant="outline" 
+                      className="w-full"
+                      onClick={handleTestNotification}
+                      disabled={testingNotification}
+                    >
+                      {testingNotification ? (
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      ) : (
+                        <BellRing className="h-4 w-4 mr-2" />
+                      )}
+                      Envoyer une notification test
+                    </Button>
                   </CardContent>
                 </Card>
               </motion.div>
@@ -673,32 +952,44 @@ const B2CSettingsPage = () => {
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <div className="space-y-2">
-                      <div className="flex justify-between text-sm">
-                        <span>Espace utilisé</span>
-                        <span className="font-medium">{storageUsed} Mo / {storageMax} Mo</span>
+                    {loadingStorage ? (
+                      <div className="flex items-center justify-center py-4">
+                        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
                       </div>
-                      <Progress value={(storageUsed / storageMax) * 100} className="h-2" />
-                    </div>
-                    
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div className="p-3 rounded-lg bg-muted/50">
-                        <p className="text-muted-foreground">Scans émotionnels</p>
-                        <p className="font-medium">~25 Mo</p>
-                      </div>
-                      <div className="p-3 rounded-lg bg-muted/50">
-                        <p className="text-muted-foreground">Journal</p>
-                        <p className="font-medium">~12 Mo</p>
-                      </div>
-                      <div className="p-3 rounded-lg bg-muted/50">
-                        <p className="text-muted-foreground">Sessions respiration</p>
-                        <p className="font-medium">~5 Mo</p>
-                      </div>
-                      <div className="p-3 rounded-lg bg-muted/50">
-                        <p className="text-muted-foreground">Autre</p>
-                        <p className="font-medium">~3 Mo</p>
-                      </div>
-                    </div>
+                    ) : (
+                      <>
+                        <div className="space-y-2">
+                          <div className="flex justify-between text-sm">
+                            <span>Espace utilisé</span>
+                            <span className="font-medium">{storageInfo.used} Ko / {storageInfo.max} Mo</span>
+                          </div>
+                          <Progress value={(storageInfo.used / (storageInfo.max * 1024)) * 100} className="h-2" />
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-4 text-sm">
+                          <div className="p-3 rounded-lg bg-muted/50">
+                            <p className="text-muted-foreground">Scans émotionnels</p>
+                            <p className="font-medium">~{storageInfo.breakdown.scans} Ko</p>
+                          </div>
+                          <div className="p-3 rounded-lg bg-muted/50">
+                            <p className="text-muted-foreground">Journal</p>
+                            <p className="font-medium">~{storageInfo.breakdown.journal} Ko</p>
+                          </div>
+                          <div className="p-3 rounded-lg bg-muted/50">
+                            <p className="text-muted-foreground">Sessions</p>
+                            <p className="font-medium">~{storageInfo.breakdown.sessions} Ko</p>
+                          </div>
+                          <div className="p-3 rounded-lg bg-muted/50">
+                            <p className="text-muted-foreground">Autre</p>
+                            <p className="font-medium">~{storageInfo.breakdown.other} Ko</p>
+                          </div>
+                        </div>
+                        <Button variant="ghost" size="sm" onClick={loadStorageInfo} className="w-full">
+                          <RefreshCw className="h-4 w-4 mr-2" />
+                          Actualiser
+                        </Button>
+                      </>
+                    )}
                   </CardContent>
                 </Card>
 
@@ -756,6 +1047,40 @@ const B2CSettingsPage = () => {
                   </CardContent>
                 </Card>
 
+                {/* Privacy Settings */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <User className="h-5 w-5 text-primary" />
+                      Visibilité du Profil
+                    </CardTitle>
+                    <CardDescription>
+                      Contrôlez qui peut voir vos informations
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-1">
+                        <label className="font-medium">Visibilité</label>
+                        <p className="text-sm text-muted-foreground">Qui peut voir votre profil</p>
+                      </div>
+                      <Select
+                        value={localSettings.profileVisibility}
+                        onValueChange={(value) => setLocalSettings(prev => ({ ...prev, profileVisibility: value as 'public' | 'friends' | 'private' }))}
+                      >
+                        <SelectTrigger className="w-40">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="public">Public</SelectItem>
+                          <SelectItem value="friends">Amis uniquement</SelectItem>
+                          <SelectItem value="private">Privé</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </CardContent>
+                </Card>
+
                 {/* Actions */}
                 <Card>
                   <CardHeader>
@@ -769,6 +1094,14 @@ const B2CSettingsPage = () => {
                     >
                       <Download className="h-4 w-4 mr-2" />
                       Exporter mes paramètres
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start"
+                      onClick={() => setShowImportDialog(true)}
+                    >
+                      <Upload className="h-4 w-4 mr-2" />
+                      Importer des paramètres
                     </Button>
                     <Button
                       variant="outline"
@@ -868,6 +1201,50 @@ const B2CSettingsPage = () => {
             <Button onClick={handleExportSettings}>
               <Download className="h-4 w-4 mr-2" />
               Télécharger
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Import Dialog */}
+      <Dialog open={showImportDialog} onOpenChange={setShowImportDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Upload className="h-5 w-5 text-primary" />
+              Importer des paramètres
+            </DialogTitle>
+            <DialogDescription>
+              Restaurez vos paramètres depuis un fichier exporté.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4 space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="import-file">Fichier de paramètres</Label>
+              <Input
+                id="import-file"
+                type="file"
+                accept=".json"
+                onChange={(e) => setImportFile(e.target.files?.[0] || null)}
+                ref={fileInputRef}
+              />
+            </div>
+            {importFile && (
+              <Alert>
+                <Info className="h-4 w-4" />
+                <AlertDescription>
+                  Fichier sélectionné : {importFile.name}
+                </AlertDescription>
+              </Alert>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => { setShowImportDialog(false); setImportFile(null); }}>
+              Annuler
+            </Button>
+            <Button onClick={handleImportSettings} disabled={!importFile}>
+              <Upload className="h-4 w-4 mr-2" />
+              Importer
             </Button>
           </DialogFooter>
         </DialogContent>
