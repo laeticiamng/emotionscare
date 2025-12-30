@@ -2825,6 +2825,400 @@ export type Database = {
         }
         Relationships: []
       }
+      buddy_activities: {
+        Row: {
+          activity_type: string
+          completed_at: string | null
+          created_at: string | null
+          created_by: string
+          description: string | null
+          duration_minutes: number | null
+          id: string
+          match_id: string | null
+          outcome_notes: string | null
+          participants_mood_after: Json | null
+          participants_mood_before: Json | null
+          scheduled_at: string | null
+          status: string | null
+          title: string
+          xp_reward: number | null
+        }
+        Insert: {
+          activity_type: string
+          completed_at?: string | null
+          created_at?: string | null
+          created_by: string
+          description?: string | null
+          duration_minutes?: number | null
+          id?: string
+          match_id?: string | null
+          outcome_notes?: string | null
+          participants_mood_after?: Json | null
+          participants_mood_before?: Json | null
+          scheduled_at?: string | null
+          status?: string | null
+          title: string
+          xp_reward?: number | null
+        }
+        Update: {
+          activity_type?: string
+          completed_at?: string | null
+          created_at?: string | null
+          created_by?: string
+          description?: string | null
+          duration_minutes?: number | null
+          id?: string
+          match_id?: string | null
+          outcome_notes?: string | null
+          participants_mood_after?: Json | null
+          participants_mood_before?: Json | null
+          scheduled_at?: string | null
+          status?: string | null
+          title?: string
+          xp_reward?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "buddy_activities_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "buddy_matches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      buddy_matches: {
+        Row: {
+          compatibility_score: number | null
+          created_at: string | null
+          id: string
+          initiated_by: string | null
+          interaction_count: number | null
+          last_interaction_at: string | null
+          match_reason: string | null
+          matched_at: string | null
+          mutual_interests: string[] | null
+          status: string | null
+          user_id_1: string
+          user_id_2: string
+        }
+        Insert: {
+          compatibility_score?: number | null
+          created_at?: string | null
+          id?: string
+          initiated_by?: string | null
+          interaction_count?: number | null
+          last_interaction_at?: string | null
+          match_reason?: string | null
+          matched_at?: string | null
+          mutual_interests?: string[] | null
+          status?: string | null
+          user_id_1: string
+          user_id_2: string
+        }
+        Update: {
+          compatibility_score?: number | null
+          created_at?: string | null
+          id?: string
+          initiated_by?: string | null
+          interaction_count?: number | null
+          last_interaction_at?: string | null
+          match_reason?: string | null
+          matched_at?: string | null
+          mutual_interests?: string[] | null
+          status?: string | null
+          user_id_1?: string
+          user_id_2?: string
+        }
+        Relationships: []
+      }
+      buddy_messages: {
+        Row: {
+          content: string
+          created_at: string | null
+          id: string
+          is_read: boolean | null
+          match_id: string | null
+          message_type: string | null
+          metadata: Json | null
+          read_at: string | null
+          receiver_id: string
+          reply_to_id: string | null
+          sender_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          match_id?: string | null
+          message_type?: string | null
+          metadata?: Json | null
+          read_at?: string | null
+          receiver_id: string
+          reply_to_id?: string | null
+          sender_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          match_id?: string | null
+          message_type?: string | null
+          metadata?: Json | null
+          read_at?: string | null
+          receiver_id?: string
+          reply_to_id?: string | null
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "buddy_messages_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "buddy_matches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "buddy_messages_reply_to_id_fkey"
+            columns: ["reply_to_id"]
+            isOneToOne: false
+            referencedRelation: "buddy_messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      buddy_profiles: {
+        Row: {
+          age_range: string | null
+          availability_schedule: Json | null
+          availability_status: string | null
+          avatar_url: string | null
+          badges: string[] | null
+          bio: string | null
+          created_at: string | null
+          display_name: string | null
+          experience_level: string | null
+          goals: string[] | null
+          id: string
+          interests: string[] | null
+          is_premium: boolean | null
+          is_verified: boolean | null
+          is_visible: boolean | null
+          languages: string[] | null
+          last_active_at: string | null
+          location: string | null
+          looking_for: string[] | null
+          mood_preference: string | null
+          response_rate: number | null
+          support_score: number | null
+          timezone: string | null
+          updated_at: string | null
+          user_id: string
+          xp_points: number | null
+        }
+        Insert: {
+          age_range?: string | null
+          availability_schedule?: Json | null
+          availability_status?: string | null
+          avatar_url?: string | null
+          badges?: string[] | null
+          bio?: string | null
+          created_at?: string | null
+          display_name?: string | null
+          experience_level?: string | null
+          goals?: string[] | null
+          id?: string
+          interests?: string[] | null
+          is_premium?: boolean | null
+          is_verified?: boolean | null
+          is_visible?: boolean | null
+          languages?: string[] | null
+          last_active_at?: string | null
+          location?: string | null
+          looking_for?: string[] | null
+          mood_preference?: string | null
+          response_rate?: number | null
+          support_score?: number | null
+          timezone?: string | null
+          updated_at?: string | null
+          user_id: string
+          xp_points?: number | null
+        }
+        Update: {
+          age_range?: string | null
+          availability_schedule?: Json | null
+          availability_status?: string | null
+          avatar_url?: string | null
+          badges?: string[] | null
+          bio?: string | null
+          created_at?: string | null
+          display_name?: string | null
+          experience_level?: string | null
+          goals?: string[] | null
+          id?: string
+          interests?: string[] | null
+          is_premium?: boolean | null
+          is_verified?: boolean | null
+          is_visible?: boolean | null
+          languages?: string[] | null
+          last_active_at?: string | null
+          location?: string | null
+          looking_for?: string[] | null
+          mood_preference?: string | null
+          response_rate?: number | null
+          support_score?: number | null
+          timezone?: string | null
+          updated_at?: string | null
+          user_id?: string
+          xp_points?: number | null
+        }
+        Relationships: []
+      }
+      buddy_requests: {
+        Row: {
+          compatibility_score: number | null
+          created_at: string | null
+          expires_at: string | null
+          from_user_id: string
+          id: string
+          message: string | null
+          responded_at: string | null
+          status: string | null
+          to_user_id: string
+        }
+        Insert: {
+          compatibility_score?: number | null
+          created_at?: string | null
+          expires_at?: string | null
+          from_user_id: string
+          id?: string
+          message?: string | null
+          responded_at?: string | null
+          status?: string | null
+          to_user_id: string
+        }
+        Update: {
+          compatibility_score?: number | null
+          created_at?: string | null
+          expires_at?: string | null
+          from_user_id?: string
+          id?: string
+          message?: string | null
+          responded_at?: string | null
+          status?: string | null
+          to_user_id?: string
+        }
+        Relationships: []
+      }
+      buddy_sessions: {
+        Row: {
+          created_at: string | null
+          duration_seconds: number | null
+          ended_at: string | null
+          id: string
+          match_id: string | null
+          metadata: Json | null
+          notes: string | null
+          quality_rating: number | null
+          session_type: string
+          started_at: string | null
+          started_by: string
+          xp_earned: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          duration_seconds?: number | null
+          ended_at?: string | null
+          id?: string
+          match_id?: string | null
+          metadata?: Json | null
+          notes?: string | null
+          quality_rating?: number | null
+          session_type: string
+          started_at?: string | null
+          started_by: string
+          xp_earned?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          duration_seconds?: number | null
+          ended_at?: string | null
+          id?: string
+          match_id?: string | null
+          metadata?: Json | null
+          notes?: string | null
+          quality_rating?: number | null
+          session_type?: string
+          started_at?: string | null
+          started_by?: string
+          xp_earned?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "buddy_sessions_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "buddy_matches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      buddy_stats: {
+        Row: {
+          average_response_time_minutes: number | null
+          created_at: string | null
+          current_streak_days: number | null
+          id: string
+          last_activity_at: string | null
+          longest_streak_days: number | null
+          total_activities_completed: number | null
+          total_buddies: number | null
+          total_messages_received: number | null
+          total_messages_sent: number | null
+          total_session_minutes: number | null
+          total_sessions: number | null
+          updated_at: string | null
+          user_id: string
+          xp_from_buddies: number | null
+        }
+        Insert: {
+          average_response_time_minutes?: number | null
+          created_at?: string | null
+          current_streak_days?: number | null
+          id?: string
+          last_activity_at?: string | null
+          longest_streak_days?: number | null
+          total_activities_completed?: number | null
+          total_buddies?: number | null
+          total_messages_received?: number | null
+          total_messages_sent?: number | null
+          total_session_minutes?: number | null
+          total_sessions?: number | null
+          updated_at?: string | null
+          user_id: string
+          xp_from_buddies?: number | null
+        }
+        Update: {
+          average_response_time_minutes?: number | null
+          created_at?: string | null
+          current_streak_days?: number | null
+          id?: string
+          last_activity_at?: string | null
+          longest_streak_days?: number | null
+          total_activities_completed?: number | null
+          total_buddies?: number | null
+          total_messages_received?: number | null
+          total_messages_sent?: number | null
+          total_session_minutes?: number | null
+          total_sessions?: number | null
+          updated_at?: string | null
+          user_id?: string
+          xp_from_buddies?: number | null
+        }
+        Relationships: []
+      }
       cache_config: {
         Row: {
           cache_key: string
@@ -24109,6 +24503,10 @@ export type Database = {
       audit_user_rights_compliance: { Args: never; Returns: Json }
       auto_security_maintenance: { Args: never; Returns: Json }
       backup_critical_data: { Args: never; Returns: undefined }
+      calculate_buddy_compatibility: {
+        Args: { user1_id: string; user2_id: string }
+        Returns: number
+      }
       calculate_completeness_score:
         | { Args: { item_data: Json }; Returns: number }
         | { Args: { item_id: string }; Returns: number }
