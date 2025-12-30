@@ -13,3 +13,5 @@ export type { Comment, UseCommunityCommentsReturn } from './useCommunityComments
 
 export { useFollow, useMyFollowStats } from './useFollow';
 export type { UseFollowReturn } from './useFollow';
+
+export { useRealtimeNotifications } from './useRealtimeNotifications';
