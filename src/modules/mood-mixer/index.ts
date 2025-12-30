@@ -22,6 +22,8 @@ export { MoodMixerService, moodMixerService } from './moodMixerServiceUnified';
 // ============================================================================
 
 export { useMoodMixer } from './useMoodMixer';
+export { useMoodMixerEnriched } from './useMoodMixerEnriched';
+export type { MoodComponent, MoodPreset, UseMoodMixerEnrichedReturn } from './useMoodMixerEnriched';
 
 // ============================================================================
 // TYPES
@@ -36,6 +38,15 @@ export type {
   PersonalizedMix,
   MoodMixerStats,
 } from './moodMixerServiceUnified';
+
+export type {
+  Sliders,
+  PresetDraft,
+  PresetInsert,
+  PresetRecord,
+  PresetUpdate,
+  Preset,
+} from './types';
 
 // ============================================================================
 // LEGACY EXPORTS (deprecated - utiliser MoodMixerService à la place)
