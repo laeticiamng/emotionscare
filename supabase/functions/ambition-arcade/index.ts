@@ -35,7 +35,7 @@ serve(async (req) => {
     }
 
     // Lovable AI Gateway
-    const LOVABLE_AI_URL = 'https://ai-gateway.lovable.ai/chat/completions';
+    const LOVABLE_AI_URL = 'https://ai.gateway.lovable.dev/v1/chat/completions';
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY') || '';
 
     const difficultyMultiplier = difficulty === 'easy' ? 0.7 : difficulty === 'hard' ? 1.5 : 1;
