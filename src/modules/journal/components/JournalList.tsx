@@ -3,8 +3,10 @@ import DOMPurify from 'dompurify'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip'
 import type { SanitizedNote } from '../types'
-import { Loader2, MessageSquare } from 'lucide-react'
+import { Loader2, MessageSquare, Heart, Edit2, Trash2 } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 type JournalListProps = {
   notes: SanitizedNote[]
@@ -14,6 +16,13 @@ type JournalListProps = {
   onLoadMore?: () => void
   onSendToCoach: (note: SanitizedNote) => Promise<void>
   sendingId?: string | null
+  // New enriched props
+  onDelete?: (noteId: string) => void
+  onToggleFavorite?: (noteId: string) => void
+  onEdit?: (note: SanitizedNote) => void
+  isFavorite?: (noteId: string) => boolean
+  isDeleting?: boolean
+  isTogglingFavorite?: boolean
 }
 
 const dateFormatter = new Intl.DateTimeFormat('fr-FR', {
@@ -29,6 +38,12 @@ export function JournalList({
   onLoadMore,
   onSendToCoach,
   sendingId,
+  onDelete,
+  onToggleFavorite,
+  onEdit,
+  isFavorite,
+  isDeleting,
+  isTogglingFavorite,
 }: JournalListProps) {
   if (isLoading) {
     return (
@@ -50,72 +65,144 @@ export function JournalList({
   }
 
   return (
-    <div className="space-y-4">
-      <ul className="space-y-3" data-testid="journal-feed">
-        {notes.map(note => (
-          <li key={note.id} data-testid="journal-feed-entry">
-            <Card>
-              <CardContent className="space-y-3 py-5">
-                <header className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
-                  <span>{dateFormatter.format(new Date(note.created_at))}</span>
-                  {note.summary && <span className="italic">{note.summary}</span>}
-                </header>
-                <SafeNote text={note.text} />
-                {note.tags.length > 0 && (
-                  <div className="flex flex-wrap gap-2">
-                    {note.tags.map(tag => (
-                      <Badge key={tag} variant="outline">
-                        #{tag}
-                      </Badge>
-                    ))}
-                  </div>
-                )}
-                <div className="flex flex-wrap items-center justify-end gap-2">
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant="outline"
-                    onClick={() => onSendToCoach(note)}
-                    disabled={sendingId === note.id}
-                  >
-                    {sendingId === note.id ? (
-                      <span className="flex items-center gap-2">
-                        <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
-                        Envoi…
-                      </span>
-                    ) : (
-                      <span className="flex items-center gap-2">
-                        <MessageSquare className="h-4 w-4" aria-hidden="true" />
-                        Envoyer au coach
-                      </span>
+    <TooltipProvider>
+      <div className="space-y-4">
+        <ul className="space-y-3" data-testid="journal-feed">
+          {notes.map(note => {
+            const noteIsFavorite = isFavorite?.(note.id ?? '') ?? false
+            
+            return (
+              <li key={note.id} data-testid="journal-feed-entry">
+                <Card className="group hover:shadow-md transition-shadow">
+                  <CardContent className="space-y-3 py-5">
+                    <header className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
+                      <div className="flex items-center gap-2">
+                        <span>{dateFormatter.format(new Date(note.created_at))}</span>
+                        {note.mode && (
+                          <Badge variant="outline" className="text-[10px]">
+                            {note.mode === 'voice' ? '🎤 Vocal' : '✍️ Texte'}
+                          </Badge>
+                        )}
+                      </div>
+                      {note.summary && <span className="italic">{note.summary}</span>}
+                    </header>
+                    
+                    <SafeNote text={note.text} />
+                    
+                    {note.tags.length > 0 && (
+                      <div className="flex flex-wrap gap-2">
+                        {note.tags.map(tag => (
+                          <Badge key={tag} variant="outline">
+                            #{tag}
+                          </Badge>
+                        ))}
+                      </div>
                     )}
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </li>
-        ))}
-      </ul>
-      {hasMore && onLoadMore && (
-        <div className="flex justify-center">
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={onLoadMore}
-            disabled={isFetchingMore}
-          >
-            {isFetchingMore ? (
-              <span className="flex items-center gap-2">
-                <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
-                Chargement…
-              </span>
-            ) : (
-              'Charger plus'
-            )}
-          </Button>
-        </div>
-      )}
-    </div>
+                    
+                    <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t">
+                      {/* Action buttons on the left */}
+                      <div className="flex items-center gap-1 opacity-70 group-hover:opacity-100 transition-opacity">
+                        {onToggleFavorite && (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => onToggleFavorite(note.id ?? '')}
+                                disabled={isTogglingFavorite}
+                                className={cn(noteIsFavorite && 'text-red-500')}
+                                aria-label={noteIsFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'}
+                              >
+                                <Heart className={cn('h-4 w-4', noteIsFavorite && 'fill-current')} />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>{noteIsFavorite ? 'Retirer des favoris' : 'Favoris'}</TooltipContent>
+                          </Tooltip>
+                        )}
+                        
+                        {onEdit && (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => onEdit(note)}
+                                aria-label="Modifier"
+                              >
+                                <Edit2 className="h-4 w-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Modifier</TooltipContent>
+                          </Tooltip>
+                        )}
+                        
+                        {onDelete && (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => onDelete(note.id ?? '')}
+                                disabled={isDeleting}
+                                className="hover:text-destructive"
+                                aria-label="Supprimer"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Supprimer</TooltipContent>
+                          </Tooltip>
+                        )}
+                      </div>
+                      
+                      {/* Send to coach on the right */}
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        onClick={() => onSendToCoach(note)}
+                        disabled={sendingId === note.id}
+                      >
+                        {sendingId === note.id ? (
+                          <span className="flex items-center gap-2">
+                            <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+                            Envoi…
+                          </span>
+                        ) : (
+                          <span className="flex items-center gap-2">
+                            <MessageSquare className="h-4 w-4" aria-hidden="true" />
+                            Envoyer au coach
+                          </span>
+                        )}
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </li>
+            )
+          })}
+        </ul>
+        {hasMore && onLoadMore && (
+          <div className="flex justify-center">
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={onLoadMore}
+              disabled={isFetchingMore}
+            >
+              {isFetchingMore ? (
+                <span className="flex items-center gap-2">
+                  <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+                  Chargement…
+                </span>
+              ) : (
+                'Charger plus'
+              )}
+            </Button>
+          </div>
+        )}
+      </div>
+    </TooltipProvider>
   )
 }
 
