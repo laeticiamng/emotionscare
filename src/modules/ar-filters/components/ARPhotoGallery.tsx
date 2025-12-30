@@ -4,34 +4,49 @@
 
 import React, { memo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Download, Trash2, Image, Maximize2 } from 'lucide-react';
+import { X, Download, Trash2, Image, Maximize2, Share2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
-import { toast } from 'sonner';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 interface ARPhotoGalleryProps {
   photos: string[];
   onClearPhotos: () => void;
+  onDeletePhoto?: (index: number) => void;
+  onDownloadPhoto?: (index: number) => void;
+  onSharePhoto?: (index: number) => Promise<void>;
 }
 
 export const ARPhotoGallery = memo<ARPhotoGalleryProps>(({
   photos,
   onClearPhotos,
+  onDeletePhoto,
+  onDownloadPhoto,
+  onSharePhoto,
 }) => {
-  const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
+  const [selectedPhoto, setSelectedPhoto] = useState<number | null>(null);
 
-  const handleDownload = (photoUrl: string, index: number) => {
-    const link = document.createElement('a');
-    link.href = photoUrl;
-    link.download = `ar-photo-${Date.now()}-${index}.png`;
-    link.click();
-    toast.success('Photo téléchargée !');
+  const handleDownload = (index: number) => {
+    if (onDownloadPhoto) {
+      onDownloadPhoto(index);
+    }
   };
 
-  const handleDeletePhoto = (index: number) => {
-    // Note: This would need to be implemented in the hook to properly remove photos
-    toast.info('Fonctionnalité de suppression individuelle à venir');
+  const handleShare = async (index: number) => {
+    if (onSharePhoto) {
+      await onSharePhoto(index);
+    }
   };
 
   if (photos.length === 0) {
@@ -56,18 +71,29 @@ export const ARPhotoGallery = memo<ARPhotoGalleryProps>(({
             <Image className="w-5 h-5" />
             Galerie ({photos.length})
           </CardTitle>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onClearPhotos}
-            className="gap-2"
-          >
-            <Trash2 className="w-4 h-4" />
-            Effacer tout
-          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="outline" size="sm" className="gap-2">
+                <Trash2 className="w-4 h-4" />
+                Effacer tout
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Effacer toutes les photos ?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Cette action est irréversible. Toutes les photos de la galerie seront supprimées.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Annuler</AlertDialogCancel>
+                <AlertDialogAction onClick={onClearPhotos}>Effacer</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
             <AnimatePresence mode="popLayout">
               {photos.map((photo, index) => (
                 <motion.div
@@ -85,12 +111,12 @@ export const ARPhotoGallery = memo<ARPhotoGalleryProps>(({
                   />
                   
                   {/* Hover Overlay */}
-                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                     <Button
                       size="icon"
                       variant="secondary"
                       className="w-8 h-8"
-                      onClick={() => setSelectedPhoto(photo)}
+                      onClick={() => setSelectedPhoto(index)}
                       aria-label="Agrandir la photo"
                     >
                       <Maximize2 className="w-4 h-4" />
@@ -99,11 +125,33 @@ export const ARPhotoGallery = memo<ARPhotoGalleryProps>(({
                       size="icon"
                       variant="secondary"
                       className="w-8 h-8"
-                      onClick={() => handleDownload(photo, index)}
+                      onClick={() => handleDownload(index)}
                       aria-label="Télécharger la photo"
                     >
                       <Download className="w-4 h-4" />
                     </Button>
+                    {onSharePhoto && (
+                      <Button
+                        size="icon"
+                        variant="secondary"
+                        className="w-8 h-8"
+                        onClick={() => handleShare(index)}
+                        aria-label="Partager la photo"
+                      >
+                        <Share2 className="w-4 h-4" />
+                      </Button>
+                    )}
+                    {onDeletePhoto && (
+                      <Button
+                        size="icon"
+                        variant="destructive"
+                        className="w-8 h-8"
+                        onClick={() => onDeletePhoto(index)}
+                        aria-label="Supprimer la photo"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    )}
                   </div>
                   
                   {/* Photo Number */}
@@ -118,7 +166,7 @@ export const ARPhotoGallery = memo<ARPhotoGalleryProps>(({
       </Card>
 
       {/* Fullscreen Dialog */}
-      <Dialog open={!!selectedPhoto} onOpenChange={() => setSelectedPhoto(null)}>
+      <Dialog open={selectedPhoto !== null} onOpenChange={() => setSelectedPhoto(null)}>
         <DialogContent className="max-w-4xl p-0 overflow-hidden">
           <div className="relative">
             <Button
@@ -129,12 +177,36 @@ export const ARPhotoGallery = memo<ARPhotoGalleryProps>(({
             >
               <X className="w-5 h-5" />
             </Button>
-            {selectedPhoto && (
-              <img
-                src={selectedPhoto}
-                alt="Photo AR en plein écran"
-                className="w-full h-auto"
-              />
+            {selectedPhoto !== null && photos[selectedPhoto] && (
+              <>
+                <img
+                  src={photos[selectedPhoto]}
+                  alt="Photo AR en plein écran"
+                  className="w-full h-auto"
+                />
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2">
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    className="gap-2"
+                    onClick={() => handleDownload(selectedPhoto)}
+                  >
+                    <Download className="w-4 h-4" />
+                    Télécharger
+                  </Button>
+                  {onSharePhoto && (
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      className="gap-2"
+                      onClick={() => handleShare(selectedPhoto)}
+                    >
+                      <Share2 className="w-4 h-4" />
+                      Partager
+                    </Button>
+                  )}
+                </div>
+              </>
             )}
           </div>
         </DialogContent>

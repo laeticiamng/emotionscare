@@ -2,7 +2,7 @@
  * Hook enrichi pour gérer les filtres AR avec intégration Supabase
  */
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ARFiltersService } from '../arFiltersService';
 import type { ARFilterSession, ARFilterStats, FilterType } from '../types';
@@ -93,10 +93,6 @@ const AR_FILTERS: ARFilter[] = [
   },
 ];
 
-// Types for mutations
-type CreateSessionMutation = ReturnType<typeof import('@tanstack/react-query').useMutation<ARFilterSession, Error, { filterType: string }>>;
-type CompleteSessionMutation = ReturnType<typeof import('@tanstack/react-query').useMutation<void, Error, { sessionId: string; duration: number; moodImpact?: string }>>;
-
 export interface UseARFiltersReturn {
   // Filters
   filters: ARFilter[];
@@ -105,6 +101,8 @@ export interface UseARFiltersReturn {
   
   // Camera
   isCameraActive: boolean;
+  isMirrored: boolean;
+  toggleMirror: () => void;
   startCamera: () => Promise<void>;
   stopCamera: () => void;
   videoRef: React.RefObject<HTMLVideoElement>;
@@ -119,7 +117,10 @@ export interface UseARFiltersReturn {
   // Photos
   capturedPhotos: string[];
   capturePhoto: () => void;
+  deletePhoto: (index: number) => void;
   clearPhotos: () => void;
+  downloadPhoto: (index: number) => void;
+  sharePhoto: (index: number) => Promise<void>;
   
   // Stats & History
   stats: (ARFilterStats & { weeklyTrend: number[] }) | null;
@@ -137,15 +138,16 @@ export const useARFilters = (userId?: string): UseARFiltersReturn => {
   // State
   const [currentFilter, setCurrentFilter] = useState<ARFilter | null>(null);
   const [isCameraActive, setIsCameraActive] = useState(false);
+  const [isMirrored, setIsMirrored] = useState(true);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [isSessionActive, setIsSessionActive] = useState(false);
   const [startTime, setStartTime] = useState<number | null>(null);
   const [sessionDuration, setSessionDuration] = useState(0);
   const [capturedPhotos, setCapturedPhotos] = useState<string[]>([]);
-  const [stream, setStream] = useState<MediaStream | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
   
-  // Video ref for camera
-  const videoRef = { current: null as HTMLVideoElement | null };
+  // Video ref for camera - use proper ref
+  const videoRef = useRef<HTMLVideoElement>(null);
   
   // Timer for session duration
   useEffect(() => {
@@ -157,6 +159,16 @@ export const useARFilters = (userId?: string): UseARFiltersReturn => {
     }
     return () => clearInterval(interval);
   }, [isSessionActive, startTime]);
+
+  // Cleanup stream on unmount
+  useEffect(() => {
+    return () => {
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+        streamRef.current = null;
+      }
+    };
+  }, []);
 
   // Fetch stats
   const { data: statsData, isLoading: isLoadingStats } = useQuery({
@@ -208,9 +220,10 @@ export const useARFilters = (userId?: string): UseARFiltersReturn => {
       const mediaStream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: 'user', width: 1280, height: 720 }
       });
-      setStream(mediaStream);
+      streamRef.current = mediaStream;
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
+        await videoRef.current.play();
       }
       setIsCameraActive(true);
     } catch (error) {
@@ -220,19 +233,26 @@ export const useARFilters = (userId?: string): UseARFiltersReturn => {
   }, []);
 
   const stopCamera = useCallback(() => {
-    if (stream) {
-      stream.getTracks().forEach(track => track.stop());
-      setStream(null);
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current = null;
+    }
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
     }
     setIsCameraActive(false);
-  }, [stream]);
+  }, []);
+
+  const toggleMirror = useCallback(() => {
+    setIsMirrored(prev => !prev);
+  }, []);
 
   // Session functions
   const startSession = useCallback(() => {
     if (currentFilter && userId) {
       createSessionMutation.mutate({ filterType: currentFilter.type });
     }
-  }, [currentFilter, userId]);
+  }, [currentFilter, userId, createSessionMutation]);
 
   const endSession = useCallback((moodImpact?: string) => {
     if (sessionId && startTime) {
@@ -243,21 +263,30 @@ export const useARFilters = (userId?: string): UseARFiltersReturn => {
     setSessionId(null);
     setStartTime(null);
     setSessionDuration(0);
-  }, [sessionId, startTime]);
+  }, [sessionId, startTime, completeSessionMutation]);
 
   // Photo capture
   const capturePhoto = useCallback(() => {
     if (videoRef.current && isCameraActive) {
+      const video = videoRef.current;
       const canvas = document.createElement('canvas');
-      canvas.width = videoRef.current.videoWidth || 640;
-      canvas.height = videoRef.current.videoHeight || 480;
+      canvas.width = video.videoWidth || 640;
+      canvas.height = video.videoHeight || 480;
       const ctx = canvas.getContext('2d');
+      
       if (ctx) {
+        // Handle mirroring
+        if (isMirrored) {
+          ctx.translate(canvas.width, 0);
+          ctx.scale(-1, 1);
+        }
+        
         // Apply filter effect
         if (currentFilter) {
           ctx.filter = currentFilter.cssFilter;
         }
-        ctx.drawImage(videoRef.current, 0, 0);
+        
+        ctx.drawImage(video, 0, 0);
         const dataUrl = canvas.toDataURL('image/png');
         setCapturedPhotos(prev => [...prev, dataUrl]);
         
@@ -268,11 +297,58 @@ export const useARFilters = (userId?: string): UseARFiltersReturn => {
         toast.success('Photo capturée !');
       }
     }
-  }, [isCameraActive, currentFilter, sessionId]);
+  }, [isCameraActive, currentFilter, sessionId, isMirrored]);
+
+  const deletePhoto = useCallback((index: number) => {
+    setCapturedPhotos(prev => prev.filter((_, i) => i !== index));
+    toast.success('Photo supprimée');
+  }, []);
 
   const clearPhotos = useCallback(() => {
     setCapturedPhotos([]);
+    toast.success('Galerie vidée');
   }, []);
+
+  const downloadPhoto = useCallback((index: number) => {
+    const photo = capturedPhotos[index];
+    if (photo) {
+      const link = document.createElement('a');
+      link.href = photo;
+      link.download = `ar-photo-${Date.now()}-${index + 1}.png`;
+      link.click();
+      toast.success('Photo téléchargée !');
+    }
+  }, [capturedPhotos]);
+
+  const sharePhoto = useCallback(async (index: number) => {
+    const photo = capturedPhotos[index];
+    if (!photo) return;
+    
+    try {
+      // Convert data URL to blob
+      const response = await fetch(photo);
+      const blob = await response.blob();
+      const file = new File([blob], `ar-photo-${Date.now()}.png`, { type: 'image/png' });
+      
+      if (navigator.share && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          title: 'Ma photo AR EmotionsCare',
+          text: 'Découvrez mon expérience avec les filtres AR émotionnels !',
+          files: [file],
+        });
+        toast.success('Photo partagée !');
+      } else {
+        // Fallback: copy to clipboard
+        await navigator.clipboard.write([
+          new ClipboardItem({ 'image/png': blob })
+        ]);
+        toast.success('Photo copiée dans le presse-papiers !');
+      }
+    } catch (error) {
+      console.error('Share error:', error);
+      toast.error('Impossible de partager la photo');
+    }
+  }, [capturedPhotos]);
 
   const selectFilter = useCallback((filter: ARFilter | null) => {
     setCurrentFilter(filter);
@@ -283,9 +359,11 @@ export const useARFilters = (userId?: string): UseARFiltersReturn => {
     currentFilter,
     selectFilter,
     isCameraActive,
+    isMirrored,
+    toggleMirror,
     startCamera,
     stopCamera,
-    videoRef: videoRef as React.RefObject<HTMLVideoElement>,
+    videoRef,
     sessionId,
     isSessionActive,
     startSession,
@@ -293,7 +371,10 @@ export const useARFilters = (userId?: string): UseARFiltersReturn => {
     sessionDuration,
     capturedPhotos,
     capturePhoto,
+    deletePhoto,
     clearPhotos,
+    downloadPhoto,
+    sharePhoto,
     stats: statsData || null,
     history,
     isLoadingStats,

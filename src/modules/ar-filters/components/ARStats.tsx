@@ -4,7 +4,7 @@
 
 import React, { memo } from 'react';
 import { motion } from 'framer-motion';
-import { Camera, Clock, Award, TrendingUp, Image, Star } from 'lucide-react';
+import { Camera, Clock, Award, TrendingUp, Image, Star, Lightbulb } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
@@ -148,7 +148,7 @@ export const ARStats = memo<ARStatsProps>(({ stats, isLoading }) => {
                   <div key={index} className="flex-1 flex flex-col items-center gap-1">
                     <motion.div
                       initial={{ height: 0 }}
-                      animate={{ height: `${height}%` }}
+                      animate={{ height: `${Math.max(height, 4)}%` }}
                       transition={{ delay: index * 0.05 }}
                       className="w-full bg-primary/80 rounded-t min-h-[4px]"
                     />
@@ -157,6 +157,35 @@ export const ARStats = memo<ARStatsProps>(({ stats, isLoading }) => {
                 );
               })}
             </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Recommendations */}
+      {stats.recommendations && stats.recommendations.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Lightbulb className="w-5 h-5" />
+              Recommandations
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {stats.recommendations.map((rec, index) => (
+              <motion.div
+                key={rec.filterId}
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.1 }}
+                className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg"
+              >
+                <span className="text-2xl">{rec.filterEmoji}</span>
+                <div className="flex-1">
+                  <p className="font-medium">{rec.filterName}</p>
+                  <p className="text-xs text-muted-foreground">{rec.reason}</p>
+                </div>
+              </motion.div>
+            ))}
           </CardContent>
         </Card>
       )}
@@ -171,17 +200,23 @@ export const ARStats = memo<ARStatsProps>(({ stats, isLoading }) => {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            {stats.achievements.map((achievement) => {
+            {stats.achievements.map((achievement, index) => {
               const progress = Math.min((achievement.progress / achievement.target) * 100, 100);
               const isUnlocked = !!achievement.unlockedAt;
               
               return (
-                <div
+                <motion.div
                   key={achievement.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.05 }}
                   className={`p-3 rounded-lg border ${isUnlocked ? 'bg-primary/5 border-primary/20' : 'bg-muted/50 border-border'}`}
                 >
                   <div className="flex items-center justify-between mb-2">
-                    <span className="font-medium text-sm">{achievement.name}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xl">{achievement.icon}</span>
+                      <span className="font-medium text-sm">{achievement.name}</span>
+                    </div>
                     {isUnlocked && (
                       <Badge variant="default" className="text-xs">Débloqué</Badge>
                     )}
@@ -189,11 +224,11 @@ export const ARStats = memo<ARStatsProps>(({ stats, isLoading }) => {
                   <p className="text-xs text-muted-foreground mb-2">{achievement.description}</p>
                   <div className="flex items-center gap-2">
                     <Progress value={progress} className="flex-1 h-2" />
-                    <span className="text-xs text-muted-foreground">
+                    <span className="text-xs text-muted-foreground min-w-[50px] text-right">
                       {achievement.progress}/{achievement.target}
                     </span>
                   </div>
-                </div>
+                </motion.div>
               );
             })}
           </CardContent>
