@@ -4183,6 +4183,57 @@ export type Database = {
         }
         Relationships: []
       }
+      consent_records: {
+        Row: {
+          analytics_consent: boolean | null
+          audio_consent: boolean | null
+          consent_version: string
+          created_at: string | null
+          data_sharing_consent: boolean | null
+          data_storage_consent: boolean | null
+          emotion_analysis_consent: boolean | null
+          id: string
+          ip_address: string | null
+          marketing_consent: boolean | null
+          updated_at: string | null
+          user_agent: string | null
+          user_id: string
+          video_consent: boolean | null
+        }
+        Insert: {
+          analytics_consent?: boolean | null
+          audio_consent?: boolean | null
+          consent_version?: string
+          created_at?: string | null
+          data_sharing_consent?: boolean | null
+          data_storage_consent?: boolean | null
+          emotion_analysis_consent?: boolean | null
+          id?: string
+          ip_address?: string | null
+          marketing_consent?: boolean | null
+          updated_at?: string | null
+          user_agent?: string | null
+          user_id: string
+          video_consent?: boolean | null
+        }
+        Update: {
+          analytics_consent?: boolean | null
+          audio_consent?: boolean | null
+          consent_version?: string
+          created_at?: string | null
+          data_sharing_consent?: boolean | null
+          data_storage_consent?: boolean | null
+          emotion_analysis_consent?: boolean | null
+          id?: string
+          ip_address?: string | null
+          marketing_consent?: boolean | null
+          updated_at?: string | null
+          user_agent?: string | null
+          user_id?: string
+          video_consent?: boolean | null
+        }
+        Relationships: []
+      }
       crisis_alerts: {
         Row: {
           acknowledged_at: string | null
