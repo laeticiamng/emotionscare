@@ -18987,8 +18987,14 @@ export type Database = {
           duration_seconds: number | null
           emotion_tags: string[] | null
           id: string
+          is_favorite: boolean | null
+          reading_duration_seconds: number | null
           story_content: string | null
           story_theme: string | null
+          theme: string | null
+          tone: string | null
+          updated_at: string | null
+          user_context: string | null
           user_id: string
         }
         Insert: {
@@ -18998,8 +19004,14 @@ export type Database = {
           duration_seconds?: number | null
           emotion_tags?: string[] | null
           id?: string
+          is_favorite?: boolean | null
+          reading_duration_seconds?: number | null
           story_content?: string | null
           story_theme?: string | null
+          theme?: string | null
+          tone?: string | null
+          updated_at?: string | null
+          user_context?: string | null
           user_id: string
         }
         Update: {
@@ -19009,8 +19021,14 @@ export type Database = {
           duration_seconds?: number | null
           emotion_tags?: string[] | null
           id?: string
+          is_favorite?: boolean | null
+          reading_duration_seconds?: number | null
           story_content?: string | null
           story_theme?: string | null
+          theme?: string | null
+          tone?: string | null
+          updated_at?: string | null
+          user_context?: string | null
           user_id?: string
         }
         Relationships: []
