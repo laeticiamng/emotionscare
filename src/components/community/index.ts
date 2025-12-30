@@ -12,3 +12,6 @@ export { EnhancedPostCard } from './EnhancedPostCard';
 export { CommunityStatsBoard } from './CommunityStatsBoard';
 export { SavedPostsTab } from './SavedPostsTab';
 export { EnhancedCommunityPageV2 } from './EnhancedCommunityPageV2';
+export { CommunityNotifications } from './CommunityNotifications';
+export { FollowButton } from './FollowButton';
+export { ReportModal } from './ReportModal';

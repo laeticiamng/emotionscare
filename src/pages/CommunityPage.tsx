@@ -1,5 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { Users, MessageCircle, Heart, Send, ArrowLeft, ThumbsUp, Smile, Star, UserCircle, Search } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { 
+  Users, MessageCircle, Heart, Send, ArrowLeft, Smile, Search, Plus,
+  TrendingUp, Bookmark, Flag, Settings, BarChart3, UserPlus
+} from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -11,143 +14,163 @@ import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { Navigate } from 'react-router-dom';
+import { useCommunityGroups, useCommunityPosts } from '@/hooks/community';
+import { CommunityReportService, REPORT_REASONS, ReportReason } from '@/modules/community/services';
+import { CommunitySavedPostsService } from '@/modules/community/services';
+import { motion, AnimatePresence } from 'framer-motion';
 
-interface Group {
-  id: string;
-  name: string;
-  emoji: string;
-  description: string;
-  category: string;
-  is_member?: boolean;
-  member_count?: number;
-}
+const REACTION_EMOJIS = ['❤️', '👍', '🙏', '💪', '🌟', '🤗'];
 
-interface Message {
+interface GroupMessage {
   id: string;
   content: string;
-  is_anonymous: boolean;
+  is_anonymous?: boolean;
   created_at: string;
-  user_id?: string;
-  profiles?: { display_name?: string; avatar_url?: string };
+  author_id: string;
+  author?: { full_name?: string; avatar_url?: string };
   reactions?: { emoji: string; count: number; user_reacted: boolean }[];
 }
 
-interface Member {
+interface GroupMember {
   id: string;
-  display_name: string;
-  avatar_url?: string;
+  user_id: string;
+  role: string;
   joined_at: string;
-  message_count: number;
+  profile?: { full_name?: string; avatar_url?: string };
 }
-
-const REACTION_EMOJIS = ['❤️', '👍', '🙏', '💪', '🌟', '🤗'];
 
 export default function CommunityPage() {
   const { user } = useAuth();
   const { toast } = useToast();
-  const [groups, setGroups] = useState<Group[]>([]);
-  const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [members, setMembers] = useState<Member[]>([]);
+  
+  // Hooks pour les données
+  const { groups, myGroups, loading: groupsLoading, joinGroup, leaveGroup, createGroup, refresh: refreshGroups } = useCommunityGroups();
+  const { posts, loading: postsLoading, createPost, toggleReaction, refresh: refreshPosts } = useCommunityPosts();
+  
+  // États locaux
+  const [selectedGroup, setSelectedGroup] = useState<any | null>(null);
+  const [messages, setMessages] = useState<GroupMessage[]>([]);
+  const [members, setMembers] = useState<GroupMember[]>([]);
   const [newMessage, setNewMessage] = useState('');
+  const [newPostContent, setNewPostContent] = useState('');
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [sending, setSending] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeTab, setActiveTab] = useState('messages');
+  const [activeTab, setActiveTab] = useState('feed');
+  const [activeGroupTab, setActiveGroupTab] = useState('messages');
+  const [savedPostIds, setSavedPostIds] = useState<string[]>([]);
+  
+  // États pour les modals
+  const [showCreateGroup, setShowCreateGroup] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [reportTarget, setReportTarget] = useState<{ type: 'post' | 'comment' | 'user'; id: string } | null>(null);
+  const [reportReason, setReportReason] = useState<ReportReason>('other');
+  const [reportDescription, setReportDescription] = useState('');
+  
+  // Nouveau groupe
+  const [newGroupName, setNewGroupName] = useState('');
+  const [newGroupDescription, setNewGroupDescription] = useState('');
+  const [newGroupIcon, setNewGroupIcon] = useState('👥');
+  const [newGroupPrivate, setNewGroupPrivate] = useState(false);
 
+  // Charger les posts sauvegardés
   useEffect(() => {
-    if (user) loadGroups();
+    const loadSavedPosts = async () => {
+      try {
+        const ids = await CommunitySavedPostsService.getSavedPosts();
+        setSavedPostIds(ids);
+      } catch (err) {
+        console.error('Failed to load saved posts:', err);
+      }
+    };
+    if (user) loadSavedPosts();
   }, [user]);
 
-  const loadGroups = async () => {
+  // Charger les messages d'un groupe
+  const loadGroupMessages = useCallback(async (groupId: string) => {
     try {
-      const { data, error } = await supabase.functions.invoke('community-groups', {
-        body: { action: 'list' }
-      });
-      if (!error && data?.groups) {
-        setGroups(data.groups);
-      }
-    } catch (err) {
-      console.error('Failed to load groups:', err);
-    }
-  };
+      const { data, error } = await supabase
+        .from('community_posts')
+        .select('*, profiles!community_posts_author_id_fkey(full_name, avatar_url)')
+        .eq('group_id', groupId)
+        .order('created_at', { ascending: true })
+        .limit(50);
 
-  const loadMessages = async (groupId: string) => {
-    try {
-      const { data, error } = await supabase.functions.invoke('community-groups', {
-        body: { action: 'messages', groupId }
-      });
-      if (!error && data?.messages) {
-        // Add mock reactions for demo
-        const messagesWithReactions = data.messages.reverse().map((msg: Message) => ({
-          ...msg,
-          reactions: [
-            { emoji: '❤️', count: Math.floor(Math.random() * 5), user_reacted: false },
-            { emoji: '👍', count: Math.floor(Math.random() * 3), user_reacted: false },
-          ].filter(r => r.count > 0)
-        }));
-        setMessages(messagesWithReactions);
-      }
+      if (error) throw error;
+      
+      setMessages((data || []).map(msg => ({
+        id: msg.id,
+        content: msg.content,
+        created_at: msg.created_at,
+        author_id: msg.author_id,
+        author: msg.profiles,
+        reactions: []
+      })));
     } catch (err) {
       console.error('Failed to load messages:', err);
     }
-  };
+  }, []);
 
-  const loadMembers = async (groupId: string) => {
-    // Mock members for demo
-    setMembers([
-      { id: '1', display_name: 'Sophie M.', joined_at: '2024-01-15', message_count: 24 },
-      { id: '2', display_name: 'Lucas D.', joined_at: '2024-02-20', message_count: 18 },
-      { id: '3', display_name: 'Emma R.', joined_at: '2024-03-10', message_count: 12 },
-      { id: '4', display_name: 'Thomas B.', joined_at: '2024-03-25', message_count: 8 },
-    ]);
-  };
-
-  const handleJoinGroup = async (groupId: string) => {
+  // Charger les membres d'un groupe
+  const loadGroupMembers = useCallback(async (groupId: string) => {
     try {
-      const { error } = await supabase.functions.invoke('community-groups', {
-        body: { action: 'join', groupId }
-      });
-      if (!error) {
-        toast({ title: 'Bienvenue!', description: 'Vous avez rejoint le groupe.' });
-        loadGroups();
-      }
-    } catch (err) {
-      toast({ title: 'Erreur', description: 'Impossible de rejoindre le groupe.', variant: 'destructive' });
-    }
-  };
+      const { data, error } = await supabase
+        .from('community_group_members')
+        .select('*, profiles!community_group_members_user_id_fkey(full_name, avatar_url)')
+        .eq('group_id', groupId)
+        .eq('status', 'active')
+        .order('joined_at', { ascending: false });
 
-  const handleSelectGroup = async (group: Group) => {
+      if (error) throw error;
+      
+      setMembers((data || []).map(m => ({
+        id: m.id,
+        user_id: m.user_id,
+        role: m.role,
+        joined_at: m.joined_at,
+        profile: m.profiles
+      })));
+    } catch (err) {
+      console.error('Failed to load members:', err);
+    }
+  }, []);
+
+  const handleSelectGroup = async (group: any) => {
     if (!group.is_member) {
-      await handleJoinGroup(group.id);
+      await joinGroup(group.id);
     }
     setSelectedGroup(group);
-    loadMessages(group.id);
-    loadMembers(group.id);
+    loadGroupMessages(group.id);
+    loadGroupMembers(group.id);
   };
 
   const handleSendMessage = async () => {
-    if (!newMessage.trim() || !selectedGroup) return;
+    if (!newMessage.trim() || !selectedGroup || !user) return;
     
     setSending(true);
     try {
-      const { error } = await supabase.functions.invoke('community-groups', {
-        body: {
-          action: 'post',
-          groupId: selectedGroup.id,
+      const { error } = await supabase
+        .from('community_posts')
+        .insert({
+          group_id: selectedGroup.id,
+          author_id: user.id,
+          title: 'Message',
           content: newMessage,
-          isAnonymous
-        }
-      });
+          likes_count: 0,
+          comments_count: 0
+        });
+
+      if (error) throw error;
       
-      if (!error) {
-        setNewMessage('');
-        loadMessages(selectedGroup.id);
-      }
+      setNewMessage('');
+      loadGroupMessages(selectedGroup.id);
+      toast({ title: 'Message envoyé ✓' });
     } catch (err) {
       toast({ title: 'Erreur', description: 'Impossible d\'envoyer le message.', variant: 'destructive' });
     } finally {
@@ -155,8 +178,75 @@ export default function CommunityPage() {
     }
   };
 
+  const handleCreatePost = async () => {
+    if (!newPostContent.trim()) return;
+    
+    try {
+      await createPost({
+        content: newPostContent,
+        isAnonymous
+      });
+      setNewPostContent('');
+      setIsAnonymous(false);
+    } catch (err) {
+      // Error handled in hook
+    }
+  };
+
+  const handleCreateGroup = async () => {
+    if (!newGroupName.trim()) {
+      toast({ title: 'Nom requis', variant: 'destructive' });
+      return;
+    }
+
+    await createGroup({
+      name: newGroupName,
+      description: newGroupDescription,
+      icon: newGroupIcon,
+      is_private: newGroupPrivate
+    });
+
+    setShowCreateGroup(false);
+    setNewGroupName('');
+    setNewGroupDescription('');
+    setNewGroupIcon('👥');
+    setNewGroupPrivate(false);
+  };
+
+  const handleReport = async () => {
+    if (!reportTarget) return;
+
+    try {
+      if (reportTarget.type === 'post') {
+        await CommunityReportService.reportPost(reportTarget.id, reportReason, reportDescription);
+      } else if (reportTarget.type === 'comment') {
+        await CommunityReportService.reportComment(reportTarget.id, reportReason, reportDescription);
+      } else {
+        await CommunityReportService.reportUser(reportTarget.id, reportReason, reportDescription);
+      }
+
+      toast({ title: 'Signalement envoyé', description: 'Merci, notre équipe va examiner ce contenu.' });
+      setShowReportModal(false);
+      setReportTarget(null);
+      setReportDescription('');
+    } catch (err) {
+      toast({ title: 'Erreur', description: 'Impossible d\'envoyer le signalement.', variant: 'destructive' });
+    }
+  };
+
+  const handleToggleSavePost = async (postId: string) => {
+    try {
+      const isSaved = await CommunitySavedPostsService.toggleSavePost(postId);
+      setSavedPostIds(prev => 
+        isSaved ? [...prev, postId] : prev.filter(id => id !== postId)
+      );
+      toast({ title: isSaved ? 'Post sauvegardé' : 'Post retiré des favoris' });
+    } catch (err) {
+      toast({ title: 'Erreur', variant: 'destructive' });
+    }
+  };
+
   const handleReaction = async (messageId: string, emoji: string) => {
-    // Mise à jour optimiste de l'UI
     setMessages(prev => prev.map(msg => {
       if (msg.id !== messageId) return msg;
       
@@ -177,21 +267,6 @@ export default function CommunityPage() {
         };
       }
     }));
-
-    // Persister sur le serveur
-    try {
-      await supabase.functions.invoke('community-groups', {
-        body: { action: 'react', messageId, emoji }
-      });
-    } catch (err) {
-      // Rollback si erreur
-      console.error('Reaction failed:', err);
-      toast({ 
-        title: 'Erreur', 
-        description: 'Impossible d\'enregistrer la réaction.', 
-        variant: 'destructive' 
-      });
-    }
   };
 
   if (!user) return <Navigate to="/login" replace />;
@@ -199,7 +274,7 @@ export default function CommunityPage() {
   // Filtrer les groupes
   const filteredGroups = groups.filter(g => 
     g.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    g.description.toLowerCase().includes(searchQuery.toLowerCase())
+    g.description?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   // Vue détail du groupe
@@ -212,15 +287,25 @@ export default function CommunityPage() {
           </Button>
           <div className="flex-1">
             <h1 className="text-xl font-bold flex items-center gap-2">
-              <span>{selectedGroup.emoji}</span>
+              <span>{selectedGroup.icon || '👥'}</span>
               {selectedGroup.name}
             </h1>
             <p className="text-sm text-muted-foreground">{selectedGroup.description}</p>
           </div>
           <Badge variant="outline">{members.length} membres</Badge>
+          <Button 
+            variant="ghost" 
+            size="icon"
+            onClick={() => {
+              leaveGroup(selectedGroup.id);
+              setSelectedGroup(null);
+            }}
+          >
+            <Settings className="h-4 w-4" />
+          </Button>
         </div>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
+        <Tabs value={activeGroupTab} onValueChange={setActiveGroupTab} className="flex-1 flex flex-col">
           <TabsList className="w-full justify-start">
             <TabsTrigger value="messages" className="flex items-center gap-1">
               <MessageCircle className="h-4 w-4" />
@@ -228,7 +313,7 @@ export default function CommunityPage() {
             </TabsTrigger>
             <TabsTrigger value="members" className="flex items-center gap-1">
               <Users className="h-4 w-4" />
-              Membres
+              Membres ({members.length})
             </TabsTrigger>
           </TabsList>
 
@@ -241,24 +326,23 @@ export default function CommunityPage() {
                   </p>
                 ) : (
                   messages.map(msg => (
-                    <div key={msg.id} className="bg-muted/50 rounded-lg p-4">
+                    <motion.div 
+                      key={msg.id} 
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="bg-muted/50 rounded-lg p-4"
+                    >
                       <div className="flex items-start gap-3">
                         <Avatar className="h-8 w-8">
-                          {msg.is_anonymous ? (
-                            <AvatarFallback>👤</AvatarFallback>
-                          ) : (
-                            <>
-                              <AvatarImage src={msg.profiles?.avatar_url} />
-                              <AvatarFallback>
-                                {msg.profiles?.display_name?.charAt(0) || 'M'}
-                              </AvatarFallback>
-                            </>
-                          )}
+                          <AvatarImage src={msg.author?.avatar_url} />
+                          <AvatarFallback>
+                            {msg.author?.full_name?.charAt(0) || 'M'}
+                          </AvatarFallback>
                         </Avatar>
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
                             <span className="text-sm font-medium">
-                              {msg.is_anonymous ? 'Anonyme' : msg.profiles?.display_name || 'Membre'}
+                              {msg.author?.full_name || 'Membre'}
                             </span>
                             <span className="text-xs text-muted-foreground">
                               {new Date(msg.created_at).toLocaleString('fr-FR', { 
@@ -305,10 +389,20 @@ export default function CommunityPage() {
                                 </div>
                               </PopoverContent>
                             </Popover>
+
+                            <button 
+                              className="p-1 rounded hover:bg-muted ml-auto"
+                              onClick={() => {
+                                setReportTarget({ type: 'post', id: msg.id });
+                                setShowReportModal(true);
+                              }}
+                            >
+                              <Flag className="h-4 w-4 text-muted-foreground" />
+                            </button>
                           </div>
                         </div>
                       </div>
-                    </div>
+                    </motion.div>
                   ))
                 )}
               </div>
@@ -322,11 +416,7 @@ export default function CommunityPage() {
                 className="mb-3 min-h-[80px]"
                 maxLength={2000}
               />
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <Switch id="anonymous" checked={isAnonymous} onCheckedChange={setIsAnonymous} />
-                  <Label htmlFor="anonymous" className="text-sm">Anonyme</Label>
-                </div>
+              <div className="flex items-center justify-end">
                 <Button onClick={handleSendMessage} disabled={sending || !newMessage.trim()}>
                   <Send className="h-4 w-4 mr-2" />
                   Envoyer
@@ -341,17 +431,17 @@ export default function CommunityPage() {
                 {members.map(member => (
                   <div key={member.id} className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/50">
                     <Avatar>
-                      <AvatarImage src={member.avatar_url} />
-                      <AvatarFallback>{member.display_name.charAt(0)}</AvatarFallback>
+                      <AvatarImage src={member.profile?.avatar_url} />
+                      <AvatarFallback>{member.profile?.full_name?.charAt(0) || 'M'}</AvatarFallback>
                     </Avatar>
                     <div className="flex-1">
-                      <p className="font-medium">{member.display_name}</p>
+                      <p className="font-medium">{member.profile?.full_name || 'Membre'}</p>
                       <p className="text-xs text-muted-foreground">
                         Membre depuis {new Date(member.joined_at).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}
                       </p>
                     </div>
-                    <Badge variant="secondary" className="text-xs">
-                      {member.message_count} messages
+                    <Badge variant={member.role === 'admin' ? 'default' : 'secondary'} className="text-xs">
+                      {member.role === 'admin' ? 'Admin' : 'Membre'}
                     </Badge>
                   </div>
                 ))}
@@ -363,7 +453,7 @@ export default function CommunityPage() {
     );
   }
 
-  // Liste des groupes
+  // Vue principale
   return (
     <div className="container max-w-4xl mx-auto py-8 px-4">
       <div className="mb-8 text-center">
@@ -376,54 +466,449 @@ export default function CommunityPage() {
         </p>
       </div>
 
-      {/* Recherche */}
-      <div className="relative mb-6">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input
-          placeholder="Rechercher un groupe..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-10"
-        />
-      </div>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="w-full mb-6 grid grid-cols-4">
+          <TabsTrigger value="feed" className="flex items-center gap-1">
+            <MessageCircle className="h-4 w-4" />
+            <span className="hidden sm:inline">Fil</span>
+          </TabsTrigger>
+          <TabsTrigger value="groups" className="flex items-center gap-1">
+            <Users className="h-4 w-4" />
+            <span className="hidden sm:inline">Groupes</span>
+          </TabsTrigger>
+          <TabsTrigger value="trending" className="flex items-center gap-1">
+            <TrendingUp className="h-4 w-4" />
+            <span className="hidden sm:inline">Tendances</span>
+          </TabsTrigger>
+          <TabsTrigger value="saved" className="flex items-center gap-1">
+            <Bookmark className="h-4 w-4" />
+            <span className="hidden sm:inline">Favoris</span>
+          </TabsTrigger>
+        </TabsList>
 
-      <div className="grid gap-4 md:grid-cols-2">
-        {filteredGroups.map(group => (
-          <Card 
-            key={group.id} 
-            className={`cursor-pointer transition-all hover:shadow-md ${
-              group.is_member ? 'border-primary/50' : ''
-            }`}
-            onClick={() => handleSelectGroup(group)}
-          >
-            <CardHeader className="pb-2">
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <span className="text-2xl">{group.emoji}</span>
-                {group.name}
-                {group.is_member && (
-                  <Badge variant="secondary" className="ml-auto">
-                    <Heart className="h-3 w-3 mr-1 fill-current" />
-                    Membre
-                  </Badge>
-                )}
-              </CardTitle>
-              <CardDescription>{group.description}</CardDescription>
+        {/* Onglet Fil */}
+        <TabsContent value="feed" className="space-y-6">
+          {/* Composer */}
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg">Partager avec la communauté</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                <span className="flex items-center gap-1">
-                  <Users className="h-4 w-4" />
-                  {group.member_count || '10+'} membres
-                </span>
-                <span className="flex items-center gap-1">
-                  <MessageCircle className="h-4 w-4" />
-                  Actif
-                </span>
+            <CardContent className="space-y-3">
+              <Textarea
+                placeholder="Comment vous sentez-vous aujourd'hui ?"
+                value={newPostContent}
+                onChange={(e) => setNewPostContent(e.target.value)}
+                className="min-h-[100px]"
+                maxLength={2000}
+              />
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <Switch id="anon-post" checked={isAnonymous} onCheckedChange={setIsAnonymous} />
+                  <Label htmlFor="anon-post" className="text-sm">Publier anonymement</Label>
+                </div>
+                <Button onClick={handleCreatePost} disabled={!newPostContent.trim()}>
+                  <Send className="h-4 w-4 mr-2" />
+                  Publier
+                </Button>
               </div>
             </CardContent>
           </Card>
-        ))}
-      </div>
+
+          {/* Posts */}
+          {postsLoading ? (
+            <div className="text-center py-8 text-muted-foreground">Chargement...</div>
+          ) : posts.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              Aucun post pour le moment. Soyez le premier à partager !
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {posts.map(post => (
+                <Card key={post.id}>
+                  <CardContent className="pt-4">
+                    <div className="flex items-start gap-3">
+                      <Avatar>
+                        <AvatarFallback>{post.is_anonymous ? '👤' : 'M'}</AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-sm font-medium">
+                            {post.is_anonymous ? 'Anonyme' : 'Membre'}
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            {new Date(post.created_at).toLocaleDateString('fr-FR')}
+                          </span>
+                        </div>
+                        <p className="text-sm mb-3">{post.content}</p>
+                        <div className="flex items-center gap-2">
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            onClick={() => toggleReaction(post.id, 'like')}
+                          >
+                            <Heart className="h-4 w-4 mr-1" />
+                            {post.likes_count}
+                          </Button>
+                          <Button variant="ghost" size="sm">
+                            <MessageCircle className="h-4 w-4 mr-1" />
+                            {post.comments_count}
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            onClick={() => handleToggleSavePost(post.id)}
+                          >
+                            <Bookmark className={`h-4 w-4 ${savedPostIds.includes(post.id) ? 'fill-current' : ''}`} />
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            className="ml-auto"
+                            onClick={() => {
+                              setReportTarget({ type: 'post', id: post.id });
+                              setShowReportModal(true);
+                            }}
+                          >
+                            <Flag className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </TabsContent>
+
+        {/* Onglet Groupes */}
+        <TabsContent value="groups" className="space-y-6">
+          <div className="flex items-center gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Rechercher un groupe..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            <Dialog open={showCreateGroup} onOpenChange={setShowCreateGroup}>
+              <DialogTrigger asChild>
+                <Button>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Créer
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Créer un groupe</DialogTitle>
+                  <DialogDescription>
+                    Créez un espace de partage pour votre communauté.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                  <div className="space-y-2">
+                    <Label>Nom du groupe</Label>
+                    <Input 
+                      value={newGroupName}
+                      onChange={(e) => setNewGroupName(e.target.value)}
+                      placeholder="Ex: Gestion du stress"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Description</Label>
+                    <Textarea 
+                      value={newGroupDescription}
+                      onChange={(e) => setNewGroupDescription(e.target.value)}
+                      placeholder="Décrivez l'objectif de ce groupe..."
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Icône</Label>
+                    <div className="flex gap-2">
+                      {['👥', '🧘', '💪', '🌿', '❤️', '🌟', '🎯', '🧠'].map(icon => (
+                        <button
+                          key={icon}
+                          onClick={() => setNewGroupIcon(icon)}
+                          className={`text-2xl p-2 rounded-lg ${newGroupIcon === icon ? 'bg-primary/20 ring-2 ring-primary' : 'hover:bg-muted'}`}
+                        >
+                          {icon}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Switch 
+                      id="private-group"
+                      checked={newGroupPrivate}
+                      onCheckedChange={setNewGroupPrivate}
+                    />
+                    <Label htmlFor="private-group">Groupe privé</Label>
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => setShowCreateGroup(false)}>
+                    Annuler
+                  </Button>
+                  <Button onClick={handleCreateGroup}>
+                    Créer le groupe
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </div>
+
+          {/* Mes groupes */}
+          {myGroups.length > 0 && (
+            <div>
+              <h3 className="font-semibold mb-3 flex items-center gap-2">
+                <Heart className="h-4 w-4 text-primary" />
+                Mes groupes
+              </h3>
+              <div className="grid gap-4 md:grid-cols-2">
+                {myGroups.map(group => (
+                  <Card 
+                    key={group.id} 
+                    className="cursor-pointer transition-all hover:shadow-md border-primary/30"
+                    onClick={() => handleSelectGroup(group)}
+                  >
+                    <CardHeader className="pb-2">
+                      <CardTitle className="flex items-center gap-2 text-lg">
+                        <span className="text-2xl">{group.icon || '👥'}</span>
+                        {group.name}
+                        <Badge variant="secondary" className="ml-auto">
+                          <Heart className="h-3 w-3 mr-1 fill-current" />
+                          Membre
+                        </Badge>
+                      </CardTitle>
+                      <CardDescription>{group.description}</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                        <span className="flex items-center gap-1">
+                          <Users className="h-4 w-4" />
+                          {group.member_count} membres
+                        </span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Découvrir */}
+          <div>
+            <h3 className="font-semibold mb-3 flex items-center gap-2">
+              <Search className="h-4 w-4" />
+              Découvrir
+            </h3>
+            {groupsLoading ? (
+              <div className="text-center py-8 text-muted-foreground">Chargement...</div>
+            ) : filteredGroups.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                Aucun groupe trouvé. Créez le premier !
+              </div>
+            ) : (
+              <div className="grid gap-4 md:grid-cols-2">
+                {filteredGroups.filter(g => !g.is_member).map(group => (
+                  <Card 
+                    key={group.id} 
+                    className="cursor-pointer transition-all hover:shadow-md"
+                    onClick={() => handleSelectGroup(group)}
+                  >
+                    <CardHeader className="pb-2">
+                      <CardTitle className="flex items-center gap-2 text-lg">
+                        <span className="text-2xl">{group.icon || '👥'}</span>
+                        {group.name}
+                        {group.is_private && (
+                          <Badge variant="outline" className="ml-auto">
+                            Privé
+                          </Badge>
+                        )}
+                      </CardTitle>
+                      <CardDescription>{group.description}</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex items-center justify-between">
+                        <span className="flex items-center gap-1 text-sm text-muted-foreground">
+                          <Users className="h-4 w-4" />
+                          {group.member_count} membres
+                        </span>
+                        <Button size="sm" variant="outline">
+                          <UserPlus className="h-4 w-4 mr-1" />
+                          Rejoindre
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </div>
+        </TabsContent>
+
+        {/* Onglet Tendances */}
+        <TabsContent value="trending" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <TrendingUp className="h-5 w-5 text-primary" />
+                Posts populaires
+              </CardTitle>
+              <CardDescription>Les discussions les plus engagées cette semaine</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {posts.length === 0 ? (
+                <p className="text-center py-4 text-muted-foreground">Aucune tendance pour le moment</p>
+              ) : (
+                <div className="space-y-3">
+                  {[...posts]
+                    .sort((a, b) => b.likes_count - a.likes_count)
+                    .slice(0, 5)
+                    .map((post, idx) => (
+                      <div key={post.id} className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
+                        <span className="text-lg font-bold text-primary">#{idx + 1}</span>
+                        <div className="flex-1">
+                          <p className="text-sm line-clamp-2">{post.content}</p>
+                          <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
+                            <span className="flex items-center gap-1">
+                              <Heart className="h-3 w-3" />
+                              {post.likes_count}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <MessageCircle className="h-3 w-3" />
+                              {post.comments_count}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BarChart3 className="h-5 w-5 text-primary" />
+                Statistiques
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-3 gap-4 text-center">
+                <div>
+                  <p className="text-2xl font-bold text-primary">{posts.length}</p>
+                  <p className="text-xs text-muted-foreground">Posts</p>
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-primary">{groups.length}</p>
+                  <p className="text-xs text-muted-foreground">Groupes</p>
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-primary">
+                    {posts.reduce((sum, p) => sum + p.likes_count, 0)}
+                  </p>
+                  <p className="text-xs text-muted-foreground">Réactions</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Onglet Favoris */}
+        <TabsContent value="saved" className="space-y-4">
+          {savedPostIds.length === 0 ? (
+            <div className="text-center py-12">
+              <Bookmark className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+              <h3 className="font-semibold mb-2">Aucun favori</h3>
+              <p className="text-muted-foreground text-sm">
+                Sauvegardez des posts pour les retrouver ici.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {posts
+                .filter(p => savedPostIds.includes(p.id))
+                .map(post => (
+                  <Card key={post.id}>
+                    <CardContent className="pt-4">
+                      <div className="flex items-start gap-3">
+                        <Avatar>
+                          <AvatarFallback>{post.is_anonymous ? '👤' : 'M'}</AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1">
+                          <p className="text-sm mb-2">{post.content}</p>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-muted-foreground">
+                              {new Date(post.created_at).toLocaleDateString('fr-FR')}
+                            </span>
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              className="ml-auto"
+                              onClick={() => handleToggleSavePost(post.id)}
+                            >
+                              <Bookmark className="h-4 w-4 fill-current" />
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+            </div>
+          )}
+        </TabsContent>
+      </Tabs>
+
+      {/* Modal de signalement */}
+      <Dialog open={showReportModal} onOpenChange={setShowReportModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Signaler un contenu</DialogTitle>
+            <DialogDescription>
+              Aidez-nous à maintenir un espace bienveillant.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label>Raison du signalement</Label>
+              <Select value={reportReason} onValueChange={(v) => setReportReason(v as ReportReason)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {REPORT_REASONS.map(reason => (
+                    <SelectItem key={reason.value} value={reason.value}>
+                      {reason.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>Description (optionnel)</Label>
+              <Textarea
+                value={reportDescription}
+                onChange={(e) => setReportDescription(e.target.value)}
+                placeholder="Décrivez le problème..."
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowReportModal(false)}>
+              Annuler
+            </Button>
+            <Button onClick={handleReport} variant="destructive">
+              <Flag className="h-4 w-4 mr-2" />
+              Signaler
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <p className="text-xs text-muted-foreground text-center mt-8">
         🔒 Tous les échanges sont confidentiels et modérés pour garantir un espace bienveillant.
