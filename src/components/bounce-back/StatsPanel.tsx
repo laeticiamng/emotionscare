@@ -33,7 +33,9 @@ interface StatsPanelProps {
   isLoading?: boolean;
 }
 
-const COPING_LABELS: Record<string, { label: string; icon: React.ElementType }> = {
+import type { LucideIcon } from 'lucide-react';
+
+const COPING_LABELS: Record<string, { label: string; icon: LucideIcon }> = {
   distraction: { label: 'Distraction', icon: Brain },
   reframing: { label: 'Recadrage', icon: Lightbulb },
   support: { label: 'Support social', icon: Users },
@@ -173,7 +175,7 @@ export const StatsPanel: React.FC<StatsPanelProps> = ({ stats, isLoading }) => {
           <CardContent className="space-y-4">
             {copingEntries.map(([key, value], index) => {
               const config = COPING_LABELS[key] || { label: key, icon: Shield };
-              const Icon = config.icon;
+              const IconComponent = config.icon;
               const percentage = (value / 4) * 100;
 
               return (
@@ -186,7 +188,7 @@ export const StatsPanel: React.FC<StatsPanelProps> = ({ stats, isLoading }) => {
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      {React.createElement(config.icon, { className: "w-4 h-4 text-muted-foreground" })}
+                      <IconComponent className="w-4 h-4 text-muted-foreground" />
                       <span className="text-sm font-medium text-foreground">
                         {config.label}
                       </span>
