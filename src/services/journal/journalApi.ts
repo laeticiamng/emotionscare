@@ -296,6 +296,217 @@ export async function createCoachDraft(note: Pick<SanitizedNote, 'id'> | { id: s
   return conversation.id as string
 }
 
+// ============================================
+// ENRICHED API METHODS
+// ============================================
+
+/**
+ * Delete a note permanently
+ */
+export async function deleteNote(noteId: string): Promise<boolean> {
+  const parsed = NoteIdSchema.parse(noteId)
+
+  Sentry.addBreadcrumb({
+    category: 'journal',
+    message: 'journal:delete',
+    level: 'info',
+    data: { noteId: parsed },
+  })
+
+  const { error } = await supabase
+    .from('journal_entries')
+    .delete()
+    .eq('id', parsed)
+
+  if (error) {
+    Sentry.captureException(error, scope =>
+      redactErrorScope(scope, { action: 'delete', reason: 'delete_failed' }),
+    )
+    throw new Error('journal_delete_failed')
+  }
+
+  return true
+}
+
+/**
+ * Update an existing note
+ */
+export async function updateNote(
+  noteId: string,
+  updates: { text?: string; tags?: string[] }
+): Promise<SanitizedNote> {
+  const parsed = NoteIdSchema.parse(noteId)
+
+  Sentry.addBreadcrumb({
+    category: 'journal',
+    message: 'journal:update',
+    level: 'info',
+    data: { noteId: parsed },
+  })
+
+  const updatePayload: Record<string, any> = {}
+  
+  if (updates.text !== undefined) {
+    updatePayload.content = sanitizePlainText(updates.text)
+    updatePayload.text_content = updatePayload.content
+    updatePayload.summary = updatePayload.content.split(/\s+/).slice(0, 40).join(' ')
+  }
+  
+  if (updates.tags !== undefined) {
+    updatePayload.tags = sanitizeTags(updates.tags)
+  }
+
+  const { data, error } = await supabase
+    .from('journal_entries')
+    .update(updatePayload)
+    .eq('id', parsed)
+    .select('id, content, text_content, transcript, summary, tags, created_at, mode')
+    .single()
+
+  if (error || !data) {
+    Sentry.captureException(error ?? new Error('journal_update_failed'), scope =>
+      redactErrorScope(scope, { action: 'update', reason: 'update_failed' }),
+    )
+    throw new Error('journal_update_failed')
+  }
+
+  return mapRowToNote(data)
+}
+
+/**
+ * Toggle favorite status on a note
+ */
+export async function toggleFavorite(noteId: string): Promise<boolean> {
+  const parsed = NoteIdSchema.parse(noteId)
+
+  // First get current favorite status
+  const { data: currentNote, error: fetchError } = await supabase
+    .from('journal_entries')
+    .select('is_favorite')
+    .eq('id', parsed)
+    .single()
+
+  if (fetchError) {
+    throw new Error('journal_fetch_failed')
+  }
+
+  const newValue = !currentNote?.is_favorite
+
+  const { error } = await supabase
+    .from('journal_entries')
+    .update({ is_favorite: newValue })
+    .eq('id', parsed)
+
+  if (error) {
+    Sentry.captureException(error, scope =>
+      redactErrorScope(scope, { action: 'toggle_favorite', reason: 'update_failed' }),
+    )
+    throw new Error('journal_favorite_failed')
+  }
+
+  return newValue
+}
+
+/**
+ * Get all favorite notes
+ */
+export async function listFavorites(): Promise<SanitizedNote[]> {
+  Sentry.addBreadcrumb({
+    category: 'journal',
+    message: 'journal:list_favorites',
+    level: 'info',
+  })
+
+  const { data, error } = await supabase
+    .from('journal_entries')
+    .select('id, content, text_content, transcript, summary, tags, created_at, mode')
+    .eq('is_favorite', true)
+    .order('created_at', { ascending: false })
+
+  if (error) {
+    Sentry.captureException(error, scope =>
+      redactErrorScope(scope, { action: 'list_favorites', reason: 'query_failed' }),
+    )
+    throw new Error('journal_fetch_failed')
+  }
+
+  return (data ?? []).map(mapRowToNote)
+}
+
+/**
+ * Get journal statistics
+ */
+export async function getJournalStats(): Promise<{
+  totalNotes: number
+  totalWords: number
+  favoriteCount: number
+  currentStreak: number
+  longestStreak: number
+  avgWordsPerNote: number
+  lastEntryDate: string | null
+}> {
+  const { data: notes, error } = await supabase
+    .from('journal_entries')
+    .select('id, content, text_content, created_at, is_favorite')
+    .order('created_at', { ascending: false })
+
+  if (error) {
+    throw new Error('journal_stats_failed')
+  }
+
+  const allNotes = notes ?? []
+  
+  // Calculate total words
+  const totalWords = allNotes.reduce((sum, note) => {
+    const text = note.content ?? note.text_content ?? ''
+    return sum + text.split(/\s+/).filter((w: string) => w.length > 0).length
+  }, 0)
+
+  // Calculate streak
+  const sortedDates = allNotes
+    .map(n => new Date(n.created_at).toDateString())
+    .filter((v, i, a) => a.indexOf(v) === i) // unique dates
+    .sort((a, b) => new Date(b).getTime() - new Date(a).getTime())
+
+  let currentStreak = 0
+  let longestStreak = 0
+  let tempStreak = 0
+  const today = new Date().toDateString()
+
+  for (let i = 0; i < sortedDates.length; i++) {
+    const date = new Date(sortedDates[i])
+    const nextDate = i > 0 ? new Date(sortedDates[i - 1]) : null
+    
+    if (i === 0) {
+      const daysDiff = Math.floor((Date.now() - date.getTime()) / (1000 * 60 * 60 * 24))
+      if (daysDiff <= 1) {
+        tempStreak = 1
+        currentStreak = 1
+      }
+    } else if (nextDate) {
+      const daysDiff = Math.floor((nextDate.getTime() - date.getTime()) / (1000 * 60 * 60 * 24))
+      if (daysDiff === 1) {
+        tempStreak++
+        if (currentStreak > 0) currentStreak = tempStreak
+      } else {
+        longestStreak = Math.max(longestStreak, tempStreak)
+        tempStreak = 1
+      }
+    }
+  }
+  longestStreak = Math.max(longestStreak, tempStreak)
+
+  return {
+    totalNotes: allNotes.length,
+    totalWords,
+    favoriteCount: allNotes.filter(n => n.is_favorite).length,
+    currentStreak,
+    longestStreak,
+    avgWordsPerNote: allNotes.length > 0 ? Math.round(totalWords / allNotes.length) : 0,
+    lastEntryDate: allNotes[0]?.created_at ?? null,
+  }
+}
+
 export function __testUtils__() {
   return { sanitizePlainText, sanitizeTags, sanitizeSummary, extractHashtags, mapRowToNote }
 }

@@ -1,6 +1,6 @@
 /**
  * Journal Module - Journal vocal et textuel avec IA
- * @version 1.0.0
+ * @version 2.0.0
  */
 
 // ============ Services ============
@@ -10,6 +10,7 @@ export { journalService } from './journalService';
 export { useJournalMachine } from './useJournalMachine';
 export { useJournalComposer } from './useJournalComposer';
 export { usePanasSuggestions } from './usePanasSuggestions';
+export { useJournalEnriched } from './useJournalEnriched';
 
 // ============ UI Components ============
 export { default as WhisperInput } from './ui/WhisperInput';
@@ -20,6 +21,9 @@ export { default as BurnSealToggle } from './ui/BurnSealToggle';
 export { JournalComposer } from './components/JournalComposer';
 export { JournalPromptCard } from './components/JournalPromptCard';
 export { JournalRemindersList } from './components/JournalRemindersList';
+export { JournalStatsCard } from './components/JournalStatsCard';
+export { JournalEditDialog } from './components/JournalEditDialog';
+export { JournalNoteActions } from './components/JournalNoteActions';
 
 // ============ Types ============
 export type { 
@@ -33,3 +37,9 @@ export type {
   SanitizedNote,
   FeedQuery
 } from './types';
+
+export type {
+  JournalStats,
+  JournalTab,
+  UseJournalEnrichedReturn
+} from './useJournalEnriched';
