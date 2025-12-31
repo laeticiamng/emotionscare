@@ -13,7 +13,14 @@ import PageRoot from '@/components/common/PageRoot';
 import { usePageSEO } from '@/hooks/usePageSEO';
 import { useEmotionScan } from '@/hooks/useEmotionScan';
 import { useToast } from '@/hooks/use-toast';
-import { EmotionResult } from '@/types/emotion-unified';
+import { EmotionResult, ConfidenceLevel } from '@/types/emotion-unified';
+
+// Helper pour extraire la valeur numérique de confidence
+const getConfidenceValue = (confidence: number | ConfidenceLevel | undefined): number => {
+  if (confidence === undefined) return 0;
+  if (typeof confidence === 'number') return confidence;
+  return confidence.overall ?? 0;
+};
 
 // Simple Result Display Component
 const SimpleResultCard: React.FC<{ result: EmotionResult }> = ({ result }) => {
@@ -22,6 +29,8 @@ const SimpleResultCard: React.FC<{ result: EmotionResult }> = ({ result }) => {
     if (valence > 40) return 'text-amber-500';
     return 'text-red-500';
   };
+  
+  const confidenceValue = getConfidenceValue(result.confidence);
   
   return (
     <Card>
@@ -52,8 +61,8 @@ const SimpleResultCard: React.FC<{ result: EmotionResult }> = ({ result }) => {
           </div>
           <Progress value={result.arousal || 50} className="h-2" />
         </div>
-        {result.confidence && (
-          <Badge variant="secondary">Confiance: {Math.round(result.confidence)}%</Badge>
+        {confidenceValue > 0 && (
+          <Badge variant="secondary">Confiance: {Math.round(confidenceValue)}%</Badge>
         )}
       </CardContent>
     </Card>
