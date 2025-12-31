@@ -370,3 +370,10 @@ export const useAutoOptimization = () => {
   
   return optimizationSettings;
 };
+
+// ==================== HOOKS SCAN ÉMOTIONNEL ====================
+export { useEmotionScanHistory } from './useEmotionScanHistory';
+export { useScanPageState } from './useScanPageState';
+export { useScanHistory } from './useScanHistory';
+export { useScanSettings } from './useScanSettings';
+export { useEmotionScan } from './useEmotionScan';
