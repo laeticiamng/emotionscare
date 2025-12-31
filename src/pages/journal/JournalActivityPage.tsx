@@ -3,21 +3,20 @@
  * JournalActivityPage - Activité et streaks enrichis
  */
 import { memo } from 'react';
-import type { SanitizedNote } from '@/modules/journal/types';
+import { useJournalEnriched } from '@/modules/journal/useJournalEnriched';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 import { JournalHeatmap } from '@/components/journal/JournalHeatmap';
 import { JournalStreak } from '@/components/journal/JournalStreak';
 import { JournalPersonalStats } from '@/components/journal/JournalPersonalStats';
 import { Activity, Flame, Calendar, TrendingUp, Target } from 'lucide-react';
 
-interface JournalActivityPageProps {
-  notes: SanitizedNote[];
-}
-
-export const JournalActivityPage = memo<JournalActivityPageProps>(({ notes }) => {
-  // Calculate activity stats
+const JournalActivityPage = memo(() => {
+  const { notes, isLoading } = useJournalEnriched();
   const now = new Date();
+
+  // Calculate activity stats
   const thisMonth = notes.filter(n => {
     const date = new Date(n.created_at);
     return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
@@ -49,6 +48,21 @@ export const JournalActivityPage = memo<JournalActivityPageProps>(({ notes }) =>
       if (diff === 1) currentStreak++;
       else break;
     }
+  }
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <Skeleton className="h-10 w-48" />
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-24" />)}
+        </div>
+        <div className="grid gap-6 md:grid-cols-2">
+          <Skeleton className="h-64" />
+          <Skeleton className="h-64" />
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -132,19 +146,11 @@ export const JournalActivityPage = memo<JournalActivityPageProps>(({ notes }) =>
       </div>
 
       {/* Heatmap */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Calendar className="h-5 w-5" aria-hidden="true" />
-            Calendrier d'activité {now.getFullYear()}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <JournalHeatmap notes={notes} year={now.getFullYear()} />
-        </CardContent>
-      </Card>
+      <JournalHeatmap notes={notes} year={now.getFullYear()} />
     </div>
   );
 });
 
 JournalActivityPage.displayName = 'JournalActivityPage';
+
+export default JournalActivityPage;

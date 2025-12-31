@@ -3,19 +3,18 @@
  * JournalGoalsPage - Objectifs d'écriture enrichis
  */
 import { memo, useMemo } from 'react';
-import type { SanitizedNote } from '@/modules/journal/types';
+import { useJournalEnriched } from '@/modules/journal/useJournalEnriched';
 import { JournalWritingGoals } from '@/components/journal/JournalWritingGoals';
 import { JournalAchievements } from '@/components/journal/JournalAchievements';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Progress } from '@/components/ui/progress';
 import { Target, Trophy, Flame, Calendar, CheckCircle } from 'lucide-react';
 
-interface JournalGoalsPageProps {
-  notes: SanitizedNote[];
-}
+const JournalGoalsPage = memo(() => {
+  const { notes, isLoading } = useJournalEnriched();
 
-export const JournalGoalsPage = memo<JournalGoalsPageProps>(({ notes }) => {
   // Calculate goals progress
   const goals = useMemo(() => {
     const now = new Date();
@@ -45,6 +44,18 @@ export const JournalGoalsPage = memo<JournalGoalsPageProps>(({ notes }) => {
       words: { current: totalWordsThisMonth, target: wordsGoal },
     };
   }, [notes]);
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <Skeleton className="h-10 w-48" />
+        <div className="grid gap-4 sm:grid-cols-3">
+          {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-32" />)}
+        </div>
+        <Skeleton className="h-64" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -147,3 +158,5 @@ export const JournalGoalsPage = memo<JournalGoalsPageProps>(({ notes }) => {
 });
 
 JournalGoalsPage.displayName = 'JournalGoalsPage';
+
+export default JournalGoalsPage;

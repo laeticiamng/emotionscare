@@ -1,24 +1,48 @@
 // @ts-nocheck
 /**
- * JournalArchivePage - Archive & Export enrichi
+ * JournalArchivePage - Archive & Export enrichi avec notes archivées
  */
-import { memo, useMemo } from 'react';
-import type { SanitizedNote } from '@/modules/journal/types';
+import { memo, useMemo, useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { listArchivedNotes, unarchiveNote } from '@/services/journal/journalApi';
+import { useJournalEnriched } from '@/modules/journal/useJournalEnriched';
+import { useToast } from '@/hooks/use-toast';
 import { JournalExportPanel } from '@/components/journal/JournalExportPanel';
 import { JournalBackup } from '@/components/journal/JournalBackup';
 import { JournalAdvancedExport } from '@/components/journal/JournalAdvancedExport';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Archive, FileText, Download, Database, Shield, Calendar } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Archive, FileText, Download, Database, Shield, Calendar, RotateCcw } from 'lucide-react';
 import { logger } from '@/lib/logger';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
-interface JournalArchivePageProps {
-  notes: SanitizedNote[];
-}
+const JournalArchivePage = memo(() => {
+  const { notes } = useJournalEnriched();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
-export const JournalArchivePage = memo<JournalArchivePageProps>(({ notes }) => {
+  // Fetch archived notes
+  const { data: archivedNotes = [], isLoading: isLoadingArchived } = useQuery({
+    queryKey: ['journal', 'archived'],
+    queryFn: listArchivedNotes,
+    staleTime: 60_000,
+  });
+
+  // Unarchive mutation
+  const unarchiveMutation = useMutation({
+    mutationFn: unarchiveNote,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['journal'] });
+      toast({ title: 'Note restaurée', description: 'La note a été restaurée avec succès.' });
+    },
+    onError: () => {
+      toast({ title: 'Erreur', description: 'Impossible de restaurer la note.', variant: 'destructive' });
+    },
+  });
+
   // Calculate archive stats
   const stats = useMemo(() => {
     const totalSize = notes.reduce((acc, n) => acc + (n.text?.length || 0), 0);
@@ -30,10 +54,23 @@ export const JournalArchivePage = memo<JournalArchivePageProps>(({ notes }) => {
     
     return {
       totalNotes: notes.length,
+      archivedCount: archivedNotes.length,
       totalSizeKB: Math.round(totalSize / 1024 * 100) / 100,
       oldestDate: oldestNote ? new Date(oldestNote.created_at) : null,
     };
-  }, [notes]);
+  }, [notes, archivedNotes]);
+
+  if (isLoadingArchived) {
+    return (
+      <div className="space-y-6">
+        <Skeleton className="h-10 w-48" />
+        <div className="grid gap-4 sm:grid-cols-3">
+          {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-24" />)}
+        </div>
+        <Skeleton className="h-64" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -49,7 +86,7 @@ export const JournalArchivePage = memo<JournalArchivePageProps>(({ notes }) => {
       </header>
 
       {/* Stats */}
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-4">
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
@@ -58,7 +95,21 @@ export const JournalArchivePage = memo<JournalArchivePageProps>(({ notes }) => {
               </div>
               <div>
                 <p className="text-2xl font-bold">{stats.totalNotes}</p>
-                <p className="text-xs text-muted-foreground">Notes totales</p>
+                <p className="text-xs text-muted-foreground">Notes actives</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-muted">
+                <Archive className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">{stats.archivedCount}</p>
+                <p className="text-xs text-muted-foreground">Archivées</p>
               </div>
             </div>
           </CardContent>
@@ -98,6 +149,42 @@ export const JournalArchivePage = memo<JournalArchivePageProps>(({ notes }) => {
         </Card>
       </div>
 
+      {/* Archived Notes */}
+      {archivedNotes.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Archive className="h-5 w-5" aria-hidden="true" />
+              Notes archivées
+              <Badge variant="secondary">{archivedNotes.length}</Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3 max-h-[300px] overflow-y-auto">
+              {archivedNotes.map((note) => (
+                <div key={note.id} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm truncate">{note.text}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {format(new Date(note.created_at), 'd MMM yyyy', { locale: fr })}
+                    </p>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => unarchiveMutation.mutate(note.id)}
+                    disabled={unarchiveMutation.isPending}
+                  >
+                    <RotateCcw className="h-4 w-4 mr-1" />
+                    Restaurer
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* RGPD Notice */}
       <Card className="border-success/30 bg-success/5">
         <CardContent className="pt-6">
@@ -132,3 +219,5 @@ export const JournalArchivePage = memo<JournalArchivePageProps>(({ notes }) => {
 });
 
 JournalArchivePage.displayName = 'JournalArchivePage';
+
+export default JournalArchivePage;

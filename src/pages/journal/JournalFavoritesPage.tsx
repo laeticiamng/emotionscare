@@ -4,38 +4,44 @@
  */
 import { memo } from 'react';
 import { Link } from 'react-router-dom';
-import type { SanitizedNote } from '@/modules/journal/types';
-import { useJournalFavorites } from '@/hooks/useJournalFavorites';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useJournalEnriched } from '@/modules/journal/useJournalEnriched';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Heart, Star, FileText, ArrowRight, Sparkles } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Heart, Star, FileText, ArrowRight, Sparkles, Trash2 } from 'lucide-react';
 
-interface JournalFavoritesPageProps {
-  notes: SanitizedNote[];
-}
-
-export const JournalFavoritesPage = memo<JournalFavoritesPageProps>(({ notes }) => {
-  const { favorites, isFavorite } = useJournalFavorites();
-  
-  const favoriteNotes = notes.filter(note => note.id && isFavorite(note.id));
+const JournalFavoritesPage = memo(() => {
+  const { favorites, isLoadingFavorites, handleToggleFavorite, isTogglingFavorite } = useJournalEnriched();
 
   // Stats
   const favStats = {
-    total: favoriteNotes.length,
-    thisMonth: favoriteNotes.filter(f => {
+    total: favorites.length,
+    thisMonth: favorites.filter(f => {
       const date = new Date(f.created_at);
       const now = new Date();
       return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
     }).length,
-    totalWords: favoriteNotes.reduce((acc, f) => acc + (f.text?.split(/\s+/).length || 0), 0),
+    totalWords: favorites.reduce((acc, f) => acc + (f.text?.split(/\s+/).length || 0), 0),
     topTags: Array.from(
-      favoriteNotes.reduce((map, f) => {
+      favorites.reduce((map, f) => {
         (f.tags || []).forEach(tag => map.set(tag, (map.get(tag) || 0) + 1));
         return map;
       }, new Map<string, number>())
     ).sort((a, b) => b[1] - a[1]).slice(0, 5),
   };
+
+  if (isLoadingFavorites) {
+    return (
+      <div className="space-y-6">
+        <Skeleton className="h-10 w-48" />
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-24" />)}
+        </div>
+        <Skeleton className="h-64" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -129,7 +135,7 @@ export const JournalFavoritesPage = memo<JournalFavoritesPageProps>(({ notes }) 
       )}
 
       {/* Favorites List */}
-      {favoriteNotes.length === 0 ? (
+      {favorites.length === 0 ? (
         <Card>
           <CardContent className="py-16 text-center">
             <Heart className="h-16 w-16 mx-auto mb-4 text-muted-foreground/30" aria-hidden="true" />
@@ -147,7 +153,7 @@ export const JournalFavoritesPage = memo<JournalFavoritesPageProps>(({ notes }) 
         </Card>
       ) : (
         <div className="grid gap-4">
-          {favoriteNotes.map((note) => (
+          {favorites.map((note) => (
             <Card key={note.id} className="hover:shadow-md transition-shadow">
               <CardContent className="pt-6">
                 <div className="flex items-start justify-between gap-4">
@@ -163,7 +169,15 @@ export const JournalFavoritesPage = memo<JournalFavoritesPageProps>(({ notes }) 
                       </div>
                     )}
                   </div>
-                  <Heart className="h-5 w-5 text-destructive fill-destructive flex-shrink-0" aria-hidden="true" />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleToggleFavorite(note.id)}
+                    disabled={isTogglingFavorite}
+                    aria-label="Retirer des favoris"
+                  >
+                    <Heart className="h-5 w-5 text-destructive fill-destructive" />
+                  </Button>
                 </div>
                 <p className="text-xs text-muted-foreground mt-3">
                   {new Date(note.created_at).toLocaleDateString('fr-FR', {
@@ -182,3 +196,5 @@ export const JournalFavoritesPage = memo<JournalFavoritesPageProps>(({ notes }) 
 });
 
 JournalFavoritesPage.displayName = 'JournalFavoritesPage';
+
+export default JournalFavoritesPage;
