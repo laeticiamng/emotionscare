@@ -23,23 +23,37 @@ async function fetchVRStats(): Promise<VRNebulaStats> {
 
   const { data: sessions, error } = await supabase
     .from('vr_nebula_sessions')
-    .select('*')
+    .select('id, user_id, scene, breathing_pattern, duration_s, resp_rate_avg, hrv_pre, hrv_post, rmssd_delta, coherence_score, cycles_completed, vr_mode, created_at')
     .eq('user_id', user.id);
 
   if (error) throw error;
 
-  const safeData = sessions || [];
+  const safeData = (sessions || []) as Array<{
+    id: string;
+    user_id: string;
+    scene: string | null;
+    breathing_pattern: string | null;
+    duration_s: number | null;
+    resp_rate_avg: number | null;
+    hrv_pre: number | null;
+    hrv_post: number | null;
+    rmssd_delta: number | null;
+    coherence_score: number | null;
+    cycles_completed: number | null;
+    vr_mode: boolean | null;
+    created_at: string;
+  }>;
   
   const total_sessions = safeData.length;
   const total_minutes = Math.round(safeData.reduce((sum, s) => sum + (s.duration_s || 0), 0) / 60);
   const total_breaths = safeData.reduce((sum, s) => sum + (s.cycles_completed || 0), 0);
 
-  const withCoherence = safeData.filter(s => s.coherence_score !== null);
+  const withCoherence = safeData.filter(s => s.coherence_score !== null && s.coherence_score !== undefined);
   const average_coherence = withCoherence.length > 0
     ? Math.round(withCoherence.reduce((sum, s) => sum + (s.coherence_score || 0), 0) / withCoherence.length)
     : 0;
 
-  const withHRV = safeData.filter(s => s.rmssd_delta !== null);
+  const withHRV = safeData.filter(s => s.rmssd_delta !== null && s.rmssd_delta !== undefined);
   const average_hrv_gain = withHRV.length > 0
     ? Math.round(withHRV.reduce((sum, s) => sum + (s.rmssd_delta || 0), 0) / withHRV.length * 10) / 10
     : 0;

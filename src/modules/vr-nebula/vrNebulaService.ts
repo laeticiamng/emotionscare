@@ -42,8 +42,9 @@ export async function createSession(
         vr_mode: validated.vr_mode,
         duration_s: 0,
         cycles_completed: 0,
+        ts_start: new Date().toISOString(),
       })
-      .select()
+      .select('id, user_id, scene, breathing_pattern, duration_s, resp_rate_avg, hrv_pre, hrv_post, rmssd_delta, coherence_score, cycles_completed, vr_mode, created_at, updated_at')
       .single();
 
     if (error) throw error;
@@ -80,9 +81,10 @@ export async function completeSession(
         rmssd_delta,
         coherence_score,
         cycles_completed: validated.cycles_completed,
+        ts_finish: new Date().toISOString(),
       })
       .eq('id', validated.session_id)
-      .select()
+      .select('id, user_id, scene, breathing_pattern, duration_s, resp_rate_avg, hrv_pre, hrv_post, rmssd_delta, coherence_score, cycles_completed, vr_mode, created_at, updated_at')
       .single();
 
     if (error) throw error;
@@ -98,7 +100,7 @@ export async function getSession(sessionId: string): Promise<VRNebulaSession> {
   try {
     const { data, error } = await supabase
       .from('vr_nebula_sessions')
-      .select('*')
+      .select('id, user_id, scene, breathing_pattern, duration_s, resp_rate_avg, hrv_pre, hrv_post, rmssd_delta, coherence_score, cycles_completed, vr_mode, created_at, updated_at')
       .eq('id', sessionId)
       .single();
 
@@ -124,7 +126,7 @@ export async function getStats(): Promise<VRNebulaStats> {
 
     const { data, error } = await supabase
       .from('vr_nebula_sessions')
-      .select('*')
+      .select('id, user_id, scene, breathing_pattern, duration_s, resp_rate_avg, hrv_pre, hrv_post, rmssd_delta, coherence_score, cycles_completed, vr_mode, created_at')
       .eq('user_id', user.id);
 
     if (error) throw error;
@@ -228,7 +230,7 @@ export async function getRecentSessions(limit = 10): Promise<VRNebulaSession[]> 
 
     const { data, error } = await supabase
       .from('vr_nebula_sessions')
-      .select('*')
+      .select('id, user_id, scene, breathing_pattern, duration_s, resp_rate_avg, hrv_pre, hrv_post, rmssd_delta, coherence_score, cycles_completed, vr_mode, created_at, updated_at')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
       .limit(limit);

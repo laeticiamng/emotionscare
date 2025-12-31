@@ -23965,49 +23965,64 @@ export type Database = {
       }
       vr_nebula_sessions: {
         Row: {
+          breathing_pattern: string | null
           client: string | null
           coherence_score: number | null
           created_at: string
+          cycles_completed: number | null
           duration_s: number
           hrv_post: number | null
           hrv_pre: number | null
           id: string
           resp_rate_avg: number | null
           rmssd_delta: number | null
+          scene: string | null
           ts_finish: string | null
           ts_start: string
+          updated_at: string | null
           user_id: string
           user_id_hash: string | null
+          vr_mode: boolean | null
         }
         Insert: {
+          breathing_pattern?: string | null
           client?: string | null
           coherence_score?: number | null
           created_at?: string
+          cycles_completed?: number | null
           duration_s: number
           hrv_post?: number | null
           hrv_pre?: number | null
           id?: string
           resp_rate_avg?: number | null
           rmssd_delta?: number | null
+          scene?: string | null
           ts_finish?: string | null
           ts_start?: string
+          updated_at?: string | null
           user_id: string
           user_id_hash?: string | null
+          vr_mode?: boolean | null
         }
         Update: {
+          breathing_pattern?: string | null
           client?: string | null
           coherence_score?: number | null
           created_at?: string
+          cycles_completed?: number | null
           duration_s?: number
           hrv_post?: number | null
           hrv_pre?: number | null
           id?: string
           resp_rate_avg?: number | null
           rmssd_delta?: number | null
+          scene?: string | null
           ts_finish?: string | null
           ts_start?: string
+          updated_at?: string | null
           user_id?: string
           user_id_hash?: string | null
+          vr_mode?: boolean | null
         }
         Relationships: []
       }
