@@ -1,7 +1,9 @@
-// @ts-nocheck
+/**
+ * PostCheck - Composant de post-vérification après session Nyvee
+ */
+
 import type { FC } from 'react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { captureException } from '@/lib/ai-monitoring';
+import { useCallback, useEffect, useMemo, useState, memo } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -16,7 +18,7 @@ interface PostCheckProps {
   prefersReducedMotion?: boolean;
 }
 
-export const PostCheck: FC<PostCheckProps> = ({
+export const PostCheck: FC<PostCheckProps> = memo(({
   visible,
   summaryLabel,
   onStart,
@@ -69,8 +71,10 @@ export const PostCheck: FC<PostCheckProps> = ({
       <section
         aria-live="polite"
         aria-describedby={statusId}
+        role="dialog"
+        aria-label="Retour post-session"
         className={cn(
-          'mx-auto mt-6 max-w-3xl rounded-2xl border border-emerald-400/30 bg-emerald-950/60 p-4 shadow-lg backdrop-blur',
+          'mx-auto mt-6 max-w-3xl rounded-2xl border border-accent/30 bg-accent/10 p-4 shadow-lg backdrop-blur',
           motionClass,
         )}
       >
@@ -78,10 +82,10 @@ export const PostCheck: FC<PostCheckProps> = ({
           <CardContent className="p-0">
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
               <div>
-                <p id={statusId} className="text-sm font-medium text-emerald-100">
+                <p id={statusId} className="text-sm font-medium text-foreground">
                   {announcement || 'Partage comment ton corps se sent après le cocon.'}
                 </p>
-                <p className="mt-1 text-sm text-emerald-200/80">
+                <p className="mt-1 text-sm text-muted-foreground">
                   Dernier repère ressenti : {summaryLabel}.
                 </p>
               </div>
@@ -89,16 +93,17 @@ export const PostCheck: FC<PostCheckProps> = ({
                 <Button
                   type="button"
                   variant="secondary"
-                  className="bg-white/90 text-emerald-900 hover:bg-white"
+                  className="bg-secondary text-secondary-foreground hover:bg-secondary/80"
                   disabled={isStarting}
                   onClick={handleStart}
+                  aria-busy={isStarting}
                 >
-                  Ajouter mon ressenti
+                  {isStarting ? 'Chargement...' : 'Ajouter mon ressenti'}
                 </Button>
                 <Button
                   type="button"
                   variant="ghost"
-                  className="text-emerald-100 hover:bg-emerald-900/40"
+                  className="text-muted-foreground hover:text-foreground hover:bg-muted/50"
                   onClick={handleDismiss}
                 >
                   Pas maintenant
@@ -110,6 +115,8 @@ export const PostCheck: FC<PostCheckProps> = ({
       </section>
     </FocusTrap>
   );
-};
+});
+
+PostCheck.displayName = 'PostCheck';
 
 export default PostCheck;

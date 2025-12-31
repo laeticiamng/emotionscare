@@ -1,11 +1,16 @@
-// @ts-nocheck
+/**
+ * BadgeReveal - Révélation du badge avec animation
+ */
+
+import { memo } from 'react';
 import { motion } from 'framer-motion';
 import { Sparkles, Heart, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Card, CardContent } from '@/components/ui/card';
+import type { BadgeType } from '@/modules/nyvee/types';
 
 interface BadgeRevealProps {
-  badge: 'calm' | 'partial' | 'tense';
+  badge: BadgeType;
   message: string;
   onComplete?: () => void;
   className?: string;
@@ -14,31 +19,31 @@ interface BadgeRevealProps {
 const BADGE_CONFIG = {
   calm: {
     icon: Heart,
-    color: 'from-emerald-400 to-cyan-400',
-    bgColor: 'bg-emerald-950/60',
-    borderColor: 'border-emerald-400/30',
+    gradient: 'from-emerald-400 to-cyan-400',
+    bgClass: 'bg-emerald-500/10',
+    borderClass: 'border-emerald-500/30',
     label: 'Calme retrouvé',
     emoji: '🌿',
   },
   partial: {
     icon: Sparkles,
-    color: 'from-violet-400 to-purple-400',
-    bgColor: 'bg-violet-950/60',
-    borderColor: 'border-violet-400/30',
+    gradient: 'from-violet-400 to-purple-400',
+    bgClass: 'bg-violet-500/10',
+    borderClass: 'border-violet-500/30',
     label: 'Apaisé en partie',
     emoji: '✨',
   },
   tense: {
     icon: Zap,
-    color: 'from-orange-400 to-rose-400',
-    bgColor: 'bg-orange-950/60',
-    borderColor: 'border-orange-400/30',
+    gradient: 'from-orange-400 to-rose-400',
+    bgClass: 'bg-orange-500/10',
+    borderClass: 'border-orange-500/30',
     label: 'Encore tendu',
     emoji: '💫',
   },
 };
 
-export const BadgeReveal = ({ badge, message, onComplete, className }: BadgeRevealProps) => {
+export const BadgeReveal = memo(({ badge, message, onComplete, className }: BadgeRevealProps) => {
   const config = BADGE_CONFIG[badge];
   const Icon = config.icon;
 
@@ -49,6 +54,8 @@ export const BadgeReveal = ({ badge, message, onComplete, className }: BadgeReve
       transition={{ duration: 0.6, ease: 'easeOut' }}
       onAnimationComplete={onComplete}
       className={cn('relative', className)}
+      role="alert"
+      aria-label={`Badge obtenu: ${config.label}`}
     >
       {/* Glow effect */}
       <motion.div
@@ -60,12 +67,13 @@ export const BadgeReveal = ({ badge, message, onComplete, className }: BadgeReve
         className={cn(
           'absolute inset-0 -z-10 rounded-2xl blur-2xl',
           'bg-gradient-to-r',
-          config.color,
+          config.gradient,
           'opacity-30'
         )}
+        aria-hidden="true"
       />
 
-      <Card className={cn('border backdrop-blur-xl', config.bgColor, config.borderColor)}>
+      <Card className={cn('border backdrop-blur-xl', config.bgClass, config.borderClass)}>
         <CardContent className="p-6">
           <div className="flex flex-col items-center gap-4 text-center">
             {/* Icon with pulse */}
@@ -75,9 +83,10 @@ export const BadgeReveal = ({ badge, message, onComplete, className }: BadgeReve
                 rotate: [0, 5, -5, 0],
               }}
               transition={{ duration: 2, repeat: Infinity }}
-              className={cn('rounded-full bg-gradient-to-r p-4', config.color)}
+              className={cn('rounded-full bg-gradient-to-r p-4', config.gradient)}
+              aria-hidden="true"
             >
-              <Icon className="h-8 w-8 text-primary-foreground" />
+              <Icon className="h-8 w-8 text-white" />
             </motion.div>
 
             {/* Badge label */}
@@ -95,7 +104,7 @@ export const BadgeReveal = ({ badge, message, onComplete, className }: BadgeReve
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.4 }}
-                className="mt-2 text-base text-foreground/80"
+                className="mt-2 text-base text-muted-foreground"
               >
                 {message}
               </motion.p>
@@ -105,7 +114,7 @@ export const BadgeReveal = ({ badge, message, onComplete, className }: BadgeReve
             {[...Array(6)].map((_, i) => (
               <motion.div
                 key={i}
-                className="absolute h-1 w-1 rounded-full bg-white/60"
+                className="absolute h-1 w-1 rounded-full bg-foreground/40"
                 style={{
                   left: `${20 + Math.random() * 60}%`,
                   top: `${20 + Math.random() * 60}%`,
@@ -120,6 +129,7 @@ export const BadgeReveal = ({ badge, message, onComplete, className }: BadgeReve
                   repeat: Infinity,
                   delay: i * 0.3,
                 }}
+                aria-hidden="true"
               />
             ))}
           </div>
@@ -127,6 +137,8 @@ export const BadgeReveal = ({ badge, message, onComplete, className }: BadgeReve
       </Card>
     </motion.div>
   );
-};
+});
+
+BadgeReveal.displayName = 'BadgeReveal';
 
 export default BadgeReveal;

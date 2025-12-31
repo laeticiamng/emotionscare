@@ -3,10 +3,11 @@
  */
 
 // ============================================================================
-// SERVICE UNIFIÉ
+// SERVICE
 // ============================================================================
 
-export { nyveeService, NyveeServiceEnriched } from './nyveeServiceUnified';
+export { nyveeService } from './nyveeService';
+export { nyveeService as NyveeServiceEnriched } from './nyveeServiceUnified';
 
 // ============================================================================
 // HOOKS
@@ -16,7 +17,7 @@ export { useNyveeMachine } from './useNyveeMachine';
 export { useNyveeSessions } from './hooks/useNyveeSessions';
 
 // ============================================================================
-// COMPONENTS (re-export depuis features)
+// COMPONENTS
 // ============================================================================
 
 export { BreathingBubble } from '@/features/nyvee/components/BreathingBubble';
@@ -30,6 +31,8 @@ export { NyveeStreakWidget } from '@/features/nyvee/components/NyveeStreakWidget
 export { IntensitySelector } from '@/features/nyvee/components/IntensitySelector';
 export { MoodSlider } from '@/features/nyvee/components/MoodSlider';
 export { NyveeExportButton } from '@/features/nyvee/components/NyveeExportButton';
+export { AmbientSound } from '@/features/nyvee/components/AmbientSound';
+export { ShareSessionButton } from '@/features/nyvee/components/ShareSessionButton';
 
 // ============================================================================
 // STORE

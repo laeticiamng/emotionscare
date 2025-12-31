@@ -1,7 +1,9 @@
-// @ts-nocheck
+/**
+ * PreCheck - Composant de pré-vérification avant session Nyvee
+ */
+
 import type { FC } from 'react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { captureException } from '@/lib/ai-monitoring';
+import { useCallback, useEffect, useMemo, useState, memo } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -16,7 +18,7 @@ interface PreCheckProps {
   prefersReducedMotion?: boolean;
 }
 
-export const PreCheck: FC<PreCheckProps> = ({
+export const PreCheck: FC<PreCheckProps> = memo(({
   visible,
   summaryLabel,
   onStart,
@@ -70,8 +72,10 @@ export const PreCheck: FC<PreCheckProps> = ({
       <section
         aria-live="polite"
         aria-describedby={statusId}
+        role="dialog"
+        aria-label="Préparation de session"
         className={cn(
-          'mx-auto mt-6 max-w-3xl rounded-2xl border border-indigo-400/30 bg-indigo-950/60 p-4 shadow-lg backdrop-blur',
+          'mx-auto mt-6 max-w-3xl rounded-2xl border border-primary/30 bg-card/60 p-4 shadow-lg backdrop-blur',
           motionClass,
         )}
       >
@@ -79,10 +83,10 @@ export const PreCheck: FC<PreCheckProps> = ({
           <CardContent className="p-0">
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
               <div>
-                <p id={statusId} className="text-sm font-medium text-indigo-100">
+                <p id={statusId} className="text-sm font-medium text-foreground">
                   {announcement || 'Préparer un ancrage doux avant de plonger dans Nyvée.'}
                 </p>
-                <p className="mt-1 text-sm text-indigo-200/80">
+                <p className="mt-1 text-sm text-muted-foreground">
                   Ton ressenti actuel guidera la scène : {summaryLabel}.
                 </p>
               </div>
@@ -90,16 +94,17 @@ export const PreCheck: FC<PreCheckProps> = ({
                 <Button
                   type="button"
                   variant="secondary"
-                  className="bg-white/90 text-indigo-900 hover:bg-white"
+                  className="bg-secondary text-secondary-foreground hover:bg-secondary/80"
                   disabled={isStarting}
                   onClick={handleStart}
+                  aria-busy={isStarting}
                 >
-                  Commencer en douceur
+                  {isStarting ? 'Chargement...' : 'Commencer en douceur'}
                 </Button>
                 <Button
                   type="button"
                   variant="ghost"
-                  className="text-indigo-100 hover:bg-indigo-900/40"
+                  className="text-muted-foreground hover:text-foreground hover:bg-muted/50"
                   onClick={handleDismiss}
                 >
                   Plus tard
@@ -111,6 +116,8 @@ export const PreCheck: FC<PreCheckProps> = ({
       </section>
     </FocusTrap>
   );
-};
+});
+
+PreCheck.displayName = 'PreCheck';
 
 export default PreCheck;
