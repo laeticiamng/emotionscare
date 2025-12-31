@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * COACH CONTEXT UNIFIÉ - EmotionsCare
  * Fusion optimisée de toutes les versions de CoachContext
@@ -9,6 +8,7 @@ import { useQuery } from '@tanstack/react-query';
 import { ChatMessage, ChatConversation } from '@/types/chat';
 import { Suggestion } from '@/types/coach';
 import { logger } from '@/lib/logger';
+import { supabase } from '@/integrations/supabase/client';
 
 // Types unifiés
 export interface EmotionAnalysis {
@@ -65,33 +65,49 @@ export interface UnifiedCoachContextType {
 const UnifiedCoachContext = createContext<UnifiedCoachContextType | null>(null);
 
 // Mock initial conversation
-const createInitialConversation = (): ChatConversation => ({
+const createInitialConversation = (userId: string = 'anonymous'): ChatConversation => ({
   id: `conv-${Date.now()}`,
   title: 'Nouvelle conversation',
   messages: [],
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString(),
+  createdAt: new Date(),
+  updatedAt: new Date(),
+  userId,
   isActive: true
 });
 
-// Service coach mock
+// Real coach service using edge function
 const createCoachService = (): CoachService => ({
   askQuestion: async (question: string): Promise<string> => {
-    // Simulation d'une réponse IA
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    return `Je comprends votre question : "${question}". Laissez-moi vous aider à explorer cela ensemble.`;
+    try {
+      const { data, error } = await supabase.functions.invoke('ai-coach', {
+        body: {
+          message: question,
+          conversationHistory: [],
+          userEmotion: 'neutral',
+          coachPersonality: 'empathetic',
+        },
+      });
+
+      if (error) {
+        logger.error('Coach API error', error, 'COACH');
+        return "Je suis là pour t'écouter. Comment puis-je t'aider?";
+      }
+
+      return data?.response || "Je comprends. Dis-m'en plus.";
+    } catch (err) {
+      logger.error('Coach request failed', err as Error, 'COACH');
+      return "Désolé, je rencontre un problème. Réessaie dans quelques instants.";
+    }
   },
 
   analyzeEmotion: async (text: string): Promise<EmotionAnalysis> => {
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    // Simple analyse basée sur des mots-clés
-    const emotions = {
-      stress: ['stress', 'anxieux', 'tendu', 'pression'],
-      joie: ['heureux', 'joyeux', 'content', 'satisfait'],
-      tristesse: ['triste', 'déprimé', 'mélancolique', 'abattu'],
-      colère: ['colère', 'énervé', 'frustré', 'agacé'],
-      peur: ['peur', 'anxiété', 'inquiet', 'angoisse']
+    // Simple local emotion analysis based on keywords
+    const emotions: Record<string, string[]> = {
+      stress: ['stress', 'anxieux', 'tendu', 'pression', 'nerveux'],
+      joie: ['heureux', 'joyeux', 'content', 'satisfait', 'bien'],
+      tristesse: ['triste', 'déprimé', 'mélancolique', 'abattu', 'mal'],
+      colère: ['colère', 'énervé', 'frustré', 'agacé', 'fâché'],
+      peur: ['peur', 'anxiété', 'inquiet', 'angoisse', 'effrayé']
     };
 
     const lowerText = text.toLowerCase();
@@ -107,7 +123,7 @@ const createCoachService = (): CoachService => ({
       }
     }
 
-    const recommendations = await this.generateRecommendations(detectedEmotion);
+    const recommendations = await createCoachService().generateRecommendations(detectedEmotion);
 
     return {
       emotion: detectedEmotion,
@@ -204,8 +220,8 @@ export const UnifiedCoachProvider: React.FC<{ children: React.ReactNode }> = ({ 
   }, [conversations]);
 
   // Créer une nouvelle conversation
-  const createConversation = useCallback(() => {
-    const newConv = createInitialConversation();
+  const createConversation = useCallback((): ChatConversation => {
+    const newConv = createInitialConversation('anonymous');
     
     const updatedConversations = conversations.map(c => ({
       ...c,
@@ -237,8 +253,9 @@ export const UnifiedCoachProvider: React.FC<{ children: React.ReactNode }> = ({ 
       const userMessage: ChatMessage = {
         id: `msg-${Date.now()}`,
         content,
+        text: content,
+        conversationId: conversation.id,
         sender,
-        isUser: sender === 'user',
         timestamp: new Date().toISOString()
       };
 
@@ -260,16 +277,17 @@ export const UnifiedCoachProvider: React.FC<{ children: React.ReactNode }> = ({ 
       const aiMessage: ChatMessage = {
         id: `msg-${Date.now() + 1}`,
         content: response,
+        text: response,
+        conversationId: conversation.id,
         sender: 'assistant',
-        isUser: false,
         timestamp: new Date().toISOString()
       };
 
       const updatedMessages = [...conversation.messages, userMessage, aiMessage];
-      const updatedConversation = {
+      const updatedConversation: ChatConversation = {
         ...conversation,
         messages: updatedMessages,
-        updatedAt: new Date().toISOString()
+        updatedAt: new Date()
       };
 
       // Mettre à jour les états

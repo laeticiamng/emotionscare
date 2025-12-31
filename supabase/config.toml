@@ -93,6 +93,9 @@ verify_jwt = false
 [functions.exchange-ai]
 verify_jwt = true
 
+[functions.ai-coach]
+verify_jwt = true
+
 [functions.ai-analysis]
 verify_jwt = true
 

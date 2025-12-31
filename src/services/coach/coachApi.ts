@@ -28,9 +28,8 @@ export interface CoachApiResponse {
   suggestions?: CoachSuggestions;
 }
 
-const END_TOKEN = '[END]';
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || 'https://yaincoxihiqdksxgrsrk.supabase.co';
-const FUNCTION_URL = `${SUPABASE_URL}/functions/v1/ai-coach-response`;
+const SUPABASE_URL = 'https://yaincoxihiqdksxgrsrk.supabase.co';
+const FUNCTION_URL = `${SUPABASE_URL}/functions/v1/ai-coach`;
 
 function buildPayload(options: SendCoachMessageOptions) {
   return {
