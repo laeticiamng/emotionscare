@@ -119,7 +119,7 @@ export function useParkStreak() {
   }, [streakData, setStreakData, updateWeeklyActivity]);
 
   // Réinitialiser l'activité hebdomadaire (appelé chaque lundi)
-  const resetWeeklyIfNeeded = useCallback(() => {
+  useEffect(() => {
     const today = new Date();
     if (today.getDay() === 1) { // Lundi
       // Vérifier si on a déjà reset cette semaine
@@ -136,11 +136,9 @@ export function useParkStreak() {
         }
       }
     }
-  }, [streakData, setStreakData]);
-
-  useEffect(() => {
-    resetWeeklyIfNeeded();
-  }, [resetWeeklyIfNeeded]);
+    // Only run once on mount, not on every streakData change
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Calculer le jour actuel de la semaine (0 = Lundi)
   const todayIndex = useMemo(() => {

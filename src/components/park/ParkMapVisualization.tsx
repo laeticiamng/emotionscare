@@ -121,6 +121,10 @@ export const ParkMapVisualization: React.FC<ParkMapVisualizationProps> = ({
                 <g
                   key={zone.name}
                   onClick={() => onZoneClick?.(zone.name)}
+                  onMouseEnter={() => setHoveredZone(zone.name)}
+                  onMouseLeave={() => setHoveredZone(null)}
+                  onTouchStart={() => setHoveredZone(zone.name)}
+                  onTouchEnd={() => setTimeout(() => setHoveredZone(null), 2000)}
                   className="cursor-pointer"
                 >
                   {/* Zone circle background */}
