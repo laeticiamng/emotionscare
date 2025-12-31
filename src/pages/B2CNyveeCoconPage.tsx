@@ -17,6 +17,9 @@ import { NyveeStatsWidget } from '@/features/nyvee/components/NyveeStatsWidget';
 import { NyveeSessionHistory } from '@/features/nyvee/components/NyveeSessionHistory';
 import { NyveeStreakWidget } from '@/features/nyvee/components/NyveeStreakWidget';
 import { NyveeExportButton } from '@/features/nyvee/components/NyveeExportButton';
+import { AmbientSound } from '@/features/nyvee/components/AmbientSound';
+import { ShareSessionButton } from '@/features/nyvee/components/ShareSessionButton';
+import { DurationSelector } from '@/features/nyvee/components/DurationSelector';
 import { useMediaQuery } from '@/hooks/use-media-query';
 import { useCocoonStore } from '@/features/nyvee/stores/cocoonStore';
 import { useNyveeSessions } from '@/modules/nyvee/hooks/useNyveeSessions';
@@ -50,10 +53,12 @@ const B2CNyveeCoconPage: FC = () => {
   
   const [sessionPhase, setSessionPhase] = useState<SessionPhase>('ready');
   const [intensity, setIntensity] = useState<BreathingIntensity>('calm');
+  const [targetCycles, setTargetCycles] = useState(6);
   const [badgeType, setBadgeType] = useState<BadgeType>('calm');
   const [moodBefore, setMoodBefore] = useState<number | null>(null);
   const [moodAfter, setMoodAfter] = useState<number | null>(null);
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
+  const [cyclesCompleted, setCyclesCompleted] = useState(0);
   const sessionStartRef = useRef<number>(0);
   const [activeTab, setActiveTab] = useState('session');
 
@@ -231,11 +236,18 @@ const B2CNyveeCoconPage: FC = () => {
                     <IntensitySelector
                       value={intensity}
                       onChange={setIntensity}
+                      className="mb-4"
+                    />
+                    
+                    <DurationSelector
+                      value={targetCycles}
+                      onChange={setTargetCycles}
                       className="mb-6"
                     />
                     
                     <BreathingBubble
                       isActive={false}
+                      targetCycles={targetCycles}
                       intensity={intensity}
                       className="my-6"
                     />
@@ -266,10 +278,18 @@ const B2CNyveeCoconPage: FC = () => {
               {/* Session de respiration */}
               {sessionPhase === 'breathing' && (
                 <div className="space-y-6">
+                  <div className="flex justify-center">
+                    <AmbientSound isPlaying={true} />
+                  </div>
+                  
                   <BreathingBubble
                     isActive={true}
                     intensity={intensity}
-                    onCycleComplete={handleBreathingComplete}
+                    targetCycles={targetCycles}
+                    onCycleComplete={() => {
+                      setCyclesCompleted(targetCycles);
+                      handleBreathingComplete();
+                    }}
                     className="my-8"
                   />
                   
@@ -331,6 +351,11 @@ const B2CNyveeCoconPage: FC = () => {
                       )}
                     </CardHeader>
                     <CardContent className="flex flex-col gap-3 sm:flex-row sm:justify-center">
+                      <ShareSessionButton
+                        badge={badgeType}
+                        moodDelta={moodBefore !== null && moodAfter !== null ? moodAfter - moodBefore : null}
+                        cyclesCompleted={cyclesCompleted}
+                      />
                       <Button
                         onClick={handleRestart}
                         variant="secondary"
