@@ -124,6 +124,7 @@ export const b2cRoutes = {
   feedback: () => resolveRoutePath('help'),
   accountDelete: () => resolveRoutePath('settings-privacy'),
   exchange: () => resolveRoutePath('exchange-hub'),
+  groupSessions: () => resolveRoutePath('group-sessions'),
 } as const;
 
 export const consumerRoutes = {
@@ -164,6 +165,7 @@ export const consumerRoutes = {
   settings: () => resolveRoutePath('settings-general'),
   profile: () => resolveRoutePath('settings-profile'),
   exchange: () => resolveRoutePath('exchange-hub'),
+  groupSessions: () => resolveRoutePath('group-sessions'),
 } as const;
 
 export const b2bRoutes = {

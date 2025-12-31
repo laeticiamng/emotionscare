@@ -898,6 +898,17 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     aliases: ['/story-synth-lab'],
   },
   {
+    name: 'group-sessions',
+    path: '/app/group-sessions',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app-sidebar',
+    component: 'GroupSessionsPage',
+    guard: true,
+    requireAuth: true,
+    aliases: ['/group-sessions', '/sessions-groupe'],
+  },
+  {
     name: 'social-cocon-b2c',
     path: '/app/social-cocon',
     segment: 'consumer',
