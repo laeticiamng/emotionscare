@@ -10,13 +10,26 @@
 // ============================================================================
 
 export { CommunityService } from './communityService';
-export * from './services';
+export { CommunityFollowService } from './services/communityFollowService';
+export { CommunityReportService, REPORT_REASONS } from './services/communityReportService';
+export { CommunitySavedPostsService } from './services/communitySavedPostsService';
 
 // ============================================================================
 // TYPES
 // ============================================================================
 
-export * from './types';
+export type {
+  CommunityStats,
+  ModerationStatus,
+  ReactionType,
+  CommunityPost,
+  PostComment,
+  PostReaction,
+  CommunityGroup,
+  CommunityNotification,
+  UserFollow,
+  FollowStats
+} from './types';
 
 // Re-export des types depuis le service
 export type {
@@ -28,3 +41,7 @@ export type {
   Reaction,
   NotificationPayload,
 } from './communityService';
+
+// Types from services
+export type { ReportReason, CommunityReport } from './services/communityReportService';
+export type { SavedPost } from './services/communitySavedPostsService';

@@ -20,3 +20,8 @@ export { PostCommentSection } from './PostCommentSection';
 export { MentionTextarea } from './MentionTextarea';
 export { CommunitySearch } from './CommunitySearch';
 export { EmpathyTemplates } from './EmpathyTemplates';
+export { NotificationBell } from './NotificationBell';
+export { default as TagSelector } from './TagSelector';
+export { default as CommentForm } from './CommentForm';
+export { default as PostForm } from './PostForm';
+export { default as GroupForm } from './GroupForm';
