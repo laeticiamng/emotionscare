@@ -323,12 +323,13 @@ export async function requestCoachResponse(options: CoachRequestOptions): Promis
     const { data, error } = await supabase.functions.invoke("ai-coach", {
       body: {
         message: trimmedMessage,
-        emotion: options.emotion,
-        audience: options.audience,
-        consent: true,
-        consentToken: options.consentToken,
-        history: limitedHistory,
-        personality: options.personality,
+        conversationHistory: limitedHistory.map(item => ({
+          role: item.role,
+          content: item.content
+        })),
+        userEmotion: options.emotion || 'neutral',
+        coachPersonality: options.personality || 'empathetic',
+        context: options.audience === 'b2b' ? 'Mode professionnel B2B' : ''
       },
     });
 

@@ -37,12 +37,12 @@ const CoachChat: React.FC<CoachChatProps> = ({
     }
   }, [initialMessage, messages.length, sendMessage]);
   
-  const handleSendMessage = (text: string) => {
+  const handleSendMessage = async (text: string) => {
     if (!text.trim()) return;
     
     try {
-      // Send user message
-      sendMessage(text, 'user');
+      // Send user message - sendMessage handles both user message and AI response
+      await sendMessage(text);
     } catch (error) {
       logger.error('Failed to send message:', error);
       toast({
