@@ -2,7 +2,7 @@
  * AurasLeaderboardPage - Page du ciel d'auras (/app/leaderboard)
  * Affiche un classement visuel sans chiffres, basé sur les auras
  */
-import { useEffect } from 'react';
+import { useEffect, useState, useRef, useMemo } from 'react';
 import { ArrowLeft, Sparkles, HelpCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -16,16 +16,78 @@ import {
   AurasGalaxy,
   LeaderboardStats,
   MyAuraCard,
+  AuraTimeFilter,
+  AuraHistoryChart,
+  AuraFullscreenToggle,
   useAurasLeaderboard,
+  type TimeRange,
 } from '@/features/leaderboard';
+import { supabase } from '@/integrations/supabase/client';
+import { startOfWeek, startOfMonth, subWeeks } from 'date-fns';
+
+interface AuraHistoryEntry {
+  weekStart: string;
+  weekEnd: string;
+  colorHue: number;
+  luminosity: number;
+  sizeScale: number;
+}
 
 const AurasLeaderboardPage = () => {
   const navigate = useNavigate();
   const { auras, myAura, loading } = useAurasLeaderboard();
+  const [timeRange, setTimeRange] = useState<TimeRange>('week');
+  const [myHistory, setMyHistory] = useState<AuraHistoryEntry[]>([]);
+  const galaxyRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     document.title = 'Le Ciel des Auras | EmotionsCare';
   }, []);
+
+  // Fetch my aura history
+  useEffect(() => {
+    const fetchHistory = async () => {
+      const { data: userData } = await supabase.auth.getUser();
+      if (!userData?.user?.id) return;
+
+      const { data } = await supabase
+        .from('aura_history')
+        .select('week_start, week_end, color_hue, luminosity, size_scale')
+        .eq('user_id', userData.user.id)
+        .order('week_start', { ascending: true })
+        .limit(12);
+
+      if (data) {
+        setMyHistory(
+          data.map((row) => ({
+            weekStart: row.week_start,
+            weekEnd: row.week_end,
+            colorHue: row.color_hue,
+            luminosity: row.luminosity > 1 ? row.luminosity / 100 : row.luminosity,
+            sizeScale: row.size_scale,
+          }))
+        );
+      }
+    };
+
+    fetchHistory();
+  }, []);
+
+  // Filter auras by time range
+  const filteredAuras = useMemo(() => {
+    if (timeRange === 'all') return auras;
+
+    const now = new Date();
+    const cutoff =
+      timeRange === 'week'
+        ? startOfWeek(now, { weekStartsOn: 1 })
+        : startOfMonth(now);
+
+    return auras.filter((a) => {
+      if (!a.lastUpdated) return true;
+      return new Date(a.lastUpdated) >= cutoff;
+    });
+  }, [auras, timeRange]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-secondary/10">
@@ -55,23 +117,26 @@ const AurasLeaderboardPage = () => {
           </h1>
         </div>
 
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" aria-label="Aide">
-                <HelpCircle className="h-5 w-5" aria-hidden="true" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="bottom" className="max-w-xs">
-              <p className="text-sm">
-                Ce n'est pas un classement traditionnel. Chaque aura représente
-                un explorateur. La couleur reflète votre état émotionnel, la
-                taille votre régularité. Pas de rang, juste un spectacle
-                cosmique de progression douce.
-              </p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
+        <div className="flex items-center gap-2">
+          <AuraFullscreenToggle targetRef={galaxyRef} />
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="icon" aria-label="Aide">
+                  <HelpCircle className="h-5 w-5" aria-hidden="true" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" className="max-w-xs">
+                <p className="text-sm">
+                  Ce n'est pas un classement traditionnel. Chaque aura représente
+                  un explorateur. La couleur reflète votre état émotionnel, la
+                  taille votre régularité. Pas de rang, juste un spectacle
+                  cosmique de progression douce.
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
       </header>
 
       <main id="main-content" role="main" className="container mx-auto px-4 py-8 space-y-8">
@@ -87,14 +152,24 @@ const AurasLeaderboardPage = () => {
           </p>
         </section>
 
+        {/* Time Filter */}
+        <div className="flex justify-center">
+          <AuraTimeFilter value={timeRange} onChange={setTimeRange} />
+        </div>
+
         {/* Stats */}
-        <LeaderboardStats auras={auras} />
+        <LeaderboardStats auras={filteredAuras} />
 
         {/* My Aura Card */}
         <MyAuraCard aura={myAura} />
 
+        {/* My Aura History */}
+        {myHistory.length > 0 && <AuraHistoryChart history={myHistory} />}
+
         {/* Galaxy */}
-        <AurasGalaxy minHeight="500px" showHeader={false} />
+        <div ref={galaxyRef}>
+          <AurasGalaxy minHeight="500px" showHeader={false} />
+        </div>
 
         {/* Explanation */}
         <section className="bg-card border border-border rounded-xl p-6 space-y-4">

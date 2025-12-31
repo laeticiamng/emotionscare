@@ -135,6 +135,17 @@ export const useAurasLeaderboard = (): UseAurasLeaderboardResult => {
         .select('id, full_name, avatar_url')
         .in('id', userIds);
 
+      // Récupérer les streaks des utilisateurs
+      const { data: streakData } = await supabase
+        .from('activity_streaks')
+        .select('user_id, current_streak')
+        .in('user_id', userIds);
+
+      const streakMap = new Map<string, number>();
+      (streakData || []).forEach((s) => {
+        streakMap.set(s.user_id, s.current_streak || 0);
+      });
+
       const profileMap = new Map<string, { name: string; avatar: string | null }>();
       (profileData || []).forEach((p) => {
         profileMap.set(p.id, {
@@ -146,6 +157,7 @@ export const useAurasLeaderboard = (): UseAurasLeaderboardResult => {
 
       const mapped: AuraEntry[] = auraData.map((row, index) => {
         const profile = profileMap.get(row.user_id);
+        const streak = streakMap.get(row.user_id);
         return {
           id: row.id,
           userId: row.user_id,
@@ -155,7 +167,7 @@ export const useAurasLeaderboard = (): UseAurasLeaderboardResult => {
           luminosity: normalizeLuminosity(row.luminosity),
           sizeScale: normalizeSize(row.size_scale),
           who5Badge: row.who5_badge,
-          streakDays: undefined,
+          streakDays: streak,
           lastUpdated: row.week_end,
           isMe: row.user_id === userId,
         };

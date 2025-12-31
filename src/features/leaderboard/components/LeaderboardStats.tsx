@@ -53,22 +53,22 @@ export const LeaderboardStats = memo(function LeaderboardStats({
       icon: Sparkles,
       label: 'Luminosité moyenne',
       value: `${stats.avgLuminosity}%`,
-      color: 'text-amber-500',
-      bgColor: 'bg-amber-500/10',
+      color: 'text-warning',
+      bgColor: 'bg-warning/10',
     },
     {
       icon: Flame,
       label: 'Streaks actifs',
       value: stats.streakActive,
-      color: 'text-orange-500',
-      bgColor: 'bg-orange-500/10',
+      color: 'text-destructive',
+      bgColor: 'bg-destructive/10',
     },
     {
       icon: Target,
       label: 'Auras vives',
       value: stats.warmAuras,
-      color: 'text-green-500',
-      bgColor: 'bg-green-500/10',
+      color: 'text-accent-foreground',
+      bgColor: 'bg-accent/10',
     },
   ];
 
