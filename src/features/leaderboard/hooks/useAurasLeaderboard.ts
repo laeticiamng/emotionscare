@@ -1,10 +1,12 @@
 /**
  * Hook pour récupérer les auras des utilisateurs pour le leaderboard visuel
  * Affiche un "ciel d'auras" sans classement numérique, basé sur WHO-5 / activité
+ * Connecté au système d'interconnexion des modules
  */
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';
+import { useModuleInterconnect } from '@/hooks/useModuleInterconnect';
 
 export interface AuraEntry {
   id: string;
@@ -99,6 +101,9 @@ export const useAurasLeaderboard = (): UseAurasLeaderboardResult => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  
+  // Connexion au système d'interconnexion pour les insights cross-modules
+  const { insights } = useModuleInterconnect({ autoFetch: true });
 
   const fetchAuras = useCallback(async () => {
     try {

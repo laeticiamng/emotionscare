@@ -32,6 +32,7 @@ import { ProgressionTimeline } from '@/components/park/ProgressionTimeline';
 import { parkAttractions } from '@/data/parkAttractions';
 import { parkZones } from '@/data/parkZones';
 import { useParkQuests } from '@/hooks/useParkQuests';
+import { useParkModuleSymbiosis } from '@/hooks/useParkModuleSymbiosis';
 import type { ZoneKey, ZoneProgressData, ParkStat, MoodOption } from '@/types/park';
 
 export default function EmotionalPark() {
@@ -73,6 +74,7 @@ export default function EmotionalPark() {
   const { getRecommendations, getDailyChallenge } = useParkRecommendations();
   const { stats: userStats } = useUserStatsQuery();
   const { quests, getCompletedQuestsCount, getTotalRewards, updateQuestProgress, updateQuestFromZoneVisit } = useParkQuests();
+  const { syncAttractionVisit, getZoneRecommendations, crossModuleInsights } = useParkModuleSymbiosis();
 
   const [showTourModal, setShowTourModal] = useState(false);
 
@@ -184,7 +186,7 @@ export default function EmotionalPark() {
   };
 
   // Handle attraction click
-  const handleAttractionClick = (attraction: Attraction) => {
+  const handleAttractionClick = useCallback((attraction: Attraction) => {
     markVisited(attraction.id);
     
     // Check zone completion
@@ -201,9 +203,16 @@ export default function EmotionalPark() {
     // Update quest progress based on zone visit
     updateQuestFromZoneVisit(attraction.zone);
     
+    // Sync with module interconnect system for symbiosis
+    syncAttractionVisit(
+      attraction.id,
+      attraction.title,
+      attraction.zone
+    );
+    
     // Navigate to attraction
     navigate(attraction.route);
-  };
+  }, [attractions, zones, markVisited, checkZoneCompletion, updateQuestFromZoneVisit, syncAttractionVisit, navigate]);
 
   // Calculate zone progress for each zone
   const zoneProgressData = useMemo(() => {
