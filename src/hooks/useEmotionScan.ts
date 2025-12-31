@@ -67,8 +67,9 @@ export const useEmotionScan = () => {
     reader.readAsDataURL(audioBlob);
     const audioBase64 = await base64Promise;
 
-    const { data, error } = await supabase.functions.invoke('hume-prosody', {
-      body: { audio_base64: audioBase64 }
+    // Utiliser analyze-voice-hume qui transcrit puis analyse
+    const { data, error } = await supabase.functions.invoke('analyze-voice-hume', {
+      body: { audioBase64 }
     });
 
     if (error) {
@@ -77,13 +78,13 @@ export const useEmotionScan = () => {
 
     return normalizeEmotionResult({
       id: crypto.randomUUID(),
-      emotion: data?.dominant_emotion || 'neutre',
+      emotion: data?.emotion || 'neutre',
       valence: (data?.valence ?? 0.5) * 100,
       arousal: (data?.arousal ?? 0.5) * 100,
       confidence: (data?.confidence ?? 0.6) * 100,
       source: 'voice',
       timestamp: new Date().toISOString(),
-      summary: data?.summary,
+      summary: data?.transcript ? `"${data.transcript.substring(0, 100)}..."` : undefined,
       emotions: data?.emotions || {}
     });
   }, []);
