@@ -1,8 +1,8 @@
 /**
- * BreathingBubble - Bulle de respiration animée
+ * BreathingBubble - Bulle de respiration animée avec compteur de cycles corrigé
  */
 
-import { useEffect, useRef, useState, memo } from 'react';
+import { useEffect, useRef, useState, memo, useCallback } from 'react';
 import { motion, useAnimation } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useHaptics } from '@/hooks/useHaptics';
@@ -11,6 +11,7 @@ import type { BreathingIntensity } from '@/modules/nyvee/types';
 interface BreathingBubbleProps {
   isActive: boolean;
   intensity?: BreathingIntensity;
+  targetCycles?: number;
   onCycleComplete?: () => void;
   className?: string;
 }
@@ -21,11 +22,11 @@ const BUBBLE_CLASSES = {
   intense: 'from-orange-400/40 via-rose-400/30 to-red-400/40',
 } as const;
 
-const CYCLE_CONFIG = {
-  inhale: 4000,
-  hold: 2000,
-  exhale: 6000,
-};
+const CYCLE_CONFIGS = {
+  calm: { inhale: 4000, hold: 2000, exhale: 6000 },
+  moderate: { inhale: 4000, hold: 4000, exhale: 4000 },
+  intense: { inhale: 4000, hold: 7000, exhale: 8000 },
+} as const;
 
 const PHASE_LABELS = {
   inhale: 'Inspire',
@@ -36,6 +37,7 @@ const PHASE_LABELS = {
 export const BreathingBubble = memo(({
   isActive,
   intensity = 'calm',
+  targetCycles = 6,
   onCycleComplete,
   className,
 }: BreathingBubbleProps) => {
@@ -44,79 +46,124 @@ export const BreathingBubble = memo(({
   const [phase, setPhase] = useState<'inhale' | 'hold' | 'exhale'>('inhale');
   const [cycleCount, setCycleCount] = useState(0);
   const { pattern } = useHaptics();
+  
+  // Refs pour éviter les problèmes de closure
+  const cycleCountRef = useRef(0);
+  const isActiveRef = useRef(isActive);
   const phaseTimeoutRef = useRef<NodeJS.Timeout>();
+  const isRunningRef = useRef(false);
 
+  const cycleConfig = CYCLE_CONFIGS[intensity];
+
+  // Sync ref avec state
+  useEffect(() => {
+    isActiveRef.current = isActive;
+  }, [isActive]);
+
+  // Reset quand isActive change
   useEffect(() => {
     if (!isActive) {
+      cycleCountRef.current = 0;
+      setCycleCount(0);
+      setPhase('inhale');
+      isRunningRef.current = false;
       if (phaseTimeoutRef.current) clearTimeout(phaseTimeoutRef.current);
       bubbleControls.stop();
       particlesControls.stop();
+    }
+  }, [isActive, bubbleControls, particlesControls]);
+
+  const runCycle = useCallback(async () => {
+    if (!isActiveRef.current || isRunningRef.current) return;
+    if (cycleCountRef.current >= targetCycles) {
+      onCycleComplete?.();
       return;
     }
 
-    const runCycle = async () => {
+    isRunningRef.current = true;
+
+    try {
       // Inhale
       setPhase('inhale');
       await Promise.all([
         bubbleControls.start({
           scale: 1.5,
           opacity: 0.9,
-          transition: { duration: CYCLE_CONFIG.inhale / 1000, ease: 'easeInOut' },
+          transition: { duration: cycleConfig.inhale / 1000, ease: 'easeInOut' },
         }),
         particlesControls.start({
           opacity: 1,
           scale: 1.2,
-          transition: { duration: CYCLE_CONFIG.inhale / 1000 },
+          transition: { duration: cycleConfig.inhale / 1000 },
         }),
       ]);
 
+      if (!isActiveRef.current) return;
+
       // Hold
       setPhase('hold');
-      phaseTimeoutRef.current = setTimeout(async () => {
-        // Exhale
-        setPhase('exhale');
-        pattern([50, 100, 50]); // Haptic feedback sur l'expire
+      await new Promise<void>((resolve) => {
+        phaseTimeoutRef.current = setTimeout(resolve, cycleConfig.hold);
+      });
 
-        await Promise.all([
-          bubbleControls.start({
-            scale: 1,
-            opacity: 0.6,
-            transition: { duration: CYCLE_CONFIG.exhale / 1000, ease: 'easeInOut' },
-          }),
-          particlesControls.start({
-            opacity: 0.3,
-            scale: 0.8,
-            transition: { duration: CYCLE_CONFIG.exhale / 1000 },
-          }),
-        ]);
+      if (!isActiveRef.current) return;
 
-        setCycleCount((prev) => {
-          const newCount = prev + 1;
-          if (newCount >= 6) {
-            onCycleComplete?.();
-          }
-          return newCount;
-        });
+      // Exhale
+      setPhase('exhale');
+      pattern([50, 100, 50]); // Haptic feedback
 
-        // Restart cycle
-        if (cycleCount < 5) {
-          phaseTimeoutRef.current = setTimeout(runCycle, 500);
-        }
-      }, CYCLE_CONFIG.hold);
-    };
+      await Promise.all([
+        bubbleControls.start({
+          scale: 1,
+          opacity: 0.6,
+          transition: { duration: cycleConfig.exhale / 1000, ease: 'easeInOut' },
+        }),
+        particlesControls.start({
+          opacity: 0.3,
+          scale: 0.8,
+          transition: { duration: cycleConfig.exhale / 1000 },
+        }),
+      ]);
 
-    runCycle();
+      if (!isActiveRef.current) return;
+
+      // Increment cycle
+      cycleCountRef.current += 1;
+      setCycleCount(cycleCountRef.current);
+
+      isRunningRef.current = false;
+
+      // Check if complete
+      if (cycleCountRef.current >= targetCycles) {
+        onCycleComplete?.();
+      } else {
+        // Pause avant prochain cycle
+        phaseTimeoutRef.current = setTimeout(() => {
+          runCycle();
+        }, 500);
+      }
+    } catch (error) {
+      console.error('Breathing cycle error:', error);
+      isRunningRef.current = false;
+    }
+  }, [bubbleControls, particlesControls, cycleConfig, targetCycles, onCycleComplete, pattern]);
+
+  // Start cycle when active
+  useEffect(() => {
+    if (isActive && cycleCountRef.current === 0 && !isRunningRef.current) {
+      runCycle();
+    }
 
     return () => {
       if (phaseTimeoutRef.current) clearTimeout(phaseTimeoutRef.current);
     };
-  }, [isActive, bubbleControls, particlesControls, cycleCount, onCycleComplete, pattern]);
+  }, [isActive, runCycle]);
 
   return (
     <div 
       className={cn('relative flex h-[400px] w-full items-center justify-center', className)}
       role="img"
-      aria-label={`Bulle de respiration - ${PHASE_LABELS[phase]} - Cycle ${cycleCount + 1} sur 6`}
+      aria-label={`Bulle de respiration - ${PHASE_LABELS[phase]} - Cycle ${cycleCount + 1} sur ${targetCycles}`}
       aria-live="polite"
     >
       {/* Particles background */}
@@ -184,7 +231,9 @@ export const BreathingBubble = memo(({
           >
             {PHASE_LABELS[phase]}
           </motion.p>
-          <p className="mt-2 text-sm text-muted-foreground">Cycle {cycleCount + 1}/6</p>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Cycle {cycleCount + 1}/{targetCycles}
+          </p>
         </div>
       </motion.div>
 
