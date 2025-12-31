@@ -71,7 +71,7 @@ export function useScanHistory(limit = 3) {
         .from('clinical_signals')
         .select('id, metadata, created_at, source_instrument')
         .eq('user_id', user.id)
-        .in('source_instrument', ['SAM', 'scan_camera', 'scan_sliders', 'voice', 'scan_text', 'scan_facial', 'scan_voice'])
+        .in('source_instrument', ['SAM', 'scan_camera', 'scan_sliders', 'voice', 'scan_text', 'scan_facial', 'scan_voice', 'self-report', 'scan_image'])
         .order('created_at', { ascending: false })
         .limit(limit);
 
@@ -90,8 +90,9 @@ export function useScanHistory(limit = 3) {
         };
       });
     },
-    staleTime: 30_000,
+    staleTime: 10_000, // Rafraîchir toutes les 10s
     gcTime: 5 * 60_000,
-    refetchOnMount: false,
+    refetchOnMount: true, // Rafraîchir à chaque montage
+    refetchOnWindowFocus: true,
   });
 }

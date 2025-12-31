@@ -12,11 +12,12 @@ import {
   ChartOptions,
 } from 'chart.js';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { TrendingUp, Video, Mic, FileText } from 'lucide-react';
+import { useEffect } from 'react';
 
 ChartJS.register(
   CategoryScale,
@@ -49,7 +50,7 @@ const fetchMultiSourceHistory = async (days = 30): Promise<ScanData[]> => {
     .from('clinical_signals')
     .select('created_at, source_instrument, metadata')
     .eq('user_id', userData.user.id)
-    .in('source_instrument', ['SAM', 'scan_camera', 'scan_sliders', 'voice'])
+    .in('source_instrument', ['SAM', 'scan_camera', 'scan_sliders', 'voice', 'scan_text', 'scan_facial', 'scan_voice', 'self-report', 'scan_image'])
     .gte('created_at', since.toISOString())
     .order('created_at', { ascending: true });
 
@@ -67,6 +68,7 @@ const fetchMultiSourceHistory = async (days = 30): Promise<ScanData[]> => {
 };
 
 export const MultiSourceChart: React.FC = () => {
+  const queryClient = useQueryClient();
   const [visibleSources, setVisibleSources] = useState<Record<SourceKey, boolean>>({
     video: true,
     text: true,
@@ -74,10 +76,21 @@ export const MultiSourceChart: React.FC = () => {
     total: true,
   });
 
+  // Écouter les nouveaux scans pour rafraîchir
+  useEffect(() => {
+    const handleScanSaved = () => {
+      queryClient.invalidateQueries({ queryKey: ['multi-source-history'] });
+    };
+    
+    window.addEventListener('scan-saved', handleScanSaved);
+    return () => window.removeEventListener('scan-saved', handleScanSaved);
+  }, [queryClient]);
+
   const { data: scans, isLoading } = useQuery({
     queryKey: ['multi-source-history'],
     queryFn: () => fetchMultiSourceHistory(30),
-    staleTime: 60_000,
+    staleTime: 30_000,
+    refetchOnMount: true,
   });
 
   const toggleSource = (source: SourceKey) => {

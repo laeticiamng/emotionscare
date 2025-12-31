@@ -195,7 +195,7 @@ export const useEmotionScan = () => {
               confidence: result.confidence,
               summary: result.summary
             },
-            expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+            expires_at: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString()
           });
           
           window.dispatchEvent(new CustomEvent('scan-saved'));
