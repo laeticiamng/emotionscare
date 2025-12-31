@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React, { memo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -7,15 +7,28 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 import { 
   ArrowLeft, Shield, Camera, Mic, Heart, MapPin, Users, Coins, 
   BarChart, Sparkles, Info, Download, History, AlertCircle, CheckCircle,
-  Lock, Database, FileText, Bell
+  Lock, Database, FileText, Bell, Trash2, AlertTriangle, ExternalLink, Loader2, XCircle
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { usePrivacy } from '@/modules/privacy';
 import { PREFERENCE_METADATA, type PrivacyPreferenceKey } from '@/modules/privacy/types';
 import { motion, AnimatePresence } from 'framer-motion';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Camera, Mic, Heart, MapPin, Users, Coins, BarChart, Sparkles
@@ -24,6 +37,9 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
 const B2CPrivacyTogglesPage = memo(() => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [deletionReason, setDeletionReason] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
+  
   const {
     preferences,
     stats,
@@ -33,6 +49,9 @@ const B2CPrivacyTogglesPage = memo(() => {
     error,
     updatePreference,
     requestExport,
+    requestDeletion,
+    cancelDeletion,
+    refresh,
     isPreferenceEnabled,
     getEnabledPreferences,
     getDisabledPreferences,
@@ -71,6 +90,41 @@ const B2CPrivacyTogglesPage = memo(() => {
       });
     }
   };
+
+  const handleDeleteAccount = async () => {
+    setIsDeleting(true);
+    try {
+      const success = await requestDeletion(deletionReason || undefined);
+      if (success) {
+        toast({
+          title: "Demande enregistrée",
+          description: "Votre compte sera supprimé dans 30 jours. Vous pouvez annuler à tout moment.",
+        });
+        setDeletionReason('');
+        refresh();
+      } else {
+        throw new Error('Échec');
+      }
+    } catch {
+      toast({
+        title: "Erreur",
+        description: "Impossible de créer la demande de suppression.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleCancelDeletion = async () => {
+    const success = await cancelDeletion();
+    if (success) {
+      toast({ title: "Suppression annulée" });
+      refresh();
+    }
+  };
+
+  const pendingDeletion = exports.find(e => e.type === 'all' && e.status === 'pending');
 
   const preferenceKeys: PrivacyPreferenceKey[] = ['cam', 'mic', 'hr', 'gps', 'social', 'nft', 'analytics', 'personalization'];
   const sensorKeys = preferenceKeys.filter(k => PREFERENCE_METADATA[k].category === 'sensors');
@@ -339,27 +393,78 @@ const B2CPrivacyTogglesPage = memo(() => {
                         <div className="flex items-center gap-3">
                           <FileText className="w-5 h-5 text-muted-foreground" />
                           <div>
-                            <div className="font-medium">{exp.type}</div>
+                            <div className="font-medium capitalize">{exp.type}</div>
                             <div className="text-xs text-muted-foreground">
                               {new Date(exp.created_at).toLocaleDateString('fr-FR')}
                             </div>
                           </div>
                         </div>
-                        <Badge variant={
-                          exp.status === 'ready' ? 'default' :
-                          exp.status === 'processing' ? 'secondary' :
-                          'destructive'
-                        }>
-                          {exp.status === 'ready' && <CheckCircle className="w-3 h-3 mr-1" />}
-                          {exp.status === 'processing' && <Bell className="w-3 h-3 mr-1 animate-pulse" />}
-                          {exp.status}
-                        </Badge>
+                        <div className="flex items-center gap-2">
+                          <Badge variant={exp.status === 'ready' ? 'default' : exp.status === 'processing' ? 'secondary' : 'outline'}>
+                            {exp.status === 'ready' && <CheckCircle className="w-3 h-3 mr-1" />}
+                            {exp.status === 'processing' && <Loader2 className="w-3 h-3 mr-1 animate-spin" />}
+                            {exp.status}
+                          </Badge>
+                          {exp.status === 'ready' && exp.file_url && (
+                            <Button variant="outline" size="sm" asChild>
+                              <a href={exp.file_url} target="_blank" rel="noopener noreferrer">
+                                <ExternalLink className="w-3 h-3" />
+                              </a>
+                            </Button>
+                          )}
+                        </div>
                       </div>
                     ))}
                   </div>
                 </CardContent>
               </Card>
             )}
+
+            {/* Zone de suppression */}
+            <Card className="bg-destructive/5 border-destructive/30">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-destructive">
+                  <Trash2 className="w-5 h-5" />
+                  Supprimer mon compte
+                </CardTitle>
+                <CardDescription>
+                  Action irréversible après 30 jours
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="destructive" disabled={isDeleting}>
+                      {isDeleting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Trash2 className="w-4 h-4 mr-2" />}
+                      Demander la suppression
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Confirmer la suppression</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Votre compte sera supprimé dans 30 jours. Vous pouvez annuler à tout moment.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <div className="py-2">
+                      <Label>Raison (optionnel)</Label>
+                      <Textarea 
+                        value={deletionReason} 
+                        onChange={(e) => setDeletionReason(e.target.value)}
+                        placeholder="Dites-nous pourquoi..."
+                        className="mt-2"
+                      />
+                    </div>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Annuler</AlertDialogCancel>
+                      <AlertDialogAction onClick={handleDeleteAccount} className="bg-destructive">
+                        Confirmer
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </CardContent>
+            </Card>
           </TabsContent>
 
           {/* Historique */}
