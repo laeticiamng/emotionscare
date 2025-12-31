@@ -440,6 +440,6 @@ Pour toute question ou problème :
 
 ---
 
-**Dernière mise à jour :** 15 novembre 2025
+**Dernière mise à jour :** 31 décembre 2025
 **Auteur :** EmotionsCare Team
-**Version :** 1.0.0
+**Version :** 1.1.0

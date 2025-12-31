@@ -1,19 +1,32 @@
 # 📊 Reports Directory
 
-Ce dossier contient tous les rapports d'audit et analyses générés automatiquement.
+Ce dossier contient les rapports d'audit générés automatiquement.
 
-## 📁 Structure :
-- `accessibility/` - Rapports d'accessibilité WCAG
-- `performance/` - Analyses de performance
-- `dependencies/` - Audits des dépendances
-- `code-quality/` - Rapports de qualité de code
-- `security/` - Analyses de sécurité
+## 📁 Structure
 
-## 🔄 Auto-génération :
-Les rapports sont automatiquement générés via :
+```
+reports/
+├── accessibility/     # Rapports WCAG et a11y
+├── archive/           # Anciens rapports archivés
+├── dependencies/      # Audits npm
+└── *.md               # Rapports actifs
+```
+
+## 📋 Rapports Actifs
+
+| Fichier | Description |
+|---------|-------------|
+| `AUDIT_COHERENCE_COMPLET.md` | Cohérence globale de l'architecture |
+| `AUDIT_ACCESSIBILITE_COMPLET.md` | Conformité WCAG 2.1 AA |
+| `AUDIT_UX_COMPLET.md` | Audit UX et ergonomie |
+| `FINAL_AUDIT_REPORT.md` | Rapport d'audit final consolidé |
+
+## 🔄 Génération
+
 ```bash
 npm run audit:full
 ```
 
-## 📋 Archive :
-Les anciens rapports sont conservés dans `archive/` avec timestamp.
+## 📅 Dernière mise à jour
+
+31 décembre 2025

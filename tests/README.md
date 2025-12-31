@@ -299,5 +299,5 @@ Pour toute question :
 
 ---
 
-**Dernière mise à jour** : 2025-11-10  
-**Version** : 1.0.0
+**Dernière mise à jour** : 31 décembre 2025  
+**Version** : 1.1.0
