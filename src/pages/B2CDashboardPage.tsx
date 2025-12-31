@@ -33,6 +33,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useClinicalHints } from '@/hooks/useClinicalHints';
 import { useUserStatsQuery, useUserStatsRealtime } from '@/hooks/useUserStatsQuery';
 import { useDynamicRecommendations } from '@/hooks/useDynamicRecommendations';
+import { useAuth } from '@/contexts/AuthContext';
 
 const WeeklyPlanCard = React.lazy(() => import('@/components/dashboard/widgets/WeeklyPlanCard'));
 const RecentEmotionScansWidget = React.lazy(() => import('@/components/dashboard/widgets/RecentEmotionScansWidget'));
@@ -149,6 +150,7 @@ const DashboardWidgetSkeleton: React.FC<{ lines?: number }> = ({ lines = 4 }) =>
 
 export default function B2CDashboardPage() {
   useOptimizedPage('B2CDashboardPage');
+  const { user } = useAuth();
   const { runAudit } = useAccessibilityAudit();
   const { has } = useFlags();
   const playback = useAdaptivePlayback();
@@ -161,7 +163,7 @@ export default function B2CDashboardPage() {
   const clinicalTone = summaryTone;
   
   // Stats réelles depuis Supabase
-  const { stats: userStats, loading: statsLoading } = useUserStatsQuery();
+  const { stats: userStats, loading: statsLoading, refetch: refetchStats } = useUserStatsQuery();
   useUserStatsRealtime();
   
   // Recommandations dynamiques
@@ -223,14 +225,12 @@ export default function B2CDashboardPage() {
       <a 
         href="#main-content" 
         className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 z-50 bg-primary text-primary-foreground px-4 py-2 rounded-md"
-        tabIndex={1}
       >
         Aller au contenu principal
       </a>
       <a 
         href="#quick-actions" 
         className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-40 z-50 bg-primary text-primary-foreground px-4 py-2 rounded-md"
-        tabIndex={2}
       >
         Aller aux actions rapides
       </a>
@@ -278,7 +278,7 @@ export default function B2CDashboardPage() {
         {/* En-tête de bienvenue */}
         <header className="mb-8">
           <h1 className="text-3xl font-bold mb-2">
-            Bienvenue sur votre espace bien-être
+            Bienvenue{user?.user_metadata?.first_name ? `, ${user.user_metadata.first_name}` : ''} sur votre espace bien-être
           </h1>
           <p className="text-muted-foreground text-lg">
             Découvrez vos outils d'intelligence émotionnelle personnalisés
@@ -325,9 +325,21 @@ export default function B2CDashboardPage() {
 
         {/* Statistiques rapides - données réelles */}
         <section aria-labelledby="stats-title" className="mb-8">
-          <h2 id="stats-title" className="text-xl font-semibold mb-4">
-            Votre progression
-          </h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 id="stats-title" className="text-xl font-semibold">
+              Votre progression
+            </h2>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => refetchStats()}
+              disabled={statsLoading}
+              aria-label="Actualiser les statistiques"
+            >
+              <TrendingUp className="h-4 w-4 mr-1" aria-hidden="true" />
+              Actualiser
+            </Button>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <Card className="relative">
               <CardHeader className="pb-3">
@@ -430,12 +442,15 @@ export default function B2CDashboardPage() {
                     <div className="mt-3">
                       <div className="flex justify-between text-xs text-muted-foreground mb-1">
                         <span>{userStats.totalPoints} XP</span>
-                        <span>{(userStats.level) * (userStats.level) * 100} XP</span>
+                        <span>{Math.pow(userStats.level + 1, 2) * 100} XP</span>
                       </div>
                       <Progress 
-                        value={Math.min(100, (userStats.totalPoints / ((userStats.level) * (userStats.level) * 100)) * 100)} 
+                        value={Math.min(100, (userStats.totalPoints / (Math.pow(userStats.level + 1, 2) * 100)) * 100)} 
                         className="h-2"
                         aria-label={`Progression vers le niveau ${userStats.level + 1}`}
+                        aria-valuemin={0}
+                        aria-valuemax={Math.pow(userStats.level + 1, 2) * 100}
+                        aria-valuenow={userStats.totalPoints}
                       />
                     </div>
                   </>
@@ -541,26 +556,27 @@ export default function B2CDashboardPage() {
               </>
             ) : (
               recommendations.map((rec) => {
-                const iconMap = {
+                const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
                   breath: Wind,
                   music: Music,
                   journal: BookOpen,
                   scan: Brain,
                   coach: MessageCircle
-                } as const;
-                const colorMap = {
+                };
+                const colorMap: Record<string, string> = {
                   breath: 'bg-sky-500/10 text-sky-500',
                   music: 'bg-info/10 text-info',
                   journal: 'bg-success/10 text-success',
                   scan: 'bg-primary/10 text-primary',
                   coach: 'bg-accent/10 text-accent'
-                } as const;
-                const RecIcon = iconMap[rec.icon as keyof typeof iconMap] ?? Brain;
+                };
+                const RecIcon = iconMap[rec.icon] ?? Brain;
+                const recColor = colorMap[rec.icon] ?? 'bg-muted text-muted-foreground';
                 return (
                   <Card key={rec.id}>
                     <CardHeader>
                       <CardTitle className="flex items-center space-x-2">
-                        <div className={`p-2 rounded ${colorMap[rec.icon]}`}>
+                        <div className={`p-2 rounded ${recColor}`}>
                           <RecIcon className="h-4 w-4" aria-hidden="true" />
                         </div>
                         <span>{rec.title}</span>
@@ -584,15 +600,21 @@ export default function B2CDashboardPage() {
       {/* Footer */}
       <footer role="contentinfo" className="bg-card border-t mt-12">
         <div className="container mx-auto px-4 py-6">
-          <div className="flex items-center justify-between text-sm text-muted-foreground">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
             <p>© 2025 EmotionsCare - Votre bien-être, notre priorité</p>
             <nav aria-label="Liens footer">
-              <div className="flex space-x-4">
-                <Link to="/legal/privacy" className="hover:text-foreground">
+              <div className="flex flex-wrap justify-center gap-4">
+                <Link to="/settings/privacy" className="hover:text-foreground">
                   Confidentialité
+                </Link>
+                <Link to="/legal/privacy" className="hover:text-foreground">
+                  Politique vie privée
                 </Link>
                 <Link to="/legal/terms" className="hover:text-foreground">
                   Conditions
+                </Link>
+                <Link to="/accessibility" className="hover:text-foreground">
+                  Accessibilité
                 </Link>
                 <Link to="/contact" className="hover:text-foreground">
                   Support
