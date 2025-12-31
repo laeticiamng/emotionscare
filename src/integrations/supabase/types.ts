@@ -14057,6 +14057,45 @@ export type Database = {
         }
         Relationships: []
       }
+      music_listening_sessions: {
+        Row: {
+          completed_at: string | null
+          created_at: string | null
+          duration_seconds: number | null
+          emotion_after: string | null
+          emotion_before: string | null
+          id: string
+          metadata: Json | null
+          session_type: string | null
+          track_id: string | null
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string | null
+          duration_seconds?: number | null
+          emotion_after?: string | null
+          emotion_before?: string | null
+          id?: string
+          metadata?: Json | null
+          session_type?: string | null
+          track_id?: string | null
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string | null
+          duration_seconds?: number | null
+          emotion_after?: string | null
+          emotion_before?: string | null
+          id?: string
+          metadata?: Json | null
+          session_type?: string | null
+          track_id?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       music_notifications: {
         Row: {
           created_at: string
@@ -25749,13 +25788,13 @@ export type Database = {
       }
       get_user_ia_stats: { Args: { p_period_days?: number }; Returns: Json }
       get_user_listening_stats: {
-        Args: { p_user_id?: string }
+        Args: { p_user_id: string }
         Returns: {
-          avg_completion_rate: number
-          last_played_at: string
+          streak_days: number
           top_emotion: string
           total_duration_seconds: number
           total_listens: number
+          unique_tracks: number
         }[]
       }
       get_user_medical_stats: { Args: { p_user_id?: string }; Returns: Json }

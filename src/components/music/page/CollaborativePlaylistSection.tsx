@@ -257,25 +257,57 @@ export const CollaborativePlaylistSection: React.FC = () => {
     }, 50);
   };
 
-  const handleInvite = () => {
-    if (!inviteEmail.trim()) return;
+  const handleInvite = async () => {
+    if (!inviteEmail.trim() || !playlist) return;
 
-    // TODO: Implémenter l'envoi d'email réel via edge function
-    toast({
-      title: '📧 Fonctionnalité à venir',
-      description: 'Les invitations par email seront disponibles prochainement',
-    });
-    setInviteEmail('');
-    setShowInvite(false);
+    try {
+      // Envoyer l'invitation via edge function
+      const { error } = await supabase.functions.invoke('send-invitation', {
+        body: {
+          email: inviteEmail,
+          type: 'collaborative_playlist',
+          playlistId: playlist.id,
+          playlistName: playlist.name,
+          inviterName: user?.email?.split('@')[0] || 'Un ami'
+        }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: '📧 Invitation envoyée',
+        description: `Une invitation a été envoyée à ${inviteEmail}`,
+      });
+      setInviteEmail('');
+      setShowInvite(false);
+    } catch (error) {
+      console.error('Failed to send invitation:', error);
+      toast({
+        title: '❌ Erreur',
+        description: 'Impossible d\'envoyer l\'invitation',
+        variant: 'destructive'
+      });
+    }
   };
 
-  const copyInviteLink = () => {
+  const copyInviteLink = async () => {
     if (!playlist) return;
-    // Note: Le partage par lien sera disponible dans une future version
-    toast({
-      title: '🔗 Fonctionnalité à venir',
-      description: 'Le partage par lien sera disponible prochainement',
-    });
+    
+    const shareUrl = `${window.location.origin}/app/music/collab/${playlist.id}`;
+    
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      toast({
+        title: '🔗 Lien copié',
+        description: 'Le lien d\'invitation a été copié dans le presse-papier',
+      });
+    } catch (error) {
+      toast({
+        title: '❌ Erreur',
+        description: 'Impossible de copier le lien',
+        variant: 'destructive'
+      });
+    }
   };
 
   if (loading) {
