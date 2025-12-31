@@ -24,6 +24,10 @@ import { useCommunityGroups, useCommunityPosts } from '@/hooks/community';
 import { CommunityReportService, REPORT_REASONS, ReportReason } from '@/modules/community/services';
 import { CommunitySavedPostsService } from '@/modules/community/services';
 import { motion, AnimatePresence } from 'framer-motion';
+import { MentionTextarea } from '@/components/community/MentionTextarea';
+import { CommunitySearch } from '@/components/community/CommunitySearch';
+import { NotificationBell } from '@/components/community/NotificationBell';
+import { EmpathyTemplates } from '@/components/community/EmpathyTemplates';
 
 const REACTION_EMOJIS = ['❤️', '👍', '🙏', '💪', '🌟', '🤗'];
 
@@ -456,12 +460,18 @@ export default function CommunityPage() {
   // Vue principale
   return (
     <div className="container max-w-4xl mx-auto py-8 px-4">
-      <div className="mb-8 text-center">
-        <h1 className="text-3xl font-bold mb-2 flex items-center justify-center gap-2">
-          <Users className="h-8 w-8 text-primary" />
-          Communauté
-        </h1>
-        <p className="text-muted-foreground">
+      <div className="mb-8">
+        <div className="flex items-center justify-between mb-4">
+          <h1 className="text-3xl font-bold flex items-center gap-2">
+            <Users className="h-8 w-8 text-primary" />
+            Communauté
+          </h1>
+          <div className="flex items-center gap-2">
+            <CommunitySearch />
+            <NotificationBell />
+          </div>
+        </div>
+        <p className="text-muted-foreground text-center">
           Rejoignez des groupes de soutien bienveillants et partagez en toute sécurité.
         </p>
       </div>
@@ -494,12 +504,14 @@ export default function CommunityPage() {
               <CardTitle className="text-lg">Partager avec la communauté</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              <Textarea
-                placeholder="Comment vous sentez-vous aujourd'hui ?"
+              <MentionTextarea
                 value={newPostContent}
-                onChange={(e) => setNewPostContent(e.target.value)}
-                className="min-h-[100px]"
-                maxLength={2000}
+                onChange={setNewPostContent}
+                placeholder="Comment vous sentez-vous aujourd'hui ? Utilisez @ pour mentionner quelqu'un..."
+                minRows={3}
+              />
+              <EmpathyTemplates 
+                onSelect={(template: string) => setNewPostContent(prev => prev + ' ' + template)} 
               />
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
