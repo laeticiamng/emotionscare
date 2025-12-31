@@ -40,7 +40,14 @@ export const BattleArena: React.FC<BattleArenaProps> = ({
 
   const isPaused = phase === 'paused';
   const isCalming = phase === 'calming';
-  const duration = mode === 'intense' ? 240 : 180;
+  // Duration based on mode
+  const durationMap: Record<string, number> = {
+    quick: 90,
+    standard: 180,
+    zen: 240,
+    challenge: 300
+  };
+  const duration = durationMap[mode] || 180;
   const progressPercent = ((duration - timeLeft) / duration) * 100;
 
   // Filter active (unprocessed) stimuli that have triggered
@@ -71,7 +78,7 @@ export const BattleArena: React.FC<BattleArenaProps> = ({
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
             <Shield className="w-5 h-5 text-primary" />
-            <span className="font-semibold text-foreground">Mode {mode === 'intense' ? 'Intense' : 'Standard'}</span>
+            <span className="font-semibold text-foreground">Mode {mode.charAt(0).toUpperCase() + mode.slice(1)}</span>
           </div>
         </div>
         
