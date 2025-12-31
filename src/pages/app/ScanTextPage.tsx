@@ -14,21 +14,30 @@ import PageRoot from '@/components/common/PageRoot';
 import { usePageSEO } from '@/hooks/usePageSEO';
 import { useEmotionScan } from '@/hooks/useEmotionScan';
 import { useToast } from '@/hooks/use-toast';
-import { EmotionResult } from '@/types/emotion-unified';
+import { EmotionResult, ConfidenceLevel } from '@/types/emotion-unified';
 
-const SimpleResultCard: React.FC<{ result: EmotionResult }> = ({ result }) => (
-  <Card>
-    <CardHeader><CardTitle>Résultat</CardTitle></CardHeader>
-    <CardContent className="space-y-4">
-      <p className="text-2xl font-bold text-center">{result.emotion || 'Neutre'}</p>
-      <div className="space-y-2">
-        <div className="flex justify-between text-sm"><span>Valence</span><span>{Math.round(result.valence || 50)}%</span></div>
-        <Progress value={result.valence || 50} className="h-2" />
-      </div>
-      {result.confidence && <Badge variant="secondary">Confiance: {Math.round(result.confidence)}%</Badge>}
-    </CardContent>
-  </Card>
-);
+const getConfidenceValue = (confidence: number | ConfidenceLevel | undefined): number => {
+  if (confidence === undefined) return 0;
+  if (typeof confidence === 'number') return confidence;
+  return confidence.overall ?? 0;
+};
+
+const SimpleResultCard: React.FC<{ result: EmotionResult }> = ({ result }) => {
+  const confidenceValue = getConfidenceValue(result.confidence);
+  return (
+    <Card>
+      <CardHeader><CardTitle>Résultat</CardTitle></CardHeader>
+      <CardContent className="space-y-4">
+        <p className="text-2xl font-bold text-center">{result.emotion || 'Neutre'}</p>
+        <div className="space-y-2">
+          <div className="flex justify-between text-sm"><span>Valence</span><span>{Math.round(result.valence || 50)}%</span></div>
+          <Progress value={result.valence || 50} className="h-2" />
+        </div>
+        {confidenceValue > 0 && <Badge variant="secondary">Confiance: {Math.round(confidenceValue)}%</Badge>}
+      </CardContent>
+    </Card>
+  );
+};
 
 const PROMPTS = [
   "Comment vous sentez-vous en ce moment ?",
