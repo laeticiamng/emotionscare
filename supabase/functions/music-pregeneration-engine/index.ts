@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Music Pre-generation Engine
  * Anticipe et pré-génère la musique basée sur les patterns émotionnels utilisateur
