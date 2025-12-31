@@ -2,8 +2,8 @@
  * Hook pour générer des recommandations dynamiques basées sur les données utilisateur
  */
 
-import { useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useMemo, useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -220,14 +220,30 @@ function generateRecommendations(context: UserContext): Recommendation[] {
 
 export function useDynamicRecommendations() {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
 
   const query = useQuery({
     queryKey: ['recommendations', user?.id],
     queryFn: () => fetchUserContext(user!.id),
     enabled: !!user?.id,
-    staleTime: 10 * 60 * 1000, // 10 minutes
+    staleTime: 5 * 60 * 1000, // 5 minutes - réduit pour plus de réactivité
     gcTime: 30 * 60 * 1000,
   });
+
+  // Invalider le cache quand un scan est sauvegardé
+  useEffect(() => {
+    const handleScanSaved = () => {
+      queryClient.invalidateQueries({ queryKey: ['recommendations', user?.id] });
+    };
+
+    window.addEventListener('scan-saved', handleScanSaved);
+    window.addEventListener('journal-note-created', handleScanSaved);
+    
+    return () => {
+      window.removeEventListener('scan-saved', handleScanSaved);
+      window.removeEventListener('journal-note-created', handleScanSaved);
+    };
+  }, [queryClient, user?.id]);
 
   const recommendations = useMemo(() => {
     if (!query.data) {

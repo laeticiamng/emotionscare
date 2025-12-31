@@ -129,11 +129,40 @@ const colorMap: Record<Notification['type'], string> = {
   alert: 'bg-destructive/10 text-destructive'
 };
 
+// Clés localStorage pour persistance
+const DISMISSED_KEY = 'emotionscare_notifications_dismissed';
+const READ_KEY = 'emotionscare_notifications_read';
+
+function getStoredSet(key: string): Set<string> {
+  try {
+    const stored = localStorage.getItem(key);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      if (Array.isArray(parsed)) {
+        return new Set(parsed);
+      }
+    }
+  } catch (e) {
+    console.warn('Error reading from localStorage:', e);
+  }
+  return new Set();
+}
+
+function saveSet(key: string, set: Set<string>) {
+  try {
+    localStorage.setItem(key, JSON.stringify([...set]));
+  } catch (e) {
+    console.warn('Error saving to localStorage:', e);
+  }
+}
+
 export default function NotificationsWidget() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const [dismissedIds, setDismissedIds] = useState<Set<string>>(new Set());
-  const [readIds, setReadIds] = useState<Set<string>>(new Set());
+  
+  // Initialiser depuis localStorage
+  const [dismissedIds, setDismissedIds] = useState<Set<string>>(() => getStoredSet(DISMISSED_KEY));
+  const [readIds, setReadIds] = useState<Set<string>>(() => getStoredSet(READ_KEY));
 
   const { data: notifications, isLoading, refetch } = useQuery({
     queryKey: ['dashboard-notifications', user?.id],
@@ -143,14 +172,22 @@ export default function NotificationsWidget() {
     refetchInterval: 5 * 60 * 1000,
   });
 
-  // Marquer comme lu
+  // Marquer comme lu avec persistance
   const markAsRead = useCallback((id: string) => {
-    setReadIds(prev => new Set([...prev, id]));
+    setReadIds(prev => {
+      const next = new Set([...prev, id]);
+      saveSet(READ_KEY, next);
+      return next;
+    });
   }, []);
 
-  // Supprimer une notification
+  // Supprimer une notification avec persistance
   const dismissNotification = useCallback((id: string) => {
-    setDismissedIds(prev => new Set([...prev, id]));
+    setDismissedIds(prev => {
+      const next = new Set([...prev, id]);
+      saveSet(DISMISSED_KEY, next);
+      return next;
+    });
   }, []);
 
   // Filtrer les notifications non supprimées
