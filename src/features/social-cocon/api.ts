@@ -497,3 +497,38 @@ export const fetchMspssSummary = async (): Promise<MspssSummary> => {
     return FALLBACK_MSPSS;
   }
 };
+
+export const saveQuietHours = async (
+  settings: QuietHoursSettings
+): Promise<QuietHoursSettings> => {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    const { data, error } = await supabase
+      .from('quiet_hours_settings')
+      .upsert({
+        user_id: user?.id,
+        enabled: settings.enabled,
+        start_utc: settings.startUtc,
+        end_utc: settings.endUtc,
+        updated_at: new Date().toISOString(),
+      })
+      .select('enabled, start_utc, end_utc')
+      .single();
+
+    if (error) {
+      throw error;
+    }
+
+    return {
+      enabled: Boolean(data?.enabled),
+      startUtc: data?.start_utc || settings.startUtc,
+      endUtc: data?.end_utc || settings.endUtc,
+    };
+  } catch (error) {
+    Sentry.captureException(error, {
+      tags: { feature: 'social-cocon', action: 'save-quiet-hours' },
+    });
+    throw error;
+  }
+};

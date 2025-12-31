@@ -35,6 +35,10 @@ import { cn } from '@/lib/utils';
 import { useSocialRooms } from '@/features/social-cocon/hooks/useSocialRooms';
 import { useSocialBreakPlanner } from '@/features/social-cocon/hooks/useSocialBreakPlanner';
 import { useMspssSummary } from '@/features/social-cocon/hooks/useMspssSummary';
+import { usePastBreaks } from '@/features/social-cocon/hooks/usePastBreaks';
+import ShareRoomDialog from '@/features/social-cocon/components/ShareRoomDialog';
+import PastBreaksHistory from '@/features/social-cocon/components/PastBreaksHistory';
+import QuietHoursConfig from '@/features/social-cocon/components/QuietHoursConfig';
 import { computeSocialCoconUIHints, serializeHints } from '@/features/orchestration';
 import { createSession } from '@/services/sessions/sessionsApi';
 import {
@@ -758,6 +762,11 @@ const B2CSocialCoconPage: React.FC = () => {
                             <MicOff className="h-4 w-4 mr-2" aria-hidden="true" />
                             {room.softModeEnabled ? 'Mode standard' : 'Passer en mode très doux'}
                           </Button>
+                          <ShareRoomDialog 
+                            roomId={room.id} 
+                            roomName={room.name} 
+                            inviteCode={room.inviteCode} 
+                          />
                         </div>
 
                         <div className="grid gap-3 sm:grid-cols-2">
@@ -797,6 +806,12 @@ const B2CSocialCoconPage: React.FC = () => {
               </div>
             </div>
           </section>
+        </div>
+
+        {/* Additional sections */}
+        <div className="grid gap-6 lg:grid-cols-2">
+          <PastBreaksHistory limit={5} />
+          <QuietHoursConfig initialSettings={quietHours} />
         </div>
 
         <footer className="rounded-3xl bg-white/80 backdrop-blur border border-white/60 p-6 text-xs text-muted-foreground">

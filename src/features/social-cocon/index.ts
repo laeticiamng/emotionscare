@@ -16,3 +16,4 @@ export * from './types';
 
 // API
 export * from './api';
+export { saveQuietHours } from './api';
