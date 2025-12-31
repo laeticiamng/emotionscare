@@ -38,7 +38,7 @@ import { useB2BTeamStats } from '@/hooks/useB2BTeamStats';
 import { useAccessibilityAudit } from '@/lib/accessibility-checker';
 import { cn } from '@/lib/utils';
 
-const B2BHeatmapLazy = React.lazy(() => import('./b2b/reports'));
+const B2BHeatmapLazy = React.lazy(() => import('@/pages/b2b/reports'));
 
 export default function B2BRHDashboard() {
   const { user } = useAuth();
