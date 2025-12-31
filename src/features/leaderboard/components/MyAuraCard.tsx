@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { Sparkles, TrendingUp, Flame } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
+import { AuraShareButton } from './AuraShareButton';
 import type { AuraEntry } from '../hooks/useAurasLeaderboard';
 
 interface MyAuraCardProps {
@@ -45,11 +46,12 @@ export const MyAuraCard = memo(function MyAuraCard({ aura }: MyAuraCardProps) {
 
   return (
     <Card className="border-primary/30 bg-gradient-to-br from-background to-primary/5 overflow-hidden">
-      <CardHeader className="pb-2">
+      <CardHeader className="pb-2 flex flex-row items-center justify-between">
         <CardTitle className="flex items-center gap-2 text-foreground">
           <Sparkles className="h-5 w-5 text-primary" />
           Votre Aura
         </CardTitle>
+        <AuraShareButton aura={aura} />
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex items-center gap-6">

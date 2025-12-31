@@ -2,7 +2,7 @@
  * Hook pour récupérer les auras des utilisateurs pour le leaderboard visuel
  * Affiche un "ciel d'auras" sans classement numérique, basé sur WHO-5 / activité
  */
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';
 
@@ -13,7 +13,7 @@ export interface AuraEntry {
   avatarUrl?: string | null;
   /** Teinte HSL 0-360 */
   colorHue: number;
-  /** Luminosité 0.3-0.9 */
+  /** Luminosité 0-1 (0.3-0.9 typiquement) */
   luminosity: number;
   /** Taille relative 0.5-1.5 */
   sizeScale: number;
@@ -41,35 +41,73 @@ export interface UseAurasLeaderboardResult {
  * 2 = neutre (vert 120-180)
  * 3-4 = warm (orange/jaune 30-60)
  */
-const computeHue = (who5Level?: number): number => {
+const computeHue = (who5Level?: number, seed = 0): number => {
+  // Utiliser seed pour éviter re-render aléatoire
+  const pseudoRandom = ((seed * 9301 + 49297) % 233280) / 233280;
+  
   if (typeof who5Level !== 'number') return 180; // neutre
-  if (who5Level <= 1) return 220 + Math.random() * 50; // cool
-  if (who5Level >= 3) return 30 + Math.random() * 30; // warm
-  return 120 + Math.random() * 60; // neutre
+  if (who5Level <= 1) return 220 + pseudoRandom * 50; // cool
+  if (who5Level >= 3) return 30 + pseudoRandom * 30; // warm
+  return 120 + pseudoRandom * 60; // neutre
 };
 
-const computeLuminosity = (who5Level?: number): number => {
-  if (typeof who5Level !== 'number') return 0.6;
-  // Plus le score est haut, plus c'est lumineux
-  return 0.4 + (who5Level / 4) * 0.4;
+/**
+ * Convertit luminosity DB (integer 0-100) en float 0-1
+ */
+const normalizeLuminosity = (dbValue?: number | null): number => {
+  if (typeof dbValue !== 'number' || dbValue < 0) return 0.6;
+  // Si > 1, c'est un pourcentage, diviser par 100
+  if (dbValue > 1) return Math.min(dbValue / 100, 1);
+  return dbValue;
 };
 
-const computeSize = (streakDays?: number): number => {
-  if (typeof streakDays !== 'number' || streakDays <= 0) return 0.7;
-  // Streak augmente la taille (cap à 30 jours)
-  const cappedStreak = Math.min(streakDays, 30);
-  return 0.7 + (cappedStreak / 30) * 0.6;
+const normalizeSize = (dbValue?: number | null): number => {
+  if (typeof dbValue !== 'number' || dbValue <= 0) return 0.8;
+  // Si valeur entre 0-2, c'est déjà normalisé
+  if (dbValue <= 2) return dbValue;
+  // Sinon considérer comme pourcentage
+  return Math.min(dbValue / 100, 1.5);
+};
+
+/** Génère des auras de démonstration si la table est vide */
+const generateDemoAuras = (): AuraEntry[] => {
+  const demoNames = [
+    'Étoile Paisible', 'Lueur Sereine', 'Flamme Douce', 
+    'Océan Calme', 'Soleil Bienveillant', 'Lune Apaisante',
+    'Nuage Léger', 'Brise Matinale', 'Aurore Céleste'
+  ];
+  
+  return demoNames.map((name, i) => ({
+    id: `demo-${i}`,
+    userId: `demo-user-${i}`,
+    displayName: name,
+    avatarUrl: null,
+    colorHue: computeHue(Math.floor(i / 3), i),
+    luminosity: 0.5 + (i % 5) * 0.1,
+    sizeScale: 0.7 + (i % 4) * 0.15,
+    who5Badge: null,
+    streakDays: i * 2,
+    lastUpdated: new Date().toISOString(),
+    isMe: false,
+  }));
 };
 
 export const useAurasLeaderboard = (): UseAurasLeaderboardResult => {
-  const [auras, setAuras] = useState<AuraEntry[]>([]);
+  const [rawAuras, setRawAuras] = useState<AuraEntry[]>([]);
+  const [profiles, setProfiles] = useState<Map<string, { name: string; avatar: string | null }>>(new Map());
   const [myAura, setMyAura] = useState<AuraEntry | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
   const fetchAuras = useCallback(async () => {
     try {
       setLoading(true);
+
+      // Récupérer l'utilisateur courant
+      const { data: userData } = await supabase.auth.getUser();
+      const userId = userData?.user?.id || null;
+      setCurrentUserId(userId);
 
       // Récupérer les dernières entrées de aura_history
       const { data: auraData, error: fetchError } = await supabase
@@ -80,22 +118,48 @@ export const useAurasLeaderboard = (): UseAurasLeaderboardResult => {
 
       if (fetchError) throw fetchError;
 
-      const { data: userData } = await supabase.auth.getUser();
-      const currentUserId = userData?.user?.id;
+      // Si pas de données, utiliser des données de démo
+      if (!auraData || auraData.length === 0) {
+        const demoAuras = generateDemoAuras();
+        setRawAuras(demoAuras);
+        setMyAura(null);
+        setError(null);
+        setLoading(false);
+        return;
+      }
 
-      const mapped: AuraEntry[] = (auraData || []).map((row) => ({
-        id: row.id,
-        userId: row.user_id,
-        displayName: `Explorateur ${row.user_id.slice(0, 4)}`,
-        avatarUrl: null,
-        colorHue: row.color_hue ?? computeHue(row.who5_badge ? 3 : undefined),
-        luminosity: row.luminosity ?? computeLuminosity(3),
-        sizeScale: row.size_scale ?? 1,
-        who5Badge: row.who5_badge,
-        streakDays: undefined,
-        lastUpdated: row.week_end,
-        isMe: row.user_id === currentUserId,
-      }));
+      // Récupérer les profils pour les noms et avatars
+      const userIds = [...new Set(auraData.map((row) => row.user_id))];
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .select('id, full_name, avatar_url')
+        .in('id', userIds);
+
+      const profileMap = new Map<string, { name: string; avatar: string | null }>();
+      (profileData || []).forEach((p) => {
+        profileMap.set(p.id, {
+          name: p.full_name || `Explorateur ${p.id.slice(0, 4)}`,
+          avatar: p.avatar_url,
+        });
+      });
+      setProfiles(profileMap);
+
+      const mapped: AuraEntry[] = auraData.map((row, index) => {
+        const profile = profileMap.get(row.user_id);
+        return {
+          id: row.id,
+          userId: row.user_id,
+          displayName: profile?.name || `Explorateur ${row.user_id.slice(0, 4)}`,
+          avatarUrl: profile?.avatar || null,
+          colorHue: row.color_hue ?? computeHue(row.who5_badge ? 3 : undefined, index),
+          luminosity: normalizeLuminosity(row.luminosity),
+          sizeScale: normalizeSize(row.size_scale),
+          who5Badge: row.who5_badge,
+          streakDays: undefined,
+          lastUpdated: row.week_end,
+          isMe: row.user_id === userId,
+        };
+      });
 
       // Dédupliquer par user_id (garder le plus récent)
       const uniqueByUser = new Map<string, AuraEntry>();
@@ -106,7 +170,7 @@ export const useAurasLeaderboard = (): UseAurasLeaderboardResult => {
       });
 
       const finalAuras = Array.from(uniqueByUser.values());
-      setAuras(finalAuras);
+      setRawAuras(finalAuras);
 
       const mine = finalAuras.find((a) => a.isMe) || null;
       setMyAura(mine);
@@ -115,6 +179,8 @@ export const useAurasLeaderboard = (): UseAurasLeaderboardResult => {
       const message = err instanceof Error ? err.message : 'Erreur inconnue';
       logger.error('Erreur chargement auras leaderboard:', err as Error, 'HOOK');
       setError(message);
+      // En cas d'erreur, afficher des données de démo
+      setRawAuras(generateDemoAuras());
     } finally {
       setLoading(false);
     }
@@ -138,6 +204,9 @@ export const useAurasLeaderboard = (): UseAurasLeaderboardResult => {
       supabase.removeChannel(channel);
     };
   }, [fetchAuras]);
+
+  // Mémoiser les auras pour éviter les re-renders inutiles
+  const auras = useMemo(() => rawAuras, [rawAuras]);
 
   return {
     auras,
