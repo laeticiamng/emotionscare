@@ -2287,6 +2287,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     component: 'B2BAnalyticsPage',
     guard: true,
     requireAuth: true,
+    aliases: ['/b2b/analytics'],
   },
   {
     name: 'app-b2b-alerts',
@@ -2300,6 +2301,48 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     meta: {
       title: 'Alertes RH - EmotionsCare B2B',
       description: 'Gestion des alertes bien-être anonymisées',
+    },
+  },
+  {
+    name: 'b2b-teams',
+    path: '/b2b/teams',
+    segment: 'manager',
+    role: 'manager',
+    layout: 'app',
+    component: 'B2BTeamsPage',
+    guard: true,
+    requireAuth: true,
+    meta: {
+      title: 'Gestion des Équipes - EmotionsCare B2B',
+      description: 'Gestion et suivi du bien-être des équipes',
+    },
+  },
+  {
+    name: 'b2b-events',
+    path: '/b2b/events',
+    segment: 'manager',
+    role: 'manager',
+    layout: 'app',
+    component: 'B2BEventsPage',
+    guard: true,
+    requireAuth: true,
+    meta: {
+      title: 'Événements Bien-être - EmotionsCare B2B',
+      description: 'Planification et gestion des événements bien-être',
+    },
+  },
+  {
+    name: 'b2b-social-cocon',
+    path: '/b2b/social-cocon',
+    segment: 'manager',
+    role: 'manager',
+    layout: 'app',
+    component: 'B2BSocialCoconPage',
+    guard: true,
+    requireAuth: true,
+    meta: {
+      title: 'Cocon Social B2B - EmotionsCare',
+      description: 'Plateforme collaborative pour le bien-être en entreprise',
     },
   },
   {
