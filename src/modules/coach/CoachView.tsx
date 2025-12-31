@@ -40,6 +40,9 @@ import {
   CoachSessionTimer,
   CoachSuggestionsPanel,
   CoachEndSessionButton,
+  CoachVoiceInput,
+  CoachEmotionDisplay,
+  CoachQuickReplies,
   type CoachPersonality,
 } from '@/modules/coach/components';
 
@@ -161,7 +164,9 @@ export function CoachView({ initialMode = 'b2c' }: { initialMode?: CoachMode }) 
     techniques: string[];
     resources: CoachResource[];
     followUpQuestions: string[];
+    emotion?: string;
   }>({ techniques: [], resources: [], followUpQuestions: [] });
+  const [detectedEmotion, setDetectedEmotion] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const controllerRef = useRef<AbortController | null>(null);
@@ -544,7 +549,11 @@ export function CoachView({ initialMode = 'b2c' }: { initialMode?: CoachMode }) 
             techniques: suggestions.techniques,
             resources: suggestions.resources,
             followUpQuestions: suggestions.followUpQuestions,
+            emotion: suggestions.emotion,
           });
+          if (suggestions.emotion) {
+            setDetectedEmotion(suggestions.emotion);
+          }
           
           // Persist techniques, resources and detected emotion to session
           if (sessionId && suggestions) {
@@ -854,6 +863,17 @@ export function CoachView({ initialMode = 'b2c' }: { initialMode?: CoachMode }) 
         ))}
       </section>
 
+      {/* Quick Replies */}
+      <CoachQuickReplies
+        onSelect={(text) => {
+          setInput(text);
+          textareaRef.current?.focus();
+        }}
+        emotion={detectedEmotion}
+        hasMessages={messages.length > 0}
+        disabled={isSending}
+      />
+
       <form onSubmit={handleSend} className="rounded-2xl border border-slate-200 bg-white/80 p-4 shadow-sm dark:border-slate-700 dark:bg-slate-900">
         <label className="sr-only" htmlFor="coach-message">
           Ton message pour le coach
@@ -869,7 +889,16 @@ export function CoachView({ initialMode = 'b2c' }: { initialMode?: CoachMode }) 
           disabled={isSending}
         />
         <div className="mt-3 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
-          <span>Astuce : Ctrl + Entrée pour envoyer rapidement.</span>
+          <div className="flex items-center gap-2">
+            <CoachVoiceInput
+              onTranscript={(text) => setInput(prev => prev + (prev ? ' ' : '') + text)}
+              disabled={isSending}
+            />
+            {detectedEmotion && (
+              <CoachEmotionDisplay emotion={detectedEmotion} size="sm" />
+            )}
+            <span className="hidden sm:inline">Ctrl + Entrée pour envoyer</span>
+          </div>
           <button
             type="submit"
             disabled={disableSend}
