@@ -27,4 +27,10 @@ export interface CoachChatProps {
   embedded?: boolean;
 }
 
+export interface Suggestion {
+  id: string;
+  text: string;
+  type: 'question' | 'reflection' | 'action' | 'exercise';
+}
+
 export type { ChatMessage, ChatConversation, ChatResponse } from './chat';

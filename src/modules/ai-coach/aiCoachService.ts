@@ -172,12 +172,22 @@ export async function addMessage(payload: AddCoachMessage): Promise<CoachMessage
 
     if (error) throw error;
 
-    // Incrémenter le compteur de messages de la session
-    await supabase.rpc('increment', {
-      table_name: 'ai_coach_sessions',
-      column_name: 'messages_count',
-      row_id: validated.session_id,
-    });
+    // Incrémenter le compteur de messages de la session manuellement
+    const { data: session } = await supabase
+      .from('ai_coach_sessions')
+      .select('messages_count')
+      .eq('id', validated.session_id)
+      .single();
+
+    if (session) {
+      await supabase
+        .from('ai_coach_sessions')
+        .update({
+          messages_count: (session.messages_count || 0) + 1,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', validated.session_id);
+    }
 
     return {
       id: data.id,

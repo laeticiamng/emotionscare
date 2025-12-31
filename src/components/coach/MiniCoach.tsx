@@ -107,9 +107,9 @@ const MiniCoach: React.FC<MiniCoachProps> = memo(({
     }
   }, [isProcessing]);
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (inputText.trim()) {
-      sendMessage(inputText, 'user');
+      await sendMessage(inputText);
       setInputText('');
       
       // Update stats
@@ -121,8 +121,8 @@ const MiniCoach: React.FC<MiniCoachProps> = memo(({
     }
   };
 
-  const handleQuickQuestion = (question: string) => {
-    sendMessage(question, 'user');
+  const handleQuickQuestion = async (question: string) => {
+    await sendMessage(question);
     
     // Update stats
     const newFavorites = { ...stats.favoriteQuestions };
