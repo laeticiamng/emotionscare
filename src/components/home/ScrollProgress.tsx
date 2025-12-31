@@ -41,9 +41,14 @@ const ScrollProgress: React.FC<ScrollProgressProps> = ({
         initial={{ opacity: 0 }}
         animate={{ opacity: progress > 5 ? 1 : 0 }}
         className={cn('fixed bottom-6 left-6 z-40', className)}
+        role="progressbar"
+        aria-valuenow={progress}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-label={`Progression de lecture : ${progress}%`}
       >
         <div className="relative w-12 h-12">
-          <svg className="w-12 h-12 transform -rotate-90">
+          <svg className="w-12 h-12 transform -rotate-90" aria-hidden="true">
             <circle
               cx="24"
               cy="24"
@@ -66,7 +71,7 @@ const ScrollProgress: React.FC<ScrollProgressProps> = ({
               strokeDashoffset={strokeDashoffset}
             />
           </svg>
-          <span className="absolute inset-0 flex items-center justify-center text-xs font-medium text-foreground">
+          <span className="absolute inset-0 flex items-center justify-center text-xs font-medium text-foreground" aria-hidden="true">
             {progress}%
           </span>
         </div>
@@ -110,6 +115,11 @@ const ScrollProgress: React.FC<ScrollProgressProps> = ({
         className
       )}
       style={{ scaleX }}
+      role="progressbar"
+      aria-valuenow={progress}
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-label={`Progression de lecture : ${progress}%`}
     />
   );
 };

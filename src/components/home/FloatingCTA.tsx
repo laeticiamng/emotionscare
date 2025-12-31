@@ -1,8 +1,9 @@
 /**
  * FloatingCTA - CTA flottant qui apparaît au scroll
+ * Avec tracking analytics intégré
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Heart, ArrowRight, X } from 'lucide-react';
@@ -13,15 +14,20 @@ interface FloatingCTAProps {
   className?: string;
   showAfterScroll?: number; // en pixels
   hideOnMobile?: boolean;
+  onView?: () => void;
+  onClick?: () => void;
 }
 
 const FloatingCTA: React.FC<FloatingCTAProps> = ({
   className,
   showAfterScroll = 500,
   hideOnMobile = false,
+  onView,
+  onClick,
 }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [isDismissed, setIsDismissed] = useState(false);
+  const [hasTrackedView, setHasTrackedView] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -32,6 +38,18 @@ const FloatingCTA: React.FC<FloatingCTAProps> = ({
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, [showAfterScroll]);
+
+  // Tracker la vue quand le CTA devient visible
+  useEffect(() => {
+    if (isVisible && !hasTrackedView && !isDismissed) {
+      onView?.();
+      setHasTrackedView(true);
+    }
+  }, [isVisible, hasTrackedView, isDismissed, onView]);
+
+  const handleClick = useCallback(() => {
+    onClick?.();
+  }, [onClick]);
 
   if (isDismissed) return null;
 
@@ -64,11 +82,12 @@ const FloatingCTA: React.FC<FloatingCTAProps> = ({
               asChild
               size="lg"
               className="shadow-2xl hover:shadow-primary/25 transition-all group px-6 py-6"
+              onClick={handleClick}
             >
               <Link to="/b2c">
-                <Heart className="h-5 w-5 mr-2 group-hover:animate-heartbeat" />
+                <Heart className="h-5 w-5 mr-2 group-hover:animate-heartbeat" aria-hidden="true" />
                 Essai gratuit 30 jours
-                <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
               </Link>
             </Button>
 

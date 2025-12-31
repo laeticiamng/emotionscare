@@ -86,6 +86,13 @@ const ModernHomePage: React.FC = () => {
   // Hooks analytics
   const { trackCTAClick, trackCTAView } = useHomePageAnalytics();
 
+  // Tracker les vues CTA au chargement de la page
+  React.useEffect(() => {
+    trackCTAView('hero-cta');
+    trackCTAView('header-signup');
+    trackCTAView('final-cta');
+  }, [trackCTAView]);
+
   // Actions rapides reframées - interventions, pas fonctionnalités
   const quickActions: QuickAction[] = [
     { 
@@ -113,6 +120,14 @@ const ModernHomePage: React.FC = () => {
 
   return (
     <div className="relative">
+      {/* Skip to main content - Accessibilité */}
+      <a 
+        href="#main-content" 
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:bg-primary focus:text-primary-foreground focus:px-4 focus:py-2 focus:rounded-md focus:outline-none"
+      >
+        Aller au contenu principal
+      </a>
+
       {/* Scroll Progress Indicator */}
       <ScrollProgress variant="bar" />
 
@@ -293,7 +308,9 @@ const ModernHomePage: React.FC = () => {
       )}
 
       {/* SECTION 1: Hero interventionnel */}
-      <EnrichedHeroSection />
+      <main id="main-content" role="main">
+        {/* SECTION 1: Hero interventionnel */}
+        <EnrichedHeroSection />
 
       {/* SECTION 2: Trust Badges - Badges de confiance */}
       <TrustBadges variant="inline" className="container mx-auto" />
@@ -353,6 +370,8 @@ const ModernHomePage: React.FC = () => {
           </Button>
         </div>
       </div>
+
+      </main>
 
       {/* SECTION 13: Footer (lazy loaded) */}
       <Suspense fallback={<div className="h-48 bg-muted/30" />}>
