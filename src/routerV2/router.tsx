@@ -162,6 +162,7 @@ const MoodPresetsAdminPage = lazy(() => import('@/pages/MoodPresetsAdminPage'));
 const B2CSocialCoconPage = lazy(() => import('@/pages/B2CSocialCoconPage'));
 const B2CStorySynthLabPage = lazy(() => import('@/pages/B2CStorySynthLabPage'));
 const B2CCommunautePage = lazy(() => import('@/pages/B2CCommunautePage'));
+const GroupSessionsPage = lazy(() => import('@/pages/GroupSessionsPage'));
 const B2BSelectionPage = lazy(() => import('@/pages/B2BSelectionPage'));
 
 // B2B Enterprise
@@ -437,6 +438,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   B2CSocialCoconPage,
   B2CStorySynthLabPage,
   B2CCommunautePage,
+  GroupSessionsPage,
   SubscribePage,
   
   // Pages fonctionnelles avancées
