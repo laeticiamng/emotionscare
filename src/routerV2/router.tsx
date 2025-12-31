@@ -184,7 +184,7 @@ const ValidationPage = lazy(() => import('@/pages/ValidationPage'));
 // CoachChatPage supprimé - utiliser B2CAICoachPage
 // VRSessionsPage supprimé - fonctionnalité dans B2CVRBreathGuidePage
 const JournalNewPage = lazy(() => import('@/pages/JournalNewPage'));
-const JournalSettingsPage = lazy(() => import('@/pages/JournalSettings'));
+const JournalSettingsPage = lazy(() => import('@/pages/journal/JournalSettingsPage'));
 const ReportingPage = lazy(() => import('@/pages/ReportingPage'));
 const ExportPage = lazy(() => import('@/pages/ExportPage'));
 
@@ -466,6 +466,13 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   // VRSessionsPage supprimé
   JournalNewPage,
   JournalSettingsPage,
+  JournalActivityPage,
+  JournalAnalyticsPage,
+  JournalArchivePage,
+  JournalFavoritesPage,
+  JournalGoalsPage,
+  JournalNotesPage,
+  JournalSearchPage,
   ReportingPage,
   ExportPage,
   // PricingPageWorking,
@@ -552,14 +559,6 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   ParkJourneyPage: ParkJourney, // Alias pour registry
   ParcoursXL,
   ParcoursXLPage: ParcoursXL, // Alias pour registry
-  // Journal sub-pages - redirigent vers la page principale
-  JournalActivityPage: B2CJournalPage,
-  JournalAnalyticsPage: B2CJournalPage,
-  JournalArchivePage: B2CJournalPage,
-  JournalFavoritesPage: B2CJournalPage,
-  JournalGoalsPage: B2CJournalPage,
-  JournalNotesPage: B2CJournalPage,
-  JournalSearchPage: B2CJournalPage,
   CoachProgramsPage,
   CoachProgramDetailPage,
   CoachSessionsPage,
