@@ -26,7 +26,7 @@ export function useVRExport() {
 
     const { data, error } = await supabase
       .from('vr_nebula_sessions')
-      .select('*')
+      .select('id, scene, breathing_pattern, duration_s, coherence_score, rmssd_delta, cycles_completed, created_at')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false });
 
@@ -35,11 +35,11 @@ export function useVRExport() {
       return [];
     }
 
-    return (data || []).map(s => ({
+    return (data || []).map((s: any) => ({
       id: s.id,
       date: new Date(s.created_at).toLocaleString('fr-FR'),
-      scene: s.scene,
-      pattern: s.breathing_pattern,
+      scene: s.scene || 'galaxy',
+      pattern: s.breathing_pattern || 'coherence',
       duration_minutes: Math.round((s.duration_s || 0) / 60 * 10) / 10,
       cycles: s.cycles_completed || 0,
       coherence_score: s.coherence_score,

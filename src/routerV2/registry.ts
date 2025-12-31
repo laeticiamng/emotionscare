@@ -581,6 +581,17 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     requireAuth: true,
     aliases: ['/vr-galaxy'],
   },
+  {
+    name: 'vr-breath-guide',
+    path: '/app/vr-breath-guide',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'simple',
+    component: 'VRBreathGuidePage',
+    guard: true,
+    requireAuth: true,
+    aliases: ['/vr-breath'],
+  },
   
   // ═══════════════════════════════════════════════════════════
   // B2C INTEGRATION - PARTICULIER ROUTES

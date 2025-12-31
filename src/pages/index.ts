@@ -24,6 +24,7 @@ export { default as EmotionSessionHistoryPage } from './EmotionSessionHistoryPag
 export { default as B2CVRBreathGuidePage } from './B2CVRBreathGuidePage';
 export { default as B2CVRGalaxyPage } from './B2CVRGalaxyPage';
 export { default as VRPage } from './app/VRPage';
+export { default as VRBreathGuidePage } from './app/VRBreathGuidePage';
 
 // Modules B2C Fun-First
 export { default as B2CFlashGlowPage } from './B2CFlashGlowPage';
