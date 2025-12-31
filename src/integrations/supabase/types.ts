@@ -5037,9 +5037,13 @@ export type Database = {
         Row: {
           change_type: string
           channel_id: string
+          consent_type: string | null
+          consent_version: string | null
           created_at: string
+          granted: boolean | null
           id: string
           ip_address: unknown
+          metadata: Json | null
           new_consent: boolean
           notes: string | null
           previous_consent: boolean | null
@@ -5051,9 +5055,13 @@ export type Database = {
         Insert: {
           change_type: string
           channel_id: string
+          consent_type?: string | null
+          consent_version?: string | null
           created_at?: string
+          granted?: boolean | null
           id?: string
           ip_address?: unknown
+          metadata?: Json | null
           new_consent: boolean
           notes?: string | null
           previous_consent?: boolean | null
@@ -5065,9 +5073,13 @@ export type Database = {
         Update: {
           change_type?: string
           channel_id?: string
+          consent_type?: string | null
+          consent_version?: string | null
           created_at?: string
+          granted?: boolean | null
           id?: string
           ip_address?: unknown
+          metadata?: Json | null
           new_consent?: boolean
           notes?: string | null
           previous_consent?: boolean | null
@@ -5524,8 +5536,10 @@ export type Database = {
           completed_at: string | null
           expires_at: string | null
           export_type: string
+          file_size_bytes: number | null
           file_url: string | null
           id: string
+          metadata: Json | null
           requested_at: string
           status: string
           user_id: string
@@ -5534,8 +5548,10 @@ export type Database = {
           completed_at?: string | null
           expires_at?: string | null
           export_type?: string
+          file_size_bytes?: number | null
           file_url?: string | null
           id?: string
+          metadata?: Json | null
           requested_at?: string
           status?: string
           user_id: string
@@ -5544,8 +5560,10 @@ export type Database = {
           completed_at?: string | null
           expires_at?: string | null
           export_type?: string
+          file_size_bytes?: number | null
           file_url?: string | null
           id?: string
+          metadata?: Json | null
           requested_at?: string
           status?: string
           user_id?: string
