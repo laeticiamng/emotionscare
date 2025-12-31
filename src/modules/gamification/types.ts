@@ -76,3 +76,32 @@ export interface LeaderboardUser {
   badges: string[];
   isCurrentUser?: boolean;
 }
+
+export interface GamificationNotification {
+  id: string;
+  type: 'achievement' | 'level_up' | 'streak' | 'challenge' | 'reward';
+  title: string;
+  description: string;
+  icon: string;
+  rarity?: RewardRarity;
+  points?: number;
+  xp?: number;
+  timestamp: string;
+  read: boolean;
+}
+
+export interface GamificationStats {
+  totalXpEarned: number;
+  totalPointsEarned: number;
+  totalChallengesCompleted: number;
+  totalAchievementsUnlocked: number;
+  currentStreak: number;
+  longestStreak: number;
+  favoriteActivity: string | null;
+  lastActivityDate: string | null;
+  weeklyProgress: {
+    day: string;
+    xp: number;
+    points: number;
+  }[];
+}

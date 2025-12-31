@@ -402,7 +402,118 @@ class GamificationService {
     
     return progress.streak;
   }
+
+  // ============================================================================
+  // LEADERBOARD
+  // ============================================================================
+  
+  async getLeaderboard(limit: number = 20): Promise<LeaderboardUser[]> {
+    try {
+      const { data, error } = await supabase
+        .from('leaderboard_entries')
+        .select('*')
+        .order('score', { ascending: false })
+        .limit(limit);
+
+      if (error) throw error;
+
+      const { data: userData } = await supabase.auth.getUser();
+      const currentUserId = userData?.user?.id;
+
+      // Get profiles for display names
+      const userIds = (data || []).map(e => e.user_id);
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('id, full_name, avatar_url')
+        .in('id', userIds);
+
+      const profileMap = new Map(
+        (profiles || []).map(p => [p.id, { name: p.full_name, avatar: p.avatar_url }])
+      );
+
+      return (data || []).map((entry, index) => {
+        const profile = profileMap.get(entry.user_id);
+        return {
+          rank: index + 1,
+          userId: entry.user_id,
+          displayName: profile?.name || `Utilisateur ${entry.user_id.slice(0, 4)}`,
+          avatarUrl: profile?.avatar || undefined,
+          points: entry.score || 0,
+          level: Math.floor((entry.score || 0) / 100) + 1,
+          streak: entry.streak_days || 0,
+          badges: entry.badges || [],
+          isCurrentUser: entry.user_id === currentUserId,
+        };
+      });
+    } catch (error) {
+      logger.error('Error fetching leaderboard', error as Error, 'GAMIFICATION');
+      // Return demo data on error
+      return this.getDemoLeaderboard();
+    }
+  }
+
+  private getDemoLeaderboard(): LeaderboardUser[] {
+    const names = ['Étoile Sereine', 'Zen Master', 'Flamme Paisible', 'Océan Calme', 'Lune Douce'];
+    return names.map((name, i) => ({
+      rank: i + 1,
+      userId: `demo-${i}`,
+      displayName: name,
+      points: 1000 - i * 150,
+      level: 10 - i,
+      streak: 14 - i * 2,
+      badges: ['Explorer', 'Zen'],
+      isCurrentUser: false,
+    }));
+  }
+
+  // ============================================================================
+  // ACTIVITY TRACKING
+  // ============================================================================
+  
+  async trackActivity(userId: string, activityType: string, metadata?: Record<string, unknown>): Promise<void> {
+    // Update streak
+    await this.updateStreak(userId);
+
+    // Update relevant challenges based on activity type
+    switch (activityType) {
+      case 'scan':
+        this.updateChallengeProgress(userId, 'daily-scan', 1);
+        this.updateAchievementProgress(userId, 'first-scan', 1);
+        break;
+      case 'meditation':
+        const minutes = (metadata?.minutes as number) || 5;
+        this.updateChallengeProgress(userId, 'daily-meditation', minutes);
+        const currentMed = this.getUserAchievements(userId).find(a => a.id === 'meditation-50');
+        if (currentMed) {
+          this.updateAchievementProgress(userId, 'meditation-50', currentMed.progress + 1);
+        }
+        break;
+      case 'journal':
+        this.updateChallengeProgress(userId, 'daily-journal', 1);
+        const currentJournal = this.getUserAchievements(userId).find(a => a.id === 'journal-30');
+        if (currentJournal) {
+          this.updateAchievementProgress(userId, 'journal-30', currentJournal.progress + 1);
+        }
+        break;
+      case 'music':
+        await this.addXp(userId, 5);
+        await this.addPoints(userId, 3);
+        break;
+      case 'breathing':
+        await this.addXp(userId, 10);
+        await this.addPoints(userId, 5);
+        break;
+    }
+
+    // Check level achievement
+    const progress = await this.getProgress(userId);
+    this.updateAchievementProgress(userId, 'level-25', progress.level);
+    
+    // Check streak achievements
+    this.updateAchievementProgress(userId, 'streak-7', progress.streak);
+
+    logger.debug(`Activity tracked: ${activityType}`, { userId, metadata }, 'GAMIFICATION');
+  }
 }
 
 export const gamificationService = new GamificationService();
-export default gamificationService;
