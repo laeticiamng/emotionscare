@@ -22245,6 +22245,7 @@ export type Database = {
           audio_url: string
           created_at: string
           id: string
+          is_favorite: boolean | null
           item_code: string | null
           music_id: string
           music_style: string
@@ -22257,6 +22258,7 @@ export type Database = {
           audio_url: string
           created_at?: string
           id?: string
+          is_favorite?: boolean | null
           item_code?: string | null
           music_id: string
           music_style: string
@@ -22269,6 +22271,7 @@ export type Database = {
           audio_url?: string
           created_at?: string
           id?: string
+          is_favorite?: boolean | null
           item_code?: string | null
           music_id?: string
           music_style?: string
