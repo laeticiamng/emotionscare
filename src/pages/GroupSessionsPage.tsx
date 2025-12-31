@@ -7,15 +7,19 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Users, Calendar, Plus, Sparkles, Video, TrendingUp } from 'lucide-react';
+import { Users, Calendar, Plus, Sparkles, Video, TrendingUp, Filter } from 'lucide-react';
 import PageRoot from '@/components/common/PageRoot';
 import { useAuth } from '@/contexts/AuthContext';
-import { useGroupSessions, useGroupSession } from '@/modules/group-sessions/hooks/useGroupSessions';
-import { GroupSessionCard } from '@/modules/group-sessions/components/GroupSessionCard';
-import { CreateSessionModal } from '@/modules/group-sessions/components/CreateSessionModal';
-import { GroupSessionDetail } from '@/modules/group-sessions/components/GroupSessionDetail';
-import { GroupSessionCalendar } from '@/modules/group-sessions/components/GroupSessionCalendar';
-import type { GroupSession } from '@/modules/group-sessions/types';
+import { useGroupSessions, useGroupSession, useSessionStats } from '@/modules/group-sessions/hooks';
+import { 
+  GroupSessionCard, 
+  CreateSessionModal, 
+  GroupSessionDetail, 
+  GroupSessionCalendar,
+  SessionStats,
+  SessionFilters
+} from '@/modules/group-sessions/components';
+import type { GroupSession, GroupSessionFilters } from '@/modules/group-sessions/types';
 import { motion } from 'framer-motion';
 
 const GroupSessionsPage: React.FC = () => {
@@ -26,22 +30,31 @@ const GroupSessionsPage: React.FC = () => {
     mySessions,
     categories,
     loading,
+    filters,
     createSession,
     registerForSession,
     unregisterFromSession,
     joinSession,
-    leaveSession
+    leaveSession,
+    updateFilters
   } = useGroupSessions({ autoLoad: true });
+
+  const { stats, loading: statsLoading } = useSessionStats();
 
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
   const [showDetail, setShowDetail] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
 
   const sessionDetail = useGroupSession(selectedSessionId || '');
 
   const handleSelectSession = (session: GroupSession) => {
     setSelectedSessionId(session.id);
     setShowDetail(true);
+  };
+
+  const handleClearFilters = () => {
+    updateFilters({});
   };
 
   const registeredIds = mySessions.map(s => s.id);
@@ -75,12 +88,36 @@ const GroupSessionsPage: React.FC = () => {
                   {liveSessions.length} en direct
                 </Badge>
               )}
+              <Button 
+                variant="outline" 
+                size="icon"
+                onClick={() => setShowFilters(!showFilters)}
+              >
+                <Filter className="h-4 w-4" />
+              </Button>
               <Button onClick={() => setShowCreateModal(true)} className="gap-2">
                 <Plus className="h-4 w-4" />
                 Créer une session
               </Button>
             </div>
           </motion.div>
+
+          {/* Filters */}
+          {showFilters && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="mb-6"
+            >
+              <SessionFilters
+                filters={filters}
+                categories={categories}
+                onFilterChange={updateFilters}
+                onClearFilters={handleClearFilters}
+              />
+            </motion.div>
+          )}
 
           {/* Live Sessions Banner */}
           {liveSessions.length > 0 && (
@@ -174,6 +211,16 @@ const GroupSessionsPage: React.FC = () => {
                   <CardContent className="py-12 text-center">
                     <Calendar className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                     <p className="text-muted-foreground">Vous n'êtes inscrit à aucune session</p>
+                    <Button 
+                      className="mt-4" 
+                      variant="outline"
+                      onClick={() => {
+                        const tabs = document.querySelector('[data-state="active"][value="upcoming"]');
+                        if (tabs) (tabs as HTMLElement).click();
+                      }}
+                    >
+                      Découvrir les sessions
+                    </Button>
                   </CardContent>
                 </Card>
               ) : (
@@ -193,12 +240,7 @@ const GroupSessionsPage: React.FC = () => {
             </TabsContent>
 
             <TabsContent value="stats">
-              <Card>
-                <CardContent className="py-12 text-center">
-                  <TrendingUp className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                  <p className="text-muted-foreground">Statistiques disponibles après vos premières sessions</p>
-                </CardContent>
-              </Card>
+              <SessionStats stats={stats} loading={statsLoading} />
             </TabsContent>
           </Tabs>
         </div>
