@@ -8,3 +8,7 @@ export { PresetShareDialog } from './PresetShareDialog';
 export { ImportExportPanel } from './ImportExportPanel';
 export { NotificationsPanel } from './NotificationsPanel';
 export { AnalyticsDashboard } from './AnalyticsDashboard';
+export { AudioVisualizer } from './AudioVisualizer';
+export { MoodMixerQuickActions } from './MoodMixerQuickActions';
+export { AmbientSoundsPanel } from './AmbientSoundsPanel';
+export { SessionTimer } from './SessionTimer';
