@@ -13,7 +13,6 @@ import type {
   DataDeletionRequest,
   PrivacyStats,
   PrivacyAuditLog,
-  DEFAULT_PRIVACY_PREFERENCES,
 } from './types';
 
 const LOG_CATEGORY = 'PRIVACY';
@@ -39,8 +38,14 @@ export async function getPrivacyPreferences(userId: string): Promise<PrivacyPref
       return await initializePrivacyPreferences(userId);
     }
 
+    // Récupérer les consentements individuels depuis privacy_consents
+    const { data: consentsData } = await supabase
+      .from('privacy_consents')
+      .select('consent_type, granted')
+      .eq('user_id', userId);
+
     // Mapper les colonnes DB vers notre interface
-    return mapDbToPreferences(data, userId);
+    return mapDbToPreferences(data, consentsData || [], userId);
   } catch (error) {
     logger.error('Exception fetching privacy preferences', error as Error, LOG_CATEGORY);
     return null;
@@ -69,9 +74,9 @@ export async function initializePrivacyPreferences(userId: string): Promise<Priv
     }
 
     // Log l'action
-    await logPrivacyAction(userId, 'preferences_initialized', 'privacy_preferences', userId, {});
+    await logPrivacyAction(userId, 'preferences_initialized', {});
 
-    return mapDbToPreferences(data, userId);
+    return mapDbToPreferences(data, [], userId);
   } catch (error) {
     logger.error('Exception initializing privacy preferences', error as Error, LOG_CATEGORY);
     // Retourner des valeurs par défaut en mémoire
@@ -99,20 +104,6 @@ export async function updatePrivacyPreference(
   value: boolean
 ): Promise<boolean> {
   try {
-    // Mettre à jour dans la table consent_history pour audit trail
-    const { error: consentError } = await supabase
-      .from('consent_history')
-      .insert({
-        user_id: userId,
-        consent_type: key,
-        granted: value,
-        consent_version: '1.0',
-      });
-
-    if (consentError) {
-      logger.warn('Error logging consent history', consentError, LOG_CATEGORY);
-    }
-
     // Si c'est analytics, mettre à jour la table principale
     if (key === 'analytics') {
       const { error } = await supabase
@@ -129,24 +120,27 @@ export async function updatePrivacyPreference(
       }
     }
 
-    // Stocker les autres préférences dans privacy_consents
+    // Stocker dans privacy_consents avec les bonnes colonnes
     const { error } = await supabase
       .from('privacy_consents')
-      .upsert({
-        user_id: userId,
-        consent_type: key,
-        consented: value,
-        consent_date: new Date().toISOString(),
-        version: '1.0',
-      });
+      .upsert(
+        {
+          user_id: userId,
+          consent_type: key,
+          granted: value,
+          source: 'settings',
+          granted_at: new Date().toISOString(),
+        },
+        { onConflict: 'user_id,consent_type' }
+      );
 
     if (error) {
       logger.error('Error updating privacy consent', error, LOG_CATEGORY);
       return false;
     }
 
-    // Log l'action
-    await logPrivacyAction(userId, 'preference_updated', 'privacy_preference', key, {
+    // Log l'action dans privacy_consents (pas consent_history qui a une structure différente)
+    await logPrivacyAction(userId, 'preference_updated', {
       preference: key,
       new_value: value,
     });
@@ -182,15 +176,15 @@ export async function updatePrivacyPreferences(
 }
 
 /**
- * Récupère l'historique des consentements
+ * Récupère l'historique des consentements depuis privacy_consents
  */
 export async function getConsentHistory(userId: string): Promise<ConsentRecord[]> {
   try {
     const { data, error } = await supabase
-      .from('consent_history')
+      .from('privacy_consents')
       .select('*')
       .eq('user_id', userId)
-      .order('created_at', { ascending: false })
+      .order('granted_at', { ascending: false })
       .limit(100);
 
     if (error) {
@@ -203,8 +197,9 @@ export async function getConsentHistory(userId: string): Promise<ConsentRecord[]
       user_id: record.user_id,
       consent_type: record.consent_type,
       granted: record.granted,
-      granted_at: record.created_at,
-      version: record.consent_version || '1.0',
+      granted_at: record.granted_at,
+      revoked_at: record.revoked_at,
+      version: '1.0',
     }));
   } catch (error) {
     logger.error('Exception fetching consent history', error as Error, LOG_CATEGORY);
@@ -236,7 +231,7 @@ export async function requestDataExport(
       return null;
     }
 
-    await logPrivacyAction(userId, 'export_requested', 'data_export', data.id, { type });
+    await logPrivacyAction(userId, 'export_requested', { type });
 
     return {
       id: data.id,
@@ -328,7 +323,7 @@ export async function requestAccountDeletion(
       return null;
     }
 
-    await logPrivacyAction(userId, 'deletion_requested', 'account', userId, { reason });
+    await logPrivacyAction(userId, 'deletion_requested', { reason });
 
     return {
       id: data.id,
@@ -361,7 +356,7 @@ export async function cancelDeletionRequest(userId: string): Promise<boolean> {
       return false;
     }
 
-    await logPrivacyAction(userId, 'deletion_cancelled', 'account', userId, {});
+    await logPrivacyAction(userId, 'deletion_cancelled', {});
 
     return true;
   } catch (error) {
@@ -376,18 +371,18 @@ export async function cancelDeletionRequest(userId: string): Promise<boolean> {
 export async function getPrivacyStats(userId: string): Promise<PrivacyStats> {
   try {
     // Compter les différents types de données
-    const [
-      { count: journalCount },
-      { count: assessmentCount },
-      { count: sessionCount },
-    ] = await Promise.all([
+    const [journalResult, assessmentResult, sessionResult] = await Promise.all([
       supabase.from('journal_entries').select('*', { count: 'exact', head: true }).eq('user_id', userId),
       supabase.from('assessments').select('*', { count: 'exact', head: true }).eq('user_id', userId),
       supabase.from('emotion_sessions').select('*', { count: 'exact', head: true }).eq('user_id', userId),
     ]);
 
-    const totalRecords = (journalCount || 0) + (assessmentCount || 0) + (sessionCount || 0);
-    const personalDataRecords = (journalCount || 0) + (assessmentCount || 0);
+    const journalCount = journalResult.count || 0;
+    const assessmentCount = assessmentResult.count || 0;
+    const sessionCount = sessionResult.count || 0;
+
+    const totalRecords = journalCount + assessmentCount + sessionCount;
+    const personalDataRecords = journalCount + assessmentCount;
     const anonymizedRecords = Math.floor(totalRecords * 0.3);
     const sharedDataRecords = 0; // Par défaut, aucune donnée partagée
 
@@ -428,10 +423,10 @@ export async function getPrivacyStats(userId: string): Promise<PrivacyStats> {
 export async function getPrivacyAuditLogs(userId: string): Promise<PrivacyAuditLog[]> {
   try {
     const { data, error } = await supabase
-      .from('consent_history')
+      .from('privacy_consents')
       .select('*')
       .eq('user_id', userId)
-      .order('created_at', { ascending: false })
+      .order('granted_at', { ascending: false })
       .limit(50);
 
     if (error) {
@@ -446,7 +441,7 @@ export async function getPrivacyAuditLogs(userId: string): Promise<PrivacyAuditL
       resource_type: 'privacy_preference',
       resource_id: log.consent_type,
       details: { consent_type: log.consent_type, granted: log.granted },
-      created_at: log.created_at,
+      created_at: log.granted_at,
     }));
   } catch (error) {
     logger.error('Exception fetching audit logs', error as Error, LOG_CATEGORY);
@@ -460,17 +455,17 @@ export async function getPrivacyAuditLogs(userId: string): Promise<PrivacyAuditL
 async function logPrivacyAction(
   userId: string,
   action: string,
-  resourceType: string,
-  resourceId: string,
   details: Record<string, unknown>
 ): Promise<void> {
   try {
-    await supabase.from('consent_history').insert({
+    // Utiliser privacy_consents pour le logging (structure correcte)
+    await supabase.from('privacy_consents').insert({
       user_id: userId,
       consent_type: action,
       granted: true,
-      consent_version: '1.0',
-      metadata: { resource_type: resourceType, resource_id: resourceId, ...details },
+      source: 'system',
+      granted_at: new Date().toISOString(),
+      metadata: details,
     });
   } catch (error) {
     logger.warn('Error logging privacy action', error as Error, LOG_CATEGORY);
@@ -480,17 +475,25 @@ async function logPrivacyAction(
 /**
  * Mappe les données DB vers notre interface
  */
-function mapDbToPreferences(data: Record<string, unknown>, userId: string): PrivacyPreferences {
+function mapDbToPreferences(
+  data: Record<string, unknown>, 
+  consents: Array<{ consent_type: string; granted: boolean }>,
+  userId: string
+): PrivacyPreferences {
+  // Créer un map des consentements
+  const consentMap = new Map<string, boolean>();
+  consents.forEach(c => consentMap.set(c.consent_type, c.granted));
+
   return {
     user_id: userId,
-    cam: false,
-    mic: false,
-    hr: false,
-    gps: false,
-    social: false,
-    nft: false,
-    analytics: data.analytics_opt_in as boolean ?? true,
-    personalization: true,
+    cam: consentMap.get('cam') ?? false,
+    mic: consentMap.get('mic') ?? false,
+    hr: consentMap.get('hr') ?? false,
+    gps: consentMap.get('gps') ?? false,
+    social: consentMap.get('social') ?? false,
+    nft: consentMap.get('nft') ?? false,
+    analytics: (data.analytics_opt_in as boolean) ?? consentMap.get('analytics') ?? true,
+    personalization: consentMap.get('personalization') ?? true,
     updated_at: (data.updated_at as string) || new Date().toISOString(),
   };
 }
