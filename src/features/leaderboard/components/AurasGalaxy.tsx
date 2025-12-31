@@ -111,7 +111,7 @@ export const AurasGalaxy = memo(function AurasGalaxy({
 
             {/* Galaxy container */}
             <div
-              className="relative rounded-xl overflow-hidden bg-gradient-to-b from-slate-900 via-indigo-950 to-violet-950"
+              className="relative rounded-xl overflow-hidden bg-gradient-to-b from-background via-secondary/30 to-primary/20"
               style={{ minHeight }}
               role="img"
               aria-label={`Ciel d'auras avec ${auras.length} participants`}

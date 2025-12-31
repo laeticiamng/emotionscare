@@ -49,7 +49,7 @@ export const AuraSphere = memo(function AuraSphere({ aura, index }: AuraSpherePr
             role="img"
             aria-label={`Aura de ${aura.displayName}${aura.who5Badge ? ` - ${aura.who5Badge}` : ''}`}
           >
-            {/* Glow effect */}
+            {/* Glow effect - durée stable basée sur index */}
             <motion.div
               className="absolute inset-0 rounded-full blur-md"
               style={{ backgroundColor: glowColor }}
@@ -58,7 +58,7 @@ export const AuraSphere = memo(function AuraSphere({ aura, index }: AuraSpherePr
                 opacity: [0.5, 0.8, 0.5],
               }}
               transition={{
-                duration: 3 + Math.random() * 2,
+                duration: 3 + (index % 5) * 0.4,
                 repeat: Infinity,
                 ease: 'easeInOut',
               }}
