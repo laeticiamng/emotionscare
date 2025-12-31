@@ -283,9 +283,72 @@ serve(async (req) => {
       );
     }
 
-    const { email, role, organizationId, customMessage } = await req.json();
+    const body = await req.json();
+    const { email, role, organizationId, customMessage, type, playlistId, playlistName, inviterName } = body;
     
-    // Validation des données
+    // Handle collaborative playlist invitations
+    if (type === 'collaborative_playlist') {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!email || !emailRegex.test(email)) {
+        return new Response(
+          JSON.stringify({ error: 'Email invalide' }),
+          { status: 400, headers: corsHeaders }
+        );
+      }
+
+      const frontendUrl = Deno.env.get('FRONTEND_URL') || 'https://app.emotionscare.com';
+      const inviteUrl = `${frontendUrl}/app/music/collab/${playlistId}`;
+      
+      const html = `
+<!DOCTYPE html>
+<html lang="fr">
+<head><meta charset="UTF-8"><title>Invitation Playlist Collaborative</title></head>
+<body style="margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; background-color: #f4f4f5;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; margin: 0 auto; background-color: #ffffff;">
+    <tr>
+      <td style="padding: 40px 30px; text-align: center; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);">
+        <h1 style="color: #ffffff; margin: 0;">🎵 EmotionsCare</h1>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding: 40px 30px;">
+        <h2 style="color: #1f2937;">Vous êtes invité(e) à collaborer !</h2>
+        <p style="color: #4b5563; line-height: 1.6;">
+          <strong>${inviterName || 'Un ami'}</strong> vous invite à rejoindre la playlist collaborative 
+          <strong>"${playlistName || 'Playlist partagée'}"</strong>.
+        </p>
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${inviteUrl}" 
+             style="display: inline-block; padding: 14px 40px; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); 
+                    color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 600;">
+            Rejoindre la playlist
+          </a>
+        </div>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+
+      const text = `${inviterName || 'Un ami'} vous invite à rejoindre la playlist collaborative "${playlistName}". Cliquez ici: ${inviteUrl}`;
+      
+      const emailResult = await sendEmail(email, `🎵 Invitation à collaborer sur "${playlistName}"`, html, text);
+      
+      if (!emailResult.success) {
+        console.error(`[Invitation] Failed to send collab email to ${email}:`, emailResult.error);
+        return new Response(
+          JSON.stringify({ error: 'Email non envoyé', details: emailResult.error }),
+          { status: 500, headers: corsHeaders }
+        );
+      }
+
+      return new Response(
+        JSON.stringify({ success: true, message: 'Invitation envoyée' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    
+    // Standard organization invitation flow
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email || !emailRegex.test(email)) {
       return new Response(
