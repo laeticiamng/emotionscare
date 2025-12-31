@@ -2,7 +2,7 @@
  * AurasGalaxy - Ciel d'auras visuelles (Leaderboard sans chiffres)
  * Affiche les auras comme un ciel cosmique où chaque utilisateur est une étoile
  */
-import { memo } from 'react';
+import { memo, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { RefreshCw, Sparkles, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,11 +17,25 @@ interface AurasGalaxyProps {
   showHeader?: boolean;
 }
 
+/** Génère des positions stables pour les étoiles de fond */
+const generateStarPositions = (count: number) => {
+  return Array.from({ length: count }, (_, i) => ({
+    id: i,
+    left: ((i * 17 + 13) % 100),
+    top: ((i * 23 + 7) % 100),
+    opacity: 0.3 + ((i * 11) % 50) / 100,
+    size: 1 + ((i * 7) % 3),
+  }));
+};
+
 export const AurasGalaxy = memo(function AurasGalaxy({
   minHeight = '400px',
   showHeader = true,
 }: AurasGalaxyProps) {
   const { auras, myAura, loading, error, refresh } = useAurasLeaderboard();
+
+  // Positions stables des étoiles de fond (ne change pas à chaque render)
+  const starPositions = useMemo(() => generateStarPositions(50), []);
 
   return (
     <Card className="bg-gradient-to-br from-background via-secondary/10 to-primary/5 border-border overflow-hidden">
@@ -56,7 +70,7 @@ export const AurasGalaxy = memo(function AurasGalaxy({
             <Loader2 className="h-8 w-8 animate-spin text-primary" aria-hidden="true" />
             <p>Chargement du ciel d'auras…</p>
           </div>
-        ) : error ? (
+        ) : error && !auras.length ? (
           <div
             className="flex flex-col items-center justify-center gap-3 text-destructive"
             style={{ minHeight }}
@@ -66,17 +80,6 @@ export const AurasGalaxy = memo(function AurasGalaxy({
             <Button variant="outline" size="sm" onClick={refresh}>
               Réessayer
             </Button>
-          </div>
-        ) : !auras.length ? (
-          <div
-            className="flex flex-col items-center justify-center gap-3 text-muted-foreground"
-            style={{ minHeight }}
-          >
-            <Sparkles className="h-10 w-10" aria-hidden="true" />
-            <p>Aucune aura à afficher pour le moment.</p>
-            <p className="text-xs">
-              Complétez des séances pour voir votre aura apparaître.
-            </p>
           </div>
         ) : (
           <div className="space-y-4">
@@ -113,16 +116,18 @@ export const AurasGalaxy = memo(function AurasGalaxy({
               role="img"
               aria-label={`Ciel d'auras avec ${auras.length} participants`}
             >
-              {/* Starfield background */}
+              {/* Starfield background - positions stables */}
               <div className="absolute inset-0 opacity-30">
-                {Array.from({ length: 50 }).map((_, i) => (
+                {starPositions.map((star) => (
                   <div
-                    key={i}
-                    className="absolute w-1 h-1 bg-white rounded-full"
+                    key={star.id}
+                    className="absolute rounded-full bg-white"
                     style={{
-                      left: `${Math.random() * 100}%`,
-                      top: `${Math.random() * 100}%`,
-                      opacity: 0.3 + Math.random() * 0.5,
+                      left: `${star.left}%`,
+                      top: `${star.top}%`,
+                      width: star.size,
+                      height: star.size,
+                      opacity: star.opacity,
                     }}
                   />
                 ))}

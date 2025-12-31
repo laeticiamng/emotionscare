@@ -12,3 +12,4 @@ export { AuraSphere } from './components/AuraSphere';
 export { AurasGalaxy } from './components/AurasGalaxy';
 export { LeaderboardStats } from './components/LeaderboardStats';
 export { MyAuraCard } from './components/MyAuraCard';
+export { AuraShareButton } from './components/AuraShareButton';
