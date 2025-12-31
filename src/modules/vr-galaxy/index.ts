@@ -25,6 +25,7 @@ export { GalaxySessionHistoryPanel } from './components/GalaxySessionHistoryPane
 // ============================================================================
 
 export { useVRGalaxy } from './hooks/useVRGalaxy';
+export { useVRGalaxyEnriched } from './hooks/useVRGalaxyEnriched';
 
 // ============================================================================
 // TYPES
