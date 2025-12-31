@@ -753,9 +753,10 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     segment: 'consumer',
     role: 'consumer',
     layout: 'app-sidebar',
-    component: 'B2CCommunautePage',
+    component: 'CommunityPage',
     guard: true,
-    aliases: ['/community'],
+    requireAuth: true,
+    aliases: ['/community', '/community-groups', '/groups'],
   },
   // ═══════════════════════════════════════════════════════════
   // EXCHANGE HUB V2.0 - 4 Marchés
@@ -770,20 +771,6 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: true,
     requireAuth: true,
     aliases: ['/exchange'],
-  },
-  // ═══════════════════════════════════════════════════════════
-  // NOUVELLES FONCTIONNALITÉS V2.1
-  // ═══════════════════════════════════════════════════════════
-  {
-    name: 'community',
-    path: '/app/community',
-    segment: 'consumer',
-    role: 'consumer',
-    layout: 'app-sidebar',
-    component: 'CommunityPage',
-    guard: true,
-    requireAuth: true,
-    aliases: ['/community-groups', '/groups'],
   },
   {
     name: 'buddies',
