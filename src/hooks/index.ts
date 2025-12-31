@@ -17,6 +17,15 @@ export {
 // Export des hooks natifs optimisés
 export { usePerformanceOptimization, useConditionalLazyLoad } from './performance/useOptimizedPerformance';
 
+// Scan hooks
+export { useScanHistory } from './useScanHistory';
+export { useScanSettings } from './useScanSettings';
+export { useEmotionScan } from './useEmotionScan';
+export { useEmotionScanHistory } from './useEmotionScanHistory';
+export { useScanPageState } from './useScanPageState';
+export { useMultiSourceScan } from './useMultiSourceScan';
+export { useScanRealtime } from './useScanRealtime';
+
 // Toast system - compatible shadcn
 export { useToast, toast } from './use-toast';
 export { useClinicalHints } from './useClinicalHints';
