@@ -21,6 +21,11 @@ import {
   Wind,
   TreePalm,
   Flame,
+  RefreshCw,
+  Award,
+  Heart,
+  AlertCircle,
+  Loader2,
 } from 'lucide-react';
 import { useAccessibilityAudit } from '@/lib/accessibility-checker';
 import { motion, useReducedMotion } from 'framer-motion';
@@ -336,7 +341,11 @@ export default function B2CDashboardPage() {
               disabled={statsLoading}
               aria-label="Actualiser les statistiques"
             >
-              <TrendingUp className="h-4 w-4 mr-1" aria-hidden="true" />
+              {statsLoading ? (
+                <Loader2 className="h-4 w-4 mr-1 animate-spin" aria-hidden="true" />
+              ) : (
+                <RefreshCw className="h-4 w-4 mr-1" aria-hidden="true" />
+              )}
               Actualiser
             </Button>
           </div>
@@ -468,8 +477,9 @@ export default function B2CDashboardPage() {
             </h2>
             <div className="grid gap-3">
               {clinicalHintsList.slice(0, 3).map((hint: string, index: number) => (
-                <Card key={index} className="bg-muted/50">
-                  <CardContent className="py-3 px-4">
+                <Card key={`hint-${index}-${hint.slice(0, 10)}`} className="bg-muted/50">
+                  <CardContent className="py-3 px-4 flex items-center gap-3">
+                    <Heart className="h-4 w-4 text-primary shrink-0" aria-hidden="true" />
                     <p className="text-sm">{hint}</p>
                   </CardContent>
                 </Card>
@@ -544,7 +554,7 @@ export default function B2CDashboardPage() {
         </section>
 
         {/* Recommandations personnalisées */}
-        <section aria-labelledby="recommendations-title">
+        <section aria-labelledby="recommendations-title" className="mb-8">
           <h2 id="recommendations-title" className="text-xl font-semibold mb-4">
             Recommandé pour vous
           </h2>
@@ -554,6 +564,14 @@ export default function B2CDashboardPage() {
                 <Skeleton className="h-40 w-full" />
                 <Skeleton className="h-40 w-full" />
               </>
+            ) : recommendations.length === 0 ? (
+              <Card className="md:col-span-2 bg-muted/30">
+                <CardContent className="py-8 text-center">
+                  <AlertCircle className="h-8 w-8 text-muted-foreground mx-auto mb-3" aria-hidden="true" />
+                  <p className="text-muted-foreground">Aucune recommandation pour le moment</p>
+                  <p className="text-xs text-muted-foreground mt-1">Effectuez un scan émotionnel pour débloquer des suggestions</p>
+                </CardContent>
+              </Card>
             ) : (
               recommendations.map((rec) => {
                 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -573,7 +591,7 @@ export default function B2CDashboardPage() {
                 const RecIcon = iconMap[rec.icon] ?? Brain;
                 const recColor = colorMap[rec.icon] ?? 'bg-muted text-muted-foreground';
                 return (
-                  <Card key={rec.id}>
+                  <Card key={rec.id} className="hover:shadow-md transition-shadow">
                     <CardHeader>
                       <CardTitle className="flex items-center space-x-2">
                         <div className={`p-2 rounded ${recColor}`}>
@@ -586,7 +604,7 @@ export default function B2CDashboardPage() {
                     <CardContent>
                       <p className="text-sm text-muted-foreground mb-4">{rec.description}</p>
                       <Button asChild size="sm">
-                        <Link to={rec.to}>Commencer</Link>
+                        <Link to={rec.to} aria-label={`Commencer: ${rec.title}`}>Commencer</Link>
                       </Button>
                     </CardContent>
                   </Card>
@@ -594,6 +612,35 @@ export default function B2CDashboardPage() {
               })
             )}
           </div>
+        </section>
+
+        {/* Section Achievements & Badges */}
+        <section aria-labelledby="achievements-title" className="mb-8">
+          <h2 id="achievements-title" className="text-xl font-semibold mb-4 flex items-center gap-2">
+            <Award className="h-5 w-5 text-warning" aria-hidden="true" />
+            Vos récompenses
+          </h2>
+          <Card className="bg-gradient-to-r from-warning/5 to-primary/5">
+            <CardContent className="py-6">
+              <div className="flex flex-wrap gap-3 justify-center md:justify-start">
+                <Badge variant="outline" className="px-3 py-1 text-sm border-warning/50">
+                  🔥 Série {userStats.currentStreak} jours
+                </Badge>
+                <Badge variant="outline" className="px-3 py-1 text-sm border-primary/50">
+                  ⭐ Niveau {userStats.level}
+                </Badge>
+                <Badge variant="outline" className="px-3 py-1 text-sm border-success/50">
+                  ✅ {userStats.weeklyGoals} objectifs
+                </Badge>
+                <Badge variant="outline" className="px-3 py-1 text-sm border-info/50">
+                  🧠 {userStats.completedSessions} scans
+                </Badge>
+              </div>
+              <p className="text-center text-xs text-muted-foreground mt-4">
+                Continuez à utiliser l'application pour débloquer de nouvelles récompenses
+              </p>
+            </CardContent>
+          </Card>
         </section>
       </main>
 
