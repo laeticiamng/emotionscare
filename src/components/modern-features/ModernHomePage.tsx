@@ -12,6 +12,7 @@ import { Link } from 'react-router-dom';
 import { useUserStatsQuery, useUserStatsRealtime } from '@/hooks/useUserStatsQuery';
 import { useOnlineUsers } from '@/hooks/useOnlineUsers';
 import { useStatsNotifications } from '@/hooks/useStatsNotifications';
+import { useHomePageAnalytics } from '@/hooks/useHomePageAnalytics';
 import { StatsCard, StatsGrid } from '@/components/common/StatsCard';
 import {
   ArrowRight,
@@ -31,6 +32,14 @@ import QuickStartModules from '@/components/home/QuickStartModules';
 import CommunityEngagement from '@/components/home/CommunityEngagement';
 import AcademySection from '@/components/home/AcademySection';
 import ParkPreviewCard from '@/components/home/ParkPreviewCard';
+import TrustBadges from '@/components/home/TrustBadges';
+import LiveCounter from '@/components/home/LiveCounter';
+import NewsletterSection from '@/components/home/NewsletterSection';
+import SocialProofBar from '@/components/home/SocialProofBar';
+import CookieConsent from '@/components/home/CookieConsent';
+import FloatingCTA from '@/components/home/FloatingCTA';
+import PressLogos from '@/components/home/PressLogos';
+import ScrollProgress from '@/components/home/ScrollProgress';
 
 // Code splitting : lazy load des sections non critiques
 const FAQSection = lazy(() => import('@/components/home/FAQSection'));
@@ -74,6 +83,9 @@ const ModernHomePage: React.FC = () => {
   // Activer les notifications automatiques pour les changements de stats
   useStatsNotifications(userStats, statsLoading);
 
+  // Hooks analytics
+  const { trackCTAClick, trackCTAView } = useHomePageAnalytics();
+
   // Actions rapides reframées - interventions, pas fonctionnalités
   const quickActions: QuickAction[] = [
     { 
@@ -101,6 +113,9 @@ const ModernHomePage: React.FC = () => {
 
   return (
     <div className="relative">
+      {/* Scroll Progress Indicator */}
+      <ScrollProgress variant="bar" />
+
       {/* Header avec nom de la plateforme */}
       <header className="bg-background/95 backdrop-blur-sm border-b border-border/50 sticky top-0 z-50">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
@@ -133,7 +148,7 @@ const ModernHomePage: React.FC = () => {
                 <Link to="/login">
                   <Button variant="ghost" size="sm">Se connecter</Button>
                 </Link>
-                <Link to="/signup">
+                <Link to="/signup" onClick={() => trackCTAClick('header-signup')}>
                   <Button size="sm">Commencer</Button>
                 </Link>
               </>
@@ -141,6 +156,7 @@ const ModernHomePage: React.FC = () => {
           </nav>
         </div>
       </header>
+
       {/* Bannière utilisateur connecté - version interventionnelle */}
       {isAuthenticated && user && (
         <div className="bg-gradient-to-r from-primary/10 to-blue-500/10 border-b border-primary/20 py-4">
@@ -254,7 +270,7 @@ const ModernHomePage: React.FC = () => {
               <div className="text-sm font-medium mb-2">Besoin d'intervenir maintenant ?</div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                 {quickActions.map((action, index) => (
-                  <Link key={index} to={action.href}>
+                  <Link key={index} to={action.href} onClick={() => trackCTAClick(`quick-action-${action.title}`)}>
                     <Card className="bg-card/30 backdrop-blur-sm border-border/20 hover:bg-card/40 transition-all cursor-pointer">
                       <CardContent className="p-3">
                         <div className="flex items-center gap-3">
@@ -279,27 +295,45 @@ const ModernHomePage: React.FC = () => {
       {/* SECTION 1: Hero interventionnel */}
       <EnrichedHeroSection />
 
-      {/* SECTION 2: Carte du Parc - Accès direct */}
+      {/* SECTION 2: Trust Badges - Badges de confiance */}
+      <TrustBadges variant="inline" className="container mx-auto" />
+
+      {/* SECTION 3: Live Counter - Stats temps réel */}
+      {!isAuthenticated && (
+        <div className="py-8 bg-muted/10">
+          <div className="container mx-auto px-4">
+            <LiveCounter variant="horizontal" />
+          </div>
+        </div>
+      )}
+
+      {/* SECTION 4: Carte du Parc - Accès direct */}
       <ParkPreviewCard />
 
-      {/* SECTION 3: Onboarding ultra-court */}
+      {/* SECTION 5: Onboarding ultra-court */}
       <OnboardingGuide />
 
-      {/* SECTION 4: Protocoles d'activation */}
+      {/* SECTION 6: Protocoles d'activation */}
       <QuickStartModules />
 
-      {/* SECTION 5: Academy - Comprendre pour reprendre la main */}
+      {/* SECTION 7: Press Logos - Mentions presse */}
+      <PressLogos variant="static" />
+
+      {/* SECTION 8: Academy - Comprendre pour reprendre la main */}
       <AcademySection />
 
-      {/* SECTION 6: Engagement communautaire */}
+      {/* SECTION 9: Engagement communautaire */}
       <CommunityEngagement />
 
-      {/* SECTION 6: Témoignages (lazy loaded) */}
+      {/* SECTION 10: Témoignages (lazy loaded) */}
       <Suspense fallback={<SectionSkeleton />}>
         <TestimonialsSection />
       </Suspense>
 
-      {/* SECTION 7: FAQ (lazy loaded) */}
+      {/* SECTION 11: Newsletter */}
+      <NewsletterSection variant="full" />
+
+      {/* SECTION 12: FAQ (lazy loaded) */}
       <Suspense fallback={<SectionSkeleton />}>
         <FAQSection />
       </Suspense>
@@ -311,7 +345,7 @@ const ModernHomePage: React.FC = () => {
           <p className="text-muted-foreground mb-6 max-w-xl mx-auto">
             Rejoins les {onlineCount > 0 ? onlineCount.toLocaleString() : '...'} personnes en ligne qui prennent soin d'elles en ce moment.
           </p>
-          <Button size="lg" asChild>
+          <Button size="lg" asChild onClick={() => trackCTAClick('final-cta')}>
             <Link to="/signup">
               Commencer gratuitement
               <ArrowRight className="h-4 w-4 ml-2" />
@@ -320,10 +354,15 @@ const ModernHomePage: React.FC = () => {
         </div>
       </div>
 
-      {/* SECTION 8: Footer (lazy loaded) */}
+      {/* SECTION 13: Footer (lazy loaded) */}
       <Suspense fallback={<div className="h-48 bg-muted/30" />}>
         <Footer />
       </Suspense>
+
+      {/* Floating elements - Social Proof, CTA, Cookie Consent */}
+      <SocialProofBar position="bottom" interval={10000} />
+      {!isAuthenticated && <FloatingCTA showAfterScroll={800} />}
+      <CookieConsent />
     </div>
   );
 };
