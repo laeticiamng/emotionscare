@@ -1,11 +1,12 @@
 import React, { Suspense, useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { routes } from '@/lib/routes';
 import { useOptimizedPage } from '@/hooks/useOptimizedPage';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { usePageSEO } from '@/hooks/usePageSEO';
 import {
   Brain,
@@ -26,6 +27,10 @@ import {
   Heart,
   AlertCircle,
   Loader2,
+  User,
+  Bell,
+  Activity,
+  Calendar,
 } from 'lucide-react';
 import { useAccessibilityAudit } from '@/lib/accessibility-checker';
 import { motion, useReducedMotion } from 'framer-motion';
@@ -43,6 +48,7 @@ import { useAuth } from '@/contexts/AuthContext';
 const WeeklyPlanCard = React.lazy(() => import('@/components/dashboard/widgets/WeeklyPlanCard'));
 const RecentEmotionScansWidget = React.lazy(() => import('@/components/dashboard/widgets/RecentEmotionScansWidget'));
 const JournalSummaryCard = React.lazy(() => import('@/components/dashboard/widgets/JournalSummaryCard'));
+const WeeklyTrendChart = React.lazy(() => import('@/components/dashboard/widgets/WeeklyTrendChart'));
 
 type QuickAction = {
   id: string;
@@ -164,15 +170,25 @@ export default function B2CDashboardPage() {
   const setEphemeralSignal = useDashboardStore((state) => state.setEphemeralSignal);
   const [activeTone, setActiveTone] = useState(summaryTone);
   const shouldReduceMotion = useReducedMotion();
-  const { hints: clinicalHintsList, isLoading: hintsLoading } = useClinicalHints('dashboard');
+  const { hints: clinicalHintsList, isLoading: hintsLoading, error: hintsError, refresh: refreshHints } = useClinicalHints('dashboard');
   const clinicalTone = summaryTone;
+  const location = useLocation();
   
   // Stats réelles depuis Supabase
-  const { stats: userStats, loading: statsLoading, refetch: refetchStats } = useUserStatsQuery();
+  const { stats: userStats, loading: statsLoading, refetch: refetchStats, error: statsError } = useUserStatsQuery();
   useUserStatsRealtime();
   
   // Recommandations dynamiques
-  const { recommendations, loading: recsLoading } = useDynamicRecommendations();
+  const { recommendations, loading: recsLoading, refetch: refetchRecs } = useDynamicRecommendations();
+  
+  // Auto-refresh toutes les 5 minutes
+  useEffect(() => {
+    const interval = setInterval(() => {
+      refetchStats();
+      refetchRecs();
+    }, 5 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, [refetchStats, refetchRecs]);
 
   const musicSnapshot = playback.snapshot;
   const presetLabel = musicSnapshot?.presetId && musicSnapshot.presetId in PRESET_DETAILS
@@ -241,7 +257,7 @@ export default function B2CDashboardPage() {
       </a>
 
       {/* Navigation principale */}
-      <nav role="navigation" aria-label="Navigation du tableau de bord" className="bg-card border-b">
+      <nav role="navigation" aria-label="Navigation du tableau de bord" className="bg-card border-b sticky top-0 z-40">
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
@@ -251,28 +267,54 @@ export default function B2CDashboardPage() {
               </Badge>
             </div>
             <div className="flex items-center space-x-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                asChild
-                aria-label="Accéder aux paramètres"
-              >
-                <Link to="/settings/general">
-                  <Settings className="h-4 w-4" aria-hidden="true" />
-                  <span className="sr-only">Paramètres</span>
-                </Link>
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                asChild
-                aria-label="Accéder à l'aide"
-              >
-                <Link to="/help">
-                  <HelpCircle className="h-4 w-4" aria-hidden="true" />
-                  <span className="sr-only">Aide</span>
-                </Link>
-              </Button>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="sm" asChild aria-label="Notifications">
+                      <Link to="/notifications">
+                        <Bell className="h-4 w-4" aria-hidden="true" />
+                      </Link>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Notifications</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="sm" asChild aria-label="Mon profil">
+                      <Link to="/settings/profile">
+                        <User className="h-4 w-4" aria-hidden="true" />
+                      </Link>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Mon profil</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="sm" asChild aria-label="Paramètres">
+                      <Link to="/settings/general">
+                        <Settings className="h-4 w-4" aria-hidden="true" />
+                      </Link>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Paramètres</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="sm" asChild aria-label="Aide">
+                      <Link to="/help">
+                        <HelpCircle className="h-4 w-4" aria-hidden="true" />
+                      </Link>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Aide</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
           </div>
         </div>
@@ -327,7 +369,21 @@ export default function B2CDashboardPage() {
           </Suspense>
         </section>
 
-
+        {/* Graphique tendance hebdomadaire */}
+        <section aria-labelledby="weekly-trend" className="mb-8">
+          <h2 id="weekly-trend" className="sr-only">
+            Tendance de la semaine
+          </h2>
+          <Suspense
+            fallback={(
+              <div aria-busy="true" aria-live="polite">
+                <DashboardWidgetSkeleton lines={3} />
+              </div>
+            )}
+          >
+            <WeeklyTrendChart />
+          </Suspense>
+        </section>
         {/* Statistiques rapides - données réelles */}
         <section aria-labelledby="stats-title" className="mb-8">
           <div className="flex items-center justify-between mb-4">
@@ -466,18 +522,86 @@ export default function B2CDashboardPage() {
                 )}
               </CardContent>
             </Card>
+
+            {/* Carte Score Bien-être */}
+            <Card className="md:col-span-2 lg:col-span-1 bg-gradient-to-br from-primary/5 to-accent/5">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                  <Activity className="h-4 w-4" aria-hidden="true" />
+                  Score bien-être
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {statsLoading ? (
+                  <Skeleton className="h-12 w-full" />
+                ) : (
+                  <div className="flex items-center gap-4">
+                    <div className="text-3xl font-bold text-primary">
+                      {Math.round(50 + (userStats.currentStreak * 2) + (userStats.weeklyGoals * 5))}
+                      <span className="text-lg font-normal text-muted-foreground">/100</span>
+                    </div>
+                    <div className="flex-1">
+                      <Progress 
+                        value={Math.min(100, 50 + (userStats.currentStreak * 2) + (userStats.weeklyGoals * 5))}
+                        className="h-3"
+                        aria-label="Score de bien-être"
+                      />
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Basé sur votre activité récente
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+          
+          {/* Indicateur mise à jour en temps réel */}
+          <div className="flex items-center justify-end gap-2 mt-2 text-xs text-muted-foreground" aria-live="polite">
+            <span className="inline-block h-2 w-2 rounded-full bg-success animate-pulse" aria-hidden="true" />
+            <span>Données synchronisées en temps réel</span>
           </div>
         </section>
 
         {/* Conseils cliniques personnalisés */}
-        {!hintsLoading && clinicalHintsList.length > 0 && (
-          <section aria-labelledby="clinical-hints-title" className="mb-8">
-            <h2 id="clinical-hints-title" className="text-xl font-semibold mb-4">
-              Conseils personnalisés
-            </h2>
-            <div className="grid gap-3">
+        <section aria-labelledby="clinical-hints-title" className="mb-8">
+          <h2 id="clinical-hints-title" className="text-xl font-semibold mb-4 flex items-center gap-2">
+            <Heart className="h-5 w-5 text-primary" aria-hidden="true" />
+            Conseils personnalisés
+          </h2>
+          {hintsLoading ? (
+            <div className="grid gap-3" aria-busy="true" aria-live="polite">
+              {[1, 2, 3].map((i) => (
+                <Card key={i} className="bg-muted/50">
+                  <CardContent className="py-3 px-4">
+                    <Skeleton className="h-4 w-full" />
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : hintsError ? (
+            <Card className="bg-destructive/5 border-destructive/20">
+              <CardContent className="py-4 flex items-center gap-3">
+                <AlertCircle className="h-5 w-5 text-destructive shrink-0" aria-hidden="true" />
+                <div>
+                  <p className="text-sm text-destructive">Impossible de charger les conseils</p>
+                  <Button variant="ghost" size="sm" onClick={refreshHints} className="mt-1 h-auto p-0 text-xs">
+                    Réessayer
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ) : clinicalHintsList.length === 0 ? (
+            <Card className="bg-muted/30">
+              <CardContent className="py-6 text-center">
+                <Activity className="h-8 w-8 text-muted-foreground mx-auto mb-2" aria-hidden="true" />
+                <p className="text-sm text-muted-foreground">Effectuez un scan pour recevoir des conseils personnalisés</p>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="grid gap-3" role="list" aria-live="polite">
               {clinicalHintsList.slice(0, 3).map((hint: string, index: number) => (
-                <Card key={`hint-${index}-${hint.slice(0, 10)}`} className="bg-muted/50">
+                <Card key={`hint-${index}-${hint.slice(0, 10)}`} className="bg-muted/50" role="listitem">
                   <CardContent className="py-3 px-4 flex items-center gap-3">
                     <Heart className="h-4 w-4 text-primary shrink-0" aria-hidden="true" />
                     <p className="text-sm">{hint}</p>
@@ -485,8 +609,8 @@ export default function B2CDashboardPage() {
                 </Card>
               ))}
             </div>
-          </section>
-        )}
+          )}
+        </section>
 
         {/* Actions rapides */}
         <section id="quick-actions" aria-labelledby="actions-title" className="mb-8">
