@@ -18,15 +18,15 @@ interface Goal {
   id: string;
   title: string;
   target_value: number;
-  current_value: number;
+  current_progress: number;
   completed: boolean;
-  due_date: string | null;
+  end_date: string | null;
 }
 
 async function fetchUserGoals(userId: string): Promise<Goal[]> {
   const { data, error } = await supabase
     .from('user_goals')
-    .select('id, title, target_value, current_value, completed, due_date')
+    .select('id, title, target_value, current_progress, completed, end_date')
     .eq('user_id', userId)
     .order('created_at', { ascending: false })
     .limit(5);
@@ -40,9 +40,9 @@ async function fetchUserGoals(userId: string): Promise<Goal[]> {
     id: goal.id,
     title: goal.title || 'Objectif sans titre',
     target_value: goal.target_value || 100,
-    current_value: goal.current_value || 0,
+    current_progress: goal.current_progress || 0,
     completed: goal.completed || false,
-    due_date: goal.due_date
+    end_date: goal.end_date
   }));
 }
 
@@ -59,7 +59,7 @@ export default function GoalsProgressWidget() {
   const activeGoals = goals?.filter(g => !g.completed) || [];
   const completedCount = goals?.filter(g => g.completed).length || 0;
   const totalProgress = activeGoals.length > 0
-    ? activeGoals.reduce((sum, g) => sum + Math.min(100, (g.current_value / g.target_value) * 100), 0) / activeGoals.length
+    ? activeGoals.reduce((sum, g) => sum + Math.min(100, (g.current_progress / g.target_value) * 100), 0) / activeGoals.length
     : 0;
 
   return (
@@ -94,9 +94,9 @@ export default function GoalsProgressWidget() {
               Aucun objectif défini pour le moment
             </p>
             <Button asChild size="sm" variant="outline">
-              <Link to="/goals/new" className="inline-flex items-center gap-1">
+              <Link to="/app/gamification" className="inline-flex items-center gap-1">
                 <Plus className="h-3 w-3" />
-                Créer un objectif
+                Définir mes objectifs
               </Link>
             </Button>
           </div>
@@ -118,7 +118,7 @@ export default function GoalsProgressWidget() {
             {/* Liste des objectifs actifs */}
             <div className="space-y-2">
               {activeGoals.slice(0, 3).map((goal) => {
-                const progress = Math.min(100, (goal.current_value / goal.target_value) * 100);
+                const progress = Math.min(100, (goal.current_progress / goal.target_value) * 100);
                 return (
                   <div 
                     key={goal.id}
@@ -151,7 +151,7 @@ export default function GoalsProgressWidget() {
             {/* Lien vers tous les objectifs */}
             <div className="flex justify-end">
               <Button asChild variant="ghost" size="sm">
-                <Link to="/goals" className="inline-flex items-center gap-1 text-xs">
+                <Link to="/app/gamification" className="inline-flex items-center gap-1 text-xs">
                   Voir tous les objectifs
                   <ArrowRight className="h-3 w-3" />
                 </Link>

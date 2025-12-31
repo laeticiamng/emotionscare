@@ -52,6 +52,7 @@ const JournalSummaryCard = React.lazy(() => import('@/components/dashboard/widge
 const WeeklyTrendChart = React.lazy(() => import('@/components/dashboard/widgets/WeeklyTrendChart'));
 const GoalsProgressWidget = React.lazy(() => import('@/components/dashboard/widgets/GoalsProgressWidget'));
 const NotificationsWidget = React.lazy(() => import('@/components/dashboard/widgets/NotificationsWidget'));
+const DynamicRecommendationsWidget = React.lazy(() => import('@/components/dashboard/widgets/DynamicRecommendationsWidget'));
 
 type QuickAction = {
   id: string;
@@ -670,7 +671,21 @@ export default function B2CDashboardPage() {
           </Suspense>
         </section>
 
-        {/* Nouveaux widgets: Objectifs et Notifications côte à côte */}
+        {/* Recommandations dynamiques */}
+        <section aria-labelledby="recommendations-section" className="mb-8">
+          <h2 id="recommendations-section" className="sr-only">Recommandations personnalisées</h2>
+          <Suspense
+            fallback={(
+              <div aria-busy="true" aria-live="polite">
+                <DashboardWidgetSkeleton lines={4} />
+              </div>
+            )}
+          >
+            <DynamicRecommendationsWidget />
+          </Suspense>
+        </section>
+
+        {/* Widgets: Objectifs et Notifications côte à côte */}
         <section aria-labelledby="widgets-section" className="mb-8">
           <div className="grid gap-6 md:grid-cols-2">
             <Suspense
