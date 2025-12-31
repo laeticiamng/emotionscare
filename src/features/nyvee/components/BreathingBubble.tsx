@@ -1,19 +1,23 @@
-// @ts-nocheck
-import { useEffect, useRef, useState } from 'react';
+/**
+ * BreathingBubble - Bulle de respiration animée
+ */
+
+import { useEffect, useRef, useState, memo } from 'react';
 import { motion, useAnimation } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useHaptics } from '@/hooks/useHaptics';
+import type { BreathingIntensity } from '@/modules/nyvee/types';
 
 interface BreathingBubbleProps {
   isActive: boolean;
-  intensity?: 'calm' | 'moderate' | 'intense';
+  intensity?: BreathingIntensity;
   onCycleComplete?: () => void;
   className?: string;
 }
 
-const BUBBLE_COLORS = {
+const BUBBLE_CLASSES = {
   calm: 'from-emerald-400/40 via-cyan-400/30 to-blue-400/40',
-  moderate: 'from-violet-400/40 via-purple-400/30 to-indigo-400/40',
+  moderate: 'from-violet-400/40 via-purple-400/30 to-primary/40',
   intense: 'from-orange-400/40 via-rose-400/30 to-red-400/40',
 } as const;
 
@@ -23,7 +27,13 @@ const CYCLE_CONFIG = {
   exhale: 6000,
 };
 
-export const BreathingBubble = ({
+const PHASE_LABELS = {
+  inhale: 'Inspire',
+  hold: 'Retiens',
+  exhale: 'Expire',
+};
+
+export const BreathingBubble = memo(({
   isActive,
   intensity = 'calm',
   onCycleComplete,
@@ -39,6 +49,8 @@ export const BreathingBubble = ({
   useEffect(() => {
     if (!isActive) {
       if (phaseTimeoutRef.current) clearTimeout(phaseTimeoutRef.current);
+      bubbleControls.stop();
+      particlesControls.stop();
       return;
     }
 
@@ -101,17 +113,23 @@ export const BreathingBubble = ({
   }, [isActive, bubbleControls, particlesControls, cycleCount, onCycleComplete, pattern]);
 
   return (
-    <div className={cn('relative flex h-[400px] w-full items-center justify-center', className)}>
+    <div 
+      className={cn('relative flex h-[400px] w-full items-center justify-center', className)}
+      role="img"
+      aria-label={`Bulle de respiration - ${PHASE_LABELS[phase]} - Cycle ${cycleCount + 1} sur 6`}
+      aria-live="polite"
+    >
       {/* Particles background */}
       <motion.div
         animate={particlesControls}
         className="absolute inset-0"
         initial={{ opacity: 0.3, scale: 0.8 }}
+        aria-hidden="true"
       >
         {[...Array(20)].map((_, i) => (
           <motion.div
             key={i}
-            className="absolute h-2 w-2 rounded-full bg-white/30 blur-sm"
+            className="absolute h-2 w-2 rounded-full bg-foreground/20 blur-sm"
             style={{
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
@@ -136,12 +154,12 @@ export const BreathingBubble = ({
         className={cn(
           'relative h-64 w-64 rounded-full backdrop-blur-xl',
           'bg-gradient-to-br',
-          BUBBLE_COLORS[intensity],
-          'border border-white/20 shadow-2xl',
+          BUBBLE_CLASSES[intensity],
+          'border border-border/20 shadow-2xl',
           'flex items-center justify-center'
         )}
         style={{
-          boxShadow: '0 0 80px rgba(147, 197, 253, 0.3), inset 0 0 60px rgba(255, 255, 255, 0.1)',
+          boxShadow: '0 0 80px hsl(var(--primary) / 0.2), inset 0 0 60px hsl(var(--primary) / 0.1)',
         }}
       >
         {/* Inner glow */}
@@ -151,7 +169,8 @@ export const BreathingBubble = ({
             scale: phase === 'hold' ? 1.1 : 1,
           }}
           transition={{ duration: 1 }}
-          className="absolute inset-4 rounded-full bg-white/10 blur-2xl"
+          className="absolute inset-4 rounded-full bg-foreground/5 blur-2xl"
+          aria-hidden="true"
         />
 
         {/* Phase indicator */}
@@ -161,13 +180,11 @@ export const BreathingBubble = ({
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="text-2xl font-light text-foreground/90"
+            className="text-2xl font-light text-foreground"
           >
-            {phase === 'inhale' && 'Inspire'}
-            {phase === 'hold' && 'Retiens'}
-            {phase === 'exhale' && 'Expire'}
+            {PHASE_LABELS[phase]}
           </motion.p>
-          <p className="mt-2 text-sm text-foreground/60">Cycle {cycleCount + 1}/6</p>
+          <p className="mt-2 text-sm text-muted-foreground">Cycle {cycleCount + 1}/6</p>
         </div>
       </motion.div>
 
@@ -175,7 +192,7 @@ export const BreathingBubble = ({
       {[0, 1, 2].map((i) => (
         <motion.div
           key={i}
-          className="absolute rounded-full border border-white/10"
+          className="absolute rounded-full border border-border/10"
           style={{
             width: `${280 + i * 40}px`,
             height: `${280 + i * 40}px`,
@@ -189,10 +206,13 @@ export const BreathingBubble = ({
             repeat: Infinity,
             delay: i * 0.5,
           }}
+          aria-hidden="true"
         />
       ))}
     </div>
   );
-};
+});
+
+BreathingBubble.displayName = 'BreathingBubble';
 
 export default BreathingBubble;

@@ -1,9 +1,9 @@
 /**
  * Nyvee Service - API calls et business logic
+ * Re-export depuis le service unifié pour compatibilité
  */
 
 import { supabase } from '@/integrations/supabase/client';
-import { captureException } from '@/lib/ai-monitoring';
 import { Sentry } from '@/lib/errors/sentry-compat';
 import type {
   CreateNyveeSession,
