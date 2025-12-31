@@ -1,6 +1,7 @@
 /**
  * Module principal SEUIL
  * Expérience complète de régulation émotionnelle proactive
+ * Avec intégration des mini-sessions guidées
  */
 import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -11,6 +12,7 @@ import { SeuilScale } from './SeuilScale';
 import { SeuilMessage } from './SeuilMessage';
 import { SeuilActions } from './SeuilActions';
 import { SeuilExitMessage } from './SeuilExitMessage';
+import { SeuilMiniSession } from './SeuilMiniSession';
 import { useCreateSeuilEvent, useCompleteSeuilSession } from '../hooks';
 import { getZoneFromLevel } from '../constants';
 import type { SeuilActionType } from '../types';
@@ -20,7 +22,7 @@ interface SeuilModuleProps {
   initialLevel?: number;
 }
 
-type SeuilStep = 'scale' | 'message' | 'action' | 'exit';
+type SeuilStep = 'scale' | 'message' | 'action' | 'mini-session' | 'exit';
 
 export const SeuilModule: React.FC<SeuilModuleProps> = ({
   onClose,
@@ -30,6 +32,7 @@ export const SeuilModule: React.FC<SeuilModuleProps> = ({
   const [level, setLevel] = useState(initialLevel);
   const [eventId, setEventId] = useState<string | null>(null);
   const [selectedAction, setSelectedAction] = useState<string | null>(null);
+  const [miniSessionType, setMiniSessionType] = useState<'3min' | '5min_guided' | null>(null);
 
   const createEvent = useCreateSeuilEvent();
   const completeSession = useCompleteSeuilSession();
@@ -64,6 +67,13 @@ export const SeuilModule: React.FC<SeuilModuleProps> = ({
       'close_day': 'Journée clôturée',
     };
 
+    // Si c'est une mini-session, on la lance
+    if (actionType === '3min' || actionType === '5min_guided') {
+      setMiniSessionType(actionType);
+      setStep('mini-session');
+      return;
+    }
+
     setSelectedAction(actionLabels[actionType]);
 
     if (eventId) {
@@ -75,6 +85,32 @@ export const SeuilModule: React.FC<SeuilModuleProps> = ({
 
     setStep('exit');
   }, [eventId, completeSession]);
+
+  const handleMiniSessionComplete = useCallback(async () => {
+    const actionLabels: Record<'3min' | '5min_guided', string> = {
+      '3min': '3 minutes effectuées',
+      '5min_guided': '5 minutes guidées complétées',
+    };
+
+    if (miniSessionType) {
+      setSelectedAction(actionLabels[miniSessionType]);
+
+      if (eventId) {
+        await completeSession.mutateAsync({
+          eventId,
+          actionType: miniSessionType,
+        });
+      }
+    }
+
+    setMiniSessionType(null);
+    setStep('exit');
+  }, [eventId, miniSessionType, completeSession]);
+
+  const handleMiniSessionCancel = useCallback(() => {
+    setMiniSessionType(null);
+    setStep('action');
+  }, []);
 
   const handleSkipToExit = useCallback(async () => {
     if (eventId) {
@@ -188,6 +224,14 @@ export const SeuilModule: React.FC<SeuilModuleProps> = ({
                     </Button>
                   )}
                 </motion.div>
+              )}
+
+              {step === 'mini-session' && miniSessionType && (
+                <SeuilMiniSession
+                  actionType={miniSessionType}
+                  onComplete={handleMiniSessionComplete}
+                  onCancel={handleMiniSessionCancel}
+                />
               )}
 
               {step === 'exit' && (
