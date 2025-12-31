@@ -565,9 +565,21 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     segment: 'consumer',
     role: 'consumer',
     layout: 'app-sidebar',
+    component: 'VRPage',
+    guard: true,
+    requireAuth: true,
+    aliases: ['/vr'],
+  },
+  {
+    name: 'vr-galaxy',
+    path: '/app/vr-galaxy',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app-sidebar',
     component: 'B2CVRGalaxyPage',
     guard: true,
-    aliases: ['/vr'],
+    requireAuth: true,
+    aliases: ['/vr-galaxy'],
   },
   
   // ═══════════════════════════════════════════════════════════
