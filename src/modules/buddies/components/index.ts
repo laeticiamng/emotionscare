@@ -11,3 +11,6 @@ export { EmojiPicker } from './EmojiPicker';
 export { MoodTracker } from './MoodTracker';
 export { BuddyRecommendations } from './BuddyRecommendations';
 export { NotificationsPanel } from './NotificationsPanel';
+export { OnlineBuddiesList } from './OnlineBuddiesList';
+export { QuickActions } from './QuickActions';
+export { TypingIndicator } from './TypingIndicator';
