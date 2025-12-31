@@ -8,7 +8,7 @@ import { useMusic } from '@/hooks/useMusic';
 import { MusicTrack } from '@/types/music';
 import { toast } from '@/hooks/use-toast';
 import { useMusicHistory, useLastPlayedTrack } from '@/hooks/music/useMusicSettings';
-import { useGamification } from '@/hooks/useGamification';
+import { useGamification } from '@/modules/gamification';
 import { logger } from '@/lib/logger';
 
 export const useEnhancedMusicPlayer = () => {
