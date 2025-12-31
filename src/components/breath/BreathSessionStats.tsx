@@ -24,8 +24,8 @@ interface StatCardProps {
 const StatCard: React.FC<StatCardProps> = ({ icon, label, value, unit = '', trend, trendValue, onClick }) => (
   <div 
     className={cn(
-      "flex flex-col gap-2 rounded-xl border border-slate-800/50 bg-slate-900/40 px-4 py-3 transition-all",
-      onClick && "cursor-pointer hover:bg-slate-900/60 hover:border-slate-700/50"
+      "flex flex-col gap-2 rounded-xl border border-border/50 bg-card/40 px-4 py-3 transition-all",
+      onClick && "cursor-pointer hover:bg-card/60 hover:border-border"
     )}
     onClick={onClick}
     role={onClick ? "button" : undefined}
@@ -34,15 +34,15 @@ const StatCard: React.FC<StatCardProps> = ({ icon, label, value, unit = '', tren
   >
     <div className="flex items-center justify-between">
       <div className="flex items-center gap-2">
-        <div className="text-amber-400/80">{icon}</div>
-        <p className="text-xs font-medium text-slate-400">{label}</p>
+        <div className="text-primary/80">{icon}</div>
+        <p className="text-xs font-medium text-muted-foreground">{label}</p>
       </div>
       {trend && (
         <div className={cn(
           "flex items-center gap-1 text-xs",
-          trend === 'up' && "text-green-400",
-          trend === 'down' && "text-orange-400",
-          trend === 'stable' && "text-slate-500"
+          trend === 'up' && "text-success",
+          trend === 'down' && "text-warning",
+          trend === 'stable' && "text-muted-foreground"
         )}>
           {trend === 'up' && <TrendingUp className="h-3 w-3" />}
           {trend === 'down' && <TrendingDown className="h-3 w-3" />}
@@ -52,10 +52,10 @@ const StatCard: React.FC<StatCardProps> = ({ icon, label, value, unit = '', tren
       )}
     </div>
     <div className="flex items-end justify-between">
-      <p className="text-xl font-semibold text-slate-100">
-        {value}<span className="text-sm text-slate-400 ml-1">{unit}</span>
+      <p className="text-xl font-semibold text-foreground">
+        {value}<span className="text-sm text-muted-foreground ml-1">{unit}</span>
       </p>
-      {onClick && <ChevronRight className="h-4 w-4 text-slate-500" />}
+      {onClick && <ChevronRight className="h-4 w-4 text-muted-foreground" />}
     </div>
   </div>
 );
@@ -138,14 +138,14 @@ export const BreathSessionStats: React.FC = () => {
 
   if (loading) {
     return (
-      <Card className="border-slate-800/50 bg-slate-950/40" data-zero-number-check="true">
+      <Card className="border-border/50 bg-card/40" data-zero-number-check="true">
         <CardHeader>
-          <CardTitle className="text-lg font-semibold text-slate-100">Tes statistiques respiratoires</CardTitle>
+          <CardTitle className="text-lg font-semibold text-foreground">Tes statistiques respiratoires</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             {[...Array(4)].map((_, i) => (
-              <Skeleton key={i} className="h-20 bg-slate-800/30" />
+              <Skeleton key={i} className="h-20 bg-muted/30" />
             ))}
           </div>
         </CardContent>
@@ -155,17 +155,17 @@ export const BreathSessionStats: React.FC = () => {
 
   return (
     <>
-      <Card className="border-slate-800/50 bg-slate-950/40" data-zero-number-check="true">
+      <Card className="border-border/50 bg-card/40" data-zero-number-check="true">
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle className="text-lg font-semibold text-slate-100">
+            <CardTitle className="text-lg font-semibold text-foreground">
               Tes statistiques respiratoires
             </CardTitle>
             <div className="flex gap-2">
               <Button 
                 variant="ghost" 
                 size="sm" 
-                className="h-8 text-slate-400 hover:text-slate-100"
+                className="h-8 text-muted-foreground hover:text-foreground"
                 onClick={handleShare}
                 aria-label="Partager les statistiques"
               >
@@ -174,7 +174,7 @@ export const BreathSessionStats: React.FC = () => {
               <Button 
                 variant="ghost" 
                 size="sm" 
-                className="h-8 text-slate-400 hover:text-slate-100"
+                className="h-8 text-muted-foreground hover:text-foreground"
                 onClick={() => setShowDetails(true)}
               >
                 Détails
@@ -219,12 +219,12 @@ export const BreathSessionStats: React.FC = () => {
           {/* Weekly goal progress */}
           <div className="space-y-2">
             <div className="flex items-center justify-between text-sm">
-              <span className="text-slate-400">Objectif hebdo</span>
-              <span className="text-slate-200">{stats.weeklyMinutes}/{weeklyGoal} min</span>
+              <span className="text-muted-foreground">Objectif hebdo</span>
+              <span className="text-foreground">{stats.weeklyMinutes}/{weeklyGoal} min</span>
             </div>
             <Progress value={goalProgress} className="h-2" />
             {goalProgress >= 100 && (
-              <div className="flex items-center gap-2 text-xs text-green-400">
+              <div className="flex items-center gap-2 text-xs text-success">
                 <Award className="h-3 w-3" />
                 Objectif atteint ! 🎉
               </div>
@@ -232,8 +232,8 @@ export const BreathSessionStats: React.FC = () => {
           </div>
 
           {stats.averageSessionDuration > 0 && (
-            <p className="text-sm text-slate-400">
-              Durée moyenne: <span className="text-slate-200">{Math.round(stats.averageSessionDuration / 60)}min {stats.averageSessionDuration % 60}s</span>
+            <p className="text-sm text-muted-foreground">
+              Durée moyenne: <span className="text-foreground">{Math.round(stats.averageSessionDuration / 60)}min {stats.averageSessionDuration % 60}s</span>
             </p>
           )}
         </CardContent>
@@ -248,42 +248,42 @@ export const BreathSessionStats: React.FC = () => {
           </DialogHeader>
           <div className="space-y-4 mt-4">
             <div className="grid grid-cols-2 gap-4">
-              <div className="text-center p-4 bg-slate-900/50 rounded-lg">
-                <div className="text-3xl font-bold text-amber-400">{stats.totalSessions}</div>
-                <div className="text-sm text-slate-400">Séances totales</div>
+              <div className="text-center p-4 bg-muted/50 rounded-lg">
+                <div className="text-3xl font-bold text-primary">{stats.totalSessions}</div>
+                <div className="text-sm text-muted-foreground">Séances totales</div>
               </div>
-              <div className="text-center p-4 bg-slate-900/50 rounded-lg">
-                <div className="text-3xl font-bold text-cyan-400">{Math.round(stats.totalMinutes / 60)}h</div>
-                <div className="text-sm text-slate-400">Heures de pratique</div>
+              <div className="text-center p-4 bg-muted/50 rounded-lg">
+                <div className="text-3xl font-bold text-info">{Math.round(stats.totalMinutes / 60)}h</div>
+                <div className="text-sm text-muted-foreground">Heures de pratique</div>
               </div>
-              <div className="text-center p-4 bg-slate-900/50 rounded-lg">
-                <div className="text-3xl font-bold text-green-400">{stats.currentStreak}</div>
-                <div className="text-sm text-slate-400">Jours consécutifs</div>
+              <div className="text-center p-4 bg-muted/50 rounded-lg">
+                <div className="text-3xl font-bold text-success">{stats.currentStreak}</div>
+                <div className="text-sm text-muted-foreground">Jours consécutifs</div>
               </div>
-              <div className="text-center p-4 bg-slate-900/50 rounded-lg">
-                <div className="text-3xl font-bold text-purple-400">{Math.round(stats.averageSessionDuration / 60)}</div>
-                <div className="text-sm text-slate-400">Min/séance en moyenne</div>
+              <div className="text-center p-4 bg-muted/50 rounded-lg">
+                <div className="text-3xl font-bold text-accent">{Math.round(stats.averageSessionDuration / 60)}</div>
+                <div className="text-sm text-muted-foreground">Min/séance en moyenne</div>
               </div>
             </div>
 
             {/* Milestones */}
             <div className="space-y-2">
-              <h4 className="font-medium text-slate-200">Prochains jalons</h4>
+              <h4 className="font-medium text-foreground">Prochains jalons</h4>
               <div className="space-y-2">
                 {stats.totalSessions < 10 && (
-                  <div className="flex items-center justify-between p-2 bg-slate-900/30 rounded">
+                  <div className="flex items-center justify-between p-2 bg-muted/30 rounded">
                     <span className="text-sm">10 séances</span>
                     <Progress value={(stats.totalSessions / 10) * 100} className="w-24 h-2" />
                   </div>
                 )}
                 {stats.totalMinutes < 100 && (
-                  <div className="flex items-center justify-between p-2 bg-slate-900/30 rounded">
+                  <div className="flex items-center justify-between p-2 bg-muted/30 rounded">
                     <span className="text-sm">100 minutes</span>
                     <Progress value={(stats.totalMinutes / 100) * 100} className="w-24 h-2" />
                   </div>
                 )}
                 {stats.currentStreak < 7 && (
-                  <div className="flex items-center justify-between p-2 bg-slate-900/30 rounded">
+                  <div className="flex items-center justify-between p-2 bg-muted/30 rounded">
                     <span className="text-sm">7 jours d'affilée</span>
                     <Progress value={(stats.currentStreak / 7) * 100} className="w-24 h-2" />
                   </div>

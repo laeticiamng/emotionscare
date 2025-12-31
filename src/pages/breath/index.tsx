@@ -4,7 +4,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { captureException } from '@/lib/ai-monitoring';
 import { Sentry } from '@/lib/errors/sentry-compat';
-import { Loader2, Wind, BookOpen, Zap, Trophy, Calendar, Download } from 'lucide-react';
+import { Loader2, Wind, BookOpen, Zap, Trophy, Calendar, History, Sparkles } from 'lucide-react';
 
 import PageHeader from '@/components/ui/PageHeader';
 import { Button } from '@/components/ui/button';
@@ -32,6 +32,8 @@ import { BreathProgressMilestones } from '@/components/breath/BreathProgressMile
 import { BreathCalendar } from '@/components/breath/BreathCalendar';
 import { BreathRecommendationWidget } from '@/components/breath/BreathRecommendationWidget';
 import { BreathExportButton } from '@/components/breath/BreathExportButton';
+import { BreathStreakWidget } from '@/components/breath/BreathStreakWidget';
+import { BreathSessionHistory } from '@/components/breath/BreathSessionHistory';
 import { useBreathSessions } from '@/hooks/useBreathSessions';
 
 import ZeroNumberBoundary from '@/components/a11y/ZeroNumberBoundary';
@@ -55,14 +57,14 @@ interface AssessmentPromptProps {
 }
 
 const AssessmentPrompt: React.FC<AssessmentPromptProps> = ({ title, description, cta, onStart, onSkip }) => (
-  <Card className="border-amber-500/30 bg-slate-950/80 text-slate-100" data-zero-number-check="true">
+  <Card className="border-warning/30 bg-card/80" data-zero-number-check="true">
     <CardHeader>
-      <CardTitle className="text-lg font-semibold text-amber-100/90">{title}</CardTitle>
-      <CardDescription className="text-sm text-slate-200/80">{description}</CardDescription>
+      <CardTitle className="text-lg font-semibold text-warning">{title}</CardTitle>
+      <CardDescription className="text-sm text-muted-foreground">{description}</CardDescription>
     </CardHeader>
     <CardContent className="flex flex-wrap gap-3">
       <Button onClick={onStart}>{cta}</Button>
-      <Button variant="ghost" onClick={onSkip} className="text-slate-200/70">
+      <Button variant="ghost" onClick={onSkip} className="text-muted-foreground">
         Plus tard
       </Button>
     </CardContent>
@@ -139,14 +141,14 @@ const AssessmentDialog: React.FC<AssessmentDialogProps> = ({ assessment, kind, l
           }}
         >
           {!items.length ? (
-            <div className="flex items-center gap-2 text-slate-400">
+            <div className="flex items-center gap-2 text-muted-foreground">
               <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
               <span>Chargement des ressentis…</span>
             </div>
           ) : (
             items.map((item) => (
               <div key={item.id} className="space-y-3">
-                <p className="text-base font-medium text-slate-100/90">{item.prompt}</p>
+                <p className="text-base font-medium text-foreground">{item.prompt}</p>
                 <RadioGroup
                   className="grid gap-2"
                   value={(() => {
@@ -177,8 +179,8 @@ const AssessmentDialog: React.FC<AssessmentDialogProps> = ({ assessment, kind, l
                         className={cn(
                           'flex cursor-pointer items-center gap-3 rounded-xl border p-3 text-sm font-medium transition-colors',
                           isSelected
-                            ? 'border-amber-300/80 bg-amber-400/10 text-amber-100'
-                            : 'border-slate-800/60 bg-slate-900/80 text-slate-100/90 hover:border-slate-700',
+                            ? 'border-primary/80 bg-primary/10 text-primary'
+                            : 'border-border/60 bg-card/80 text-foreground hover:border-border'
                         )}
                       >
                         <RadioGroupItem value={value} id={`${item.id}-${value}`} className="sr-only" />
@@ -198,7 +200,7 @@ const AssessmentDialog: React.FC<AssessmentDialogProps> = ({ assessment, kind, l
               Envoyer
             </Button>
             {assessment.state.status === 'submitted' && (
-              <span className="text-sm text-emerald-600">Merci ! Tes réponses ont été prises en compte.</span>
+              <span className="text-sm text-success">Merci ! Tes réponses ont été prises en compte.</span>
             )}
           </DialogFooter>
         </form>
@@ -217,7 +219,7 @@ const BreathPage: React.FC = () => {
 
   const staiAssessment = orchestration.assessments.stai;
   const isiAssessment = orchestration.assessments.isi;
-  const { stats } = useBreathSessions();
+  const { stats, sessions } = useBreathSessions();
 
   useEffect(() => {
     if (orchestration.mode === 'sleep_preset') {
@@ -232,6 +234,17 @@ const BreathPage: React.FC = () => {
       message: 'breath:session:start',
       level: 'info',
       data: { mode: sleepMode ? 'sleep_preset' : 'default', profile: orchestration.profile },
+    });
+  };
+
+  const handleStartRecommendedSession = (pattern: string, duration: number) => {
+    // Start a session with the recommended pattern
+    setSessionActive(true);
+    Sentry.addBreadcrumb({
+      category: 'breath',
+      message: 'breath:session:start:recommended',
+      level: 'info',
+      data: { pattern, duration, profile: orchestration.profile },
     });
   };
 
@@ -256,7 +269,7 @@ const BreathPage: React.FC = () => {
         durationSec,
       });
     },
-    [orchestration.mode, orchestration.next, orchestration.profile, orchestration.summaryLabel, sleepMode],
+    [orchestration.mode, orchestration.next, orchestration.profile, orchestration.summaryLabel, sleepMode]
   );
 
   const showStaiPrompt = orchestration.staiPreDue && !staiAssessment.state.isActive;
@@ -264,9 +277,12 @@ const BreathPage: React.FC = () => {
 
   const skipAssessment = () => undefined;
 
+  // Calculate longest streak (simulated - would come from backend)
+  const longestStreak = Math.max(stats.currentStreak, 7);
+
   return (
     <ConsentGate>
-      <ZeroNumberBoundary className="min-h-screen bg-slate-950 py-10 text-slate-100">
+      <ZeroNumberBoundary className="min-h-screen bg-background py-10">
         <div className="mx-auto flex max-w-5xl flex-col gap-8 px-4 sm:px-6">
           <PageHeader
             title="Respiration orchestrée"
@@ -274,26 +290,22 @@ const BreathPage: React.FC = () => {
           />
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full space-y-6">
-            <TabsList className="grid w-full grid-cols-6 bg-slate-900/50 border border-slate-800/50">
+            <TabsList className="grid w-full grid-cols-5 bg-muted/30 border border-border/50">
               <TabsTrigger value="session" className="flex items-center gap-1 text-xs sm:text-sm">
                 <Wind className="h-4 w-4" />
-                <span className="hidden sm:inline">Séance</span>
+                <span className="hidden sm:inline">Pratiquer</span>
               </TabsTrigger>
               <TabsTrigger value="stats" className="flex items-center gap-1 text-xs sm:text-sm">
                 <Zap className="h-4 w-4" />
                 <span className="hidden sm:inline">Stats</span>
               </TabsTrigger>
-              <TabsTrigger value="calendar" className="flex items-center gap-1 text-xs sm:text-sm">
-                <Calendar className="h-4 w-4" />
-                <span className="hidden sm:inline">Calendrier</span>
+              <TabsTrigger value="history" className="flex items-center gap-1 text-xs sm:text-sm">
+                <History className="h-4 w-4" />
+                <span className="hidden sm:inline">Historique</span>
               </TabsTrigger>
-              <TabsTrigger value="techniques" className="flex items-center gap-1 text-xs sm:text-sm">
+              <TabsTrigger value="library" className="flex items-center gap-1 text-xs sm:text-sm">
                 <BookOpen className="h-4 w-4" />
-                <span className="hidden sm:inline">Tech</span>
-              </TabsTrigger>
-              <TabsTrigger value="programs" className="flex items-center gap-1 text-xs sm:text-sm">
-                <Zap className="h-4 w-4" />
-                <span className="hidden sm:inline">Prog</span>
+                <span className="hidden sm:inline">Biblio</span>
               </TabsTrigger>
               <TabsTrigger value="progress" className="flex items-center gap-1 text-xs sm:text-sm">
                 <Trophy className="h-4 w-4" />
@@ -303,18 +315,34 @@ const BreathPage: React.FC = () => {
 
             {/* Session Tab */}
             <TabsContent value="session" className="space-y-6">
-              <Card className="border-slate-800/70 bg-slate-950/60" data-zero-number-check="true">
+              {/* Streak Widget */}
+              <BreathStreakWidget
+                currentStreak={stats.currentStreak}
+                longestStreak={longestStreak}
+                weeklyGoal={60}
+                weeklyProgress={stats.weeklyMinutes}
+              />
+
+              {/* Recommendations */}
+              <BreathRecommendationWidget onStartSession={handleStartRecommendedSession} />
+
+              <Card className="border-border/70 bg-card/60" data-zero-number-check="true">
                 <CardHeader>
-                  <CardTitle className="text-xl font-semibold text-slate-100">Ton atmosphère du moment</CardTitle>
-                  <CardDescription className="text-sm text-slate-200/80">
+                  <CardTitle className="text-xl font-semibold text-foreground">Ton atmosphère du moment</CardTitle>
+                  <CardDescription className="text-sm text-muted-foreground">
                     {orchestration.summaryLabel}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="flex flex-wrap gap-3">
-                  <span className="rounded-full bg-amber-400/10 px-4 py-1 text-sm text-amber-200/90">
-                    Cadence : {orchestration.profile === 'long_exhale_focus' ? 'expirations très longues' : orchestration.profile === 'standard_soft' ? 'équilibre doux' : 'souffle ample'}
+                  <span className="rounded-full bg-primary/10 px-4 py-1 text-sm text-primary">
+                    Cadence :{' '}
+                    {orchestration.profile === 'long_exhale_focus'
+                      ? 'expirations très longues'
+                      : orchestration.profile === 'standard_soft'
+                      ? 'équilibre doux'
+                      : 'souffle ample'}
                   </span>
-                  <span className="rounded-full bg-slate-800/60 px-4 py-1 text-sm text-slate-200/80">
+                  <span className="rounded-full bg-muted/60 px-4 py-1 text-sm text-muted-foreground">
                     Ambiance : {sleepMode ? 'Sommeil' : 'Classique'}
                   </span>
                 </CardContent>
@@ -348,21 +376,19 @@ const BreathPage: React.FC = () => {
                 sleepMode ? (
                   <SleepPreset onSessionFinish={handleSessionFinish} />
                 ) : (
-                  <BreathFlowController
-                    profile={orchestration.profile}
-                    onSessionFinish={handleSessionFinish}
-                  />
+                  <BreathFlowController profile={orchestration.profile} onSessionFinish={handleSessionFinish} />
                 )
               ) : (
-                <Card className="border-slate-800/60 bg-slate-950/40" data-zero-number-check="true">
+                <Card className="border-border/60 bg-card/40" data-zero-number-check="true">
                   <CardHeader>
-                    <CardTitle className="text-lg font-medium text-slate-100">Prêt pour ta séance ?</CardTitle>
-                    <CardDescription className="text-sm text-slate-300/80">
+                    <CardTitle className="text-lg font-medium text-foreground">Prêt pour ta séance ?</CardTitle>
+                    <CardDescription className="text-sm text-muted-foreground">
                       Lance une session adaptée à ton état du moment.
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <Button size="lg" onClick={handleStartSession} className="w-full">
+                      <Wind className="h-5 w-5 mr-2" />
                       Démarrer la séance
                     </Button>
                   </CardContent>
@@ -376,19 +402,28 @@ const BreathPage: React.FC = () => {
                 <BreathExportButton />
               </div>
               <BreathSessionStats />
-            </TabsContent>
-
-            {/* Calendar Tab */}
-            <TabsContent value="calendar">
               <BreathCalendar />
             </TabsContent>
-            <TabsContent value="techniques">
-              <BreathingTechniquesLibrary />
+
+            {/* History Tab */}
+            <TabsContent value="history" className="space-y-4">
+              <BreathSessionHistory limit={15} />
             </TabsContent>
 
-            {/* Programs Tab */}
-            <TabsContent value="programs">
-              <BreathingProgramsLibrary />
+            {/* Library Tab - Techniques & Programs */}
+            <TabsContent value="library" className="space-y-6">
+              <Tabs defaultValue="techniques" className="w-full">
+                <TabsList className="grid w-full grid-cols-2 bg-muted/30">
+                  <TabsTrigger value="techniques">Techniques</TabsTrigger>
+                  <TabsTrigger value="programs">Programmes</TabsTrigger>
+                </TabsList>
+                <TabsContent value="techniques" className="mt-4">
+                  <BreathingTechniquesLibrary />
+                </TabsContent>
+                <TabsContent value="programs" className="mt-4">
+                  <BreathingProgramsLibrary />
+                </TabsContent>
+              </Tabs>
             </TabsContent>
 
             {/* Progress Tab */}
