@@ -74,31 +74,29 @@ export const useMusicEmotionIntegration = () => {
     }
   }, [generateMusicForEmotion, setPlaylist, updateSoundscapeForEmotion]);
 
-  // Recherche de tracks existants par émotion
+  // Recherche de tracks existants par émotion (utilise generated_music_tracks)
   const searchExistingTracks = useCallback(async (emotion: string): Promise<MusicTrack[]> => {
     try {
       const { data, error } = await supabase
-        .from('music_tracks')
+        .from('generated_music_tracks')
         .select('*')
-        .or(`emotion.eq.${emotion},tags.ilike.%${emotion}%`)
+        .or(`emotion.ilike.%${emotion}%,prompt.ilike.%${emotion}%`)
+        .eq('generation_status', 'completed')
         .limit(10);
 
       if (error) throw error;
 
-      return data.map(track => ({
+      return (data || []).map(track => ({
         id: track.id,
-        title: track.title,
-        artist: track.artist,
+        title: track.title || 'Morceau généré',
+        artist: 'Suno AI',
         url: track.audio_url,
         audioUrl: track.audio_url,
-        duration: track.duration || 120,
+        duration: track.duration ? Number(track.duration) : 120,
         emotion: track.emotion,
-        mood: track.mood,
-        coverUrl: track.cover_url,
-        tags: track.tags,
-        bpm: track.bpm,
-        key: track.key,
-        energy: track.energy
+        mood: track.emotion,
+        coverUrl: track.image_url,
+        tags: track.emotion || ''
       }));
     } catch (error) {
       logger.error('Erreur recherche tracks', error as Error, 'MUSIC');
@@ -153,25 +151,21 @@ export const useMusicEmotionIntegration = () => {
     }
   }, []);
 
-  // Analyse de l'impact émotionnel de la musique
+  // Analyse de l'impact émotionnel de la musique (version simplifiée)
   const analyzeMusicImpact = useCallback(async (trackId: string, userFeedback: 'positive' | 'negative' | 'neutral') => {
     try {
+      // Log le feedback dans music_track_feedback
       const { error } = await supabase
-        .from('music_feedback')
+        .from('music_track_feedback')
         .insert({
           track_id: trackId,
-          user_feedback: userFeedback,
-          timestamp: new Date().toISOString()
+          feedback_type: userFeedback,
+          created_at: new Date().toISOString()
         });
 
-      if (error) throw error;
-
-      // Mettre à jour les statistiques du track
-      await supabase.rpc('update_track_stats', {
-        track_id: trackId,
-        feedback: userFeedback
-      });
-
+      if (error) {
+        logger.warn('Could not save music feedback', 'MUSIC');
+      }
     } catch (error) {
       logger.error('Erreur analyse impact', error as Error, 'ANALYTICS');
     }

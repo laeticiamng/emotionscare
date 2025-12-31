@@ -90,12 +90,13 @@ export class MusicTherapyService {
     mood: string,
     preferences?: any
   ): Promise<any> {
-    const { data, error } = await supabase.functions.invoke('coach-ai', {
+    // Utiliser adaptive-music au lieu de coach-ai (qui n'existe pas)
+    const { data, error } = await supabase.functions.invoke('adaptive-music', {
       body: {
-        action: 'generate_music',
-        userId,
-        mood,
-        preferences
+        action: 'create-playlist',
+        emotions: [mood],
+        duration: preferences?.duration || 30,
+        playlist_type: 'therapeutic'
       }
     });
 
