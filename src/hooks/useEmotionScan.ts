@@ -96,9 +96,8 @@ export const useEmotionScan = () => {
 
     const { data, error } = await supabase.functions.invoke('hume-analysis', {
       body: { 
-        image_base64: base64,
-        mode: 'camera',
-        context: options.context || 'b2c'
+        imageBase64: base64,
+        analysisType: 'facial'
       }
     });
 
@@ -106,16 +105,40 @@ export const useEmotionScan = () => {
       throw new Error(error.message || 'Erreur d\'analyse faciale');
     }
 
+    // Normaliser la réponse de Hume (structure analysis)
+    const analysis = data?.analysis || data;
+    const emotionsList = analysis?.emotions || [];
+    const dominantEmotion = emotionsList[0]?.name || analysis?.dominant_emotion || 'neutre';
+    const confidence = emotionsList[0]?.confidence || analysis?.confidence_score || 0.7;
+    
+    // Calculer valence et arousal depuis les émotions détectées
+    const positiveEmotions = ['joy', 'happiness', 'excitement', 'contentment', 'amusement', 'love'];
+    const highArousalEmotions = ['excitement', 'anger', 'fear', 'surprise', 'anxiety'];
+    
+    const emotionsObj: Record<string, number> = {};
+    let valenceScore = 0.5;
+    let arousalScore = 0.5;
+    
+    emotionsList.forEach((e: { name: string; confidence: number }) => {
+      emotionsObj[e.name] = e.confidence;
+      if (positiveEmotions.includes(e.name.toLowerCase())) {
+        valenceScore = Math.max(valenceScore, 0.5 + e.confidence * 0.5);
+      }
+      if (highArousalEmotions.includes(e.name.toLowerCase())) {
+        arousalScore = Math.max(arousalScore, 0.5 + e.confidence * 0.5);
+      }
+    });
+
     return normalizeEmotionResult({
       id: crypto.randomUUID(),
-      emotion: data?.label || data?.bucket || 'neutre',
-      valence: (data?.valence ?? 0.5) * 100,
-      arousal: (data?.arousal ?? 0.5) * 100,
-      confidence: (data?.confidence ?? 0.7) * 100,
+      emotion: dominantEmotion,
+      valence: valenceScore * 100,
+      arousal: arousalScore * 100,
+      confidence: confidence * 100,
       source: 'facial',
       timestamp: new Date().toISOString(),
-      summary: data?.advice || data?.label,
-      emotions: data?.emotions || {}
+      summary: `Émotion détectée: ${dominantEmotion}`,
+      emotions: emotionsObj
     });
   }, []);
 
