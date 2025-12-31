@@ -23,12 +23,12 @@ const TechniqueCard: React.FC<{ technique: BreathingTechnique }> = ({ technique 
   const [expanded, setExpanded] = useState(false);
 
   return (
-    <Card className="border-slate-800/50 bg-slate-900/40 overflow-hidden" data-zero-number-check="true">
+    <Card className="border-border/50 bg-card/40 overflow-hidden" data-zero-number-check="true">
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1">
-            <CardTitle className="text-base font-semibold text-slate-100">{technique.name}</CardTitle>
-            <CardDescription className="text-sm text-slate-400 mt-1">
+            <CardTitle className="text-base font-semibold text-foreground">{technique.name}</CardTitle>
+            <CardDescription className="text-sm text-muted-foreground mt-1">
               {technique.description}
             </CardDescription>
           </div>
@@ -43,27 +43,27 @@ const TechniqueCard: React.FC<{ technique: BreathingTechnique }> = ({ technique 
       <CardContent className="space-y-4">
         <div className="grid grid-cols-3 gap-3 text-sm">
           <div className="flex items-center gap-2">
-            <Clock className="h-4 w-4 text-amber-400/70" />
-            <span className="text-slate-300">{technique.duration_minutes} min</span>
+            <Clock className="h-4 w-4 text-primary/70" />
+            <span className="text-muted-foreground">{technique.duration_minutes} min</span>
           </div>
           <div className="flex items-center gap-2">
-            <Zap className="h-4 w-4 text-cyan-400/70" />
-            <span className="text-slate-300">Ins: {technique.timings.inhale / 1000}s</span>
+            <Zap className="h-4 w-4 text-info/70" />
+            <span className="text-muted-foreground">Ins: {technique.timings.inhale / 1000}s</span>
           </div>
           <div className="flex items-center gap-2">
-            <Zap className="h-4 w-4 text-amber-400/70" />
-            <span className="text-slate-300">Exp: {technique.timings.exhale / 1000}s</span>
+            <Zap className="h-4 w-4 text-warning/70" />
+            <span className="text-muted-foreground">Exp: {technique.timings.exhale / 1000}s</span>
           </div>
         </div>
 
         <div className="flex flex-wrap gap-2">
           {technique.benefits.slice(0, 2).map((benefit) => (
-            <Badge key={benefit} variant="secondary" className="bg-slate-800/50 text-slate-300 border-0">
+            <Badge key={benefit} variant="secondary">
               {benefit}
             </Badge>
           ))}
           {technique.benefits.length > 2 && (
-            <Badge variant="secondary" className="bg-slate-800/50 text-slate-300 border-0">
+            <Badge variant="secondary">
               +{technique.benefits.length - 2} plus
             </Badge>
           )}
@@ -71,23 +71,23 @@ const TechniqueCard: React.FC<{ technique: BreathingTechnique }> = ({ technique 
 
         <button
           onClick={() => setExpanded(!expanded)}
-          className="flex items-center gap-2 text-sm text-amber-400/80 hover:text-amber-300 transition-colors"
+          className="flex items-center gap-2 text-sm text-primary/80 hover:text-primary transition-colors"
         >
           <span>{expanded ? 'Masquer' : 'Afficher'} détails</span>
           <ChevronDown className={cn('h-4 w-4 transition-transform', expanded && 'rotate-180')} />
         </button>
 
         {expanded && (
-          <div className="space-y-4 border-t border-slate-800/30 pt-4">
+          <div className="space-y-4 border-t border-border/30 pt-4">
             <div>
-              <h4 className="font-semibold text-slate-200 text-sm mb-2 flex items-center gap-2">
-                <Lightbulb className="h-4 w-4 text-amber-400/70" />
+              <h4 className="font-semibold text-foreground text-sm mb-2 flex items-center gap-2">
+                <Lightbulb className="h-4 w-4 text-primary/70" />
                 Bénéfices
               </h4>
-              <ul className="space-y-1 text-sm text-slate-300">
+              <ul className="space-y-1 text-sm text-muted-foreground">
                 {technique.benefits.map((benefit) => (
                   <li key={benefit} className="flex items-center gap-2">
-                    <span className="h-1.5 w-1.5 rounded-full bg-amber-400/50" />
+                    <span className="h-1.5 w-1.5 rounded-full bg-primary/50" />
                     {benefit}
                   </li>
                 ))}
@@ -95,11 +95,11 @@ const TechniqueCard: React.FC<{ technique: BreathingTechnique }> = ({ technique 
             </div>
 
             <div>
-              <h4 className="font-semibold text-slate-200 text-sm mb-2">Instructions</h4>
-              <ol className="space-y-2 text-sm text-slate-300">
+              <h4 className="font-semibold text-foreground text-sm mb-2">Instructions</h4>
+              <ol className="space-y-2 text-sm text-muted-foreground">
                 {technique.instructions.map((instruction, idx) => (
                   <li key={idx} className="flex gap-2">
-                    <span className="flex-shrink-0 font-semibold text-amber-400/60 min-w-[1.5rem]">{idx + 1}.</span>
+                    <span className="flex-shrink-0 font-semibold text-primary/60 min-w-[1.5rem]">{idx + 1}.</span>
                     <span>{instruction}</span>
                   </li>
                 ))}
@@ -107,22 +107,22 @@ const TechniqueCard: React.FC<{ technique: BreathingTechnique }> = ({ technique 
             </div>
 
             {technique.contraindications && (
-              <div className="rounded-lg bg-red-500/10 border border-red-500/20 p-3">
-                <p className="text-sm text-red-200">
+              <div className="rounded-lg bg-destructive/10 border border-destructive/20 p-3">
+                <p className="text-sm text-destructive">
                   <strong>⚠️ Attention:</strong> {technique.contraindications}
                 </p>
               </div>
             )}
 
             {technique.scientific_basis && (
-              <div className="rounded-lg bg-cyan-500/10 border border-cyan-500/20 p-3">
-                <p className="text-sm text-cyan-200">
+              <div className="rounded-lg bg-info/10 border border-info/20 p-3">
+                <p className="text-sm text-info">
                   <strong>📚 Fondement scientifique:</strong> {technique.scientific_basis}
                 </p>
               </div>
             )}
 
-            <Button className="w-full bg-amber-600/80 hover:bg-amber-600 text-amber-50">
+            <Button className="w-full">
               Commencer cette technique
             </Button>
           </div>
@@ -142,8 +142,8 @@ export const BreathingTechniquesLibrary: React.FC = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-slate-100 mb-2">Bibliothèque de Techniques</h2>
-        <p className="text-slate-400">Découvre différentes techniques respiratoires adaptées à tes besoins</p>
+        <h2 className="text-2xl font-bold text-foreground mb-2">Bibliothèque de Techniques</h2>
+        <p className="text-muted-foreground">Découvre différentes techniques respiratoires adaptées à tes besoins</p>
       </div>
 
       <div className="flex flex-wrap gap-2">
@@ -153,12 +153,6 @@ export const BreathingTechniquesLibrary: React.FC = () => {
             variant={selectedDifficulty === difficulty ? 'default' : 'outline'}
             size="sm"
             onClick={() => setSelectedDifficulty(difficulty)}
-            className={cn(
-              'transition-colors',
-              selectedDifficulty === difficulty
-                ? 'bg-amber-600/80 text-amber-50 border-amber-600'
-                : 'border-slate-700 text-slate-300 hover:border-slate-600'
-            )}
           >
             {difficulty === 'all' && 'Toutes'}
             {difficulty === 'beginner' && 'Débutant'}

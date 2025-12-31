@@ -181,8 +181,8 @@ const AchievementCard: React.FC<{ achievement: Achievement; onShare: (a: Achieve
       className={cn(
         'rounded-lg border-2 p-4 transition-all relative group',
         achievement.earned
-          ? 'border-amber-400/50 bg-amber-400/10'
-          : 'border-slate-800/50 bg-slate-900/30 opacity-60'
+          ? 'border-primary/50 bg-primary/10'
+          : 'border-border/50 bg-muted/30 opacity-60'
       )}
     >
       {/* Rarity badge */}
@@ -196,31 +196,31 @@ const AchievementCard: React.FC<{ achievement: Achievement; onShare: (a: Achieve
         <div className={cn(
           'rounded-lg p-2.5 transition-colors',
           achievement.earned
-            ? 'bg-amber-500/30 text-amber-300'
-            : 'bg-slate-800/50 text-slate-600'
+            ? 'bg-primary/30 text-primary'
+            : 'bg-muted/50 text-muted-foreground'
         )}>
           {achievement.earned ? achievement.icon : <Lock className="h-5 w-5" />}
         </div>
         <div className="flex-1 min-w-0 pr-16">
-          <h4 className="font-semibold text-slate-100 text-sm">{achievement.name}</h4>
-          <p className="text-xs text-slate-400 mt-0.5">{achievement.description}</p>
+          <h4 className="font-semibold text-foreground text-sm">{achievement.name}</h4>
+          <p className="text-xs text-muted-foreground mt-0.5">{achievement.description}</p>
 
           {achievement.maxProgress && achievement.progress !== undefined && (
             <div className="mt-2">
               <div className="flex items-center justify-between mb-1">
-                <span className="text-xs text-slate-400">
+                <span className="text-xs text-muted-foreground">
                   {Math.min(achievement.progress, achievement.maxProgress)}/{achievement.maxProgress}
                 </span>
-                <span className="text-xs text-slate-500">{Math.round(progressPercent)}%</span>
+                <span className="text-xs text-muted-foreground/70">{Math.round(progressPercent)}%</span>
               </div>
-              <div className="h-2 rounded-full bg-slate-800/50 overflow-hidden">
+              <div className="h-2 rounded-full bg-muted/50 overflow-hidden">
                 <motion.div
                   initial={{ width: 0 }}
                   animate={{ width: `${progressPercent}%` }}
                   transition={{ duration: 0.5, ease: 'easeOut' }}
                   className={cn(
                     'h-full transition-all rounded-full',
-                    achievement.earned ? 'bg-amber-400' : 'bg-slate-600'
+                    achievement.earned ? 'bg-primary' : 'bg-muted-foreground/50'
                   )}
                 />
               </div>

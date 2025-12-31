@@ -45,12 +45,12 @@ const ProgramCard: React.FC<{ program: BreathingProgram }> = ({ program }) => {
   const [expanded, setExpanded] = useState(false);
 
   return (
-    <Card className="border-slate-800/50 bg-slate-900/40 overflow-hidden" data-zero-number-check="true">
+    <Card className="border-border/50 bg-card/40 overflow-hidden" data-zero-number-check="true">
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1">
-            <CardTitle className="text-lg font-semibold text-slate-100">{program.name}</CardTitle>
-            <CardDescription className="text-sm text-slate-400 mt-1">
+            <CardTitle className="text-lg font-semibold text-foreground">{program.name}</CardTitle>
+            <CardDescription className="text-sm text-muted-foreground mt-1">
               {program.description}
             </CardDescription>
           </div>
@@ -71,25 +71,25 @@ const ProgramCard: React.FC<{ program: BreathingProgram }> = ({ program }) => {
       <CardContent className="space-y-4">
         <div className="grid grid-cols-3 gap-3 text-sm">
           <div className="flex items-center gap-2">
-            <Calendar className="h-4 w-4 text-amber-400/70" />
-            <span className="text-slate-300">{program.duration_days}j</span>
+            <Calendar className="h-4 w-4 text-primary/70" />
+            <span className="text-muted-foreground">{program.duration_days}j</span>
           </div>
           <div className="flex items-center gap-2">
-            <Clock className="h-4 w-4 text-cyan-400/70" />
-            <span className="text-slate-300 text-xs">{program.estimatedCommitment}</span>
+            <Clock className="h-4 w-4 text-info/70" />
+            <span className="text-muted-foreground text-xs">{program.estimatedCommitment}</span>
           </div>
           <div className="flex items-center gap-2">
-            <Target className="h-4 w-4 text-emerald-400/70" />
-            <span className="text-slate-300">{program.sessions.length} étapes</span>
+            <Target className="h-4 w-4 text-success/70" />
+            <span className="text-muted-foreground">{program.sessions.length} étapes</span>
           </div>
         </div>
 
         <div className="space-y-2">
-          <p className="text-sm font-medium text-slate-200">Bénéfices:</p>
+          <p className="text-sm font-medium text-foreground">Bénéfices:</p>
           <ul className="space-y-1">
             {program.benefits.map((benefit) => (
-              <li key={benefit} className="flex items-center gap-2 text-sm text-slate-300">
-                <span className="h-1.5 w-1.5 rounded-full bg-amber-400/50" />
+              <li key={benefit} className="flex items-center gap-2 text-sm text-muted-foreground">
+                <span className="h-1.5 w-1.5 rounded-full bg-primary/50" />
                 {benefit}
               </li>
             ))}
@@ -98,32 +98,32 @@ const ProgramCard: React.FC<{ program: BreathingProgram }> = ({ program }) => {
 
         <button
           onClick={() => setExpanded(!expanded)}
-          className="flex items-center gap-2 text-sm text-amber-400/80 hover:text-amber-300 transition-colors"
+          className="flex items-center gap-2 text-sm text-primary/80 hover:text-primary transition-colors"
         >
           <span>{expanded ? 'Masquer' : 'Afficher'} le plan</span>
           <ChevronDown className={cn('h-4 w-4 transition-transform', expanded && 'rotate-180')} />
         </button>
 
         {expanded && (
-          <div className="space-y-4 border-t border-slate-800/30 pt-4">
+          <div className="space-y-4 border-t border-border/30 pt-4">
             <div>
-              <h4 className="font-semibold text-slate-200 text-sm mb-3">Plan du programme</h4>
+              <h4 className="font-semibold text-foreground text-sm mb-3">Plan du programme</h4>
               <div className="space-y-3">
                 {program.sessions.map((session) => (
-                  <div key={session.day} className="rounded-lg bg-slate-800/30 border border-slate-800/50 p-3">
+                  <div key={session.day} className="rounded-lg bg-muted/30 border border-border/50 p-3">
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="flex-shrink-0 h-6 w-6 rounded-full bg-amber-400/20 border border-amber-400/50 flex items-center justify-center text-xs font-semibold text-amber-300">
+                          <span className="flex-shrink-0 h-6 w-6 rounded-full bg-primary/20 border border-primary/50 flex items-center justify-center text-xs font-semibold text-primary">
                             {session.day}
                           </span>
-                          <h5 className="font-medium text-slate-100">{session.title}</h5>
+                          <h5 className="font-medium text-foreground">{session.title}</h5>
                         </div>
-                        <p className="text-sm text-slate-400 ml-8">{session.description}</p>
-                        <p className="text-xs text-slate-500 mt-1 ml-8">💡 {session.notes}</p>
+                        <p className="text-sm text-muted-foreground ml-8">{session.description}</p>
+                        <p className="text-xs text-muted-foreground/70 mt-1 ml-8">💡 {session.notes}</p>
                       </div>
                       <div className="flex-shrink-0 text-right">
-                        <p className="text-sm font-medium text-slate-300">{session.duration_minutes}min</p>
+                        <p className="text-sm font-medium text-muted-foreground">{session.duration_minutes}min</p>
                       </div>
                     </div>
                   </div>
@@ -131,13 +131,13 @@ const ProgramCard: React.FC<{ program: BreathingProgram }> = ({ program }) => {
               </div>
             </div>
 
-            <div className="rounded-lg bg-cyan-500/10 border border-cyan-500/20 p-3">
-              <p className="text-sm text-cyan-200">
+            <div className="rounded-lg bg-info/10 border border-info/20 p-3">
+              <p className="text-sm text-info">
                 <strong>📖 À propos:</strong> {program.longDescription}
               </p>
             </div>
 
-            <Button className="w-full bg-amber-600/80 hover:bg-amber-600 text-amber-50">
+            <Button className="w-full">
               Commencer ce programme
             </Button>
           </div>
@@ -159,8 +159,8 @@ export const BreathingProgramsLibrary: React.FC = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-slate-100 mb-2">Programmes Guidés</h2>
-        <p className="text-slate-400">Des séquences structurées sur plusieurs jours pour des résultats durables</p>
+        <h2 className="text-2xl font-bold text-foreground mb-2">Programmes Guidés</h2>
+        <p className="text-muted-foreground">Des séquences structurées sur plusieurs jours pour des résultats durables</p>
       </div>
 
       <div className="flex flex-wrap gap-2">
@@ -170,12 +170,6 @@ export const BreathingProgramsLibrary: React.FC = () => {
             variant={selectedCategory === category ? 'default' : 'outline'}
             size="sm"
             onClick={() => setSelectedCategory(category)}
-            className={cn(
-              'transition-colors',
-              selectedCategory === category
-                ? 'bg-amber-600/80 text-amber-50 border-amber-600'
-                : 'border-slate-700 text-slate-300 hover:border-slate-600'
-            )}
           >
             {category === 'all' && 'Tous'}
             {category === 'stress' && 'Stress'}
@@ -195,7 +189,7 @@ export const BreathingProgramsLibrary: React.FC = () => {
 
       {filteredPrograms.length === 0 && (
         <div className="text-center py-12">
-          <p className="text-slate-400">Aucun programme dans cette catégorie</p>
+          <p className="text-muted-foreground">Aucun programme dans cette catégorie</p>
         </div>
       )}
     </div>
