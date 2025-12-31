@@ -99,6 +99,60 @@ export interface B2BOrganization {
   createdAt: string;
 }
 
+export interface B2BSettings {
+  id: string;
+  orgId: string;
+  notificationsEnabled: boolean;
+  weeklyReportEnabled: boolean;
+  alertThreshold: number;
+  wellnessGoal: number;
+  timezone: string;
+  language: 'fr' | 'en';
+  branding?: {
+    logo?: string;
+    primaryColor?: string;
+  };
+  features: {
+    heatmap: boolean;
+    reports: boolean;
+    events: boolean;
+    analytics: boolean;
+  };
+  updatedAt: string;
+}
+
+export interface B2BNotification {
+  id: string;
+  orgId: string;
+  type: 'alert' | 'report' | 'event' | 'team' | 'system';
+  title: string;
+  message: string;
+  read: boolean;
+  priority: 'low' | 'medium' | 'high' | 'critical';
+  link?: string;
+  createdAt: string;
+}
+
+export interface B2BAnalyticsData {
+  period: string;
+  wellnessScore: number;
+  engagementRate: number;
+  participationRate: number;
+  alertsCount: number;
+  trendDirection: 'up' | 'down' | 'stable';
+  teamBreakdown: Array<{
+    teamId: string;
+    teamName: string;
+    score: number;
+    change: number;
+  }>;
+  instrumentBreakdown: Array<{
+    instrument: string;
+    score: number;
+    respondents: number;
+  }>;
+}
+
 // API Response types
 export interface B2BApiResponse<T> {
   success: boolean;
@@ -110,6 +164,13 @@ export interface B2BApiResponse<T> {
 // Form types
 export interface CreateTeamInput {
   name: string;
+  description?: string;
+  leadEmail?: string;
+}
+
+export interface UpdateTeamInput {
+  id: string;
+  name?: string;
   description?: string;
   leadEmail?: string;
 }
@@ -126,9 +187,32 @@ export interface CreateEventInput {
   category: B2BEvent['category'];
 }
 
+export interface UpdateEventInput {
+  id: string;
+  title?: string;
+  description?: string;
+  date?: string;
+  time?: string;
+  endTime?: string;
+  location?: string;
+  locationType?: 'onsite' | 'remote' | 'hybrid';
+  maxParticipants?: number;
+  category?: B2BEvent['category'];
+  status?: B2BEvent['status'];
+}
+
 export interface InviteMemberInput {
   email: string;
   teamId?: string;
   role: 'member' | 'admin';
   message?: string;
+}
+
+export interface UpdateSettingsInput {
+  notificationsEnabled?: boolean;
+  weeklyReportEnabled?: boolean;
+  alertThreshold?: number;
+  wellnessGoal?: number;
+  timezone?: string;
+  language?: 'fr' | 'en';
 }

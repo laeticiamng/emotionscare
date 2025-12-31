@@ -1,16 +1,20 @@
 // @ts-nocheck
 /**
  * Hook pour les données des équipes B2B avec données Supabase réelles
+ * Inclut mutations create/update/delete
  */
 
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';
+import { useToast } from '@/hooks/use-toast';
+import type { CreateTeamInput, UpdateTeamInput } from '@/features/b2b/types';
 
 export interface B2BTeam {
   id: string;
   name: string;
+  description?: string;
   members: number;
   lead: string;
   email: string;
@@ -40,7 +44,7 @@ async function fetchTeams(orgId: string): Promise<B2BTeamsData> {
     // Récupérer les équipes de l'organisation
     const { data: teamsData, error: teamsError } = await supabase
       .from('teams')
-      .select('id, name, created_at')
+      .select('id, name, description, created_at, updated_at')
       .eq('org_id', orgId)
       .order('name');
 
@@ -54,6 +58,7 @@ async function fetchTeams(orgId: string): Promise<B2BTeamsData> {
         {
           id: 'demo-1',
           name: 'Équipe Marketing',
+          description: 'Équipe en charge de la communication',
           members: 12,
           lead: 'Sarah Martin',
           email: 'sarah.martin@company.com',
@@ -64,6 +69,7 @@ async function fetchTeams(orgId: string): Promise<B2BTeamsData> {
         {
           id: 'demo-2',
           name: 'Équipe Développement',
+          description: 'Équipe technique',
           members: 8,
           lead: 'Thomas Dubois',
           email: 'thomas.dubois@company.com',
@@ -74,6 +80,7 @@ async function fetchTeams(orgId: string): Promise<B2BTeamsData> {
         {
           id: 'demo-3',
           name: 'Équipe Support',
+          description: 'Support client',
           members: 6,
           lead: 'Marie Leroy',
           email: 'marie.leroy@company.com',
@@ -119,12 +126,13 @@ async function fetchTeams(orgId: string): Promise<B2BTeamsData> {
         : 75;
       
       const lastAssessment = teamAssessments[0];
-      const lastActivity = lastAssessment?.created_at?.split('T')[0] || team.created_at?.split('T')[0] || new Date().toISOString().split('T')[0];
+      const lastActivity = lastAssessment?.created_at?.split('T')[0] || team.updated_at?.split('T')[0] || team.created_at?.split('T')[0] || new Date().toISOString().split('T')[0];
 
       return {
         id: team.id,
         name: team.name,
-        members: Math.floor(Math.random() * 10) + 5, // À remplacer par vraie table team_members
+        description: team.description || '',
+        members: Math.floor(Math.random() * 10) + 5,
         lead: 'Manager équipe',
         email: 'team@company.com',
         avgWellness,
@@ -147,6 +155,8 @@ async function fetchTeams(orgId: string): Promise<B2BTeamsData> {
 
 export function useB2BTeams() {
   const { user } = useAuth();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
   const orgId = user?.user_metadata?.org_id as string | undefined;
 
   const query = useQuery({
@@ -158,10 +168,128 @@ export function useB2BTeams() {
     refetchOnWindowFocus: true,
   });
 
+  // Create team mutation
+  const createMutation = useMutation({
+    mutationFn: async (input: CreateTeamInput) => {
+      if (!orgId) throw new Error('No organization');
+      
+      const { data, error } = await supabase
+        .from('teams')
+        .insert({
+          org_id: orgId,
+          name: input.name,
+          description: input.description || null,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      // Log audit
+      await supabase.from('b2b_audit_logs').insert({
+        org_id: orgId,
+        action: 'team_created',
+        entity_type: 'team',
+        entity_id: data.id,
+        user_id: user?.id,
+        user_email: user?.email,
+        details: { name: input.name },
+      });
+
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['b2b-teams'] });
+      toast({ title: 'Équipe créée', description: 'La nouvelle équipe a été créée avec succès' });
+    },
+    onError: (error) => {
+      toast({ title: 'Erreur', description: 'Impossible de créer l\'équipe', variant: 'destructive' });
+      logger.error('Create team error', error as Error, 'B2B');
+    },
+  });
+
+  // Update team mutation
+  const updateMutation = useMutation({
+    mutationFn: async (input: UpdateTeamInput) => {
+      if (!orgId) throw new Error('No organization');
+      
+      const updateData: Record<string, unknown> = { updated_at: new Date().toISOString() };
+      if (input.name) updateData.name = input.name;
+      if (input.description !== undefined) updateData.description = input.description;
+
+      const { error } = await supabase
+        .from('teams')
+        .update(updateData)
+        .eq('id', input.id)
+        .eq('org_id', orgId);
+
+      if (error) throw error;
+
+      // Log audit
+      await supabase.from('b2b_audit_logs').insert({
+        org_id: orgId,
+        action: 'team_updated',
+        entity_type: 'team',
+        entity_id: input.id,
+        user_id: user?.id,
+        user_email: user?.email,
+        details: input,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['b2b-teams'] });
+      toast({ title: 'Équipe mise à jour' });
+    },
+    onError: (error) => {
+      toast({ title: 'Erreur', description: 'Impossible de mettre à jour l\'équipe', variant: 'destructive' });
+      logger.error('Update team error', error as Error, 'B2B');
+    },
+  });
+
+  // Delete team mutation
+  const deleteMutation = useMutation({
+    mutationFn: async (teamId: string) => {
+      if (!orgId) throw new Error('No organization');
+      
+      const { error } = await supabase
+        .from('teams')
+        .delete()
+        .eq('id', teamId)
+        .eq('org_id', orgId);
+
+      if (error) throw error;
+
+      // Log audit
+      await supabase.from('b2b_audit_logs').insert({
+        org_id: orgId,
+        action: 'team_deleted',
+        entity_type: 'team',
+        entity_id: teamId,
+        user_id: user?.id,
+        user_email: user?.email,
+        details: {},
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['b2b-teams'] });
+      toast({ title: 'Équipe supprimée' });
+    },
+    onError: (error) => {
+      toast({ title: 'Erreur', description: 'Impossible de supprimer l\'équipe', variant: 'destructive' });
+      logger.error('Delete team error', error as Error, 'B2B');
+    },
+  });
+
   return {
     data: query.data || DEFAULT_DATA,
     loading: query.isLoading,
     error: query.error,
     refetch: query.refetch,
+    createTeam: createMutation.mutate,
+    updateTeam: updateMutation.mutate,
+    deleteTeam: deleteMutation.mutate,
+    isCreating: createMutation.isPending,
+    isUpdating: updateMutation.isPending,
+    isDeleting: deleteMutation.isPending,
   };
 }
