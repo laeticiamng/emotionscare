@@ -18,7 +18,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
-import { MusicAnalyticsDashboard } from '@/components/music/analytics/MusicAnalyticsDashboard';
+import { MusicAnalyticsDashboard, MusicAnalyticsEnhanced } from '@/components/music/analytics';
 import { useMusicPreferencesLearning } from '@/hooks/useMusicPreferencesLearning';
 import { usePageSEO } from '@/hooks/usePageSEO';
 import { logger } from '@/lib/logger';
@@ -152,6 +152,8 @@ const MusicAnalyticsPage: React.FC = () => {
             <div id="analytics-dashboard">
               <MusicAnalyticsDashboard />
             </div>
+            {/* Vue enrichie avec données sessions */}
+            <MusicAnalyticsEnhanced period={selectedPeriod} />
           </TabsContent>
 
           <TabsContent value="trends" className="space-y-6">
