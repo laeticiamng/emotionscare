@@ -10,3 +10,4 @@ export { SeuilCalendar } from './SeuilCalendar';
 export { SeuilInsightsPanel } from './SeuilInsightsPanel';
 export { SeuilMiniSession } from './SeuilMiniSession';
 export { SeuilSettings, type SeuilUserSettings } from './SeuilSettings';
+export { SeuilHistoryItem } from './SeuilHistoryItem';

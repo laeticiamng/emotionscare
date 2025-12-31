@@ -60,11 +60,24 @@ export const EXIT_MESSAGE = 'Merci d\'avoir écouté le signal.\nC\'est ça, pre
 
 export const SEUIL_BUTTON_TEXT = 'Ça commence';
 
-export function getZoneFromLevel(level: number): SeuilZoneConfig {
-  for (const zone of SEUIL_ZONES) {
-    if (level >= zone.range[0] && level <= zone.range[1]) {
-      return zone;
-    }
+export function getZoneFromLevel(
+  level: number, 
+  customThresholds?: { intermediate: number; critical: number; closure: number }
+): SeuilZoneConfig {
+  const thresholds = customThresholds || {
+    intermediate: 31,
+    critical: 61,
+    closure: 86,
+  };
+
+  // Build dynamic zones based on custom thresholds
+  if (level < thresholds.intermediate) {
+    return SEUIL_ZONES[0]; // low
+  } else if (level < thresholds.critical) {
+    return SEUIL_ZONES[1]; // intermediate
+  } else if (level < thresholds.closure) {
+    return SEUIL_ZONES[2]; // critical
+  } else {
+    return SEUIL_ZONES[3]; // closure
   }
-  return SEUIL_ZONES[0];
 }

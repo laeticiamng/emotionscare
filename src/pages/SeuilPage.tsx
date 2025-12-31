@@ -1,15 +1,16 @@
 /**
  * Page SEUIL - Module de régulation émotionnelle proactive
- * Version enrichie avec Insights, Calendrier et Paramètres
+ * Version enrichie avec persistance, export CSV/JSON, favoris
  */
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowLeft, Waves, History, TrendingUp, BarChart3, Calendar, Settings, Sparkles, Download } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { ArrowLeft, Waves, History, TrendingUp, BarChart3, Calendar, Settings, Download, FileJson, FileSpreadsheet } from 'lucide-react';
 import { 
   SeuilModule, 
   SeuilTriggerButton, 
@@ -17,19 +18,20 @@ import {
   SeuilTrendChart,
   SeuilCalendar,
   SeuilInsightsPanel,
-  SeuilSettings
+  SeuilSettings,
+  SeuilHistoryItem
 } from '@/modules/seuil/components';
-import { useTodaySeuilEvents, useSeuilEvents } from '@/modules/seuil/hooks';
+import { useTodaySeuilEvents, useSeuilEvents, useSeuilSettings, useSeuilExport } from '@/modules/seuil/hooks';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { useToast } from '@/hooks/use-toast';
 
 const SeuilPage: React.FC = () => {
   const [showModule, setShowModule] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const { data: todayEvents } = useTodaySeuilEvents();
   const { data: allEvents } = useSeuilEvents();
-  const { toast } = useToast();
+  const { data: settings } = useSeuilSettings();
+  const { exportJSON, exportCSV } = useSeuilExport();
 
   const zoneLabels = {
     low: { label: 'Basse', color: 'bg-emerald-500/20 text-emerald-600' },
@@ -37,42 +39,6 @@ const SeuilPage: React.FC = () => {
     critical: { label: 'Critique', color: 'bg-rose-500/20 text-rose-600' },
     closure: { label: 'Clôture', color: 'bg-indigo-500/20 text-indigo-600' },
   };
-
-  const handleExport = useCallback(() => {
-    if (!allEvents || allEvents.length === 0) {
-      toast({
-        title: 'Aucune donnée',
-        description: 'Pas de données à exporter.',
-        variant: 'destructive'
-      });
-      return;
-    }
-
-    const exportData = {
-      exportedAt: new Date().toISOString(),
-      totalEvents: allEvents.length,
-      events: allEvents.map(e => ({
-        date: e.createdAt,
-        level: e.thresholdLevel,
-        zone: e.zone,
-        action: e.actionType,
-        completed: e.sessionCompleted
-      }))
-    };
-
-    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `seuil-export-${new Date().toISOString().split('T')[0]}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-
-    toast({
-      title: 'Export réussi',
-      description: 'Vos données SEUIL ont été exportées.'
-    });
-  }, [allEvents, toast]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-500/5 via-background to-rose-500/5 p-4 md:p-6">
@@ -84,10 +50,24 @@ const SeuilPage: React.FC = () => {
           </Button>
         </Link>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" className="gap-2" onClick={handleExport}>
-            <Download className="w-4 h-4" />
-            Exporter
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="gap-2">
+                <Download className="w-4 h-4" />
+                Exporter
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem onClick={exportJSON} className="gap-2">
+                <FileJson className="w-4 h-4" />
+                Export JSON
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={exportCSV} className="gap-2">
+                <FileSpreadsheet className="w-4 h-4" />
+                Export CSV
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <Button variant="ghost" size="icon" onClick={() => setShowSettings(!showSettings)}>
             <Settings className="w-4 h-4" />
           </Button>

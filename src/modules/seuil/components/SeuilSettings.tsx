@@ -1,8 +1,9 @@
 /**
  * Paramètres du module SEUIL
  * Personnalisation des rappels, seuils et préférences
+ * Avec persistance réelle des données
  */
-import React, { memo, useState, useCallback } from 'react';
+import React, { memo, useState, useCallback, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -11,37 +12,28 @@ import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { 
-  Settings, 
   Bell, 
   Volume2, 
   Vibrate, 
-  Clock,
   Target,
   Palette,
   Save,
   RotateCcw
 } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { useSeuilSettings, useSaveSeuilSettings } from '../hooks/useSeuilSettings';
 
 export interface SeuilUserSettings {
-  // Rappels
   remindersEnabled: boolean;
-  reminderTimes: string[]; // ['09:00', '14:00', '20:00']
-  reminderDays: number[]; // [1, 2, 3, 4, 5] (lundi-vendredi)
-  
-  // Feedback
+  reminderTimes: string[];
+  reminderDays: number[];
   soundEnabled: boolean;
   hapticEnabled: boolean;
-  soundVolume: number; // 0-100
-  
-  // Seuils personnalisés
+  soundVolume: number;
   customThresholds: {
-    intermediate: number; // défaut 31
-    critical: number; // défaut 61
-    closure: number; // défaut 86
+    intermediate: number;
+    critical: number;
+    closure: number;
   };
-  
-  // Apparence
   showInsights: boolean;
   showTrends: boolean;
   compactMode: boolean;
@@ -65,20 +57,21 @@ const DEFAULT_SETTINGS: SeuilUserSettings = {
 };
 
 interface SeuilSettingsProps {
-  settings?: Partial<SeuilUserSettings>;
   onSave?: (settings: SeuilUserSettings) => void;
 }
 
-export const SeuilSettings: React.FC<SeuilSettingsProps> = memo(({ 
-  settings: initialSettings,
-  onSave 
-}) => {
-  const [settings, setSettings] = useState<SeuilUserSettings>({
-    ...DEFAULT_SETTINGS,
-    ...initialSettings,
-  });
+export const SeuilSettings: React.FC<SeuilSettingsProps> = memo(({ onSave }) => {
+  const { data: savedSettings } = useSeuilSettings();
+  const saveSettings = useSaveSeuilSettings();
+  
+  const [settings, setSettings] = useState<SeuilUserSettings>(DEFAULT_SETTINGS);
   const [hasChanges, setHasChanges] = useState(false);
-  const { toast } = useToast();
+
+  useEffect(() => {
+    if (savedSettings) {
+      setSettings(savedSettings);
+    }
+  }, [savedSettings]);
 
   const updateSetting = useCallback(<K extends keyof SeuilUserSettings>(
     key: K, 
@@ -89,13 +82,10 @@ export const SeuilSettings: React.FC<SeuilSettingsProps> = memo(({
   }, []);
 
   const handleSave = useCallback(() => {
-    onSave?.(settings);
+    saveSettings.mutate(settings);
     setHasChanges(false);
-    toast({
-      title: 'Préférences enregistrées',
-      description: 'Tes paramètres SEUIL ont été sauvegardés.',
-    });
-  }, [settings, onSave, toast]);
+    onSave?.(settings);
+  }, [settings, saveSettings, onSave]);
 
   const handleReset = useCallback(() => {
     setSettings(DEFAULT_SETTINGS);
@@ -145,7 +135,6 @@ export const SeuilSettings: React.FC<SeuilSettingsProps> = memo(({
               animate={{ opacity: 1, height: 'auto' }}
               className="space-y-4 pt-2"
             >
-              {/* Jours */}
               <div>
                 <Label className="text-sm mb-2 block">Jours actifs</Label>
                 <div className="flex flex-wrap gap-2">
@@ -168,7 +157,6 @@ export const SeuilSettings: React.FC<SeuilSettingsProps> = memo(({
                 </div>
               </div>
 
-              {/* Heures */}
               <div>
                 <Label className="text-sm mb-2 block">Heures de rappel</Label>
                 <div className="flex flex-wrap gap-2">
@@ -194,7 +182,7 @@ export const SeuilSettings: React.FC<SeuilSettingsProps> = memo(({
         </CardContent>
       </Card>
 
-      {/* Feedback sonore et haptique */}
+      {/* Feedback */}
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="text-base flex items-center gap-2">
@@ -255,7 +243,6 @@ export const SeuilSettings: React.FC<SeuilSettingsProps> = memo(({
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          {/* Intermediate threshold */}
           <div>
             <div className="flex justify-between text-sm mb-2">
               <span className="flex items-center gap-2">
@@ -276,7 +263,6 @@ export const SeuilSettings: React.FC<SeuilSettingsProps> = memo(({
             />
           </div>
 
-          {/* Critical threshold */}
           <div>
             <div className="flex justify-between text-sm mb-2">
               <span className="flex items-center gap-2">
@@ -297,7 +283,6 @@ export const SeuilSettings: React.FC<SeuilSettingsProps> = memo(({
             />
           </div>
 
-          {/* Closure threshold */}
           <div>
             <div className="flex justify-between text-sm mb-2">
               <span className="flex items-center gap-2">
