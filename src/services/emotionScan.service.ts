@@ -256,7 +256,7 @@ export async function getEmotionScanHistory(userId: string, limit = 12): Promise
     .from('clinical_signals')
     .select('*')
     .eq('user_id', userId)
-    .in('source_instrument', ['SAM', 'scan_camera', 'scan_sliders', 'voice', 'scan_text', 'scan_facial', 'scan_voice', 'self-report'])
+    .in('source_instrument', ['SAM', 'scan_camera', 'scan_sliders', 'voice', 'scan_text', 'scan_facial', 'scan_voice', 'self-report', 'scan_image'])
     .order('created_at', { ascending: false })
     .limit(limit);
 
