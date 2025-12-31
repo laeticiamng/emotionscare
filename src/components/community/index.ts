@@ -15,3 +15,4 @@ export { EnhancedCommunityPageV2 } from './EnhancedCommunityPageV2';
 export { CommunityNotifications } from './CommunityNotifications';
 export { FollowButton } from './FollowButton';
 export { ReportModal } from './ReportModal';
+export { CommunityGroupsList } from './CommunityGroupsList';
