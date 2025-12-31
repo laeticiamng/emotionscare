@@ -56,11 +56,11 @@ export const EmotionAnalysisSchema = z.discriminatedUnion('type', [
 export const AICoachRequestSchema = z.object({
   message: z.string().trim().min(1, 'Message required').max(2000, 'Message too long (max 2000 chars)'),
   conversationHistory: z.array(z.object({
-    role: z.enum(['user', 'assistant']),
+    role: z.enum(['user', 'assistant', 'system']),
     content: z.string().max(2000)
   })).max(20, 'History too long (max 20 messages)').optional().default([]),
   userEmotion: z.string().max(50).optional().default('neutral'),
-  coachPersonality: z.enum(['empathetic', 'analytical', 'motivational', 'mindful']).optional().default('empathetic'),
+  coachPersonality: z.enum(['empathetic', 'analytical', 'motivational', 'mindful', 'zen', 'energetic']).optional().default('empathetic'),
   context: z.string().max(500).optional().default('')
 });
 
