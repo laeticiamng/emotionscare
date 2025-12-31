@@ -333,6 +333,9 @@ const ModernHomePage: React.FC = () => {
         <QuickStartModules />
 
 
+        {/* SECTION 7: Logos Presse - Social Proof */}
+        <PressLogos variant="scroll" />
+
         {/* SECTION 8: Academy - Comprendre pour reprendre la main */}
         <AcademySection />
 
@@ -375,7 +378,7 @@ const ModernHomePage: React.FC = () => {
       </Suspense>
 
       {/* Floating elements - Social Proof, CTA, Cookie Consent */}
-      <SocialProofBar position="bottom" interval={10000} />
+      <SocialProofBar position="bottom" interval={10000} showOnMobile />
       {!isAuthenticated && (
         <FloatingCTA 
           showAfterScroll={800} 
