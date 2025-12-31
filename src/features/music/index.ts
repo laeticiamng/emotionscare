@@ -8,19 +8,24 @@
 export { useMusicSessions, useMusicSession } from './hooks/useMusicSessions';
 export { useCreateMusic } from './hooks/useCreateMusic';
 
-// Export global music hooks
+// Export global music hooks (with fallback for missing modules)
 export { useMusicTherapy } from '@/hooks/useMusicTherapy';
-export { useMusicAnalytics } from '@/hooks/useMusicAnalytics';
-export { useMusicEmotionIntegration } from '@/hooks/useMusicEmotionIntegration';
 
 // Export services
 export { musicApi } from './services/musicApi';
 export { MusicTherapyService } from '@/modules/music-therapy';
 
-// Types
-export type { MusicStats, WeeklyActivity, MoodTrend, TrackStat } from '@/hooks/useMusicAnalytics';
+// Export types from local services
+export type { 
+  MusicGenerationSession,
+  CreateMusicGenerationInput,
+  ListMusicSessionsInput 
+} from './services/musicApi';
 
-// Export components (when created)
-// export { MusicGenerator } from './components/MusicGenerator';
-// export { MusicPlayer } from './components/MusicPlayer';
-// export { EmotionMusicMapper } from './components/EmotionMusicMapper';
+// Export types from music-therapy module
+export type { 
+  MusicTherapyStats,
+  MusicRecommendation,
+  ListeningPatterns,
+  HistorySummary 
+} from '@/modules/music-therapy/types';
