@@ -1,16 +1,18 @@
 /**
- * Hook Gamification - EmotionsCare
+ * Hook Gamification Unifié - EmotionsCare
+ * Centralise toute la logique de gamification avec React Query
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/contexts/AuthContext';
 import { gamificationService } from './gamificationService';
 import type { 
   Reward, 
   DailyChallenge, 
   GamificationProgress, 
-  Achievement 
+  Achievement,
+  LeaderboardUser,
 } from './types';
 
 const QUERY_KEYS = {
@@ -18,12 +20,15 @@ const QUERY_KEYS = {
   rewards: 'gamification-rewards',
   challenges: 'gamification-challenges',
   achievements: 'gamification-achievements',
+  leaderboard: 'gamification-leaderboard',
 };
 
 export function useGamification() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const userId = user?.id ?? 'anonymous';
+
+  // ========== QUERIES ==========
 
   // Progress
   const { 
@@ -68,7 +73,19 @@ export function useGamification() {
     staleTime: 60000,
   });
 
-  // Claim Reward Mutation
+  // Leaderboard
+  const {
+    data: leaderboard = [],
+    isLoading: leaderboardLoading,
+  } = useQuery({
+    queryKey: [QUERY_KEYS.leaderboard],
+    queryFn: () => gamificationService.getLeaderboard(20),
+    staleTime: 120000,
+  });
+
+  // ========== MUTATIONS ==========
+
+  // Claim Reward
   const claimRewardMutation = useMutation({
     mutationFn: (rewardId: string) => gamificationService.claimReward(rewardId, userId),
     onSuccess: () => {
@@ -76,6 +93,19 @@ export function useGamification() {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.rewards] });
     },
   });
+
+  // Track Activity
+  const trackActivityMutation = useMutation({
+    mutationFn: ({ activityType, metadata }: { activityType: string; metadata?: Record<string, unknown> }) => 
+      gamificationService.trackActivity(userId, activityType, metadata),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.progress] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.challenges] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.achievements] });
+    },
+  });
+
+  // ========== ACTIONS ==========
 
   // Update Challenge Progress
   const updateChallengeProgress = useCallback((challengeId: string, increment?: number) => {
@@ -100,6 +130,27 @@ export function useGamification() {
     return streak;
   }, [userId, queryClient]);
 
+  // Add Points
+  const addPoints = useCallback(async (points: number) => {
+    const result = await gamificationService.addPoints(userId, points);
+    queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.progress] });
+    return result;
+  }, [userId, queryClient]);
+
+  // Add XP
+  const addXp = useCallback(async (xp: number) => {
+    const result = await gamificationService.addXp(userId, xp);
+    queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.progress] });
+    return result;
+  }, [userId, queryClient]);
+
+  // Track Activity (convenience wrapper)
+  const trackActivity = useCallback((activityType: string, metadata?: Record<string, unknown>) => {
+    return trackActivityMutation.mutate({ activityType, metadata });
+  }, [trackActivityMutation]);
+
+  // ========== COMPUTED VALUES ==========
+
   // Claimed Rewards
   const claimedRewards = gamificationService.getClaimedRewards(userId);
 
@@ -121,6 +172,14 @@ export function useGamification() {
     return { hours, minutes };
   }, []);
 
+  // Completed challenges count
+  const completedChallengesCount = dailyChallenges.filter(c => c.completed).length;
+
+  // Unlocked achievements count
+  const unlockedAchievementsCount = achievements.filter(a => a.unlocked).length;
+
+  // ========== RETURN ==========
+
   return {
     // Data
     progress,
@@ -129,6 +188,11 @@ export function useGamification() {
     claimedRewards,
     dailyChallenges,
     achievements,
+    leaderboard,
+    
+    // Computed
+    completedChallengesCount,
+    unlockedAchievementsCount,
     
     // Loading states
     isLoading: progressLoading || rewardsLoading || challengesLoading || achievementsLoading,
@@ -136,6 +200,7 @@ export function useGamification() {
     rewardsLoading,
     challengesLoading,
     achievementsLoading,
+    leaderboardLoading,
     
     // Actions
     claimReward: claimRewardMutation.mutate,
@@ -143,7 +208,19 @@ export function useGamification() {
     updateChallengeProgress,
     updateAchievementProgress,
     updateStreak,
+    addPoints,
+    addXp,
+    trackActivity,
     getTimeRemaining,
+    
+    // Refresh
+    refreshProgress: () => queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.progress] }),
+    refreshAll: () => {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.progress] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.challenges] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.achievements] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.leaderboard] });
+    },
   };
 }
 
