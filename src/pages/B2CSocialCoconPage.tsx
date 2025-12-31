@@ -30,6 +30,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useFlags } from '@/core/flags';
 import { useAssessment } from '@/hooks/useAssessment';
 import { useAssessmentHistory } from '@/hooks/useAssessmentHistory';
+import { usePageSEO } from '@/hooks/usePageSEO';
 import { cn } from '@/lib/utils';
 import { useSocialRooms } from '@/features/social-cocon/hooks/useSocialRooms';
 import { useSocialBreakPlanner } from '@/features/social-cocon/hooks/useSocialBreakPlanner';
@@ -102,6 +103,14 @@ const B2CSocialCoconPage: React.FC = () => {
   const featureEnabled = has('FF_SOCIAL_COCON');
   const mspssEnabled = has('FF_ASSESS_MSPSS');
   const orchestratorEnabled = has('FF_ORCH_SOCIAL_COCON');
+
+  // SEO
+  usePageSEO({
+    title: 'Social Cocon - Espaces d\'écoute privés | EmotionsCare',
+    description: 'Créez des rooms privées pour des moments de pause partagée en toute confidentialité. Audio/texte, mode très doux, sans jugement.',
+    keywords: 'room privée, écoute, soutien, pause partagée, confidentialité, soignants, bien-être',
+    canonical: 'https://emotionscare.app/app/social-cocon',
+  });
 
   const {
     rooms,
