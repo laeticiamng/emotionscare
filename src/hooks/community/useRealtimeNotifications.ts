@@ -26,7 +26,7 @@ export interface UseRealtimeNotificationsReturn {
   refresh: () => Promise<void>;
 }
 
-// Map DB columns to our interface
+// Map DB columns to our interface - handles both old and new column names
 function mapNotification(dbNotif: Record<string, unknown>): Notification {
   return {
     id: dbNotif.id as string,
@@ -34,8 +34,10 @@ function mapNotification(dbNotif: Record<string, unknown>): Notification {
     type: (dbNotif.type as string) || 'info',
     title: (dbNotif.title as string) || '',
     message: (dbNotif.message as string) || '',
-    action_url: (dbNotif.action_link as string) || undefined,
-    is_read: (dbNotif.read as boolean) || false,
+    // Support both action_url (new) and action_link (legacy)
+    action_url: (dbNotif.action_url as string) || (dbNotif.action_link as string) || undefined,
+    // Support both is_read (new) and read (legacy)
+    is_read: (dbNotif.is_read as boolean) ?? (dbNotif.read as boolean) ?? false,
     metadata: (dbNotif.metadata as Record<string, unknown>) || {},
     created_at: dbNotif.created_at as string
   };
@@ -156,9 +158,10 @@ export function useRealtimeNotifications(): UseRealtimeNotificationsReturn {
   // Mark notification as read
   const markAsRead = useCallback(async (notificationId: string) => {
     try {
+      // Update both columns for compatibility
       const { error } = await supabase
         .from('notifications')
-        .update({ read: true })
+        .update({ read: true, is_read: true })
         .eq('id', notificationId);
 
       if (error) throw error;
@@ -180,11 +183,11 @@ export function useRealtimeNotifications(): UseRealtimeNotificationsReturn {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
+      // Update using OR condition for both old and new columns
       const { error } = await supabase
         .from('notifications')
-        .update({ read: true })
-        .eq('user_id', user.id)
-        .eq('read', false);
+        .update({ read: true, is_read: true })
+        .eq('user_id', user.id);
 
       if (error) throw error;
 
