@@ -1,37 +1,36 @@
-// @ts-nocheck
 /**
- * JournalSettingsPage - Paramètres enrichis
+ * JournalSettingsPage - Paramètres enrichis du journal
+ * Utilise useJournalEnriched pour les données dynamiques
  */
 import { memo } from 'react';
+import { useJournalEnriched } from '@/modules/journal/useJournalEnriched';
 import { JournalUserPreferences } from '@/components/journal/JournalUserPreferences';
 import { JournalTagManager } from '@/components/journal/JournalTagManager';
 import { JournalTemplates } from '@/components/journal/JournalTemplates';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import type { SanitizedNote } from '@/modules/journal/types';
 import { logger } from '@/lib/logger';
-import { Settings, Tag, FileText, Shield, Bell } from 'lucide-react';
+import { Settings, Tag, FileText, Shield, Flame, BarChart3 } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 
-interface JournalSettingsPageProps {
-  notes?: SanitizedNote[];
-}
+const JournalSettingsPage = memo(() => {
+  const { notes, stats, isLoading, isLoadingStats, availableTags } = useJournalEnriched();
 
-const JournalSettingsPage = memo<JournalSettingsPageProps>(({ notes = [] }) => {
   return (
     <div className="space-y-6">
       {/* Header */}
       <header>
         <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
           <Settings className="h-7 w-7 text-primary" aria-hidden="true" />
-          Paramètres
+          Paramètres du Journal
         </h1>
         <p className="text-muted-foreground mt-1">
-          Personnalisez votre expérience
+          Personnalisez votre expérience d'écriture
         </p>
       </header>
 
       {/* Quick Stats */}
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-4">
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
@@ -39,7 +38,11 @@ const JournalSettingsPage = memo<JournalSettingsPageProps>(({ notes = [] }) => {
                 <FileText className="h-5 w-5 text-primary" aria-hidden="true" />
               </div>
               <div>
-                <p className="text-2xl font-bold">{notes.length}</p>
+                {isLoadingStats ? (
+                  <Skeleton className="h-8 w-16" />
+                ) : (
+                  <p className="text-2xl font-bold">{stats.totalNotes}</p>
+                )}
                 <p className="text-xs text-muted-foreground">Notes</p>
               </div>
             </div>
@@ -49,13 +52,15 @@ const JournalSettingsPage = memo<JournalSettingsPageProps>(({ notes = [] }) => {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-success/10">
-                <Tag className="h-5 w-5 text-success" aria-hidden="true" />
+              <div className="p-2 rounded-lg bg-green-500/10">
+                <Tag className="h-5 w-5 text-green-500" aria-hidden="true" />
               </div>
               <div>
-                <p className="text-2xl font-bold">
-                  {new Set(notes.flatMap(n => n.tags || [])).size}
-                </p>
+                {isLoading ? (
+                  <Skeleton className="h-8 w-16" />
+                ) : (
+                  <p className="text-2xl font-bold">{availableTags.length}</p>
+                )}
                 <p className="text-xs text-muted-foreground">Tags uniques</p>
               </div>
             </div>
@@ -65,17 +70,57 @@ const JournalSettingsPage = memo<JournalSettingsPageProps>(({ notes = [] }) => {
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-secondary/10">
-                <Shield className="h-5 w-5 text-secondary" aria-hidden="true" />
+              <div className="p-2 rounded-lg bg-orange-500/10">
+                <Flame className="h-5 w-5 text-orange-500" aria-hidden="true" />
               </div>
               <div>
-                <p className="text-2xl font-bold">AES-256</p>
-                <p className="text-xs text-muted-foreground">Chiffrement</p>
+                {isLoadingStats ? (
+                  <Skeleton className="h-8 w-16" />
+                ) : (
+                  <p className="text-2xl font-bold">{stats.currentStreak}</p>
+                )}
+                <p className="text-xs text-muted-foreground">Jours de suite</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-blue-500/10">
+                <BarChart3 className="h-5 w-5 text-blue-500" aria-hidden="true" />
+              </div>
+              <div>
+                {isLoadingStats ? (
+                  <Skeleton className="h-8 w-16" />
+                ) : (
+                  <p className="text-2xl font-bold">{stats.avgWordsPerNote}</p>
+                )}
+                <p className="text-xs text-muted-foreground">Mots/note</p>
               </div>
             </div>
           </CardContent>
         </Card>
       </div>
+
+      {/* Security Badge */}
+      <Card>
+        <CardContent className="py-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-secondary/10">
+              <Shield className="h-5 w-5 text-secondary-foreground" aria-hidden="true" />
+            </div>
+            <div>
+              <p className="font-medium">Chiffrement AES-256</p>
+              <p className="text-xs text-muted-foreground">
+                Vos données sont protégées avec un chiffrement de niveau bancaire
+              </p>
+            </div>
+            <Badge variant="outline" className="ml-auto">Actif</Badge>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Preferences */}
       <JournalUserPreferences />
