@@ -79,17 +79,22 @@ export function useMusicListeningStats() {
       let realHistory: any[] = [];
       
       if (user) {
-        // Utiliser la RPC optimisée pour les stats de base
-        const { data: rpcStats, error: rpcError } = await supabase
-          .rpc('get_user_listening_stats', { p_user_id: user.id });
+        // Utiliser la RPC optimisée pour les stats de base avec gestion d'erreur robuste
+        try {
+          const { data: rpcStats, error: rpcError } = await supabase
+            .rpc('get_user_listening_stats', { p_user_id: user.id });
 
-        if (!rpcError && rpcStats && rpcStats.length > 0) {
-          const stats = rpcStats[0];
-          totalTracks = Number(stats.total_listens) || 0;
-          totalMinutes = Math.round((Number(stats.total_duration_seconds) || 0) / 60);
-          topEmotion = stats.top_emotion ? 
-            stats.top_emotion.charAt(0).toUpperCase() + stats.top_emotion.slice(1) : 
-            'Calme';
+          if (!rpcError && rpcStats && rpcStats.length > 0) {
+            const stats = rpcStats[0];
+            totalTracks = Number(stats.total_listens) || 0;
+            totalMinutes = Math.round((Number(stats.total_duration_seconds) || 0) / 60);
+            topEmotion = stats.top_emotion ? 
+              stats.top_emotion.charAt(0).toUpperCase() + stats.top_emotion.slice(1) : 
+              'Calme';
+          }
+        } catch (rpcErr) {
+          // La RPC peut échouer si la table music_history est vide, ce n'est pas critique
+          logger.warn('RPC get_user_listening_stats failed, using fallback', 'MUSIC');
         }
 
         // Récupérer l'historique pour les stats détaillées (artistes, daily, emotions)
