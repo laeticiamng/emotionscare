@@ -44,6 +44,9 @@ import { useParkRealtime } from '@/hooks/useParkRealtime';
 import { useParkFavorites } from '@/hooks/useParkFavorites';
 import { useParkExport } from '@/hooks/useParkExport';
 import { useParkSharing, type ShareableAchievement } from '@/hooks/useParkSharing';
+import { useParkEnergy } from '@/hooks/useParkEnergy';
+import { useParkStreak } from '@/hooks/useParkStreak';
+import { ParkProgressDashboard } from '@/components/park/ParkProgressDashboard';
 import type { ZoneKey, ZoneProgressData, ParkStat, MoodOption } from '@/types/park';
 
 export default function EmotionalPark() {
@@ -62,11 +65,27 @@ export default function EmotionalPark() {
   
   // Mood persisté via Supabase
   const [currentMood, setCurrentMood] = useUserPreference<string>('emotional-park-mood', '');
+  const [showProgressDashboard, setShowProgressDashboard] = useState(false);
 
-  // Energy system
-  const [energy, setEnergy] = useState(80);
-  const maxEnergy = 100;
-  const energyRegenRate = 10;
+  // Energy system (persisté via Supabase)
+  const { 
+    energy, 
+    maxEnergy, 
+    regenRate: energyRegenRate, 
+    consumeEnergy, 
+    canAfford,
+    restoreEnergy
+  } = useParkEnergy();
+
+  // Streak system (persisté via Supabase)
+  const {
+    currentStreak,
+    longestStreak,
+    weeklyActivity,
+    lastActivityDate,
+    recordActivity,
+    isActiveToday
+  } = useParkStreak();
 
   const {
     visitedAttractions,
@@ -111,13 +130,12 @@ export default function EmotionalPark() {
     }
   }, [tourCompleted, visitedAttractions]);
 
-  // Energy regeneration
+  // Record activity on first load
   useEffect(() => {
-    const interval = setInterval(() => {
-      setEnergy(prev => Math.min(maxEnergy, prev + energyRegenRate / 6));
-    }, 10 * 60 * 1000);
-    return () => clearInterval(interval);
-  }, []);
+    if (!isActiveToday && Object.keys(visitedAttractions).length > 0) {
+      recordActivity();
+    }
+  }, [isActiveToday, visitedAttractions, recordActivity]);
 
   // Use imported attractions and zones
   const attractions = parkAttractions;
@@ -223,12 +241,13 @@ export default function EmotionalPark() {
   // Handle attraction click
   const handleAttractionClick = useCallback((attraction: Attraction) => {
     // Check energy
-    if (energy < 10) {
+    if (!canAfford(10)) {
       return;
     }
     
-    setEnergy(prev => Math.max(0, prev - 10));
+    consumeEnergy(10);
     markVisited(attraction.id);
+    recordActivity(); // Record streak activity
     
     // Record visit for favorites
     if (isFavorite(attraction.id)) {
@@ -266,7 +285,7 @@ export default function EmotionalPark() {
     
     // Navigate to attraction
     navigate(attraction.route);
-  }, [attractions, zones, energy, markVisited, isFavorite, recordVisit, checkZoneCompletion, notifyBadgeUnlock, updateQuestFromZoneVisit, syncAttractionVisit, navigate]);
+  }, [attractions, zones, canAfford, consumeEnergy, markVisited, isFavorite, recordVisit, checkZoneCompletion, notifyBadgeUnlock, updateQuestFromZoneVisit, syncAttractionVisit, navigate, recordActivity]);
 
   // Handle favorite toggle
   const handleToggleFavorite = useCallback((attraction: Attraction, e: React.MouseEvent) => {
@@ -538,12 +557,63 @@ export default function EmotionalPark() {
             description={currentMood ? `Basé sur votre humeur actuelle` : 'Le parc est en pleine forme !'}
           />
           <ParkStreakWidget 
-            currentStreak={userStats.currentStreak}
-            longestStreak={Math.max(userStats.currentStreak, 7)}
-            weeklyActivity={[true, true, false, true, true, false, false]}
-            lastActivityDate={new Date().toISOString()}
+            currentStreak={currentStreak}
+            longestStreak={longestStreak}
+            weeklyActivity={weeklyActivity}
+            lastActivityDate={lastActivityDate || undefined}
           />
         </div>
+
+        {/* Progress Dashboard Toggle */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+        >
+          <Button
+            variant={showProgressDashboard ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setShowProgressDashboard(!showProgressDashboard)}
+            className="gap-2"
+          >
+            <TrendingUp className="h-4 w-4" />
+            {showProgressDashboard ? 'Masquer le tableau de bord' : 'Mon tableau de bord'}
+          </Button>
+        </motion.div>
+
+        {/* Progress Dashboard */}
+        <AnimatePresence>
+          {showProgressDashboard && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+            >
+              <ParkProgressDashboard
+                streak={{
+                  current: currentStreak,
+                  longest: longestStreak,
+                  lastActivityDate: lastActivityDate || undefined,
+                  weeklyProgress: weeklyActivity
+                }}
+                level={{
+                  level: Math.floor(getCompletedQuestsCount() / 2) + 1,
+                  xp: getTotalRewards(),
+                  xpToNextLevel: (Math.floor(getCompletedQuestsCount() / 2) + 1) * 500,
+                  title: 'Explorateur'
+                }}
+                dailyGoals={[
+                  { id: '1', title: 'Visiter une attraction', progress: Object.keys(visitedAttractions).length > 0 ? 1 : 0, target: 1, icon: '🎪', completed: Object.keys(visitedAttractions).length > 0 },
+                  { id: '2', title: 'Compléter une quête', progress: getCompletedQuestsCount() > 0 ? 1 : 0, target: 1, icon: '🏆', completed: getCompletedQuestsCount() > 0 },
+                  { id: '3', title: 'Explorer 3 zones', progress: Math.min(3, new Set(Object.keys(visitedAttractions).map(id => attractions.find(a => a.id === id)?.zone)).size), target: 3, icon: '🗺️', completed: new Set(Object.keys(visitedAttractions).map(id => attractions.find(a => a.id === id)?.zone)).size >= 3 }
+                ]}
+                totalVisits={Object.keys(visitedAttractions).length}
+                zonesCompleted={unlockedBadges.length}
+                totalZones={Object.keys(zones).length}
+                onStartActivity={handleRandomAttraction}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Quick Actions */}
         <div className="flex items-center justify-between">
