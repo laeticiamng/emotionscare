@@ -47,6 +47,33 @@ const TestimonialsSection: React.FC = () => {
       avatar: "👩‍⚕️",
       category: 'nurse',
       highlight: 'Gestion du stress',
+    },
+    {
+      name: "Lucas M.",
+      role: "Étudiant en pharmacie, 3ème année",
+      content: "J'utilise le protocole Concentration avant chaque session de révision. Ma capacité à rester focus a littéralement doublé.",
+      rating: 5,
+      avatar: "👨‍🎓",
+      category: 'student',
+      highlight: 'Focus amélioré',
+    },
+    {
+      name: "Sarah B.",
+      role: "Aide-soignante en EHPAD",
+      content: "Les journées sont émotionnellement intenses. Les 3 minutes de Reset entre les accompagnements me permettent de rester présente pour chaque résident.",
+      rating: 5,
+      avatar: "👩‍⚕️",
+      category: 'nurse',
+      highlight: 'Présence maintenue',
+    },
+    {
+      name: "Antoine V.",
+      role: "Chef de clinique, urgences",
+      content: "Je recommande EmotionsCare à tous mes internes. C'est devenu un outil de prévention du burn-out dans notre service.",
+      rating: 5,
+      avatar: "👨‍⚕️",
+      category: 'doctor',
+      highlight: 'Prévention burn-out',
     }
   ];
 

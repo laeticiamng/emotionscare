@@ -118,7 +118,7 @@ const CommunityEngagement: React.FC = () => {
           {/* Header - Framing interventionnel */}
           <motion.div variants={itemVariants} className="text-center space-y-4">
             <Badge variant="outline" className="justify-center">
-              <Users className="h-3 w-3 mr-2" />
+              <Users className="h-3 w-3 mr-2" aria-hidden="true" />
               Rituels collectifs
             </Badge>
             <h2 className="text-3xl lg:text-4xl font-bold">
