@@ -125,8 +125,13 @@ const SocialProofBar: React.FC<SocialProofBarProps> = ({
             className
           )}
         >
-          <div className="flex items-center gap-3 px-4 py-3 bg-card/95 backdrop-blur-sm rounded-lg border border-border shadow-lg max-w-sm">
-            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-muted">
+          <div 
+            className="flex items-center gap-3 px-4 py-3 bg-card/95 backdrop-blur-sm rounded-lg border border-border shadow-lg max-w-sm"
+            role="status"
+            aria-live="polite"
+            aria-label={`${currentProof.name} ${currentProof.action} - ${currentProof.time}`}
+          >
+            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-muted" aria-hidden="true">
               {currentProof.icon}
             </div>
             <div className="flex-1 min-w-0">

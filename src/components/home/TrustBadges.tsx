@@ -106,7 +106,7 @@ const TrustBadges: React.FC<TrustBadgesProps> = ({
             variants={itemVariants}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-muted/50 border border-border/50"
           >
-            <span className={badge.color}>{badge.icon}</span>
+            <span className={badge.color} aria-hidden="true">{badge.icon}</span>
             <span className="text-xs font-medium text-foreground">{badge.label}</span>
           </motion.div>
         ))}
@@ -130,7 +130,7 @@ const TrustBadges: React.FC<TrustBadgesProps> = ({
             whileHover={{ scale: 1.05 }}
             className="flex flex-col items-center p-4 rounded-xl bg-card/50 border border-border/50 text-center hover:shadow-lg transition-all"
           >
-            <div className={cn('p-2 rounded-full bg-muted mb-2', badge.color)}>
+            <div className={cn('p-2 rounded-full bg-muted mb-2', badge.color)} aria-hidden="true">
               {badge.icon}
             </div>
             <span className="text-sm font-semibold text-foreground">{badge.label}</span>
@@ -161,7 +161,7 @@ const TrustBadges: React.FC<TrustBadgesProps> = ({
           variants={itemVariants}
           className="flex items-center gap-2"
         >
-          <span className={badge.color}>{badge.icon}</span>
+          <span className={badge.color} aria-hidden="true">{badge.icon}</span>
           <div className="text-left">
             <span className="text-sm font-medium text-foreground block">{badge.label}</span>
             {badge.sublabel && (
