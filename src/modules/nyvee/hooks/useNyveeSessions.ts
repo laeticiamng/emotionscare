@@ -1,12 +1,14 @@
 /**
  * useNyveeSessions - Hook React Query pour les sessions Nyvee
  * Gère la persistance et le fetching des sessions
+ * Synchronise avec le système d'interconnexion des modules
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import { useModuleInterconnect } from '@/hooks/useModuleInterconnect';
 import type { BreathingIntensity, BadgeType, CocoonType } from '../types';
 
 export interface NyveeSessionRecord {
@@ -66,6 +68,7 @@ export const useNyveeSessions = () => {
   const { toast } = useToast();
   const { user } = useAuth();
   const userId = user?.id;
+  const { syncFromModule, notifyModules } = useModuleInterconnect();
 
   // Récupérer l'historique des sessions
   const sessionsQuery = useQuery({
@@ -264,11 +267,37 @@ export const useNyveeSessions = () => {
         .eq('id', params.sessionId);
 
       if (error) throw error;
+      
+      // Sync avec le système d'interconnexion des modules
+      try {
+        await syncFromModule('nyvee', params.sessionId, {
+          duration_seconds: params.durationSeconds,
+          mood_after: params.moodAfter,
+          xp_earned: params.badgeEarned === 'calm' ? 50 : params.badgeEarned === 'partial' ? 25 : 10,
+          metadata: {
+            cycles_completed: params.cyclesCompleted,
+            badge_earned: params.badgeEarned,
+            cocoon_unlocked: params.cocoonUnlocked
+          }
+        });
+
+        // Notifier les modules connectés
+        await notifyModules('nyvee', 'shares_data', {
+          event: 'session_completed',
+          badge_earned: params.badgeEarned,
+          cycles: params.cyclesCompleted,
+          duration: params.durationSeconds
+        });
+      } catch (syncError) {
+        console.warn('Module sync failed:', syncError);
+      }
+      
       return { success: true };
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['nyvee-sessions', userId] });
       queryClient.invalidateQueries({ queryKey: ['nyvee-stats', userId] });
+      queryClient.invalidateQueries({ queryKey: ['unified-sessions'] });
       toast({ title: 'Session terminée avec succès' });
     },
     onError: (error: Error) => {
