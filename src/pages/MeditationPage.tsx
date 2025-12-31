@@ -1,377 +1,862 @@
-import { useState, useEffect, useRef } from 'react';
+/**
+ * Meditation Page - Module complet de méditation guidée
+ */
+
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { Brain, Clock, Play, Pause, RotateCcw, ArrowLeft, Sparkles } from 'lucide-react';
+import { 
+  Brain, 
+  Clock, 
+  Play, 
+  Pause, 
+  RotateCcw, 
+  ArrowLeft, 
+  Sparkles,
+  Settings,
+  History,
+  TrendingUp,
+  Target,
+  Volume2,
+  VolumeX,
+  Heart,
+  CheckCircle,
+  BarChart3,
+  Wind,
+  Waves,
+  TreePine,
+  Flame,
+  Cloud
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Slider } from '@/components/ui/slider';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import { Skeleton } from '@/components/ui/skeleton';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
+import { useMeditationStats, useMeditationHistory, useMeditationWeeklyProgress } from '@/hooks/useMeditationStats';
+import { useMeditationSettings } from '@/hooks/useMeditationSettings';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/contexts/AuthContext';
+import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
 
-interface MeditationStats {
-  totalSessions: number;
-  totalMinutes: number;
-  longestSession: number;
-  lastSession: string | null;
-}
+const TECHNIQUE_OPTIONS = [
+  { 
+    id: 'mindfulness', 
+    title: 'Pleine conscience', 
+    description: 'Observer le moment présent sans jugement',
+    icon: Brain,
+    color: 'bg-blue-500/10 text-blue-600',
+    durations: [5, 10, 15, 20]
+  },
+  { 
+    id: 'breath-focus', 
+    title: 'Focus respiration', 
+    description: 'Se concentrer sur le souffle naturel',
+    icon: Wind,
+    color: 'bg-cyan-500/10 text-cyan-600',
+    durations: [5, 10, 15]
+  },
+  { 
+    id: 'body-scan', 
+    title: 'Scan corporel', 
+    description: 'Explorer les sensations progressivement',
+    icon: Heart,
+    color: 'bg-pink-500/10 text-pink-600',
+    durations: [10, 15, 20, 30]
+  },
+  { 
+    id: 'visualization', 
+    title: 'Visualisation', 
+    description: 'Créer des images mentales apaisantes',
+    icon: Sparkles,
+    color: 'bg-purple-500/10 text-purple-600',
+    durations: [10, 15, 20]
+  },
+  { 
+    id: 'loving-kindness', 
+    title: 'Bienveillance', 
+    description: 'Cultiver la compassion',
+    icon: Heart,
+    color: 'bg-rose-500/10 text-rose-600',
+    durations: [10, 15, 20]
+  },
+  { 
+    id: 'mantra', 
+    title: 'Mantra', 
+    description: 'Répéter un son calmant',
+    icon: Volume2,
+    color: 'bg-indigo-500/10 text-indigo-600',
+    durations: [5, 10, 15, 20]
+  },
+];
+
+const AMBIENT_SOUNDS = [
+  { id: 'none', label: 'Aucun', icon: VolumeX },
+  { id: 'rain', label: 'Pluie', icon: Cloud },
+  { id: 'forest', label: 'Forêt', icon: TreePine },
+  { id: 'ocean', label: 'Océan', icon: Waves },
+  { id: 'fire', label: 'Feu', icon: Flame },
+  { id: 'wind', label: 'Vent', icon: Wind },
+];
+
+const TECHNIQUE_LABELS: Record<string, string> = {
+  'mindfulness': 'Pleine conscience',
+  'breath-focus': 'Focus respiration',
+  'body-scan': 'Scan corporel',
+  'visualization': 'Visualisation',
+  'loving-kindness': 'Bienveillance',
+  'mantra': 'Mantra',
+};
 
 export default function MeditationPage() {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { user } = useAuth();
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [selectedDuration, setSelectedDuration] = useState(5);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [selectedProgram, setSelectedProgram] = useState<string | null>(null);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const { data: stats, isLoading: statsLoading, refetch: refetchStats } = useMeditationStats();
+  const { data: history, isLoading: historyLoading } = useMeditationHistory(10);
+  const { data: weeklyProgress } = useMeditationWeeklyProgress();
+  const { settings, saveSettings } = useMeditationSettings();
   
-  // Statistiques de méditation - persistées en Supabase
-  const [stats, setStats] = useState<MeditationStats>({ 
-    totalSessions: 0, 
-    totalMinutes: 0,
-    longestSession: 0,
-    lastSession: null
-  });
-
-  // Charger les stats depuis Supabase
+  // Session state
+  const [selectedTechnique, setSelectedTechnique] = useState<string | null>(null);
+  const [selectedDuration, setSelectedDuration] = useState(10);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [moodBefore, setMoodBefore] = useState<number | null>(null);
+  const [showMoodPrompt, setShowMoodPrompt] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [activeTab, setActiveTab] = useState<'practice' | 'history' | 'progress'>('practice');
+  const [breathScale, setBreathScale] = useState(1);
+  
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const breathRef = useRef<NodeJS.Timeout | null>(null);
+  
+  const totalDuration = selectedDuration * 60;
+  const progress = (currentTime / totalDuration) * 100;
+  
+  // Breath animation
   useEffect(() => {
-    const loadStats = async () => {
-      if (!user) {
-        // Fallback localStorage pour utilisateurs non connectés
-        const saved = localStorage.getItem('meditation_stats');
-        if (saved) setStats(JSON.parse(saved));
-        return;
-      }
-
-      const { data, error } = await supabase
-        .from('user_preferences')
-        .select('meditation_stats')
-        .eq('user_id', user.id)
-        .single();
-
-      if (data?.meditation_stats) {
-        setStats(data.meditation_stats as MeditationStats);
-      } else if (error?.code === 'PGRST116') {
-        // Pas de préférences, créer une entrée
-        await supabase.from('user_preferences').insert({
-          user_id: user.id,
-          meditation_stats: stats
-        });
-      }
-    };
-    loadStats();
-  }, [user]);
-
-  // Sauvegarder les stats
-  const saveStats = async (newStats: MeditationStats) => {
-    setStats(newStats);
-    
-    if (user) {
-      await supabase
-        .from('user_preferences')
-        .upsert({
-          user_id: user.id,
-          meditation_stats: newStats,
-          updated_at: new Date().toISOString()
-        }, { onConflict: 'user_id' });
-    } else {
-      localStorage.setItem('meditation_stats', JSON.stringify(newStats));
+    if (!isPlaying) {
+      setBreathScale(1);
+      return;
     }
-  };
+    
+    let expanding = true;
+    breathRef.current = setInterval(() => {
+      setBreathScale(prev => {
+        if (expanding) {
+          if (prev >= 1.3) {
+            expanding = false;
+            return prev - 0.02;
+          }
+          return prev + 0.02;
+        } else {
+          if (prev <= 1) {
+            expanding = true;
+            return prev + 0.02;
+          }
+          return prev - 0.02;
+        }
+      });
+    }, 100);
+    
+    return () => {
+      if (breathRef.current) clearInterval(breathRef.current);
+    };
+  }, [isPlaying]);
 
-  const programs = [
-    {
-      id: 'calm',
-      title: 'Méditation Calme',
-      description: 'Apaiser votre esprit et réduire le stress',
-      duration: [5, 10, 15, 20],
-      icon: Brain,
-      color: 'bg-blue-500/10 text-blue-600',
-    },
-    {
-      id: 'focus',
-      title: 'Concentration',
-      description: 'Améliorer votre focus et clarté mentale',
-      duration: [5, 10, 15],
-      icon: Sparkles,
-      color: 'bg-purple-500/10 text-purple-600',
-    },
-    {
-      id: 'sleep',
-      title: 'Sommeil Profond',
-      description: 'Préparer votre corps et esprit au repos',
-      duration: [10, 15, 20, 30],
-      icon: Clock,
-      color: 'bg-indigo-500/10 text-indigo-600',
-    },
-  ];
-
-  const handleStart = () => {
-    if (!selectedProgram) {
+  // Start session
+  const startSession = useCallback(async () => {
+    if (!selectedTechnique) {
       toast({
-        title: 'Programme requis',
-        description: 'Veuillez sélectionner un programme de méditation',
+        title: 'Technique requise',
+        description: 'Veuillez sélectionner une technique de méditation',
         variant: 'destructive',
       });
       return;
     }
+    
+    setShowMoodPrompt(true);
+  }, [selectedTechnique, toast]);
+  
+  // Confirm start with mood
+  const confirmStart = useCallback(async (mood: number | null) => {
+    setMoodBefore(mood);
+    setShowMoodPrompt(false);
     setIsPlaying(true);
     setCurrentTime(0);
-  };
-
-  const handlePause = () => {
-    setIsPlaying(false);
-  };
-
-  const handleReset = () => {
-    setIsPlaying(false);
-    setCurrentTime(0);
-  };
-
-  // Timer logic for meditation session
-  useEffect(() => {
-    if (isPlaying && currentTime < selectedDuration * 60) {
-      timerRef.current = setInterval(() => {
-        setCurrentTime(prev => {
-          const newTime = prev + 1;
-          // Auto-complete when time is up
-          if (newTime >= selectedDuration * 60) {
-            setIsPlaying(false);
-            
-            // Sauvegarder la session via Supabase
-            const newStats: MeditationStats = {
-              totalSessions: stats.totalSessions + 1,
-              totalMinutes: stats.totalMinutes + selectedDuration,
-              longestSession: Math.max(stats.longestSession, selectedDuration),
-              lastSession: new Date().toISOString()
-            };
-            saveStats(newStats);
-            
-            toast({
-              title: 'Méditation terminée! 🧘',
-              description: `Vous avez complété votre session de ${selectedDuration} minutes. Total: ${newStats.totalSessions} sessions.`,
-            });
-          }
-          return newTime;
-        });
-      }, 1000);
-    } else {
-      if (timerRef.current) clearInterval(timerRef.current);
+    
+    // Create session in DB
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data, error } = await supabase
+          .from('meditation_sessions')
+          .insert({
+            user_id: user.id,
+            technique: selectedTechnique,
+            duration: selectedDuration * 60,
+            mood_before: mood,
+            with_guidance: settings.withGuidance,
+            with_music: settings.withMusic,
+            completed: false,
+            completed_duration: 0,
+            started_at: new Date().toISOString(),
+          })
+          .select('id')
+          .single();
+        
+        if (!error && data) {
+          setSessionId(data.id);
+        }
+      }
+    } catch (err) {
+      console.error('Error creating session:', err);
     }
+    
+    // Haptic feedback
+    if (settings.hapticFeedback && navigator.vibrate) {
+      navigator.vibrate(100);
+    }
+  }, [selectedTechnique, selectedDuration, settings]);
 
+  // Complete session
+  const completeSession = useCallback(async (moodAfter?: number) => {
+    setIsPlaying(false);
+    
+    if (sessionId) {
+      try {
+        await supabase
+          .from('meditation_sessions')
+          .update({
+            completed: true,
+            completed_duration: currentTime,
+            completed_at: new Date().toISOString(),
+            mood_after: moodAfter,
+          })
+          .eq('id', sessionId);
+        
+        refetchStats();
+        
+        toast({
+          title: 'Méditation terminée ! 🧘',
+          description: `${Math.round(currentTime / 60)} minutes de ${TECHNIQUE_LABELS[selectedTechnique || ''] || 'méditation'}`,
+        });
+      } catch (err) {
+        console.error('Error completing session:', err);
+      }
+    }
+    
+    setSessionId(null);
+    setCurrentTime(0);
+  }, [sessionId, currentTime, selectedTechnique, refetchStats, toast]);
+
+  // Timer effect
+  useEffect(() => {
+    if (!isPlaying) return;
+    
+    timerRef.current = setInterval(() => {
+      setCurrentTime(prev => {
+        if (prev >= totalDuration) {
+          completeSession();
+          return prev;
+        }
+        return prev + 1;
+      });
+    }, 1000);
+    
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [isPlaying, selectedDuration, currentTime]);
+  }, [isPlaying, totalDuration, completeSession]);
 
-  const progress = (currentTime / (selectedDuration * 60)) * 100;
+  // Pause/Resume
+  const togglePause = useCallback(() => {
+    setIsPlaying(prev => !prev);
+    if (settings.hapticFeedback && navigator.vibrate) {
+      navigator.vibrate(50);
+    }
+  }, [settings.hapticFeedback]);
+
+  // Reset
+  const resetSession = useCallback(() => {
+    setIsPlaying(false);
+    setCurrentTime(0);
+    setSessionId(null);
+  }, []);
+
+  // Format time
+  const formatTime = (seconds: number): string => {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m}:${s.toString().padStart(2, '0')}`;
+  };
+  
+  const weeklyGoalProgress = stats 
+    ? Math.min(100, Math.round((stats.total_minutes / settings.weeklyGoalMinutes) * 100))
+    : 0;
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-background via-background to-muted p-6">
-      <div className="mx-auto max-w-5xl space-y-6">
-        <header className="space-y-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate(-1)}
-            className="mb-4"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Retour
-          </Button>
-          <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-              <Brain className="h-6 w-6 text-primary" />
+    <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-background">
+      <div className="container mx-auto px-4 py-6 max-w-4xl">
+        {/* Header */}
+        <header className="mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => navigate('/app')}
+                aria-label="Retour"
+              >
+                <ArrowLeft className="h-5 w-5" />
+              </Button>
+              <div>
+                <h1 className="text-2xl font-bold text-foreground">Méditation</h1>
+                <p className="text-sm text-muted-foreground">Recentrez-vous en pleine conscience</p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-3xl font-bold">Méditation Guidée</h1>
-              <p className="text-muted-foreground">
-                Prenez un moment pour vous recentrer
-              </p>
-            </div>
+            
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setShowSettings(true)}
+              aria-label="Paramètres"
+            >
+              <Settings className="h-5 w-5" />
+            </Button>
+          </div>
+
+          {/* Quick Stats */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <Card className="bg-card/50">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-2">
+                  <Brain className="h-4 w-4 text-primary" />
+                  <div>
+                    <p className="text-xs text-muted-foreground">Sessions</p>
+                    {statsLoading ? (
+                      <Skeleton className="h-6 w-12" />
+                    ) : (
+                      <p className="text-xl font-bold">{stats?.completed_sessions || 0}</p>
+                    )}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-card/50">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-2">
+                  <Clock className="h-4 w-4 text-info" />
+                  <div>
+                    <p className="text-xs text-muted-foreground">Minutes</p>
+                    {statsLoading ? (
+                      <Skeleton className="h-6 w-16" />
+                    ) : (
+                      <p className="text-xl font-bold">{stats?.total_minutes || 0}</p>
+                    )}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-card/50">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-2">
+                  <TrendingUp className="h-4 w-4 text-success" />
+                  <div>
+                    <p className="text-xs text-muted-foreground">Streak</p>
+                    {statsLoading ? (
+                      <Skeleton className="h-6 w-16" />
+                    ) : (
+                      <p className="text-xl font-bold">{stats?.current_streak || 0} j</p>
+                    )}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-card/50">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-2">
+                  <Heart className="h-4 w-4 text-destructive" />
+                  <div>
+                    <p className="text-xs text-muted-foreground">Δ Humeur</p>
+                    {statsLoading ? (
+                      <Skeleton className="h-6 w-12" />
+                    ) : (
+                      <p className="text-xl font-bold">
+                        {stats?.avg_mood_delta != null 
+                          ? `${(stats?.avg_mood_delta ?? 0) > 0 ? '+' : ''}${stats?.avg_mood_delta ?? 0}`
+                          : '—'}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </header>
 
-        {/* Meditation Programs */}
-        <section>
-          <h2 className="mb-4 text-xl font-semibold">Programmes de méditation</h2>
-          <div className="grid gap-4 md:grid-cols-3">
-            {programs.map((program) => {
-              const Icon = program.icon;
-              const isSelected = selectedProgram === program.id;
-              return (
-                <Card
-                  key={program.id}
-                  className={`cursor-pointer transition-all ${
-                    isSelected
-                      ? 'border-primary bg-primary/5'
-                      : 'hover:border-primary/50'
-                  }`}
-                  onClick={() => setSelectedProgram(program.id)}
-                >
-                  <CardHeader>
-                    <div className={`mb-3 flex h-12 w-12 items-center justify-center rounded-lg ${program.color}`}>
-                      <Icon className="h-6 w-6" />
+        {/* Main Content */}
+        <AnimatePresence mode="wait">
+          {isPlaying || currentTime > 0 ? (
+            // Active Session View
+            <motion.div
+              key="session"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="space-y-6"
+            >
+              {/* Meditation Circle */}
+              <div className="flex items-center justify-center py-12">
+                <div className="relative">
+                  <motion.div
+                    animate={{ scale: breathScale }}
+                    transition={{ duration: 0.1, ease: 'linear' }}
+                    className="w-56 h-56 rounded-full bg-gradient-to-br from-primary/20 to-purple-500/20 flex items-center justify-center shadow-2xl"
+                  >
+                    <div className="w-44 h-44 rounded-full bg-gradient-to-br from-primary/30 to-purple-500/30 flex items-center justify-center">
+                      <div className="text-center">
+                        <p className="text-4xl font-bold text-foreground">
+                          {formatTime(totalDuration - currentTime)}
+                        </p>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          {TECHNIQUE_LABELS[selectedTechnique || ''] || 'Méditation'}
+                        </p>
+                      </div>
                     </div>
-                    <CardTitle className="text-lg">{program.title}</CardTitle>
-                    <CardDescription>{program.description}</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex flex-wrap gap-2">
-                      {program.duration.map((duration) => (
-                        <Badge
-                          key={duration}
-                          variant={
-                            isSelected && selectedDuration === duration
-                              ? 'default'
-                              : 'outline'
-                          }
-                          className="cursor-pointer"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setSelectedProgram(program.id);
-                            setSelectedDuration(duration);
-                          }}
-                        >
-                          {duration} min
-                        </Badge>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-        </section>
-
-        {/* Player */}
-        {selectedProgram && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Session de méditation</CardTitle>
-              <CardDescription>
-                {selectedDuration} minutes - {programs.find((p) => p.id === selectedProgram)?.title}
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Progression</span>
-                  <span className="font-medium">
-                    {Math.floor(currentTime / 60)}:{(currentTime % 60).toString().padStart(2, '0')} / {selectedDuration}:00
-                  </span>
+                  </motion.div>
+                  
+                  {/* Progress ring */}
+                  <svg
+                    className="absolute inset-0 w-full h-full -rotate-90"
+                    viewBox="0 0 224 224"
+                  >
+                    <circle
+                      cx="112"
+                      cy="112"
+                      r="108"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                      className="text-muted/20"
+                    />
+                    <circle
+                      cx="112"
+                      cy="112"
+                      r="108"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                      strokeDasharray={2 * Math.PI * 108}
+                      strokeDashoffset={2 * Math.PI * 108 * (1 - progress / 100)}
+                      className="text-primary transition-all duration-1000"
+                      strokeLinecap="round"
+                    />
+                  </svg>
                 </div>
-                <Progress value={progress} className="h-2" />
               </div>
-
+              
+              {/* Session Info */}
+              <Card className="bg-card/50">
+                <CardContent className="p-4 text-center">
+                  <p className="text-muted-foreground">
+                    {isPlaying 
+                      ? 'Respirez profondément... Laissez vos pensées passer comme des nuages.'
+                      : 'Session en pause. Appuyez pour reprendre.'}
+                  </p>
+                </CardContent>
+              </Card>
+              
+              {/* Controls */}
               <div className="flex items-center justify-center gap-4">
                 <Button
                   variant="outline"
                   size="icon"
-                  onClick={handleReset}
-                  disabled={currentTime === 0}
+                  onClick={resetSession}
+                  aria-label="Réinitialiser"
                 >
                   <RotateCcw className="h-5 w-5" />
-                  <span className="sr-only">Réinitialiser</span>
                 </Button>
+                
+                <Button
+                  size="lg"
+                  className="w-16 h-16 rounded-full"
+                  onClick={togglePause}
+                  aria-label={isPlaying ? 'Pause' : 'Reprendre'}
+                >
+                  {isPlaying ? (
+                    <Pause className="h-8 w-8" />
+                  ) : (
+                    <Play className="h-8 w-8 ml-1" />
+                  )}
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => completeSession()}
+                  aria-label="Terminer"
+                >
+                  <CheckCircle className="h-5 w-5" />
+                </Button>
+              </div>
+            </motion.div>
+          ) : (
+            // Selection View
+            <motion.div
+              key="selection"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+            >
+              <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)}>
+                <TabsList className="w-full mb-6">
+                  <TabsTrigger value="practice" className="flex-1">
+                    <Brain className="h-4 w-4 mr-2" />
+                    Pratiquer
+                  </TabsTrigger>
+                  <TabsTrigger value="history" className="flex-1">
+                    <History className="h-4 w-4 mr-2" />
+                    Historique
+                  </TabsTrigger>
+                  <TabsTrigger value="progress" className="flex-1">
+                    <BarChart3 className="h-4 w-4 mr-2" />
+                    Progrès
+                  </TabsTrigger>
+                </TabsList>
 
-                {!isPlaying ? (
+                <TabsContent value="practice" className="space-y-6">
+                  {/* Technique Selection */}
+                  <div>
+                    <h2 className="text-lg font-semibold mb-4">Choisissez votre technique</h2>
+                    <div className="grid gap-3 md:grid-cols-2">
+                      {TECHNIQUE_OPTIONS.map((technique) => {
+                        const Icon = technique.icon;
+                        const isSelected = selectedTechnique === technique.id;
+                        return (
+                          <Card
+                            key={technique.id}
+                            className={`cursor-pointer transition-all ${
+                              isSelected
+                                ? 'border-primary bg-primary/5 shadow-md'
+                                : 'hover:border-primary/50'
+                            }`}
+                            onClick={() => {
+                              setSelectedTechnique(technique.id);
+                              if (!technique.durations.includes(selectedDuration)) {
+                                setSelectedDuration(technique.durations[0]);
+                              }
+                            }}
+                          >
+                            <CardContent className="p-4">
+                              <div className="flex items-start gap-3">
+                                <div className={`p-2 rounded-lg ${technique.color}`}>
+                                  <Icon className="h-5 w-5" />
+                                </div>
+                                <div className="flex-1">
+                                  <h3 className="font-medium">{technique.title}</h3>
+                                  <p className="text-sm text-muted-foreground">{technique.description}</p>
+                                  {isSelected && (
+                                    <div className="flex flex-wrap gap-2 mt-3">
+                                      {technique.durations.map((d) => (
+                                        <Badge
+                                          key={d}
+                                          variant={selectedDuration === d ? 'default' : 'outline'}
+                                          className="cursor-pointer"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            setSelectedDuration(d);
+                                          }}
+                                        >
+                                          {d} min
+                                        </Badge>
+                                      ))}
+                                    </div>
+                                  )}
+                                </div>
+                                {isSelected && <CheckCircle className="h-5 w-5 text-primary" />}
+                              </div>
+                            </CardContent>
+                          </Card>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Start Button */}
                   <Button
                     size="lg"
-                    className="h-16 w-16 rounded-full"
-                    onClick={handleStart}
+                    className="w-full h-14 text-lg"
+                    onClick={startSession}
+                    disabled={!selectedTechnique}
                   >
-                    <Play className="h-6 w-6" />
-                    <span className="sr-only">Démarrer</span>
+                    <Play className="h-6 w-6 mr-2" />
+                    Commencer ({selectedDuration} min)
                   </Button>
-                ) : (
-                  <Button
-                    size="lg"
-                    className="h-16 w-16 rounded-full"
-                    onClick={handlePause}
-                    variant="secondary"
+
+                  {/* Weekly Goal */}
+                  <Card>
+                    <CardHeader className="pb-3">
+                      <div className="flex items-center justify-between">
+                        <CardTitle className="text-base flex items-center gap-2">
+                          <Target className="h-4 w-4" />
+                          Objectif hebdomadaire
+                        </CardTitle>
+                        <Badge variant={weeklyGoalProgress >= 100 ? 'default' : 'secondary'}>
+                          {weeklyGoalProgress}%
+                        </Badge>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <Progress value={weeklyGoalProgress} className="h-3 mb-2" />
+                      <p className="text-sm text-muted-foreground">
+                        {(stats?.total_minutes ?? 0)} / {settings.weeklyGoalMinutes} minutes
+                      </p>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+
+                <TabsContent value="history" className="space-y-3">
+                  {historyLoading ? (
+                    Array.from({ length: 3 }).map((_, i) => (
+                      <Skeleton key={i} className="h-20 w-full" />
+                    ))
+                  ) : history && history.length > 0 ? (
+                    history.map((session) => (
+                      <Card key={session.id} className="hover:shadow-md transition-shadow">
+                        <CardContent className="p-4">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <div className="flex items-center gap-2 mb-1">
+                                <span className="font-medium">
+                                  {TECHNIQUE_LABELS[session.technique] || session.technique}
+                                </span>
+                                <Badge variant={session.completed ? 'default' : 'secondary'} className="text-xs">
+                                  {session.completed ? 'Terminée' : 'Incomplète'}
+                                </Badge>
+                              </div>
+                              <p className="text-sm text-muted-foreground">
+                                {format(new Date(session.created_at), "d MMM yyyy 'à' HH:mm", { locale: fr })}
+                                {' • '}{Math.round((session.completed_duration || session.duration) / 60)} min
+                              </p>
+                            </div>
+                            {session.mood_delta !== null && (
+                              <div className="text-right">
+                                <p className={`text-lg font-bold ${session.mood_delta > 0 ? 'text-success' : session.mood_delta < 0 ? 'text-destructive' : 'text-muted-foreground'}`}>
+                                  {session.mood_delta > 0 ? '+' : ''}{session.mood_delta}
+                                </p>
+                                <p className="text-xs text-muted-foreground">Δ Humeur</p>
+                              </div>
+                            )}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))
+                  ) : (
+                    <Card className="border-dashed">
+                      <CardContent className="p-8 text-center">
+                        <Brain className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                        <h3 className="font-medium mb-2">Aucune session</h3>
+                        <p className="text-sm text-muted-foreground mb-4">
+                          Commencez votre première méditation
+                        </p>
+                        <Button onClick={() => setActiveTab('practice')}>
+                          <Play className="h-4 w-4 mr-2" />
+                          Commencer
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  )}
+                </TabsContent>
+
+                <TabsContent value="progress" className="space-y-4">
+                  {/* Weekly Chart */}
+                  {weeklyProgress && weeklyProgress.length > 0 && (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-base">Cette semaine</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="flex items-end gap-2 h-32">
+                          {weeklyProgress.map((day, i) => (
+                            <div key={i} className="flex-1 flex flex-col items-center gap-1">
+                              <div 
+                                className="w-full bg-primary/20 rounded-t transition-all"
+                                style={{ 
+                                  height: `${Math.max(4, (day.minutes / Math.max(...weeklyProgress.map(d => d.minutes), 1)) * 100)}%`,
+                                  minHeight: day.minutes > 0 ? 8 : 4,
+                                }}
+                              />
+                              <span className="text-xs text-muted-foreground">{day.day}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {/* Stats Details */}
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-base">Statistiques</CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-3">
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-muted-foreground">Sessions cette semaine</span>
+                          <span className="font-medium">{stats?.sessions_this_week || 0}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-muted-foreground">Taux de complétion</span>
+                          <span className="font-medium">{stats?.completion_rate || 0}%</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-muted-foreground">Durée moyenne</span>
+                          <span className="font-medium">{stats?.average_duration_minutes || 0} min</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-muted-foreground">Plus longue session</span>
+                          <span className="font-medium">{stats?.longest_session_minutes || 0} min</span>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-base">Préférences</CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-3">
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-muted-foreground">Technique favorite</span>
+                          <Badge variant="outline">
+                            {stats?.favorite_technique 
+                              ? TECHNIQUE_LABELS[stats.favorite_technique] || stats.favorite_technique
+                              : 'Aucune'}
+                          </Badge>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-muted-foreground">Record streak</span>
+                          <span className="font-medium">{stats?.longest_streak || 0} jours</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-muted-foreground">Amélioration humeur</span>
+                          <span className="font-medium">
+                            {stats?.avg_mood_delta != null 
+                              ? `${(stats?.avg_mood_delta ?? 0) > 0 ? '+' : ''}${stats?.avg_mood_delta ?? 0}`
+                              : 'N/A'}
+                          </span>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </TabsContent>
+              </Tabs>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Mood Prompt Dialog */}
+        <Dialog open={showMoodPrompt} onOpenChange={setShowMoodPrompt}>
+          <DialogContent className="max-w-sm">
+            <DialogHeader>
+              <DialogTitle>Comment vous sentez-vous ?</DialogTitle>
+              <DialogDescription>
+                Évaluez votre humeur avant la méditation (optionnel)
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="flex justify-between">
+                {[1, 2, 3, 4, 5].map((mood) => (
+                  <button
+                    key={mood}
+                    onClick={() => confirmStart(mood * 20)}
+                    className="w-12 h-12 rounded-full bg-muted hover:bg-primary/20 flex items-center justify-center text-lg font-medium transition-colors"
                   >
-                    <Pause className="h-6 w-6" />
-                    <span className="sr-only">Pause</span>
-                  </Button>
-                )}
+                    {mood === 1 ? '😔' : mood === 2 ? '😕' : mood === 3 ? '😐' : mood === 4 ? '🙂' : '😊'}
+                  </button>
+                ))}
               </div>
+              <Button
+                variant="ghost"
+                className="w-full"
+                onClick={() => confirmStart(null)}
+              >
+                Passer cette étape
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
 
-              {isPlaying && (
-                <div className="rounded-lg border bg-muted/50 p-4 text-center">
-                  <p className="text-sm text-muted-foreground">
-                    Fermez les yeux, respirez profondément et laissez-vous guider...
-                  </p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Benefits */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Bienfaits de la méditation</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ul className="grid gap-3 md:grid-cols-2">
-              <li className="flex items-start gap-2">
-                <Sparkles className="mt-1 h-4 w-4 text-primary" />
-                <span className="text-sm">Réduction du stress et de l'anxiété</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <Sparkles className="mt-1 h-4 w-4 text-primary" />
-                <span className="text-sm">Amélioration de la concentration</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <Sparkles className="mt-1 h-4 w-4 text-primary" />
-                <span className="text-sm">Meilleure qualité de sommeil</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <Sparkles className="mt-1 h-4 w-4 text-primary" />
-                <span className="text-sm">Augmentation du bien-être émotionnel</span>
-              </li>
-            </ul>
-          </CardContent>
-        </Card>
-
-        {/* Statistiques personnelles */}
-        {stats.totalSessions > 0 && (
-          <Card className="bg-gradient-to-r from-primary/5 to-purple-500/5 border-primary/20">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Clock className="h-5 w-5 text-primary" />
-                Vos statistiques
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-                <div>
-                  <p className="text-3xl font-bold text-primary">{stats.totalSessions}</p>
-                  <p className="text-xs text-muted-foreground">Sessions</p>
-                </div>
-                <div>
-                  <p className="text-3xl font-bold text-primary">{stats.totalMinutes}</p>
-                  <p className="text-xs text-muted-foreground">Minutes totales</p>
-                </div>
-                <div>
-                  <p className="text-3xl font-bold text-primary">{stats.longestSession}</p>
-                  <p className="text-xs text-muted-foreground">Plus longue (min)</p>
-                </div>
-                <div>
-                  <p className="text-3xl font-bold text-primary">
-                    {stats.lastSession 
-                      ? new Date(stats.lastSession).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
-                      : '—'}
-                  </p>
-                  <p className="text-xs text-muted-foreground">Dernière session</p>
-                </div>
+        {/* Settings Dialog */}
+        <Dialog open={showSettings} onOpenChange={setShowSettings}>
+          <DialogContent className="max-w-md max-h-[85vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Settings className="h-5 w-5" />
+                Paramètres
+              </DialogTitle>
+              <DialogDescription>
+                Personnalisez votre expérience de méditation
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-6 py-4">
+              <div className="flex items-center justify-between">
+                <Label>Guidance vocale</Label>
+                <Switch
+                  checked={settings.withGuidance}
+                  onCheckedChange={(v) => saveSettings({ withGuidance: v })}
+                />
               </div>
-            </CardContent>
-          </Card>
-        )}
+              
+              <div className="flex items-center justify-between">
+                <Label>Musique ambiante</Label>
+                <Switch
+                  checked={settings.withMusic}
+                  onCheckedChange={(v) => saveSettings({ withMusic: v })}
+                />
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <Label>Retour haptique</Label>
+                <Switch
+                  checked={settings.hapticFeedback}
+                  onCheckedChange={(v) => saveSettings({ hapticFeedback: v })}
+                />
+              </div>
+              
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <Label>Objectif hebdomadaire</Label>
+                  <span className="text-sm font-medium">{settings.weeklyGoalMinutes} min</span>
+                </div>
+                <Slider
+                  value={[settings.weeklyGoalMinutes]}
+                  onValueChange={([v]) => saveSettings({ weeklyGoalMinutes: v })}
+                  min={15}
+                  max={180}
+                  step={15}
+                />
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
-    </main>
+    </div>
   );
 }

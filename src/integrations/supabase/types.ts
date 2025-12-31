@@ -12510,46 +12510,61 @@ export type Database = {
       }
       meditation_sessions: {
         Row: {
+          completed: boolean | null
           completed_at: string | null
+          completed_duration: number | null
           config: Json | null
           created_at: string
           duration: number
           id: string
           mood_after: number | null
           mood_before: number | null
+          mood_delta: number | null
           notes: string | null
           started_at: string
           technique: string
           updated_at: string
           user_id: string
+          with_guidance: boolean | null
+          with_music: boolean | null
         }
         Insert: {
+          completed?: boolean | null
           completed_at?: string | null
+          completed_duration?: number | null
           config?: Json | null
           created_at?: string
           duration: number
           id?: string
           mood_after?: number | null
           mood_before?: number | null
+          mood_delta?: number | null
           notes?: string | null
           started_at?: string
           technique: string
           updated_at?: string
           user_id: string
+          with_guidance?: boolean | null
+          with_music?: boolean | null
         }
         Update: {
+          completed?: boolean | null
           completed_at?: string | null
+          completed_duration?: number | null
           config?: Json | null
           created_at?: string
           duration?: number
           id?: string
           mood_after?: number | null
           mood_before?: number | null
+          mood_delta?: number | null
           notes?: string | null
           started_at?: string
           technique?: string
           updated_at?: string
           user_id?: string
+          with_guidance?: boolean | null
+          with_music?: boolean | null
         }
         Relationships: []
       }
