@@ -46,8 +46,19 @@ export default function RecentEmotionScansWidget({ className }: RecentEmotionSca
     queryKey: ['recent-scans', user?.id],
     queryFn: () => getEmotionScanHistory(user!.id, HISTORY_LIMIT),
     enabled: Boolean(user?.id),
-    staleTime: 60_000,
+    staleTime: 30_000, // 30 secondes - rafraîchir plus souvent
+    refetchOnMount: true,
   });
+
+  // Écouter les événements de nouveaux scans
+  React.useEffect(() => {
+    const handleScanSaved = () => {
+      refetch();
+    };
+    
+    window.addEventListener('scan-saved', handleScanSaved);
+    return () => window.removeEventListener('scan-saved', handleScanSaved);
+  }, [refetch]);
 
   const entries = React.useMemo<EmotionScanHistoryEntry[]>(
     () => (user?.id ? data ?? [] : []),

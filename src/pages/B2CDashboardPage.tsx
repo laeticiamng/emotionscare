@@ -506,24 +506,37 @@ export default function B2CDashboardPage() {
                   )}
                   <Sparkles className="h-4 w-4 text-purple-500" aria-hidden="true" />
                 </div>
-                {!statsLoading && (
+                  {!statsLoading && (
                   <>
                     <Badge variant="outline" className="text-xs mt-2">
                       {userStats.rank}
                     </Badge>
                     <div className="mt-3">
-                      <div className="flex justify-between text-xs text-muted-foreground mb-1">
-                        <span>{userStats.totalPoints} XP</span>
-                        <span>{Math.pow(userStats.level + 1, 2) * 100} XP</span>
-                      </div>
-                      <Progress 
-                        value={Math.min(100, (userStats.totalPoints / (Math.pow(userStats.level + 1, 2) * 100)) * 100)} 
-                        className="h-2"
-                        aria-label={`Progression vers le niveau ${userStats.level + 1}`}
-                        aria-valuemin={0}
-                        aria-valuemax={Math.pow(userStats.level + 1, 2) * 100}
-                        aria-valuenow={userStats.totalPoints}
-                      />
+                      {/* Calcul correct du prochain niveau: niveau^2 * 100 */}
+                      {(() => {
+                        const currentLevelXP = Math.pow(userStats.level, 2) * 100;
+                        const nextLevelXP = Math.pow(userStats.level + 1, 2) * 100;
+                        const xpInLevel = userStats.totalPoints - currentLevelXP;
+                        const xpNeeded = nextLevelXP - currentLevelXP;
+                        const progress = Math.max(0, Math.min(100, (xpInLevel / xpNeeded) * 100));
+                        
+                        return (
+                          <>
+                            <div className="flex justify-between text-xs text-muted-foreground mb-1">
+                              <span>{userStats.totalPoints} XP</span>
+                              <span>{nextLevelXP} XP</span>
+                            </div>
+                            <Progress 
+                              value={progress}
+                              className="h-2"
+                              aria-label={`Progression vers le niveau ${userStats.level + 1}`}
+                              aria-valuemin={0}
+                              aria-valuemax={100}
+                              aria-valuenow={Math.round(progress)}
+                            />
+                          </>
+                        );
+                      })()}
                     </div>
                   </>
                 )}
