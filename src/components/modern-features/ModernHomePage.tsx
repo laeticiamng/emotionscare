@@ -384,7 +384,6 @@ const ModernHomePage: React.FC = () => {
         />
       )}
       <CookieConsent />
-      <CookieConsent />
     </div>
   );
 };
