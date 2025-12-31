@@ -144,36 +144,71 @@ export async function invokeEmotionScan(
 
 export async function persistEmotionScanResult(
   input: PersistEmotionScanInput,
-): Promise<EmotionScanRow> {
-  const persistedPayload = {
-    scores: input.emotions,
-    insights: input.insights,
-    context: input.context ?? null,
-    previousEmotions: input.previousEmotions ?? null,
-  };
-
+): Promise<EmotionScanRow | null> {
+  // Utiliser clinical_signals pour la cohérence
   const { data, error } = await supabase
-    .from('emotion_scans')
+    .from('clinical_signals')
     .insert({
       user_id: input.userId,
-      scan_type: input.scanType ?? 'self-report',
-      mood: input.mood,
-      confidence: input.confidence,
-      summary: input.summary,
-      recommendations: input.recommendations,
-      insights: input.insights,
-      emotions: persistedPayload,
-      emotional_balance: input.emotionalBalance,
+      domain: 'emotional',
+      level: Math.round((input.emotionalBalance || 50) / 25),
+      source_instrument: input.scanType || 'self-report',
+      window_type: 'instant',
+      module_context: 'scan',
+      metadata: {
+        mood: input.mood,
+        confidence: input.confidence,
+        summary: input.summary,
+        recommendations: input.recommendations,
+        insights: input.insights,
+        emotions: input.emotions,
+        emotionalBalance: input.emotionalBalance,
+        context: input.context,
+        previousEmotions: input.previousEmotions
+      },
+      expires_at: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString()
     })
     .select('*')
     .single();
 
   if (error) {
-    logger.error('Failed to insert emotion scan row', error, 'emotionScan.persist');
+    logger.error('Failed to insert clinical signal for scan', error, 'emotionScan.persist');
     throw new Error(error.message || 'Impossible de sauvegarder le scan émotionnel');
   }
 
-  return data as EmotionScanRow;
+  // Dispatch event for realtime updates
+  window.dispatchEvent(new CustomEvent('scan-saved'));
+
+  // Return null since we're using clinical_signals, not emotion_scans
+  return null;
+}
+
+// Mapper un signal clinique vers l'historique des scans
+export function mapClinicalSignalToHistoryEntry(signal: {
+  id: string;
+  created_at: string;
+  metadata: unknown;
+  source_instrument: string;
+}): EmotionScanHistoryEntry {
+  const metadata = (signal.metadata ?? {}) as Record<string, unknown>;
+  
+  const scores = (metadata.emotions ?? {}) as Record<string, number>;
+  const normalizedBalance = typeof metadata.emotionalBalance === 'number'
+    ? metadata.emotionalBalance
+    : computeNormalizedBalance(scores);
+
+  return {
+    id: signal.id,
+    createdAt: signal.created_at ?? new Date().toISOString(),
+    mood: (metadata.mood as string) ?? null,
+    summary: (metadata.summary as string) ?? null,
+    confidence: Math.round(coerceNumber(metadata.confidence)),
+    recommendations: coerceStringArray(metadata.recommendations),
+    insights: coerceStringArray(metadata.insights),
+    scores,
+    normalizedBalance,
+    scanType: signal.source_instrument ?? null,
+  };
 }
 
 export function mapScanRow(row: EmotionScanRow): EmotionScanHistoryEntry {
@@ -216,10 +251,12 @@ export function mapScanRow(row: EmotionScanRow): EmotionScanHistoryEntry {
 }
 
 export async function getEmotionScanHistory(userId: string, limit = 12): Promise<EmotionScanHistoryEntry[]> {
+  // Utiliser clinical_signals pour la cohérence
   const { data, error } = await supabase
-    .from('emotion_scans')
+    .from('clinical_signals')
     .select('*')
     .eq('user_id', userId)
+    .in('source_instrument', ['SAM', 'scan_camera', 'scan_sliders', 'voice', 'scan_text', 'scan_facial', 'scan_voice', 'self-report'])
     .order('created_at', { ascending: false })
     .limit(limit);
 
@@ -227,7 +264,7 @@ export async function getEmotionScanHistory(userId: string, limit = 12): Promise
     throw new Error(error.message || 'Impossible de récupérer les scans émotionnels');
   }
 
-  return (data ?? []).map(mapScanRow);
+  return (data ?? []).map(mapClinicalSignalToHistoryEntry);
 }
 
 export function deriveScore10(normalizedBalance: number): number {
