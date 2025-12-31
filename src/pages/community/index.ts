@@ -1,5 +1,5 @@
 /**
- * Community Pages
+ * Community Pages - Re-exports from main page
  */
 
-export { CommunityPage, default } from './CommunityPage';
+export { default as CommunityPage, default } from '../CommunityPage';
