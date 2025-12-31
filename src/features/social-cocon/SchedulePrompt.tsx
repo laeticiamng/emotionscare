@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { logger } from '@/lib/logger';
+import { captureException } from '@/lib/ai-monitoring';
 import {
   Select,
   SelectContent,

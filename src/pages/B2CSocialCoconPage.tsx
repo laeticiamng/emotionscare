@@ -467,7 +467,7 @@ const B2CSocialCoconPage: React.FC = () => {
                     <Label htmlFor="room-select">Room concernée</Label>
                     <select
                       id="room-select"
-                      className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rose-300"
+                      className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rose-300 focus-visible:ring-2 focus-visible:ring-rose-400"
                       value={scheduleForm.roomId}
                       onChange={(event) => setScheduleForm((prev) => ({ ...prev, roomId: event.target.value }))}
                     >
@@ -495,7 +495,7 @@ const B2CSocialCoconPage: React.FC = () => {
                       <Label htmlFor="duration">Durée</Label>
                       <select
                         id="duration"
-                        className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rose-300"
+                        className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rose-300 focus-visible:ring-2 focus-visible:ring-rose-400"
                         value={scheduleForm.durationMinutes}
                         onChange={(event) =>
                           setScheduleForm((prev) => ({ ...prev, durationMinutes: Number.parseInt(event.target.value, 10) }))
@@ -509,7 +509,7 @@ const B2CSocialCoconPage: React.FC = () => {
                       <Label htmlFor="channel">Canal d'invitation</Label>
                       <select
                         id="channel"
-                        className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rose-300"
+                        className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rose-300 focus-visible:ring-2 focus-visible:ring-rose-400"
                         value={scheduleForm.deliveryChannel}
                         onChange={(event) =>
                           setScheduleForm((prev) => ({
@@ -618,7 +618,7 @@ const B2CSocialCoconPage: React.FC = () => {
             </Card>
           </section>
 
-          <section className={cn('space-y-4', roomsSectionOrder)}>
+          <section className={cn('space-y-4', roomsSectionOrder)} aria-label="Espaces disponibles">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-xl">
@@ -679,7 +679,7 @@ const B2CSocialCoconPage: React.FC = () => {
 
               {isLoading && (
                 <Card className="border-dashed">
-                  <CardContent className="flex items-center justify-center py-10 text-sm text-muted-foreground">
+                  <CardContent className="flex items-center justify-center py-10 text-sm text-muted-foreground" aria-live="polite" aria-busy="true">
                     Chargement des rooms privées…
                   </CardContent>
                 </Card>
