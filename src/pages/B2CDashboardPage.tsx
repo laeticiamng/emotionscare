@@ -671,7 +671,7 @@ export default function B2CDashboardPage() {
           </Suspense>
         </section>
 
-        {/* Recommandations dynamiques */}
+        {/* Recommandations dynamiques - Widget unique */}
         <section aria-labelledby="recommendations-section" className="mb-8">
           <h2 id="recommendations-section" className="sr-only">Recommandations personnalisées</h2>
           <Suspense
@@ -724,66 +724,6 @@ export default function B2CDashboardPage() {
           </Suspense>
         </section>
 
-        {/* Recommandations personnalisées */}
-        <section aria-labelledby="recommendations-title" className="mb-8">
-          <h2 id="recommendations-title" className="text-xl font-semibold mb-4">
-            Recommandé pour vous
-          </h2>
-          <div className="grid gap-4 md:grid-cols-2">
-            {recsLoading ? (
-              <>
-                <Skeleton className="h-40 w-full" />
-                <Skeleton className="h-40 w-full" />
-              </>
-            ) : recommendations.length === 0 ? (
-              <Card className="md:col-span-2 bg-muted/30">
-                <CardContent className="py-8 text-center">
-                  <AlertCircle className="h-8 w-8 text-muted-foreground mx-auto mb-3" aria-hidden="true" />
-                  <p className="text-muted-foreground">Aucune recommandation pour le moment</p>
-                  <p className="text-xs text-muted-foreground mt-1">Effectuez un scan émotionnel pour débloquer des suggestions</p>
-                </CardContent>
-              </Card>
-            ) : (
-              recommendations.map((rec) => {
-                const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
-                  breath: Wind,
-                  music: Music,
-                  journal: BookOpen,
-                  scan: Brain,
-                  coach: MessageCircle
-                };
-                const colorMap: Record<string, string> = {
-                  breath: 'bg-sky-500/10 text-sky-500',
-                  music: 'bg-info/10 text-info',
-                  journal: 'bg-success/10 text-success',
-                  scan: 'bg-primary/10 text-primary',
-                  coach: 'bg-accent/10 text-accent'
-                };
-                const RecIcon = iconMap[rec.icon] ?? Brain;
-                const recColor = colorMap[rec.icon] ?? 'bg-muted text-muted-foreground';
-                return (
-                  <Card key={rec.id} className="hover:shadow-md transition-shadow">
-                    <CardHeader>
-                      <CardTitle className="flex items-center space-x-2">
-                        <div className={`p-2 rounded ${recColor}`}>
-                          <RecIcon className="h-4 w-4" aria-hidden="true" />
-                        </div>
-                        <span>{rec.title}</span>
-                      </CardTitle>
-                      <CardDescription>{rec.reason}</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-sm text-muted-foreground mb-4">{rec.description}</p>
-                      <Button asChild size="sm">
-                        <Link to={rec.to} aria-label={`Commencer: ${rec.title}`}>Commencer</Link>
-                      </Button>
-                    </CardContent>
-                  </Card>
-                );
-              })
-            )}
-          </div>
-        </section>
 
         {/* Section Achievements & Badges */}
         <section aria-labelledby="achievements-title" className="mb-8">
