@@ -1,3 +1,5 @@
+import { supabase } from '@/integrations/supabase/client';
+
 export interface CoachSuggestions {
   techniques: string[];
   resources: Array<{ type: string; title: string; description: string }>;
@@ -28,50 +30,29 @@ export interface CoachApiResponse {
   suggestions?: CoachSuggestions;
 }
 
-const SUPABASE_URL = 'https://yaincoxihiqdksxgrsrk.supabase.co';
-const FUNCTION_URL = `${SUPABASE_URL}/functions/v1/ai-coach`;
-
-function buildPayload(options: SendCoachMessageOptions) {
-  return {
-    thread_id: options.threadId,
+export async function sendMessage(options: SendCoachMessageOptions): Promise<CoachApiResponse> {
+  // Build the payload for the edge function
+  const payload = {
     message: options.message,
-    mode: options.mode ?? 'b2c',
-    locale: options.locale ?? 'fr',
-    user_hash: options.userHash,
-    flex_hint: options.flexHint,
-    coachPersonality: options.personality ?? 'empathetic',
     conversationHistory: options.conversationHistory ?? [],
     userEmotion: 'neutral',
+    coachPersonality: options.personality ?? 'empathetic',
+    context: options.mode === 'b2b' ? 'Mode professionnel B2B' : '',
+    threadId: options.threadId,
+    flexHint: options.flexHint,
   };
-}
 
-export async function sendMessage(options: SendCoachMessageOptions): Promise<CoachApiResponse> {
-  const payload = buildPayload(options);
-  const body = JSON.stringify(payload);
-
-  // Use fetch directly for better control and error handling
-
-  const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhaW5jb3hpaGlxZGtzeGdyc3JrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI4MTE4MjcsImV4cCI6MjA1ODM4NzgyN30.HBfwymB2F9VBvb3uyeTtHBMZFZYXzL0wQmS5fqd65yU';
-  
-  const response = await fetch(FUNCTION_URL, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${anonKey}`,
-      'apikey': anonKey,
-    },
-    body,
-    signal: options.signal,
+  // Use supabase.functions.invoke which handles auth automatically
+  const { data: json, error } = await supabase.functions.invoke('ai-coach', {
+    body: payload,
   });
 
-  if (!response.ok) {
-    const errorText = await response.text().catch(() => '');
-    console.error('[coachApi] Request failed:', response.status, errorText);
-    throw new Error(`coach_failed_${response.status}`);
+  if (error) {
+    console.error('[coachApi] Request failed:', error);
+    throw new Error(`coach_failed: ${error.message}`);
   }
 
-  const json = await response.json();
-  const threadId = typeof json?.thread_id === 'string' ? json.thread_id : options.threadId ?? 'new';
+  const threadId = typeof json?.thread_id === 'string' ? json.thread_id : options.threadId ?? `thread-${Date.now()}`;
   const text = String(json?.response ?? json?.messages?.[0]?.content ?? '');
   const disclaimers = Array.isArray(json?.disclaimers)
     ? json.disclaimers.filter((item: unknown): item is string => typeof item === 'string')
