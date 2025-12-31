@@ -14,14 +14,15 @@ interface PressLogo {
   name: string;
   logo?: string;
   mention?: string;
+  url?: string;
 }
 
 const pressLogos: PressLogo[] = [
-  { id: 'lemonde', name: 'Le Monde', mention: 'Solution innovante' },
-  { id: 'figaro', name: 'Le Figaro', mention: 'App de l\'année' },
-  { id: 'france2', name: 'France 2', mention: 'Vu sur' },
-  { id: 'liberation', name: 'Libération', mention: 'Recommandé' },
-  { id: 'huffpost', name: 'HuffPost', mention: 'Top 10 Apps Santé' },
+  { id: 'lemonde', name: 'Le Monde', mention: 'Solution innovante', url: 'https://www.lemonde.fr' },
+  { id: 'figaro', name: 'Le Figaro', mention: 'App de l\'année', url: 'https://www.lefigaro.fr' },
+  { id: 'france2', name: 'France 2', mention: 'Vu sur', url: 'https://www.france.tv/france-2' },
+  { id: 'liberation', name: 'Libération', mention: 'Recommandé', url: 'https://www.liberation.fr' },
+  { id: 'huffpost', name: 'HuffPost', mention: 'Top 10 Apps Santé', url: 'https://www.huffingtonpost.fr' },
 ];
 
 interface PressLogosProps {
