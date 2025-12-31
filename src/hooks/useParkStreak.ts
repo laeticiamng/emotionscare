@@ -42,7 +42,7 @@ export function useParkStreak() {
       
       const daysDiff = Math.floor((today.getTime() - lastActivity.getTime()) / (1000 * 60 * 60 * 24));
 
-      if (daysDiff > 1) {
+      if (daysDiff > 1 && streakData.currentStreak > 0) {
         // Streak cassé - plus d'un jour sans activité
         logger.info('Streak broken', { daysDiff, lastActivity: streakData.lastActivityDate }, 'PARK');
         setStreakData({
@@ -56,7 +56,8 @@ export function useParkStreak() {
     };
 
     checkAndUpdateStreak();
-  }, [streakData.lastActivityDate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [streakData.lastActivityDate, streakData.currentStreak]);
 
   // Mettre à jour l'activité hebdomadaire
   const updateWeeklyActivity = useCallback((current: boolean[], activeToday: boolean): boolean[] => {
