@@ -12,3 +12,5 @@ export { MusicGamificationSection } from './MusicGamificationSection';
 export { MusicFocusSection } from './MusicFocusSection';
 export { MusicGeneratorSection } from './MusicGeneratorSection';
 export { MusicLibrarySection } from './MusicLibrarySection';
+export { CollaborativePlaylistSection } from './CollaborativePlaylistSection';
+export { MusicStatsSection } from './MusicStatsSection';

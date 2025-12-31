@@ -109,41 +109,40 @@ export const useMusicEmotionIntegration = () => {
     try {
       // Mapping émotions vers styles musicaux
       const emotionStyleMap: Record<string, string[]> = {
-        'calm': ['ambient', 'classical', 'meditation'],
-        'energetic': ['upbeat', 'electronic', 'pop'],
-        'sad': ['melancholic', 'acoustic', 'slow'],
-        'happy': ['uplifting', 'major key', 'bright'],
-        'focused': ['instrumental', 'minimal', 'concentration'],
-        'stressed': ['relaxing', 'nature sounds', 'breathing'],
-        'creative': ['inspiring', 'artistic', 'experimental'],
-        'tired': ['gentle', 'soft', 'recovery']
+        'calm': ['calm', 'peaceful', 'serene', 'relaxing'],
+        'energetic': ['energetic', 'upbeat', 'dynamic', 'energy'],
+        'sad': ['sad', 'melancholic', 'healing', 'emotional'],
+        'happy': ['happy', 'joyful', 'uplifting', 'positive'],
+        'focused': ['focus', 'concentration', 'flow', 'productive'],
+        'stressed': ['relaxing', 'calming', 'peaceful', 'zen'],
+        'creative': ['creative', 'inspiring', 'artistic', 'flow'],
+        'tired': ['gentle', 'soft', 'recovery', 'calm']
       };
 
-      const styles = emotionStyleMap[emotion.toLowerCase()] || ['ambient'];
+      const emotions = emotionStyleMap[emotion.toLowerCase()] || [emotion];
       
+      // Utiliser generated_music_tracks au lieu de music_tracks
       const { data, error } = await supabase
-        .from('music_tracks')
+        .from('generated_music_tracks')
         .select('*')
-        .or(styles.map(style => `tags.ilike.%${style}%`).join(','))
+        .or(emotions.map(e => `emotion.ilike.%${e}%`).join(','))
+        .eq('generation_status', 'completed')
         .limit(15)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
 
-      return data.map(track => ({
+      return (data || []).map(track => ({
         id: track.id,
-        title: track.title,
-        artist: track.artist,
+        title: track.title || 'Morceau généré',
+        artist: 'Suno AI',
         url: track.audio_url,
         audioUrl: track.audio_url,
-        duration: track.duration || 120,
+        duration: track.duration ? Number(track.duration) : 120,
         emotion: track.emotion,
-        mood: track.mood,
-        coverUrl: track.cover_url,
-        tags: track.tags,
-        bpm: track.bpm,
-        key: track.key,
-        energy: track.energy
+        mood: track.emotion,
+        coverUrl: track.image_url,
+        tags: track.emotion || ''
       }));
     } catch (error) {
       logger.error('Erreur recommandations musique', error as Error, 'MUSIC');

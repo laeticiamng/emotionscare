@@ -126,6 +126,24 @@ verify_jwt = false
 [functions.download-audio]
 verify_jwt = false
 
+[functions.adaptive-music]
+verify_jwt = true
+
+[functions.generate-music]
+verify_jwt = true
+
+[functions.music-recommendations]
+verify_jwt = true
+
+[functions.generate-therapeutic-music]
+verify_jwt = true
+
+[functions.music-api]
+verify_jwt = true
+
+[functions.process-music-session]
+verify_jwt = true
+
 [api]
 enabled = true
 port = 54321
