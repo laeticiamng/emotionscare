@@ -17,10 +17,13 @@ import {
   Timer,
   Target,
   Volume2,
-  VolumeX
+  VolumeX,
+  type LucideIcon
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import * as Tone from 'tone';
+
+type LucideIconType = LucideIcon;
 
 interface BreathingPattern {
   id: string;
