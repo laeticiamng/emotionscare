@@ -378,6 +378,73 @@ export const fetchUpcomingBreaks = async (): Promise<SocialBreakPlan[]> => {
   }
 };
 
+export const fetchPastBreaks = async (limit = 10): Promise<SocialBreakPlan[]> => {
+  try {
+    const { data, error } = await supabase
+      .from('social_room_breaks')
+      .select('id, room_id, starts_at, duration_minutes, remind_at, delivery_channel, invitees')
+      .lt('starts_at', new Date().toISOString())
+      .order('starts_at', { ascending: false })
+      .limit(limit);
+
+    if (error || !data) {
+      throw error ?? new Error('no_past_breaks');
+    }
+
+    return data.map(mapBreakRecord);
+  } catch (error) {
+    if (import.meta.env.DEV) {
+      logger.info('[social-cocon] Past breaks fallback', { error }, 'SYSTEM');
+    }
+    return [];
+  }
+};
+
+export const deleteSocialRoom = async (roomId: string): Promise<void> => {
+  try {
+    const { error } = await supabase
+      .from('social_rooms')
+      .delete()
+      .eq('id', roomId);
+
+    if (error) {
+      throw error;
+    }
+  } catch (error) {
+    Sentry.captureException(error, {
+      tags: { feature: 'social-cocon', action: 'delete-room' },
+    });
+    throw error;
+  }
+};
+
+export interface SendInvitePayload {
+  roomId: string;
+  startsAt: string;
+  reminderAt: string | null;
+  deliveryChannel: 'email' | 'in-app';
+  invitees: Array<{ id: string; type: 'member' | 'email'; label: string }>;
+}
+
+export const sendRoomInvite = async (payload: SendInvitePayload): Promise<boolean> => {
+  try {
+    const { data, error } = await supabase.functions.invoke('social-cocon-invite', {
+      body: payload,
+    });
+
+    if (error) {
+      throw error;
+    }
+
+    return data?.success ?? true;
+  } catch (error) {
+    Sentry.captureException(error, {
+      tags: { feature: 'social-cocon', action: 'send-invite' },
+    });
+    return false;
+  }
+};
+
 export const scheduleBreak = async (
   payload: ScheduleBreakPayload
 ): Promise<SocialBreakPlan> => {
