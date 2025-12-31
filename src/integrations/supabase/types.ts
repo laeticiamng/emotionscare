@@ -24515,6 +24515,57 @@ export type Database = {
         }
         Relationships: []
       }
+      vr_session_templates: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          difficulty: string
+          duration: number
+          environment_id: string | null
+          id: string
+          intensity: number | null
+          is_active: boolean
+          name: string
+          popularity_score: number | null
+          tags: string[] | null
+          thumbnail_url: string | null
+          updated_at: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          difficulty?: string
+          duration?: number
+          environment_id?: string | null
+          id?: string
+          intensity?: number | null
+          is_active?: boolean
+          name: string
+          popularity_score?: number | null
+          tags?: string[] | null
+          thumbnail_url?: string | null
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          difficulty?: string
+          duration?: number
+          environment_id?: string | null
+          id?: string
+          intensity?: number | null
+          is_active?: boolean
+          name?: string
+          popularity_score?: number | null
+          tags?: string[] | null
+          thumbnail_url?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       vr_sessions: {
         Row: {
           category: string | null
