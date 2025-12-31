@@ -3,41 +3,34 @@
  * JournalSearchPage - Recherche avancée enrichie
  */
 import { memo, useState, useMemo } from 'react';
-import type { SanitizedNote } from '@/modules/journal/types';
+import { useJournalEnriched } from '@/modules/journal/useJournalEnriched';
 import { JournalAdvancedSearch } from '@/components/journal/JournalAdvancedSearch';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Search, FileText, Calendar, Tag, X } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import type { SanitizedNote } from '@/modules/journal/types';
 
-interface JournalSearchPageProps {
-  notes: SanitizedNote[];
-}
-
-export const JournalSearchPage = memo<JournalSearchPageProps>(({ notes }) => {
-  const [searchResults, setSearchResults] = useState<SanitizedNote[]>(notes);
+const JournalSearchPage = memo(() => {
+  const { notes, isLoading, availableTags } = useJournalEnriched();
+  const [searchResults, setSearchResults] = useState<SanitizedNote[]>([]);
   const [hasSearched, setHasSearched] = useState(false);
   const [quickSearch, setQuickSearch] = useState('');
 
   // Quick search filter
   const filteredResults = useMemo(() => {
-    if (!quickSearch.trim()) return searchResults;
+    const source = hasSearched ? searchResults : notes;
+    if (!quickSearch.trim()) return source;
     const query = quickSearch.toLowerCase();
-    return searchResults.filter(
+    return source.filter(
       n => n.text?.toLowerCase().includes(query) || 
            n.tags?.some(t => t.toLowerCase().includes(query))
     );
-  }, [searchResults, quickSearch]);
-
-  // All available tags
-  const allTags = useMemo(() => {
-    const tagSet = new Set<string>();
-    notes.forEach(n => n.tags?.forEach(t => tagSet.add(t)));
-    return Array.from(tagSet).sort();
-  }, [notes]);
+  }, [searchResults, quickSearch, hasSearched, notes]);
 
   const handleResultsChange = (results: SanitizedNote[]) => {
     setSearchResults(results);
@@ -47,6 +40,23 @@ export const JournalSearchPage = memo<JournalSearchPageProps>(({ notes }) => {
   const handleTagClick = (tag: string) => {
     setQuickSearch(`#${tag}`);
   };
+
+  const handleClearSearch = () => {
+    setQuickSearch('');
+    setHasSearched(false);
+    setSearchResults([]);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <Skeleton className="h-10 w-48" />
+        <Skeleton className="h-12 w-full" />
+        <Skeleton className="h-24 w-full" />
+        <Skeleton className="h-64 w-full" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -67,7 +77,7 @@ export const JournalSearchPage = memo<JournalSearchPageProps>(({ notes }) => {
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" aria-hidden="true" />
             <Input
-              placeholder="Recherche rapide dans les résultats..."
+              placeholder="Recherche rapide..."
               value={quickSearch}
               onChange={(e) => setQuickSearch(e.target.value)}
               className="pl-10 pr-10"
@@ -78,7 +88,7 @@ export const JournalSearchPage = memo<JournalSearchPageProps>(({ notes }) => {
                 variant="ghost"
                 size="icon"
                 className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
-                onClick={() => setQuickSearch('')}
+                onClick={handleClearSearch}
                 aria-label="Effacer la recherche"
               >
                 <X className="h-4 w-4" />
@@ -89,7 +99,7 @@ export const JournalSearchPage = memo<JournalSearchPageProps>(({ notes }) => {
       </Card>
 
       {/* Tags Quick Filter */}
-      {allTags.length > 0 && (
+      {availableTags.length > 0 && (
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-base flex items-center gap-2">
@@ -99,7 +109,7 @@ export const JournalSearchPage = memo<JournalSearchPageProps>(({ notes }) => {
           </CardHeader>
           <CardContent>
             <div className="flex flex-wrap gap-2">
-              {allTags.slice(0, 15).map((tag) => (
+              {availableTags.slice(0, 15).map((tag) => (
                 <Badge
                   key={tag}
                   variant={quickSearch === `#${tag}` ? 'default' : 'outline'}
@@ -109,8 +119,8 @@ export const JournalSearchPage = memo<JournalSearchPageProps>(({ notes }) => {
                   #{tag}
                 </Badge>
               ))}
-              {allTags.length > 15 && (
-                <Badge variant="secondary">+{allTags.length - 15} autres</Badge>
+              {availableTags.length > 15 && (
+                <Badge variant="secondary">+{availableTags.length - 15} autres</Badge>
               )}
             </div>
           </CardContent>
@@ -159,7 +169,7 @@ export const JournalSearchPage = memo<JournalSearchPageProps>(({ notes }) => {
           ) : (
             <div className="py-12 text-center text-muted-foreground">
               <Search className="h-12 w-12 mx-auto mb-4 opacity-30" aria-hidden="true" />
-              <p>{hasSearched ? 'Aucun résultat trouvé' : 'Lancez une recherche pour voir les résultats'}</p>
+              <p>{hasSearched ? 'Aucun résultat trouvé' : 'Toutes vos notes sont affichées'}</p>
             </div>
           )}
         </CardContent>
@@ -169,3 +179,5 @@ export const JournalSearchPage = memo<JournalSearchPageProps>(({ notes }) => {
 });
 
 JournalSearchPage.displayName = 'JournalSearchPage';
+
+export default JournalSearchPage;

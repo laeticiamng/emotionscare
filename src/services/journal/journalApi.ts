@@ -507,6 +507,74 @@ export async function getJournalStats(): Promise<{
   }
 }
 
+/**
+ * Archive a note
+ */
+export async function archiveNote(noteId: string): Promise<boolean> {
+  const parsed = NoteIdSchema.parse(noteId)
+
+  const { error } = await supabase
+    .from('journal_entries')
+    .update({ is_archived: true })
+    .eq('id', parsed)
+
+  if (error) {
+    Sentry.captureException(error, scope =>
+      redactErrorScope(scope, { action: 'archive', reason: 'archive_failed' }),
+    )
+    throw new Error('journal_archive_failed')
+  }
+
+  return true
+}
+
+/**
+ * Unarchive a note
+ */
+export async function unarchiveNote(noteId: string): Promise<boolean> {
+  const parsed = NoteIdSchema.parse(noteId)
+
+  const { error } = await supabase
+    .from('journal_entries')
+    .update({ is_archived: false })
+    .eq('id', parsed)
+
+  if (error) {
+    Sentry.captureException(error, scope =>
+      redactErrorScope(scope, { action: 'unarchive', reason: 'unarchive_failed' }),
+    )
+    throw new Error('journal_unarchive_failed')
+  }
+
+  return true
+}
+
+/**
+ * Get all archived notes
+ */
+export async function listArchivedNotes(): Promise<SanitizedNote[]> {
+  Sentry.addBreadcrumb({
+    category: 'journal',
+    message: 'journal:list_archived',
+    level: 'info',
+  })
+
+  const { data, error } = await supabase
+    .from('journal_entries')
+    .select('id, content, text_content, transcript, summary, tags, created_at, mode')
+    .eq('is_archived', true)
+    .order('created_at', { ascending: false })
+
+  if (error) {
+    Sentry.captureException(error, scope =>
+      redactErrorScope(scope, { action: 'list_archived', reason: 'query_failed' }),
+    )
+    throw new Error('journal_fetch_failed')
+  }
+
+  return (data ?? []).map(mapRowToNote)
+}
+
 export function __testUtils__() {
   return { sanitizePlainText, sanitizeTags, sanitizeSummary, extractHashtags, mapRowToNote }
 }

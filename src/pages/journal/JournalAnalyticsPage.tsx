@@ -3,20 +3,19 @@
  * JournalAnalyticsPage - Dashboard Analytics enrichi
  */
 import { memo, useMemo } from 'react';
-import type { SanitizedNote } from '@/modules/journal/types';
+import { useJournalEnriched } from '@/modules/journal/useJournalEnriched';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 import { JournalAnalyticsDashboard } from '@/components/journal/JournalAnalyticsDashboard';
 import { JournalAIInsights } from '@/components/journal/JournalAIInsights';
 import { JournalPeriodComparison } from '@/components/journal/JournalPeriodComparison';
 import { JournalWordCloud } from '@/components/journal/JournalWordCloud';
 import { BarChart3, TrendingUp, Brain, FileText, Sparkles } from 'lucide-react';
 
-interface JournalAnalyticsPageProps {
-  notes: SanitizedNote[];
-}
+const JournalAnalyticsPage = memo(() => {
+  const { notes, isLoading } = useJournalEnriched();
 
-export const JournalAnalyticsPage = memo<JournalAnalyticsPageProps>(({ notes }) => {
   // Calculate analytics
   const analytics = useMemo(() => {
     const totalWords = notes.reduce((acc, n) => acc + (n.text?.split(/\s+/).length || 0), 0);
@@ -51,6 +50,18 @@ export const JournalAnalyticsPage = memo<JournalAnalyticsPageProps>(({ notes }) 
       uniqueTags: tagCounts.size,
     };
   }, [notes]);
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <Skeleton className="h-10 w-48" />
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-24" />)}
+        </div>
+        <Skeleton className="h-64" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -159,3 +170,5 @@ export const JournalAnalyticsPage = memo<JournalAnalyticsPageProps>(({ notes }) 
 });
 
 JournalAnalyticsPage.displayName = 'JournalAnalyticsPage';
+
+export default JournalAnalyticsPage;

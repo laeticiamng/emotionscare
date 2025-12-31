@@ -3,27 +3,49 @@
  * JournalNotesPage - Page principale des notes enrichie
  */
 import { memo } from 'react';
-import type { SanitizedNote } from '@/modules/journal/types';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useJournalEnriched } from '@/modules/journal/useJournalEnriched';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { BookOpen, FileText, Calendar, Heart } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
+import { BookOpen, FileText, Calendar, Heart, Trash2, Edit } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
-interface JournalNotesPageProps {
-  notes: SanitizedNote[];
-}
+const JournalNotesPage = memo(() => {
+  const { 
+    notes, 
+    isLoading, 
+    handleDelete, 
+    handleToggleFavorite, 
+    isFavorite,
+    setEditingNote,
+    loadMore,
+    hasMore,
+    isFetchingMore 
+  } = useJournalEnriched();
 
-export const JournalNotesPage = memo<JournalNotesPageProps>(({ notes }) => {
   // Group by date
   const groupedNotes = notes.reduce((acc, note) => {
     const dateKey = format(new Date(note.created_at), 'yyyy-MM-dd');
     if (!acc[dateKey]) acc[dateKey] = [];
     acc[dateKey].push(note);
     return acc;
-  }, {} as Record<string, SanitizedNote[]>);
+  }, {} as Record<string, typeof notes>);
 
   const sortedDates = Object.keys(groupedNotes).sort((a, b) => b.localeCompare(a));
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <Skeleton className="h-10 w-48" />
+        <Skeleton className="h-4 w-32" />
+        <div className="space-y-4">
+          {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-32" />)}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -61,7 +83,7 @@ export const JournalNotesPage = memo<JournalNotesPageProps>(({ notes }) => {
               </h2>
               <div className="grid gap-4">
                 {groupedNotes[dateKey].map((note) => (
-                  <Card key={note.id} className="hover:shadow-md transition-shadow">
+                  <Card key={note.id} className="hover:shadow-md transition-shadow group">
                     <CardContent className="pt-6">
                       <div className="flex items-start gap-3">
                         <div className="p-2 rounded-lg bg-primary/10 flex-shrink-0">
@@ -78,14 +100,48 @@ export const JournalNotesPage = memo<JournalNotesPageProps>(({ notes }) => {
                               ))}
                             </div>
                           )}
-                          <p className="text-xs text-muted-foreground mt-2">
-                            {format(new Date(note.created_at), 'HH:mm', { locale: fr })}
-                            {note.mode === 'voice' && (
-                              <Badge variant="secondary" className="ml-2 text-xs">
-                                🎤 Vocal
-                              </Badge>
-                            )}
-                          </p>
+                          <div className="flex items-center justify-between mt-3">
+                            <p className="text-xs text-muted-foreground">
+                              {format(new Date(note.created_at), 'HH:mm', { locale: fr })}
+                              {note.mode === 'voice' && (
+                                <Badge variant="secondary" className="ml-2 text-xs">
+                                  🎤 Vocal
+                                </Badge>
+                              )}
+                            </p>
+                            {/* Actions */}
+                            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-7 w-7"
+                                onClick={() => handleToggleFavorite(note.id)}
+                                aria-label={isFavorite(note.id) ? "Retirer des favoris" : "Ajouter aux favoris"}
+                              >
+                                <Heart 
+                                  className={`h-4 w-4 ${isFavorite(note.id) ? 'text-destructive fill-destructive' : 'text-muted-foreground'}`} 
+                                />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-7 w-7"
+                                onClick={() => setEditingNote(note)}
+                                aria-label="Modifier"
+                              >
+                                <Edit className="h-4 w-4 text-muted-foreground" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-7 w-7"
+                                onClick={() => handleDelete(note.id)}
+                                aria-label="Supprimer"
+                              >
+                                <Trash2 className="h-4 w-4 text-destructive" />
+                              </Button>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </CardContent>
@@ -94,6 +150,19 @@ export const JournalNotesPage = memo<JournalNotesPageProps>(({ notes }) => {
               </div>
             </section>
           ))}
+
+          {/* Load More */}
+          {hasMore && (
+            <div className="flex justify-center pt-4">
+              <Button 
+                variant="outline" 
+                onClick={loadMore}
+                disabled={isFetchingMore}
+              >
+                {isFetchingMore ? 'Chargement...' : 'Voir plus'}
+              </Button>
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -101,3 +170,5 @@ export const JournalNotesPage = memo<JournalNotesPageProps>(({ notes }) => {
 });
 
 JournalNotesPage.displayName = 'JournalNotesPage';
+
+export default JournalNotesPage;
