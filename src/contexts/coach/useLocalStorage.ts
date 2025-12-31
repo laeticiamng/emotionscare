@@ -1,68 +1,127 @@
 // @ts-nocheck
 
-import { useState, useEffect } from 'react';
+import { useEffect, useCallback, useRef } from 'react';
+import { ChatMessage } from '@/types/chat';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 import { logger } from '@/lib/logger';
 
-// Hook for persistent storage using localStorage
-export function useLocalStorage<T>(key: string, initialValue: T): [T, (value: T | ((val: T) => T)) => void] {
-  // State to store our value
-  const [storedValue, setStoredValue] = useState<T>(() => {
-    if (typeof window === 'undefined') {
-      return initialValue;
-    }
-    
-    try {
-      // Get from local storage by key
-      const item = window.localStorage.getItem(key);
-      // Parse stored json or if none, return initialValue
-      return item ? JSON.parse(item) : initialValue;
-    } catch (error) {
-      // If error, return initialValue
-      logger.error('Error reading from localStorage', error as Error, 'SYSTEM');
-      return initialValue;
-    }
-  });
-  
-  // Return a wrapped version of useState's setter function that
-  // persists the new value to localStorage.
-  const setValue = (value: T | ((val: T) => T)) => {
-    try {
-      // Allow value to be a function to get the previous value
-      const valueToStore =
-        value instanceof Function ? value(storedValue) : value;
-      
-      // Save state
-      setStoredValue(valueToStore);
-      
-      // Save to local storage
-      if (typeof window !== 'undefined') {
-        window.localStorage.setItem(key, JSON.stringify(valueToStore));
-      }
-    } catch (error) {
-      logger.error('Error writing to localStorage', error as Error, 'SYSTEM');
-    }
-  };
-  
-  // Listen to storage events to ensure consistency across tabs
+const SETTINGS_KEY = 'coach_messages';
+
+export function useCoachLocalStorage(
+  messages: ChatMessage[],
+  setMessages: (messages: ChatMessage[]) => void
+) {
+  const { user } = useAuth();
+  const isLoaded = useRef(false);
+  const saveTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Charger les messages depuis Supabase ou localStorage au montage
   useEffect(() => {
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key !== key || e.storageArea !== window.localStorage) return;
+    const loadMessages = async () => {
+      if (isLoaded.current) return;
       
       try {
-        const newValue = e.newValue ? JSON.parse(e.newValue) as T : initialValue;
-        setStoredValue(newValue);
+        if (user) {
+          // Charger depuis Supabase
+          const { data } = await supabase
+            .from('user_settings')
+            .select('value')
+            .eq('user_id', user.id)
+            .eq('key', SETTINGS_KEY)
+            .maybeSingle();
+
+          if (data?.value) {
+            const parsed = typeof data.value === 'string' 
+              ? JSON.parse(data.value) 
+              : data.value;
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              setMessages(parsed);
+              isLoaded.current = true;
+              return;
+            }
+          }
+
+          // Migrer depuis localStorage si présent
+          const localMessages = localStorage.getItem('coachMessages');
+          if (localMessages) {
+            const parsed = JSON.parse(localMessages);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              setMessages(parsed);
+              // Sync vers Supabase
+              await saveToSupabase(parsed, user.id);
+              localStorage.removeItem('coachMessages');
+            }
+          }
+        } else {
+          // Fallback localStorage pour utilisateurs non connectés
+          const savedMessages = localStorage.getItem('coachMessages');
+          if (savedMessages) {
+            setMessages(JSON.parse(savedMessages));
+          }
+        }
       } catch (error) {
-        logger.error('Error parsing localStorage change', error as Error, 'SYSTEM');
+        logger.error('Failed to load coach messages', error as Error, 'COACH');
+        // Fallback localStorage
+        const savedMessages = localStorage.getItem('coachMessages');
+        if (savedMessages) {
+          try {
+            setMessages(JSON.parse(savedMessages));
+          } catch (e) {
+            logger.error('Failed to parse saved messages', e as Error, 'COACH');
+          }
+        }
+      } finally {
+        isLoaded.current = true;
       }
     };
-    
-    if (typeof window !== 'undefined') {
-      window.addEventListener('storage', handleStorageChange);
-      return () => window.removeEventListener('storage', handleStorageChange);
+
+    loadMessages();
+  }, [user?.id, setMessages]);
+
+  // Sauvegarder les messages avec debounce
+  useEffect(() => {
+    if (!isLoaded.current || messages.length === 0) return;
+
+    // Sauvegarder en localStorage immédiatement (fallback)
+    try {
+      localStorage.setItem('coachMessages', JSON.stringify(messages.slice(-100))); // Limiter à 100
+    } catch (e) {
+      logger.warn('[CoachStorage] localStorage save failed', e, 'COACH');
     }
-    
-    return undefined;
-  }, [initialValue, key]);
-  
-  return [storedValue, setValue];
+
+    // Debounce la sauvegarde Supabase
+    if (saveTimeout.current) {
+      clearTimeout(saveTimeout.current);
+    }
+
+    saveTimeout.current = setTimeout(async () => {
+      if (user) {
+        await saveToSupabase(messages.slice(-100), user.id);
+      }
+    }, 1000); // 1s debounce
+
+    return () => {
+      if (saveTimeout.current) {
+        clearTimeout(saveTimeout.current);
+      }
+    };
+  }, [messages, user?.id]);
+}
+
+async function saveToSupabase(messages: ChatMessage[], userId: string) {
+  try {
+    await supabase
+      .from('user_settings')
+      .upsert({
+        user_id: userId,
+        key: SETTINGS_KEY,
+        value: JSON.stringify(messages),
+        updated_at: new Date().toISOString()
+      }, {
+        onConflict: 'user_id,key'
+      });
+  } catch (error) {
+    logger.error('Failed to save coach messages to Supabase', error as Error, 'COACH');
+  }
 }
