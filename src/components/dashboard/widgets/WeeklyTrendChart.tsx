@@ -1,8 +1,8 @@
 /**
  * Graphique de tendance hebdomadaire - Mini sparkline des 7 derniers jours
  */
-import React, { useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import React, { useEffect, useMemo } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
@@ -94,12 +94,24 @@ async function fetchWeeklyTrend(userId: string): Promise<DayData[]> {
 
 export default function WeeklyTrendChart() {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
+
+  // Écouter les nouveaux scans pour invalider le cache
+  useEffect(() => {
+    const handleScanSaved = () => {
+      queryClient.invalidateQueries({ queryKey: ['weekly-trend', user?.id] });
+    };
+    
+    window.addEventListener('scan-saved', handleScanSaved);
+    return () => window.removeEventListener('scan-saved', handleScanSaved);
+  }, [queryClient, user?.id]);
 
   const { data: weekData, isLoading } = useQuery({
     queryKey: ['weekly-trend', user?.id],
     queryFn: () => fetchWeeklyTrend(user!.id),
     enabled: !!user?.id,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 2 * 60 * 1000,
+    refetchOnMount: true,
   });
 
   const trend = useMemo(() => {

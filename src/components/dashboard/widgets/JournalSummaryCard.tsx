@@ -1,12 +1,12 @@
 // @ts-nocheck
-import React, { useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import React, { useMemo, useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { BookOpen, Loader2, MessageSquareQuote } from 'lucide-react';
+import { BookOpen, Loader2, MessageSquareQuote, RefreshCw } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { listFeed } from '@/services/journal/journalApi';
 import type { SanitizedNote } from '@/modules/journal/types';
@@ -48,12 +48,29 @@ const formatRelative = (isoDate: string) => {
 
 export const JournalSummaryCard: React.FC = () => {
   const { user } = useAuth();
-  const { data, isLoading, isFetching, isError } = useQuery({
+  const queryClient = useQueryClient();
+  
+  const { data, isLoading, isFetching, isError, refetch } = useQuery({
     queryKey: ['journal', 'feed', user?.id, 'dashboard'],
     queryFn: () => listFeed({ limit: 10 }),
     enabled: Boolean(user?.id),
-    staleTime: 60 * 1000,
+    staleTime: 30 * 1000, // 30 secondes
+    refetchOnMount: true,
   });
+
+  // Écouter les événements de nouvelles notes
+  useEffect(() => {
+    const handleNoteCreated = () => {
+      queryClient.invalidateQueries({ queryKey: ['journal', 'feed', user?.id, 'dashboard'] });
+    };
+    
+    window.addEventListener('journal-note-created', handleNoteCreated);
+    window.addEventListener('journal-note-updated', handleNoteCreated);
+    return () => {
+      window.removeEventListener('journal-note-created', handleNoteCreated);
+      window.removeEventListener('journal-note-updated', handleNoteCreated);
+    };
+  }, [queryClient, user?.id]);
 
   const entries = (data ?? []) as SanitizedNote[];
 
@@ -159,7 +176,17 @@ export const JournalSummaryCard: React.FC = () => {
       <CardFooter className="flex items-center justify-between">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <MessageSquareQuote className="h-4 w-4" aria-hidden="true" />
-          Notes synchronisées en temps réel
+          Notes synchronisées
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => refetch()}
+            disabled={isFetching}
+            className="h-6 w-6 p-0 ml-1"
+            aria-label="Actualiser les notes"
+          >
+            <RefreshCw className={`h-3 w-3 ${isFetching ? 'animate-spin' : ''}`} aria-hidden="true" />
+          </Button>
         </div>
         <Button asChild variant="ghost" size="sm" data-testid="journal-summary-cta">
           <Link to="/app/journal">

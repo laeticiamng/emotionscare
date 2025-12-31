@@ -1,14 +1,14 @@
 /**
  * Widget de notifications et rappels du dashboard
  */
-import React from 'react';
-import { useQuery } from '@tanstack/react-query';
+import React, { useState, useCallback } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Bell, Clock, Sparkles, Heart, Brain, X } from 'lucide-react';
+import { Bell, Clock, Sparkles, Heart, Brain, X, Check } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
@@ -131,16 +131,31 @@ const colorMap: Record<Notification['type'], string> = {
 
 export default function NotificationsWidget() {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
+  const [dismissedIds, setDismissedIds] = useState<Set<string>>(new Set());
+  const [readIds, setReadIds] = useState<Set<string>>(new Set());
 
   const { data: notifications, isLoading, refetch } = useQuery({
     queryKey: ['dashboard-notifications', user?.id],
     queryFn: () => fetchNotifications(user!.id),
     enabled: !!user?.id,
-    staleTime: 5 * 60 * 1000,
-    refetchInterval: 10 * 60 * 1000, // Refetch toutes les 10 minutes
+    staleTime: 3 * 60 * 1000,
+    refetchInterval: 5 * 60 * 1000,
   });
 
-  const unreadCount = notifications?.filter(n => !n.read).length || 0;
+  // Marquer comme lu
+  const markAsRead = useCallback((id: string) => {
+    setReadIds(prev => new Set([...prev, id]));
+  }, []);
+
+  // Supprimer une notification
+  const dismissNotification = useCallback((id: string) => {
+    setDismissedIds(prev => new Set([...prev, id]));
+  }, []);
+
+  // Filtrer les notifications non supprimées
+  const visibleNotifications = notifications?.filter(n => !dismissedIds.has(n.id)) || [];
+  const unreadCount = visibleNotifications.filter(n => !n.read && !readIds.has(n.id)).length;
 
   return (
     <Card>
@@ -166,7 +181,7 @@ export default function NotificationsWidget() {
             <Skeleton className="h-16 w-full" />
             <Skeleton className="h-16 w-full" />
           </div>
-        ) : !notifications || notifications.length === 0 ? (
+        ) : visibleNotifications.length === 0 ? (
           <div className="text-center py-4">
             <Bell className="h-8 w-8 text-muted-foreground mx-auto mb-2" aria-hidden="true" />
             <p className="text-sm text-muted-foreground">
@@ -175,31 +190,49 @@ export default function NotificationsWidget() {
           </div>
         ) : (
           <div className="space-y-2" role="list" aria-label="Liste des notifications">
-            {notifications.map((notification) => {
+            {visibleNotifications.map((notification) => {
               const IconComponent = iconMap[notification.type];
               const colorClass = colorMap[notification.type];
+              const isRead = notification.read || readIds.has(notification.id);
               
               return (
                 <div 
                   key={notification.id}
                   className={cn(
-                    'flex items-start gap-3 p-3 rounded-lg transition-colors',
-                    notification.read ? 'bg-muted/20' : 'bg-muted/40 hover:bg-muted/60'
+                    'flex items-start gap-3 p-3 rounded-lg transition-colors group',
+                    isRead ? 'bg-muted/20' : 'bg-muted/40 hover:bg-muted/60'
                   )}
                   role="listitem"
+                  onClick={() => markAsRead(notification.id)}
                 >
                   <div className={cn('h-8 w-8 rounded-full flex items-center justify-center shrink-0', colorClass)}>
                     <IconComponent className="h-4 w-4" aria-hidden="true" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2">
-                      <p className="text-sm font-medium">{notification.title}</p>
-                      <span className="text-xs text-muted-foreground shrink-0">
-                        {formatDistanceToNow(new Date(notification.created_at), { 
-                          addSuffix: true, 
-                          locale: fr 
-                        })}
-                      </span>
+                      <p className={cn('text-sm', isRead ? 'font-normal' : 'font-medium')}>
+                        {notification.title}
+                      </p>
+                      <div className="flex items-center gap-1">
+                        <span className="text-xs text-muted-foreground shrink-0">
+                          {formatDistanceToNow(new Date(notification.created_at), { 
+                            addSuffix: true, 
+                            locale: fr 
+                          })}
+                        </span>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            dismissNotification(notification.id);
+                          }}
+                          aria-label="Supprimer cette notification"
+                        >
+                          <X className="h-3 w-3" aria-hidden="true" />
+                        </Button>
+                      </div>
                     </div>
                     <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
                       {notification.message}
@@ -210,6 +243,7 @@ export default function NotificationsWidget() {
                         variant="link" 
                         size="sm" 
                         className="h-auto p-0 mt-1 text-xs"
+                        onClick={() => markAsRead(notification.id)}
                       >
                         <Link to={notification.action_url}>
                           Voir plus →

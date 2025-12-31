@@ -2,7 +2,8 @@
  * Hook pour calculer le score de bien-être basé sur les données réelles
  * Utilise clinical_signals comme source principale
  */
-import { useQuery } from '@tanstack/react-query';
+import { useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -134,13 +135,25 @@ async function calculateWellbeingScore(userId: string): Promise<WellbeingScoreDa
 
 export function useWellbeingScore() {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
+
+  // Écouter les événements de nouveaux scans pour invalider le cache
+  useEffect(() => {
+    const handleScanSaved = () => {
+      queryClient.invalidateQueries({ queryKey: ['wellbeing-score', user?.id] });
+    };
+    
+    window.addEventListener('scan-saved', handleScanSaved);
+    return () => window.removeEventListener('scan-saved', handleScanSaved);
+  }, [queryClient, user?.id]);
 
   const query = useQuery({
     queryKey: ['wellbeing-score', user?.id],
     queryFn: () => calculateWellbeingScore(user!.id),
     enabled: !!user?.id,
-    staleTime: 5 * 60 * 1000,
-    gcTime: 15 * 60 * 1000,
+    staleTime: 3 * 60 * 1000, // 3 minutes
+    gcTime: 10 * 60 * 1000,
+    refetchOnMount: true,
   });
 
   return {
