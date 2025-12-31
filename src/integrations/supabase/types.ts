@@ -2630,6 +2630,53 @@ export type Database = {
           },
         ]
       }
+      breath_session_feedback: {
+        Row: {
+          created_at: string
+          felt_calm: boolean | null
+          felt_focused: boolean | null
+          felt_relaxed: boolean | null
+          id: string
+          notes: string | null
+          rating: number
+          session_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          felt_calm?: boolean | null
+          felt_focused?: boolean | null
+          felt_relaxed?: boolean | null
+          id?: string
+          notes?: string | null
+          rating: number
+          session_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          felt_calm?: boolean | null
+          felt_focused?: boolean | null
+          felt_relaxed?: boolean | null
+          id?: string
+          notes?: string | null
+          rating?: number
+          session_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "breath_session_feedback_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "breathing_vr_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       breath_weekly_metrics: {
         Row: {
           coherence_avg: number | null

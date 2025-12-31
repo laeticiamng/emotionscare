@@ -4,7 +4,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { captureException } from '@/lib/ai-monitoring';
 import { Sentry } from '@/lib/errors/sentry-compat';
-import { Loader2, Wind, BookOpen, Zap, Trophy } from 'lucide-react';
+import { Loader2, Wind, BookOpen, Zap, Trophy, Calendar, Download } from 'lucide-react';
 
 import PageHeader from '@/components/ui/PageHeader';
 import { Button } from '@/components/ui/button';
@@ -29,6 +29,9 @@ import { BreathingTechniquesLibrary } from '@/components/breath/BreathingTechniq
 import { BreathingProgramsLibrary } from '@/components/breath/BreathingProgramsLibrary';
 import { BreathSessionFeedback } from '@/components/breath/BreathSessionFeedback';
 import { BreathProgressMilestones } from '@/components/breath/BreathProgressMilestones';
+import { BreathCalendar } from '@/components/breath/BreathCalendar';
+import { BreathRecommendationWidget } from '@/components/breath/BreathRecommendationWidget';
+import { BreathExportButton } from '@/components/breath/BreathExportButton';
 import { useBreathSessions } from '@/hooks/useBreathSessions';
 
 import ZeroNumberBoundary from '@/components/a11y/ZeroNumberBoundary';
@@ -271,7 +274,7 @@ const BreathPage: React.FC = () => {
           />
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full space-y-6">
-            <TabsList className="grid w-full grid-cols-5 bg-slate-900/50 border border-slate-800/50">
+            <TabsList className="grid w-full grid-cols-6 bg-slate-900/50 border border-slate-800/50">
               <TabsTrigger value="session" className="flex items-center gap-1 text-xs sm:text-sm">
                 <Wind className="h-4 w-4" />
                 <span className="hidden sm:inline">Séance</span>
@@ -279,6 +282,10 @@ const BreathPage: React.FC = () => {
               <TabsTrigger value="stats" className="flex items-center gap-1 text-xs sm:text-sm">
                 <Zap className="h-4 w-4" />
                 <span className="hidden sm:inline">Stats</span>
+              </TabsTrigger>
+              <TabsTrigger value="calendar" className="flex items-center gap-1 text-xs sm:text-sm">
+                <Calendar className="h-4 w-4" />
+                <span className="hidden sm:inline">Calendrier</span>
               </TabsTrigger>
               <TabsTrigger value="techniques" className="flex items-center gap-1 text-xs sm:text-sm">
                 <BookOpen className="h-4 w-4" />
@@ -364,11 +371,17 @@ const BreathPage: React.FC = () => {
             </TabsContent>
 
             {/* Stats Tab */}
-            <TabsContent value="stats">
+            <TabsContent value="stats" className="space-y-4">
+              <div className="flex justify-end">
+                <BreathExportButton />
+              </div>
               <BreathSessionStats />
             </TabsContent>
 
-            {/* Techniques Tab */}
+            {/* Calendar Tab */}
+            <TabsContent value="calendar">
+              <BreathCalendar />
+            </TabsContent>
             <TabsContent value="techniques">
               <BreathingTechniquesLibrary />
             </TabsContent>
