@@ -2271,6 +2271,48 @@ export type Database = {
         }
         Relationships: []
       }
+      b2b_audit_logs: {
+        Row: {
+          action: string
+          created_at: string | null
+          details: Json | null
+          entity_id: string
+          entity_type: string
+          id: string
+          ip_address: unknown
+          org_id: string
+          user_agent: string | null
+          user_email: string | null
+          user_id: string
+        }
+        Insert: {
+          action: string
+          created_at?: string | null
+          details?: Json | null
+          entity_id: string
+          entity_type: string
+          id?: string
+          ip_address?: unknown
+          org_id: string
+          user_agent?: string | null
+          user_email?: string | null
+          user_id: string
+        }
+        Update: {
+          action?: string
+          created_at?: string | null
+          details?: Json | null
+          entity_id?: string
+          entity_type?: string
+          id?: string
+          ip_address?: unknown
+          org_id?: string
+          user_agent?: string | null
+          user_email?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       b2b_music_aggregates: {
         Row: {
           cohort_size: number
@@ -2298,6 +2340,78 @@ export type Database = {
           org_id?: string
           text_summary?: string
           week_start?: string
+        }
+        Relationships: []
+      }
+      b2b_reports: {
+        Row: {
+          content: Json | null
+          created_at: string | null
+          generated_at: string | null
+          generated_by: string | null
+          id: string
+          metrics: Json | null
+          narrative: string | null
+          org_id: string
+          period: string
+          report_type: string | null
+          title: string | null
+        }
+        Insert: {
+          content?: Json | null
+          created_at?: string | null
+          generated_at?: string | null
+          generated_by?: string | null
+          id?: string
+          metrics?: Json | null
+          narrative?: string | null
+          org_id: string
+          period: string
+          report_type?: string | null
+          title?: string | null
+        }
+        Update: {
+          content?: Json | null
+          created_at?: string | null
+          generated_at?: string | null
+          generated_by?: string | null
+          id?: string
+          metrics?: Json | null
+          narrative?: string | null
+          org_id?: string
+          period?: string
+          report_type?: string | null
+          title?: string | null
+        }
+        Relationships: []
+      }
+      b2b_user_roles: {
+        Row: {
+          expires_at: string | null
+          granted_at: string | null
+          granted_by: string | null
+          id: string
+          org_id: string
+          role: Database["public"]["Enums"]["b2b_role"]
+          user_id: string
+        }
+        Insert: {
+          expires_at?: string | null
+          granted_at?: string | null
+          granted_by?: string | null
+          id?: string
+          org_id: string
+          role?: Database["public"]["Enums"]["b2b_role"]
+          user_id: string
+        }
+        Update: {
+          expires_at?: string | null
+          granted_at?: string | null
+          granted_by?: string | null
+          id?: string
+          org_id?: string
+          role?: Database["public"]["Enums"]["b2b_role"]
+          user_id?: string
         }
         Relationships: []
       }
@@ -25706,6 +25820,10 @@ export type Database = {
           schedule: string
         }[]
       }
+      get_highest_b2b_role: {
+        Args: { _org_id: string; _user_id: string }
+        Returns: Database["public"]["Enums"]["b2b_role"]
+      }
       get_latest_compliance_audit: {
         Args: never
         Returns: {
@@ -26113,6 +26231,18 @@ export type Database = {
         }[]
       }
       get_weekly_summary: { Args: { user_uuid: string }; Returns: Json }
+      has_any_b2b_role: {
+        Args: { _org_id: string; _user_id: string }
+        Returns: boolean
+      }
+      has_b2b_role: {
+        Args: {
+          _org_id: string
+          _role: Database["public"]["Enums"]["b2b_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
       has_org_role: {
         Args: { _org_id: string; _role: string; _user_id: string }
         Returns: boolean
@@ -26690,6 +26820,7 @@ export type Database = {
     Enums: {
       app_role: "admin" | "moderator" | "user" | "b2c"
       app_user_role: "user_b2c" | "user_b2b" | "manager_b2b" | "admin"
+      b2b_role: "b2b_admin" | "b2b_manager" | "b2b_member" | "b2b_viewer"
       invitation_status: "pending" | "accepted" | "expired"
       share_permission: "viewer" | "editor" | "admin"
     }
@@ -26821,6 +26952,7 @@ export const Constants = {
     Enums: {
       app_role: ["admin", "moderator", "user", "b2c"],
       app_user_role: ["user_b2c", "user_b2b", "manager_b2b", "admin"],
+      b2b_role: ["b2b_admin", "b2b_manager", "b2b_member", "b2b_viewer"],
       invitation_status: ["pending", "accepted", "expired"],
       share_permission: ["viewer", "editor", "admin"],
     },
