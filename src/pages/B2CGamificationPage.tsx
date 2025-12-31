@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * GAMIFICATION PAGE - EMOTIONSCARE
  * Page de gamification accessible WCAG 2.1 AA
@@ -6,8 +5,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Trophy, Star, Flame, Gift, Zap, Crown } from 'lucide-react';
+import { ArrowLeft, Trophy, Star, Flame, Gift, Zap, Crown, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { AurasGalaxy, useAurasLeaderboard, MyAuraCard } from '@/features/leaderboard';
 
 interface Achievement {
   id: string;
@@ -330,11 +330,9 @@ const B2CGamificationPage: React.FC = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                className="text-center py-12"
+                className="space-y-4"
               >
-                <Trophy className="w-16 h-16 text-yellow-400 mx-auto mb-4" aria-hidden="true" />
-                <h3 className="text-lg font-semibold mb-2">Classement</h3>
-                <p className="text-gray-600">Bientôt disponible !</p>
+                <AurasGalaxy minHeight="300px" showHeader={true} />
               </motion.div>
             )}
           </AnimatePresence>
