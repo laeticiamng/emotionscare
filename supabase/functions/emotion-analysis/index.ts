@@ -1,5 +1,16 @@
+// @ts-nocheck
+/**
+ * Emotion Analysis Edge Function
+ * Analyse textuelle des émotions via Lovable AI Gateway
+ * 
+ * Sécurisé avec authentification + rate limiting
+ */
+
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { authenticateRequest } from '../_shared/auth-middleware.ts';
+import { enforceEdgeRateLimit, buildRateLimitResponse } from '../_shared/rate-limit.ts';
+import { validateRequest, createErrorResponse, TextAnalysisSchema } from '../_shared/validation.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -12,7 +23,37 @@ serve(async (req) => {
   }
 
   try {
-    const { text, language = 'fr' } = await req.json();
+    // 🔒 SÉCURITÉ: Authentification obligatoire
+    const authResult = await authenticateRequest(req);
+    if (authResult.status !== 200 || !authResult.user) {
+      console.warn('[emotion-analysis] Unauthorized access attempt');
+      return createErrorResponse(authResult.error || 'Authentication required', authResult.status, corsHeaders);
+    }
+
+    // 🛡️ SÉCURITÉ: Rate limiting (20 req/min pour l'analyse texte)
+    const rateLimit = await enforceEdgeRateLimit(req, {
+      route: 'emotion-analysis',
+      userId: authResult.user.id,
+      limit: 20,
+      windowMs: 60_000,
+      description: 'Text emotion analysis via Lovable AI'
+    });
+
+    if (!rateLimit.allowed) {
+      console.warn('[emotion-analysis] Rate limit exceeded', { userId: authResult.user.id });
+      return buildRateLimitResponse(rateLimit, corsHeaders, {
+        errorCode: 'rate_limit_exceeded',
+        message: `Trop de requêtes. Réessayez dans ${rateLimit.retryAfterSeconds}s.`
+      });
+    }
+
+    // ✅ VALIDATION: Valider les entrées
+    const validation = await validateRequest(req, TextAnalysisSchema);
+    if (!validation.success) {
+      return createErrorResponse(validation.error, validation.status, corsHeaders);
+    }
+
+    const { text, language = 'fr' } = validation.data;
     
     if (!text || typeof text !== 'string' || text.trim().length === 0) {
       return new Response(
@@ -165,7 +206,12 @@ RÈGLES :
       latency_ms: latencyMs
     };
 
-    console.log('[emotion-analysis] Success:', JSON.stringify(result));
+    console.log('[emotion-analysis] Success:', JSON.stringify({
+      userId: authResult.user.id,
+      emotion: result.emotion,
+      valence: result.valence,
+      latencyMs
+    }));
 
     return new Response(
       JSON.stringify(result),

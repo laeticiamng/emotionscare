@@ -148,6 +148,17 @@ export const HumeAnalysisSchema = z.object({
 });
 
 // ============================================
+// Schémas Text Analysis (Lovable AI)
+// ============================================
+
+export const TextAnalysisSchema = z.object({
+  text: z.string()
+    .min(1, 'Text cannot be empty')
+    .max(10000, 'Text too long (max 10000 chars)'),
+  language: z.enum(['fr', 'en', 'es', 'de', 'it', 'pt']).optional().default('fr')
+});
+
+// ============================================
 // Fonctions utilitaires de validation
 // ============================================
 
