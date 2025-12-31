@@ -1,0 +1,6 @@
+/**
+ * B2B Components exports
+ */
+export { CreateTeamDialog } from './CreateTeamDialog';
+export { CreateEventDialog } from './CreateEventDialog';
+export { InviteMemberDialog } from './InviteMemberDialog';
