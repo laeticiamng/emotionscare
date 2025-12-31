@@ -46,8 +46,10 @@ import { useParkExport } from '@/hooks/useParkExport';
 import { useParkSharing, type ShareableAchievement } from '@/hooks/useParkSharing';
 import { useParkEnergy } from '@/hooks/useParkEnergy';
 import { useParkStreak } from '@/hooks/useParkStreak';
+import { useParkAchievements } from '@/hooks/useParkAchievements';
 import { ParkProgressDashboard } from '@/components/park/ParkProgressDashboard';
 import type { ZoneKey, ZoneProgressData, ParkStat, MoodOption } from '@/types/park';
+import type { WeatherType } from '@/components/park/ParkWeatherWidget';
 
 export default function EmotionalPark() {
   const navigate = useNavigate();
@@ -121,6 +123,18 @@ export default function EmotionalPark() {
   const { isFavorite, toggleFavorite, recordVisit } = useParkFavorites();
   const { exportToJSON, isExporting } = useParkExport();
   const { shareSummary, isSharing } = useParkSharing();
+  const { achievements: parkAchievements, stats: achievementStats } = useParkAchievements();
+
+  // Calculer le type de météo basé sur l'humeur
+  const weatherType: WeatherType = useMemo(() => {
+    const moodScore = currentMood === 'happy' ? 85 : currentMood === 'calm' ? 70 : currentMood === 'anxious' ? 35 : currentMood === 'sad' ? 25 : currentMood === 'excited' ? 90 : 60;
+    if (moodScore >= 85) return 'magical';
+    if (moodScore >= 70) return 'sunny';
+    if (moodScore >= 55) return 'partly-cloudy';
+    if (moodScore >= 40) return 'cloudy';
+    if (moodScore >= 25) return 'rainy';
+    return 'stormy';
+  }, [currentMood]);
 
   const [showTourModal, setShowTourModal] = useState(false);
 
@@ -553,8 +567,9 @@ export default function EmotionalPark() {
         {/* Weather & Streak Widgets */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <ParkWeatherWidget 
-            mood={currentMood === 'happy' ? 85 : currentMood === 'calm' ? 70 : currentMood === 'anxious' ? 35 : currentMood === 'sad' ? 25 : 60}
-            description={currentMood ? `Basé sur votre humeur actuelle` : 'Le parc est en pleine forme !'}
+            weatherType={weatherType}
+            mood={currentMood === 'happy' ? 85 : currentMood === 'calm' ? 70 : currentMood === 'anxious' ? 35 : currentMood === 'sad' ? 25 : currentMood === 'excited' ? 90 : 60}
+            description={currentMood ? `Météo basée sur votre humeur : ${currentMood}` : 'Le parc est en pleine forme !'}
           />
           <ParkStreakWidget 
             currentStreak={currentStreak}
@@ -1128,21 +1143,9 @@ export default function EmotionalPark() {
             </DialogTitle>
           </DialogHeader>
           <ParkAchievementsPanel
-            achievements={unlockedBadges.map((badge, idx) => ({
-              id: badge.zoneKey,
-              title: badge.zoneName,
-              description: `Zone ${badge.zoneName} complétée`,
-              icon: parkZones[badge.zoneKey as keyof typeof parkZones]?.emoji || '🏆',
-              category: 'exploration' as const,
-              rarity: idx < 2 ? 'common' as const : idx < 5 ? 'rare' as const : 'epic' as const,
-              progress: 1,
-              maxProgress: 1,
-              unlocked: true,
-              unlockedAt: typeof badge.unlockedAt === 'number' ? new Date(badge.unlockedAt).toISOString() : badge.unlockedAt,
-              reward: { xp: 100, coins: 50 }
-            }))}
-            totalXP={getCompletedQuestsCount() * 100}
-            totalCoins={getTotalRewards()}
+            achievements={parkAchievements}
+            totalXP={achievementStats.totalXP}
+            totalCoins={achievementStats.totalCoins}
           />
         </DialogContent>
       </Dialog>
