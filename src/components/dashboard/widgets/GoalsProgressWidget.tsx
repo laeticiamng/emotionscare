@@ -1,18 +1,30 @@
 /**
- * Widget de progression des objectifs personnels
+ * Widget de progression des objectifs personnels avec création inline
  */
-import React from 'react';
-import { useQuery } from '@tanstack/react-query';
+import React, { useState, useCallback } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Target, CheckCircle2, Circle, Plus, ArrowRight } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { Target, CheckCircle2, Circle, Plus, ArrowRight, Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 interface Goal {
   id: string;
@@ -46,8 +58,31 @@ async function fetchUserGoals(userId: string): Promise<Goal[]> {
   }));
 }
 
+async function createUserGoal(userId: string, title: string, targetValue: number): Promise<boolean> {
+  const { error } = await supabase
+    .from('user_goals')
+    .insert({
+      user_id: userId,
+      title,
+      target_value: targetValue,
+      current_progress: 0,
+      completed: false
+    });
+
+  if (error) {
+    console.error('Error creating goal:', error);
+    return false;
+  }
+  return true;
+}
+
 export default function GoalsProgressWidget() {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
+  const [newGoalTitle, setNewGoalTitle] = useState('');
+  const [newGoalTarget, setNewGoalTarget] = useState(100);
 
   const { data: goals, isLoading } = useQuery({
     queryKey: ['user-goals-widget', user?.id],
@@ -55,6 +90,26 @@ export default function GoalsProgressWidget() {
     enabled: !!user?.id,
     staleTime: 5 * 60 * 1000,
   });
+
+  const handleCreateGoal = useCallback(async () => {
+    if (!user?.id || !newGoalTitle.trim()) return;
+
+    setIsCreating(true);
+    try {
+      const success = await createUserGoal(user.id, newGoalTitle.trim(), newGoalTarget);
+      if (success) {
+        toast.success('Objectif créé avec succès !');
+        setNewGoalTitle('');
+        setNewGoalTarget(100);
+        setIsDialogOpen(false);
+        queryClient.invalidateQueries({ queryKey: ['user-goals-widget', user.id] });
+      } else {
+        toast.error('Erreur lors de la création de l\'objectif');
+      }
+    } finally {
+      setIsCreating(false);
+    }
+  }, [user?.id, newGoalTitle, newGoalTarget, queryClient]);
 
   const activeGoals = goals?.filter(g => !g.completed) || [];
   const completedCount = goals?.filter(g => g.completed).length || 0;
@@ -73,11 +128,72 @@ export default function GoalsProgressWidget() {
             </CardTitle>
             <CardDescription>Progression de vos objectifs personnels</CardDescription>
           </div>
-          {goals && goals.length > 0 && (
-            <Badge variant="outline" className="text-xs">
-              {completedCount} complété{completedCount > 1 ? 's' : ''}
-            </Badge>
-          )}
+          <div className="flex items-center gap-2">
+            {goals && goals.length > 0 && (
+              <Badge variant="outline" className="text-xs">
+                {completedCount} complété{completedCount > 1 ? 's' : ''}
+              </Badge>
+            )}
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-8 w-8 p-0" aria-label="Ajouter un objectif">
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle>Nouvel objectif</DialogTitle>
+                  <DialogDescription>
+                    Définissez un nouvel objectif personnel à atteindre.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="goal-title">Titre de l'objectif</Label>
+                    <Input
+                      id="goal-title"
+                      placeholder="Ex: Méditer 10 minutes par jour"
+                      value={newGoalTitle}
+                      onChange={(e) => setNewGoalTitle(e.target.value)}
+                      maxLength={100}
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="goal-target">Valeur cible</Label>
+                    <Input
+                      id="goal-target"
+                      type="number"
+                      min={1}
+                      max={1000}
+                      value={newGoalTarget}
+                      onChange={(e) => setNewGoalTarget(Number(e.target.value) || 100)}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Nombre de fois à atteindre (ex: 10 sessions, 30 jours, etc.)
+                    </p>
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+                    Annuler
+                  </Button>
+                  <Button 
+                    onClick={handleCreateGoal} 
+                    disabled={isCreating || !newGoalTitle.trim()}
+                  >
+                    {isCreating ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Création...
+                      </>
+                    ) : (
+                      'Créer l\'objectif'
+                    )}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
       </CardHeader>
       <CardContent>
@@ -93,11 +209,9 @@ export default function GoalsProgressWidget() {
             <p className="text-sm text-muted-foreground mb-3">
               Aucun objectif défini pour le moment
             </p>
-            <Button asChild size="sm" variant="outline">
-              <Link to="/app/gamification" className="inline-flex items-center gap-1">
-                <Plus className="h-3 w-3" />
-                Définir mes objectifs
-              </Link>
+            <Button size="sm" variant="outline" onClick={() => setIsDialogOpen(true)}>
+              <Plus className="h-3 w-3 mr-1" />
+              Définir mon premier objectif
             </Button>
           </div>
         ) : (
