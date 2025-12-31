@@ -213,7 +213,8 @@ export default function SupportPage() {
             </form>
           </CardContent>
         </Card>
-      </div>
+        </div>
+      </main>
     </div>
   );
 }
