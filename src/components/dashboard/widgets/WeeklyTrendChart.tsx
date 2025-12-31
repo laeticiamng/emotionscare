@@ -39,19 +39,13 @@ async function fetchWeeklyTrend(userId: string): Promise<DayData[]> {
   sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
   // Récupérer en parallèle les différentes sources de données
-  const [scansResult, sessionsResult, clinicalResult] = await Promise.all([
-    supabase
-      .from('scan_history')
-      .select('created_at, normalized_balance')
-      .eq('user_id', userId)
-      .gte('created_at', sevenDaysAgo.toISOString())
-      .order('created_at', { ascending: true }),
-    
+  const [sessionsResult, clinicalResult] = await Promise.all([
     supabase
       .from('activity_sessions')
       .select('started_at, mood_after')
       .eq('user_id', userId)
       .gte('started_at', sevenDaysAgo.toISOString()),
+    
     
     supabase
       .from('clinical_signals')
@@ -60,18 +54,6 @@ async function fetchWeeklyTrend(userId: string): Promise<DayData[]> {
       .gte('created_at', sevenDaysAgo.toISOString())
       .order('created_at', { ascending: true })
   ]);
-
-  // Traiter les scans
-  if (scansResult.data && scansResult.data.length > 0) {
-    scansResult.data.forEach(scan => {
-      const scanDate = scan.created_at.split('T')[0];
-      const dayIndex = days.findIndex(d => d.date === scanDate);
-      if (dayIndex !== -1) {
-        days[dayIndex].hasActivity = true;
-        days[dayIndex].score = Math.max(days[dayIndex].score, scan.normalized_balance || 50);
-      }
-    });
-  }
 
   // Traiter les sessions d'activités
   if (sessionsResult.data && sessionsResult.data.length > 0) {
