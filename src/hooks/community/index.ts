@@ -15,6 +15,10 @@ export { useFollow, useMyFollowStats } from './useFollow';
 export type { UseFollowReturn } from './useFollow';
 
 export { useRealtimeNotifications } from './useRealtimeNotifications';
+export type { Notification, UseRealtimeNotificationsReturn } from './useRealtimeNotifications';
 
 export { useCommunitySearch } from './useCommunitySearch';
 export type { SearchResult, UseCommunitySearchReturn } from './useCommunitySearch';
+
+export { useTrendingTags } from './useTrendingTags';
+export type { UseTrendingTagsReturn } from './useTrendingTags';

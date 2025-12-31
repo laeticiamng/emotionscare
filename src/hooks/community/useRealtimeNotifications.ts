@@ -7,12 +7,12 @@ import { logger } from '@/lib/logger';
 export interface Notification {
   id: string;
   user_id: string;
-  type: 'comment' | 'reaction' | 'mention' | 'follow' | 'group_invite';
+  type: string;
   title: string;
   message: string;
   action_url?: string;
   is_read: boolean;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   created_at: string;
 }
 
@@ -24,6 +24,21 @@ export interface UseRealtimeNotificationsReturn {
   markAllAsRead: () => Promise<void>;
   deleteNotification: (notificationId: string) => Promise<void>;
   refresh: () => Promise<void>;
+}
+
+// Map DB columns to our interface
+function mapNotification(dbNotif: Record<string, unknown>): Notification {
+  return {
+    id: dbNotif.id as string,
+    user_id: dbNotif.user_id as string,
+    type: (dbNotif.type as string) || 'info',
+    title: (dbNotif.title as string) || '',
+    message: (dbNotif.message as string) || '',
+    action_url: (dbNotif.action_link as string) || undefined,
+    is_read: (dbNotif.read as boolean) || false,
+    metadata: (dbNotif.metadata as Record<string, unknown>) || {},
+    created_at: dbNotif.created_at as string
+  };
 }
 
 export function useRealtimeNotifications(): UseRealtimeNotificationsReturn {
@@ -50,7 +65,7 @@ export function useRealtimeNotifications(): UseRealtimeNotificationsReturn {
 
       if (error) throw error;
 
-      setNotifications(data || []);
+      setNotifications((data || []).map(mapNotification));
     } catch (error) {
       logger.error('Failed to load notifications', error, 'NOTIFICATIONS');
     } finally {
@@ -60,12 +75,14 @@ export function useRealtimeNotifications(): UseRealtimeNotificationsReturn {
 
   // Setup realtime subscription
   useEffect(() => {
+    let notificationChannel: RealtimeChannel | null = null;
+
     const setupSubscription = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
       // Create channel for user's notifications
-      const notificationChannel = supabase
+      notificationChannel = supabase
         .channel(`notifications:${user.id}`)
         .on(
           'postgres_changes',
@@ -76,7 +93,7 @@ export function useRealtimeNotifications(): UseRealtimeNotificationsReturn {
             filter: `user_id=eq.${user.id}`
           },
           (payload) => {
-            const newNotification = payload.new as Notification;
+            const newNotification = mapNotification(payload.new as Record<string, unknown>);
 
             // Add to list
             setNotifications(prev => [newNotification, ...prev]);
@@ -97,7 +114,7 @@ export function useRealtimeNotifications(): UseRealtimeNotificationsReturn {
             filter: `user_id=eq.${user.id}`
           },
           (payload) => {
-            const updatedNotification = payload.new as Notification;
+            const updatedNotification = mapNotification(payload.new as Record<string, unknown>);
             setNotifications(prev =>
               prev.map(notif =>
                 notif.id === updatedNotification.id ? updatedNotification : notif
@@ -114,7 +131,7 @@ export function useRealtimeNotifications(): UseRealtimeNotificationsReturn {
             filter: `user_id=eq.${user.id}`
           },
           (payload) => {
-            const deletedId = payload.old.id;
+            const deletedId = (payload.old as Record<string, unknown>).id as string;
             setNotifications(prev =>
               prev.filter(notif => notif.id !== deletedId)
             );
@@ -130,8 +147,8 @@ export function useRealtimeNotifications(): UseRealtimeNotificationsReturn {
 
     // Cleanup
     return () => {
-      if (channel) {
-        supabase.removeChannel(channel);
+      if (notificationChannel) {
+        supabase.removeChannel(notificationChannel);
       }
     };
   }, [loadNotifications, toast]);
@@ -141,7 +158,7 @@ export function useRealtimeNotifications(): UseRealtimeNotificationsReturn {
     try {
       const { error } = await supabase
         .from('notifications')
-        .update({ is_read: true })
+        .update({ read: true })
         .eq('id', notificationId);
 
       if (error) throw error;
@@ -165,9 +182,9 @@ export function useRealtimeNotifications(): UseRealtimeNotificationsReturn {
 
       const { error } = await supabase
         .from('notifications')
-        .update({ is_read: true })
+        .update({ read: true })
         .eq('user_id', user.id)
-        .eq('is_read', false);
+        .eq('read', false);
 
       if (error) throw error;
 

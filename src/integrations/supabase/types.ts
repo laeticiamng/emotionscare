@@ -4428,45 +4428,75 @@ export type Database = {
       community_posts: {
         Row: {
           author_id: string
+          category: string | null
           comments_count: number | null
           content: string
           created_at: string | null
           group_id: string | null
           has_empathy_response: boolean | null
           id: string
+          is_anonymous: boolean | null
+          is_featured: boolean | null
           likes_count: number | null
+          location: string | null
+          media_urls: string[] | null
+          moderation_status: string | null
           mood_halo: string | null
           reply_count: number | null
+          shares_count: number | null
+          tags: string[] | null
           title: string
           updated_at: string | null
+          user_id: string | null
+          views_count: number | null
         }
         Insert: {
           author_id: string
+          category?: string | null
           comments_count?: number | null
           content: string
           created_at?: string | null
           group_id?: string | null
           has_empathy_response?: boolean | null
           id?: string
+          is_anonymous?: boolean | null
+          is_featured?: boolean | null
           likes_count?: number | null
+          location?: string | null
+          media_urls?: string[] | null
+          moderation_status?: string | null
           mood_halo?: string | null
           reply_count?: number | null
+          shares_count?: number | null
+          tags?: string[] | null
           title: string
           updated_at?: string | null
+          user_id?: string | null
+          views_count?: number | null
         }
         Update: {
           author_id?: string
+          category?: string | null
           comments_count?: number | null
           content?: string
           created_at?: string | null
           group_id?: string | null
           has_empathy_response?: boolean | null
           id?: string
+          is_anonymous?: boolean | null
+          is_featured?: boolean | null
           likes_count?: number | null
+          location?: string | null
+          media_urls?: string[] | null
+          moderation_status?: string | null
           mood_halo?: string | null
           reply_count?: number | null
+          shares_count?: number | null
+          tags?: string[] | null
           title?: string
           updated_at?: string | null
+          user_id?: string | null
+          views_count?: number | null
         }
         Relationships: [
           {
@@ -14630,6 +14660,7 @@ export type Database = {
         Row: {
           action_link: string | null
           action_text: string | null
+          action_url: string | null
           category: string | null
           channel: string | null
           clicked_at: string | null
@@ -14641,6 +14672,7 @@ export type Database = {
           icon: string | null
           id: string
           image: string | null
+          is_read: boolean | null
           message: string
           metadata: Json | null
           priority: string | null
@@ -14655,6 +14687,7 @@ export type Database = {
         Insert: {
           action_link?: string | null
           action_text?: string | null
+          action_url?: string | null
           category?: string | null
           channel?: string | null
           clicked_at?: string | null
@@ -14666,6 +14699,7 @@ export type Database = {
           icon?: string | null
           id?: string
           image?: string | null
+          is_read?: boolean | null
           message: string
           metadata?: Json | null
           priority?: string | null
@@ -14680,6 +14714,7 @@ export type Database = {
         Update: {
           action_link?: string | null
           action_text?: string | null
+          action_url?: string | null
           category?: string | null
           channel?: string | null
           clicked_at?: string | null
@@ -14691,6 +14726,7 @@ export type Database = {
           icon?: string | null
           id?: string
           image?: string | null
+          is_read?: boolean | null
           message?: string
           metadata?: Json | null
           priority?: string | null
