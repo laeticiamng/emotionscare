@@ -2289,6 +2289,20 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     requireAuth: true,
   },
   {
+    name: 'app-b2b-alerts',
+    path: '/b2b/alerts',
+    segment: 'manager',
+    role: 'manager',
+    layout: 'app',
+    component: 'B2BAlertsPage',
+    guard: true,
+    requireAuth: true,
+    meta: {
+      title: 'Alertes RH - EmotionsCare B2B',
+      description: 'Gestion des alertes bien-être anonymisées',
+    },
+  },
+  {
     name: 'app-collab-coach',
     path: '/app/collab/coach',
     segment: 'employee',
