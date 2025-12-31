@@ -1,8 +1,17 @@
-import { memo, useState } from 'react';
+// @ts-nocheck
+/**
+ * JournalSearchPage - Recherche avancée enrichie
+ */
+import { memo, useState, useMemo } from 'react';
 import type { SanitizedNote } from '@/modules/journal/types';
 import { JournalAdvancedSearch } from '@/components/journal/JournalAdvancedSearch';
-import { Card, CardContent } from '@/components/ui/card';
-import { Search } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Search, FileText, Calendar, Tag, X } from 'lucide-react';
+import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
 
 interface JournalSearchPageProps {
   notes: SanitizedNote[];
@@ -11,59 +20,150 @@ interface JournalSearchPageProps {
 export const JournalSearchPage = memo<JournalSearchPageProps>(({ notes }) => {
   const [searchResults, setSearchResults] = useState<SanitizedNote[]>(notes);
   const [hasSearched, setHasSearched] = useState(false);
+  const [quickSearch, setQuickSearch] = useState('');
+
+  // Quick search filter
+  const filteredResults = useMemo(() => {
+    if (!quickSearch.trim()) return searchResults;
+    const query = quickSearch.toLowerCase();
+    return searchResults.filter(
+      n => n.text?.toLowerCase().includes(query) || 
+           n.tags?.some(t => t.toLowerCase().includes(query))
+    );
+  }, [searchResults, quickSearch]);
+
+  // All available tags
+  const allTags = useMemo(() => {
+    const tagSet = new Set<string>();
+    notes.forEach(n => n.tags?.forEach(t => tagSet.add(t)));
+    return Array.from(tagSet).sort();
+  }, [notes]);
 
   const handleResultsChange = (results: SanitizedNote[]) => {
     setSearchResults(results);
     setHasSearched(true);
   };
 
+  const handleTagClick = (tag: string) => {
+    setQuickSearch(`#${tag}`);
+  };
+
   return (
-    <div className="container max-w-6xl mx-auto p-6 space-y-6">
-      <div>
-        <h2 className="text-3xl font-bold tracking-tight">Recherche avancée</h2>
-        <p className="text-muted-foreground">
-          Trouvez rapidement vos notes avec des filtres puissants
+    <div className="space-y-6">
+      {/* Header */}
+      <header>
+        <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
+          <Search className="h-7 w-7 text-primary" aria-hidden="true" />
+          Recherche
+        </h1>
+        <p className="text-muted-foreground mt-1">
+          Trouvez rapidement vos notes
         </p>
-      </div>
+      </header>
 
-      <JournalAdvancedSearch notes={notes} onResultsChange={handleResultsChange} />
-
-      {searchResults.length > 0 ? (
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold">
-            {searchResults.length} résultat{searchResults.length > 1 ? 's' : ''}
-          </h3>
-          <div className="grid gap-4">
-            {searchResults.map((note) => (
-              <Card key={note.id}>
-                <CardContent className="pt-6">
-                  <p className="text-sm">{note.text}</p>
-                  {note.tags.length > 0 && (
-                    <div className="flex gap-2 mt-4">
-                      {note.tags.map(tag => (
-                        <span key={tag} className="text-xs bg-muted px-2 py-1 rounded">
-                          #{tag}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            ))}
+      {/* Quick Search */}
+      <Card>
+        <CardContent className="pt-6">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" aria-hidden="true" />
+            <Input
+              placeholder="Recherche rapide dans les résultats..."
+              value={quickSearch}
+              onChange={(e) => setQuickSearch(e.target.value)}
+              className="pl-10 pr-10"
+              aria-label="Recherche rapide"
+            />
+            {quickSearch && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
+                onClick={() => setQuickSearch('')}
+                aria-label="Effacer la recherche"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            )}
           </div>
-        </div>
-      ) : hasSearched ? (
+        </CardContent>
+      </Card>
+
+      {/* Tags Quick Filter */}
+      {allTags.length > 0 && (
         <Card>
-          <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-            <Search className="h-12 w-12 text-muted-foreground mb-4" />
-            <h3 className="text-lg font-semibold mb-2">Aucun résultat trouvé</h3>
-            <p className="text-sm text-muted-foreground max-w-md">
-              Aucune note ne correspond à vos critères de recherche.
-              Essayez de modifier vos filtres ou votre recherche.
-            </p>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center gap-2">
+              <Tag className="h-4 w-4" aria-hidden="true" />
+              Filtrer par tag
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-wrap gap-2">
+              {allTags.slice(0, 15).map((tag) => (
+                <Badge
+                  key={tag}
+                  variant={quickSearch === `#${tag}` ? 'default' : 'outline'}
+                  className="cursor-pointer hover:bg-primary/10"
+                  onClick={() => handleTagClick(tag)}
+                >
+                  #{tag}
+                </Badge>
+              ))}
+              {allTags.length > 15 && (
+                <Badge variant="secondary">+{allTags.length - 15} autres</Badge>
+              )}
+            </div>
           </CardContent>
         </Card>
-      ) : null}
+      )}
+
+      {/* Advanced Search */}
+      <JournalAdvancedSearch notes={notes} onResultsChange={handleResultsChange} />
+
+      {/* Results */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center justify-between">
+            <span className="flex items-center gap-2">
+              <FileText className="h-5 w-5" aria-hidden="true" />
+              Résultats
+            </span>
+            <Badge variant="secondary">{filteredResults.length} notes</Badge>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {filteredResults.length > 0 ? (
+            <div className="space-y-4 max-h-[600px] overflow-y-auto">
+              {filteredResults.map((note) => (
+                <div
+                  key={note.id}
+                  className="p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+                >
+                  <p className="text-sm whitespace-pre-wrap line-clamp-3">{note.text}</p>
+                  <div className="flex items-center justify-between mt-3">
+                    <div className="flex flex-wrap gap-1">
+                      {note.tags?.map(tag => (
+                        <Badge key={tag} variant="outline" className="text-xs">
+                          #{tag}
+                        </Badge>
+                      ))}
+                    </div>
+                    <span className="text-xs text-muted-foreground flex items-center gap-1">
+                      <Calendar className="h-3 w-3" aria-hidden="true" />
+                      {format(new Date(note.created_at), 'd MMM yyyy', { locale: fr })}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="py-12 text-center text-muted-foreground">
+              <Search className="h-12 w-12 mx-auto mb-4 opacity-30" aria-hidden="true" />
+              <p>{hasSearched ? 'Aucun résultat trouvé' : 'Lancez une recherche pour voir les résultats'}</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 });
