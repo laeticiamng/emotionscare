@@ -104,6 +104,8 @@ const B2BReportsPage = lazy(() => import('@/pages/B2BReportsPage'));
 const B2BReportDetailPage = lazy(() => import('@/pages/B2BReportDetailPage'));
 const B2BReportsHeatmapPage = lazy(() => import('@/pages/b2b/reports'));
 const B2BEventsPage = lazy(() => import('@/pages/B2BEventsPage'));
+const B2BAlertsPage = lazy(() => import('@/pages/B2BAlertsPage'));
+const B2BAnalyticsPageReal = lazy(() => import('@/pages/B2BAnalyticsPage'));
 
 // Additional B2B pages - use correct paths
 const B2BOptimisationPage = lazy(() => import('@/pages/B2BOptimisationPage'));
@@ -434,6 +436,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   B2BReportDetailPage,
   B2BReportsHeatmapPage,
   B2BEventsPage,
+  B2BAlertsPage,
   B2BOptimisationPage,
   B2BSecurityPage,
   B2BAuditPage,
@@ -684,7 +687,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   ActivityLogsPage,
   
   // Alias fallback pour pages non créées
-  B2BAnalyticsPage: B2BReportsPage,
+  B2BAnalyticsPage: B2BAnalyticsPageReal,
   B2BUserCoachPage: B2CAICoachPage,
   UnifiedDashboardPage: B2CDashboardPage,
   UnifiedHomePage: HomePage,
