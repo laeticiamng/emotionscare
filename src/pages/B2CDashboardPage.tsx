@@ -45,8 +45,6 @@ import { useUserStatsQuery, useUserStatsRealtime } from '@/hooks/useUserStatsQue
 import { useDynamicRecommendations } from '@/hooks/useDynamicRecommendations';
 import { useWellbeingScore } from '@/hooks/useWellbeingScore';
 import { useAuth } from '@/contexts/AuthContext';
-import { useDynamicRecommendations } from '@/hooks/useDynamicRecommendations';
-import { useAuth } from '@/contexts/AuthContext';
 
 const WeeklyPlanCard = React.lazy(() => import('@/components/dashboard/widgets/WeeklyPlanCard'));
 const RecentEmotionScansWidget = React.lazy(() => import('@/components/dashboard/widgets/RecentEmotionScansWidget'));
@@ -185,6 +183,9 @@ export default function B2CDashboardPage() {
   
   // Recommandations dynamiques
   const { recommendations, loading: recsLoading, refetch: refetchRecs } = useDynamicRecommendations();
+  
+  // Score de bien-être calculé depuis les données réelles
+  const { score: wellbeingScore, trend: wellbeingTrend, loading: wellbeingLoading } = useWellbeingScore();
   
   // Auto-refresh toutes les 5 minutes
   useEffect(() => {
@@ -528,31 +529,33 @@ export default function B2CDashboardPage() {
               </CardContent>
             </Card>
 
-            {/* Carte Score Bien-être */}
+            {/* Carte Score Bien-être - utilisant le hook useWellbeingScore */}
             <Card className="md:col-span-2 lg:col-span-1 bg-gradient-to-br from-primary/5 to-accent/5">
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
                   <Activity className="h-4 w-4" aria-hidden="true" />
                   Score bien-être
+                  {wellbeingTrend === 'up' && <TrendingUp className="h-3 w-3 text-success" />}
+                  {wellbeingTrend === 'down' && <TrendingUp className="h-3 w-3 text-destructive rotate-180" />}
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                {statsLoading ? (
+                {wellbeingLoading || statsLoading ? (
                   <Skeleton className="h-12 w-full" />
                 ) : (
                   <div className="flex items-center gap-4">
                     <div className="text-3xl font-bold text-primary">
-                      {Math.round(50 + (userStats.currentStreak * 2) + (userStats.weeklyGoals * 5))}
+                      {wellbeingScore}
                       <span className="text-lg font-normal text-muted-foreground">/100</span>
                     </div>
                     <div className="flex-1">
                       <Progress 
-                        value={Math.min(100, 50 + (userStats.currentStreak * 2) + (userStats.weeklyGoals * 5))}
+                        value={wellbeingScore}
                         className="h-3"
                         aria-label="Score de bien-être"
                       />
                       <p className="text-xs text-muted-foreground mt-1">
-                        Basé sur votre activité récente
+                        Basé sur vos données réelles
                       </p>
                     </div>
                   </div>
@@ -665,6 +668,30 @@ export default function B2CDashboardPage() {
           >
             <RecentEmotionScansWidget />
           </Suspense>
+        </section>
+
+        {/* Nouveaux widgets: Objectifs et Notifications côte à côte */}
+        <section aria-labelledby="widgets-section" className="mb-8">
+          <div className="grid gap-6 md:grid-cols-2">
+            <Suspense
+              fallback={(
+                <div aria-busy="true" aria-live="polite">
+                  <DashboardWidgetSkeleton lines={4} />
+                </div>
+              )}
+            >
+              <GoalsProgressWidget />
+            </Suspense>
+            <Suspense
+              fallback={(
+                <div aria-busy="true" aria-live="polite">
+                  <DashboardWidgetSkeleton lines={4} />
+                </div>
+              )}
+            >
+              <NotificationsWidget />
+            </Suspense>
+          </div>
         </section>
 
         <section aria-labelledby="journal-summary-section" className="mb-8">
