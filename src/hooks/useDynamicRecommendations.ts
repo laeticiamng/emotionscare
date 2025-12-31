@@ -94,8 +94,8 @@ const RECOMMENDATIONS_CONFIG: Record<string, Recommendation> = {
 async function fetchUserContext(userId: string): Promise<UserContext> {
   const [lastScan, userStats, recentActivity, clinicalSignals] = await Promise.all([
     supabase
-      .from('scan_history')
-      .select('dominant_emotion, created_at')
+      .from('clinical_signals')
+      .select('metadata, created_at')
       .eq('user_id', userId)
       .order('created_at', { ascending: false })
       .limit(1)
@@ -121,9 +121,22 @@ async function fetchUserContext(userId: string): Promise<UserContext> {
   ]);
 
   // Analyser les signaux cliniques pour détecter le mood
-  let detectedMood: string | undefined = lastScan.data?.dominant_emotion;
+  let detectedMood: string | undefined;
   
-  if (clinicalSignals.data && clinicalSignals.data.length > 0) {
+  // D'abord extraire depuis le dernier scan (clinical_signals)
+  if (lastScan.data?.metadata) {
+    const metadata = lastScan.data.metadata as Record<string, unknown> | null;
+    if (metadata?.dominant_emotion) {
+      detectedMood = String(metadata.dominant_emotion);
+    } else if (metadata?.mood) {
+      detectedMood = String(metadata.mood);
+    } else if (metadata?.emotion) {
+      detectedMood = String(metadata.emotion);
+    }
+  }
+  
+  // Fallback: chercher dans les signaux cliniques additionnels
+  if (!detectedMood && clinicalSignals.data && clinicalSignals.data.length > 0) {
     for (const signal of clinicalSignals.data) {
       const metadata = signal.metadata as Record<string, unknown> | null;
       if (metadata?.dominant_emotion) {

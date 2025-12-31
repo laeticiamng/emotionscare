@@ -54,7 +54,7 @@ async function fetchUserStats(userId: string): Promise<UserStats> {
         }),
       
       supabase
-        .from('scan_history')
+        .from('clinical_signals')
         .select('*', { count: 'exact', head: true })
         .eq('user_id', userId)
         .then(({ count, error }) => {
@@ -135,7 +135,7 @@ export function useUserStatsRealtime() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
-  // Écouter les changements sur user_stats, scan_history, et user_goals
+  // Écouter les changements sur user_stats, clinical_signals, et user_goals
   useEffect(() => {
     if (!user?.id) return;
 
@@ -159,7 +159,7 @@ export function useUserStatsRealtime() {
         {
           event: 'INSERT',
           schema: 'public',
-          table: 'scan_history',
+          table: 'clinical_signals',
           filter: `user_id=eq.${user.id}`
         },
         () => {
