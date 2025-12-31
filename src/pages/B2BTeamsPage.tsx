@@ -158,9 +158,6 @@ const B2BTeamsPage: React.FC = () => {
           teams={data.teams as any}
           onSuccess={() => refetch()}
         />
-            </Button>
-          </div>
-        </header>
 
         {/* Stats Overview */}
         <section aria-labelledby="stats-title" className="mb-8">
