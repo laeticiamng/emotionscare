@@ -9,3 +9,7 @@ export { GroupSessionDetail } from './GroupSessionDetail';
 export { GroupSessionCalendar } from './GroupSessionCalendar';
 export { SessionStats } from './SessionStats';
 export { SessionFilters } from './SessionFilters';
+export { SessionRating } from './SessionRating';
+export { RecommendedSessions } from './RecommendedSessions';
+export { ShareSessionButton } from './ShareSessionButton';
+export { CalendarLegend } from './CalendarLegend';

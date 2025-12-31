@@ -2,28 +2,32 @@
  * Page des sessions de groupe B2C
  */
 
-import React, { useState } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Users, Calendar, Plus, Sparkles, Video, TrendingUp, Filter } from 'lucide-react';
+import { Users, Calendar, Plus, Sparkles, Video, TrendingUp, Filter, Star } from 'lucide-react';
 import PageRoot from '@/components/common/PageRoot';
 import { useAuth } from '@/contexts/AuthContext';
-import { useGroupSessions, useGroupSession, useSessionStats } from '@/modules/group-sessions/hooks';
+import { useGroupSessions, useGroupSession, useSessionStats, useSessionReminders } from '@/modules/group-sessions/hooks';
 import { 
   GroupSessionCard, 
   CreateSessionModal, 
   GroupSessionDetail, 
   GroupSessionCalendar,
   SessionStats,
-  SessionFilters
+  SessionFilters,
+  RecommendedSessions,
+  CalendarLegend
 } from '@/modules/group-sessions/components';
-import type { GroupSession, GroupSessionFilters } from '@/modules/group-sessions/types';
-import { motion } from 'framer-motion';
+import type { GroupSession } from '@/modules/group-sessions/types';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useSearchParams } from 'react-router-dom';
 
 const GroupSessionsPage: React.FC = () => {
   const { user } = useAuth();
+  const [searchParams] = useSearchParams();
   const {
     sessions,
     liveSessions,
@@ -40,13 +44,28 @@ const GroupSessionsPage: React.FC = () => {
   } = useGroupSessions({ autoLoad: true });
 
   const { stats, loading: statsLoading } = useSessionStats();
+  
+  // Hook pour les rappels
+  useSessionReminders();
 
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
   const [showDetail, setShowDetail] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
+  const [calendarCategory, setCalendarCategory] = useState<string | undefined>();
 
   const sessionDetail = useGroupSession(selectedSessionId || '');
+
+  // Ouvrir une session depuis l'URL
+  useEffect(() => {
+    const sessionFromUrl = searchParams.get('session');
+    if (sessionFromUrl && sessions.length > 0) {
+      const session = sessions.find(s => s.id === sessionFromUrl);
+      if (session) {
+        handleSelectSession(session);
+      }
+    }
+  }, [searchParams, sessions]);
 
   const handleSelectSession = (session: GroupSession) => {
     setSelectedSessionId(session.id);
@@ -58,6 +77,27 @@ const GroupSessionsPage: React.FC = () => {
   };
 
   const registeredIds = mySessions.map(s => s.id);
+
+  // Sessions recommandées (sessions non inscrites, catégories populaires)
+  const recommendedSessions = useMemo(() => {
+    if (!sessions.length) return [];
+    
+    // Récupérer les catégories des sessions passées de l'utilisateur
+    const userCategories = mySessions.map(s => s.category);
+    const uniqueCategories = [...new Set(userCategories)];
+    
+    // Filtrer les sessions non inscrites et dans les catégories préférées
+    return sessions
+      .filter(s => !registeredIds.includes(s.id))
+      .filter(s => uniqueCategories.length === 0 || uniqueCategories.includes(s.category))
+      .slice(0, 5);
+  }, [sessions, mySessions, registeredIds]);
+
+  // Sessions filtrées par catégorie pour le calendrier
+  const calendarSessions = useMemo(() => {
+    if (!calendarCategory) return sessions;
+    return sessions.filter(s => s.category === calendarCategory);
+  }, [sessions, calendarCategory]);
 
   return (
     <PageRoot>
@@ -92,6 +132,7 @@ const GroupSessionsPage: React.FC = () => {
                 variant="outline" 
                 size="icon"
                 onClick={() => setShowFilters(!showFilters)}
+                className={showFilters ? 'bg-primary/10' : ''}
               >
                 <Filter className="h-4 w-4" />
               </Button>
@@ -103,18 +144,36 @@ const GroupSessionsPage: React.FC = () => {
           </motion.div>
 
           {/* Filters */}
-          {showFilters && (
+          <AnimatePresence>
+            {showFilters && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="mb-6 overflow-hidden"
+              >
+                <SessionFilters
+                  filters={filters}
+                  categories={categories}
+                  onFilterChange={updateFilters}
+                  onClearFilters={handleClearFilters}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Recommended Sessions */}
+          {recommendedSessions.length > 0 && !loading && (
             <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
               className="mb-6"
             >
-              <SessionFilters
-                filters={filters}
-                categories={categories}
-                onFilterChange={updateFilters}
-                onClearFilters={handleClearFilters}
+              <RecommendedSessions
+                sessions={recommendedSessions}
+                onSelectSession={handleSelectSession}
+                onRegister={registerForSession}
               />
             </motion.div>
           )}
@@ -155,8 +214,13 @@ const GroupSessionsPage: React.FC = () => {
                 Calendrier
               </TabsTrigger>
               <TabsTrigger value="my-sessions" className="gap-2">
-                <Users className="h-4 w-4" />
+                <Star className="h-4 w-4" />
                 Mes sessions
+                {mySessions.length > 0 && (
+                  <Badge variant="secondary" className="ml-1 h-5 px-1.5">
+                    {mySessions.length}
+                  </Badge>
+                )}
               </TabsTrigger>
               <TabsTrigger value="stats" className="gap-2">
                 <TrendingUp className="h-4 w-4" />
@@ -183,24 +247,39 @@ const GroupSessionsPage: React.FC = () => {
                 </Card>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {sessions.map(session => (
-                    <GroupSessionCard
+                  {sessions.map((session, index) => (
+                    <motion.div
                       key={session.id}
-                      session={session}
-                      isRegistered={registeredIds.includes(session.id)}
-                      onRegister={() => registerForSession(session.id)}
-                      onUnregister={() => unregisterFromSession(session.id)}
-                      onJoin={() => handleSelectSession(session)}
-                      onSelect={() => handleSelectSession(session)}
-                    />
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.05 }}
+                    >
+                      <GroupSessionCard
+                        session={session}
+                        isRegistered={registeredIds.includes(session.id)}
+                        onRegister={() => registerForSession(session.id)}
+                        onUnregister={() => unregisterFromSession(session.id)}
+                        onJoin={() => handleSelectSession(session)}
+                        onSelect={() => handleSelectSession(session)}
+                      />
+                    </motion.div>
                   ))}
                 </div>
               )}
             </TabsContent>
 
-            <TabsContent value="calendar">
+            <TabsContent value="calendar" className="space-y-4">
+              {/* Calendar Legend */}
+              <CalendarLegend
+                categories={categories}
+                activeCategory={calendarCategory}
+                onCategoryClick={(cat) => 
+                  setCalendarCategory(calendarCategory === cat ? undefined : cat)
+                }
+              />
+              
               <GroupSessionCalendar
-                sessions={sessions}
+                sessions={calendarSessions}
                 onSelectSession={handleSelectSession}
               />
             </TabsContent>
@@ -215,8 +294,8 @@ const GroupSessionsPage: React.FC = () => {
                       className="mt-4" 
                       variant="outline"
                       onClick={() => {
-                        const tabs = document.querySelector('[data-state="active"][value="upcoming"]');
-                        if (tabs) (tabs as HTMLElement).click();
+                        const el = document.querySelector('[data-value="upcoming"]');
+                        if (el) (el as HTMLElement).click();
                       }}
                     >
                       Découvrir les sessions
@@ -225,15 +304,21 @@ const GroupSessionsPage: React.FC = () => {
                 </Card>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {mySessions.map(session => (
-                    <GroupSessionCard
+                  {mySessions.map((session, index) => (
+                    <motion.div
                       key={session.id}
-                      session={session}
-                      isRegistered={true}
-                      onUnregister={() => unregisterFromSession(session.id)}
-                      onJoin={() => handleSelectSession(session)}
-                      onSelect={() => handleSelectSession(session)}
-                    />
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.05 }}
+                    >
+                      <GroupSessionCard
+                        session={session}
+                        isRegistered={true}
+                        onUnregister={() => unregisterFromSession(session.id)}
+                        onJoin={() => handleSelectSession(session)}
+                        onSelect={() => handleSelectSession(session)}
+                      />
+                    </motion.div>
                   ))}
                 </div>
               )}
