@@ -289,6 +289,17 @@ export const parkAttractions: Attraction[] = [
     zone: 'social'
   },
   {
+    id: 'gamification',
+    title: 'L\'Arène des Champions',
+    subtitle: 'Défis & récompenses',
+    description: 'Gagnez des points, débloquez des badges et grimpez dans les classements en prenant soin de vous.',
+    icon: Trophy,
+    route: '/app/gamification',
+    gradient: 'from-amber-500/20 to-yellow-500/20',
+    collection: 'Trophées conquis',
+    zone: 'social'
+  },
+  {
     id: 'group-sessions',
     title: 'L\'Agora du Partage',
     subtitle: 'Sessions de groupe',
