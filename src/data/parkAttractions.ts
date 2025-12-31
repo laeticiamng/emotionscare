@@ -355,17 +355,6 @@ export const parkAttractions: Attraction[] = [
     zone: 'wisdom'
   },
   {
-    id: 'bounce-back',
-    title: 'Le Rebond Résilient',
-    subtitle: 'Bounce Back Battle',
-    description: 'Combat l\'adversité dans ce jeu de résilience émotionnelle.',
-    icon: Shield,
-    route: '/app/bounce-back',
-    gradient: 'from-blue-500/20 to-indigo-500/20',
-    collection: 'Médailles de résilience',
-    zone: 'challenge'
-  },
-  {
     id: 'activity',
     title: 'Le Jardin des Saisons',
     subtitle: 'Activité hebdomadaire',
