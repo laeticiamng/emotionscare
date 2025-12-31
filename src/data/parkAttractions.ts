@@ -8,7 +8,7 @@ import {
   Home, Sparkles, Wind, Palette, Music, Leaf, Book, Cloud, Star,
   Lightbulb, Waves, Scan, Beaker, Sword, Sliders, Users, Trophy,
   Theater, Sprout, Grid3X3, Settings, Bell, MessageSquare, BarChart3,
-  Heart, Monitor, Camera, Shield
+  Heart, Monitor, Camera, Shield, Flower2
 } from 'lucide-react';
 import type { Attraction } from '@/types/park';
 
@@ -275,6 +275,17 @@ export const parkAttractions: Attraction[] = [
     route: '/app/buddies',
     gradient: 'from-pink-500/20 to-rose-500/20',
     collection: 'Liens de confiance',
+    zone: 'social'
+  },
+  {
+    id: 'social-cocon',
+    title: 'Le Cocon Social',
+    subtitle: 'Espace bienveillant',
+    description: 'Un espace protégé où le groupe forme un cocon de soutien mutuel et de partage sécurisé.',
+    icon: Flower2,
+    route: '/app/social-cocon',
+    gradient: 'from-rose-500/20 to-pink-500/20',
+    collection: 'Liens de confiance tissés',
     zone: 'social'
   },
   {
