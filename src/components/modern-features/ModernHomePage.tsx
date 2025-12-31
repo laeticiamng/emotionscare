@@ -332,8 +332,6 @@ const ModernHomePage: React.FC = () => {
         {/* SECTION 6: Protocoles d'activation */}
         <QuickStartModules />
 
-        {/* SECTION 7: Press Logos - Mentions presse */}
-        <PressLogos variant="static" />
 
         {/* SECTION 8: Academy - Comprendre pour reprendre la main */}
         <AcademySection />
