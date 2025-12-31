@@ -28,11 +28,12 @@ export interface BattleEvent {
 }
 
 type BouncePhase = 'idle' | 'starting' | 'battle' | 'paused' | 'calming' | 'debrief' | 'pairing' | 'completed';
+type BattleMode = 'quick' | 'standard' | 'zen' | 'challenge';
 
 interface BounceStoreState {
   battleId: string | null;
   phase: BouncePhase;
-  mode: 'standard' | 'intense';
+  mode: BattleMode;
   stimuli: StimulusSpec[];
   processedStimuli: string[];
   events: BattleEvent[];
@@ -56,7 +57,7 @@ interface BounceStoreState {
 interface BounceStoreActions {
   setPhase: (phase: BouncePhase) => void;
   setBattleId: (battleId: string) => void;
-  setMode: (mode: 'standard' | 'intense') => void;
+  setMode: (mode: BattleMode) => void;
   setStimuli: (stimuli: StimulusSpec[]) => void;
   addStimulus: (stimulus: StimulusSpec) => void;
   processStimulus: (stimulusId: string) => void;
@@ -118,7 +119,7 @@ const useBounceStoreBase = create<BounceStore>()(
         set({ battleId });
       },
       
-      setMode: (mode: 'standard' | 'intense') => {
+      setMode: (mode: BattleMode) => {
         set({ mode });
       },
       
@@ -153,7 +154,14 @@ const useBounceStoreBase = create<BounceStore>()(
       startBattle: () => {
         const now = new Date();
         const state = get();
-        const duration = state.mode === 'intense' ? 240 : 180; // 4min vs 3min
+        // Duration based on mode: quick=90, standard=180, zen=240, challenge=300
+        const durationMap: Record<BattleMode, number> = {
+          quick: 90,
+          standard: 180,
+          zen: 240,
+          challenge: 300
+        };
+        const duration = durationMap[state.mode] || 180;
         
         set({
           phase: 'battle',

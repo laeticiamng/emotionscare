@@ -4,9 +4,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Shield, BarChart2, ArrowLeft } from 'lucide-react';
+import { Shield, BarChart2, ArrowLeft, History, Trophy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { supabase } from '@/integrations/supabase/client';
 import { useBounceBattle } from '@/hooks/useBounceBattle';
 import {
   BattleArena,
@@ -58,26 +59,27 @@ const B2CBounceBackBattlePage: React.FC = () => {
   const loadStats = async () => {
     setStatsLoading(true);
     try {
-      // Stats are loaded from the bounce store or service
-      // For now we'll compute from local data
-      const localStats = {
-        total_battles: 0,
-        completed_battles: 0,
-        completion_rate: 0,
-        total_duration_seconds: 0,
-        average_duration_seconds: 0,
-        coping_averages: {}
-      };
-      setStats(localStats);
+      const { data, error } = await supabase.functions.invoke('bounce-back-battle', {
+        body: { action: 'stats' }
+      });
+      
+      if (error) throw error;
+      
+      if (data?.success && data?.stats) {
+        setStats(data.stats);
+      } else {
+        setStats(null);
+      }
     } catch (error) {
       console.error('Failed to load stats', error);
+      setStats(null);
     } finally {
       setStatsLoading(false);
     }
   };
 
-  const handleSelectMode = (mode: 'standard' | 'intense') => {
-    start(mode);
+  const handleSelectMode = (mode: string) => {
+    start(mode as any);
   };
 
   const handleDebriefSubmit = (answers: Array<{ id: string; value: 0 | 1 | 2 | 3 }>) => {

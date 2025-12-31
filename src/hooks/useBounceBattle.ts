@@ -30,7 +30,7 @@ export const useBounceBattle = () => {
   const wsRef = useRef<WebSocket | null>(null);
   const stimuliTimeoutsRef = useRef<NodeJS.Timeout[]>([]);
 
-  const start = useCallback(async (mode: 'standard' | 'intense' = 'standard') => {
+  const start = useCallback(async (mode: string = 'standard') => {
     setIsLoading(true);
     setError(null);
     
