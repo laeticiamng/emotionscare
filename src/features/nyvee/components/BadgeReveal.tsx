@@ -77,7 +77,7 @@ export const BadgeReveal = ({ badge, message, onComplete, className }: BadgeReve
               transition={{ duration: 2, repeat: Infinity }}
               className={cn('rounded-full bg-gradient-to-r p-4', config.color)}
             >
-              <Icon className="h-8 w-8 text-white" />
+              <Icon className="h-8 w-8 text-primary-foreground" />
             </motion.div>
 
             {/* Badge label */}
@@ -86,7 +86,7 @@ export const BadgeReveal = ({ badge, message, onComplete, className }: BadgeReve
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
-                className="text-2xl font-semibold text-white"
+                className="text-2xl font-semibold text-foreground"
               >
                 {config.label} {config.emoji}
               </motion.h3>
@@ -95,7 +95,7 @@ export const BadgeReveal = ({ badge, message, onComplete, className }: BadgeReve
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.4 }}
-                className="mt-2 text-base text-white/80"
+                className="mt-2 text-base text-foreground/80"
               >
                 {message}
               </motion.p>

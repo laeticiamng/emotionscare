@@ -2,7 +2,7 @@
  * useNyveeMachine - State machine pour sessions Nyvee
  */
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { nyveeService } from './nyveeService';
 import type { 
   BreathingIntensity,
@@ -10,9 +10,8 @@ import type {
   BadgeType,
   NyveeSession,
   CocoonType,
-  BreathingCycleConfig,
-  DEFAULT_CYCLE_CONFIG,
 } from './types';
+import { DEFAULT_CYCLE_CONFIG } from './types';
 import { useToast } from '@/hooks/use-toast';
 
 export interface NyveeMachineConfig {

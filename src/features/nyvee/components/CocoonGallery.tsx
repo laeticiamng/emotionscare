@@ -129,8 +129,8 @@ export const CocoonGallery = ({ className }: { className?: string }) => {
 
                 {/* Cocoon name overlay */}
                 {isUnlocked && (
-                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-2">
-                    <p className="text-xs font-semibold text-white">{cocoon.name}</p>
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-background/80 to-transparent p-2">
+                    <p className="text-xs font-semibold text-foreground">{cocoon.name}</p>
                   </div>
                 )}
               </motion.button>
