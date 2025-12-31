@@ -142,11 +142,11 @@ const ModernHomePage: React.FC = () => {
             EmotionsCare
           </Link>
           
-          <nav className="flex items-center gap-2 sm:gap-4">
+          <nav className="flex items-center gap-2 sm:gap-4" aria-label="Navigation principale">
             {/* Bouton Entreprise B2B - toujours visible */}
             <Link to="/b2b">
               <Button variant="outline" size="sm" className="gap-2 border-blue-500/50 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950">
-                <Building2 className="h-4 w-4" />
+                <Building2 className="h-4 w-4" aria-hidden="true" />
                 <span className="hidden sm:inline">Entreprise</span>
               </Button>
             </Link>
@@ -307,70 +307,68 @@ const ModernHomePage: React.FC = () => {
         </div>
       )}
 
-      {/* SECTION 1: Hero interventionnel */}
       <main id="main-content" role="main">
         {/* SECTION 1: Hero interventionnel */}
         <EnrichedHeroSection />
 
-      {/* SECTION 2: Trust Badges - Badges de confiance */}
-      <TrustBadges variant="inline" className="container mx-auto" />
+        {/* SECTION 2: Trust Badges - Badges de confiance */}
+        <TrustBadges variant="inline" className="container mx-auto" />
 
-      {/* SECTION 3: Live Counter - Stats temps réel */}
-      {!isAuthenticated && (
-        <div className="py-8 bg-muted/10">
-          <div className="container mx-auto px-4">
-            <LiveCounter variant="horizontal" />
+        {/* SECTION 3: Live Counter - Stats temps réel */}
+        {!isAuthenticated && (
+          <div className="py-8 bg-muted/10">
+            <div className="container mx-auto px-4">
+              <LiveCounter variant="horizontal" />
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* SECTION 4: Carte du Parc - Accès direct */}
-      <ParkPreviewCard />
+        {/* SECTION 4: Carte du Parc - Accès direct */}
+        <ParkPreviewCard />
 
-      {/* SECTION 5: Onboarding ultra-court */}
-      <OnboardingGuide />
+        {/* SECTION 5: Onboarding ultra-court */}
+        <OnboardingGuide />
 
-      {/* SECTION 6: Protocoles d'activation */}
-      <QuickStartModules />
+        {/* SECTION 6: Protocoles d'activation */}
+        <QuickStartModules />
 
-      {/* SECTION 7: Press Logos - Mentions presse */}
-      <PressLogos variant="static" />
+        {/* SECTION 7: Press Logos - Mentions presse */}
+        <PressLogos variant="static" />
 
-      {/* SECTION 8: Academy - Comprendre pour reprendre la main */}
-      <AcademySection />
+        {/* SECTION 8: Academy - Comprendre pour reprendre la main */}
+        <AcademySection />
 
-      {/* SECTION 9: Engagement communautaire */}
-      <CommunityEngagement />
+        {/* SECTION 9: Engagement communautaire */}
+        <CommunityEngagement />
 
-      {/* SECTION 10: Témoignages (lazy loaded) */}
-      <Suspense fallback={<SectionSkeleton />}>
-        <TestimonialsSection />
-      </Suspense>
+        {/* SECTION 10: Témoignages (lazy loaded) */}
+        <Suspense fallback={<SectionSkeleton />}>
+          <TestimonialsSection />
+        </Suspense>
 
-      {/* SECTION 11: Newsletter */}
-      <NewsletterSection variant="full" />
+        {/* SECTION 11: Newsletter */}
+        <NewsletterSection variant="full" />
 
-      {/* SECTION 12: FAQ (lazy loaded) */}
-      <Suspense fallback={<SectionSkeleton />}>
-        <FAQSection />
-      </Suspense>
+        {/* SECTION 12: FAQ (lazy loaded) */}
+        <Suspense fallback={<SectionSkeleton />}>
+          <FAQSection />
+        </Suspense>
 
-      {/* CTA Final */}
-      <div className="bg-gradient-to-r from-primary/10 to-blue-500/10 py-12">
-        <div className="container mx-auto px-4 text-center">
-          <h3 className="text-2xl font-bold mb-4">Prêt à reprendre le contrôle ?</h3>
-          <p className="text-muted-foreground mb-6 max-w-xl mx-auto">
-            Rejoins les {onlineCount > 0 ? onlineCount.toLocaleString() : '...'} personnes en ligne qui prennent soin d'elles en ce moment.
-          </p>
-          <Button size="lg" asChild onClick={() => trackCTAClick('final-cta')}>
-            <Link to="/signup">
-              Commencer gratuitement
-              <ArrowRight className="h-4 w-4 ml-2" />
-            </Link>
-          </Button>
-        </div>
-      </div>
-
+        {/* CTA Final */}
+        <section className="bg-gradient-to-r from-primary/10 to-blue-500/10 py-12" aria-labelledby="cta-final-title">
+          <div className="container mx-auto px-4 text-center">
+            <h3 id="cta-final-title" className="text-2xl font-bold mb-4">Prêt à reprendre le contrôle ?</h3>
+            <p className="text-muted-foreground mb-6 max-w-xl mx-auto">
+              Rejoins les {onlineCount > 0 ? onlineCount.toLocaleString() : '2 500+'} personnes en ligne qui prennent soin d'elles en ce moment.
+            </p>
+            <Button size="lg" asChild onClick={() => trackCTAClick('final-cta')}>
+              <Link to="/signup">
+                Commencer gratuitement
+                <ArrowRight className="h-4 w-4 ml-2" aria-hidden="true" />
+              </Link>
+            </Button>
+          </div>
+        </section>
       </main>
 
       {/* SECTION 13: Footer (lazy loaded) */}
@@ -380,7 +378,14 @@ const ModernHomePage: React.FC = () => {
 
       {/* Floating elements - Social Proof, CTA, Cookie Consent */}
       <SocialProofBar position="bottom" interval={10000} />
-      {!isAuthenticated && <FloatingCTA showAfterScroll={800} />}
+      {!isAuthenticated && (
+        <FloatingCTA 
+          showAfterScroll={800} 
+          onView={() => trackCTAView('floating-cta')}
+          onClick={() => trackCTAClick('floating-cta')}
+        />
+      )}
+      <CookieConsent />
       <CookieConsent />
     </div>
   );

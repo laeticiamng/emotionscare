@@ -73,7 +73,10 @@ const TestimonialsSection: React.FC = () => {
   };
 
   return (
-    <section className="py-20 bg-gradient-to-b from-background to-primary/5">
+    <section 
+      className="py-20 bg-gradient-to-b from-background to-primary/5"
+      aria-labelledby="testimonials-title"
+    >
       <div className="container mx-auto px-4">
         <motion.div
           variants={containerVariants}
@@ -85,10 +88,10 @@ const TestimonialsSection: React.FC = () => {
           {/* Header */}
           <motion.div variants={itemVariants} className="text-center space-y-4">
             <Badge variant="outline">
-              <Quote className="h-3 w-3 mr-2" />
+              <Quote className="h-3 w-3 mr-2" aria-hidden="true" />
               Ce qu'ils en disent
             </Badge>
-            <h2 className="text-3xl lg:text-4xl font-bold text-foreground">
+            <h2 id="testimonials-title" className="text-3xl lg:text-4xl font-bold text-foreground">
               Ils ont repris le contrôle
             </h2>
             <p className="text-lg text-muted-foreground max-w-xl mx-auto">
@@ -100,44 +103,51 @@ const TestimonialsSection: React.FC = () => {
           <motion.div 
             variants={containerVariants}
             className="grid md:grid-cols-3 gap-6"
+            role="list"
+            aria-label="Témoignages d'utilisateurs"
           >
             {testimonials.map((testimonial, index) => (
-              <motion.div key={index} variants={itemVariants}>
+              <motion.article 
+                key={index} 
+                variants={itemVariants}
+                role="listitem"
+                aria-label={`Témoignage de ${testimonial.name}`}
+              >
                 <Card className="h-full border-border/50 bg-card/50 backdrop-blur-sm hover:shadow-lg transition-all">
                   <CardContent className="p-6 space-y-4">
                     {/* Rating */}
-                    <div className="flex gap-0.5">
+                    <div className="flex gap-0.5" role="img" aria-label={`Note : ${testimonial.rating} étoiles sur 5`}>
                       {[...Array(testimonial.rating)].map((_, i) => (
-                        <Star key={i} className="h-4 w-4 text-yellow-400 fill-yellow-400" />
+                        <Star key={i} className="h-4 w-4 text-yellow-400 fill-yellow-400" aria-hidden="true" />
                       ))}
                     </div>
                     
                     {/* Quote */}
                     <blockquote className="text-foreground/90 italic leading-relaxed">
-                      "{testimonial.content}"
+                      <p>"{testimonial.content}"</p>
                     </blockquote>
 
                     {/* Highlight Badge */}
                     {testimonial.highlight && (
                       <Badge variant="secondary" className="w-fit text-xs">
-                        ✨ {testimonial.highlight}
+                        <span aria-hidden="true">✨</span> {testimonial.highlight}
                       </Badge>
                     )}
                     
                     {/* Author */}
-                    <div className="flex items-center gap-3 pt-4 border-t border-border/50">
-                      <div className="text-3xl">{testimonial.avatar}</div>
+                    <footer className="flex items-center gap-3 pt-4 border-t border-border/50">
+                      <div className="text-3xl" aria-hidden="true">{testimonial.avatar}</div>
                       <div>
-                        <div className="font-semibold text-foreground">{testimonial.name}</div>
+                        <cite className="font-semibold text-foreground not-italic">{testimonial.name}</cite>
                         <div className="text-sm text-muted-foreground flex items-center gap-1">
-                          {getCategoryIcon(testimonial.category)}
-                          {testimonial.role}
+                          <span aria-hidden="true">{getCategoryIcon(testimonial.category)}</span>
+                          <span>{testimonial.role}</span>
                         </div>
                       </div>
-                    </div>
+                    </footer>
                   </CardContent>
                 </Card>
-              </motion.div>
+              </motion.article>
             ))}
           </motion.div>
         </motion.div>
