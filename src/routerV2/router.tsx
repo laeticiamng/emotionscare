@@ -163,6 +163,7 @@ const B2CSocialCoconPage = lazy(() => import('@/pages/B2CSocialCoconPage'));
 const B2CStorySynthLabPage = lazy(() => import('@/pages/B2CStorySynthLabPage'));
 const B2CCommunautePage = lazy(() => import('@/pages/B2CCommunautePage'));
 const GroupSessionsPage = lazy(() => import('@/pages/GroupSessionsPage'));
+const BuddiesPage = lazy(() => import('@/pages/BuddiesPage'));
 const B2BSelectionPage = lazy(() => import('@/pages/B2BSelectionPage'));
 
 // B2B Enterprise
@@ -439,6 +440,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   B2CStorySynthLabPage,
   B2CCommunautePage,
   GroupSessionsPage,
+  BuddiesPage,
   SubscribePage,
   
   // Pages fonctionnelles avancées
