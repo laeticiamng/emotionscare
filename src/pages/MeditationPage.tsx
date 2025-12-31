@@ -26,7 +26,9 @@ import {
   Waves,
   TreePine,
   Flame,
-  Cloud
+  Cloud,
+  Calendar,
+  Download
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -51,13 +53,20 @@ import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
+// Composants du module
+import { MeditationCalendar } from '@/modules/meditation/ui/MeditationCalendar';
+import { StreakWidget } from '@/modules/meditation/ui/StreakWidget';
+import { AmbientSoundMixer } from '@/modules/meditation/ui/AmbientSoundMixer';
+import { MeditationRecommendationWidget } from '@/components/meditation/MeditationRecommendationWidget';
+import { MeditationExportButton } from '@/components/meditation/MeditationExportButton';
+
 const TECHNIQUE_OPTIONS = [
   { 
     id: 'mindfulness', 
     title: 'Pleine conscience', 
     description: 'Observer le moment présent sans jugement',
     icon: Brain,
-    color: 'bg-blue-500/10 text-blue-600',
+    color: 'bg-blue-500/10 text-blue-600 dark:text-blue-400',
     durations: [5, 10, 15, 20]
   },
   { 
@@ -65,7 +74,7 @@ const TECHNIQUE_OPTIONS = [
     title: 'Focus respiration', 
     description: 'Se concentrer sur le souffle naturel',
     icon: Wind,
-    color: 'bg-cyan-500/10 text-cyan-600',
+    color: 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400',
     durations: [5, 10, 15]
   },
   { 
@@ -73,7 +82,7 @@ const TECHNIQUE_OPTIONS = [
     title: 'Scan corporel', 
     description: 'Explorer les sensations progressivement',
     icon: Heart,
-    color: 'bg-pink-500/10 text-pink-600',
+    color: 'bg-pink-500/10 text-pink-600 dark:text-pink-400',
     durations: [10, 15, 20, 30]
   },
   { 
@@ -81,7 +90,7 @@ const TECHNIQUE_OPTIONS = [
     title: 'Visualisation', 
     description: 'Créer des images mentales apaisantes',
     icon: Sparkles,
-    color: 'bg-purple-500/10 text-purple-600',
+    color: 'bg-purple-500/10 text-purple-600 dark:text-purple-400',
     durations: [10, 15, 20]
   },
   { 
@@ -89,7 +98,7 @@ const TECHNIQUE_OPTIONS = [
     title: 'Bienveillance', 
     description: 'Cultiver la compassion',
     icon: Heart,
-    color: 'bg-rose-500/10 text-rose-600',
+    color: 'bg-rose-500/10 text-rose-600 dark:text-rose-400',
     durations: [10, 15, 20]
   },
   { 
@@ -97,18 +106,9 @@ const TECHNIQUE_OPTIONS = [
     title: 'Mantra', 
     description: 'Répéter un son calmant',
     icon: Volume2,
-    color: 'bg-indigo-500/10 text-indigo-600',
+    color: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400',
     durations: [5, 10, 15, 20]
   },
-];
-
-const AMBIENT_SOUNDS = [
-  { id: 'none', label: 'Aucun', icon: VolumeX },
-  { id: 'rain', label: 'Pluie', icon: Cloud },
-  { id: 'forest', label: 'Forêt', icon: TreePine },
-  { id: 'ocean', label: 'Océan', icon: Waves },
-  { id: 'fire', label: 'Feu', icon: Flame },
-  { id: 'wind', label: 'Vent', icon: Wind },
 ];
 
 const TECHNIQUE_LABELS: Record<string, string> = {
@@ -136,9 +136,12 @@ export default function MeditationPage() {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [moodBefore, setMoodBefore] = useState<number | null>(null);
   const [showMoodPrompt, setShowMoodPrompt] = useState(false);
+  const [showMoodAfterPrompt, setShowMoodAfterPrompt] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-  const [activeTab, setActiveTab] = useState<'practice' | 'history' | 'progress'>('practice');
+  const [showAmbientMixer, setShowAmbientMixer] = useState(false);
+  const [activeTab, setActiveTab] = useState<'practice' | 'history' | 'progress' | 'calendar'>('practice');
   const [breathScale, setBreathScale] = useState(1);
+  const [breathPhase, setBreathPhase] = useState<'inhale' | 'hold' | 'exhale'>('inhale');
   
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const breathRef = useRef<NodeJS.Timeout | null>(null);
@@ -146,30 +149,44 @@ export default function MeditationPage() {
   const totalDuration = selectedDuration * 60;
   const progress = (currentTime / totalDuration) * 100;
   
-  // Breath animation
+  // Breath animation améliorée
   useEffect(() => {
     if (!isPlaying) {
       setBreathScale(1);
+      setBreathPhase('inhale');
       return;
     }
     
-    let expanding = true;
+    let phase: 'inhale' | 'hold' | 'exhale' = 'inhale';
+    let timer = 0;
+    const cycleDuration = { inhale: 4000, hold: 2000, exhale: 4000 };
+    
     breathRef.current = setInterval(() => {
-      setBreathScale(prev => {
-        if (expanding) {
-          if (prev >= 1.3) {
-            expanding = false;
-            return prev - 0.02;
-          }
-          return prev + 0.02;
-        } else {
-          if (prev <= 1) {
-            expanding = true;
-            return prev + 0.02;
-          }
-          return prev - 0.02;
+      timer += 100;
+      
+      if (phase === 'inhale') {
+        const progress = timer / cycleDuration.inhale;
+        setBreathScale(1 + 0.3 * progress);
+        if (timer >= cycleDuration.inhale) {
+          phase = 'hold';
+          timer = 0;
+          setBreathPhase('hold');
         }
-      });
+      } else if (phase === 'hold') {
+        if (timer >= cycleDuration.hold) {
+          phase = 'exhale';
+          timer = 0;
+          setBreathPhase('exhale');
+        }
+      } else {
+        const progress = timer / cycleDuration.exhale;
+        setBreathScale(1.3 - 0.3 * progress);
+        if (timer >= cycleDuration.exhale) {
+          phase = 'inhale';
+          timer = 0;
+          setBreathPhase('inhale');
+        }
+      }
     }, 100);
     
     return () => {
@@ -198,7 +215,6 @@ export default function MeditationPage() {
     setIsPlaying(true);
     setCurrentTime(0);
     
-    // Create session in DB
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
@@ -226,7 +242,6 @@ export default function MeditationPage() {
       console.error('Error creating session:', err);
     }
     
-    // Haptic feedback
     if (settings.hapticFeedback && navigator.vibrate) {
       navigator.vibrate(100);
     }
@@ -235,9 +250,14 @@ export default function MeditationPage() {
   // Complete session
   const completeSession = useCallback(async (moodAfter?: number) => {
     setIsPlaying(false);
+    setShowMoodAfterPrompt(false);
     
     if (sessionId) {
       try {
+        const moodDelta = (moodBefore !== null && moodAfter !== undefined) 
+          ? moodAfter - moodBefore 
+          : null;
+        
         await supabase
           .from('meditation_sessions')
           .update({
@@ -245,14 +265,19 @@ export default function MeditationPage() {
             completed_duration: currentTime,
             completed_at: new Date().toISOString(),
             mood_after: moodAfter,
+            mood_delta: moodDelta,
           })
           .eq('id', sessionId);
         
         refetchStats();
         
+        const moodText = moodDelta !== null && moodDelta > 0 
+          ? ` (+${moodDelta} humeur)` 
+          : '';
+        
         toast({
           title: 'Méditation terminée ! 🧘',
-          description: `${Math.round(currentTime / 60)} minutes de ${TECHNIQUE_LABELS[selectedTechnique || ''] || 'méditation'}`,
+          description: `${Math.round(currentTime / 60)} minutes de ${TECHNIQUE_LABELS[selectedTechnique || ''] || 'méditation'}${moodText}`,
         });
       } catch (err) {
         console.error('Error completing session:', err);
@@ -261,7 +286,13 @@ export default function MeditationPage() {
     
     setSessionId(null);
     setCurrentTime(0);
-  }, [sessionId, currentTime, selectedTechnique, refetchStats, toast]);
+    setMoodBefore(null);
+  }, [sessionId, currentTime, selectedTechnique, moodBefore, refetchStats, toast]);
+
+  const handleCompleteClick = useCallback(() => {
+    setIsPlaying(false);
+    setShowMoodAfterPrompt(true);
+  }, []);
 
   // Timer effect
   useEffect(() => {
@@ -270,7 +301,7 @@ export default function MeditationPage() {
     timerRef.current = setInterval(() => {
       setCurrentTime(prev => {
         if (prev >= totalDuration) {
-          completeSession();
+          handleCompleteClick();
           return prev;
         }
         return prev + 1;
@@ -280,7 +311,7 @@ export default function MeditationPage() {
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [isPlaying, totalDuration, completeSession]);
+  }, [isPlaying, totalDuration, handleCompleteClick]);
 
   // Pause/Resume
   const togglePause = useCallback(() => {
@@ -295,6 +326,7 @@ export default function MeditationPage() {
     setIsPlaying(false);
     setCurrentTime(0);
     setSessionId(null);
+    setMoodBefore(null);
   }, []);
 
   // Format time
@@ -303,14 +335,26 @@ export default function MeditationPage() {
     const s = seconds % 60;
     return `${m}:${s.toString().padStart(2, '0')}`;
   };
+
+  // Handle recommendation selection
+  const handleRecommendationSelect = useCallback((technique: string, duration: number) => {
+    setSelectedTechnique(technique);
+    setSelectedDuration(duration);
+  }, []);
   
   const weeklyGoalProgress = stats 
     ? Math.min(100, Math.round((stats.total_minutes / settings.weeklyGoalMinutes) * 100))
     : 0;
 
+  const breathInstructions = {
+    inhale: 'Inspirez...',
+    hold: 'Retenez...',
+    exhale: 'Expirez...',
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-background">
-      <div className="container mx-auto px-4 py-6 max-w-4xl">
+      <div className="container mx-auto px-4 py-6 max-w-5xl">
         {/* Header */}
         <header className="mb-6">
           <div className="flex items-center justify-between mb-4">
@@ -329,14 +373,25 @@ export default function MeditationPage() {
               </div>
             </div>
             
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setShowSettings(true)}
-              aria-label="Paramètres"
-            >
-              <Settings className="h-5 w-5" />
-            </Button>
+            <div className="flex items-center gap-2">
+              <MeditationExportButton />
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setShowAmbientMixer(true)}
+                aria-label="Sons ambiants"
+              >
+                <Volume2 className="h-5 w-5" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setShowSettings(true)}
+                aria-label="Paramètres"
+              >
+                <Settings className="h-5 w-5" />
+              </Button>
+            </div>
           </div>
 
           {/* Quick Stats */}
@@ -360,7 +415,7 @@ export default function MeditationPage() {
             <Card className="bg-card/50">
               <CardContent className="p-4">
                 <div className="flex items-center gap-2">
-                  <Clock className="h-4 w-4 text-info" />
+                  <Clock className="h-4 w-4 text-blue-500" />
                   <div>
                     <p className="text-xs text-muted-foreground">Minutes</p>
                     {statsLoading ? (
@@ -376,7 +431,7 @@ export default function MeditationPage() {
             <Card className="bg-card/50">
               <CardContent className="p-4">
                 <div className="flex items-center gap-2">
-                  <TrendingUp className="h-4 w-4 text-success" />
+                  <TrendingUp className="h-4 w-4 text-green-500" />
                   <div>
                     <p className="text-xs text-muted-foreground">Streak</p>
                     {statsLoading ? (
@@ -392,7 +447,7 @@ export default function MeditationPage() {
             <Card className="bg-card/50">
               <CardContent className="p-4">
                 <div className="flex items-center gap-2">
-                  <Heart className="h-4 w-4 text-destructive" />
+                  <Heart className="h-4 w-4 text-rose-500" />
                   <div>
                     <p className="text-xs text-muted-foreground">Δ Humeur</p>
                     {statsLoading ? (
@@ -400,7 +455,7 @@ export default function MeditationPage() {
                     ) : (
                       <p className="text-xl font-bold">
                         {stats?.avg_mood_delta != null 
-                          ? `${(stats?.avg_mood_delta ?? 0) > 0 ? '+' : ''}${stats?.avg_mood_delta ?? 0}`
+                          ? `${stats.avg_mood_delta > 0 ? '+' : ''}${stats.avg_mood_delta}`
                           : '—'}
                       </p>
                     )}
@@ -475,9 +530,12 @@ export default function MeditationPage() {
               {/* Session Info */}
               <Card className="bg-card/50">
                 <CardContent className="p-4 text-center">
+                  <p className="text-lg font-medium text-primary mb-1">
+                    {breathInstructions[breathPhase]}
+                  </p>
                   <p className="text-muted-foreground">
                     {isPlaying 
-                      ? 'Respirez profondément... Laissez vos pensées passer comme des nuages.'
+                      ? 'Laissez vos pensées passer comme des nuages.'
                       : 'Session en pause. Appuyez pour reprendre.'}
                   </p>
                 </CardContent>
@@ -510,7 +568,7 @@ export default function MeditationPage() {
                 <Button
                   variant="outline"
                   size="icon"
-                  onClick={() => completeSession()}
+                  onClick={handleCompleteClick}
                   aria-label="Terminer"
                 >
                   <CheckCircle className="h-5 w-5" />
@@ -525,7 +583,7 @@ export default function MeditationPage() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
             >
-              <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)}>
+              <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as typeof activeTab)}>
                 <TabsList className="w-full mb-6">
                   <TabsTrigger value="practice" className="flex-1">
                     <Brain className="h-4 w-4 mr-2" />
@@ -539,9 +597,22 @@ export default function MeditationPage() {
                     <BarChart3 className="h-4 w-4 mr-2" />
                     Progrès
                   </TabsTrigger>
+                  <TabsTrigger value="calendar" className="flex-1">
+                    <Calendar className="h-4 w-4 mr-2" />
+                    Calendrier
+                  </TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="practice" className="space-y-6">
+                  {/* Recommendations Widget */}
+                  <MeditationRecommendationWidget 
+                    onSelectTechnique={handleRecommendationSelect}
+                    currentTechnique={selectedTechnique}
+                  />
+
+                  {/* Streak Widget compact */}
+                  <StreakWidget compact />
+
                   {/* Technique Selection */}
                   <div>
                     <h2 className="text-lg font-semibold mb-4">Choisissez votre technique</h2>
@@ -626,7 +697,7 @@ export default function MeditationPage() {
                     <CardContent>
                       <Progress value={weeklyGoalProgress} className="h-3 mb-2" />
                       <p className="text-sm text-muted-foreground">
-                        {(stats?.total_minutes ?? 0)} / {settings.weeklyGoalMinutes} minutes
+                        {stats?.total_minutes ?? 0} / {settings.weeklyGoalMinutes} minutes
                       </p>
                     </CardContent>
                   </Card>
@@ -658,7 +729,13 @@ export default function MeditationPage() {
                             </div>
                             {session.mood_delta !== null && (
                               <div className="text-right">
-                                <p className={`text-lg font-bold ${session.mood_delta > 0 ? 'text-success' : session.mood_delta < 0 ? 'text-destructive' : 'text-muted-foreground'}`}>
+                                <p className={`text-lg font-bold ${
+                                  session.mood_delta > 0 
+                                    ? 'text-green-600 dark:text-green-400' 
+                                    : session.mood_delta < 0 
+                                      ? 'text-red-600 dark:text-red-400' 
+                                      : 'text-muted-foreground'
+                                }`}>
                                   {session.mood_delta > 0 ? '+' : ''}{session.mood_delta}
                                 </p>
                                 <p className="text-xs text-muted-foreground">Δ Humeur</p>
@@ -686,6 +763,9 @@ export default function MeditationPage() {
                 </TabsContent>
 
                 <TabsContent value="progress" className="space-y-4">
+                  {/* Streak Widget full */}
+                  <StreakWidget />
+
                   {/* Weekly Chart */}
                   {weeklyProgress && weeklyProgress.length > 0 && (
                     <Card>
@@ -758,7 +838,7 @@ export default function MeditationPage() {
                           <span className="text-sm text-muted-foreground">Amélioration humeur</span>
                           <span className="font-medium">
                             {stats?.avg_mood_delta != null 
-                              ? `${(stats?.avg_mood_delta ?? 0) > 0 ? '+' : ''}${stats?.avg_mood_delta ?? 0}`
+                              ? `${stats.avg_mood_delta > 0 ? '+' : ''}${stats.avg_mood_delta}`
                               : 'N/A'}
                           </span>
                         </div>
@@ -766,12 +846,16 @@ export default function MeditationPage() {
                     </Card>
                   </div>
                 </TabsContent>
+
+                <TabsContent value="calendar">
+                  <MeditationCalendar />
+                </TabsContent>
               </Tabs>
             </motion.div>
           )}
         </AnimatePresence>
 
-        {/* Mood Prompt Dialog */}
+        {/* Mood Before Dialog */}
         <Dialog open={showMoodPrompt} onOpenChange={setShowMoodPrompt}>
           <DialogContent className="max-w-sm">
             <DialogHeader>
@@ -800,6 +884,54 @@ export default function MeditationPage() {
                 Passer cette étape
               </Button>
             </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Mood After Dialog */}
+        <Dialog open={showMoodAfterPrompt} onOpenChange={setShowMoodAfterPrompt}>
+          <DialogContent className="max-w-sm">
+            <DialogHeader>
+              <DialogTitle>Comment vous sentez-vous maintenant ?</DialogTitle>
+              <DialogDescription>
+                Évaluez votre humeur après la méditation
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="flex justify-between">
+                {[1, 2, 3, 4, 5].map((mood) => (
+                  <button
+                    key={mood}
+                    onClick={() => completeSession(mood * 20)}
+                    className="w-12 h-12 rounded-full bg-muted hover:bg-primary/20 flex items-center justify-center text-lg font-medium transition-colors"
+                  >
+                    {mood === 1 ? '😔' : mood === 2 ? '😕' : mood === 3 ? '😐' : mood === 4 ? '🙂' : '😊'}
+                  </button>
+                ))}
+              </div>
+              <Button
+                variant="ghost"
+                className="w-full"
+                onClick={() => completeSession(undefined)}
+              >
+                Passer cette étape
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Ambient Sound Mixer Dialog */}
+        <Dialog open={showAmbientMixer} onOpenChange={setShowAmbientMixer}>
+          <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Volume2 className="h-5 w-5" />
+                Sons ambiants
+              </DialogTitle>
+              <DialogDescription>
+                Créez votre ambiance sonore idéale
+              </DialogDescription>
+            </DialogHeader>
+            <AmbientSoundMixer />
           </DialogContent>
         </Dialog>
 
@@ -839,6 +971,14 @@ export default function MeditationPage() {
                   onCheckedChange={(v) => saveSettings({ hapticFeedback: v })}
                 />
               </div>
+
+              <div className="flex items-center justify-between">
+                <Label>Animations réduites</Label>
+                <Switch
+                  checked={settings.reducedAnimations}
+                  onCheckedChange={(v) => saveSettings({ reducedAnimations: v })}
+                />
+              </div>
               
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
@@ -851,6 +991,20 @@ export default function MeditationPage() {
                   min={15}
                   max={180}
                   step={15}
+                />
+              </div>
+
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <Label>Volume par défaut</Label>
+                  <span className="text-sm font-medium">{settings.volume}%</span>
+                </div>
+                <Slider
+                  value={[settings.volume]}
+                  onValueChange={([v]) => saveSettings({ volume: v })}
+                  min={0}
+                  max={100}
+                  step={5}
                 />
               </div>
             </div>
