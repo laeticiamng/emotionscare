@@ -28,6 +28,7 @@ import { MentionTextarea } from '@/components/community/MentionTextarea';
 import { CommunitySearch } from '@/components/community/CommunitySearch';
 import { NotificationBell } from '@/components/community/NotificationBell';
 import { EmpathyTemplates } from '@/components/community/EmpathyTemplates';
+import { PostCommentSection } from '@/components/community/PostCommentSection';
 
 const REACTION_EMOJIS = ['❤️', '👍', '🙏', '💪', '🌟', '🤗'];
 
@@ -545,7 +546,7 @@ export default function CommunityPage() {
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
                           <span className="text-sm font-medium">
-                            {post.is_anonymous ? 'Anonyme' : 'Membre'}
+                            {post.is_anonymous ? 'Anonyme' : post.author?.full_name || 'Membre'}
                           </span>
                           <span className="text-xs text-muted-foreground">
                             {new Date(post.created_at).toLocaleDateString('fr-FR')}
@@ -560,10 +561,6 @@ export default function CommunityPage() {
                           >
                             <Heart className="h-4 w-4 mr-1" />
                             {post.likes_count}
-                          </Button>
-                          <Button variant="ghost" size="sm">
-                            <MessageCircle className="h-4 w-4 mr-1" />
-                            {post.comments_count}
                           </Button>
                           <Button 
                             variant="ghost" 
@@ -584,6 +581,11 @@ export default function CommunityPage() {
                             <Flag className="h-4 w-4" />
                           </Button>
                         </div>
+                        {/* Section des commentaires */}
+                        <PostCommentSection 
+                          postId={post.id} 
+                          initialCount={post.comments_count}
+                        />
                       </div>
                     </div>
                   </CardContent>
