@@ -49,9 +49,9 @@ const toLatency = (startedAt: number) => Math.max(0, Math.round((typeof performa
 
 const sanitizeDuration = (value: number) => {
   if (!Number.isFinite(value) || value <= 0) {
-    return 0
+    return 1 // Minimum 1 seconde pour respecter la contrainte CHECK (duration_seconds > 0)
   }
-  return Math.max(0, Math.floor(value))
+  return Math.max(1, Math.floor(value))
 }
 
 const sanitizeMoodDelta = (value: number | null | undefined) => {
