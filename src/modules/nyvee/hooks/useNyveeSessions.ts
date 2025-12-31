@@ -7,7 +7,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
-import type { NyveeSession, BreathingIntensity, BadgeType, CocoonType } from '../types';
+import type { BreathingIntensity, BadgeType, CocoonType } from '../types';
 
 export interface NyveeSessionRecord {
   id: string;
@@ -43,6 +43,24 @@ interface CompleteSessionParams {
   durationSeconds: number;
 }
 
+// Map pattern DB vers intensity
+const patternToIntensity = (pattern: string): BreathingIntensity => {
+  if (pattern === '4-2-6' || pattern === 'coherence' || pattern === 'calm') return 'calm';
+  if (pattern === '4-7-8' || pattern === 'relaxing' || pattern === 'moderate') return 'moderate';
+  if (pattern === 'box' || pattern === 'energizing' || pattern === 'intense') return 'intense';
+  return 'calm';
+};
+
+// Map intensity vers pattern DB
+const intensityToPattern = (intensity: BreathingIntensity): string => {
+  switch (intensity) {
+    case 'calm': return '4-2-6';
+    case 'moderate': return '4-7-8';
+    case 'intense': return 'box';
+    default: return '4-2-6';
+  }
+};
+
 export const useNyveeSessions = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -55,7 +73,6 @@ export const useNyveeSessions = () => {
     queryFn: async (): Promise<NyveeSessionRecord[]> => {
       if (!userId) return [];
 
-      // Utiliser breathing_vr_sessions comme table de fallback
       const { data, error } = await supabase
         .from('breathing_vr_sessions')
         .select('*')
@@ -72,17 +89,17 @@ export const useNyveeSessions = () => {
       return (data || []).map((session: any) => ({
         id: session.id,
         user_id: session.user_id,
-        intensity: session.scene_type === 'calm' ? 'calm' : session.scene_type === 'energetic' ? 'intense' : 'moderate',
+        intensity: patternToIntensity(session.pattern || ''),
         cycles_completed: session.cycles_completed || 0,
         target_cycles: 6,
         mood_before: session.mood_before,
         mood_after: session.mood_after,
         mood_delta: session.mood_after && session.mood_before ? session.mood_after - session.mood_before : null,
-        badge_earned: 'calm' as BadgeType,
+        badge_earned: determineBadgeFromSession(session),
         cocoon_unlocked: null,
         cozy_level: 50,
         session_duration: session.duration_seconds || 0,
-        completed: session.completed || false,
+        completed: session.completed_at !== null,
         created_at: session.created_at,
         completed_at: session.completed_at,
       }));
@@ -90,13 +107,35 @@ export const useNyveeSessions = () => {
     enabled: !!userId,
   });
 
-  // Récupérer les stats
+  // Récupérer les stats (calcul côté client pour éviter dépendance circulaire)
   const statsQuery = useQuery({
     queryKey: ['nyvee-stats', userId],
     queryFn: async () => {
       if (!userId) return null;
 
-      const sessions = sessionsQuery.data || [];
+      // Fetch sessions directement ici pour éviter dépendance
+      const { data: sessionsData, error } = await supabase
+        .from('breathing_vr_sessions')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+        .limit(100);
+
+      if (error) {
+        console.error('Error fetching stats:', error);
+        return null;
+      }
+
+      const sessions = (sessionsData || []).map((session: any) => ({
+        cycles_completed: session.cycles_completed || 0,
+        mood_before: session.mood_before,
+        mood_after: session.mood_after,
+        intensity: patternToIntensity(session.pattern || ''),
+        completed: session.completed_at !== null,
+        created_at: session.created_at,
+        badge_earned: determineBadgeFromSession(session),
+      }));
+
       const completedSessions = sessions.filter(s => s.completed);
       const totalCycles = sessions.reduce((sum, s) => sum + s.cycles_completed, 0);
 
@@ -142,9 +181,9 @@ export const useNyveeSessions = () => {
       longestStreak = Math.max(longestStreak, streak, currentStreak);
 
       // Calculer l'amélioration d'humeur moyenne
-      const sessionsWithMood = sessions.filter(s => s.mood_delta !== null);
+      const sessionsWithMood = sessions.filter(s => s.mood_after !== null && s.mood_before !== null);
       const avgMoodDelta = sessionsWithMood.length > 0
-        ? sessionsWithMood.reduce((sum, s) => sum + (s.mood_delta || 0), 0) / sessionsWithMood.length
+        ? sessionsWithMood.reduce((sum, s) => sum + ((s.mood_after || 0) - (s.mood_before || 0)), 0) / sessionsWithMood.length
         : null;
 
       // Intensité favorite
@@ -172,7 +211,7 @@ export const useNyveeSessions = () => {
         },
       };
     },
-    enabled: !!userId && !!sessionsQuery.data,
+    enabled: !!userId,
   });
 
   // Créer une nouvelle session
@@ -184,11 +223,11 @@ export const useNyveeSessions = () => {
         .from('breathing_vr_sessions')
         .insert({
           user_id: userId,
-          scene_type: params.intensity,
+          pattern: intensityToPattern(params.intensity),
           duration_seconds: 0,
           cycles_completed: 0,
           mood_before: params.moodBefore,
-          completed: false,
+          started_at: new Date().toISOString(),
         })
         .select()
         .single();
@@ -220,7 +259,6 @@ export const useNyveeSessions = () => {
           cycles_completed: params.cyclesCompleted,
           mood_after: params.moodAfter,
           duration_seconds: params.durationSeconds,
-          completed: true,
           completed_at: new Date().toISOString(),
         })
         .eq('id', params.sessionId);
@@ -255,3 +293,15 @@ export const useNyveeSessions = () => {
     },
   };
 };
+
+// Helper pour déterminer le badge depuis les données de session
+function determineBadgeFromSession(session: any): BadgeType {
+  const cycles = session.cycles_completed || 0;
+  const moodDelta = session.mood_after && session.mood_before 
+    ? session.mood_after - session.mood_before 
+    : 0;
+  
+  if (cycles >= 5 && moodDelta >= 0) return 'calm';
+  if (cycles >= 3) return 'partial';
+  return 'tense';
+}

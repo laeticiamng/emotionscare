@@ -27,6 +27,9 @@ export { PostCheck } from '@/features/nyvee/components/PostCheck';
 export { NyveeStatsWidget } from '@/features/nyvee/components/NyveeStatsWidget';
 export { NyveeSessionHistory } from '@/features/nyvee/components/NyveeSessionHistory';
 export { NyveeStreakWidget } from '@/features/nyvee/components/NyveeStreakWidget';
+export { IntensitySelector } from '@/features/nyvee/components/IntensitySelector';
+export { MoodSlider } from '@/features/nyvee/components/MoodSlider';
+export { NyveeExportButton } from '@/features/nyvee/components/NyveeExportButton';
 
 // ============================================================================
 // STORE
