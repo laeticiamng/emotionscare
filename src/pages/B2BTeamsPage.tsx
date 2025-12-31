@@ -30,11 +30,17 @@ import {
 } from 'lucide-react';
 import { useB2BTeams } from '@/hooks/useB2BTeams';
 import { usePageSEO } from '@/hooks/usePageSEO';
+import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
+import { CreateTeamDialog, InviteMemberDialog } from '@/features/b2b/components';
 
 const B2BTeamsPage: React.FC = () => {
+  const { user } = useAuth();
+  const orgId = user?.user_metadata?.org_id as string || 'demo';
   const { data, loading, refetch } = useB2BTeams();
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [showCreateTeam, setShowCreateTeam] = useState(false);
+  const [showInviteMember, setShowInviteMember] = useState(false);
 
   usePageSEO({
     title: 'Gestion des Équipes B2B',
@@ -131,9 +137,27 @@ const B2BTeamsPage: React.FC = () => {
             <Button variant="outline" onClick={handleRefresh} disabled={loading || isRefreshing}>
               {isRefreshing ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
             </Button>
-            <Button className="gap-2">
+            <Button className="gap-2" onClick={() => setShowCreateTeam(true)}>
               <UserPlus className="h-4 w-4" aria-hidden="true" />
               Nouvelle équipe
+            </Button>
+          </div>
+        </header>
+
+        {/* Dialogs */}
+        <CreateTeamDialog 
+          open={showCreateTeam} 
+          onOpenChange={setShowCreateTeam} 
+          orgId={orgId}
+          onSuccess={() => refetch()}
+        />
+        <InviteMemberDialog 
+          open={showInviteMember} 
+          onOpenChange={setShowInviteMember} 
+          orgId={orgId}
+          teams={data.teams as any}
+          onSuccess={() => refetch()}
+        />
             </Button>
           </div>
         </header>
