@@ -32,6 +32,7 @@ const EmotionComparisonView = lazy(() => import('@/components/scan/EmotionCompar
 const SmartRecommendations = lazy(() => import('@/components/scan/SmartRecommendations'));
 const ScanExportPanel = lazy(() => import('@/components/scan/ScanExportPanel'));
 const WeeklyEmotionReport = lazy(() => import('@/components/scan/WeeklyEmotionReport').then(m => ({ default: m.WeeklyEmotionReport })));
+const ScanInsightsPanel = lazy(() => import('@/components/scan/ScanInsightsPanel'));
 
 // Loading fallback component
 const LoadingFallback = () => (
@@ -503,8 +504,13 @@ const B2CScanPage: React.FC = () => {
               </TabsContent>
 
               {/* Onglet Insights */}
-              <TabsContent value="insights" className="mt-6">
-                <SmartRecommendations />
+              <TabsContent value="insights" className="mt-6 space-y-6">
+                <Suspense fallback={<LoadingFallback />}>
+                  <ScanInsightsPanel />
+                </Suspense>
+                <Suspense fallback={<LoadingFallback />}>
+                  <SmartRecommendations />
+                </Suspense>
               </TabsContent>
 
               {/* Onglet Rapport Hebdomadaire */}

@@ -41,10 +41,13 @@ const getEmotionLabel = (valence: number, arousal: number) => {
 };
 
 const sourceConfig: Record<string, { label: string; icon: React.ComponentType<{ className?: string }>; color: string }> = {
-  'scan_camera': { label: 'Vidéo', icon: Camera, color: 'text-blue-500' },
-  'SAM': { label: 'Texte', icon: MessageSquare, color: 'text-green-500' },
+  'scan_camera': { label: 'Caméra', icon: Camera, color: 'text-blue-500' },
+  'scan_facial': { label: 'Facial', icon: Camera, color: 'text-blue-500' },
+  'SAM': { label: 'SAM', icon: MessageSquare, color: 'text-green-500' },
   'scan_sliders': { label: 'Manuel', icon: SlidersHorizontal, color: 'text-purple-500' },
   'voice': { label: 'Vocal', icon: Mic, color: 'text-orange-500' },
+  'scan_voice': { label: 'Vocal', icon: Mic, color: 'text-orange-500' },
+  'scan_text': { label: 'Texte', icon: MessageSquare, color: 'text-emerald-500' },
 };
 
 // Mini graphique en barres
