@@ -1,7 +1,7 @@
 /**
  * Module principal SEUIL
  * Expérience complète de régulation émotionnelle proactive
- * Avec intégration des mini-sessions guidées
+ * Avec intégration des mini-sessions guidées et seuils personnalisés
  */
 import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -13,7 +13,7 @@ import { SeuilMessage } from './SeuilMessage';
 import { SeuilActions } from './SeuilActions';
 import { SeuilExitMessage } from './SeuilExitMessage';
 import { SeuilMiniSession } from './SeuilMiniSession';
-import { useCreateSeuilEvent, useCompleteSeuilSession } from '../hooks';
+import { useCreateSeuilEvent, useCompleteSeuilSession, useCustomZoneThresholds, useSeuilSettings } from '../hooks';
 import { getZoneFromLevel } from '../constants';
 import type { SeuilActionType } from '../types';
 
@@ -36,10 +36,21 @@ export const SeuilModule: React.FC<SeuilModuleProps> = ({
 
   const createEvent = useCreateSeuilEvent();
   const completeSession = useCompleteSeuilSession();
+  const customThresholds = useCustomZoneThresholds();
+  const { data: settings } = useSeuilSettings();
 
-  const currentZone = getZoneFromLevel(level);
+  // Use custom thresholds for zone detection
+  const currentZone = getZoneFromLevel(level, customThresholds);
+
+  // Haptic feedback helper
+  const triggerHaptic = useCallback(() => {
+    if (settings?.hapticEnabled && 'vibrate' in navigator) {
+      navigator.vibrate(50);
+    }
+  }, [settings?.hapticEnabled]);
 
   const handleConfirmLevel = useCallback(async () => {
+    triggerHaptic();
     try {
       const event = await createEvent.mutateAsync({
         thresholdLevel: level,
@@ -55,9 +66,10 @@ export const SeuilModule: React.FC<SeuilModuleProps> = ({
     } catch (error) {
       console.error('Error creating seuil event:', error);
     }
-  }, [createEvent, level, currentZone.zone]);
+  }, [createEvent, level, currentZone.zone, triggerHaptic]);
 
   const handleSelectAction = useCallback(async (actionType: SeuilActionType) => {
+    triggerHaptic();
     const actionLabels: Record<SeuilActionType, string> = {
       '3min': '3 minutes effectuées',
       '5min_guided': '5 minutes guidées complétées',
@@ -84,9 +96,10 @@ export const SeuilModule: React.FC<SeuilModuleProps> = ({
     }
 
     setStep('exit');
-  }, [eventId, completeSession]);
+  }, [eventId, completeSession, triggerHaptic]);
 
   const handleMiniSessionComplete = useCallback(async () => {
+    triggerHaptic();
     const actionLabels: Record<'3min' | '5min_guided', string> = {
       '3min': '3 minutes effectuées',
       '5min_guided': '5 minutes guidées complétées',
@@ -105,7 +118,7 @@ export const SeuilModule: React.FC<SeuilModuleProps> = ({
 
     setMiniSessionType(null);
     setStep('exit');
-  }, [eventId, miniSessionType, completeSession]);
+  }, [eventId, miniSessionType, completeSession, triggerHaptic]);
 
   const handleMiniSessionCancel = useCallback(() => {
     setMiniSessionType(null);
