@@ -33,6 +33,9 @@ import { FavoriteAttractions } from '@/components/park/FavoriteAttractions';
 import { ShareAchievementDialog } from '@/components/park/ShareAchievementDialog';
 import { EnergyBar } from '@/components/park/EnergyBar';
 import { ParkQuickActions } from '@/components/park/ParkQuickActions';
+import { ParkAchievementsPanel } from '@/components/park/ParkAchievementsPanel';
+import { ParkSettingsPanel } from '@/components/park/ParkSettingsPanel';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { parkAttractions } from '@/data/parkAttractions';
 import { parkZones } from '@/data/parkZones';
 import { useParkQuests } from '@/hooks/useParkQuests';
@@ -54,6 +57,8 @@ export default function EmotionalPark() {
   const [showFavorites, setShowFavorites] = useState(false);
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [achievementToShare, setAchievementToShare] = useState<ShareableAchievement | null>(null);
+  const [showAchievementsPanel, setShowAchievementsPanel] = useState(false);
+  const [showSettingsPanel, setShowSettingsPanel] = useState(false);
   
   // Mood persisté via Supabase
   const [currentMood, setCurrentMood] = useUserPreference<string>('emotional-park-mood', '');
@@ -549,8 +554,8 @@ export default function EmotionalPark() {
             onShowMap={() => setShowMap(!showMap)}
             onRandomAttraction={handleRandomAttraction}
             onDailyChallenge={() => dailyChallenge && handleAttractionClick(dailyChallenge)}
-            onAchievements={() => navigate('/app/achievements')}
-            onSettings={() => navigate('/settings')}
+            onAchievements={() => setShowAchievementsPanel(true)}
+            onSettings={() => setShowSettingsPanel(true)}
           />
           
           {/* Mobile Energy Bar */}
@@ -1042,6 +1047,48 @@ export default function EmotionalPark() {
         onClose={() => setShareDialogOpen(false)}
         achievement={achievementToShare}
       />
+
+      {/* Achievements Panel Dialog */}
+      <Dialog open={showAchievementsPanel} onOpenChange={setShowAchievementsPanel}>
+        <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Trophy className="h-5 w-5 text-primary" />
+              Mes Succès du Parc
+            </DialogTitle>
+          </DialogHeader>
+          <ParkAchievementsPanel
+            achievements={unlockedBadges.map((badge, idx) => ({
+              id: badge.zoneKey,
+              title: badge.zoneName,
+              description: `Zone ${badge.zoneName} complétée`,
+              icon: parkZones[badge.zoneKey as keyof typeof parkZones]?.emoji || '🏆',
+              category: 'exploration' as const,
+              rarity: idx < 2 ? 'common' as const : idx < 5 ? 'rare' as const : 'epic' as const,
+              progress: 1,
+              maxProgress: 1,
+              unlocked: true,
+              unlockedAt: typeof badge.unlockedAt === 'number' ? new Date(badge.unlockedAt).toISOString() : badge.unlockedAt,
+              reward: { xp: 100, coins: 50 }
+            }))}
+            totalXP={getCompletedQuestsCount() * 100}
+            totalCoins={getTotalRewards()}
+          />
+        </DialogContent>
+      </Dialog>
+
+      {/* Settings Panel Dialog */}
+      <Dialog open={showSettingsPanel} onOpenChange={setShowSettingsPanel}>
+        <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Settings className="h-5 w-5 text-primary" />
+              Paramètres du Parc
+            </DialogTitle>
+          </DialogHeader>
+          <ParkSettingsPanel />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
