@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+import { saveQuietHours } from '../api';
 import type { QuietHoursSettings } from '../types';
 
 export interface QuietHoursConfigProps {
@@ -26,15 +26,7 @@ const QuietHoursConfig: React.FC<QuietHoursConfigProps> = memo(({ initialSetting
   const handleSave = useCallback(async () => {
     setIsSaving(true);
     try {
-      const { error } = await supabase
-        .from('quiet_hours_settings')
-        .upsert({
-          enabled: settings.enabled,
-          start_utc: settings.startUtc,
-          end_utc: settings.endUtc,
-        });
-
-      if (error) throw error;
+      await saveQuietHours(settings);
 
       toast({
         title: 'Heures calmes enregistrées',

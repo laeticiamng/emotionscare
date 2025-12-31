@@ -15,5 +15,19 @@ export { useShareRoom } from './hooks/useShareRoom';
 export * from './types';
 
 // API
-export * from './api';
-export { saveQuietHours } from './api';
+export {
+  fetchSocialRooms,
+  createSocialRoom,
+  joinSocialRoom,
+  leaveSocialRoom,
+  toggleSoftMode,
+  deleteSocialRoom,
+  fetchUpcomingBreaks,
+  fetchPastBreaks,
+  scheduleBreak,
+  cancelScheduledBreak,
+  fetchQuietHours,
+  saveQuietHours,
+  fetchMspssSummary,
+  sendRoomInvite,
+} from './api';
