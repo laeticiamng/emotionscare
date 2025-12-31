@@ -10,3 +10,9 @@ export type { CommunityReport, ReportReason } from './communityReportService';
 
 export { CommunitySavedPostsService } from './communitySavedPostsService';
 export type { SavedPost } from './communitySavedPostsService';
+
+export { CommunityTrendingService } from './communityTrendingService';
+export type { TrendingTag } from './communityTrendingService';
+
+export { CommunityMentionService } from './communityMentionService';
+export type { CommunityMention } from './communityMentionService';

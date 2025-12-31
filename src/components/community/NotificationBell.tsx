@@ -13,7 +13,7 @@ import { useRealtimeNotifications } from '@/hooks/community/useRealtimeNotificat
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 
-const notificationIcons = {
+const notificationIcons: Record<string, React.ComponentType<{ className?: string }>> = {
   comment: MessageCircle,
   reaction: Heart,
   mention: AtSign,
@@ -21,7 +21,7 @@ const notificationIcons = {
   group_invite: Users,
 };
 
-const notificationColors = {
+const notificationColors: Record<string, string> = {
   comment: 'text-blue-500',
   reaction: 'text-red-500',
   mention: 'text-purple-500',

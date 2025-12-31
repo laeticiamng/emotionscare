@@ -13,6 +13,8 @@ export { CommunityService } from './communityService';
 export { CommunityFollowService } from './services/communityFollowService';
 export { CommunityReportService, REPORT_REASONS } from './services/communityReportService';
 export { CommunitySavedPostsService } from './services/communitySavedPostsService';
+export { CommunityTrendingService } from './services/communityTrendingService';
+export { CommunityMentionService } from './services/communityMentionService';
 
 // ============================================================================
 // TYPES
@@ -45,3 +47,5 @@ export type {
 // Types from services
 export type { ReportReason, CommunityReport } from './services/communityReportService';
 export type { SavedPost } from './services/communitySavedPostsService';
+export type { TrendingTag } from './services/communityTrendingService';
+export type { CommunityMention } from './services/communityMentionService';
