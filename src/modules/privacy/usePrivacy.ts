@@ -98,7 +98,7 @@ export function usePrivacy(): UsePrivacyReturn {
         {
           event: '*',
           schema: 'public',
-          table: 'consent_history',
+          table: 'privacy_consents',
           filter: `user_id=eq.${user.id}`,
         },
         () => {

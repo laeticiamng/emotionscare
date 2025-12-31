@@ -33,13 +33,14 @@ export interface ConsentRecord {
 export interface DataExportRequest {
   id: string;
   user_id: string;
-  type: 'all' | 'personal' | 'activity' | 'analytics';
-  status: 'pending' | 'processing' | 'ready' | 'expired' | 'failed';
+  type: 'all' | 'personal' | 'activity' | 'analytics' | 'deletion';
+  status: 'pending' | 'processing' | 'ready' | 'expired' | 'failed' | 'cancelled';
   file_url?: string;
   file_size_bytes?: number;
   created_at: string;
   completed_at?: string;
   expires_at?: string;
+  metadata?: Record<string, unknown>;
 }
 
 export interface DataDeletionRequest {

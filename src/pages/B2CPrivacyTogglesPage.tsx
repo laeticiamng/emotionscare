@@ -124,7 +124,7 @@ const B2CPrivacyTogglesPage = memo(() => {
     }
   };
 
-  const pendingDeletion = exports.find(e => e.type === 'all' && e.status === 'pending');
+  const pendingDeletion = exports.find(e => e.type === 'deletion' && (e.status === 'pending' || e.status === 'processing'));
 
   const preferenceKeys: PrivacyPreferenceKey[] = ['cam', 'mic', 'hr', 'gps', 'social', 'nft', 'analytics', 'personalization'];
   const sensorKeys = preferenceKeys.filter(k => PREFERENCE_METADATA[k].category === 'sensors');
@@ -381,34 +381,39 @@ const B2CPrivacyTogglesPage = memo(() => {
             </Card>
 
             {/* Liste des exports */}
-            {exports.length > 0 && (
+            {exports.filter(e => e.type !== 'deletion').length > 0 && (
               <Card className="bg-card/50 backdrop-blur-sm">
                 <CardHeader>
                   <CardTitle>Exports précédents</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
-                    {exports.map((exp) => (
+                    {exports.filter(e => e.type !== 'deletion').map((exp) => (
                       <div key={exp.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
                         <div className="flex items-center gap-3">
-                          <FileText className="w-5 h-5 text-muted-foreground" />
+                          <FileText className="w-5 h-5 text-muted-foreground" aria-hidden="true" />
                           <div>
                             <div className="font-medium capitalize">{exp.type}</div>
                             <div className="text-xs text-muted-foreground">
                               {new Date(exp.created_at).toLocaleDateString('fr-FR')}
+                              {exp.file_size_bytes && ` • ${(exp.file_size_bytes / 1024).toFixed(1)} Ko`}
                             </div>
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
                           <Badge variant={exp.status === 'ready' ? 'default' : exp.status === 'processing' ? 'secondary' : 'outline'}>
-                            {exp.status === 'ready' && <CheckCircle className="w-3 h-3 mr-1" />}
-                            {exp.status === 'processing' && <Loader2 className="w-3 h-3 mr-1 animate-spin" />}
-                            {exp.status}
+                            {exp.status === 'ready' && <CheckCircle className="w-3 h-3 mr-1" aria-hidden="true" />}
+                            {exp.status === 'processing' && <Loader2 className="w-3 h-3 mr-1 animate-spin" aria-hidden="true" />}
+                            {exp.status === 'pending' && 'En attente'}
+                            {exp.status === 'processing' && 'Traitement'}
+                            {exp.status === 'ready' && 'Prêt'}
+                            {exp.status === 'expired' && 'Expiré'}
+                            {exp.status === 'failed' && 'Échec'}
                           </Badge>
                           {exp.status === 'ready' && exp.file_url && (
                             <Button variant="outline" size="sm" asChild>
-                              <a href={exp.file_url} target="_blank" rel="noopener noreferrer">
-                                <ExternalLink className="w-3 h-3" />
+                              <a href={exp.file_url} target="_blank" rel="noopener noreferrer" aria-label="Télécharger l'export">
+                                <Download className="w-3 h-3" aria-hidden="true" />
                               </a>
                             </Button>
                           )}
@@ -431,38 +436,70 @@ const B2CPrivacyTogglesPage = memo(() => {
                   Action irréversible après 30 jours
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button variant="destructive" disabled={isDeleting}>
-                      {isDeleting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Trash2 className="w-4 h-4 mr-2" />}
-                      Demander la suppression
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Confirmer la suppression</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        Votre compte sera supprimé dans 30 jours. Vous pouvez annuler à tout moment.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <div className="py-2">
-                      <Label>Raison (optionnel)</Label>
-                      <Textarea 
-                        value={deletionReason} 
-                        onChange={(e) => setDeletionReason(e.target.value)}
-                        placeholder="Dites-nous pourquoi..."
-                        className="mt-2"
-                      />
+              <CardContent className="space-y-4">
+                {/* Afficher demande en cours */}
+                {pendingDeletion && (
+                  <div className="p-4 bg-destructive/10 border border-destructive/30 rounded-lg">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <AlertTriangle className="w-5 h-5 text-destructive" aria-hidden="true" />
+                        <div>
+                          <p className="font-medium text-destructive">Suppression programmée</p>
+                          <p className="text-sm text-muted-foreground">
+                            Demandée le {new Date(pendingDeletion.created_at).toLocaleDateString('fr-FR')}
+                          </p>
+                        </div>
+                      </div>
+                      <Button 
+                        variant="outline" 
+                        onClick={handleCancelDeletion}
+                        className="border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground"
+                      >
+                        <XCircle className="w-4 h-4 mr-2" aria-hidden="true" />
+                        Annuler
+                      </Button>
                     </div>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Annuler</AlertDialogCancel>
-                      <AlertDialogAction onClick={handleDeleteAccount} className="bg-destructive">
-                        Confirmer
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
+                  </div>
+                )}
+                
+                {!pendingDeletion && (
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="destructive" disabled={isDeleting}>
+                        {isDeleting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" aria-hidden="true" /> : <Trash2 className="w-4 h-4 mr-2" aria-hidden="true" />}
+                        Demander la suppression
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Confirmer la suppression</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Votre compte sera supprimé dans 30 jours. Vous pouvez annuler à tout moment.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <div className="py-2">
+                        <Label htmlFor="deletion-reason">Raison (optionnel)</Label>
+                        <Textarea 
+                          id="deletion-reason"
+                          value={deletionReason} 
+                          onChange={(e) => setDeletionReason(e.target.value)}
+                          placeholder="Dites-nous pourquoi..."
+                          className="mt-2"
+                          aria-describedby="deletion-reason-help"
+                        />
+                        <p id="deletion-reason-help" className="text-xs text-muted-foreground mt-1">
+                          Votre feedback nous aide à améliorer nos services
+                        </p>
+                      </div>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Annuler</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleDeleteAccount} className="bg-destructive">
+                          Confirmer
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
@@ -575,38 +612,99 @@ const B2CPrivacyTogglesPage = memo(() => {
               <Card className="bg-card/50 backdrop-blur-sm">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Shield className="w-5 h-5 text-success" />
+                    <Shield className="w-5 h-5 text-success" aria-hidden="true" />
                     Score de conformité RGPD
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
                     <div className="flex items-center gap-4">
-                      <div className="text-4xl font-bold text-success">{stats.gdprScore}%</div>
-                      <Progress value={stats.gdprScore} className="flex-1" />
+                      <div className="text-4xl font-bold text-success" aria-label={`Score RGPD ${stats.gdprScore} pourcent`}>
+                        {stats.gdprScore}%
+                      </div>
+                      <Progress 
+                        value={stats.gdprScore} 
+                        className="flex-1" 
+                        aria-label={`Barre de progression du score RGPD à ${stats.gdprScore}%`}
+                      />
                     </div>
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       <div className="flex items-center gap-2">
-                        <CheckCircle className="w-4 h-4 text-success" />
+                        <CheckCircle className="w-4 h-4 text-success" aria-hidden="true" />
                         <span>Chiffrement activé</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <CheckCircle className="w-4 h-4 text-success" />
+                        <CheckCircle className="w-4 h-4 text-success" aria-hidden="true" />
                         <span>RLS activée</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <CheckCircle className="w-4 h-4 text-success" />
+                        <CheckCircle className="w-4 h-4 text-success" aria-hidden="true" />
                         <span>Audit trail actif</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <CheckCircle className="w-4 h-4 text-success" />
+                        <CheckCircle className="w-4 h-4 text-success" aria-hidden="true" />
                         <span>Export RGPD disponible</span>
                       </div>
                     </div>
+                    {stats.lastAuditDate && (
+                      <p className="text-xs text-muted-foreground">
+                        Dernier audit : {new Date(stats.lastAuditDate).toLocaleDateString('fr-FR')}
+                      </p>
+                    )}
                   </div>
                 </CardContent>
               </Card>
             )}
+
+            {/* Rétention des données */}
+            <Card className="bg-card/50 backdrop-blur-sm border-info/20">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Database className="w-5 h-5 text-info" aria-hidden="true" />
+                  Politique de rétention
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                  <div>
+                    <p className="font-medium">Durée de conservation</p>
+                    <p className="text-sm text-muted-foreground">Vos données sont conservées pendant</p>
+                  </div>
+                  <Badge variant="outline" className="text-lg px-4 py-2">365 jours</Badge>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Après cette période, vos données sont automatiquement anonymisées conformément au RGPD.
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* Contact DPO */}
+            <Card className="bg-card/50 backdrop-blur-sm border-primary/20">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Bell className="w-5 h-5 text-primary" aria-hidden="true" />
+                  Contact DPO
+                </CardTitle>
+                <CardDescription>
+                  Délégué à la Protection des Données
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-muted-foreground">
+                      Pour toute question concernant vos données personnelles
+                    </p>
+                  </div>
+                  <Button variant="outline" asChild>
+                    <a href="mailto:dpo@emotionscare.com" className="flex items-center gap-2">
+                      <ExternalLink className="w-4 h-4" aria-hidden="true" />
+                      dpo@emotionscare.com
+                    </a>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </div>
@@ -624,14 +722,17 @@ interface PreferenceToggleProps {
 const PreferenceToggle = memo<PreferenceToggleProps>(({ prefKey, isEnabled, onToggle }) => {
   const meta = PREFERENCE_METADATA[prefKey];
   const IconComponent = iconMap[meta.icon];
+  const switchId = `switch-${prefKey}`;
 
   return (
     <motion.div 
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
       className="flex items-start gap-4 p-4 border rounded-lg bg-background/50"
+      role="group"
+      aria-labelledby={`label-${prefKey}`}
     >
-      <div className={`p-3 rounded-lg ${isEnabled ? 'bg-success/20' : 'bg-muted'}`}>
+      <div className={`p-3 rounded-lg ${isEnabled ? 'bg-success/20' : 'bg-muted'}`} aria-hidden="true">
         {IconComponent && (
           <IconComponent className={`w-5 h-5 ${isEnabled ? 'text-success' : 'text-muted-foreground'}`} />
         )}
@@ -639,19 +740,23 @@ const PreferenceToggle = memo<PreferenceToggleProps>(({ prefKey, isEnabled, onTo
       
       <div className="flex-1">
         <div className="flex items-center justify-between mb-2">
-          <h4 className="font-medium">{meta.label}</h4>
+          <label id={`label-${prefKey}`} htmlFor={switchId} className="font-medium cursor-pointer">
+            {meta.label}
+          </label>
           <div className="flex items-center gap-3">
-            <Badge variant={isEnabled ? 'default' : 'secondary'}>
+            <Badge variant={isEnabled ? 'default' : 'secondary'} aria-hidden="true">
               {isEnabled ? 'Activé' : 'Désactivé'}
             </Badge>
             <Switch
+              id={switchId}
               checked={isEnabled}
               onCheckedChange={(value) => onToggle(prefKey, value)}
+              aria-describedby={`desc-${prefKey}`}
             />
           </div>
         </div>
         
-        <p className="text-sm text-muted-foreground mb-2">
+        <p id={`desc-${prefKey}`} className="text-sm text-muted-foreground mb-2">
           {meta.description}
         </p>
         
@@ -662,6 +767,7 @@ const PreferenceToggle = memo<PreferenceToggleProps>(({ prefKey, isEnabled, onTo
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
               className="bg-muted/50 p-2 rounded text-xs text-muted-foreground"
+              role="note"
             >
               <strong>Fallback:</strong> {meta.fallback}
             </motion.div>
