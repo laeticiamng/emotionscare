@@ -32,6 +32,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useVRStats, useVRHistory, useVRWeeklyProgress } from '@/hooks/useVRStats';
 import { useVRSettings } from '@/hooks/useVRSettings';
 import { useVRExport } from '@/hooks/useVRExport';
+import { VRSettingsModal } from '@/components/vr/VRSettingsModal';
+import { VRRecommendationWidget } from '@/components/vr/VRRecommendationWidget';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
@@ -60,6 +62,7 @@ export default function VRPage() {
   const { settings } = useVRSettings();
   const { exportJSON, exportCSV } = useVRExport();
   const [activeTab, setActiveTab] = useState<'overview' | 'history' | 'progress'>('overview');
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   const weeklyGoalProgress = stats 
     ? Math.min(100, Math.round((stats.total_minutes / settings.weeklyGoalMinutes) * 100))
@@ -90,22 +93,33 @@ export default function VRPage() {
               </div>
             </div>
             
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm">
-                  <Download className="h-4 w-4 mr-2" />
-                  Exporter
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={exportJSON}>
-                  Export JSON
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={exportCSV}>
-                  Export CSV
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setSettingsOpen(true)}
+                aria-label="Paramètres VR"
+              >
+                <Settings className="h-5 w-5" />
+              </Button>
+              
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm">
+                    <Download className="h-4 w-4 mr-2" />
+                    Exporter
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={exportJSON}>
+                    Export JSON
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={exportCSV}>
+                    Export CSV
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
 
           {/* Quick Stats */}
@@ -231,6 +245,9 @@ export default function VRPage() {
               </Link>
             </Card>
           </div>
+          
+          {/* Recommendations */}
+          <VRRecommendationWidget />
         </motion.section>
 
         {/* Weekly Goal */}
@@ -436,6 +453,9 @@ export default function VRPage() {
           </Tabs>
         </motion.section>
       </div>
+      
+      {/* Settings Modal */}
+      <VRSettingsModal open={settingsOpen} onOpenChange={setSettingsOpen} />
     </div>
   );
 }
