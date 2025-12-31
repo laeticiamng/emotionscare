@@ -30,3 +30,13 @@ export {
   groupCellsByInstrument
 } from './reports/utils';
 export type { HeatmapCell, HeatmapTone, HeatmapInsight } from './reports/utils';
+
+// Re-export hooks for convenience
+export { useB2BTeams } from '@/hooks/useB2BTeams';
+export { useB2BEvents } from '@/hooks/useB2BEvents';
+export { useB2BReports } from '@/hooks/useB2BReports';
+export { useB2BAudit } from '@/hooks/useB2BAudit';
+export { useB2BRole } from '@/hooks/useB2BRole';
+export { useB2BSettings } from '@/hooks/useB2BSettings';
+export { useB2BNotifications } from '@/hooks/useB2BNotifications';
+export { useB2BAnalytics } from '@/hooks/useB2BAnalytics';
