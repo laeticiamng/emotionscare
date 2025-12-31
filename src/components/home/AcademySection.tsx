@@ -99,7 +99,7 @@ const AcademySection: React.FC = () => {
           {/* Header - Nouveau framing */}
           <motion.div variants={itemVariants} className="text-center space-y-4 max-w-3xl mx-auto">
             <Badge variant="outline" className="justify-center">
-              <BookOpen className="h-3 w-3 mr-2" />
+              <BookOpen className="h-3 w-3 mr-2" aria-hidden="true" />
               Comprendre pour reprendre la main
             </Badge>
             <h2 className="text-3xl lg:text-4xl font-bold">
