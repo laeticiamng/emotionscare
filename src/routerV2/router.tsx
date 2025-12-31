@@ -185,7 +185,7 @@ const JournalNewPage = lazy(() => import('@/pages/JournalNewPage'));
 const JournalSettingsPage = lazy(() => import('@/pages/JournalSettings'));
 const ReportingPage = lazy(() => import('@/pages/ReportingPage'));
 const ExportPage = lazy(() => import('@/pages/ExportPage'));
-const LeaderboardPage = lazy(() => import('@/pages/LeaderboardPage'));
+const LeaderboardPage = lazy(() => import('@/pages/AurasLeaderboardPage'));
 const GuildListPage = lazy(() => import('@/pages/GuildListPage'));
 const GuildPage = lazy(() => import('@/pages/GuildPage'));
 const PremiumRewardsPage = lazy(() => import('@/pages/PremiumRewardsPage'));
