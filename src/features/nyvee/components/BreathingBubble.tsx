@@ -15,7 +15,7 @@ const BUBBLE_COLORS = {
   calm: 'from-emerald-400/40 via-cyan-400/30 to-blue-400/40',
   moderate: 'from-violet-400/40 via-purple-400/30 to-indigo-400/40',
   intense: 'from-orange-400/40 via-rose-400/30 to-red-400/40',
-};
+} as const;
 
 const CYCLE_CONFIG = {
   inhale: 4000,
@@ -161,13 +161,13 @@ export const BreathingBubble = ({
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="text-2xl font-light text-white/90"
+            className="text-2xl font-light text-foreground/90"
           >
             {phase === 'inhale' && 'Inspire'}
             {phase === 'hold' && 'Retiens'}
             {phase === 'exhale' && 'Expire'}
           </motion.p>
-          <p className="mt-2 text-sm text-white/60">Cycle {cycleCount + 1}/6</p>
+          <p className="mt-2 text-sm text-foreground/60">Cycle {cycleCount + 1}/6</p>
         </div>
       </motion.div>
 
