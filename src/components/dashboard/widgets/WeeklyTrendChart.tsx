@@ -35,44 +35,73 @@ async function fetchWeeklyTrend(userId: string): Promise<DayData[]> {
     });
   }
 
-  // Récupérer les scans des 7 derniers jours
   const sevenDaysAgo = new Date(today);
   sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-  const { data: scans } = await supabase
-    .from('scan_history')
-    .select('created_at, normalized_balance')
-    .eq('user_id', userId)
-    .gte('created_at', sevenDaysAgo.toISOString())
-    .order('created_at', { ascending: true });
+  // Récupérer en parallèle les différentes sources de données
+  const [scansResult, sessionsResult, clinicalResult] = await Promise.all([
+    supabase
+      .from('scan_history')
+      .select('created_at, normalized_balance')
+      .eq('user_id', userId)
+      .gte('created_at', sevenDaysAgo.toISOString())
+      .order('created_at', { ascending: true }),
+    
+    supabase
+      .from('activity_sessions')
+      .select('started_at, mood_after')
+      .eq('user_id', userId)
+      .gte('started_at', sevenDaysAgo.toISOString()),
+    
+    supabase
+      .from('clinical_signals')
+      .select('created_at, metadata, source_instrument')
+      .eq('user_id', userId)
+      .gte('created_at', sevenDaysAgo.toISOString())
+      .order('created_at', { ascending: true })
+  ]);
 
-  if (scans && scans.length > 0) {
-    scans.forEach(scan => {
+  // Traiter les scans
+  if (scansResult.data && scansResult.data.length > 0) {
+    scansResult.data.forEach(scan => {
       const scanDate = scan.created_at.split('T')[0];
       const dayIndex = days.findIndex(d => d.date === scanDate);
       if (dayIndex !== -1) {
         days[dayIndex].hasActivity = true;
-        // Score basé sur normalized_balance (0-100)
         days[dayIndex].score = Math.max(days[dayIndex].score, scan.normalized_balance || 50);
       }
     });
   }
 
-  // Récupérer les sessions d'activités
-  const { data: sessions } = await supabase
-    .from('activity_sessions')
-    .select('started_at, mood_after')
-    .eq('user_id', userId)
-    .gte('started_at', sevenDaysAgo.toISOString());
-
-  if (sessions && sessions.length > 0) {
-    sessions.forEach(session => {
+  // Traiter les sessions d'activités
+  if (sessionsResult.data && sessionsResult.data.length > 0) {
+    sessionsResult.data.forEach(session => {
       const sessionDate = session.started_at.split('T')[0];
       const dayIndex = days.findIndex(d => d.date === sessionDate);
       if (dayIndex !== -1) {
         days[dayIndex].hasActivity = true;
         if (session.mood_after && days[dayIndex].score === 0) {
           days[dayIndex].score = session.mood_after * 10;
+        }
+      }
+    });
+  }
+
+  // Traiter les signaux cliniques (WHO5, SAM, etc.)
+  if (clinicalResult.data && clinicalResult.data.length > 0) {
+    clinicalResult.data.forEach(signal => {
+      const signalDate = signal.created_at.split('T')[0];
+      const dayIndex = days.findIndex(d => d.date === signalDate);
+      if (dayIndex !== -1) {
+        days[dayIndex].hasActivity = true;
+        // Extraire le score du metadata si disponible
+        const metadata = signal.metadata as Record<string, unknown> | null;
+        if (metadata) {
+          const rawScore = metadata.score ?? metadata.valence ?? metadata.level;
+          if (typeof rawScore === 'number' && days[dayIndex].score === 0) {
+            // Normaliser le score sur 100
+            days[dayIndex].score = Math.min(100, Math.max(0, rawScore * 20));
+          }
         }
       }
     });

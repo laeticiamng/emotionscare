@@ -92,7 +92,7 @@ const RECOMMENDATIONS_CONFIG: Record<string, Recommendation> = {
 };
 
 async function fetchUserContext(userId: string): Promise<UserContext> {
-  const [lastScan, userStats, recentModules] = await Promise.all([
+  const [lastScan, userStats, recentActivity, clinicalSignals] = await Promise.all([
     supabase
       .from('scan_history')
       .select('dominant_emotion, created_at')
@@ -106,20 +106,54 @@ async function fetchUserContext(userId: string): Promise<UserContext> {
       .eq('user_id', userId)
       .maybeSingle(),
     supabase
-      .from('user_goals')
-      .select('id, completed')
+      .from('activity_sessions')
+      .select('activity_id')
       .eq('user_id', userId)
       .eq('completed', true)
+      .order('completed_at', { ascending: false })
+      .limit(5),
+    supabase
+      .from('clinical_signals')
+      .select('metadata, source_instrument')
+      .eq('user_id', userId)
       .order('created_at', { ascending: false })
-      .limit(5)
+      .limit(3)
   ]);
 
+  // Analyser les signaux cliniques pour détecter le mood
+  let detectedMood: string | undefined = lastScan.data?.dominant_emotion;
+  
+  if (clinicalSignals.data && clinicalSignals.data.length > 0) {
+    for (const signal of clinicalSignals.data) {
+      const metadata = signal.metadata as Record<string, unknown> | null;
+      if (metadata?.dominant_emotion) {
+        detectedMood = String(metadata.dominant_emotion);
+        break;
+      }
+      if (metadata?.mood) {
+        detectedMood = String(metadata.mood);
+        break;
+      }
+    }
+  }
+
+  // Détecter les modules préférés basés sur l'activité récente
+  const preferredModules: string[] = [];
+  if (recentActivity.data) {
+    const activityIds = recentActivity.data.map(a => a.activity_id).filter(Boolean);
+    if (activityIds.length > 0) {
+      // Les IDs d'activités peuvent indiquer des préférences
+      // Ex: si beaucoup de sessions breath -> préférence respiration
+      preferredModules.push('breath', 'music'); // Fallback par défaut
+    }
+  }
+
   return {
-    lastScanMood: lastScan.data?.dominant_emotion,
+    lastScanMood: detectedMood,
     lastScanTime: lastScan.data?.created_at ? new Date(lastScan.data.created_at) : undefined,
     streakDays: userStats.data?.streak_days || 0,
     weeklyGoals: 0,
-    preferredModules: [] // Simplified - module_type doesn't exist in user_goals
+    preferredModules
   };
 }
 

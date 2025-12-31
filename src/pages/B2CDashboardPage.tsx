@@ -43,12 +43,17 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useClinicalHints } from '@/hooks/useClinicalHints';
 import { useUserStatsQuery, useUserStatsRealtime } from '@/hooks/useUserStatsQuery';
 import { useDynamicRecommendations } from '@/hooks/useDynamicRecommendations';
+import { useWellbeingScore } from '@/hooks/useWellbeingScore';
+import { useAuth } from '@/contexts/AuthContext';
+import { useDynamicRecommendations } from '@/hooks/useDynamicRecommendations';
 import { useAuth } from '@/contexts/AuthContext';
 
 const WeeklyPlanCard = React.lazy(() => import('@/components/dashboard/widgets/WeeklyPlanCard'));
 const RecentEmotionScansWidget = React.lazy(() => import('@/components/dashboard/widgets/RecentEmotionScansWidget'));
 const JournalSummaryCard = React.lazy(() => import('@/components/dashboard/widgets/JournalSummaryCard'));
 const WeeklyTrendChart = React.lazy(() => import('@/components/dashboard/widgets/WeeklyTrendChart'));
+const GoalsProgressWidget = React.lazy(() => import('@/components/dashboard/widgets/GoalsProgressWidget'));
+const NotificationsWidget = React.lazy(() => import('@/components/dashboard/widgets/NotificationsWidget'));
 
 type QuickAction = {
   id: string;
