@@ -1,13 +1,14 @@
 /**
  * LiveCounter - Compteurs animés en temps réel
- * Affiche les statistiques live de la plateforme
+ * Affiche les statistiques live de la plateforme avec vraies données
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Users, Activity, Heart, Zap, TrendingUp, RefreshCw } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { useOnlineUsers } from '@/hooks/useOnlineUsers';
 
 interface CounterItem {
   id: string;
@@ -32,11 +33,14 @@ const LiveCounter: React.FC<LiveCounterProps> = ({
   showRefresh = true,
   onRefresh,
 }) => {
+  // Utiliser le hook réel pour le nombre d'utilisateurs en ligne
+  const { onlineCount } = useOnlineUsers();
+  
   const [counters, setCounters] = useState<CounterItem[]>([
     {
       id: 'online',
       label: 'En ligne',
-      value: 127,
+      value: 0,
       icon: <Users className="h-4 w-4" />,
       color: 'text-green-500',
       trend: 'up',
@@ -69,6 +73,19 @@ const LiveCounter: React.FC<LiveCounterProps> = ({
   ]);
 
   const [isLive, setIsLive] = useState(true);
+
+  // Mettre à jour le compteur en ligne avec les vraies données
+  useEffect(() => {
+    if (onlineCount > 0) {
+      setCounters(prev =>
+        prev.map(counter =>
+          counter.id === 'online'
+            ? { ...counter, value: onlineCount, trend: 'up' as const }
+            : counter
+        )
+      );
+    }
+  }, [onlineCount]);
 
   // Simuler des mises à jour en temps réel
   useEffect(() => {

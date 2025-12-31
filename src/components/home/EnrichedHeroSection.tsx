@@ -146,38 +146,41 @@ const EnrichedHeroSection: React.FC = () => {
             variants={itemVariants}
             className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4"
           >
+            {/* CTA Principal - Essai gratuit vers /b2c (testé par E2E) */}
             <motion.div
               variants={pulseVariants}
               animate="animate"
               onHoverStart={() => setIsHovered(true)}
               onHoverEnd={() => setIsHovered(false)}
             >
-              <Button
-                size="lg"
-                onClick={handleImmediateAction}
-                className="relative overflow-hidden bg-gradient-to-r from-primary to-primary/90 hover:from-primary/95 hover:to-primary shadow-2xl hover:shadow-primary/25 transition-all duration-500 px-10 py-7 text-lg font-semibold group"
-              >
-                <Heart className="h-5 w-5 mr-3" />
-                <span>Commencer maintenant</span>
-                
-                {/* Effet de brillance au hover */}
-                <motion.div
-                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                  initial={{ x: '-100%' }}
-                  animate={isHovered ? { x: '100%' } : { x: '-100%' }}
-                  transition={{ duration: 0.6 }}
-                />
-              </Button>
+              <Link to="/b2c">
+                <Button
+                  size="lg"
+                  className="relative overflow-hidden bg-gradient-to-r from-primary to-primary/90 hover:from-primary/95 hover:to-primary shadow-2xl hover:shadow-primary/25 transition-all duration-500 px-10 py-7 text-lg font-semibold group"
+                >
+                  <Heart className="h-5 w-5 mr-3" aria-hidden="true" />
+                  <span>Essai gratuit 30 jours</span>
+                  
+                  {/* Effet de brillance au hover */}
+                  <motion.div
+                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                    initial={{ x: '-100%' }}
+                    animate={isHovered ? { x: '100%' } : { x: '-100%' }}
+                    transition={{ duration: 0.6 }}
+                  />
+                </Button>
+              </Link>
             </motion.div>
 
+            {/* CTA secondaire - action immédiate */}
             <Button
               size="lg"
               variant="ghost"
               onClick={handleImmediateAction}
               className="text-muted-foreground hover:text-foreground px-8 py-7 text-lg group"
             >
-              <Clock className="h-4 w-4 mr-2 group-hover:text-primary transition-colors" />
-              <span>2 minutes suffisent</span>
+              <Clock className="h-4 w-4 mr-2 group-hover:text-primary transition-colors" aria-hidden="true" />
+              <span>Commencer maintenant</span>
             </Button>
           </motion.div>
 
