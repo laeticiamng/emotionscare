@@ -1,9 +1,10 @@
 /**
  * FAQSection - FAQ avec framing interventionnel
  * Vision: Répondre aux vraies questions sur le moment où utiliser EmotionsCare
+ * Inclut Schema.org FAQPage pour SEO
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -11,6 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { ChevronDown, Search, HelpCircle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 
 interface FAQItem {
   id: number;
@@ -102,6 +104,20 @@ const FAQSection: React.FC = () => {
     return matchesSearch && matchesCategory;
   });
 
+  // Générer le Schema.org FAQPage
+  const faqSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.map((faq) => ({
+      '@type': 'Question',
+      name: faq.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: faq.answer,
+      },
+    })),
+  };
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -122,7 +138,14 @@ const FAQSection: React.FC = () => {
   };
 
   return (
-    <section className="py-20 bg-gradient-to-b from-background to-muted/20">
+    <section className="py-20 bg-gradient-to-b from-background to-muted/20" id="faq" aria-labelledby="faq-title">
+      {/* Schema.org FAQPage pour SEO */}
+      <Helmet>
+        <script type="application/ld+json">
+          {JSON.stringify(faqSchema)}
+        </script>
+      </Helmet>
+
       <div className="container max-w-3xl">
         <motion.div
           initial={{ opacity: 0 }}
@@ -133,10 +156,10 @@ const FAQSection: React.FC = () => {
           {/* Header */}
           <div className="text-center space-y-4">
             <Badge variant="outline" className="mb-2">
-              <HelpCircle className="h-3 w-3 mr-2" />
+              <HelpCircle className="h-3 w-3 mr-2" aria-hidden="true" />
               Questions légitimes
             </Badge>
-            <h2 className="text-3xl lg:text-4xl font-bold">
+            <h2 id="faq-title" className="text-3xl lg:text-4xl font-bold">
               Ce que tu te demandes probablement
             </h2>
             <p className="text-lg text-muted-foreground">
