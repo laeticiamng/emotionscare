@@ -17057,6 +17057,36 @@ export type Database = {
         }
         Relationships: []
       }
+      quiet_hours_settings: {
+        Row: {
+          created_at: string
+          enabled: boolean | null
+          end_utc: string | null
+          id: string
+          start_utc: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          enabled?: boolean | null
+          end_utc?: string | null
+          id?: string
+          start_utc?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          enabled?: boolean | null
+          end_utc?: string | null
+          id?: string
+          start_utc?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       quiz_results: {
         Row: {
           answers: Json | null
@@ -17655,6 +17685,47 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      room_members: {
+        Row: {
+          display_name: string | null
+          id: string
+          joined_at: string
+          member_id: string | null
+          preferences: Json | null
+          role: string | null
+          room_id: string
+          user_id: string | null
+        }
+        Insert: {
+          display_name?: string | null
+          id?: string
+          joined_at?: string
+          member_id?: string | null
+          preferences?: Json | null
+          role?: string | null
+          room_id: string
+          user_id?: string | null
+        }
+        Update: {
+          display_name?: string | null
+          id?: string
+          joined_at?: string
+          member_id?: string | null
+          preferences?: Json | null
+          role?: string | null
+          room_id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "room_members_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "social_rooms"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       route_metadata: {
         Row: {
@@ -18833,6 +18904,122 @@ export type Database = {
           service_name?: string
           status?: string
           target_value?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      social_room_breaks: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          delivery_channel: string | null
+          duration_minutes: number | null
+          id: string
+          invitees: Json | null
+          remind_at: string | null
+          room_id: string
+          starts_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          delivery_channel?: string | null
+          duration_minutes?: number | null
+          id?: string
+          invitees?: Json | null
+          remind_at?: string | null
+          room_id: string
+          starts_at: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          delivery_channel?: string | null
+          duration_minutes?: number | null
+          id?: string
+          invitees?: Json | null
+          remind_at?: string | null
+          room_id?: string
+          starts_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "social_room_breaks_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "social_rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      social_room_events: {
+        Row: {
+          created_at: string
+          event_type: string
+          id: string
+          role: string | null
+          room_ref: string
+        }
+        Insert: {
+          created_at?: string
+          event_type: string
+          id?: string
+          role?: string | null
+          room_ref: string
+        }
+        Update: {
+          created_at?: string
+          event_type?: string
+          id?: string
+          role?: string | null
+          room_ref?: string
+        }
+        Relationships: []
+      }
+      social_rooms: {
+        Row: {
+          allow_audio: boolean | null
+          created_at: string
+          description: string | null
+          host_display_name: string | null
+          host_id: string | null
+          id: string
+          invite_code: string | null
+          is_private: boolean | null
+          metadata: Json | null
+          name: string
+          soft_mode_enabled: boolean | null
+          topic: string | null
+          updated_at: string
+        }
+        Insert: {
+          allow_audio?: boolean | null
+          created_at?: string
+          description?: string | null
+          host_display_name?: string | null
+          host_id?: string | null
+          id?: string
+          invite_code?: string | null
+          is_private?: boolean | null
+          metadata?: Json | null
+          name: string
+          soft_mode_enabled?: boolean | null
+          topic?: string | null
+          updated_at?: string
+        }
+        Update: {
+          allow_audio?: boolean | null
+          created_at?: string
+          description?: string | null
+          host_display_name?: string | null
+          host_id?: string | null
+          id?: string
+          invite_code?: string | null
+          is_private?: boolean | null
+          metadata?: Json | null
+          name?: string
+          soft_mode_enabled?: boolean | null
+          topic?: string | null
           updated_at?: string
         }
         Relationships: []
