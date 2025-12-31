@@ -262,7 +262,10 @@ const RedirectToMusic = lazy(() => import('@/components/redirects/RedirectToMusi
 
 // Pages Dashboard modules
 const ModulesDashboard = lazy(() => import('@/pages/ModulesDashboard'));
-// FacialScanPage supprimé - fusionné dans B2CScanPage
+// Pages Scan spécialisées
+const ScanFacialPage = lazy(() => import('@/pages/app/ScanFacialPage'));
+const ScanVoicePage = lazy(() => import('@/pages/app/ScanVoicePage'));
+const ScanTextPage = lazy(() => import('@/pages/app/ScanTextPage'));
 const VoiceScanPage = lazy(() => import('@/pages/VoiceScanPage'));
 const TextScanPage = lazy(() => import('@/pages/TextScanPage'));
 // MusicGeneratePage supprimé - fonctionnalité dans B2CMusicEnhanced
@@ -375,6 +378,9 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   
   // Modules
   B2CScanPage,
+  ScanFacialPage,
+  ScanVoicePage,
+  ScanTextPage,
   B2CMusicEnhanced,
   MusicTherapyPage,
   MusicAnalyticsPage,

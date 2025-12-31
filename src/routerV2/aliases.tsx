@@ -53,7 +53,7 @@ export const ROUTE_ALIASES = {
   '/emotion-scan': '/app/scan',
   '/modules/emotion-scan': '/app/scan',
   '/app/emotion-scan': '/app/scan',
-  '/app/scan/facial': '/app/scan',
+  // Routes scan spécialisées - ne PAS rediriger (pages dédiées existantes)
   '/music': '/app/music',
   '/coaching': '/app/coach',
   '/app/coaching': '/app/coach',
