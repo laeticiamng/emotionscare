@@ -786,6 +786,17 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     aliases: ['/community-groups', '/groups'],
   },
   {
+    name: 'buddies',
+    path: '/app/buddies',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app-sidebar',
+    component: 'BuddiesPage',
+    guard: true,
+    requireAuth: true,
+    aliases: ['/buddy-system', '/find-buddy'],
+  },
+  {
     name: 'wearables',
     path: '/app/wearables',
     segment: 'consumer',

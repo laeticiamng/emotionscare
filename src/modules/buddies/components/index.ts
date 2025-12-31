@@ -8,3 +8,6 @@ export { BuddyActivities } from './BuddyActivities';
 export { BuddySentRequests } from './BuddySentRequests';
 export { BuddyCompatibility } from './BuddyCompatibility';
 export { EmojiPicker } from './EmojiPicker';
+export { MoodTracker } from './MoodTracker';
+export { BuddyRecommendations } from './BuddyRecommendations';
+export { NotificationsPanel } from './NotificationsPanel';

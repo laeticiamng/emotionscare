@@ -125,6 +125,7 @@ export const b2cRoutes = {
   accountDelete: () => resolveRoutePath('settings-privacy'),
   exchange: () => resolveRoutePath('exchange-hub'),
   groupSessions: () => resolveRoutePath('group-sessions'),
+  buddies: () => resolveRoutePath('buddies'),
 } as const;
 
 export const consumerRoutes = {
