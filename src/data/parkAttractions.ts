@@ -8,7 +8,7 @@ import {
   Home, Sparkles, Wind, Palette, Music, Leaf, Book, Cloud, Star,
   Lightbulb, Waves, Scan, Beaker, Sword, Sliders, Users, Trophy,
   Theater, Sprout, Grid3X3, Settings, Bell, MessageSquare, BarChart3,
-  Heart, Monitor, Camera, Shield, Flower2
+  Heart, Monitor, Camera, Shield, Flower2, Zap
 } from 'lucide-react';
 import type { Attraction } from '@/types/park';
 
@@ -298,6 +298,17 @@ export const parkAttractions: Attraction[] = [
     gradient: 'from-amber-500/20 to-yellow-500/20',
     collection: 'Trophées conquis',
     zone: 'social'
+  },
+  {
+    id: 'bounce-back',
+    title: 'Le Trampoline Résilient',
+    subtitle: 'Rebondir après l\'échec',
+    description: 'Transforme les obstacles en tremplins grâce à des exercices de résilience ludiques.',
+    icon: Zap,
+    route: '/app/bounce-back',
+    gradient: 'from-orange-500/20 to-red-500/20',
+    collection: 'Rebonds victorieux',
+    zone: 'challenge'
   },
   {
     id: 'group-sessions',
