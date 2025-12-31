@@ -20,7 +20,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { Navigate } from 'react-router-dom';
-import { useCommunityGroups, useCommunityPosts } from '@/hooks/community';
+import { useCommunityGroups, useCommunityPosts, useTrendingTags } from '@/hooks/community';
 import { CommunityReportService, REPORT_REASONS, ReportReason } from '@/modules/community/services';
 import { CommunitySavedPostsService } from '@/modules/community/services';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -29,6 +29,7 @@ import { CommunitySearch } from '@/components/community/CommunitySearch';
 import { NotificationBell } from '@/components/community/NotificationBell';
 import { EmpathyTemplates } from '@/components/community/EmpathyTemplates';
 import { PostCommentSection } from '@/components/community/PostCommentSection';
+import { TrendingPostsSection } from '@/components/community/TrendingPostsSection';
 
 const REACTION_EMOJIS = ['❤️', '👍', '🙏', '💪', '🌟', '🤗'];
 
@@ -57,6 +58,7 @@ export default function CommunityPage() {
   // Hooks pour les données
   const { groups, myGroups, loading: groupsLoading, joinGroup, leaveGroup, createGroup, refresh: refreshGroups } = useCommunityGroups();
   const { posts, loading: postsLoading, createPost, toggleReaction, refresh: refreshPosts } = useCommunityPosts();
+  const { tags: trendingTags, loading: trendingLoading, refresh: refreshTrending } = useTrendingTags(10);
   
   // États locaux
   const [selectedGroup, setSelectedGroup] = useState<any | null>(null);
@@ -765,44 +767,61 @@ export default function CommunityPage() {
 
         {/* Onglet Tendances */}
         <TabsContent value="trending" className="space-y-4">
+          {/* Tags tendance */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <TrendingUp className="h-5 w-5 text-primary" />
-                Posts populaires
+                Tags populaires
               </CardTitle>
-              <CardDescription>Les discussions les plus engagées cette semaine</CardDescription>
+              <CardDescription>Les sujets les plus discutés cette semaine</CardDescription>
             </CardHeader>
             <CardContent>
-              {posts.length === 0 ? (
-                <p className="text-center py-4 text-muted-foreground">Aucune tendance pour le moment</p>
+              {trendingLoading ? (
+                <div className="text-center py-4 text-muted-foreground">Chargement...</div>
+              ) : trendingTags.length === 0 ? (
+                <p className="text-center py-4 text-muted-foreground">Aucun tag tendance</p>
               ) : (
-                <div className="space-y-3">
-                  {[...posts]
-                    .sort((a, b) => b.likes_count - a.likes_count)
-                    .slice(0, 5)
-                    .map((post, idx) => (
-                      <div key={post.id} className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
-                        <span className="text-lg font-bold text-primary">#{idx + 1}</span>
-                        <div className="flex-1">
-                          <p className="text-sm line-clamp-2">{post.content}</p>
-                          <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
-                            <span className="flex items-center gap-1">
-                              <Heart className="h-3 w-3" />
-                              {post.likes_count}
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <MessageCircle className="h-3 w-3" />
-                              {post.comments_count}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
+                <div className="flex flex-wrap gap-2">
+                  {trendingTags.map((tag, idx) => (
+                    <Badge 
+                      key={tag.tag} 
+                      variant={idx < 3 ? 'default' : 'secondary'}
+                      className="cursor-pointer hover:opacity-80"
+                    >
+                      #{tag.tag}
+                      <span className="ml-1 text-xs opacity-75">({tag.usage_count})</span>
+                    </Badge>
+                  ))}
                 </div>
               )}
             </CardContent>
           </Card>
+
+          {/* Posts populaires avec TrendingPostsSection */}
+          <TrendingPostsSection
+            posts={[...posts]
+              .sort((a, b) => b.likes_count - a.likes_count)
+              .slice(0, 10)
+              .map((post, idx) => ({
+                id: post.id,
+                title: post.title || `Post #${idx + 1}`,
+                snippet: post.content,
+                engagementScore: post.likes_count + post.comments_count,
+                reactionCount: post.likes_count,
+                commentCount: post.comments_count,
+                trend: post.likes_count > 5 ? 'up' as const : 'stable' as const,
+                timestamp: post.created_at
+              }))}
+            onPostClick={(postId) => {
+              if (postId !== 'view-all') {
+                // Scroll to post
+                const postElement = document.getElementById(`post-${postId}`);
+                postElement?.scrollIntoView({ behavior: 'smooth' });
+              }
+            }}
+            onRefresh={refreshTrending}
+          />
 
           <Card>
             <CardHeader>
@@ -812,7 +831,7 @@ export default function CommunityPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-3 gap-4 text-center">
+              <div className="grid grid-cols-4 gap-4 text-center">
                 <div>
                   <p className="text-2xl font-bold text-primary">{posts.length}</p>
                   <p className="text-xs text-muted-foreground">Posts</p>
@@ -826,6 +845,10 @@ export default function CommunityPage() {
                     {posts.reduce((sum, p) => sum + p.likes_count, 0)}
                   </p>
                   <p className="text-xs text-muted-foreground">Réactions</p>
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-primary">{trendingTags.length}</p>
+                  <p className="text-xs text-muted-foreground">Tags</p>
                 </div>
               </div>
             </CardContent>

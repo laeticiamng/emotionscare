@@ -22,3 +22,6 @@ export type { SearchResult, UseCommunitySearchReturn } from './useCommunitySearc
 
 export { useTrendingTags } from './useTrendingTags';
 export type { UseTrendingTagsReturn } from './useTrendingTags';
+
+// Re-export TrendingTag type for convenience
+export type { TrendingTag } from '@/modules/community/services/communityTrendingService';
