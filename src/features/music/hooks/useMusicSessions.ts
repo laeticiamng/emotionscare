@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import type { MusicGenerationSession, ListMusicSessionsInput } from '@emotionscare/contracts';
-import { musicApi } from '../services/musicApi';
+import { musicApi, type MusicGenerationSession, type ListMusicSessionsInput } from '../services/musicApi';
 
 /**
  * Hook to fetch music generation sessions
@@ -39,3 +38,5 @@ export function useMusicSession(sessionId: string, options?: { refetchInterval?:
     enabled: !!sessionId,
   });
 }
+
+export type { MusicGenerationSession, ListMusicSessionsInput };

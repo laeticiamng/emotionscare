@@ -1,6 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { CreateMusicGenerationInput, MusicGenerationSession } from '@emotionscare/contracts';
-import { musicApi } from '../services/musicApi';
+import { musicApi, type CreateMusicGenerationInput, type MusicGenerationSession } from '../services/musicApi';
 import { logger } from '@/lib/logger';
 
 /**
@@ -43,3 +42,5 @@ export function useCreateMusic(options?: {
     onError: options?.onError,
   });
 }
+
+export type { CreateMusicGenerationInput, MusicGenerationSession };
