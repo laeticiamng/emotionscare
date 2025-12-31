@@ -1,8 +1,10 @@
 // @ts-nocheck
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Sentry } from '@/lib/errors/sentry-compat';
 import { useToast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
+import { supabase } from '@/integrations/supabase/client';
 import {
   cancelScheduledBreak,
   fetchQuietHours,
@@ -37,6 +39,7 @@ export const useSocialBreakPlanner = (
   options?: UseSocialBreakPlannerOptions
 ): UseSocialBreakPlannerResult => {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [breaks, setBreaks] = useState<SocialBreakPlan[]>([]);
   const [quietHours, setQuietHours] = useState<QuietHoursSettings | null>(null);
 
@@ -45,7 +48,6 @@ export const useSocialBreakPlanner = (
     queryFn: fetchUpcomingBreaks,
     enabled: options?.enabled ?? true,
     staleTime: 1000 * 30,
-    refetchInterval: options?.enabled === false ? false : 1000 * 60 * 5,
   });
 
   const quietHoursQuery = useQuery({
@@ -54,6 +56,40 @@ export const useSocialBreakPlanner = (
     enabled: options?.enabled ?? true,
     staleTime: 1000 * 60 * 60,
   });
+
+  // Supabase Realtime subscription for breaks
+  useEffect(() => {
+    if (options?.enabled === false) return;
+
+    const channel = supabase
+      .channel('social-breaks-realtime')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'social_room_breaks' },
+        (payload) => {
+          logger.info('social:realtime:breaks', { eventType: payload.eventType }, 'SOCIAL');
+          queryClient.invalidateQueries({ queryKey: ['social-breaks'] });
+          queryClient.invalidateQueries({ queryKey: ['social-breaks-past'] });
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'quiet_hours_settings' },
+        (payload) => {
+          logger.info('social:realtime:quiet-hours', { eventType: payload.eventType }, 'SOCIAL');
+          queryClient.invalidateQueries({ queryKey: ['social-quiet-hours'] });
+        }
+      )
+      .subscribe((status) => {
+        if (status === 'SUBSCRIBED') {
+          logger.info('social:realtime:breaks:subscribed', {}, 'SOCIAL');
+        }
+      });
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [options?.enabled, queryClient]);
 
   useEffect(() => {
     if (breaksQuery.data) {

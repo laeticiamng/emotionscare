@@ -1,9 +1,10 @@
 // @ts-nocheck
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Sentry } from '@/lib/errors/sentry-compat';
 import { useToast } from '@/hooks/use-toast';
 import { logger } from '@/lib/logger';
+import { supabase } from '@/integrations/supabase/client';
 import {
   createSocialRoom,
   fetchSocialRooms,
@@ -41,6 +42,7 @@ interface UseSocialRoomsResult {
 
 export const useSocialRooms = (options?: UseSocialRoomsOptions): UseSocialRoomsResult => {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [rooms, setRooms] = useState<SocialRoom[]>([]);
   const [memberships, setMemberships] = useState<Record<string, SocialRoomMember>>({});
 
@@ -49,8 +51,41 @@ export const useSocialRooms = (options?: UseSocialRoomsOptions): UseSocialRoomsR
     queryFn: fetchSocialRooms,
     enabled: options?.enabled ?? true,
     staleTime: 1000 * 30,
-    refetchInterval: options?.enabled === false ? false : 1000 * 60,
   });
+
+  // Supabase Realtime subscription for rooms
+  useEffect(() => {
+    if (options?.enabled === false) return;
+
+    const channel = supabase
+      .channel('social-rooms-realtime')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'social_rooms' },
+        (payload) => {
+          logger.info('social:realtime:rooms', { eventType: payload.eventType }, 'SOCIAL');
+          // Refetch to get updated data with members
+          queryClient.invalidateQueries({ queryKey: ['social-rooms'] });
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'room_members' },
+        (payload) => {
+          logger.info('social:realtime:members', { eventType: payload.eventType }, 'SOCIAL');
+          queryClient.invalidateQueries({ queryKey: ['social-rooms'] });
+        }
+      )
+      .subscribe((status) => {
+        if (status === 'SUBSCRIBED') {
+          logger.info('social:realtime:subscribed', {}, 'SOCIAL');
+        }
+      });
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [options?.enabled, queryClient]);
 
   useEffect(() => {
     if (roomsQuery.data) {
