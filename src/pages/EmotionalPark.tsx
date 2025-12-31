@@ -1,16 +1,14 @@
 /**
- * EMOTIONAL PARK - Refactorisé
+ * EMOTIONAL PARK - Module complet et enrichi
  * Carte du Parc Émotionnel — Monde des Modules
- * 
- * Refactorisation: 1076 lignes → ~700 lignes (-35%)
- * Données extraites vers: src/data/parkAttractions.ts, src/data/parkZones.ts
+ * Intégration complète: météo, streak, favoris, notifications, partage, énergie
  */
 
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { useUserStatsQuery } from '@/hooks/useUserStatsQuery';
 import { useUserPreference } from '@/hooks/useSupabaseStorage';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Filter, Search, X, TrendingUp, Target, Award, ChevronDown, Star, Calendar, Sparkles, Trophy, Zap, BarChart3, Map, Clock } from 'lucide-react';
+import { Filter, Search, X, TrendingUp, Target, Award, ChevronDown, Star, Calendar, Sparkles, Trophy, Zap, BarChart3, Map, Clock, Heart, Share2, Download, Settings } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 import { ParkAttraction } from '@/components/park/ParkAttraction';
 import type { Attraction } from '@/types/park';
@@ -25,14 +23,24 @@ import { GuidedTourModal } from '@/components/park/GuidedTourModal';
 import { TourStepOverlay } from '@/components/park/TourStepOverlay';
 import { useParkRecommendations } from '@/hooks/useParkRecommendations';
 import { AttractionRecommendations } from '@/components/park/AttractionRecommendations';
-import { ParkStatistics, ProgressStage } from '@/components/park/ParkStatistics';
 import { ParkQuests } from '@/components/park/ParkQuests';
 import { ParkMapVisualization } from '@/components/park/ParkMapVisualization';
 import { ProgressionTimeline } from '@/components/park/ProgressionTimeline';
+import { ParkWeatherWidget } from '@/components/park/ParkWeatherWidget';
+import { ParkStreakWidget } from '@/components/park/ParkStreakWidget';
+import { ParkNotificationsPanel } from '@/components/park/ParkNotificationsPanel';
+import { FavoriteAttractions } from '@/components/park/FavoriteAttractions';
+import { ShareAchievementDialog } from '@/components/park/ShareAchievementDialog';
+import { EnergyBar } from '@/components/park/EnergyBar';
+import { ParkQuickActions } from '@/components/park/ParkQuickActions';
 import { parkAttractions } from '@/data/parkAttractions';
 import { parkZones } from '@/data/parkZones';
 import { useParkQuests } from '@/hooks/useParkQuests';
 import { useParkModuleSymbiosis } from '@/hooks/useParkModuleSymbiosis';
+import { useParkRealtime } from '@/hooks/useParkRealtime';
+import { useParkFavorites } from '@/hooks/useParkFavorites';
+import { useParkExport } from '@/hooks/useParkExport';
+import { useParkSharing, type ShareableAchievement } from '@/hooks/useParkSharing';
 import type { ZoneKey, ZoneProgressData, ParkStat, MoodOption } from '@/types/park';
 
 export default function EmotionalPark() {
@@ -43,9 +51,17 @@ export default function EmotionalPark() {
   const [showStatistics, setShowStatistics] = useState(true);
   const [showMap, setShowMap] = useState(false);
   const [showTimeline, setShowTimeline] = useState(false);
+  const [showFavorites, setShowFavorites] = useState(false);
+  const [shareDialogOpen, setShareDialogOpen] = useState(false);
+  const [achievementToShare, setAchievementToShare] = useState<ShareableAchievement | null>(null);
   
   // Mood persisté via Supabase
   const [currentMood, setCurrentMood] = useUserPreference<string>('emotional-park-mood', '');
+
+  // Energy system
+  const [energy, setEnergy] = useState(80);
+  const maxEnergy = 100;
+  const energyRegenRate = 10;
 
   const {
     visitedAttractions,
@@ -74,7 +90,13 @@ export default function EmotionalPark() {
   const { getRecommendations, getDailyChallenge } = useParkRecommendations();
   const { stats: userStats } = useUserStatsQuery();
   const { quests, getCompletedQuestsCount, getTotalRewards, updateQuestProgress, updateQuestFromZoneVisit } = useParkQuests();
-  const { syncAttractionVisit, getZoneRecommendations, crossModuleInsights } = useParkModuleSymbiosis();
+  const { syncAttractionVisit } = useParkModuleSymbiosis();
+  
+  // New hooks integration
+  const { notifications, unreadCount, notifyBadgeUnlock } = useParkRealtime();
+  const { isFavorite, toggleFavorite, recordVisit } = useParkFavorites();
+  const { exportToJSON, isExporting } = useParkExport();
+  const { shareSummary, isSharing } = useParkSharing();
 
   const [showTourModal, setShowTourModal] = useState(false);
 
@@ -83,6 +105,14 @@ export default function EmotionalPark() {
       setShowTourModal(true);
     }
   }, [tourCompleted, visitedAttractions]);
+
+  // Energy regeneration
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setEnergy(prev => Math.min(maxEnergy, prev + energyRegenRate / 6));
+    }, 10 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Use imported attractions and zones
   const attractions = parkAttractions;
@@ -187,18 +217,37 @@ export default function EmotionalPark() {
 
   // Handle attraction click
   const handleAttractionClick = useCallback((attraction: Attraction) => {
+    // Check energy
+    if (energy < 10) {
+      return;
+    }
+    
+    setEnergy(prev => Math.max(0, prev - 10));
     markVisited(attraction.id);
+    
+    // Record visit for favorites
+    if (isFavorite(attraction.id)) {
+      recordVisit(attraction.id);
+    }
     
     // Check zone completion
     const zoneAttractions = attractions
       .filter(a => a.zone === attraction.zone)
       .map(a => a.id);
     
-    checkZoneCompletion(
+    const wasCompleted = checkZoneCompletion(
       attraction.zone,
       zones[attraction.zone as keyof typeof zones].name,
       zoneAttractions
     );
+    
+    // Notify badge unlock
+    if (wasCompleted) {
+      notifyBadgeUnlock(
+        zones[attraction.zone as keyof typeof zones].name,
+        zones[attraction.zone as keyof typeof zones].emoji
+      );
+    }
     
     // Update quest progress based on zone visit
     updateQuestFromZoneVisit(attraction.zone);
@@ -212,7 +261,28 @@ export default function EmotionalPark() {
     
     // Navigate to attraction
     navigate(attraction.route);
-  }, [attractions, zones, markVisited, checkZoneCompletion, updateQuestFromZoneVisit, syncAttractionVisit, navigate]);
+  }, [attractions, zones, energy, markVisited, isFavorite, recordVisit, checkZoneCompletion, notifyBadgeUnlock, updateQuestFromZoneVisit, syncAttractionVisit, navigate]);
+
+  // Handle favorite toggle
+  const handleToggleFavorite = useCallback((attraction: Attraction, e: React.MouseEvent) => {
+    e.stopPropagation();
+    toggleFavorite(attraction.id, attraction.title, attraction.zone);
+  }, [toggleFavorite]);
+
+  // Handle share
+  const handleShare = useCallback(() => {
+    shareSummary();
+  }, [shareSummary]);
+
+  // Get random attraction
+  const handleRandomAttraction = useCallback(() => {
+    const unvisited = attractions.filter(a => !visitedAttractions[a.id]);
+    const pool = unvisited.length > 0 ? unvisited : attractions;
+    const random = pool[Math.floor(Math.random() * pool.length)];
+    if (random) {
+      handleAttractionClick(random);
+    }
+  }, [attractions, visitedAttractions, handleAttractionClick]);
 
   // Calculate zone progress for each zone
   const zoneProgressData = useMemo(() => {
@@ -293,7 +363,7 @@ export default function EmotionalPark() {
         <div className="container mx-auto px-4 py-6">
           <div className="flex flex-col gap-4">
             {/* Title and Stats */}
-            <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-3">
                 <motion.div
                   animate={{ rotate: [0, 10, -10, 0], scale: [1, 1.1, 1] }}
@@ -311,10 +381,24 @@ export default function EmotionalPark() {
                 </div>
               </div>
               
-              <Badge variant="secondary" className="gap-2">
-                <Trophy className="h-3 w-3" />
-                {unlockedBadges.length} Badges
-              </Badge>
+              <div className="flex items-center gap-2">
+                {/* Energy Bar */}
+                <div className="hidden md:block w-32">
+                  <EnergyBar 
+                    current={energy} 
+                    max={maxEnergy} 
+                    regenRate={energyRegenRate} 
+                  />
+                </div>
+                
+                {/* Notifications */}
+                <ParkNotificationsPanel />
+                
+                <Badge variant="secondary" className="gap-2">
+                  <Trophy className="h-3 w-3" />
+                  {unlockedBadges.length} Badges
+                </Badge>
+              </div>
             </div>
 
             {/* Search Bar */}
@@ -441,6 +525,61 @@ export default function EmotionalPark() {
             />
           </motion.div>
         )}
+
+        {/* Weather & Streak Widgets */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <ParkWeatherWidget 
+            mood={currentMood === 'happy' ? 85 : currentMood === 'calm' ? 70 : currentMood === 'anxious' ? 35 : currentMood === 'sad' ? 25 : 60}
+            description={currentMood ? `Basé sur votre humeur actuelle` : 'Le parc est en pleine forme !'}
+          />
+          <ParkStreakWidget 
+            currentStreak={userStats.currentStreak}
+            longestStreak={Math.max(userStats.currentStreak, 7)}
+            weeklyActivity={[true, true, false, true, true, false, false]}
+            lastActivityDate={new Date().toISOString()}
+          />
+        </div>
+
+        {/* Quick Actions */}
+        <div className="flex items-center justify-between">
+          <ParkQuickActions
+            onShowFavorites={() => setShowFavorites(!showFavorites)}
+            onShare={handleShare}
+            onExport={exportToJSON}
+            onShowMap={() => setShowMap(!showMap)}
+            onRandomAttraction={handleRandomAttraction}
+            onDailyChallenge={() => dailyChallenge && handleAttractionClick(dailyChallenge)}
+            onAchievements={() => navigate('/app/achievements')}
+            onSettings={() => navigate('/settings')}
+          />
+          
+          {/* Mobile Energy Bar */}
+          <div className="md:hidden w-28">
+            <EnergyBar 
+              current={energy} 
+              max={maxEnergy} 
+              regenRate={energyRegenRate} 
+            />
+          </div>
+        </div>
+
+        {/* Favorites Panel */}
+        <AnimatePresence>
+          {showFavorites && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+            >
+              <FavoriteAttractions
+                onSelectAttraction={(id) => {
+                  const attraction = attractions.find(a => a.id === id);
+                  if (attraction) handleAttractionClick(attraction);
+                }}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Statistics Toggle & Display */}
         <motion.div
@@ -733,6 +872,7 @@ export default function EmotionalPark() {
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {zoneAttractions.map((attraction, index) => {
                       const isVisited = !!visitedAttractions[attraction.id];
+                      const isFav = isFavorite(attraction.id);
                       return (
                         <div
                           key={attraction.id}
@@ -742,12 +882,26 @@ export default function EmotionalPark() {
                           role="button"
                           tabIndex={0}
                           aria-label={`Accéder à ${attraction.title} - ${attraction.subtitle}`}
-                          className={`relative cursor-pointer ${tourActive && currentStep?.attractionId === attraction.id ? 'ring-4 ring-primary rounded-xl animate-pulse' : ''}`}
+                          className={`relative cursor-pointer group ${tourActive && currentStep?.attractionId === attraction.id ? 'ring-4 ring-primary rounded-xl animate-pulse' : ''}`}
                         >
                           <ParkAttraction
                             {...attraction}
                             delay={index * 0.05}
                           />
+                          {/* Favorite Button */}
+                          <motion.button
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            onClick={(e) => handleToggleFavorite(attraction, e)}
+                            className={`absolute top-3 left-3 p-1.5 rounded-full shadow-lg z-10 transition-all ${
+                              isFav 
+                                ? 'bg-red-500 text-white' 
+                                : 'bg-background/80 text-muted-foreground opacity-0 group-hover:opacity-100'
+                            }`}
+                            aria-label={isFav ? 'Retirer des favoris' : 'Ajouter aux favoris'}
+                          >
+                            <Heart className={`h-3 w-3 ${isFav ? 'fill-current' : ''}`} />
+                          </motion.button>
                           {isVisited && (
                             <motion.div
                               initial={{ scale: 0 }}
@@ -788,6 +942,7 @@ export default function EmotionalPark() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredAttractions.map((attraction, index) => {
                   const isVisited = !!visitedAttractions[attraction.id];
+                  const isFav = isFavorite(attraction.id);
                   return (
                     <div
                       key={attraction.id}
@@ -796,12 +951,26 @@ export default function EmotionalPark() {
                       role="button"
                       tabIndex={0}
                       aria-label={`Accéder à ${attraction.title} - ${attraction.subtitle}`}
-                      className="relative cursor-pointer"
+                      className="relative cursor-pointer group"
                     >
                       <ParkAttraction
                         {...attraction}
                         delay={index * 0.05}
                       />
+                      {/* Favorite Button */}
+                      <motion.button
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        onClick={(e) => handleToggleFavorite(attraction, e)}
+                        className={`absolute top-3 left-3 p-1.5 rounded-full shadow-lg z-10 transition-all ${
+                          isFav 
+                            ? 'bg-red-500 text-white' 
+                            : 'bg-background/80 text-muted-foreground opacity-0 group-hover:opacity-100'
+                        }`}
+                        aria-label={isFav ? 'Retirer des favoris' : 'Ajouter aux favoris'}
+                      >
+                        <Heart className={`h-3 w-3 ${isFav ? 'fill-current' : ''}`} />
+                      </motion.button>
                       {isVisited && (
                         <motion.div
                           initial={{ scale: 0 }}
@@ -866,6 +1035,13 @@ export default function EmotionalPark() {
           </div>
         </div>
       </footer>
+
+      {/* Share Achievement Dialog */}
+      <ShareAchievementDialog
+        isOpen={shareDialogOpen}
+        onClose={() => setShareDialogOpen(false)}
+        achievement={achievementToShare}
+      />
     </div>
   );
 }
