@@ -10,12 +10,7 @@
 // ============================================================================
 
 export { MoodMixerView } from './MoodMixerView';
-
-// ============================================================================
-// SERVICE UNIFIÉ
-// ============================================================================
-
-export { MoodMixerService, moodMixerService } from './moodMixerServiceUnified';
+export * from './components';
 
 // ============================================================================
 // HOOKS
@@ -24,6 +19,13 @@ export { MoodMixerService, moodMixerService } from './moodMixerServiceUnified';
 export { useMoodMixer } from './useMoodMixer';
 export { useMoodMixerEnriched } from './useMoodMixerEnriched';
 export type { MoodComponent, MoodPreset, UseMoodMixerEnrichedReturn } from './useMoodMixerEnriched';
+export * from './hooks';
+
+// ============================================================================
+// SERVICE UNIFIÉ
+// ============================================================================
+
+export { MoodMixerService, moodMixerService } from './moodMixerServiceUnified';
 
 // ============================================================================
 // TYPES
