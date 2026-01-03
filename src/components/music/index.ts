@@ -21,6 +21,10 @@ export { default as AudioVisualizer } from './AudioVisualizer';
 export { default as QuotaWarningBanner } from './QuotaWarningBanner';
 export { default as OfflineDownloadButton } from './OfflineDownloadButton';
 export { default as EmotionLinkBanner } from './EmotionLinkBanner';
+export { default as MusicPageHeaderEnhanced } from './MusicPageHeaderEnhanced';
+export { default as MusicStatsDrawer } from './MusicStatsDrawer';
+export { default as PlaylistExportButton } from './PlaylistExportButton';
+export { default as AudioSourceBadge } from './AudioSourceBadge';
 
 // Hooks - exports nommés
 export { useMusicControls } from '@/hooks/useMusicControls';
