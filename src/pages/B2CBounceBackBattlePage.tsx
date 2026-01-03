@@ -4,12 +4,13 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Shield, BarChart2, ArrowLeft, History, Trophy } from 'lucide-react';
+import { Shield, BarChart2, ArrowLeft, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
 import { useBounceBattle } from '@/hooks/useBounceBattle';
 import { useBounceStore } from '@/store/bounce.store';
+import { useBattleFeedback } from '@/hooks/useBattleFeedback';
 import {
   BattleArena,
   CopingDebrief,
@@ -17,17 +18,24 @@ import {
   StatsPanel,
   ModeSelector,
   CompletionScreen,
-  BattleHistory
+  BattleHistory,
+  BattleTutorial
 } from '@/components/bounce-back';
 
 type ViewMode = 'battle' | 'stats';
 
+const TUTORIAL_KEY = 'bounce-back-tutorial-completed';
+
 const B2CBounceBackBattlePage: React.FC = () => {
   const [viewMode, setViewMode] = useState<ViewMode>('battle');
   const [showPairingModal, setShowPairingModal] = useState(false);
+  const [showTutorial, setShowTutorial] = useState(false);
   const [stats, setStats] = useState<any>(null);
   const [recentBattles, setRecentBattles] = useState<any[]>([]);
   const [statsLoading, setStatsLoading] = useState(false);
+  const [battleScore, setBattleScore] = useState(0);
+  
+  const feedback = useBattleFeedback();
 
   const {
     state,
@@ -51,6 +59,21 @@ const B2CBounceBackBattlePage: React.FC = () => {
       setShowPairingModal(true);
     }
   }, [phase, pairToken]);
+
+  // Check if tutorial should be shown
+  useEffect(() => {
+    const tutorialCompleted = localStorage.getItem(TUTORIAL_KEY);
+    if (!tutorialCompleted) {
+      setShowTutorial(true);
+    }
+  }, []);
+
+  // Trigger feedback on battle completion
+  useEffect(() => {
+    if (phase === 'completed') {
+      feedback.onBattleComplete();
+    }
+  }, [phase]);
 
   // Load stats when viewing stats tab
   useEffect(() => {
@@ -92,7 +115,22 @@ const B2CBounceBackBattlePage: React.FC = () => {
   };
 
   const handleSelectMode = (mode: string) => {
+    feedback.initAudio();
     start(mode as any);
+  };
+
+  const handleTutorialComplete = () => {
+    localStorage.setItem(TUTORIAL_KEY, 'true');
+    setShowTutorial(false);
+  };
+
+  const handleTutorialSkip = () => {
+    localStorage.setItem(TUTORIAL_KEY, 'true');
+    setShowTutorial(false);
+  };
+
+  const handleShowTutorial = () => {
+    setShowTutorial(true);
   };
 
   const handleDebriefSubmit = (answers: Array<{ id: string; value: 0 | 1 | 2 | 3 }>) => {
@@ -168,6 +206,8 @@ const B2CBounceBackBattlePage: React.FC = () => {
             onRestart={handleRestart}
             onViewStats={handleViewStats}
             tipReceived={tipReceived}
+            mode={state.mode}
+            score={battleScore}
           />
         );
 
@@ -183,6 +223,11 @@ const B2CBounceBackBattlePage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-destructive/5 to-muted/20 p-6" data-testid="page-root">
+      {/* Tutorial Modal */}
+      {showTutorial && (
+        <BattleTutorial onComplete={handleTutorialComplete} onSkip={handleTutorialSkip} />
+      )}
+
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <motion.div
@@ -190,8 +235,19 @@ const B2CBounceBackBattlePage: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-8"
         >
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-destructive to-warning rounded-full mb-4">
-            <Shield className="w-8 h-8 text-primary-foreground" />
+          <div className="relative inline-block">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-destructive to-warning rounded-full mb-4">
+              <Shield className="w-8 h-8 text-primary-foreground" />
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute -right-10 top-0"
+              onClick={handleShowTutorial}
+              aria-label="Afficher le tutoriel"
+            >
+              <HelpCircle className="w-5 h-5 text-muted-foreground" />
+            </Button>
           </div>
           <h1 className="text-3xl font-bold text-foreground mb-2">
             Bounce-Back Battle
