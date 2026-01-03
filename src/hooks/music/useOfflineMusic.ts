@@ -1,6 +1,6 @@
 /**
  * useOfflineMusic - Hook pour gérer le mode hors-ligne de la musique
- * Gère le cache des pistes via Service Worker et Cache API
+ * Gère le cache des pistes via Service Worker dédié et Cache API
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -25,27 +25,57 @@ interface UseOfflineMusicReturn {
   clearCache: () => Promise<void>;
   getCacheSize: () => Promise<number>;
   swSupported: boolean;
+  swRegistered: boolean;
 }
 
 const CACHE_NAME = 'emotionscare-audio-v1';
 const STORAGE_KEY = 'music:offline-tracks';
+const SW_MUSIC_URL = '/sw-music.js';
 
 export function useOfflineMusic(): UseOfflineMusicReturn {
   const { toast } = useToast();
   const [cachedTracks, setCachedTracks] = useState<CachedTrack[]>([]);
   const [isCaching, setIsCaching] = useState(false);
-  const [isOffline, setIsOffline] = useState(!navigator.onLine);
+  const [isOffline, setIsOffline] = useState(typeof navigator !== 'undefined' ? !navigator.onLine : false);
   const [swSupported, setSwSupported] = useState(false);
+  const [swRegistered, setSwRegistered] = useState(false);
 
-  // Check service worker support
+  // Check service worker support and register music SW
   useEffect(() => {
-    setSwSupported('serviceWorker' in navigator && 'caches' in window);
+    const supported = 'serviceWorker' in navigator && 'caches' in window;
+    setSwSupported(supported);
+    
+    if (supported && typeof navigator !== 'undefined') {
+      // Register the music-specific service worker
+      navigator.serviceWorker.register(SW_MUSIC_URL, { scope: '/app/music' })
+        .then((registration) => {
+          setSwRegistered(true);
+          logger.info('[useOfflineMusic] Music SW registered', { scope: registration.scope }, 'MUSIC');
+        })
+        .catch((error) => {
+          logger.warn('[useOfflineMusic] Music SW registration failed', { error: String(error) }, 'MUSIC');
+        });
+    }
   }, []);
 
   // Listen for online/offline events
   useEffect(() => {
-    const handleOnline = () => setIsOffline(false);
-    const handleOffline = () => setIsOffline(true);
+    if (typeof window === 'undefined') return;
+    
+    const handleOnline = () => {
+      setIsOffline(false);
+      toast({
+        title: '📡 Connexion rétablie',
+        description: 'Vous êtes de nouveau en ligne',
+      });
+    };
+    const handleOffline = () => {
+      setIsOffline(true);
+      toast({
+        title: '📴 Mode hors-ligne',
+        description: 'Utilisation du cache local',
+      });
+    };
 
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
@@ -54,7 +84,7 @@ export function useOfflineMusic(): UseOfflineMusicReturn {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
     };
-  }, []);
+  }, [toast]);
 
   // Load cached tracks from localStorage
   useEffect(() => {
@@ -215,6 +245,7 @@ export function useOfflineMusic(): UseOfflineMusicReturn {
     clearCache,
     getCacheSize,
     swSupported,
+    swRegistered,
   };
 }
 

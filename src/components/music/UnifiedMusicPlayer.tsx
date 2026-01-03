@@ -47,6 +47,7 @@ import {
 
 // Lazy load additional components
 const TrackLyrics = lazy(() => import('@/components/music/TrackLyrics'));
+const RealTimeLyricsPanel = lazy(() => import('@/components/music/RealTimeLyricsPanel'));
 const TrackExtendButton = lazy(() => import('@/components/music/TrackExtendButton'));
 const TrackFeedback = lazy(() => import('@/components/music/TrackFeedback'));
 const OfflineDownloadButton = lazy(() => import('@/components/music/OfflineDownloadButton'));
@@ -479,11 +480,17 @@ export const UnifiedMusicPlayer: React.FC<UnifiedMusicPlayerProps> = ({
           )}
         </div>
 
-        {/* Lyrics Panel */}
+        {/* Lyrics Panel - RealTimeLyricsPanel avec synchronisation */}
         {showLyrics && currentTrack && (
-          <Suspense fallback={<div className="p-4 text-center text-muted-foreground">Chargement...</div>}>
-            <div className="p-3 rounded-lg bg-muted/30 mt-2">
-              <TrackLyrics trackTitle={currentTrack.title} mood={currentTrack.mood} />
+          <Suspense fallback={<div className="p-4 text-center text-muted-foreground">Chargement des paroles...</div>}>
+            <div className="mt-2">
+              <RealTimeLyricsPanel
+                trackTitle={currentTrack.title}
+                trackMood={currentTrack.mood}
+                currentTime={currentTime}
+                onSeek={seek}
+                className="max-h-[300px]"
+              />
             </div>
           </Suspense>
         )}
