@@ -11,8 +11,15 @@ const corsHeaders = {
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
-// Stimuli templates
+// Stimuli templates for all 4 modes
 const STIMULI_TEMPLATES = {
+  quick: [
+    { kind: 'mail', payload: { subject: 'Rappel: Réunion bientôt', sender: 'team@work.com' }, at: 10 },
+    { kind: 'notif', payload: { app: 'Calendar', message: 'Événement dans 15 min' }, at: 25 },
+    { kind: 'timer', payload: { label: 'Pause café', remaining: 120 }, at: 40 },
+    { kind: 'mail', payload: { subject: 'Re: Question rapide', sender: 'colleague@work.com' }, at: 55 },
+    { kind: 'notif', payload: { app: 'Tasks', message: '2 tâches en attente' }, at: 70 },
+  ],
   standard: [
     { kind: 'mail', payload: { subject: 'URGENT: Réunion dans 5 minutes!', sender: 'manager@work.com' }, at: 15 },
     { kind: 'notif', payload: { app: 'News', message: 'Alerte: Marché en chute libre!' }, at: 35 },
@@ -23,7 +30,15 @@ const STIMULI_TEMPLATES = {
     { kind: 'notif', payload: { app: 'Calendar', message: 'Conflit d\'agenda détecté' }, at: 150 },
     { kind: 'timer', payload: { label: 'Appel important', remaining: 60 }, at: 170 },
   ],
-  intense: [
+  zen: [
+    { kind: 'notif', payload: { app: 'Wellness', message: 'Moment de respiration' }, at: 30 },
+    { kind: 'mail', payload: { subject: 'Newsletter hebdomadaire', sender: 'info@newsletter.com' }, at: 70 },
+    { kind: 'timer', payload: { label: 'Pause méditation', remaining: 300 }, at: 110 },
+    { kind: 'notif', payload: { app: 'Health', message: 'Objectif pas atteint' }, at: 150 },
+    { kind: 'mail', payload: { subject: 'Rappel abonnement', sender: 'service@app.com' }, at: 190 },
+    { kind: 'notif', payload: { app: 'Weather', message: 'Changement météo prévu' }, at: 220 },
+  ],
+  challenge: [
     { kind: 'mail', payload: { subject: 'CRITIQUE: Serveur en panne!', sender: 'ops@emergency.com' }, at: 10 },
     { kind: 'notif', payload: { app: 'Bank', message: 'Transaction inhabituelle détectée' }, at: 25 },
     { kind: 'timer', payload: { label: 'Présentation CEO', remaining: 180 }, at: 40 },
@@ -36,7 +51,18 @@ const STIMULI_TEMPLATES = {
     { kind: 'notif', payload: { app: 'News', message: 'Breaking: Crise économique' }, at: 170 },
     { kind: 'mail', payload: { subject: 'Erreur dans votre rapport!', sender: 'qa@work.com' }, at: 190 },
     { kind: 'timer', payload: { label: 'Fin imminente', remaining: 30 }, at: 210 },
+    { kind: 'notif', payload: { app: 'Security', message: 'Tentative de connexion suspecte' }, at: 240 },
+    { kind: 'mail', payload: { subject: 'URGENT: Appel immédiat requis', sender: 'ceo@company.com' }, at: 270 },
+    { kind: 'timer', payload: { label: 'Dernière chance', remaining: 15 }, at: 290 },
   ]
+};
+
+// Duration map for modes (in seconds)
+const DURATION_MAP: Record<string, number> = {
+  quick: 90,
+  standard: 180,
+  zen: 240,
+  challenge: 300
 };
 
 // Coaching messages based on coping scores
@@ -111,7 +137,7 @@ serve(async (req) => {
           success: true,
           battle_id: battle.id,
           stimuli,
-          duration: mode === 'intense' ? 240 : 180
+          duration: DURATION_MAP[mode] || 180
         }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
@@ -329,6 +355,26 @@ serve(async (req) => {
             average_duration_seconds: completed > 0 ? Math.round(totalDuration / completed) : 0,
             coping_averages: copingAvg
           }
+        }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      case 'history': {
+        const { limit = 10 } = body;
+
+        const { data: battles, error } = await supabase
+          .from('bounce_battles')
+          .select('id, mode, status, duration_seconds, started_at, ended_at')
+          .eq('user_id', user.id)
+          .order('started_at', { ascending: false })
+          .limit(limit);
+
+        if (error) throw error;
+
+        return new Response(JSON.stringify({
+          success: true,
+          battles: battles || []
         }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });

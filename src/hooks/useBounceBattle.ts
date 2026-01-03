@@ -215,7 +215,14 @@ export const useBounceBattle = () => {
 
   // Timer management
   const startTimer = useCallback(() => {
-    const duration = bounceStore.mode === 'intense' ? 240 : 180; // 4min vs 3min
+    // Duration based on mode: quick=90, standard=180, zen=240, challenge=300
+    const durationMap: Record<string, number> = {
+      quick: 90,
+      standard: 180,
+      zen: 240,
+      challenge: 300
+    };
+    const duration = durationMap[bounceStore.mode] || 180;
     bounceStore.updateTimeLeft(duration);
     
     timerRef.current = setInterval(() => {
@@ -306,10 +313,23 @@ export const useBounceBattle = () => {
     }
   }, [bounceStore]);
 
-  // Generate offline stimuli
-  const generateOfflineStimuli = useCallback((mode: 'standard' | 'intense') => {
-    const duration = mode === 'intense' ? 240 : 180;
-    const stimuliCount = mode === 'intense' ? 12 : 8;
+  // Generate offline stimuli for all modes
+  const generateOfflineStimuli = useCallback((mode: string) => {
+    const durationMap: Record<string, number> = {
+      quick: 90,
+      standard: 180,
+      zen: 240,
+      challenge: 300
+    };
+    const stimuliCountMap: Record<string, number> = {
+      quick: 5,
+      standard: 8,
+      zen: 6,
+      challenge: 15
+    };
+    
+    const duration = durationMap[mode] || 180;
+    const stimuliCount = stimuliCountMap[mode] || 8;
     
     const stimuli = [];
     for (let i = 0; i < stimuliCount; i++) {

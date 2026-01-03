@@ -22,10 +22,11 @@ import { Progress } from '@/components/ui/progress';
 interface StatsData {
   total_battles: number;
   completed_battles: number;
-  completion_rate: number;
+  completion_rate: number | string;
   total_duration_seconds: number;
   average_duration_seconds: number;
   coping_averages?: Record<string, number>;
+  coping_strategies_avg?: Record<string, number>; // Alternative key from service
 }
 
 interface StatsPanelProps {
@@ -79,9 +80,15 @@ export const StatsPanel: React.FC<StatsPanelProps> = ({ stats, isLoading }) => {
     );
   }
 
-  const copingEntries = stats.coping_averages 
-    ? Object.entries(stats.coping_averages)
+  // Handle both key names from different sources
+  const copingData = stats.coping_averages || stats.coping_strategies_avg;
+  const copingEntries = copingData 
+    ? Object.entries(copingData)
     : [];
+  
+  const completionRate = typeof stats.completion_rate === 'string' 
+    ? parseFloat(stats.completion_rate) 
+    : stats.completion_rate;
 
   return (
     <div className="space-y-6">
@@ -132,7 +139,7 @@ export const StatsPanel: React.FC<StatsPanelProps> = ({ stats, isLoading }) => {
             <CardContent className="pt-6 text-center">
               <TrendingUp className="w-8 h-8 mx-auto mb-2 text-info" />
               <div className="text-2xl font-bold text-foreground">
-                {stats.completion_rate.toFixed(0)}%
+                {completionRate.toFixed(0)}%
               </div>
               <div className="text-sm text-muted-foreground">
                 Taux de complétion
