@@ -25,8 +25,10 @@ export { default as MusicPageHeaderEnhanced } from './MusicPageHeaderEnhanced';
 export { default as MusicStatsDrawer } from './MusicStatsDrawer';
 export { default as PlaylistExportButton } from './PlaylistExportButton';
 export { default as AudioSourceBadge } from './AudioSourceBadge';
+export { default as RealTimeLyricsPanel } from './RealTimeLyricsPanel';
+export { MusicLyricsSynchronized } from './MusicLyricsSynchronized';
+export { default as TrackLyrics } from './TrackLyrics';
 
-// Hooks - exports nommés
 export { useMusicControls } from '@/hooks/useMusicControls';
 export { useAdaptiveMusic } from '@/hooks/useAdaptiveMusic';
 
