@@ -72,7 +72,7 @@ const useSimpleVoiceRecognition = () => {
 
 const VoiceCommands: React.FC = () => {
   const musicContext = useMusic();
-  const { state, play, pause, next, previous, stop: stopPlayback, setVolume } = musicContext;
+  const { state, play, pause, next, previous, stop: stopPlayback, setVolume, shufflePlaylist, setRepeatMode } = musicContext;
   const [lastCommand, setLastCommand] = useState<string>('');
   
   const { isListening, isSupported, transcript, start, stop } = useSimpleVoiceRecognition();
@@ -135,15 +135,20 @@ const VoiceCommands: React.FC = () => {
       }
     }
 
-    // Shuffle commands
+    // Shuffle commands - Connected to shufflePlaylist
     if (text.includes('aléatoire') || text.includes('shuffle') || text.includes('mélange')) {
-      toast.success('🔀 Mode aléatoire activé');
+      shufflePlaylist();
+      toast.success('🔀 Lecture aléatoire activée');
       return;
     }
 
-    // Repeat commands
+    // Repeat commands - Connected to setRepeatMode
     if (text.includes('répète') || text.includes('repeat') || text.includes('boucle')) {
-      toast.success('🔁 Mode répétition activé');
+      // Cycle through repeat modes
+      const newMode = state.repeatMode === 'none' ? 'all' : state.repeatMode === 'all' ? 'one' : 'none';
+      setRepeatMode(newMode);
+      const modeLabels = { none: 'désactivé', all: 'toutes les pistes', one: 'piste en cours' };
+      toast.success(`🔁 Mode répétition: ${modeLabels[newMode]}`);
       return;
     }
 
@@ -155,7 +160,7 @@ const VoiceCommands: React.FC = () => {
 
     // Unknown command
     toast.info('Commande non reconnue. Essayez: joue, pause, suivant, volume plus...');
-  }, [state, play, pause, next, previous, setVolume]);
+  }, [state, play, pause, next, previous, setVolume, shufflePlaylist, setRepeatMode]);
 
   const handleToggle = useCallback(() => {
     if (isListening) {
