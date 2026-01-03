@@ -49,6 +49,7 @@ import {
 const TrackLyrics = lazy(() => import('@/components/music/TrackLyrics'));
 const TrackExtendButton = lazy(() => import('@/components/music/TrackExtendButton'));
 const TrackFeedback = lazy(() => import('@/components/music/TrackFeedback'));
+const OfflineDownloadButton = lazy(() => import('@/components/music/OfflineDownloadButton'));
 
 interface UnifiedMusicPlayerProps {
   className?: string;
@@ -469,6 +470,11 @@ export const UnifiedMusicPlayer: React.FC<UnifiedMusicPlayerProps> = ({
           {currentTrack && (
             <Suspense fallback={null}>
               <TrackExtendButton track={currentTrack} size="sm" variant="outline" />
+            </Suspense>
+          )}
+          {currentTrack && (
+            <Suspense fallback={null}>
+              <OfflineDownloadButton track={currentTrack} size="sm" variant="outline" />
             </Suspense>
           )}
         </div>
