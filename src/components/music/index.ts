@@ -17,6 +17,11 @@ export { default as EmotionBasedMusicSelector } from './EmotionBasedMusicSelecto
 export { default as MusicTherapy } from './MusicTherapy';
 export { default as AudioVisualizer } from './AudioVisualizer';
 
+// New enriched components
+export { default as QuotaWarningBanner } from './QuotaWarningBanner';
+export { default as OfflineDownloadButton } from './OfflineDownloadButton';
+export { default as EmotionLinkBanner } from './EmotionLinkBanner';
+
 // Hooks - exports nommés
 export { useMusicControls } from '@/hooks/useMusicControls';
 export { useAdaptiveMusic } from '@/hooks/useAdaptiveMusic';

@@ -53,6 +53,11 @@ const MusicFocusSection = lazy(() => import('@/components/music/page/MusicFocusS
 const CollaborativePlaylistSection = lazy(() => import('@/components/music/page/CollaborativePlaylistSection').then(m => ({ default: m.CollaborativePlaylistSection })));
 const ExternalIntegrationsPanel = lazy(() => import('@/components/music/ExternalIntegrationsPanel').then(m => ({ default: m.ExternalIntegrationsPanel })));
 const ImmersiveMode = lazy(() => import('@/components/music/ImmersiveMode').then(m => ({ default: m.ImmersiveMode })));
+
+// Nouveaux composants enrichis
+import { QuotaWarningBanner } from '@/components/music/QuotaWarningBanner';
+import { EmotionLinkBanner } from '@/components/music/EmotionLinkBanner';
+
 // Composants statiques chargés immédiatement
 import {
   MusicPageHeader,
@@ -120,7 +125,7 @@ const B2CMusicEnhanced: React.FC = () => {
   const { updateChallengeProgress } = useGamification();
   
   // Hook Suno pour générer la musique à la demande
-  const { generateForVinyl, generationState } = useSunoVinyl();
+  const { generateForVinyl, generationState, credits } = useSunoVinyl();
   
   // Les vinyles avec URL vide initialement - sera rempli après génération
   const vinylTracks: VinylTrack[] = useMemo(() => {
@@ -295,6 +300,32 @@ const B2CMusicEnhanced: React.FC = () => {
         <div>
           {!playerVisible ? (
             <div className="space-y-8">
+              {/* Quota Warning */}
+              <QuotaWarningBanner 
+                remaining={generationState ? Object.keys(generationState).length : credits.remaining}
+                total={credits.total}
+                onUseFallback={() => {
+                  const demoTrack = vinylTracks[0];
+                  if (demoTrack) startTrack(demoTrack);
+                }}
+              />
+
+              {/* Lien avec émotions */}
+              <EmotionLinkBanner
+                onGenerateForEmotion={(mood) => {
+                  // Trouver un vinyl correspondant à l'humeur
+                  const moodMap: Record<string, string> = {
+                    calm: 'doux',
+                    energize: 'énergique',
+                    focus: 'créatif',
+                    meditation: 'guérison',
+                  };
+                  const category = moodMap[mood] || 'doux';
+                  const matchingTrack = vinylTracks.find(t => t.category === category);
+                  if (matchingTrack) startTrack(matchingTrack);
+                }}
+              />
+
               <VinylIntroduction />
 
               {/* Vinyles - Priorité haute */}
