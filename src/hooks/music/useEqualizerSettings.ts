@@ -37,7 +37,7 @@ const DEFAULT_SETTINGS: EqualizerSettings = {
 
 export function useEqualizerSettings() {
   const { value, setValue, isLoading, isSynced, saveNow } = useMusicSettings<EqualizerSettings>({
-    key: 'music:equalizer-settings' as any,
+    key: 'music:equalizer-settings',
     defaultValue: DEFAULT_SETTINGS,
     debounceMs: 300,
   });

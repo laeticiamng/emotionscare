@@ -33,7 +33,9 @@ type SettingKey =
   | 'music:progressbar-markers'
   | 'music:adaptive-playback'
   | 'music:integrations'
-  | 'music:email';
+  | 'music:email'
+  | 'music:equalizer-settings'
+  | 'music:listening-sessions';
 
 interface UseMusicSettingsOptions<T> {
   key: SettingKey;

@@ -16,6 +16,9 @@ export { default as EnhancedMusicRecommendations } from './EnhancedMusicRecommen
 export { default as EmotionBasedMusicSelector } from './EmotionBasedMusicSelector';
 export { default as MusicTherapy } from './MusicTherapy';
 export { default as AudioVisualizer } from './AudioVisualizer';
+export { default as AudioEqualizer } from './AudioEqualizer';
+export { UnifiedMusicPlayer } from './UnifiedMusicPlayer';
+export { default as FloatingMiniPlayer } from './FloatingMiniPlayer';
 
 // New enriched components
 export { default as QuotaWarningBanner } from './QuotaWarningBanner';
@@ -28,7 +31,14 @@ export { default as AudioSourceBadge } from './AudioSourceBadge';
 export { default as RealTimeLyricsPanel } from './RealTimeLyricsPanel';
 export { MusicLyricsSynchronized } from './MusicLyricsSynchronized';
 export { default as TrackLyrics } from './TrackLyrics';
+export { default as TrackFeedback } from './TrackFeedback';
+export { default as TrackExtendButton } from './TrackExtendButton';
 
+// Offline Mode
+export { default as OfflineModeManager } from './OfflineModeManager';
+export { default as CollaborativePlaylistUI } from './CollaborativePlaylistUI';
+
+// Hooks
 export { useMusicControls } from '@/hooks/useMusicControls';
 export { useAdaptiveMusic } from '@/hooks/useAdaptiveMusic';
 
