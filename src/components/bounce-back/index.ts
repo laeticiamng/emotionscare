@@ -9,3 +9,4 @@ export { PairingModal } from './PairingModal';
 export { StatsPanel } from './StatsPanel';
 export { ModeSelector } from './ModeSelector';
 export { CompletionScreen } from './CompletionScreen';
+export { BattleHistory } from './BattleHistory';

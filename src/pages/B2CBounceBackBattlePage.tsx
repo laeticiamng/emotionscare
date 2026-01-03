@@ -9,13 +9,15 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
 import { useBounceBattle } from '@/hooks/useBounceBattle';
+import { useBounceStore } from '@/store/bounce.store';
 import {
   BattleArena,
   CopingDebrief,
   PairingModal,
   StatsPanel,
   ModeSelector,
-  CompletionScreen
+  CompletionScreen,
+  BattleHistory
 } from '@/components/bounce-back';
 
 type ViewMode = 'battle' | 'stats';
@@ -24,6 +26,7 @@ const B2CBounceBackBattlePage: React.FC = () => {
   const [viewMode, setViewMode] = useState<ViewMode>('battle');
   const [showPairingModal, setShowPairingModal] = useState(false);
   const [stats, setStats] = useState<any>(null);
+  const [recentBattles, setRecentBattles] = useState<any[]>([]);
   const [statsLoading, setStatsLoading] = useState(false);
 
   const {
@@ -59,16 +62,26 @@ const B2CBounceBackBattlePage: React.FC = () => {
   const loadStats = async () => {
     setStatsLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke('bounce-back-battle', {
-        body: { action: 'stats' }
-      });
+      // Load stats and recent battles in parallel
+      const [statsResponse, battlesResponse] = await Promise.all([
+        supabase.functions.invoke('bounce-back-battle', {
+          body: { action: 'stats' }
+        }),
+        supabase.functions.invoke('bounce-back-battle', {
+          body: { action: 'history', limit: 10 }
+        })
+      ]);
       
-      if (error) throw error;
+      if (statsResponse.error) throw statsResponse.error;
       
-      if (data?.success && data?.stats) {
-        setStats(data.stats);
+      if (statsResponse.data?.success && statsResponse.data?.stats) {
+        setStats(statsResponse.data.stats);
       } else {
         setStats(null);
+      }
+      
+      if (battlesResponse.data?.success && battlesResponse.data?.battles) {
+        setRecentBattles(battlesResponse.data.battles);
       }
     } catch (error) {
       console.error('Failed to load stats', error);
@@ -91,9 +104,12 @@ const B2CBounceBackBattlePage: React.FC = () => {
     setShowPairingModal(false);
   };
 
+  // Access store directly for setPhase
+  const bounceStore = useBounceStore();
+
   const handlePairSkip = () => {
     setShowPairingModal(false);
-    state.setPhase('completed');
+    bounceStore.setPhase('completed');
   };
 
   const handleRestart = () => {
@@ -203,7 +219,7 @@ const B2CBounceBackBattlePage: React.FC = () => {
           </TabsContent>
 
           <TabsContent value="stats" className="mt-6">
-            <div className="max-w-3xl mx-auto">
+            <div className="max-w-4xl mx-auto space-y-6">
               <Button
                 variant="ghost"
                 onClick={handleBackToBattle}
@@ -212,7 +228,10 @@ const B2CBounceBackBattlePage: React.FC = () => {
                 <ArrowLeft className="w-4 h-4" />
                 Retour à la bataille
               </Button>
-              <StatsPanel stats={stats} isLoading={statsLoading} />
+              <div className="grid md:grid-cols-2 gap-6">
+                <StatsPanel stats={stats} isLoading={statsLoading} />
+                <BattleHistory battles={recentBattles} isLoading={statsLoading} />
+              </div>
             </div>
           </TabsContent>
         </Tabs>

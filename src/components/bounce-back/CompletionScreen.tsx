@@ -16,6 +16,7 @@ interface CompletionScreenProps {
   onRestart: () => void;
   onViewStats: () => void;
   tipReceived?: string | null;
+  xpEarned?: number;
 }
 
 export const CompletionScreen: React.FC<CompletionScreenProps> = ({
@@ -24,8 +25,11 @@ export const CompletionScreen: React.FC<CompletionScreenProps> = ({
   eventCount,
   onRestart,
   onViewStats,
-  tipReceived
+  tipReceived,
+  xpEarned
 }) => {
+  // Calculate XP if not provided (based on duration and events)
+  const calculatedXP = xpEarned ?? Math.round((duration / 60) * 10 + eventCount * 5);
   // Trigger confetti on mount
   React.useEffect(() => {
     confetti({
@@ -65,7 +69,7 @@ export const CompletionScreen: React.FC<CompletionScreenProps> = ({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        className="grid grid-cols-2 gap-4 mb-8"
+        className="grid grid-cols-3 gap-4 mb-8"
       >
         <Card>
           <CardContent className="pt-6">
@@ -81,6 +85,14 @@ export const CompletionScreen: React.FC<CompletionScreenProps> = ({
               {eventCount}
             </div>
             <div className="text-sm text-muted-foreground">Stimuli gérés</div>
+          </CardContent>
+        </Card>
+        <Card className="bg-warning/10 border-warning/30">
+          <CardContent className="pt-6">
+            <div className="text-3xl font-bold text-warning">
+              +{calculatedXP}
+            </div>
+            <div className="text-sm text-muted-foreground">XP gagnés</div>
           </CardContent>
         </Card>
       </motion.div>
