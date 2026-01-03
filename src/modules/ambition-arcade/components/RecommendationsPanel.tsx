@@ -129,9 +129,20 @@ export const RecommendationsPanel: React.FC<RecommendationsPanelProps> = ({ onSe
   return (
     <Card className="border-dashed border-info/30 bg-gradient-to-br from-info/5 to-transparent">
       <CardHeader className="pb-2">
-        <CardTitle className="flex items-center gap-2 text-lg">
-          <Lightbulb className="w-5 h-5 text-info" />
-          Suggestions
+        <CardTitle className="flex items-center justify-between text-lg">
+          <div className="flex items-center gap-2">
+            <Lightbulb className="w-5 h-5 text-info" />
+            Suggestions
+          </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => refetch()}
+            className="h-8 w-8"
+            aria-label="Rafraîchir les suggestions"
+          >
+            <RefreshCw className="w-4 h-4" />
+          </Button>
         </CardTitle>
         <CardDescription>Basées sur votre activité</CardDescription>
       </CardHeader>

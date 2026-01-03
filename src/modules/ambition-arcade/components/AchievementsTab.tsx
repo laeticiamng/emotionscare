@@ -1,5 +1,6 @@
 /**
  * Onglet des achievements/succès Ambition Arcade
+ * Avec partage social intégré
  */
 import React from 'react';
 import { motion } from 'framer-motion';
@@ -9,6 +10,7 @@ import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Lock, Trophy } from 'lucide-react';
 import { useAmbitionAchievements, type Achievement } from '../hooks';
+import { ShareAchievement } from './ShareAchievement';
 
 const RARITY_COLORS: Record<string, string> = {
   common: 'bg-muted text-muted-foreground',
@@ -76,15 +78,27 @@ const AchievementCard: React.FC<AchievementCardProps> = ({ achievement, index })
             </div>
 
             {achievement.unlocked && (
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ type: 'spring', delay: index * 0.05 + 0.2 }}
-              >
-                <div className="w-8 h-8 rounded-full bg-success/20 flex items-center justify-center">
-                  <Trophy className="w-4 h-4 text-success" />
-                </div>
-              </motion.div>
+              <div className="flex items-center gap-2">
+                {/* Share button for unlocked achievements */}
+                <ShareAchievement
+                  type="achievement"
+                  title={achievement.name}
+                  description={achievement.description}
+                  icon={achievement.icon}
+                  stats={[
+                    { label: 'Rareté', value: RARITY_LABELS[achievement.rarity] }
+                  ]}
+                />
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: 'spring', delay: index * 0.05 + 0.2 }}
+                >
+                  <div className="w-8 h-8 rounded-full bg-success/20 flex items-center justify-center">
+                    <Trophy className="w-4 h-4 text-success" />
+                  </div>
+                </motion.div>
+              </div>
             )}
           </div>
         </CardContent>

@@ -1,13 +1,17 @@
 /**
  * Page Ambition Arcade - Gamification d'objectifs
+ * Module complet avec tutoriel, leaderboard, calendrier et paramètres
  */
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ArrowLeft, Gamepad2, Target, TrendingUp, Trophy, Plus, Lightbulb, Flame } from 'lucide-react';
+import { 
+  ArrowLeft, Gamepad2, Target, TrendingUp, Trophy, Plus, 
+  Lightbulb, Flame, Users, Calendar, Settings, HelpCircle 
+} from 'lucide-react';
 import { useAmbitionGoals, useAmbitionStats, useAmbitionNotifications } from '@/modules/ambition-arcade/hooks';
 import { GoalCard } from '@/modules/ambition-arcade/components/GoalCard';
 import { GoalCreator } from '@/modules/ambition-arcade/components/GoalCreator';
@@ -19,6 +23,12 @@ import { ExportButton } from '@/modules/ambition-arcade/components/ExportButton'
 import { ProgressChart } from '@/modules/ambition-arcade/components/ProgressChart';
 import { DailyStreak } from '@/modules/ambition-arcade/components/DailyStreak';
 import { GlobalArtifactGallery } from '@/modules/ambition-arcade/components/GlobalArtifactGallery';
+import { Leaderboard } from '@/modules/ambition-arcade/components/Leaderboard';
+import { CalendarView } from '@/modules/ambition-arcade/components/CalendarView';
+import { SettingsPanel } from '@/modules/ambition-arcade/components/SettingsPanel';
+import { OnboardingTutorial } from '@/modules/ambition-arcade/components/OnboardingTutorial';
+
+const TUTORIAL_KEY = 'ambition-arcade-tutorial-seen';
 
 const B2CAmbitionArcadePage: React.FC = () => {
   const [showCreator, setShowCreator] = useState(false);
@@ -26,12 +36,32 @@ const B2CAmbitionArcadePage: React.FC = () => {
   const [sortBy, setSortBy] = useState<GoalSortOption>('newest');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [showTutorial, setShowTutorial] = useState(false);
+  const [activeTab, setActiveTab] = useState('goals');
 
   const { data: goals, isLoading: goalsLoading } = useAmbitionGoals();
   const { data: stats } = useAmbitionStats();
   
   // Enable realtime notifications
   useAmbitionNotifications();
+
+  // Check if first visit to show tutorial
+  useEffect(() => {
+    const seen = localStorage.getItem(TUTORIAL_KEY);
+    if (!seen) {
+      setShowTutorial(true);
+    }
+  }, []);
+
+  const handleTutorialComplete = () => {
+    localStorage.setItem(TUTORIAL_KEY, 'true');
+    setShowTutorial(false);
+  };
+
+  const handleTutorialSkip = () => {
+    localStorage.setItem(TUTORIAL_KEY, 'true');
+    setShowTutorial(false);
+  };
 
   // Extract all unique tags
   const availableTags = useMemo(() => {
@@ -106,7 +136,15 @@ const B2CAmbitionArcadePage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-muted/20 p-4 md:p-6" data-testid="page-root">
-      {/* Back Button & Export */}
+      {/* Onboarding Tutorial */}
+      {showTutorial && (
+        <OnboardingTutorial
+          onComplete={handleTutorialComplete}
+          onSkip={handleTutorialSkip}
+        />
+      )}
+
+      {/* Back Button & Actions */}
       <div className="max-w-6xl mx-auto mb-4 flex items-center justify-between">
         <Link to="/app/home">
           <Button variant="ghost" size="sm" className="gap-2">
@@ -114,7 +152,17 @@ const B2CAmbitionArcadePage: React.FC = () => {
             Retour au menu
           </Button>
         </Link>
-        <ExportButton />
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setShowTutorial(true)}
+            aria-label="Voir le tutoriel"
+          >
+            <HelpCircle className="w-4 h-4" />
+          </Button>
+          <ExportButton />
+        </div>
       </div>
 
       <div className="max-w-6xl mx-auto">
@@ -151,26 +199,69 @@ const B2CAmbitionArcadePage: React.FC = () => {
           )}
         </motion.div>
 
-        {/* Tabs */}
-        <Tabs defaultValue="goals" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="goals" className="gap-2">
+        {/* Tabs - Extended with Leaderboard, Calendar, Settings */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <TabsList className="grid w-full grid-cols-4 md:grid-cols-7">
+            <TabsTrigger value="goals" className="gap-1 text-xs md:text-sm">
               <Target className="w-4 h-4" />
-              Objectifs
+              <span className="hidden md:inline">Objectifs</span>
             </TabsTrigger>
-            <TabsTrigger value="suggestions" className="gap-2">
+            <TabsTrigger value="suggestions" className="gap-1 text-xs md:text-sm">
               <Lightbulb className="w-4 h-4" />
-              Suggestions
+              <span className="hidden md:inline">Suggestions</span>
             </TabsTrigger>
-            <TabsTrigger value="progress" className="gap-2">
+            <TabsTrigger value="progress" className="gap-1 text-xs md:text-sm">
               <TrendingUp className="w-4 h-4" />
-              Progression
+              <span className="hidden md:inline">Progression</span>
             </TabsTrigger>
-            <TabsTrigger value="achievements" className="gap-2">
+            <TabsTrigger value="achievements" className="gap-1 text-xs md:text-sm">
               <Trophy className="w-4 h-4" />
-              Succès
+              <span className="hidden md:inline">Succès</span>
+            </TabsTrigger>
+            <TabsTrigger value="leaderboard" className="gap-1 text-xs md:text-sm hidden md:flex">
+              <Users className="w-4 h-4" />
+              <span className="hidden md:inline">Classement</span>
+            </TabsTrigger>
+            <TabsTrigger value="calendar" className="gap-1 text-xs md:text-sm hidden md:flex">
+              <Calendar className="w-4 h-4" />
+              <span className="hidden md:inline">Calendrier</span>
+            </TabsTrigger>
+            <TabsTrigger value="settings" className="gap-1 text-xs md:text-sm hidden md:flex">
+              <Settings className="w-4 h-4" />
+              <span className="hidden md:inline">Paramètres</span>
             </TabsTrigger>
           </TabsList>
+
+          {/* Mobile additional tabs */}
+          <div className="flex md:hidden gap-2 overflow-x-auto pb-2">
+            <Button
+              variant={activeTab === 'leaderboard' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setActiveTab('leaderboard')}
+              className="gap-1 shrink-0"
+            >
+              <Users className="w-3 h-3" />
+              Classement
+            </Button>
+            <Button
+              variant={activeTab === 'calendar' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setActiveTab('calendar')}
+              className="gap-1 shrink-0"
+            >
+              <Calendar className="w-3 h-3" />
+              Calendrier
+            </Button>
+            <Button
+              variant={activeTab === 'settings' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setActiveTab('settings')}
+              className="gap-1 shrink-0"
+            >
+              <Settings className="w-3 h-3" />
+              Paramètres
+            </Button>
+          </div>
 
           {/* Goals Tab */}
           <TabsContent value="goals" className="space-y-6">
@@ -286,6 +377,21 @@ const B2CAmbitionArcadePage: React.FC = () => {
           {/* Achievements Tab */}
           <TabsContent value="achievements">
             <AchievementsTab />
+          </TabsContent>
+
+          {/* Leaderboard Tab */}
+          <TabsContent value="leaderboard">
+            <Leaderboard />
+          </TabsContent>
+
+          {/* Calendar Tab */}
+          <TabsContent value="calendar">
+            <CalendarView />
+          </TabsContent>
+
+          {/* Settings Tab */}
+          <TabsContent value="settings">
+            <SettingsPanel />
           </TabsContent>
         </Tabs>
       </div>
