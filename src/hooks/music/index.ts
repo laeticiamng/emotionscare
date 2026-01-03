@@ -14,8 +14,10 @@ export { useMusicAccessibilitySettings, useQuotaIndicatorData } from './useMusic
 export { useMusicHistory, useLastPlayedTrack } from './useMusicSettings';
 export { useCachedTracks, useMusicQueue, useMusicPlayerFavorites } from './useMusicSettings';
 export { useMusicPlayerStats, useTrackRatings, useTrackPlayCounts } from './useMusicSettings';
-export { useShortcutsSeen, useMusicListeningStats } from './useMusicSettings';
-export type { MusicListeningStats } from './useMusicSettings';
+export { useShortcutsSeen } from './useMusicSettings';
+
+// Listening Stats - Hook complet avec données Supabase
+export { default as useMusicListeningStats } from './useMusicListeningStats';
 
 // Equalizer
 export { useEqualizerSettings } from './useEqualizerSettings';
@@ -26,6 +28,9 @@ export { useLyricsGeneration } from './useLyricsGeneration';
 export { useSyncedLyrics } from './useSyncedLyrics';
 export { useMusicCache } from './useMusicCache';
 export { useOfflineMusic } from './useOfflineMusic';
+
+// Haptic feedback for mobile
+export { useHapticFeedback } from './useHapticFeedback';
 
 // Re-export for backward compatibility
 export type { MusicHookOptions } from '../useMusicRecommendation';
