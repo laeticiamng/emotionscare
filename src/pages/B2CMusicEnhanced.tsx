@@ -57,6 +57,9 @@ const ImmersiveMode = lazy(() => import('@/components/music/ImmersiveMode').then
 // Nouveaux composants enrichis
 import { QuotaWarningBanner } from '@/components/music/QuotaWarningBanner';
 import { EmotionLinkBanner } from '@/components/music/EmotionLinkBanner';
+import { MusicPageHeaderEnhanced } from '@/components/music/MusicPageHeaderEnhanced';
+import { MusicStatsDrawer } from '@/components/music/MusicStatsDrawer';
+import { AudioSourceBadge } from '@/components/music/AudioSourceBadge';
 
 // Composants statiques chargés immédiatement
 import {
@@ -175,8 +178,10 @@ const B2CMusicEnhanced: React.FC = () => {
   const { value: playHistory } = useMusicHistory();
   const { setValue: setLastPlayed } = useLastPlayedTrack();
   const [voiceCoachEnabled, setVoiceCoachEnabled] = useState(true);
+  const [voiceCommandsEnabled, setVoiceCommandsEnabled] = useState(false);
   const [sessionState] = useState<'idle' | 'active' | 'break' | 'completed'>('idle');
   const [showImmersive, setShowImmersive] = useState(false);
+  const [showStatsDrawer, setShowStatsDrawer] = useState(false);
   
   // Préférences musicales
   const { hasPreferences, isLoading: prefsLoading, refreshPreferences } = useUserMusicPreferences();
@@ -272,9 +277,18 @@ const B2CMusicEnhanced: React.FC = () => {
     <div className="min-h-full bg-background p-8">
       {showReward && <RewardSystem type="crystal" message="Harmonie créée ♪" onComplete={() => setShowReward(false)} />}
 
-      <MusicPageHeader 
+      <MusicPageHeaderEnhanced 
         hasPreferences={hasPreferences} 
-        onOpenPreferences={() => setShowPreferencesModal(true)} 
+        onOpenPreferences={() => setShowPreferencesModal(true)}
+        onOpenImmersive={() => state.currentTrack && setShowImmersive(true)}
+        voiceEnabled={voiceCommandsEnabled}
+        onToggleVoice={() => setVoiceCommandsEnabled(!voiceCommandsEnabled)}
+        onOpenStats={() => setShowStatsDrawer(true)}
+      />
+
+      <MusicStatsDrawer 
+        open={showStatsDrawer} 
+        onClose={() => setShowStatsDrawer(false)} 
       />
 
       <MusicPreferencesModal
@@ -426,7 +440,7 @@ const B2CMusicEnhanced: React.FC = () => {
         </div>
 
         <VoiceCoach sessionState={sessionState} enabled={voiceCoachEnabled} onToggle={setVoiceCoachEnabled} />
-        <VoiceCommands />
+        {voiceCommandsEnabled && <VoiceCommands />}
 
         <FloatingMiniPlayer
           currentTrack={state.currentTrack}

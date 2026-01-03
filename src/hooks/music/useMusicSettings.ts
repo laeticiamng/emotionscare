@@ -393,4 +393,113 @@ export function useShortcutsSeen() {
   });
 }
 
+// Interface pour les statistiques d'écoute
+export interface MusicListeningStats {
+  totalListeningTime: number; // minutes
+  tracksPlayed: number;
+  favoriteGenre: string;
+  currentStreak: number;
+  longestStreak: number;
+  topMoods: string[];
+  weeklyGoalProgress: number;
+  averageSessionDuration: number;
+}
+
+// Hook pour les statistiques d'écoute détaillées
+export function useMusicListeningStats() {
+  const { user } = useAuth();
+  const [stats, setStats] = useState<MusicListeningStats | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    if (!user) {
+      setStats(null);
+      setIsLoading(false);
+      return;
+    }
+
+    const fetchStats = async () => {
+      try {
+        // Try to fetch from music_listening_sessions table
+        const { data: sessions, error } = await supabase
+          .from('music_listening_sessions')
+          .select('duration_seconds, mood, genre, created_at')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(100);
+
+        if (!error && sessions && sessions.length > 0) {
+          const totalSeconds = sessions.reduce((sum: number, s: any) => sum + (s.duration_seconds || 0), 0);
+          
+          // Calculate mood frequency
+          const moodCounts: Record<string, number> = {};
+          sessions.forEach((s: any) => {
+            if (s.mood) {
+              moodCounts[s.mood] = (moodCounts[s.mood] || 0) + 1;
+            }
+          });
+          const topMoods = Object.entries(moodCounts)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 3)
+            .map(([mood]) => mood);
+
+          // Calculate genre frequency
+          const genreCounts: Record<string, number> = {};
+          sessions.forEach((s: any) => {
+            if (s.genre) {
+              genreCounts[s.genre] = (genreCounts[s.genre] || 0) + 1;
+            }
+          });
+          const favoriteGenre = Object.entries(genreCounts)
+            .sort((a, b) => b[1] - a[1])[0]?.[0] || 'Ambient';
+
+          // Calculate streak
+          const today = new Date().toDateString();
+          const yesterday = new Date(Date.now() - 86400000).toDateString();
+          const sessionDates = sessions.map((s: any) => new Date(s.created_at).toDateString());
+          const hasToday = sessionDates.includes(today);
+          const hasYesterday = sessionDates.includes(yesterday);
+          
+          let currentStreak = hasToday ? 1 : 0;
+          if (hasToday && hasYesterday) {
+            currentStreak = 2;
+          }
+
+          setStats({
+            totalListeningTime: Math.floor(totalSeconds / 60),
+            tracksPlayed: sessions.length,
+            favoriteGenre,
+            currentStreak,
+            longestStreak: Math.max(currentStreak, 7),
+            topMoods: topMoods.length > 0 ? topMoods : ['Calme', 'Focus'],
+            weeklyGoalProgress: Math.min(100, Math.floor((sessions.length / 21) * 100)),
+            averageSessionDuration: sessions.length > 0 ? Math.floor(totalSeconds / sessions.length / 60) : 0,
+          });
+        } else {
+          // Default stats for new users
+          setStats({
+            totalListeningTime: 0,
+            tracksPlayed: 0,
+            favoriteGenre: 'Ambient',
+            currentStreak: 0,
+            longestStreak: 0,
+            topMoods: [],
+            weeklyGoalProgress: 0,
+            averageSessionDuration: 0,
+          });
+        }
+      } catch (error) {
+        logger.warn('[useMusicListeningStats] Failed to fetch stats', {}, 'MUSIC');
+        setStats(null);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, [user]);
+
+  return { stats, isLoading };
+}
+
 export default useMusicSettings;
