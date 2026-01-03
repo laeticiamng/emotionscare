@@ -10,3 +10,5 @@ export { StatsPanel } from './StatsPanel';
 export { ModeSelector } from './ModeSelector';
 export { CompletionScreen } from './CompletionScreen';
 export { BattleHistory } from './BattleHistory';
+export { BattleTutorial } from './BattleTutorial';
+

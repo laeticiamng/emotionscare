@@ -70,6 +70,8 @@ export const CopingDebrief: React.FC<CopingDebriefProps> = ({ onSubmit, isLoadin
   const question = COPING_QUESTIONS[currentQuestion];
   const Icon = question.icon;
 
+  const [showReview, setShowReview] = useState(false);
+
   const handleNext = () => {
     if (selectedValue === undefined) return;
 
@@ -85,20 +87,108 @@ export const CopingDebrief: React.FC<CopingDebriefProps> = ({ onSubmit, isLoadin
     if (currentQuestion < COPING_QUESTIONS.length - 1) {
       setCurrentQuestion(currentQuestion + 1);
     } else {
-      onSubmit(updatedAnswers);
+      // Show review before submitting
+      setShowReview(true);
     }
+  };
+
+  const handleConfirmSubmit = () => {
+    onSubmit(answers);
+  };
+
+  const handleEditAnswer = (index: number) => {
+    setCurrentQuestion(index);
+    setSelectedValue(String(answers[index].value));
+    // Remove this and subsequent answers
+    setAnswers(answers.slice(0, index));
+    setShowReview(false);
   };
 
   const isLastQuestion = currentQuestion === COPING_QUESTIONS.length - 1;
 
+  // Review mode - show summary of answers before final submission
+  if (showReview) {
+    return (
+      <Card className="max-w-2xl mx-auto">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Check className="w-5 h-5 text-success" />
+            Récapitulatif de vos réponses
+          </CardTitle>
+          <CardDescription>
+            Vérifiez vos réponses avant de soumettre
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {answers.map((answer, index) => {
+            const q = COPING_QUESTIONS[index];
+            const Icon = q.icon;
+            const responseLabel = RESPONSE_OPTIONS.find(o => o.value === answer.value);
+            
+            return (
+              <motion.div
+                key={q.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.05 }}
+                className="flex items-center justify-between p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors cursor-pointer"
+                onClick={() => handleEditAnswer(index)}
+                role="button"
+                aria-label={`Modifier la réponse pour ${q.question}`}
+              >
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-primary/10 rounded-lg">
+                    <Icon className="w-4 h-4 text-primary" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-foreground">{q.question}</p>
+                  </div>
+                </div>
+                <span className={`text-sm font-medium ${responseLabel?.color}`}>
+                  {responseLabel?.label}
+                </span>
+              </motion.div>
+            );
+          })}
+          
+          <div className="flex justify-between pt-4">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowReview(false);
+                setCurrentQuestion(answers.length - 1);
+                setSelectedValue(String(answers[answers.length - 1].value));
+                setAnswers(answers.slice(0, -1));
+              }}
+            >
+              Retour
+            </Button>
+            <Button
+              onClick={handleConfirmSubmit}
+              disabled={isLoading}
+              className="gap-2"
+            >
+              {isLoading ? 'Analyse en cours...' : (
+                <>
+                  Confirmer et terminer
+                  <Check className="w-4 h-4" />
+                </>
+              )}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
-    <Card className="max-w-2xl mx-auto">
+    <Card className="max-w-2xl mx-auto" role="form" aria-label="Questionnaire de coping">
       <CardHeader>
         <div className="flex items-center justify-between mb-4">
           <span className="text-sm text-muted-foreground">
             Question {currentQuestion + 1} / {COPING_QUESTIONS.length}
           </span>
-          <Progress value={progress} className="w-32 h-2" />
+          <Progress value={progress} className="w-32 h-2" aria-label={`Progression: ${Math.round(progress)}%`} />
         </div>
         
         <motion.div
@@ -108,7 +198,7 @@ export const CopingDebrief: React.FC<CopingDebriefProps> = ({ onSubmit, isLoadin
           className="flex items-start gap-4"
         >
           <div className="p-3 bg-primary/10 rounded-xl">
-            <Icon className="w-6 h-6 text-primary" />
+            <Icon className="w-6 h-6 text-primary" aria-hidden="true" />
           </div>
           <div>
             <CardTitle className="text-lg mb-1">{question.question}</CardTitle>
@@ -128,6 +218,7 @@ export const CopingDebrief: React.FC<CopingDebriefProps> = ({ onSubmit, isLoadin
             value={selectedValue}
             onValueChange={setSelectedValue}
             className="grid grid-cols-2 gap-3"
+            aria-label="Options de réponse"
           >
             {RESPONSE_OPTIONS.map((option) => (
               <Label
@@ -163,26 +254,42 @@ export const CopingDebrief: React.FC<CopingDebriefProps> = ({ onSubmit, isLoadin
             ))}
           </RadioGroup>
 
-          <div className="flex justify-end mt-6">
-            <Button
-              onClick={handleNext}
-              disabled={selectedValue === undefined || isLoading}
-              className="gap-2"
-            >
-              {isLoading ? (
-                'Analyse en cours...'
-              ) : isLastQuestion ? (
-                <>
-                  Terminer
-                  <Check className="w-4 h-4" />
-                </>
-              ) : (
-                <>
-                  Suivant
-                  <ChevronRight className="w-4 h-4" />
-                </>
-              )}
-            </Button>
+          <div className="flex justify-between mt-6">
+            {currentQuestion > 0 && (
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  if (currentQuestion > 0) {
+                    setCurrentQuestion(currentQuestion - 1);
+                    setSelectedValue(String(answers[currentQuestion - 1]?.value ?? ''));
+                    setAnswers(answers.slice(0, -1));
+                  }
+                }}
+              >
+                Précédent
+              </Button>
+            )}
+            <div className={currentQuestion === 0 ? 'ml-auto' : ''}>
+              <Button
+                onClick={handleNext}
+                disabled={selectedValue === undefined || isLoading}
+                className="gap-2"
+              >
+                {isLoading ? (
+                  'Analyse en cours...'
+                ) : isLastQuestion ? (
+                  <>
+                    Vérifier
+                    <Check className="w-4 h-4" />
+                  </>
+                ) : (
+                  <>
+                    Suivant
+                    <ChevronRight className="w-4 h-4" />
+                  </>
+                )}
+              </Button>
+            </div>
           </div>
         </motion.div>
       </CardContent>
