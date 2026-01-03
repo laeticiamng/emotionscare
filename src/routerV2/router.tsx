@@ -68,6 +68,7 @@ const B2CMusicEnhanced = lazy(() => import('@/pages/B2CMusicEnhanced'));
 const MusicTherapyPage = lazy(() => import('@/pages/MusicTherapyPage'));
 const MusicAnalyticsPage = lazy(() => import('@/pages/MusicAnalyticsPage'));
 const MusicProfilePage = lazy(() => import('@/pages/MusicProfilePage'));
+const CollaborativePlaylistPage = lazy(() => import('@/pages/CollaborativePlaylistPage'));
 const AdvancedAnalyticsPage = lazy(() => import('@/pages/AdvancedAnalyticsPage'));
 // EmotionMusicPage supprimé - utiliser MusicTherapyPage ou B2CMusicEnhanced
 const B2CAICoachPage = lazy(() => import('@/pages/B2CAICoachPage'));
@@ -559,6 +560,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   B2CDashboardPage,
   // B2CMusicEnhancedPage - alias pour registry
   B2CMusicEnhancedPage: B2CMusicEnhanced,
+  CollaborativePlaylistPage,
   // B2BCollabDashboardPage et B2BRHDashboardPage - alias pour registry
   B2BCollabDashboardPage: B2BCollabDashboard,
   B2BRHDashboardPage: B2BRHDashboard,

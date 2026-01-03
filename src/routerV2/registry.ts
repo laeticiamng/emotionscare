@@ -361,6 +361,16 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     requireAuth: true,
   },
   {
+    name: 'music-collab',
+    path: '/app/music/collab/:playlistId',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'simple',
+    component: 'CollaborativePlaylistPage',
+    guard: false,
+    requireAuth: false,
+  },
+  {
     name: 'parcours-xl',
     path: '/app/parcours-xl',
     segment: 'public',

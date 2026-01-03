@@ -10,6 +10,7 @@ export { useMusicEmotionIntegration } from '../useMusicEmotionIntegration';
 export { useLyricsGeneration } from './useLyricsGeneration';
 export { useSyncedLyrics } from './useSyncedLyrics';
 export { useMusicCache } from './useMusicCache';
+export { useOfflineMusic } from './useOfflineMusic';
 
 // Re-export for backward compatibility
 export type { MusicHookOptions } from '../useMusicRecommendation';
