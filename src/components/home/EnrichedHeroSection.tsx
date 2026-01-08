@@ -64,7 +64,7 @@ const EnrichedHeroSection: React.FC = () => {
         {!prefersReducedMotion ? (
           <>
             <motion.div
-              className="absolute top-1/4 left-1/4 w-[40rem] h-[40rem] bg-gradient-to-br from-primary/15 to-transparent rounded-full mix-blend-multiply filter blur-3xl"
+              className="absolute top-1/4 left-1/4 w-[40rem] h-[40rem] bg-gradient-to-br from-primary/10 to-transparent rounded-full blur-3xl"
               style={{ willChange: 'transform' }}
               animate={{
                 y: [0, 50, 0],
@@ -79,7 +79,7 @@ const EnrichedHeroSection: React.FC = () => {
               }}
             />
             <motion.div
-              className="absolute bottom-1/4 right-1/4 w-[35rem] h-[35rem] bg-gradient-to-br from-blue-500/10 to-cyan-500/5 rounded-full mix-blend-multiply filter blur-3xl"
+              className="absolute bottom-1/4 right-1/4 w-[35rem] h-[35rem] bg-gradient-to-br from-blue-500/8 to-transparent rounded-full blur-3xl"
               style={{ willChange: 'transform' }}
               animate={{
                 y: [0, -40, 0],
@@ -95,8 +95,8 @@ const EnrichedHeroSection: React.FC = () => {
           </>
         ) : (
           <>
-            <div className="absolute top-1/4 left-1/4 w-[40rem] h-[40rem] bg-gradient-to-br from-primary/15 to-transparent rounded-full mix-blend-multiply filter blur-3xl" />
-            <div className="absolute bottom-1/4 right-1/4 w-[35rem] h-[35rem] bg-gradient-to-br from-blue-500/10 to-cyan-500/5 rounded-full mix-blend-multiply filter blur-3xl" />
+            <div className="absolute top-1/4 left-1/4 w-[40rem] h-[40rem] bg-gradient-to-br from-primary/10 to-transparent rounded-full blur-3xl" />
+            <div className="absolute bottom-1/4 right-1/4 w-[35rem] h-[35rem] bg-gradient-to-br from-blue-500/8 to-transparent rounded-full blur-3xl" />
           </>
         )}
       </div>
