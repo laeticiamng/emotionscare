@@ -99,18 +99,28 @@ const TrackList: React.FC<TrackListProps> = ({
 
   return (
     <div className="space-y-2">
-      {/* Playlist controls */}
+      {/* Playlist controls - responsive */}
       {showActions && tracks.length > 1 && (
-        <div className="flex items-center gap-2 pb-2 border-b border-border/50">
-          <Button size="sm" variant="secondary" onClick={handlePlayAll} className="gap-2">
-            <Play className="h-3 w-3" />
-            Tout lire
+        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 pb-2 border-b border-border/50">
+          <Button 
+            size="sm" 
+            variant="secondary" 
+            onClick={handlePlayAll} 
+            className="gap-1 sm:gap-2 h-7 sm:h-8 text-xs sm:text-sm px-2 sm:px-3"
+          >
+            <Play className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
+            <span className="hidden xs:inline">Tout</span> lire
           </Button>
-          <Button size="sm" variant="outline" onClick={handleShufflePlay} className="gap-2">
-            <Shuffle className="h-3 w-3" />
+          <Button 
+            size="sm" 
+            variant="outline" 
+            onClick={handleShufflePlay} 
+            className="gap-1 sm:gap-2 h-7 sm:h-8 text-xs sm:text-sm px-2 sm:px-3"
+          >
+            <Shuffle className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
             Aléatoire
           </Button>
-          <span className="ml-auto text-xs text-muted-foreground">
+          <span className="ml-auto text-[10px] sm:text-xs text-muted-foreground whitespace-nowrap">
             {tracks.length} pistes • {formatDuration(tracks.reduce((acc, t) => acc + (t.duration || 0), 0))}
           </span>
         </div>
@@ -131,20 +141,20 @@ const TrackList: React.FC<TrackListProps> = ({
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.02 }}
                 className={cn(
-                  "flex items-center p-3 rounded-lg hover:bg-accent cursor-pointer transition-all group",
+                  "flex items-center p-2 sm:p-3 rounded-lg hover:bg-accent cursor-pointer transition-all group touch-manipulation",
                   isCurrent && "bg-accent ring-1 ring-primary/30"
                 )}
                 onClick={() => onTrackSelect?.(track)}
                 onMouseEnter={() => setHoveredTrack(track.id)}
                 onMouseLeave={() => setHoveredTrack(null)}
               >
-                {/* Track number / Play button */}
-                <div className="flex-shrink-0 w-8 mr-2 text-center">
+                {/* Track number / Play button - responsive */}
+                <div className="flex-shrink-0 w-6 sm:w-8 mr-1.5 sm:mr-2 text-center">
                   {isHovered || isCurrent ? (
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-8 w-8"
+                      className="h-6 w-6 sm:h-8 sm:w-8"
                       aria-label={isCurrent && isPlaying ? "Mettre en pause" : "Lire"}
                       onClick={(e) => {
                         e.stopPropagation();
@@ -156,34 +166,34 @@ const TrackList: React.FC<TrackListProps> = ({
                       }}
                     >
                       {isCurrent && isPlaying ? (
-                        <Pause className="h-4 w-4" />
+                        <Pause className="h-3 w-3 sm:h-4 sm:w-4" />
                       ) : (
-                        <Play className="h-4 w-4" />
+                        <Play className="h-3 w-3 sm:h-4 sm:w-4" />
                       )}
                     </Button>
                   ) : (
-                    <span className="text-sm text-muted-foreground">{index + 1}</span>
+                    <span className="text-xs sm:text-sm text-muted-foreground">{index + 1}</span>
                   )}
                 </div>
                 
-                {/* Track info */}
+                {/* Track info - responsive */}
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1 sm:gap-2">
                     <p className={cn(
-                      "text-sm font-medium truncate",
+                      "text-xs sm:text-sm font-medium truncate",
                       isCurrent ? "text-primary" : "text-foreground"
                     )}>
                       {track.title}
                     </p>
-                    {isFavorite && <Heart className="h-3 w-3 fill-red-500 text-red-500 flex-shrink-0" />}
+                    {isFavorite && <Heart className="h-2.5 w-2.5 sm:h-3 sm:w-3 fill-red-500 text-red-500 flex-shrink-0" />}
                   </div>
-                  <p className="text-xs text-muted-foreground truncate">
+                  <p className="text-[10px] sm:text-xs text-muted-foreground truncate">
                     {track.artist}
                   </p>
                 </div>
 
-                {/* Duration */}
-                <div className="text-xs text-muted-foreground mx-3 hidden sm:block">
+                {/* Duration - responsive */}
+                <div className="text-[10px] sm:text-xs text-muted-foreground mx-1.5 sm:mx-3 hidden xs:block">
                   {formatDuration(track.duration)}
                 </div>
 

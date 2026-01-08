@@ -85,6 +85,15 @@ body {
     .header-safe-area {
       padding-top: env(safe-area-inset-top);
     }
+    .safe-area-bottom {
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+  }
+
+  /* Touch optimization */
+  .touch-manipulation {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
   }
 
   /* Header height variable */
