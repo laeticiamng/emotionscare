@@ -40,51 +40,52 @@ export const PlaylistCard = memo(function PlaylistCard({
 
   return (
     <Card
-      className="group cursor-pointer overflow-hidden transition-all hover:shadow-lg hover:scale-[1.02]"
+      className="group cursor-pointer overflow-hidden transition-all hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] touch-manipulation"
       onClick={onClick}
       role="button"
       tabIndex={0}
       onKeyDown={(e) => e.key === 'Enter' && onClick?.()}
       aria-label={`Playlist ${playlist.name}`}
     >
-      {/* Cover */}
+      {/* Cover - aspect ratio responsive */}
       <div className="relative aspect-square bg-gradient-to-br from-primary/20 to-accent/20">
         {playlist.coverUrl ? (
           <img
             src={playlist.coverUrl}
             alt={playlist.name}
             className="w-full h-full object-cover"
+            loading="lazy"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <Music className="h-16 w-16 text-muted-foreground/50" />
+            <Music className="h-10 w-10 sm:h-12 sm:w-12 md:h-16 md:w-16 text-muted-foreground/50" />
           </div>
         )}
         
-        {/* Play button overlay */}
+        {/* Play button overlay - responsive */}
         <Button
           size="icon"
-          className="absolute bottom-3 right-3 h-12 w-12 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+          className="absolute bottom-2 right-2 sm:bottom-3 sm:right-3 h-9 w-9 sm:h-10 sm:w-10 md:h-12 md:w-12 rounded-full shadow-lg opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity"
           onClick={handlePlay}
           aria-label={`Jouer ${playlist.name}`}
         >
-          <Play className="h-6 w-6 ml-1" />
+          <Play className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 ml-0.5" />
         </Button>
       </div>
 
-      <CardContent className="p-4">
-        <h3 className="font-semibold text-foreground truncate">
+      <CardContent className="p-2.5 sm:p-3 md:p-4">
+        <h3 className="font-semibold text-sm sm:text-base text-foreground truncate">
           {playlist.name}
         </h3>
         {playlist.description && (
-          <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
+          <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2 mt-0.5 sm:mt-1">
             {playlist.description}
           </p>
         )}
-        <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
+        <div className="flex items-center gap-2 sm:gap-3 mt-1.5 sm:mt-2 text-[10px] sm:text-xs text-muted-foreground">
           <span>{playlist.tracks.length} titres</span>
-          <span className="flex items-center gap-1">
-            <Clock className="h-3 w-3" />
+          <span className="flex items-center gap-0.5 sm:gap-1">
+            <Clock className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
             {formatTotalDuration(playlist.tracks)}
           </span>
         </div>
