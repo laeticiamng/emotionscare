@@ -174,7 +174,7 @@ const ModernHomePage: React.FC = () => {
 
       {/* Bannière utilisateur connecté - version interventionnelle */}
       {isAuthenticated && user && (
-        <div className="bg-gradient-to-r from-primary/10 to-blue-500/10 border-b border-primary/20 py-4">
+        <div className="bg-muted/50 border-b border-border py-4">
           <div className="container mx-auto px-4">
             {/* Barre de statut */}
             <div className="flex items-center justify-between mb-3">
@@ -356,7 +356,7 @@ const ModernHomePage: React.FC = () => {
         </Suspense>
 
         {/* CTA Final */}
-        <section className="bg-gradient-to-r from-primary/10 to-blue-500/10 py-12" aria-labelledby="cta-final-title">
+        <section className="bg-muted/30 py-12" aria-labelledby="cta-final-title">
           <div className="container mx-auto px-4 text-center">
             <h3 id="cta-final-title" className="text-2xl font-bold mb-4">Prêt à reprendre le contrôle ?</h3>
             <p className="text-muted-foreground mb-6 max-w-xl mx-auto">

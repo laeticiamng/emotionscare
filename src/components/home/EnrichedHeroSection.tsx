@@ -58,47 +58,10 @@ const EnrichedHeroSection: React.FC = () => {
   };
 
   return (
-    <section className="relative overflow-hidden min-h-[90vh] flex items-center py-12 lg:py-20 bg-gradient-to-br from-background via-background to-primary/5">
-      {/* Animated background - ambiance apaisante */}
+    <section className="relative overflow-hidden min-h-[90vh] flex items-center py-12 lg:py-20 bg-background">
+      {/* Background décoratif subtil - sans teinte colorée */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
-        {!prefersReducedMotion ? (
-          <>
-            <motion.div
-              className="absolute top-1/4 left-1/4 w-[40rem] h-[40rem] bg-gradient-to-br from-primary/10 to-transparent rounded-full blur-3xl"
-              style={{ willChange: 'transform' }}
-              animate={{
-                y: [0, 50, 0],
-                x: [0, 30, 0],
-                scale: [1, 1.1, 1],
-              }}
-              transition={{
-                duration: 12,
-                repeat: Infinity,
-                ease: 'easeInOut',
-                repeatType: 'mirror'
-              }}
-            />
-            <motion.div
-              className="absolute bottom-1/4 right-1/4 w-[35rem] h-[35rem] bg-gradient-to-br from-blue-500/8 to-transparent rounded-full blur-3xl"
-              style={{ willChange: 'transform' }}
-              animate={{
-                y: [0, -40, 0],
-                x: [0, -20, 0],
-              }}
-              transition={{
-                duration: 10,
-                repeat: Infinity,
-                ease: 'easeInOut',
-                repeatType: 'mirror'
-              }}
-            />
-          </>
-        ) : (
-          <>
-            <div className="absolute top-1/4 left-1/4 w-[40rem] h-[40rem] bg-gradient-to-br from-primary/10 to-transparent rounded-full blur-3xl" />
-            <div className="absolute bottom-1/4 right-1/4 w-[35rem] h-[35rem] bg-gradient-to-br from-blue-500/8 to-transparent rounded-full blur-3xl" />
-          </>
-        )}
+        {/* Suppression des orbes colorées pour éviter le filtre */}
       </div>
 
       <div className="container relative z-10">
