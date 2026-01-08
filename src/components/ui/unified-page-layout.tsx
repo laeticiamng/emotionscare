@@ -16,7 +16,7 @@ import { cn } from '@/lib/utils';
 import { Link, useLocation } from 'react-router-dom';
 
 const pageLayoutVariants = cva(
-  "min-h-screen",
+  "min-h-screen min-h-[100dvh]",
   {
     variants: {
       variant: {
@@ -25,9 +25,9 @@ const pageLayoutVariants = cva(
         elevated: "bg-gradient-to-br from-background to-muted/20"
       },
       container: {
-        default: "container mx-auto px-4 py-6",
-        full: "px-4 py-6",
-        narrow: "max-w-4xl mx-auto px-4 py-6"
+        default: "w-full max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-5 md:py-6 lg:py-8",
+        full: "w-full px-3 sm:px-4 md:px-6 py-4 sm:py-5 md:py-6",
+        narrow: "w-full max-w-4xl mx-auto px-3 sm:px-4 md:px-6 py-4 sm:py-5 md:py-6"
       }
     },
     defaultVariants: {
@@ -166,14 +166,14 @@ const UnifiedPageLayout: React.FC<UnifiedPageLayoutProps> = ({
 
         <div className={cn(pageLayoutVariants({ container }))}>
           {/* Header de page */}
-          <header className={cn("mb-8", headerClassName)}>
-            {/* Breadcrumbs */}
+          <header className={cn("mb-4 sm:mb-6 md:mb-8", headerClassName)}>
+            {/* Breadcrumbs - responsive */}
             {showBreadcrumb && generatedBreadcrumbs.length > 1 && (
-              <nav aria-label="Fil d'Ariane" className="mb-4">
-                <ol className="flex items-center space-x-2 text-sm text-muted-foreground">
+              <nav aria-label="Fil d'Ariane" className="mb-3 sm:mb-4 overflow-x-auto">
+                <ol className="flex items-center space-x-1.5 sm:space-x-2 text-xs sm:text-sm text-muted-foreground whitespace-nowrap">
                   {generatedBreadcrumbs.map((crumb, index) => (
-                    <li key={index} className="flex items-center">
-                      {index > 0 && <ChevronRight className="w-4 h-4 mx-2" />}
+                    <li key={index} className="flex items-center shrink-0">
+                      {index > 0 && <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 mx-1 sm:mx-2" />}
                       {crumb.href ? (
                         <Link 
                           to={crumb.href}
@@ -192,39 +192,39 @@ const UnifiedPageLayout: React.FC<UnifiedPageLayoutProps> = ({
               </nav>
             )}
 
-            <div className="flex items-start justify-between flex-wrap gap-4">
-              <div className="flex items-start space-x-4 flex-1">
-                {/* Bouton retour */}
+            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
+              <div className="flex items-start gap-2 sm:gap-3 md:gap-4 flex-1 min-w-0">
+                {/* Bouton retour - responsive */}
                 {backUrl && (
                   <Button
                     variant="ghost"
                     size="sm"
                     asChild
-                    className="hover:bg-primary/10 shrink-0 mt-1"
+                    className="hover:bg-primary/10 shrink-0 h-8 sm:h-9 px-2 sm:px-3"
                   >
                     <Link to={backUrl}>
-                      <ArrowLeft className="w-4 h-4 mr-2" />
-                      {backLabel}
+                      <ArrowLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4 sm:mr-2" />
+                      <span className="hidden sm:inline">{backLabel}</span>
                     </Link>
                   </Button>
                 )}
 
-                {/* Titre et description */}
+                {/* Titre et description - responsive */}
                 <div className="min-w-0 flex-1">
-                  <h1 className="text-3xl font-bold text-foreground mb-2 break-words">
+                  <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground mb-1 sm:mb-2 break-words leading-tight">
                     {title}
                   </h1>
                   {description && (
-                    <p className="text-muted-foreground text-lg max-w-2xl leading-relaxed">
+                    <p className="text-sm sm:text-base md:text-lg text-muted-foreground max-w-2xl leading-relaxed line-clamp-2 sm:line-clamp-none">
                       {description}
                     </p>
                   )}
                 </div>
               </div>
 
-              {/* Actions et aide */}
-              <div className="flex items-center space-x-2 shrink-0">
-                {/* Actions secondaires */}
+              {/* Actions et aide - responsive */}
+              <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 flex-wrap">
+                {/* Actions secondaires - hidden on mobile */}
                 {actions.map((action, index) => (
                   <Button
                     key={index}
@@ -232,39 +232,41 @@ const UnifiedPageLayout: React.FC<UnifiedPageLayoutProps> = ({
                     size="sm"
                     onClick={action.onClick}
                     asChild={!!action.href}
-                    className="text-muted-foreground hover:text-foreground"
+                    className="text-muted-foreground hover:text-foreground h-8 sm:h-9 px-2 sm:px-3 text-xs sm:text-sm hidden sm:inline-flex"
                   >
                     {action.href ? (
                       <Link to={action.href}>
-                        {action.icon && <action.icon className="w-4 h-4 mr-2" />}
-                        {action.label}
+                        {action.icon && <action.icon className="w-3.5 h-3.5 sm:w-4 sm:h-4 sm:mr-2" />}
+                        <span className="hidden md:inline">{action.label}</span>
                       </Link>
                     ) : (
                       <>
-                        {action.icon && <action.icon className="w-4 h-4 mr-2" />}
-                        {action.label}
+                        {action.icon && <action.icon className="w-3.5 h-3.5 sm:w-4 sm:h-4 sm:mr-2" />}
+                        <span className="hidden md:inline">{action.label}</span>
                       </>
                     )}
                   </Button>
                 ))}
 
-                {/* Action principale */}
+                {/* Action principale - always visible */}
                 {primaryAction && (
                   <>
-                    {actions.length > 0 && <Separator orientation="vertical" className="h-6" />}
+                    {actions.length > 0 && <Separator orientation="vertical" className="h-5 sm:h-6 hidden sm:block" />}
                     <Button
                       variant={primaryAction.variant || "default"}
                       onClick={primaryAction.onClick}
                       asChild={!!primaryAction.href}
+                      size="sm"
+                      className="h-8 sm:h-9 px-3 sm:px-4 text-xs sm:text-sm"
                     >
                       {primaryAction.href ? (
                         <Link to={primaryAction.href}>
-                          {primaryAction.icon && <primaryAction.icon className="w-4 h-4 mr-2" />}
+                          {primaryAction.icon && <primaryAction.icon className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />}
                           {primaryAction.label}
                         </Link>
                       ) : (
                         <>
-                          {primaryAction.icon && <primaryAction.icon className="w-4 h-4 mr-2" />}
+                          {primaryAction.icon && <primaryAction.icon className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />}
                           {primaryAction.label}
                         </>
                       )}
@@ -272,19 +274,19 @@ const UnifiedPageLayout: React.FC<UnifiedPageLayoutProps> = ({
                   </>
                 )}
 
-                {/* Lien d'aide */}
+                {/* Lien d'aide - icon only on mobile */}
                 {helpUrl && (
                   <>
-                    {(actions.length > 0 || primaryAction) && <Separator orientation="vertical" className="h-6" />}
+                    {(actions.length > 0 || primaryAction) && <Separator orientation="vertical" className="h-5 sm:h-6 hidden sm:block" />}
                     <Button
                       variant="ghost"
                       size="sm"
                       asChild
-                      className="text-muted-foreground hover:text-foreground"
+                      className="text-muted-foreground hover:text-foreground h-8 sm:h-9 px-2 sm:px-3"
                     >
                       <Link to={helpUrl}>
-                        <HelpCircle className="w-4 h-4 mr-2" />
-                        Aide
+                        <HelpCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 sm:mr-2" />
+                        <span className="hidden sm:inline">Aide</span>
                       </Link>
                     </Button>
                   </>

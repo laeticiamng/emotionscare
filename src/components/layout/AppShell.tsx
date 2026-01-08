@@ -47,17 +47,17 @@ const AppShell: React.FC = () => {
   }, [sidebarOpen]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-muted/20 w-full">
+    <div className="min-h-screen min-h-[100dvh] bg-gradient-to-br from-background to-muted/20 w-full">
       {/* Delete Pending Banner */}
       {accountStatus === 'soft_deleted' && <DeletePendingBanner />}
       
-      {/* Header */}
-      <header className="sticky top-0 z-50 h-16 bg-white/80 backdrop-blur border-b header-safe-area">
-        <div className="flex items-center justify-between h-full px-4">
+      {/* Header - responsive */}
+      <header className="sticky top-0 z-50 h-14 sm:h-16 bg-background/80 backdrop-blur-lg border-b header-safe-area">
+        <div className="flex items-center justify-between h-full px-3 sm:px-4 md:px-6">
           {/* Mobile menu button */}
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="xl:hidden p-2 rounded-md hover:bg-gray-100 transition-colors"
+            className="xl:hidden p-2 rounded-md hover:bg-muted/80 transition-colors touch-manipulation"
             aria-label="Toggle navigation"
           >
             {sidebarOpen ? (
@@ -70,13 +70,13 @@ const AppShell: React.FC = () => {
           {/* Desktop sidebar toggle */}
           <button
             onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-            className="hidden xl:flex p-2 rounded-md hover:bg-gray-100 transition-colors"
+            className="hidden xl:flex p-2 rounded-md hover:bg-muted/80 transition-colors"
             aria-label="Collapse sidebar"
           >
             <Menu className="h-5 w-5" />
           </button>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
             <HealthBadge />
             <Header />
           </div>
@@ -84,26 +84,36 @@ const AppShell: React.FC = () => {
       </header>
 
       <div className="flex w-full">
-        {/* Desktop Sidebar */}
+        {/* Desktop Sidebar - responsive height */}
         <aside 
           className={cn(
-            "hidden xl:block border-r bg-white h-[calc(100vh-4rem)] sticky top-16 transition-all duration-300",
-            sidebarCollapsed ? "w-16" : "w-64"
+            "hidden xl:block border-r bg-background/95 backdrop-blur-sm h-[calc(100vh-3.5rem)] sm:h-[calc(100vh-4rem)] sticky top-14 sm:top-16 transition-all duration-300",
+            sidebarCollapsed ? "w-16" : "w-56 lg:w-64"
           )}
         >
           <Sidebar collapsed={sidebarCollapsed} />
         </aside>
 
-        {/* Mobile Sidebar Overlay */}
+        {/* Mobile Sidebar Overlay - improved touch handling */}
         {sidebarOpen && (
-          <div className="xl:hidden fixed inset-0 z-40 bg-black/40" onClick={() => setSidebarOpen(false)} role="button" tabIndex={0} onKeyDown={(e) => e.key === 'Escape' && setSidebarOpen(false)} aria-label="Fermer le menu latéral">
-            <aside className="absolute left-0 top-16 h-[calc(100vh-4rem)] w-72 bg-white shadow-xl border-r">
+          <div 
+            className="xl:hidden fixed inset-0 z-40 bg-black/40 backdrop-blur-sm" 
+            onClick={() => setSidebarOpen(false)} 
+            role="button" 
+            tabIndex={0} 
+            onKeyDown={(e) => e.key === 'Escape' && setSidebarOpen(false)} 
+            aria-label="Fermer le menu latéral"
+          >
+            <aside 
+              className="absolute left-0 top-14 sm:top-16 h-[calc(100vh-3.5rem)] sm:h-[calc(100vh-4rem)] w-64 sm:w-72 bg-background shadow-xl border-r"
+              onClick={(e) => e.stopPropagation()}
+            >
               <Sidebar collapsed={false} />
             </aside>
           </div>
         )}
 
-        {/* Main Content */}
+        {/* Main Content - responsive padding */}
         <main className={cn(
           "flex-1 min-w-0 transition-all duration-300",
           "pt-0" // No padding-top since header is sticky
@@ -112,11 +122,11 @@ const AppShell: React.FC = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="container mx-auto px-6 py-8"
+            className="w-full max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 md:py-8"
           >
             <EnhancedErrorBoundary>
               <React.Suspense fallback={
-                <div className="flex items-center justify-center min-h-[400px]">
+                <div className="flex items-center justify-center min-h-[300px] sm:min-h-[400px]">
                   <LoadingSpinner size="lg" />
                 </div>
               }>

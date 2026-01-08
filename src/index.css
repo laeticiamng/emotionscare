@@ -519,6 +519,135 @@ p, li, td {
   }
 }
 
+/* ============================================
+   RESPONSIVE UTILITIES - Échelle adaptative
+   ============================================ */
+
+/* Viewport height fix pour iOS Safari */
+@supports (height: 100dvh) {
+  .min-h-screen {
+    min-height: 100dvh;
+  }
+  .h-screen {
+    height: 100dvh;
+  }
+}
+
+/* Safe area insets pour mobiles avec notch */
+@supports (padding: env(safe-area-inset-top)) {
+  .safe-area-top {
+    padding-top: env(safe-area-inset-top);
+  }
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .safe-area-left {
+    padding-left: env(safe-area-inset-left);
+  }
+  .safe-area-right {
+    padding-right: env(safe-area-inset-right);
+  }
+  .safe-area-all {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+}
+
+/* Touch optimization */
+@media (pointer: coarse) {
+  /* Taille minimale des cibles tactiles - WCAG 2.5.5 */
+  button, 
+  [role="button"], 
+  a, 
+  input[type="checkbox"], 
+  input[type="radio"],
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Amélioration du tap feedback */
+  .touch-manipulation {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* Hover effects uniquement sur les appareils non-tactiles */
+@media (hover: hover) and (pointer: fine) {
+  .hover-effect:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px hsl(var(--foreground) / 0.1);
+  }
+}
+
+/* Typographie fluide responsive */
+.text-fluid-xs { font-size: clamp(0.75rem, 2vw, 0.875rem); }
+.text-fluid-sm { font-size: clamp(0.875rem, 2.5vw, 1rem); }
+.text-fluid-base { font-size: clamp(1rem, 3vw, 1.125rem); }
+.text-fluid-lg { font-size: clamp(1.125rem, 3.5vw, 1.25rem); }
+.text-fluid-xl { font-size: clamp(1.25rem, 4vw, 1.5rem); }
+.text-fluid-2xl { font-size: clamp(1.5rem, 5vw, 2rem); }
+.text-fluid-3xl { font-size: clamp(1.875rem, 6vw, 2.5rem); }
+
+/* Espacement fluide responsive */
+.gap-fluid-1 { gap: clamp(0.25rem, 1vw, 0.5rem); }
+.gap-fluid-2 { gap: clamp(0.5rem, 2vw, 1rem); }
+.gap-fluid-4 { gap: clamp(1rem, 3vw, 2rem); }
+.p-fluid-2 { padding: clamp(0.5rem, 2vw, 1rem); }
+.p-fluid-4 { padding: clamp(1rem, 3vw, 2rem); }
+
+/* Prevent layout shifts */
+.scrollbar-stable {
+  scrollbar-gutter: stable;
+}
+
+/* Optimisation du scroll sur mobile */
+.scroll-smooth-mobile {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-smooth-mobile {
+    scroll-behavior: auto;
+  }
+}
+
+/* Container responsive fluid */
+.container-responsive {
+  width: 100%;
+  max-width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .container-responsive {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .container-responsive {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container-responsive {
+    padding-left: 2rem;
+    padding-right: 2rem;
+    max-width: 1280px;
+  }
+}
+
 @media (prefers-color-scheme: light) {
   :root:not(.dark) {
     color-scheme: light;
