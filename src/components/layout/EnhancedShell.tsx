@@ -86,13 +86,8 @@ const EnhancedShell: React.FC<EnhancedShellProps> = ({
         style={{ transform: `scaleX(${scrollProgress})` }}
       />
 
-      {/* Background Gradient Effects */}
-      <div className={cn(
-        "fixed inset-0 -z-10 pointer-events-none transition-opacity duration-500",
-        isDarkMode 
-          ? 'bg-gradient-to-b from-gray-900 to-black/80' 
-          : 'bg-gradient-to-b from-blue-50/50 to-white'
-      )} />
+      {/* Background - solid color only, no tinted gradients */}
+      <div className="fixed inset-0 -z-10 pointer-events-none bg-background" />
 
       {/* Decorative Background Elements */}
       {immersive && !reduceMotion && (
