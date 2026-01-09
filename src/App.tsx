@@ -13,6 +13,7 @@ const WellnessHubPage = lazy(() => import('@/pages/b2b/WellnessHubPage'));
 const OrgDashboardPage = lazy(() => import('@/pages/b2b/admin/OrgDashboardPage'));
 const B2BSettingsPage = lazy(() => import('@/pages/b2b/admin/SettingsPage'));
 const B2BRHDashboard = lazy(() => import('@/pages/B2BRHDashboard'));
+const ReportsPage = lazy(() => import('@/pages/b2b/reports/ReportsPage'));
 
 const queryClient = new QueryClient();
 
@@ -37,7 +38,8 @@ function App() {
               <Route path="/b2b/admin" element={<OrgDashboardPage />} />
               <Route path="/b2b/admin/settings" element={<B2BSettingsPage />} />
               <Route path="/b2b/admin/dashboard" element={<B2BRHDashboard />} />
-              <Route path="/b2b/reports" element={<lazy(() => import('@/pages/b2b/reports/ReportsPage')) />} />
+              {/* Reports page - lazy loaded inline */}
+              <Route path="/b2b/reports" element={<ReportsPage />} />
               
               {/* App Routes */}
               <Route path="/app/music" element={<MusicPage />} />
