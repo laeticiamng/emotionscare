@@ -2271,6 +2271,57 @@ export type Database = {
         }
         Relationships: []
       }
+      b2b_anonymous_sessions: {
+        Row: {
+          access_code_id: string | null
+          created_at: string
+          duration_seconds: number | null
+          ended_at: string | null
+          id: string
+          org_id: string
+          session_hash: string
+          session_type: string
+          started_at: string
+        }
+        Insert: {
+          access_code_id?: string | null
+          created_at?: string
+          duration_seconds?: number | null
+          ended_at?: string | null
+          id?: string
+          org_id: string
+          session_hash: string
+          session_type?: string
+          started_at?: string
+        }
+        Update: {
+          access_code_id?: string | null
+          created_at?: string
+          duration_seconds?: number | null
+          ended_at?: string | null
+          id?: string
+          org_id?: string
+          session_hash?: string
+          session_type?: string
+          started_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "b2b_anonymous_sessions_access_code_id_fkey"
+            columns: ["access_code_id"]
+            isOneToOne: false
+            referencedRelation: "org_access_codes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "b2b_anonymous_sessions_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       b2b_audit_logs: {
         Row: {
           action: string
@@ -15280,6 +15331,56 @@ export type Database = {
         }
         Relationships: []
       }
+      org_access_codes: {
+        Row: {
+          code: string
+          code_type: string
+          created_at: string
+          created_by: string | null
+          current_uses: number | null
+          expires_at: string | null
+          id: string
+          is_active: boolean | null
+          max_uses: number | null
+          org_id: string
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          code_type?: string
+          created_at?: string
+          created_by?: string | null
+          current_uses?: number | null
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          max_uses?: number | null
+          org_id: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          code_type?: string
+          created_at?: string
+          created_by?: string | null
+          current_uses?: number | null
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          max_uses?: number | null
+          org_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "org_access_codes_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       org_aggregates: {
         Row: {
           created_at: string | null
@@ -15343,6 +15444,94 @@ export type Database = {
         }
         Relationships: []
       }
+      org_daily_aggregates: {
+        Row: {
+          avg_duration_seconds: number | null
+          created_at: string
+          date: string
+          id: string
+          org_id: string
+          sessions_by_hour: Json | null
+          sessions_by_type: Json | null
+          team_id: string | null
+          total_sessions: number | null
+          unique_users_hash_count: number | null
+          updated_at: string
+        }
+        Insert: {
+          avg_duration_seconds?: number | null
+          created_at?: string
+          date: string
+          id?: string
+          org_id: string
+          sessions_by_hour?: Json | null
+          sessions_by_type?: Json | null
+          team_id?: string | null
+          total_sessions?: number | null
+          unique_users_hash_count?: number | null
+          updated_at?: string
+        }
+        Update: {
+          avg_duration_seconds?: number | null
+          created_at?: string
+          date?: string
+          id?: string
+          org_id?: string
+          sessions_by_hour?: Json | null
+          sessions_by_type?: Json | null
+          team_id?: string | null
+          total_sessions?: number | null
+          unique_users_hash_count?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "org_daily_aggregates_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      org_ethical_disclaimers: {
+        Row: {
+          accepted_at: string
+          accepted_by: string | null
+          created_at: string
+          disclaimer_version: string
+          id: string
+          ip_address: string | null
+          org_id: string
+        }
+        Insert: {
+          accepted_at?: string
+          accepted_by?: string | null
+          created_at?: string
+          disclaimer_version?: string
+          id?: string
+          ip_address?: string | null
+          org_id: string
+        }
+        Update: {
+          accepted_at?: string
+          accepted_by?: string | null
+          created_at?: string
+          disclaimer_version?: string
+          id?: string
+          ip_address?: string | null
+          org_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "org_ethical_disclaimers_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       org_memberships: {
         Row: {
           created_at: string
@@ -15371,6 +15560,212 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "org_memberships_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      org_monthly_reports: {
+        Row: {
+          created_at: string
+          generated_at: string
+          generated_by: string | null
+          id: string
+          month: number
+          org_id: string
+          report_data: Json
+          status: string | null
+          year: number
+        }
+        Insert: {
+          created_at?: string
+          generated_at?: string
+          generated_by?: string | null
+          id?: string
+          month: number
+          org_id: string
+          report_data?: Json
+          status?: string | null
+          year: number
+        }
+        Update: {
+          created_at?: string
+          generated_at?: string
+          generated_by?: string | null
+          id?: string
+          month?: number
+          org_id?: string
+          report_data?: Json
+          status?: string | null
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "org_monthly_reports_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      org_teams: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          manager_id: string | null
+          name: string
+          org_id: string
+          settings: Json | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          manager_id?: string | null
+          name: string
+          org_id: string
+          settings?: Json | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          manager_id?: string | null
+          name?: string
+          org_id?: string
+          settings?: Json | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "org_teams_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      org_weekly_aggregates: {
+        Row: {
+          adoption_rate: number | null
+          created_at: string
+          id: string
+          most_used_features: Json | null
+          org_id: string
+          peak_usage_hours: Json | null
+          sessions_by_type: Json | null
+          team_id: string | null
+          total_sessions: number | null
+          trend_vs_previous_week: number | null
+          unique_users_hash_count: number | null
+          updated_at: string
+          week_end: string
+          week_start: string
+        }
+        Insert: {
+          adoption_rate?: number | null
+          created_at?: string
+          id?: string
+          most_used_features?: Json | null
+          org_id: string
+          peak_usage_hours?: Json | null
+          sessions_by_type?: Json | null
+          team_id?: string | null
+          total_sessions?: number | null
+          trend_vs_previous_week?: number | null
+          unique_users_hash_count?: number | null
+          updated_at?: string
+          week_end: string
+          week_start: string
+        }
+        Update: {
+          adoption_rate?: number | null
+          created_at?: string
+          id?: string
+          most_used_features?: Json | null
+          org_id?: string
+          peak_usage_hours?: Json | null
+          sessions_by_type?: Json | null
+          team_id?: string | null
+          total_sessions?: number | null
+          trend_vs_previous_week?: number | null
+          unique_users_hash_count?: number | null
+          updated_at?: string
+          week_end?: string
+          week_start?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "org_weekly_aggregates_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      org_wellness_events: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          current_participants: number | null
+          description: string | null
+          duration_minutes: number | null
+          event_date: string
+          event_type: string
+          id: string
+          is_recurring: boolean | null
+          max_participants: number | null
+          org_id: string
+          recurrence_rule: string | null
+          status: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          current_participants?: number | null
+          description?: string | null
+          duration_minutes?: number | null
+          event_date: string
+          event_type?: string
+          id?: string
+          is_recurring?: boolean | null
+          max_participants?: number | null
+          org_id: string
+          recurrence_rule?: string | null
+          status?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          current_participants?: number | null
+          description?: string | null
+          duration_minutes?: number | null
+          event_date?: string
+          event_type?: string
+          id?: string
+          is_recurring?: boolean | null
+          max_participants?: number | null
+          org_id?: string
+          recurrence_rule?: string | null
+          status?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "org_wellness_events_org_id_fkey"
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "organizations"
@@ -15426,27 +15821,60 @@ export type Database = {
       }
       organizations: {
         Row: {
+          access_code: string | null
           created_at: string
+          description: string | null
           domain: string | null
+          ethical_charter_accepted: boolean | null
+          ethical_charter_accepted_at: string | null
           id: string
+          industry: string | null
+          logo_url: string | null
+          max_users: number | null
           name: string
+          org_type: string | null
+          privacy_settings: Json | null
           settings: Json | null
+          size_category: string | null
+          subscription_plan: string | null
           updated_at: string
         }
         Insert: {
+          access_code?: string | null
           created_at?: string
+          description?: string | null
           domain?: string | null
+          ethical_charter_accepted?: boolean | null
+          ethical_charter_accepted_at?: string | null
           id?: string
+          industry?: string | null
+          logo_url?: string | null
+          max_users?: number | null
           name: string
+          org_type?: string | null
+          privacy_settings?: Json | null
           settings?: Json | null
+          size_category?: string | null
+          subscription_plan?: string | null
           updated_at?: string
         }
         Update: {
+          access_code?: string | null
           created_at?: string
+          description?: string | null
           domain?: string | null
+          ethical_charter_accepted?: boolean | null
+          ethical_charter_accepted_at?: string | null
           id?: string
+          industry?: string | null
+          logo_url?: string | null
+          max_users?: number | null
           name?: string
+          org_type?: string | null
+          privacy_settings?: Json | null
           settings?: Json | null
+          size_category?: string | null
+          subscription_plan?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -26371,6 +26799,10 @@ export type Database = {
       }
       is_admin: { Args: never; Returns: boolean }
       is_manager_of_org: { Args: { p_org_id: string }; Returns: boolean }
+      is_org_admin: {
+        Args: { _org_id: string; _user_id: string }
+        Returns: boolean
+      }
       is_org_admin_or_manager: {
         Args: { _org_id: string; _user_id: string }
         Returns: boolean
