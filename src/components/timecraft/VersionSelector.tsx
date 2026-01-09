@@ -51,10 +51,10 @@ import type { TimeVersion, CreateVersionInput } from '@/hooks/timecraft';
 interface VersionSelectorProps {
   versions: TimeVersion[];
   activeVersion: TimeVersion | null;
-  onSetActive: (id: string) => Promise<void>;
+  onSetActive: (id: string) => Promise<unknown>;
   onCreate: (input: CreateVersionInput) => Promise<TimeVersion>;
-  onDuplicate: (sourceId: string, newName: string) => Promise<void>;
-  onDelete: (id: string) => Promise<void>;
+  onDuplicate: (sourceId: string, newName: string) => Promise<unknown>;
+  onDelete: (id: string) => Promise<unknown>;
   isLoading?: boolean;
 }
 
