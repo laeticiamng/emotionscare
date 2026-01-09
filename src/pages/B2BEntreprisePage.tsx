@@ -2,7 +2,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Link } from 'react-router-dom';
-import { Users, Shield, BarChart3, Heart, ArrowRight } from 'lucide-react';
+import { Users, Shield, BarChart3, Heart, ArrowRight, KeyRound, Building2 } from 'lucide-react';
 
 const B2BEntreprisePage: React.FC = () => {
   return (
@@ -25,9 +25,38 @@ const B2BEntreprisePage: React.FC = () => {
               </Link>
             </Button>
             <Button variant="outline" size="lg" asChild>
-              <Link to="/login?segment=b2b">Accès équipe</Link>
+              <Link to="/b2b/access">
+                <KeyRound className="mr-2 h-5 w-5" />
+                Accès avec code
+              </Link>
             </Button>
           </div>
+        </div>
+      </div>
+
+      {/* Accès institutionnel - Section mise en avant */}
+      <div className="py-12 bg-primary/5 border-y border-primary/10">
+        <div className="container mx-auto px-4">
+          <Card className="max-w-2xl mx-auto border-primary/20 bg-background">
+            <CardContent className="p-6 flex flex-col sm:flex-row items-center gap-6">
+              <div className="p-4 rounded-full bg-primary/10">
+                <Building2 className="h-10 w-10 text-primary" />
+              </div>
+              <div className="flex-1 text-center sm:text-left">
+                <h3 className="text-lg font-semibold mb-1">Accès Institutionnel</h3>
+                <p className="text-muted-foreground text-sm">
+                  Votre organisation vous a fourni un code d'accès ? 
+                  Accédez à l'espace bien-être en toute anonymité.
+                </p>
+              </div>
+              <Button asChild>
+                <Link to="/b2b/access">
+                  Entrer le code
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+            </CardContent>
+          </Card>
         </div>
       </div>
 
