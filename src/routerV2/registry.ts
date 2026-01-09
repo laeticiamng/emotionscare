@@ -252,8 +252,31 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: true,
     requireAuth: true,
   },
+  // ═══════════════════════════════════════════════════════════
+  // TIMECRAFT - Design du temps
+  // ═══════════════════════════════════════════════════════════
   {
-    name: 'login',
+    name: 'timecraft',
+    path: '/app/timecraft',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app',
+    component: 'TimeCraftPage',
+    guard: true,
+    requireAuth: true,
+    aliases: ['/timecraft'],
+  },
+  {
+    name: 'timecraft-b2b',
+    path: '/b2b/admin/timecraft',
+    segment: 'manager',
+    role: 'manager',
+    layout: 'app',
+    component: 'TimeCraftB2BPage',
+    guard: true,
+    requireAuth: true,
+  },
+  {
     path: '/login',
     segment: 'public',
     layout: 'marketing',

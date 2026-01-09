@@ -15652,6 +15652,112 @@ export type Database = {
           },
         ]
       }
+      org_time_aggregates: {
+        Row: {
+          aggregation_type: string | null
+          block_distribution: Json | null
+          cohort_size: number | null
+          created_at: string | null
+          department: string | null
+          id: string
+          metrics: Json
+          org_id: string | null
+          period_end: string
+          period_start: string
+          recommendations: Json | null
+          risk_zones: Json | null
+          team_id: string | null
+        }
+        Insert: {
+          aggregation_type?: string | null
+          block_distribution?: Json | null
+          cohort_size?: number | null
+          created_at?: string | null
+          department?: string | null
+          id?: string
+          metrics?: Json
+          org_id?: string | null
+          period_end: string
+          period_start: string
+          recommendations?: Json | null
+          risk_zones?: Json | null
+          team_id?: string | null
+        }
+        Update: {
+          aggregation_type?: string | null
+          block_distribution?: Json | null
+          cohort_size?: number | null
+          created_at?: string | null
+          department?: string | null
+          id?: string
+          metrics?: Json
+          org_id?: string | null
+          period_end?: string
+          period_start?: string
+          recommendations?: Json | null
+          risk_zones?: Json | null
+          team_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "org_time_aggregates_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      org_time_scenarios: {
+        Row: {
+          configuration: Json
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          id: string
+          impact_analysis: Json | null
+          is_active: boolean | null
+          name: string
+          org_id: string | null
+          scenario_type: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          configuration?: Json
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          impact_analysis?: Json | null
+          is_active?: boolean | null
+          name: string
+          org_id?: string | null
+          scenario_type?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          configuration?: Json
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          impact_analysis?: Json | null
+          is_active?: boolean | null
+          name?: string
+          org_id?: string | null
+          scenario_type?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "org_time_scenarios_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       org_weekly_aggregates: {
         Row: {
           adoption_rate: number | null
@@ -20956,6 +21062,60 @@ export type Database = {
         }
         Relationships: []
       }
+      time_blocks: {
+        Row: {
+          block_type: Database["public"]["Enums"]["time_block_type"]
+          created_at: string | null
+          day_of_week: number | null
+          duration_hours: number | null
+          emotional_charge: number | null
+          energy_level: number | null
+          id: string
+          is_ideal: boolean | null
+          label: string | null
+          metadata: Json | null
+          notes: string | null
+          start_hour: number | null
+          updated_at: string | null
+          user_id: string
+          version_id: string | null
+        }
+        Insert: {
+          block_type: Database["public"]["Enums"]["time_block_type"]
+          created_at?: string | null
+          day_of_week?: number | null
+          duration_hours?: number | null
+          emotional_charge?: number | null
+          energy_level?: number | null
+          id?: string
+          is_ideal?: boolean | null
+          label?: string | null
+          metadata?: Json | null
+          notes?: string | null
+          start_hour?: number | null
+          updated_at?: string | null
+          user_id: string
+          version_id?: string | null
+        }
+        Update: {
+          block_type?: Database["public"]["Enums"]["time_block_type"]
+          created_at?: string | null
+          day_of_week?: number | null
+          duration_hours?: number | null
+          emotional_charge?: number | null
+          energy_level?: number | null
+          id?: string
+          is_ideal?: boolean | null
+          label?: string | null
+          metadata?: Json | null
+          notes?: string | null
+          start_hour?: number | null
+          updated_at?: string | null
+          user_id?: string
+          version_id?: string | null
+        }
+        Relationships: []
+      }
       time_exchanges: {
         Row: {
           completed_at: string | null
@@ -21015,6 +21175,50 @@ export type Database = {
             columns: ["offer_id"]
             isOneToOne: false
             referencedRelation: "time_offers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      time_insights: {
+        Row: {
+          created_at: string | null
+          data: Json | null
+          id: string
+          insight_type: string
+          is_dismissed: boolean | null
+          message: string
+          severity: string | null
+          user_id: string
+          version_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          data?: Json | null
+          id?: string
+          insight_type: string
+          is_dismissed?: boolean | null
+          message: string
+          severity?: string | null
+          user_id: string
+          version_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          data?: Json | null
+          id?: string
+          insight_type?: string
+          is_dismissed?: boolean | null
+          message?: string
+          severity?: string | null
+          user_id?: string
+          version_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "time_insights_version_id_fkey"
+            columns: ["version_id"]
+            isOneToOne: false
+            referencedRelation: "time_versions"
             referencedColumns: ["id"]
           },
         ]
@@ -21091,6 +21295,45 @@ export type Database = {
           time_value?: number | null
           updated_at?: string | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      time_versions: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          insights: Json | null
+          is_active: boolean | null
+          name: string
+          snapshot_data: Json | null
+          updated_at: string | null
+          user_id: string
+          version_type: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          insights?: Json | null
+          is_active?: boolean | null
+          name: string
+          snapshot_data?: Json | null
+          updated_at?: string | null
+          user_id: string
+          version_type?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          insights?: Json | null
+          is_active?: boolean | null
+          name?: string
+          snapshot_data?: Json | null
+          updated_at?: string | null
+          user_id?: string
+          version_type?: string | null
         }
         Relationships: []
       }
@@ -27309,6 +27552,17 @@ export type Database = {
       b2b_role: "b2b_admin" | "b2b_manager" | "b2b_member" | "b2b_viewer"
       invitation_status: "pending" | "accepted" | "expired"
       share_permission: "viewer" | "editor" | "admin"
+      time_block_type:
+        | "creation"
+        | "recovery"
+        | "constraint"
+        | "emotional"
+        | "chosen"
+        | "imposed"
+        | "decision"
+        | "urgency"
+        | "routine"
+        | "exposure"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -27441,6 +27695,18 @@ export const Constants = {
       b2b_role: ["b2b_admin", "b2b_manager", "b2b_member", "b2b_viewer"],
       invitation_status: ["pending", "accepted", "expired"],
       share_permission: ["viewer", "editor", "admin"],
+      time_block_type: [
+        "creation",
+        "recovery",
+        "constraint",
+        "emotional",
+        "chosen",
+        "imposed",
+        "decision",
+        "urgency",
+        "routine",
+        "exposure",
+      ],
     },
   },
 } as const

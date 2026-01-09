@@ -180,7 +180,10 @@ const OrgDashboardPage = lazy(() => import('@/pages/b2b/admin/OrgDashboardPage')
 const B2BSettingsPage = lazy(() => import('@/pages/b2b/admin/SettingsPage'));
 const B2BInstitutionalReportsPage = lazy(() => import('@/pages/b2b/reports/ReportsPage'));
 
-// Pages fonctionnelles avancées
+// TIMECRAFT - Module de design du temps
+const TimeCraftPage = lazy(() => import('@/pages/timecraft/TimeCraftPage'));
+const TimeCraftB2BPage = lazy(() => import('@/pages/timecraft/TimeCraftB2BPage'));
+
 const B2CMusicTherapyPremiumPage = lazy(() => import('@/pages/B2CMusicTherapyPremiumPage'));
 const B2CAICoachMicroPage = lazy(() => import('@/pages/B2CAICoachMicroPage'));
 const B2CActivitePage = lazy(() => import('@/pages/B2CActivitePage'));
@@ -413,7 +416,10 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   B2CVRGalaxyPage,
   // VRBreathPage supprimé
   
-  // Fun-First
+  // TIMECRAFT
+  TimeCraftPage,
+  TimeCraftB2BPage,
+  
   B2CFlashGlowPage,
   B2CBreathworkPage,
   B2CARFiltersPage,
