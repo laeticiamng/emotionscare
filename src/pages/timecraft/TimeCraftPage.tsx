@@ -3,8 +3,7 @@
  * Visualisation du temps comme architecture, pas comme to-do list
  */
 
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -15,44 +14,105 @@ import {
   Palette,
   Layers,
   GitCompare,
-  Sparkles,
-  Plus,
-  Calendar,
-  BarChart3,
-  Zap,
-  Moon,
-  AlertTriangle,
-  Heart,
-  Target,
   Brain,
+  Plus,
+  BarChart3,
   ArrowRight,
   Info,
+  Loader2,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { usePageSEO } from '@/hooks/usePageSEO';
 import { cn } from '@/lib/utils';
 
-// Types de blocs temporels avec couleurs
-const blockTypes = [
-  { id: 'creation', label: 'Création', icon: Sparkles, color: 'bg-purple-500', description: 'Temps de flow, création' },
-  { id: 'recovery', label: 'Récupération', icon: Moon, color: 'bg-blue-500', description: 'Repos, détente' },
-  { id: 'constraint', label: 'Contrainte', icon: AlertTriangle, color: 'bg-orange-500', description: 'Obligations, devoirs' },
-  { id: 'emotional', label: 'Charge émotionnelle', icon: Heart, color: 'bg-red-500', description: 'Moments intenses' },
-  { id: 'chosen', label: 'Temps choisi', icon: Target, color: 'bg-green-500', description: 'Décisions personnelles' },
-  { id: 'imposed', label: 'Temps subi', icon: Clock, color: 'bg-gray-500', description: 'Imposé par contexte' },
-];
+// Hooks TIMECRAFT
+import {
+  useTimeBlocks,
+  useTimeVersions,
+  useTimeInsights,
+  useTimeEmotionCorrelation,
+  type TimeBlock,
+  type CreateTimeBlockInput,
+} from '@/hooks/timecraft';
 
-const daysOfWeek = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+// Composants TIMECRAFT
+import { WeekGrid } from '@/components/timecraft/WeekGrid';
+import { TimeStats } from '@/components/timecraft/TimeStats';
+import { TimeBlockEditor } from '@/components/timecraft/TimeBlockEditor';
+import { InsightsList } from '@/components/timecraft/InsightCard';
+import { VersionSelector } from '@/components/timecraft/VersionSelector';
+import { EmotionCorrelationChart } from '@/components/timecraft/EmotionCorrelationChart';
 
 export default function TimeCraftPage() {
-  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('map');
-  const [selectedVersion, setSelectedVersion] = useState<'current' | 'ideal' | 'compare'>('current');
+  const [editorOpen, setEditorOpen] = useState(false);
+  const [editingBlock, setEditingBlock] = useState<TimeBlock | null>(null);
+  const [defaultDay, setDefaultDay] = useState(1);
+  const [defaultHour, setDefaultHour] = useState(9);
+
+  // Hooks
+  const {
+    blocks,
+    blocksByDay,
+    stats,
+    isLoading: blocksLoading,
+    createBlock,
+    updateBlock,
+    deleteBlock,
+    isCreating,
+  } = useTimeBlocks();
+
+  const {
+    versions,
+    activeVersion,
+    createVersion,
+    setActiveVersion,
+    duplicateVersion,
+    deleteVersion,
+    isCreating: versionCreating,
+  } = useTimeVersions();
+
+  const { insights, balanceIndicators } = useTimeInsights();
+
+  const {
+    correlations,
+    dayPatterns,
+    emotionDataCount,
+    hasData: hasCorrelationData,
+    isLoading: correlationLoading,
+  } = useTimeEmotionCorrelation();
 
   usePageSEO({
     title: 'TimeCraft - Design du temps personnel | EmotionsCare',
     description: 'Visualisez et architecturez votre temps. Comprenez vos rythmes émotionnels et énergétiques.',
   });
+
+  // Handlers
+  const handleAddBlock = useCallback((day: number, hour: number) => {
+    setEditingBlock(null);
+    setDefaultDay(day);
+    setDefaultHour(hour);
+    setEditorOpen(true);
+  }, []);
+
+  const handleEditBlock = useCallback((block: TimeBlock) => {
+    setEditingBlock(block);
+    setEditorOpen(true);
+  }, []);
+
+  const handleSaveBlock = useCallback(async (data: CreateTimeBlockInput) => {
+    if (editingBlock) {
+      await updateBlock({ id: editingBlock.id, ...data });
+    } else {
+      await createBlock(data);
+    }
+  }, [editingBlock, createBlock, updateBlock]);
+
+  const handleDeleteBlock = useCallback(async (id: string) => {
+    await deleteBlock(id);
+  }, [deleteBlock]);
+
+  const isLoading = blocksLoading || correlationLoading;
 
   return (
     <main className="min-h-screen bg-background p-4 lg:p-8">
@@ -78,11 +138,11 @@ export default function TimeCraftPage() {
             </div>
             
             <div className="flex gap-2">
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" onClick={() => setActiveTab('versions')}>
                 <GitCompare className="h-4 w-4 mr-2" />
                 Comparer
               </Button>
-              <Button size="sm">
+              <Button size="sm" onClick={() => handleAddBlock(1, 9)}>
                 <Plus className="h-4 w-4 mr-2" />
                 Nouveau bloc
               </Button>
@@ -99,35 +159,13 @@ export default function TimeCraftPage() {
           </Alert>
         </motion.div>
 
-        {/* Version selector */}
+        {/* Stats rapides */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
-          className="flex gap-2"
         >
-          <Button 
-            variant={selectedVersion === 'current' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setSelectedVersion('current')}
-          >
-            Temps actuel
-          </Button>
-          <Button 
-            variant={selectedVersion === 'ideal' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setSelectedVersion('ideal')}
-          >
-            Temps souhaité
-          </Button>
-          <Button 
-            variant={selectedVersion === 'compare' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setSelectedVersion('compare')}
-          >
-            <GitCompare className="h-4 w-4 mr-2" />
-            Comparer
-          </Button>
+          <TimeStats stats={stats} compact />
         </motion.div>
 
         {/* Main content tabs */}
@@ -158,81 +196,31 @@ export default function TimeCraftPage() {
               animate={{ opacity: 1 }}
               transition={{ duration: 0.4 }}
             >
-              {/* Légende des types */}
-              <div className="flex flex-wrap gap-2 mb-6">
-                {blockTypes.map((type) => (
-                  <Badge 
-                    key={type.id} 
-                    variant="outline" 
-                    className="cursor-pointer hover:bg-muted transition-colors"
-                  >
-                    <div className={cn('w-3 h-3 rounded-full mr-2', type.color)} />
-                    {type.label}
-                  </Badge>
-                ))}
-              </div>
+              {isLoading ? (
+                <Card>
+                  <CardContent className="py-12 text-center">
+                    <Loader2 className="h-8 w-8 mx-auto animate-spin text-primary" />
+                    <p className="text-muted-foreground mt-2">Chargement...</p>
+                  </CardContent>
+                </Card>
+              ) : (
+                <WeekGrid
+                  blocks={blocks}
+                  blocksByDay={blocksByDay}
+                  onAddBlock={handleAddBlock}
+                  onEditBlock={handleEditBlock}
+                  onDeleteBlock={handleDeleteBlock}
+                />
+              )}
 
-              {/* Grille semaine */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Calendar className="h-5 w-5" />
-                    Vue semaine
-                  </CardTitle>
-                  <CardDescription>
-                    Cliquez pour ajouter ou modifier des blocs temporels
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-7 gap-2">
-                    {daysOfWeek.map((day) => (
-                      <div key={day} className="text-center">
-                        <div className="text-sm font-medium text-muted-foreground mb-2">
-                          {day}
-                        </div>
-                        <div className="space-y-1 min-h-[200px] bg-muted/30 rounded-lg p-2">
-                          {/* Placeholder pour les blocs */}
-                          <div className="text-xs text-muted-foreground text-center py-8">
-                            Cliquez pour ajouter
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Résumé rapide */}
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                <Card className="bg-purple-500/10 border-purple-500/20">
-                  <CardContent className="p-4 text-center">
-                    <Sparkles className="h-6 w-6 mx-auto mb-2 text-purple-600" />
-                    <div className="text-2xl font-bold">0h</div>
-                    <div className="text-sm text-muted-foreground">Création</div>
-                  </CardContent>
-                </Card>
-                <Card className="bg-blue-500/10 border-blue-500/20">
-                  <CardContent className="p-4 text-center">
-                    <Moon className="h-6 w-6 mx-auto mb-2 text-blue-600" />
-                    <div className="text-2xl font-bold">0h</div>
-                    <div className="text-sm text-muted-foreground">Récupération</div>
-                  </CardContent>
-                </Card>
-                <Card className="bg-orange-500/10 border-orange-500/20">
-                  <CardContent className="p-4 text-center">
-                    <AlertTriangle className="h-6 w-6 mx-auto mb-2 text-orange-600" />
-                    <div className="text-2xl font-bold">0h</div>
-                    <div className="text-sm text-muted-foreground">Contrainte</div>
-                  </CardContent>
-                </Card>
-                <Card className="bg-green-500/10 border-green-500/20">
-                  <CardContent className="p-4 text-center">
-                    <Target className="h-6 w-6 mx-auto mb-2 text-green-600" />
-                    <div className="text-2xl font-bold">0h</div>
-                    <div className="text-sm text-muted-foreground">Temps choisi</div>
-                  </CardContent>
-                </Card>
-              </div>
+              {/* Corrélation émotions */}
+              <EmotionCorrelationChart
+                correlations={correlations}
+                dayPatterns={dayPatterns}
+                emotionDataCount={emotionDataCount}
+                hasData={hasCorrelationData}
+                isLoading={correlationLoading}
+              />
             </motion.div>
           </TabsContent>
 
@@ -246,14 +234,36 @@ export default function TimeCraftPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-center py-12 text-muted-foreground">
-                  <Layers className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p>Aucun bloc créé pour le moment</p>
-                  <Button className="mt-4" variant="outline">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Créer mon premier bloc
-                  </Button>
-                </div>
+                {blocks.length === 0 ? (
+                  <div className="text-center py-12 text-muted-foreground">
+                    <Layers className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <p>Aucun bloc créé pour le moment</p>
+                    <Button className="mt-4" variant="outline" onClick={() => handleAddBlock(1, 9)}>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Créer mon premier bloc
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    <TimeStats stats={stats} />
+                    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                      {blocks.map((block) => (
+                        <Card
+                          key={block.id}
+                          className="cursor-pointer hover:shadow-md transition-shadow"
+                          onClick={() => handleEditBlock(block)}
+                        >
+                          <CardContent className="p-4">
+                            <div className="font-medium">{block.label || block.block_type}</div>
+                            <div className="text-sm text-muted-foreground">
+                              {['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'][block.day_of_week]} • {block.start_hour}h-{block.start_hour + block.duration_hours}h
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
@@ -271,48 +281,25 @@ export default function TimeCraftPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-center py-12 text-muted-foreground">
-                  <Zap className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p>Les insights apparaîtront une fois vos blocs créés</p>
-                  <p className="text-sm mt-2">
-                    Nous observons, nous ne jugeons pas.
-                  </p>
-                </div>
+                <InsightsList 
+                  insights={insights} 
+                  emptyMessage="Les insights apparaîtront une fois vos blocs créés"
+                />
               </CardContent>
             </Card>
           </TabsContent>
 
           {/* Versions */}
           <TabsContent value="versions" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <GitCompare className="h-5 w-5 text-primary" />
-                  Versions de trajectoires
-                </CardTitle>
-                <CardDescription>
-                  Comparez différentes architectures temporelles
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid gap-4">
-                  <Card className="border-primary/20 bg-primary/5">
-                    <CardContent className="p-4 flex items-center justify-between">
-                      <div>
-                        <div className="font-medium">Temps actuel</div>
-                        <div className="text-sm text-muted-foreground">Version principale</div>
-                      </div>
-                      <Badge>Active</Badge>
-                    </CardContent>
-                  </Card>
-                  
-                  <Button variant="outline" className="w-full">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Créer une nouvelle version
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+            <VersionSelector
+              versions={versions}
+              activeVersion={activeVersion}
+              onSetActive={setActiveVersion}
+              onCreate={createVersion}
+              onDuplicate={duplicateVersion}
+              onDelete={deleteVersion}
+              isLoading={versionCreating}
+            />
           </TabsContent>
         </Tabs>
 
@@ -331,18 +318,32 @@ export default function TimeCraftPage() {
                 <div>
                   <h3 className="font-semibold">Corrélation émotions ↔ temps</h3>
                   <p className="text-sm text-muted-foreground">
-                    Reliez vos données émotionnelles à votre structure temporelle
+                    {emotionDataCount > 0 
+                      ? `${emotionDataCount} scans émotionnels connectés`
+                      : 'Connectez vos données émotionnelles pour plus d\'insights'
+                    }
                   </p>
                 </div>
               </div>
-              <Button variant="outline">
-                Connecter mes données
+              <Button variant="outline" onClick={() => setActiveTab('map')}>
+                Voir les corrélations
                 <ArrowRight className="h-4 w-4 ml-2" />
               </Button>
             </CardContent>
           </Card>
         </motion.div>
       </div>
+
+      {/* Block Editor Dialog */}
+      <TimeBlockEditor
+        open={editorOpen}
+        onOpenChange={setEditorOpen}
+        block={editingBlock}
+        defaultDay={defaultDay}
+        defaultHour={defaultHour}
+        onSave={handleSaveBlock}
+        isLoading={isCreating}
+      />
     </main>
   );
 }
