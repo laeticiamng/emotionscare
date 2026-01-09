@@ -81,58 +81,60 @@ export default function InstitutionalAccessPage() {
     setIsLoading(true);
     try {
       // Vérifier le code d'accès
-      const { data, error } = await supabase
+      const { data: codeData, error: codeError } = await supabase
         .from('org_access_codes')
-        .select(`
-          id,
-          org_id,
-          is_active,
-          expires_at,
-          max_uses,
-          current_uses,
-          organizations (
-            id,
-            name,
-            logo_url,
-            description
-          )
-        `)
+        .select('id, org_id, is_active, expires_at, max_uses, current_uses')
         .eq('code', codeToVerify.trim().toUpperCase())
         .eq('is_active', true)
-        .single();
+        .maybeSingle();
 
-      if (error || !data) {
+      if (codeError || !codeData) {
         toast({
           title: 'Code invalide',
-          description: 'Ce code d\'accès n\'existe pas ou n\'est plus actif.',
+          description: "Ce code d'accès n'existe pas ou n'est plus actif.",
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      // Récupérer les infos de l'organisation séparément
+      const { data: orgData, error: orgError } = await supabase
+        .from('organizations')
+        .select('id, name, logo_url, description')
+        .eq('id', codeData.org_id)
+        .maybeSingle();
+
+      if (orgError || !orgData) {
+        toast({
+          title: 'Erreur',
+          description: "Organisation non trouvée.",
           variant: 'destructive',
         });
         return;
       }
 
       // Vérifier expiration
-      if (data.expires_at && new Date(data.expires_at) < new Date()) {
+      if (codeData.expires_at && new Date(codeData.expires_at) < new Date()) {
         toast({
           title: 'Code expiré',
-          description: 'Ce code d\'accès a expiré. Contactez votre organisation.',
+          description: "Ce code d'accès a expiré. Contactez votre organisation.",
           variant: 'destructive',
         });
         return;
       }
 
       // Vérifier limite d'utilisation
-      if (data.max_uses && data.current_uses >= data.max_uses) {
+      if (codeData.max_uses && codeData.current_uses >= codeData.max_uses) {
         toast({
           title: 'Limite atteinte',
-          description: 'Ce code d\'accès a atteint sa limite d\'utilisation.',
+          description: "Ce code d'accès a atteint sa limite d'utilisation.",
           variant: 'destructive',
         });
         return;
       }
 
       // Stocker les infos de l'organisation
-      const orgData = data.organizations as unknown as OrganizationInfo;
-      setOrganization(orgData);
+      setOrganization(orgData as OrganizationInfo);
       setStep('charter');
 
     } catch (err) {
