@@ -172,6 +172,14 @@ const B2BSelectionPage = lazy(() => import('@/pages/B2BSelectionPage'));
 // B2B Enterprise
 const B2BEntreprisePage = lazy(() => import('@/pages/B2BEntreprisePage'));
 
+// B2B Institutional (nouvelles pages)
+const InstitutionalLandingPage = lazy(() => import('@/pages/b2b/InstitutionalLandingPage'));
+const InstitutionalAccessPage = lazy(() => import('@/pages/b2b/InstitutionalAccessPage'));
+const WellnessHubPage = lazy(() => import('@/pages/b2b/WellnessHubPage'));
+const OrgDashboardPage = lazy(() => import('@/pages/b2b/admin/OrgDashboardPage'));
+const B2BSettingsPage = lazy(() => import('@/pages/b2b/admin/SettingsPage'));
+const B2BInstitutionalReportsPage = lazy(() => import('@/pages/b2b/reports/ReportsPage'));
+
 // Pages fonctionnelles avancées
 const B2CMusicTherapyPremiumPage = lazy(() => import('@/pages/B2CMusicTherapyPremiumPage'));
 const B2CAICoachMicroPage = lazy(() => import('@/pages/B2CAICoachMicroPage'));
@@ -376,6 +384,14 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   B2BSelectionPage,
   B2BCollabDashboard,
   B2BRHDashboard,
+  
+  // B2B Institutional
+  InstitutionalLandingPage,
+  InstitutionalAccessPage,
+  WellnessHubPage,
+  OrgDashboardPage,
+  B2BSettingsPage,
+  B2BInstitutionalReportsPage,
   
   // Modules
   B2CScanPage,
