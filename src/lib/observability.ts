@@ -49,8 +49,8 @@ const CONFIG = {
   maxLogs: 1000,
   batchSize: 50,
   flushInterval: 30000, // 30 secondes
-  enableConsoleLog: process.env.NODE_ENV === 'development',
-  enableRemoteLogging: process.env.NODE_ENV === 'production',
+  enableConsoleLog: import.meta.env.DEV,
+  enableRemoteLogging: import.meta.env.PROD,
 };
 
 // ============= Storage local =============

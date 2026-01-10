@@ -7,7 +7,7 @@
 import { logger } from '@/lib/logger';
 
 export const cleanupConsoleStatements = () => {
-  if (process.env.NODE_ENV === 'production') {
+  if (import.meta.env.PROD) {
     // Override all console methods except error and warn for critical issues
     const noop = () => {};
     
@@ -54,7 +54,7 @@ export const cleanupConsoleStatements = () => {
 
 // Development helper to find console statements
 export const logProductionEvent = (event: string, data?: any, level: 'info' | 'warn' | 'error' = 'info') => {
-  if (process.env.NODE_ENV === 'development') {
+  if (import.meta.env.DEV) {
     console[level](`[${event}]`, data);
   } else if (level === 'error' || level === 'warn') {
     // Only log warnings and errors in production
@@ -64,13 +64,13 @@ export const logProductionEvent = (event: string, data?: any, level: 'info' | 'w
 
 // Replace console.log with this in components
 export const devLog = (...args: any[]) => {
-  if (process.env.NODE_ENV === 'development') {
+  if (import.meta.env.DEV) {
     logger.debug(String(args[0]), args.slice(1), 'SYSTEM');
   }
 };
 
 export const debugLog = (context: string, data?: any) => {
-  if (process.env.NODE_ENV === 'development') {
+  if (import.meta.env.DEV) {
     logger.debug(`DEBUG-${context}`, data, 'SYSTEM');
   }
 };

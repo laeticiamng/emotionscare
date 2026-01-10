@@ -51,6 +51,7 @@ export interface MusicPlaylist {
   emotion?: string;
   mood?: string;
   category?: string;
+  isPublic?: boolean;
 }
 
 export interface EmotionMusicParams {

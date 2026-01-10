@@ -458,7 +458,7 @@ export class AccountDeletionService {
         scheduledDate: scheduledDate.toISOString(),
       }, 'GDPR');
 
-      // TODO: Send confirmation email to user
+      // Send confirmation email to user
       await this.sendDeletionConfirmationEmail(userId, scheduledDate);
 
       return data as DeletionRequest;
@@ -486,7 +486,7 @@ export class AccountDeletionService {
 
       logger.info('Account deletion cancelled', { userId }, 'GDPR');
 
-      // TODO: Send cancellation confirmation email
+      // Send cancellation confirmation email
       await this.sendCancellationEmail(userId);
     } catch (error) {
       logger.error('Failed to cancel account deletion', error, 'GDPR');

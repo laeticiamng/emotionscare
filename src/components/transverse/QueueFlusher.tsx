@@ -26,7 +26,7 @@ export const QueueFlusher: React.FC<QueueFlusherProps> = ({
       
       // Nettoyer les timeouts et intervals orphelins
       // Note: Cette approche est limitée mais sûre
-      if (process.env.NODE_ENV === 'development') {
+      if (import.meta.env.DEV) {
         logger.debug('🧹 Queue flushed', {}, 'SYSTEM');
       }
     };
