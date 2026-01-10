@@ -92,8 +92,7 @@ export function useSupportChatbot(userId: string | undefined) {
    */
   const loadMessages = useCallback(async (conversationId: string) => {
     try {
-      const messages =
-        await supportChatbotService.getConversationMessages(conversationId);
+      const messages = await supportChatbotService.getMessages(conversationId);
       setState((prev) => ({
         ...prev,
         messages,
@@ -196,11 +195,17 @@ export function useSupportChatbot(userId: string | undefined) {
       if (!state.conversation || !userId) return;
 
       try {
+        // Update satisfaction first if provided
+        if (satisfaction !== undefined) {
+          await supportChatbotService.updateSatisfaction(
+            state.conversation.id,
+            satisfaction
+          );
+        }
+
+        // Then close the conversation
         const success = await supportChatbotService.closeConversation(
-          state.conversation.id,
-          userId,
-          satisfaction,
-          feedback
+          state.conversation.id
         );
 
         if (success) {
@@ -264,14 +269,14 @@ export function useSupportChatbot(userId: string | undefined) {
 
     // Vérifier les nouveaux messages toutes les 5 secondes
     pollIntervalRef.current = setInterval(async () => {
-      const messages = await supportChatbotService.getConversationMessages(
+      const messages = await supportChatbotService.getMessages(
         state.conversation!.id
       );
 
       // Vérifier s'il y a des nouveaux messages du chatbot
       const lastLocalMessage = state.messages[state.messages.length - 1];
       const hasNewBotMessages = messages.some(
-        (m) =>
+        (m: SupportMessage) =>
           m.sender === 'chatbot' &&
           (!lastLocalMessage || m.created_at > lastLocalMessage.created_at)
       );
@@ -364,12 +369,12 @@ export function useConversationSatisfaction(conversationId: string | undefined) 
 
       try {
         setIsSubmitting(true);
-        await supportChatbotService.closeConversation(
-          conversationId,
-          userId,
-          rating,
-          text
-        );
+        
+        // Update satisfaction
+        await supportChatbotService.updateSatisfaction(conversationId, rating);
+        
+        // Close the conversation
+        await supportChatbotService.closeConversation(conversationId);
 
         setSatisfaction(rating);
         setFeedback(text || '');
