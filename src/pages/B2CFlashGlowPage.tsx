@@ -3,9 +3,9 @@
  * Page de respiration gamifiée accessible WCAG 2.1 AA
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Trophy, Flame, Clock, Share2, Settings } from 'lucide-react';
+import { ArrowLeft, Trophy, Flame, Clock, Share2, Settings, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -13,69 +13,23 @@ import { Link } from 'react-router-dom';
 import { ConsentGate } from '@/features/clinical-optin/ConsentGate';
 import EnhancedFlashGlow from '@/components/modules/EnhancedFlashGlow';
 import { useAuth } from '@/hooks/useAuth';
-import { flashGlowService } from '@/modules/flash-glow/flash-glowService';
+import { useFlashGlowStats } from '@/hooks/useFlashGlowStats';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-
-interface UserStats {
-  totalSessions: number;
-  totalScore: number;
-  currentStreak: number;
-  bestStreak: number;
-  level: number;
-  nextLevelProgress: number;
-}
 
 export default function B2CFlashGlowPage() {
   const { user } = useAuth();
-  const [stats, setStats] = useState<UserStats>({
-    totalSessions: 0,
-    totalScore: 0,
-    currentStreak: 0,
-    bestStreak: 0,
-    level: 1,
-    nextLevelProgress: 0
-  });
-  const [isLoading, setIsLoading] = useState(true);
+  const { stats, isLoading, saveSession } = useFlashGlowStats();
 
   useEffect(() => {
     document.title = "Flash Glow - Respiration Gamifiée | EmotionsCare";
-
-    if (user) {
-      loadStats();
-    } else {
-      setIsLoading(false);
-    }
-  }, [user]);
-
-  const loadStats = async () => {
-    try {
-      const data = await flashGlowService.getStats();
-
-      // Calculate level from total sessions
-      const level = Math.floor(data.total_sessions / 10) + 1;
-      const progress = ((data.total_sessions % 10) / 10) * 100;
-
-      setStats({
-        totalSessions: data.total_sessions,
-        totalScore: data.total_sessions * 50, // Approximate score
-        currentStreak: Math.min(data.recent_sessions.length, 7),
-        bestStreak: Math.min(data.total_sessions, 14),
-        level,
-        nextLevelProgress: progress
-      });
-    } catch (error) {
-      // Use default stats on error
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  }, []);
 
   const handleShare = async () => {
     if (navigator.share) {
       try {
         await navigator.share({
           title: 'Flash Glow - EmotionsCare',
-          text: `J'ai atteint le niveau ${stats.level} sur Flash Glow ! 🌟`,
+          text: `J'ai atteint le niveau ${stats.level} avec ${stats.totalScore} points sur Flash Glow ! 🌟`,
           url: window.location.href
         });
       } catch (err) {
@@ -84,15 +38,26 @@ export default function B2CFlashGlowPage() {
     }
   };
 
+  const handleSessionComplete = async (duration: number, score: number, pattern: string) => {
+    await saveSession({
+      duration_seconds: duration,
+      score,
+      pattern,
+      completed: true
+    });
+  };
+
   const getLevelTitle = (level: number): string => {
     const titles = [
-      'Débutant Lumineux',
-      'Étoile Montante',
-      'Maître de l\'Éclat',
-      'Champion Radiant',
-      'Légende Lumineuse'
+      'Débutant Lumineux',       // Level 1
+      'Étoile Montante',         // Level 2
+      'Maître de l\'Éclat',      // Level 3
+      'Champion Radiant',        // Level 4
+      'Légende Lumineuse',       // Level 5
+      'Gardien de l\'Aura',      // Level 6
+      'Sage Lumineux',           // Level 7+
     ];
-    return titles[Math.min(level - 1, titles.length - 1)];
+    return titles[Math.min(level - 1, titles.length - 1)] || titles[titles.length - 1];
   };
 
   return (
@@ -212,11 +177,11 @@ export default function B2CFlashGlowPage() {
                           <div className="h-2 w-32 bg-muted rounded-full overflow-hidden">
                             <div
                               className="h-full bg-gradient-to-r from-primary to-secondary transition-all duration-500"
-                              style={{ width: `${stats.nextLevelProgress}%` }}
+                              style={{ width: `${stats.levelProgress}%` }}
                             />
                           </div>
                           <span className="text-xs text-muted-foreground">
-                            {Math.round(stats.nextLevelProgress)}%
+                            {Math.round(stats.levelProgress)}%
                           </span>
                         </div>
                       </div>
