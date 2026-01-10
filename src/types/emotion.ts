@@ -24,6 +24,7 @@ export interface EmotionResult {
   duration?: number;
   environment?: string;
   emotions?: Record<string, number>;
+  feedback?: string;
 }
 
 export interface EmotionRecommendation {
