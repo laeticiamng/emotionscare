@@ -2,12 +2,13 @@
  * B2C Boss Level Grit Page - Module de résilience gamifié
  */
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Crown, BarChart2, Sword, RefreshCw, History } from 'lucide-react';
+import { Crown, BarChart2, Sword, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useGritQuest } from '@/hooks/useGritQuest';
+import { useBossGritPersistence } from '@/hooks/useBossGritPersistence';
 import { toast } from '@/hooks/use-toast';
 import {
   ChallengeCard,
@@ -87,50 +88,25 @@ const B2CBossLevelGritPage: React.FC = () => {
     updateElapsedTime
   } = useGritQuest();
 
-  // History state
-  const [questHistory, setQuestHistory] = useState<Array<{
-    id: string;
-    title: string;
-    completedAt: string;
-    xp: number;
-    success: boolean;
-  }>>([]);
+  // Supabase persistence
+  const { stats: persistedStats, saveQuest, quests: questHistory } = useBossGritPersistence();
 
-  // Player stats from localStorage
-  const [playerStats, setPlayerStats] = useState({
-    level: 1,
-    currentXP: 0,
-    maxXP: 100,
-    totalQuests: 0,
-    completedQuests: 0,
-    streak: 0,
-    bestStreak: 0
-  });
+  // Player stats from Supabase (with fallback)
+  const playerStats = {
+    level: persistedStats.level,
+    currentXP: persistedStats.totalXP % 500,
+    maxXP: 500,
+    totalQuests: persistedStats.totalQuests,
+    completedQuests: persistedStats.completedQuests,
+    streak: persistedStats.currentStreak,
+    bestStreak: persistedStats.bestStreak
+  };
 
   // Timer ref for elapsed time
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const startTimeRef = useRef<number | null>(null);
 
-  // Load stats and history from localStorage
-  useEffect(() => {
-    const saved = localStorage.getItem('boss-grit-stats');
-    if (saved) {
-      try {
-        setPlayerStats(JSON.parse(saved));
-      } catch {
-        // Ignore
-      }
-    }
-
-    const savedHistory = localStorage.getItem('boss-grit-history');
-    if (savedHistory) {
-      try {
-        setQuestHistory(JSON.parse(savedHistory));
-      } catch {
-        // Ignore
-      }
-    }
-  }, []);
+  // Stats are now loaded from Supabase via useBossGritPersistence
 
   // Timer effect: increment elapsed time every second when active
   useEffect(() => {
@@ -157,16 +133,6 @@ const B2CBossLevelGritPage: React.FC = () => {
       }
     };
   }, [status, elapsedTime, updateElapsedTime]);
-
-  const saveStats = (stats: typeof playerStats) => {
-    localStorage.setItem('boss-grit-stats', JSON.stringify(stats));
-    setPlayerStats(stats);
-  };
-
-  const saveHistory = (history: typeof questHistory) => {
-    localStorage.setItem('boss-grit-history', JSON.stringify(history));
-    setQuestHistory(history);
-  };
 
   // Convert quest from hook to Quest format
   useEffect(() => {
@@ -230,51 +196,33 @@ const B2CBossLevelGritPage: React.FC = () => {
   const handleCompleteQuest = async () => {
     if (!activeQuest) return;
 
+    const tasksCompleted = activeQuest.tasks.filter(t => t.completed).length;
     const xp = activeQuest.tasks
       .filter(t => t.completed)
       .reduce((sum, t) => sum + t.xp, 0);
     
     setEarnedXP(xp);
 
-    // Update stats
-    let newStats = {
-      ...playerStats,
-      currentXP: playerStats.currentXP + xp,
-      completedQuests: playerStats.completedQuests + 1,
-      totalQuests: playerStats.totalQuests + 1,
-      streak: playerStats.streak + 1,
-      bestStreak: Math.max(playerStats.bestStreak, playerStats.streak + 1)
-    };
-
-    // Level up check
-    let leveledUp = false;
-    while (newStats.currentXP >= newStats.maxXP) {
-      newStats = {
-        ...newStats,
-        level: newStats.level + 1,
-        currentXP: newStats.currentXP - newStats.maxXP,
-        maxXP: Math.floor(newStats.maxXP * 1.5)
-      };
-      leveledUp = true;
-    }
-
-    saveStats(newStats);
-
-    // Save to history
-    const historyEntry = {
-      id: activeQuest.id || `quest-${Date.now()}`,
-      title: activeQuest.title,
-      completedAt: new Date().toISOString(),
-      xp,
-      success: true
-    };
-    saveHistory([historyEntry, ...questHistory].slice(0, 50));
+    // Save to Supabase
+    await saveQuest({
+      quest_title: activeQuest.title,
+      quest_description: activeQuest.description,
+      difficulty: activeQuest.difficulty,
+      xp_earned: xp,
+      tasks_completed: tasksCompleted,
+      total_tasks: activeQuest.tasks.length,
+      elapsed_seconds: elapsedTime,
+      success: true,
+      completed_at: new Date().toISOString()
+    });
 
     await completeQuest(true);
 
-    if (leveledUp) {
+    // Check for level up
+    const newLevel = Math.floor((persistedStats.totalXP + xp) / 500) + 1;
+    if (newLevel > persistedStats.level) {
       toast({
-        title: `🎉 Niveau ${newStats.level} atteint !`,
+        title: `🎉 Niveau ${newLevel} atteint !`,
         description: 'Félicitations pour votre progression !'
       });
     }
@@ -282,17 +230,20 @@ const B2CBossLevelGritPage: React.FC = () => {
     setShowCompletion(true);
   };
 
-  const handleAbandonQuest = () => {
+  const handleAbandonQuest = async () => {
     if (activeQuest) {
-      // Save abandoned quest to history
-      const historyEntry = {
-        id: activeQuest.id || `quest-${Date.now()}`,
-        title: activeQuest.title,
-        completedAt: new Date().toISOString(),
-        xp: 0,
-        success: false
-      };
-      saveHistory([historyEntry, ...questHistory].slice(0, 50));
+      // Save abandoned quest to Supabase
+      await saveQuest({
+        quest_title: activeQuest.title,
+        quest_description: activeQuest.description,
+        difficulty: activeQuest.difficulty,
+        xp_earned: 0,
+        tasks_completed: 0,
+        total_tasks: activeQuest.tasks.length,
+        elapsed_seconds: elapsedTime,
+        success: false,
+        completed_at: new Date().toISOString()
+      });
     }
 
     abortQuest('User abandoned');
