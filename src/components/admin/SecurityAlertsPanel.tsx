@@ -13,13 +13,14 @@ import {
   type SecurityAlert,
 } from '@/services/securityAlertsService';
 import { format } from 'date-fns';
+import { useAuth } from '@/contexts/AuthContext';
 import { fr } from 'date-fns/locale';
 
 export const SecurityAlertsPanel: React.FC = () => {
+  const { user } = useAuth();
   const [alerts, setAlerts] = useState<SecurityAlert[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const toast = useToast();
-
   useEffect(() => {
     loadAlerts();
     
@@ -50,9 +51,13 @@ export const SecurityAlertsPanel: React.FC = () => {
   };
 
   const handleAcknowledge = async (alertId: string) => {
+    if (!user) {
+      toast.error('Erreur', 'Vous devez être connecté pour traiter les alertes.');
+      return;
+    }
+    
     try {
-      // TODO: Get actual user ID from auth context
-      await acknowledgeAlert(alertId, 'current-user-id');
+      await acknowledgeAlert(alertId, user.id);
       setAlerts((prev) => prev.filter((a) => a.id !== alertId));
       toast.success('Alerte traitée', 'L\'alerte a été marquée comme traitée.');
     } catch (error) {

@@ -5,17 +5,19 @@
 
 import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Info, Settings, Share2 } from 'lucide-react';
+import { ArrowLeft, Info, Settings, Share2, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Link } from 'react-router-dom';
 import { ConsentGate } from '@/features/clinical-optin/ConsentGate';
 import { AdvancedBreathwork } from '@/components/breath/AdvancedBreathwork';
 import { useAuth } from '@/hooks/useAuth';
+import { useBreathworkStats } from '@/hooks/useBreathworkStats';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 export default function B2CBreathworkPage() {
   const { user } = useAuth();
+  const { stats, isLoading, saveSession } = useBreathworkStats();
 
   useEffect(() => {
     document.title = "Breathwork Avancé | EmotionsCare";
@@ -154,19 +156,27 @@ export default function B2CBreathworkPage() {
               {user && (
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
                   <Card className="p-4 text-center">
-                    <div className="text-2xl font-bold text-primary">12</div>
-                    <div className="text-xs text-muted-foreground">Sessions cette semaine</div>
+                    <div className="text-2xl font-bold text-primary">
+                      {isLoading ? <Loader2 className="h-6 w-6 animate-spin mx-auto" /> : stats.totalSessions}
+                    </div>
+                    <div className="text-xs text-muted-foreground">Sessions totales</div>
                   </Card>
                   <Card className="p-4 text-center">
-                    <div className="text-2xl font-bold text-success">85%</div>
+                    <div className="text-2xl font-bold text-success">
+                      {isLoading ? <Loader2 className="h-6 w-6 animate-spin mx-auto" /> : `${stats.averageCompletionRate}%`}
+                    </div>
                     <div className="text-xs text-muted-foreground">Taux de complétion</div>
                   </Card>
                   <Card className="p-4 text-center">
-                    <div className="text-2xl font-bold text-warning">7</div>
+                    <div className="text-2xl font-bold text-warning">
+                      {isLoading ? <Loader2 className="h-6 w-6 animate-spin mx-auto" /> : stats.currentStreak}
+                    </div>
                     <div className="text-xs text-muted-foreground">Jours de streak</div>
                   </Card>
                   <Card className="p-4 text-center">
-                    <div className="text-2xl font-bold text-info">4</div>
+                    <div className="text-2xl font-bold text-info">
+                      {isLoading ? <Loader2 className="h-6 w-6 animate-spin mx-auto" /> : stats.masteredPatterns}
+                    </div>
                     <div className="text-xs text-muted-foreground">Techniques maîtrisées</div>
                   </Card>
                 </div>

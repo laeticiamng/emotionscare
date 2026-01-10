@@ -53,8 +53,8 @@ const EnhancedUserDashboard: React.FC<EnhancedUserDashboardProps> = ({ user }) =
   // Calculate dashboard stats from real API data
   const dashboardStats = {
     weeklyProgress: stats?.wellnessScore || 0,
-    monthlyGoals: 12, // TODO: Add goals tracking
-    completedGoals: 9, // TODO: Add goals tracking
+    monthlyGoals: stats?.monthlyGoals || 10,
+    completedGoals: stats?.completedGoals || 0,
     currentStreak: stats?.streakDays || 0,
     totalSessions: stats?.totalSessions || 0,
     averageRating: weeklyData?.today?.glow_score ? weeklyData.today.glow_score / 10 : 0,

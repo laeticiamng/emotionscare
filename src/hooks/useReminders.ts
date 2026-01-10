@@ -1,148 +1,167 @@
-// @ts-nocheck
+/**
+ * useReminders - Gestion des rappels avec persistance Supabase
+ */
 import { useState, useEffect, useCallback } from 'react';
-import { useNotifyStore, type Reminder } from '@/store/notify.store';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
 import { logger } from '@/lib/logger';
 
-export const useReminders = () => {
-  const {
-    reminders,
-    loading,
-    error,
-    setReminders,
-    addReminder,
-    updateReminder,
-    removeReminder,
-    setLoading,
-    setError
-  } = useNotifyStore();
+export interface Reminder {
+  id: string;
+  kind: 'breathwork' | 'journal' | 'scan' | 'meditation' | 'check-in' | 'custom';
+  title: string;
+  message?: string;
+  time: string;
+  days_of_week: number[];
+  is_active: boolean;
+  last_sent_at?: string;
+  created_at?: string;
+  updated_at?: string;
+}
 
+export const useReminders = () => {
+  const { user } = useAuth();
+  const [reminders, setReminders] = useState<Reminder[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [initialized, setInitialized] = useState(false);
 
-  // Load reminders from API
+  // Load reminders from Supabase
   const loadReminders = useCallback(async () => {
+    if (!user) {
+      setReminders([]);
+      setInitialized(true);
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
     try {
-      // TODO: Implement with Supabase edge function
-      // For now, return empty array (reminders stored locally)
-      setReminders([]);
-      
-    } catch (error: any) {
-      logger.error('Load reminders failed', error as Error, 'SYSTEM');
-      setError(error.message);
+      const { data, error: fetchError } = await supabase
+        .from('user_reminders')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('time', { ascending: true });
+
+      if (fetchError) throw fetchError;
+
+      setReminders((data || []) as Reminder[]);
+      logger.info('[Reminders] Loaded', { count: data?.length || 0 }, 'REMINDERS');
+    } catch (err: any) {
+      logger.error('Load reminders failed', err as Error, 'SYSTEM');
+      setError(err.message);
     } finally {
       setLoading(false);
       setInitialized(true);
     }
-  }, [setReminders, setLoading, setError]);
+  }, [user]);
 
   // Create a new reminder
-  const createReminder = useCallback(async (reminderData: Omit<Reminder, 'id'>) => {
+  const createReminder = useCallback(async (reminderData: Omit<Reminder, 'id' | 'created_at' | 'updated_at'>) => {
+    if (!user) {
+      toast({
+        title: "Connexion requise",
+        description: "Veuillez vous connecter pour créer des rappels.",
+        variant: "destructive"
+      });
+      return null;
+    }
+
     setLoading(true);
     setError(null);
 
     try {
-      const response = await fetch('/api/me/reminders', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(reminderData)
-      });
+      const { data, error: insertError } = await supabase
+        .from('user_reminders')
+        .insert({
+          user_id: user.id,
+          kind: reminderData.kind,
+          title: reminderData.title,
+          message: reminderData.message,
+          time: reminderData.time,
+          days_of_week: reminderData.days_of_week,
+          is_active: reminderData.is_active ?? true
+        })
+        .select()
+        .single();
 
-      if (!response.ok) {
-        throw new Error('Failed to create reminder');
-      }
+      if (insertError) throw insertError;
 
-      const result = await response.json();
-      const newReminder = { ...reminderData, id: result.id };
-      
-      addReminder(newReminder);
+      const newReminder = data as Reminder;
+      setReminders(prev => [...prev, newReminder]);
 
       toast({
         title: "Rappel créé ✨",
-        description: `Rappel ${reminderData.kind} programmé avec succès.`,
+        description: `Rappel "${reminderData.title}" programmé avec succès.`,
       });
 
-      // Analytics
-      if (typeof window !== 'undefined' && window.gtag) {
-        window.gtag('event', 'notify.reminder.created', {
-          kind: reminderData.kind
-        });
-      }
-
+      logger.info('[Reminders] Created', { kind: reminderData.kind }, 'REMINDERS');
       return newReminder;
-
-    } catch (error: any) {
-      logger.error('Create reminder failed', error as Error, 'SYSTEM');
-      setError(error.message);
-      
+    } catch (err: any) {
+      logger.error('Create reminder failed', err as Error, 'SYSTEM');
+      setError(err.message);
       toast({
         title: "Erreur",
         description: "Impossible de créer le rappel.",
         variant: "destructive"
       });
-      
       return null;
     } finally {
       setLoading(false);
     }
-  }, [addReminder, setLoading, setError]);
+  }, [user]);
 
   // Update a reminder
   const editReminder = useCallback(async (id: string, updates: Partial<Reminder>) => {
+    if (!user) return false;
+
     setLoading(true);
     setError(null);
 
     // Optimistic update
-    updateReminder(id, updates);
+    setReminders(prev => prev.map(r => r.id === id ? { ...r, ...updates } : r));
 
     try {
-      const response = await fetch(`/api/me/reminders/${id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updates)
-      });
+      const { error: updateError } = await supabase
+        .from('user_reminders')
+        .update({
+          ...updates,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', id)
+        .eq('user_id', user.id);
 
-      if (!response.ok) {
-        throw new Error('Failed to update reminder');
-      }
+      if (updateError) throw updateError;
 
       toast({
         title: "Rappel mis à jour",
         description: "Vos modifications ont été enregistrées.",
       });
 
-      // Analytics
-      if (typeof window !== 'undefined' && window.gtag) {
-        window.gtag('event', 'notify.reminder.updated', {
-          kind: reminders.find(r => r.id === id)?.kind
-        });
-      }
-
+      logger.info('[Reminders] Updated', { id }, 'REMINDERS');
       return true;
-
-    } catch (error: any) {
+    } catch (err: any) {
       // Rollback on error
       await loadReminders();
-      
-      logger.error('Update reminder failed', error as Error, 'SYSTEM');
-      setError(error.message);
-      
+      logger.error('Update reminder failed', err as Error, 'SYSTEM');
+      setError(err.message);
       toast({
         title: "Erreur",
         description: "Impossible de mettre à jour le rappel.",
         variant: "destructive"
       });
-      
       return false;
     } finally {
       setLoading(false);
     }
-  }, [updateReminder, reminders, setLoading, setError, loadReminders]);
+  }, [user, loadReminders]);
 
   // Delete a reminder
   const deleteReminder = useCallback(async (id: string) => {
+    if (!user) return false;
+
     setLoading(true);
     setError(null);
 
@@ -150,51 +169,48 @@ export const useReminders = () => {
     const reminder = reminders.find(r => r.id === id);
     
     // Optimistic removal
-    removeReminder(id);
+    setReminders(prev => prev.filter(r => r.id !== id));
 
     try {
-      const response = await fetch(`/api/me/reminders/${id}`, {
-        method: 'DELETE'
-      });
+      const { error: deleteError } = await supabase
+        .from('user_reminders')
+        .delete()
+        .eq('id', id)
+        .eq('user_id', user.id);
 
-      if (!response.ok) {
-        throw new Error('Failed to delete reminder');
-      }
+      if (deleteError) throw deleteError;
 
       toast({
         title: "Rappel supprimé",
         description: "Le rappel a été supprimé avec succès.",
       });
 
-      // Analytics
-      if (typeof window !== 'undefined' && window.gtag) {
-        window.gtag('event', 'notify.reminder.deleted', {
-          kind: reminder?.kind
-        });
-      }
-
+      logger.info('[Reminders] Deleted', { id }, 'REMINDERS');
       return true;
-
-    } catch (error: any) {
+    } catch (err: any) {
       // Rollback on error
       if (reminder) {
-        addReminder(reminder);
+        setReminders(prev => [...prev, reminder]);
       }
-      
-      logger.error('Delete reminder failed', error as Error, 'SYSTEM');
-      setError(error.message);
-      
+      logger.error('Delete reminder failed', err as Error, 'SYSTEM');
+      setError(err.message);
       toast({
         title: "Erreur",
         description: "Impossible de supprimer le rappel.",
         variant: "destructive"
       });
-      
       return false;
     } finally {
       setLoading(false);
     }
-  }, [reminders, removeReminder, addReminder, setLoading, setError]);
+  }, [user, reminders]);
+
+  // Toggle reminder active state
+  const toggleReminder = useCallback(async (id: string) => {
+    const reminder = reminders.find(r => r.id === id);
+    if (!reminder) return false;
+    return editReminder(id, { is_active: !reminder.is_active });
+  }, [reminders, editReminder]);
 
   // Initialize on mount
   useEffect(() => {
@@ -203,6 +219,15 @@ export const useReminders = () => {
     }
   }, [initialized, loadReminders]);
 
+  // Reload when user changes
+  useEffect(() => {
+    if (user) {
+      loadReminders();
+    } else {
+      setReminders([]);
+    }
+  }, [user?.id]);
+
   return {
     reminders,
     loading,
@@ -210,6 +235,9 @@ export const useReminders = () => {
     loadReminders,
     createReminder,
     editReminder,
-    deleteReminder
+    deleteReminder,
+    toggleReminder
   };
 };
+
+export default useReminders;

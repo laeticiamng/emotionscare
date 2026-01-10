@@ -24592,6 +24592,48 @@ export type Database = {
         }
         Relationships: []
       }
+      user_reminders: {
+        Row: {
+          created_at: string | null
+          days_of_week: number[] | null
+          id: string
+          is_active: boolean | null
+          kind: string
+          last_sent_at: string | null
+          message: string | null
+          time: string
+          title: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          days_of_week?: number[] | null
+          id?: string
+          is_active?: boolean | null
+          kind: string
+          last_sent_at?: string | null
+          message?: string | null
+          time: string
+          title: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          days_of_week?: number[] | null
+          id?: string
+          is_active?: boolean | null
+          kind?: string
+          last_sent_at?: string | null
+          message?: string | null
+          time?: string
+          title?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_reports: {
         Row: {
           created_at: string | null
