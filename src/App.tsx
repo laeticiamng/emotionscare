@@ -10,6 +10,7 @@ import './index.css';
 const InstitutionalLandingPage = lazy(() => import('@/pages/b2b/InstitutionalLandingPage'));
 const InstitutionalAccessPage = lazy(() => import('@/pages/b2b/InstitutionalAccessPage'));
 const WellnessHubPage = lazy(() => import('@/pages/b2b/WellnessHubPage'));
+const B2BModuleWrapperPage = lazy(() => import('@/pages/b2b/B2BModuleWrapperPage'));
 const OrgDashboardPage = lazy(() => import('@/pages/b2b/admin/OrgDashboardPage'));
 const B2BSettingsPage = lazy(() => import('@/pages/b2b/admin/SettingsPage'));
 const B2BRHDashboard = lazy(() => import('@/pages/B2BRHDashboard'));
@@ -35,6 +36,7 @@ function App() {
               <Route path="/b2b" element={<InstitutionalLandingPage />} />
               <Route path="/b2b/access" element={<InstitutionalAccessPage />} />
               <Route path="/b2b/wellness" element={<WellnessHubPage />} />
+              <Route path="/b2b/module/:moduleId" element={<B2BModuleWrapperPage />} />
               <Route path="/b2b/admin" element={<OrgDashboardPage />} />
               <Route path="/b2b/admin/settings" element={<B2BSettingsPage />} />
               <Route path="/b2b/admin/dashboard" element={<B2BRHDashboard />} />
