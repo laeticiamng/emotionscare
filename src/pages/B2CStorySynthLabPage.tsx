@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Play, Pause, RotateCcw, Volume2, VolumeX, BookOpen } from 'lucide-react';
+import { ArrowLeft, Play, Pause, RotateCcw, Volume2, VolumeX, BookOpen, Trash2, Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { useMotionPrefs } from '@/hooks/useMotionPrefs';
+import { useStorySynthPersistence, type StorySynthStory } from '@/hooks/useStorySynthPersistence';
+import { useAuth } from '@/contexts/AuthContext';
 
-interface Story {
+interface LocalStory {
   id: string;
   title: string;
   content: string;
@@ -19,31 +21,41 @@ interface Story {
 const B2CStorySynthLabPage: React.FC = () => {
   const navigate = useNavigate();
   const { shouldAnimate } = useMotionPrefs();
+  const { user } = useAuth();
+  const { 
+    stories: savedStoriesDB, 
+    isLoading: isLoadingStories, 
+    fetchStories, 
+    saveStory, 
+    toggleFavorite: toggleFavoriteDB,
+    incrementPlayCount,
+    deleteStory 
+  } = useStorySynthPersistence();
   
   const [intentions, setIntentions] = useState<string[]>(['', '', '']);
-  const [currentStory, setCurrentStory] = useState<Story | null>(null);
+  const [currentStory, setCurrentStory] = useState<LocalStory | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [playTime, setPlayTime] = useState(0);
-  const [savedStories, setSavedStories] = useState<Story[]>([
-    {
-      id: '1',
-      title: 'Respiration de la forêt',
-      content: 'Dans une clairière baignée de lumière douce...',
-      intention: ['calme', 'nature', 'respirer'],
-      duration: 240,
-      isFavorite: true
-    },
-    {
-      id: '2', 
-      title: 'Le refuge des nuages',
-      content: 'Vous flotez sur un coussin de vapeur...',
-      intention: ['détente', 'nuages', 'flotter'],
-      duration: 180,
-      isFavorite: false
+
+  // Fetch stories on mount
+  useEffect(() => {
+    if (user) {
+      fetchStories();
     }
-  ]);
+  }, [user, fetchStories]);
+
+  // Convert DB stories to local format
+  const savedStories: LocalStory[] = savedStoriesDB.map(s => ({
+    id: s.id,
+    title: s.title,
+    content: s.content,
+    intention: s.intentions,
+    audioUrl: s.audio_url,
+    duration: s.duration_seconds,
+    isFavorite: s.is_favorite
+  }));
 
   const generateStory = async () => {
     const validIntentions = intentions.filter(i => i.trim());
@@ -54,7 +66,7 @@ const B2CStorySynthLabPage: React.FC = () => {
     // Simulation de génération OpenAI + Suno
     await new Promise(resolve => setTimeout(resolve, 2000));
     
-    const mockStory: Story = {
+    const mockStory: LocalStory = {
       id: Date.now().toString(),
       title: `Histoire de ${validIntentions.join(', ')}`,
       content: `Une histoire apaisante tissée autour de vos mots : ${validIntentions.join(', ')}. 
@@ -77,15 +89,25 @@ const B2CStorySynthLabPage: React.FC = () => {
 
   const togglePlay = () => {
     setIsPlaying(!isPlaying);
-  };
-
-  const saveStory = () => {
-    if (currentStory) {
-      setSavedStories(prev => [{ ...currentStory, isFavorite: false }, ...prev]);
+    if (!isPlaying && currentStory && savedStoriesDB.find(s => s.id === currentStory.id)) {
+      incrementPlayCount(currentStory.id);
     }
   };
 
-  const loadStory = (story: Story) => {
+  const handleSaveStory = async () => {
+    if (currentStory && user) {
+      await saveStory({
+        title: currentStory.title,
+        content: currentStory.content,
+        intentions: currentStory.intention,
+        audio_url: currentStory.audioUrl,
+        duration_seconds: currentStory.duration,
+        is_favorite: false
+      });
+    }
+  };
+
+  const loadStory = (story: LocalStory) => {
     setCurrentStory(story);
     setIntentions([...story.intention, '', ''].slice(0, 3));
     setPlayTime(0);
@@ -93,13 +115,11 @@ const B2CStorySynthLabPage: React.FC = () => {
   };
 
   const toggleFavorite = (storyId: string) => {
-    setSavedStories(prev => 
-      prev.map(story => 
-        story.id === storyId 
-          ? { ...story, isFavorite: !story.isFavorite }
-          : story
-      )
-    );
+    toggleFavoriteDB(storyId);
+  };
+
+  const handleDeleteStory = (storyId: string) => {
+    deleteStory(storyId);
   };
 
   const handleIntentionChange = (index: number, value: string) => {
@@ -243,7 +263,7 @@ const B2CStorySynthLabPage: React.FC = () => {
             </div>
 
             <div className="flex gap-2">
-              <Button onClick={saveStory} variant="outline" className="flex-1">
+              <Button onClick={handleSaveStory} variant="outline" className="flex-1">
                 Sauvegarder
               </Button>
               <Button onClick={generateStory} variant="ghost">

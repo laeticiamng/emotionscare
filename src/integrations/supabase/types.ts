@@ -6382,6 +6382,7 @@ export type Database = {
           id: string
           is_active: boolean | null
           is_premium: boolean | null
+          item_number: number | null
           metadata: Json | null
           order_index: number | null
           slug: string
@@ -6399,6 +6400,7 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           is_premium?: boolean | null
+          item_number?: number | null
           metadata?: Json | null
           order_index?: number | null
           slug: string
@@ -6416,6 +6418,7 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           is_premium?: boolean | null
+          item_number?: number | null
           metadata?: Json | null
           order_index?: number | null
           slug?: string
@@ -14777,6 +14780,57 @@ export type Database = {
           music_url?: string | null
           started_at?: string | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      music_therapy_tracks: {
+        Row: {
+          artist: string
+          audio_url: string | null
+          binaural_hz: number | null
+          category: string
+          cover_url: string | null
+          created_at: string | null
+          description: string | null
+          duration_seconds: number
+          frequency: string | null
+          id: string
+          is_premium: boolean | null
+          play_count: number | null
+          tags: string[] | null
+          title: string
+        }
+        Insert: {
+          artist?: string
+          audio_url?: string | null
+          binaural_hz?: number | null
+          category: string
+          cover_url?: string | null
+          created_at?: string | null
+          description?: string | null
+          duration_seconds: number
+          frequency?: string | null
+          id?: string
+          is_premium?: boolean | null
+          play_count?: number | null
+          tags?: string[] | null
+          title: string
+        }
+        Update: {
+          artist?: string
+          audio_url?: string | null
+          binaural_hz?: number | null
+          category?: string
+          cover_url?: string | null
+          created_at?: string | null
+          description?: string | null
+          duration_seconds?: number
+          frequency?: string | null
+          id?: string
+          is_premium?: boolean | null
+          play_count?: number | null
+          tags?: string[] | null
+          title?: string
         }
         Relationships: []
       }
@@ -25078,6 +25132,56 @@ export type Database = {
             columns: ["plan_id"]
             isOneToOne: false
             referencedRelation: "subscription_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_therapy_sessions: {
+        Row: {
+          completion_rate: number | null
+          created_at: string | null
+          duration_seconds: number | null
+          ended_at: string | null
+          id: string
+          mood_after: number | null
+          mood_before: number | null
+          notes: string | null
+          started_at: string | null
+          track_id: string | null
+          user_id: string
+        }
+        Insert: {
+          completion_rate?: number | null
+          created_at?: string | null
+          duration_seconds?: number | null
+          ended_at?: string | null
+          id?: string
+          mood_after?: number | null
+          mood_before?: number | null
+          notes?: string | null
+          started_at?: string | null
+          track_id?: string | null
+          user_id: string
+        }
+        Update: {
+          completion_rate?: number | null
+          created_at?: string | null
+          duration_seconds?: number | null
+          ended_at?: string | null
+          id?: string
+          mood_after?: number | null
+          mood_before?: number | null
+          notes?: string | null
+          started_at?: string | null
+          track_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_therapy_sessions_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "music_therapy_tracks"
             referencedColumns: ["id"]
           },
         ]
