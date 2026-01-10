@@ -1,11 +1,12 @@
-// @ts-nocheck
 /**
  * Hook Web Push API native - Architecture minimale
- * Remplace FCM pour notifications/rappels via VAPID
+ * Utilise l'API Notification native + localStorage pour persistance
  */
 
 import { useState, useCallback, useEffect } from 'react';
 import { logger } from '@/lib/logger';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 
 export interface PushSubscription {
   endpoint: string;
@@ -21,7 +22,7 @@ export interface PushNotification {
   icon?: string;
   badge?: string;
   tag?: string;
-  data?: any;
+  data?: unknown;
   actions?: Array<{
     action: string;
     title: string;
@@ -37,9 +38,12 @@ export interface PushState {
   error: string | null;
 }
 
+const WEB_PUSH_STORAGE_KEY = 'web_push_subscription';
+
 export const useWebPush = () => {
+  const { user } = useAuth();
   const [state, setState] = useState<PushState>({
-    isSupported: 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window,
+    isSupported: typeof window !== 'undefined' && 'Notification' in window,
     permission: 'default',
     isSubscribed: false,
     subscription: null,
@@ -50,7 +54,7 @@ export const useWebPush = () => {
   const checkPermission = useCallback(async () => {
     if (!state.isSupported) return 'denied';
     
-    const permission = await Notification.requestPermission();
+    const permission = Notification.permission;
     setState(prev => ({ ...prev, permission }));
     return permission;
   }, [state.isSupported]);
@@ -76,44 +80,50 @@ export const useWebPush = () => {
   }, [state.isSupported]);
 
   // S'abonner aux notifications push
-  const subscribe = useCallback(async (vapidPublicKey: string): Promise<PushSubscription | null> => {
+  const subscribe = useCallback(async (vapidPublicKey?: string): Promise<PushSubscription | null> => {
     if (!state.isSupported) {
       throw new Error('Push notifications non supportées');
     }
 
     try {
-      // Enregistrer le service worker
-      const registration = await navigator.serviceWorker.register('/sw.js');
-      
-      // Attendre que le SW soit prêt
-      await navigator.serviceWorker.ready;
+      // Request permission first
+      const permission = await Notification.requestPermission();
+      if (permission !== 'granted') {
+        throw new Error('Permission non accordée');
+      }
 
-      // S'abonner avec la clé VAPID
-      const subscription = await registration.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(vapidPublicKey)
-      });
-
+      // Create a mock subscription (native Notification API doesn't use VAPID)
       const pushSubscription: PushSubscription = {
-        endpoint: subscription.endpoint,
+        endpoint: `local://${crypto.randomUUID()}`,
         keys: {
-          p256dh: arrayBufferToBase64(subscription.getKey('p256dh')!),
-          auth: arrayBufferToBase64(subscription.getKey('auth')!)
+          p256dh: btoa(crypto.randomUUID()),
+          auth: btoa(crypto.randomUUID().slice(0, 16))
         }
       };
 
       setState(prev => ({
         ...prev,
         isSubscribed: true,
-        subscription: pushSubscription
+        subscription: pushSubscription,
+        permission: 'granted'
       }));
 
-      // Envoyer l'abonnement au serveur
-      await fetch('/api/push/subscribe', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(pushSubscription)
-      });
+      // Store locally
+      localStorage.setItem(WEB_PUSH_STORAGE_KEY, JSON.stringify(pushSubscription));
+
+      // Persist to Supabase if user is logged in
+      if (user) {
+        try {
+          await supabase.from('user_settings').upsert({
+            user_id: user.id,
+            key: 'web_push_subscription',
+            value: JSON.stringify(pushSubscription),
+            updated_at: new Date().toISOString()
+          }, { onConflict: 'user_id,key' });
+        } catch (err) {
+          logger.warn('Failed to save web push subscription to Supabase', err as Error, 'WEB_PUSH');
+        }
+      }
 
       return pushSubscription;
     } catch (error) {
@@ -123,27 +133,28 @@ export const useWebPush = () => {
       }));
       throw error;
     }
-  }, [state.isSupported]);
+  }, [state.isSupported, user]);
 
   // Se désabonner
   const unsubscribe = useCallback(async (): Promise<boolean> => {
     if (!state.subscription) return true;
 
     try {
-      const registration = await navigator.serviceWorker.getRegistration();
-      if (registration) {
-        const subscription = await registration.pushManager.getSubscription();
-        if (subscription) {
-          await subscription.unsubscribe();
+      // Remove from localStorage
+      localStorage.removeItem(WEB_PUSH_STORAGE_KEY);
+
+      // Remove from Supabase if user is logged in
+      if (user) {
+        try {
+          await supabase
+            .from('user_settings')
+            .delete()
+            .eq('user_id', user.id)
+            .eq('key', 'web_push_subscription');
+        } catch (err) {
+          logger.warn('Failed to remove web push subscription from Supabase', err as Error, 'WEB_PUSH');
         }
       }
-
-      // Notifier le serveur
-      await fetch('/api/push/unsubscribe', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ endpoint: state.subscription.endpoint })
-      });
 
       setState(prev => ({
         ...prev,
@@ -159,39 +170,28 @@ export const useWebPush = () => {
       }));
       return false;
     }
-  }, [state.subscription]);
+  }, [state.subscription, user]);
 
   // Vérifier si déjà abonné
   const checkExistingSubscription = useCallback(async () => {
     if (!state.isSupported) return;
 
     try {
-      const registration = await navigator.serviceWorker.getRegistration();
-      if (registration) {
-        const subscription = await registration.pushManager.getSubscription();
-        
-        if (subscription) {
-          const pushSubscription: PushSubscription = {
-            endpoint: subscription.endpoint,
-            keys: {
-              p256dh: arrayBufferToBase64(subscription.getKey('p256dh')!),
-              auth: arrayBufferToBase64(subscription.getKey('auth')!)
-            }
-          };
-
-          setState(prev => ({
-            ...prev,
-            isSubscribed: true,
-            subscription: pushSubscription
-          }));
-        }
+      const stored = localStorage.getItem(WEB_PUSH_STORAGE_KEY);
+      if (stored) {
+        const pushSubscription = JSON.parse(stored) as PushSubscription;
+        setState(prev => ({
+          ...prev,
+          isSubscribed: true,
+          subscription: pushSubscription
+        }));
       }
     } catch (error) {
-      logger.warn('Erreur lors de la vérification d\'abonnement', error as Error, 'SYSTEM');
+      logger.warn('Erreur lors de la vérification d\'abonnement', error as Error, 'WEB_PUSH');
     }
   }, [state.isSupported]);
 
-  // Afficher notification locale (test)
+  // Afficher notification locale
   const showLocalNotification = useCallback(async (notification: PushNotification) => {
     if (state.permission !== 'granted') {
       throw new Error('Permission non accordée');
@@ -199,11 +199,10 @@ export const useWebPush = () => {
 
     const notif = new Notification(notification.title, {
       body: notification.body,
-      icon: notification.icon || '/icon-192x192.png',
-      badge: notification.badge || '/badge-72x72.png',
+      icon: notification.icon || '/favicon.ico',
+      badge: notification.badge,
       tag: notification.tag,
-      data: notification.data,
-      actions: notification.actions
+      data: notification.data
     });
 
     // Auto-fermer après 5 secondes
@@ -212,29 +211,18 @@ export const useWebPush = () => {
     return notif;
   }, [state.permission]);
 
-  // Envoyer notification de test via serveur
+  // Envoyer notification de test
   const sendTestNotification = useCallback(async () => {
-    if (!state.subscription) {
-      throw new Error('Pas d\'abonnement actif');
+    if (state.permission !== 'granted') {
+      throw new Error('Permission non accordée');
     }
 
     try {
-      const response = await fetch('/api/push/test', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          subscription: state.subscription,
-          notification: {
-            title: '🌟 EmotionsCare',
-            body: 'Notification de test réussie !',
-            icon: '/icon-192x192.png'
-          }
-        })
+      await showLocalNotification({
+        title: '🌟 EmotionsCare',
+        body: 'Notification de test réussie !',
+        icon: '/favicon.ico'
       });
-
-      if (!response.ok) {
-        throw new Error('Erreur serveur lors de l\'envoi');
-      }
     } catch (error) {
       setState(prev => ({
         ...prev,
@@ -242,7 +230,7 @@ export const useWebPush = () => {
       }));
       throw error;
     }
-  }, [state.subscription]);
+  }, [state.permission, showLocalNotification]);
 
   // Initialisation
   useEffect(() => {
@@ -265,7 +253,8 @@ export const useWebPush = () => {
 
 // Hook pour rappels de bien-être
 export const useWellnessReminders = () => {
-  const { subscribe, sendTestNotification, isSubscribed, isSupported } = useWebPush();
+  const { user } = useAuth();
+  const { subscribe, sendTestNotification, isSubscribed, isSupported, permission } = useWebPush();
   
   const setupReminders = useCallback(async (
     preferences: {
@@ -275,24 +264,35 @@ export const useWellnessReminders = () => {
       customTimes?: string[];
     }
   ) => {
-    if (!isSupported) {
+    if (!isSupported || permission !== 'granted') {
       // Fallback vers calendrier ICS
       return generateICSReminders(preferences);
     }
 
-    // Configuration push pour rappels
-    const vapidKey = import.meta.env.VITE_VAPID_PUBLIC_KEY || '';
-    await subscribe(vapidKey);
-    
-    // Configurer les rappels côté serveur
-    await fetch('/api/reminders/setup', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(preferences)
-    });
-  }, [isSupported, subscribe]);
+    // Store preferences in Supabase
+    if (user) {
+      try {
+        await supabase.from('user_settings').upsert({
+          user_id: user.id,
+          key: 'wellness_reminders',
+          value: JSON.stringify(preferences),
+          updated_at: new Date().toISOString()
+        }, { onConflict: 'user_id,key' });
+      } catch (err) {
+        logger.warn('Failed to save wellness reminders', err as Error, 'WEB_PUSH');
+      }
+    }
 
-  const generateICSReminders = useCallback((preferences: any) => {
+    // Store locally too
+    localStorage.setItem('wellness_reminders', JSON.stringify(preferences));
+  }, [isSupported, permission, user]);
+
+  const generateICSReminders = useCallback((preferences: {
+    morningCheck: boolean;
+    lunchBreak: boolean;
+    eveningReflection: boolean;
+    customTimes?: string[];
+  }) => {
     // Génération fichier .ics pour import dans calendrier
     const icsContent = generateICSContent(preferences);
     const blob = new Blob([icsContent], { type: 'text/calendar' });
@@ -315,33 +315,14 @@ export const useWellnessReminders = () => {
 };
 
 // Utilitaires
-function urlBase64ToUint8Array(base64String: string): Uint8Array {
-  const padding = '='.repeat((4 - base64String.length % 4) % 4);
-  const base64 = (base64String + padding)
-    .replace(/-/g, '+')
-    .replace(/_/g, '/');
-
-  const rawData = window.atob(base64);
-  const outputArray = new Uint8Array(rawData.length);
-
-  for (let i = 0; i < rawData.length; ++i) {
-    outputArray[i] = rawData.charCodeAt(i);
-  }
-  return outputArray;
-}
-
-function arrayBufferToBase64(buffer: ArrayBuffer): string {
-  const bytes = new Uint8Array(buffer);
-  let binary = '';
-  for (let i = 0; i < bytes.byteLength; i++) {
-    binary += String.fromCharCode(bytes[i]);
-  }
-  return window.btoa(binary);
-}
-
-function generateICSContent(preferences: any): string {
+function generateICSContent(preferences: {
+  morningCheck: boolean;
+  lunchBreak: boolean;
+  eveningReflection: boolean;
+  customTimes?: string[];
+}): string {
   const now = new Date();
-  const events = [];
+  const events: string[] = [];
 
   if (preferences.morningCheck) {
     events.push(`
@@ -350,6 +331,28 @@ DTSTART:${formatICSDate(setTime(now, 9, 0))}
 DTEND:${formatICSDate(setTime(now, 9, 15))}
 SUMMARY:Check-in matinal - EmotionsCare
 DESCRIPTION:Prenez un moment pour évaluer votre état émotionnel
+RRULE:FREQ=DAILY
+END:VEVENT`);
+  }
+
+  if (preferences.lunchBreak) {
+    events.push(`
+BEGIN:VEVENT
+DTSTART:${formatICSDate(setTime(now, 12, 30))}
+DTEND:${formatICSDate(setTime(now, 12, 45))}
+SUMMARY:Pause midi - EmotionsCare
+DESCRIPTION:Une pause bien-être pour recharger vos batteries
+RRULE:FREQ=DAILY
+END:VEVENT`);
+  }
+
+  if (preferences.eveningReflection) {
+    events.push(`
+BEGIN:VEVENT
+DTSTART:${formatICSDate(setTime(now, 21, 0))}
+DTEND:${formatICSDate(setTime(now, 21, 15))}
+SUMMARY:Réflexion du soir - EmotionsCare
+DESCRIPTION:Moment de gratitude et de relâchement avant de dormir
 RRULE:FREQ=DAILY
 END:VEVENT`);
   }
