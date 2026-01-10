@@ -1,17 +1,40 @@
 // @ts-nocheck
 
 import { toast } from '@/hooks/use-toast';
-import { GlobalInterceptor } from './globalInterceptor';
 import { logger } from '@/lib/logger';
 
 /**
- * Utilitaires vocaux ultra-robustes avec gestion d'erreur complète
- * Timeout strict et désactivation temporaire en cas d'erreur
+ * Utilitaires vocaux ultra-robustes utilisant Web Speech API
+ * Pas d'appels API backend - utilise les APIs navigateur natives
  */
 export class RobustVoiceUtils {
   private static disabledUntil: { [key: string]: number } = {};
-  private static readonly TIMEOUT_MS = 15000; // 15s timeout strict
-  private static readonly DISABLE_DURATION_MS = 30000; // 30s désactivation
+  private static readonly TIMEOUT_MS = 15000;
+  private static readonly DISABLE_DURATION_MS = 30000;
+  private static recognition: SpeechRecognition | null = null;
+  private static synthesis: SpeechSynthesis | null = null;
+  
+  /**
+   * Initialise les APIs vocales du navigateur
+   */
+  private static initSpeechAPIs(): void {
+    if (typeof window === 'undefined') return;
+    
+    // Speech Recognition
+    const SpeechRecognitionAPI = (window as any).SpeechRecognition || 
+                                  (window as any).webkitSpeechRecognition;
+    if (SpeechRecognitionAPI && !this.recognition) {
+      this.recognition = new SpeechRecognitionAPI();
+      this.recognition.continuous = false;
+      this.recognition.interimResults = false;
+      this.recognition.lang = 'fr-FR';
+    }
+    
+    // Speech Synthesis
+    if (window.speechSynthesis && !this.synthesis) {
+      this.synthesis = window.speechSynthesis;
+    }
+  }
   
   /**
    * Vérifie si une fonction vocale est temporairement désactivée
@@ -43,59 +66,66 @@ export class RobustVoiceUtils {
   }
 
   /**
-   * Appel sécurisé pour la transcription vocale
+   * Transcription vocale via Web Speech API
    */
-  static async transcribeAudio(audioData: string): Promise<string | null> {
+  static async transcribeAudio(_audioData?: string): Promise<string | null> {
     const functionName = 'transcribeAudio';
     
     if (this.isDisabled(functionName)) {
       return null;
     }
 
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), this.TIMEOUT_MS);
-
-      const response = await GlobalInterceptor.secureFetch('/api/voice-to-text', {
-        method: 'POST',
-        body: JSON.stringify({ audio: audioData }),
-        signal: controller.signal,
+    this.initSpeechAPIs();
+    
+    if (!this.recognition) {
+      logger.warn('Speech Recognition not available in this browser', {}, 'VR');
+      toast({
+        title: "Reconnaissance vocale non disponible",
+        description: "Votre navigateur ne supporte pas cette fonctionnalité",
+        variant: "destructive",
       });
-
-      clearTimeout(timeoutId);
-
-      if (!response) {
-        // GlobalInterceptor a géré l'erreur
-        this.disableTemporarily(functionName);
-        return null;
-      }
-
-      if (response.status >= 500) {
-        throw new Error(`Voice service error: ${response.status}`);
-      }
-
-      const result = await response.json();
-      return result.text || null;
-
-    } catch (error: any) {
-      if (error.name === 'AbortError') {
-        logger.error(`[Voice] ${functionName} timeout exceeded`, error as Error, 'VR');
-        toast({
-          title: "Timeout vocal",
-          description: "La transcription a pris trop de temps",
-          variant: "destructive",
-        });
-      } else {
-        logger.error(`[Voice] ${functionName} error`, error as Error, 'VR');
-      }
-      
-      this.disableTemporarily(functionName);
       return null;
     }
+
+    return new Promise((resolve) => {
+      const timeoutId = setTimeout(() => {
+        this.recognition?.stop();
+        logger.warn('Speech recognition timeout', {}, 'VR');
+        resolve(null);
+      }, this.TIMEOUT_MS);
+
+      this.recognition!.onresult = (event) => {
+        clearTimeout(timeoutId);
+        const transcript = event.results[0]?.[0]?.transcript || null;
+        logger.info('Speech transcribed', { length: transcript?.length }, 'VR');
+        resolve(transcript);
+      };
+
+      this.recognition!.onerror = (event) => {
+        clearTimeout(timeoutId);
+        logger.error(`Speech recognition error: ${event.error}`, new Error(event.error), 'VR');
+        if (event.error === 'not-allowed' || event.error === 'network') {
+          this.disableTemporarily(functionName);
+        }
+        resolve(null);
+      };
+
+      this.recognition!.onend = () => {
+        clearTimeout(timeoutId);
+      };
+
+      try {
+        this.recognition!.start();
+      } catch (error) {
+        clearTimeout(timeoutId);
+        logger.error('Failed to start speech recognition', error as Error, 'VR');
+        resolve(null);
+      }
+    });
   }
 
   /**
-   * Appel sécurisé pour la synthèse vocale
+   * Synthèse vocale via Web Speech Synthesis API
    */
   static async synthesizeText(text: string, voice?: string): Promise<string | null> {
     const functionName = 'synthesizeText';
@@ -104,46 +134,80 @@ export class RobustVoiceUtils {
       return null;
     }
 
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), this.TIMEOUT_MS);
+    this.initSpeechAPIs();
 
-      const response = await GlobalInterceptor.secureFetch('/api/text-to-voice', {
-        method: 'POST',
-        body: JSON.stringify({ text, voice }),
-        signal: controller.signal,
+    if (!this.synthesis) {
+      logger.warn('Speech Synthesis not available in this browser', {}, 'VR');
+      toast({
+        title: "Synthèse vocale non disponible",
+        description: "Votre navigateur ne supporte pas cette fonctionnalité",
+        variant: "destructive",
       });
-
-      clearTimeout(timeoutId);
-
-      if (!response) {
-        // GlobalInterceptor a géré l'erreur
-        this.disableTemporarily(functionName);
-        return null;
-      }
-
-      if (response.status >= 500) {
-        throw new Error(`Voice service error: ${response.status}`);
-      }
-
-      const result = await response.json();
-      return result.audioContent || null;
-
-    } catch (error: any) {
-      if (error.name === 'AbortError') {
-        logger.error(`[Voice] ${functionName} timeout exceeded`, error as Error, 'VR');
-        toast({
-          title: "Timeout vocal",
-          description: "La synthèse vocale a pris trop de temps",
-          variant: "destructive",
-        });
-      } else {
-        logger.error(`[Voice] ${functionName} error`, error as Error, 'VR');
-      }
-      
-      this.disableTemporarily(functionName);
       return null;
     }
+
+    return new Promise((resolve) => {
+      try {
+        // Cancel any ongoing speech
+        this.synthesis!.cancel();
+
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'fr-FR';
+        utterance.rate = 0.9;
+        utterance.pitch = 1;
+
+        // Select voice if specified
+        if (voice) {
+          const voices = this.synthesis!.getVoices();
+          const selectedVoice = voices.find(v => 
+            v.name.toLowerCase().includes(voice.toLowerCase()) ||
+            v.lang.includes('fr')
+          );
+          if (selectedVoice) {
+            utterance.voice = selectedVoice;
+          }
+        }
+
+        const timeoutId = setTimeout(() => {
+          this.synthesis!.cancel();
+          logger.warn('Speech synthesis timeout', {}, 'VR');
+          resolve(null);
+        }, this.TIMEOUT_MS);
+
+        utterance.onend = () => {
+          clearTimeout(timeoutId);
+          logger.info('Speech synthesis completed', { textLength: text.length }, 'VR');
+          resolve('completed');
+        };
+
+        utterance.onerror = (event) => {
+          clearTimeout(timeoutId);
+          logger.error(`Speech synthesis error: ${event.error}`, new Error(event.error), 'VR');
+          this.disableTemporarily(functionName);
+          resolve(null);
+        };
+
+        this.synthesis!.speak(utterance);
+      } catch (error) {
+        logger.error('Failed to synthesize speech', error as Error, 'VR');
+        resolve(null);
+      }
+    });
+  }
+
+  /**
+   * Arrête la synthèse vocale en cours
+   */
+  static stopSynthesis(): void {
+    this.initSpeechAPIs();
+    this.synthesis?.cancel();
+  }
+
+  /**
+   * Arrête la reconnaissance vocale en cours
+   */
+  static stopRecognition(): void {
+    this.recognition?.stop();
   }
 
   /**
@@ -166,17 +230,31 @@ export class RobustVoiceUtils {
   }
 
   /**
+   * Vérifie la disponibilité des APIs vocales
+   */
+  static checkAvailability(): { recognition: boolean; synthesis: boolean } {
+    this.initSpeechAPIs();
+    return {
+      recognition: !!this.recognition,
+      synthesis: !!this.synthesis,
+    };
+  }
+
+  /**
    * Status de toutes les fonctions vocales
    */
-  static getStatus(): { [key: string]: { disabled: boolean; timeRemaining: number } } {
+  static getStatus(): { [key: string]: { disabled: boolean; timeRemaining: number; available: boolean } } {
+    const availability = this.checkAvailability();
     return {
       transcribeAudio: {
         disabled: this.isDisabled('transcribeAudio'),
-        timeRemaining: this.getDisabledTimeRemaining('transcribeAudio')
+        timeRemaining: this.getDisabledTimeRemaining('transcribeAudio'),
+        available: availability.recognition,
       },
       synthesizeText: {
         disabled: this.isDisabled('synthesizeText'),
-        timeRemaining: this.getDisabledTimeRemaining('synthesizeText')
+        timeRemaining: this.getDisabledTimeRemaining('synthesizeText'),
+        available: availability.synthesis,
       }
     };
   }

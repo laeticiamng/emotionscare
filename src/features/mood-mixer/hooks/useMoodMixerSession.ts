@@ -9,6 +9,8 @@ import { Sentry } from '@/lib/errors/sentry-compat';
 import { useFlags } from '@/core/flags';
 import { useToast } from '@/components/ui/use-toast';
 import { useCurrentMood } from '@/hooks/useCurrentMood';
+import { createSession } from '@/services/sessions/sessionsApi';
+import { logger } from '@/lib/logger';
 
 import { computeMixerActions, type MixerAction } from '@/features/orchestration/moodMixer.orchestrator';
 import type { MixerParams } from '../audio/engine';
@@ -174,34 +176,32 @@ const reduceActions = (actions: MixerAction[]) => {
   return { params, hints: Array.from(hints), microGesture, crossfadeMs };
 };
 
+/**
+ * Persiste la session MoodMixer via Supabase
+ */
 async function persistSession(intent: MoodMixerIntent, params: MixerParams) {
   try {
-    const response = await fetch('/api/sessions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
+    await createSession({
+      type: 'music',
+      duration_sec: 0,
+      mood_delta: null,
+      meta: {
         module: 'mood_mixer',
-        metadata: {
-          intent,
-          params: {
-            warmth: params.warmth,
-            brightness: params.brightness,
-            tempo: params.tempo,
-            rhythm: params.rhythm,
-            dynamics: params.dynamics,
-            reverb: params.reverb,
-          },
-          notes: 'guidage sliders appliqué',
+        intent,
+        params: {
+          warmth: params.warmth,
+          brightness: params.brightness,
+          tempo: params.tempo,
+          rhythm: params.rhythm,
+          dynamics: params.dynamics,
+          reverb: params.reverb,
         },
-      }),
+        notes: 'guidage sliders appliqué',
+      },
     });
-
-    if (!response.ok) {
-      throw new Error('persist_failed');
-    }
+    logger.info('MoodMixer session persisted', { intent }, 'MIXER');
   } catch (error) {
+    logger.error('Failed to persist MoodMixer session', error as Error, 'MIXER');
     Sentry.captureException(error);
   }
 }
@@ -300,7 +300,7 @@ export function useMoodMixerSession(): MoodMixerSessionState {
         Sentry.captureException(error);
         toast({
           title: 'Synchronisation sonore indisponible',
-          description: 'Le moteur audio n’a pas pu suivre les curseurs pour le moment.',
+          description: "Le moteur audio n'a pas pu suivre les curseurs pour le moment.",
           variant: 'destructive',
         });
       } finally {
