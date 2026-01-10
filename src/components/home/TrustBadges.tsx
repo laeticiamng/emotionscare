@@ -151,7 +151,7 @@ const TrustBadges: React.FC<TrustBadgesProps> = ({
       whileInView="visible"
       viewport={{ once: true }}
       className={cn(
-        'flex flex-wrap justify-center gap-6 py-6 border-y border-border/30',
+        'flex flex-wrap justify-center gap-4 sm:gap-6 py-4 sm:py-6 border-y border-border/30 px-2 sm:px-0',
         className
       )}
     >

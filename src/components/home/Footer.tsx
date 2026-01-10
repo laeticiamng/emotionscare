@@ -149,14 +149,14 @@ const Footer: React.FC = () => {
 
         {/* Divider */}
         <div className="border-t border-border/50 pt-6">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
             {/* Copyright */}
             <p className="text-sm text-muted-foreground">
               © {currentYear} EmotionsCare. Tous droits réservés.
             </p>
 
             {/* Contact & Status */}
-            <div className="flex items-center gap-6">
+            <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
               <a 
                 href="mailto:contact@emotionscare.app" 
                 className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
