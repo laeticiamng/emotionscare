@@ -1,18 +1,16 @@
 /**
  * Suno Music Generator Demo Page
  * Complete music generation interface with Suno AI
+ * Uses Edge Functions - no API keys needed on client side
  */
 
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { SunoMusicGenerator } from '@/components/music/SunoMusicGenerator';
 import { Music, Sparkles, Info, Zap, Heart, Clock } from 'lucide-react';
 
 export default function SunoMusicGeneratorPage() {
-  const sunoApiKey = import.meta.env.VITE_SUNO_API_KEY;
-
   return (
     <div className="container max-w-7xl mx-auto p-6 space-y-6">
       {/* Header */}
@@ -35,15 +33,15 @@ export default function SunoMusicGeneratorPage() {
       </div>
 
       {/* Info Banner */}
-      <Card className="border-blue-200 bg-blue-50/50">
+      <Card className="border-blue-200 bg-blue-50/50 dark:bg-blue-950/20 dark:border-blue-800">
         <CardContent className="pt-6">
           <div className="flex items-start gap-3">
-            <Info className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
+            <Info className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
             <div className="space-y-2">
-              <p className="text-sm font-medium text-blue-900">
+              <p className="text-sm font-medium text-blue-900 dark:text-blue-100">
                 Comment ça fonctionne ?
               </p>
-              <ul className="text-sm text-blue-800 space-y-1 list-disc list-inside">
+              <ul className="text-sm text-blue-800 dark:text-blue-200 space-y-1 list-disc list-inside">
                 <li>
                   <strong>Sélectionnez votre humeur :</strong> Choisissez l'émotion que vous ressentez ou celle que vous souhaitez atteindre
                 </li>
@@ -211,28 +209,6 @@ export default function SunoMusicGeneratorPage() {
           </p>
         </CardContent>
       </Card>
-
-      {/* Configuration Notice */}
-      {!sunoApiKey && (
-        <Alert variant="destructive" className="mt-6">
-          <AlertTitle>Configuration requise</AlertTitle>
-          <AlertDescription>
-            Pour utiliser le générateur musical Suno, vous devez configurer votre clé API.
-            <br />
-            Ajoutez <code className="bg-muted px-1 py-0.5 rounded">VITE_SUNO_API_KEY</code> dans
-            votre fichier <code className="bg-muted px-1 py-0.5 rounded">.env</code>
-            <br />
-            <a
-              href="https://suno.ai/api"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline mt-2 inline-block"
-            >
-              Obtenir une clé API Suno →
-            </a>
-          </AlertDescription>
-        </Alert>
-      )}
 
       {/* Footer Note */}
       <Card className="bg-muted/50">

@@ -1,6 +1,7 @@
 /**
  * Sentry Alerting Configuration
  * Defines alert rules, thresholds, and integrations for production monitoring
+ * Note: Sensitive config (PagerDuty, email) should be managed via Supabase secrets
  */
 
 import * as Sentry from '@sentry/react';
@@ -314,9 +315,9 @@ export const SLACK_ALERT_CONFIG = {
 /**
  * PagerDuty alert configuration
  * For critical on-call incidents
+ * Note: Service ID should be configured in Supabase Edge Function secrets
  */
 export const PAGERDUTY_ALERT_CONFIG = {
-  service_id: process.env.VITE_PAGERDUTY_SERVICE_ID,
   urgency: 'high',
   rules: [
     {
@@ -339,9 +340,9 @@ export const PAGERDUTY_ALERT_CONFIG = {
 
 /**
  * Daily/Weekly email digest configuration
+ * Note: Recipients should be configured in Supabase Edge Function secrets
  */
 export const EMAIL_DIGEST_CONFIG = {
-  recipients: [process.env.VITE_ALERT_EMAIL_RECIPIENTS || 'ops@emotionscare.com'],
   frequency: 'daily', // or 'weekly'
   include_metrics: ['error_rate', 'response_time_p95', 'request_volume', 'affected_users'],
   include_top_issues: 10,
