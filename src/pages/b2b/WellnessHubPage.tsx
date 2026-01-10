@@ -56,7 +56,7 @@ const wellnessModules: WellnessModule[] = [
     icon: Brain,
     color: 'text-purple-600',
     bgColor: 'bg-purple-500/10',
-    path: '/app/scan',
+    path: '/b2b/module/scan',
     duration: '2-5 min',
     category: 'scan',
   },
@@ -67,7 +67,7 @@ const wellnessModules: WellnessModule[] = [
     icon: Music,
     color: 'text-blue-600',
     bgColor: 'bg-blue-500/10',
-    path: '/app/music',
+    path: '/b2b/module/music',
     duration: '5-30 min',
     category: 'relax',
   },
@@ -78,7 +78,7 @@ const wellnessModules: WellnessModule[] = [
     icon: Wind,
     color: 'text-teal-600',
     bgColor: 'bg-teal-500/10',
-    path: '/app/breath',
+    path: '/b2b/module/breath',
     duration: '3-10 min',
     category: 'relax',
   },
@@ -89,7 +89,7 @@ const wellnessModules: WellnessModule[] = [
     icon: Sparkles,
     color: 'text-indigo-600',
     bgColor: 'bg-indigo-500/10',
-    path: '/app/meditation',
+    path: '/b2b/module/meditation',
     duration: '5-20 min',
     category: 'relax',
   },
@@ -100,7 +100,7 @@ const wellnessModules: WellnessModule[] = [
     icon: Zap,
     color: 'text-amber-600',
     bgColor: 'bg-amber-500/10',
-    path: '/app/flash-glow',
+    path: '/b2b/module/flash-glow',
     duration: '1-3 min',
     category: 'activity',
   },
@@ -111,7 +111,7 @@ const wellnessModules: WellnessModule[] = [
     icon: Headphones,
     color: 'text-pink-600',
     bgColor: 'bg-pink-500/10',
-    path: '/app/mood-mixer',
+    path: '/b2b/module/mood-mixer',
     duration: '5-15 min',
     category: 'explore',
   },
@@ -122,7 +122,7 @@ const wellnessModules: WellnessModule[] = [
     icon: BookOpen,
     color: 'text-emerald-600',
     bgColor: 'bg-emerald-500/10',
-    path: '/app/journal',
+    path: '/b2b/module/journal',
     duration: 'Variable',
     category: 'explore',
   },
@@ -133,16 +133,16 @@ const wellnessModules: WellnessModule[] = [
     icon: Eye,
     color: 'text-cyan-600',
     bgColor: 'bg-cyan-500/10',
-    path: '/app/vr',
+    path: '/b2b/module/vr',
     duration: '5-15 min',
     category: 'explore',
   },
 ];
 
 const quickSessions = [
-  { label: 'Pause 2 min', duration: 2, icon: Timer },
-  { label: 'Détente 5 min', duration: 5, icon: Heart },
-  { label: 'Reset 10 min', duration: 10, icon: Sparkles },
+  { label: 'Pause 2 min', duration: 2, icon: Timer, path: '/b2b/module/quick-session' },
+  { label: 'Détente 5 min', duration: 5, icon: Heart, path: '/b2b/module/quick-session' },
+  { label: 'Reset 10 min', duration: 10, icon: Sparkles, path: '/b2b/module/quick-session' },
 ];
 
 export default function WellnessHubPage() {
@@ -237,7 +237,7 @@ export default function WellnessHubPage() {
                       key={session.duration}
                       variant="secondary"
                       size="sm"
-                      onClick={() => navigate(`/app/quick-session?duration=${session.duration}`)}
+                      onClick={() => navigate(`${session.path}?duration=${session.duration}`)}
                     >
                       <session.icon className="h-4 w-4 mr-1" />
                       {session.label}

@@ -277,6 +277,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     requireAuth: true,
   },
   {
+    name: 'login',
     path: '/login',
     segment: 'public',
     layout: 'marketing',
