@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { HumeStreamClient } from '@/services/hume/stream';
+import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 
 interface EmotionData {
@@ -10,30 +10,25 @@ interface EmotionData {
   timestamp: number;
 }
 
+/**
+ * Hook pour l'analyse émotionnelle via Edge Functions
+ * Sécurisé - pas de clé API côté client
+ */
 export const useHumeStream = () => {
   const [isConnected, setIsConnected] = useState(false);
   const [currentEmotion, setCurrentEmotion] = useState<EmotionData | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const clientRef = useRef<HumeStreamClient | null>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const pollingRef = useRef<NodeJS.Timeout | null>(null);
 
   const connect = useCallback(() => {
     try {
-      const apiKey = import.meta.env.VITE_HUME_API_KEY;
-
-      if (!apiKey) {
-        throw new Error('Hume API key not configured. Please set VITE_HUME_API_KEY in your environment variables.');
-      }
-
-      clientRef.current = new HumeStreamClient({ apiKey });
-      
-      clientRef.current.connect((emotion: EmotionData) => {
-        setCurrentEmotion(emotion);
-        setIsConnected(true);
-      });
+      setIsConnected(true);
+      setError(null);
 
       toast({
         title: '🎭 Analyse émotionnelle activée',
-        description: 'Votre état émotionnel est maintenant suivi en temps réel',
+        description: 'Votre état émotionnel peut maintenant être analysé',
       });
 
     } catch (err) {
@@ -48,9 +43,9 @@ export const useHumeStream = () => {
   }, []);
 
   const disconnect = useCallback(() => {
-    if (clientRef.current) {
-      clientRef.current.disconnect();
-      clientRef.current = null;
+    if (pollingRef.current) {
+      clearInterval(pollingRef.current);
+      pollingRef.current = null;
     }
     setIsConnected(false);
     setCurrentEmotion(null);
@@ -61,27 +56,90 @@ export const useHumeStream = () => {
     });
   }, []);
 
-  const sendAudioChunk = useCallback((audioData: ArrayBuffer) => {
-    if (clientRef.current) {
-      clientRef.current.sendAudioChunk(audioData);
+  /**
+   * Analyse un chunk audio via Edge Function
+   */
+  const sendAudioChunk = useCallback(async (audioData: ArrayBuffer) => {
+    if (!isConnected || isAnalyzing) return;
+    
+    setIsAnalyzing(true);
+    try {
+      // Convertir en base64
+      const base64Audio = btoa(
+        String.fromCharCode(...new Uint8Array(audioData))
+      );
+      
+      const { data, error } = await supabase.functions.invoke('hume-analysis', {
+        body: { 
+          audio: base64Audio, 
+          analysisType: 'prosody' 
+        }
+      });
+      
+      if (error) throw error;
+      
+      if (data?.emotions) {
+        const emotion: EmotionData = {
+          valence: data.valence || 0.5,
+          arousal: data.arousal || 0.5,
+          dominantEmotion: data.emotions[0]?.name || 'neutral',
+          confidence: data.emotions[0]?.score || 0.5,
+          timestamp: Date.now()
+        };
+        setCurrentEmotion(emotion);
+      }
+    } catch (err) {
+      console.error('Audio analysis error:', err);
+    } finally {
+      setIsAnalyzing(false);
     }
-  }, []);
+  }, [isConnected, isAnalyzing]);
 
-  const sendText = useCallback((text: string) => {
-    if (clientRef.current) {
-      clientRef.current.sendText(text);
+  /**
+   * Analyse du texte via Edge Function
+   */
+  const sendText = useCallback(async (text: string) => {
+    if (!isConnected || isAnalyzing || !text.trim()) return;
+    
+    setIsAnalyzing(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('hume-analysis', {
+        body: { 
+          text, 
+          analysisType: 'text' 
+        }
+      });
+      
+      if (error) throw error;
+      
+      if (data?.emotions) {
+        const emotion: EmotionData = {
+          valence: data.valence || 0.5,
+          arousal: data.arousal || 0.5,
+          dominantEmotion: data.emotions[0]?.name || 'neutral',
+          confidence: data.emotions[0]?.score || 0.5,
+          timestamp: Date.now()
+        };
+        setCurrentEmotion(emotion);
+      }
+    } catch (err) {
+      console.error('Text analysis error:', err);
+    } finally {
+      setIsAnalyzing(false);
     }
-  }, []);
+  }, [isConnected, isAnalyzing]);
 
   const getSmoothedEmotion = useCallback(() => {
-    return clientRef.current?.getSmoothedEmotion() || { valence: 0.5, arousal: 0.5 };
-  }, []);
+    return currentEmotion 
+      ? { valence: currentEmotion.valence, arousal: currentEmotion.arousal }
+      : { valence: 0.5, arousal: 0.5 };
+  }, [currentEmotion]);
 
   // Cleanup au démontage
   useEffect(() => {
     return () => {
-      if (clientRef.current) {
-        clientRef.current.disconnect();
+      if (pollingRef.current) {
+        clearInterval(pollingRef.current);
       }
     };
   }, []);
@@ -90,6 +148,7 @@ export const useHumeStream = () => {
     isConnected,
     currentEmotion,
     error,
+    isAnalyzing,
     connect,
     disconnect,
     sendAudioChunk,

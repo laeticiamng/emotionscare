@@ -1,39 +1,59 @@
 /**
  * Hume AI Real-time Emotion Scanning Page
- * Demo/Example page for Hume AI WebSocket integration
+ * Uses Edge Functions for secure API calls - no client-side API keys
  */
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { logger } from '@/lib/logger';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
-import { HumeAIRealtimeScanner } from '@/components/scan/HumeAIRealtimeScanner';
-import { Camera, Mic, Type, Info, Sparkles, AlertTriangle } from 'lucide-react';
+import { Camera, Mic, Type, Info, Sparkles } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-// Service temporarily disabled - using console.log
-// import { emotionScanService } from '@/services/emotion/scan-service';
 import { useToast } from '@/hooks/use-toast';
-import type { HumeEmotionResult } from '@/services/ai/HumeAIWebSocketService';
+
+interface EmotionResult {
+  topEmotion: {
+    name: string;
+    score: number;
+  };
+  emotions?: Array<{ name: string; score: number }>;
+}
 
 export default function HumeAIRealtimePage() {
   const { user } = useAuth();
   const { toast } = useToast();
-  const [selectedMode, setSelectedMode] = useState<'face' | 'prosody' | 'language'>('face');
+  const [selectedMode, setSelectedMode] = useState<'face' | 'prosody' | 'language'>('language');
   const [scanCount, setScanCount] = useState(0);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [textInput, setTextInput] = useState('');
+  const [lastResult, setLastResult] = useState<EmotionResult | null>(null);
 
-  // Get Hume AI API key from environment
-  const humeApiKey = import.meta.env.VITE_HUME_API_KEY;
-
-  const handleEmotionDetected = async (result: HumeEmotionResult) => {
-    if (!user?.id) return;
-
-    // Save the emotion scan to Supabase
+  const analyzeText = useCallback(async (text: string) => {
+    if (!text.trim() || !user?.id) return;
+    
+    setIsAnalyzing(true);
     try {
-      logger.debug('Emotion detected', { emotion: result.topEmotion.name, score: result.topEmotion.score }, 'SCAN');
+      // Appel via Edge Function - pas de clé API côté client
+      const { data, error } = await supabase.functions.invoke('hume-analysis', {
+        body: { 
+          text, 
+          analysisType: 'text'
+        }
+      });
+      
+      if (error) throw error;
+      
+      const result: EmotionResult = {
+        topEmotion: {
+          name: data?.emotions?.[0]?.name || 'neutral',
+          score: data?.emotions?.[0]?.score || 0.5
+        },
+        emotions: data?.emotions || []
+      };
+      
+      setLastResult(result);
       
       // Sauvegarder le scan en base de données
       const { error: insertError } = await supabase
@@ -41,7 +61,7 @@ export default function HumeAIRealtimePage() {
         .insert({
           user_id: user.id,
           valence: result.topEmotion.score * 100,
-          arousal: 50, // Valeur par défaut
+          arousal: 50,
           summary: result.topEmotion.name,
           source: 'hume_realtime',
           metadata: {
@@ -58,29 +78,19 @@ export default function HumeAIRealtimePage() {
           title: 'Scan enregistré',
           description: `Émotion détectée: ${result.topEmotion.name}`,
         });
+        setScanCount((prev) => prev + 1);
       }
-      
-      setScanCount((prev) => prev + 1);
     } catch (error) {
-      logger.error('Failed to save emotion scan', error instanceof Error ? error : new Error(String(error)), 'SCAN');
+      logger.error('Failed to analyze text', error instanceof Error ? error : new Error(String(error)), 'SCAN');
+      toast({
+        title: 'Erreur d\'analyse',
+        description: 'Impossible d\'analyser le texte',
+        variant: 'destructive'
+      });
+    } finally {
+      setIsAnalyzing(false);
     }
-  };
-
-  if (!humeApiKey) {
-    return (
-      <div className="container max-w-4xl mx-auto p-6">
-        <Alert variant="destructive">
-          <AlertTriangle className="h-4 w-4" />
-          <AlertTitle>Configuration manquante</AlertTitle>
-          <AlertDescription>
-            La clé API Hume AI n'est pas configurée. Veuillez ajouter{' '}
-            <code className="bg-muted px-1 py-0.5 rounded">VITE_HUME_API_KEY</code> dans votre
-            fichier .env
-          </AlertDescription>
-        </Alert>
-      </div>
-    );
-  }
+  }, [user, selectedMode, toast]);
 
   return (
     <div className="container max-w-6xl mx-auto p-6 space-y-6">
@@ -92,8 +102,7 @@ export default function HumeAIRealtimePage() {
         <div className="flex-1">
           <h1 className="text-3xl font-bold">Analyse Émotionnelle en Temps Réel</h1>
           <p className="text-muted-foreground mt-2">
-            Streaming d'émotions en temps réel avec l'API Hume AI. Détection faciale, vocale et
-            textuelle instantanée.
+            Streaming d'émotions via l'API Hume AI. Détection faciale, vocale et textuelle.
           </p>
           {scanCount > 0 && (
             <Badge className="mt-2">
@@ -104,22 +113,17 @@ export default function HumeAIRealtimePage() {
       </div>
 
       {/* Info Card */}
-      <Card className="border-blue-200 bg-blue-50/50">
+      <Card className="border-blue-200 bg-blue-50/50 dark:bg-blue-950/20 dark:border-blue-800">
         <CardContent className="pt-6">
           <div className="flex items-start gap-3">
-            <Info className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
+            <Info className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
             <div className="space-y-2">
-              <p className="text-sm font-medium text-blue-900">
+              <p className="text-sm font-medium text-blue-900 dark:text-blue-100">
                 À propos de l'analyse en temps réel
               </p>
-              <ul className="text-sm text-blue-800 space-y-1 list-disc list-inside">
+              <ul className="text-sm text-blue-800 dark:text-blue-200 space-y-1 list-disc list-inside">
                 <li>
-                  <strong>Analyse faciale :</strong> Détecte les émotions via votre caméra en
-                  temps réel
-                </li>
-                <li>
-                  <strong>Analyse vocale :</strong> Analyse la prosodie et les émotions dans
-                  votre voix
+                  <strong>Analyse sécurisée :</strong> Les appels API sont gérés côté serveur via Edge Functions
                 </li>
                 <li>
                   <strong>Analyse textuelle :</strong> Comprend les émotions dans vos textes
@@ -136,7 +140,7 @@ export default function HumeAIRealtimePage() {
         <CardHeader>
           <CardTitle>Mode d'analyse</CardTitle>
           <CardDescription>
-            Choisissez le type d'analyse émotionnelle que vous souhaitez utiliser
+            Choisissez le type d'analyse émotionnelle
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -145,11 +149,11 @@ export default function HumeAIRealtimePage() {
             onValueChange={(value) => setSelectedMode(value as typeof selectedMode)}
           >
             <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="face" className="flex items-center gap-2">
+              <TabsTrigger value="face" className="flex items-center gap-2" disabled>
                 <Camera className="h-4 w-4" />
                 Faciale
               </TabsTrigger>
-              <TabsTrigger value="prosody" className="flex items-center gap-2">
+              <TabsTrigger value="prosody" className="flex items-center gap-2" disabled>
                 <Mic className="h-4 w-4" />
                 Vocale
               </TabsTrigger>
@@ -158,17 +162,56 @@ export default function HumeAIRealtimePage() {
                 Textuelle
               </TabsTrigger>
             </TabsList>
+            
+            <TabsContent value="language" className="mt-4 space-y-4">
+              <textarea
+                className="w-full h-32 p-3 border rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-primary"
+                placeholder="Écrivez votre texte ici pour analyser les émotions..."
+                value={textInput}
+                onChange={(e) => setTextInput(e.target.value)}
+              />
+              <button
+                className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 disabled:opacity-50"
+                onClick={() => analyzeText(textInput)}
+                disabled={isAnalyzing || !textInput.trim()}
+              >
+                {isAnalyzing ? 'Analyse en cours...' : 'Analyser les émotions'}
+              </button>
+              
+              {lastResult && (
+                <div className="mt-4 p-4 bg-muted rounded-lg">
+                  <p className="font-medium">Résultat:</p>
+                  <p className="text-lg">
+                    Émotion dominante: <span className="font-bold text-primary">{lastResult.topEmotion.name}</span>
+                    <span className="text-muted-foreground ml-2">({(lastResult.topEmotion.score * 100).toFixed(1)}%)</span>
+                  </p>
+                  {lastResult.emotions && lastResult.emotions.length > 1 && (
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {lastResult.emotions.slice(1, 5).map((emotion, i) => (
+                        <Badge key={i} variant="secondary">
+                          {emotion.name}: {(emotion.score * 100).toFixed(0)}%
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </TabsContent>
+            
+            <TabsContent value="face" className="mt-4">
+              <p className="text-muted-foreground text-center py-8">
+                L'analyse faciale en temps réel sera disponible prochainement
+              </p>
+            </TabsContent>
+            
+            <TabsContent value="prosody" className="mt-4">
+              <p className="text-muted-foreground text-center py-8">
+                L'analyse vocale en temps réel sera disponible prochainement
+              </p>
+            </TabsContent>
           </Tabs>
         </CardContent>
       </Card>
-
-      {/* Hume AI Scanner */}
-      <HumeAIRealtimeScanner
-        apiKey={humeApiKey}
-        mode={selectedMode}
-        onEmotionDetected={handleEmotionDetected}
-        autoConnect={false}
-      />
 
       {/* Features Info */}
       <Card>
@@ -179,23 +222,23 @@ export default function HumeAIRealtimePage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <Camera className="h-5 w-5 text-primary" />
+                <Camera className="h-5 w-5 text-muted-foreground" />
                 <h3 className="font-medium">Analyse Faciale</h3>
+                <Badge variant="outline">Bientôt</Badge>
               </div>
               <p className="text-sm text-muted-foreground">
-                Détection en temps réel des émotions via expressions faciales. Identifie plus de
-                30 émotions différentes avec précision.
+                Détection en temps réel des émotions via expressions faciales.
               </p>
             </div>
 
             <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <Mic className="h-5 w-5 text-primary" />
+                <Mic className="h-5 w-5 text-muted-foreground" />
                 <h3 className="font-medium">Analyse Vocale</h3>
+                <Badge variant="outline">Bientôt</Badge>
               </div>
               <p className="text-sm text-muted-foreground">
-                Analyse de la prosodie (ton, tempo, volume) pour détecter les émotions dans la
-                voix. Streaming audio continu.
+                Analyse de la prosodie pour détecter les émotions dans la voix.
               </p>
             </div>
 
@@ -203,10 +246,10 @@ export default function HumeAIRealtimePage() {
               <div className="flex items-center gap-2">
                 <Type className="h-5 w-5 text-primary" />
                 <h3 className="font-medium">Analyse Textuelle</h3>
+                <Badge>Disponible</Badge>
               </div>
               <p className="text-sm text-muted-foreground">
-                Compréhension du langage naturel pour identifier les émotions dans le texte.
-                Analyse sémantique avancée.
+                Compréhension du langage naturel pour identifier les émotions.
               </p>
             </div>
           </div>
@@ -219,21 +262,10 @@ export default function HumeAIRealtimePage() {
           <CardTitle className="text-lg">Détails Techniques</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2 text-sm text-muted-foreground">
-          <p>
-            ✓ Connexion WebSocket sécurisée avec reconnexion automatique
-          </p>
-          <p>
-            ✓ Latence ultra-faible (&lt;500ms) pour une expérience en temps réel
-          </p>
-          <p>
-            ✓ Plus de 30 émotions détectées avec scores de confiance
-          </p>
-          <p>
-            ✓ Données de prosodie (tonalité, tempo, volume) pour l'analyse vocale
-          </p>
-          <p>
-            ✓ Historique des émotions pour le suivi dans le temps
-          </p>
+          <p>✓ Appels API sécurisés via Supabase Edge Functions</p>
+          <p>✓ Aucune clé API exposée côté client</p>
+          <p>✓ Plus de 30 émotions détectées avec scores de confiance</p>
+          <p>✓ Historique des émotions pour le suivi dans le temps</p>
           <p className="pt-2 border-t">
             Propulsé par{' '}
             <a
@@ -243,8 +275,7 @@ export default function HumeAIRealtimePage() {
               className="text-primary hover:underline"
             >
               Hume AI
-            </a>{' '}
-            - L'API d'expression émotionnelle la plus avancée
+            </a>
           </p>
         </CardContent>
       </Card>

@@ -1,36 +1,39 @@
-
 /**
  * Composant ApiConfigPanel
  * 
  * Panneau de configuration des API pour les administrateurs.
- * Permet de configurer les clés API, tester les connexions, et gérer les paramètres.
+ * Les clés API sont gérées côté serveur via Supabase Edge Function secrets.
+ * Ce panneau affiche uniquement le statut et les options de configuration.
  */
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { logger } from '@/lib/logger';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Loader2, Key, Save, RefreshCw, ExternalLink } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Loader2, Key, RefreshCw, CheckCircle, XCircle, Shield } from 'lucide-react';
 import ApiStatus from './ApiStatus';
-import { API_URL } from '@/lib/env';
+import { supabase } from '@/integrations/supabase/client';
 
 interface ApiConfigPanelProps {
   className?: string;
-  onUpdate?: (keys: Record<string, string>) => Promise<void>;
 }
 
-const ApiConfigPanel: React.FC<ApiConfigPanelProps> = ({ className = '', onUpdate }) => {
-  // Configuration actuelle
-  const [apiKeys, setApiKeys] = useState<Record<string, string>>(() => ({
-    openai: import.meta.env.VITE_OPENAI_API_KEY ?? '',
-    humeai: import.meta.env.VITE_HUME_API_KEY ?? '',
-  }));
-  
-  // État de chargement
+interface ApiServiceStatus {
+  name: string;
+  configured: boolean;
+  lastCheck?: string;
+}
+
+const ApiConfigPanel: React.FC<ApiConfigPanelProps> = ({ className = '' }) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [apiStatus, setApiStatus] = useState<ApiServiceStatus[]>([
+    { name: 'OpenAI', configured: false },
+    { name: 'Hume AI', configured: false },
+    { name: 'Suno AI', configured: false },
+  ]);
   
   // Options avancées
   const [advanced, setAdvanced] = useState({
@@ -40,112 +43,89 @@ const ApiConfigPanel: React.FC<ApiConfigPanelProps> = ({ className = '', onUpdat
     useProxy: true,
   });
   
-  // Gestion des changements de clés API
-  const handleKeyChange = (api: string, value: string) => {
-    setApiKeys(prev => ({ ...prev, [api]: value }));
-  };
-  
-  // Sauvegarde des clés API
-  const handleSaveKeys = async () => {
+  // Vérifier le statut des API via Edge Function
+  const checkApiStatus = async () => {
     setIsLoading(true);
     try {
-      if (onUpdate) {
-        await onUpdate(apiKeys);
-      }
-      // Simule un délai de sauvegarde
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const { data, error } = await supabase.functions.invoke('check-api-connection', {
+        body: { services: ['openai', 'hume', 'suno'] }
+      });
       
-      logger.info('API keys saved successfully', {}, 'SYSTEM');
+      if (error) throw error;
+      
+      if (data?.status) {
+        setApiStatus([
+          { name: 'OpenAI', configured: data.status.openai || false, lastCheck: new Date().toISOString() },
+          { name: 'Hume AI', configured: data.status.hume || false, lastCheck: new Date().toISOString() },
+          { name: 'Suno AI', configured: data.status.suno || false, lastCheck: new Date().toISOString() },
+        ]);
+      }
+      
+      logger.info('API status checked successfully', {}, 'SYSTEM');
     } catch (error) {
-      logger.error('Error saving API keys', error, 'SYSTEM');
+      logger.error('Error checking API status', error, 'SYSTEM');
     } finally {
       setIsLoading(false);
     }
   };
   
+  useEffect(() => {
+    checkApiStatus();
+  }, []);
+  
   return (
     <Card className={className}>
       <CardHeader>
-        <CardTitle className="text-xl">Configuration des API</CardTitle>
+        <CardTitle className="text-xl flex items-center gap-2">
+          <Shield className="h-5 w-5" />
+          Configuration des API
+        </CardTitle>
         <CardDescription>
-          Gérez les clés API et les paramètres pour les services externes
+          Les clés API sont gérées de manière sécurisée via Supabase Edge Function secrets
         </CardDescription>
       </CardHeader>
       
       <CardContent className="p-0">
-        <Tabs defaultValue="keys">
+        <Tabs defaultValue="status">
           <TabsList className="mx-6">
-            <TabsTrigger value="keys">Clés API</TabsTrigger>
-            <TabsTrigger value="status">Statut</TabsTrigger>
+            <TabsTrigger value="status">Statut des API</TabsTrigger>
             <TabsTrigger value="advanced">Options avancées</TabsTrigger>
           </TabsList>
           
-          {/* Onglet des clés API */}
-          <TabsContent value="keys" className="px-6 py-4 space-y-4">
+          {/* Onglet de statut */}
+          <TabsContent value="status" className="px-6 py-4 space-y-4">
             <Alert>
-              <AlertTitle className="flex items-center gap-2">
-                <Key className="h-4 w-4" />
-                Sécurité des clés API
-              </AlertTitle>
+              <Key className="h-4 w-4" />
+              <AlertTitle>Sécurité des clés API</AlertTitle>
               <AlertDescription>
-                Les clés API sont stockées de manière sécurisée dans les variables d'environnement côté serveur. 
-                Elles ne sont jamais exposées au client.
+                Les clés API sont stockées de manière sécurisée dans les secrets Supabase et ne sont jamais exposées au client. 
+                Gérez vos clés dans le tableau de bord Supabase → Settings → Edge Functions.
               </AlertDescription>
             </Alert>
             
-            <div className="space-y-4 mt-4">
-              <div className="space-y-2">
-                <label htmlFor="openai" className="text-sm font-medium">OpenAI API Key</label>
-                <div className="flex gap-2">
-                  <Input
-                    id="openai"
-                    type="password"
-                    value={apiKeys.openai}
-                    onChange={e => handleKeyChange('openai', e.target.value)}
-                    placeholder="sk-..."
-                  />
-                  <a 
-                    href="https://platform.openai.com/api-keys" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-center px-3 py-2 border rounded-md text-sm"
-                  >
-                    <ExternalLink className="h-4 w-4" />
-                  </a>
+            <div className="space-y-3 mt-4">
+              {apiStatus.map((api) => (
+                <div key={api.name} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div className="flex items-center gap-3">
+                    {api.configured ? (
+                      <CheckCircle className="h-5 w-5 text-green-500" />
+                    ) : (
+                      <XCircle className="h-5 w-5 text-muted-foreground" />
+                    )}
+                    <div>
+                      <p className="font-medium">{api.name}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {api.lastCheck ? `Vérifié: ${new Date(api.lastCheck).toLocaleTimeString()}` : 'Non vérifié'}
+                      </p>
+                    </div>
+                  </div>
+                  <Badge variant={api.configured ? 'default' : 'secondary'}>
+                    {api.configured ? 'Configuré' : 'Non configuré'}
+                  </Badge>
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  Utilisé pour OpenAI, GPT-4, DALL-E et Whisper
-                </p>
-              </div>
-              
-              <div className="space-y-2">
-                <label htmlFor="humeai" className="text-sm font-medium">Hume AI API Key</label>
-                <div className="flex gap-2">
-                  <Input
-                    id="humeai"
-                    type="password"
-                    value={apiKeys.humeai}
-                    onChange={e => handleKeyChange('humeai', e.target.value)}
-                    placeholder="hume_..."
-                  />
-                  <a 
-                    href="https://hume.ai/dashboard" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-center px-3 py-2 border rounded-md text-sm"
-                  >
-                    <ExternalLink className="h-4 w-4" />
-                  </a>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Utilisé pour l'analyse émotionnelle avancée
-                </p>
-              </div>
+              ))}
             </div>
-          </TabsContent>
-          
-          {/* Onglet de statut */}
-          <TabsContent value="status" className="px-6 py-4">
+            
             <ApiStatus />
           </TabsContent>
           
@@ -223,7 +203,7 @@ const ApiConfigPanel: React.FC<ApiConfigPanelProps> = ({ className = '', onUpdat
                     Utiliser un proxy pour les appels API
                   </label>
                   <p className="text-xs text-muted-foreground">
-                    Renforce la sécurité en acheminant les appels via un proxy côté serveur
+                    Renforce la sécurité en acheminant les appels via Edge Functions
                   </p>
                 </div>
               </div>
@@ -232,23 +212,17 @@ const ApiConfigPanel: React.FC<ApiConfigPanelProps> = ({ className = '', onUpdat
         </Tabs>
       </CardContent>
       
-      <CardFooter className="flex justify-between border-t px-6 py-4">
+      <CardFooter className="flex justify-end border-t px-6 py-4">
         <Button
-          variant="outline"
-          onClick={() => window.location.reload()}
+          onClick={checkApiStatus}
           disabled={isLoading}
         >
-          <RefreshCw className="h-4 w-4 mr-2" />
-          Rafraîchir
-        </Button>
-        
-        <Button onClick={handleSaveKeys} disabled={isLoading}>
           {isLoading ? (
             <Loader2 className="h-4 w-4 mr-2 animate-spin" />
           ) : (
-            <Save className="h-4 w-4 mr-2" />
+            <RefreshCw className="h-4 w-4 mr-2" />
           )}
-          Sauvegarder
+          Rafraîchir le statut
         </Button>
       </CardFooter>
     </Card>
