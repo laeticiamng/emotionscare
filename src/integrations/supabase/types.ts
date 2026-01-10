@@ -11413,6 +11413,57 @@ export type Database = {
         }
         Relationships: []
       }
+      leaderboard_entries: {
+        Row: {
+          activities_completed: number | null
+          avatar_url: string | null
+          created_at: string
+          display_name: string
+          id: string
+          last_activity_at: string | null
+          level: number | null
+          monthly_xp: number | null
+          rank: number | null
+          streak_days: number | null
+          total_xp: number | null
+          updated_at: string | null
+          user_id: string
+          weekly_xp: number | null
+        }
+        Insert: {
+          activities_completed?: number | null
+          avatar_url?: string | null
+          created_at?: string
+          display_name: string
+          id?: string
+          last_activity_at?: string | null
+          level?: number | null
+          monthly_xp?: number | null
+          rank?: number | null
+          streak_days?: number | null
+          total_xp?: number | null
+          updated_at?: string | null
+          user_id: string
+          weekly_xp?: number | null
+        }
+        Update: {
+          activities_completed?: number | null
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string
+          id?: string
+          last_activity_at?: string | null
+          level?: number | null
+          monthly_xp?: number | null
+          rank?: number | null
+          streak_days?: number | null
+          total_xp?: number | null
+          updated_at?: string | null
+          user_id?: string
+          weekly_xp?: number | null
+        }
+        Relationships: []
+      }
       learning_analytics: {
         Row: {
           average_score: number | null

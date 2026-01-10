@@ -6,10 +6,10 @@ import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
 import { Heart, Play, Pause, Square, Waves, Zap, Target, Trophy, Music } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import PageRoot from '@/components/common/PageRoot';
 import { logger } from '@/lib/logger';
+import { useBubbleBeatPersistence } from '@/hooks/useBubbleBeatPersistence';
 
 interface Bubble {
   id: string;
@@ -168,6 +168,9 @@ const B2CBubbleBeatPage: React.FC = () => {
     oscillatorRef.current = oscillator;
   };
 
+  // Hook de persistance
+  const { saveSession } = useBubbleBeatPersistence();
+
   const startSession = async () => {
     setIsPlaying(true);
     setCurrentScore(0);
@@ -176,20 +179,6 @@ const B2CBubbleBeatPage: React.FC = () => {
     // Démarre le son binaural
     const baseFreq = gameMode === 'relax' ? 432 : gameMode === 'energize' ? 528 : 40;
     playBinauralBeat(baseFreq);
-
-    // Enregistre le début de session
-    try {
-      await supabase.functions.invoke('bubble-sessions', {
-        body: {
-          action: 'start',
-          gameMode,
-          targetHeartRate: targetHeartRate[0],
-          difficulty: difficulty[0]
-        }
-      });
-    } catch (error) {
-      logger.error('Error starting session', error as Error, 'SYSTEM');
-    }
 
     // Timer de session
     sessionIntervalRef.current = setInterval(() => {
@@ -205,7 +194,6 @@ const B2CBubbleBeatPage: React.FC = () => {
         oscillatorRef.current.stop();
         oscillatorRef.current.disconnect();
       } catch (e) {
-        // Oscillator already stopped or disconnected
         logger.error('Error stopping oscillator', e as Error, 'AUDIO');
       }
       oscillatorRef.current = null;
@@ -215,25 +203,21 @@ const B2CBubbleBeatPage: React.FC = () => {
       clearInterval(sessionIntervalRef.current);
     }
 
-    // Enregistre les résultats de la session
-    try {
-      await supabase.functions.invoke('bubble-sessions', {
-        body: {
-          action: 'end',
-          score: currentScore,
-          duration: sessionTime,
-          averageHeartRate: heartRate,
-          biometrics: biometricData
-        }
-      });
+    // Sauvegarde via hook Supabase
+    await saveSession({
+      game_mode: gameMode,
+      score: currentScore,
+      duration_seconds: sessionTime,
+      average_heart_rate: heartRate,
+      target_heart_rate: targetHeartRate[0],
+      difficulty: difficulty[0],
+      biometrics: biometricData
+    });
 
-      toast({
-        title: "🎉 Session terminée !",
-        description: `Score: ${currentScore} points en ${Math.floor(sessionTime / 60)}m ${sessionTime % 60}s`
-      });
-    } catch (error) {
-      logger.error('Error ending session', error as Error, 'SYSTEM');
-    }
+    toast({
+      title: "🎉 Session terminée !",
+      description: `Score: ${currentScore} points en ${Math.floor(sessionTime / 60)}m ${sessionTime % 60}s`
+    });
 
     setBubbles([]);
   };
