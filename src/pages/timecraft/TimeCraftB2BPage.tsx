@@ -82,10 +82,27 @@ export default function TimeCraftB2BPage() {
   };
 
   const handleGenerateReport = useCallback(async (reportType: string, sections: string[]) => {
-    // TODO: Implémenter la génération de rapport PDF
-    console.log('Generating report:', reportType, sections);
-    await new Promise(resolve => setTimeout(resolve, 1500));
-  }, []);
+    try {
+      const { supabase } = await import('@/integrations/supabase/client');
+      const { data, error } = await supabase.functions.invoke('generate-executive-report', {
+        body: {
+          reportType,
+          sections,
+          period: selectedPeriod,
+          departmentId: selectedDepartment
+        }
+      });
+      
+      if (error) throw error;
+      
+      // Download the generated PDF
+      if (data?.pdfUrl) {
+        window.open(data.pdfUrl, '_blank');
+      }
+    } catch (error) {
+      console.error('Error generating report:', error);
+    }
+  }, [selectedPeriod, selectedDepartment]);
 
   return (
     <main className="min-h-screen bg-background p-4 lg:p-8">

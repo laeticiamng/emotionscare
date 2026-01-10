@@ -48,7 +48,8 @@ export const useHumeVoice = (config: HumeVoiceConfig) => {
       microphoneRef.current.connect(analyserRef.current);
 
       // Connect to Hume Voice WebSocket (via backend proxy)
-      const wsUrl = `${process.env.VITE_SUPABASE_URL?.replace('https', 'wss')}/functions/v1/hume-voice-proxy`;
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
+      const wsUrl = `${supabaseUrl.replace('https', 'wss')}/functions/v1/hume-websocket-proxy`;
       wsRef.current = new WebSocket(wsUrl);
       
       wsRef.current.onopen = () => {

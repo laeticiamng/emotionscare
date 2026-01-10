@@ -47,8 +47,9 @@ export const useMoodSession = () => {
 
       if (data?.mix) {
         const sessionId = data.mix.mixId;
+        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
         const wsUrl = data.mix.adaptiveFeatures?.realTimeAdjustment ? 
-          `${process.env.VITE_SUPABASE_URL?.replace('https', 'wss')}/functions/v1/mood-ws` : 
+          `${supabaseUrl.replace('https', 'wss')}/functions/v1/mood-ws` : 
           undefined;
 
         moodStore.startSession(sessionId, wsUrl);

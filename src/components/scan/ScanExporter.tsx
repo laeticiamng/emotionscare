@@ -106,9 +106,21 @@ export const ScanExporter: React.FC<ScanExporterProps> = ({ scans, onExport }) =
 
     setIsSharing(true);
     try {
-      // TODO: Implémenter partage sécurisé via API
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Appel à l'edge function pour envoyer le partage sécurisé
+      const { supabase } = await import('@/integrations/supabase/client');
+      const { data, error } = await supabase.functions.invoke('send-email', {
+        body: {
+          to: shareEmail,
+          subject: 'Partage sécurisé - Scans EmotionsCare',
+          template: 'share-scans',
+          data: {
+            scans: filterScansByDateRange(scans, options),
+            expiresIn: '7 days'
+          }
+        }
+      });
 
+      if (error) throw error;
       toast({
         title: 'Partage envoyé',
         description: `Un lien sécurisé a été envoyé à ${shareEmail}.`,
