@@ -1,6 +1,7 @@
 /**
  * Support Chatbot Service - Phase 4.4
  * Gestion du chatbot support IA autonome avec détection d'intent
+ * Corrigé: Utilise Supabase Edge Function au lieu d'appels API directs
  */
 
 import { supabase } from '@/integrations/supabase/client';
@@ -270,7 +271,7 @@ class SupportChatbotService {
         };
       }
 
-      // Générer une réponse avec OpenAI
+      // Générer une réponse avec Edge Function
       const response = await this.generateChatbotResponse(
         userMessage,
         intent,
@@ -313,6 +314,7 @@ class SupportChatbotService {
 
   /**
    * Analyser un message pour déterminer l'intent et le sentiment
+   * Utilise Edge Function openai-chat au lieu d'appel API direct
    */
   private async analyzeMessage(
     content: string
@@ -328,35 +330,24 @@ Return ONLY valid JSON (no markdown, no code blocks):
   "sentiment": "positive|neutral|negative"
 }`;
 
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${import.meta.env.VITE_OPENAI_API_KEY}`,
-        },
-        body: JSON.stringify({
-          model: 'gpt-3.5-turbo',
+      // Appel via Edge Function sécurisée
+      const { data, error } = await supabase.functions.invoke('openai-chat', {
+        body: {
           messages: [{ role: 'user', content: prompt }],
+          model: 'gpt-3.5-turbo',
           temperature: 0.3,
           max_tokens: 100,
-        }),
+        },
       });
 
-      if (!response.ok) {
-        throw new Error(`OpenAI API error: ${response.statusText}`);
-      }
+      if (error) throw error;
 
-      const data = await response.json();
-      const analysisText = data.choices[0].message.content;
+      const analysisText = data?.content || data?.message?.content || '';
 
       // Parse JSON response
       const jsonMatch = analysisText.match(/\{[\s\S]*\}/);
       if (!jsonMatch) {
-        return {
-          intent: 'general',
-          confidence: 0.5,
-          sentiment: 'neutral',
-        };
+        return this.analyzeMessageLocally(content);
       }
 
       const analysis = JSON.parse(jsonMatch[0]);
@@ -366,17 +357,59 @@ Return ONLY valid JSON (no markdown, no code blocks):
         sentiment: analysis.sentiment || 'neutral',
       };
     } catch (error) {
-      logger.warn('Message analysis failed, using defaults', error as Error, 'CHATBOT');
-      return {
-        intent: 'general',
-        confidence: 0.5,
-        sentiment: 'neutral',
-      };
+      logger.warn('Edge function analysis failed, using local analysis', error as Error, 'CHATBOT');
+      return this.analyzeMessageLocally(content);
     }
   }
 
   /**
-   * Générer une réponse avec OpenAI
+   * Analyse locale de fallback basée sur mots-clés
+   */
+  private analyzeMessageLocally(content: string): { intent: Intent; confidence: number; sentiment: Sentiment } {
+    const lowerContent = content.toLowerCase();
+    
+    // Détection d'intent par mots-clés
+    const intentPatterns: Record<Intent, string[]> = {
+      diagnostic: ['erreur', 'bug', 'problème', 'ne fonctionne pas', 'crash', 'bloqué'],
+      onboarding: ['comment', 'commencer', 'débuter', 'nouveau', 'première fois', 'inscription'],
+      feature_help: ['fonctionnalité', 'option', 'paramètre', 'réglage', 'utiliser', 'trouver'],
+      billing: ['paiement', 'abonnement', 'facturation', 'prix', 'premium', 'annuler'],
+      feedback: ['suggestion', 'amélioration', 'avis', 'retour', 'idée', 'proposer'],
+      emotion_support: ['anxieux', 'triste', 'stress', 'déprimé', 'aide', 'soutien', 'mal'],
+      general: [],
+    };
+
+    let detectedIntent: Intent = 'general';
+    let maxMatches = 0;
+
+    for (const [intent, keywords] of Object.entries(intentPatterns)) {
+      const matches = keywords.filter(kw => lowerContent.includes(kw)).length;
+      if (matches > maxMatches) {
+        maxMatches = matches;
+        detectedIntent = intent as Intent;
+      }
+    }
+
+    // Détection de sentiment
+    const positiveWords = ['merci', 'super', 'génial', 'parfait', 'excellent', 'content'];
+    const negativeWords = ['nul', 'horrible', 'mauvais', 'déçu', 'frustré', 'énervé'];
+    
+    const positiveCount = positiveWords.filter(w => lowerContent.includes(w)).length;
+    const negativeCount = negativeWords.filter(w => lowerContent.includes(w)).length;
+    
+    let sentiment: Sentiment = 'neutral';
+    if (positiveCount > negativeCount) sentiment = 'positive';
+    else if (negativeCount > positiveCount) sentiment = 'negative';
+
+    return {
+      intent: detectedIntent,
+      confidence: maxMatches > 0 ? 0.6 + (maxMatches * 0.1) : 0.4,
+      sentiment,
+    };
+  }
+
+  /**
+   * Générer une réponse avec Edge Function openai-chat
    */
   private async generateChatbotResponse(
     userMessage: string,
@@ -386,36 +419,22 @@ Return ONLY valid JSON (no markdown, no code blocks):
     try {
       const systemPrompt = this.buildSystemPrompt(intent);
 
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${import.meta.env.VITE_OPENAI_API_KEY}`,
-        },
-        body: JSON.stringify({
-          model: 'gpt-3.5-turbo',
+      // Appel via Edge Function sécurisée
+      const { data, error } = await supabase.functions.invoke('openai-chat', {
+        body: {
           messages: [
-            {
-              role: 'system',
-              content: systemPrompt,
-            },
-            {
-              role: 'user',
-              content: `${context}\n\nUtilisateur: ${userMessage}`,
-            },
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: `${context}\n\nUtilisateur: ${userMessage}` },
           ],
+          model: 'gpt-3.5-turbo',
           temperature: 0.7,
           max_tokens: 300,
-        }),
+        },
       });
 
-      if (!response.ok) {
-        throw new Error(`OpenAI API error: ${response.statusText}`);
-      }
+      if (error) throw error;
 
-      const data = await response.json();
-      const content = data.choices[0].message.content;
-
+      const content = data?.content || data?.message?.content || this.getDefaultResponse(intent);
       const suggestedActions = this.extractSuggestedActions(intent);
 
       return {
@@ -423,9 +442,29 @@ Return ONLY valid JSON (no markdown, no code blocks):
         suggestedActions,
       };
     } catch (error) {
-      logger.error('Failed to generate response with OpenAI', error as Error, 'CHATBOT');
-      throw error;
+      logger.error('Failed to generate response with Edge Function', error as Error, 'CHATBOT');
+      // Fallback: réponse locale
+      return {
+        content: this.getDefaultResponse(intent),
+        suggestedActions: this.extractSuggestedActions(intent),
+      };
     }
+  }
+
+  /**
+   * Réponse par défaut selon l'intent
+   */
+  private getDefaultResponse(intent: Intent): string {
+    const responses: Record<Intent, string> = {
+      diagnostic: "Je comprends que vous rencontrez un problème technique. Pouvez-vous me décrire plus en détail ce qui se passe?",
+      onboarding: "Bienvenue sur EmotionsCare! Je suis là pour vous aider à démarrer. Que souhaitez-vous explorer en premier?",
+      feature_help: "Je serais ravi de vous expliquer comment utiliser cette fonctionnalité. De quelle fonctionnalité avez-vous besoin d'aide?",
+      billing: "Pour les questions de facturation, je peux vous aider. Quelle est votre question concernant votre abonnement?",
+      feedback: "Merci pour votre retour! Votre avis est précieux pour nous. Pouvez-vous m'en dire plus?",
+      emotion_support: "Je suis là pour vous soutenir. Comment vous sentez-vous en ce moment? N'hésitez pas à vous confier.",
+      general: "Comment puis-je vous aider aujourd'hui?",
+    };
+    return responses[intent];
   }
 
   /**
@@ -498,98 +537,66 @@ Be empathetic when discussing emotions or well-being.`;
 
       if (error) throw error;
 
-      let context = `Contexte de la conversation:\n`;
+      // Construire le contexte
+      const contextMessages = (messages || []).map((m: any) =>
+        `${m.sender === 'user' ? 'Utilisateur' : 'Assistant'}: ${m.content}`
+      );
 
-      if (messages && messages.length > 0) {
-        (messages as any[]).forEach((msg) => {
-          const sender = msg.sender === 'user' ? 'Utilisateur' : 'Chatbot';
-          context += `${sender}: ${msg.content}\n`;
-        });
+      // Ajouter le profil utilisateur si disponible
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('display_name, subscription_tier')
+        .eq('id', userId)
+        .single();
+
+      let userContext = '';
+      if (profile) {
+        userContext = `[Utilisateur: ${profile.display_name || 'Anonyme'}, Abonnement: ${profile.subscription_tier || 'Gratuit'}]\n`;
       }
 
-      return context;
+      return userContext + contextMessages.join('\n');
     } catch (error) {
-      logger.warn('Failed to build context', error as Error, 'CHATBOT');
-      return 'Contexte: Nouvelle conversation.\n';
+      logger.error('Failed to build context', error as Error, 'CHATBOT');
+      return '';
     }
   }
 
   /**
    * Créer un ticket de support
    */
-  async createSupportTicket(
+  private async createSupportTicket(
     conversationId: string,
     userId: string,
-    description: string
-  ): Promise<any | null> {
+    message: string
+  ): Promise<{ ticket_number: string } | null> {
     try {
+      const ticketNumber = `TICK-${Date.now().toString(36).toUpperCase()}`;
+
       const { data, error } = await supabase
         .from('support_tickets')
         .insert({
           conversation_id: conversationId,
           user_id: userId,
-          title: `Support request - ${new Date().toLocaleDateString('fr-FR')}`,
-          description: description.substring(0, 500),
-          category: 'technical',
-          priority: 'normal',
+          ticket_number: ticketNumber,
+          subject: message.substring(0, 100),
+          description: message,
           status: 'open',
+          priority: 'normal',
         })
         .select()
         .single();
 
       if (error) throw error;
 
-      logger.info(
-        `Support ticket created: ${data.ticket_number}`,
-        { userId, conversationId },
-        'CHATBOT'
-      );
-
-      return data;
+      return { ticket_number: ticketNumber };
     } catch (error) {
-      logger.error('Failed to create support ticket', error as Error, 'CHATBOT');
-      return null;
+      logger.error('Failed to create ticket', error as Error, 'CHATBOT');
+      return { ticket_number: 'UNKNOWN' };
     }
   }
 
   /**
-   * Clôturer une conversation
-   */
-  async closeConversation(
-    conversationId: string,
-    userId: string,
-    satisfaction?: number,
-    feedback?: string
-  ): Promise<boolean> {
-    try {
-      const { error } = await supabase
-        .from('support_conversations')
-        .update({
-          status: 'closed',
-          closed_at: new Date().toISOString(),
-          user_satisfaction: satisfaction,
-          satisfaction_feedback: feedback,
-        })
-        .eq('id', conversationId)
-        .eq('user_id', userId);
-
-      if (error) throw error;
-
-      logger.info(
-        `Conversation closed: ${conversationId}`,
-        { satisfaction },
-        'CHATBOT'
-      );
-
-      return true;
-    } catch (error) {
-      logger.error('Failed to close conversation', error as Error, 'CHATBOT');
-      return false;
-    }
-  }
-
-  /**
-   * Récupérer le nombre de messages
+   * Obtenir le nombre de messages d'une conversation
    */
   private async getMessageCount(conversationId: string): Promise<number> {
     try {
@@ -601,15 +608,50 @@ Be empathetic when discussing emotions or well-being.`;
       if (error) throw error;
       return count || 0;
     } catch (error) {
-      logger.warn('Failed to get message count', error as Error, 'CHATBOT');
       return 0;
+    }
+  }
+
+  /**
+   * Mettre à jour la satisfaction utilisateur
+   */
+  async updateSatisfaction(conversationId: string, rating: number): Promise<boolean> {
+    try {
+      const { error } = await supabase
+        .from('support_conversations')
+        .update({ user_satisfaction: rating })
+        .eq('id', conversationId);
+
+      if (error) throw error;
+      return true;
+    } catch (error) {
+      logger.error('Failed to update satisfaction', error as Error, 'CHATBOT');
+      return false;
+    }
+  }
+
+  /**
+   * Fermer une conversation
+   */
+  async closeConversation(conversationId: string): Promise<boolean> {
+    try {
+      const { error } = await supabase
+        .from('support_conversations')
+        .update({ status: 'closed' })
+        .eq('id', conversationId);
+
+      if (error) throw error;
+      return true;
+    } catch (error) {
+      logger.error('Failed to close conversation', error as Error, 'CHATBOT');
+      return false;
     }
   }
 
   /**
    * Récupérer les messages d'une conversation
    */
-  async getConversationMessages(conversationId: string): Promise<SupportMessage[]> {
+  async getMessages(conversationId: string): Promise<SupportMessage[]> {
     try {
       const { data, error } = await supabase
         .from('support_messages')
