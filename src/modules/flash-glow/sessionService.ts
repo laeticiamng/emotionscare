@@ -52,11 +52,18 @@ export const logAndJournal = async (data: {
   meta?: Record<string, unknown>;
 }): Promise<{ id: string } | null> => {
   try {
+    const sessionType = data.type === 'boss_grit' ? 'grit' 
+      : data.type === 'meditation' ? 'custom'
+      : data.type === 'mood_mixer' ? 'music'
+      : data.type === 'journal' ? 'custom'
+      : (data.type as 'flash_glow' | 'breath' | 'custom');
+    
     const result = await createSession({
-      type: data.type,
+      type: sessionType,
       duration_sec: data.duration_sec,
       mood_delta: data.mood_delta ?? null,
       meta: {
+        original_type: data.type,
         mood_before: data.mood_before,
         mood_after: data.mood_after,
         ...data.meta,
