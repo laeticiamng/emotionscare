@@ -1,37 +1,52 @@
 /**
  * Offline Services Integration - Phase 4
- * Wrapper pour supporter l'offline mode dans les services existants
+ * Wrapper pour supporter l'offline mode avec Supabase et localStorage
  */
 
 import { offlineQueue } from './offlineQueue';
 import { logger } from './logger';
+import { supabase } from '@/integrations/supabase/client';
 
 /**
  * Wrapper pour les mutations émotions
- * Sauvegarde en queue si offline
+ * Sauvegarde en queue si offline, sinon envoie à Supabase
  */
 export async function saveEmotionOffline(
   emotionData: any
 ): Promise<any> {
   try {
-    // Si online, faire l'appel normal
     if (navigator.onLine) {
-      // L'appel normal sera fait par le service
+      // Online: envoyer directement à Supabase
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data, error } = await supabase
+          .from('mood_entries')
+          .insert({
+            user_id: user.id,
+            mood_score: emotionData.score,
+            emotions: emotionData.emotions,
+            notes: emotionData.notes,
+            created_at: new Date().toISOString(),
+          })
+          .select()
+          .single();
+
+        if (error) throw error;
+        return data;
+      }
       return emotionData;
     }
 
-    // Si offline, ajouter à la queue
+    // Offline: ajouter à la queue locale
     logger.info('Saving emotion to offline queue', {}, 'OFFLINE');
-
     const queueItem = await offlineQueue.addToQueue(
       'emotion',
       emotionData,
-      '/api/emotions',
+      'mood_entries',
       'POST',
       'normal'
     );
 
-    // Retourner les données avec un ID temporaire
     return {
       ...emotionData,
       id: queueItem.id,
@@ -39,7 +54,7 @@ export async function saveEmotionOffline(
       _queueId: queueItem.id,
     };
   } catch (error) {
-    logger.error('Failed to save emotion offline', error as Error, 'OFFLINE');
+    logger.error('Failed to save emotion', error as Error, 'OFFLINE');
     throw error;
   }
 }
@@ -52,15 +67,32 @@ export async function saveJournalEntryOffline(
 ): Promise<any> {
   try {
     if (navigator.onLine) {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data, error } = await supabase
+          .from('journal_entries')
+          .insert({
+            user_id: user.id,
+            content: entryData.content,
+            title: entryData.title,
+            mood: entryData.mood,
+            tags: entryData.tags,
+            created_at: new Date().toISOString(),
+          })
+          .select()
+          .single();
+
+        if (error) throw error;
+        return data;
+      }
       return entryData;
     }
 
     logger.info('Saving journal entry to offline queue', {}, 'OFFLINE');
-
     const queueItem = await offlineQueue.addToQueue(
       'journal',
       entryData,
-      '/api/journal-entries',
+      'journal_entries',
       'POST',
       'normal'
     );
@@ -72,11 +104,7 @@ export async function saveJournalEntryOffline(
       _queueId: queueItem.id,
     };
   } catch (error) {
-    logger.error(
-      'Failed to save journal entry offline',
-      error as Error,
-      'OFFLINE'
-    );
+    logger.error('Failed to save journal entry', error as Error, 'OFFLINE');
     throw error;
   }
 }
@@ -89,17 +117,33 @@ export async function savePlaylistOffline(
 ): Promise<any> {
   try {
     if (navigator.onLine) {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data, error } = await supabase
+          .from('user_playlists')
+          .insert({
+            user_id: user.id,
+            name: playlistData.name,
+            description: playlistData.description,
+            tracks: playlistData.tracks,
+            created_at: new Date().toISOString(),
+          })
+          .select()
+          .single();
+
+        if (error) throw error;
+        return data;
+      }
       return playlistData;
     }
 
     logger.info('Saving playlist to offline queue', {}, 'OFFLINE');
-
     const queueItem = await offlineQueue.addToQueue(
       'music-playlist',
       playlistData,
-      '/api/music-playlists',
+      'user_playlists',
       'POST',
-      'high' // Haute priorité pour la musique
+      'high'
     );
 
     return {
@@ -109,7 +153,7 @@ export async function savePlaylistOffline(
       _queueId: queueItem.id,
     };
   } catch (error) {
-    logger.error('Failed to save playlist offline', error as Error, 'OFFLINE');
+    logger.error('Failed to save playlist', error as Error, 'OFFLINE');
     throw error;
   }
 }
@@ -123,20 +167,30 @@ export async function updatePreferenceOffline(
 ): Promise<void> {
   try {
     if (navigator.onLine) {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        await supabase
+          .from('user_preferences')
+          .upsert({
+            user_id: user.id,
+            preference_key: key,
+            preference_value: value,
+            updated_at: new Date().toISOString(),
+          });
+      }
       return;
     }
 
     logger.info('Saving preference to offline queue', { key }, 'OFFLINE');
-
     await offlineQueue.addToQueue(
       'preference',
       { key, value },
-      '/api/user-preferences',
+      'user_preferences',
       'PUT',
       'low'
     );
   } catch (error) {
-    logger.error('Failed to save preference offline', error as Error, 'OFFLINE');
+    logger.error('Failed to save preference', error as Error, 'OFFLINE');
     throw error;
   }
 }
@@ -144,39 +198,43 @@ export async function updatePreferenceOffline(
 /**
  * Wrapper pour récupérer les données avec fallback cache
  */
-export async function fetchWithOfflineFallback(
-  url: string,
-  options?: RequestInit
-): Promise<Response> {
+export async function fetchWithOfflineFallback<T>(
+  tableName: string,
+  query: any
+): Promise<T[]> {
   try {
-    // Essayer de fetch
     if (navigator.onLine) {
-      return await fetch(url, options);
+      const { data, error } = await supabase
+        .from(tableName)
+        .select(query.select || '*')
+        .order(query.orderBy || 'created_at', { ascending: false })
+        .limit(query.limit || 50);
+
+      if (error) throw error;
+      
+      // Cache les données
+      localStorage.setItem(`cache_${tableName}`, JSON.stringify(data));
+      return data as T[];
     }
 
-    // Si offline, vérifier le cache
-    const cache = await caches.open('emotionscare-api-v1');
-    const cachedResponse = await cache.match(url);
-
-    if (cachedResponse) {
-      logger.info('Using cached response', { url }, 'OFFLINE');
-      return cachedResponse;
+    // Offline: utiliser le cache
+    const cached = localStorage.getItem(`cache_${tableName}`);
+    if (cached) {
+      logger.info('Using cached data', { tableName }, 'OFFLINE');
+      return JSON.parse(cached);
     }
 
-    // Pas de cache, retourner une erreur 503
-    return new Response(
-      JSON.stringify({
-        error: 'Offline and no cached data available',
-      }),
-      {
-        status: 503,
-        statusText: 'Service Unavailable',
-        headers: { 'Content-Type': 'application/json' },
-      }
-    );
+    return [];
   } catch (error) {
     logger.error('Fetch with offline fallback failed', error as Error, 'OFFLINE');
-    throw error;
+    
+    // Essayer le cache en cas d'erreur
+    const cached = localStorage.getItem(`cache_${tableName}`);
+    if (cached) {
+      return JSON.parse(cached);
+    }
+    
+    return [];
   }
 }
 
@@ -230,7 +288,6 @@ export async function getEmotionsWithOfflineQueue(
   emotions: any[] = []
 ): Promise<any[]> {
   try {
-    // Ajouter les émotions qui sont en queue
     const queueItems = await offlineQueue.getAll();
     const offlineEmotions = queueItems
       .filter((item) => item.type === 'emotion')

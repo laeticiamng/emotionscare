@@ -143,36 +143,25 @@ export type NyveePersistPayload = {
   notes: string;
 };
 
-const DEFAULT_ENDPOINT = '/api/modules/nyvee/sessions';
-
-type PersistSessionOptions = {
-  endpoint?: string;
-};
-
 export async function persistNyveeSession(
   module: 'nyvee',
-  payload: NyveePersistPayload,
-  options: PersistSessionOptions = {}
+  payload: NyveePersistPayload
 ): Promise<void> {
-  const endpoint = options.endpoint ?? DEFAULT_ENDPOINT;
-  const body = JSON.stringify({ module, payload });
+  logger.info('nyvee:session:persist', { module, next: payload.next }, 'SESSION');
 
-  const response = await (typeof fetch === 'function'
-    ? fetch(endpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body,
-      })
-    : Promise.reject(new Error('fetch_unavailable')));
-
-  if (!response || !('ok' in response)) {
-    throw new Error('persist_session_invalid_response');
-  }
-
-  if (!response.ok) {
-    throw new Error(`persist_session_failed:${response.status}`);
+  try {
+    await createSession({
+      type: 'nyvee',
+      duration_sec: 0,
+      mood_delta: null,
+      meta: {
+        module,
+        ...payload,
+      },
+    });
+  } catch (error) {
+    logger.error('[Nyvee] persist session failed', error as Error, 'SYSTEM');
+    Sentry.captureException(error);
   }
 }
 

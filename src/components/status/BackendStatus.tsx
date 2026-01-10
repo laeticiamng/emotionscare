@@ -4,19 +4,20 @@ import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { RefreshCw, CheckCircle, XCircle, Clock } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
-// Hook simplifié pour éviter les erreurs d'import
+// Hook pour vérifier la connexion Supabase
 const useBackendStatus = () => {
   const [isConnected, setIsConnected] = React.useState<boolean | null>(null);
   const [lastCheck, setLastCheck] = React.useState<Date | null>(null);
 
   const refetch = React.useCallback(async () => {
     try {
-      // Test de connexion simple
-      const response = await fetch('/api/health', { method: 'HEAD' });
-      setIsConnected(response.ok);
+      // Test de connexion via Supabase health check
+      const { error } = await supabase.from('profiles').select('id').limit(1);
+      setIsConnected(!error);
       setLastCheck(new Date());
-    } catch (error) {
+    } catch {
       setIsConnected(false);
       setLastCheck(new Date());
     }

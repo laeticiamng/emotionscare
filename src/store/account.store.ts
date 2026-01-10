@@ -1,19 +1,10 @@
 import { create } from 'zustand';
 import { logger } from '@/lib/logger';
-
+import { supabase } from '@/integrations/supabase/client';
 import { persist } from './utils/createImmutableStore';
 import { createSelectors } from './utils/createSelectors';
 
 export type AccountStatus = 'active' | 'soft_deleted';
-
-export interface DeleteResp {
-  status: 'soft_deleted';
-  purge_at: string;
-}
-
-export interface UndeleteResp {
-  status: 'active';
-}
 
 export interface MeAccount {
   status: AccountStatus;
@@ -44,81 +35,85 @@ const initialState = {
 
 const accountStoreBase = create<AccountState>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       ...initialState,
       setStatus: (status) => set({ status }),
       setPurgeAt: (purgeAt) => set({ purgeAt }),
       setLoading: (loading) => set({ loading }),
       setError: (error) => set({ error }),
+      
       softDelete: async (reason) => {
         set({ loading: true, error: null });
 
         try {
-          const response = await fetch('/api/me/delete', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ reason }),
-          });
+          const { data: { user } } = await supabase.auth.getUser();
+          if (!user) throw new Error('Not authenticated');
 
-          if (!response.ok) {
-            throw new Error('Failed to delete account');
-          }
+          const purgeDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
 
-          const data: DeleteResp = await response.json();
+          const { error } = await supabase
+            .from('profiles')
+            .update({
+              deletion_scheduled_at: purgeDate.toISOString(),
+              deletion_reason: reason,
+              is_active: false,
+            })
+            .eq('id', user.id);
+
+          if (error) throw error;
+
           set({
-            status: data.status,
-            purgeAt: data.purge_at,
+            status: 'soft_deleted',
+            purgeAt: purgeDate.toISOString(),
             loading: false,
           });
 
-          if (typeof window !== 'undefined' && window.gtag) {
-            window.gtag('event', 'account_delete_confirmed');
+          if (typeof window !== 'undefined' && (window as any).gtag) {
+            (window as any).gtag('event', 'account_delete_confirmed');
           }
 
           return true;
         } catch (error) {
+          logger.error('Account deletion failed', error as Error, 'ACCOUNT');
           set({
             loading: false,
             error: error instanceof Error ? error.message : 'Erreur de suppression',
           });
-
-          if (typeof window !== 'undefined' && window.gtag) {
-            window.gtag('event', 'account_delete_error');
-          }
-
           return false;
         }
       },
+
       undelete: async () => {
         set({ loading: true, error: null });
 
         try {
-          const response = await fetch('/api/me/undelete', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          });
+          const { data: { user } } = await supabase.auth.getUser();
+          if (!user) throw new Error('Not authenticated');
 
-          if (!response.ok) {
-            throw new Error('Failed to restore account');
-          }
+          const { error } = await supabase
+            .from('profiles')
+            .update({
+              deletion_scheduled_at: null,
+              deletion_reason: null,
+              is_active: true,
+            })
+            .eq('id', user.id);
 
-          const data: UndeleteResp = await response.json();
+          if (error) throw error;
+
           set({
-            status: data.status,
+            status: 'active',
             purgeAt: undefined,
             loading: false,
           });
 
-          if (typeof window !== 'undefined' && window.gtag) {
-            window.gtag('event', 'account_undelete_success');
+          if (typeof window !== 'undefined' && (window as any).gtag) {
+            (window as any).gtag('event', 'account_undelete_success');
           }
 
           return true;
         } catch (error) {
+          logger.error('Account restoration failed', error as Error, 'ACCOUNT');
           set({
             loading: false,
             error: error instanceof Error ? error.message : 'Erreur de restauration',
@@ -126,13 +121,29 @@ const accountStoreBase = create<AccountState>()(
           return false;
         }
       },
+
       checkStatus: async () => {
         try {
-          logger.debug('Account status check skipped in demo mode', {}, 'SYSTEM');
+          const { data: { user } } = await supabase.auth.getUser();
+          if (!user) return;
+
+          const { data } = await supabase
+            .from('profiles')
+            .select('deletion_scheduled_at, is_active')
+            .eq('id', user.id)
+            .single();
+
+          if (data?.deletion_scheduled_at) {
+            set({
+              status: 'soft_deleted',
+              purgeAt: data.deletion_scheduled_at,
+            });
+          }
         } catch (error) {
-          logger.warn('Failed to check account status', error, 'SYSTEM');
+          logger.warn('Failed to check account status', { error }, 'ACCOUNT');
         }
       },
+
       reset: () => set(initialState),
     }),
     {

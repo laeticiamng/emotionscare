@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { logger } from '@/lib/logger';
+import { rgpdService } from '@/services/rgpdService';
 
 export type ExportStatus = 'idle' | 'processing' | 'ready' | 'error';
 
@@ -21,7 +22,7 @@ interface RGPDState {
   setJob: (job: ExportJob | null) => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
-  startExport: () => Promise<boolean>;
+  startExport: (format?: 'json' | 'csv' | 'pdf') => Promise<boolean>;
   pollStatus: (jobId: string) => Promise<void>;
   cancelJob: () => void;
   reset: () => void;
@@ -36,37 +37,34 @@ export const useRGPDStore = create<RGPDState>((set, get) => ({
   setLoading: (loading) => set({ loading }),
   setError: (error) => set({ error }),
   
-  startExport: async () => {
+  startExport: async (format = 'json') => {
     set({ loading: true, error: null });
     
     try {
-      const response = await fetch('/api/me/export', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      const result = await rgpdService.requestDataExport({ format });
       
-      if (!response.ok) {
-        throw new Error('Failed to start export job');
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to start export job');
       }
       
-      const data = await response.json();
       set({ 
         job: {
-          job_id: data.job_id,
-          status: 'processing'
+          job_id: result.jobId || crypto.randomUUID(),
+          status: 'ready',
+          download_url: result.downloadUrl,
+          expires_at: result.expiresAt,
         },
         loading: false 
       });
       
       // Analytics
-      if (typeof window !== 'undefined' && window.gtag) {
-        window.gtag('event', 'rgpd_export_requested');
+      if (typeof window !== 'undefined' && (window as any).gtag) {
+        (window as any).gtag('event', 'rgpd_export_requested', { format });
       }
       
       return true;
     } catch (error) {
+      logger.error('RGPD export failed', error as Error, 'GDPR');
       set({ 
         loading: false,
         error: error instanceof Error ? error.message : 'Erreur de démarrage'
@@ -77,28 +75,32 @@ export const useRGPDStore = create<RGPDState>((set, get) => ({
 
   pollStatus: async (jobId: string) => {
     try {
-      const response = await fetch(`/api/me/export/${jobId}`);
+      const result = await rgpdService.checkExportStatus(jobId);
       
-      if (!response.ok) {
-        throw new Error('Failed to get export status');
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to get export status');
       }
       
-      const data = await response.json();
       const currentJob = get().job;
       
       if (currentJob && currentJob.job_id === jobId) {
         set({ 
-          job: { ...currentJob, ...data }
+          job: { 
+            ...currentJob, 
+            status: 'ready',
+            download_url: result.downloadUrl,
+          }
         });
         
         // Analytics for completion
-        if (data.status === 'ready' && currentJob.status !== 'ready') {
-          if (typeof window !== 'undefined' && window.gtag) {
-            window.gtag('event', 'rgpd_export_ready');
+        if (currentJob.status !== 'ready') {
+          if (typeof window !== 'undefined' && (window as any).gtag) {
+            (window as any).gtag('event', 'rgpd_export_ready');
           }
         }
       }
     } catch (error) {
+      logger.error('RGPD status check failed', error as Error, 'GDPR');
       set({ 
         error: error instanceof Error ? error.message : 'Erreur de statut'
       });
@@ -107,10 +109,13 @@ export const useRGPDStore = create<RGPDState>((set, get) => ({
 
   cancelJob: () => {
     const currentJob = get().job;
-    if (currentJob) {
-      // Optionally call DELETE API to revoke URL
-      fetch(`/api/me/export/${currentJob.job_id}`, { method: 'DELETE' })
-        .catch((error) => logger.warn('Failed to delete export job', error, 'SYSTEM'));
+    if (currentJob?.download_url) {
+      // Revoke the blob URL if it exists
+      try {
+        URL.revokeObjectURL(currentJob.download_url);
+      } catch {
+        // Silent fail
+      }
     }
     
     set({ job: null, loading: false, error: null });
