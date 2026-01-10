@@ -13837,6 +13837,7 @@ export type Database = {
           created_at: string
           emotion: string
           error_message: string | null
+          generation_status: string | null
           id: string
           intensity: number
           max_retries: number
@@ -13854,6 +13855,7 @@ export type Database = {
           created_at?: string
           emotion: string
           error_message?: string | null
+          generation_status?: string | null
           id?: string
           intensity?: number
           max_retries?: number
@@ -13871,6 +13873,7 @@ export type Database = {
           created_at?: string
           emotion?: string
           error_message?: string | null
+          generation_status?: string | null
           id?: string
           intensity?: number
           max_retries?: number
@@ -19177,6 +19180,48 @@ export type Database = {
         }
         Relationships: []
       }
+      session_emotions: {
+        Row: {
+          arousal: number | null
+          context: Json | null
+          created_at: string | null
+          detected_at: string | null
+          emotion: string
+          id: string
+          intensity: number | null
+          session_id: string | null
+          source: string | null
+          user_id: string | null
+          valence: number | null
+        }
+        Insert: {
+          arousal?: number | null
+          context?: Json | null
+          created_at?: string | null
+          detected_at?: string | null
+          emotion: string
+          id?: string
+          intensity?: number | null
+          session_id?: string | null
+          source?: string | null
+          user_id?: string | null
+          valence?: number | null
+        }
+        Update: {
+          arousal?: number | null
+          context?: Json | null
+          created_at?: string | null
+          detected_at?: string | null
+          emotion?: string
+          id?: string
+          intensity?: number | null
+          session_id?: string | null
+          source?: string | null
+          user_id?: string | null
+          valence?: number | null
+        }
+        Relationships: []
+      }
       sessions: {
         Row: {
           achievements_unlocked: string[] | null
@@ -24129,6 +24174,7 @@ export type Database = {
           current_progress: number
           id: string
           quest_id: string
+          started_at: string | null
           updated_at: string
           user_id: string
         }
@@ -24141,6 +24187,7 @@ export type Database = {
           current_progress?: number
           id?: string
           quest_id: string
+          started_at?: string | null
           updated_at?: string
           user_id: string
         }
@@ -24153,6 +24200,7 @@ export type Database = {
           current_progress?: number
           id?: string
           quest_id?: string
+          started_at?: string | null
           updated_at?: string
           user_id?: string
         }
