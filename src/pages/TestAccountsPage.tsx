@@ -16,20 +16,20 @@ interface TestAccount {
 const TEST_ACCOUNTS: TestAccount[] = [
   {
     role: 'Consumer',
-    email: process.env.REACT_APP_TEST_CONSUMER_EMAIL || 'consumer@test.fr',
-    password: process.env.REACT_APP_TEST_CONSUMER_PASSWORD || 'test123456',
+    email: import.meta.env.VITE_TEST_CONSUMER_EMAIL || 'consumer@test.fr',
+    password: import.meta.env.VITE_TEST_CONSUMER_PASSWORD || 'test123456',
     description: 'Accès aux fonctionnalités B2C',
   },
   {
     role: 'Employee',
-    email: process.env.REACT_APP_TEST_EMPLOYEE_EMAIL || 'employee@test.fr',
-    password: process.env.REACT_APP_TEST_EMPLOYEE_PASSWORD || 'test123456',
+    email: import.meta.env.VITE_TEST_EMPLOYEE_EMAIL || 'employee@test.fr',
+    password: import.meta.env.VITE_TEST_EMPLOYEE_PASSWORD || 'test123456',
     description: 'Accès collaborateur B2B',
   },
   {
     role: 'Manager',
-    email: process.env.REACT_APP_TEST_MANAGER_EMAIL || 'manager@test.fr',
-    password: process.env.REACT_APP_TEST_MANAGER_PASSWORD || 'test123456',
+    email: import.meta.env.VITE_TEST_MANAGER_EMAIL || 'manager@test.fr',
+    password: import.meta.env.VITE_TEST_MANAGER_PASSWORD || 'test123456',
     description: 'Accès gestionnaire RH B2B',
   },
 ];

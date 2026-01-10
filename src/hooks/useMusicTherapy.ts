@@ -1,6 +1,7 @@
 /**
  * useMusicTherapy Hook
  * Interface React pour le service MusicTherapy
+ * Types complets pour toutes les réponses du service
  */
 
 import { useState, useCallback, useMemo } from 'react';

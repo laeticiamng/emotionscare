@@ -7,7 +7,7 @@ import { ApiResponse, EmotionAnalysisResult, UserProfile, JournalEntry } from '@
  */
 class MockServer {
   private delay: number = 500; // Délai simulé pour les réponses
-  private isEnabled: boolean = process.env.NODE_ENV === 'development';
+  private isEnabled: boolean = import.meta.env.DEV;
 
   /**
    * Configuration du mock server

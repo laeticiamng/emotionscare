@@ -45,7 +45,7 @@ export const CSP_DIRECTIVES = {
     "https://*.supabase.co",
     "https://api.hume.ai",
     "wss://*.supabase.co",
-    process.env.NODE_ENV === 'development' ? "ws://localhost:*" : ""
+    isDevelopment ? "ws://localhost:*" : ""
   ].filter(Boolean),
   'frame-src': [
     "'self'",

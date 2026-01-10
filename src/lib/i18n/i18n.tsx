@@ -108,26 +108,36 @@ export function I18nProvider({ children, defaultLang = DEFAULT_LANG }: { childre
     }
   }, [applyLanguage, defaultLang, hydrated, lang, profileLanguage]);
 
+  // Synchronisation avec Supabase si l'utilisateur est connecté
   React.useEffect(() => {
-    if (typeof window === 'undefined') {
+    if (typeof window === 'undefined' || !hydrated) {
       return;
     }
 
-    let cancelled = false;
-
     const syncLanguageFromProfile = async () => {
-      // DÉSACTIVÉ: API /api/me/profile inexistante
-      // TODO: Implémenter avec Supabase directement si nécessaire
-      // Pour l'instant, utiliser le localStorage uniquement
-      return;
+      try {
+        // Récupérer depuis Supabase directement
+        const { supabase } = await import('@/integrations/supabase/client');
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        if (user) {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('language')
+            .eq('id', user.id)
+            .single();
+
+          if (profile?.language && profile.language !== lang && profile.language !== 'auto') {
+            await applyLanguage(profile.language as Lang, false);
+          }
+        }
+      } catch (error) {
+        // Silently fail - use localStorage as fallback
+      }
     };
 
     syncLanguageFromProfile();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [profileLanguage, setProfileLanguage]);
+  }, [hydrated, lang, applyLanguage]);
 
   const contextValue = React.useMemo<I18nContextValue>(
     () => ({

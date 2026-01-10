@@ -130,7 +130,7 @@ export function useHomePageAnalytics(): UseHomePageAnalyticsReturn {
     setInteractions(prev => [...prev, interaction].slice(-100));
 
     // Log pour debug
-    if (process.env.NODE_ENV === 'development') {
+    if (import.meta.env.DEV) {
       console.log('[Analytics] Interaction:', interaction);
     }
   }, []);

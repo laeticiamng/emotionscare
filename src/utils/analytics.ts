@@ -8,7 +8,7 @@ interface TrackEventOptions {
 
 export const trackEvent = (eventName: string, options: TrackEventOptions = {}) => {
   if (!hasConsent("analytics")) return;
-  if (process.env.NODE_ENV === 'development') {
+  if (import.meta.env.DEV) {
     logger.info('📊 Analytics Event', { eventName, ...options }, 'ANALYTICS');
   }
 

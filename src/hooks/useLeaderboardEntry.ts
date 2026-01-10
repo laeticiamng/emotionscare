@@ -47,7 +47,7 @@ export function useLeaderboardEntry() {
     setIsLoading(true);
 
     try {
-      // Fetch top 100 entries
+      // Fetch top 100 entries ordered by total XP (global ranking)
       const { data: topData, error: topError } = await supabase
         .from('leaderboard_entries')
         .select('*')
@@ -56,7 +56,16 @@ export function useLeaderboardEntry() {
 
       if (topError) throw topError;
 
-      // Add rank
+      // Fetch top 100 entries ordered by weekly XP (weekly ranking)
+      const { data: weeklyData, error: weeklyError } = await supabase
+        .from('leaderboard_entries')
+        .select('user_id, weekly_xp')
+        .order('weekly_xp', { ascending: false })
+        .limit(100);
+
+      if (weeklyError) throw weeklyError;
+
+      // Add global rank
       const rankedEntries = (topData || []).map((entry, index) => ({
         ...entry,
         rank: index + 1
@@ -75,18 +84,20 @@ export function useLeaderboardEntry() {
         if (myError && myError.code !== 'PGRST116') throw myError;
 
         if (myData) {
-          const myRank = rankedEntries.findIndex(e => e.user_id === user.id) + 1;
-          setMyEntry({ ...myData, rank: myRank || null } as LeaderboardEntry);
+          const myGlobalRank = rankedEntries.findIndex(e => e.user_id === user.id) + 1;
+          const myWeeklyRank = (weeklyData || []).findIndex(e => e.user_id === user.id) + 1;
+          
+          setMyEntry({ ...myData, rank: myGlobalRank || null } as LeaderboardEntry);
 
-          // Calculate stats
+          // Calculate stats with both rankings
           const totalParticipants = rankedEntries.length;
-          const percentile = myRank > 0 
-            ? Math.round(((totalParticipants - myRank + 1) / totalParticipants) * 100)
+          const percentile = myGlobalRank > 0 
+            ? Math.round(((totalParticipants - myGlobalRank + 1) / totalParticipants) * 100)
             : 0;
 
           setStats({
-            globalRank: myRank || null,
-            weeklyRank: null, // TODO: implement weekly ranking
+            globalRank: myGlobalRank || null,
+            weeklyRank: myWeeklyRank > 0 ? myWeeklyRank : null,
             percentile,
             totalParticipants
           });
