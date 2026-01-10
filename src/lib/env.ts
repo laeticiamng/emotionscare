@@ -4,7 +4,10 @@ import { CONFIG } from './config';
 
 /**
  * Gestion centralisée des variables d'environnement avec validation stricte.
- * Utilise les valeurs hardcodées de CONFIG comme fallback.
+ * 
+ * IMPORTANT: Les clés API privées (OpenAI, Hume, Suno, etc.) sont gérées
+ * exclusivement via Supabase Edge Function secrets et ne doivent JAMAIS
+ * être exposées côté client.
  */
 
 const rawEnv = {
@@ -47,11 +50,6 @@ const rawEnv = {
   VITE_UPLOAD_MAX_SIZE: import.meta.env.VITE_UPLOAD_MAX_SIZE,
   VITE_ALLOWED_IMAGE_TYPES: import.meta.env.VITE_ALLOWED_IMAGE_TYPES,
   VITE_ALLOWED_AUDIO_TYPES: import.meta.env.VITE_ALLOWED_AUDIO_TYPES,
-  VITE_OPENAI_API_KEY:
-    import.meta.env.VITE_OPENAI_API_KEY,
-  VITE_OPENAI_BASE_URL: import.meta.env.VITE_OPENAI_BASE_URL,
-  VITE_HUME_API_KEY:
-    import.meta.env.VITE_HUME_API_KEY,
 };
 
 const envSchema = z.object({
@@ -78,26 +76,21 @@ const envSchema = z.object({
   VITE_UPLOAD_MAX_SIZE: z.coerce.number().positive().optional(),
   VITE_ALLOWED_IMAGE_TYPES: z.string().optional(),
   VITE_ALLOWED_AUDIO_TYPES: z.string().optional(),
-  VITE_OPENAI_API_KEY: z.string().optional(),
-  VITE_OPENAI_BASE_URL: z.string().url().optional(),
-  VITE_HUME_API_KEY: z.string().optional(),
 });
 
 const parsedEnv = envSchema.safeParse(rawEnv);
 
-// Debug info in development
+// Debug info in development (sans exposer de secrets)
 if (rawEnv.MODE === 'development') {
-  console.debug('[SYSTEM] Raw environment variables', {
-    VITE_SUPABASE_URL: rawEnv.VITE_SUPABASE_URL,
+  console.debug('[SYSTEM] Environment configured', {
+    VITE_SUPABASE_URL: rawEnv.VITE_SUPABASE_URL ? '[SET]' : '[EMPTY]',
     VITE_SUPABASE_ANON_KEY: rawEnv.VITE_SUPABASE_ANON_KEY ? '[SET]' : '[EMPTY]',
-    allViteVars: Object.keys(import.meta.env).filter(k => k.startsWith('VITE_'))
   });
 }
 
 if (!parsedEnv.success) {
   console.warn('[SYSTEM] ⚠️ Environment validation warnings:', JSON.stringify(parsedEnv.error.flatten().fieldErrors));
   console.info('[SYSTEM] Using fallback values from CONFIG');
-  // Continue with fallback values from CONFIG instead of throwing
 }
 
 const env = parsedEnv.data;
@@ -152,13 +145,16 @@ export const SENTRY_REPLAYS_SESSION_SAMPLE_RATE = SENTRY_CONFIG.replaysSessionSa
 export const SENTRY_REPLAYS_ON_ERROR_SAMPLE_RATE = SENTRY_CONFIG.replaysOnErrorSampleRate;
 export const SENTRY_RELEASE = BUILD_INFO.release ?? undefined;
 
+/**
+ * Configuration AI - Les clés sont gérées côté serveur via Edge Functions
+ * Ces valeurs sont utilisées uniquement pour vérifier si les clés sont configurées
+ */
 export const AI_CONFIG = {
-  openai: {
-    apiKey: env.VITE_OPENAI_API_KEY ?? '',
-    baseUrl: env.VITE_OPENAI_BASE_URL ?? 'https://api.openai.com/v1',
-  },
-  hume: {
-    apiKey: env.VITE_HUME_API_KEY ?? '',
+  note: 'API keys are managed server-side via Supabase Edge Function secrets',
+  edgeFunctions: {
+    openai: 'openai-chat',
+    hume: 'hume-analysis',
+    suno: 'suno-music',
   },
 } as const;
 
@@ -195,8 +191,7 @@ export const ENV_VALIDATION = {
     configured: Boolean(FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.projectId),
   },
   ai: {
-    openai: Boolean(AI_CONFIG.openai.apiKey),
-    hume: Boolean(AI_CONFIG.hume.apiKey),
+    note: 'API keys are managed via Edge Function secrets - check Supabase dashboard',
   },
 };
 
@@ -204,8 +199,6 @@ const missingOptionalKeys = Object.entries({
   VITE_API_URL: env.VITE_API_URL,
   VITE_WEB_URL: env.VITE_WEB_URL,
   VITE_SENTRY_DSN: SENTRY_CONFIG.dsn,
-  VITE_OPENAI_API_KEY: AI_CONFIG.openai.apiKey,
-  VITE_HUME_API_KEY: AI_CONFIG.hume.apiKey,
 }).filter(([, value]) => !value);
 
 if (missingOptionalKeys.length > 0) {
@@ -221,7 +214,7 @@ if (IS_DEV) {
     supabase: ENV_VALIDATION.isConfigured ? '✅' : '❌',
     firebase: ENV_VALIDATION.hasFirebase ? '✅' : '⚠️ optionnel',
     sentry: ENV_VALIDATION.hasSentry ? '✅' : '⚠️ optionnel',
-    ai: ENV_VALIDATION.ai,
+    ai: 'Managed via Edge Functions',
   });
 }
 
