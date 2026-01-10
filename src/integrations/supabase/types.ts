@@ -2663,6 +2663,51 @@ export type Database = {
         }
         Relationships: []
       }
+      boss_grit_quests: {
+        Row: {
+          completed_at: string | null
+          created_at: string | null
+          difficulty: string | null
+          elapsed_seconds: number | null
+          id: string
+          quest_description: string | null
+          quest_title: string
+          success: boolean | null
+          tasks_completed: number | null
+          total_tasks: number | null
+          user_id: string | null
+          xp_earned: number | null
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string | null
+          difficulty?: string | null
+          elapsed_seconds?: number | null
+          id?: string
+          quest_description?: string | null
+          quest_title: string
+          success?: boolean | null
+          tasks_completed?: number | null
+          total_tasks?: number | null
+          user_id?: string | null
+          xp_earned?: number | null
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string | null
+          difficulty?: string | null
+          elapsed_seconds?: number | null
+          id?: string
+          quest_description?: string | null
+          quest_title?: string
+          success?: boolean | null
+          tasks_completed?: number | null
+          total_tasks?: number | null
+          user_id?: string | null
+          xp_earned?: number | null
+        }
+        Relationships: []
+      }
       bounce_battles: {
         Row: {
           created_at: string | null
@@ -2977,6 +3022,39 @@ export type Database = {
           updated_at?: string
           user_id?: string
           vr_mode?: boolean | null
+        }
+        Relationships: []
+      }
+      breathwork_sessions: {
+        Row: {
+          completion_rate: number | null
+          created_at: string | null
+          cycles_completed: number | null
+          duration_seconds: number
+          id: string
+          pattern_name: string
+          session_date: string | null
+          user_id: string | null
+        }
+        Insert: {
+          completion_rate?: number | null
+          created_at?: string | null
+          cycles_completed?: number | null
+          duration_seconds: number
+          id?: string
+          pattern_name: string
+          session_date?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          completion_rate?: number | null
+          created_at?: string | null
+          cycles_completed?: number | null
+          duration_seconds?: number
+          id?: string
+          pattern_name?: string
+          session_date?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -4080,6 +4158,39 @@ export type Database = {
           message_count?: number | null
           title?: string | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      coach_memory: {
+        Row: {
+          content: string
+          created_at: string | null
+          expires_at: string | null
+          id: string
+          importance_score: number | null
+          memory_type: string
+          metadata: Json | null
+          user_id: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          importance_score?: number | null
+          memory_type?: string
+          metadata?: Json | null
+          user_id?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          importance_score?: number | null
+          memory_type?: string
+          metadata?: Json | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -6256,6 +6367,60 @@ export type Database = {
           status?: string
           updated_at?: string
           versions?: string[]
+        }
+        Relationships: []
+      }
+      edn_items: {
+        Row: {
+          category: string | null
+          color: string | null
+          created_at: string | null
+          description: string | null
+          difficulty: string | null
+          duration_min: number | null
+          icon: string | null
+          id: string
+          is_active: boolean | null
+          is_premium: boolean | null
+          metadata: Json | null
+          order_index: number | null
+          slug: string
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          category?: string | null
+          color?: string | null
+          created_at?: string | null
+          description?: string | null
+          difficulty?: string | null
+          duration_min?: number | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_premium?: boolean | null
+          metadata?: Json | null
+          order_index?: number | null
+          slug: string
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string | null
+          color?: string | null
+          created_at?: string | null
+          description?: string | null
+          difficulty?: string | null
+          duration_min?: number | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_premium?: boolean | null
+          metadata?: Json | null
+          order_index?: number | null
+          slug?: string
+          title?: string
+          updated_at?: string | null
         }
         Relationships: []
       }
@@ -8491,6 +8656,39 @@ export type Database = {
         }
         Relationships: []
       }
+      flash_glow_sessions: {
+        Row: {
+          completed: boolean | null
+          created_at: string | null
+          duration_seconds: number
+          id: string
+          pattern: string | null
+          score: number | null
+          session_date: string | null
+          user_id: string | null
+        }
+        Insert: {
+          completed?: boolean | null
+          created_at?: string | null
+          duration_seconds: number
+          id?: string
+          pattern?: string | null
+          score?: number | null
+          session_date?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          completed?: boolean | null
+          created_at?: string | null
+          duration_seconds?: number
+          id?: string
+          pattern?: string | null
+          score?: number | null
+          session_date?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       flash_lite_cards: {
         Row: {
           answer: string
@@ -9344,6 +9542,45 @@ export type Database = {
           updated_at?: string
           user_id?: string
           voice_id?: string
+        }
+        Relationships: []
+      }
+      global_leaderboard: {
+        Row: {
+          avatar_emoji: string | null
+          display_name: string
+          id: string
+          level: number | null
+          rank_position: number | null
+          streak_days: number | null
+          total_score: number | null
+          updated_at: string | null
+          user_id: string | null
+          weekly_score: number | null
+        }
+        Insert: {
+          avatar_emoji?: string | null
+          display_name: string
+          id?: string
+          level?: number | null
+          rank_position?: number | null
+          streak_days?: number | null
+          total_score?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+          weekly_score?: number | null
+        }
+        Update: {
+          avatar_emoji?: string | null
+          display_name?: string
+          id?: string
+          level?: number | null
+          rank_position?: number | null
+          streak_days?: number | null
+          total_score?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+          weekly_score?: number | null
         }
         Relationships: []
       }
@@ -20095,6 +20332,48 @@ export type Database = {
           updated_at?: string | null
           user_context?: string | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      story_synth_stories: {
+        Row: {
+          audio_url: string | null
+          content: string
+          created_at: string | null
+          duration_seconds: number | null
+          id: string
+          intentions: string[]
+          is_favorite: boolean | null
+          play_count: number | null
+          title: string
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          audio_url?: string | null
+          content: string
+          created_at?: string | null
+          duration_seconds?: number | null
+          id?: string
+          intentions: string[]
+          is_favorite?: boolean | null
+          play_count?: number | null
+          title: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          audio_url?: string | null
+          content?: string
+          created_at?: string | null
+          duration_seconds?: number | null
+          id?: string
+          intentions?: string[]
+          is_favorite?: boolean | null
+          play_count?: number | null
+          title?: string
+          updated_at?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
