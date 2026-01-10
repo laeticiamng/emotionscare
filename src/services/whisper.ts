@@ -1,91 +1,57 @@
-// @ts-nocheck
-
 /**
- * Service Whisper
+ * Service Whisper - Transcription vocale via Edge Function
  * 
- * Ce service gère l'intégration avec l'API Whisper d'OpenAI pour la reconnaissance vocale.
- * Il permet de transcrire de l'audio en texte.
+ * Utilise l'edge function openai-transcribe pour la transcription.
+ * Ne fait JAMAIS d'appel direct à l'API OpenAI.
  */
-import { API_URL } from '@/lib/env';
+import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';
 
 // Types pour les options de transcription
 export interface WhisperOptions {
-  model?: string; // Modèle Whisper à utiliser
-  language?: string; // Code langue ISO (fr, en, etc.)
-  prompt?: string; // Prompt pour guider la transcription
-  temperature?: number; // Température (créativité)
-  responseFormat?: 'json' | 'text' | 'srt' | 'verbose_json' | 'vtt';
+  language?: string;
+  prompt?: string;
 }
 
 // Types pour les résultats
 export interface WhisperTranscription {
   text: string;
-  segments?: Array<{
-    id: number;
-    start: number;
-    end: number;
-    text: string;
-  }>;
   language?: string;
+  confidence?: number;
 }
 
 /**
- * Transcrit un fichier audio en texte
- * @param audioFile Le fichier audio à transcrire
- * @param options Options de transcription
- * @returns Le texte transcrit
+ * Transcrit un fichier audio en texte via Edge Function
  */
 export async function transcribeAudio(
   audioFile: File | Blob,
   options: WhisperOptions = {}
 ): Promise<WhisperTranscription> {
-  const {
-    model = 'whisper-1',
-    language,
-    prompt,
-    temperature = 0,
-    responseFormat = 'json'
-  } = options;
-  
   try {
-    // Vérification de la clé API
-    // NOTE: En production, utiliser Supabase Edge Functions
-    const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
-    if (!apiKey) {
-      throw new Error('OpenAI API key is not set. Use Supabase Edge Functions in production.');
-    }
-
-    // Préparation du FormData pour l'upload
     const formData = new FormData();
-    formData.append('file', audioFile);
-    formData.append('model', model);
     
-    if (language) {
-      formData.append('language', language);
+    // Créer un File à partir du Blob si nécessaire
+    if (audioFile instanceof Blob && !(audioFile instanceof File)) {
+      const file = new File([audioFile], 'audio.webm', { type: audioFile.type || 'audio/webm' });
+      formData.append('audio', file);
+    } else {
+      formData.append('audio', audioFile);
     }
-    if (prompt) {
-      formData.append('prompt', prompt);
-    }
-    
-    formData.append('temperature', temperature.toString());
-    formData.append('response_format', responseFormat);
 
-    // Appel à l'API Whisper
-    const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`
-      },
+    const { data, error } = await supabase.functions.invoke('openai-transcribe', {
       body: formData
     });
 
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error?.error?.message || 'Failed to transcribe audio');
+    if (error) {
+      logger.error('Whisper transcription error', error, 'API');
+      throw new Error(error.message || 'Transcription failed');
     }
 
-    return await response.json();
+    return {
+      text: data?.text || '',
+      language: data?.language || options.language || 'fr',
+      confidence: data?.confidence || 0.9
+    };
   } catch (error) {
     logger.error('Error transcribing audio', error as Error, 'API');
     throw error;
@@ -93,80 +59,40 @@ export async function transcribeAudio(
 }
 
 /**
- * Transcrit un enregistrement vocal depuis un microphone
- * @param options Options de transcription
- * @returns Promise avec le texte transcrit
+ * Transcrit audio en base64 via Edge Function voice-to-text
  */
-export async function recordAndTranscribe(options: WhisperOptions = {}): Promise<string> {
+export async function transcribeBase64Audio(
+  base64Audio: string,
+  mimeType: string = 'audio/webm',
+  language: string = 'fr'
+): Promise<WhisperTranscription> {
   try {
-    // Demande d'accès au microphone
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    
-    // Création de l'enregistreur
-    const mediaRecorder = new MediaRecorder(stream);
-    const audioChunks: BlobPart[] = [];
-    
-    // Collecte des morceaux audio
-    mediaRecorder.addEventListener('dataavailable', (event) => {
-      audioChunks.push(event.data);
+    const { data, error } = await supabase.functions.invoke('voice-to-text', {
+      body: {
+        audio: base64Audio,
+        mimeType,
+        language
+      }
     });
-    
-    // Lance l'enregistrement
-    mediaRecorder.start();
-    
-    // Attend que l'utilisateur arrête l'enregistrement
-    return new Promise((resolve, reject) => {
-      // Fonction pour arrêter l'enregistrement
-      const stopRecording = () => {
-        return new Promise<Blob>((resolveBlob) => {
-          mediaRecorder.addEventListener('stop', () => {
-            // Combine les chunks en un seul blob
-            const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-            resolveBlob(audioBlob);
-          });
-          
-          // Arrête l'enregistrement
-          mediaRecorder.stop();
-          
-          // Arrête les flux audio
-          stream.getTracks().forEach(track => track.stop());
-        });
-      };
-      
-      // Timer pour arrêter automatiquement après 30 secondes
-      const timer = setTimeout(async () => {
-        try {
-          const audioBlob = await stopRecording();
-          const transcription = await transcribeAudio(audioBlob, options);
-          resolve(transcription.text);
-        } catch (error) {
-          reject(error);
-        }
-      }, 30000);
-      
-      // Méthode pour arrêter manuellement
-      (window as any).stopWhisperRecording = async () => {
-        clearTimeout(timer);
-        delete (window as any).stopWhisperRecording;
-        
-        try {
-          const audioBlob = await stopRecording();
-          const transcription = await transcribeAudio(audioBlob, options);
-          resolve(transcription.text);
-        } catch (error) {
-          reject(error);
-        }
-      };
-    });
+
+    if (error) {
+      logger.error('Voice-to-text error', error, 'API');
+      throw new Error(error.message || 'Transcription failed');
+    }
+
+    return {
+      text: data?.text || '',
+      language,
+      confidence: data?.confidence || 0.85
+    };
   } catch (error) {
-    logger.error('Error recording audio', error as Error, 'API');
+    logger.error('Error in base64 transcription', error as Error, 'API');
     throw error;
   }
 }
 
 /**
  * Vérifie l'accès au microphone
- * @returns true si l'accès est disponible, false sinon
  */
 export async function checkMicrophoneAccess(): Promise<boolean> {
   try {
@@ -179,8 +105,72 @@ export async function checkMicrophoneAccess(): Promise<boolean> {
   }
 }
 
+/**
+ * Enregistre et transcrit l'audio du microphone
+ */
+export async function recordAndTranscribe(
+  options: WhisperOptions & { maxDurationMs?: number } = {}
+): Promise<string> {
+  const { maxDurationMs = 30000, language = 'fr' } = options;
+
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const mediaRecorder = new MediaRecorder(stream, {
+      mimeType: MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/mp4'
+    });
+    const audioChunks: BlobPart[] = [];
+
+    mediaRecorder.addEventListener('dataavailable', (event) => {
+      if (event.data.size > 0) {
+        audioChunks.push(event.data);
+      }
+    });
+
+    mediaRecorder.start(1000);
+
+    return new Promise((resolve, reject) => {
+      const stopAndTranscribe = async () => {
+        return new Promise<string>((resolveStop) => {
+          mediaRecorder.addEventListener('stop', async () => {
+            stream.getTracks().forEach(track => track.stop());
+            
+            const audioBlob = new Blob(audioChunks, { type: mediaRecorder.mimeType });
+            
+            try {
+              const result = await transcribeAudio(audioBlob, { language });
+              resolveStop(result.text);
+            } catch (err) {
+              resolveStop('');
+            }
+          }, { once: true });
+          
+          mediaRecorder.stop();
+        });
+      };
+
+      // Auto-stop après maxDuration
+      const timer = setTimeout(async () => {
+        const text = await stopAndTranscribe();
+        resolve(text);
+      }, maxDurationMs);
+
+      // Méthode manuelle pour arrêter
+      (window as any).stopWhisperRecording = async () => {
+        clearTimeout(timer);
+        delete (window as any).stopWhisperRecording;
+        const text = await stopAndTranscribe();
+        resolve(text);
+      };
+    });
+  } catch (error) {
+    logger.error('Error recording audio', error as Error, 'API');
+    throw error;
+  }
+}
+
 export default {
   transcribeAudio,
+  transcribeBase64Audio,
   recordAndTranscribe,
   checkMicrophoneAccess
 };
