@@ -2,24 +2,16 @@
  * Service d'intégration Withings
  * Phase 3 - Excellence
  * API v2: https://developer.withings.com/api-reference
+ * Uses Edge Functions for OAuth - no client secrets exposed
  */
 
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/integrations/supabase/client';
 import type {
   HealthConnection,
   HealthMetric,
   HealthSyncResult,
   HealthDataType,
 } from '@/types/health-integrations';
-
-const WITHINGS_CONFIG = {
-  client_id: import.meta.env.VITE_WITHINGS_CLIENT_ID || '',
-  client_secret: import.meta.env.VITE_WITHINGS_CLIENT_SECRET || '',
-  redirect_uri: `${window.location.origin}/app/health/callback/withings`,
-  auth_url: 'https://account.withings.com/oauth2_user/authorize2',
-  token_url: 'https://wbsapi.withings.net/v2/oauth2',
-  api_base_url: 'https://wbsapi.withings.net',
-};
 
 // Mapping des types de mesures Withings
 const WITHINGS_MEASURE_TYPES = {
@@ -39,18 +31,18 @@ const WITHINGS_MEASURE_TYPES = {
 };
 
 /**
- * Initier la connexion Withings (OAuth 2.0)
+ * Initier la connexion Withings (OAuth 2.0) via Edge Function
  */
 export async function initiateWithingsConnection(userId: string): Promise<string> {
-  const params = new URLSearchParams({
-    response_type: 'code',
-    client_id: WITHINGS_CONFIG.client_id,
-    redirect_uri: WITHINGS_CONFIG.redirect_uri,
-    state: userId,
-    scope: 'user.metrics,user.activity',
+  const { data, error } = await supabase.functions.invoke('health-withings-init', {
+    body: { 
+      userId,
+      redirectUri: `${window.location.origin}/app/health/callback/withings`
+    }
   });
 
-  return `${WITHINGS_CONFIG.auth_url}?${params.toString()}`;
+  if (error) throw new Error(`Failed to initiate Withings connection: ${error.message}`);
+  return data.authUrl;
 }
 
 /**
@@ -61,7 +53,11 @@ export async function exchangeWithingsCode(
   userId: string
 ): Promise<HealthConnection> {
   const { data, error } = await supabase.functions.invoke('health-withings-exchange', {
-    body: { code, userId, redirectUri: WITHINGS_CONFIG.redirect_uri },
+    body: { 
+      code, 
+      userId, 
+      redirectUri: `${window.location.origin}/app/health/callback/withings` 
+    },
   });
 
   if (error) throw new Error(`Failed to exchange Withings code: ${error.message}`);
@@ -84,216 +80,65 @@ export async function syncWithingsData(
 }
 
 /**
- * Récupérer les mesures corporelles (poids, graisse, etc.)
+ * Récupérer les mesures corporelles via Edge Function
  */
 export async function getWithingsMeasures(
-  accessToken: string,
+  userId: string,
   startTime: Date,
   endTime: Date,
   measureTypes?: number[]
 ): Promise<HealthMetric[]> {
-  const params = new URLSearchParams({
-    action: 'getmeas',
-    startdate: Math.floor(startTime.getTime() / 1000).toString(),
-    enddate: Math.floor(endTime.getTime() / 1000).toString(),
-  });
-
-  if (measureTypes) {
-    params.append('meastypes', measureTypes.join(','));
-  }
-
-  const response = await fetch(`${WITHINGS_CONFIG.api_base_url}/measure?${params}`, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
-
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(`Withings API error: ${error.message || response.statusText}`);
-  }
-
-  const data = await response.json();
-
-  if (data.status !== 0) {
-    throw new Error(`Withings API returned status ${data.status}`);
-  }
-
-  // Transformer les mesures en HealthMetric
-  const metrics: HealthMetric[] = [];
-
-  for (const measureGroup of data.body?.measuregrps || []) {
-    const timestamp = new Date(measureGroup.date * 1000).toISOString();
-
-    for (const measure of measureGroup.measures) {
-      const dataType = getHealthDataType(measure.type);
-      if (dataType) {
-        // Appliquer le facteur d'échelle (Withings utilise des valeurs avec exposant)
-        const value = measure.value * Math.pow(10, measure.unit);
-
-        metrics.push({
-          id: crypto.randomUUID(),
-          user_id: '',
-          provider: 'withings',
-          data_type: dataType,
-          value,
-          unit: getUnit(measure.type),
-          timestamp,
-          metadata: {
-            category: measureGroup.category,
-            attrib: measureGroup.attrib,
-            deviceid: measureGroup.deviceid,
-          },
-          synced_at: new Date().toISOString(),
-          created_at: new Date().toISOString(),
-        });
-      }
+  const { data, error } = await supabase.functions.invoke('health-withings-measures', {
+    body: {
+      userId,
+      startTime: startTime.toISOString(),
+      endTime: endTime.toISOString(),
+      measureTypes
     }
-  }
+  });
 
-  return metrics;
+  if (error) throw new Error(`Failed to get Withings measures: ${error.message}`);
+  return data.metrics || [];
 }
 
 /**
- * Récupérer les données d'activité (pas, calories, etc.)
+ * Récupérer les données d'activité via Edge Function
  */
 export async function getWithingsActivity(
-  accessToken: string,
+  userId: string,
   startDate: Date,
   endDate: Date
 ): Promise<HealthMetric[]> {
-  const params = new URLSearchParams({
-    action: 'getactivity',
-    startdateymd: formatDateYMD(startDate),
-    enddateymd: formatDateYMD(endDate),
+  const { data, error } = await supabase.functions.invoke('health-withings-activity', {
+    body: {
+      userId,
+      startDate: formatDateYMD(startDate),
+      endDate: formatDateYMD(endDate)
+    }
   });
 
-  const response = await fetch(`${WITHINGS_CONFIG.api_base_url}/v2/measure?${params}`, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
-
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(`Withings API error: ${error.message || response.statusText}`);
-  }
-
-  const data = await response.json();
-
-  if (data.status !== 0) {
-    throw new Error(`Withings API returned status ${data.status}`);
-  }
-
-  const metrics: HealthMetric[] = [];
-
-  for (const activity of data.body?.activities || []) {
-    const date = activity.date; // Format: YYYY-MM-DD
-
-    // Pas
-    if (activity.steps) {
-      metrics.push({
-        id: crypto.randomUUID(),
-        user_id: '',
-        provider: 'withings',
-        data_type: 'steps',
-        value: activity.steps,
-        unit: 'steps',
-        timestamp: `${date}T12:00:00Z`,
-        metadata: {
-          distance: activity.distance,
-          elevation: activity.elevation,
-          calories: activity.calories,
-        },
-        synced_at: new Date().toISOString(),
-        created_at: new Date().toISOString(),
-      });
-    }
-
-    // Fréquence cardiaque moyenne
-    if (activity.hr_average) {
-      metrics.push({
-        id: crypto.randomUUID(),
-        user_id: '',
-        provider: 'withings',
-        data_type: 'heart_rate',
-        value: activity.hr_average,
-        unit: 'bpm',
-        timestamp: `${date}T12:00:00Z`,
-        metadata: {
-          hr_min: activity.hr_min,
-          hr_max: activity.hr_max,
-          hr_zone_0: activity.hr_zone_0,
-          hr_zone_1: activity.hr_zone_1,
-          hr_zone_2: activity.hr_zone_2,
-          hr_zone_3: activity.hr_zone_3,
-        },
-        synced_at: new Date().toISOString(),
-        created_at: new Date().toISOString(),
-      });
-    }
-  }
-
-  return metrics;
+  if (error) throw new Error(`Failed to get Withings activity: ${error.message}`);
+  return data.metrics || [];
 }
 
 /**
- * Récupérer les données de sommeil
+ * Récupérer les données de sommeil via Edge Function
  */
 export async function getWithingsSleep(
-  accessToken: string,
+  userId: string,
   startTime: Date,
   endTime: Date
 ): Promise<HealthMetric[]> {
-  const params = new URLSearchParams({
-    action: 'getsummary',
-    startdateymd: formatDateYMD(startTime),
-    enddateymd: formatDateYMD(endTime),
-  });
-
-  const response = await fetch(`${WITHINGS_CONFIG.api_base_url}/v2/sleep?${params}`, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
-
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(`Withings API error: ${error.message || response.statusText}`);
-  }
-
-  const data = await response.json();
-
-  if (data.status !== 0) {
-    throw new Error(`Withings API returned status ${data.status}`);
-  }
-
-  const metrics: HealthMetric[] = [];
-
-  for (const sleep of data.body?.series || []) {
-    if (sleep.data?.total_sleep_time) {
-      metrics.push({
-        id: crypto.randomUUID(),
-        user_id: '',
-        provider: 'withings',
-        data_type: 'sleep',
-        value: sleep.data.total_sleep_time / 3600, // Convertir secondes en heures
-        unit: 'hours',
-        timestamp: new Date(sleep.startdate * 1000).toISOString(),
-        metadata: {
-          deep_sleep_duration: sleep.data.deepsleepduration,
-          light_sleep_duration: sleep.data.lightsleepduration,
-          rem_sleep_duration: sleep.data.remsleepduration,
-          wake_up_count: sleep.data.wakeupcount,
-          sleep_score: sleep.data.sleep_score,
-        },
-        synced_at: new Date().toISOString(),
-        created_at: new Date().toISOString(),
-      });
+  const { data, error } = await supabase.functions.invoke('health-withings-sleep', {
+    body: {
+      userId,
+      startTime: startTime.toISOString(),
+      endTime: endTime.toISOString()
     }
-  }
+  });
 
-  return metrics;
+  if (error) throw new Error(`Failed to get Withings sleep: ${error.message}`);
+  return data.metrics || [];
 }
 
 /**

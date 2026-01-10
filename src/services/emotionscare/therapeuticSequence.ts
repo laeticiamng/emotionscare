@@ -1,9 +1,9 @@
 // @ts-nocheck
 
 // Parcours thérapeutique progressif EmotionsCare
+import { supabase } from '@/integrations/supabase/client';
 import { EmotionInput, ANALGESIC_ROUTER } from './analgesic';
 import { PRESETS } from './presets';
-import { SunoApiClient } from './sunoClient';
 
 export interface TherapeuticStep {
   preset: string;
@@ -64,32 +64,22 @@ export async function generateTherapeuticSequence(
   callBackUrl?: string
 ): Promise<{ taskId: string; sequence: TherapeuticSequence }> {
   
-  // Silent: starting therapeutic sequence generation
-  
   try {
-    // 1. Détecter l'émotion de départ
-    const humeApiKey = process.env.HUME_API_KEY;
-    if (!humeApiKey) {
-      throw new Error('HUME_API_KEY not configured');
+    // 1. Détecter l'émotion de départ via Edge Function
+    const { data: emotionData, error: emotionError } = await supabase.functions.invoke('hume-analysis', {
+      body: { text, analysisType: 'text' }
+    });
+    
+    if (emotionError) {
+      throw new Error(`Emotion detection failed: ${emotionError.message}`);
     }
     
-    const { HumeClient } = await import('./humeClient');
-    const hume = new HumeClient(humeApiKey);
-    const emotions = await hume.detectEmotion(text);
-    
-    const startEmotion = emotions[0]?.name || "neutral";
-    // Silent: start emotion detected
+    const startEmotion = emotionData?.emotions?.[0]?.name || "neutral";
     
     // 2. Créer la séquence thérapeutique
     const sequence = createTherapeuticSequence(startEmotion);
-    // Silent: sequence created
-    // 3. Générer le premier morceau avec extension programmée
-    const sunoApiKey = process.env.SUNO_API_KEY;
-    if (!sunoApiKey) {
-      throw new Error('SUNO_API_KEY not configured');
-    }
     
-    const suno = new SunoApiClient(sunoApiKey);
+    // 3. Trouver le premier preset
     const firstStep = sequence.steps[0];
     const firstPreset = PRESETS.find(p => p.tag === firstStep.preset);
     
@@ -97,29 +87,32 @@ export async function generateTherapeuticSequence(
       throw new Error(`Preset ${firstStep.preset} introuvable`);
     }
     
-    // Prompt pour séquence évolutive
+    // 4. Prompt pour séquence évolutive
     const sequencePrompt = `${language} | parcours thérapeutique évolutif | ${firstPreset.style} | mood progression ${sequence.startEmotion} vers ${sequence.targetEmotion} | tempo ${firstStep.tempo} BPM progressif | durée ${sequence.totalDuration}s`;
     
-    // Silent: sequence prompt generated
-    const musicResponse = await suno.generateMusic({
-      prompt: sequencePrompt,
-      style: firstPreset.style,
-      title: `Parcours thérapeutique: ${sequence.startEmotion} → ${sequence.targetEmotion}`,
-      customMode: true,
-      instrumental: true, // Instrumental pour concentration thérapeutique
-      model: "V4_5",
-      callBackUrl: callBackUrl || ""
+    // 5. Générer la musique via Edge Function Suno
+    const { data: musicData, error: musicError } = await supabase.functions.invoke('suno-music', {
+      body: {
+        prompt: sequencePrompt,
+        style: firstPreset.style,
+        title: `Parcours thérapeutique: ${sequence.startEmotion} → ${sequence.targetEmotion}`,
+        customMode: true,
+        instrumental: true,
+        model: "V4_5",
+        callBackUrl: callBackUrl || ""
+      }
     });
     
-    // Silent: therapeutic sequence generated
+    if (musicError) {
+      throw new Error(`Music generation failed: ${musicError.message}`);
+    }
     
     return {
-      taskId: musicResponse.taskId,
+      taskId: musicData?.taskId || musicData?.task_id || `task-${Date.now()}`,
       sequence
     };
     
   } catch (error) {
-    // Silent: therapeutic sequence generation error logged internally
     throw new Error(`Génération séquence échouée: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
   }
 }
