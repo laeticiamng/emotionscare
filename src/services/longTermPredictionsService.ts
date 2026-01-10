@@ -705,40 +705,62 @@ ${opportunities.slice(0, 2).map((o) => `- ${o.description}`).join('\n')}
 Provide warm, actionable, and personalized insights. Respond in French.
 `;
 
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${import.meta.env.VITE_OPENAI_API_KEY}`,
-        },
-        body: JSON.stringify({
-          model: 'gpt-3.5-turbo',
+      // Utiliser l'Edge Function openai-chat au lieu de l'API directe
+      const { data, error } = await supabase.functions.invoke('openai-chat', {
+        body: {
           messages: [
             {
               role: 'system',
               content:
-                'Vous êtes un coach émotionnel bienveillant et expert en bien-être psychologique.',
+                'Vous êtes un coach émotionnel bienveillant et expert en bien-être psychologique. Répondez toujours en français de manière chaleureuse et encourageante.',
             },
             {
               role: 'user',
               content: prompt,
             },
           ],
-          temperature: 0.7,
-          max_tokens: 300,
-        }),
+        },
       });
 
-      if (!response.ok) {
-        throw new Error(`OpenAI API error: ${response.statusText}`);
+      if (error) {
+        throw new Error(`Edge Function error: ${error.message}`);
       }
 
-      const data = await response.json();
-      return data.choices[0].message.content;
+      return data?.response || 'Continuez à tracker vos émotions pour des prédictions personnalisées.';
     } catch (error) {
       logger.warn('Failed to generate AI insights', error as Error, 'PREDICTIONS');
-      return 'Insight IA non disponible. Continuez à tracker vos émotions pour des prédictions plus précises.';
+      return this.generateFallbackInsights(patterns, risks, opportunities);
     }
+  }
+
+  /**
+   * Générer des insights de fallback sans IA
+   */
+  private generateFallbackInsights(
+    patterns: IdentifiedPattern[],
+    risks: RiskIndicator[],
+    opportunities: WellnessOpportunity[]
+  ): string {
+    const insights: string[] = [];
+
+    if (patterns.length > 0) {
+      const topPattern = patterns[0];
+      insights.push(`📊 ${topPattern.description}`);
+    }
+
+    if (risks.length > 0 && risks[0].severity !== 'low') {
+      insights.push(`⚠️ Point d'attention : ${risks[0].description}. ${risks[0].mitigationStrategies[0] || 'Restez vigilant.'}`);
+    }
+
+    if (opportunities.length > 0) {
+      insights.push(`✨ Opportunité à saisir : ${opportunities[0].description}`);
+    }
+
+    if (insights.length === 0) {
+      insights.push('Continuez à tracker vos émotions régulièrement pour obtenir des prédictions personnalisées et découvrir vos patterns émotionnels.');
+    }
+
+    return insights.join('\n\n');
   }
 
   /**

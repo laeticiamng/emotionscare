@@ -1,8 +1,9 @@
 /**
  * aiAnalysisService - Service pour l'analyse AI (transcription, sentiment, emotion)
- * Intègre OpenAI Whisper pour la transcription et Hume AI pour l'analyse émotionnelle
+ * Utilise les Edge Functions Supabase pour l'analyse sécurisée
  */
 
+import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';
 
 export interface TranscriptionResult {
@@ -31,52 +32,36 @@ export interface SentimentAnalysisResult {
 }
 
 class AIAnalysisService {
-  private openaiApiKey: string | undefined;
-  private humeApiKey: string | undefined;
-
-  constructor() {
-    this.openaiApiKey = import.meta.env.VITE_OPENAI_API_KEY;
-    this.humeApiKey = import.meta.env.VITE_HUME_API_KEY;
-  }
-
   /**
-   * Transcrit un audio avec OpenAI Whisper
+   * Transcrit un audio via Edge Function
    */
   async transcribeAudio(audioBlob: Blob): Promise<TranscriptionResult> {
     try {
-      // Si pas de clé API, utiliser un fallback basique
-      if (!this.openaiApiKey || this.openaiApiKey === '') {
-        logger.warn('OpenAI API key not configured, using fallback transcription', undefined, 'AI_ANALYSIS');
-        return this.fallbackTranscription(audioBlob);
-      }
+      // Convertir le blob en base64
+      const arrayBuffer = await audioBlob.arrayBuffer();
+      const base64Audio = btoa(
+        new Uint8Array(arrayBuffer).reduce(
+          (data, byte) => data + String.fromCharCode(byte),
+          ''
+        )
+      );
 
-      // Préparer le fichier audio pour Whisper
-      const formData = new FormData();
-      formData.append('file', audioBlob, 'audio.webm');
-      formData.append('model', 'whisper-1');
-      formData.append('language', 'fr'); // Français par défaut, peut être configuré
-      formData.append('response_format', 'json');
-
-      const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${this.openaiApiKey}`,
+      const { data, error } = await supabase.functions.invoke('openai-transcribe', {
+        body: {
+          audio: base64Audio,
+          language: 'fr',
         },
-        body: formData,
       });
 
-      if (!response.ok) {
-        const error = await response.text();
-        logger.error('Whisper transcription failed', new Error(error), 'AI_ANALYSIS');
+      if (error) {
+        logger.warn('Transcription via Edge Function failed, using fallback', { error: error.message }, 'AI_ANALYSIS');
         return this.fallbackTranscription(audioBlob);
       }
 
-      const data = await response.json();
-
       return {
-        text: data.text || '',
-        language: data.language,
-        duration: data.duration,
+        text: data?.text || '',
+        language: data?.language || 'fr',
+        duration: data?.duration,
       };
     } catch (error) {
       logger.error('Error transcribing audio', error as Error, 'AI_ANALYSIS');
@@ -90,65 +75,31 @@ class AIAnalysisService {
   private fallbackTranscription(audioBlob: Blob): TranscriptionResult {
     const duration = audioBlob.size / 16000; // Estimation approximative
     return {
-      text: `[Enregistrement vocal de ${Math.round(duration)}s - Transcription automatique non disponible. Configurez VITE_OPENAI_API_KEY pour activer la transcription.]`,
+      text: `[Enregistrement vocal de ${Math.round(duration)}s - Transcription automatique temporairement indisponible]`,
       language: 'fr',
       duration,
     };
   }
 
   /**
-   * Analyse le sentiment d'un texte avec OpenAI GPT-4
+   * Analyse le sentiment d'un texte via Edge Function
    */
   async analyzeSentiment(text: string): Promise<SentimentAnalysisResult> {
     try {
-      // Si pas de clé API, utiliser un fallback heuristique
-      if (!this.openaiApiKey || this.openaiApiKey === '') {
-        logger.warn('OpenAI API key not configured, using fallback sentiment analysis', undefined, 'AI_ANALYSIS');
-        return this.fallbackSentimentAnalysis(text);
-      }
-
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.openaiApiKey}`,
-        },
-        body: JSON.stringify({
-          model: 'gpt-4o-mini',
-          messages: [
-            {
-              role: 'system',
-              content: 'Tu es un expert en analyse de sentiment. Analyse le texte et réponds UNIQUEMENT avec un JSON au format: {"tone": "positive|neutral|negative", "score": <number between -1 and 1>, "confidence": <number between 0 and 1>}',
-            },
-            {
-              role: 'user',
-              content: `Analyse le sentiment de ce texte: "${text}"`,
-            },
-          ],
-          temperature: 0.3,
-          max_tokens: 100,
-        }),
+      const { data, error } = await supabase.functions.invoke('analyze-text', {
+        body: { text, analysis_type: 'sentiment' },
       });
 
-      if (!response.ok) {
-        const error = await response.text();
-        logger.error('Sentiment analysis failed', new Error(error), 'AI_ANALYSIS');
+      if (error) {
+        logger.warn('Sentiment analysis via Edge Function failed, using fallback', { error: error.message }, 'AI_ANALYSIS');
         return this.fallbackSentimentAnalysis(text);
       }
 
-      const data = await response.json();
-      const content = data.choices[0]?.message?.content || '{}';
-
-      try {
-        const result = JSON.parse(content);
-        return {
-          tone: result.tone || 'neutral',
-          score: result.score || 0,
-          confidence: result.confidence || 0.5,
-        };
-      } catch {
-        return this.fallbackSentimentAnalysis(text);
-      }
+      return {
+        tone: data?.tone || 'neutral',
+        score: data?.score || 0,
+        confidence: data?.confidence || 0.5,
+      };
     } catch (error) {
       logger.error('Error analyzing sentiment', error as Error, 'AI_ANALYSIS');
       return this.fallbackSentimentAnalysis(text);
@@ -195,7 +146,7 @@ class AIAnalysisService {
     }
 
     const score = (positiveCount - negativeCount) / totalEmotionalWords;
-    const confidence = Math.min(totalEmotionalWords / 10, 0.8); // Max 80% confidence for heuristic
+    const confidence = Math.min(totalEmotionalWords / 10, 0.8);
 
     let tone: 'positive' | 'neutral' | 'negative';
     if (score > 0.2) {
@@ -210,77 +161,24 @@ class AIAnalysisService {
   }
 
   /**
-   * Analyse les émotions avec Hume AI
+   * Analyse les émotions via Edge Function (Hume AI ou fallback)
    */
   async analyzeEmotions(text: string): Promise<EmotionAnalysisResult> {
     try {
-      // Si pas de clé Hume AI, utiliser l'analyse avancée multi-modèle
-      if (!this.humeApiKey || this.humeApiKey === '') {
-        logger.warn('Hume AI API key not configured, using advanced fallback analysis', undefined, 'AI_ANALYSIS');
-        return this.advancedEmotionAnalysis(text);
-      }
-
-      // Appel à Hume AI Batch API pour analyse de texte
-      const response = await fetch('https://api.hume.ai/v0/batch/jobs', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Hume-Api-Key': this.humeApiKey,
-        },
-        body: JSON.stringify({
-          models: {
-            language: {
-              granularity: 'sentence',
-              identify_speakers: false,
-            },
-          },
-          text: [text],
-        }),
+      const { data, error } = await supabase.functions.invoke('hume-analysis', {
+        body: { text, type: 'text' },
       });
 
-      if (!response.ok) {
-        logger.warn('Hume AI API error, using fallback', { status: response.status }, 'AI_ANALYSIS');
+      if (error) {
+        logger.warn('Emotion analysis via Edge Function failed, using fallback', { error: error.message }, 'AI_ANALYSIS');
         return this.advancedEmotionAnalysis(text);
       }
 
-      const jobData = await response.json();
-      const jobId = jobData.job_id;
-
-      // Polling pour le résultat (max 30 secondes)
-      let attempts = 0;
-      const maxAttempts = 15;
-      
-      while (attempts < maxAttempts) {
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        
-        const statusResponse = await fetch(`https://api.hume.ai/v0/batch/jobs/${jobId}`, {
-          headers: { 'X-Hume-Api-Key': this.humeApiKey },
-        });
-
-        if (!statusResponse.ok) break;
-
-        const statusData = await statusResponse.json();
-        
-        if (statusData.state?.status === 'COMPLETED') {
-          // Récupérer les prédictions
-          const predictionsResponse = await fetch(`https://api.hume.ai/v0/batch/jobs/${jobId}/predictions`, {
-            headers: { 'X-Hume-Api-Key': this.humeApiKey },
-          });
-
-          if (predictionsResponse.ok) {
-            const predictions = await predictionsResponse.json();
-            return this.parseHumeEmotions(predictions);
-          }
-          break;
-        } else if (statusData.state?.status === 'FAILED') {
-          break;
-        }
-        
-        attempts++;
-      }
-
-      // Fallback si le polling échoue
-      return this.advancedEmotionAnalysis(text);
+      return {
+        tone: data?.tone || 'neutral',
+        emotions: data?.emotions || {},
+        dominantEmotion: data?.dominantEmotion,
+      };
     } catch (error) {
       logger.error('Error analyzing emotions', error as Error, 'AI_ANALYSIS');
       return this.advancedEmotionAnalysis(text);
@@ -288,57 +186,9 @@ class AIAnalysisService {
   }
 
   /**
-   * Parse les résultats Hume AI en EmotionAnalysisResult
-   */
-  private parseHumeEmotions(predictions: any): EmotionAnalysisResult {
-    try {
-      const emotionData = predictions[0]?.results?.predictions?.[0]?.models?.language?.grouped_predictions?.[0]?.predictions?.[0]?.emotions;
-      
-      if (!emotionData || !Array.isArray(emotionData)) {
-        return { tone: 'neutral', emotions: {}, dominantEmotion: undefined };
-      }
-
-      const emotions: Record<string, number> = {};
-      let topEmotion = { name: 'neutral', score: 0 };
-
-      for (const emotion of emotionData) {
-        emotions[emotion.name.toLowerCase()] = emotion.score;
-        if (emotion.score > topEmotion.score) {
-          topEmotion = { name: emotion.name.toLowerCase(), score: emotion.score };
-        }
-      }
-
-      const positiveEmotions = ['joy', 'amusement', 'love', 'admiration', 'excitement', 'gratitude', 'pride', 'relief'];
-      const negativeEmotions = ['sadness', 'anger', 'fear', 'disgust', 'contempt', 'disappointment', 'embarrassment', 'shame'];
-      
-      let positiveScore = 0;
-      let negativeScore = 0;
-      
-      for (const [emotion, score] of Object.entries(emotions)) {
-        if (positiveEmotions.includes(emotion)) positiveScore += score;
-        if (negativeEmotions.includes(emotion)) negativeScore += score;
-      }
-
-      let tone: 'positive' | 'neutral' | 'negative';
-      if (positiveScore > negativeScore + 0.1) tone = 'positive';
-      else if (negativeScore > positiveScore + 0.1) tone = 'negative';
-      else tone = 'neutral';
-
-      return {
-        tone,
-        emotions,
-        dominantEmotion: topEmotion.name,
-      };
-    } catch {
-      return { tone: 'neutral', emotions: {}, dominantEmotion: undefined };
-    }
-  }
-
-  /**
    * Analyse émotionnelle avancée multi-modèle (fallback)
    */
-  private async advancedEmotionAnalysis(text: string): Promise<EmotionAnalysisResult> {
-    // Analyse heuristique avancée avec patterns émotionnels français
+  private advancedEmotionAnalysis(text: string): EmotionAnalysisResult {
     const emotionPatterns: Record<string, { keywords: string[]; weight: number }> = {
       joy: {
         keywords: ['heureux', 'heureuse', 'content', 'contente', 'joie', 'ravi', 'ravie', 'super', 'génial', 'fantastique', 'merveilleux', 'excité', 'enthousiaste', 'sourire', 'rire', '😊', '😄', '🎉'],
@@ -359,10 +209,6 @@ class AIAnalysisService {
       surprise: {
         keywords: ['surpris', 'surprise', 'étonné', 'étonnée', 'choqué', 'choquée', 'stupéfait', 'stupéfaite', 'incroyable', 'wow', 'oh', '😮', '😲'],
         weight: 0.8
-      },
-      disgust: {
-        keywords: ['dégoût', 'dégoûté', 'dégoûtée', 'écœuré', 'écœurée', 'répugnant', 'horrible', 'déplaisant', '🤢', '🤮'],
-        weight: 0.9
       },
       love: {
         keywords: ['amour', 'aimer', 'adore', 'adoré', 'adorée', 'affection', 'tendresse', 'chéri', 'chérie', 'passion', '❤️', '💕', '🥰'],
@@ -403,7 +249,7 @@ class AIAnalysisService {
 
     // Déterminer le tone
     const positiveEmotions = ['joy', 'love', 'gratitude', 'surprise'];
-    const negativeEmotions = ['sadness', 'anger', 'fear', 'disgust'];
+    const negativeEmotions = ['sadness', 'anger', 'fear'];
     
     let positiveScore = 0;
     let negativeScore = 0;
@@ -418,7 +264,6 @@ class AIAnalysisService {
     else if (negativeScore > positiveScore + 0.1) tone = 'negative';
     else tone = 'neutral';
 
-    // Si aucune émotion détectée, retourner neutre
     if (totalMatches === 0) {
       return {
         tone: 'neutral',
@@ -435,88 +280,89 @@ class AIAnalysisService {
   }
 
   /**
-   * Convertit un sentiment en émotions
-   */
-  private sentimentToEmotion(sentiment: SentimentAnalysisResult): EmotionAnalysisResult {
-    const emotions: any = {};
-
-    if (sentiment.tone === 'positive') {
-      emotions.joy = 0.7 + (sentiment.score * 0.3);
-      emotions.surprise = 0.3;
-      return {
-        tone: 'positive',
-        emotions,
-        dominantEmotion: 'joy',
-      };
-    } else if (sentiment.tone === 'negative') {
-      emotions.sadness = 0.7 + (Math.abs(sentiment.score) * 0.3);
-      emotions.fear = 0.2;
-      emotions.anger = 0.1;
-      return {
-        tone: 'negative',
-        emotions,
-        dominantEmotion: 'sadness',
-      };
-    } else {
-      return {
-        tone: 'neutral',
-        emotions: {},
-        dominantEmotion: undefined,
-      };
-    }
-  }
-
-  /**
-   * Génère un résumé du texte
+   * Génère un résumé du texte via Edge Function
    */
   async generateSummary(text: string, maxLength: number = 100): Promise<string> {
     try {
-      // Si le texte est déjà court, le retourner tel quel
       if (text.length <= maxLength) {
         return text;
       }
 
-      // Si pas de clé API, utiliser un fallback simple
-      if (!this.openaiApiKey || this.openaiApiKey === '') {
-        return text.substring(0, maxLength - 3) + '...';
-      }
-
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.openaiApiKey}`,
-        },
-        body: JSON.stringify({
-          model: 'gpt-4o-mini',
+      const { data, error } = await supabase.functions.invoke('openai-chat', {
+        body: {
           messages: [
             {
               role: 'system',
-              content: `Tu es un expert en résumé de texte. Résume le texte en maximum ${maxLength} caractères tout en préservant les informations clés.`,
+              content: `Tu es un expert en résumé de texte. Résume le texte en maximum ${maxLength} caractères tout en préservant les informations clés. Réponds uniquement avec le résumé.`,
             },
             {
               role: 'user',
               content: text,
             },
           ],
-          temperature: 0.3,
-          max_tokens: 50,
-        }),
+        },
       });
 
-      if (!response.ok) {
+      if (error) {
         return text.substring(0, maxLength - 3) + '...';
       }
 
-      const data = await response.json();
-      const summary = data.choices[0]?.message?.content || '';
-
-      return summary.substring(0, maxLength);
+      return data?.response || text.substring(0, maxLength - 3) + '...';
     } catch (error) {
       logger.error('Error generating summary', error as Error, 'AI_ANALYSIS');
       return text.substring(0, maxLength - 3) + '...';
     }
   }
+
+  /**
+   * Génère des insights émotionnels via Edge Function
+   */
+  async generateEmotionalInsights(emotionData: EmotionAnalysisResult): Promise<string> {
+    try {
+      const { data, error } = await supabase.functions.invoke('openai-chat', {
+        body: {
+          messages: [
+            {
+              role: 'system',
+              content: 'Tu es un coach en bien-être émotionnel. Génère un insight bienveillant et encourageant basé sur les émotions détectées. Réponds en 2-3 phrases maximum en français.',
+            },
+            {
+              role: 'user',
+              content: `Émotions détectées: ${JSON.stringify(emotionData.emotions)}. Émotion dominante: ${emotionData.dominantEmotion || 'aucune'}. Ton général: ${emotionData.tone}.`,
+            },
+          ],
+        },
+      });
+
+      if (error) {
+        return this.getFallbackInsight(emotionData);
+      }
+
+      return data?.response || this.getFallbackInsight(emotionData);
+    } catch (error) {
+      logger.error('Error generating insights', error as Error, 'AI_ANALYSIS');
+      return this.getFallbackInsight(emotionData);
+    }
+  }
+
+  /**
+   * Insight de fallback
+   */
+  private getFallbackInsight(emotionData: EmotionAnalysisResult): string {
+    const insights: Record<string, string> = {
+      joy: "Votre joie rayonne ! Profitez de ce moment de bien-être et partagez cette énergie positive.",
+      sadness: "Il est normal de ressentir de la tristesse parfois. Prenez soin de vous et n'hésitez pas à vous entourer.",
+      anger: "Votre colère est une émotion valide. Prenez un moment pour respirer et identifier ce qui vous affecte.",
+      fear: "L'anxiété peut être difficile. Essayez une technique de respiration pour vous recentrer.",
+      love: "L'amour et l'affection que vous ressentez sont précieux. Cultivez ces connections.",
+      gratitude: "La gratitude est une force puissante. Continuez à apprécier les petites choses.",
+      neutral: "Vous semblez dans un état équilibré. C'est le moment idéal pour vous ressourcer.",
+    };
+
+    return insights[emotionData.dominantEmotion || 'neutral'] || insights.neutral;
+  }
 }
 
+// Export singleton
 export const aiAnalysisService = new AIAnalysisService();
+export default aiAnalysisService;
