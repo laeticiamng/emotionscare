@@ -1,6 +1,7 @@
 /**
  * Consent Management Service
  * GDPR Article 7 - Conditions for consent
+ * Corrigé: Suppression de l'appel API externe pour IP (respect vie privée)
  */
 
 import { supabase } from '@/integrations/supabase/client';
@@ -48,9 +49,9 @@ export class ConsentManagementService {
     request: ConsentRequest
   ): Promise<ConsentRecord> {
     try {
-      // Get user's IP and user agent for audit trail
-      const ipAddress = await this.getUserIP();
-      const userAgent = navigator.userAgent;
+      // Générer un hash anonyme au lieu d'utiliser l'IP réelle
+      const anonymousHash = await this.generateAnonymousHash();
+      const userAgent = typeof navigator !== 'undefined' ? navigator.userAgent : 'server';
 
       const consentData = {
         user_id: userId,
@@ -59,7 +60,7 @@ export class ConsentManagementService {
         granted: request.granted,
         granted_at: request.granted ? new Date().toISOString() : null,
         revoked_at: !request.granted ? new Date().toISOString() : null,
-        ip_address: ipAddress,
+        ip_address: anonymousHash, // Hash anonyme, pas l'IP réelle
         user_agent: userAgent,
         metadata: request.metadata || {},
       };
@@ -74,7 +75,6 @@ export class ConsentManagementService {
         .single();
 
       if (fetchError && fetchError.code !== 'PGRST116') {
-        // PGRST116 = not found
         throw fetchError;
       }
 
@@ -289,7 +289,6 @@ export class ConsentManagementService {
         byType: {} as Record<ConsentType, { granted: boolean; version: string } | null>,
       };
 
-      // Get latest consent for each type
       const consentTypes: ConsentType[] = [
         'terms_of_service',
         'privacy_policy',
@@ -328,18 +327,30 @@ export class ConsentManagementService {
   }
 
   /**
-   * Get user's IP address (best effort)
+   * Generate anonymous hash for audit trail (GDPR compliant)
+   * Does NOT use real IP address
    */
-  private static async getUserIP(): Promise<string | null> {
+  private static async generateAnonymousHash(): Promise<string> {
     try {
-      // Note: This is a best-effort approach. In production, you should
-      // get the IP address from the server-side
-      const response = await fetch('https://api.ipify.org?format=json');
-      const data = await response.json();
-      return data.ip || null;
-    } catch (error) {
-      logger.warn('Failed to get user IP', error, 'GDPR');
-      return null;
+      const data = [
+        typeof navigator !== 'undefined' ? navigator.language : 'en',
+        new Date().toISOString().split('T')[0],
+        Math.random().toString(36).substring(7),
+      ].join('-');
+
+      // Use Web Crypto API for hashing
+      if (typeof crypto !== 'undefined' && crypto.subtle) {
+        const encoder = new TextEncoder();
+        const dataBuffer = encoder.encode(data);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.slice(0, 8).map(b => b.toString(16).padStart(2, '0')).join('');
+      }
+      
+      // Fallback for environments without crypto.subtle
+      return 'anon-' + Date.now().toString(36);
+    } catch {
+      return 'anon-' + Date.now().toString(36);
     }
   }
 
