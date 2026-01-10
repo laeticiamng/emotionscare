@@ -132,7 +132,7 @@ const ModernHomePage: React.FC = () => {
       <ScrollProgress variant="bar" />
 
       {/* Header avec nom de la plateforme */}
-      <header className="bg-background/95 backdrop-blur-sm border-b border-border/50 sticky top-0 z-50">
+      <header className="bg-background/95 backdrop-blur-sm border-b border-border/50 sticky top-0 z-50 safe-area-top">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <Link 
             to="/" 
@@ -283,7 +283,7 @@ const ModernHomePage: React.FC = () => {
             {/* Actions rapides - interventions */}
             <div className="mt-4">
               <div className="text-sm font-medium mb-2">Besoin d'intervenir maintenant ?</div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
                 {quickActions.map((action, index) => (
                   <Link key={index} to={action.href} onClick={() => trackCTAClick(`quick-action-${action.title}`)}>
                     <Card className="bg-card/30 backdrop-blur-sm border-border/20 hover:bg-card/40 transition-all cursor-pointer">

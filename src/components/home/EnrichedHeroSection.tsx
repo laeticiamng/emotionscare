@@ -84,7 +84,7 @@ const EnrichedHeroSection: React.FC = () => {
 
           {/* Headline interventionnelle - positionnement santé */}
           <motion.div variants={itemVariants} className="space-y-6">
-            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold leading-[1.1] tracking-tight">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold leading-[1.1] tracking-tight px-2 sm:px-0">
               <span className="text-foreground">
                 Prendre soin de celles et ceux
               </span>
@@ -98,7 +98,7 @@ const EnrichedHeroSection: React.FC = () => {
           {/* Sous-titre - urgence avant explication */}
           <motion.p
             variants={itemVariants}
-            className="text-xl lg:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed font-light"
+            className="text-base sm:text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed font-light px-4 sm:px-0"
           >
             Une plateforme de régulation émotionnelle dédiée{' '}
             <strong className="text-foreground font-medium">aux étudiants en santé et aux soignants.</strong>
@@ -150,7 +150,7 @@ const EnrichedHeroSection: React.FC = () => {
           {/* Indicateurs de confiance - réassurance santé */}
           <motion.div
             variants={itemVariants}
-            className="flex flex-col sm:flex-row gap-8 justify-center items-center text-sm text-muted-foreground pt-10"
+            className="flex flex-col sm:flex-row gap-4 sm:gap-8 justify-center items-center text-sm text-muted-foreground pt-8 sm:pt-10"
           >
             <div className="flex items-center space-x-2">
               <div className="h-9 w-9 bg-primary/15 rounded-full flex items-center justify-center">
@@ -175,7 +175,7 @@ const EnrichedHeroSection: React.FC = () => {
           {/* Cartes de sessions - protocoles, pas playlists */}
           <motion.div
             variants={itemVariants}
-            className="pt-14 grid grid-cols-1 md:grid-cols-3 gap-5 max-w-4xl mx-auto"
+            className="pt-8 sm:pt-14 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-5 max-w-4xl mx-auto px-2 sm:px-0"
           >
             {/* Session STOP */}
             <motion.button
