@@ -1,8 +1,10 @@
 /**
- * Service pour gérer les sessions Flash Glow
+ * Service pour gérer les sessions Flash Glow avec Supabase
  */
 
 import { logger } from '@/lib/logger';
+import { supabase } from '@/integrations/supabase/client';
+import { createSession } from '@/services/sessions/sessionsApi';
 
 export interface MoodSnapshot {
   value: number;
@@ -14,7 +16,6 @@ export interface MoodSnapshot {
  * Récupère un snapshot de l'humeur actuelle
  */
 export const getCurrentMoodSnapshot = (): MoodSnapshot => {
-  // Récupère depuis le store ou valeur par défaut
   const stored = typeof window !== 'undefined' 
     ? window.localStorage.getItem('current_mood') 
     : null;
@@ -40,7 +41,7 @@ export const computeMoodDelta = (
 };
 
 /**
- * Log et crée une entrée de journal
+ * Log et crée une entrée de journal via Supabase
  */
 export const logAndJournal = async (data: {
   type: string;
@@ -51,19 +52,18 @@ export const logAndJournal = async (data: {
   meta?: Record<string, unknown>;
 }): Promise<{ id: string } | null> => {
   try {
-    // Utilise l'API sessions pour logger
-    const response = await fetch('/api/sessions/log', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
+    const result = await createSession({
+      type: data.type,
+      duration_sec: data.duration_sec,
+      mood_delta: data.mood_delta ?? null,
+      meta: {
+        mood_before: data.mood_before,
+        mood_after: data.mood_after,
+        ...data.meta,
+      },
     });
 
-    if (!response.ok) {
-      logger.error('Failed to log session', undefined, 'MODULE');
-      return null;
-    }
-
-    return await response.json();
+    return result ? { id: result.id } : null;
   } catch (error) {
     logger.error('Error logging session', error as Error, 'MODULE');
     return null;

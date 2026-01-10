@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import { persist } from './utils/createImmutableStore';
 import { createSelectors } from './utils/createSelectors';
+import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/lib/logger';
 
 export type PrivacyKey = 'cam' | 'mic' | 'hr' | 'gps' | 'social' | 'nft';
 export type PrivacyPrefs = Record<PrivacyKey, boolean>;
@@ -61,34 +63,42 @@ const usePrivacyStoreBase = create<PrivacyState>()(
         });
 
         try {
-          const response = await fetch('/api/me/privacy_prefs', {
-            method: 'PATCH',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ [key]: value }),
-          });
-
-          if (!response.ok) {
-            throw new Error('Failed to update privacy preference');
+          const { data: { user } } = await supabase.auth.getUser();
+          
+          if (!user) {
+            // Not logged in, just save locally
+            set({ loading: false });
+            return true;
           }
 
-          const updatedPrefs = await response.json();
-          set({ 
-            prefs: updatedPrefs,
-            loading: false 
-          });
+          // Upsert privacy preferences to Supabase
+          const { error } = await supabase
+            .from('user_preferences')
+            .upsert({
+              user_id: user.id,
+              preference_key: `privacy_${key}`,
+              preference_value: value,
+              updated_at: new Date().toISOString(),
+            }, {
+              onConflict: 'user_id,preference_key',
+            });
+
+          if (error) {
+            throw error;
+          }
+
+          set({ loading: false });
 
           // Broadcast change to other components
           if (typeof window !== 'undefined') {
             window.dispatchEvent(new CustomEvent('privacyPrefChanged', {
-              detail: { key, value, allPrefs: updatedPrefs }
+              detail: { key, value, allPrefs: { ...state.prefs, [key]: value } }
             }));
           }
 
           // Analytics
-          if (typeof window !== 'undefined' && window.gtag) {
-            window.gtag('event', 'privacy_toggle', {
+          if (typeof window !== 'undefined' && (window as any).gtag) {
+            (window as any).gtag('event', 'privacy_toggle', {
               custom_key: key,
               custom_value: value
             });
@@ -96,6 +106,7 @@ const usePrivacyStoreBase = create<PrivacyState>()(
 
           return true;
         } catch (error) {
+          logger.error('Failed to update privacy preference', error as Error, 'PRIVACY');
           // Rollback on error
           set({ 
             prefs: oldPrefs, 
@@ -110,18 +121,39 @@ const usePrivacyStoreBase = create<PrivacyState>()(
         set({ loading: true, error: null });
         
         try {
-          const response = await fetch('/api/me/privacy_prefs');
-          if (!response.ok) {
-            throw new Error('Failed to fetch privacy preferences');
-          }
+          const { data: { user } } = await supabase.auth.getUser();
           
-          const data = await response.json();
+          if (!user) {
+            set({ loading: false });
+            return;
+          }
+
+          // Fetch all privacy preferences
+          const { data, error } = await supabase
+            .from('user_preferences')
+            .select('preference_key, preference_value')
+            .eq('user_id', user.id)
+            .like('preference_key', 'privacy_%');
+
+          if (error) {
+            throw error;
+          }
+
+          // Build prefs object from data
+          const prefs = { ...initialPrefs };
+          data?.forEach((row) => {
+            const key = row.preference_key.replace('privacy_', '') as PrivacyKey;
+            if (key in prefs) {
+              prefs[key] = row.preference_value === true || row.preference_value === 'true';
+            }
+          });
+
           set({ 
-            prefs: data,
-            lockedByOrg: data.lockedByOrg || {},
+            prefs,
             loading: false 
           });
         } catch (error) {
+          logger.error('Failed to fetch privacy preferences', error as Error, 'PRIVACY');
           set({ 
             loading: false,
             error: error instanceof Error ? error.message : 'Erreur de chargement'
