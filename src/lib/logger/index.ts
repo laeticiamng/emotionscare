@@ -47,9 +47,9 @@ class Logger {
   error(message: string, error?: Error | any, context: LogContext = 'SYSTEM'): void {
     console.error(`[${context}] ${message}`, error || '')
     
-    // En production, on pourrait envoyer à un service de monitoring
+    // En production, envoyer à Sentry si configuré
     if (!this.isDevelopment && error instanceof Error) {
-      // TODO: Envoyer à Sentry, LogRocket, etc.
+      this.sendToMonitoring('error', message, error, context);
     }
   }
 
@@ -58,7 +58,40 @@ class Logger {
     
     // En production, alert immédiate
     if (!this.isDevelopment) {
-      // TODO: Alert système critique
+      this.sendToMonitoring('critical', message, error, context);
+    }
+  }
+  
+  private async sendToMonitoring(level: 'error' | 'critical', message: string, error?: Error | any, context?: LogContext): Promise<void> {
+    try {
+      // Utiliser Sentry si disponible
+      if (typeof window !== 'undefined' && (window as any).Sentry) {
+        const Sentry = (window as any).Sentry;
+        Sentry.captureException(error instanceof Error ? error : new Error(message), {
+          level: level === 'critical' ? 'fatal' : 'error',
+          tags: { context },
+          extra: { sessionId: this.sessionId }
+        });
+      }
+      
+      // Fallback: envoyer à l'edge function de monitoring
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      if (supabaseUrl) {
+        await fetch(`${supabaseUrl}/functions/v1/ai-monitoring`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            level,
+            message,
+            error: error instanceof Error ? { name: error.name, message: error.message, stack: error.stack } : error,
+            context,
+            sessionId: this.sessionId,
+            timestamp: new Date().toISOString()
+          })
+        }).catch(() => {/* Silent fail */});
+      }
+    } catch {
+      // Silent fail - ne pas casser l'app pour le monitoring
     }
   }
 
