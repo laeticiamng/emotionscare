@@ -7699,6 +7699,7 @@ export type Database = {
       emotionsroom_rooms: {
         Row: {
           created_at: string
+          created_by: string | null
           expires_at: string
           id: string
           is_active: boolean | null
@@ -7710,6 +7711,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          created_by?: string | null
           expires_at?: string
           id?: string
           is_active?: boolean | null
@@ -7721,6 +7723,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          created_by?: string | null
           expires_at?: string
           id?: string
           is_active?: boolean | null
