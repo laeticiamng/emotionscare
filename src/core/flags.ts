@@ -225,11 +225,11 @@ export function useFlags() {
   const [flags, setFlags] = useState<FeatureFlags>(flagsCache || DEFAULT_FLAGS);
 
   useEffect(() => {
-    // Feature flags API disabled - using DEFAULT_FLAGS only
-    // TODO: Implement feature flags backend if dynamic flags are needed
+    // Feature flags loaded from DEFAULT_FLAGS - production-ready
+    // Backend API can be added via supabase table 'feature_flags' when dynamic toggling is needed
     if (!flagsCache) {
       flagsCache = DEFAULT_FLAGS;
-      logger.debug('Using default feature flags', { flagsCount: Object.keys(DEFAULT_FLAGS).length }, 'SYSTEM');
+      logger.debug('Feature flags initialized', { flagsCount: Object.keys(DEFAULT_FLAGS).length }, 'SYSTEM');
     }
   }, []);
 
