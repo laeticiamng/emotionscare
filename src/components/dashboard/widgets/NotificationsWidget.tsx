@@ -260,14 +260,16 @@ export default function NotificationsWidget() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                          className="h-8 w-8 p-0 shrink-0 hover:bg-destructive/10 hover:text-destructive focus:bg-destructive/10 focus:text-destructive transition-colors"
                           onClick={(e) => {
+                            e.preventDefault();
                             e.stopPropagation();
                             dismissNotification(notification.id);
                           }}
                           aria-label="Supprimer cette notification"
+                          type="button"
                         >
-                          <X className="h-3 w-3" aria-hidden="true" />
+                          <X className="h-4 w-4" aria-hidden="true" />
                         </Button>
                       </div>
                     </div>
