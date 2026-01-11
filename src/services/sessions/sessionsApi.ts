@@ -47,6 +47,26 @@ export type ListMySessionsParams = {
 
 const toLatency = (startedAt: number) => Math.max(0, Math.round((typeof performance !== 'undefined' ? performance.now() : Date.now()) - startedAt))
 
+// Patterns valides selon la contrainte DB: ['box', 'calm', '478', 'energy', 'coherence']
+const VALID_BREATH_PATTERNS = ['box', 'calm', '478', 'energy', 'coherence'] as const;
+type ValidBreathPattern = typeof VALID_BREATH_PATTERNS[number];
+
+const sanitizePattern = (value: string | undefined): ValidBreathPattern => {
+  if (value && VALID_BREATH_PATTERNS.includes(value as ValidBreathPattern)) {
+    return value as ValidBreathPattern;
+  }
+  // Mapper les anciens patterns vers les nouveaux
+  const patternMap: Record<string, ValidBreathPattern> = {
+    'anchor': 'calm',
+    '54321': 'box',
+    'default': 'box',
+    'relax': 'calm',
+    'focus': 'coherence',
+    'stress': '478',
+  };
+  return patternMap[value || ''] || 'box';
+}
+
 const sanitizeDuration = (value: number) => {
   if (!Number.isFinite(value) || value <= 0) {
     return 1 // Minimum 1 seconde pour respecter la contrainte CHECK (duration_seconds > 0)
@@ -112,7 +132,7 @@ export async function createSession(input: CreateSessionInput): Promise<SessionR
         .from('breathing_vr_sessions')
         .insert({
           user_id: user.id,
-          pattern: input.meta?.pattern || 'default',
+          pattern: sanitizePattern(input.meta?.pattern as string),
           duration_seconds: duration,
           mood_before: input.meta?.mood_before ?? null,
           mood_after: input.meta?.mood_after ?? null,

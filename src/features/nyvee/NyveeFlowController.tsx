@@ -72,7 +72,7 @@ const persistNyveeSession = async (
 
   await supabase.from('breathing_vr_sessions').insert({
     user_id: user.id,
-    pattern: data.next === 'anchor' ? 'anchor' : '54321',
+    pattern: 'calm', // Pattern valide selon contrainte DB: ['box', 'calm', '478', 'energy', 'coherence']
     duration_seconds: 60,
     cycles_completed: 1,
     completed_at: new Date().toISOString(),

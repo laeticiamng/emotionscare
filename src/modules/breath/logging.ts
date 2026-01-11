@@ -21,6 +21,25 @@ export interface LogAndJournalResult {
   };
 }
 
+// Patterns valides selon la contrainte DB: ['box', 'calm', '478', 'energy', 'coherence']
+const VALID_BREATH_PATTERNS = ['box', 'calm', '478', 'energy', 'coherence'] as const;
+type ValidBreathPattern = typeof VALID_BREATH_PATTERNS[number];
+
+const sanitizePattern = (value: string | undefined): ValidBreathPattern => {
+  if (value && VALID_BREATH_PATTERNS.includes(value as ValidBreathPattern)) {
+    return value as ValidBreathPattern;
+  }
+  const patternMap: Record<string, ValidBreathPattern> = {
+    'anchor': 'calm',
+    '54321': 'box',
+    'default': 'box',
+    'relax': 'calm',
+    'focus': 'coherence',
+    'stress': '478',
+  };
+  return patternMap[value || ''] || 'box';
+};
+
 const clampDuration = (durationSec: number): number => {
   if (!Number.isFinite(durationSec) || durationSec <= 0) {
     return 1;
@@ -45,7 +64,7 @@ export async function logAndJournal(payload: LogAndJournalPayload): Promise<LogA
     // Utiliser breathing_vr_sessions au lieu de sessions
     const insertPayload = {
       user_id: user.id,
-      pattern: (payload.metadata?.profile as string) || 'default',
+      pattern: sanitizePattern(payload.metadata?.profile as string),
       duration_seconds: durationSec,
       mood_before: typeof payload.metadata?.mood_before === 'number' ? payload.metadata.mood_before : null,
       mood_after: typeof payload.moodDelta === 'number' ? (payload.metadata?.mood_before as number ?? 5) + payload.moodDelta : null,
