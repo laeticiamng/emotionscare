@@ -20,7 +20,7 @@ interface PerformanceOptions {
 }
 
 const defaultOptions: PerformanceOptions = {
-  enableMetrics: process.env.NODE_ENV === 'development',
+  enableMetrics: import.meta.env.MODE === 'development',
   enableOptimizations: true,
   threshold: {
     renderTime: 16.67, // 60fps
@@ -152,7 +152,7 @@ export const useOptimizedPerformance = (
       }
       
       // Check for missing alt attributes
-      if (!img.alt && process.env.NODE_ENV === 'development') {
+      if (!img.alt && import.meta.env.MODE === 'development') {
         logProductionEvent(
           'Accessibility Warning',
           { component: componentName, issue: 'Missing alt attribute', element: img.src },

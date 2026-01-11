@@ -44,7 +44,7 @@ export const useErrorHandler = () => {
       },
     );
 
-    if (reportToService && process.env.NODE_ENV === 'production') {
+    if (reportToService && import.meta.env.MODE === 'production') {
       // Ici on pourrait intégrer Sentry ou un autre service de monitoring
       logger.warn('Error reporting service not configured', undefined, 'SYSTEM');
     }

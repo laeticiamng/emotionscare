@@ -53,7 +53,8 @@ export const useHumeFaces = (config: HumeFacesConfig) => {
       }
 
       // Connect to Hume WebSocket (via backend proxy)
-      const wsUrl = `${process.env.VITE_SUPABASE_URL?.replace('https', 'wss')}/functions/v1/hume-proxy`;
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://yaincoxihiqdksxgrsrk.supabase.co';
+      const wsUrl = `${supabaseUrl.replace('https', 'wss')}/functions/v1/hume-proxy`;
       wsRef.current = new WebSocket(wsUrl);
       
       wsRef.current.onopen = () => {

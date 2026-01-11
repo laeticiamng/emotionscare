@@ -67,7 +67,7 @@ export class CriticalErrorBoundary extends Component<Props, State> {
       });
       
       // En développement, essayer de donner plus d'informations
-      if (process.env.NODE_ENV === 'development') {
+      if (import.meta.env.MODE === 'development') {
         log.warn('💡 Suggestions de debug:', {
           suggestions: [
             'Vérifier que tous les Sets/Maps sont initialisés',
@@ -195,7 +195,7 @@ export class CriticalErrorBoundary extends Component<Props, State> {
                 </div>
               )}
               
-              {process.env.NODE_ENV === 'development' && error && (
+              {import.meta.env.MODE === 'development' && error && (
                 <details className="text-left text-xs bg-muted p-3 rounded mt-4">
                   <summary className="cursor-pointer font-medium">Détails techniques (dev)</summary>
                   <pre className="mt-2 overflow-auto">

@@ -90,7 +90,7 @@ class HomePageErrorBoundary extends Component<Props, State> {
 
             <CardContent className="space-y-6">
               {/* Détails de l'erreur (en développement uniquement) */}
-              {process.env.NODE_ENV === 'development' && this.state.error && (
+              {import.meta.env.MODE === 'development' && this.state.error && (
                 <details className="text-sm bg-muted p-4 rounded-lg">
                   <summary className="cursor-pointer font-semibold mb-2">
                     Détails techniques (dev mode)

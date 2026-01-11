@@ -116,7 +116,7 @@ export function useSessionClock(options: Options = {}): Return {
       try {
         cb(ms)
       } catch (error) {
-        if (typeof process !== 'undefined' && process.env?.NODE_ENV !== 'production') {
+        if (import.meta.env.MODE !== 'production') {
           logger.error('useSessionClock tick callback error', error as Error, 'SYSTEM');
         }
       }

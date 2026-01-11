@@ -61,7 +61,7 @@ const parsePersistedState = <T extends object>(
       version: 0,
     };
   } catch (error) {
-    if (process.env.NODE_ENV !== 'production') {
+    if (import.meta.env.MODE !== 'production') {
       logger.warn('Unable to parse stored value', error, 'SYSTEM');
     }
 
@@ -103,7 +103,7 @@ export const createImmutableStore = <T extends object>(
 
         storage.setItem(persistOptions.name, JSON.stringify(payload));
       } catch (error) {
-        if (process.env.NODE_ENV !== 'production') {
+        if (import.meta.env.MODE !== 'production') {
           logger.warn('Unable to store state', { name: persistOptions.name, error }, 'SYSTEM');
         }
       }

@@ -2,6 +2,8 @@
 import { trackEvent } from './analytics';
 import { logger } from '@/lib/logger';
 
+const isProd = import.meta.env.MODE === 'production';
+
 /**
  * Log an unauthorized dashboard access attempt.
  * @param userId Identifier of the user or null for anonymous
@@ -17,7 +19,7 @@ export function logDashboardAccessDenied(userId: string | null, path: string) {
     },
     anonymous: !userId,
   });
-  if (process.env.NODE_ENV !== 'production') {
+  if (!isProd) {
     logger.warn(`[SECURITY] Access denied for ${userId || 'anonymous'} on ${path} at ${timestamp}`, {}, 'SYSTEM');
   }
 }
@@ -43,7 +45,7 @@ export function logSessionRedirect(
     },
     anonymous: !userId,
   });
-  if (process.env.NODE_ENV !== 'production') {
+  if (!isProd) {
     logger.warn(
       `[SECURITY] Session redirect for ${userId || 'anonymous'} on ${path} reason ${reason} at ${timestamp}`, {}, 'SYSTEM'
     );

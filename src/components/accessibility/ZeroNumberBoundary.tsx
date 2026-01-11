@@ -16,7 +16,7 @@ export function ZeroNumberBoundary<T extends ElementType = 'div'>(
   const containerRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
-    if (process.env.NODE_ENV === 'production') return;
+    if (import.meta.env.MODE === 'production') return;
     const node = containerRef.current;
     if (!node || typeof window === 'undefined') return;
 

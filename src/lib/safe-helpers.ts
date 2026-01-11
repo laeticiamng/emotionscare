@@ -91,7 +91,7 @@ export function must<T>(
     const error = new Error(`[must] ${message}`);
     logger.error('[must] Required value is missing', error, 'SYSTEM');
     
-    if (process.env.NODE_ENV === 'development') {
+    if (import.meta.env.MODE === 'development') {
       throw error;
     }
     

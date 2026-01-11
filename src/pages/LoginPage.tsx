@@ -395,7 +395,7 @@ const LoginPage: React.FC = () => {
         </motion.div>
 
         {/* Demo Info */}
-        {process.env.NODE_ENV === 'development' && (
+        {import.meta.env.MODE === 'development' && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}

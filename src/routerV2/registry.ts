@@ -1849,7 +1849,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
   // ═══════════════════════════════════════════════════════════
   // DÉVELOPPEMENT (UNIQUEMENT SI DEBUG)
   // ═══════════════════════════════════════════════════════════
-  ...(process.env.NODE_ENV === 'development' ? [
+  ...(import.meta.env.MODE === 'development' ? [
     {
       name: 'validation',
       path: '/validation',

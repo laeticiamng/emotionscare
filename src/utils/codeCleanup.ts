@@ -6,8 +6,10 @@
 
 import { logger } from '@/lib/logger';
 
+const isProd = import.meta.env.MODE === 'production';
+
 export const cleanupDevelopmentCode = () => {
-  if (typeof window !== 'undefined' && process.env.NODE_ENV === 'production') {
+  if (typeof window !== 'undefined' && isProd) {
     // Override console methods in production
     const noop = () => {};
     console.log = noop;
@@ -32,7 +34,7 @@ export const initializeProductionOptimizations = () => {
     }
     
     // Service Worker registration for caching
-    if ('serviceWorker' in navigator && process.env.NODE_ENV === 'production') {
+    if ('serviceWorker' in navigator && isProd) {
       navigator.serviceWorker.register('/sw.js').catch(() => {
         // Silent fail for SW registration
       });
@@ -41,7 +43,7 @@ export const initializeProductionOptimizations = () => {
 };
 
 export const logProductionEvent = (event: string, data?: any) => {
-  if (process.env.NODE_ENV === 'production') {
+  if (isProd) {
     // In production, send to analytics service instead of console
     // For now, we'll just track critical events
     if (event.includes('error') || event.includes('critical')) {

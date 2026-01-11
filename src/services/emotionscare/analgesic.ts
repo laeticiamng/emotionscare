@@ -71,9 +71,9 @@ export async function generateAnalgesicTrack(
   
   try {
     // 1. Analyser les émotions avec Hume AI
-    const humeApiKey = process.env.HUME_API_KEY;
+    const humeApiKey = import.meta.env.VITE_HUME_API_KEY;
     if (!humeApiKey) {
-      throw new Error('HUME_API_KEY not configured');
+      throw new Error('VITE_HUME_API_KEY not configured');
     }
     
     const { HumeClient } = await import('./humeClient');
@@ -104,9 +104,9 @@ export async function generateAnalgesicTrack(
     
     // Silent: therapeutic prompt generated
     // 5. Générer avec Suno
-    const sunoApiKey = process.env.SUNO_API_KEY;
+    const sunoApiKey = import.meta.env.VITE_SUNO_API_KEY;
     if (!sunoApiKey) {
-      throw new Error('SUNO_API_KEY not configured');
+      throw new Error('VITE_SUNO_API_KEY not configured');
     }
     
     const suno = new SunoApiClient(sunoApiKey);
