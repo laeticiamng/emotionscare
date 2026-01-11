@@ -211,19 +211,23 @@ export function useSunoVinyl(): UseSunoVinylReturn {
         if (error) throw error;
 
         const statusData = data?.data || data;
-        const status = statusData?.status;
+        const rawStatus = statusData?.status?.toLowerCase?.() || statusData?.status || '';
         const audioUrl = statusData?.audio_url || statusData?.audioUrl;
 
         // Update progress
         const progress = Math.min(10 + (attempt / maxAttempts) * 85, 95);
         updateState(vinylId, { progress });
 
-        if (status === 'completed' && audioUrl) {
+        // Normalize status check - Suno returns 'completed', 'success', etc.
+        const isCompleted = ['completed', 'success', 'text_success', 'first_success'].includes(rawStatus);
+        const isFailed = ['failed', 'error'].includes(rawStatus);
+
+        if (isCompleted && audioUrl) {
           logger.info(`Suno generation completed for ${vinylId}`, { audioUrl }, 'MUSIC');
           return audioUrl;
         }
 
-        if (status === 'failed' || status === 'error') {
+        if (isFailed) {
           throw new Error('Generation failed');
         }
 
