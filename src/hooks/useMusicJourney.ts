@@ -1,7 +1,9 @@
-// TODO: Add proper type definitions for Supabase tables music_journeys and music_journey_tracks
 /**
  * useMusicJourney - Gestion des parcours musicaux guidés
  * Transitions progressives d'émotions négatives vers positives
+ * 
+ * Types MusicJourney et JourneyTrack définis localement (lignes 14-40)
+ * Tables Supabase: music_journeys, music_journey_tracks
  */
 
 import { useState, useCallback } from 'react';
