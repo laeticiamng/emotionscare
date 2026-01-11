@@ -22,7 +22,7 @@ const NotificationToast: React.FC = () => {
   };
 
   return (
-    <div className="fixed bottom-20 right-4 z-50">
+    <div className="fixed bottom-36 right-4 z-50">
       <AnimatePresence>
         {toasts.map(({ id, title, description, action, ...props }) => (
           <motion.div
