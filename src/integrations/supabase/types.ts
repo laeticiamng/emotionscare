@@ -2708,6 +2708,51 @@ export type Database = {
         }
         Relationships: []
       }
+      boss_grit_sessions: {
+        Row: {
+          completed_at: string | null
+          created_at: string | null
+          difficulty: string | null
+          elapsed_seconds: number | null
+          id: string
+          quest_description: string | null
+          quest_title: string
+          success: boolean | null
+          tasks_completed: number | null
+          total_tasks: number | null
+          user_id: string
+          xp_earned: number | null
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string | null
+          difficulty?: string | null
+          elapsed_seconds?: number | null
+          id?: string
+          quest_description?: string | null
+          quest_title: string
+          success?: boolean | null
+          tasks_completed?: number | null
+          total_tasks?: number | null
+          user_id: string
+          xp_earned?: number | null
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string | null
+          difficulty?: string | null
+          elapsed_seconds?: number | null
+          id?: string
+          quest_description?: string | null
+          quest_title?: string
+          success?: boolean | null
+          tasks_completed?: number | null
+          total_tasks?: number | null
+          user_id?: string
+          xp_earned?: number | null
+        }
+        Relationships: []
+      }
       bounce_battles: {
         Row: {
           created_at: string | null
@@ -5720,6 +5765,39 @@ export type Database = {
           user_interaction?: string
           vector_string?: string | null
           vulnerability_name?: string
+        }
+        Relationships: []
+      }
+      daily_challenge_progress: {
+        Row: {
+          challenge_id: string | null
+          completed: boolean | null
+          completed_at: string | null
+          created_at: string | null
+          id: string
+          progress: number | null
+          user_id: string
+          xp_claimed: boolean | null
+        }
+        Insert: {
+          challenge_id?: string | null
+          completed?: boolean | null
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          progress?: number | null
+          user_id: string
+          xp_claimed?: boolean | null
+        }
+        Update: {
+          challenge_id?: string | null
+          completed?: boolean | null
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          progress?: number | null
+          user_id?: string
+          xp_claimed?: boolean | null
         }
         Relationships: []
       }
@@ -9569,39 +9647,63 @@ export type Database = {
       global_leaderboard: {
         Row: {
           avatar_emoji: string | null
+          avatar_url: string | null
+          badges_count: number | null
+          best_streak: number | null
+          current_streak: number | null
           display_name: string
           id: string
           level: number | null
+          monthly_xp: number | null
           rank_position: number | null
           streak_days: number | null
           total_score: number | null
+          total_sessions: number | null
+          total_xp: number | null
           updated_at: string | null
           user_id: string | null
           weekly_score: number | null
+          weekly_xp: number | null
         }
         Insert: {
           avatar_emoji?: string | null
+          avatar_url?: string | null
+          badges_count?: number | null
+          best_streak?: number | null
+          current_streak?: number | null
           display_name: string
           id?: string
           level?: number | null
+          monthly_xp?: number | null
           rank_position?: number | null
           streak_days?: number | null
           total_score?: number | null
+          total_sessions?: number | null
+          total_xp?: number | null
           updated_at?: string | null
           user_id?: string | null
           weekly_score?: number | null
+          weekly_xp?: number | null
         }
         Update: {
           avatar_emoji?: string | null
+          avatar_url?: string | null
+          badges_count?: number | null
+          best_streak?: number | null
+          current_streak?: number | null
           display_name?: string
           id?: string
           level?: number | null
+          monthly_xp?: number | null
           rank_position?: number | null
           streak_days?: number | null
           total_score?: number | null
+          total_sessions?: number | null
+          total_xp?: number | null
           updated_at?: string | null
           user_id?: string | null
           weekly_score?: number | null
+          weekly_xp?: number | null
         }
         Relationships: []
       }
@@ -25278,6 +25380,75 @@ export type Database = {
           streak_days?: number | null
           total_badges?: number | null
           total_points?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_stats_consolidated: {
+        Row: {
+          best_streak: number | null
+          boss_grit_sessions: number | null
+          breathwork_sessions: number | null
+          bubble_beat_sessions: number | null
+          created_at: string | null
+          current_level: number | null
+          current_streak: number | null
+          favorite_module: string | null
+          flash_glow_sessions: number | null
+          id: string
+          journal_entries: number | null
+          last_activity_date: string | null
+          meditation_sessions: number | null
+          mood_mixer_sessions: number | null
+          story_synth_sessions: number | null
+          total_minutes: number | null
+          total_sessions: number | null
+          total_xp: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          best_streak?: number | null
+          boss_grit_sessions?: number | null
+          breathwork_sessions?: number | null
+          bubble_beat_sessions?: number | null
+          created_at?: string | null
+          current_level?: number | null
+          current_streak?: number | null
+          favorite_module?: string | null
+          flash_glow_sessions?: number | null
+          id?: string
+          journal_entries?: number | null
+          last_activity_date?: string | null
+          meditation_sessions?: number | null
+          mood_mixer_sessions?: number | null
+          story_synth_sessions?: number | null
+          total_minutes?: number | null
+          total_sessions?: number | null
+          total_xp?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          best_streak?: number | null
+          boss_grit_sessions?: number | null
+          breathwork_sessions?: number | null
+          bubble_beat_sessions?: number | null
+          created_at?: string | null
+          current_level?: number | null
+          current_streak?: number | null
+          favorite_module?: string | null
+          flash_glow_sessions?: number | null
+          id?: string
+          journal_entries?: number | null
+          last_activity_date?: string | null
+          meditation_sessions?: number | null
+          mood_mixer_sessions?: number | null
+          story_synth_sessions?: number | null
+          total_minutes?: number | null
+          total_sessions?: number | null
+          total_xp?: number | null
           updated_at?: string | null
           user_id?: string
         }
