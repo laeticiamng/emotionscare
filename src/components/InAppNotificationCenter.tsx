@@ -31,9 +31,9 @@ export const InAppNotificationCenter: React.FC = () => {
 
   return (
     <>
-      {/* Notification Bell Button */}
+      {/* Notification Bell Button - repositionné pour éviter chevauchement */}
       <motion.div
-        className="fixed bottom-6 right-6 z-50"
+        className="fixed bottom-24 right-6 z-50"
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
         transition={{ type: 'spring', stiffness: 260, damping: 20 }}
@@ -75,7 +75,7 @@ export const InAppNotificationCenter: React.FC = () => {
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: 400, opacity: 0 }}
               transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-              className="fixed bottom-24 right-6 w-96 max-h-[500px] bg-card border border-border rounded-lg shadow-2xl z-50 overflow-hidden flex flex-col"
+              className="fixed bottom-40 right-6 w-96 max-h-[500px] bg-card border border-border rounded-lg shadow-2xl z-50 overflow-hidden flex flex-col"
             >
               {/* Header */}
               <div className="flex items-center justify-between p-4 border-b border-border bg-muted/50">
