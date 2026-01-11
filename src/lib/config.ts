@@ -2,6 +2,20 @@
  * Configuration centralisée pour EmotionsCare Production
  */
 
+// ⚠️ MODE TEST - Mettre à true pour bypasser l'authentification
+// IMPORTANT: Remettre à false avant mise en production!
+export const TEST_MODE = {
+  BYPASS_AUTH: true, // ← Désactive toute l'authentification pour les tests
+  MOCK_USER: {
+    id: 'test-user-id',
+    email: 'testeur@emotionscare.com',
+    user_metadata: {
+      full_name: 'Testeur EmotionsCare',
+      avatar_url: null,
+    },
+  },
+};
+
 export const CONFIG = {
   // APIs Configuration
   SUPABASE: {
