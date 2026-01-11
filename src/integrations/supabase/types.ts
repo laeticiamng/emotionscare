@@ -9440,6 +9440,7 @@ export type Database = {
           generation_status: string | null
           id: string
           image_url: string | null
+          is_public: boolean | null
           metadata: Json | null
           original_task_id: string | null
           prompt: string | null
@@ -9458,6 +9459,7 @@ export type Database = {
           generation_status?: string | null
           id?: string
           image_url?: string | null
+          is_public?: boolean | null
           metadata?: Json | null
           original_task_id?: string | null
           prompt?: string | null
@@ -9476,6 +9478,7 @@ export type Database = {
           generation_status?: string | null
           id?: string
           image_url?: string | null
+          is_public?: boolean | null
           metadata?: Json | null
           original_task_id?: string | null
           prompt?: string | null
@@ -14642,6 +14645,50 @@ export type Database = {
         }
         Relationships: []
       }
+      music_play_history: {
+        Row: {
+          completed: boolean | null
+          duration_listened: number | null
+          id: string
+          metadata: Json | null
+          mood_after: string | null
+          mood_before: string | null
+          played_at: string
+          track_id: string
+          user_id: string
+        }
+        Insert: {
+          completed?: boolean | null
+          duration_listened?: number | null
+          id?: string
+          metadata?: Json | null
+          mood_after?: string | null
+          mood_before?: string | null
+          played_at?: string
+          track_id: string
+          user_id: string
+        }
+        Update: {
+          completed?: boolean | null
+          duration_listened?: number | null
+          id?: string
+          metadata?: Json | null
+          mood_after?: string | null
+          mood_before?: string | null
+          played_at?: string
+          track_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "music_play_history_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "generated_music_tracks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       music_play_logs: {
         Row: {
           emotion_context: string | null
@@ -17139,6 +17186,45 @@ export type Database = {
             columns: ["playlist_id"]
             isOneToOne: false
             referencedRelation: "automix_playlists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      playlist_tracks: {
+        Row: {
+          added_at: string
+          id: string
+          playlist_id: string
+          position: number
+          track_id: string
+        }
+        Insert: {
+          added_at?: string
+          id?: string
+          playlist_id: string
+          position?: number
+          track_id: string
+        }
+        Update: {
+          added_at?: string
+          id?: string
+          playlist_id?: string
+          position?: number
+          track_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "playlist_tracks_playlist_id_fkey"
+            columns: ["playlist_id"]
+            isOneToOne: false
+            referencedRelation: "user_playlists"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "playlist_tracks_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "generated_music_tracks"
             referencedColumns: ["id"]
           },
         ]
