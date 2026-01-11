@@ -3060,36 +3060,48 @@ export type Database = {
       }
       bubble_beat_sessions: {
         Row: {
+          average_heart_rate: number | null
+          biometrics: Json | null
           bubbles_popped: number | null
           completed_at: string | null
           created_at: string
           difficulty: string | null
           duration_seconds: number | null
+          game_mode: string | null
           id: string
           rhythm_accuracy: number | null
           score: number | null
+          target_heart_rate: number | null
           user_id: string
         }
         Insert: {
+          average_heart_rate?: number | null
+          biometrics?: Json | null
           bubbles_popped?: number | null
           completed_at?: string | null
           created_at?: string
           difficulty?: string | null
           duration_seconds?: number | null
+          game_mode?: string | null
           id?: string
           rhythm_accuracy?: number | null
           score?: number | null
+          target_heart_rate?: number | null
           user_id: string
         }
         Update: {
+          average_heart_rate?: number | null
+          biometrics?: Json | null
           bubbles_popped?: number | null
           completed_at?: string | null
           created_at?: string
           difficulty?: string | null
           duration_seconds?: number | null
+          game_mode?: string | null
           id?: string
           rhythm_accuracy?: number | null
           score?: number | null
+          target_heart_rate?: number | null
           user_id?: string
         }
         Relationships: []
@@ -13672,6 +13684,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      mood_mixer_presets: {
+        Row: {
+          category: string | null
+          components: Json
+          created_at: string
+          description: string | null
+          id: string
+          is_favorite: boolean | null
+          name: string
+          updated_at: string
+          use_count: number | null
+          user_id: string
+        }
+        Insert: {
+          category?: string | null
+          components?: Json
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_favorite?: boolean | null
+          name: string
+          updated_at?: string
+          use_count?: number | null
+          user_id: string
+        }
+        Update: {
+          category?: string | null
+          components?: Json
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_favorite?: boolean | null
+          name?: string
+          updated_at?: string
+          use_count?: number | null
+          user_id?: string
+        }
+        Relationships: []
       }
       mood_mixer_sessions: {
         Row: {
