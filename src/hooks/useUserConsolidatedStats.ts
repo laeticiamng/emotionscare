@@ -110,7 +110,7 @@ export function useUserConsolidatedStats() {
         supabase.from('flash_glow_sessions').select('id, duration_seconds, score').eq('user_id', user.id),
         supabase.from('bubble_beat_sessions').select('id, duration_seconds, score').eq('user_id', user.id),
         supabase.from('mood_mixer_sessions').select('id, duration_seconds').eq('user_id', user.id),
-        supabase.from('story_synth_sessions').select('id, reading_duration_seconds').eq('user_id', user.id),
+        supabase.from('story_synth_sessions').select('id, duration_seconds').eq('user_id', user.id),
         supabase.from('boss_grit_sessions').select('id, elapsed_seconds, xp_earned').eq('user_id', user.id)
       ]);
 
@@ -128,17 +128,17 @@ export function useUserConsolidatedStats() {
         bossGritSessions.length;
 
       const totalMinutes = Math.round((
-        flashGlowSessions.reduce((sum, s) => sum + (s.duration_seconds || 0), 0) +
-        bubbleBeatSessions.reduce((sum, s) => sum + (s.duration_seconds || 0), 0) +
-        moodMixerSessions.reduce((sum, s) => sum + (s.duration_seconds || 0), 0) +
-        storySynthSessions.reduce((sum, s) => sum + (s.reading_duration_seconds || 0), 0) +
-        bossGritSessions.reduce((sum, s) => sum + (s.elapsed_seconds || 0), 0)
+        flashGlowSessions.reduce((sum, s) => sum + ((s as Record<string, number>).duration_seconds || 0), 0) +
+        bubbleBeatSessions.reduce((sum, s) => sum + ((s as Record<string, number>).duration_seconds || 0), 0) +
+        moodMixerSessions.reduce((sum, s) => sum + ((s as Record<string, number>).duration_seconds || 0), 0) +
+        storySynthSessions.reduce((sum, s) => sum + ((s as Record<string, number>).duration_seconds || 0), 0) +
+        bossGritSessions.reduce((sum, s) => sum + ((s as Record<string, number>).elapsed_seconds || 0), 0)
       ) / 60);
 
       const totalXp = 
-        flashGlowSessions.reduce((sum, s) => sum + (s.score || 0), 0) +
-        bubbleBeatSessions.reduce((sum, s) => sum + (s.score || 0), 0) +
-        bossGritSessions.reduce((sum, s) => sum + (s.xp_earned || 0), 0);
+        flashGlowSessions.reduce((sum, s) => sum + ((s as Record<string, number>).score || 0), 0) +
+        bubbleBeatSessions.reduce((sum, s) => sum + ((s as Record<string, number>).score || 0), 0) +
+        bossGritSessions.reduce((sum, s) => sum + ((s as Record<string, number>).xp_earned || 0), 0);
 
       const currentLevel = Math.floor(totalXp / XP_PER_LEVEL) + 1;
       const levelProgress = ((totalXp % XP_PER_LEVEL) / XP_PER_LEVEL) * 100;
