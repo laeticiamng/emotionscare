@@ -10,27 +10,24 @@ import { useToast } from '@/hooks/use-toast';
 
 export interface FlashGlowSession {
   id: string;
-  mode: 'calm' | 'focus' | 'energy' | 'sleep';
+  pattern: string; // calm, focus, energy, sleep
   duration_seconds: number;
-  completion_rate: number;
-  heart_rate_start?: number;
-  heart_rate_end?: number;
-  stress_level_before?: number;
-  stress_level_after?: number;
-  feedback_rating?: number;
+  score: number;
+  completed: boolean;
+  session_date: string;
   created_at: string;
 }
 
 export interface FlashGlowStats {
   totalSessions: number;
   totalMinutes: number;
-  averageCompletion: number;
-  averageStressReduction: number;
-  favoriteMode: string;
+  averageScore: number;
+  completionRate: number;
+  favoritePattern: string;
   weeklyGoalProgress: number;
   streak: number;
   lastSessionDate?: string;
-  modeBreakdown: { mode: string; count: number; avgDuration: number }[];
+  patternBreakdown: { pattern: string; count: number; avgDuration: number; avgScore: number }[];
 }
 
 export function useFlashGlowPersistence() {
@@ -40,12 +37,12 @@ export function useFlashGlowPersistence() {
   const [stats, setStats] = useState<FlashGlowStats>({
     totalSessions: 0,
     totalMinutes: 0,
-    averageCompletion: 0,
-    averageStressReduction: 0,
-    favoriteMode: 'calm',
+    averageScore: 0,
+    completionRate: 0,
+    favoritePattern: 'calm',
     weeklyGoalProgress: 0,
     streak: 0,
-    modeBreakdown: []
+    patternBreakdown: []
   });
   const [isLoading, setIsLoading] = useState(false);
 
@@ -54,45 +51,41 @@ export function useFlashGlowPersistence() {
       return {
         totalSessions: 0,
         totalMinutes: 0,
-        averageCompletion: 0,
-        averageStressReduction: 0,
-        favoriteMode: 'calm',
+        averageScore: 0,
+        completionRate: 0,
+        favoritePattern: 'calm',
         weeklyGoalProgress: 0,
         streak: 0,
-        modeBreakdown: []
+        patternBreakdown: []
       };
     }
 
     const totalMinutes = Math.round(sessionList.reduce((sum, s) => sum + s.duration_seconds, 0) / 60);
-    const avgCompletion = Math.round(sessionList.reduce((sum, s) => sum + s.completion_rate, 0) / sessionList.length * 100);
-    
-    // Calculate stress reduction
-    const sessionsWithStress = sessionList.filter(s => 
-      s.stress_level_before !== undefined && s.stress_level_after !== undefined
-    );
-    const avgStressReduction = sessionsWithStress.length > 0
-      ? Math.round(sessionsWithStress.reduce((sum, s) => 
-          sum + ((s.stress_level_before! - s.stress_level_after!) / s.stress_level_before! * 100), 0
-        ) / sessionsWithStress.length)
+    const completedSessions = sessionList.filter(s => s.completed);
+    const avgScore = completedSessions.length > 0
+      ? Math.round(completedSessions.reduce((sum, s) => sum + s.score, 0) / completedSessions.length)
       : 0;
+    const completionRate = Math.round((completedSessions.length / sessionList.length) * 100);
 
-    // Find favorite mode
-    const modeCounts: Record<string, { count: number; totalDuration: number }> = {};
+    // Find favorite pattern
+    const patternCounts: Record<string, { count: number; totalDuration: number; totalScore: number }> = {};
     sessionList.forEach(s => {
-      if (!modeCounts[s.mode]) {
-        modeCounts[s.mode] = { count: 0, totalDuration: 0 };
+      if (!patternCounts[s.pattern]) {
+        patternCounts[s.pattern] = { count: 0, totalDuration: 0, totalScore: 0 };
       }
-      modeCounts[s.mode].count++;
-      modeCounts[s.mode].totalDuration += s.duration_seconds;
+      patternCounts[s.pattern].count++;
+      patternCounts[s.pattern].totalDuration += s.duration_seconds;
+      patternCounts[s.pattern].totalScore += s.score;
     });
     
-    const favoriteMode = Object.entries(modeCounts)
+    const favoritePattern = Object.entries(patternCounts)
       .sort((a, b) => b[1].count - a[1].count)[0]?.[0] || 'calm';
 
-    const modeBreakdown = Object.entries(modeCounts).map(([mode, data]) => ({
-      mode,
+    const patternBreakdown = Object.entries(patternCounts).map(([pattern, data]) => ({
+      pattern,
       count: data.count,
-      avgDuration: Math.round(data.totalDuration / data.count / 60)
+      avgDuration: Math.round(data.totalDuration / data.count / 60),
+      avgScore: Math.round(data.totalScore / data.count)
     }));
 
     // Calculate weekly progress (goal: 5 sessions per week)
@@ -127,13 +120,13 @@ export function useFlashGlowPersistence() {
     return {
       totalSessions: sessionList.length,
       totalMinutes,
-      averageCompletion: avgCompletion,
-      averageStressReduction: avgStressReduction,
-      favoriteMode,
+      averageScore: avgScore,
+      completionRate,
+      favoritePattern,
       weeklyGoalProgress,
       streak,
       lastSessionDate: sessionList[0]?.created_at,
-      modeBreakdown
+      patternBreakdown
     };
   };
 
@@ -176,14 +169,11 @@ export function useFlashGlowPersistence() {
         .from('flash_glow_sessions')
         .insert({
           user_id: user.id,
-          mode: session.mode,
+          pattern: session.pattern,
           duration_seconds: session.duration_seconds,
-          completion_rate: session.completion_rate,
-          heart_rate_start: session.heart_rate_start,
-          heart_rate_end: session.heart_rate_end,
-          stress_level_before: session.stress_level_before,
-          stress_level_after: session.stress_level_after,
-          feedback_rating: session.feedback_rating
+          score: session.score,
+          completed: session.completed,
+          session_date: session.session_date
         })
         .select()
         .single();
@@ -196,7 +186,7 @@ export function useFlashGlowPersistence() {
       
       toast({
         title: '✨ Session sauvegardée',
-        description: `${session.mode} - ${Math.round(session.duration_seconds / 60)} min`
+        description: `${session.pattern} - ${Math.round(session.duration_seconds / 60)} min`
       });
       
       return newSession;
@@ -215,8 +205,8 @@ export function useFlashGlowPersistence() {
     return sessions[0] || null;
   }, [sessions]);
 
-  const getSessionsByMode = useCallback((mode: string) => {
-    return sessions.filter(s => s.mode === mode);
+  const getSessionsByPattern = useCallback((pattern: string) => {
+    return sessions.filter(s => s.pattern === pattern);
   }, [sessions]);
 
   useEffect(() => {
@@ -230,6 +220,6 @@ export function useFlashGlowPersistence() {
     fetchSessions,
     saveSession,
     getRecentSession,
-    getSessionsByMode
+    getSessionsByPattern
   };
 }

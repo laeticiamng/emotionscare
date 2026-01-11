@@ -6,21 +6,21 @@ import { useState, useCallback, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { logger } from '@/lib/logger';
+import { Json } from '@/integrations/supabase/types';
 
 export interface BubbleBeatSession {
   id: string;
   game_mode: string;
   score: number;
+  bubbles_popped: number;
+  rhythm_accuracy: number;
   duration_seconds: number;
+  difficulty: number;
   average_heart_rate?: number;
   target_heart_rate?: number;
-  difficulty: number;
-  biometrics?: {
-    hrv?: number;
-    stressLevel?: number;
-    coherenceLevel?: number;
-  };
+  biometrics?: Json;
   created_at: string;
+  completed_at?: string;
 }
 
 export interface BubbleBeatStats {
@@ -28,9 +28,10 @@ export interface BubbleBeatStats {
   totalScore: number;
   averageScore: number;
   bestScore: number;
+  totalBubblesPopped: number;
   totalPlayTime: number;
   favoriteMode: string;
-  averageCoherence: number;
+  averageAccuracy: number;
   recentSessions: BubbleBeatSession[];
 }
 
@@ -42,9 +43,10 @@ export function useBubbleBeatPersistence() {
     totalScore: 0,
     averageScore: 0,
     bestScore: 0,
+    totalBubblesPopped: 0,
     totalPlayTime: 0,
     favoriteMode: 'relax',
-    averageCoherence: 0,
+    averageAccuracy: 0,
     recentSessions: []
   });
   const [isLoading, setIsLoading] = useState(false);
@@ -56,15 +58,17 @@ export function useBubbleBeatPersistence() {
         totalScore: 0,
         averageScore: 0,
         bestScore: 0,
+        totalBubblesPopped: 0,
         totalPlayTime: 0,
         favoriteMode: 'relax',
-        averageCoherence: 0,
+        averageAccuracy: 0,
         recentSessions: []
       };
     }
 
     const totalScore = sessionList.reduce((sum, s) => sum + s.score, 0);
     const bestScore = Math.max(...sessionList.map(s => s.score));
+    const totalBubblesPopped = sessionList.reduce((sum, s) => sum + (s.bubbles_popped || 0), 0);
     const totalPlayTime = sessionList.reduce((sum, s) => sum + s.duration_seconds, 0);
     
     // Find favorite mode
@@ -75,22 +79,20 @@ export function useBubbleBeatPersistence() {
     const favoriteMode = Object.entries(modeCounts)
       .sort((a, b) => b[1] - a[1])[0]?.[0] || 'relax';
 
-    // Average coherence
-    const coherenceValues = sessionList
-      .filter(s => s.biometrics?.coherenceLevel !== undefined)
-      .map(s => s.biometrics!.coherenceLevel!);
-    const averageCoherence = coherenceValues.length > 0
-      ? Math.round(coherenceValues.reduce((sum, v) => sum + v, 0) / coherenceValues.length)
-      : 0;
+    // Average accuracy
+    const avgAccuracy = Math.round(
+      sessionList.reduce((sum, s) => sum + (s.rhythm_accuracy || 0), 0) / sessionList.length
+    );
 
     return {
       totalSessions: sessionList.length,
       totalScore,
       averageScore: Math.round(totalScore / sessionList.length),
       bestScore,
+      totalBubblesPopped,
       totalPlayTime,
       favoriteMode,
-      averageCoherence,
+      averageAccuracy: avgAccuracy,
       recentSessions: sessionList.slice(0, 10)
     };
   };
@@ -129,11 +131,14 @@ export function useBubbleBeatPersistence() {
           user_id: user.id,
           game_mode: session.game_mode,
           score: session.score,
+          bubbles_popped: session.bubbles_popped,
+          rhythm_accuracy: session.rhythm_accuracy,
           duration_seconds: session.duration_seconds,
+          difficulty: session.difficulty,
           average_heart_rate: session.average_heart_rate,
           target_heart_rate: session.target_heart_rate,
-          difficulty: session.difficulty,
-          biometrics: session.biometrics
+          biometrics: session.biometrics,
+          completed_at: session.completed_at
         })
         .select()
         .single();
