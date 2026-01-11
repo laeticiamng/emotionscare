@@ -8,6 +8,23 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { logger } from '@/lib/logger';
 
+// Patterns valides selon la contrainte DB: ['box', 'calm', '478', 'energy', 'coherence']
+const VALID_DB_PATTERNS = ['box', 'calm', '478', 'energy', 'coherence'] as const;
+type ValidDbPattern = typeof VALID_DB_PATTERNS[number];
+
+const mapPatternToDb = (pattern: BreathingPattern): ValidDbPattern => {
+  const patternMap: Record<BreathingPattern, ValidDbPattern> = {
+    'box': 'box',
+    '4-7-8': '478',
+    'coherence': 'coherence',
+    'wim-hof': 'energy',
+    'calm': 'calm',
+    'energize': 'energy',
+    'sleep': 'calm',
+  };
+  return patternMap[pattern] || 'box';
+};
+
 export type BreathingPattern = 'box' | '4-7-8' | 'coherence' | 'wim-hof' | 'calm' | 'energize' | 'sleep';
 export type BreathingPhase = 'inhale' | 'hold-in' | 'exhale' | 'hold-out';
 export type SessionStatus = 'idle' | 'preparing' | 'active' | 'paused' | 'completed';
@@ -469,9 +486,9 @@ export function useVRBreathingEnriched() {
       try {
         await supabase.from('breathing_vr_sessions').insert({
           user_id: user.id,
-          pattern: finalSession.pattern,
+          pattern: mapPatternToDb(finalSession.pattern),
           vr_mode: finalSession.vrMode,
-          duration_seconds: finalSession.elapsedTime,
+          duration_seconds: Math.max(1, Math.floor(finalSession.elapsedTime)),
           cycles_completed: finalSession.currentCycle,
           mood_before: finalSession.moodBefore,
           mood_after: finalSession.moodAfter,
