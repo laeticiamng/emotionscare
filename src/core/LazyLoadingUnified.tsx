@@ -233,7 +233,7 @@ class ComponentRegistry {
   
   register(name: string, component: ComponentType<any>) {
     this.components.set(name, component);
-    if (process.env.NODE_ENV === 'development') {
+    if (import.meta.env.MODE === 'development') {
       logProductionEvent('Component Registered', { name });
     }
   }

@@ -77,7 +77,7 @@ const OptimizedLayout: React.FC<OptimizedLayoutProps> = memo(({
             {/* Enhanced Features - Lazy Loaded */}
             {/* AccessibilityEnhancer disabled for now - no default export */}
             
-            {enableMonitoring && process.env.NODE_ENV === 'development' && (
+            {enableMonitoring && import.meta.env.MODE === 'development' && (
               <Suspense fallback={null}>
                 <PerformanceMonitor />
               </Suspense>

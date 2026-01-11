@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Activity } from 'lucide-react';
 import { logger } from '@/lib/logger';
 
+const isDev = import.meta.env.MODE === 'development';
+
 export const PerformanceMonitor: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [metrics, setMetrics] = useState({
@@ -11,7 +13,7 @@ export const PerformanceMonitor: React.FC = () => {
   });
 
   useEffect(() => {
-    if (process.env.NODE_ENV !== 'development') return;
+    if (!isDev) return;
 
     const observer = new PerformanceObserver((list) => {
       const entries = list.getEntries();
@@ -31,7 +33,7 @@ export const PerformanceMonitor: React.FC = () => {
     return () => observer.disconnect();
   }, []);
 
-  if (process.env.NODE_ENV !== 'development') return null;
+  if (!isDev) return null;
 
   return (
     <>

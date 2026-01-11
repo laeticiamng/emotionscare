@@ -383,7 +383,7 @@ export default function UnifiedErrorPage({
           </div>
 
           {/* Informations techniques (développement) */}
-          {process.env.NODE_ENV === 'development' && (
+          {import.meta.env.MODE === 'development' && (
             <details className="bg-muted/50 rounded-lg p-4 text-left text-sm">
               <summary className="cursor-pointer font-medium">
                 Informations techniques (dev)

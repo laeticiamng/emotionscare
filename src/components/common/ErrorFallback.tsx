@@ -64,7 +64,7 @@ const ErrorFallback: React.FC<ErrorFallbackProps> = ({
               L'équipe technique a été automatiquement notifiée.
             </p>
             
-            {process.env.NODE_ENV === 'development' && (
+            {import.meta.env.MODE === 'development' && (
               <details className="text-left">
                 <summary className="cursor-pointer text-xs text-muted-foreground hover:text-foreground">
                   Détails techniques

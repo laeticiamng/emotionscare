@@ -39,7 +39,7 @@ export const SecurityAudit: React.FC = () => {
   const [activeCategory, setActiveCategory] = useState<string>('all');
 
   useEffect(() => {
-    if (process.env.NODE_ENV !== 'development') return;
+    if (import.meta.env.MODE !== 'development') return;
     runSecurityAudit();
   }, []);
 
@@ -327,7 +327,7 @@ export const SecurityAudit: React.FC = () => {
     ? metrics.issues 
     : metrics.issues.filter(issue => issue.category === activeCategory);
 
-  if (process.env.NODE_ENV !== 'development') return null;
+  if (import.meta.env.MODE !== 'development') return null;
 
   return (
     <>

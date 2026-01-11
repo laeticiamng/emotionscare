@@ -101,7 +101,7 @@ const Enhanced500Page: React.FC<Enhanced500PageProps> = ({
           </div>
 
           {/* Informations d'erreur (si disponibles) */}
-          {error && process.env.NODE_ENV === 'development' && (
+          {error && import.meta.env.MODE === 'development' && (
             <details className="bg-muted/50 rounded-lg p-4 text-left text-sm">
               <summary className="cursor-pointer font-medium text-destructive">
                 Détails de l'erreur (développement)

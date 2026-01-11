@@ -24,15 +24,11 @@ const ROLE_MAP: Record<string, Role> = {
 
 const getEnvFlag = (key: string): string | undefined => {
   const normalized = key.toUpperCase();
-  const processValue =
-    typeof process !== 'undefined'
-      ? process.env?.[`VITE_${normalized}`]
-      : undefined;
-  const importMetaValue =
-    typeof import.meta !== 'undefined' && typeof import.meta.env !== 'undefined'
-      ? (import.meta.env as Record<string, string | undefined>)[`VITE_${normalized}`]
-      : undefined;
-  return processValue ?? importMetaValue;
+  // Use only import.meta.env for Vite compatibility
+  if (typeof import.meta !== 'undefined' && typeof import.meta.env !== 'undefined') {
+    return (import.meta.env as Record<string, string | undefined>)[`VITE_${normalized}`];
+  }
+  return undefined;
 };
 
 const normalizeRole = (rawRole?: string | null): Role | null => {

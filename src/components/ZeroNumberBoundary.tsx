@@ -113,7 +113,7 @@ export const ZeroNumberBoundary: FC<ZeroNumberBoundaryProps> = ({
       newStats.detectedNumbers = [...new Set([...stats.detectedNumbers, ...violations])].slice(-50);
 
       // Log warning
-      if (!warningIssuedRef.current && process.env.NODE_ENV !== 'production') {
+      if (!warningIssuedRef.current && import.meta.env.MODE !== 'production') {
         logger.warn(
           `ZeroNumberBoundary: ${violations.length} numeric violation(s) detected`, 
           { violations, mode },

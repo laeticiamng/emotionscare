@@ -17,7 +17,7 @@ const DEFAULT_SITE_NAME = "EmotionsCare";
 const DEFAULT_DESCRIPTION =
   "Plateforme d'intelligence émotionnelle pour le bien-être personnel et professionnel. Analysez et améliorez vos émotions avec nos outils innovants.";
 const DEFAULT_IMAGE_PATH = "/images/vr-banner-bg.jpg";
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://emotionscare.com";
+const BASE_URL = import.meta.env.VITE_BASE_URL || "https://emotionscare.com";
 
 const resolveAbsoluteUrl = (value: string): string => {
   if (/^https?:\/\//i.test(value)) {

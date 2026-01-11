@@ -512,7 +512,7 @@ export const PremiumBadgeSystem: React.FC = () => {
                       )}
 
                       {/* Bouton de test pour débloquer (dev seulement) */}
-                      {!badge.unlocked && process.env.NODE_ENV === 'development' && (
+                      {!badge.unlocked && import.meta.env.MODE === 'development' && (
                         <Button
                           size="sm"
                           variant="outline"
