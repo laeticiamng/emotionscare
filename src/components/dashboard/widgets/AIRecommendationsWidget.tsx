@@ -3,7 +3,7 @@
  * @module dashboard/widgets
  */
 
-import React, { useState } from 'react';
+import React, { useState, ComponentType } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -18,7 +18,8 @@ import {
   Brain,
   Zap,
   Music,
-  BookOpen
+  BookOpen,
+  type LucideProps
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -39,7 +40,9 @@ interface Recommendation {
   reason: string;
 }
 
-const ICON_MAP: Record<string, React.ElementType> = {
+type LucideIconComponent = ComponentType<LucideProps>;
+
+const ICON_MAP: Record<string, LucideIconComponent> = {
   heart: Heart,
   brain: Brain,
   zap: Zap,
