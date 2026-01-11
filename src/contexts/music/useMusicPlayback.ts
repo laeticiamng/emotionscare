@@ -26,7 +26,7 @@ export const useMusicPlayback = (
   const sanitizeAudioUrl = useCallback((url: string | undefined): string | null => {
     if (!url) return null;
     
-    // URLs valides connues
+    // URLs valides connues - domaines CDN audio
     const validDomains = [
       'cdn.pixabay.com',
       'cdn.sunoapi.org',
@@ -34,6 +34,9 @@ export const useMusicPlayback = (
       'cdn2.suno.ai',
       'audiopipe.suno.ai',
       'suno.ai',
+      'sunoapi.org',
+      's3.amazonaws.com',
+      'cloudfront.net',
     ];
     
     try {

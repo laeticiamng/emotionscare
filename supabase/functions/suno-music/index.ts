@@ -274,15 +274,16 @@ serve(async (req) => {
               console.log('[suno-music] Status response:', JSON.stringify(statusData));
               
               // Parse Suno status response
-              const sunoStatus = statusData.data?.status;
+              const sunoStatus = statusData.data?.status?.toUpperCase?.() || statusData.data?.status || '';
               const sunoTracks = statusData.data?.response?.sunoData || [];
               const firstTrack = sunoTracks[0];
               
-              // Map Suno statuses: SUCCESS, TEXT_SUCCESS = complete
-              const isComplete = sunoStatus === 'SUCCESS' || sunoStatus === 'TEXT_SUCCESS';
+              // Map Suno statuses: SUCCESS, TEXT_SUCCESS, FIRST_SUCCESS = complete
+              const isComplete = ['SUCCESS', 'TEXT_SUCCESS', 'FIRST_SUCCESS', 'COMPLETED'].includes(sunoStatus);
+              const isFailed = ['FAILED', 'ERROR'].includes(sunoStatus);
               
               result = {
-                status: isComplete ? 'completed' : (sunoStatus?.toLowerCase() || 'pending'),
+                status: isComplete ? 'completed' : isFailed ? 'failed' : 'pending',
                 audio_url: firstTrack?.audioUrl || firstTrack?.streamAudioUrl,
                 image_url: firstTrack?.imageUrl,
                 duration: firstTrack?.duration,
