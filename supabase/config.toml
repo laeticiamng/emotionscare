@@ -162,6 +162,15 @@ verify_jwt = true
 [functions.scans-api]
 verify_jwt = true
 
+[functions.story-synth]
+verify_jwt = true
+
+[functions.flash-glow-sessions]
+verify_jwt = true
+
+[functions.global-leaderboard]
+verify_jwt = true
+
 [api]
 enabled = true
 port = 54321
