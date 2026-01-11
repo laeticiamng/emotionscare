@@ -17,8 +17,9 @@ export const CSP_DIRECTIVES = {
   ],
   'style-src': [
     "'self'",
-    "'unsafe-inline'", // Required for Tailwind CSS and CSS-in-JS libraries (Radix UI, Framer Motion)
-    // TODO: Consider using nonces or hashes for inline styles in production
+    // Note: unsafe-inline is required for Tailwind CSS, Radix UI, and Framer Motion
+    // Nonces/hashes would require build-time integration and server-side rendering
+    "'unsafe-inline'",
     "https://fonts.googleapis.com"
   ],
   'font-src': [

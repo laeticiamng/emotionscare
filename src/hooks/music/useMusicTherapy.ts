@@ -1,4 +1,7 @@
-// TODO: Add proper types for musicTherapyService responses
+/**
+ * Hook for music therapy sessions
+ * Types imported from @/services/types for full type safety
+ */
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { musicTherapyService } from '@/services';
 import type { ApiResponse, EmotionData, MusicRecommendation } from '@/services/types';

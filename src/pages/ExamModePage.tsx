@@ -171,21 +171,14 @@ export default function ExamModePage() {
       description: `Lancement de votre expérience de ${experience.duration}...`,
     });
 
-    // Rediriger vers la page appropriée selon le type
-    // TODO: Adapter selon les vraies routes de l'app
-    switch (experience.type) {
-      case 'pre-exam':
-        navigate('/app/music');
-        break;
-      case 'post-exam':
-        navigate('/app/music');
-        break;
-      case 'stress-relief':
-        navigate('/app/breath');
-        break;
-      default:
-        navigate('/app/consumer/home');
-    }
+    // Routes adaptées aux expériences d'examen
+    const routeMap: Record<typeof experience.type, string> = {
+      'pre-exam': '/app/music?preset=focus',
+      'post-exam': '/app/music?preset=relax',
+      'stress-relief': '/app/breath'
+    };
+    
+    navigate(routeMap[experience.type] || '/app/consumer/home');
   };
 
   // Afficher loader pendant le SSO
