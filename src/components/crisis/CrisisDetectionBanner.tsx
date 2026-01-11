@@ -84,7 +84,7 @@ export default function CrisisDetectionBanner() {
       <Button
         variant="destructive"
         size="sm"
-        className="fixed bottom-4 right-4 z-50 gap-2 shadow-lg"
+        className="fixed bottom-4 right-20 z-50 gap-2 shadow-lg"
         onClick={() => setIsMinimized(false)}
       >
         <Heart className="h-4 w-4" />

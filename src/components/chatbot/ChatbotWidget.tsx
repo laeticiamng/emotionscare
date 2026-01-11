@@ -46,12 +46,12 @@ export function ChatbotWidget({
   };
 
   const positionClasses = {
-    'bottom-right': 'bottom-4 right-4',
-    'bottom-left': 'bottom-4 left-4',
+    'bottom-right': 'bottom-20 right-4', // Décalé pour éviter chevauchement avec autres widgets
+    'bottom-left': 'bottom-20 left-4',
   };
 
   return (
-    <div className={cn('fixed z-50', positionClasses[position], className)}>
+    <div className={cn('fixed z-40', positionClasses[position], className)}>
       {/* Widget ouvert */}
       {isOpen && (
         <div className="w-full max-w-sm bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden flex flex-col h-96 mb-4">
