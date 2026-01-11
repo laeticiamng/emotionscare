@@ -26,18 +26,50 @@ export const useMusicPlayback = (
   const sanitizeAudioUrl = useCallback((url: string | undefined): string | null => {
     if (!url) return null;
     
-    // Refuser les URLs Supabase Storage (fichiers non uploadés)
-    if (url.includes('supabase.co/storage')) {
-      logger.warn('Rejecting Supabase storage URL', { url }, 'MUSIC');
+    // URLs valides connues
+    const validDomains = [
+      'cdn.pixabay.com',
+      'cdn.sunoapi.org',
+      'cdn1.suno.ai',
+      'cdn2.suno.ai',
+      'audiopipe.suno.ai',
+      'suno.ai',
+    ];
+    
+    try {
+      const urlObj = new URL(url);
+      
+      // Accepter les URLs de domaines connus
+      if (validDomains.some(domain => urlObj.hostname.includes(domain))) {
+        // Corriger les URLs Pixabay /download/ vers /audio/
+        if (url.includes('cdn.pixabay.com/download/')) {
+          return url.replace('/download/', '/');
+        }
+        return url;
+      }
+      
+      // Refuser les URLs Supabase Storage génériques (fichiers placeholder)
+      if (url.includes('supabase.co/storage') && !url.includes('.mp3') && !url.includes('.wav')) {
+        logger.warn('Rejecting Supabase storage placeholder URL', { url }, 'MUSIC');
+        return null;
+      }
+      
+      // Accepter les URLs avec extensions audio valides
+      if (url.match(/\.(mp3|wav|ogg|m4a|aac|webm)(\?|$)/i)) {
+        return url;
+      }
+      
+      // Accepter les URLs HTTPS génériques (autres CDNs)
+      if (urlObj.protocol === 'https:') {
+        return url;
+      }
+      
+      logger.warn('Rejecting non-HTTPS audio URL', { url }, 'MUSIC');
+      return null;
+    } catch {
+      logger.warn('Invalid audio URL format', { url }, 'MUSIC');
       return null;
     }
-    
-    // Corriger les URLs Pixabay /download/ vers /audio/ (download nécessite auth)
-    if (url.includes('cdn.pixabay.com/download/')) {
-      return url.replace('/download/', '/');
-    }
-    
-    return url;
   }, []);
 
   /**

@@ -90,15 +90,12 @@ export const ZeroNumberBoundary: FC<ZeroNumberBoundaryProps> = ({
     });
   }, [allowPatterns]);
 
-  // Main detection function
+  // Main detection function - use refs to avoid infinite loop
   const checkForNumbers = useCallback(() => {
     if (!enabled || !containerRef.current) return;
 
     const element = containerRef.current;
     const textContent = element.textContent ?? '';
-    
-    // Update stats
-    const newStats = { ...stats, totalChecks: stats.totalChecks + 1 };
 
     // Find all numbers
     const matches = textContent.match(DIGIT_PATTERN) || [];
@@ -108,11 +105,20 @@ export const ZeroNumberBoundary: FC<ZeroNumberBoundaryProps> = ({
       setHasViolation(true);
       setDetectedNumbers(violations);
       
-      newStats.violations++;
-      newStats.lastViolation = new Date();
-      newStats.detectedNumbers = [...new Set([...stats.detectedNumbers, ...violations])].slice(-50);
+      // Update stats without causing re-render loop
+      setStats(prev => {
+        const newStats = {
+          ...prev,
+          totalChecks: prev.totalChecks + 1,
+          violations: prev.violations + 1,
+          lastViolation: new Date(),
+          detectedNumbers: [...new Set([...prev.detectedNumbers, ...violations])].slice(-50)
+        };
+        localStorage.setItem(STATS_KEY, JSON.stringify(newStats));
+        return newStats;
+      });
 
-      // Log warning
+      // Log warning only once
       if (!warningIssuedRef.current && import.meta.env.MODE !== 'production') {
         logger.warn(
           `ZeroNumberBoundary: ${violations.length} numeric violation(s) detected`, 
@@ -124,24 +130,20 @@ export const ZeroNumberBoundary: FC<ZeroNumberBoundaryProps> = ({
 
       // Callback
       onNumberDetected?.(violations);
-
-      // Mode-specific actions
-      if (mode === 'warn') {
-        // Just log (already done above)
-      } else if (mode === 'block') {
-        // Content will be hidden via state
-      } else if (mode === 'highlight') {
-        // Will be handled in render
-      }
     } else {
-      setHasViolation(false);
-      setDetectedNumbers([]);
-      warningIssuedRef.current = false;
+      if (hasViolation) {
+        setHasViolation(false);
+        setDetectedNumbers([]);
+        warningIssuedRef.current = false;
+        
+        setStats(prev => {
+          const newStats = { ...prev, totalChecks: prev.totalChecks + 1 };
+          localStorage.setItem(STATS_KEY, JSON.stringify(newStats));
+          return newStats;
+        });
+      }
     }
-
-    setStats(newStats);
-    localStorage.setItem(STATS_KEY, JSON.stringify(newStats));
-  }, [enabled, mode, stats, isAllowedNumber, onNumberDetected]);
+  }, [enabled, mode, isAllowedNumber, onNumberDetected, hasViolation]);
 
   // Observe mutations
   useEffect(() => {
