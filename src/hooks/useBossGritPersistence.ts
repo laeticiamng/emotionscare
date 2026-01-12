@@ -1,11 +1,27 @@
 /**
- * Hook pour la persistance des quêtes Boss Grit
+ * Hook pour la persistance des sessions Boss Grit dans Supabase
+ * Utilise boss_grit_sessions pour les données de session
+ * et boss_grit_quests pour les quêtes individuelles
  */
 
 import { useState, useCallback, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { logger } from '@/lib/logger';
+import { useToast } from '@/hooks/use-toast';
+
+export interface BossGritSession {
+  id: string;
+  challenge_type: string;
+  difficulty: string;
+  elapsed_seconds: number;
+  xp_earned: number;
+  success: boolean;
+  tasks_completed: number;
+  total_tasks: number;
+  created_at: string;
+  completed_at?: string;
+}
 
 export interface BossGritQuest {
   id: string;
@@ -22,6 +38,7 @@ export interface BossGritQuest {
 }
 
 export interface BossGritStats {
+  totalSessions: number;
   totalQuests: number;
   completedQuests: number;
   totalXP: number;
@@ -30,13 +47,17 @@ export interface BossGritStats {
   currentStreak: number;
   bestStreak: number;
   level: number;
-  recentQuests: BossGritQuest[];
+  totalMinutes: number;
+  recentSessions: BossGritSession[];
 }
 
 export function useBossGritPersistence() {
   const { user } = useAuth();
+  const { toast } = useToast();
+  const [sessions, setSessions] = useState<BossGritSession[]>([]);
   const [quests, setQuests] = useState<BossGritQuest[]>([]);
   const [stats, setStats] = useState<BossGritStats>({
+    totalSessions: 0,
     totalQuests: 0,
     completedQuests: 0,
     totalXP: 0,
@@ -45,18 +66,21 @@ export function useBossGritPersistence() {
     currentStreak: 0,
     bestStreak: 0,
     level: 1,
-    recentQuests: []
+    totalMinutes: 0,
+    recentSessions: []
   });
   const [isLoading, setIsLoading] = useState(false);
 
-  const calculateStats = (questList: BossGritQuest[]): BossGritStats => {
-    const completed = questList.filter(q => q.success);
-    const totalXP = completed.reduce((sum, q) => sum + q.xp_earned, 0);
+  const calculateStats = (sessionList: BossGritSession[], questList: BossGritQuest[]): BossGritStats => {
+    const allItems = [...sessionList, ...questList];
+    const completed = allItems.filter(q => q.success);
+    const totalXP = completed.reduce((sum, q) => sum + (q.xp_earned || 0), 0);
+    const totalMinutes = Math.round(allItems.reduce((sum, s) => sum + (s.elapsed_seconds || 0), 0) / 60);
     
-    // Calculate streaks
+    // Calculate streaks from sessions and quests
     const successDates = completed
-      .filter(q => q.completed_at)
-      .map(q => q.completed_at!.split('T')[0])
+      .filter(q => q.completed_at || q.created_at)
+      .map(q => (q.completed_at || q.created_at).split('T')[0])
       .sort()
       .reverse();
     
@@ -66,7 +90,8 @@ export function useBossGritPersistence() {
     const today = new Date().toISOString().split('T')[0];
     let lastDate: string | null = null;
 
-    for (const dateStr of successDates) {
+    const uniqueDates = [...new Set(successDates)];
+    for (const dateStr of uniqueDates) {
       if (!lastDate) {
         const diff = Math.floor((new Date(today).getTime() - new Date(dateStr).getTime()) / (1000 * 60 * 60 * 24));
         if (diff <= 1) {
@@ -90,41 +115,106 @@ export function useBossGritPersistence() {
     bestStreak = Math.max(bestStreak, tempStreak);
 
     return {
+      totalSessions: sessionList.length,
       totalQuests: questList.length,
       completedQuests: completed.length,
       totalXP,
       averageXP: completed.length > 0 ? Math.round(totalXP / completed.length) : 0,
-      successRate: questList.length > 0 ? Math.round((completed.length / questList.length) * 100) : 0,
+      successRate: allItems.length > 0 ? Math.round((completed.length / allItems.length) * 100) : 0,
       currentStreak,
       bestStreak,
       level: Math.floor(totalXP / 500) + 1,
-      recentQuests: questList.slice(0, 10)
+      totalMinutes,
+      recentSessions: sessionList.slice(0, 10)
     };
   };
 
-  const fetchQuests = useCallback(async () => {
+  const fetchData = useCallback(async () => {
     if (!user) return;
     setIsLoading(true);
 
     try {
-      const { data, error } = await supabase
-        .from('boss_grit_quests')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
-        .limit(100);
+      // Fetch both sessions and quests in parallel
+      const [sessionsRes, questsRes] = await Promise.all([
+        supabase
+          .from('boss_grit_sessions')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(100),
+        supabase
+          .from('boss_grit_quests')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(100)
+      ]);
 
-      if (error) throw error;
+      if (sessionsRes.error) throw sessionsRes.error;
+      if (questsRes.error) throw questsRes.error;
 
-      const typedQuests = (data || []) as BossGritQuest[];
+      const typedSessions = (sessionsRes.data || []) as BossGritSession[];
+      const typedQuests = (questsRes.data || []) as BossGritQuest[];
+      
+      setSessions(typedSessions);
       setQuests(typedQuests);
-      setStats(calculateStats(typedQuests));
+      setStats(calculateStats(typedSessions, typedQuests));
     } catch (error) {
-      logger.error('Failed to fetch boss grit quests', error as Error, 'BOSS_GRIT');
+      logger.error('Failed to fetch boss grit data', error as Error, 'BOSS_GRIT');
     } finally {
       setIsLoading(false);
     }
   }, [user]);
+
+  const saveSession = useCallback(async (session: Omit<BossGritSession, 'id' | 'created_at'>) => {
+    if (!user) {
+      toast({
+        title: 'Connexion requise',
+        description: 'Connectez-vous pour sauvegarder vos sessions.',
+        variant: 'destructive'
+      });
+      return null;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('boss_grit_sessions')
+        .insert({
+          user_id: user.id,
+          challenge_type: session.challenge_type,
+          difficulty: session.difficulty,
+          elapsed_seconds: session.elapsed_seconds,
+          xp_earned: session.xp_earned,
+          success: session.success,
+          tasks_completed: session.tasks_completed,
+          total_tasks: session.total_tasks,
+          completed_at: session.completed_at
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      
+      const newSession = data as BossGritSession;
+      setSessions(prev => [newSession, ...prev]);
+      setStats(calculateStats([newSession, ...sessions], quests));
+      
+      toast({
+        title: session.success ? '⚔️ Défi réussi !' : '💪 Bon effort !',
+        description: `+${session.xp_earned} XP gagnés`,
+      });
+      
+      return newSession;
+    } catch (error) {
+      logger.error('Failed to save boss grit session', error as Error, 'BOSS_GRIT');
+      toast({
+        title: 'Erreur',
+        description: 'Impossible de sauvegarder la session.',
+        variant: 'destructive'
+      });
+      return null;
+    }
+  }, [user, sessions, quests, toast]);
 
   const saveQuest = useCallback(async (quest: Omit<BossGritQuest, 'id' | 'created_at'>) => {
     if (!user) return null;
@@ -151,24 +241,26 @@ export function useBossGritPersistence() {
       
       const newQuest = data as BossGritQuest;
       setQuests(prev => [newQuest, ...prev]);
-      setStats(calculateStats([newQuest, ...quests]));
+      setStats(calculateStats(sessions, [newQuest, ...quests]));
       
       return newQuest;
     } catch (error) {
       logger.error('Failed to save boss grit quest', error as Error, 'BOSS_GRIT');
       return null;
     }
-  }, [user, quests]);
+  }, [user, sessions, quests]);
 
   useEffect(() => {
-    fetchQuests();
-  }, [fetchQuests]);
+    fetchData();
+  }, [fetchData]);
 
   return {
+    sessions,
     quests,
     stats,
     isLoading,
-    fetchQuests,
+    fetchData,
+    saveSession,
     saveQuest
   };
 }
