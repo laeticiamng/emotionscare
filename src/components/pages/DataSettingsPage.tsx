@@ -30,6 +30,9 @@ import {
   CheckCircle,
   Clock
 } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { exportService, type ExportType } from '@/services/exportService';
+import { AccountDeletionService } from '@/services/gdpr/AccountDeletionService';
 
 interface DataSettingsPageProps {
   'data-testid'?: string;
@@ -37,29 +40,23 @@ interface DataSettingsPageProps {
 
 interface DataExport {
   id: string;
-  type: string;
+  type: ExportType;
+  label: string;
+  format: 'json' | 'csv' | 'xlsx' | 'pdf';
   status: 'pending' | 'processing' | 'completed' | 'failed';
   requestedAt: string;
   completedAt?: string;
   downloadUrl?: string;
   expiresAt?: string;
+  error?: string;
 }
 
 export const DataSettingsPage: React.FC<DataSettingsPageProps> = ({ 'data-testid': testId }) => {
+  const { user } = useAuth();
   const [isExporting, setIsExporting] = React.useState(false);
   const [isDeleting, setIsDeleting] = React.useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = React.useState(false);
-  const [exports, setExports] = React.useState<DataExport[]>([
-    {
-      id: '1',
-      type: 'complete',
-      status: 'completed',
-      requestedAt: '2024-01-15T10:00:00Z',
-      completedAt: '2024-01-15T10:05:00Z',
-      downloadUrl: '/exports/data-export-1.zip',
-      expiresAt: '2024-01-22T10:05:00Z'
-    }
-  ]);
+  const [exports, setExports] = React.useState<DataExport[]>([]);
 
   const dataCategories = [
     {
@@ -94,30 +91,82 @@ export const DataSettingsPage: React.FC<DataSettingsPageProps> = ({ 'data-testid
     },
   ];
 
-  const handleExportData = async (type: 'partial' | 'complete') => {
+  const formatExportLabel = (type: ExportType) => {
+    const labels: Record<ExportType, string> = {
+      mood_history: 'Historique des humeurs',
+      journal_entries: 'Entrées de journal',
+      assessments: 'Évaluations',
+      sessions: 'Sessions coach',
+      achievements: 'Succès et badges',
+      music_history: 'Historique musical',
+      breathing_sessions: 'Sessions respiration',
+      full_profile: 'Profil complet',
+    };
+    return labels[type];
+  };
+
+  const pushExportHistory = (entry: DataExport) => {
+    setExports(prev => [entry, ...prev].slice(0, 5));
+  };
+
+  const handleExportData = async (type: ExportType, format: DataExport['format']) => {
+    if (!user?.id) {
+      toast({
+        title: 'Connexion requise',
+        description: 'Veuillez vous reconnecter pour exporter vos données.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     setIsExporting(true);
+    const requestId = Date.now().toString();
     try {
-      // Simulate export request
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      const newExport: DataExport = {
-        id: Date.now().toString(),
+      const pendingExport: DataExport = {
+        id: requestId,
         type,
+        label: formatExportLabel(type),
+        format,
         status: 'processing',
         requestedAt: new Date().toISOString(),
       };
-      
-      setExports(prev => [newExport, ...prev]);
-      
+      pushExportHistory(pendingExport);
+
+      const result = await exportService.export(user.id, {
+        type,
+        format,
+      });
+
+      if (!result.success) {
+        throw new Error(result.error || "Impossible de générer l'export");
+      }
+
+      const completedExport: DataExport = {
+        ...pendingExport,
+        status: 'completed',
+        completedAt: new Date().toISOString(),
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+      };
+
+      setExports(prev => prev.map(item => (item.id === pendingExport.id ? completedExport : item)));
+
       toast({
-        title: "Export demandé",
-        description: "Votre demande d'export a été prise en compte. Vous recevrez un email quand il sera prêt.",
+        title: 'Export prêt',
+        description: "Votre fichier est prêt au téléchargement.",
       });
     } catch (error) {
+      const message = error instanceof Error ? error.message : "Impossible de lancer l'export des données.";
+      setExports(prev =>
+        prev.map(item =>
+          item.id === requestId
+            ? { ...item, status: 'failed', error: message, completedAt: new Date().toISOString() }
+            : item
+        )
+      );
       toast({
-        title: "Erreur",
-        description: "Impossible de lancer l'export des données.",
-        variant: "destructive",
+        title: 'Erreur',
+        description: message,
+        variant: 'destructive',
       });
     } finally {
       setIsExporting(false);
@@ -127,8 +176,11 @@ export const DataSettingsPage: React.FC<DataSettingsPageProps> = ({ 'data-testid
   const handleDeleteAccount = async () => {
     setIsDeleting(true);
     try {
-      // Simulate account deletion
-      await new Promise(resolve => setTimeout(resolve, 3000));
+      if (!user?.id) {
+        throw new Error('Utilisateur non connecté');
+      }
+
+      await AccountDeletionService.requestDeletion(user.id);
 
       toast({
         title: "Suppression programmée",
@@ -230,7 +282,7 @@ export const DataSettingsPage: React.FC<DataSettingsPageProps> = ({ 'data-testid
             Exporter mes données
           </CardTitle>
           <CardDescription>
-            Téléchargez une copie de toutes vos données au format JSON
+            Téléchargez une copie de vos données selon le format souhaité
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -241,22 +293,40 @@ export const DataSettingsPage: React.FC<DataSettingsPageProps> = ({ 'data-testid
             </AlertDescription>
           </Alert>
 
-          <div className="flex gap-3">
+          <div className="grid gap-3 sm:grid-cols-2">
             <Button 
-              onClick={() => handleExportData('partial')}
+              onClick={() => handleExportData('full_profile', 'json')}
               disabled={isExporting}
               variant="outline"
             >
               <FileText className="h-4 w-4 mr-2" />
-              Export partiel (profil uniquement)
+              Export profil (JSON)
             </Button>
             
             <Button 
-              onClick={() => handleExportData('complete')}
+              onClick={() => handleExportData('journal_entries', 'pdf')}
+              disabled={isExporting}
+              variant="outline"
+            >
+              <Download className="h-4 w-4 mr-2" />
+              Export journal (PDF)
+            </Button>
+
+            <Button 
+              onClick={() => handleExportData('mood_history', 'csv')}
+              disabled={isExporting}
+              variant="outline"
+            >
+              <Download className="h-4 w-4 mr-2" />
+              Export humeurs (CSV)
+            </Button>
+
+            <Button 
+              onClick={() => handleExportData('full_profile', 'xlsx')}
               disabled={isExporting}
             >
               <Download className="h-4 w-4 mr-2" />
-              {isExporting ? 'Export en cours...' : 'Export complet'}
+              {isExporting ? 'Export en cours...' : 'Export complet (Excel)'}
             </Button>
           </div>
 
@@ -290,11 +360,16 @@ export const DataSettingsPage: React.FC<DataSettingsPageProps> = ({ 'data-testid
                     {getStatusIcon(exp.status)}
                     <div>
                       <p className="font-medium">
-                        Export {exp.type === 'complete' ? 'complet' : 'partiel'}
+                        {exp.label}
                       </p>
                       <p className="text-sm text-muted-foreground">
                         Demandé le {new Date(exp.requestedAt).toLocaleDateString('fr-FR')}
                       </p>
+                      {exp.error && (
+                        <p className="text-xs text-destructive">
+                          {exp.error}
+                        </p>
+                      )}
                       {exp.expiresAt && (
                         <p className="text-xs text-muted-foreground">
                           Expire le {new Date(exp.expiresAt).toLocaleDateString('fr-FR')}
@@ -305,11 +380,10 @@ export const DataSettingsPage: React.FC<DataSettingsPageProps> = ({ 'data-testid
                   
                   <div className="flex items-center gap-3">
                     {getStatusBadge(exp.status)}
-                    {exp.status === 'completed' && exp.downloadUrl && (
-                      <Button size="sm" variant="outline">
-                        <Download className="h-4 w-4 mr-2" />
-                        Télécharger
-                      </Button>
+                    {exp.status === 'completed' && (
+                      <Badge variant="outline" className="text-xs">
+                        {exp.format.toUpperCase()}
+                      </Badge>
                     )}
                   </div>
                 </div>

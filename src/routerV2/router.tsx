@@ -94,6 +94,7 @@ const SeuilPage = lazy(() => import('@/pages/SeuilPage'));
 // Paramètres
 const B2CSettingsPage = lazy(() => import('@/pages/B2CSettingsPage'));
 const B2CProfileSettingsPage = lazy(() => import('@/pages/B2CProfileSettingsPage'));
+const DataSettingsPage = lazy(() => import('@/pages/DataSettingsPage'));
 const B2CPrivacyTogglesPage = lazy(() => import('@/pages/B2CPrivacyTogglesPage'));
 const B2CNotificationsPage = lazy(() => import('@/pages/B2CNotificationsPage'));
 const HowItAdaptsPage = lazy(() => import('@/pages/HowItAdaptsPage'));
@@ -454,6 +455,7 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   // Settings
   B2CSettingsPage,
   B2CProfileSettingsPage,
+  DataSettingsPage,
   B2CPrivacyTogglesPage,
   B2CNotificationsPage,
   HowItAdaptsPage,

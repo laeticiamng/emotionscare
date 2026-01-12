@@ -1418,6 +1418,16 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     aliases: ['/profile-settings'],
   },
   {
+    name: 'settings-data',
+    path: '/settings/data',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app-sidebar',
+    component: 'DataSettingsPage',
+    guard: true,
+    aliases: ['/data-settings'],
+  },
+  {
     name: 'app-profile',
     path: '/app/profile',
     segment: 'consumer',
