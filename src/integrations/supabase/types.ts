@@ -19806,6 +19806,51 @@ export type Database = {
         }
         Relationships: []
       }
+      session_history: {
+        Row: {
+          completed: boolean | null
+          completed_at: string | null
+          created_at: string | null
+          duration_seconds: number | null
+          id: string
+          metadata: Json | null
+          module_type: string
+          score: number | null
+          session_data: Json | null
+          started_at: string | null
+          user_id: string
+          xp_earned: number | null
+        }
+        Insert: {
+          completed?: boolean | null
+          completed_at?: string | null
+          created_at?: string | null
+          duration_seconds?: number | null
+          id?: string
+          metadata?: Json | null
+          module_type: string
+          score?: number | null
+          session_data?: Json | null
+          started_at?: string | null
+          user_id: string
+          xp_earned?: number | null
+        }
+        Update: {
+          completed?: boolean | null
+          completed_at?: string | null
+          created_at?: string | null
+          duration_seconds?: number | null
+          id?: string
+          metadata?: Json | null
+          module_type?: string
+          score?: number | null
+          session_data?: Json | null
+          started_at?: string | null
+          user_id?: string
+          xp_earned?: number | null
+        }
+        Relationships: []
+      }
       sessions: {
         Row: {
           achievements_unlocked: string[] | null
