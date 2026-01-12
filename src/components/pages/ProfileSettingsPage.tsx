@@ -16,6 +16,7 @@ import { useToast } from '@/hooks/use-toast';
 import { logger } from '@/lib/logger';
 import { User, Mail, Phone, MapPin, Calendar, Shield } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { useAvatarHelpers } from '@/hooks/useAvatarHelpers';
 
 interface ProfileSettingsPageProps {
   'data-testid'?: string;
@@ -48,6 +49,8 @@ export const ProfileSettingsPage: React.FC<ProfileSettingsPageProps> = ({ 'data-
   const setUser = useAppStore.use.setUser();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = React.useState(false);
+  const fileInputRef = React.useRef<HTMLInputElement | null>(null);
+  const { avatarUrl, uploading, uploadAvatar, removeAvatar, getInitials } = useAvatarHelpers();
 
   const [formData, setFormData] = React.useState({
     displayName: user?.user_metadata?.full_name || '',
@@ -134,6 +137,54 @@ export const ProfileSettingsPage: React.FC<ProfileSettingsPageProps> = ({ 'data-
     setFormData(prev => ({ ...prev, [field]: value }));
   }, []);
 
+  const handleAvatarClick = React.useCallback(() => {
+    fileInputRef.current?.click();
+  }, []);
+
+  const handleAvatarChange = React.useCallback(
+    async (event: React.ChangeEvent<HTMLInputElement>) => {
+      const file = event.target.files?.[0];
+      if (!file) return;
+
+      try {
+        await uploadAvatar(file);
+        toast({
+          title: 'Avatar mis à jour',
+          description: 'Votre nouvelle photo de profil est enregistrée.',
+        });
+      } catch (error) {
+        logger.error('Error uploading avatar', error as Error, 'COMPONENT');
+        toast({
+          title: 'Erreur',
+          description: "Impossible de mettre à jour la photo de profil.",
+          variant: 'destructive',
+        });
+      } finally {
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
+      }
+    },
+    [toast, uploadAvatar],
+  );
+
+  const handleAvatarRemove = React.useCallback(async () => {
+    try {
+      await removeAvatar();
+      toast({
+        title: 'Avatar supprimé',
+        description: 'Votre photo de profil a été supprimée.',
+      });
+    } catch (error) {
+      logger.error('Error removing avatar', error as Error, 'COMPONENT');
+      toast({
+        title: 'Erreur',
+        description: 'Impossible de supprimer la photo de profil.',
+        variant: 'destructive',
+      });
+    }
+  }, [removeAvatar, toast]);
+
   return (
     <div className="container max-w-4xl mx-auto py-8 space-y-6" data-testid={testId}>
       <div className="space-y-2">
@@ -158,16 +209,29 @@ export const ProfileSettingsPage: React.FC<ProfileSettingsPageProps> = ({ 'data-
           <CardContent className="space-y-4">
             <div className="flex items-center gap-4">
               <Avatar className="h-20 w-20">
-                <AvatarImage src={user?.user_metadata?.avatar_url} />
+                <AvatarImage src={avatarUrl ?? undefined} />
                 <AvatarFallback className="text-lg">
-                  {formData.displayName.split(' ').map((n: string) => n[0]).join('').toUpperCase() || user?.email?.[0]?.toUpperCase()}
+                  {getInitials(formData.displayName || user?.email)}
                 </AvatarFallback>
               </Avatar>
               <div className="space-y-2">
-                <Button variant="outline" size="sm">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleAvatarChange}
+                />
+                <Button variant="outline" size="sm" onClick={handleAvatarClick} disabled={uploading}>
                   Changer la photo
                 </Button>
-                <Button variant="ghost" size="sm" className="text-destructive">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-destructive"
+                  onClick={handleAvatarRemove}
+                  disabled={uploading || !avatarUrl}
+                >
                   Supprimer
                 </Button>
               </div>
