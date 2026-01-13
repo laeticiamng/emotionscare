@@ -9215,6 +9215,172 @@ export type Database = {
           },
         ]
       }
+      forum_bookmarks: {
+        Row: {
+          created_at: string
+          id: string
+          topic_id: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          topic_id?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          topic_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "forum_bookmarks_topic_id_fkey"
+            columns: ["topic_id"]
+            isOneToOne: false
+            referencedRelation: "forum_topics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      forum_likes: {
+        Row: {
+          created_at: string
+          id: string
+          reply_id: string | null
+          topic_id: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          reply_id?: string | null
+          topic_id?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          reply_id?: string | null
+          topic_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "forum_likes_reply_id_fkey"
+            columns: ["reply_id"]
+            isOneToOne: false
+            referencedRelation: "forum_replies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "forum_likes_topic_id_fkey"
+            columns: ["topic_id"]
+            isOneToOne: false
+            referencedRelation: "forum_topics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      forum_replies: {
+        Row: {
+          author_id: string
+          content: string
+          created_at: string
+          id: string
+          is_best_answer: boolean | null
+          likes_count: number | null
+          topic_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          author_id: string
+          content: string
+          created_at?: string
+          id?: string
+          is_best_answer?: boolean | null
+          likes_count?: number | null
+          topic_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string
+          content?: string
+          created_at?: string
+          id?: string
+          is_best_answer?: boolean | null
+          likes_count?: number | null
+          topic_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "forum_replies_topic_id_fkey"
+            columns: ["topic_id"]
+            isOneToOne: false
+            referencedRelation: "forum_topics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      forum_topics: {
+        Row: {
+          author_id: string
+          category: string
+          content: string
+          created_at: string
+          id: string
+          is_locked: boolean | null
+          is_pinned: boolean | null
+          is_solved: boolean | null
+          last_reply_at: string | null
+          last_reply_author_id: string | null
+          likes_count: number | null
+          replies_count: number | null
+          tags: string[] | null
+          title: string
+          updated_at: string
+          views: number | null
+        }
+        Insert: {
+          author_id: string
+          category?: string
+          content: string
+          created_at?: string
+          id?: string
+          is_locked?: boolean | null
+          is_pinned?: boolean | null
+          is_solved?: boolean | null
+          last_reply_at?: string | null
+          last_reply_author_id?: string | null
+          likes_count?: number | null
+          replies_count?: number | null
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+          views?: number | null
+        }
+        Update: {
+          author_id?: string
+          category?: string
+          content?: string
+          created_at?: string
+          id?: string
+          is_locked?: boolean | null
+          is_pinned?: boolean | null
+          is_solved?: boolean | null
+          last_reply_at?: string | null
+          last_reply_author_id?: string | null
+          likes_count?: number | null
+          replies_count?: number | null
+          tags?: string[] | null
+          title?: string
+          updated_at?: string
+          views?: number | null
+        }
+        Relationships: []
+      }
       free_trial_usage: {
         Row: {
           created_at: string | null
@@ -13236,6 +13402,101 @@ export type Database = {
           user_id?: string
           with_guidance?: boolean | null
           with_music?: boolean | null
+        }
+        Relationships: []
+      }
+      mentor_sessions: {
+        Row: {
+          created_at: string
+          duration: number | null
+          feedback: string | null
+          id: string
+          mentor_id: string | null
+          rating: number | null
+          scheduled_at: string
+          status: string | null
+          student_id: string
+          topic: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          duration?: number | null
+          feedback?: string | null
+          id?: string
+          mentor_id?: string | null
+          rating?: number | null
+          scheduled_at: string
+          status?: string | null
+          student_id: string
+          topic: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          duration?: number | null
+          feedback?: string | null
+          id?: string
+          mentor_id?: string | null
+          rating?: number | null
+          scheduled_at?: string
+          status?: string | null
+          student_id?: string
+          topic?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mentor_sessions_mentor_id_fkey"
+            columns: ["mentor_id"]
+            isOneToOne: false
+            referencedRelation: "mentors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mentors: {
+        Row: {
+          availability: string | null
+          bio: string | null
+          created_at: string
+          expertise: string[] | null
+          id: string
+          is_active: boolean | null
+          rating: number | null
+          review_count: number | null
+          specialty: string
+          students_helped: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          availability?: string | null
+          bio?: string | null
+          created_at?: string
+          expertise?: string[] | null
+          id?: string
+          is_active?: boolean | null
+          rating?: number | null
+          review_count?: number | null
+          specialty: string
+          students_helped?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          availability?: string | null
+          bio?: string | null
+          created_at?: string
+          expertise?: string[] | null
+          id?: string
+          is_active?: boolean | null
+          rating?: number | null
+          review_count?: number | null
+          specialty?: string
+          students_helped?: number | null
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
