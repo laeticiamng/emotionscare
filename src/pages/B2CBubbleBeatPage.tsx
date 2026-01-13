@@ -144,28 +144,67 @@ const B2CBubbleBeatPage: React.FC = () => {
     }
   }, [isPlaying, difficulty]);
 
-  // Synthèse sonore binaural
+  // Synthèse sonore binaural avec gestion d'erreur robuste
   const playBinauralBeat = (frequency: number) => {
-    if (!audioContextRef.current) {
-      audioContextRef.current = new AudioContext();
-    }
+    try {
+      // Création du contexte audio si nécessaire
+      if (!audioContextRef.current) {
+        const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+        if (!AudioContextClass) {
+          logger.warn('AudioContext not supported on this browser', {}, 'AUDIO');
+          toast({
+            title: "Audio non supporté",
+            description: "Votre navigateur ne supporte pas l'audio binaural",
+            variant: "destructive"
+          });
+          return;
+        }
+        audioContextRef.current = new AudioContextClass();
+      }
 
-    if (oscillatorRef.current) {
-      oscillatorRef.current.stop();
-    }
+      // Résumé si suspendu (autoplay policy)
+      if (audioContextRef.current.state === 'suspended') {
+        audioContextRef.current.resume().catch(e => {
+          logger.error('Failed to resume AudioContext', e as Error, 'AUDIO');
+        });
+      }
 
-    const oscillator = audioContextRef.current.createOscillator();
-    const gainNode = audioContextRef.current.createGain();
-    
-    oscillator.connect(gainNode);
-    gainNode.connect(audioContextRef.current.destination);
-    
-    oscillator.frequency.setValueAtTime(frequency, audioContextRef.current.currentTime);
-    oscillator.type = 'sine';
-    gainNode.gain.setValueAtTime(0.1, audioContextRef.current.currentTime);
-    
-    oscillator.start();
-    oscillatorRef.current = oscillator;
+      // Arrêt de l'oscillateur précédent
+      if (oscillatorRef.current) {
+        try {
+          oscillatorRef.current.stop();
+          oscillatorRef.current.disconnect();
+        } catch (e) {
+          // Ignore l'erreur si déjà stoppé
+        }
+        oscillatorRef.current = null;
+      }
+
+      const oscillator = audioContextRef.current.createOscillator();
+      const gainNode = audioContextRef.current.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContextRef.current.destination);
+      
+      oscillator.frequency.setValueAtTime(frequency, audioContextRef.current.currentTime);
+      oscillator.type = 'sine';
+      
+      // Fade in doux pour éviter les clics
+      gainNode.gain.setValueAtTime(0, audioContextRef.current.currentTime);
+      gainNode.gain.linearRampToValueAtTime(0.1, audioContextRef.current.currentTime + 0.1);
+      
+      oscillator.start();
+      oscillatorRef.current = oscillator;
+      
+      logger.info(`Binaural beat started at ${frequency}Hz`, {}, 'AUDIO');
+    } catch (error) {
+      logger.error('Failed to play binaural beat', error as Error, 'AUDIO');
+      toast({
+        title: "Erreur audio",
+        description: "Impossible de démarrer l'audio binaural. Essayez de rafraîchir la page.",
+        variant: "destructive"
+      });
+    }
   };
 
   // Hook de persistance
