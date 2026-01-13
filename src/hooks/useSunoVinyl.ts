@@ -33,12 +33,15 @@ const VINYL_PROMPTS: Record<string, { prompt: string; style: string; mood: strin
   }
 };
 
-// Fallback URLs - Audio libre de droits (Internet Archive/Freesound)
+// Version du cache - incrémenter pour invalider les anciens caches
+const CACHE_VERSION = 2;
+
+// Fallback URLs - Audio MP3 de test (commondatastorage Google - 100% fiable)
 const FALLBACK_URLS: Record<string, string> = {
-  'doux': 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
-  'énergique': 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
-  'créatif': 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
-  'guérison': 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3'
+  'doux': 'https://commondatastorage.googleapis.com/codeskulptor-demos/DDR_assets/Kan6_Cannon.mp3',
+  'énergique': 'https://commondatastorage.googleapis.com/codeskulptor-demos/DDR_assets/Sevish_-__Happy_Sundays.mp3',
+  'créatif': 'https://commondatastorage.googleapis.com/codeskulptor-demos/DDR_assets/Kanon_Kabin.mp3',
+  'guérison': 'https://commondatastorage.googleapis.com/codeskulptor-assets/Epoq-Lepidoptera.ogg'
 };
 
 interface GenerationState {
@@ -106,7 +109,7 @@ export function useSunoVinyl(): UseSunoVinylReturn {
     refreshCredits();
   }, [refreshCredits]);
 
-  // Charger le cache depuis la DB
+  // Charger le cache depuis la DB - invalider les URLs Pixabay cassées
   useEffect(() => {
     if (!user) return;
     
@@ -114,22 +117,28 @@ export function useSunoVinyl(): UseSunoVinylReturn {
       try {
         const { data } = await supabase
           .from('suno_generated_tracks')
-          .select('vinyl_id, audio_url, is_fallback, expires_at')
+          .select('vinyl_id, audio_url, is_fallback, expires_at, cache_version')
           .eq('status', 'completed')
           .gt('expires_at', new Date().toISOString());
         
         if (data) {
           const cache: Record<string, CachedTrack> = {};
           data.forEach((track: any) => {
-            cache[track.vinyl_id] = {
-              id: track.vinyl_id,
-              audio_url: track.audio_url,
-              is_fallback: track.is_fallback,
-              expires_at: track.expires_at
-            };
+            // Invalider les anciennes URLs Pixabay cassées
+            const isOldPixabayUrl = track.audio_url?.includes('cdn.pixabay.com');
+            const isOldCache = !track.cache_version || track.cache_version < CACHE_VERSION;
+            
+            if (!isOldPixabayUrl && !isOldCache) {
+              cache[track.vinyl_id] = {
+                id: track.vinyl_id,
+                audio_url: track.audio_url,
+                is_fallback: track.is_fallback,
+                expires_at: track.expires_at
+              };
+            }
           });
           cacheRef.current = cache;
-          logger.info(`Loaded ${data.length} cached Suno tracks`, {}, 'MUSIC');
+          logger.info(`Loaded ${Object.keys(cache).length} valid cached Suno tracks`, {}, 'MUSIC');
         }
       } catch (err) {
         logger.warn('Failed to load Suno cache', err as Error, 'MUSIC');
