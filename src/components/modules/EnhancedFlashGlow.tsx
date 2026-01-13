@@ -71,7 +71,15 @@ const breathingPatterns: BreathingPattern[] = [
   }
 ];
 
-export default function EnhancedFlashGlow() {
+interface EnhancedFlashGlowProps {
+  selectedDuration?: 2 | 5 | 10;
+  onSessionComplete?: (duration: number, score: number, pattern: string) => void;
+}
+
+export default function EnhancedFlashGlow({ 
+  selectedDuration = 2, 
+  onSessionComplete 
+}: EnhancedFlashGlowProps) {
   const { playTone, stopAll } = useWebAudio();
   const { isConnected: hrConnected, heartRate } = useWebBluetooth();
   
@@ -79,7 +87,9 @@ export default function EnhancedFlashGlow() {
   const [currentPhase, setCurrentPhase] = useState<'inhale' | 'hold1' | 'exhale' | 'hold2'>('inhale');
   const [phaseTime, setPhaseTime] = useState(0);
   const [cycleCount, setCycleCount] = useState(0);
-  const [totalCycles, setTotalCycles] = useState(8);
+  // Calculate cycles based on selected duration (approx 15s per cycle for 4-7-8 pattern)
+  const durationCyclesMap: Record<number, number> = { 2: 6, 5: 15, 10: 30 };
+  const [totalCycles, setTotalCycles] = useState(durationCyclesMap[selectedDuration] || 8);
   const [isActive, setIsActive] = useState(false);
   const [totalScore, setTotalScore] = useState(0);
   const [sessionStreak, setSessionStreak] = useState(0);
@@ -131,6 +141,12 @@ export default function EnhancedFlashGlow() {
   useEffect(() => {
     setAchievements(initialAchievements);
   }, []);
+
+  // Update cycles when duration changes
+  useEffect(() => {
+    const newCycles = durationCyclesMap[selectedDuration] || 8;
+    setTotalCycles(newCycles);
+  }, [selectedDuration]);
 
   // Animation de la sphère
   useEffect(() => {
@@ -299,6 +315,8 @@ export default function EnhancedFlashGlow() {
     
     const sessionScore = calculateScore();
     const newTotalScore = totalScore + sessionScore;
+    const sessionDurationSec = totalCycles * Object.values(selectedPattern.phases).reduce((a, b) => a + b, 0);
+    
     setTotalScore(newTotalScore);
     setSessionStreak(prev => prev + 1);
     
@@ -306,12 +324,17 @@ export default function EnhancedFlashGlow() {
     updateAchievement('first_session', 1);
     updateAchievement('zen_master', newTotalScore);
     
+    // Callback pour la page parent
+    if (onSessionComplete) {
+      onSessionComplete(sessionDurationSec, sessionScore, selectedPattern.id);
+    }
+    
     // Sauvegarder en base
     try {
       await supabase.functions.invoke('flash-glow-metrics', {
         body: {
           pattern: selectedPattern.id,
-          duration_sec: totalCycles * Object.values(selectedPattern.phases).reduce((a, b) => a + b, 0),
+          duration_sec: sessionDurationSec,
           cycles_completed: cycleCount,
           perfect_breaths: perfectBreaths,
           score: sessionScore,

@@ -284,7 +284,10 @@ export default function B2CFlashGlowPage() {
               </div>
 
               {/* Main Flash Glow Component */}
-              <EnhancedFlashGlow />
+              <EnhancedFlashGlow 
+                selectedDuration={selectedDuration} 
+                onSessionComplete={handleSessionComplete}
+              />
 
               {/* Leaderboard Preview */}
               {user && (
