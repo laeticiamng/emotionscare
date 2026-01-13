@@ -10,6 +10,8 @@ import { toast } from '@/hooks/use-toast';
 import PageRoot from '@/components/common/PageRoot';
 import { logger } from '@/lib/logger';
 import { useBubbleBeatPersistence } from '@/hooks/useBubbleBeatPersistence';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface Bubble {
   id: string;
@@ -208,7 +210,12 @@ const B2CBubbleBeatPage: React.FC = () => {
   };
 
   // Hook de persistance
-  const { saveSession } = useBubbleBeatPersistence();
+  const { saveSession, sessions: sessionHistory, isLoadingHistory, fetchHistory } = useBubbleBeatPersistence();
+
+  // Fetch history on mount
+  useEffect(() => {
+    fetchHistory();
+  }, [fetchHistory]);
 
   const startSession = async () => {
     setIsPlaying(true);
@@ -260,6 +267,28 @@ const B2CBubbleBeatPage: React.FC = () => {
 
     setBubbles([]);
   };
+
+  // Cleanup audio on unmount
+  useEffect(() => {
+    return () => {
+      if (oscillatorRef.current) {
+        try {
+          oscillatorRef.current.stop();
+          oscillatorRef.current.disconnect();
+        } catch (e) {
+          // Ignore if already stopped
+        }
+        oscillatorRef.current = null;
+      }
+      if (audioContextRef.current) {
+        audioContextRef.current.close();
+        audioContextRef.current = null;
+      }
+      if (sessionIntervalRef.current) {
+        clearInterval(sessionIntervalRef.current);
+      }
+    };
+  }, []);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -555,6 +584,59 @@ const B2CBubbleBeatPage: React.FC = () => {
               </div>
             </div>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Historique des sessions */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Trophy className="h-5 w-5 text-yellow-500" />
+            Historique des Sessions
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {isLoadingHistory ? (
+            <div className="text-center py-8 text-muted-foreground">
+              Chargement de l'historique...
+            </div>
+          ) : sessionHistory.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              Aucune session enregistrée. Lancez votre première session !
+            </div>
+          ) : (
+            <ScrollArea className="h-[200px]">
+              <div className="space-y-2">
+                {sessionHistory.slice(0, 10).map((session) => (
+                  <div
+                    key={session.id}
+                    className="flex items-center justify-between p-3 bg-muted/30 rounded-lg"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Badge variant={
+                        session.game_mode === 'relax' ? 'secondary' :
+                        session.game_mode === 'energize' ? 'destructive' : 'default'
+                      }>
+                        {session.game_mode}
+                      </Badge>
+                      <div>
+                        <div className="font-medium">{session.score} pts</div>
+                        <div className="text-xs text-muted-foreground">
+                          {formatTime(session.duration_seconds)} • Difficulté {session.difficulty}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-right text-sm text-muted-foreground">
+                      {new Date(session.created_at).toLocaleDateString('fr-FR', {
+                        day: 'numeric',
+                        month: 'short'
+                      })}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </ScrollArea>
+          )}
         </CardContent>
       </Card>
         </div>

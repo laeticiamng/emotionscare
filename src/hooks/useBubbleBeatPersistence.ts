@@ -164,7 +164,9 @@ export function useBubbleBeatPersistence() {
     sessions,
     stats,
     isLoading,
+    isLoadingHistory: isLoading,
     fetchSessions,
+    fetchHistory: fetchSessions,
     saveSession
   };
 }

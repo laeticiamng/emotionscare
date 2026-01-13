@@ -3,8 +3,8 @@
  * Page de respiration gamifiée accessible WCAG 2.1 AA
  */
 
-import React, { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import React, { useEffect, useState, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Trophy, Flame, Clock, Share2, Settings, Loader2, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -15,7 +15,10 @@ import EnhancedFlashGlow from '@/components/modules/EnhancedFlashGlow';
 import { useAuth } from '@/hooks/useAuth';
 import { useFlashGlowStats } from '@/hooks/useFlashGlowStats';
 import { useRealtimeLeaderboard } from '@/hooks/useRealtimeLeaderboard';
+import { useStreakTracker } from '@/hooks/useStreakTracker';
+import { SessionFeedback, type FeedbackData } from '@/components/feedback/SessionFeedback';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { toast } from '@/hooks/use-toast';
 
 type SessionDuration = 2 | 5 | 10;
 
@@ -23,7 +26,10 @@ export default function B2CFlashGlowPage() {
   const { user } = useAuth();
   const { stats, isLoading, saveSession } = useFlashGlowStats();
   const { weeklyTop: leaderboardEntries, isLoading: leaderboardLoading } = useRealtimeLeaderboard();
+  const { recordActivity } = useStreakTracker();
   const [selectedDuration, setSelectedDuration] = useState<SessionDuration>(2);
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [lastSession, setLastSession] = useState<{ duration: number; score: number; pattern: string } | null>(null);
 
   useEffect(() => {
     document.title = "Flash Glow - Respiration Gamifiée | EmotionsCare";
@@ -47,14 +53,39 @@ export default function B2CFlashGlowPage() {
     setSelectedDuration(duration);
   };
 
-  const handleSessionComplete = async (duration: number, score: number, pattern: string) => {
+  const handleSessionComplete = useCallback(async (duration: number, score: number, pattern: string) => {
     await saveSession({
       duration_seconds: duration,
       score,
       pattern,
       completed: true
     });
-  };
+    
+    // Record activity for streak
+    await recordActivity();
+    
+    // Store session data and show feedback
+    setLastSession({ duration, score, pattern });
+    setShowFeedback(true);
+    
+    // Show success toast
+    toast({
+      title: '🌟 Session terminée !',
+      description: `+${score} points • Durée: ${Math.floor(duration / 60)}m ${duration % 60}s`,
+    });
+  }, [saveSession, recordActivity]);
+
+  const handleFeedbackSubmit = useCallback(async (feedback: FeedbackData) => {
+    // Could save feedback to DB here if needed
+    console.log('Feedback submitted:', feedback);
+    setShowFeedback(false);
+    setLastSession(null);
+  }, []);
+
+  const handleFeedbackSkip = useCallback(() => {
+    setShowFeedback(false);
+    setLastSession(null);
+  }, []);
 
   const getLevelTitle = (level: number): string => {
     const titles = [
@@ -282,6 +313,27 @@ export default function B2CFlashGlowPage() {
                   </Card>
                 ))}
               </div>
+
+              {/* Session Feedback Modal */}
+              <AnimatePresence>
+                {showFeedback && lastSession && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+                  >
+                    <SessionFeedback
+                      moduleName="Flash Glow"
+                      sessionDuration={lastSession.duration}
+                      score={lastSession.score}
+                      xpEarned={Math.round(lastSession.score * 1.2)}
+                      onSubmit={handleFeedbackSubmit}
+                      onSkip={handleFeedbackSkip}
+                    />
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
               {/* Main Flash Glow Component */}
               <EnhancedFlashGlow 
