@@ -2474,6 +2474,63 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
       description: 'Dashboard analytics des tests de charge K6',
     },
   },
+  
+  // ═══════════════════════════════════════════════════════════
+  // ROUTES MANQUANTES - AJOUTÉES POUR COHÉRENCE
+  // ═══════════════════════════════════════════════════════════
+  {
+    name: 'hume-ai-realtime',
+    path: '/app/hume-ai',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app-sidebar',
+    component: 'HumeAIRealtimePage',
+    guard: true,
+    requireAuth: true,
+    aliases: ['/hume-ai', '/emotion-ai'],
+  },
+  {
+    name: 'suno-music-generator',
+    path: '/app/suno',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app-sidebar',
+    component: 'SunoMusicGeneratorPage',
+    guard: true,
+    requireAuth: true,
+    aliases: ['/suno', '/ai-music-generator'],
+  },
+  {
+    name: 'auras-leaderboard',
+    path: '/app/auras',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app-sidebar',
+    component: 'AurasLeaderboardPage',
+    guard: true,
+    requireAuth: true,
+    aliases: ['/auras', '/aura-ranking'],
+  },
+  {
+    name: 'consent-management',
+    path: '/app/consent',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app-sidebar',
+    component: 'ConsentManagementPage',
+    guard: true,
+    requireAuth: true,
+  },
+  {
+    name: 'account-deletion',
+    path: '/app/delete-account',
+    segment: 'consumer',
+    role: 'consumer',
+    layout: 'app-sidebar',
+    component: 'AccountDeletionPage',
+    guard: true,
+    requireAuth: true,
+  },
 
   // 404 FALLBACK ROUTE - Le fallback '*' est géré directement dans router.tsx
   // Cette entrée est gardée pour documentation mais n'est pas utilisée
