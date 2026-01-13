@@ -3,9 +3,9 @@
  * Page de respiration gamifiée accessible WCAG 2.1 AA
  */
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Trophy, Flame, Clock, Share2, Settings, Loader2 } from 'lucide-react';
+import { ArrowLeft, Trophy, Flame, Clock, Share2, Settings, Loader2, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -14,11 +14,16 @@ import { ConsentGate } from '@/features/clinical-optin/ConsentGate';
 import EnhancedFlashGlow from '@/components/modules/EnhancedFlashGlow';
 import { useAuth } from '@/hooks/useAuth';
 import { useFlashGlowStats } from '@/hooks/useFlashGlowStats';
+import { useRealtimeLeaderboard } from '@/hooks/useRealtimeLeaderboard';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+
+type SessionDuration = 2 | 5 | 10;
 
 export default function B2CFlashGlowPage() {
   const { user } = useAuth();
   const { stats, isLoading, saveSession } = useFlashGlowStats();
+  const { weeklyTop: leaderboardEntries, isLoading: leaderboardLoading } = useRealtimeLeaderboard();
+  const [selectedDuration, setSelectedDuration] = useState<SessionDuration>(2);
 
   useEffect(() => {
     document.title = "Flash Glow - Respiration Gamifiée | EmotionsCare";
@@ -36,6 +41,10 @@ export default function B2CFlashGlowPage() {
         // User cancelled share
       }
     }
+  };
+
+  const handleDurationSelect = (duration: SessionDuration) => {
+    setSelectedDuration(duration);
   };
 
   const handleSessionComplete = async (duration: number, score: number, pattern: string) => {
@@ -59,6 +68,12 @@ export default function B2CFlashGlowPage() {
     ];
     return titles[Math.min(level - 1, titles.length - 1)] || titles[titles.length - 1];
   };
+
+  const durationOptions = [
+    { value: 2 as SessionDuration, label: '2 minutes', sublabel: 'Session rapide', color: 'primary' },
+    { value: 5 as SessionDuration, label: '5 minutes', sublabel: 'Session standard', color: 'secondary' },
+    { value: 10 as SessionDuration, label: '10 minutes', sublabel: 'Session intensive', color: 'accent' },
+  ];
 
   return (
     <ConsentGate>
@@ -233,41 +248,39 @@ export default function B2CFlashGlowPage() {
                 </Card>
               )}
 
-              {/* Quick Session Option */}
+              {/* Quick Session Option - Now Functional */}
               <div className="grid sm:grid-cols-3 gap-4 mb-8">
-                <Card className="p-4 cursor-pointer hover:bg-muted/50 transition-colors border-primary/20">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                      <Clock className="h-5 w-5 text-primary" aria-hidden="true" />
+                {durationOptions.map((option) => (
+                  <Card 
+                    key={option.value}
+                    className={`p-4 cursor-pointer transition-all ${
+                      selectedDuration === option.value 
+                        ? 'ring-2 ring-primary bg-primary/5' 
+                        : 'hover:bg-muted/50'
+                    }`}
+                    onClick={() => handleDurationSelect(option.value)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => e.key === 'Enter' && handleDurationSelect(option.value)}
+                    aria-pressed={selectedDuration === option.value}
+                    aria-label={`Sélectionner ${option.label}`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={`w-10 h-10 rounded-full bg-${option.color}/10 flex items-center justify-center relative`}>
+                        <Clock className={`h-5 w-5 text-${option.color}`} aria-hidden="true" />
+                        {selectedDuration === option.value && (
+                          <div className="absolute -top-1 -right-1 w-4 h-4 bg-primary rounded-full flex items-center justify-center">
+                            <Check className="h-3 w-3 text-primary-foreground" />
+                          </div>
+                        )}
+                      </div>
+                      <div>
+                        <div className="font-medium">{option.label}</div>
+                        <div className="text-xs text-muted-foreground">{option.sublabel}</div>
+                      </div>
                     </div>
-                    <div>
-                      <div className="font-medium">2 minutes</div>
-                      <div className="text-xs text-muted-foreground">Session rapide</div>
-                    </div>
-                  </div>
-                </Card>
-                <Card className="p-4 cursor-pointer hover:bg-muted/50 transition-colors">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-secondary/10 flex items-center justify-center">
-                      <Clock className="h-5 w-5 text-secondary" aria-hidden="true" />
-                    </div>
-                    <div>
-                      <div className="font-medium">5 minutes</div>
-                      <div className="text-xs text-muted-foreground">Session standard</div>
-                    </div>
-                  </div>
-                </Card>
-                <Card className="p-4 cursor-pointer hover:bg-muted/50 transition-colors">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center">
-                      <Clock className="h-5 w-5 text-accent" aria-hidden="true" />
-                    </div>
-                    <div>
-                      <div className="font-medium">10 minutes</div>
-                      <div className="text-xs text-muted-foreground">Session intensive</div>
-                    </div>
-                  </div>
-                </Card>
+                  </Card>
+                ))}
               </div>
 
               {/* Main Flash Glow Component */}
@@ -288,34 +301,69 @@ export default function B2CFlashGlowPage() {
                   </div>
                   <Card className="overflow-hidden">
                     <div className="divide-y">
-                      {[
-                        { rank: 1, name: 'Emma L.', score: 2450, avatar: '👑' },
-                        { rank: 2, name: 'Thomas B.', score: 2180, avatar: '🥈' },
-                        { rank: 3, name: 'Marie K.', score: 1920, avatar: '🥉' },
-                        { rank: 4, name: 'Vous', score: stats.totalScore, avatar: '✨', isUser: true },
-                      ].map((player) => (
-                        <div
-                          key={player.rank}
-                          className={`flex items-center justify-between p-4 ${
-                            player.isUser ? 'bg-primary/5' : ''
-                          }`}
-                        >
-                          <div className="flex items-center gap-3">
-                            <span className="text-2xl">{player.avatar}</span>
-                            <div>
-                              <div className={`font-medium ${player.isUser ? 'text-primary' : ''}`}>
-                                {player.name}
+                      {leaderboardLoading ? (
+                        <div className="p-8 text-center">
+                          <Loader2 className="h-6 w-6 animate-spin mx-auto text-muted-foreground" />
+                        </div>
+                      ) : leaderboardEntries.length > 0 ? (
+                        leaderboardEntries.slice(0, 5).map((entry: { user_id: string; display_name?: string; score: number }, index: number) => {
+                          const isCurrentUser = entry.user_id === user?.id;
+                          const avatar = index === 0 ? '👑' : index === 1 ? '🥈' : index === 2 ? '🥉' : '✨';
+                          return (
+                            <div
+                              key={entry.user_id}
+                              className={`flex items-center justify-between p-4 ${
+                                isCurrentUser ? 'bg-primary/5' : ''
+                              }`}
+                            >
+                              <div className="flex items-center gap-3">
+                                <span className="text-2xl">{avatar}</span>
+                                <div>
+                                  <div className={`font-medium ${isCurrentUser ? 'text-primary' : ''}`}>
+                                    {isCurrentUser ? 'Vous' : (entry.display_name || `Joueur ${index + 1}`)}
+                                  </div>
+                                  <div className="text-xs text-muted-foreground">
+                                    #{index + 1} cette semaine
+                                  </div>
+                                </div>
                               </div>
-                              <div className="text-xs text-muted-foreground">
-                                #{player.rank} cette semaine
+                              <div className="font-bold text-lg">
+                                {entry.score.toLocaleString()}
                               </div>
                             </div>
+                          );
+                        })
+                      ) : (
+                        // Fallback to mock data if no real entries
+                        [
+                          { rank: 1, name: 'Emma L.', score: 2450, avatar: '👑' },
+                          { rank: 2, name: 'Thomas B.', score: 2180, avatar: '🥈' },
+                          { rank: 3, name: 'Marie K.', score: 1920, avatar: '🥉' },
+                          { rank: 4, name: 'Vous', score: stats.totalScore, avatar: '✨', isUser: true },
+                        ].map((player) => (
+                          <div
+                            key={player.rank}
+                            className={`flex items-center justify-between p-4 ${
+                              player.isUser ? 'bg-primary/5' : ''
+                            }`}
+                          >
+                            <div className="flex items-center gap-3">
+                              <span className="text-2xl">{player.avatar}</span>
+                              <div>
+                                <div className={`font-medium ${player.isUser ? 'text-primary' : ''}`}>
+                                  {player.name}
+                                </div>
+                                <div className="text-xs text-muted-foreground">
+                                  #{player.rank} cette semaine
+                                </div>
+                              </div>
+                            </div>
+                            <div className="font-bold text-lg">
+                              {player.score.toLocaleString()}
+                            </div>
                           </div>
-                          <div className="font-bold text-lg">
-                            {player.score.toLocaleString()}
-                          </div>
-                        </div>
-                      ))}
+                        ))
+                      )}
                     </div>
                   </Card>
                 </section>
