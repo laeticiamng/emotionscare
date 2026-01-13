@@ -63,29 +63,72 @@ const B2CStorySynthLabPage: React.FC = () => {
 
     setIsGenerating(true);
     
-    // Simulation de génération OpenAI + Suno
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    const mockStory: LocalStory = {
-      id: Date.now().toString(),
-      title: `Histoire de ${validIntentions.join(', ')}`,
-      content: `Une histoire apaisante tissée autour de vos mots : ${validIntentions.join(', ')}. 
-      
-      Vous vous trouvez dans un espace qui respire au rythme de vos pensées. Chaque mot que vous avez choisi résonne doucement dans cet environnement protégé.
-      
-      ${validIntentions[0]} vous enveloppe comme une couverture de soie...
-      ${validIntentions[1] ? `Tandis que ${validIntentions[1]} danse autour de vous...` : ''}
-      ${validIntentions[2] ? `Et ${validIntentions[2]} vous guide vers un état de paix profonde.` : ''}
-      
-      Laissez cette symphonie de sensations vous porter. Votre respiration s'harmonise naturellement avec ce récit qui vous appartient.`,
-      intention: validIntentions,
-      duration: 200 + validIntentions.length * 60,
-      isFavorite: false
-    };
-    
-    setCurrentStory(mockStory);
-    setIsGenerating(false);
+    try {
+      // Appel à l'Edge Function story-synth
+      const response = await fetch(
+        `https://yaincoxihiqdksxgrsrk.supabase.co/functions/v1/story-synth`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhaW5jb3hpaGlxZGtzeGdyc3JrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI4MTE4MjcsImV4cCI6MjA1ODM4NzgyN30.HBfwymB2F9VBvb3uyeTtHBMZFZYXzL0wQmS5fqd65yU`
+          },
+          body: JSON.stringify({
+            intentions: validIntentions,
+            style: 'relaxation',
+            duration: 'medium'
+          })
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        
+        const generatedStory: LocalStory = {
+          id: data.id || Date.now().toString(),
+          title: data.title || `Histoire de ${validIntentions.join(', ')}`,
+          content: data.content || data.story || getFallbackContent(validIntentions),
+          intention: validIntentions,
+          audioUrl: data.audioUrl,
+          duration: data.duration || 200 + validIntentions.length * 60,
+          isFavorite: false
+        };
+        
+        setCurrentStory(generatedStory);
+      } else {
+        // Fallback en cas d'erreur API
+        console.warn('Story Synth API error, using fallback');
+        setCurrentStory(createFallbackStory(validIntentions));
+      }
+    } catch (error) {
+      console.error('Story generation error:', error);
+      // Fallback graceful
+      setCurrentStory(createFallbackStory(validIntentions));
+    } finally {
+      setIsGenerating(false);
+    }
   };
+
+  const getFallbackContent = (validIntentions: string[]) => {
+    return `Une histoire apaisante tissée autour de vos mots : ${validIntentions.join(', ')}. 
+      
+Vous vous trouvez dans un espace qui respire au rythme de vos pensées. Chaque mot que vous avez choisi résonne doucement dans cet environnement protégé.
+
+${validIntentions[0]} vous enveloppe comme une couverture de soie...
+${validIntentions[1] ? `Tandis que ${validIntentions[1]} danse autour de vous...` : ''}
+${validIntentions[2] ? `Et ${validIntentions[2]} vous guide vers un état de paix profonde.` : ''}
+
+Laissez cette symphonie de sensations vous porter. Votre respiration s'harmonise naturellement avec ce récit qui vous appartient.`;
+  };
+
+  const createFallbackStory = (validIntentions: string[]): LocalStory => ({
+    id: Date.now().toString(),
+    title: `Histoire de ${validIntentions.join(', ')}`,
+    content: getFallbackContent(validIntentions),
+    intention: validIntentions,
+    duration: 200 + validIntentions.length * 60,
+    isFavorite: false
+  });
 
   const togglePlay = () => {
     setIsPlaying(!isPlaying);

@@ -4,7 +4,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Crown, BarChart2, Sword, RefreshCw } from 'lucide-react';
+import { Crown, BarChart2, Sword, RefreshCw, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useGritQuest } from '@/hooks/useGritQuest';
@@ -325,14 +325,18 @@ const B2CBossLevelGritPage: React.FC = () => {
         {!showCompletion && !activeQuest && (
           <>
             <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as ViewMode)} className="mb-8">
-              <TabsList className="grid w-full max-w-md mx-auto grid-cols-2">
+              <TabsList className="grid w-full max-w-md mx-auto grid-cols-3">
                 <TabsTrigger value="challenges" className="gap-2">
                   <Sword className="w-4 h-4" />
                   Défis
                 </TabsTrigger>
                 <TabsTrigger value="stats" className="gap-2">
                   <BarChart2 className="w-4 h-4" />
-                  Statistiques
+                  Stats
+                </TabsTrigger>
+                <TabsTrigger value="history" className="gap-2">
+                  <Clock className="w-4 h-4" />
+                  Historique
                 </TabsTrigger>
               </TabsList>
 
@@ -370,6 +374,64 @@ const B2CBossLevelGritPage: React.FC = () => {
               <TabsContent value="stats" className="mt-6">
                 <div className="max-w-3xl mx-auto">
                   <PlayerStats stats={playerStats} />
+                </div>
+              </TabsContent>
+
+              <TabsContent value="history" className="mt-6">
+                <div className="max-w-3xl mx-auto space-y-4">
+                  <h3 className="text-xl font-semibold text-foreground mb-4">
+                    Historique des quêtes
+                  </h3>
+                  {questHistory && questHistory.length > 0 ? (
+                    <div className="space-y-3">
+                      {questHistory.slice(0, 10).map((quest, index) => (
+                        <motion.div
+                          key={quest.id || index}
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: index * 0.05 }}
+                          className={`p-4 rounded-xl border ${
+                            quest.success 
+                              ? 'bg-success/10 border-success/30' 
+                              : 'bg-destructive/10 border-destructive/30'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <h4 className="font-medium text-foreground">
+                                {quest.quest_title || 'Quête'}
+                              </h4>
+                              <p className="text-sm text-muted-foreground">
+                                {quest.quest_description?.slice(0, 60)}...
+                              </p>
+                            </div>
+                            <div className="text-right">
+                              <div className={`font-bold ${quest.success ? 'text-success' : 'text-destructive'}`}>
+                                {quest.success ? `+${quest.xp_earned} XP` : 'Abandonné'}
+                              </div>
+                              <div className="text-xs text-muted-foreground">
+                                {quest.completed_at 
+                                  ? new Date(quest.completed_at).toLocaleDateString('fr-FR')
+                                  : 'Date inconnue'
+                                }
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
+                            <span>⏱️ {Math.floor((quest.elapsed_seconds || 0) / 60)}min</span>
+                            <span>✅ {quest.tasks_completed}/{quest.total_tasks} tâches</span>
+                            <span className="capitalize">📊 {quest.difficulty}</span>
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-12 text-muted-foreground">
+                      <Clock className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                      <p>Aucune quête terminée pour le moment</p>
+                      <p className="text-sm">Commencez une quête pour voir votre historique ici</p>
+                    </div>
+                  )}
                 </div>
               </TabsContent>
             </Tabs>
