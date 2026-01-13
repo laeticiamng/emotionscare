@@ -5,19 +5,37 @@
  * Usage: import { useScan, ScanResult } from '@/features/scan';
  */
 
-// Core Features (existants)
+// ============================================================================
+// CORE FEATURES
+// ============================================================================
+
 export * as scan from './scan';
 export * as journal from './journal';
 export * as coach from './coach';
 export * as breath from './breath';
-export * as gamification from './gamification';
+export * as dashboard from './dashboard';
 
-// Community & Social (existants)
-export * as socialCocon from './social-cocon';
+// ============================================================================
+// GAMIFICATION & ENGAGEMENT
+// ============================================================================
+
+export * as gamification from './gamification';
+export * as challenges from './challenges';
+export * as tournaments from './tournaments';
+export * as guilds from './guilds';
 export * as leaderboard from './leaderboard';
 
-// Specialized (existants)
-export * as orchestration from './orchestration';
+// ============================================================================
+// COMMUNITY & SOCIAL
+// ============================================================================
 
-// Note: Les autres features seront ajoutées progressivement
-// lors de la migration complète de l'architecture
+export * as community from './community';
+export * as socialCocon from './social-cocon';
+
+// ============================================================================
+// SPECIALIZED
+// ============================================================================
+
+export * as orchestration from './orchestration';
+export * as music from './music';
+export * as b2b from './b2b';
