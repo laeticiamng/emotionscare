@@ -9,6 +9,8 @@ export { useBubbleBeatPersistence } from '../useBubbleBeatPersistence';
 export { useMoodMixerPersistence } from '../useMoodMixerPersistence';
 export { useBossGritPersistence } from '../useBossGritPersistence';
 export { useStorySynthPersistence } from '../useStorySynthPersistence';
+export { useVRGalaxyPersistence } from '../useVRGalaxyPersistence';
+export type { VRGalaxySession, VRGalaxyStats } from '../useVRGalaxyPersistence';
 
 // Hook d'historique unifié
 export { useSessionHistory } from '../useSessionHistory';
