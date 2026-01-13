@@ -361,11 +361,91 @@ export function useMoodMixerEnriched(userId?: string): UseMoodMixerEnrichedRetur
     setIsPlaying(false);
   }, [sessionId, startTime, userId, completeSessionMutation]);
 
+  // Audio synthesis for mood components
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const oscillatorsRef = useRef<OscillatorNode[]>([]);
+
+  const startAudio = useCallback(() => {
+    try {
+      if (!audioContextRef.current) {
+        const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+        if (!AudioContextClass) return;
+        audioContextRef.current = new AudioContextClass();
+      }
+      
+      if (audioContextRef.current.state === 'suspended') {
+        audioContextRef.current.resume();
+      }
+
+      // Stop existing oscillators
+      oscillatorsRef.current.forEach(osc => {
+        try { osc.stop(); osc.disconnect(); } catch (e) {}
+      });
+      oscillatorsRef.current = [];
+
+      // Create oscillators based on mood components
+      const frequencies: Record<string, number> = {
+        energy: 528,    // "Love" frequency - energizing
+        calm: 432,      // Natural frequency - calming
+        joy: 639,       // Harmony frequency
+        focus: 40,      // Gamma binaural (40Hz) for focus
+        comfort: 396,   // Liberation frequency
+        serenity: 285   // Healing frequency
+      };
+
+      moodComponents.forEach(comp => {
+        if (comp.value > 30 && audioContextRef.current) {
+          const osc = audioContextRef.current.createOscillator();
+          const gain = audioContextRef.current.createGain();
+          
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(frequencies[comp.id] || 432, audioContextRef.current.currentTime);
+          
+          // Volume based on component value (0-1, scaled down for mixing)
+          const volume = (comp.value / 100) * 0.05;
+          gain.gain.setValueAtTime(0, audioContextRef.current.currentTime);
+          gain.gain.linearRampToValueAtTime(volume, audioContextRef.current.currentTime + 0.5);
+          
+          osc.connect(gain);
+          gain.connect(audioContextRef.current.destination);
+          osc.start();
+          
+          oscillatorsRef.current.push(osc);
+        }
+      });
+    } catch (e) {
+      console.warn('Audio synthesis not available:', e);
+    }
+  }, [moodComponents]);
+
+  const stopAudio = useCallback(() => {
+    oscillatorsRef.current.forEach(osc => {
+      try { osc.stop(); osc.disconnect(); } catch (e) {}
+    });
+    oscillatorsRef.current = [];
+  }, []);
+
   // Playback
   const togglePlayback = useCallback(() => {
-    setIsPlaying(prev => !prev);
-    // L'audio réel serait géré par un composant AudioPreview séparé
-  }, []);
+    setIsPlaying(prev => {
+      if (!prev) {
+        startAudio();
+      } else {
+        stopAudio();
+      }
+      return !prev;
+    });
+  }, [startAudio, stopAudio]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      stopAudio();
+      if (audioContextRef.current) {
+        audioContextRef.current.close();
+      }
+    };
+  }, [stopAudio]);
 
   // Mood helpers
   const getMoodDescription = useCallback((): string => {
