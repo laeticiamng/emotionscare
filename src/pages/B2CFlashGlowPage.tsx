@@ -306,7 +306,7 @@ export default function B2CFlashGlowPage() {
                           <Loader2 className="h-6 w-6 animate-spin mx-auto text-muted-foreground" />
                         </div>
                       ) : leaderboardEntries.length > 0 ? (
-                        leaderboardEntries.slice(0, 5).map((entry: { user_id: string; display_name?: string; score: number }, index: number) => {
+                        leaderboardEntries.slice(0, 5).map((entry, index) => {
                           const isCurrentUser = entry.user_id === user?.id;
                           const avatar = index === 0 ? '👑' : index === 1 ? '🥈' : index === 2 ? '🥉' : '✨';
                           return (
@@ -328,7 +328,7 @@ export default function B2CFlashGlowPage() {
                                 </div>
                               </div>
                               <div className="font-bold text-lg">
-                                {entry.score.toLocaleString()}
+                                {entry.weekly_score.toLocaleString()}
                               </div>
                             </div>
                           );
