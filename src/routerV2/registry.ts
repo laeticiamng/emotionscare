@@ -163,19 +163,10 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     segment: 'public',
     layout: 'marketing',
     component: 'B2BEntreprisePage',
-    aliases: ['/b2b'],
+    aliases: ['/b2b', '/b2b/landing'],
     guard: false,
   },
-  // /b2b/landing -> redirection vers /entreprise
-  {
-    name: 'b2b-landing-redirect',
-    path: '/b2b/landing',
-    segment: 'public',
-    layout: 'marketing',
-    component: 'RedirectToEntreprisePage',
-    deprecated: true,
-    guard: false,
-  },
+  // Route /b2b/landing supprimée - alias dans b2b-landing
   {
     name: 'b2b-selection',
     path: '/b2b/selection',
@@ -369,7 +360,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     component: 'B2CScanPage',
     guard: true,
     requireAuth: true,
-    aliases: ['/scan'],
+    aliases: ['/scan', '/app/emotions', '/emotions'],
   },
   {
     name: 'scan-facial',
@@ -420,6 +411,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     component: 'B2CMusicEnhancedPage',
     guard: true,
     requireAuth: true,
+    aliases: ['/music'],
   },
   {
     name: 'music-analytics',
@@ -538,6 +530,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     layout: 'app-sidebar',
     component: 'B2CJournalPage',
     guard: true,
+    aliases: ['/journal'],
   },
   {
     name: 'emotion-sessions',
@@ -836,18 +829,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: true,
     aliases: ['/voice-journal', '/vocal-journal'],
   },
-  // emotions route obsolète - alias vers scan
-  {
-    name: 'emotions-redirect',
-    path: '/app/emotions',
-    segment: 'consumer',
-    role: 'consumer',
-    layout: 'app',
-    component: 'RedirectToScanPage',
-    guard: true,
-    aliases: ['/emotions'],
-    deprecated: true,
-  },
+  // Route /app/emotions supprimée - alias vers /app/scan
   {
     name: 'community',
     path: '/app/community',
@@ -1343,26 +1325,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     component: 'TestPage',
     guard: false,
   },
-  {
-    name: 'journal-legacy',
-    path: '/journal',
-    segment: 'consumer',
-    role: 'consumer',
-    layout: 'app',
-    component: 'B2CJournalPage',
-    guard: true,
-    deprecated: true, // Redirection vers /app/journal
-  },
-  {
-    name: 'music-legacy',
-    path: '/music',
-    segment: 'consumer',
-    role: 'consumer',
-    layout: 'app',
-    component: 'B2CMusicEnhancedPage',
-    guard: true,
-    deprecated: true, // Redirection vers /app/music
-  },
+  // Routes legacy supprimées - redirection automatique via aliases dans les routes principales
   // emotions-legacy supprimé - utiliser /app/scan directement
   {
     name: 'reporting',
@@ -2143,19 +2106,7 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: true,
   },
   
-  // Navigation Hub
-  {
-    name: 'navigation-hub',
-    path: '/navigation',
-    segment: 'public',
-    layout: 'simple',
-    component: 'NavigationPage',
-    guard: false,
-    meta: {
-      title: 'Navigation - EmotionsCare',
-      description: 'Explorez toutes les fonctionnalités EmotionsCare',
-    },
-  },
+  // Navigation Hub - DOUBLON SUPPRIMÉ (défini ligne 781)
   
   // Gamification avancée
   {
