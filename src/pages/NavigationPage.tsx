@@ -399,6 +399,7 @@ const allRoutes: RouteItem[] = [
   // ═══════════════════════════════════════════════════════════
   { path: '/admin/challenges', label: 'Admin Challenges', description: 'Gestion défis', category: 'Admin Gamification', icon: Trophy, requiresAuth: true },
   { path: '/admin/challenges/create', label: 'Créer Challenge', description: 'Nouveau challenge', category: 'Admin Gamification', icon: Zap, requiresAuth: true },
+  { path: '/admin/module-sync', label: 'Sync Modules', description: 'Synchronisation front/back', category: 'Admin Système', icon: RefreshCw, requiresAuth: true },
   
   // ═══════════════════════════════════════════════════════════
   // PAGES SYSTÈME

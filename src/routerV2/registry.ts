@@ -2290,6 +2290,16 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     requireAuth: true,
   },
   {
+    name: 'admin-module-sync',
+    path: '/admin/module-sync',
+    segment: 'manager',
+    role: 'manager',
+    layout: 'app',
+    component: 'ModuleSyncPage',
+    guard: true,
+    requireAuth: true,
+  },
+  {
     name: 'admin-recommendation-engine',
     path: '/admin/recommendation-engine',
     segment: 'manager',
