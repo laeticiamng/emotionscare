@@ -778,6 +778,15 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: false,
   },
   {
+    name: 'navigation-hub',
+    path: '/navigation',
+    segment: 'public',
+    layout: 'simple',
+    component: 'NavigationPage',
+    guard: false,
+    aliases: ['/all-pages', '/sitemap'],
+  },
+  {
     name: 'nyvee-cocon',
     path: '/app/nyvee',
     segment: 'consumer',

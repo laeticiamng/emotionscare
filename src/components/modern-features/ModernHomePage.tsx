@@ -143,6 +143,14 @@ const ModernHomePage: React.FC = () => {
           </Link>
           
           <nav className="flex items-center gap-2 sm:gap-4" aria-label="Navigation principale">
+            {/* Lien vers toutes les pages */}
+            <Link to="/navigation">
+              <Button variant="ghost" size="sm" className="gap-2">
+                <Map className="h-4 w-4" aria-hidden="true" />
+                <span className="hidden sm:inline">Explorer</span>
+              </Button>
+            </Link>
+            
             {/* Bouton Entreprise B2B - toujours visible */}
             <Link to="/b2b">
               <Button variant="outline" size="sm" className="gap-2 border-blue-500/50 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950">

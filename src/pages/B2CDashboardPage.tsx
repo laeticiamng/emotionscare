@@ -31,6 +31,7 @@ import {
   Bell,
   Activity,
   Calendar,
+  Compass,
 } from 'lucide-react';
 import { useAccessibilityAudit } from '@/lib/accessibility-checker';
 import { motion, useReducedMotion } from 'framer-motion';
@@ -274,6 +275,18 @@ export default function B2CDashboardPage() {
               </Badge>
             </div>
             <div className="flex items-center space-x-2">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="sm" asChild aria-label="Explorer tous les modules">
+                      <Link to="/navigation">
+                        <Compass className="h-4 w-4" aria-hidden="true" />
+                      </Link>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Explorer tous les modules</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
