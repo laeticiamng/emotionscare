@@ -2753,6 +2753,187 @@ export type Database = {
         }
         Relationships: []
       }
+      bounce_back_players: {
+        Row: {
+          avatar_emoji: string | null
+          best_comeback: number | null
+          current_streak: number | null
+          display_name: string
+          id: string
+          is_eliminated: boolean | null
+          joined_at: string
+          resilience_score: number | null
+          rounds_won: number | null
+          tournament_id: string
+          user_id: string
+        }
+        Insert: {
+          avatar_emoji?: string | null
+          best_comeback?: number | null
+          current_streak?: number | null
+          display_name: string
+          id?: string
+          is_eliminated?: boolean | null
+          joined_at?: string
+          resilience_score?: number | null
+          rounds_won?: number | null
+          tournament_id: string
+          user_id: string
+        }
+        Update: {
+          avatar_emoji?: string | null
+          best_comeback?: number | null
+          current_streak?: number | null
+          display_name?: string
+          id?: string
+          is_eliminated?: boolean | null
+          joined_at?: string
+          resilience_score?: number | null
+          rounds_won?: number | null
+          tournament_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bounce_back_players_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "bounce_back_tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bounce_back_rounds: {
+        Row: {
+          challenge_prompt: string
+          challenge_type: string
+          completions_count: number | null
+          ended_at: string | null
+          id: string
+          participants_count: number | null
+          round_number: number
+          started_at: string | null
+          time_limit_seconds: number | null
+          tournament_id: string
+        }
+        Insert: {
+          challenge_prompt: string
+          challenge_type?: string
+          completions_count?: number | null
+          ended_at?: string | null
+          id?: string
+          participants_count?: number | null
+          round_number: number
+          started_at?: string | null
+          time_limit_seconds?: number | null
+          tournament_id: string
+        }
+        Update: {
+          challenge_prompt?: string
+          challenge_type?: string
+          completions_count?: number | null
+          ended_at?: string | null
+          id?: string
+          participants_count?: number | null
+          round_number?: number
+          started_at?: string | null
+          time_limit_seconds?: number | null
+          tournament_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bounce_back_rounds_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "bounce_back_tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bounce_back_submissions: {
+        Row: {
+          id: string
+          player_id: string
+          response: string
+          round_id: string
+          score: number | null
+          submitted_at: string
+          time_taken_seconds: number | null
+        }
+        Insert: {
+          id?: string
+          player_id: string
+          response: string
+          round_id: string
+          score?: number | null
+          submitted_at?: string
+          time_taken_seconds?: number | null
+        }
+        Update: {
+          id?: string
+          player_id?: string
+          response?: string
+          round_id?: string
+          score?: number | null
+          submitted_at?: string
+          time_taken_seconds?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bounce_back_submissions_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "bounce_back_players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bounce_back_submissions_round_id_fkey"
+            columns: ["round_id"]
+            isOneToOne: false
+            referencedRelation: "bounce_back_rounds"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bounce_back_tournaments: {
+        Row: {
+          created_at: string
+          current_round: number | null
+          description: string | null
+          id: string
+          max_players: number
+          name: string
+          phase: string
+          prize_xp: number | null
+          starts_at: string
+          total_rounds: number | null
+        }
+        Insert: {
+          created_at?: string
+          current_round?: number | null
+          description?: string | null
+          id?: string
+          max_players?: number
+          name: string
+          phase?: string
+          prize_xp?: number | null
+          starts_at?: string
+          total_rounds?: number | null
+        }
+        Update: {
+          created_at?: string
+          current_round?: number | null
+          description?: string | null
+          id?: string
+          max_players?: number
+          name?: string
+          phase?: string
+          prize_xp?: number | null
+          starts_at?: string
+          total_rounds?: number | null
+        }
+        Relationships: []
+      }
       bounce_battles: {
         Row: {
           created_at: string | null
@@ -4758,6 +4939,35 @@ export type Database = {
           },
         ]
       }
+      community_post_likes: {
+        Row: {
+          created_at: string
+          id: string
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "community_post_likes_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "community_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       community_posts: {
         Row: {
           author_id: string
@@ -6113,6 +6323,33 @@ export type Database = {
           id?: number
           intéret?: string | null
           prénom?: string
+        }
+        Relationships: []
+      }
+      direct_messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          is_read: boolean | null
+          receiver_id: string
+          sender_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          is_read?: boolean | null
+          receiver_id: string
+          sender_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          is_read?: boolean | null
+          receiver_id?: string
+          sender_id?: string
         }
         Relationships: []
       }
@@ -18981,6 +19218,102 @@ export type Database = {
         }
         Relationships: []
       }
+      resource_bookmarks: {
+        Row: {
+          created_at: string
+          id: string
+          resource_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          resource_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          resource_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "resource_bookmarks_resource_id_fkey"
+            columns: ["resource_id"]
+            isOneToOne: false
+            referencedRelation: "shared_resources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      resource_comments: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          likes_count: number | null
+          resource_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          likes_count?: number | null
+          resource_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          likes_count?: number | null
+          resource_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "resource_comments_resource_id_fkey"
+            columns: ["resource_id"]
+            isOneToOne: false
+            referencedRelation: "shared_resources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      resource_likes: {
+        Row: {
+          created_at: string
+          id: string
+          resource_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          resource_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          resource_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "resource_likes_resource_id_fkey"
+            columns: ["resource_id"]
+            isOneToOne: false
+            referencedRelation: "shared_resources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       retention_notifications: {
         Row: {
           acknowledged: boolean | null
@@ -20365,6 +20698,57 @@ export type Database = {
           },
         ]
       }
+      shared_resources: {
+        Row: {
+          author_id: string
+          comments_count: number | null
+          created_at: string
+          description: string | null
+          downloads_count: number | null
+          id: string
+          is_approved: boolean | null
+          likes_count: number | null
+          resource_type: string
+          tags: string[] | null
+          title: string
+          updated_at: string
+          url: string
+          views_count: number | null
+        }
+        Insert: {
+          author_id: string
+          comments_count?: number | null
+          created_at?: string
+          description?: string | null
+          downloads_count?: number | null
+          id?: string
+          is_approved?: boolean | null
+          likes_count?: number | null
+          resource_type?: string
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+          url: string
+          views_count?: number | null
+        }
+        Update: {
+          author_id?: string
+          comments_count?: number | null
+          created_at?: string
+          description?: string | null
+          downloads_count?: number | null
+          id?: string
+          is_approved?: boolean | null
+          likes_count?: number | null
+          resource_type?: string
+          tags?: string[] | null
+          title?: string
+          updated_at?: string
+          url?: string
+          views_count?: number | null
+        }
+        Relationships: []
+      }
       shopify_purchases: {
         Row: {
           activated_at: string | null
@@ -21060,6 +21444,74 @@ export type Database = {
           song_id?: string
           user_agent?: string | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      study_group_members: {
+        Row: {
+          group_id: string
+          id: string
+          joined_at: string
+          role: string | null
+          user_id: string
+        }
+        Insert: {
+          group_id: string
+          id?: string
+          joined_at?: string
+          role?: string | null
+          user_id: string
+        }
+        Update: {
+          group_id?: string
+          id?: string
+          joined_at?: string
+          role?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "study_group_members_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "study_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      study_groups: {
+        Row: {
+          category: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          is_public: boolean | null
+          last_activity_at: string | null
+          member_count: number | null
+          name: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_public?: boolean | null
+          last_activity_at?: string | null
+          member_count?: number | null
+          name: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_public?: boolean | null
+          last_activity_at?: string | null
+          member_count?: number | null
+          name?: string
         }
         Relationships: []
       }
@@ -27347,6 +27799,10 @@ export type Database = {
       }
       decrement_post_comments: { Args: { post_id: string }; Returns: undefined }
       decrement_post_likes: { Args: { post_id: string }; Returns: undefined }
+      decrement_preset_likes: {
+        Args: { p_preset_id: string }
+        Returns: undefined
+      }
       decrypt_sensitive_data: {
         Args: { p_ciphertext: string; p_key_name?: string }
         Returns: string
@@ -28153,6 +28609,14 @@ export type Database = {
       }
       increment_post_comments: { Args: { post_id: string }; Returns: undefined }
       increment_post_likes: { Args: { post_id: string }; Returns: undefined }
+      increment_preset_likes: {
+        Args: { p_preset_id: string }
+        Returns: undefined
+      }
+      increment_preset_uses: {
+        Args: { p_preset_id: string }
+        Returns: undefined
+      }
       increment_rate_limit_counter: {
         Args: {
           p_identifier: string
