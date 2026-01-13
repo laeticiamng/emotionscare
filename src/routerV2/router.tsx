@@ -352,6 +352,13 @@ const CommunityPage = lazy(() => import('@/pages/CommunityPage'));
 const WearablesPage = lazy(() => import('@/pages/WearablesPage'));
 const NotificationSettingsPage = lazy(() => import('@/pages/NotificationSettingsPage'));
 
+// Pages manquantes - ajoutées pour cohérence registry
+const HumeAIRealtimePage = lazy(() => import('@/pages/HumeAIRealtimePage'));
+const SunoMusicGeneratorPage = lazy(() => import('@/pages/SunoMusicGeneratorPage'));
+const AurasLeaderboardPage = lazy(() => import('@/pages/AurasLeaderboardPage'));
+const ConsentManagementPage = lazy(() => import('@/pages/ConsentManagementPage'));
+const AccountDeletionPage = lazy(() => import('@/pages/AccountDeletionPage'));
+
 // ═══════════════════════════════════════════════════════════
 // MAPPING DES COMPOSANTS
 // ═══════════════════════════════════════════════════════════
@@ -652,6 +659,13 @@ const componentMap: Record<string, React.LazyExoticComponent<React.ComponentType
   CommunityPage,
   WearablesPage,
   NotificationSettingsPage,
+  
+  // Pages manquantes - cohérence registry
+  HumeAIRealtimePage,
+  SunoMusicGeneratorPage,
+  AurasLeaderboardPage,
+  ConsentManagementPage,
+  AccountDeletionPage,
   
   // GDPR & Compliance - avec alias pour registry
   UnifiedGDPRDashboard,
