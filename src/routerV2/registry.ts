@@ -907,27 +907,8 @@ export const ROUTES_REGISTRY: RouteMeta[] = [
     guard: true,
     aliases: ['/screen-silk-break'],
   },
-  {
-    name: 'vr-breath-guide',
-    path: '/app/vr-breath-guide',
-    segment: 'consumer',
-    role: 'consumer',
-    layout: 'app-sidebar',
-    component: 'B2CVRBreathGuidePage',
-    guard: true,
-    aliases: ['/vr-breath-ariane'],
-  },
-  {
-    name: 'vr-galaxy',
-    path: '/app/vr-galaxy',
-    segment: 'consumer',
-    role: 'consumer',
-    layout: 'app-sidebar',
-    component: 'B2CVRGalaxyPage',
-    guard: true,
-    aliases: ['/vr-galactique'],
-  },
-  // Route fusionnée avec vr-breath-guide (ligne 505-513) - utiliser B2CVRBreathGuidePage
+  // Routes VR déjà définies aux lignes 676-686 et 666-675
+  // Doublons supprimés pour éviter conflits
   {
     name: 'boss-grit',
     path: '/app/boss-grit',
