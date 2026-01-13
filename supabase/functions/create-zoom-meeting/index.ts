@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Edge function pour créer une réunion Zoom
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from '../_shared/supabase.ts'
