@@ -779,6 +779,44 @@ export default function B2CDashboardPage() {
             </CardContent>
           </Card>
         </section>
+
+        {/* Explorer tous les modules */}
+        <section aria-labelledby="explore-modules" className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h2 id="explore-modules" className="text-xl font-semibold flex items-center gap-2">
+              <Compass className="h-5 w-5 text-primary" aria-hidden="true" />
+              Explorer tous les modules
+            </h2>
+            <Button asChild variant="outline" size="sm">
+              <Link to="/navigation">Voir tout →</Link>
+            </Button>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+            {[
+              { to: '/app/vr-galaxy', icon: '🌌', label: 'VR Galaxy' },
+              { to: '/app/story-synth', icon: '📖', label: 'Story Synth' },
+              { to: '/app/boss-grit', icon: '💪', label: 'Boss Grit' },
+              { to: '/app/tournaments', icon: '🏆', label: 'Tournois' },
+              { to: '/app/guilds', icon: '⚔️', label: 'Guildes' },
+              { to: '/app/wearables', icon: '⌚', label: 'Wearables' },
+              { to: '/app/voice-analysis', icon: '🎙️', label: 'Voice Analysis' },
+              { to: '/app/timecraft', icon: '⏰', label: 'TimeCraft' },
+              { to: '/app/daily-challenges', icon: '🎯', label: 'Défis du jour' },
+              { to: '/app/workshops', icon: '🎓', label: 'Ateliers' },
+              { to: '/app/webinars', icon: '📺', label: 'Webinaires' },
+              { to: '/app/themes', icon: '🎨', label: 'Thèmes' },
+            ].map((item) => (
+              <Link
+                key={item.to}
+                to={item.to}
+                className="flex flex-col items-center gap-2 p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors text-center"
+              >
+                <span className="text-2xl" aria-hidden="true">{item.icon}</span>
+                <span className="text-xs font-medium">{item.label}</span>
+              </Link>
+            ))}
+          </div>
+        </section>
       </main>
 
       {/* Footer */}
