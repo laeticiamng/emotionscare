@@ -33,12 +33,12 @@ const VINYL_PROMPTS: Record<string, { prompt: string; style: string; mood: strin
   }
 };
 
-// Fallback URLs (Pixabay) si Suno échoue
+// Fallback URLs - Audio libre de droits (Internet Archive/Freesound)
 const FALLBACK_URLS: Record<string, string> = {
-  'doux': 'https://cdn.pixabay.com/audio/2022/05/27/audio_1808fbf07a.mp3',
-  'énergique': 'https://cdn.pixabay.com/audio/2022/10/25/audio_946b0939c5.mp3',
-  'créatif': 'https://cdn.pixabay.com/audio/2022/08/02/audio_884fe92c21.mp3',
-  'guérison': 'https://cdn.pixabay.com/audio/2022/02/22/audio_d1718ab41b.mp3'
+  'doux': 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
+  'énergique': 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
+  'créatif': 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
+  'guérison': 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3'
 };
 
 interface GenerationState {
