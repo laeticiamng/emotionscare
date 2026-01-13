@@ -1,20 +1,62 @@
 /**
  * Journal Feature
- *
- * Public exports for the journal feature.
- * Only export what's needed by other parts of the application.
+ * 
+ * Vocal and text journal with AI enrichment.
+ * @module features/journal
  */
 
-// Export hooks
-export { useJournalEntries } from './hooks/useJournalEntries';
-// export { useCreateEntry } from './hooks/useCreateEntry';
-// export { useUpdateEntry } from './hooks/useUpdateEntry';
-// export { useDeleteEntry } from './hooks/useDeleteEntry';
+// ============================================================================
+// SERVICES
+// ============================================================================
 
-// Export services
 export { journalApi } from './services/journalApi';
 
-// Export components (when created)
-// export { JournalEditor } from './components/JournalEditor';
-// export { JournalList } from './components/JournalList';
-// export { JournalCard } from './components/JournalCard';
+// Re-export from modules
+export { journalService } from '@/modules/journal';
+
+// ============================================================================
+// HOOKS
+// ============================================================================
+
+export { useJournalEntries } from './hooks/useJournalEntries';
+
+// Re-export from modules
+export {
+  useJournalMachine,
+  useJournalComposer,
+  usePanasSuggestions,
+  useJournalEnriched,
+} from '@/modules/journal';
+
+// ============================================================================
+// COMPONENTS
+// ============================================================================
+
+// Re-export from modules
+export {
+  WhisperInput,
+  SummaryChip,
+  BurnSealToggle,
+  JournalComposer,
+  JournalPromptCard,
+  JournalRemindersList,
+  JournalStatsCard,
+  JournalEditDialog,
+  JournalNoteActions,
+} from '@/modules/journal';
+
+// ============================================================================
+// TYPES
+// ============================================================================
+
+export type {
+  JournalEntry,
+  JournalVoiceEntry,
+  JournalTextEntry,
+  Note,
+  SanitizedNote,
+  FeedQuery,
+  JournalStats,
+  JournalTab,
+  UseJournalEnrichedReturn,
+} from '@/modules/journal';
