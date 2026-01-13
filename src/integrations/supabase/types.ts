@@ -5051,6 +5051,57 @@ export type Database = {
           },
         ]
       }
+      community_presets: {
+        Row: {
+          category: string | null
+          created_at: string
+          creator_id: string
+          creator_name: string
+          description: string | null
+          downloads_count: number | null
+          id: string
+          is_featured: boolean | null
+          is_public: boolean | null
+          likes_count: number | null
+          name: string
+          preset_data: Json
+          tags: string[] | null
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          creator_id: string
+          creator_name: string
+          description?: string | null
+          downloads_count?: number | null
+          id?: string
+          is_featured?: boolean | null
+          is_public?: boolean | null
+          likes_count?: number | null
+          name: string
+          preset_data?: Json
+          tags?: string[] | null
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          creator_id?: string
+          creator_name?: string
+          description?: string | null
+          downloads_count?: number | null
+          id?: string
+          is_featured?: boolean | null
+          is_public?: boolean | null
+          likes_count?: number | null
+          name?: string
+          preset_data?: Json
+          tags?: string[] | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       community_reports: {
         Row: {
           comment_id: string | null
@@ -10642,6 +10693,51 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      guilds: {
+        Row: {
+          banner_emoji: string | null
+          created_at: string
+          description: string | null
+          id: string
+          is_public: boolean | null
+          leader_id: string
+          level: number | null
+          max_members: number | null
+          member_count: number | null
+          name: string
+          tags: string[] | null
+          total_xp: number | null
+        }
+        Insert: {
+          banner_emoji?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_public?: boolean | null
+          leader_id: string
+          level?: number | null
+          max_members?: number | null
+          member_count?: number | null
+          name: string
+          tags?: string[] | null
+          total_xp?: number | null
+        }
+        Update: {
+          banner_emoji?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_public?: boolean | null
+          leader_id?: string
+          level?: number | null
+          max_members?: number | null
+          member_count?: number | null
+          name?: string
+          tags?: string[] | null
+          total_xp?: number | null
+        }
+        Relationships: []
       }
       health_data: {
         Row: {
@@ -18051,6 +18147,35 @@ export type Database = {
         }
         Relationships: []
       }
+      preset_likes: {
+        Row: {
+          created_at: string
+          id: string
+          preset_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          preset_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          preset_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "preset_likes_preset_id_fkey"
+            columns: ["preset_id"]
+            isOneToOne: false
+            referencedRelation: "community_presets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       privacy_consents: {
         Row: {
           consent_type: string
@@ -22825,6 +22950,59 @@ export type Database = {
           },
         ]
       }
+      tournament_participants: {
+        Row: {
+          avatar_emoji: string | null
+          current_round: number | null
+          display_name: string
+          id: string
+          is_eliminated: boolean | null
+          losses: number | null
+          registered_at: string
+          seed: number | null
+          total_score: number | null
+          tournament_id: string
+          user_id: string
+          wins: number | null
+        }
+        Insert: {
+          avatar_emoji?: string | null
+          current_round?: number | null
+          display_name: string
+          id?: string
+          is_eliminated?: boolean | null
+          losses?: number | null
+          registered_at?: string
+          seed?: number | null
+          total_score?: number | null
+          tournament_id: string
+          user_id: string
+          wins?: number | null
+        }
+        Update: {
+          avatar_emoji?: string | null
+          current_round?: number | null
+          display_name?: string
+          id?: string
+          is_eliminated?: boolean | null
+          losses?: number | null
+          registered_at?: string
+          seed?: number | null
+          total_score?: number | null
+          tournament_id?: string
+          user_id?: string
+          wins?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tournament_participants_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tournament_registrations: {
         Row: {
           id: string
@@ -26408,6 +26586,47 @@ export type Database = {
         }
         Relationships: []
       }
+      user_weekly_progress: {
+        Row: {
+          challenge_id: string
+          completed: boolean | null
+          completed_at: string | null
+          created_at: string
+          current_value: number | null
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          challenge_id: string
+          completed?: boolean | null
+          completed_at?: string | null
+          created_at?: string
+          current_value?: number | null
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          challenge_id?: string
+          completed?: boolean | null
+          completed_at?: string | null
+          created_at?: string
+          current_value?: number | null
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_weekly_progress_challenge_id_fkey"
+            columns: ["challenge_id"]
+            isOneToOne: false
+            referencedRelation: "weekly_challenges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_wellness_chests: {
         Row: {
           chest_type: string
@@ -27159,6 +27378,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      weekly_challenges: {
+        Row: {
+          badge_reward: string | null
+          challenge_type: string
+          created_at: string
+          description: string
+          ends_at: string
+          id: string
+          is_active: boolean | null
+          starts_at: string
+          target_value: number
+          title: string
+          xp_reward: number | null
+        }
+        Insert: {
+          badge_reward?: string | null
+          challenge_type: string
+          created_at?: string
+          description: string
+          ends_at: string
+          id?: string
+          is_active?: boolean | null
+          starts_at: string
+          target_value: number
+          title: string
+          xp_reward?: number | null
+        }
+        Update: {
+          badge_reward?: string | null
+          challenge_type?: string
+          created_at?: string
+          description?: string
+          ends_at?: string
+          id?: string
+          is_active?: boolean | null
+          starts_at?: string
+          target_value?: number
+          title?: string
+          xp_reward?: number | null
+        }
+        Relationships: []
       }
       weekly_garden: {
         Row: {
