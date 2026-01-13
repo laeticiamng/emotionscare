@@ -33,15 +33,16 @@ const VINYL_PROMPTS: Record<string, { prompt: string; style: string; mood: strin
   }
 };
 
-// Version du cache - incrémenter pour invalider les anciens caches
-const CACHE_VERSION = 2;
+// Version du cache - incrémentée à 3 pour invalider les caches avec OGG non supporté
+const CACHE_VERSION = 3;
 
-// Fallback URLs - Audio MP3 de test (commondatastorage Google - 100% fiable)
+// Version du cache incrémentée pour forcer le rafraîchissement avec nouveaux URLs MP3
+// Fallback URLs - Audio MP3 100% compatibles (format universel)
 const FALLBACK_URLS: Record<string, string> = {
   'doux': 'https://commondatastorage.googleapis.com/codeskulptor-demos/DDR_assets/Kan6_Cannon.mp3',
   'énergique': 'https://commondatastorage.googleapis.com/codeskulptor-demos/DDR_assets/Sevish_-__Happy_Sundays.mp3',
   'créatif': 'https://commondatastorage.googleapis.com/codeskulptor-demos/DDR_assets/Kanon_Kabin.mp3',
-  'guérison': 'https://commondatastorage.googleapis.com/codeskulptor-assets/Epoq-Lepidoptera.ogg'
+  'guérison': 'https://commondatastorage.googleapis.com/codeskulptor-demos/DDR_assets/Kan_Kan.mp3'
 };
 
 interface GenerationState {
