@@ -10,7 +10,16 @@ import {
   Heart,
   Music,
   MessageSquare,
-  HelpCircle
+  HelpCircle,
+  Brain,
+  Wind,
+  Sparkles,
+  BookOpen,
+  Eye,
+  Gamepad2,
+  Target,
+  Compass,
+  Grid3X3
 } from "lucide-react"
 import { NavLink, useLocation } from "react-router-dom"
 
@@ -27,28 +36,61 @@ import {
   SidebarFooter,
   useSidebar,
 } from "@/components/ui/sidebar"
-import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { ThemeToggle } from "@/components/ui/theme-toggle"
 
 const mainItems = [
   { title: "Accueil", url: "/", icon: Home },
-  { title: "Dashboard", url: "/dashboard", icon: BarChart3 },
-  { title: "Journal", url: "/journal", icon: FileText },
-  { title: "Émotions", url: "/emotions", icon: Heart },
-  { title: "Musique", url: "/music", icon: Music },
+  { title: "Mon Espace", url: "/app/home", icon: BarChart3 },
+  { title: "Tous les Modules", url: "/navigation", icon: Grid3X3 },
+]
+
+const analysisItems = [
+  { title: "Scanner Émotionnel", url: "/app/scan", icon: Brain },
+  { title: "Hume AI Realtime", url: "/app/hume-realtime", icon: Sparkles },
+]
+
+const wellnessItems = [
+  { title: "Flash Glow", url: "/app/flash-glow", icon: Sparkles },
+  { title: "Respiration", url: "/app/breath", icon: Wind },
+  { title: "Méditation", url: "/app/meditation", icon: Heart },
+  { title: "Bubble Beat", url: "/app/bubble-beat", icon: Target },
+]
+
+const contentItems = [
+  { title: "Musicothérapie", url: "/app/music", icon: Music },
+  { title: "Journal", url: "/app/journal", icon: BookOpen },
+  { title: "Coach IA", url: "/app/coach", icon: Brain },
+]
+
+const immersiveItems = [
+  { title: "Espace VR", url: "/app/vr", icon: Eye },
+  { title: "Parc Émotionnel", url: "/app/emotional-park", icon: Compass },
+  { title: "AR Filters", url: "/app/face-ar", icon: Eye },
+]
+
+const gamificationItems = [
+  { title: "Défis", url: "/app/challenges", icon: Target },
+  { title: "Badges", url: "/app/badges", icon: Gamepad2 },
+  { title: "Classements", url: "/app/leaderboard", icon: BarChart3 },
+]
+
+const socialItems = [
+  { title: "Communauté", url: "/app/community", icon: Users },
   { title: "Messages", url: "/messages", icon: MessageSquare },
+  { title: "Buddies", url: "/app/buddies", icon: Users },
 ]
 
 const settingsItems = [
-  { title: "Profil", url: "/profile", icon: Users },
-  { title: "Paramètres", url: "/settings", icon: Settings },
-  { title: "Confidentialité", url: "/privacy", icon: Shield },
+  { title: "Profil", url: "/app/profile", icon: Users },
+  { title: "Paramètres", url: "/settings/general", icon: Settings },
+  { title: "Confidentialité", url: "/settings/privacy", icon: Shield },
   { title: "Calendrier", url: "/calendar", icon: Calendar },
 ]
 
 const supportItems = [
   { title: "Aide", url: "/help", icon: HelpCircle },
+  { title: "Support", url: "/app/support", icon: MessageSquare },
 ]
 
 export function AppSidebar() {
@@ -56,9 +98,33 @@ export function AppSidebar() {
   const { state } = useSidebar()
   const currentPath = location.pathname
 
-  const isActive = (path: string) => currentPath === path
+  const isActive = (path: string) => currentPath === path || (path !== '/' && currentPath.startsWith(path))
   const getNavCls = (active: boolean) =>
     active ? "bg-primary/10 text-primary font-medium" : "hover:bg-muted/50"
+
+  const renderMenuGroup = (items: typeof mainItems, label: string) => (
+    <SidebarGroup>
+      <SidebarGroupLabel>{label}</SidebarGroupLabel>
+      <SidebarGroupContent>
+        <SidebarMenu>
+          {items.map((item) => (
+            <SidebarMenuItem key={item.title}>
+              <SidebarMenuButton 
+                asChild 
+                isActive={isActive(item.url)}
+                tooltip={state === "closed" ? item.title : undefined}
+              >
+                <NavLink to={item.url} className={getNavCls(isActive(item.url))}>
+                  <item.icon className="h-4 w-4" />
+                  <span>{item.title}</span>
+                </NavLink>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          ))}
+        </SidebarMenu>
+      </SidebarGroupContent>
+    </SidebarGroup>
+  )
 
   return (
     <Sidebar collapsible="icon" className="border-r">
@@ -78,71 +144,15 @@ export function AppSidebar() {
       </SidebarHeader>
 
       <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {mainItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton 
-                    asChild 
-                    isActive={isActive(item.url)}
-                    tooltip={state === "closed" ? item.title : undefined}
-                  >
-                    <NavLink to={item.url} className={getNavCls(isActive(item.url))}>
-                      <item.icon className="h-4 w-4" />
-                      <span>{item.title}</span>
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-
-        <SidebarGroup>
-          <SidebarGroupLabel>Configuration</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {settingsItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton 
-                    asChild 
-                    isActive={isActive(item.url)}
-                    tooltip={state === "closed" ? item.title : undefined}
-                  >
-                    <NavLink to={item.url} className={getNavCls(isActive(item.url))}>
-                      <item.icon className="h-4 w-4" />
-                      <span>{item.title}</span>
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-
-        <SidebarGroup>
-          <SidebarGroupLabel>Support</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {supportItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton 
-                    asChild 
-                    isActive={isActive(item.url)}
-                    tooltip={state === "closed" ? item.title : undefined}
-                  >
-                    <NavLink to={item.url} className={getNavCls(isActive(item.url))}>
-                      <item.icon className="h-4 w-4" />
-                      <span>{item.title}</span>
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        {renderMenuGroup(mainItems, "Navigation")}
+        {renderMenuGroup(analysisItems, "Analyse")}
+        {renderMenuGroup(wellnessItems, "Bien-être")}
+        {renderMenuGroup(contentItems, "Contenu")}
+        {renderMenuGroup(immersiveItems, "Immersif")}
+        {renderMenuGroup(gamificationItems, "Gamification")}
+        {renderMenuGroup(socialItems, "Social")}
+        {renderMenuGroup(settingsItems, "Configuration")}
+        {renderMenuGroup(supportItems, "Support")}
       </SidebarContent>
 
       <SidebarFooter className="border-t">
