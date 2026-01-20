@@ -17,7 +17,6 @@ export { journalService } from '@/modules/journal';
 // ============================================================================
 // HOOKS
 // ============================================================================
-
 export { useJournalEntries } from './hooks/useJournalEntries';
 
 // Re-export from modules
@@ -27,6 +26,16 @@ export {
   usePanasSuggestions,
   useJournalEnriched,
 } from '@/modules/journal';
+
+// Hooks additionnels depuis racine
+export { useJournal } from '@/hooks/useJournal';
+export { useJournalExport } from '@/hooks/useJournalExport';
+export { useJournalFavorites } from '@/hooks/useJournalFavorites';
+export { useJournalMutations } from '@/hooks/useJournalMutations';
+export { useJournalNotes } from '@/hooks/useJournalNotes';
+export { useJournalPrompts } from '@/hooks/useJournalPrompts';
+export { useJournalReminders } from '@/hooks/useJournalReminders';
+export { useJournalSettings } from '@/hooks/useJournalSettings';
 
 // ============================================================================
 // COMPONENTS

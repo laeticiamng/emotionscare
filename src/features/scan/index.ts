@@ -8,7 +8,9 @@ export { default as CameraSampler } from './CameraSampler';
 export { default as MicroGestes } from './MicroGestes';
 export { default as SamSliders } from './SamSliders';
 
-// Hooks (re-exports depuis hooks racine pour rétrocompatibilité)
+// ============================================================================
+// HOOKS
+// ============================================================================
 export { useScan } from '@/hooks/useScan';
 export { useScanHistory } from '@/hooks/useScanHistory';
 export { useScanSettings } from '@/hooks/useScanSettings';
@@ -16,6 +18,17 @@ export { useScanRealtime } from '@/hooks/useScanRealtime';
 export { useEmotionScan } from '@/hooks/useEmotionScan';
 export { useEnhancedEmotionScan } from '@/hooks/useEnhancedEmotionScan';
 export { useMultiSourceScan } from '@/hooks/useMultiSourceScan';
+export { useScanPageState } from '@/hooks/useScanPageState';
+export { useEmotionScanHistory } from '@/hooks/useEmotionScanHistory';
+export { useScanReminders } from '@/hooks/useScanReminders';
+export { useScanBackground } from '@/hooks/useScanBackground';
+
+// Emotion hooks
+export { useEmotionAnalysis } from '@/hooks/emotion/useEmotionAnalysis';
+export { useEmotionFusion } from '@/hooks/useEmotionFusion';
+export { useEmotionVisualizer } from '@/hooks/useEmotionVisualizer';
+export { useEmotionRecommendations } from '@/hooks/useEmotionRecommendations';
+export { useEmotionAnalytics } from '@/hooks/useEmotionAnalytics';
 
 // Types
 export interface ScanResult {

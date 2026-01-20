@@ -6,13 +6,47 @@
  */
 
 // ============================================================================
+// HOOKS - Re-export depuis le dossier hooks/community organisé
+// ============================================================================
+export {
+  useCommunityPosts,
+  useCommunityGroups,
+  useCommunityComments,
+  useFollow,
+  useMyFollowStats,
+  useRealtimeNotifications,
+  useCommunitySearch,
+  useTrendingTags,
+} from '@/hooks/community';
+
+export type {
+  UseCommunityPostsOptions,
+  UseCommunityPostsReturn,
+  UseCommunityGroupsReturn,
+  Comment as CommunityComment,
+  UseCommunityCommentsReturn,
+  UseFollowReturn,
+  Notification,
+  UseRealtimeNotificationsReturn,
+  SearchResult,
+  UseCommunitySearchReturn,
+  UseTrendingTagsReturn,
+} from '@/hooks/community';
+
+// Hooks additionnels
+export { useCommunityEnhancements } from '@/hooks/useCommunityEnhancements';
+export { useCommunityRecommendations } from '@/hooks/useCommunityRecommendations';
+
+// ============================================================================
 // COMPONENTS
 // ============================================================================
-
 export { default as EmpathicRepliesPanel } from './EmpathicRepliesPanel';
 export { default as ListenTwoMinutesBanner } from './ListenTwoMinutesBanner';
+export { CommunityPresetsGallery } from '@/components/community/CommunityPresetsGallery';
 
-// Re-export from modules for backwards compatibility
+// ============================================================================
+// SERVICES - Re-export from modules
+// ============================================================================
 export {
   CommunityService,
   CommunityFollowService,
@@ -23,6 +57,9 @@ export {
   CommunityMentionService,
 } from '@/modules/community';
 
+// ============================================================================
+// TYPES
+// ============================================================================
 export type {
   CommunityStats,
   ModerationStatus,
@@ -37,7 +74,6 @@ export type {
   AuraConnection,
   Buddy,
   Post,
-  Comment,
   Group,
   Reaction,
   NotificationPayload,
@@ -47,9 +83,3 @@ export type {
   TrendingTag,
   CommunityMention,
 } from '@/modules/community';
-
-// ============================================================================
-// COMPONENTS - Community UI
-// ============================================================================
-
-export { CommunityPresetsGallery } from '@/components/community/CommunityPresetsGallery';

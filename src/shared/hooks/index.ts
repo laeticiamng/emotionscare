@@ -18,6 +18,7 @@ export { useKeyboardNavigation } from '@/hooks/useKeyboardNavigation';
 export { useLazyRender } from '@/hooks/useLazyRender';
 export { usePrefetchOnHover } from '@/hooks/usePrefetchOnHover';
 export { useOptimizedQuery } from '@/hooks/useOptimizedQuery';
+export { usePerformanceMonitoring } from '@/hooks/usePerformanceMonitoring';
 
 // ===== AUDIO =====
 export { default as useSound } from '@/hooks/useSound';
@@ -27,3 +28,20 @@ export { useHaptics } from '@/hooks/useHaptics';
 export { usePagination } from '@/hooks/usePagination';
 export { useLogger } from '@/hooks/useLogger';
 export { useErrorHandler } from '@/hooks/useErrorHandler';
+
+// ===== TOAST & NOTIFICATIONS =====
+export { useToast, toast } from '@/hooks/use-toast';
+
+// ===== AUTH =====
+export { useAuth } from '@/hooks/useAuth';
+
+// ===== ANALYTICS =====
+export { useAnalytics } from '@/hooks/useAnalytics';
+export { useAnalyticsConsent } from '@/hooks/useAnalyticsConsent';
+
+// ===== FORMS =====
+export { useFormAccessibility } from '@/hooks/use-form-accessibility';
+
+// ===== FEATURE FLAGS =====
+export { useFeatureFlags } from '@/hooks/useFeatureFlags';
+export { useFlags } from '@/hooks/useFlags';
