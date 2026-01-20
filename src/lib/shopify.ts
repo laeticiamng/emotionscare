@@ -3,7 +3,7 @@
  */
 
 import { toast } from 'sonner';
-import type { CartItem } from '@/stores/cartStore';
+import type { CartItem } from '@/store';
 import { logger } from '@/lib/logger';
 
 const SHOPIFY_API_VERSION = '2025-07';
