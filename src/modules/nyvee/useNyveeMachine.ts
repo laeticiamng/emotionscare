@@ -3,7 +3,7 @@
  */
 
 import { useCallback, useState } from 'react';
-import { nyveeService } from './nyveeService';
+import { nyveeService } from './nyveeServiceUnified';
 import type { 
   BreathingIntensity,
   SessionPhase,
