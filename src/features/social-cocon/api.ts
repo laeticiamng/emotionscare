@@ -1,4 +1,9 @@
-// @ts-nocheck
+/**
+ * Social Cocon API
+ *
+ * API functions for social rooms, breaks, and quiet hours.
+ */
+
 import { Sentry } from '@/lib/errors/sentry-compat';
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/lib/logger';

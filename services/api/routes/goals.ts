@@ -286,7 +286,73 @@ export function registerGoalRoutes(app: FastifyInstance, options: GoalRoutesOpti
     }
   });
 
-  // GET /api/v1/goals/:id - Détails d'un objectif
+  // IMPORTANT: Routes statiques AVANT les routes dynamiques (:id)
+  // GET /api/v1/goals/active - Objectifs actifs
+  app.get('/api/v1/goals/active', async (req: FastifyRequest, reply: FastifyReply) => {
+    const user = ensureUser(req, reply);
+    if (!user) return;
+
+    try {
+      const goals = await repository.listActiveGoals(user.sub);
+      reply.send({ ok: true, data: goals });
+    } catch (error) {
+      app.log.error({ error }, 'Unexpected error fetching active goals');
+      reply.code(500).send({
+        ok: false,
+        error: { code: 'internal_error', message: 'Internal server error' },
+      });
+    }
+  });
+
+  // GET /api/v1/goals/completed - Objectifs terminés
+  app.get('/api/v1/goals/completed', async (req: FastifyRequest, reply: FastifyReply) => {
+    const user = ensureUser(req, reply);
+    if (!user) return;
+
+    try {
+      const goals = await repository.listCompletedGoals(user.sub);
+      reply.send({ ok: true, data: goals });
+    } catch (error) {
+      app.log.error({ error }, 'Unexpected error fetching completed goals');
+      reply.code(500).send({
+        ok: false,
+        error: { code: 'internal_error', message: 'Internal server error' },
+      });
+    }
+  });
+
+  // GET /api/v1/goals/stats - Statistiques des objectifs
+  app.get('/api/v1/goals/stats', async (req: FastifyRequest, reply: FastifyReply) => {
+    const user = ensureUser(req, reply);
+    if (!user) return;
+
+    try {
+      const goals = await repository.listAllGoals(user.sub);
+
+      const total = goals.length;
+      const completed = goals.filter((g: any) => g.completed).length;
+      const active = total - completed;
+      const completionRate = total > 0 ? (completed / total) * 100 : 0;
+
+      reply.send({
+        ok: true,
+        data: {
+          total,
+          active,
+          completed,
+          completion_rate: completionRate,
+        },
+      });
+    } catch (error) {
+      app.log.error({ error }, 'Unexpected error fetching goals stats');
+      reply.code(500).send({
+        ok: false,
+        error: { code: 'internal_error', message: 'Internal server error' },
+      });
+    }
+  });
+
+  // GET /api/v1/goals/:id - Détails d'un objectif (routes dynamiques APRÈS les statiques)
   app.get('/api/v1/goals/:id', async (req: GoalGetRequest, reply: FastifyReply) => {
     const user = ensureUser(req, reply);
     if (!user) return;
@@ -438,68 +504,4 @@ export function registerGoalRoutes(app: FastifyInstance, options: GoalRoutesOpti
     }
   });
 
-  // GET /api/v1/goals/active - Objectifs actifs
-  app.get('/api/v1/goals/active', async (req: FastifyRequest, reply: FastifyReply) => {
-    const user = ensureUser(req, reply);
-    if (!user) return;
-
-    try {
-      const goals = await repository.listActiveGoals(user.sub);
-      reply.send({ ok: true, data: goals });
-    } catch (error) {
-      app.log.error({ error }, 'Unexpected error fetching active goals');
-      reply.code(500).send({
-        ok: false,
-        error: { code: 'internal_error', message: 'Internal server error' },
-      });
-    }
-  });
-
-  // GET /api/v1/goals/completed - Objectifs terminés
-  app.get('/api/v1/goals/completed', async (req: FastifyRequest, reply: FastifyReply) => {
-    const user = ensureUser(req, reply);
-    if (!user) return;
-
-    try {
-      const goals = await repository.listCompletedGoals(user.sub);
-      reply.send({ ok: true, data: goals });
-    } catch (error) {
-      app.log.error({ error }, 'Unexpected error fetching completed goals');
-      reply.code(500).send({
-        ok: false,
-        error: { code: 'internal_error', message: 'Internal server error' },
-      });
-    }
-  });
-
-  // GET /api/v1/goals/stats - Statistiques des objectifs
-  app.get('/api/v1/goals/stats', async (req: FastifyRequest, reply: FastifyReply) => {
-    const user = ensureUser(req, reply);
-    if (!user) return;
-
-    try {
-      const goals = await repository.listAllGoals(user.sub);
-
-      const total = goals.length;
-      const completed = goals.filter((g: any) => g.completed).length;
-      const active = total - completed;
-      const completionRate = total > 0 ? (completed / total) * 100 : 0;
-
-      reply.send({
-        ok: true,
-        data: {
-          total,
-          active,
-          completed,
-          completion_rate: completionRate,
-        },
-      });
-    } catch (error) {
-      app.log.error({ error }, 'Unexpected error fetching goals stats');
-      reply.code(500).send({
-        ok: false,
-        error: { code: 'internal_error', message: 'Internal server error' },
-      });
-    }
-  });
 }

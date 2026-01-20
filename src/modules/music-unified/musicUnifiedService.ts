@@ -416,6 +416,103 @@ export class MusicUnifiedService {
         ? moodSessions.reduce((sum, s) => sum + (s.mood_improvement || 0), 0) / moodSessions.length
         : 0;
 
+    // Calculer les moods les plus utilisés
+    const moodUsage: Record<string, number> = {};
+    const moodEffectiveness: Record<string, { total: number; count: number }> = {};
+    const hourUsage: Record<number, number> = {};
+
+    (sessions || []).forEach((s) => {
+      // Analyser mood_before pour les moods les plus utilisés
+      if (s.mood_before) {
+        const moodKey = typeof s.mood_before === 'string'
+          ? s.mood_before
+          : (s.mood_before as any).label || 'unknown';
+        moodUsage[moodKey] = (moodUsage[moodKey] || 0) + 1;
+
+        // Tracker l'efficacité par mood
+        if (s.therapeutic_effectiveness !== null && s.therapeutic_effectiveness !== undefined) {
+          if (!moodEffectiveness[moodKey]) {
+            moodEffectiveness[moodKey] = { total: 0, count: 0 };
+          }
+          moodEffectiveness[moodKey].total += s.therapeutic_effectiveness;
+          moodEffectiveness[moodKey].count++;
+        }
+      }
+
+      // Analyser les heures de session pour les patterns
+      if (s.created_at) {
+        const hour = new Date(s.created_at).getHours();
+        hourUsage[hour] = (hourUsage[hour] || 0) + 1;
+      }
+    });
+
+    // Top 5 moods les plus utilisés
+    const mostUsedMoods = Object.entries(moodUsage)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5)
+      .map(([mood]) => mood);
+
+    // Top 5 moods les plus efficaces (par moyenne d'efficacité)
+    const mostEffectiveMoods = Object.entries(moodEffectiveness)
+      .filter(([, data]) => data.count >= 2) // Au moins 2 sessions pour être significatif
+      .map(([mood, data]) => ({
+        mood,
+        avgEffectiveness: data.total / data.count
+      }))
+      .sort((a, b) => b.avgEffectiveness - a.avgEffectiveness)
+      .slice(0, 5)
+      .map(item => item.mood);
+
+    // Top 5 heures les plus efficaces
+    const mostEffectiveTimes = Object.entries(hourUsage)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5)
+      .map(([hour]) => `${hour}:00`);
+
+    // Calculer les genres et artistes favoris (si track_details disponibles)
+    const genreUsage: Record<string, number> = {};
+    const artistUsage: Record<string, number> = {};
+
+    (sessions || []).forEach((s) => {
+      const tracksPlayed = s.tracks_played || [];
+      tracksPlayed.forEach((track: any) => {
+        if (track?.genre) {
+          genreUsage[track.genre] = (genreUsage[track.genre] || 0) + 1;
+        }
+        if (track?.artist) {
+          artistUsage[track.artist] = (artistUsage[track.artist] || 0) + 1;
+        }
+      });
+    });
+
+    const favoriteGenres = Object.entries(genreUsage)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5)
+      .map(([genre]) => genre);
+
+    const favoriteArtists = Object.entries(artistUsage)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5)
+      .map(([artist]) => artist);
+
+    // Calculer le tempo et l'énergie préférés
+    let tempoMin = 60, tempoMax = 120;
+    let totalEnergy = 0, energyCount = 0;
+
+    (sessions || []).forEach((s) => {
+      const tracksPlayed = s.tracks_played || [];
+      tracksPlayed.forEach((track: any) => {
+        if (track?.tempo) {
+          tempoMin = Math.min(tempoMin, track.tempo);
+          tempoMax = Math.max(tempoMax, track.tempo);
+        }
+        if (track?.energy !== undefined) {
+          totalEnergy += track.energy;
+          energyCount++;
+        }
+      });
+    });
+
     return {
       total_sessions: totalSessions,
       total_duration_seconds: totalDuration,
@@ -424,15 +521,15 @@ export class MusicUnifiedService {
       average_effectiveness: avgEffectiveness,
       average_satisfaction: avgSatisfaction,
       average_mood_improvement: avgMoodImprovement,
-      most_used_moods: [],
-      most_effective_moods: [],
+      most_used_moods: mostUsedMoods,
+      most_effective_moods: mostEffectiveMoods,
       listening_patterns: {
-        favorite_genres: [],
-        favorite_artists: [],
-        preferred_tempo_range: { min: 60, max: 120 },
-        preferred_energy_level: 0.5,
+        favorite_genres: favoriteGenres,
+        favorite_artists: favoriteArtists,
+        preferred_tempo_range: { min: tempoMin, max: tempoMax },
+        preferred_energy_level: energyCount > 0 ? totalEnergy / energyCount : 0.5,
         average_session_duration: Math.round(averageDuration),
-        most_effective_times: [],
+        most_effective_times: mostEffectiveTimes,
         mood_improvement_average: avgMoodImprovement,
       },
       period_start: startDate.toISOString(),

@@ -81,15 +81,35 @@ export const nyveeService = {
   // --------------------------------------------------------------------------
 
   /**
-   * Créer une nouvelle session Nyvee simple
+   * Créer une nouvelle session Nyvee simple avec persistance DB
    */
   async createSession(data: CreateNyveeSession): Promise<NyveeSession> {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('User not authenticated');
 
+      // Persister en base de données
+      const { data: dbSession, error } = await supabase
+        .from('nyvee_sessions')
+        .insert({
+          user_id: user.id,
+          intensity: data.intensity,
+          cycles_completed: 0,
+          target_cycles: data.targetCycles,
+          mood_before: data.moodBefore,
+          badge_earned: 'calm',
+          completed: false,
+        })
+        .select()
+        .single();
+
+      if (error) {
+        Sentry.captureException(error);
+        throw error;
+      }
+
       const session: NyveeSession = {
-        id: crypto.randomUUID(),
+        id: dbSession.id,
         userId: user.id,
         intensity: data.intensity,
         cyclesCompleted: 0,
@@ -99,14 +119,14 @@ export const nyveeService = {
         moodDelta: undefined,
         badgeEarned: 'calm',
         completed: false,
-        createdAt: new Date().toISOString(),
+        createdAt: dbSession.created_at,
         completedAt: undefined,
       };
 
       Sentry.addBreadcrumb({
         category: 'nyvee',
-        message: 'Session created',
-        data: { intensity: data.intensity, targetCycles: data.targetCycles },
+        message: 'Session created and persisted',
+        data: { sessionId: session.id, intensity: data.intensity, targetCycles: data.targetCycles },
       });
 
       return session;
@@ -117,40 +137,76 @@ export const nyveeService = {
   },
 
   /**
-   * Compléter une session Nyvee
+   * Compléter une session Nyvee avec persistance DB
    */
   async completeSession(data: CompleteNyveeSession): Promise<NyveeSession> {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('User not authenticated');
 
+      // Récupérer la session existante pour obtenir moodBefore
+      const { data: existingSession } = await supabase
+        .from('nyvee_sessions')
+        .select('mood_before, intensity, target_cycles, created_at')
+        .eq('id', data.sessionId)
+        .eq('user_id', user.id)
+        .single();
+
       let moodDelta: number | undefined;
-      if (data.moodAfter !== undefined) {
-        moodDelta = data.moodAfter - 50;
+      if (data.moodAfter !== undefined && existingSession?.mood_before !== undefined) {
+        moodDelta = data.moodAfter - existingSession.mood_before;
+      } else if (data.moodAfter !== undefined) {
+        moodDelta = data.moodAfter - 50; // Fallback si mood_before n'existe pas
+      }
+
+      const completedAt = new Date().toISOString();
+
+      // Mettre à jour en base de données
+      const { data: dbSession, error } = await supabase
+        .from('nyvee_sessions')
+        .update({
+          cycles_completed: data.cyclesCompleted,
+          mood_after: data.moodAfter,
+          mood_delta: moodDelta,
+          badge_earned: data.badgeEarned,
+          cocoon_unlocked: data.cocoonUnlocked,
+          completed: true,
+          completed_at: completedAt,
+        })
+        .eq('id', data.sessionId)
+        .eq('user_id', user.id)
+        .select()
+        .single();
+
+      if (error) {
+        Sentry.captureException(error);
+        throw error;
       }
 
       const completedSession: NyveeSession = {
-        id: data.sessionId,
+        id: dbSession.id,
         userId: user.id,
-        intensity: 'calm',
+        intensity: dbSession.intensity || 'calm',
         cyclesCompleted: data.cyclesCompleted,
-        targetCycles: 6,
+        targetCycles: dbSession.target_cycles || 6,
+        moodBefore: dbSession.mood_before,
         moodAfter: data.moodAfter,
         moodDelta,
         badgeEarned: data.badgeEarned,
         cocoonUnlocked: data.cocoonUnlocked,
         completed: true,
-        createdAt: new Date().toISOString(),
-        completedAt: new Date().toISOString(),
+        createdAt: dbSession.created_at,
+        completedAt,
       };
 
       Sentry.addBreadcrumb({
         category: 'nyvee',
-        message: 'Session completed',
+        message: 'Session completed and persisted',
         data: {
           sessionId: data.sessionId,
           cycles: data.cyclesCompleted,
           badge: data.badgeEarned,
+          moodDelta,
         },
       });
 
@@ -368,28 +424,79 @@ export const nyveeService = {
   // --------------------------------------------------------------------------
 
   /**
-   * Obtenir les statistiques utilisateur (basique)
+   * Obtenir les statistiques utilisateur (avec calcul réel depuis la DB)
    */
   async getStats(): Promise<NyveeStats> {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('User not authenticated');
 
+      // Récupérer toutes les sessions de l'utilisateur
+      const { data: sessions, error } = await supabase
+        .from('nyvee_sessions')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        Sentry.captureException(error);
+        throw error;
+      }
+
+      const allSessions = sessions || [];
+      const completedSessions = allSessions.filter(s => s.completed);
+
+      // Calculs des statistiques
+      const totalSessions = allSessions.length;
+      const totalCycles = allSessions.reduce((sum, s) => sum + (s.cycles_completed || 0), 0);
+      const averageCyclesPerSession = totalSessions > 0 ? totalCycles / totalSessions : 0;
+      const completionRate = totalSessions > 0 ? completedSessions.length / totalSessions : 0;
+
+      // Calcul du streak
+      const { currentStreak, longestStreak } = this.calculateStreaks(completedSessions);
+
+      // Intensité favorite
+      const intensityCounts: Record<string, number> = {};
+      allSessions.forEach(s => {
+        if (s.intensity) {
+          intensityCounts[s.intensity] = (intensityCounts[s.intensity] || 0) + 1;
+        }
+      });
+      const favoriteIntensity = Object.entries(intensityCounts)
+        .sort(([, a], [, b]) => b - a)[0]?.[0] as BreathingIntensity | undefined || null;
+
+      // Cocoons débloqués
+      const cocoonsUnlocked = [...new Set(
+        allSessions
+          .filter(s => s.cocoon_unlocked)
+          .map(s => s.cocoon_unlocked)
+      )];
+      if (cocoonsUnlocked.length === 0) cocoonsUnlocked.push('crystal');
+
+      // Moyenne du mood delta
+      const sessionsWithDelta = allSessions.filter(s => s.mood_delta !== null && s.mood_delta !== undefined);
+      const avgMoodDelta = sessionsWithDelta.length > 0
+        ? sessionsWithDelta.reduce((sum, s) => sum + (s.mood_delta || 0), 0) / sessionsWithDelta.length
+        : null;
+
+      // Badges earned
+      const badgesEarned = {
+        calm: allSessions.filter(s => s.badge_earned === 'calm').length,
+        partial: allSessions.filter(s => s.badge_earned === 'partial').length,
+        tense: allSessions.filter(s => s.badge_earned === 'tense').length,
+      };
+
       const stats: NyveeStats = {
-        totalSessions: 0,
-        totalCycles: 0,
-        averageCyclesPerSession: 0,
-        completionRate: 0,
-        currentStreak: 0,
-        longestStreak: 0,
-        favoriteIntensity: null,
-        cocoonsUnlocked: ['crystal'],
-        avgMoodDelta: null,
-        badgesEarned: {
-          calm: 0,
-          partial: 0,
-          tense: 0,
-        },
+        totalSessions,
+        totalCycles,
+        averageCyclesPerSession,
+        completionRate,
+        currentStreak,
+        longestStreak,
+        favoriteIntensity,
+        cocoonsUnlocked,
+        avgMoodDelta,
+        badgesEarned,
       };
 
       return stats;
@@ -397,6 +504,70 @@ export const nyveeService = {
       Sentry.captureException(error);
       throw error;
     }
+  },
+
+  /**
+   * Calculer les streaks (séries consécutives de jours)
+   */
+  calculateStreaks(sessions: any[]): { currentStreak: number; longestStreak: number } {
+    if (sessions.length === 0) return { currentStreak: 0, longestStreak: 0 };
+
+    // Trier par date décroissante
+    const sortedSessions = [...sessions].sort((a, b) =>
+      new Date(b.completed_at || b.created_at).getTime() - new Date(a.completed_at || a.created_at).getTime()
+    );
+
+    // Obtenir les dates uniques de sessions
+    const sessionDates = [...new Set(
+      sortedSessions.map(s => {
+        const date = new Date(s.completed_at || s.created_at);
+        return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+      })
+    )];
+
+    // Calculer le streak actuel
+    let currentStreak = 0;
+    const today = new Date();
+    const todayStr = `${today.getFullYear()}-${today.getMonth()}-${today.getDate()}`;
+    const yesterday = new Date(today.getTime() - 24 * 60 * 60 * 1000);
+    const yesterdayStr = `${yesterday.getFullYear()}-${yesterday.getMonth()}-${yesterday.getDate()}`;
+
+    if (sessionDates[0] === todayStr || sessionDates[0] === yesterdayStr) {
+      currentStreak = 1;
+      let checkDate = new Date(sessionDates[0].split('-').map(Number).join('/'));
+
+      for (let i = 1; i < sessionDates.length; i++) {
+        const prevDate = new Date(checkDate.getTime() - 24 * 60 * 60 * 1000);
+        const prevDateStr = `${prevDate.getFullYear()}-${prevDate.getMonth()}-${prevDate.getDate()}`;
+
+        if (sessionDates[i] === prevDateStr) {
+          currentStreak++;
+          checkDate = prevDate;
+        } else {
+          break;
+        }
+      }
+    }
+
+    // Calculer le plus long streak
+    let longestStreak = currentStreak;
+    let tempStreak = 1;
+
+    for (let i = 1; i < sessionDates.length; i++) {
+      const currentDate = new Date(sessionDates[i - 1].split('-').map(Number).join('/'));
+      const prevDate = new Date(currentDate.getTime() - 24 * 60 * 60 * 1000);
+      const prevDateStr = `${prevDate.getFullYear()}-${prevDate.getMonth()}-${prevDate.getDate()}`;
+
+      if (sessionDates[i] === prevDateStr) {
+        tempStreak++;
+      } else {
+        longestStreak = Math.max(longestStreak, tempStreak);
+        tempStreak = 1;
+      }
+    }
+    longestStreak = Math.max(longestStreak, tempStreak);
+
+    return { currentStreak, longestStreak };
   },
 
   /**
@@ -464,14 +635,41 @@ export const nyveeService = {
   },
 
   /**
-   * Récupérer les sessions récentes (basique)
+   * Récupérer les sessions récentes depuis la DB
    */
   async getRecentSessions(limit: number = 10): Promise<NyveeSession[]> {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('User not authenticated');
 
-      return [];
+      const { data: sessions, error } = await supabase
+        .from('nyvee_sessions')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(limit);
+
+      if (error) {
+        Sentry.captureException(error);
+        throw error;
+      }
+
+      // Mapper les données DB vers le type NyveeSession
+      return (sessions || []).map(s => ({
+        id: s.id,
+        userId: s.user_id,
+        intensity: s.intensity || 'calm',
+        cyclesCompleted: s.cycles_completed || 0,
+        targetCycles: s.target_cycles || 6,
+        moodBefore: s.mood_before,
+        moodAfter: s.mood_after,
+        moodDelta: s.mood_delta,
+        badgeEarned: s.badge_earned || 'calm',
+        cocoonUnlocked: s.cocoon_unlocked,
+        completed: s.completed || false,
+        createdAt: s.created_at,
+        completedAt: s.completed_at,
+      }));
     } catch (error) {
       Sentry.captureException(error);
       throw error;

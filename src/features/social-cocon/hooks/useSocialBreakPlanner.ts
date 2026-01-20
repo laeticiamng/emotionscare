@@ -1,4 +1,9 @@
-// @ts-nocheck
+/**
+ * Social Break Planner Hook
+ *
+ * Hook for scheduling social breaks with quiet hours support.
+ */
+
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Sentry } from '@/lib/errors/sentry-compat';
@@ -149,7 +154,10 @@ export const useSocialBreakPlanner = (
         return null;
       }
 
-      return scheduleMutation.mutateAsync(payload).catch(() => null);
+      return scheduleMutation.mutateAsync(payload).catch((error: Error) => {
+        logger.error('social:schedule_break_failed', { error: error.message }, 'SOCIAL');
+        return null;
+      });
     },
     [quietHours, scheduleMutation, toast]
   );

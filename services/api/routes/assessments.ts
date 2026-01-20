@@ -239,7 +239,42 @@ export function registerAssessmentRoutes(app: FastifyInstance, options: Assessme
     }
   });
 
-  // GET /api/v1/assessments/:id - Détails d'une évaluation
+  // IMPORTANT: Routes statiques AVANT les routes dynamiques (:id)
+  // GET /api/v1/assessments/active - Évaluation en cours
+  app.get('/api/v1/assessments/active', async (req: FastifyRequest, reply: FastifyReply) => {
+    const user = ensureUser(req, reply);
+    if (!user) return;
+
+    try {
+      const assessment = await repository.getActiveAssessment(user.sub);
+      reply.send({ ok: true, data: assessment });
+    } catch (error) {
+      app.log.error({ error }, 'Unexpected error fetching active assessment');
+      reply.code(500).send({
+        ok: false,
+        error: { code: 'internal_error', message: 'Internal server error' },
+      });
+    }
+  });
+
+  // GET /api/v1/assessments/instruments - Instruments disponibles
+  app.get('/api/v1/assessments/instruments', async (req: FastifyRequest, reply: FastifyReply) => {
+    const user = ensureUser(req, reply);
+    if (!user) return;
+
+    try {
+      const instruments = await repository.listInstruments();
+      reply.send({ ok: true, data: instruments });
+    } catch (error) {
+      app.log.error({ error }, 'Unexpected error fetching instruments');
+      reply.code(500).send({
+        ok: false,
+        error: { code: 'internal_error', message: 'Internal server error' },
+      });
+    }
+  });
+
+  // GET /api/v1/assessments/:id - Détails d'une évaluation (routes dynamiques APRÈS les statiques)
   app.get('/api/v1/assessments/:id', async (req: AssessmentGetRequest, reply: FastifyReply) => {
     const user = ensureUser(req, reply);
     if (!user) return;
@@ -306,37 +341,4 @@ export function registerAssessmentRoutes(app: FastifyInstance, options: Assessme
     }
   });
 
-  // GET /api/v1/assessments/active - Évaluation en cours
-  app.get('/api/v1/assessments/active', async (req: FastifyRequest, reply: FastifyReply) => {
-    const user = ensureUser(req, reply);
-    if (!user) return;
-
-    try {
-      const assessment = await repository.getActiveAssessment(user.sub);
-      reply.send({ ok: true, data: assessment });
-    } catch (error) {
-      app.log.error({ error }, 'Unexpected error fetching active assessment');
-      reply.code(500).send({
-        ok: false,
-        error: { code: 'internal_error', message: 'Internal server error' },
-      });
-    }
-  });
-
-  // GET /api/v1/assessments/instruments - Instruments disponibles
-  app.get('/api/v1/assessments/instruments', async (req: FastifyRequest, reply: FastifyReply) => {
-    const user = ensureUser(req, reply);
-    if (!user) return;
-
-    try {
-      const instruments = await repository.listInstruments();
-      reply.send({ ok: true, data: instruments });
-    } catch (error) {
-      app.log.error({ error }, 'Unexpected error fetching instruments');
-      reply.code(500).send({
-        ok: false,
-        error: { code: 'internal_error', message: 'Internal server error' },
-      });
-    }
-  });
 }

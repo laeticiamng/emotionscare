@@ -246,51 +246,7 @@ export function registerScanRoutes(app: FastifyInstance, options: ScanRoutesOpti
     }
   });
 
-  // GET /api/v1/scans/:id - Détails d'un scan
-  app.get('/api/v1/scans/:id', async (req: ScanGetRequest, reply: FastifyReply) => {
-    const user = ensureUser(req, reply);
-    if (!user) return;
-
-    try {
-      const { id } = req.params;
-      const scan = await repository.getScan(id, user.sub);
-
-      if (!scan) {
-        reply.code(404).send({
-          ok: false,
-          error: { code: 'not_found', message: 'Scan not found' },
-        });
-        return;
-      }
-
-      reply.send({ ok: true, data: scan });
-    } catch (error) {
-      app.log.error({ error }, 'Unexpected error fetching scan');
-      reply.code(500).send({
-        ok: false,
-        error: { code: 'internal_error', message: 'Internal server error' },
-      });
-    }
-  });
-
-  // DELETE /api/v1/scans/:id - Supprimer un scan
-  app.delete('/api/v1/scans/:id', async (req: ScanGetRequest, reply: FastifyReply) => {
-    const user = ensureUser(req, reply);
-    if (!user) return;
-
-    try {
-      const { id } = req.params;
-      await repository.deleteScan(id, user.sub);
-      reply.code(204).send();
-    } catch (error) {
-      app.log.error({ error }, 'Unexpected error deleting scan');
-      reply.code(500).send({
-        ok: false,
-        error: { code: 'internal_error', message: 'Internal server error' },
-      });
-    }
-  });
-
+  // IMPORTANT: Les routes statiques doivent être enregistrées AVANT les routes dynamiques (:id)
   // GET /api/v1/scans/stats - Statistiques globales
   app.get('/api/v1/scans/stats', async (req: ScanStatsRequest, reply: FastifyReply) => {
     const user = ensureUser(req, reply);
@@ -373,4 +329,50 @@ export function registerScanRoutes(app: FastifyInstance, options: ScanRoutesOpti
       });
     }
   });
+
+  // GET /api/v1/scans/:id - Détails d'un scan (routes dynamiques APRÈS les routes statiques)
+  app.get('/api/v1/scans/:id', async (req: ScanGetRequest, reply: FastifyReply) => {
+    const user = ensureUser(req, reply);
+    if (!user) return;
+
+    try {
+      const { id } = req.params;
+      const scan = await repository.getScan(id, user.sub);
+
+      if (!scan) {
+        reply.code(404).send({
+          ok: false,
+          error: { code: 'not_found', message: 'Scan not found' },
+        });
+        return;
+      }
+
+      reply.send({ ok: true, data: scan });
+    } catch (error) {
+      app.log.error({ error }, 'Unexpected error fetching scan');
+      reply.code(500).send({
+        ok: false,
+        error: { code: 'internal_error', message: 'Internal server error' },
+      });
+    }
+  });
+
+  // DELETE /api/v1/scans/:id - Supprimer un scan
+  app.delete('/api/v1/scans/:id', async (req: ScanGetRequest, reply: FastifyReply) => {
+    const user = ensureUser(req, reply);
+    if (!user) return;
+
+    try {
+      const { id } = req.params;
+      await repository.deleteScan(id, user.sub);
+      reply.code(204).send();
+    } catch (error) {
+      app.log.error({ error }, 'Unexpected error deleting scan');
+      reply.code(500).send({
+        ok: false,
+        error: { code: 'internal_error', message: 'Internal server error' },
+      });
+    }
+  });
+
 }
