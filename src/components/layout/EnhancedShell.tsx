@@ -1,17 +1,16 @@
-import React, { useState, useEffect, lazy, Suspense } from 'react';
+import React, { useState, useEffect, lazy, Suspense, memo, useMemo, useCallback } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '@/providers/theme';
 import EnhancedHeader from './EnhancedHeader';
-import EnhancedFooter from './EnhancedFooter';
-import CommandMenu from './CommandMenu';
-import NotificationToast from './NotificationToast';
-import MainNavigationHub from '@/components/navigation/MainNavigationHub';
 import SkipLinks from './SkipLinks';
-import { InAppNotificationCenter } from '@/components/InAppNotificationCenter';
 import { cn } from '@/lib/utils';
 
-// Lazy load crisis detection banner
+// Lazy load non-critical components
+const EnhancedFooter = lazy(() => import('./EnhancedFooter'));
+const CommandMenu = lazy(() => import('./CommandMenu'));
+const NotificationToast = lazy(() => import('./NotificationToast'));
+const MainNavigationHub = lazy(() => import('@/components/navigation/MainNavigationHub'));
+const InAppNotificationCenter = lazy(() => import('@/components/InAppNotificationCenter').then(m => ({ default: m.InAppNotificationCenter })));
 const CrisisDetectionBanner = lazy(() => import('@/components/crisis/CrisisDetectionBanner'));
 
 interface EnhancedShellProps {
@@ -22,7 +21,7 @@ interface EnhancedShellProps {
   className?: string;
 }
 
-const EnhancedShell: React.FC<EnhancedShellProps> = ({
+const EnhancedShell: React.FC<EnhancedShellProps> = memo(({
   children,
   hideNav = false,
   hideFooter = false,
@@ -35,136 +34,122 @@ const EnhancedShell: React.FC<EnhancedShellProps> = ({
   const location = useLocation();
   const [commandMenuOpen, setCommandMenuOpen] = useState(false);
   
-  // Compute derived theme properties
-  const isDarkMode = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // Memoize theme check - only recalc on theme change
+  const isDarkMode = useMemo(() => 
+    theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches),
+    [theme]
+  );
   
-  // Handling scroll effects
+  // Check once on mount
+  const reduceMotion = useMemo(() => 
+    typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+    []
+  );
+  
+  // Throttled scroll handler for better performance
   useEffect(() => {
+    let ticking = false;
+    
     const handleScroll = () => {
-      // Update scrolled state for header effects
-      const isScrolled = window.scrollY > 10;
-      if (isScrolled !== scrolled) {
-        setScrolled(isScrolled);
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          const isScrolled = window.scrollY > 10;
+          if (isScrolled !== scrolled) {
+            setScrolled(isScrolled);
+          }
+          
+          const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+          const progress = height ? Math.min(window.scrollY / height, 1) : 0;
+          setScrollProgress(progress);
+          ticking = false;
+        });
+        ticking = true;
       }
-      
-      // Calculate scroll progress
-      const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-      const progress = height ? Math.min(window.scrollY / height, 1) : 0;
-      setScrollProgress(progress);
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, [scrolled]);
   
-  // Keyboard shortcuts
+  // Keyboard shortcuts - stable callback
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      e.preventDefault();
+      setCommandMenuOpen(prev => !prev);
+    }
+  }, []);
+  
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Command+K to open command menu
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-        e.preventDefault();
-        setCommandMenuOpen(prev => !prev);
-      }
-    };
-    
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [handleKeyDown]);
 
   return (
     <div className={cn(
-      "flex flex-col min-h-screen bg-background transition-colors duration-300",
+      "flex flex-col min-h-screen bg-background",
       className
     )} data-testid="page-root">
       {/* Skip Links pour accessibilité */}
       <SkipLinks />
       
-      {/* Scroll Progress Indicator */}
+      {/* Scroll Progress Indicator - CSS-only transform for perf */}
       <div 
-        className="fixed top-0 left-0 h-1 bg-primary z-50 transition-transform duration-200 ease-in-out origin-left"
+        className="fixed top-0 left-0 h-1 bg-primary z-50 origin-left will-change-transform"
         style={{ transform: `scaleX(${scrollProgress})` }}
       />
 
-      {/* Background - solid color only, no tinted gradients */}
-      <div className="fixed inset-0 -z-10 pointer-events-none bg-background" />
-
-      {/* Decorative Background Elements */}
-      {immersive && !reduceMotion && (
-        <div className="fixed inset-0 -z-5 pointer-events-none overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-full opacity-20 dark:opacity-10">
-            {[...Array(8)].map((_, i) => (
-              <motion.div
-                key={i}
-                className={cn(
-                  "absolute rounded-full",
-                  isDarkMode ? 'bg-blue-400' : 'bg-blue-500'
-                )}
-                style={{
-                  width: Math.random() * 8 + 4,
-                  height: Math.random() * 8 + 4,
-                  left: `${Math.random() * 100}%`,
-                  top: `${Math.random() * 100}%`,
-                }}
-                animate={{
-                  y: [0, -100, 0],
-                  opacity: [0.3, 0.8, 0.3],
-                }}
-                transition={{
-                  duration: Math.random() * 20 + 10,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-              />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Header */}
+      {/* Header - always rendered first for LCP */}
       {!hideNav && (
         <div id="main-navigation">
           <EnhancedHeader scrolled={scrolled} />
         </div>
       )}
 
-      {/* Main Content */}
+      {/* Main Content - priority rendering */}
       <main id="main-content" className="flex-1 w-full mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 relative mt-16">
-        {/* Crisis Detection Banner */}
-        <Suspense fallback={null}>
-          <CrisisDetectionBanner />
-        </Suspense>
-        
-        <AnimatePresence mode="sync">{/* Fixed multiple children warning */}
-          <motion.div
-            key={location.pathname}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: reduceMotion ? 0 : 0.3 }}
-            className="w-full"
-          >
-            {children || <Outlet />}
-          </motion.div>
-        </AnimatePresence>
+        {/* Content rendered immediately - no animation wrapper for faster FCP */}
+        <div 
+          className={cn(
+            "w-full",
+            reduceMotion ? "" : "animate-in fade-in duration-200"
+          )}
+        >
+          {children || <Outlet />}
+        </div>
       </main>
 
-      {/* Footer */}
-      {!hideFooter && <EnhancedFooter />}
+      {/* Defer non-critical UI with lower priority */}
+      <Suspense fallback={null}>
+        <CrisisDetectionBanner />
+      </Suspense>
 
-      {/* Command Menu (Cmd+K) */}
-      <CommandMenu open={commandMenuOpen} onOpenChange={setCommandMenuOpen} />
+      {/* Footer - lazy loaded */}
+      {!hideFooter && (
+        <Suspense fallback={<div className="h-16" />}>
+          <EnhancedFooter />
+        </Suspense>
+      )}
+
+      {/* Deferred components - load after main content */}
+      <Suspense fallback={null}>
+        <CommandMenu open={commandMenuOpen} onOpenChange={setCommandMenuOpen} />
+      </Suspense>
       
-      {/* Floating Notification Container */}
-      <NotificationToast />
+      <Suspense fallback={null}>
+        <NotificationToast />
+      </Suspense>
       
-      {/* Navigation Hub */}
-      <MainNavigationHub />
+      <Suspense fallback={null}>
+        <MainNavigationHub />
+      </Suspense>
       
-      {/* In-App Notification Center */}
-      <InAppNotificationCenter />
+      <Suspense fallback={null}>
+        <InAppNotificationCenter />
+      </Suspense>
     </div>
   );
-};
+});
+
+EnhancedShell.displayName = 'EnhancedShell';
 
 export default EnhancedShell;
