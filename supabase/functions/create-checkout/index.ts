@@ -1,12 +1,21 @@
-// @ts-nocheck
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@14.21.0";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { createClient, SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
+
+// Liste blanche des origines autorisées
+const ALLOWED_ORIGINS = [
+  'https://emotionscare.com',
+  'https://www.emotionscare.com',
+  'https://app.emotionscare.com',
+  'http://localhost:3000',
+  'http://localhost:5173',
+  'http://localhost:8080',
+];
 
 // Helper logging function for enhanced debugging
 const logStep = (step: string, details?: any) => {
@@ -55,7 +64,12 @@ serve(async (req) => {
       logStep("No existing customer found, will create new one");
     }
 
-    const origin = req.headers.get("origin") || "http://localhost:3000";
+    // Valider l'origine
+    const requestOrigin = req.headers.get("origin");
+    const origin = requestOrigin && ALLOWED_ORIGINS.includes(requestOrigin)
+      ? requestOrigin
+      : ALLOWED_ORIGINS[0]; // Fallback vers l'origine principale
+    logStep("Origin validated", { requestOrigin, usedOrigin: origin });
     
     const session = await stripe.checkout.sessions.create({
       customer: customerId,

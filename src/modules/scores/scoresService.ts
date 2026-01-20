@@ -593,8 +593,9 @@ export class ScoresService {
     start: Date,
     end: Date
   ): Promise<Record<string, unknown>[]> {
+    // Utiliser gamification_events comme table d'activités (existe dans le schéma)
     const { data } = await supabase
-      .from('user_activities')
+      .from('gamification_events')
       .select('*')
       .eq('user_id', userId)
       .gte('created_at', start.toISOString())
@@ -608,14 +609,43 @@ export class ScoresService {
     start: Date,
     end: Date
   ): Promise<Record<string, unknown>[]> {
-    const { data } = await supabase
-      .from('sessions')
-      .select('*')
-      .eq('user_id', userId)
-      .gte('created_at', start.toISOString())
-      .lte('created_at', end.toISOString());
+    // Utiliser breathing_sessions comme table de sessions principale
+    // et combiner avec d'autres types de sessions
+    const [breathingSessions, musicSessions, coachSessions] = await Promise.all([
+      supabase
+        .from('breathing_sessions')
+        .select('*, created_at, duration_seconds, mood_score:emotional_score')
+        .eq('user_id', userId)
+        .gte('created_at', start.toISOString())
+        .lte('created_at', end.toISOString()),
+      supabase
+        .from('music_sessions')
+        .select('*, created_at, duration_seconds, mood_score:mood_improvement')
+        .eq('user_id', userId)
+        .gte('created_at', start.toISOString())
+        .lte('created_at', end.toISOString()),
+      supabase
+        .from('coach_sessions')
+        .select('*, created_at, mood_score:mood_after')
+        .eq('user_id', userId)
+        .gte('created_at', start.toISOString())
+        .lte('created_at', end.toISOString())
+    ]);
 
-    return (data as Record<string, unknown>[]) || [];
+    // Combiner toutes les sessions
+    const allSessions: Record<string, unknown>[] = [];
+
+    if (breathingSessions.data) {
+      allSessions.push(...breathingSessions.data.map(s => ({ ...s, session_type: 'breathing' })));
+    }
+    if (musicSessions.data) {
+      allSessions.push(...musicSessions.data.map(s => ({ ...s, session_type: 'music' })));
+    }
+    if (coachSessions.data) {
+      allSessions.push(...coachSessions.data.map(s => ({ ...s, session_type: 'coach' })));
+    }
+
+    return allSessions;
   }
 
   private static calculateEmotionalScore(data: Record<string, unknown>[]): number {
@@ -734,8 +764,9 @@ export class ScoresService {
     start: Date,
     end: Date
   ): Promise<Record<string, unknown>[]> {
+    // Utiliser la table journal_entries_raw qui existe dans le schéma
     const { data } = await supabase
-      .from('journal_entries')
+      .from('journal_entries_raw')
       .select('*')
       .eq('user_id', userId)
       .gte('created_at', start.toISOString())
@@ -749,16 +780,125 @@ export class ScoresService {
     sessions: Record<string, unknown>[],
     journal: Record<string, unknown>[]
   ): VibeMetrics {
-    // Analyse simplifiée du vibe
-    const vibe: VibeType = 'neutral';
-    const intensity = 50;
+    // Analyse réelle du vibe basée sur les données
+
+    // Extraire les émotions dominantes des scans récents
+    const emotionCounts: Record<string, number> = {};
+    const emotionValences: Record<string, number[]> = {};
+
+    emotions.forEach(scan => {
+      const payload = scan.payload as Record<string, unknown> | undefined;
+      const result = payload?.result as Record<string, unknown> | undefined;
+      const emotion = result?.emotion as string || 'neutral';
+      const valence = (result?.valence as number) || 50;
+
+      emotionCounts[emotion] = (emotionCounts[emotion] || 0) + 1;
+      if (!emotionValences[emotion]) emotionValences[emotion] = [];
+      emotionValences[emotion].push(valence);
+    });
+
+    // Trouver l'émotion dominante
+    let dominantEmotion = 'neutral';
+    let maxCount = 0;
+    Object.entries(emotionCounts).forEach(([emotion, count]) => {
+      if (count > maxCount) {
+        maxCount = count;
+        dominantEmotion = emotion;
+      }
+    });
+
+    // Mapper l'émotion vers un VibeType
+    const emotionToVibe: Record<string, VibeType> = {
+      happy: 'joyful',
+      excited: 'energized',
+      calm: 'calm',
+      focused: 'focused',
+      curious: 'creative',
+      reflective: 'reflective',
+      sad: 'melancholic',
+      anxious: 'anxious',
+      tired: 'tired',
+      stressed: 'overwhelmed',
+      angry: 'determined',
+      peaceful: 'peaceful',
+      neutral: 'neutral',
+      bored: 'tired',
+      confused: 'reflective',
+      content: 'calm',
+      grateful: 'peaceful',
+      hopeful: 'energized',
+      inspired: 'creative',
+      motivated: 'determined',
+      relaxed: 'calm',
+      confident: 'determined',
+      playful: 'playful',
+      amused: 'playful',
+      social: 'social',
+      lonely: 'melancholic',
+      overwhelmed: 'overwhelmed'
+    };
+
+    const vibe: VibeType = emotionToVibe[dominantEmotion.toLowerCase()] || 'neutral';
+
+    // Calculer l'intensité du vibe (0-100)
+    let intensity = 50;
+    const allValences = Object.values(emotionValences).flat();
+    if (allValences.length > 0) {
+      const avgValence = allValences.reduce((a, b) => a + b, 0) / allValences.length;
+      // Plus l'écart par rapport au neutre (50) est grand, plus l'intensité est élevée
+      intensity = Math.min(100, 50 + Math.abs(avgValence - 50));
+    }
+
+    // Si beaucoup de sessions récentes, augmenter l'intensité
+    if (sessions.length > 5) {
+      intensity = Math.min(100, intensity + 10);
+    }
+
+    // Calculer la durée approximative du vibe (basé sur le premier scan avec cette émotion)
+    let vibeDurationHours = 0;
+    const emotionScansWithDominant = emotions.filter(scan => {
+      const payload = scan.payload as Record<string, unknown> | undefined;
+      const result = payload?.result as Record<string, unknown> | undefined;
+      return (result?.emotion as string)?.toLowerCase() === dominantEmotion.toLowerCase();
+    });
+
+    if (emotionScansWithDominant.length > 0) {
+      const oldestScan = emotionScansWithDominant[emotionScansWithDominant.length - 1];
+      const scanTime = new Date(oldestScan.created_at as string);
+      vibeDurationHours = Math.round((Date.now() - scanTime.getTime()) / (1000 * 60 * 60));
+    }
+
+    // Activités récentes
+    const recentActivities = sessions.map(s => {
+      const sessionType = s.session_type as string;
+      return sessionType || 'unknown';
+    }).filter((v, i, a) => a.indexOf(v) === i); // Unique values
+
+    // Facteurs contributifs
+    const contributingFactors: string[] = [];
+    if (emotions.length > 0) contributingFactors.push('Scans émotionnels récents');
+    if (sessions.length > 0) contributingFactors.push(`${sessions.length} sessions actives`);
+    if (journal.length > 0) contributingFactors.push('Entrées de journal récentes');
+
+    // Recommandations basées sur le vibe
+    const recommendedModules: string[] = [];
+    if (vibe === 'anxious' || vibe === 'overwhelmed') {
+      recommendedModules.push('breathing', 'meditation', 'coach');
+    } else if (vibe === 'tired' || vibe === 'melancholic') {
+      recommendedModules.push('music', 'coach', 'journal');
+    } else if (vibe === 'energized' || vibe === 'joyful') {
+      recommendedModules.push('challenges', 'community', 'goals');
+    } else if (vibe === 'calm' || vibe === 'peaceful') {
+      recommendedModules.push('meditation', 'journal', 'reflection');
+    }
 
     return {
       current_vibe: vibe,
       vibe_intensity: intensity,
-      vibe_duration_hours: 0,
-      recent_activities: sessions.map((s) => (s.type as string) || 'unknown'),
-      contributing_factors: []
+      vibe_duration_hours: vibeDurationHours,
+      recent_activities: recentActivities,
+      contributing_factors: contributingFactors,
+      recommended_modules: recommendedModules
     };
   }
 

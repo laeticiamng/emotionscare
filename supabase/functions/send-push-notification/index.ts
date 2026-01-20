@@ -1,15 +1,25 @@
-// @ts-nocheck
 /**
  * Send Push Notification - Envoyer notifications Web Push avec VAPID
  */
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.43.4";
+import { z } from "https://esm.sh/zod@3.23.8";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+// Schéma de validation du payload
+const pushNotificationSchema = z.object({
+  userId: z.string().uuid('userId must be a valid UUID'),
+  title: z.string().min(1, 'Title is required').max(200, 'Title too long'),
+  body: z.string().min(1, 'Body is required').max(1000, 'Body too long'),
+  data: z.record(z.unknown()).optional(),
+  icon: z.string().optional(),
+  badge: z.string().optional(),
+});
 
 // Encodage base64url sans padding
 function base64UrlEncode(data: Uint8Array | string): string {
@@ -163,12 +173,73 @@ serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
 
   try {
+    // Vérifier l'authentification
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: 'Authorization header required'
+      }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
     );
 
-    const { userId, title, body, data, icon, badge } = await req.json();
+    // Vérifier le token JWT
+    const token = authHeader.replace('Bearer ', '');
+    const { data: userData, error: authError } = await supabaseClient.auth.getUser(token);
+
+    if (authError || !userData.user) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: 'Invalid or expired token'
+      }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Parser et valider le payload
+    const rawBody = await req.json();
+    const validationResult = pushNotificationSchema.safeParse(rawBody);
+
+    if (!validationResult.success) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: 'Validation error',
+        details: validationResult.error.flatten()
+      }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const { userId, title, body, data, icon, badge } = validationResult.data;
+
+    // Vérifier que l'utilisateur ne peut envoyer des notifications qu'à lui-même
+    // sauf s'il a un rôle admin
+    const { data: profile } = await supabaseClient
+      .from('profiles')
+      .select('role')
+      .eq('id', userData.user.id)
+      .single();
+
+    const isAdmin = profile?.role === 'admin' || profile?.role === 'super_admin';
+
+    if (userId !== userData.user.id && !isAdmin) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: 'Unauthorized: cannot send notifications to other users'
+      }), {
+        status: 403,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
 
     const vapidPrivateKey = Deno.env.get('VAPID_PRIVATE_KEY');
     const vapidPublicKey = Deno.env.get('VITE_VAPID_PUBLIC_KEY') || Deno.env.get('VAPID_PUBLIC_KEY');

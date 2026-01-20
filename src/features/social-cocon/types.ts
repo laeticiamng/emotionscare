@@ -1,4 +1,9 @@
-// @ts-nocheck
+/**
+ * Social Cocon Types
+ *
+ * Types for social rooms, breaks, and quiet hours features.
+ */
+
 export type Json =
   | string
   | number
