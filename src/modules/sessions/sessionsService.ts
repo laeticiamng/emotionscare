@@ -317,6 +317,22 @@ export const SessionsService = {
 
     return data;
   },
+
+  /**
+   * Appel à l'edge function sessions-api pour les stats
+   */
+  async getStatsFromEdge(userId: string): Promise<SessionStats | null> {
+    const { data, error } = await supabase.functions.invoke('sessions-api', {
+      body: { action: 'stats' },
+    });
+
+    if (error) {
+      logger.warn('sessions-api edge function not available, using local stats');
+      return null;
+    }
+
+    return data?.stats || null;
+  },
 };
 
 export const sessionsService = SessionsService;
