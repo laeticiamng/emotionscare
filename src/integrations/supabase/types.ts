@@ -18698,14 +18698,19 @@ export type Database = {
           fcp: number | null
           id: string
           inp: number | null
+          install_date: string | null
+          is_installed: boolean | null
+          is_offline: boolean | null
           is_pwa: boolean | null
           lcp: number | null
           os: string | null
           page_views: number | null
           screen_height: number | null
           screen_width: number | null
+          session_duration: number | null
           session_id: string
           ttfb: number | null
+          updated_at: string | null
           user_id: string | null
         }
         Insert: {
@@ -18717,14 +18722,19 @@ export type Database = {
           fcp?: number | null
           id?: string
           inp?: number | null
+          install_date?: string | null
+          is_installed?: boolean | null
+          is_offline?: boolean | null
           is_pwa?: boolean | null
           lcp?: number | null
           os?: string | null
           page_views?: number | null
           screen_height?: number | null
           screen_width?: number | null
+          session_duration?: number | null
           session_id: string
           ttfb?: number | null
+          updated_at?: string | null
           user_id?: string | null
         }
         Update: {
@@ -18736,14 +18746,19 @@ export type Database = {
           fcp?: number | null
           id?: string
           inp?: number | null
+          install_date?: string | null
+          is_installed?: boolean | null
+          is_offline?: boolean | null
           is_pwa?: boolean | null
           lcp?: number | null
           os?: string | null
           page_views?: number | null
           screen_height?: number | null
           screen_width?: number | null
+          session_duration?: number | null
           session_id?: string
           ttfb?: number | null
+          updated_at?: string | null
           user_id?: string | null
         }
         Relationships: []
