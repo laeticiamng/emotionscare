@@ -28922,6 +28922,7 @@ export type Database = {
         }[]
       }
       is_admin: { Args: never; Returns: boolean }
+      is_authenticated: { Args: never; Returns: boolean }
       is_manager_of_org: { Args: { p_org_id: string }; Returns: boolean }
       is_org_admin: {
         Args: { _org_id: string; _user_id: string }
@@ -28943,6 +28944,7 @@ export type Database = {
         Args: { _org_id: string; _user_id: string }
         Returns: boolean
       }
+      is_owner: { Args: { resource_user_id: string }; Returns: boolean }
       is_room_host: {
         Args: { _room_id: string; _user_id: string }
         Returns: boolean
