@@ -32,6 +32,8 @@ export {
 export type { HeatmapCell, HeatmapTone, HeatmapInsight } from './reports/utils';
 
 // Re-export hooks for convenience
+export { useAccessCodes } from '@/hooks/b2b/useAccessCodes';
+export { useOrgAggregates } from '@/hooks/b2b/useOrgAggregates';
 export { useB2BTeams } from '@/hooks/useB2BTeams';
 export { useB2BEvents } from '@/hooks/useB2BEvents';
 export { useB2BReports } from '@/hooks/useB2BReports';
@@ -40,3 +42,15 @@ export { useB2BRole } from '@/hooks/useB2BRole';
 export { useB2BSettings } from '@/hooks/useB2BSettings';
 export { useB2BNotifications } from '@/hooks/useB2BNotifications';
 export { useB2BAnalytics } from '@/hooks/useB2BAnalytics';
+export { useB2BAlerts } from '@/hooks/useB2BAlerts';
+export { useB2BCollabStats } from '@/hooks/useB2BCollabStats';
+export { useB2BExport } from '@/hooks/useB2BExport';
+export { useB2BInvitations } from '@/hooks/useB2BInvitations';
+export { useB2BOrgSettings } from '@/hooks/useB2BOrgSettings';
+export { useB2BTeamStats } from '@/hooks/useB2BTeamStats';
+export { useOrgInsights } from '@/hooks/useOrgInsights';
+export { useOrgScan } from '@/hooks/useOrgScan';
+export { useOrgWeekly } from '@/hooks/useOrgWeekly';
+
+// Store
+export { useOrgStore } from '@/store';

@@ -3,15 +3,32 @@
  * Coaching émotionnel personnalisé avec IA
  */
 
-// Hooks - re-export depuis le barrel
+// ============================================================================
+// HOOKS - Re-export depuis le dossier hooks/coach organisé
+// ============================================================================
+export { useCoach } from '@/hooks/coach/useCoach';
+export { useCoachEvents } from '@/hooks/coach/useCoachEvents';
+export { useRecommendations } from '@/hooks/coach/useRecommendations';
+
+// Hooks depuis racine
 export { useCoachState, useCoachConversations } from '@/hooks/useCoach';
 export { useCoachChat } from '@/hooks/useCoachChat';
 export { useCoachMemory } from '@/hooks/useCoachMemory';
+export { useCoachConversationsEnriched } from '@/hooks/useCoachConversationsEnriched';
 
-// Context
+// ============================================================================
+// CONTEXT
+// ============================================================================
 export { useUnifiedCoach as useCoachContext } from '@/contexts/coach/UnifiedCoachContext';
 
-// Types
+// ============================================================================
+// COMPONENTS - Re-export from modules
+// ============================================================================
+export { CoachPage, CoachView, CoachConsent } from '@/modules/coach';
+
+// ============================================================================
+// TYPES
+// ============================================================================
 export interface CoachMessage {
   id: string;
   role: 'user' | 'assistant';
