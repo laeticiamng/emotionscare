@@ -18287,6 +18287,7 @@ export type Database = {
           id: string
           is_test_account: boolean | null
           job_title: string | null
+          language: string | null
           location: string | null
           name: string | null
           org_id: string | null
@@ -18310,6 +18311,7 @@ export type Database = {
           id: string
           is_test_account?: boolean | null
           job_title?: string | null
+          language?: string | null
           location?: string | null
           name?: string | null
           org_id?: string | null
@@ -18333,6 +18335,7 @@ export type Database = {
           id?: string
           is_test_account?: boolean | null
           job_title?: string | null
+          language?: string | null
           location?: string | null
           name?: string | null
           org_id?: string | null
