@@ -280,6 +280,36 @@ export class SeuilService {
   }
 
   /**
+   * Vérifier une valeur contre les seuils (via edge function)
+   */
+  static async checkThreshold(
+    value: number,
+    type: 'mood' | 'energy' | 'stress' | 'anxiety' | 'sleep' | 'custom'
+  ): Promise<{ status: 'ok' | 'warning' | 'critical'; message: string }> {
+    const { data, error } = await supabase.functions.invoke('seuil-api', {
+      body: { action: 'check', value, type },
+    });
+
+    if (error) {
+      return { status: 'ok', message: 'Vérification non disponible' };
+    }
+
+    return data;
+  }
+
+  /**
+   * Récupérer les seuils configurés (via edge function)
+   */
+  static async getThresholds(): Promise<unknown[]> {
+    const { data, error } = await supabase.functions.invoke('seuil-api', {
+      body: { action: 'list' },
+    });
+
+    if (error) return [];
+    return data?.thresholds || [];
+  }
+
+  /**
    * Prédire le risque de décrochage (via edge function)
    */
   static async predictRisk(userId: string): Promise<SeuilPrediction> {
