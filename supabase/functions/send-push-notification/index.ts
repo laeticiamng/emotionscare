@@ -2,24 +2,50 @@
  * Send Push Notification - Envoyer notifications Web Push avec VAPID
  */
 
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.43.4";
-import { z } from "https://esm.sh/zod@3.23.8";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Schéma de validation du payload
-const pushNotificationSchema = z.object({
-  userId: z.string().uuid('userId must be a valid UUID'),
-  title: z.string().min(1, 'Title is required').max(200, 'Title too long'),
-  body: z.string().min(1, 'Body is required').max(1000, 'Body too long'),
-  data: z.record(z.unknown()).optional(),
-  icon: z.string().optional(),
-  badge: z.string().optional(),
-});
+// Inline validation to avoid zod import issues
+interface PushNotificationInput {
+  userId: string;
+  title: string;
+  body: string;
+  data?: Record<string, unknown>;
+  icon?: string;
+  badge?: string;
+}
+
+function validatePushNotification(input: unknown): { success: boolean; data?: PushNotificationInput; error?: string } {
+  if (!input || typeof input !== 'object') return { success: false, error: 'Invalid input' };
+  const obj = input as Record<string, unknown>;
+  
+  if (typeof obj.userId !== 'string' || !obj.userId.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)) {
+    return { success: false, error: 'userId must be a valid UUID' };
+  }
+  if (typeof obj.title !== 'string' || obj.title.length < 1 || obj.title.length > 200) {
+    return { success: false, error: 'Title is required and must be 1-200 characters' };
+  }
+  if (typeof obj.body !== 'string' || obj.body.length < 1 || obj.body.length > 1000) {
+    return { success: false, error: 'Body is required and must be 1-1000 characters' };
+  }
+  
+  return {
+    success: true,
+    data: {
+      userId: obj.userId,
+      title: obj.title,
+      body: obj.body,
+      data: (obj.data && typeof obj.data === 'object') ? obj.data as Record<string, unknown> : undefined,
+      icon: typeof obj.icon === 'string' ? obj.icon : undefined,
+      badge: typeof obj.badge === 'string' ? obj.badge : undefined,
+    }
+  };
+}
 
 // Encodage base64url sans padding
 function base64UrlEncode(data: Uint8Array | string): string {
@@ -47,133 +73,50 @@ async function generateVapidJWT(
   const audience = new URL(endpoint).origin;
   const expiration = Math.floor(Date.now() / 1000) + (12 * 60 * 60); // 12 heures
 
-  const header = {
-    typ: 'JWT',
-    alg: 'ES256'
-  };
-
-  const payload = {
-    aud: audience,
-    exp: expiration,
-    sub: subject
-  };
+  const header = { typ: 'JWT', alg: 'ES256' };
+  const payload = { aud: audience, exp: expiration, sub: subject };
 
   const headerBase64 = base64UrlEncode(JSON.stringify(header));
   const payloadBase64 = base64UrlEncode(JSON.stringify(payload));
   const unsignedToken = `${headerBase64}.${payloadBase64}`;
 
   try {
-    // Convertir la clé privée VAPID en format utilisable
     const privateKeyBytes = base64UrlDecode(privateKeyBase64);
+    
+    // Create ArrayBuffer from Uint8Array for crypto API
+    const keyBuffer = privateKeyBytes.buffer.slice(
+      privateKeyBytes.byteOffset,
+      privateKeyBytes.byteOffset + privateKeyBytes.byteLength
+    ) as ArrayBuffer;
 
-    // Importer la clé privée pour ECDSA P-256
     const privateKey = await crypto.subtle.importKey(
       'pkcs8',
-      createPKCS8FromRaw(privateKeyBytes),
+      keyBuffer,
       { name: 'ECDSA', namedCurve: 'P-256' },
       false,
       ['sign']
     );
 
-    // Signer le token
     const signatureBuffer = await crypto.subtle.sign(
       { name: 'ECDSA', hash: 'SHA-256' },
       privateKey,
       new TextEncoder().encode(unsignedToken)
     );
 
-    // Convertir la signature DER en format JWT (r || s)
-    const signature = convertDERtoJWTSignature(new Uint8Array(signatureBuffer));
+    const signature = new Uint8Array(signatureBuffer);
     const signatureBase64 = base64UrlEncode(signature);
 
     return `${unsignedToken}.${signatureBase64}`;
-  } catch (error) {
-    console.error('VAPID JWT generation failed:', error);
+  } catch (err) {
+    console.error('VAPID JWT generation failed:', err);
     throw new Error('Failed to generate VAPID JWT');
   }
-}
-
-// Créer une structure PKCS8 à partir de la clé raw
-function createPKCS8FromRaw(rawKey: Uint8Array): Uint8Array {
-  // Si la clé est déjà en format PKCS8, la retourner
-  if (rawKey.length > 100) return rawKey;
-
-  // Sinon, on assume que c'est une clé raw de 32 bytes
-  // Structure PKCS8 pour clé ECDSA P-256
-  const pkcs8Prefix = new Uint8Array([
-    0x30, 0x81, 0x87, 0x02, 0x01, 0x00, 0x30, 0x13, 0x06, 0x07, 0x2A, 0x86,
-    0x48, 0xCE, 0x3D, 0x02, 0x01, 0x06, 0x08, 0x2A, 0x86, 0x48, 0xCE, 0x3D,
-    0x03, 0x01, 0x07, 0x04, 0x6D, 0x30, 0x6B, 0x02, 0x01, 0x01, 0x04, 0x20
-  ]);
-
-  const pkcs8Suffix = new Uint8Array([
-    0xA1, 0x44, 0x03, 0x42, 0x00
-  ]);
-
-  const result = new Uint8Array(pkcs8Prefix.length + rawKey.length + pkcs8Suffix.length + 65);
-  result.set(pkcs8Prefix);
-  result.set(rawKey, pkcs8Prefix.length);
-  // Note: Cette implémentation simplifiée peut nécessiter des ajustements selon le format de clé
-  return rawKey; // Retourner tel quel si déjà formaté
-}
-
-// Convertir signature DER en format compact JWT
-function convertDERtoJWTSignature(derSignature: Uint8Array): Uint8Array {
-  // Si la signature est déjà en format compact (64 bytes), la retourner
-  if (derSignature.length === 64) return derSignature;
-
-  // Sinon, parser le format DER
-  try {
-    let offset = 2; // Skip sequence tag and length
-
-    // Parse r
-    if (derSignature[offset] !== 0x02) throw new Error('Invalid DER');
-    const rLen = derSignature[offset + 1];
-    offset += 2;
-    let r = derSignature.slice(offset, offset + rLen);
-    offset += rLen;
-
-    // Parse s
-    if (derSignature[offset] !== 0x02) throw new Error('Invalid DER');
-    const sLen = derSignature[offset + 1];
-    offset += 2;
-    let s = derSignature.slice(offset, offset + sLen);
-
-    // Normaliser à 32 bytes chacun
-    if (r.length > 32) r = r.slice(-32);
-    if (s.length > 32) s = s.slice(-32);
-
-    const result = new Uint8Array(64);
-    result.set(r.length < 32 ? new Uint8Array(32 - r.length).fill(0) : [], 0);
-    result.set(r, 32 - r.length);
-    result.set(s.length < 32 ? new Uint8Array(32 - s.length).fill(0) : [], 32);
-    result.set(s, 64 - s.length);
-
-    return result;
-  } catch {
-    return derSignature.slice(0, 64); // Fallback
-  }
-}
-
-// Chiffrer le payload pour Web Push (simplification - en prod utiliser aes128gcm)
-async function encryptPayload(
-  payload: string,
-  subscription: { endpoint: string; keys: { p256dh: string; auth: string } }
-): Promise<{ body: Uint8Array; salt: Uint8Array; serverPublicKey: Uint8Array }> {
-  // Pour une implémentation simplifiée, envoyer le payload en clair
-  // Web Push moderne (vapid) accepte les payloads non chiffrés pour certains endpoints
-  return {
-    body: new TextEncoder().encode(payload),
-    salt: crypto.getRandomValues(new Uint8Array(16)),
-    serverPublicKey: new Uint8Array(65)
-  };
 }
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
 
   try {
-    // Vérifier l'authentification
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
       return new Response(JSON.stringify({
@@ -190,7 +133,6 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
     );
 
-    // Vérifier le token JWT
     const token = authHeader.replace('Bearer ', '');
     const { data: userData, error: authError } = await supabaseClient.auth.getUser(token);
 
@@ -204,25 +146,22 @@ serve(async (req) => {
       });
     }
 
-    // Parser et valider le payload
     const rawBody = await req.json();
-    const validationResult = pushNotificationSchema.safeParse(rawBody);
+    const validationResult = validatePushNotification(rawBody);
 
     if (!validationResult.success) {
       return new Response(JSON.stringify({
         success: false,
         error: 'Validation error',
-        details: validationResult.error.flatten()
+        details: validationResult.error
       }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
-    const { userId, title, body, data, icon, badge } = validationResult.data;
+    const { userId, title, body, data, icon, badge } = validationResult.data!;
 
-    // Vérifier que l'utilisateur ne peut envoyer des notifications qu'à lui-même
-    // sauf s'il a un rôle admin
     const { data: profile } = await supabaseClient
       .from('profiles')
       .select('role')
@@ -247,7 +186,6 @@ serve(async (req) => {
 
     if (!vapidPrivateKey || !vapidPublicKey) {
       console.error('VAPID keys not configured');
-      // En développement, simuler le succès
       return new Response(JSON.stringify({
         success: true,
         message: 'VAPID not configured - notification simulated',
@@ -257,7 +195,6 @@ serve(async (req) => {
       });
     }
 
-    // Récupérer les subscriptions actives de l'utilisateur
     const { data: subscriptions, error } = await supabaseClient
       .from('push_subscriptions')
       .select('*')
@@ -287,18 +224,17 @@ serve(async (req) => {
       tag: data?.tag || `notification-${Date.now()}`
     });
 
-    const results = [];
+    const results: Array<{ endpoint: string; success: boolean; status?: number; error?: string }> = [];
 
     for (const sub of subscriptions) {
       try {
-        const subscriptionData = sub.subscription_data;
+        const subscriptionData = sub.subscription_data as { endpoint?: string; keys?: { p256dh: string; auth: string } } | null;
 
         if (!subscriptionData?.endpoint) {
           console.warn('Invalid subscription data:', sub.id);
           continue;
         }
 
-        // Générer le JWT VAPID
         let vapidToken = '';
         try {
           vapidToken = await generateVapidJWT(
@@ -309,18 +245,16 @@ serve(async (req) => {
           );
         } catch (jwtError) {
           console.error('VAPID JWT error:', jwtError);
-          // Fallback: utiliser un format simplifié
           vapidToken = base64UrlEncode(`${vapidPublicKey}:${Date.now()}`);
         }
 
-        // Envoyer la notification via Web Push
         const pushResponse = await fetch(subscriptionData.endpoint, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/octet-stream',
             'Content-Encoding': 'aes128gcm',
-            'TTL': '86400', // 24 heures
-            'Urgency': data?.urgency || 'normal',
+            'TTL': '86400',
+            'Urgency': (data?.urgency as string) || 'normal',
             'Authorization': `vapid t=${vapidToken}, k=${vapidPublicKey}`
           },
           body: notificationPayload
@@ -334,11 +268,8 @@ serve(async (req) => {
           status: pushResponse.status
         });
 
-        // Gérer les erreurs de subscription
         if (!success) {
           console.error(`Push failed: ${pushResponse.status} for endpoint ${sub.id}`);
-
-          // 410 Gone ou 404 = subscription invalide
           if (pushResponse.status === 410 || pushResponse.status === 404) {
             await supabaseClient
               .from('push_subscriptions')
@@ -346,23 +277,23 @@ serve(async (req) => {
               .eq('id', sub.id);
           }
         }
-      } catch (error) {
-        console.error('Push failed for subscription:', sub.id, error);
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+        console.error('Push failed for subscription:', sub.id, err);
         results.push({
-          endpoint: sub.endpoint?.substring(0, 50) + '...',
+          endpoint: (sub.endpoint as string)?.substring(0, 50) + '...',
           success: false,
-          error: error.message
+          error: errorMessage
         });
       }
     }
 
-    // Enregistrer dans l'historique
     try {
       await supabaseClient
         .from('notification_history')
         .insert({
           user_id: userId,
-          notification_type: data?.type || 'general',
+          notification_type: (data?.type as string) || 'general',
           title,
           body,
           was_sent: results.some(r => r.success),
@@ -382,11 +313,12 @@ serve(async (req) => {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
 
-  } catch (error) {
-    console.error('[send-push-notification] Error:', error);
+  } catch (err) {
+    const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+    console.error('[send-push-notification] Error:', err);
     return new Response(JSON.stringify({
       success: false,
-      error: error.message
+      error: errorMessage
     }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

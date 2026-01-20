@@ -874,11 +874,11 @@ export class ScoresService {
       return sessionType || 'unknown';
     }).filter((v, i, a) => a.indexOf(v) === i); // Unique values
 
-    // Facteurs contributifs
-    const contributingFactors: string[] = [];
-    if (emotions.length > 0) contributingFactors.push('Scans émotionnels récents');
-    if (sessions.length > 0) contributingFactors.push(`${sessions.length} sessions actives`);
-    if (journal.length > 0) contributingFactors.push('Entrées de journal récentes');
+    // Facteurs contributifs avec impact
+    const contributingFactors: { factor: string; impact: number }[] = [];
+    if (emotions.length > 0) contributingFactors.push({ factor: 'Scans émotionnels récents', impact: emotions.length * 5 });
+    if (sessions.length > 0) contributingFactors.push({ factor: `${sessions.length} sessions actives`, impact: sessions.length * 10 });
+    if (journal.length > 0) contributingFactors.push({ factor: 'Entrées de journal récentes', impact: journal.length * 8 });
 
     // Recommandations basées sur le vibe
     const recommendedModules: string[] = [];
