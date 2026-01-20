@@ -1,17 +1,20 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.43.4";
-import { z } from "https://esm.sh/zod@3.23.8";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Schéma de validation
-const analyzeTextSchema = z.object({
-  text: z.string().min(1, 'Text is required').max(10000, 'Text too long'),
-  language: z.enum(['fr', 'en']).optional().default('fr'),
-});
+// Inline validation for Deno compatibility
+const validateInput = (data: unknown): { success: boolean; data?: { text: string; language: string }; error?: string } => {
+  if (!data || typeof data !== 'object') return { success: false, error: 'Invalid input' };
+  const obj = data as Record<string, unknown>;
+  if (typeof obj.text !== 'string' || obj.text.length < 1) return { success: false, error: 'Text is required' };
+  if (obj.text.length > 10000) return { success: false, error: 'Text too long' };
+  const language = (obj.language === 'en' ? 'en' : 'fr') as string;
+  return { success: true, data: { text: obj.text, language } };
+};
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -46,19 +49,19 @@ serve(async (req) => {
 
     // Parser et valider le payload
     const rawBody = await req.json();
-    const validationResult = analyzeTextSchema.safeParse(rawBody);
+    const validationResult = validateInput(rawBody);
 
     if (!validationResult.success) {
       return new Response(
         JSON.stringify({
           error: 'Validation error',
-          details: validationResult.error.flatten()
+          details: validationResult.error
         }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    const { text } = validationResult.data;
+    const { text } = validationResult.data!;
 
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     if (!LOVABLE_API_KEY) {
@@ -99,8 +102,8 @@ serve(async (req) => {
     });
 
     if (!response.ok) {
-      const error = await response.text();
-      console.error('[analyze-text] Lovable AI error:', error);
+      const errorText = await response.text();
+      console.error('[analyze-text] Lovable AI error:', errorText);
       throw new Error(`Lovable AI error: ${response.status}`);
     }
 
