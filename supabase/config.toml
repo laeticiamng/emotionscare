@@ -13,7 +13,7 @@ verify_jwt = true
 verify_jwt = false
 
 [functions.emotion-music-ai]
-verify_jwt = true
+verify_jwt = false
 
 [functions.gamification]
 verify_jwt = true
@@ -103,7 +103,7 @@ verify_jwt = true
 verify_jwt = true
 
 [functions.crisis-detection]
-verify_jwt = true
+verify_jwt = false
 
 [functions.data-export]
 verify_jwt = true
