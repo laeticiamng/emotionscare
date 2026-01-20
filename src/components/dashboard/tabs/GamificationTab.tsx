@@ -1,50 +1,30 @@
 // @ts-nocheck
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
+import { Skeleton } from '@/components/ui/skeleton';
 import { 
   Trophy, Star, Medal, TrendingUp, Download, Share2, 
   Target, Flame, Award, Crown 
 } from 'lucide-react';
-import { mockChallenges, mockBadges, mockLeaderboard } from '@/hooks/community-gamification/mockData';
+import { useGamificationRealData } from '@/hooks/useGamificationRealData';
 import { useToast } from '@/hooks/use-toast';
 
 export interface GamificationTabProps {
   className?: string;
 }
 
-const STORAGE_KEY = 'gamification-tab-stats';
-
 const GamificationTab: React.FC<GamificationTabProps> = ({ className }) => {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState('overview');
-  const [stats, setStats] = useState({
-    totalPoints: 0,
-    level: 1,
-    badgesEarned: 0,
-    challengesCompleted: 0,
-  });
-
-  useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) setStats(JSON.parse(saved));
-    
-    // Calculate stats from mock data
-    const points = mockLeaderboard.find(e => e.rank === 1)?.score || 0;
-    const badges = mockBadges.filter(b => b.earned).length;
-    const challenges = mockChallenges.filter(c => c.progress >= 100).length;
-    
-    const newStats = { totalPoints: points, level: Math.floor(points / 100) + 1, badgesEarned: badges, challengesCompleted: challenges };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(newStats));
-    setStats(newStats);
-  }, []);
+  const { stats, badges, challenges, leaderboard, isLoading } = useGamificationRealData();
 
   const handleExport = () => {
-    const data = { stats, challenges: mockChallenges, badges: mockBadges };
+    const data = { stats, challenges, badges };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -53,6 +33,26 @@ const GamificationTab: React.FC<GamificationTabProps> = ({ className }) => {
     a.click();
     toast({ title: 'Exporté !', description: 'Données de gamification téléchargées' });
   };
+
+  if (isLoading) {
+    return (
+      <div className={className}>
+        <Card>
+          <CardHeader>
+            <Skeleton className="h-6 w-40" />
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-4 gap-3">
+              {[...Array(4)].map((_, i) => (
+                <Skeleton key={i} className="h-20 w-full" />
+              ))}
+            </div>
+            <Skeleton className="h-48 w-full" />
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   const handleShare = async () => {
     const text = `🎮 Mon profil EmotionsCare: Niveau ${stats.level} | ${stats.totalPoints} pts | ${stats.badgesEarned} badges !`;
@@ -106,46 +106,58 @@ const GamificationTab: React.FC<GamificationTabProps> = ({ className }) => {
             </TabsList>
 
             <TabsContent value="overview" className="space-y-4 mt-4">
-              {mockChallenges.slice(0, 3).map(challenge => (
-                <div key={challenge.id} className="border p-3 rounded-md">
-                  <div className="flex justify-between items-center mb-2">
-                    <h4 className="font-medium flex items-center gap-2">
-                      <Flame className="h-4 w-4 text-orange-500" />
-                      {challenge.title}
-                    </h4>
-                    <Badge variant={challenge.progress >= 100 ? "default" : "secondary"}>
-                      {challenge.progress}%
-                    </Badge>
+              {challenges.length === 0 ? (
+                <p className="text-center text-muted-foreground py-8">Aucun défi actif pour le moment</p>
+              ) : (
+                challenges.slice(0, 3).map(challenge => (
+                  <div key={challenge.id} className="border p-3 rounded-md">
+                    <div className="flex justify-between items-center mb-2">
+                      <h4 className="font-medium flex items-center gap-2">
+                        <Flame className="h-4 w-4 text-orange-500" />
+                        {challenge.title}
+                      </h4>
+                      <Badge variant={challenge.status === 'completed' ? "default" : "secondary"}>
+                        {challenge.progress}%
+                      </Badge>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-2">{challenge.description}</p>
+                    <Progress value={challenge.progress} className="h-2" />
                   </div>
-                  <p className="text-sm text-muted-foreground mb-2">{challenge.description}</p>
-                  <Progress value={challenge.progress} className="h-2" />
-                </div>
-              ))}
+                ))
+              )}
             </TabsContent>
 
             <TabsContent value="badges" className="mt-4">
-              <div className="grid grid-cols-3 gap-4">
-                {mockBadges.map(badge => (
-                  <div key={badge.id} className={`border p-3 rounded-md text-center ${badge.earned ? 'border-primary' : 'opacity-50'}`}>
-                    <div className="text-2xl mb-2">{badge.earned ? '🏅' : '🔒'}</div>
-                    <p className="text-sm font-medium">{badge.name}</p>
-                  </div>
-                ))}
-              </div>
+              {badges.length === 0 ? (
+                <p className="text-center text-muted-foreground py-8">Aucun badge disponible</p>
+              ) : (
+                <div className="grid grid-cols-3 gap-4">
+                  {badges.map(badge => (
+                    <div key={badge.id} className={`border p-3 rounded-md text-center ${badge.earned ? 'border-primary' : 'opacity-50'}`}>
+                      <div className="text-2xl mb-2">{badge.earned ? badge.icon || '🏅' : '🔒'}</div>
+                      <p className="text-sm font-medium">{badge.name}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
             </TabsContent>
 
             <TabsContent value="leaderboard" className="mt-4 space-y-2">
-              {mockLeaderboard.slice(0, 5).map(entry => (
-                <div key={entry.id} className={`flex justify-between items-center border p-3 rounded-md ${entry.rank <= 3 ? 'bg-primary/5' : ''}`}>
-                  <div className="flex items-center gap-3">
-                    <span className="font-bold w-6 text-center">
-                      {entry.rank === 1 ? '🥇' : entry.rank === 2 ? '🥈' : entry.rank === 3 ? '🥉' : `#${entry.rank}`}
-                    </span>
-                    <span>{entry.username}</span>
+              {leaderboard.length === 0 ? (
+                <p className="text-center text-muted-foreground py-8">Classement non disponible</p>
+              ) : (
+                leaderboard.slice(0, 5).map(entry => (
+                  <div key={entry.id} className={`flex justify-between items-center border p-3 rounded-md ${entry.rank <= 3 ? 'bg-primary/5' : ''}`}>
+                    <div className="flex items-center gap-3">
+                      <span className="font-bold w-6 text-center">
+                        {entry.rank === 1 ? '🥇' : entry.rank === 2 ? '🥈' : entry.rank === 3 ? '🥉' : `#${entry.rank}`}
+                      </span>
+                      <span>{entry.username}</span>
+                    </div>
+                    <span className="font-medium text-primary">{entry.score} pts</span>
                   </div>
-                  <span className="font-medium text-primary">{entry.score} pts</span>
-                </div>
-              ))}
+                ))
+              )}
             </TabsContent>
           </Tabs>
         </CardContent>
