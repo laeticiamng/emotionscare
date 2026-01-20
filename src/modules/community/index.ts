@@ -17,6 +17,13 @@ export { CommunityTrendingService } from './services/communityTrendingService';
 export { CommunityMentionService } from './services/communityMentionService';
 
 // ============================================================================
+// HOOK
+// ============================================================================
+
+export { useCommunity } from './useCommunity';
+export type { UseCommunityReturn } from './useCommunity';
+
+// ============================================================================
 // TYPES
 // ============================================================================
 

@@ -13,6 +13,13 @@ import { lazyDefault } from '@/lib/lazyDefault';
 export { BossGritService } from './bossGritService';
 
 // ============================================================================
+// HOOK
+// ============================================================================
+
+export { useBossGrit } from './useBossGrit';
+export type { UseBossGritReturn } from './useBossGrit';
+
+// ============================================================================
 // TYPES
 // ============================================================================
 

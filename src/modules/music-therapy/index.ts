@@ -12,6 +12,13 @@
 export { MusicTherapyService, musicTherapyService } from './musicTherapyServiceUnified';
 
 // ============================================================================
+// HOOK
+// ============================================================================
+
+export { useMusicTherapy } from './useMusicTherapy';
+export type { UseMusicTherapyReturn } from './useMusicTherapy';
+
+// ============================================================================
 // TYPES
 // ============================================================================
 
