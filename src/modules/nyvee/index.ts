@@ -6,8 +6,7 @@
 // SERVICE
 // ============================================================================
 
-export { nyveeService } from './nyveeService';
-export { nyveeService as NyveeServiceEnriched } from './nyveeServiceUnified';
+export { nyveeService, NyveeServiceEnriched } from './nyveeServiceUnified';
 
 // ============================================================================
 // HOOKS

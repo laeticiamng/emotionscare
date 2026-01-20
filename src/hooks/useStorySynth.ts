@@ -4,7 +4,7 @@
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import * as storySynthService from '@/modules/story-synth/storySynthService';
+import { storySynthService } from '@/modules/story-synth/storySynthServiceUnified';
 import { useToast } from '@/hooks/use-toast';
 
 export const useStorySynth = (userId: string) => {

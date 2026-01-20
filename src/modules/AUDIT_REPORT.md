@@ -1,12 +1,11 @@
 # Audit des 48 Modules - EmotionsCare
 
-## Résumé
+## Résumé (Après nettoyage)
 
 | Catégorie | Modules | Statut |
 |-----------|---------|--------|
-| ✅ Complets | 34 | Bien structurés |
-| ⚠️ À consolider | 8 | Duplications/services multiples |
-| 🔧 À nettoyer | 6 | Index doubles, exports conflictuels |
+| ✅ Complets | 48 | Nettoyés et consolidés |
+| 🗑️ Supprimés | 19 fichiers | Services legacy + index doubles |
 
 ---
 

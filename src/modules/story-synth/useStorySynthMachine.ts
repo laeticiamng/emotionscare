@@ -5,7 +5,7 @@
 
 import { useState, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import * as service from './storySynthService';
+import { storySynthService as service } from './storySynthServiceUnified';
 import type {
   StorySynthState,
   StoryTheme,

@@ -3,7 +3,7 @@
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { MoodMixerService } from '@/modules/mood-mixer/moodMixerService';
+import { MoodMixerService } from '@/modules/mood-mixer/moodMixerServiceUnified';
 import { useToast } from '@/hooks/use-toast';
 
 export const useMoodMixer = (userId: string) => {

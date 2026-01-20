@@ -1,13 +1,45 @@
 /**
- * Story Synth Module - Index TypeScript
- * Re-exports depuis index.tsx pour compatibilité
- * 
+ * Story Synth Module - Narration thérapeutique immersive et adaptative
  * @module story-synth
  */
 
-// Tout est exporté depuis index.tsx, ce fichier sert de pont
+import { lazyDefault } from '@/lib/lazyDefault';
+
+// ============================================================================
+// SERVICE UNIFIÉ
+// ============================================================================
+
+export { storySynthService, StorySynthServiceEnriched } from './storySynthServiceUnified';
+
+// ============================================================================
+// HOOKS
+// ============================================================================
+
+export { useStorySynthMachine } from './useStorySynthMachine';
+export { useStorySynthEnriched } from './useStorySynthEnriched';
+export type { 
+  UseStorySynthEnrichedReturn,
+  StorySynthSessionEnriched,
+  StoryGenerationConfig,
+  StorySynthAchievement,
+} from './useStorySynthEnriched';
+
+// ============================================================================
+// COMPOSANTS
+// ============================================================================
+
+export { StoryCard } from './components/StoryCard';
+export { StoryStats } from './components/StoryStats';
+export { StoryGeneratorForm } from './components/StoryGeneratorForm';
+export { StoryReader } from './components/StoryReader';
+export { StoryLibrary } from './components/StoryLibrary';
+
+// ============================================================================
+// TYPES
+// ============================================================================
+
 export * from './types';
-export { storySynthService } from './storySynthServiceUnified';
+export type { StorySynthState, StorySynthPhase } from './types';
 export type {
   EnrichedStorySynthSession,
   NarrativeArc,
@@ -17,3 +49,15 @@ export type {
   EmotionalImpactPoint,
   PersonalizedStory,
 } from './storySynthServiceUnified';
+
+// ============================================================================
+// PAGE
+// ============================================================================
+
+export { default } from './StorySynthPage';
+export { default as StorySynthPage } from './StorySynthPage';
+
+export const LazyStorySynthPage = lazyDefault(
+  () => import('./StorySynthPage'),
+  'StorySynthPage'
+);

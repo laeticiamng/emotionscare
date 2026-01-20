@@ -3,7 +3,7 @@
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { nyveeService } from '@/modules/nyvee/nyveeService';
+import { nyveeService } from '@/modules/nyvee/nyveeServiceUnified';
 import { useToast } from '@/hooks/use-toast';
 
 export const useNyvee = (userId: string) => {
