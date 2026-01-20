@@ -15,7 +15,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { ShoppingCart, Minus, Plus, Trash2, ExternalLink, Loader2 } from "lucide-react";
-import { useCartStore } from "@/stores/cartStore";
+import { useCartStore, type CartItem } from "@/store";
 import { createStorefrontCheckout } from "@/lib/shopify";
 import { formatPrice, formatTotal } from "@/lib/currency";
 import { toast } from "sonner";
