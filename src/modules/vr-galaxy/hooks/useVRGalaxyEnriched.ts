@@ -72,7 +72,7 @@ export const useVRGalaxyEnriched = (): UseVRGalaxyEnrichedReturn => {
   const sessionStartTime = useRef<number | null>(null);
   const userId = useRef<string | null>(null);
 
-  // Charger les données au montage
+  // Charger les données au montage - depuis Supabase uniquement
   useEffect(() => {
     const loadData = async () => {
       setState(prev => ({ ...prev, isLoading: true }));
@@ -82,24 +82,41 @@ export const useVRGalaxyEnriched = (): UseVRGalaxyEnrichedReturn => {
         const { data: { user } } = await supabase.auth.getUser();
         userId.current = user?.id || null;
 
-        // Charger depuis localStorage
-        const stored = localStorage.getItem(STORAGE_KEY);
-        if (stored) {
-          const parsed = JSON.parse(stored);
-          setState(prev => ({
-            ...prev,
-            favorites: parsed.favorites || [],
-            stats: {
-              ...prev.stats,
-              ...parsed.stats,
-              galaxiesVisited: new Set(parsed.stats?.galaxiesVisited || []),
-            },
-          }));
-        }
-
-        // Charger les stats depuis Supabase
         if (user?.id) {
+          // Charger les favoris depuis Supabase (table profiles ou user_preferences)
+          const { data: profileData } = await supabase
+            .from('profiles')
+            .select('preferences')
+            .eq('id', user.id)
+            .maybeSingle();
+
+          const savedPrefs = profileData?.preferences as Record<string, unknown> | null;
+          const vrGalaxyPrefs = savedPrefs?.vr_galaxy as Record<string, unknown> | undefined;
+          
+          if (vrGalaxyPrefs?.favorites) {
+            setState(prev => ({
+              ...prev,
+              favorites: (vrGalaxyPrefs.favorites as GalaxyFavorite[]) || [],
+            }));
+          }
+
+          // Charger les stats depuis les sessions Supabase
           await refreshStatsFromDB(user.id);
+        } else {
+          // Fallback localStorage pour utilisateurs non connectés
+          const stored = localStorage.getItem(STORAGE_KEY);
+          if (stored) {
+            const parsed = JSON.parse(stored);
+            setState(prev => ({
+              ...prev,
+              favorites: parsed.favorites || [],
+              stats: {
+                ...prev.stats,
+                ...parsed.stats,
+                galaxiesVisited: new Set(parsed.stats?.galaxiesVisited || []),
+              },
+            }));
+          }
         }
       } catch (error) {
         logger.error('VRGalaxy: Failed to load data', error as Error, 'VR');
@@ -111,8 +128,9 @@ export const useVRGalaxyEnriched = (): UseVRGalaxyEnrichedReturn => {
     loadData();
   }, []);
 
-  // Sauvegarder les données locales
-  const persistLocal = useCallback((data: Partial<VRGalaxyState>) => {
+  // Sauvegarder les données vers Supabase (avec fallback localStorage)
+  const persistData = useCallback(async (data: Partial<VRGalaxyState>) => {
+    // Toujours sauvegarder en local pour le cache
     try {
       const current = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
       const updated = {
@@ -128,6 +146,38 @@ export const useVRGalaxyEnriched = (): UseVRGalaxyEnrichedReturn => {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
     } catch (error) {
       logger.warn('VRGalaxy: Failed to persist local data', undefined, 'VR');
+    }
+
+    // Sauvegarder dans Supabase si utilisateur connecté
+    if (userId.current && data.favorites) {
+      try {
+        // Récupérer les préférences existantes
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('preferences')
+          .eq('id', userId.current)
+          .maybeSingle();
+
+        const existingPrefs = (profileData?.preferences as Record<string, unknown>) || {};
+        
+        // Mettre à jour avec les nouvelles données VR Galaxy
+        await supabase
+          .from('profiles')
+          .update({
+            preferences: {
+              ...existingPrefs,
+              vr_galaxy: {
+                favorites: data.favorites,
+                lastUpdated: new Date().toISOString(),
+              },
+            },
+          })
+          .eq('id', userId.current);
+
+        logger.info('VRGalaxy: Favorites synced to Supabase', undefined, 'VR');
+      } catch (error) {
+        logger.warn('VRGalaxy: Failed to sync to Supabase', undefined, 'VR');
+      }
     }
   }, []);
 
@@ -287,7 +337,7 @@ export const useVRGalaxyEnriched = (): UseVRGalaxyEnrichedReturn => {
         totalDiscoveries: prev.stats.totalDiscoveries + state.discoveries.length,
       };
 
-      persistLocal({ stats: newStats });
+      persistData({ stats: newStats });
 
       return {
         ...prev,
@@ -302,7 +352,7 @@ export const useVRGalaxyEnriched = (): UseVRGalaxyEnrichedReturn => {
     logger.info('VRGalaxy: Session ended', { duration: durationSeconds, discoveries: state.discoveries.length }, 'VR');
 
     return report;
-  }, [state.currentSession, state.discoveries, state.biometrics, state.galaxyType, persistLocal]);
+  }, [state.currentSession, state.discoveries, state.biometrics, state.galaxyType, persistData]);
 
   // Enregistrer une découverte
   const recordDiscovery = useCallback((discovery: Omit<Discovery, 'timestamp'>) => {
@@ -349,19 +399,19 @@ export const useVRGalaxyEnriched = (): UseVRGalaxyEnrichedReturn => {
 
     setState(prev => {
       const updated = [...prev.favorites, newFavorite];
-      persistLocal({ favorites: updated });
+      persistData({ favorites: updated });
       return { ...prev, favorites: updated };
     });
-  }, [persistLocal]);
+  }, [persistData]);
 
   // Retirer des favoris
   const removeFromFavorites = useCallback((id: string) => {
     setState(prev => {
       const updated = prev.favorites.filter(f => f.id !== id);
-      persistLocal({ favorites: updated });
+      persistData({ favorites: updated });
       return { ...prev, favorites: updated };
     });
-  }, [persistLocal]);
+  }, [persistData]);
 
   // Récupérer l'historique des sessions
   const getSessionHistory = useCallback(async (limit = 50): Promise<VRGalaxySession[]> => {

@@ -1,13 +1,14 @@
 // @ts-nocheck
 /**
  * Perfect Dashboard - Tableau de bord intelligent et adaptatif
- * Interface principale qui s'adapte à l'utilisateur et au contexte
+ * Interface principale avec données réelles Supabase
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { usePerfectDashboardData } from '@/hooks/usePerfectDashboardData';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -31,40 +32,19 @@ import {
   Activity
 } from 'lucide-react';
 
-interface DashboardData {
-  wellnessScore: number;
-  todaysSessions: number;
-  weekStreak: number;
-  emotionalState: string;
-  recommendations: Array<{
-    title: string;
-    description: string;
-    action: string;
-    path: string;
-    priority: 'high' | 'medium' | 'low';
-    icon: React.ReactNode;
-  }>;
-  recentActivities: Array<{
-    id: string;
-    type: string;
-    title: string;
-    time: string;
-    score: number;
-  }>;
-  achievements: Array<{
-    id: string;
-    title: string;
-    description: string;
-    progress: number;
-    unlocked: boolean;
-  }>;
+interface Recommendation {
+  title: string;
+  description: string;
+  action: string;
+  path: string;
+  priority: 'high' | 'medium' | 'low';
+  icon: React.ReactNode;
 }
 
 const PerfectDashboard: React.FC = () => {
   const { user } = useAuth();
-  const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
+  const { metrics, isLoading, refresh } = usePerfectDashboardData();
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [isLoading, setIsLoading] = useState(true);
 
   // Mise à jour de l'heure en temps réel
   useEffect(() => {
@@ -72,136 +52,84 @@ const PerfectDashboard: React.FC = () => {
     return () => clearInterval(timer);
   }, []);
 
-  // Simulation de données dashboard intelligentes
-  useEffect(() => {
-    const generatePersonalizedData = async () => {
-      setIsLoading(true);
-      
-      // Simulation d'API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      const hour = currentTime.getHours();
-      let recommendations = [];
-      
-      // Recommandations contextuelles intelligentes
-      if (hour < 10) {
-        recommendations.push({
-          title: 'Routine matinale énergisante',
-          description: 'Commencez votre journée avec un scan émotionnel',
-          action: 'Démarrer scan',
-          path: '/app/scan',
-          priority: 'high' as const,
-          icon: <Brain className="w-5 h-5" />
-        });
-      } else if (hour < 14) {
-        recommendations.push({
-          title: 'Boost de mi-journée',
-          description: 'Une session de musique thérapeutique pour maintenir l\'énergie',
-          action: 'Écouter maintenant',
-          path: '/app/music',
-          priority: 'medium' as const,
-          icon: <Music className="w-5 h-5" />
-        });
-      } else if (hour < 18) {
-        recommendations.push({
-          title: 'Focus afternoon',
-          description: 'Session de respiration pour améliorer la concentration',
-          action: 'Respirer',
-          path: '/app/breath',
-          priority: 'medium' as const,
-          icon: <Zap className="w-5 h-5" />
-        });
-      } else {
-        recommendations.push({
-          title: 'Relaxation du soir',
-          description: 'Préparez une nuit paisible avec notre VR galactique',
-          action: 'Se relaxer',
-          path: '/app/vr-galaxy',
-          priority: 'high' as const,
-          icon: <Sparkles className="w-5 h-5" />
-        });
+  // Recommandations contextuelles basées sur l'heure
+  const recommendations = useMemo((): Recommendation[] => {
+    const hour = currentTime.getHours();
+    const recs: Recommendation[] = [];
+    
+    // Recommandations contextuelles intelligentes
+    if (hour < 10) {
+      recs.push({
+        title: 'Routine matinale énergisante',
+        description: 'Commencez votre journée avec un scan émotionnel',
+        action: 'Démarrer scan',
+        path: '/app/scan',
+        priority: 'high',
+        icon: <Brain className="w-5 h-5" />
+      });
+    } else if (hour < 14) {
+      recs.push({
+        title: 'Boost de mi-journée',
+        description: 'Une session de musique thérapeutique pour maintenir l\'énergie',
+        action: 'Écouter maintenant',
+        path: '/app/music',
+        priority: 'medium',
+        icon: <Music className="w-5 h-5" />
+      });
+    } else if (hour < 18) {
+      recs.push({
+        title: 'Focus afternoon',
+        description: 'Session de respiration pour améliorer la concentration',
+        action: 'Respirer',
+        path: '/app/breath',
+        priority: 'medium',
+        icon: <Zap className="w-5 h-5" />
+      });
+    } else {
+      recs.push({
+        title: 'Relaxation du soir',
+        description: 'Préparez une nuit paisible avec notre VR galactique',
+        action: 'Se relaxer',
+        path: '/app/vr-galaxy',
+        priority: 'high',
+        icon: <Sparkles className="w-5 h-5" />
+      });
+    }
+
+    // Recommandations basées sur l'état émotionnel
+    if (metrics.emotionalState === 'tendu' || metrics.emotionalState === 'préoccupé') {
+      recs.unshift({
+        title: 'Respiration anti-stress',
+        description: 'Technique de cohérence cardiaque pour vous apaiser',
+        action: 'Commencer',
+        path: '/app/breath',
+        priority: 'high',
+        icon: <Heart className="w-5 h-5" />
+      });
+    }
+
+    // Recommandations toujours disponibles
+    recs.push(
+      {
+        title: 'Journal quotidien',
+        description: 'Notez vos réflexions et émotions du jour',
+        action: 'Écrire',
+        path: '/app/journal',
+        priority: 'medium',
+        icon: <BookOpen className="w-5 h-5" />
+      },
+      {
+        title: 'Coach IA disponible',
+        description: 'Votre coach virtuel est prêt à vous accompagner',
+        action: 'Discuter',
+        path: '/app/coach',
+        priority: 'low',
+        icon: <MessageSquare className="w-5 h-5" />
       }
+    );
 
-      // Recommandations toujours disponibles
-      recommendations.push(
-        {
-          title: 'Journal quotidien',
-          description: 'Notez vos réflexions et émotions du jour',
-          action: 'Écrire',
-          path: '/app/journal',
-          priority: 'medium' as const,
-          icon: <BookOpen className="w-5 h-5" />
-        },
-        {
-          title: 'Coach IA disponible',
-          description: 'Votre coach virtuel est prêt à vous accompagner',
-          action: 'Discuter',
-          path: '/app/coach',
-          priority: 'low' as const,
-          icon: <MessageSquare className="w-5 h-5" />
-        }
-      );
-
-      const mockData: DashboardData = {
-        wellnessScore: Math.floor(Math.random() * 20) + 75,
-        todaysSessions: Math.floor(Math.random() * 5) + 2,
-        weekStreak: Math.floor(Math.random() * 7) + 3,
-        emotionalState: ['serein', 'énergique', 'créatif', 'focalisé', 'paisible'][Math.floor(Math.random() * 5)],
-        recommendations,
-        recentActivities: [
-          {
-            id: '1',
-            type: 'scan',
-            title: 'Scan émotionnel matinal',
-            time: '9:15',
-            score: 87
-          },
-          {
-            id: '2',
-            type: 'music',
-            title: 'Session musique - Calme',
-            time: '13:45',
-            score: 92
-          },
-          {
-            id: '3',
-            type: 'breath',
-            title: 'Respiration guidée',
-            time: '16:20',
-            score: 85
-          }
-        ],
-        achievements: [
-          {
-            id: '1',
-            title: 'Explorateur émotionnel',
-            description: 'Complétez 10 scans différents',
-            progress: 70,
-            unlocked: false
-          },
-          {
-            id: '2',
-            title: 'Méditant régulier',
-            description: '7 jours consécutifs de pratique',
-            progress: 100,
-            unlocked: true
-          },
-          {
-            id: '3',
-            title: 'Maître du bien-être',
-            description: 'Score > 90 pendant 3 jours',
-            progress: 45,
-            unlocked: false
-          }
-        ]
-      };
-
-      setDashboardData(mockData);
-      setIsLoading(false);
-    };
-
-    generatePersonalizedData();
-  }, [currentTime.getHours()]);
+    return recs.slice(0, 4); // Max 4 recommandations
+  }, [currentTime.getHours(), metrics.emotionalState]);
 
   const getGreeting = () => {
     const hour = currentTime.getHours();

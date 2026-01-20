@@ -106,25 +106,131 @@ const AIRecommendationsWidget: React.FC<AIRecommendationsWidgetProps> = ({
       if (!user) return DEFAULT_RECOMMENDATIONS;
 
       try {
-        // Try to get AI recommendations from edge function
-        const { data, error } = await supabase.functions.invoke('ai-coach', {
-          body: {
-            type: 'recommendations',
-            userId: user.id,
-            context: {
-              timeOfDay: new Date().getHours(),
-              dayOfWeek: new Date().getDay(),
-            }
-          }
-        });
+        // Fetch user context data for personalized recommendations
+        const [moodResult, activityResult, streakResult] = await Promise.all([
+          supabase
+            .from('mood_entries')
+            .select('mood, energy_level')
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .maybeSingle(),
+          supabase
+            .from('activity_sessions')
+            .select('activity:activities(category)')
+            .eq('user_id', user.id)
+            .eq('completed', true)
+            .order('started_at', { ascending: false })
+            .limit(5),
+          supabase
+            .from('activity_streaks')
+            .select('current_streak')
+            .eq('user_id', user.id)
+            .maybeSingle(),
+        ]);
 
-        if (error) throw error;
-        
-        if (data?.recommendations && Array.isArray(data.recommendations)) {
-          return data.recommendations.slice(0, maxItems);
+        const hour = new Date().getHours();
+        const currentMood = moodResult.data?.mood?.toLowerCase() || '';
+        const energyLevel = moodResult.data?.energy_level || 5;
+        const recentCategories = (activityResult.data || []).map((a: any) => a.activity?.category).filter(Boolean);
+        const streak = streakResult.data?.current_streak || 0;
+
+        // Build context-aware recommendations
+        const contextRecommendations: Recommendation[] = [];
+
+        // Time-based primary recommendation
+        if (hour < 10) {
+          contextRecommendations.push({
+            id: 'morning-1',
+            type: 'module',
+            title: 'Scan matinal',
+            description: 'Démarrez avec un check-in émotionnel',
+            duration: 3,
+            icon: 'brain',
+            route: '/app/scan',
+            priority: 'high',
+            reason: 'Parfait pour commencer la journée',
+          });
+        } else if (hour >= 12 && hour < 14) {
+          contextRecommendations.push({
+            id: 'lunch-1',
+            type: 'activity',
+            title: 'Pause respiratoire',
+            description: 'Rechargez vos batteries',
+            duration: 5,
+            icon: 'zap',
+            route: '/app/breath',
+            priority: 'high',
+            reason: 'Idéal pour la pause déjeuner',
+          });
+        } else if (hour >= 20) {
+          contextRecommendations.push({
+            id: 'evening-1',
+            type: 'module',
+            title: 'Relaxation nocturne',
+            description: 'Préparez un sommeil réparateur',
+            duration: 10,
+            icon: 'sparkles',
+            route: '/app/vr-galaxy',
+            priority: 'high',
+            reason: 'Détendez-vous avant de dormir',
+          });
         }
-        
-        return DEFAULT_RECOMMENDATIONS;
+
+        // Mood-based recommendations
+        if (['stressé', 'anxieux', 'bad', 'terrible'].includes(currentMood)) {
+          contextRecommendations.push({
+            id: 'mood-stress',
+            type: 'activity',
+            title: 'Cohérence cardiaque',
+            description: 'Réduisez le stress en 5 minutes',
+            duration: 5,
+            icon: 'heart',
+            route: '/app/breath',
+            priority: 'high',
+            reason: 'Basé sur votre état actuel',
+          });
+        }
+
+        // Energy-based recommendations
+        if (energyLevel <= 3) {
+          contextRecommendations.push({
+            id: 'energy-low',
+            type: 'music',
+            title: 'Musique énergisante',
+            description: 'Boostez votre énergie',
+            duration: 15,
+            icon: 'music',
+            route: '/app/music',
+            priority: 'medium',
+            reason: 'Pour recharger vos batteries',
+          });
+        }
+
+        // Streak motivation
+        if (streak > 0 && streak < 7) {
+          contextRecommendations.push({
+            id: 'streak-keep',
+            type: 'challenge',
+            title: 'Gardez votre série !',
+            description: `${streak} jours consécutifs - continuez !`,
+            duration: 2,
+            icon: 'flame',
+            route: '/app/challenges',
+            priority: 'medium',
+            reason: `Série de ${streak} jours à maintenir`,
+          });
+        }
+
+        // Fill with defaults if needed
+        if (contextRecommendations.length < maxItems) {
+          const needed = maxItems - contextRecommendations.length;
+          const existingIds = contextRecommendations.map(r => r.id);
+          const fillers = DEFAULT_RECOMMENDATIONS.filter(r => !existingIds.includes(r.id));
+          contextRecommendations.push(...fillers.slice(0, needed));
+        }
+
+        return contextRecommendations.slice(0, maxItems);
       } catch (err) {
         console.warn('AI recommendations fallback:', err);
         return DEFAULT_RECOMMENDATIONS;
