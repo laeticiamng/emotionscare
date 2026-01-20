@@ -1,64 +1,72 @@
-// @ts-nocheck
-
 import { useState, useEffect } from 'react';
 import { MoodData } from '@/types/other';
-import { format, subDays, startOfDay } from 'date-fns';
+import { format, subDays } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { logger } from '@/lib/logger';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 
 export function useMoodChartData(period: 'day' | 'week' | 'month' = 'week') {
+  const { user } = useAuth();
   const [moodData, setMoodData] = useState<MoodData[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadData = async () => {
+      if (!user?.id) {
+        setLoading(false);
+        return;
+      }
+      
       setLoading(true);
       
       try {
-        // Dans un vrai cas, nous récupérerions des données depuis une API
-        // Pour l'instant, nous générons des données de test
+        let numberOfDays = 7;
+        if (period === 'day') numberOfDays = 1;
+        else if (period === 'month') numberOfDays = 30;
         
-        let numberOfDays = 7; // Par défaut pour 'week'
+        const startDate = subDays(new Date(), numberOfDays).toISOString();
         
-        if (period === 'day') {
-          numberOfDays = 1;
-        } else if (period === 'month') {
-          numberOfDays = 30;
+        // Récupérer les données réelles depuis Supabase
+        const { data: entries, error } = await supabase
+          .from('mood_entries')
+          .select('id, mood, intensity, created_at, notes, energy_level')
+          .eq('user_id', user.id)
+          .gte('created_at', startDate)
+          .order('created_at', { ascending: true });
+
+        if (error) {
+          logger.warn('Erreur chargement mood_entries, fallback local', error, 'DB');
+          throw error;
         }
-        
-        // Générer des données factices pour chaque jour
-        const mockData: MoodData[] = [];
-        
-        for (let i = 0; i < numberOfDays; i++) {
-          const date = subDays(new Date(), i);
-          const formattedDate = format(date, 'yyyy-MM-dd');
-          const originalDate = format(date, 'dd MMMM', { locale: fr });
-          
-          mockData.push({
-            id: `mood-${i}`,
-            mood: ['happy', 'calm', 'sad', 'anxious', 'motivated'][Math.floor(Math.random() * 5)],
-            intensity: Math.floor(Math.random() * 10) + 1,
-            date: formattedDate,
-            value: Math.floor(Math.random() * 10) + 1,
-            sentiment: (Math.random() * 2) - 1, // Entre -1 et 1
-            anxiety: Math.random() * 10, // Entre 0 et 10
-            energy: Math.random() * 10, // Entre 0 et 10
-            originalDate
-          });
+
+        if (entries && entries.length > 0) {
+          const realData: MoodData[] = entries.map((entry) => ({
+            id: entry.id,
+            mood: entry.mood || 'neutral',
+            intensity: entry.intensity || 5,
+            date: format(new Date(entry.created_at), 'yyyy-MM-dd'),
+            value: entry.intensity || 5,
+            sentiment: ((entry.intensity || 5) - 5) / 5,
+            anxiety: Math.max(0, 5 - (entry.intensity || 5)),
+            energy: entry.energy_level || 5,
+            originalDate: format(new Date(entry.created_at), 'dd MMMM', { locale: fr })
+          }));
+          setMoodData(realData);
+        } else {
+          setMoodData([]);
         }
-        
-        setMoodData(mockData.sort((a, b) => a.date && b.date ? a.date.localeCompare(b.date) : 0));
       } catch (error) {
-        logger.error('Erreur lors du chargement des données', error as Error, 'UI');
+        logger.error('Erreur lors du chargement des données mood', error as Error, 'UI');
+        setMoodData([]);
       } finally {
         setLoading(false);
       }
     };
 
     loadData();
-  }, [period]);
+  }, [period, user?.id]);
 
-  // Transforme les données pour un format compatible avec les graphiques
   const chartData = moodData.map(item => ({
     date: item.date,
     value: item.intensity,
