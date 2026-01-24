@@ -273,7 +273,7 @@ describe('Matching Algorithm Functions', () => {
         scheduleMatch * 0.25
       );
 
-      expect(baseScore).toBe(0.65);
+      expect(baseScore).toBeCloseTo(0.65);
     });
 
     it('applique le bonus d\'intérêts communs (max 20%)', () => {
@@ -283,7 +283,7 @@ describe('Matching Algorithm Functions', () => {
       const finalScore = Math.min(1, baseScore + interestBonus);
 
       expect(interestBonus).toBe(0.2);
-      expect(finalScore).toBe(0.85);
+      expect(finalScore).toBeCloseTo(0.85);
     });
 
     it('plafonne le score final à 100%', () => {
