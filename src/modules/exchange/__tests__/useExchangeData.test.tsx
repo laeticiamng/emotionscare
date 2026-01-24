@@ -36,7 +36,7 @@ import {
 // MOCKS
 // ============================================================================
 
-const mockSupabaseResponse = <T>(data: T, error: Error | null = null, count?: number) => ({
+const mockSupabaseResponse = <T,>(data: T, error: Error | null = null, count?: number) => ({
   data,
   error,
   count,

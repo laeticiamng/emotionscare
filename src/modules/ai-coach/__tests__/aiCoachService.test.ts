@@ -187,13 +187,13 @@ describe('AI Coach Service', () => {
     });
 
     it('met à jour les émotions détectées', async () => {
-      const emotions = [{ emotion: 'happy', intensity: 0.9 }];
+      const emotions = [{ emotion: 'happy', intensity: 0.9 }] as any;
       mockChain.single.mockResolvedValue(mockSupabaseResponse({ ...mockSession, emotions_detected: emotions }));
 
       const result = await updateSession({
         session_id: 'session-123',
         emotions_detected: emotions,
-      });
+      } as any);
 
       expect(mockChain.update).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -203,13 +203,13 @@ describe('AI Coach Service', () => {
     });
 
     it('met à jour les techniques suggérées', async () => {
-      const techniques = ['breathing', 'meditation', 'journaling'];
+      const techniques = ['breathing', 'meditation', 'journaling'] as any;
       mockChain.single.mockResolvedValue(mockSupabaseResponse({ ...mockSession, techniques_suggested: techniques }));
 
       const result = await updateSession({
         session_id: 'session-123',
         techniques_suggested: techniques,
-      });
+      } as any);
 
       expect(result.techniques_suggested).toEqual(techniques);
     });

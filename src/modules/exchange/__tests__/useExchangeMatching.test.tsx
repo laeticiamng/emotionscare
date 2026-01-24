@@ -13,7 +13,7 @@ import { useExchangeMatching, useCreateMatch, type MatchCandidate } from '../hoo
 // MOCKS
 // ============================================================================
 
-const mockSupabaseResponse = <T>(data: T, error: Error | null = null) => ({
+const mockSupabaseResponse = <T,>(data: T, error: Error | null = null) => ({
   data,
   error,
 });

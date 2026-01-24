@@ -118,14 +118,12 @@ describe('Story Synth Types', () => {
     it('validates complete story content', () => {
       const content = {
         title: 'A Journey of Hope',
-        narrative: 'Once upon a time, in a world where courage mattered...',
-        reflection_prompts: [
-          'What does hope mean to you?',
-          'How can you cultivate inner strength?',
+        paragraphs: [
+          { id: 'p1', text: 'Once upon a time, in a world where courage mattered...', emphasis: 'normal' as const },
+          { id: 'p2', text: 'And so the journey began.', emphasis: 'soft' as const },
         ],
-        audio_url: 'https://storage.example.com/story-123.mp3',
-        duration_seconds: 360,
-        generated_at: '2025-01-15T10:00:00Z',
+        estimated_duration_seconds: 360,
+        ambient_music: 'calm-piano',
       };
 
       expect(() => StoryContentSchema.parse(content)).not.toThrow();
@@ -134,10 +132,9 @@ describe('Story Synth Types', () => {
     it('validates story content without optional fields', () => {
       const content = {
         title: 'Simple Story',
-        narrative: 'A brief tale of transformation.',
-        reflection_prompts: [],
-        duration_seconds: 120,
-        generated_at: '2025-01-15T10:00:00Z',
+        paragraphs: [
+          { id: 'p1', text: 'A brief tale of transformation.' },
+        ],
       };
 
       expect(() => StoryContentSchema.parse(content)).not.toThrow();
