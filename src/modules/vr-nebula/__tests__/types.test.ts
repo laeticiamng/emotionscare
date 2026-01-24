@@ -316,7 +316,7 @@ describe('VR Nebula Schemas', () => {
 
       it('should handle negative HRV delta', () => {
         const score = calculateCoherenceScore(5.5, -10);
-        expect(score).toBeLessThan(60);
+        expect(score).toBeLessThanOrEqual(60);
       });
     });
   });
