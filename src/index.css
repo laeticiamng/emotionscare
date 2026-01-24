@@ -3,6 +3,16 @@
 @import './styles/accessibility.css';
 @import './styles/base.css';
 @tailwind base;
+
+/* Animation pulse lente pour CTA */
+@keyframes pulse-slow {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 3s ease-in-out infinite;
+}
 @tailwind components;
 @tailwind utilities;
 

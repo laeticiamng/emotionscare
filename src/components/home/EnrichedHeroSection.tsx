@@ -1,56 +1,21 @@
 /**
- * EnrichedHeroSection - Section héro interventionnelle
+ * EnrichedHeroSection - Section héro interventionnelle OPTIMISÉE
  * Vision: EmotionsCare n'est pas une plateforme, c'est un réflexe émotionnel
+ * Performance: CSS animations au lieu de framer-motion pour FCP/LCP
  */
 
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import React, { memo, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Link, useNavigate } from 'react-router-dom';
-import { StopCircle, Clock, Zap, Heart, Shield, Brain, GraduationCap, Stethoscope } from 'lucide-react';
-import { useReducedMotion, getAnimationVariants } from '@/hooks/useReducedMotion';
+import { StopCircle, Clock, Heart, Shield, Brain, GraduationCap, Stethoscope, Zap } from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+// Suppression du composant SessionCard inutilisé (inline dans le rendu)
 
 const EnrichedHeroSection: React.FC = () => {
-  const prefersReducedMotion = useReducedMotion();
-  const animations = getAnimationVariants(prefersReducedMotion);
   const navigate = useNavigate();
   const [isHovered, setIsHovered] = useState(false);
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: prefersReducedMotion ? 0.05 : 0.15,
-        delayChildren: prefersReducedMotion ? 0 : 0.1,
-      },
-    },
-  };
-
-  const itemVariants = prefersReducedMotion
-    ? animations.fadeIn
-    : {
-        hidden: { opacity: 0, y: 30 },
-        visible: {
-          opacity: 1,
-          y: 0,
-          transition: { duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] },
-        },
-      };
-
-  const pulseVariants = prefersReducedMotion
-    ? { animate: {} }
-    : {
-        animate: {
-          scale: [1, 1.05, 1],
-          transition: {
-            duration: 2,
-            repeat: Infinity,
-            ease: 'easeInOut',
-          },
-        },
-      };
 
   // Action immédiate - lancer une session
   const handleImmediateAction = () => {
@@ -59,20 +24,10 @@ const EnrichedHeroSection: React.FC = () => {
 
   return (
     <section className="relative overflow-hidden min-h-[90vh] flex items-center py-12 lg:py-20 bg-background">
-      {/* Background décoratif subtil - sans teinte colorée */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
-        {/* Suppression des orbes colorées pour éviter le filtre */}
-      </div>
-
       <div className="container relative z-10">
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-          className="text-center space-y-10 max-w-5xl mx-auto"
-        >
+        <div className="text-center space-y-10 max-w-5xl mx-auto animate-in fade-in duration-500">
           {/* Badge contextuel - pas de jargon tech */}
-          <motion.div variants={itemVariants}>
+          <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-100">
             <Badge
               variant="secondary"
               className="px-5 py-2.5 text-sm font-medium bg-gradient-to-r from-primary/10 to-blue-500/10 border-primary/20 backdrop-blur-sm"
@@ -80,10 +35,10 @@ const EnrichedHeroSection: React.FC = () => {
               <Heart className="h-3.5 w-3.5 mr-2 text-primary" />
               Si tu es ici, ce n'est probablement pas par curiosité.
             </Badge>
-          </motion.div>
+          </div>
 
           {/* Headline interventionnelle - positionnement santé */}
-          <motion.div variants={itemVariants} className="space-y-6">
+          <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-200">
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold leading-[1.1] tracking-tight px-2 sm:px-0">
               <span className="text-foreground">
                 Prendre soin de celles et ceux
@@ -93,28 +48,24 @@ const EnrichedHeroSection: React.FC = () => {
                 qui prennent soin.
               </span>
             </h1>
-          </motion.div>
+          </div>
 
           {/* Sous-titre - urgence avant explication */}
-          <motion.p
-            variants={itemVariants}
-            className="text-base sm:text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed font-light px-4 sm:px-0"
-          >
+          <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed font-light px-4 sm:px-0 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-300">
             Une plateforme de régulation émotionnelle dédiée{' '}
             <strong className="text-foreground font-medium">aux étudiants en santé et aux soignants.</strong>
-          </motion.p>
+          </p>
 
           {/* CTAs émotionnels - action avant compréhension */}
-          <motion.div
-            variants={itemVariants}
-            className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4"
-          >
-            {/* CTA Principal - Essai gratuit vers /b2c (testé par E2E) */}
-            <motion.div
-              variants={pulseVariants}
-              animate="animate"
-              onHoverStart={() => setIsHovered(true)}
-              onHoverEnd={() => setIsHovered(false)}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-400">
+            {/* CTA Principal - Essai gratuit vers /b2c */}
+            <div
+              className={cn(
+                "transition-transform duration-300",
+                isHovered ? "scale-105" : "animate-pulse-slow"
+              )}
+              onMouseEnter={() => setIsHovered(true)}
+              onMouseLeave={() => setIsHovered(false)}
             >
               <Link to="/b2c">
                 <Button
@@ -124,16 +75,17 @@ const EnrichedHeroSection: React.FC = () => {
                   <Heart className="h-5 w-5 mr-3" aria-hidden="true" />
                   <span>Essai gratuit 30 jours</span>
                   
-                  {/* Effet de brillance au hover */}
-                  <motion.div
-                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                    initial={{ x: '-100%' }}
-                    animate={isHovered ? { x: '100%' } : { x: '-100%' }}
-                    transition={{ duration: 0.6 }}
+                  {/* Effet de brillance au hover - CSS only */}
+                  <span 
+                    className={cn(
+                      "absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent",
+                      "transition-transform duration-600",
+                      isHovered ? "translate-x-full" : "-translate-x-full"
+                    )}
                   />
                 </Button>
               </Link>
-            </motion.div>
+            </div>
 
             {/* CTA secondaire - action immédiate */}
             <Button
@@ -145,13 +97,10 @@ const EnrichedHeroSection: React.FC = () => {
               <Clock className="h-4 w-4 mr-2 group-hover:text-primary transition-colors" aria-hidden="true" />
               <span>Commencer maintenant</span>
             </Button>
-          </motion.div>
+          </div>
 
           {/* Indicateurs de confiance - réassurance santé */}
-          <motion.div
-            variants={itemVariants}
-            className="flex flex-col sm:flex-row gap-4 sm:gap-8 justify-center items-center text-sm text-muted-foreground pt-8 sm:pt-10"
-          >
+          <div className="flex flex-col sm:flex-row gap-4 sm:gap-8 justify-center items-center text-sm text-muted-foreground pt-8 sm:pt-10 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-500">
             <div className="flex items-center space-x-2">
               <div className="h-9 w-9 bg-primary/15 rounded-full flex items-center justify-center">
                 <GraduationCap className="h-4 w-4 text-primary" aria-hidden="true" />
@@ -170,19 +119,14 @@ const EnrichedHeroSection: React.FC = () => {
               </div>
               <span>100% confidentiel</span>
             </div>
-          </motion.div>
+          </div>
 
           {/* Cartes de sessions - protocoles, pas playlists */}
-          <motion.div
-            variants={itemVariants}
-            className="pt-8 sm:pt-14 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-5 max-w-4xl mx-auto px-2 sm:px-0"
-          >
+          <div className="pt-8 sm:pt-14 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-5 max-w-4xl mx-auto px-2 sm:px-0 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-600">
             {/* Session STOP */}
-            <motion.button
+            <button
               onClick={() => navigate('/app/scan?mode=stop')}
-              whileHover={{ scale: 1.03, y: -5 }}
-              whileTap={{ scale: 0.98 }}
-              className="text-left bg-gradient-to-br from-red-500/10 to-red-500/5 backdrop-blur-sm rounded-2xl p-6 border border-red-500/20 hover:border-red-500/40 transition-all group cursor-pointer"
+              className="text-left bg-gradient-to-br from-red-500/10 to-red-500/5 backdrop-blur-sm rounded-2xl p-6 border border-red-500/20 hover:border-red-500/40 transition-all duration-300 hover:scale-[1.03] hover:-translate-y-1 active:scale-[0.98] cursor-pointer"
             >
               <div className="flex items-center gap-3 mb-3">
                 <div className="h-10 w-10 rounded-full bg-red-500/20 flex items-center justify-center">
@@ -196,14 +140,12 @@ const EnrichedHeroSection: React.FC = () => {
               <p className="text-sm text-muted-foreground">
                 Interrompre une montée anxieuse en cours
               </p>
-            </motion.button>
+            </button>
 
             {/* Session Arrêt mental */}
-            <motion.button
+            <button
               onClick={() => navigate('/app/scan?mode=mental-stop')}
-              whileHover={{ scale: 1.03, y: -5 }}
-              whileTap={{ scale: 0.98 }}
-              className="text-left bg-gradient-to-br from-indigo-500/10 to-indigo-500/5 backdrop-blur-sm rounded-2xl p-6 border border-indigo-500/20 hover:border-indigo-500/40 transition-all group cursor-pointer"
+              className="text-left bg-gradient-to-br from-indigo-500/10 to-indigo-500/5 backdrop-blur-sm rounded-2xl p-6 border border-indigo-500/20 hover:border-indigo-500/40 transition-all duration-300 hover:scale-[1.03] hover:-translate-y-1 active:scale-[0.98] cursor-pointer"
             >
               <div className="flex items-center gap-3 mb-3">
                 <div className="h-10 w-10 rounded-full bg-indigo-500/20 flex items-center justify-center">
@@ -217,14 +159,12 @@ const EnrichedHeroSection: React.FC = () => {
               <p className="text-sm text-muted-foreground">
                 Quand le corps est épuisé mais que le cerveau refuse
               </p>
-            </motion.button>
+            </button>
 
             {/* Session Reset */}
-            <motion.button
+            <button
               onClick={() => navigate('/app/scan?mode=reset')}
-              whileHover={{ scale: 1.03, y: -5 }}
-              whileTap={{ scale: 0.98 }}
-              className="text-left bg-gradient-to-br from-amber-500/10 to-amber-500/5 backdrop-blur-sm rounded-2xl p-6 border border-amber-500/20 hover:border-amber-500/40 transition-all group cursor-pointer"
+              className="text-left bg-gradient-to-br from-amber-500/10 to-amber-500/5 backdrop-blur-sm rounded-2xl p-6 border border-amber-500/20 hover:border-amber-500/40 transition-all duration-300 hover:scale-[1.03] hover:-translate-y-1 active:scale-[0.98] cursor-pointer"
             >
               <div className="flex items-center gap-3 mb-3">
                 <div className="h-10 w-10 rounded-full bg-amber-500/20 flex items-center justify-center">
@@ -238,12 +178,12 @@ const EnrichedHeroSection: React.FC = () => {
               <p className="text-sm text-muted-foreground">
                 Quand tu dois continuer sans t'effondrer
               </p>
-            </motion.button>
-          </motion.div>
-        </motion.div>
+            </button>
+          </div>
+        </div>
       </div>
     </section>
   );
 };
 
-export default EnrichedHeroSection;
+export default memo(EnrichedHeroSection);
