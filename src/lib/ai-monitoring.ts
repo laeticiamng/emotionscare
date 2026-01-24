@@ -69,8 +69,8 @@ class AIMonitoring {
       type: 'custom',
       severity,
       message,
-      url: window.location.href,
-      userAgent: navigator.userAgent,
+      url: typeof window !== 'undefined' ? window.location.href : 'server',
+      userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'server',
       timestamp: new Date().toISOString(),
       context,
     };

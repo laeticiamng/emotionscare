@@ -191,7 +191,8 @@ describe('achievementsService', () => {
         rarity: 'rare',
         conditions: [{ type: 'test', value: 5, operator: 'gte' }],
         rewards: { xp: 200 },
-      };
+        is_hidden: false,
+      } as any;
 
       const result = await achievementsService.createAchievement(newAchievement);
 
@@ -387,7 +388,7 @@ describe('achievementsService', () => {
       const conditions = [
         { type: 'sessions_completed', value: 10, operator: 'gte' },
         { type: 'xp_earned', value: 500, operator: 'gte' },
-      ];
+      ] as any;
 
       const result = achievementsService.getTargetValue(conditions);
 

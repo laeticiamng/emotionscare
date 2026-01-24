@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Tests complets pour GroupSessionService
  * Couvre toutes les opérations CRUD, participants, messages et statistiques
