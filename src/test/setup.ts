@@ -22,8 +22,18 @@ const createDefaultTable = () => {
     select: vi.fn(() => table),
     eq: vi.fn(() => table),
     is: vi.fn(() => table),
+    not: vi.fn(() => table), // Added for .not() queries
+    in: vi.fn(() => table),
+    neq: vi.fn(() => table),
+    gt: vi.fn(() => table),
+    gte: vi.fn(() => table),
+    lt: vi.fn(() => table),
+    lte: vi.fn(() => table),
+    like: vi.fn(() => table),
+    ilike: vi.fn(() => table),
     order: vi.fn(() => table),
     limit: vi.fn(() => table),
+    range: vi.fn(() => table),
     single: vi.fn(() => Promise.resolve({ data: {}, error: null })),
     maybeSingle: vi.fn(() => Promise.resolve({ data: null, error: null })),
     then: (onFulfilled: any, onRejected?: any) => defaultResult.then(onFulfilled, onRejected),
@@ -39,6 +49,11 @@ const createDefaultTable = () => {
         select: vi.fn(() => ({
           single: vi.fn(() => Promise.resolve({ data: {}, error: null }))
         }))
+      }))
+    })),
+    upsert: vi.fn(() => ({
+      select: vi.fn(() => ({
+        single: vi.fn(() => Promise.resolve({ data: {}, error: null }))
       }))
     })),
     delete: vi.fn(() => ({
@@ -113,3 +128,45 @@ global.ResizeObserver = class ResizeObserver {
   observe() {}
   unobserve() {}
 } as any;
+
+// Mock URL.createObjectURL and revokeObjectURL
+global.URL.createObjectURL = vi.fn(() => 'blob:test-url');
+global.URL.revokeObjectURL = vi.fn();
+
+// Mock Audio
+global.Audio = class Audio {
+  src = '';
+  onloadedmetadata: (() => void) | null = null;
+  onerror: (() => void) | null = null;
+  duration = 0;
+  constructor(src?: string) {
+    if (src) this.src = src;
+    // Auto-trigger loadedmetadata after a tick
+    setTimeout(() => {
+      if (this.onloadedmetadata) this.onloadedmetadata();
+    }, 0);
+  }
+  play() { return Promise.resolve(); }
+  pause() {}
+  load() {}
+} as any;
+
+// Mock AuthContext
+vi.mock('@/contexts/AuthContext', () => ({
+  useAuth: () => ({
+    user: { id: 'test-user', email: 'test@example.com' },
+    session: { access_token: 'test-token' },
+    isLoading: false,
+    isAuthenticated: true,
+    isTestMode: true,
+    signIn: vi.fn(),
+    signOut: vi.fn(),
+    signUp: vi.fn(),
+    resetPassword: vi.fn(),
+    register: vi.fn(),
+    updateUser: vi.fn(),
+    refreshSession: vi.fn(),
+    logout: vi.fn(),
+  }),
+  AuthProvider: ({ children }: any) => children,
+}));

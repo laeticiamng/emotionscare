@@ -6,46 +6,48 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { FlashLiteService } from '../flashLiteService';
 
 // Mock Supabase
-vi.mock('@/integrations/supabase/client', () => ({
-  supabase: {
-    from: vi.fn(() => ({
-      insert: vi.fn(() => ({
-        select: vi.fn(() => ({
-          single: vi.fn(() => Promise.resolve({ 
-            data: { 
-              id: 'test-session-id',
-              user_id: 'test-user-id',
-              mode: 'quick',
-              cards_total: 10,
-              cards_completed: 0,
-              cards_correct: 0,
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-              started_at: new Date().toISOString()
-            }, 
-            error: null 
-          }))
-        }))
-      })),
+vi.mock('@/integrations/supabase/client', () => {
+  const mockTable = {
+    insert: vi.fn(() => ({
       select: vi.fn(() => ({
-        eq: vi.fn(() => ({
-          order: vi.fn(() => ({
-            limit: vi.fn(() => Promise.resolve({ data: [], error: null }))
-          })),
-          single: vi.fn(() => Promise.resolve({ data: null, error: null }))
-        })),
-        not: vi.fn(() => Promise.resolve({ data: [], error: null }))
-      })),
-      update: vi.fn(() => ({
-        eq: vi.fn(() => ({
-          select: vi.fn(() => ({
-            single: vi.fn(() => Promise.resolve({ data: {}, error: null }))
-          }))
+        single: vi.fn(() => Promise.resolve({ 
+          data: { 
+            id: 'test-session-id',
+            user_id: 'test-user-id',
+            mode: 'quick',
+            cards_total: 10,
+            cards_completed: 0,
+            cards_correct: 0,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            started_at: new Date().toISOString()
+          }, 
+          error: null 
         }))
       }))
-    }))
-  }
-}));
+    })),
+    select: vi.fn(() => mockTable),
+    eq: vi.fn(() => mockTable),
+    not: vi.fn(() => Promise.resolve({ data: [], error: null })),
+    order: vi.fn(() => mockTable),
+    limit: vi.fn(() => Promise.resolve({ data: [], error: null })),
+    single: vi.fn(() => Promise.resolve({ data: null, error: null })),
+    update: vi.fn(() => ({
+      eq: vi.fn(() => ({
+        select: vi.fn(() => ({
+          single: vi.fn(() => Promise.resolve({ data: {}, error: null }))
+        }))
+      }))
+    })),
+    then: (cb: any) => Promise.resolve({ data: [], error: null }).then(cb),
+  };
+  
+  return {
+    supabase: {
+      from: vi.fn(() => mockTable)
+    }
+  };
+});
 
 describe('FlashLiteService', () => {
   beforeEach(() => {
