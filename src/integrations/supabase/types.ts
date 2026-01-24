@@ -27931,17 +27931,19 @@ export type Database = {
         Args: { instrument_code: string; score: number }
         Returns: number
       }
-      calculate_item_completeness_score: {
-        Args: {
-          p_item_code: string
-          p_paroles_musicales: string[]
-          p_quiz_questions: Json
-          p_scene_immersive: Json
-          p_tableau_a: Json
-          p_tableau_b: Json
-        }
-        Returns: number
-      }
+      calculate_item_completeness_score:
+        | { Args: { item_id: string }; Returns: number }
+        | {
+            Args: {
+              p_item_code: string
+              p_paroles_musicales: string[]
+              p_quiz_questions: Json
+              p_scene_immersive: Json
+              p_tableau_a: Json
+              p_tableau_b: Json
+            }
+            Returns: number
+          }
       calculate_next_audit_run: {
         Args: {
           p_day_of_month: number

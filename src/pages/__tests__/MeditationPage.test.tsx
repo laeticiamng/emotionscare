@@ -93,6 +93,11 @@ describe('MeditationPage', () => {
     reducedAnimations: false,
     weeklyGoalMinutes: 60,
     volume: 50,
+    defaultTechnique: 'mindfulness' as const,
+    defaultDuration: 10,
+    ambientSound: 'ocean' as const,
+    reminderEnabled: false,
+    reminderTime: '08:00',
   };
 
   beforeEach(() => {
@@ -100,20 +105,22 @@ describe('MeditationPage', () => {
       data: defaultStats,
       isLoading: false,
       refetch: vi.fn(),
-    } as ReturnType<typeof useMeditationStats>);
+    } as unknown as ReturnType<typeof useMeditationStats>);
     vi.mocked(useMeditationHistory).mockReturnValue({
       data: [],
       isLoading: false,
-    } as ReturnType<typeof useMeditationHistory>);
+    } as unknown as ReturnType<typeof useMeditationHistory>);
     vi.mocked(useMeditationWeeklyProgress).mockReturnValue({
       data: [
         { day: 'Lun', minutes: 10 },
         { day: 'Mar', minutes: 0 },
       ],
-    } as ReturnType<typeof useMeditationWeeklyProgress>);
+    } as unknown as ReturnType<typeof useMeditationWeeklyProgress>);
     vi.mocked(useMeditationSettings).mockReturnValue({
       settings: defaultSettings,
+      isLoaded: true,
       saveSettings: vi.fn(),
+      resetSettings: vi.fn(),
     });
 
     mockInsert.mockReturnValue({
